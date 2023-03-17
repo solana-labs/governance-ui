@@ -1,10 +1,10 @@
+import { useEffect, useState } from 'react'
+import { PublicKey } from '@solana/web3.js'
+import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
+import { findMetadataPda } from '@metaplex-foundation/js'
 import { getTreasuryAccountItemInfoV2 } from '@utils/treasuryTools'
 import { AssetAccount } from '@utils/uiTypes/assets'
-import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
-import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
-import { findMetadataPda } from '@metaplex-foundation/js'
-import { PublicKey } from '@solana/web3.js'
 
 const AccountItem = ({
   governedAccountTokenAccount,
@@ -28,34 +28,54 @@ const AccountItem = ({
   const connection = useWalletStore((s) => s.connection)
 
   useEffect(() => {
-    const getTokenMetadata = async (mintAddress: string) => {
+    const tryAndLoadLogoAndSymbolFromTokenMetadata = async (
+      mintAddress: PublicKey
+    ) => {
       try {
-        const mintPubkey = new PublicKey(mintAddress)
-        const metadataAccount = findMetadataPda(mintPubkey)
+        const metadataAccount = findMetadataPda(mintAddress)
+
         const accountData = await connection.current.getAccountInfo(
           metadataAccount
         )
 
-        const state = Metadata.deserialize(accountData!.data)
-        const jsonUri = state[0].data.uri.slice(
-          0,
-          state[0].data.uri.indexOf('\x00')
-        )
+        if (!accountData) {
+          throw new Error(
+            `Cannot find metaplex token metadata for mint ${mintAddress.toBase58()} at pda ${metadataAccount.toBase58()}`
+          )
+        }
 
-        const data = await (await fetch(jsonUri)).json()
+        const [
+          {
+            data: { uri },
+          },
+        ] = Metadata.deserialize(accountData.data)
+
+        const jsonUri = uri.slice(0, uri.indexOf('\x00'))
+
+        const data: {
+          // Token Metadata Standard (Version 1.0) doesn't include image attribute, v2 does
+          image?: string
+          symbol: string
+        } = await (await fetch(jsonUri)).json()
 
         setLogoFromMeta(data.image)
         setSymbolFromMeta(data.symbol)
       } catch (e) {
-        console.log(e)
+        console.warn(e.message)
       }
     }
-    if (!logo) {
-      getTokenMetadata(
-        governedAccountTokenAccount.extensions.mint?.publicKey.toBase58() ?? ''
+
+    if (
+      !logo &&
+      typeof governedAccountTokenAccount.extensions.mint?.publicKey !==
+        'undefined'
+    ) {
+      tryAndLoadLogoAndSymbolFromTokenMetadata(
+        governedAccountTokenAccount.extensions.mint.publicKey
       )
     }
-  })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+  }, [governedAccountTokenAccount.extensions.mint?.publicKey.toBase58()])
 
   return (
     <div className="flex items-center w-full p-3 border rounded-lg text-fgd-1 border-fgd-4">

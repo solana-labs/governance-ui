@@ -1,8 +1,9 @@
-import Button from '@components/Button'
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
+import { SecondaryButton } from '@components/Button'
 import Loading from '@components/Loading'
 import useRealm from '@hooks/useRealm'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { RpcContext } from '@solana/spl-governance'
 import { notify } from '@utils/notifications'
 import { useState } from 'react'
@@ -11,7 +12,7 @@ import { voteRegistryDepositWithoutLockup } from 'VoteStakeRegistry/actions/vote
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 
-const DepositCommunityTokensBtn = ({ className = '' }) => {
+const DepositCommunityTokensBtn = ({ className = '', inAccountDetails }) => {
   const { getOwnedDeposits } = useDepositStore()
   const { realm, realmInfo, realmTokenAccount, tokenRecords } = useRealm()
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
@@ -48,6 +49,7 @@ const DepositCommunityTokensBtn = ({ className = '' }) => {
         mintPk: realm.account.communityMint!,
         realmPk: realm.pubkey,
         programId: realm.owner,
+        programVersion: realmInfo?.programVersion!,
         amount: realmTokenAccount!.account.amount,
         tokenOwnerRecordPk,
         client: client,
@@ -78,16 +80,25 @@ const DepositCommunityTokensBtn = ({ className = '' }) => {
     ? "You don't have any governance tokens in your wallet to deposit."
     : ''
 
-  return (
-    <Button
+  return hasTokensInWallet && !inAccountDetails ? (
+    <SecondaryButton
       tooltipMessage={depositTooltipContent}
       className={`sm:w-1/2 ${className}`}
       disabled={!connected || !hasTokensInWallet || isLoading}
       onClick={depositAllTokens}
     >
       {isLoading ? <Loading></Loading> : 'Deposit'}
-    </Button>
-  )
+    </SecondaryButton>
+  ) : inAccountDetails ? (
+    <SecondaryButton
+      tooltipMessage={depositTooltipContent}
+      className={`sm:w-1/2 ${className}`}
+      disabled={!connected || !hasTokensInWallet || isLoading}
+      onClick={depositAllTokens}
+    >
+      {isLoading ? <Loading></Loading> : 'Deposit'}
+    </SecondaryButton>
+  ) : null
 }
 
 export default DepositCommunityTokensBtn

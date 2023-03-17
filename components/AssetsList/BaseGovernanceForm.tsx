@@ -4,7 +4,7 @@ import AmountSlider from '@components/Slider'
 import Switch from '@components/Switch'
 import useRealm from '@hooks/useRealm'
 import { VoteTipping } from '@solana/spl-governance'
-import { MAX_TOKENS_TO_DISABLE } from '@tools/constants'
+import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import {
   fmtPercentage,
   getMintMinAmountAsDecimal,
@@ -15,8 +15,11 @@ import {
 } from '@tools/sdk/units'
 import BigNumber from 'bignumber.js'
 import React, { useEffect, useState } from 'react'
+import { BaseGovernanceFormFieldsV3 } from './BaseGovernanceForm-data'
+import { BaseGovernanceFormV3 } from './BaseGovernanceFormV3'
 
-export interface BaseGovernanceFormFields {
+export interface BaseGovernanceFormFieldsV2 {
+  _programVersion: 2
   minCommunityTokensToCreateProposal: number | string
   minInstructionHoldUpTime: number
   maxVotingTime: number
@@ -24,13 +27,23 @@ export interface BaseGovernanceFormFields {
   voteTipping: VoteTipping
 }
 
-const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
+const BaseGovernanceFormV2 = ({
+  formErrors,
+  form,
+  setForm,
+  setFormErrors,
+}: {
+  formErrors: any
+  setForm: any
+  setFormErrors: any
+  form: BaseGovernanceFormFieldsV2
+}) => {
   const { realmInfo, mint: realmMint } = useRealm()
   const [minTokensPercentage, setMinTokensPercentage] = useState<
     number | undefined
   >()
   const isMaxMinCommunityNumber =
-    form.minCommunityTokensToCreateProposal === MAX_TOKENS_TO_DISABLE.toString()
+    form.minCommunityTokensToCreateProposal === DISABLED_VOTER_WEIGHT.toString()
   const [showMinCommunity, setMinCommunity] = useState(!isMaxMinCommunityNumber)
 
   const handleSetForm = ({ propertyName, value }) => {
@@ -46,8 +59,8 @@ const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
 
     handleSetForm({
       value:
-        e.target.value === MAX_TOKENS_TO_DISABLE.toString()
-          ? MAX_TOKENS_TO_DISABLE.toString()
+        e.target.value === DISABLED_VOTER_WEIGHT.toString()
+          ? DISABLED_VOTER_WEIGHT.toString()
           : parseFloat(
               Math.max(
                 Number(min),
@@ -99,6 +112,7 @@ const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
 
   useEffect(() => {
     onMinTokensChange(form.minCommunityTokensToCreateProposal)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.minCommunityTokensToCreateProposal, realmInfo?.symbol])
 
   return (
@@ -117,7 +131,7 @@ const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
                 })
               } else {
                 handleSetForm({
-                  value: MAX_TOKENS_TO_DISABLE.toString(),
+                  value: DISABLED_VOTER_WEIGHT.toString(),
                   propertyName: 'minCommunityTokensToCreateProposal',
                 })
               }
@@ -225,6 +239,21 @@ const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
           ))}
       </Select>
     </>
+  )
+}
+const BaseGovernanceForm = ({
+  form,
+  ...props
+}: {
+  formErrors: any
+  setForm: any
+  setFormErrors: any
+  form: BaseGovernanceFormFieldsV3 | BaseGovernanceFormFieldsV2
+}) => {
+  return form._programVersion === 3 ? (
+    <BaseGovernanceFormV3 form={form} {...props} />
+  ) : (
+    <BaseGovernanceFormV2 form={form} {...props} />
   )
 }
 

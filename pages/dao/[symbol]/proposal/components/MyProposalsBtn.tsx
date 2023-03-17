@@ -2,11 +2,14 @@ import useRealm from '@hooks/useRealm'
 import React, { useEffect, useMemo, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import {
+  getProposalDepositsByDepositPayer,
   ProgramAccount,
   Proposal,
+  ProposalDeposit,
   ProposalState,
   withCancelProposal,
   withFinalizeVote,
+  withRefundProposalDeposit,
   withRelinquishVote,
 } from '@solana/spl-governance'
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
@@ -24,10 +27,11 @@ import { chunks } from '@utils/helpers'
 import { sendSignedTransaction } from '@utils/send'
 import { getRegistrarPDA, getVoterWeightRecord } from '@utils/plugin/accounts'
 import {
-  sendTransactionsV2,
+  sendTransactionsV3,
   SequenceType,
-  transactionInstructionsToTypedInstructionsSets,
+  txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
+import useQueryContext from '@hooks/useQueryContext'
 
 const MyProposalsBn = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
@@ -43,11 +47,17 @@ const MyProposalsBn = () => {
   const ownNftVoteRecordsFilterd = ownNftVoteRecords
   const maxVoterWeight =
     useNftPluginStore((s) => s.state.maxVoteRecord)?.pubkey || undefined
-  const { realm, programId } = useWalletStore((s) => s.selectedRealm)
+  const { realm, programId, programVersion } = useWalletStore(
+    (s) => s.selectedRealm
+  )
   const { refetchProposals } = useWalletStore((s) => s.actions)
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
+  const [
+    proposalsWithDepositedTokens,
+    setProposalsWithDepositedTokens,
+  ] = useState<ProgramAccount<ProposalDeposit>[]>([])
   const {
     proposals,
     ownTokenRecord,
@@ -66,6 +76,7 @@ const MyProposalsBn = () => {
                 ownCouncilTokenRecord?.pubkey.toBase58()
           )
         : [],
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     [proposals, ownVoteRecordsByProposal, connected]
   )
   const drafts = myProposals.filter((x) => {
@@ -99,6 +110,7 @@ const MyProposalsBn = () => {
         x.account.state === ProposalState.Succeeded ||
         x.account.state === ProposalState.ExecutingWithErrors ||
         x.account.state === ProposalState.Defeated ||
+        x.account.state === ProposalState.Vetoed ||
         x.account.state === ProposalState.Cancelled) &&
       ownVoteRecordsByProposal[x.pubkey.toBase58()] &&
       !ownVoteRecordsByProposal[x.pubkey.toBase58()]?.account.isRelinquished
@@ -151,7 +163,7 @@ const MyProposalsBn = () => {
       await refetchProposals()
     } catch (e) {
       console.log(e)
-      notify({ type: 'error', message: 'Something wnet wrong' })
+      notify({ type: 'error', message: `Something went wrong ${e}` })
     }
     setIsLoading(false)
   }
@@ -186,6 +198,8 @@ const MyProposalsBn = () => {
       const inst = await withRelinquishVote(
         instructions,
         realm!.owner,
+        realmInfo!.programVersion!,
+        realm!.pubkey,
         proposal.account.governance,
         proposal.pubkey,
         voterTokenRecord!.pubkey,
@@ -266,19 +280,20 @@ const MyProposalsBn = () => {
       instructions.push(relinquishNftVoteIx)
     }
     try {
-      const insertChunks = chunks(instructions, 10)
-      const signerChunks = Array(insertChunks.length).fill([])
-      await sendTransactionsV2({
+      const insertChunks = chunks(instructions, 5).map((txBatch, batchIdx) => {
+        return {
+          instructionsSet: txBatchesToInstructionSetWithSigners(
+            txBatch,
+            [],
+            batchIdx
+          ),
+          sequenceType: SequenceType.Parallel,
+        }
+      })
+      await sendTransactionsV3({
         connection,
-        showUiComponent: true,
         wallet: wallet!,
-        signersSet: [...signerChunks],
-        TransactionInstructions: insertChunks.map((x) =>
-          transactionInstructionsToTypedInstructionsSets(
-            x,
-            SequenceType.Parallel
-          )
-        ),
+        transactionInstructions: insertChunks,
       })
       setIsLoading(false)
       getNftsVoteRecord()
@@ -299,14 +314,74 @@ const MyProposalsBn = () => {
     ])
 
     const nftVoteRecordsFiltered = nftVoteRecords.filter(
-      (x) => proposals[x.account.proposal.toBase58()]
+      (x) =>
+        proposals[x.account.proposal.toBase58()] &&
+        proposals[
+          x.account.proposal.toBase58()
+        ].account.governingTokenMint.toBase58() ===
+          realm?.account.communityMint.toBase58()
     )
     setOwnNftVoteRecords(nftVoteRecordsFiltered)
   }
+  const releaseSol = async () => {
+    const instructions: TransactionInstruction[] = []
+    for (const proposalDeposit of proposalsWithDepositedTokens) {
+      await withRefundProposalDeposit(
+        instructions,
+        programId!,
+        programVersion,
+        proposalDeposit.account.proposal,
+        proposalDeposit.account.depositPayer
+      )
+    }
+    await sendTransactionsV3({
+      connection,
+      wallet: wallet!,
+      transactionInstructions: instructions.map((x, idx) => ({
+        instructionsSet: txBatchesToInstructionSetWithSigners([x], [], idx),
+        sequenceType: SequenceType.Parallel,
+      })),
+    })
+    getSolDeposits()
+  }
+  const getSolDeposits = async () => {
+    const solDeposits = await getProposalDepositsByDepositPayer(
+      connection,
+      realm!.owner,
+      wallet!.publicKey!
+    )
+    const filterdSolDeposits = solDeposits.filter((x) => {
+      const proposalState =
+        proposals[x.account.proposal.toBase58()].account.state
+      return (
+        proposalState !== ProposalState.Draft &&
+        proposalState !== ProposalState.Voting &&
+        proposalState !== ProposalState.SigningOff
+      )
+    })
+    setProposalsWithDepositedTokens(filterdSolDeposits)
+  }
+  useEffect(() => {
+    if (
+      wallet?.publicKey &&
+      modalIsOpen &&
+      realmInfo!.programVersion &&
+      realmInfo!.programVersion > 2 &&
+      Object.keys(proposals).length
+    ) {
+      getSolDeposits()
+    }
+  }, [
+    wallet?.publicKey?.toBase58(),
+    modalIsOpen,
+    realmInfo?.programVersion,
+    Object.keys(proposals).length,
+  ])
   useEffect(() => {
     if (wallet?.publicKey && isNftMode && client.client && modalIsOpen) {
       getNftsVoteRecord()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [client.clientType, isNftMode, wallet?.publicKey?.toBase58(), modalIsOpen])
 
   return (
@@ -326,6 +401,16 @@ const MyProposalsBn = () => {
             <h3 className="mb-4 flex flex-col">
               Your proposals {isLoading && <Loading w="50px"></Loading>}
             </h3>
+            {proposalsWithDepositedTokens.length !== 0 && (
+              <div>
+                <div className="mb-4">
+                  You have some sol to be released from proposals deposits
+                </div>
+                <Button className="mb-4" onClick={releaseSol}>
+                  Release sol
+                </Button>
+              </div>
+            )}
             <ProposalList
               title="Drafts"
               fcn={cleanDrafts}
@@ -399,6 +484,8 @@ const ProposalList = ({
   proposals: ProgramAccount<Proposal>[]
   isLoading: boolean
 }) => {
+  const { fmtUrlWithCluster } = useQueryContext()
+  const { symbol } = useRealm()
   return (
     <>
       {' '}
@@ -432,7 +519,16 @@ const ProposalList = ({
             className="text-xs border-fgd-4 border px-3 py-2 mb-3 rounded-lg"
             key={x.pubkey.toBase58()}
           >
-            {x.account.name}
+            <a
+              className="underline cursor-pointer"
+              href={fmtUrlWithCluster(
+                `/dao/${symbol}/proposal/${x.pubkey.toBase58()}`
+              )}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {x.account.name}
+            </a>
           </div>
         ))}
       </div>

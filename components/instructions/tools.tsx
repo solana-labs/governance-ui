@@ -5,12 +5,16 @@ import {
   // Account,
   // Transaction,
 } from '@solana/web3.js'
-import { AccountMetaData, InstructionData } from '@solana/spl-governance'
+import {
+  AccountMetaData,
+  InstructionData,
+  ProgramAccount,
+  Realm,
+} from '@solana/spl-governance'
 
 import { BPF_UPGRADEABLE_LOADER_INSTRUCTIONS } from './programs/bpfUpgradeableLoader'
 import { GOVERNANCE_INSTRUCTIONS } from './programs/governance'
-import { MANGO_INSTRUCTIONS } from './programs/mango'
-import { getProgramName, isGovernanceProgram } from './programs/names'
+import { getProgramName } from './programs/names'
 import { RAYDIUM_INSTRUCTIONS } from './programs/raydium'
 import { SPL_TOKEN_INSTRUCTIONS } from './programs/splToken'
 import { SYSTEM_INSTRUCTIONS } from './programs/system'
@@ -24,19 +28,24 @@ import { ConnectionContext } from '@utils/connection'
 import { NFT_VOTER_INSTRUCTIONS } from './programs/nftVotingClient'
 import { PROGRAM_IDS } from '@castlefinance/vault-sdk'
 import { FORESIGHT_INSTRUCTIONS } from './programs/foresight'
-import { SAGA_PHONE } from './programs/SagaPhone'
 import { LIDO_INSTRUCTIONS } from './programs/lido'
-/**
- * Default governance program id instance
- */
-export const DEFAULT_GOVERNANCE_PROGRAM_ID =
+import { NAME_SERVICE_INSTRUCTIONS } from './programs/nameService'
+import { TOKEN_AUCTION_INSTRUCTIONS } from './programs/tokenAuction'
+import { VALIDATORDAO_INSTRUCTIONS } from './programs/validatordao'
+import { POSEIDON_INSTRUCTIONS } from './programs/poseidon'
+import { MANGO_V4_INSTRUCTIONS } from './programs/mangoV4'
+
+export const V3_DEFAULT_GOVERNANCE_PROGRAM_ID =
+  '7e75Nwsz8i5i4NiDa43CNzKJ4AeQGyRimha46VKTM1Ls'
+
+export const V2_DEFAULT_GOVERNANCE_PROGRAM_ID =
   'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'
 
 /**
- * Default TEST governance program id instance
+ * Default governance program id instance
  */
-export const DEFAULT_TEST_GOVERNANCE_PROGRAM_ID =
-  'GTesTBiEWE32WHXXE2S4XbZvA5CrEc4xs6ZgRe895dP'
+export const DEFAULT_GOVERNANCE_PROGRAM_ID = V2_DEFAULT_GOVERNANCE_PROGRAM_ID
+export const DEFAULT_GOVERNANCE_PROGRAM_VERSION = 2
 
 export const MANGO_DAO_TREASURY = '9RGoboEjmaAjSCXsKi6p6zJucnwF3Eg5NUN9jPS6ziL3'
 
@@ -45,16 +54,21 @@ export const ACCOUNT_NAMES = {
   AQeo6r6jdwnmf48AMejgoKdUGtV8qzbVJH42Gb5sWdi: 'Deprecated: Mango IDO program',
   '9pDEi3yT9ooT1uw1PApQDYK65advJs4Nt65EJG1m59Yq':
     'Mango Developer Council Mint',
-
   Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z: 'Mango DAO MNGO Treasury Vault',
-  '7zGXUAeUkY9pEGfApsY26amibvqsf2dmty1cbtxHdfaQ':
-    'Mango DAO SOL Treasury Vault Governance',
-  '5tgfd6XgwiXB9otEnzFpXK11m7Q7yZUaAJzWK4oT5UGF':
-    'Mango DAO SOL Treasury Vault',
+  '7zGXUAeUkY9pEGfApsY26amibvqsf2dmty1cbtxHdfaQ': 'Mango DAO Wallet Governance',
+  '7D6tGmaMyC8i73Q8X2Fec2S1Zb5rkyai6pctdMqHpHWT':
+    'Mango DAO Fast Listing Governance',
+  Fmt4596j4uBvYutwQ2ZBw7RGw9EngR8yNijdqemnpiaB: 'Mango DAO Fast Listing Wallet',
+  '5tgfd6XgwiXB9otEnzFpXK11m7Q7yZUaAJzWK4oT5UGF': 'Mango DAO Wallet',
   '9RGoboEjmaAjSCXsKi6p6zJucnwF3Eg5NUN9jPS6ziL3': 'Mango DAO MNGO Treasury',
+  '3r1tQ2qaR5teYPEyGoHwZeZfMU1zxD5FAAmtAJPbj9xX':
+    'Mango DAO Opinion Voting Governance',
+  '36LbigK7RRiw12u7rb83Ztb9SFrUFUCDfYPxtfZndtyV':
+    'Mango DAO Opinion Voting Wallet',
+  '65u1A86RC2U6whcHeD2mRG1tXCSmH2GsiktmEFQmzZgq': 'Mango DAO USDC Governance',
   '4PdEyhrV3gaUj4ffwjKGXBLo42jF2CQCCBoXenwCRWXf':
     'Mango DAO USDC Treasury Vault',
-  '65u1A86RC2U6whcHeD2mRG1tXCSmH2GsiktmEFQmzZgq': 'Mango DAO USDC Treasury',
+  '6h29sTzK4XsL4Gjo8uXLWXgKLNSXvnnax45RJ4NSCziP': 'Mango DAO USDC Treasury',
   '4WQSYg21RrJNYhF4251XFpoy1uYbMHcMfZNLMXA3x5Mp':
     'Mango DAO Voter Stake Registry Registrar',
   DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE: 'Mango DAO Governance Realm',
@@ -143,10 +157,50 @@ export const ACCOUNT_NAMES = {
   '2fEL6au59KfmtarX5cJD4a6EaxRr6gLBvFkE65uEPJ4U': 'DAOJONES',
   FboFh3DkwmAeH4GyM5Ttd8ismd2wq6c8MrRkSsmr5nQW: 'LUNA',
   GnfeSuTwbXcxVnuXJTzx172174PJAHUfXpNgsBdGCncd: 'Solend Holdings',
+
+  // Jungle DeFi Community DAO
+  Ebuwy24prHRL3QEAT911wWD8aa493ikZeH7LfYzMQxS1: 'Incoming Protocol Fees/Assets',
+  '8jEtEwEYrFyNnHkvEC4xn2GeMKz5rpCtaxovdnD335xD': 'RAY Fee Wallet',
+  Gf6zQBC5nYs53KcuTsvPUx6i39eTDt5GoALuvJged6Wt: 'USDC Fee Wallet',
+  '2yCZaxgH1Y5P1aXRhe4XfKaL2roRzdDn5dJE67UgJx72': 'stSOL Fee Wallet',
+  Crq4ztCBzga78n1KusfiE2HsExGoPUGoHCgXkVSwwsrG: 'I-JFI-Q4/USDC POL',
+  '893e6nmHcgrf3wyxhKGMy8wGNBNLU9Eev7yVRapo7jcP': 'JFI/USDC POL',
+  '9BJQmMEke66pNEgwNB7M8s7WkMwLJFidUPujc1Xjdwjj': 'I-RAY-Q4/USDC POL',
+  '2dFDdEow6sX6jeJKdVoBfiPWjcMDUAYxCsHmk64JZGuy': 'JFI Fee Wallet',
+  '5HfKKTngUFzbdRJufnjZJnBpRsWqRj1jJgwouxgQituB': 'BTC Fee Wallet',
+  HEpRCwvshWL4zUo35SEPRxYy2ZCEACHLzdHbuv9Q9Gtg: 'USH Fee Wallet',
+  HEw5YMeF9ogZDSeRtz7btvE5BF9x53Pq9Cya83GZHR2D: 'mSOL Fee Wallet',
+  F9uzuZ46wMxxYZmg4baegfocoSWBX8YDNhqM5HrG6t87: 'USDH Fee Wallet',
+  '9uYzWw9rT9EMANe5yHKAsQfCKZP7Hjj46Pp1vmGz1K5s': 'USDT Fee Wallet',
+  gE8dBQZJze8zzCxb7iRiiHAvwv68t4vzBJsUMrWUPtx: 'ETH Fee Wallet',
+  CP8CMdBczN4GYjm3ygrVGhfU1HwnPxxcmWjPCkwihM74: 'Emission and Expense Reserves',
+  Hd65UxhS8sagMyQP3gU1E7N8xsTcQYM7Vpi2gZAMTDE7: 'JFI Reserves',
+  '4R1emrnFsWzgawRSN6QFKUTEGG5ZPmE2qDLXgZYMsCMv': 'USDC Reserves',
+  '3AtD8oiBUWttbnNCpKk1enRoquN9V88Nv6Rn7ESHPWHa':
+    'DAO Instance Authority Governance',
+  jdaoDN37BrVRvxuXSeyR7xE5Z9CAoQApexGrQJbnj6V: 'Jungle DeFi Governance Program',
+
+  //Serum DAO
+  '5xinfvkvL5NZ6BG3cDtFdTbVuMutqGXkDBuhncfmzPr2': 'Serum SRM Grant Treasury',
+
+  //Kaimana DAO
+
+  '3X9EEzWbpCzRmLxbTFoddux9faLxTMVFwjTSTXQ4W8ar': 'Kaiman dao community wallet',
+  '4Amtnu7TjDHYLyKMMvoCTDHW18a2dEMdS3sAoE96JwQz':
+    'Kaiman dao community wallet governance',
+  FXCgiZvkm9mAr6ZC9NnqNSeWZWZSmHDDZxCmzgaeShki: 'Kaiman dao council wallet',
+  yrtHtvgyPgWFrRDDMpBEva2f888kDrGnwHYEdM7fSFT:
+    'Kaiman dao council wallet governance',
+  '714JsESwkxjDZTaxD2TNe7vqMG52yxug8vaXug5VKBqd':
+    'Kaiman dao council mint governance',
+  '9rFYGii2nQz74qg5PTYViPj46E82PrJguEC2QvbZVuwk': 'Kaiman dao council mint',
 }
 
-// Blacklisted governances which should not be displayed in the UI
 // TODO: Add this to on-chain metadata to Governance account
+// Blacklisted governances which should not be displayed in the UI
+// Hidden accounts that are unusable due to wrong configuration e.g
+// 60% vote threshold on 5b token supply
+// hidden legacy accounts to declutter UI
 export const HIDDEN_GOVERNANCES = new Map<string, string>([
   ['HfWc8M6Df5wtLg8xg5vti4QKAo9KG4nL5gKQ8B2sjfYC', ''],
   ['A3Fb876sEiUmDWgrJ1fShASstw8b5wHB6XETzQa8VM7S', ''],
@@ -154,14 +208,26 @@ export const HIDDEN_GOVERNANCES = new Map<string, string>([
   ['56yqzBEr9BqDGjYPJz9G8LVQrbXsQM2t2Yq3Gk8S56d1', ''],
   ['4styeLGsBRpV4xKsCNMRPb94U7JN8ZXoXJTLZA5hdjo9', ''],
   ['CKWNNwtn5nbsGMkvtRwHDv4QTyoHMByKVd7Ypo2deNpc', ''],
+  ['G8JgCHfca7PehBwRp1Q91smJ9CXAd8K9e9CpfVjyD2MP', ''],
 ])
 
-// Blacklisted proposals which should not be displayed in the UI
 // TODO: Add this to on-chain metadata to Proposal account
+// Blacklisted proposals which should not be displayed in the UI
+// hidden legacy accounts to declutter UI
 export const HIDDEN_PROPOSALS = new Map<string, string>([
   ['E8XgiVpDJgDf4XgBKjZnMs3S1K7cmibtbDqjw5aNobCZ', ''],
   ['DrhhwYXaY4fvTBoQdNtgwEoTjuQswvDQLfVcgUXgP1Mx', ''],
   ['CfbCUF7cn6UdWRsGPUUtj4CKMBL7qNCdF1WunED4gYA4', ''],
+  ['Hzv3N2KtVikNoXz6nH9AWvt7Y9Smn8bRQ2gnAeJDkhm1', ''],
+  ['FeFaHN8c3yokUxyJw3F475uegMUoYsYtr4J2DMaS6JZh', ''],
+  ['GqoMraqhfK7ezFiKexRVkbYwvCegs9dgFpXn2f7aeePT', ''],
+  ['CZnFphcs2UmbqppTEP5PkAAF4DqeyFr7fPQ2bunCey2J', ''],
+  ['8ptWWXgb2nLVuMgJ1ZgXJfRaBesBDkyzYarJvWNLECbG', ''],
+  ['7P3dtUTSvcQcjtJpZHZKEzrGvvHQdQGJrtKFLNAYHvpv', ''],
+  ['EVzN1pfZwniGuyp45ZASHo6rU4Z8xx5kWevzDauR8sWp', ''],
+  ['7P3dtUTSvcQcjtJpZHZKEzrGvvHQdQGJrtKFLNAYHvpv', ''],
+  ['H5TnbSBNFKJJwKea8tUj7ETcmhRHXQ1N9XCXBSD6Q9P1', ''],
+  ['GeMQWvFTasBoui11RqRzMtDPQ9b2BkMK8NzepWzvuXw3', ''],
 ])
 
 export const DEFAULT_NATIVE_SOL_MINT =
@@ -170,8 +236,9 @@ export const DEFAULT_NATIVE_SOL_MINT =
 export const DEFAULT_NFT_TREASURY_MINT =
   'GNFTm5rz1Kzvq94G7DJkcrEUnCypeQYf7Ya8arPoHWvw'
 
-export function getAccountName(accountPk: PublicKey) {
-  return ACCOUNT_NAMES[accountPk.toBase58()] ?? getProgramName(accountPk)
+export function getAccountName(accountPk: PublicKey | string) {
+  const key = typeof accountPk === 'string' ? accountPk : accountPk.toBase58()
+  return ACCOUNT_NAMES[key] ?? getProgramName(accountPk)
 }
 
 export const CHAT_PROGRAM_ID = new PublicKey(
@@ -181,6 +248,8 @@ export const CHAT_PROGRAM_ID = new PublicKey(
 export const WSOL_MINT = 'So11111111111111111111111111111111111111112'
 export const WSOL_MINT_PK = new PublicKey(WSOL_MINT)
 
+//Hidden accounts that has some shit coins with 0 value inside but freeze authority
+//blocks closing them
 const HIDDEN_MNGO_TREASURES = [
   'GZQSF4Fh9xK7rf9WBEhawXYFw8qPXeatZLUqVQeuW3X8',
   'J6jYLFDWeeGwg4u2TXhKDCcH4fSzJFQyDE2VSv2drRkg',
@@ -244,7 +313,6 @@ export interface InstructionDescriptor {
 export const INSTRUCTION_DESCRIPTORS = {
   ...SPL_TOKEN_INSTRUCTIONS,
   ...BPF_UPGRADEABLE_LOADER_INSTRUCTIONS,
-  ...MANGO_INSTRUCTIONS,
   ...RAYDIUM_INSTRUCTIONS,
   ...MARINADE_INSTRUCTIONS,
   ...LIDO_INSTRUCTIONS,
@@ -255,15 +323,20 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...VOTE_STAKE_REGISTRY_INSTRUCTIONS,
   ...NFT_VOTER_INSTRUCTIONS,
   ...STREAMFLOW_INSTRUCTIONS,
-  ...SAGA_PHONE,
+  ...NAME_SERVICE_INSTRUCTIONS,
+  ...TOKEN_AUCTION_INSTRUCTIONS,
+  ...VALIDATORDAO_INSTRUCTIONS,
+  ...POSEIDON_INSTRUCTIONS,
+  ...MANGO_V4_INSTRUCTIONS,
 }
 
 export async function getInstructionDescriptor(
   connection: ConnectionContext,
-  instruction: InstructionData
+  instruction: InstructionData,
+  realm?: ProgramAccount<Realm> | undefined
 ) {
   let descriptors: any
-  if (isGovernanceProgram(instruction.programId)) {
+  if (realm && instruction.programId.equals(realm.owner)) {
     descriptors =
       GOVERNANCE_INSTRUCTIONS['GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw']
   } else {
@@ -275,6 +348,12 @@ export async function getInstructionDescriptor(
   const descriptor = !instruction.data.length
     ? descriptors
     : descriptors && descriptors[instruction.data[0]]
+    ? descriptors[instruction.data[0]]
+    : //backup if first number is same for couple of instructions inside same idl
+    descriptors && descriptors[`${instruction.data[0]}${instruction.data[1]}`]
+    ? descriptors[`${instruction.data[0]}${instruction.data[1]}`]
+    : descriptors
+
   const dataUI = (descriptor?.getDataUI &&
     (await descriptor?.getDataUI(
       connection.current,

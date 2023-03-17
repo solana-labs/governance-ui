@@ -28,7 +28,7 @@ import {
 } from 'VoteStakeRegistry/tools/dateTools'
 import {
   getCastleReconcileInstruction,
-  getCastleRefreshInstruction,
+  getCastleRefreshInstructions,
 } from '@utils/instructions/Castle'
 import Wallet from '@project-serum/sol-wallet-adapter'
 
@@ -84,6 +84,7 @@ export function ExecuteInstructionButton({
         clearTimeout(timer)
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [ineligibleToSee, rpcContext.connection, currentSlot])
 
   const onExecuteInstruction = async () => {
@@ -98,11 +99,11 @@ export function ExecuteInstructionButton({
       switch (instructionOption) {
         case InstructionOptions.castleRefresh:
           adjacentTransaction = new Transaction().add(
-            await getCastleRefreshInstruction(
-              rpcContext.connection,
-              (wallet as unknown) as Wallet,
-              proposalInstruction
-            )
+              ...await getCastleRefreshInstructions(
+                  rpcContext.connection,
+                  (wallet as unknown) as Wallet,
+                  proposalInstruction
+              )
           )
           break
         case InstructionOptions.castleReconcileRefresh: {
@@ -112,11 +113,11 @@ export function ExecuteInstructionButton({
             proposalInstruction
           )
           adjacentTransaction = new Transaction().add(
-            await getCastleRefreshInstruction(
-              rpcContext.connection,
-              (wallet as unknown) as Wallet,
-              proposalInstruction
-            )
+              ...await getCastleRefreshInstructions(
+                rpcContext.connection,
+                (wallet as unknown) as Wallet,
+                proposalInstruction
+              )
           )
           break
         }

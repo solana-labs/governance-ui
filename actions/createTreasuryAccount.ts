@@ -14,12 +14,12 @@ import {
   withCreateGovernance,
   withCreateNativeTreasury,
 } from '@solana/spl-governance'
-
 import { withCreateTokenGovernance } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { sendTransaction } from '@utils/send'
 import { withCreateSplTokenAccount } from '@models/withCreateSplTokenAccount'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
+import { trySentryLog } from '@utils/logs'
 
 export const createTreasuryAccount = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -90,6 +90,7 @@ export const createTreasuryAccount = async (
     await withCreateNativeTreasury(
       instructions,
       programId,
+      programVersion,
       governanceAddress,
       walletPubkey
     )
@@ -106,6 +107,16 @@ export const createTreasuryAccount = async (
     sendingMessage: 'Creating treasury account',
     successMessage: 'Treasury account has been created',
   })
-
+  const logInfo = {
+    realmId: realm.pubkey.toBase58(),
+    realmSymbol: realm.account.name,
+    wallet: wallet.publicKey?.toBase58(),
+    governanceAddress: governanceAddress,
+    cluster: connection.rpcEndpoint.includes('devnet') ? 'devnet' : 'mainnet',
+  }
+  trySentryLog({
+    tag: 'governanceCreated',
+    objToStringify: logInfo,
+  })
   return governanceAddress
 }

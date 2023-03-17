@@ -9,18 +9,20 @@ import {
 import { validateInstruction } from '@utils/instructionTools'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
-import useWalletStore from 'stores/useWalletStore'
 import useRealm from '@hooks/useRealm'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NewProposalContext } from '../../../new'
 import InstructionForm, { InstructionInputType } from '../FormCreator'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { SYSVAR_RENT_PUBKEY } from '@solana/web3.js'
 import { getRegistrarPDA } from 'VoteStakeRegistry/sdk/accounts'
+import { DEFAULT_VSR_ID, VsrClient } from 'VoteStakeRegistry/sdk/client'
+import { web3 } from '@coral-xyz/anchor'
+import useWallet from '@hooks/useWallet'
 
 interface CreateVsrRegistrarForm {
   governedAccount: AssetAccount | undefined
+  programId: string | undefined
 }
 
 const CreateVsrRegistrar = ({
@@ -31,13 +33,13 @@ const CreateVsrRegistrar = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const { realm, realmInfo } = useRealm()
-  const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
   const { assetAccounts } = useGovernanceAssets()
-  const wallet = useWalletStore((s) => s.current)
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<CreateVsrRegistrarForm>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
+  const { wallet, anchorProvider } = useWallet()
+
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     let serializedInstruction = ''
@@ -46,6 +48,10 @@ const CreateVsrRegistrar = ({
       form!.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
+      const vsrClient = VsrClient.connect(
+        anchorProvider,
+        form?.programId ? new web3.PublicKey(form.programId) : DEFAULT_VSR_ID
+      )
       const { registrar, registrarBump } = await getRegistrarPDA(
         realm!.pubkey,
         realm!.account.communityMint,
@@ -79,16 +85,29 @@ const CreateVsrRegistrar = ({
       { governedAccount: form?.governedAccount?.governance, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
       .nullable()
       .required('Governed account is required'),
+    programId: yup
+      .string()
+      .nullable()
+      .test((key) => {
+        try {
+          new web3.PublicKey(key as string)
+        } catch (err) {
+          return false
+        }
+        return true
+      })
+      .required('VSR Program ID is required'),
   })
   const inputs = [
     {
-      label: 'Governance',
+      label: 'Wallet',
       initialValue: null,
       name: 'governedAccount',
       type: InstructionInputType.GOVERNED_ACCOUNT,
@@ -99,6 +118,12 @@ const CreateVsrRegistrar = ({
           x.governance.pubkey.toBase58() ===
           realm?.account.authority?.toBase58()
       ),
+    },
+    {
+      label: 'Voter Stake Registry Program ID',
+      initialValue: DEFAULT_VSR_ID.toString(),
+      name: 'programId',
+      type: InstructionInputType.INPUT,
     },
   ]
   return (

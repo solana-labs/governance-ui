@@ -10,7 +10,7 @@ import { RadioGroup } from '@components/NewRealmWizard/components/Input'
 import AdviceBox from '@components/NewRealmWizard/components/AdviceBox'
 import Text from '@components/Text'
 
-import { updateUserInput, validateSolAddress } from '@utils/formValidation'
+import { updateUserInput, validatePubkey } from '@utils/formValidation'
 import TokenInput, { TokenWithMintInfo, COUNCIL_TOKEN } from '../TokenInput'
 
 export const AddCouncilSchema = {
@@ -37,7 +37,7 @@ export const AddCouncilSchema = {
       otherwise: yup.string().optional(),
     })
     .test('is-valid-address', 'Please enter a valid Solana address', (value) =>
-      value ? validateSolAddress(value) : true
+      value ? validatePubkey(value) : true
     ),
   transferCouncilMintAuthority: yup
     .boolean()
@@ -52,12 +52,18 @@ export const AddCouncilSchema = {
     }),
 }
 
-export interface AddCouncil {
+export type AddCouncilV2 = {
+  _programVersion: 2
   addCouncil: boolean
   useExistingCouncilToken?: boolean
   councilTokenMintAddress?: string
   transferCouncilMintAuthority?: boolean
 }
+export type AddCouncilV3 = {
+  _programVersion: 3
+  councilYesVotePercentage: number
+} & Omit<AddCouncilV2, '_programVersion'>
+export type AddCouncil = AddCouncilV2 | AddCouncilV3
 
 export default function AddCouncilForm({
   type,
@@ -90,10 +96,12 @@ export default function AddCouncilForm({
 
   useEffect(() => {
     updateUserInput(formData, AddCouncilSchema, setValue)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [])
 
   useEffect(() => {
     setValue('addCouncil', forceCouncil || undefined)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [forceCouncil])
 
   useEffect(() => {
@@ -102,12 +110,14 @@ export default function AddCouncilForm({
       setValue('transferCouncilMintAuthority', undefined)
       setCouncilTokenInfo(undefined)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [useExistingCouncilToken])
 
   useEffect(() => {
     if (!addCouncil) {
       setValue('useExistingCouncilToken', undefined, { shouldValidate: true })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [addCouncil])
 
   function handleTokenInput({ tokenInfo }) {

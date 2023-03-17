@@ -2,6 +2,8 @@ import React, { useContext, useEffect, useState } from 'react'
 import {
   createSetRealmConfig,
   Governance,
+  GoverningTokenConfigAccountArgs,
+  GoverningTokenType,
   ProgramAccount,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
@@ -19,8 +21,9 @@ import { getRealmCfgSchema } from '@utils/validations'
 import RealmConfigFormComponent from '../forms/RealmConfigFormComponent'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { AssetAccount } from '@utils/uiTypes/assets'
-import { MAX_TOKENS_TO_DISABLE } from '@tools/constants'
-import { BN } from '@project-serum/anchor'
+import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
+import { isDisabledVoterWeight } from '@tools/governance/units'
+import useProgramVersion from '@hooks/useProgramVersion'
 
 export interface RealmConfigForm {
   governedAccount: AssetAccount | undefined
@@ -40,7 +43,7 @@ const RealmConfig = ({
 }) => {
   const { realm, mint, realmInfo } = useRealm()
   const wallet = useWalletStore((s) => s.current)
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const { assetAccounts } = useGovernanceAssets()
   const realmAuthority = assetAccounts.find(
     (x) =>
@@ -49,6 +52,9 @@ const RealmConfig = ({
   const [form, setForm] = useState<RealmConfigForm>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
+  const programVersion = useProgramVersion()
+  const schema = getRealmCfgSchema({ programVersion, form })
+
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     let serializedInstruction = ''
@@ -58,10 +64,10 @@ const RealmConfig = ({
       wallet?.publicKey &&
       realm
     ) {
-      const mintAmount = MAX_TOKENS_TO_DISABLE.eq(
-        new BN(form!.minCommunityTokensToCreateGovernance)
+      const mintAmount = isDisabledVoterWeight(
+        form!.minCommunityTokensToCreateGovernance
       )
-        ? MAX_TOKENS_TO_DISABLE
+        ? DISABLED_VOTER_WEIGHT
         : parseMintNaturalAmountFromDecimalAsBN(
             form!.minCommunityTokensToCreateGovernance!,
             mint!.decimals!
@@ -74,12 +80,16 @@ const RealmConfig = ({
         form?.removeCouncil ? undefined : realm?.account.config.councilMint,
         parseMintSupplyFraction(form!.communityMintSupplyFactor.toString()),
         mintAmount,
-        form!.communityVoterWeightAddin
-          ? new PublicKey(form!.communityVoterWeightAddin)
-          : undefined,
-        form?.maxCommunityVoterWeightAddin
-          ? new PublicKey(form.maxCommunityVoterWeightAddin)
-          : undefined,
+        new GoverningTokenConfigAccountArgs({
+          voterWeightAddin: form!.communityVoterWeightAddin
+            ? new PublicKey(form!.communityVoterWeightAddin)
+            : undefined,
+          maxVoterWeightAddin: form?.maxCommunityVoterWeightAddin
+            ? new PublicKey(form.maxCommunityVoterWeightAddin)
+            : undefined,
+          tokenType: GoverningTokenType.Liquid,
+        }),
+        undefined,
         wallet.publicKey
       )
       serializedInstruction = serializeInstructionToBase64(instruction)
@@ -96,8 +106,8 @@ const RealmConfig = ({
       { governedAccount: form?.governedAccount?.governance, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
-  const schema = getRealmCfgSchema({ form })
 
   return (
     <>

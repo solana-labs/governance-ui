@@ -1,16 +1,33 @@
 import { StyledLabel, StyledSuffix, inputClasses } from './styles'
 import ErrorField from './ErrorField'
 import { CheckCircleIcon } from '@heroicons/react/outline'
+import {
+  ChangeEventHandler,
+  DetailedHTMLProps,
+  InputHTMLAttributes,
+} from 'react'
 
-interface InputProps {
+export interface InputProps
+  extends Omit<
+    DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>,
+    'prefix'
+  > {
   type: string
   value: any
-  onChange?: (e) => void
+  onChange?: ChangeEventHandler<HTMLInputElement>
   className?: string
   disabled?: boolean
   useDefaultStyle?: boolean
-  [x: string]: any
   checkIcon?: boolean
+  wrapperClassName?: string
+  label?: string
+  prefix?: JSX.Element
+  prefixClassName?: string
+  suffix?: JSX.Element
+  error?: string
+  showErrorState?: boolean
+  noMaxWidth?: boolean
+  subtitle?: JSX.Element | string
 }
 
 const Input = ({

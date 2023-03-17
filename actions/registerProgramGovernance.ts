@@ -16,6 +16,8 @@ import { withCreateProgramGovernance } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { sendTransaction } from '@utils/send'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
+import { trySentryLog } from '@utils/logs'
+import { createSetUpgradeAuthority } from '@tools/sdk/bpfUpgradeableLoader/createSetUpgradeAuthority'
 
 export const registerProgramGovernance = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -55,13 +57,22 @@ export const registerProgramGovernance = async (
         realm.pubkey,
         governedAccount,
         config,
-        transferAuthority!,
+        false,
         walletPubkey,
         tokenOwnerRecord.pubkey,
         walletPubkey,
         governanceAuthority,
         plugin?.voterWeightPk
       )
+      if (transferAuthority) {
+        const transferUpgradeAuthIx = await createSetUpgradeAuthority(
+          governedAccount,
+          walletPubkey,
+          governanceAddress
+        )
+        instructions.push(transferUpgradeAuthIx)
+      }
+
       break
     }
     default: {
@@ -79,6 +90,16 @@ export const registerProgramGovernance = async (
     sendingMessage: 'Creating governance program account',
     successMessage: 'Governance program account has been created',
   })
-
+  const logInfo = {
+    realmId: realm.pubkey.toBase58(),
+    realmSymbol: realm.account.name,
+    wallet: wallet.publicKey?.toBase58(),
+    governanceAddress: governanceAddress,
+    cluster: connection.rpcEndpoint.includes('devnet') ? 'devnet' : 'mainnet',
+  }
+  trySentryLog({
+    tag: 'governanceCreated',
+    objToStringify: logInfo,
+  })
   return governanceAddress
 }

@@ -45,6 +45,15 @@ export const isFormValid = async (schema, formValues, abortEarly = false) => {
   return values
 }
 
+export function validatePubkey(address: string) {
+  try {
+    new PublicKey(address)
+    return true
+  } catch (err) {
+    return false
+  }
+}
+
 export function validateSolAddress(address: string) {
   try {
     const pubkey = new PublicKey(address)
@@ -83,7 +92,12 @@ export function isWizardValid({ currentStep, steps, formData }) {
       yup.object(schema).validateSync(formData, { context: formData })
       return true
     } catch (error) {
-      console.log('error', error.message, error.values)
+      console.log(
+        'form validation error',
+        error.message,
+        error.values,
+        JSON.stringify('error')
+      )
       return false
     }
   }

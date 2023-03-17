@@ -5,13 +5,15 @@ import Account from 'VoteStakeRegistry/components/Account/Account'
 import LockTokensAccount from 'VoteStakeRegistry/components/Account/LockTokensAccount'
 
 const account = () => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const router = useRouter()
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const { config } = useRealm()
   const tokenOwnerRecordPk = router?.query?.tokenOwnerRecordPk
   const isLockTokensMode =
-    config?.account.communityVoterWeightAddin &&
+    config?.account.communityTokenConfig.voterWeightAddin &&
     vsrPluginsPks.includes(
-      config?.account.communityVoterWeightAddin?.toBase58()
+      config?.account.communityTokenConfig.voterWeightAddin?.toBase58()
     )
 
   const getAccountView = () => {

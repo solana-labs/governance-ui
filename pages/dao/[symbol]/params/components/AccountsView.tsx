@@ -2,6 +2,7 @@ import { getTreasuryAccountItemInfoV2 } from '@utils/treasuryTools'
 import { AccountType } from '@utils/uiTypes/assets'
 import { AddressField } from '../index'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import { fmtTokenAmount } from '@utils/formatting'
 
 const AccountsView = ({
   activeGovernance,
@@ -108,11 +109,16 @@ const AccountsView = ({
                   label="Mint Authority"
                   val={x.extensions.mint?.account.mintAuthority?.toBase58()}
                 />
-                <AddressField
-                  bg={false}
-                  label="Supply"
-                  val={x.extensions.mint?.account.supply.toNumber()}
-                />
+                {x.extensions.mint?.account.supply && (
+                  <AddressField
+                    bg={false}
+                    label="Supply"
+                    val={fmtTokenAmount(
+                      x.extensions.mint?.account.supply,
+                      x.extensions.mint?.account.decimals
+                    )}
+                  />
+                )}
                 <AddressField
                   bg={false}
                   label="Is Initialized"

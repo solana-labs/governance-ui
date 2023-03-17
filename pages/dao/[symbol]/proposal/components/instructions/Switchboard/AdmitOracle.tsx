@@ -10,7 +10,7 @@ import { PublicKey } from '@solana/web3.js'
 import Input from '@components/inputs/Input'
 import * as sbv2 from '@switchboard-xyz/switchboard-v2'
 import useWalletStore from 'stores/useWalletStore'
-import * as anchor from '@project-serum/anchor'
+import * as anchor from '@coral-xyz/anchor'
 import sbIdl from 'SwitchboardVotePlugin/switchboard_v2.json'
 import gonIdl from 'SwitchboardVotePlugin/gameofnodes.json'
 import {
@@ -24,10 +24,9 @@ import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
 const SwitchboardAdmitOracle = ({
   index,
-  _governance,
 }: {
   index: number
-  _governance: ProgramAccount<Governance> | null
+  governance: ProgramAccount<Governance> | null
 }) => {
   const [form, setForm] = useState<SwitchboardAdmitOracleForm>({
     oraclePubkey: undefined,
@@ -45,6 +44,7 @@ const SwitchboardAdmitOracle = ({
       },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
 
   async function getInstruction(): Promise<UiInstruction> {
@@ -90,8 +90,7 @@ const SwitchboardAdmitOracle = ({
       new PublicKey(qPk),
       new PublicKey(oPk)
     )[0]
-    console.log('P:')
-    console.log(p)
+    console.log('P:', p)
 
     const grantTx = await grantPermissionTx(
       addinProgram,

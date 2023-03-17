@@ -7,11 +7,9 @@ import {
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
-import Select from '@components/inputs/Select'
 import useRealm from '@hooks/useRealm'
 import { createAssociatedTokenAccount } from '@utils/associated'
-import { isFormValid } from '@utils/formValidation'
-import { getSplTokenMintAddressByUIName, SPL_TOKENS } from '@utils/splTokens'
+import { isFormValid, validatePubkey } from '@utils/formValidation'
 import {
   CreateAssociatedTokenAccountForm,
   UiInstruction,
@@ -23,6 +21,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../new'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import TokenMintInput from '@components/inputs/TokenMintInput'
 
 const CreateAssociatedTokenAccount = ({
   index,
@@ -37,7 +36,7 @@ const CreateAssociatedTokenAccount = ({
 
   const { assetAccounts } = useGovernanceAssets()
 
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<CreateAssociatedTokenAccountForm>({})
   const [formErrors, setFormErrors] = useState({})
@@ -62,7 +61,7 @@ const CreateAssociatedTokenAccount = ({
       !isValid ||
       !programId ||
       !form.governedAccount?.governance?.account ||
-      !form.splTokenMintUIName ||
+      !form.splTokenMint ||
       !wallet?.publicKey
     ) {
       return {
@@ -80,7 +79,7 @@ const CreateAssociatedTokenAccount = ({
       form.governedAccount.governance.pubkey,
 
       // splTokenMintAddress
-      getSplTokenMintAddressByUIName(form.splTokenMintUIName)
+      new PublicKey(form.splTokenMint)
     )
 
     return {
@@ -95,6 +94,7 @@ const CreateAssociatedTokenAccount = ({
       propertyName: 'programId',
       value: programId?.toString(),
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [programId])
 
   useEffect(() => {
@@ -105,6 +105,7 @@ const CreateAssociatedTokenAccount = ({
       },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
 
   const schema = yup.object().shape({
@@ -112,7 +113,10 @@ const CreateAssociatedTokenAccount = ({
       .object()
       .nullable()
       .required('Governed account is required'),
-    splTokenMintUIName: yup.string().required('SPL Token Mint is required'),
+    splTokenMint: yup
+      .string()
+      .test(validatePubkey)
+      .required('SPL Token Mint is required'),
   })
 
   return (
@@ -129,25 +133,16 @@ const CreateAssociatedTokenAccount = ({
         governance={governance}
       />
 
-      <Select
+      <TokenMintInput
+        noMaxWidth={false}
         label="SPL Token Mint"
-        value={form.splTokenMintUIName}
-        placeholder="Please select..."
-        onChange={(value) =>
-          handleSetForm({ value, propertyName: 'splTokenMintUIName' })
-        }
-        error={formErrors['baseTokenName']}
-      >
-        {Object.entries(SPL_TOKENS).map(([key, { name, mint }]) => (
-          <Select.Option key={key} value={name}>
-            <div className="flex flex-col">
-              <span>{name}</span>
-
-              <span className="text-gray-500 text-sm">{mint.toString()}</span>
-            </div>
-          </Select.Option>
-        ))}
-      </Select>
+        onValidMintChange={(mintAddress, _) => {
+          handleSetForm({
+            value: mintAddress,
+            propertyName: 'splTokenMint',
+          })
+        }}
+      />
     </>
   )
 }

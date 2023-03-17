@@ -1,6 +1,6 @@
 import useRealm from '@hooks/useRealm'
-import { fmtMintAmount } from '@tools/sdk/units'
-import { MAX_TOKENS_TO_DISABLE } from '@tools/constants'
+import { fmtMintAmount, getHoursFromTimestamp } from '@tools/sdk/units'
+import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import {
   getFormattedStringFromDays,
   SECS_PER_DAY,
@@ -8,17 +8,18 @@ import {
 import Button from '@components/Button'
 import { VoteTipping } from '@solana/spl-governance'
 import { AddressField, NumberField } from '../index'
+import useProgramVersion from '@hooks/useProgramVersion'
 
 const ParamsView = ({ activeGovernance, openGovernanceProposalModal }) => {
   const { realm, mint, councilMint, ownVoterWeight } = useRealm()
-
+  const programVersion = useProgramVersion()
   const realmAccount = realm?.account
   const communityMint = realmAccount?.communityMint.toBase58()
 
   const minCommunityTokensToCreateProposal = activeGovernance?.account?.config
     ?.minCommunityTokensToCreateProposal
     ? mint &&
-      MAX_TOKENS_TO_DISABLE.eq(
+      DISABLED_VOTER_WEIGHT.eq(
         activeGovernance.account.config.minCommunityTokensToCreateProposal
       )
       ? 'Disabled'
@@ -65,24 +66,67 @@ const ParamsView = ({ activeGovernance, openGovernanceProposalModal }) => {
             padding
             val={activeGovernance.account.config.minInstructionHoldUpTime}
           />
-          {/* NOT NEEDED RIGHT NOW */}
-          {/* <AddressField
-          label="Proposal Cool-off Time"
-          padding
-          val={activeGovernance.account.config.proposalCoolOffTime}
-          /> */}
-          <AddressField
-            label="Vote Threshold Percentage"
-            padding
-            val={`${activeGovernance.account.config.voteThresholdPercentage.value}%`}
-          />
-          <AddressField
-            label="Vote Tipping"
-            padding
-            val={
-              VoteTipping[activeGovernance.account.config.voteTipping as any]
-            }
-          />
+          {programVersion >= 3 && (
+            <>
+              <AddressField
+                label="Proposal Cool-off Time"
+                padding
+                val={`${getHoursFromTimestamp(
+                  activeGovernance.account.config.votingCoolOffTime
+                )} hour(s)`}
+              />
+              <AddressField
+                label="Deposit Exempt Proposal Count"
+                padding
+                val={`${activeGovernance.account.config.depositExemptProposalCount}`}
+              />
+            </>
+          )}
+          {activeGovernance.account.config?.communityVoteThreshold?.value && (
+            <AddressField
+              label="Community Vote Threshold Percentage"
+              padding
+              val={`${activeGovernance.account.config.communityVoteThreshold.value}%`}
+            />
+          )}
+          {activeGovernance.account.config?.councilVoteThreshold?.value && (
+            <AddressField
+              label="Council Vote Threshold Percentage"
+              padding
+              val={`${activeGovernance.account.config.councilVoteThreshold.value}%`}
+            />
+          )}
+          {programVersion >= 3 ? (
+            <>
+              <AddressField
+                label="Community Vote Tipping"
+                padding
+                val={
+                  VoteTipping[
+                    activeGovernance.account.config.communityVoteTipping as any
+                  ]
+                }
+              />
+              <AddressField
+                label="Council Vote Tipping"
+                padding
+                val={
+                  VoteTipping[
+                    activeGovernance.account.config.councilVoteTipping as any
+                  ]
+                }
+              />
+            </>
+          ) : (
+            <AddressField
+              label="Vote Tipping"
+              padding
+              val={
+                VoteTipping[activeGovernance.account.config.voteTipping as any]
+              }
+            />
+          )}
+
           <div className="flex">
             <Button
               disabled={

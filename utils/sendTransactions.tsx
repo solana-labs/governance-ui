@@ -17,6 +17,10 @@ import {
   showTransactionError,
   showTransactionsProcessUi,
 } from './transactionsLoader'
+import {
+  sendSignAndConfirmTransactions,
+  sendSignAndConfirmTransactionsProps,
+} from '@blockworks-foundation/mangolana/lib/transactions'
 
 interface TransactionInstructionWithType {
   instructionsSet: TransactionInstruction[]
@@ -197,32 +201,6 @@ async function awaitTransactionSignatureConfirmation(
   return { status, timeout }
 }
 
-//////////////////////////////////////////////
-export async function simulateTransaction(
-  connection: Connection,
-  transaction: Transaction,
-  commitment: Commitment
-): Promise<RpcResponseAndContext<SimulatedTransactionResponse>> {
-  // @ts-ignore
-  transaction.recentBlockhash = await connection._recentBlockhash(
-    // @ts-ignore
-    connection._disableBlockhashCaching
-  )
-
-  const signData = transaction.serializeMessage()
-  // @ts-ignore
-  const wireTransaction = transaction._serialize(signData)
-  const encodedTransaction = wireTransaction.toString('base64')
-  const config: any = { encoding: 'base64', commitment }
-  const args = [encodedTransaction, config]
-
-  // @ts-ignore
-  const res = await connection._rpcRequest('simulateTransaction', args)
-  if (res.error) {
-    throw new Error('failed to simulate transaction: ' + res.error.message)
-  }
-  return res.result
-}
 ///////////////////////////////////////
 export const getUnixTs = () => {
   return new Date().getTime() / 1000
@@ -289,9 +267,8 @@ export async function sendSignedTransaction({
     })
     let simulateResult: SimulatedTransactionResponse | null = null
     try {
-      simulateResult = (
-        await simulateTransaction(connection, signedTransaction, 'single')
-      ).value
+      simulateResult = (await connection.simulateTransaction(signedTransaction))
+        .value
     } catch (e) {
       //
     }
@@ -342,89 +319,10 @@ export enum SequenceType {
   Parallel,
   StopOnFailure,
 }
-/////////////////////////////////////////
-export const sendTransactions = async (
-  connection: Connection,
-  wallet: WalletSigner,
-  instructionSet: TransactionInstruction[][],
-  signersSet: Keypair[][],
-  sequenceType: SequenceType = SequenceType.Parallel,
-  commitment: Commitment = 'singleGossip',
-  successCallback: (txid: string, ind: number) => void = (_txid, _ind) => null,
-  failCallback: (reason: string, ind: number) => boolean = (_txid, _ind) =>
-    false,
-  block?: Block
-): Promise<number> => {
-  if (!wallet.publicKey) throw new Error('Wallet not connected!')
 
-  const unsignedTxns: Transaction[] = []
-
-  if (!block) {
-    block = await connection.getLatestBlockhash(commitment)
-  }
-  for (let i = 0; i < instructionSet.length; i++) {
-    const instructions = instructionSet[i]
-    const signers = signersSet[i]
-
-    if (instructions.length === 0) {
-      continue
-    }
-
-    const transaction = new Transaction()
-    instructions.forEach((instruction) => transaction.add(instruction))
-    transaction.recentBlockhash = block.blockhash
-    transaction.setSigners(
-      // fee payed by the wallet owner
-      wallet.publicKey,
-      ...signers.map((s) => s.publicKey)
-    )
-
-    if (signers.length > 0) {
-      transaction.partialSign(...signers)
-    }
-
-    unsignedTxns.push(transaction)
-  }
-  const signedTxns = await wallet.signAllTransactions(unsignedTxns)
-  const pendingTxns: Promise<{ txid: string; slot: number }>[] = []
-
-  const breakEarlyObject = { breakEarly: false }
-  for (let i = 0; i < signedTxns.length; i++) {
-    const signedTxnPromise = sendSignedTransaction({
-      connection,
-      signedTransaction: signedTxns[i],
-      block: block,
-    })
-
-    signedTxnPromise
-      .then(({ txid }) => {
-        successCallback(txid, i)
-      })
-      .catch((_reason) => {
-        // @ts-ignore
-        failCallback(signedTxns[i], i)
-        if (sequenceType == SequenceType.StopOnFailure) {
-          breakEarlyObject.breakEarly = true
-        }
-      })
-
-    if (sequenceType != SequenceType.Parallel) {
-      await signedTxnPromise
-      if (breakEarlyObject.breakEarly) {
-        return i // REturn the txn we failed on by index
-      }
-    } else {
-      pendingTxns.push(signedTxnPromise)
-    }
-  }
-
-  if (sequenceType != SequenceType.Parallel) {
-    await Promise.all(pendingTxns)
-  }
-
-  return signedTxns.length
-}
-
+/**
+ * @deprecated The method should not be used use sendTransactionsV3
+ */
 /////////////////////////////////////////
 export const sendTransactionsV2 = async ({
   connection,
@@ -433,6 +331,8 @@ export const sendTransactionsV2 = async ({
   signersSet,
   block,
   showUiComponent = false,
+  runAfterApproval,
+  runAfterTransactionConfirmation,
 }: {
   connection: Connection
   wallet: WalletSigner
@@ -440,6 +340,8 @@ export const sendTransactionsV2 = async ({
   signersSet: Keypair[][]
   block?: Block
   showUiComponent?: boolean
+  runAfterApproval?: (() => void) | null
+  runAfterTransactionConfirmation?: (() => void) | null
 }) => {
   if (!wallet.publicKey) throw new Error('Wallet not connected!')
   //block will be used for timeout calculation
@@ -505,6 +407,9 @@ export const sendTransactionsV2 = async ({
   const signedTxns = await wallet.signAllTransactions(unsignedTxns)
   if (showUiComponent) {
     showTransactionsProcessUi(signedTxns.length)
+  }
+  if (runAfterApproval) {
+    runAfterApproval()
   }
   console.log(
     'Transactions play type order',
@@ -577,6 +482,9 @@ export const sendTransactionsV2 = async ({
     if (showUiComponent) {
       closeTransactionProcessUi()
     }
+    if (runAfterTransactionConfirmation) {
+      runAfterTransactionConfirmation()
+    }
   } catch (e) {
     if (showUiComponent) {
       const idx = e?.txInstructionIdx
@@ -594,6 +502,8 @@ export const sendTransactionsV2 = async ({
               TransactionInstructions: txInstructionForRetry,
               signersSet: signersForRetry,
               showUiComponent,
+              runAfterApproval: runAfterApproval,
+              runAfterTransactionConfirmation: runAfterTransactionConfirmation,
             }),
           e.error ? e.error : `${e}`,
           e.txid
@@ -612,4 +522,110 @@ export const transactionInstructionsToTypedInstructionsSets = (
     instructionsSet: instructionsSet,
     sequenceType: type,
   }
+}
+
+export const sendTransactionsV3 = ({
+  connection,
+  wallet,
+  transactionInstructions,
+  timeoutStrategy,
+  callbacks,
+  config,
+}: sendSignAndConfirmTransactionsProps) => {
+  const callbacksWithUiComponent = {
+    afterBatchSign: (signedTxnsCount) => {
+      if (callbacks?.afterBatchSign) {
+        callbacks?.afterBatchSign(signedTxnsCount)
+      }
+      showTransactionsProcessUi(signedTxnsCount)
+    },
+    afterAllTxConfirmed: () => {
+      if (callbacks?.afterAllTxConfirmed) {
+        callbacks?.afterAllTxConfirmed()
+      }
+      closeTransactionProcessUi()
+    },
+    afterEveryTxConfirmation: () => {
+      if (callbacks?.afterEveryTxConfirmation) {
+        callbacks?.afterEveryTxConfirmation()
+      }
+      incrementProcessedTransactions()
+    },
+    onError: (e, notProcessedTransactions, originalProps) => {
+      if (callbacks?.onError) {
+        callbacks?.onError(e, notProcessedTransactions, originalProps)
+      }
+      showTransactionError(
+        () =>
+          sendTransactionsV3({
+            ...originalProps,
+            transactionInstructions: notProcessedTransactions,
+          }),
+        getErrorMsg(e),
+        e.txid
+      )
+    },
+  }
+
+  const cfg = {
+    maxTxesInBatch:
+      transactionInstructions.filter(
+        (x) => x.sequenceType === SequenceType.Sequential
+      ).length > 0
+        ? 20
+        : 30,
+    autoRetry: false,
+    maxRetries: 5,
+    retried: 0,
+    logFlowInfo: true,
+    ...config,
+  }
+  return sendSignAndConfirmTransactions({
+    connection,
+    wallet,
+    transactionInstructions,
+    timeoutStrategy,
+    callbacks: callbacksWithUiComponent,
+    config: cfg,
+  })
+}
+
+const getErrorMsg = (e) => {
+  if (e.error) {
+    return e.error
+  }
+  if (e.message) {
+    return e.message
+  }
+  if (typeof e === 'object') {
+    return tryStringify(e)
+  }
+  return `${e}`
+}
+
+const tryStringify = (obj) => {
+  try {
+    return JSON.stringify(obj)
+  } catch {
+    return null
+  }
+}
+
+export const txBatchesToInstructionSetWithSigners = (
+  txBatch: TransactionInstruction[],
+  signerBatches: Keypair[][],
+  batchIdx?: number
+) => {
+  return txBatch.map((tx, txIdx) => {
+    return {
+      transactionInstruction: tx,
+      signers:
+        typeof batchIdx !== 'undefined' &&
+        signerBatches.length &&
+        signerBatches[batchIdx] &&
+        signerBatches[batchIdx][txIdx]
+          ? [signerBatches[batchIdx][txIdx]]
+          : [],
+    }
+  })
 }

@@ -2,6 +2,7 @@ import { PublicKey } from '@solana/web3.js'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 import {
   AccountMetaData,
+  BPF_UPGRADE_LOADER_ID,
   Proposal,
   ProposalTransaction,
 } from '@solana/spl-governance'
@@ -12,24 +13,26 @@ import {
   InstructionDescriptor,
   WSOL_MINT,
 } from './tools'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import useWalletStore from '../../stores/useWalletStore'
 import { getExplorerUrl } from '../explorer/tools'
-import { getProgramName } from './programs/names'
+import { getProgramName, isNativeSolanaProgram } from './programs/names'
 import { tryGetTokenAccount } from '@utils/tokens'
 import { ExecuteInstructionButton, PlayState } from './ExecuteInstructionButton'
 import { ProgramAccount } from '@solana/spl-governance'
 import InspectorButton from '@components/explorer/inspectorButton'
 import { FlagInstructionErrorButton } from './FlagInstructionErrorButton'
-import { deprecated } from '@metaplex-foundation/mpl-token-metadata'
 import axios from 'axios'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import InstructionOptionInput, {
   InstructionOption,
   InstructionOptions,
 } from '@components/InstructionOptions'
 import StreamCard from '@components/StreamCard'
+import { Metaplex, findMetadataPda } from '@metaplex-foundation/js'
+import { ConnectionContext } from '@utils/connection'
+import { abbreviateAddress } from '@utils/formatting'
 
 export default function InstructionCard({
   index,
@@ -45,6 +48,7 @@ export default function InstructionCard({
     governedTokenAccountsWithoutNfts,
   } = useGovernanceAssets()
   const connection = useWalletStore((s) => s.connection)
+  const realm = useWalletStore((s) => s.selectedRealm.realm)
   const [descriptor, setDescriptor] = useState<InstructionDescriptor>()
   const [instructionOption, setInstructionOption] = useState<InstructionOption>(
     InstructionOptions.none
@@ -65,7 +69,8 @@ export default function InstructionCard({
   useEffect(() => {
     getInstructionDescriptor(
       connection,
-      proposalInstruction.account.getSingleInstruction()
+      proposalInstruction.account.getSingleInstruction(),
+      realm
     ).then((d) => setDescriptor(d))
     const getAmountImg = async () => {
       const sourcePk = proposalInstruction.account.getSingleInstruction()
@@ -88,12 +93,13 @@ export default function InstructionCard({
         const mint = tokenAccount?.account.mint
         if (mint) {
           try {
-            const metadataPDA = await deprecated.Metadata.getPDA(mint)
-            const tokenMetadata = await deprecated.Metadata.load(
-              connection.current,
-              metadataPDA
-            )
-            const url = (await axios.get(tokenMetadata?.data!.data.uri)).data
+            const metaplex = new Metaplex(connection.current)
+            const metadataPDA = findMetadataPda(mint)
+            const tokenMetadata = await metaplex.nfts().findByMetadata({
+              metadata: metadataPDA,
+            })
+
+            const url = (await axios.get(tokenMetadata.uri)).data
             setNftImgUrl(url.image)
           } catch (e) {
             console.log(e)
@@ -103,21 +109,26 @@ export default function InstructionCard({
       }
 
       if (isSol) {
-        const info = tokenService.getTokenInfo(WSOL_MINT)
+        const info = tokenPriceService.getTokenInfo(WSOL_MINT)
         const imgUrl = info?.logoURI ? info.logoURI : ''
         setTokenImgUrl(imgUrl)
         return
       }
       const mint = tokenAccount?.account.mint
       if (mint) {
-        const info = tokenService.getTokenInfo(mint.toBase58())
+        const info = tokenPriceService.getTokenInfo(mint.toBase58())
         const imgUrl = info?.logoURI ? info.logoURI : ''
         setTokenImgUrl(imgUrl)
       }
       return
     }
     getAmountImg()
-  }, [proposalInstruction, governedTokenAccountsWithoutNfts.length])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+  }, [
+    proposalInstruction,
+    governedTokenAccountsWithoutNfts.length,
+    realm?.pubkey.toBase58(),
+  ])
   const isSol = tokenImgUrl.includes(WSOL_MINT)
 
   return (
@@ -133,7 +144,7 @@ export default function InstructionCard({
         )}
       </h3>
       <InstructionProgram
-        endpoint={connection.endpoint}
+        connection={connection}
         programId={proposalInstruction.account.getSingleInstruction().programId}
       ></InstructionProgram>
       <div className="border-b border-bkg-4 mb-6">
@@ -158,11 +169,14 @@ export default function InstructionCard({
       </div>
 
       {nftImgUrl ? (
-        <div
-          style={{ width: '150px', height: '150px' }}
-          className="flex items-center overflow-hidden"
-        >
-          <img src={nftImgUrl}></img>
+        <div className="flex justify-between mb-2">
+          <div
+            style={{ width: '150px', height: '150px' }}
+            className="flex items-center overflow-hidden"
+          >
+            <img src={nftImgUrl}></img>
+          </div>
+          <InstructionData descriptor={descriptor}></InstructionData>
         </div>
       ) : (
         <InstructionData descriptor={descriptor}></InstructionData>
@@ -210,20 +224,83 @@ export default function InstructionCard({
 }
 
 export function InstructionProgram({
-  endpoint,
+  connection,
   programId,
 }: {
-  endpoint: string
+  connection: ConnectionContext
   programId: PublicKey
 }) {
+  const isNativeSolProgram = isNativeSolanaProgram(programId)
+  const [isAnchorVerified, setIsAnchorVerified] = useState(false)
+  const [isUpgradeable, setIsUpgradeable] = useState(false)
+  const [authority, setAuthority] = useState('')
   const programLabel = getProgramName(programId)
+  useEffect(() => {
+    const tryGetProgramInfo = async (programId: PublicKey) => {
+      try {
+        const programAccount = await connection.current.getParsedAccountInfo(
+          programId
+        )
+        const programInfo = await connection.current.getParsedAccountInfo(
+          new PublicKey(programAccount.value?.data['parsed']?.info?.programData)
+        )
+        const info = programInfo.value?.data['parsed']?.info
+        const authority = info.authority
+        const isUpgradeable =
+          programInfo.value?.owner?.equals(BPF_UPGRADE_LOADER_ID) && authority
+        setIsUpgradeable(isUpgradeable)
+        setAuthority(authority)
+        const deploymentSlot = info.slot
+        tryGetAnchorInfo(programId, deploymentSlot)
+        // eslint-disable-next-line no-empty
+      } catch {}
+    }
+    const tryGetAnchorInfo = async (
+      programId: PublicKey,
+      lastDeploymentSlot: number
+    ) => {
+      try {
+        const apiUrl = `https://api.apr.dev/api/v0/program/${programId.toBase58()}/latest?limit=5`
+        const resp = await axios.get(apiUrl)
+        const isLastVersionVerified = resp.data[0].verified === 'Verified'
+        const lastDeploymentSlotMatch =
+          resp.data[0].verified_slot === lastDeploymentSlot
+        setIsAnchorVerified(isLastVersionVerified && lastDeploymentSlotMatch)
+        // eslint-disable-next-line no-empty
+      } catch {}
+    }
+    if (connection.cluster === 'mainnet' && !isNativeSolProgram) {
+      tryGetProgramInfo(programId)
+    }
+  }, [programId, connection, isNativeSolProgram])
   return (
     <div className="border-t border-bkg-4 flex flex-col lg:flex-row lg:items-center lg:justify-between py-3">
-      <span className="font-bold text-fgd-1 text-sm">Program</span>
+      <span className="font-bold text-fgd-1 text-sm">
+        <div>Program</div>
+        {authority && (
+          <a
+            href={`https://explorer.solana.com/address/${authority}`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <div className="text-[10px] text-link">
+              Authority: {abbreviateAddress(authority)}
+            </div>
+            <div className="text-[10px]">
+              Upgradeable: {isUpgradeable ? 'Yes' : 'No'}
+            </div>
+          </a>
+        )}
+        {!isNativeSolProgram && (
+          <div className="text-primary-light text-[10px]">
+            Anchor: {isAnchorVerified ? 'Verified' : 'Unverified'}
+          </div>
+        )}
+      </span>
       <div className="flex items-center pt-1 lg:pt-0">
         <a
           className="text-sm hover:brightness-[1.15] focus:outline-none flex items-center"
-          href={getExplorerUrl(endpoint, programId)}
+          href={getExplorerUrl(connection.endpoint, programId)}
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -234,6 +311,7 @@ export function InstructionProgram({
                 {programLabel}
               </div>
             )}
+            <div></div>
           </div>
           <ExternalLinkIcon
             className={`flex-shrink-0 h-4 w-4 ml-2 text-primary-light`}
@@ -259,26 +337,39 @@ export function InstructionAccount({
   const [accountLabel, setAccountLabel] = useState(
     getAccountName(accountMeta.pubkey)
   )
+  const isFetching = useRef(false)
 
-  if (!accountLabel) {
-    // Check if the account is SPL token account and if yes then display its owner
-    tryGetTokenAccount(connection.current, accountMeta.pubkey).then((ta) => {
-      if (ta) {
-        setAccountLabel(`owner: ${ta?.account.owner.toBase58()}`)
-      }
-    })
-    // TODO: Extend to other well known account types
-  }
+  useEffect(() => {
+    if (!accountLabel && !isFetching.current) {
+      isFetching.current = true
+      // Check if the account is SPL token account and if yes then display its owner
+      tryGetTokenAccount(connection.current, accountMeta.pubkey).then((ta) => {
+        if (ta) {
+          setAccountLabel(`owner: ${ta?.account.owner.toBase58()}`)
+        }
+        isFetching.current = false
+      })
+      // TODO: Extend to other well known account types
+    }
+  }, [accountLabel, accountMeta.pubkey, connection])
 
   return (
     <div className="border-t border-bkg-4 flex flex-col lg:flex-row lg:items-center lg:justify-between py-3">
       <div className="pb-1 lg:pb-0">
         <p className="font-bold text-fgd-1">{`Account ${index + 1}`}</p>
         {descriptor?.accounts && (
-          <div className="mt-0.5 text-fgd-3 text-xs">
+          <div className="my-0.5 text-fgd-3 text-xs">
             {descriptor.accounts[index]?.name}
           </div>
         )}
+        <div className="text-[10px] flex space-x-3">
+          {accountMeta.isSigner && (
+            <div className="text-primary-light">Signer</div>
+          )}{' '}
+          {accountMeta.isWritable && (
+            <div className="text-[#b45be1]">Writable</div>
+          )}
+        </div>
       </div>
       <div className="flex items-center">
         <a
@@ -288,7 +379,8 @@ export function InstructionAccount({
           rel="noopener noreferrer"
         >
           <div>
-            {accountMeta.pubkey.toBase58()}
+            <div>{accountMeta.pubkey.toBase58()}</div>
+            <div></div>
             {accountLabel && (
               <div className="mt-0.5 text-fgd-3 text-right text-xs">
                 {accountLabel}

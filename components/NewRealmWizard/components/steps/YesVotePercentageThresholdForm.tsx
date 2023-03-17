@@ -31,15 +31,16 @@ export const CouncilYesVotePercentageSchema = {
     .number()
     .transform((value) => (isNaN(value) ? 0 : value))
     .max(100, 'Approval cannot require more than 100% of votes')
-    .when('$memberAddresses', (memberAddresses, schema) => {
-      if (memberAddresses) {
-        return schema
-          .min(1, 'Quorum must be at least 1% of member')
-          .required('Required')
-      } else {
-        return schema.min(1, 'Quorum must be at least 1% of member')
+    .min(1, 'Quorum must be at least 1% of member')
+    .when(
+      ['$_programVersion', '$addCouncil'],
+      // @ts-expect-error yup types are wrong https://github.com/jquense/yup/issues/649
+      (_programVersion, addCouncil, schema) => {
+        if (_programVersion >= 3 && addCouncil) {
+          return schema.required('Council yes threshold is required')
+        }
       }
-    }),
+    ),
 }
 
 export interface CouncilYesVotePercentage {
@@ -55,6 +56,7 @@ export default function YesVotePercentageForm({
   forCommunity = false,
   onSubmit,
   onPrevClick,
+  title,
 }) {
   const schema = yup
     .object(
@@ -89,7 +91,7 @@ export default function YesVotePercentageForm({
         : CouncilYesVotePercentageSchema,
       setValue
     )
-  }, [])
+  }, [forCommunity, formData, setValue])
 
   function serializeValues(values) {
     onSubmit({ step: currentStep, data: values })
@@ -104,9 +106,7 @@ export default function YesVotePercentageForm({
         type={type}
         currentStep={currentStep}
         totalSteps={totalSteps}
-        title={`Next, set your ${
-          forCommunity ? "DAO's" : "wallet's"
-        } approval threshold.`}
+        title={title}
       />
       <div className="mt-16 space-y-10 md:space-y-12">
         <Controller

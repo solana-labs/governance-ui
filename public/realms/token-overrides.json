@@ -1,0 +1,15 @@
+{
+  "METAewgxyPbgwsseH8T16a39CQ5VyVxZi9zXiDPY18m": {
+    "symbol": "MPLX",
+    "extensions": {
+      "coingeckoId": "metaplex"
+    }
+  },
+  
+  "GePFQaZKHcWE5vpxHfviQtH5jgxokSs51Y5Q4zgBiMDs": {
+    "symbol": "JFI",
+    "extensions": {
+      "coingeckoId": "jungle-defi"
+    }
+  }
+}

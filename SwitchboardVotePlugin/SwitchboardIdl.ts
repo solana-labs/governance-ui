@@ -3901,19 +3901,9 @@ export type Switchboard = {
           },
           {
             name: 'SerializationError'
-            fields: [
-              {
-                defined: 'bincode::Error'
-              }
-            ]
           },
           {
             name: 'DeserializationError'
-            fields: [
-              {
-                defined: 'bincode::Error'
-              }
-            ]
           },
           {
             name: 'InvalidDataError'
@@ -8755,19 +8745,9 @@ export const IDL: Switchboard = {
           },
           {
             name: 'SerializationError',
-            fields: [
-              {
-                defined: 'bincode::Error',
-              },
-            ],
           },
           {
             name: 'DeserializationError',
-            fields: [
-              {
-                defined: 'bincode::Error',
-              },
-            ],
           },
           {
             name: 'InvalidDataError',

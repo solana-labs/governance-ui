@@ -1,5 +1,4 @@
 import create, { State } from 'zustand'
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import {
   NftVoterClient,
   GatewayClient,
@@ -7,7 +6,7 @@ import {
 import { SwitchboardQueueVoterClient } from '../SwitchboardVotePlugin/SwitchboardQueueVoterClient'
 import { getRegistrarPDA, Registrar } from 'VoteStakeRegistry/sdk/accounts'
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts'
-import { AnchorProvider, Wallet } from '@project-serum/anchor'
+import { AnchorProvider, Wallet } from '@coral-xyz/anchor'
 import { tryGetNftRegistrar, tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { ConnectionContext } from '@utils/connection'
@@ -16,6 +15,7 @@ import { VotingClient, VotingClientProps } from '@utils/uiTypes/VotePlugin'
 import { PythClient } from 'pyth-staking-api'
 import { PublicKey } from '@solana/web3.js'
 import { tryGetGatewayRegistrar } from '../GatewayPlugin/sdk/api'
+import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 
 interface UseVotePluginsClientStore extends State {
   state: {
@@ -30,10 +30,12 @@ interface UseVotePluginsClientStore extends State {
     gatewayRegistrar: any
     currentRealmVotingClient: VotingClient
     voteStakeRegistryRegistrarPk: PublicKey | null
+    maxVoterWeight: PublicKey | undefined
   }
   handleSetVsrClient: (
     wallet: SignerWalletAdapter | undefined,
-    connection: ConnectionContext
+    connection: ConnectionContext,
+    programId: PublicKey
   ) => void
   handleSetNftClient: (
     wallet: SignerWalletAdapter | undefined,
@@ -85,6 +87,7 @@ const defaultState = {
     realm: undefined,
     walletPk: undefined,
   }),
+  maxVoterWeight: undefined,
 }
 
 const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
@@ -92,9 +95,8 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
     state: {
       ...defaultState,
     },
-    handleSetVsrClient: async (wallet, connection) => {
+    handleSetVsrClient: async (wallet, connection, programId) => {
       const options = AnchorProvider.defaultOptions()
-      console.log('wallet', wallet)
       const provider = new AnchorProvider(
         connection.current,
         (wallet as unknown) as Wallet,
@@ -102,6 +104,7 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
       )
       const vsrClient = await VsrClient.connect(
         provider,
+        programId,
         connection.cluster === 'devnet'
       )
       set((s) => {
@@ -176,27 +179,29 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
       })
     },
     handleSetPythClient: async (wallet, connection) => {
-      if (
-        connection.cluster === 'localnet' ||
-        connection.cluster === 'devnet'
-      ) {
-        const options = AnchorProvider.defaultOptions()
-        const provider = new AnchorProvider(
-          connection.current,
-          (wallet as unknown) as Wallet,
-          options
+      const options = AnchorProvider.defaultOptions()
+      const provider = new AnchorProvider(
+        connection.current,
+        (wallet as unknown) as Wallet,
+        options
+      )
+      try {
+        const pythClient = await PythClient.connect(
+          provider,
+          connection.cluster
         )
-        try {
-          const pythClient = await PythClient.connect(
-            provider,
-            connection.cluster
-          )
-          set((s) => {
-            s.state.pythClient = pythClient
-          })
-        } catch (e) {
-          console.error(e)
-        }
+
+        const updateMaxVoterWeightKeys = await pythClient.stakeConnection.program.methods
+            .updateMaxVoterWeight()
+            .pubkeys();
+        const maxVoterWeight = updateMaxVoterWeightKeys.maxVoterRecord as PublicKey;
+
+        set((s) => {
+          s.state.pythClient = pythClient
+          s.state.maxVoterWeight = maxVoterWeight
+        })
+      } catch (e) {
+        console.error(e)
       }
     },
     handleSetCurrentRealmVotingClient: ({ client, realm, walletPk }) => {

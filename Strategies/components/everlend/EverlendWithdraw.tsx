@@ -17,15 +17,21 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useQueryContext from '@hooks/useQueryContext'
 import { useRouter } from 'next/router'
 import AdditionalProposalOptions from '@components/AdditionalProposalOptions'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import * as yup from 'yup'
 import { precision } from '@utils/formatting'
 import { validateInstruction } from '@utils/instructionTools'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Loading from '@components/Loading'
+import { TreasuryStrategy } from '../../types/types'
 
 interface IProps {
-  proposedInvestment
+  proposedInvestment: TreasuryStrategy & {
+    poolMint: string
+    rateEToken: number
+    decimals: number
+    poolPubKey: string
+  }
   handledMint: string
   createProposalFcn: CreateEverlendProposal
   governedTokenAccount: AssetAccount
@@ -53,6 +59,7 @@ const EverlendWithdraw = ({
     councilMint,
     ownVoterWeight,
     symbol,
+    config,
   } = useRealm()
   const { canUseTransferInstruction } = useGovernanceAssets()
   const [voteByCouncil, setVoteByCouncil] = useState(false)
@@ -64,7 +71,7 @@ const EverlendWithdraw = ({
   const wallet = useWalletStore((s) => s.current)
   const router = useRouter()
 
-  const tokenSymbol = tokenService.getTokenInfo(
+  const tokenSymbol = tokenPriceService.getTokenInfo(
     governedTokenAccount.extensions.mint!.publicKey.toBase58()
   )?.symbol
 
@@ -101,11 +108,17 @@ const EverlendWithdraw = ({
       const defaultProposalMint = voteByCouncil
         ? realm?.account.config.councilMint
         : !mint?.supply.isZero() ||
-          realm?.account.config.useMaxCommunityVoterWeightAddin
+          config?.account.communityTokenConfig.maxVoterWeightAddin
         ? realm!.account.communityMint
         : !councilMint?.supply.isZero()
         ? realm!.account.config.councilMint
         : undefined
+
+      const amountToRate = Number(
+        (amount * proposedInvestment.rateEToken).toFixed(
+          proposedInvestment.decimals
+        )
+      )
 
       const proposalAddress = await createProposalFcn(
         rpcContext,
@@ -114,7 +127,7 @@ const EverlendWithdraw = ({
           description: proposalInfo.description,
           amountFmt: String(amount),
           bnAmount: getMintNaturalAmountFromDecimalAsBN(
-            amount as number,
+            amountToRate,
             governedTokenAccount.extensions.mint!.account.decimals
           ),
           action: 'Withdraw',
@@ -129,10 +142,11 @@ const EverlendWithdraw = ({
         governedTokenAccount!.governance!.account!.proposalCount,
         false,
         connection,
+        wallet!,
         client
       )
       const url = fmtUrlWithCluster(
-        `/dao/${symbol}/proposal/${proposalAddress}`
+        `/dao/${symbol}/proposal/${proposalAddress[0]}`
       )
       router.push(url)
     } catch (e) {
@@ -173,7 +187,7 @@ const EverlendWithdraw = ({
 
       <Input
         type="number"
-        onChange={(e) => setAmount(e.target.value)}
+        onChange={(e) => setAmount(e.target.value as any)}
         value={amount}
         onBlur={validateAmountOnBlur}
         error={formErrors['amount']}
@@ -205,7 +219,7 @@ const EverlendWithdraw = ({
           </span>
         </div>
         <div className="flex justify-between">
-          <span className="text-fgd-3">Proposed Deposit</span>
+          <span className="text-fgd-3">Proposed Withdraw</span>
           <span className="font-bold text-fgd-1">
             {amount?.toLocaleString() || (
               <span className="font-normal text-red">Enter an amount</span>

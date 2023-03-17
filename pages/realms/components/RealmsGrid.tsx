@@ -53,7 +53,7 @@ const RealmBox = React.forwardRef<HTMLDivElement, IRealmBox>(
         <h3 className="text-center">{realm.displayName ?? realm.symbol}</h3>
       </div>
       {editing && (
-        <AiOutlineDrag className="absolute cursor-grab active:cursor-grabbing left-0 right-0 top-0 bottom-0 m-auto h-20 w-20 opacity-50" />
+        <AiOutlineDrag className="absolute cursor-grab active:cursor-grabbing left-1 top-1 h-8 w-8 hover:opacity-50" />
       )}
       {editing && inGrid && (
         <div
@@ -98,7 +98,6 @@ function RealmsGrid({
   }, [cluster])
 
   const onSortEnd = (oldIndex: number, newIndex: number) => {
-    console.log(arrayMove(gridRealms, oldIndex, newIndex))
     setGridRealms((array) => arrayMove(array, oldIndex, newIndex))
     localStorage.setItem(
       STORAGE_REALMS,
@@ -141,6 +140,7 @@ function RealmsGrid({
 
   useEffect(() => {
     setGridRealms(getGridRealms())
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [])
 
   const goToRealm = (realmInfo: RealmInfo) => {
@@ -238,6 +238,7 @@ function RealmsGrid({
                   ) && (
                     <div
                       draggable={editing}
+                      // eslint-disable-next-line react/no-unknown-property
                       unselectable="on"
                       onMouseDown={
                         editing

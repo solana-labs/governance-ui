@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import React, { useContext, useEffect, useState } from 'react'
 import Input from '@components/inputs/Input'
 import useRealm from '@hooks/useRealm'
@@ -48,9 +49,9 @@ const Grant = ({
   const dateNow = dayjs().unix()
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
-  const { realm, tokenRecords } = useRealm()
+  const { realm, tokenRecords, realmInfo } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const [startDate, setStartDate] = useState(dayjs().format('DD-MM-YYYY'))
   const [endDate, setEndDate] = useState('')
   const [useableGrantMints, setUseableGrantMints] = useState<string[]>([])
@@ -127,6 +128,7 @@ const Grant = ({
         await withCreateTokenOwnerRecord(
           prerequisiteInstructions,
           realm!.owner,
+          realmInfo?.programVersion!,
           realm!.pubkey,
           destinationAccount,
           realm!.account.communityMint,
@@ -191,6 +193,7 @@ const Grant = ({
         propertyName: 'periods',
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [startDate, endDate, form.lockupKind.value])
   useEffect(() => {
     if (form.destinationAccount) {
@@ -206,16 +209,19 @@ const Grant = ({
     } else {
       setDestinationAccount(null)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.destinationAccount])
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: governedAccount, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
   useEffect(() => {
     setGovernedAccount(form.governedTokenAccount?.governance)
     setMintInfo(form.governedTokenAccount?.extensions.mint?.account)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.governedTokenAccount])
   const destinationAccountName =
     destinationAccount?.publicKey &&
@@ -250,7 +256,10 @@ const Grant = ({
     if (client) {
       getGrantMints()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [client])
+  const isNotVested =
+    form.lockupKind.value !== 'monthly' && form.lockupKind.value !== 'daily'
   return (
     <>
       <Select
@@ -286,6 +295,7 @@ const Grant = ({
         error={formErrors['governedTokenAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
+        type="token"
       ></GovernedAccountSelect>
       <div className="text-sm mb-3">
         <div className="mb-2">Allow dao to clawback</div>
@@ -308,7 +318,7 @@ const Grant = ({
         onChange={handleChangeStartDate}
         error={formErrors['startDateUnixSeconds']}
       />
-      {form.lockupKind.value !== 'monthly' ? (
+      {isNotVested && (
         <Input
           label="End date"
           type="date"
@@ -316,10 +326,26 @@ const Grant = ({
           onChange={handleChangeEndDate}
           error={formErrors['periods']}
         />
-      ) : (
+      )}
+      {form.lockupKind.value === 'monthly' && (
         <Input
           type="number"
           label="Number of months"
+          min="1"
+          value={form.periods}
+          onChange={(e) => {
+            handleSetForm({
+              value: e.target.value,
+              propertyName: 'periods',
+            })
+          }}
+          error={formErrors['periods']}
+        ></Input>
+      )}
+      {form.lockupKind.value === 'daily' && (
+        <Input
+          type="number"
+          label="Number of days"
           min="1"
           value={form.periods}
           onChange={(e) => {
@@ -382,6 +408,13 @@ const Grant = ({
         !isNaN(form.amount) &&
         !isNaN(form.periods) && (
           <div>Vesting rate: {(form.amount / form.periods).toFixed(2)} p/m</div>
+        )}
+
+      {form.lockupKind.value === 'daily' &&
+        form.amount &&
+        !isNaN(form.amount) &&
+        !isNaN(form.periods) && (
+          <div>Vesting rate: {(form.amount / form.periods).toFixed(2)} p/d</div>
         )}
     </>
   )

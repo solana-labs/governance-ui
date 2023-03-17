@@ -34,6 +34,7 @@ export default function CommunityVotingPower(props: Props) {
   const connection = useWalletStore((s) => s.connection.current)
   const wallet = useWalletStore((s) => s.current)
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   const depositAmount = realmTokenAccount
     ? new BigNumber(realmTokenAccount.account.amount.toString())
     : new BigNumber(0)
@@ -74,7 +75,7 @@ export default function CommunityVotingPower(props: Props) {
     wallet,
   ])
 
-  if (!(realm && realmInfo && ownTokenRecord)) {
+  if (!(realm && realmInfo)) {
     return (
       <div
         className={classNames(props.className, 'rounded-md bg-bkg-1 h-[76px]')}
@@ -86,9 +87,7 @@ export default function CommunityVotingPower(props: Props) {
     <div className={props.className}>
       {amount.isZero() ? (
         <div className={'text-xs text-white/50'}>
-          You do not have any voting power
-          <br />
-          in this realm.
+          You do not have any voting power in this dao.
         </div>
       ) : (
         <div className={'p-3 rounded-md bg-bkg-1'}>
@@ -111,7 +110,7 @@ export default function CommunityVotingPower(props: Props) {
               ? depositAmount.shiftedBy(-mint.decimals).toFormat()
               : depositAmount.toFormat()}{' '}
             more {tokenName} votes in your wallet. Do you want to deposit them
-            to increase your voting power in this Realm?
+            to increase your voting power in this Dao?
           </div>
           <SecondaryButton className="mt-4 w-48" onClick={deposit}>
             Deposit

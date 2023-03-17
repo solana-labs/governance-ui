@@ -18,20 +18,20 @@ import {
 } from '@solana/spl-governance'
 import { getMaxVoterWeightRecord as getPluginMaxVoterWeightRecord } from '@utils/plugin/accounts'
 import { notify } from '@utils/notifications'
-import * as anchor from '@project-serum/anchor'
+import * as anchor from '@coral-xyz/anchor'
 import * as sbv2 from '@switchboard-xyz/switchboard-v2'
 import sbIdl from 'SwitchboardVotePlugin/switchboard_v2.json'
 import gonIdl from 'SwitchboardVotePlugin/gameofnodes.json'
 
-import {
-  LOCALNET_STAKING_ADDRESS as PYTH_LOCALNET_STAKING_ADDRESS,
-  DEVNET_STAKING_ADDRESS as PYTH_DEVNET_STAKING_ADDRESS,
-} from 'pyth-staking-api'
+import { STAKING_ADDRESS as PYTH_STAKING_ADDRESS } from 'pyth-staking-api'
 import useGatewayPluginStore from '../GatewayPlugin/store/gatewayPluginStore'
 import { getGatekeeperNetwork } from '../GatewayPlugin/sdk/accounts'
+import { NFTWithMeta } from '@utils/uiTypes/VotePlugin'
 
 export const vsrPluginsPks: string[] = [
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo',
+  'vsr2nfGVNHmSY8uxoBGqq8AQbwz3JwaEaHqGbsTPXqQ',
+  'VotEn9AWwTFtJPJSMV5F9jsMY6QwWM5qn3XP9PATGW7',
 ]
 
 export const nftPluginsPks: string[] = [
@@ -45,10 +45,7 @@ export const gatewayPluginsPks: string[] = [
 
 export const switchboardPluginsPks: string[] = [SWITCHBOARD_ADDIN_ID.toBase58()]
 
-export const pythPluginsPks: string[] = [
-  PYTH_LOCALNET_STAKING_ADDRESS.toBase58(),
-  PYTH_DEVNET_STAKING_ADDRESS.toBase58(),
-]
+export const pythPluginsPks: string[] = [PYTH_STAKING_ADDRESS.toBase58()]
 
 export function useVotingPlugins() {
   const { realm, config, ownTokenRecord } = useRealm()
@@ -57,7 +54,7 @@ export function useVotingPlugins() {
     handleSetVsrClient,
     handleSetNftClient,
     handleSetGatewayClient,
-    handleSetSwitchboardClient,
+    //handleSetSwitchboardClient,
     handleSetNftRegistrar,
     handleSetGatewayRegistrar,
     handleSetPythClient,
@@ -93,7 +90,8 @@ export function useVotingPlugins() {
   const currentClient = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
-  const currentPluginPk = config?.account.communityVoterWeightAddin
+  const currentPluginPk = config?.account.communityTokenConfig.voterWeightAddin
+
   const nftMintRegistrar = useVotePluginsClientStore(
     (s) => s.state.nftMintRegistrar
   )
@@ -114,7 +112,7 @@ export function useVotingPlugins() {
     } catch (e) {
       console.log(e)
       notify({
-        message: "Something went wrong can't fetch nfts",
+        message: `Something went wrong can't fetch nfts: ${e}`,
         type: 'error',
       })
     }
@@ -298,23 +296,29 @@ export function useVotingPlugins() {
       setMaxVoterWeight(null)
     }
   }
-  const getIsFromCollection = (nft) => {
+  const getIsFromCollection = (nft: NFTWithMeta) => {
     return (
       nft.collection &&
       nft.collection.mintAddress &&
+      (nft.collection.verified ||
+        typeof nft.collection.verified === 'undefined') &&
       usedCollectionsPks.includes(nft.collection.mintAddress) &&
       nft.collection.creators?.filter((x) => x.verified).length > 0
     )
   }
   useEffect(() => {
     if (wallet) {
-      handleSetVsrClient(wallet, connection)
+      if (currentPluginPk) {
+        handleSetVsrClient(wallet, connection, currentPluginPk)
+      }
+
       handleSetNftClient(wallet, connection)
-      handleSetSwitchboardClient(wallet, connection)
+      //handleSetSwitchboardClient(wallet, connection)
       handleSetGatewayClient(wallet, connection)
       handleSetPythClient(wallet, connection)
     }
-  }, [connection.endpoint, wallet])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+  }, [connection.endpoint, wallet, currentPluginPk?.toBase58()])
 
   useEffect(() => {
     const handleVsrPlugin = () => {
@@ -391,6 +395,8 @@ export function useVotingPlugins() {
         }
       }
     }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleSwitchboardPlugin = () => {
       if (
         switchboardClient &&
@@ -399,7 +405,6 @@ export function useVotingPlugins() {
       ) {
         // Switchboard: don't think we need this
         //handleSetNftRegistrar(nftClient!, realm)
-        console.log('Switchboard')
         if (connected) {
           handleSetCurrentRealmVotingClient({
             client: switchboardClient,
@@ -419,15 +424,22 @@ export function useVotingPlugins() {
       handleNftplugin()
       handleGatewayPlugin()
       handleVsrPlugin()
-      handleSwitchboardPlugin()
+      //handleSwitchboardPlugin()
       handlePythPlugin()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     currentPluginPk?.toBase58(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     vsrClient?.program.programId.toBase58(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     nftClient?.program.programId.toBase58(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     gatewayClient?.program.programId.toBase58(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     pythClient?.program.programId.toBase58(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     realm?.pubkey.toBase58(),
     connection.endpoint,
     connected,
@@ -453,11 +465,16 @@ export function useVotingPlugins() {
       setVotingNfts([], currentClient, nftMintRegistrar)
       setMaxVoterWeight(null)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     JSON.stringify(usedCollectionsPks),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     currentPluginPk?.toBase58(),
     connected,
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     realm?.pubkey.toBase58(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     currentClient.walletPk?.toBase58(),
   ])
 }

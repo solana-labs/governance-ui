@@ -42,15 +42,16 @@ const CreateGatewayPluginRegistrar = ({
   const gatewayClient = useVotePluginsClientStore((s) => s.state.gatewayClient)
   const { assetAccounts } = useGovernanceAssets()
   const wallet = useWalletStore((s) => s.current)
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<CreateGatewayRegistrarForm>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
 
   const chosenGatekeeperNetwork = useMemo(() => {
-    const chosenEntry = form?.otherGatekeeperNetwork || form?.gatekeeperNetwork
-    if (chosenEntry) {
-      return new PublicKey(chosenEntry.value)
+    const chosenEntry =
+      form?.otherGatekeeperNetwork || form?.gatekeeperNetwork?.value
+    if (chosenEntry && chosenEntry !== '') {
+      return new PublicKey(chosenEntry)
     }
   }, [form])
 
@@ -100,6 +101,7 @@ const CreateGatewayPluginRegistrar = ({
       { governedAccount: form?.governedAccount?.governance, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
   const schema = yup.object().shape({
     governedAccount: yup
@@ -109,7 +111,7 @@ const CreateGatewayPluginRegistrar = ({
   })
   const inputs: InstructionInput[] = [
     {
-      label: 'Governance',
+      label: 'Wallet',
       initialValue: null,
       name: 'governedAccount',
       type: InstructionInputType.GOVERNED_ACCOUNT,
@@ -131,6 +133,17 @@ const CreateGatewayPluginRegistrar = ({
         <Tooltip content="The type of Civic Pass to add to the DAO. Visit civic.com for details">
           <span>
             <InformationCircleIcon className="w-4 h-4 ml-1"></InformationCircleIcon>
+            <p className="ml-1">
+              By installing or integrating the{' '}
+              <a href="https://www.civic.com">Civic Pass</a> plugin, you agree
+              to the{' '}
+              <a
+                className="underline"
+                href="https://www.civic.com/legal/terms-of-service-civic-pass-v1/"
+              >
+                Civic Pass Terms of Service
+              </a>
+            </p>
           </span>
         </Tooltip>
       ),

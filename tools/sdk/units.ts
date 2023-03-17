@@ -1,6 +1,6 @@
-import { BN, ProgramAccount } from '@project-serum/anchor'
+import { BN, ProgramAccount } from '@coral-xyz/anchor'
 import { MintInfo } from '@solana/spl-token'
-import { TokenInfo } from '@solana/spl-token-registry'
+import { TokenInfoWithoutDecimals } from '@utils/services/tokenPrice'
 import { BigNumber } from 'bignumber.js'
 
 const SECONDS_PER_DAY = 86400
@@ -9,12 +9,31 @@ export function getDaysFromTimestamp(unixTimestamp: number) {
   return unixTimestamp / SECONDS_PER_DAY
 }
 
+export function getHoursFromTimestamp(unixTimestamp: number) {
+  return unixTimestamp / (60 * 60)
+}
+
 export function getTimestampFromDays(days: number) {
   return days * SECONDS_PER_DAY
 }
 
+export function getTimestampFromHours(hours: number) {
+  return hours * 60 * 60
+}
+
 export function fmtBnMintDecimals(amount: BN, decimals: number) {
   return new BigNumber(amount.toString()).shiftedBy(-decimals).toFormat()
+}
+
+export function fmtBnMintDecimalsUndelimited(amount: BN, decimals: number) {
+  return new BigNumber(amount.toString())
+    .shiftedBy(-decimals)
+    .toFormat()
+    .replaceAll(',', '')
+}
+
+export function fmtBNAmount(amount: BN | number | string) {
+  return new BigNumber(amount.toString()).toFormat()
 }
 
 /// Formats mint amount (natural units) as a decimal string
@@ -27,7 +46,7 @@ export function fmtMintAmount(mint: MintInfo | undefined, mintAmount: BN) {
 export function fmtTokenInfoWithMint(
   amount: BN,
   mintInfo: ProgramAccount<MintInfo>,
-  tokenInfo: TokenInfo | undefined = undefined
+  tokenInfo: TokenInfoWithoutDecimals | undefined = undefined
 ) {
   return `${fmtBnMintDecimals(amount, mintInfo.account.decimals)} ${
     tokenInfo?.symbol

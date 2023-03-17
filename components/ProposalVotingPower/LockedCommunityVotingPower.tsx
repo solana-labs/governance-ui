@@ -162,9 +162,7 @@ export default function LockedCommunityVotingPower(props: Props) {
     <div className={props.className}>
       {amount.isZero() ? (
         <div className={'text-xs text-white/50'}>
-          You do not have any voting power
-          <br />
-          in this realm.
+          You do not have any voting power in this dao.
         </div>
       ) : (
         <>
@@ -213,7 +211,7 @@ export default function LockedCommunityVotingPower(props: Props) {
               ? depositAmount.shiftedBy(-mint.decimals).toFormat()
               : depositAmount.toFormat()}{' '}
             more {tokenName} votes in your wallet. Do you want to deposit them
-            to increase your voting power in this Realm?
+            to increase your voting power in this Dao?
           </div>
           <SecondaryButton className="mt-4 w-48" onClick={deposit}>
             Deposit

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import classNames from 'classnames'
 import { BigNumber } from 'bignumber.js'
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
@@ -19,6 +20,8 @@ import VotingPowerPct from './VotingPowerPct'
 
 interface Props {
   className?: string
+  inAccountDetails?: boolean
+  children?: React.ReactNode
 }
 
 export default function NftVotingPower(props: Props) {
@@ -30,7 +33,7 @@ export default function NftVotingPower(props: Props) {
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
-  const { ownTokenRecord, realm } = useRealm()
+  const { ownTokenRecord, realm, realmInfo } = useRealm()
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
@@ -65,6 +68,7 @@ export default function NftVotingPower(props: Props) {
     await withCreateTokenOwnerRecord(
       instructions,
       realm!.owner!,
+      realmInfo?.programVersion!,
       realm!.pubkey,
       wallet!.publicKey!,
       realm!.account.communityMint,
@@ -94,43 +98,55 @@ export default function NftVotingPower(props: Props) {
 
   if (nfts.length === 0) {
     return (
-      <div className={classNames(props.className, 'text-xs', 'text-white/50')}>
-        You do not have any voting power
-        <br />
-        in this realm.
-      </div>
+      <Wrapper inAccountDetails={props.inAccountDetails}>
+        <div
+          className={classNames(props.className, 'text-xs', 'text-white/50')}
+        >
+          You do not have any voting power in this dao.
+        </div>
+      </Wrapper>
     )
   }
 
   return (
-    <div className={props.className}>
-      <div className={classNames('p-3', 'rounded-md', 'bg-bkg-1')}>
-        <div className="text-white/50 text-xs">My NFT Votes</div>
-        <div className="flex items-center justify-between mt-1">
-          <div className="text-white flex items-center gap-1">
-            {displayNfts.slice(0, 3).map((nft, index) => (
-              <div
-                className="h-12 w-12 rounded-sm bg-bkg-2 bg-cover"
-                key={nft.mintAddress + index}
-                style={{ backgroundImage: `url("${nft.image}")` }}
-              />
-            ))}
-            {!!remainingCount && (
-              <div className="text-sm text-white ml-2">
-                +{remainingCount} more
-              </div>
+    <Wrapper inAccountDetails={props.inAccountDetails}>
+      <div className={props.className}>
+        <div className={classNames('p-3', 'rounded-md', 'bg-bkg-1')}>
+          <div className="text-white/50 text-xs">My NFT Votes</div>
+          <div className="flex items-center justify-between mt-1">
+            <div className="text-white flex items-center gap-1">
+              {displayNfts.slice(0, 3).map((nft, index) => (
+                <div
+                  className="h-12 w-12 rounded-sm bg-bkg-2 bg-cover"
+                  key={nft.mintAddress + index}
+                  style={{ backgroundImage: `url("${nft.image}")` }}
+                />
+              ))}
+              {!!remainingCount && (
+                <div className="text-sm text-white ml-2">
+                  +{remainingCount} more
+                </div>
+              )}
+            </div>
+            {max && !max.isZero() && (
+              <VotingPowerPct amount={amount} total={max} />
             )}
           </div>
-          {max && !max.isZero() && (
-            <VotingPowerPct amount={amount} total={max} />
-          )}
         </div>
+        {connected && !ownTokenRecord && (
+          <Button className="w-full mt-3" onClick={handleRegister}>
+            Join
+          </Button>
+        )}
       </div>
-      {connected && !ownTokenRecord && (
-        <Button className="w-full mt-3" onClick={handleRegister}>
-          Join
-        </Button>
-      )}
-    </div>
+    </Wrapper>
   )
+}
+
+const Wrapper = (props: Props) => {
+  if (props.inAccountDetails) {
+    return <div className="my-4 space-y-4 w-1/2">{props.children}</div>
+  } else {
+    return <>{props.children}</>
+  }
 }

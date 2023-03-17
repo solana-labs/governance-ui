@@ -5,7 +5,6 @@ import ProposalFilter, {
   Filters,
 } from 'components/ProposalFilter'
 import {
-  Governance,
   ProgramAccount,
   Proposal,
   ProposalState,
@@ -31,8 +30,13 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NftVoterClient } from '@solana/governance-program-library'
 import { notify } from '@utils/notifications'
 import { sendSignedTransaction } from '@utils/send'
-import { LOCALNET_REALM_ID as PYTH_LOCALNET_REALM_ID } from 'pyth-staking-api'
-import { hasInstructions } from '@components/ProposalStatusBadge'
+import { compareProposals, filterProposals } from '@utils/proposals'
+import { REALM_ID as PYTH_REALM_ID } from 'pyth-staking-api'
+import ProposalSorting, {
+  InitialSorting,
+  PROPOSAL_SORTING_LOCAL_STORAGE_KEY,
+  Sorting,
+} from '@components/ProposalSorting'
 
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
@@ -49,136 +53,24 @@ const DepositLabel = dynamic(
   () => import('@components/TreasuryAccount/DepositLabel')
 )
 
-const filterProposals = (
-  proposals: [string, ProgramAccount<Proposal>][],
-  filters: Filters
-) => {
-  return proposals.filter(([, proposal]) => {
-    if (
-      !filters.Cancelled &&
-      proposal.account.state === ProposalState.Cancelled
-    ) {
-      return false
-    }
-
-    if (!filters.Completed) {
-      if (proposal.account.state === ProposalState.Completed) {
-        return false
-      }
-
-      if (
-        proposal.account.state === ProposalState.Succeeded &&
-        !hasInstructions(proposal.account)
-      ) {
-        return false
-      }
-    }
-
-    if (
-      !filters.Defeated &&
-      proposal.account.state === ProposalState.Defeated
-    ) {
-      return false
-    }
-
-    if (!filters.Draft && proposal.account.state === ProposalState.Draft) {
-      return false
-    }
-
-    if (!filters.Executable) {
-      if (proposal.account.state === ProposalState.Executing) {
-        return false
-      }
-
-      if (
-        proposal.account.state === ProposalState.Succeeded &&
-        hasInstructions(proposal.account)
-      ) {
-        return false
-      }
-    }
-
-    if (
-      !filters.ExecutingWithErrors &&
-      proposal.account.state === ProposalState.ExecutingWithErrors
-    ) {
-      return false
-    }
-
-    if (
-      !filters.SigningOff &&
-      proposal.account.state === ProposalState.SigningOff
-    ) {
-      return false
-    }
-
-    if (!filters.Voting && proposal.account.state === ProposalState.Voting) {
-      return false
-    }
-
-    return true
-  })
-}
-
-const compareProposals = (
-  p1: Proposal,
-  p2: Proposal,
-  governances: {
-    [governance: string]: ProgramAccount<Governance>
-  }
-) => {
-  const p1Rank = p1.getStateSortRank()
-  const p2Rank = p2.getStateSortRank()
-
-  if (p1Rank > p2Rank) {
-    return 1
-  } else if (p1Rank < p2Rank) {
-    return -1
-  }
-
-  if (p1.state === ProposalState.Voting && p2.state === ProposalState.Voting) {
-    const p1VotingRank = getVotingStateRank(p1, governances)
-    const p2VotingRank = getVotingStateRank(p2, governances)
-
-    if (p1VotingRank > p2VotingRank) {
-      return 1
-    } else if (p1VotingRank < p2VotingRank) {
-      return -1
-    }
-
-    // Show the proposals in voting state expiring earlier at the top
-    return p2.getStateTimestamp() - p1.getStateTimestamp()
-  }
-
-  return p1.getStateTimestamp() - p2.getStateTimestamp()
-}
-
-/// Compares proposals in voting state to distinguish between Voting and Finalizing states
-function getVotingStateRank(
-  proposal: Proposal,
-  governances: {
-    [governance: string]: ProgramAccount<Governance>
-  }
-) {
-  // Show proposals in Voting state before proposals in Finalizing state
-  const governance = governances[proposal.governance.toBase58()].account
-  return proposal.hasVoteTimeEnded(governance) ? 0 : 1
-}
-
 const REALM = () => {
   const pagination = useRef<{ setPage: (val) => void }>(null)
   const {
     realm,
     realmInfo,
+    mint,
+    councilMint,
     proposals,
     governances,
     tokenRecords,
     ownVoterWeight,
     ownTokenRecord,
-    isNftMode,
+    councilTokenOwnerRecords,
+    ownCouncilTokenRecord,
   } = useRealm()
   const proposalsPerPage = 20
   const [filters, setFilters] = useState<Filters>(InitialFilters)
+  const [sorting, setSorting] = useState<Sorting>(InitialSorting)
   const [displayedProposals, setDisplayedProposals] = useState(
     Object.entries(proposals)
   )
@@ -196,12 +88,36 @@ const REALM = () => {
   const ownVoteRecordsByProposal = useWalletStore(
     (s) => s.ownVoteRecordsByProposal
   )
+
+  const councilDelegateVoteRecordsByProposal = useWalletStore(
+    (s) => s.councilDelegateVoteRecordsByProposal
+  )
+
+  const communityDelegateVoteRecordsByProposal = useWalletStore(
+    (s) => s.communityDelegateVoteRecordsByProposal
+  )
+  const selectedCouncilDelegate = useWalletStore(
+    (s) => s.selectedCouncilDelegate
+  )
+  const selectedCommunityDelegate = useWalletStore(
+    (s) => s.selectedCommunityDelegate
+  )
+
+  const getCurrentVoteRecKeyVal = () => {
+    if (selectedCommunityDelegate) {
+      return communityDelegateVoteRecordsByProposal
+    }
+    if (selectedCouncilDelegate) {
+      return councilDelegateVoteRecordsByProposal
+    }
+    return ownVoteRecordsByProposal
+  }
+
   const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
   const wallet = useWalletStore((s) => s.current)
-  const connected = useWalletStore((s) => s.connected)
   const connection = useWalletStore((s) => s.connection.current)
 
   const allProposals = Object.entries(proposals).sort((a, b) =>
@@ -210,10 +126,19 @@ const REALM = () => {
   useEffect(() => {
     setPaginatedProposals(paginateProposals(0))
     pagination?.current?.setPage(0)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(filteredProposals)])
 
   useEffect(() => {
-    let proposals = filterProposals(allProposals, filters)
+    let proposals = filterProposals(
+      allProposals,
+      filters,
+      sorting,
+      realm,
+      governances,
+      councilMint,
+      mint
+    )
 
     if (proposalSearch) {
       proposals = proposals.filter(([, v]) =>
@@ -223,12 +148,22 @@ const REALM = () => {
       )
     }
     setFilteredProposals(proposals)
-  }, [filters, proposalSearch])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+  }, [filters, proposalSearch, sorting])
 
   useEffect(() => {
-    const proposals = filterProposals(allProposals, filters)
+    const proposals = filterProposals(
+      allProposals,
+      filters,
+      sorting,
+      realm,
+      governances,
+      councilMint,
+      mint
+    )
     setDisplayedProposals(proposals)
     setFilteredProposals(proposals)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(proposals)])
 
   const onProposalPageChange = (page) => {
@@ -244,6 +179,13 @@ const REALM = () => {
   const toggleMultiVoteMode = () => {
     setMultiVoteMode(!multiVoteMode)
   }
+  const handleSetSorting = (sorting: Sorting) => {
+    localStorage.setItem(
+      PROPOSAL_SORTING_LOCAL_STORAGE_KEY,
+      JSON.stringify(sorting)
+    )
+    setSorting(sorting)
+  }
 
   const votingProposals = useMemo(
     () =>
@@ -251,10 +193,11 @@ const REALM = () => {
         const governance = governances[v.account.governance.toBase58()]?.account
         return (
           v.account.state === ProposalState.Voting &&
-          !ownVoteRecordsByProposal[k] &&
+          !getCurrentVoteRecKeyVal()[k] &&
           !v.account.hasVoteTimeEnded(governance)
         )
       }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     [allProposals]
   )
 
@@ -263,18 +206,43 @@ const REALM = () => {
     if (multiVoteMode) {
       setFilteredProposals(votingProposals)
     } else {
-      const proposals = filterProposals(allProposals, filters)
+      const proposals = filterProposals(
+        allProposals,
+        filters,
+        sorting,
+        realm,
+        governances,
+        councilMint,
+        mint
+      )
       setFilteredProposals(proposals)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [multiVoteMode])
+
+  useEffect(() => {
+    const initialSort = localStorage.getItem(PROPOSAL_SORTING_LOCAL_STORAGE_KEY)
+    if (initialSort) {
+      const initialSortObj = JSON.parse(initialSort)
+      setSorting(initialSortObj)
+    }
+  }, [])
 
   const allVotingProposalsSelected =
     selectedProposals.length === votingProposals.length
   const hasCommunityVoteWeight =
     ownTokenRecord &&
     ownVoterWeight.hasMinAmountToVote(ownTokenRecord.account.governingTokenMint)
+  const hasCouncilVoteWeight =
+    ownCouncilTokenRecord &&
+    ownVoterWeight.hasMinAmountToVote(
+      ownCouncilTokenRecord.account.governingTokenMint
+    )
+
   const cantMultiVote =
-    selectedProposals.length === 0 || isMultiVoting || !hasCommunityVoteWeight
+    selectedProposals.length === 0 ||
+    isMultiVoting ||
+    (!hasCommunityVoteWeight && !hasCouncilVoteWeight)
 
   const toggleSelectAll = () => {
     if (allVotingProposalsSelected) {
@@ -304,7 +272,19 @@ const REALM = () => {
       const transactions: Transaction[] = []
       for (let i = 0; i < selectedProposals.length; i++) {
         const selectedProposal = selectedProposals[i]
-        const ownTokenRecord = tokenRecords[wallet.publicKey!.toBase58()]
+        const ownTokenRecord =
+          selectedProposal.proposal.governingTokenMint.toBase58() ===
+          realm.account.communityMint.toBase58()
+            ? tokenRecords[
+                selectedCommunityDelegate
+                  ? selectedCommunityDelegate
+                  : wallet.publicKey!.toBase58()
+              ]
+            : councilTokenOwnerRecords[
+                selectedCouncilDelegate
+                  ? selectedCouncilDelegate
+                  : wallet.publicKey!.toBase58()
+              ]
 
         const instructions: TransactionInstruction[] = []
 
@@ -364,16 +344,8 @@ const REALM = () => {
     setIsMultiVoting(false)
   }
 
-  const showMultiVote = useMemo(
-    () =>
-      realm
-        ? realm.account.votingProposalCount > 1 && connected && !isNftMode
-        : false,
-    [realm, connected]
-  )
   //Todo: move to own components with refactor to dao folder structure
-  const isPyth =
-    realmInfo?.realmId.toBase58() === PYTH_LOCALNET_REALM_ID.toBase58()
+  const isPyth = realmInfo?.realmId.toBase58() === PYTH_REALM_ID.toBase58()
 
   return (
     <>
@@ -400,7 +372,9 @@ const REALM = () => {
               className="whitespace-nowrap"
               disabled={cantMultiVote}
               tooltipMessage={
-                !hasCommunityVoteWeight ? "You don't have voting power" : ''
+                !hasCommunityVoteWeight && !hasCouncilVoteWeight
+                  ? "You don't have voting power"
+                  : ''
               }
               onClick={() => voteOnSelected(YesNoVote.Yes)}
               isLoading={isMultiVoting}
@@ -411,7 +385,9 @@ const REALM = () => {
               className="whitespace-nowrap"
               disabled={cantMultiVote}
               tooltipMessage={
-                !hasCommunityVoteWeight ? "You don't have voting power" : ''
+                !hasCommunityVoteWeight && !hasCouncilVoteWeight
+                  ? "You don't have voting power"
+                  : ''
               }
               onClick={() => voteOnSelected(YesNoVote.No)}
               isLoading={isMultiVoting}
@@ -474,37 +450,32 @@ const REALM = () => {
                           filters={filters}
                           onChange={setFilters}
                         />
+                        <ProposalSorting
+                          sorting={sorting}
+                          disabled={multiVoteMode}
+                          onChange={handleSetSorting}
+                        ></ProposalSorting>
                       </div>
                       <div
-                        className={`flex lg:flex-row items-center justify-between lg:space-x-3 w-full ${
-                          showMultiVote ? 'flex-col-reverse' : 'flex-row'
-                        }`}
+                        className={`flex lg:flex-row items-center justify-between lg:space-x-3 w-full flex-col-reverse`}
                       >
-                        <h4 className="font-normal mb-0 text-fgd-2 whitespace-nowrap">{`${
-                          filteredProposals.length
-                        } Proposal${
-                          filteredProposals.length === 1 ? '' : 's'
-                        }`}</h4>
-                        <div
-                          className={`flex items-center lg:justify-end lg:pb-0 lg:space-x-3 w-full ${
-                            showMultiVote
-                              ? 'justify-between pb-3'
-                              : 'justify-end'
+                        <h4 className="font-normal mb-0 text-fgd-2 whitespace-nowrap">
+                          {`${filteredProposals.length} Proposal${
+                            filteredProposals.length === 1 ? '' : 's'
                           }`}
+                        </h4>
+                        <div
+                          className={`flex items-center lg:justify-end lg:pb-0 lg:space-x-3 w-full justify-between pb-3`}
                         >
-                          {showMultiVote ? (
-                            <div className="flex items-center">
-                              <p className="mb-0 mr-1 text-fgd-3">
-                                Multi-vote Mode
-                              </p>
-                              <Switch
-                                checked={multiVoteMode}
-                                onChange={() => {
-                                  toggleMultiVoteMode()
-                                }}
-                              />
-                            </div>
-                          ) : null}
+                          <div className="flex items-center">
+                            <p className="mb-0 mr-1 text-fgd-3">Batch voting</p>
+                            <Switch
+                              checked={multiVoteMode}
+                              onChange={() => {
+                                toggleMultiVoteMode()
+                              }}
+                            />
+                          </div>
                           <NewProposalBtn />
                         </div>
                       </div>
@@ -550,7 +521,7 @@ const REALM = () => {
             </div>
             <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
               <TokenBalanceCardWrapper />
-              {!isPyth && <NFTSCompactWrapper />}
+              {!isPyth && !process?.env?.DISABLE_NFTS && <NFTSCompactWrapper />}
               <AccountsCompactWrapper />
               <AssetsCompactWrapper />
             </div>

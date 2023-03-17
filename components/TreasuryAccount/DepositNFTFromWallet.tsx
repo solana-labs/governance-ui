@@ -5,7 +5,7 @@ import Button from '@components/Button'
 import Tooltip from '@components/Tooltip'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
 import { notify } from '@utils/notifications'
-import { web3 } from '@project-serum/anchor'
+import { web3 } from '@coral-xyz/anchor'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
@@ -31,6 +31,7 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [sendingSuccess, setSendingSuccess] = useState(false)
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
+
   const handleDeposit = async () => {
     for (const i of selectedNfts) {
       setIsLoading(true)
@@ -106,6 +107,7 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
     if (sendingSuccess) {
       setCurrentAccount(currentAccount!, connection)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [connected, sendingSuccess])
 
   return (

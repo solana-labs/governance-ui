@@ -7,9 +7,9 @@ import {
 import { RpcContext } from '@solana/spl-governance'
 import { sendTransaction } from 'utils/send'
 
-import { BN } from '@project-serum/anchor'
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
+import { BN } from '@coral-xyz/anchor'
 import { withVoteRegistryDeposit } from '../sdk/withVoteRegistryDeposit'
+import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 
 export const voteRegistryDepositWithoutLockup = async ({
   rpcContext,
@@ -18,6 +18,7 @@ export const voteRegistryDepositWithoutLockup = async ({
   realmPk,
   communityMintPk,
   programId,
+  programVersion,
   amount,
   tokenOwnerRecordPk,
   client,
@@ -29,6 +30,7 @@ export const voteRegistryDepositWithoutLockup = async ({
   communityMintPk: PublicKey
   realmPk: PublicKey
   programId: PublicKey
+  programVersion: number
   amount: BN
   tokenOwnerRecordPk: PublicKey | null
   client?: VsrClient
@@ -45,6 +47,7 @@ export const voteRegistryDepositWithoutLockup = async ({
     mintPk,
     realmPk,
     programId,
+    programVersion,
     amount,
     tokenOwnerRecordPk,
     lockUpPeriodInDays,

@@ -9,8 +9,6 @@ import {
 import { validateInstruction } from '@utils/instructionTools'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
-import useWalletStore from 'stores/useWalletStore'
-
 import useRealm from '@hooks/useRealm'
 import { NewProposalContext } from '../../../new'
 import InstructionForm, {
@@ -22,16 +20,18 @@ import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getScaledFactor } from '@utils/tokens'
 import { yearsToSecs } from 'VoteStakeRegistry/tools/dateTools'
-import { BN } from '@project-serum/anchor'
+import { BN, web3 } from '@coral-xyz/anchor'
 import { PublicKey } from '@solana/web3.js'
 import {
   emptyPk,
   getRegistrarPDA,
   Registrar,
 } from 'VoteStakeRegistry/sdk/accounts'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import { DEFAULT_VSR_ID, VsrClient } from 'VoteStakeRegistry/sdk/client'
+import useWallet from '@hooks/useWallet'
 
 interface ConfigureCollectionForm {
+  programId: string | undefined
   governedAccount: AssetAccount | undefined
   mint: string
   mintIndex: number
@@ -50,13 +50,13 @@ const VotingMintConfig = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const { realm } = useRealm()
-  const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
   const { assetAccounts } = useGovernanceAssets()
-  const wallet = useWalletStore((s) => s.current)
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<ConfigureCollectionForm>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
+  const { wallet, anchorProvider } = useWallet()
+
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     let serializedInstruction = ''
@@ -64,8 +64,12 @@ const VotingMintConfig = ({
       isValid &&
       form &&
       form!.governedAccount?.governance.pubkey &&
-      wallet?.publicKey
+      wallet?.publicKey?.toBase58()
     ) {
+      const vsrClient = VsrClient.connect(
+        anchorProvider,
+        form?.programId ? new web3.PublicKey(form.programId) : DEFAULT_VSR_ID
+      )
       const digitShift = form.mintDigitShift
       const unlockedScaledFactor = getScaledFactor(form.mintUnlockedFactor)
       const lockupScaledFactor = getScaledFactor(form.mintLockupFactor)
@@ -143,8 +147,21 @@ const VotingMintConfig = ({
       { governedAccount: form?.governedAccount?.governance, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
   const schema = yup.object().shape({
+    programId: yup
+      .string()
+      .nullable()
+      .test((key) => {
+        try {
+          new web3.PublicKey(key as string)
+        } catch (err) {
+          return false
+        }
+        return true
+      })
+      .required('VSR Program ID is required'),
     governedAccount: yup
       .object()
       .nullable()
@@ -178,7 +195,13 @@ const VotingMintConfig = ({
   })
   const inputs: InstructionInput[] = [
     {
-      label: 'Governance',
+      label: 'Voter Stake Registry Program ID',
+      initialValue: DEFAULT_VSR_ID.toString(),
+      name: 'programId',
+      type: InstructionInputType.INPUT,
+    },
+    {
+      label: 'Wallet',
       initialValue: null,
       name: 'governedAccount',
       type: InstructionInputType.GOVERNED_ACCOUNT,

@@ -6,8 +6,9 @@ import {
   Proposal,
   Realm,
   TokenOwnerRecord,
+  VoteChoice,
+  VoteKind,
   withPostChatMessage,
-  YesNoVote,
 } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
@@ -18,21 +19,39 @@ import { withCastVote } from '@solana/spl-governance'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
 import { chunks } from '@utils/helpers'
 import {
-  sendTransactionsV2,
+  sendTransactionsV3,
   SequenceType,
-  transactionInstructionsToTypedInstructionsSets,
+  txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
 import { sendTransaction } from '@utils/send'
 import { NftVoterClient } from '@solana/governance-program-library'
+import { calcCostOfNftVote, checkHasEnoughSolToVote } from '@tools/nftVoteCalc'
+import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
+
+const getVetoTokenMint = (
+  proposal: ProgramAccount<Proposal>,
+  realm: ProgramAccount<Realm>
+) => {
+  const communityMint = realm.account.communityMint
+  const councilMint = realm.account.config.councilMint
+  const governingMint = proposal.account.governingTokenMint
+  const vetoTokenMint = governingMint.equals(communityMint)
+    ? councilMint
+    : communityMint
+  if (vetoTokenMint === undefined)
+    throw new Error('There is no token that can veto this proposal')
+  return vetoTokenMint
+}
 
 export async function castVote(
   { connection, wallet, programId, walletPubkey }: RpcContext,
   realm: ProgramAccount<Realm>,
   proposal: ProgramAccount<Proposal>,
   tokeOwnerRecord: ProgramAccount<TokenOwnerRecord>,
-  yesNoVote: YesNoVote,
+  voteKind: VoteKind,
   message?: ChatMessageBody | undefined,
-  votingPlugin?: VotingClient
+  votingPlugin?: VotingClient,
+  runAfterConfirmation?: (() => void) | null
 ) {
   const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []
@@ -54,6 +73,42 @@ export async function castVote(
     tokeOwnerRecord
   )
 
+  // It is not clear that defining these extraneous fields, `deny` and `veto`, is actually necessary.
+  // See:  https://discord.com/channels/910194960941338677/910630743510777926/1044741454175674378
+  const vote =
+    voteKind === VoteKind.Approve
+      ? new Vote({
+          voteType: VoteKind.Approve,
+          approveChoices: [new VoteChoice({ rank: 0, weightPercentage: 100 })],
+          deny: undefined,
+          veto: undefined,
+        })
+      : voteKind === VoteKind.Deny
+      ? new Vote({
+          voteType: VoteKind.Deny,
+          approveChoices: undefined,
+          deny: true,
+          veto: undefined,
+        })
+      : voteKind == VoteKind.Veto
+      ? new Vote({
+          voteType: VoteKind.Veto,
+          veto: true,
+          deny: undefined,
+          approveChoices: undefined,
+        })
+      : new Vote({
+          voteType: VoteKind.Abstain,
+          veto: undefined,
+          deny: undefined,
+          approveChoices: undefined,
+        })
+
+  const tokenMint =
+    voteKind === VoteKind.Veto
+      ? getVetoTokenMint(proposal, realm)
+      : proposal.account.governingTokenMint
+
   await withCastVote(
     instructions,
     programId,
@@ -64,8 +119,8 @@ export async function castVote(
     proposal.account.tokenOwnerRecord,
     tokeOwnerRecord.pubkey,
     governanceAuthority,
-    proposal.account.governingTokenMint,
-    Vote.fromYesNoVote(yesNoVote),
+    tokenMint,
+    vote,
     payer,
     plugin?.voterWeightPk,
     plugin?.maxVoterWeightRecord
@@ -96,6 +151,11 @@ export async function castVote(
   const shouldChunk = votingPlugin?.client instanceof NftVoterClient
   const instructionsCountThatMustHaveTheirOwnChunk = message ? 4 : 2
   if (shouldChunk) {
+    const {
+      openNftVotingCountingModal,
+      closeNftVotingCountingModal,
+    } = useNftProposalStore.getState()
+    //update voter weight + cast vote from spl gov need to be in one transaction
     const instructionsWithTheirOwnChunk = instructions.slice(
       -instructionsCountThatMustHaveTheirOwnChunk
     )
@@ -103,34 +163,69 @@ export async function castVote(
       0,
       instructions.length - instructionsCountThatMustHaveTheirOwnChunk
     )
+
     const splInstructionsWithAccountsChunk = chunks(
       instructionsWithTheirOwnChunk,
       2
     )
     const nftsAccountsChunks = chunks(remainingInstructionsToChunk, 2)
-    const signerChunks = Array(
-      splInstructionsWithAccountsChunk.length + nftsAccountsChunks.length
-    ).fill([])
-    const singersMap = message
-      ? [...signerChunks.slice(0, signerChunks.length - 1), signers]
-      : signerChunks
+
     const instructionsChunks = [
-      ...nftsAccountsChunks.map((x) =>
-        transactionInstructionsToTypedInstructionsSets(x, SequenceType.Parallel)
-      ),
-      ...splInstructionsWithAccountsChunk.map((x) =>
-        transactionInstructionsToTypedInstructionsSets(
-          x,
-          SequenceType.Sequential
-        )
-      ),
+      ...nftsAccountsChunks.map((txBatch, batchIdx) => {
+        return {
+          instructionsSet: txBatchesToInstructionSetWithSigners(
+            txBatch,
+            [],
+            batchIdx
+          ),
+          sequenceType: SequenceType.Parallel,
+        }
+      }),
+      ...splInstructionsWithAccountsChunk.map((txBatch, batchIdx) => {
+        return {
+          instructionsSet: txBatchesToInstructionSetWithSigners(
+            txBatch,
+            message ? [[], signers] : [],
+            batchIdx
+          ),
+          sequenceType: SequenceType.Sequential,
+        }
+      }),
     ]
-    await sendTransactionsV2({
+    const totalVoteCost = await calcCostOfNftVote(
+      message,
+      instructionsChunks.length,
+      proposal.pubkey,
+      votingPlugin
+    )
+    const hasEnoughSol = await checkHasEnoughSolToVote(
+      totalVoteCost,
+      wallet.publicKey!,
+      connection
+    )
+    if (!hasEnoughSol) {
+      return
+    }
+
+    await sendTransactionsV3({
       connection,
       wallet,
-      TransactionInstructions: instructionsChunks,
-      signersSet: singersMap,
-      showUiComponent: true,
+      transactionInstructions: instructionsChunks,
+      callbacks: {
+        afterFirstBatchSign: () => {
+          instructionsChunks.length > 2 ? openNftVotingCountingModal() : null
+        },
+        afterAllTxConfirmed: () => {
+          if (runAfterConfirmation) {
+            runAfterConfirmation()
+          }
+          closeNftVotingCountingModal(
+            votingPlugin.client as NftVoterClient,
+            proposal,
+            wallet.publicKey!
+          )
+        },
+      },
     })
   } else {
     const transaction = new Transaction()

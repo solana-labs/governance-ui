@@ -12,6 +12,7 @@ const Select = ({
   error = '',
   disabled = false,
   label = '',
+  subtitle = '',
   componentLabel,
   useDefaultStyle = true,
   noMaxWidth = false,
@@ -26,6 +27,7 @@ const Select = ({
   error?: string | undefined
   disabled?: boolean | undefined
   label?: string | undefined
+  subtitle?: string | undefined
   componentLabel?: any | undefined
   useDefaultStyle?: boolean
   noMaxWidth?: boolean
@@ -38,6 +40,7 @@ const Select = ({
       style={minWidth ? { minWidth: minWidth } : {}}
     >
       {label && <StyledLabel>{label}</StyledLabel>}
+      {subtitle && <p className="text-fgd-3 mb-1 -mt-2">{subtitle}</p>}
       <div className={`relative ${className} ${error && 'pb-1'}`}>
         <Listbox value={value} onChange={onChange} disabled={disabled}>
           {({ open }) => (

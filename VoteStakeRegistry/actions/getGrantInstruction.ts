@@ -1,7 +1,6 @@
 import { PublicKey, SystemProgram, SYSVAR_RENT_PUBKEY } from '@solana/web3.js'
 
-import { BN } from '@project-serum/anchor'
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
+import { BN } from '@coral-xyz/anchor'
 import {
   getRegistrarPDA,
   getVoterPDA,
@@ -13,6 +12,7 @@ import {
   Token,
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
+import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 
 export const getGrantInstruction = async ({
   fromPk,

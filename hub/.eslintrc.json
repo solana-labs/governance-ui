@@ -1,0 +1,76 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "tsconfig.json",
+    "tsconfigRootDir": ".",
+    "sourceType": "module"
+  },
+  "plugins": [
+    "@typescript-eslint/eslint-plugin",
+    "import"
+  ],
+  "extends": [
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended"
+  ],
+  "root": true,
+  "env": {
+    "node": true,
+    "jest": true
+  },
+  "ignorePatterns": [
+    ".eslintrc.js",
+    "migrations"
+  ],
+  "rules": {
+    "@typescript-eslint/interface-name-prefix": "off",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-empty-interface": "off",
+    "import/order": [
+      "error",
+      {
+        "newlines-between": "always-and-inside-groups",
+        "pathGroupsExcludedImportTypes": [
+          "builtin"
+        ],
+        "pathGroups": [
+          {
+            "pattern": "@hub/**/**",
+            "group": "parent"
+          },
+          {
+            "pattern": "@tools/**/**",
+            "group": "parent"
+          },
+          {
+            "pattern": "@utils/**/**",
+            "group": "parent"
+          },
+          {
+            "pattern": "@components/**/**",
+            "group": "parent"
+          },
+          {
+            "pattern": "pages/**/**",
+            "group": "parent"
+          },
+          {
+            "pattern": "@verify-wallet/**/**",
+            "group": "parent"
+          },
+          {
+            "pattern": "@hooks/**/**",
+            "group": "parent"
+          }
+        ],
+        "alphabetize": {
+          "order": "asc",
+          "caseInsensitive": true
+        }
+      }
+    ]
+  }
+}

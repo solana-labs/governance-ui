@@ -16,14 +16,15 @@ import {
 import { NewProposalContext } from '../../../new'
 import { isFormValid } from '@utils/formValidation'
 import useWalletStore from 'stores/useWalletStore'
-import { web3 } from '@project-serum/anchor'
+import { web3 } from '@coral-xyz/anchor'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
-import { getFilteredProgramAccounts } from '@blockworks-foundation/mango-client'
 import StakeAccountSelect from '../../StakeAccountSelect'
 import Input from '@components/inputs/Input'
-import { bs58 } from '@project-serum/anchor/dist/cjs/utils/bytes'
+import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes'
 import { StakeAccount, StakeState } from '@utils/uiTypes/assets'
+import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
+import { getFilteredProgramAccounts } from '@utils/helpers'
 
 const WithdrawValidatorStake = ({
   index,
@@ -35,7 +36,7 @@ const WithdrawValidatorStake = ({
   const connection = useWalletStore((s) => s.connection)
   const programId: PublicKey = StakeProgram.programId
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
 
   const [form, setForm] = useState<ValidatorWithdrawStakeForm>({
     stakingAccount: undefined,
@@ -72,7 +73,7 @@ const WithdrawValidatorStake = ({
   const getStakeAccounts = async (): Promise<StakeAccount[]> => {
     if (!form.governedTokenAccount) return []
 
-    const stakingAccounts = await getFilteredProgramAccounts(
+    const accountsNotYetStaked = await getFilteredProgramAccounts(
       connection.current,
       StakeProgram.programId,
       [
@@ -91,10 +92,39 @@ const WithdrawValidatorStake = ({
       ]
     )
 
+    const accountsStaked = await getFilteredProgramAccounts(
+      connection.current,
+      StakeProgram.programId,
+      [
+        {
+          memcmp: {
+            offset: 0,
+            bytes: bs58.encode([2, 0, 0, 0]),
+          },
+        },
+        {
+          memcmp: {
+            offset: 44,
+            bytes: form.governedTokenAccount.pubkey.toBase58(),
+          },
+        },
+      ]
+    )
+
+    const stakingAccounts = accountsNotYetStaked.concat(
+      accountsStaked.filter((x) => {
+        // filter all accounts which are not yet deactivated
+        const data = x.accountInfo.data.slice(172, 172 + 8)
+        return !data.equals(
+          Buffer.from([255, 255, 255, 255, 255, 255, 255, 255])
+        )
+      })
+    )
+
     return stakingAccounts.map((x) => {
       return {
         stakeAccount: x.publicKey,
-        state: StakeState.Active,
+        state: StakeState.Inactive,
         delegatedValidator: web3.PublicKey.default,
         amount: x.accountInfo.lamports / web3.LAMPORTS_PER_SOL,
       }
@@ -148,10 +178,11 @@ const WithdrawValidatorStake = ({
     ) {
       return returnInvalid()
     }
+    const realAmount = parseMintNaturalAmountFromDecimal(form.amount!, 9)
     const instruction = web3.StakeProgram.withdraw({
-      stakePubkey: new PublicKey(form.stakingAccount),
+      stakePubkey: new PublicKey(form.stakingAccount.stakeAccount),
       authorizedPubkey: form.governedTokenAccount.pubkey,
-      lamports: form.amount,
+      lamports: realAmount,
       toPubkey: form.governedTokenAccount.pubkey,
     })
     return {
@@ -172,6 +203,7 @@ const WithdrawValidatorStake = ({
       },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
 
   useEffect(() => {
@@ -179,12 +211,14 @@ const WithdrawValidatorStake = ({
       { governedAccount: governedAccount, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
   useEffect(() => {
     setGovernedAccount(form.governedTokenAccount?.governance)
     if (form.governedTokenAccount) {
       getStakeAccounts().then((x) => setStakeAccounts(x))
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.governedTokenAccount])
 
   return (
@@ -201,6 +235,7 @@ const WithdrawValidatorStake = ({
         error={formErrors['governedTokenAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
+        type="token"
       ></GovernedAccountSelect>
       <StakeAccountSelect
         label="Staking Account"

@@ -27,7 +27,7 @@ const UpdateTokenMetadata = ({
   const mintGovernancesWithMintInfo = assetAccounts.filter(
     (x) => x.type === AccountType.MINT
   )
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<UpdateTokenMetadataForm>({
     name: '',
@@ -66,6 +66,7 @@ const UpdateTokenMetadata = ({
       propertyName: 'programId',
       value: programId?.toString(),
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [realmInfo?.programId])
 
   useEffect(() => {
@@ -73,6 +74,7 @@ const UpdateTokenMetadata = ({
       { governedAccount: governedAccount, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form, governedAccount])
   useEffect(() => {
     setGovernedAccount(form?.mintAccount?.governance)
@@ -93,6 +95,7 @@ const UpdateTokenMetadata = ({
         error={formErrors['mintAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
+        type="mint"
       />
 
       <Input

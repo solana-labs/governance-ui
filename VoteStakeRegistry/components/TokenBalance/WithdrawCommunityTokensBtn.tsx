@@ -1,7 +1,7 @@
-import Button from '@components/Button'
+import { SecondaryButton } from '@components/Button'
 import useRealm from '@hooks/useRealm'
 import { getUnrelinquishedVoteRecords } from '@models/api'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import {
   getProposal,
   ProposalState,
@@ -105,6 +105,8 @@ const WithDrawCommunityTokens = () => {
         await withRelinquishVote(
           instructions,
           realmInfo!.programId,
+          getProgramVersionForRealm(realmInfo!),
+          realmInfo!.realmId,
           proposal.account.governance,
           proposal.pubkey,
           ownTokenRecord!.pubkey,
@@ -128,6 +130,8 @@ const WithDrawCommunityTokens = () => {
       depositIndex: depositRecord!.index,
       connection,
       client: client,
+      splProgramId: realm!.owner,
+      splProgramVersion: getProgramVersionForRealm(realmInfo!),
     })
 
     try {
@@ -178,7 +182,7 @@ const WithDrawCommunityTokens = () => {
     ? "You don't have any governance tokens to withdraw."
     : ''
   return (
-    <Button
+    <SecondaryButton
       tooltipMessage={withdrawTooltipContent}
       className="sm:w-1/2"
       disabled={
@@ -193,7 +197,7 @@ const WithDrawCommunityTokens = () => {
       onClick={withdrawAllTokens}
     >
       {isLoading ? <Loading></Loading> : 'Withdraw'}
-    </Button>
+    </SecondaryButton>
   )
 }
 

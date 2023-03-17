@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import Button, { LinkButton, SecondaryButton } from '@components/Button'
 import Input from '@components/inputs/Input'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
@@ -5,7 +6,7 @@ import Modal from '@components/Modal'
 import { QuestionMarkCircleIcon } from '@heroicons/react/outline'
 import useRealm from '@hooks/useRealm'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { RpcContext } from '@solana/spl-governance'
 import {
   fmtMintAmount,
@@ -24,6 +25,8 @@ import {
   getMinDurationInDays,
   SECS_PER_DAY,
   getFormattedStringFromDays,
+  secsToDays,
+  yearsToSecs,
 } from 'VoteStakeRegistry/tools/dateTools'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { voteRegistryStartUnlock } from 'VoteStakeRegistry/actions/voteRegistryStartUnlock'
@@ -35,6 +38,7 @@ import {
   Period,
   VestingPeriod,
   vestingPeriods,
+  DAILY,
 } from 'VoteStakeRegistry/tools/types'
 import BigNumber from 'bignumber.js'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
@@ -70,6 +74,13 @@ const LockTokensModal = ({
   const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
     (s) => s.actions
   )
+  const fiveYearsSecs = yearsToSecs(5)
+  const maxLockupSecs =
+    (realm &&
+      voteStakeRegistryRegistrar?.votingMints
+        .find((x) => x.mint.equals(realm.account.communityMint))
+        ?.lockupSaturationSecs.toNumber()) ||
+    fiveYearsSecs
 
   const lockupPeriods: Period[] = [
     {
@@ -96,12 +107,14 @@ const LockTokensModal = ({
       defaultValue: 1,
       display: 'Custom',
     },
-  ].filter((x) =>
-    depositToUnlock
-      ? getMinDurationInDays(depositToUnlock) <= x.defaultValue ||
-        x.display === 'Custom'
-      : true
-  )
+  ]
+    .filter((x) =>
+      depositToUnlock
+        ? getMinDurationInDays(depositToUnlock) <= x.defaultValue ||
+          x.display === 'Custom'
+        : true
+    )
+    .filter((x) => x.defaultValue <= secsToDays(maxLockupSecs))
 
   const maxNonCustomDaysLockup = lockupPeriods
     .map((x) => x.defaultValue)
@@ -120,8 +133,7 @@ const LockTokensModal = ({
       x.lockup.kind.none
   )
   const [lockupPeriodDays, setLockupPeriodDays] = useState<number>(0)
-  const [allowClawback, setAllowClawback] = useState(false)
-  console.log(setAllowClawback)
+  const allowClawback = false
   const [lockupPeriod, setLockupPeriod] = useState<Period>(lockupPeriods[0])
   const [amount, setAmount] = useState<number | undefined>()
   const [lockMoreThenDeposited, setLockMoreThenDeposited] = useState<string>(
@@ -241,6 +253,7 @@ const LockTokensModal = ({
       communityMintPk: realm!.account.communityMint!,
       realmPk: realm!.pubkey!,
       programId: realm!.owner,
+      programVersion: realmInfo?.programVersion!,
       amountFromVoteRegistryDeposit: amountFromDeposit,
       totalTransferAmount: totalAmountToLock,
       lockUpPeriodInDays: lockupPeriodDays,
@@ -292,6 +305,7 @@ const LockTokensModal = ({
       mintPk: depositToUnlock!.mint.publicKey,
       realmPk: realm!.pubkey!,
       programId: realm!.owner,
+      programVersion: realmInfo?.programVersion!,
       transferAmount: totalAmountToUnlock,
       amountAfterOperation: whatWillBeLeftInsideDeposit,
       lockUpPeriodInDays: lockupPeriodDays,
@@ -350,12 +364,14 @@ const LockTokensModal = ({
                       setLockupType(
                         //@ts-ignore
                         lockupTypes
-                          .filter((x) => x.value !== MONTHLY)
+                          .filter(
+                            (x) => x.value !== MONTHLY && x.value !== DAILY
+                          )
                           .find((t) => t.displayName === type)
                       )
                     }
                     values={lockupTypes
-                      .filter((x) => x.value !== MONTHLY)
+                      .filter((x) => x.value !== MONTHLY && x.value !== DAILY)
                       .map((type) => type.displayName)}
                   />
                 </div>
@@ -384,11 +400,12 @@ const LockTokensModal = ({
                   </LinkButton>
                 </div>
                 <Input
+                  // @ts-expect-error this probably doesn't work right, maxAmount is a BigNumber
                   max={maxAmount}
                   min={mintMinAmount}
                   value={amount}
                   type="number"
-                  onChange={(e) => setAmount(e.target.value)}
+                  onChange={(e) => setAmount(e.target.value as any)}
                   step={mintMinAmount}
                   onBlur={validateAmountOnBlur}
                 />
@@ -537,9 +554,11 @@ const LockTokensModal = ({
     if (amount) {
       validateAmountOnBlur()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [lockMoreThenDeposited])
   useEffect(() => {
     setLockupPeriod(lockupPeriods[0])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [voteStakeRegistryRegistrar])
   useEffect(() => {
     if (depositToUnlock) {

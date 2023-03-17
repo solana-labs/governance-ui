@@ -1,8 +1,8 @@
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useRealm from '@hooks/useRealm'
 import {
+  GoverningTokenType,
   MintMaxVoteWeightSource,
-  PROGRAM_VERSION_V1,
 } from '@solana/spl-governance'
 import {
   getMintDecimalAmount,
@@ -15,7 +15,7 @@ import InstructionForm, {
   InstructionInput,
   InstructionInputType,
 } from '../instructions/FormCreator'
-import { MAX_TOKENS_TO_DISABLE } from '@tools/constants'
+import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 
 export interface RealmConfigForm {
   governedAccount: AssetAccount | undefined
@@ -24,7 +24,17 @@ export interface RealmConfigForm {
   removeCouncil: boolean
   maxCommunityVoterWeightAddin: string
   communityMintSupplyFactor: number
+  communityTokenType: typeof TOKEN_TYPE_NAME_VALUES[number] // programVersion >= v3
+  councilTokenType: typeof TOKEN_TYPE_NAME_VALUES[number] // programVersion >= v3
+  councilVoterWeightAddin: string // programVersion >= v3
+  maxCouncilVoterWeightAddin: string // programVersion >= v3
 }
+
+const TOKEN_TYPE_NAME_VALUES = [
+  { name: 'Liquid', value: GoverningTokenType.Liquid },
+  { name: 'Membership', value: GoverningTokenType.Membership },
+  { name: 'Disabled', value: GoverningTokenType.Dormant },
+]
 
 const RealmConfigFormComponent = ({
   setForm,
@@ -48,10 +58,10 @@ const RealmConfigFormComponent = ({
   const minCommunity = mint ? getMintMinAmountAsDecimal(mint) : 0
   const minCommunityTokensToCreateProposal =
     realm && mint
-      ? MAX_TOKENS_TO_DISABLE.eq(
+      ? DISABLED_VOTER_WEIGHT.eq(
           realm.account.config.minCommunityTokensToCreateGovernance
         )
-        ? MAX_TOKENS_TO_DISABLE
+        ? DISABLED_VOTER_WEIGHT
         : getMintDecimalAmount(
             mint,
             realm.account.config.minCommunityTokensToCreateGovernance
@@ -89,6 +99,9 @@ const RealmConfigFormComponent = ({
       return ''
     }
   }
+
+  // TODO @asktree: the way we are setting initial values that could be undefined seems bad -- risks race conditions if users dirty fields before loading is done?
+  // In any case dummy values should be absolutely avoided.
   const inputs: InstructionInput[] = [
     {
       label: 'Governance',
@@ -108,7 +121,7 @@ const RealmConfigFormComponent = ({
       label: 'Min community tokens to create governance',
       initialValue: minCommunityTokensToCreateProposal,
       name: 'minCommunityTokensToCreateGovernance',
-      type: InstructionInputType.INPUT,
+      type: InstructionInputType.DISABLEABLE_INPUT,
       inputType: 'number',
       min: minCommunity,
       step: minCommunity,
@@ -134,29 +147,76 @@ const RealmConfigFormComponent = ({
       ),
     },
     {
+      label: 'Community token type',
+      name: 'communityTokenType',
+      type: InstructionInputType.SELECT,
+      initialValue:
+        TOKEN_TYPE_NAME_VALUES[
+          config?.account.communityTokenConfig.tokenType ?? 0
+        ],
+      options: TOKEN_TYPE_NAME_VALUES,
+    },
+    {
       label: 'Community voter weight addin',
       initialValue:
-        config?.account?.communityVoterWeightAddin?.toBase58() || '',
+        config?.account?.communityTokenConfig.voterWeightAddin?.toBase58() ||
+        '',
       name: 'communityVoterWeightAddin',
       type: InstructionInputType.INPUT,
       inputType: 'text',
-      hide: realmInfo?.programVersion === PROGRAM_VERSION_V1,
+      hide: realmInfo?.programVersion === 1,
     },
     {
       label: 'Community max voter weight addin',
       initialValue:
-        config?.account?.maxCommunityVoterWeightAddin?.toBase58() || '',
+        config?.account?.communityTokenConfig.maxVoterWeightAddin?.toBase58() ||
+        '',
       name: 'maxCommunityVoterWeightAddin',
       type: InstructionInputType.INPUT,
       inputType: 'text',
-      hide: realmInfo?.programVersion === PROGRAM_VERSION_V1,
+      hide: realmInfo?.programVersion === 1,
+    },
+    {
+      label: 'Council token type',
+      name: 'councilTokenType',
+      type: InstructionInputType.SELECT,
+      initialValue:
+        TOKEN_TYPE_NAME_VALUES[
+          config?.account.councilTokenConfig.tokenType ?? 0
+        ],
+      options: TOKEN_TYPE_NAME_VALUES,
+    },
+    {
+      label: 'Council voter weight addin',
+      initialValue:
+        config?.account?.councilTokenConfig.voterWeightAddin?.toBase58() || '',
+      name: 'councilVoterWeightAddin',
+      type: InstructionInputType.INPUT,
+      inputType: 'text',
+      hide:
+        realmInfo?.programVersion === undefined ||
+        realmInfo?.programVersion < 3,
+    },
+    {
+      label: 'Council max voter weight addin',
+      initialValue:
+        config?.account?.councilTokenConfig.maxVoterWeightAddin?.toBase58() ||
+        '',
+      name: 'maxCouncilVoterWeightAddin',
+      type: InstructionInputType.INPUT,
+      inputType: 'text',
+      hide:
+        realmInfo?.programVersion === undefined ||
+        realmInfo?.programVersion < 3,
     },
     {
       label: 'Remove council',
       initialValue: false,
       name: 'removeCouncil',
       type: InstructionInputType.SWITCH,
-      hide: typeof councilMint === 'undefined',
+      hide:
+        typeof councilMint === 'undefined' ||
+        (realmInfo?.programVersion ?? 0) >= 3,
     },
   ]
 

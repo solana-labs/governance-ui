@@ -2,7 +2,7 @@
 
 ## To set this up for development with Switchboard, the first step is to get [this](https://github.com/switchboard-xyz/switchboard-core/blob/main/switchboard_v2/tests/addin-tests.ts) to work.
 
-- [install anchor](https://project-serum.github.io/anchor/getting-started/installation.html#installing-dependencies)[install anchor](https://project-serum.github.io/anchor/getting-started/installation.html#installing-dependencies) if you don't currently have it installed
+- [Install Anchor](https://www.anchor-lang.com/docs/installation) if you don't currently have it installed.
 - navigate to the `switchboard_v2` directory within `switchboard-core` and run `anchor test`. This will build switchboardv2 and run the addin-tests.ts script, which will set up a realm, governance, queue, oracles, permissions, and proposal.
 - you will need to make sure the pubkeys of the governance program and switchboard program throughout the codebase are pointed to your local pubkeys of those programs:
 - you can determine the pubkeys of the localnet switchboardv2 and governance programs by navigating to `switchboard-core/switchboard_v2/target/deploy` and running `solana-keygen pubkey switchboard_v2-keypair.json` and `solana-keygen pubkey spl_governance-keypair.json` respectively
@@ -15,6 +15,19 @@
 ## Working on governance-ui
 
 - most of the work is in `hooks/useRealm.ts` and `hooks/useVotingPlugins.ts` in the governance-ui. The UI work is in `components/TokenBalance`
+
+## Changing dependencies
+Whenever you change dependencies (adding, removing, or updating, either in package.json or yarn.lock), there are various files that must be kept up-to-date.
+
+`yarn.lock`:
+- Run yarn again after your changes to ensure yarn.lock has been properly updated.
+- Run `yarn deduplicate` to remove duplicate dependencies from the lockfile.
+
+The `allow-scripts` configuration in `package.json`:
+- Run `yarn allow-scripts auto` to update the `allow-scripts` configuration automatically. This config determines whether the package's install/postinstall scripts are allowed to run.
+- Alternatively update the `allow-scripts` section manually. 
+- Review each new package to determine whether the install script needs to run or not, testing if necessary.
+- Use `npx can-i-ignore-scripts` to help assessing whether scripts are needed
 
 # NextJS Typescript Boilerplate
 

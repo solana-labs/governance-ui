@@ -1,11 +1,11 @@
+import { useEffect } from 'react'
+import { BN_ZERO } from '@solana/spl-governance'
+import { DisplayAddress } from '@cardinal/namespaces-components'
+import Select from '@components/inputs/Select'
+import { fmtMintAmount } from '@tools/sdk/units'
 import useMembersStore from 'stores/useMembersStore'
 import useWalletStore from 'stores/useWalletStore'
-import Select from '@components/inputs/Select'
 import useRealm from 'hooks/useRealm'
-import { DisplayAddress } from '@cardinal/namespaces-components'
-import { fmtMintAmount } from '@tools/sdk/units'
-import { BN } from '@project-serum/anchor'
-import { useEffect } from 'react'
 
 const DelegateBalanceCard = () => {
   const delegates = useMembersStore((s) => s.compact.delegates)
@@ -47,26 +47,28 @@ const DelegateBalanceCard = () => {
         ownDelegateTokenRecords[0]?.account?.governingTokenOwner?.toBase58()
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [walletId])
 
   // whenever we change delegate, get that delegates vote record so we can display it
   useEffect(() => {
     actions.fetchDelegateVoteRecords()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [selectedCommunityDelegate, selectedCouncilDelegate])
 
   const getCouncilTokenCount = () => {
     if (walletId && delegates?.[walletId]) {
-      return delegates?.[walletId].councilTokenCount || 0
+      return fmtMintAmount(
+        councilMint,
+        delegates?.[walletId].councilTokenCount ?? BN_ZERO
+      )
     }
     return 0
   }
 
   const getCouncilDelegateAmt = () => {
     if (walletId && delegates?.[walletId]) {
-      return fmtMintAmount(
-        councilMint,
-        new BN(delegates?.[walletId].councilTokenCount || 0)
-      )
+      return delegates?.[walletId]?.councilMembers?.length ?? 0
     }
     return 0
   }
@@ -75,7 +77,7 @@ const DelegateBalanceCard = () => {
     if (walletId && delegates?.[walletId]) {
       return fmtMintAmount(
         mint,
-        new BN(delegates?.[walletId].communityTokenCount || 0)
+        delegates?.[walletId].communityTokenCount ?? BN_ZERO
       )
     }
     return 0
@@ -83,7 +85,7 @@ const DelegateBalanceCard = () => {
 
   const getCommunityDelegateAmt = () => {
     if (walletId && delegates?.[walletId]) {
-      return delegates?.[walletId]?.communityMembers?.length || 0
+      return delegates?.[walletId]?.communityMembers?.length ?? 0
     }
     return 0
   }

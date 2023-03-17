@@ -26,10 +26,10 @@ const DryRunInstructionBtn = ({
   } | null>(null)
   const [isOpen, setIsOpen] = useState(false)
 
-  const onInspect = () => {
+  const onInspect = async () => {
     if (result) {
-      const inspectUrl = getExplorerInspectorUrl(
-        connection.endpoint,
+      const inspectUrl = await getExplorerInspectorUrl(
+        connection,
         result.transaction
       )
       window.open(inspectUrl, '_blank')
@@ -103,7 +103,7 @@ const DryRunInstructionBtn = ({
       </SecondaryButton>
 
       {result?.response && (
-        <Modal onClose={onClose} isOpen={isOpen}>
+        <Modal sizeClassName={'sm:max-w-2xl'} onClose={onClose} isOpen={isOpen}>
           <h2>
             {result?.response.err
               ? 'Simulation error'

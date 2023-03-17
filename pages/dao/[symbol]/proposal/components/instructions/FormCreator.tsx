@@ -7,6 +7,7 @@ import { precision } from '@utils/formatting'
 import Switch from '@components/Switch'
 import Select from '@components/inputs/Select'
 import { usePrevious } from '@hooks/usePrevious'
+import { DISABLED_VALUE } from '@tools/constants'
 
 export enum InstructionInputType {
   GOVERNED_ACCOUNT,
@@ -14,20 +15,23 @@ export enum InstructionInputType {
   TEXTAREA,
   SWITCH,
   SELECT,
+  DISABLEABLE_INPUT,
 }
 
 export interface InstructionInput {
   label: string
+  subtitle?: string
   initialValue: any
   name: string
   type: InstructionInputType
+  assetType?: 'mint' | 'token' | 'wallet'
   inputType?: string
   placeholder?: string
   min?: number
   max?: number
   step?: number
   onBlur?: () => void
-  shouldBeGoverned?: false | ProgramAccount<Governance> | null
+  shouldBeGoverned?: boolean
   governance?: ProgramAccount<Governance> | null
   options?: any[]
   hide?: boolean | (() => boolean)
@@ -59,12 +63,15 @@ const InstructionForm = ({
   )
   useEffect(() => {
     setForm(form)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(form)])
   useEffect(() => {
     setInnerForm({
       ...inputs.reduce((a, v) => ({ ...a, [v.name]: v.initialValue }), {}),
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     previousInitialValue !== JSON.stringify(inputs.map((x) => x.initialValue)),
   ])
   return (
@@ -106,7 +113,7 @@ const InstructionInput = ({
       case InstructionInputType.GOVERNED_ACCOUNT:
         return (
           <GovernedAccountSelect
-            autoselectFirst={false}
+            autoSelectFirst={false}
             label={input.label}
             governedAccounts={input.options!}
             onChange={(value) => {
@@ -116,12 +123,15 @@ const InstructionInput = ({
             error={formErrors[input.name]}
             shouldBeGoverned={input.shouldBeGoverned}
             governance={input.governance}
+            type={input.assetType}
           />
         )
       case InstructionInputType.SELECT:
         return (
           <Select
             label={input.label}
+            subtitle={input.subtitle}
+            // Note that this is different from native selects, which simply use the value as the value, not the name-value pair.
             value={form[input.name]?.name}
             placeholder="Please select..."
             onChange={(value) => {
@@ -168,14 +178,28 @@ const InstructionInput = ({
         return (
           <Input
             min={input.min}
+            subtitle={input.subtitle}
             label={input.label}
             value={form[input.name]}
             type={input.inputType!}
             onChange={(event) => {
-              handleSetForm({
-                value: event.target.value,
-                propertyName: input.name,
-              })
+              if (input.inputType === 'number') {
+                const isNumber =
+                  event.target.value !== '' &&
+                  !isNaN(Number(event.target.value))
+
+                handleSetForm({
+                  value: isNumber
+                    ? Number(event.target.value)
+                    : event.target.value,
+                  propertyName: input.name,
+                })
+              } else {
+                handleSetForm({
+                  value: event.target.value,
+                  propertyName: input.name,
+                })
+              }
             }}
             step={input.step}
             error={formErrors[input.name]}
@@ -184,7 +208,7 @@ const InstructionInput = ({
                 ? input.onBlur
                 : input.validateMinMax
                 ? validateAmountOnBlur
-                : null
+                : undefined
             }
           />
         )
@@ -192,6 +216,7 @@ const InstructionInput = ({
       case InstructionInputType.TEXTAREA:
         return (
           <Textarea
+            subtitle={input.subtitle}
             label={input.label}
             placeholder={input.placeholder}
             wrapperClassName="mb-5"
@@ -209,6 +234,9 @@ const InstructionInput = ({
         return (
           <div className="text-sm mb-3">
             <div className="mb-2">{input.label}</div>
+            {input.subtitle && (
+              <p className="text-fgd-3 mb-1 -mt-2">{input.subtitle}</p>
+            )}
             <div className="flex flex-row text-xs items-center">
               <Switch
                 checked={form[input.name]}
@@ -222,6 +250,84 @@ const InstructionInput = ({
             </div>
           </div>
         )
+
+      // DISABLEABLE_INPUT is for concealing ugly numbers; it uses a toggle to disable the setting (by setting it to u64::max)
+      case InstructionInputType.DISABLEABLE_INPUT: {
+        const validateAmountOnBlur = () => {
+          const value = form[input.name]
+          const precisionFromMin = input.min ? precision(input.min) : 1
+          handleSetForm({
+            value: parseFloat(
+              Math.max(
+                Number(input.min ? input.min : 0),
+                Math.min(
+                  Number(
+                    typeof input.max !== 'undefined'
+                      ? input.max
+                      : Number.MAX_SAFE_INTEGER
+                  ),
+                  Number(value)
+                )
+              ).toFixed(
+                input.precision
+                  ? input.precision
+                  : precisionFromMin
+                  ? precisionFromMin
+                  : 0
+              )
+            ),
+            propertyName: input.name,
+          })
+        }
+        return (
+          <div className="max-w-lg">
+            <div className="text-sm mb-3">
+              <div className="mb-2">{input.label}</div>
+              <div className="flex flex-row text-xs items-center">
+                <Switch
+                  checked={
+                    form[input.name]?.toString() !== DISABLED_VALUE.toString()
+                  }
+                  onChange={(checked) =>
+                    handleSetForm({
+                      value: checked ? 1 : DISABLED_VALUE,
+                      propertyName: input.name,
+                    })
+                  }
+                />
+                <div className="ml-3 grow">
+                  {form[input.name]?.toString() !==
+                  DISABLED_VALUE.toString() ? (
+                    <Input
+                      className="ml-1"
+                      min={input.min}
+                      value={form[input.name]}
+                      type={input.inputType!}
+                      onChange={(event) => {
+                        handleSetForm({
+                          value: event.target.value,
+                          propertyName: input.name,
+                        })
+                      }}
+                      step={input.step}
+                      error={formErrors[input.name]}
+                      onBlur={
+                        input.onBlur
+                          ? input.onBlur
+                          : input.validateMinMax
+                          ? validateAmountOnBlur
+                          : undefined
+                      }
+                    />
+                  ) : (
+                    'Disabled'
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+      }
     }
   }
   return (

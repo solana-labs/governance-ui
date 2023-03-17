@@ -5,7 +5,7 @@ import useRealm from '@hooks/useRealm'
 import { getTokenOwnerRecordAddress, Proposal } from '@solana/spl-governance'
 import useWalletStore from '../../../stores/useWalletStore'
 import { Option } from '@tools/core/option'
-import { GoverningTokenType } from '@solana/spl-governance'
+import { GoverningTokenRole } from '@solana/spl-governance'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import useQueryContext from '@hooks/useQueryContext'
@@ -22,11 +22,15 @@ import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
 
 const LockPluginTokenBalanceCard = ({
   proposal,
+  inAccountDetails,
 }: {
   proposal?: Option<Proposal>
+  inAccountDetails?: boolean
 }) => {
+  const [hasGovPower, setHasGovPower] = useState<boolean>(false)
+
   const { fmtUrlWithCluster } = useQueryContext()
-  const { councilMint, mint, realm, symbol } = useRealm()
+  const { councilMint, mint, realm, symbol, config } = useRealm()
   const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
@@ -53,7 +57,7 @@ const LockPluginTokenBalanceCard = ({
     const getTokenOwnerRecord = async () => {
       const defaultMint =
         !mint?.supply.isZero() ||
-        realm?.account.config.useMaxCommunityVoterWeightAddin
+        config?.account.communityTokenConfig.maxVoterWeightAddin
           ? realm!.account.communityMint
           : !councilMint?.supply.isZero()
           ? realm!.account.config.councilMint
@@ -69,13 +73,14 @@ const LockPluginTokenBalanceCard = ({
     if (realm && wallet?.connected) {
       getTokenOwnerRecord()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [realm?.pubkey.toBase58(), wallet?.connected])
 
   const hasLoaded = mint || councilMint
   return (
-    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
+    <>
       <div className="flex items-center justify-between">
-        <h3 className="mb-0">Your Account</h3>
+        <h3 className="mb-0">My governance power</h3>
         <Link
           href={fmtUrlWithCluster(
             `/dao/${symbol}/account/${tokenOwnerRecordPk}`
@@ -95,19 +100,32 @@ const LockPluginTokenBalanceCard = ({
       </div>
       {hasLoaded ? (
         <>
+          {!hasGovPower && !inAccountDetails && connected && (
+            <div className={'text-xs text-white/50 mt-8'}>
+              You do not have any governance power in this dao
+            </div>
+          )}
+          {!connected && (
+            <div className={'text-xs text-white/50 mt-8'}>
+              Connect your wallet to see governance power
+            </div>
+          )}
           {communityDepositVisible && (
             <TokenDepositLock
+              inAccountDetails={inAccountDetails}
               mint={mint}
-              tokenType={GoverningTokenType.Community}
+              tokenRole={GoverningTokenRole.Community}
               councilVote={false}
+              setHasGovPower={setHasGovPower}
             />
           )}
           {councilDepositVisible && (
             <div className="mt-4">
               <TokenDeposit
                 mint={councilMint}
-                tokenType={GoverningTokenType.Council}
+                tokenRole={GoverningTokenRole.Council}
                 councilVote={true}
+                setHasGovPower={setHasGovPower}
               />
             </div>
           )}
@@ -119,17 +137,21 @@ const LockPluginTokenBalanceCard = ({
           <div className="animate-pulse bg-bkg-3 h-10 rounded-lg" />
         </>
       )}
-    </div>
+    </>
   )
 }
 
 const TokenDepositLock = ({
   mint,
-  tokenType,
+  tokenRole,
+  inAccountDetails,
+  setHasGovPower,
 }: {
   mint: MintInfo | undefined
-  tokenType: GoverningTokenType
+  tokenRole: GoverningTokenRole
   councilVote?: boolean
+  inAccountDetails?: boolean
+  setHasGovPower: (hasGovPower: boolean) => void
 }) => {
   const { realm, realmTokenAccount, councilTokenAccount } = useRealm()
   const connected = useWalletStore((s) => s.connected)
@@ -157,19 +179,19 @@ const TokenDepositLock = ({
   }
 
   const depositTokenAccount =
-    tokenType === GoverningTokenType.Community
+    tokenRole === GoverningTokenRole.Community
       ? realmTokenAccount
       : councilTokenAccount
 
   const depositMint =
-    tokenType === GoverningTokenType.Community
+    tokenRole === GoverningTokenRole.Community
       ? realm?.account.communityMint
       : realm?.account.config.councilMint
 
   const tokenName = getMintMetadata(depositMint)?.name ?? realm?.account.name
 
   const depositTokenName = `${tokenName} ${
-    tokenType === GoverningTokenType.Community ? '' : 'Council'
+    tokenRole === GoverningTokenRole.Community ? '' : 'Council'
   }`
 
   const hasTokensInWallet =
@@ -186,14 +208,19 @@ const TokenDepositLock = ({
       ? fmtMintAmount(mint, depositRecord.amountDepositedNative)
       : '0'
 
-  const canShowAvailableTokensMessage =
-    !hasTokensDeposited && hasTokensInWallet && connected
-  const canExecuteAction = !hasTokensDeposited ? 'deposit' : 'withdraw'
-  const canDepositToken = !hasTokensDeposited && hasTokensInWallet
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
+  useEffect(() => {
+    if (availableTokens != '0' || hasTokensDeposited || hasTokensInWallet) {
+      setHasGovPower(true)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+  }, [availableTokens, hasTokensDeposited, hasTokensInWallet])
+
+  const canShowAvailableTokensMessage = hasTokensInWallet && connected
   const tokensToShow =
-    canDepositToken && depositTokenAccount
+    hasTokensInWallet && depositTokenAccount
       ? fmtMintAmount(mint, depositTokenAccount.account.amount)
-      : canDepositToken
+      : hasTokensInWallet
       ? availableTokens
       : 0
 
@@ -202,42 +229,50 @@ const TokenDepositLock = ({
       {canShowAvailableTokensMessage ? (
         <div className="pt-2">
           <InlineNotification
-            desc={`You have ${tokensToShow} tokens available to ${canExecuteAction}`}
+            desc={`You have ${tokensToShow} ${
+              hasTokensDeposited ? `more` : ``
+            } ${depositTokenName} available to deposit.`}
             type="info"
           />
         </div>
       ) : null}
-      <div className="flex space-x-4 items-center mt-4">
-        <VotingPowerBox
-          votingPower={votingPower}
-          mint={mint}
-          votingPowerFromDeposits={votingPowerFromDeposits}
-          className="w-full px-4 py-2"
-        ></VotingPowerBox>
-      </div>
-      <div className="pt-4 px-4">
-        <p className="flex mb-1.5 text-xs">
-          <span>{depositTokenName} Deposited</span>
-          <span className="font-bold ml-auto text-fgd-1">
-            {availableTokens}
-          </span>
-        </p>
-        <p className="flex text-xs">
-          <span>{depositTokenName} Locked</span>
-          <span className="font-bold ml-auto text-fgd-1">{lockTokensFmt}</span>
-        </p>
-      </div>
-      {/* <p
-        className={`mt-2 opacity-70 mb-4 text-xs ${
-          canShowAvailableTokensMessage ? 'block' : 'hidden'
-        }`}
-      >
-        You have {tokensToShow} tokens available to {canExecuteAction}.
-      </p> */}
-
+      {votingPower.toNumber() > 0 && (
+        <div className="flex space-x-4 items-center mt-4">
+          <VotingPowerBox
+            votingPower={votingPower}
+            mint={mint}
+            votingPowerFromDeposits={votingPowerFromDeposits}
+            className="w-full px-4 py-2"
+          ></VotingPowerBox>
+        </div>
+      )}
+      {(availableTokens != '0' || lockTokensFmt != '0') && (
+        <div className="pt-4 px-4">
+          {availableTokens != '0' && (
+            <p className="flex mb-1.5 text-xs">
+              <span>{depositTokenName} Deposited</span>
+              <span className="font-bold ml-auto text-fgd-1">
+                {availableTokens}
+              </span>
+            </p>
+          )}
+          {availableTokens != '0' && (
+            <p className="flex text-xs">
+              <span>{depositTokenName} Locked</span>
+              <span className="font-bold ml-auto text-fgd-1">
+                {lockTokensFmt}
+              </span>
+            </p>
+          )}
+        </div>
+      )}
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
-        <DepositCommunityTokensBtn></DepositCommunityTokensBtn>
-        <WithDrawCommunityTokens></WithDrawCommunityTokens>
+        <DepositCommunityTokensBtn
+          inAccountDetails={inAccountDetails}
+        ></DepositCommunityTokensBtn>
+        {inAccountDetails && (
+          <WithDrawCommunityTokens></WithDrawCommunityTokens>
+        )}
       </div>
     </>
   )

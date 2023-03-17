@@ -1,7 +1,11 @@
 import ButtonGroup from '@components/ButtonGroup'
 import { useEffect, useState } from 'react'
 import { TreasuryStrategy } from 'Strategies/types/types'
-import { CreateEverlendProposal } from 'Strategies/protocols/everlend/tools'
+import {
+  calcUserTokenBalanceByPoolToken,
+  CreateEverlendProposal,
+  lamportsToSol,
+} from 'Strategies/protocols/everlend/tools'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import EverlendDeposit from './everlend/EverlendDeposit'
 import EverlendWithdraw from './everlend/EverlendWithdraw'
@@ -15,7 +19,12 @@ enum Tabs {
 }
 
 interface IProps {
-  proposedInvestment: TreasuryStrategy & { poolMint: string }
+  proposedInvestment: TreasuryStrategy & {
+    poolMint: string
+    rateEToken: number
+    decimals: number
+    poolPubKey: string
+  }
   handledMint: string
   createProposalFcn: CreateEverlendProposal
   governedTokenAccount: AssetAccount
@@ -29,6 +38,7 @@ const EverlendModalContent = ({
 }: IProps) => {
   const [selectedTab, setSelectedTab] = useState(Tabs.DEPOSIT)
   const [depositedAmount, setDepositedAmount] = useState(0)
+  const [maxDepositAmount, setMaxDepositAmount] = useState(0)
   const tabs = Object.values(Tabs)
   const connection = useWalletStore((s) => s.connection)
 
@@ -39,16 +49,44 @@ const EverlendModalContent = ({
 
   useEffect(() => {
     const loadMaxAmount = async () => {
-      const tokenMintATA = await findAssociatedTokenAccount(
+      const poolMintATA = await findAssociatedTokenAccount(
         owner,
         new PublicKey(proposedInvestment.poolMint)
       )
-      const tokenMintATABalance = await connection.current.getTokenAccountBalance(
-        tokenMintATA
-      )
-      setDepositedAmount(Number(tokenMintATABalance.value.uiAmount))
+      let poolMintATABalance = 0
+      let tokenMintATABalance = 0
+      try {
+        const fetchedTokenMintATABalance = await connection.current.getTokenAccountBalance(
+          poolMintATA
+        )
+
+        poolMintATABalance = calcUserTokenBalanceByPoolToken(
+          Number(fetchedTokenMintATABalance.value.uiAmount),
+          proposedInvestment.decimals,
+          proposedInvestment.rateEToken,
+          false
+        )
+      } catch (e) {
+        console.log(e)
+      }
+      try {
+        if (isSol) {
+          const fetchedBalance = await connection.current.getBalance(owner)
+          tokenMintATABalance = lamportsToSol(fetchedBalance)
+        } else {
+          const fetchedBalance = await connection.current.getTokenAccountBalance(
+            governedTokenAccount!.pubkey
+          )
+          tokenMintATABalance = Number(fetchedBalance.value.uiAmount)
+        }
+      } catch (e) {
+        console.log(e)
+      }
+      setDepositedAmount(poolMintATABalance)
+      setMaxDepositAmount(tokenMintATABalance)
     }
     loadMaxAmount()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [proposedInvestment, handledMint])
 
   return (
@@ -67,6 +105,7 @@ const EverlendModalContent = ({
           governedTokenAccount={governedTokenAccount}
           handledMint={handledMint}
           depositedAmount={depositedAmount}
+          maxDepositAmount={maxDepositAmount}
         />
       )}
       {selectedTab === Tabs.WITHDRAW && (

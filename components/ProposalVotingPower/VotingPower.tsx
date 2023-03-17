@@ -8,7 +8,7 @@ import {
 } from '@solana/spl-governance'
 import { AccountInfo, MintInfo } from '@solana/spl-token'
 import type { PublicKey } from '@solana/web3.js'
-import { GoverningTokenType } from '@solana/spl-governance'
+import { GoverningTokenRole } from '@solana/spl-governance'
 
 import { TokenProgramAccount } from '@utils/tokens'
 import useRealm from '@hooks/useRealm'
@@ -39,16 +39,16 @@ function getTypes(
   ownTokenRecord?: ProgramAccount<TokenOwnerRecord>,
   proposal?: ProgramAccount<Proposal>,
   realm?: ProgramAccount<Realm>,
-  tokenType?: GoverningTokenType
+  tokenRole?: GoverningTokenRole
 ) {
   const types: Type[] = []
 
-  const currentPluginPk = config?.account?.communityVoterWeightAddin
+  const currentPluginPk = config?.account?.communityTokenConfig.voterWeightAddin
 
   if (
     currentPluginPk &&
     nftPluginsPks.includes(currentPluginPk.toBase58()) &&
-    tokenType === GoverningTokenType.Community
+    tokenRole === GoverningTokenRole.Community
   ) {
     types.push(Type.NFT)
   } else if (
@@ -67,18 +67,18 @@ function getTypes(
     if (
       (!realm?.account.config.councilMint ||
         isDepositVisible(mint, realm?.account.communityMint)) &&
-      tokenType === GoverningTokenType.Community
+      tokenRole === GoverningTokenRole.Community
     ) {
       types.push(Type.LockedCommunity)
     } else if (
       isDepositVisible(councilMint, realm?.account.config.councilMint) &&
-      tokenType === GoverningTokenType.Council
+      tokenRole === GoverningTokenRole.Council
     ) {
       types.push(Type.LockedCouncil)
     }
-  } else if (tokenType === GoverningTokenType.Council) {
+  } else if (tokenRole === GoverningTokenRole.Council) {
     types.push(Type.Council)
-  } else if (tokenType === GoverningTokenType.Community) {
+  } else if (tokenRole === GoverningTokenRole.Community) {
     types.push(Type.Community)
   }
 
@@ -101,7 +101,7 @@ export default function VotingPower(props: Props) {
     realm,
   } = useRealm()
   const connected = useWalletStore((s) => s.connected)
-  const tokenType = useWalletStore((s) => s.selectedProposal.tokenType)
+  const tokenRole = useWalletStore((s) => s.selectedProposal.tokenRole)
 
   const types = getTypes(
     config,
@@ -112,7 +112,7 @@ export default function VotingPower(props: Props) {
     ownTokenRecord,
     proposal,
     realm,
-    tokenType
+    tokenRole
   )
 
   if (!connected || !proposal) {
@@ -126,9 +126,7 @@ export default function VotingPower(props: Props) {
   if (connected && types.length === 0) {
     return (
       <div className={classNames(props.className, 'text-xs', 'text-white/50')}>
-        You do not have any voting power
-        <br />
-        in this realm.
+        You do not have any voting power in this dao.
       </div>
     )
   }

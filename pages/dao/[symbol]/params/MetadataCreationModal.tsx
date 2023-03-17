@@ -26,8 +26,8 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { AccountType } from '@utils/uiTypes/assets'
 import { WebBundlr } from '@bundlr-network/client'
 import { LAMPORTS_PER_SOL } from '@solana/web3.js'
-import { deprecated } from '@metaplex-foundation/mpl-token-metadata'
 import { PublicKey } from '@solana/web3.js'
+import { Metaplex } from '@metaplex-foundation/js'
 
 interface GovernanceConfigForm {
   mintAccount: AssetAccount | undefined
@@ -40,10 +40,12 @@ const MetadataCreationModal = ({
   closeModal,
   isOpen,
   governance,
+  initialMintAccount,
 }: {
   closeModal: () => void
   isOpen: boolean
   governance: ProgramAccount<Governance>
+  initialMintAccount?: AssetAccount | undefined
 }) => {
   const router = useRouter()
   const { realm, canChooseWhoVote, symbol, realmInfo } = useRealm()
@@ -71,7 +73,7 @@ const MetadataCreationModal = ({
   >(undefined)
   const [shouldMakeSolTreasury, setShouldMakeSolTreasury] = useState(false)
   const [form, setForm] = useState<GovernanceConfigForm>({
-    mintAccount: undefined,
+    mintAccount: initialMintAccount,
     name: '',
     symbol: '',
     description: '',
@@ -263,15 +265,15 @@ const MetadataCreationModal = ({
   const checkCurrentMetadataExist = async () => {
     if (form.mintAccount) {
       try {
-        const tokenMetaPubkey = await deprecated.Metadata.getPDA(
-          form.mintAccount.pubkey
-        )
-
-        const tokenMeta = await deprecated.Metadata.load(
-          connection.current,
-          tokenMetaPubkey
-        )
-        if (tokenMeta) return true
+        const metaplex = new Metaplex(connection.current)
+        const metadataPDA = await metaplex
+          .nfts()
+          .pdas()
+          .metadata({ mint: form.mintAccount.pubkey })
+        const tokenMetadata = await metaplex.nfts().findByMetadata({
+          metadata: metadataPDA,
+        })
+        if (tokenMetadata) return true
         return false
       } catch (e) {
         return false
@@ -295,6 +297,7 @@ const MetadataCreationModal = ({
       setShouldMakeSolTreasury(true)
       setPayerSolTreasury(undefined)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
     form,
     setMintAuthority,

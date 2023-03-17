@@ -1,10 +1,10 @@
 import { getAccountName, WSOL_MINT } from '@components/instructions/tools'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { PublicKey } from '@solana/web3.js'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
 import BigNumber from 'bignumber.js'
 import { abbreviateAddress } from './formatting'
-import tokenService from './services/token'
+import tokenPriceService from './services/tokenPrice'
 import { AccountType, AssetAccount } from './uiTypes/assets'
 
 export const getTreasuryAccountItemInfoV2 = (account: AssetAccount) => {
@@ -24,12 +24,12 @@ export const getTreasuryAccountItemInfoV2 = (account: AssetAccount) => {
           )
         ).toNumber()
       : 0
-  const price = tokenService.getUSDTokenPrice(mintAddress!)
+  const price = tokenPriceService.getUSDTokenPrice(mintAddress!)
   const totalPrice = amount * price
   const totalPriceFormatted = amount
     ? new BigNumber(totalPrice).toFormat(0)
     : ''
-  const info = tokenService.getTokenInfo(mintAddress!)
+  const info = tokenPriceService.getTokenInfo(mintAddress!)
 
   const symbol =
     account.type === AccountType.NFT

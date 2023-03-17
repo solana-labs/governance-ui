@@ -14,16 +14,19 @@ import {
   ChevronDownIcon,
 } from '@heroicons/react/solid'
 import { abbreviateAddress } from '@utils/formatting'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import useLocalStorageState from '../hooks/useLocalStorageState'
 import useWalletStore from '../stores/useWalletStore'
-import {
-  getWalletProviderByUrl,
-  WALLET_PROVIDERS,
-} from '../utils/wallet-adapters'
+import { getWalletProviderByName } from '../utils/wallet-adapters'
 import Switch from './Switch'
 import { TwitterIcon } from './icons'
 import { notify } from '@utils/notifications'
+import { Profile } from '@components/Profile'
+import Loading from './Loading'
+import { WalletReadyState } from '@solana/wallet-adapter-base'
+import { useWallet } from '@solana/wallet-adapter-react'
+import useInitWallet from '@hooks/useInitWallet'
+import { ExternalLinkIcon } from '@heroicons/react/outline'
 
 const StyledWalletProviderLabel = styled.p`
   font-size: 0.65rem;
@@ -31,26 +34,33 @@ const StyledWalletProviderLabel = styled.p`
 `
 
 const ConnectWalletButton = (props) => {
+  useInitWallet()
   const { pathname, query, replace } = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
   const [currentCluster, setCurrentCluster] = useLocalStorageState(
     'cluster',
     'mainnet'
   )
+  const { wallets } = useWallet()
+
   const {
     connected,
     current,
-    providerUrl,
+    providerName,
     connection,
     set: setWalletStore,
   } = useWalletStore((s) => s)
-  const provider = useMemo(() => getWalletProviderByUrl(providerUrl), [
-    providerUrl,
-  ])
+
+  const provider = useMemo(
+    () => getWalletProviderByName(providerName, wallets),
+    [providerName, wallets]
+  )
 
   useEffect(() => {
     if (connection.cluster !== currentCluster) {
       setCurrentCluster(connection.cluster)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [connection.cluster])
 
   function updateClusterParam(cluster) {
@@ -73,6 +83,7 @@ const ConnectWalletButton = (props) => {
   }
 
   const handleConnectDisconnect = async () => {
+    setIsLoading(true)
     try {
       if (connected) {
         await current?.disconnect()
@@ -88,6 +99,7 @@ const ConnectWalletButton = (props) => {
       }
       console.warn('handleConnectDisconnect', e)
     }
+    setIsLoading(false)
   }
 
   const { show } = useWalletIdentity()
@@ -110,6 +122,7 @@ const ConnectWalletButton = (props) => {
         dark={true}
       />
     ) : null
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [current?.publicKey?.toBase58()])
 
   const displayAddressImage = useMemo(() => {
@@ -133,13 +146,14 @@ const ConnectWalletButton = (props) => {
         <img src={provider?.adapter.icon} className="w-5 h-5" />
       </div>
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [provider])
 
   return (
     <div className="flex">
       <div
         disabled={connected}
-        className={`bg-bkg-2 hover:bg-bkg-3  border border-fgd-4 border-r-0 default-transition flex h-12 items-center pl-1 pr-2 rounded-l-full rounded-r-none ${
+        className={`bg-bkg-2 hover:bg-bkg-3  border border-fgd-4 border-r-0 default-transition flex h-12 items-center pl-4 pr-3 sm:pl-1 sm:pr-2 rounded-l-full rounded-r-none ${
           connected
             ? 'cursor-default'
             : 'cursor-pointer hover:bg-bkg-3 focus:outline-none'
@@ -159,9 +173,9 @@ const ConnectWalletButton = (props) => {
               </>
             ) : (
               <>
-                Connect
+                {isLoading ? <Loading></Loading> : 'Connect'}
                 <StyledWalletProviderLabel className="font-normal text-fgd-3">
-                  {provider?.name}
+                  {provider?.adapter?.name}
                 </StyledWalletProviderLabel>
               </>
             )}
@@ -184,25 +198,30 @@ const ConnectWalletButton = (props) => {
               </Menu.Button>
               <Menu.Items className="absolute right-0 z-20 w-48 p-2 border rounded-md shadow-md outline-none bg-bkg-1 border-fgd-4 top-14">
                 <>
-                  {WALLET_PROVIDERS.map(({ name, url, adapter: { icon } }) => (
-                    <Menu.Item key={name}>
-                      <button
-                        className="flex items-center w-full p-2 font-normal default-transition h-9 hover:bg-bkg-3 hover:cursor-pointer hover:rounded focus:outline-none"
-                        onClick={() =>
-                          setWalletStore((s) => {
-                            s.providerUrl = url
-                          })
-                        }
-                      >
-                        <img src={icon} className="w-4 h-4 mr-2" />
-                        <span className="text-sm">{name}</span>
+                  {wallets
+                    .filter(
+                      ({ adapter }) =>
+                        adapter.readyState !== WalletReadyState.Unsupported
+                    )
+                    .map(({ adapter: { icon, name } }) => (
+                      <Menu.Item key={name}>
+                        <button
+                          className="flex items-center w-full p-2 font-normal default-transition h-9 hover:bg-bkg-3 hover:cursor-pointer hover:rounded focus:outline-none"
+                          onClick={() =>
+                            setWalletStore((s) => {
+                              s.providerName = name
+                            })
+                          }
+                        >
+                          <img src={icon} className="w-4 h-4 mr-2" />
+                          <span className="text-sm">{name}</span>
 
-                        {provider?.url === url ? (
-                          <CheckCircleIcon className="w-5 h-5 ml-2 text-green" />
-                        ) : null}
-                      </button>
-                    </Menu.Item>
-                  ))}
+                          {provider?.adapter?.name === name ? (
+                            <CheckCircleIcon className="w-5 h-5 ml-2 text-green" />
+                          ) : null}
+                        </button>
+                      </Menu.Item>
+                    ))}
                   <Menu.Item key={'devnet'}>
                     <div className="flex items-center w-full p-2 font-normal default-transition h-9 hover:bg-bkg-3 hover:cursor-pointer hover:rounded focus:outline-none">
                       <span className="text-sm">Devnet</span>
@@ -216,6 +235,14 @@ const ConnectWalletButton = (props) => {
                   </Menu.Item>
                   {current && current.publicKey && (
                     <>
+                      <hr
+                        className={`border border-fgd-3 opacity-50 mt-2 mb-2`}
+                      ></hr>
+                      <Menu.Item key={'profile'}>
+                        <div className="p-2">
+                          <Profile />
+                        </div>
+                      </Menu.Item>
                       <hr
                         className={`border border-fgd-3 opacity-50 mt-2 mb-2`}
                       ></hr>
@@ -248,6 +275,18 @@ const ConnectWalletButton = (props) => {
                       </Menu.Item>
                     </>
                   )}
+                  <hr className="border border-fgd-3 opacity-50 mt-2 mb-2 sm:hidden" />
+                  <Menu.Item>
+                    <a
+                      className="flex items-center p-2 rounded transition-colors sm:hidden hover:bg-bkg-3"
+                      href="https://docs.realms.today/"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <ExternalLinkIcon className="w-4 h-4 mr-2 stroke-white" />
+                      <div className="text-white text-sm">Read the Docs</div>
+                    </a>
+                  </Menu.Item>
                 </>
               </Menu.Items>
             </>

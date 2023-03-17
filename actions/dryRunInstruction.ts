@@ -5,7 +5,6 @@ import {
   Transaction,
   TransactionInstruction,
 } from '@solana/web3.js'
-import { simulateTransaction } from '../utils/send'
 import { WalletAdapter } from '@solana/wallet-adapter-base'
 
 export async function dryRunInstruction(
@@ -37,7 +36,11 @@ export async function dryRunInstruction(
     })
   }
 
-  const result = await simulateTransaction(connection, transaction, 'single')
+  const result = await connection.simulateTransaction(
+    transaction,
+    undefined,
+    true
+  )
 
   return { response: result.value, transaction }
 }

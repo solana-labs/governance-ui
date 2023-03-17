@@ -5,6 +5,7 @@ import Text from '@components/Text'
 export default function AdvancedOptionsDropdown({
   className = 'mt-10 md:mt-16 w-fit',
   children,
+  title = 'Advanced Options',
 }) {
   const [open, setOpen] = useState(false)
   return (
@@ -17,7 +18,7 @@ export default function AdvancedOptionsDropdown({
         onClick={() => setOpen(!open)}
       >
         <Text level="2" className="font-normal">
-          Advanced Options
+          {title}
         </Text>
         <div
           className={`default-transition ${open ? 'transform rotate-180' : ''}`}

@@ -96,10 +96,11 @@ const AccountTab: FunctionComponent<AccountTabProps> = ({
         console.log(e)
       }
     }
-    if (!logo) {
-      getTokenMetadata(assetAccount.extensions.mint?.publicKey.toBase58() ?? '')
+    if (!logo && assetAccount.extensions.mint?.publicKey.toBase58()) {
+      getTokenMetadata(assetAccount.extensions.mint?.publicKey.toBase58())
     }
-  })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+  }, [assetAccount.extensions.mint?.publicKey.toBase58()])
   return (
     <button
       key={assetAccount.extensions.transferAddress?.toBase58()}

@@ -15,15 +15,17 @@ import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
   TOKEN_PROGRAM_ID,
+  MintInfo,
 } from '@solana/spl-token'
 import { Connection } from '@solana/web3.js'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import {
   nftPluginsPks,
   vsrPluginsPks,
   gatewayPluginsPks,
 } from '@hooks/useVotingPlugins'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import { validatePubkey } from './formValidation'
 
 // Plugins supported by Realms
 const supportedPlugins = [
@@ -297,10 +299,360 @@ export const getCastleWithdrawSchema = () => {
   })
 }
 
+export const getMeanCreateAccountSchema = ({ form }) => {
+  const governedTokenAccount = form.governedTokenAccount as
+    | AssetAccount
+    | undefined
+
+  return yup.object().shape({
+    governedTokenAccount: yup.object().required('Source of funds is required'),
+    label: yup.string().required('Name is required'),
+    amount: yup
+      .number()
+      .typeError('Amount is required')
+      .test(
+        'amount',
+        'Transfer amount must be less than the source of funds available amount',
+        async function (val: number) {
+          if (val && !form.governedTokenAccount) {
+            return this.createError({
+              message: `Please select source of funds to validate the amount`,
+            })
+          }
+          if (
+            val &&
+            governedTokenAccount &&
+            governedTokenAccount.extensions.mint
+          ) {
+            const mintValue = getMintNaturalAmountFromDecimalAsBN(
+              val,
+              governedTokenAccount?.extensions.mint.account.decimals
+            )
+            return !!(governedTokenAccount?.extensions.token?.publicKey &&
+            !governedTokenAccount.isSol
+              ? governedTokenAccount.extensions.token.account.amount.gte(
+                  mintValue
+                )
+              : new BN(
+                  governedTokenAccount.extensions.solAccount!.lamports
+                ).gte(mintValue))
+          }
+          return this.createError({
+            message: `Amount is required`,
+          })
+        }
+      ),
+  })
+}
+
+export const getMeanFundAccountSchema = ({ form }) => {
+  const governedTokenAccount = form.governedTokenAccount as
+    | AssetAccount
+    | undefined
+
+  return yup.object().shape({
+    governedTokenAccount: yup.object().required('Source of funds is required'),
+    treasury: yup
+      .object()
+      .required('Streaming account destination is required'),
+    amount: yup
+      .number()
+      .typeError('Amount is required')
+      .test(
+        'amount',
+        'Transfer amount must be less than the source of funds available amount',
+        async function (val: number) {
+          if (val && !form.governedTokenAccount) {
+            return this.createError({
+              message: `Please select source of funds to validate the amount`,
+            })
+          }
+          if (
+            val &&
+            governedTokenAccount &&
+            governedTokenAccount.extensions.mint
+          ) {
+            const mintValue = getMintNaturalAmountFromDecimalAsBN(
+              val,
+              governedTokenAccount?.extensions.mint.account.decimals
+            )
+            return !!(governedTokenAccount?.extensions.token?.publicKey &&
+            !governedTokenAccount.isSol
+              ? governedTokenAccount.extensions.token.account.amount.gte(
+                  mintValue
+                )
+              : new BN(
+                  governedTokenAccount.extensions.solAccount!.lamports
+                ).gte(mintValue))
+          }
+          return this.createError({
+            message: `Amount is required`,
+          })
+        }
+      ),
+  })
+}
+export const getMeanWithdrawFromAccountSchema = ({
+  form,
+  connection,
+  mintInfo,
+}: {
+  form: any
+  connection: ConnectionContext
+  mintInfo?: MintInfo
+}) => {
+  return yup.object().shape({
+    governedTokenAccount: yup.object().required('Governance is required'),
+    treasury: yup.object().required('Streaming account source is required'),
+
+    destination: yup
+      .string()
+      .test(
+        'destination',
+        'Account validation error',
+        async function (val: string) {
+          if (val) {
+            try {
+              if (form.treasury?.id.toString() == val) {
+                return this.createError({
+                  message: `Destination account address can't be same as source account`,
+                })
+              }
+              await validateDestinationAccAddress(
+                connection,
+                val,
+                new PublicKey(form.treasury?.id)
+              )
+              return true
+            } catch (e) {
+              console.log(e)
+              return this.createError({
+                message: `${e}`,
+              })
+            }
+          } else {
+            return this.createError({
+              message: `Destination account is required`,
+            })
+          }
+        }
+      ),
+    amount: yup
+      .number()
+      .typeError('Amount is required')
+      .test(
+        'amount',
+        'Transfer amount must be less than the source of funds available amount',
+        async function (val: number) {
+          if (val && !form.treasury) {
+            return this.createError({
+              message: `Please select source of funds to validate the amount`,
+            })
+          }
+          if (val && form.treasury && mintInfo) {
+            const mintValue = getMintNaturalAmountFromDecimalAsBN(
+              val,
+              mintInfo.decimals
+            )
+            return new BN(form.treasury.balance).gte(mintValue)
+          }
+          return this.createError({
+            message: `Amount is required`,
+          })
+        }
+      ),
+  })
+}
+
+export const getMeanCreateStreamSchema = ({
+  form,
+  connection,
+  mintInfo,
+}: {
+  form: any
+  connection: ConnectionContext
+  mintInfo?: MintInfo
+}) => {
+  return yup.object().shape({
+    governedTokenAccount: yup.object().required('Governance is required'),
+    treasury: yup.object().required('Streaming account source is required'),
+    streamName: yup.string().required('Stream name is required'),
+    destination: yup
+      .string()
+      .test(
+        'destination',
+        'Account validation error',
+        async function (val: string) {
+          if (val) {
+            try {
+              if (form.treasury?.id.toString() == val) {
+                return this.createError({
+                  message: `Destination account address can't be same as source account`,
+                })
+              }
+              await validateDestinationAccAddress(
+                connection,
+                val,
+                new PublicKey(form.treasury?.id)
+              )
+              return true
+            } catch (e) {
+              console.log(e)
+              return this.createError({
+                message: `${e}`,
+              })
+            }
+          } else {
+            return this.createError({
+              message: `Destination account is required`,
+            })
+          }
+        }
+      ),
+    allocationAssigned: yup
+      .number()
+      .typeError('Amount is required')
+      .test(
+        'amount',
+        'Transfer amount must be less than the source of funds available amount',
+        async function (val: number) {
+          if (val && !form.treasury) {
+            return this.createError({
+              message: `Please select source of funds to validate the amount`,
+            })
+          }
+          if (val && form.treasury && mintInfo) {
+            const mintValue = getMintNaturalAmountFromDecimalAsBN(
+              val,
+              mintInfo.decimals
+            )
+            return new BN(form.treasury.balance).gte(mintValue)
+          }
+          return this.createError({
+            message: `Amount is required`,
+          })
+        }
+      ),
+    rateAmount: yup.number().required('Rate amount is required'),
+  })
+}
+
+export const getMeanTransferStreamSchema = () => {
+  return yup.object().shape({
+    governedTokenAccount: yup.object().required('Governance is required'),
+    stream: yup.object().required('Stream source is required'),
+    destination: yup.string().required('New stream owner is required'),
+  })
+}
+
 export const getFriktionWithdrawSchema = () => {
   return yup.object().shape({
     governedTokenAccount: yup.object().required('Source account is required'),
     amount: yup.number().typeError('Amount is required'),
+  })
+}
+
+export const getDualFinanceGovernanceAirdropSchema = () => {
+  return yup.object().shape({
+    amountPerVoter: yup.number().typeError('Amount per voter is required'),
+    eligibilityStart: yup.number().typeError('Eligibility start is required'),
+    eligibilityEnd: yup.number().typeError('Eligibility end is required'),
+    treasury: yup.object().typeError('Treasury is required'),
+    amount: yup.number().typeError('Amount is required'),
+  })
+}
+
+export const getDualFinanceMerkleAirdropSchema = () => {
+  return yup.object().shape({
+    root: yup
+      .string()
+      .required('Root is required')
+      .test(
+        'destination',
+        'Account validation error',
+        async function (val: string) {
+          if (val) {
+            try {
+              const arr = Uint8Array.from(Buffer.from(val, 'hex'))
+              if (arr.length !== 32) {
+                return this.createError({
+                  message: 'Expected 32 bytes',
+                })
+              }
+              return true
+            } catch (e) {
+              console.log(e)
+            }
+            try {
+              const root = val.split(',').map(function (item) {
+                return parseInt(item, 10)
+              })
+              if (root.length !== 32) {
+                return this.createError({
+                  message: 'Expected 32 bytes',
+                })
+              }
+              for (const byte of root) {
+                if (byte < 0 || byte >= 256) {
+                  return this.createError({
+                    message: 'Invalid byte',
+                  })
+                }
+              }
+              return true
+            } catch (e) {
+              console.log(e)
+            }
+            return this.createError({
+              message: `Could not parse`,
+            })
+          } else {
+            return this.createError({
+              message: `Root is required`,
+            })
+          }
+        }
+      ),
+    treasury: yup.object().typeError('Treasury is required'),
+    amount: yup.number().typeError('Amount is required'),
+  })
+}
+
+export const getDualFinanceStakingOptionSchema = () => {
+  return yup.object().shape({
+    soName: yup.string().required('Staking option name is required'),
+    userPk: yup.string().required('User pk is required'),
+    optionExpirationUnixSeconds: yup
+      .number()
+      .typeError('Expiration is required'),
+    numTokens: yup.number().typeError('Num tokens is required'),
+    strike: yup.number().typeError('Strike is required'),
+    lotSize: yup.number().typeError('lotSize is required'),
+    baseTreasury: yup.object().typeError('baseTreasury is required'),
+    quoteTreasury: yup.object().typeError('quoteTreasury is required'),
+    payer: yup.object().typeError('payer is required'),
+  })
+}
+
+export const getDualFinanceExerciseSchema = () => {
+  return yup.object().shape({
+    soName: yup.string().required('Staking option name is required'),
+    optionAccount: yup.object().required('Option account is required'),
+    numTokens: yup.number().typeError('Num tokens is required'),
+    baseTreasury: yup.object().typeError('baseTreasury is required'),
+    quoteTreasury: yup.object().typeError('quoteTreasury is required'),
+  })
+}
+
+export const getDualFinanceWithdrawSchema = () => {
+  return yup.object().shape({
+    soName: yup.string().required('Staking option name is required'),
+    baseTreasury: yup.object().typeError('baseTreasury is required'),
+    mintPk: yup
+      .string()
+      .test('is-valid-address1', 'Please enter a valid PublicKey', (value) =>
+        value ? validatePubkey(value) : true
+      ),
   })
 }
 
@@ -517,7 +869,7 @@ export const getMintSchema = ({ form, connection }) => {
             }
           } else {
             return this.createError({
-              message: `Destination account is required`,
+              message: `Invalid destination account`,
             })
           }
         }
@@ -568,80 +920,225 @@ export const getStakeSchema = ({ form }) => {
   })
 }
 
-export const getRealmCfgSchema = ({ form }) => {
-  return yup.object().shape({
-    governedAccount: yup
-      .object()
-      .nullable()
-      .required('Governed account is required'),
-    minCommunityTokensToCreateGovernance: yup
-      .number()
-      .required('Min community tokens to create governance is required'),
-    communityVoterWeightAddin: yup
-      .string()
-      .test(
-        'communityVoterWeightAddinTest',
-        'communityVoterWeightAddin validation error',
-        function (val: string) {
-          if (!form?.communityVoterWeightAddin) {
-            return true
-          }
-          if (val) {
-            try {
-              getValidatedPublickKey(val)
-              if (supportedPlugins.includes(val)) {
+// @asktree: It's odd that `form` would be an input both to the schema factory and the schema itself.
+export const getRealmCfgSchema = ({
+  form,
+  programVersion,
+}: {
+  form: any
+  programVersion: number
+}) => {
+  return programVersion >= 3
+    ? yup.object().shape({
+        governedAccount: yup
+          .object()
+          .nullable()
+          .required('Governed account is required'),
+        minCommunityTokensToCreateGovernance: yup
+          .number()
+          .required('Min community tokens to create governance is required'),
+        communityVoterWeightAddin: yup
+          .string()
+          .test(
+            'communityVoterWeightAddinTest',
+            'communityVoterWeightAddin validation error',
+            function (val: string) {
+              if (!form?.communityVoterWeightAddin) {
                 return true
+              }
+              if (val) {
+                try {
+                  getValidatedPublickKey(val)
+                  if (supportedPlugins.includes(val)) {
+                    return true
+                  } else {
+                    return this.createError({
+                      message: `Provided pubkey is not a known plugin pubkey`,
+                    })
+                  }
+                } catch (e) {
+                  console.log(e)
+                  return this.createError({
+                    message: `${e}`,
+                  })
+                }
               } else {
                 return this.createError({
-                  message: `Provided pubkey is not a known plugin pubkey`,
+                  message: `communityVoterWeightAddin is required`,
                 })
               }
-            } catch (e) {
-              console.log(e)
-              return this.createError({
-                message: `${e}`,
-              })
             }
-          } else {
-            return this.createError({
-              message: `communityVoterWeightAddin is required`,
-            })
-          }
-        }
-      ),
-    maxCommunityVoterWeightAddin: yup
-      .string()
-      .test(
-        'maxCommunityVoterWeightAddin',
-        'maxCommunityVoterWeightAddin validation error',
-        function (val: string) {
-          if (!form?.maxCommunityVoterWeightAddin) {
-            return true
-          }
-          if (val) {
-            try {
-              getValidatedPublickKey(val)
-              if ([...nftPluginsPks].includes(val)) {
+          ),
+        maxCommunityVoterWeightAddin: yup
+          .string()
+          .test(
+            'maxCommunityVoterWeightAddin',
+            'maxCommunityVoterWeightAddin validation error',
+            function (val: string) {
+              if (!form?.maxCommunityVoterWeightAddin) {
                 return true
+              }
+              if (val) {
+                try {
+                  getValidatedPublickKey(val)
+                  if ([...nftPluginsPks].includes(val)) {
+                    return true
+                  } else {
+                    return this.createError({
+                      message: `Provided pubkey is not a known plugin pubkey`,
+                    })
+                  }
+                } catch (e) {
+                  console.log(e)
+                  return this.createError({
+                    message: `${e}`,
+                  })
+                }
               } else {
                 return this.createError({
-                  message: `Provided pubkey is not a known plugin pubkey`,
+                  message: `maxCommunityVoterWeightAddin is required`,
                 })
               }
-            } catch (e) {
-              console.log(e)
-              return this.createError({
-                message: `${e}`,
-              })
             }
-          } else {
-            return this.createError({
-              message: `maxCommunityVoterWeightAddin is required`,
-            })
-          }
-        }
-      ),
-  })
+          ),
+        councilVoterWeightAddin: yup
+          .string()
+          .test(
+            'councilVoterWeightAddinTest',
+            'councilVoterWeightAddin validation error',
+            function (val: string) {
+              if (!form?.councilVoterWeightAddin) {
+                return true
+              }
+              if (val) {
+                try {
+                  getValidatedPublickKey(val)
+                  if (supportedPlugins.includes(val)) {
+                    return true
+                  } else {
+                    return this.createError({
+                      message: `Provided pubkey is not a known plugin pubkey`,
+                    })
+                  }
+                } catch (e) {
+                  console.log(e)
+                  return this.createError({
+                    message: `${e}`,
+                  })
+                }
+              } else {
+                return this.createError({
+                  message: `councilVoterWeightAddin is required`,
+                })
+              }
+            }
+          ),
+        maxCouncilVoterWeightAddin: yup
+          .string()
+          .test(
+            'maxCouncilVoterWeightAddin',
+            'maxCouncilVoterWeightAddin validation error',
+            function (val: string) {
+              if (!form?.maxCouncilVoterWeightAddin) {
+                return true
+              }
+              if (val) {
+                try {
+                  getValidatedPublickKey(val)
+                  if ([...nftPluginsPks].includes(val)) {
+                    return true
+                  } else {
+                    return this.createError({
+                      message: `Provided pubkey is not a known plugin pubkey`,
+                    })
+                  }
+                } catch (e) {
+                  console.log(e)
+                  return this.createError({
+                    message: `${e}`,
+                  })
+                }
+              } else {
+                return this.createError({
+                  message: `maxCouncilVoterWeightAddin is required`,
+                })
+              }
+            }
+          ),
+      })
+    : yup.object().shape({
+        governedAccount: yup
+          .object()
+          .nullable()
+          .required('Governed account is required'),
+        minCommunityTokensToCreateGovernance: yup
+          .number()
+          .required('Min community tokens to create governance is required'),
+        communityVoterWeightAddin: yup
+          .string()
+          .test(
+            'communityVoterWeightAddinTest',
+            'communityVoterWeightAddin validation error',
+            function (val: string) {
+              if (!form?.communityVoterWeightAddin) {
+                return true
+              }
+              if (val) {
+                try {
+                  getValidatedPublickKey(val)
+                  if (supportedPlugins.includes(val)) {
+                    return true
+                  } else {
+                    return this.createError({
+                      message: `Provided pubkey is not a known plugin pubkey`,
+                    })
+                  }
+                } catch (e) {
+                  console.log(e)
+                  return this.createError({
+                    message: `${e}`,
+                  })
+                }
+              } else {
+                return this.createError({
+                  message: `communityVoterWeightAddin is required`,
+                })
+              }
+            }
+          ),
+        maxCommunityVoterWeightAddin: yup
+          .string()
+          .test(
+            'maxCommunityVoterWeightAddin',
+            'maxCommunityVoterWeightAddin validation error',
+            function (val: string) {
+              if (!form?.maxCommunityVoterWeightAddin) {
+                return true
+              }
+              if (val) {
+                try {
+                  getValidatedPublickKey(val)
+                  if ([...nftPluginsPks].includes(val)) {
+                    return true
+                  } else {
+                    return this.createError({
+                      message: `Provided pubkey is not a known plugin pubkey`,
+                    })
+                  }
+                } catch (e) {
+                  console.log(e)
+                  return this.createError({
+                    message: `${e}`,
+                  })
+                }
+              } else {
+                return this.createError({
+                  message: `maxCommunityVoterWeightAddin is required`,
+                })
+              }
+            }
+          ),
+      })
 }
 
 export const getCreateTokenMetadataSchema = () => {
