@@ -908,116 +908,121 @@ const getProgramAccountInfo = async (
   { endpoint, current }: ConnectionContext,
   publicKeys: PublicKey[]
 ): Promise<{ owner: PublicKey; programId: PublicKey }[]> => {
-  const { data: exetuableAccountInfoJson } = await axios.post<
-    unknown,
-    {
-      data: {
-        result: {
-          account: {
-            data: [string, 'base64']
-          }
-          pubkey: string
+  let result: { owner: PublicKey; programId: PublicKey }[] = []
+  try {
+    const { data: exetuableAccountInfoJson } = await axios.post<
+      unknown,
+      {
+        data: {
+          result: {
+            account: {
+              data: [string, 'base64']
+            }
+            pubkey: string
+          }[]
         }[]
-      }[]
-    }
-  >(
-    endpoint,
-    publicKeys.map((publicKey) => ({
-      jsonrpc: '2.0',
-      id: publicKey.toBase58(),
-      method: 'getProgramAccounts',
-      params: [
-        'BPFLoaderUpgradeab1e11111111111111111111111',
-        {
-          commitment: current.commitment,
-          encoding: 'base64',
-          filters: [
-            {
-              memcmp: {
-                offset: programAccountOwnerOffset,
-                bytes: publicKey.toBase58(),
+      }
+    >(
+      endpoint,
+      publicKeys.map((publicKey) => ({
+        jsonrpc: '2.0',
+        id: publicKey.toBase58(),
+        method: 'getProgramAccounts',
+        params: [
+          'BPFLoaderUpgradeab1e11111111111111111111111',
+          {
+            commitment: current.commitment,
+            encoding: 'base64',
+            filters: [
+              {
+                memcmp: {
+                  offset: programAccountOwnerOffset,
+                  bytes: publicKey.toBase58(),
+                },
               },
+            ],
+            dataSlice: {
+              offset: 0,
+              length: 0,
             },
-          ],
-          dataSlice: {
-            offset: 0,
-            length: 0,
           },
-        },
-      ],
-    }))
-  )
-
-  if (!exetuableAccountInfoJson) {
-    throw new Error(
-      `Cannot load information about program accounts ${publicKeys.map((x) =>
-        x.toBase58()
-      )}`
+        ],
+      }))
     )
-  }
-  const executableDataPks = (exetuableAccountInfoJson as any).reduce(
-    (executableAccountInfo, { result, id }) => {
-      result.forEach(({ pubkey }) => {
-        const executableDataPk = new PublicKey(pubkey)
-        executableAccountInfo.push({
-          executableDataPk: executableDataPk,
-          owner: new PublicKey(id),
-        })
-      })
+    if (exetuableAccountInfoJson && exetuableAccountInfoJson.length) {
+      const executableDataPks = (exetuableAccountInfoJson as any).reduce(
+        (executableAccountInfo, { result, id }) => {
+          result.forEach(({ pubkey }) => {
+            const executableDataPk = new PublicKey(pubkey)
+            executableAccountInfo.push({
+              executableDataPk: executableDataPk,
+              owner: new PublicKey(id),
+            })
+          })
 
-      return executableAccountInfo
-    },
-    []
-  ) as { owner: PublicKey; executableDataPk: PublicKey }[]
-  const { data: programAccountInfoJson } = await axios.post<
-    unknown,
-    {
-      data: {
-        result: {
-          account: {
-            data: [string, 'base64']
-          }
-          pubkey: string
-        }[]
-      }[]
-    }
-  >(
-    endpoint,
-    executableDataPks.map((obj) => ({
-      jsonrpc: '2.0',
-      id: obj.owner,
-      method: 'getProgramAccounts',
-      params: [
-        'BPFLoaderUpgradeab1e11111111111111111111111',
-        {
-          commitment: current.commitment,
-          encoding: 'base64',
-          filters: [
-            {
-              memcmp: {
-                offset: 4,
-                bytes: obj.executableDataPk.toBase58(),
-              },
-            },
-          ],
-          dataSlice: {
-            offset: 0,
-            length: 0,
-          },
+          return executableAccountInfo
         },
-      ],
-    }))
-  )
-  const programDataPks = (programAccountInfoJson as any).reduce(
-    (programAccountInfo, { result, id }) => {
-      result.forEach(({ pubkey }) => {
-        const programId = new PublicKey(pubkey)
-        programAccountInfo.push({ programId, owner: new PublicKey(id) })
-      })
+        []
+      ) as { owner: PublicKey; executableDataPk: PublicKey }[]
+      if (executableDataPks.length) {
+        const { data: programAccountInfoJson } = await axios.post<
+          unknown,
+          {
+            data: {
+              result: {
+                account: {
+                  data: [string, 'base64']
+                }
+                pubkey: string
+              }[]
+            }[]
+          }
+        >(
+          endpoint,
+          executableDataPks.map((obj) => ({
+            jsonrpc: '2.0',
+            id: obj.owner,
+            method: 'getProgramAccounts',
+            params: [
+              'BPFLoaderUpgradeab1e11111111111111111111111',
+              {
+                commitment: current.commitment,
+                encoding: 'base64',
+                filters: [
+                  {
+                    memcmp: {
+                      offset: 4,
+                      bytes: obj.executableDataPk.toBase58(),
+                    },
+                  },
+                ],
+                dataSlice: {
+                  offset: 0,
+                  length: 0,
+                },
+              },
+            ],
+          }))
+        )
+        if (programAccountInfoJson && programAccountInfoJson.length) {
+          const programDataPks = (programAccountInfoJson as any).reduce(
+            (programAccountInfo, { result, id }) => {
+              result.forEach(({ pubkey }) => {
+                const programId = new PublicKey(pubkey)
+                programAccountInfo.push({ programId, owner: new PublicKey(id) })
+              })
 
-      return programAccountInfo
-    },
-    []
-  ) as { owner: PublicKey; programId: PublicKey }[]
-  return programDataPks
+              return programAccountInfo
+            },
+            []
+          ) as { owner: PublicKey; programId: PublicKey }[]
+          result = programDataPks
+        }
+      }
+    }
+  } catch (e) {
+    console.log('unable to fetch programs owned by DAO', e)
+  }
+
+  return result
 }
