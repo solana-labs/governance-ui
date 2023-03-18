@@ -910,7 +910,7 @@ const getProgramAccountInfo = async (
 ): Promise<{ owner: PublicKey; programId: PublicKey }[]> => {
   let result: { owner: PublicKey; programId: PublicKey }[] = []
   try {
-    const { data: exetuableAccountInfoJson } = await axios.post<
+    const { data: executableAccountInfoJson } = await axios.post<
       unknown,
       {
         data: {
@@ -920,6 +920,7 @@ const getProgramAccountInfo = async (
             }
             pubkey: string
           }[]
+          id: string
         }[]
       }
     >(
@@ -949,8 +950,8 @@ const getProgramAccountInfo = async (
         ],
       }))
     )
-    if (exetuableAccountInfoJson && exetuableAccountInfoJson.length) {
-      const executableDataPks = (exetuableAccountInfoJson as any).reduce(
+    if (executableAccountInfoJson && executableAccountInfoJson.length) {
+      const executableDataPks = executableAccountInfoJson.reduce(
         (executableAccountInfo, { result, id }) => {
           result.forEach(({ pubkey }) => {
             const executableDataPk = new PublicKey(pubkey)
@@ -962,8 +963,8 @@ const getProgramAccountInfo = async (
 
           return executableAccountInfo
         },
-        []
-      ) as { owner: PublicKey; executableDataPk: PublicKey }[]
+        [] as { owner: PublicKey; executableDataPk: PublicKey }[]
+      )
       if (executableDataPks.length) {
         const { data: programAccountInfoJson } = await axios.post<
           unknown,
@@ -975,6 +976,7 @@ const getProgramAccountInfo = async (
                 }
                 pubkey: string
               }[]
+              id: string
             }[]
           }
         >(
@@ -1005,7 +1007,7 @@ const getProgramAccountInfo = async (
           }))
         )
         if (programAccountInfoJson && programAccountInfoJson.length) {
-          const programDataPks = (programAccountInfoJson as any).reduce(
+          const programDataPks = programAccountInfoJson.reduce(
             (programAccountInfo, { result, id }) => {
               result.forEach(({ pubkey }) => {
                 const programId = new PublicKey(pubkey)
@@ -1014,8 +1016,8 @@ const getProgramAccountInfo = async (
 
               return programAccountInfo
             },
-            []
-          ) as { owner: PublicKey; programId: PublicKey }[]
+            [] as { owner: PublicKey; programId: PublicKey }[]
+          )
           result = programDataPks
         }
       }
