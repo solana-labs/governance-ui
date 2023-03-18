@@ -5,7 +5,6 @@ export async function getProgramData(
   connection: Connection,
   programId: string
 ) {
-console.log(programId)
   const programData = await getProgramDataAccount(
     connection,
     new PublicKey(programId)
