@@ -85,7 +85,11 @@ export default function Header(props: Props) {
         <AddAssetModal
           wallet={props.wallet}
           onAddProgramSelected={() =>
-            router.push(fmtUrlWithCluster(`/dao/${symbol}${NEW_PROGRAM_VIEW}`))
+            router.push(
+              fmtUrlWithCluster(
+                `/dao/${symbol}${NEW_PROGRAM_VIEW}?wallet=${props.wallet.address}`
+              )
+            )
           }
           onAddTokenAccount={() => setOpenModal(ModalType.NewTokenAccount)}
           onClose={() => setOpenModal(ModalType.None)}

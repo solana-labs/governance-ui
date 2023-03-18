@@ -46,7 +46,10 @@ const GovernedAccountSelect = ({
           case AccountType.PROGRAM:
             return getProgramAccountLabel(value.governance)
           default:
-            return value.governance.account.governedAccount.toBase58()
+            return (
+              value.extensions.transferAddress?.toBase58() ||
+              value.pubkey.toBase58()
+            )
         }
       }
     } else {

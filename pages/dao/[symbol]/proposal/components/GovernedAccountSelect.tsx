@@ -1,9 +1,6 @@
 import Select from '@components/inputs/Select'
 import { Governance } from '@solana/spl-governance'
-import {
-  ProgramAccount,
-  getNativeTreasuryAddress,
-} from '@solana/spl-governance'
+import { ProgramAccount } from '@solana/spl-governance'
 import {
   getMintAccountLabelInfo,
   getSolAccountLabel,
@@ -125,31 +122,23 @@ const GovernedAccountSelect = ({
       for (const account of governedAccounts) {
         governances.add(account.governance.pubkey.toBase58())
       }
+      const rawWallets = governedAccounts.map((x) => ({
+        account: x,
+        governance: x.governance.pubkey,
+        walletAddress: x.governance.nativeTreasuryAddress,
+      }))
 
-      Promise.all(
-        governedAccounts.map((account) => {
-          return getNativeTreasuryAddress(
-            programId,
-            account.governance.pubkey
-          ).then((walletAddress) => ({
-            account,
-            governance: account.governance.pubkey,
-            walletAddress,
-          }))
-        })
-      ).then((rawWallets) => {
-        const visited = new Set<string>()
-        const deduped: typeof rawWallets = []
+      const visited = new Set<string>()
+      const deduped: typeof rawWallets = []
 
-        for (const wallet of rawWallets) {
-          if (!visited.has(wallet.walletAddress.toBase58())) {
-            visited.add(wallet.walletAddress.toBase58())
-            deduped.push(wallet)
-          }
+      for (const wallet of rawWallets) {
+        if (!visited.has(wallet.walletAddress.toBase58())) {
+          visited.add(wallet.walletAddress.toBase58())
+          deduped.push(wallet)
         }
+      }
 
-        setWallets(deduped)
-      })
+      setWallets(deduped)
     }
   }, [governedAccounts, programId])
 

@@ -3,10 +3,10 @@ import axios from 'axios'
 import {
   getNativeTreasuryAddress,
   Governance,
-  GovernanceAccountType,
   Realm,
   TOKEN_PROGRAM_ID,
   ProgramAccount,
+  GovernanceAccountType,
 } from '@solana/spl-governance'
 import { ParsedAccountData, PublicKey } from '@solana/web3.js'
 import { AccountInfo, MintInfo } from '@solana/spl-token'
@@ -39,14 +39,15 @@ import {
   AccountTypeSol,
   AccountTypeToken,
   AssetAccount,
+  GovernanceProgramAccountWithNativeTreasuryAddress,
 } from '@utils/uiTypes/assets'
 import group from '@utils/group'
 
 const additionalPossibleMintAccounts = {
   Mango: [new PublicKey('EGk8Gw7Z484mzAKb7GwCcqrZd4KwwsyU2Dv9woY6uDQu')],
 }
-
 const tokenAccountOwnerOffset = 32
+const programAccountOwnerOffset = 13
 
 interface SolAccInfo {
   governancePk: PublicKey
@@ -59,7 +60,9 @@ interface GovernanceAssetsStore extends State {
   governedTokenAccounts: AssetAccount[]
   assetAccounts: AssetAccount[]
   loadGovernedAccounts: boolean
-
+  loadTokenAccounts: boolean
+  loadProgramAccounts: boolean
+  loadMintAccounts: boolean
   setGovernancesArray: (
     connection: ConnectionContext,
     realm: ProgramAccount<Realm>,
@@ -83,6 +86,9 @@ const defaultState = {
   assetAccounts: [],
   governedTokenAccounts: [],
   loadGovernedAccounts: false,
+  loadTokenAccounts: false,
+  loadProgramAccounts: false,
+  loadMintAccounts: false,
 }
 
 const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
@@ -109,18 +115,60 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
   getGovernedAccounts: async (connection, realm) => {
     set((s) => {
       s.loadGovernedAccounts = true
+      s.loadTokenAccounts = true
+      s.loadMintAccounts = true
+      s.loadProgramAccounts = true
       s.governedTokenAccounts = []
       s.assetAccounts = []
     })
 
     const governancesArray = _get().governancesArray
-    const accounts = governancesArray.length
-      ? await getAccountsForGovernances(connection, realm, governancesArray)
-      : []
+    const accounts: AssetAccount[] = []
+    const nativeAddresses = await Promise.all([
+      ...governancesArray.map((x) =>
+        getNativeTreasuryAddress(realm.owner, x.pubkey)
+      ),
+    ])
+    const governancesWithNativeTreasuryAddress = governancesArray.map(
+      (x, index) => ({
+        ...x,
+        nativeTreasuryAddress: nativeAddresses[index],
+      })
+    )
+    //due to long request for mint accounts that are owned by every governance
+    //we fetch
+    const possibleMintAccountPks = [
+      realm.account.communityMint,
+      realm.account.config.councilMint,
+    ].filter((x) => typeof x !== 'undefined') as PublicKey[]
 
+    const additionalMintAccounts =
+      additionalPossibleMintAccounts[realm.account.name]
+    if (additionalMintAccounts) {
+      possibleMintAccountPks.push(...additionalMintAccounts)
+    }
+    // 1 - Load token accounts behind any type of governance
+    const governedTokenAccounts = await loadGovernedTokenAccounts(
+      connection,
+      realm,
+      governancesWithNativeTreasuryAddress
+    )
+    // 2 - Call to fetch token prices for every token account's mints
+    await tokenPriceService.fetchTokenPrices(
+      governedTokenAccounts.reduce((mints, governedTokenAccount) => {
+        if (!governedTokenAccount.extensions.mint?.publicKey) {
+          return mints
+        }
+
+        return [
+          ...mints,
+          governedTokenAccount.extensions.mint.publicKey.toBase58(),
+        ]
+      }, [] as string[])
+    )
+    accounts.push(...governedTokenAccounts)
     set((s) => {
-      s.governancesArray = governancesArray
-      s.loadGovernedAccounts = false
+      s.loadTokenAccounts = false
       s.governedTokenAccounts = accounts
         .filter(
           (x) =>
@@ -129,6 +177,46 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
             x.type === AccountType.SOL
         )
         .filter(filterOutHiddenAccounts)
+      s.assetAccounts = accounts.filter(filterOutHiddenAccounts)
+    })
+
+    // 3 - Load accounts related to mint
+    const mintAccounts = await loadMintGovernanceAccounts(
+      connection,
+      governancesWithNativeTreasuryAddress,
+      possibleMintAccountPks
+    )
+    accounts.push(...mintAccounts)
+    set((s) => {
+      s.loadMintAccounts = false
+      s.assetAccounts = accounts.filter(filterOutHiddenAccounts)
+    })
+
+    // 4 - Load accounts related to program governances
+    const programAccounts = await getProgramAssetAccounts(
+      connection,
+      governancesWithNativeTreasuryAddress
+    )
+    accounts.push(...programAccounts)
+    set((s) => {
+      s.loadProgramAccounts = false
+      s.assetAccounts = accounts.filter(filterOutHiddenAccounts)
+    })
+
+    // 5 - Create generic asset accounts for governance's governedAccounts that have not been handled yet
+    // We do this so theses accounts may be selected
+    const genericGovernances = getGenericAssetAccounts(
+      governancesWithNativeTreasuryAddress.filter(
+        (governance) =>
+          !accounts.some((account) =>
+            account.pubkey.equals(governance.account.governedAccount)
+          )
+      )
+    )
+    accounts.push(...genericGovernances)
+
+    set((s) => {
+      s.loadGovernedAccounts = false
       s.assetAccounts = accounts.filter(filterOutHiddenAccounts)
     })
   },
@@ -174,7 +262,7 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
 export default useGovernanceAssetsStore
 
 const getTokenAccountObj = async (
-  governance: ProgramAccount<Governance>,
+  governance: GovernanceProgramAccountWithNativeTreasuryAddress,
   tokenAccount: TokenProgramAccount<AccountInfo>,
   mintAccounts: TokenProgramAccount<MintInfo>[]
 ): Promise<AccountTypeNFT | AccountTypeToken | null> => {
@@ -205,7 +293,7 @@ const getSolAccountsObj = async (
   accounts: AssetAccount[],
   solAccountsInfo: SolAccInfo[],
   mintAccounts: TokenProgramAccount<MintAccount>[],
-  governances: ProgramAccount<Governance>[]
+  governances: GovernanceProgramAccountWithNativeTreasuryAddress[]
 ): Promise<AssetAccount[]> => {
   const solAccounts: AccountTypeSol[] = []
 
@@ -251,8 +339,7 @@ const getTokenAssetAccounts = async (
     publicKey: PublicKey
     account: AccountInfo
   }[],
-  governances: ProgramAccount<Governance>[],
-  realm: ProgramAccount<Realm>,
+  governances: GovernanceProgramAccountWithNativeTreasuryAddress[],
   connection: ConnectionContext
 ) => {
   const accounts: AssetAccount[] = []
@@ -267,29 +354,24 @@ const getTokenAssetAccounts = async (
     mintsPks.push(new PublicKey(WSOL_MINT))
   }
 
-  const [mintAccounts, ...nativeSolAddresses] = await Promise.all([
-    getMintAccountsInfo(connection, mintsPks),
-    ...governances.map((x) => getNativeTreasuryAddress(realm.owner, x.pubkey)),
-  ])
-
-  const govNativeSolAddress = nativeSolAddresses.map((x, index) => ({
-    governanceAcc: governances[index],
-    governancePk: governances[index].pubkey,
-    nativeSolAddress: x,
+  const govNativeSolAddress = governances.map((x) => ({
+    governanceAcc: x,
+    governancePk: x.pubkey,
+    nativeSolAddress: x.nativeTreasuryAddress,
   }))
 
-  const solAccountsInfo = await getSolAccountsInfo(
-    connection,
-    govNativeSolAddress
-  )
+  const [solAccountsInfo, mintAccounts] = await Promise.all([
+    getSolAccountsInfo(connection, govNativeSolAddress),
+    getMintAccountsInfo(connection, mintsPks),
+  ])
 
   for (const tokenAccount of tokenAccounts) {
     let governance = governances.find(
       (x) => x.pubkey.toBase58() === tokenAccount.account.owner.toBase58()
     )
-    const nativeSolAddress = nativeSolAddresses.find((x) =>
-      x.equals(tokenAccount.account.owner)
-    )
+    const nativeSolAddress = govNativeSolAddress.find((x) =>
+      x.nativeSolAddress.equals(tokenAccount.account.owner)
+    )?.nativeSolAddress
 
     if (!governance && nativeSolAddress) {
       governance = govNativeSolAddress.find((x) =>
@@ -337,7 +419,7 @@ const getTokenAssetAccounts = async (
 }
 
 const getMintAccounts = (
-  mintGovernances: ProgramAccount<Governance>[],
+  mintGovernances: GovernanceProgramAccountWithNativeTreasuryAddress[],
   mintGovernancesMintInfo: (MintInfo & { publicKey: PublicKey })[]
 ) => {
   const accounts: AccountTypeMint[] = []
@@ -356,33 +438,45 @@ const getMintAccounts = (
   return accounts
 }
 
-const getProgramAssetAccounts = (
-  programGovernances: ProgramAccount<Governance>[]
-): AccountTypeProgram[] => {
-  return programGovernances.map(
-    (programGov) => new AccountTypeProgram(programGov)
+const getProgramAssetAccounts = async (
+  connection: ConnectionContext,
+  governancesArray: GovernanceProgramAccountWithNativeTreasuryAddress[]
+): Promise<AccountTypeProgram[]> => {
+  const possibleOwnersPk = [
+    ...governancesArray.map((x) => x.nativeTreasuryAddress),
+    ...governancesArray
+      .filter(
+        (x) =>
+          x.account.accountType === GovernanceAccountType.ProgramGovernanceV1 ||
+          x.account.accountType === GovernanceAccountType.ProgramGovernanceV2
+      )
+      .map((x) => x.pubkey),
+  ]
+
+  const programs = await getProgramAccountInfo(connection, possibleOwnersPk)
+  return programs.map(
+    (program) =>
+      new AccountTypeProgram(
+        governancesArray.find(
+          (x) =>
+            x.pubkey.equals(program.owner) ||
+            x.nativeTreasuryAddress.equals(program.owner)
+        )!,
+        program.programId
+      )
   )
 }
 
 const getGenericAssetAccounts = (
-  genericGovernances: ProgramAccount<Governance>[]
+  genericGovernances: GovernanceProgramAccountWithNativeTreasuryAddress[]
 ): AccountTypeGeneric[] => {
   return genericGovernances.map(
     (programGov) => new AccountTypeGeneric(programGov)
   )
 }
 
-const getGovernancesByAccountTypes = (
-  governancesArray: ProgramAccount<Governance>[],
-  types: GovernanceAccountType[]
-): ProgramAccount<Governance>[] => {
-  return governancesArray.filter((gov) =>
-    types.some((t) => gov.account.accountType === t)
-  )
-}
-
 const getSolAccountObj = async (
-  governance: ProgramAccount<Governance>,
+  governance: GovernanceProgramAccountWithNativeTreasuryAddress,
   connection: ConnectionContext,
   mint: TokenProgramAccount<MintInfo>,
   accounts: AssetAccount[],
@@ -644,19 +738,15 @@ const getSolAccountsInfo = async (
 
 const loadMintGovernanceAccounts = async (
   connection: ConnectionContext,
-  governances: ProgramAccount<Governance>[],
+  governances: GovernanceProgramAccountWithNativeTreasuryAddress[],
   possibleMintAccountPks: PublicKey[]
 ) => {
-  const nativeAccountAddresses = await Promise.all(
-    governances.map((governance) =>
-      getNativeTreasuryAddress(governance.owner, governance.pubkey)
-    )
-  )
+  const nativeAccountAddresses = governances.map((x) => x.nativeTreasuryAddress)
   const possibleMintAccounts = await getMultipleAccountInfoChunked(
     connection.current,
     possibleMintAccountPks
   )
-  const mintGovernances: ProgramAccount<Governance>[] = []
+  const mintGovernances: GovernanceProgramAccountWithNativeTreasuryAddress[] = []
   const mintAccounts: (MintInfo & { publicKey: PublicKey })[] = []
   for (const index in possibleMintAccounts) {
     const possibleMintAccount = possibleMintAccounts[index]
@@ -692,7 +782,7 @@ const loadMintGovernanceAccounts = async (
 const loadGovernedTokenAccounts = async (
   connection: ConnectionContext,
   realm: ProgramAccount<Realm>,
-  governancesArray: ProgramAccount<Governance>[]
+  governancesArray: GovernanceProgramAccountWithNativeTreasuryAddress[]
 ): Promise<AssetAccount[]> => {
   const auxiliaryTokenAccounts: typeof AUXILIARY_TOKEN_ACCOUNTS[keyof typeof AUXILIARY_TOKEN_ACCOUNTS] = AUXILIARY_TOKEN_ACCOUNTS[
     realm.account.name
@@ -700,14 +790,8 @@ const loadGovernedTokenAccounts = async (
     ? AUXILIARY_TOKEN_ACCOUNTS[realm.account.name]
     : []
 
-  const nativeAccountAddresses = await Promise.all(
-    governancesArray.map((governance) =>
-      getNativeTreasuryAddress(governance.owner, governance.pubkey)
-    )
-  )
-
   const tokenAccountsOwnedByGovernances = uniquePublicKey([
-    ...nativeAccountAddresses,
+    ...governancesArray.map((x) => x.nativeTreasuryAddress),
     ...governancesArray.map((g) => g.pubkey),
     ...auxiliaryTokenAccounts.map((x) => new PublicKey(x.owner)),
   ])
@@ -725,7 +809,7 @@ const loadGovernedTokenAccounts = async (
     await Promise.all(
       // Load infos in batch, cannot load 9999 accounts within one request
       group(tokenAccountsInfo).map((group) =>
-        getTokenAssetAccounts(group, governancesArray, realm, connection)
+        getTokenAssetAccounts(group, governancesArray, connection)
       )
     )
   ).flat()
@@ -741,22 +825,17 @@ const getAccountsForGovernances = async (
 ): Promise<
   (AccountTypeMint | AccountTypeProgram | AssetAccount | AccountTypeGeneric)[]
 > => {
-  const programGovernances = getGovernancesByAccountTypes(governancesArray, [
-    GovernanceAccountType.ProgramGovernanceV1,
-    GovernanceAccountType.ProgramGovernanceV2,
+  const nativeAddresses = await Promise.all([
+    ...governancesArray.map((x) =>
+      getNativeTreasuryAddress(realm.owner, x.pubkey)
+    ),
   ])
-
-  // 1 - Load accounts related to program governances
-  const programAccounts = getProgramAssetAccounts(programGovernances)
-
-  // 2 - Load token accounts behind any type of governance
-  const governedTokenAccounts = await loadGovernedTokenAccounts(
-    connection,
-    realm,
-    governancesArray
+  const governancesWithNativeTreasuryAddress = governancesArray.map(
+    (x, index) => ({
+      ...x,
+      nativeTreasuryAddress: nativeAddresses[index],
+    })
   )
-
-  // 3 - Load accounts related to mint
   //due to long request for mint accounts that are owned by every governance
   //we fetch
   const possibleMintAccountPks = [
@@ -770,11 +849,26 @@ const getAccountsForGovernances = async (
     possibleMintAccountPks.push(...additionalMintAccounts)
   }
 
-  const mintAccounts = await loadMintGovernanceAccounts(
-    connection,
-    governancesArray,
-    possibleMintAccountPks
-  )
+  // 1 - Load accounts related to program governances
+  // 2 - Load token accounts behind any type of governance
+  // 3 - Load accounts related to mint
+  const [
+    programAccounts,
+    governedTokenAccounts,
+    mintAccounts,
+  ] = await Promise.all([
+    getProgramAssetAccounts(connection, governancesWithNativeTreasuryAddress),
+    loadGovernedTokenAccounts(
+      connection,
+      realm,
+      governancesWithNativeTreasuryAddress
+    ),
+    loadMintGovernanceAccounts(
+      connection,
+      governancesWithNativeTreasuryAddress,
+      possibleMintAccountPks
+    ),
+  ])
 
   // 4 - Call to fetch token prices for every token account's mints
   await tokenPriceService.fetchTokenPrices(
@@ -799,7 +893,7 @@ const getAccountsForGovernances = async (
   // 5 - Create generic asset accounts for governance's governedAccounts that have not been handled yet
   // We do this so theses accounts may be selected
   const genericGovernances = getGenericAssetAccounts(
-    governancesArray.filter(
+    governancesWithNativeTreasuryAddress.filter(
       (governance) =>
         !accounts.some((account) =>
           account.pubkey.equals(governance.account.governedAccount)
@@ -808,4 +902,129 @@ const getAccountsForGovernances = async (
   )
 
   return [...accounts, ...genericGovernances]
+}
+
+const getProgramAccountInfo = async (
+  { endpoint, current }: ConnectionContext,
+  publicKeys: PublicKey[]
+): Promise<{ owner: PublicKey; programId: PublicKey }[]> => {
+  let result: { owner: PublicKey; programId: PublicKey }[] = []
+  try {
+    const { data: executableAccountInfoJson } = await axios.post<
+      unknown,
+      {
+        data: {
+          result: {
+            account: {
+              data: [string, 'base64']
+            }
+            pubkey: string
+          }[]
+          id: string
+        }[]
+      }
+    >(
+      endpoint,
+      publicKeys.map((publicKey) => ({
+        jsonrpc: '2.0',
+        id: publicKey.toBase58(),
+        method: 'getProgramAccounts',
+        params: [
+          'BPFLoaderUpgradeab1e11111111111111111111111',
+          {
+            commitment: current.commitment,
+            encoding: 'base64',
+            filters: [
+              {
+                memcmp: {
+                  offset: programAccountOwnerOffset,
+                  bytes: publicKey.toBase58(),
+                },
+              },
+            ],
+            dataSlice: {
+              offset: 0,
+              length: 0,
+            },
+          },
+        ],
+      }))
+    )
+    if (executableAccountInfoJson && executableAccountInfoJson.length) {
+      const executableDataPks = executableAccountInfoJson.reduce(
+        (executableAccountInfo, { result, id }) => {
+          result.forEach(({ pubkey }) => {
+            const executableDataPk = new PublicKey(pubkey)
+            executableAccountInfo.push({
+              executableDataPk: executableDataPk,
+              owner: new PublicKey(id),
+            })
+          })
+
+          return executableAccountInfo
+        },
+        [] as { owner: PublicKey; executableDataPk: PublicKey }[]
+      )
+      if (executableDataPks.length) {
+        const { data: programAccountInfoJson } = await axios.post<
+          unknown,
+          {
+            data: {
+              result: {
+                account: {
+                  data: [string, 'base64']
+                }
+                pubkey: string
+              }[]
+              id: string
+            }[]
+          }
+        >(
+          endpoint,
+          executableDataPks.map((obj) => ({
+            jsonrpc: '2.0',
+            id: obj.owner,
+            method: 'getProgramAccounts',
+            params: [
+              'BPFLoaderUpgradeab1e11111111111111111111111',
+              {
+                commitment: current.commitment,
+                encoding: 'base64',
+                filters: [
+                  {
+                    memcmp: {
+                      offset: 4,
+                      bytes: obj.executableDataPk.toBase58(),
+                    },
+                  },
+                ],
+                dataSlice: {
+                  offset: 0,
+                  length: 0,
+                },
+              },
+            ],
+          }))
+        )
+        if (programAccountInfoJson && programAccountInfoJson.length) {
+          const programDataPks = programAccountInfoJson.reduce(
+            (programAccountInfo, { result, id }) => {
+              result.forEach(({ pubkey }) => {
+                const programId = new PublicKey(pubkey)
+                programAccountInfo.push({ programId, owner: new PublicKey(id) })
+              })
+
+              return programAccountInfo
+            },
+            [] as { owner: PublicKey; programId: PublicKey }[]
+          )
+          result = programDataPks
+        }
+      }
+    }
+  } catch (e) {
+    console.log('unable to fetch programs owned by DAO', e)
+  }
+
+  return result
 }

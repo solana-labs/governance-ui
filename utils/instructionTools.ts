@@ -1,5 +1,4 @@
 import {
-  getNativeTreasuryAddress,
   Governance,
   ProgramAccount,
   serializeInstructionToBase64,
@@ -643,10 +642,7 @@ export async function getCreateTokenMetadataInstruction({
   let payer = payerSolTreasury
 
   if (!payer && shouldMakeSolTreasury && governedMintInfoAccount) {
-    payer = await getNativeTreasuryAddress(
-      governedMintInfoAccount.governance.owner,
-      governedMintInfoAccount.governance.pubkey
-    )
+    payer = governedMintInfoAccount.governance.nativeTreasuryAddress
   }
 
   if (
