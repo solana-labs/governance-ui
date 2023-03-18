@@ -8,6 +8,7 @@ interface AssetsListProps {
 
 const AssetsList = ({ panelView }: AssetsListProps) => {
   const { assetAccounts } = useGovernanceAssets()
+
   const programGovernances = assetAccounts
     .filter((x) => x.type === AccountType.PROGRAM)
     .map((x) => x.governance)

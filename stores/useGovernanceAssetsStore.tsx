@@ -60,7 +60,9 @@ interface GovernanceAssetsStore extends State {
   governedTokenAccounts: AssetAccount[]
   assetAccounts: AssetAccount[]
   loadGovernedAccounts: boolean
-
+  loadTokenAccounts: boolean
+  loadProgramAccounts: boolean
+  loadMintAccounts: boolean
   setGovernancesArray: (
     connection: ConnectionContext,
     realm: ProgramAccount<Realm>,
@@ -84,6 +86,9 @@ const defaultState = {
   assetAccounts: [],
   governedTokenAccounts: [],
   loadGovernedAccounts: false,
+  loadTokenAccounts: false,
+  loadProgramAccounts: false,
+  loadMintAccounts: false,
 }
 
 const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
@@ -110,18 +115,60 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
   getGovernedAccounts: async (connection, realm) => {
     set((s) => {
       s.loadGovernedAccounts = true
+      s.loadTokenAccounts = true
+      s.loadMintAccounts = true
+      s.loadProgramAccounts = true
       s.governedTokenAccounts = []
       s.assetAccounts = []
     })
 
     const governancesArray = _get().governancesArray
-    const accounts = governancesArray.length
-      ? await getAccountsForGovernances(connection, realm, governancesArray)
-      : []
+    const accounts: AssetAccount[] = []
+    const nativeAddresses = await Promise.all([
+      ...governancesArray.map((x) =>
+        getNativeTreasuryAddress(realm.owner, x.pubkey)
+      ),
+    ])
+    const governancesWithNativeTreasuryAddress = governancesArray.map(
+      (x, index) => ({
+        ...x,
+        nativeTreasuryAddress: nativeAddresses[index],
+      })
+    )
+    //due to long request for mint accounts that are owned by every governance
+    //we fetch
+    const possibleMintAccountPks = [
+      realm.account.communityMint,
+      realm.account.config.councilMint,
+    ].filter((x) => typeof x !== 'undefined') as PublicKey[]
 
+    const additionalMintAccounts =
+      additionalPossibleMintAccounts[realm.account.name]
+    if (additionalMintAccounts) {
+      possibleMintAccountPks.push(...additionalMintAccounts)
+    }
+    // 1 - Load token accounts behind any type of governance
+    const governedTokenAccounts = await loadGovernedTokenAccounts(
+      connection,
+      realm,
+      governancesWithNativeTreasuryAddress
+    )
+    // 2 - Call to fetch token prices for every token account's mints
+    await tokenPriceService.fetchTokenPrices(
+      governedTokenAccounts.reduce((mints, governedTokenAccount) => {
+        if (!governedTokenAccount.extensions.mint?.publicKey) {
+          return mints
+        }
+
+        return [
+          ...mints,
+          governedTokenAccount.extensions.mint.publicKey.toBase58(),
+        ]
+      }, [] as string[])
+    )
+    accounts.push(...governedTokenAccounts)
     set((s) => {
-      s.governancesArray = governancesArray
-      s.loadGovernedAccounts = false
+      s.loadTokenAccounts = false
       s.governedTokenAccounts = accounts
         .filter(
           (x) =>
@@ -130,6 +177,46 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
             x.type === AccountType.SOL
         )
         .filter(filterOutHiddenAccounts)
+      s.assetAccounts = accounts.filter(filterOutHiddenAccounts)
+    })
+
+    // 3 - Load accounts related to mint
+    const mintAccounts = await loadMintGovernanceAccounts(
+      connection,
+      governancesWithNativeTreasuryAddress,
+      possibleMintAccountPks
+    )
+    accounts.push(...mintAccounts)
+    set((s) => {
+      s.loadMintAccounts = false
+      s.assetAccounts = accounts.filter(filterOutHiddenAccounts)
+    })
+
+    // 4 - Load accounts related to program governances
+    const programAccounts = await getProgramAssetAccounts(
+      connection,
+      governancesWithNativeTreasuryAddress
+    )
+    accounts.push(...programAccounts)
+    set((s) => {
+      s.loadProgramAccounts = false
+      s.assetAccounts = accounts.filter(filterOutHiddenAccounts)
+    })
+
+    // 5 - Create generic asset accounts for governance's governedAccounts that have not been handled yet
+    // We do this so theses accounts may be selected
+    const genericGovernances = getGenericAssetAccounts(
+      governancesWithNativeTreasuryAddress.filter(
+        (governance) =>
+          !accounts.some((account) =>
+            account.pubkey.equals(governance.account.governedAccount)
+          )
+      )
+    )
+    accounts.push(...genericGovernances)
+
+    set((s) => {
+      s.loadGovernedAccounts = false
       s.assetAccounts = accounts.filter(filterOutHiddenAccounts)
     })
   },

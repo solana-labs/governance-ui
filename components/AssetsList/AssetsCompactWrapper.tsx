@@ -14,6 +14,8 @@ import {
   renderAddNewAssetTooltip,
 } from 'pages/dao/[symbol]/assets'
 import { AccountType } from '@utils/uiTypes/assets'
+import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
+import Loading from '@components/Loading'
 
 const AssetsCompactWrapper = () => {
   const router = useRouter()
@@ -44,7 +46,9 @@ const AssetsCompactWrapper = () => {
   const programGovernances = assetAccounts
     .filter((x) => x.type === AccountType.PROGRAM)
     .map((x) => x.governance)
-
+  const isLoadingGovernances = useGovernanceAssetsStore(
+    (s) => s.loadProgramAccounts
+  )
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
       <div className="flex items-center justify-between pb-4">
@@ -64,7 +68,7 @@ const AssetsCompactWrapper = () => {
         <div className="overflow-y-auto" style={{ maxHeight: '350px' }}>
           <AssetsList panelView />
         </div>
-      ) : (
+      ) : !isLoadingGovernances ? (
         <EmptyState
           desc="No programs found"
           disableButton={!!newAssetToolTip}
@@ -73,6 +77,8 @@ const AssetsCompactWrapper = () => {
           onClickButton={goToNewAssetForm}
           toolTipContent={newAssetToolTip}
         />
+      ) : (
+        <Loading></Loading>
       )}
     </div>
   )
