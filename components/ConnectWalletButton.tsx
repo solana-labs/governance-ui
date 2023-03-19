@@ -86,6 +86,7 @@ const ConnectWalletButton = (props) => {
     setIsLoading(true)
     try {
       if (connected) {
+        setIsLoading(false)
         await current?.disconnect()
       } else {
         await current?.connect()
