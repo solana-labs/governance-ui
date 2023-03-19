@@ -55,7 +55,7 @@ export default function useInitWallet() {
 
   const provider = useMemo(
     () => getWalletProviderByName(selectedProviderName, wallets),
-    [savedProviderName, wallets]
+    [selectedProviderName, wallets]
   )
 
   // save selection in local storage
