@@ -1110,7 +1110,7 @@
     "ogImage": "/realms/bacDao/logo_bulls.png",
     "website": "https://bullsarmyclub.com/"
   },
- {
+  {
     "symbol": "EPCT",
     "category": "web3",
     "bannerImage": "https://bafybeigyh52dlntjyn4lyajvt7v5d2vtifjhyaklu3j5rhkpihhbb3wkwa.ipfs.w3s.link/BuidlToEarnTwitterHeader.png",
@@ -3032,11 +3032,10 @@
     "discord": "https://discord.gg/XcWVHM2Z",
     "github": "https://github.com/brdot",
     "website": "https://brdot.com.br"
-    
   },
-  { 
+  {
     "symbol": "SAO",
-    "category":"nft",
+    "category": "nft",
     "displayName": "Sator DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "7yAiT2bUg5MwBzT3K9BvhcZdtHr5z8AnCGWa2iPJjB3T",
@@ -3045,6 +3044,18 @@
     "shortDescription": "Sator brings traditional TV and movies into Web3 through NFT-VOD and token-gated staking.",
     "website": "https://sator.io",
     "discord": "https://discord.gg/qftzCFrHNQ",
-    "twitter": "https://twitter.com/SatorSAO" 
+    "twitter": "https://twitter.com/SatorSAO"
+  },
+  {
+    "symbol": "DustCity",
+    "category": "nft",
+    "displayName": "Dust City DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "2ZgE1bubdGppXrLozyYYRNcwfzyMdWmDUbWYt8agPxEg",
+    "ogImage": "/realms/DustCity/img/wb.png",
+    "shortDescription": "Dust City is an alpha and community lore-based project. Our vision is to build long term value for our holders, bringing additional benefits over time and creating an online identity that can represent them.",
+    "website": "https://dustcity.world/",
+    "discord": "https://discord.com/invite/dustcity",
+    "twitter": "https://twitter.com/DustCityNFT"
   }
 ]
