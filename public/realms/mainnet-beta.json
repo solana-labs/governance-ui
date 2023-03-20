@@ -14,6 +14,16 @@
     "sortRank": 3
   },
   {
+    "symbol": "Dean's List Network State",
+    "displayName": "Dean's List Network State",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "F9V4Lwo49aUe8fFujMbU6uhdFyDRqKY54WpzdpncUSk9",
+    "bannerImage": "/realms/Dean's List Grape/deans list logo.png",
+    "website": "https://www.deanslist.services/",
+    "twitter": "@deanslistDAO",
+    "ogImage": "/realms/Dean's List Grape/deans list logo.png"
+   },
+   {
     "symbol": "Ukraine",
     "displayName": "Ukraine.SOL",
     "programId": "gUAedF544JeE6NYbQakQvribHykUNgaPJqcgf3UQVnY",
