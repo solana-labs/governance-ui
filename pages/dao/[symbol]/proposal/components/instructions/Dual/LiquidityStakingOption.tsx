@@ -11,7 +11,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Input from '@components/inputs/Input'
 import { getConfigLsoInstruction } from '@utils/instructions/Dual'
 import useWalletStore from 'stores/useWalletStore'
-import { getDualFinanceStakingOptionSchema } from '@utils/validations'
+import { getDualFinanceLiquidityStakingOptionSchema } from '@utils/validations'
 import Tooltip from '@components/Tooltip'
 
 const LiquidityStakingOption = ({
@@ -62,7 +62,7 @@ const LiquidityStakingOption = ({
   useEffect(() => {
     setGovernedAccount(form.baseTreasury?.governance)
   }, [form.baseTreasury])
-  const schema = getDualFinanceStakingOptionSchema()
+  const schema = getDualFinanceLiquidityStakingOptionSchema()
 
   return (
     <>

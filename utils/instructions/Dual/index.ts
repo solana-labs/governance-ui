@@ -534,6 +534,7 @@ export async function getConfigLsoInstruction({
       serializeInstructionToBase64(configInstruction)
     )
 
+    // TODO: Move this to initStrike function instead
     for (const strike of form.strikes.split(',')) {
       const initStrikeInstruction = await so.createInitStrikeInstruction(
         new BN(Number(strike)),
@@ -579,7 +580,7 @@ export async function getConfigLsoInstruction({
       governance: form.baseTreasury?.governance,
       additionalSerializedInstructions,
       chunkSplitByDefault: true,
-      chunkBy: 2,
+      chunkBy: 1,
     }
   }
 

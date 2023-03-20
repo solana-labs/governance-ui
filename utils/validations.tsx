@@ -620,7 +620,6 @@ export const getDualFinanceMerkleAirdropSchema = () => {
 
 export const getDualFinanceLiquidityStakingOptionSchema = () => {
   return yup.object().shape({
-    userPk: yup.string().required('User pk is required'),
     optionExpirationUnixSeconds: yup
       .number()
       .typeError('Expiration is required'),
