@@ -63,7 +63,7 @@ function WalletSelectorInner(props: Props) {
   useEffect(() => {
     if (typeof localStorage !== 'undefined') {
       const adapterName = JSON.parse(
-        localStorage.getItem('walletName') || '""',
+        localStorage.getItem('walletNameV2') || '""',
       );
 
       const adapter = wallets.find(

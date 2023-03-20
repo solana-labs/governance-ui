@@ -237,6 +237,7 @@ export function App(props: Props) {
         )}
       </Head>
       <GoogleTag />
+      <pre className="text-white absolute z-[10000]" id="log"></pre>
       <ErrorBoundary>
         <QueryClientProvider client={queryClient}>
           <ThemeProvider defaultTheme="Dark">
