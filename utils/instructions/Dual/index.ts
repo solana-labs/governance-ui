@@ -29,7 +29,7 @@ import {
   closeAccount,
   initializeAccount,
 } from '@project-serum/serum/lib/token-instructions'
-import { BN } from '@coral-xyz/anchor'
+import { BN, web3, utils } from '@coral-xyz/anchor'
 import { Token } from '@solana/spl-token'
 
 interface StakingOptionArgs {
@@ -50,6 +50,15 @@ interface StakingOptionLsoArgs {
 
 function getStakingOptionsApi(connection: ConnectionContext) {
   return new StakingOptions(connection.endpoint, 'confirmed')
+}
+
+function toBeBytes(x: number) {
+  const y = Math.floor(x / 2 ** 32);
+  return Uint8Array.from(
+    [y, y << 8, y << 16, y << 24, x, x << 8, x << 16, x << 24].map(
+      (z) => z >>> 24,
+    ),
+  );
 }
 
 export async function getConfigInstruction({
@@ -496,8 +505,14 @@ export async function getConfigLsoInstruction({
     }
 
     const soName = `LSO-${form.optionExpirationUnixSeconds}`;
+    const [issueAuthority, _issueAuthorityBump] = await web3.PublicKey.findProgramAddress(
+      [
+        Buffer.from(utils.bytes.utf8.encode('LSO')),
+        toBeBytes(form.optionExpirationUnixSeconds),
+      ],
+      new PublicKey('DiPbvUUJkDhV9jFtQsDFnMEMRJyjW5iS6NMwoySiW8ki')
+    );
 
-    // TODO: Use the newer version where it has an issueAuthority and set that to a PDA of the program
     const configInstruction = await so.createConfigInstruction(
       form.optionExpirationUnixSeconds,
       form.optionExpirationUnixSeconds,
@@ -510,7 +525,9 @@ export async function getConfigLsoInstruction({
       //use helper account as base account
       helperTokenAccount.publicKey,
       quoteMint,
-      form.quoteTreasury.pubkey
+      form.quoteTreasury.pubkey,
+      form.payer.extensions.transferAddress!,
+      issueAuthority,
     )
 
     additionalSerializedInstructions.push(
