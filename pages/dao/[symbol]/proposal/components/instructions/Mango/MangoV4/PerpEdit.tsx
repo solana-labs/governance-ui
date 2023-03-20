@@ -236,7 +236,7 @@ const PerpEdit = ({
           values.reduceOnly,
           values.resetStablePrice,
           getNullOrTransform(values.positivePnlLiquidationFee, null, Number),
-          getNullOrTransform(values.name, null)
+          getNullOrTransform(values.name, null, String)
         )
         .accounts({
           group: mangoGroup!.publicKey,
