@@ -122,7 +122,7 @@ const GroupEdit = ({
           getNullOrTransform(values.testing, null, Number),
           getNullOrTransform(values.version, null, Number),
           getNullOrTransform(values.depositLimitQuote, BN),
-          getNullOrTransform(values.feePayWithMngo, null),
+          getNullOrTransform(values.feePayWithMngo, null, Boolean),
           getNullOrTransform(values.feesMngoBonusRate, null, Number),
           getNullOrTransform(values.feesSwapMangoAccount, PublicKey),
           getNullOrTransform(values.feesMngoTokenIndex, null, Number),
