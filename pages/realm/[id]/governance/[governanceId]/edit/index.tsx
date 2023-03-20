@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { PublicKey } from '@solana/web3.js'
 
-import { EditWalletRules } from '@hub/components/EditWalletRules'
+import { EditWalletRules } from '@hub/components/WalletRules/EditWalletRules'
 import { ECOSYSTEM_PAGE } from '@hub/lib/constants'
 
 export default function EditWallet() {
