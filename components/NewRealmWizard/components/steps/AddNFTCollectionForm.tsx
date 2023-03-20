@@ -22,20 +22,7 @@ import AdviceBox from '@components/NewRealmWizard/components/AdviceBox'
 import NFTCollectionModal from '@components/NewRealmWizard/components/NFTCollectionModal'
 import { Metaplex } from '@metaplex-foundation/js'
 import { Connection, PublicKey } from '@solana/web3.js'
-import { HOLAPLEX_GRAPQL_URL_MAINNET } from '@tools/constants'
-
-const getNftQuery = (limit, offset) => {
-  return `
-    query nfts($collection: PublicKey!) {
-        nfts(
-          collection: $collection,
-           limit: ${limit}, offset: ${offset}) {
-          mintAddress
-        }
-  
-    }
-  `
-}
+import { getNFTsByCollection } from '@utils/tokens'
 
 function filterAndMapVerifiedCollections(nfts) {
   return nfts
@@ -97,13 +84,11 @@ async function getNFTCollectionInfo(
   connection: Connection,
   collectionKey: string
 ) {
-  const collectionResult = await axios.post(HOLAPLEX_GRAPQL_URL_MAINNET, {
-    query: getNftQuery(1, 0),
-    variables: {
-      collection: new PublicKey(collectionKey),
-    },
-  })
-  const mintToCheck = collectionResult.data?.nfts[0]?.mintAddress
+  const collectionResult = await getNFTsByCollection(
+    new PublicKey(collectionKey)
+  )
+
+  const mintToCheck = collectionResult[0]?.mintAddress
   if (!mintToCheck) {
     throw new Error(
       'Address did not return collection with children whose "collection.key" matched'
@@ -126,16 +111,9 @@ async function getNFTCollectionInfo(
     return collectionInfo
   }
   // assume we've been given the collection address already, so we need to go find it's children
-  const allNftsResult = await axios.post(HOLAPLEX_GRAPQL_URL_MAINNET, {
-    query: getNftQuery(1000, 0),
-    variables: {
-      collection: new PublicKey(collectionKey),
-    },
-  })
+  const allNftsResult = collectionResult
 
-  const verifiedCollections = filterAndMapVerifiedCollections(
-    allNftsResult.data?.nfts
-  )
+  const verifiedCollections = filterAndMapVerifiedCollections(allNftsResult)
   if (verifiedCollections[collectionKey]) {
     const collectionInfo = await enrichCollectionInfo(connection, collectionKey)
     const nfts = await Promise.all(
