@@ -127,6 +127,7 @@ import PsyFinanceExerciseOption from './components/instructions/PsyFinance/Exerc
 import RevokeGoverningTokens from './components/instructions/SplGov/RevokeGoverningTokens'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import SetMintAuthority from './components/instructions/SetMintAuthroity'
+import LiquidityStakingOption from './components/instructions/Dual/LiquidityStakingOption'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -438,6 +439,7 @@ const New = () => {
       [Instructions.DepositIntoCastle]: CastleDeposit,
       [Instructions.DualFinanceAirdrop]: DualAirdrop,
       [Instructions.DualFinanceStakingOption]: StakingOption,
+      [Instructions.DualFinanceLiquidityStakingOption]: LiquidityStakingOption,
       [Instructions.DualFinanceWithdraw]: DualWithdraw,
       [Instructions.DualFinanceExercise]: DualExercise,
       [Instructions.MeanCreateAccount]: MeanCreateAccount,

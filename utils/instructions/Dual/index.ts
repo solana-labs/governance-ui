@@ -15,6 +15,7 @@ import { validateInstruction } from '@utils/instructionTools'
 import {
   DualFinanceExerciseForm,
   DualFinanceStakingOptionForm,
+  DualFinanceLiquidityStakingOptionForm,
   DualFinanceWithdrawForm,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
@@ -34,6 +35,14 @@ import { Token } from '@solana/spl-token'
 interface StakingOptionArgs {
   connection: ConnectionContext
   form: DualFinanceStakingOptionForm
+  setFormErrors: any
+  schema: any
+  wallet: WalletAdapter | undefined
+}
+
+interface StakingOptionLsoArgs {
+  connection: ConnectionContext
+  form: DualFinanceLiquidityStakingOptionForm
   setFormErrors: any
   schema: any
   wallet: WalletAdapter | undefined
@@ -403,4 +412,167 @@ export async function getWithdrawInstruction({
     governance: form.baseTreasury?.governance,
     additionalSerializedInstructions: [],
   }
+}
+
+
+export async function getConfigLsoInstruction({
+  connection,
+  wallet,
+  form,
+  schema,
+  setFormErrors,
+}: StakingOptionLsoArgs): Promise<UiInstruction> {
+  const isValid = await validateInstruction({ schema, form, setFormErrors })
+
+  const serializedInstruction = ''
+  const additionalSerializedInstructions: string[] = []
+  const prerequisiteInstructions: TransactionInstruction[] = []
+  if (
+    isValid &&
+    form.baseTreasury &&
+    form.quoteTreasury &&
+    form.payer &&
+    wallet?.publicKey
+  ) {
+    const so = getStakingOptionsApi(connection)
+    const baseMint = form.baseTreasury.extensions.mint?.publicKey
+    const space = 165
+    const rent = await connection.current.getMinimumBalanceForRentExemption(
+      space,
+      'processed'
+    )
+    //Creating checking account on the fly with same mint as base and owner
+    //made to be more safe - instructions don't have access to main treasury
+    const helperTokenAccount = new Keypair()
+    //run as prerequsite instructions payer is connected wallet
+    prerequisiteInstructions.push(
+      SystemProgram.createAccount({
+        fromPubkey: wallet.publicKey,
+        newAccountPubkey: helperTokenAccount.publicKey,
+        lamports: rent,
+        space: space,
+        programId: TOKEN_PROGRAM_ID,
+      }),
+      //initialized account with same mint as base
+      initializeAccount({
+        account: helperTokenAccount.publicKey,
+        mint: baseMint,
+        owner: form.baseTreasury.isSol
+          ? form.baseTreasury.governance.pubkey
+          : form.baseTreasury.extensions.token?.account.owner,
+      })
+    )
+
+    additionalSerializedInstructions.push(
+      //transfer funds from base treasury to the helper checking account
+      serializeInstructionToBase64(
+        Token.createTransferInstruction(
+          TOKEN_PROGRAM_ID,
+          form.baseTreasury.extensions.transferAddress!,
+          helperTokenAccount.publicKey,
+          //owner is sol wallet or governance same as baseTokenAccount
+          form.baseTreasury.extensions!.token!.account.owner,
+          [],
+          form.numTokens
+        )
+      )
+    )
+
+    const quoteTreasuryAccount = await tryGetTokenAccount(
+      connection.current,
+      form.quoteTreasury.pubkey
+    )
+    const quoteMint = quoteTreasuryAccount?.account.mint
+
+    if (!baseMint || !quoteMint) {
+      return {
+        serializedInstruction,
+        isValid: false,
+        governance: form.baseTreasury?.governance,
+        additionalSerializedInstructions: [],
+        chunkSplitByDefault: true,
+        chunkBy: 1,
+      }
+    }
+
+    const soName = `LSO-${form.optionExpirationUnixSeconds}`;
+
+    // TODO: Use the newer version where it has an issueAuthority and set that to a PDA of the program
+    const configInstruction = await so.createConfigInstruction(
+      form.optionExpirationUnixSeconds,
+      form.optionExpirationUnixSeconds,
+      new BN(form.numTokens),
+      new BN(form.lotSize),
+      soName,
+      //use sol wallet as authority
+      form.payer.extensions.transferAddress!,
+      baseMint,
+      //use helper account as base account
+      helperTokenAccount.publicKey,
+      quoteMint,
+      form.quoteTreasury.pubkey
+    )
+
+    additionalSerializedInstructions.push(
+      serializeInstructionToBase64(configInstruction)
+    )
+
+    for (const strike of form.strikes.split(',')) {
+      const initStrikeInstruction = await so.createInitStrikeInstruction(
+        new BN(Number(strike)),
+        soName,
+        //authority sol wallet
+        form.payer.extensions.transferAddress!,
+        baseMint
+      )
+      additionalSerializedInstructions.push(
+        serializeInstructionToBase64(initStrikeInstruction)
+      )
+
+      const nameInstruction = await so.createNameTokenInstruction(
+        new BN(Number(strike)),
+        soName,
+        form.payer.extensions.transferAddress!,
+        baseMint
+      )
+
+      additionalSerializedInstructions.push(
+        serializeInstructionToBase64(nameInstruction)
+      )
+    }
+
+    //after everything we close helper account
+    additionalSerializedInstructions.push(
+      serializeInstructionToBase64(
+        closeAccount({
+          source: helperTokenAccount.publicKey,
+          //sol wallet
+          destination: form.payer.extensions.transferAddress,
+          //owner governance or sol wallet same as baseTokenAccount
+          owner: form.baseTreasury.extensions.token?.account.owner,
+        })
+      )
+    )
+
+    return {
+      serializedInstruction,
+      isValid: true,
+      prerequisiteInstructions: prerequisiteInstructions,
+      prerequisiteInstructionsSigners: [helperTokenAccount],
+      governance: form.baseTreasury?.governance,
+      additionalSerializedInstructions,
+      chunkSplitByDefault: true,
+      chunkBy: 2,
+    }
+  }
+
+  const obj: UiInstruction = {
+    serializedInstruction,
+    isValid: false,
+    governance: form.baseTreasury?.governance,
+    additionalSerializedInstructions,
+    chunkSplitByDefault: true,
+    chunkBy: 1,
+  }
+  return obj
 }
