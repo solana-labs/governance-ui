@@ -96,6 +96,7 @@ const IxGateSet = ({
     TokenRegisterTrustless: true,
     TokenUpdateIndexAndRate: true,
     TokenWithdraw: true,
+    AccountSettleFeesWithMngo: true,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -467,6 +468,12 @@ const IxGateSet = ({
       initialValue: form.TokenWithdraw,
       type: InstructionInputType.SWITCH,
       name: 'TokenWithdraw',
+    },
+    {
+      label: 'Account Settle Fees With Mngo',
+      initialValue: form.AccountSettleFeesWithMngo,
+      type: InstructionInputType.SWITCH,
+      name: 'AccountSettleFeesWithMngo',
     },
   ]
 
