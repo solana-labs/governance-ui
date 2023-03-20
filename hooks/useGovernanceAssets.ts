@@ -1,3 +1,4 @@
+import { GovernanceAccountType } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import { Instructions, PackageEnum } from '@utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
@@ -50,6 +51,20 @@ export default function useGovernanceAssets() {
   ).filter((x) => x.type === AccountType.AuxiliaryToken)
   const currentPluginPk = config?.account.communityTokenConfig.voterWeightAddin
   const governancesArray = useGovernanceAssetsStore((s) => s.governancesArray)
+
+  const getGovernancesByAccountType = (type: GovernanceAccountType) => {
+    const governancesFiltered = governancesArray.filter(
+      (gov) => gov.account?.accountType === type
+    )
+    return governancesFiltered
+  }
+
+  const getGovernancesByAccountTypes = (types: GovernanceAccountType[]) => {
+    const governancesFiltered = governancesArray.filter((gov) =>
+      types.some((t) => gov.account?.accountType === t)
+    )
+    return governancesFiltered
+  }
 
   function canUseGovernanceForInstruction(types: AccountType[]) {
     return (
@@ -828,6 +843,8 @@ export default function useGovernanceAssets() {
     canUseMintInstruction,
     canUseProgramUpgradeInstruction,
     canUseTransferInstruction,
+    getGovernancesByAccountType,
+    getGovernancesByAccountTypes,
     getPackageTypeById,
     governancesArray,
     governedNativeAccounts,

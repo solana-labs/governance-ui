@@ -53,12 +53,9 @@ const AssetItem = ({
       }
       setLoadData(false)
     }
-    if (!panelView) {
-      handleSetProgramVersion()
-    }
-
+    handleSetProgramVersion()
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [JSON.stringify(item), panelView])
+  }, [JSON.stringify(item)])
 
   return (
     <div className="text-fgd-1 border border-fgd-4 p-3 rounded-lg w-full">

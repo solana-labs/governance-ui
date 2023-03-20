@@ -12,11 +12,8 @@ interface AccountExtension {
   token?: TokenProgramAccount<AccountInfo>
 }
 
-export type GovernanceProgramAccountWithNativeTreasuryAddress = ProgramAccount<Governance> & {
-  nativeTreasuryAddress: PublicKey
-}
 export interface AssetAccount {
-  governance: GovernanceProgramAccountWithNativeTreasuryAddress
+  governance: ProgramAccount<Governance>
   pubkey: PublicKey
   type: AccountType
   extensions: AccountExtension
@@ -36,7 +33,7 @@ export enum AccountType {
 }
 
 export class AccountTypeToken implements AssetAccount {
-  governance: GovernanceProgramAccountWithNativeTreasuryAddress
+  governance: ProgramAccount<Governance>
   type: AccountType
   extensions: AccountExtension
   pubkey: PublicKey
@@ -44,7 +41,7 @@ export class AccountTypeToken implements AssetAccount {
   constructor(
     tokenAccount: TokenProgramAccount<AccountInfo>,
     mint: TokenProgramAccount<MintInfo>,
-    governance: GovernanceProgramAccountWithNativeTreasuryAddress
+    governance: ProgramAccount<Governance>
   ) {
     this.governance = governance
     this.pubkey = tokenAccount.publicKey
@@ -60,7 +57,7 @@ export class AccountTypeToken implements AssetAccount {
 }
 
 export class AccountTypeAuxiliaryToken implements AssetAccount {
-  governance: GovernanceProgramAccountWithNativeTreasuryAddress
+  governance: ProgramAccount<Governance>
   type: AccountType
   extensions: AccountExtension
   pubkey: PublicKey
@@ -81,28 +78,25 @@ export class AccountTypeAuxiliaryToken implements AssetAccount {
 }
 
 export class AccountTypeProgram implements AssetAccount {
-  governance: GovernanceProgramAccountWithNativeTreasuryAddress
+  governance: ProgramAccount<Governance>
   type: AccountType
   extensions: AccountExtension
   pubkey: PublicKey
-  constructor(
-    governance: GovernanceProgramAccountWithNativeTreasuryAddress,
-    programId: PublicKey
-  ) {
+  constructor(governance: ProgramAccount<Governance>) {
     this.governance = governance
-    this.pubkey = programId
+    this.pubkey = governance.account.governedAccount
     this.type = AccountType.PROGRAM
     this.extensions = {}
   }
 }
 
 export class AccountTypeMint implements AssetAccount {
-  governance: GovernanceProgramAccountWithNativeTreasuryAddress
+  governance: ProgramAccount<Governance>
   type: AccountType
   extensions: AccountExtension
   pubkey: PublicKey
   constructor(
-    governance: GovernanceProgramAccountWithNativeTreasuryAddress,
+    governance: ProgramAccount<Governance>,
     account: MintInfo & { publicKey: PublicKey }
   ) {
     this.governance = governance
@@ -118,7 +112,7 @@ export class AccountTypeMint implements AssetAccount {
 }
 
 export class AccountTypeNFT implements AssetAccount {
-  governance: GovernanceProgramAccountWithNativeTreasuryAddress
+  governance: ProgramAccount<Governance>
   type: AccountType
   extensions: AccountExtension
   pubkey: PublicKey
@@ -126,7 +120,7 @@ export class AccountTypeNFT implements AssetAccount {
   constructor(
     tokenAccount: TokenProgramAccount<AccountInfo>,
     mint: TokenProgramAccount<MintInfo>,
-    governance: GovernanceProgramAccountWithNativeTreasuryAddress
+    governance: ProgramAccount<Governance>
   ) {
     this.governance = governance
     this.pubkey = tokenAccount.publicKey
@@ -142,7 +136,7 @@ export class AccountTypeNFT implements AssetAccount {
 }
 
 export class AccountTypeSol implements AssetAccount {
-  governance: GovernanceProgramAccountWithNativeTreasuryAddress
+  governance: ProgramAccount<Governance>
   type: AccountType
   extensions: AccountExtension
   pubkey: PublicKey
@@ -151,7 +145,7 @@ export class AccountTypeSol implements AssetAccount {
     mint: TokenProgramAccount<MintInfo>,
     solAddress: PublicKey,
     solAccount: AccountInfoGen<Buffer | ParsedAccountData>,
-    governance: GovernanceProgramAccountWithNativeTreasuryAddress
+    governance: ProgramAccount<Governance>
   ) {
     this.governance = governance
     this.type = AccountType.SOL
@@ -168,11 +162,11 @@ export class AccountTypeSol implements AssetAccount {
 }
 
 export class AccountTypeGeneric implements AssetAccount {
-  governance: GovernanceProgramAccountWithNativeTreasuryAddress
+  governance: ProgramAccount<Governance>
   type: AccountType
   extensions: AccountExtension
   pubkey: PublicKey
-  constructor(governance: GovernanceProgramAccountWithNativeTreasuryAddress) {
+  constructor(governance: ProgramAccount<Governance>) {
     this.governance = governance
     this.pubkey = governance.account.governedAccount
     this.type = AccountType.GENERIC
