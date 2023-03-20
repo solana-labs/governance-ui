@@ -54,24 +54,6 @@ const DepositLabel = dynamic(
 )
 
 const REALM = () => {
-  useEffect(() => {
-    if (document) {
-      ;(function () {
-        const logger = document.getElementById('log')
-        console.log = function (message) {
-          if (logger) {
-            if (typeof message == 'object') {
-              logger!.innerHTML +=
-                (JSON && JSON.stringify ? JSON.stringify(message) : message) +
-                '<br />'
-            } else {
-              logger!.innerHTML += message + '<br />'
-            }
-          }
-        }
-      })()
-    }
-  }, [])
   const pagination = useRef<{ setPage: (val) => void }>(null)
   const {
     realm,

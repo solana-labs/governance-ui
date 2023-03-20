@@ -92,7 +92,6 @@ export const getWalletProviderByName = (
   nameOrNull: string | null | undefined,
   wallets?
 ) => {
-  console.log(nameOrNull, wallets)
   if (wallets) {
     return (
       wallets.find(({ adapter: { name } }) => name === nameOrNull) ||
