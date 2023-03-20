@@ -87,7 +87,7 @@ export const DEFAULT_PROVIDER =
   MOBILE_WALLET_PROVIDER.adapter.readyState !== WalletReadyState.Unsupported
     ? MOBILE_WALLET_PROVIDER
     : PHANTOM_PROVIDER
-
+console.log(DEFAULT_PROVIDER)
 export const getWalletProviderByName = (
   nameOrNull: string | null | undefined,
   wallets?
