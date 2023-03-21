@@ -287,4 +287,7 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
   VotEn9AWwTFtJPJSMV5F9jsMY6QwWM5qn3XP9PATGW7: common_instructions(
     new PublicKey('VotEn9AWwTFtJPJSMV5F9jsMY6QwWM5qn3XP9PATGW7')
   ),
+  VoteWPk9yyGmkX4U77nEWRJWpcc8kUfrPoghxENpstL: common_instructions(
+    new PublicKey('VoteWPk9yyGmkX4U77nEWRJWpcc8kUfrPoghxENpstL')
+  ),
 }
