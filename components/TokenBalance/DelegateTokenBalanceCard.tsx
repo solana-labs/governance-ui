@@ -44,9 +44,7 @@ const DelegateBalanceCard = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
-    ownCouncilTokenRecord?.pubkey.toBase58(),
     walletId,
-    connected,
     ownDelegateTokenRecords?.map((x) => x.pubkey.toBase58()).toString(),
     ownDelegateCouncilTokenRecords?.map((x) => x.pubkey.toBase58()).toString(),
   ])
