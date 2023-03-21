@@ -120,20 +120,6 @@ const LiquidityStakingOption = ({
           error={formErrors['optionExpirationUnixSeconds']}
         />
       </Tooltip>
-      <Tooltip content="Strike prices for the staking option. Units are quote atoms per lot. Comma separated string">
-        <Input
-          label="Strikes"
-          value={form.strikes}
-          type="text"
-          onChange={(evt) =>
-            handleSetForm({
-              value: evt.target.value,
-              propertyName: 'strikes',
-            })
-          }
-          error={formErrors['strikes']}
-        />
-      </Tooltip>
       <Tooltip content="Lot size for base atoms. This is the min size of an option.">
         <Input
           label="Lot Size"

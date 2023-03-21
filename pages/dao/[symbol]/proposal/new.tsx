@@ -439,6 +439,7 @@ const New = () => {
       [Instructions.DepositIntoCastle]: CastleDeposit,
       [Instructions.DualFinanceAirdrop]: DualAirdrop,
       [Instructions.DualFinanceStakingOption]: StakingOption,
+      [Instructions.DualFinanceInitStrike]: InitStrike,
       [Instructions.DualFinanceLiquidityStakingOption]: LiquidityStakingOption,
       [Instructions.DualFinanceWithdraw]: DualWithdraw,
       [Instructions.DualFinanceExercise]: DualExercise,

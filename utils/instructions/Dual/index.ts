@@ -18,6 +18,7 @@ import {
   DualFinanceLiquidityStakingOptionForm,
   DualFinanceWithdrawForm,
   UiInstruction,
+  DualFinanceInitStrikeForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import {
   createAssociatedTokenAccount,
@@ -43,6 +44,14 @@ interface StakingOptionArgs {
 interface StakingOptionLsoArgs {
   connection: ConnectionContext
   form: DualFinanceLiquidityStakingOptionForm
+  setFormErrors: any
+  schema: any
+  wallet: WalletAdapter | undefined
+}
+
+interface InitStrikeArgs {
+  connection: ConnectionContext
+  form: DualFinanceInitStrikeForm
   setFormErrors: any
   schema: any
   wallet: WalletAdapter | undefined
@@ -423,7 +432,6 @@ export async function getWithdrawInstruction({
   }
 }
 
-
 export async function getConfigLsoInstruction({
   connection,
   wallet,
@@ -534,31 +542,6 @@ export async function getConfigLsoInstruction({
       serializeInstructionToBase64(configInstruction)
     )
 
-    // TODO: Move this to initStrike function instead
-    for (const strike of form.strikes.split(',')) {
-      const initStrikeInstruction = await so.createInitStrikeInstruction(
-        new BN(Number(strike)),
-        soName,
-        //authority sol wallet
-        form.payer.extensions.transferAddress!,
-        baseMint
-      )
-      additionalSerializedInstructions.push(
-        serializeInstructionToBase64(initStrikeInstruction)
-      )
-
-      const nameInstruction = await so.createNameTokenInstruction(
-        new BN(Number(strike)),
-        soName,
-        form.payer.extensions.transferAddress!,
-        baseMint
-      )
-
-      additionalSerializedInstructions.push(
-        serializeInstructionToBase64(nameInstruction)
-      )
-    }
-
     //after everything we close helper account
     additionalSerializedInstructions.push(
       serializeInstructionToBase64(
@@ -588,6 +571,84 @@ export async function getConfigLsoInstruction({
     serializedInstruction,
     isValid: false,
     governance: form.baseTreasury?.governance,
+    additionalSerializedInstructions,
+    chunkSplitByDefault: true,
+    chunkBy: 1,
+  }
+  return obj
+}
+
+export async function getInitStrikeInstruction({
+  connection,
+  wallet,
+  form,
+  schema,
+  setFormErrors,
+}: InitStrikeArgs): Promise<UiInstruction> {
+  const isValid = await validateInstruction({ schema, form, setFormErrors })
+
+  const serializedInstruction = ''
+  const additionalSerializedInstructions: string[] = []
+  const prerequisiteInstructions: TransactionInstruction[] = []
+  if (
+    isValid &&
+    form.payer &&
+    form.soName &&
+    form.strikes &&
+    form.baseTreasury &&
+    wallet?.publicKey
+  ) {
+    const so = getStakingOptionsApi(connection)
+
+    const baseMint = form.baseTreasury.extensions.mint?.publicKey
+    if (!baseMint) {
+      return {
+        serializedInstruction,
+        isValid: false,
+        governance: form.baseTreasury?.governance,
+        additionalSerializedInstructions: [],
+      }
+    }
+
+    for (const strike of form.strikes.split(',')) {
+      const initStrikeInstruction = await so.createInitStrikeInstruction(
+        new BN(Number(strike)),
+        form.soName,
+        //authority sol wallet
+        form.payer.extensions.transferAddress!,
+        baseMint
+      )
+      additionalSerializedInstructions.push(
+        serializeInstructionToBase64(initStrikeInstruction)
+      )
+
+      const nameInstruction = await so.createNameTokenInstruction(
+        new BN(Number(strike)),
+        form.soName,
+        form.payer.extensions.transferAddress!,
+        baseMint
+      )
+
+      additionalSerializedInstructions.push(
+        serializeInstructionToBase64(nameInstruction)
+      )
+    }
+
+    return {
+      serializedInstruction,
+      isValid: true,
+      prerequisiteInstructions: prerequisiteInstructions,
+      governance: form.payer?.governance,
+      additionalSerializedInstructions,
+      chunkSplitByDefault: true,
+      chunkBy: 1,
+    }
+  }
+
+  const obj: UiInstruction = {
+    serializedInstruction,
+    isValid: false,
+    governance: form.payer?.governance,
     additionalSerializedInstructions,
     chunkSplitByDefault: true,
     chunkBy: 1,

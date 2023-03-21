@@ -579,6 +579,7 @@ export enum Instructions {
   DualFinanceAirdrop,
   DualFinanceExercise,
   DualFinanceLiquidityStakingOption,
+  DualFinanceInitStrike,
   DualFinanceStakingOption,
   DualFinanceWithdraw,
   EverlendDeposit,
@@ -741,13 +742,19 @@ export interface DualFinanceStakingOptionForm {
 }
 
 export interface DualFinanceLiquidityStakingOptionForm {
-  strikes: string
   optionExpirationUnixSeconds: number
   numTokens: number
   lotSize: number
   baseTreasury: AssetAccount | undefined
   quoteTreasury: AssetAccount | undefined
   payer: AssetAccount | undefined
+}
+
+export interface DualFinanceInitStrikeForm {
+  strikes: string
+  soName: string
+  payer: AssetAccount | undefined
+  baseTreasury: AssetAccount | undefined
 }
 
 export interface DualFinanceExerciseForm {
