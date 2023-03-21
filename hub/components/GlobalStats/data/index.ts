@@ -276,8 +276,10 @@ export async function fetchData(
   logger.log(`token count: ${tokenAmountMap.size}`);
 
   await tokenPriceService.fetchSolanaTokenList();
-
-  const tokenGroups = group(Array.from(tokenAmountMap.keys()), 50);
+  const relevantTokens = Array.from(tokenAmountMap.keys()).filter(
+    (key) => !!tokenAmountMap.get(key)?.isGreaterThan(1),
+  );
+  const tokenGroups = group(relevantTokens, 50);
 
   for (const [idx, tokenGroup] of tokenGroups.entries()) {
     cbs.onUpdate?.({
