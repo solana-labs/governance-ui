@@ -1,29 +1,30 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
-import { PublicKey } from '@solana/web3.js'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid, validatePubkey } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
-import { NewProposalContext } from '../../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
+import UseMangoV4 from '@hooks/useMangoV4'
+import { NewProposalContext } from '../../../../new'
 import InstructionForm, {
   InstructionInput,
   InstructionInputType,
 } from '../../FormCreator'
-import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 
 interface AltSetForm {
   governedAccount: AssetAccount | null
-  index: number
-  addressLookupTable: string
+  programId: string
+  idlAccount: string
+  buffer: string
 }
 
-const AltSet = ({
+const IdlSetBuffer = ({
   index,
   governance,
 }: {
@@ -31,7 +32,7 @@ const AltSet = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { mangoClient, mangoGroup } = UseMangoV4()
+  const { mangoGroup } = UseMangoV4()
   const { assetAccounts } = useGovernanceAssets()
   const solAccounts = assetAccounts.filter(
     (x) =>
@@ -42,8 +43,9 @@ const AltSet = ({
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<AltSetForm>({
     governedAccount: null,
-    addressLookupTable: '',
-    index: 0,
+    programId: '4MangoMjqJ2firMokCjjGgoK8d4MXcrgL7XJaL3w6fVg',
+    idlAccount: '3foqXduY5PabCn6LjNrLo3waNf3Hy6vQgqavoVUCsUN9',
+    buffer: '',
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -61,15 +63,13 @@ const AltSet = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const ix = await mangoClient!.program.methods
-        .altSet(Number(form.index))
-        .accounts({
-          group: mangoGroup!.publicKey,
-          admin: form.governedAccount.extensions.transferAddress,
-          addressLookupTable: new PublicKey(form.addressLookupTable),
-        })
-        .instruction()
-
+      const ix = await createIdlUpgradeInstruction(
+        new PublicKey(form.programId),
+        new PublicKey(form.buffer),
+        form.governedAccount.extensions.transferAddress!,
+        new PublicKey(form.idlAccount)
+      )
+      console.log(ix)
       serializedInstruction = serializeInstructionToBase64(ix)
     }
     const obj: UiInstruction = {
@@ -92,13 +92,24 @@ const AltSet = ({
       .object()
       .nullable()
       .required('Program governed account is required'),
-    addressLookupTable: yup
+    programId: yup
       .string()
       .required()
-      .test('is-valid-address', 'Please enter a valid PublicKey', (value) =>
+      .test('is-valid-programId', 'Please enter a valid PublicKey', (value) =>
         value ? validatePubkey(value) : true
       ),
-    index: yup.string().required(),
+    idlAccount: yup
+      .string()
+      .required()
+      .test('is-idl-account', 'Please enter a valid PublicKey', (value) =>
+        value ? validatePubkey(value) : true
+      ),
+    buffer: yup
+      .string()
+      .required()
+      .test('is-buffer', 'Please enter a valid PublicKey', (value) =>
+        value ? validatePubkey(value) : true
+      ),
   })
   const inputs: InstructionInput[] = [
     {
@@ -111,17 +122,22 @@ const AltSet = ({
       options: solAccounts,
     },
     {
-      label: 'Address Lookup Table',
-      initialValue: form.addressLookupTable,
+      label: 'Program',
+      initialValue: form.programId,
       type: InstructionInputType.INPUT,
-      name: 'addressLookupTable',
+      name: 'programId',
     },
     {
-      label: 'Index',
-      initialValue: form.index,
+      label: 'Idl Account',
+      initialValue: form.idlAccount,
       type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'index',
+      name: 'idlAccount',
+    },
+    {
+      label: 'Buffer',
+      initialValue: form.buffer,
+      type: InstructionInputType.INPUT,
+      name: 'buffer',
     },
   ]
 
@@ -140,4 +156,40 @@ const AltSet = ({
   )
 }
 
-export default AltSet
+export default IdlSetBuffer
+
+export async function createIdlUpgradeInstruction(
+  programId: PublicKey,
+  bufferAddress: PublicKey,
+  upgradeAuthority: PublicKey,
+  idlAccount: PublicKey
+) {
+  const prefix = Buffer.from('0a69e9a778bcf440', 'hex')
+  const ixn = Buffer.from('03', 'hex')
+  const data = Buffer.concat([prefix.reverse(), ixn])
+  const idlAddr = idlAccount
+
+  const keys = [
+    {
+      pubkey: bufferAddress,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: idlAddr,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: upgradeAuthority,
+      isWritable: true,
+      isSigner: true,
+    },
+  ]
+
+  return new TransactionInstruction({
+    keys,
+    programId,
+    data,
+  })
+}
