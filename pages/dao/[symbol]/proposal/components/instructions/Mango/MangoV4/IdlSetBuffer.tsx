@@ -16,7 +16,6 @@ import InstructionForm, {
   InstructionInput,
   InstructionInputType,
 } from '../../FormCreator'
-import { Layout, rustEnum, struct } from '@project-serum/borsh'
 
 interface AltSetForm {
   governedAccount: AssetAccount | null
@@ -64,11 +63,11 @@ const IdlSetBuffer = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const ix = await createSetBuffer(
+      const ix = await createIdlUpgradeInstruction(
         new PublicKey(form.programId),
         new PublicKey(form.buffer),
-        new PublicKey(form.idlAccount),
-        form.governedAccount.extensions.transferAddress!
+        form.governedAccount.extensions.transferAddress!,
+        new PublicKey(form.idlAccount)
       )
       console.log(ix)
       serializedInstruction = serializeInstructionToBase64(ix)
@@ -159,22 +158,33 @@ const IdlSetBuffer = ({
 
 export default IdlSetBuffer
 
-export async function createSetBuffer(
+export async function createIdlUpgradeInstruction(
   programId: PublicKey,
-  buffer: PublicKey,
-  idlAccount: PublicKey,
-  idlAuthority: PublicKey
+  bufferAddress: PublicKey,
+  upgradeAuthority: PublicKey,
+  idlAccount: PublicKey
 ) {
-  const data = encodeInstruction({ setBuffer: {} })
+  const prefix = Buffer.from('0a69e9a778bcf440', 'hex')
+  const ixn = Buffer.from('03', 'hex')
+  const data = Buffer.concat([prefix.reverse(), ixn])
+  const idlAddr = idlAccount
 
   const keys = [
     {
-      pubkey: buffer,
+      pubkey: bufferAddress,
       isWritable: true,
       isSigner: false,
     },
-    { pubkey: idlAccount, isWritable: true, isSigner: false },
-    { pubkey: idlAuthority, isWritable: false, isSigner: true },
+    {
+      pubkey: idlAddr,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: upgradeAuthority,
+      isWritable: true,
+      isSigner: true,
+    },
   ]
 
   return new TransactionInstruction({
@@ -183,40 +193,3 @@ export async function createSetBuffer(
     data,
   })
 }
-
-const IDL_INSTRUCTION_LAYOUT: Layout<IdlInstruction> = rustEnum([
-  struct([], 'create'),
-  struct([], 'createBuffer'),
-  struct([], 'write'),
-  struct([], 'setBuffer'),
-  struct([], 'setAuthority'),
-])
-
-// Reverse for little endian.
-export const IDL_TAG = Buffer.from('0a69e9a778bcf440', 'hex').reverse()
-
-// Deterministic IDL address as a function of the program id.
-export function encodeInstruction(i: IdlInstruction): Buffer {
-  const buffer = Buffer.alloc(1000) // TODO: use a tighter buffer.
-  const len = IDL_INSTRUCTION_LAYOUT.encode(i, buffer)
-  return Buffer.concat([IDL_TAG, buffer.slice(0, len)])
-}
-
-// Simplified since we only use the SetBuffer variant.
-export type IdlInstruction =
-  | Create
-  | CreateBuffer
-  | Write
-  | SetBuffer
-  | SetAuthority
-
-// eslint-disable-next-line @typescript-eslint/ban-types
-type Create = {}
-// eslint-disable-next-line @typescript-eslint/ban-types
-type CreateBuffer = {}
-// eslint-disable-next-line @typescript-eslint/ban-types
-type Write = {}
-// eslint-disable-next-line @typescript-eslint/ban-types
-type SetBuffer = {}
-// eslint-disable-next-line @typescript-eslint/ban-types
-type SetAuthority = {}
