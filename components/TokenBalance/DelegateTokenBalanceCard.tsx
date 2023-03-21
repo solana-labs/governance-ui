@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { BN_ZERO } from '@solana/spl-governance'
 import { DisplayAddress } from '@cardinal/namespaces-components'
 import Select from '@components/inputs/Select'
@@ -20,42 +19,7 @@ const DelegateBalanceCard = () => {
     mint,
     councilMint,
   } = useRealm()
-  const {
-    actions,
-    selectedCommunityDelegate,
-    selectedCouncilDelegate,
-  } = useWalletStore((s) => s)
-
-  useEffect(() => {
-    if (
-      ownDelegateCouncilTokenRecords &&
-      ownDelegateCouncilTokenRecords.length > 0
-    ) {
-      actions.selectCouncilDelegate(
-        ownDelegateCouncilTokenRecords[0]?.account?.governingTokenOwner?.toBase58()
-      )
-    } else {
-      actions.selectCouncilDelegate(undefined)
-    }
-
-    if (ownDelegateTokenRecords && ownDelegateTokenRecords.length > 0) {
-      actions.selectCommunityDelegate(
-        ownDelegateTokenRecords[0]?.account?.governingTokenOwner?.toBase58()
-      )
-    } else {
-      actions.selectCommunityDelegate(undefined)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [
-    walletId,
-    ownDelegateTokenRecords?.map((x) => x.pubkey.toBase58()).toString(),
-    ownDelegateCouncilTokenRecords?.map((x) => x.pubkey.toBase58()).toString(),
-  ])
-  // whenever we change delegate, get that delegates vote record so we can display it
-  useEffect(() => {
-    actions.fetchDelegateVoteRecords()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [selectedCommunityDelegate, selectedCouncilDelegate])
+  const { actions } = useWalletStore((s) => s)
 
   const getCouncilTokenCount = () => {
     if (walletId && delegates?.[walletId]) {
