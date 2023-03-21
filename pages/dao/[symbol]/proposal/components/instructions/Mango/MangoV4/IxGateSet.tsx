@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
-import useRealm from '@hooks/useRealm'
-import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
@@ -31,7 +29,6 @@ const IxGateSet = ({
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const { mangoClient, mangoGroup } = UseMangoV4()
-  const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const solAccounts = assetAccounts.filter(
     (x) =>
@@ -42,7 +39,6 @@ const IxGateSet = ({
           x.extensions.transferAddress?.equals(mangoGroup.securityAdmin)))
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<IxGateSetForm>({
     governedAccount: null,
     AccountClose: true,
@@ -111,7 +107,6 @@ const IxGateSet = ({
     let serializedInstruction = ''
     if (
       isValid &&
-      programId &&
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {

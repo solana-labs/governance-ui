@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
-import useRealm from '@hooks/useRealm'
 import {
   Keypair,
   PublicKey,
@@ -66,7 +65,6 @@ const PerpCreate = ({
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const { mangoClient, mangoGroup, getAdditionalLabelInfo } = UseMangoV4()
-  const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const solAccounts = assetAccounts.filter(
     (x) =>
@@ -76,7 +74,6 @@ const PerpCreate = ({
   )
   const { connection } = useWalletStore()
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<PerpCreateForm>({
     governedAccount: null,
     oracleConfFilter: 0.1,
@@ -124,7 +121,6 @@ const PerpCreate = ({
     let prerequisiteInstructionsSigners: Keypair[] = []
     if (
       isValid &&
-      programId &&
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {

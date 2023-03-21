@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
-import useRealm from '@hooks/useRealm'
 import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid, validatePubkey } from '@utils/formValidation'
@@ -34,7 +33,6 @@ const StubOracleCreate = ({
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const { mangoClient, mangoGroup } = UseMangoV4()
-  const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const solAccounts = assetAccounts.filter(
     (x) =>
@@ -43,7 +41,6 @@ const StubOracleCreate = ({
       x.extensions.transferAddress?.equals(mangoGroup.admin)
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<StubOracleCreateForm>({
     governedAccount: null,
     price: 0,
@@ -62,7 +59,6 @@ const StubOracleCreate = ({
     let serializedInstruction = ''
     if (
       isValid &&
-      programId &&
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {

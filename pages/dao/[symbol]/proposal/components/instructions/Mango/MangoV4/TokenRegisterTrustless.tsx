@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
-import useRealm from '@hooks/useRealm'
 import { PublicKey, SYSVAR_RENT_PUBKEY } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid, validatePubkey } from '@utils/formValidation'
@@ -35,7 +34,6 @@ const TokenRegisterTrustless = ({
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const { mangoClient, mangoGroup } = UseMangoV4()
-  const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const solAccounts = assetAccounts.filter(
     (x) =>
@@ -44,7 +42,6 @@ const TokenRegisterTrustless = ({
       x.extensions.transferAddress?.equals(mangoGroup?.fastListingAdmin)
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<TokenRegisterTrustlessForm>({
     governedAccount: null,
     mintPk: '',
@@ -65,7 +62,6 @@ const TokenRegisterTrustless = ({
     let serializedInstruction = ''
     if (
       isValid &&
-      programId &&
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
