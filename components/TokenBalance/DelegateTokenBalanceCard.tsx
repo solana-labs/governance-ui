@@ -11,7 +11,6 @@ const DelegateBalanceCard = () => {
   const delegates = useMembersStore((s) => s.compact.delegates)
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
-  const connected = useWalletStore((s) => s.connected)
   const walletId = wallet?.publicKey?.toBase58()
   const {
     ownDelegateTokenRecords,
@@ -35,12 +34,16 @@ const DelegateBalanceCard = () => {
       actions.selectCouncilDelegate(
         ownDelegateCouncilTokenRecords[0]?.account?.governingTokenOwner?.toBase58()
       )
+    } else {
+      actions.selectCouncilDelegate(undefined)
     }
 
     if (ownDelegateTokenRecords && ownDelegateTokenRecords.length > 0) {
       actions.selectCommunityDelegate(
         ownDelegateTokenRecords[0]?.account?.governingTokenOwner?.toBase58()
       )
+    } else {
+      actions.selectCommunityDelegate(undefined)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
