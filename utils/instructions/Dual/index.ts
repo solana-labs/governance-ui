@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   serializeInstructionToBase64,
   TOKEN_PROGRAM_ID,
