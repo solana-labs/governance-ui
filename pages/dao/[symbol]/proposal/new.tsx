@@ -129,6 +129,7 @@ import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import SetMintAuthority from './components/instructions/SetMintAuthroity'
 import LiquidityStakingOption from './components/instructions/Dual/LiquidityStakingOption'
 import InitStrike from './components/instructions/Dual/InitStrike'
+import IdlSetBuffer from './components/instructions/Mango/MangoV4/IdlSetBuffer'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -419,6 +420,7 @@ const New = () => {
       [Instructions.MangoV4TokenRegister]: TokenRegister,
       [Instructions.MangoV4TokenEdit]: EditToken,
       [Instructions.MangoV4GroupEdit]: GroupEdit,
+      [Instructions.IdlSetBuffer]: IdlSetBuffer,
       [Instructions.MangoV4OpenBookEditMarket]: OpenBookEditMarket,
       [Instructions.MangoV4IxGateSet]: IxGateSet,
       [Instructions.MangoV4AltExtend]: AltExtend,

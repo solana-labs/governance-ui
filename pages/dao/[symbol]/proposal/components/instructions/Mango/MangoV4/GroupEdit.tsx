@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from 'react'
-import useRealm from '@hooks/useRealm'
 import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid, validatePubkey } from '@utils/formValidation'
@@ -74,7 +73,6 @@ const GroupEdit = ({
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const { mangoClient, mangoGroup, getAdditionalLabelInfo } = UseMangoV4()
-  const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const solAccounts = assetAccounts.filter(
     (x) =>
@@ -85,7 +83,6 @@ const GroupEdit = ({
           x.extensions.transferAddress?.equals(mangoGroup.securityAdmin)))
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const programId: PublicKey | undefined = realmInfo?.programId
   const [originalFormValues, setOriginalFormValues] = useState<GroupEditForm>({
     ...defaultFormValues,
   })
@@ -104,7 +101,6 @@ const GroupEdit = ({
     let serializedInstruction = ''
     if (
       isValid &&
-      programId &&
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
@@ -122,7 +118,7 @@ const GroupEdit = ({
           getNullOrTransform(values.testing, null, Number),
           getNullOrTransform(values.version, null, Number),
           getNullOrTransform(values.depositLimitQuote, BN),
-          getNullOrTransform(values.feePayWithMngo, null),
+          getNullOrTransform(values.feePayWithMngo, null, Boolean),
           getNullOrTransform(values.feesMngoBonusRate, null, Number),
           getNullOrTransform(values.feesSwapMangoAccount, PublicKey),
           getNullOrTransform(values.feesMngoTokenIndex, null, Number),

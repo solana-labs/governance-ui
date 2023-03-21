@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { BN_ZERO } from '@solana/spl-governance'
 import { DisplayAddress } from '@cardinal/namespaces-components'
 import Select from '@components/inputs/Select'
@@ -11,7 +10,6 @@ const DelegateBalanceCard = () => {
   const delegates = useMembersStore((s) => s.compact.delegates)
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
-
   const walletId = wallet?.publicKey?.toBase58()
   const {
     ownDelegateTokenRecords,
@@ -21,40 +19,7 @@ const DelegateBalanceCard = () => {
     mint,
     councilMint,
   } = useRealm()
-  const {
-    actions,
-    selectedCommunityDelegate,
-    selectedCouncilDelegate,
-  } = useWalletStore((s) => s)
-
-  useEffect(() => {
-    if (
-      !ownCouncilTokenRecord &&
-      ownDelegateCouncilTokenRecords &&
-      ownDelegateCouncilTokenRecords.length > 0
-    ) {
-      actions.selectCouncilDelegate(
-        ownDelegateCouncilTokenRecords[0]?.account?.governingTokenOwner?.toBase58()
-      )
-    }
-
-    if (
-      !ownTokenRecord &&
-      ownDelegateTokenRecords &&
-      ownDelegateTokenRecords.length > 0
-    ) {
-      actions.selectCommunityDelegate(
-        ownDelegateTokenRecords[0]?.account?.governingTokenOwner?.toBase58()
-      )
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [walletId])
-
-  // whenever we change delegate, get that delegates vote record so we can display it
-  useEffect(() => {
-    actions.fetchDelegateVoteRecords()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [selectedCommunityDelegate, selectedCouncilDelegate])
+  const { actions } = useWalletStore((s) => s)
 
   const getCouncilTokenCount = () => {
     if (walletId && delegates?.[walletId]) {
