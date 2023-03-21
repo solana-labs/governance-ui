@@ -381,7 +381,7 @@ export default function useGovernanceAssets() {
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Dual,
     },
-    [Instructions.DualFinanceInitLsoStrike]: {
+    [Instructions.DualFinanceInitStrike]: {
       name: 'Init Staking Option Strike',
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Dual,

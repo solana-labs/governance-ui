@@ -28,7 +28,6 @@ const LiquidityStakingOption = ({
     baseTreasury: undefined,
     quoteTreasury: undefined,
     payer: undefined,
-    strikes: '',
   })
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)

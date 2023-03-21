@@ -128,6 +128,7 @@ import RevokeGoverningTokens from './components/instructions/SplGov/RevokeGovern
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import SetMintAuthority from './components/instructions/SetMintAuthroity'
 import LiquidityStakingOption from './components/instructions/Dual/LiquidityStakingOption'
+import InitStrike from './components/instructions/Dual/InitStrike'
 
 const TITLE_LENGTH_LIMIT = 130
 
