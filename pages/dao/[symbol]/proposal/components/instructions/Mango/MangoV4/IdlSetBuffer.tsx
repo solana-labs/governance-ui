@@ -192,8 +192,10 @@ const IDL_INSTRUCTION_LAYOUT: Layout<IdlInstruction> = rustEnum([
   struct([], 'setAuthority'),
 ])
 
+// Reverse for little endian.
 export const IDL_TAG = Buffer.from('0a69e9a778bcf440', 'hex').reverse()
 
+// Deterministic IDL address as a function of the program id.
 export function encodeInstruction(i: IdlInstruction): Buffer {
   const buffer = Buffer.alloc(1000) // TODO: use a tighter buffer.
   const len = IDL_INSTRUCTION_LAYOUT.encode(i, buffer)
