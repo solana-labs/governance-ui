@@ -11,7 +11,7 @@ const DelegateBalanceCard = () => {
   const delegates = useMembersStore((s) => s.compact.delegates)
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
-
+  const connected = useWalletStore((s) => s.connected)
   const walletId = wallet?.publicKey?.toBase58()
   const {
     ownDelegateTokenRecords,
@@ -29,7 +29,6 @@ const DelegateBalanceCard = () => {
 
   useEffect(() => {
     if (
-      !ownCouncilTokenRecord &&
       ownDelegateCouncilTokenRecords &&
       ownDelegateCouncilTokenRecords.length > 0
     ) {
@@ -38,18 +37,19 @@ const DelegateBalanceCard = () => {
       )
     }
 
-    if (
-      !ownTokenRecord &&
-      ownDelegateTokenRecords &&
-      ownDelegateTokenRecords.length > 0
-    ) {
+    if (ownDelegateTokenRecords && ownDelegateTokenRecords.length > 0) {
       actions.selectCommunityDelegate(
         ownDelegateTokenRecords[0]?.account?.governingTokenOwner?.toBase58()
       )
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [walletId])
-
+  }, [
+    ownCouncilTokenRecord?.pubkey.toBase58(),
+    walletId,
+    connected,
+    ownDelegateTokenRecords?.map((x) => x.pubkey.toBase58()).toString(),
+    ownDelegateCouncilTokenRecords?.map((x) => x.pubkey.toBase58()).toString(),
+  ])
   // whenever we change delegate, get that delegates vote record so we can display it
   useEffect(() => {
     actions.fetchDelegateVoteRecords()
