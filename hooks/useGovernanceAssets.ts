@@ -832,52 +832,52 @@ export default function useGovernanceAssets() {
                     \_/        \/                    \/         \/                 \/        \/         \/        \/
    */
     [Instructions.UXDInitializeController]: {
-      name: 'UXD: Initialize Controller',
+      name: 'Initialize Controller',
       isVisible: symbol === 'UXP',
       packageId: PackageEnum.UXDProtocol,
     },
     [Instructions.UXDEditController]: {
-      name: 'UXD: Edit Controller',
+      name: 'Edit Controller',
       isVisible: symbol === 'UXP',
       packageId: PackageEnum.UXDProtocol,
     },
     [Instructions.UXDInitializeIdentityDepository]: {
-      name: 'UXD: Initialize Identity Depository',
+      name: 'Initialize Identity Depository',
       isVisible: symbol === 'UXP',
       packageId: PackageEnum.UXDProtocol,
     },
     [Instructions.UXDEditIdentityDepository]: {
-      name: 'UXD: Edit Identity Depository',
+      name: 'Edit Identity Depository',
       isVisible: symbol === 'UXP',
       packageId: PackageEnum.UXDProtocol,
     },
     [Instructions.UXDMintWithIdentityDepository]: {
-      name: 'UXD: Mint with Identity Depository',
+      name: 'Mint with Identity Depository',
       isVisible: symbol === 'UXP',
       packageId: PackageEnum.UXDProtocol,
     },
     [Instructions.UXDRedeemWithIdentityDepository]: {
-      name: 'UXD: Redeem with Identity Depository',
+      name: 'Redeem with Identity Depository',
       isVisible: symbol === 'UXP',
       packageId: PackageEnum.UXDProtocol,
     },
     [Instructions.UXDRegisterDepository]: {
-      name: 'UXD: Register a Depository',
+      name: 'Register a Depository',
       isVisible: symbol === 'UXP',
       packageId: PackageEnum.UXDProtocol,
     },
     [Instructions.UXDEditDepository]: {
-      name: 'UXD: Edit a Depository',
+      name: 'Edit a Depository',
       isVisible: symbol === 'UXP',
       packageId: PackageEnum.UXDProtocol,
     },
     [Instructions.UXDMint]: {
-      name: 'UXD: Mint',
+      name: 'Mint',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.UXDProtocol,
     },
     [Instructions.UXDRedeem]: {
-      name: 'UXD: Redeem',
+      name: 'Redeem',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.UXDProtocol,
     },

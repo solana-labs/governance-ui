@@ -24,12 +24,12 @@ const schema = yup.object().shape({
     .object()
     .nullable()
     .required('Governance account is required'),
-  decimalRedeemableGlobalSupplyCap: yup
+  redeemableGlobalSupplyCap: yup
     .number()
     .min(0, 'Redeemable global supply cap should be min 0'),
 })
 
-const EditControllerDepository = ({
+const EditController = ({
   index,
   governance,
 }: {
@@ -49,7 +49,7 @@ const EditControllerDepository = ({
 
   const [form, setForm] = useState<UXDEditControllerForm>({
     governedAccount: undefined,
-    decimalRedeemableGlobalSupplyCap: 0,
+    redeemableGlobalSupplyCap: 0,
   })
 
   const handleSetForm = ({ propertyName, value }) => {
@@ -85,7 +85,7 @@ const EditControllerDepository = ({
       new Controller('UXD', UXD_DECIMALS, uxdProgramId),
       authority,
       {
-        redeemableGlobalSupplyCap: form.decimalRedeemableGlobalSupplyCap,
+        redeemableGlobalSupplyCap: form.redeemableGlobalSupplyCap,
       },
       { preflightCommitment: 'processed', commitment: 'processed' }
     )
@@ -130,21 +130,21 @@ const EditControllerDepository = ({
       {redeemableGlobalSupplyCapChange ? (
         <Input
           label="Redeemable Global Supply Cap"
-          value={form.decimalRedeemableGlobalSupplyCap}
+          value={form.redeemableGlobalSupplyCap}
           type="number"
           min={0}
           max={10 ** 12}
           onChange={(evt) =>
             handleSetForm({
               value: evt.target.value,
-              propertyName: 'decimalRedeemableGlobalSupplyCap',
+              propertyName: 'redeemableGlobalSupplyCap',
             })
           }
-          error={formErrors['decimalRedeemableGlobalSupplyCap']}
+          error={formErrors['redeemableGlobalSupplyCap']}
         />
       ) : null}
     </>
   )
 }
 
-export default EditControllerDepository
+export default EditController

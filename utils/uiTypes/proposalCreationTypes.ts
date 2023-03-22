@@ -396,7 +396,7 @@ export interface UXDInitializeControllerForm {
 
 export interface UXDEditControllerForm {
   governedAccount?: AssetAccount
-  decimalRedeemableGlobalSupplyCap?: number
+  redeemableGlobalSupplyCap?: number
 }
 
 export interface UXDInitializeIdentityDepositoryForm {
