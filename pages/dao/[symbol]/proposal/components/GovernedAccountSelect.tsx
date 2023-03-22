@@ -132,6 +132,7 @@ const GovernedAccountSelect = ({
             programId,
             account.governance.pubkey
           ).then((walletAddress) => ({
+            //if there is materialized wallet we want to have it as main account of deduped wallet
             account: governedAccounts.find((x) =>
               x.extensions.transferAddress?.equals(walletAddress)
             )
