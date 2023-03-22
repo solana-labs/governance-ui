@@ -124,7 +124,7 @@ export const QUARRY_MINE_PROGRAM_INSTRUCTIONS = {
     },
 
     [quarryMineConfiguration.quarryMineProgramInstructions.claimRewards]: {
-      name: 'Quarry Mine - Create Miner',
+      name: 'Quarry Mine - Claim Rewards',
       accounts: [
         'Mint Wrapper',
         'Mint Wrapper Program',
