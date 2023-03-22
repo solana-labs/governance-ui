@@ -164,6 +164,13 @@ const IxGateSet = ({
       options: solAccounts,
     },
     {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
+    },
+    {
       label: 'Account Close',
       initialValue: form.AccountClose,
       type: InstructionInputType.SWITCH,
@@ -474,13 +481,6 @@ const IxGateSet = ({
       initialValue: form.AccountSettleFeesWithMngo,
       type: InstructionInputType.SWITCH,
       name: 'AccountSettleFeesWithMngo',
-    },
-    {
-      label: 'Instruction hold up time (days)',
-      initialValue: form.holdupTime,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'holdupTime',
     },
   ]
 

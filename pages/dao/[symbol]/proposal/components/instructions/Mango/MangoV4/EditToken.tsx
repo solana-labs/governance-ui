@@ -380,6 +380,13 @@ const EditToken = ({
       options: solAccounts,
     },
     {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
+    },
+    {
       label: 'Token',
       name: 'token',
       type: InstructionInputType.SELECT,
@@ -615,13 +622,6 @@ const EditToken = ({
       initialValue: form.reduceOnly,
       type: InstructionInputType.SWITCH,
       name: 'reduceOnly',
-    },
-    {
-      label: 'Instruction hold up time (days)',
-      initialValue: form.holdupTime,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'holdupTime',
     },
   ]
 

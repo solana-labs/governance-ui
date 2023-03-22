@@ -114,6 +114,13 @@ const AltSet = ({
       options: solAccounts,
     },
     {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
+    },
+    {
       label: 'Address Lookup Table',
       initialValue: form.addressLookupTable,
       type: InstructionInputType.INPUT,
@@ -125,13 +132,6 @@ const AltSet = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'index',
-    },
-    {
-      label: 'Instruction hold up time (days)',
-      initialValue: form.holdupTime,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'holdupTime',
     },
   ]
 

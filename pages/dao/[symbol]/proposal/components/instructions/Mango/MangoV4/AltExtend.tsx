@@ -120,6 +120,13 @@ const AltExtend = ({
       options: solAccounts,
     },
     {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
+    },
+    {
       label: 'Address Lookup Table',
       initialValue: form.addressLookupTable,
       type: InstructionInputType.INPUT,
@@ -138,13 +145,6 @@ const AltExtend = ({
       type: InstructionInputType.TEXTAREA,
       inputType: 'string',
       name: 'publicKeys',
-    },
-    {
-      label: 'Instruction hold up time (days)',
-      initialValue: form.holdupTime,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'holdupTime',
     },
   ]
 

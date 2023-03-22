@@ -161,6 +161,13 @@ const OpenBookRegisterMarket = ({
       options: solAccounts,
     },
     {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
+    },
+    {
       label: 'Name',
       initialValue: form.name,
       type: InstructionInputType.INPUT,
@@ -196,13 +203,6 @@ const OpenBookRegisterMarket = ({
       initialValue: form.openBookProgram,
       type: InstructionInputType.INPUT,
       name: 'openBookProgram',
-    },
-    {
-      label: 'Instruction hold up time (days)',
-      initialValue: form.holdupTime,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'holdupTime',
     },
   ]
 

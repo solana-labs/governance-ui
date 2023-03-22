@@ -347,6 +347,13 @@ const PerpEdit = ({
       options: solAccounts,
     },
     {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
+    },
+    {
       label: keyToLabel['perp'],
       name: 'perp',
       type: InstructionInputType.SELECT,
@@ -584,13 +591,6 @@ const PerpEdit = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'positivePnlLiquidationFee',
-    },
-    {
-      label: 'Instruction hold up time (days)',
-      initialValue: form.holdupTime,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'holdupTime',
     },
   ]
   return (
