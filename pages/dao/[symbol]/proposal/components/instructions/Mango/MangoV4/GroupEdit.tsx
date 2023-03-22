@@ -220,6 +220,13 @@ const GroupEdit = ({
       options: solAccounts,
     },
     {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
+    },
+    {
       label: keyToLabel['admin'],
       subtitle: getAdditionalLabelInfo('admin'),
       initialValue: form.admin,

@@ -22,6 +22,7 @@ interface AltSetForm {
   programId: string
   idlAccount: string
   buffer: string
+  holdupTime: number
 }
 
 const IdlSetBuffer = ({
@@ -46,6 +47,7 @@ const IdlSetBuffer = ({
     programId: '4MangoMjqJ2firMokCjjGgoK8d4MXcrgL7XJaL3w6fVg',
     idlAccount: '3foqXduY5PabCn6LjNrLo3waNf3Hy6vQgqavoVUCsUN9',
     buffer: '',
+    holdupTime: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -69,13 +71,13 @@ const IdlSetBuffer = ({
         form.governedAccount.extensions.transferAddress!,
         new PublicKey(form.idlAccount)
       )
-      console.log(ix)
       serializedInstruction = serializeInstructionToBase64(ix)
     }
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
+      customHoldUpTime: form.holdupTime,
     }
     return obj
   }
@@ -120,6 +122,13 @@ const IdlSetBuffer = ({
       shouldBeGoverned: shouldBeGoverned as any,
       governance: governance,
       options: solAccounts,
+    },
+    {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
     },
     {
       label: 'Program',

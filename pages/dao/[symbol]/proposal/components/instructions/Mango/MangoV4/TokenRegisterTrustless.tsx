@@ -140,6 +140,13 @@ const TokenRegisterTrustless = ({
       options: solAccounts,
     },
     {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
+    },
+    {
       label: 'Mint PublicKey',
       initialValue: form.mintPk,
       type: InstructionInputType.INPUT,
