@@ -376,6 +376,16 @@ export default function useGovernanceAssets() {
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Dual,
     },
+    [Instructions.DualFinanceLiquidityStakingOption]: {
+      name: 'Liquidity Staking Option',
+      isVisible: canUseTransferInstruction,
+      packageId: PackageEnum.Dual,
+    },
+    [Instructions.DualFinanceInitStrike]: {
+      name: 'Init Staking Option Strike',
+      isVisible: canUseTransferInstruction,
+      packageId: PackageEnum.Dual,
+    },
     [Instructions.DualFinanceExercise]: {
       name: 'Exercise',
       isVisible: canUseTransferInstruction,
