@@ -121,9 +121,7 @@ const CustomBase64 = ({
         error={formErrors['governedAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
-        type="token"
       />
-      {console.log(form.governedAccount)}
       <Input
         min={0}
         label="Hold up time (days)"
