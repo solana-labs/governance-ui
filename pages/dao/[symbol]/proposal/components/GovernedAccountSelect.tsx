@@ -74,7 +74,7 @@ const GovernedAccountSelect = ({
   type?: 'mint' | 'token' | 'wallet'
 }) => {
   const realm = useRealm()
-  const treasuryInfo = useTreasuryInfo()
+  const treasuryInfo = useTreasuryInfo(false)
   const { voteByCouncil } = useContext(NewProposalContext)
   const [wallets, setWallets] = useState<
     {
@@ -248,7 +248,7 @@ const GovernedAccountSelect = ({
         )
       : null
 
-    const programName = getAccountName(value.governance.account.governedAccount)
+    const programName = getAccountName(value.pubkey)
 
     return (
       <div className="grid grid-cols-[40px,1fr,max-content] gap-x-4 text-fgd-1 items-center w-full">
