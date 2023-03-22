@@ -22,6 +22,7 @@ interface AltExtendForm {
   index: number
   addressLookupTable: string
   publicKeys: string
+  holdupTime: number
 }
 
 const AltExtend = ({
@@ -46,6 +47,7 @@ const AltExtend = ({
     addressLookupTable: '',
     index: 0,
     publicKeys: '',
+    holdupTime: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -82,6 +84,7 @@ const AltExtend = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
+      customHoldUpTime: form.holdupTime,
     }
     return obj
   }
@@ -135,6 +138,13 @@ const AltExtend = ({
       type: InstructionInputType.TEXTAREA,
       inputType: 'string',
       name: 'publicKeys',
+    },
+    {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
     },
   ]
 

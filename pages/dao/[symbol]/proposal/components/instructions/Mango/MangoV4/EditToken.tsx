@@ -92,9 +92,10 @@ interface EditTokenForm {
   resetStablePrice: boolean
   resetNetBorrowLimit: boolean
   reduceOnly: boolean
+  holdupTime: number
 }
 
-const defaultFormValues = {
+const defaultFormValues: EditTokenForm = {
   governedAccount: null,
   token: null,
   oraclePk: '',
@@ -127,6 +128,7 @@ const defaultFormValues = {
   resetStablePrice: false,
   resetNetBorrowLimit: false,
   reduceOnly: false,
+  holdupTime: 0,
 }
 
 const EditToken = ({
@@ -275,6 +277,7 @@ const EditToken = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
+      customHoldUpTime: form.holdupTime,
     }
     return obj
   }
@@ -613,6 +616,13 @@ const EditToken = ({
       type: InstructionInputType.SWITCH,
       name: 'reduceOnly',
     },
+    {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
+    },
   ]
 
   return (
@@ -632,28 +642,27 @@ const EditToken = ({
               {Object.keys(defaultFormValues)
                 .filter((x) => x !== 'governedAccount')
                 .filter((x) => x !== 'token')
+                .filter((x) => x !== 'holdupTime')
                 .map((key) => (
-                  <>
-                    <div className="text-sm mb-3">
-                      <div className="mb-2">{keyToLabel[key]}</div>
-                      <div className="flex flex-row text-xs items-center">
-                        <Switch
-                          checked={
-                            forcedValues.find((x) => x === key) ? true : false
+                  <div className="text-sm mb-3" key={key}>
+                    <div className="mb-2">{keyToLabel[key]}</div>
+                    <div className="flex flex-row text-xs items-center">
+                      <Switch
+                        checked={
+                          forcedValues.find((x) => x === key) ? true : false
+                        }
+                        onChange={(checked) => {
+                          if (checked) {
+                            setForcedValues([...forcedValues, key])
+                          } else {
+                            setForcedValues([
+                              ...forcedValues.filter((x) => x !== key),
+                            ])
                           }
-                          onChange={(checked) => {
-                            if (checked) {
-                              setForcedValues([...forcedValues, key])
-                            } else {
-                              setForcedValues([
-                                ...forcedValues.filter((x) => x !== key),
-                              ])
-                            }
-                          }}
-                        />
-                      </div>
+                        }}
+                      />
                     </div>
-                  </>
+                  </div>
                 ))}
             </div>
           </AdvancedOptionsDropdown>

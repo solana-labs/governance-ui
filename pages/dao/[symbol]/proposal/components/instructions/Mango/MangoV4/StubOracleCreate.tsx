@@ -22,6 +22,7 @@ interface StubOracleCreateForm {
   governedAccount: AssetAccount | null
   price: number
   mintPk: string
+  holdupTime: number
 }
 
 const StubOracleCreate = ({
@@ -45,6 +46,7 @@ const StubOracleCreate = ({
     governedAccount: null,
     price: 0,
     mintPk: '',
+    holdupTime: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -80,6 +82,7 @@ const StubOracleCreate = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
+      customHoldUpTime: form.holdupTime,
     }
     return obj
   }
@@ -126,6 +129,13 @@ const StubOracleCreate = ({
       initialValue: form.mintPk,
       type: InstructionInputType.INPUT,
       name: 'mintPk',
+    },
+    {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
     },
   ]
 

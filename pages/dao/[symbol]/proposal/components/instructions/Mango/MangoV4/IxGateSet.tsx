@@ -18,7 +18,10 @@ import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { buildIxGate } from '@blockworks-foundation/mango-v4'
 import { IxGateParams } from '@blockworks-foundation/mango-v4/dist/types/src/clientIxParamBuilder'
 
-type IxGateSetForm = IxGateParams & { governedAccount: AssetAccount | null }
+type IxGateSetForm = IxGateParams & {
+  governedAccount: AssetAccount | null
+  holdupTime: number
+}
 
 const IxGateSet = ({
   index,
@@ -41,6 +44,7 @@ const IxGateSet = ({
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<IxGateSetForm>({
     governedAccount: null,
+    holdupTime: 0,
     AccountClose: true,
     AccountCreate: true,
     AccountEdit: true,
@@ -131,6 +135,7 @@ const IxGateSet = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
+      customHoldUpTime: form.holdupTime,
     }
     return obj
   }
@@ -469,6 +474,13 @@ const IxGateSet = ({
       initialValue: form.AccountSettleFeesWithMngo,
       type: InstructionInputType.SWITCH,
       name: 'AccountSettleFeesWithMngo',
+    },
+    {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
     },
   ]
 

@@ -21,6 +21,7 @@ interface AltSetForm {
   governedAccount: AssetAccount | null
   index: number
   addressLookupTable: string
+  holdupTime: number
 }
 
 const AltSet = ({
@@ -44,6 +45,7 @@ const AltSet = ({
     governedAccount: null,
     addressLookupTable: '',
     index: 0,
+    holdupTime: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -76,6 +78,7 @@ const AltSet = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
+      customHoldUpTime: form.holdupTime,
     }
     return obj
   }
@@ -122,6 +125,13 @@ const AltSet = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'index',
+    },
+    {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
     },
   ]
 
