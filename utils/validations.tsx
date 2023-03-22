@@ -833,9 +833,7 @@ export const getMintSchema = ({ form, connection }) => {
             val,
             form.mintAccount?.extensions.mint.account.decimals
           )
-          return !!(
-            form.mintAccount.governance?.account.governedAccount && mintValue
-          )
+          return !!(form.mintAccount.extensions.mint.publicKey && mintValue)
         }
         return this.createError({
           message: `Amount is required`,
@@ -853,7 +851,7 @@ export const getMintSchema = ({ form, connection }) => {
                 await validateDestinationAccAddressWithMint(
                   connection,
                   val,
-                  form.mintAccount.governance.account.governedAccount
+                  form.mintAccount.extensions.mint.publicKey
                 )
               } else {
                 return this.createError({

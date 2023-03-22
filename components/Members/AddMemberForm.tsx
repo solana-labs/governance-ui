@@ -153,7 +153,7 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
         tokenMint,
         tokenMint,
         new PublicKey(form.destinationAccount),
-        mintAccount.governance.pubkey,
+        mintAccount.extensions.mint!.account.mintAuthority!,
         new PublicKey(form.destinationAccount),
         getMintNaturalAmountFromDecimalAsBN(
           form.amount ?? 1,
