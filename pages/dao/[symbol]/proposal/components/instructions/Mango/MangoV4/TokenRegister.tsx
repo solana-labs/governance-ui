@@ -43,6 +43,7 @@ interface TokenRegisterForm {
   netBorrowLimitWindowSizeTs: number
   netBorrowLimitPerWindowQuote: number
   tokenIndex: number
+  holdupTime: number
 }
 
 const TokenRegister = ({
@@ -86,6 +87,7 @@ const TokenRegister = ({
     netBorrowLimitWindowSizeTs: 24 * 60 * 60,
     netBorrowLimitPerWindowQuote: toNative(1000000, 6).toNumber(),
     tokenIndex: 0,
+    holdupTime: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -149,6 +151,7 @@ const TokenRegister = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
+      customHoldUpTime: form.holdupTime,
     }
     return obj
   }
@@ -369,6 +372,13 @@ const TokenRegister = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'netBorrowLimitPerWindowQuote',
+    },
+    {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
     },
   ]
 

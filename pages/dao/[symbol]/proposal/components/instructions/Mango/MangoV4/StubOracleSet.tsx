@@ -22,6 +22,7 @@ interface StubOracleSetForm {
   governedAccount: AssetAccount | null
   price: number
   oraclePk: string
+  holdupTime: number
 }
 
 const StubOracleSet = ({
@@ -45,6 +46,7 @@ const StubOracleSet = ({
     governedAccount: null,
     price: 0,
     oraclePk: '',
+    holdupTime: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -77,6 +79,7 @@ const StubOracleSet = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
+      customHoldUpTime: form.holdupTime,
     }
     return obj
   }
@@ -123,6 +126,13 @@ const StubOracleSet = ({
       initialValue: form.oraclePk,
       type: InstructionInputType.INPUT,
       name: 'oraclePk',
+    },
+    {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
     },
   ]
 

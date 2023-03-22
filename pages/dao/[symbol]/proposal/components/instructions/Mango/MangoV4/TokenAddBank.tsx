@@ -26,6 +26,7 @@ type NamePkVal = {
 interface TokenAddBankForm {
   governedAccount: AssetAccount | null
   token: null | NamePkVal
+  holdupTime: number
 }
 
 const TokenAddBank = ({
@@ -49,6 +50,7 @@ const TokenAddBank = ({
   const [form, setForm] = useState<TokenAddBankForm>({
     governedAccount: null,
     token: null,
+    holdupTime: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -95,6 +97,7 @@ const TokenAddBank = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
+      customHoldUpTime: form.holdupTime,
     }
     return obj
   }
@@ -142,6 +145,13 @@ const TokenAddBank = ({
       type: InstructionInputType.SELECT,
       initialValue: form.token,
       options: tokens,
+    },
+    {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
     },
   ]
 

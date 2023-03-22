@@ -26,6 +26,7 @@ interface OpenBookRegisterMarketForm {
   openBookProgram: string
   marketIndex: number
   name: string
+  holdupTime: number
 }
 
 const OpenBookRegisterMarket = ({
@@ -56,6 +57,7 @@ const OpenBookRegisterMarket = ({
       connection.cluster === 'mainnet' ? 'mainnet-beta' : 'devnet'
     ].toBase58(),
     name: '',
+    holdupTime: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -92,6 +94,7 @@ const OpenBookRegisterMarket = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
+      customHoldUpTime: form.holdupTime,
     }
     return obj
   }
@@ -193,6 +196,13 @@ const OpenBookRegisterMarket = ({
       initialValue: form.openBookProgram,
       type: InstructionInputType.INPUT,
       name: 'openBookProgram',
+    },
+    {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
     },
   ]
 

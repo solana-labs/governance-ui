@@ -54,6 +54,7 @@ interface PerpCreateForm {
   settlePnlLimitWindowSize: number
   positivePnlLiquidationFee: number
   perpMarketIndex: number
+  holdupTime: number
 }
 
 const PerpCreate = ({
@@ -105,6 +106,7 @@ const PerpCreate = ({
     settlePnlLimitFactor: 1.0,
     settlePnlLimitWindowSize: 60 * 60,
     positivePnlLiquidationFee: 0,
+    holdupTime: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -221,6 +223,7 @@ const PerpCreate = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
+      customHoldUpTime: form.holdupTime,
     }
     return obj
   }
@@ -493,6 +496,13 @@ const PerpCreate = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'positivePnlLiquidationFee',
+    },
+    {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
     },
   ]
   return (

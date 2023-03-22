@@ -26,6 +26,7 @@ interface OpenBookEditMarketForm {
   governedAccount: AssetAccount | null
   market: NameMarketIndexVal | null
   reduceOnly: boolean
+  holdupTime: number
 }
 
 const OpenBookEditMarket = ({
@@ -49,6 +50,7 @@ const OpenBookEditMarket = ({
     governedAccount: null,
     reduceOnly: false,
     market: null,
+    holdupTime: 0,
   })
   const [currentMarkets, setCurrentMarkets] = useState<NameMarketIndexVal[]>([])
   const [formErrors, setFormErrors] = useState({})
@@ -86,6 +88,7 @@ const OpenBookEditMarket = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
+      customHoldUpTime: form.holdupTime,
     }
     return obj
   }
@@ -153,6 +156,13 @@ const OpenBookEditMarket = ({
       initialValue: form.reduceOnly,
       type: InstructionInputType.SWITCH,
       name: 'reduceOnly',
+    },
+    {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
     },
   ]
 

@@ -23,6 +23,7 @@ interface TokenRegisterTrustlessForm {
   oraclePk: string
   name: string
   tokenIndex: number
+  holdupTime: number
 }
 
 const TokenRegisterTrustless = ({
@@ -48,6 +49,7 @@ const TokenRegisterTrustless = ({
     oraclePk: '',
     name: '',
     tokenIndex: 0,
+    holdupTime: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -83,6 +85,7 @@ const TokenRegisterTrustless = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
+      customHoldUpTime: form.holdupTime,
     }
     return obj
   }
@@ -160,6 +163,13 @@ const TokenRegisterTrustless = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'tokenIndex',
+    },
+    {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
     },
   ]
 
