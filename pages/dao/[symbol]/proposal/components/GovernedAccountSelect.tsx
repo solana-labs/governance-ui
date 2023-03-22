@@ -166,12 +166,12 @@ const GovernedAccountSelect = ({
       return null
     }
 
-    const accountName = value.isSol
+    const name = value.isSol
       ? getSolAccountLabel(value).tokenAccountName
       : value.isToken
       ? getTokenAccountLabelInfo(value).tokenAccountName
       : getMintAccountLabelInfo(value).mintAccountName
-
+    const accountName = name ? name : getAccountName(wallet.walletAddress)
     const walletInfo = RE.isOk(treasuryInfo)
       ? treasuryInfo.data.wallets.find(
           (wallet) =>

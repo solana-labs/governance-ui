@@ -177,7 +177,8 @@ export async function getNFTsByOwner(owner: PublicKey, isDevnet?: boolean) {
         owner,
         tokenAccountAddress: await getAssociatedTokenAddress(
           nft.mint.address,
-          owner
+          owner,
+          true
         ).catch((e) => {
           console.error(e)
           return null
