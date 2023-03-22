@@ -132,7 +132,13 @@ const GovernedAccountSelect = ({
             programId,
             account.governance.pubkey
           ).then((walletAddress) => ({
-            account,
+            account: governedAccounts.find((x) =>
+              x.extensions.transferAddress?.equals(walletAddress)
+            )
+              ? governedAccounts.find((x) =>
+                  x.extensions.transferAddress?.equals(walletAddress)
+                )!
+              : account,
             governance: account.governance.pubkey,
             walletAddress,
           }))
