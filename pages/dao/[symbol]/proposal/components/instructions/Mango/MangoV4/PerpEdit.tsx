@@ -182,18 +182,18 @@ const PerpEdit = ({
         forcedValues
       )
 
-      const oracleConfFilter = getNullOrTransform(
-        values.oracleConfFilter,
-        null,
-        Number
-      )
-      const maxStalenessSlots = getNullOrTransform(
-        values.maxStalenessSlots,
-        null,
-        Number
-      )
+      const oracleConfFilter =
+        (form.oracleConfFilter as number | string) === ''
+          ? null
+          : form.oracleConfFilter
+      const maxStalenessSlots =
+        (form.maxStalenessSlots as number | string) === ''
+          ? null
+          : form.maxStalenessSlots
+
       const isThereNeedOfSendingOracleConfig =
-        oracleConfFilter || maxStalenessSlots
+        originalFormValues.oracleConfFilter !== oracleConfFilter ||
+        originalFormValues.maxStalenessSlots !== maxStalenessSlots
       //Mango instruction call and serialize
       const ix = await mangoClient!.program.methods
         .perpEditMarket(
@@ -591,13 +591,6 @@ const PerpEdit = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'positivePnlLiquidationFee',
-    },
-    {
-      label: 'Instruction hold up time (days)',
-      initialValue: form.holdupTime,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'holdupTime',
     },
   ]
   return (

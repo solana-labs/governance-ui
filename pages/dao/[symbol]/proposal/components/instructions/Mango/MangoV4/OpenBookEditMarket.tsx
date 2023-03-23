@@ -164,13 +164,6 @@ const OpenBookEditMarket = ({
       type: InstructionInputType.SWITCH,
       name: 'reduceOnly',
     },
-    {
-      label: 'Instruction hold up time (days)',
-      initialValue: form.holdupTime,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'holdupTime',
-    },
   ]
 
   return (

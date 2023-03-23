@@ -482,13 +482,6 @@ const IxGateSet = ({
       type: InstructionInputType.SWITCH,
       name: 'AccountSettleFeesWithMngo',
     },
-    {
-      label: 'Instruction hold up time (days)',
-      initialValue: form.holdupTime,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'holdupTime',
-    },
   ]
 
   return (

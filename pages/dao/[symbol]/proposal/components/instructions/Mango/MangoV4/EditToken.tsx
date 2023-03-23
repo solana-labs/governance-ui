@@ -183,19 +183,19 @@ const EditToken = ({
         form,
         forcedValues
       )
-      const oracleConfFilter = getNullOrTransform(
-        values.oracleConfFilter,
-        null,
-        Number
-      )
-      const maxStalenessSlots = getNullOrTransform(
-        values.maxStalenessSlots,
-        null,
-        Number
-      )
-      const isThereNeedOfSendingOracleConfig =
-        oracleConfFilter || maxStalenessSlots
 
+      const oracleConfFilter =
+        (form.oracleConfFilter as number | string) === ''
+          ? null
+          : form.oracleConfFilter
+      const maxStalenessSlots =
+        (form.maxStalenessSlots as number | string) === ''
+          ? null
+          : form.maxStalenessSlots
+
+      const isThereNeedOfSendingOracleConfig =
+        originalFormValues.oracleConfFilter !== oracleConfFilter ||
+        originalFormValues.maxStalenessSlots !== maxStalenessSlots
       const rateConfigs = {
         adjustmentFactor: getNullOrTransform(
           values.adjustmentFactor,
@@ -406,8 +406,8 @@ const EditToken = ({
       name: 'oraclePk',
     },
     {
-      label: keyToLabel['confFilter'],
-      subtitle: getAdditionalLabelInfo('confFilter'),
+      label: keyToLabel['oracleConfFilter'],
+      subtitle: getAdditionalLabelInfo('oracleConfFilter'),
       initialValue: form.oracleConfFilter,
       type: InstructionInputType.INPUT,
       inputType: 'number',
@@ -622,13 +622,6 @@ const EditToken = ({
       initialValue: form.reduceOnly,
       type: InstructionInputType.SWITCH,
       name: 'reduceOnly',
-    },
-    {
-      label: 'Instruction hold up time (days)',
-      initialValue: form.holdupTime,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'holdupTime',
     },
   ]
 
