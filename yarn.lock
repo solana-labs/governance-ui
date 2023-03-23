@@ -356,10 +356,10 @@
     toformat "^2.0.0"
     yargs "^17.0.1"
 
-"@blockworks-foundation/mango-v4@0.9.5":
-  version "0.9.5"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4/-/mango-v4-0.9.5.tgz#d931a85aa2fa3ff23feaf701dc41d67b0e7aaa01"
-  integrity sha512-osxZgbz+CNndIOk+eW29PRKI+NAWZzG3sFLAqsBzQOIi7ehHjNWUovX93EXbt6XLElf0HanX7gAH6tUiKsAsnA==
+"@blockworks-foundation/mango-v4@0.9.8":
+  version "0.9.8"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4/-/mango-v4-0.9.8.tgz#9126596faa3f49048efe98b5dbae377ab46ecbd4"
+  integrity sha512-eDDTNhqFay32C3tg79BGD+0lvkawDewVbKfQJ55gPD07p4oBdLNUmR83hdD/NxQbmT5v/DJmO2xLK66Bn/v9Mg==
   dependencies:
     "@coral-xyz/anchor" "^0.26.0"
     "@project-serum/serum" "0.13.65"
@@ -405,7 +405,7 @@
     borsh "^0.6.0"
     bs58 "4.0.1"
 
-"@bonfida/spl-name-service@0.1.47", "@bonfida/spl-name-service@^0.1.24", "@bonfida/spl-name-service@^0.1.50":
+"@bonfida/spl-name-service@0.1.47":
   version "0.1.47"
   resolved "https://registry.yarnpkg.com/@bonfida/spl-name-service/-/spl-name-service-0.1.47.tgz#bb5b22ccbbb3135d70f2fa3e7bbfaee0c2c7f3dc"
   integrity sha512-BQrdvWm27KJowPvCuWmDWNC4vtYOnBNK9i+PFzfhKAMxa0X58DYpmk7ZSQDr4/EklAK8aR2noUMfvBInlsIfgg==
@@ -413,7 +413,15 @@
     "@bonfida/name-offers" "^0.0.1"
     "@ethersproject/sha2" "^5.5.0"
 
-"@bundlr-network/client@0.7.15", "@bundlr-network/client@^0.8.8":
+"@bonfida/spl-name-service@^0.1.24", "@bonfida/spl-name-service@^0.1.50":
+  version "0.1.58"
+  resolved "https://registry.yarnpkg.com/@bonfida/spl-name-service/-/spl-name-service-0.1.58.tgz#4819c0d18e55495f3dac2437cc2fec59f64f3825"
+  integrity sha512-4M2RJViB+WFLwY5mvkC4A+u38j1+We2ODPG4OdllTWhUj4o3ncZQxQT5zxleEkdJH/eUhSHFVNcX/OB82c9/VA==
+  dependencies:
+    "@bonfida/name-offers" "^0.0.1"
+    "@ethersproject/sha2" "^5.5.0"
+
+"@bundlr-network/client@0.7.15":
   version "0.7.15"
   resolved "https://registry.yarnpkg.com/@bundlr-network/client/-/client-0.7.15.tgz#099c5edf287878465686bd01e29638958badabb1"
   integrity sha512-PzKH6VVyK/Ii5+rRwG7/5kcXZK0WeZGIng7xVtYaA8eb/SvIfaufTfJQl6ff3xnCA0QO0Fr6wkIWoXU5lHuEXA==
@@ -423,6 +431,31 @@
     "@supercharge/promise-pool" "^2.1.0"
     algosdk "^1.13.1"
     arbundles "^0.6.19"
+    arweave "^1.11.4"
+    async-retry "^1.3.3"
+    axios "^0.25.0"
+    base64url "^3.0.1"
+    bignumber.js "^9.0.1"
+    bs58 "^4.0.1"
+    commander "^8.2.0"
+    csv "^6.0.5"
+    ethers "^5.5.1"
+    inquirer "^8.2.0"
+    js-sha256 "^0.9.0"
+    mime-types "^2.1.34"
+    near-api-js "^0.44.2"
+    near-seed-phrase "^0.2.0"
+
+"@bundlr-network/client@^0.8.8":
+  version "0.8.9"
+  resolved "https://registry.yarnpkg.com/@bundlr-network/client/-/client-0.8.9.tgz#58e969a5d80f8d25d212d46bb7a060730a3c1736"
+  integrity sha512-SJ7BAt/KhONeFQ0+nbqrw2DUWrsev6y6cmlXt+3x7fPCkw7OJwudtxV/h2nBteZd65NXjqw8yzkmLiLfZ7CCRA==
+  dependencies:
+    "@solana/wallet-adapter-base" "^0.9.2"
+    "@solana/web3.js" "^1.36.0"
+    "@supercharge/promise-pool" "^2.1.0"
+    algosdk "^1.13.1"
+    arbundles "^0.6.21"
     arweave "^1.11.4"
     async-retry "^1.3.3"
     axios "^0.25.0"
@@ -849,10 +882,10 @@
     "@solana/web3.js" "^1.73.2"
     js-sha3 "^0.8.0"
 
-"@dual-finance/staking-options@0.0.18":
-  version "0.0.18"
-  resolved "https://registry.yarnpkg.com/@dual-finance/staking-options/-/staking-options-0.0.18.tgz#f91e71c988af93f813a74b2560de9319c0d1a770"
-  integrity sha512-peAHpk9CqE9Fy2TcRKvMJgMkqOny/6ftm23KcN9z9HYOJ1RTk74dcLNnB2bldHdwgZeCVHK2CuSAppEOQn+pjQ==
+"@dual-finance/staking-options@0.0.20":
+  version "0.0.20"
+  resolved "https://registry.yarnpkg.com/@dual-finance/staking-options/-/staking-options-0.0.20.tgz#797539c518c75dc88e63c348c89c4edf2115c426"
+  integrity sha512-BBIJpDAjAF38BDqTxqFV9x6zhYPGt7yOPz9kR3DZhBWD/01UB7U9ZVqC8thXcQwzPks7Yt+uJS2ppTlKlhCaRQ==
   dependencies:
     "@project-serum/anchor" "^0.25.0"
     "@solana/spl-token" "^0.3.6"
@@ -4305,12 +4338,12 @@
     bs58 "^5.0.0"
     js-base64 "^3.7.2"
 
-"@solana-mobile/mobile-wallet-adapter-protocol-web3js@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@solana-mobile/mobile-wallet-adapter-protocol-web3js/-/mobile-wallet-adapter-protocol-web3js-1.0.0.tgz#0969913909bf2d3d6c893d1b425daff64a5c1c44"
-  integrity sha512-dqFMDH+bqP4IL32cVh5TKXBO1pM6jloPEfCdvWJigtwTfBMYKL9G9itDSFs3PdUKgpVP3x6UQ2sm1FCZ7kWDgw==
+"@solana-mobile/mobile-wallet-adapter-protocol-web3js@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@solana-mobile/mobile-wallet-adapter-protocol-web3js/-/mobile-wallet-adapter-protocol-web3js-2.0.0.tgz#5433705c174f59a177280f85396df051711be09d"
+  integrity sha512-cMADp/UIAN42QJVCM1oyj1wFM/9DTZNIa5z5eHXUXBksw/bNv2fWkiO+4ZUoQj1P4UoMoZJUBx9+qMVl18sPOA==
   dependencies:
-    "@solana-mobile/mobile-wallet-adapter-protocol" "^1.0.0"
+    "@solana-mobile/mobile-wallet-adapter-protocol" "^2.0.0"
     bs58 "^5.0.0"
     js-base64 "^3.7.2"
 
@@ -4319,18 +4352,18 @@
   resolved "https://registry.yarnpkg.com/@solana-mobile/mobile-wallet-adapter-protocol/-/mobile-wallet-adapter-protocol-0.9.9.tgz#8b8e3f94f609e0e8c1149c0dbf1548adf18bfd4b"
   integrity sha512-Jxd3O3txeUiAXLIo6YfWhTs7UTVMlnIgz/xgdYmf99TSE4IaUhWGEVC2/OcOA7eAA85y0/XItU5OhHhXSPva8g==
 
-"@solana-mobile/mobile-wallet-adapter-protocol@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@solana-mobile/mobile-wallet-adapter-protocol/-/mobile-wallet-adapter-protocol-1.0.0.tgz#94a6be98a8cd6683469dc7071447ef12535fbd58"
-  integrity sha512-IU80gOfGHeHoCs5sqDYZx4xmXzDxtJorWFEitjvK3MOl44p6r+ZEWeIhFhGQwXxsDeIOSEhaqlGdwWEbaDjK7g==
+"@solana-mobile/mobile-wallet-adapter-protocol@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@solana-mobile/mobile-wallet-adapter-protocol/-/mobile-wallet-adapter-protocol-2.0.0.tgz#75a3e8163544f659803260cb1dd7aede6da96b36"
+  integrity sha512-mLK9B/AQgOxzbdRoOMH3G5wB5akWgGSBoVqIZ/6iDWY37uu/CuyX4lTwRyoRlOb8Cxs/tDwiovIGobkti2qF/w==
 
-"@solana-mobile/wallet-adapter-mobile@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@solana-mobile/wallet-adapter-mobile/-/wallet-adapter-mobile-1.0.0.tgz#c2a2adad6696801043043c0307623f89a40f0746"
-  integrity sha512-JRjQc3gB6DJWH/Tq0XoOJfUk8VONkDXmBnpCzbrBrrn3pi7jluqiXipiXpJiMCwRgoCCGN5n1OaTm4fyAas5Xg==
+"@solana-mobile/wallet-adapter-mobile@2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@solana-mobile/wallet-adapter-mobile/-/wallet-adapter-mobile-2.0.0.tgz#4429dec675e5a3339b7734521dd386d94bf3ad71"
+  integrity sha512-q/m0X+LUhoSYBUaQsw+9YhttbokA5+klrC2euLhbDu+Wy/n9hL4NXNvw7291bzVvNXVh9ovBi7DjoCdcfPXRWA==
   dependencies:
     "@react-native-async-storage/async-storage" "^1.17.7"
-    "@solana-mobile/mobile-wallet-adapter-protocol-web3js" "^1.0.0"
+    "@solana-mobile/mobile-wallet-adapter-protocol-web3js" "^2.0.0"
     "@solana/wallet-adapter-base" "^0.9.17"
     js-base64 "^3.7.2"
 
@@ -6699,7 +6732,7 @@ aproba@^1.0.3:
   resolved "https://registry.yarnpkg.com/aproba/-/aproba-2.0.0.tgz#52520b8ae5b569215b354efc0caa3fe1e45a8adc"
   integrity sha512-lYe4Gx7QT+MKGbDsA+Z+he/Wtef0BiwDOlK/XkBrdfsh9J/jPPXbX0tE9x9cl27Tmu5gg3QUbUrQYa/y+KOHPQ==
 
-arbundles@^0.6.19:
+arbundles@^0.6.19, arbundles@^0.6.21:
   version "0.6.22"
   resolved "https://registry.yarnpkg.com/arbundles/-/arbundles-0.6.22.tgz#0fd58ec76514f1d6c2db7c5870a6232314f52de6"
   integrity sha512-QlSavBHk59mNqgQ6ScxlqaBJlDbSmSrK/uTcF3HojLAZ/4aufTkVTBjl1hSfZ/ZN45oIPgJC05R8SmVARF+8VA==

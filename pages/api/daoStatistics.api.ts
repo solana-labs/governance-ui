@@ -21,8 +21,6 @@ import { WSOL_MINT_PK } from '@components/instructions/tools'
 import { withSentry } from '@sentry/nextjs'
 import { getRealmConfigAccountOrDefault } from '@tools/governance/configs'
 import { chunks } from '@utils/helpers'
-import { gql, request } from 'graphql-request'
-import { HOLAPLEX_GRAPQL_URL_MAINNET } from '@tools/constants'
 import { differenceInMinutes, minutesToMilliseconds } from 'date-fns'
 import { pause } from '@utils/pause'
 
@@ -50,38 +48,11 @@ async function getTokenAmount(conn: Connection, publicKey: PublicKey) {
   return value
 }
 
-const getGovernancesQuery = gql`
-  query($realm: PublicKey!) {
-    governances(realms: [$realm]) {
-      address
-    }
-  }
-`
-
 async function getGovernances(
   conn: Connection,
   programId: PublicKey,
   realm: PublicKey
 ): Promise<PublicKey[]> {
-  try {
-    const resp = await request(
-      HOLAPLEX_GRAPQL_URL_MAINNET,
-      getGovernancesQuery,
-      { realm }
-    )
-
-    if (!resp.governances || resp.governances.length === 0) {
-      throw new Error()
-    }
-
-    return resp.governances.map((g) => new PublicKey(g.address))
-  } catch (e) {
-    console.error(
-      `Failed to fetch governances for ${realm.toBase58()} using Holaplex, will try using PRC`
-    )
-    console.error(e)
-  }
-
   const governances = await getAllGovernances(conn, programId, realm)
   return governances.map((g) => g.pubkey)
 }

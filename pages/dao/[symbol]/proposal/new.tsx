@@ -127,6 +127,9 @@ import PsyFinanceExerciseOption from './components/instructions/PsyFinance/Exerc
 import RevokeGoverningTokens from './components/instructions/SplGov/RevokeGoverningTokens'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import SetMintAuthority from './components/instructions/SetMintAuthroity'
+import LiquidityStakingOption from './components/instructions/Dual/LiquidityStakingOption'
+import InitStrike from './components/instructions/Dual/InitStrike'
+import IdlSetBuffer from './components/instructions/Mango/MangoV4/IdlSetBuffer'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -417,6 +420,7 @@ const New = () => {
       [Instructions.MangoV4TokenRegister]: TokenRegister,
       [Instructions.MangoV4TokenEdit]: EditToken,
       [Instructions.MangoV4GroupEdit]: GroupEdit,
+      [Instructions.IdlSetBuffer]: IdlSetBuffer,
       [Instructions.MangoV4OpenBookEditMarket]: OpenBookEditMarket,
       [Instructions.MangoV4IxGateSet]: IxGateSet,
       [Instructions.MangoV4AltExtend]: AltExtend,
@@ -438,6 +442,8 @@ const New = () => {
       [Instructions.DepositIntoCastle]: CastleDeposit,
       [Instructions.DualFinanceAirdrop]: DualAirdrop,
       [Instructions.DualFinanceStakingOption]: StakingOption,
+      [Instructions.DualFinanceInitStrike]: InitStrike,
+      [Instructions.DualFinanceLiquidityStakingOption]: LiquidityStakingOption,
       [Instructions.DualFinanceWithdraw]: DualWithdraw,
       [Instructions.DualFinanceExercise]: DualExercise,
       [Instructions.MeanCreateAccount]: MeanCreateAccount,

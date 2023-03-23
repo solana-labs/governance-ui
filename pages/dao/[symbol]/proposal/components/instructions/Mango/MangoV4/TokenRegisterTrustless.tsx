@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
-import useRealm from '@hooks/useRealm'
 import { PublicKey, SYSVAR_RENT_PUBKEY } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid, validatePubkey } from '@utils/formValidation'
@@ -24,6 +23,7 @@ interface TokenRegisterTrustlessForm {
   oraclePk: string
   name: string
   tokenIndex: number
+  holdupTime: number
 }
 
 const TokenRegisterTrustless = ({
@@ -35,7 +35,6 @@ const TokenRegisterTrustless = ({
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const { mangoClient, mangoGroup } = UseMangoV4()
-  const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const solAccounts = assetAccounts.filter(
     (x) =>
@@ -44,13 +43,13 @@ const TokenRegisterTrustless = ({
       x.extensions.transferAddress?.equals(mangoGroup?.fastListingAdmin)
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<TokenRegisterTrustlessForm>({
     governedAccount: null,
     mintPk: '',
     oraclePk: '',
     name: '',
     tokenIndex: 0,
+    holdupTime: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -65,7 +64,6 @@ const TokenRegisterTrustless = ({
     let serializedInstruction = ''
     if (
       isValid &&
-      programId &&
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
@@ -87,6 +85,7 @@ const TokenRegisterTrustless = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
+      customHoldUpTime: form.holdupTime,
     }
     return obj
   }
@@ -141,6 +140,13 @@ const TokenRegisterTrustless = ({
       options: solAccounts,
     },
     {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
+    },
+    {
       label: 'Mint PublicKey',
       initialValue: form.mintPk,
       type: InstructionInputType.INPUT,
@@ -164,6 +170,13 @@ const TokenRegisterTrustless = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'tokenIndex',
+    },
+    {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
     },
   ]
 

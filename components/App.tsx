@@ -74,18 +74,32 @@ export function App(props: Props) {
   )
   const { getNfts } = useTreasuryAccountStore()
   const { getOwnedDeposits, resetDepositState } = useDepositStore()
-  const { realm, ownTokenRecord, realmInfo, symbol, config } = useRealm()
+  const {
+    realm,
+    ownTokenRecord,
+    realmInfo,
+    symbol,
+    config,
+    ownDelegateTokenRecords,
+    ownDelegateCouncilTokenRecords,
+  } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const prevStringifyPossibleNftsAccounts = usePrevious(
     JSON.stringify(possibleNftsAccounts)
   )
+  const walletId = wallet?.publicKey?.toBase58()
   const router = useRouter()
   const { cluster } = router.query
   const updateSerumGovAccounts = useSerumGovStore(
     (s) => s.actions.updateSerumGovAccounts
   )
+  const {
+    actions,
+    selectedCommunityDelegate,
+    selectedCouncilDelegate,
+  } = useWalletStore((s) => s)
 
   const realmName = realmInfo?.displayName ?? realm?.account?.name
   const title = realmName ? `${realmName}` : 'Realms'
@@ -147,6 +161,37 @@ export function App(props: Props) {
     updateSerumGovAccounts(cluster as string | undefined)
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [cluster])
+
+  useEffect(() => {
+    if (
+      ownDelegateCouncilTokenRecords &&
+      ownDelegateCouncilTokenRecords.length > 0
+    ) {
+      actions.selectCouncilDelegate(
+        ownDelegateCouncilTokenRecords[0]?.account?.governingTokenOwner?.toBase58()
+      )
+    } else {
+      actions.selectCouncilDelegate(undefined)
+    }
+
+    if (ownDelegateTokenRecords && ownDelegateTokenRecords.length > 0) {
+      actions.selectCommunityDelegate(
+        ownDelegateTokenRecords[0]?.account?.governingTokenOwner?.toBase58()
+      )
+    } else {
+      actions.selectCommunityDelegate(undefined)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+  }, [
+    walletId,
+    ownDelegateTokenRecords?.map((x) => x.pubkey.toBase58()).toString(),
+    ownDelegateCouncilTokenRecords?.map((x) => x.pubkey.toBase58()).toString(),
+  ])
+  // whenever we change delegate, get that delegates vote record so we can display it
+  useEffect(() => {
+    actions.fetchDelegateVoteRecords()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+  }, [selectedCommunityDelegate, selectedCouncilDelegate])
 
   return (
     <div className="relative bg-bkg-1 text-fgd-1">

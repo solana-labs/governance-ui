@@ -618,6 +618,19 @@ export const getDualFinanceMerkleAirdropSchema = () => {
   })
 }
 
+export const getDualFinanceLiquidityStakingOptionSchema = () => {
+  return yup.object().shape({
+    optionExpirationUnixSeconds: yup
+      .number()
+      .typeError('Expiration is required'),
+    numTokens: yup.number().typeError('Num tokens is required'),
+    lotSize: yup.number().typeError('lotSize is required'),
+    baseTreasury: yup.object().typeError('baseTreasury is required'),
+    quoteTreasury: yup.object().typeError('quoteTreasury is required'),
+    payer: yup.object().typeError('payer is required'),
+  })
+}
+
 export const getDualFinanceStakingOptionSchema = () => {
   return yup.object().shape({
     soName: yup.string().required('Staking option name is required'),
@@ -631,6 +644,15 @@ export const getDualFinanceStakingOptionSchema = () => {
     baseTreasury: yup.object().typeError('baseTreasury is required'),
     quoteTreasury: yup.object().typeError('quoteTreasury is required'),
     payer: yup.object().typeError('payer is required'),
+  })
+}
+
+export const getDualFinanceInitStrikeSchema = () => {
+  return yup.object().shape({
+    soName: yup.string().required('Staking option name is required'),
+    strikes: yup.string().typeError('Strike is required'),
+    payer: yup.object().typeError('payer is required'),
+    baseTreasury: yup.object().typeError('baseTreasury is required'),
   })
 }
 
@@ -833,9 +855,7 @@ export const getMintSchema = ({ form, connection }) => {
             val,
             form.mintAccount?.extensions.mint.account.decimals
           )
-          return !!(
-            form.mintAccount.governance?.account.governedAccount && mintValue
-          )
+          return !!(form.mintAccount.extensions.mint.publicKey && mintValue)
         }
         return this.createError({
           message: `Amount is required`,
@@ -853,7 +873,7 @@ export const getMintSchema = ({ form, connection }) => {
                 await validateDestinationAccAddressWithMint(
                   connection,
                   val,
-                  form.mintAccount.governance.account.governedAccount
+                  form.mintAccount.extensions.mint.publicKey
                 )
               } else {
                 return this.createError({

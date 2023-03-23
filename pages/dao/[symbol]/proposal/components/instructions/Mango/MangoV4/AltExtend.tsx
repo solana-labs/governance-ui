@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
-import useRealm from '@hooks/useRealm'
 import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid, validatePubkey } from '@utils/formValidation'
@@ -23,6 +22,7 @@ interface AltExtendForm {
   index: number
   addressLookupTable: string
   publicKeys: string
+  holdupTime: number
 }
 
 const AltExtend = ({
@@ -34,7 +34,6 @@ const AltExtend = ({
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const { mangoClient, mangoGroup } = UseMangoV4()
-  const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const solAccounts = assetAccounts.filter(
     (x) =>
@@ -43,12 +42,12 @@ const AltExtend = ({
       x.extensions.transferAddress?.equals(mangoGroup.admin)
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<AltExtendForm>({
     governedAccount: null,
     addressLookupTable: '',
     index: 0,
     publicKeys: '',
+    holdupTime: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -62,7 +61,6 @@ const AltExtend = ({
     let serializedInstruction = ''
     if (
       isValid &&
-      programId &&
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
@@ -86,6 +84,7 @@ const AltExtend = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
+      customHoldUpTime: form.holdupTime,
     }
     return obj
   }
@@ -121,6 +120,13 @@ const AltExtend = ({
       options: solAccounts,
     },
     {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
+    },
+    {
       label: 'Address Lookup Table',
       initialValue: form.addressLookupTable,
       type: InstructionInputType.INPUT,
@@ -139,6 +145,13 @@ const AltExtend = ({
       type: InstructionInputType.TEXTAREA,
       inputType: 'string',
       name: 'publicKeys',
+    },
+    {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
     },
   ]
 

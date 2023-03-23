@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
-import useRealm from '@hooks/useRealm'
 import { AccountMeta, PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid, validatePubkey } from '@utils/formValidation'
@@ -93,9 +92,10 @@ interface EditTokenForm {
   resetStablePrice: boolean
   resetNetBorrowLimit: boolean
   reduceOnly: boolean
+  holdupTime: number
 }
 
-const defaultFormValues = {
+const defaultFormValues: EditTokenForm = {
   governedAccount: null,
   token: null,
   oraclePk: '',
@@ -128,6 +128,7 @@ const defaultFormValues = {
   resetStablePrice: false,
   resetNetBorrowLimit: false,
   reduceOnly: false,
+  holdupTime: 0,
 }
 
 const EditToken = ({
@@ -139,7 +140,6 @@ const EditToken = ({
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const { getAdditionalLabelInfo, mangoClient, mangoGroup } = UseMangoV4()
-  const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const [forcedValues, setForcedValues] = useState<string[]>([])
   const solAccounts = assetAccounts.filter(
@@ -152,7 +152,6 @@ const EditToken = ({
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [tokens, setTokens] = useState<NamePkVal[]>([])
-  const programId: PublicKey | undefined = realmInfo?.programId
   const [originalFormValues, setOriginalFormValues] = useState<EditTokenForm>({
     ...defaultFormValues,
   })
@@ -172,7 +171,6 @@ const EditToken = ({
     let serializedInstruction = ''
     if (
       isValid &&
-      programId &&
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
@@ -256,7 +254,7 @@ const EditToken = ({
           values.resetStablePrice,
           values.resetNetBorrowLimit,
           values.reduceOnly,
-          getNullOrTransform(values.name, null)
+          getNullOrTransform(values.name, null, String)
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -279,6 +277,7 @@ const EditToken = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
+      customHoldUpTime: form.holdupTime,
     }
     return obj
   }
@@ -379,6 +378,13 @@ const EditToken = ({
       shouldBeGoverned: shouldBeGoverned as any,
       governance: governance,
       options: solAccounts,
+    },
+    {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
     },
     {
       label: 'Token',
@@ -617,6 +623,13 @@ const EditToken = ({
       type: InstructionInputType.SWITCH,
       name: 'reduceOnly',
     },
+    {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
+    },
   ]
 
   return (
@@ -636,28 +649,27 @@ const EditToken = ({
               {Object.keys(defaultFormValues)
                 .filter((x) => x !== 'governedAccount')
                 .filter((x) => x !== 'token')
+                .filter((x) => x !== 'holdupTime')
                 .map((key) => (
-                  <>
-                    <div className="text-sm mb-3">
-                      <div className="mb-2">{keyToLabel[key]}</div>
-                      <div className="flex flex-row text-xs items-center">
-                        <Switch
-                          checked={
-                            forcedValues.find((x) => x === key) ? true : false
+                  <div className="text-sm mb-3" key={key}>
+                    <div className="mb-2">{keyToLabel[key]}</div>
+                    <div className="flex flex-row text-xs items-center">
+                      <Switch
+                        checked={
+                          forcedValues.find((x) => x === key) ? true : false
+                        }
+                        onChange={(checked) => {
+                          if (checked) {
+                            setForcedValues([...forcedValues, key])
+                          } else {
+                            setForcedValues([
+                              ...forcedValues.filter((x) => x !== key),
+                            ])
                           }
-                          onChange={(checked) => {
-                            if (checked) {
-                              setForcedValues([...forcedValues, key])
-                            } else {
-                              setForcedValues([
-                                ...forcedValues.filter((x) => x !== key),
-                              ])
-                            }
-                          }}
-                        />
-                      </div>
+                        }}
+                      />
                     </div>
-                  </>
+                  </div>
                 ))}
             </div>
           </AdvancedOptionsDropdown>

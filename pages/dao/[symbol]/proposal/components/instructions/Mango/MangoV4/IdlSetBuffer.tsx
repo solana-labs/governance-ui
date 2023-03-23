@@ -1,31 +1,31 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
-import { PublicKey } from '@solana/web3.js'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid, validatePubkey } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
-import { NewProposalContext } from '../../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
+import UseMangoV4 from '@hooks/useMangoV4'
+import { NewProposalContext } from '../../../../new'
 import InstructionForm, {
   InstructionInput,
   InstructionInputType,
 } from '../../FormCreator'
-import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
-import { I80F48 } from '@blockworks-foundation/mango-v4'
 
-interface StubOracleCreateForm {
+interface AltSetForm {
   governedAccount: AssetAccount | null
-  price: number
-  mintPk: string
+  programId: string
+  idlAccount: string
+  buffer: string
   holdupTime: number
 }
 
-const StubOracleCreate = ({
+const IdlSetBuffer = ({
   index,
   governance,
 }: {
@@ -33,7 +33,7 @@ const StubOracleCreate = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { mangoClient, mangoGroup } = UseMangoV4()
+  const { mangoGroup } = UseMangoV4()
   const { assetAccounts } = useGovernanceAssets()
   const solAccounts = assetAccounts.filter(
     (x) =>
@@ -42,10 +42,11 @@ const StubOracleCreate = ({
       x.extensions.transferAddress?.equals(mangoGroup.admin)
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const [form, setForm] = useState<StubOracleCreateForm>({
+  const [form, setForm] = useState<AltSetForm>({
     governedAccount: null,
-    price: 0,
-    mintPk: '',
+    programId: '4MangoMjqJ2firMokCjjGgoK8d4MXcrgL7XJaL3w6fVg',
+    idlAccount: '3foqXduY5PabCn6LjNrLo3waNf3Hy6vQgqavoVUCsUN9',
+    buffer: '',
     holdupTime: 0,
   })
   const [formErrors, setFormErrors] = useState({})
@@ -64,18 +65,12 @@ const StubOracleCreate = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const ix = await mangoClient!.program.methods
-        .stubOracleCreate({
-          val: I80F48.fromNumber(Number(form.price)).getData(),
-        })
-        .accounts({
-          group: mangoGroup!.publicKey,
-          admin: form.governedAccount.extensions.transferAddress,
-          mint: new PublicKey(form.mintPk),
-          payer: form.governedAccount.extensions.transferAddress,
-        })
-        .instruction()
-
+      const ix = await createIdlUpgradeInstruction(
+        new PublicKey(form.programId),
+        new PublicKey(form.buffer),
+        form.governedAccount.extensions.transferAddress!,
+        new PublicKey(form.idlAccount)
+      )
       serializedInstruction = serializeInstructionToBase64(ix)
     }
     const obj: UiInstruction = {
@@ -99,11 +94,22 @@ const StubOracleCreate = ({
       .object()
       .nullable()
       .required('Program governed account is required'),
-    price: yup.string().required(),
-    mintPk: yup
+    programId: yup
       .string()
       .required()
-      .test('is-valid-address', 'Please enter a valid PublicKey', (value) =>
+      .test('is-valid-programId', 'Please enter a valid PublicKey', (value) =>
+        value ? validatePubkey(value) : true
+      ),
+    idlAccount: yup
+      .string()
+      .required()
+      .test('is-idl-account', 'Please enter a valid PublicKey', (value) =>
+        value ? validatePubkey(value) : true
+      ),
+    buffer: yup
+      .string()
+      .required()
+      .test('is-buffer', 'Please enter a valid PublicKey', (value) =>
         value ? validatePubkey(value) : true
       ),
   })
@@ -125,24 +131,22 @@ const StubOracleCreate = ({
       name: 'holdupTime',
     },
     {
-      label: 'Price',
-      initialValue: form.price,
+      label: 'Program',
+      initialValue: form.programId,
       type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'price',
+      name: 'programId',
     },
     {
-      label: 'Mint',
-      initialValue: form.mintPk,
+      label: 'Idl Account',
+      initialValue: form.idlAccount,
       type: InstructionInputType.INPUT,
-      name: 'mintPk',
+      name: 'idlAccount',
     },
     {
-      label: 'Instruction hold up time (days)',
-      initialValue: form.holdupTime,
+      label: 'Buffer',
+      initialValue: form.buffer,
       type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'holdupTime',
+      name: 'buffer',
     },
   ]
 
@@ -161,4 +165,40 @@ const StubOracleCreate = ({
   )
 }
 
-export default StubOracleCreate
+export default IdlSetBuffer
+
+export async function createIdlUpgradeInstruction(
+  programId: PublicKey,
+  bufferAddress: PublicKey,
+  upgradeAuthority: PublicKey,
+  idlAccount: PublicKey
+) {
+  const prefix = Buffer.from('0a69e9a778bcf440', 'hex')
+  const ixn = Buffer.from('03', 'hex')
+  const data = Buffer.concat([prefix.reverse(), ixn])
+  const idlAddr = idlAccount
+
+  const keys = [
+    {
+      pubkey: bufferAddress,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: idlAddr,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: upgradeAuthority,
+      isWritable: true,
+      isSigner: true,
+    },
+  ]
+
+  return new TransactionInstruction({
+    keys,
+    programId,
+    data,
+  })
+}
