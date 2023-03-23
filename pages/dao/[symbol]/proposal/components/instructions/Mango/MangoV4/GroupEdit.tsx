@@ -309,13 +309,6 @@ const GroupEdit = ({
       inputType: 'number',
       name: 'feesExpiryInterval',
     },
-    {
-      label: 'Instruction hold up time (days)',
-      initialValue: form.holdupTime,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'holdupTime',
-    },
   ]
 
   return (

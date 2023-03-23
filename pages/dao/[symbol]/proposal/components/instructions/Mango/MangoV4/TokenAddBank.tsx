@@ -153,13 +153,6 @@ const TokenAddBank = ({
       initialValue: form.token,
       options: tokens,
     },
-    {
-      label: 'Instruction hold up time (days)',
-      initialValue: form.holdupTime,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'holdupTime',
-    },
   ]
 
   return (

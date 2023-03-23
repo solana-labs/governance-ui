@@ -504,13 +504,6 @@ const PerpCreate = ({
       inputType: 'number',
       name: 'positivePnlLiquidationFee',
     },
-    {
-      label: 'Instruction hold up time (days)',
-      initialValue: form.holdupTime,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'holdupTime',
-    },
   ]
   return (
     <>
