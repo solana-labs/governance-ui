@@ -882,10 +882,10 @@
     "@solana/web3.js" "^1.73.2"
     js-sha3 "^0.8.0"
 
-"@dual-finance/staking-options@0.0.18":
-  version "0.0.18"
-  resolved "https://registry.yarnpkg.com/@dual-finance/staking-options/-/staking-options-0.0.18.tgz#f91e71c988af93f813a74b2560de9319c0d1a770"
-  integrity sha512-peAHpk9CqE9Fy2TcRKvMJgMkqOny/6ftm23KcN9z9HYOJ1RTk74dcLNnB2bldHdwgZeCVHK2CuSAppEOQn+pjQ==
+"@dual-finance/staking-options@0.0.20":
+  version "0.0.20"
+  resolved "https://registry.yarnpkg.com/@dual-finance/staking-options/-/staking-options-0.0.20.tgz#797539c518c75dc88e63c348c89c4edf2115c426"
+  integrity sha512-BBIJpDAjAF38BDqTxqFV9x6zhYPGt7yOPz9kR3DZhBWD/01UB7U9ZVqC8thXcQwzPks7Yt+uJS2ppTlKlhCaRQ==
   dependencies:
     "@project-serum/anchor" "^0.25.0"
     "@solana/spl-token" "^0.3.6"
@@ -4945,7 +4945,7 @@
   dependencies:
     "@solana/wallet-adapter-base" "^0.9.22"
 
-"@solana/wallet-adapter-walletconnect@^0.1.14", "@solana/wallet-adapter-walletconnect@^0.1.6":
+"@solana/wallet-adapter-walletconnect@0.1.14", "@solana/wallet-adapter-walletconnect@^0.1.14", "@solana/wallet-adapter-walletconnect@^0.1.6":
   version "0.1.14"
   resolved "https://registry.yarnpkg.com/@solana/wallet-adapter-walletconnect/-/wallet-adapter-walletconnect-0.1.14.tgz#6994077781880b1a86fda27e000e947ed7764609"
   integrity sha512-nz8BB1Gs9s2yLuAf1+wDyZoGxCAVi1XWpzVlXMRBD7oL7Bn3kx3SOohzgoOKQltTrye4PF4cl+KCStzY3zQfkg==

@@ -52,6 +52,18 @@ const Input = ({
   subtitle,
   ...props
 }: InputProps) => {
+  const numberInputOnWheelPreventChange = (e) => {
+    // Prevent the input value change
+    e.target.blur()
+
+    // Prevent the page/container scrolling
+    e.stopPropagation()
+
+    // Refocus immediately, on the next tick (after the current     function is done)
+    setTimeout(() => {
+      e.target.focus()
+    }, 0)
+  }
   return (
     <div className={`flex flex-col relative ${wrapperClassName}`}>
       {label && <StyledLabel>{label}</StyledLabel>}
@@ -64,6 +76,7 @@ const Input = ({
         </div>
       ) : null}
       <input
+        onWheel={numberInputOnWheelPreventChange}
         max={max}
         min={min}
         type={type}

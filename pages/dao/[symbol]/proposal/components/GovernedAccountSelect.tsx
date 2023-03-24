@@ -74,7 +74,7 @@ const GovernedAccountSelect = ({
   type?: 'mint' | 'token' | 'wallet'
 }) => {
   const realm = useRealm()
-  const treasuryInfo = useTreasuryInfo()
+  const treasuryInfo = useTreasuryInfo(false)
   const { voteByCouncil } = useContext(NewProposalContext)
   const [wallets, setWallets] = useState<
     {
@@ -132,7 +132,14 @@ const GovernedAccountSelect = ({
             programId,
             account.governance.pubkey
           ).then((walletAddress) => ({
-            account,
+            //if there is materialized wallet we want to have it as main account of deduped wallet
+            account: governedAccounts.find((x) =>
+              x.extensions.transferAddress?.equals(walletAddress)
+            )
+              ? governedAccounts.find((x) =>
+                  x.extensions.transferAddress?.equals(walletAddress)
+                )!
+              : account,
             governance: account.governance.pubkey,
             walletAddress,
           }))
@@ -166,12 +173,12 @@ const GovernedAccountSelect = ({
       return null
     }
 
-    const accountName = value.isSol
+    const name = value.isSol
       ? getSolAccountLabel(value).tokenAccountName
       : value.isToken
       ? getTokenAccountLabelInfo(value).tokenAccountName
       : getMintAccountLabelInfo(value).mintAccountName
-
+    const accountName = name ? name : getAccountName(wallet.walletAddress)
     const walletInfo = RE.isOk(treasuryInfo)
       ? treasuryInfo.data.wallets.find(
           (wallet) =>
@@ -248,7 +255,7 @@ const GovernedAccountSelect = ({
         )
       : null
 
-    const programName = getAccountName(value.governance.account.governedAccount)
+    const programName = getAccountName(value.pubkey)
 
     return (
       <div className="grid grid-cols-[40px,1fr,max-content] gap-x-4 text-fgd-1 items-center w-full">

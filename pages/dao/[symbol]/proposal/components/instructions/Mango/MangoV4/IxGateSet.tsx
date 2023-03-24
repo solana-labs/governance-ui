@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
-import useRealm from '@hooks/useRealm'
-import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
@@ -20,7 +18,10 @@ import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { buildIxGate } from '@blockworks-foundation/mango-v4'
 import { IxGateParams } from '@blockworks-foundation/mango-v4/dist/types/src/clientIxParamBuilder'
 
-type IxGateSetForm = IxGateParams & { governedAccount: AssetAccount | null }
+type IxGateSetForm = IxGateParams & {
+  governedAccount: AssetAccount | null
+  holdupTime: number
+}
 
 const IxGateSet = ({
   index,
@@ -31,7 +32,6 @@ const IxGateSet = ({
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const { mangoClient, mangoGroup } = UseMangoV4()
-  const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const solAccounts = assetAccounts.filter(
     (x) =>
@@ -42,9 +42,9 @@ const IxGateSet = ({
           x.extensions.transferAddress?.equals(mangoGroup.securityAdmin)))
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<IxGateSetForm>({
     governedAccount: null,
+    holdupTime: 0,
     AccountClose: true,
     AccountCreate: true,
     AccountEdit: true,
@@ -111,7 +111,6 @@ const IxGateSet = ({
     let serializedInstruction = ''
     if (
       isValid &&
-      programId &&
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
@@ -136,6 +135,7 @@ const IxGateSet = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
+      customHoldUpTime: form.holdupTime,
     }
     return obj
   }
@@ -162,6 +162,13 @@ const IxGateSet = ({
       shouldBeGoverned: shouldBeGoverned as any,
       governance: governance,
       options: solAccounts,
+    },
+    {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
     },
     {
       label: 'Account Close',

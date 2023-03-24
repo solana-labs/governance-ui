@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
-import useRealm from '@hooks/useRealm'
 import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid, validatePubkey } from '@utils/formValidation'
@@ -94,6 +93,7 @@ interface PerpEditForm {
   reduceOnly: boolean
   resetStablePrice: boolean
   positivePnlLiquidationFee: number
+  holdupTime: number
 }
 
 const defaultFormValues = {
@@ -129,6 +129,7 @@ const defaultFormValues = {
   reduceOnly: false,
   resetStablePrice: false,
   positivePnlLiquidationFee: 0,
+  holdupTime: 0,
 }
 
 const PerpEdit = ({
@@ -140,7 +141,6 @@ const PerpEdit = ({
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const { mangoClient, mangoGroup, getAdditionalLabelInfo } = UseMangoV4()
-  const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const [perps, setPerps] = useState<NameMarketIndexVal[]>([])
   const [forcedValues, setForcedValues] = useState<string[]>([])
@@ -153,7 +153,6 @@ const PerpEdit = ({
           x.extensions.transferAddress?.equals(mangoGroup.securityAdmin)))
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<PerpEditForm>({ ...defaultFormValues })
   const [originalFormValues, setOriginalFormValues] = useState<PerpEditForm>({
     ...defaultFormValues,
@@ -171,7 +170,6 @@ const PerpEdit = ({
     let serializedInstruction = ''
     if (
       isValid &&
-      programId &&
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
@@ -184,18 +182,18 @@ const PerpEdit = ({
         forcedValues
       )
 
-      const oracleConfFilter = getNullOrTransform(
-        values.oracleConfFilter,
-        null,
-        Number
-      )
-      const maxStalenessSlots = getNullOrTransform(
-        values.maxStalenessSlots,
-        null,
-        Number
-      )
+      const oracleConfFilter =
+        (form.oracleConfFilter as number | string) === ''
+          ? null
+          : form.oracleConfFilter
+      const maxStalenessSlots =
+        (form.maxStalenessSlots as number | string) === ''
+          ? null
+          : form.maxStalenessSlots
+
       const isThereNeedOfSendingOracleConfig =
-        oracleConfFilter || maxStalenessSlots
+        originalFormValues.oracleConfFilter !== oracleConfFilter ||
+        originalFormValues.maxStalenessSlots !== maxStalenessSlots
       //Mango instruction call and serialize
       const ix = await mangoClient!.program.methods
         .perpEditMarket(
@@ -253,6 +251,7 @@ const PerpEdit = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
+      customHoldUpTime: form.holdupTime,
     }
     return obj
   }
@@ -346,6 +345,13 @@ const PerpEdit = ({
       shouldBeGoverned: shouldBeGoverned as any,
       governance: governance,
       options: solAccounts,
+    },
+    {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
     },
     {
       label: keyToLabel['perp'],
@@ -604,28 +610,27 @@ const PerpEdit = ({
               {Object.keys(defaultFormValues)
                 .filter((x) => x !== 'governedAccount')
                 .filter((x) => x !== 'perp')
+                .filter((x) => x !== 'holdupTime')
                 .map((key) => (
-                  <>
-                    <div className="text-sm mb-3">
-                      <div className="mb-2">{keyToLabel[key]}</div>
-                      <div className="flex flex-row text-xs items-center">
-                        <Switch
-                          checked={
-                            forcedValues.find((x) => x === key) ? true : false
+                  <div className="text-sm mb-3" key={key}>
+                    <div className="mb-2">{keyToLabel[key]}</div>
+                    <div className="flex flex-row text-xs items-center">
+                      <Switch
+                        checked={
+                          forcedValues.find((x) => x === key) ? true : false
+                        }
+                        onChange={(checked) => {
+                          if (checked) {
+                            setForcedValues([...forcedValues, key])
+                          } else {
+                            setForcedValues([
+                              ...forcedValues.filter((x) => x !== key),
+                            ])
                           }
-                          onChange={(checked) => {
-                            if (checked) {
-                              setForcedValues([...forcedValues, key])
-                            } else {
-                              setForcedValues([
-                                ...forcedValues.filter((x) => x !== key),
-                              ])
-                            }
-                          }}
-                        />
-                      </div>
+                        }}
+                      />
                     </div>
-                  </>
+                  </div>
                 ))}
             </div>
           </AdvancedOptionsDropdown>

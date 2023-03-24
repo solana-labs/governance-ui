@@ -177,7 +177,8 @@ export async function getNFTsByOwner(owner: PublicKey, isDevnet?: boolean) {
         owner,
         tokenAccountAddress: await getAssociatedTokenAddress(
           nft.mint.address,
-          owner
+          owner,
+          true
         ).catch((e) => {
           console.error(e)
           return null
@@ -474,13 +475,11 @@ export function getMintAccountLabelInfo(acc: AssetAccount | undefined) {
   let amount = ''
   let imgUrl = ''
   if (acc?.extensions.mint && acc.governance) {
-    const info = tokenPriceService.getTokenInfo(
-      acc.governance.account.governedAccount.toBase58()
-    )
+    const info = tokenPriceService.getTokenInfo(acc.pubkey.toBase58())
     imgUrl = info?.logoURI ? info.logoURI : ''
-    account = acc.governance?.account.governedAccount.toBase58()
+    account = acc.pubkey.toBase58()
     tokenName = info?.name ? info.name : ''
-    mintAccountName = getAccountName(acc.governance.account.governedAccount)
+    mintAccountName = getAccountName(acc.pubkey)
     amount = formatMintNaturalAmountAsDecimal(
       acc.extensions.mint.account,
       acc?.extensions.mint.account.supply

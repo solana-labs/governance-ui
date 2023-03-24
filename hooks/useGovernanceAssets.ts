@@ -379,6 +379,16 @@ export default function useGovernanceAssets() {
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Dual,
     },
+    [Instructions.DualFinanceLiquidityStakingOption]: {
+      name: 'Liquidity Staking Option',
+      isVisible: canUseTransferInstruction,
+      packageId: PackageEnum.Dual,
+    },
+    [Instructions.DualFinanceInitStrike]: {
+      name: 'Init Staking Option Strike',
+      isVisible: canUseTransferInstruction,
+      packageId: PackageEnum.Dual,
+    },
     [Instructions.DualFinanceExercise]: {
       name: 'Exercise',
       isVisible: canUseTransferInstruction,
@@ -625,6 +635,11 @@ export default function useGovernanceAssets() {
     },
     [Instructions.MangoV4TokenAddBank]: {
       name: 'Add additional Bank to an existing Token',
+      packageId: PackageEnum.MangoMarketV4,
+      isVisible: canUseAnyInstruction,
+    },
+    [Instructions.IdlSetBuffer]: {
+      name: 'Idl Set Buffer',
       packageId: PackageEnum.MangoMarketV4,
       isVisible: canUseAnyInstruction,
     },

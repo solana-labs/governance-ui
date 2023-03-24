@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
-import useRealm from '@hooks/useRealm'
 import { PublicKey, SYSVAR_RENT_PUBKEY } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid, validatePubkey } from '@utils/formValidation'
@@ -44,6 +43,7 @@ interface TokenRegisterForm {
   netBorrowLimitWindowSizeTs: number
   netBorrowLimitPerWindowQuote: number
   tokenIndex: number
+  holdupTime: number
 }
 
 const TokenRegister = ({
@@ -55,7 +55,6 @@ const TokenRegister = ({
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const { mangoClient, mangoGroup, getAdditionalLabelInfo } = UseMangoV4()
-  const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const solAccounts = assetAccounts.filter(
     (x) =>
@@ -64,7 +63,6 @@ const TokenRegister = ({
       x.extensions.transferAddress?.equals(mangoGroup?.admin)
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<TokenRegisterForm>({
     governedAccount: null,
     mintPk: '',
@@ -89,6 +87,7 @@ const TokenRegister = ({
     netBorrowLimitWindowSizeTs: 24 * 60 * 60,
     netBorrowLimitPerWindowQuote: toNative(1000000, 6).toNumber(),
     tokenIndex: 0,
+    holdupTime: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -103,7 +102,6 @@ const TokenRegister = ({
     let serializedInstruction = ''
     if (
       isValid &&
-      programId &&
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
@@ -153,6 +151,7 @@ const TokenRegister = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
+      customHoldUpTime: form.holdupTime,
     }
     return obj
   }
@@ -204,6 +203,13 @@ const TokenRegister = ({
       shouldBeGoverned: shouldBeGoverned as any,
       governance: governance,
       options: solAccounts,
+    },
+    {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
     },
     {
       label: 'Mint PublicKey',
