@@ -80,8 +80,9 @@ export default function useProposalVotes(proposal?: Proposal) {
   const rawYesVotesRequired = minimumYesVotes - yesVoteCount
   const actualVotesRequired = rawYesVotesRequired < 0 ? 0 : rawYesVotesRequired
   const yesVoteProgress = actualVotesRequired
-    ? (actualVotesRequired / minimumYesVotes) * 100
+    ? 100 - (actualVotesRequired / minimumYesVotes) * 100
     : 100
+
   const yesVotesRequired =
     proposalMint.decimals == 0
       ? Math.ceil(actualVotesRequired)
