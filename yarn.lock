@@ -4869,7 +4869,7 @@
   dependencies:
     "@solana/wallet-adapter-base" "^0.9.22"
 
-"@solana/wallet-adapter-walletconnect@^0.1.14", "@solana/wallet-adapter-walletconnect@^0.1.6":
+"@solana/wallet-adapter-walletconnect@0.1.14", "@solana/wallet-adapter-walletconnect@^0.1.14", "@solana/wallet-adapter-walletconnect@^0.1.6":
   version "0.1.14"
   resolved "https://registry.yarnpkg.com/@solana/wallet-adapter-walletconnect/-/wallet-adapter-walletconnect-0.1.14.tgz#6994077781880b1a86fda27e000e947ed7764609"
   integrity sha512-nz8BB1Gs9s2yLuAf1+wDyZoGxCAVi1XWpzVlXMRBD7oL7Bn3kx3SOohzgoOKQltTrye4PF4cl+KCStzY3zQfkg==
