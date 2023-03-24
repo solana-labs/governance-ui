@@ -1045,8 +1045,8 @@
     "website": "https://flipsidecrypto.xyz/",
     "twitter": "@flipsidecrypto",
     "ogImage": "/realms/FSLOGO/FLIPSIDE-LOGO-WHITE.png"
-    },
-    {
+   },
+   {
     "symbol": "Legacy Dean's List Classic (moved to new one)",
     "displayName": "Dean's List",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1055,18 +1055,8 @@
     "website": "https://deans-list.strataprotocol.com/",
     "twitter": "@GrapeDeanslist",
     "ogImage": "/realms/Dean's List Grape/deans list logo.png"
-  },
-  {
-    "symbol": "Legacy Dean's List Classic (moved to new one)",
-    "displayName": " Legacy Dean's List",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "9mS8GuMx2MkZGMSwa2k87HNLTFZ1ssa9mJ1RkGFKcGyQ",
-    "bannerImage": "/realms/Deans-List-Grape/deans-list-logo.png",
-    "website": "https://deans-list.strataprotocol.com/",
-    "twitter": "@GrapeDeanslist",
-    "ogImage": "/realms/Deans-List-Grape/deans-list-logo.png"
-  },
-  {
+   },
+   {
     "symbol": "GrapeCCSubDAO",
     "displayName": "Grape CC SubDAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
