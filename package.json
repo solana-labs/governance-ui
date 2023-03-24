@@ -26,7 +26,7 @@
     ]
   },
   "dependencies": {
-    "@blockworks-foundation/mango-v4": "0.9.5",
+    "@blockworks-foundation/mango-v4": "0.9.8",
     "@blockworks-foundation/mangolana": "0.0.1-beta.11",
     "@bonfida/spl-name-service": "0.1.47",
     "@bundlr-network/client": "0.7.15",
@@ -41,7 +41,7 @@
     "@dialectlabs/react-sdk-blockchain-solana": "1.0.0-beta.3",
     "@dialectlabs/react-ui": "1.1.0-beta.5",
     "@dual-finance/airdrop": "0.2.2",
-    "@dual-finance/staking-options": "0.0.18",
+    "@dual-finance/staking-options": "0.0.20",
     "@emotion/react": "11.9.0",
     "@emotion/styled": "11.8.1",
     "@everlend/general-pool": "0.0.27",
@@ -80,7 +80,7 @@
     "@radix-ui/react-toolbar": "1.0.0",
     "@radix-ui/react-tooltip": "1.0.0",
     "@sentry/nextjs": "6.19.7",
-    "@solana-mobile/wallet-adapter-mobile": "1.0.0",
+    "@solana-mobile/wallet-adapter-mobile": "2.0.0",
     "@solana/buffer-layout": "4.0.0",
     "@solana/governance-program-library": "npm:@civic/governance-program-library@0.16.9-beta.2",
     "@solana/spl-governance": "0.3.25",

@@ -2,6 +2,7 @@ import useRealm from '@hooks/useRealm'
 import { getTokenOwnerRecordAddress } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
+import { tryParseKey } from '@tools/validators/pubkey'
 import useWalletStore from 'stores/useWalletStore'
 
 export const useAddressQuery_CouncilTokenOwner = () => {
@@ -34,7 +35,8 @@ export const useAddressQuery_CommunityTokenOwner = () => {
 
   // if we have a community token delegator selected (this is rare), use that. otherwise use user wallet.
   const owner =
-    selectedCommunityDelegator !== undefined
+    selectedCommunityDelegator !== undefined &&
+    tryParseKey(selectedCommunityDelegator)
       ? new PublicKey(selectedCommunityDelegator)
       : // I wanted to eliminate `null` as a possible type
         wallet?.publicKey ?? undefined
