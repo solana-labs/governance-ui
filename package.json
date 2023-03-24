@@ -95,6 +95,7 @@
     "@solana/wallet-adapter-solflare": "0.6.24",
     "@solana/wallet-adapter-sollet": "0.11.16",
     "@solana/wallet-adapter-torus": "0.11.27",
+    "@solana/wallet-adapter-walletconnect": "0.1.14",
     "@solana/wallet-adapter-wallets": "0.19.15",
     "@solana/web3.js": "1.73.3",
     "@solendprotocol/solend-sdk": "0.5.5",
