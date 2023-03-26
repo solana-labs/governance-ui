@@ -30,10 +30,7 @@ import React, { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import * as yup from 'yup'
 import { DEFAULT_NFT_TREASURY_MINT } from '@components/instructions/tools'
-import {
-  DISABLED_VOTER_WEIGHT,
-  MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
-} from '@tools/constants'
+import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import Select from '@components/inputs/Select'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
