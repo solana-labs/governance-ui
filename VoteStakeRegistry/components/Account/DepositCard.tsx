@@ -13,17 +13,17 @@ import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import tokenPriceService from '@utils/services/tokenPrice'
 import LockTokensModal from './LockTokensModal'
 import { useState } from 'react'
-import {
-  getFormattedStringFromDays,
-  getMinDurationFmt,
-  getTimeLeftFromNowFmt,
-  SECS_PER_DAY,
-} from 'VoteStakeRegistry/tools/dateTools'
 import { closeDeposit } from 'VoteStakeRegistry/actions/closeDeposit'
 import { abbreviateAddress } from '@utils/formatting'
 import { notify } from '@utils/notifications'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import dayjs from 'dayjs'
+import {
+  getMinDurationFmt,
+  getTimeLeftFromNowFmt,
+  getFormattedStringFromDays,
+  SECS_PER_DAY,
+} from '@utils/dateTools'
 import { BN } from '@coral-xyz/anchor'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 
@@ -222,8 +222,11 @@ const DepositCard = ({
             label={isConstant ? 'Min. Duration' : 'Time left'}
             value={
               isConstant
-                ? getMinDurationFmt(deposit)
-                : getTimeLeftFromNowFmt(deposit)
+                ? getMinDurationFmt(
+                    deposit.lockup.startTs,
+                    deposit.lockup.endTs
+                  )
+                : getTimeLeftFromNowFmt(deposit.lockup.endTs)
             }
           />
           <CardLabel

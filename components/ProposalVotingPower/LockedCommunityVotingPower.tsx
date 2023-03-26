@@ -15,7 +15,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { notify } from '@utils/notifications'
 
 import { getMintMetadata } from '../instructions/programs/splToken'
-import depositTokensVST from './depositTokensVSR'
+import depositTokensVSR from './depositTokensVSR'
 import VotingPowerPct from './VotingPowerPct'
 
 interface Props {
@@ -110,7 +110,7 @@ export default function LockedCommunityVotingPower(props: Props) {
       wallet.publicKey
     ) {
       try {
-        await depositTokensVST({
+        await depositTokensVSR({
           client,
           connection,
           endpoint,
@@ -170,7 +170,7 @@ export default function LockedCommunityVotingPower(props: Props) {
             <div className="text-white/50 text-xs">{tokenName} Votes</div>
             <div className="flex items-center justify-between mt-1">
               <div className="text-white font-bold text-2xl flex items-center">
-                {amount.toFormat()}{' '}
+                {amount.toFormat(2)}{' '}
                 {multiplier && (
                   <Tooltip content="Vote Weight Multiplier – Increase your vote weight by locking tokens">
                     <div className="cursor-help flex font-normal items-center ml-3 text-xs rounded-full bg-bkg-3 px-2 py-1">

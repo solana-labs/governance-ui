@@ -7,7 +7,6 @@ import useQueryContext from '@hooks/useQueryContext'
 import {
   gatewayPluginsPks,
   nftPluginsPks,
-  vsrPluginsPks,
   switchboardPluginsPks,
 } from '@hooks/useVotingPlugins'
 import GatewayCard from '@components/Gateway/GatewayCard'
@@ -22,6 +21,14 @@ const LockPluginTokenBalanceCard = dynamic(
       'VoteStakeRegistry/components/TokenBalance/LockPluginTokenBalanceCard'
     )
 )
+
+const HeliumVotingPowerCard = dynamic(() =>
+  import('HeliumVotePlugin/components/VotingPowerCard').then((module) => {
+    const { VotingPowerCard } = module
+    return VotingPowerCard
+  })
+)
+
 const TokenBalanceCard = dynamic(() => import('./TokenBalanceCard'))
 const NftVotingPower = dynamic(
   () => import('../ProposalVotingPower/NftVotingPower')
@@ -70,12 +77,10 @@ const TokenBalanceCardWrapper = ({
     config,
     ownCouncilTokenRecord,
     councilTokenAccount,
+    vsrMode,
   } = useRealm()
   const currentPluginPk = config?.account?.communityTokenConfig.voterWeightAddin
   const getTokenBalanceCard = () => {
-    //based on realm config it will provide proper tokenBalanceCardComponent
-    const isLockTokensMode =
-      currentPluginPk && vsrPluginsPks.includes(currentPluginPk?.toBase58())
     const isNftMode =
       currentPluginPk && nftPluginsPks.includes(currentPluginPk?.toBase58())
     const isGatewayMode =
@@ -85,16 +90,21 @@ const TokenBalanceCardWrapper = ({
       switchboardPluginsPks.includes(currentPluginPk?.toBase58())
 
     if (
-      isLockTokensMode &&
+      vsrMode === 'default' &&
       (!ownTokenRecord ||
         ownTokenRecord.account.governingTokenDepositAmount.isZero())
     ) {
-      return (
-        <LockPluginTokenBalanceCard
-          inAccountDetails={inAccountDetails}
-        ></LockPluginTokenBalanceCard>
-      )
+      return <LockPluginTokenBalanceCard inAccountDetails={inAccountDetails} />
     }
+
+    if (
+      vsrMode === 'helium' &&
+      (!ownTokenRecord ||
+        ownTokenRecord.account.governingTokenDepositAmount.isZero())
+    ) {
+      return <HeliumVotingPowerCard inAccountDetails={inAccountDetails} />
+    }
+
     if (
       isNftMode &&
       (!ownTokenRecord ||

@@ -1,4 +1,4 @@
-import { AnchorProvider, Wallet } from '@project-serum/anchor';
+import { AnchorProvider, Wallet } from '@coral-xyz/anchor';
 import {
   NftVoterClient,
   GatewayClient,

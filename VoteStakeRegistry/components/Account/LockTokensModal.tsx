@@ -27,7 +27,7 @@ import {
   getFormattedStringFromDays,
   secsToDays,
   yearsToSecs,
-} from 'VoteStakeRegistry/tools/dateTools'
+} from '@utils/dateTools'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { voteRegistryStartUnlock } from 'VoteStakeRegistry/actions/voteRegistryStartUnlock'
 import {
@@ -46,7 +46,6 @@ import { calcMintMultiplier } from 'VoteStakeRegistry/tools/deposits'
 import ButtonGroup from '@components/ButtonGroup'
 import InlineNotification from '@components/InlineNotification'
 import Tooltip from '@components/Tooltip'
-//import Switch from '@components/Switch'
 import { notify } from '@utils/notifications'
 
 const YES = 'Yes'
@@ -110,8 +109,10 @@ const LockTokensModal = ({
   ]
     .filter((x) =>
       depositToUnlock
-        ? getMinDurationInDays(depositToUnlock) <= x.defaultValue ||
-          x.display === 'Custom'
+        ? getMinDurationInDays(
+            depositToUnlock.lockup.startTs,
+            depositToUnlock.lockup.endTs
+          ) <= x.defaultValue || x.display === 'Custom'
         : true
     )
     .filter((x) => x.defaultValue <= secsToDays(maxLockupSecs))

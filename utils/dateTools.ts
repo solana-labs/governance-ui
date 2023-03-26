@@ -1,5 +1,4 @@
 import { BN } from '@coral-xyz/anchor'
-import { DepositWithMintAccount } from 'VoteStakeRegistry/sdk/accounts'
 
 export const DAYS_PER_YEAR = 365
 export const SECS_PER_DAY = 86400
@@ -44,6 +43,10 @@ export const yearsToSecs = (years: number) => {
   return DAYS_PER_YEAR * years * SECS_PER_DAY
 }
 
+export const daysToSecs = (days: number) => {
+  return days * SECS_PER_DAY
+}
+
 export const secsToDays = (secs: number) => {
   return secs / SECS_PER_DAY
 }
@@ -52,18 +55,16 @@ export const daysToMonths = (days: number) => {
   return days / DAYS_PER_MONTH
 }
 
-export const getMinDurationFmt = (deposit: DepositWithMintAccount) => {
-  return getFormattedStringFromDays(getMinDurationInDays(deposit))
+export const getMinDurationFmt = (startTs: BN, endTs: BN) => {
+  return getFormattedStringFromDays(getMinDurationInDays(startTs, endTs))
 }
-export const getTimeLeftFromNowFmt = (deposit: DepositWithMintAccount) => {
+export const getTimeLeftFromNowFmt = (ts: BN) => {
   const dateNowSecTimeStampBN = new BN(new Date().getTime() / 1000)
   return getFormattedStringFromDays(
-    deposit.lockup.endTs.sub(dateNowSecTimeStampBN).toNumber() / SECS_PER_DAY
+    ts.sub(dateNowSecTimeStampBN).toNumber() / SECS_PER_DAY
   )
 }
 
-export const getMinDurationInDays = (deposit: DepositWithMintAccount) => {
-  return (
-    deposit.lockup.endTs.sub(deposit.lockup.startTs).toNumber() / SECS_PER_DAY
-  )
+export const getMinDurationInDays = (startTs: BN, endTs: BN) => {
+  return endTs.sub(startTs).toNumber() / SECS_PER_DAY
 }

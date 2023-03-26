@@ -194,10 +194,11 @@ export async function getOwnedTokenAccounts(
   connection: Connection,
   publicKey: PublicKey
 ): Promise<TokenProgramAccount<TokenAccount>[]> {
-  const results = await connection.getTokenAccountsByOwner(publicKey, {
+  const result = await connection.getTokenAccountsByOwner(publicKey, {
     programId: TOKEN_PROGRAM_ID,
   })
-  return results.value.map((r) => {
+
+  return result.value.map((r) => {
     const publicKey = r.pubkey
     const data = Buffer.from(r.account.data)
     const account = parseTokenAccountData(publicKey, data)
@@ -554,4 +555,10 @@ export function getScaledFactor(amount: number) {
   return new BN(
     new BigNumber(amount.toString()).shiftedBy(SCALED_FACTOR_SHIFT).toString()
   )
+}
+
+export function getInverseScaledFactor(amount: BN) {
+  return new BigNumber(amount.toNumber())
+    .shiftedBy(-SCALED_FACTOR_SHIFT)
+    .toNumber()
 }
