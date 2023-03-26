@@ -40,6 +40,7 @@ import {
   transform,
   BaseGovernanceFormFieldsV3,
 } from '@components/AssetsList/BaseGovernanceForm-data'
+import useProgramVersion from '@hooks/useProgramVersion'
 
 type NewTreasuryAccountForm = (
   | BaseGovernanceFormFieldsV3
@@ -47,17 +48,6 @@ type NewTreasuryAccountForm = (
 ) & {
   mintAddress: string
 }
-
-const defaultFormValues = {
-  // TODO support v3
-  _programVersion: 2,
-  mintAddress: '',
-  minCommunityTokensToCreateProposal: MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
-  minInstructionHoldUpTime: 0,
-  maxVotingTime: 3,
-  voteThreshold: 60,
-  voteTipping: VoteTipping.Disabled,
-} as const
 
 const SOL = 'SOL'
 const OTHER = 'OTHER'
@@ -114,9 +104,7 @@ const NewAccountForm = () => {
   const connection = useWalletStore((s) => s.connection)
   const connected = useWalletStore((s) => s.connected)
   const { fetchRealm } = useWalletStore((s) => s.actions)
-  const [form, setForm] = useState<NewTreasuryAccountForm>({
-    ...defaultFormValues,
-  })
+  const [form, setForm] = useState<NewTreasuryAccountForm>()
   const [tokenInfo, setTokenInfo] = useState<
     TokenInfoWithoutDecimals | undefined
   >(undefined)
@@ -130,7 +118,51 @@ const NewAccountForm = () => {
     ? ownVoterWeight.communityTokenRecord
     : undefined
 
+  const programVersion = useProgramVersion()
+
+  useEffect(() => {
+    if (realm === undefined) return
+
+    if (programVersion <= 2) {
+      setForm({
+        _programVersion: 2,
+        mintAddress: '',
+        minInstructionHoldUpTime: 0,
+        maxVotingTime: 3,
+        voteThreshold: 60,
+        minCommunityTokensToCreateProposal: (realmMint?.supply.isZero()
+          ? MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY
+          : realmMint
+          ? getMintDecimalAmount(realmMint!, realmMint!.supply).toNumber() *
+            0.01
+          : 0
+        ).toString(),
+      })
+    } else {
+      setForm({
+        _programVersion: 3,
+        /* in days */
+        minInstructionHoldUpTime: '0',
+        /* in days */
+        maxVotingTime: '3',
+        minCommunityTokensToCreateProposal: '1',
+        minCouncilTokensToCreateProposal: '0',
+        votingCoolOffTime: '12',
+        depositExemptProposalCount: '10',
+        communityVoteThreshold: '60',
+        communityVetoVoteThreshold: 'disabled',
+        councilVoteThreshold: '60',
+        councilVetoVoteThreshold: '60',
+        councilVoteTipping: VoteTipping.Strict,
+        mintAddress: '',
+      })
+    }
+    // realmMint needs to be memoized.......
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [realm, programVersion, JSON.stringify(realmMint)])
+
   const handleSetForm = ({ propertyName, value }) => {
+    if (form === undefined) return
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
@@ -139,6 +171,7 @@ const NewAccountForm = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [filteredTypes.length])
   const handleCreate = async () => {
+    if (!form) return
     try {
       if (!realm) {
         throw 'No realm selected'
@@ -281,7 +314,7 @@ const NewAccountForm = () => {
       setTokenInfo(undefined)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form.mintAddress])
+  }, [form?.mintAddress])
 
   useEffect(() => {
     handleSetForm({
@@ -302,7 +335,7 @@ const NewAccountForm = () => {
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(realmMint)])
-  return (
+  return form === undefined ? null : (
     <div className="space-y-3">
       <PreviousRouteBtn />
       <div className="border-b border-fgd-4 pb-4 pt-2">
