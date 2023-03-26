@@ -293,6 +293,7 @@ const NewAccountForm = () => {
       ),
   })
   useEffect(() => {
+    if (!form) return
     if (form.mintAddress) {
       debounce.debounceFcn(async () => {
         const pubKey = tryParseKey(form.mintAddress)
@@ -324,6 +325,7 @@ const NewAccountForm = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [treasuryType])
   useEffect(() => {
+    if (!form) return
     setForm({
       ...form,
       minCommunityTokensToCreateProposal: (realmMint?.supply.isZero()
