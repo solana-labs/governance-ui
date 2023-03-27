@@ -107,7 +107,7 @@ const NewProgramForm = () => {
         /* in days */
         maxVotingTime: '3',
         minCommunityTokensToCreateProposal: '1',
-        minCouncilTokensToCreateProposal: '0',
+        minCouncilTokensToCreateProposal: '1',
         votingCoolOffTime: '12',
         depositExemptProposalCount: '10',
         communityVoteThreshold: '60',
