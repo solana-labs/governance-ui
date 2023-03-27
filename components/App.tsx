@@ -6,7 +6,6 @@ import Head from 'next/head'
 import Script from 'next/script'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
-
 import { GatewayProvider } from '@components/Gateway/GatewayProvider'
 import { usePrevious } from '@hooks/usePrevious'
 import { useVotingPlugins, vsrPluginsPks } from '@hooks/useVotingPlugins'
@@ -85,7 +84,7 @@ export function App(props: Props) {
   } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
-  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
+  const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
   const prevStringifyPossibleNftsAccounts = usePrevious(
     JSON.stringify(possibleNftsAccounts)
   )
@@ -123,13 +122,13 @@ export function App(props: Props) {
       realm.pubkey &&
       wallet?.connected &&
       ownTokenRecord &&
-      client
+      vsrClient
     ) {
       getOwnedDeposits({
         realmPk: realm!.pubkey,
         communityMintPk: realm!.account.communityMint,
         walletPk: ownTokenRecord!.account!.governingTokenOwner,
-        client: client!,
+        client: vsrClient!,
         connection: connection.current,
       })
     } else if (!wallet?.connected || !ownTokenRecord) {
@@ -143,7 +142,7 @@ export function App(props: Props) {
     ownTokenRecord?.pubkey.toBase58(),
     wallet?.connected,
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    client?.program.programId.toBase58(),
+    vsrClient?.program.programId.toBase58(),
   ])
 
   useEffect(() => {

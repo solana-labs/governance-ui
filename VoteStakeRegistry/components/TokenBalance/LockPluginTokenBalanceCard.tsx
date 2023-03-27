@@ -28,7 +28,6 @@ const LockPluginTokenBalanceCard = ({
   inAccountDetails?: boolean
 }) => {
   const [hasGovPower, setHasGovPower] = useState<boolean>(false)
-
   const { fmtUrlWithCluster } = useQueryContext()
   const { councilMint, mint, realm, symbol, config } = useRealm()
   const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')

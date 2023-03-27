@@ -18,6 +18,7 @@ import {
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
 import { NftVoterClient } from '@solana/governance-program-library'
+import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 
 export const relinquishVote = async (
   { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
@@ -45,8 +46,18 @@ export const relinquishVote = async (
     governanceAuthority,
     beneficiary
   )
-  await plugin.withRelinquishVote(instructions, proposal, voteRecord)
-  const shouldChunk = plugin?.client instanceof NftVoterClient
+
+  await plugin.withRelinquishVote(
+    instructions,
+    proposal,
+    voteRecord,
+    tokenOwnerRecord
+  )
+
+  const shouldChunk =
+    plugin?.client instanceof NftVoterClient ||
+    plugin?.client instanceof HeliumVsrClient
+
   if (shouldChunk) {
     const insertChunks = chunks(instructions, 2)
     const instArray = [
@@ -71,6 +82,7 @@ export const relinquishVote = async (
         }
       }),
     ]
+
     await sendTransactionsV3({
       connection,
       wallet,

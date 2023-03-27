@@ -1,10 +1,7 @@
 import useRealm from '@hooks/useRealm'
 import { fmtMintAmount, getHoursFromTimestamp } from '@tools/sdk/units'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
-import {
-  getFormattedStringFromDays,
-  SECS_PER_DAY,
-} from 'VoteStakeRegistry/tools/dateTools'
+import { getFormattedStringFromDays, SECS_PER_DAY } from '@utils/dateTools'
 import Button from '@components/Button'
 import { VoteTipping } from '@solana/spl-governance'
 import { AddressField, NumberField } from '../index'

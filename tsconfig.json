@@ -26,7 +26,7 @@
     "incremental": true,
     "isolatedModules": true
   },
-  "exclude": ["node_modules", ".next", "out", "docs"],
+  "exclude": ["node_modules/**/*", ".next", "out", "docs"],
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.js"],
   "ts-node": {
     "require": ["tsconfig-paths/register"],

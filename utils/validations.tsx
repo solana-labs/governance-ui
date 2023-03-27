@@ -22,6 +22,7 @@ import { BN } from '@coral-xyz/anchor'
 import {
   nftPluginsPks,
   vsrPluginsPks,
+  heliumVsrPluginsPks,
   gatewayPluginsPks,
 } from '@hooks/useVotingPlugins'
 import { AssetAccount } from '@utils/uiTypes/assets'
@@ -31,6 +32,7 @@ import { validatePubkey } from './formValidation'
 const supportedPlugins = [
   ...nftPluginsPks,
   ...vsrPluginsPks,
+  ...heliumVsrPluginsPks,
   ...gatewayPluginsPks,
 ]
 
@@ -1001,7 +1003,9 @@ export const getRealmCfgSchema = ({
               if (val) {
                 try {
                   getValidatedPublickKey(val)
-                  if ([...nftPluginsPks].includes(val)) {
+                  if (
+                    [...nftPluginsPks, ...heliumVsrPluginsPks].includes(val)
+                  ) {
                     return true
                   } else {
                     return this.createError({
@@ -1138,7 +1142,9 @@ export const getRealmCfgSchema = ({
               if (val) {
                 try {
                   getValidatedPublickKey(val)
-                  if ([...nftPluginsPks].includes(val)) {
+                  if (
+                    [...nftPluginsPks, ...heliumVsrPluginsPks].includes(val)
+                  ) {
                     return true
                   } else {
                     return this.createError({

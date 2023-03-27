@@ -38,6 +38,10 @@ const useCanVote = () => {
     !(
       client.clientType === VotingClientType.NftVoterClient && !voterTokenRecord
     ) &&
+    !(
+      client.clientType === VotingClientType.HeliumVsrClient &&
+      !voterTokenRecord
+    ) &&
     !isVoteCast &&
     hasMinAmountToVote
 
@@ -48,6 +52,7 @@ const useCanVote = () => {
     : !hasMinAmountToVote
     ? 'You don’t have governance power to vote in this dao'
     : ''
+
   return [canVote, voteTooltipContent] as const
 }
 
