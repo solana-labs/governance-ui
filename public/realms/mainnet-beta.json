@@ -3059,6 +3059,20 @@
     "website": "https://safecows.com",
     "discord": "https://discord.gg/aQCeMSWs"
   },
+   { 
+    "symbol": "BlueChickDAO",
+    "category":"gaming",
+    "displayName": "The Blue Chick NFTs DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "99c96qFUwLiGcbudDeTLVxYTbtQ4CkDsstvHHmGPGGWj",
+    "ogImage": "/realms/BlueChickNFTsDAO/BlueChickNFTsDAO.png",
+    "bannerImage": "/realms/BlueChickNFTsDAO/BlueChickNFTsDAO-banner.png",
+    "shortDescription": "PVP artillery tactical game with x9999 immutable Blue Chicks. The NFTs and the DAO were actually made by birds!",
+    "website": "https://bluechicknfts.wtf",
+    "discord": "https://discord.gg/SHVcwHKUNG",
+    "twitter": "@blueChickNFTs"
+  },  
+  
   {
     "symbol": "HNT",
     "displayName": "Helium DAO",
