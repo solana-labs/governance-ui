@@ -16,10 +16,6 @@ const useDomainsForAccount = (connection) => {
   const [isLoading, setIsLoading] = useState(false)
 
   const refreshDomainsForAccount = async (account: AssetAccount) => {
-    console.log(
-      '🚀 ~ file: useDomainNames.tsx:19 ~ refreshDomainsForAccount ~ account:',
-      account.pubkey.toBase58()
-    )
     setIsLoading(true)
     try {
       const domains = await getAllDomains(connection, account.pubkey)
