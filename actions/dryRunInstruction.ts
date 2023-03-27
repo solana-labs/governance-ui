@@ -1,6 +1,7 @@
 import { InstructionData } from '@solana/spl-governance'
 
 import {
+  ComputeBudgetProgram,
   Connection,
   Transaction,
   TransactionInstruction,
@@ -15,6 +16,11 @@ export async function dryRunInstruction(
   additionalInstructions?: InstructionData[]
 ) {
   const transaction = new Transaction({ feePayer: wallet.publicKey })
+
+  transaction.add(
+    ComputeBudgetProgram.setComputeUnitLimit({ units: 1_000_000 })
+  )
+
   if (prerequisiteInstructionsToRun) {
     prerequisiteInstructionsToRun.map((x) => transaction.add(x))
   }

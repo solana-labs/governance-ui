@@ -1,3 +1,4 @@
+import React from 'react'
 import Button from '@components/Button'
 import useRealm from '@hooks/useRealm'
 import {
@@ -32,7 +33,6 @@ import {
   LockClosedIcon,
 } from '@heroicons/react/outline'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
-import Account from './Account'
 import { abbreviateAddress } from '@utils/formatting'
 import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
 
@@ -44,7 +44,10 @@ interface DepositBox {
 }
 const unlockedTypes = ['none']
 
-const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
+const LockTokensAccount: React.FC<{
+  tokenOwnerRecordPk: string | string[] | undefined
+  children: React.ReactNode
+}> = ({ tokenOwnerRecordPk, children }) => {
   const {
     realm,
     realmInfo,
@@ -398,7 +401,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
           />
         </div>
       </div>
-      {connected && <Account withHeader={false} displayPanel={false}></Account>}
+      {connected && children}
     </div>
   )
 }

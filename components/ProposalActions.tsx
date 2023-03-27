@@ -17,10 +17,10 @@ import { Proposal } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { cancelProposal } from 'actions/cancelProposal'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import dayjs from 'dayjs'
 import { diffTime } from './ProposalRemainingVotingTime'
+import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 
 const ProposalActionsPanel = () => {
   const { governance, proposal, proposalOwner } = useWalletStore(
@@ -34,12 +34,11 @@ const ProposalActionsPanel = () => {
   const connection = useWalletStore((s) => s.connection)
   const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
   const [signatoryRecord, setSignatoryRecord] = useState<any>(undefined)
-  const nftMaxVoterWeight = useNftPluginStore((s) => s.state.maxVoteRecord)
-    ?.pubkey
-  const votePLuginsClientMaxVoterWeight = useVotePluginsClientStore(
+  const maxVoteRecordPk = useMaxVoteRecord()?.pubkey
+  const votePluginsClientMaxVoterWeight = useVotePluginsClientStore(
     (s) => s.state.maxVoterWeight
   )
-  const maxVoterWeight = nftMaxVoterWeight || votePLuginsClientMaxVoterWeight
+  const maxVoterWeight = maxVoteRecordPk || votePluginsClientMaxVoterWeight
   const canFinalizeVote =
     hasVoteTimeExpired && proposal?.account.state === ProposalState.Voting
   const now = new Date().getTime() / 1000 // unix timestamp in seconds

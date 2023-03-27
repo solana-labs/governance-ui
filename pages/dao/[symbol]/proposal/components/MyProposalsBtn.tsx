@@ -20,7 +20,6 @@ import dayjs from 'dayjs'
 import { notify } from '@utils/notifications'
 import Loading from '@components/Loading'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { sleep } from '@project-serum/common'
 import { NftVoterClient } from '@solana/governance-program-library'
 import { chunks } from '@utils/helpers'
@@ -32,6 +31,7 @@ import {
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
 import useQueryContext from '@hooks/useQueryContext'
+import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 
 const MyProposalsBn = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
@@ -45,8 +45,8 @@ const MyProposalsBn = () => {
   )
   const [ownNftVoteRecords, setOwnNftVoteRecords] = useState<any[]>([])
   const ownNftVoteRecordsFilterd = ownNftVoteRecords
-  const maxVoterWeight =
-    useNftPluginStore((s) => s.state.maxVoteRecord)?.pubkey || undefined
+
+  const maxVoterWeight = useMaxVoteRecord()?.pubkey || undefined
   const { realm, programId, programVersion } = useWalletStore(
     (s) => s.selectedRealm
   )
@@ -211,7 +211,8 @@ const MyProposalsBn = () => {
       await client.withRelinquishVote(
         instructions,
         proposal,
-        ownVoteRecordsByProposal[proposal.pubkey.toBase58()].pubkey
+        ownVoteRecordsByProposal[proposal.pubkey.toBase58()].pubkey,
+        voterTokenRecord!.pubkey
       )
       return inst
     }

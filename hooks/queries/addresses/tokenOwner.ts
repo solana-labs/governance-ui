@@ -14,7 +14,8 @@ export const useAddressQuery_CouncilTokenOwner = () => {
 
   // if we have a council token delegator selected (this is rare), use that. otherwise use user wallet.
   const owner =
-    selectedCouncilDelegator !== undefined
+    selectedCouncilDelegator !== undefined &&
+    tryParseKey(selectedCouncilDelegator)
       ? new PublicKey(selectedCouncilDelegator)
       : wallet?.publicKey ?? undefined
 

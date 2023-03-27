@@ -1,15 +1,15 @@
 import { BN } from '@coral-xyz/anchor'
 import { Proposal, ProposalState } from '@solana/spl-governance'
-import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { getProposalMaxVoteWeight } from '../models/voteWeights'
 import { calculatePct, fmtTokenAmount } from '../utils/formatting'
+import { useMaxVoteRecord } from './useMaxVoteRecord'
 import useProgramVersion from './useProgramVersion'
 import useRealm from './useRealm'
 
 // TODO support council plugins
 export default function useProposalVotes(proposal?: Proposal) {
   const { realm, mint, councilMint, governances } = useRealm()
-  const maxVoteRecord = useNftPluginStore((s) => s.state.maxVoteRecord)
+  const maxVoteRecord = useMaxVoteRecord()
   const governance =
     proposal && governances[proposal.governance?.toBase58()]?.account
   const programVersion = useProgramVersion()

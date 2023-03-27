@@ -31,7 +31,7 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
   const [tokenOwnerRecords, setTokenOwnerRecords] = useState<
     ProgramAccount<TokenOwnerRecord>[]
   >([])
-  const { mint, realm, isLockTokensMode } = useRealm()
+  const { mint, realm, vsrMode } = useRealm()
 
   //for vsr
   const [
@@ -124,7 +124,10 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
     setUndecidedDepositByVoteRecord(votingPerWallet)
   }
   useEffect(() => {
-    if (isLockTokensMode && !Object.keys(undecidedDepositByVoteRecord).length) {
+    if (
+      vsrMode === 'default' &&
+      !Object.keys(undecidedDepositByVoteRecord).length
+    ) {
       const undecidedData = tokenOwnerRecords.filter(
         (tokenOwnerRecord) =>
           !voteRecords
@@ -145,7 +148,7 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
   }, [
     tokenOwnerRecords.length,
     voteRecords.length,
-    isLockTokensMode,
+    vsrMode,
     mintsUsedInRealm.length,
   ])
   ///////
