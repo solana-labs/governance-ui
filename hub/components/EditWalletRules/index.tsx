@@ -17,6 +17,7 @@ import { useCluster, ClusterType } from '@hub/hooks/useCluster';
 import { useProposal } from '@hub/hooks/useProposal';
 import { useQuery } from '@hub/hooks/useQuery';
 import { useToast, ToastType } from '@hub/hooks/useToast';
+import { useWallet } from '@hub/hooks/useWallet';
 import cx from '@hub/lib/cx';
 import { GovernanceTokenType } from '@hub/types/GovernanceTokenType';
 import { GovernanceVoteTipping } from '@hub/types/GovernanceVoteTipping';
@@ -59,6 +60,7 @@ interface Props {
 
 export function EditWalletRules(props: Props) {
   const [cluster] = useCluster();
+  const wallet = useWallet();
   const { createProposal, progress } = useProposal();
   const { publish } = useToast();
   const [result] = useQuery(gql.getGovernanceRulesResp, {
@@ -147,7 +149,6 @@ export function EditWalletRules(props: Props) {
 
   return pipe(
     result,
-
     RE.match(
       () => <div />,
       () => <div />,
@@ -157,7 +158,7 @@ export function EditWalletRules(props: Props) {
           getAccountName(governance.governanceAddress) ||
           governance.walletAddress.toBase58();
 
-        if (!me) {
+        if (!me && !(wallet.softConnect && wallet.publicKey)) {
           return (
             <div className={cx(props.className, 'dark:bg-neutral-900')}>
               <Head>

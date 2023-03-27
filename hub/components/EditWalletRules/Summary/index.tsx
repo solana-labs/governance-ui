@@ -49,7 +49,6 @@ export function Summary(props: Props) {
       <ProposalDetails
         proposalDescription={props.proposalDescription}
         proposalTitle={props.proposalTitle}
-        governanceAddress={props.governanceAddress}
         walletAddress={props.walletAddress}
         onProposalDescriptionChange={props.onProposalDescriptionChange}
         onProposalTitleChange={props.onProposalTitleChange}

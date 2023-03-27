@@ -1,30 +1,30 @@
 import CheckmarkIcon from '@carbon/icons-react/lib/Checkmark';
 import ChevronDownIcon from '@carbon/icons-react/lib/ChevronDown';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import { GoverningTokenType } from '@solana/spl-governance';
 import { useEffect, useRef, useState } from 'react';
 
 import cx from '@hub/lib/cx';
-import { GovernanceVoteTipping } from '@hub/types/GovernanceVoteTipping';
 
-export function getLabel(value: GovernanceVoteTipping): string {
+export function getLabel(value: GoverningTokenType): string {
   switch (value) {
-    case GovernanceVoteTipping.Disabled:
+    case GoverningTokenType.Dormant:
       return 'Disabled';
-    case GovernanceVoteTipping.Early:
-      return 'Early';
-    case GovernanceVoteTipping.Strict:
-      return 'Strict';
+    case GoverningTokenType.Liquid:
+      return 'Liquid';
+    case GoverningTokenType.Membership:
+      return 'Membership';
   }
 }
 
-function getDescription(value: GovernanceVoteTipping): string {
+function getDescription(value: GoverningTokenType): string {
   switch (value) {
-    case GovernanceVoteTipping.Disabled:
-      return 'A proposal passes only when the total voting duration elapses';
-    case GovernanceVoteTipping.Early:
-      return 'A proposal passes when quorum is reached';
-    case GovernanceVoteTipping.Strict:
-      return 'A proposal passes as soon as it cannot mathematically be defeated';
+    case GoverningTokenType.Dormant:
+      return 'This removes voting & managing power for token owners';
+    case GoverningTokenType.Liquid:
+      return 'May be bought, sold, or transferred';
+    case GoverningTokenType.Membership:
+      return 'Cannot be traded or transferred, but can be revoked by the DAO';
   }
 }
 
@@ -32,7 +32,7 @@ const itemStyles = cx(
   'border',
   'cursor-pointer',
   'gap-x-4',
-  'grid-cols-[80px,1fr,20px]',
+  'grid-cols-[100px,1fr,20px]',
   'grid',
   'h-14',
   'items-center',
@@ -51,11 +51,11 @@ const iconStyles = cx('fill-neutral-500', 'h-5', 'transition-transform', 'w-4');
 
 interface Props {
   className?: string;
-  value: GovernanceVoteTipping;
-  onChange?(value: GovernanceVoteTipping): void;
+  value: GoverningTokenType;
+  onChange?(value: GoverningTokenType): void;
 }
 
-export function VoteTippingSelector(props: Props) {
+export function TokenTypeSelector(props: Props) {
   const [open, setOpen] = useState(false);
   const [width, setWidth] = useState(0);
   const trigger = useRef<HTMLButtonElement>(null);
@@ -90,9 +90,9 @@ export function VoteTippingSelector(props: Props) {
             style={{ width }}
           >
             {[
-              GovernanceVoteTipping.Disabled,
-              GovernanceVoteTipping.Early,
-              GovernanceVoteTipping.Strict,
+              GoverningTokenType.Dormant,
+              GoverningTokenType.Liquid,
+              GoverningTokenType.Membership,
             ]
               .filter((voteTippingType) => voteTippingType !== props.value)
               .map((voteTippingType) => (
