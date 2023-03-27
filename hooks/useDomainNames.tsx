@@ -1,28 +1,32 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import {
   getAllDomains,
   performReverseLookupBatch,
 } from '@bonfida/spl-name-service'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
-interface Domains {
+export interface DomainObj {
   domainName: string | undefined
   domainAddress: string
 }
 
-const useDomainsForAccount = (connection, governedAccount) => {
-  const [accountDomains, setAccountDomains] = useState<Domains[]>([])
+const useDomainsForAccount = (connection) => {
+  const [accountDomains, setAccountDomains] = useState<DomainObj[]>([])
   const [isLoading, setIsLoading] = useState(false)
 
-  useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-extra-semi
-    ;(async () => {
-      setIsLoading(true)
-      const domains = await getAllDomains(connection, governedAccount.pubkey)
+  const refreshDomainsForAccount = async (account: AssetAccount) => {
+    console.log(
+      '🚀 ~ file: useDomainNames.tsx:19 ~ refreshDomainsForAccount ~ account:',
+      account.pubkey.toBase58()
+    )
+    setIsLoading(true)
+    try {
+      const domains = await getAllDomains(connection, account.pubkey)
+      const results: DomainObj[] = []
 
       if (domains.length > 0) {
         const reverse = await performReverseLookupBatch(connection, domains)
-        const results: Domains[] = []
 
         for (let i = 0; i < domains.length; i++) {
           results.push({
@@ -30,14 +34,17 @@ const useDomainsForAccount = (connection, governedAccount) => {
             domainName: reverse[i],
           })
         }
-
-        setAccountDomains(results)
       }
-      setIsLoading(false)
-    })()
-  }, [governedAccount, connection])
 
-  return { accountDomains, isLoading }
+      setAccountDomains(results)
+    } catch (error) {
+      setAccountDomains([])
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return { accountDomains, isLoading, refreshDomainsForAccount }
 }
 
 export { useDomainsForAccount }
