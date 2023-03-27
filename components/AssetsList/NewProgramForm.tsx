@@ -173,6 +173,7 @@ const NewProgramForm = () => {
                   { ...form, communityVoteTipping: VoteTipping.Disabled }
                 )[0]
               )
+
         await registerProgramGovernance(
           rpcContext,
           GovernanceType.Program,

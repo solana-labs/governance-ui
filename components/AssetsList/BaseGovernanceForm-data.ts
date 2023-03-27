@@ -130,7 +130,7 @@ export const transform = <T extends Record<keyof U, any>, U>(
   const errs = {}
   for (const [key, value] of Object.entries(data)) {
     try {
-      obj[key] = transformer[key](value)
+      obj[key] = transformer[key](value, data)
     } catch (e) {
       errs[key] = e
     }
