@@ -1,6 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import * as yup from 'yup'
-import useWalletStore from 'stores/useWalletStore'
 import {
   Governance,
   ProgramAccount,
@@ -20,9 +19,9 @@ import { LoadingDots } from '@components/Loading'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Select from '@components/inputs/Select'
 import Input from '@components/inputs/Input'
-import { DomainObj, useDomainsForAccount } from '@hooks/useDomainNames'
 import { isPublicKey } from '@tools/core/pubkey'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import { useDomainQuery } from '@hooks/queries/domain'
 
 const TransferDomainName = ({
   index,
@@ -31,18 +30,10 @@ const TransferDomainName = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const connection = useWalletStore((s) => s.connection.current)
   const shouldBeGoverned = !!(index !== 0 && governance)
   const { handleSetInstructions } = useContext(NewProposalContext)
 
   const { assetAccounts } = useGovernanceAssets()
-
-  const {
-    accountDomains,
-    isLoading,
-    refreshDomainsForAccount,
-  } = useDomainsForAccount(connection)
-  const [selectedDomain, setSelectedDomain] = useState<DomainObj | null>()
 
   const [formErrors, setFormErrors] = useState({})
   const [form, setForm] = useState<DomainNameTransferForm>({
@@ -50,6 +41,17 @@ const TransferDomainName = ({
     governedAccount: undefined,
     domainAddress: undefined,
   })
+
+  const { data: accountDomains, status } = useDomainQuery(
+    form.governedAccount
+      ? new PublicKey(form.governedAccount?.pubkey)
+      : undefined
+  )
+
+  const selectedDomain = useMemo(
+    () => accountDomains?.find((d) => d.domainAddress === form.domainAddress),
+    [accountDomains, form.domainAddress]
+  )
 
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
@@ -93,9 +95,12 @@ const TransferDomainName = ({
   }
 
   useEffect(() => {
-    if (!form.governedAccount) return
-    setSelectedDomain(null)
-    refreshDomainsForAccount(form.governedAccount)
+    // if governed account should change the domain address field should be cleared
+    handleSetForm({
+      value: undefined,
+      propertyName: 'domainAddress',
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.governedAccount])
 
   useEffect(() => {
@@ -154,7 +159,7 @@ const TransferDomainName = ({
         }
         error={formErrors['destinationAccount']}
       />
-      {isLoading ? (
+      {form.governedAccount && status === 'loading' ? (
         <div className="mt-5">
           <div>Looking up Domains...</div>
           <LoadingDots />
@@ -163,15 +168,12 @@ const TransferDomainName = ({
         <Select
           className=""
           label="Domain"
-          value={selectedDomain ? selectedDomain?.domainName + '.sol' : ''}
+          value={selectedDomain ? selectedDomain.domainName + '.sol' : ''}
           placeholder="Please select..."
           error={formErrors['domainAddress']}
           onChange={(value) => {
-            setSelectedDomain(
-              accountDomains.find((d) => d.domainName === value)
-            )
             handleSetForm({
-              value: accountDomains.find((d) => d.domainName === value)
+              value: accountDomains?.find((d) => d.domainName === value)
                 ?.domainAddress,
               propertyName: 'domainAddress',
             })
