@@ -43,9 +43,7 @@ const TransferDomainName = ({
   })
 
   const { data: accountDomains, status } = useDomainQuery(
-    form.governedAccount
-      ? new PublicKey(form.governedAccount?.pubkey)
-      : undefined
+    form.governedAccount?.pubkey
   )
 
   const selectedDomain = useMemo(
@@ -68,7 +66,7 @@ const TransferDomainName = ({
     const obj: UiInstruction = {
       serializedInstruction: '',
       isValid,
-      governance: undefined,
+      governance: form.governedAccount?.governance,
     }
 
     if (
