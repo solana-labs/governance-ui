@@ -13,7 +13,6 @@ export class HeliumVsrClient {
     programId: web3.PublicKey = PROGRAM_ID,
     devnet?: boolean
   ): Promise<HeliumVsrClient> {
-    console.log(provider, '@@@')
     return new HeliumVsrClient(
       (await init(provider as any, programId)) as any,
       devnet
