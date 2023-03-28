@@ -43,7 +43,7 @@ const ProposalActionsPanel = () => {
     hasVoteTimeExpired && proposal?.account.state === ProposalState.Voting
   const now = new Date().getTime() / 1000 // unix timestamp in seconds
   const mainVotingEndedAt = proposal?.account.signingOffAt
-    ?.addn(governance?.account.config.maxVotingTime || 0)
+    ?.addn(governance?.account.config.baseVotingTime || 0)
     .toNumber()
 
   const votingCoolOffTime = governance?.account.config.votingCoolOffTime || 0

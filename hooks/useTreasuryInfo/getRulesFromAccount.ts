@@ -16,7 +16,7 @@ export function getRulesFromAccount(
 
   if (!rules.common) {
     rules.common = {
-      maxVotingTime: govConfig.maxVotingTime,
+      maxVotingTime: govConfig.baseVotingTime,
       minInstructionHoldupTime: govConfig.minInstructionHoldUpTime,
       votingCoolOffSeconds: govConfig.votingCoolOffTime,
     }

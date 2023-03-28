@@ -42,7 +42,7 @@ const ParamsView = ({ activeGovernance }) => {
             label="Max Voting Time"
             padding
             val={getFormattedStringFromDays(
-              activeGovernance.account.config.maxVotingTime / SECS_PER_DAY
+              activeGovernance.account.config.baseVotingTime / SECS_PER_DAY
             )}
           />
           {communityMint && (
