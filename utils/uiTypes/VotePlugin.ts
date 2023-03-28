@@ -520,14 +520,9 @@ export class VotingClient {
       }
 
       //1 nft is 3 accounts
-      const firstFiveNfts = remainingAccounts.slice(0, 15)
-      const remainingNftsChunk = chunks(
-        remainingAccounts.slice(15, remainingAccounts.length),
-        12
-      )
+      const nftChunks = chunks(remainingAccounts, 12)
 
-      for (const chunk of [firstFiveNfts, ...remainingNftsChunk]) {
-        36
+      for (const chunk of [...nftChunks]) {
         instructions.push(
           await this.client.program.methods
             .castNftVote(proposal.pubkey)
