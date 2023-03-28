@@ -359,7 +359,7 @@ export function useVotingPlugins() {
   }
 
   useEffect(() => {
-    if (wallet) {
+    if (wallet?.publicKey?.toBase58()) {
       if (currentPluginPk) {
         handleSetVsrClient(wallet, connection, currentPluginPk)
         handleSetHeliumVsrClient(wallet, connection, currentPluginPk)
@@ -370,7 +370,11 @@ export function useVotingPlugins() {
       handleSetPythClient(wallet, connection)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [connection.endpoint, wallet, currentPluginPk?.toBase58()])
+  }, [
+    connection.endpoint,
+    wallet?.publicKey?.toBase58(),
+    currentPluginPk?.toBase58(),
+  ])
 
   useEffect(() => {
     const handleVsrPlugin = () => {
