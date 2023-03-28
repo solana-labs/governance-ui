@@ -14,6 +14,16 @@
     "sortRank": 3
   },
   {
+    "symbol": "Dean's List Network State",
+    "displayName": "Dean's List Network State",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "F9V4Lwo49aUe8fFujMbU6uhdFyDRqKY54WpzdpncUSk9",
+    "bannerImage": "/realms/Deans_List_Network_State/DeansList_Network_State_logo.png",
+    "website": "https://www.deanslist.services/",
+    "twitter": "@deanslistDAO",
+    "ogImage": "/realms/Deans_List_Network_State/DeansList_Network_State_logo.png"
+   },
+   {
     "symbol": "Ukraine",
     "displayName": "Ukraine.SOL",
     "programId": "gUAedF544JeE6NYbQakQvribHykUNgaPJqcgf3UQVnY",
@@ -1035,18 +1045,18 @@
     "website": "https://flipsidecrypto.xyz/",
     "twitter": "@flipsidecrypto",
     "ogImage": "/realms/FSLOGO/FLIPSIDE-LOGO-WHITE.png"
-  },
-  {
-    "symbol": "Dean's List",
+   },
+   {
+    "symbol": "Legacy Dean's List Classic (moved to new one)",
     "displayName": "Dean's List",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "9mS8GuMx2MkZGMSwa2k87HNLTFZ1ssa9mJ1RkGFKcGyQ",
-    "bannerImage": "/realms/Deans-List-Grape/deans-list-logo.png",
+    "bannerImage": "/realms/Dean's List Grape/deans list logo.png",
     "website": "https://deans-list.strataprotocol.com/",
     "twitter": "@GrapeDeanslist",
-    "ogImage": "/realms/Deans-List-Grape/deans-list-logo.png"
-  },
-  {
+    "ogImage": "/realms/Dean's List Grape/deans list logo.png"
+   },
+   {
     "symbol": "GrapeCCSubDAO",
     "displayName": "Grape CC SubDAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1054,8 +1064,8 @@
     "website": "https://services.grapes.network/",
     "twitter": "@grapeprotocol",
     "ogImage": "/realms/GrapeCCSubDAO/GrapeCCSubDAO.png"
-  },
-  {
+   },
+   {
     "symbol": "AthensDAO",
     "displayName": "AthensDAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1064,8 +1074,17 @@
     "website": "https://athensdao.net/",
     "twitter": "@GrapeAthensDAO",
     "ogImage": "/realms/AthensDAO/AthensDAO_Logo.jpg"
-  },
-  {
+   },
+   {
+    "symbol": "Wen DAO",
+    "displayName": "Wen DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "3GoWL2uR7qx9NLGuZydTuyoxaYSwAQ3HVqCF3Kz6D7F3",
+    "website": "https://services.grapes.network/",
+    "twitter": "@grapeprotocol",
+    "ogImage": "/realms/Wen DAO/Wen DAO.png"
+   }, 
+   { 
     "symbol": "BOOT",
     "displayName": "Bootstrap DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
