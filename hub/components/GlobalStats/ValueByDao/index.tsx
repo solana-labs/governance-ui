@@ -1,4 +1,3 @@
-import type { BigNumber } from 'bignumber.js';
 import React from 'react';
 
 import * as common from '../common';

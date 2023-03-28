@@ -29,7 +29,6 @@ import {
   vsrPluginsPks,
   nftPluginsPks,
   gatewayPluginsPks,
-  switchboardPluginsPks,
   pythPluginsPks,
 } from '@hooks/useVotingPlugins';
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts';
@@ -204,13 +203,6 @@ export async function createProposal(args: Args) {
         );
       }
     }
-
-    // if (
-    //   switchboardPluginsPks.includes(pluginPublicKeyStr) &&
-    //   votingPlugins.switchboardClient
-    // ) {
-    //   client = votingPlugins.switchboardClient;
-    // }
 
     if (
       gatewayPluginsPks.includes(pluginPublicKeyStr) &&

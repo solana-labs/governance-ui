@@ -30,9 +30,9 @@ import useQueryContext from '@hooks/useQueryContext'
 
 const Params = () => {
   const router = useRouter()
-  const { fmtUrlWithCluster } = useQueryContext()
   const { realm, mint, config, symbol } = useRealm()
   const wallet = useWalletStore((s) => s.current)
+  const { fmtUrlWithCluster } = useQueryContext()
   const {
     canUseAuthorityInstruction,
     assetAccounts,
@@ -85,9 +85,6 @@ const Params = () => {
   const communityMintMaxVoteWeightSource =
     realmAccount?.config.communityMintMaxVoteWeightSource
   const realmConfig = realmAccount?.config
-  const openRealmProposalModal = () => {
-    setIsRealmProposalModalOpen(true)
-  }
   const closeRealmProposalModal = () => {
     setIsRealmProposalModalOpen(false)
   }
@@ -262,7 +259,11 @@ const Params = () => {
                         ? 'None of the governances is realm authority'
                         : ''
                     }
-                    onClick={openRealmProposalModal}
+                    onClick={() => {
+                      router.push(
+                        fmtUrlWithCluster(`/realm/${symbol}/config/edit`)
+                      )
+                    }}
                     className="ml-auto"
                   >
                     Change config
@@ -331,16 +332,7 @@ const Params = () => {
                     />
                   ) : null}
                   {activeTab === 'Params' && (
-                    <ParamsView
-                      activeGovernance={activeGovernance}
-                      openGovernanceProposalModal={() =>
-                        router.push(
-                          fmtUrlWithCluster(
-                            `/realm/${symbol}/governance/${activeGovernance.pubkey.toBase58()}/edit`
-                          )
-                        )
-                      }
-                    />
+                    <ParamsView activeGovernance={activeGovernance} />
                   )}
                   {activeTab === 'Accounts' && (
                     <AccountsView

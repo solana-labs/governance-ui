@@ -1,8 +1,7 @@
-import BuildingIcon from '@carbon/icons-react/lib/Building';
 import ChevronDownIcon from '@carbon/icons-react/lib/ChevronDown';
+import RuleIcon from '@carbon/icons-react/lib/Rule';
 import UserMultipleIcon from '@carbon/icons-react/lib/UserMultiple';
 import WalletIcon from '@carbon/icons-react/lib/Wallet';
-import WarningFilledIcon from '@carbon/icons-react/lib/WarningFilled';
 import { useState } from 'react';
 
 import { SectionBlock } from '../SectionBlock';
@@ -86,7 +85,7 @@ export function ProposalVoteType(props: Props) {
             {props.proposalVoteType === 'community' ? (
               <UserMultipleIcon className="h-4 fill-neutral-500 mr-3 w-4" />
             ) : (
-              <BuildingIcon className="h-4 fill-neutral-500 mr-3 w-4" />
+              <RuleIcon className="h-4 fill-neutral-500 mr-3 w-4" />
             )}
             <div className="text-neutral-500">
               Current{' '}

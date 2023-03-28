@@ -9,7 +9,11 @@ import {
 } from '@solana/spl-governance'
 import { useMemo, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
-import { useIsVoting, useProposalVoteRecordQuery } from './hooks'
+import {
+  useIsInCoolOffTime,
+  useIsVoting,
+  useProposalVoteRecordQuery,
+} from './hooks'
 
 /* 
   returns: undefined if loading, false if nobody can veto, 'council' if council can veto, 'community' if community can veto
@@ -33,9 +37,9 @@ export const useVetoingPop = () => {
 const useIsVetoable = (): undefined | boolean => {
   const vetoingPop = useVetoingPop()
   const isVoting = useIsVoting()
-
+  const isInCoolOffTime = useIsInCoolOffTime()
   // TODO is this accurate?
-  if (isVoting === false) return false
+  if (isVoting === false && isInCoolOffTime === false) return false
   if (vetoingPop === undefined) return undefined
   return !!vetoingPop
 }
