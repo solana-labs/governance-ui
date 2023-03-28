@@ -1051,10 +1051,10 @@
     "displayName": "Dean's List",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "9mS8GuMx2MkZGMSwa2k87HNLTFZ1ssa9mJ1RkGFKcGyQ",
-    "bannerImage": "/realms/Dean's List Grape/deans list logo.png",
+    "bannerImage": "/realms/DeanListGrape/deans-list-logo.png",
     "website": "https://deans-list.strataprotocol.com/",
     "twitter": "@GrapeDeanslist",
-    "ogImage": "/realms/Dean's List Grape/deans list logo.png"
+    "ogImage": "/realms/DeanListGrape/deans-list-logo.png"
    },
    {
     "symbol": "GrapeCCSubDAO",
