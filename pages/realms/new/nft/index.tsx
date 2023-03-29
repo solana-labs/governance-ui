@@ -37,13 +37,16 @@ import { nftPluginsPks } from '@hooks/useVotingPlugins'
 import YesVotePercentageForm, {
   CouncilYesVotePercentageSchema,
 } from '@components/NewRealmWizard/components/steps/YesVotePercentageThresholdForm'
+import useWalletGay from '@hooks/useWallet'
 
 export const FORM_NAME = 'nft'
 
 type NFTForm = BasicDetails & AddNFTCollection & AddCouncil & InviteMembers
 
 export default function NFTWizard() {
-  const { connected, connection, current: wallet } = useWalletStore((s) => s)
+  const connected = useWalletStore((s) => s.connected)
+  const connection = useWalletStore((s) => s.connection)
+  const wallet = useWalletGay()
   const { push } = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
   const [requestPending, setRequestPending] = useState(false)

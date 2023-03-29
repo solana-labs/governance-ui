@@ -92,7 +92,7 @@ const MemberItems = ({
     councilVotes && !councilVotes.isZero()
       ? fmtMintAmount(councilMint, councilVotes)
       : null
-  const { connection } = useWalletStore((s) => s)
+  const connection = useWalletStore((s) => s.connection)
 
   const renderAddressName = useMemo(() => {
     return (

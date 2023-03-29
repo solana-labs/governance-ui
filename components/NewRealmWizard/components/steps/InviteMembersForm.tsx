@@ -14,6 +14,7 @@ import Input from '@components/NewRealmWizard/components/Input'
 import { updateUserInput, validateSolAddress } from '@utils/formValidation'
 import { FORM_NAME as MULTISIG_FORM } from 'pages/realms/new/multisig'
 import { textToAddressList } from '@utils/textToAddressList'
+import useWalletGay from '@hooks/useWallet'
 
 /**
  * Convert a list of addresses into a list of uniques and duplicates
@@ -140,7 +141,7 @@ export default function InviteMembersForm({
   currentStep,
   totalSteps,
 }) {
-  const { current } = useWalletStore((s) => s)
+  const current = useWalletGay()
   const userAddress = current?.publicKey?.toBase58()
   const inputElement = useRef<HTMLInputElement>(null)
   const [inviteList, setInviteList] = useState<string[]>([])

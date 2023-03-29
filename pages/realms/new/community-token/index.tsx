@@ -36,6 +36,7 @@ import {
   GoverningTokenConfigAccountArgs,
   GoverningTokenType,
 } from '@solana/spl-governance'
+import useWalletGay from '@hooks/useWallet'
 
 export const FORM_NAME = 'tokenized'
 
@@ -104,7 +105,9 @@ const transformFormData2RealmCreation = (formData: CommunityTokenForm) => {
 }
 
 export default function CommunityTokenWizard() {
-  const { connected, connection, current: wallet } = useWalletStore((s) => s)
+  const connected = useWalletStore((s) => s.connected)
+  const connection = useWalletStore((s) => s.connection)
+  const wallet = useWalletGay()
   const { push } = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
   const [requestPending, setRequestPending] = useState(false)

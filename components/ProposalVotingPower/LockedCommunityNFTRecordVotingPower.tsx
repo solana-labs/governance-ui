@@ -17,6 +17,7 @@ import useQueryContext from '@hooks/useQueryContext'
 import InlineNotification from '@components/InlineNotification'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
+import useWalletGay from '@hooks/useWallet'
 
 interface Props {
   className?: string
@@ -27,7 +28,8 @@ export default function LockedCommunityNFTRecordVotingPower(props: Props) {
   const [amount, setAmount] = useState(new BigNumber(0))
   const { mint, realm, ownTokenRecord, realmTokenAccount, symbol } = useRealm()
   const { proposal } = useProposal()
-  const [connected, wallet] = useWalletStore((s) => [s.connected, s.current])
+  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletGay()
   const { data: tokenOwnerRecordPk } = useAddressQuery_CommunityTokenOwner()
   const [currentClient] = useVotePluginsClientStore((s) => [
     s.state.currentRealmVotingClient,

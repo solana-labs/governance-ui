@@ -10,11 +10,7 @@ export const LockCommunityTokensBtn: React.FC<{
   onClick: () => void
 }> = ({ onClick, className = '' }) => {
   const { realmTokenAccount } = useRealm()
-  const [connected] = useWalletStore((s) => [
-    s.current,
-    s.connected,
-    s.connection.current,
-  ])
+  const connected = useWalletStore((s) => s.connected)
 
   const hasTokensInWallet =
     realmTokenAccount && realmTokenAccount.account.amount.gt(new BN(0))
