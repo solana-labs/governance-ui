@@ -41,9 +41,9 @@ export function VoteCountdown({
       const now = dayjs().unix()
 
       let timeToVoteEnd = proposal.isPreVotingState()
-        ? governance.config.maxVotingTime
+        ? governance.config.baseVotingTime
         : (proposal.votingAt?.toNumber() ?? 0) +
-          governance.config.maxVotingTime -
+          governance.config.baseVotingTime -
           now
 
       if (timeToVoteEnd <= 0) {

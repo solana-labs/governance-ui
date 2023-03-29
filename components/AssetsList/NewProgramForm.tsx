@@ -5,7 +5,11 @@ import PreviousRouteBtn from 'components/PreviousRouteBtn'
 import Tooltip from 'components/Tooltip'
 import useQueryContext from 'hooks/useQueryContext'
 import useRealm from 'hooks/useRealm'
-import { GovernanceConfig, RpcContext, VoteTipping } from '@solana/spl-governance'
+import {
+  GovernanceConfig,
+  RpcContext,
+  VoteTipping,
+} from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import { tryParseKey } from 'tools/validators/pubkey'
 import { isFormValid } from 'utils/formValidation'
@@ -22,11 +26,17 @@ import { registerProgramGovernance } from 'actions/registerProgramGovernance'
 import { GovernanceType } from '@solana/spl-governance'
 import Switch from 'components/Switch'
 import { debounce } from '@utils/debounce'
-import { DISABLED_VOTER_WEIGHT, MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
+import {
+  DISABLED_VOTER_WEIGHT,
+  MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
+} from '@tools/constants'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { getMintDecimalAmount } from '@tools/sdk/units'
-import { transform, transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig } from './BaseGovernanceForm-data'
+import {
+  transform,
+  transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig,
+} from './BaseGovernanceForm-data'
 interface NewProgramForm extends BaseGovernanceFormFieldsV2 {
   programId: string
   transferAuthority: boolean
@@ -59,7 +69,7 @@ const NewProgramForm = () => {
     mint: realmMint,
     symbol,
     ownVoterWeight,
-    councilMint
+    councilMint,
   } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
@@ -132,7 +142,7 @@ const NewProgramForm = () => {
                         : form.minCommunityTokensToCreateProposal,
                     minCouncilTokensToCreateProposal: '1',
                     minInstructionHoldUpTime: form.minInstructionHoldUpTime.toString(),
-                    maxVotingTime: form.maxVotingTime.toString(),
+                    baseVotingTime: form.maxVotingTime.toString(),
                     votingCoolOffTime: '0',
                     depositExemptProposalCount: '10',
                     communityVoteThreshold: form.voteThreshold.toString(),

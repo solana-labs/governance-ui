@@ -133,7 +133,7 @@ async function runNotifier() {
 
       const remainingInSeconds =
         governancesMap[proposal.account.governance.toBase58()].account.config
-          .maxVotingTime +
+          .baseVotingTime +
         proposal.account.votingAt.toNumber() -
         nowInSeconds
       if (
