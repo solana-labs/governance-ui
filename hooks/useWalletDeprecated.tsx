@@ -3,7 +3,7 @@ import { useMemo } from 'react'
 
 import useWalletStore from '../stores/useWalletStore'
 
-export default function useWallet() {
+export default function useWalletDeprecated() {
   const { connected, connection, current: wallet } = useWalletStore(
     (state) => state
   )

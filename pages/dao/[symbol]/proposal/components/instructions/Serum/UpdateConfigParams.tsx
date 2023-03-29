@@ -1,6 +1,6 @@
 import Input from '@components/inputs/Input'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useWallet from '@hooks/useWallet'
+import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import {
   Governance,
   ProgramAccount,
@@ -23,7 +23,7 @@ const UpdateConfigParams = ({
   const actions = useSerumGovStore((s) => s.actions)
   const connection = useWalletStore((s) => s.connection.current)
   const wallet = useWalletStore((s) => s.current)
-  const { anchorProvider } = useWallet()
+  const { anchorProvider } = useWalletDeprecated()
 
   const [configAccount, setConfigAccount] = useState<ConfigAccountType | null>(
     null

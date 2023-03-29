@@ -1,4 +1,4 @@
-import useWallet from '@hooks/useWallet'
+import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import { web3 } from '@coral-xyz/anchor'
 import { useAsync, UseAsyncReturn } from 'react-async-hook'
 import { SubDaoWithMeta } from '../sdk/types'
@@ -11,6 +11,6 @@ export const useSubDaos = (
   const {
     connection: { current },
     anchorProvider: provider,
-  } = useWallet()
+  } = useWalletDeprecated()
   return useAsync(getSubDaos, [current, provider, programId])
 }
