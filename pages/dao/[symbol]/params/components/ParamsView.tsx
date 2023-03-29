@@ -139,7 +139,17 @@ const ParamsView = ({ activeGovernance }) => {
                 'Please connect wallet with enough voting power to create governance config proposals'
               }
               onClick={() => {
-                router.push(fmtUrlWithCluster(`/realm/${symbol}/config/edit`))
+                if (
+                  ownVoterWeight.canCreateProposal(
+                    activeGovernance.account.config
+                  )
+                ) {
+                  router.push(
+                    fmtUrlWithCluster(
+                      `/realm/${symbol}/governance/${activeGovernance.pubkey.toBase58()}/edit`
+                    )
+                  )
+                }
               }}
               className="ml-auto"
             >

@@ -159,7 +159,7 @@ export function EditRealmConfig(props: Props) {
           (existingConfig.current.configAccount.communityTokenConfig
             .tokenType === GoverningTokenType.Dormant ||
             !governanceResult.data.realmByUrlId.governance.communityTokenRules
-              .canCreateProposal)
+              .canVote)
         ) {
           setProposalVoteType('council');
         }
