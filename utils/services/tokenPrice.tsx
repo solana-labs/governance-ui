@@ -54,7 +54,6 @@ class TokenPriceService {
     }
   }
   async fetchTokenPrices(mintAddresses: string[]) {
-    console.log(mintAddresses)
     if (mintAddresses.length) {
       const mintAddressesWithSol = [...mintAddresses, WSOL_MINT]
       const symbols = mintAddressesWithSol.join(',')
