@@ -17,6 +17,7 @@ import InstructionForm, {
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { buildIxGate } from '@blockworks-foundation/mango-v4'
 import { IxGateParams } from '@blockworks-foundation/mango-v4/dist/types/src/clientIxParamBuilder'
+import useWalletGay from '@hooks/useWallet'
 
 type IxGateSetForm = IxGateParams & {
   governedAccount: AssetAccount | null
@@ -30,7 +31,7 @@ const IxGateSet = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const { mangoClient, mangoGroup } = UseMangoV4()
   const { assetAccounts } = useGovernanceAssets()
   const solAccounts = assetAccounts.filter(

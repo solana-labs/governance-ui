@@ -32,10 +32,11 @@ import {
 } from '@utils/sendTransactions'
 import useQueryContext from '@hooks/useQueryContext'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
+import useWalletGay from '@hooks/useWallet'
 
 const MyProposalsBn = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const connected = useWalletStore((s) => s.connected)
   const [isLoading, setIsLoading] = useState(false)
   const { governancesArray } = useGovernanceAssets()

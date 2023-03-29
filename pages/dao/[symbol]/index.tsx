@@ -37,6 +37,7 @@ import ProposalSorting, {
   PROPOSAL_SORTING_LOCAL_STORAGE_KEY,
   Sorting,
 } from '@components/ProposalSorting'
+import useWalletGay from '@hooks/useWallet'
 
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
@@ -117,7 +118,7 @@ const REALM = () => {
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const connection = useWalletStore((s) => s.connection.current)
 
   const allProposals = Object.entries(proposals).sort((a, b) =>

@@ -19,6 +19,7 @@ import { NewProposalContext } from '../../new'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import useRealm from '@hooks/useRealm'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import useWalletGay from '@hooks/useWallet'
 
 const CustomBase64 = ({
   index,
@@ -28,7 +29,7 @@ const CustomBase64 = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const { ownVoterWeight } = useRealm()
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const { assetAccounts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<Base64InstructionForm>({

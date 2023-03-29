@@ -49,7 +49,7 @@
 // const DEFAULT_MIN_PRICE = 1
 
 export default function Sell() {
-  //   const wallet = useWalletStore((s) => s.current)
+  //   const wallet = useWalletGay()
   //   const connection = useWalletStore((s) => s.connection)
   //   const formatter = Intl.NumberFormat('en', {
   //     notation: 'compact',

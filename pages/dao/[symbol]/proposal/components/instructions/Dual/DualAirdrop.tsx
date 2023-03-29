@@ -19,6 +19,7 @@ import {
 } from '@utils/validations'
 import Tooltip from '@components/Tooltip'
 import Select from '@components/inputs/Select'
+import useWalletGay from '@hooks/useWallet'
 
 const DualAirdrop = ({
   index,
@@ -36,7 +37,7 @@ const DualAirdrop = ({
     treasury: undefined,
   })
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const { assetAccounts } = useGovernanceAssets()
   const [governedAccount, setGovernedAccount] = useState<

@@ -16,6 +16,7 @@ import InstructionForm, {
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { MarketIndex } from '@blockworks-foundation/mango-v4/dist/types/src/accounts/serum3'
+import useWalletGay from '@hooks/useWallet'
 
 type NameMarketIndexVal = {
   name: string
@@ -36,7 +37,7 @@ const OpenBookEditMarket = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const { mangoClient, mangoGroup } = UseMangoV4()
   const { assetAccounts } = useGovernanceAssets()
   const solAccounts = assetAccounts.filter(

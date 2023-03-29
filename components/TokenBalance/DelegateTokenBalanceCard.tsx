@@ -5,10 +5,11 @@ import { fmtMintAmount } from '@tools/sdk/units'
 import useMembersStore from 'stores/useMembersStore'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from 'hooks/useRealm'
+import useWalletGay from '@hooks/useWallet'
 
 const DelegateBalanceCard = () => {
   const delegates = useMembersStore((s) => s.compact.delegates)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const connection = useWalletStore((s) => s.connection)
   const walletId = wallet?.publicKey?.toBase58()
   const {

@@ -21,6 +21,7 @@ import {
 } from 'SwitchboardVotePlugin/SwitchboardQueueVoterClient'
 import { NewProposalContext } from '../../../new'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
+import useWalletGay from '@hooks/useWallet'
 
 const SwitchboardAdmitOracle = ({
   index,
@@ -33,7 +34,7 @@ const SwitchboardAdmitOracle = ({
     queuePubkey: undefined,
   })
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const { handleSetInstructions } = useContext(NewProposalContext)
 
   useEffect(() => {

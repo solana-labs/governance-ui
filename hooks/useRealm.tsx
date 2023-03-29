@@ -35,13 +35,14 @@ import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import { BN } from '@coral-xyz/anchor'
 import { PublicKey } from '@solana/web3.js'
 import { useVsrMode } from './useVsrMode'
+import useWalletGay from './useWallet'
 
 export default function useRealm() {
   const router = useRouter()
   const { symbol } = router.query
   const connection = useWalletStore((s) => s.connection)
   const connected = useWalletStore((s) => s.connected)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const tokenAccounts = useWalletStore((s) => s.tokenAccounts)
   const {
     realm,

@@ -12,6 +12,7 @@ import useSerumGovStore, { ConfigAccountType } from 'stores/useSerumGovStore'
 import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
 import * as anchor from '@coral-xyz/anchor'
+import useWalletGay from '@hooks/useWallet'
 
 const UpdateConfigParams = ({
   index,
@@ -22,7 +23,7 @@ const UpdateConfigParams = ({
   const programId = useSerumGovStore((s) => s.programId)
   const actions = useSerumGovStore((s) => s.actions)
   const connection = useWalletStore((s) => s.connection.current)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const { anchorProvider } = useWalletDeprecated()
 
   const [configAccount, setConfigAccount] = useState<ConfigAccountType | null>(

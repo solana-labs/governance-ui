@@ -34,6 +34,7 @@ import {
   Token,
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
+import useWalletGay from '@hooks/useWallet'
 
 const DepositForm = ({
   index,
@@ -43,7 +44,7 @@ const DepositForm = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const { realmInfo } = useRealm()
   const [stratagies, setStratagies] = useState<any>([])
 

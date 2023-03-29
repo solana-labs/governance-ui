@@ -13,6 +13,7 @@ import { getWithdrawInstruction } from '@utils/instructions/Dual'
 import useWalletStore from 'stores/useWalletStore'
 import { getDualFinanceWithdrawSchema } from '@utils/validations'
 import Tooltip from '@components/Tooltip'
+import useWalletGay from '@hooks/useWallet'
 
 const DualWithdraw = ({
   index,
@@ -27,7 +28,7 @@ const DualWithdraw = ({
     mintPk: undefined,
   })
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const { assetAccounts } = useGovernanceAssets()
   const [governedAccount, setGovernedAccount] = useState<

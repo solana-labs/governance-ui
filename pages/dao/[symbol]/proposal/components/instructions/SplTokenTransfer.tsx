@@ -21,6 +21,7 @@ import {
   getTransferInstruction,
 } from '@utils/instructionTools'
 import { useDestination } from '@hooks/useDestination'
+import useWalletGay from '@hooks/useWallet'
 
 const SplTokenTransfer = ({
   index,
@@ -30,7 +31,7 @@ const SplTokenTransfer = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const { realmInfo } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)

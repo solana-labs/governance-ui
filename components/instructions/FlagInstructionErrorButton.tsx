@@ -16,6 +16,7 @@ import Tooltip from '@components/Tooltip'
 import { notify } from '@utils/notifications'
 import { PublicKey } from '@solana/web3.js'
 import { getProgramVersionForRealm } from '@models/registry/api'
+import useWalletGay from '@hooks/useWallet'
 
 export function FlagInstructionErrorButton({
   proposal,
@@ -27,7 +28,7 @@ export function FlagInstructionErrorButton({
   playState: PlayState
 }) {
   const { realmInfo, ownTokenRecord, ownCouncilTokenRecord } = useRealm()
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const connection = useWalletStore((s) => s.connection)
   const isProposalOwner =
     proposal.account.tokenOwnerRecord.toBase58() ===

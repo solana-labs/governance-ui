@@ -20,6 +20,7 @@ import useSerumGovStore from 'stores/useSerumGovStore'
 import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import { NewProposalContext } from '../../../new'
 import { findProgramAddressSync } from '@coral-xyz/anchor/dist/cjs/utils/pubkey'
+import useWalletGay from '@hooks/useWallet'
 
 const InitUser = ({
   index,
@@ -31,7 +32,7 @@ const InitUser = ({
   const programId = useSerumGovStore((s) => s.programId)
   const actions = useSerumGovStore((s) => s.actions)
   const connection = useWalletStore((s) => s.connection.current)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const { anchorProvider } = useWalletDeprecated()
   const { governedNativeAccounts } = useGovernanceAssets()
 

@@ -29,6 +29,7 @@ import { useRouter } from 'next/router'
 import { notify } from '@utils/notifications'
 import useCreateProposal from '@hooks/useCreateProposal'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import useWalletGay from '@hooks/useWallet'
 
 const ConvertToMsol = () => {
   const { canChooseWhoVote, realm, symbol } = useRealm()
@@ -38,7 +39,7 @@ const ConvertToMsol = () => {
   const router = useRouter()
   const { handleCreateProposal } = useCreateProposal()
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const notConnectedMessage =

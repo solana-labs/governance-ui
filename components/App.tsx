@@ -29,6 +29,7 @@ import { getResourcePathPart } from '@tools/core/resources'
 import queryClient from '@hooks/queries/queryClient'
 import useSerumGovStore from 'stores/useSerumGovStore'
 import { WalletProvider } from '@hub/providers/Wallet'
+import useWalletGay from '@hooks/useWallet'
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
@@ -82,7 +83,7 @@ export function App(props: Props) {
     ownDelegateTokenRecords,
     ownDelegateCouncilTokenRecords,
   } = useRealm()
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const connection = useWalletStore((s) => s.connection)
   const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
   const prevStringifyPossibleNftsAccounts = usePrevious(

@@ -21,6 +21,7 @@ import { getChangedValues, getNullOrTransform } from '@utils/mangoV4Tools'
 import { BN } from '@coral-xyz/anchor'
 import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
 import Switch from '@components/Switch'
+import useWalletGay from '@hooks/useWallet'
 
 const keyToLabel = {
   oraclePk: 'Oracle',
@@ -139,7 +140,7 @@ const PerpEdit = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const { mangoClient, mangoGroup, getAdditionalLabelInfo } = UseMangoV4()
   const { assetAccounts } = useGovernanceAssets()
   const [perps, setPerps] = useState<NameMarketIndexVal[]>([])

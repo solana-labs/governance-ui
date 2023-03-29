@@ -17,6 +17,7 @@ import Input from '@components/inputs/Input'
 import { validatePubkey } from '@utils/formValidation'
 import * as yup from 'yup'
 import { PublicKey } from '@solana/web3.js'
+import useWalletGay from '@hooks/useWallet'
 
 type Form = {
   governedAccount: AssetAccount | null
@@ -42,7 +43,7 @@ const SetMintAuthority = ({
     setAuthorityToNone: false,
     mintAuthority: '',
   })
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const [formErrors, setFormErrors] = useState({})
 
   const { handleSetInstructions } = useContext(NewProposalContext)

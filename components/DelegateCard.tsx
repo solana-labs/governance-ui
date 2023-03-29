@@ -21,6 +21,7 @@ import { DisplayAddress } from '@cardinal/namespaces-components'
 import { tryParseKey } from 'tools/validators/pubkey'
 import { XCircleIcon } from '@heroicons/react/outline'
 import Tooltip from './Tooltip'
+import useWalletGay from '@hooks/useWallet'
 
 const DelegateCard = () => {
   const {
@@ -31,7 +32,7 @@ const DelegateCard = () => {
     ownCouncilTokenRecord,
   } = useRealm()
   const [isLoading, setLoading] = useState<boolean>(false)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const connection = useWalletStore((s) => s.connection.current)
   const { fetchRealm } = useWalletStore((s) => s.actions)
 

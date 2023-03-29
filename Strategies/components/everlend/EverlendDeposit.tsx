@@ -24,6 +24,7 @@ import { precision } from '@utils/formatting'
 import { validateInstruction } from '@utils/instructionTools'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Loading from '@components/Loading'
+import useWalletGay from '@hooks/useWallet'
 
 interface IProps {
   proposedInvestment
@@ -72,7 +73,7 @@ const EverlendDeposit = ({
     (s) => s.state.currentRealmVotingClient
   )
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
 
   const { canUseTransferInstruction } = useGovernanceAssets()
 

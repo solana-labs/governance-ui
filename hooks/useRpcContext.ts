@@ -3,11 +3,12 @@ import { RpcContext } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from './useRealm'
+import useWalletGay from './useWallet'
 
 export default function useRpcContext() {
   const { realmInfo, realm } = useRealm()
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const getRpcContext = () =>
     new RpcContext(
       new PublicKey(realm!.owner.toString()),

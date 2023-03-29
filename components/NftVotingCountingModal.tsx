@@ -1,4 +1,5 @@
 import { usePrevious } from '@hooks/usePrevious'
+import useWalletGay from '@hooks/useWallet'
 import { NftVoterClient } from '@solana/governance-program-library'
 import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
@@ -24,7 +25,7 @@ const NftVotingComponent = () => {
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const { votingNfts } = useNftPluginStore((s) => s.state)
   const votingInProgress = useNftProposalStore((s) => s.votingInProgress)
   const usedNfts = countedNftsForProposal.length

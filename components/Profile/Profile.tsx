@@ -4,6 +4,7 @@ import { PublicKey } from '@solana/web3.js'
 import { LoadingDots } from '@components/Loading'
 import { CivicIcon } from '@components/icons'
 import useWalletStore from '../../stores/useWalletStore'
+import useWalletGay from '@hooks/useWallet'
 
 const VisitLink: FC<{ address: PublicKey }> = ({ address }) => (
   <a
@@ -32,7 +33,7 @@ const ClaimLink: FC<{ address: PublicKey; expanded }> = ({
 
 type Props = { publicKey?: PublicKey; expanded?: boolean }
 export const Profile: FC<Props> = ({ publicKey, expanded }) => {
-  const connectedWallet = useWalletStore((s) => s.current)
+  const connectedWallet = useWalletGay()
   const { profile, loading } = useProfile(publicKey)
 
   if (!profile && loading) return <LoadingDots />

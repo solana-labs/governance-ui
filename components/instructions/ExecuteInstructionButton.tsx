@@ -28,6 +28,7 @@ import {
 } from '@utils/instructions/Castle'
 import Wallet from '@project-serum/sol-wallet-adapter'
 import { getFormattedStringFromDays, SECS_PER_DAY } from '@utils/dateTools'
+import useWalletGay from '@hooks/useWallet'
 
 export enum PlayState {
   Played,
@@ -50,7 +51,7 @@ export function ExecuteInstructionButton({
   instructionOption: InstructionOption
 }) {
   const { realmInfo } = useRealm()
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const connection = useWalletStore((s) => s.connection)
   const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
   const connected = useWalletStore((s) => s.connected)
@@ -96,11 +97,11 @@ export function ExecuteInstructionButton({
       switch (instructionOption) {
         case InstructionOptions.castleRefresh:
           adjacentTransaction = new Transaction().add(
-              ...await getCastleRefreshInstructions(
-                  rpcContext.connection,
-                  (wallet as unknown) as Wallet,
-                  proposalInstruction
-              )
+            ...(await getCastleRefreshInstructions(
+              rpcContext.connection,
+              (wallet as unknown) as Wallet,
+              proposalInstruction
+            ))
           )
           break
         case InstructionOptions.castleReconcileRefresh: {
@@ -110,11 +111,11 @@ export function ExecuteInstructionButton({
             proposalInstruction
           )
           adjacentTransaction = new Transaction().add(
-              ...await getCastleRefreshInstructions(
-                rpcContext.connection,
-                (wallet as unknown) as Wallet,
-                proposalInstruction
-              )
+            ...(await getCastleRefreshInstructions(
+              rpcContext.connection,
+              (wallet as unknown) as Wallet,
+              proposalInstruction
+            ))
           )
           break
         }

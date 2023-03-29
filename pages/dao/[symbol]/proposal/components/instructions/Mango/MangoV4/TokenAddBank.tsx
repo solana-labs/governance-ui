@@ -17,6 +17,7 @@ import InstructionForm, {
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
+import useWalletGay from '@hooks/useWallet'
 
 type NamePkVal = {
   name: string
@@ -36,7 +37,7 @@ const TokenAddBank = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const { mangoGroup, mangoClient } = UseMangoV4()
   const { assetAccounts } = useGovernanceAssets()
   const solAccounts = assetAccounts.filter(

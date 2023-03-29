@@ -17,6 +17,7 @@ import InstructionForm, { InstructionInputType } from '../FormCreator'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getRegistrarPDA } from '@utils/plugin/accounts'
+import useWalletGay from '@hooks/useWallet'
 
 interface CreateNftRegistrarForm {
   governedAccount: AssetAccount | undefined
@@ -33,7 +34,7 @@ const CreateNftPluginRegistrar = ({
   const { realm, realmInfo } = useRealm()
   const nftClient = useVotePluginsClientStore((s) => s.state.nftClient)
   const { assetAccounts } = useGovernanceAssets()
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<CreateNftRegistrarForm>()
   const [formErrors, setFormErrors] = useState({})

@@ -17,6 +17,7 @@ import InstructionForm, {
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { I80F48 } from '@blockworks-foundation/mango-v4'
+import useWalletGay from '@hooks/useWallet'
 
 interface StubOracleSetForm {
   governedAccount: AssetAccount | null
@@ -32,7 +33,7 @@ const StubOracleSet = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const { mangoClient, mangoGroup } = UseMangoV4()
   const { assetAccounts } = useGovernanceAssets()
   const solAccounts = assetAccounts.filter(

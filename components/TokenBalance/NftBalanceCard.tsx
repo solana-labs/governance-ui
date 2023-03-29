@@ -19,6 +19,7 @@ import { FC, useEffect, useState } from 'react'
 import useQueryContext from '@hooks/useQueryContext'
 import Link from 'next/link'
 import { ChevronRightIcon } from '@heroicons/react/outline'
+import useWalletGay from '@hooks/useWallet'
 
 interface Props {
   inAccountDetails?: boolean
@@ -28,7 +29,7 @@ interface Props {
 const NftBalanceCard = ({ inAccountDetails, showView }: Props) => {
   const { fmtUrlWithCluster } = useQueryContext()
   const connected = useWalletStore((s) => s.connected)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )

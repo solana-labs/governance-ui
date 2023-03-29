@@ -37,6 +37,7 @@ import {
 import { PsyFiStrategy } from 'Strategies/types/types'
 import { usePsyFiProgram } from './hooks/usePsyFiProgram'
 import { notify } from '@utils/notifications'
+import useWalletGay from '@hooks/useWallet'
 
 const SOL_BUFFER = 0.02
 
@@ -70,7 +71,7 @@ export const Deposit: React.FC<{
     (s) => s.state.currentRealmVotingClient
   )
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const [ownedStrategyTokenAccount, setOwnedStrategyTokenAccount] = useState<
     AssetAccount | undefined
   >()

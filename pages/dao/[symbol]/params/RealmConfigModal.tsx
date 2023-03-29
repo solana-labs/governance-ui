@@ -32,6 +32,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import { isDisabledVoterWeight } from '@tools/governance/units'
 import useProgramVersion from '@hooks/useProgramVersion'
+import useWalletGay from '@hooks/useWallet'
 
 interface RealmConfigProposal extends RealmConfigForm {
   title: string
@@ -48,7 +49,7 @@ const RealmConfigModal = ({ closeProposalModal, isProposalModalOpen }) => {
       x.governance.pubkey.toBase58() === realm?.account.authority?.toBase58()
   )
   const { fmtUrlWithCluster } = useQueryContext()
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const connection = useWalletStore((s) => s.connection)
   const { handleCreateProposal } = useCreateProposal()
   const defaultCfgTitle = 'Change realm config'

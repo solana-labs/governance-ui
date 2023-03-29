@@ -26,6 +26,7 @@ import {
   getTransferInstruction,
 } from '@utils/instructionTools'
 import NonprofitSelect from '@components/inputs/ChangeNonprofitSelect'
+import useWalletGay from '@hooks/useWallet'
 
 const ChangeDonation = ({
   index,
@@ -35,7 +36,7 @@ const ChangeDonation = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const { realmInfo } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)

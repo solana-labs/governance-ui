@@ -27,11 +27,12 @@ import Tooltip from '@components/Tooltip'
 import { AccountType } from '@utils/uiTypes/assets'
 import { MintMaxVoteWeightSourceType } from '@solana/spl-governance'
 import useQueryContext from '@hooks/useQueryContext'
+import useWalletGay from '@hooks/useWallet'
 
 const Params = () => {
   const router = useRouter()
   const { realm, mint, config, symbol } = useRealm()
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const { fmtUrlWithCluster } = useQueryContext()
   const {
     canUseAuthorityInstruction,

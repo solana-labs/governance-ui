@@ -21,6 +21,7 @@ import InstructionForm, {
 import { getMaxVoterWeightRecord } from '@utils/plugin/accounts'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import useWalletGay from '@hooks/useWallet'
 
 interface CreateNftMaxVoterWeightRecord {
   governedAccount: AssetAccount | undefined
@@ -36,7 +37,7 @@ const CreateNftPluginMaxVoterWeightRecord = ({
   const { realm, realmInfo } = useRealm()
   const nftClient = useVotePluginsClientStore((s) => s.state.nftClient)
   const { assetAccounts } = useGovernanceAssets()
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<CreateNftMaxVoterWeightRecord>()
   const [formErrors, setFormErrors] = useState({})

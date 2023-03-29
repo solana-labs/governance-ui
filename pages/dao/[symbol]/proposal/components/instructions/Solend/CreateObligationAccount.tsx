@@ -20,6 +20,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import useWalletGay from '@hooks/useWallet'
 
 const CreateObligationAccount = ({
   index,
@@ -29,7 +30,7 @@ const CreateObligationAccount = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const { realmInfo } = useRealm()
 
   // Hardcoded gate used to be clear about what cluster is supported for now

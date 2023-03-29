@@ -40,6 +40,7 @@ import SerumGovernanceTokenWrapper from './SerumGovernanceTokenWrapper'
 import getNumTokens from '@components/ProposalVotingPower/getNumTokens'
 import VotingPowerPct from '@components/ProposalVotingPower/VotingPowerPct'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
+import useWalletGay from '@hooks/useWallet'
 
 const TokenBalanceCard = ({
   proposal,
@@ -141,7 +142,7 @@ export const TokenDeposit = ({
   inAccountDetails?: boolean
   setHasGovPower?: (hasGovPower: boolean) => void
 }) => {
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletGay()
   const connected = useWalletStore((s) => s.connected)
   const connection = useWalletStore((s) => s.connection.current)
   const { fetchWalletTokenAccounts, fetchRealm } = useWalletStore(
