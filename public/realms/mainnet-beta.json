@@ -3118,5 +3118,12 @@
     "website": "https://helium.com",
     "twitter": "@Helium",
     "ogImage": "/realms/Helium/img/mobilelogo.png"
+  },
+  {
+    "symbol": "JEFF",
+    "displayName": "JEFF",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "APiZ1jchvykfnJkqmp3bXJQyPBvYDR3HycaWVff2MEd8"
+    "ogImage": "/realms/JEFF/jeff.jpg"
   }
 ]
