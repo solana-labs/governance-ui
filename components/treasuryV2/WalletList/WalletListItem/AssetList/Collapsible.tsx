@@ -86,7 +86,7 @@ export default function Collapsible(props: Props) {
             />
           )}
         </button>
-        {props.onToggleHiddenItems && props.itemsToHide?.length && (
+        {props.onToggleHiddenItems && props.itemsToHide?.length !== 0 && (
           <div className="mr-3">
             {props.showHiddenItems ? (
               <EyeIcon
