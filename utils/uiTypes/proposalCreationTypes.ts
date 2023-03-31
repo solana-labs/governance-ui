@@ -229,6 +229,8 @@ export interface UXDEditMercurialVaultDepositoryForm {
   uiRedeemableAmountUnderManagementCap?: number;
   mintingFeeInBps?: number;
   redeemingFeeInBps?: number;
+  mintingDisabled?: boolean;
+  profitsBeneficiaryCollateral?: PublicKey;
 }
 
 export interface UXDEditCredixLpDepositoryForm {
@@ -237,6 +239,8 @@ export interface UXDEditCredixLpDepositoryForm {
   uiRedeemableAmountUnderManagementCap?: number;
   mintingFeeInBps?: number;
   redeemingFeeInBps?: number;
+  mintingDisabled?: boolean;
+  profitsBeneficiaryCollateral?: PublicKey;
 }
 
 export interface UXDEditIdentityDepositoryForm {

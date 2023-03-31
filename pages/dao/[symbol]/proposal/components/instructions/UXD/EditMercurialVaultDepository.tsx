@@ -36,6 +36,12 @@ const EditMercurialVaultDepository = ({
   index: number;
   governedAccount?: GovernedMultiTypeAccount;
 }) => {
+
+  const [
+    uiRedeemableAmountUnderManagementCapChange,
+    setUiRedeemableAmountUnderManagementCapChange,
+  ] = useState<boolean>(false);
+
   const [mintingFeesInBpsChange, setMintingFeesInBpsChange] = useState<boolean>(
     false,
   );
@@ -46,8 +52,13 @@ const EditMercurialVaultDepository = ({
   ] = useState<boolean>(false);
 
   const [
-    uiRedeemableAmountUnderManagementCapChange,
-    setUiRedeemableAmountUnderManagementCapChange,
+    mintingDisabledChange,
+    setMintingDisabledChange,
+  ] = useState<boolean>(false);
+
+  const [
+    profitsBeneficiaryCollateralChange,
+    setProfitsBeneficiaryCollateralChange,
   ] = useState<boolean>(false);
 
   const {
@@ -76,16 +87,21 @@ const EditMercurialVaultDepository = ({
         // ================
 
         depositoryMintName: form.collateralName!,
-        mintingFeeInBps: mintingFeesInBpsChange
-          ? form.mintingFeeInBps!
-          : undefined,
-
-        redeemingFeeInBps: redeemingFeesInBpsChange
-          ? form.redeemingFeeInBps!
-          : undefined,
 
         redeemableAmountUnderManagementCap: uiRedeemableAmountUnderManagementCapChange
           ? form.uiRedeemableAmountUnderManagementCap!
+          : undefined,
+        mintingFeeInBps: mintingFeesInBpsChange
+          ? form.mintingFeeInBps!
+          : undefined,
+        redeemingFeeInBps: redeemingFeesInBpsChange
+          ? form.redeemingFeeInBps!
+          : undefined,
+          mintingDisabled: mintingDisabledChange
+          ? form.mintingDisabled!
+          : undefined,
+        profitsBeneficiaryCollateral: profitsBeneficiaryCollateralChange
+          ? form.profitsBeneficiaryCollateral!
           : undefined,
       });
     },
@@ -104,6 +120,30 @@ const EditMercurialVaultDepository = ({
       >
         <SelectOptionList list={getDepositoryMintSymbols(connection.cluster)} />
       </Select>
+
+      <h5>Redeemable Depository Supply Cap</h5>
+
+      <Switch
+        checked={uiRedeemableAmountUnderManagementCapChange}
+        onChange={(checked) =>
+          setUiRedeemableAmountUnderManagementCapChange(checked)
+        }
+      />
+
+      {uiRedeemableAmountUnderManagementCapChange ? (
+        <InputNumber
+          value={form.uiRedeemableAmountUnderManagementCap}
+          min={0}
+          max={10 ** 12}
+          onChange={(value) =>
+            handleSetForm({
+              value,
+              propertyName: 'uiRedeemableAmountUnderManagementCap',
+            })
+          }
+          error={formErrors['uiRedeemableAmountUnderManagementCap']}
+        />
+      ) : null}
 
       <h5>Minting Fees in BPS</h5>
 
@@ -149,29 +189,51 @@ const EditMercurialVaultDepository = ({
         />
       ) : null}
 
-      <h5>Redeemable Depository Supply Cap</h5>
 
-      <Switch
-        checked={uiRedeemableAmountUnderManagementCapChange}
-        onChange={(checked) =>
-          setUiRedeemableAmountUnderManagementCapChange(checked)
-        }
-      />
+<h5>Minting Disabled</h5>
 
-      {uiRedeemableAmountUnderManagementCapChange ? (
-        <InputNumber
-          value={form.uiRedeemableAmountUnderManagementCap}
-          min={0}
-          max={10 ** 12}
-          onChange={(value) =>
-            handleSetForm({
-              value,
-              propertyName: 'uiRedeemableAmountUnderManagementCap',
-            })
-          }
-          error={formErrors['uiRedeemableAmountUnderManagementCap']}
-        />
-      ) : null}
+<Switch
+  checked={mintingDisabledChange}
+  onChange={(checked) =>
+    setMintingDisabledChange(checked)
+  }
+/>
+
+{mintingDisabledChange ? (
+  <Switch
+    checked={form.mintingDisabled}
+    onChange={(value) =>
+      handleSetForm({
+        value,
+        propertyName: 'mintingDisabled',
+      })
+    }
+    error={formErrors['mintingDisabled']}
+  />
+) : null}
+
+<Switch
+  checked={profitsBeneficiaryCollateralChange}
+  onChange={(checked) =>
+    setProfitsBeneficiaryCollateralChange(checked)
+  }
+/>
+
+<h5>Profits Beneficiary Collateral</h5>
+
+{profitsBeneficiaryCollateralChange ? (
+  <Input
+    value={form.profitsBeneficiaryCollateral}
+    onChange={(value) =>
+      handleSetForm({
+        new PublicKey(value),
+        propertyName: 'profitsBeneficiaryCollateral',
+      })
+    }
+    error={formErrors['profitsBeneficiaryCollateral']}
+  />
+) : null}
+
     </>
   );
 };
