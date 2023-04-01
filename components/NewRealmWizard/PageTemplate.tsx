@@ -5,7 +5,6 @@ import Head from 'next/head'
 import { isWizardValid, validateSolAddress } from '@utils/formValidation'
 
 import CreateDAOWizard from '@components/NewRealmWizard/CreateDAOWizard'
-import useWalletStore from 'stores/useWalletStore'
 
 // import { FORM_NAME as NFT_FORM } from 'pages/realms/new/nft'
 import { FORM_NAME as MULTISIG_WALLET_FORM } from 'pages/realms/new/multisig'
@@ -30,8 +29,8 @@ export default function FormPage({
   handleSubmit,
   submissionPending,
 }) {
-  const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const userAddress = wallet?.publicKey?.toBase58()
 
   const { query, push } = useRouter()

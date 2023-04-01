@@ -44,9 +44,9 @@ export const FORM_NAME = 'nft'
 type NFTForm = BasicDetails & AddNFTCollection & AddCouncil & InviteMembers
 
 export default function NFTWizard() {
-  const connected = useWalletStore((s) => s.connected)
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const { push } = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
   const [requestPending, setRequestPending] = useState(false)

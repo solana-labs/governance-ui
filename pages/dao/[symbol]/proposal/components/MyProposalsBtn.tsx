@@ -37,7 +37,7 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 const MyProposalsBn = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
   const wallet = useWalletOnePointOh()
-  const connected = useWalletStore((s) => s.connected)
+  const connected = !!wallet?.connected
   const [isLoading, setIsLoading] = useState(false)
   const { governancesArray } = useGovernanceAssets()
   const { current: connection } = useWalletStore((s) => s.connection)

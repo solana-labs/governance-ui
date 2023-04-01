@@ -105,9 +105,9 @@ const transformFormData2RealmCreation = (formData: CommunityTokenForm) => {
 }
 
 export default function CommunityTokenWizard() {
-  const connected = useWalletStore((s) => s.connected)
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const { push } = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
   const [requestPending, setRequestPending] = useState(false)

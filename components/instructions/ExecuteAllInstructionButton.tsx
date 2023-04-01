@@ -101,7 +101,7 @@ export function ExecuteAllInstructionButton({
   const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
   const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
-  const connected = useWalletStore((s) => s.connected)
+  const connected = !!wallet?.connected
 
   const [currentSlot, setCurrentSlot] = useState(0)
 

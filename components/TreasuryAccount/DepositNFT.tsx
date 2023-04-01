@@ -7,6 +7,7 @@ import DepositNFTAddress from './DepositNFTAddress'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import { ArrowLeftIcon, ExternalLinkIcon } from '@heroicons/react/solid'
 import { getExplorerUrl } from '@components/explorer/tools'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 enum DepositState {
   DepositNFTFromWallet,
@@ -16,7 +17,8 @@ enum DepositState {
 const DepositNFT = ({ onClose }) => {
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const connection = useWalletStore((s) => s.connection)
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const [
     currentDepositView,
     setCurrentDepositView,

@@ -19,7 +19,7 @@ const DepositCommunityTokensBtn = ({ className = '', inAccountDetails }) => {
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const [isLoading, setIsLoading] = useState(false)
   const wallet = useWalletOnePointOh()
-  const connected = useWalletStore((s) => s.connected)
+  const connected = !!wallet?.connected
   const connection = useWalletStore((s) => s.connection.current)
   const endpoint = useWalletStore((s) => s.connection.endpoint)
   const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(

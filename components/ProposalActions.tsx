@@ -29,7 +29,7 @@ const ProposalActionsPanel = () => {
   )
   const { realmInfo } = useRealm()
   const wallet = useWalletOnePointOh()
-  const connected = useWalletStore((s) => s.connected)
+  const connected = !!wallet?.connected
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
   const signatories = useWalletStore((s) => s.selectedProposal.signatories)
   const connection = useWalletStore((s) => s.connection)

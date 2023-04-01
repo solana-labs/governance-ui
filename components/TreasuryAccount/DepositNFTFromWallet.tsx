@@ -27,7 +27,7 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
   const { getNfts } = useTreasuryAccountStore()
   const [selectedNfts, setSelectedNfts] = useState<NFTWithMint[]>([])
   const wallet = useWalletOnePointOh()
-  const connected = useWalletStore((s) => s.connected)
+  const connected = !!wallet?.connected
   const connection = useWalletStore((s) => s.connection)
   const [isLoading, setIsLoading] = useState(false)
   const [sendingSuccess, setSendingSuccess] = useState(false)

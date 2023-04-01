@@ -29,8 +29,8 @@ const Realms = () => {
   const [editingGrid, setEditingGrid] = useState(false)
   const { actions, selectedRealm } = useWalletStore((s) => s)
   const connection = useWalletStore((s) => s.connection)
-  const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
   const [searchString, setSearchString] = useState('')

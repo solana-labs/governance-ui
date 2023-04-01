@@ -30,8 +30,8 @@ export default function NftVotingPower(props: Props) {
   const votingPower = useNftPluginStore((s) => s.state.votingPower)
   const maxWeight = useNftPluginStore((s) => s.state.maxVoteRecord)
   const isLoading = useNftPluginStore((s) => s.state.isLoadingNfts)
-  const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const connection = useWalletStore((s) => s.connection)
   const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
   const { ownTokenRecord, realm, realmInfo } = useRealm()

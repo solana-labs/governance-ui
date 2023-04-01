@@ -21,7 +21,6 @@ import React, {
 } from 'react'
 import { useCallback } from 'react'
 
-import useWalletStore from '../../stores/useWalletStore'
 import Button from '../Button'
 import Input from '../inputs/Input'
 import NotifiFullLogo from './NotifiFullLogo'
@@ -72,7 +71,7 @@ const NotificationsCard = ({
   const [firstTimeUser, setFirstTimeUser] = useState<boolean>(false)
 
   const wallet = useWalletOnePointOh()
-  const connected = useWalletStore((s) => s.connected)
+  const connected = !!wallet?.connected
 
   const alerts = data?.alerts
   const sources = data?.sources

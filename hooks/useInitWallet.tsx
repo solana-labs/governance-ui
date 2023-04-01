@@ -94,9 +94,6 @@ export default function useInitWallet() {
   useEffect(() => {
     if (!wallet) return
     wallet.on('connect', async () => {
-      setWalletStore((state) => {
-        state.connected = true
-      })
       notify({
         message: 'Wallet connected',
         description:
@@ -111,7 +108,6 @@ export default function useInitWallet() {
     })
     wallet.on('disconnect', () => {
       setWalletStore((state) => {
-        state.connected = false
         state.tokenAccounts = []
       })
       notify({
@@ -121,9 +117,6 @@ export default function useInitWallet() {
     })
     return () => {
       wallet?.disconnect?.()
-      setWalletStore((state) => {
-        state.connected = false
-      })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [wallet])

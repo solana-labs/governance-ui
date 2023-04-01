@@ -239,9 +239,9 @@ export default function AddNFTCollectionForm({
   onSubmit,
   onPrevClick,
 }) {
-  const connected = useWalletStore((s) => s.connected)
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const [walletConnecting, setWalletConnecting] = useState(false)
   const [requestPending, setRequestPending] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)

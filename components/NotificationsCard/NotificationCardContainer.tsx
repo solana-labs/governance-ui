@@ -10,7 +10,6 @@ import {
 import { firstOrNull } from '@utils/helpers'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 
 type Props = {
   onClose: () => void
@@ -28,7 +27,7 @@ const NotificationCardContainer: React.FC<Props> = ({
 
   const endpoint = cluster ? (cluster as EndpointTypes) : 'mainnet'
   const wallet = useWalletOnePointOh()
-  const connected = useWalletStore((s) => s.connected)
+  const connected = !!wallet?.connected
   let env = BlockchainEnvironment.MainNetBeta
 
   switch (endpoint) {

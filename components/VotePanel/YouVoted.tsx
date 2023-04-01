@@ -38,7 +38,7 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
   const { realm, realmInfo } = useRealm()
   const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
-  const connected = useWalletStore((s) => s.connected)
+  const connected = !!wallet?.connected
   const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
   const fetchProposal = useWalletStore((s) => s.actions.fetchProposal)
   const { governance } = useWalletStore((s) => s.selectedProposal)

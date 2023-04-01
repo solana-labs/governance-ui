@@ -7,10 +7,12 @@ import VetoButtons from './VetoButtons'
 import { CastVoteButtons } from './CastVoteButtons'
 import { YouVoted } from './YouVoted'
 import { useIsVoting, useProposalVoteRecordQuery } from './hooks'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const VotePanel = () => {
   const { proposal } = useWalletStore((s) => s.selectedProposal)
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
 
   const { data: ownVoteRecord } = useProposalVoteRecordQuery('electoral')
 

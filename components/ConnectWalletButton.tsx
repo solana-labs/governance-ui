@@ -44,14 +44,12 @@ const ConnectWalletButton = (props) => {
   )
   const { wallets } = useWallet()
 
-  const {
-    connected,
-    providerName,
-    connection,
-    set: setWalletStore,
-  } = useWalletStore((s) => s)
+  const { providerName, connection, set: setWalletStore } = useWalletStore(
+    (s) => s
+  )
 
   const current = useWalletOnePointOh()
+  const connected = !!current?.connected
 
   const provider = useMemo(
     () => getWalletProviderByName(providerName, wallets),
