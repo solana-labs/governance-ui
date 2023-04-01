@@ -19,6 +19,7 @@ import InlineNotification from '@components/InlineNotification'
 import Link from 'next/link'
 import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
 import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const LockPluginTokenBalanceCard = ({
   proposal,
@@ -32,7 +33,7 @@ const LockPluginTokenBalanceCard = ({
   const { councilMint, mint, realm, symbol, config } = useRealm()
   const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
   const connected = useWalletStore((s) => s.connected)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const isDepositVisible = (
     depositMint: MintInfo | undefined,
     realmMint: PublicKey | undefined

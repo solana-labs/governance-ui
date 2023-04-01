@@ -1,7 +1,7 @@
 import { BN } from '@coral-xyz/anchor'
 import { MintLayout, Token, TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { withCreateTokenOwnerRecord } from '@solana/spl-governance'
-import useWallet from '@hooks/useWallet'
+import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import {
   Keypair,
   PublicKey,
@@ -18,7 +18,7 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 
 export const useCreatePosition = () => {
-  const { connection, wallet } = useWallet()
+  const { connection, wallet } = useWalletDeprecated()
   const { realm, realmInfo } = useRealm()
   const [{ client }, registrarPk] = useVotePluginsClientStore((s) => [
     s.state.currentRealmVotingClient,

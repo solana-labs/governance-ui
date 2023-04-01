@@ -1,4 +1,4 @@
-import useWallet from '@hooks/useWallet'
+import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import { BN } from '@coral-xyz/anchor'
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
 import { useAsyncCallback } from 'react-async-hook'
@@ -11,7 +11,7 @@ import { useUnixNow } from '@hooks/useUnixNow'
 
 export const useClosePosition = () => {
   const { unixNow } = useUnixNow()
-  const { connection, wallet } = useWallet()
+  const { connection, wallet } = useWalletDeprecated()
   const { realm } = useRealm()
   const [{ client }] = useVotePluginsClientStore((s) => [
     s.state.currentRealmVotingClient,

@@ -26,6 +26,7 @@ import { abbreviateAddress } from '@utils/formatting'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance, ProgramAccount } from '@solana/spl-governance'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface CloseBuffersForm {
   governedAccount: AssetAccount | undefined
@@ -43,7 +44,7 @@ const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
   } = useGovernanceAssets()
   const router = useRouter()
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const governedAccount = assetAccounts.find(
     (x) => x.governance.pubkey.toBase58() === program.pubkey.toBase58()
   )

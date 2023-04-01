@@ -36,6 +36,7 @@ import {
   GoverningTokenConfigAccountArgs,
   GoverningTokenType,
 } from '@solana/spl-governance'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export const FORM_NAME = 'tokenized'
 
@@ -104,7 +105,9 @@ const transformFormData2RealmCreation = (formData: CommunityTokenForm) => {
 }
 
 export default function CommunityTokenWizard() {
-  const { connected, connection, current: wallet } = useWalletStore((s) => s)
+  const connected = useWalletStore((s) => s.connected)
+  const connection = useWalletStore((s) => s.connection)
+  const wallet = useWalletOnePointOh()
   const { push } = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
   const [requestPending, setRequestPending] = useState(false)

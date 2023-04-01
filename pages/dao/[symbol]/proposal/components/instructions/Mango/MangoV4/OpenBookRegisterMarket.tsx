@@ -17,6 +17,7 @@ import InstructionForm, {
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { OPENBOOK_PROGRAM_ID } from '@blockworks-foundation/mango-v4'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface OpenBookRegisterMarketForm {
   governedAccount: AssetAccount | null
@@ -36,7 +37,7 @@ const OpenBookRegisterMarket = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const { mangoClient, mangoGroup } = UseMangoV4()
   const { assetAccounts } = useGovernanceAssets()
   const solAccounts = assetAccounts.filter(

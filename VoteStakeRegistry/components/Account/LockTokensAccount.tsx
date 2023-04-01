@@ -35,6 +35,7 @@ import {
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import { abbreviateAddress } from '@utils/formatting'
 import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface DepositBox {
   mintPk: PublicKey
@@ -71,7 +72,7 @@ const LockTokensAccount: React.FC<{
   )
   const [isLoading, setIsLoading] = useState(false)
   const connection = useWalletStore((s) => s.connection.current)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const connected = useWalletStore((s) => s.connected)
   const mainBoxesClasses = 'bg-bkg-1 col-span-1 p-4 rounded-md'
   const isNextSameRecord = (x, next) => {

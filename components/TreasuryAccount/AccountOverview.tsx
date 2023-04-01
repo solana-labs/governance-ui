@@ -65,7 +65,8 @@ const AccountOverview = () => {
   const isSplToken = currentAccount?.type === AccountType.TOKEN
   const isAuxiliaryAccount = currentAccount?.type === AccountType.AuxiliaryToken
   const { canUseTransferInstruction } = useGovernanceAssets()
-  const { connection, connected } = useWalletStore((s) => s)
+  const connected = useWalletStore((s) => s.connected)
+  const connection = useWalletStore((s) => s.connection)
   const recentActivity = useTreasuryAccountStore((s) => s.recentActivity)
   const isLoadingRecentActivity = useTreasuryAccountStore(
     (s) => s.isLoadingRecentActivity

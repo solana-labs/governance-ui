@@ -36,6 +36,7 @@ import { PositionCard } from './PositionCard'
 import useHeliumVsrStore from '../hooks/useHeliumVsrStore'
 import { PublicKey } from '@solana/web3.js'
 import { notify } from '@utils/notifications'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export const LockTokensAccount: React.FC<{
   tokenOwnerRecordPk: string | string[] | undefined
@@ -67,17 +68,12 @@ export const LockTokensAccount: React.FC<{
   const { error, createPosition } = useCreatePosition()
   const [isOwnerOfPositions, setIsOwnerOfPositions] = useState(true)
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
-  const [
-    connected,
-    connection,
-    wallet,
-    { fetchRealm, fetchWalletTokenAccounts },
-  ] = useWalletStore((s) => [
-    s.connected,
-    s.connection.current,
-    s.current,
-    s.actions,
-  ])
+  const connected = useWalletStore((s) => s.connected)
+  const connection = useWalletStore((s) => s.connection)
+  const wallet = useWalletOnePointOh()
+  const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
+    (s) => s.actions
+  )
 
   const [
     isLoading,
@@ -109,7 +105,7 @@ export const LockTokensAccount: React.FC<{
             ? new PublicKey(tokenOwnerRecordWalletPk)
             : wallet.publicKey,
           client: vsrClient,
-          connection: connection,
+          connection: connection.current,
         })
       }
     } catch (e) {
@@ -227,7 +223,7 @@ export const LockTokensAccount: React.FC<{
         communityMintPk: realm!.account.communityMint,
         walletPk: wallet!.publicKey!,
         client: vsrClient!,
-        connection,
+        connection: connection.current,
       })
     }
   }

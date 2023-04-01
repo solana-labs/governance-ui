@@ -9,7 +9,6 @@ import {
 import { validateInstruction } from '@utils/instructionTools'
 import { NameValue, UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
-import useWalletStore from 'stores/useWalletStore'
 import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NewProposalContext } from '../../../new'
@@ -23,6 +22,7 @@ import { PublicKey } from '@solana/web3.js'
 import { InformationCircleIcon } from '@heroicons/react/outline'
 import Tooltip from '@components/Tooltip'
 import { getRegistrarPDA } from '@utils/plugin/accounts'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface CreateGatewayRegistrarForm {
   governedAccount: AssetAccount | undefined
@@ -41,7 +41,7 @@ const CreateGatewayPluginRegistrar = ({
   const { realm, realmInfo } = useRealm()
   const gatewayClient = useVotePluginsClientStore((s) => s.state.gatewayClient)
   const { assetAccounts } = useGovernanceAssets()
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<CreateGatewayRegistrarForm>()
   const [formErrors, setFormErrors] = useState({})

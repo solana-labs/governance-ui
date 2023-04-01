@@ -17,6 +17,7 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { sendTransaction } from '@utils/send'
 
 import VotingPowerPct from './VotingPowerPct'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface Props {
   className?: string
@@ -30,7 +31,7 @@ export default function NftVotingPower(props: Props) {
   const maxWeight = useNftPluginStore((s) => s.state.maxVoteRecord)
   const isLoading = useNftPluginStore((s) => s.state.isLoadingNfts)
   const connected = useWalletStore((s) => s.connected)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
   const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
   const { ownTokenRecord, realm, realmInfo } = useRealm()

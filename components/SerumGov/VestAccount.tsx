@@ -1,7 +1,7 @@
 import * as yup from 'yup'
 import * as anchor from '@coral-xyz/anchor'
 import { yupResolver } from '@hookform/resolvers/yup'
-import useWallet from '@hooks/useWallet'
+import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import {
   fmtBnMintDecimals,
   parseMintNaturalAmountFromDecimalAsBN,
@@ -67,7 +67,7 @@ const VestAccount: FC<Props> = ({
   const gsrmMint = useSerumGovStore((s) => s.gsrmMint)
   const actions = useSerumGovStore((s) => s.actions)
 
-  const { anchorProvider, wallet } = useWallet()
+  const { anchorProvider, wallet } = useWalletDeprecated()
   const connection = useWalletStore((s) => s.connection.current)
 
   const [isBurning, setIsBurning] = useState(false)
