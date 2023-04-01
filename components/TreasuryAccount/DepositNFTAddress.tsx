@@ -37,7 +37,7 @@ const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
 
   const wallet = useWalletOnePointOh()
   const { realm } = useRealm()
-  const connected = useWalletStore((s) => s.connected)
+  const connected = !!wallet?.connected
   const [form, setForm] = useState({
     mint: '',
   })

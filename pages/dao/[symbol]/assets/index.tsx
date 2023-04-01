@@ -4,10 +4,10 @@ import Tooltip from '@components/Tooltip'
 import useRealm from '@hooks/useRealm'
 import useQueryContext from '@hooks/useQueryContext'
 import { useRouter } from 'next/router'
-import useWalletStore from 'stores/useWalletStore'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import { LinkButton } from '@components/Button'
 import { PlusCircleIcon } from '@heroicons/react/outline'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 export const NEW_PROGRAM_VIEW = `/program/new`
 
 const Assets = () => {
@@ -19,7 +19,8 @@ const Assets = () => {
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const { fmtUrlWithCluster } = useQueryContext()
   const goToNewAssetForm = () => {
     router.push(fmtUrlWithCluster(`/dao/${symbol}${NEW_PROGRAM_VIEW}`))

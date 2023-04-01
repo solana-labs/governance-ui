@@ -1,11 +1,12 @@
 import { Governance, ProgramAccount } from '@solana/spl-governance'
-import useWalletStore from 'stores/useWalletStore'
 import useRealm from './useRealm'
+import useWalletOnePointOh from './useWalletOnePointOh'
 
 const useProposalCreationButtonTooltip = (
   governances?: ProgramAccount<Governance>[]
 ) => {
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const {
     ownVoterWeight,
     toManyCommunityOutstandingProposalsForUser,

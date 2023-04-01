@@ -10,9 +10,9 @@ import Tooltip from '@components/Tooltip'
 
 import useRealm from '@hooks/useRealm'
 import useQueryContext from '@hooks/useQueryContext'
-import useWalletStore from 'stores/useWalletStore'
 
 import { Domain as DomainModel } from '@models/treasury/Domain'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface Props {
   domain: DomainModel
@@ -20,7 +20,8 @@ interface Props {
 
 const Domain: React.FC<Props> = (props) => {
   const { fmtUrlWithCluster } = useQueryContext()
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const {
     symbol,
     realm,

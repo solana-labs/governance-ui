@@ -79,7 +79,7 @@ export function useVotingPlugins() {
   const switchboardStore = useSwitchboardPluginStore()
   const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
-  const connected = useWalletStore((s) => s.connected)
+  const connected = !!wallet?.connected
 
   const [
     currentClient,

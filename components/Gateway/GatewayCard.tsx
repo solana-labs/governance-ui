@@ -22,8 +22,8 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 // TODO lots of overlap with NftBalanceCard here - we need to separate the logic for creating the Token Owner Record
 // from the rest of this logic
 const GatewayCard = () => {
-  const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )

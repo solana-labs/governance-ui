@@ -3,7 +3,6 @@ import { PublicKey } from '@solana/web3.js'
 import BN from 'bn.js'
 import useRealm from '@hooks/useRealm'
 import { getTokenOwnerRecordAddress, Proposal } from '@solana/spl-governance'
-import useWalletStore from '../../../stores/useWalletStore'
 import { Option } from '@tools/core/option'
 import { GoverningTokenRole } from '@solana/spl-governance'
 import { fmtMintAmount } from '@tools/sdk/units'
@@ -32,8 +31,8 @@ const LockPluginTokenBalanceCard = ({
   const { fmtUrlWithCluster } = useQueryContext()
   const { councilMint, mint, realm, symbol, config } = useRealm()
   const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
-  const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const isDepositVisible = (
     depositMint: MintInfo | undefined,
     realmMint: PublicKey | undefined
@@ -154,7 +153,8 @@ const TokenDepositLock = ({
   setHasGovPower: (hasGovPower: boolean) => void
 }) => {
   const { realm, realmTokenAccount, councilTokenAccount } = useRealm()
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const deposits = useDepositStore((s) => s.state.deposits)
   const votingPower = useDepositStore((s) => s.state.votingPower)
   const votingPowerFromDeposits = useDepositStore(

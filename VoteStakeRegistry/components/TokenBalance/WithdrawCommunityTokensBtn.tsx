@@ -37,7 +37,7 @@ const WithDrawCommunityTokens = () => {
   } = useRealm()
   const [isLoading, setIsLoading] = useState(false)
   const wallet = useWalletOnePointOh()
-  const connected = useWalletStore((s) => s.connected)
+  const connected = !!wallet?.connected
   const connection = useWalletStore((s) => s.connection.current)
   const deposits = useDepositStore((s) => s.state.deposits)
   const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(

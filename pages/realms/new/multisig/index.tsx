@@ -93,9 +93,9 @@ const transformMultisigForm2RealmCreation = ({ ...formData }: MultisigForm) => {
 }
 
 export default function MultiSigWizard() {
-  const connected = useWalletStore((s) => s.connected)
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const { push } = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
   const [requestPending, setRequestPending] = useState(false)
