@@ -321,10 +321,9 @@ export async function prepareRealmCreation({
     minCommunityTokensToCreateProposal: minCommunityTokensToCreateAsMintValue,
     // Do not use instruction hold up time
     minInstructionHoldUpTime: 0,
-    // baseVotingTime is incorrectly called maxVotingTime in the sdk
     // maxVotingTime = baseVotingTime + votingCoolOffTime
     // since this is actually baseVotingTime, we have to manually subtract the cooloff time.
-    maxVotingTime:
+    baseVotingTime:
       getTimestampFromDays(maxVotingTimeInDays) - VOTING_COOLOFF_TIME_DEFAULT,
     communityVoteTipping: VoteTipping.Disabled,
     councilVoteTipping: VoteTipping.Strict,

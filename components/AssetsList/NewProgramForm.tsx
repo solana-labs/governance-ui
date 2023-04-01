@@ -143,7 +143,7 @@ const NewProgramForm = () => {
                         : form.minCommunityTokensToCreateProposal,
                     minCouncilTokensToCreateProposal: '1',
                     minInstructionHoldUpTime: form.minInstructionHoldUpTime.toString(),
-                    maxVotingTime: form.maxVotingTime.toString(),
+                    baseVotingTime: form.maxVotingTime.toString(),
                     votingCoolOffTime: '0',
                     depositExemptProposalCount: '10',
                     communityVoteThreshold: form.voteThreshold.toString(),

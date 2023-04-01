@@ -93,7 +93,7 @@ const MyProposalsBn = () => {
         ? 0 // If vote is finalized then set the timestamp to 0 to make it expired
         : x.account.votingAt && governance
         ? x.account.votingAt.toNumber() +
-          governance.account.config.maxVotingTime
+          governance.account.config.baseVotingTime
         : undefined
       : undefined
     return (

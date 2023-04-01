@@ -398,12 +398,23 @@ const displayArgs = async (connection: Connection, data: Uint8Array) => {
   const args = await getArgs(connection, data)
   return (
     <div className="space-y-3">
-      {Object.keys(args).map((key) => (
-        <div key={key} className="flex">
-          <div className="mr-3">{key}:</div>
-          <div>{`${args[key]}`}</div>
-        </div>
-      ))}
+      {Object.keys(args)
+        .filter((key) => {
+          if (key === 'resetStablePrice' && args[key] === false) {
+            return false
+          }
+          if (key === 'resetNetBorrowLimit' && args[key] === false) {
+            return false
+          }
+
+          return true
+        })
+        .map((key) => (
+          <div key={key} className="flex">
+            <div className="mr-3">{key}:</div>
+            <div>{`${args[key]}`}</div>
+          </div>
+        ))}
     </div>
   )
 }

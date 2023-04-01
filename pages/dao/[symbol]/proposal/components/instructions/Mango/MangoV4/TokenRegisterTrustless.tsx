@@ -39,8 +39,10 @@ const TokenRegisterTrustless = ({
   const solAccounts = assetAccounts.filter(
     (x) =>
       x.type === AccountType.SOL &&
-      mangoGroup?.fastListingAdmin &&
-      x.extensions.transferAddress?.equals(mangoGroup?.fastListingAdmin)
+      ((mangoGroup?.fastListingAdmin &&
+        x.extensions.transferAddress?.equals(mangoGroup?.fastListingAdmin)) ||
+        (mangoGroup?.admin &&
+          x.extensions.transferAddress?.equals(mangoGroup?.admin)))
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<TokenRegisterTrustlessForm>({
