@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import { UiInstruction } from 'utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../new'
 import {

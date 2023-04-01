@@ -5,7 +5,6 @@ import * as yup from 'yup'
 import type { ConditionBuilder } from 'yup/lib/Condition'
 import clsx from 'clsx'
 
-import useWalletStore from 'stores/useWalletStore'
 import FormHeader from '@components/NewRealmWizard/components/FormHeader'
 import FormField from '@components/NewRealmWizard/components/FormField'
 import FormFooter from '@components/NewRealmWizard/components/FormFooter'

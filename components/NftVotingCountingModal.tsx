@@ -6,7 +6,6 @@ import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { useEffect, useState } from 'react'
 import useTransactionsStore from 'stores/useTransactionStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import useWalletStore from 'stores/useWalletStore'
 import Modal from './Modal'
 
 const NftVotingCountingModal = () => {

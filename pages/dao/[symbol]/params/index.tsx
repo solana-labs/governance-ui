@@ -15,7 +15,6 @@ import { useRouter } from 'next/router'
 import RealmConfigModal from './RealmConfigModal'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { getAccountName } from '@components/instructions/tools'
-import useWalletStore from 'stores/useWalletStore'
 import SetRealmAuthorityModal from './SetRealmAuthorityModal'
 import MetadataCreationModal from './MetadataCreationModal'
 

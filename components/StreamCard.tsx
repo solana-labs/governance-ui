@@ -12,7 +12,6 @@ import Button from '@components/Button'
 
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 
-import useWalletStore from 'stores/useWalletStore'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import useCreateProposal from '@hooks/useCreateProposal'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
