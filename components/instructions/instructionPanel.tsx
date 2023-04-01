@@ -14,7 +14,7 @@ import {
 import Button from '@components/Button'
 import { dryRunInstruction } from 'actions/dryRunInstruction'
 import { getExplorerInspectorUrl } from '@components/explorer/tools'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 export function InstructionPanel() {
   const { instructions, proposal } = useProposal()
@@ -27,7 +27,7 @@ export function InstructionPanel() {
       mounted.current = false
     }
   }, [])
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
 
   const [currentSlot, setCurrentSlot] = useState(0)

@@ -30,7 +30,7 @@ import { notify } from '@utils/notifications'
 import useCreateProposal from '@hooks/useCreateProposal'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { PublicKey } from '@solana/web3.js'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 const defaultFormState = {
   destinationAccount: undefined,
@@ -64,7 +64,7 @@ const ConvertToStSol = () => {
   const { handleCreateProposal } = useCreateProposal()
 
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
 

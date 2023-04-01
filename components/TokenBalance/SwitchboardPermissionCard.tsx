@@ -4,7 +4,7 @@ import Button from '@components/Button'
 import { ChevronRightIcon } from '@heroicons/react/outline'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 import { getTokenOwnerRecordAddress } from '@solana/spl-governance'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
@@ -15,7 +15,7 @@ import { sbRefreshWeight } from '../../actions/switchboardRefreshVoterWeight'
 const SwitchboardPermissionCard = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const connected = useWalletStore((s) => s.connected)
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
 
   const switchboardVoterWeight = useSwitchboardPluginStore(
     (s) => s.state.votingPower

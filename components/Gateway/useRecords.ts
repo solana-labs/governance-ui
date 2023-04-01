@@ -5,7 +5,7 @@ import useWalletStore from '../../stores/useWalletStore'
 import useRealm from '@hooks/useRealm'
 import { getVoterWeightRecord as getPluginVoterWeightRecord } from '@utils/plugin/accounts'
 import { Client } from '@utils/uiTypes/VotePlugin'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 // A data structure that indicates if a record that a plugin relies on (token owner record or voter weight recird)
 // exists on chain or not - if not, it will trigger the "Join" button to create it.
@@ -26,7 +26,7 @@ export const useRecords = (): AvailableRecordAccounts => {
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
   const { tokenRecords, realm } = useRealm()
   const ownTokenRecord = wallet?.publicKey

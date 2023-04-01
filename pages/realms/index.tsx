@@ -16,7 +16,7 @@ import Input from '@components/inputs/Input'
 import dynamic from 'next/dynamic'
 
 import { BsLayoutWtf, BsCheck } from 'react-icons/bs'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 const RealmsDashboard = dynamic(() => import('./components/RealmsDashboard'))
 
@@ -30,7 +30,7 @@ const Realms = () => {
   const { actions, selectedRealm } = useWalletStore((s) => s)
   const connection = useWalletStore((s) => s.connection)
   const connected = useWalletStore((s) => s.connected)
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
   const [searchString, setSearchString] = useState('')

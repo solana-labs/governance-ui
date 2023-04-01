@@ -33,7 +33,7 @@ import {
 } from 'Strategies/protocols/solend'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { PublicKey } from '@solana/web3.js'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 const SOL_BUFFER = 0.02
 
@@ -69,7 +69,7 @@ const SolendDeposit = ({
     (s) => s.state.currentRealmVotingClient
   )
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const tokenInfo = tokenPriceService.getTokenInfo(handledMint)
   const {
     governedTokenAccountsWithoutNfts,

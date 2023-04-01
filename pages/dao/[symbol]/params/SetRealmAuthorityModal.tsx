@@ -13,7 +13,7 @@ import { Transaction, TransactionInstruction } from '@solana/web3.js'
 import { sendTransaction } from '@utils/send'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import GovernanceAccountSelect from '../proposal/components/GovernanceAccountSelect'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 const SetRealmAuthorityModal = ({
   closeModal,
@@ -23,7 +23,7 @@ const SetRealmAuthorityModal = ({
   isOpen: boolean
 }) => {
   const { realmInfo, realm } = useRealm()
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
   const { fetchRealm, fetchAllRealms } = useWalletStore((s) => s.actions)
   const { governancesArray } = useGovernanceAssets()

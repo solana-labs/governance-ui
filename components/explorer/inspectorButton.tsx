@@ -8,7 +8,7 @@ import useWalletStore from '../../stores/useWalletStore'
 import { getExplorerInspectorUrl, getExplorerUrl } from './tools'
 import { SecondaryButton } from '../Button'
 import { notify } from '@utils/notifications'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 export default function InspectorButton({
   proposalInstruction,
@@ -16,7 +16,7 @@ export default function InspectorButton({
   proposalInstruction: ProgramAccount<ProposalTransaction>
 }) {
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const connected = useWalletStore((s) => s.connected)
   const wasExecuted =
     proposalInstruction.account.executionStatus ===

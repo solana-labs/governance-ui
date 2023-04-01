@@ -12,7 +12,7 @@ import { getMintMetadata } from '../instructions/programs/splToken'
 import getNumTokens from './getNumTokens'
 import depositTokens from './depositTokens'
 import VotingPowerPct from './VotingPowerPct'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 interface Props {
   className?: string
@@ -33,7 +33,7 @@ export default function CouncilVotingPower(props: Props) {
   )
   const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
   const connection = useWalletStore((s) => s.connection.current)
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
 
   // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   const depositAmount = councilTokenAccount

@@ -22,7 +22,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 const RefreshReserve = ({
   index,
@@ -32,7 +32,7 @@ const RefreshReserve = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const { realmInfo } = useRealm()
 
   const { assetAccounts } = useGovernanceAssets()

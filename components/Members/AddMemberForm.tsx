@@ -31,7 +31,7 @@ import useProgramVersion from '@hooks/useProgramVersion'
 import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
 import BigNumber from 'bignumber.js'
 import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 interface AddMemberForm extends Omit<MintForm, 'mintAccount'> {
   description: string
@@ -50,7 +50,7 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
   const { handleCreateProposal } = useCreateProposal()
   const router = useRouter()
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
 
   const { fmtUrlWithCluster } = useQueryContext()
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)

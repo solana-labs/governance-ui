@@ -13,7 +13,7 @@ import { FORM_NAME as COMMUNITY_TOKEN_FORM } from 'pages/realms/new/community-to
 import { useProgramVersionByIdQuery } from '@hooks/queries/useProgramVersionQuery'
 import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
 import { PublicKey } from '@solana/web3.js'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 export const Section = ({ children }) => {
   return (
@@ -31,7 +31,7 @@ export default function FormPage({
   submissionPending,
 }) {
   const connected = useWalletStore((s) => s.connected)
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const userAddress = wallet?.publicKey?.toBase58()
 
   const { query, push } = useRouter()

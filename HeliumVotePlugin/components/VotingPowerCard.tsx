@@ -15,7 +15,7 @@ import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import { MintInfo } from '@solana/spl-token'
 import { VotingPowerBox } from './VotingPowerBox'
 import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 export const VotingPowerCard: React.FC<{
   inAccountDetails?: boolean
@@ -24,7 +24,7 @@ export const VotingPowerCard: React.FC<{
   const [hasGovPower, setHasGovPower] = useState(false)
   const { councilMint, ownTokenRecord, mint, symbol } = useRealm()
   const connected = useWalletStore((s) => s.connected)
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const councilDepositVisible = !!councilMint
   const { data: tokenOwnerRecordPk } = useAddressQuery_CommunityTokenOwner()
 

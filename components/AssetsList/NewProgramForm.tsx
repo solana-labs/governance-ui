@@ -37,7 +37,7 @@ import {
   transform,
   transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig,
 } from './BaseGovernanceForm-data'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 interface NewProgramForm extends BaseGovernanceFormFieldsV2 {
   programId: string
   transferAuthority: boolean
@@ -72,7 +72,7 @@ const NewProgramForm = () => {
     ownVoterWeight,
     councilMint,
   } = useRealm()
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
   const connected = useWalletStore((s) => s.connected)
   const { fetchRealm } = useWalletStore((s) => s.actions)

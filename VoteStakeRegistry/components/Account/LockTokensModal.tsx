@@ -47,7 +47,7 @@ import ButtonGroup from '@components/ButtonGroup'
 import InlineNotification from '@components/InlineNotification'
 import Tooltip from '@components/Tooltip'
 import { notify } from '@utils/notifications'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 const YES = 'Yes'
 const NO = 'No'
@@ -69,7 +69,7 @@ const LockTokensModal = ({
   )
   const connection = useWalletStore((s) => s.connection.current)
   const endpoint = useWalletStore((s) => s.connection.endpoint)
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const deposits = useDepositStore((s) => s.state.deposits)
   const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
     (s) => s.actions

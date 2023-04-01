@@ -32,7 +32,7 @@ import {
   SolendSubStrategy,
 } from 'Strategies/protocols/solend'
 import { PublicKey } from '@solana/web3.js'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 const SolendWithdraw = ({
   proposedInvestment,
@@ -71,7 +71,7 @@ const SolendWithdraw = ({
     (s) => s.state.currentRealmVotingClient
   )
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const tokenInfo = tokenPriceService.getTokenInfo(handledMint)
   const mintInfo = governedTokenAccount.extensions?.mint?.account
   const tokenSymbol = tokenPriceService.getTokenInfo(

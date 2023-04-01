@@ -26,7 +26,7 @@ import {
 } from '@utils/dateTools'
 import { BN } from '@coral-xyz/anchor'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 const DepositCard = ({
   deposit,
@@ -39,7 +39,7 @@ const DepositCard = ({
   const { realm, realmInfo, tokenRecords, ownTokenRecord } = useRealm()
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const actualClient = vsrClient || client
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection.current)
   const endpoint = useWalletStore((s) => s.connection.endpoint)
   const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false)

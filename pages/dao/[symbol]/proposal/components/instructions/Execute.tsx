@@ -9,7 +9,7 @@ import { executeTransaction } from 'actions/executeTransaction'
 import { ProposalTransaction } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 type ExecuteInstructionProps = {
   onClose: () => void
@@ -22,7 +22,7 @@ const ExecuteInstruction = ({
   isOpen,
   instruction,
 }: ExecuteInstructionProps) => {
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
   const { proposal } = useWalletStore((s) => s.selectedProposal)
   const { realmInfo } = useRealm()

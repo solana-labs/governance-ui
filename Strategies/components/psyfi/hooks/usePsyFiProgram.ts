@@ -1,5 +1,5 @@
 import { AnchorProvider, Program } from '@coral-xyz/anchor'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 import { PsyFiEuros, PsyFiIdl } from 'psyfi-euros-test'
 import { useMemo } from 'react'
 import useWalletStore from 'stores/useWalletStore'
@@ -7,7 +7,7 @@ import { MAINNET_PROGRAM_KEYS } from '../programIds'
 
 export const usePsyFiProgram = () => {
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
 
   // construct the PsyFi program. This could be pulled into a hook
   return useMemo(() => {

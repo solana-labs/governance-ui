@@ -29,7 +29,7 @@ import { getGatekeeperNetwork } from '../GatewayPlugin/sdk/accounts'
 import { NFTWithMeta } from '@utils/uiTypes/VotePlugin'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import * as heliumVsrSdk from '@helium/voter-stake-registry-sdk'
-import useWalletGay from './useWallet'
+import useWalletOnePointOh from './useWallet'
 
 export const vsrPluginsPks: string[] = [
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo',
@@ -77,7 +77,7 @@ export function useVotingPlugins() {
   const heliumStore = useHeliumVsrStore()
   const gatewayStore = useGatewayPluginStore()
   const switchboardStore = useSwitchboardPluginStore()
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
   const connected = useWalletStore((s) => s.connected)
 

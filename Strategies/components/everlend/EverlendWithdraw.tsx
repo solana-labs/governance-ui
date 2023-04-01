@@ -24,7 +24,7 @@ import { validateInstruction } from '@utils/instructionTools'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Loading from '@components/Loading'
 import { TreasuryStrategy } from '../../types/types'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 interface IProps {
   proposedInvestment: TreasuryStrategy & {
@@ -69,7 +69,7 @@ const EverlendWithdraw = ({
   )
   const { fmtUrlWithCluster } = useQueryContext()
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const router = useRouter()
 
   const tokenSymbol = tokenPriceService.getTokenInfo(

@@ -23,7 +23,7 @@ import NFTCollectionModal from '@components/NewRealmWizard/components/NFTCollect
 import { Metaplex } from '@metaplex-foundation/js'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { getNFTsByCollection } from '@utils/tokens'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 function filterAndMapVerifiedCollections(nfts) {
   return nfts
@@ -241,7 +241,7 @@ export default function AddNFTCollectionForm({
 }) {
   const connected = useWalletStore((s) => s.connected)
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const [walletConnecting, setWalletConnecting] = useState(false)
   const [requestPending, setRequestPending] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)

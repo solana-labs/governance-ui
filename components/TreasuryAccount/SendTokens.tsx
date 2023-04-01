@@ -51,7 +51,7 @@ import { NFTWithMint } from '@utils/uiTypes/nfts'
 import useCreateProposal from '@hooks/useCreateProposal'
 import NFTAccountSelect from './NFTAccountSelect'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 const SendTokens = ({
   isNft = false,
@@ -71,7 +71,7 @@ const SendTokens = ({
   const isNFT = isNft || currentAccount?.isNft
   const isSol = currentAccount?.isSol
   const { fmtUrlWithCluster } = useQueryContext()
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const router = useRouter()
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const programId: PublicKey | undefined = realmInfo?.programId

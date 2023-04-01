@@ -3,7 +3,7 @@ import { GatewayProvider as InternalGatewayProvider } from '@civic/solana-gatewa
 import useWalletStore from '../../stores/useWalletStore'
 import useVotePluginsClientStore from '../../stores/useVotePluginsClientStore'
 import useGatewayPluginStore from '../../GatewayPlugin/store/gatewayPluginStore'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 /**
  * Wrapper for the Civic Gateway Provider react component. This component is responsible for
@@ -13,7 +13,7 @@ import useWalletGay from '@hooks/useWallet'
  * @constructor
  */
 export const GatewayProvider: FC = ({ children }) => {
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )

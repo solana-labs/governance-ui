@@ -22,7 +22,7 @@ import { notify } from '@utils/notifications'
 import useRealm from '@hooks/useRealm'
 import { useEffect, useState } from 'react'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 export interface TokenMintMetadata {
   readonly decimals: number
@@ -49,7 +49,7 @@ export default function StreamCard({
   const { assetAccounts } = useGovernanceAssets()
 
   const { fmtUrlWithCluster } = useQueryContext()
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const { handleCreateProposal } = useCreateProposal()
   const [voteByCouncil] = useState(false)
   const defaultCancelTitle = 'Cancel streamflow contract'

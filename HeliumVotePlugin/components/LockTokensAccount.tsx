@@ -36,7 +36,7 @@ import { PositionCard } from './PositionCard'
 import useHeliumVsrStore from '../hooks/useHeliumVsrStore'
 import { PublicKey } from '@solana/web3.js'
 import { notify } from '@utils/notifications'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 export const LockTokensAccount: React.FC<{
   tokenOwnerRecordPk: string | string[] | undefined
@@ -70,7 +70,7 @@ export const LockTokensAccount: React.FC<{
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
   const connected = useWalletStore((s) => s.connected)
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
     (s) => s.actions
   )

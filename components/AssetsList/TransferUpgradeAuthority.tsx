@@ -22,7 +22,7 @@ import { abbreviateAddress } from '@utils/formatting'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance, ProgramAccount } from '@solana/spl-governance'
 import { AssetAccount } from '@utils/uiTypes/assets'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 interface CloseBuffersForm {
   governedAccount: AssetAccount | undefined
@@ -40,7 +40,7 @@ const TransferUpgradeAuthority = ({
   const { handleCreateProposal } = useCreateProposal()
   const { assetAccounts } = useGovernanceAssets()
   const router = useRouter()
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const governedAccount = assetAccounts.find(
     (x) => x.governance.pubkey.toBase58() === program.pubkey.toBase58()
   )

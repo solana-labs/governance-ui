@@ -22,7 +22,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getGoblinGoldWithdrawInstruction } from '@utils/instructions/GoblinGold'
 import { StrategyVault } from 'goblingold-sdk'
 import { getGoblinGoldWithdrawSchema } from '@utils/validations'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 const GoblinGoldWithdraw = ({
   index,
@@ -32,7 +32,7 @@ const GoblinGoldWithdraw = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const { realmInfo } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)

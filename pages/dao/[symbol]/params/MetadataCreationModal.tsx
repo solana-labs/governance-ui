@@ -28,7 +28,7 @@ import { WebBundlr } from '@bundlr-network/client'
 import { LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { PublicKey } from '@solana/web3.js'
 import { Metaplex } from '@metaplex-foundation/js'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 interface GovernanceConfigForm {
   mintAccount: AssetAccount | undefined
@@ -59,7 +59,7 @@ const MetadataCreationModal = ({
   })
   const shouldBeGoverned = false
   const { fmtUrlWithCluster } = useQueryContext()
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const { handleCreateProposal } = useCreateProposal()
   const [formErrors, setFormErrors] = useState({})
   const [creatingProposal, setCreatingProposal] = useState(false)

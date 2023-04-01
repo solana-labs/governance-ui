@@ -32,7 +32,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../pages/dao/[symbol]/proposal/new'
 import Select from '@components/inputs/Select'
 import TextareaProps from '@components/inputs/Textarea'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 type EmptyObject = Record<string, never>
 type SetFormErrors = Dispatch<React.SetStateAction<EmptyObject>>
@@ -163,7 +163,7 @@ export function commonAssets<T extends ForesightHasGovernedAccount>(
   )
   const schema = getSchema<T>(extraSchemaFields)
   // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const filteredTokenAccounts = getFilteredTokenAccounts()
   // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [formErrors, setFormErrors] = useState({})

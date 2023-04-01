@@ -24,7 +24,7 @@ import { AssetAccount } from '@utils/uiTypes/assets'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import { isDisabledVoterWeight } from '@tools/governance/units'
 import useProgramVersion from '@hooks/useProgramVersion'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 export interface RealmConfigForm {
   governedAccount: AssetAccount | undefined
@@ -43,7 +43,7 @@ const RealmConfig = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const { realm, mint, realmInfo } = useRealm()
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const { assetAccounts } = useGovernanceAssets()
   const realmAuthority = assetAccounts.find(

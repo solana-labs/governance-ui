@@ -15,7 +15,7 @@ import GovernedAccountSelect from '../GovernedAccountSelect'
 import { getCreateTokenMetadataInstruction } from 'utils/instructionTools'
 import { AccountType } from '@utils/uiTypes/assets'
 import useWalletStore from 'stores/useWalletStore'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 const CreateTokenMetadata = ({
   index,
@@ -39,7 +39,7 @@ const CreateTokenMetadata = ({
     mintAccount: undefined,
     programId: programId?.toString(),
   })
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const [governedAccount, setGovernedAccount] = useState<
     ProgramAccount<Governance> | undefined
   >(undefined)

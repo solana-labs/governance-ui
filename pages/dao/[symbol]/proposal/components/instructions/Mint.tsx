@@ -16,7 +16,7 @@ import GovernedAccountSelect from '../GovernedAccountSelect'
 import { getMintInstruction } from 'utils/instructionTools'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import { useDestination } from '@hooks/useDestination'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 const Mint = ({
   index,
@@ -51,7 +51,7 @@ const Mint = ({
     mintAccount: initialMintAccount,
     programId: programId?.toString(),
   })
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const [governedAccount, setGovernedAccount] = useState<
     ProgramAccount<Governance> | undefined
   >(undefined)

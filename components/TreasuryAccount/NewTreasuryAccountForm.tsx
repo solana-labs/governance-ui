@@ -42,7 +42,7 @@ import {
   transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig,
   transform,
 } from '@components/AssetsList/BaseGovernanceForm-data'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 interface NewTreasuryAccountForm extends BaseGovernanceFormFieldsV2 {
   mintAddress: string
 }
@@ -108,7 +108,7 @@ const NewAccountForm = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [realmInfo?.programVersion])
   const filteredTypes = types.filter((x) => !x.hide)
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
   const connected = useWalletStore((s) => s.connected)
   const { fetchRealm } = useWalletStore((s) => s.actions)

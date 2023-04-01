@@ -13,7 +13,7 @@ import { getConfigLsoInstruction } from '@utils/instructions/Dual'
 import useWalletStore from 'stores/useWalletStore'
 import { getDualFinanceLiquidityStakingOptionSchema } from '@utils/validations'
 import Tooltip from '@components/Tooltip'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 const LiquidityStakingOption = ({
   index,
@@ -31,7 +31,7 @@ const LiquidityStakingOption = ({
     payer: undefined,
   })
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const { assetAccounts } = useGovernanceAssets()
   const [governedAccount, setGovernedAccount] = useState<

@@ -27,14 +27,14 @@ import ProposalVotingPower from '@components/ProposalVotingPower'
 import { useMediaQuery } from 'react-responsive'
 import NftProposalVoteState from 'NftVotePlugin/NftProposalVoteState'
 import ProposalWarnings from './ProposalWarnings'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 const Proposal = () => {
   const { realmInfo, symbol } = useRealm()
   const { proposal, descriptionLink, governance } = useProposal()
   const [description, setDescription] = useState('')
   const voteData = useProposalVotes(proposal?.account)
-  const currentWallet = useWalletGay()
+  const currentWallet = useWalletOnePointOh()
   const showResults =
     proposal &&
     proposal.account.state !== ProposalState.Cancelled &&

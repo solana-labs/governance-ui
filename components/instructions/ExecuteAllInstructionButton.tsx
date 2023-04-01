@@ -19,7 +19,7 @@ import { notify } from '@utils/notifications'
 import useProgramVersion from '@hooks/useProgramVersion'
 import { abbreviateAddress } from '@utils/formatting'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 export enum PlayState {
   Played,
@@ -98,7 +98,7 @@ export function ExecuteAllInstructionButton({
   label?: string
 }) {
   const { realmInfo } = useRealm()
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
   const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
   const connected = useWalletStore((s) => s.connected)

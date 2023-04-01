@@ -28,7 +28,7 @@ import {
 } from '@utils/instructions/Castle'
 import Wallet from '@project-serum/sol-wallet-adapter'
 import { getFormattedStringFromDays, SECS_PER_DAY } from '@utils/dateTools'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 export enum PlayState {
   Played,
@@ -51,7 +51,7 @@ export function ExecuteInstructionButton({
   instructionOption: InstructionOption
 }) {
   const { realmInfo } = useRealm()
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
   const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
   const connected = useWalletStore((s) => s.connected)

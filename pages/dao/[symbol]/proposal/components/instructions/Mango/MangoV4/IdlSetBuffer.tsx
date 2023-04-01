@@ -16,7 +16,7 @@ import InstructionForm, {
   InstructionInput,
   InstructionInputType,
 } from '../../FormCreator'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 
 interface AltSetForm {
   governedAccount: AssetAccount | null
@@ -33,7 +33,7 @@ const IdlSetBuffer = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const { mangoGroup } = UseMangoV4()
   const { assetAccounts } = useGovernanceAssets()
   const solAccounts = assetAccounts.filter(

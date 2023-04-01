@@ -1,6 +1,6 @@
 import useRealm from '@hooks/useRealm'
 import { nftPluginsPks } from '@hooks/useVotingPlugins'
-import useWalletGay from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWallet'
 import { ProgramAccount, Proposal, ProposalState } from '@solana/spl-governance'
 import { useEffect } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
@@ -18,7 +18,7 @@ const NftProposalVoteState = ({
   const plugin = useVotePluginsClientStore((s) => s.state.nftClient)
   const getCountedNfts = useNftProposalStore((s) => s.getCountedNfts)
   const countedNfts = useNftProposalStore((s) => s.countedNftsForProposal)
-  const wallet = useWalletGay()
+  const wallet = useWalletOnePointOh()
   const votingPower = useNftPluginStore((s) => s.state.votingPower)
   const isNftPlugin =
     config?.account.communityTokenConfig.voterWeightAddin &&
