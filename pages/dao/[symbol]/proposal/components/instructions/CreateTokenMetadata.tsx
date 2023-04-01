@@ -15,7 +15,7 @@ import GovernedAccountSelect from '../GovernedAccountSelect'
 import { getCreateTokenMetadataInstruction } from 'utils/instructionTools'
 import { AccountType } from '@utils/uiTypes/assets'
 import useWalletStore from 'stores/useWalletStore'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const CreateTokenMetadata = ({
   index,

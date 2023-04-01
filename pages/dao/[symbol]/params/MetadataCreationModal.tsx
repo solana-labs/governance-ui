@@ -28,7 +28,7 @@ import { WebBundlr } from '@bundlr-network/client'
 import { LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { PublicKey } from '@solana/web3.js'
 import { Metaplex } from '@metaplex-foundation/js'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface GovernanceConfigForm {
   mintAccount: AssetAccount | undefined

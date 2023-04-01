@@ -33,7 +33,7 @@ import {
 } from 'Strategies/protocols/solend'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { PublicKey } from '@solana/web3.js'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const SOL_BUFFER = 0.02
 

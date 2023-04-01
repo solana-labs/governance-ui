@@ -13,7 +13,7 @@ import { Transaction, TransactionInstruction } from '@solana/web3.js'
 import { sendTransaction } from '@utils/send'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import GovernanceAccountSelect from '../proposal/components/GovernanceAccountSelect'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const SetRealmAuthorityModal = ({
   closeModal,

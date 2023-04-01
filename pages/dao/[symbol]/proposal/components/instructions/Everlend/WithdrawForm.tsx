@@ -34,7 +34,7 @@ import {
   Token,
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const WithdrawForm = ({
   index,

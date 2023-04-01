@@ -19,7 +19,7 @@ import { notify } from '@utils/notifications'
 import useProgramVersion from '@hooks/useProgramVersion'
 import { abbreviateAddress } from '@utils/formatting'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export enum PlayState {
   Played,

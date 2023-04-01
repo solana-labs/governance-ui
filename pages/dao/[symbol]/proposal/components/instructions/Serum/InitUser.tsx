@@ -20,7 +20,7 @@ import useSerumGovStore from 'stores/useSerumGovStore'
 import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import { NewProposalContext } from '../../../new'
 import { findProgramAddressSync } from '@coral-xyz/anchor/dist/cjs/utils/pubkey'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const InitUser = ({
   index,

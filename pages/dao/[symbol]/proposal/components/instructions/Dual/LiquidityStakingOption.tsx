@@ -13,7 +13,7 @@ import { getConfigLsoInstruction } from '@utils/instructions/Dual'
 import useWalletStore from 'stores/useWalletStore'
 import { getDualFinanceLiquidityStakingOptionSchema } from '@utils/validations'
 import Tooltip from '@components/Tooltip'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const LiquidityStakingOption = ({
   index,

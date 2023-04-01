@@ -29,7 +29,7 @@ import ProgramUpgradeInfo from 'pages/dao/[symbol]/proposal/components/instructi
 import { getProgramName } from '@components/instructions/programs/names'
 import useCreateProposal from '@hooks/useCreateProposal'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface UpgradeProgramCompactForm extends ProgramUpgradeForm {
   description: string

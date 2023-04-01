@@ -21,7 +21,7 @@ import {
   getTransferInstruction,
 } from '@utils/instructionTools'
 import { useDestination } from '@hooks/useDestination'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const SplTokenTransfer = ({
   index,

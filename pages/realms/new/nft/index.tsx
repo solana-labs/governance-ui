@@ -37,7 +37,7 @@ import { nftPluginsPks } from '@hooks/useVotingPlugins'
 import YesVotePercentageForm, {
   CouncilYesVotePercentageSchema,
 } from '@components/NewRealmWizard/components/steps/YesVotePercentageThresholdForm'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export const FORM_NAME = 'nft'
 

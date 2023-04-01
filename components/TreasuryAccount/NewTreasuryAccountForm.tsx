@@ -42,7 +42,7 @@ import {
   transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig,
   transform,
 } from '@components/AssetsList/BaseGovernanceForm-data'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 interface NewTreasuryAccountForm extends BaseGovernanceFormFieldsV2 {
   mintAddress: string
 }

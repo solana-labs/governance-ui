@@ -26,7 +26,7 @@ import {
   getTransferInstruction,
 } from '@utils/instructionTools'
 import NonprofitSelect from '@components/inputs/ChangeNonprofitSelect'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const ChangeDonation = ({
   index,

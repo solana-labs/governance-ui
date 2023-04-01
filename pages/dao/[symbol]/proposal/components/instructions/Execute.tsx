@@ -9,7 +9,7 @@ import { executeTransaction } from 'actions/executeTransaction'
 import { ProposalTransaction } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 type ExecuteInstructionProps = {
   onClose: () => void

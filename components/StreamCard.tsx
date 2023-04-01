@@ -21,7 +21,7 @@ import { notify } from '@utils/notifications'
 import useRealm from '@hooks/useRealm'
 import { useEffect, useState } from 'react'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export interface TokenMintMetadata {
   readonly decimals: number

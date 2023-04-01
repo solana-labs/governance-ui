@@ -19,7 +19,7 @@ import { FC, useEffect, useState } from 'react'
 import useQueryContext from '@hooks/useQueryContext'
 import Link from 'next/link'
 import { ChevronRightIcon } from '@heroicons/react/outline'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface Props {
   inAccountDetails?: boolean

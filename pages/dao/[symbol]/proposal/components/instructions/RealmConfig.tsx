@@ -22,7 +22,7 @@ import { AssetAccount } from '@utils/uiTypes/assets'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import { isDisabledVoterWeight } from '@tools/governance/units'
 import useProgramVersion from '@hooks/useProgramVersion'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export interface RealmConfigForm {
   governedAccount: AssetAccount | undefined

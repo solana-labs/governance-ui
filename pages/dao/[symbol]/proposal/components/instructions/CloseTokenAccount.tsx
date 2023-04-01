@@ -26,7 +26,7 @@ import { getValidatedPublickKey } from '@utils/validations'
 import { PublicKey } from '@solana/web3.js'
 import { getATA } from '@utils/ataTools'
 import { sendTransactionsV3, SequenceType } from '@utils/sendTransactions'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export interface CloseTokenAccountForm {
   governedAccount: AssetAccount | undefined

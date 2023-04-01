@@ -13,7 +13,7 @@ import {
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
 import { ProposalState } from '@solana/spl-governance'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const NFT_SOL_BALANCE = 0.0014616
 

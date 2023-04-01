@@ -13,7 +13,7 @@ import { FORM_NAME as COMMUNITY_TOKEN_FORM } from 'pages/realms/new/community-to
 import { useProgramVersionByIdQuery } from '@hooks/queries/useProgramVersionQuery'
 import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
 import { PublicKey } from '@solana/web3.js'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export const Section = ({ children }) => {
   return (

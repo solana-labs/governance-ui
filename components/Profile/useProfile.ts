@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { CivicProfile, Profile as BaseProfile } from '@civic/profile'
 import useWalletStore from 'stores/useWalletStore'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 type Profile = BaseProfile & {
   exists: boolean

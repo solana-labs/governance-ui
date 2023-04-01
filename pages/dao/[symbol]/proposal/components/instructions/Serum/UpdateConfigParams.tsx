@@ -12,7 +12,7 @@ import useSerumGovStore, { ConfigAccountType } from 'stores/useSerumGovStore'
 import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
 import * as anchor from '@coral-xyz/anchor'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const UpdateConfigParams = ({
   index,

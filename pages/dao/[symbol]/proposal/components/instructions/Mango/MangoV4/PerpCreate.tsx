@@ -22,7 +22,7 @@ import InstructionForm, {
 } from '../../FormCreator'
 import UseMangoV4 from '@hooks/useMangoV4'
 import { BN } from '@coral-xyz/anchor'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface PerpCreateForm {
   governedAccount: AssetAccount | null

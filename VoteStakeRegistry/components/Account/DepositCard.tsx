@@ -26,7 +26,7 @@ import {
 } from '@utils/dateTools'
 import { BN } from '@coral-xyz/anchor'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const DepositCard = ({
   deposit,

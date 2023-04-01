@@ -23,7 +23,7 @@ import NFTCollectionModal from '@components/NewRealmWizard/components/NFTCollect
 import { Metaplex } from '@metaplex-foundation/js'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { getNFTsByCollection } from '@utils/tokens'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 function filterAndMapVerifiedCollections(nfts) {
   return nfts

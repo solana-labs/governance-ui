@@ -5,7 +5,7 @@ import useWalletStore from '../../stores/useWalletStore'
 import useRealm from '@hooks/useRealm'
 import { getVoterWeightRecord as getPluginVoterWeightRecord } from '@utils/plugin/accounts'
 import { Client } from '@utils/uiTypes/VotePlugin'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 // A data structure that indicates if a record that a plugin relies on (token owner record or voter weight recird)
 // exists on chain or not - if not, it will trigger the "Join" button to create it.

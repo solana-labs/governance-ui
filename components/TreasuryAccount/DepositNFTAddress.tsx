@@ -31,7 +31,7 @@ import {
   Sft,
   SftWithToken,
 } from '@metaplex-foundation/js/dist/types/plugins/nftModule/models'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
 

@@ -16,7 +16,7 @@ import Input, { RadioGroup } from '@components/NewRealmWizard/components/Input'
 import TokenInfoTable, {
   GenericTokenIcon,
 } from '@components/NewRealmWizard/components/TokenInfoTable'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface MintInfoWithDecimalSupply extends MintInfo {
   supplyAsDecimal: number

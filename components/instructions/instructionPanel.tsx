@@ -14,7 +14,7 @@ import {
 import Button from '@components/Button'
 import { dryRunInstruction } from 'actions/dryRunInstruction'
 import { getExplorerInspectorUrl } from '@components/explorer/tools'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export function InstructionPanel() {
   const { instructions, proposal } = useProposal()

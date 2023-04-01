@@ -8,7 +8,7 @@ import useWalletStore from '../../stores/useWalletStore'
 import { getExplorerInspectorUrl, getExplorerUrl } from './tools'
 import { SecondaryButton } from '../Button'
 import { notify } from '@utils/notifications'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export default function InspectorButton({
   proposalInstruction,

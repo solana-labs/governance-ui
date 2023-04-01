@@ -36,7 +36,7 @@ import { PositionCard } from './PositionCard'
 import useHeliumVsrStore from '../hooks/useHeliumVsrStore'
 import { PublicKey } from '@solana/web3.js'
 import { notify } from '@utils/notifications'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export const LockTokensAccount: React.FC<{
   tokenOwnerRecordPk: string | string[] | undefined

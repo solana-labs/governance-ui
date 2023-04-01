@@ -21,7 +21,7 @@ import {
 } from 'SwitchboardVotePlugin/SwitchboardQueueVoterClient'
 import { NewProposalContext } from '../../../new'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const SwitchboardAdmitOracle = ({
   index,

@@ -9,7 +9,7 @@ import {
 } from '@blockworks-foundation/mango-v4'
 import useWalletStore from 'stores/useWalletStore'
 import { useEffect, useState } from 'react'
-import useWalletOnePointOh from './useWallet'
+import useWalletOnePointOh from './useWalletOnePointOh'
 
 export default function UseMangoV4() {
   const cluster = useWalletStore((s) => s.connection).cluster

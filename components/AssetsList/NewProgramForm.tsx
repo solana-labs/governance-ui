@@ -37,7 +37,7 @@ import {
   transform,
   transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig,
 } from './BaseGovernanceForm-data'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 interface NewProgramForm extends BaseGovernanceFormFieldsV2 {
   programId: string
   transferAuthority: boolean

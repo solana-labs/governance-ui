@@ -15,7 +15,7 @@ import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import * as serum from '@project-serum/common'
 import TokenMintInput from '@components/inputs/TokenMintInput'
 import { TokenInfoWithoutDecimals } from '@utils/services/tokenPrice'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const CreateAta = ({
   owner,

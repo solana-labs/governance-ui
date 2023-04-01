@@ -13,7 +13,7 @@ import Input from '@components/NewRealmWizard/components/Input'
 import { updateUserInput, validateSolAddress } from '@utils/formValidation'
 import { FORM_NAME as MULTISIG_FORM } from 'pages/realms/new/multisig'
 import { textToAddressList } from '@utils/textToAddressList'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 /**
  * Convert a list of addresses into a list of uniques and duplicates

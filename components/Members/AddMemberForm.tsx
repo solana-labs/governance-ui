@@ -31,7 +31,7 @@ import useProgramVersion from '@hooks/useProgramVersion'
 import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
 import BigNumber from 'bignumber.js'
 import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface AddMemberForm extends Omit<MintForm, 'mintAccount'> {
   description: string

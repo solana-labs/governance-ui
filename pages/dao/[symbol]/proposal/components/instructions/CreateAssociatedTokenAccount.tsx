@@ -22,7 +22,7 @@ import { NewProposalContext } from '../../new'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import TokenMintInput from '@components/inputs/TokenMintInput'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const CreateAssociatedTokenAccount = ({
   index,

@@ -16,7 +16,7 @@ import Input from '@components/inputs/Input'
 import dynamic from 'next/dynamic'
 
 import { BsLayoutWtf, BsCheck } from 'react-icons/bs'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const RealmsDashboard = dynamic(() => import('./components/RealmsDashboard'))
 

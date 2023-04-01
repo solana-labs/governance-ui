@@ -32,7 +32,7 @@ import {
   SolendSubStrategy,
 } from 'Strategies/protocols/solend'
 import { PublicKey } from '@solana/web3.js'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const SolendWithdraw = ({
   proposedInvestment,

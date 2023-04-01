@@ -3,7 +3,7 @@ import { useProfile, ProfileImage } from '@components/Profile'
 import { PublicKey } from '@solana/web3.js'
 import { LoadingDots } from '@components/Loading'
 import { CivicIcon } from '@components/icons'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const VisitLink: FC<{ address: PublicKey }> = ({ address }) => (
   <a

@@ -15,7 +15,7 @@ import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { getFriktionClaimPendingWithdrawInstruction } from '@utils/instructions/Friktion'
 import Select from '@components/inputs/Select'
 import { FriktionSnapshot, VoltSnapshot } from '@friktion-labs/friktion-sdk'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const FriktionClaimPendingWithdraw = ({
   index,

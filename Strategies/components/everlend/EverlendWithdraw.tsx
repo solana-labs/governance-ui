@@ -24,7 +24,7 @@ import { validateInstruction } from '@utils/instructionTools'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Loading from '@components/Loading'
 import { TreasuryStrategy } from '../../types/types'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface IProps {
   proposedInvestment: TreasuryStrategy & {

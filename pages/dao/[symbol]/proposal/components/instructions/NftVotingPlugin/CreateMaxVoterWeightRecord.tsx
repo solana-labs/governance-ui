@@ -19,7 +19,7 @@ import InstructionForm, {
 import { getMaxVoterWeightRecord } from '@utils/plugin/accounts'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface CreateNftMaxVoterWeightRecord {
   governedAccount: AssetAccount | undefined

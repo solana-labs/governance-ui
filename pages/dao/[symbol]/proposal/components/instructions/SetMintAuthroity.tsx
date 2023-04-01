@@ -16,7 +16,7 @@ import Input from '@components/inputs/Input'
 import { validatePubkey } from '@utils/formValidation'
 import * as yup from 'yup'
 import { PublicKey } from '@solana/web3.js'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 type Form = {
   governedAccount: AssetAccount | null

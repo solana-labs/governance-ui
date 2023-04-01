@@ -18,7 +18,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getGoblinGoldDepositInstruction } from '@utils/instructions/GoblinGold'
 import { StrategyVault } from 'goblingold-sdk'
 import { getGoblinGoldDepositSchema } from '@utils/validations'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const GoblinGoldDeposit = ({
   index,

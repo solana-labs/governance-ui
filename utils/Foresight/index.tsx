@@ -31,7 +31,7 @@ import useRealm from '@hooks/useRealm'
 import { NewProposalContext } from '../../pages/dao/[symbol]/proposal/new'
 import Select from '@components/inputs/Select'
 import TextareaProps from '@components/inputs/Textarea'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 type EmptyObject = Record<string, never>
 type SetFormErrors = Dispatch<React.SetStateAction<EmptyObject>>

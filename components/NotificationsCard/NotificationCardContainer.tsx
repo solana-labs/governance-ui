@@ -1,6 +1,6 @@
 import NotificationsCard from '@components/NotificationsCard'
 import NotifiPreviewCard from '@components/NotificationsCard/NotifiPreviewCard'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { EndpointTypes } from '@models/types'
 import {
   BlockchainEnvironment,

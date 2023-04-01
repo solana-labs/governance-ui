@@ -37,7 +37,7 @@ import ProposalSorting, {
   PROPOSAL_SORTING_LOCAL_STORAGE_KEY,
   Sorting,
 } from '@components/ProposalSorting'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')

@@ -17,7 +17,7 @@ import { notify } from '@utils/notifications'
 import { getMintMetadata } from '../instructions/programs/splToken'
 import depositTokensVSR from './depositTokensVSR'
 import VotingPowerPct from './VotingPowerPct'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface Props {
   className?: string

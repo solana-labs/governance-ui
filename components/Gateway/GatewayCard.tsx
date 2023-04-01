@@ -17,7 +17,7 @@ import useGatewayPluginStore from '../../GatewayPlugin/store/gatewayPluginStore'
 import { GatewayButton } from '@components/Gateway/GatewayButton'
 import { getRegistrarPDA, getVoterWeightRecord } from '@utils/plugin/accounts'
 import { useRecords } from '@components/Gateway/useRecords'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 // TODO lots of overlap with NftBalanceCard here - we need to separate the logic for creating the Token Owner Record
 // from the rest of this logic

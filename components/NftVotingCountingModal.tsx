@@ -1,5 +1,5 @@
 import { usePrevious } from '@hooks/usePrevious'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { NftVoterClient } from '@solana/governance-program-library'
 import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'

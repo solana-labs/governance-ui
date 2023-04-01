@@ -25,7 +25,7 @@ import {
   getCastleVaults,
   getCastleWithdrawInstruction,
 } from '@utils/instructions/Castle'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const CastleWithdraw = ({
   index,

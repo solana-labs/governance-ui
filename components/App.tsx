@@ -29,7 +29,7 @@ import { getResourcePathPart } from '@tools/core/resources'
 import queryClient from '@hooks/queries/queryClient'
 import useSerumGovStore from 'stores/useSerumGovStore'
 import { WalletProvider } from '@hub/providers/Wallet'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,

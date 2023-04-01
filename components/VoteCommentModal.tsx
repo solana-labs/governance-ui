@@ -25,7 +25,7 @@ import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
 import { NftVoterClient } from '@solana/governance-program-library'
 import queryClient from '@hooks/queries/queryClient'
 import { voteRecordQueryKeys } from '@hooks/queries/voteRecord'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface VoteCommentModalProps {
   onClose: () => void

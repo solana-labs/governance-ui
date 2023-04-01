@@ -35,7 +35,7 @@ import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import { BN } from '@coral-xyz/anchor'
 import { PublicKey } from '@solana/web3.js'
 import { useVsrMode } from './useVsrMode'
-import useWalletOnePointOh from './useWallet'
+import useWalletOnePointOh from './useWalletOnePointOh'
 
 export default function useRealm() {
   const router = useRouter()

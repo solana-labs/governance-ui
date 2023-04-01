@@ -17,7 +17,7 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { sendTransaction } from '@utils/send'
 
 import VotingPowerPct from './VotingPowerPct'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface Props {
   className?: string

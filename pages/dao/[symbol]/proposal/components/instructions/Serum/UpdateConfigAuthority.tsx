@@ -1,6 +1,6 @@
 import Input from '@components/inputs/Input'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import {
   Governance,

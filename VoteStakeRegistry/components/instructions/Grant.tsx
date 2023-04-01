@@ -37,7 +37,7 @@ import { tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import dayjs from 'dayjs'
 import { AssetAccount } from '@utils/uiTypes/assets'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const Grant = ({
   index,

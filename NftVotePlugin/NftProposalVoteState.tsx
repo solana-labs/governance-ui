@@ -1,6 +1,6 @@
 import useRealm from '@hooks/useRealm'
 import { nftPluginsPks } from '@hooks/useVotingPlugins'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { ProgramAccount, Proposal, ProposalState } from '@solana/spl-governance'
 import { useEffect } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'

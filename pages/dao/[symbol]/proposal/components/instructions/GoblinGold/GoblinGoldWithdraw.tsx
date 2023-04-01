@@ -22,7 +22,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getGoblinGoldWithdrawInstruction } from '@utils/instructions/GoblinGold'
 import { StrategyVault } from 'goblingold-sdk'
 import { getGoblinGoldWithdrawSchema } from '@utils/validations'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const GoblinGoldWithdraw = ({
   index,

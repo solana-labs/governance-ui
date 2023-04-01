@@ -19,7 +19,7 @@ import {
 } from '@utils/validations'
 import Tooltip from '@components/Tooltip'
 import Select from '@components/inputs/Select'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const DualAirdrop = ({
   index,

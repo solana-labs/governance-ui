@@ -16,7 +16,7 @@ import Tooltip from '@components/Tooltip'
 import { notify } from '@utils/notifications'
 import { PublicKey } from '@solana/web3.js'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export function FlagInstructionErrorButton({
   proposal,

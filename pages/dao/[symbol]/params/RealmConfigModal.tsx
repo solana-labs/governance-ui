@@ -32,7 +32,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import { isDisabledVoterWeight } from '@tools/governance/units'
 import useProgramVersion from '@hooks/useProgramVersion'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface RealmConfigProposal extends RealmConfigForm {
   title: string

@@ -22,7 +22,7 @@ import { PublicKey } from '@solana/web3.js'
 import { InformationCircleIcon } from '@heroicons/react/outline'
 import Tooltip from '@components/Tooltip'
 import { getRegistrarPDA } from '@utils/plugin/accounts'
-import useWalletOnePointOh from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface CreateGatewayRegistrarForm {
   governedAccount: AssetAccount | undefined
