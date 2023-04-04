@@ -34,6 +34,7 @@ import { TOKEN_AUCTION_INSTRUCTIONS } from './programs/tokenAuction'
 import { VALIDATORDAO_INSTRUCTIONS } from './programs/validatordao'
 import { POSEIDON_INSTRUCTIONS } from './programs/poseidon'
 import { MANGO_V4_INSTRUCTIONS } from './programs/mangoV4'
+import { DUAL_INSTRUCTIONS } from './programs/dual'
 
 export const V3_DEFAULT_GOVERNANCE_PROGRAM_ID =
   '7e75Nwsz8i5i4NiDa43CNzKJ4AeQGyRimha46VKTM1Ls'
@@ -328,6 +329,7 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...VALIDATORDAO_INSTRUCTIONS,
   ...POSEIDON_INSTRUCTIONS,
   ...MANGO_V4_INSTRUCTIONS,
+  ...DUAL_INSTRUCTIONS,
 }
 
 export async function getInstructionDescriptor(
