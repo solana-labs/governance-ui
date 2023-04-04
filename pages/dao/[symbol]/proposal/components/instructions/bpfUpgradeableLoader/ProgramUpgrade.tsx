@@ -22,6 +22,7 @@ import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { validateInstruction } from '@utils/instructionTools'
 import ProgramUpgradeInfo from './ProgramUpgradeInfo'
 import { AccountType } from '@utils/uiTypes/assets'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const ProgramUpgrade = ({
   index,
@@ -31,7 +32,7 @@ const ProgramUpgrade = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(

@@ -6,12 +6,16 @@ import Button from '@components/Button'
 import { VoteTipping } from '@solana/spl-governance'
 import { AddressField, NumberField } from '../index'
 import useProgramVersion from '@hooks/useProgramVersion'
+import { useRouter } from 'next/router'
+import useQueryContext from '@hooks/useQueryContext'
 
-const ParamsView = ({ activeGovernance, openGovernanceProposalModal }) => {
-  const { realm, mint, councilMint, ownVoterWeight } = useRealm()
+const ParamsView = ({ activeGovernance }) => {
+  const { realm, mint, councilMint, ownVoterWeight, symbol } = useRealm()
   const programVersion = useProgramVersion()
   const realmAccount = realm?.account
   const communityMint = realmAccount?.communityMint.toBase58()
+  const router = useRouter()
+  const { fmtUrlWithCluster } = useQueryContext()
 
   const minCommunityTokensToCreateProposal = activeGovernance?.account?.config
     ?.minCommunityTokensToCreateProposal
@@ -38,7 +42,7 @@ const ParamsView = ({ activeGovernance, openGovernanceProposalModal }) => {
             label="Max Voting Time"
             padding
             val={getFormattedStringFromDays(
-              activeGovernance.account.config.maxVotingTime / SECS_PER_DAY
+              activeGovernance.account.config.baseVotingTime / SECS_PER_DAY
             )}
           />
           {communityMint && (
@@ -134,7 +138,19 @@ const ParamsView = ({ activeGovernance, openGovernanceProposalModal }) => {
               tooltipMessage={
                 'Please connect wallet with enough voting power to create governance config proposals'
               }
-              onClick={openGovernanceProposalModal}
+              onClick={() => {
+                if (
+                  ownVoterWeight.canCreateProposal(
+                    activeGovernance.account.config
+                  )
+                ) {
+                  router.push(
+                    fmtUrlWithCluster(
+                      `/realm/${symbol}/governance/${activeGovernance.pubkey.toBase58()}/edit`
+                    )
+                  )
+                }
+              }}
               className="ml-auto"
             >
               Change config

@@ -16,6 +16,7 @@ import Input, { RadioGroup } from '@components/NewRealmWizard/components/Input'
 import TokenInfoTable, {
   GenericTokenIcon,
 } from '@components/NewRealmWizard/components/TokenInfoTable'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface MintInfoWithDecimalSupply extends MintInfo {
   supplyAsDecimal: number
@@ -58,7 +59,9 @@ export default function TokenInput({
   onValidation,
   disableMinTokenInput = false,
 }) {
-  const { connected, connection, current: wallet } = useWalletStore((s) => s)
+  const connection = useWalletStore((s) => s.connection)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const [tokenList, setTokenList] = useState<TokenInfo[] | undefined>()
   const [tokenMintAddress, setTokenMintAddress] = useState('')
   const [tokenInfo, setTokenInfo] = useState<TokenWithMintInfo | undefined>()

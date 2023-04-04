@@ -14,6 +14,16 @@
     "sortRank": 3
   },
   {
+    "symbol": "Dean's List Network State",
+    "displayName": "Dean's List Network State",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "F9V4Lwo49aUe8fFujMbU6uhdFyDRqKY54WpzdpncUSk9",
+    "bannerImage": "/realms/Deans_List_Network_State/DeansList_Network_State_logo.png",
+    "website": "https://www.deanslist.services/",
+    "twitter": "@deanslistDAO",
+    "ogImage": "/realms/Deans_List_Network_State/DeansList_Network_State_logo.png"
+   },
+   {
     "symbol": "Ukraine",
     "displayName": "Ukraine.SOL",
     "programId": "gUAedF544JeE6NYbQakQvribHykUNgaPJqcgf3UQVnY",
@@ -1035,18 +1045,18 @@
     "website": "https://flipsidecrypto.xyz/",
     "twitter": "@flipsidecrypto",
     "ogImage": "/realms/FSLOGO/FLIPSIDE-LOGO-WHITE.png"
-  },
-  {
-    "symbol": "Dean's List",
+   },
+   {
+    "symbol": "Legacy Dean's List Classic (moved to new one)",
     "displayName": "Dean's List",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "9mS8GuMx2MkZGMSwa2k87HNLTFZ1ssa9mJ1RkGFKcGyQ",
-    "bannerImage": "/realms/Deans-List-Grape/deans-list-logo.png",
+    "bannerImage": "/realms/DeanListGrape/deans-list-logo.png",
     "website": "https://deans-list.strataprotocol.com/",
     "twitter": "@GrapeDeanslist",
-    "ogImage": "/realms/Deans-List-Grape/deans-list-logo.png"
-  },
-  {
+    "ogImage": "/realms/DeanListGrape/deans-list-logo.png"
+   },
+   {
     "symbol": "GrapeCCSubDAO",
     "displayName": "Grape CC SubDAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1054,8 +1064,8 @@
     "website": "https://services.grapes.network/",
     "twitter": "@grapeprotocol",
     "ogImage": "/realms/GrapeCCSubDAO/GrapeCCSubDAO.png"
-  },
-  {
+   },
+   {
     "symbol": "AthensDAO",
     "displayName": "AthensDAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1064,8 +1074,17 @@
     "website": "https://athensdao.net/",
     "twitter": "@GrapeAthensDAO",
     "ogImage": "/realms/AthensDAO/AthensDAO_Logo.jpg"
-  },
-  {
+   },
+   {
+    "symbol": "Wen DAO",
+    "displayName": "Wen DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "3GoWL2uR7qx9NLGuZydTuyoxaYSwAQ3HVqCF3Kz6D7F3",
+    "website": "https://services.grapes.network/",
+    "twitter": "@grapeprotocol",
+    "ogImage": "/realms/Wen DAO/Wen DAO.png"
+   }, 
+   { 
     "symbol": "BOOT",
     "displayName": "Bootstrap DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1113,11 +1132,11 @@
  {
     "symbol": "EPCT",
     "category": "web3",
-    "bannerImage": "https://bafybeigyh52dlntjyn4lyajvt7v5d2vtifjhyaklu3j5rhkpihhbb3wkwa.ipfs.w3s.link/BuidlToEarnTwitterHeader.png",
+    "bannerImage": "https://bafybeih52um4tvyggeja36kmbyg5b4pfod547qxdite4krwoe4nwtareji.ipfs.w3s.link/EpicsBetaTwitterHeaderLogo.png",
     "displayName": "Epics",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "DCdCsuUjg6MnULfEmBUmvg1heggnLrKSFdp5uTRSKuwR",
-    "ogImage": "/realms/Epics/Epics-logo-background.png",
+    "ogImage": "/realms/Epics/EpicsLogoSquareInvert.svg",
     "shortDescription": "Buidl to Earn. Epics is a decentralized crowdsourcing platform for incentivizing open source software development.",
     "sortRank": 3,
     "website": "https://epics.dev",
@@ -3059,6 +3078,20 @@
     "website": "https://safecows.com",
     "discord": "https://discord.gg/aQCeMSWs"
   },
+   { 
+    "symbol": "BlueChickDAO",
+    "category":"gaming",
+    "displayName": "The Blue Chick NFTs DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "99c96qFUwLiGcbudDeTLVxYTbtQ4CkDsstvHHmGPGGWj",
+    "ogImage": "/realms/BlueChickNFTsDAO/BlueChickNFTsDAO.png",
+    "bannerImage": "/realms/BlueChickNFTsDAO/BlueChickNFTsDAO-banner.png",
+    "shortDescription": "PVP artillery tactical game with x9999 immutable Blue Chicks. The NFTs and the DAO were actually made by birds!",
+    "website": "https://bluechicknfts.wtf",
+    "discord": "https://discord.gg/SHVcwHKUNG",
+    "twitter": "@blueChickNFTs"
+  },  
+  
   {
     "symbol": "HNT",
     "displayName": "Helium DAO",

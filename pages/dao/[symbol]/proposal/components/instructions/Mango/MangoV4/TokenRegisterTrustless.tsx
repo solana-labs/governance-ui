@@ -8,7 +8,6 @@ import { NewProposalContext } from '../../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, {
@@ -16,6 +15,7 @@ import InstructionForm, {
   InstructionInputType,
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface TokenRegisterTrustlessForm {
   governedAccount: AssetAccount | null
@@ -33,14 +33,16 @@ const TokenRegisterTrustless = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const { mangoClient, mangoGroup } = UseMangoV4()
   const { assetAccounts } = useGovernanceAssets()
   const solAccounts = assetAccounts.filter(
     (x) =>
       x.type === AccountType.SOL &&
-      mangoGroup?.fastListingAdmin &&
-      x.extensions.transferAddress?.equals(mangoGroup?.fastListingAdmin)
+      ((mangoGroup?.fastListingAdmin &&
+        x.extensions.transferAddress?.equals(mangoGroup?.fastListingAdmin)) ||
+        (mangoGroup?.admin &&
+          x.extensions.transferAddress?.equals(mangoGroup?.admin)))
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<TokenRegisterTrustlessForm>({

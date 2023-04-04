@@ -47,9 +47,9 @@ import { getRealmConfigAccountOrDefault } from '@tools/governance/configs'
 import { getProposals } from '@utils/GovernanceTools'
 
 interface WalletStore extends State {
-  connected: boolean
   connection: ConnectionContext
   current: SignerWalletAdapter | undefined
+  mockWallet: SignerWalletAdapter | undefined
 
   ownVoteRecordsByProposal: { [proposal: string]: ProgramAccount<VoteRecord> }
   realms: { [realm: string]: ProgramAccount<Realm> }
@@ -129,9 +129,9 @@ const INITIAL_PROPOSAL_STATE = {
 } as const
 
 const useWalletStore = create<WalletStore>((set, get) => ({
-  connected: false,
   connection: getConnectionContext('mainnet'),
   current: undefined,
+  mockWallet: undefined,
   realms: {},
   ownVoteRecordsByProposal: {},
   selectedRealm: INITIAL_REALM_STATE,
@@ -185,8 +185,9 @@ const useWalletStore = create<WalletStore>((set, get) => ({
     },
     async fetchWalletTokenAccounts() {
       const connection = get().connection.current
-      const connected = get().connected
-      const wallet = get().current
+      const wallet = get().mockWallet ?? get().current
+      const connected = !!wallet?.connected
+
       const walletOwner = wallet?.publicKey
       const set = get().set
 
@@ -207,7 +208,8 @@ const useWalletStore = create<WalletStore>((set, get) => ({
     },
     async fetchDelegateVoteRecords() {
       const connection = get().connection.current
-      const connected = get().connected
+      const wallet = get().mockWallet ?? get().current
+      const connected = !!wallet?.connected
       const programId = get().selectedRealm.programId
       const realmId = get().selectedRealm.realm?.pubkey
       const selectedCouncilDelegate = get().selectedCouncilDelegate
@@ -253,11 +255,11 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 
     async fetchOwnVoteRecords() {
       const connection = get().connection.current
-      const connected = get().connected
       const programId = get().selectedRealm.programId
       const realmId = get().selectedRealm.realm?.pubkey
       const realmMintPk = get().selectedRealm.realm?.account.communityMint
-      const wallet = get().current
+      const wallet = get().mockWallet ?? get().current
+      const connected = !!wallet?.connected
       const walletOwner = wallet?.publicKey
       const set = get().set
 

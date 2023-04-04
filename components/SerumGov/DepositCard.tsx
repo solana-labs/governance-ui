@@ -2,7 +2,7 @@ import * as yup from 'yup'
 import * as anchor from '@coral-xyz/anchor'
 import { yupResolver } from '@hookform/resolvers/yup'
 import useTokenAccountBalance from '@hooks/useTokenAccountBalance'
-import useWallet from '@hooks/useWallet'
+import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import useSerumGovStore, {
   MSRM_DECIMALS,
   SRM_DECIMALS,
@@ -52,7 +52,7 @@ const DepositCard = ({ mint, callback, createProposal }: DepositCardProps) => {
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
 
-  const { wallet, anchorProvider } = useWallet()
+  const { wallet, anchorProvider } = useWalletDeprecated()
 
   const connection = useWalletStore((s) => s.connection)
   const actions = useSerumGovStore((s) => s.actions)

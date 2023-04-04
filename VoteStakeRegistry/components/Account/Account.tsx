@@ -1,10 +1,10 @@
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import { LinkIcon } from '@heroicons/react/outline'
 import MyProposalsBtn from 'pages/dao/[symbol]/proposal/components/MyProposalsBtn'
-import useWalletStore from 'stores/useWalletStore'
 import DelegateCard from '@components/DelegateCard'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import useRealm from '@hooks/useRealm'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const AccountInner = ({
   displayPanel,
@@ -13,7 +13,8 @@ const AccountInner = ({
   displayPanel?: boolean
   withHeader?: boolean
 }) => {
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const { realmInfo } = useRealm()
   return (
     <div className="bg-bkg-2 col-span-12 p-4 md:p-6 rounded-lg">

@@ -39,6 +39,7 @@ import {
 import tokenPriceService from '@utils/services/tokenPrice'
 import { EVERLEND } from '../../Strategies/protocols/everlend/tools'
 import { findAssociatedTokenAccount } from '@everlend/common'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 type InvestmentType = TreasuryStrategy & {
   investedAmount: number
@@ -65,7 +66,9 @@ const AccountOverview = () => {
   const isSplToken = currentAccount?.type === AccountType.TOKEN
   const isAuxiliaryAccount = currentAccount?.type === AccountType.AuxiliaryToken
   const { canUseTransferInstruction } = useGovernanceAssets()
-  const { connection, connected } = useWalletStore((s) => s)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
+  const connection = useWalletStore((s) => s.connection)
   const recentActivity = useTreasuryAccountStore((s) => s.recentActivity)
   const isLoadingRecentActivity = useTreasuryAccountStore(
     (s) => s.isLoadingRecentActivity

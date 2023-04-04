@@ -31,6 +31,7 @@ import { useClosePosition } from '../hooks/useClosePosition'
 import { DelegateTokensModal } from './DelegateTokensModal'
 import { useDelegatePosition } from '../hooks/useDelegatePosition'
 import { useUndelegatePosition } from '../hooks/useUndelegatePosition'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export interface PositionCardProps {
   position: PositionWithMeta
@@ -127,11 +128,11 @@ export const PositionCard: React.FC<PositionCardProps> = ({
     undelegatePosition,
   } = useUndelegatePosition()
 
-  const [
-    connection,
-    wallet,
-    { fetchRealm, fetchWalletTokenAccounts },
-  ] = useWalletStore((s) => [s.connection.current, s.current, s.actions])
+  const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
+    (s) => s.actions
+  )
+  const connection = useWalletStore((s) => s.connection)
+  const wallet = useWalletOnePointOh()
 
   const { lockup, hasGenesisMultiplier, votingMint } = position
   const lockupKind = Object.keys(lockup.kind)[0] as string
@@ -174,7 +175,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
       communityMintPk: realm!.account.communityMint,
       walletPk: wallet!.publicKey!,
       client: vsrClient!,
-      connection,
+      connection: connection.current,
     })
   }
 

@@ -31,12 +31,13 @@ import {
   Sft,
   SftWithToken,
 } from '@metaplex-foundation/js/dist/types/plugins/nftModule/models'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
 
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const { realm } = useRealm()
-  const connected = useWalletStore((s) => s.connected)
+  const connected = !!wallet?.connected
   const [form, setForm] = useState({
     mint: '',
   })

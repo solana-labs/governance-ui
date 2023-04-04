@@ -17,6 +17,7 @@ import { notify } from '@utils/notifications'
 import { getMintMetadata } from '../instructions/programs/splToken'
 import depositTokensVSR from './depositTokensVSR'
 import VotingPowerPct from './VotingPowerPct'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface Props {
   className?: string
@@ -38,7 +39,7 @@ export default function LockedCommunityVotingPower(props: Props) {
   const votingPowerFromDeposits = useDepositStore(
     (s) => s.state.votingPowerFromDeposits
   )
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const isLoading = useDepositStore((s) => s.state.isLoading)
 
   const currentTokenOwnerRecord =

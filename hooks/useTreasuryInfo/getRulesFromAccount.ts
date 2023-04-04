@@ -4,6 +4,7 @@ import { MintInfo } from '@solana/spl-token'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { Wallet } from '@models/treasury/Wallet'
 
+// @asktree: this function and file should not exist. Taking an account and slightly modifying every field before serving it to components should be done almost never.
 export function getRulesFromAccount(
   account: AssetAccount,
   existingRules: Wallet['rules'],
@@ -15,7 +16,7 @@ export function getRulesFromAccount(
 
   if (!rules.common) {
     rules.common = {
-      maxVotingTime: govConfig.maxVotingTime,
+      maxVotingTime: govConfig.baseVotingTime,
       minInstructionHoldupTime: govConfig.minInstructionHoldUpTime,
       votingCoolOffSeconds: govConfig.votingCoolOffTime,
     }

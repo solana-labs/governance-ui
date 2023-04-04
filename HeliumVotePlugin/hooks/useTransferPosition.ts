@@ -1,4 +1,4 @@
-import useWallet from '@hooks/useWallet'
+import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import { Program } from '@coral-xyz/anchor'
 import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 import { useAsyncCallback } from 'react-async-hook'
@@ -10,7 +10,7 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 
 export const useTransferPosition = () => {
-  const { connection, wallet, anchorProvider: provider } = useWallet()
+  const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
   const { realm } = useRealm()
   const [{ client }] = useVotePluginsClientStore((s) => [
     s.state.currentRealmVotingClient,

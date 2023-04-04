@@ -8,7 +8,6 @@ import { NewProposalContext } from '../../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, {
@@ -18,6 +17,7 @@ import InstructionForm, {
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { toNative } from '@blockworks-foundation/mango-v4'
 import { BN } from '@coral-xyz/anchor'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface TokenRegisterForm {
   governedAccount: AssetAccount | null
@@ -53,7 +53,7 @@ const TokenRegister = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const { mangoClient, mangoGroup, getAdditionalLabelInfo } = UseMangoV4()
   const { assetAccounts } = useGovernanceAssets()
   const solAccounts = assetAccounts.filter(

@@ -8,7 +8,6 @@ import { NewProposalContext } from '../../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, {
@@ -21,6 +20,7 @@ import { getChangedValues, getNullOrTransform } from '@utils/mangoV4Tools'
 import { BN } from '@coral-xyz/anchor'
 import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
 import Switch from '@components/Switch'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const keyToLabel = {
   oraclePk: 'Oracle',
@@ -139,7 +139,7 @@ const PerpEdit = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const { mangoClient, mangoGroup, getAdditionalLabelInfo } = UseMangoV4()
   const { assetAccounts } = useGovernanceAssets()
   const [perps, setPerps] = useState<NameMarketIndexVal[]>([])

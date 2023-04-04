@@ -21,14 +21,15 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import dayjs from 'dayjs'
 import { diffTime } from './ProposalRemainingVotingTime'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const ProposalActionsPanel = () => {
   const { governance, proposal, proposalOwner } = useWalletStore(
     (s) => s.selectedProposal
   )
   const { realmInfo } = useRealm()
-  const wallet = useWalletStore((s) => s.current)
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
   const signatories = useWalletStore((s) => s.selectedProposal.signatories)
   const connection = useWalletStore((s) => s.connection)
@@ -43,7 +44,7 @@ const ProposalActionsPanel = () => {
     hasVoteTimeExpired && proposal?.account.state === ProposalState.Voting
   const now = new Date().getTime() / 1000 // unix timestamp in seconds
   const mainVotingEndedAt = proposal?.account.signingOffAt
-    ?.addn(governance?.account.config.maxVotingTime || 0)
+    ?.addn(governance?.account.config.baseVotingTime || 0)
     .toNumber()
 
   const votingCoolOffTime = governance?.account.config.votingCoolOffTime || 0

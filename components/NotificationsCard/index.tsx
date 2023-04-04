@@ -3,6 +3,7 @@ import {
   MailIcon,
   PaperAirplaneIcon,
 } from '@heroicons/react/solid'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import {
   Alert,
   GqlError,
@@ -20,7 +21,6 @@ import React, {
 } from 'react'
 import { useCallback } from 'react'
 
-import useWalletStore from '../../stores/useWalletStore'
 import Button from '../Button'
 import Input from '../inputs/Input'
 import NotifiFullLogo from './NotifiFullLogo'
@@ -70,8 +70,8 @@ const NotificationsCard = ({
   const [telegramEnabled, setTelegramEnabled] = useState<boolean>(false)
   const [firstTimeUser, setFirstTimeUser] = useState<boolean>(false)
 
-  const wallet = useWalletStore((s) => s.current)
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
 
   const alerts = data?.alerts
   const sources = data?.sources

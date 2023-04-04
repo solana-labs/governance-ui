@@ -24,6 +24,7 @@ import * as anchor from '@coral-xyz/anchor'
 import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
 import useRealm from '@hooks/useRealm'
 import { SOLANA_VALIDATOR_DAO_PROGRAM_ID } from '@components/instructions/programs/validatordao'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const StakeValidator = ({
   index,
@@ -36,7 +37,7 @@ const StakeValidator = ({
   const programId: PublicKey = StakeProgram.programId
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
 
   const [form, setForm] = useState<ValidatorStakingForm>({
     validatorVoteKey: '',

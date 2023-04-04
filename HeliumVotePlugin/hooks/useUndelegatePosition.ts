@@ -1,4 +1,4 @@
-import useWallet from '@hooks/useWallet'
+import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import { Program } from '@coral-xyz/anchor'
 import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 import { useAsyncCallback } from 'react-async-hook'
@@ -11,7 +11,7 @@ import {
 } from '@helium/helium-sub-daos-sdk'
 
 export const useUndelegatePosition = () => {
-  const { connection, wallet, anchorProvider: provider } = useWallet()
+  const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
   const { error, loading, execute } = useAsyncCallback(
     async ({
       position,

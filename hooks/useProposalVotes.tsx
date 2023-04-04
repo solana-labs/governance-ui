@@ -44,8 +44,8 @@ export default function useProposalVotes(proposal?: Proposal) {
       ? governance.config.communityVoteThreshold.value
       : 0
     : programVersion > 2
-    ? governance.config.councilVoteThreshold.value
-    : governance.config.communityVoteThreshold.value
+    ? governance.config.councilVoteThreshold.value || 0
+    : governance.config.communityVoteThreshold.value || 0
 
   if (voteThresholdPct === undefined)
     throw new Error(

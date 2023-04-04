@@ -4490,10 +4490,10 @@
     bs58 "^4.0.1"
     superstruct "^0.15.2"
 
-"@solana/spl-governance@0.3.25":
-  version "0.3.25"
-  resolved "https://registry.yarnpkg.com/@solana/spl-governance/-/spl-governance-0.3.25.tgz#57563003ebd4cf0bf778876035828196e34e29fd"
-  integrity sha512-+qepFswOvG0mHLoLnONw+6bwSuEKr7UhJyeAuM/nodjkR8Z5IfH4HQuOzl+TlPTjMStLFJ7Ja6AzTu+FkPGIUQ==
+"@solana/spl-governance@0.3.26":
+  version "0.3.26"
+  resolved "https://registry.yarnpkg.com/@solana/spl-governance/-/spl-governance-0.3.26.tgz#1a6c56037063654d243cc3ee9503b5b3140bbd6f"
+  integrity sha512-L84AWKcAmEMIWhh5gcfasfDesOMT+IU4i+s0ELgKCN0O9MC/hVrSjTkn68vBhDfCElnJyJTFMAN7NqSbrweD9A==
   dependencies:
     "@solana/web3.js" "^1.22.0"
     axios "^1.1.3"
@@ -5057,7 +5057,7 @@
     "@wallet-standard/app" "^1.0.1"
     "@wallet-standard/base" "^1.0.1"
 
-"@solana/web3.js@1.42.0", "@solana/web3.js@1.56.0", "@solana/web3.js@1.73.3", "@solana/web3.js@^1.16.1", "@solana/web3.js@^1.17.0", "@solana/web3.js@^1.20.0", "@solana/web3.js@^1.21.0", "@solana/web3.js@^1.22.0", "@solana/web3.js@^1.24.1", "@solana/web3.js@^1.29.2", "@solana/web3.js@^1.30.2", "@solana/web3.js@^1.31.0", "@solana/web3.js@^1.32.0", "@solana/web3.js@^1.35.1", "@solana/web3.js@^1.36.0", "@solana/web3.js@^1.37.1", "@solana/web3.js@^1.42.0", "@solana/web3.js@^1.44.3", "@solana/web3.js@^1.48.0", "@solana/web3.js@^1.56.2", "@solana/web3.js@^1.59.1", "@solana/web3.js@^1.63.0", "@solana/web3.js@^1.63.1", "@solana/web3.js@^1.66.2", "@solana/web3.js@^1.68.0", "@solana/web3.js@^1.73.2":
+"@solana/web3.js@1.42.0", "@solana/web3.js@1.56.0", "@solana/web3.js@1.73.3", "@solana/web3.js@^1.16.1", "@solana/web3.js@^1.17.0", "@solana/web3.js@^1.20.0", "@solana/web3.js@^1.21.0", "@solana/web3.js@^1.22.0", "@solana/web3.js@^1.24.1", "@solana/web3.js@^1.29.2", "@solana/web3.js@^1.30.2", "@solana/web3.js@^1.31.0", "@solana/web3.js@^1.32.0", "@solana/web3.js@^1.35.1", "@solana/web3.js@^1.36.0", "@solana/web3.js@^1.37.1", "@solana/web3.js@^1.42.0", "@solana/web3.js@^1.43.4", "@solana/web3.js@^1.44.3", "@solana/web3.js@^1.48.0", "@solana/web3.js@^1.56.2", "@solana/web3.js@^1.59.1", "@solana/web3.js@^1.63.0", "@solana/web3.js@^1.63.1", "@solana/web3.js@^1.66.2", "@solana/web3.js@^1.68.0", "@solana/web3.js@^1.73.2":
   version "1.73.3"
   resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.73.3.tgz#60e6bd68f6f364d4be360b1e0a03a0a68468a029"
   integrity sha512-vHRMo589XEIpoujpE2sZZ1aMZvfA1ImKfNxobzEFyMb+H5j6mRRUXfdgWD0qJ0sm11e5BcBC7HPeRXJB+7f3Lg==
@@ -7801,6 +7801,14 @@ chai@^4.3.7:
     pathval "^1.1.1"
     type-detect "^4.0.5"
 
+chalk@4.1.2, chalk@^4.0.0, chalk@^4.1.0, chalk@^4.1.1, chalk@^4.1.2:
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/chalk/-/chalk-4.1.2.tgz#aac4e2b7734a740867aeb16bf02aad556a1e7a01"
+  integrity sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==
+  dependencies:
+    ansi-styles "^4.1.0"
+    supports-color "^7.1.0"
+
 chalk@^1.0.0, chalk@^1.1.3:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/chalk/-/chalk-1.1.3.tgz#a8115c55e4a702fe4d150abd3872822a7e09fc98"
@@ -7825,14 +7833,6 @@ chalk@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/chalk/-/chalk-3.0.0.tgz#3f73c2bf526591f574cc492c51e2456349f844e4"
   integrity sha512-4D3B6Wf41KOYRFdszmDqMCGq5VV/uMAB273JILmO+3jAlh8X4qDtdtgCR3fxtbLEMzSx22QdhnDcJvu2u1fVwg==
-  dependencies:
-    ansi-styles "^4.1.0"
-    supports-color "^7.1.0"
-
-chalk@^4.0.0, chalk@^4.1.0, chalk@^4.1.1, chalk@^4.1.2:
-  version "4.1.2"
-  resolved "https://registry.yarnpkg.com/chalk/-/chalk-4.1.2.tgz#aac4e2b7734a740867aeb16bf02aad556a1e7a01"
-  integrity sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==
   dependencies:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
@@ -7938,6 +7938,11 @@ clean-stack@^3.0.0:
   integrity sha512-lR9wNiMRcVQjSB3a7xXGLuz4cr4wJuuXlaAEbRutGowQTmlp7R72/DOgN21e8jdwblMWl9UOJMJXarX94pzKdg==
   dependencies:
     escape-string-regexp "4.0.0"
+
+clear@0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/clear/-/clear-0.1.0.tgz#b81b1e03437a716984fd7ac97c87d73bdfe7048a"
+  integrity sha512-qMjRnoL+JDPJHeLePZJuao6+8orzHMGP04A8CdwCNsKhRbOnKRjefxONR7bwILT3MHecxKBjHkKL/tkZ8r4Uzw==
 
 cli-columns@^3.1.2:
   version "3.1.2"
@@ -10146,6 +10151,11 @@ fetch-retry-ts@^1.1.24:
   version "1.1.25"
   resolved "https://registry.yarnpkg.com/fetch-retry-ts/-/fetch-retry-ts-1.1.25.tgz#25849a87a5a016cc772f90986d95dd5049eeb5ac"
   integrity sha512-kjJcfBYDbajnxMBfBa85hrS0Z+A0bDKuZWuzh5uHpaLSm2qZ3eAND5sDVfFUuIJg51sTd91cdB+Ayqo3magB/g==
+
+figlet@1.5.2:
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/figlet/-/figlet-1.5.2.tgz#dda34ff233c9a48e36fcff6741aeb5bafe49b634"
+  integrity sha512-WOn21V8AhyE1QqVfPIVxe3tupJacq1xGkPTB4iagT6o+P2cAgEOOwIxMftr4+ZCTI6d551ij9j61DFr0nsP2uQ==
 
 figures@^1.7.0:
   version "1.7.0"
@@ -14816,6 +14826,13 @@ prompt-sync@^4.1.6:
   dependencies:
     strip-ansi "^5.0.0"
 
+promptly@3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/promptly/-/promptly-3.2.0.tgz#a5517fbbf59bd31c1751d4e1d9bef1714f42b9d8"
+  integrity sha512-WnR9obtgW+rG4oUV3hSnNGl1pHm3V1H/qD9iJBumGSmVsSC5HpZOLuu8qdMb6yCItGfT7dcRszejr/5P3i9Pug==
+  dependencies:
+    read "^1.0.4"
+
 prompts@^2.0.1, prompts@^2.4.1:
   version "2.4.2"
   resolved "https://registry.yarnpkg.com/prompts/-/prompts-2.4.2.tgz#7b57e73b3a48029ad10ebd44f74b01722a4cb069"
@@ -15470,7 +15487,7 @@ read-package-json@^4.1.1:
     normalize-package-data "^3.0.0"
     npm-normalize-package-bin "^1.0.0"
 
-read@1, read@^1.0.7, read@~1.0.1, read@~1.0.7:
+read@1, read@^1.0.4, read@^1.0.7, read@~1.0.1, read@~1.0.7:
   version "1.0.7"
   resolved "https://registry.yarnpkg.com/read/-/read-1.0.7.tgz#b3da19bd052431a97671d44a42634adf710b40c4"
   integrity sha512-rSOKNYUmaxy0om1BNjMN4ezNT6VKK+2xF4GBhc81mkH7L60i6dp8qPYrkndNLT3QPphoII3maL9PVC9XmhHwVQ==

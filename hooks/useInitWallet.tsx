@@ -10,11 +10,14 @@ import {
 
 import useInterval from './useInterval'
 import useLocalStorageState from './useLocalStorageState'
+import useViewAsWallet from './useViewAsWallet'
 
 const SECONDS = 1000
 
 export default function useInitWallet() {
   const { wallets } = useWallet()
+  const mockWallet = useViewAsWallet()
+
   const {
     connection,
     current: wallet,
@@ -42,6 +45,12 @@ export default function useInitWallet() {
       }
     }
   }
+
+  useEffect(() => {
+    setWalletStore((s) => {
+      s.mockWallet = mockWallet
+    })
+  }, [mockWallet, setWalletStore])
 
   // initialize selection from local storage
   useEffect(() => {
@@ -94,9 +103,6 @@ export default function useInitWallet() {
   useEffect(() => {
     if (!wallet) return
     wallet.on('connect', async () => {
-      setWalletStore((state) => {
-        state.connected = true
-      })
       notify({
         message: 'Wallet connected',
         description:
@@ -111,7 +117,6 @@ export default function useInitWallet() {
     })
     wallet.on('disconnect', () => {
       setWalletStore((state) => {
-        state.connected = false
         state.tokenAccounts = []
       })
       notify({
@@ -121,9 +126,6 @@ export default function useInitWallet() {
     })
     return () => {
       wallet?.disconnect?.()
-      setWalletStore((state) => {
-        state.connected = false
-      })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [wallet])
