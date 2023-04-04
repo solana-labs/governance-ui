@@ -163,6 +163,11 @@ const ConnectWalletButton = (props) => {
         {...props}
       >
         <div className="relative flex items-center text-sm font-bold text-left text-fgd-1">
+          {(current as any)?.FAKE_DEBUG_WALLET ? (
+            <div className="absolute -left-4 h-full text-red-400 opacity-90 pointer-events-none text-2xl drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)] -rotate-45">
+              DEBUG
+            </div>
+          ) : null}
           {displayAddressImage}
           <div>
             {connected && current?.publicKey ? (

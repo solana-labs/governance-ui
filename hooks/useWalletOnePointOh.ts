@@ -1,4 +1,5 @@
 import useWalletStore from '../stores/useWalletStore'
+import useViewAsWallet from './useViewAsWallet'
 
 /** Why does this have such a weird name?
  * I wanted to differentiate it from the solana-wallet-adapter hook, useWallet, which is used by Hubs
@@ -7,5 +8,7 @@ import useWalletStore from '../stores/useWalletStore'
  */
 export default function useWalletOnePointOh() {
   const wallet = useWalletStore((s) => s.current)
-  return wallet
+  const debugWallet = useViewAsWallet()
+
+  return debugWallet ?? wallet
 }

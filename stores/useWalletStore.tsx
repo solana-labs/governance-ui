@@ -49,6 +49,7 @@ import { getProposals } from '@utils/GovernanceTools'
 interface WalletStore extends State {
   connection: ConnectionContext
   current: SignerWalletAdapter | undefined
+  mockWallet: SignerWalletAdapter | undefined
 
   ownVoteRecordsByProposal: { [proposal: string]: ProgramAccount<VoteRecord> }
   realms: { [realm: string]: ProgramAccount<Realm> }
@@ -130,6 +131,7 @@ const INITIAL_PROPOSAL_STATE = {
 const useWalletStore = create<WalletStore>((set, get) => ({
   connection: getConnectionContext('mainnet'),
   current: undefined,
+  mockWallet: undefined,
   realms: {},
   ownVoteRecordsByProposal: {},
   selectedRealm: INITIAL_REALM_STATE,
@@ -183,7 +185,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
     },
     async fetchWalletTokenAccounts() {
       const connection = get().connection.current
-      const wallet = get().current
+      const wallet = get().mockWallet ?? get().current
       const connected = !!wallet?.connected
 
       const walletOwner = wallet?.publicKey
@@ -206,7 +208,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
     },
     async fetchDelegateVoteRecords() {
       const connection = get().connection.current
-      const wallet = get().current
+      const wallet = get().mockWallet ?? get().current
       const connected = !!wallet?.connected
       const programId = get().selectedRealm.programId
       const realmId = get().selectedRealm.realm?.pubkey
@@ -256,7 +258,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const programId = get().selectedRealm.programId
       const realmId = get().selectedRealm.realm?.pubkey
       const realmMintPk = get().selectedRealm.realm?.account.communityMint
-      const wallet = get().current
+      const wallet = get().mockWallet ?? get().current
       const connected = !!wallet?.connected
       const walletOwner = wallet?.publicKey
       const set = get().set
