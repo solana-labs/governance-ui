@@ -35,6 +35,8 @@ const GovernanceSharedWalletApiProvider: FC<{ children?: React.ReactNode }> = ({
   const value = !wallet
     ? HUBS_WALLET_CONTEXT_DEFAULT
     : {
+        ...HUBS_WALLET_CONTEXT_DEFAULT,
+
         publicKey: wallet.publicKey ?? undefined,
         // It's stupid that TS requires this to be explicitly generically typed >:-(
         signAllTransactions: async <
@@ -45,13 +47,22 @@ const GovernanceSharedWalletApiProvider: FC<{ children?: React.ReactNode }> = ({
         signTransaction: async <T extends Transaction | VersionedTransaction>(
           x: T
         ) => wallet.signTransaction(x),
-        connect: HUBS_WALLET_CONTEXT_DEFAULT.connect, // governance side has no clear analogue for this?
-        signMessage: HUBS_WALLET_CONTEXT_DEFAULT.signMessage, // governance side has no analogue for this?
       }
 
   return <context.Provider value={value}>{children}</context.Provider>
 }
 
 export const useSharedWalletApi = () => useContext(context)
+
+export function withSharedWalletApi<P extends JSX.IntrinsicAttributes>(
+  Component: React.ComponentType<P>
+) {
+  const X = (props: P & Pick<Props, 'appKind'>) => (
+    <SharedWalletApiProvider appKind={props.appKind}>
+      <Component {...props} />
+    </SharedWalletApiProvider>
+  )
+  return X
+}
 
 export default SharedWalletApiProvider
