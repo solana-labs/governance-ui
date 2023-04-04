@@ -73,7 +73,7 @@ const LockTokensAccount: React.FC<{
   const [isLoading, setIsLoading] = useState(false)
   const connection = useWalletStore((s) => s.connection.current)
   const wallet = useWalletOnePointOh()
-  const connected = useWalletStore((s) => s.connected)
+  const connected = !!wallet?.connected
   const mainBoxesClasses = 'bg-bkg-1 col-span-1 p-4 rounded-md'
   const isNextSameRecord = (x, next) => {
     const nextType = Object.keys(next.lockup.kind)[0]

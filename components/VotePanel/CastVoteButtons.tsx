@@ -13,14 +13,15 @@ import {
 import useRealm from '@hooks/useRealm'
 import { VotingClientType } from '@utils/uiTypes/VotePlugin'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import useWalletStore from 'stores/useWalletStore'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const useCanVote = () => {
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
   const { ownVoterWeight } = useRealm()
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
 
   const { data: ownVoteRecord } = useProposalVoteRecordQuery('electoral')
   const voterTokenRecord = useVoterTokenRecord()

@@ -3,13 +3,14 @@ import { PlusCircleIcon } from '@heroicons/react/outline'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import React from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import Tooltip from '@components/Tooltip'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const NewProposalBtn = () => {
   const { fmtUrlWithCluster } = useQueryContext()
 
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
 
   const {
     symbol,

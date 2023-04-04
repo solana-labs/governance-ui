@@ -17,7 +17,7 @@ export default function InspectorButton({
 }) {
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletOnePointOh()
-  const connected = useWalletStore((s) => s.connected)
+  const connected = !!wallet?.connected
   const wasExecuted =
     proposalInstruction.account.executionStatus ===
     InstructionExecutionStatus.Success

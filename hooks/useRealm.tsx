@@ -41,8 +41,8 @@ export default function useRealm() {
   const router = useRouter()
   const { symbol } = router.query
   const connection = useWalletStore((s) => s.connection)
-  const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const tokenAccounts = useWalletStore((s) => s.tokenAccounts)
   const {
     realm,

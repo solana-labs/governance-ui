@@ -26,6 +26,7 @@ import LockedCommunityVotingPower from './LockedCommunityVotingPower'
 import LockedCouncilVotingPower from './LockedCouncilVotingPower'
 import NftVotingPower from './NftVotingPower'
 import LockedCommunityNFTRecordVotingPower from './LockedCommunityNFTRecordVotingPower'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 enum Type {
   Council,
@@ -120,7 +121,8 @@ export default function VotingPower(props: Props) {
     ownTokenRecord,
     realm,
   } = useRealm()
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const tokenRole = useWalletStore((s) => s.selectedProposal.tokenRole)
 
   const types = getTypes(

@@ -68,9 +68,9 @@ export const LockTokensAccount: React.FC<{
   const { error, createPosition } = useCreatePosition()
   const [isOwnerOfPositions, setIsOwnerOfPositions] = useState(true)
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
-  const connected = useWalletStore((s) => s.connected)
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
     (s) => s.actions
   )

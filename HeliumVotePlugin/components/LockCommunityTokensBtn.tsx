@@ -3,14 +3,15 @@ import { BN } from '@coral-xyz/anchor'
 import { LockClosedIcon } from '@heroicons/react/solid'
 import useRealm from '@hooks/useRealm'
 import { SecondaryButton } from '@components/Button'
-import useWalletStore from 'stores/useWalletStore'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export const LockCommunityTokensBtn: React.FC<{
   className?: string
   onClick: () => void
 }> = ({ onClick, className = '' }) => {
   const { realmTokenAccount } = useRealm()
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
 
   const hasTokensInWallet =
     realmTokenAccount && realmTokenAccount.account.amount.gt(new BN(0))

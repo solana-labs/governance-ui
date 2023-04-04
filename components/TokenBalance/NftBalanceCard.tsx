@@ -28,8 +28,8 @@ interface Props {
 
 const NftBalanceCard = ({ inAccountDetails, showView }: Props) => {
   const { fmtUrlWithCluster } = useQueryContext()
-  const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )

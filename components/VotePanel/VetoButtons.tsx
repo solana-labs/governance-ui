@@ -2,6 +2,7 @@ import Button from '@components/Button'
 import VoteCommentModal from '@components/VoteCommentModal'
 import { BanIcon } from '@heroicons/react/solid'
 import useRealm from '@hooks/useRealm'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import {
   GoverningTokenRole,
   VoteThresholdType,
@@ -57,7 +58,8 @@ const useCanVeto = ():
   | { canVeto: true }
   | { canVeto: false; message: string } => {
   const { ownVoterWeight } = useRealm()
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const isVetoable = useIsVetoable()
   const { data: userVetoRecord } = useProposalVoteRecordQuery('veto')
   const voterTokenRecord = useUserVetoTokenRecord()
