@@ -36,7 +36,7 @@ const GOVERNANCE_PROGRAM = new PublicKey(
   'GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J'
 )
 
-export const PROPOSAL_MINT = new PublicKey(
+const PROPOSAL_MINT = new PublicKey(
   'MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac'
 )
 
