@@ -5,7 +5,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { fmtMintAmount } from '@tools/sdk/units'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { abbreviateAddress } from '@utils/formatting'
-import { useUnixNow } from '@hooks/useUnixNow'
+import { useSolanaUnixNow } from '@hooks/useSolanaUnixNow'
 import { BN } from '@coral-xyz/anchor'
 import Button from '@components/Button'
 import { HNT_MINT } from '@helium/spl-utils'
@@ -31,6 +31,7 @@ import { useClosePosition } from '../hooks/useClosePosition'
 import { DelegateTokensModal } from './DelegateTokensModal'
 import { useDelegatePosition } from '../hooks/useDelegatePosition'
 import { useUndelegatePosition } from '../hooks/useUndelegatePosition'
+import { useClaimDelegatedPositionRewards } from '../hooks/useClaimDelegatedPositionRewards'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export interface PositionCardProps {
@@ -42,7 +43,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
   position,
   isOwner,
 }) => {
-  const { unixNow = 0 } = useUnixNow()
+  const { unixNow = 0 } = useSolanaUnixNow()
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
   const [isExtendModalOpen, setIsExtendModalOpen] = useState(false)
   const [isDelegateModalOpen, setIsDelegateModalOpen] = useState(false)
@@ -127,6 +128,12 @@ export const PositionCard: React.FC<PositionCardProps> = ({
     error: undelegatingError,
     undelegatePosition,
   } = useUndelegatePosition()
+
+  const {
+    loading: isClaimingRewards,
+    error: claimingRewardsError,
+    claimDelegatedPositionRewards,
+  } = useClaimDelegatedPositionRewards()
 
   const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
     (s) => s.actions
@@ -242,6 +249,21 @@ export const PositionCard: React.FC<PositionCardProps> = ({
     }
   }
 
+  const handleClaimRewards = async () => {
+    try {
+      await claimDelegatedPositionRewards({ position })
+
+      // if (!claimingRewardsError) {
+      //   await refetchState()
+      // }
+    } catch (e) {
+      notify({
+        type: 'error',
+        message: e.message || 'Unable to claim rewards',
+      })
+    }
+  }
+
   const handleClose = async () => {
     try {
       await closePosition({
@@ -274,7 +296,8 @@ export const PositionCard: React.FC<PositionCardProps> = ({
     isTransfering ||
     isUnlocking ||
     isDelegating ||
-    isUndelegating
+    isUndelegating ||
+    isClaimingRewards
 
   return (
     <div className="relative border overflow-hidden border-fgd-4 rounded-lg flex flex-col">
@@ -309,7 +332,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
           </div>
           <div
             className="p-4 rounded-lg flex flex-col h-full w-full"
-            style={{ minHeight: '290px' }}
+            style={{ minHeight: '260px' }}
           >
             <div className="flex flex-wrap mb-4">
               <CardLabel
@@ -353,14 +376,24 @@ export const PositionCard: React.FC<PositionCardProps> = ({
             {isOwner && (
               <div style={{ marginTop: 'auto' }}>
                 {position.isDelegated ? (
-                  <Button
-                    className="w-full"
-                    onClick={handleUndelegateTokens}
-                    disabled={isSubmitting}
-                    isLoading={isUndelegating}
-                  >
-                    UnDelegate
-                  </Button>
+                  <div className="flex flex-col gap-2 items-center">
+                    <Button
+                      className="w-full"
+                      onClick={handleClaimRewards}
+                      disabled={isSubmitting || !position.hasRewards}
+                      isLoading={isClaimingRewards}
+                    >
+                      Claim Rewards
+                    </Button>
+                    <Button
+                      className="w-full"
+                      onClick={handleUndelegateTokens}
+                      disabled={isSubmitting}
+                      isLoading={isUndelegating}
+                    >
+                      UnDelegate
+                    </Button>
+                  </div>
                 ) : (
                   <>
                     {lockupExpired ? (
