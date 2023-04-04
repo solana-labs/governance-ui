@@ -103,7 +103,7 @@ const INSTRUCTIONS = {
 
       return (
         <div className="space-y-3">
-          <div>Strike: {decodedInstructionData.strike.toNumber()}</div>
+          <div>Strike atoms per lot: {decodedInstructionData.strike.toNumber()}</div>
         </div>
       )
     },
