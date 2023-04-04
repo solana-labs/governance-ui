@@ -8,9 +8,10 @@ const useViewAsWallet = () => {
   const { viewAs } = router.query
 
   const err = () => {
-    throw new Error(
-      'not implemented -- you are using a debug feature. remove "viewAs" from the url and try again '
-    )
+    const msg =
+      'not implemented -- you are using a debug feature. remove "viewAs" from the url and try again'
+    window.alert(msg)
+    throw new Error(msg)
   }
 
   const wallet = useMemo(
@@ -32,6 +33,8 @@ const useViewAsWallet = () => {
             disconnect: err,
             readyStateChange: err,
           }, */
+            connect: err,
+            disconnect: err,
             // wallet:
             name: 'Phantom',
             supportedTransactionVersions: new Set([0, 'Legacy']),
