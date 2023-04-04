@@ -5,6 +5,7 @@ import { Program, AnchorProvider } from '@coral-xyz/anchor';
 import { PublicKey } from '@solana/web3.js';
 import React, { useEffect, useState } from 'react';
 
+import { useSharedWalletApi } from '@components/SharedWalletApiProvider';
 import {
   vsrPluginsPks,
   nftPluginsPks,
@@ -14,7 +15,6 @@ import {
 } from '@hooks/useVotingPlugins';
 import { Input } from '@hub/components/controls/Input';
 import { useCluster } from '@hub/hooks/useCluster';
-import { useWallet } from '@hub/hooks/useWallet';
 
 const RECOGNIZED_PLUGINS = new Set([
   ...vsrPluginsPks,
@@ -37,7 +37,7 @@ export function AddressValidator(props: Props) {
   const [isVerified, setIsVerified] = useState(true);
   const [showMessages, setShowMessages] = useState(false);
   const [cluster] = useCluster();
-  const wallet = useWallet();
+  const wallet = useSharedWalletApi();
 
   useEffect(() => {
     const text = props.value?.toBase58() || '';

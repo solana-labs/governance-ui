@@ -10,14 +10,17 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 import { getAccountName } from '@components/instructions/tools';
+import {
+  useSharedWalletApi,
+  withSharedWalletApi,
+} from '@components/SharedWalletApiProvider';
 import { Primary, Secondary } from '@hub/components/controls/Button';
 import { Connect } from '@hub/components/GlobalHeader/User/Connect';
 import { ProposalCreationProgress } from '@hub/components/ProposalCreationProgress';
-import { useCluster, ClusterType } from '@hub/hooks/useCluster';
+import { ClusterType, useCluster } from '@hub/hooks/useCluster';
 import { useProposal } from '@hub/hooks/useProposal';
 import { useQuery } from '@hub/hooks/useQuery';
-import { useToast, ToastType } from '@hub/hooks/useToast';
-import { useWallet } from '@hub/hooks/useWallet';
+import { ToastType, useToast } from '@hub/hooks/useToast';
 import cx from '@hub/lib/cx';
 import { GovernanceTokenType } from '@hub/types/GovernanceTokenType';
 import { GovernanceVoteTipping } from '@hub/types/GovernanceVoteTipping';
@@ -58,9 +61,9 @@ interface Props {
   governanceAddress: PublicKey;
 }
 
-export function EditWalletRules(props: Props) {
+function EditWalletRules(props: Props) {
   const [cluster] = useCluster();
-  const wallet = useWallet();
+  const wallet = useSharedWalletApi();
   const { createProposal, progress } = useProposal();
   const { publish } = useToast();
   const [result] = useQuery(gql.getGovernanceRulesResp, {
@@ -383,3 +386,5 @@ export function EditWalletRules(props: Props) {
     ),
   );
 }
+
+export default withSharedWalletApi(EditWalletRules);

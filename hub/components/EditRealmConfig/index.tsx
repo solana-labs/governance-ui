@@ -9,6 +9,10 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState, useRef } from 'react';
 
+import {
+  useSharedWalletApi,
+  withSharedWalletApi,
+} from '@components/SharedWalletApiProvider';
 import { Primary, Secondary } from '@hub/components/controls/Button';
 import { Connect } from '@hub/components/GlobalHeader/User/Connect';
 import { ProposalCreationProgress } from '@hub/components/ProposalCreationProgress';
@@ -16,7 +20,6 @@ import { useCluster, ClusterType } from '@hub/hooks/useCluster';
 import { useProposal } from '@hub/hooks/useProposal';
 import { useQuery } from '@hub/hooks/useQuery';
 import { useToast, ToastType } from '@hub/hooks/useToast';
-import { useWallet } from '@hub/hooks/useWallet';
 import cx from '@hub/lib/cx';
 import * as RE from '@hub/types/Result';
 
@@ -59,9 +62,9 @@ interface Props {
   realmUrlId: string;
 }
 
-export function EditRealmConfig(props: Props) {
+function EditRealmConfig(props: Props) {
   const [cluster] = useCluster();
-  const wallet = useWallet();
+  const wallet = useSharedWalletApi();
   const [step, setStep] = useState(Step.Form);
   const [realmAuthority, setRealmAuthority] = useState<PublicKey | undefined>(
     undefined,
@@ -366,3 +369,5 @@ export function EditRealmConfig(props: Props) {
     ),
   );
 }
+
+export default withSharedWalletApi(EditRealmConfig);

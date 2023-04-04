@@ -54,9 +54,7 @@ const GovernanceSharedWalletApiProvider: FC<{ children?: React.ReactNode }> = ({
 
 export const useSharedWalletApi = () => useContext(context)
 
-export function withSharedWalletApi<P extends JSX.IntrinsicAttributes>(
-  Component: React.ComponentType<P>
-) {
+export function withSharedWalletApi<P>(Component: React.ComponentType<P>) {
   const X = (props: P & Pick<Props, 'appKind'>) => (
     <SharedWalletApiProvider appKind={props.appKind}>
       <Component {...props} />

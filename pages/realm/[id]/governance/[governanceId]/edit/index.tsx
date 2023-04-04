@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { PublicKey } from '@solana/web3.js'
 
-import { EditWalletRules } from '@hub/components/EditWalletRules'
+import EditWalletRules from '@hub/components/EditWalletRules'
 import { ECOSYSTEM_PAGE } from '@hub/lib/constants'
 
 export default function EditWallet() {
@@ -34,6 +34,7 @@ export default function EditWallet() {
         <meta property="og:title" content="Edit Wallet" key="title" />
       </Head>
       <EditWalletRules
+        appKind="hub"
         className="min-h-screen"
         realmUrlId={id as string}
         governanceAddress={governanceAddress}

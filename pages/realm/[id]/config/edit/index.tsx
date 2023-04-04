@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
 import { ECOSYSTEM_PAGE } from '@hub/lib/constants'
-import { EditRealmConfig } from '@hub/components/EditRealmConfig'
+import EditRealmConfig from '@hub/components/EditRealmConfig'
 
 export default function EditRealmConfigPage() {
   const router = useRouter()
@@ -26,7 +26,11 @@ export default function EditRealmConfigPage() {
         <title>Edit Org Config</title>
         <meta property="og:title" content="Edit Org Config" key="title" />
       </Head>
-      <EditRealmConfig className="min-h-screen" realmUrlId={id as string} />
+      <EditRealmConfig
+        appKind="hub"
+        className="min-h-screen"
+        realmUrlId={id as string}
+      />
     </div>
   )
 }
