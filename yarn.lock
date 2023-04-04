@@ -882,10 +882,10 @@
     "@solana/web3.js" "^1.73.2"
     js-sha3 "^0.8.0"
 
-"@dual-finance/staking-options@0.0.20":
-  version "0.0.20"
-  resolved "https://registry.yarnpkg.com/@dual-finance/staking-options/-/staking-options-0.0.20.tgz#797539c518c75dc88e63c348c89c4edf2115c426"
-  integrity sha512-BBIJpDAjAF38BDqTxqFV9x6zhYPGt7yOPz9kR3DZhBWD/01UB7U9ZVqC8thXcQwzPks7Yt+uJS2ppTlKlhCaRQ==
+"@dual-finance/staking-options@0.0.21":
+  version "0.0.21"
+  resolved "https://registry.yarnpkg.com/@dual-finance/staking-options/-/staking-options-0.0.21.tgz#618a5633e22ab6078808abbe669eaf65e899d463"
+  integrity sha512-6XmpavPwalguOx1mDXB5XeJY1o+QyDFrdqJOlkXktpAeIzml/esm1sDrLQU8tb8RiwV6jUDV0pFUrZyrI5cQtw==
   dependencies:
     "@project-serum/anchor" "^0.25.0"
     "@solana/spl-token" "^0.3.6"
