@@ -1,7 +1,7 @@
 import { useWallet as useHubsWallet } from '@hub/hooks/useWallet'
 import { DEFAULT as HUBS_WALLET_CONTEXT_DEFAULT } from '@hub/providers/Wallet'
 import { Transaction, VersionedTransaction } from '@solana/web3.js'
-import { createContext, FC } from 'react'
+import { createContext, FC, useContext } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 
 export const context = createContext(HUBS_WALLET_CONTEXT_DEFAULT)
@@ -42,12 +42,16 @@ const GovernanceSharedWalletApiProvider: FC<{ children?: React.ReactNode }> = ({
         >(
           x: T[]
         ) => wallet.signAllTransactions(x),
-        signTransaction: async (x) => wallet.signTransaction(x),
-        connect: HUBS_WALLET_CONTEXT_DEFAULT.connect, // governance side has no analogue for this?
+        signTransaction: async <T extends Transaction | VersionedTransaction>(
+          x: T
+        ) => wallet.signTransaction(x),
+        connect: HUBS_WALLET_CONTEXT_DEFAULT.connect, // governance side has no clear analogue for this?
         signMessage: HUBS_WALLET_CONTEXT_DEFAULT.signMessage, // governance side has no analogue for this?
       }
 
   return <context.Provider value={value}>{children}</context.Provider>
 }
+
+export const useSharedWalletApi = () => useContext(context)
 
 export default SharedWalletApiProvider
