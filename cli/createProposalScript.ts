@@ -26,9 +26,9 @@ const loadWalletFromFile = (walletPath: string): Keypair => {
 
 const VSR_PROGRAM_ID = '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo'
 
-const ENDPOINT_URL = 'https://realms-realms-c335.mainnet.rpcpool.com/'
+const ENDPOINT_URL = 'https://api.mainnet-beta.solana.com/'
 
-const CLUSTER = 'devnet'
+const CLUSTER = 'mainnet'
 
 const REALM = new PublicKey('DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE')
 
@@ -91,7 +91,7 @@ class GovernanceCli {
       return
     }
     const delegatedWallet = await promptly.prompt(
-      'Enter the address that delegated the token to you, if you dont want to use delegate leave it empty: '
+      'Enter the address that delegated the token to you: '
     )
     if (!tryParseKey(delegatedWallet)) {
       console.log('Error invalid publickey')
