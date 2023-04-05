@@ -1,5 +1,5 @@
 import { PaymentStreamingAccount } from '@mean-dao/payment-streaming'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { Governance, ProgramAccount } from '@solana/spl-governance'
 import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'

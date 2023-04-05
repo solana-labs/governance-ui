@@ -6,7 +6,13 @@ import { useAddressQuery_SelectedProposalVoteRecord } from '@hooks/queries/addre
 import { useVoteRecordByPubkeyQuery } from '@hooks/queries/voteRecord'
 import { useHasVoteTimeExpired } from '@hooks/useHasVoteTimeExpired'
 import useRealm from '@hooks/useRealm'
-import { ProposalState, GoverningTokenRole } from '@solana/spl-governance'
+import {
+  ProposalState,
+  GoverningTokenRole,
+  Proposal,
+  Governance,
+} from '@solana/spl-governance'
+import dayjs from 'dayjs'
 import useWalletStore from 'stores/useWalletStore'
 
 export const useIsVoting = () => {
@@ -16,6 +22,38 @@ export const useIsVoting = () => {
   const isVoting =
     proposal?.account.state === ProposalState.Voting && !hasVoteTimeExpired
   return isVoting
+}
+
+export const useIsInCoolOffTime = () => {
+  const { governance, proposal } = useWalletStore((s) => s.selectedProposal)
+
+  return isInCoolOffTime(proposal?.account, governance?.account)
+}
+
+export const isInCoolOffTime = (
+  proposal: Proposal | undefined,
+  governance: Governance | undefined
+) => {
+  const mainVotingEndedAt = proposal?.signingOffAt
+    ?.addn(governance?.config.baseVotingTime || 0)
+    .toNumber()
+
+  const votingCoolOffTime = governance?.config.votingCoolOffTime || 0
+  const canFinalizeAt = mainVotingEndedAt
+    ? mainVotingEndedAt + votingCoolOffTime
+    : mainVotingEndedAt
+
+  const endOfProposalAndCoolOffTime = canFinalizeAt
+    ? dayjs(1000 * canFinalizeAt!)
+    : undefined
+
+  const isInCoolOffTime = endOfProposalAndCoolOffTime
+    ? dayjs().isBefore(endOfProposalAndCoolOffTime) &&
+      mainVotingEndedAt &&
+      dayjs().isAfter(mainVotingEndedAt * 1000)
+    : undefined
+
+  return !!isInCoolOffTime && proposal!.state !== ProposalState.Defeated
 }
 
 export const useVotingPop = () => {

@@ -1,6 +1,6 @@
 import Input from '@components/inputs/Input'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useWallet from '@hooks/useWallet'
+import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import {
   Governance,
   ProgramAccount,
@@ -11,7 +11,8 @@ import { useContext, useEffect, useState } from 'react'
 import useSerumGovStore, { ConfigAccountType } from 'stores/useSerumGovStore'
 import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
-import * as anchor from '@project-serum/anchor'
+import * as anchor from '@coral-xyz/anchor'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const UpdateConfigParams = ({
   index,
@@ -22,8 +23,8 @@ const UpdateConfigParams = ({
   const programId = useSerumGovStore((s) => s.programId)
   const actions = useSerumGovStore((s) => s.actions)
   const connection = useWalletStore((s) => s.connection.current)
-  const wallet = useWalletStore((s) => s.current)
-  const { anchorProvider } = useWallet()
+  const wallet = useWalletOnePointOh()
+  const { anchorProvider } = useWalletDeprecated()
 
   const [configAccount, setConfigAccount] = useState<ConfigAccountType | null>(
     null

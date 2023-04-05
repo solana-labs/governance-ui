@@ -49,6 +49,7 @@ export function LinksDropdown(props: Props) {
               'text-sm',
               'transition-colors',
               'group-hover:text-neutral-900',
+              'dark:group-hover:text-neutral-200',
             )}
           >
             <Select.Value asChild>
@@ -63,6 +64,7 @@ export function LinksDropdown(props: Props) {
                 'transition-colors',
                 'w-3',
                 'group-hover:fill-neutral-900',
+                'dark:group-hover:fill-neutral-200',
               )}
             />
           </Select.Icon>
@@ -71,6 +73,7 @@ export function LinksDropdown(props: Props) {
       <Select.Portal>
         <Select.Content
           className={cx(
+            'dark:bg-neutral-900',
             'bg-white',
             'rounded',
             'overflow-hidden',
@@ -96,6 +99,9 @@ export function LinksDropdown(props: Props) {
                   'text-neutral-900',
                   'hover:bg-neutral-200',
                   'focus:bg-neutral-200',
+                  'dark:text-neutral-400',
+                  'dark:hover:bg-neutral-700',
+                  'dark:focus:bg-neutral-700',
                 )}
                 key={i}
               >

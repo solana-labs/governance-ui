@@ -42,7 +42,7 @@ interface Props {
 }
 
 export function Connect(props: Props) {
-  const { connect, signMessage } = useWallet();
+  const { connect, signMessage, setSoftConnect } = useWallet();
   const [, createClaim] = useMutation(getClaimResp, getClaim);
   const [, createToken] = useMutation(getTokenResp, getToken);
   const [, setJwt] = useJWT();
@@ -52,7 +52,6 @@ export function Connect(props: Props) {
     <NavigationMenu.Item>
       <button
         className={cx(
-          props.className,
           'cursor-pointer',
           'flex',
           'items-center',
@@ -66,9 +65,15 @@ export function Connect(props: Props) {
           'transition-colors',
           'active:bg-black/20',
           'hover:bg-black/10',
+          'dark:text-neutral-400',
+          'dark:hover:text-neutral-200',
+          'dark:active:bg-neutral-800',
+          'dark:hover:bg-neutral-700',
+          props.className,
         )}
         onClick={async () => {
           try {
+            localStorage.removeItem('walletName');
             const publicKey = await connect();
 
             const claimResult = await createClaim({
@@ -84,7 +89,15 @@ export function Connect(props: Props) {
             } = claimResult.data;
 
             const claimBlob = sig.toUint8Array(claim);
-            const signatureResp = await signMessage(claimBlob);
+            const signatureResp = await signMessage(claimBlob).catch(
+              () => null,
+            );
+
+            if (!signatureResp) {
+              setSoftConnect(true);
+              return;
+            }
+
             const signature = sig.toHex(signatureResp);
             const tokenResult = await createToken({ claim, signature });
 

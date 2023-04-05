@@ -34,6 +34,7 @@ export function GlobalHeader(props: Props) {
     <NavigationMenu.Root
       className={cx(
         props.className,
+        'dark:bg-neutral-800',
         'bg-white',
         'flex',
         'items-center',
@@ -57,7 +58,10 @@ export function GlobalHeader(props: Props) {
           )}
         >
           <div className={cx('flex', 'items-center')}>
-            <Logo compressed={!showExpandedUserDropdown} />
+            <Logo
+              className="text-[#201F27] dark:text-neutral-50"
+              compressed={!showExpandedUserDropdown}
+            />
             {showDesktopRealmSelector && (
               <NavigationMenu.Item asChild>
                 <RealmSearchNavigation className="ml-4" />

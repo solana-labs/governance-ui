@@ -10,10 +10,10 @@ import Loading from '../Loading'
 import Tooltip from '@components/Tooltip'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const DiscussionForm = () => {
   const [comment, setComment] = useState('')
-  const connected = useWalletStore((s) => s.connected)
   const {
     ownVoterWeight,
     realmInfo,
@@ -26,7 +26,8 @@ const DiscussionForm = () => {
   )
   const [submitting, setSubmitting] = useState(false)
 
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const connection = useWalletStore((s) => s.connection)
   const { proposal } = useWalletStore((s) => s.selectedProposal)
   const { fetchChatMessages } = useWalletStore((s) => s.actions)

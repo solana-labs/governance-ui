@@ -6,7 +6,7 @@ import Modal from '@components/Modal'
 import { QuestionMarkCircleIcon } from '@heroicons/react/outline'
 import useRealm from '@hooks/useRealm'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { RpcContext } from '@solana/spl-governance'
 import {
   fmtMintAmount,
@@ -25,7 +25,9 @@ import {
   getMinDurationInDays,
   SECS_PER_DAY,
   getFormattedStringFromDays,
-} from 'VoteStakeRegistry/tools/dateTools'
+  secsToDays,
+  yearsToSecs,
+} from '@utils/dateTools'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { voteRegistryStartUnlock } from 'VoteStakeRegistry/actions/voteRegistryStartUnlock'
 import {
@@ -36,6 +38,7 @@ import {
   Period,
   VestingPeriod,
   vestingPeriods,
+  DAILY,
 } from 'VoteStakeRegistry/tools/types'
 import BigNumber from 'bignumber.js'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
@@ -43,8 +46,8 @@ import { calcMintMultiplier } from 'VoteStakeRegistry/tools/deposits'
 import ButtonGroup from '@components/ButtonGroup'
 import InlineNotification from '@components/InlineNotification'
 import Tooltip from '@components/Tooltip'
-//import Switch from '@components/Switch'
 import { notify } from '@utils/notifications'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const YES = 'Yes'
 const NO = 'No'
@@ -66,11 +69,18 @@ const LockTokensModal = ({
   )
   const connection = useWalletStore((s) => s.connection.current)
   const endpoint = useWalletStore((s) => s.connection.endpoint)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const deposits = useDepositStore((s) => s.state.deposits)
   const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
     (s) => s.actions
   )
+  const fiveYearsSecs = yearsToSecs(5)
+  const maxLockupSecs =
+    (realm &&
+      voteStakeRegistryRegistrar?.votingMints
+        .find((x) => x.mint.equals(realm.account.communityMint))
+        ?.lockupSaturationSecs.toNumber()) ||
+    fiveYearsSecs
 
   const lockupPeriods: Period[] = [
     {
@@ -97,12 +107,16 @@ const LockTokensModal = ({
       defaultValue: 1,
       display: 'Custom',
     },
-  ].filter((x) =>
-    depositToUnlock
-      ? getMinDurationInDays(depositToUnlock) <= x.defaultValue ||
-        x.display === 'Custom'
-      : true
-  )
+  ]
+    .filter((x) =>
+      depositToUnlock
+        ? getMinDurationInDays(
+            depositToUnlock.lockup.startTs,
+            depositToUnlock.lockup.endTs
+          ) <= x.defaultValue || x.display === 'Custom'
+        : true
+    )
+    .filter((x) => x.defaultValue <= secsToDays(maxLockupSecs))
 
   const maxNonCustomDaysLockup = lockupPeriods
     .map((x) => x.defaultValue)
@@ -352,12 +366,14 @@ const LockTokensModal = ({
                       setLockupType(
                         //@ts-ignore
                         lockupTypes
-                          .filter((x) => x.value !== MONTHLY)
+                          .filter(
+                            (x) => x.value !== MONTHLY && x.value !== DAILY
+                          )
                           .find((t) => t.displayName === type)
                       )
                     }
                     values={lockupTypes
-                      .filter((x) => x.value !== MONTHLY)
+                      .filter((x) => x.value !== MONTHLY && x.value !== DAILY)
                       .map((type) => type.displayName)}
                   />
                 </div>
@@ -386,6 +402,7 @@ const LockTokensModal = ({
                   </LinkButton>
                 </div>
                 <Input
+                  // @ts-expect-error this probably doesn't work right, maxAmount is a BigNumber
                   max={maxAmount}
                   min={mintMinAmount}
                   value={amount}

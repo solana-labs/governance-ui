@@ -16,10 +16,10 @@ import useRealm from '@hooks/useRealm'
 import { buildTopVoters, VoteType } from '@models/proposal'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { getLockTokensVotingPowerPerWallet } from 'VoteStakeRegistry/tools/deposits'
-import { BN } from '@project-serum/anchor'
-import { PublicKey } from '@blockworks-foundation/mango-client'
+import { BN } from '@coral-xyz/anchor'
 import useWalletStore from 'stores/useWalletStore'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
+import { PublicKey } from '@solana/web3.js'
 
 export { VoteType }
 
@@ -31,7 +31,7 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
   const [tokenOwnerRecords, setTokenOwnerRecords] = useState<
     ProgramAccount<TokenOwnerRecord>[]
   >([])
-  const { mint, realm, isLockTokensMode } = useRealm()
+  const { mint, realm, vsrMode } = useRealm()
 
   //for vsr
   const [
@@ -124,7 +124,10 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
     setUndecidedDepositByVoteRecord(votingPerWallet)
   }
   useEffect(() => {
-    if (isLockTokensMode && !Object.keys(undecidedDepositByVoteRecord).length) {
+    if (
+      vsrMode === 'default' &&
+      !Object.keys(undecidedDepositByVoteRecord).length
+    ) {
       const undecidedData = tokenOwnerRecords.filter(
         (tokenOwnerRecord) =>
           !voteRecords
@@ -145,7 +148,7 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
   }, [
     tokenOwnerRecords.length,
     voteRecords.length,
-    isLockTokensMode,
+    vsrMode,
     mintsUsedInRealm.length,
   ])
   ///////

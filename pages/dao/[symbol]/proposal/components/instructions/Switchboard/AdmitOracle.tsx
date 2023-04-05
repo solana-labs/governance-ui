@@ -10,7 +10,7 @@ import { PublicKey } from '@solana/web3.js'
 import Input from '@components/inputs/Input'
 import * as sbv2 from '@switchboard-xyz/switchboard-v2'
 import useWalletStore from 'stores/useWalletStore'
-import * as anchor from '@project-serum/anchor'
+import * as anchor from '@coral-xyz/anchor'
 import sbIdl from 'SwitchboardVotePlugin/switchboard_v2.json'
 import gonIdl from 'SwitchboardVotePlugin/gameofnodes.json'
 import {
@@ -21,6 +21,7 @@ import {
 } from 'SwitchboardVotePlugin/SwitchboardQueueVoterClient'
 import { NewProposalContext } from '../../../new'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const SwitchboardAdmitOracle = ({
   index,
@@ -33,7 +34,7 @@ const SwitchboardAdmitOracle = ({
     queuePubkey: undefined,
   })
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const { handleSetInstructions } = useContext(NewProposalContext)
 
   useEffect(() => {
@@ -90,8 +91,7 @@ const SwitchboardAdmitOracle = ({
       new PublicKey(qPk),
       new PublicKey(oPk)
     )[0]
-    console.log('P:')
-    console.log(p)
+    console.log('P:', p)
 
     const grantTx = await grantPermissionTx(
       addinProgram,

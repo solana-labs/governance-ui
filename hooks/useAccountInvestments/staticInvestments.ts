@@ -29,6 +29,19 @@ export const getSolInvestments = () => [
     strategyDescription: '',
     createProposalFcn: () => null,
   },
+  {
+    liquidity: 0,
+    protocolSymbol: '',
+    apy: '',
+    protocolName: 'Mango',
+    handledMint: '',
+    handledTokenSymbol: '',
+    handledTokenImgSrc: '',
+    protocolLogoSrc: 'https://alpha.mango.markets/logos/logo-mark.svg',
+    strategyName: 'Trade',
+    strategyDescription: '',
+    createProposalFcn: () => null,
+  },
 ]
 
 export const getTokenInvestments = (tokenImg: string) => [
@@ -36,14 +49,14 @@ export const getTokenInvestments = (tokenImg: string) => [
     liquidity: 0,
     protocolSymbol: '',
     apy: '',
-    protocolName: 'Serum',
+    protocolName: 'Poseidon',
     handledMint: '',
     handledTokenSymbol: '',
     handledTokenImgSrc: tokenImg,
-    protocolLogoSrc:
-      'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt/logo.png',
+    protocolLogoSrc: '',
     strategyName: 'Trade',
     strategyDescription: '',
     createProposalFcn: () => null,
+    noProtocol: true,
   },
 ]

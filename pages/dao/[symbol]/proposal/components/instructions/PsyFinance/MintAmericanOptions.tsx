@@ -31,10 +31,10 @@ import {
   PsyAmericanIdl,
   PSY_AMERICAN_PROGRAM_ID,
 } from '@utils/instructions/PsyFinance'
-import useWallet from '@hooks/useWallet'
+import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import { getATA } from '@utils/ataTools'
 import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
-import { Program } from '@project-serum/anchor'
+import { Program } from '@coral-xyz/anchor'
 
 const formReducer = (
   state: PsyFinanceMintAmericanOptionsForm,
@@ -51,7 +51,7 @@ const MintAmericanOptions = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { anchorProvider, connection, wallet } = useWallet()
+  const { anchorProvider, connection, wallet } = useWalletDeprecated()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const { handleSetInstructions } = useContext(NewProposalContext)
   const [underlyingMintInfo, setUnderlyingMintInfo] = useState<MintInfo | null>(

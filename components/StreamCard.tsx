@@ -12,7 +12,6 @@ import Button from '@components/Button'
 
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 
-import useWalletStore from 'stores/useWalletStore'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import useCreateProposal from '@hooks/useCreateProposal'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
@@ -22,6 +21,7 @@ import { notify } from '@utils/notifications'
 import useRealm from '@hooks/useRealm'
 import { useEffect, useState } from 'react'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export interface TokenMintMetadata {
   readonly decimals: number
@@ -48,7 +48,7 @@ export default function StreamCard({
   const { assetAccounts } = useGovernanceAssets()
 
   const { fmtUrlWithCluster } = useQueryContext()
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const { handleCreateProposal } = useCreateProposal()
   const [voteByCouncil] = useState(false)
   const defaultCancelTitle = 'Cancel streamflow contract'

@@ -1,4 +1,3 @@
-import { PublicKey } from '@blockworks-foundation/mango-client'
 import Button, { LinkButton } from '@components/Button'
 import Input from '@components/inputs/Input'
 import Loading from '@components/Loading'
@@ -7,7 +6,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { RpcContext } from '@solana/spl-governance'
 import {
   getMintMinAmountAsDecimal,
@@ -32,6 +31,8 @@ import {
   getReserveData,
   SolendSubStrategy,
 } from 'Strategies/protocols/solend'
+import { PublicKey } from '@solana/web3.js'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const SolendWithdraw = ({
   proposedInvestment,
@@ -70,7 +71,7 @@ const SolendWithdraw = ({
     (s) => s.state.currentRealmVotingClient
   )
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const tokenInfo = tokenPriceService.getTokenInfo(handledMint)
   const mintInfo = governedTokenAccount.extensions?.mint?.account
   const tokenSymbol = tokenPriceService.getTokenInfo(

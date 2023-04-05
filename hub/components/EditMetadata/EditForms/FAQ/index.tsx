@@ -25,6 +25,7 @@ function trimFAQ(
       return (!!item.answer && !isEmpty(item.answer)) || !!item.question;
     })
     .map((item) => {
+      // eslint-disable-next-line
       const { __typename, clippedAnswer, ...rest } = item;
       return rest;
     });

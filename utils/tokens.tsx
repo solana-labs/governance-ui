@@ -21,18 +21,24 @@ import { chunks } from './helpers'
 import { getAccountName, WSOL_MINT } from '@components/instructions/tools'
 import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
 import tokenPriceService from './services/tokenPrice'
-import { notify } from './notifications'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { abbreviateAddress } from './formatting'
 import BigNumber from 'bignumber.js'
 import { AssetAccount } from '@utils/uiTypes/assets'
-import { I80F48 } from '@blockworks-foundation/mango-client'
 import { NFTWithMeta } from './uiTypes/VotePlugin'
 import { ConnectionContext } from './connection'
+import { I80F48 } from '@blockworks-foundation/mango-v4'
 import {
-  HOLAPLEX_GRAPQL_URL_DEVNET,
-  HOLAPLEX_GRAPQL_URL_MAINNET,
-} from '@tools/constants'
+  Metaplex,
+  Nft,
+  Sft,
+  SftWithToken,
+  NftWithToken,
+  Metadata,
+  JsonMetadata,
+} from '@metaplex-foundation/js'
+import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
+import { pause } from './pause'
 
 export type TokenAccount = AccountInfo
 export type MintAccount = MintInfo
@@ -42,14 +48,157 @@ export type TokenProgramAccount<T> = {
   account: T
 }
 
+type RawNft = Nft | Sft | SftWithToken | NftWithToken
+type NftWithATA = RawNft & {
+  owner: null | PublicKey
+  tokenAccountAddress: null | PublicKey
+}
+
+function exists<T>(item: T | null | undefined): item is T {
+  return !!item
+}
+
+const enhanceNFT = (nft: NftWithATA) => {
+  return {
+    image: nft.json?.image || '',
+    name: nft.json?.name || '',
+    description: nft.json?.description || '',
+    properties: {
+      category: '',
+      files: [],
+    },
+    collection: {
+      mintAddress: nft.collection?.address.toBase58() || '',
+      name: nft.json?.collection?.name || '',
+      creators: nft.creators.map((creator) => ({
+        verified: creator.verified,
+        address: creator.address.toBase58(),
+      })),
+      verified: nft.collection?.verified,
+      count: nft.collectionDetails?.size,
+      image: nft.json?.image || '',
+    },
+    address: nft.metadataAddress.toBase58(),
+    mintAddress: nft.mint.address.toBase58(),
+    owner: nft.owner,
+    tokenAccountAddress: nft.tokenAccountAddress?.toBase58() || '',
+    updateAuthorityAddress: nft.updateAuthorityAddress.toBase58(),
+    getAssociatedTokenAccount: async () => {
+      return nft.tokenAccountAddress?.toBase58() || ''
+    },
+  }
+}
+
+function loadNft(
+  nft: Metadata<JsonMetadata<string>> | Nft | Sft,
+  isDevnet?: boolean
+) {
+  const endpoint = isDevnet
+    ? process.env.NEXT_PUBLIC_HELIUS_DEVNET_RPC || process.env.DEVNET_RPC
+    : process.env.NEXT_PUBLIC_HELIUS_MAINNET_RPC || process.env.MAINNET_RPC
+
+  const connection = new Connection(endpoint || '')
+  const metaplex = new Metaplex(connection)
+
+  return Promise.race([
+    metaplex
+      .nfts()
+      // @ts-ignore
+      .load({ metadata: nft })
+      .catch((e) => {
+        console.error(e)
+        return null
+      }),
+    // sometime loading the nft metadata will timeout due to invalid or unsafe uris
+    pause(5000).then(() => null),
+  ])
+}
+
+export async function getNFTsByCollection(
+  collectionAddress: PublicKey,
+  isDevnet?: boolean
+) {
+  const endpoint = isDevnet
+    ? process.env.NEXT_PUBLIC_HELIUS_DEVNET_RPC || process.env.DEVNET_RPC
+    : process.env.NEXT_PUBLIC_HELIUS_MAINNET_RPC || process.env.MAINNET_RPC
+
+  const connection = new Connection(endpoint || '')
+  const metaplex = new Metaplex(connection)
+  const rawNfts = (
+    await metaplex.nfts().findAllByMintList({ mints: [collectionAddress] })
+  ).filter(exists)
+
+  const nfts = await Promise.all(
+    rawNfts.map((nft) => loadNft(nft, isDevnet))
+  ).then((nfts) =>
+    Promise.all(
+      nfts.filter(exists).map(async (nft) => {
+        const owner =
+          (await getTokenAccountsByMint(connection, nft.address.toBase58()))[0]
+            ?.account.owner || null
+
+        return {
+          ...nft,
+          owner,
+          tokenAccountAddress: owner
+            ? await getAssociatedTokenAddress(nft.mint.address, owner).catch(
+                (e) => {
+                  console.error(e)
+                  return null
+                }
+              )
+            : null,
+        }
+      })
+    )
+  )
+
+  return nfts.map(enhanceNFT)
+}
+
+export async function getNFTsByOwner(owner: PublicKey, isDevnet?: boolean) {
+  const endpoint = isDevnet
+    ? process.env.NEXT_PUBLIC_HELIUS_DEVNET_RPC || process.env.DEVNET_RPC
+    : process.env.NEXT_PUBLIC_HELIUS_MAINNET_RPC || process.env.MAINNET_RPC
+
+  const connection = new Connection(endpoint || '')
+  const metaplex = new Metaplex(connection)
+
+  const rawNfts = await metaplex.nfts().findAllByOwner({
+    owner,
+  })
+
+  const nfts = await Promise.all(
+    rawNfts.map((nft) => loadNft(nft, isDevnet))
+  ).then((nfts) =>
+    Promise.all(
+      nfts.filter(exists).map(async (nft) => ({
+        ...nft,
+        owner,
+        tokenAccountAddress: await getAssociatedTokenAddress(
+          nft.mint.address,
+          owner,
+          true
+        ).catch((e) => {
+          console.error(e)
+          return null
+        }),
+      }))
+    )
+  )
+
+  return nfts.map(enhanceNFT)
+}
+
 export async function getOwnedTokenAccounts(
   connection: Connection,
   publicKey: PublicKey
 ): Promise<TokenProgramAccount<TokenAccount>[]> {
-  const results = await connection.getTokenAccountsByOwner(publicKey, {
+  const result = await connection.getTokenAccountsByOwner(publicKey, {
     programId: TOKEN_PROGRAM_ID,
   })
-  return results.value.map((r) => {
+
+  return result.value.map((r) => {
     const publicKey = r.pubkey
     const data = Buffer.from(r.account.data)
     const account = parseTokenAccountData(publicKey, data)
@@ -326,13 +475,11 @@ export function getMintAccountLabelInfo(acc: AssetAccount | undefined) {
   let amount = ''
   let imgUrl = ''
   if (acc?.extensions.mint && acc.governance) {
-    const info = tokenPriceService.getTokenInfo(
-      acc.governance.account.governedAccount.toBase58()
-    )
+    const info = tokenPriceService.getTokenInfo(acc.pubkey.toBase58())
     imgUrl = info?.logoURI ? info.logoURI : ''
-    account = acc.governance?.account.governedAccount.toBase58()
+    account = acc.pubkey.toBase58()
     tokenName = info?.name ? info.name : ''
-    mintAccountName = getAccountName(acc.governance.account.governedAccount)
+    mintAccountName = getAccountName(acc.pubkey)
     amount = formatMintNaturalAmountAsDecimal(
       acc.extensions.mint.account,
       acc?.extensions.mint.account.supply
@@ -380,83 +527,11 @@ export const deserializeMint = (data: Buffer) => {
   return mintInfo as MintInfo
 }
 
-const fetchNftsFromHolaplexIndexer = async (
-  owner: PublicKey,
-  cluster: string
-) => {
-  const result = await fetch(
-    cluster === 'devnet'
-      ? HOLAPLEX_GRAPQL_URL_DEVNET
-      : HOLAPLEX_GRAPQL_URL_MAINNET,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        query: `
-        query nfts($owners: [PublicKey!]) {
-            nfts(
-              owners: $owners,
-               limit: 10000, offset: 0) {
-              name
-              mintAddress
-              address
-              image
-              tokenAccountAddress
-              updateAuthorityAddress
-              collection {
-                creators {
-                  verified
-                  address
-                }
-                mintAddress
-              }
-
-            }
-
-        }
-      `,
-        variables: {
-          owners: [owner.toBase58()],
-        },
-      }),
-    }
-  )
-
-  const body = await result.json()
-  return body.data
-}
-
-export const getNfts = async (
+export const getNfts = (
   ownerPk: PublicKey,
   connection: ConnectionContext
 ): Promise<NFTWithMeta[]> => {
-  return await getNftsFromHolaplex(ownerPk, connection)
-}
-
-const getNftsFromHolaplex = async (
-  ownerPk: PublicKey,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  connection: ConnectionContext
-): Promise<NFTWithMeta[]> => {
-  try {
-    const data = await fetchNftsFromHolaplexIndexer(ownerPk, connection.cluster)
-    return data.nfts.map((nft) => {
-      return {
-        ...nft,
-        getAssociatedTokenAccount: async () => {
-          return nft.tokenAccountAddress
-        },
-      }
-    })
-  } catch (error) {
-    notify({
-      type: 'error',
-      message: 'Unable to fetch nfts',
-    })
-  }
-  return []
+  return getNFTsByOwner(ownerPk, connection.cluster === 'devnet')
 }
 
 export const parseMintSupplyFraction = (fraction: string) => {
@@ -480,4 +555,10 @@ export function getScaledFactor(amount: number) {
   return new BN(
     new BigNumber(amount.toString()).shiftedBy(SCALED_FACTOR_SHIFT).toString()
   )
+}
+
+export function getInverseScaledFactor(amount: BN) {
+  return new BigNumber(amount.toNumber())
+    .shiftedBy(-SCALED_FACTOR_SHIFT)
+    .toNumber()
 }

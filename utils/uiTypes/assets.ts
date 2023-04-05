@@ -1,4 +1,4 @@
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { Governance, ProgramAccount } from '@solana/spl-governance'
 import { AccountInfo, MintInfo, u64 } from '@solana/spl-token'
 import { ParsedAccountData, PublicKey } from '@solana/web3.js'
@@ -95,13 +95,16 @@ export class AccountTypeMint implements AssetAccount {
   type: AccountType
   extensions: AccountExtension
   pubkey: PublicKey
-  constructor(governance: ProgramAccount<Governance>, account: MintInfo) {
+  constructor(
+    governance: ProgramAccount<Governance>,
+    account: MintInfo & { publicKey: PublicKey }
+  ) {
     this.governance = governance
-    this.pubkey = governance.account.governedAccount
+    this.pubkey = account.publicKey
     this.type = AccountType.MINT
     this.extensions = {
       mint: {
-        publicKey: governance.account.governedAccount,
+        publicKey: account.publicKey,
         account: account,
       },
     }

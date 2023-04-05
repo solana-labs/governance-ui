@@ -1,6 +1,8 @@
 import Loading from '@components/Loading'
+import { fetchMintInfoByPubkey } from '@hooks/queries/mintInfo'
 import {
   AccountMetaData,
+  DepositGoverningTokensArgs,
   deserializeBorsh,
   getGovernance,
   getGovernanceInstructionSchema,
@@ -10,6 +12,7 @@ import {
   InstructionData,
   ProgramAccount,
   RealmConfigAccount,
+  RevokeGoverningTokensArgs,
   SetRealmAuthorityAction,
   SetRealmAuthorityArgs,
   tryGetRealmConfig,
@@ -24,6 +27,7 @@ import { DISABLED_VOTER_WEIGHT, SIMULATION_WALLET } from '@tools/constants'
 import { fmtVoterWeightThresholdMintAmount } from '@tools/governance/units'
 import {
   fmtBNAmount,
+  fmtBnMintDecimals,
   fmtMintAmount,
   getDaysFromTimestamp,
   getHoursFromTimestamp,
@@ -36,6 +40,70 @@ const governanceProgramId = 'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'
 
 export const GOVERNANCE_INSTRUCTIONS = {
   [governanceProgramId]: {
+    1: {
+      /// Deposits governing tokens (Community or Council) to Governance Realm and establishes your voter weight to be used for voting within the Realm
+      /// Note: If subsequent (top up) deposit is made and there are active votes for the Voter then the vote weights won't be updated automatically
+      /// It can be done by relinquishing votes on active Proposals and voting again with the new weight
+      ///
+      ///  0. `[]` Realm account
+      ///  1. `[writable]` Governing Token Holding account. PDA seeds: ['governance',realm, governing_token_mint]
+      ///  2. `[writable]` Governing Token Source account. It can be either spl-token TokenAccount or MintAccount
+      ///      Tokens will be transferred or minted to the Holding account
+      ///  3. `[signer]` Governing Token Owner account
+      ///  4. `[signer]` Governing Token Source account authority
+      ///      It should be owner for TokenAccount and mint_authority for MintAccount
+      ///  5. `[writable]` TokenOwnerRecord account. PDA seeds: ['governance',realm, governing_token_mint, governing_token_owner]
+      ///  6. `[signer]` Payer
+      ///  7. `[]` System
+      ///  8. `[]` SPL Token program
+      ///  9. `[]` RealmConfig account. PDA seeds: ['realm-config', realm]
+      name: 'Deposit Governing Tokens',
+      accounts: [
+        { name: 'Realm' },
+        { name: 'Governing Token Holding' },
+        { name: 'Mint' },
+        { name: 'Governing Token Owner' },
+        { name: 'Mint Authority' },
+        { name: 'Token Owner Record' },
+        { name: 'Payer' },
+        { name: 'System' },
+        { name: 'SPL Token Program' },
+        { name: 'Realm Config' },
+      ],
+      getDataUI: async (
+        connection: Connection,
+        data: Uint8Array,
+        accounts: AccountMetaData[]
+      ) => {
+        const realm = await getRealm(connection, accounts[0].pubkey)
+        const programVersion = await getGovernanceProgramVersion(
+          connection,
+          realm.owner
+        )
+        const mintInfoQuery = await fetchMintInfoByPubkey(
+          connection,
+          accounts[2].pubkey
+        )
+
+        const args = deserializeBorsh(
+          getGovernanceInstructionSchema(programVersion),
+          DepositGoverningTokensArgs,
+          Buffer.from(data)
+        ) as DepositGoverningTokensArgs
+
+        return (
+          <>
+            <p>
+              amount:{' '}
+              {mintInfoQuery.result !== undefined
+                ? fmtBnMintDecimals(args.amount, mintInfoQuery.result.decimals)
+                : 'loading mint info...'}{' '}
+              ({args.amount.toString()})
+            </p>
+          </>
+        )
+      },
+    },
     19: {
       name: 'Set Governance Config',
       accounts: [{ name: 'Governance' }],
@@ -51,12 +119,25 @@ export const GOVERNANCE_INSTRUCTIONS = {
           connection,
           realm.owner
         )
-
-        const args = deserializeBorsh(
-          getGovernanceInstructionSchema(programVersion),
-          SetGovernanceConfigArgs,
-          Buffer.from(data)
-        ) as SetGovernanceConfigArgs
+        let args: SetGovernanceConfigArgs = {} as SetGovernanceConfigArgs
+        let proposalProgramVersion = programVersion
+        for (
+          let propProgVersion = programVersion;
+          propProgVersion >= 0;
+          propProgVersion--
+        ) {
+          try {
+            args = deserializeBorsh(
+              getGovernanceInstructionSchema(programVersion),
+              SetGovernanceConfigArgs,
+              Buffer.from(data)
+            ) as SetGovernanceConfigArgs
+            proposalProgramVersion = propProgVersion
+            break
+          } catch (e) {
+            console.log(e)
+          }
+        }
 
         const communityMint = await tryGetMint(
           connection,
@@ -72,7 +153,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
           governance.account.config.minCommunityTokensToCreateProposal.toString() ===
           DISABLED_VOTER_WEIGHT.toString()
 
-        return programVersion >= 3 ? (
+        return proposalProgramVersion >= 3 ? (
           <>
             <h1>Current config</h1>
             <div className="space-y-3">
@@ -143,11 +224,11 @@ export const GOVERNANCE_INSTRUCTIONS = {
                 } secs`}
               </p>
               <p>
-                {`maxVotingTime:
+                {`baseVotingTime:
           ${getDaysFromTimestamp(
-            governance.account.config.maxVotingTime
+            governance.account.config.baseVotingTime
           )} days(s) | raw arg: ${
-                  governance.account.config.maxVotingTime
+                  governance.account.config.baseVotingTime
                 } secs`}
               </p>
               <p>
@@ -237,10 +318,10 @@ export const GOVERNANCE_INSTRUCTIONS = {
           )} day(s) | raw arg: ${args.config.minInstructionHoldUpTime} secs`}
               </p>
               <p>
-                {`maxVotingTime:
+                {`baseVotingTime:
           ${getDaysFromTimestamp(
-            args.config.maxVotingTime
-          )} days(s) | raw arg: ${args.config.maxVotingTime} secs`}
+            args.config.baseVotingTime
+          )} days(s) | raw arg: ${args.config.baseVotingTime} secs`}
               </p>
               <p>
                 {`votingCoolOffTime:
@@ -298,9 +379,9 @@ export const GOVERNANCE_INSTRUCTIONS = {
               )} day(s)`}
               </p>
               <p>
-                {`maxVotingTime:
+                {`baseVotingTime:
               ${getDaysFromTimestamp(
-                governance.account.config.maxVotingTime
+                governance.account.config.baseVotingTime
               )} days(s)`}
               </p>
               <p>
@@ -340,8 +421,8 @@ export const GOVERNANCE_INSTRUCTIONS = {
               )} day(s)`}
               </p>
               <p>
-                {`maxVotingTime:
-              ${getDaysFromTimestamp(args.config.maxVotingTime)} days(s)`}
+                {`baseVotingTime:
+              ${getDaysFromTimestamp(args.config.baseVotingTime)} days(s)`}
               </p>
               <p>
                 {`voteTipping:
@@ -418,12 +499,25 @@ export const GOVERNANCE_INSTRUCTIONS = {
           tryGetRealmConfig(connection, realm.owner, realm.pubkey),
           dryRunInstruction(connection, walletMoq, instructionMoq),
         ])
-
-        const args = deserializeBorsh(
-          getGovernanceInstructionSchema(programVersion),
-          SetRealmConfigArgs,
-          Buffer.from(data)
-        ) as SetRealmConfigArgs
+        let args: SetRealmConfigArgs = {} as SetRealmConfigArgs
+        let proposalProgramVersion = programVersion
+        for (
+          let propProgVersion = programVersion;
+          propProgVersion >= 0;
+          propProgVersion--
+        ) {
+          try {
+            args = deserializeBorsh(
+              getGovernanceInstructionSchema(propProgVersion),
+              SetRealmConfigArgs,
+              Buffer.from(data)
+            ) as SetRealmConfigArgs
+            proposalProgramVersion = propProgVersion
+            break
+          } catch (e) {
+            console.log(e)
+          }
+        }
 
         const possibleRealmConfigsAccounts = simulationResults.response.accounts?.filter(
           (x) => x?.owner === realm.owner.toBase58()
@@ -451,7 +545,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
 
         return isLoading ? (
           <Loading></Loading>
-        ) : programVersion >= 3 ? (
+        ) : proposalProgramVersion >= 3 ? (
           <>
             <p>
               {`minCommunityTokensToCreateGovernance:
@@ -633,6 +727,73 @@ export const GOVERNANCE_INSTRUCTIONS = {
                 )}
               </p>
             </div>
+          </>
+        )
+      },
+    },
+    26: {
+      name: 'Revoke Governing Tokens',
+      /// Revokes (burns) membership governing tokens for the given TokenOwnerRecord and hence takes away governance power from the TokenOwner
+      /// Note: If there are active votes for the TokenOwner then the vote weights won't be updated automatically
+      ///
+      ///  0. `[]` Realm account
+      ///  1. `[writable]` Governing Token Holding account. PDA seeds: ['governance',realm, governing_token_mint]
+      ///  2. `[writable]` TokenOwnerRecord account. PDA seeds: ['governance',realm, governing_token_mint, governing_token_owner]
+      ///  3. `[writable]` GoverningTokenMint
+      ///  4. `[signer]` Revoke authority which can be either of:
+      ///                1) GoverningTokenMint mint_authority to forcefully revoke the membership tokens
+      ///                2) GoverningTokenOwner who voluntarily revokes their own membership
+      ///  5. `[]` RealmConfig account. PDA seeds: ['realm-config', realm]
+      ///  6. `[]` SPL Token program
+      accounts: [
+        {
+          name: 'Realm',
+        },
+        {
+          name: 'Governing Token Holding',
+        },
+        {
+          name: 'Token Owner Record',
+        },
+        {
+          name: 'Governing Token Mint',
+        },
+        {
+          name: 'Governing Token Mint Authority',
+        },
+        { name: 'Realm Config Account' },
+        { name: 'SPL Token Program' },
+      ],
+      getDataUI: async (
+        connection: Connection,
+        data: Uint8Array,
+        accounts: AccountMetaData[]
+      ) => {
+        const realm = await getRealm(connection, accounts[0].pubkey)
+        const programVersion = await getGovernanceProgramVersion(
+          connection,
+          realm.owner
+        )
+        const mintInfoQuery = await fetchMintInfoByPubkey(
+          connection,
+          accounts[3].pubkey
+        )
+
+        const args = deserializeBorsh(
+          getGovernanceInstructionSchema(programVersion),
+          RevokeGoverningTokensArgs,
+          Buffer.from(data)
+        ) as RevokeGoverningTokensArgs
+
+        return (
+          <>
+            <p>
+              amount:{' '}
+              {mintInfoQuery.result !== undefined
+                ? fmtBnMintDecimals(args.amount, mintInfoQuery.result.decimals)
+                : 'loading mint info...'}{' '}
+              ({args.amount.toString()})
+            </p>
           </>
         )
       },

@@ -6,8 +6,12 @@ import {
 import { SwitchboardQueueVoterClient } from '../SwitchboardVotePlugin/SwitchboardQueueVoterClient'
 import { getRegistrarPDA, Registrar } from 'VoteStakeRegistry/sdk/accounts'
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts'
-import { AnchorProvider, Wallet } from '@project-serum/anchor'
-import { tryGetNftRegistrar, tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
+import { AnchorProvider, Wallet } from '@coral-xyz/anchor'
+import {
+  tryGetNftRegistrar,
+  tryGetRegistrar,
+  tryGetHeliumRegistrar,
+} from 'VoteStakeRegistry/sdk/api'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { ConnectionContext } from '@utils/connection'
 import { ProgramAccount, Realm } from '@solana/spl-governance'
@@ -16,23 +20,33 @@ import { PythClient } from 'pyth-staking-api'
 import { PublicKey } from '@solana/web3.js'
 import { tryGetGatewayRegistrar } from '../GatewayPlugin/sdk/api'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
+import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
+import { Registrar as HeliumVsrRegistrar } from 'HeliumVotePlugin/sdk/types'
+import * as heliumVsrSdk from '@helium/voter-stake-registry-sdk'
 
 interface UseVotePluginsClientStore extends State {
   state: {
     //diffrent plugins to choose because we will still have functions related only to one plugin
     vsrClient: VsrClient | undefined
+    heliumVsrClient: HeliumVsrClient | undefined
     nftClient: NftVoterClient | undefined
     gatewayClient: GatewayClient | undefined
     switchboardClient: SwitchboardQueueVoterClient | undefined
     pythClient: PythClient | undefined
-    voteStakeRegistryRegistrar: Registrar | null
     nftMintRegistrar: any
     gatewayRegistrar: any
     currentRealmVotingClient: VotingClient
+    voteStakeRegistryRegistrar: Registrar | null
     voteStakeRegistryRegistrarPk: PublicKey | null
+    heliumVsrRegistrar: HeliumVsrRegistrar | null
     maxVoterWeight: PublicKey | undefined
   }
   handleSetVsrClient: (
+    wallet: SignerWalletAdapter | undefined,
+    connection: ConnectionContext,
+    programId: PublicKey
+  ) => void
+  handleSetHeliumVsrClient: (
     wallet: SignerWalletAdapter | undefined,
     connection: ConnectionContext,
     programId: PublicKey
@@ -57,6 +71,10 @@ interface UseVotePluginsClientStore extends State {
     client: VsrClient,
     realm: ProgramAccount<Realm> | undefined
   ) => void
+  handleSetHeliumVsrRegistrar: (
+    client: HeliumVsrClient,
+    realm: ProgramAccount<Realm> | undefined
+  ) => void
   handleSetNftRegistrar: (
     client: NftVoterClient,
     realm: ProgramAccount<Realm> | undefined
@@ -74,11 +92,13 @@ interface UseVotePluginsClientStore extends State {
 
 const defaultState = {
   vsrClient: undefined,
+  heliumVsrClient: undefined,
   nftClient: undefined,
   gatewayClient: undefined,
   switchboardClient: undefined,
   pythClient: undefined,
   voteStakeRegistryRegistrar: null,
+  heliumVsrRegistrar: null,
   voteStakeRegistryRegistrarPk: null,
   nftMintRegistrar: null,
   gatewayRegistrar: null,
@@ -111,6 +131,24 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
         s.state.vsrClient = vsrClient
       })
     },
+    handleSetHeliumVsrClient: async (wallet, connection, programId) => {
+      const options = AnchorProvider.defaultOptions()
+      const provider = new AnchorProvider(
+        connection.current,
+        (wallet as unknown) as Wallet,
+        options
+      )
+
+      const heliumVsrClient = await HeliumVsrClient.connect(
+        provider,
+        programId,
+        connection.cluster === 'devnet'
+      )
+
+      set((s) => {
+        s.state.heliumVsrClient = heliumVsrClient
+      })
+    },
     handleSetVsrRegistrar: async (client, realm) => {
       const clientProgramId = client!.program.programId
       const { registrar } = await getRegistrarPDA(
@@ -121,6 +159,21 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
       const existingRegistrar = await tryGetRegistrar(registrar, client!)
       set((s) => {
         s.state.voteStakeRegistryRegistrar = existingRegistrar
+        s.state.voteStakeRegistryRegistrarPk = registrar
+      })
+    },
+    handleSetHeliumVsrRegistrar: async (client, realm) => {
+      const clientProgramId = client!.program.programId
+      const [registrar] = heliumVsrSdk.registrarKey(
+        realm!.pubkey,
+        realm!.account.communityMint,
+        clientProgramId
+      )
+
+      const existingRegistrar = await tryGetHeliumRegistrar(registrar, client!)
+
+      set((s) => {
+        s.state.heliumVsrRegistrar = existingRegistrar as HeliumVsrRegistrar
         s.state.voteStakeRegistryRegistrarPk = registrar
       })
     },
@@ -191,11 +244,10 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
           connection.cluster
         )
 
-        const maxVoterWeight = (
-          await pythClient.stakeConnection.program.methods
-            .updateMaxVoterWeight()
-            .pubkeys()
-        ).maxVoterRecord
+        const updateMaxVoterWeightKeys = await pythClient.stakeConnection.program.methods
+          .updateMaxVoterWeight()
+          .pubkeys()
+        const maxVoterWeight = updateMaxVoterWeightKeys.maxVoterRecord as PublicKey
 
         set((s) => {
           s.state.pythClient = pythClient

@@ -4,9 +4,8 @@ import MemberOverview from '@components/Members/MemberOverview'
 import { PlusCircleIcon, SearchIcon, UsersIcon } from '@heroicons/react/outline'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Tooltip from '@components/Tooltip'
-import useWalletStore from 'stores/useWalletStore'
 import Modal from '@components/Modal'
-import AddMemberForm from '@components/Members/AddMemberForm'
+import { AddCouncilMemberForm } from '@components/Members/AddMemberForm'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import { LinkButton } from '@components/Button'
 import MembersTabs from '@components/Members/MembersTabs'
@@ -15,6 +14,7 @@ import Input from '@components/inputs/Input'
 import { Member } from '@utils/uiTypes/members'
 import useMembersStore from 'stores/useMembersStore'
 import PaginationComponent from '@components/Pagination'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const Members = () => {
   const {
@@ -25,7 +25,8 @@ const Members = () => {
   const pagination = useRef<{ setPage: (val) => void }>(null)
   const membersPerPage = 10
   const activeMembers = useMembersStore((s) => s.compact.activeMembers)
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const {
     canUseMintInstruction,
     canMintRealmCouncilToken,
@@ -194,7 +195,7 @@ const Members = () => {
           onClose={() => setOpenAddMemberModal(false)}
           isOpen={openAddMemberModal}
         >
-          <AddMemberForm close={() => setOpenAddMemberModal(false)} />
+          <AddCouncilMemberForm close={() => setOpenAddMemberModal(false)} />
         </Modal>
       )}
     </div>

@@ -1,4 +1,4 @@
-import { BN, Program, Provider, web3 } from '@project-serum/anchor'
+import { BN, Program, Provider, web3 } from '@coral-xyz/anchor'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
@@ -16,6 +16,8 @@ import { PsyAmerican } from './PsyAmericanIdl'
 import { OptionMarket, OptionMarketWithKey } from './types'
 
 export { PsyAmericanIdl } from './PsyAmericanIdl'
+export * from './types'
+export * from './hooks'
 
 export const PSY_AMERICAN_PROGRAM_ID = new PublicKey(
   'R2y9ip6mxmWUj4pt54jP2hz2dgvMozy9VTSwMWE7evs'

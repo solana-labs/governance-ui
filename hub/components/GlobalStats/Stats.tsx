@@ -14,6 +14,7 @@ import { NumProposals } from './NumProposals';
 import { NumRealms } from './NumRealms';
 import { NumVoteRecords } from './NumVoteRecords';
 import { TotalValue } from './TotalValue';
+import { ValueByDao } from './ValueByDao';
 
 interface Props {
   className?: string;
@@ -24,6 +25,14 @@ export function Stats(props: Props) {
   const [runCount, setRunCount] = useState(0);
   const [realms, setRealms] = useState<PublicKey[]>([]);
   const [totalValue, setTotalValue] = useState(0);
+  const [valueByDao, setValueByDao] = useState<{
+    [dao: string]: number;
+  }>({});
+  const [valueByDaoAndTokens, setValueByDaoAndTokens] = useState<{
+    [name: string]: {
+      [token: string]: number;
+    };
+  }>({});
   const [nftRealms, setNFTRealms] = useState<PublicKey[]>([]);
   const [duration, setDuration] = useState('');
   const [proposals, setProposals] = useState<ProgramAccount<Proposal>[]>([]);
@@ -35,10 +44,7 @@ export function Stats(props: Props) {
   const timer = useRef<number | null>(null);
   const wakePrevent = useRef<any>(null);
   const connection = useRef(
-    new Connection(
-      'http://realms-realms-c335.mainnet.rpcpool.com/258d3727-bb96-409d-abea-0b1b4c48af29/',
-      'recent',
-    ),
+    new Connection(process.env.NEXT_PUBLIC_HELIUS_MAINNET_RPC || '', 'recent'),
   );
   const logger = useRef(new Logger());
 
@@ -102,6 +108,10 @@ export function Stats(props: Props) {
         <NumRealms realms={realms} />
         <NumNFTRealms fetching={!donefetchingNFTs} realms={nftRealms} />
         <TotalValue value={totalValue} />
+        <ValueByDao
+          valueByDao={valueByDao}
+          valueByDaoAndTokens={valueByDaoAndTokens}
+        />
         <NumProposals proposals={proposals} />
         <NumVoteRecords voteRecords={voteRecords} />
         <NumMembers members={members} />
@@ -128,7 +138,11 @@ export function Stats(props: Props) {
           }}
           onProposalsComplete={setProposals}
           onRealmsComplete={setRealms}
-          onTVLComplete={setTotalValue}
+          onTVLComplete={(total, byDao, byDaosAndTokens) => {
+            setTotalValue(total);
+            setValueByDao(byDao);
+            setValueByDaoAndTokens(byDaosAndTokens);
+          }}
           onVoteRecordsComplete={setVoteRecords}
           runCount={runCount}
         />

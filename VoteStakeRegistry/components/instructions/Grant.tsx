@@ -29,7 +29,7 @@ import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/Govern
 import { lockupTypes } from 'VoteStakeRegistry/tools/types'
 import Select from '@components/inputs/Select'
 import Switch from '@components/Switch'
-import { getFormattedStringFromDays } from 'VoteStakeRegistry/tools/dateTools'
+import { getFormattedStringFromDays } from '@utils/dateTools'
 import * as yup from 'yup'
 import { getGrantInstruction } from 'VoteStakeRegistry/actions/getGrantInstruction'
 import { getRegistrarPDA } from 'VoteStakeRegistry/sdk/accounts'
@@ -37,6 +37,7 @@ import { tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import dayjs from 'dayjs'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const Grant = ({
   index,
@@ -48,7 +49,7 @@ const Grant = ({
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const dateNow = dayjs().unix()
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const { realm, tokenRecords, realmInfo } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)
@@ -258,6 +259,8 @@ const Grant = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [client])
+  const isNotVested =
+    form.lockupKind.value !== 'monthly' && form.lockupKind.value !== 'daily'
   return (
     <>
       <Select
@@ -316,7 +319,7 @@ const Grant = ({
         onChange={handleChangeStartDate}
         error={formErrors['startDateUnixSeconds']}
       />
-      {form.lockupKind.value !== 'monthly' ? (
+      {isNotVested && (
         <Input
           label="End date"
           type="date"
@@ -324,10 +327,26 @@ const Grant = ({
           onChange={handleChangeEndDate}
           error={formErrors['periods']}
         />
-      ) : (
+      )}
+      {form.lockupKind.value === 'monthly' && (
         <Input
           type="number"
           label="Number of months"
+          min="1"
+          value={form.periods}
+          onChange={(e) => {
+            handleSetForm({
+              value: e.target.value,
+              propertyName: 'periods',
+            })
+          }}
+          error={formErrors['periods']}
+        ></Input>
+      )}
+      {form.lockupKind.value === 'daily' && (
+        <Input
+          type="number"
+          label="Number of days"
           min="1"
           value={form.periods}
           onChange={(e) => {
@@ -390,6 +409,13 @@ const Grant = ({
         !isNaN(form.amount) &&
         !isNaN(form.periods) && (
           <div>Vesting rate: {(form.amount / form.periods).toFixed(2)} p/m</div>
+        )}
+
+      {form.lockupKind.value === 'daily' &&
+        form.amount &&
+        !isNaN(form.amount) &&
+        !isNaN(form.periods) && (
+          <div>Vesting rate: {(form.amount / form.periods).toFixed(2)} p/d</div>
         )}
     </>
   )
