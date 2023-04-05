@@ -354,7 +354,7 @@ export const getMeanFundAccountSchema = ({ form }) => {
 
   return yup.object().shape({
     governedTokenAccount: yup.object().required('Source of funds is required'),
-    treasury: yup
+    paymentStreamingAccount: yup
       .object()
       .required('Streaming account destination is required'),
     amount: yup
@@ -405,7 +405,9 @@ export const getMeanWithdrawFromAccountSchema = ({
 }) => {
   return yup.object().shape({
     governedTokenAccount: yup.object().required('Governance is required'),
-    treasury: yup.object().required('Streaming account source is required'),
+    paymentStreamingAccount: yup
+      .object()
+      .required('Streaming account source is required'),
 
     destination: yup
       .string()
@@ -415,7 +417,7 @@ export const getMeanWithdrawFromAccountSchema = ({
         async function (val: string) {
           if (val) {
             try {
-              if (form.treasury?.id.toString() == val) {
+              if (form.paymentStreamingAccount?.id.toString() == val) {
                 return this.createError({
                   message: `Destination account address can't be same as source account`,
                 })
@@ -423,7 +425,7 @@ export const getMeanWithdrawFromAccountSchema = ({
               await validateDestinationAccAddress(
                 connection,
                 val,
-                new PublicKey(form.treasury?.id)
+                new PublicKey(form.paymentStreamingAccount?.id)
               )
               return true
             } catch (e) {
@@ -446,17 +448,17 @@ export const getMeanWithdrawFromAccountSchema = ({
         'amount',
         'Transfer amount must be less than the source of funds available amount',
         async function (val: number) {
-          if (val && !form.treasury) {
+          if (val && !form.paymentStreamingAccount) {
             return this.createError({
               message: `Please select source of funds to validate the amount`,
             })
           }
-          if (val && form.treasury && mintInfo) {
+          if (val && form.paymentStreamingAccount && mintInfo) {
             const mintValue = getMintNaturalAmountFromDecimalAsBN(
               val,
               mintInfo.decimals
             )
-            return new BN(form.treasury.balance).gte(mintValue)
+            return new BN(form.paymentStreamingAccount.balance).gte(mintValue)
           }
           return this.createError({
             message: `Amount is required`,
@@ -477,7 +479,9 @@ export const getMeanCreateStreamSchema = ({
 }) => {
   return yup.object().shape({
     governedTokenAccount: yup.object().required('Governance is required'),
-    treasury: yup.object().required('Streaming account source is required'),
+    paymentStreamingAccount: yup
+      .object()
+      .required('Streaming account source is required'),
     streamName: yup.string().required('Stream name is required'),
     destination: yup
       .string()
@@ -487,7 +491,7 @@ export const getMeanCreateStreamSchema = ({
         async function (val: string) {
           if (val) {
             try {
-              if (form.treasury?.id.toString() == val) {
+              if (form.paymentStreamingAccount?.id.toString() == val) {
                 return this.createError({
                   message: `Destination account address can't be same as source account`,
                 })
@@ -495,7 +499,7 @@ export const getMeanCreateStreamSchema = ({
               await validateDestinationAccAddress(
                 connection,
                 val,
-                new PublicKey(form.treasury?.id)
+                new PublicKey(form.paymentStreamingAccount?.id)
               )
               return true
             } catch (e) {
@@ -518,17 +522,17 @@ export const getMeanCreateStreamSchema = ({
         'amount',
         'Transfer amount must be less than the source of funds available amount',
         async function (val: number) {
-          if (val && !form.treasury) {
+          if (val && !form.paymentStreamingAccount) {
             return this.createError({
               message: `Please select source of funds to validate the amount`,
             })
           }
-          if (val && form.treasury && mintInfo) {
+          if (val && form.paymentStreamingAccount && mintInfo) {
             const mintValue = getMintNaturalAmountFromDecimalAsBN(
               val,
               mintInfo.decimals
             )
-            return new BN(form.treasury.balance).gte(mintValue)
+            return new BN(form.paymentStreamingAccount.balance).gte(mintValue)
           }
           return this.createError({
             message: `Amount is required`,
