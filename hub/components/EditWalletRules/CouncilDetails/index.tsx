@@ -1,6 +1,6 @@
 import BuildingIcon from '@carbon/icons-react/lib/Building';
 import ChevronDownIcon from '@carbon/icons-react/lib/ChevronDown';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
 import {
   CanCreateProposal,
@@ -35,11 +35,14 @@ export function CouncilDetails(props: Props) {
     false,
   );
 
-  const inputProps = {
-    rules: props.councilRules,
-    onRulesChange: props.onCouncilRulesChange,
-    govPop: 'council' as const,
-  };
+  const inputProps = useMemo(
+    () => ({
+      rules: props.councilRules,
+      onRulesChange: props.onCouncilRulesChange,
+      govPop: 'council' as const,
+    }),
+    [props.councilRules, props.onCouncilRulesChange],
+  );
 
   return (
     <SectionBlock className={props.className}>
