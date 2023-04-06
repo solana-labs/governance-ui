@@ -1,6 +1,6 @@
 import AccountsItems from './AccountsItems'
 import HoldTokensTotalPrice from './HoldTokensTotalPrice'
-import useRealm from '@hooks/useRealm'
+// import useRealm from '@hooks/useRealm'
 import React from 'react'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import useQueryContext from '@hooks/useQueryContext'
@@ -18,7 +18,7 @@ const AccountsCompactWrapper = () => {
     ...governedTokenAccountsWithoutNfts,
     ...auxiliaryTokenAccounts,
   ]
-  const { symbol } = useRealm()
+  // const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
   const isLoadingAccounts = useGovernanceAssetsStore(
     (s) => s.loadGovernedAccounts
