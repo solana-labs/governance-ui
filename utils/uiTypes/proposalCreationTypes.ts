@@ -653,7 +653,7 @@ export enum Instructions {
   // AddServiceToDID,
   // RemoveServiceFromDID,
   RevokeGoverningTokens,
-  SetMintAuthority,
+  //SetMintAuthority,
 }
 
 export type createParams = [
