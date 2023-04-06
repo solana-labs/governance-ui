@@ -5,9 +5,9 @@ import { Wallet } from '@models/treasury/Wallet'
 import Button from '@components/Button'
 import Modal from '@components/Modal'
 import useRealm from '@hooks/useRealm'
-import useWalletStore from 'stores/useWalletStore'
 import WalletQRCode from '@components/WalletQRCode'
 import Address from '@components/Address'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface TokenAccount {
   iconUrl?: string
@@ -44,7 +44,8 @@ interface Props {
 
 export default function AddAssetModal(props: Props) {
   const { ownVoterWeight, realmInfo, realm } = useRealm()
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
 
   const tokenOwnerRecord = ownVoterWeight.canCreateGovernanceUsingCouncilTokens()
     ? ownVoterWeight.councilTokenRecord

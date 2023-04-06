@@ -18,9 +18,8 @@ const RealmHeader = () => {
   return (
     <div className="px-4 pt-4 pb-4 rounded-t-lg bg-bkg-2 md:px-6 md:pt-6">
       <div
-        className={`flex items-center ${
-          isBackNavVisible ? 'justify-between' : 'justify-end'
-        } mb-2 md:mb-4`}
+        className={`flex items-center ${isBackNavVisible ? 'justify-between' : 'justify-end'
+          } mb-2 md:mb-4`}
       >
         {isBackNavVisible ? (
           <Link href={fmtUrlWithCluster('/realms')}>
@@ -74,9 +73,9 @@ const RealmHeader = () => {
               Forum
             </a>
           </Link>
-        </div>
-      </div>
-    </div>
+        </div >
+      </div >
+    </div >
   )
 }
 

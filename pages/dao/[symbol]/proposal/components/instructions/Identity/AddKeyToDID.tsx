@@ -121,7 +121,6 @@ const AddKeyToDID = ({
 
   return (
     <>
-      {form && (
       <InstructionForm
         outerForm={form}
         setForm={setForm}
@@ -129,7 +128,6 @@ const AddKeyToDID = ({
         setFormErrors={setFormErrors}
         formErrors={formErrors}
       ></InstructionForm>
-      )}
     </>
   )
 }

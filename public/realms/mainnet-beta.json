@@ -14,6 +14,16 @@
     "sortRank": 3
   },
   {
+    "symbol": "Dean's List Network State",
+    "displayName": "Dean's List Network State",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "F9V4Lwo49aUe8fFujMbU6uhdFyDRqKY54WpzdpncUSk9",
+    "bannerImage": "/realms/Deans_List_Network_State/DeansList_Network_State_logo.png",
+    "website": "https://www.deanslist.services/",
+    "twitter": "@deanslistDAO",
+    "ogImage": "/realms/Deans_List_Network_State/DeansList_Network_State_logo.png"
+   },
+   {
     "symbol": "Ukraine",
     "displayName": "Ukraine.SOL",
     "programId": "gUAedF544JeE6NYbQakQvribHykUNgaPJqcgf3UQVnY",
@@ -233,7 +243,7 @@
   },
   {
     "symbol": "WEZ",
-    "displayName": "Wezesha DAO",
+    "displayName": "Wezesha",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "FEtF7V55LorZmUriVVobubPvLXoS7sfP3smzb5zR4BWz",
     "website": "https://wezesha.co",
@@ -1035,18 +1045,18 @@
     "website": "https://flipsidecrypto.xyz/",
     "twitter": "@flipsidecrypto",
     "ogImage": "/realms/FSLOGO/FLIPSIDE-LOGO-WHITE.png"
-  },
-  {
-    "symbol": "Dean's List",
+   },
+   {
+    "symbol": "Legacy Dean's List Classic (moved to new one)",
     "displayName": "Dean's List",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "9mS8GuMx2MkZGMSwa2k87HNLTFZ1ssa9mJ1RkGFKcGyQ",
-    "bannerImage": "/realms/Deans-List-Grape/deans-list-logo.png",
+    "bannerImage": "/realms/DeanListGrape/deans-list-logo.png",
     "website": "https://deans-list.strataprotocol.com/",
     "twitter": "@GrapeDeanslist",
-    "ogImage": "/realms/Deans-List-Grape/deans-list-logo.png"
-  },
-  {
+    "ogImage": "/realms/DeanListGrape/deans-list-logo.png"
+   },
+   {
     "symbol": "GrapeCCSubDAO",
     "displayName": "Grape CC SubDAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1054,8 +1064,8 @@
     "website": "https://services.grapes.network/",
     "twitter": "@grapeprotocol",
     "ogImage": "/realms/GrapeCCSubDAO/GrapeCCSubDAO.png"
-  },
-  {
+   },
+   {
     "symbol": "AthensDAO",
     "displayName": "AthensDAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1064,8 +1074,17 @@
     "website": "https://athensdao.net/",
     "twitter": "@GrapeAthensDAO",
     "ogImage": "/realms/AthensDAO/AthensDAO_Logo.jpg"
-  },
-  {
+   },
+   {
+    "symbol": "Wen DAO",
+    "displayName": "Wen DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "3GoWL2uR7qx9NLGuZydTuyoxaYSwAQ3HVqCF3Kz6D7F3",
+    "website": "https://services.grapes.network/",
+    "twitter": "@grapeprotocol",
+    "ogImage": "/realms/Wen DAO/Wen DAO.png"
+   }, 
+   { 
     "symbol": "BOOT",
     "displayName": "Bootstrap DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1113,11 +1132,11 @@
  {
     "symbol": "EPCT",
     "category": "web3",
-    "bannerImage": "https://bafybeigyh52dlntjyn4lyajvt7v5d2vtifjhyaklu3j5rhkpihhbb3wkwa.ipfs.w3s.link/BuidlToEarnTwitterHeader.png",
+    "bannerImage": "https://bafybeih52um4tvyggeja36kmbyg5b4pfod547qxdite4krwoe4nwtareji.ipfs.w3s.link/EpicsBetaTwitterHeaderLogo.png",
     "displayName": "Epics",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "DCdCsuUjg6MnULfEmBUmvg1heggnLrKSFdp5uTRSKuwR",
-    "ogImage": "/realms/Epics/Epics-logo-background.png",
+    "ogImage": "/realms/Epics/EpicsLogoSquareInvert.svg",
     "shortDescription": "Buidl to Earn. Epics is a decentralized crowdsourcing platform for incentivizing open source software development.",
     "sortRank": 3,
     "website": "https://epics.dev",
@@ -3006,5 +3025,98 @@
     "ogImage": "/realms/HadeswapGovernance/hadeswap_logo.jpg",
     "website": "https://hadeswap.com",
     "twitter": "@hadeswap"
+  },
+  {
+    "symbol": "Clack DAO",
+    "displayName": "Clack DAO",
+    "shortDescription": "Clack - Meme Token at Solana BlockChain",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "5qfNPr56sGqoH7dTDBqVWqnhHZqYj7AcouoiHFDV9ZU3",
+    "communityMint": "2Y6sQjp2PiwnQpMPSvGGYFNSQGY24YubNYXtrB9ufon9",
+    "ogImage": "/realms/ClackDAO/Logo.png",
+    "discord": "https://discord.gg/BfkCHQkUTq",
+    "github": "https://github.com/clackinu",
+    "website": "https://clack.uno",
+    "twitter": "@clack_inu"
+  },
+  {
+    "symbol": "BRDOT",
+    "category": "web3",
+    "bannerImage": "/realms/brdot/banner_brdot.png",
+    "displayName": "BRDOT DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "3HDYDcQQ75kLKnQT3EkU8MXWLrYFjE4sF1Bu1m359Gxz",
+    "ogImage": "/realms/brdot/brdot_dao_logo.png",
+    "shortDescription": "Bridging the Gap to Connectivity, Freedom, and Development in Latin America",
+    "discord": "https://discord.gg/XcWVHM2Z",
+    "github": "https://github.com/brdot",
+    "website": "https://brdot.com.br"
+    
+  },
+  { 
+    "symbol": "SAO",
+    "category":"nft",
+    "displayName": "Sator DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "7yAiT2bUg5MwBzT3K9BvhcZdtHr5z8AnCGWa2iPJjB3T",
+    "ogImage": "/realms/SatorDAO/SatorLogo.png",
+    "bannerImage": "https://i.imgur.com/1rNmAIj.jpg",
+    "shortDescription": "Sator brings traditional TV and movies into Web3 through NFT-VOD and token-gated staking.",
+    "website": "https://sator.io",
+    "discord": "https://discord.gg/qftzCFrHNQ",
+    "twitter": "https://twitter.com/SatorSAO" 
+  },
+  { 
+    "symbol": "Safecows",
+    "category":"web3",
+    "displayName": "Safecows",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "6RQAna7aWHLVwfYRFGyM8kpnBXNGkMNCGfvuwYuuvpFU",
+    "ogImage": "/realms/safecows/logo.png",
+    "bannerImage": "/realms/safecows/banner.png",
+    "shortDescription": "Take Action for the Zero Hunger by mining for Proof-of-Health over Helium Network.",
+    "website": "https://safecows.com",
+    "discord": "https://discord.gg/aQCeMSWs"
+  },
+   { 
+    "symbol": "BlueChickDAO",
+    "category":"gaming",
+    "displayName": "The Blue Chick NFTs DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "99c96qFUwLiGcbudDeTLVxYTbtQ4CkDsstvHHmGPGGWj",
+    "ogImage": "/realms/BlueChickNFTsDAO/BlueChickNFTsDAO.png",
+    "bannerImage": "/realms/BlueChickNFTsDAO/BlueChickNFTsDAO-banner.png",
+    "shortDescription": "PVP artillery tactical game with x9999 immutable Blue Chicks. The NFTs and the DAO were actually made by birds!",
+    "website": "https://bluechicknfts.wtf",
+    "discord": "https://discord.gg/SHVcwHKUNG",
+    "twitter": "@blueChickNFTs"
+  },  
+  
+  {
+    "symbol": "HNT",
+    "displayName": "Helium DAO",
+    "programId": "hgovkRU6Ghe1Qoyb54HdSLdqN7VtxaifBzRmh9jtd3S",
+    "realmId": "2VfPJn8ML1hNBnsEBo7SzmG11UJc7gbY8b23A3K8expd",
+    "website": "https://helium.com",
+    "twitter": "@Helium",
+    "ogImage": "/realms/Helium/img/logo.svg"
+  },
+  {
+    "symbol": "IOT",
+    "displayName": "Helium IOT DAO",
+    "programId": "hgovkRU6Ghe1Qoyb54HdSLdqN7VtxaifBzRmh9jtd3S",
+    "realmId": "8UQNtD5Zw8ijB7ZpGiPLodKXMxtVyQmtu1AEztd3p6Po",
+    "website": "https://helium.com",
+    "twitter": "@Helium",
+    "ogImage": "/realms/Helium/img/iotlogo.png"
+  },
+  {
+    "symbol": "MOBILE",
+    "displayName": "Helium MOBILE DAO",
+    "programId": "hgovkRU6Ghe1Qoyb54HdSLdqN7VtxaifBzRmh9jtd3S",
+    "realmId": "8itzNAn1kMZ5sf18dVd8gGykztWZLVT93Svbdt7Gn2NP",
+    "website": "https://helium.com",
+    "twitter": "@Helium",
+    "ogImage": "/realms/Helium/img/mobilelogo.png"
   }
 ]

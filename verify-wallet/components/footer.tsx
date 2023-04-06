@@ -5,6 +5,7 @@ interface Props {
 }
 
 export function GlobalFooter(props: Props) {
+  const year = new Date().getFullYear();
   return (
     <footer
       className={cx(
@@ -32,7 +33,7 @@ export function GlobalFooter(props: Props) {
           'sm:text-sm',
         )}
       >
-        <div>© 2022 Solana Technology Services LLC</div>
+        <div>© {year} Solana Technology Services LLC</div>
         <div className="hidden sm:block mx-2">|</div>
         <a href="https://realms.today/terms" target="_blank" rel="noreferrer">
           Terms

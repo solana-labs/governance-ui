@@ -5,7 +5,6 @@ import Input from 'components/inputs/Input'
 import Button, { LinkButton } from '@components/Button'
 import Textarea from 'components/inputs/Textarea'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
-import useWalletStore from 'stores/useWalletStore'
 import { getValidatedPublickKey } from 'utils/validations'
 import { useEffect, useState } from 'react'
 import { UiInstruction } from 'utils/uiTypes/proposalCreationTypes'
@@ -22,6 +21,7 @@ import { abbreviateAddress } from '@utils/formatting'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance, ProgramAccount } from '@solana/spl-governance'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface CloseBuffersForm {
   governedAccount: AssetAccount | undefined
@@ -39,7 +39,7 @@ const TransferUpgradeAuthority = ({
   const { handleCreateProposal } = useCreateProposal()
   const { assetAccounts } = useGovernanceAssets()
   const router = useRouter()
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const governedAccount = assetAccounts.find(
     (x) => x.governance.pubkey.toBase58() === program.pubkey.toBase58()
   )

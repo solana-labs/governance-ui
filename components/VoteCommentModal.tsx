@@ -25,6 +25,7 @@ import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
 import { NftVoterClient } from '@solana/governance-program-library'
 import queryClient from '@hooks/queries/queryClient'
 import { voteRecordQueryKeys } from '@hooks/queries/voteRecord'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface VoteCommentModalProps {
   onClose: () => void
@@ -46,7 +47,7 @@ const useSubmitVote = ({
     (s) => s.state.currentRealmVotingClient
   )
   const [submitting, setSubmitting] = useState(false)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
   const { proposal } = useWalletStore((s) => s.selectedProposal)
   const { fetchChatMessages } = useWalletStore((s) => s.actions)

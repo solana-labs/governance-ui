@@ -187,6 +187,7 @@ export async function getTransferInstruction({
         )
       )
     }
+
     const transferIx = Token.createTransferInstruction(
       TOKEN_PROGRAM_ID,
       sourceAccount!,
@@ -309,9 +310,11 @@ export async function getTransferNftInstruction({
       mintPK,
       wallet: wallet!,
     })
+    console.log(needToCreateAta)
     //we push this createATA instruction to transactions to create right before creating proposal
     //we don't want to create ata only when instruction is serialized
     if (needToCreateAta) {
+      console.log('create atas')
       prerequisiteInstructions.push(
         Token.createAssociatedTokenAccountInstruction(
           ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
@@ -368,7 +371,8 @@ export async function getMintInstruction({
   if (isValid && programId && form.mintAccount?.governance?.pubkey) {
     //this is the original owner
     const destinationAccount = new PublicKey(form.destinationAccount)
-    const mintPK = form.mintAccount.governance.account.governedAccount
+
+    const mintPK = form.mintAccount.extensions.mint!.publicKey
     const mintAmount = parseMintNaturalAmountFromDecimal(
       form.amount!,
       form.mintAccount.extensions.mint.account?.decimals
@@ -397,9 +401,9 @@ export async function getMintInstruction({
     }
     const transferIx = Token.createMintToInstruction(
       TOKEN_PROGRAM_ID,
-      form.mintAccount.governance.account.governedAccount,
+      mintPK,
       receiverAddress,
-      form.mintAccount.governance!.pubkey,
+      form.mintAccount.extensions.mint!.account.mintAuthority!,
       [],
       mintAmount
     )

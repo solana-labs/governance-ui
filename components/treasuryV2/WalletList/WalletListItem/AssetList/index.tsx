@@ -34,6 +34,8 @@ import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
 import { findMetadataPda } from '@metaplex-foundation/js'
 import useWalletStore from 'stores/useWalletStore'
 import TokenOwnerRecordsList from './TokenOwnerRecordsList'
+import useRealm from '@hooks/useRealm'
+import { GoverningTokenType } from '@solana/spl-governance'
 
 export type Section = 'tokens' | 'nfts' | 'others'
 
@@ -72,6 +74,13 @@ export default function AssetList(props: Props) {
 
   const [tokens, setTokens] = useState<(Token | Sol)[]>(tokensFromProps)
   const connection = useWalletStore((s) => s.connection)
+  const { config, realm } = useRealm()
+  const isCommunityMintDisabled =
+    config?.account.communityTokenConfig?.tokenType ===
+      GoverningTokenType.Dormant || false
+  const isCouncilMintDisabled =
+    config?.account?.councilTokenConfig?.tokenType ===
+      GoverningTokenType.Dormant || false
 
   useEffect(() => {
     const getTokenMetadata = async (mintAddress: string) => {
@@ -152,6 +161,17 @@ export default function AssetList(props: Props) {
   const [others, setOthers] = useState<
     (Mint | Programs | Unknown | Domains | RealmAuthority)[]
   >(othersFromProps)
+  const [itemsToHide, setItemsToHide] = useState<string[]>([])
+  useEffect(() => {
+    const newItemsToHide: string[] = []
+    if (isCommunityMintDisabled && realm?.account.communityMint) {
+      newItemsToHide.push(realm.account.communityMint.toBase58())
+    }
+    if (isCouncilMintDisabled && realm?.account.config.councilMint) {
+      newItemsToHide.push(realm.account.config.councilMint.toBase58())
+    }
+    setItemsToHide(newItemsToHide)
+  }, [isCommunityMintDisabled, isCouncilMintDisabled])
 
   useEffect(() => {
     const getTokenMetadata = async (mintAddress: string) => {
@@ -252,6 +272,7 @@ export default function AssetList(props: Props) {
           selectedAssetId={props.selectedAssetId}
           onSelect={props.onSelectAsset}
           onToggleExpand={() => props.onToggleExpandSection?.('others')}
+          itemsToHide={itemsToHide}
         />
       )}
       {tokenOwnerRecordsFromProps.length > 0 && (

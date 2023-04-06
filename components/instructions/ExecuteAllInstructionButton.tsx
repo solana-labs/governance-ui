@@ -6,9 +6,8 @@ import {
   ProposalState,
   ProposalTransaction,
   RpcContext,
-  withExecuteTransaction,
 } from '@solana/spl-governance'
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js'
 import { CheckCircleIcon, PlayIcon, RefreshIcon } from '@heroicons/react/solid'
 import Button from '@components/Button'
 import Tooltip from '@components/Tooltip'
@@ -19,6 +18,8 @@ import useWalletStore from 'stores/useWalletStore'
 import { notify } from '@utils/notifications'
 import useProgramVersion from '@hooks/useProgramVersion'
 import { abbreviateAddress } from '@utils/formatting'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export enum PlayState {
   Played,
@@ -33,44 +34,44 @@ const useSignersNeeded = (
 ) => {
   const { realm } = useRealm()
   const programVersion = useProgramVersion()
-
+  const { governancesArray, assetAccounts } = useGovernanceAssets()
   const [signersNeeded, setSignersNeeded] = useState<PublicKey[]>()
 
   useEffect(() => {
-    const x = async () => {
-      console.log('i ran the check')
-
+    const handleGetSigners = async () => {
       if (realm?.owner === undefined) return undefined
+      const pksToFilterOut = [
+        ...governancesArray.map((x) => x.pubkey),
+        ...assetAccounts
+          .filter((x) => x.isSol)
+          .map((x) => x.extensions.transferAddress),
+      ]
+      const propInstructions = Object.values(proposalInstructions) || []
 
-      const executionInstructions: TransactionInstruction[] = []
-
-      await Promise.all(
-        proposalInstructions.map((instruction) =>
-          // withExecuteTransaction function mutates 'executionInstructions'
-          withExecuteTransaction(
-            executionInstructions,
-            realm.owner,
-            programVersion,
-            proposal.account.governance,
-            proposal.pubkey,
-            instruction.pubkey,
-            [instruction.account.getSingleInstruction()]
-          )
+      //we need to remmove governances and sol wallets from singers
+      const signers = propInstructions
+        .map((x) => x.account.instructions.flatMap((inst) => inst.accounts))
+        .filter((x) => x)
+        .flatMap((x) => x)
+        .filter(
+          (x) =>
+            !pksToFilterOut.find((filteredOutPk) =>
+              filteredOutPk?.equals(x.pubkey)
+            )
         )
-      )
-
-      const signers = executionInstructions
-        .flatMap((x) => x.keys)
         .filter((x) => x.isSigner)
         .map((x) => x.pubkey)
+
       setSignersNeeded(signers)
     }
-    x()
+    handleGetSigners()
   }, [
     programVersion,
     proposal.account.governance,
     proposal.pubkey,
     proposalInstructions,
+    governancesArray.length,
+    assetAccounts.length,
     realm?.owner,
   ])
 
@@ -97,10 +98,10 @@ export function ExecuteAllInstructionButton({
   label?: string
 }) {
   const { realmInfo } = useRealm()
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
   const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
-  const connected = useWalletStore((s) => s.connected)
+  const connected = !!wallet?.connected
 
   const [currentSlot, setCurrentSlot] = useState(0)
 
@@ -133,6 +134,7 @@ export function ExecuteAllInstructionButton({
   }, [isPassedExecutionSlot, rpcContext.connection, currentSlot])
 
   const signersNeeded = useSignersNeeded(proposalInstructions, proposal)
+
   const otherSignerNeeded =
     signersNeeded === undefined
       ? undefined

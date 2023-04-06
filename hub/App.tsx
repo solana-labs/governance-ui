@@ -58,7 +58,9 @@ interface Props {
 
 export function App(props: Props) {
   const router = useRouter();
-  const isDarkMode = router.pathname.startsWith('/realm/[id]/governance');
+  const isDarkMode =
+    router.pathname.startsWith('/realm/[id]/governance') ||
+    router.pathname.startsWith('/realm/[id]/config');
 
   useEffect(() => {
     if (isDarkMode) {

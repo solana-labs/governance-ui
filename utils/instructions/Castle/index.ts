@@ -1,11 +1,10 @@
-import { BN, WalletAdapter } from '@blockworks-foundation/mango-client'
 import {
   VaultConfig,
   DeploymentEnvs,
   Clusters,
 } from '@castlefinance/vault-core'
 import { VaultClient } from '@castlefinance/vault-sdk'
-import { AnchorProvider } from '@coral-xyz/anchor'
+import { AnchorProvider, BN } from '@coral-xyz/anchor'
 import { AnchorWallet } from '@friktion-labs/friktion-sdk/dist/cjs/src/miscUtils'
 import {
   serializeInstructionToBase64,
@@ -24,6 +23,7 @@ import {
   TransactionInstruction,
   Keypair,
   Connection,
+  Transaction,
 } from '@solana/web3.js'
 import { ConnectionContext, getNetworkFromEndpoint } from '@utils/connection'
 import { validateInstruction } from '@utils/instructionTools'
@@ -395,4 +395,13 @@ export const getCastleVaults = async () => {
   const configResponse = await fetch('https://api.castle.finance/configs')
   const vaults = (await configResponse.json()) as VaultConfig<DeploymentEnvs>[]
   return vaults
+}
+
+interface WalletAdapter {
+  publicKey: PublicKey
+  connected: boolean
+  signTransaction: (transaction: Transaction) => Promise<Transaction>
+  signAllTransactions: (transaction: Transaction[]) => Promise<Transaction[]>
+  connect: () => any
+  disconnect: () => any
 }

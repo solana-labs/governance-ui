@@ -31,6 +31,7 @@ import useProgramVersion from '@hooks/useProgramVersion'
 import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
 import BigNumber from 'bignumber.js'
 import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface AddMemberForm extends Omit<MintForm, 'mintAccount'> {
   description: string
@@ -49,7 +50,7 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
   const { handleCreateProposal } = useCreateProposal()
   const router = useRouter()
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
 
   const { fmtUrlWithCluster } = useQueryContext()
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
@@ -71,8 +72,7 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
   const schema = getMintSchema({ form: { ...form, mintAccount }, connection })
 
   const mintMinAmount = mintInfo?.found
-    ? // @ts-expect-error this discrimination fails on 4.6 but not future versions of TS
-      new BigNumber(1).shiftedBy(mintInfo.result.decimals).toNumber()
+    ? new BigNumber(1).shiftedBy(mintInfo.result.decimals).toNumber()
     : 1
 
   const currentPrecision = precision(mintMinAmount)
@@ -144,8 +144,7 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
       }
 
       const goofySillyArrayForBuilderPattern = []
-      const tokenMint = mintAccount.governance.account.governedAccount
-
+      const tokenMint = mintAccount.pubkey
       // eslint-disable-next-line
       const tokenOwnerRecordPk = await withDepositGoverningTokens(
         goofySillyArrayForBuilderPattern,
@@ -155,7 +154,7 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
         tokenMint,
         tokenMint,
         new PublicKey(form.destinationAccount),
-        mintAccount.governance.pubkey,
+        mintAccount.extensions.mint!.account.mintAuthority!,
         new PublicKey(form.destinationAccount),
         getMintNaturalAmountFromDecimalAsBN(
           form.amount ?? 1,
@@ -388,8 +387,7 @@ const useCouncilMintAccount = () => {
     () =>
       assetAccounts.find(
         (x) =>
-          x.governance?.account.governedAccount.toBase58() ===
-          realm?.account.config.councilMint?.toBase58()
+          x.pubkey.toBase58() === realm?.account.config.councilMint?.toBase58()
       ),
     [assetAccounts, realm?.account.config.councilMint]
   )

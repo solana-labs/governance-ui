@@ -5,7 +5,7 @@ import { ExternalLinkIcon } from '@heroicons/react/outline'
 import useCreateProposal from '@hooks/useCreateProposal'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
-import useWallet from '@hooks/useWallet'
+import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import {
   getInstructionDataFromBase64,
   Governance,
@@ -58,7 +58,7 @@ const Ticket: FC<Props> = ({ ticket, createProposal, callback }) => {
   const { fmtUrlWithCluster } = useQueryContext()
 
   const connection = useWalletStore((s) => s.connection.current)
-  const { anchorProvider, wallet } = useWallet()
+  const { anchorProvider, wallet } = useWalletDeprecated()
 
   const actions = useSerumGovStore((s) => s.actions)
   const gsrmMint = useSerumGovStore((s) => s.gsrmMint)

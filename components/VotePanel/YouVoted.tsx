@@ -16,7 +16,6 @@ import { SecondaryButton } from '../Button'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { useRouter } from 'next/router'
-import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import Tooltip from '@components/Tooltip'
 import {
   useVoterTokenRecord,
@@ -26,6 +25,8 @@ import {
 } from './hooks'
 import assertUnreachable from '@utils/typescript/assertUnreachable'
 import { useHasVoteTimeExpired } from '@hooks/useHasVoteTimeExpired'
+import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
   const client = useVotePluginsClientStore(
@@ -35,14 +36,13 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
   const { pk } = router.query
   const { proposal } = useWalletStore((s) => s.selectedProposal)
   const { realm, realmInfo } = useRealm()
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
-  const connected = useWalletStore((s) => s.connected)
+  const connected = !!wallet?.connected
   const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
   const fetchProposal = useWalletStore((s) => s.actions.fetchProposal)
   const { governance } = useWalletStore((s) => s.selectedProposal)
-  const maxVoterWeight =
-    useNftPluginStore((s) => s.state.maxVoteRecord)?.pubkey || undefined
+  const maxVoterWeight = useMaxVoteRecord()?.pubkey || undefined
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
   const isVoting = useIsVoting()
   const isInCoolOffTime = useIsInCoolOffTime()
@@ -89,6 +89,7 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
       connection.current,
       connection.endpoint
     )
+
     try {
       setIsLoading(true)
       const instructions: TransactionInstruction[] = []
@@ -179,7 +180,7 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
               onClick={() => submitRelinquishVote()}
               disabled={!isWithdrawEnabled || isLoading}
             >
-              Withdraw
+              Relinquish Vote
             </SecondaryButton>
             {isInCoolOffTime && (
               <div className="text-xs">

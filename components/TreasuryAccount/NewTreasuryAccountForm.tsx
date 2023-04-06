@@ -42,6 +42,7 @@ import {
   transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig,
   transform,
 } from '@components/AssetsList/BaseGovernanceForm-data'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 interface NewTreasuryAccountForm extends BaseGovernanceFormFieldsV2 {
   mintAddress: string
 }
@@ -107,9 +108,9 @@ const NewAccountForm = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [realmInfo?.programVersion])
   const filteredTypes = types.filter((x) => !x.hide)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
-  const connected = useWalletStore((s) => s.connected)
+  const connected = !!wallet?.connected
   const { fetchRealm } = useWalletStore((s) => s.actions)
   const [form, setForm] = useState<NewTreasuryAccountForm>({
     ...defaultFormValues,
@@ -188,7 +189,7 @@ const NewAccountForm = () => {
                         : form.minCommunityTokensToCreateProposal,
                     minCouncilTokensToCreateProposal: '1',
                     minInstructionHoldUpTime: form.minInstructionHoldUpTime.toString(),
-                    maxVotingTime: form.maxVotingTime.toString(),
+                    baseVotingTime: form.maxVotingTime.toString(),
                     votingCoolOffTime: '0',
                     depositExemptProposalCount: '10',
                     communityVoteThreshold: form.voteThreshold.toString(),

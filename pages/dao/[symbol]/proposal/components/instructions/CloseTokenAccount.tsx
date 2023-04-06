@@ -26,6 +26,7 @@ import { getValidatedPublickKey } from '@utils/validations'
 import { PublicKey } from '@solana/web3.js'
 import { getATA } from '@utils/ataTools'
 import { sendTransactionsV3, SequenceType } from '@utils/sendTransactions'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export interface CloseTokenAccountForm {
   governedAccount: AssetAccount | undefined
@@ -41,7 +42,7 @@ const CloseTokenAccount = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const { realm } = useRealm()
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
   const shouldBeGoverned = !!(index !== 0 && governance)
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
@@ -232,7 +233,6 @@ const CloseTokenAccount = ({
   ]
   return (
     <>
-      {form && (
       <InstructionForm
         outerForm={form}
         setForm={setForm}
@@ -240,7 +240,6 @@ const CloseTokenAccount = ({
         setFormErrors={setFormErrors}
         formErrors={formErrors}
       ></InstructionForm>
-      )}
     </>
   )
 }

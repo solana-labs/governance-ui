@@ -9,11 +9,12 @@ import {
 } from '@blockworks-foundation/mango-v4'
 import useWalletStore from 'stores/useWalletStore'
 import { useEffect, useState } from 'react'
+import useWalletOnePointOh from './useWalletOnePointOh'
 
 export default function UseMangoV4() {
   const cluster = useWalletStore((s) => s.connection).cluster
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const GROUP_NUM = 0
   const ADMIN_PK = new PublicKey('BJFYN2ZbcxRSTFGCAVkUEn4aJF99xaPFuyQj2rq5pFpo')
   const DEVNET_GROUP = new PublicKey(

@@ -1,8 +1,10 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
+
 const Index = () => {
   const router = useRouter()
   const REALM = process?.env?.REALM
+
   useEffect(() => {
     const mainUrl = `/dao/ORCA`
     router.replace(mainUrl)

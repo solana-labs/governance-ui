@@ -18,6 +18,7 @@ import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { getFriktionWithdrawInstruction } from '@utils/instructions/Friktion'
 import Select from '@components/inputs/Select'
 import { FriktionSnapshot, VoltSnapshot } from '@friktion-labs/friktion-sdk'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const FriktionWithdraw = ({
   index,
@@ -27,7 +28,7 @@ const FriktionWithdraw = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const { realmInfo } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)
