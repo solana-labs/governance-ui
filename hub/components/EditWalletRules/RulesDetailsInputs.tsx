@@ -14,6 +14,7 @@ import { FormProps } from '@hub/types/FormProps';
 
 import { SliderValue } from './SliderValue';
 import { ValueBlock } from './ValueBlock';
+import { VoteTippingSelector } from './VoteTippingSelector';
 
 type Pop = 'community' | 'council';
 interface Props
@@ -174,6 +175,63 @@ export function CanCreateProposal(props: Props) {
         onChange={(value) => {
           const newRules = produce(props.rules, (data) => {
             data.canCreateProposal = value;
+          });
+          props.onRulesChange?.(newRules);
+        }}
+      />
+    </ValueBlock>
+  );
+}
+
+export function QuorumPercent(props: Props) {
+  return (
+    <ValueBlock
+      title={`${capitalize(props.govPop)} Approval Quorum`}
+      description="The percentage of Yes votes required to pass a proposal"
+    >
+      <div className="grid grid-cols-[100px,1fr] gap-x-2 items-center">
+        <SliderValue
+          min={1}
+          max={100}
+          value={props.rules.quorumPercent}
+          units="%"
+          onChange={(value) => {
+            const newRules = produce(props.rules, (data) => {
+              data.quorumPercent = value;
+            });
+            props.onRulesChange?.(newRules);
+          }}
+        />
+        <Slider
+          min={1}
+          max={100}
+          trackColor="bg-sky-400"
+          value={props.rules.quorumPercent}
+          onChange={(value) => {
+            const newRules = produce(props.rules, (data) => {
+              data.quorumPercent = value;
+            });
+            props.onRulesChange?.(newRules);
+          }}
+          onRenderValue={(val) => `${val}%`}
+        />
+      </div>
+    </ValueBlock>
+  );
+}
+
+export function VoteTipping(props: Props) {
+  return (
+    <ValueBlock
+      title={`${capitalize(props.govPop)} Vote Tipping`}
+      description="Decide when voting should end"
+    >
+      <VoteTippingSelector
+        className="w-full"
+        value={props.rules.voteTipping}
+        onChange={(value) => {
+          const newRules = produce(props.rules, (data) => {
+            data.voteTipping = value;
           });
           props.onRulesChange?.(newRules);
         }}

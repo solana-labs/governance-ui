@@ -1,6 +1,5 @@
 import BuildingIcon from '@carbon/icons-react/lib/Building';
 import ChevronDownIcon from '@carbon/icons-react/lib/ChevronDown';
-import { produce } from 'immer';
 import { useState } from 'react';
 
 import {
@@ -9,13 +8,11 @@ import {
   CanVote,
   CanVeto,
   VetoQuorumPercent,
+  QuorumPercent,
+  VoteTipping,
 } from '../RulesDetailsInputs';
 import { SectionBlock } from '../SectionBlock';
 import { SectionHeader } from '../SectionHeader';
-import { SliderValue } from '../SliderValue';
-import { ValueBlock } from '../ValueBlock';
-import { VoteTippingSelector } from '../VoteTippingSelector';
-import { Slider } from '@hub/components/controls/Slider';
 import {
   CommunityRules,
   CouncilRules,
@@ -62,53 +59,8 @@ export function CouncilDetails(props: Props) {
         {props.currentCommunityRules.canVote && <CanVote {...inputProps} />}
         {props.councilRules.canVote && (
           <>
-            <ValueBlock
-              title="Council Approval Quorum"
-              description="The percentage of Yes votes required to pass a proposal"
-            >
-              <div className="grid grid-cols-[100px,1fr] gap-x-2 items-center">
-                <SliderValue
-                  min={1}
-                  max={100}
-                  value={props.councilRules.quorumPercent}
-                  units="%"
-                  onChange={(value) => {
-                    const newRules = produce(props.councilRules, (data) => {
-                      data.quorumPercent = value;
-                    });
-                    props.onCouncilRulesChange?.(newRules);
-                  }}
-                />
-                <Slider
-                  min={1}
-                  max={100}
-                  trackColor="bg-sky-400"
-                  value={props.councilRules.quorumPercent}
-                  onChange={(value) => {
-                    const newRules = produce(props.councilRules, (data) => {
-                      data.quorumPercent = value;
-                    });
-                    props.onCouncilRulesChange?.(newRules);
-                  }}
-                  onRenderValue={(val) => `${val}%`}
-                />
-              </div>
-            </ValueBlock>
-            <ValueBlock
-              title="Council Vote Tipping"
-              description="Decide when voting should end"
-            >
-              <VoteTippingSelector
-                className="w-full"
-                value={props.councilRules.voteTipping}
-                onChange={(value) => {
-                  const newRules = produce(props.councilRules, (data) => {
-                    data.voteTipping = value;
-                  });
-                  props.onCouncilRulesChange?.(newRules);
-                }}
-              />
-            </ValueBlock>
+            <QuorumPercent {...inputProps} />
+            <VoteTipping {...inputProps} />
           </>
         )}
         {props.currentCommunityRules.canVote && (
