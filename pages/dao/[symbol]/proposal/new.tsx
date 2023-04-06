@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, {
   createContext,
@@ -7,7 +8,11 @@ import React, {
   useState,
 } from 'react'
 import * as yup from 'yup'
-import { PlusCircleIcon, XCircleIcon } from '@heroicons/react/outline'
+import {
+  ArrowLeftIcon,
+  PlusCircleIcon,
+  XCircleIcon,
+} from '@heroicons/react/outline'
 import {
   getInstructionDataFromBase64,
   Governance,
@@ -130,11 +135,6 @@ import SelectInstructionType from '@components/SelectInstructionType'
 // import DualWithdraw from './components/instructions/Dual/DualWithdraw'
 // import DualExercise from './components/instructions/Dual/DualExercise'
 import RevokeGoverningTokens from './components/instructions/SplGov/RevokeGoverningTokens'
-import PreviousRouteBtn from '@components/PreviousRouteBtn'
-// import SetMintAuthority from './components/instructions/SetMintAuthroity'
-// import LiquidityStakingOption from './components/instructions/Dual/LiquidityStakingOption'
-// import InitStrike from './components/instructions/Dual/InitStrike'
-// import IdlSetBuffer from './components/instructions/Mango/MangoV4/IdlSetBuffer'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -595,7 +595,12 @@ const New = () => {
           }`}
       >
         <>
-          <PreviousRouteBtn></PreviousRouteBtn>
+          <Link href={fmtUrlWithCluster(`/dao/${symbol}/`)}>
+            <a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">
+              <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
+              Back
+            </a>
+          </Link>
           <div className="border-b border-fgd-4 pb-4 pt-2">
             <div className="flex items-center justify-between">
               <h1>
