@@ -7,17 +7,18 @@ import {
 import { RpcContext, TOKEN_PROGRAM_ID } from '@solana/spl-governance'
 import { sendTransaction } from 'utils/send'
 
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { LockupType } from 'VoteStakeRegistry/sdk/accounts'
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { withCreateNewDeposit } from '../sdk/withCreateNewDeposit'
 import { getPeriod } from 'VoteStakeRegistry/tools/deposits'
+import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 
 export const voteRegistryLockDeposit = async ({
   rpcContext,
   mintPk,
   realmPk,
   programId,
+  programVersion,
   amountFromVoteRegistryDeposit,
   totalTransferAmount,
   lockUpPeriodInDays,
@@ -33,6 +34,7 @@ export const voteRegistryLockDeposit = async ({
   mintPk: PublicKey
   realmPk: PublicKey
   programId: PublicKey
+  programVersion: number
   //amount that will be taken from vote registry deposit
   amountFromVoteRegistryDeposit: BN
   totalTransferAmount: BN
@@ -68,6 +70,7 @@ export const voteRegistryLockDeposit = async ({
     mintPk,
     realmPk,
     programId,
+    programVersion,
     tokenOwnerRecordPk,
     lockUpPeriodInDays,
     lockupKind,

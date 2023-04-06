@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js'
 import {
   GovernanceConfig,
   MintMaxVoteWeightSource,
+  MintMaxVoteWeightSourceType,
   Proposal,
   Realm,
   TokenOwnerRecord,
@@ -74,6 +75,7 @@ export class VoteRegistryVoterWeight implements VoterWeightInterface {
       this.communityTokenRecord && this.votingPower.cmp(minCommunityWeight) >= 0
     )
   }
+
   hasMinCouncilWeight(minCouncilWeight: BN) {
     return (
       this.councilTokenRecord &&
@@ -89,6 +91,7 @@ export class VoteRegistryVoterWeight implements VoterWeightInterface {
       this.hasMinCouncilWeight(config.minCouncilTokensToCreateProposal)
     )
   }
+
   canCreateGovernanceUsingCommunityTokens(realm: ProgramAccount<Realm>) {
     return this.hasMinCommunityWeight(
       realm.account.config.minCommunityTokensToCreateGovernance
@@ -550,7 +553,7 @@ export class SimpleGatedVoterWeight implements VoterWeightInterface {
   }
 }
 
-/// Returns max VoteWeight for given mint and max source
+/** Returns max VoteWeight for given mint and max source */
 export function getMintMaxVoteWeight(
   mint: MintInfo,
   maxVoteWeightSource: MintMaxVoteWeightSource
@@ -559,20 +562,27 @@ export function getMintMaxVoteWeight(
     return mint.supply
   }
 
-  const supplyFraction = maxVoteWeightSource.getSupplyFraction()
+  if (maxVoteWeightSource.type === MintMaxVoteWeightSourceType.SupplyFraction) {
+    const supplyFraction = maxVoteWeightSource.getSupplyFraction()
 
-  const maxVoteWeight = new BigNumber(supplyFraction.toString())
-    .multipliedBy(mint.supply.toString())
-    .shiftedBy(-MintMaxVoteWeightSource.SUPPLY_FRACTION_DECIMALS)
+    const maxVoteWeight = new BigNumber(supplyFraction.toString())
+      .multipliedBy(mint.supply.toString())
+      .shiftedBy(-MintMaxVoteWeightSource.SUPPLY_FRACTION_DECIMALS)
 
-  return new BN(maxVoteWeight.dp(0, BigNumber.ROUND_DOWN).toString())
+    return new BN(maxVoteWeight.dp(0, BigNumber.ROUND_DOWN).toString())
+  } else {
+    // absolute value
+    return maxVoteWeightSource.value
+  }
 }
 
-/// Returns max vote weight for a proposal
+/** Returns max vote weight for a proposal  */
 export function getProposalMaxVoteWeight(
   realm: Realm,
   proposal: Proposal,
-  governingTokenMint: MintInfo
+  governingTokenMint: MintInfo,
+  // For vetos we want to override the proposal.governingTokenMint
+  governingTokenMintPk?: PublicKey
 ) {
   // For finalized proposals the max is stored on the proposal in case it can change in the future
   if (proposal.isVoteFinalized() && proposal.maxVoteWeight) {
@@ -581,7 +591,7 @@ export function getProposalMaxVoteWeight(
 
   // Council votes are currently not affected by MaxVoteWeightSource
   if (
-    proposal.governingTokenMint.toBase58() ===
+    (governingTokenMintPk ?? proposal.governingTokenMint).toBase58() ===
     realm.config.councilMint?.toBase58()
   ) {
     return governingTokenMint.supply

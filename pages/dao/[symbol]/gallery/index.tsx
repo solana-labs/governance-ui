@@ -15,27 +15,42 @@ import { LinkButton } from '@components/Button'
 import SendTokens from '@components/TreasuryAccount/SendTokens'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import { MdScheduleSend } from 'react-icons/md'
 
 const gallery = () => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const connection = useWalletStore((s) => s.connection)
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const realmNfts = useTreasuryAccountStore((s) => s.allNfts)
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const isLoading = useTreasuryAccountStore((s) => s.isLoadingNfts)
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const isLoadingGovernances = useGovernanceAssetsStore(
     (s) => s.loadGovernedAccounts
   )
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const nftsPerPubkey = useTreasuryAccountStore((s) => s.governanceNfts)
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const { setCurrentAccount } = useTreasuryAccountStore()
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [currentAccount, setStateAccount] = useState<AssetAccount | null>(null)
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [nfts, setNfts] = useState<NFTWithMint[]>([])
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [openNftDepositModal, setOpenNftDepositModal] = useState(false)
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [openSendNftsModal, setOpenSendNftsModal] = useState(false)
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
+  const [selectedNft, setSelectedNft] = useState<NFTWithMint | null>(null)
   const handleCloseModal = () => {
     setOpenNftDepositModal(false)
   }
   const handleCloseSendModal = () => {
     setOpenSendNftsModal(false)
   }
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   useEffect(() => {
     if (currentAccount === null) {
       setNfts(realmNfts)
@@ -61,9 +76,12 @@ const gallery = () => {
       }
       setNfts(curretnAccountNfts)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
     realmNfts.length,
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     JSON.stringify(nftsPerPubkey),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     currentAccount?.extensions.transferAddress?.toBase58(),
   ])
   return (
@@ -79,6 +97,7 @@ const gallery = () => {
               <div className="flex ">
                 <LinkButton
                   onClick={() => {
+                    setSelectedNft(null)
                     setCurrentAccount(nftsGovernedTokenAccounts[0], connection)
                     setOpenSendNftsModal(true)
                   }}
@@ -150,23 +169,42 @@ const gallery = () => {
               </>
             ) : nfts.length ? (
               nfts.map((x, idx) => (
-                <a
-                  className="bg-bkg-4 col-span-1 flex items-center justify-center rounded-lg filter drop-shadow-xl"
+                <div
                   key={idx}
-                  href={
-                    connection.endpoint && x.mint
-                      ? getExplorerUrl(connection.cluster, x.mint)
-                      : ''
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
+                  className="relative group bg-bkg-4 col-span-1 flex items-center justify-center rounded-lg filter drop-shadow-xl"
                 >
-                  <ImgWithLoader
-                    className="bg-bkg-2 cursor-pointer default-transition h-full w-full rounded-md border border-transparent transform scale-90 hover:scale-95"
-                    src={x.val.image}
-                  />
-                </a>
+                  <a
+                    key={idx}
+                    href={
+                      connection.endpoint && x.mintAddress
+                        ? getExplorerUrl(connection.cluster, x.mintAddress)
+                        : ''
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <ImgWithLoader
+                      className="bg-bkg-2 cursor-pointer default-transition h-full w-full rounded-md border border-transparent transform scale-90 group-hover:scale-95 group-hover:opacity-50"
+                      src={x.image}
+                    />
+                  </a>
+                  <button
+                    className="hidden group-hover:block absolute w-20 h-20 items-center justify-center flex-auto text-primary-light"
+                    onClick={() => {
+                      setCurrentAccount(
+                        nftsGovernedTokenAccounts[0],
+                        connection
+                      )
+                      setSelectedNft(x)
+                      setOpenSendNftsModal(true)
+                    }}
+                  >
+                    <div className="bg-white rounded-full flex items-center justify-center h-full w-full p-2 hover:opacity-75">
+                      <MdScheduleSend className="h-full w-full p-3" />
+                    </div>
+                  </button>
+                </div>
               ))
             ) : (
               <div className="col-span-4 text-fgd-3 flex flex-col items-center">
@@ -191,7 +229,7 @@ const gallery = () => {
           onClose={handleCloseSendModal}
           isOpen={openSendNftsModal}
         >
-          <SendTokens isNft></SendTokens>
+          <SendTokens isNft selectedNft={selectedNft}></SendTokens>
         </Modal>
       )}
     </div>

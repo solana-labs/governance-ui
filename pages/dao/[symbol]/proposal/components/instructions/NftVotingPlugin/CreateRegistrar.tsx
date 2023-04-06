@@ -9,14 +9,14 @@ import {
 import { validateInstruction } from '@utils/instructionTools'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
-import useWalletStore from 'stores/useWalletStore'
 import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NewProposalContext } from '../../../new'
 import InstructionForm, { InstructionInputType } from '../FormCreator'
-import { getNftRegistrarPDA } from 'NftVotePlugin/sdk/accounts'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import { getRegistrarPDA } from '@utils/plugin/accounts'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface CreateNftRegistrarForm {
   governedAccount: AssetAccount | undefined
@@ -33,8 +33,8 @@ const CreateNftPluginRegistrar = ({
   const { realm, realmInfo } = useRealm()
   const nftClient = useVotePluginsClientStore((s) => s.state.nftClient)
   const { assetAccounts } = useGovernanceAssets()
-  const wallet = useWalletStore((s) => s.current)
-  const shouldBeGoverned = index !== 0 && governance
+  const wallet = useWalletOnePointOh()
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<CreateNftRegistrarForm>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -46,7 +46,7 @@ const CreateNftPluginRegistrar = ({
       form!.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const { registrar } = await getNftRegistrarPDA(
+      const { registrar } = await getRegistrarPDA(
         realm!.pubkey,
         realm!.account.communityMint,
         nftClient!.program.programId
@@ -79,6 +79,7 @@ const CreateNftPluginRegistrar = ({
       { governedAccount: form?.governedAccount?.governance, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
   const schema = yup.object().shape({
     governedAccount: yup
@@ -88,7 +89,7 @@ const CreateNftPluginRegistrar = ({
   })
   const inputs = [
     {
-      label: 'Governance',
+      label: 'Wallet',
       initialValue: null,
       name: 'governedAccount',
       type: InstructionInputType.GOVERNED_ACCOUNT,

@@ -1,13 +1,18 @@
-import { getRealms, PROGRAM_VERSION_V1, Realm } from '@solana/spl-governance'
+import {
+  PROGRAM_VERSION_V1,
+  getRealms,
+  ProgramAccount,
+  Realm,
+} from '@solana/spl-governance'
 
-import { ProgramAccount } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
-import { arrayToMap, arrayToUnique } from '@tools/core/script'
+import { arrayToMap } from '@tools/core/script'
 
 import devnetRealms from 'public/realms/devnet.json'
 import mainnetBetaRealms from 'public/realms/mainnet-beta.json'
 import type { ConnectionContext } from 'utils/connection'
 import { equalsIgnoreCase } from '../../tools/core/strings'
+import { getAllSplGovernanceProgramIds } from 'pages/api/tools/realms'
 
 export interface RealmInfo {
   symbol: string
@@ -39,6 +44,8 @@ export interface RealmInfo {
   // The default shared wallet of the DAO displayed on the home page
   // It's used for crowdfunding DAOs like  Ukraine.SOL or #Unchain_Ukraine
   sharedWalletId?: PublicKey
+
+  communityMint?: PublicKey
 }
 
 export function getProgramVersionForRealm(realmInfo: RealmInfo) {
@@ -49,12 +56,13 @@ export function getProgramVersionForRealm(realmInfo: RealmInfo) {
 interface RealmInfoAsJSON
   extends Omit<
     RealmInfo,
-    'programId' | 'realmId' | 'isCertified' | 'sharedWalletId'
+    'programId' | 'realmId' | 'isCertified' | 'sharedWalletId' | 'communityMint'
   > {
   enableNotifi?: boolean
   programId: string
   realmId: string
   sharedWalletId?: string
+  communityMint?: string
 }
 
 // TODO: Once governance program clones registry program and governance
@@ -71,6 +79,7 @@ function parseCertifiedRealms(realms: RealmInfoAsJSON[]) {
     isCertified: true,
     programVersion: realm.programVersion,
     enableNotifi: realm.enableNotifi ?? true, // enable by default
+    communityMint: realm.communityMint && new PublicKey(realm.communityMint),
   })) as ReadonlyArray<RealmInfo>
 }
 
@@ -78,7 +87,7 @@ function parseCertifiedRealms(realms: RealmInfoAsJSON[]) {
 // Note: the certification process is currently done through PRs to this repo
 // This is a temp. workaround until we have the registry up and running
 export function getCertifiedRealmInfos({ cluster }: ConnectionContext) {
-  return cluster === 'mainnet' ? MAINNET_REALMS : DEVNET_REALMS
+  return cluster === 'devnet' ? DEVNET_REALMS : MAINNET_REALMS
 }
 
 export function getCertifiedRealmInfo(
@@ -105,7 +114,7 @@ export function getCertifiedRealmInfo(
 // If they keep getting added we might want to use some pattern to exclude them
 
 // Other excluded ones are know test DAOs like Test 'Grape Test' for example
-
+//hidden realms
 const EXCLUDED_REALMS = new Map<string, string>([
   ['HtV3PXqDhuPoCTDfYhaWxrs5e7oYk96zYpiWSrWCj6FC', ''],
   ['3mBJhp6w7Sqi6JhbnNvV6yi3RHDveUGsmzeyWprBFBWB', ''],
@@ -156,46 +165,67 @@ const EXCLUDED_REALMS = new Map<string, string>([
   ['DkSvNgykZPPFczhJVh8HDkhz25ByrDoPcB32q75AYu9k', ''], // UXDProtocolDAO test
   ['CvAD2XnHuJCzTyqRRHZtqRigVw11i9CDH8ACRGQpxhuf', ''], // Savana Sins Club
   ['AxuK6ZGEQS2vrLXwJeK5pZFBAAPamEUyQXptfEEnCHuD', ''],
+  ['24pZ9VkpRGTH6wHqjSsySYHpxAKbQL1Tczb6b7zytomZ', ''],
+  ['2HpvQJNTXgso4HWTXamiRAXshRyGu4ZhJ5esDT3tHPUV', ''], // Epics DAO (Dead because of loosing vote power)
+  ['Hd7hrf1fyZN5ZkuCerpfXs4UCAgoHELyiscE4utaKhSx', ''],
+  ['9K6P7vbAPqZ8hHsDbShLZat9bFdWzA52QAgJThGeWui5', ''], // BonkDAO (council only)
+  ['C556EiXyMWU62Ed7rrGipZrRHWnUm3hPvufUzcdXsj2V', ''], //Mango security council duplicate
+  ['HnLuYmBxDxK1MCihHJVFnNudUTpLPc2km6xNcRQ8KPdj', ''], // df test
 ])
 
 // Returns all known realms from all known spl-gov instances which are not certified
 export async function getUnchartedRealmInfos(connection: ConnectionContext) {
   const certifiedRealms = getCertifiedRealmInfos(connection)
 
-  const allRealms = (
-    await Promise.all(
-      // Assuming all the known spl-gov instances are already included in the certified realms list
-      arrayToUnique(certifiedRealms, (r) => r.programId.toBase58()).map((p) => {
-        return getRealms(connection.current, p.programId)
-      })
+  const allProgramIds = getAllSplGovernanceProgramIds()
+  let allRealms: ProgramAccount<Realm>[] = []
+
+  for (const programId of allProgramIds) {
+    const allProgramRealms = await getRealms(
+      connection.current,
+      new PublicKey(programId)
     )
+
+    allRealms = allRealms.concat(allProgramRealms)
+  }
+
+  const sortedRealms = allRealms.sort((r1, r2) =>
+    r1.account.name.localeCompare(r2.account.name)
   )
-    .flatMap((r) => Object.values(r))
-    .sort((r1, r2) => r1.account.name.localeCompare(r2.account.name))
 
   const excludedRealms = arrayToMap(certifiedRealms, (r) =>
     r.realmId.toBase58()
   )
 
-  return Object.values(allRealms)
+  return Object.values(sortedRealms)
     .map((r) => {
       return !(
         excludedRealms.has(r.pubkey.toBase58()) ||
         EXCLUDED_REALMS.has(r.pubkey.toBase58())
       )
-        ? createUnchartedRealmInfo(r)
+        ? createUnchartedRealmInfo({
+            name: r.account.name,
+            programId: r.owner.toBase58(),
+            address: r.pubkey.toBase58(),
+          })
         : undefined
     })
     .filter(Boolean) as readonly RealmInfo[]
 }
 
-export function createUnchartedRealmInfo(realm: ProgramAccount<Realm>) {
+export function createUnchartedRealmInfo(realm: UnchartedRealm) {
   return {
-    symbol: realm.account.name,
-    programId: new PublicKey(realm.owner),
-    realmId: realm.pubkey,
-    displayName: realm.account.name,
+    symbol: realm.name,
+    programId: new PublicKey(realm.programId),
+    realmId: new PublicKey(realm.address),
+    displayName: realm.name,
     isCertified: false,
     enableNotifi: true, // enable by default
   } as RealmInfo
+}
+
+type UnchartedRealm = {
+  name: string
+  programId: string
+  address: string
 }

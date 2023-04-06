@@ -1,4 +1,4 @@
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
 import { TokenProgramAccount } from '@utils/tokens'
@@ -10,7 +10,7 @@ export interface Voter {
   //there are more fields but no use for them on ui yet
 }
 
-export interface votingMint {
+export interface VotingMint {
   baselineVoteWeightScaledFactor: BN
   digitShift: number
   grantAuthority: PublicKey
@@ -19,13 +19,13 @@ export interface votingMint {
   mint: PublicKey
 }
 
-export type LockupType = 'none' | 'monthly' | 'cliff' | 'constant' | 'daily' //there is also daily type but not used on ui yet
+export type LockupType = 'none' | 'monthly' | 'cliff' | 'constant' | 'daily'
 export interface Registrar {
   governanceProgramId: PublicKey
   realm: PublicKey
   realmAuthority: PublicKey
   realmGoverningTokenMint: PublicKey
-  votingMints: votingMint[]
+  votingMints: VotingMint[]
   //there are more fields but no use for them on ui yet
 }
 interface LockupKind {
@@ -35,11 +35,13 @@ interface LockupKind {
   cliff: object
   constant: object
 }
-interface Lockup {
+
+export interface Lockup {
   endTs: BN
   kind: LockupKind
   startTs: BN
 }
+
 export interface Deposit {
   allowClawback: boolean
   amountDepositedNative: BN

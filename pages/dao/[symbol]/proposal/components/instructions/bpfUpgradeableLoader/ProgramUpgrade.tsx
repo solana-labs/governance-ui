@@ -22,6 +22,7 @@ import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { validateInstruction } from '@utils/instructionTools'
 import ProgramUpgradeInfo from './ProgramUpgradeInfo'
 import { AccountType } from '@utils/uiTypes/assets'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const ProgramUpgrade = ({
   index,
@@ -31,13 +32,13 @@ const ProgramUpgrade = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
     (x) => x.type === AccountType.PROGRAM
   )
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<ProgramUpgradeForm>({
     governedAccount: undefined,
@@ -84,6 +85,7 @@ const ProgramUpgrade = ({
       propertyName: programUpgradeFormNameOf('programId'),
       value: programId?.toString(),
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [realmInfo?.programId])
 
   useEffect(() => {
@@ -91,6 +93,7 @@ const ProgramUpgrade = ({
       propertyName: programUpgradeFormNameOf('bufferSpillAddress'),
       value: wallet?.publicKey?.toBase58(),
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [wallet?.publicKey?.toBase58()])
 
   useEffect(() => {
@@ -100,6 +103,7 @@ const ProgramUpgrade = ({
         setFormErrors(validationErrors)
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.bufferAddress])
 
   useEffect(() => {
@@ -107,6 +111,7 @@ const ProgramUpgrade = ({
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
 
   const schema = yup.object().shape({

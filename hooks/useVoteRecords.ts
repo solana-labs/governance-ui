@@ -7,12 +7,19 @@ import {
   VoteRecord,
   TokenOwnerRecord,
   RpcContext,
+  VoteKind,
 } from '@solana/spl-governance'
 
 import useRpcContext from '@hooks/useRpcContext'
 import { getVoteRecords, getTokenOwnerRecords } from '@models/proposal'
 import useRealm from '@hooks/useRealm'
 import { buildTopVoters, VoteType } from '@models/proposal'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import { getLockTokensVotingPowerPerWallet } from 'VoteStakeRegistry/tools/deposits'
+import { BN } from '@coral-xyz/anchor'
+import useWalletStore from 'stores/useWalletStore'
+import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
+import { PublicKey } from '@solana/web3.js'
 
 export { VoteType }
 
@@ -24,12 +31,23 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
   const [tokenOwnerRecords, setTokenOwnerRecords] = useState<
     ProgramAccount<TokenOwnerRecord>[]
   >([])
-  const [context, setContext] = useState<RpcContext | null>(null)
-  const { mint, realm } = useRealm()
+  const { mint, realm, vsrMode } = useRealm()
 
-  const governingTokenMintPk = proposal?.account.isVoteFinalized()
-    ? undefined
-    : proposal?.account.governingTokenMint
+  //for vsr
+  const [
+    undecidedDepositByVoteRecord,
+    setUndecidedDepositByVoteRecord,
+  ] = useState<{ [walletPk: string]: BN }>({})
+  const assetAccounts = useGovernanceAssetsStore((s) => s.assetAccounts)
+  const mintsUsedInRealm = assetAccounts
+    .filter((x) => x.isToken)
+    .map((x) => x.extensions.mint!)
+  ///
+
+  const [context, setContext] = useState<RpcContext | null>(null)
+  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
+  const connection = useWalletStore((s) => s.connection)
+  const governingTokenMintPk = proposal?.account.governingTokenMint
 
   useEffect(() => {
     if (context && proposal && realm) {
@@ -70,8 +88,8 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
     if (realm) {
       setContext(getRpcContext())
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [realm])
-
   const topVoters = useMemo(() => {
     if (realm && proposal && mint) {
       return buildTopVoters(
@@ -79,12 +97,61 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
         tokenOwnerRecords,
         realm,
         proposal,
-        mint
+        mint,
+        undecidedDepositByVoteRecord
       )
     }
 
     return []
-  }, [voteRecords, tokenOwnerRecords, realm, proposal, mint])
+  }, [
+    voteRecords,
+    tokenOwnerRecords,
+    realm,
+    proposal,
+    mint,
+    undecidedDepositByVoteRecord,
+  ])
+
+  //VSR only
+  const handleGetVsrVotingPowers = async (walletsPks: PublicKey[]) => {
+    const votingPerWallet = await getLockTokensVotingPowerPerWallet(
+      walletsPks,
+      realm!,
+      client!,
+      connection,
+      mintsUsedInRealm
+    )
+    setUndecidedDepositByVoteRecord(votingPerWallet)
+  }
+  useEffect(() => {
+    if (
+      vsrMode === 'default' &&
+      !Object.keys(undecidedDepositByVoteRecord).length
+    ) {
+      const undecidedData = tokenOwnerRecords.filter(
+        (tokenOwnerRecord) =>
+          !voteRecords
+            .filter((x) => x.account.vote?.voteType !== VoteKind.Veto)
+            .some(
+              (voteRecord) =>
+                voteRecord.account.governingTokenOwner.toBase58() ===
+                tokenOwnerRecord.account.governingTokenOwner.toBase58()
+            )
+      )
+      if (undecidedData.length && mintsUsedInRealm.length) {
+        handleGetVsrVotingPowers(
+          undecidedData.map((x) => x.account.governingTokenOwner)
+        )
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+  }, [
+    tokenOwnerRecords.length,
+    voteRecords.length,
+    vsrMode,
+    mintsUsedInRealm.length,
+  ])
+  ///////
 
   return topVoters
 }

@@ -24,31 +24,109 @@ import YesVotePercentageForm, {
   CouncilYesVotePercentage,
 } from '@components/NewRealmWizard/components/steps/YesVotePercentageThresholdForm'
 import FormPage from '@components/NewRealmWizard/PageTemplate'
+import {
+  GoverningTokenConfigAccountArgs,
+  GoverningTokenType,
+} from '@solana/spl-governance'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export const FORM_NAME = 'multisig'
 
-type MultisigForm = BasicDetails & InviteMembers & CouncilYesVotePercentage
+type MultisigForm = BasicDetails &
+  InviteMembers &
+  CouncilYesVotePercentage & { _programVersion: 2 | 3 }
+
+const transformMultisigForm2RealmCreation = ({ ...formData }: MultisigForm) => {
+  const programIdAddress = formData?.programId || DEFAULT_GOVERNANCE_PROGRAM_ID
+
+  const sharedParams = {
+    programIdAddress,
+
+    realmName: formData.name,
+    tokensToGovernThreshold: undefined,
+
+    existingCommunityMintPk: undefined,
+    transferCommunityMintAuthority: true,
+    communityYesVotePercentage: 'disabled',
+
+    // (useSupplyFactor = true && communityMintSupplyFactor = undefined) => FULL_SUPPLY_FRACTION
+    useSupplyFactor: true,
+    communityMintSupplyFactor: undefined,
+    communityAbsoluteMaxVoteWeight: undefined,
+
+    createCouncil: true,
+    existingCouncilMintPk: undefined,
+    transferCouncilMintAuthority: true,
+    councilWalletPks: formData.memberAddresses.map((w) => new PublicKey(w)),
+  }
+  const discriminatedParams =
+    formData._programVersion === 3
+      ? ({
+          _programVersion: 3,
+          communityYesVotePercentage: 'disabled',
+          councilYesVotePercentage: formData.councilYesVotePercentage,
+          councilTokenConfig: new GoverningTokenConfigAccountArgs({
+            tokenType: GoverningTokenType.Membership,
+            voterWeightAddin: undefined,
+            maxVoterWeightAddin: undefined,
+          }),
+          communityTokenConfig: new GoverningTokenConfigAccountArgs({
+            tokenType: GoverningTokenType.Dormant,
+            voterWeightAddin: undefined,
+            maxVoterWeightAddin: undefined,
+          }),
+        } as const)
+      : ({
+          _programVersion: 2,
+          communityYesVotePercentage: formData.councilYesVotePercentage,
+          communityTokenConfig: new GoverningTokenConfigAccountArgs({
+            tokenType: GoverningTokenType.Liquid,
+            voterWeightAddin: undefined,
+            maxVoterWeightAddin: undefined,
+          }),
+        } as const)
+
+  return {
+    ...sharedParams,
+    ...discriminatedParams,
+  }
+}
 
 export default function MultiSigWizard() {
-  const { connected, connection, current: wallet } = useWalletStore((s) => s)
+  const connection = useWalletStore((s) => s.connection)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const { push } = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
   const [requestPending, setRequestPending] = useState(false)
 
   const steps = [
-    { Form: BasicDetailsForm, schema: BasicDetailsSchema, required: 'true' },
-    { Form: InviteMembersForm, schema: InviteMembersSchema, required: 'true' },
+    {
+      Form: BasicDetailsForm,
+      schema: BasicDetailsSchema,
+      required: () => true,
+    },
+    {
+      Form: InviteMembersForm,
+      schema: InviteMembersSchema,
+      required: () => true,
+    },
     {
       Form: YesVotePercentageForm,
       schema: CouncilYesVotePercentageSchema,
-      required: 'true',
+      required: () => true,
       forCouncil: true,
+      title: `Next, set your wallet's approval threshold.`,
     },
   ]
 
   async function handleSubmit(formData: MultisigForm) {
     console.log('submit clicked')
     setRequestPending(true)
+
+    if (formData._programVersion !== 3 && formData._programVersion !== 2)
+      throw new Error('Could not verify version of supplied programId')
+
     try {
       console.log('connection', connected, wallet)
       if (!connected) {
@@ -58,17 +136,10 @@ export default function MultiSigWizard() {
         throw new Error('No valid wallet connected')
       }
 
-      const programIdAddress =
-        formData?.programId || DEFAULT_GOVERNANCE_PROGRAM_ID
-
       const results = await createMultisigWallet({
         wallet,
         connection: connection.current,
-        programIdAddress,
-
-        realmName: formData.name,
-        councilYesVotePercentage: formData.councilYesVotePercentage,
-        councilWalletPks: formData.memberAddresses.map((w) => new PublicKey(w)),
+        ...transformMultisigForm2RealmCreation(formData),
       })
 
       if (results) {

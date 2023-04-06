@@ -21,6 +21,7 @@ import { DisplayAddress } from '@cardinal/namespaces-components'
 import { tryParseKey } from 'tools/validators/pubkey'
 import { XCircleIcon } from '@heroicons/react/outline'
 import Tooltip from './Tooltip'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const DelegateCard = () => {
   const {
@@ -31,7 +32,7 @@ const DelegateCard = () => {
     ownCouncilTokenRecord,
   } = useRealm()
   const [isLoading, setLoading] = useState<boolean>(false)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection.current)
   const { fetchRealm } = useWalletStore((s) => s.actions)
 
@@ -282,7 +283,7 @@ const DelegateCard = () => {
       ) : (
         <div className="text-sm text-th-fgd-1 flex flex-row items-center justify-between mt-4">
           {wallet && wallet.publicKey
-            ? 'Gain a governance token for this realm to delegate'
+            ? 'Gain a governance token for this dao to delegate'
             : 'Connect wallet to delegate'}
         </div>
       )}

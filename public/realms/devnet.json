@@ -1,4 +1,5 @@
 [
+   
   {
     "symbol": "UNQ",
     "displayName": "UNQ Universe",
@@ -16,6 +17,21 @@
     "twitter": "@mangomarkets",
     "ogImage": "https://trade.mango.markets/assets/icons/logo.svg",
     "notificationsEnabled": true
+  },
+  {
+    "symbol": "SERUM",
+    "displayName": "SerumDAO - Devnet",
+    "programId": "G41fmJzd29v7Qmdi8ZyTBBYa98ghh3cwHBTexqCG1PQJ",
+    "communityMint": "CEdTnJ9Yr2G3zWt8J1hA2XbAAgSPVvxtuE9g44sjtecs",
+    "realmId": "8rTohXsU2L3xaf3KeHiS55DNninzCjDZT8zkpwikHSQt",
+    "ogImage": "https://assets.website-files.com/61284dcff241c2f0729af9f3/61285237ce2e301255d09108_logo-serum.png"
+  },
+  {
+    "symbol": "DAO2DAO",
+    "displayName": "DAO-to-DAO",
+    "programId": "GTesTBiEWE32WHXXE2S4XbZvA5CrEc4xs6ZgRe895dP",
+    "realmId": "3SXQuce59HJMy1udz9UaQJKjWrRw2s6q2rEK1S9Ep7cv",
+    "ogImage": "https://assets.website-files.com/61284dcff241c2f0729af9f3/61285237ce2e301255d09108_logo-serum.png"
   },
   {
     "symbol": "SOCEAN",
@@ -164,9 +180,9 @@
   },
   {
     "symbol": "PYTH",
-    "displayName": "Pyth DAO",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "44xGQELUXXD1TiLEMc73RBnCxeW8XKw27LyJNpt2G8bF",
+    "displayName": "Pyth Network",
+    "programId": "GovFUVGZWWwyoLq8rhnoVWknRFkhDSbQiSoREJ5LiZCV",
+    "realmId": "A1f6LNEymJSSJsEVCL1FSgtS1jA9dNTC4ni8SkmbwQjG",
     "ogImage": "/realms/PYTH/img/pyth.svg",
     "website": "https://pyth.network/",
     "twitter": "@PythNetwork"
@@ -178,5 +194,59 @@
     "realmId": "Bi65vLgphakAdFTZj6pUWweNaYaviPtSDf5VJ3WD6YL",
     "ogImage": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/AXY11ExJToaGPKp7BmGjkzitfs1ta7cmjJn58Pn2t3Z1/logo.jpg",
     "website": "https://axy.network/"
+  },
+  {
+    "symbol": "YMDAO",
+    "displayName": "Yellow Man DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "8PdjmsN5qvSnJtJ7bTQbGkZtuHmSBeQ6ESnrHdUx3bZ",
+    "website": "https://yellowman.vercel.app/",
+    "keywords": "YELLOW MAN",
+    "ogImage": "/realms/YMDAO/img/ymdaologo.png"
+  },
+  {
+    "symbol": "MEAN",
+    "displayName": "MEAN DAO",
+    "programId": "MGovW65tDhMMcpEmsegpsdgvzb6zUwGsNjhXFxRAnjd",
+    "realmId": "GkR6JMPU1b2bFj7j9Db8VAmQdisCCqoTQFfzWi2siwcB",
+    "website": "https://www.meanfi.com",
+    "twitter": "@meanfinance",
+    "ogImage": "/realms/MEAN/logo.svg"
+  },
+  {
+    "symbol": "SOLDC",
+    "displayName": "SOLANA DOTA CLUB",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "5aNk7Zig6p3GwQgP4XnxGFg6DgC3jzmM9FURwabjnGTa",
+    "website": "https://soldc.us",
+    "twitter": "https://twitter.com/deniz_safak",
+    "ogImage": "/realms/SOLDCDAO/img/NEWSOLDCDAO.png"
+  },
+  {
+    "symbol": "HNT",
+    "displayName": "Helium DAO",
+    "programId": "hgovkRU6Ghe1Qoyb54HdSLdqN7VtxaifBzRmh9jtd3S",
+    "realmId": "2VfPJn8ML1hNBnsEBo7SzmG11UJc7gbY8b23A3K8expd",
+    "website": "https://helium.com",
+    "twitter": "@Helium",
+    "ogImage": "/realms/Helium/img/logo.svg"
+  },
+  {
+    "symbol": "IOT",
+    "displayName": "Helium IOT DAO",
+    "programId": "hgovkRU6Ghe1Qoyb54HdSLdqN7VtxaifBzRmh9jtd3S",
+    "realmId": "8UQNtD5Zw8ijB7ZpGiPLodKXMxtVyQmtu1AEztd3p6Po",
+    "website": "https://helium.com",
+    "twitter": "@Helium",
+    "ogImage": "/realms/Helium/img/iotlogo.png"
+  },
+  {
+    "symbol": "MOBILE",
+    "displayName": "Helium MOBILE DAO",
+    "programId": "hgovkRU6Ghe1Qoyb54HdSLdqN7VtxaifBzRmh9jtd3S",
+    "realmId": "8itzNAn1kMZ5sf18dVd8gGykztWZLVT93Svbdt7Gn2NP",
+    "website": "https://helium.com",
+    "twitter": "@Helium",
+    "ogImage": "/realms/Helium/img/mobilelogo.png"
   }
 ]

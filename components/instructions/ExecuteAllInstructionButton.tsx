@@ -16,6 +16,10 @@ import { getProgramVersionForRealm } from '@models/registry/api'
 import { executeInstructions } from 'actions/executeInstructions'
 import useWalletStore from 'stores/useWalletStore'
 import { notify } from '@utils/notifications'
+import useProgramVersion from '@hooks/useProgramVersion'
+import { abbreviateAddress } from '@utils/formatting'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export enum PlayState {
   Played,
@@ -24,22 +28,80 @@ export enum PlayState {
   Error,
 }
 
+const useSignersNeeded = (
+  proposalInstructions: ProgramAccount<ProposalTransaction>[],
+  proposal: ProgramAccount<Proposal>
+) => {
+  const { realm } = useRealm()
+  const programVersion = useProgramVersion()
+  const { governancesArray, assetAccounts } = useGovernanceAssets()
+  const [signersNeeded, setSignersNeeded] = useState<PublicKey[]>()
+
+  useEffect(() => {
+    const handleGetSigners = async () => {
+      if (realm?.owner === undefined) return undefined
+      const pksToFilterOut = [
+        ...governancesArray.map((x) => x.pubkey),
+        ...assetAccounts
+          .filter((x) => x.isSol)
+          .map((x) => x.extensions.transferAddress),
+      ]
+      const propInstructions = Object.values(proposalInstructions) || []
+
+      //we need to remmove governances and sol wallets from singers
+      const signers = propInstructions
+        .map((x) => x.account.instructions.flatMap((inst) => inst.accounts))
+        .filter((x) => x)
+        .flatMap((x) => x)
+        .filter(
+          (x) =>
+            !pksToFilterOut.find((filteredOutPk) =>
+              filteredOutPk?.equals(x.pubkey)
+            )
+        )
+        .filter((x) => x.isSigner)
+        .map((x) => x.pubkey)
+
+      setSignersNeeded(signers)
+    }
+    handleGetSigners()
+  }, [
+    programVersion,
+    proposal.account.governance,
+    proposal.pubkey,
+    proposalInstructions,
+    governancesArray.length,
+    assetAccounts.length,
+    realm?.owner,
+  ])
+
+  return signersNeeded
+}
+
 export function ExecuteAllInstructionButton({
+  className,
   proposal,
   playing,
   setPlaying,
   proposalInstructions,
+  small,
+  multiTransactionMode = false,
+  label = 'Execute',
 }: {
+  className?: string
   proposal: ProgramAccount<Proposal>
   proposalInstructions: ProgramAccount<ProposalTransaction>[]
   playing: PlayState
   setPlaying: React.Dispatch<React.SetStateAction<PlayState>>
+  small?: boolean
+  multiTransactionMode?: boolean
+  label?: string
 }) {
   const { realmInfo } = useRealm()
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
   const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
-  const connected = useWalletStore((s) => s.connected)
+  const connected = !!wallet?.connected
 
   const [currentSlot, setCurrentSlot] = useState(0)
 
@@ -68,13 +130,28 @@ export function ExecuteAllInstructionButton({
         clearTimeout(timer)
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [isPassedExecutionSlot, rpcContext.connection, currentSlot])
+
+  const signersNeeded = useSignersNeeded(proposalInstructions, proposal)
+
+  const otherSignerNeeded =
+    signersNeeded === undefined
+      ? undefined
+      : signersNeeded.filter(
+          (x) => !wallet?.publicKey || !x.equals(wallet?.publicKey)
+        ).length > 0
 
   const onExecuteInstructions = async () => {
     setPlaying(PlayState.Playing)
 
     try {
-      await executeInstructions(rpcContext, proposal, proposalInstructions)
+      await executeInstructions(
+        rpcContext,
+        proposal,
+        proposalInstructions,
+        multiTransactionMode
+      )
       await refetchProposals()
     } catch (error) {
       notify({ type: 'error', message: `error executing instruction ${error}` })
@@ -109,8 +186,23 @@ export function ExecuteAllInstructionButton({
     )
   ) {
     return (
-      <Button small disabled={!connected} onClick={onExecuteInstructions}>
-        Execute All
+      <Button
+        className={className}
+        small={small ?? true}
+        disabled={!connected || otherSignerNeeded}
+        onClick={onExecuteInstructions}
+        tooltipMessage={
+          otherSignerNeeded && signersNeeded !== undefined
+            ? `This proposal must be executed by ${abbreviateAddress(
+                signersNeeded[0]
+              )}`
+            : undefined
+        }
+      >
+        {label}
+        {proposalInstructions.length > 1
+          ? ` (${proposalInstructions.length})`
+          : ''}
       </Button>
     )
   }

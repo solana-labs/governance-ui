@@ -22,6 +22,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getGoblinGoldWithdrawInstruction } from '@utils/instructions/GoblinGold'
 import { StrategyVault } from 'goblingold-sdk'
 import { getGoblinGoldWithdrawSchema } from '@utils/validations'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const GoblinGoldWithdraw = ({
   index,
@@ -31,10 +32,10 @@ const GoblinGoldWithdraw = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const { realmInfo } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
 
   const [form, setForm] = useState<GoblinGoldWithdrawForm>({
@@ -116,6 +117,7 @@ const GoblinGoldWithdraw = ({
       propertyName: 'programId',
       value: programId?.toString(),
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [programId])
 
   useEffect(() => {
@@ -123,11 +125,13 @@ const GoblinGoldWithdraw = ({
       { governedAccount: governedAccount, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
 
   useEffect(() => {
     setGovernedAccount(form.governedTokenAccount?.governance)
     setMintInfo(form.governedTokenAccount?.extensions.mint?.account)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.governedTokenAccount])
 
   const schema = getGoblinGoldWithdrawSchema()
@@ -144,6 +148,7 @@ const GoblinGoldWithdraw = ({
         error={formErrors['governedTokenAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
+        type="token"
       />
 
       <Select

@@ -1,30 +1,32 @@
+import React from 'react'
 import useRealm from '@hooks/useRealm'
-import { vsrPluginsPks } from '@hooks/useVotingPlugins'
 import { useRouter } from 'next/router'
-import Account from 'VoteStakeRegistry/components/Account/Account'
+import { default as VoteStakeRegistryAccount } from 'VoteStakeRegistry/components/Account/Account'
 import LockTokensAccount from 'VoteStakeRegistry/components/Account/LockTokensAccount'
+import { LockTokensAccount as HeliumLockTokensAccount } from 'HeliumVotePlugin/components/LockTokensAccount'
 
-const account = () => {
+const Account: React.FC = () => {
   const router = useRouter()
-  const { config } = useRealm()
+  const { vsrMode } = useRealm()
   const tokenOwnerRecordPk = router?.query?.tokenOwnerRecordPk
-  const isLockTokensMode =
-    config?.account.communityVoterWeightAddin &&
-    vsrPluginsPks.includes(
-      config?.account.communityVoterWeightAddin?.toBase58()
-    )
 
-  const getAccountView = () => {
-    if (isLockTokensMode) {
+  if (vsrMode) {
+    if (vsrMode === 'helium') {
       return (
-        <LockTokensAccount
-          tokenOwnerRecordPk={tokenOwnerRecordPk}
-        ></LockTokensAccount>
+        <HeliumLockTokensAccount tokenOwnerRecordPk={tokenOwnerRecordPk}>
+          <VoteStakeRegistryAccount withHeader={false} displayPanel={false} />
+        </HeliumLockTokensAccount>
       )
     }
-    return <Account></Account>
+
+    return (
+      <LockTokensAccount tokenOwnerRecordPk={tokenOwnerRecordPk}>
+        <VoteStakeRegistryAccount withHeader={false} displayPanel={false} />
+      </LockTokensAccount>
+    )
   }
-  return getAccountView()
+
+  return <VoteStakeRegistryAccount />
 }
 
-export default account
+export default Account

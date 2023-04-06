@@ -1,12 +1,13 @@
 import VoteResultsBar from './VoteResultsBar'
-import useProposalVotes from '@hooks/useProposalVotes'
 import { Proposal } from '@solana/spl-governance'
+import useProposalVotes from '@hooks/useProposalVotes'
 
 type VoteResultsProps = {
   isListView?: boolean
   proposal: Proposal
 }
 
+// TODO make component display well when data is loading
 const VoteResults = ({ isListView, proposal }: VoteResultsProps) => {
   const {
     yesVoteCount,
@@ -14,6 +15,7 @@ const VoteResults = ({ isListView, proposal }: VoteResultsProps) => {
     relativeNoVotes,
     relativeYesVotes,
   } = useProposalVotes(proposal)
+
   return (
     <div className="flex items-center space-x-4">
       {proposal ? (
@@ -28,7 +30,7 @@ const VoteResults = ({ isListView, proposal }: VoteResultsProps) => {
                   !isListView ? 'hero-text' : ''
                 }`}
               >
-                {yesVoteCount.toLocaleString()}
+                {(yesVoteCount ?? 0).toLocaleString()}
                 {isListView ? (
                   <span className="ml-1 text-xs font-normal text-fgd-3">
                     {relativeYesVotes?.toFixed(1)}%
@@ -48,7 +50,7 @@ const VoteResults = ({ isListView, proposal }: VoteResultsProps) => {
                   !isListView ? 'hero-text' : ''
                 }`}
               >
-                {noVoteCount.toLocaleString()}
+                {(noVoteCount ?? 0).toLocaleString()}
                 {isListView ? (
                   <span className="ml-1 text-xs font-normal text-fgd-3">
                     {relativeNoVotes?.toFixed(1)}%

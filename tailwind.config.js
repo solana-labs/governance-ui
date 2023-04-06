@@ -1,9 +1,14 @@
+const lineClamp = require('@tailwindcss/line-clamp')
+
 module.exports = {
+  darkMode: 'class',
   content: [
     './pages/**/*.{js,ts,jsx,tsx}',
     './components/**/*.{js,ts,jsx,tsx}',
     './Strategies/**/*.{js,ts,jsx,tsx}',
     './VoteStakeRegistry/**/*.{js,ts,jsx,tsx}',
+    './hub/**/*.{js,ts,jsx,tsx}',
+    './verify-wallet/**/*.{js,ts,jsx,tsx}',
   ],
   future: {
     removeDeprecatedGapUtilities: true,
@@ -21,6 +26,7 @@ module.exports = {
         help: 'help',
       },
       colors: {
+        discord: '#7289da',
         'dark-theme': {
           primary: { light: '#5DC9EB', dark: '#cecece' },
           'secondary-1': { light: '#AFD803', dark: '#6CBF00' },
@@ -38,6 +44,7 @@ module.exports = {
           red: '#FF7C7C',
           green: '#30C89A',
           blue: '#00e4ff',
+          discord: '#7289da',
         },
         'light-theme': {
           primary: { light: '#5DC9EB', dark: '#101010' },
@@ -55,6 +62,7 @@ module.exports = {
           red: '#cb676f',
           green: '#6BBF5F',
           blue: '#3F77DE',
+          discord: '#7289da',
         },
         'mango-theme': {
           primary: { light: '#F2C94C', dark: '#EEB91B' },
@@ -96,12 +104,56 @@ module.exports = {
         'confirm-green': '#8effdd',
         'bkg-grey': '#292833',
         'night-grey': '#201F27',
+        'bkg-black': '#212429',
+        'secondary-grey': '#D5D4D7',
+        'red-50': '#fef2f2',
+        'red-100': '#fee2e2',
+        'red-200': '#fecaca',
+        'red-300': '#fca5a5',
+        'red-400': '#f87171',
+        'red-500': '#ef4444',
+        'red-600': '#dc2626',
+        'red-700': '#b91c1c',
+        'red-800': '#991b1b',
+        'red-900': '#7f1d1d',
+        'green-50': '#f0fdf4',
+        'green-100': '#dcfce7',
+        'green-200': '#bbf7d0',
+        'green-300': '#86efac',
+        'green-400': '#4ade80',
+        'green-500': '#22c55e',
+        'green-600': '#16a34a',
+        'green-700': '#15803d',
+        'green-800': '#166534',
+        'green-900': '#14532d',
+        'orange-50': '#fff7ed',
+        'orange-100': '#ffedd5',
+        'orange-200': '#fed7aa',
+        'orange-300': '#fdba74',
+        'orange-400': '#fb923c',
+        'orange-500': '#f97316',
+        'orange-600': '#ea580c',
+        'orange-700': '#c2410c',
+        'orange-800': '#9a3412',
+        'orange-900': '#7c2d12',
+        'blue-50': '#eff6ff',
+        'blue-100': '#dbeafe',
+        'blue-200': '#bfdbfe',
+        'blue-300': '#93c5fd',
+        'blue-400': '#60a5fa',
+        'blue-500': '#3b82f6',
+        'blue-600': '#2563eb',
+        'blue-700': '#1d4ed8',
+        'blue-800': '#1e40af',
+        'blue-900': '#1e3a8a',
       },
       animation: {
         'connect-wallet-ping':
           'connect-wallet-ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite',
         gradient: 'gradient 4s ease-in-out infinite',
         loader: 'loader 0.6s infinite alternate',
+        'staggered-bounce': 'staggered-bounce 1600ms infinite',
+        'move-stripes': 'move-stripes 2s linear infinite',
       },
       keyframes: {
         'connect-wallet-ping': {
@@ -127,8 +179,26 @@ module.exports = {
             transform: 'translate3d(0, 0, 0)',
           },
         },
+        'staggered-bounce': {
+          '0%, 25%': {
+            transform: 'translateY(0)',
+            'animation-timing-function': 'cubic-bezier(0, 0, 0.2, 1)',
+          },
+          '12.5%': {
+            transform: 'translateY(-50%)',
+            'animation-timing-function': 'cubic-bezier(0.8, 0, 1, 1)',
+          },
+        },
+        'move-stripes': {
+          '0%': { backgroundPosition: '0 0' },
+          '100%': { backgroundPosition: '44px 0' },
+        },
+      },
+      fontFamily: {
+        rota: ['Rota', 'sans-serif'],
+        roboto: ['Roboto', 'sans-serif'],
       },
     },
   },
-  plugins: [],
+  plugins: [lineClamp],
 }

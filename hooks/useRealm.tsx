@@ -1,4 +1,3 @@
-import { BN, PublicKey } from '@blockworks-foundation/mango-client'
 import { ProgramAccount, TokenOwnerRecord } from '@solana/spl-governance'
 import { isPublicKey } from '@tools/core/pubkey'
 import { useRouter } from 'next/router'
@@ -28,16 +27,22 @@ import {
   switchboardPluginsPks,
   pythPluginsPks,
   gatewayPluginsPks,
+  heliumVsrPluginsPks,
 } from './useVotingPlugins'
 import useGatewayPluginStore from '../GatewayPlugin/store/gatewayPluginStore'
 import useSwitchboardPluginStore from 'SwitchboardVotePlugin/store/switchboardStore'
+import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
+import { BN } from '@coral-xyz/anchor'
+import { PublicKey } from '@solana/web3.js'
+import { useVsrMode } from './useVsrMode'
+import useWalletOnePointOh from './useWalletOnePointOh'
 
 export default function useRealm() {
   const router = useRouter()
   const { symbol } = router.query
   const connection = useWalletStore((s) => s.connection)
-  const connected = useWalletStore((s) => s.connected)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const tokenAccounts = useWalletStore((s) => s.tokenAccounts)
   const {
     realm,
@@ -51,17 +56,23 @@ export default function useRealm() {
     config,
   } = useWalletStore((s) => s.selectedRealm)
   const votingPower = useDepositStore((s) => s.state.votingPower)
+  const heliumVotingPower = useHeliumVsrStore((s) => s.state.votingPower)
   const nftVotingPower = useNftPluginStore((s) => s.state.votingPower)
   const gatewayVotingPower = useGatewayPluginStore((s) => s.state.votingPower)
   const sbVotingPower = useSwitchboardPluginStore((s) => s.state.votingPower)
   const [realmInfo, setRealmInfo] = useState<RealmInfo | undefined>(undefined)
-
+  const currentPluginPk = config?.account?.communityTokenConfig.voterWeightAddin
   const pythClient = useVotePluginsClientStore((s) => s.state.pythClient)
   const [pythVoterWeight, setPythVoterWeight] = useState<PythBalance>()
+  const isPythclientMode =
+    currentPluginPk && pythPluginsPks.includes(currentPluginPk?.toBase58())
 
+  //Move to store + move useEffect to main app index,
+  //useRealm is used very often across application
+  //and in every instance of useRealm it will shot with getMainAccount spamming rpc.
   useEffect(() => {
     const getPythVoterWeight = async () => {
-      if (connected && wallet?.publicKey && pythClient) {
+      if (connected && wallet?.publicKey && pythClient && isPythclientMode) {
         const sa = await pythClient.stakeConnection.getMainAccount(
           wallet.publicKey
         )
@@ -72,7 +83,8 @@ export default function useRealm() {
       }
     }
     getPythVoterWeight()
-  }, [connected])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+  }, [wallet?.publicKey])
 
   const delegates = useMembersStore((s) => s.compact.delegates)
   const selectedCouncilDelegate = useWalletStore(
@@ -87,7 +99,11 @@ export default function useRealm() {
       ? realm
         ? // Realm program data needs to contain config options to enable/disable things such as notifications
           // Currently defaulting to false here for now
-          createUnchartedRealmInfo(realm)
+          createUnchartedRealmInfo({
+            programId: realm.owner.toBase58(),
+            address: realm.pubkey.toBase58(),
+            name: realm.account.name,
+          })
         : undefined
       : getCertifiedRealmInfo(symbol as string, connection)
 
@@ -98,6 +114,7 @@ export default function useRealm() {
     if (programVersion) {
       setRealmInfo(realmInfo)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [symbol, realm, programVersion])
 
   const realmTokenAccount = useMemo(
@@ -121,7 +138,7 @@ export default function useRealm() {
       return tokenRecords[wallet.publicKey.toBase58()]
     }
     return undefined
-  }, [tokenRecords, wallet, connected, selectedCommunityDelegate])
+  }, [tokenRecords, wallet, selectedCommunityDelegate])
 
   // returns array of community tokenOwnerRecords that connected wallet has been delegated
   const ownDelegateTokenRecords = useMemo(() => {
@@ -140,6 +157,7 @@ export default function useRealm() {
     }
 
     return undefined
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [tokenRecords, wallet, connected])
 
   const councilTokenAccount = useMemo(
@@ -151,6 +169,7 @@ export default function useRealm() {
           realm.account.config.councilMint &&
           a.account.mint.equals(realm.account.config.councilMint)
       ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     [realm, tokenAccounts]
   )
 
@@ -166,6 +185,7 @@ export default function useRealm() {
       return councilTokenOwnerRecords[wallet.publicKey.toBase58()]
     }
     return undefined
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [tokenRecords, wallet, connected, selectedCouncilDelegate])
 
   // returns array of council tokenOwnerRecords that connected wallet has been delegated
@@ -184,12 +204,13 @@ export default function useRealm() {
       }
     }
     return undefined
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [tokenRecords, wallet, connected])
 
   const canChooseWhoVote =
     realm?.account.communityMint &&
     (!mint?.supply.isZero() ||
-      realm.account.config.useCommunityVoterWeightAddin) &&
+      config?.account.communityTokenConfig.voterWeightAddin) &&
     realm.account.config.councilMint &&
     !councilMint?.supply.isZero()
 
@@ -203,11 +224,7 @@ export default function useRealm() {
     ownCouncilTokenRecord &&
     ownCouncilTokenRecord?.account.outstandingProposalCount >=
       realmCfgMaxOutstandingProposalCount
-
-  const currentPluginPk = config?.account?.communityVoterWeightAddin
-  //based on realm config it will provide proper tokenBalanceCardComponent
-  const isLockTokensMode =
-    currentPluginPk && vsrPluginsPks.includes(currentPluginPk?.toBase58())
+  const vsrMode = useVsrMode()
   const isNftMode =
     currentPluginPk && nftPluginsPks.includes(currentPluginPk?.toBase58())
   const pythVotingPower = pythVoterWeight?.toBN() || new BN(0)
@@ -219,7 +236,8 @@ export default function useRealm() {
     sbVotingPower,
     pythVotingPower,
     gatewayVotingPower,
-    ownCouncilTokenRecord
+    ownCouncilTokenRecord,
+    heliumVotingPower
   )
   return {
     realm,
@@ -244,7 +262,7 @@ export default function useRealm() {
     ownDelegateCouncilTokenRecords,
     config,
     currentPluginPk,
-    isLockTokensMode,
+    vsrMode,
     isNftMode,
   }
 }
@@ -257,7 +275,8 @@ const getVoterWeight = (
   sbVotingPower: BN,
   pythVotingPower: BN,
   gatewayVotingPower: BN,
-  ownCouncilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
+  ownCouncilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,
+  heliumVotingPower: BN
 ) => {
   if (currentPluginPk) {
     if (vsrPluginsPks.includes(currentPluginPk.toBase58())) {
@@ -265,6 +284,13 @@ const getVoterWeight = (
         ownTokenRecord,
         ownCouncilTokenRecord,
         votingPower
+      )
+    }
+    if (heliumVsrPluginsPks.includes(currentPluginPk.toBase58())) {
+      return new VoteRegistryVoterWeight(
+        ownTokenRecord,
+        ownCouncilTokenRecord,
+        heliumVotingPower
       )
     }
     if (nftPluginsPks.includes(currentPluginPk.toBase58())) {

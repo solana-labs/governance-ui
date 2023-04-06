@@ -6,7 +6,7 @@ import { PublicKey } from '@solana/web3.js'
 import { getMintSupplyAsDecimal } from '@tools/sdk/units'
 import useWalletStore from 'stores/useWalletStore'
 import { tryGetMint } from '@utils/tokens'
-import { validateSolAddress } from '@utils/formValidation'
+import { validatePubkey } from '@utils/formValidation'
 import { preventNegativeNumberInput } from '@utils/helpers'
 
 import { Controller } from 'react-hook-form'
@@ -16,6 +16,7 @@ import Input, { RadioGroup } from '@components/NewRealmWizard/components/Input'
 import TokenInfoTable, {
   GenericTokenIcon,
 } from '@components/NewRealmWizard/components/TokenInfoTable'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface MintInfoWithDecimalSupply extends MintInfo {
   supplyAsDecimal: number
@@ -58,7 +59,9 @@ export default function TokenInput({
   onValidation,
   disableMinTokenInput = false,
 }) {
-  const { connected, connection, current: wallet } = useWalletStore((s) => s)
+  const connection = useWalletStore((s) => s.connection)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const [tokenList, setTokenList] = useState<TokenInfo[] | undefined>()
   const [tokenMintAddress, setTokenMintAddress] = useState('')
   const [tokenInfo, setTokenInfo] = useState<TokenWithMintInfo | undefined>()
@@ -74,6 +77,7 @@ export default function TokenInput({
     if (!connected) {
       wallet?.connect()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [wallet])
 
   useEffect(() => {
@@ -114,11 +118,12 @@ export default function TokenInput({
       }
     }
 
-    if (tokenMintAddress && validateSolAddress(tokenMintAddress)) {
+    if (tokenMintAddress && validatePubkey(tokenMintAddress)) {
       getTokenInfo(tokenMintAddress)
     } else {
       setTokenInfo(undefined)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [tokenList, tokenMintAddress])
 
   useEffect(() => {
@@ -134,6 +139,7 @@ export default function TokenInput({
       suggestedMinTokenAmount,
       walletIsMintAuthority,
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [validMintAddress, walletIsMintAuthority, tokenInfo])
 
   return (

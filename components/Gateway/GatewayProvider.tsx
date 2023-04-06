@@ -1,10 +1,9 @@
 import { FC } from 'react'
-import { Transaction } from '@solana/web3.js'
-import { sendTransaction } from '@utils/send'
 import { GatewayProvider as InternalGatewayProvider } from '@civic/solana-gateway-react'
 import useWalletStore from '../../stores/useWalletStore'
 import useVotePluginsClientStore from '../../stores/useVotePluginsClientStore'
 import useGatewayPluginStore from '../../GatewayPlugin/store/gatewayPluginStore'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 /**
  * Wrapper for the Civic Gateway Provider react component. This component is responsible for
@@ -14,7 +13,7 @@ import useGatewayPluginStore from '../../GatewayPlugin/store/gatewayPluginStore'
  * @constructor
  */
 export const GatewayProvider: FC = ({ children }) => {
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
@@ -22,32 +21,21 @@ export const GatewayProvider: FC = ({ children }) => {
     (s) => s.state.gatekeeperNetwork
   )
   const connection = useWalletStore((s) => s.connection)
-
-  // This signs and sends a transaction returned from the gatekeeper (e.g. the pass issuance transaction)
-  const handleTransaction = async (transaction: Transaction) => {
-    await sendTransaction({
-      transaction,
-      wallet: wallet!,
-      connection: connection.current,
-      signers: [],
-      sendingMessage: 'Creating pass',
-      successMessage: 'Pass created',
-    })
-  }
+  const cluster =
+    connection.cluster === 'mainnet' ? 'mainnet-beta' : connection.cluster
 
   if (!wallet || !wallet.publicKey || !client || !gatekeeperNetwork)
     return <>{children}</>
 
   return (
     <InternalGatewayProvider
-      clusterUrl={connection.endpoint}
-      cluster={connection.cluster}
+      connection={connection.current}
+      cluster={cluster}
       gatekeeperNetwork={gatekeeperNetwork}
       wallet={{
         publicKey: wallet.publicKey,
         signTransaction: wallet.signTransaction.bind(wallet),
       }}
-      handleTransaction={handleTransaction}
     >
       {children}
     </InternalGatewayProvider>

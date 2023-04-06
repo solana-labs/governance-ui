@@ -1,17 +1,16 @@
+import { BN_ZERO } from '@solana/spl-governance'
+import { DisplayAddress } from '@cardinal/namespaces-components'
+import Select from '@components/inputs/Select'
+import { fmtMintAmount } from '@tools/sdk/units'
 import useMembersStore from 'stores/useMembersStore'
 import useWalletStore from 'stores/useWalletStore'
-import Select from '@components/inputs/Select'
 import useRealm from 'hooks/useRealm'
-import { DisplayAddress } from '@cardinal/namespaces-components'
-import { fmtMintAmount } from '@tools/sdk/units'
-import { BN } from '@project-serum/anchor'
-import { useEffect } from 'react'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const DelegateBalanceCard = () => {
   const delegates = useMembersStore((s) => s.compact.delegates)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
-
   const walletId = wallet?.publicKey?.toBase58()
   const {
     ownDelegateTokenRecords,
@@ -21,52 +20,21 @@ const DelegateBalanceCard = () => {
     mint,
     councilMint,
   } = useRealm()
-  const {
-    actions,
-    selectedCommunityDelegate,
-    selectedCouncilDelegate,
-  } = useWalletStore((s) => s)
-
-  useEffect(() => {
-    if (
-      !ownCouncilTokenRecord &&
-      ownDelegateCouncilTokenRecords &&
-      ownDelegateCouncilTokenRecords.length > 0
-    ) {
-      actions.selectCouncilDelegate(
-        ownDelegateCouncilTokenRecords[0]?.account?.governingTokenOwner?.toBase58()
-      )
-    }
-
-    if (
-      !ownTokenRecord &&
-      ownDelegateTokenRecords &&
-      ownDelegateTokenRecords.length > 0
-    ) {
-      actions.selectCommunityDelegate(
-        ownDelegateTokenRecords[0]?.account?.governingTokenOwner?.toBase58()
-      )
-    }
-  }, [walletId])
-
-  // whenever we change delegate, get that delegates vote record so we can display it
-  useEffect(() => {
-    actions.fetchDelegateVoteRecords()
-  }, [selectedCommunityDelegate, selectedCouncilDelegate])
+  const { actions } = useWalletStore((s) => s)
 
   const getCouncilTokenCount = () => {
     if (walletId && delegates?.[walletId]) {
-      return delegates?.[walletId].councilTokenCount || 0
+      return fmtMintAmount(
+        councilMint,
+        delegates?.[walletId].councilTokenCount ?? BN_ZERO
+      )
     }
     return 0
   }
 
   const getCouncilDelegateAmt = () => {
     if (walletId && delegates?.[walletId]) {
-      return fmtMintAmount(
-        councilMint,
-        new BN(delegates?.[walletId].councilTokenCount || 0)
-      )
+      return delegates?.[walletId]?.councilMembers?.length ?? 0
     }
     return 0
   }
@@ -75,7 +43,7 @@ const DelegateBalanceCard = () => {
     if (walletId && delegates?.[walletId]) {
       return fmtMintAmount(
         mint,
-        new BN(delegates?.[walletId].communityTokenCount || 0)
+        delegates?.[walletId].communityTokenCount ?? BN_ZERO
       )
     }
     return 0
@@ -83,7 +51,7 @@ const DelegateBalanceCard = () => {
 
   const getCommunityDelegateAmt = () => {
     if (walletId && delegates?.[walletId]) {
-      return delegates?.[walletId]?.communityMembers?.length || 0
+      return delegates?.[walletId]?.communityMembers?.length ?? 0
     }
     return 0
   }

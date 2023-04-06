@@ -11,7 +11,11 @@ import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import { getVoteRecordsByVoterMapByProposal } from '@models/api'
 import { isYesVote } from '@models/voteRecords'
-import { GOVERNANCE_CHAT_PROGRAM_ID, VoteRecord } from '@solana/spl-governance'
+import {
+  GOVERNANCE_CHAT_PROGRAM_ID,
+  GoverningTokenType,
+  VoteRecord,
+} from '@solana/spl-governance'
 import { ChatMessage, ProgramAccount } from '@solana/spl-governance'
 import { getGovernanceChatMessagesByVoter } from '@solana/spl-governance'
 
@@ -20,16 +24,80 @@ import { tryParsePublicKey } from '@tools/core/pubkey'
 import { accountsToPubkeyMap } from '@tools/sdk/accounts'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { notify } from '@utils/notifications'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import { Member } from '@utils/uiTypes/members'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { FC, useEffect, useMemo, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { WalletTokenRecordWithProposal } from './types'
 import PaginationComponent from '@components/Pagination'
 import useMembersStore from 'stores/useMembersStore'
+import { LinkButton } from '@components/Button'
+import useProgramVersion from '@hooks/useProgramVersion'
+import { useRouter } from 'next/router'
+import { Instructions } from '@utils/uiTypes/proposalCreationTypes'
+import { abbreviateAddress } from '@utils/formatting'
+import useGovernanceForGovernedAddress from '@hooks/useGovernanceForGovernedAddress'
+import useProposalCreationButtonTooltip from '@hooks/useProposalCreationButtonTooltip'
+import Tooltip from '@components/Tooltip'
+
+const RevokeMembership: FC<{ member: PublicKey; mint: PublicKey }> = ({
+  member,
+  mint,
+}) => {
+  const { symbol, realm } = useRealm()
+
+  const router = useRouter()
+  const { fmtUrlWithCluster } = useQueryContext()
+  const governance = useGovernanceForGovernedAddress(mint)
+
+  const govpop =
+    realm !== undefined &&
+    (mint.equals(realm.account.communityMint)
+      ? 'community '
+      : realm.account.config.councilMint &&
+        mint.equals(realm.account.config.councilMint)
+      ? 'council '
+      : '')
+  let abbrevAddress: string
+  try {
+    abbrevAddress = abbreviateAddress(member)
+  } catch {
+    abbrevAddress = ''
+  }
+  // note the lack of space is not a typo
+  const proposalTitle = `Remove ${govpop}member ${abbrevAddress}`
+
+  const tooltipContent = useProposalCreationButtonTooltip(
+    governance ? [governance] : []
+  )
+
+  return (
+    <>
+      <Tooltip content={tooltipContent}>
+        <LinkButton
+          disabled={!!tooltipContent}
+          className=" fill-red-400 text-red-400 flex items-center whitespace-nowrap"
+          onClick={() =>
+            router.push(
+              fmtUrlWithCluster(
+                `/dao/${symbol}/proposal/new?i=${
+                  Instructions.RevokeGoverningTokens
+                }&t=${proposalTitle}&memberKey=${member.toString()}`
+              )
+            )
+          }
+        >
+          <XCircleIcon className="flex-shrink-0 h-5 mr-2 w-5" />
+          Revoke Membership
+        </LinkButton>
+      </Tooltip>
+    </>
+  )
+}
 
 const MemberOverview = ({ member }: { member: Member }) => {
-  const { realm } = useRealm()
+  const programVersion = useProgramVersion()
+  const { realm, config } = useRealm()
   const connection = useWalletStore((s) => s.connection)
   const selectedRealm = useWalletStore((s) => s.selectedRealm)
   const { mint, councilMint, proposals, symbol } = useRealm()
@@ -52,13 +120,15 @@ const MemberOverview = ({ member }: { member: Member }) => {
 
   const walletPublicKey = tryParsePublicKey(walletAddress)
   const tokenName = realm
-    ? tokenService.getTokenInfo(realm?.account.communityMint.toBase58())?.symbol
+    ? tokenPriceService.getTokenInfo(realm?.account.communityMint.toBase58())
+        ?.symbol
     : ''
   const communityAmount = useMemo(
     () =>
       communityVotes && communityVotes && !communityVotes.isZero()
         ? fmtMintAmount(mint, communityVotes)
         : '',
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     [walletAddress]
   )
 
@@ -67,6 +137,7 @@ const MemberOverview = ({ member }: { member: Member }) => {
       councilVotes && councilVotes && !councilVotes.isZero()
         ? fmtMintAmount(councilMint, councilVotes)
         : '',
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     [walletAddress]
   )
 
@@ -135,6 +206,7 @@ const MemberOverview = ({ member }: { member: Member }) => {
       setOwnVoteRecords(voteRecordsArray)
     }
     handleSetVoteRecords()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [walletAddress])
 
   const memberVotePowerRank = useMemo(() => {
@@ -146,10 +218,12 @@ const MemberOverview = ({ member }: { member: Member }) => {
         (m) => m.walletAddress === member?.walletAddress
       ) + 1
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(activeMembers.length), member.walletAddress])
 
   useEffect(() => {
     setRecentVotes(paginateVotes(0))
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(ownVoteRecords)])
 
   const perPage = 8
@@ -171,25 +245,54 @@ const MemberOverview = ({ member }: { member: Member }) => {
         dark={true}
       />
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [walletPublicKey?.toBase58()])
+
+  const councilMintKey = realm?.account.config.councilMint
+  const communityMintKey = realm?.account.communityMint
+
+  const isRevokableCouncilMember =
+    !councilVotes.isZero() &&
+    councilMintKey &&
+    config?.account.councilTokenConfig.tokenType ===
+      GoverningTokenType.Membership
+
+  const isRevokableCommunityMember =
+    !communityVotes.isZero() &&
+    communityMintKey &&
+    config?.account.communityTokenConfig.tokenType ===
+      GoverningTokenType.Membership
+
   return (
     <>
       <div className="flex items-center justify-between mb-2 py-2">
         <h2 className="mb-0">{Address}</h2>
-        <a
-          className="default-transition flex items-center text-primary-light hover:text-primary-dark text-sm"
-          href={
-            walletAddress
-              ? getExplorerUrl(connection.cluster, walletAddress)
-              : ''
-          }
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={(e) => e.stopPropagation()}
-        >
-          Explorer
-          <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 w-4" />
-        </a>
+        <div className="flex gap-6">
+          <a
+            className="default-transition flex items-center text-primary-light hover:text-primary-dark text-sm"
+            href={
+              walletAddress
+                ? getExplorerUrl(connection.cluster, walletAddress)
+                : ''
+            }
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+          >
+            Explorer
+            <ExternalLinkIcon className="flex-shrink-0 h-4 ml-1 w-4" />
+          </a>
+          {programVersion >= 3 &&
+            realm !== undefined &&
+            (isRevokableCouncilMember || isRevokableCommunityMember) && (
+              <RevokeMembership
+                member={new PublicKey(member.walletAddress)}
+                mint={
+                  isRevokableCouncilMember ? councilMintKey : communityMintKey! // Typescript is wrong!
+                }
+              />
+            )}
+        </div>
       </div>
       <div className="flex flex-col space-y-3 md:space-y-0 md:flex-row md:space-x-3">
         {(communityAmount || !councilAmount) && (

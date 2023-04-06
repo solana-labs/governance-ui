@@ -4,7 +4,6 @@ import Input from '@components/inputs/Input'
 import { tryParseKey } from '@tools/validators/pubkey'
 import { debounce } from '@utils/debounce'
 import useWalletStore from 'stores/useWalletStore'
-import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
 import axios from 'axios'
 import { notify } from '@utils/notifications'
 import Loading from '@components/Loading'
@@ -25,17 +24,27 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import DepositLabel from './DepositLabel'
 import NFTAccountSelect from './NFTAccountSelect'
 import ImgWithLoader from '@components/ImgWithLoader'
+import { Metaplex } from '@metaplex-foundation/js'
+import {
+  Nft,
+  NftWithToken,
+  Sft,
+  SftWithToken,
+} from '@metaplex-foundation/js/dist/types/plugins/nftModule/models'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
 
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const { realm } = useRealm()
-  const connected = useWalletStore((s) => s.connected)
+  const connected = !!wallet?.connected
   const [form, setForm] = useState({
     mint: '',
   })
   const [isLoading, setIsLoading] = useState(false)
-  const [nftMetaData, setNftMetaData] = useState<Metadata | null>(null)
+  const [nftMetaData, setNftMetaData] = useState<
+    Sft | SftWithToken | Nft | NftWithToken | null
+  >(null)
   const [isInvalidMint, setIsInvalidMint] = useState(false)
   const [formErrors, setFormErrors] = useState({})
   const [imgUrl, setImgUrl] = useState('')
@@ -97,11 +106,14 @@ const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
         if (pubKey) {
           setIsLoading(true)
           try {
-            const metadataPDA = await Metadata.getPDA(pubKey)
-            const tokenMetadata = await Metadata.load(
-              connection.current,
-              metadataPDA
-            )
+            const metaplex = new Metaplex(connection.current)
+            const metadataPDA = await metaplex
+              .nfts()
+              .pdas()
+              .metadata({ mint: pubKey })
+            const tokenMetadata = await metaplex.nfts().findByMetadata({
+              metadata: metadataPDA,
+            })
             setNftMetaData(tokenMetadata)
           } catch (e) {
             notify({
@@ -119,9 +131,10 @@ const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
     } else {
       setNftMetaData(null)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.mint])
   useEffect(() => {
-    const uri = nftMetaData?.data?.data?.uri
+    const uri = nftMetaData?.uri
     const getNftData = async (uri) => {
       if (uri) {
         setIsLoading(true)
@@ -141,6 +154,7 @@ const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
     }
     setAtaAddress('')
     getNftData(uri)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(nftMetaData)])
   return (
     <>

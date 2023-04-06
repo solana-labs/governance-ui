@@ -13,7 +13,7 @@ const MinimumApprovalThreshold = ({
   // const info = { config: { voteThresholdPercentage: { value: 50 } } }
   return info ? (
     <ProgressBar
-      progress={info?.config.voteThresholdPercentage.value}
+      progress={info?.config.communityVoteThreshold.value}
       prefix="Approval quorum"
     ></ProgressBar>
   ) : null

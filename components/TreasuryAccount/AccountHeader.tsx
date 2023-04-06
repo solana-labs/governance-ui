@@ -1,5 +1,5 @@
 import useTotalTokenValue from '@hooks/useTotalTokenValue'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
 import BigNumber from 'bignumber.js'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
@@ -30,6 +30,7 @@ const AccountHeader = () => {
   const totalPrice = useTotalTokenValue({ amount, mintAddress })
   return (
     <BaseAccountHeader
+      mintAddress={mintAddress}
       isNFT={isNFT}
       tokenInfo={tokenInfo}
       amountFormatted={isNFT ? nftsCount?.toString() : amountFormatted}

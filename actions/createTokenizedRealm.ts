@@ -1,51 +1,24 @@
-import { Connection, PublicKey } from '@solana/web3.js'
-
 import {
-  sendTransactionsV2,
-  transactionInstructionsToTypedInstructionsSets,
   SequenceType,
-  WalletSigner,
+  txBatchesToInstructionSetWithSigners,
+  sendTransactionsV3,
 } from 'utils/sendTransactions'
 import { chunks } from '@utils/helpers'
 
-import { prepareRealmCreation } from '@tools/governance/prepareRealmCreation'
+import {
+  prepareRealmCreation,
+  RealmCreation,
+  Web3Context,
+} from '@tools/governance/prepareRealmCreation'
+import { trySentryLog } from '@utils/logs'
 
-interface TokenizedRealm {
-  connection: Connection
-  wallet: WalletSigner
-  programIdAddress: string
-
-  realmName: string
-  tokensToGovernThreshold: number | undefined
-
-  communityYesVotePercentage: number
-  existingCommunityMintPk: PublicKey | undefined
-  transferCommunityMintAuthority: boolean | undefined
-  communityMintSupplyFactor: number | undefined
-
-  createCouncil: boolean
-  existingCouncilMintPk: PublicKey | undefined
-  transferCouncilMintAuthority: boolean | undefined
-  councilWalletPks: PublicKey[]
-}
+export type TokenizedRealm = Web3Context & RealmCreation
 
 export default async function createTokenizedRealm({
   connection,
   wallet,
-  programIdAddress,
-  realmName,
-  tokensToGovernThreshold,
 
-  existingCommunityMintPk,
-  transferCommunityMintAuthority = true,
-  communityYesVotePercentage,
-  communityMintSupplyFactor: rawCMSF,
-
-  createCouncil = false,
-  existingCouncilMintPk,
-  transferCouncilMintAuthority = true,
-  // councilYesVotePercentage,
-  councilWalletPks,
+  ...params
 }: TokenizedRealm) {
   const {
     communityMintPk,
@@ -59,20 +32,8 @@ export default async function createTokenizedRealm({
   } = await prepareRealmCreation({
     connection,
     wallet,
-    programIdAddress,
-
-    realmName,
-    tokensToGovernThreshold,
-
-    existingCommunityMintPk,
-    communityMintSupplyFactor: rawCMSF,
-    transferCommunityMintAuthority,
-    communityYesVotePercentage,
-
-    createCouncil,
-    existingCouncilMintPk,
-    transferCouncilMintAuthority,
-    councilWalletPks,
+    // TODO does there need to be community token config
+    ...params,
   })
 
   try {
@@ -82,25 +43,42 @@ export default async function createTokenizedRealm({
       []
     )
     console.log('CREATE GOV TOKEN REALM: sending transactions')
-    const tx = await sendTransactionsV2({
+
+    const signers = [
+      mintsSetupSigners,
+      ...councilMembersSignersChunks,
+      realmSigners,
+    ]
+    const txes = [
+      mintsSetupInstructions,
+      ...councilMembersChunks,
+      realmInstructions,
+    ].map((txBatch, batchIdx) => {
+      return {
+        instructionsSet: txBatchesToInstructionSetWithSigners(
+          txBatch,
+          signers,
+          batchIdx
+        ),
+        sequenceType: SequenceType.Sequential,
+      }
+    })
+
+    const tx = await sendTransactionsV3({
       connection,
-      showUiComponent: true,
       wallet,
-      signersSet: [
-        mintsSetupSigners,
-        ...councilMembersSignersChunks,
-        realmSigners,
-      ],
-      TransactionInstructions: [
-        mintsSetupInstructions,
-        ...councilMembersChunks,
-        realmInstructions,
-      ].map((x) =>
-        transactionInstructionsToTypedInstructionsSets(
-          x,
-          SequenceType.Sequential
-        )
-      ),
+      transactionInstructions: txes,
+    })
+
+    const logInfo = {
+      realmId: realmPk,
+      realmSymbol: params.realmName,
+      wallet: wallet.publicKey?.toBase58(),
+      cluster: connection.rpcEndpoint.includes('devnet') ? 'devnet' : 'mainnet',
+    }
+    trySentryLog({
+      tag: 'realmCreated',
+      objToStringify: logInfo,
     })
 
     return {

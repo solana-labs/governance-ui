@@ -1,31 +1,44 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import Button from 'components/Button'
 import Input from 'components/inputs/Input'
 import PreviousRouteBtn from 'components/PreviousRouteBtn'
 import Tooltip from 'components/Tooltip'
 import useQueryContext from 'hooks/useQueryContext'
 import useRealm from 'hooks/useRealm'
-import { RpcContext, VoteTipping } from '@solana/spl-governance'
+import {
+  GovernanceConfig,
+  RpcContext,
+  VoteTipping,
+} from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import { tryParseKey } from 'tools/validators/pubkey'
 import { isFormValid } from 'utils/formValidation'
-import { getGovernanceConfig } from 'utils/GovernanceTools'
+import { getGovernanceConfigFromV2Form } from 'utils/GovernanceTools'
 import { notify } from 'utils/notifications'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import * as yup from 'yup'
 import BaseGovernanceForm, {
-  BaseGovernanceFormFields,
+  BaseGovernanceFormFieldsV2,
 } from './BaseGovernanceForm'
 import { registerProgramGovernance } from 'actions/registerProgramGovernance'
 import { GovernanceType } from '@solana/spl-governance'
 import Switch from 'components/Switch'
 import { debounce } from '@utils/debounce'
-import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
+import {
+  DISABLED_VOTER_WEIGHT,
+  MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
+} from '@tools/constants'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { getMintDecimalAmount } from '@tools/sdk/units'
-interface NewProgramForm extends BaseGovernanceFormFields {
+import {
+  transform,
+  transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig,
+} from './BaseGovernanceForm-data'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+interface NewProgramForm extends BaseGovernanceFormFieldsV2 {
   programId: string
   transferAuthority: boolean
 }
@@ -36,12 +49,15 @@ const defaultFormValues = {
   // This should be dynamic and set to 1% of the community mint supply or
   // MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY when supply is 0
   minCommunityTokensToCreateProposal: MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
+  // TODO support v3
+  _programVersion: 2,
   minInstructionHoldUpTime: 0,
   maxVotingTime: 3,
   voteThreshold: 60,
   transferAuthority: true,
   voteTipping: VoteTipping.Strict,
-}
+} as const
+
 const NewProgramForm = () => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
@@ -54,10 +70,11 @@ const NewProgramForm = () => {
     mint: realmMint,
     symbol,
     ownVoterWeight,
+    councilMint,
   } = useRealm()
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
-  const connected = useWalletStore((s) => s.connected)
+  const connected = !!wallet?.connected
   const { fetchRealm } = useWalletStore((s) => s.actions)
   const [form, setForm] = useState<NewProgramForm>({
     ...defaultFormValues,
@@ -106,7 +123,39 @@ const NewProgramForm = () => {
           mintDecimals: realmMint.decimals,
           voteTipping: form.voteTipping,
         }
-        const governanceConfig = getGovernanceConfig(governanceConfigValues)
+        const governanceConfig =
+          realmInfo!.programVersion === 2
+            ? getGovernanceConfigFromV2Form(
+                realmInfo!.programVersion!,
+                governanceConfigValues
+              )
+            : new GovernanceConfig(
+                transform(
+                  transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig(
+                    realmMint.decimals,
+                    councilMint?.decimals || 0
+                  ),
+                  {
+                    minCommunityTokensToCreateProposal:
+                      form.minCommunityTokensToCreateProposal ===
+                      DISABLED_VOTER_WEIGHT.toString()
+                        ? 'disabled'
+                        : form.minCommunityTokensToCreateProposal,
+                    minCouncilTokensToCreateProposal: '1',
+                    minInstructionHoldUpTime: form.minInstructionHoldUpTime.toString(),
+                    baseVotingTime: form.maxVotingTime.toString(),
+                    votingCoolOffTime: '0',
+                    depositExemptProposalCount: '10',
+                    communityVoteThreshold: form.voteThreshold.toString(),
+                    communityVetoVoteThreshold: 'disabled',
+                    councilVoteThreshold: form.voteThreshold.toString(),
+                    councilVetoVoteThreshold: form.voteThreshold.toString(),
+                    communityVoteTipping: form.voteTipping,
+                    councilVoteTipping: form.voteTipping,
+                    _programVersion: 3,
+                  }
+                )[0]
+              )
         await registerProgramGovernance(
           rpcContext,
           GovernanceType.Program,
@@ -178,6 +227,7 @@ const NewProgramForm = () => {
         setFormErrors(validationErrors)
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.programId])
   useEffect(() => {
     setForm({
@@ -188,6 +238,7 @@ const NewProgramForm = () => {
         ? getMintDecimalAmount(realmMint!, realmMint!.supply).toNumber() * 0.01
         : 0,
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(realmMint)])
   return (
     <div className="space-y-3">

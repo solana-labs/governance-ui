@@ -27,7 +27,7 @@ import {
   ArrowCircleUpIcon,
   //   InformationCircleIcon,
 } from '@heroicons/react/solid'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import BigNumber from 'bignumber.js'
 import { getInstructionDataFromBase64 } from '@solana/spl-governance'
 import useQueryContext from '@hooks/useQueryContext'
@@ -50,8 +50,16 @@ import NFTSelector from '@components/NFTS/NFTSelector'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
 import useCreateProposal from '@hooks/useCreateProposal'
 import NFTAccountSelect from './NFTAccountSelect'
+import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
-const SendTokens = ({ isNft = false }) => {
+const SendTokens = ({
+  isNft = false,
+  selectedNft,
+}: {
+  isNft?: boolean
+  selectedNft?: NFTWithMint | null
+}) => {
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const connection = useWalletStore((s) => s.connection)
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
@@ -63,7 +71,7 @@ const SendTokens = ({ isNft = false }) => {
   const isNFT = isNft || currentAccount?.isNft
   const isSol = currentAccount?.isSol
   const { fmtUrlWithCluster } = useQueryContext()
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const router = useRouter()
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const programId: PublicKey | undefined = realmInfo?.programId
@@ -120,7 +128,7 @@ const SendTokens = ({ isNft = false }) => {
     })
   }
   const calcTransactionDolarAmount = (amount) => {
-    const price = tokenService.getUSDTokenPrice(
+    const price = tokenPriceService.getUSDTokenPrice(
       currentAccount!.extensions.mint!.publicKey.toBase58()
     )
     const totalPrice = amount * price
@@ -129,8 +137,8 @@ const SendTokens = ({ isNft = false }) => {
     return totalPriceFormatted
   }
 
-  async function getInstruction(): Promise<UiInstruction> {
-    const selectedNftMint = selectedNfts[0]?.mint
+  async function getNftInstruction(x: NFTWithMint): Promise<UiInstruction> {
+    const selectedNftMint = x.mintAddress
     const defaultProps = {
       schema,
       form,
@@ -140,18 +148,89 @@ const SendTokens = ({ isNft = false }) => {
       currentAccount,
       setFormErrors,
     }
-    if (isNFT) {
-      return getTransferNftInstruction({
-        ...defaultProps,
-        nftMint: selectedNftMint,
+    return getTransferNftInstruction({
+      ...defaultProps,
+      nftMint: selectedNftMint,
+    })
+  }
+
+  const handleProposeNftSend = async () => {
+    const instructions: InstructionDataWithHoldUpTime[] = []
+    let proposalTitle = ''
+    const governance = currentAccount?.governance
+    setIsLoading(true)
+    for (const x of selectedNfts) {
+      const nftName = x?.name
+      const nftTitle = `Send ${nftName ? nftName : 'NFT'} to ${
+        tryParseKey(form.destinationAccount)
+          ? abbreviateAddress(new PublicKey(form.destinationAccount))
+          : ''
+      }`
+      proposalTitle = isNFT
+        ? nftTitle
+        : `Pay ${form.amount}${tokenInfo ? ` ${tokenInfo?.symbol} ` : ' '}to ${
+            tryParseKey(form.destinationAccount)
+              ? abbreviateAddress(new PublicKey(form.destinationAccount))
+              : ''
+          }`
+      const instruction: UiInstruction = await getNftInstruction(x)
+      if (instruction.isValid) {
+        if (!realm) {
+          setIsLoading(false)
+          throw 'No realm selected'
+        }
+        const instructionData: InstructionDataWithHoldUpTime = {
+          data: instruction.serializedInstruction
+            ? getInstructionDataFromBase64(instruction.serializedInstruction)
+            : null,
+          holdUpTime: governance?.account?.config.minInstructionHoldUpTime,
+          prerequisiteInstructions: instruction.prerequisiteInstructions || [],
+          chunkSplitByDefault: true,
+          chunkBy: 4,
+        }
+        instructions.push(instructionData)
+      }
+    }
+    try {
+      proposalTitle = instructions.length > 1 ? 'Send NFTS' : proposalTitle
+      // Fetch governance to get up to date proposalCount
+      const selectedGovernance = (await fetchRealmGovernance(
+        governance?.pubkey
+      )) as ProgramAccount<Governance>
+      const proposalAddress = await handleCreateProposal({
+        title: form.title ? form.title : proposalTitle,
+        description: form.description ? form.description : '',
+        voteByCouncil,
+        instructionsData: [...instructions],
+        governance: selectedGovernance!,
       })
+      const url = fmtUrlWithCluster(
+        `/dao/${symbol}/proposal/${proposalAddress}`
+      )
+      router.push(url)
+    } catch (ex) {
+      notify({ type: 'error', message: `${ex}` })
+    }
+    setIsLoading(false)
+  }
+
+  async function getInstruction(): Promise<UiInstruction> {
+    const defaultProps = {
+      schema,
+      form,
+      programId,
+      connection,
+      wallet,
+      currentAccount,
+      setFormErrors,
     }
     if (isSol) {
       return getSolTransferInstruction(defaultProps)
     }
     return getTransferInstruction(defaultProps)
   }
-  const handlePropose = async () => {
+
+  const handleProposeTransfer = async () => {
     setIsLoading(true)
     const instruction: UiInstruction = await getInstruction()
     if (instruction.isValid) {
@@ -190,6 +269,7 @@ const SendTokens = ({ isNft = false }) => {
     }
     setIsLoading(false)
   }
+
   const IsAmountNotHigherThenBalance = () => {
     const mintValue = getMintNaturalAmountFromDecimalAsBN(
       form.amount!,
@@ -203,7 +283,6 @@ const SendTokens = ({ isNft = false }) => {
     }
     return gte
   }
-
   useEffect(() => {
     if (currentAccount) {
       handleSetForm({
@@ -211,6 +290,7 @@ const SendTokens = ({ isNft = false }) => {
         propertyName: 'governedTokenAccount',
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [currentAccount])
   useEffect(() => {
     if (form.destinationAccount) {
@@ -226,11 +306,12 @@ const SendTokens = ({ isNft = false }) => {
     } else {
       setDestinationAccount(null)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.destinationAccount])
 
   const schema = getTokenTransferSchema({ form, connection, nftMode: isNft })
   const transactionDolarAmount = calcTransactionDolarAmount(form.amount)
-  const nftName = selectedNfts[0]?.val?.name
+  const nftName: string | undefined = undefined
   const nftTitle = `Send ${nftName ? nftName : 'NFT'} to ${
     tryParseKey(form.destinationAccount)
       ? abbreviateAddress(new PublicKey(form.destinationAccount))
@@ -293,17 +374,20 @@ const SendTokens = ({ isNft = false }) => {
           </div>
         )}
         {isNFT ? (
-          <NFTSelector
-            onNftSelect={(nfts) => setSelectedNfts(nfts)}
-            ownersPk={
-              currentAccount.isSol
-                ? [
-                    currentAccount.extensions.transferAddress!,
-                    currentAccount.governance.pubkey,
-                  ]
-                : [currentAccount.governance.pubkey]
-            }
-          ></NFTSelector>
+          <>
+            <NFTSelector
+              selectedNft={selectedNft}
+              onNftSelect={(nfts) => setSelectedNfts(nfts)}
+              ownersPk={
+                currentAccount.isSol
+                  ? [
+                      currentAccount.extensions.transferAddress!,
+                      currentAccount.governance.pubkey,
+                    ]
+                  : [currentAccount.governance.pubkey]
+              }
+            ></NFTSelector>
+          </>
         ) : (
           <Input
             min={mintMinAmount}
@@ -396,13 +480,8 @@ const SendTokens = ({ isNft = false }) => {
       </div>
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
         <Button
-          disabled={
-            !canUseTransferInstruction ||
-            isLoading ||
-            (isNFT && !selectedNfts.length)
-          }
           className="ml-auto"
-          onClick={handlePropose}
+          onClick={isNft ? handleProposeNftSend : handleProposeTransfer}
           isLoading={isLoading}
         >
           <Tooltip

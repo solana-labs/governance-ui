@@ -1,4 +1,5 @@
 import {
+  getNativeTreasuryAddress,
   Governance,
   ProgramAccount,
   serializeInstructionToBase64,
@@ -9,14 +10,14 @@ import {
   TOKEN_PROGRAM_ID,
   u64,
 } from '@solana/spl-token'
-import { SignerWalletAdapter, WalletAdapter } from '@solana/wallet-adapter-base'
+import { WalletAdapter } from '@solana/wallet-adapter-base'
 import {
   Keypair,
   PublicKey,
   SystemProgram,
   TransactionInstruction,
 } from '@solana/web3.js'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { Marinade, MarinadeConfig } from '@marinade.finance/marinade-ts-sdk'
 import {
   getMintNaturalAmountFromDecimal,
@@ -28,6 +29,12 @@ import { isFormValid } from './formValidation'
 import { getTokenAccountsByMint } from './tokens'
 import { UiInstruction } from './uiTypes/proposalCreationTypes'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import {
+  createCreateMetadataAccountV2Instruction,
+  createUpdateMetadataAccountV2Instruction,
+} from '@metaplex-foundation/mpl-token-metadata'
+import { findMetadataPda } from '@metaplex-foundation/js'
+import { lidoStake } from '@utils/lidoStake'
 
 export const validateInstruction = async ({
   schema,
@@ -180,6 +187,7 @@ export async function getTransferInstruction({
         )
       )
     }
+
     const transferIx = Token.createTransferInstruction(
       TOKEN_PROGRAM_ID,
       sourceAccount!,
@@ -302,9 +310,11 @@ export async function getTransferNftInstruction({
       mintPK,
       wallet: wallet!,
     })
+    console.log(needToCreateAta)
     //we push this createATA instruction to transactions to create right before creating proposal
     //we don't want to create ata only when instruction is serialized
     if (needToCreateAta) {
+      console.log('create atas')
       prerequisiteInstructions.push(
         Token.createAssociatedTokenAccountInstruction(
           ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
@@ -361,7 +371,8 @@ export async function getMintInstruction({
   if (isValid && programId && form.mintAccount?.governance?.pubkey) {
     //this is the original owner
     const destinationAccount = new PublicKey(form.destinationAccount)
-    const mintPK = form.mintAccount.governance.account.governedAccount
+
+    const mintPK = form.mintAccount.extensions.mint!.publicKey
     const mintAmount = parseMintNaturalAmountFromDecimal(
       form.amount!,
       form.mintAccount.extensions.mint.account?.decimals
@@ -390,9 +401,9 @@ export async function getMintInstruction({
     }
     const transferIx = Token.createMintToInstruction(
       TOKEN_PROGRAM_ID,
-      form.mintAccount.governance.account.governedAccount,
+      mintPK,
       receiverAddress,
-      form.mintAccount.governance!.pubkey,
+      form.mintAccount.extensions.mint!.account.mintAuthority!,
       [],
       mintAmount
     )
@@ -509,66 +520,272 @@ export async function getConvertToMsolInstruction({
   return obj
 }
 
-export const getTransferInstructionObj = async ({
+export async function getConvertToStSolInstruction({
+  schema,
+  form,
   connection,
-  governedTokenAccount,
-  destinationAccount,
-  amount,
   wallet,
+  setFormErrors,
+  config,
 }: {
+  schema: any
+  form: any
   connection: ConnectionContext
-  governedTokenAccount: AssetAccount
-  destinationAccount: string
-  amount: number | BN
-  wallet: SignerWalletAdapter
-}) => {
-  const obj: {
-    transferInstruction: TransactionInstruction | null
-    ataInstruction: TransactionInstruction | null
-  } = {
-    transferInstruction: null,
-    ataInstruction: null,
-  }
-  const sourceAccount = governedTokenAccount.extensions.transferAddress
-  //this is the original owner
-  const destinationAccountPk = new PublicKey(destinationAccount)
-  const mintPK = governedTokenAccount!.extensions!.mint!.publicKey!
-  const mintAmount =
-    typeof amount === 'number'
-      ? parseMintNaturalAmountFromDecimal(
-          amount,
-          governedTokenAccount.extensions.mint!.account.decimals
-        )
-      : amount
+  wallet: WalletAdapter | undefined
+  setFormErrors: any
+  config: any
+}): Promise<UiInstruction> {
+  const isValid = await validateInstruction({ schema, form, setFormErrors })
+  const prerequisiteInstructions: TransactionInstruction[] = []
+  let serializedInstruction = ''
 
-  //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
-  const { currentAddress: receiverAddress, needToCreateAta } = await getATA({
-    connection: connection,
-    receiverAddress: destinationAccountPk,
-    mintPK,
-    wallet: wallet!,
-  })
-  //we push this createATA instruction to transactions to create right before creating proposal
-  //we don't want to create ata only when instruction is serialized
-  if (needToCreateAta) {
-    const ataInst = Token.createAssociatedTokenAccountInstruction(
-      ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-      TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-      mintPK, // mint
-      receiverAddress, // ata
-      destinationAccountPk, // owner of token account
-      wallet!.publicKey! // fee payer
+  if (isValid && form.governedTokenAccount.extensions.transferAddress) {
+    const amount = getMintNaturalAmountFromDecimal(
+      form.amount,
+      form.governedTokenAccount.extensions.mint.account.decimals
     )
-    obj.ataInstruction = ataInst
+    let originAccount = form.governedTokenAccount.extensions.transferAddress
+    let associatedStSolAccount: PublicKey
+
+    if (form.destinationAccount) {
+      associatedStSolAccount = form.destinationAccount.pubkey
+
+      const stSolToken = new Token(
+        connection.current,
+        config.stSolMint,
+        TOKEN_PROGRAM_ID,
+        (null as unknown) as Keypair
+      )
+
+      const destinationAccountInfo = await stSolToken.getAccountInfo(
+        associatedStSolAccount
+      )
+      originAccount = destinationAccountInfo.owner
+    } else {
+      const { currentAddress: stSolAccount, needToCreateAta } = await getATA({
+        connection: connection,
+        receiverAddress: originAccount,
+        mintPK: config.stSolMint,
+        wallet,
+      })
+      associatedStSolAccount = stSolAccount
+      if (needToCreateAta && wallet?.publicKey) {
+        prerequisiteInstructions.push(
+          Token.createAssociatedTokenAccountInstruction(
+            ASSOCIATED_TOKEN_PROGRAM_ID,
+            TOKEN_PROGRAM_ID,
+            config.stSolMint,
+            associatedStSolAccount,
+            originAccount,
+            wallet.publicKey
+          )
+        )
+      }
+    }
+
+    const transaction = await lidoStake({
+      connection: connection.current,
+      payer: originAccount,
+      stSolAddress: associatedStSolAccount,
+      amount,
+      config,
+    })
+
+    if (transaction.instructions.length === 1) {
+      serializedInstruction = serializeInstructionToBase64(
+        transaction.instructions[0]
+      )
+    } else if (transaction.instructions.length === 2) {
+      serializedInstruction = serializeInstructionToBase64(
+        transaction.instructions[1]
+      )
+    } else {
+      throw Error(
+        `Lido's lidoStake instructions could not be calculated correctly.`
+      )
+    }
   }
-  const transferIx = Token.createTransferInstruction(
-    TOKEN_PROGRAM_ID,
-    sourceAccount!,
-    receiverAddress,
-    governedTokenAccount!.extensions!.token!.account.owner,
-    [],
-    new u64(mintAmount.toString())
-  )
-  obj.transferInstruction = transferIx
+
+  return {
+    serializedInstruction,
+    isValid,
+    governance: form.governedTokenAccount?.governance,
+    prerequisiteInstructions: prerequisiteInstructions,
+  }
+}
+
+export async function getCreateTokenMetadataInstruction({
+  schema,
+  form,
+  programId,
+  connection,
+  wallet,
+  governedMintInfoAccount,
+  setFormErrors,
+  mintAuthority,
+  payerSolTreasury,
+  shouldMakeSolTreasury,
+}: {
+  schema: any
+  form: any
+  programId: PublicKey | undefined
+  connection: ConnectionContext
+  wallet: WalletAdapter | undefined
+  governedMintInfoAccount: AssetAccount | undefined
+  setFormErrors: any
+  mintAuthority: PublicKey | null | undefined
+  payerSolTreasury: PublicKey | null | undefined
+  shouldMakeSolTreasury: boolean
+}): Promise<UiInstruction> {
+  const isValid = await validateInstruction({ schema, form, setFormErrors })
+  let serializedInstruction = ''
+  const prerequisiteInstructions: TransactionInstruction[] = []
+
+  let payer = payerSolTreasury
+
+  if (!payer && shouldMakeSolTreasury && governedMintInfoAccount) {
+    payer = await getNativeTreasuryAddress(
+      governedMintInfoAccount.governance.owner,
+      governedMintInfoAccount.governance.pubkey
+    )
+  }
+
+  if (
+    isValid &&
+    programId &&
+    form.mintAccount?.pubkey &&
+    mintAuthority &&
+    payer &&
+    wallet
+  ) {
+    const metadataPDA = await findMetadataPda(form.mintAccount?.pubkey)
+
+    const tokenMetadata = {
+      name: form.name,
+      symbol: form.symbol,
+      uri: form.uri,
+      sellerFeeBasisPoints: 0,
+      creators: null,
+      collection: null,
+      uses: null,
+    }
+
+    const treasuryFee = await connection.current.getMinimumBalanceForRentExemption(
+      0
+    )
+    // Todo: metadataSize is hardcoded at this moment but should be caliculated in the future.
+    // On 8.July.2022, Metadata.getMinimumBalanceForRentExemption is returning wrong price.
+    // const metadataFee = await Metadata.getMinimumBalanceForRentExemption(
+    //   {
+    //     key: Key.MetadataV1,
+    //     updateAuthority: mintAuthority,
+    //     mint: form.mintAccount?.pubkey,
+    //     data: tokenMetadata,
+    //     primarySaleHappened: true,
+    //     isMutable: true,
+    //     tokenStandard: TokenStandard.Fungible,
+    //     uses: null,
+    //     collection: null,
+    //     editionNonce: 255,
+    //   },
+    //   connection.current
+    // )
+    const metadataFee = await connection.current.getMinimumBalanceForRentExemption(
+      679
+    )
+    const treasuryInfo = await connection.current.getAccountInfo(payer)
+    const solTreasury = treasuryInfo?.lamports ?? 0
+    const amount = treasuryFee + metadataFee - solTreasury
+    if (amount > 0) {
+      const preTransferIx = SystemProgram.transfer({
+        fromPubkey: wallet.publicKey!,
+        toPubkey: payer,
+        lamports: amount,
+      })
+      preTransferIx.keys[0].isWritable = true
+      prerequisiteInstructions.push(preTransferIx)
+    }
+
+    const transferIx = createCreateMetadataAccountV2Instruction(
+      {
+        metadata: metadataPDA,
+        mint: form.mintAccount?.pubkey,
+        mintAuthority,
+        payer,
+        updateAuthority: mintAuthority,
+      },
+      {
+        createMetadataAccountArgsV2: {
+          data: tokenMetadata,
+          isMutable: true,
+        },
+      }
+    )
+    transferIx.keys[3].isWritable = true
+    serializedInstruction = serializeInstructionToBase64(transferIx)
+  }
+  const obj: UiInstruction = {
+    serializedInstruction,
+    isValid,
+    governance: governedMintInfoAccount?.governance,
+    prerequisiteInstructions: prerequisiteInstructions,
+  }
+  return obj
+}
+
+export async function getUpdateTokenMetadataInstruction({
+  schema,
+  form,
+  programId,
+  governedMintInfoAccount,
+  setFormErrors,
+  mintAuthority,
+}: {
+  schema: any
+  form: any
+  programId: PublicKey | undefined
+  governedMintInfoAccount: AssetAccount | undefined
+  setFormErrors: any
+  mintAuthority: PublicKey | null | undefined
+}): Promise<UiInstruction> {
+  const isValid = await validateInstruction({ schema, form, setFormErrors })
+  let serializedInstruction = ''
+  const prerequisiteInstructions: TransactionInstruction[] = []
+  if (isValid && programId && form.mintAccount?.pubkey && mintAuthority) {
+    const metadataPDA = await findMetadataPda(form.mintAccount?.pubkey)
+
+    const tokenMetadata = {
+      name: form.name,
+      symbol: form.symbol,
+      uri: form.uri,
+      sellerFeeBasisPoints: 0,
+      creators: null,
+      collection: null,
+      uses: null,
+    }
+
+    const transferIx = createUpdateMetadataAccountV2Instruction(
+      {
+        metadata: metadataPDA,
+        updateAuthority: mintAuthority,
+      },
+      {
+        updateMetadataAccountArgsV2: {
+          data: tokenMetadata,
+          updateAuthority: mintAuthority,
+          primarySaleHappened: true,
+          isMutable: true,
+        },
+      }
+    )
+    serializedInstruction = serializeInstructionToBase64(transferIx)
+  }
+
+  const obj: UiInstruction = {
+    serializedInstruction,
+    isValid,
+    governance: governedMintInfoAccount?.governance,
+    prerequisiteInstructions: prerequisiteInstructions,
+  }
   return obj
 }

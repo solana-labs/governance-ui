@@ -1,18 +1,19 @@
 import create, { State } from 'zustand'
 import { getNfts } from '@utils/tokens'
-import tokenService from '@utils/services/token'
+import tokenPriceService, {
+  TokenInfoWithoutDecimals,
+} from '@utils/services/tokenPrice'
 import { ConfirmedSignatureInfo, PublicKey } from '@solana/web3.js'
 import { notify } from '@utils/notifications'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
-import { Connection } from '@solana/web3.js'
-import { TokenInfo } from '@solana/spl-token-registry'
 import { WSOL_MINT } from '@components/instructions/tools'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
+import { ConnectionContext } from '@utils/connection'
 
 interface TreasuryAccountStore extends State {
   currentAccount: AssetAccount | null
   mintAddress: string
-  tokenInfo?: TokenInfo
+  tokenInfo?: TokenInfoWithoutDecimals
   recentActivity: ConfirmedSignatureInfo[]
 
   allNfts: NFTWithMint[]
@@ -26,7 +27,7 @@ interface TreasuryAccountStore extends State {
   handleFetchRecentActivity: (account: AssetAccount, connection) => void
   getNfts: (
     nftsGovernedTokenAccounts: AssetAccount[],
-    connection: Connection
+    connection: ConnectionContext
   ) => void
 }
 
@@ -50,13 +51,13 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
       const governance = acc.governance.pubkey.toBase58()
       try {
         const nfts = acc.governance.pubkey
-          ? await getNfts(connection, acc.governance.pubkey)
+          ? await getNfts(acc.governance.pubkey, connection)
           : []
         if (acc.isSol) {
           const solAccountNfts = acc.extensions.transferAddress
             ? await getNfts(
-                connection,
-                new PublicKey(acc.extensions.transferAddress!)
+                new PublicKey(acc.extensions.transferAddress!),
+                connection
               )
             : []
           realmNfts = [...realmNfts, ...solAccountNfts]
@@ -103,7 +104,7 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
     if (account.type === AccountType.SOL) {
       mintAddress = WSOL_MINT
     }
-    const tokenInfo = tokenService.getTokenInfo(mintAddress)
+    const tokenInfo = tokenPriceService.getTokenInfo(mintAddress)
     set((s) => {
       s.currentAccount = account
       s.mintAddress = mintAddress

@@ -29,8 +29,8 @@ export default function ProposalVoteResult(props: Props) {
   }, 0)
 
   const threshold =
-    props.proposal.account.voteThresholdPercentage?.value ||
-    props.governance.account.config.voteThresholdPercentage.value
+    props.proposal.account.voteThreshold?.value ||
+    props.governance.account.config.communityVoteThreshold.value
 
   return (
     <div className={props.className}>

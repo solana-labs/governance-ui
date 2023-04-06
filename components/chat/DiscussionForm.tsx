@@ -3,17 +3,17 @@ import Button from '../Button'
 import Input from '../inputs/Input'
 import useWalletStore from '../../stores/useWalletStore'
 import useRealm from '../../hooks/useRealm'
-import { RpcContext, GoverningTokenType } from '@solana/spl-governance'
+import { RpcContext, GoverningTokenRole } from '@solana/spl-governance'
 import { ChatMessageBody, ChatMessageBodyType } from '@solana/spl-governance'
 import { postChatMessage } from '../../actions/chat/postMessage'
 import Loading from '../Loading'
 import Tooltip from '@components/Tooltip'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const DiscussionForm = () => {
   const [comment, setComment] = useState('')
-  const connected = useWalletStore((s) => s.connected)
   const {
     ownVoterWeight,
     realmInfo,
@@ -26,13 +26,14 @@ const DiscussionForm = () => {
   )
   const [submitting, setSubmitting] = useState(false)
 
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const connection = useWalletStore((s) => s.connection)
   const { proposal } = useWalletStore((s) => s.selectedProposal)
   const { fetchChatMessages } = useWalletStore((s) => s.actions)
-  const { tokenType } = useWalletStore((s) => s.selectedProposal)
+  const { tokenRole } = useWalletStore((s) => s.selectedProposal)
   const commenterVoterTokenRecord =
-    tokenType === GoverningTokenType.Community
+    tokenRole === GoverningTokenRole.Community
       ? ownTokenRecord
       : ownCouncilTokenRecord
 

@@ -17,6 +17,8 @@
     "paths": {
       "@components/*": ["components/*"],
       "@hooks/*": ["hooks/*"],
+      "@hub/*": ["hub/*"],
+      "@verify-wallet/*": ["verify-wallet/*"],
       "@tools/*": ["tools/*"],
       "@models/*": ["models/*"],
       "@utils/*": ["utils/*"]
@@ -24,7 +26,7 @@
     "incremental": true,
     "isolatedModules": true
   },
-  "exclude": ["node_modules", ".next", "out", "docs"],
+  "exclude": ["node_modules/**/*", ".next", "out", "docs"],
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.js"],
   "ts-node": {
     "require": ["tsconfig-paths/register"],

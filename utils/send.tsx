@@ -1,9 +1,7 @@
 import { notify } from './notifications'
 import {
-  Commitment,
   Connection,
   Keypair,
-  RpcResponseAndContext,
   SimulatedTransactionResponse,
   Transaction,
   TransactionSignature,
@@ -49,7 +47,6 @@ export async function sendTransaction({
     signers,
     connection,
   })
-
   return await sendSignedTransaction({
     signedTransaction,
     connection,
@@ -180,9 +177,8 @@ export async function sendSignedTransaction({
     // Simulate failed transaction to parse out an error reason
     try {
       console.log('start simulate')
-      simulateResult = (
-        await simulateTransaction(connection, signedTransaction, 'single')
-      ).value
+      simulateResult = (await connection.simulateTransaction(signedTransaction))
+        .value
     } catch (error) {
       console.log('Error simulating: ', error)
     }
@@ -294,9 +290,8 @@ export async function sendSignedAndAdjacentTransactions({
     // Simulate failed transaction to parse out an error reason
     try {
       console.log('start simulate')
-      simulateResult = (
-        await simulateTransaction(connection, signedTransaction, 'single')
-      ).value
+      simulateResult = (await connection.simulateTransaction(signedTransaction))
+        .value
     } catch (error) {
       console.log('Error simulating: ', error)
     }
@@ -423,38 +418,4 @@ async function awaitTransactionSignatureConfirmation(
   })
   done = true
   return result
-}
-
-/** Copy of Connection.simulateTransaction that takes a commitment parameter. */
-export async function simulateTransaction(
-  connection: Connection,
-  transaction: Transaction,
-  commitment: Commitment
-): Promise<RpcResponseAndContext<SimulatedTransactionResponse>> {
-  // @ts-ignore
-  transaction.recentBlockhash = await connection._recentBlockhash(
-    // @ts-ignore
-    connection._disableBlockhashCaching
-  )
-
-  console.log('simulating transaction', transaction)
-
-  const signData = transaction.serializeMessage()
-  // @ts-ignore
-  const wireTransaction = transaction._serialize(signData)
-  const encodedTransaction = wireTransaction.toString('base64')
-
-  console.log('encoding')
-  const config: any = { encoding: 'base64', commitment }
-  const args = [encodedTransaction, config]
-  console.log('simulating data', args)
-
-  // @ts-ignore
-  const res = await connection._rpcRequest('simulateTransaction', args)
-
-  console.log('res simulating transaction', res)
-  if (res.error) {
-    throw new Error('failed to simulate transaction: ' + res.error.message)
-  }
-  return res.result
 }

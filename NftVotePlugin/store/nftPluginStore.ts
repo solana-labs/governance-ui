@@ -1,4 +1,4 @@
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { MaxVoterWeightRecord, ProgramAccount } from '@solana/spl-governance'
 import { NFTWithMeta, VotingClient } from '@utils/uiTypes/VotePlugin'
 import create, { State } from 'zustand'
@@ -39,22 +39,18 @@ const useNftPluginStore = create<nftPluginStore>((set, _get) => ({
     })
   },
   setVotingNfts: (nfts, votingClient, nftMintRegistrar) => {
-    const filteredNfts = nfts.filter(
-      (x) => x.token.account.amount.cmpn(1) === 0
-    )
-    votingClient._setCurrentVoterNfts(filteredNfts)
+    votingClient._setCurrentVoterNfts(nfts)
     set((s) => {
-      s.state.votingNfts = filteredNfts
+      s.state.votingNfts = nfts
     })
-    _get().setVotingPower(filteredNfts, nftMintRegistrar)
+    _get().setVotingPower(nfts, nftMintRegistrar)
   },
   setVotingPower: (nfts, nftMintRegistrar) => {
     const votingPower = nfts
       .map(
         (x) =>
           nftMintRegistrar?.collectionConfigs?.find(
-            (j) =>
-              j.collection?.toBase58() === x.metadata?.data?.collection?.key
+            (j) => j.collection?.toBase58() === x.collection.mintAddress
           )?.weight || new BN(0)
       )
       .reduce((prev, next) => prev.add(next), new BN(0))

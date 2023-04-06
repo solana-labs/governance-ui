@@ -1,72 +1,101 @@
-import { Menu } from '@headlessui/react'
+import React from 'react'
+import { Menu, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/solid'
+import { InformationCircleIcon } from '@heroicons/react/outline'
 import Loading from '@components/Loading'
+import Tooltip from './Tooltip'
 
-export interface DropdownBtnOptions {
-  isDefault: boolean | undefined
+interface DropdownOption {
   label: string
-  callback: () => Promise<void>
+  disabled?: boolean
+  disabledTooltip?: string
+  onClick: () => Promise<void>
 }
 
-const DropdownBtn = ({
-  options,
-  isLoading,
-}: {
-  options: DropdownBtnOptions[]
+interface DropdownBtnProps {
+  className: string
+  label?: string
+  options: DropdownOption[]
   isLoading?: boolean
-}) => {
-  const defaultFunction = options.find((x) => x.isDefault)
-  if (!defaultFunction) {
-    throw 'DropdownBtn must have at least one default option'
-  }
-  const filtredOptions = options.filter((x) => !x.isDefault)
-  return (
-    <div className="flex">
-      {isLoading ? (
-        <Loading></Loading>
-      ) : (
-        <>
-          <button
-            className={`bg-transparent border border-fgd-3 border-r-0 default-transition flex h-12 items-center pl-3 pr-4 rounded-l-full rounded-r-none w-36 hover:bg-bkg-3 focus:outline-none`}
-            onClick={() => defaultFunction?.callback()}
-          >
-            <div className="flex font-bold items-center text-fgd-1 text-left text-sm">
-              <div>{defaultFunction?.label}</div>
-            </div>
-          </button>
+  disabled?: boolean
+}
 
-          <div className="relative ">
-            <Menu>
-              {({ open }) => (
-                <>
-                  <Menu.Button
-                    className={`border border-fgd-3 cursor-pointer default-transition h-12 w-12 py-2 px-2 rounded-r-full hover:bg-bkg-3 focus:outline-none`}
-                  >
-                    <ChevronDownIcon
-                      className={`${
-                        open ? 'transform rotate-180' : 'transform rotate-360'
-                      } default-transition h-5 m-auto ml-1 text-primary-light w-5`}
-                    />
-                  </Menu.Button>
-                  <Menu.Items className="absolute bg-bkg-1 border border-fgd-4 p-2 right-0 top-14 shadow-md outline-none rounded-md w-48 z-20">
-                    {filtredOptions.map((x) => (
-                      <Menu.Item key={x.label}>
+const DropdownBtn: React.FC<DropdownBtnProps> = ({
+  className,
+  label = 'Options',
+  options,
+  isLoading = false,
+  disabled = false,
+}) => {
+  const basicClasses = `inline-flex rounded-full w-full justify-center bg-primary-light text-bkg-2 px-4 py-3 text-sm font-medium`
+  const hoverClasses = `hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 hover:bg-fgd-1`
+  const disabledClasses = disabled
+    ? `!bg-fgd-4 !cursor-not-allowed !text-fgd-3`
+    : ''
+  const btnClasses = `${basicClasses} ${hoverClasses} ${disabledClasses}`
+
+  return (
+    <Menu as="div" className={`${className} relative inline-block text-left`}>
+      {({ open }) => (
+        <>
+          <Menu.Button className={`${btnClasses}`}>
+            {isLoading ? (
+              <Loading />
+            ) : (
+              <>
+                <div className="font-bold">{label}</div>
+                <ChevronDownIcon
+                  className="ml-2 -mr-1 h-5 w-5"
+                  aria-hidden="true"
+                />
+              </>
+            )}
+          </Menu.Button>
+          <Transition
+            enter="transition ease-out duration-100"
+            enterFrom="transform opacity-0 scale-95"
+            enterTo="transform opacity-100 scale-100"
+            leave="transition ease-in duration-75"
+            leaveFrom="transform opacity-100 scale-100"
+            leaveTo="transform opacity-0 scale-95"
+          >
+            {!disabled && open && (
+              <Menu.Items
+                className="absolute right-0 mt-2 w-full origin-top-right divide-y divide-gray-100 rounded-md bg-bkg-3 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                static
+              >
+                <div className="px-1 py-1 ">
+                  {options.map((option, idx) => (
+                    <Menu.Item key={`option-${idx}`} disabled={option.disabled}>
+                      {({ active, disabled }) => (
                         <button
-                          className="flex default-transition h-9 items-center p-2 w-full hover:bg-bkg-3 hover:cursor-pointer hover:rounded font-normal focus:outline-none"
-                          onClick={() => x.callback()}
+                          onClick={option.onClick}
+                          className={`${
+                            active
+                              ? 'bg-primary-light text-fgd-1'
+                              : 'text-fgd-2'
+                          } 
+                          ${
+                            disabled ? `cursor-not-allowed !text-fgd-4` : ''
+                          } group flex w-full items-center justify-between rounded-md px-2 py-2 text-sm`}
                         >
-                          {x.label}
+                          {option.label}
+                          {disabled && option.disabledTooltip && (
+                            <Tooltip content={option.disabledTooltip}>
+                              <InformationCircleIcon className="h-5" />
+                            </Tooltip>
+                          )}
                         </button>
-                      </Menu.Item>
-                    ))}
-                  </Menu.Items>
-                </>
-              )}
-            </Menu>
-          </div>
+                      )}
+                    </Menu.Item>
+                  ))}
+                </div>
+              </Menu.Items>
+            )}
+          </Transition>
         </>
       )}
-    </div>
+    </Menu>
   )
 }
 

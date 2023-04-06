@@ -4,13 +4,17 @@ import { Disclosure } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/solid'
 import { useEffect, useRef, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
-import { RpcContext } from '@solana/spl-governance'
+import { InstructionExecutionStatus, RpcContext } from '@solana/spl-governance'
 import useRealm from '@hooks/useRealm'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import {
   ExecuteAllInstructionButton,
   PlayState,
 } from './ExecuteAllInstructionButton'
+import Button from '@components/Button'
+import { dryRunInstruction } from 'actions/dryRunInstruction'
+import { getExplorerInspectorUrl } from '@components/explorer/tools'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export function InstructionPanel() {
   const { instructions, proposal } = useProposal()
@@ -23,12 +27,12 @@ export function InstructionPanel() {
       mounted.current = false
     }
   }, [])
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
 
   const [currentSlot, setCurrentSlot] = useState(0)
 
-  const canExecuteAt = proposal!.account.votingCompletedAt
+  const canExecuteAt = proposal?.account.votingCompletedAt
     ? proposal!.account.votingCompletedAt.toNumber() + 1
     : 0
 
@@ -54,6 +58,7 @@ export function InstructionPanel() {
         clearTimeout(timer)
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [ineligibleToSee, connection, currentSlot])
 
   if (Object.values(instructions).length === 0) {
@@ -64,11 +69,28 @@ export function InstructionPanel() {
     (i1, i2) => i1.account.instructionIndex - i2.account.instructionIndex
   )
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [playing, setPlaying] = useState(
     proposalInstructions.every((x) => x.account.executedAt)
       ? PlayState.Played
       : PlayState.Unplayed
   )
+
+  const simulate = async () => {
+    const result = await dryRunInstruction(
+      connection.current,
+      wallet!,
+      null,
+      [],
+      proposalInstructions.map((x) => x.account.getSingleInstruction())
+    )
+
+    const inspectUrl = await getExplorerInspectorUrl(
+      connection,
+      result.transaction
+    )
+    window.open(inspectUrl, '_blank')
+  }
 
   return (
     <div>
@@ -105,7 +127,23 @@ export function InstructionPanel() {
               ))}
 
               {proposal && proposalInstructions.length > 1 && (
-                <div className="flex justify-end">
+                <div className="flex justify-end space-x-4">
+                  {proposalInstructions.filter((x) => !x.account.executedAt)
+                    .length !== 0 && (
+                    <Button onClick={simulate}>Inspect all</Button>
+                  )}
+                  <ExecuteAllInstructionButton
+                    proposal={proposal}
+                    proposalInstructions={proposalInstructions.filter(
+                      (x) =>
+                        x.account.executionStatus ===
+                        InstructionExecutionStatus.None
+                    )}
+                    playing={playing}
+                    setPlaying={setPlaying}
+                    label="Execute in separated transactions"
+                    multiTransactionMode={true}
+                  />
                   <ExecuteAllInstructionButton
                     proposal={proposal}
                     proposalInstructions={proposalInstructions}

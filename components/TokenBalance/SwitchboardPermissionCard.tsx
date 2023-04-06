@@ -4,6 +4,7 @@ import Button from '@components/Button'
 import { ChevronRightIcon } from '@heroicons/react/outline'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { getTokenOwnerRecordAddress } from '@solana/spl-governance'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
@@ -13,8 +14,8 @@ import { sbRefreshWeight } from '../../actions/switchboardRefreshVoterWeight'
 
 const SwitchboardPermissionCard = () => {
   const { fmtUrlWithCluster } = useQueryContext()
-  const connected = useWalletStore((s) => s.connected)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
 
   const switchboardVoterWeight = useSwitchboardPluginStore(
     (s) => s.state.votingPower
@@ -41,9 +42,10 @@ const SwitchboardPermissionCard = () => {
     if (realm && wallet?.connected) {
       getTokenOwnerRecord()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [realm?.pubkey.toBase58(), wallet?.connected])
   return (
-    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
+    <>
       <div className="flex items-center justify-between mb-4">
         <h3 className="mb-0">Your Queue Voting Rights:</h3>
         <Link
@@ -80,7 +82,7 @@ const SwitchboardPermissionCard = () => {
       >
         Refresh Voting Rights
       </Button>
-    </div>
+    </>
   )
 }
 export default SwitchboardPermissionCard

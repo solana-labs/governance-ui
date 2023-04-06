@@ -17,9 +17,9 @@ import {
   getVoterWeightPDA,
   LockupType,
 } from 'VoteStakeRegistry/sdk/accounts'
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { getMintCfgIdx, tryGetVoter } from './api'
 import { getPeriod } from 'VoteStakeRegistry/tools/deposits'
+import { VsrClient } from './client'
 
 export const withCreateNewDeposit = async ({
   instructions,
@@ -28,6 +28,7 @@ export const withCreateNewDeposit = async ({
   communityMintPk,
   realmPk,
   programId,
+  programVersion,
   tokenOwnerRecordPk,
   lockUpPeriodInDays,
   lockupKind,
@@ -40,6 +41,7 @@ export const withCreateNewDeposit = async ({
   communityMintPk: PublicKey
   realmPk: PublicKey
   programId: PublicKey
+  programVersion: number
   tokenOwnerRecordPk: PublicKey | null
   lockUpPeriodInDays: number
   lockupKind: LockupType
@@ -83,12 +85,14 @@ export const withCreateNewDeposit = async ({
     tokenOwnerRecordPubKey = await withCreateTokenOwnerRecord(
       instructions,
       programId,
+      programVersion,
       realmPk,
       walletPk,
       mintPk,
       walletPk
     )
   }
+
   if (!existingVoter) {
     const createVoterIx = await client?.program.methods
       .createVoter(voterBump, voterWeightBump)

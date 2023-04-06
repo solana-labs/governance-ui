@@ -1,4 +1,4 @@
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { PublicKey } from '@solana/web3.js'
 
 export interface Member {
@@ -15,8 +15,8 @@ export interface Member {
 export interface Delegate {
   communityMembers?: Array<Member>
   councilMembers?: Array<Member>
-  communityTokenCount?: number
-  councilTokenCount?: number
+  communityTokenCount?: BN
+  councilTokenCount?: BN
 }
 
 export interface Delegates {

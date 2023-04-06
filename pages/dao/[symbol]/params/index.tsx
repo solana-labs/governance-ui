@@ -2,37 +2,64 @@ import { useEffect, useState } from 'react'
 import GovernedAccountsTabs from '@components/GovernedAccountsTabs'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import useRealm from '@hooks/useRealm'
-import { fmtMintAmount } from '@tools/sdk/units'
-import { MAX_TOKENS_TO_DISABLE } from '@tools/constants'
+import { fmtBNAmount, fmtMintAmount } from '@tools/sdk/units'
+import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import { capitalize } from '@utils/helpers'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import Tabs from '@components/Tabs'
 import Select from '@components/inputs/Select'
 import Button from '@components/Button'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import { useRouter } from 'next/router'
 
 import RealmConfigModal from './RealmConfigModal'
-import GovernanceConfigModal from './GovernanceConfigModal'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { getAccountName } from '@components/instructions/tools'
-import useWalletStore from 'stores/useWalletStore'
 import SetRealmAuthorityModal from './SetRealmAuthorityModal'
+import MetadataCreationModal from './MetadataCreationModal'
 
 import ParamsView from './components/ParamsView'
 import AccountsView from './components/AccountsView'
 import StatsView from './components/StatsView'
 import { ExclamationIcon } from '@heroicons/react/outline'
 import Tooltip from '@components/Tooltip'
+import { AccountType } from '@utils/uiTypes/assets'
+import { MintMaxVoteWeightSourceType } from '@solana/spl-governance'
+import useQueryContext from '@hooks/useQueryContext'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const Params = () => {
-  const { realm, mint } = useRealm()
-  const wallet = useWalletStore((s) => s.current)
+  const router = useRouter()
+  const { realm, mint, config, symbol } = useRealm()
+  const wallet = useWalletOnePointOh()
+  const { fmtUrlWithCluster } = useQueryContext()
   const {
     canUseAuthorityInstruction,
     assetAccounts,
     auxiliaryTokenAccounts,
   } = useGovernanceAssets()
   const governancesArray = useGovernanceAssetsStore((s) => s.governancesArray)
+  const mintGovernancesWithMintInfo = assetAccounts.filter((x) => {
+    return x.type === AccountType.MINT
+  })
+
+  const hasAuthorityGovernances = governancesArray.filter((governance) => {
+    const filteredMintGovernances = mintGovernancesWithMintInfo.filter(
+      (mintGovernance) =>
+        mintGovernance.governance.pubkey.toString() ===
+        governance.pubkey.toString()
+    )
+
+    if (filteredMintGovernances.length == 0) {
+      return false
+    }
+
+    return (
+      filteredMintGovernances[0].governance.pubkey.toString() ===
+      governance.pubkey.toString()
+    )
+  })
+  const showCreateMetadataButton = !!hasAuthorityGovernances.length
   const loadGovernedAccounts = useGovernanceAssetsStore(
     (s) => s.loadGovernedAccounts
   )
@@ -43,32 +70,29 @@ const Params = () => {
   const [isRealmProposalModalOpen, setIsRealmProposalModalOpen] = useState(
     false
   )
-  const [
-    isGovernanceProposalModalOpen,
-    setIsGovernanceProposalModalOpen,
-  ] = useState(false)
   const [activeGovernance, setActiveGovernance] = useState<any>(null)
   const [activeTab, setActiveTab] = useState('Params')
   const [isRealmAuthorityModalOpen, setRealmAuthorityModalIsOpen] = useState(
     false
   )
+  const [
+    isMetadataCreationModalOpen,
+    setIsMetadataCreationModalOpen,
+  ] = useState(false)
   const realmAccount = realm?.account
   const communityMint = realmAccount?.communityMint.toBase58()
   const councilMintPk = realmAccount?.config.councilMint?.toBase58()
   const communityMintMaxVoteWeightSource =
     realmAccount?.config.communityMintMaxVoteWeightSource
   const realmConfig = realmAccount?.config
-  const openRealmProposalModal = () => {
-    setIsRealmProposalModalOpen(true)
-  }
   const closeRealmProposalModal = () => {
     setIsRealmProposalModalOpen(false)
   }
-  const openGovernanceProposalModal = () => {
-    setIsGovernanceProposalModalOpen(true)
+  const openMetadataCreationModal = () => {
+    setIsMetadataCreationModalOpen(true)
   }
-  const closeGovernanceProposalModal = () => {
-    setIsGovernanceProposalModalOpen(false)
+  const closeMetadataCreationModal = () => {
+    setIsMetadataCreationModalOpen(false)
   }
   const openSetRealmAuthorityModal = () => {
     setRealmAuthorityModalIsOpen(true)
@@ -81,7 +105,7 @@ const Params = () => {
   }
   const minCommunityTokensToCreateGovernance =
     realmConfig &&
-    MAX_TOKENS_TO_DISABLE.eq(realmConfig.minCommunityTokensToCreateGovernance)
+    DISABLED_VOTER_WEIGHT.eq(realmConfig.minCommunityTokensToCreateGovernance)
       ? 'Disabled'
       : realmConfig?.minCommunityTokensToCreateGovernance &&
         fmtMintAmount(mint, realmConfig.minCommunityTokensToCreateGovernance)
@@ -100,18 +124,18 @@ const Params = () => {
           closeProposalModal={closeRealmProposalModal}
         ></RealmConfigModal>
       )}
-      {isGovernanceProposalModalOpen && activeGovernance && (
-        <GovernanceConfigModal
-          governance={activeGovernance}
-          isProposalModalOpen={isGovernanceProposalModalOpen}
-          closeProposalModal={closeGovernanceProposalModal}
-        ></GovernanceConfigModal>
-      )}
       {isRealmAuthorityModalOpen && (
         <SetRealmAuthorityModal
           isOpen={isRealmAuthorityModalOpen}
           closeModal={closeSetRealmAuthorityModal}
         ></SetRealmAuthorityModal>
+      )}
+      {isMetadataCreationModalOpen && (
+        <MetadataCreationModal
+          governance={activeGovernance}
+          isOpen={isMetadataCreationModalOpen}
+          closeModal={closeMetadataCreationModal}
+        ></MetadataCreationModal>
       )}
       <div className="col-span-12 p-4 rounded-lg bg-bkg-2 md:p-6">
         <div className="mb-4">
@@ -123,7 +147,7 @@ const Params = () => {
           </h1>
         </div>
         <div className="grid grid-cols-1 gap-4 pb-6 lg:grid-cols-2 lg:gap-6">
-          {activeGovernance ? (
+          {realm ? (
             <>
               <div className="col-span-1 p-4 border rounded-md border-fgd-4">
                 <h2>Addresses</h2>
@@ -169,6 +193,26 @@ const Params = () => {
                     </Button>
                   )}
                 </div>
+                <div className="flex">
+                  {showCreateMetadataButton && (
+                    <Button
+                      disabled={
+                        !canUseAuthorityInstruction || !realmAuthorityGovernance
+                      }
+                      tooltipMessage={
+                        !canUseAuthorityInstruction
+                          ? 'Please connect wallet with enough voting power to create realm config proposals'
+                          : !realmAuthorityGovernance
+                          ? 'None of the governances is realm authority'
+                          : ''
+                      }
+                      onClick={openMetadataCreationModal}
+                      className="ml-auto"
+                    >
+                      Create metadata
+                    </Button>
+                  )}
+                </div>
               </div>
               <div className="col-span-1 p-4 border rounded-md border-fgd-4">
                 <h2 className="flex items-center">Config </h2>
@@ -176,7 +220,12 @@ const Params = () => {
                   <AddressField
                     padding
                     label="Community mint max vote weight source"
-                    val={`${communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}%`}
+                    val={`${
+                      communityMintMaxVoteWeightSource.type ===
+                      MintMaxVoteWeightSourceType.SupplyFraction
+                        ? `${communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}%`
+                        : fmtBNAmount(communityMintMaxVoteWeightSource.value)
+                    }`}
                   />
                 )}
                 <AddressField
@@ -188,14 +237,14 @@ const Params = () => {
                   padding
                   label="Use community voter weight add-in"
                   val={getYesNoString(
-                    realmConfig?.useCommunityVoterWeightAddin
+                    config?.account.communityTokenConfig.voterWeightAddin
                   )}
                 />
                 <AddressField
                   padding
                   label="Use max community voter weight add-in"
                   val={getYesNoString(
-                    realmConfig?.useMaxCommunityVoterWeightAddin
+                    config?.account.communityTokenConfig.maxVoterWeightAddin
                   )}
                 />
                 <div className="flex">
@@ -210,7 +259,11 @@ const Params = () => {
                         ? 'None of the governances is realm authority'
                         : ''
                     }
-                    onClick={openRealmProposalModal}
+                    onClick={() => {
+                      router.push(
+                        fmtUrlWithCluster(`/realm/${symbol}/config/edit`)
+                      )
+                    }}
                     className="ml-auto"
                   >
                     Change config
@@ -279,10 +332,7 @@ const Params = () => {
                     />
                   ) : null}
                   {activeTab === 'Params' && (
-                    <ParamsView
-                      activeGovernance={activeGovernance}
-                      openGovernanceProposalModal={openGovernanceProposalModal}
-                    />
+                    <ParamsView activeGovernance={activeGovernance} />
                   )}
                   {activeTab === 'Accounts' && (
                     <AccountsView

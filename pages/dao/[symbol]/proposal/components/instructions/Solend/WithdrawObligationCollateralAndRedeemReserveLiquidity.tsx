@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import Input from '@components/inputs/Input'
 import BigNumber from 'bignumber.js'
 import * as yup from 'yup'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import {
   Governance,
   ProgramAccount,
@@ -25,6 +25,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const WithdrawObligationCollateralAndRedeemReserveLiquidity = ({
   index,
@@ -34,7 +35,7 @@ const WithdrawObligationCollateralAndRedeemReserveLiquidity = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
 
@@ -43,15 +44,18 @@ const WithdrawObligationCollateralAndRedeemReserveLiquidity = ({
     return <>This instruction does not support {connection.cluster}</>
   }
 
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [
     form,
     setForm,
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   ] = useState<WithdrawObligationCollateralAndRedeemReserveLiquidityForm>({
     uiAmount: '0',
   })
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [formErrors, setFormErrors] = useState({})
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const { handleSetInstructions } = useContext(NewProposalContext)
 
   const handleSetForm = ({ propertyName, value }) => {
@@ -106,13 +110,16 @@ const WithdrawObligationCollateralAndRedeemReserveLiquidity = ({
     }
   }
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   useEffect(() => {
     handleSetForm({
       propertyName: 'programId',
       value: programId?.toString(),
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [programId])
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   useEffect(() => {
     handleSetInstructions(
       {
@@ -121,6 +128,7 @@ const WithdrawObligationCollateralAndRedeemReserveLiquidity = ({
       },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
 
   const schema = yup.object().shape({
@@ -138,7 +146,7 @@ const WithdrawObligationCollateralAndRedeemReserveLiquidity = ({
   return (
     <>
       <GovernedAccountSelect
-        label="Governance"
+        label="Wallet"
         governedAccounts={assetAccounts}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedAccount' })

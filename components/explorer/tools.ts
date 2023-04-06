@@ -1,4 +1,5 @@
 import { PublicKey, Transaction } from '@solana/web3.js'
+import { ConnectionContext } from '@utils/connection'
 import base58 from 'bs58'
 
 export function getExplorerUrl(
@@ -27,18 +28,23 @@ export function getExplorerUrl(
 }
 
 /// Returns explorer inspector URL for the given transaction
-export function getExplorerInspectorUrl(
-  endpoint: string,
+export async function getExplorerInspectorUrl(
+  connection: ConnectionContext,
   transaction: Transaction
 ) {
   const SIGNATURE_LENGTH = 64
 
-  const explorerUrl = new URL(getExplorerUrl(endpoint, 'inspector', 'tx'))
+  const explorerUrl = new URL(
+    getExplorerUrl(connection.endpoint, 'inspector', 'tx')
+  )
 
   const signatures = transaction.signatures.map((s) =>
     base58.encode(s.signature ?? Buffer.alloc(SIGNATURE_LENGTH))
   )
   explorerUrl.searchParams.append('signatures', JSON.stringify(signatures))
+  const latestBlockhash = await connection.current.getLatestBlockhash()
+  transaction.lastValidBlockHeight = latestBlockhash.lastValidBlockHeight
+  transaction.recentBlockhash = latestBlockhash.blockhash
 
   const message = transaction.serializeMessage()
   explorerUrl.searchParams.append('message', message.toString('base64'))

@@ -1,9 +1,10 @@
 import Modal from '@components/Modal'
 import ModalHeader from './ModalHeader'
 import SolendModalContent from './SolendModalContent'
-import MangoDeposit from './MangoDepositComponent'
-import BigNumber from 'bignumber.js'
 import { SolendStrategy } from 'Strategies/types/types'
+import EverlendModalContent from './EverlendModalContent'
+import { PsyFiStrategies } from './psyfi'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 const DepositModal = ({
   onClose,
@@ -14,15 +15,20 @@ const DepositModal = ({
   protocolLogoSrc,
   handledTokenName,
   strategyName,
-  currentPosition,
   createProposalFcn,
-  mangoAccounts,
   governedTokenAccount,
+}: {
+  onClose: () => void
+  proposedInvestment: any
+  handledMint: string
+  apy: string
+  protocolName: string
+  protocolLogoSrc: string
+  handledTokenName: string
+  strategyName: string
+  createProposalFcn: any
+  governedTokenAccount: AssetAccount
 }) => {
-  const currentPositionFtm = new BigNumber(
-    currentPosition.toFixed(0)
-  ).toFormat()
-
   return (
     <Modal onClose={onClose} isOpen={Boolean(proposedInvestment)}>
       <ModalHeader
@@ -40,14 +46,22 @@ const DepositModal = ({
           createProposalFcn={createProposalFcn}
         />
       ) : null}
-      {protocolName === 'Mango' ? (
-        <MangoDeposit
+      {protocolName === 'Everlend' ? (
+        <EverlendModalContent
+          proposedInvestment={proposedInvestment}
           governedTokenAccount={governedTokenAccount}
-          mangoAccounts={mangoAccounts}
           handledMint={handledMint}
-          currentPositionFtm={currentPositionFtm}
           createProposalFcn={createProposalFcn}
-        ></MangoDeposit>
+        />
+      ) : null}
+      {/* TODO: Add the PsyFi modal */}
+      {protocolName === 'PsyFi' ? (
+        <PsyFiStrategies
+          proposedInvestment={proposedInvestment}
+          governedTokenAccount={governedTokenAccount}
+          handledMint={handledMint}
+          createProposalFcn={createProposalFcn}
+        />
       ) : null}
     </Modal>
   )

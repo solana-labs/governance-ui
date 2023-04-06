@@ -1,3 +1,4 @@
+import React from 'react'
 import Button from '@components/Button'
 import useRealm from '@hooks/useRealm'
 import {
@@ -13,15 +14,18 @@ import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import VotingPowerBox from '../TokenBalance/VotingPowerBox'
 import { PublicKey } from '@solana/web3.js'
 import { MintInfo } from '@solana/spl-token'
-import { BN } from '@project-serum/anchor'
-import tokenService from '@utils/services/token'
+import { BN } from '@coral-xyz/anchor'
+import tokenPriceService from '@utils/services/tokenPrice'
 import useWalletStore from 'stores/useWalletStore'
 import { getDeposits } from 'VoteStakeRegistry/tools/deposits'
 import { DepositWithMintAccount } from 'VoteStakeRegistry/sdk/accounts'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { notify } from '@utils/notifications'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { getTokenOwnerRecordAddress } from '@solana/spl-governance'
+import {
+  getTokenOwnerRecordAddress,
+  GoverningTokenRole,
+} from '@solana/spl-governance'
 import InlineNotification from '@components/InlineNotification'
 import {
   LightningBoltIcon,
@@ -29,8 +33,9 @@ import {
   LockClosedIcon,
 } from '@heroicons/react/outline'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
-import Account from './Account'
 import { abbreviateAddress } from '@utils/formatting'
+import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface DepositBox {
   mintPk: PublicKey
@@ -40,8 +45,18 @@ interface DepositBox {
 }
 const unlockedTypes = ['none']
 
-const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
-  const { realm, realmInfo, mint, tokenRecords, councilMint } = useRealm()
+const LockTokensAccount: React.FC<{
+  tokenOwnerRecordPk: string | string[] | undefined
+  children: React.ReactNode
+}> = ({ tokenOwnerRecordPk, children }) => {
+  const {
+    realm,
+    realmInfo,
+    mint,
+    tokenRecords,
+    councilMint,
+    config,
+  } = useRealm()
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const [reducedDeposits, setReducedDeposits] = useState<DepositBox[]>([])
@@ -57,8 +72,8 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
   )
   const [isLoading, setIsLoading] = useState(false)
   const connection = useWalletStore((s) => s.connection.current)
-  const wallet = useWalletStore((s) => s.current)
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const mainBoxesClasses = 'bg-bkg-1 col-span-1 p-4 rounded-md'
   const isNextSameRecord = (x, next) => {
     const nextType = Object.keys(next.lockup.kind)[0]
@@ -74,8 +89,8 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
     setIsLoading(true)
     try {
       if (
-        realm?.account.config.useCommunityVoterWeightAddin &&
-        realm.pubkey &&
+        config?.account.communityTokenConfig.voterWeightAddin &&
+        realm!.pubkey &&
         wallet?.publicKey &&
         client
       ) {
@@ -147,15 +162,17 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
     ) {
       handleGetDeposits()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(ownDeposits), ownDeposits.length])
   useEffect(() => {
     handleGetDeposits()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [isOwnerOfDeposits, client])
   useEffect(() => {
     const getTokenOwnerRecord = async () => {
       const defaultMint =
         !mint?.supply.isZero() ||
-        realm?.account.config.useMaxCommunityVoterWeightAddin
+        config?.account.communityTokenConfig.maxVoterWeightAddin
           ? realm!.account.communityMint
           : !councilMint?.supply.isZero()
           ? realm!.account.config.councilMint
@@ -173,6 +190,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
     if (realm && wallet?.connected) {
       getTokenOwnerRecord()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [realm?.pubkey.toBase58(), wallet?.connected, tokenOwnerRecordPk])
 
   const hasLockedTokens = useMemo(() => {
@@ -197,6 +215,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
             )?.index
         )
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [deposits])
 
   return (
@@ -206,15 +225,24 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
           <PreviousRouteBtn />
         </div>
         <div className="flex items-center justify-between mb-4">
-          <h1 className="leading-none mb-0">
-            Your Account{' '}
-            <span className="font-normal text-fgd-2 text-xs">
-              ({realmInfo?.displayName})
+          {realmInfo?.ogImage && (
+            <img
+              src={realmInfo?.ogImage}
+              className="mr-2 rouninded-full w-8 h-8"
+            />
+          )}
+          <h1 className="leading-none flex flex-col mb-0">
+            <span className="font-normal text-fgd-2 text-xs mb-2">
+              {realmInfo?.displayName}
             </span>
+            My governance power{' '}
           </h1>
 
           <div className="ml-auto flex flex-row">
-            <DepositCommunityTokensBtn className="mr-3" />
+            <DepositCommunityTokensBtn
+              inAccountDetails={true}
+              className="mr-3"
+            />
             <WithDrawCommunityTokens />
           </div>
         </div>
@@ -257,10 +285,11 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
                         x.mint,
                         x.currentAmount
                       ).toNumber() *
-                      tokenService.getUSDTokenPrice(x.mintPk.toBase58())
+                      tokenPriceService.getUSDTokenPrice(x.mintPk.toBase58())
                     const tokenName =
                       getMintMetadata(x.mintPk)?.name ||
-                      tokenService.getTokenInfo(x.mintPk.toBase58())?.name ||
+                      tokenPriceService.getTokenInfo(x.mintPk.toBase58())
+                        ?.name ||
                       abbreviateAddress(x.mintPk)
                     const formatter = Intl.NumberFormat('en', {
                       notation: 'compact',
@@ -364,8 +393,16 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
             onClose={() => setIsLockModalOpen(false)}
           ></LockTokensModal>
         )}
+        <div className="mt-4">
+          <TokenDeposit
+            mint={councilMint}
+            tokenRole={GoverningTokenRole.Council}
+            councilVote={true}
+            inAccountDetails={true}
+          />
+        </div>
       </div>
-      {connected && <Account withHeader={false}></Account>}
+      {connected && children}
     </div>
   )
 }

@@ -8,6 +8,7 @@ import useWalletStore from '../../stores/useWalletStore'
 import { getExplorerInspectorUrl, getExplorerUrl } from './tools'
 import { SecondaryButton } from '../Button'
 import { notify } from '@utils/notifications'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export default function InspectorButton({
   proposalInstruction,
@@ -15,8 +16,8 @@ export default function InspectorButton({
   proposalInstruction: ProgramAccount<ProposalTransaction>
 }) {
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const wasExecuted =
     proposalInstruction.account.executionStatus ===
     InstructionExecutionStatus.Success
@@ -30,10 +31,7 @@ export default function InspectorButton({
         instructionData
       )
 
-      inspectUrl = getExplorerInspectorUrl(
-        connection.endpoint,
-        result.transaction
-      )
+      inspectUrl = await getExplorerInspectorUrl(connection, result.transaction)
     } else {
       try {
         const recentActivity = await connection.current.getConfirmedSignaturesForAddress2(

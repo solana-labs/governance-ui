@@ -15,10 +15,12 @@ export default function useHydrateStore() {
     if ((routeHasClusterInPath && cluster) || !routeHasClusterInPath) {
       fetchRealmBySymbol(cluster as string, symbol as string)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [symbol, cluster])
   useEffect(() => {
     if (pk && Object.entries(selectedRealmMints).length > 0) {
       fetchProposal(pk)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [pk, selectedRealmMints, JSON.stringify(proposals)])
 }

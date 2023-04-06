@@ -1,10 +1,12 @@
 import useRealm from '@hooks/useRealm'
 import Members from './Members'
 const MembersPage = () => {
-  const { realm } = useRealm()
+  const { config } = useRealm()
   return (
     <div>
-      {!realm?.account.config.useCommunityVoterWeightAddin ? <Members /> : null}
+      {!config?.account.communityTokenConfig.voterWeightAddin ? (
+        <Members />
+      ) : null}
     </div>
   )
 }

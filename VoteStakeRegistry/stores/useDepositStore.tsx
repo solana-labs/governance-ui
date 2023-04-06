@@ -1,15 +1,16 @@
 import create, { State } from 'zustand'
 import { DepositWithMintAccount } from 'VoteStakeRegistry/sdk/accounts'
 import { Connection, PublicKey } from '@solana/web3.js'
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { getDeposits } from 'VoteStakeRegistry/tools/deposits'
+import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 
 interface DepositStore extends State {
   state: {
     deposits: DepositWithMintAccount[]
     votingPower: BN
     votingPowerFromDeposits: BN
+    isLoading: boolean
   }
   resetDepositState: () => void
   getOwnedDeposits: ({
@@ -33,6 +34,7 @@ const defaultState = {
   deposits: [],
   votingPower: new BN(0),
   votingPowerFromDeposits: new BN(0),
+  isLoading: false,
 }
 
 const useDepositStore = create<DepositStore>((set, _get) => ({
@@ -52,6 +54,10 @@ const useDepositStore = create<DepositStore>((set, _get) => ({
     client,
     connection,
   }) => {
+    set((s) => {
+      s.state.isLoading = true
+    })
+
     const {
       votingPower,
       deposits,
@@ -69,6 +75,7 @@ const useDepositStore = create<DepositStore>((set, _get) => ({
       s.state.votingPower = votingPower
       s.state.deposits = deposits
       s.state.votingPowerFromDeposits = votingPowerFromDeposits
+      s.state.isLoading = false
     })
   },
 }))

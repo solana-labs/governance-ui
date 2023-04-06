@@ -29,6 +29,7 @@ import { useRouter } from 'next/router'
 import { notify } from '@utils/notifications'
 import useCreateProposal from '@hooks/useCreateProposal'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const ConvertToMsol = () => {
   const { canChooseWhoVote, realm, symbol } = useRealm()
@@ -38,7 +39,7 @@ const ConvertToMsol = () => {
   const router = useRouter()
   const { handleCreateProposal } = useCreateProposal()
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const notConnectedMessage =
@@ -131,6 +132,7 @@ const ConvertToMsol = () => {
       value: currentAccount,
       propertyName: 'governedTokenAccount',
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [currentAccount, form.destinationAccount])
 
   return (

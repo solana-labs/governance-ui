@@ -13,7 +13,9 @@ import { getSignatories } from '@models/proposal'
 import useRealm from '@hooks/useRealm'
 import { fromOption } from 'fp-ts/Either'
 
-export default function useSignatories(proposal?: ProgramAccount<Proposal>) {
+export default function useSignatories(
+  proposal?: Pick<ProgramAccount<Proposal>, 'pubkey'>
+) {
   const { getRpcContext } = useRpcContext()
   const [signatories, setSignatories] = useState<
     ProgramAccount<SignatoryRecord>[]
@@ -25,6 +27,7 @@ export default function useSignatories(proposal?: ProgramAccount<Proposal>) {
     if (realm) {
       setContext(getRpcContext())
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [realm])
 
   useEffect(() => {

@@ -1,37 +1,31 @@
-import {
-  Keypair,
-  PublicKey,
-  Transaction,
-  TransactionInstruction,
-} from '@solana/web3.js'
+import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js'
 
 import {
   getGovernanceProgramVersion,
   getInstructionDataFromBase64,
-  getSignatoryRecordAddress,
   Governance,
   ProgramAccount,
   Realm,
   TokenOwnerRecord,
   VoteType,
   withCreateProposal,
+  getSignatoryRecordAddress,
 } from '@solana/spl-governance'
-import { withAddSignatory } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { withInsertTransaction } from '@solana/spl-governance'
 import { InstructionData } from '@solana/spl-governance'
-import { sendTransaction } from 'utils/send'
 import { withSignOffProposal } from '@solana/spl-governance'
 import {
-  sendTransactionsV2,
+  sendTransactionsV3,
   SequenceType,
-  transactionInstructionsToTypedInstructionsSets,
+  txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
 import { chunks } from '@utils/helpers'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
 import { NftVoterClient } from '@solana/governance-program-library'
-
+import { withAddSignatory } from '@solana/spl-governance'
+import { trySentryLog } from '@utils/logs'
 export interface InstructionDataWithHoldUpTime {
   data: InstructionData | null
   holdUpTime: number | undefined
@@ -77,14 +71,13 @@ export const createProposal = async (
   proposalIndex: number,
   instructionsData: InstructionDataWithHoldUpTime[],
   isDraft: boolean,
-  client?: VotingClient
+  client?: VotingClient,
+  callbacks?: Parameters<typeof sendTransactionsV3>[0]['callbacks']
 ): Promise<PublicKey> => {
   const instructions: TransactionInstruction[] = []
-
   const governanceAuthority = walletPubkey
   const signatory = walletPubkey
   const payer = walletPubkey
-  const notificationTitle = isDraft ? 'proposal draft' : 'proposal'
   const prerequisiteInstructions: TransactionInstruction[] = []
   const prerequisiteInstructionsSigners: Keypair[] = []
   // sum up signers
@@ -111,7 +104,8 @@ export const createProposal = async (
   const plugin = await client?.withUpdateVoterWeightRecord(
     instructions,
     tokenOwnerRecord,
-    'createProposal'
+    'createProposal',
+    governance
   )
 
   const proposalAddress = await withCreateProposal(
@@ -155,6 +149,7 @@ export const createProposal = async (
   const splitToChunkByDefault = instructionsData.filter(
     (x) => x.chunkSplitByDefault
   ).length
+
   const chunkBys = instructionsData
     .filter((x) => x.chunkBy)
     .map((x) => x.chunkBy!)
@@ -204,31 +199,9 @@ export const createProposal = async (
     )
   }
 
-  if (shouldSplitIntoSeparateTxs) {
-    const transaction1 = new Transaction()
-    const transaction2 = new Transaction()
-
-    transaction1.add(...prerequisiteInstructions, ...instructions)
-    transaction2.add(...insertInstructions)
-
-    await sendTransaction({
-      transaction: transaction1,
-      wallet,
-      connection,
-      signers,
-      sendingMessage: `creating ${notificationTitle}`,
-      successMessage: `${notificationTitle} created`,
-    })
-    await sendTransaction({
-      transaction: transaction2,
-      wallet,
-      connection,
-      signers: undefined,
-      sendingMessage: `inserting into ${notificationTitle}`,
-      successMessage: `inserted into ${notificationTitle}`,
-    })
-  } else if (
+  if (
     insertInstructionCount <= 2 &&
+    !shouldSplitIntoSeparateTxs &&
     !splitToChunkByDefault &&
     !(client?.client instanceof NftVoterClient)
   ) {
@@ -236,47 +209,95 @@ export const createProposal = async (
     // This is conservative setting and we might need to revise it if we have more empirical examples or
     // reliable way to determine Tx size
     // We merge instructions with prerequisiteInstructions
-    // Prerequisite  instructions can came from instructions as something we need to do before instruction can be executed
+    // Prerequisite instructions can came from instructions as something we need to do before instruction can be executed
     // For example we create ATAs if they don't exist as part of the proposal creation flow
+    const signersSet = [[], [], signers]
+    const txes = [
+      prerequisiteInstructions,
+      instructions,
+      insertInstructions,
+    ].map((txBatch, batchIdx) => {
+      return {
+        instructionsSet: txBatchesToInstructionSetWithSigners(
+          txBatch,
+          signersSet,
+          batchIdx
+        ),
+        sequenceType: SequenceType.Sequential,
+      }
+    })
 
-    await sendTransactionsV2({
-      wallet,
+    await sendTransactionsV3({
+      callbacks,
       connection,
-      signersSet: [[], [], signers],
-      showUiComponent: true,
-      TransactionInstructions: [
-        prerequisiteInstructions,
-        instructions,
-        insertInstructions,
-      ].map((x) =>
-        transactionInstructionsToTypedInstructionsSets(
-          x,
-          SequenceType.Sequential
-        )
-      ),
+      wallet,
+      transactionInstructions: txes,
     })
   } else {
     const insertChunks = chunks(insertInstructions, chunkBy)
-    const signerChunks = Array(insertChunks.length).fill([])
-
-    console.log(`Creating proposal using ${insertChunks.length} chunks`)
-    await sendTransactionsV2({
-      wallet,
-      connection,
-      signersSet: [[...prerequisiteInstructionsSigners], [], ...signerChunks],
-      showUiComponent: true,
-      TransactionInstructions: [
-        prerequisiteInstructions,
-        instructions,
-        ...insertChunks,
-      ].map((x) =>
-        transactionInstructionsToTypedInstructionsSets(
-          x,
-          SequenceType.Sequential
+    const signerChunks = Array(insertChunks.length)
+    signerChunks.push(...chunks(signers, chunkBy))
+    signerChunks.fill([])
+    const deduplicatedPrerequisiteInstructions = prerequisiteInstructions.filter(
+      (value, index, self) =>
+        index ===
+        self.findIndex(
+          (t) =>
+            t.data.toString() === value.data.toString() &&
+            t.keys.every((x) =>
+              value.keys.find(
+                (key) => key.pubkey.toBase58() === x.pubkey.toBase58()
+              )
+            )
         )
-      ),
+    )
+    const deduplicatedPrerequisiteInstructionsSigners = prerequisiteInstructionsSigners.filter(
+      (value, index, self) =>
+        index ===
+        self.findIndex(
+          (t) =>
+            t.publicKey.toString() === value.publicKey.toString() &&
+            t.secretKey.toString() === value.secretKey.toString()
+        )
+    )
+    const signersSet = [
+      ...chunks([...deduplicatedPrerequisiteInstructionsSigners], 5),
+      [],
+      ...signerChunks,
+    ]
+    const txes = [
+      ...chunks(deduplicatedPrerequisiteInstructions, 5),
+      instructions,
+      ...insertChunks,
+    ].map((txBatch, batchIdx) => {
+      return {
+        instructionsSet: txBatchesToInstructionSetWithSigners(
+          txBatch,
+          signersSet,
+          batchIdx
+        ),
+        sequenceType: SequenceType.Sequential,
+      }
+    })
+
+    await sendTransactionsV3({
+      callbacks,
+      connection,
+      wallet,
+      transactionInstructions: txes,
     })
   }
-
+  const logInfo = {
+    realmId: realm.pubkey.toBase58(),
+    realmSymbol: realm.account.name,
+    wallet: wallet.publicKey?.toBase58(),
+    proposalAddress: proposalAddress.toBase58(),
+    proposalIndex: proposalIndex,
+    cluster: connection.rpcEndpoint.includes('devnet') ? 'devnet' : 'mainnet',
+  }
+  trySentryLog({
+    tag: 'proposalCreated',
+    objToStringify: logInfo,
+  })
   return proposalAddress
 }

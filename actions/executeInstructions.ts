@@ -5,17 +5,29 @@ import {
   RpcContext,
   withExecuteTransaction,
 } from '@solana/spl-governance'
-import { Transaction, TransactionInstruction } from '@solana/web3.js'
+import {
+  ComputeBudgetProgram,
+  Transaction,
+  TransactionInstruction,
+} from '@solana/web3.js'
 import { sendSignedTransaction, signTransaction } from '@utils/send'
+import {
+  sendTransactionsV3,
+  SequenceType,
+  txBatchesToInstructionSetWithSigners,
+} from '@utils/sendTransactions'
 
-// Merge instructions within one Transaction, sign it and execute it
 export const executeInstructions = async (
   { connection, wallet, programId, programVersion }: RpcContext,
   proposal: ProgramAccount<Proposal>,
-  proposalInstructions: ProgramAccount<ProposalTransaction>[]
+  proposalInstructions: ProgramAccount<ProposalTransaction>[],
+  multiTransactionMode = false
 ) => {
   const instructions: TransactionInstruction[] = []
 
+  instructions.push(
+    ComputeBudgetProgram.setComputeUnitLimit({ units: 1_000_000 })
+  )
   await Promise.all(
     proposalInstructions.map((instruction) =>
       // withExecuteTransaction function mutate the given 'instructions' parameter
@@ -30,22 +42,36 @@ export const executeInstructions = async (
       )
     )
   )
-
-  const transaction = new Transaction()
-
-  transaction.add(...instructions)
-
-  const signedTransaction = await signTransaction({
-    transaction,
-    wallet,
-    connection,
-    signers: [],
-  })
-
-  await sendSignedTransaction({
-    signedTransaction,
-    connection,
-    sendingMessage: 'Executing instruction',
-    successMessage: 'Execution finalized',
-  })
+  if (multiTransactionMode) {
+    const txes = [...instructions.map((x) => [x])].map((txBatch, batchIdx) => {
+      return {
+        instructionsSet: txBatchesToInstructionSetWithSigners(
+          txBatch,
+          [],
+          batchIdx
+        ),
+        sequenceType: SequenceType.Sequential,
+      }
+    })
+    await sendTransactionsV3({
+      connection,
+      wallet,
+      transactionInstructions: txes,
+    })
+  } else {
+    const transaction = new Transaction()
+    transaction.add(...instructions)
+    const signedTransaction = await signTransaction({
+      transaction,
+      wallet,
+      connection,
+      signers: [],
+    })
+    await sendSignedTransaction({
+      signedTransaction,
+      connection,
+      sendingMessage: 'Executing instruction',
+      successMessage: 'Execution finalized',
+    })
+  }
 }

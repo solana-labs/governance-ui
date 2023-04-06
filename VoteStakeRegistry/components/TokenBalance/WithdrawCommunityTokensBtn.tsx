@@ -1,7 +1,7 @@
-import Button from '@components/Button'
+import { SecondaryButton } from '@components/Button'
 import useRealm from '@hooks/useRealm'
 import { getUnrelinquishedVoteRecords } from '@models/api'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import {
   getProposal,
   ProposalState,
@@ -19,7 +19,8 @@ import { notify } from '@utils/notifications'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { useState } from 'react'
 import Loading from '@components/Loading'
-import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
+import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const WithDrawCommunityTokens = () => {
   const { getOwnedDeposits } = useDepositStore()
@@ -35,15 +36,14 @@ const WithDrawCommunityTokens = () => {
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
   const [isLoading, setIsLoading] = useState(false)
-  const wallet = useWalletStore((s) => s.current)
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const connection = useWalletStore((s) => s.connection.current)
   const deposits = useDepositStore((s) => s.state.deposits)
   const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
     (s) => s.actions
   )
-  const maxVoterWeight =
-    useNftPluginStore((s) => s.state.maxVoteRecord)?.pubkey || undefined
+  const maxVoterWeight = useMaxVoteRecord()?.pubkey || undefined
   const depositRecord = deposits.find(
     (x) =>
       x.mint.publicKey.toBase58() === realm!.account.communityMint.toBase58() &&
@@ -105,6 +105,8 @@ const WithDrawCommunityTokens = () => {
         await withRelinquishVote(
           instructions,
           realmInfo!.programId,
+          getProgramVersionForRealm(realmInfo!),
+          realmInfo!.realmId,
           proposal.account.governance,
           proposal.pubkey,
           ownTokenRecord!.pubkey,
@@ -128,6 +130,8 @@ const WithDrawCommunityTokens = () => {
       depositIndex: depositRecord!.index,
       connection,
       client: client,
+      splProgramId: realm!.owner,
+      splProgramVersion: getProgramVersionForRealm(realmInfo!),
     })
 
     try {
@@ -178,7 +182,7 @@ const WithDrawCommunityTokens = () => {
     ? "You don't have any governance tokens to withdraw."
     : ''
   return (
-    <Button
+    <SecondaryButton
       tooltipMessage={withdrawTooltipContent}
       className="sm:w-1/2"
       disabled={
@@ -193,7 +197,7 @@ const WithDrawCommunityTokens = () => {
       onClick={withdrawAllTokens}
     >
       {isLoading ? <Loading></Loading> : 'Withdraw'}
-    </Button>
+    </SecondaryButton>
   )
 }
 

@@ -18,6 +18,7 @@ import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { getFriktionDepositInstruction } from '@utils/instructions/Friktion'
 import Select from '@components/inputs/Select'
 import { FriktionSnapshot, VoltSnapshot } from '@friktion-labs/friktion-sdk'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const FriktionDeposit = ({
   index,
@@ -27,10 +28,10 @@ const FriktionDeposit = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const { realmInfo } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<FriktionDepositForm>({
     amount: undefined,
@@ -108,16 +109,19 @@ const FriktionDeposit = ({
       propertyName: 'programId',
       value: programId?.toString(),
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [realmInfo?.programId])
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: governedAccount, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
   useEffect(() => {
     setGovernedAccount(form.governedTokenAccount?.governance)
     setMintInfo(form.governedTokenAccount?.extensions.mint?.account)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.governedTokenAccount])
   const schema = getFriktionDepositSchema({ form })
 
@@ -133,6 +137,7 @@ const FriktionDeposit = ({
         error={formErrors['governedTokenAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
+        type="token"
       ></GovernedAccountSelect>
       <Select
         label="Friktion Volt"

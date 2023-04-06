@@ -17,27 +17,50 @@ import { Proposal } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { cancelProposal } from 'actions/cancelProposal'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import dayjs from 'dayjs'
+import { diffTime } from './ProposalRemainingVotingTime'
+import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const ProposalActionsPanel = () => {
   const { governance, proposal, proposalOwner } = useWalletStore(
     (s) => s.selectedProposal
   )
   const { realmInfo } = useRealm()
-  const wallet = useWalletStore((s) => s.current)
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
   const signatories = useWalletStore((s) => s.selectedProposal.signatories)
   const connection = useWalletStore((s) => s.connection)
   const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
   const [signatoryRecord, setSignatoryRecord] = useState<any>(undefined)
-  const maxVoterWeight =
-    useNftPluginStore((s) => s.state.maxVoteRecord)?.pubkey || undefined
+  const maxVoteRecordPk = useMaxVoteRecord()?.pubkey
+  const votePluginsClientMaxVoterWeight = useVotePluginsClientStore(
+    (s) => s.state.maxVoterWeight
+  )
+  const maxVoterWeight = maxVoteRecordPk || votePluginsClientMaxVoterWeight
   const canFinalizeVote =
     hasVoteTimeExpired && proposal?.account.state === ProposalState.Voting
+  const now = new Date().getTime() / 1000 // unix timestamp in seconds
+  const mainVotingEndedAt = proposal?.account.signingOffAt
+    ?.addn(governance?.account.config.baseVotingTime || 0)
+    .toNumber()
+
+  const votingCoolOffTime = governance?.account.config.votingCoolOffTime || 0
+  const canFinalizeAt = mainVotingEndedAt
+    ? mainVotingEndedAt + votingCoolOffTime
+    : mainVotingEndedAt
+
+  const canFinalizeNow = canFinalizeAt ? canFinalizeAt <= now : true
+  const endOfProposalAndCoolOffTime = canFinalizeAt
+    ? dayjs(1000 * canFinalizeAt!)
+    : undefined
+  const coolOffTimeLeft = endOfProposalAndCoolOffTime
+    ? diffTime(false, dayjs(), endOfProposalAndCoolOffTime)
+    : undefined
 
   const walletPk = wallet?.publicKey
-
   useEffect(() => {
     const setup = async () => {
       if (proposal && realmInfo && walletPk) {
@@ -54,7 +77,8 @@ const ProposalActionsPanel = () => {
     }
 
     setup()
-  }, [proposal, realmInfo, walletPk])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+  }, [proposal?.pubkey.toBase58(), realmInfo?.symbol, walletPk?.toBase58()])
 
   const canSignOff =
     signatoryRecord &&
@@ -217,19 +241,28 @@ const ProposalActionsPanel = () => {
                 onClick={() => handleCancelProposal(proposal)}
                 disabled={!connected}
               >
-                Cancel
+                Cancel Proposal
               </SecondaryButton>
             )}
 
             {canFinalizeVote && (
-              <Button
-                tooltipMessage={finalizeVoteTooltipContent}
-                className="w-1/2"
-                onClick={handleFinalizeVote}
-                disabled={!connected || !canFinalizeVote}
-              >
-                Finalize
-              </Button>
+              <>
+                <Button
+                  tooltipMessage={finalizeVoteTooltipContent}
+                  className="w-1/2"
+                  onClick={handleFinalizeVote}
+                  disabled={!connected || !canFinalizeVote || !canFinalizeNow}
+                >
+                  Finalize
+                </Button>
+                {!canFinalizeNow && coolOffTimeLeft && (
+                  <div>
+                    Cool Off Time: {coolOffTimeLeft.days}d &nbsp;
+                    {coolOffTimeLeft.hours}h &nbsp;
+                    {coolOffTimeLeft.minutes}m
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

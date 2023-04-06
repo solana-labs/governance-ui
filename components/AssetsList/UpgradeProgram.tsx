@@ -29,6 +29,7 @@ import ProgramUpgradeInfo from 'pages/dao/[symbol]/proposal/components/instructi
 import { getProgramName } from '@components/instructions/programs/names'
 import useCreateProposal from '@hooks/useCreateProposal'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface UpgradeProgramCompactForm extends ProgramUpgradeForm {
   description: string
@@ -42,7 +43,7 @@ const UpgradeProgram = ({
 }) => {
   const router = useRouter()
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const { assetAccounts } = useGovernanceAssets()
   const governedAccount = assetAccounts.find(
     (x) => x.governance.pubkey.toBase58() === program.pubkey.toBase58()
@@ -171,6 +172,7 @@ const UpgradeProgram = ({
       propertyName: 'programId',
       value: programId?.toString(),
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [realmInfo?.programId])
 
   useEffect(() => {
@@ -180,6 +182,7 @@ const UpgradeProgram = ({
         setFormErrors(validationErrors)
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.bufferAddress])
   return (
     <>
