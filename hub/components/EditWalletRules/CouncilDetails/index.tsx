@@ -38,6 +38,12 @@ export function CouncilDetails(props: Props) {
     false,
   );
 
+  const inputProps = {
+    rules: props.councilRules,
+    onRulesChange: props.onCouncilRulesChange,
+    govPop: 'council' as const,
+  };
+
   return (
     <SectionBlock className={props.className}>
       <SectionHeader
@@ -47,13 +53,13 @@ export function CouncilDetails(props: Props) {
       />
       <div className="space-y-8">
         {props.currentCommunityRules.canCreateProposal && (
-          <CanCreateProposal {...props} />
+          <CanCreateProposal {...inputProps} />
         )}
         {props.currentCommunityRules.canCreateProposal &&
           props.councilRules.canCreateProposal && (
-            <VotingPowerToCreateProposals {...props} />
+            <VotingPowerToCreateProposals {...inputProps} />
           )}
-        {props.currentCommunityRules.canVote && <CanVote {...props} />}
+        {props.currentCommunityRules.canVote && <CanVote {...inputProps} />}
         {props.councilRules.canVote && (
           <>
             <ValueBlock
@@ -105,9 +111,11 @@ export function CouncilDetails(props: Props) {
             </ValueBlock>
           </>
         )}
-        {props.currentCommunityRules.canVote && <CanVeto {...props} />}
+        {props.currentCommunityRules.canVote && (
+          <CanVeto {...inputProps} govPop="council" />
+        )}
         {props.currentCommunityRules.canVote && props.councilRules.canVeto && (
-          <VetoQuorumPercent {...props} />
+          <VetoQuorumPercent {...inputProps} govPop="council" />
         )}
         {(!props.currentCommunityRules.canCreateProposal ||
           !props.currentCommunityRules.canVote) && (
@@ -130,16 +138,22 @@ export function CouncilDetails(props: Props) {
         {additionalOptionsExpanded && (
           <>
             {!props.currentCommunityRules.canCreateProposal && (
-              <CanCreateProposal {...props} />
+              <CanCreateProposal {...inputProps} />
             )}
             {!props.currentCommunityRules.canCreateProposal &&
               props.councilRules.canCreateProposal && (
-                <VotingPowerToCreateProposals {...props} />
+                <VotingPowerToCreateProposals {...inputProps} />
               )}
-            {!props.currentCommunityRules.canVote && <CanVote {...props} />}
-            {!props.currentCommunityRules.canVote && <CanVeto {...props} />}
+            {!props.currentCommunityRules.canVote && (
+              <CanVote {...inputProps} />
+            )}
+            {!props.currentCommunityRules.canVote && (
+              <CanVeto {...inputProps} />
+            )}
             {!props.currentCommunityRules.canVote &&
-              props.councilRules.canVeto && <VetoQuorumPercent {...props} />}
+              props.councilRules.canVeto && (
+                <VetoQuorumPercent {...inputProps} />
+              )}
           </>
         )}
       </div>

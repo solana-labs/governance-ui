@@ -8,29 +8,31 @@ import {
   CommunityRules,
   CouncilRules,
 } from '@hub/components/EditWalletRules/types';
+import { capitalize } from '@hub/lib/capitalize';
 import { formatNumber } from '@hub/lib/formatNumber';
 import { FormProps } from '@hub/types/FormProps';
 
 import { SliderValue } from './SliderValue';
 import { ValueBlock } from './ValueBlock';
+
+type Pop = 'community' | 'council';
 interface Props
   extends FormProps<{
-    councilRules: NonNullable<CouncilRules>;
+    rules: NonNullable<CouncilRules> | CommunityRules;
   }> {
-  className?: string;
-  currentCommunityRules: CommunityRules;
-  currentCouncilRules: NonNullable<CouncilRules>;
-  programVersion: number;
+  govPop: Pop;
 }
 
 export function VetoQuorumPercent(props: Props) {
+  const otherPop = props.govPop === 'community' ? 'council' : 'community';
+
   return (
     <ValueBlock
-      title="Council Veto Voting Quorum"
+      title={`${capitalize(props.govPop)} Veto Voting Quorum`}
       description={
         <>
           The percentage of <span className="font-bold">No</span> votes required
-          to veto a community proposal
+          to veto a {otherPop} proposal
         </>
       }
     >
@@ -38,25 +40,25 @@ export function VetoQuorumPercent(props: Props) {
         <SliderValue
           min={1}
           max={100}
-          value={props.councilRules.vetoQuorumPercent}
+          value={props.rules.vetoQuorumPercent}
           units="%"
           onChange={(value) => {
-            const newRules = produce(props.councilRules, (data) => {
+            const newRules = produce(props.rules, (data) => {
               data.vetoQuorumPercent = value;
             });
-            props.onCouncilRulesChange?.(newRules);
+            props.onRulesChange?.(newRules);
           }}
         />
         <Slider
           min={1}
           max={100}
           trackColor="bg-sky-400"
-          value={props.councilRules.vetoQuorumPercent}
+          value={props.rules.vetoQuorumPercent}
           onChange={(value) => {
-            const newRules = produce(props.councilRules, (data) => {
+            const newRules = produce(props.rules, (data) => {
               data.vetoQuorumPercent = value;
             });
-            props.onCouncilRulesChange?.(newRules);
+            props.onRulesChange?.(newRules);
           }}
           onRenderValue={(val) => `${val}%`}
         />
@@ -66,19 +68,21 @@ export function VetoQuorumPercent(props: Props) {
 }
 
 export function CanVeto(props: Props) {
+  const otherPop = props.govPop === 'community' ? 'council' : 'community';
+
   return (
     <ValueBlock
-      title="Do you want your council to have veto power over community proposals?"
-      description="Your council can veto a community-approved proposal."
+      title={`Do you want your ${props.govPop} to have veto power over ${otherPop} proposals?`}
+      description={`Your ${props.govPop} can veto a ${otherPop}-approved proposal.`}
     >
       <ButtonToggle
         className="h-14"
-        value={props.councilRules.canVeto}
+        value={props.rules.canVeto}
         onChange={(value) => {
-          const newRules = produce(props.councilRules, (data) => {
+          const newRules = produce(props.rules, (data) => {
             data.canVeto = value;
           });
-          props.onCouncilRulesChange?.(newRules);
+          props.onRulesChange?.(newRules);
         }}
       />
     </ValueBlock>
@@ -88,17 +92,17 @@ export function CanVeto(props: Props) {
 export function CanVote(props: Props) {
   return (
     <ValueBlock
-      title="Do you want to allow council members to vote?"
-      description="If disabled, the council members can no longer vote on proposals."
+      title={`Do you want to allow ${props.govPop} members to vote?`}
+      description={`If disabled, the ${props.govPop} members can no longer vote on proposals.`}
     >
       <ButtonToggle
         className="h-14"
-        value={props.councilRules.canVote}
+        value={props.rules.canVote}
         onChange={(value) => {
-          const newRules = produce(props.councilRules, (data) => {
+          const newRules = produce(props.rules, (data) => {
             data.canVote = value;
           });
-          props.onCouncilRulesChange?.(newRules);
+          props.onRulesChange?.(newRules);
         }}
       />
     </ValueBlock>
@@ -106,21 +110,21 @@ export function CanVote(props: Props) {
 }
 
 export function VotingPowerToCreateProposals(props: Props) {
-  const councilPowerPercent = props.councilRules.votingPowerToCreateProposals
-    .dividedBy(props.councilRules.totalSupply)
+  const councilPowerPercent = props.rules.votingPowerToCreateProposals
+    .dividedBy(props.rules.totalSupply)
     .multipliedBy(100);
 
   return (
     <ValueBlock
-      title="What is the minimum amount of council governance power required to create a proposal?"
-      description="A user must have this many council governance power in order to create a proposal."
+      title={`What is the minimum amount of ${props.govPop} governance power required to create a proposal?`}
+      description={`A user must have this many ${props.govPop} governance power in order to create a proposal.`}
     >
       <div className="relative">
         <Input
           className="w-full pr-24"
           placeholder="amount of governance power"
           value={formatNumber(
-            props.councilRules.votingPowerToCreateProposals,
+            props.rules.votingPowerToCreateProposals,
             undefined,
             {
               maximumFractionDigits: 0,
@@ -129,10 +133,10 @@ export function VotingPowerToCreateProposals(props: Props) {
           onChange={(e) => {
             const text = e.currentTarget.value.replaceAll(/[^\d.-]/g, '');
             const value = text ? new BigNumber(text) : new BigNumber(0);
-            const newRules = produce(props.councilRules, (data) => {
+            const newRules = produce(props.rules, (data) => {
               data.votingPowerToCreateProposals = value;
             });
-            props.onCouncilRulesChange?.(newRules);
+            props.onRulesChange?.(newRules);
           }}
         />
         <div className="absolute top-1/2 right-4 text-neutral-500 -translate-y-1/2">
@@ -140,7 +144,7 @@ export function VotingPowerToCreateProposals(props: Props) {
         </div>
       </div>
       <div className="flex items-center justify-end">
-        {props.councilRules.totalSupply.isGreaterThan(0) && (
+        {props.rules.totalSupply.isGreaterThan(0) && (
           <div className="mt-1 text-xs text-neutral-500">
             {councilPowerPercent.isGreaterThan(0)
               ? councilPowerPercent.isLessThan(0.01)
@@ -161,17 +165,17 @@ export function VotingPowerToCreateProposals(props: Props) {
 export function CanCreateProposal(props: Props) {
   return (
     <ValueBlock
-      title="Do you want to allow council members to create proposals?"
-      description="If disabled, the council members can no longer create proposals."
+      title={`Do you want to allow ${props.govPop} members to create proposals?`}
+      description={`If disabled, the ${props.govPop} members can no longer create proposals.`}
     >
       <ButtonToggle
         className="h-14"
-        value={props.councilRules.canCreateProposal}
+        value={props.rules.canCreateProposal}
         onChange={(value) => {
-          const newRules = produce(props.councilRules, (data) => {
+          const newRules = produce(props.rules, (data) => {
             data.canCreateProposal = value;
           });
-          props.onCouncilRulesChange?.(newRules);
+          props.onRulesChange?.(newRules);
         }}
       />
     </ValueBlock>
