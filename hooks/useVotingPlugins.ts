@@ -36,6 +36,7 @@ export const vsrPluginsPks: string[] = [
   'vsr2nfGVNHmSY8uxoBGqq8AQbwz3JwaEaHqGbsTPXqQ',
   'VotEn9AWwTFtJPJSMV5F9jsMY6QwWM5qn3XP9PATGW7',
   'VoteWPk9yyGmkX4U77nEWRJWpcc8kUfrPoghxENpstL',
+  'VoteMBhDCqGLRgYpp9o7DGyq81KNmwjXQRAHStjtJsS'
 ]
 
 export const heliumVsrPluginsPks: string[] = [
