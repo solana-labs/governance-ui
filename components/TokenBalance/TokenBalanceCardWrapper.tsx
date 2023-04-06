@@ -7,15 +7,13 @@ import useQueryContext from '@hooks/useQueryContext'
 import {
   gatewayPluginsPks,
   nftPluginsPks,
-  vsrPluginsPks,
   switchboardPluginsPks,
 } from '@hooks/useVotingPlugins'
 import GatewayCard from '@components/Gateway/GatewayCard'
 import ClaimUnreleasedNFTs from './ClaimUnreleasedNFTs'
 import Link from 'next/link'
-import { getTokenOwnerRecordAddress } from '@solana/spl-governance'
-import useWalletStore from 'stores/useWalletStore'
-import { useEffect, useState } from 'react'
+import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const LockPluginTokenBalanceCard = dynamic(
   () =>
@@ -23,6 +21,14 @@ const LockPluginTokenBalanceCard = dynamic(
       'VoteStakeRegistry/components/TokenBalance/LockPluginTokenBalanceCard'
     )
 )
+
+const HeliumVotingPowerCard = dynamic(() =>
+  import('HeliumVotePlugin/components/VotingPowerCard').then((module) => {
+    const { VotingPowerCard } = module
+    return VotingPowerCard
+  })
+)
+
 const TokenBalanceCard = dynamic(() => import('./TokenBalanceCard'))
 const NftVotingPower = dynamic(
   () => import('../ProposalVotingPower/NftVotingPower')
@@ -33,32 +39,12 @@ const SwitchboardPermissionCard = dynamic(
 )
 
 const GovernancePowerTitle = () => {
-  const { councilMint, mint, realm, symbol } = useRealm()
-  const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
+  const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
-  const wallet = useWalletStore((s) => s.current)
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
+  const { data: tokenOwnerRecordPk } = useAddressQuery_CommunityTokenOwner()
 
-  useEffect(() => {
-    const getTokenOwnerRecord = async () => {
-      const defaultMint = !mint?.supply.isZero()
-        ? realm!.account.communityMint
-        : !councilMint?.supply.isZero()
-        ? realm!.account.config.councilMint
-        : undefined
-      const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
-        realm!.owner,
-        realm!.pubkey,
-        defaultMint!,
-        wallet!.publicKey!
-      )
-      setTokenOwneRecordPk(tokenOwnerRecordAddress.toBase58())
-    }
-    if (realm && wallet?.connected) {
-      getTokenOwnerRecord()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [realm?.pubkey.toBase58(), wallet?.connected])
   return (
     <div className="flex items-center justify-between mb-4">
       <h3 className="mb-0">My governance power</h3>
@@ -92,12 +78,10 @@ const TokenBalanceCardWrapper = ({
     config,
     ownCouncilTokenRecord,
     councilTokenAccount,
+    vsrMode,
   } = useRealm()
   const currentPluginPk = config?.account?.communityTokenConfig.voterWeightAddin
   const getTokenBalanceCard = () => {
-    //based on realm config it will provide proper tokenBalanceCardComponent
-    const isLockTokensMode =
-      currentPluginPk && vsrPluginsPks.includes(currentPluginPk?.toBase58())
     const isNftMode =
       currentPluginPk && nftPluginsPks.includes(currentPluginPk?.toBase58())
     const isGatewayMode =
@@ -107,16 +91,21 @@ const TokenBalanceCardWrapper = ({
       switchboardPluginsPks.includes(currentPluginPk?.toBase58())
 
     if (
-      isLockTokensMode &&
+      vsrMode === 'default' &&
       (!ownTokenRecord ||
         ownTokenRecord.account.governingTokenDepositAmount.isZero())
     ) {
-      return (
-        <LockPluginTokenBalanceCard
-          inAccountDetails={inAccountDetails}
-        ></LockPluginTokenBalanceCard>
-      )
+      return <LockPluginTokenBalanceCard inAccountDetails={inAccountDetails} />
     }
+
+    if (
+      vsrMode === 'helium' &&
+      (!ownTokenRecord ||
+        ownTokenRecord.account.governingTokenDepositAmount.isZero())
+    ) {
+      return <HeliumVotingPowerCard inAccountDetails={inAccountDetails} />
+    }
+
     if (
       isNftMode &&
       (!ownTokenRecord ||

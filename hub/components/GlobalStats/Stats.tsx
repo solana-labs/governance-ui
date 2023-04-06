@@ -44,10 +44,7 @@ export function Stats(props: Props) {
   const timer = useRef<number | null>(null);
   const wakePrevent = useRef<any>(null);
   const connection = useRef(
-    new Connection(
-      'http://realms-realms-c335.mainnet.rpcpool.com/258d3727-bb96-409d-abea-0b1b4c48af29/',
-      'recent',
-    ),
+    new Connection(process.env.NEXT_PUBLIC_HELIUS_MAINNET_RPC || '', 'recent'),
   );
   const logger = useRef(new Logger());
 

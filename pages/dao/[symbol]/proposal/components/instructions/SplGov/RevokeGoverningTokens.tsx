@@ -174,7 +174,19 @@ const RevokeGoverningTokens: FC<{
       { governedAccount: governance, getInstruction },
       index
     )
-  }, [getInstruction, handleSetInstructions, index, governance])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    form.amount,
+    form.memberKey,
+    governance,
+    mintInfo?.result,
+    programId,
+    programVersion,
+    realm,
+    selectedMint,
+    index,
+    governance,
+  ])
 
   return (
     <>

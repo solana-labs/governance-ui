@@ -8,7 +8,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { UiInstruction, MintForm } from 'utils/uiTypes/proposalCreationTypes'
 import { getAccountName } from 'components/instructions/tools'
 import { NewProposalContext } from '../../new'
-import { Governance } from '@solana/spl-governance'
+import { Governance, GoverningTokenType } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import useGovernanceAssets from 'hooks/useGovernanceAssets'
 import { getMintSchema } from 'utils/validations'
@@ -16,6 +16,7 @@ import GovernedAccountSelect from '../GovernedAccountSelect'
 import { getMintInstruction } from 'utils/instructionTools'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import { useDestination } from '@hooks/useDestination'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const Mint = ({
   index,
@@ -27,11 +28,20 @@ const Mint = ({
   initialMintAccount?: AssetAccount | undefined
 }) => {
   const connection = useWalletStore((s) => s.connection)
-  const { realmInfo } = useRealm()
+  const { realmInfo, realm, config } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
-  const mintGovernancesWithMintInfo = assetAccounts.filter(
-    (x) => x.type === AccountType.MINT
-  )
+
+  const mintGovernancesWithMintInfo = assetAccounts
+    .filter((x) => x.type === AccountType.MINT)
+    .filter((x) =>
+      realm?.account.config.councilMint &&
+      x.extensions.mint?.publicKey.equals(realm?.account.config.councilMint)
+        ? config?.account?.councilTokenConfig?.tokenType === undefined ||
+          config?.account.councilTokenConfig.tokenType ===
+            GoverningTokenType.Liquid
+        : true
+    )
+
   const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<MintForm>({
@@ -41,7 +51,7 @@ const Mint = ({
     mintAccount: initialMintAccount,
     programId: programId?.toString(),
   })
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const [governedAccount, setGovernedAccount] = useState<
     ProgramAccount<Governance> | undefined
   >(undefined)

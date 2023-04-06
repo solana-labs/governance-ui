@@ -72,7 +72,11 @@ export function VoteTippingSelector(props: Props) {
     <DropdownMenu.Root open={open} onOpenChange={setOpen}>
       <div>
         <DropdownMenu.Trigger
-          className={cx(itemStyles, props.className)}
+          className={cx(
+            itemStyles,
+            props.className,
+            open && 'border dark:border-white/40',
+          )}
           ref={trigger}
         >
           <div className={labelStyles}>{getLabel(props.value)}</div>
@@ -81,7 +85,7 @@ export function VoteTippingSelector(props: Props) {
         </DropdownMenu.Trigger>
         <DropdownMenu.Portal>
           <DropdownMenu.Content
-            className="space-y-0.5"
+            className="space-y-0.5 bg-white dark:bg-black"
             sideOffset={2}
             style={{ width }}
           >

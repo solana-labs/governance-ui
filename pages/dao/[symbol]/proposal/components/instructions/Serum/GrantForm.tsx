@@ -1,7 +1,7 @@
 import GovernedAccountSelect from '@components/inputs/GovernedAccountSelect'
 import Input from '@components/inputs/Input'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useWallet from '@hooks/useWallet'
+import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import {
   Governance,
   ProgramAccount,
@@ -41,7 +41,7 @@ const GrantForm = ({
   } | null>(null)
 
   const connection = useWalletStore((s) => s.connection.current)
-  const { anchorProvider, wallet } = useWallet()
+  const { anchorProvider, wallet } = useWalletDeprecated()
   const actions = useSerumGovStore((s) => s.actions)
   const programId = useSerumGovStore((s) => s.programId)
   const { srmMint, msrmMint } = useSerumGovStore((s) => ({

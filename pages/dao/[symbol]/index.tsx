@@ -37,6 +37,7 @@ import ProposalSorting, {
   PROPOSAL_SORTING_LOCAL_STORAGE_KEY,
   Sorting,
 } from '@components/ProposalSorting'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
@@ -58,6 +59,8 @@ const REALM = () => {
   const {
     realm,
     realmInfo,
+    mint,
+    councilMint,
     proposals,
     governances,
     tokenRecords,
@@ -115,7 +118,7 @@ const REALM = () => {
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection.current)
 
   const allProposals = Object.entries(proposals).sort((a, b) =>
@@ -128,7 +131,15 @@ const REALM = () => {
   }, [JSON.stringify(filteredProposals)])
 
   useEffect(() => {
-    let proposals = filterProposals(allProposals, filters, sorting)
+    let proposals = filterProposals(
+      allProposals,
+      filters,
+      sorting,
+      realm,
+      governances,
+      councilMint,
+      mint
+    )
 
     if (proposalSearch) {
       proposals = proposals.filter(([, v]) =>
@@ -142,7 +153,15 @@ const REALM = () => {
   }, [filters, proposalSearch, sorting])
 
   useEffect(() => {
-    const proposals = filterProposals(allProposals, filters, sorting)
+    const proposals = filterProposals(
+      allProposals,
+      filters,
+      sorting,
+      realm,
+      governances,
+      councilMint,
+      mint
+    )
     setDisplayedProposals(proposals)
     setFilteredProposals(proposals)
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
@@ -188,7 +207,15 @@ const REALM = () => {
     if (multiVoteMode) {
       setFilteredProposals(votingProposals)
     } else {
-      const proposals = filterProposals(allProposals, filters, sorting)
+      const proposals = filterProposals(
+        allProposals,
+        filters,
+        sorting,
+        realm,
+        governances,
+        councilMint,
+        mint
+      )
       setFilteredProposals(proposals)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
@@ -249,8 +276,16 @@ const REALM = () => {
         const ownTokenRecord =
           selectedProposal.proposal.governingTokenMint.toBase58() ===
           realm.account.communityMint.toBase58()
-            ? tokenRecords[wallet.publicKey!.toBase58()]
-            : councilTokenOwnerRecords[wallet.publicKey!.toBase58()]
+            ? tokenRecords[
+                selectedCommunityDelegate
+                  ? selectedCommunityDelegate
+                  : wallet.publicKey!.toBase58()
+              ]
+            : councilTokenOwnerRecords[
+                selectedCouncilDelegate
+                  ? selectedCouncilDelegate
+                  : wallet.publicKey!.toBase58()
+              ]
 
         const instructions: TransactionInstruction[] = []
 

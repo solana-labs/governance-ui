@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import {
   Proposal,
   ProgramAccount,
@@ -6,7 +7,6 @@ import {
 } from '@solana/spl-governance'
 import classNames from 'classnames'
 import { ThumbUpIcon, ThumbDownIcon } from '@heroicons/react/solid'
-
 import { isYesVote } from '@models/voteRecords'
 import useRealm from '@hooks/useRealm'
 import useWalletStore from '../stores/useWalletStore'
@@ -52,21 +52,34 @@ interface Props {
 }
 
 export default function ProposalMyVoteBadge(props: Props) {
-  const { realm } = useRealm()
-  const communityDelegateVoteRecords = useWalletStore(
-    (s) => s.communityDelegateVoteRecordsByProposal
-  )
-  const councilDelegateVoteRecords = useWalletStore(
-    (s) => s.councilDelegateVoteRecordsByProposal
-  )
-  const ownVoteRecords = useWalletStore((s) => s.ownVoteRecordsByProposal)
-
-  const ownVoteRecord = getOwnVoteRecord(
+  const { realm, ownTokenRecord } = useRealm()
+  const [
+    ownVoteRecords,
     communityDelegateVoteRecords,
     councilDelegateVoteRecords,
-    ownVoteRecords,
-    props.proposal,
-    realm
+  ] = useWalletStore((s) => [
+    s.ownVoteRecordsByProposal,
+    s.communityDelegateVoteRecordsByProposal,
+    s.councilDelegateVoteRecordsByProposal,
+  ])
+
+  const ownVoteRecord = useMemo(
+    () =>
+      getOwnVoteRecord(
+        communityDelegateVoteRecords,
+        councilDelegateVoteRecords,
+        ownVoteRecords,
+        props.proposal,
+        realm
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+    [
+      communityDelegateVoteRecords,
+      councilDelegateVoteRecords,
+      ownVoteRecords,
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+      ownTokenRecord?.account.governingTokenOwner.toBase58(),
+    ]
   )
 
   if (!ownVoteRecord) {
@@ -74,7 +87,6 @@ export default function ProposalMyVoteBadge(props: Props) {
   }
 
   const isYes = isYesVote(ownVoteRecord.account)
-
   return (
     <Tooltip content={isYes ? 'You voted "Yes"' : 'You voted "No"'}>
       <div

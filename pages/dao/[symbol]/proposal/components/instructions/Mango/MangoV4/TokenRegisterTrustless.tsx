@@ -1,15 +1,13 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
-import useRealm from '@hooks/useRealm'
 import { PublicKey, SYSVAR_RENT_PUBKEY } from '@solana/web3.js'
 import * as yup from 'yup'
-import { isFormValid } from '@utils/formValidation'
+import { isFormValid, validatePubkey } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, {
@@ -17,12 +15,15 @@ import InstructionForm, {
   InstructionInputType,
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface TokenRegisterTrustlessForm {
   governedAccount: AssetAccount | null
   mintPk: string
   oraclePk: string
   name: string
+  tokenIndex: number
+  holdupTime: number
 }
 
 const TokenRegisterTrustless = ({
@@ -32,27 +33,29 @@ const TokenRegisterTrustless = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const { mangoClient, mangoGroup } = UseMangoV4()
-  const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
-  const governedProgramAccounts = assetAccounts.filter(
-    (x) => x.type === AccountType.SOL
+  const solAccounts = assetAccounts.filter(
+    (x) =>
+      x.type === AccountType.SOL &&
+      ((mangoGroup?.fastListingAdmin &&
+        x.extensions.transferAddress?.equals(mangoGroup?.fastListingAdmin)) ||
+        (mangoGroup?.admin &&
+          x.extensions.transferAddress?.equals(mangoGroup?.admin)))
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<TokenRegisterTrustlessForm>({
     governedAccount: null,
     mintPk: '',
     oraclePk: '',
     name: '',
+    tokenIndex: 0,
+    holdupTime: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
-  const handleSetForm = ({ propertyName, value }) => {
-    setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
-  }
+
   const validateInstruction = async (): Promise<boolean> => {
     const { isValid, validationErrors } = await isFormValid(schema, form)
     setFormErrors(validationErrors)
@@ -63,17 +66,14 @@ const TokenRegisterTrustless = ({
     let serializedInstruction = ''
     if (
       isValid &&
-      programId &&
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const tokenIndex = mangoGroup!.banksMapByName.size
       //Mango instruction call and serialize
       const ix = await mangoClient!.program.methods
-        .tokenRegisterTrustless(tokenIndex, form.name)
+        .tokenRegisterTrustless(Number(form.tokenIndex), form.name)
         .accounts({
           group: mangoGroup!.publicKey,
-          fastListingAdmin: form.governedAccount.extensions.transferAddress,
           mint: new PublicKey(form.mintPk),
           oracle: new PublicKey(form.oraclePk),
           payer: form.governedAccount.extensions.transferAddress,
@@ -87,16 +87,11 @@ const TokenRegisterTrustless = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
+      customHoldUpTime: form.holdupTime,
     }
     return obj
   }
-  useEffect(() => {
-    handleSetForm({
-      propertyName: 'programId',
-      value: programId?.toString(),
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [realmInfo?.programId])
+
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
@@ -109,7 +104,33 @@ const TokenRegisterTrustless = ({
       .object()
       .nullable()
       .required('Program governed account is required'),
+    oraclePk: yup
+      .string()
+      .required()
+      .test('is-valid-address', 'Please enter a valid PublicKey', (value) =>
+        value ? validatePubkey(value) : true
+      ),
+    mintPk: yup
+      .string()
+      .required()
+      .test('is-valid-address1', 'Please enter a valid PublicKey', (value) =>
+        value ? validatePubkey(value) : true
+      ),
+    name: yup.string().required(),
+    tokenIndex: yup.string().required(),
   })
+
+  useEffect(() => {
+    const tokenIndex =
+      !mangoGroup || mangoGroup?.banksMapByTokenIndex.size === 0
+        ? 0
+        : Math.max(...[...mangoGroup!.banksMapByTokenIndex.keys()]) + 1
+    setForm({
+      ...form,
+      tokenIndex: tokenIndex,
+    })
+  }, [mangoGroup?.banksMapByTokenIndex.size])
+
   const inputs: InstructionInput[] = [
     {
       label: 'Governance',
@@ -118,7 +139,14 @@ const TokenRegisterTrustless = ({
       type: InstructionInputType.GOVERNED_ACCOUNT,
       shouldBeGoverned: shouldBeGoverned as any,
       governance: governance,
-      options: governedProgramAccounts,
+      options: solAccounts,
+    },
+    {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
     },
     {
       label: 'Mint PublicKey',
@@ -137,6 +165,13 @@ const TokenRegisterTrustless = ({
       initialValue: form.name,
       type: InstructionInputType.INPUT,
       name: 'name',
+    },
+    {
+      label: `Token Index`,
+      initialValue: form.tokenIndex,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'tokenIndex',
     },
   ]
 

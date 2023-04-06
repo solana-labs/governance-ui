@@ -95,13 +95,16 @@ export class AccountTypeMint implements AssetAccount {
   type: AccountType
   extensions: AccountExtension
   pubkey: PublicKey
-  constructor(governance: ProgramAccount<Governance>, account: MintInfo) {
+  constructor(
+    governance: ProgramAccount<Governance>,
+    account: MintInfo & { publicKey: PublicKey }
+  ) {
     this.governance = governance
-    this.pubkey = governance.account.governedAccount
+    this.pubkey = account.publicKey
     this.type = AccountType.MINT
     this.extensions = {
       mint: {
-        publicKey: governance.account.governedAccount,
+        publicKey: account.publicKey,
         account: account,
       },
     }

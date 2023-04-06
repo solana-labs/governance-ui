@@ -5,27 +5,30 @@ import useWalletStore from '../stores/useWalletStore'
 import { notify } from '../utils/notifications'
 import {
   DEFAULT_PROVIDER,
-  getWalletProviderByUrl,
+  getWalletProviderByName,
 } from '../utils/wallet-adapters'
 
 import useInterval from './useInterval'
 import useLocalStorageState from './useLocalStorageState'
+import useViewAsWallet from './useViewAsWallet'
 
 const SECONDS = 1000
 
 export default function useInitWallet() {
   const { wallets } = useWallet()
+  const mockWallet = useViewAsWallet()
+
   const {
     connection,
     current: wallet,
-    providerUrl: selectedProviderUrl,
+    providerName: selectedProviderName,
     set: setWalletStore,
     actions,
   } = useWalletStore((state) => state)
 
-  const [savedProviderUrl, setSavedProviderUrl] = useLocalStorageState(
-    'walletProvider',
-    DEFAULT_PROVIDER.url
+  const [savedProviderName, setSavedProviderName] = useLocalStorageState(
+    'walletProviderV2',
+    DEFAULT_PROVIDER.name
   )
 
   async function flipWalletByTurningOffAndOn() {
@@ -43,28 +46,34 @@ export default function useInitWallet() {
     }
   }
 
+  useEffect(() => {
+    setWalletStore((s) => {
+      s.mockWallet = mockWallet
+    })
+  }, [mockWallet, setWalletStore])
+
   // initialize selection from local storage
   useEffect(() => {
-    if (!selectedProviderUrl) {
+    if (!selectedProviderName) {
       setWalletStore((s) => {
-        s.providerUrl = savedProviderUrl
+        s.providerName = savedProviderName
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [selectedProviderUrl, savedProviderUrl])
+  }, [selectedProviderName, savedProviderName])
 
-  const provider = useMemo(() => getWalletProviderByUrl(selectedProviderUrl, wallets), [
-    selectedProviderUrl,
-    wallets,
-  ])
+  const provider = useMemo(
+    () => getWalletProviderByName(selectedProviderName, wallets),
+    [selectedProviderName, wallets]
+  )
 
   // save selection in local storage
   useEffect(() => {
-    if (selectedProviderUrl && selectedProviderUrl != savedProviderUrl) {
-      setSavedProviderUrl(selectedProviderUrl)
+    if (selectedProviderName && selectedProviderName != savedProviderName) {
+      setSavedProviderName(selectedProviderName)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [selectedProviderUrl])
+  }, [selectedProviderName])
 
   useEffect(() => {
     if (provider) {
@@ -94,9 +103,6 @@ export default function useInitWallet() {
   useEffect(() => {
     if (!wallet) return
     wallet.on('connect', async () => {
-      setWalletStore((state) => {
-        state.connected = true
-      })
       notify({
         message: 'Wallet connected',
         description:
@@ -111,7 +117,6 @@ export default function useInitWallet() {
     })
     wallet.on('disconnect', () => {
       setWalletStore((state) => {
-        state.connected = false
         state.tokenAccounts = []
       })
       notify({
@@ -121,9 +126,6 @@ export default function useInitWallet() {
     })
     return () => {
       wallet?.disconnect?.()
-      setWalletStore((state) => {
-        state.connected = false
-      })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [wallet])

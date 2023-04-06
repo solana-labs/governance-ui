@@ -7,7 +7,10 @@ import {
   ProgramAccount,
   Proposal,
   ProposalState,
+  Realm,
 } from '@solana/spl-governance'
+import { MintInfo } from '@solana/spl-token'
+import { fmtTokenAmount } from './formatting'
 
 export const compareProposals = (
   p1: Proposal,
@@ -56,7 +59,11 @@ export function getVotingStateRank(
 export const filterProposals = (
   proposals: [string, ProgramAccount<Proposal>][],
   filters: Filters,
-  sorting: Sorting
+  sorting: Sorting,
+  realm: ProgramAccount<Realm> | undefined,
+  governances: Record<string, ProgramAccount<Governance>>,
+  councilMint: MintInfo | undefined,
+  communityMint: MintInfo | undefined
 ) => {
   return proposals
     .sort(([, proposalA], [, proposalB]) => {
@@ -85,6 +92,32 @@ export const filterProposals = (
           .sub(
             proposalA.account.votingCompletedAt ||
               proposalA.account.signingOffAt ||
+              proposalA.account.draftAt ||
+              new BN(0)
+          )
+          .toNumber()
+      }
+      if (sorting.signedOffAt === SORTING_OPTIONS.ASC) {
+        return (
+          proposalA.account.signingOffAt ||
+          proposalA.account.draftAt ||
+          new BN(0)
+        )
+          .sub(
+            proposalB.account.signingOffAt ||
+              proposalB.account.draftAt ||
+              new BN(0)
+          )
+          .toNumber()
+      }
+      if (sorting.signedOffAt === SORTING_OPTIONS.DESC) {
+        return (
+          proposalB.account.signingOffAt ||
+          proposalB.account.draftAt ||
+          new BN(0)
+        )
+          .sub(
+            proposalA.account.signingOffAt ||
               proposalA.account.draftAt ||
               new BN(0)
           )
@@ -155,8 +188,40 @@ export const filterProposals = (
         return false
       }
 
-      if (!filters.Voting && proposal.account.state === ProposalState.Voting) {
+      if (
+        !filters.Voting &&
+        proposal.account.state === ProposalState.Voting &&
+        !filters.withoutQuorum
+      ) {
         return false
+      }
+      if (
+        filters.withoutQuorum &&
+        proposal.account.state === ProposalState.Voting
+      ) {
+        const proposalMint =
+          proposal?.account.governingTokenMint.toBase58() ===
+          realm?.account.communityMint.toBase58()
+            ? communityMint
+            : councilMint
+        const isCommunityVote =
+          proposal.account?.governingTokenMint.toBase58() ===
+          realm?.account.communityMint.toBase58()
+        const governance =
+          governances[proposal.account.governance.toBase58()].account
+        const voteThresholdPct = isCommunityVote
+          ? governance.config.communityVoteThreshold.value
+          : governance.config.councilVoteThreshold.value
+
+        const minimumYesVotes =
+          fmtTokenAmount(proposalMint!.supply, proposalMint!.decimals) *
+          (voteThresholdPct! / 100)
+        return (
+          fmtTokenAmount(
+            proposal.account.getYesVoteCount(),
+            proposalMint!.decimals
+          ) < minimumYesVotes && !proposal.account.hasVoteTimeEnded(governance)
+        )
       }
 
       return true

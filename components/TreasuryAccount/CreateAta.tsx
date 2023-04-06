@@ -15,6 +15,7 @@ import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import * as serum from '@project-serum/common'
 import TokenMintInput from '@components/inputs/TokenMintInput'
 import { TokenInfoWithoutDecimals } from '@utils/services/tokenPrice'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const CreateAta = ({
   owner,
@@ -30,7 +31,7 @@ const CreateAta = ({
     (s) => s.refetchGovernanceAccounts
   )
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const [isLoading, setIsLoading] = useState(false)
   const [validatedTypedMint, setValidatedTypedMint] = useState<
     string | undefined
@@ -91,7 +92,6 @@ const CreateAta = ({
     createCallback()
   }
 
-  console.log(isLoading, validatedTypedMint, foundByNameToken)
   return (
     <div>
       <h3 className="mb-4 flex items-center">Create token account</h3>

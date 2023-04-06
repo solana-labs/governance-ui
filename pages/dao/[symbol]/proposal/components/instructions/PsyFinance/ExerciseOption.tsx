@@ -4,7 +4,7 @@ import {
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
 import { PsyFinanceExerciseOption } from '@utils/uiTypes/proposalCreationTypes'
-import useWallet from '@hooks/useWallet'
+import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import { useContext, useEffect, useMemo, useReducer } from 'react'
 import { NewProposalContext } from '../../../new'
 import { AssetAccount } from '@utils/uiTypes/assets'
@@ -42,7 +42,7 @@ const ExerciseOption = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { anchorProvider, connection, wallet } = useWallet()
+  const { anchorProvider, connection, wallet } = useWalletDeprecated()
   const { handleSetInstructions } = useContext(NewProposalContext)
   const options = useOptionAccounts()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()

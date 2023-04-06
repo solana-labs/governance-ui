@@ -2,7 +2,7 @@ import { AnchorProvider, BN, Idl, Program } from '@coral-xyz/anchor'
 import { PublicKey } from '@solana/web3.js'
 import useSerumGovStore, { UserAccountType } from 'stores/useSerumGovStore'
 import useSWR from 'swr'
-import useWallet from './useWallet'
+import useWalletDeprecated from './useWalletDeprecated'
 import IDL from '../idls/serum_gov.json'
 
 const fetchUserAccount = async (
@@ -34,7 +34,7 @@ const fetchUserAccount = async (
 }
 
 export default function useSerumGovUser(owner?: PublicKey | string | null) {
-  const { anchorProvider } = useWallet()
+  const { anchorProvider } = useWalletDeprecated()
   const serumGovProgramId = useSerumGovStore((s) => s.programId)
 
   const { data, error, mutate, isValidating } = useSWR(

@@ -224,11 +224,11 @@ export const GOVERNANCE_INSTRUCTIONS = {
                 } secs`}
               </p>
               <p>
-                {`maxVotingTime:
+                {`baseVotingTime:
           ${getDaysFromTimestamp(
-            governance.account.config.maxVotingTime
+            governance.account.config.baseVotingTime
           )} days(s) | raw arg: ${
-                  governance.account.config.maxVotingTime
+                  governance.account.config.baseVotingTime
                 } secs`}
               </p>
               <p>
@@ -318,10 +318,10 @@ export const GOVERNANCE_INSTRUCTIONS = {
           )} day(s) | raw arg: ${args.config.minInstructionHoldUpTime} secs`}
               </p>
               <p>
-                {`maxVotingTime:
+                {`baseVotingTime:
           ${getDaysFromTimestamp(
-            args.config.maxVotingTime
-          )} days(s) | raw arg: ${args.config.maxVotingTime} secs`}
+            args.config.baseVotingTime
+          )} days(s) | raw arg: ${args.config.baseVotingTime} secs`}
               </p>
               <p>
                 {`votingCoolOffTime:
@@ -379,9 +379,9 @@ export const GOVERNANCE_INSTRUCTIONS = {
               )} day(s)`}
               </p>
               <p>
-                {`maxVotingTime:
+                {`baseVotingTime:
               ${getDaysFromTimestamp(
-                governance.account.config.maxVotingTime
+                governance.account.config.baseVotingTime
               )} days(s)`}
               </p>
               <p>
@@ -421,8 +421,8 @@ export const GOVERNANCE_INSTRUCTIONS = {
               )} day(s)`}
               </p>
               <p>
-                {`maxVotingTime:
-              ${getDaysFromTimestamp(args.config.maxVotingTime)} days(s)`}
+                {`baseVotingTime:
+              ${getDaysFromTimestamp(args.config.baseVotingTime)} days(s)`}
               </p>
               <p>
                 {`voteTipping:

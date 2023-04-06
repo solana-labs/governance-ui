@@ -3,7 +3,7 @@ import {
   ProgramAccount as AnchorProgramAccount,
 } from '@coral-xyz/anchor'
 import { useEffect, useMemo, useState } from 'react'
-import useWallet from '@hooks/useWallet'
+import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import { OptionMarket, PSY_AMERICAN_PROGRAM_ID } from './index'
 import { PsyAmericanIdl } from './PsyAmericanIdl'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -13,7 +13,7 @@ import { AssetAccount } from '@utils/uiTypes/assets'
  * Return entire list of PsyOption American options.
  */
 export const useOptionAccounts = () => {
-  const { anchorProvider } = useWallet()
+  const { anchorProvider } = useWalletDeprecated()
   const [options, setOptions] = useState<
     AnchorProgramAccount<OptionMarket>[] | null
   >(null)

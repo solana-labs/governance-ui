@@ -1,4 +1,4 @@
-import { Wallet } from '@project-serum/anchor';
+import { Wallet } from '@coral-xyz/anchor';
 import {
   serializeInstructionToBase64,
   getGovernance,
@@ -29,7 +29,6 @@ import {
   vsrPluginsPks,
   nftPluginsPks,
   gatewayPluginsPks,
-  switchboardPluginsPks,
   pythPluginsPks,
 } from '@hooks/useVotingPlugins';
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts';
@@ -76,7 +75,7 @@ export async function createProposal(args: Args) {
       args.realmPublicKey,
       args.governingTokenMintPublicKey,
       args.requestingUserPublicKey,
-    ),
+    ).catch(() => undefined),
     getRealmConfigAddress(args.programPublicKey, args.realmPublicKey),
     args.councilTokenMintPublicKey
       ? getTokenOwnerRecordForRealm(
@@ -97,6 +96,13 @@ export async function createProposal(args: Args) {
         ).catch(() => undefined)
       : undefined,
   ]);
+
+  const userTOR =
+    tokenOwnerRecord || communityTokenOwnerRecord || councilTokenOwnerRecord;
+
+  if (!userTOR) {
+    throw new Error('You do not have any voting power in this org');
+  }
 
   const realmConfigAccountInfo = await args.connection.getAccountInfo(
     realmConfigPublicKey,
@@ -205,13 +211,6 @@ export async function createProposal(args: Args) {
       }
     }
 
-    // if (
-    //   switchboardPluginsPks.includes(pluginPublicKeyStr) &&
-    //   votingPlugins.switchboardClient
-    // ) {
-    //   client = votingPlugins.switchboardClient;
-    // }
-
     if (
       gatewayPluginsPks.includes(pluginPublicKeyStr) &&
       votingPlugins.gatewayClient
@@ -250,7 +249,7 @@ export async function createProposal(args: Args) {
     } as RpcContext,
     realm,
     args.governancePublicKey,
-    tokenOwnerRecord,
+    userTOR,
     args.proposalTitle,
     args.proposalDescription,
     args.governingTokenMintPublicKey,

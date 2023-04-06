@@ -95,14 +95,14 @@ export const BaseGovernanceFormV3 = ({
         />
         <Input
           label="Max voting time (days)"
-          value={form.maxVotingTime}
+          value={form.baseVotingTime}
           name="maxVotingTime"
           type="number"
           min={0.01}
           onChange={(evt) =>
             setForm((prev) => ({
               ...prev,
-              maxVotingTime: evt.target.value !== '' ? evt.target.value : '0',
+              baseVotingTime: evt.target.value !== '' ? evt.target.value : '0',
             }))
           }
           error={formErrors['maxVotingTime']}

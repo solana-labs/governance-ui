@@ -5,13 +5,17 @@ import { TorusWalletAdapter } from '@solana/wallet-adapter-torus'
 import { GlowWalletAdapter } from '@solana/wallet-adapter-glow'
 import { BackpackWalletAdapter } from '@solana/wallet-adapter-backpack'
 import { ExodusWalletAdapter } from '@solana/wallet-adapter-exodus'
+import { WalletConnectWalletAdapter } from '@solana/wallet-adapter-walletconnect'
 import {
   createDefaultAddressSelector,
   createDefaultAuthorizationResultCache,
   createDefaultWalletNotFoundHandler,
   SolanaMobileWalletAdapter,
 } from '@solana-mobile/wallet-adapter-mobile'
-import { WalletReadyState } from '@solana/wallet-adapter-base'
+import {
+  WalletAdapterNetwork,
+  WalletReadyState,
+} from '@solana/wallet-adapter-base'
 
 const BACKPACK_PROVIDER = {
   name: 'Backpack',
@@ -72,6 +76,25 @@ const TORUS_PROVIDER = {
   adapter: new TorusWalletAdapter(),
 }
 
+const WALLET_CONNECT = {
+  name: 'Wallet Connect',
+  url: 'https://walletconnect.com/',
+  adapter: new WalletConnectWalletAdapter({
+    // TODO make network dynamic
+    network: WalletAdapterNetwork.Mainnet,
+    options: {
+      projectId: '59618f8645f135f20f975e83f4ef0743',
+      metadata: {
+        name: 'Realms',
+        description:
+          'Powered by Solana, Realms is a hub for communities to share ideas, make decisions, and collectively manage treasuries.',
+        url: 'https://app.realms.today/img/logo-realms.png',
+        icons: ['https://app.realms.today'],
+      },
+    },
+  }),
+}
+
 export const WALLET_PROVIDERS = [
   MOBILE_WALLET_PROVIDER,
   PHANTOM_PROVIDER,
@@ -81,6 +104,7 @@ export const WALLET_PROVIDERS = [
   SOLFLARE_PROVIDER,
   SOLLET_PROVIDER,
   EXODUS_PROVIDER,
+  WALLET_CONNECT,
 ]
 
 export const DEFAULT_PROVIDER =
@@ -88,9 +112,17 @@ export const DEFAULT_PROVIDER =
     ? MOBILE_WALLET_PROVIDER
     : PHANTOM_PROVIDER
 
-export const getWalletProviderByUrl = (urlOrNull, wallets?) => {
+export const getWalletProviderByName = (
+  nameOrNull: string | null | undefined,
+  wallets?
+) => {
   if (wallets) {
-    return wallets.find(({ adapter: { url } }) => url === urlOrNull) || DEFAULT_PROVIDER
+    return (
+      wallets.find(({ adapter: { name } }) => name === nameOrNull) ||
+      DEFAULT_PROVIDER
+    )
   }
-  return WALLET_PROVIDERS.find(({ url }) => url === urlOrNull) || DEFAULT_PROVIDER
+  return (
+    WALLET_PROVIDERS.find(({ name }) => name === nameOrNull) || DEFAULT_PROVIDER
+  )
 }

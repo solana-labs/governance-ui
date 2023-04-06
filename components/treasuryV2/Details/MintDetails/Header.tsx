@@ -15,7 +15,6 @@ import useRealm from '@hooks/useRealm'
 import Modal from '@components/Modal'
 import AddMemberForm from '@components/Members/AddMemberForm'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useWalletStore from 'stores/useWalletStore'
 import useQueryContext from '@hooks/useQueryContext'
 import { Instructions } from '@utils/uiTypes/proposalCreationTypes'
 import MetadataCreationModal from 'pages/dao/[symbol]/params/MetadataCreationModal'
@@ -27,6 +26,7 @@ import CommunityMintIcon from '../../icons/CommunityMintIcon'
 import TokenIcon from '../../icons/TokenIcon'
 import { GoverningTokenType } from '@solana/spl-governance'
 import useProgramVersion from '@hooks/useProgramVersion'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface Props {
   className?: string
@@ -61,7 +61,8 @@ export default function Header(props: Props) {
     toManyCouncilOutstandingProposalsForUse,
     toManyCommunityOutstandingProposalsForUser,
   } = useRealm()
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
   const tokenType = useTokenType(props.mint.tokenRole)

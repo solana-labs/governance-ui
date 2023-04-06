@@ -10,10 +10,10 @@ import {
   GovernanceConfig,
   GoverningTokenConfigAccountArgs,
   SetRealmAuthorityAction,
+  TOKEN_PROGRAM_ID,
   VoteTipping,
   WalletSigner,
   withCreateGovernance,
-  withCreateMintGovernance,
   withCreateNativeTreasury,
   withCreateRealm,
   withCreateTokenOwnerRecord,
@@ -28,6 +28,7 @@ import { parseMintMaxVoteWeight } from '@tools/governance/units'
 import {
   getTimestampFromDays,
   getMintNaturalAmountFromDecimalAsBN,
+  getTimestampFromHours,
 } from '@tools/sdk/units'
 import { withCreateMint } from '@tools/sdk/splToken/withCreateMint'
 import { withCreateAssociatedTokenAccount } from '@tools/sdk/splToken/withCreateAssociatedTokenAccount'
@@ -36,6 +37,7 @@ import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 
 import BN from 'bn.js'
 import { createGovernanceThresholds } from './configs'
+import { Token } from '@solana/spl-token'
 
 export interface Web3Context {
   connection: Connection
@@ -111,7 +113,7 @@ export async function prepareRealmCreation({
   const mintsSetupSigners: Keypair[] = []
   const initialCouncilTokenAmount = 1
 
-  const walletPk = getWalletPublicKey(wallet)
+  const walletPk = getWalletPublicKey(wallet as any)
   const programIdPk = new PublicKey(programIdAddress)
   const programVersion = await getGovernanceProgramVersion(
     connection,
@@ -136,13 +138,6 @@ export async function prepareRealmCreation({
     communityMintDecimals,
     communityMintSupplyFactor,
     communityAbsoluteMaxVoteWeight
-  )
-
-  // If we're using an existing community mint check if we can create a governance for it
-  // 1) The mint must have mintAuthority
-  // 2) The current wallet must be the authority
-  let createCommunityMintGovernance = communityMintAccount?.account.mintAuthority?.equals(
-    walletPk
   )
 
   console.log('Prepare realm - community mint address', existingCommunityMintPk)
@@ -174,8 +169,6 @@ export async function prepareRealmCreation({
       communityMintDecimals,
       walletPk
     )
-    // If we create the mint then always create a governance for it
-    createCommunityMintGovernance = true
   }
 
   console.log(
@@ -321,72 +314,94 @@ export async function prepareRealmCreation({
     params._programVersion === 3 ? params.councilYesVotePercentage : 'disabled'
   )
 
+  const VOTING_COOLOFF_TIME_DEFAULT = getTimestampFromHours(12)
   // Put community and council mints under the realm governance with default config
   const config = new GovernanceConfig({
     communityVoteThreshold: communityVoteThreshold,
     minCommunityTokensToCreateProposal: minCommunityTokensToCreateAsMintValue,
     // Do not use instruction hold up time
     minInstructionHoldUpTime: 0,
-    // max voting time 3 days
-    maxVotingTime: getTimestampFromDays(maxVotingTimeInDays),
-    communityVoteTipping: VoteTipping.Strict,
+    // maxVotingTime = baseVotingTime + votingCoolOffTime
+    // since this is actually baseVotingTime, we have to manually subtract the cooloff time.
+    baseVotingTime:
+      getTimestampFromDays(maxVotingTimeInDays) - VOTING_COOLOFF_TIME_DEFAULT,
+    communityVoteTipping: VoteTipping.Disabled,
     councilVoteTipping: VoteTipping.Strict,
     minCouncilTokensToCreateProposal: new BN(initialCouncilTokenAmount),
     councilVoteThreshold: councilVoteThreshold,
     councilVetoVoteThreshold: councilVetoVoteThreshold,
     communityVetoVoteThreshold: communityVetoVoteThreshold,
-    votingCoolOffTime: 0,
+    votingCoolOffTime: VOTING_COOLOFF_TIME_DEFAULT,
     depositExemptProposalCount: 10,
   })
 
-  const communityMintGovPk = createCommunityMintGovernance
-    ? await withCreateMintGovernance(
-        realmInstructions,
-        programIdPk,
-        programVersion,
-        realmPk,
-        communityMintPk,
-        config,
-        transferCommunityMintAuthority,
-        walletPk,
-        PublicKey.default,
-        walletPk,
-        walletPk
-      )
-    : await withCreateGovernance(
-        realmInstructions,
-        programIdPk,
-        programVersion,
-        realmPk,
-        communityMintPk,
-        config,
-        PublicKey.default,
-        walletPk,
-        walletPk
-      )
-
-  await withCreateNativeTreasury(
+  const mainGovernancePk = await withCreateGovernance(
     realmInstructions,
     programIdPk,
     programVersion,
-    communityMintGovPk,
+    realmPk,
+    undefined,
+    config,
+    PublicKey.default,
+    walletPk,
     walletPk
   )
 
-  if (councilMintPk && councilMintHasMintAuthority) {
-    await withCreateMintGovernance(
-      realmInstructions,
-      programIdPk,
-      programVersion,
-      realmPk,
-      councilMintPk,
-      config,
-      transferCouncilMintAuthority,
+  const nativeTreasuryAddress = await withCreateNativeTreasury(
+    realmInstructions,
+    programIdPk,
+    programVersion,
+    mainGovernancePk,
+    walletPk
+  )
+  if (transferCommunityMintAuthority) {
+    const ix = Token.createSetAuthorityInstruction(
+      TOKEN_PROGRAM_ID,
+      communityMintPk,
+      nativeTreasuryAddress,
+      'MintTokens',
       walletPk,
-      PublicKey.default,
-      walletPk,
-      walletPk
+      []
     )
+    if (communityMintAccount?.account.freezeAuthority) {
+      const freezeMintAuthorityPassIx = Token.createSetAuthorityInstruction(
+        TOKEN_PROGRAM_ID,
+        communityMintPk,
+        nativeTreasuryAddress,
+        'FreezeAccount',
+        walletPk,
+        []
+      )
+      realmInstructions.push(freezeMintAuthorityPassIx)
+    }
+    realmInstructions.push(ix)
+  }
+
+  if (
+    councilMintPk &&
+    councilMintHasMintAuthority &&
+    transferCouncilMintAuthority
+  ) {
+    const ix = Token.createSetAuthorityInstruction(
+      TOKEN_PROGRAM_ID,
+      councilMintPk,
+      nativeTreasuryAddress,
+      'MintTokens',
+      walletPk,
+      []
+    )
+    if (councilMintAccount?.account.freezeAuthority) {
+      const freezeMintAuthorityPassIx = Token.createSetAuthorityInstruction(
+        TOKEN_PROGRAM_ID,
+        councilMintPk,
+        nativeTreasuryAddress,
+        'FreezeAccount',
+        walletPk,
+        []
+      )
+      realmInstructions.push(freezeMintAuthorityPassIx)
+    }
+    realmInstructions.push(ix)
   }
 
   // Set the community governance as the realm authority
@@ -397,13 +412,13 @@ export async function prepareRealmCreation({
       programVersion,
       realmPk,
       walletPk,
-      communityMintGovPk,
+      mainGovernancePk,
       SetRealmAuthorityAction.SetChecked
     )
   }
 
   return {
-    communityMintGovPk,
+    mainGovernancePk,
     communityMintPk,
     councilMintPk,
     realmPk,
