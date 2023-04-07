@@ -53,7 +53,6 @@ export const useClaimDelegatedPositionRewards = () => {
         )
 
         const { lastClaimedEpoch } = delegatedPosAcc
-
         for (
           let epoch = lastClaimedEpoch.add(new BN(1));
           epoch.lt(currentEpoch);
