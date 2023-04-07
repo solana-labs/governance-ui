@@ -240,7 +240,7 @@ const StakeValidator = ({
         onChange={setValidatorVoteKey}
       />
       <Input
-        label="Seed for stake address (will be added with validator address)"
+        label="(optional, advanced) Seed for stake address"
         value={form.seed}
         error={formErrors['seed']}
         type="number"
