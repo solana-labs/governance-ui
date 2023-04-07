@@ -4,10 +4,10 @@ import type { PublicKey } from '@solana/web3.js';
 import { ProposalDetails } from '../ProposalDetails';
 import { ProposalVoteType } from '../ProposalVoteType';
 import { CommunityRules, CouncilRules } from '../types';
-import { NewRulesList } from '../UpdatesList/New';
+import { UpdatesList } from '../UpdatesList';
+import { NewRulesList } from '../UpdatesList/NewRulesList';
 import { WalletDescription } from '../WalletDescription';
 import { FormProps } from '@hub/types/FormProps';
-import { UpdatesList } from '../UpdatesList';
 
 interface Props
   extends FormProps<{
