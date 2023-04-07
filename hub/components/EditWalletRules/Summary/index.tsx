@@ -4,9 +4,10 @@ import type { PublicKey } from '@solana/web3.js';
 import { ProposalDetails } from '../ProposalDetails';
 import { ProposalVoteType } from '../ProposalVoteType';
 import { CommunityRules, CouncilRules } from '../types';
-import { UpdatesList } from '../UpdatesList';
+import { NewRulesList } from '../UpdatesList/New';
 import { WalletDescription } from '../WalletDescription';
 import { FormProps } from '@hub/types/FormProps';
+import { UpdatesList } from '../UpdatesList';
 
 interface Props
   extends FormProps<{
@@ -31,7 +32,7 @@ interface Props
   walletAddress: PublicKey;
 }
 
-export function Summary(props: Props) {
+function Summary(props: Props & { proposalPreview: React.ReactNode }) {
   return (
     <article className={props.className}>
       <WalletDescription
@@ -63,32 +64,87 @@ export function Summary(props: Props) {
         proposalVoteType={props.proposalVoteType}
         onProposalVoteTypeChange={props.onProposalVoteTypeChange}
       />
-      <div className="mt-14">
-        <div className="text-lg font-bold dark:text-white">
-          Proposed Rules Updates
-        </div>
-        <div className="flex items-center mt-3 dark:text-emerald-400">
-          <BotIcon className="h-3 fill-current mr-1 w-4" />
-          <div className="text-xs">This section is automatically generated</div>
-        </div>
-      </div>
-      <UpdatesList
-        className="mt-4"
-        communityRules={props.communityRules}
-        coolOffHours={props.coolOffHours}
-        councilRules={props.councilRules}
-        initialCommunityRules={props.initialCommunityRules}
-        currentCoolOffHours={props.currentCoolOffHours}
-        initialCouncilRules={props.initialCouncilRules}
-        currentDepositExemptProposalCount={
-          props.currentDepositExemptProposalCount
-        }
-        currentBaseVoteDays={props.currentBaseVoteDays}
-        currentMinInstructionHoldupDays={props.currentMinInstructionHoldupDays}
-        depositExemptProposalCount={props.depositExemptProposalCount}
-        baseVoteDays={props.baseVoteDays}
-        minInstructionHoldupDays={props.minInstructionHoldupDays}
-      />
+      {props.proposalPreview}
     </article>
   );
 }
+
+export const EditWalletSummary = (props: Props) => (
+  <Summary
+    {...props}
+    proposalPreview={
+      <>
+        <div className="mt-14">
+          <div className="text-lg font-bold dark:text-white">
+            Proposed Rules Updates
+          </div>
+          <div className="flex items-center mt-3 dark:text-emerald-400">
+            <BotIcon className="h-3 fill-current mr-1 w-4" />
+            <div className="text-xs">
+              This section is automatically generated
+            </div>
+          </div>
+        </div>
+        <UpdatesList
+          className="mt-4"
+          communityRules={props.communityRules}
+          coolOffHours={props.coolOffHours}
+          councilRules={props.councilRules}
+          initialCommunityRules={props.initialCommunityRules}
+          currentCoolOffHours={props.currentCoolOffHours}
+          initialCouncilRules={props.initialCouncilRules}
+          currentDepositExemptProposalCount={
+            props.currentDepositExemptProposalCount
+          }
+          currentBaseVoteDays={props.currentBaseVoteDays}
+          currentMinInstructionHoldupDays={
+            props.currentMinInstructionHoldupDays
+          }
+          depositExemptProposalCount={props.depositExemptProposalCount}
+          baseVoteDays={props.baseVoteDays}
+          minInstructionHoldupDays={props.minInstructionHoldupDays}
+        />
+      </>
+    }
+  />
+);
+
+export const NewWalletSummary = (props: Props) => (
+  <Summary
+    {...props}
+    proposalPreview={
+      <>
+        <div className="mt-14">
+          <div className="text-lg font-bold dark:text-white">
+            Proposed Wallet Rules
+          </div>
+          <div className="flex items-center mt-3 dark:text-emerald-400">
+            <BotIcon className="h-3 fill-current mr-1 w-4" />
+            <div className="text-xs">
+              This section is automatically generated
+            </div>
+          </div>
+        </div>
+        <NewRulesList
+          className="mt-4"
+          communityRules={props.communityRules}
+          coolOffHours={props.coolOffHours}
+          councilRules={props.councilRules}
+          initialCommunityRules={props.initialCommunityRules}
+          currentCoolOffHours={props.currentCoolOffHours}
+          initialCouncilRules={props.initialCouncilRules}
+          currentDepositExemptProposalCount={
+            props.currentDepositExemptProposalCount
+          }
+          currentBaseVoteDays={props.currentBaseVoteDays}
+          currentMinInstructionHoldupDays={
+            props.currentMinInstructionHoldupDays
+          }
+          depositExemptProposalCount={props.depositExemptProposalCount}
+          baseVoteDays={props.baseVoteDays}
+          minInstructionHoldupDays={props.minInstructionHoldupDays}
+        />
+      </>
+    }
+  />
+);

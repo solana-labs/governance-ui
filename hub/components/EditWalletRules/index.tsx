@@ -26,7 +26,7 @@ import * as RE from '@hub/types/Result';
 import { createTransaction } from './createTransaction';
 import { EditWalletForm } from './Form';
 import * as gql from './gql';
-import { Summary } from './Summary';
+import { EditWalletSummary, Summary } from './Summary';
 import { CommunityRules, CouncilRules } from './types';
 
 enum Step {
@@ -267,7 +267,7 @@ export function EditWalletRules(props: Props) {
                 )}
                 {step === Step.Summary && (
                   <>
-                    <Summary
+                    <EditWalletSummary
                       className="mb-16"
                       communityRules={communityRules}
                       coolOffHours={coolOffHours}
