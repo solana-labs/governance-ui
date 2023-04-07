@@ -21,15 +21,16 @@ export function getFormattedStringFromDays(
   const monthSuffix = months > 1 ? ' months' : ' month'
   const daysSuffix = days > 1 ? ' days' : ' day'
   const yearsDisplay =
-    years > 0 ? years + `${fullFormat ? yearSuffix : 'y'} ` : ''
+    years > 0 ? years + `${fullFormat ? yearSuffix : 'y'}` : null
   const monthsDisplay =
-    months > 0 ? months + `${fullFormat ? monthSuffix : 'm'} ` : ''
-  const daysDisplay = days > 0 ? days + `${fullFormat ? daysSuffix : 'd'} ` : ''
-  const hoursDisplay = hours > 0 ? `${hoursInt}h ${minutes}min` : ''
+    months > 0 ? months + `${fullFormat ? monthSuffix : 'm'}` : null
+  const daysDisplay =
+    days > 0 ? days + `${fullFormat ? daysSuffix : 'd'}` : null
+  const hoursDisplay = hours > 0 ? `${hoursInt}h ${minutes}min` : null
   const text =
     !years && !months && days <= 1
-      ? daysDisplay + hoursDisplay
-      : yearsDisplay + monthsDisplay + daysDisplay
+      ? [daysDisplay, hoursDisplay].filter(Boolean).join(' ')
+      : [yearsDisplay, monthsDisplay, daysDisplay].filter(Boolean).join(' ')
   return text ? text : 0
 }
 

@@ -89,7 +89,7 @@ export const useClaimDelegatedPositionRewards = () => {
           callbacks: {
             afterAllTxConfirmed: () =>
               notify({
-                message: 'Claming Rewards successful',
+                message: 'Claiming Rewards successful',
                 type: 'success',
               }),
           },
