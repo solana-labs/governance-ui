@@ -1,4 +1,4 @@
-import useWallet from '@hooks/useWallet'
+import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
 import { useAsyncCallback } from 'react-async-hook'
 import { sendTransaction } from '@utils/send'
@@ -8,7 +8,7 @@ import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import { secsToDays } from '@utils/dateTools'
 
 export const useUnlockPosition = () => {
-  const { connection, wallet } = useWallet()
+  const { connection, wallet } = useWalletDeprecated()
   const [{ client }] = useVotePluginsClientStore((s) => [
     s.state.currentRealmVotingClient,
   ])

@@ -29,6 +29,7 @@ import { getGatekeeperNetwork } from '../GatewayPlugin/sdk/accounts'
 import { NFTWithMeta } from '@utils/uiTypes/VotePlugin'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import * as heliumVsrSdk from '@helium/voter-stake-registry-sdk'
+import useWalletOnePointOh from './useWalletOnePointOh'
 
 export const vsrPluginsPks: string[] = [
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo',
@@ -76,9 +77,9 @@ export function useVotingPlugins() {
   const heliumStore = useHeliumVsrStore()
   const gatewayStore = useGatewayPluginStore()
   const switchboardStore = useSwitchboardPluginStore()
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
-  const connected = useWalletStore((s) => s.connected)
+  const connected = !!wallet?.connected
 
   const [
     currentClient,
@@ -359,7 +360,7 @@ export function useVotingPlugins() {
   }
 
   useEffect(() => {
-    if (wallet) {
+    if (wallet?.publicKey?.toBase58()) {
       if (currentPluginPk) {
         handleSetVsrClient(wallet, connection, currentPluginPk)
         handleSetHeliumVsrClient(wallet, connection, currentPluginPk)
@@ -370,7 +371,11 @@ export function useVotingPlugins() {
       handleSetPythClient(wallet, connection)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [connection.endpoint, wallet, currentPluginPk?.toBase58()])
+  }, [
+    connection.endpoint,
+    wallet?.publicKey?.toBase58(),
+    currentPluginPk?.toBase58(),
+  ])
 
   useEffect(() => {
     const handleVsrPlugin = () => {

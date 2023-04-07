@@ -163,7 +163,7 @@ export default function Rules(props: Props) {
                 <Section
                   icon={<CalendarIcon />}
                   name="Unrestricted Voting Time"
-                  value={votingLengthText(governanceConfig.maxVotingTime)}
+                  value={votingLengthText(governanceConfig.baseVotingTime)}
                 />
                 <Section
                   icon={<CalendarIcon />}

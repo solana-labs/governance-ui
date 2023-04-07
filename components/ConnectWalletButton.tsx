@@ -27,6 +27,7 @@ import { WalletReadyState } from '@solana/wallet-adapter-base'
 import { useWallet } from '@solana/wallet-adapter-react'
 import useInitWallet from '@hooks/useInitWallet'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const StyledWalletProviderLabel = styled.p`
   font-size: 0.65rem;
@@ -43,13 +44,12 @@ const ConnectWalletButton = (props) => {
   )
   const { wallets } = useWallet()
 
-  const {
-    connected,
-    current,
-    providerName,
-    connection,
-    set: setWalletStore,
-  } = useWalletStore((s) => s)
+  const { providerName, connection, set: setWalletStore } = useWalletStore(
+    (s) => s
+  )
+
+  const current = useWalletOnePointOh()
+  const connected = !!current?.connected
 
   const provider = useMemo(
     () => getWalletProviderByName(providerName, wallets),
@@ -163,6 +163,11 @@ const ConnectWalletButton = (props) => {
         {...props}
       >
         <div className="relative flex items-center text-sm font-bold text-left text-fgd-1">
+          {(current as any)?.FAKE_DEBUG_WALLET ? (
+            <div className="absolute -left-4 h-full text-red-400 opacity-90 pointer-events-none text-2xl drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)] -rotate-45">
+              DEBUG
+            </div>
+          ) : null}
           {displayAddressImage}
           <div>
             {connected && current?.publicKey ? (

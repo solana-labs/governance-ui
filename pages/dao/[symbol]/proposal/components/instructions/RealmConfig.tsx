@@ -10,8 +10,6 @@ import {
 import { validateInstruction } from '@utils/instructionTools'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
-import useWalletStore from 'stores/useWalletStore'
-
 import { NewProposalContext } from '../../new'
 import useRealm from '@hooks/useRealm'
 import { parseMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
@@ -24,6 +22,7 @@ import { AssetAccount } from '@utils/uiTypes/assets'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import { isDisabledVoterWeight } from '@tools/governance/units'
 import useProgramVersion from '@hooks/useProgramVersion'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export interface RealmConfigForm {
   governedAccount: AssetAccount | undefined
@@ -42,7 +41,7 @@ const RealmConfig = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const { realm, mint, realmInfo } = useRealm()
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const { assetAccounts } = useGovernanceAssets()
   const realmAuthority = assetAccounts.find(

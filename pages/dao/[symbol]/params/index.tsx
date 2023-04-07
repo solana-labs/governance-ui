@@ -15,7 +15,6 @@ import { useRouter } from 'next/router'
 import RealmConfigModal from './RealmConfigModal'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { getAccountName } from '@components/instructions/tools'
-import useWalletStore from 'stores/useWalletStore'
 import SetRealmAuthorityModal from './SetRealmAuthorityModal'
 import MetadataCreationModal from './MetadataCreationModal'
 
@@ -27,11 +26,12 @@ import Tooltip from '@components/Tooltip'
 import { AccountType } from '@utils/uiTypes/assets'
 import { MintMaxVoteWeightSourceType } from '@solana/spl-governance'
 import useQueryContext from '@hooks/useQueryContext'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const Params = () => {
   const router = useRouter()
   const { realm, mint, config, symbol } = useRealm()
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const { fmtUrlWithCluster } = useQueryContext()
   const {
     canUseAuthorityInstruction,

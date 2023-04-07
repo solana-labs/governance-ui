@@ -13,6 +13,7 @@ import { getInitStrikeInstruction } from '@utils/instructions/Dual'
 import useWalletStore from 'stores/useWalletStore'
 import { getDualFinanceInitStrikeSchema } from '@utils/validations'
 import Tooltip from '@components/Tooltip'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const InitStrike = ({
   index,
@@ -28,7 +29,7 @@ const InitStrike = ({
     strikes: '',
   })
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const { assetAccounts } = useGovernanceAssets()
   const [governedAccount, setGovernedAccount] = useState<

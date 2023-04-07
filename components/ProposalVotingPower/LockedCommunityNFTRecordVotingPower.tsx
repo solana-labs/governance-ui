@@ -3,7 +3,6 @@ import classNames from 'classnames'
 import { BigNumber } from 'bignumber.js'
 import useRealm from '@hooks/useRealm'
 import useProposal from '@hooks/useProposal'
-import useWalletStore from 'stores/useWalletStore'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import { fmtMintAmount, getMintDecimalAmount } from '@tools/sdk/units'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
@@ -17,6 +16,7 @@ import useQueryContext from '@hooks/useQueryContext'
 import InlineNotification from '@components/InlineNotification'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface Props {
   className?: string
@@ -27,7 +27,8 @@ export default function LockedCommunityNFTRecordVotingPower(props: Props) {
   const [amount, setAmount] = useState(new BigNumber(0))
   const { mint, realm, ownTokenRecord, realmTokenAccount, symbol } = useRealm()
   const { proposal } = useProposal()
-  const [connected, wallet] = useWalletStore((s) => [s.connected, s.current])
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const { data: tokenOwnerRecordPk } = useAddressQuery_CommunityTokenOwner()
   const [currentClient] = useVotePluginsClientStore((s) => [
     s.state.currentRealmVotingClient,

@@ -25,6 +25,7 @@ import {
   getCastleVaults,
   getCastleDepositInstruction,
 } from '@utils/instructions/Castle'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const CastleDeposit = ({
   index,
@@ -34,7 +35,7 @@ const CastleDeposit = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const { realmInfo } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)

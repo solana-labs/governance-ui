@@ -13,6 +13,7 @@ import {
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
 import { ProposalState } from '@solana/spl-governance'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const NFT_SOL_BALANCE = 0.0014616
 
@@ -21,7 +22,7 @@ const ClaimUnreleasedNFTs = ({
 }: {
   inAccountDetails?: boolean
 }) => {
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const [isLoading, setIsLoading] = useState(false)
   const { current: connection } = useWalletStore((s) => s.connection)
   const [ownNftVoteRecords, setOwnNftVoteRecords] = useState<any[]>([])

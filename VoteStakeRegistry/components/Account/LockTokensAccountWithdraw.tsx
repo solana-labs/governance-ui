@@ -32,6 +32,7 @@ import Account from './Account'
 import { abbreviateAddress } from '@utils/formatting'
 import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface DepositBox {
   mintPk: PublicKey
@@ -66,8 +67,8 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
   const [isLoading, setIsLoading] = useState(false)
   const connection = useWalletStore((s) => s.connection.current)
   const connnectionContext = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const mainBoxesClasses = 'bg-bkg-1 col-span-1 p-4 rounded-md'
   const isNextSameRecord = (x, next) => {
     const nextType = Object.keys(next.lockup.kind)[0]

@@ -243,7 +243,7 @@
   },
   {
     "symbol": "WEZ",
-    "displayName": "Wezesha DAO",
+    "displayName": "Wezesha",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "FEtF7V55LorZmUriVVobubPvLXoS7sfP3smzb5zR4BWz",
     "website": "https://wezesha.co",
@@ -1051,10 +1051,10 @@
     "displayName": "Dean's List",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "9mS8GuMx2MkZGMSwa2k87HNLTFZ1ssa9mJ1RkGFKcGyQ",
-    "bannerImage": "/realms/Dean's List Grape/deans list logo.png",
+    "bannerImage": "/realms/DeanListGrape/deans-list-logo.png",
     "website": "https://deans-list.strataprotocol.com/",
     "twitter": "@GrapeDeanslist",
-    "ogImage": "/realms/Dean's List Grape/deans list logo.png"
+    "ogImage": "/realms/DeanListGrape/deans-list-logo.png"
    },
    {
     "symbol": "GrapeCCSubDAO",
@@ -1132,11 +1132,11 @@
  {
     "symbol": "EPCT",
     "category": "web3",
-    "bannerImage": "https://bafybeigyh52dlntjyn4lyajvt7v5d2vtifjhyaklu3j5rhkpihhbb3wkwa.ipfs.w3s.link/BuidlToEarnTwitterHeader.png",
+    "bannerImage": "https://bafybeih52um4tvyggeja36kmbyg5b4pfod547qxdite4krwoe4nwtareji.ipfs.w3s.link/EpicsBetaTwitterHeaderLogo.png",
     "displayName": "Epics",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "DCdCsuUjg6MnULfEmBUmvg1heggnLrKSFdp5uTRSKuwR",
-    "ogImage": "/realms/Epics/Epics-logo-background.png",
+    "ogImage": "/realms/Epics/EpicsLogoSquareInvert.svg",
     "shortDescription": "Buidl to Earn. Epics is a decentralized crowdsourcing platform for incentivizing open source software development.",
     "sortRank": 3,
     "website": "https://epics.dev",

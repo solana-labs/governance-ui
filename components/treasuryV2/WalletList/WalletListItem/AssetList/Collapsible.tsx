@@ -5,6 +5,7 @@ import {
   ArrowCircleDownIcon,
   ArrowCircleUpIcon,
 } from '@heroicons/react/outline'
+import { EyeIcon, EyeOffIcon } from '@heroicons/react/solid'
 
 interface Props {
   className?: string
@@ -17,6 +18,9 @@ interface Props {
   icon: JSX.Element
   title: string
   onToggleExpand?(): void
+  onToggleHiddenItems?(): void
+  itemsToHide?: string[]
+  showHiddenItems?: boolean
 }
 
 export default function Collapsible(props: Props) {
@@ -28,58 +32,77 @@ export default function Collapsible(props: Props) {
 
   return (
     <div className={cx(props.className)}>
-      <button
-        className={cx(
-          'flex',
-          'items-center',
-          'justify-between',
-          'w-full',
-          'px-[18px]',
-          !props.disableCollapse ? 'cursor-pointer' : 'cursor-default'
-        )}
-        disabled={props.disableCollapse}
-        onClick={(e) => {
-          if (!props.disableCollapse) {
-            e.stopPropagation()
-            setOpen((current) => !current)
-          }
-        }}
-      >
-        <div className="flex items-center">
-          {React.cloneElement(props.icon, {
-            className: cx(props.icon.props.className, 'h-4', 'w-4'),
-          })}
-          <div className="text-white/50 text-xs ml-1">{props.title}</div>
-          <div
-            className={cx(
-              'bg-white/10',
-              'flex',
-              'h-4',
-              'items-center',
-              'justify-center',
-              'ml-2',
-              'rounded-full',
-              'text-[10px]',
-              'text-white/50',
-              'min-w-[16px]',
-              'px-1'
-            )}
-          >
-            {props.count}
+      <div className="flex justify-center items-center">
+        <button
+          className={cx(
+            'flex',
+            'items-center',
+            'justify-between',
+            'w-full',
+            'px-[18px]',
+            props.onToggleHiddenItems ? 'pr-[10px]' : '',
+            !props.disableCollapse ? 'cursor-pointer' : 'cursor-default'
+          )}
+          disabled={props.disableCollapse}
+          onClick={(e) => {
+            if (!props.disableCollapse) {
+              e.stopPropagation()
+              setOpen((current) => !current)
+            }
+          }}
+        >
+          <div className="flex items-center">
+            {React.cloneElement(props.icon, {
+              className: cx(props.icon.props.className, 'h-4', 'w-4'),
+            })}
+            <div className="text-white/50 text-xs ml-1">{props.title}</div>
+            <div
+              className={cx(
+                'bg-white/10',
+                'flex',
+                'h-4',
+                'items-center',
+                'justify-center',
+                'ml-2',
+                'rounded-full',
+                'text-[10px]',
+                'text-white/50',
+                'min-w-[16px]',
+                'px-1'
+              )}
+            >
+              {props.count}
+            </div>
           </div>
-        </div>
-        {!props.disableCollapse && (
-          <ChevronDownIcon
-            className={cx(
-              'h-4',
-              'text-white/50',
-              'transition-all',
-              'w-4',
-              open ? '' : '-rotate-90'
+          {!props.disableCollapse && (
+            <ChevronDownIcon
+              className={cx(
+                'h-4',
+                'text-white/50',
+                'transition-all',
+                'w-4',
+                open ? '' : '-rotate-90'
+              )}
+            />
+          )}
+        </button>
+        {props.onToggleHiddenItems && props.itemsToHide?.length !== 0 && (
+          <div className="mr-3">
+            {props.showHiddenItems ? (
+              <EyeIcon
+                className="w-3 cursor-pointer text-white/50"
+                onClick={props.onToggleHiddenItems}
+              ></EyeIcon>
+            ) : (
+              <EyeOffIcon
+                className="w-3 cursor-pointer text-white/50"
+                onClick={props.onToggleHiddenItems}
+              ></EyeOffIcon>
             )}
-          />
+          </div>
         )}
-      </button>
+      </div>
+
       {open && children && (
         <div className="space-y-1 mt-3">
           {children.map((child, i) =>

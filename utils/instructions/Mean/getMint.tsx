@@ -1,13 +1,13 @@
-import { Treasury } from '@mean-dao/msp'
+import { PaymentStreamingAccount } from '@mean-dao/payment-streaming'
 import { AssetAccount } from '@utils/uiTypes/assets'
 
 export default function getMint(
   accounts: AssetAccount[] = [],
-  treasury: Treasury
+  paymentStreamingAccount: PaymentStreamingAccount
 ) {
   return accounts.find(
     (a) =>
       a.extensions.mint?.publicKey.toBase58() ===
-      treasury?.associatedToken.toString()
+      paymentStreamingAccount?.mint.toString()
   )?.extensions.mint?.account
 }

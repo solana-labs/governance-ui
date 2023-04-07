@@ -1,4 +1,5 @@
-import { MSP } from '@mean-dao/msp'
+import { PaymentStreaming } from '@mean-dao/payment-streaming'
+import { PublicKey } from '@solana/web3.js'
 import { ConnectionContext } from '@utils/connection'
 
 const STREAM_V2_PROGRAM_ADDRESS_DEVNET =
@@ -7,10 +8,16 @@ const STREAM_V2_PROGRAM_ADDRESS_MAINNET =
   'MSPCUMbLfy2MeT6geLMMzrUkv1Tx88XRApaVRdyxTuu'
 
 export default function (connection: ConnectionContext) {
-  const streamV2ProgramAddress =
+  const streamV2ProgramAddressString =
     connection.cluster === 'mainnet'
       ? STREAM_V2_PROGRAM_ADDRESS_MAINNET
       : STREAM_V2_PROGRAM_ADDRESS_DEVNET
-  const msp = new MSP(connection.endpoint, streamV2ProgramAddress, 'confirmed')
-  return msp
+
+  const streamV2ProgramAddress = new PublicKey(streamV2ProgramAddressString)
+
+  return new PaymentStreaming(
+    connection.current,
+    streamV2ProgramAddress,
+    'confirmed'
+  )
 }

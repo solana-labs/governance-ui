@@ -1,7 +1,7 @@
 import Button from '@components/Button'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { Token } from '@models/treasury/Asset'
 import { useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import BuyModal from '../Auction/BuyModal'
 import SellModal from '../Auction/SellModal'
 
@@ -11,7 +11,8 @@ interface Props {
 }
 
 export default function Auction(props: Props) {
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const [sellModalOpen, setSellModalOpen] = useState(false)
   const closeSellModal = () => {
     setSellModalOpen(false)

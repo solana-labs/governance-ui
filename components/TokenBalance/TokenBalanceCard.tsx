@@ -40,6 +40,7 @@ import SerumGovernanceTokenWrapper from './SerumGovernanceTokenWrapper'
 import getNumTokens from '@components/ProposalVotingPower/getNumTokens'
 import VotingPowerPct from '@components/ProposalVotingPower/VotingPowerPct'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const TokenBalanceCard = ({
   proposal,
@@ -53,7 +54,8 @@ const TokenBalanceCard = ({
   const realmProgramId = useWalletStore((s) => s.selectedRealm.programId)
   const [hasGovPower, setHasGovPower] = useState<boolean>(false)
   const { councilMint, mint, realm } = useRealm()
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const isDepositVisible = (
     depositMint: MintInfo | undefined,
     realmMint: PublicKey | undefined
@@ -141,8 +143,8 @@ export const TokenDeposit = ({
   inAccountDetails?: boolean
   setHasGovPower?: (hasGovPower: boolean) => void
 }) => {
-  const wallet = useWalletStore((s) => s.current)
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const connection = useWalletStore((s) => s.connection.current)
   const { fetchWalletTokenAccounts, fetchRealm } = useWalletStore(
     (s) => s.actions

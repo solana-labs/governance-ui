@@ -28,7 +28,7 @@ import {
 } from 'VoteStakeRegistry/sdk/accounts'
 import { DEFAULT_VSR_ID, VsrClient } from 'VoteStakeRegistry/sdk/client'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
-import useWallet from '@hooks/useWallet'
+import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import { heliumVsrPluginsPks, vsrPluginsPks } from '@hooks/useVotingPlugins'
 
 interface ConfigureVotingMintForm {
@@ -56,7 +56,7 @@ const VotingMintConfig = ({
   const [formErrors, setFormErrors] = useState({})
   const [form, setForm] = useState<ConfigureVotingMintForm>()
   const { handleSetInstructions } = useContext(NewProposalContext)
-  const { wallet, anchorProvider } = useWallet()
+  const { wallet, anchorProvider } = useWalletDeprecated()
   const showGrantAuth = useMemo(
     () => form?.programId && !heliumVsrPluginsPks.includes(form.programId),
     [form?.programId]

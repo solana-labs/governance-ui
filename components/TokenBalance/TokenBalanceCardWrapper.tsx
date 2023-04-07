@@ -12,8 +12,8 @@ import {
 import GatewayCard from '@components/Gateway/GatewayCard'
 import ClaimUnreleasedNFTs from './ClaimUnreleasedNFTs'
 import Link from 'next/link'
-import useWalletStore from 'stores/useWalletStore'
 import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const LockPluginTokenBalanceCard = dynamic(
   () =>
@@ -41,7 +41,8 @@ const SwitchboardPermissionCard = dynamic(
 const GovernancePowerTitle = () => {
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const { data: tokenOwnerRecordPk } = useAddressQuery_CommunityTokenOwner()
 
   return (

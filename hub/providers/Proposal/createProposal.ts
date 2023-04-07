@@ -75,7 +75,7 @@ export async function createProposal(args: Args) {
       args.realmPublicKey,
       args.governingTokenMintPublicKey,
       args.requestingUserPublicKey,
-    ),
+    ).catch(() => undefined),
     getRealmConfigAddress(args.programPublicKey, args.realmPublicKey),
     args.councilTokenMintPublicKey
       ? getTokenOwnerRecordForRealm(
@@ -96,6 +96,13 @@ export async function createProposal(args: Args) {
         ).catch(() => undefined)
       : undefined,
   ]);
+
+  const userTOR =
+    tokenOwnerRecord || communityTokenOwnerRecord || councilTokenOwnerRecord;
+
+  if (!userTOR) {
+    throw new Error('You do not have any voting power in this org');
+  }
 
   const realmConfigAccountInfo = await args.connection.getAccountInfo(
     realmConfigPublicKey,
@@ -242,7 +249,7 @@ export async function createProposal(args: Args) {
     } as RpcContext,
     realm,
     args.governancePublicKey,
-    tokenOwnerRecord,
+    userTOR,
     args.proposalTitle,
     args.proposalDescription,
     args.governingTokenMintPublicKey,

@@ -2,11 +2,12 @@ import { AnchorProvider, Wallet } from '@coral-xyz/anchor'
 import { useMemo } from 'react'
 
 import useWalletStore from '../stores/useWalletStore'
+import useWalletOnePointOh from './useWalletOnePointOh'
 
-export default function useWallet() {
-  const { connected, connection, current: wallet } = useWalletStore(
-    (state) => state
-  )
+export default function useWalletDeprecated() {
+  const { connection } = useWalletStore((state) => state)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
 
   const anchorProvider = useMemo(() => {
     const options = AnchorProvider.defaultOptions()

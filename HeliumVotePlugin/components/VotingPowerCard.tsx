@@ -10,11 +10,11 @@ import { ChevronRightIcon } from '@heroicons/react/solid'
 import InlineNotification from '@components/InlineNotification'
 import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
 import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
-import useWalletStore from 'stores/useWalletStore'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import { MintInfo } from '@solana/spl-token'
 import { VotingPowerBox } from './VotingPowerBox'
 import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export const VotingPowerCard: React.FC<{
   inAccountDetails?: boolean
@@ -22,7 +22,9 @@ export const VotingPowerCard: React.FC<{
   const { fmtUrlWithCluster } = useQueryContext()
   const [hasGovPower, setHasGovPower] = useState(false)
   const { councilMint, ownTokenRecord, mint, symbol } = useRealm()
-  const [wallet, connected] = useWalletStore((s) => [s.current, s.connected])
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
+
   const councilDepositVisible = !!councilMint
   const { data: tokenOwnerRecordPk } = useAddressQuery_CommunityTokenOwner()
 
@@ -105,7 +107,8 @@ const TokenDepositLock = ({
   isSameWallet: boolean
 }) => {
   const { realm, realmTokenAccount } = useRealm()
-  const [connected] = useWalletStore((s) => [s.connected])
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const [amountLocked, votingPower] = useHeliumVsrStore((s) => [
     s.state.amountLocked,
     s.state.votingPower,

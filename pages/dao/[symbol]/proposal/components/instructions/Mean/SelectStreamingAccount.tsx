@@ -1,4 +1,4 @@
-import { Treasury } from '@mean-dao/msp'
+import { PaymentStreamingAccount } from '@mean-dao/payment-streaming'
 import { BN } from '@coral-xyz/anchor'
 import { Governance, ProgramAccount } from '@solana/spl-governance'
 import { useEffect, useState } from 'react'
@@ -8,30 +8,42 @@ import Select from '@components/inputs/Select'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
 import { abbreviateAddress } from '@utils/formatting'
-import createMsp from '@utils/instructions/Mean/createMsp'
+import createPaymentStreaming from '@utils/instructions/Mean/createPaymentStreaming'
 import getMint from '@utils/instructions/Mean/getMint'
 import { AssetAccount } from '@utils/uiTypes/assets'
 
-const getLabel = (treasury: Treasury | undefined, accounts: AssetAccount[]) => {
-  if (!treasury) return undefined
-  const passedAccount = getMint(accounts, treasury)
+const getLabel = (
+  paymentStreamingAccount: PaymentStreamingAccount | undefined,
+  accounts: AssetAccount[]
+) => {
+  if (!paymentStreamingAccount) return undefined
+  const passedAccount = getMint(accounts, paymentStreamingAccount)
   const amount = passedAccount
-    ? formatMintNaturalAmountAsDecimal(passedAccount, new BN(treasury.balance))
-    : treasury.balance
+    ? formatMintNaturalAmountAsDecimal(
+        passedAccount,
+        new BN(paymentStreamingAccount.balance)
+      )
+    : paymentStreamingAccount.balance
 
   return (
     <div className="break-all text-fgd-1 ">
-      <div className="mb-0.5 text-primary-light">{treasury.name}</div>
-      <div className="mb-2 text-fgd-3 text-xs">{treasury.id}</div>
+      <div className="mb-0.5 text-primary-light">
+        {paymentStreamingAccount.name}
+      </div>
+      <div className="mb-2 text-fgd-3 text-xs">
+        {paymentStreamingAccount.id.toBase58()}
+      </div>
       <div className="flex space-x-3 text-xs text-fgd-3">
         <div className="flex items-center">
           Streams:
-          <span className="ml-1 text-fgd-1">{treasury.totalStreams}</span>
+          <span className="ml-1 text-fgd-1">
+            {paymentStreamingAccount.totalStreams}
+          </span>
         </div>
         <div className="flex items-center">
           Token:
           <span className="ml-1 text-fgd-1">
-            {abbreviateAddress(treasury.associatedToken)}
+            {abbreviateAddress(paymentStreamingAccount.mint)}
           </span>
         </div>
         <div>
@@ -43,8 +55,8 @@ const getLabel = (treasury: Treasury | undefined, accounts: AssetAccount[]) => {
 }
 
 interface Props {
-  onChange: (treasury: Treasury) => void
-  value: Treasury | undefined
+  onChange: (paymentStreamingAccount: PaymentStreamingAccount) => void
+  value: PaymentStreamingAccount | undefined
   label: string
   error?: string
   shouldBeGoverned?: boolean
@@ -62,12 +74,14 @@ const SelectStreamingAccount = ({
   const connection = useWalletStore((s) => s.connection)
 
   const { governedTokenAccountsWithoutNfts: accounts } = useGovernanceAssets()
-  const [treasuries, setTreasuries] = useState<Treasury[]>([])
+  const [paymentStreamingAccounts, setPaymentStreamingAccounts] = useState<
+    PaymentStreamingAccount[]
+  >([])
   useEffect(() => {
     ;(async () => {
-      const msp = createMsp(connection)
+      const paymentStreaming = createPaymentStreaming(connection)
 
-      const nextTreasuries = await Promise.all(
+      const nextPaymentStreamingAccounts = await Promise.all(
         accounts
           .filter((x) =>
             !shouldBeGoverned
@@ -76,10 +90,13 @@ const SelectStreamingAccount = ({
                 governance?.pubkey?.toBase58()
           )
           .filter((a) => a.isSol)
-          .map((a) => msp.listTreasuries(a.governance.pubkey, true))
+          .map((a) => paymentStreaming.listAccounts(a.governance.pubkey, true))
       )
-      setTreasuries(nextTreasuries.flat().filter((t) => getMint(accounts, t)))
+      setPaymentStreamingAccounts(
+        nextPaymentStreamingAccounts.flat().filter((t) => getMint(accounts, t))
+      )
     })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(accounts)])
 
   return (
@@ -91,14 +108,14 @@ const SelectStreamingAccount = ({
       value={value?.id.toString()}
       error={error}
     >
-      {treasuries.map((treasury) => {
+      {paymentStreamingAccounts.map((paymentStreamingAccount) => {
         return (
           <Select.Option
             className="border-red"
-            key={treasury.id.toString()}
-            value={treasury}
+            key={paymentStreamingAccount.id.toString()}
+            value={paymentStreamingAccount}
           >
-            {getLabel(treasury, accounts)}
+            {getLabel(paymentStreamingAccount, accounts)}
           </Select.Option>
         )
       })}
