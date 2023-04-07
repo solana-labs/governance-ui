@@ -1,8 +1,7 @@
 import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import { Program, BN } from '@coral-xyz/anchor'
-import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { useAsyncCallback } from 'react-async-hook'
-import { sendTransaction } from '@utils/send'
 import { PositionWithMeta } from '../sdk/types'
 import {
   PROGRAM_ID,
@@ -11,6 +10,13 @@ import {
   delegatedPositionKey,
 } from '@helium/helium-sub-daos-sdk'
 import { useSolanaUnixNow } from '@hooks/useSolanaUnixNow'
+import { chunks } from '@utils/helpers'
+import {
+  sendTransactionsV3,
+  SequenceType,
+  txBatchesToInstructionSetWithSigners,
+} from '@utils/sendTransactions'
+import { notify } from '@utils/notifications'
 
 export const useClaimDelegatedPositionRewards = () => {
   const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
@@ -41,14 +47,13 @@ export const useClaimDelegatedPositionRewards = () => {
       } else {
         const currentEpoch = new BN(unixNow).div(new BN(EPOCH_LENGTH))
         const instructions: TransactionInstruction[] = []
-        const transactions: Transaction[] = []
         const delegatedPosKey = delegatedPositionKey(position.pubkey)[0]
         const delegatedPosAcc = await hsdProgram.account.delegatedPositionV0.fetch(
           delegatedPosKey
         )
 
         const { lastClaimedEpoch } = delegatedPosAcc
-        
+
         for (
           let epoch = lastClaimedEpoch.add(new BN(1));
           epoch.lt(currentEpoch);
@@ -67,15 +72,28 @@ export const useClaimDelegatedPositionRewards = () => {
           )
         }
 
-        const tx = new Transaction()
-        tx.add(...instructions)
-        await sendTransaction({
-          transaction: tx,
+        const ixsChunks = chunks(instructions, 4)
+        const txsChunks = ixsChunks.map((txBatch, batchIdx) => ({
+          instructionsSet: txBatchesToInstructionSetWithSigners(
+            txBatch,
+            [],
+            batchIdx
+          ),
+          sequenceType: SequenceType.Sequential,
+        }))
+
+        notify({ message: 'Claiming Rewards' })
+        await sendTransactionsV3({
+          transactionInstructions: txsChunks,
           wallet,
           connection: connection.current,
-          signers: [],
-          sendingMessage: 'Claming Rewards',
-          successMessage: 'Claming Rewards successful',
+          callbacks: {
+            afterAllTxConfirmed: () =>
+              notify({
+                message: 'Claming Rewards successful',
+                type: 'success',
+              }),
+          },
         })
       }
     }

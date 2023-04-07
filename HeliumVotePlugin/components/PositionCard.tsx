@@ -253,9 +253,9 @@ export const PositionCard: React.FC<PositionCardProps> = ({
     try {
       await claimDelegatedPositionRewards({ position })
 
-      // if (!claimingRewardsError) {
-      //   await refetchState()
-      // }
+      if (!claimingRewardsError) {
+        await refetchState()
+      }
     } catch (e) {
       notify({
         type: 'error',

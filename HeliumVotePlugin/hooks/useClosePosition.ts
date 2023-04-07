@@ -31,7 +31,7 @@ export const useClosePosition = () => {
         // lockupExpired
         !(
           lockupKind !== 'constant' &&
-          lockup.endTs.sub(new BN(Number(unixNow!))).lt(new BN(0))
+          lockup.endTs.sub(new BN(unixNow!)).lt(new BN(0))
         )
 
       if (loading) return
