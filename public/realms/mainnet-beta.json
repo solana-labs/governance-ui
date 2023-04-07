@@ -22,8 +22,8 @@
     "website": "https://www.deanslist.services/",
     "twitter": "@deanslistDAO",
     "ogImage": "/realms/Deans_List_Network_State/DeansList_Network_State_logo.png"
-   },
-   {
+  },
+  {
     "symbol": "Ukraine",
     "displayName": "Ukraine.SOL",
     "programId": "gUAedF544JeE6NYbQakQvribHykUNgaPJqcgf3UQVnY",
@@ -1045,8 +1045,8 @@
     "website": "https://flipsidecrypto.xyz/",
     "twitter": "@flipsidecrypto",
     "ogImage": "/realms/FSLOGO/FLIPSIDE-LOGO-WHITE.png"
-   },
-   {
+  },
+  {
     "symbol": "Legacy Dean's List Classic (moved to new one)",
     "displayName": "Dean's List",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1055,8 +1055,8 @@
     "website": "https://deans-list.strataprotocol.com/",
     "twitter": "@GrapeDeanslist",
     "ogImage": "/realms/DeanListGrape/deans-list-logo.png"
-   },
-   {
+  },
+  {
     "symbol": "GrapeCCSubDAO",
     "displayName": "Grape CC SubDAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1064,8 +1064,8 @@
     "website": "https://services.grapes.network/",
     "twitter": "@grapeprotocol",
     "ogImage": "/realms/GrapeCCSubDAO/GrapeCCSubDAO.png"
-   },
-   {
+  },
+  {
     "symbol": "AthensDAO",
     "displayName": "AthensDAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1074,8 +1074,8 @@
     "website": "https://athensdao.net/",
     "twitter": "@GrapeAthensDAO",
     "ogImage": "/realms/AthensDAO/AthensDAO_Logo.jpg"
-   },
-   {
+  },
+  {
     "symbol": "Wen DAO",
     "displayName": "Wen DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1083,8 +1083,8 @@
     "website": "https://services.grapes.network/",
     "twitter": "@grapeprotocol",
     "ogImage": "/realms/Wen DAO/Wen DAO.png"
-   }, 
-   { 
+  },
+  {
     "symbol": "BOOT",
     "displayName": "Bootstrap DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1129,7 +1129,7 @@
     "ogImage": "/realms/bacDao/logo_bulls.png",
     "website": "https://bullsarmyclub.com/"
   },
- {
+  {
     "symbol": "EPCT",
     "category": "web3",
     "bannerImage": "https://bafybeih52um4tvyggeja36kmbyg5b4pfod547qxdite4krwoe4nwtareji.ipfs.w3s.link/EpicsBetaTwitterHeaderLogo.png",
@@ -1681,20 +1681,6 @@
     "sortRank": 3,
     "website": "https://empiredao.xyz/",
     "twitter": "@empiredao"
-  },
-  {
-    "symbol": "Holaplex",
-    "category": "web3",
-    "bannerImage": "https://i.imgur.com/uW2laRX.png",
-    "displayName": "Holaplex",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "4H282CCFjstxBd651gdhAydnXcjGk956Dk7p25MqxmfN",
-    "ogImage": "https://i.imgur.com/v9GE74q.png",
-    "shortDescription": "Holaplex provides a suite of web3 and NFT commerce solutions for businesses.",
-    "sortRank": 3,
-    "website": "https://www.holaplex.com/",
-    "twitter": "@holaplex",
-    "github": "https://github.com/holaplex"
   },
   {
     "symbol": "Angelic",
@@ -3051,11 +3037,10 @@
     "discord": "https://discord.gg/XcWVHM2Z",
     "github": "https://github.com/brdot",
     "website": "https://brdot.com.br"
-    
   },
-  { 
+  {
     "symbol": "SAO",
-    "category":"nft",
+    "category": "nft",
     "displayName": "Sator DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "7yAiT2bUg5MwBzT3K9BvhcZdtHr5z8AnCGWa2iPJjB3T",
@@ -3064,11 +3049,11 @@
     "shortDescription": "Sator brings traditional TV and movies into Web3 through NFT-VOD and token-gated staking.",
     "website": "https://sator.io",
     "discord": "https://discord.gg/qftzCFrHNQ",
-    "twitter": "https://twitter.com/SatorSAO" 
+    "twitter": "https://twitter.com/SatorSAO"
   },
-  { 
+  {
     "symbol": "Safecows",
-    "category":"web3",
+    "category": "web3",
     "displayName": "Safecows",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "6RQAna7aWHLVwfYRFGyM8kpnBXNGkMNCGfvuwYuuvpFU",
@@ -3078,9 +3063,9 @@
     "website": "https://safecows.com",
     "discord": "https://discord.gg/aQCeMSWs"
   },
-   { 
+  {
     "symbol": "BlueChickDAO",
-    "category":"gaming",
+    "category": "gaming",
     "displayName": "The Blue Chick NFTs DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "99c96qFUwLiGcbudDeTLVxYTbtQ4CkDsstvHHmGPGGWj",
@@ -3090,8 +3075,7 @@
     "website": "https://bluechicknfts.wtf",
     "discord": "https://discord.gg/SHVcwHKUNG",
     "twitter": "@blueChickNFTs"
-  },  
-  
+  },
   {
     "symbol": "HNT",
     "displayName": "Helium DAO",
