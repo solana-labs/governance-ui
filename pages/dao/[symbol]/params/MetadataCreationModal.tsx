@@ -179,11 +179,9 @@ const MetadataCreationModal = ({
         : 'https://node1.bundlr.network',
       'solana',
       wallet,
-      connection.cluster == 'devnet'
-        ? {
-            providerUrl: connection.current.rpcEndpoint,
-          }
-        : undefined
+      {
+        providerUrl: connection.current.rpcEndpoint,
+      }
     )
     try {
       await bundlr.utils.getBundlerAddress('solana')
