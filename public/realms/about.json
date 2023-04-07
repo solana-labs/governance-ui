@@ -129,7 +129,9 @@
       },
       {
         "question": "Do you have an SDK?",
-        "answer": ["Yes we have three."]
+        "answer": [
+          "Yes we have three."
+        ]
       }
     ]
   },
@@ -217,7 +219,9 @@
     "resources": [
       {
         "title": "Writings From Planet Jupiter",
-        "content": [""],
+        "content": [
+          ""
+        ],
         "url": "https://blog.jup.ag/"
       },
       {
@@ -1140,7 +1144,7 @@
     ],
     "documentation": {
       "title": "Docs",
-      "url": "https://epics.dev/en/what-is-epics/"
+      "url": "https://epics.dev/"
     },
     "resources": [
       {
@@ -1281,42 +1285,42 @@
           }
         },
         {
-            "title": "USDH as Quote Token on Primary Solana DEXes",
-            "date": "2022-04-01T15:42:21.109Z",
-            "status": "completed"
-          },
-          {
-            "title": "Onboard Numerous Liquid Staked SOL Assets",
-            "date": "2022-05-01T15:42:21.109Z",
-            "status": "completed"
-          },
-          {
-            "title": "Peg Stability Module Launch",
-            "date": "2022-08-01T15:42:21.109Z",
-            "status": "completed",
-            "resource": {
-              "title": "Introducing the Hubble Peg Stability Module",
-              "url": "https://blog.hubbleprotocol.io/introducing-peg-stability-mobule/"
-            }
-          },
-          {
-            "title": "Introduction of Stability Fees & Isolated Vaults",
-            "date": "2022-08-01T15:42:21.109Z",
-            "status": "completed",
-            "resource": {
-              "title": "Hubble Introduces Stability Fees",
-              "url": "https://blog.hubbleprotocol.io/hubble-stability-fees/"
-            }
-          },
-          {
-            "title": "Onboard Kamino kTokens as Collateral",
-            "date": "2022-09-01T15:42:21.109Z",
-            "status": "completed",
-            "resource": {
-              "title": "Hubble Protocol Accepts Kamino kTokens as USDH Collateral",
-              "url": "https://blog.hubbleprotocol.io/hubble-kamino-ktokens-usdh/"
-            }
+          "title": "USDH as Quote Token on Primary Solana DEXes",
+          "date": "2022-04-01T15:42:21.109Z",
+          "status": "completed"
+        },
+        {
+          "title": "Onboard Numerous Liquid Staked SOL Assets",
+          "date": "2022-05-01T15:42:21.109Z",
+          "status": "completed"
+        },
+        {
+          "title": "Peg Stability Module Launch",
+          "date": "2022-08-01T15:42:21.109Z",
+          "status": "completed",
+          "resource": {
+            "title": "Introducing the Hubble Peg Stability Module",
+            "url": "https://blog.hubbleprotocol.io/introducing-peg-stability-mobule/"
           }
+        },
+        {
+          "title": "Introduction of Stability Fees & Isolated Vaults",
+          "date": "2022-08-01T15:42:21.109Z",
+          "status": "completed",
+          "resource": {
+            "title": "Hubble Introduces Stability Fees",
+            "url": "https://blog.hubbleprotocol.io/hubble-stability-fees/"
+          }
+        },
+        {
+          "title": "Onboard Kamino kTokens as Collateral",
+          "date": "2022-09-01T15:42:21.109Z",
+          "status": "completed",
+          "resource": {
+            "title": "Hubble Protocol Accepts Kamino kTokens as USDH Collateral",
+            "url": "https://blog.hubbleprotocol.io/hubble-kamino-ktokens-usdh/"
+          }
+        }
       ]
     },
     "faq": [
@@ -1419,7 +1423,7 @@
       }
     ]
   },
-  "BZE9AiJrMxUXXjwy9iBPzj34Wh5Zf1wLEFAM4oSSMRLi" : {
+  "BZE9AiJrMxUXXjwy9iBPzj34Wh5Zf1wLEFAM4oSSMRLi": {
     "symbol": "Allie Coin",
     "heading": "Allie Coin unlocks a new world of gaming.",
     "about": [
@@ -1783,23 +1787,23 @@
           }
         },
         {
-            "title": "Mint Phase 1",
-            "date": "2022-10-03T15:42:21.109Z",
-            "status": "completed"
-          },
-          {
-            "title": "Mutation Feature Release",
-            "date": "2022-10-26T15:42:21.109Z",
-            "status": "inprogress",
-            "resource": {
-              "title": "Plantoids Whitepaper: Human Intervention",
-              "url": "https://docs.plantoids.io/plantoids-nft/human-intervention"
-            }
-          },
-          {
-            "title": "Mint Phase 2",
-            "status": "upcoming"
+          "title": "Mint Phase 1",
+          "date": "2022-10-03T15:42:21.109Z",
+          "status": "completed"
+        },
+        {
+          "title": "Mutation Feature Release",
+          "date": "2022-10-26T15:42:21.109Z",
+          "status": "inprogress",
+          "resource": {
+            "title": "Plantoids Whitepaper: Human Intervention",
+            "url": "https://docs.plantoids.io/plantoids-nft/human-intervention"
           }
+        },
+        {
+          "title": "Mint Phase 2",
+          "status": "upcoming"
+        }
       ]
     },
     "faq": [
@@ -1910,14 +1914,14 @@
           }
         },
         {
-            "title": "Season 2 Launch",
-            "date": "2022-04-07T15:42:21.109Z",
-            "status": "completed"
+          "title": "Season 2 Launch",
+          "date": "2022-04-07T15:42:21.109Z",
+          "status": "completed"
         },
         {
-            "title": "Season 3 Launch",
-            "date": "2022-09-01T15:42:21.109Z",
-            "status": "completed"
+          "title": "Season 3 Launch",
+          "date": "2022-09-01T15:42:21.109Z",
+          "status": "completed"
         }
       ]
     },
@@ -1947,22 +1951,6 @@
         ]
       }
     ]
-  },
-  "4H282CCFjstxBd651gdhAydnXcjGk956Dk7p25MqxmfN": {
-    "symbol": "Holaplex",
-    "heading": "Holaplex provides a suite of web3 and NFT commerce solutions for businesses.",
-    "about": [
-      {
-        "heading": "Introduction",
-        "content": [
-          "Holaplex provides a suite of blockchain and NFT products and services to power brands building new business opportunities in Web3. Holaplex makes the process of creating, selling and managing digital assets, both simple to execute and valuable for your business. Our robust suite of tools for enterprises building in Web3, are supported by a community of developers who contribute to critical open source projects we initiate."
-        ]
-      }
-    ],
-    "documentation": {
-      "title": "Docs",
-      "url": "https://docs.holaplex.com/"
-    }
   },
   "AvpoeRXmbfrtkF9NQvWkcN4LbWmQHy3ntWnYudEUdU3N": {
     "symbol": "Blockasset",
@@ -4652,7 +4640,7 @@
       }
     ]
   },
-  "4pzwicnneaxCL4XVms2gJApfj7jpiFvDMzCWEHYw2rMV" : {
+  "4pzwicnneaxCL4XVms2gJApfj7jpiFvDMzCWEHYw2rMV": {
     "symbol": "Coin98",
     "heading": "Your Crypto Everything App.",
     "about": [
@@ -4674,7 +4662,7 @@
       }
     ]
   },
-  "8gqpog28H6UvefDu7wMbwaRQX7a7rbVtw7z3yX9xjJQa" : {
+  "8gqpog28H6UvefDu7wMbwaRQX7a7rbVtw7z3yX9xjJQa": {
     "symbol": "Genopets",
     "heading": "The Free-to-Play, Move-to-Earn NFT mobile game. Steps you take every day fuel your journey in the Genoverse. Move. Play. Create. ",
     "about": [
@@ -4709,7 +4697,7 @@
       }
     ]
   },
-  "5K4VVEeYpANxL79r7rM3heyXqYZkzu2KkD4kFkt1gGpG" : {
+  "5K4VVEeYpANxL79r7rM3heyXqYZkzu2KkD4kFkt1gGpG": {
     "symbol": "Multiverse (Earth From Another Sun)",
     "heading": "Earth From Another Sun is an open-world MMO sandbox FPS game where you can command massive armies to fight & conquer the Galaxy.",
     "about": [
@@ -4727,7 +4715,7 @@
       }
     ]
   },
-  "2AgaUrJeZYxQgipGa8s5opQBPRqJBjKwWqv3hwinnefJ" : {
+  "2AgaUrJeZYxQgipGa8s5opQBPRqJBjKwWqv3hwinnefJ": {
     "symbol": "Helio",
     "heading": "The Web3 payments API",
     "about": [
@@ -4747,7 +4735,7 @@
       "url": "https://docs.hel.io/introduction/welcome-to-helio"
     }
   },
-  "E5yobpBits2Wm8LbtGSPS6KhKzU3oZRTcbx2XTM6Q1fF" : {
+  "E5yobpBits2Wm8LbtGSPS6KhKzU3oZRTcbx2XTM6Q1fF": {
     "symbol": "Kaizen Corps",
     "heading": "Creators of the strategy game: Domination, which drives our gaming/metaverse infrastructure and ecosystem development for Solana.",
     "about": [
@@ -4770,7 +4758,7 @@
       }
     ]
   },
-  "4xXbWdJbTdvmNNb2ZE1MEk7wtYWj3MJm8SqQ8u3TErvh" : {
+  "4xXbWdJbTdvmNNb2ZE1MEk7wtYWj3MJm8SqQ8u3TErvh": {
     "symbol": "YGG SEA",
     "heading": "The first subDAO of YGG, with the mission of creating the biggest and most sustainable virtual economy in Southeast Asia!",
     "about": [
@@ -4794,7 +4782,7 @@
       }
     ]
   },
-  "6orGiJYGXYk9GT2NFoTv2ZMYpA6asMieAqdek4YRH2Dn" : {
+  "6orGiJYGXYk9GT2NFoTv2ZMYpA6asMieAqdek4YRH2Dn": {
     "symbol": "The Imperium of Rain DAO",
     "about": [
       {
@@ -4811,7 +4799,7 @@
       "url": "https://docs.raindrops.xyz"
     }
   },
-  "DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE" : {
+  "DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE": {
     "symbol": "Mango ",
     "heading": "Every market, all the power, none of the fuss. Simplifying decentralized finance through easy-to-use products and developer tools.",
     "about": [
@@ -4828,7 +4816,7 @@
       "url": "https://docs.mango.markets/"
     }
   },
-  "DReG8cfj6XA73u82AGFnytxGm3XZ3saetGwapRrRkoty" : {
+  "DReG8cfj6XA73u82AGFnytxGm3XZ3saetGwapRrRkoty": {
     "symbol": "CandyPay",
     "heading": "Powering seamless, mobile native NFT and Payments experiences on Solana",
     "about": [
@@ -4844,7 +4832,7 @@
       "url": "https://docs.candypay.fun"
     }
   },
-  "9jebQmDLbYRa4vo8rCQpPJu9VxRxWMp1cNTU1nzmrNLY" : {
+  "9jebQmDLbYRa4vo8rCQpPJu9VxRxWMp1cNTU1nzmrNLY": {
     "symbol": "Dispatch Protocol",
     "heading": "Decentralized, censorship resistant, on-chain forums protocol. Reddit for Solana. ",
     "about": [
@@ -4860,7 +4848,7 @@
       "url": "https://docs.dispatch.forum"
     }
   },
-  "GHVYhVLqSfqsuNXkKrALXDEX8xq76WGMAtJka5zr3jqw" : {
+  "GHVYhVLqSfqsuNXkKrALXDEX8xq76WGMAtJka5zr3jqw": {
     "symbol": "Sphere",
     "heading": "Payments Infrastructure for web3",
     "about": [
@@ -4973,7 +4961,7 @@
       }
     ]
   },
-  "4iUTtxTm6aJRLKJBqQrn36kg84i33xeGmruyQDd2pqbr" : {
+  "4iUTtxTm6aJRLKJBqQrn36kg84i33xeGmruyQDd2pqbr": {
     "symbol": "SunriseStake",
     "heading": "Carbon-neutral Staking on Solana",
     "about": [

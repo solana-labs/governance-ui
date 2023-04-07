@@ -18,8 +18,8 @@ import Modal from '@components/Modal'
 import Tooltip from '@components/Tooltip'
 import TransferUpgradeAuthority from '@components/AssetsList/TransferUpgradeAuthority'
 import UpgradeProgram from '@components/AssetsList/UpgradeProgram'
-import useWalletStore from 'stores/useWalletStore'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface Props {
   className?: string
@@ -28,7 +28,8 @@ interface Props {
 
 export default function Program(props: Props) {
   const { canUseProgramUpgradeInstruction } = useGovernanceAssets()
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const [closeBuffersModalOpen, setOpenCloseBuffersModalOpen] = useState(false)
   const [
     transferAuthorityModalOpen,

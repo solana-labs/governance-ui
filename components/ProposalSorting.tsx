@@ -4,7 +4,7 @@ import classNames from 'classnames'
 import { ArrowDown, ArrowsVertical, ArrowUp } from '@carbon/icons-react'
 import styled from '@emotion/styled'
 
-export const PROPOSAL_SORTING_LOCAL_STORAGE_KEY = 'PROPOSALS_SORTING_OPT'
+export const PROPOSAL_SORTING_LOCAL_STORAGE_KEY = 'PROPOSALS_SORTING_OPT_V2'
 
 export enum SORTING_OPTIONS {
   ASC,
@@ -14,10 +14,17 @@ export enum SORTING_OPTIONS {
 
 export type Sorting = {
   completed_at: SORTING_OPTIONS
+  signedOffAt: SORTING_OPTIONS
 }
 
 export const InitialSorting = {
   completed_at: SORTING_OPTIONS.NONE,
+  signedOffAt: SORTING_OPTIONS.NONE,
+}
+
+const keyToLabel = {
+  completed_at: 'Voting completed',
+  signedOffAt: 'Signing time',
 }
 
 const StyledAlertCount = styled.span`
@@ -60,44 +67,61 @@ const ProposalSorting = ({ className, disabled, onChange, sorting }: Props) => {
             </div>
           </Disclosure.Button>
           <Disclosure.Panel
-            className={`bg-bkg-1 border border-fgd-4 mt-2 p-4 absolute right-0 w-56 z-20 rounded-md text-xs`}
+            className={`bg-bkg-1 border border-fgd-4 mt-2 p-4 absolute right-0 w-56 z-20 rounded-md text-xs space-y-2`}
           >
-            <div className="flex">
-              Voting completed{' '}
-              <div className="ml-auto cursor-pointer">
-                {sorting.completed_at === SORTING_OPTIONS.NONE && (
-                  <ArrowsVertical
-                    onClick={() =>
-                      onChange({
-                        completed_at: SORTING_OPTIONS.DESC,
-                      })
-                    }
-                  ></ArrowsVertical>
-                )}
-                {sorting.completed_at === SORTING_OPTIONS.DESC && (
-                  <ArrowDown
-                    onClick={() =>
-                      onChange({
-                        completed_at: SORTING_OPTIONS.ASC,
-                      })
-                    }
-                  ></ArrowDown>
-                )}
-                {sorting.completed_at === SORTING_OPTIONS.ASC && (
-                  <ArrowUp
-                    onClick={() =>
-                      onChange({
-                        completed_at: SORTING_OPTIONS.NONE,
-                      })
-                    }
-                  ></ArrowUp>
-                )}
-              </div>
-            </div>
+            {Object.keys(InitialSorting).map((x) => (
+              <Option
+                sorting={sorting}
+                objKey={x}
+                key={x}
+                onChange={onChange}
+                label={keyToLabel[x]}
+              ></Option>
+            ))}
           </Disclosure.Panel>
         </>
       )}
     </Disclosure>
+  )
+}
+
+const Option = ({ sorting, objKey, onChange, label }) => {
+  return (
+    <div className="flex">
+      {label}
+      <div className="ml-auto cursor-pointer">
+        {sorting[objKey] === SORTING_OPTIONS.NONE && (
+          <ArrowsVertical
+            onClick={() =>
+              onChange({
+                ...sorting,
+                [objKey]: SORTING_OPTIONS.DESC,
+              })
+            }
+          ></ArrowsVertical>
+        )}
+        {sorting[objKey] === SORTING_OPTIONS.DESC && (
+          <ArrowDown
+            onClick={() =>
+              onChange({
+                ...sorting,
+                [objKey]: SORTING_OPTIONS.ASC,
+              })
+            }
+          ></ArrowDown>
+        )}
+        {sorting[objKey] === SORTING_OPTIONS.ASC && (
+          <ArrowUp
+            onClick={() =>
+              onChange({
+                ...sorting,
+                [objKey]: SORTING_OPTIONS.NONE,
+              })
+            }
+          ></ArrowUp>
+        )}
+      </div>
+    </div>
   )
 }
 

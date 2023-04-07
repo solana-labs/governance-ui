@@ -1,4 +1,4 @@
-import { Treasury } from '@mean-dao/msp'
+import { PaymentStreamingAccount } from '@mean-dao/payment-streaming'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 
@@ -10,7 +10,7 @@ import {
   MeanCreateStream,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
-import createMsp from './createMsp'
+import createPaymentStreaming from './createPaymentStreaming'
 
 interface Args {
   connection: ConnectionContext
@@ -56,12 +56,14 @@ Args): Promise<UiInstruction> {
   const serializedInstruction = ''
   const governedTokenAccount = form.governedTokenAccount
 
-  const formTreasury = form.treasury as Treasury | undefined
+  const formPaymentStreamingAccount = form.paymentStreamingAccount as
+    | PaymentStreamingAccount
+    | undefined
 
   if (
     isValid &&
     governedTokenAccount &&
-    formTreasury &&
+    formPaymentStreamingAccount &&
     form.destination &&
     form.streamName &&
     governedTokenAccount.extensions.mint &&
@@ -69,11 +71,11 @@ Args): Promise<UiInstruction> {
     form.rateAmount &&
     form.mintInfo
   ) {
-    const msp = createMsp(connection)
+    const paymentStreaming = createPaymentStreaming(connection)
 
-    const payer = getGovernedAccountPk(governedTokenAccount)
-    const treasurer = governedTokenAccount.governance.pubkey
-    const treasury = new PublicKey(formTreasury.id)
+    const feePayer = getGovernedAccountPk(governedTokenAccount)
+    const owner = governedTokenAccount.governance.pubkey
+    const psAccount = new PublicKey(formPaymentStreamingAccount.id)
     const beneficiary = new PublicKey(form.destination)
     const streamName = form.streamName
     const allocationAssigned = parseMintNaturalAmountFromDecimal(
@@ -88,15 +90,12 @@ Args): Promise<UiInstruction> {
     const startUtc = new Date(form.startDate)
     const usePda = true
 
-    const transaction = await msp.createStream(
-      payer,
-      treasurer,
-      treasury,
-      beneficiary,
+    const { transaction } = await paymentStreaming.buildCreateStreamTransaction(
+      { psAccount, owner, feePayer, beneficiary },
       streamName,
-      allocationAssigned,
       rateAmount,
       rateIntervalInSeconds,
+      allocationAssigned,
       startUtc,
       undefined,
       undefined,

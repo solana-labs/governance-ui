@@ -11,7 +11,11 @@ import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import { getVoteRecordsByVoterMapByProposal } from '@models/api'
 import { isYesVote } from '@models/voteRecords'
-import { GOVERNANCE_CHAT_PROGRAM_ID, VoteRecord } from '@solana/spl-governance'
+import {
+  GOVERNANCE_CHAT_PROGRAM_ID,
+  GoverningTokenType,
+  VoteRecord,
+} from '@solana/spl-governance'
 import { ChatMessage, ProgramAccount } from '@solana/spl-governance'
 import { getGovernanceChatMessagesByVoter } from '@solana/spl-governance'
 
@@ -63,7 +67,6 @@ const RevokeMembership: FC<{ member: PublicKey; mint: PublicKey }> = ({
   // note the lack of space is not a typo
   const proposalTitle = `Remove ${govpop}member ${abbrevAddress}`
 
-  console.log(governance, 'AAAAAA')
   const tooltipContent = useProposalCreationButtonTooltip(
     governance ? [governance] : []
   )
@@ -94,7 +97,7 @@ const RevokeMembership: FC<{ member: PublicKey; mint: PublicKey }> = ({
 
 const MemberOverview = ({ member }: { member: Member }) => {
   const programVersion = useProgramVersion()
-  const { realm } = useRealm()
+  const { realm, config } = useRealm()
   const connection = useWalletStore((s) => s.connection)
   const selectedRealm = useWalletStore((s) => s.selectedRealm)
   const { mint, councilMint, proposals, symbol } = useRealm()
@@ -244,6 +247,22 @@ const MemberOverview = ({ member }: { member: Member }) => {
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [walletPublicKey?.toBase58()])
+
+  const councilMintKey = realm?.account.config.councilMint
+  const communityMintKey = realm?.account.communityMint
+
+  const isRevokableCouncilMember =
+    !councilVotes.isZero() &&
+    councilMintKey &&
+    config?.account.councilTokenConfig.tokenType ===
+      GoverningTokenType.Membership
+
+  const isRevokableCommunityMember =
+    !communityVotes.isZero() &&
+    communityMintKey &&
+    config?.account.communityTokenConfig.tokenType ===
+      GoverningTokenType.Membership
+
   return (
     <>
       <div className="flex items-center justify-between mb-2 py-2">
@@ -263,16 +282,16 @@ const MemberOverview = ({ member }: { member: Member }) => {
             Explorer
             <ExternalLinkIcon className="flex-shrink-0 h-4 ml-1 w-4" />
           </a>
-          {programVersion >= 3 && realm !== undefined && (
-            <RevokeMembership
-              member={new PublicKey(member.walletAddress)}
-              mint={
-                !councilVotes.isZero() && realm.account.config.councilMint
-                  ? realm.account.config.councilMint
-                  : realm.account.communityMint
-              }
-            />
-          )}
+          {programVersion >= 3 &&
+            realm !== undefined &&
+            (isRevokableCouncilMember || isRevokableCommunityMember) && (
+              <RevokeMembership
+                member={new PublicKey(member.walletAddress)}
+                mint={
+                  isRevokableCouncilMember ? councilMintKey : communityMintKey! // Typescript is wrong!
+                }
+              />
+            )}
         </div>
       </div>
       <div className="flex flex-col space-y-3 md:space-y-0 md:flex-row md:space-x-3">

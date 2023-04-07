@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { CivicProfile, Profile as BaseProfile } from '@civic/profile'
 import useWalletStore from 'stores/useWalletStore'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 type Profile = BaseProfile & {
   exists: boolean
@@ -24,7 +25,7 @@ export const useProfile = (
   publicKey?: PublicKey
 ): { profile: Profile | undefined; loading: boolean } => {
   const connection = useWalletStore((s) => s.connection)
-  const connectedWallet = useWalletStore((s) => s.current)
+  const connectedWallet = useWalletOnePointOh()
   const [profile, setProfile] = useState<Profile>()
   const [loading, setLoading] = useState(true)
 

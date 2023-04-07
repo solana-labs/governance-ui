@@ -23,14 +23,12 @@ import {
 } from '@components/InstructionOptions'
 import dayjs from 'dayjs'
 import {
-  getFormattedStringFromDays,
-  SECS_PER_DAY,
-} from 'VoteStakeRegistry/tools/dateTools'
-import {
   getCastleReconcileInstruction,
   getCastleRefreshInstructions,
 } from '@utils/instructions/Castle'
 import Wallet from '@project-serum/sol-wallet-adapter'
+import { getFormattedStringFromDays, SECS_PER_DAY } from '@utils/dateTools'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export enum PlayState {
   Played,
@@ -53,10 +51,10 @@ export function ExecuteInstructionButton({
   instructionOption: InstructionOption
 }) {
   const { realmInfo } = useRealm()
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
   const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
-  const connected = useWalletStore((s) => s.connected)
+  const connected = !!wallet?.connected
 
   const [currentSlot, setCurrentSlot] = useState(0)
 
@@ -99,11 +97,11 @@ export function ExecuteInstructionButton({
       switch (instructionOption) {
         case InstructionOptions.castleRefresh:
           adjacentTransaction = new Transaction().add(
-              ...await getCastleRefreshInstructions(
-                  rpcContext.connection,
-                  (wallet as unknown) as Wallet,
-                  proposalInstruction
-              )
+            ...(await getCastleRefreshInstructions(
+              rpcContext.connection,
+              (wallet as unknown) as Wallet,
+              proposalInstruction
+            ))
           )
           break
         case InstructionOptions.castleReconcileRefresh: {
@@ -113,11 +111,11 @@ export function ExecuteInstructionButton({
             proposalInstruction
           )
           adjacentTransaction = new Transaction().add(
-              ...await getCastleRefreshInstructions(
-                rpcContext.connection,
-                (wallet as unknown) as Wallet,
-                proposalInstruction
-              )
+            ...(await getCastleRefreshInstructions(
+              rpcContext.connection,
+              (wallet as unknown) as Wallet,
+              proposalInstruction
+            ))
           )
           break
         }

@@ -1,18 +1,18 @@
-import { PROGRAM_VERSION_V1 } from '@solana/spl-governance'
+import {
+  PROGRAM_VERSION_V1,
+  getRealms,
+  ProgramAccount,
+  Realm,
+} from '@solana/spl-governance'
 
 import { PublicKey } from '@solana/web3.js'
-import {
-  HOLAPLEX_GRAPQL_URL_DEVNET,
-  HOLAPLEX_GRAPQL_URL_MAINNET,
-} from '@tools/constants'
 import { arrayToMap } from '@tools/core/script'
-import axios from 'axios'
-import { gql } from 'graphql-request'
 
 import devnetRealms from 'public/realms/devnet.json'
 import mainnetBetaRealms from 'public/realms/mainnet-beta.json'
 import type { ConnectionContext } from 'utils/connection'
 import { equalsIgnoreCase } from '../../tools/core/strings'
+import { getAllSplGovernanceProgramIds } from 'pages/api/tools/realms'
 
 export interface RealmInfo {
   symbol: string
@@ -169,35 +169,28 @@ const EXCLUDED_REALMS = new Map<string, string>([
   ['2HpvQJNTXgso4HWTXamiRAXshRyGu4ZhJ5esDT3tHPUV', ''], // Epics DAO (Dead because of loosing vote power)
   ['Hd7hrf1fyZN5ZkuCerpfXs4UCAgoHELyiscE4utaKhSx', ''],
   ['9K6P7vbAPqZ8hHsDbShLZat9bFdWzA52QAgJThGeWui5', ''], // BonkDAO (council only)
+  ['C556EiXyMWU62Ed7rrGipZrRHWnUm3hPvufUzcdXsj2V', ''], //Mango security council duplicate
+  ['HnLuYmBxDxK1MCihHJVFnNudUTpLPc2km6xNcRQ8KPdj', ''], // df test
 ])
 
 // Returns all known realms from all known spl-gov instances which are not certified
 export async function getUnchartedRealmInfos(connection: ConnectionContext) {
   const certifiedRealms = getCertifiedRealmInfos(connection)
-  const queryUrl =
-    connection.cluster === 'devnet'
-      ? HOLAPLEX_GRAPQL_URL_DEVNET
-      : HOLAPLEX_GRAPQL_URL_MAINNET
-  const query = gql`
-    query realms($limit: Int!, $offset: Int!) {
-      realms(limit: $limit, offset: $offset) {
-        name
-        programId
-        address
-      }
-    }
-  `
-  const allRealms: {
-    data: { data: { realms: UnchartedRealm[] } }
-  } = await axios.post(queryUrl, {
-    query,
-    variables: {
-      limit: 10000,
-      offset: 0,
-    },
-  })
-  const sortedRealms = allRealms.data.data.realms.sort((r1, r2) =>
-    r1.name.localeCompare(r2.name)
+
+  const allProgramIds = getAllSplGovernanceProgramIds()
+  let allRealms: ProgramAccount<Realm>[] = []
+
+  for (const programId of allProgramIds) {
+    const allProgramRealms = await getRealms(
+      connection.current,
+      new PublicKey(programId)
+    )
+
+    allRealms = allRealms.concat(allProgramRealms)
+  }
+
+  const sortedRealms = allRealms.sort((r1, r2) =>
+    r1.account.name.localeCompare(r2.account.name)
   )
 
   const excludedRealms = arrayToMap(certifiedRealms, (r) =>
@@ -206,8 +199,15 @@ export async function getUnchartedRealmInfos(connection: ConnectionContext) {
 
   return Object.values(sortedRealms)
     .map((r) => {
-      return !(excludedRealms.has(r.address) || EXCLUDED_REALMS.has(r.address))
-        ? createUnchartedRealmInfo(r)
+      return !(
+        excludedRealms.has(r.pubkey.toBase58()) ||
+        EXCLUDED_REALMS.has(r.pubkey.toBase58())
+      )
+        ? createUnchartedRealmInfo({
+            name: r.account.name,
+            programId: r.owner.toBase58(),
+            address: r.pubkey.toBase58(),
+          })
         : undefined
     })
     .filter(Boolean) as readonly RealmInfo[]

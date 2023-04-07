@@ -5,7 +5,7 @@ import { ThumbDownIcon, ThumbUpIcon } from '@heroicons/react/solid'
 import useCreateProposal from '@hooks/useCreateProposal'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
-import useWallet from '@hooks/useWallet'
+import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import {
   getGovernanceProgramVersion,
   getInstructionDataFromBase64,
@@ -54,7 +54,7 @@ export default function VoteProposalModal({
   const [submitting, setSubmitting] = useState(false)
 
   const connection = useWalletStore((s) => s.connection)
-  const { wallet } = useWallet()
+  const { wallet } = useWalletDeprecated()
 
   const { handleCreateProposal } = useCreateProposal()
 

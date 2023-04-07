@@ -34,9 +34,7 @@ export const useDestination = (connection: Connection, address: string) => {
   useEffect(() => {
     if (address) {
       debounce.debounceFcn(async () => {
-        console.log('useDestination -> debounce', address)
         const { pubKey, account } = await getDestination(connection, address)
-        console.log({ pubKey: pubKey?.toBase58(), account })
 
         if (pubKey) {
           setDestinationAddress(pubKey)

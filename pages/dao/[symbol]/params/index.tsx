@@ -10,12 +10,11 @@ import Tabs from '@components/Tabs'
 import Select from '@components/inputs/Select'
 import Button from '@components/Button'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import { useRouter } from 'next/router'
 
 import RealmConfigModal from './RealmConfigModal'
-import GovernanceConfigModal from './GovernanceConfigModal'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { getAccountName } from '@components/instructions/tools'
-import useWalletStore from 'stores/useWalletStore'
 import SetRealmAuthorityModal from './SetRealmAuthorityModal'
 import MetadataCreationModal from './MetadataCreationModal'
 
@@ -26,10 +25,14 @@ import { ExclamationIcon } from '@heroicons/react/outline'
 import Tooltip from '@components/Tooltip'
 import { AccountType } from '@utils/uiTypes/assets'
 import { MintMaxVoteWeightSourceType } from '@solana/spl-governance'
+import useQueryContext from '@hooks/useQueryContext'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const Params = () => {
-  const { realm, mint, config } = useRealm()
-  const wallet = useWalletStore((s) => s.current)
+  const router = useRouter()
+  const { realm, mint, config, symbol } = useRealm()
+  const wallet = useWalletOnePointOh()
+  const { fmtUrlWithCluster } = useQueryContext()
   const {
     canUseAuthorityInstruction,
     assetAccounts,
@@ -67,10 +70,6 @@ const Params = () => {
   const [isRealmProposalModalOpen, setIsRealmProposalModalOpen] = useState(
     false
   )
-  const [
-    isGovernanceProposalModalOpen,
-    setIsGovernanceProposalModalOpen,
-  ] = useState(false)
   const [activeGovernance, setActiveGovernance] = useState<any>(null)
   const [activeTab, setActiveTab] = useState('Params')
   const [isRealmAuthorityModalOpen, setRealmAuthorityModalIsOpen] = useState(
@@ -86,9 +85,6 @@ const Params = () => {
   const communityMintMaxVoteWeightSource =
     realmAccount?.config.communityMintMaxVoteWeightSource
   const realmConfig = realmAccount?.config
-  const openRealmProposalModal = () => {
-    setIsRealmProposalModalOpen(true)
-  }
   const closeRealmProposalModal = () => {
     setIsRealmProposalModalOpen(false)
   }
@@ -97,12 +93,6 @@ const Params = () => {
   }
   const closeMetadataCreationModal = () => {
     setIsMetadataCreationModalOpen(false)
-  }
-  const openGovernanceProposalModal = () => {
-    setIsGovernanceProposalModalOpen(true)
-  }
-  const closeGovernanceProposalModal = () => {
-    setIsGovernanceProposalModalOpen(false)
   }
   const openSetRealmAuthorityModal = () => {
     setRealmAuthorityModalIsOpen(true)
@@ -133,13 +123,6 @@ const Params = () => {
           isProposalModalOpen={isRealmProposalModalOpen}
           closeProposalModal={closeRealmProposalModal}
         ></RealmConfigModal>
-      )}
-      {isGovernanceProposalModalOpen && activeGovernance && (
-        <GovernanceConfigModal
-          governance={activeGovernance}
-          isProposalModalOpen={isGovernanceProposalModalOpen}
-          closeProposalModal={closeGovernanceProposalModal}
-        ></GovernanceConfigModal>
       )}
       {isRealmAuthorityModalOpen && (
         <SetRealmAuthorityModal
@@ -276,7 +259,11 @@ const Params = () => {
                         ? 'None of the governances is realm authority'
                         : ''
                     }
-                    onClick={openRealmProposalModal}
+                    onClick={() => {
+                      router.push(
+                        fmtUrlWithCluster(`/realm/${symbol}/config/edit`)
+                      )
+                    }}
                     className="ml-auto"
                   >
                     Change config
@@ -345,10 +332,7 @@ const Params = () => {
                     />
                   ) : null}
                   {activeTab === 'Params' && (
-                    <ParamsView
-                      activeGovernance={activeGovernance}
-                      openGovernanceProposalModal={openGovernanceProposalModal}
-                    />
+                    <ParamsView activeGovernance={activeGovernance} />
                   )}
                   {activeTab === 'Accounts' && (
                     <AccountsView

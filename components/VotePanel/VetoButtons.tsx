@@ -2,6 +2,7 @@ import Button from '@components/Button'
 import VoteCommentModal from '@components/VoteCommentModal'
 import { BanIcon } from '@heroicons/react/solid'
 import useRealm from '@hooks/useRealm'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import {
   GoverningTokenRole,
   VoteThresholdType,
@@ -9,7 +10,11 @@ import {
 } from '@solana/spl-governance'
 import { useMemo, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
-import { useIsVoting, useProposalVoteRecordQuery } from './hooks'
+import {
+  useIsInCoolOffTime,
+  useIsVoting,
+  useProposalVoteRecordQuery,
+} from './hooks'
 
 /* 
   returns: undefined if loading, false if nobody can veto, 'council' if council can veto, 'community' if community can veto
@@ -33,9 +38,9 @@ export const useVetoingPop = () => {
 const useIsVetoable = (): undefined | boolean => {
   const vetoingPop = useVetoingPop()
   const isVoting = useIsVoting()
-
+  const isInCoolOffTime = useIsInCoolOffTime()
   // TODO is this accurate?
-  if (isVoting === false) return false
+  if (isVoting === false && isInCoolOffTime === false) return false
   if (vetoingPop === undefined) return undefined
   return !!vetoingPop
 }
@@ -53,7 +58,8 @@ const useCanVeto = ():
   | { canVeto: true }
   | { canVeto: false; message: string } => {
   const { ownVoterWeight } = useRealm()
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const isVetoable = useIsVetoable()
   const { data: userVetoRecord } = useProposalVoteRecordQuery('veto')
   const voterTokenRecord = useUserVetoTokenRecord()

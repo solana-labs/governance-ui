@@ -13,24 +13,33 @@ import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import tokenPriceService from '@utils/services/tokenPrice'
 import LockTokensModal from './LockTokensModal'
 import { useState } from 'react'
-import {
-  getFormattedStringFromDays,
-  getMinDurationFmt,
-  getTimeLeftFromNowFmt,
-  SECS_PER_DAY,
-} from 'VoteStakeRegistry/tools/dateTools'
 import { closeDeposit } from 'VoteStakeRegistry/actions/closeDeposit'
 import { abbreviateAddress } from '@utils/formatting'
 import { notify } from '@utils/notifications'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import dayjs from 'dayjs'
+import {
+  getMinDurationFmt,
+  getTimeLeftFromNowFmt,
+  getFormattedStringFromDays,
+  SECS_PER_DAY,
+} from '@utils/dateTools'
 import { BN } from '@coral-xyz/anchor'
+import { VsrClient } from 'VoteStakeRegistry/sdk/client'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
-const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
+const DepositCard = ({
+  deposit,
+  vsrClient,
+}: {
+  deposit: DepositWithMintAccount
+  vsrClient?: VsrClient | undefined
+}) => {
   const { getOwnedDeposits } = useDepositStore()
   const { realm, realmInfo, tokenRecords, ownTokenRecord } = useRealm()
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
-  const wallet = useWalletStore((s) => s.current)
+  const actualClient = vsrClient || client
+  const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection.current)
   const endpoint = useWalletStore((s) => s.connection.endpoint)
   const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false)
@@ -71,7 +80,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       tokenOwnerRecordPubKey:
         tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey,
       depositIndex: depositEntry.index,
-      client: client,
+      client: actualClient,
       splProgramId: realm!.owner!,
       splProgramVersion: getProgramVersionForRealm(realmInfo!),
     })
@@ -79,7 +88,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       realmPk: realm!.pubkey,
       communityMintPk: realm!.account.communityMint,
       walletPk: wallet!.publicKey!,
-      client: client!,
+      client: actualClient!,
       connection,
     })
     await fetchWalletTokenAccounts()
@@ -102,13 +111,13 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       realmPk: realm!.pubkey!,
       depositIndex: deposit.index,
       communityMintPk: realm!.account.communityMint,
-      client,
+      client: actualClient,
     })
     await getOwnedDeposits({
       realmPk: realm!.pubkey,
       communityMintPk: realm!.account.communityMint,
       walletPk: wallet!.publicKey!,
-      client: client!,
+      client: actualClient!,
       connection,
     })
   }
@@ -118,8 +127,8 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
     deposit.currentlyLocked.add(deposit.available)
   )
   const type = Object.keys(deposit.lockup.kind)[0] as LockupType
-  const typeName = type !== 'monthly' ? type : 'Vested'
-  const isVest = type === 'monthly'
+  const isVest = type === 'monthly' || type === 'daily'
+  const typeName = !isVest ? type : 'Vested'
   const isRealmCommunityMint =
     deposit.mint.publicKey.toBase58() ===
     realm?.account.communityMint.toBase58()
@@ -153,10 +162,12 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
         className="p-4 rounded-lg flex flex-col h-full"
         style={{ minHeight: '290px' }}
       >
-        <div className="flex flex-row flex-wrap">
+        <div className="flex flex-wrap">
           <CardLabel
             label="Lockup Type"
-            value={typeName.charAt(0).toUpperCase() + typeName.slice(1)}
+            value={`${typeName.charAt(0).toUpperCase() + typeName.slice(1)} ${
+              isVest ? `(${type})` : ''
+            }`}
           />
           <CardLabel
             label="Allow dao to clawback"
@@ -179,7 +190,11 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
                 `${getMintDecimalAmount(
                   deposit.mint.account,
                   deposit.vestingRate
-                ).toFormat(0)} p/mo`
+                ).toFormat(0)} ${
+                  typeof deposit.lockup.kind.monthly !== 'undefined'
+                    ? 'p/mo'
+                    : 'p/d'
+                }`
               }
             />
           )}
@@ -208,8 +223,11 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
             label={isConstant ? 'Min. Duration' : 'Time left'}
             value={
               isConstant
-                ? getMinDurationFmt(deposit)
-                : getTimeLeftFromNowFmt(deposit)
+                ? getMinDurationFmt(
+                    deposit.lockup.startTs,
+                    deposit.lockup.endTs
+                  )
+                : getTimeLeftFromNowFmt(deposit.lockup.endTs)
             }
           />
           <CardLabel

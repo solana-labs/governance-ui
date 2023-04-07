@@ -1,3 +1,4 @@
+import React from 'react'
 import Button from '@components/Button'
 import useRealm from '@hooks/useRealm'
 import {
@@ -32,9 +33,9 @@ import {
   LockClosedIcon,
 } from '@heroicons/react/outline'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
-import Account from './Account'
 import { abbreviateAddress } from '@utils/formatting'
 import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface DepositBox {
   mintPk: PublicKey
@@ -44,7 +45,10 @@ interface DepositBox {
 }
 const unlockedTypes = ['none']
 
-const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
+const LockTokensAccount: React.FC<{
+  tokenOwnerRecordPk: string | string[] | undefined
+  children: React.ReactNode
+}> = ({ tokenOwnerRecordPk, children }) => {
   const {
     realm,
     realmInfo,
@@ -68,8 +72,8 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
   )
   const [isLoading, setIsLoading] = useState(false)
   const connection = useWalletStore((s) => s.connection.current)
-  const wallet = useWalletStore((s) => s.current)
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const mainBoxesClasses = 'bg-bkg-1 col-span-1 p-4 rounded-md'
   const isNextSameRecord = (x, next) => {
     const nextType = Object.keys(next.lockup.kind)[0]
@@ -398,7 +402,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
           />
         </div>
       </div>
-      {connected && <Account withHeader={false} displayPanel={false}></Account>}
+      {connected && children}
     </div>
   )
 }

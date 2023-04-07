@@ -51,6 +51,7 @@ import { NFTWithMint } from '@utils/uiTypes/nfts'
 import useCreateProposal from '@hooks/useCreateProposal'
 import NFTAccountSelect from './NFTAccountSelect'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const SendTokens = ({
   isNft = false,
@@ -70,7 +71,7 @@ const SendTokens = ({
   const isNFT = isNft || currentAccount?.isNft
   const isSol = currentAccount?.isSol
   const { fmtUrlWithCluster } = useQueryContext()
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const router = useRouter()
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const programId: PublicKey | undefined = realmInfo?.programId
@@ -479,11 +480,6 @@ const SendTokens = ({
       </div>
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
         <Button
-          disabled={
-            !canUseTransferInstruction ||
-            isLoading ||
-            (isNFT && !selectedNfts.length)
-          }
           className="ml-auto"
           onClick={isNft ? handleProposeNftSend : handleProposeTransfer}
           isLoading={isLoading}

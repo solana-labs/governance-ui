@@ -13,7 +13,6 @@ interface Props
     proposalTitle: string;
   }> {
   className?: string;
-  governanceAddress: PublicKey;
   walletAddress: PublicKey;
 }
 

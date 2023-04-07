@@ -1,5 +1,6 @@
 import NotificationsCard from '@components/NotificationsCard'
 import NotifiPreviewCard from '@components/NotificationsCard/NotifiPreviewCard'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { EndpointTypes } from '@models/types'
 import {
   BlockchainEnvironment,
@@ -9,7 +10,6 @@ import {
 import { firstOrNull } from '@utils/helpers'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 
 type Props = {
   onClose: () => void
@@ -26,8 +26,8 @@ const NotificationCardContainer: React.FC<Props> = ({
   const { cluster } = router.query
 
   const endpoint = cluster ? (cluster as EndpointTypes) : 'mainnet'
-  const wallet = useWalletStore((s) => s.current)
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   let env = BlockchainEnvironment.MainNetBeta
 
   switch (endpoint) {

@@ -13,7 +13,7 @@ import useSerumGovStore, {
   SRM_DECIMALS,
 } from 'stores/useSerumGovStore'
 import { notify } from '@utils/notifications'
-import useWallet from '@hooks/useWallet'
+import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import useWalletStore from 'stores/useWalletStore'
 import { useRouter } from 'next/router'
 import useRealm from '@hooks/useRealm'
@@ -63,7 +63,7 @@ const LockedAccount: FC<Props> = ({
 
   const actions = useSerumGovStore((s) => s.actions)
 
-  const { anchorProvider, wallet } = useWallet()
+  const { anchorProvider, wallet } = useWalletDeprecated()
   const connection = useWalletStore((s) => s.connection.current)
 
   const [isBurning, setIsBurning] = useState(false)

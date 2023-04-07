@@ -13,6 +13,7 @@ import { getWithdrawInstruction } from '@utils/instructions/Dual'
 import useWalletStore from 'stores/useWalletStore'
 import { getDualFinanceWithdrawSchema } from '@utils/validations'
 import Tooltip from '@components/Tooltip'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const DualWithdraw = ({
   index,
@@ -24,9 +25,10 @@ const DualWithdraw = ({
   const [form, setForm] = useState<DualFinanceWithdrawForm>({
     soName: undefined,
     baseTreasury: undefined,
+    mintPk: undefined,
   })
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const { assetAccounts } = useGovernanceAssets()
   const [governedAccount, setGovernedAccount] = useState<
@@ -53,6 +55,9 @@ const DualWithdraw = ({
       index
     )
   }, [form])
+  useEffect(() => {
+    handleSetForm({ value: undefined, propertyName: 'mintPk' })
+  }, [form.baseTreasury])
   useEffect(() => {
     setGovernedAccount(form.baseTreasury?.governance)
   }, [form.baseTreasury])
@@ -90,6 +95,20 @@ const DualWithdraw = ({
           type="token"
         ></GovernedAccountSelect>
       </Tooltip>
+      {form.baseTreasury?.isSol && (
+        <Input
+          label="Mint"
+          value={form.mintPk}
+          type="text"
+          onChange={(evt) =>
+            handleSetForm({
+              value: evt.target.value,
+              propertyName: 'mintPk',
+            })
+          }
+          error={formErrors['mintPk']}
+        />
+      )}
     </>
   )
 }
