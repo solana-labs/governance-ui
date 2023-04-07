@@ -28,7 +28,7 @@ interface Props
   walletAddress: PublicKey;
 }
 
-export function Form(props: Props) {
+function Form(props: Props & { title: string; description: string }) {
   const [showCouncilOptions, setShowCouncilOptions] = useState(
     props.initialCouncilRules?.canVote || false,
   );
@@ -46,12 +46,9 @@ export function Form(props: Props) {
         walletAddress={props.walletAddress}
       />
       <h1 className="text-5xl font-medium m-0 mb-4 dark:text-white ">
-        What changes would you like to make to this wallet?
+        {props.title}
       </h1>
-      <p className="m-0 mb-16 dark:text-neutral-300">
-        Submitting updates to a wallet’s rules will create a proposal for the
-        DAO to vote on. If approved, the updates will be ready to be executed.
-      </p>
+      <p className="m-0 mb-16 dark:text-neutral-300">{props.description}</p>
       <div>
         <VotingDuration
           className="mb-8"
@@ -161,3 +158,26 @@ export function Form(props: Props) {
     </article>
   );
 }
+
+export const EditWalletForm = (props: Props) => (
+  <Form
+    title="What changes would you like to make to this wallet?"
+    description={
+      'Submitting updates to a wallet’s rules will create a proposal for the DAO to vote on.' +
+      ' ' +
+      'If approved, the updates will be ready to be executed.'
+    }
+    {...props}
+  />
+);
+export const NewWalletForm = (props: Props) => (
+  <Form
+    title="What rules would you like this wallet to have?"
+    description={
+      'Submitting wallet rules will create a proposal for the DAO to vote on.' +
+      ' ' +
+      'If approved, the wallet creation will be ready to be executed.'
+    }
+    {...props}
+  />
+);

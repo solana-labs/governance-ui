@@ -24,7 +24,7 @@ import { GovernanceVoteTipping } from '@hub/types/GovernanceVoteTipping';
 import * as RE from '@hub/types/Result';
 
 import { createTransaction } from './createTransaction';
-import { Form } from './Form';
+import { EditWalletForm } from './Form';
 import * as gql from './gql';
 import { Summary } from './Summary';
 import { CommunityRules, CouncilRules } from './types';
@@ -206,7 +206,7 @@ export function EditWalletRules(props: Props) {
               <div className="py-16">
                 {step === Step.Form && (
                   <>
-                    <Form
+                    <EditWalletForm
                       className="mb-16"
                       communityRules={communityRules}
                       coolOffHours={coolOffHours}
