@@ -13,6 +13,8 @@ import { getLabel } from '../VoteTippingSelector';
 import cx from '@hub/lib/cx';
 import { formatNumber } from '@hub/lib/formatNumber';
 import { ntext } from '@hub/lib/ntext';
+import { DISABLED_VALUE } from '@tools/constants';
+import { capitalize } from '@hub/lib/capitalize';
 
 function unrestrictedVotingTimeText(days: number) {
   const hours = days * 24;
@@ -83,187 +85,10 @@ export function NewRulesList(props: Props) {
         </div>
       </div>
 
-      <div>
-        <SectionHeader
-          className="mb-8"
-          icon={<UserMultipleIcon />}
-          text="Community Details"
-        />
-        <div className="grid grid-cols-2 gap-x-4 gap-y-8">
-          <SummaryItem
-            label="Allow community members to create proposals"
-            value={
-              <div className="flex items-baseline">
-                <div>
-                  {props.communityRules.canCreateProposal ? 'Yes' : 'No'}
-                </div>
-              </div>
-            }
-          />
-          <SummaryItem
-            label="Minimum amount of community tokens required to create a proposal"
-            value={
-              <div>
-                {props.communityRules.votingPowerToCreateProposals ? (
-                  <div>
-                    {formatNumber(
-                      props.communityRules.votingPowerToCreateProposals,
-                      undefined,
-                      { maximumFractionDigits: 0 },
-                    )}{' '}
-                    {ntext(
-                      props.communityRules.votingPowerToCreateProposals.toNumber(),
-                      'token',
-                    )}
-                  </div>
-                ) : (
-                  <div>Disabled</div>
-                )}
-              </div>
-            }
-          />
+      <GovPopRules govPop="community" rules={props.communityRules} />
 
-          <SummaryItem
-            label="Community Members Can Vote?"
-            value={
-              <div className="flex items-baseline">
-                <div>{props.communityRules.canVote ? 'Yes' : 'No'}</div>
-              </div>
-            }
-          />
-          <SummaryItem
-            label="Community Voting Quorum"
-            value={
-              <div className="flex items-baseline">
-                {props.communityRules.quorumPercent ? (
-                  <div>{props.communityRules.quorumPercent}%</div>
-                ) : (
-                  <div>Disabled</div>
-                )}
-              </div>
-            }
-          />
-
-          <SummaryItem
-            label="Community Veto Power over Council Proposals?"
-            value={
-              <div className="flex items-baseline">
-                <div>{props.communityRules.canVeto ? 'Yes' : 'No'}</div>
-              </div>
-            }
-          />
-          <SummaryItem
-            label="Community Veto Voting Quorum"
-            value={
-              <div className="flex items-baseline">
-                <div>{props.communityRules.vetoQuorumPercent || 0}%</div>
-              </div>
-            }
-          />
-          <SummaryItem
-            label="Community Vote Tipping"
-            value={
-              <div className="flex items-baseline">
-                {props.communityRules.voteTipping ? (
-                  <div>{getLabel(props.communityRules.voteTipping)}</div>
-                ) : (
-                  <div>Disabled</div>
-                )}
-              </div>
-            }
-          />
-        </div>
-      </div>
       {props.councilRules !== null && (
-        <div>
-          <SectionHeader
-            className="mb-8"
-            icon={<BuildingIcon />}
-            text="Council Details"
-          />
-          <div className="grid grid-cols-2 gap-x-4 gap-y-8">
-            <SummaryItem
-              label="Allow council members to create proposals"
-              value={
-                <div className="flex items-baseline">
-                  <div>
-                    {props.councilRules.canCreateProposal ? 'Yes' : 'No'}
-                  </div>
-                </div>
-              }
-            />
-            <SummaryItem
-              label="Minimum amount of council tokens required to create a proposal"
-              value={
-                <div>
-                  {props.councilRules.votingPowerToCreateProposals ? (
-                    <div>
-                      {formatNumber(
-                        props.councilRules.votingPowerToCreateProposals,
-                        undefined,
-                        { maximumFractionDigits: 0 },
-                      )}{' '}
-                      {ntext(
-                        props.councilRules.votingPowerToCreateProposals.toNumber(),
-                        'token',
-                      )}
-                    </div>
-                  ) : (
-                    <div>Disabled</div>
-                  )}
-                </div>
-              }
-            />
-            <SummaryItem
-              label="Council Members Can Vote?"
-              value={
-                <div className="flex items-baseline">
-                  <div>{props.councilRules.canVote ? 'Yes' : 'No'}</div>
-                </div>
-              }
-            />
-            <SummaryItem
-              label="Council Voting Quorum"
-              value={
-                <div className="flex items-baseline">
-                  {props.councilRules.quorumPercent ? (
-                    <div>{props.councilRules.quorumPercent}%</div>
-                  ) : (
-                    <div>Disabled</div>
-                  )}
-                </div>
-              }
-            />
-            <SummaryItem
-              label="Council Veto Power over Community Proposals?"
-              value={
-                <div className="flex items-baseline">
-                  <div>{props.councilRules.canVeto ? 'Yes' : 'No'}</div>
-                </div>
-              }
-            />
-            <SummaryItem
-              label="Council Veto Voting Quorum"
-              value={
-                <div className="flex items-baseline">
-                  <div>{props.councilRules.vetoQuorumPercent || 0}%</div>
-                </div>
-              }
-            />
-            <SummaryItem
-              label="Council Vote Tipping"
-              value={
-                <div className="flex items-baseline">
-                  {props.councilRules.voteTipping ? (
-                    <div>{getLabel(props.councilRules.voteTipping)}</div>
-                  ) : (
-                    <div>Disabled</div>
-                  )}
-                </div>
-              }
-            />
-          </div>
-        </div>
+        <GovPopRules govPop="council" rules={props.councilRules} />
       )}
       <div className="space-y-8">
         <SectionHeader
@@ -300,3 +125,97 @@ export function NewRulesList(props: Props) {
     </SectionBlock>
   );
 }
+
+const GovPopRules = ({
+  rules,
+  govPop,
+}: {
+  rules: NonNullable<CouncilRules> | CommunityRules;
+  govPop: 'community' | 'council';
+}) => {
+  return (
+    <div>
+      <SectionHeader
+        className="mb-8"
+        icon={govPop === 'community' ? <UserMultipleIcon /> : <BuildingIcon />}
+        text={`${capitalize(govPop)} Details`}
+      />
+      <div className="grid grid-cols-2 gap-x-4 gap-y-8">
+        <SummaryItem
+          label={`Allow ${govPop} members to create proposals`}
+          value={
+            <div className="flex items-baseline">
+              <div>{rules.canCreateProposal ? 'Yes' : 'No'}</div>
+            </div>
+          }
+        />
+        {rules.canCreateProposal && (
+          <SummaryItem
+            label={`Minimum amount of ${govPop} tokens required to create a proposal`}
+            value={
+              <div>
+                <div>
+                  {formatNumber(rules.votingPowerToCreateProposals, undefined, {
+                    maximumFractionDigits: 0,
+                  })}{' '}
+                  {ntext(
+                    rules.votingPowerToCreateProposals.toNumber(),
+                    'token',
+                  )}
+                </div>
+              </div>
+            }
+          />
+        )}
+        <SummaryItem
+          label={`${capitalize(govPop)} Members Can Vote?`}
+          value={
+            <div className="flex items-baseline">
+              <div>{rules.canVote ? 'Yes' : 'No'}</div>
+            </div>
+          }
+        />
+        <SummaryItem
+          label={`${capitalize(govPop)} Voting Quorum`}
+          value={
+            <div className="flex items-baseline">
+              {rules.quorumPercent ? (
+                <div>{rules.quorumPercent}%</div>
+              ) : (
+                <div>Disabled</div>
+              )}
+            </div>
+          }
+        />
+        <SummaryItem
+          label={`${capitalize(govPop)} Veto Power over Community Proposals?`}
+          value={
+            <div className="flex items-baseline">
+              <div>{rules.canVeto ? 'Yes' : 'No'}</div>
+            </div>
+          }
+        />
+        <SummaryItem
+          label={`${capitalize(govPop)} Veto Voting Quorum`}
+          value={
+            <div className="flex items-baseline">
+              <div>{rules.vetoQuorumPercent || 0}%</div>
+            </div>
+          }
+        />
+        <SummaryItem
+          label={`${capitalize(govPop)} Vote Tipping`}
+          value={
+            <div className="flex items-baseline">
+              {rules.voteTipping ? (
+                <div>{getLabel(rules.voteTipping)}</div>
+              ) : (
+                <div>Disabled</div>
+              )}
+            </div>
+          }
+        />
+      </div>
+    </div>
+  );
+};
