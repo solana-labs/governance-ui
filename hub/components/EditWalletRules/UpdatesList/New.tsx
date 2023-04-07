@@ -151,6 +151,7 @@ const GovPopRules = ({
         />
         {rules.canCreateProposal && (
           <SummaryItem
+            className="col-start-2"
             label={`Minimum amount of ${govPop} tokens required to create a proposal`}
             value={
               <div>
@@ -175,18 +176,16 @@ const GovPopRules = ({
             </div>
           }
         />
-        <SummaryItem
-          label={`${capitalize(govPop)} Voting Quorum`}
-          value={
-            <div className="flex items-baseline">
-              {rules.quorumPercent ? (
-                <div>{rules.quorumPercent}%</div>
-              ) : (
-                <div>Disabled</div>
-              )}
-            </div>
-          }
-        />
+        {rules.canVote && (
+          <SummaryItem
+            label={`${capitalize(govPop)} Voting Quorum`}
+            value={
+              <div className="flex items-baseline">
+                {<div>{rules.quorumPercent}%</div>}
+              </div>
+            }
+          />
+        )}
         <SummaryItem
           label={`${capitalize(govPop)} Veto Power over Community Proposals?`}
           value={
@@ -195,14 +194,16 @@ const GovPopRules = ({
             </div>
           }
         />
-        <SummaryItem
-          label={`${capitalize(govPop)} Veto Voting Quorum`}
-          value={
-            <div className="flex items-baseline">
-              <div>{rules.vetoQuorumPercent || 0}%</div>
-            </div>
-          }
-        />
+        {rules.canVeto && (
+          <SummaryItem
+            label={`${capitalize(govPop)} Veto Voting Quorum`}
+            value={
+              <div className="flex items-baseline">
+                <div>{rules.vetoQuorumPercent || 0}%</div>
+              </div>
+            }
+          />
+        )}
         <SummaryItem
           label={`${capitalize(govPop)} Vote Tipping`}
           value={
