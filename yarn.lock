@@ -4527,14 +4527,14 @@
     bs58 "^4.0.1"
     superstruct "^0.15.2"
 
-"@solana/spl-token-registry@0.2.3775":
+"@solana/spl-token-registry@0.2.3775", "@solana/spl-token-registry@^0.2.1107":
   version "0.2.3775"
   resolved "https://registry.yarnpkg.com/@solana/spl-token-registry/-/spl-token-registry-0.2.3775.tgz#96abffc351fe156917aedb8bba7db94600abed6e"
   integrity sha512-3a6wn6LZ1ZdCt50p9Bz2s8tIh1cJvJue4vvlPlzZ1n2j/0H2Coy4Xx92nIsYot399TjtO9NeLU2NowBDH4vtpg==
   dependencies:
     cross-fetch "3.0.6"
 
-"@solana/spl-token-registry@0.2.4574", "@solana/spl-token-registry@^0.2.1107":
+"@solana/spl-token-registry@0.2.4574":
   version "0.2.4574"
   resolved "https://registry.yarnpkg.com/@solana/spl-token-registry/-/spl-token-registry-0.2.4574.tgz#13f4636b7bec90d2bb43bbbb83512cd90d2ce257"
   integrity sha512-JzlfZmke8Rxug20VT/VpI2XsXlsqMlcORIUivF+Yucj7tFi7A0dXG7h+2UnD0WaZJw8BrUz2ABNkUnv89vbv1A==
@@ -5120,6 +5120,16 @@
     bs58 "^4.0.1"
     eventemitter3 "^4.0.7"
     uuid "^8.3.2"
+
+"@sqds/iframe-adapter@1.0.16":
+  version "1.0.16"
+  resolved "https://registry.yarnpkg.com/@sqds/iframe-adapter/-/iframe-adapter-1.0.16.tgz#2439045b2eff89237bc194a45198288adf4297db"
+  integrity sha512-Qt210kDzA9N4hWWl2sXennoP6eyCb87hWAA7+wawDqP9phcgRuFZEfEh/ebrhBg05cEOMY/cWxUHCF7A8LOAEw==
+  dependencies:
+    "@solana/wallet-adapter-base" "^0.9.21"
+    "@solana/web3.js" "^1.73.2"
+    bs58 "^5.0.0"
+    encoding "^0.1.13"
 
 "@stablelib/aead@^1.0.1":
   version "1.0.1"
