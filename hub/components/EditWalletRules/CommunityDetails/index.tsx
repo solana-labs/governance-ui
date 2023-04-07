@@ -21,8 +21,8 @@ interface Props
   extends FormProps<{
     communityRules: CommunityRules;
   }> {
-  currentCommunityRules: CommunityRules;
-  currentCouncilRules?: CouncilRules;
+  initialCommunityRules: CommunityRules;
+  initialCouncilRules?: CouncilRules;
   className?: string;
   programVersion: number;
 }
@@ -49,14 +49,14 @@ export function CommunityDetails(props: Props) {
         text="Community Details"
       />
       <div className="space-y-8">
-        {!!props.currentCouncilRules &&
-          props.currentCouncilRules.canCreateProposal && (
+        {!!props.initialCouncilRules &&
+          props.initialCouncilRules.canCreateProposal && (
             <CanCreateProposal {...inputProps} />
           )}
         {props.communityRules.canCreateProposal && (
           <VotingPowerToCreateProposals {...inputProps} />
         )}
-        {!!props.currentCouncilRules && props.currentCouncilRules.canVote && (
+        {!!props.initialCouncilRules && props.initialCouncilRules.canVote && (
           <CanVote {...inputProps} />
         )}
         {props.communityRules.canVote && (
@@ -65,15 +65,15 @@ export function CommunityDetails(props: Props) {
             <VoteTipping {...inputProps} />
           </>
         )}
-        {!!props.currentCouncilRules && props.currentCouncilRules.canVote && (
+        {!!props.initialCouncilRules && props.initialCouncilRules.canVote && (
           <CanVeto {...inputProps} />
         )}
-        {!!props.currentCouncilRules &&
-          props.currentCouncilRules.canVote &&
+        {!!props.initialCouncilRules &&
+          props.initialCouncilRules.canVote &&
           props.communityRules.canVeto && <VetoQuorumPercent {...inputProps} />}
-        {!!props.currentCouncilRules &&
-          (!props.currentCouncilRules.canVote ||
-            !props.currentCouncilRules.canCreateProposal) && (
+        {!!props.initialCouncilRules &&
+          (!props.initialCouncilRules.canVote ||
+            !props.initialCouncilRules.canCreateProposal) && (
             <button
               className="flex items-center text-sm text-neutral-500"
               onClick={() => setAdditionalOptionsExpanded((cur) => !cur)}
@@ -92,16 +92,16 @@ export function CommunityDetails(props: Props) {
           )}
         {additionalOptionsExpanded && (
           <>
-            {!!props.currentCouncilRules &&
-              !props.currentCouncilRules.canCreateProposal && (
+            {!!props.initialCouncilRules &&
+              !props.initialCouncilRules.canCreateProposal && (
                 <CanCreateProposal {...inputProps} />
               )}
-            {!!props.currentCouncilRules &&
-              !props.currentCouncilRules.canVote && <CanVote {...inputProps} />}
-            {!!props.currentCouncilRules &&
-              !props.currentCouncilRules.canVote && <CanVeto {...inputProps} />}
-            {!!props.currentCouncilRules &&
-              !props.currentCouncilRules.canVote &&
+            {!!props.initialCouncilRules &&
+              !props.initialCouncilRules.canVote && <CanVote {...inputProps} />}
+            {!!props.initialCouncilRules &&
+              !props.initialCouncilRules.canVote && <CanVeto {...inputProps} />}
+            {!!props.initialCouncilRules &&
+              !props.initialCouncilRules.canVote &&
               props.communityRules.canVeto && (
                 <VetoQuorumPercent {...inputProps} />
               )}

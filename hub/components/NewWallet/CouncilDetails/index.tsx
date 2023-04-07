@@ -25,8 +25,8 @@ interface Props
     councilRules: NonNullable<CouncilRules>;
   }> {
   className?: string;
-  currentCommunityRules: CommunityRules;
-  currentCouncilRules: NonNullable<CouncilRules>;
+  initialCommunityRules: CommunityRules;
+  initialCouncilRules: NonNullable<CouncilRules>;
   programVersion: number;
 }
 
@@ -43,14 +43,14 @@ export function CouncilDetails(props: Props) {
         text="Council Details"
       />
       <div className="space-y-8">
-        {props.currentCommunityRules.canCreateProposal && (
+        {props.initialCommunityRules.canCreateProposal && (
           <CanCreateProposal {...props} />
         )}
-        {props.currentCommunityRules.canCreateProposal &&
+        {props.initialCommunityRules.canCreateProposal &&
           props.councilRules.canCreateProposal && (
             <VotingPowerToCreateProposals {...props} />
           )}
-        {props.currentCommunityRules.canVote && <CanVote {...props} />}
+        {props.initialCommunityRules.canVote && <CanVote {...props} />}
         {props.councilRules.canVote && (
           <>
             <ValueBlock
@@ -102,12 +102,12 @@ export function CouncilDetails(props: Props) {
             </ValueBlock>
           </>
         )}
-        {props.currentCommunityRules.canVote && <CanVeto {...props} />}
-        {props.currentCommunityRules.canVote && props.councilRules.canVeto && (
+        {props.initialCommunityRules.canVote && <CanVeto {...props} />}
+        {props.initialCommunityRules.canVote && props.councilRules.canVeto && (
           <VetoQuorumPercent {...props} />
         )}
-        {(!props.currentCommunityRules.canCreateProposal ||
-          !props.currentCommunityRules.canVote) && (
+        {(!props.initialCommunityRules.canCreateProposal ||
+          !props.initialCommunityRules.canVote) && (
           <button
             className="flex items-center text-sm text-neutral-500"
             onClick={() => setAdditionalOptionsExpanded((cur) => !cur)}
@@ -126,16 +126,16 @@ export function CouncilDetails(props: Props) {
         )}
         {additionalOptionsExpanded && (
           <>
-            {!props.currentCommunityRules.canCreateProposal && (
+            {!props.initialCommunityRules.canCreateProposal && (
               <CanCreateProposal {...props} />
             )}
-            {!props.currentCommunityRules.canCreateProposal &&
+            {!props.initialCommunityRules.canCreateProposal &&
               props.councilRules.canCreateProposal && (
                 <VotingPowerToCreateProposals {...props} />
               )}
-            {!props.currentCommunityRules.canVote && <CanVote {...props} />}
-            {!props.currentCommunityRules.canVote && <CanVeto {...props} />}
-            {!props.currentCommunityRules.canVote &&
+            {!props.initialCommunityRules.canVote && <CanVote {...props} />}
+            {!props.initialCommunityRules.canVote && <CanVeto {...props} />}
+            {!props.initialCommunityRules.canVote &&
               props.councilRules.canVeto && <VetoQuorumPercent {...props} />}
           </>
         )}

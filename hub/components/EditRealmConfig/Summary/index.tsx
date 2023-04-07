@@ -45,8 +45,8 @@ export function Summary(props: Props) {
       />
       <ProposalVoteType
         className="mt-8"
-        currentCommunityRules={props.governance.communityTokenRules}
-        currentCouncilRules={props.governance.councilTokenRules}
+        initialCommunityRules={props.governance.communityTokenRules}
+        initialCouncilRules={props.governance.councilTokenRules}
         currentBaseVoteDays={props.governance.maxVoteDays}
         currentCoolOffHours={props.governance.coolOffHours}
         currentMinInstructionHoldupDays={

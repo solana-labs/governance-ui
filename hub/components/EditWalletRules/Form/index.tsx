@@ -21,8 +21,8 @@ interface Props
     minInstructionHoldupDays: number;
   }> {
   className?: string;
-  currentCommunityRules: CommunityRules;
-  currentCouncilRules: CouncilRules;
+  initialCommunityRules: CommunityRules;
+  initialCouncilRules: CouncilRules;
   governanceAddress: PublicKey;
   programVersion: number;
   walletAddress: PublicKey;
@@ -30,13 +30,13 @@ interface Props
 
 export function Form(props: Props) {
   const [showCouncilOptions, setShowCouncilOptions] = useState(
-    props.currentCouncilRules?.canVote || false,
+    props.initialCouncilRules?.canVote || false,
   );
   const [showCommunityOptions, setShowCommunityOptions] = useState(
-    props.currentCommunityRules.canVote,
+    props.initialCommunityRules.canVote,
   );
   const [showAdvanceOptions, setShowAdvanceOptions] = useState(false);
-  const showCommunityFirst = props.currentCommunityRules.canVote;
+  const showCommunityFirst = props.initialCommunityRules.canVote;
 
   return (
     <article className={props.className}>
@@ -65,13 +65,13 @@ export function Form(props: Props) {
           <CommunityDetails
             className="mb-8"
             communityRules={props.communityRules}
-            currentCommunityRules={props.currentCommunityRules}
-            currentCouncilRules={props.currentCouncilRules}
+            initialCommunityRules={props.initialCommunityRules}
+            initialCouncilRules={props.initialCouncilRules}
             programVersion={props.programVersion}
             onCommunityRulesChange={props.onCommunityRulesChange}
           />
         )}
-        {!props.currentCouncilRules?.canVote && props.currentCouncilRules && (
+        {!props.initialCouncilRules?.canVote && props.initialCouncilRules && (
           <button
             className="flex items-center text-sm text-neutral-500 mt-16 mb-2.5"
             onClick={() => setShowCouncilOptions((cur) => !cur)}
@@ -90,17 +90,17 @@ export function Form(props: Props) {
         )}
         {showCouncilOptions &&
           props.councilRules &&
-          props.currentCouncilRules && (
+          props.initialCouncilRules && (
             <CouncilDetails
               className="mb-8"
               councilRules={props.councilRules}
-              currentCouncilRules={props.currentCouncilRules}
-              currentCommunityRules={props.currentCommunityRules}
+              initialCouncilRules={props.initialCouncilRules}
+              initialCommunityRules={props.initialCommunityRules}
               programVersion={props.programVersion}
               onCouncilRulesChange={props.onCouncilRulesChange}
             />
           )}
-        {!props.currentCommunityRules.canVote && !showCommunityFirst && (
+        {!props.initialCommunityRules.canVote && !showCommunityFirst && (
           <button
             className="flex items-center text-sm text-neutral-500 mt-16 mb-2.5"
             onClick={() => setShowCommunityOptions((cur) => !cur)}
@@ -120,8 +120,8 @@ export function Form(props: Props) {
         {showCommunityOptions && !showCommunityFirst && (
           <CommunityDetails
             communityRules={props.communityRules}
-            currentCommunityRules={props.currentCommunityRules}
-            currentCouncilRules={props.currentCouncilRules}
+            initialCommunityRules={props.initialCommunityRules}
+            initialCouncilRules={props.initialCouncilRules}
             programVersion={props.programVersion}
             onCommunityRulesChange={props.onCommunityRulesChange}
           />

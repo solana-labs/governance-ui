@@ -21,8 +21,8 @@ interface Props
   extends FormProps<{
     communityRules: CommunityRules;
   }> {
-  currentCommunityRules: CommunityRules;
-  currentCouncilRules?: CouncilRules;
+  initialCommunityRules: CommunityRules;
+  initialCouncilRules?: CouncilRules;
   className?: string;
   programVersion: number;
 }
@@ -44,8 +44,8 @@ export function CommunityDetails(props: Props) {
         text="Community Details"
       />
       <div className="space-y-8">
-        {!!props.currentCouncilRules &&
-          props.currentCouncilRules.canCreateProposal && (
+        {!!props.initialCouncilRules &&
+          props.initialCouncilRules.canCreateProposal && (
             <ValueBlock
               title="Do you want to allow community members to create proposals?"
               description="If disabled, the community members can no longer create proposals."
@@ -108,7 +108,7 @@ export function CommunityDetails(props: Props) {
             </div>
           </ValueBlock>
         )}
-        {!!props.currentCouncilRules && props.currentCouncilRules.canVote && (
+        {!!props.initialCouncilRules && props.initialCouncilRules.canVote && (
           <ValueBlock
             title="Do you want to allow community members to vote?"
             description="If disabled, the community members can no longer vote on proposals."
@@ -176,7 +176,7 @@ export function CommunityDetails(props: Props) {
             </ValueBlock>
           </>
         )}
-        {!!props.currentCouncilRules && props.currentCouncilRules.canVote && (
+        {!!props.initialCouncilRules && props.initialCouncilRules.canVote && (
           <ValueBlock
             title="Do you want your community to have veto power over council proposals?"
             description="Your community can veto a council-approved proposal."
@@ -193,8 +193,8 @@ export function CommunityDetails(props: Props) {
             />
           </ValueBlock>
         )}
-        {!!props.currentCouncilRules &&
-          props.currentCouncilRules.canVote &&
+        {!!props.initialCouncilRules &&
+          props.initialCouncilRules.canVote &&
           props.communityRules.canVeto && (
             <ValueBlock
               title="Community Veto Voting Quorum"
@@ -234,9 +234,9 @@ export function CommunityDetails(props: Props) {
               </div>
             </ValueBlock>
           )}
-        {!!props.currentCouncilRules &&
-          (!props.currentCouncilRules.canVote ||
-            !props.currentCouncilRules.canCreateProposal) && (
+        {!!props.initialCouncilRules &&
+          (!props.initialCouncilRules.canVote ||
+            !props.initialCouncilRules.canCreateProposal) && (
             <button
               className="flex items-center text-sm text-neutral-500"
               onClick={() => setAdditionalOptionsExpanded((cur) => !cur)}
@@ -255,8 +255,8 @@ export function CommunityDetails(props: Props) {
           )}
         {additionalOptionsExpanded && (
           <>
-            {!!props.currentCouncilRules &&
-              !props.currentCouncilRules.canCreateProposal && (
+            {!!props.initialCouncilRules &&
+              !props.initialCouncilRules.canCreateProposal && (
                 <ValueBlock
                   title="Do you want to allow community members to create proposals?"
                   description="If disabled, the community members can no longer create proposals."
@@ -273,7 +273,7 @@ export function CommunityDetails(props: Props) {
                   />
                 </ValueBlock>
               )}
-            {!!props.currentCouncilRules && !props.currentCouncilRules.canVote && (
+            {!!props.initialCouncilRules && !props.initialCouncilRules.canVote && (
               <ValueBlock
                 title="Do you want to allow community members to vote?"
                 description="If disabled, the community members can no longer vote on proposals."
@@ -290,7 +290,7 @@ export function CommunityDetails(props: Props) {
                 />
               </ValueBlock>
             )}
-            {!!props.currentCouncilRules && !props.currentCouncilRules.canVote && (
+            {!!props.initialCouncilRules && !props.initialCouncilRules.canVote && (
               <ValueBlock
                 title="Do you want your community to have veto power over council proposals?"
                 description="Your community can veto a council-approved proposal."
@@ -307,8 +307,8 @@ export function CommunityDetails(props: Props) {
                 />
               </ValueBlock>
             )}
-            {!!props.currentCouncilRules &&
-              !props.currentCouncilRules.canVote &&
+            {!!props.initialCouncilRules &&
+              !props.initialCouncilRules.canVote &&
               props.communityRules.canVeto && (
                 <ValueBlock
                   title="Community Veto Voting Quorum"

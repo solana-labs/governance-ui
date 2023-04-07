@@ -18,9 +18,9 @@ interface Props
   communityRules: CommunityRules;
   coolOffHours: number;
   councilRules: CouncilRules;
-  currentCommunityRules: CommunityRules;
+  initialCommunityRules: CommunityRules;
   currentCoolOffHours: number;
-  currentCouncilRules: CouncilRules;
+  initialCouncilRules: CouncilRules;
   currentDepositExemptProposalCount: number;
   currentBaseVoteDays: number;
   currentMinInstructionHoldupDays: number;
@@ -55,8 +55,8 @@ export function Summary(props: Props) {
       />
       <ProposalVoteType
         className="mt-8"
-        currentCommunityRules={props.currentCommunityRules}
-        currentCouncilRules={props.currentCouncilRules}
+        initialCommunityRules={props.initialCommunityRules}
+        initialCouncilRules={props.initialCouncilRules}
         currentBaseVoteDays={props.currentBaseVoteDays}
         currentCoolOffHours={props.currentCoolOffHours}
         currentMinInstructionHoldupDays={props.currentMinInstructionHoldupDays}
@@ -77,9 +77,9 @@ export function Summary(props: Props) {
         communityRules={props.communityRules}
         coolOffHours={props.coolOffHours}
         councilRules={props.councilRules}
-        currentCommunityRules={props.currentCommunityRules}
+        initialCommunityRules={props.initialCommunityRules}
         currentCoolOffHours={props.currentCoolOffHours}
-        currentCouncilRules={props.currentCouncilRules}
+        initialCouncilRules={props.initialCouncilRules}
         currentDepositExemptProposalCount={
           props.currentDepositExemptProposalCount
         }

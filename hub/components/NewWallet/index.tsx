@@ -196,8 +196,8 @@ export function NewWallet(props: Props) {
                       communityRules={communityRules}
                       coolOffHours={coolOffHours}
                       councilRules={councilRules}
-                      currentCommunityRules={governance.communityTokenRules}
-                      currentCouncilRules={governance.councilTokenRules}
+                      initialCommunityRules={governance.communityTokenRules}
+                      initialCouncilRules={governance.councilTokenRules}
                       depositExemptProposalCount={depositExemptProposalCount}
                       governanceAddress={governance.governanceAddress}
                       maxVoteDays={maxVoteDays}
@@ -257,9 +257,9 @@ export function NewWallet(props: Props) {
                       communityRules={communityRules}
                       coolOffHours={coolOffHours}
                       councilRules={councilRules}
-                      currentCommunityRules={governance.communityTokenRules}
+                      initialCommunityRules={governance.communityTokenRules}
                       currentCoolOffHours={governance.coolOffHours}
-                      currentCouncilRules={governance.councilTokenRules}
+                      initialCouncilRules={governance.councilTokenRules}
                       currentDepositExemptProposalCount={
                         governance.depositExemptProposalCount
                       }

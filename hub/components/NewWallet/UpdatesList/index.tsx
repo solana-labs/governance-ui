@@ -63,9 +63,9 @@ interface Props {
   communityRules: CommunityRules;
   coolOffHours: number;
   councilRules: CouncilRules;
-  currentCommunityRules: CommunityRules;
+  initialCommunityRules: CommunityRules;
   currentCoolOffHours: number;
-  currentCouncilRules: CouncilRules;
+  initialCouncilRules: CouncilRules;
   currentDepositExemptProposalCount: number;
   currentBaseVoteDays: number;
   currentMinInstructionHoldupDays: number;
@@ -97,11 +97,11 @@ export function UpdatesList(props: Props) {
 
   const votingDurationDiff = diff(currentVotingDuration, newVotingDuration);
   const communityDetailsDiff = diff(
-    props.currentCommunityRules,
+    props.initialCommunityRules,
     props.communityRules,
   );
   const councilDetailsDiff = diff(
-    (props.currentCouncilRules || {}) as NonNullable<CouncilRules>,
+    (props.initialCouncilRules || {}) as NonNullable<CouncilRules>,
     (props.councilRules || {}) as NonNullable<CouncilRules>,
   );
   const advancedSettingsDiff = diff(
@@ -244,7 +244,7 @@ export function UpdatesList(props: Props) {
                       ) : (
                         <div>Disabled</div>
                       )}
-                      {!props.currentCommunityRules.canCreateProposal ||
+                      {!props.initialCommunityRules.canCreateProposal ||
                       !communityDetailsDiff.votingPowerToCreateProposals[0] ? (
                         <div className="text-base text-neutral-500 line-through">
                           Disabled
@@ -402,7 +402,7 @@ export function UpdatesList(props: Props) {
                       ) : (
                         <div>Disabled</div>
                       )}
-                      {!props.currentCouncilRules?.canCreateProposal ||
+                      {!props.initialCouncilRules?.canCreateProposal ||
                       !councilDetailsDiff.votingPowerToCreateProposals[0] ? (
                         <div className="text-base text-neutral-500 line-through">
                           Disabled
