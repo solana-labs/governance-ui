@@ -20,11 +20,11 @@ interface Props
   coolOffHours: number;
   councilRules: CouncilRules;
   initialCommunityRules: CommunityRules;
-  currentCoolOffHours: number;
+  initialCoolOffHours: number;
   initialCouncilRules: CouncilRules;
-  currentDepositExemptProposalCount: number;
-  currentBaseVoteDays: number;
-  currentMinInstructionHoldupDays: number;
+  initialDepositExemptProposalCount: number;
+  initialBaseVoteDays: number;
+  initialMinInstructionHoldupDays: number;
   depositExemptProposalCount: number;
   governanceAddress: PublicKey;
   baseVoteDays: number;
@@ -58,9 +58,9 @@ function Summary(props: Props & { proposalPreview: React.ReactNode }) {
         className="mt-8"
         initialCommunityRules={props.initialCommunityRules}
         initialCouncilRules={props.initialCouncilRules}
-        currentBaseVoteDays={props.currentBaseVoteDays}
-        currentCoolOffHours={props.currentCoolOffHours}
-        currentMinInstructionHoldupDays={props.currentMinInstructionHoldupDays}
+        initialBaseVoteDays={props.initialBaseVoteDays}
+        initialCoolOffHours={props.initialCoolOffHours}
+        initialMinInstructionHoldupDays={props.initialMinInstructionHoldupDays}
         proposalVoteType={props.proposalVoteType}
         onProposalVoteTypeChange={props.onProposalVoteTypeChange}
       />
@@ -91,14 +91,14 @@ export const EditWalletSummary = (props: Props) => (
           coolOffHours={props.coolOffHours}
           councilRules={props.councilRules}
           initialCommunityRules={props.initialCommunityRules}
-          currentCoolOffHours={props.currentCoolOffHours}
+          initialCoolOffHours={props.initialCoolOffHours}
           initialCouncilRules={props.initialCouncilRules}
-          currentDepositExemptProposalCount={
-            props.currentDepositExemptProposalCount
+          initialDepositExemptProposalCount={
+            props.initialDepositExemptProposalCount
           }
-          currentBaseVoteDays={props.currentBaseVoteDays}
-          currentMinInstructionHoldupDays={
-            props.currentMinInstructionHoldupDays
+          initialBaseVoteDays={props.initialBaseVoteDays}
+          initialMinInstructionHoldupDays={
+            props.initialMinInstructionHoldupDays
           }
           depositExemptProposalCount={props.depositExemptProposalCount}
           baseVoteDays={props.baseVoteDays}
@@ -130,16 +130,6 @@ export const NewWalletSummary = (props: Props) => (
           communityRules={props.communityRules}
           coolOffHours={props.coolOffHours}
           councilRules={props.councilRules}
-          initialCommunityRules={props.initialCommunityRules}
-          currentCoolOffHours={props.currentCoolOffHours}
-          initialCouncilRules={props.initialCouncilRules}
-          currentDepositExemptProposalCount={
-            props.currentDepositExemptProposalCount
-          }
-          currentBaseVoteDays={props.currentBaseVoteDays}
-          currentMinInstructionHoldupDays={
-            props.currentMinInstructionHoldupDays
-          }
           depositExemptProposalCount={props.depositExemptProposalCount}
           baseVoteDays={props.baseVoteDays}
           minInstructionHoldupDays={props.minInstructionHoldupDays}

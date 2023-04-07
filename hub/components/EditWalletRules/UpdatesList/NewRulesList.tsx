@@ -34,12 +34,6 @@ interface Props {
   communityRules: CommunityRules;
   coolOffHours: number;
   councilRules: CouncilRules;
-  initialCommunityRules: CommunityRules;
-  currentCoolOffHours: number;
-  initialCouncilRules: CouncilRules;
-  currentDepositExemptProposalCount: number;
-  currentBaseVoteDays: number;
-  currentMinInstructionHoldupDays: number;
   depositExemptProposalCount: number;
   baseVoteDays: number;
   minInstructionHoldupDays: number;

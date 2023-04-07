@@ -23,9 +23,9 @@ interface Props
   className?: string;
   initialCommunityRules: CommunityRules;
   initialCouncilRules: CouncilRules;
-  currentBaseVoteDays: number;
-  currentCoolOffHours: number;
-  currentMinInstructionHoldupDays: number;
+  initialBaseVoteDays: number;
+  initialCoolOffHours: number;
+  initialMinInstructionHoldupDays: number;
 }
 
 export function ProposalVoteType(props: Props) {
@@ -36,7 +36,7 @@ export function ProposalVoteType(props: Props) {
       ? props.initialCouncilRules
       : props.initialCommunityRules;
 
-  const unrestrictedVotingHours = 24 * props.currentBaseVoteDays;
+  const unrestrictedVotingHours = 24 * props.initialBaseVoteDays;
   const unrestrictedVotingDays = Math.floor(unrestrictedVotingHours / 24);
   const unrestrictedVotingRemainingHours =
     unrestrictedVotingHours - unrestrictedVotingDays * 24;
@@ -111,15 +111,15 @@ export function ProposalVoteType(props: Props) {
             />
             <SummaryItem
               label="Voting Cool-off Hours"
-              value={`${props.currentCoolOffHours} ${ntext(
-                props.currentCoolOffHours,
+              value={`${props.initialCoolOffHours} ${ntext(
+                props.initialCoolOffHours,
                 'hour',
               )}`}
             />
             <SummaryItem
               label="Min Instruction Holdup Time"
-              value={`${props.currentMinInstructionHoldupDays} ${ntext(
-                props.currentMinInstructionHoldupDays,
+              value={`${props.initialMinInstructionHoldupDays} ${ntext(
+                props.initialMinInstructionHoldupDays,
                 'day',
               )}`}
             />

@@ -273,13 +273,13 @@ export function EditWalletRules(props: Props) {
                       coolOffHours={coolOffHours}
                       councilRules={councilRules}
                       initialCommunityRules={governance.communityTokenRules}
-                      currentCoolOffHours={governance.coolOffHours}
+                      initialCoolOffHours={governance.coolOffHours}
                       initialCouncilRules={governance.councilTokenRules}
-                      currentDepositExemptProposalCount={
+                      initialDepositExemptProposalCount={
                         governance.depositExemptProposalCount
                       }
-                      currentBaseVoteDays={governance.maxVoteDays}
-                      currentMinInstructionHoldupDays={
+                      initialBaseVoteDays={governance.maxVoteDays}
+                      initialMinInstructionHoldupDays={
                         governance.minInstructionHoldupDays
                       }
                       depositExemptProposalCount={depositExemptProposalCount}

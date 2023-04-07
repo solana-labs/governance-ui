@@ -64,11 +64,11 @@ interface Props {
   coolOffHours: number;
   councilRules: CouncilRules;
   initialCommunityRules: CommunityRules;
-  currentCoolOffHours: number;
+  initialCoolOffHours: number;
   initialCouncilRules: CouncilRules;
-  currentDepositExemptProposalCount: number;
-  currentBaseVoteDays: number;
-  currentMinInstructionHoldupDays: number;
+  initialDepositExemptProposalCount: number;
+  initialBaseVoteDays: number;
+  initialMinInstructionHoldupDays: number;
   depositExemptProposalCount: number;
   baseVoteDays: number;
   minInstructionHoldupDays: number;
@@ -76,13 +76,13 @@ interface Props {
 
 export function UpdatesList(props: Props) {
   const currentVotingDuration = {
-    coolOffHours: props.currentCoolOffHours,
-    baseVoteDays: props.currentBaseVoteDays,
+    coolOffHours: props.initialCoolOffHours,
+    baseVoteDays: props.initialBaseVoteDays,
   };
 
   const currentAdvancedSettings = {
-    depositExemptProposalCount: props.currentDepositExemptProposalCount,
-    minInstructionHoldupDays: props.currentMinInstructionHoldupDays,
+    depositExemptProposalCount: props.initialDepositExemptProposalCount,
+    minInstructionHoldupDays: props.initialMinInstructionHoldupDays,
   };
 
   const newVotingDuration = {

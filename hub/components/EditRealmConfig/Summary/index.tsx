@@ -47,9 +47,9 @@ export function Summary(props: Props) {
         className="mt-8"
         initialCommunityRules={props.governance.communityTokenRules}
         initialCouncilRules={props.governance.councilTokenRules}
-        currentBaseVoteDays={props.governance.maxVoteDays}
-        currentCoolOffHours={props.governance.coolOffHours}
-        currentMinInstructionHoldupDays={
+        initialBaseVoteDays={props.governance.maxVoteDays}
+        initialCoolOffHours={props.governance.coolOffHours}
+        initialMinInstructionHoldupDays={
           props.governance.minInstructionHoldupDays
         }
         proposalVoteType={props.proposalVoteType}
