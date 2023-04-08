@@ -7,6 +7,10 @@ import {
   Wallet as BaseWallet,
 } from '@solana/wallet-adapter-react';
 import type { PublicKey } from '@solana/web3.js';
+import {
+  detectEmbeddedInSquadsIframe,
+  SquadsEmbeddedWalletAdapter,
+} from '@sqds/iframe-adapter';
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 
 import { RealmCircle } from '@hub/components/branding/RealmCircle';
@@ -219,7 +223,10 @@ export function WalletSelector(props: Props) {
   const [cluster] = useCluster();
 
   const supportedWallets = useMemo(
-    () => WALLET_PROVIDERS.map((provider) => provider.adapter),
+    () =>
+      detectEmbeddedInSquadsIframe()
+        ? [new SquadsEmbeddedWalletAdapter()]
+        : WALLET_PROVIDERS.map((provider) => provider.adapter),
     [],
   );
 
