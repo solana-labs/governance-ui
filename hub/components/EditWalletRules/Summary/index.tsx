@@ -26,20 +26,22 @@ interface Props
   initialBaseVoteDays: number;
   initialMinInstructionHoldupDays: number;
   depositExemptProposalCount: number;
-  governanceAddress: PublicKey;
   baseVoteDays: number;
   minInstructionHoldupDays: number;
-  walletAddress: PublicKey;
+  governanceAddress?: PublicKey;
+  walletAddress?: PublicKey;
 }
 
 function Summary(props: Props & { proposalPreview: React.ReactNode }) {
   return (
     <article className={props.className}>
-      <WalletDescription
-        className="mb-3"
-        governanceAddress={props.governanceAddress}
-        walletAddress={props.walletAddress}
-      />
+      {props.governanceAddress && props.walletAddress && (
+        <WalletDescription
+          className="mb-3"
+          governanceAddress={props.governanceAddress}
+          walletAddress={props.walletAddress}
+        />
+      )}
       <h1 className="text-5xl font-medium m-0 mb-4 dark:text-white ">
         Your proposal is almost ready. Does everything look correct?
       </h1>
@@ -69,7 +71,12 @@ function Summary(props: Props & { proposalPreview: React.ReactNode }) {
   );
 }
 
-export const EditWalletSummary = (props: Props) => (
+export const EditWalletSummary = (
+  props: Props & {
+    governanceAddress: NonNullable<Props['governanceAddress']>;
+    walletAddress: NonNullable<Props['walletAddress']>;
+  },
+) => (
   <Summary
     {...props}
     proposalPreview={
@@ -109,7 +116,9 @@ export const EditWalletSummary = (props: Props) => (
   />
 );
 
-export const NewWalletSummary = (props: Props) => (
+export const NewWalletSummary = (
+  props: Omit<Props, 'walletAddress' | 'governanceAddress'>,
+) => (
   <Summary
     {...props}
     proposalPreview={

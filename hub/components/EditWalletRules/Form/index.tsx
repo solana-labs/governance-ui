@@ -23,9 +23,9 @@ interface Props
   className?: string;
   initialCommunityRules: CommunityRules;
   initialCouncilRules: CouncilRules;
-  governanceAddress: PublicKey;
+  governanceAddress?: PublicKey;
   programVersion: number;
-  walletAddress: PublicKey;
+  walletAddress?: PublicKey;
 }
 
 function Form(props: Props & { title: string; description: string }) {
@@ -40,11 +40,13 @@ function Form(props: Props & { title: string; description: string }) {
 
   return (
     <article className={props.className}>
-      <WalletDescription
-        className="mb-3"
-        governanceAddress={props.governanceAddress}
-        walletAddress={props.walletAddress}
-      />
+      {props.governanceAddress && props.walletAddress && (
+        <WalletDescription
+          className="mb-3"
+          governanceAddress={props.governanceAddress}
+          walletAddress={props.walletAddress}
+        />
+      )}
       <h1 className="text-5xl font-medium m-0 mb-4 dark:text-white ">
         {props.title}
       </h1>
@@ -159,7 +161,12 @@ function Form(props: Props & { title: string; description: string }) {
   );
 }
 
-export const EditWalletForm = (props: Props) => (
+export const EditWalletForm = (
+  props: Props & {
+    governanceAddress: NonNullable<Props['governanceAddress']>;
+    walletAddress: NonNullable<Props['walletAddress']>;
+  },
+) => (
   <Form
     title="What changes would you like to make to this wallet?"
     description={
@@ -170,7 +177,9 @@ export const EditWalletForm = (props: Props) => (
     {...props}
   />
 );
-export const NewWalletForm = (props: Props) => (
+export const NewWalletForm = (
+  props: Omit<Props, 'walletAddress' | 'governanceAddress'>,
+) => (
   <Form
     title="What rules would you like this wallet to have?"
     description={
