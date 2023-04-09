@@ -243,12 +243,17 @@
   },
   {
     "symbol": "WEZ",
+    "category": "web3",
     "displayName": "Wezesha DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "3QF8K3jK8Kpn7Ls9Wn3FcFWquKGcJHUfnD25bTufWeLL",
+    "bannerImage": "/realms/WezeshaDAO/img/WezeshaBanner.png",
+    "sortRank": 3,
+    "shortDescription": "Wezesha means 'to enable' in Swahili. We want to enable tech progress and web3 in the ascending world.",
     "website": "https://wezesha.co",
     "keywords": "Wezesha DAO, Wezesha, Wezesha Coin, The Big Five NFTs Club, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, SPL-TOKEN, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
     "twitter": "@WezeshaDAO",
+    "discord": "https://discord.com/invite/erCSgXqhGu",
     "ogImage": "/realms/WezeshaDAO/img/wezesha_dao_logo.png"
   },
   {
