@@ -7,10 +7,10 @@ import { PositionWithMeta } from '../sdk/types'
 import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
-import { useUnixNow } from '@hooks/useUnixNow'
+import { useSolanaUnixNow } from '@hooks/useSolanaUnixNow'
 
 export const useClosePosition = () => {
-  const { unixNow } = useUnixNow()
+  const { unixNow } = useSolanaUnixNow()
   const { connection, wallet } = useWalletDeprecated()
   const { realm } = useRealm()
   const [{ client }] = useVotePluginsClientStore((s) => [
