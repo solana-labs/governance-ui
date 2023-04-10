@@ -38,6 +38,19 @@ export function createTransaction(
   governance: PublicKey,
   rules: Rules,
 ) {
+  const newConfig = rules2governanceConfig(rules);
+
+  const instruction = createSetGovernanceConfig(
+    programId,
+    programVersion,
+    governance,
+    newConfig,
+  );
+
+  return instruction;
+}
+
+export function rules2governanceConfig(rules: Rules) {
   const communityRules = rules.communityTokenRules;
   const councilRules = rules.councilTokenRules;
   const minCommunityTokensToCreateProposal = new BN(
@@ -107,13 +120,5 @@ export function createTransaction(
     votingCoolOffTime: hoursToSeconds(rules.coolOffHours),
     depositExemptProposalCount: rules.depositExemptProposalCount,
   });
-
-  const instruction = createSetGovernanceConfig(
-    programId,
-    programVersion,
-    governance,
-    newConfig,
-  );
-
-  return instruction;
+  return newConfig;
 }

@@ -183,9 +183,7 @@ export const NewWalletForm = (
   <Form
     title="What rules would you like this wallet to have?"
     description={
-      'Submitting wallet rules will create a proposal for the DAO to vote on.' +
-      ' ' +
-      'If approved, the wallet creation will be ready to be executed.'
+      'Once configured, you will be able to create a new DAO wallet immediately.'
     }
     {...props}
   />

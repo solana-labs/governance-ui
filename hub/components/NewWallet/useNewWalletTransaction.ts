@@ -1,27 +1,22 @@
-import { GovernanceConfig, withCreateGovernance } from '@solana/spl-governance';
-import { Keypair, TransactionInstruction } from '@solana/web3.js';
+import { withCreateGovernance } from '@solana/spl-governance';
+import { Transaction, TransactionInstruction } from '@solana/web3.js';
 
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore';
 
+import { rules2governanceConfig } from '../EditWalletRules/createTransaction';
+import { Rules } from '../EditWalletRules/types';
 import useProgramVersion from '@hooks/useProgramVersion';
 import useRealm from '@hooks/useRealm';
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh';
 
-const useNewWalletTransaction = (config: GovernanceConfig) => {
+const useNewWalletTransaction = (rules: Rules) => {
   const wallet = useWalletOnePointOh();
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient,
   );
   const programVersion = useProgramVersion();
 
-  const {
-    realmInfo,
-    realm,
-    mint: realmMint,
-    councilMint,
-    symbol,
-    ownVoterWeight,
-  } = useRealm();
+  const { realm, ownVoterWeight } = useRealm();
 
   const tokenOwnerRecord = ownVoterWeight.canCreateGovernanceUsingCouncilTokens()
     ? ownVoterWeight.councilTokenRecord
@@ -35,8 +30,9 @@ const useNewWalletTransaction = (config: GovernanceConfig) => {
     if (tokenOwnerRecord === undefined)
       throw new Error('insufficient voting power');
 
+    const config = rules2governanceConfig(rules);
+
     const instructions: TransactionInstruction[] = [];
-    const signers: Keypair[] = [];
 
     // client is typed such that it cant be undefined, but whatever.
     const plugin = await client?.withUpdateVoterWeightRecord(
@@ -57,6 +53,9 @@ const useNewWalletTransaction = (config: GovernanceConfig) => {
       wallet.publicKey,
       plugin?.voterWeightPk,
     );
+
+    const transaction = new Transaction().add(...instructions);
+    return [transaction, governanceAddress] as const;
   };
 };
 

@@ -33,7 +33,7 @@ function stepNum(step: Step): number {
 function stepName(step: Step): string {
   switch (step) {
     case Step.Form:
-      return 'Edit Wallet Rules';
+      return 'Configure Wallet Rules';
     case Step.Summary:
       return 'Create Wallet';
   }
@@ -41,7 +41,6 @@ function stepName(step: Step): string {
 
 interface Props {
   className?: string;
-  realmUrlId: string;
 }
 
 // TODO generate defaults
@@ -192,7 +191,7 @@ function NewWalletWithDefaults({
                   onClick={() => setStep(Step.Form)}
                 >
                   <EditIcon className="h-4 fill-current mr-1 w-4" />
-                  Edit Rules
+                  Configure Rules
                 </button>
                 <Primary
                   className="ml-16 h-14 w-44"
@@ -206,7 +205,7 @@ function NewWalletWithDefaults({
                   }}
                 >
                   <CheckmarkIcon className="h-4 fill-current mr-1 w-4" />
-                  Create Proposal
+                  Create Wallet
                 </Primary>
               </footer>
             </>

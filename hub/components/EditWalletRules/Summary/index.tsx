@@ -32,7 +32,13 @@ interface Props
   walletAddress?: PublicKey;
 }
 
-function Summary(props: Props & { proposalPreview: React.ReactNode }) {
+function Summary(
+  props: Props & {
+    proposalPreview: React.ReactNode;
+    title: string;
+    proposalForm: boolean;
+  },
+) {
   return (
     <article className={props.className}>
       {props.governanceAddress && props.walletAddress && (
@@ -43,29 +49,35 @@ function Summary(props: Props & { proposalPreview: React.ReactNode }) {
         />
       )}
       <h1 className="text-5xl font-medium m-0 mb-4 dark:text-white ">
-        Your proposal is almost ready. Does everything look correct?
+        {props.title}
       </h1>
-      <p className="m-0 mb-16 dark:text-neutral-300">
-        Before submitting, ensure your description is correct and rules updates
-        are accurate.
-      </p>
-      <ProposalDetails
-        proposalDescription={props.proposalDescription}
-        proposalTitle={props.proposalTitle}
-        walletAddress={props.walletAddress}
-        onProposalDescriptionChange={props.onProposalDescriptionChange}
-        onProposalTitleChange={props.onProposalTitleChange}
-      />
-      <ProposalVoteType
-        className="mt-8"
-        initialCommunityRules={props.initialCommunityRules}
-        initialCouncilRules={props.initialCouncilRules}
-        initialBaseVoteDays={props.initialBaseVoteDays}
-        initialCoolOffHours={props.initialCoolOffHours}
-        initialMinInstructionHoldupDays={props.initialMinInstructionHoldupDays}
-        proposalVoteType={props.proposalVoteType}
-        onProposalVoteTypeChange={props.onProposalVoteTypeChange}
-      />
+      {props.proposalForm && (
+        <>
+          <p className="m-0 mb-16 dark:text-neutral-300">
+            Before submitting, ensure your description is correct and rules
+            updates are accurate.
+          </p>
+          <ProposalDetails
+            proposalDescription={props.proposalDescription}
+            proposalTitle={props.proposalTitle}
+            walletAddress={props.walletAddress}
+            onProposalDescriptionChange={props.onProposalDescriptionChange}
+            onProposalTitleChange={props.onProposalTitleChange}
+          />
+          <ProposalVoteType
+            className="mt-8"
+            initialCommunityRules={props.initialCommunityRules}
+            initialCouncilRules={props.initialCouncilRules}
+            initialBaseVoteDays={props.initialBaseVoteDays}
+            initialCoolOffHours={props.initialCoolOffHours}
+            initialMinInstructionHoldupDays={
+              props.initialMinInstructionHoldupDays
+            }
+            proposalVoteType={props.proposalVoteType}
+            onProposalVoteTypeChange={props.onProposalVoteTypeChange}
+          />
+        </>
+      )}
       {props.proposalPreview}
     </article>
   );
@@ -79,6 +91,8 @@ export const EditWalletSummary = (
 ) => (
   <Summary
     {...props}
+    proposalForm
+    title="Your proposal is almost ready. Does everything look correct?"
     proposalPreview={
       <>
         <div className="mt-14">
@@ -121,6 +135,7 @@ export const NewWalletSummary = (
 ) => (
   <Summary
     {...props}
+    title="Your new wallet is ready. Does everything look correct?"
     proposalPreview={
       <>
         <div className="mt-14">
