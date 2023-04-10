@@ -1,23 +1,20 @@
 import CheckmarkIcon from '@carbon/icons-react/lib/Checkmark';
 import ChevronLeftIcon from '@carbon/icons-react/lib/ChevronLeft';
 import EditIcon from '@carbon/icons-react/lib/Edit';
-import { PublicKey } from '@solana/web3.js';
-import { BigNumber } from 'bignumber.js';
 import { hoursToSeconds, secondsToHours } from 'date-fns';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { NewWalletForm } from '../EditWalletRules/Form';
 import { NewWalletSummary } from '../EditWalletRules/Summary';
-import { CommunityRules, CouncilRules } from '../EditWalletRules/types';
+import useProgramVersion from '@hooks/useProgramVersion';
 import { Primary, Secondary } from '@hub/components/controls/Button';
 import { Connect } from '@hub/components/GlobalHeader/User/Connect';
-import { ProposalCreationProgress } from '@hub/components/ProposalCreationProgress';
 import { useWallet } from '@hub/hooks/useWallet';
 import cx from '@hub/lib/cx';
-import { GovernanceTokenType } from '@hub/types/GovernanceTokenType';
-import { GovernanceVoteTipping } from '@hub/types/GovernanceVoteTipping';
+
+import useGovernanceDefaults from './useGovernanceDefaults';
 
 enum Step {
   Form,
@@ -38,7 +35,7 @@ function stepName(step: Step): string {
     case Step.Form:
       return 'Edit Wallet Rules';
     case Step.Summary:
-      return 'Create Proposal';
+      return 'Create Wallet';
   }
 }
 
@@ -48,9 +45,15 @@ interface Props {
 }
 
 // TODO generate defaults
-export function NewWallet(props: Props) {
+function NewWalletWithDefaults({
+  defaults,
+  ...props
+}: Props & {
+  defaults: NonNullable<ReturnType<typeof useGovernanceDefaults>>;
+}) {
   const wallet = useWallet();
   const router = useRouter();
+  const programVersion = useProgramVersion();
   const [step, setStep] = useState(Step.Form);
   const [proposalVoteType, setProposalVoteType] = useState<
     'community' | 'council'
@@ -58,30 +61,15 @@ export function NewWallet(props: Props) {
   const [proposalDescription, setProposalDescription] = useState('');
   const [proposalTitle, setProposalTitle] = useState('');
 
-  const [communityRules, setCommunityRules] = useState<CommunityRules>({
-    canCreateProposal: true,
-    canVeto: false,
-    canVote: false,
-    quorumPercent: 1,
-    // this isn't a valid value, but it's just to satisfy the types for the
-    // default initialized value
-    tokenMintAddress: new PublicKey(0),
-    tokenMintDecimals: new BigNumber(0),
-    tokenType: GovernanceTokenType.Community,
-    totalSupply: new BigNumber(1),
-    vetoQuorumPercent: 100,
-    voteTipping: GovernanceVoteTipping.Disabled,
-    votingPowerToCreateProposals: new BigNumber(1),
-  });
+  const [rules, setRules] = useState(defaults);
 
-  const [councilRules, setCouncilRules] = useState<CouncilRules>(null);
-  const [coolOffHours, setCoolOffHours] = useState(0);
-  const [depositExemptProposalCount, setDepositExemptProposalCount] = useState(
-    0,
-  );
-  const [baseVoteDays, setBaseVoteDays] = useState(3);
-  const [maxVoteDays, setMaxVoteDays] = useState(3);
-  const [minInstructionHoldupDays, setMinInstructionHoldupDays] = useState(0);
+  // calculate baseVoteDays
+  const baseVoteDays = useMemo(() => {
+    const maxVotingSeconds = hoursToSeconds(24 * rules.maxVoteDays);
+    const coolOffSeconds = hoursToSeconds(rules.coolOffHours);
+    const baseVotingSeconds = maxVotingSeconds - coolOffSeconds;
+    return secondsToHours(baseVotingSeconds) / 24;
+  }, [rules.maxVoteDays, rules.coolOffHours]);
 
   const [submitting, setSubmitting] = useState(false);
 
@@ -110,9 +98,14 @@ export function NewWallet(props: Props) {
     );
   }
 
+  const setRule = (field: keyof NonNullable<typeof rules>) => (
+    v: NonNullable<typeof rules>[typeof field],
+  ) => {
+    setRules((prev) => ({ ...prev, [field]: v }));
+  };
+
   return (
     <div className={cx(props.className, 'dark:bg-neutral-900')}>
-      <ProposalCreationProgress progress={progress} />
       <div className="w-full max-w-3xl pt-14 mx-auto">
         <Head>
           <title>Create Wallet</title>
@@ -129,37 +122,25 @@ export function NewWallet(props: Props) {
             <>
               <NewWalletForm
                 className="mb-16"
-                communityRules={communityRules}
-                coolOffHours={coolOffHours}
-                councilRules={councilRules}
-                initialCommunityRules={governance.communityTokenRules}
-                initialCouncilRules={governance.councilTokenRules}
-                depositExemptProposalCount={depositExemptProposalCount}
-                governanceAddress={governance.governanceAddress}
-                maxVoteDays={maxVoteDays}
-                minInstructionHoldupDays={minInstructionHoldupDays}
-                programVersion={governance.version}
-                walletAddress={governance.walletAddress}
-                onCommunityRulesChange={setCommunityRules}
-                onCoolOffHoursChange={(coolOffHours) => {
-                  setCoolOffHours(coolOffHours);
-                  const maxVotingSeconds = hoursToSeconds(maxVoteDays * 24);
-                  const coolOffSeconds = hoursToSeconds(coolOffHours);
-                  const baseVotingSeconds = maxVotingSeconds - coolOffSeconds;
-                  setBaseVoteDays(secondsToHours(baseVotingSeconds) / 24);
-                }}
-                onCouncilRulesChange={setCouncilRules}
-                onDepositExemptProposalCountChange={
-                  setDepositExemptProposalCount
-                }
-                onMaxVoteDaysChange={(votingDays) => {
-                  setMaxVoteDays(votingDays);
-                  const maxVotingSeconds = hoursToSeconds(24 * votingDays);
-                  const coolOffSeconds = hoursToSeconds(coolOffHours);
-                  const baseVotingSeconds = maxVotingSeconds - coolOffSeconds;
-                  setBaseVoteDays(secondsToHours(baseVotingSeconds) / 24);
-                }}
-                onMinInstructionHoldupDaysChange={setMinInstructionHoldupDays}
+                communityRules={rules.communityTokenRules}
+                coolOffHours={rules.coolOffHours}
+                councilRules={rules.councilTokenRules}
+                initialCommunityRules={defaults.communityTokenRules}
+                initialCouncilRules={defaults.councilTokenRules}
+                depositExemptProposalCount={rules.depositExemptProposalCount}
+                maxVoteDays={rules.maxVoteDays}
+                minInstructionHoldupDays={rules.minInstructionHoldupDays}
+                programVersion={programVersion}
+                onCommunityRulesChange={setRule('communityTokenRules')}
+                onCoolOffHoursChange={setRule('coolOffHours')}
+                onCouncilRulesChange={setRule('councilTokenRules')}
+                onDepositExemptProposalCountChange={setRule(
+                  'depositExemptProposalCount',
+                )}
+                onMaxVoteDaysChange={setRule('maxVoteDays')}
+                onMinInstructionHoldupDaysChange={setRule(
+                  'minInstructionHoldupDays',
+                )}
               />
               <footer className="flex items-center justify-between">
                 <button
@@ -182,27 +163,25 @@ export function NewWallet(props: Props) {
             <>
               <NewWalletSummary
                 className="mb-16"
-                communityRules={communityRules}
-                coolOffHours={coolOffHours}
-                councilRules={councilRules}
-                initialCommunityRules={governance.communityTokenRules}
-                initialCoolOffHours={governance.coolOffHours}
-                initialCouncilRules={governance.councilTokenRules}
+                communityRules={rules.communityTokenRules}
+                coolOffHours={rules.coolOffHours}
+                councilRules={rules.councilTokenRules}
+                initialCommunityRules={defaults.communityTokenRules}
+                initialCoolOffHours={defaults.coolOffHours}
+                initialCouncilRules={defaults.councilTokenRules}
                 initialDepositExemptProposalCount={
-                  governance.depositExemptProposalCount
+                  defaults.depositExemptProposalCount
                 }
-                initialBaseVoteDays={governance.maxVoteDays}
+                initialBaseVoteDays={defaults.maxVoteDays}
                 initialMinInstructionHoldupDays={
-                  governance.minInstructionHoldupDays
+                  defaults.minInstructionHoldupDays
                 }
-                depositExemptProposalCount={depositExemptProposalCount}
-                governanceAddress={governance.governanceAddress}
+                depositExemptProposalCount={rules.depositExemptProposalCount}
                 baseVoteDays={baseVoteDays}
-                minInstructionHoldupDays={minInstructionHoldupDays}
+                minInstructionHoldupDays={rules.minInstructionHoldupDays}
                 proposalDescription={proposalDescription}
                 proposalTitle={proposalTitle}
                 proposalVoteType={proposalVoteType}
-                walletAddress={governance.walletAddress}
                 onProposalDescriptionChange={setProposalDescription}
                 onProposalTitleChange={setProposalTitle}
                 onProposalVoteTypeChange={setProposalVoteType}
@@ -237,3 +216,11 @@ export function NewWallet(props: Props) {
     </div>
   );
 }
+
+// would be nice to have a hoc that just takes a hook an does this :thinking:
+export const NewWallet = (props: Props) => {
+  const defaults = useGovernanceDefaults();
+  return defaults ? (
+    <NewWalletWithDefaults {...props} defaults={defaults} />
+  ) : null;
+};

@@ -6,10 +6,9 @@ import { Rules } from '../EditWalletRules/types';
 import { GovernanceTokenType } from '@hub/types/GovernanceTokenType';
 import { GovernanceVoteTipping } from '@hub/types/GovernanceVoteTipping';
 
-const useGovernanceDefaults = (): Omit<
-  Rules,
-  'governanceAddress' | 'walletAddress'
-> => {
+const useGovernanceDefaults = ():
+  | undefined
+  | Omit<Rules, 'governanceAddress' | 'walletAddress'> => {
   return {
     communityTokenRules: {
       canCreateProposal: true,
