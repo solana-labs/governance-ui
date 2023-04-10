@@ -97,13 +97,6 @@ export async function createProposal(args: Args) {
       : undefined,
   ]);
 
-  const userTOR =
-    tokenOwnerRecord || communityTokenOwnerRecord || councilTokenOwnerRecord;
-
-  if (!userTOR) {
-    throw new Error('You do not have any voting power in this org');
-  }
-
   const realmConfigAccountInfo = await args.connection.getAccountInfo(
     realmConfigPublicKey,
   );
@@ -133,6 +126,30 @@ export async function createProposal(args: Args) {
           reserved: new Uint8Array(),
         }),
       };
+
+  let userTOR = tokenOwnerRecord;
+
+  if (
+    councilTokenOwnerRecord &&
+    councilTokenOwnerRecord.account.governingTokenDepositAmount.gte(
+      governance.account.config.minCouncilTokensToCreateProposal,
+    )
+  ) {
+    userTOR = councilTokenOwnerRecord;
+  }
+
+  if (
+    communityTokenOwnerRecord &&
+    communityTokenOwnerRecord.account.governingTokenDepositAmount.gte(
+      governance.account.config.minCommunityTokensToCreateProposal,
+    )
+  ) {
+    userTOR = communityTokenOwnerRecord;
+  }
+
+  if (!userTOR) {
+    throw new Error('You do not have any voting power in this org');
+  }
 
   const serializedInstructions = args.instructions.map(
     serializeInstructionToBase64,

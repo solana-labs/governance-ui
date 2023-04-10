@@ -10,11 +10,14 @@ import {
 
 import useInterval from './useInterval'
 import useLocalStorageState from './useLocalStorageState'
+import useViewAsWallet from './useViewAsWallet'
 
 const SECONDS = 1000
 
 export default function useInitWallet() {
   const { wallets } = useWallet()
+  const mockWallet = useViewAsWallet()
+
   const {
     connection,
     current: wallet,
@@ -42,6 +45,12 @@ export default function useInitWallet() {
       }
     }
   }
+
+  useEffect(() => {
+    setWalletStore((s) => {
+      s.mockWallet = mockWallet
+    })
+  }, [mockWallet, setWalletStore])
 
   // initialize selection from local storage
   useEffect(() => {

@@ -34,6 +34,7 @@ import { TOKEN_AUCTION_INSTRUCTIONS } from './programs/tokenAuction'
 import { VALIDATORDAO_INSTRUCTIONS } from './programs/validatordao'
 import { POSEIDON_INSTRUCTIONS } from './programs/poseidon'
 import { MANGO_V4_INSTRUCTIONS } from './programs/mangoV4'
+import { DUAL_INSTRUCTIONS } from './programs/dual'
 
 export const V3_DEFAULT_GOVERNANCE_PROGRAM_ID =
   '7e75Nwsz8i5i4NiDa43CNzKJ4AeQGyRimha46VKTM1Ls'
@@ -253,7 +254,6 @@ export const WSOL_MINT_PK = new PublicKey(WSOL_MINT)
 const HIDDEN_MNGO_TREASURES = [
   'GZQSF4Fh9xK7rf9WBEhawXYFw8qPXeatZLUqVQeuW3X8',
   'J6jYLFDWeeGwg4u2TXhKDCcH4fSzJFQyDE2VSv2drRkg',
-  '9VEbrfajRanMXoR1ubQiuR1ni9cNWx4QcGv3WgUUikgu',
   'HXxjhCQwm496HAXsHBWfuVkiXBLinHJqUbVKomCjKsfo',
   'EwPgko6gXD5PAgQaFo1KD7R9tPUEgRcTAfsGvgdhkP4Z',
   '6VYcrmbK4QNC7WpfVRXBAXP59ZH2FkUMBoMYhtgENGMn',
@@ -328,6 +328,7 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...VALIDATORDAO_INSTRUCTIONS,
   ...POSEIDON_INSTRUCTIONS,
   ...MANGO_V4_INSTRUCTIONS,
+  ...DUAL_INSTRUCTIONS,
 }
 
 export async function getInstructionDescriptor(
