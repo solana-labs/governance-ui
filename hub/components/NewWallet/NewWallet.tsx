@@ -87,7 +87,7 @@ function NewWalletWithDefaults({
     }
   }, [step]);
 
-  if (!wallet.publicKey) {
+  if (!wallet?.publicKey) {
     return (
       <div className={cx(props.className, 'dark:bg-neutral-900')}>
         <Head>
