@@ -9,12 +9,16 @@ import { useEffect, useMemo, useState } from 'react';
 import { NewWalletForm } from '../EditWalletRules/Form';
 import { NewWalletSummary } from '../EditWalletRules/Summary';
 import useProgramVersion from '@hooks/useProgramVersion';
+import useRealm from '@hooks/useRealm';
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh';
 import { Primary, Secondary } from '@hub/components/controls/Button';
 import { Connect } from '@hub/components/GlobalHeader/User/Connect';
 import { useWallet } from '@hub/hooks/useWallet';
 import cx from '@hub/lib/cx';
 
 import useGovernanceDefaults from './useGovernanceDefaults';
+import useNewWalletCallback from './useNewWalletTransaction';
+import useQueryContext from '@hooks/useQueryContext';
 
 enum Step {
   Form,
@@ -50,7 +54,10 @@ function NewWalletWithDefaults({
 }: Props & {
   defaults: NonNullable<ReturnType<typeof useGovernanceDefaults>>;
 }) {
-  const wallet = useWallet();
+  const { symbol } = useRealm();
+  const { fmtUrlWithCluster } = useQueryContext();
+
+  const wallet = useWalletOnePointOh();
   const router = useRouter();
   const programVersion = useProgramVersion();
   const [step, setStep] = useState(Step.Form);
@@ -61,6 +68,8 @@ function NewWalletWithDefaults({
   const [proposalTitle, setProposalTitle] = useState('');
 
   const [rules, setRules] = useState(defaults);
+
+  const callback = useNewWalletCallback(rules);
 
   // calculate baseVoteDays
   const baseVoteDays = useMemo(() => {
@@ -88,9 +97,8 @@ function NewWalletWithDefaults({
         <div className="w-full max-w-3xl pt-14 mx-auto grid place-items-center">
           <div className="my-16 py-8 px-16 dark:bg-black/40 rounded flex flex-col items-center">
             <div className="text-white mb-2 text-center">
-              Please sign in to create a new wallet.
+              Please sign in to create a new wallet
             </div>
-            <Connect />
           </div>
         </div>
       </div>
@@ -198,10 +206,13 @@ function NewWalletWithDefaults({
                   pending={submitting}
                   onClick={async () => {
                     setSubmitting(true);
-
-                    //await handleCreate();
-
-                    setSubmitting(false);
+                    try {
+                      await callback();
+                      router.push(fmtUrlWithCluster(`/dao/${symbol}/`));
+                    } catch (e) {
+                      setSubmitting(false);
+                      throw e;
+                    }
                   }}
                 >
                   <CheckmarkIcon className="h-4 fill-current mr-1 w-4" />

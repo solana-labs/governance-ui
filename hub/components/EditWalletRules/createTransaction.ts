@@ -50,7 +50,9 @@ export function createTransaction(
   return instruction;
 }
 
-export function rules2governanceConfig(rules: Rules) {
+export function rules2governanceConfig(
+  rules: Omit<Rules, 'governanceAddress' | 'walletAddress'>,
+) {
   const communityRules = rules.communityTokenRules;
   const councilRules = rules.councilTokenRules;
   const minCommunityTokensToCreateProposal = new BN(
