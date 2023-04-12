@@ -3108,7 +3108,7 @@
   },
   {
     "symbol": "IOT",
-    "displayName": "Helium IOT DAO",
+    "displayName": "Helium IOT SubDAO",
     "programId": "hgovkRU6Ghe1Qoyb54HdSLdqN7VtxaifBzRmh9jtd3S",
     "realmId": "8UQNtD5Zw8ijB7ZpGiPLodKXMxtVyQmtu1AEztd3p6Po",
     "website": "https://helium.com",
@@ -3117,7 +3117,7 @@
   },
   {
     "symbol": "MOBILE",
-    "displayName": "Helium MOBILE DAO",
+    "displayName": "Helium MOBILE SubDAO",
     "programId": "hgovkRU6Ghe1Qoyb54HdSLdqN7VtxaifBzRmh9jtd3S",
     "realmId": "8itzNAn1kMZ5sf18dVd8gGykztWZLVT93Svbdt7Gn2NP",
     "website": "https://helium.com",
