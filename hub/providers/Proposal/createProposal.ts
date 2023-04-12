@@ -57,9 +57,10 @@ interface Args {
 }
 
 export async function createProposal(args: Args) {
+  const realm = await getRealm(args.connection, args.realmPublicKey);
+
   const [
     governance,
-    realm,
     tokenOwnerRecord,
     realmConfigPublicKey,
     // eslint-disable-next-line
@@ -68,19 +69,18 @@ export async function createProposal(args: Args) {
     communityTokenOwnerRecord,
   ] = await Promise.all([
     getGovernance(args.connection, args.governancePublicKey),
-    getRealm(args.connection, args.realmPublicKey),
     getTokenOwnerRecordForRealm(
       args.connection,
-      args.programPublicKey,
+      realm.owner,
       args.realmPublicKey,
       args.governingTokenMintPublicKey,
       args.requestingUserPublicKey,
     ).catch(() => undefined),
-    getRealmConfigAddress(args.programPublicKey, args.realmPublicKey),
+    getRealmConfigAddress(realm.owner, args.realmPublicKey),
     args.councilTokenMintPublicKey
       ? getTokenOwnerRecordForRealm(
           args.connection,
-          args.programPublicKey,
+          realm.owner,
           args.realmPublicKey,
           args.councilTokenMintPublicKey,
           args.requestingUserPublicKey,
@@ -89,7 +89,7 @@ export async function createProposal(args: Args) {
     args.communityTokenMintPublicKey
       ? getTokenOwnerRecordForRealm(
           args.connection,
-          args.programPublicKey,
+          realm.owner,
           args.realmPublicKey,
           args.communityTokenMintPublicKey,
           args.requestingUserPublicKey,
@@ -115,7 +115,7 @@ export async function createProposal(args: Args) {
       )
     : {
         pubkey: realmConfigPublicKey,
-        owner: args.programPublicKey,
+        owner: realm.owner,
         account: new RealmConfigAccount({
           realm: args.realmPublicKey,
           communityTokenConfig: new GoverningTokenConfig({
@@ -153,7 +153,7 @@ export async function createProposal(args: Args) {
   const proposalIndex = governance.account.proposalCount;
   const votingPlugins = await fetchPlugins(
     args.connection,
-    args.programPublicKey,
+    realm.owner,
     {
       publicKey: args.requestingUserPublicKey,
       signTransaction: args.signTransaction,
@@ -244,7 +244,7 @@ export async function createProposal(args: Args) {
         signTransaction: args.signTransaction,
         signAllTransactions: args.signAllTransactions,
       },
-      programId: args.programPublicKey,
+      programId: realm.owner,
       walletPubkey: args.requestingUserPublicKey,
     } as RpcContext,
     realm,
