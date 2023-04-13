@@ -35,11 +35,13 @@ import { useClaimDelegatedPositionRewards } from '../hooks/useClaimDelegatedPosi
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export interface PositionCardProps {
+  subDaos?: SubDaoWithMeta[]
   position: PositionWithMeta
   isOwner: boolean
 }
 
 export const PositionCard: React.FC<PositionCardProps> = ({
+  subDaos,
   position,
   isOwner,
 }) => {
@@ -290,6 +292,11 @@ export const PositionCard: React.FC<PositionCardProps> = ({
     )
   }
 
+  const delegatedSubDaoMetadata = position.delegatedSubDao
+    ? subDaos?.find((sd) => sd.pubkey.equals(position.delegatedSubDao!))
+        ?.dntMetadata
+    : null
+
   const isSubmitting =
     isExtending ||
     isClosing ||
@@ -377,6 +384,18 @@ export const PositionCard: React.FC<PositionCardProps> = ({
               <div style={{ marginTop: 'auto' }}>
                 {position.isDelegated ? (
                   <div className="flex flex-col gap-2 items-center">
+                    {delegatedSubDaoMetadata ? (
+                      <span
+                        className="text-fgd-2 flex-row gap-2"
+                        style={{ fontSize: '9px' }}
+                      >
+                        <img
+                          className="w-4 h-4"
+                          src={delegatedSubDaoMetadata.json?.image}
+                        />
+                        {delegatedSubDaoMetadata.name}
+                      </span>
+                    ) : null}
                     <Button
                       className="w-full"
                       onClick={handleClaimRewards}

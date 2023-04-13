@@ -20,6 +20,7 @@ export interface Position extends Omit<PositionV0, 'lockup'> {
 export interface PositionWithMeta extends Position {
   pubkey: PublicKey
   isDelegated: boolean
+  delegatedSubDao: PublicKey | null
   hasRewards: boolean
   hasGenesisMultiplier: boolean
   votingPower: BN
