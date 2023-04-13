@@ -22,6 +22,7 @@ import * as anchor from '@coral-xyz/anchor'
 import * as sbv2 from '@switchboard-xyz/switchboard-v2'
 import sbIdl from 'SwitchboardVotePlugin/switchboard_v2.json'
 import gonIdl from 'SwitchboardVotePlugin/gameofnodes.json'
+import { useDeepCompareEffect } from 'use-deep-compare'
 
 import { STAKING_ADDRESS as PYTH_STAKING_ADDRESS } from 'pyth-staking-api'
 import useGatewayPluginStore from '../GatewayPlugin/store/gatewayPluginStore'
@@ -36,7 +37,7 @@ export const vsrPluginsPks: string[] = [
   'vsr2nfGVNHmSY8uxoBGqq8AQbwz3JwaEaHqGbsTPXqQ',
   'VotEn9AWwTFtJPJSMV5F9jsMY6QwWM5qn3XP9PATGW7',
   'VoteWPk9yyGmkX4U77nEWRJWpcc8kUfrPoghxENpstL',
-  'VoteMBhDCqGLRgYpp9o7DGyq81KNmwjXQRAHStjtJsS'
+  'VoteMBhDCqGLRgYpp9o7DGyq81KNmwjXQRAHStjtJsS',
 ]
 
 export const heliumVsrPluginsPks: string[] = [
@@ -361,7 +362,7 @@ export function useVotingPlugins() {
   }
 
   useEffect(() => {
-    if (wallet?.publicKey?.toBase58()) {
+    if (wallet && connection) {
       if (currentPluginPk) {
         handleSetVsrClient(wallet, connection, currentPluginPk)
         handleSetHeliumVsrClient(wallet, connection, currentPluginPk)
@@ -371,11 +372,15 @@ export function useVotingPlugins() {
       handleSetGatewayClient(wallet, connection)
       handleSetPythClient(wallet, connection)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
-    connection.endpoint,
-    wallet?.publicKey?.toBase58(),
-    currentPluginPk?.toBase58(),
+    connection,
+    wallet,
+    currentPluginPk,
+    handleSetNftClient,
+    handleSetGatewayClient,
+    handleSetPythClient,
+    handleSetVsrClient,
+    handleSetHeliumVsrClient,
   ])
 
   useEffect(() => {
