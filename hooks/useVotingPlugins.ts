@@ -363,8 +363,12 @@ export function useVotingPlugins() {
   useEffect(() => {
     if (wallet?.publicKey?.toBase58()) {
       if (currentPluginPk) {
-        handleSetVsrClient(wallet, connection, currentPluginPk)
-        handleSetHeliumVsrClient(wallet, connection, currentPluginPk)
+        if (vsrPluginsPks.includes(currentPluginPk.toBase58())) {
+          handleSetVsrClient(wallet, connection, currentPluginPk)
+        }
+        if (heliumVsrPluginsPks.includes(currentPluginPk.toBase58())) {
+          handleSetHeliumVsrClient(wallet, connection, currentPluginPk)  
+        }        
       }
       handleSetNftClient(wallet, connection)
       //handleSetSwitchboardClient(wallet, connection)
