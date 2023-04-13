@@ -63,7 +63,7 @@ const IdlSetBuffer = ({
       const ix = await createIdlUpgradeInstruction(
         new PublicKey(form.programId),
         new PublicKey(form.buffer),
-        form.governedAccount.extensions.transferAddress!,
+        form.governedAccount.governance.pubkey!,
         new PublicKey(form.idlAccount)
       )
       serializedInstruction = serializeInstructionToBase64(ix)
