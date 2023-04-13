@@ -110,7 +110,6 @@ export function EditRealmConfig(props: Props) {
           fetchConfig(
             cluster.connection,
             result.data.realmByUrlId.publicKey,
-            result.data.realmByUrlId.programPublicKey,
             {
               publicKey,
               signAllTransactions: wallet.signAllTransactions,
@@ -293,7 +292,6 @@ export function EditRealmConfig(props: Props) {
                           const userPublicKey = await wallet.connect();
 
                           const transaction = await createTransaction(
-                            realmByUrlId.programPublicKey,
                             realmByUrlId.publicKey,
                             governance.governanceAddress,
                             config,
@@ -318,7 +316,6 @@ export function EditRealmConfig(props: Props) {
                               proposalDescription,
                               proposalTitle,
                               governingTokenMintPublicKey,
-                              programPublicKey: realmByUrlId.programPublicKey,
                               governancePublicKey: governance.governanceAddress,
                               instructions: transaction,
                               isDraft: false,

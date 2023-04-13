@@ -14,7 +14,6 @@ export const getRealm = gql`
     realmByUrlId(urlId: $realmUrlId) {
       iconUrl
       name
-      programPublicKey
       publicKey
     }
   }
@@ -87,7 +86,6 @@ export const getRealmResp = IT.type({
   realmByUrlId: IT.type({
     iconUrl: IT.union([IT.null, IT.string]),
     name: IT.string,
-    programPublicKey: PublicKey,
     publicKey: PublicKey,
   }),
 });
