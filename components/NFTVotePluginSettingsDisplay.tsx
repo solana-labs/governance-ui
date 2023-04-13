@@ -135,7 +135,6 @@ export function NFTVotePluginSettingsDisplay(props: Props) {
   const collectionConfigs: CollectionConfig[] =
     registrar?.collectionConfigs || []
 
-  //
   useEffect(() => {
     setCollections(RE.pending())
     fetchCollections(
