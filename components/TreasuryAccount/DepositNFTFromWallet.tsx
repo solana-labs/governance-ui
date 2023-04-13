@@ -1,24 +1,68 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useWalletStore from 'stores/useWalletStore'
 import Button from '@components/Button'
 import Tooltip from '@components/Tooltip'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
-import { notify } from '@utils/notifications'
 import { web3 } from '@coral-xyz/anchor'
-import {
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  Token,
-  TOKEN_PROGRAM_ID,
-} from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
-import { createATA } from '@utils/ataTools'
-import { getTokenAccountsByMint } from '@utils/tokens'
 import { sendTransaction } from '@utils/send'
 import NFTSelector, { NftSelectorFunctions } from '@components/NFTS/NFTSelector'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import NFTAccountSelect from './NFTAccountSelect'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { Metaplex, walletAdapterIdentity } from '@metaplex-foundation/js'
+import { fetchNFTbyMint } from '@hooks/queries/nft'
+import { notify } from '@utils/notifications'
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  TOKEN_PROGRAM_ID,
+  Token,
+} from '@solana/spl-token'
+import { createATA } from '@utils/ataTools'
+
+const useMetaplexDeposit = () => {
+  const wallet = useWalletOnePointOh()
+  const connection = useWalletStore((s) => s.connection)
+  const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
+
+  return async (address: PublicKey) => {
+    if (!wallet?.publicKey) throw new Error()
+    if (!currentAccount) throw new Error()
+
+    const owner = currentAccount.isSol
+      ? currentAccount.extensions.transferAddress!
+      : currentAccount.governance!.pubkey
+
+    const metaplex = new Metaplex(connection.current, {
+      cluster:
+        connection.cluster === 'mainnet' ? 'mainnet-beta' : connection.cluster,
+    }).use(walletAdapterIdentity(wallet))
+
+    const nft = await fetchNFTbyMint(connection.current, address)
+    if (nft.result) {
+      const tokenStandard = nft.result.tokenStandard
+
+      const x = metaplex.nfts().builders().transfer({
+        nftOrSft: {
+          address,
+          tokenStandard,
+        },
+        toOwner: owner,
+        fromOwner: wallet.publicKey,
+      })
+
+      const transaction = new web3.Transaction().add(...x.getInstructions())
+      await sendTransaction({
+        connection: connection.current,
+        wallet: wallet!,
+        transaction,
+        sendingMessage: 'Depositing NFT',
+        successMessage: 'NFT has been deposited',
+      })
+    }
+  }
+}
 
 const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
   const nftSelectorRef = useRef<NftSelectorFunctions>(null)
@@ -33,75 +77,56 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
   const [sendingSuccess, setSendingSuccess] = useState(false)
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
 
+  const deposit = useMetaplexDeposit()
+
   const handleDeposit = async () => {
-    for (const i of selectedNfts) {
+    // really these should probably get batched into one TX or whatever.
+    if (!currentAccount) throw new Error()
+
+    for (const nft of selectedNfts) {
       setIsLoading(true)
       setSendingSuccess(false)
-      try {
-        const owner = currentAccount?.isSol
-          ? currentAccount.extensions.transferAddress!
-          : currentAccount!.governance!.pubkey
-        const ConnectedWalletAddress = wallet?.publicKey
-        const selectedNft = i
-        const nftMintPk = new PublicKey(selectedNft.mintAddress)
-        const tokenAccountsWithNftMint = await getTokenAccountsByMint(
+
+      const owner = currentAccount.isSol
+        ? currentAccount.extensions.transferAddress!
+        : currentAccount.governance!.pubkey
+      const nftMintPk = new PublicKey(nft.mintAddress)
+
+      const ataPk = await Token.getAssociatedTokenAddress(
+        ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+        TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+        nftMintPk, // mint
+        owner!, // owner
+        true
+      )
+
+      const ataQueried = await connection.current.getAccountInfo(ataPk)
+
+      if (ataQueried === null) {
+        await createATA(
           connection.current,
-          nftMintPk.toBase58()
+          wallet,
+          nftMintPk,
+          owner!,
+          wallet!.publicKey!
         )
-        //we find ata from connected wallet that holds the nft
-        const fromAddress = tokenAccountsWithNftMint.find(
-          (x) =>
-            x.account.owner.toBase58() === ConnectedWalletAddress?.toBase58()
-        )?.publicKey
-        //we check is there ata created for nft before
-        const doseAtaForReciverAddressExisit = tokenAccountsWithNftMint.find(
-          (x) => x.account.owner.toBase58() === owner.toBase58()
+      }
+
+      await deposit(new PublicKey(nft.mintAddress))
+        .then(() => setSendingSuccess(true))
+        .catch(() =>
+          notify({
+            type: 'error',
+            message: 'Unable to send selected nft',
+          })
         )
 
-        const ataPk = await Token.getAssociatedTokenAddress(
-          ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-          TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-          nftMintPk, // mint
-          owner!, // owner
-          true
-        )
-        if (!doseAtaForReciverAddressExisit) {
-          await createATA(
-            connection.current,
-            wallet,
-            nftMintPk,
-            owner!,
-            wallet!.publicKey!
-          )
-        }
-        const transaction = new web3.Transaction().add(
-          Token.createTransferInstruction(
-            TOKEN_PROGRAM_ID,
-            fromAddress!,
-            ataPk,
-            wallet!.publicKey!,
-            [],
-            1
-          )
-        )
-        await sendTransaction({
-          connection: connection.current,
-          wallet: wallet!,
-          transaction,
-          sendingMessage: 'Depositing NFT',
-          successMessage: 'NFT has been deposited',
-        })
-        setSendingSuccess(true)
-        nftSelectorRef.current?.handleGetNfts()
-        getNfts(nftsGovernedTokenAccounts, connection)
-      } catch (e) {
-        notify({
-          type: 'error',
-          message: 'Unable to send selected nft',
-        })
-      }
       setIsLoading(false)
     }
+
+    nftSelectorRef.current?.handleGetNfts()
+    // @asktree: as far as I can tell this doesn't have the effect of refreshing any queries properly
+    getNfts(nftsGovernedTokenAccounts, connection)
   }
 
   useEffect(() => {
