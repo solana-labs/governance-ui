@@ -17,7 +17,7 @@ import {
   SendTokenCompactViewForm,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useWalletStore from 'stores/useWalletStore'
 
@@ -51,7 +51,6 @@ import NFTSelector from '@components/NFTS/NFTSelector'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
 import useCreateProposal from '@hooks/useCreateProposal'
 import NFTAccountSelect from './NFTAccountSelect'
-import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const SendTokens = ({
@@ -159,9 +158,9 @@ const SendTokens = ({
       return
     }
 
-    const instructions: InstructionDataWithHoldUpTime[] = await Promise.all(
-      selectedNfts.map(async (x) => {
-        const instruction: UiInstruction = await getTransferNftInstruction({
+    const instructions = await Promise.all(
+      selectedNfts.map((x) =>
+        getTransferNftInstruction({
           programId,
           form,
           connection,
@@ -170,18 +169,16 @@ const SendTokens = ({
           setFormErrors,
           nftMint: x.mintAddress,
         })
-
-        return {
-          data: instruction.serializedInstruction
-            ? getInstructionDataFromBase64(instruction.serializedInstruction)
-            : null,
-          holdUpTime: governance.account.config.minInstructionHoldUpTime,
-          prerequisiteInstructions: instruction.prerequisiteInstructions || [],
-          chunkSplitByDefault: true,
-          chunkBy: 4,
-        }
-      })
+      )
     )
+
+    const instructionsData = instructions.map((instruction) => ({
+      data: getInstructionDataFromBase64(instruction.serializedInstruction),
+      holdUpTime: governance.account.config.minInstructionHoldUpTime,
+      prerequisiteInstructions: instruction.prerequisiteInstructions ?? [],
+      chunkSplitByDefault: true,
+      chunkBy: 1,
+    }))
 
     const proposalTitle =
       selectedNfts.length > 1
@@ -201,7 +198,7 @@ const SendTokens = ({
         title: form.title ? form.title : proposalTitle,
         description: form.description ? form.description : '',
         voteByCouncil,
-        instructionsData: [...instructions],
+        instructionsData,
         governance: selectedGovernance!,
       })
       const url = fmtUrlWithCluster(
