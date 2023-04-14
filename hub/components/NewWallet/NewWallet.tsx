@@ -209,6 +209,7 @@ function NewWalletWithDefaults({
                     try {
                       await callback();
                       router.push(fmtUrlWithCluster(`/dao/${symbol}/`));
+                      // TODO refetch wallets
                     } catch (e) {
                       setSubmitting(false);
                       throw e;
