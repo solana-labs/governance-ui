@@ -286,6 +286,19 @@
     "ogImage": "https://miro.medium.com/fit/c/176/176/1*-mdTTAgsSuBYSfDqG6Fd1w.png"
   },
   {
+    "symbol": "PHY",
+    "displayName": "Physis",
+    "category": "web3",
+    "sortRank": 3,
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "DsWWtZrqXBcqTTPoEyFH793Euq82r95CuXWTwqo3JZur",
+    "website": "https://phys.is",
+    "keywords": "Physis, PhysisVerse, , PHY, Metaverse, XR, ASTRALIS, AI, Web3, Governance, Solana, SOL",
+    "twitter": "@PhysisVerse",
+    "bannerImage": "https://shdw-drive.genesysgo.net/GEmb2ovbEuWijEzapoEaViShkUvwbgpe2ohVTzVLzuU/physis-banner-spray-dao-001.jpg",
+    "ogImage": "https://shdw-drive.genesysgo.net/GEmb2ovbEuWijEzapoEaViShkUvwbgpe2ohVTzVLzuU/physis-holo-blk-sml.png"
+  },
+  {
     "symbol": "JET",
     "displayName": "Jet DAO",
     "programId": "JPGov2SBA6f7XSJF5R4Si5jEJekGiyrwP2m7gSEqLUs",
