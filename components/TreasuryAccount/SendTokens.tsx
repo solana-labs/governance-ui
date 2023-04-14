@@ -44,6 +44,7 @@ import {
   getSolTransferInstruction,
   getTransferInstruction,
   getTransferNftInstruction,
+  validateInstruction,
 } from '@utils/instructionTools'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
 import NFTSelector from '@components/NFTS/NFTSelector'
@@ -137,63 +138,65 @@ const SendTokens = ({
     return totalPriceFormatted
   }
 
-  async function getNftInstruction(x: NFTWithMint): Promise<UiInstruction> {
-    const selectedNftMint = x.mintAddress
-    return getTransferNftInstruction({
-      schema,
-      form,
-      programId,
-      connection,
-      wallet,
-      currentAccount,
-      setFormErrors,
-      nftMint: selectedNftMint,
-    })
-  }
-
   const handleProposeNftSend = async () => {
-    const instructions: InstructionDataWithHoldUpTime[] = []
-    let proposalTitle = ''
-    const governance = currentAccount?.governance
+    if (!realm || !programId) {
+      throw new Error()
+    }
+    if (!wallet?.publicKey) {
+      throw 'connect wallet'
+    }
+    if (!currentAccount) {
+      throw new Error()
+    }
     setIsLoading(true)
-    for (const x of selectedNfts) {
-      const nftName = x?.name
-      const nftTitle = `Send ${nftName ? nftName : 'NFT'} to ${
-        tryParseKey(form.destinationAccount)
-          ? abbreviateAddress(new PublicKey(form.destinationAccount))
-          : ''
-      }`
-      proposalTitle = isNFT
-        ? nftTitle
-        : `Pay ${form.amount}${tokenInfo ? ` ${tokenInfo?.symbol} ` : ' '}to ${
-            tryParseKey(form.destinationAccount)
-              ? abbreviateAddress(new PublicKey(form.destinationAccount))
-              : ''
-          }`
-      const instruction: UiInstruction = await getNftInstruction(x)
-      if (instruction.isValid) {
-        if (!realm) {
-          setIsLoading(false)
-          throw 'No realm selected'
-        }
-        const instructionData: InstructionDataWithHoldUpTime = {
+
+    const governance = currentAccount.governance
+
+    //validate
+    const valid = await validateInstruction({ schema, form, setFormErrors })
+    if (!valid) {
+      setIsLoading(false)
+      return
+    }
+
+    const instructions: InstructionDataWithHoldUpTime[] = await Promise.all(
+      selectedNfts.map(async (x) => {
+        const instruction: UiInstruction = await getTransferNftInstruction({
+          programId,
+          form,
+          connection,
+          wallet,
+          currentAccount,
+          setFormErrors,
+          nftMint: x.mintAddress,
+        })
+
+        return {
           data: instruction.serializedInstruction
             ? getInstructionDataFromBase64(instruction.serializedInstruction)
             : null,
-          holdUpTime: governance?.account?.config.minInstructionHoldUpTime,
+          holdUpTime: governance.account.config.minInstructionHoldUpTime,
           prerequisiteInstructions: instruction.prerequisiteInstructions || [],
           chunkSplitByDefault: true,
           chunkBy: 4,
         }
-        instructions.push(instructionData)
-      }
-    }
+      })
+    )
+
+    const proposalTitle =
+      selectedNfts.length > 1
+        ? 'Send NFTs'
+        : `Send ${selectedNfts[0].name} to ${
+            tryParseKey(form.destinationAccount)
+              ? abbreviateAddress(new PublicKey(form.destinationAccount))
+              : ''
+          }`
+    // Fetch governance to get up to date proposalCount
+    const selectedGovernance = (await fetchRealmGovernance(
+      governance?.pubkey
+    )) as ProgramAccount<Governance>
+
     try {
-      proposalTitle = instructions.length > 1 ? 'Send NFTS' : proposalTitle
-      // Fetch governance to get up to date proposalCount
-      const selectedGovernance = (await fetchRealmGovernance(
-        governance?.pubkey
-      )) as ProgramAccount<Governance>
       const proposalAddress = await handleCreateProposal({
         title: form.title ? form.title : proposalTitle,
         description: form.description ? form.description : '',
@@ -207,6 +210,9 @@ const SendTokens = ({
       router.push(url)
     } catch (ex) {
       notify({ type: 'error', message: `${ex}` })
+      //console.error(ex)
+      setIsLoading(false)
+      throw ex
     }
     setIsLoading(false)
   }

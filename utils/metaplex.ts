@@ -5,10 +5,10 @@ import { Connection, PublicKey } from '@solana/web3.js'
 
 export const createIx_transferNft = async (
   connection: Connection,
-  wallet: WalletAdapter,
   fromOwner: PublicKey,
   toOwner: PublicKey,
-  mint: PublicKey
+  mint: PublicKey,
+  wallet: WalletAdapter
 ) => {
   const metaplex = new Metaplex(
     connection
@@ -17,7 +17,7 @@ export const createIx_transferNft = async (
       cluster:
         connection.en === 'mainnet' ? 'mainnet-beta' : connection.cluster,
      }*/
-  ).use(walletAdapterIdentity(wallet))
+  ) //.use(walletAdapterIdentity(wallet)) // surely this doesnt matter either
 
   const nft = await fetchNFTbyMint(connection, mint)
   if (nft.result) {
@@ -36,5 +36,7 @@ export const createIx_transferNft = async (
       })
 
     return x.getInstructions()[0]
+  } else {
+    throw 'Failed to fetch nft'
   }
 }

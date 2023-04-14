@@ -34,7 +34,6 @@ const useMetaplexDeposit = () => {
 
     const ix = await createIx_transferNft(
       connection.current,
-      wallet,
       wallet.publicKey,
       toOwner,
       address
