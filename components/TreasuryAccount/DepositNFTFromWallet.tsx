@@ -4,15 +4,12 @@ import useWalletStore from 'stores/useWalletStore'
 import Button from '@components/Button'
 import Tooltip from '@components/Tooltip'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
-import { web3 } from '@coral-xyz/anchor'
-import { PublicKey } from '@solana/web3.js'
+import { PublicKey, Transaction } from '@solana/web3.js'
 import { sendTransaction } from '@utils/send'
 import NFTSelector, { NftSelectorFunctions } from '@components/NFTS/NFTSelector'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import NFTAccountSelect from './NFTAccountSelect'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { Metaplex, walletAdapterIdentity } from '@metaplex-foundation/js'
-import { fetchNFTbyMint } from '@hooks/queries/nft'
 import { notify } from '@utils/notifications'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -20,6 +17,7 @@ import {
   Token,
 } from '@solana/spl-token'
 import { createATA } from '@utils/ataTools'
+import { createIx_transferNft } from '@utils/metaplex'
 
 const useMetaplexDeposit = () => {
   const wallet = useWalletOnePointOh()
@@ -30,29 +28,20 @@ const useMetaplexDeposit = () => {
     if (!wallet?.publicKey) throw new Error()
     if (!currentAccount) throw new Error()
 
-    const owner = currentAccount.isSol
+    const toOwner = currentAccount.isSol
       ? currentAccount.extensions.transferAddress!
-      : currentAccount.governance!.pubkey
+      : currentAccount.governance!.pubkey // TODO use the native treasury
 
-    const metaplex = new Metaplex(connection.current, {
-      cluster:
-        connection.cluster === 'mainnet' ? 'mainnet-beta' : connection.cluster,
-    }).use(walletAdapterIdentity(wallet))
+    const ix = await createIx_transferNft(
+      connection.current,
+      wallet,
+      wallet.publicKey,
+      toOwner,
+      address
+    )
 
-    const nft = await fetchNFTbyMint(connection.current, address)
-    if (nft.result) {
-      const tokenStandard = nft.result.tokenStandard
-
-      const x = metaplex.nfts().builders().transfer({
-        nftOrSft: {
-          address,
-          tokenStandard,
-        },
-        toOwner: owner,
-        fromOwner: wallet.publicKey,
-      })
-
-      const transaction = new web3.Transaction().add(...x.getInstructions())
+    if (ix !== undefined) {
+      const transaction = new Transaction().add(ix)
       await sendTransaction({
         connection: connection.current,
         wallet: wallet!,
