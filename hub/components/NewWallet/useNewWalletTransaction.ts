@@ -1,4 +1,7 @@
-import { withCreateGovernance } from '@solana/spl-governance';
+import {
+  withCreateGovernance,
+  withCreateNativeTreasury,
+} from '@solana/spl-governance';
 import { TransactionInstruction } from '@solana/web3.js';
 
 import { useCallback } from 'react';
@@ -62,6 +65,13 @@ const useNewWalletCallback = (
       wallet.publicKey,
       wallet.publicKey,
       plugin?.voterWeightPk,
+    );
+    await withCreateNativeTreasury(
+      instructions,
+      realm.owner,
+      programVersion,
+      governanceAddress,
+      wallet.publicKey,
     );
 
     await sendTransactionsV3({
