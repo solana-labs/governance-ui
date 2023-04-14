@@ -22,7 +22,6 @@ import * as anchor from '@coral-xyz/anchor'
 import * as sbv2 from '@switchboard-xyz/switchboard-v2'
 import sbIdl from 'SwitchboardVotePlugin/switchboard_v2.json'
 import gonIdl from 'SwitchboardVotePlugin/gameofnodes.json'
-import { useDeepCompareEffect } from 'use-deep-compare'
 
 import { STAKING_ADDRESS as PYTH_STAKING_ADDRESS } from 'pyth-staking-api'
 import useGatewayPluginStore from '../GatewayPlugin/store/gatewayPluginStore'
