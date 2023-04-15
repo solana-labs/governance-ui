@@ -116,7 +116,7 @@ export const getPositions = async (
           ? delegatedPositionAccs[idx]?.subDao
           : null
         const hasRewards = isDelegated
-          ? delegatedPositionAccs[idx]!.lastClaimedEpoch.lt(
+          ? delegatedPositionAccs[idx]!.lastClaimedEpoch.add(new BN(1)).lt(
               now.div(new BN(EPOCH_LENGTH))
             )
           : false
