@@ -47,7 +47,6 @@ interface Args {
   governingTokenMintPublicKey: PublicKey;
   instructions: TransactionInstruction[];
   isDraft: boolean;
-  programPublicKey: PublicKey;
   proposalDescription: string;
   proposalTitle: string;
   realmPublicKey: PublicKey;

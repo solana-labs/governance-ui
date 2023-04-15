@@ -35,14 +35,17 @@ export interface Config {
 export async function fetchConfig(
   connection: Connection,
   realmPublicKey: PublicKey,
-  programPublicKey: PublicKey,
   wallet: Pick<Wallet, 'publicKey' | 'signTransaction' | 'signAllTransactions'>,
   isDevnet?: boolean,
 ): Promise<Config> {
-  const [realm, realmConfigPublicKey] = await Promise.all([
-    getRealm(connection, realmPublicKey),
-    getRealmConfigAddress(programPublicKey, realmPublicKey),
-  ]);
+  const realm = await getRealm(connection, realmPublicKey);
+
+  const programPublicKey = realm.owner;
+
+  const realmConfigPublicKey = await getRealmConfigAddress(
+    programPublicKey,
+    realmPublicKey,
+  );
 
   const realmConfig = realm.account.config;
   const configAccountInfo = await connection.getAccountInfo(

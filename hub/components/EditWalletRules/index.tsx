@@ -1,6 +1,7 @@
 import CheckmarkIcon from '@carbon/icons-react/lib/Checkmark';
 import ChevronLeftIcon from '@carbon/icons-react/lib/ChevronLeft';
 import EditIcon from '@carbon/icons-react/lib/Edit';
+import { getRealm } from '@solana/spl-governance';
 import { PublicKey } from '@solana/web3.js';
 import { BigNumber } from 'bignumber.js';
 import { hoursToSeconds, secondsToHours } from 'date-fns';
@@ -152,7 +153,7 @@ export function EditWalletRules(props: Props) {
     RE.match(
       () => <div />,
       () => <div />,
-      ({ me, realmByUrlId: { governance, programPublicKey, publicKey } }) => {
+      ({ me, realmByUrlId: { governance, publicKey } }) => {
         const walletName =
           getAccountName(governance.walletAddress) ||
           getAccountName(governance.governanceAddress) ||
@@ -308,6 +309,13 @@ export function EditWalletRules(props: Props) {
                         onClick={async () => {
                           setSubmitting(true);
 
+                          const realm = await getRealm(
+                            cluster.connection,
+                            publicKey,
+                          );
+
+                          const programPublicKey = realm.owner;
+
                           const transaction = createTransaction(
                             programPublicKey,
                             governance.version,
@@ -334,7 +342,6 @@ export function EditWalletRules(props: Props) {
                           try {
                             const proposalAddress = await createProposal({
                               governingTokenMintPublicKey,
-                              programPublicKey,
                               proposalDescription,
                               proposalTitle,
                               governancePublicKey: governance.governanceAddress,

@@ -36,7 +36,7 @@ export const vsrPluginsPks: string[] = [
   'vsr2nfGVNHmSY8uxoBGqq8AQbwz3JwaEaHqGbsTPXqQ',
   'VotEn9AWwTFtJPJSMV5F9jsMY6QwWM5qn3XP9PATGW7',
   'VoteWPk9yyGmkX4U77nEWRJWpcc8kUfrPoghxENpstL',
-  'VoteMBhDCqGLRgYpp9o7DGyq81KNmwjXQRAHStjtJsS'
+  'VoteMBhDCqGLRgYpp9o7DGyq81KNmwjXQRAHStjtJsS',
 ]
 
 export const heliumVsrPluginsPks: string[] = [
@@ -361,7 +361,7 @@ export function useVotingPlugins() {
   }
 
   useEffect(() => {
-    if (wallet?.publicKey?.toBase58()) {
+    if (wallet && connection) {
       if (currentPluginPk) {
         if (vsrPluginsPks.includes(currentPluginPk.toBase58())) {
           handleSetVsrClient(wallet, connection, currentPluginPk)
@@ -375,11 +375,15 @@ export function useVotingPlugins() {
       handleSetGatewayClient(wallet, connection)
       handleSetPythClient(wallet, connection)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
-    connection.endpoint,
-    wallet?.publicKey?.toBase58(),
-    currentPluginPk?.toBase58(),
+    connection,
+    wallet,
+    currentPluginPk,
+    handleSetNftClient,
+    handleSetGatewayClient,
+    handleSetPythClient,
+    handleSetVsrClient,
+    handleSetHeliumVsrClient,
   ])
 
   useEffect(() => {
