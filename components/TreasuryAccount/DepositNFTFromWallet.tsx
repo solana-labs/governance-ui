@@ -4,8 +4,7 @@ import useWalletStore from 'stores/useWalletStore'
 import Button from '@components/Button'
 import Tooltip from '@components/Tooltip'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
-import { PublicKey, Transaction } from '@solana/web3.js'
-import { sendTransaction } from '@utils/send'
+import { PublicKey } from '@solana/web3.js'
 import NFTSelector, { NftSelectorFunctions } from '@components/NFTS/NFTSelector'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import NFTAccountSelect from './NFTAccountSelect'
@@ -18,6 +17,7 @@ import {
 } from '@solana/spl-token'
 import { createATA } from '@utils/ataTools'
 import { createIx_transferNft } from '@utils/metaplex'
+import { SequenceType, sendTransactionsV3 } from '@utils/sendTransactions'
 
 const useMetaplexDeposit = () => {
   const wallet = useWalletOnePointOh()
@@ -38,17 +38,18 @@ const useMetaplexDeposit = () => {
       toOwner,
       address
     )
+    console.log('IX', ix)
 
-    if (ix !== undefined) {
-      const transaction = new Transaction().add(ix)
-      await sendTransaction({
-        connection: connection.current,
-        wallet: wallet!,
-        transaction,
-        sendingMessage: 'Depositing NFT',
-        successMessage: 'NFT has been deposited',
-      })
-    }
+    await sendTransactionsV3({
+      connection: connection.current,
+      wallet,
+      transactionInstructions: [
+        {
+          instructionsSet: [{ transactionInstruction: ix }],
+          sequenceType: SequenceType.Parallel,
+        },
+      ],
+    })
   }
 }
 
@@ -102,12 +103,13 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
 
       await deposit(new PublicKey(nft.mintAddress))
         .then(() => setSendingSuccess(true))
-        .catch(() =>
+        .catch((e) => {
           notify({
             type: 'error',
             message: 'Unable to send selected nft',
           })
-        )
+          throw e
+        })
 
       setIsLoading(false)
     }

@@ -325,8 +325,7 @@ export async function getTransferNftInstruction({
     connection.current,
     sourceAccount,
     destinationAccount,
-    mint,
-    wallet
+    mint
   )
 
   return {

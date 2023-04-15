@@ -1,14 +1,12 @@
 import { fetchNFTbyMint } from '@hooks/queries/nft'
-import { Metaplex, walletAdapterIdentity } from '@metaplex-foundation/js'
-import { WalletAdapter } from '@solana/wallet-adapter-base'
+import { Metaplex } from '@metaplex-foundation/js'
 import { Connection, PublicKey } from '@solana/web3.js'
 
 export const createIx_transferNft = async (
   connection: Connection,
   fromOwner: PublicKey,
   toOwner: PublicKey,
-  mint: PublicKey,
-  wallet: WalletAdapter
+  mint: PublicKey
 ) => {
   const metaplex = new Metaplex(
     connection
@@ -17,26 +15,24 @@ export const createIx_transferNft = async (
       cluster:
         connection.en === 'mainnet' ? 'mainnet-beta' : connection.cluster,
      }*/
-  ) //.use(walletAdapterIdentity(wallet)) // surely this doesnt matter either
+  ) //.use(walletAdapterIdentity(wallet)) // surely this doesnt matter either (IT DOES)
+  metaplex.identity = () => ({ publicKey: fromOwner } as any) // you need to do this to set payer and authority. I love OOP!!
 
   const nft = await fetchNFTbyMint(connection, mint)
-  if (nft.result) {
-    const tokenStandard = nft.result.tokenStandard
+  if (!nft.result) throw 'failed to fetch nft'
 
-    const x = metaplex
-      .nfts()
-      .builders()
-      .transfer({
-        nftOrSft: {
-          address: mint,
-          tokenStandard,
-        },
-        toOwner,
-        fromOwner,
-      })
+  const tokenStandard = nft.result.tokenStandard
 
-    return x.getInstructions()[0]
-  } else {
-    throw 'Failed to fetch nft'
-  }
+  return metaplex
+    .nfts()
+    .builders()
+    .transfer({
+      nftOrSft: {
+        address: mint,
+        tokenStandard,
+      },
+      toOwner,
+      fromOwner,
+    })
+    .getInstructions()[0]
 }
