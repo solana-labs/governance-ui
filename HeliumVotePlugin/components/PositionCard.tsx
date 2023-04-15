@@ -239,30 +239,30 @@ export const PositionCard: React.FC<PositionCardProps> = ({
   const handleUndelegateTokens = async () => {
     try {
       await undelegatePosition({ position })
-
-      if (!undelegatingError) {
-        await refetchState()
-      }
     } catch (e) {
       notify({
         type: 'error',
         message: e.message || 'Unable to undelegate tokens',
       })
+    } finally {
+      if (!undelegatingError) {
+        await refetchState()
+      }
     }
   }
 
   const handleClaimRewards = async () => {
     try {
       await claimDelegatedPositionRewards({ position })
-
-      if (!claimingRewardsError) {
-        await refetchState()
-      }
     } catch (e) {
       notify({
         type: 'error',
         message: e.message || 'Unable to claim rewards',
       })
+    } finally {
+      if (!claimingRewardsError) {
+        await refetchState()
+      }
     }
   }
 
@@ -271,15 +271,15 @@ export const PositionCard: React.FC<PositionCardProps> = ({
       await closePosition({
         position,
       })
-
-      if (!closingError) {
-        await refetchState()
-      }
     } catch (e) {
       notify({
         type: 'error',
         message: e.message || 'Unable to close position',
       })
+    } finally {
+      if (!closingError) {
+        await refetchState()
+      }
     }
   }
 
