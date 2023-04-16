@@ -51,7 +51,7 @@ function Summary(
       <h1 className="text-5xl font-medium m-0 mb-4 dark:text-white ">
         {props.title}
       </h1>
-      {props.proposalForm && (
+      {props.proposalForm && props.walletAddress && (
         <>
           <p className="m-0 mb-16 dark:text-neutral-300">
             Before submitting, ensure your description is correct and rules

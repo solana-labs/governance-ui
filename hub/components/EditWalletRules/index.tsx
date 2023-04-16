@@ -26,7 +26,7 @@ import * as RE from '@hub/types/Result';
 import { createTransaction } from './createTransaction';
 import { EditWalletForm } from './Form';
 import * as gql from './gql';
-import { EditWalletSummary, Summary } from './Summary';
+import { EditWalletSummary } from './Summary';
 import { CommunityRules, CouncilRules } from './types';
 
 enum Step {
