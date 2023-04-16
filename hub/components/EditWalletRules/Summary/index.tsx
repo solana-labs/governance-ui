@@ -36,7 +36,7 @@ function Summary(
   props: Props & {
     proposalPreview: React.ReactNode;
     title: string;
-    proposalForm: boolean;
+    proposalForm?: boolean;
   },
 ) {
   return (
