@@ -117,7 +117,7 @@ function NFTSelector(
                   }}
                 >
                   {selected.find((k) => x.mintAddress === k.mintAddress) && (
-                    <CheckCircleIcon className="w-10 h-10 absolute text-green z-10"></CheckCircleIcon>
+                    <CheckCircleIcon className="w-10 h-10 absolute text-green z-10" />
                   )}
 
                   <ImgWithLoader style={{ width: '150px' }} src={x.image} />
