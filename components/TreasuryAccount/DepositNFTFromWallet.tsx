@@ -36,7 +36,9 @@ const useMetaplexDeposit = () => {
       connection.current,
       wallet.publicKey,
       toOwner,
-      address
+      address,
+      wallet.publicKey,
+      wallet.publicKey
     )
     console.log('IX', ix)
 

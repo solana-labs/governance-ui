@@ -255,84 +255,66 @@ export async function getSolTransferInstruction({
 }
 
 export async function getTransferNftInstruction({
-  form,
+  toOwner,
   connection,
-  wallet,
+  ataCreationPayer,
   currentAccount,
   nftMint,
+  assetAccount,
 }: {
-  form: any
+  toOwner: PublicKey
   programId: PublicKey
   connection: ConnectionContext
-  wallet: WalletAdapter
+  ataCreationPayer: PublicKey
   currentAccount: AssetAccount
-  setFormErrors: any
   nftMint: string
+  assetAccount: AssetAccount
 }): Promise<UiInstruction> {
-  if (!wallet.publicKey) throw 'connect wallet'
-
-  if (!form.governedTokenAccount?.extensions.mint?.account) throw new Error()
-
-  const prerequisiteInstructions: TransactionInstruction[] = []
-
-  const tokenAccountsWithNftMint = await getTokenAccountsByMint(
-    connection.current,
-    nftMint
-  )
-  const solAccSource = tokenAccountsWithNftMint.find(
-    (x) =>
-      x.account.owner.toBase58() ===
-      form.governedTokenAccount.extensions.transferAddress.toBase58()
-  )?.publicKey
-  const governanceSource = tokenAccountsWithNftMint.find(
-    (x) =>
-      x.account.owner.toBase58() ===
-      form.governedTokenAccount.governance.pubkey.toBase58()
-  )?.publicKey
-  //we find ata from connected wallet that holds the nft
-  const sourceAccount = solAccSource || governanceSource
-  if (!sourceAccount) {
-    throw 'Nft ata not found for governance'
-  }
-  //this is the original owner
-  const destinationAccount = new PublicKey(form.destinationAccount)
   const mint = new PublicKey(nftMint)
   //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
-  const { currentAddress: receiverATA, needToCreateAta } = await getATA({
-    connection: connection,
-    receiverAddress: destinationAccount,
-    mintPK: mint,
-    wallet: wallet,
-  })
-  console.log(needToCreateAta)
-  //we push this createATA instruction to transactions to create right before creating proposal
-  //we don't want to create ata only when instruction is serialized
-  if (needToCreateAta) {
-    console.log('create atas')
-    prerequisiteInstructions.push(
-      Token.createAssociatedTokenAccountInstruction(
-        ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-        TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-        mint, // mint
-        receiverATA, // ata
-        destinationAccount, // owner of token account
-        wallet.publicKey // fee payer
-      )
-    )
-  }
+
+  const destinationAtaPk = await Token.getAssociatedTokenAddress(
+    ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+    TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+    mint, // mint
+    toOwner, // owner
+    true
+  )
+  const destinationAtaQueried = await connection.current.getAccountInfo(
+    destinationAtaPk
+  )
+  console.log('asset account', assetAccount.pubkey.toString())
+  console.log(
+    'asset account governance',
+    assetAccount.governance.pubkey.toString()
+  )
 
   const transferIx = await createIx_transferNft(
     connection.current,
-    sourceAccount,
-    destinationAccount,
-    mint
+    assetAccount.pubkey,
+    toOwner,
+    mint,
+    assetAccount.pubkey,
+    toOwner
   )
 
   return {
     serializedInstruction: serializeInstructionToBase64(transferIx),
     isValid: true,
     governance: currentAccount.governance,
-    prerequisiteInstructions: prerequisiteInstructions,
+    prerequisiteInstructions:
+      destinationAtaQueried === null
+        ? [
+            Token.createAssociatedTokenAccountInstruction(
+              ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+              TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+              mint, // mint
+              destinationAtaPk, // ata
+              toOwner, // owner of token account
+              ataCreationPayer // fee payer
+            ),
+          ]
+        : [],
   }
 }
 

@@ -147,6 +147,10 @@ const SendTokens = ({
     if (!currentAccount) {
       throw new Error()
     }
+    const assetAccount = form.governedTokenAccount
+    if (assetAccount === undefined) {
+      throw 'no governance/asset account selected'
+    }
     setIsLoading(true)
 
     const governance = currentAccount.governance
@@ -157,17 +161,16 @@ const SendTokens = ({
       setIsLoading(false)
       return
     }
-
     const instructions = await Promise.all(
       selectedNfts.map((x) =>
         getTransferNftInstruction({
           programId,
-          form,
+          assetAccount,
           connection,
-          wallet,
           currentAccount,
-          setFormErrors,
           nftMint: x.mintAddress,
+          toOwner: new PublicKey(form.destinationAccount),
+          ataCreationPayer: wallet.publicKey!, //typescript why are you like this? its not null, wtf
         })
       )
     )
