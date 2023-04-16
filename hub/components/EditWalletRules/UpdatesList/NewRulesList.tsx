@@ -2,19 +2,16 @@ import BuildingIcon from '@carbon/icons-react/lib/Building';
 import ChemistryIcon from '@carbon/icons-react/lib/Chemistry';
 import TimeIcon from '@carbon/icons-react/lib/Time';
 import UserMultipleIcon from '@carbon/icons-react/lib/UserMultiple';
-import { PublicKey } from '@solana/web3.js';
-import { BigNumber } from 'bignumber.js';
 
 import { SectionBlock } from '../SectionBlock';
 import { SectionHeader } from '../SectionHeader';
 import { SummaryItem } from '../SummaryItem';
 import { CommunityRules, CouncilRules } from '../types';
 import { getLabel } from '../VoteTippingSelector';
+import { capitalize } from '@hub/lib/capitalize';
 import cx from '@hub/lib/cx';
 import { formatNumber } from '@hub/lib/formatNumber';
 import { ntext } from '@hub/lib/ntext';
-import { DISABLED_VALUE } from '@tools/constants';
-import { capitalize } from '@hub/lib/capitalize';
 
 function unrestrictedVotingTimeText(days: number) {
   const hours = days * 24;

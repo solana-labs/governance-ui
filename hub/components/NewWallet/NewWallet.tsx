@@ -9,16 +9,14 @@ import { useEffect, useMemo, useState } from 'react';
 import { NewWalletForm } from '../EditWalletRules/Form';
 import { NewWalletSummary } from '../EditWalletRules/Summary';
 import useProgramVersion from '@hooks/useProgramVersion';
+import useQueryContext from '@hooks/useQueryContext';
 import useRealm from '@hooks/useRealm';
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh';
 import { Primary, Secondary } from '@hub/components/controls/Button';
-import { Connect } from '@hub/components/GlobalHeader/User/Connect';
-import { useWallet } from '@hub/hooks/useWallet';
 import cx from '@hub/lib/cx';
 
 import useGovernanceDefaults from './useGovernanceDefaults';
 import useNewWalletCallback from './useNewWalletTransaction';
-import useQueryContext from '@hooks/useQueryContext';
 
 enum Step {
   Form,
