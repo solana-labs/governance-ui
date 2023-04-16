@@ -15,7 +15,7 @@ const MintPnft = () => {
       cluster: 'devnet',
     }).use(walletAdapterIdentity(wallet))
     const signerman = new Keypair()
-    const x = await metaplex.nfts().create({
+    await metaplex.nfts().create({
       updateAuthority: signerman,
       mintAuthority: signerman,
       useNewMint: signerman,

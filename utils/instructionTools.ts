@@ -26,7 +26,6 @@ import {
 import { ConnectionContext } from 'utils/connection'
 import { getATA } from './ataTools'
 import { isFormValid } from './formValidation'
-import { getTokenAccountsByMint } from './tokens'
 import { UiInstruction } from './uiTypes/proposalCreationTypes'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import {
