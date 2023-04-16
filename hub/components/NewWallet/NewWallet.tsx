@@ -67,6 +67,9 @@ function NewWalletWithDefaults({
   const [proposalDescription, setProposalDescription] = useState('');
   const [proposalTitle, setProposalTitle] = useState('');
 
+  // typically you should not initialize state from props.
+  // In this case, we DONT want to be reactive;
+  // if props change, it would be dangerous for the form's inputs to change to values the user didn't review
   const [rules, setRules] = useState(defaults);
 
   const callback = useNewWalletCallback(rules);
@@ -228,9 +231,10 @@ function NewWalletWithDefaults({
   );
 }
 
-// would be nice to have a hoc that just takes a hook an does this :thinking:
+// would be nice to have a hoc that just takes a hook and does this :thinking:
 export const NewWallet = (props: Props) => {
   const defaults = useGovernanceDefaults();
+
   return defaults ? (
     <NewWalletWithDefaults {...props} defaults={defaults} />
   ) : null;
