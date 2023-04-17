@@ -167,16 +167,6 @@ export async function createProposal(args: Args) {
   );
 
   const proposalIndex = governance.account.proposalCount;
-  const votingPlugins = await fetchPlugins(
-    args.connection,
-    realm.owner,
-    {
-      publicKey: args.requestingUserPublicKey,
-      signTransaction: args.signTransaction,
-      signAllTransactions: args.signAllTransactions,
-    } as Wallet,
-    args.cluster === 'devnet',
-  );
 
   const pluginPublicKey =
     realmConfig.account.communityTokenConfig.voterWeightAddin;
@@ -184,6 +174,16 @@ export async function createProposal(args: Args) {
   let votingNfts: NFTWithMeta[] = [];
 
   if (pluginPublicKey) {
+    const votingPlugins = await fetchPlugins(
+      args.connection,
+      pluginPublicKey,
+      {
+        publicKey: args.requestingUserPublicKey,
+        signTransaction: args.signTransaction,
+        signAllTransactions: args.signAllTransactions,
+      } as Wallet,
+      args.cluster === 'devnet',
+    );
     const pluginPublicKeyStr = pluginPublicKey.toBase58();
     let client: VotingClient['client'] = undefined;
     // Check for plugins in a particular order. I'm not sure why, but I
