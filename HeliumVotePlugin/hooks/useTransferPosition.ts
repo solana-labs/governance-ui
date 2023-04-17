@@ -8,10 +8,11 @@ import { PROGRAM_ID, init, daoKey } from '@helium/helium-sub-daos-sdk'
 import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
+import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
 
 export const useTransferPosition = () => {
   const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
-  const { realm } = useRealm()
+  const { mint, realm } = useRealm()
   const [{ client }] = useVotePluginsClientStore((s) => [
     s.state.currentRealmVotingClient,
     s.state.voteStakeRegistryRegistrarPk,
@@ -19,10 +20,12 @@ export const useTransferPosition = () => {
   const { error, loading, execute } = useAsyncCallback(
     async ({
       sourcePosition,
+      amount,
       targetPosition,
       programId = PROGRAM_ID,
     }: {
       sourcePosition: PositionWithMeta
+      amount: number
       targetPosition: PositionWithMeta
       programId?: PublicKey
     }) => {
@@ -31,6 +34,7 @@ export const useTransferPosition = () => {
         !connection.current ||
         !provider ||
         !realm ||
+        !mint ||
         !wallet ||
         !client ||
         !(client instanceof HeliumVsrClient)
@@ -45,11 +49,15 @@ export const useTransferPosition = () => {
       } else {
         const instructions: TransactionInstruction[] = []
         const [dao] = daoKey(realm.account.communityMint)
+        const amountToTransfer = getMintNaturalAmountFromDecimalAsBN(
+          amount,
+          mint!.decimals
+        )
 
         instructions.push(
           await hsdProgram.methods
             .transferV0({
-              amount: sourcePosition.amountDepositedNative,
+              amount: amountToTransfer,
             })
             .accounts({
               sourcePosition: sourcePosition.pubkey,
@@ -60,14 +68,16 @@ export const useTransferPosition = () => {
             .instruction()
         )
 
-        instructions.push(
-          await client.program.methods
-            .closePositionV0()
-            .accounts({
-              position: sourcePosition.pubkey,
-            })
-            .instruction()
-        )
+        if (amountToTransfer.eq(sourcePosition.amountDepositedNative)) {
+          instructions.push(
+            await client.program.methods
+              .closePositionV0()
+              .accounts({
+                position: sourcePosition.pubkey,
+              })
+              .instruction()
+          )
+        }
 
         const tx = new Transaction()
         tx.add(...instructions)
