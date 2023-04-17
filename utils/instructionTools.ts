@@ -260,6 +260,7 @@ export async function getTransferNftInstruction({
   currentAccount,
   nftMint,
   assetAccount,
+  programId,
 }: {
   toOwner: PublicKey
   programId: PublicKey
@@ -288,13 +289,19 @@ export async function getTransferNftInstruction({
     assetAccount.governance.pubkey.toString()
   )
 
+  // typically this should just be the same as the account that owns the NFT, but I'm just trying to be safe
+  const nativeTreasury = await getNativeTreasuryAddress(
+    programId,
+    assetAccount.governance.pubkey
+  )
+
   const transferIx = await createIx_transferNft(
     connection.current,
     assetAccount.pubkey,
     toOwner,
     mint,
     assetAccount.pubkey,
-    toOwner
+    nativeTreasury
   )
 
   return {
