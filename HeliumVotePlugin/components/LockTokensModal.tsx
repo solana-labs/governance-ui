@@ -185,6 +185,15 @@ export const LockTokensModal: React.FC<{
                 </div>
               </>
             ) : null}
+            {mode === 'extend' ? (
+              <>
+                <br />
+                <div className="text-red">
+                  Extending a Landrush position after the Landrush period will
+                  result in losing the multiplier!
+                </div>
+              </>
+            ) : null}
           </div>
         ) : null}
         {!showLockupKindInfo && (
