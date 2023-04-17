@@ -10,7 +10,7 @@ import { VsrClient } from 'VoteStakeRegistry/sdk/client';
 
 export async function fetchPlugins(
   connection: Connection,
-  programPublicKey: PublicKey,
+  pluginProgram: PublicKey,
   wallet: Wallet,
   isDevnet?: boolean,
 ) {
@@ -18,7 +18,7 @@ export async function fetchPlugins(
   const anchorProvider = new AnchorProvider(connection, wallet, defaultOptions);
 
   const [vsrClient, nftClient, gatewayClient, pythClient] = await Promise.all([
-    VsrClient.connect(anchorProvider, programPublicKey, isDevnet),
+    VsrClient.connect(anchorProvider, pluginProgram, isDevnet),
     NftVoterClient.connect(anchorProvider, isDevnet),
     GatewayClient.connect(anchorProvider, isDevnet),
     PythClient.connect(anchorProvider, connection.rpcEndpoint),
