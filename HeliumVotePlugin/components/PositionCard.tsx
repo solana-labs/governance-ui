@@ -479,6 +479,14 @@ export const PositionCard: React.FC<PositionCardProps> = ({
                             Transfer
                           </Button>
                         </div>
+                        <Button
+                          className="w-full"
+                          onClick={() => setIsExtendModalOpen(true)}
+                          disabled={isSubmitting}
+                          isLoading={isExtending}
+                        >
+                          Extend
+                        </Button>
                         {isConstant && (
                           <Button
                             onClick={handleUnlock}
@@ -488,14 +496,6 @@ export const PositionCard: React.FC<PositionCardProps> = ({
                             Unlock
                           </Button>
                         )}
-                        <Button
-                          className="w-full"
-                          onClick={() => setIsExtendModalOpen(true)}
-                          disabled={isSubmitting}
-                          isLoading={isExtending}
-                        >
-                          Extend
-                        </Button>
                         {canDelegate && (
                           <Button
                             className="w-full"
