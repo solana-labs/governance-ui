@@ -220,7 +220,6 @@ export const LockTokensAccount: React.FC<{
       amount,
       mint!.decimals
     )
-
     await createPosition({
       amount: amountToLock,
       lockupPeriodsInDays: lockupPeriodInDays,
@@ -355,6 +354,10 @@ export const LockTokensAccount: React.FC<{
                       key={idx}
                       position={pos}
                       subDaos={subDaos}
+                      tokenOwnerRecordPk={
+                        tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey ||
+                        null
+                      }
                       isOwner={isOwnerOfPositions}
                     />
                   ))}
