@@ -16,7 +16,6 @@ import useQueryContext from '@hooks/useQueryContext';
 import useRealm from '@hooks/useRealm';
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh';
 import { Primary, Secondary } from '@hub/components/controls/Button';
-import { Connect } from '@hub/components/GlobalHeader/User/Connect';
 import { useQuery } from '@hub/hooks/useQuery';
 import cx from '@hub/lib/cx';
 import { GovernanceTokenType } from '@hub/types/GovernanceTokenType';
