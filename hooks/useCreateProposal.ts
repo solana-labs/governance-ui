@@ -1,4 +1,3 @@
-import { ProgramAccount, Governance } from '@solana/spl-governance'
 import {
   createProposal,
   InstructionDataWithHoldUpTime,
@@ -7,14 +6,17 @@ import useWalletStore from 'stores/useWalletStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useRealm from './useRealm'
 import useRpcContext from './useRpcContext'
+import { fetchGovernanceByPubkey } from './queries/governance'
+import { PublicKey } from '@solana/web3.js'
 
 export default function useCreateProposal() {
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
-  const { fetchRealmGovernance, refetchProposals } = useWalletStore(
-    (s) => s.actions
-  )
+  const { refetchProposals } = useWalletStore((s) => s.actions)
+
+  const connection = useWalletStore((s) => s.connection)
+
   const {
     realm,
     ownVoterWeight,
@@ -24,6 +26,8 @@ export default function useCreateProposal() {
     config,
   } = useRealm()
   const { getRpcContext } = useRpcContext()
+
+  /** @deprecated */
   const handleCreateProposal = async ({
     title,
     description,
@@ -34,13 +38,19 @@ export default function useCreateProposal() {
   }: {
     title: string
     description: string
-    governance: ProgramAccount<Governance>
+    governance: { pubkey: PublicKey }
     instructionsData: InstructionDataWithHoldUpTime[]
     voteByCouncil?: boolean
     isDraft?: boolean
   }) => {
+    const { result: selectedGovernance } = await fetchGovernanceByPubkey(
+      connection.current,
+      governance.pubkey
+    )
+    if (!selectedGovernance) throw new Error('governance not found')
+
     const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-      governance!.account.config,
+      selectedGovernance.config,
       voteByCouncil
     )
 
@@ -61,20 +71,16 @@ export default function useCreateProposal() {
       throw new Error('There is no suitable governing token for the proposal')
     }
     const rpcContext = getRpcContext()
-    // Fetch governance to get up to date proposalCount
-    const selectedGovernance = (await fetchRealmGovernance(
-      governance?.pubkey
-    )) as ProgramAccount<Governance>
 
     const proposalAddress = await createProposal(
       rpcContext,
       realm!,
-      selectedGovernance.pubkey,
+      governance.pubkey,
       ownTokenRecord!,
       title,
       description,
       proposalMint,
-      selectedGovernance?.account?.proposalCount,
+      selectedGovernance.proposalCount,
       instructionsData,
       isDraft,
       client
@@ -82,5 +88,15 @@ export default function useCreateProposal() {
     await refetchProposals()
     return proposalAddress
   }
-  return { handleCreateProposal }
+
+  const propose = (
+    params: Omit<Parameters<typeof handleCreateProposal>[0], 'governance'> & {
+      governance: PublicKey
+    }
+  ) => {
+    const { governance, ...rest } = params
+    return handleCreateProposal({ ...rest, governance: { pubkey: governance } })
+  }
+
+  return { handleCreateProposal, propose }
 }
