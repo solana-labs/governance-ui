@@ -18,6 +18,7 @@ import {
 import { createATA } from '@utils/ataTools'
 import { createIx_transferNft } from '@utils/metaplex'
 import { SequenceType, sendTransactionsV3 } from '@utils/sendTransactions'
+import { getNativeTreasuryAddress } from '@solana/spl-governance'
 
 const useMetaplexDeposit = () => {
   const wallet = useWalletOnePointOh()
@@ -28,9 +29,11 @@ const useMetaplexDeposit = () => {
     if (!wallet?.publicKey) throw new Error()
     if (!currentAccount) throw new Error()
 
-    const toOwner = currentAccount.isSol
-      ? currentAccount.extensions.transferAddress!
-      : currentAccount.governance!.pubkey // TODO use the native treasury
+    // ostensibly currentAccount should in fact be a native treasury, but I haven't verified this.
+    const toOwner = await getNativeTreasuryAddress(
+      currentAccount.governance.owner,
+      currentAccount.governance.pubkey
+    )
 
     const ix = await createIx_transferNft(
       connection.current,
@@ -40,7 +43,6 @@ const useMetaplexDeposit = () => {
       wallet.publicKey,
       wallet.publicKey
     )
-    console.log('IX', ix)
 
     await sendTransactionsV3({
       connection: connection.current,
