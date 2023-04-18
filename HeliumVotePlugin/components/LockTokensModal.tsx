@@ -181,7 +181,7 @@ export const LockTokensModal: React.FC<{
                 <br />
                 <div className="text-red">
                   Splitting a Landrush position after the Landrush period will
-                  result in losing the multiplier!
+                  result in the split tokens losing the multiplier!
                 </div>
               </>
             ) : null}

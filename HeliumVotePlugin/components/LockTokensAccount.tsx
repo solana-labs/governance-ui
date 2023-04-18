@@ -336,7 +336,7 @@ export const LockTokensAccount: React.FC<{
             </div>
             <h2 className="mb-4">Locked Positions</h2>
             <div
-              className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8 ${
+              className={`grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8 ${
                 !isOwnerOfPositions ? 'opacity-0.8 pointer-events-none' : ''
               }`}
             >
