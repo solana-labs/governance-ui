@@ -66,7 +66,7 @@ export const DelegateTokensModal: React.FC<DelegateTokensModalProps> = ({
           <div>Select an existing subdao too delegate too</div>
           <br />
           <div>
-            Once delegated, you can't perform any actions on this position until
+            Once delegated, you can&apos;t perform any actions on this position until
             you undelegate
           </div>
           <div className="w-full flex flex-col gap-2 pt-4">
