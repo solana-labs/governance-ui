@@ -27,7 +27,7 @@ export default function useCreateProposal() {
   } = useRealm()
   const { getRpcContext } = useRpcContext()
 
-  /** @deprecated */
+  /** @deprecated because the api is goofy, use `propose` */
   const handleCreateProposal = async ({
     title,
     description,
