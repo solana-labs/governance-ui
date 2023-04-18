@@ -18,24 +18,28 @@ export const context = createContext(DEFAULT);
 
 interface Props {
   children: React.ReactNode;
+  disabled?: boolean;
 }
 
 export function JWTProvider(props: Props) {
   const [jwt, _setJwt] = useState<string | null>(
-    typeof localStorage === 'undefined' ? null : localStorage.getItem('user'),
+    typeof localStorage === 'undefined' || props.disabled
+      ? null
+      : localStorage.getItem('user'),
   );
 
   const handleStorageChange = useCallback((event: StorageEvent) => {
     if (event.storageArea === localStorage && event.key === 'user') {
       gqlStores.destroy(event.oldValue);
-      _setJwt(event.newValue);
+      const newValue = props.disabled ? null : event.newValue;
+      _setJwt(newValue);
     }
   }, []);
 
   const setJwt = useCallback(
     (jwt: string | null) => {
       if (typeof localStorage !== 'undefined') {
-        if (jwt) {
+        if (jwt && !props.disabled) {
           localStorage.setItem('user', jwt);
           _setJwt((current) => {
             gqlStores.destroy(current);
@@ -56,7 +60,7 @@ export function JWTProvider(props: Props) {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       window.addEventListener('storage', handleStorageChange);
-      _setJwt(localStorage.getItem('user'));
+      setJwt(props.disabled ? null : localStorage.getItem('user'));
     }
 
     return () => {

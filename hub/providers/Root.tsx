@@ -13,6 +13,7 @@ import { WalletProvider } from './Wallet';
 
 interface Props {
   children: React.ReactNode;
+  disableJwts?: boolean;
 }
 
 export function RootProvider(props: Props) {
@@ -29,7 +30,7 @@ export function RootProvider(props: Props) {
         'px-4',
       )}
     >
-      <JWTProvider>
+      <JWTProvider disabled={props.disableJwts}>
         <ClusterProvider>
           <WalletProvider>
             <GraphQLProvider>

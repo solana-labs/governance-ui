@@ -1,5 +1,6 @@
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import * as IT from 'io-ts';
+import { useEffect } from 'react';
 import { gql } from 'urql';
 
 import { SolanaLogo } from '@hub/components/branding/SolanaLogo';
@@ -38,6 +39,7 @@ const getTokenResp = IT.type({
 interface Props {
   className?: string;
   compressed?: boolean;
+  doNotUseJwts?: boolean;
   onConnected?(): void;
 }
 
@@ -47,6 +49,13 @@ export function Connect(props: Props) {
   const [, createToken] = useMutation(getTokenResp, getToken);
   const [, setJwt] = useJWT();
   const { publish } = useToast();
+
+  useEffect(() => {
+    if (props.doNotUseJwts) {
+      setSoftConnect(true);
+      connect();
+    }
+  }, [props.doNotUseJwts]);
 
   return (
     <NavigationMenu.Item>

@@ -1,4 +1,5 @@
 import { pipe } from 'fp-ts/function';
+import { useRouter } from 'next/router';
 
 import { useJWT } from '@hub/hooks/useJWT';
 import { useQuery } from '@hub/hooks/useQuery';
@@ -19,6 +20,11 @@ interface Props {
 }
 
 export function User(props: Props) {
+  const router = useRouter();
+  const isHybridRealmsHubPage =
+    router.pathname.startsWith('/realm/[id]/governance') ||
+    router.pathname.startsWith('/realm/[id]/config');
+
   const [result, refetch] = useQuery(gql.getUserResp, { query: gql.getUser });
   const { publicKey, softConnect } = useWallet();
   const [jwt] = useJWT();
@@ -40,6 +46,7 @@ export function User(props: Props) {
         <Connect
           className={props.className}
           compressed={props.compressed}
+          doNotUseJwts={isHybridRealmsHubPage}
           onConnected={() => refetch({})}
         />
       ),

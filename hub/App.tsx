@@ -58,22 +58,22 @@ interface Props {
 
 export function App(props: Props) {
   const router = useRouter();
-  const isDarkMode =
+  const isHybridRealmsHubPage =
     router.pathname.startsWith('/realm/[id]/governance') ||
     router.pathname.startsWith('/realm/[id]/config');
 
   useEffect(() => {
-    if (isDarkMode) {
+    if (isHybridRealmsHubPage) {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
-  }, [isDarkMode]);
+  }, [isHybridRealmsHubPage]);
 
   return (
-    <RootProvider>
+    <RootProvider disableJwts={isHybridRealmsHubPage}>
       <Head>
-        {isDarkMode && (
+        {isHybridRealmsHubPage && (
           <style
             dangerouslySetInnerHTML={{
               __html: `
