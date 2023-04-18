@@ -283,12 +283,6 @@ export async function getTransferNftInstruction({
   const destinationAtaQueried = await connection.current.getAccountInfo(
     destinationAtaPk
   )
-  console.log('asset account', assetAccount.pubkey.toString())
-  console.log(
-    'asset account governance',
-    assetAccount.governance.pubkey.toString()
-  )
-
   // typically this should just be the same as the account that owns the NFT, but I'm just trying to be safe
   const nativeTreasury = await getNativeTreasuryAddress(
     programId,
