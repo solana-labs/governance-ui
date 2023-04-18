@@ -327,37 +327,7 @@ export function EditWalletRules(props: Props) {
                             },
                           );
 
-                          const governingTokenMintPublicKey =
-                            proposalVoteType === 'council' &&
-                            governance.councilTokenRules
-                              ? governance.councilTokenRules.tokenMintAddress
-                              : governance.communityTokenRules.tokenMintAddress;
-
                           try {
-                            /* const proposalAddress = await createProposal({
-                              governingTokenMintPublicKey,
-                              programPublicKey: realm.owner,
-                              proposalDescription,
-                              proposalTitle,
-                              governancePublicKey: governance.governanceAddress,
-                              instructions: [transaction],
-                              isDraft: false,
-                              realmPublicKey: realm.pubkey,
-                              councilTokenMintPublicKey:
-                                governance.councilTokenRules
-                                  ?.tokenMintAddress || undefined,
-                              communityTokenMintPublicKey:
-                                governance.communityTokenRules.tokenMintAddress,
-                            }); */
-
-                            function hoursToSeconds(hours: number) {
-                              return hours * 60 * 60;
-                            }
-
-                            function daysToSeconds(days: number) {
-                              return hoursToSeconds(days * 24);
-                            }
-
                             const proposalAddress = await propose({
                               title: proposalTitle,
                               description: proposalDescription,
@@ -365,9 +335,11 @@ export function EditWalletRules(props: Props) {
                               instructionsData: [
                                 {
                                   data: createInstructionData(instruction),
-                                  holdUpTime: daysToSeconds(
+                                  holdUpTime:
+                                    60 *
+                                    60 *
+                                    24 *
                                     governance.minInstructionHoldupDays,
-                                  ),
                                   prerequisiteInstructions: [],
                                 },
                               ],
