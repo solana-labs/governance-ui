@@ -80,10 +80,10 @@ export const TransferTokensModal: React.FC<TransferTokensModalProps> = ({
     <Modal onClose={onClose} isOpen={isOpen}>
       <h2 className="mb-4 flex flex-row items-center">Transfer Tokens</h2>
       <div className="bg-bkg-3 rounded-md w-full p-4 mb-4 font-normal text-xs">
-        <div>Select an existing positon to transfer too</div>
+        <div>Select an existing positon to transfer to</div>
         <br />
         <div>
-          You can only transfer to positions that have greater than or equal
+          You can only transfer to positions that have a greater than or equal
           lockup time.
         </div>
         <br />
