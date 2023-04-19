@@ -8,7 +8,7 @@ import { PROGRAM_ID, init, daoKey } from '@helium/helium-sub-daos-sdk'
 import { secsToDays } from '@utils/dateTools'
 import useRealm from '@hooks/useRealm'
 
-export const useUnlockPosition = () => {
+export const useFlipPositionLockupKind = () => {
   const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
   const { realm } = useRealm()
   const { error, loading, execute } = useAsyncCallback(
@@ -26,21 +26,28 @@ export const useUnlockPosition = () => {
         !wallet ||
         position.numActiveVotes > 0
 
+      const lockupKind = Object.keys(position.lockup.kind)[0] as string
+      const isConstant = lockupKind === 'constant'
       const idl = await Program.fetchIdl(programId, provider)
       const hsdProgram = await init(provider as any, programId, idl)
 
       if (loading) return
 
       if (isInvalid) {
-        throw new Error('Unable to Unlock Position, Invalid params')
+        if (isConstant) {
+          throw new Error('Unable to Unlock Position, Invalid params')
+        } else {
+          throw new Error('Unable to Pause Position, Invalid params')
+        }
       } else {
         const instructions: TransactionInstruction[] = []
         const [dao] = daoKey(realm.account.communityMint)
+        const kind = isConstant ? { cliff: {} } : { constant: {} }
 
         instructions.push(
           await hsdProgram.methods
             .resetLockupV0({
-              kind: { cliff: {} },
+              kind,
               periods: secsToDays(
                 position.lockup.endTs.sub(position.lockup.startTs).toNumber()
               ),
@@ -59,8 +66,10 @@ export const useUnlockPosition = () => {
           wallet,
           connection: connection.current,
           signers: [],
-          sendingMessage: `Unlocking`,
-          successMessage: `Unlocking successful`,
+          sendingMessage: isConstant ? `Unlocking` : `Pausing`,
+          successMessage: isConstant
+            ? `Unlocking successful`
+            : `Pausing successful`,
         })
       }
     }
@@ -69,6 +78,6 @@ export const useUnlockPosition = () => {
   return {
     error,
     loading,
-    unlockPosition: execute,
+    flipPositionLockupKind: execute,
   }
 }
