@@ -215,8 +215,8 @@ export const PositionCard: React.FC<PositionCardProps> = ({
         type: 'error',
         message:
           e.message || isConstant
-            ? 'Unable to unlock tokens'
-            : 'Unable to pause cooldown',
+            ? 'Unable to unlock position'
+            : 'Unable to pause unlock',
       })
     }
   }
