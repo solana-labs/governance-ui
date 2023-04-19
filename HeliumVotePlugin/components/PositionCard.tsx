@@ -24,7 +24,7 @@ import {
 } from '../components/LockTokensModal'
 import { TransferTokensModal } from './TransferTokensModal'
 import { calcLockupMultiplier } from '../utils/calcLockupMultiplier'
-import { useUnlockPosition } from '../hooks/useUnlockPosition'
+import { useFlipPositionLockupKind } from '../hooks/useFlipPositionLockupKind'
 import { useExtendPosition } from '../hooks/useExtendPosition'
 import { useSplitPosition } from '../hooks/useSplitPosition'
 import { useTransferPosition } from '../hooks/useTransferPosition'
@@ -114,10 +114,10 @@ export const PositionCard: React.FC<PositionCardProps> = ({
   } = useSplitPosition()
 
   const {
-    loading: isUnlocking,
-    error: unlockingError,
-    unlockPosition,
-  } = useUnlockPosition()
+    loading: isFlipping,
+    error: flippingError,
+    flipPositionLockupKind,
+  } = useFlipPositionLockupKind()
 
   const {
     loading: isTransfering,
@@ -203,17 +203,20 @@ export const PositionCard: React.FC<PositionCardProps> = ({
     })
   }
 
-  const handleUnlock = async () => {
+  const handleFlipPositionLockupKind = async () => {
     try {
-      await unlockPosition({ position })
+      await flipPositionLockupKind({ position })
 
-      if (!unlockingError) {
+      if (!flippingError) {
         await refetchState()
       }
     } catch (e) {
       notify({
         type: 'error',
-        message: e.message || 'Unable to unlock tokens',
+        message:
+          e.message || isConstant
+            ? 'Unable to unlock tokens'
+            : 'Unable to pause cooldown',
       })
     }
   }
@@ -335,7 +338,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
     isSpliting ||
     isClosing ||
     isTransfering ||
-    isUnlocking ||
+    isFlipping ||
     isDelegating ||
     isUndelegating ||
     isClaimingRewards
@@ -487,13 +490,21 @@ export const PositionCard: React.FC<PositionCardProps> = ({
                         >
                           Extend
                         </Button>
-                        {isConstant && (
+                        {isConstant ? (
                           <Button
-                            onClick={handleUnlock}
+                            onClick={handleFlipPositionLockupKind}
                             disabled={isSubmitting}
-                            isLoading={isUnlocking}
+                            isLoading={isFlipping}
                           >
-                            Unlock
+                            Start Unlock
+                          </Button>
+                        ) : (
+                          <Button
+                            onClick={handleFlipPositionLockupKind}
+                            disabled={isSubmitting}
+                            isLoading={isFlipping}
+                          >
+                            Pause Unlock
                           </Button>
                         )}
                         {canDelegate && (
