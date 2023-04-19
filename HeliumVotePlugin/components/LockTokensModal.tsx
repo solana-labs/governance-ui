@@ -14,6 +14,10 @@ import { notify } from '@utils/notifications'
 
 export const defaultLockupPeriods = [
   {
+    value: 183,
+    display: '6m',
+  },
+  {
     value: yearsToDays(1),
     display: '1y',
   },
@@ -28,10 +32,6 @@ export const defaultLockupPeriods = [
   {
     value: yearsToDays(4),
     display: '4y',
-  },
-  {
-    value: yearsToDays(5),
-    display: '5y',
   },
 ]
 
