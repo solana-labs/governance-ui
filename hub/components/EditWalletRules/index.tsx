@@ -25,9 +25,9 @@ import { GovernanceVoteTipping } from '@hub/types/GovernanceVoteTipping';
 import * as RE from '@hub/types/Result';
 
 import { createTransaction } from './createTransaction';
-import { Form } from './Form';
+import { EditWalletForm } from './Form';
 import * as gql from './gql';
-import { Summary } from './Summary';
+import { EditWalletSummary } from './Summary';
 import { CommunityRules, CouncilRules } from './types';
 
 enum Step {
@@ -207,13 +207,13 @@ export function EditWalletRules(props: Props) {
               <div className="py-16">
                 {step === Step.Form && (
                   <>
-                    <Form
+                    <EditWalletForm
                       className="mb-16"
                       communityRules={communityRules}
                       coolOffHours={coolOffHours}
                       councilRules={councilRules}
-                      currentCommunityRules={governance.communityTokenRules}
-                      currentCouncilRules={governance.councilTokenRules}
+                      initialCommunityRules={governance.communityTokenRules}
+                      initialCouncilRules={governance.councilTokenRules}
                       depositExemptProposalCount={depositExemptProposalCount}
                       governanceAddress={governance.governanceAddress}
                       maxVoteDays={maxVoteDays}
@@ -268,19 +268,19 @@ export function EditWalletRules(props: Props) {
                 )}
                 {step === Step.Summary && (
                   <>
-                    <Summary
+                    <EditWalletSummary
                       className="mb-16"
                       communityRules={communityRules}
                       coolOffHours={coolOffHours}
                       councilRules={councilRules}
-                      currentCommunityRules={governance.communityTokenRules}
-                      currentCoolOffHours={governance.coolOffHours}
-                      currentCouncilRules={governance.councilTokenRules}
-                      currentDepositExemptProposalCount={
+                      initialCommunityRules={governance.communityTokenRules}
+                      initialCoolOffHours={governance.coolOffHours}
+                      initialCouncilRules={governance.councilTokenRules}
+                      initialDepositExemptProposalCount={
                         governance.depositExemptProposalCount
                       }
-                      currentBaseVoteDays={governance.maxVoteDays}
-                      currentMinInstructionHoldupDays={
+                      initialBaseVoteDays={governance.maxVoteDays}
+                      initialMinInstructionHoldupDays={
                         governance.minInstructionHoldupDays
                       }
                       depositExemptProposalCount={depositExemptProposalCount}
