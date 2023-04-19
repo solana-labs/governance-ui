@@ -1,26 +1,33 @@
 import useWalletDeprecated from '@hooks/useWalletDeprecated'
-import { Transaction, TransactionInstruction } from '@solana/web3.js'
+import { Program } from '@coral-xyz/anchor'
+import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 import { useAsyncCallback } from 'react-async-hook'
 import { sendTransaction } from '@utils/send'
 import { PositionWithMeta } from '../sdk/types'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
+import { PROGRAM_ID, init, daoKey } from '@helium/helium-sub-daos-sdk'
 import { secsToDays } from '@utils/dateTools'
+import useRealm from '@hooks/useRealm'
 
 export const useUnlockPosition = () => {
-  const { connection, wallet } = useWalletDeprecated()
-  const [{ client }] = useVotePluginsClientStore((s) => [
-    s.state.currentRealmVotingClient,
-  ])
+  const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
+  const { realm } = useRealm()
   const { error, loading, execute } = useAsyncCallback(
-    async ({ position }: { position: PositionWithMeta }) => {
+    async ({
+      position,
+      programId = PROGRAM_ID,
+    }: {
+      position: PositionWithMeta
+      programId?: PublicKey
+    }) => {
       const isInvalid =
         !connection ||
         !connection.current ||
-        !client ||
-        !(client instanceof HeliumVsrClient) ||
+        !realm ||
         !wallet ||
         position.numActiveVotes > 0
+
+      const idl = await Program.fetchIdl(programId, provider)
+      const hsdProgram = await init(provider as any, programId, idl)
 
       if (loading) return
 
@@ -28,9 +35,10 @@ export const useUnlockPosition = () => {
         throw new Error('Unable to Unlock Position, Invalid params')
       } else {
         const instructions: TransactionInstruction[] = []
+        const [dao] = daoKey(realm.account.communityMint)
 
         instructions.push(
-          await client.program.methods
+          await hsdProgram.methods
             .resetLockupV0({
               kind: { cliff: {} },
               periods: secsToDays(
@@ -39,6 +47,7 @@ export const useUnlockPosition = () => {
             } as any)
             .accounts({
               position: position.pubkey,
+              dao: dao,
             })
             .instruction()
         )
