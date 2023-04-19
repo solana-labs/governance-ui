@@ -395,7 +395,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
                 />
               )}
               <CardLabel
-                label={isConstant ? 'Min. Duration' : 'Time left'}
+                label={isConstant ? 'Min Duration' : 'Time left'}
                 value={
                   isConstant
                     ? getMinDurationFmt(
