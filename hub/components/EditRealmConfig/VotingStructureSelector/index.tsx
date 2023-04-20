@@ -262,7 +262,8 @@ export function VotingStructureSelector(props: Props) {
         )}
         <DropdownMenu.Portal>
           <DropdownMenu.Content
-            className="space-y-0.5 bg-white dark:bg-black"
+            // weo weo z-index crap
+            className="dark space-y-0.5 z-20"
             sideOffset={2}
             style={{ width }}
           >

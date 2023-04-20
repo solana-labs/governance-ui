@@ -12,7 +12,6 @@ import Button from '@components/Button'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { useRouter } from 'next/router'
 
-import RealmConfigModal from './RealmConfigModal'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { getAccountName } from '@components/instructions/tools'
 import SetRealmAuthorityModal from './SetRealmAuthorityModal'
@@ -67,9 +66,7 @@ const Params = () => {
   const realmAuthorityGovernance = governancesArray.find(
     (x) => x.pubkey.toBase58() === realm?.account.authority?.toBase58()
   )
-  const [isRealmProposalModalOpen, setIsRealmProposalModalOpen] = useState(
-    false
-  )
+
   const [activeGovernance, setActiveGovernance] = useState<any>(null)
   const [activeTab, setActiveTab] = useState('Params')
   const [isRealmAuthorityModalOpen, setRealmAuthorityModalIsOpen] = useState(
@@ -85,9 +82,6 @@ const Params = () => {
   const communityMintMaxVoteWeightSource =
     realmAccount?.config.communityMintMaxVoteWeightSource
   const realmConfig = realmAccount?.config
-  const closeRealmProposalModal = () => {
-    setIsRealmProposalModalOpen(false)
-  }
   const openMetadataCreationModal = () => {
     setIsMetadataCreationModalOpen(true)
   }
@@ -118,12 +112,6 @@ const Params = () => {
 
   return (
     <div className="grid grid-cols-12 gap-4">
-      {isRealmProposalModalOpen && (
-        <RealmConfigModal
-          isProposalModalOpen={isRealmProposalModalOpen}
-          closeProposalModal={closeRealmProposalModal}
-        ></RealmConfigModal>
-      )}
       {isRealmAuthorityModalOpen && (
         <SetRealmAuthorityModal
           isOpen={isRealmAuthorityModalOpen}
@@ -261,7 +249,7 @@ const Params = () => {
                     }
                     onClick={() => {
                       router.push(
-                        fmtUrlWithCluster(`/realm/${symbol}/config/edit`)
+                        fmtUrlWithCluster(`/dao/${symbol}/editConfig`)
                       )
                     }}
                     className="ml-auto"
