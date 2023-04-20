@@ -295,7 +295,6 @@ export function EditRealmConfig(props: Props) {
                           const userPublicKey = wallet.publicKey;
 
                           const instructions = await createTransaction(
-                            realm.owner,
                             realm.pubkey,
                             governance.governanceAddress,
                             config,
