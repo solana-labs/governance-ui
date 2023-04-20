@@ -347,8 +347,8 @@ const EditToken = ({
         borrowWeightScaleStartQuote: currentToken.borrowWeightScaleStartQuote,
         depositWeightScaleStartQuote: currentToken.depositWeightScaleStartQuote,
         groupInsuranceFund: !!groupInsuranceFund,
-        reduceOnly: currentToken.reduceOnly,
-        forceClose: false,
+        reduceOnly: !!currentToken.reduceOnly,
+        forceClose: currentToken.forceClose,
       }
       setForm({
         ...vals,
