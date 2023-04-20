@@ -249,7 +249,7 @@ const Params = () => {
                     }
                     onClick={() => {
                       router.push(
-                        fmtUrlWithCluster(`/realm/${symbol}/config/edit`)
+                        fmtUrlWithCluster(`/dao/${symbol}/editConfig`)
                       )
                     }}
                     className="ml-auto"
