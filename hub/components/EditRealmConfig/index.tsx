@@ -177,7 +177,7 @@ export function EditRealmConfig(props: Props) {
       ({ realmByUrlId }) => {
         if (!wallet?.publicKey) {
           return (
-            <div className={cx(props.className, 'dark:bg-neutral-900')}>
+            <div className={cx(props.className)}>
               <Head>
                 <title>Edit Org Config - {realmByUrlId.name}</title>
                 <meta
