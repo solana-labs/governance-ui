@@ -1,7 +1,7 @@
 import CheckmarkIcon from '@carbon/icons-react/lib/Checkmark';
 import ChevronLeftIcon from '@carbon/icons-react/lib/ChevronLeft';
 import EditIcon from '@carbon/icons-react/lib/Edit';
-import { getRealm } from '@solana/spl-governance';
+import { createInstructionData } from '@solana/spl-governance';
 import { PublicKey } from '@solana/web3.js';
 import { BigNumber } from 'bignumber.js';
 import { hoursToSeconds, secondsToHours } from 'date-fns';
@@ -11,18 +11,18 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 import { getAccountName } from '@components/instructions/tools';
+import useCreateProposal from '@hooks/useCreateProposal';
+import useQueryContext from '@hooks/useQueryContext';
+import useRealm from '@hooks/useRealm';
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh';
 import { Primary, Secondary } from '@hub/components/controls/Button';
-import { Connect } from '@hub/components/GlobalHeader/User/Connect';
-import { ProposalCreationProgress } from '@hub/components/ProposalCreationProgress';
-import { useCluster, ClusterType } from '@hub/hooks/useCluster';
-import { useProposal } from '@hub/hooks/useProposal';
 import { useQuery } from '@hub/hooks/useQuery';
-import { useToast, ToastType } from '@hub/hooks/useToast';
-import { useWallet } from '@hub/hooks/useWallet';
 import cx from '@hub/lib/cx';
 import { GovernanceTokenType } from '@hub/types/GovernanceTokenType';
 import { GovernanceVoteTipping } from '@hub/types/GovernanceVoteTipping';
 import * as RE from '@hub/types/Result';
+
+import { notify } from '@utils/notifications';
 
 import { createTransaction } from './createTransaction';
 import { EditWalletForm } from './Form';
@@ -55,19 +55,19 @@ function stepName(step: Step): string {
 
 interface Props {
   className?: string;
-  realmUrlId: string;
   governanceAddress: PublicKey;
 }
 
 export function EditWalletRules(props: Props) {
-  const [cluster] = useCluster();
-  const wallet = useWallet();
-  const { createProposal, progress } = useProposal();
-  const { publish } = useToast();
+  const { fmtUrlWithCluster } = useQueryContext();
+  const wallet = useWalletOnePointOh();
+  const { propose } = useCreateProposal();
+  const { symbol, realm } = useRealm();
+
   const [result] = useQuery(gql.getGovernanceRulesResp, {
     query: gql.getGovernanceRules,
     variables: {
-      realmUrlId: props.realmUrlId,
+      realmUrlId: symbol,
       governancePublicKey: props.governanceAddress.toBase58(),
     },
   });
@@ -153,13 +153,13 @@ export function EditWalletRules(props: Props) {
     RE.match(
       () => <div />,
       () => <div />,
-      ({ me, realmByUrlId: { governance, publicKey } }) => {
+      ({ realmByUrlId: { governance } }) => {
         const walletName =
           getAccountName(governance.walletAddress) ||
           getAccountName(governance.governanceAddress) ||
           governance.walletAddress.toBase58();
 
-        if (!me && !(wallet.softConnect && wallet.publicKey)) {
+        if (!wallet?.publicKey) {
           return (
             <div className={cx(props.className, 'dark:bg-neutral-900')}>
               <Head>
@@ -177,7 +177,6 @@ export function EditWalletRules(props: Props) {
                     <br />
                     for "{walletName}"
                   </div>
-                  <Connect />
                 </div>
               </div>
             </div>
@@ -186,7 +185,6 @@ export function EditWalletRules(props: Props) {
 
         return (
           <div className={cx(props.className, 'dark:bg-neutral-900')}>
-            <ProposalCreationProgress progress={progress} />
             <div className="w-full max-w-3xl pt-14 mx-auto">
               <Head>
                 <title>Edit Wallet Rules - {walletName}</title>
@@ -307,17 +305,12 @@ export function EditWalletRules(props: Props) {
                         className="ml-16 h-14 w-44"
                         pending={submitting}
                         onClick={async () => {
+                          if (!realm) throw new Error();
+
                           setSubmitting(true);
 
-                          const realm = await getRealm(
-                            cluster.connection,
-                            publicKey,
-                          );
-
-                          const programPublicKey = realm.owner;
-
-                          const transaction = createTransaction(
-                            programPublicKey,
+                          const instruction = createTransaction(
+                            realm.owner,
                             governance.version,
                             governance.governanceAddress,
                             {
@@ -333,43 +326,37 @@ export function EditWalletRules(props: Props) {
                             },
                           );
 
-                          const governingTokenMintPublicKey =
-                            proposalVoteType === 'council' &&
-                            governance.councilTokenRules
-                              ? governance.councilTokenRules.tokenMintAddress
-                              : governance.communityTokenRules.tokenMintAddress;
-
                           try {
-                            const proposalAddress = await createProposal({
-                              governingTokenMintPublicKey,
-                              proposalDescription,
-                              proposalTitle,
-                              governancePublicKey: governance.governanceAddress,
-                              instructions: [transaction],
-                              isDraft: false,
-                              realmPublicKey: publicKey,
-                              councilTokenMintPublicKey:
-                                governance.councilTokenRules
-                                  ?.tokenMintAddress || undefined,
-                              communityTokenMintPublicKey:
-                                governance.communityTokenRules.tokenMintAddress,
+                            const proposalAddress = await propose({
+                              title: proposalTitle,
+                              description: proposalDescription,
+                              voteByCouncil: proposalVoteType === 'council',
+                              instructionsData: [
+                                {
+                                  data: createInstructionData(instruction),
+                                  holdUpTime:
+                                    60 *
+                                    60 *
+                                    24 *
+                                    governance.minInstructionHoldupDays,
+                                  prerequisiteInstructions: [],
+                                },
+                              ],
+                              governance: props.governanceAddress,
                             });
 
                             if (proposalAddress) {
                               router.push(
-                                `/dao/${
-                                  props.realmUrlId
-                                }/proposal/${proposalAddress.toBase58()}` +
-                                  (cluster.type === ClusterType.Devnet
-                                    ? '?cluster=devnet'
-                                    : ''),
+                                fmtUrlWithCluster(
+                                  `/dao/${symbol}/proposal/${proposalAddress.toBase58()}`,
+                                ),
                               );
                             }
                           } catch (e) {
-                            publish({
-                              type: ToastType.Error,
-                              title: 'Could not create proposal.',
-                              message: String(e),
+                            notify({
+                              type: 'error',
+                              message:
+                                'Could not create proposal: ' + String(e),
                             });
                           }
 
