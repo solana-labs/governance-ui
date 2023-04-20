@@ -17,6 +17,7 @@ import useWalletStore from 'stores/useWalletStore';
 
 import useCreateProposal from '@hooks/useCreateProposal';
 import useQueryContext from '@hooks/useQueryContext';
+import useRealm from '@hooks/useRealm';
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh';
 import { Primary, Secondary } from '@hub/components/controls/Button';
 import { useQuery } from '@hub/hooks/useQuery';
@@ -31,7 +32,6 @@ import { Form } from './Form';
 import * as gql from './gql';
 import { RealmHeader } from './RealmHeader';
 import { Summary } from './Summary';
-import useRealm from '@hooks/useRealm';
 
 type Governance = TypeOf<
   typeof gql.getGovernanceResp
