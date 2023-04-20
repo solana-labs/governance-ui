@@ -243,12 +243,17 @@
   },
   {
     "symbol": "WEZ",
-    "displayName": "Wezesha",
+    "category": "web3",
+    "displayName": "Wezesha DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "FEtF7V55LorZmUriVVobubPvLXoS7sfP3smzb5zR4BWz",
+    "realmId": "3QF8K3jK8Kpn7Ls9Wn3FcFWquKGcJHUfnD25bTufWeLL",
+    "bannerImage": "/realms/WezeshaDAO/img/WezeshaBanner.png",
+    "sortRank": 3,
+    "shortDescription": "Wezesha means 'to enable' in Swahili. We want to enable tech progress and web3 in the ascending world.",
     "website": "https://wezesha.co",
     "keywords": "Wezesha DAO, Wezesha, Wezesha Coin, The Big Five NFTs Club, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, SPL-TOKEN, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
-    "twitter": "@WezeshaCo",
+    "twitter": "@WezeshaDAO",
+    "discord": "https://discord.com/invite/erCSgXqhGu",
     "ogImage": "/realms/WezeshaDAO/img/wezesha_dao_logo.png"
   },
   {
@@ -279,6 +284,19 @@
     "website": "https://www.orca.so/",
     "twitter": "@orca_so",
     "ogImage": "https://miro.medium.com/fit/c/176/176/1*-mdTTAgsSuBYSfDqG6Fd1w.png"
+  },
+  {
+    "symbol": "PHY",
+    "displayName": "Physis",
+    "category": "web3",
+    "sortRank": 3,
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "DsWWtZrqXBcqTTPoEyFH793Euq82r95CuXWTwqo3JZur",
+    "website": "https://phys.is",
+    "keywords": "Physis, PhysisVerse, PHY, Metaverse, XR, ASTRALIS, AI, Web3, Governance, Solana, SOL",
+    "twitter": "@PhysisVerse",
+    "bannerImage": "https://shdw-drive.genesysgo.net/GEmb2ovbEuWijEzapoEaViShkUvwbgpe2ohVTzVLzuU/physis-banner-spray-dao-001.jpg",
+    "ogImage": "https://shdw-drive.genesysgo.net/GEmb2ovbEuWijEzapoEaViShkUvwbgpe2ohVTzVLzuU/physis-holo-blk-sml.png"
   },
   {
     "symbol": "JET",
@@ -496,8 +514,8 @@
     "category": "defi",
     "bannerImage": "https://i.imgur.com/I30J9NT.png",
     "displayName": "Marinade.Finance",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "3gmcbygQUUDgmtDtx41R7xSf3K4oFXrH9icPNijyq9pS",
+    "programId": "GovMaiHfpVPw8BAM1mbdzgmSZYDw2tdP32J2fapoQoYs",
+    "realmId": "899YG3yk4F66ZgbNWLHriZHTXSKk9e1kvsKEquW7L6Mo",
     "ogImage": "https://i.imgur.com/vEFzgY4.png",
     "shortDescription": "Secure Solana and earn rewards without your funds locked in.",
     "sortRank": 3,
@@ -3103,7 +3121,7 @@
   },
   {
     "symbol": "IOT",
-    "displayName": "Helium IOT DAO",
+    "displayName": "Helium IOT SubDAO",
     "programId": "hgovkRU6Ghe1Qoyb54HdSLdqN7VtxaifBzRmh9jtd3S",
     "realmId": "8UQNtD5Zw8ijB7ZpGiPLodKXMxtVyQmtu1AEztd3p6Po",
     "website": "https://helium.com",
@@ -3112,9 +3130,9 @@
   },
   {
     "symbol": "MOBILE",
-    "displayName": "Helium MOBILE DAO",
+    "displayName": "Helium MOBILE SubDAO",
     "programId": "hgovkRU6Ghe1Qoyb54HdSLdqN7VtxaifBzRmh9jtd3S",
-    "realmId": "8itzNAn1kMZ5sf18dVd8gGykztWZLVT93Svbdt7Gn2NP",
+    "realmId": "7yyaEqDNfgqS6cgmPmJGVoU5dkwayPFRq55VmNDR79ij",
     "website": "https://helium.com",
     "twitter": "@Helium",
     "ogImage": "/realms/Helium/img/mobilelogo.png"

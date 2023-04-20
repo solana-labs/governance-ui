@@ -142,12 +142,6 @@ export const NewWalletSummary = (
           <div className="text-lg font-bold dark:text-white">
             Proposed Wallet Rules
           </div>
-          <div className="flex items-center mt-3 dark:text-emerald-400">
-            <BotIcon className="h-3 fill-current mr-1 w-4" />
-            <div className="text-xs">
-              This section is automatically generated
-            </div>
-          </div>
         </div>
         <NewRulesList
           className="mt-4"

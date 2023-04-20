@@ -112,8 +112,11 @@ export const getPositions = async (
       )
       .map((pos, idx) => {
         const isDelegated = !!delegatedPositionAccs[idx]
+        const delegatedSubDao = isDelegated
+          ? delegatedPositionAccs[idx]?.subDao
+          : null
         const hasRewards = isDelegated
-          ? delegatedPositionAccs[idx]!.lastClaimedEpoch.lt(
+          ? delegatedPositionAccs[idx]!.lastClaimedEpoch.add(new BN(1)).lt(
               now.div(new BN(EPOCH_LENGTH))
             )
           : false
@@ -122,6 +125,7 @@ export const getPositions = async (
           ...pos,
           pubkey: posKeys[idx],
           isDelegated,
+          delegatedSubDao,
           hasRewards,
           hasGenesisMultiplier: pos.genesisEnd.gt(now),
           votingPower: calcPositionVotingPower({

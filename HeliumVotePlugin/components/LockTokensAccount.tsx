@@ -37,6 +37,7 @@ import useHeliumVsrStore from '../hooks/useHeliumVsrStore'
 import { PublicKey } from '@solana/web3.js'
 import { notify } from '@utils/notifications'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useSubDaos } from 'HeliumVotePlugin/hooks/useSubDaos'
 
 export const LockTokensAccount: React.FC<{
   tokenOwnerRecordPk: string | string[] | undefined
@@ -65,6 +66,11 @@ export const LockTokensAccount: React.FC<{
     s.state.heliumVsrClient,
     s.state.heliumVsrRegistrar,
   ])
+  const {
+    loading: loadingSubDaos,
+    error: subDaosError,
+    result: subDaos,
+  } = useSubDaos()
   const { error, createPosition } = useCreatePosition()
   const [isOwnerOfPositions, setIsOwnerOfPositions] = useState(true)
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
@@ -88,6 +94,15 @@ export const LockTokensAccount: React.FC<{
     s.state.amountLocked,
     s.getPositions,
   ])
+
+  useEffect(() => {
+    if (subDaosError) {
+      notify({
+        type: 'error',
+        message: subDaosError.message || 'Unable to fetch subdaos',
+      })
+    }
+  }, [subDaosError])
 
   useAsync(async () => {
     try {
@@ -205,7 +220,6 @@ export const LockTokensAccount: React.FC<{
       amount,
       mint!.decimals
     )
-
     await createPosition({
       amount: amountToLock,
       lockupPeriodsInDays: lockupPeriodInDays,
@@ -229,6 +243,7 @@ export const LockTokensAccount: React.FC<{
   }
 
   const mainBoxesClasses = 'bg-bkg-1 col-span-1 p-4 rounded-md'
+  const loading = isLoading || loadingSubDaos
   return (
     <div className="grid grid-cols-12 gap-4">
       <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12">
@@ -268,7 +283,7 @@ export const LockTokensAccount: React.FC<{
         {connected ? (
           <div>
             <div className="grid md:grid-cols-3 grid-flow-row gap-4 pb-8">
-              {isLoading ? (
+              {loading ? (
                 <>
                   <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-md" />
                   <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-md" />
@@ -321,11 +336,11 @@ export const LockTokensAccount: React.FC<{
             </div>
             <h2 className="mb-4">Locked Positions</h2>
             <div
-              className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8 ${
+              className={`grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8 ${
                 !isOwnerOfPositions ? 'opacity-0.8 pointer-events-none' : ''
               }`}
             >
-              {!isLoading &&
+              {!loading &&
                 positions
                   .sort((a, b) =>
                     a.hasGenesisMultiplier
@@ -338,6 +353,11 @@ export const LockTokensAccount: React.FC<{
                     <PositionCard
                       key={idx}
                       position={pos}
+                      subDaos={subDaos}
+                      tokenOwnerRecordPk={
+                        tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey ||
+                        null
+                      }
                       isOwner={isOwnerOfPositions}
                     />
                   ))}

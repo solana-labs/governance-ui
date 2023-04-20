@@ -209,8 +209,13 @@ function NewWalletWithDefaults({
                     setSubmitting(true);
                     try {
                       await callback();
-                      router.push(fmtUrlWithCluster(`/dao/${symbol}/`));
-                      // TODO refetch wallets
+                      /* router.push(
+                        fmtUrlWithCluster(`/dao/${symbol}/treasury/v2`),
+                      ); */
+                      // this is how you navigate while forcing a reload.
+                      // we just need to refetch the wallet data but that is too difficult to do in this god forsaken codebase
+                      // so instead the page can just reload.
+                      window.location.pathname = `/dao/${symbol}/treasury/v2`;
                     } catch (e) {
                       setSubmitting(false);
                       throw e;
