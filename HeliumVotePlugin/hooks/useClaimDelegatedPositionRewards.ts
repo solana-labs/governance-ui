@@ -71,6 +71,7 @@ export const useClaimDelegatedPositionRewards = () => {
           )
         }
 
+        // This is an arbitrary threshold and we assume that up to 4 instructions can be inserted as a single Tx
         const ixsChunks = chunks(instructions, 4)
         const txsChunks = ixsChunks.map((txBatch, batchIdx) => ({
           instructionsSet: txBatchesToInstructionSetWithSigners(

@@ -9,7 +9,7 @@ import queryClient from './queryClient'
 
 export const mintInfoQueryKeys = {
   all: (cluster: EndpointTypes) => [cluster, 'MintInfo'],
-  byPubkey: (cluster, k: PublicKey) => [
+  byPubkey: (cluster: EndpointTypes, k: PublicKey) => [
     ...mintInfoQueryKeys.all(cluster),
     k.toString(),
   ],

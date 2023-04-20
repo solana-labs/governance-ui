@@ -52,6 +52,7 @@ const keyToLabel = {
   resetStablePrice: 'Reset Stable Price',
   resetNetBorrowLimit: 'Reset Net Borrow Limit',
   reduceOnly: 'Reduce Only',
+  forceClose: 'Force Close',
 }
 
 type NamePkVal = {
@@ -93,6 +94,7 @@ interface EditTokenForm {
   resetNetBorrowLimit: boolean
   reduceOnly: boolean
   holdupTime: number
+  forceClose: boolean
 }
 
 const defaultFormValues: EditTokenForm = {
@@ -128,6 +130,7 @@ const defaultFormValues: EditTokenForm = {
   resetStablePrice: false,
   resetNetBorrowLimit: false,
   reduceOnly: false,
+  forceClose: false,
   holdupTime: 0,
 }
 
@@ -254,7 +257,8 @@ const EditToken = ({
           values.resetStablePrice,
           values.resetNetBorrowLimit,
           values.reduceOnly,
-          getNullOrTransform(values.name, null, String)
+          getNullOrTransform(values.name, null, String),
+          values.forceClose
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -311,6 +315,7 @@ const EditToken = ({
       const groupInsuranceFund = mangoGroup.mintInfosMapByMint.get(
         form.token.value.toBase58()
       )?.groupInsuranceFund
+
       const vals = {
         ...form,
         oraclePk: currentToken.oracle.toBase58(),
@@ -342,7 +347,8 @@ const EditToken = ({
         borrowWeightScaleStartQuote: currentToken.borrowWeightScaleStartQuote,
         depositWeightScaleStartQuote: currentToken.depositWeightScaleStartQuote,
         groupInsuranceFund: !!groupInsuranceFund,
-        reduceOnly: currentToken.reduceOnly,
+        reduceOnly: !!currentToken.reduceOnly,
+        forceClose: currentToken.forceClose,
       }
       setForm({
         ...vals,
@@ -622,6 +628,13 @@ const EditToken = ({
       initialValue: form.reduceOnly,
       type: InstructionInputType.SWITCH,
       name: 'reduceOnly',
+    },
+    {
+      label: keyToLabel['forceClose'],
+      subtitle: getAdditionalLabelInfo('forceClose'),
+      initialValue: form.forceClose,
+      type: InstructionInputType.SWITCH,
+      name: 'forceClose',
     },
   ]
 

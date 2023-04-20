@@ -17,21 +17,10 @@ import { DISABLED_VOTER_WEIGHT } from '@tools/constants';
 
 const configs2defaults = (configs: GovernanceConfig[]) => {
   // community ---
-  const disableCommunityVote =
+  const enableCommunityVote =
     configs.find(
-      (x) => x.communityVoteThreshold.type === VoteThresholdType.Disabled,
+      (x) => x.communityVoteThreshold.type !== VoteThresholdType.Disabled,
     ) !== undefined;
-  const highestCommunityThreshold = Math.max(
-    ...configs.map((x) => x.communityVoteThreshold.value ?? 0),
-  );
-
-  const disableCommunityVetoVote =
-    configs.find(
-      (x) => x.communityVetoVoteThreshold.type === VoteThresholdType.Disabled,
-    ) !== undefined;
-  const highestCommunityVetoVoteThreshold = Math.max(
-    ...configs.map((x) => x.communityVetoVoteThreshold.value ?? 0),
-  );
 
   const highestMinCommunityTokensToCreateProposal = configs.reduce(
     (acc, x) => BN.max(acc, x.minCommunityTokensToCreateProposal),
@@ -39,21 +28,15 @@ const configs2defaults = (configs: GovernanceConfig[]) => {
   );
 
   // council ---
-  const disableCouncilVote =
+  const enableCouncilVote =
     configs.find(
-      (x) => x.councilVoteThreshold.type === VoteThresholdType.Disabled,
+      (x) => x.councilVoteThreshold.type !== VoteThresholdType.Disabled,
     ) !== undefined;
-  const highestCouncilThreshold = Math.max(
-    ...configs.map((x) => x.councilVoteThreshold.value ?? 0),
-  );
 
-  const disableCouncilVetoVote =
+  const enableCouncilVetoVote =
     configs.find(
-      (x) => x.councilVetoVoteThreshold.type === VoteThresholdType.Disabled,
+      (x) => x.councilVetoVoteThreshold.type !== VoteThresholdType.Disabled,
     ) !== undefined;
-  const highestCouncilVetoVoteThreshold = Math.max(
-    ...configs.map((x) => x.councilVetoVoteThreshold.value ?? 0),
-  );
 
   const highestMinCouncilTokensToCreateProposal = configs.reduce(
     (acc, x) => BN.max(acc, x.minCouncilTokensToCreateProposal),
@@ -62,9 +45,9 @@ const configs2defaults = (configs: GovernanceConfig[]) => {
 
   const x: Omit<Rules, 'governanceAddress' | 'walletAddress'> = {
     communityTokenRules: {
-      canCreateProposal: !highestMinCommunityTokensToCreateProposal.eq(
-        DISABLED_VOTER_WEIGHT,
-      ),
+      canCreateProposal:
+        enableCommunityVote &&
+        !highestMinCommunityTokensToCreateProposal.eq(DISABLED_VOTER_WEIGHT),
       votingPowerToCreateProposals: new BigNumber(
         highestMinCommunityTokensToCreateProposal.toString(),
       ),
@@ -74,18 +57,16 @@ const configs2defaults = (configs: GovernanceConfig[]) => {
       tokenType: GovernanceTokenType.Community,
       totalSupply: new BigNumber(1),
       // END
-      canVeto: !disableCommunityVetoVote,
-      vetoQuorumPercent: disableCommunityVetoVote
-        ? 60
-        : highestCommunityVetoVoteThreshold,
-      canVote: !disableCommunityVote,
-      quorumPercent: disableCommunityVote ? 60 : highestCommunityThreshold,
+      canVeto: false,
+      vetoQuorumPercent: 60,
+      canVote: enableCommunityVote,
+      quorumPercent: 60,
       voteTipping: GovernanceVoteTipping.Disabled,
     },
     councilTokenRules: {
-      canCreateProposal: !highestMinCouncilTokensToCreateProposal.eq(
-        DISABLED_VOTER_WEIGHT,
-      ),
+      canCreateProposal:
+        enableCouncilVote &&
+        !highestMinCouncilTokensToCreateProposal.eq(DISABLED_VOTER_WEIGHT),
       votingPowerToCreateProposals: new BigNumber(
         highestMinCouncilTokensToCreateProposal.toString(),
       ),
@@ -95,12 +76,10 @@ const configs2defaults = (configs: GovernanceConfig[]) => {
       tokenType: GovernanceTokenType.Council,
       totalSupply: new BigNumber(1),
       // END
-      canVeto: !disableCouncilVetoVote,
-      vetoQuorumPercent: disableCouncilVetoVote
-        ? 60
-        : highestCouncilVetoVoteThreshold,
-      canVote: !disableCouncilVote,
-      quorumPercent: disableCouncilVote ? 60 : highestCouncilThreshold,
+      canVeto: enableCouncilVetoVote,
+      vetoQuorumPercent: 60,
+      canVote: enableCouncilVote,
+      quorumPercent: 60,
       voteTipping: GovernanceVoteTipping.Disabled,
     },
     coolOffHours: 12,

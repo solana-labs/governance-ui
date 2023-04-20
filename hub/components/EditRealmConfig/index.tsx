@@ -67,6 +67,7 @@ interface Props {
 export function EditRealmConfig(props: Props) {
   const connection = useWalletStore((s) => s.connection);
   const { fmtUrlWithCluster } = useQueryContext();
+  const { realm } = useRealm();
   const wallet = useWalletOnePointOh();
   const [step, setStep] = useState(Step.Form);
   const [realmAuthority, setRealmAuthority] = useState<PublicKey | undefined>(
@@ -113,16 +114,11 @@ export function EditRealmConfig(props: Props) {
     if (RE.isOk(result) && wallet?.publicKey) {
       Promise.resolve(wallet.publicKey) // :-)
         .then((publicKey) =>
-          fetchConfig(
-            connection.current,
-            result.data.realmByUrlId.publicKey,
-            result.data.realmByUrlId.programPublicKey,
-            {
-              publicKey,
-              signAllTransactions: wallet.signAllTransactions,
-              signTransaction: wallet.signTransaction,
-            },
-          ),
+          fetchConfig(connection.current, result.data.realmByUrlId.publicKey, {
+            publicKey,
+            signAllTransactions: wallet.signAllTransactions,
+            signTransaction: wallet.signTransaction,
+          }),
         )
         .then((config) => {
           setConfig({ ...config });
@@ -291,13 +287,14 @@ export function EditRealmConfig(props: Props) {
                             return;
                           }
                           if (!wallet.publicKey) throw new Error();
+                          if (!realm) throw new Error();
 
                           setSubmitting(true);
 
                           const userPublicKey = wallet.publicKey;
 
                           const instructions = await createTransaction(
-                            realmByUrlId.programPublicKey,
+                            realm.owner,
                             realmByUrlId.publicKey,
                             governance.governanceAddress,
                             config,

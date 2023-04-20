@@ -14,6 +14,10 @@ import { notify } from '@utils/notifications'
 
 export const defaultLockupPeriods = [
   {
+    value: 183,
+    display: '6m',
+  },
+  {
     value: yearsToDays(1),
     display: '1y',
   },
@@ -28,10 +32,6 @@ export const defaultLockupPeriods = [
   {
     value: yearsToDays(4),
     display: '4y',
-  },
-  {
-    value: yearsToDays(5),
-    display: '5y',
   },
 ]
 
@@ -63,7 +63,7 @@ export interface LockTokensModalFormValues {
 
 export const LockTokensModal: React.FC<{
   isOpen: boolean
-  mode?: 'lock' | 'extend'
+  mode?: 'lock' | 'extend' | 'split'
   minLockupTimeInDays?: number
   maxLockupTimeInDays?: number
   maxLockupAmount: number
@@ -176,11 +176,20 @@ export const LockTokensModal: React.FC<{
                 {getFormattedStringFromDays(minLockupTimeInDays)}
               </span>
             </div>
+            {mode === 'split' ? (
+              <>
+                <br />
+                <div className="text-red">
+                  Splitting a Landrush position after the Landrush period will
+                  result in the split tokens losing the multiplier!
+                </div>
+              </>
+            ) : null}
           </div>
         ) : null}
         {!showLockupKindInfo && (
           <>
-            {mode === 'lock' && (
+            {['lock', 'split'].includes(mode) && (
               <>
                 <div className="flex items-center justify-between">
                   <div className={labelClasses}>Lockup Type</div>
@@ -332,21 +341,31 @@ export const LockTokensModal: React.FC<{
                 type="submit"
                 isLoading={isSubmitting}
                 disabled={
-                  mode == 'lock'
-                    ? !amount ||
+                  {
+                    lock:
+                      !amount ||
                       !maxLockupAmount ||
                       !lockupPeriodInDays ||
                       lockupPeriodInDays === 0 ||
-                      isSubmitting
-                    : !lockupPeriodInDays ||
+                      isSubmitting,
+                    extend:
+                      !lockupPeriodInDays ||
                       lockupPeriodInDays === 0 ||
-                      isSubmitting
+                      isSubmitting,
+                    split:
+                      !amount ||
+                      !maxLockupAmount ||
+                      !lockupPeriodInDays ||
+                      lockupPeriodInDays === 0 ||
+                      isSubmitting,
+                  }[mode]
                 }
               >
                 {
                   {
                     lock: 'Lock Tokens',
                     extend: 'Extend Lockup',
+                    split: 'Split Position',
                   }[mode]
                 }
               </Button>
