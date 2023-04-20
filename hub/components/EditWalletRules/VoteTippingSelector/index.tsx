@@ -85,7 +85,9 @@ export function VoteTippingSelector(props: Props) {
         </DropdownMenu.Trigger>
         <DropdownMenu.Portal>
           <DropdownMenu.Content
-            className="space-y-0.5 bg-white dark:bg-black"
+            //z-20 is needed because the pagebody has z index set, for you know, some reason
+            // are you from the future and debugging why this component is always dark? look no further than here
+            className="dark space-y-0.5 z-20"
             sideOffset={2}
             style={{ width }}
           >
@@ -106,7 +108,9 @@ export function VoteTippingSelector(props: Props) {
                   key={voteTippingType}
                   onClick={() => props.onChange?.(voteTippingType)}
                 >
-                  <div className={labelStyles}>{getLabel(voteTippingType)}</div>
+                  <div id="BINGUS" className={labelStyles}>
+                    {getLabel(voteTippingType)}
+                  </div>
                   <div className={descriptionStyles}>
                     {getDescription(voteTippingType)}
                   </div>
