@@ -55,6 +55,7 @@ interface Args {
   signAllTransactions(transactions: Transaction[]): Promise<Transaction[]>;
 }
 
+/** @deprecated */
 export async function createProposal(args: Args) {
   const realm = await getRealm(args.connection, args.realmPublicKey);
 
