@@ -108,7 +108,9 @@ export function VoteTippingSelector(props: Props) {
                   key={voteTippingType}
                   onClick={() => props.onChange?.(voteTippingType)}
                 >
-                  <div className={labelStyles}>{getLabel(voteTippingType)}</div>
+                  <div id="BINGUS" className={labelStyles}>
+                    {getLabel(voteTippingType)}
+                  </div>
                   <div className={descriptionStyles}>
                     {getDescription(voteTippingType)}
                   </div>
