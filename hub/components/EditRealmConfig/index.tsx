@@ -31,6 +31,7 @@ import { Form } from './Form';
 import * as gql from './gql';
 import { RealmHeader } from './RealmHeader';
 import { Summary } from './Summary';
+import useRealm from '@hooks/useRealm';
 
 type Governance = TypeOf<
   typeof gql.getGovernanceResp
@@ -295,7 +296,7 @@ export function EditRealmConfig(props: Props) {
 
                           const instructions = await createTransaction(
                             realm.owner,
-                            realmByUrlId.publicKey,
+                            realm.pubkey,
                             governance.governanceAddress,
                             config,
                             existingConfig.current,
