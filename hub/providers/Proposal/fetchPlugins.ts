@@ -8,6 +8,7 @@ import { Connection, PublicKey } from '@solana/web3.js';
 import { PythClient } from 'pyth-staking-api';
 import { VsrClient } from 'VoteStakeRegistry/sdk/client';
 
+/** @deprecated */
 export async function fetchPlugins(
   connection: Connection,
   pluginProgram: PublicKey,

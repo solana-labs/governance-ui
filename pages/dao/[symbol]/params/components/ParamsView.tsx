@@ -146,7 +146,7 @@ const ParamsView = ({ activeGovernance }) => {
                 ) {
                   router.push(
                     fmtUrlWithCluster(
-                      `/realm/${symbol}/governance/${activeGovernance.pubkey.toBase58()}/edit`
+                      `/dao/${symbol}/treasury/governance/${activeGovernance.pubkey.toString()}/edit`
                     )
                   )
                 }

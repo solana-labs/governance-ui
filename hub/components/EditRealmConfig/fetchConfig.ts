@@ -16,6 +16,7 @@ import BN from 'bn.js';
 import { tryGetNftRegistrar } from 'VoteStakeRegistry/sdk/api';
 
 import { nftPluginsPks } from '@hooks/useVotingPlugins';
+import { getNetworkFromEndpoint } from '@utils/connection';
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts';
 import { parseMintAccountData, MintAccount } from '@utils/tokens';
 
@@ -36,7 +37,6 @@ export async function fetchConfig(
   connection: Connection,
   realmPublicKey: PublicKey,
   wallet: Pick<Wallet, 'publicKey' | 'signTransaction' | 'signAllTransactions'>,
-  isDevnet?: boolean,
 ): Promise<Config> {
   const realm = await getRealm(connection, realmPublicKey);
 
@@ -83,6 +83,8 @@ export async function fetchConfig(
   let nftCollectionWeight = new BN(0);
   const defaultOptions = AnchorProvider.defaultOptions();
   const anchorProvider = new AnchorProvider(connection, wallet, defaultOptions);
+
+  const isDevnet = getNetworkFromEndpoint(connection.rpcEndpoint) === 'devnet';
   const nftClient = await NftVoterClient.connect(anchorProvider, isDevnet);
   const pluginPublicKey =
     configProgramAccount.account.communityTokenConfig.voterWeightAddin;

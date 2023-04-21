@@ -52,8 +52,9 @@ export async function createTransaction(
   isDevnet?: boolean,
   wallet?: Omit<Wallet, 'payer'>,
 ) {
-  const realm = await getRealm(connection, realmPublicKey);
-  const programId = realm.owner;
+  const realmAccount = await getRealm(connection, realmPublicKey);
+
+  const programId = realmAccount.owner;
   const instructions: TransactionInstruction[] = [];
   const realmConfig = await tryGetRealmConfig(
     connection,
@@ -64,7 +65,6 @@ export async function createTransaction(
     connection,
     programId,
   );
-  const realmAccount = await getRealm(connection, realmPublicKey);
 
   if (
     realmAccount.account.authority &&

@@ -143,7 +143,7 @@ export default function Rules(props: Props) {
                 if (props.wallet.governanceAccount) {
                   router.push(
                     fmtUrlWithCluster(
-                      `/realm/${symbol}/governance/${props.wallet.governanceAccount.pubkey.toBase58()}/edit`
+                      `/dao/${symbol}/treasury/governance/${props.wallet.governanceAccount.pubkey.toBase58()}/edit`
                     )
                   )
                 }

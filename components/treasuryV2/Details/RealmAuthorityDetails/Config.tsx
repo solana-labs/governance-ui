@@ -69,7 +69,7 @@ export default function Config(props: Props) {
             )}
             disabled={!canUseAuthorityInstruction}
             onClick={() =>
-              router.push(fmtUrlWithCluster(`/realm/${symbol}/config/edit`))
+              router.push(fmtUrlWithCluster(`/dao/${symbol}/editConfig`))
             }
           >
             <PencilIcon className="h-4 w-4" />

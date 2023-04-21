@@ -1,7 +1,11 @@
 import CheckmarkIcon from '@carbon/icons-react/lib/Checkmark';
 import ChevronLeftIcon from '@carbon/icons-react/lib/ChevronLeft';
 import EditIcon from '@carbon/icons-react/lib/Edit';
-import { getRealm, GoverningTokenType } from '@solana/spl-governance';
+import {
+  createInstructionData,
+  getRealm,
+  GoverningTokenType,
+} from '@solana/spl-governance';
 import { PublicKey } from '@solana/web3.js';
 import { pipe } from 'fp-ts/lib/function';
 import { TypeOf } from 'io-ts';
@@ -9,16 +13,18 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState, useRef } from 'react';
 
+import useWalletStore from 'stores/useWalletStore';
+
+import useCreateProposal from '@hooks/useCreateProposal';
+import useQueryContext from '@hooks/useQueryContext';
+import useRealm from '@hooks/useRealm';
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh';
 import { Primary, Secondary } from '@hub/components/controls/Button';
-import { Connect } from '@hub/components/GlobalHeader/User/Connect';
-import { ProposalCreationProgress } from '@hub/components/ProposalCreationProgress';
-import { useCluster, ClusterType } from '@hub/hooks/useCluster';
-import { useProposal } from '@hub/hooks/useProposal';
 import { useQuery } from '@hub/hooks/useQuery';
-import { useToast, ToastType } from '@hub/hooks/useToast';
-import { useWallet } from '@hub/hooks/useWallet';
 import cx from '@hub/lib/cx';
 import * as RE from '@hub/types/Result';
+
+import { notify } from '@utils/notifications';
 
 import { createTransaction } from './createTransaction';
 import { fetchConfig, Config } from './fetchConfig';
@@ -60,8 +66,10 @@ interface Props {
 }
 
 export function EditRealmConfig(props: Props) {
-  const [cluster] = useCluster();
-  const wallet = useWallet();
+  const connection = useWalletStore((s) => s.connection);
+  const { fmtUrlWithCluster } = useQueryContext();
+  const { realm } = useRealm();
+  const wallet = useWalletOnePointOh();
   const [step, setStep] = useState(Step.Form);
   const [realmAuthority, setRealmAuthority] = useState<PublicKey | undefined>(
     undefined,
@@ -72,6 +80,8 @@ export function EditRealmConfig(props: Props) {
       realmUrlId: props.realmUrlId,
     },
   });
+
+  const { propose } = useCreateProposal();
   const [governance, setGovernance] = useState<Governance | null>(null);
   const [governanceResult] = useQuery(gql.getGovernanceResp, {
     query: gql.getGovernance,
@@ -82,7 +92,6 @@ export function EditRealmConfig(props: Props) {
     pause: !realmAuthority,
   });
   const router = useRouter();
-  const { publish } = useToast();
   const [submitting, setSubmitting] = useState(false);
 
   const [proposalVoteType, setProposalVoteType] = useState<
@@ -95,7 +104,6 @@ export function EditRealmConfig(props: Props) {
 
   const [config, setConfig] = useState<Config | null>(null);
   const existingConfig = useRef<Config | null>(null);
-  const { createProposal, progress } = useProposal();
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -104,19 +112,14 @@ export function EditRealmConfig(props: Props) {
   }, [step]);
 
   useEffect(() => {
-    if (RE.isOk(result)) {
-      (wallet.publicKey ? Promise.resolve(wallet.publicKey) : wallet.connect())
+    if (RE.isOk(result) && wallet?.publicKey) {
+      Promise.resolve(wallet.publicKey) // :-)
         .then((publicKey) =>
-          fetchConfig(
-            cluster.connection,
-            result.data.realmByUrlId.publicKey,
-            {
-              publicKey,
-              signAllTransactions: wallet.signAllTransactions,
-              signTransaction: wallet.signTransaction,
-            },
-            cluster.type === ClusterType.Devnet,
-          ),
+          fetchConfig(connection.current, result.data.realmByUrlId.publicKey, {
+            publicKey,
+            signAllTransactions: wallet.signAllTransactions,
+            signTransaction: wallet.signTransaction,
+          }),
         )
         .then((config) => {
           setConfig({ ...config });
@@ -139,7 +142,7 @@ export function EditRealmConfig(props: Props) {
           };
         })
         .then(() =>
-          getRealm(cluster.connection, result.data.realmByUrlId.publicKey).then(
+          getRealm(connection.current, result.data.realmByUrlId.publicKey).then(
             (realm) => {
               setRealmAuthority(realm.account.authority);
             },
@@ -171,10 +174,10 @@ export function EditRealmConfig(props: Props) {
     RE.match(
       () => <div />,
       () => <div />,
-      ({ me, realmByUrlId }) => {
-        if (!me && !(wallet.softConnect && wallet.publicKey)) {
+      ({ realmByUrlId }) => {
+        if (!wallet?.publicKey) {
           return (
-            <div className={cx(props.className, 'dark:bg-neutral-900')}>
+            <div className={cx(props.className)}>
               <Head>
                 <title>Edit Org Config - {realmByUrlId.name}</title>
                 <meta
@@ -190,7 +193,6 @@ export function EditRealmConfig(props: Props) {
                     <br />
                     for "{realmByUrlId.name}"
                   </div>
-                  <Connect />
                 </div>
               </div>
             </div>
@@ -201,11 +203,10 @@ export function EditRealmConfig(props: Props) {
           return <div />;
         }
 
-        const userPublicKey = (me?.publicKey || wallet.publicKey) as PublicKey;
+        const userPublicKey = wallet.publicKey;
 
         return (
           <div className={cx(props.className, 'dark:bg-neutral-900')}>
-            <ProposalCreationProgress progress={progress} />
             <div className="w-full max-w-3xl pt-14 mx-auto">
               <Head>
                 <title>Edit Org Config - {realmByUrlId.name}</title>
@@ -286,18 +287,20 @@ export function EditRealmConfig(props: Props) {
                           if (!existingConfig.current) {
                             return;
                           }
+                          if (!wallet.publicKey) throw new Error();
+                          if (!realm) throw new Error();
 
                           setSubmitting(true);
 
-                          const userPublicKey = await wallet.connect();
+                          const userPublicKey = wallet.publicKey;
 
-                          const transaction = await createTransaction(
-                            realmByUrlId.publicKey,
+                          const instructions = await createTransaction(
+                            realm.pubkey,
                             governance.governanceAddress,
                             config,
                             existingConfig.current,
-                            cluster.connection,
-                            cluster.type === ClusterType.Devnet,
+                            connection.current,
+                            connection.cluster === 'devnet',
                             {
                               publicKey: userPublicKey,
                               signAllTransactions: wallet.signAllTransactions,
@@ -305,44 +308,40 @@ export function EditRealmConfig(props: Props) {
                             },
                           );
 
-                          const governingTokenMintPublicKey =
-                            proposalVoteType === 'council' &&
-                            existingConfig.current.config.councilMint
-                              ? existingConfig.current.config.councilMint
-                              : existingConfig.current.communityMint.publicKey;
-
                           try {
-                            const proposalAddress = await createProposal({
-                              proposalDescription,
-                              proposalTitle,
-                              governingTokenMintPublicKey,
-                              governancePublicKey: governance.governanceAddress,
-                              instructions: transaction,
-                              isDraft: false,
-                              realmPublicKey: realmByUrlId.publicKey,
-                              councilTokenMintPublicKey:
-                                governance.councilTokenRules
-                                  ?.tokenMintAddress || undefined,
-                              communityTokenMintPublicKey:
-                                governance.communityTokenRules.tokenMintAddress,
+                            const proposalAddress = await propose({
+                              title: proposalTitle,
+                              description: proposalDescription,
+                              voteByCouncil: proposalVoteType === 'council',
+                              instructionsData: instructions.map((ix) => ({
+                                data: createInstructionData(ix),
+                                holdUpTime:
+                                  60 *
+                                  60 *
+                                  24 *
+                                  governance.minInstructionHoldupDays,
+                                prerequisiteInstructions: [],
+                                chunkBy: 3,
+                                chunkSplitByDefault: true,
+                              })),
+                              governance: governance.governanceAddress,
                             });
 
                             if (proposalAddress) {
                               router.push(
-                                `/dao/${
-                                  props.realmUrlId
-                                }/proposal/${proposalAddress.toBase58()}` +
-                                  (cluster.type === ClusterType.Devnet
-                                    ? '?cluster=devnet'
-                                    : ''),
+                                fmtUrlWithCluster(
+                                  `/dao/${
+                                    props.realmUrlId
+                                  }/proposal/${proposalAddress.toBase58()}`,
+                                ),
                               );
                             }
                           } catch (e) {
                             console.error(e);
-                            publish({
-                              type: ToastType.Error,
-                              title: 'Could not create proposal.',
-                              message: String(e),
+                            notify({
+                              type: 'error',
+                              message:
+                                'Could not create proposal: ' + String(e),
                             });
                           }
 
