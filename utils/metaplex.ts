@@ -18,8 +18,11 @@ export const createIx_transferNft = async (
         connection.en === 'mainnet' ? 'mainnet-beta' : connection.cluster,
      }*/
   ) //.use(walletAdapterIdentity(wallet)) // surely this doesnt matter either (IT DOES)
-  //metaplex.identity = () => ({ publicKey: fromOwner } as any) // you need to do this to set payer and authority. I love OOP!!
+  metaplex.identity = () => ({ publicKey: fromOwner } as any) // you need to do this to set payer and authority. I love OOP!!
   // except the payer might not be the same person. great!
+  // but if you don't do this, it fails to get the authorization rules
+  // not that the authorization rules have anything to do with the identity
+  // but you know whatever
 
   const nft = await fetchNFTbyMint(connection, mint)
   if (!nft.result) throw 'failed to fetch nft'
