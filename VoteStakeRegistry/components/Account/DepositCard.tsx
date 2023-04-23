@@ -27,7 +27,6 @@ import {
 import { BN } from '@coral-xyz/anchor'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import OutsideSrcImg from '@components/OutsideSrcImg'
 
 const DepositCard = ({
   deposit,
@@ -149,10 +148,7 @@ const DepositCard = ({
     <div className="border border-fgd-4 rounded-lg flex flex-col">
       <div className="bg-bkg-3 px-4 py-4 pr-16 rounded-md rounded-b-none flex items-center">
         {tokenInfo?.logoURI && (
-          <OutsideSrcImg
-            className="w-8 h-8 mr-2"
-            src={tokenInfo?.logoURI}
-          ></OutsideSrcImg>
+          <img className="w-8 h-8 mr-2" src={tokenInfo?.logoURI}></img>
         )}
         <h3 className="hero-text mb-0">
           {lockedTokens}{' '}

@@ -18,7 +18,6 @@ import { getTreasuryAccountItemInfoV2 } from '@utils/treasuryTools'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import Tooltip from '@components/Tooltip'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import OutsideSrcImg from '@components/OutsideSrcImg'
 
 export const NEW_TREASURY_ROUTE = `/treasury/new`
 
@@ -138,10 +137,7 @@ const Treasury = () => {
             <div className="flex flex-col justify-between pb-4 border-b border-fgd-4 md:flex-row">
               <div className="flex items-center py-2 mb-2 md:mb-0">
                 {realmInfo?.ogImage ? (
-                  <OutsideSrcImg
-                    src={realmInfo?.ogImage}
-                    className="w-8 h-8 mr-3"
-                  ></OutsideSrcImg>
+                  <img src={realmInfo?.ogImage} className="w-8 h-8 mr-3"></img>
                 ) : null}
                 <div>
                   <p className="">{realmInfo?.displayName}</p>

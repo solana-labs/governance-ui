@@ -38,7 +38,6 @@ import { PublicKey } from '@solana/web3.js'
 import { notify } from '@utils/notifications'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useSubDaos } from 'HeliumVotePlugin/hooks/useSubDaos'
-import OutsideSrcImg from '@components/OutsideSrcImg'
 
 export const LockTokensAccount: React.FC<{
   tokenOwnerRecordPk: string | string[] | undefined
@@ -253,7 +252,7 @@ export const LockTokensAccount: React.FC<{
         </div>
         <div className="flex items-center justify-between mb-4">
           {realmInfo?.ogImage && (
-            <OutsideSrcImg
+            <img
               src={realmInfo?.ogImage}
               className="mr-2 rouninded-full w-8 h-8"
             />

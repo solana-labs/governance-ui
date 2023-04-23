@@ -11,7 +11,6 @@ import { PublicKey } from '@solana/web3.js'
 import { MintInfo } from '@solana/spl-token'
 import { debounce } from '@utils/debounce'
 import { InformationCircleIcon } from '@heroicons/react/outline'
-import OutsideSrcImg from '@components/OutsideSrcImg'
 
 const TokenMintInput = ({
   noMaxWidth = true,
@@ -120,7 +119,7 @@ const TokenMintInput = ({
             {!isTyping && foundByNameToken ? (
               <>
                 {foundByNameToken?.logoURI && (
-                  <OutsideSrcImg
+                  <img
                     className={`flex-shrink-0 h-6 w-6 mr-2.5 mt-0.5`}
                     src={foundByNameToken?.logoURI}
                     onError={({ currentTarget }) => {

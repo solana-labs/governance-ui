@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { TokenListProvider, TokenInfo } from '@solana/spl-token-registry'
 import { MintInfo, u64 } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
 
@@ -17,6 +16,8 @@ import TokenInfoTable, {
   GenericTokenIcon,
 } from '@components/NewRealmWizard/components/TokenInfoTable'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { TokenInfo } from '@utils/services/types'
+import axios from 'axios'
 
 interface MintInfoWithDecimalSupply extends MintInfo {
   supplyAsDecimal: number
@@ -82,13 +83,9 @@ export default function TokenInput({
 
   useEffect(() => {
     async function getTokenList() {
-      const tokenList = await new TokenListProvider().resolve()
-      const filteredTokenList = tokenList
-        .filterByClusterSlug(
-          connection.cluster === 'mainnet' ? 'mainnet-beta' : connection.cluster
-        )
-        .getList()
-      setTokenList(filteredTokenList)
+      const tokens = await axios.get('https://token.jup.ag/strict')
+      const tokenList = tokens.data as TokenInfo[]
+      setTokenList(tokenList)
     }
 
     getTokenList()

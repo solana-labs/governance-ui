@@ -35,7 +35,6 @@ import { useUndelegatePosition } from '../hooks/useUndelegatePosition'
 import { useClaimDelegatedPositionRewards } from '../hooks/useClaimDelegatedPositionRewards'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { PublicKey } from '@solana/web3.js'
-import OutsideSrcImg from '@components/OutsideSrcImg'
 
 export interface PositionCardProps {
   subDaos?: SubDaoWithMeta[]
@@ -364,10 +363,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
         <>
           <div className="bg-bkg-3 px-4 py-4 pr-16 rounded-md rounded-b-none flex items-center">
             {tokenInfo?.logoURI && (
-              <OutsideSrcImg
-                className="w-8 h-8 mr-2"
-                src={tokenInfo?.logoURI}
-              ></OutsideSrcImg>
+              <img className="w-8 h-8 mr-2" src={tokenInfo?.logoURI}></img>
             )}
             <h3 className="hero-text mb-0">
               {lockedTokens}{' '}
@@ -430,7 +426,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
                         className="text-fgd-2 flex-row gap-2"
                         style={{ fontSize: '9px' }}
                       >
-                        <OutsideSrcImg
+                        <img
                           className="w-4 h-4"
                           src={delegatedSubDaoMetadata.json?.image || ''}
                         />

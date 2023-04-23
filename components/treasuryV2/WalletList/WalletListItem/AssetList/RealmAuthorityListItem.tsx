@@ -4,7 +4,6 @@ import cx from 'classnames'
 import LogoRealms from 'public/img/logo-realms.png'
 
 import ListItem from './ListItem'
-import OutsideSrcImg from '@components/OutsideSrcImg'
 
 interface Props {
   className?: string
@@ -50,7 +49,7 @@ export default function RealmAuthorityListItem(props: Props) {
               'w-5'
             )}
           >
-            <OutsideSrcImg className="h-4 w-4" src={LogoRealms.src} />
+            <img className="h-4 w-4" src={LogoRealms.src} />
           </div>
         </div>
       }

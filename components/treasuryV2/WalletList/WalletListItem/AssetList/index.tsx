@@ -36,7 +36,6 @@ import useWalletStore from 'stores/useWalletStore'
 import TokenOwnerRecordsList from './TokenOwnerRecordsList'
 import useRealm from '@hooks/useRealm'
 import { GoverningTokenType } from '@solana/spl-governance'
-import OutsideSrcImg from '@components/OutsideSrcImg'
 
 export type Section = 'tokens' | 'nfts' | 'others'
 
@@ -126,12 +125,7 @@ export default function AssetList(props: Props) {
 
           newTokens.push({
             ...token,
-            icon: (
-              <OutsideSrcImg
-                src={newTokenData.image}
-                className="rounded-full"
-              />
-            ),
+            icon: <img src={newTokenData.image} className="rounded-full" />,
             name: newTokenData.name,
             symbol: newTokenData.symbol,
           })

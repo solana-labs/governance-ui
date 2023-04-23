@@ -38,7 +38,6 @@ import ProposalSorting, {
   Sorting,
 } from '@components/ProposalSorting'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import OutsideSrcImg from '@components/OutsideSrcImg'
 
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
@@ -410,10 +409,7 @@ const REALM = () => {
                 <div>
                   {realmInfo?.bannerImage ? (
                     <>
-                      <OutsideSrcImg
-                        className="mb-10"
-                        src={realmInfo?.bannerImage}
-                      ></OutsideSrcImg>
+                      <img className="mb-10" src={realmInfo?.bannerImage}></img>
                       {/* temp. setup for Ukraine.SOL */}
                       {realmInfo.sharedWalletId && (
                         <div>

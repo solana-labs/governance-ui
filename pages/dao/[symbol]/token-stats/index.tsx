@@ -42,7 +42,7 @@ import {
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { abbreviateAddress } from '@utils/formatting'
 import { getDepositType } from 'VoteStakeRegistry/tools/deposits'
-import OutsideSrcImg from '@components/OutsideSrcImg'
+
 const VestingVsTime = dynamic(
   () => import('VoteStakeRegistry/components/LockTokenStats/VestingVsTime'),
   {
@@ -422,10 +422,7 @@ const LockTokenStats = () => {
           </div>
           <div className="flex items-center mb-2 md:mb-0 py-2">
             {realmInfo?.ogImage ? (
-              <OutsideSrcImg
-                src={realmInfo?.ogImage}
-                className="h-8 mr-3 w-8"
-              ></OutsideSrcImg>
+              <img src={realmInfo?.ogImage} className="h-8 mr-3 w-8"></img>
             ) : null}
             <h1 className="mb-0">
               {typeof symbol === 'string' && tryParsePublicKey(symbol)

@@ -24,7 +24,6 @@ import { useRouter } from 'next/router'
 import useQueryContext from '@hooks/useQueryContext'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 import Link from 'next/link'
-import OutsideSrcImg from '@components/OutsideSrcImg'
 
 interface Props {
   className?: string
@@ -166,7 +165,7 @@ export default function Header(props: Props) {
       <div className="flex space-x-3 items-center">
         <div>
           {asset.realmImage ? (
-            <OutsideSrcImg
+            <img
               src={asset.realmImage}
               alt={asset.realmSymbol}
               className="h-12 w-auto"

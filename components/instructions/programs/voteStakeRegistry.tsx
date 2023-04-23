@@ -21,7 +21,6 @@ import {
 import { calcMultiplier } from 'VoteStakeRegistry/tools/deposits'
 import { VoterStakeRegistry as HeliumVSR } from '@helium/idls/lib/types/voter_stake_registry'
 import { PROGRAM_ID as HELIUM_VSR_PROGRAM_ID } from '@helium/voter-stake-registry-sdk'
-import OutsideSrcImg from '@components/OutsideSrcImg'
 
 interface ClawbackInstruction {
   depositEntryIndex: number
@@ -262,10 +261,7 @@ const grantIx = (programId: PublicKey) => ({
                 )}
                 {logoUrl && (
                   <div>
-                    <OutsideSrcImg
-                      className="w-5 h-5"
-                      src={logoUrl}
-                    ></OutsideSrcImg>
+                    <img className="w-5 h-5" src={logoUrl}></img>
                   </div>
                 )}
                 <div>

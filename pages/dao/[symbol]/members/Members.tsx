@@ -15,7 +15,6 @@ import { Member } from '@utils/uiTypes/members'
 import useMembersStore from 'stores/useMembersStore'
 import PaginationComponent from '@components/Pagination'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import OutsideSrcImg from '@components/OutsideSrcImg'
 
 const Members = () => {
   const {
@@ -91,10 +90,7 @@ const Members = () => {
           <div className="border-b border-fgd-4 flex flex-col md:flex-row justify-between pb-4">
             <div className="flex items-center mb-2 md:mb-0 py-2">
               {realmInfo?.ogImage ? (
-                <OutsideSrcImg
-                  src={realmInfo?.ogImage}
-                  className="h-8 mr-3 w-8"
-                ></OutsideSrcImg>
+                <img src={realmInfo?.ogImage} className="h-8 mr-3 w-8"></img>
               ) : null}
               <div>
                 <p>{realmInfo?.displayName}</p>
