@@ -1,10 +1,8 @@
 import { FunctionComponent, useEffect, useState } from 'react'
 import { getTreasuryAccountItemInfoV2 } from '@utils/treasuryTools'
 import { AssetAccount } from '@utils/uiTypes/assets'
-import useWalletStore from 'stores/useWalletStore'
-import { findMetadataPda } from '@metaplex-foundation/js'
-import { PublicKey } from '@solana/web3.js'
-import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
+import TokenIcon from '@components/treasuryV2/icons/TokenIcon'
+import { useTokenMetadata } from '@hooks/queries/tokenMetadata'
 
 interface AccountsTabsProps {
   activeTab: AssetAccount | null
@@ -65,42 +63,20 @@ const AccountTab: FunctionComponent<AccountTabProps> = ({
     displayPrice,
   } = getTreasuryAccountItemInfoV2(assetAccount)
 
-  const [logoFromMeta, setLogoFromMeta] = useState<undefined | string>(
-    undefined
-  )
   const [symbolFromMeta, setSymbolFromMeta] = useState<undefined | string>(
     undefined
   )
-  const connection = useWalletStore((s) => s.connection)
+
+  const { data } = useTokenMetadata(
+    assetAccount.extensions.mint?.publicKey,
+    !logo
+  )
 
   useEffect(() => {
-    const getTokenMetadata = async (mintAddress: string) => {
-      try {
-        const mintPubkey = new PublicKey(mintAddress)
-        const metadataAccount = findMetadataPda(mintPubkey)
-        const accountData = await connection.current.getAccountInfo(
-          metadataAccount
-        )
-
-        const state = Metadata.deserialize(accountData!.data)
-        const jsonUri = state[0].data.uri.slice(
-          0,
-          state[0].data.uri.indexOf('\x00')
-        )
-
-        const data = await (await fetch(jsonUri)).json()
-
-        setLogoFromMeta(data.image)
-        setSymbolFromMeta(data.symbol)
-      } catch (e) {
-        console.log(e)
-      }
+    if (data?.symbol) {
+      setSymbolFromMeta(data.symbol)
     }
-    if (!logo && assetAccount.extensions.mint?.publicKey.toBase58()) {
-      getTokenMetadata(assetAccount.extensions.mint?.publicKey.toBase58())
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [assetAccount.extensions.mint?.publicKey.toBase58()])
+  }, [data?.symbol])
   return (
     <button
       key={assetAccount.extensions.transferAddress?.toBase58()}
@@ -124,16 +100,9 @@ const AccountTab: FunctionComponent<AccountTabProps> = ({
               }}
               className="w-5 h-5 mr-2"
             />
-          ) : logoFromMeta ? (
-            <img
-              src={logoFromMeta}
-              onError={({ currentTarget }) => {
-                currentTarget.onerror = null // prevents looping
-                currentTarget.hidden = true
-              }}
-              className="w-5 h-5 mr-2"
-            />
-          ) : undefined}{' '}
+          ) : (
+            <TokenIcon className="w-5 h-5 mr-2"></TokenIcon>
+          )}
           {name}
         </h3>
         <p className="mb-0 text-xs text-fgd-1">
