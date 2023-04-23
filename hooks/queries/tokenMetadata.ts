@@ -6,11 +6,11 @@ import useWalletStore from 'stores/useWalletStore'
 
 export const useTokenMetadata = (
   mint: PublicKey | undefined,
-  otherConditions?: boolean
+  enableConditions = true
 ) => {
   const connection = useWalletStore((s) => s.connection)
 
-  const enabled = !!mint && !!otherConditions
+  const enabled = !!mint && !!enableConditions
 
   const query = useQuery({
     queryFn: async () => {
