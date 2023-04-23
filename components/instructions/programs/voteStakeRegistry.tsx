@@ -1,5 +1,10 @@
 import { Wallet } from '@marinade.finance/marinade-ts-sdk'
-import { AnchorProvider, BN, BorshInstructionCoder, IdlTypes } from '@coral-xyz/anchor'
+import {
+  AnchorProvider,
+  BN,
+  BorshInstructionCoder,
+  IdlTypes,
+} from '@coral-xyz/anchor'
 import { AccountMetaData } from '@solana/spl-governance'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import { fmtMintAmount } from '@tools/sdk/units'
@@ -16,6 +21,7 @@ import {
 import { calcMultiplier } from 'VoteStakeRegistry/tools/deposits'
 import { VoterStakeRegistry as HeliumVSR } from '@helium/idls/lib/types/voter_stake_registry'
 import { PROGRAM_ID as HELIUM_VSR_PROGRAM_ID } from '@helium/voter-stake-registry-sdk'
+import OutsideSrcImg from '@components/OutsideSrcImg'
 
 interface ClawbackInstruction {
   depositEntryIndex: number
@@ -256,7 +262,10 @@ const grantIx = (programId: PublicKey) => ({
                 )}
                 {logoUrl && (
                   <div>
-                    <img className="w-5 h-5" src={logoUrl}></img>
+                    <OutsideSrcImg
+                      className="w-5 h-5"
+                      src={logoUrl}
+                    ></OutsideSrcImg>
                   </div>
                 )}
                 <div>
@@ -368,9 +377,7 @@ const heliumConfigVotingMintIx = (programId: PublicKey) => ({
             <div>
               Max multiplier:{' '}
               {getInverseScaledFactor(baselineVoteWeightScaledFactor) +
-                getInverseScaledFactor(
-                  maxExtraLockupVoteWeightScaledFactor
-                )}
+                getInverseScaledFactor(maxExtraLockupVoteWeightScaledFactor)}
             </div>
             {/* Additional Genesis Multiplier not configurable through UI */}
             {/* <div>

@@ -24,6 +24,7 @@ import { Metaplex } from '@metaplex-foundation/js'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { getNFTsByCollection } from '@utils/tokens'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import OutsideSrcImg from '@components/OutsideSrcImg'
 
 function filterAndMapVerifiedCollections(nfts) {
   return nfts
@@ -539,7 +540,7 @@ export default function AddNFTCollectionForm({
                       ?.slice(0, 3)
                       .map((nft, index) => {
                         return (
-                          <img
+                          <OutsideSrcImg
                             key={nft.name}
                             src={nft.image}
                             alt="collection item"
@@ -555,7 +556,7 @@ export default function AddNFTCollectionForm({
                           />
                         )
                       })}
-                    <img
+                    <OutsideSrcImg
                       src={selectedNFTCollection?.image}
                       className="absolute w-24 rounded-md"
                     />

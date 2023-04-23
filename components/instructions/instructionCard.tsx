@@ -33,6 +33,7 @@ import StreamCard from '@components/StreamCard'
 import { Metaplex, findMetadataPda } from '@metaplex-foundation/js'
 import { ConnectionContext } from '@utils/connection'
 import { abbreviateAddress } from '@utils/formatting'
+import OutsideSrcImg from '@components/OutsideSrcImg'
 
 export default function InstructionCard({
   index,
@@ -137,10 +138,10 @@ export default function InstructionCard({
         {`Instruction ${index} `}
         {descriptor?.name && `– ${descriptor.name}`}{' '}
         {tokenImgUrl && (
-          <img
+          <OutsideSrcImg
             className={`w-5 h-5 ml-2 ${isSol && 'rounded-full'}`}
             src={tokenImgUrl}
-          ></img>
+          ></OutsideSrcImg>
         )}
       </h3>
       <InstructionProgram
@@ -174,7 +175,7 @@ export default function InstructionCard({
             style={{ width: '150px', height: '150px' }}
             className="flex items-center overflow-hidden"
           >
-            <img src={nftImgUrl}></img>
+            <OutsideSrcImg src={nftImgUrl}></OutsideSrcImg>
           </div>
           <InstructionData descriptor={descriptor}></InstructionData>
         </div>

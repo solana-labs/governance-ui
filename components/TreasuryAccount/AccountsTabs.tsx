@@ -5,6 +5,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { findMetadataPda } from '@metaplex-foundation/js'
 import { PublicKey } from '@solana/web3.js'
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
+import OutsideSrcImg from '@components/OutsideSrcImg'
 
 interface AccountsTabsProps {
   activeTab: AssetAccount | null
@@ -116,7 +117,7 @@ const AccountTab: FunctionComponent<AccountTabProps> = ({
       <div className="text-left">
         <h3 className="flex mb-1 text-base font-bold">
           {logo ? (
-            <img
+            <OutsideSrcImg
               src={logo}
               onError={({ currentTarget }) => {
                 currentTarget.onerror = null // prevents looping
@@ -125,7 +126,7 @@ const AccountTab: FunctionComponent<AccountTabProps> = ({
               className="w-5 h-5 mr-2"
             />
           ) : logoFromMeta ? (
-            <img
+            <OutsideSrcImg
               src={logoFromMeta}
               onError={({ currentTarget }) => {
                 currentTarget.onerror = null // prevents looping

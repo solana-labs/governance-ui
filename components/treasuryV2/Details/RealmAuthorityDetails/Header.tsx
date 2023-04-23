@@ -5,6 +5,7 @@ import LogoRealms from 'public/img/logo-realms.png'
 
 import { RealmAuthority } from '@models/treasury/Asset'
 import Address from '@components/Address'
+import OutsideSrcImg from '@components/OutsideSrcImg'
 
 interface Props {
   className?: string
@@ -48,7 +49,7 @@ export default function Header(props: Props) {
                 'w-5'
               )}
             >
-              <img className="h-4 w-4" src={LogoRealms.src} />
+              <OutsideSrcImg className="h-4 w-4" src={LogoRealms.src} />
             </div>
           </div>
           <div className="overflow-hidden">

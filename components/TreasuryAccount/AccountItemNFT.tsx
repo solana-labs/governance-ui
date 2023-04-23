@@ -5,6 +5,7 @@ import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { WSOL_MINT } from '@components/instructions/tools'
+import OutsideSrcImg from '@components/OutsideSrcImg'
 const AccountItemNFT = ({
   governedAccountTokenAccount,
   className,
@@ -48,8 +49,8 @@ const AccountItemNFT = ({
       }`}
     >
       {governedAccountTokenAccount.isSol ? (
-        <img
-          src={info?.logoURI}
+        <OutsideSrcImg
+          src={info?.logoURI || ''}
           className="flex-shrink-0 h-5 w-5 mr-2.5 rounded-full"
         />
       ) : (

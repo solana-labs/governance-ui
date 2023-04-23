@@ -32,6 +32,7 @@ import { ConnectionContext } from '@utils/connection'
 import { PublicKey } from '@solana/web3.js'
 import getTokenOwnerRecordsForWallet from './getTokenOwnerRecordsForWallet'
 import { tryParseKey } from '@tools/validators/pubkey'
+import OutsideSrcImg from '@components/OutsideSrcImg'
 
 function isNotNull<T>(x: T | null): x is T {
   return x !== null
@@ -322,7 +323,7 @@ export const assembleWallets = async (
             councilTokenConfig: realmConfig?.account.councilTokenConfig,
           },
           icon: realmInfo?.ogImage ? (
-            <img src={realmInfo.ogImage} />
+            <OutsideSrcImg src={realmInfo.ogImage} />
           ) : (
             <SparklesIcon />
           ),

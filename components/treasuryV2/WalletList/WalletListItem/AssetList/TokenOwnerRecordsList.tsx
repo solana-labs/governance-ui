@@ -4,6 +4,7 @@ import { BN_ZERO } from '@solana/spl-governance'
 import { useMemo } from 'react'
 import Collapsible from './Collapsible'
 import TokenOwnerRecordListItem from './TokenOwnerRecordListItem'
+import OutsideSrcImg from '@components/OutsideSrcImg'
 
 interface Props {
   className?: string
@@ -40,7 +41,7 @@ export default function TokenOwnerRecordsList(props: Props) {
           name={a.realmSymbol}
           thumbnail={
             a.realmImage ? (
-              <img
+              <OutsideSrcImg
                 src={a.realmImage}
                 alt={a.realmSymbol}
                 className="h-6 w-auto"

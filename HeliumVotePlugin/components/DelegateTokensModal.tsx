@@ -6,6 +6,7 @@ import { notify } from '@utils/notifications'
 import { SubDaoWithMeta } from 'HeliumVotePlugin/sdk/types'
 import { useSubDaos } from 'HeliumVotePlugin/hooks/useSubDaos'
 import { LoadingDots } from '@components/Loading'
+import OutsideSrcImg from '@components/OutsideSrcImg'
 
 export interface DelegateTokensModalProps {
   isOpen: boolean
@@ -81,9 +82,9 @@ export const DelegateTokensModal: React.FC<DelegateTokensModalProps> = ({
                   onClick={() => setSelectedSubDaoPk(subDao.pubkey)}
                   key={subDao.pubkey.toBase58()}
                 >
-                  <img
+                  <OutsideSrcImg
                     className="w-5 h-5"
-                    src={subDao.dntMetadata.json?.image}
+                    src={subDao.dntMetadata.json?.image || ''}
                   />
                   {subDao.dntMetadata.name}
                 </div>

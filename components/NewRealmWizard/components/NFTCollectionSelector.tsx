@@ -4,6 +4,7 @@ import Header from '@components/Header'
 import Text from '@components/Text'
 import GradientCheckmarkCircle from './GradientCheckmarkCircle'
 import { LoadingDots } from '@components/Loading'
+import OutsideSrcImg from '@components/OutsideSrcImg'
 
 function ImageWithLoader({ className, ...props }) {
   const [loading, setLoading] = useState(true)
@@ -14,8 +15,9 @@ function ImageWithLoader({ className, ...props }) {
       <div className={loadingClassName}>
         <LoadingDots />
       </div>
-      <img
+      <OutsideSrcImg
         {...props}
+        src={props.src}
         className={imageClassName}
         onLoad={() => setLoading(false)}
       />

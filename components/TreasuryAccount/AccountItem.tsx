@@ -5,6 +5,7 @@ import { findMetadataPda } from '@metaplex-foundation/js'
 import { getTreasuryAccountItemInfoV2 } from '@utils/treasuryTools'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useWalletStore from 'stores/useWalletStore'
+import OutsideSrcImg from '@components/OutsideSrcImg'
 
 const AccountItem = ({
   governedAccountTokenAccount,
@@ -80,7 +81,7 @@ const AccountItem = ({
   return (
     <div className="flex items-center w-full p-3 border rounded-lg text-fgd-1 border-fgd-4">
       {logo ? (
-        <img
+        <OutsideSrcImg
           className={`flex-shrink-0 h-6 w-6 mr-2.5 mt-0.5 ${
             governedAccountTokenAccount.isSol && 'rounded-full'
           }`}
@@ -91,7 +92,7 @@ const AccountItem = ({
           }}
         />
       ) : logoFromMeta ? (
-        <img
+        <OutsideSrcImg
           className={`flex-shrink-0 h-6 w-6 mr-2.5 mt-0.5 ${
             governedAccountTokenAccount.isSol && 'rounded-full'
           }`}

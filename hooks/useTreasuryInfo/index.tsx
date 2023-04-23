@@ -13,6 +13,7 @@ import { assembleWallets } from './assembleWallets'
 import { calculateTokenCountAndValue } from './calculateTokenCountAndValue'
 import { getNfts } from './getNfts'
 import { getDomains } from './getDomains'
+import OutsideSrcImg from '@components/OutsideSrcImg'
 
 interface Data {
   auxiliaryWallets: AuxiliaryWallet[]
@@ -136,7 +137,9 @@ export default function useTreasuryInfo(
     data: {
       wallets,
       auxiliaryWallets: auxWallets,
-      icon: realmInfo.ogImage ? <img src={realmInfo.ogImage} /> : undefined,
+      icon: realmInfo.ogImage ? (
+        <OutsideSrcImg src={realmInfo.ogImage} />
+      ) : undefined,
       governedTokens: { counts, values },
       name: realmInfo.displayName || realmInfo.symbol,
       totalValue: wallets.reduce((acc, wallet) => {

@@ -1,3 +1,4 @@
+import OutsideSrcImg from '@components/OutsideSrcImg'
 import Text from '@components/Text'
 
 export function GenericTokenIcon() {
@@ -53,7 +54,11 @@ export default function TokenInfoTable({ tokenInfo, loading }) {
         <div className="flex items-center space-x-2">
           {tokenInfo?.logoURI ? (
             <div className="w-10">
-              <img src={tokenInfo?.logoURI} alt="token" className="w-full" />
+              <OutsideSrcImg
+                src={tokenInfo?.logoURI}
+                alt="token"
+                className="w-full"
+              />
             </div>
           ) : (
             <div className="w-10 mr-4 text-white/50">

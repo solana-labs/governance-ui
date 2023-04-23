@@ -40,6 +40,7 @@ import tokenPriceService from '@utils/services/tokenPrice'
 import { EVERLEND } from '../../Strategies/protocols/everlend/tools'
 import { findAssociatedTokenAccount } from '@everlend/common'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import OutsideSrcImg from '@components/OutsideSrcImg'
 
 type InvestmentType = TreasuryStrategy & {
   investedAmount: number
@@ -634,19 +635,19 @@ export const StrategyCard = ({
     <div className="flex items-center justify-between p-4 mt-2 border rounded-md border-fgd-4">
       <div className="flex items-center">
         {strat.protocolLogoSrc ? (
-          <img
+          <OutsideSrcImg
             src={strat.protocolLogoSrc}
             style={{
               marginRight: -8,
             }}
             className="h-8 rounded-full w-8"
-          ></img>
+          ></OutsideSrcImg>
         ) : null}
         {handledTokenImgSrc ? (
-          <img
+          <OutsideSrcImg
             src={strat.handledTokenImgSrc}
             className="w-8 h-8 mr-3 rounded-full"
-          ></img>
+          ></OutsideSrcImg>
         ) : (
           <div className="w-8 h-8 mr-3 rounded-full"></div>
         )}

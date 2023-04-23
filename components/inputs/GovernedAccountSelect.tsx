@@ -9,6 +9,7 @@ import {
 import React, { useEffect } from 'react'
 import { getProgramName } from '@components/instructions/programs/names'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
+import OutsideSrcImg from '@components/OutsideSrcImg'
 
 const GovernedAccountSelect = ({
   onChange,
@@ -68,7 +69,11 @@ const GovernedAccountSelect = ({
         <div className="space-y-0.5 text-xs text-fgd-3">
           {tokenName && (
             <div className="flex items-center">
-              Token: <img className="flex-shrink-0 h-4 mx-1 w-4" src={imgUrl} />
+              Token:{' '}
+              <OutsideSrcImg
+                className="flex-shrink-0 h-4 mx-1 w-4"
+                src={imgUrl}
+              />
               {tokenName}
             </div>
           )}

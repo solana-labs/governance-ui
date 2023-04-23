@@ -7,6 +7,7 @@ import Text from '@components/Text'
 import { FORM_NAME as MULTISIG_FORM } from 'pages/realms/new/multisig'
 import { FORM_NAME as COMMUNITY_TOKEN_FORM } from 'pages/realms/new/community-token'
 import { GenericTokenIcon } from './TokenInfoTable'
+import OutsideSrcImg from '@components/OutsideSrcImg'
 
 const TO_BE_GENERATED = '(To be generated)'
 
@@ -57,7 +58,7 @@ function TokenInfoSummary({ title, name, symbol, logoURI }) {
     >
       <div className="flex items-center">
         {logoURI ? (
-          <img src={logoURI} className="w-8" />
+          <OutsideSrcImg src={logoURI} className="w-8" />
         ) : (
           <div className="w-8 text-fgd-2">
             <GenericTokenIcon />
@@ -108,7 +109,7 @@ function CommunityInfo({
           }
         >
           <div className="flex items-center">
-            <img
+            <OutsideSrcImg
               src={nftInfo.image || '/icons/threshold-icon.svg'}
               className="w-8"
             />

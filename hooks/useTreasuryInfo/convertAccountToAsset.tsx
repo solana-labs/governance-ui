@@ -10,6 +10,7 @@ import { abbreviateAddress } from '@utils/formatting'
 
 import { getAccountAssetCount } from './getAccountAssetCount'
 import { getAccountValue } from './getAccountValue'
+import OutsideSrcImg from '@components/OutsideSrcImg'
 
 export const convertAccountToAsset = (
   account: AssetAccount,
@@ -59,7 +60,7 @@ export const convertAccountToAsset = (
         id: account.pubkey.toBase58() + account.type,
         count: getAccountAssetCount(account),
         icon: info.info?.logoURI ? (
-          <img src={info.info.logoURI} className="rounded-full" />
+          <OutsideSrcImg src={info.info.logoURI} className="rounded-full" />
         ) : (
           <TokenIcon className="fill-fgd-1" />
         ),
@@ -81,7 +82,7 @@ export const convertAccountToAsset = (
         id: account.pubkey.toBase58() + account.type,
         count: getAccountAssetCount(account),
         icon: info.info?.logoURI ? (
-          <img src={info.info.logoURI} className="rounded-full" />
+          <OutsideSrcImg src={info.info.logoURI} className="rounded-full" />
         ) : (
           <TokenIcon className="fill-fgd-1" />
         ),

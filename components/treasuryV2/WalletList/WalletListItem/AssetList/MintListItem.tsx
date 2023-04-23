@@ -12,6 +12,7 @@ import { Mint } from '@models/treasury/Asset'
 import { GoverningTokenType } from '@solana/spl-governance'
 import { UsersIcon } from '@heroicons/react/outline'
 import useProgramVersion from '@hooks/useProgramVersion'
+import OutsideSrcImg from '@components/OutsideSrcImg'
 
 interface Props {
   className?: string
@@ -79,7 +80,7 @@ export default function MintListItem(props: Props) {
       thumbnail={
         <div className="h-6 relative w-6">
           {realmInfo?.ogImage && !!props.mint.tokenRole ? (
-            <img className="h-6 w-6" src={realmInfo.ogImage} />
+            <OutsideSrcImg className="h-6 w-6" src={realmInfo.ogImage} />
           ) : membership ? (
             <UsersIcon className="h-6 w-6" />
           ) : (
