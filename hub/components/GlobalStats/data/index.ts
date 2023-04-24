@@ -23,6 +23,7 @@ import { getAllSplGovernanceProgramIds } from 'pages/api/tools/realms';
 
 import { getGovernances } from './getGovernances';
 import { getTokenAmount } from './getTokenAmount';
+import { DEFAULT_NFT_VOTER_PLUGIN } from '@tools/constants';
 
 export interface Update {
   progress: number;
@@ -153,7 +154,7 @@ export async function fetchData(
             // Get NFT DAOs
             if (
               realmConfig.account.communityTokenConfig.voterWeightAddin?.equals(
-                new PublicKey('GnftV5kLjd67tvHpNGyodwWveEKivz3ZWvvE3Z4xi2iw'),
+                new PublicKey(DEFAULT_NFT_VOTER_PLUGIN),
               )
             ) {
               nftRealms.push(realm.publicKey);
