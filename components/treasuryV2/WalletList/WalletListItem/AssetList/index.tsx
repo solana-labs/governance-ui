@@ -36,6 +36,7 @@ import useWalletStore from 'stores/useWalletStore'
 import TokenOwnerRecordsList from './TokenOwnerRecordsList'
 import useRealm from '@hooks/useRealm'
 import { GoverningTokenType } from '@solana/spl-governance'
+import TokenIcon from '@components/treasuryV2/icons/TokenIcon'
 
 export type Section = 'tokens' | 'nfts' | 'others'
 
@@ -99,7 +100,6 @@ export default function AssetList(props: Props) {
 
         const data = await (await fetch(jsonUri)).json()
         return {
-          image: data.image,
           symbol: data.symbol,
           name: data.name,
         }
@@ -125,7 +125,7 @@ export default function AssetList(props: Props) {
 
           newTokens.push({
             ...token,
-            icon: <img src={newTokenData.image} className="rounded-full" />,
+            icon: <TokenIcon></TokenIcon>,
             name: newTokenData.name,
             symbol: newTokenData.symbol,
           })
@@ -190,7 +190,6 @@ export default function AssetList(props: Props) {
 
         const data = await (await fetch(jsonUri)).json()
         return {
-          image: data.image,
           symbol: data.symbol,
           name: data.name,
         }

@@ -428,7 +428,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
                       >
                         <img
                           className="w-4 h-4"
-                          src={delegatedSubDaoMetadata.json?.image}
+                          src={delegatedSubDaoMetadata.json?.image || ''}
                         />
                         {delegatedSubDaoMetadata.name}
                       </span>
