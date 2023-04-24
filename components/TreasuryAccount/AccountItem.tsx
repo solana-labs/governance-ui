@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useMemo } from 'react'
 import { getTreasuryAccountItemInfoV2 } from '@utils/treasuryTools'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import TokenIcon from '@components/treasuryV2/icons/TokenIcon'
@@ -16,19 +16,14 @@ const AccountItem = ({
     symbol,
     displayPrice,
   } = getTreasuryAccountItemInfoV2(governedAccountTokenAccount)
-
   const [symbolFromMeta, setSymbolFromMeta] = useState<undefined | string>(
-    undefined
-  )
   const { data } = useTokenMetadata(
     governedAccountTokenAccount.extensions.mint?.publicKey,
     !logo
   )
 
-  useEffect(() => {
-    if (data?.symbol) {
-      setSymbolFromMeta(data.symbol)
-    }
+  const symbolFromMeta = useMemo(() => {
+    return data?.symbol
   }, [data?.symbol])
 
   return (

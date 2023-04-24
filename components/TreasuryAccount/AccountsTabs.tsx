@@ -1,4 +1,4 @@
-import { FunctionComponent, useEffect, useState } from 'react'
+import { FunctionComponent, useMemo } from 'react'
 import { getTreasuryAccountItemInfoV2 } from '@utils/treasuryTools'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import TokenIcon from '@components/treasuryV2/icons/TokenIcon'
@@ -64,18 +64,14 @@ const AccountTab: FunctionComponent<AccountTabProps> = ({
   } = getTreasuryAccountItemInfoV2(assetAccount)
 
   const [symbolFromMeta, setSymbolFromMeta] = useState<undefined | string>(
-    undefined
-  )
 
   const { data } = useTokenMetadata(
     assetAccount.extensions.mint?.publicKey,
     !logo
   )
 
-  useEffect(() => {
-    if (data?.symbol) {
-      setSymbolFromMeta(data.symbol)
-    }
+  const symbolFromMeta = useMemo(() => {
+    return data?.symbol
   }, [data?.symbol])
   return (
     <button

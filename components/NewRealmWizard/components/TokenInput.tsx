@@ -17,7 +17,7 @@ import TokenInfoTable, {
 } from '@components/NewRealmWizard/components/TokenInfoTable'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { TokenInfo } from '@utils/services/types'
-import axios from 'axios'
+import tokenPriceService from '@utils/services/tokenPrice'
 
 interface MintInfoWithDecimalSupply extends MintInfo {
   supplyAsDecimal: number
@@ -63,7 +63,7 @@ export default function TokenInput({
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
-  const [tokenList, setTokenList] = useState<TokenInfo[] | undefined>()
+  const tokenList = tokenPriceService._tokenList
   const [tokenMintAddress, setTokenMintAddress] = useState('')
   const [tokenInfo, setTokenInfo] = useState<TokenWithMintInfo | undefined>()
   const validMintAddress = tokenInfo && tokenInfo !== PENDING_COIN
@@ -80,16 +80,6 @@ export default function TokenInput({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [wallet])
-
-  useEffect(() => {
-    async function getTokenList() {
-      const tokens = await axios.get('https://token.jup.ag/strict')
-      const tokenList = tokens.data as TokenInfo[]
-      setTokenList(tokenList)
-    }
-
-    getTokenList()
-  }, [connection.cluster])
 
   useEffect(() => {
     async function getTokenInfo(tokenMintAddress) {
