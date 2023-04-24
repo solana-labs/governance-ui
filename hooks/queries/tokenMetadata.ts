@@ -7,7 +7,7 @@ import useWalletStore from 'stores/useWalletStore'
 const OneHMs = 3600000
 
 export const useTokenMetadataKeys = {
-  byPubkey: (k: PublicKey) => [k.toString()],
+  byMint: (k: PublicKey) => [k.toString()],
 }
 
 export const useTokenMetadata = (
@@ -19,7 +19,7 @@ export const useTokenMetadata = (
   const enabled = !!mint && !!enableConditions
 
   const query = useQuery({
-    queryKey: enabled ? useTokenMetadataKeys.byPubkey(mint) : undefined,
+    queryKey: enabled ? useTokenMetadataKeys.byMint(mint) : undefined,
     queryFn: async () => {
       const mintPubkey = new PublicKey(mint!)
       const metadataAccount = findMetadataPda(mintPubkey)
