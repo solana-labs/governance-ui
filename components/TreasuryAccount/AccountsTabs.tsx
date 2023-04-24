@@ -63,6 +63,8 @@ const AccountTab: FunctionComponent<AccountTabProps> = ({
     displayPrice,
   } = getTreasuryAccountItemInfoV2(assetAccount)
 
+  const [symbolFromMeta, setSymbolFromMeta] = useState<undefined | string>(
+
   const { data } = useTokenMetadata(
     assetAccount.extensions.mint?.publicKey,
     !logo
@@ -71,7 +73,6 @@ const AccountTab: FunctionComponent<AccountTabProps> = ({
   const symbolFromMeta = useMemo(() => {
     return data?.symbol
   }, [data?.symbol])
-
   return (
     <button
       key={assetAccount.extensions.transferAddress?.toBase58()}

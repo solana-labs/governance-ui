@@ -19,6 +19,7 @@ function ImageWithLoader({
       </div>
       <img
         {...props}
+        src={props.src}
         className={imageClassName}
         onLoad={() => setLoading(false)}
       />

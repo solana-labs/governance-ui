@@ -16,6 +16,7 @@ const AccountItem = ({
     symbol,
     displayPrice,
   } = getTreasuryAccountItemInfoV2(governedAccountTokenAccount)
+  const [symbolFromMeta, setSymbolFromMeta] = useState<undefined | string>(
   const { data } = useTokenMetadata(
     governedAccountTokenAccount.extensions.mint?.publicKey,
     !logo
