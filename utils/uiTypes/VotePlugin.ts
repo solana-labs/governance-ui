@@ -1,7 +1,4 @@
-import {
-  NftVoterClient,
-  GatewayClient,
-} from '@solana/governance-program-library'
+import { GatewayClient } from '@solana/governance-program-library'
 import {
   SwitchboardQueueVoterClient,
   SWITCHBOARD_ADDIN_ID,
@@ -48,6 +45,7 @@ import { getUnusedPositionsForProposal } from 'HeliumVotePlugin/utils/getUnusedP
 import { getUsedPositionsForProposal } from 'HeliumVotePlugin/utils/getUsedPositionsForProposal'
 import { getConnectionContext } from '@utils/connection'
 import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
+import { NftVoterClient } from './NftVoterClient'
 
 type UpdateVoterWeightRecordTypes =
   | 'castVote'

@@ -1,6 +1,6 @@
 import { Wallet } from '@marinade.finance/marinade-ts-sdk'
 import { AnchorProvider, BorshInstructionCoder } from '@coral-xyz/anchor'
-import { NftVoterClient } from '@solana/governance-program-library'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { AccountMetaData, getRealm } from '@solana/spl-governance'
 import { Connection, Keypair } from '@solana/web3.js'
 import { fmtTokenAmount } from '@utils/formatting'

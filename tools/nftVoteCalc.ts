@@ -1,4 +1,4 @@
-import { NftVoterClient } from '@solana/governance-program-library'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { ChatMessageBody } from '@solana/spl-governance'
 import { Connection, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js'
 import { notify } from '@utils/notifications'

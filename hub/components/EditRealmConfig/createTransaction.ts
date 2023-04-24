@@ -1,5 +1,5 @@
 import { AnchorProvider, Wallet } from '@project-serum/anchor';
-import { NftVoterClient } from '@solana/governance-program-library';
+
 import {
   createSetRealmConfig,
   GoverningTokenType,
@@ -19,6 +19,7 @@ import {
   getMaxVoterWeightRecord,
   getRegistrarPDA,
 } from '@utils/plugin/accounts';
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient';
 
 import { Config } from './fetchConfig';
 import { buildUpdates, diff } from './UpdatesList';

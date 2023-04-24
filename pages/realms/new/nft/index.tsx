@@ -32,7 +32,6 @@ import {
   GoverningTokenConfigAccountArgs,
   GoverningTokenType,
 } from '@solana/spl-governance'
-import { nftPluginsPks } from '@hooks/useVotingPlugins'
 
 import YesVotePercentageForm, {
   CouncilYesVotePercentageSchema,

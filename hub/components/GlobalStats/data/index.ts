@@ -14,6 +14,7 @@ import BN from 'bn.js';
 import type { Logger } from '../Logs';
 import { WSOL_MINT_PK } from '@components/instructions/tools';
 import { abbreviateAddress } from '@hub/lib/abbreviateAddress';
+import { DEFAULT_NFT_VOTER_PLUGIN } from '@tools/constants';
 import { getRealmConfigAccountOrDefault } from '@tools/governance/configs';
 import group from '@utils/group';
 import { pause } from '@utils/pause';
@@ -23,7 +24,6 @@ import { getAllSplGovernanceProgramIds } from 'pages/api/tools/realms';
 
 import { getGovernances } from './getGovernances';
 import { getTokenAmount } from './getTokenAmount';
-import { DEFAULT_NFT_VOTER_PLUGIN } from '@tools/constants';
 
 export interface Update {
   progress: number;

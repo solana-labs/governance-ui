@@ -1,5 +1,5 @@
 import { AnchorProvider, Wallet } from '@project-serum/anchor';
-import { NftVoterClient } from '@solana/governance-program-library';
+
 import {
   RealmConfig,
   RealmConfigAccount,
@@ -19,6 +19,7 @@ import { nftPluginsPks } from '@hooks/useVotingPlugins';
 import { getNetworkFromEndpoint } from '@utils/connection';
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts';
 import { parseMintAccountData, MintAccount } from '@utils/tokens';
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient';
 
 export interface Config {
   config: RealmConfig;

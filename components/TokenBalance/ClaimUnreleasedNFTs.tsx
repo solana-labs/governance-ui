@@ -4,7 +4,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { TransactionInstruction } from '@solana/web3.js'
 import { SecondaryButton } from '@components/Button'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { NftVoterClient } from '@solana/governance-program-library'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { chunks } from '@utils/helpers'
 import { getRegistrarPDA, getVoterWeightRecord } from '@utils/plugin/accounts'
 import {
