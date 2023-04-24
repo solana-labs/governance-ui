@@ -3136,5 +3136,14 @@
     "website": "https://helium.com",
     "twitter": "@Helium",
     "ogImage": "/realms/Helium/img/mobilelogo.png"
+  },
+    {
+    "symbol": "CRYSTAL",
+    "displayName": "Polar Dao",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "6xdMASp69Q42BudN7L2u2i92GfEruzCiZBqYaT3hwhZ4",
+    "website": "https://thepolariansnft.com",
+    "twitter": "@polariansnft",
+    "ogImage": "/realms/PolarDao.png"
   }
 ]
