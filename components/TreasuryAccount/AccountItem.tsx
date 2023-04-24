@@ -21,7 +21,7 @@ const AccountItem = ({
     governedAccountTokenAccount.extensions.mint?.publicKey,
     !logo
   )
-  console.log(data?.symbol)
+
   const symbolFromMeta = useMemo(() => {
     return data?.symbol
   }, [data?.symbol])

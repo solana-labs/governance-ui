@@ -27,16 +27,10 @@ export const useTokenMetadata = (
         connection.current,
         metadataAccount
       )
-      const jsonUri = metadata.data.uri.slice(
-        0,
-        metadata.data.uri.indexOf('\x00')
-      )
-
-      const data = await (await fetch(jsonUri)).json()
       //Do not use data.img we don't want to have unsafe imgs to show in realms.
       return {
-        symbol: data.symbol,
-        name: data.name,
+        symbol: metadata.data.symbol,
+        name: metadata.data.name,
       }
     },
     staleTime: OneHMs,
