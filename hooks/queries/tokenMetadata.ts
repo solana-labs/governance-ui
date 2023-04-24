@@ -6,6 +6,10 @@ import useWalletStore from 'stores/useWalletStore'
 
 const OneHMs = 3600000
 
+export const useTokenMetadataKeys = {
+  byMint: (k: PublicKey) => [k.toString()],
+}
+
 export const useTokenMetadata = (
   mint: PublicKey | undefined,
   enableConditions = true
@@ -15,6 +19,7 @@ export const useTokenMetadata = (
   const enabled = !!mint && !!enableConditions
 
   const query = useQuery({
+    queryKey: enabled ? useTokenMetadataKeys.byMint(mint) : undefined,
     queryFn: async () => {
       const mintPubkey = new PublicKey(mint!)
       const metadataAccount = findMetadataPda(mintPubkey)
@@ -22,16 +27,10 @@ export const useTokenMetadata = (
         connection.current,
         metadataAccount
       )
-      const jsonUri = metadata.data.uri.slice(
-        0,
-        metadata.data.uri.indexOf('\x00')
-      )
-
-      const data = await (await fetch(jsonUri)).json()
       //Do not use data.img we don't want to have unsafe imgs to show in realms.
       return {
-        symbol: data.symbol,
-        name: data.name,
+        symbol: metadata.data.symbol,
+        name: metadata.data.name,
       }
     },
     staleTime: OneHMs,

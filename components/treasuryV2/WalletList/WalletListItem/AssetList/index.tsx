@@ -88,20 +88,14 @@ export default function AssetList(props: Props) {
       try {
         const mintPubkey = new PublicKey(mintAddress)
         const metadataAccount = findMetadataPda(mintPubkey)
-        const accountData = await connection.current.getAccountInfo(
+        const metadata = await Metadata.fromAccountAddress(
+          connection.current,
           metadataAccount
         )
 
-        const state = Metadata.deserialize(accountData!.data)
-        const jsonUri = state[0].data.uri.slice(
-          0,
-          state[0].data.uri.indexOf('\x00')
-        )
-
-        const data = await (await fetch(jsonUri)).json()
         return {
-          symbol: data.symbol,
-          name: data.name,
+          symbol: metadata.data.symbol,
+          name: metadata.data.name,
         }
       } catch (e) {
         console.log(e)
@@ -178,20 +172,14 @@ export default function AssetList(props: Props) {
       try {
         const mintPubkey = new PublicKey(mintAddress)
         const metadataAccount = findMetadataPda(mintPubkey)
-        const accountData = await connection.current.getAccountInfo(
+        const metadata = await Metadata.fromAccountAddress(
+          connection.current,
           metadataAccount
         )
 
-        const state = Metadata.deserialize(accountData!.data)
-        const jsonUri = state[0].data.uri.slice(
-          0,
-          state[0].data.uri.indexOf('\x00')
-        )
-
-        const data = await (await fetch(jsonUri)).json()
         return {
-          symbol: data.symbol,
-          name: data.name,
+          symbol: metadata.data.symbol,
+          name: metadata.data.name,
         }
       } catch (e) {
         console.log(e)
