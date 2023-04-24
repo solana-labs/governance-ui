@@ -18,4 +18,4 @@ export const DISABLED_VALUE = new BN('18446744073709551615')
 export const SIMULATION_WALLET = 'ENmcpFCpxN1CqyUjuog9yyUVfdXBKF3LVCwLr7grJZpk'
 
 export const DEFAULT_NFT_VOTER_PLUGIN =
-  'CcequAbR1TT7N4VFzLo45bXVSPBStoBVHMGwy4gAvAEF'
+  'GnftV5kLjd67tvHpNGyodwWveEKivz3ZWvvE3Z4xi2iw'
