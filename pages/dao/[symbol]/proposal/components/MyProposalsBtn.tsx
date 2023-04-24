@@ -3,7 +3,6 @@ import React, { useEffect, useMemo, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import {
   getProposalDepositsByDepositPayer,
-  getTokenOwnerRecordAddress,
   ProgramAccount,
   Proposal,
   ProposalDeposit,
@@ -34,6 +33,7 @@ import {
 import useQueryContext from '@hooks/useQueryContext'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
 
 const MyProposalsBn = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
@@ -47,6 +47,8 @@ const MyProposalsBn = () => {
   )
   const [ownNftVoteRecords, setOwnNftVoteRecords] = useState<any[]>([])
   const ownNftVoteRecordsFilterd = ownNftVoteRecords
+
+  const { data: tokenOwnerRecord } = useAddressQuery_CommunityTokenOwner()
 
   const maxVoterWeight = useMaxVoteRecord()?.pubkey || undefined
   const { realm, programId, programVersion } = useWalletStore(
@@ -261,13 +263,6 @@ const MyProposalsBn = () => {
       realm!.account.communityMint,
       wallet!.publicKey!,
       client.client!.program.programId
-    )
-
-    const tokenOwnerRecord = await getTokenOwnerRecordAddress(
-      realm.owner,
-      realm.pubkey,
-      realm.account.communityMint,
-      wallet.publicKey
     )
 
     const nfts = ownNftVoteRecordsFilterd.slice(

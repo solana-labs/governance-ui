@@ -12,11 +12,9 @@ import {
   SequenceType,
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
-import {
-  ProposalState,
-  getTokenOwnerRecordAddress,
-} from '@solana/spl-governance'
+import { ProposalState } from '@solana/spl-governance'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
 
 const NFT_SOL_BALANCE = 0.0014616
 
@@ -37,9 +35,12 @@ const ClaimUnreleasedNFTs = ({
   )
   const { proposals, isNftMode } = useRealm()
 
+  const { data: tokenOwnerRecord } = useAddressQuery_CommunityTokenOwner()
+
   const releaseNfts = async (count: number | null = null) => {
     if (!wallet?.publicKey) throw new Error('no wallet')
     if (!realm) throw new Error()
+    if (!tokenOwnerRecord) throw new Error()
 
     setIsLoading(true)
     const instructions: TransactionInstruction[] = []
@@ -53,13 +54,6 @@ const ClaimUnreleasedNFTs = ({
       realm.account.communityMint,
       wallet.publicKey,
       client.client!.program.programId
-    )
-
-    const tokenOwnerRecord = await getTokenOwnerRecordAddress(
-      realm.owner,
-      realm.pubkey,
-      realm.account.communityMint,
-      wallet.publicKey
     )
 
     const nfts = ownNftVoteRecordsFilterd.slice(
