@@ -42,6 +42,7 @@ import {
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { abbreviateAddress } from '@utils/formatting'
 import { getDepositType } from 'VoteStakeRegistry/tools/deposits'
+
 const VestingVsTime = dynamic(
   () => import('VoteStakeRegistry/components/LockTokenStats/VestingVsTime'),
   {

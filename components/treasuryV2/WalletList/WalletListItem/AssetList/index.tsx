@@ -36,6 +36,7 @@ import useWalletStore from 'stores/useWalletStore'
 import TokenOwnerRecordsList from './TokenOwnerRecordsList'
 import useRealm from '@hooks/useRealm'
 import { GoverningTokenType } from '@solana/spl-governance'
+import TokenIcon from '@components/treasuryV2/icons/TokenIcon'
 
 export type Section = 'tokens' | 'nfts' | 'others'
 
@@ -87,21 +88,14 @@ export default function AssetList(props: Props) {
       try {
         const mintPubkey = new PublicKey(mintAddress)
         const metadataAccount = findMetadataPda(mintPubkey)
-        const accountData = await connection.current.getAccountInfo(
+        const metadata = await Metadata.fromAccountAddress(
+          connection.current,
           metadataAccount
         )
 
-        const state = Metadata.deserialize(accountData!.data)
-        const jsonUri = state[0].data.uri.slice(
-          0,
-          state[0].data.uri.indexOf('\x00')
-        )
-
-        const data = await (await fetch(jsonUri)).json()
         return {
-          image: data.image,
-          symbol: data.symbol,
-          name: data.name,
+          symbol: metadata.data.symbol,
+          name: metadata.data.name,
         }
       } catch (e) {
         console.log(e)
@@ -125,7 +119,7 @@ export default function AssetList(props: Props) {
 
           newTokens.push({
             ...token,
-            icon: <img src={newTokenData.image} className="rounded-full" />,
+            icon: <TokenIcon></TokenIcon>,
             name: newTokenData.name,
             symbol: newTokenData.symbol,
           })
@@ -178,21 +172,14 @@ export default function AssetList(props: Props) {
       try {
         const mintPubkey = new PublicKey(mintAddress)
         const metadataAccount = findMetadataPda(mintPubkey)
-        const accountData = await connection.current.getAccountInfo(
+        const metadata = await Metadata.fromAccountAddress(
+          connection.current,
           metadataAccount
         )
 
-        const state = Metadata.deserialize(accountData!.data)
-        const jsonUri = state[0].data.uri.slice(
-          0,
-          state[0].data.uri.indexOf('\x00')
-        )
-
-        const data = await (await fetch(jsonUri)).json()
         return {
-          image: data.image,
-          symbol: data.symbol,
-          name: data.name,
+          symbol: metadata.data.symbol,
+          name: metadata.data.name,
         }
       } catch (e) {
         console.log(e)
