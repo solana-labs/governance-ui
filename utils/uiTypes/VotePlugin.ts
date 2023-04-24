@@ -527,7 +527,8 @@ export class VotingClient {
             .accounts({
               registrar,
               voterWeightRecord: voterWeightPk,
-              governingTokenOwner: walletPk,
+              voterTokenOwnerRecord: tokenOwnerRecord.pubkey,
+              voterAuthority: walletPk,
               payer: walletPk,
               systemProgram: SYSTEM_PROGRAM_ID,
             })
@@ -669,7 +670,8 @@ export class VotingClient {
               voterWeightRecord: voterWeightPk,
               governance: proposal.account.governance,
               proposal: proposal.pubkey,
-              governingTokenOwner: walletPk,
+              voterTokenOwnerRecord: tokenOwnerRecord,
+              voterAuthority: walletPk,
               voteRecord: voteRecordPk,
               beneficiary: walletPk,
             })

@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import {
   getProposalDepositsByDepositPayer,
+  getTokenOwnerRecordAddress,
   ProgramAccount,
   Proposal,
   ProposalDeposit,
@@ -245,6 +246,9 @@ const MyProposalsBn = () => {
     )
   }
   const releaseNfts = async (count: number | null = null) => {
+    if (!realm) throw new Error()
+    if (!wallet?.publicKey) throw new Error('no wallet')
+
     setIsLoading(true)
     const instructions: TransactionInstruction[] = []
     const { registrar } = await getRegistrarPDA(
@@ -258,6 +262,14 @@ const MyProposalsBn = () => {
       wallet!.publicKey!,
       client.client!.program.programId
     )
+
+    const tokenOwnerRecord = await getTokenOwnerRecordAddress(
+      realm.owner,
+      realm.pubkey,
+      realm.account.communityMint,
+      wallet.publicKey
+    )
+
     const nfts = ownNftVoteRecordsFilterd.slice(
       0,
       count ? count : ownNftVoteRecordsFilterd.length
@@ -271,7 +283,8 @@ const MyProposalsBn = () => {
           governance:
             proposals[i.account.proposal.toBase58()].account.governance,
           proposal: i.account.proposal,
-          governingTokenOwner: wallet!.publicKey!,
+          voterTokenOwnerRecord: tokenOwnerRecord,
+          voterAuthority: wallet!.publicKey!,
           voteRecord: i.publicKey,
           beneficiary: wallet!.publicKey!,
         })
