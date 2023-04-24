@@ -3145,5 +3145,14 @@
     "website": "https://thepolariansnft.com",
     "twitter": "@polariansnft",
     "ogImage": "/realms/PolarDao.png"
-  }
+  },
+  {
+    "symbol": "LAVA",
+    "displayName": "LavaDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "HPhQwEU6GEYd82vkXDQ59pjavVJ7vrEsbnj1fwU9USRA",
+    "website": "https://heliumdenver.com",
+    "twitter": "@hntdenver",
+    "ogImage": "/realms/LavaDAO/img/lavalogo.png"
+  },
 ]
