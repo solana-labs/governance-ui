@@ -233,7 +233,6 @@ export const PositionCard: React.FC<PositionCardProps> = ({
   }
 
   const handleSplitTokens = async (values: LockTokensModalFormValues) => {
-    console.log(values)
     await splitPosition({
       sourcePosition: position,
       amount: values.amount,

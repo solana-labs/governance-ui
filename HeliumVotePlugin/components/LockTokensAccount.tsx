@@ -124,7 +124,6 @@ export const LockTokensAccount: React.FC<{
         })
       }
     } catch (e) {
-      console.log(e);
       notify({
         type: 'error',
         message: 'Unable to fetch positions',
