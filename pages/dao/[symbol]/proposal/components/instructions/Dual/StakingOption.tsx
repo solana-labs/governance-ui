@@ -47,25 +47,25 @@ const StakingOption = ({
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-  function getInstruction(): Promise<UiInstruction> {
-    return getConfigInstruction({
-      connection,
-      form,
-      schema,
-      setFormErrors,
-      wallet,
-    })
-  }
+  const schema = getDualFinanceStakingOptionSchema()
   useEffect(() => {
+    function getInstruction(): Promise<UiInstruction> {
+      return getConfigInstruction({
+        connection,
+        form,
+        schema,
+        setFormErrors,
+        wallet,
+      })
+    }
     handleSetInstructions(
       { governedAccount: governedAccount, getInstruction },
       index
     )
-  }, [form])
+  }, [form, governedAccount, handleSetInstructions, index, connection, schema, wallet])
   useEffect(() => {
     setGovernedAccount(form.baseTreasury?.governance)
   }, [form.baseTreasury])
-  const schema = getDualFinanceStakingOptionSchema()
 
   return (
     <>
