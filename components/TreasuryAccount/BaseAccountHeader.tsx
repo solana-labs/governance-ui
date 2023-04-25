@@ -1,10 +1,8 @@
 import React from 'react'
 import { useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
-import { findMetadataPda } from '@metaplex-foundation/js'
 import { PublicKey } from '@solana/web3.js'
-import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
 import { TokenInfoWithoutDecimals } from '@utils/services/tokenPrice'
+import { useTokenMetadata } from '@hooks/queries/tokenMetadata'
 
 const BaseAccountHeader: React.FC<{
   isNFT?: boolean
@@ -16,39 +14,20 @@ const BaseAccountHeader: React.FC<{
   const [logo, setLogo] = useState<undefined | string>(tokenInfo?.logoURI)
 
   const [symbol, setSymbol] = useState<undefined | string>(tokenInfo?.symbol)
-  const connection = useWalletStore((s) => s.connection)
+  const { data } = useTokenMetadata(
+    new PublicKey(mintAddress),
+    !tokenInfo?.symbol
+  )
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   useEffect(() => {
-    const getTokenMetadata = async (mintAddress: string) => {
-      try {
-        const mintPubkey = new PublicKey(mintAddress)
-        const metadataAccount = findMetadataPda(mintPubkey)
-        const accountData = await connection.current.getAccountInfo(
-          metadataAccount
-        )
-
-        const state = Metadata.deserialize(accountData!.data)
-        const jsonUri = state[0].data.uri.slice(
-          0,
-          state[0].data.uri.indexOf('\x00')
-        )
-
-        const data = await (await fetch(jsonUri)).json()
-
-        setLogo(data.image)
-        setSymbol(data.symbol)
-      } catch (e) {
-        console.log(e)
-      }
-    }
     if (tokenInfo?.address) {
       setLogo(tokenInfo?.logoURI)
       setSymbol(tokenInfo?.symbol)
-    } else {
-      getTokenMetadata(mintAddress)
     }
-  })
+    if (data?.symbol) {
+      setSymbol(data?.symbol)
+    }
+  }, [data, tokenInfo])
   return (
     <div className="bg-bkg-1 mb-4 p-4 rounded-md w-full flex items-center">
       {(logo || isNFT) && (

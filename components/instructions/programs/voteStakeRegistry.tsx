@@ -1,5 +1,10 @@
 import { Wallet } from '@marinade.finance/marinade-ts-sdk'
-import { AnchorProvider, BN, BorshInstructionCoder, IdlTypes } from '@coral-xyz/anchor'
+import {
+  AnchorProvider,
+  BN,
+  BorshInstructionCoder,
+  IdlTypes,
+} from '@coral-xyz/anchor'
 import { AccountMetaData } from '@solana/spl-governance'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import { fmtMintAmount } from '@tools/sdk/units'
@@ -368,9 +373,7 @@ const heliumConfigVotingMintIx = (programId: PublicKey) => ({
             <div>
               Max multiplier:{' '}
               {getInverseScaledFactor(baselineVoteWeightScaledFactor) +
-                getInverseScaledFactor(
-                  maxExtraLockupVoteWeightScaledFactor
-                )}
+                getInverseScaledFactor(maxExtraLockupVoteWeightScaledFactor)}
             </div>
             {/* Additional Genesis Multiplier not configurable through UI */}
             {/* <div>

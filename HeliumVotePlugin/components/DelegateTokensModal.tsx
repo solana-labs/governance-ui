@@ -83,7 +83,7 @@ export const DelegateTokensModal: React.FC<DelegateTokensModalProps> = ({
                 >
                   <img
                     className="w-5 h-5"
-                    src={subDao.dntMetadata.json?.image}
+                    src={subDao.dntMetadata.json?.image || ''}
                   />
                   {subDao.dntMetadata.name}
                 </div>
