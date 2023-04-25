@@ -24,6 +24,7 @@ import { Metaplex } from '@metaplex-foundation/js'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { getNFTsByCollection } from '@utils/tokens'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import asFindable from '@utils/queries/asFindable'
 
 function filterAndMapVerifiedCollections(nfts) {
   return nfts
@@ -367,20 +368,21 @@ export default function AddNFTCollectionForm({
 
       const verifiedCollections = {}
       for (const collectionKey in verfiedNfts) {
-        const collectionInfo = await enrichCollectionInfo(
+        const collectionInfo = await asFindable(enrichCollectionInfo)(
           connection.current,
           collectionKey
         )
+        if (collectionInfo.result !== undefined) {
+          const nftsWithInfo = await Promise.all(
+            verfiedNfts[collectionKey].slice(0, 2).map((nft) => {
+              return enrichItemInfo(nft, nft.uri)
+            })
+          )
 
-        const nftsWithInfo = await Promise.all(
-          verfiedNfts[collectionKey].slice(0, 2).map((nft) => {
-            return enrichItemInfo(nft, nft.uri)
-          })
-        )
-
-        verifiedCollections[collectionKey] = {
-          ...collectionInfo,
-          nfts: nftsWithInfo,
+          verifiedCollections[collectionKey] = {
+            ...collectionInfo.result,
+            nfts: nftsWithInfo,
+          }
         }
       }
 
