@@ -443,7 +443,7 @@ export default function AddNFTCollectionForm({
                 warning={
                   collectionVerificationState ===
                   'is nft but no collection details'
-                    ? 'Caution: This is an nft, but has no collection details. It may be an old collection, or just a regular nft. Please double check'
+                    ? 'Caution: This is an nft, but has no collection details. It may be an old collection, or just a regular nft. Please double check before proceeding.'
                     : ''
                 }
                 {...field}
