@@ -3154,5 +3154,14 @@
     "website": "https://heliumdenver.com",
     "twitter": "@hntdenver",
     "ogImage": "/realms/LavaDAO/img/lavalogo.png"
+  },
+  {
+    "symbol": "COMRADE",
+    "displayName": "ComradeDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "2KY6Ka8KNxLEPvD19J5GArVReVWm2VSinNmqvZJMYzRP",
+    "website": "https://thenudiemagazine.com",
+    "twitter": "@nudie_mag",
+    "ogImage": "/realms/ComradeDAO/img/comradedaologo.png"
   }
 ]
