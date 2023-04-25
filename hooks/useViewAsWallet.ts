@@ -1,7 +1,9 @@
+import { getExplorerInspectorUrl } from '@components/explorer/tools'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
-import { PublicKey } from '@solana/web3.js'
+import { PublicKey, Transaction } from '@solana/web3.js'
 import { useRouter } from 'next/router'
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
+import useWalletStore from 'stores/useWalletStore'
 
 const useViewAsWallet = () => {
   const router = useRouter()
@@ -14,13 +16,24 @@ const useViewAsWallet = () => {
     throw new Error(msg)
   }
 
+  const connection = useWalletStore((s) => s.connection)
+
+  const signTransaction = useCallback(
+    async (transaction: Transaction) => {
+      const inspectUrl = await getExplorerInspectorUrl(connection, transaction)
+      window.open(inspectUrl, '_blank')
+    },
+    [connection]
+  )
+
   const wallet = useMemo(
     () =>
       typeof viewAs === 'string'
         ? (({
             publicKey: new PublicKey(viewAs),
-            signAllTransactions: err,
-            signTransaction: err,
+            signAllTransactions: (txs: Transaction[]) =>
+              txs.forEach(signTransaction),
+            signTransaction,
             signMessage: err,
             connected: true,
             connecting: false,
@@ -43,7 +56,7 @@ const useViewAsWallet = () => {
             FAKE_DEBUG_WALLET: true,
           } as unknown) as SignerWalletAdapter)
         : undefined,
-    [viewAs]
+    [viewAs, signTransaction]
   )
 
   return wallet
