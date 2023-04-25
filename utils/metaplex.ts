@@ -25,6 +25,7 @@ export const createIx_transferNft = async (
   if (!nft.result) throw 'failed to fetch nft'
 
   const tokenStandard = nft.result.tokenStandard
+  const ruleSet = nft.result.programmableConfig?.ruleSet
 
   const ix = metaplex
     .nfts()
@@ -34,6 +35,7 @@ export const createIx_transferNft = async (
         address: mint,
         tokenStandard,
       },
+      authorizationDetails: ruleSet ? { rules: ruleSet } : undefined,
       toOwner,
       fromOwner,
     })
