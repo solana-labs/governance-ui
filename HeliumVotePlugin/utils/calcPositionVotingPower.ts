@@ -40,7 +40,7 @@ export const calcPositionVotingPower = ({
         lockupSaturationSecs: lockupSaturationSecsNum,
       })
 
-    votingPower = new BN(amountLockedNative * multiplier)
+    votingPower = new BN(amountLockedNative).mul(new BN(multiplier))
   }
 
   return votingPower
