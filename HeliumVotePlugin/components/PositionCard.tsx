@@ -526,9 +526,21 @@ export const PositionCard: React.FC<PositionCardProps> = ({
         <LockTokensModal
           mode="extend"
           isOpen={isExtendModalOpen}
-          minLockupTimeInDays={Math.ceil(
-            secsToDays(position.lockup.endTs.sub(new BN(unixNow)).toNumber())
-          )}
+          minLockupTimeInDays={
+            isConstant
+              ? Math.ceil(
+                  secsToDays(
+                    position.lockup.endTs
+                      .sub(position.lockup.startTs)
+                      .toNumber()
+                  )
+                )
+              : Math.ceil(
+                  secsToDays(
+                    position.lockup.endTs.sub(new BN(unixNow)).toNumber()
+                  )
+                )
+          }
           maxLockupTimeInDays={secsToDays(
             votingMint.lockupSaturationSecs.toNumber()
           )}
@@ -542,9 +554,21 @@ export const PositionCard: React.FC<PositionCardProps> = ({
         <LockTokensModal
           mode="split"
           isOpen={isSplitModalOpen}
-          minLockupTimeInDays={Math.ceil(
-            secsToDays(position.lockup.endTs.sub(new BN(unixNow)).toNumber())
-          )}
+          minLockupTimeInDays={
+            isConstant
+              ? Math.ceil(
+                  secsToDays(
+                    position.lockup.endTs
+                      .sub(position.lockup.startTs)
+                      .toNumber()
+                  )
+                )
+              : Math.ceil(
+                  secsToDays(
+                    position.lockup.endTs.sub(new BN(unixNow)).toNumber()
+                  )
+                )
+          }
           maxLockupTimeInDays={secsToDays(
             votingMint.lockupSaturationSecs.toNumber()
           )}
