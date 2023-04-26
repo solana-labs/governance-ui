@@ -75,7 +75,7 @@ export default function LockedCommunityNFTRecordVotingPower(props: Props) {
 
   const multiplier =
     !votingPower.isZero() && !amountLocked.isZero()
-      ? (votingPower.toNumber() / amountLocked.toNumber()).toFixed(2) + 'x'
+      ? votingPower.div(amountLocked).toNumber().toFixed(2) + 'x'
       : null
 
   const max =

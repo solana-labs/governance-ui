@@ -15,6 +15,7 @@ import {
 import { Input } from '@hub/components/controls/Input';
 import { useCluster } from '@hub/hooks/useCluster';
 import { useWallet } from '@hub/hooks/useWallet';
+import { DEFAULT_NFT_VOTER_PLUGIN } from '@tools/constants';
 
 const RECOGNIZED_PLUGINS = new Set([
   ...vsrPluginsPks,
@@ -51,7 +52,7 @@ export function AddressValidator(props: Props) {
     <div className={props.className}>
       <Input
         className="w-full"
-        placeholder="e.g. GnftV5kLjd67tvHpNGyodwWveEKivz3ZWvvE3Z4xi2iw"
+        placeholder={`e.g. ${DEFAULT_NFT_VOTER_PLUGIN}`}
         value={address}
         onBlur={async (e) => {
           const text = e.currentTarget.value;

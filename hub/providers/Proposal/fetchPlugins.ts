@@ -1,12 +1,11 @@
 import { AnchorProvider, Wallet } from '@coral-xyz/anchor';
-import {
-  NftVoterClient,
-  GatewayClient,
-} from '@solana/governance-program-library';
+import { GatewayClient } from '@solana/governance-program-library';
 import { Connection, PublicKey } from '@solana/web3.js';
 
 import { PythClient } from 'pyth-staking-api';
 import { VsrClient } from 'VoteStakeRegistry/sdk/client';
+
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient';
 
 /** @deprecated */
 export async function fetchPlugins(

@@ -6,7 +6,7 @@ import {
   SYSTEM_PROGRAM_ID,
   withCreateTokenOwnerRecord,
 } from '@solana/spl-governance'
-import { NftVoterClient } from '@solana/governance-program-library'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import useWalletStore from 'stores/useWalletStore'

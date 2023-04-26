@@ -160,7 +160,7 @@ const TokenDepositLock = ({
           />
         </div>
       ) : null}
-      {votingPower.toNumber() > 0 && (
+      {votingPower.gt(new BN(0)) && (
         <div className="flex space-x-4 items-center mt-4">
           <VotingPowerBox
             votingPower={votingPower}

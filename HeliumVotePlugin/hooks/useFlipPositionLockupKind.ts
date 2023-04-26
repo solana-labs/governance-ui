@@ -1,12 +1,17 @@
 import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import { Program } from '@coral-xyz/anchor'
-import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { useAsyncCallback } from 'react-async-hook'
-import { sendTransaction } from '@utils/send'
 import { PositionWithMeta } from '../sdk/types'
 import { PROGRAM_ID, init, daoKey } from '@helium/helium-sub-daos-sdk'
 import { secsToDays } from '@utils/dateTools'
 import useRealm from '@hooks/useRealm'
+import { notify } from '@utils/notifications'
+import {
+  SequenceType,
+  sendTransactionsV3,
+  txBatchesToInstructionSetWithSigners,
+} from '@utils/sendTransactions'
 
 export const useFlipPositionLockupKind = () => {
   const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
@@ -59,17 +64,29 @@ export const useFlipPositionLockupKind = () => {
             .instruction()
         )
 
-        const tx = new Transaction()
-        tx.add(...instructions)
-        await sendTransaction({
-          transaction: tx,
+        notify({ message: isConstant ? `Unlocking` : `Pausing` })
+        await sendTransactionsV3({
+          transactionInstructions: [
+            {
+              instructionsSet: txBatchesToInstructionSetWithSigners(
+                instructions,
+                [],
+                0
+              ),
+              sequenceType: SequenceType.Sequential,
+            },
+          ],
           wallet,
           connection: connection.current,
-          signers: [],
-          sendingMessage: isConstant ? `Unlocking` : `Pausing`,
-          successMessage: isConstant
-            ? `Unlocking successful`
-            : `Pausing successful`,
+          callbacks: {
+            afterAllTxConfirmed: () =>
+              notify({
+                message: isConstant
+                  ? `Unlocking successful`
+                  : `Pausing successful`,
+                type: 'success',
+              }),
+          },
         })
       }
     }

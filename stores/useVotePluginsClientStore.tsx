@@ -1,8 +1,5 @@
 import create, { State } from 'zustand'
-import {
-  NftVoterClient,
-  GatewayClient,
-} from '@solana/governance-program-library'
+import { GatewayClient } from '@solana/governance-program-library'
 import { SwitchboardQueueVoterClient } from '../SwitchboardVotePlugin/SwitchboardQueueVoterClient'
 import { getRegistrarPDA, Registrar } from 'VoteStakeRegistry/sdk/accounts'
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts'
@@ -23,6 +20,7 @@ import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import { Registrar as HeliumVsrRegistrar } from 'HeliumVotePlugin/sdk/types'
 import * as heliumVsrSdk from '@helium/voter-stake-registry-sdk'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 
 interface UseVotePluginsClientStore extends State {
   state: {

@@ -35,6 +35,7 @@ import { useUndelegatePosition } from '../hooks/useUndelegatePosition'
 import { useClaimDelegatedPositionRewards } from '../hooks/useClaimDelegatedPositionRewards'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { PublicKey } from '@solana/web3.js'
+import { PromptModal } from './PromptModal'
 
 export interface PositionCardProps {
   subDaos?: SubDaoWithMeta[]
@@ -344,6 +345,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
     isClaimingRewards
 
   const lockupKindDisplay = isConstant ? 'Constant' : 'Decaying'
+  const hasActiveVotes = position.numActiveVotes > 0
   return (
     <div className="relative border overflow-hidden border-fgd-4 rounded-lg flex flex-col">
       {hasGenesisMultiplier && (
@@ -387,8 +389,9 @@ export const PositionCard: React.FC<PositionCardProps> = ({
                   value={(
                     (position.votingPower.isZero()
                       ? 0
-                      : position.votingPower.toNumber() /
-                        position.amountDepositedNative.toNumber()) /
+                      : position.votingPower
+                          .div(position.amountDepositedNative)
+                          .toNumber()) /
                     (position.genesisEnd.gt(new BN(unixNow))
                       ? votingMint.genesisVotePowerMultiplier
                       : 1)
@@ -465,6 +468,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
                           <Button
                             className="w-full"
                             onClick={() => setIsSplitModalOpen(true)}
+                            disabled={isSubmitting}
                             isLoading={isSpliting}
                           >
                             Split
@@ -550,43 +554,61 @@ export const PositionCard: React.FC<PositionCardProps> = ({
           onSubmit={handleExtendTokens}
         />
       )}
-      {isSplitModalOpen && (
-        <LockTokensModal
-          mode="split"
-          isOpen={isSplitModalOpen}
-          minLockupTimeInDays={
-            isConstant
-              ? Math.ceil(
-                  secsToDays(
-                    position.lockup.endTs
-                      .sub(position.lockup.startTs)
-                      .toNumber()
+      {isSplitModalOpen &&
+        (!hasActiveVotes ? (
+          <LockTokensModal
+            mode="split"
+            isOpen={isSplitModalOpen}
+            minLockupTimeInDays={
+              isConstant
+                ? Math.ceil(
+                    secsToDays(
+                      position.lockup.endTs
+                        .sub(position.lockup.startTs)
+                        .toNumber()
+                    )
                   )
-                )
-              : Math.ceil(
-                  secsToDays(
-                    position.lockup.endTs.sub(new BN(unixNow)).toNumber()
+                : Math.ceil(
+                    secsToDays(
+                      position.lockup.endTs.sub(new BN(unixNow)).toNumber()
+                    )
                   )
-                )
-          }
-          maxLockupTimeInDays={secsToDays(
-            votingMint.lockupSaturationSecs.toNumber()
-          )}
-          maxLockupAmount={maxActionableAmount}
-          calcMultiplierFn={handleCalcLockupMultiplier}
-          onClose={() => setIsSplitModalOpen(false)}
-          onSubmit={handleSplitTokens}
-        />
-      )}
-      {isTransferModalOpen && (
-        <TransferTokensModal
-          isOpen={isTransferModalOpen}
-          positions={transferablePositions}
-          maxTransferAmount={maxActionableAmount}
-          onClose={() => setIsTransferModalOpen(false)}
-          onSubmit={handleTransferTokens}
-        />
-      )}
+            }
+            maxLockupTimeInDays={secsToDays(
+              votingMint.lockupSaturationSecs.toNumber()
+            )}
+            maxLockupAmount={maxActionableAmount}
+            calcMultiplierFn={handleCalcLockupMultiplier}
+            onClose={() => setIsSplitModalOpen(false)}
+            onSubmit={handleSplitTokens}
+          />
+        ) : (
+          <PromptModal
+            isOpen={isSplitModalOpen}
+            type="error"
+            title="Unable to split"
+            message="Position is partaking in an active vote!"
+            onClose={() => setIsSplitModalOpen(false)}
+          />
+        ))}
+      {isTransferModalOpen &&
+        (!hasActiveVotes ? (
+          <TransferTokensModal
+            isOpen={isTransferModalOpen}
+            positions={transferablePositions}
+            maxTransferAmount={maxActionableAmount}
+            onClose={() => setIsTransferModalOpen(false)}
+            onSubmit={handleTransferTokens}
+          />
+        ) : (
+          <PromptModal
+            isOpen={isTransferModalOpen}
+            type="error"
+            title="Unable to transfer"
+            message="Position is partaking in an active vote!"
+            onClose={() => setIsTransferModalOpen(false)}
+          />
+        ))}
       {canDelegate && isDelegateModalOpen && (
         <DelegateTokensModal
           isOpen={isDelegateModalOpen}

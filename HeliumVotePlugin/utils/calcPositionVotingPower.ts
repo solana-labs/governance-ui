@@ -5,9 +5,11 @@ import { Position, VotingMintConfig, Registrar, LockupKind } from '../sdk/types'
 export const calcPositionVotingPower = ({
   position,
   registrar,
+  unixNow,
 }: {
   position: Position | null
   registrar: Registrar | null
+  unixNow: BN
 }) => {
   let votingPower = new BN(0)
   const mintCfgs = registrar?.votingMints || []
@@ -20,13 +22,12 @@ export const calcPositionVotingPower = ({
       maxExtraLockupVoteWeightScaledFactor,
       genesisVotePowerMultiplier = 1,
     } = mintCfg as VotingMintConfig
-    const now = new BN(Math.round(new Date().getTime() / 1000))
-    const hasGenesisMultiplier = position.genesisEnd.gt(now)
+    const hasGenesisMultiplier = position.genesisEnd.gt(unixNow)
     const lockup = position!.lockup
     const lockupKind = Object.keys(lockup.kind as LockupKind)[0]
-    const currTs = lockupKind === 'constant' ? lockup.startTs : now
+    const currTs = lockupKind === 'constant' ? lockup.startTs : unixNow
     const lockupSecs = lockup.endTs.sub(currTs).toNumber()
-    const amountLockedNative = position!.amountDepositedNative.toNumber()
+    const amountLockedNative = position!.amountDepositedNative
     const baselineScaledFactorNum = baselineVoteWeightScaledFactor.toNumber()
     const maxExtraLockupVoteWeightScaledFactorNum = maxExtraLockupVoteWeightScaledFactor.toNumber()
     const lockupSaturationSecsNum = lockupSaturationSecs.toNumber()
@@ -40,6 +41,7 @@ export const calcPositionVotingPower = ({
         lockupSaturationSecs: lockupSaturationSecsNum,
       })
 
+    console.log(amountLockedNative.toNumber(), multiplier)
     votingPower = new BN(amountLockedNative).mul(new BN(multiplier))
   }
 
