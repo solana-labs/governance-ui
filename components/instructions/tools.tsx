@@ -117,6 +117,31 @@ export const ACCOUNT_NAMES = {
   FAFDfoUkaxoMqiNur9F1iigdBNrXFf4uNmS5XrhMewvf:
     'Friends and Family Community Mint',
 
+  // Physis DAO
+  '29epeLvAMyRXtpA1HaoKB1hGcAnrc1NvMCbaZ8AVRwEi': 'Physis DAO Treasury',
+  '4i2Yjk5bUiLeVNwqBpkRdFSECSCvMgKoeCSdRSx1TPcz': 'Rewards (PHY)',
+	'EUkYhtkRmxQpnKTvGayBJM3Pt1FQNjaMWP3UCUb38hJN': 'Grants (PHY)',
+  '3XwmcRf9R6TFqCwhLkftur8Baq45ZYE7DQDj9WUAPsmN': 'DAO (PHY)',
+
+  '6Va7K51FRbnPcYZTUwkoFfoYtnfh8qyJaZqT4W1GGxVi': 'Physis EcoSystem Treasury',
+  'C2KKuAq4UaUFYtm3zcxZMSDUuSEfPSk4yLcq5XaBr4wM': 'Development (PHY)',
+	'F6EHstw5jkmHVLLXj9HEx3xCRsY7Whm7JK266jWFrFSB': 'CapEX (PHY)',
+	'4gr1JjLD89VAbmQRrLeFDiLFSv2z2zn1tXRWRX4C3kow': 'OpEX (PHY)',
+	'8eJoFYj8XtwJ9mER7qmb1EEnV8mGYGHyjxRct8ooJXQr': 'Marketing (PHY)',
+
+  '2jfAMh48b37bBTKkoNwmvNZAqVQc1G7gh5vYv5FoWTUR': 'Physis Team Treasury',
+	'8vXYj8B567R8Di7BUvquiGC7usyPMtL756xx6KERfW9K': 'Community (PHY)',
+	'AiGCc2YEwLNER7DETRwv5e82eqLwPL8FMcmmHEhED5Vr': 'Core (PHY)',
+	'CpB6PDoxfkg2U8EC8XhyD6TdCAWkhRqZ4Fa3j3UFW6Rv': 'Extraordinary (PHY)',
+
+  'BaT8NdFHAhrBpS7gTQX2YgSwazeNLcA4gKooDsAutvCk': 'Physis Alliance Treasury',
+	'H4WWxBJoDfGWfE212SF5tcyo75zBJnzCRAUmWpRMcxyH': 'Partnerships (PHY)',
+	'5L84NZfjdfWHkkkUT9bJ8jKqtTMrpKsAobtTW4NKpJB1': 'Advisors (PHY)',
+
+  'E26u3zGmYtR4tnmbhNSQS6kLVmSizSvPCQyu7qGnTWQ3': 'Physis Reserve Treasury',
+	'BgDFLAE25QybqyK6TMPdPF7vFTrBu1AjPs2cFkF8R3cb': 'Seed (PHY)',
+	'GDJKzWrkxWHEPPt4k2Ao1TL7S1CEo4xNRnTAVk3jrmbk': 'Launchpad (PHY)',
+
   // GM DAO
   '7WbRWL33mM3pbFLvuqNjBztihQtHWWFPGr4HLHyqViG9': 'Team funds',
   DWhnQm42vCBLkA9RsrBB2spyR3uAJq1BGeroyNMKgnEh: 'Marketing funds',
