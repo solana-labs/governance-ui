@@ -47,23 +47,6 @@ export default function WalletList(props: Props) {
 
   switch (props.data._tag) {
     case Status.Failed:
-      return (
-        <div className={cx(props.className, 'h-full')}>
-          <div className="flex-shrink-0 flex items-center justify-between pb-5">
-            <div className="w-40 bg-bkg-1 rounded-sm text-lg opacity-50">
-              &nbsp;
-            </div>
-            <div className="w-40 bg-bkg-1 rounded-sm text-lg opacity-50">
-              &nbsp;
-            </div>
-          </div>
-          <div className="overflow-y-auto flex-grow space-y-4">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div className="h-24 rounded bg-bkg-1 opacity-50" key={i} />
-            ))}
-          </div>
-        </div>
-      )
     case Status.Pending:
       return (
         <div className={cx(props.className, 'h-full')}>
