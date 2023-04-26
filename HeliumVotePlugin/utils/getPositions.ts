@@ -131,6 +131,7 @@ export const getPositions = async (
           votingPower: calcPositionVotingPower({
             position: pos,
             registrar,
+            unixNow: now,
           }),
           votingMint: {
             ...mintCfgs[pos.votingMintConfigIdx],
@@ -156,6 +157,7 @@ export const getPositions = async (
         calcPositionVotingPower({
           position: pos,
           registrar,
+          unixNow: now,
         })
       ),
     new BN(0)
