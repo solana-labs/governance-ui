@@ -1,13 +1,18 @@
 import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import { BN } from '@coral-xyz/anchor'
-import { Transaction, TransactionInstruction } from '@solana/web3.js'
+import { TransactionInstruction } from '@solana/web3.js'
 import { useAsyncCallback } from 'react-async-hook'
-import { sendTransaction } from '@utils/send'
 import { PositionWithMeta } from '../sdk/types'
 import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import { useSolanaUnixNow } from '@hooks/useSolanaUnixNow'
+import { SequenceType } from '@blockworks-foundation/mangolana/lib/globalTypes'
+import { notify } from '@utils/notifications'
+import {
+  sendTransactionsV3,
+  txBatchesToInstructionSetWithSigners,
+} from '@utils/sendTransactions'
 
 export const useClosePosition = () => {
   const { unixNow } = useSolanaUnixNow()
@@ -62,15 +67,27 @@ export const useClosePosition = () => {
             .instruction()
         )
 
-        const tx = new Transaction()
-        tx.add(...instructions)
-        await sendTransaction({
-          transaction: tx,
+        notify({ message: 'Closing' })
+        await sendTransactionsV3({
+          transactionInstructions: [
+            {
+              instructionsSet: txBatchesToInstructionSetWithSigners(
+                instructions,
+                [],
+                0
+              ),
+              sequenceType: SequenceType.Sequential,
+            },
+          ],
           wallet,
           connection: connection.current,
-          signers: [],
-          sendingMessage: `Closing`,
-          successMessage: `Closed successfuly`,
+          callbacks: {
+            afterAllTxConfirmed: () =>
+              notify({
+                message: 'Closed successful',
+                type: 'success',
+              }),
+          },
         })
       }
     }

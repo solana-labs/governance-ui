@@ -466,6 +466,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
                           <Button
                             className="w-full"
                             onClick={() => setIsSplitModalOpen(true)}
+                            disabled={isSubmitting}
                             isLoading={isSpliting}
                           >
                             Split

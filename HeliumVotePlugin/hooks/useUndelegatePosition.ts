@@ -1,14 +1,19 @@
 import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import { Program } from '@coral-xyz/anchor'
-import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { useAsyncCallback } from 'react-async-hook'
-import { sendTransaction } from '@utils/send'
 import { PositionWithMeta } from '../sdk/types'
 import {
   PROGRAM_ID,
   init,
   delegatedPositionKey,
 } from '@helium/helium-sub-daos-sdk'
+import { notify } from '@utils/notifications'
+import {
+  SequenceType,
+  sendTransactionsV3,
+  txBatchesToInstructionSetWithSigners,
+} from '@utils/sendTransactions'
 
 export const useUndelegatePosition = () => {
   const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
@@ -51,15 +56,27 @@ export const useUndelegatePosition = () => {
             .instruction()
         )
 
-        const tx = new Transaction()
-        tx.add(...instructions)
-        await sendTransaction({
-          transaction: tx,
+        notify({ message: 'UnDelegating' })
+        await sendTransactionsV3({
+          transactionInstructions: [
+            {
+              instructionsSet: txBatchesToInstructionSetWithSigners(
+                instructions,
+                [],
+                0
+              ),
+              sequenceType: SequenceType.Sequential,
+            },
+          ],
           wallet,
           connection: connection.current,
-          signers: [],
-          sendingMessage: 'Undelegating',
-          successMessage: 'Undelegation successful',
+          callbacks: {
+            afterAllTxConfirmed: () =>
+              notify({
+                message: 'UnDelegation successful',
+                type: 'success',
+              }),
+          },
         })
       }
     }
