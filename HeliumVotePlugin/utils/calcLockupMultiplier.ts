@@ -17,10 +17,8 @@ export const calcMultiplier = ({
   const base = baselineScaledFactor !== 0 ? baselineScaledFactor : 1e9
 
   multiplier =
-    (base +
-      (maxExtraLockupScaledFactor *
-        Math.min(lockupSecs, lockupSaturationSecs)) /
-        lockupSaturationSecs) /
+    (Math.min(lockupSecs / lockupSaturationSecs, 1) *
+      maxExtraLockupScaledFactor) /
     base
 
   return multiplier
