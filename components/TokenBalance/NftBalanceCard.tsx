@@ -3,7 +3,7 @@ import Button from '@components/Button'
 import Loading from '@components/Loading'
 import NFTSelector from '@components/NFTS/NFTSelector'
 import useRealm from '@hooks/useRealm'
-import { NftVoterClient } from '@solana/governance-program-library'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import {
   getTokenOwnerRecordAddress,
   SYSTEM_PROGRAM_ID,

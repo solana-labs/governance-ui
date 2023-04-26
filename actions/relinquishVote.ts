@@ -17,7 +17,7 @@ import {
   SequenceType,
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
-import { NftVoterClient } from '@solana/governance-program-library'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 
 export const relinquishVote = async (
