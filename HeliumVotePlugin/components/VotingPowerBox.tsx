@@ -24,7 +24,7 @@ export const VotingPowerBox: React.FC<VotingPowerBoxProps> = ({
 }) => {
   const votingPowerFmt =
     votingPower && mint
-      ? getMintDecimalAmount(mint, votingPower).toFormat(0)
+      ? getMintDecimalAmount(mint, votingPower).toFormat(2)
       : '0'
 
   const max: BigNumber = new BigNumber(mint.supply.toString())
