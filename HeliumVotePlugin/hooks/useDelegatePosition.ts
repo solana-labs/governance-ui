@@ -1,10 +1,15 @@
 import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import { Program } from '@coral-xyz/anchor'
-import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { useAsyncCallback } from 'react-async-hook'
-import { sendTransaction } from '@utils/send'
 import { PositionWithMeta, SubDaoWithMeta } from '../sdk/types'
 import { PROGRAM_ID, init } from '@helium/helium-sub-daos-sdk'
+import {
+  SequenceType,
+  sendTransactionsV3,
+  txBatchesToInstructionSetWithSigners,
+} from '@utils/sendTransactions'
+import { notify } from '@utils/notifications'
 
 export const useDelegatePosition = () => {
   const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
@@ -45,15 +50,27 @@ export const useDelegatePosition = () => {
             .instruction()
         )
 
-        const tx = new Transaction()
-        tx.add(...instructions)
-        await sendTransaction({
-          transaction: tx,
+        notify({ message: 'Delegating' })
+        await sendTransactionsV3({
+          transactionInstructions: [
+            {
+              instructionsSet: txBatchesToInstructionSetWithSigners(
+                instructions,
+                [],
+                0
+              ),
+              sequenceType: SequenceType.Sequential,
+            },
+          ],
           wallet,
           connection: connection.current,
-          signers: [],
-          sendingMessage: 'Delegating',
-          successMessage: 'Delegation successful',
+          callbacks: {
+            afterAllTxConfirmed: () =>
+              notify({
+                message: 'Delegation successful',
+                type: 'success',
+              }),
+          },
         })
       }
     }

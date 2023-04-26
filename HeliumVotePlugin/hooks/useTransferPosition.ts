@@ -1,14 +1,19 @@
 import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import { Program } from '@coral-xyz/anchor'
-import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { useAsyncCallback } from 'react-async-hook'
-import { sendTransaction } from '@utils/send'
 import { PositionWithMeta } from '../sdk/types'
 import { PROGRAM_ID, init, daoKey } from '@helium/helium-sub-daos-sdk'
 import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
+import { notify } from '@utils/notifications'
+import {
+  SequenceType,
+  sendTransactionsV3,
+  txBatchesToInstructionSetWithSigners,
+} from '@utils/sendTransactions'
 
 export const useTransferPosition = () => {
   const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
@@ -79,15 +84,27 @@ export const useTransferPosition = () => {
           )
         }
 
-        const tx = new Transaction()
-        tx.add(...instructions)
-        await sendTransaction({
-          transaction: tx,
+        notify({ message: 'Transfering' })
+        await sendTransactionsV3({
+          transactionInstructions: [
+            {
+              instructionsSet: txBatchesToInstructionSetWithSigners(
+                instructions,
+                [],
+                0
+              ),
+              sequenceType: SequenceType.Sequential,
+            },
+          ],
           wallet,
           connection: connection.current,
-          signers: [],
-          sendingMessage: `Transfering`,
-          successMessage: `Transfer successful`,
+          callbacks: {
+            afterAllTxConfirmed: () =>
+              notify({
+                message: 'Transfer successful',
+                type: 'success',
+              }),
+          },
         })
       }
     }
