@@ -71,9 +71,7 @@ export default function LockedCommunityVotingPower(props: Props) {
 
   const multiplier =
     !votingPower.isZero() && !votingPowerFromDeposits.isZero()
-      ? (votingPower.toNumber() / votingPowerFromDeposits.toNumber()).toFixed(
-          2
-        ) + 'x'
+      ? votingPower.div(votingPowerFromDeposits).toNumber().toFixed(2) + 'x'
       : null
 
   const tokenAmount =

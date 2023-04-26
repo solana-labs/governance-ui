@@ -387,8 +387,9 @@ export const PositionCard: React.FC<PositionCardProps> = ({
                   value={(
                     (position.votingPower.isZero()
                       ? 0
-                      : position.votingPower.toNumber() /
-                        position.amountDepositedNative.toNumber()) /
+                      : position.votingPower
+                          .div(position.amountDepositedNative)
+                          .toNumber()) /
                     (position.genesisEnd.gt(new BN(unixNow))
                       ? votingMint.genesisVotePowerMultiplier
                       : 1)

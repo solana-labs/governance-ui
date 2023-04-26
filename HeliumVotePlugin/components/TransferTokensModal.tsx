@@ -144,8 +144,9 @@ export const TransferTokensModal: React.FC<TransferTokensModalProps> = ({
                     label="Vote Multiplier"
                     value={(pos.votingPower.isZero()
                       ? 0
-                      : pos.votingPower.toNumber() /
-                        pos.amountDepositedNative.toNumber()
+                      : pos.votingPower
+                          .div(pos.amountDepositedNative)
+                          .toNumber()
                     ).toFixed(2)}
                   />
                   <CardLabel
