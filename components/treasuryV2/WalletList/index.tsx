@@ -68,12 +68,8 @@ export default function WalletList(props: Props) {
       return (
         <div className={cx(props.className, 'h-full')}>
           <div className="flex-shrink-0 flex items-center justify-between pb-5">
-            <div className="w-40 bg-bkg-1 rounded-sm text-lg animate-pulse">
-              &nbsp;
-            </div>
-            <div className="w-40 bg-bkg-1 rounded-sm text-lg animate-pulse">
-              &nbsp;
-            </div>
+            <div className="font-bold text-base">DAO Wallets</div>
+            <NewWalletButton />
           </div>
           <div className="overflow-y-auto flex-grow space-y-4">
             {Array.from({ length: 3 }).map((_, i) => (
