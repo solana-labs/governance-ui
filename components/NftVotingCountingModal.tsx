@@ -1,6 +1,6 @@
 import { usePrevious } from '@hooks/usePrevious'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { NftVoterClient } from '@solana/governance-program-library'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { useEffect, useState } from 'react'
@@ -80,7 +80,7 @@ const NftVotingComponent = () => {
       wrapperStyle={{ top: '-350px' }}
       onClose={() =>
         closeNftVotingCountingModal(
-          client.client as NftVoterClient,
+          (client.client as unknown) as NftVoterClient,
           proposal!,
           wallet!.publicKey!
         )

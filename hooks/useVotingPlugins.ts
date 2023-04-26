@@ -30,6 +30,7 @@ import { NFTWithMeta } from '@utils/uiTypes/VotePlugin'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import * as heliumVsrSdk from '@helium/voter-stake-registry-sdk'
 import useWalletOnePointOh from './useWalletOnePointOh'
+import { DEFAULT_NFT_VOTER_PLUGIN } from '@tools/constants'
 
 export const vsrPluginsPks: string[] = [
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo',
@@ -44,6 +45,7 @@ export const heliumVsrPluginsPks: string[] = [
 ]
 
 export const nftPluginsPks: string[] = [
+  DEFAULT_NFT_VOTER_PLUGIN,
   'GnftV5kLjd67tvHpNGyodwWveEKivz3ZWvvE3Z4xi2iw',
 ]
 
@@ -367,8 +369,8 @@ export function useVotingPlugins() {
           handleSetVsrClient(wallet, connection, currentPluginPk)
         }
         if (heliumVsrPluginsPks.includes(currentPluginPk.toBase58())) {
-          handleSetHeliumVsrClient(wallet, connection, currentPluginPk)  
-        }        
+          handleSetHeliumVsrClient(wallet, connection, currentPluginPk)
+        }
       }
       handleSetNftClient(wallet, connection)
       //handleSetSwitchboardClient(wallet, connection)

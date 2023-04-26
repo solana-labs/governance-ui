@@ -21,7 +21,7 @@ import { notify } from '@utils/notifications'
 import Loading from '@components/Loading'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { sleep } from '@project-serum/common'
-import { NftVoterClient } from '@solana/governance-program-library'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { chunks } from '@utils/helpers'
 import { sendSignedTransaction } from '@utils/send'
 import { getRegistrarPDA, getVoterWeightRecord } from '@utils/plugin/accounts'
@@ -33,6 +33,7 @@ import {
 import useQueryContext from '@hooks/useQueryContext'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
 
 const MyProposalsBn = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
@@ -46,6 +47,8 @@ const MyProposalsBn = () => {
   )
   const [ownNftVoteRecords, setOwnNftVoteRecords] = useState<any[]>([])
   const ownNftVoteRecordsFilterd = ownNftVoteRecords
+
+  const { data: tokenOwnerRecord } = useAddressQuery_CommunityTokenOwner()
 
   const maxVoterWeight = useMaxVoteRecord()?.pubkey || undefined
   const { realm, programId, programVersion } = useWalletStore(
@@ -245,6 +248,9 @@ const MyProposalsBn = () => {
     )
   }
   const releaseNfts = async (count: number | null = null) => {
+    if (!realm) throw new Error()
+    if (!wallet?.publicKey) throw new Error('no wallet')
+
     setIsLoading(true)
     const instructions: TransactionInstruction[] = []
     const { registrar } = await getRegistrarPDA(
@@ -258,6 +264,7 @@ const MyProposalsBn = () => {
       wallet!.publicKey!,
       client.client!.program.programId
     )
+
     const nfts = ownNftVoteRecordsFilterd.slice(
       0,
       count ? count : ownNftVoteRecordsFilterd.length
@@ -271,7 +278,8 @@ const MyProposalsBn = () => {
           governance:
             proposals[i.account.proposal.toBase58()].account.governance,
           proposal: i.account.proposal,
-          governingTokenOwner: wallet!.publicKey!,
+          voterTokenOwnerRecord: tokenOwnerRecord,
+          voterAuthority: wallet!.publicKey!,
           voteRecord: i.publicKey,
           beneficiary: wallet!.publicKey!,
         })

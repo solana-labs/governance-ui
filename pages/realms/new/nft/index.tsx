@@ -32,12 +32,12 @@ import {
   GoverningTokenConfigAccountArgs,
   GoverningTokenType,
 } from '@solana/spl-governance'
-import { nftPluginsPks } from '@hooks/useVotingPlugins'
 
 import YesVotePercentageForm, {
   CouncilYesVotePercentageSchema,
 } from '@components/NewRealmWizard/components/steps/YesVotePercentageThresholdForm'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { DEFAULT_NFT_VOTER_PLUGIN } from '@tools/constants'
 
 export const FORM_NAME = 'nft'
 
@@ -122,8 +122,8 @@ export default function NFTWizard() {
           communityMintSupplyFactor: undefined,
           communityAbsoluteMaxVoteWeight: undefined,
           communityTokenConfig: new GoverningTokenConfigAccountArgs({
-            voterWeightAddin: new PublicKey(nftPluginsPks[0]),
-            maxVoterWeightAddin: new PublicKey(nftPluginsPks[0]),
+            voterWeightAddin: new PublicKey(DEFAULT_NFT_VOTER_PLUGIN),
+            maxVoterWeightAddin: new PublicKey(DEFAULT_NFT_VOTER_PLUGIN),
             tokenType: GoverningTokenType.Liquid,
           }),
 

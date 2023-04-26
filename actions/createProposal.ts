@@ -23,7 +23,7 @@ import {
 import { chunks } from '@utils/helpers'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
-import { NftVoterClient } from '@solana/governance-program-library'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { withAddSignatory } from '@solana/spl-governance'
 import { trySentryLog } from '@utils/logs'
 export interface InstructionDataWithHoldUpTime {

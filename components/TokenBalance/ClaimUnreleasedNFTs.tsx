@@ -1,10 +1,10 @@
 import useRealm from '@hooks/useRealm'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { TransactionInstruction } from '@solana/web3.js'
 import { SecondaryButton } from '@components/Button'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { NftVoterClient } from '@solana/governance-program-library'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { chunks } from '@utils/helpers'
 import { getRegistrarPDA, getVoterWeightRecord } from '@utils/plugin/accounts'
 import {
@@ -14,6 +14,7 @@ import {
 } from '@utils/sendTransactions'
 import { ProposalState } from '@solana/spl-governance'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
 
 const NFT_SOL_BALANCE = 0.0014616
 
@@ -34,20 +35,27 @@ const ClaimUnreleasedNFTs = ({
   )
   const { proposals, isNftMode } = useRealm()
 
+  const { data: tokenOwnerRecord } = useAddressQuery_CommunityTokenOwner()
+
   const releaseNfts = async (count: number | null = null) => {
+    if (!wallet?.publicKey) throw new Error('no wallet')
+    if (!realm) throw new Error()
+    if (!tokenOwnerRecord) throw new Error()
+
     setIsLoading(true)
     const instructions: TransactionInstruction[] = []
     const { registrar } = await getRegistrarPDA(
-      realm!.pubkey,
-      realm!.account.communityMint,
+      realm.pubkey,
+      realm.account.communityMint,
       client.client!.program.programId
     )
     const { voterWeightPk } = await getVoterWeightRecord(
-      realm!.pubkey,
-      realm!.account.communityMint,
-      wallet!.publicKey!,
+      realm.pubkey,
+      realm.account.communityMint,
+      wallet.publicKey,
       client.client!.program.programId
     )
+
     const nfts = ownNftVoteRecordsFilterd.slice(
       0,
       count ? count : ownNftVoteRecordsFilterd.length
@@ -65,7 +73,8 @@ const ClaimUnreleasedNFTs = ({
           voterWeightRecord: voterWeightPk,
           governance: proposal.account.governance,
           proposal: i.account.proposal,
-          governingTokenOwner: wallet!.publicKey!,
+          voterTokenOwnerRecord: tokenOwnerRecord,
+          voterAuthority: wallet.publicKey,
           voteRecord: i.publicKey,
           beneficiary: wallet!.publicKey!,
         })
