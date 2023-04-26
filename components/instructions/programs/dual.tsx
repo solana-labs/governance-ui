@@ -29,6 +29,11 @@ interface issueInstruction {
   strike: BN
 }
 
+interface exerciseInstruction {
+  amount: BN
+  strike: BN
+}
+
 const INSTRUCTIONS = {
   225: {
     name: 'Staking Option ConfigV2',
@@ -156,6 +161,55 @@ const INSTRUCTIONS = {
             Amount atoms of base: {decodedInstructionData.amount.toNumber()}
           </div>
           <div>Strike: {decodedInstructionData.strike.toNumber()}</div>
+        </div>
+      )
+    },
+  },
+  144: {
+    name: 'Staking Option Exercise',
+    accounts: [
+      { name: 'authority' },
+      { name: 'state' },
+      { name: 'userSoAccount' },
+      { name: 'optionMint' },
+      { name: 'userQuoteAccount' },
+      { name: 'projectQuoteAccount' },
+      { name: 'feeQuoteAccount' },
+      { name: 'baseVault' },
+      { name: 'userBaseAccount' },
+      { name: 'tokenProgram' },
+    ],
+    getDataUI: async (connection: Connection, data: Uint8Array) => {
+      const soHelper = new StakingOptions(connection.rpcEndpoint)
+
+      const decodedInstructionData = new BorshInstructionCoder(
+        soHelper.getIdl()
+      ).decode(Buffer.from(data))?.data as exerciseInstruction
+
+      return (
+        <div className="space-y-3">
+          <div>
+            Amount atoms of base: {decodedInstructionData.amount.toNumber()}
+          </div>
+          <div>Strike: {decodedInstructionData.strike.toNumber()}</div>
+        </div>
+      )
+    },
+  },
+  183: {
+    name: 'Staking Option Withdraw',
+    accounts: [
+      { name: 'authority' },
+      { name: 'state' },
+      { name: 'baseVault' },
+      { name: 'baseAccount' },
+      { name: 'tokenProgram' },
+      { name: 'systemProgram' },
+    ],
+    getDataUI: async () => {
+      return (
+        <div className="space-y-3">
+          Withdrawing remaining collateral tokens from SO
         </div>
       )
     },

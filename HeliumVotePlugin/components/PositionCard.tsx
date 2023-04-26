@@ -343,6 +343,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
     isUndelegating ||
     isClaimingRewards
 
+  const lockupKindDisplay = isConstant ? 'Constant' : 'Decaying'
   return (
     <div className="relative border overflow-hidden border-fgd-4 rounded-lg flex flex-col">
       {hasGenesisMultiplier && (
@@ -379,10 +380,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
             style={{ minHeight: '260px' }}
           >
             <div className="flex flex-wrap mb-4">
-              <CardLabel
-                label="Lockup Type"
-                value={lockupKind.charAt(0).toUpperCase() + lockupKind.slice(1)}
-              />
+              <CardLabel label="Lockup Type" value={lockupKindDisplay} />
               {isRealmCommunityMint && (
                 <CardLabel
                   label="Vote Multiplier"
@@ -444,7 +442,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
                     <Button
                       className="w-full"
                       onClick={handleUndelegateTokens}
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || position.hasRewards}
                       isLoading={isUndelegating}
                     >
                       UnDelegate
@@ -474,9 +472,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
                           <Button
                             className="w-full"
                             onClick={() => setIsTransferModalOpen(true)}
-                            disabled={
-                              transferablePositions.length == 0 || isSubmitting
-                            }
+                            disabled={isSubmitting}
                             isLoading={isTransfering}
                           >
                             Transfer
@@ -530,8 +526,23 @@ export const PositionCard: React.FC<PositionCardProps> = ({
         <LockTokensModal
           mode="extend"
           isOpen={isExtendModalOpen}
-          minLockupTimeInDays={Math.ceil(
-            secsToDays(position.lockup.endTs.sub(new BN(unixNow)).toNumber())
+          minLockupTimeInDays={
+            isConstant
+              ? Math.ceil(
+                  secsToDays(
+                    position.lockup.endTs
+                      .sub(position.lockup.startTs)
+                      .toNumber()
+                  )
+                )
+              : Math.ceil(
+                  secsToDays(
+                    position.lockup.endTs.sub(new BN(unixNow)).toNumber()
+                  )
+                )
+          }
+          maxLockupTimeInDays={secsToDays(
+            votingMint.lockupSaturationSecs.toNumber()
           )}
           maxLockupAmount={maxActionableAmount}
           calcMultiplierFn={handleCalcLockupMultiplier}
@@ -543,8 +554,23 @@ export const PositionCard: React.FC<PositionCardProps> = ({
         <LockTokensModal
           mode="split"
           isOpen={isSplitModalOpen}
-          minLockupTimeInDays={Math.ceil(
-            secsToDays(position.lockup.endTs.sub(new BN(unixNow)).toNumber())
+          minLockupTimeInDays={
+            isConstant
+              ? Math.ceil(
+                  secsToDays(
+                    position.lockup.endTs
+                      .sub(position.lockup.startTs)
+                      .toNumber()
+                  )
+                )
+              : Math.ceil(
+                  secsToDays(
+                    position.lockup.endTs.sub(new BN(unixNow)).toNumber()
+                  )
+                )
+          }
+          maxLockupTimeInDays={secsToDays(
+            votingMint.lockupSaturationSecs.toNumber()
           )}
           maxLockupAmount={maxActionableAmount}
           calcMultiplierFn={handleCalcLockupMultiplier}

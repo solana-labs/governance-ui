@@ -94,6 +94,7 @@ const RevokeGoverningTokens: FC<{
 
   const { data: mintInfo } = useMintInfoByPubkeyQuery(selectedMint)
   const governance = useGovernanceForGovernedAddress(selectedMint)
+  const revokeTokenAuthority = mintInfo?.result?.mintAuthority ?? governance?.pubkey
 
   const getInstruction = useCallback(async (): Promise<UiInstruction> => {
     const errors: Errors = {}
@@ -132,7 +133,8 @@ const RevokeGoverningTokens: FC<{
       realm === undefined ||
       programId === undefined ||
       mintInfo?.result === undefined ||
-      governance === undefined
+      governance === undefined ||
+      revokeTokenAuthority === undefined
     ) {
       throw new Error('proposal created before necessary data is fetched')
     }
@@ -142,7 +144,7 @@ const RevokeGoverningTokens: FC<{
       realm.pubkey,
       member,
       selectedMint,
-      governance.pubkey,
+      revokeTokenAuthority,
       getMintNaturalAmountFromDecimalAsBN(
         parseFloat(form.amount),
         mintInfo.result.decimals

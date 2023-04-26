@@ -89,7 +89,7 @@ export const LockTokensModal: React.FC<{
   const hasMinLockup = minLockupTimeInDays && minLockupTimeInDays > 0
   const hasMaxLockup = maxLockupTimeInDays && maxLockupTimeInDays !== Infinity
   const lockupKindOptions = [
-    { value: LockupKind.cliff, display: 'Cliff' },
+    { value: LockupKind.cliff, display: 'Decaying' },
     { value: LockupKind.constant, display: 'Constant' },
   ]
 
@@ -171,8 +171,8 @@ export const LockTokensModal: React.FC<{
         {hasMinLockup && !showLockupKindInfo ? (
           <div className="bg-bkg-3 rounded-md w-full p-4 mb-4 font-normal text-xs">
             <div>
-              There is a minimum required lockup time of{' '}
-              <span className="bont-bold text-sm text-primary-light">
+              Select a new lockup period longer than the existing{' '}
+              <span className="bkg-font-bold text-primary-light">
                 {getFormattedStringFromDays(minLockupTimeInDays)}
               </span>
             </div>
@@ -312,10 +312,8 @@ export const LockTokensModal: React.FC<{
         {showLockupKindInfo ? (
           <>
             {lockupKindOptions.map((type) => (
-              <>
-                <h2 className="text-base" key={type.value}>
-                  {type.display}
-                </h2>
+              <div className="mb-6" key={type.value}>
+                <h2 className="text-primary-light">{type.display}</h2>
                 <p className="mb-2">
                   {lockupInfosByType[type.value].map((info) => (
                     <p className="mb-2" key={info}>
@@ -323,9 +321,8 @@ export const LockTokensModal: React.FC<{
                     </p>
                   ))}
                 </p>
-              </>
+              </div>
             ))}
-
             <Button
               className="mt-4 w-full"
               onClick={() => setShowLockupKindInfo(false)}
