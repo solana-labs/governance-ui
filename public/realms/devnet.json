@@ -224,6 +224,7 @@
   },
   {
     "symbol": "HNT",
+    "voteSymbol": "veHNT",
     "displayName": "Helium DAO",
     "programId": "hgovkRU6Ghe1Qoyb54HdSLdqN7VtxaifBzRmh9jtd3S",
     "realmId": "2VfPJn8ML1hNBnsEBo7SzmG11UJc7gbY8b23A3K8expd",
@@ -234,6 +235,7 @@
   },
   {
     "symbol": "IOT",
+    "voteSymbol": "veIOT",
     "displayName": "Helium IOT SubDAO",
     "programId": "hgovkRU6Ghe1Qoyb54HdSLdqN7VtxaifBzRmh9jtd3S",
     "realmId": "8UQNtD5Zw8ijB7ZpGiPLodKXMxtVyQmtu1AEztd3p6Po",
@@ -243,6 +245,7 @@
   },
   {
     "symbol": "MOBILE",
+    "voteSymbol": "veMOBILE",
     "displayName": "Helium MOBILE SubDAO",
     "programId": "hgovkRU6Ghe1Qoyb54HdSLdqN7VtxaifBzRmh9jtd3S",
     "realmId": "8itzNAn1kMZ5sf18dVd8gGykztWZLVT93Svbdt7Gn2NP",
