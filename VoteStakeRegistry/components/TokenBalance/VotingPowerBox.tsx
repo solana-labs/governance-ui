@@ -19,10 +19,15 @@ const VotingPowerBox = ({
   className?: string
   style?: any
 }) => {
-  const votingPowerFmt =
+  const votingPowerBigNum =
     votingPower && mint
-      ? getMintDecimalAmount(mint, votingPower).toFormat(0)
-      : '0'
+      ? getMintDecimalAmount(mint, votingPower)
+      : new BigNumber(0)
+
+  const votingPowerFromDepositsBigNum =
+    votingPowerFromDeposits && mint
+      ? getMintDecimalAmount(mint, votingPowerFromDeposits)
+      : new BigNumber(0)
 
   const max: BigNumber = new BigNumber(mint.supply.toString())
 
@@ -36,14 +41,13 @@ const VotingPowerBox = ({
         <div>
           <p className="text-fgd-3">Votes</p>
           <span className="mb-0 flex font-bold items-center hero-text">
-            {votingPowerFmt}{' '}
+            {votingPowerBigNum.toFormat(2)}{' '}
             {!votingPowerFromDeposits.isZero() && !votingPower.isZero() && (
               <Tooltip content="Vote Weight Multiplier – Increase your vote weight by locking tokens">
                 <div className="cursor-help flex font-normal items-center text-xs ml-3 rounded-full bg-bkg-3 px-2 py-1">
                   <LightningBoltIcon className="h-3 mr-1 text-primary-light w-3" />
-                  {`${votingPower
-                    .div(votingPowerFromDeposits)
-                    .toNumber()
+                  {`${votingPowerBigNum
+                    .div(votingPowerFromDepositsBigNum)
                     .toFixed(2)}x`}
                 </div>
               </Tooltip>
@@ -51,13 +55,10 @@ const VotingPowerBox = ({
           </span>
         </div>
         <div>
-          {Number(votingPowerFmt) > 0
+          {votingPowerBigNum.gt(0)
             ? max &&
               !max.isZero() && (
-                <VotingPowerPct
-                  amount={new BigNumber(votingPowerFmt)}
-                  total={max}
-                />
+                <VotingPowerPct amount={votingPowerBigNum} total={max} />
               )
             : null}
         </div>
