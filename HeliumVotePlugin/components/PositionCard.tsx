@@ -94,7 +94,10 @@ export const PositionCard: React.FC<PositionCardProps> = ({
       )
 
       return (
-        !pos.hasGenesisMultiplier &&
+        (unixNow >= pos.genesisEnd.toNumber() ||
+          unixNow <=
+            position.votingMint.genesisVotePowerMultiplierExpirationTs.toNumber() ||
+          !pos.hasGenesisMultiplier) &&
         !pos.isDelegated &&
         !position.pubkey.equals(pos.pubkey) &&
         lockupPeriodInDays >= positionLockupPeriodInDays
