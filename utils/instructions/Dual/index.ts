@@ -401,7 +401,9 @@ export async function getExerciseInstruction({
         closeAccount({
           source: baseHelperTokenAccount.publicKey,
           destination: wallet.publicKey,
-          owner: form.baseTreasury.extensions.token?.account.owner,
+          owner: form.baseTreasury.isSol
+            ? form.baseTreasury.governance.pubkey
+            : form.baseTreasury.extensions.token?.account.owner,
         })
       )
     )
@@ -411,7 +413,9 @@ export async function getExerciseInstruction({
         closeAccount({
           source: quoteHelperTokenAccount.publicKey,
           destination: wallet.publicKey,
-          owner: form.baseTreasury.extensions.token?.account.owner,
+          owner: form.baseTreasury.isSol
+            ? form.baseTreasury.governance.pubkey
+            : form.baseTreasury.extensions.token?.account.owner,
         })
       )
     )
