@@ -73,6 +73,7 @@ const TokenRegisterTrustless = ({
       const ix = await mangoClient!.program.methods
         .tokenRegisterTrustless(Number(form.tokenIndex), form.name)
         .accounts({
+          admin: form.governedAccount.extensions.transferAddress,
           group: mangoGroup!.publicKey,
           mint: new PublicKey(form.mintPk),
           oracle: new PublicKey(form.oraclePk),
