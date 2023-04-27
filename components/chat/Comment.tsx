@@ -10,6 +10,7 @@ import { isPublicKey } from '@tools/core/pubkey'
 import { getVoteWeight, isYesVote } from '@models/voteRecords'
 import dayjs from 'dayjs'
 import { ProfilePopup, ProfileImage, useProfile } from '@components/Profile'
+
 const relativeTime = require('dayjs/plugin/relativeTime')
 const Comment = ({
   chatMessage,
@@ -26,6 +27,8 @@ const Comment = ({
   const { profile } = useProfile(author)
   const voteSymbol = !realmInfo
     ? ''
+    : realmInfo.voteSymbol
+    ? realmInfo.voteSymbol
     : isPublicKey(realmInfo.symbol)
     ? realmInfo.displayName
     : realmInfo.symbol

@@ -243,6 +243,7 @@ export default function useRealm() {
     realm,
     realmInfo,
     symbol,
+    voteSymbol: realmInfo?.voteSymbol ?? symbol,
     mint,
     councilMint,
     governances,
