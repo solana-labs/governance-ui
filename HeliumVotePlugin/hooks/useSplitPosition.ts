@@ -74,6 +74,7 @@ export const useSplitPosition = () => {
         const mintKeypair = Keypair.generate()
         const [dao] = daoKey(realm.account.communityMint)
         const [targetPosition] = positionKey(mintKeypair.publicKey)
+        const isDao = Boolean(await connection.current.getAccountInfo(dao))
         const instructions: TransactionInstruction[] = []
         const mintRent = await connection.current.getMinimumBalanceForRentExemption(
           MintLayout.span
@@ -130,19 +131,34 @@ export const useSplitPosition = () => {
             .instruction()
         )
 
-        instructions.push(
-          await hsdProgram.methods
-            .transferV0({
-              amount: amountToTransfer,
-            })
-            .accounts({
-              sourcePosition: sourcePosition.pubkey,
-              targetPosition: targetPosition,
-              depositMint: realm.account.communityMint,
-              dao: dao,
-            })
-            .instruction()
-        )
+        if (isDao) {
+          instructions.push(
+            await hsdProgram.methods
+              .transferV0({
+                amount: amountToTransfer,
+              })
+              .accounts({
+                sourcePosition: sourcePosition.pubkey,
+                targetPosition: targetPosition,
+                depositMint: realm.account.communityMint,
+                dao: dao,
+              })
+              .instruction()
+          )
+        } else {
+          instructions.push(
+            await client.program.methods
+              .transferV0({
+                amount: amountToTransfer,
+              })
+              .accounts({
+                sourcePosition: sourcePosition.pubkey,
+                targetPosition: targetPosition,
+                depositMint: realm.account.communityMint,
+              })
+              .instruction()
+          )
+        }
 
         if (amountToTransfer.eq(sourcePosition.amountDepositedNative)) {
           instructions.push(

@@ -11,10 +11,15 @@ import {
   sendTransactionsV3,
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
+import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 
 export const useExtendPosition = () => {
   const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
   const { realm } = useRealm()
+  const [{ client }] = useVotePluginsClientStore((s) => [
+    s.state.currentRealmVotingClient,
+  ])
   const { error, loading, execute } = useAsyncCallback(
     async ({
       position,
@@ -26,7 +31,13 @@ export const useExtendPosition = () => {
       programId?: PublicKey
     }) => {
       const isInvalid =
-        !connection || !connection.current || !provider || !realm || !wallet
+        !connection ||
+        !connection.current ||
+        !provider ||
+        !realm ||
+        !wallet ||
+        !client ||
+        !(client instanceof HeliumVsrClient)
 
       const idl = await Program.fetchIdl(programId, provider)
       const hsdProgram = await init(provider as any, programId, idl)
@@ -38,19 +49,34 @@ export const useExtendPosition = () => {
       } else {
         const instructions: TransactionInstruction[] = []
         const [dao] = daoKey(realm.account.communityMint)
+        const isDao = Boolean(await connection.current.getAccountInfo(dao))
 
-        instructions.push(
-          await hsdProgram.methods
-            .resetLockupV0({
-              kind: position.lockup.kind,
-              periods: lockupPeriodsInDays,
-            } as any)
-            .accounts({
-              position: position.pubkey,
-              dao: dao,
-            })
-            .instruction()
-        )
+        if (isDao) {
+          instructions.push(
+            await hsdProgram.methods
+              .resetLockupV0({
+                kind: position.lockup.kind,
+                periods: lockupPeriodsInDays,
+              } as any)
+              .accounts({
+                position: position.pubkey,
+                dao: dao,
+              })
+              .instruction()
+          )
+        } else {
+          instructions.push(
+            await client.program.methods
+              .resetLockupV0({
+                kind: position.lockup.kind,
+                periods: lockupPeriodsInDays,
+              } as any)
+              .accounts({
+                position: position.pubkey,
+              })
+              .instruction()
+          )
+        }
 
         notify({ message: 'Extending' })
         await sendTransactionsV3({
