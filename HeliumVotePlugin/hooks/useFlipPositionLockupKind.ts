@@ -12,10 +12,15 @@ import {
   sendTransactionsV3,
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 
 export const useFlipPositionLockupKind = () => {
   const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
   const { realm } = useRealm()
+  const [{ client }] = useVotePluginsClientStore((s) => [
+    s.state.currentRealmVotingClient,
+  ])
   const { error, loading, execute } = useAsyncCallback(
     async ({
       position,
@@ -29,6 +34,8 @@ export const useFlipPositionLockupKind = () => {
         !connection.current ||
         !realm ||
         !wallet ||
+        !client ||
+        !(client instanceof HeliumVsrClient) ||
         position.numActiveVotes > 0
 
       const lockupKind = Object.keys(position.lockup.kind)[0] as string
@@ -48,21 +55,38 @@ export const useFlipPositionLockupKind = () => {
         const instructions: TransactionInstruction[] = []
         const [dao] = daoKey(realm.account.communityMint)
         const kind = isConstant ? { cliff: {} } : { constant: {} }
+        const isDao = Boolean(await connection.current.getAccountInfo(dao))
 
-        instructions.push(
-          await hsdProgram.methods
-            .resetLockupV0({
-              kind,
-              periods: secsToDays(
-                position.lockup.endTs.sub(position.lockup.startTs).toNumber()
-              ),
-            } as any)
-            .accounts({
-              position: position.pubkey,
-              dao: dao,
-            })
-            .instruction()
-        )
+        if (isDao) {
+          instructions.push(
+            await hsdProgram.methods
+              .resetLockupV0({
+                kind,
+                periods: secsToDays(
+                  position.lockup.endTs.sub(position.lockup.startTs).toNumber()
+                ),
+              } as any)
+              .accounts({
+                position: position.pubkey,
+                dao,
+              })
+              .instruction()
+          )
+        } else {
+          instructions.push(
+            await client.program.methods
+              .resetLockupV0({
+                kind,
+                periods: secsToDays(
+                  position.lockup.endTs.sub(position.lockup.startTs).toNumber()
+                ),
+              } as any)
+              .accounts({
+                position: position.pubkey,
+              })
+              .instruction()
+          )
+        }
 
         notify({ message: isConstant ? `Unlocking` : `Pausing` })
         await sendTransactionsV3({

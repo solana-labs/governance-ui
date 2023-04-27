@@ -54,24 +54,40 @@ export const useTransferPosition = () => {
       } else {
         const instructions: TransactionInstruction[] = []
         const [dao] = daoKey(realm.account.communityMint)
+        const isDao = Boolean(await connection.current.getAccountInfo(dao))
         const amountToTransfer = getMintNaturalAmountFromDecimalAsBN(
           amount,
           mint!.decimals
         )
 
-        instructions.push(
-          await hsdProgram.methods
-            .transferV0({
-              amount: amountToTransfer,
-            })
-            .accounts({
-              sourcePosition: sourcePosition.pubkey,
-              targetPosition: targetPosition.pubkey,
-              depositMint: realm.account.communityMint,
-              dao: dao,
-            })
-            .instruction()
-        )
+        if (isDao) {
+          instructions.push(
+            await hsdProgram.methods
+              .transferV0({
+                amount: amountToTransfer,
+              })
+              .accounts({
+                sourcePosition: sourcePosition.pubkey,
+                targetPosition: targetPosition.pubkey,
+                depositMint: realm.account.communityMint,
+                dao: dao,
+              })
+              .instruction()
+          )
+        } else {
+          instructions.push(
+            await client.program.methods
+              .transferV0({
+                amount: amountToTransfer,
+              })
+              .accounts({
+                sourcePosition: sourcePosition.pubkey,
+                targetPosition: targetPosition.pubkey,
+                depositMint: realm.account.communityMint,
+              })
+              .instruction()
+          )
+        }
 
         if (amountToTransfer.eq(sourcePosition.amountDepositedNative)) {
           instructions.push(
