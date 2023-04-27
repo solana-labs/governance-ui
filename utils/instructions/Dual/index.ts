@@ -315,26 +315,6 @@ export async function getExerciseInstruction({
       space,
       'processed'
     )
-    // Creating checking account on the fly with same mint as base and owner
-    // made to be more safe - instructions don't have access to main treasury
-    const baseHelperTokenAccount = new Keypair()
-    // run as prerequsite instructions payer is connected wallet
-    prerequisiteInstructions.push(
-      SystemProgram.createAccount({
-        fromPubkey: wallet.publicKey,
-        newAccountPubkey: baseHelperTokenAccount.publicKey,
-        lamports: rent,
-        space: space,
-        programId: TOKEN_PROGRAM_ID,
-      }),
-      initializeAccount({
-        account: baseHelperTokenAccount.publicKey,
-        mint: baseMint,
-        owner: form.baseTreasury.isSol
-          ? form.baseTreasury.governance.pubkey
-          : form.baseTreasury.extensions.token?.account.owner,
-      })
-    )
     const quoteHelperTokenAccount = new Keypair()
     // run as prerequsite instructions payer is connected wallet
     prerequisiteInstructions.push(
@@ -376,17 +356,30 @@ export async function getExerciseInstruction({
       form.soName,
       form.baseTreasury.extensions.token!.account.owner!,
       form.optionAccount!.pubkey!,
-      form.quoteTreasury!.pubkey!,
-      form.baseTreasury.pubkey
+      quoteHelperTokenAccount.publicKey,
+      form.baseTreasury!.extensions.transferAddress!,
     )
     additionalSerializedInstructions.push(
       serializeInstructionToBase64(exerciseInstruction)
+    )
+
+    additionalSerializedInstructions.push(
+      serializeInstructionToBase64(
+        closeAccount({
+          source: quoteHelperTokenAccount.publicKey,
+          destination: wallet.publicKey,
+          owner: form.baseTreasury.isSol
+            ? form.baseTreasury.governance.pubkey
+            : form.baseTreasury.extensions.token?.account.owner,
+        })
+      )
     )
 
     return {
       serializedInstruction,
       isValid: true,
       prerequisiteInstructions: prerequisiteInstructions,
+      prerequisiteInstructionsSigners: [quoteHelperTokenAccount],
       governance: form.baseTreasury?.governance,
       additionalSerializedInstructions,
       chunkSplitByDefault: true,
