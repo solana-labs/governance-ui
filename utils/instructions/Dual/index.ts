@@ -309,6 +309,67 @@ export async function getExerciseInstruction({
       additionalSerializedInstructions.push(serializeInstructionToBase64(ataIx))
     }
 
+    const prerequisiteInstructions: TransactionInstruction[] = []
+    const space = 165
+    const rent = await connection.current.getMinimumBalanceForRentExemption(
+      space,
+      'processed'
+    )
+    // Creating checking account on the fly with same mint as base and owner
+    // made to be more safe - instructions don't have access to main treasury
+    const baseHelperTokenAccount = new Keypair()
+    // run as prerequsite instructions payer is connected wallet
+    prerequisiteInstructions.push(
+      SystemProgram.createAccount({
+        fromPubkey: wallet.publicKey,
+        newAccountPubkey: baseHelperTokenAccount.publicKey,
+        lamports: rent,
+        space: space,
+        programId: TOKEN_PROGRAM_ID,
+      }),
+      initializeAccount({
+        account: baseHelperTokenAccount.publicKey,
+        mint: baseMint,
+        owner: form.baseTreasury.isSol
+          ? form.baseTreasury.governance.pubkey
+          : form.baseTreasury.extensions.token?.account.owner,
+      })
+    )
+    const quoteHelperTokenAccount = new Keypair()
+    // run as prerequsite instructions payer is connected wallet
+    prerequisiteInstructions.push(
+      SystemProgram.createAccount({
+        fromPubkey: wallet.publicKey,
+        newAccountPubkey: quoteHelperTokenAccount.publicKey,
+        lamports: rent,
+        space: space,
+        programId: TOKEN_PROGRAM_ID,
+      }),
+      initializeAccount({
+        account: quoteHelperTokenAccount.publicKey,
+        mint: quoteMint,
+        owner: form.baseTreasury.isSol
+          ? form.baseTreasury.governance.pubkey
+          : form.baseTreasury.extensions.token?.account.owner,
+      })
+    )
+
+    const baseAmountAtoms = form.numTokens * Number(state.lotSize);
+    const quoteAmountAtoms = form.numTokens * strike;
+
+    additionalSerializedInstructions.push(
+      serializeInstructionToBase64(
+        Token.createTransferInstruction(
+          TOKEN_PROGRAM_ID,
+          form.quoteTreasury!.extensions.transferAddress!,
+          quoteHelperTokenAccount.publicKey,
+          form.quoteTreasury!.extensions!.token!.account.owner,
+          [],
+          quoteAmountAtoms
+        )
+      )
+    )
+
     const exerciseInstruction = await so.createExerciseInstruction(
       new BN(form.numTokens),
       new BN(strike),
@@ -322,9 +383,47 @@ export async function getExerciseInstruction({
       serializeInstructionToBase64(exerciseInstruction)
     )
 
+    additionalSerializedInstructions.push(
+      serializeInstructionToBase64(
+        Token.createTransferInstruction(
+          TOKEN_PROGRAM_ID,
+          baseHelperTokenAccount.publicKey,
+          form.baseTreasury!.extensions.transferAddress!,
+          form.baseTreasury!.extensions.transferAddress!,
+          [],
+          baseAmountAtoms
+        )
+      )
+    )
+
+    additionalSerializedInstructions.push(
+      serializeInstructionToBase64(
+        closeAccount({
+          source: baseHelperTokenAccount.publicKey,
+          destination: wallet.publicKey,
+          owner: form.baseTreasury.isSol
+            ? form.baseTreasury.governance.pubkey
+            : form.baseTreasury.extensions.token?.account.owner,
+        })
+      )
+    )
+
+    additionalSerializedInstructions.push(
+      serializeInstructionToBase64(
+        closeAccount({
+          source: quoteHelperTokenAccount.publicKey,
+          destination: wallet.publicKey,
+          owner: form.baseTreasury.isSol
+            ? form.baseTreasury.governance.pubkey
+            : form.baseTreasury.extensions.token?.account.owner,
+        })
+      )
+    )
+
     return {
       serializedInstruction,
       isValid: true,
+      prerequisiteInstructions: prerequisiteInstructions,
       governance: form.baseTreasury?.governance,
       additionalSerializedInstructions,
       chunkSplitByDefault: true,
