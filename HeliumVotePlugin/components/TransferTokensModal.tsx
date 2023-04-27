@@ -94,7 +94,7 @@ export const TransferTokensModal: React.FC<TransferTokensModalProps> = ({
         <br />
         <div className="text-red">
           {hasTransferablePositions
-            ? 'You cant transfer to Landrush positions, and transfering out of one after the Landrush period, will result in losing the multiplier!'
+            ? 'You cant transfer to Landrush positions after the Landrush period, and transfering out of one after the Landrush period, will result in losing the multiplier!'
             : 'There are no positions that meet this criteria.'}
         </div>
       </div>
