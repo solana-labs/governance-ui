@@ -14,7 +14,11 @@ import useProgramVersion from '@hooks/useProgramVersion';
 import useRealm from '@hooks/useRealm';
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh';
 import { trySentryLog } from '@utils/logs';
-import { sendTransactionsV3 } from '@utils/sendTransactions';
+import {
+  SequenceType,
+  sendTransactionsV3,
+  txBatchesToInstructionSetWithSigners,
+} from '@utils/sendTransactions';
 
 import useGovernanceDefaults from './useGovernanceDefaults';
 
@@ -76,7 +80,12 @@ const useNewWalletCallback = (
 
     await sendTransactionsV3({
       transactionInstructions: [
-        { instructionsSet: [{ transactionInstruction: instructions[0] }] },
+        {
+          instructionsSet: instructions.map((x) => ({
+            transactionInstruction: x,
+          })),
+          sequenceType: SequenceType.Sequential,
+        },
       ],
       connection: connection.current,
       wallet: wallet,
