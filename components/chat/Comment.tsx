@@ -32,6 +32,7 @@ const Comment = ({
     : isPublicKey(realmInfo.symbol)
     ? realmInfo.displayName
     : realmInfo.symbol
+
   //@ts-ignore
   const fromNow = dayjs(postedAt.toNumber() * 1000).fromNow()
   return (
