@@ -389,7 +389,8 @@ export async function getExerciseInstruction({
           TOKEN_PROGRAM_ID,
           baseHelperTokenAccount.publicKey,
           form.baseTreasury!.extensions.transferAddress!,
-          form.baseTreasury!.extensions.transferAddress!,
+          // Base and quote treasuries have the same owner
+          form.quoteTreasury!.extensions!.token!.account.owner,
           [],
           baseAmountAtoms
         )
