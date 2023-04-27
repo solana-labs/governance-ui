@@ -387,6 +387,7 @@ export async function getExerciseInstruction({
       serializedInstruction,
       isValid: true,
       prerequisiteInstructions: prerequisiteInstructions,
+      prerequisiteInstructionsSigners: [baseHelperTokenAccount, quoteHelperTokenAccount],
       governance: form.baseTreasury?.governance,
       additionalSerializedInstructions,
       chunkSplitByDefault: true,
