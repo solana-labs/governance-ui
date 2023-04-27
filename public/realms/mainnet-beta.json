@@ -3163,5 +3163,15 @@
     "website": "https://thenudiemagazine.com",
     "twitter": "@nudie_mag",
     "ogImage": "/realms/ComradeDAO/img/comradedaologo.png"
+  },
+  {
+    "symbol": "EBIZU",
+    "displayName": "Ebizu Vennootschap",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "EZdH6oyvrQwxVjbptwi1WC9JnXBPWTr8X1XrU73KTzTY",
+    "website": "https://ebizu.gitbook.io/",
+    "twitter": "@Ebizu_V",
+    "ogImage": "https://raw.githubusercontent.com/farizulhammi/ebizu/main/EBIZU/ebizu_og.png",
+    "bannerImage": "https://raw.githubusercontent.com/farizulhammi/ebizu/main/EBIZU/ebizu_banner.jpg"
   }
 ]
