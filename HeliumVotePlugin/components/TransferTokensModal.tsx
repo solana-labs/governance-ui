@@ -9,6 +9,8 @@ import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import useRealm from '@hooks/useRealm'
 import { precision } from '@utils/formatting'
 import Input from '@components/inputs/Input'
+import { useSolanaUnixNow } from '@hooks/useSolanaUnixNow'
+import { BN } from '@coral-xyz/anchor'
 
 export interface TransferTokensModalProps {
   isOpen: boolean
@@ -25,6 +27,7 @@ export const TransferTokensModal: React.FC<TransferTokensModalProps> = ({
   onClose,
   onSubmit,
 }) => {
+  const { unixNow = 0 } = useSolanaUnixNow()
   const { mint } = useRealm()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [amount, setAmount] = useState<number | null>(null)
@@ -136,17 +139,19 @@ export const TransferTokensModal: React.FC<TransferTokensModalProps> = ({
                 >
                   <CardLabel
                     label="Lockup Type"
-                    value={
-                      lockupKind.charAt(0).toUpperCase() + lockupKind.slice(1)
-                    }
+                    value={isConstant ? 'Constant' : 'Decaying'}
                   />
                   <CardLabel
                     label="Vote Multiplier"
-                    value={(pos.votingPower.isZero()
-                      ? 0
-                      : pos.votingPower
-                          .div(pos.amountDepositedNative)
-                          .toNumber()
+                    value={(
+                      (pos.votingPower.isZero()
+                        ? 0
+                        : pos.votingPower
+                            .div(pos.amountDepositedNative)
+                            .toNumber()) /
+                      (pos.genesisEnd.gt(new BN(unixNow))
+                        ? pos.votingMint.genesisVotePowerMultiplier
+                        : 1)
                     ).toFixed(2)}
                   />
                   <CardLabel
