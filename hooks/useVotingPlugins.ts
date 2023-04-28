@@ -154,7 +154,6 @@ export function useVotingPlugins() {
 
       if (currentClient.walletPk && heliumVsrClient) {
         try {
-          console.log('GET POSITIONS')
           await heliumStore.getPositions({
             realmPk: realm.pubkey,
             communityMintPk: realm.account.communityMint,
