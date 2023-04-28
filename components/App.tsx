@@ -8,7 +8,11 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import { GatewayProvider } from '@components/Gateway/GatewayProvider'
 import { usePrevious } from '@hooks/usePrevious'
-import { useVotingPlugins, vsrPluginsPks } from '@hooks/useVotingPlugins'
+import {
+  heliumVsrPluginsPks,
+  useVotingPlugins,
+  vsrPluginsPks,
+} from '@hooks/useVotingPlugins'
 import ErrorBoundary from '@components/ErrorBoundary'
 import handleGovernanceAssetsStore from '@hooks/handleGovernanceAssetsStore'
 import handleRouterHistory from '@hooks/handleRouterHistory'
@@ -30,6 +34,7 @@ import queryClient from '@hooks/queries/queryClient'
 import useSerumGovStore from 'stores/useSerumGovStore'
 import { WalletProvider } from '@hub/providers/Wallet'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
@@ -74,6 +79,7 @@ export function App(props: Props) {
   )
   const { getNfts } = useTreasuryAccountStore()
   const { getOwnedDeposits, resetDepositState } = useDepositStore()
+  const { getPositions, resetState: resetHvsrState } = useHeliumVsrStore()
   const {
     realm,
     ownTokenRecord,
@@ -85,7 +91,15 @@ export function App(props: Props) {
   } = useRealm()
   const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
-  const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
+  const [
+    currentClient,
+    vsrClient,
+    heliumVsrClient,
+  ] = useVotePluginsClientStore((s) => [
+    s.state.currentRealmVotingClient,
+    s.state.vsrClient,
+    s.state.heliumVsrClient,
+  ])
   const prevStringifyPossibleNftsAccounts = usePrevious(
     JSON.stringify(possibleNftsAccounts)
   )
@@ -144,6 +158,40 @@ export function App(props: Props) {
     wallet?.connected,
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     vsrClient?.program.programId.toBase58(),
+  ])
+
+  useEffect(() => {
+    if (
+      realm &&
+      config?.account.communityTokenConfig.voterWeightAddin &&
+      heliumVsrPluginsPks.includes(
+        config.account.communityTokenConfig.voterWeightAddin.toBase58()
+      ) &&
+      realm.pubkey &&
+      wallet?.connected &&
+      ownTokenRecord &&
+      heliumVsrClient
+    ) {
+      getPositions({
+        votingClient: currentClient,
+        realmPk: realm.pubkey,
+        communityMintPk: realm.account.communityMint,
+        walletPk: ownTokenRecord!.account!.governingTokenOwner,
+        client: heliumVsrClient,
+        connection: connection.current,
+      })
+    } else if (!wallet?.connected || !ownTokenRecord) {
+      resetHvsrState()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+  }, [
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+    realm?.pubkey.toBase58(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+    ownTokenRecord?.pubkey.toBase58(),
+    wallet?.connected,
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+    heliumVsrClient?.program.programId.toBase58(),
   ])
 
   useEffect(() => {

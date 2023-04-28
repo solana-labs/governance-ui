@@ -16,10 +16,7 @@ import {
 import useWalletStore from 'stores/useWalletStore'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
-import {
-  getTokenOwnerRecordAddress,
-  GoverningTokenRole,
-} from '@solana/spl-governance'
+import { GoverningTokenRole } from '@solana/spl-governance'
 import InlineNotification from '@components/InlineNotification'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
@@ -38,23 +35,36 @@ import { PublicKey } from '@solana/web3.js'
 import { notify } from '@utils/notifications'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useSubDaos } from 'HeliumVotePlugin/hooks/useSubDaos'
+import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
 
 export const LockTokensAccount: React.FC<{
   tokenOwnerRecordPk: string | string[] | undefined
   children: React.ReactNode
-}> = ({ tokenOwnerRecordPk, children }) => {
+}> = (props) => {
+  const { error, createPosition } = useCreatePosition()
+  const [isLockModalOpen, setIsLockModalOpen] = useState(false)
+  const connection = useWalletStore((s) => s.connection)
+  const wallet = useWalletOnePointOh()
+  const { data: tokenOwnerRecordPk } = useAddressQuery_CommunityTokenOwner()
+  const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
+    (s) => s.actions
+  )
+  const connected = !!wallet?.connected
+
   const {
     mint,
     realm,
     realmTokenAccount,
     realmInfo,
     tokenRecords,
+    ownTokenRecord,
     councilMint,
     config,
   } = useRealm()
 
   const tokenOwnerRecordWalletPk = Object.keys(tokenRecords)?.find(
-    (key) => tokenRecords[key]?.pubkey?.toBase58() === tokenOwnerRecordPk
+    (key) =>
+      tokenRecords[key]?.pubkey?.toBase58() === tokenOwnerRecordPk?.toBase58()
   )
 
   const [
@@ -71,18 +81,9 @@ export const LockTokensAccount: React.FC<{
     error: subDaosError,
     result: subDaos,
   } = useSubDaos()
-  const { error, createPosition } = useCreatePosition()
-  const [isOwnerOfPositions, setIsOwnerOfPositions] = useState(true)
-  const [isLockModalOpen, setIsLockModalOpen] = useState(false)
-  const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletOnePointOh()
-  const connected = !!wallet?.connected
-  const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
-    (s) => s.actions
-  )
 
   const [
-    isLoading,
+    loading,
     positions,
     votingPower,
     amountLocked,
@@ -129,35 +130,7 @@ export const LockTokensAccount: React.FC<{
         message: 'Unable to fetch positions',
       })
     }
-  }, [isOwnerOfPositions, vsrClient])
-
-  useEffect(() => {
-    const getTokenOwnerRecord = async () => {
-      const defaultMint =
-        !mint?.supply.isZero() ||
-        config?.account.communityTokenConfig.maxVoterWeightAddin
-          ? realm!.account.communityMint
-          : !councilMint?.supply.isZero()
-          ? realm!.account.config.councilMint
-          : undefined
-
-      const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
-        realm!.owner,
-        realm!.pubkey,
-        defaultMint!,
-        wallet!.publicKey!
-      )
-
-      setIsOwnerOfPositions(
-        tokenOwnerRecordAddress.toBase58() === tokenOwnerRecordPk
-      )
-    }
-
-    if (realm && wallet?.connected) {
-      getTokenOwnerRecord()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [realm?.pubkey.toBase58(), wallet?.connected, tokenOwnerRecordPk])
+  }, [props.tokenOwnerRecordPk, tokenOwnerRecordWalletPk, vsrClient])
 
   const hasTokensInWallet =
     realmTokenAccount && realmTokenAccount.account.amount.gt(new BN(0))
@@ -243,7 +216,13 @@ export const LockTokensAccount: React.FC<{
   }
 
   const mainBoxesClasses = 'bg-bkg-1 col-span-1 p-4 rounded-md'
-  const loading = isLoading || loadingSubDaos
+  const isLoading = loading || loadingSubDaos
+  const isSameWallet =
+    (connected && !ownTokenRecord) ||
+    (connected &&
+      !!ownTokenRecord &&
+      wallet!.publicKey!.equals(ownTokenRecord!.account.governingTokenOwner))
+
   return (
     <div className="grid grid-cols-12 gap-4">
       <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12">
@@ -264,7 +243,7 @@ export const LockTokensAccount: React.FC<{
             My governance power{' '}
           </h1>
 
-          {isOwnerOfPositions && (
+          {isSameWallet && (
             <div className="ml-auto flex flex-row">
               <LockCommunityTokensBtn
                 onClick={() => setIsLockModalOpen(true)}
@@ -272,7 +251,7 @@ export const LockTokensAccount: React.FC<{
             </div>
           )}
         </div>
-        {!isOwnerOfPositions && connected && (
+        {!isSameWallet && connected && (
           <div className="pb-6">
             <InlineNotification
               desc="You do not own this account"
@@ -283,7 +262,7 @@ export const LockTokensAccount: React.FC<{
         {connected ? (
           <div>
             <div className="grid md:grid-cols-3 grid-flow-row gap-4 pb-8">
-              {loading ? (
+              {isLoading ? (
                 <>
                   <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-md" />
                   <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-md" />
@@ -301,7 +280,7 @@ export const LockTokensAccount: React.FC<{
                       />
                     )}
                   </div>
-                  {isOwnerOfPositions && (
+                  {isSameWallet && (
                     <>
                       <div className={mainBoxesClasses}>
                         <p className="text-fgd-3">{`${tokenName} Available`}</p>
@@ -337,7 +316,7 @@ export const LockTokensAccount: React.FC<{
             <h2 className="mb-4">Locked Positions</h2>
             <div
               className={`grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8 ${
-                !isOwnerOfPositions ? 'opacity-0.8 pointer-events-none' : ''
+                !isSameWallet ? 'opacity-0.8 pointer-events-none' : ''
               }`}
             >
               {!loading &&
@@ -358,10 +337,10 @@ export const LockTokensAccount: React.FC<{
                         tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey ||
                         null
                       }
-                      isOwner={isOwnerOfPositions}
+                      isOwner={isSameWallet}
                     />
                   ))}
-              {isOwnerOfPositions && (
+              {isSameWallet && (
                 <div className="border border-fgd-4 flex flex-col items-center justify-center p-6 rounded-lg">
                   <LightningBoltIcon className="h-8 mb-2 text-primary-light w-8" />
                   <p className="flex text-center pb-6">
@@ -403,7 +382,7 @@ export const LockTokensAccount: React.FC<{
         )}
         <div
           className={`mt-4 ${
-            !isOwnerOfPositions ? 'opacity-0.8 pointer-events-none' : ''
+            !isSameWallet ? 'opacity-0.8 pointer-events-none' : ''
           }`}
         >
           <TokenDeposit
@@ -414,7 +393,7 @@ export const LockTokensAccount: React.FC<{
           />
         </div>
       </div>
-      {connected && isOwnerOfPositions && children}
+      {connected && isSameWallet && props.children}
     </div>
   )
 }
