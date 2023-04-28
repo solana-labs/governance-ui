@@ -63,7 +63,7 @@ export const useFlipPositionLockupKind = () => {
           secsToDays(
             isConstant
               ? position.lockup.endTs.sub(position.lockup.startTs).toNumber()
-              : position.lockup.endTs.sub(new BN(unixNow || 0)).toNumber()
+              : position.lockup.endTs.sub(new BN(unixNow)).toNumber()
           )
         )
 
