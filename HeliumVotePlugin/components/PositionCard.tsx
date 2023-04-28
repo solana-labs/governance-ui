@@ -209,7 +209,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
 
   const handleFlipPositionLockupKind = async () => {
     try {
-      await flipPositionLockupKind({ position })
+      await flipPositionLockupKind({ position, tokenOwnerRecordPk })
 
       if (!flippingError) {
         await refetchState()
@@ -229,6 +229,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
     await extendPosition({
       position,
       lockupPeriodsInDays: values.lockupPeriodInDays,
+      tokenOwnerRecordPk,
     })
 
     if (!extendingError) {
@@ -269,6 +270,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
     await delegatePosition({
       position,
       subDao,
+      tokenOwnerRecordPk,
     })
 
     if (!delegatingError) {
@@ -310,6 +312,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
     try {
       await closePosition({
         position,
+        tokenOwnerRecordPk,
       })
 
       if (!closingError) {

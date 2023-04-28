@@ -10,17 +10,22 @@ import {
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
 import { notify } from '@utils/notifications'
+import useRealm from '@hooks/useRealm'
+import { withCreateTokenOwnerRecord } from '@solana/spl-governance'
 
 export const useDelegatePosition = () => {
   const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
+  const { realm, realmInfo } = useRealm()
   const { error, loading, execute } = useAsyncCallback(
     async ({
       position,
       subDao,
+      tokenOwnerRecordPk,
       programId = PROGRAM_ID,
     }: {
       position: PositionWithMeta
       subDao: SubDaoWithMeta
+      tokenOwnerRecordPk: PublicKey | null
       programId?: PublicKey
     }) => {
       const isInvalid =
@@ -28,6 +33,8 @@ export const useDelegatePosition = () => {
         !connection.current ||
         !provider ||
         !wallet ||
+        !realm ||
+        !realmInfo ||
         position.isDelegated
 
       const idl = await Program.fetchIdl(programId, provider)
@@ -39,6 +46,18 @@ export const useDelegatePosition = () => {
         throw new Error('Unable to Delegate Position, Invalid params')
       } else {
         const instructions: TransactionInstruction[] = []
+
+        if (!tokenOwnerRecordPk) {
+          await withCreateTokenOwnerRecord(
+            instructions,
+            realm.owner,
+            realmInfo.programVersion!,
+            realm.pubkey,
+            wallet!.publicKey!,
+            realm.account.communityMint,
+            wallet!.publicKey!
+          )
+        }
 
         instructions.push(
           await hsdProgram.methods

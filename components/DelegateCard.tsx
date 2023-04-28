@@ -35,7 +35,6 @@ const DelegateCard = () => {
   const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection.current)
   const { fetchRealm } = useWalletStore((s) => s.actions)
-
   const [delegateKey, setDelegateKey] = useState('')
   const [delegateCouncilToken, setDelegateCouncilToken] = useState(true)
   const [delegateCommunityToken, setDelegateCommunityToken] = useState(true)

@@ -1,6 +1,6 @@
 import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import { BN } from '@coral-xyz/anchor'
-import { TransactionInstruction } from '@solana/web3.js'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { useAsyncCallback } from 'react-async-hook'
 import { PositionWithMeta } from '../sdk/types'
 import useRealm from '@hooks/useRealm'
@@ -13,22 +13,30 @@ import {
   sendTransactionsV3,
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
+import { withCreateTokenOwnerRecord } from '@solana/spl-governance'
 
 export const useClosePosition = () => {
   const { unixNow } = useSolanaUnixNow()
   const { connection, wallet } = useWalletDeprecated()
-  const { realm } = useRealm()
+  const { realm, realmInfo } = useRealm()
   const [{ client }] = useVotePluginsClientStore((s) => [
     s.state.currentRealmVotingClient,
   ])
   const { error, loading, execute } = useAsyncCallback(
-    async ({ position }: { position: PositionWithMeta }) => {
+    async ({
+      position,
+      tokenOwnerRecordPk,
+    }: {
+      position: PositionWithMeta
+      tokenOwnerRecordPk: PublicKey | null
+    }) => {
       const lockup = position.lockup
       const lockupKind = Object.keys(lockup.kind)[0]
       const isInvalid =
         !connection ||
         !connection.current ||
         !realm ||
+        !realmInfo ||
         !client ||
         !(client instanceof HeliumVsrClient) ||
         !wallet ||
@@ -45,6 +53,18 @@ export const useClosePosition = () => {
         throw new Error('Unable to Close Position, Invalid params')
       } else {
         const instructions: TransactionInstruction[] = []
+
+        if (!tokenOwnerRecordPk) {
+          await withCreateTokenOwnerRecord(
+            instructions,
+            realm.owner,
+            realmInfo.programVersion!,
+            realm.pubkey,
+            wallet!.publicKey!,
+            realm.account.communityMint,
+            wallet!.publicKey!
+          )
+        }
 
         instructions.push(
           await client.program.methods
