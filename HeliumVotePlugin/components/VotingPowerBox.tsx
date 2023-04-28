@@ -5,7 +5,6 @@ import { MintInfo } from '@solana/spl-token'
 import { getMintDecimalAmount } from '@tools/sdk/units'
 import { LightningBoltIcon } from '@heroicons/react/solid'
 import Tooltip from '@components/Tooltip'
-import VotingPowerPct from '@components/ProposalVotingPower/VotingPowerPct'
 
 export interface VotingPowerBoxProps {
   votingPower: BN
@@ -32,8 +31,6 @@ export const VotingPowerBox: React.FC<VotingPowerBoxProps> = ({
       ? getMintDecimalAmount(mint, votingPowerFromDeposits)
       : new BigNumber(0)
 
-  const max: BigNumber = new BigNumber(mint.supply.toString())
-
   return (
     <>
       {' '}
@@ -56,14 +53,6 @@ export const VotingPowerBox: React.FC<VotingPowerBoxProps> = ({
               </Tooltip>
             )}
           </span>
-        </div>
-        <div>
-          {votingPowerBigNum.gt(0)
-            ? max &&
-              !max.isZero() && (
-                <VotingPowerPct amount={votingPowerBigNum} total={max} />
-              )
-            : null}
         </div>
       </div>
     </>
