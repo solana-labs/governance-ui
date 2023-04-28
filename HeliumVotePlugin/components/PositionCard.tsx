@@ -161,15 +161,15 @@ export const PositionCard: React.FC<PositionCardProps> = ({
 
   const { lockup, hasGenesisMultiplier, votingMint } = position
   const lockupKind = Object.keys(lockup.kind)[0] as string
+  const isConstant = lockupKind === 'constant'
   const lockupExpired =
-    lockupKind !== 'constant' && lockup.endTs.sub(new BN(unixNow)).lt(new BN(0))
+    !isConstant && lockup.endTs.sub(new BN(unixNow)).lt(new BN(0))
 
   const lockedTokens = fmtMintAmount(
     position.votingMint.mint.account,
     position.amountDepositedNative
   )
 
-  const isConstant = lockupKind === 'constant'
   const isRealmCommunityMint =
     realm?.account.communityMint &&
     realm.account.communityMint.equals(position.votingMint.mint.publicKey)

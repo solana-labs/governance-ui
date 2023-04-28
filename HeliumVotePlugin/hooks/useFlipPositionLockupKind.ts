@@ -1,5 +1,5 @@
 import useWalletDeprecated from '@hooks/useWalletDeprecated'
-import { Program } from '@coral-xyz/anchor'
+import { BN, Program } from '@coral-xyz/anchor'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { useAsyncCallback } from 'react-async-hook'
 import { PositionWithMeta } from '../sdk/types'
@@ -14,8 +14,10 @@ import {
 } from '@utils/sendTransactions'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
+import { useSolanaUnixNow } from '@hooks/useSolanaUnixNow'
 
 export const useFlipPositionLockupKind = () => {
+  const { unixNow } = useSolanaUnixNow()
   const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
   const { realm } = useRealm()
   const [{ client }] = useVotePluginsClientStore((s) => [
@@ -35,6 +37,7 @@ export const useFlipPositionLockupKind = () => {
         !realm ||
         !wallet ||
         !client ||
+        !unixNow ||
         !(client instanceof HeliumVsrClient) ||
         position.numActiveVotes > 0
 
@@ -56,15 +59,20 @@ export const useFlipPositionLockupKind = () => {
         const [dao] = daoKey(realm.account.communityMint)
         const kind = isConstant ? { cliff: {} } : { constant: {} }
         const isDao = Boolean(await connection.current.getAccountInfo(dao))
+        const positionLockupPeriodInDays = Math.ceil(
+          secsToDays(
+            isConstant
+              ? position.lockup.endTs.sub(position.lockup.startTs).toNumber()
+              : position.lockup.endTs.sub(new BN(unixNow)).toNumber()
+          )
+        )
 
         if (isDao) {
           instructions.push(
             await hsdProgram.methods
               .resetLockupV0({
                 kind,
-                periods: secsToDays(
-                  position.lockup.endTs.sub(position.lockup.startTs).toNumber()
-                ),
+                periods: positionLockupPeriodInDays,
               } as any)
               .accounts({
                 position: position.pubkey,
@@ -77,9 +85,7 @@ export const useFlipPositionLockupKind = () => {
             await client.program.methods
               .resetLockupV0({
                 kind,
-                periods: secsToDays(
-                  position.lockup.endTs.sub(position.lockup.startTs).toNumber()
-                ),
+                periods: positionLockupPeriodInDays,
               } as any)
               .accounts({
                 position: position.pubkey,
