@@ -58,6 +58,7 @@ function exists<T>(item: T | null | undefined): item is T {
   return !!item
 }
 
+/** @deprecated - avoid transitory data models */
 const enhanceNFT = (nft: NftWithATA) => {
   return {
     image: nft.json?.image || '',
@@ -89,6 +90,7 @@ const enhanceNFT = (nft: NftWithATA) => {
   }
 }
 
+/** @deprecated -- use react-query by pubkey */
 function loadNft(
   nft: Metadata<JsonMetadata<string>> | Nft | Sft,
   isDevnet?: boolean
@@ -114,6 +116,7 @@ function loadNft(
   ])
 }
 
+/** @deprecated -- use react-query by pubkey, avoid transitory data models */
 export async function getNFTsByCollection(
   collectionAddress: PublicKey,
   isDevnet?: boolean
@@ -156,6 +159,7 @@ export async function getNFTsByCollection(
   return nfts.map(enhanceNFT)
 }
 
+/** @deprecated -- use react-query by pubkey, avoid transitory data models */
 export async function getNFTsByOwner(owner: PublicKey, isDevnet?: boolean) {
   const endpoint = isDevnet
     ? process.env.NEXT_PUBLIC_HELIUS_DEVNET_RPC || process.env.DEVNET_RPC
@@ -190,6 +194,7 @@ export async function getNFTsByOwner(owner: PublicKey, isDevnet?: boolean) {
   return nfts.map(enhanceNFT)
 }
 
+/** @deprecated -- use react-query by pubkey */
 export async function getOwnedTokenAccounts(
   connection: Connection,
   publicKey: PublicKey
@@ -206,6 +211,7 @@ export async function getOwnedTokenAccounts(
   })
 }
 
+/** @deprecated -- use react-query by pubkey */
 export const getTokenAccountsByMint = async (
   connection: Connection,
   mint: string
@@ -231,6 +237,7 @@ export const getTokenAccountsByMint = async (
   })
 }
 
+/** @deprecated, probably */
 export async function tryGetMint(
   connection: Connection,
   publicKey: PublicKey
@@ -252,10 +259,12 @@ export async function tryGetMint(
   }
 }
 
+/** @deprecated -- why? */
 export const I80F48OptionalFromNumber = (val: number | undefined) => {
   return val || val === 0 ? I80F48.fromNumber(val) : undefined
 }
 
+/** @deprecated -- use react-query by pubkey */
 export async function tryGetTokenAccount(
   connection: Connection,
   publicKey: PublicKey
@@ -279,6 +288,7 @@ export async function tryGetTokenAccount(
   }
 }
 
+/** @deprecated -- use react-query by pubkey */
 export async function tryGetTokenMint(
   connection: Connection,
   publicKey: PublicKey
@@ -288,12 +298,15 @@ export async function tryGetTokenMint(
 }
 
 // copied from @solana/spl-token
+/** @deprecated -- why? just import from spl-token? */
 export const TOKEN_PROGRAM_ID = new PublicKey(
   'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'
 )
 export const BPF_UPGRADE_LOADER_ID = new PublicKey(
   'BPFLoaderUpgradeab1e11111111111111111111111'
 )
+
+/** @deprecated -- why not just use the normal accountLayout */
 export function parseTokenAccountData(
   account: PublicKey,
   data: Buffer
@@ -332,6 +345,7 @@ export function parseTokenAccountData(
   return accountInfo
 }
 
+/** @deprecated -- why not just use the normal mint layout? */
 export function parseMintAccountData(data: Buffer): MintAccount {
   const mintInfo = MintLayout.decode(data)
   if (mintInfo.mintAuthorityOption === 0) {
@@ -407,6 +421,7 @@ export async function getMultipleAccountInfoChunked(
 }
 
 //TODO refactor both methods (getMintAccountLabelInfo, getTokenAccountLabelInfo) make it more common
+/** @deprecated */
 export function getTokenAccountLabelInfo(acc: AssetAccount | undefined) {
   let tokenAccount = ''
   let tokenName = ''
@@ -438,6 +453,7 @@ export function getTokenAccountLabelInfo(acc: AssetAccount | undefined) {
   }
 }
 
+/** @deprecated because i dont think i like the AssetAccount abstraction */
 export function getSolAccountLabel(acc: AssetAccount | undefined) {
   let tokenAccount = ''
   let tokenName = ''
@@ -468,6 +484,7 @@ export function getSolAccountLabel(acc: AssetAccount | undefined) {
   }
 }
 
+/** @deprecated because i dont think i like the AssetAccount abstraction */
 export function getMintAccountLabelInfo(acc: AssetAccount | undefined) {
   let account = ''
   let tokenName = ''
@@ -494,6 +511,7 @@ export function getMintAccountLabelInfo(acc: AssetAccount | undefined) {
   }
 }
 
+/** @deprecated why? */
 export type AccountInfoGen<T> = {
   executable: boolean
   owner: PublicKey
@@ -527,6 +545,7 @@ export const deserializeMint = (data: Buffer) => {
   return mintInfo as MintInfo
 }
 
+/** @deprecated just use react-query by owner pubkey */
 export const getNfts = (
   ownerPk: PublicKey,
   connection: ConnectionContext
