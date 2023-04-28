@@ -450,7 +450,7 @@ export class VotingClient {
       const firstFivePositions = remainingAccounts.slice(0, 15)
       const remainingPositionsChunk = chunks(
         remainingAccounts.slice(15, remainingAccounts.length),
-        12
+        8
       )
 
       for (const chunk of [firstFivePositions, ...remainingPositionsChunk]) {
