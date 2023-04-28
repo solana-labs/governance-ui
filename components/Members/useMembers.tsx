@@ -180,12 +180,10 @@ export default function useMembers() {
                       : acc.councilVotes,
                   }
                   if (curr.community) {
-                    obj.votesCasted += curr.community.account.totalVotesCount
                     obj.delegateWalletCommunity =
                       curr.community.account.governanceDelegate
                   }
                   if (curr.council) {
-                    obj.votesCasted += curr.council.account.totalVotesCount
                     obj.delegateWalletCouncil =
                       curr.council.account.governanceDelegate
                   }
@@ -193,14 +191,13 @@ export default function useMembers() {
                 },
                 {
                   walletAddress: '',
-                  votesCasted: 0,
                   councilVotes: BN_ZERO,
                   communityVotes: BN_ZERO,
                 }
               ),
           }
         })
-        .sort((a, b) => a.votesCasted - b.votesCasted)
+        // .sort((a, b) => a.votesCasted - b.votesCasted)
         .reverse(),
 
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
