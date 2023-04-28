@@ -280,7 +280,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
 
   const handleUndelegateTokens = async () => {
     try {
-      await undelegatePosition({ position })
+      await undelegatePosition({ position, tokenOwnerRecordPk })
 
       if (!undelegatingError) {
         await refetchState()
@@ -295,7 +295,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
 
   const handleClaimRewards = async () => {
     try {
-      await claimDelegatedPositionRewards({ position })
+      await claimDelegatedPositionRewards({ position, tokenOwnerRecordPk })
 
       if (!claimingRewardsError) {
         await refetchState()
