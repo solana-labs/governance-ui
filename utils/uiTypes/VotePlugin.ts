@@ -9,7 +9,6 @@ import {
   SYSTEM_PROGRAM_ID,
   Proposal,
   TokenOwnerRecord,
-  getVoterWeightRecord,
 } from '@solana/spl-governance'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { chunks } from '@utils/helpers'
