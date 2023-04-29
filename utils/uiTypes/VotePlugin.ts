@@ -46,6 +46,8 @@ import { getUsedPositionsForProposal } from 'HeliumVotePlugin/utils/getUsedPosit
 import { getConnectionContext } from '@utils/connection'
 import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
 import { NftVoterClient } from './NftVoterClient'
+import queryClient from '@hooks/queries/queryClient'
+import asFindable from '@utils/queries/asFindable'
 
 type UpdateVoterWeightRecordTypes =
   | 'castVote'
@@ -654,30 +656,39 @@ export class VotingClient {
           new AccountData(voteRecord.publicKey, false, true)
         )
       }
+      const connection = this.client.program.provider.connection
 
-      const firstFiveNfts = remainingAccounts.slice(0, 5)
-      const remainingNftsChunk = chunks(
-        remainingAccounts.slice(5, remainingAccounts.length),
-        12
-      )
-
-      for (const chunk of [firstFiveNfts, ...remainingNftsChunk]) {
-        instructions.push(
-          await this.client.program.methods
-            .relinquishNftVote()
-            .accounts({
-              registrar,
-              voterWeightRecord: voterWeightPk,
-              governance: proposal.account.governance,
-              proposal: proposal.pubkey,
-              voterTokenOwnerRecord: tokenOwnerRecord,
-              voterAuthority: walletPk,
-              voteRecord: voteRecordPk,
-              beneficiary: walletPk,
-            })
-            .remainingAccounts(chunk)
-            .instruction()
+      // if this was good code, this would appear outside of this fn.
+      // But we're not writing good code, there's no good place for it, I'm not bothering.
+      const voterWeightRecord = await queryClient.fetchQuery({
+        queryKey: [voterWeightPk],
+        queryFn: () => asFindable(connection.getAccountInfo)(voterWeightPk),
+      })
+      if (voterWeightRecord.result) {
+        const firstFiveNfts = remainingAccounts.slice(0, 5)
+        const remainingNftsChunk = chunks(
+          remainingAccounts.slice(5, remainingAccounts.length),
+          12
         )
+
+        for (const chunk of [firstFiveNfts, ...remainingNftsChunk]) {
+          instructions.push(
+            await this.client.program.methods
+              .relinquishNftVote()
+              .accounts({
+                registrar,
+                voterWeightRecord: voterWeightPk,
+                governance: proposal.account.governance,
+                proposal: proposal.pubkey,
+                voterTokenOwnerRecord: tokenOwnerRecord,
+                voterAuthority: walletPk,
+                voteRecord: voteRecordPk,
+                beneficiary: walletPk,
+              })
+              .remainingAccounts(chunk)
+              .instruction()
+          )
+        }
       }
 
       return { voterWeightPk, maxVoterWeightRecord }
