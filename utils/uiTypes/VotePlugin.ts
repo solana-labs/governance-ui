@@ -666,7 +666,6 @@ export class VotingClient {
         queryFn: () =>
           asFindable(getVoterWeightRecord)(connection, voterWeightPk),
       })
-      console.log(voterWeightRecord)
       if (voterWeightRecord.result) {
         const firstFiveNfts = remainingAccounts.slice(0, 5)
         const remainingNftsChunk = chunks(
