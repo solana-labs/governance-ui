@@ -659,6 +659,8 @@ export class VotingClient {
       }
       const connection = this.client.program.provider.connection
 
+      // if this was good code, this would appear outside of this fn.
+      // But we're not writing good code, there's no good place for it, I'm not bothering.
       const voterWeightRecord = await queryClient.fetchQuery({
         queryKey: [voterWeightPk],
         queryFn: () =>
