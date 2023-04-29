@@ -15,20 +15,23 @@ import {
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import { useSolanaUnixNow } from '@hooks/useSolanaUnixNow'
+import { withCreateTokenOwnerRecord } from '@solana/spl-governance'
 
 export const useFlipPositionLockupKind = () => {
   const { unixNow } = useSolanaUnixNow()
   const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
-  const { realm } = useRealm()
+  const { realm, realmInfo } = useRealm()
   const [{ client }] = useVotePluginsClientStore((s) => [
     s.state.currentRealmVotingClient,
   ])
   const { error, loading, execute } = useAsyncCallback(
     async ({
       position,
+      tokenOwnerRecordPk,
       programId = PROGRAM_ID,
     }: {
       position: PositionWithMeta
+      tokenOwnerRecordPk: PublicKey | null
       programId?: PublicKey
     }) => {
       const isInvalid =
@@ -38,6 +41,7 @@ export const useFlipPositionLockupKind = () => {
         !wallet ||
         !client ||
         !unixNow ||
+        !realmInfo ||
         !(client instanceof HeliumVsrClient) ||
         position.numActiveVotes > 0
 
@@ -66,6 +70,18 @@ export const useFlipPositionLockupKind = () => {
               : position.lockup.endTs.sub(new BN(unixNow)).toNumber()
           )
         )
+
+        if (!tokenOwnerRecordPk) {
+          await withCreateTokenOwnerRecord(
+            instructions,
+            realm.owner,
+            realmInfo.programVersion!,
+            realm.pubkey,
+            wallet!.publicKey!,
+            realm.account.communityMint,
+            wallet!.publicKey!
+          )
+        }
 
         if (isDao) {
           instructions.push(

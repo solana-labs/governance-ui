@@ -17,16 +17,21 @@ import {
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
 import { notify } from '@utils/notifications'
+import { withCreateTokenOwnerRecord } from '@solana/spl-governance'
+import useRealm from '@hooks/useRealm'
 
 export const useClaimDelegatedPositionRewards = () => {
   const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
   const { unixNow } = useSolanaUnixNow()
+  const { realm, realmInfo } = useRealm()
   const { error, loading, execute } = useAsyncCallback(
     async ({
       position,
+      tokenOwnerRecordPk,
       programId = PROGRAM_ID,
     }: {
       position: PositionWithMeta
+      tokenOwnerRecordPk: PublicKey | null
       programId?: PublicKey
     }) => {
       const isInvalid =
@@ -35,6 +40,8 @@ export const useClaimDelegatedPositionRewards = () => {
         !connection.current ||
         !provider ||
         !wallet ||
+        !realm ||
+        !realmInfo ||
         !position.isDelegated
 
       const idl = await Program.fetchIdl(programId, provider)
@@ -51,6 +58,18 @@ export const useClaimDelegatedPositionRewards = () => {
         const delegatedPosAcc = await hsdProgram.account.delegatedPositionV0.fetch(
           delegatedPosKey
         )
+
+        if (!tokenOwnerRecordPk) {
+          await withCreateTokenOwnerRecord(
+            instructions,
+            realm.owner,
+            realmInfo.programVersion!,
+            realm.pubkey,
+            wallet!.publicKey!,
+            realm.account.communityMint,
+            wallet!.publicKey!
+          )
+        }
 
         const { lastClaimedEpoch } = delegatedPosAcc
         for (
@@ -71,8 +90,8 @@ export const useClaimDelegatedPositionRewards = () => {
           )
         }
 
-        // This is an arbitrary threshold and we assume that up to 4 instructions can be inserted as a single Tx
-        const ixsChunks = chunks(instructions, 4)
+        // This is an arbitrary threshold and we assume that up to 3 instructions can be inserted as a single Tx
+        const ixsChunks = chunks(instructions, 3)
         const txsChunks = ixsChunks.map((txBatch, batchIdx) => ({
           instructionsSet: txBatchesToInstructionSetWithSigners(
             txBatch,

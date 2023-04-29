@@ -14,15 +14,20 @@ import {
   sendTransactionsV3,
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
+import { withCreateTokenOwnerRecord } from '@solana/spl-governance'
+import useRealm from '@hooks/useRealm'
 
 export const useUndelegatePosition = () => {
   const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
+  const { realm, realmInfo } = useRealm()
   const { error, loading, execute } = useAsyncCallback(
     async ({
       position,
+      tokenOwnerRecordPk,
       programId = PROGRAM_ID,
     }: {
       position: PositionWithMeta
+      tokenOwnerRecordPk: PublicKey | null
       programId?: PublicKey
     }) => {
       const isInvalid =
@@ -30,6 +35,8 @@ export const useUndelegatePosition = () => {
         !connection.current ||
         !provider ||
         !wallet ||
+        !realm ||
+        !realmInfo ||
         !position.isDelegated
 
       const idl = await Program.fetchIdl(programId, provider)
@@ -45,6 +52,18 @@ export const useUndelegatePosition = () => {
         const delegatedPosAcc = await hsdProgram.account.delegatedPositionV0.fetch(
           delegatedPosKey
         )
+
+        if (!tokenOwnerRecordPk) {
+          await withCreateTokenOwnerRecord(
+            instructions,
+            realm.owner,
+            realmInfo.programVersion!,
+            realm.pubkey,
+            wallet!.publicKey!,
+            realm.account.communityMint,
+            wallet!.publicKey!
+          )
+        }
 
         instructions.push(
           await hsdProgram.methods

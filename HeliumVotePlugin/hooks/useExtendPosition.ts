@@ -13,10 +13,11 @@ import {
 } from '@utils/sendTransactions'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import { withCreateTokenOwnerRecord } from '@solana/spl-governance'
 
 export const useExtendPosition = () => {
   const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
-  const { realm } = useRealm()
+  const { realm, realmInfo } = useRealm()
   const [{ client }] = useVotePluginsClientStore((s) => [
     s.state.currentRealmVotingClient,
   ])
@@ -24,10 +25,12 @@ export const useExtendPosition = () => {
     async ({
       position,
       lockupPeriodsInDays,
+      tokenOwnerRecordPk,
       programId = PROGRAM_ID,
     }: {
       position: PositionWithMeta
       lockupPeriodsInDays: number
+      tokenOwnerRecordPk: PublicKey | null
       programId?: PublicKey
     }) => {
       const isInvalid =
@@ -37,6 +40,7 @@ export const useExtendPosition = () => {
         !realm ||
         !wallet ||
         !client ||
+        !realmInfo ||
         !(client instanceof HeliumVsrClient)
 
       const idl = await Program.fetchIdl(programId, provider)
@@ -50,6 +54,18 @@ export const useExtendPosition = () => {
         const instructions: TransactionInstruction[] = []
         const [dao] = daoKey(realm.account.communityMint)
         const isDao = Boolean(await connection.current.getAccountInfo(dao))
+
+        if (!tokenOwnerRecordPk) {
+          await withCreateTokenOwnerRecord(
+            instructions,
+            realm.owner,
+            realmInfo.programVersion!,
+            realm.pubkey,
+            wallet!.publicKey!,
+            realm.account.communityMint,
+            wallet!.publicKey!
+          )
+        }
 
         if (isDao) {
           instructions.push(
