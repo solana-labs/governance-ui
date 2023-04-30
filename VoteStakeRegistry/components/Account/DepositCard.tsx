@@ -198,11 +198,6 @@ const DepositCard = ({
               }
             />
           )}
-          {console.log(
-            dayjs(deposit!.nextVestingTimestamp!.toNumber() * 1000).format(
-              'DD-MM-YYYY HH:mm'
-            )
-          )}
           {isVest && deposit.nextVestingTimestamp !== null && (
             <CardLabel
               label={`Next Vesting in ${getFormattedStringFromDays(
