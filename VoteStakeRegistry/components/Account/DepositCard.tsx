@@ -198,14 +198,21 @@ const DepositCard = ({
               }
             />
           )}
+          {console.log(
+            dayjs(deposit!.nextVestingTimestamp!.toNumber() * 1000).format(
+              'DD-MM-YYYY HH:mm'
+            )
+          )}
           {isVest && deposit.nextVestingTimestamp !== null && (
             <CardLabel
-              label="Next Vesting in"
-              value={getFormattedStringFromDays(
+              label={`Next Vesting in ${getFormattedStringFromDays(
                 deposit!.nextVestingTimestamp
                   .sub(new BN(dayjs().unix()))
                   .toNumber() / SECS_PER_DAY
-              )}
+              )}`}
+              value={`${dayjs(
+                deposit!.nextVestingTimestamp!.toNumber() * 1000
+              ).format('DD-MM-YYYY HH:mm')}`}
             />
           )}
           {isRealmCommunityMint && (
