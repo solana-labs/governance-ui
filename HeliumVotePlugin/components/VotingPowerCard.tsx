@@ -20,6 +20,7 @@ export const VotingPowerCard: React.FC<{
   inAccountDetails?: boolean
 }> = ({ inAccountDetails }) => {
   const { fmtUrlWithCluster } = useQueryContext()
+  const loading = useHeliumVsrStore((s) => s.state.isLoading)
   const [hasGovPower, setHasGovPower] = useState(false)
   const { councilMint, ownTokenRecord, mint, symbol } = useRealm()
   const wallet = useWalletOnePointOh()
@@ -28,7 +29,7 @@ export const VotingPowerCard: React.FC<{
   const councilDepositVisible = !!councilMint
   const { data: tokenOwnerRecordPk } = useAddressQuery_CommunityTokenOwner()
 
-  const isLoading = !mint || !councilMint
+  const isLoading = !mint || !councilMint || loading
   const isSameWallet =
     (connected && !ownTokenRecord) ||
     (connected &&

@@ -43,7 +43,6 @@ import {
 } from '@helium/voter-stake-registry-sdk'
 import { getUnusedPositionsForProposal } from 'HeliumVotePlugin/utils/getUnusedPositionsForProposal'
 import { getUsedPositionsForProposal } from 'HeliumVotePlugin/utils/getUsedPositionsForProposal'
-import { getConnectionContext } from '@utils/connection'
 import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
 import { NftVoterClient } from './NftVoterClient'
 import queryClient from '@hooks/queries/queryClient'
@@ -404,9 +403,6 @@ export class VotingClient {
 
     if (this.client instanceof HeliumVsrClient) {
       const remainingAccounts: AccountData[] = []
-      const { current: connection } = getConnectionContext(
-        this.client.devent ? 'devnet' : 'mainnet'
-      )
 
       const [registrar] = registrarKey(
         realm.pubkey,
@@ -415,7 +411,7 @@ export class VotingClient {
       )
 
       const unusedPositions = await getUnusedPositionsForProposal({
-        connection,
+        connection: this.client.program.provider.connection,
         client: this.client,
         positions: this.heliumVsrVotingPositions,
         proposalPk: proposal.pubkey,
@@ -449,13 +445,10 @@ export class VotingClient {
         )
       }
 
-      const firstFivePositions = remainingAccounts.slice(0, 15)
-      const remainingPositionsChunk = chunks(
-        remainingAccounts.slice(15, remainingAccounts.length),
-        8
-      )
+      //1 nft is 3 accounts
+      const positionChunks = chunks(remainingAccounts, 9)
 
-      for (const chunk of [firstFivePositions, ...remainingPositionsChunk]) {
+      for (const chunk of [...positionChunks]) {
         instructions.push(
           await this.client.program.methods
             .castVoteV0({
@@ -563,10 +556,6 @@ export class VotingClient {
 
     if (this.client instanceof HeliumVsrClient) {
       const remainingAccounts: AccountData[] = []
-      const { current: connection } = getConnectionContext(
-        this.client.devent ? 'devnet' : 'mainnet'
-      )
-
       const [registrar] = registrarKey(
         realm.pubkey,
         realm.account.communityMint,
@@ -580,7 +569,7 @@ export class VotingClient {
       )
 
       const usedPositions = await getUsedPositionsForProposal({
-        connection,
+        connection: this.client.program.provider.connection,
         client: this.client,
         positions: this.heliumVsrVotingPositions,
         proposalPk: proposal.pubkey,

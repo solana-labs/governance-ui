@@ -95,9 +95,6 @@ const useSubmitVote = ({
         client,
         confirmationCallback
       )
-      if (!isNftPlugin) {
-        await refetchProposals()
-      }
     } catch (ex) {
       if (isNftPlugin) {
         closeNftVotingCountingModal(

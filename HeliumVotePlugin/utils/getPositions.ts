@@ -15,7 +15,7 @@ import {
   Registrar,
   PositionWithMeta,
   PositionV0,
-  DelegatedPostionV0,
+  DelegatedPositionV0,
 } from '../sdk/types'
 import { chunks } from '@utils/helpers'
 import { HNT_MINT } from '@helium/spl-utils'
@@ -94,7 +94,7 @@ export const getPositions = async (
               ? (hsdProgram.coder.accounts.decode(
                   'DelegatedPositionV0',
                   delegatedPos.data
-                ) as DelegatedPostionV0)
+                ) as DelegatedPositionV0)
               : null
           )
       })()
