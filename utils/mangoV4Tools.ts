@@ -19,12 +19,12 @@ export function getChangedValues<T extends Record<keyof T, any>>(
       values[key] = newValues[key]
     }
   }
-  return values
+  return values as Partial<T>
 }
 
 export function getNullOrTransform<T>(
-  val: string | null,
-  classTransformer: (new (val: string) => T) | null,
+  val: any,
+  classTransformer: (new (val: any) => T) | null,
   functionTransformer?: (val) => T
 ): T | null {
   if (val === null) {
