@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import DiscussionForm from './DiscussionForm'
 import Comment from './Comment'
 import useWalletStore from '../../stores/useWalletStore'
-import { FixedSizeList as List } from 'react-window'
+import { VariableSizeList as List } from 'react-window'
 import AutoSizer from 'react-virtualized-auto-sizer'
 
 const DiscussionPanel: React.FC<any> = () => {
@@ -32,6 +32,15 @@ const DiscussionPanel: React.FC<any> = () => {
     )
   }
 
+  const getItemSize = (index) => {
+    const cm = sortedMessages[index]
+    const startingHeight = 100
+    const charsPerLine = 77
+    const lines = Math.ceil(cm.account.body.value.length / charsPerLine)
+
+    return startingHeight + lines * 22
+  }
+
   return (
     <div className="border border-fgd-4 p-4 md:p-6 rounded-lg">
       <h2 className="mb-4">
@@ -56,7 +65,7 @@ const DiscussionPanel: React.FC<any> = () => {
               className="comments"
               height={height}
               itemCount={sortedMessages.length}
-              itemSize={110}
+              itemSize={getItemSize}
               width={width}
             >
               {Row}
