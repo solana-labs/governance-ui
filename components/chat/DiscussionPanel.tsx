@@ -22,7 +22,7 @@ const DiscussionPanel: React.FC<any> = () => {
   const Row = ({ index, style }) => {
     const cm = sortedMessages[index]
     return (
-      <div style={style}>
+      <div style={{ ...style }} className="border-b border-fgd-4">
         <Comment
           chatMessage={cm.account}
           voteRecord={voteRecordsByVoter[cm.account.author.toBase58()]?.account}
@@ -56,7 +56,7 @@ const DiscussionPanel: React.FC<any> = () => {
               className="comments"
               height={height}
               itemCount={sortedMessages.length}
-              itemSize={94}
+              itemSize={110}
               width={width}
             >
               {Row}

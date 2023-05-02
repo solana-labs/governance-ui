@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import classNames from 'classnames'
 import { BigNumber } from 'bignumber.js'
 import useRealm from '@hooks/useRealm'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
