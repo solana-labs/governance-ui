@@ -198,6 +198,7 @@ export class VotingClient {
     }
 
     if (this.client instanceof HeliumVsrClient) {
+      console.log('WTF WHEN')
       const remainingAccounts: AccountData[] = []
       const [registrar] = registrarKey(
         realm.pubkey,
@@ -239,7 +240,7 @@ export class VotingClient {
             voterWeightRecord: voterWeightPk,
             voterTokenOwnerRecord: tokenOwnerRecord.pubkey,
           })
-          .remainingAccounts(remainingAccounts.slice(0, 10))
+          .remainingAccounts(remainingAccounts.slice(0, 6))
           .instruction()
       )
 
@@ -446,9 +447,13 @@ export class VotingClient {
       }
 
       //1 nft is 3 accounts
-      const positionChunks = chunks(remainingAccounts, 9)
+      const firstThreePositions = remainingAccounts.slice(0, 9)
+      const remainingPositionsChunk = chunks(
+        remainingAccounts.slice(9, remainingAccounts.length),
+        8
+      )
 
-      for (const chunk of [...positionChunks]) {
+      for (const chunk of [firstThreePositions, ...remainingPositionsChunk]) {
         instructions.push(
           await this.client.program.methods
             .castVoteV0({
