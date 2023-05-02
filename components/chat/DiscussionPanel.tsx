@@ -2,6 +2,8 @@ import React, { useMemo } from 'react'
 import DiscussionForm from './DiscussionForm'
 import Comment from './Comment'
 import useWalletStore from '../../stores/useWalletStore'
+import { FixedSizeList as List } from 'react-window'
+import AutoSizer from 'react-virtualized-auto-sizer'
 
 const DiscussionPanel: React.FC<any> = () => {
   const { chatMessages, voteRecordsByVoter, proposalMint } = useWalletStore(
@@ -17,6 +19,19 @@ const DiscussionPanel: React.FC<any> = () => {
     [chatMessages]
   )
 
+  const Row = ({ index, style }) => {
+    const cm = sortedMessages[index]
+    return (
+      <div style={style}>
+        <Comment
+          chatMessage={cm.account}
+          voteRecord={voteRecordsByVoter[cm.account.author.toBase58()]?.account}
+          proposalMint={proposalMint}
+        />
+      </div>
+    )
+  }
+
   return (
     <div className="border border-fgd-4 p-4 md:p-6 rounded-lg">
       <h2 className="mb-4">
@@ -28,14 +43,27 @@ const DiscussionPanel: React.FC<any> = () => {
       <div className="pb-4">
         <DiscussionForm />
       </div>
-      {sortedMessages.map((cm) => (
-        <Comment
-          chatMessage={cm.account}
-          voteRecord={voteRecordsByVoter[cm.account.author.toBase58()]?.account}
-          key={cm.pubkey.toBase58()}
-          proposalMint={proposalMint}
-        />
-      ))}
+
+      <div
+        style={{
+          height: sortedMessages.length / 0.5,
+          minHeight: 500,
+        }}
+      >
+        <AutoSizer>
+          {({ height, width }) => (
+            <List
+              className="comments"
+              height={height}
+              itemCount={sortedMessages.length}
+              itemSize={94}
+              width={width}
+            >
+              {Row}
+            </List>
+          )}
+        </AutoSizer>
+      </div>
     </div>
   )
 }

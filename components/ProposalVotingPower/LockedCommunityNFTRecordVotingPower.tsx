@@ -88,9 +88,10 @@ export default function LockedCommunityNFTRecordVotingPower(props: Props) {
 
   if (isLoading) {
     return (
-      <div
-        className={classNames(props.className, 'rounded-md bg-bkg-1 h-[76px]')}
-      />
+      <>
+        <div className="animate-pulse bg-bkg-3 h-12 mb-4 rounded-lg" />
+        <div className="animate-pulse bg-bkg-3 h-10 rounded-lg" />
+      </>
     )
   }
 
