@@ -107,7 +107,7 @@ const ProposalTimer = ({
             ))}
           </div>
         </div>
-        <div /** The colored bar */ className="flex h-[1px]">
+        <div /** The colored bar */ className="flex h-[1.5px]">
           <div
             /** Unrestricted voting time elapsed */ style={{
               flex: Math.min(
