@@ -219,7 +219,7 @@ const PerpEdit = ({
           getNullOrTransform(values.minFunding, null, Number),
           getNullOrTransform(values.maxFunding, null, Number),
           getNullOrTransform(values.impactQuantity, BN),
-          values.groupInsuranceFund,
+          values.groupInsuranceFund!,
           getNullOrTransform(values.feePenalty, null, Number),
           getNullOrTransform(values.settleFeeFlat, null, Number),
           getNullOrTransform(values.settleFeeAmountThreshold, null, Number),
@@ -233,11 +233,11 @@ const PerpEdit = ({
           getNullOrTransform(values.stablePriceGrowthLimit, null, Number),
           getNullOrTransform(values.settlePnlLimitFactor, null, Number),
           getNullOrTransform(values.settlePnlLimitWindowSize, BN),
-          values.reduceOnly,
-          values.resetStablePrice,
+          values.reduceOnly!,
+          values.resetStablePrice!,
           getNullOrTransform(values.positivePnlLiquidationFee, null, Number),
           getNullOrTransform(values.name, null, String),
-          values.forceClose
+          values.forceClose!
         )
         .accounts({
           group: mangoGroup!.publicKey,
