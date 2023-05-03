@@ -9,10 +9,14 @@ import {
 } from '@carbon/icons-react'
 import { capitalize } from '@utils/helpers'
 import useProposal from '@hooks/useProposal'
-import { VoteTipping } from '@solana/spl-governance'
+import { VoteTipping, getNativeTreasuryAddress } from '@solana/spl-governance'
 import { secondsInDay } from 'date-fns'
 import clsx from 'clsx'
 import { TimerBar } from './ProposalTimer'
+import { formatShortAddress } from '@cardinal/namespaces-components'
+import { useAsync } from 'react-async-hook'
+import { useVetoingPop } from './VotePanel/VetoButtons'
+import useRealm from '@hooks/useRealm'
 
 const formatOneDecimal = (x: number) => x.toFixed(1).replace(/[.,]0$/, '')
 
@@ -29,6 +33,7 @@ const TIPPING = {
 const VotingRules = ({}) => {
   const { proposal, governance } = useProposal()
   const votingPop = useVotingPop()
+  const vetoVotePop = useVetoingPop()
 
   const [showMore, setShowMore] = useState(false)
 
@@ -36,6 +41,11 @@ const VotingRules = ({}) => {
     votingPop === 'community'
       ? governance?.account.config.communityVoteThreshold
       : governance?.account.config.councilVoteThreshold
+
+  const vetoVoteThreshold =
+    !!vetoVotePop && vetoVotePop === 'community'
+      ? governance?.account.config.communityVetoVoteThreshold
+      : governance?.account.config.councilVetoVoteThreshold
 
   const tipping =
     votingPop === 'community'
@@ -49,6 +59,14 @@ const VotingRules = ({}) => {
           governance?.account.config.votingCoolOffTime) /
         secondsInDay
       : undefined
+
+  const treasuryAddress = useAsync(
+    async () =>
+      governance !== undefined
+        ? getNativeTreasuryAddress(governance.owner, governance.pubkey)
+        : undefined,
+    [governance]
+  )
 
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-4">
@@ -87,27 +105,35 @@ const VotingRules = ({}) => {
         <div className="grid grid-cols-2 gap-4">
           <div className="col-span-2">
             <div className="text-neutral-500">Wallet Address</div>
-            <div>asldf...asdf []</div>
-          </div>{' '}
+            <div>
+              {
+                formatShortAddress(treasuryAddress.result) //TODO use whatever name w&a uses
+              }
+            </div>
+          </div>
           <div>
             <div className="text-neutral-500">Vote Type</div>
-            <div>asldf...asdf []</div>
+            <div>{capitalize(votingPop)}</div>
           </div>
           <div>
             <div className="text-neutral-500">Approval Quorum</div>
-            <div>asldf...asdf []</div>
+            {threshold?.value !== undefined && <div>{threshold.value}%</div>}
           </div>
-          <div>
-            <div className="text-neutral-500">Veto Power</div>
-            <div>asldf...asdf []</div>
-          </div>
-          <div>
-            <div className="text-neutral-500">Veto Quorum</div>
-            <div>asldf...asdf []</div>
-          </div>
+          {vetoVotePop && vetoVoteThreshold?.value && (
+            <>
+              <div>
+                <div className="text-neutral-500">Veto Power</div>
+                <div>{capitalize(vetoVotePop)}</div>
+              </div>
+              <div>
+                <div className="text-neutral-500">Veto Quorum</div>
+                <div>{vetoVoteThreshold.value}%</div>
+              </div>
+            </>
+          )}
           <div>
             <div className="text-neutral-500">Vote Tipping</div>
-            <div>asldf...asdf []</div>
+            <div>{tipping ? TIPPING[tipping] : null}</div>
           </div>
         </div>
         <div className=" h-0 border border-neutral-900" />
