@@ -1,19 +1,13 @@
-import React, { useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
+import { useState } from 'react'
 import { useVotingPop } from './VotePanel/hooks'
-import { UserGroupIcon } from '@heroicons/react/solid'
 import {
-  ChevronDown,
   ChevronUp,
-  CircleDash,
   Events,
-  Scale,
   Scales,
   ScalesTipped,
   Time,
 } from '@carbon/icons-react'
 import { capitalize } from '@utils/helpers'
-import { ClockIcon } from '@heroicons/react/outline'
 import useProposal from '@hooks/useProposal'
 import { VoteTipping } from '@solana/spl-governance'
 import { secondsInDay } from 'date-fns'
@@ -21,6 +15,9 @@ import clsx from 'clsx'
 import { TimerBar } from './ProposalTimer'
 
 const formatOneDecimal = (x: number) => x.toFixed(1).replace(/[.,]0$/, '')
+
+const formatDays = (x: number) =>
+  formatOneDecimal(x) + ' ' + (x === 1 ? 'day' : 'days')
 
 // I love enums!
 const TIPPING = {
@@ -118,7 +115,7 @@ const VotingRules = ({}) => {
           <div className="col-span-2">
             <div className="text-neutral-500">Total Voting Duration</div>
             {voteDurationDays !== undefined && (
-              <div>{formatOneDecimal(voteDurationDays)} days</div>
+              <div>{formatDays(voteDurationDays)}</div>
             )}
           </div>
           <div>
@@ -127,9 +124,9 @@ const VotingRules = ({}) => {
               <div className="rounded-sm h-1 w-1 bg-sky-500 inline-block" />
               <div>
                 {governance?.account.config.baseVotingTime !== undefined
-                  ? formatOneDecimal(
+                  ? formatDays(
                       governance.account.config.baseVotingTime / secondsInDay
-                    ) + ' days'
+                    )
                   : null}
               </div>
             </div>
@@ -140,9 +137,9 @@ const VotingRules = ({}) => {
               <div className="rounded-sm h-1 w-1 bg-amber-400 inline-block" />
               <div>
                 {governance?.account.config.votingCoolOffTime !== undefined
-                  ? formatOneDecimal(
+                  ? formatDays(
                       governance.account.config.votingCoolOffTime / secondsInDay
-                    ) + ' days'
+                    )
                   : null}
               </div>
             </div>
