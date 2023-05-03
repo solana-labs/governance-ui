@@ -1,8 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { useVotingPop } from './VotePanel/hooks'
 import { UserGroupIcon } from '@heroicons/react/solid'
 import {
+  ChevronDown,
+  ChevronUp,
   CircleDash,
   Events,
   Scale,
@@ -15,6 +17,10 @@ import { ClockIcon } from '@heroicons/react/outline'
 import useProposal from '@hooks/useProposal'
 import { VoteTipping } from '@solana/spl-governance'
 import { secondsInDay } from 'date-fns'
+import clsx from 'clsx'
+import { TimerBar } from './ProposalTimer'
+
+const formatOneDecimal = (x: number) => x.toFixed(1).replace(/[.,]0$/, '')
 
 // I love enums!
 const TIPPING = {
@@ -27,7 +33,7 @@ const VotingRules = ({}) => {
   const { proposal, governance } = useProposal()
   const votingPop = useVotingPop()
 
-  console.log('aaa', proposal)
+  const [showMore, setShowMore] = useState(false)
 
   const threshold =
     votingPop === 'community'
@@ -49,14 +55,23 @@ const VotingRules = ({}) => {
 
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-4">
-      <h3 className="mb-0">Voting Rules</h3>
-      <div /** Badges */ className="flex gap-1 flex-wrap">
+      <div
+        className="flex justify-between items-center cursor-pointer"
+        onClick={() => setShowMore((prev) => !prev)}
+      >
+        <h3 className="mb-0">Voting Rules</h3>
+        <ChevronUp
+          size={20}
+          className={clsx('transition-transform', showMore && 'rotate-180')}
+        />
+      </div>
+      <div /** Badges */ className="flex gap-1 flex-wrap text-xs">
         <div className="bg-neutral-900 rounded-sm py-1 px-2 text-neutral-300 flex items-center gap-1">
           <Events /> {capitalize(votingPop)}
         </div>
         {voteDurationDays !== undefined && (
           <div className="bg-neutral-900 rounded-sm py-1 px-2 text-neutral-300 flex items-center gap-1">
-            <Time /> {voteDurationDays.toFixed(1).replace(/[.,]0$/, '')}d
+            <Time /> {formatOneDecimal(voteDurationDays)}d
           </div>
         )}
         {threshold?.value !== undefined && (
@@ -67,6 +82,80 @@ const VotingRules = ({}) => {
         <div className="bg-neutral-900 rounded-sm py-1 px-2 text-neutral-300 flex items-center gap-1">
           <ScalesTipped /> {tipping ? TIPPING[tipping] : null}
         </div>
+      </div>
+      <div
+        /** wallet rules */
+        className={clsx(showMore && 'hidden', 'text-xs flex flex-col gap-5')}
+      >
+        <div className="grid grid-cols-2 gap-4">
+          <div className="col-span-2">
+            <div className="text-neutral-500">Wallet Address</div>
+            <div>asldf...asdf []</div>
+          </div>{' '}
+          <div>
+            <div className="text-neutral-500">Vote Type</div>
+            <div>asldf...asdf []</div>
+          </div>
+          <div>
+            <div className="text-neutral-500">Approval Quorum</div>
+            <div>asldf...asdf []</div>
+          </div>
+          <div>
+            <div className="text-neutral-500">Veto Power</div>
+            <div>asldf...asdf []</div>
+          </div>
+          <div>
+            <div className="text-neutral-500">Veto Quorum</div>
+            <div>asldf...asdf []</div>
+          </div>
+          <div>
+            <div className="text-neutral-500">Vote Tipping</div>
+            <div>asldf...asdf []</div>
+          </div>
+        </div>
+        <div className=" h-0 border border-neutral-900" />
+        <div className="grid grid-cols-2 gap-4">
+          <div className="col-span-2">
+            <div className="text-neutral-500">Total Voting Duration</div>
+            {voteDurationDays !== undefined && (
+              <div>{formatOneDecimal(voteDurationDays)} days</div>
+            )}
+          </div>
+          <div>
+            <div className="text-neutral-500">Unrestricted Voting Time</div>
+            <div className="flex items-center gap-1">
+              <div className="rounded-sm h-1 w-1 bg-sky-500 inline-block" />
+              <div>
+                {governance?.account.config.baseVotingTime !== undefined
+                  ? formatOneDecimal(
+                      governance.account.config.baseVotingTime / secondsInDay
+                    ) + ' days'
+                  : null}
+              </div>
+            </div>
+          </div>
+          <div>
+            <div className="text-neutral-500">Cool-off Voting Time</div>
+            <div className="flex items-center gap-1">
+              <div className="rounded-sm h-1 w-1 bg-amber-400 inline-block" />
+              <div>
+                {governance?.account.config.votingCoolOffTime !== undefined
+                  ? formatOneDecimal(
+                      governance.account.config.votingCoolOffTime / secondsInDay
+                    ) + ' days'
+                  : null}
+              </div>
+            </div>
+          </div>
+        </div>
+        {governance?.account !== undefined &&
+        proposal?.account !== undefined ? (
+          <TimerBar
+            governance={governance.account}
+            proposal={proposal.account}
+            size="lg"
+          />
+        ) : null}
       </div>
     </div>
   )
