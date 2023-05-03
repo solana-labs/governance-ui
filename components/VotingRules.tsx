@@ -4,6 +4,8 @@ import {
   ChevronRight,
   ChevronUp,
   Events,
+  Information,
+  InformationFilled,
   Scales,
   ScalesTipped,
   Time,
@@ -19,7 +21,9 @@ import { useAsync } from 'react-async-hook'
 import { useVetoingPop } from './VotePanel/VetoButtons'
 import useRealm from '@hooks/useRealm'
 import { ACCOUNT_NAMES } from './instructions/tools'
-import ExploreLink, { ExploreButton } from './treasuryV2/Details/ExploreLink'
+import { ExploreButton } from './treasuryV2/Details/ExploreLink'
+import Tooltip from './Tooltip'
+import { InformationCircleIcon } from '@heroicons/react/solid'
 
 const formatOneDecimal = (x: number) => x.toFixed(1).replace(/[.,]0$/, '')
 
@@ -164,7 +168,18 @@ const VotingRules = ({}) => {
           <div>
             <div className="text-neutral-500">
               Unrestricted <br />
-              Voting Time
+              <div className="flex items-center gap-1">
+                <div>Voting Time </div>
+                <div className="">
+                  <Tooltip
+                    content={
+                      'The amount of time a voter has to approve or deny a proposal.'
+                    }
+                  >
+                    <InformationFilled className="cursor-help h-3 w-3" />
+                  </Tooltip>
+                </div>
+              </div>
             </div>
             <div className="flex items-center gap-1">
               <div className="rounded-sm h-1 w-1 bg-sky-500 inline-block" />
@@ -180,7 +195,18 @@ const VotingRules = ({}) => {
           <div>
             <div className="text-neutral-500">
               Cool-off <br />
-              Voting Time
+              <div className="flex items-center gap-1">
+                <div>Voting Time </div>
+                <div className="">
+                  <Tooltip
+                    content={
+                      'After the unrestricted voting time, this is the amount of time a voter has to deny, veto, or withdraw a vote on a proposal.'
+                    }
+                  >
+                    <InformationFilled className="cursor-help h-3 w-3" />
+                  </Tooltip>
+                </div>
+              </div>
             </div>
             <div className="flex items-center gap-1">
               <div className="rounded-sm h-1 w-1 bg-amber-400 inline-block" />
