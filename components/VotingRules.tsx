@@ -105,7 +105,7 @@ const VotingRules = ({}) => {
       >
         <div className="grid grid-cols-2 gap-4">
           <div className="col-span-2">
-            <div className="text-neutral-500">Wallet Address</div>
+            <div className="text-neutral-500">Wallet </div>
             <div>
               {
                 treasuryAddress.result &&
@@ -149,7 +149,10 @@ const VotingRules = ({}) => {
             )}
           </div>
           <div>
-            <div className="text-neutral-500">Unrestricted Voting Time</div>
+            <div className="text-neutral-500">
+              Unrestricted <br />
+              Voting Time
+            </div>
             <div className="flex items-center gap-1">
               <div className="rounded-sm h-1 w-1 bg-sky-500 inline-block" />
               <div>
@@ -162,7 +165,10 @@ const VotingRules = ({}) => {
             </div>
           </div>
           <div>
-            <div className="text-neutral-500">Cool-off Voting Time</div>
+            <div className="text-neutral-500">
+              Cool-off <br />
+              Voting Time
+            </div>
             <div className="flex items-center gap-1">
               <div className="rounded-sm h-1 w-1 bg-amber-400 inline-block" />
               <div>
