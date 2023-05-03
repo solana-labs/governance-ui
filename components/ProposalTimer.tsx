@@ -107,79 +107,109 @@ const ProposalTimer = ({
             ))}
           </div>
         </div>
-        <div /** The colored bar */ className="flex h-[1.5px]">
-          <div
-            /** Unrestricted voting time elapsed */ style={{
-              flex: Math.min(
-                countdown.total.secondsElapsed,
-                governance.config.baseVotingTime
-              ),
-            }}
-            className="bg-sky-900"
-          />
-          <Notch
-            /** White notch (unrestricted voting time) */ className={
-              countdown.total.secondsElapsed > governance.config.baseVotingTime
-                ? 'hidden'
-                : undefined
-            }
-          />
-          <div
-            /** Unrestricted voting time remaining */ style={{
-              flex: Math.max(
-                0,
-                governance.config.baseVotingTime -
-                  countdown.total.secondsElapsed
-              ),
-            }}
-            className="bg-sky-500"
-          />
-          <div className="w-[1px]" />
-          <div
-            /** Cooloff time elapsed */ style={{
-              flex: Math.min(
-                countdown.total.secondsElapsed -
-                  governance.config.baseVotingTime,
-                governance.config.baseVotingTime +
-                  governance.config.votingCoolOffTime
-              ),
-            }}
-            className="bg-[#665425]"
-          />
-          <Notch
-            /** White notch (cooloff) */
-            className={
-              countdown.total.secondsElapsed <= governance.config.baseVotingTime
-                ? 'hidden'
-                : undefined
-            }
-          />
-
-          <div
-            /** Cooloff time remaining */ style={{
-              flex: Math.max(
-                0,
-                governance.config.votingCoolOffTime -
-                  Math.max(
-                    0,
-                    countdown.total.secondsElapsed -
-                      governance.config.baseVotingTime
-                  )
-              ),
-            }}
-            className="bg-amber-500"
-          />
-        </div>
+        <TimerBar proposal={proposal} governance={governance} size="xs" />
       </div>
     </>
   ) : null
 }
 
-const Notch = ({ className }: { className?: string }) => (
+export const TimerBar = ({
+  proposal,
+  governance,
+  size,
+}: {
+  proposal: Proposal
+  governance: Governance
+  size: 'xs' | 'lg'
+}) => {
+  const countdown = useCountdown({ proposal, governance })
+
+  return countdown && countdown.state === 'voting' ? (
+    <div
+      /** The colored bar */ className={clsx(
+        'flex',
+        size === 'xs' ? 'h-[1.5px]' : 'h-[4px]'
+      )}
+    >
+      <div
+        /** Unrestricted voting time elapsed */ style={{
+          flex: Math.min(
+            countdown.total.secondsElapsed,
+            governance.config.baseVotingTime
+          ),
+        }}
+        className="bg-sky-900"
+      />
+      <Notch
+        /** White notch (unrestricted voting time) */ className={
+          countdown.total.secondsElapsed > governance.config.baseVotingTime
+            ? 'hidden'
+            : undefined
+        }
+        size={size}
+      />
+      <div
+        /** Unrestricted voting time remaining */ style={{
+          flex: Math.max(
+            0,
+            governance.config.baseVotingTime - countdown.total.secondsElapsed
+          ),
+        }}
+        className="bg-sky-500"
+      />
+      <div className="w-[1px]" />
+      <div
+        /** Cooloff time elapsed */ style={{
+          flex: Math.min(
+            countdown.total.secondsElapsed - governance.config.baseVotingTime,
+            governance.config.baseVotingTime +
+              governance.config.votingCoolOffTime
+          ),
+        }}
+        className="bg-[#665425]"
+      />
+      <Notch
+        /** White notch (cooloff) */
+        className={
+          countdown.total.secondsElapsed <= governance.config.baseVotingTime
+            ? 'hidden'
+            : undefined
+        }
+        size={size}
+      />
+
+      <div
+        /** Cooloff time remaining */ style={{
+          flex: Math.max(
+            0,
+            governance.config.votingCoolOffTime -
+              Math.max(
+                0,
+                countdown.total.secondsElapsed -
+                  governance.config.baseVotingTime
+              )
+          ),
+        }}
+        className="bg-amber-500"
+      />
+    </div>
+  ) : null
+}
+
+const Notch = ({
+  className,
+  size,
+}: {
+  className?: string
+  size: 'xs' | 'lg'
+}) => (
   <div className={clsx(className, 'relative w-[1px] bg-white')}>
     <CaretDown
       size={20}
-      className="absolute text-white left-1/2 -translate-x-1/2 top-[-13px] scale-50"
+      className={clsx(
+        'absolute text-white left-1/2 -translate-x-1/2',
+        size === 'xs' ? 'top-[-13px] scale-50' : 'top-[-16px]'
+      )}
     />
   </div>
 )
