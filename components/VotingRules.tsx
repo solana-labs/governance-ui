@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useVotingPop } from './VotePanel/hooks'
 import {
+  ChevronRight,
   ChevronUp,
   Events,
   Scales,
@@ -18,6 +19,7 @@ import { useAsync } from 'react-async-hook'
 import { useVetoingPop } from './VotePanel/VetoButtons'
 import useRealm from '@hooks/useRealm'
 import { ACCOUNT_NAMES } from './instructions/tools'
+import ExploreLink, { ExploreButton } from './treasuryV2/Details/ExploreLink'
 
 const formatOneDecimal = (x: number) => x.toFixed(1).replace(/[.,]0$/, '')
 
@@ -35,6 +37,7 @@ const VotingRules = ({}) => {
   const { proposal, governance } = useProposal()
   const votingPop = useVotingPop()
   const vetoVotePop = useVetoingPop()
+  const { symbol } = useRealm()
 
   const [showMore, setShowMore] = useState(false)
 
@@ -105,15 +108,25 @@ const VotingRules = ({}) => {
       >
         <div className="grid grid-cols-2 gap-4">
           <div className="col-span-2">
-            <div className="text-neutral-500">Wallet </div>
-            <div>
-              {
-                treasuryAddress.result &&
-                ACCOUNT_NAMES[treasuryAddress.result.toString()]
-                  ? ACCOUNT_NAMES[treasuryAddress.result.toString()]
-                  : formatShortAddress(treasuryAddress.result) //TODO use whatever name w&a uses
+            <div
+              className="text-neutral-500 flex items-center gap-1 cursor-pointer"
+              onClick={() =>
+                window.open(`/dao/${symbol}/treasury/v2`, '_blank')
               }
+            >
+              <div>Wallet</div>
+              <ChevronRight className="scale-75" />
             </div>
+            {treasuryAddress.result && (
+              <div className="flex gap-1 items-center">
+                <div>
+                  {ACCOUNT_NAMES[treasuryAddress.result.toString()]
+                    ? ACCOUNT_NAMES[treasuryAddress.result.toString()]
+                    : formatShortAddress(treasuryAddress.result)}
+                </div>
+                <ExploreButton address={treasuryAddress.result.toString()} />
+              </div>
+            )}
           </div>
           <div>
             <div className="text-neutral-500">Vote Type</div>
