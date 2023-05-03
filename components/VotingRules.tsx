@@ -17,6 +17,7 @@ import { formatShortAddress } from '@cardinal/namespaces-components'
 import { useAsync } from 'react-async-hook'
 import { useVetoingPop } from './VotePanel/VetoButtons'
 import useRealm from '@hooks/useRealm'
+import { ACCOUNT_NAMES } from './instructions/tools'
 
 const formatOneDecimal = (x: number) => x.toFixed(1).replace(/[.,]0$/, '')
 
@@ -107,7 +108,10 @@ const VotingRules = ({}) => {
             <div className="text-neutral-500">Wallet Address</div>
             <div>
               {
-                formatShortAddress(treasuryAddress.result) //TODO use whatever name w&a uses
+                treasuryAddress.result &&
+                ACCOUNT_NAMES[treasuryAddress.result.toString()]
+                  ? ACCOUNT_NAMES[treasuryAddress.result.toString()]
+                  : formatShortAddress(treasuryAddress.result) //TODO use whatever name w&a uses
               }
             </div>
           </div>
