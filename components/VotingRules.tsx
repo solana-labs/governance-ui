@@ -4,7 +4,6 @@ import {
   ChevronRight,
   ChevronUp,
   Events,
-  Information,
   InformationFilled,
   Scales,
   ScalesTipped,
@@ -23,7 +22,6 @@ import useRealm from '@hooks/useRealm'
 import { ACCOUNT_NAMES } from './instructions/tools'
 import { ExploreButton } from './treasuryV2/Details/ExploreLink'
 import Tooltip from './Tooltip'
-import { InformationCircleIcon } from '@heroicons/react/solid'
 
 const formatOneDecimal = (x: number) => x.toFixed(1).replace(/[.,]0$/, '')
 
