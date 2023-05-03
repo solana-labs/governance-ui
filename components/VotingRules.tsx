@@ -35,7 +35,7 @@ const TIPPING = {
   [VoteTipping.Strict]: 'Strict',
 } as const
 
-const VotingRules = ({}) => {
+const VotingRules = () => {
   const { proposal, governance } = useProposal()
   const votingPop = useVotingPop()
   const vetoVotePop = useVetoingPop()
