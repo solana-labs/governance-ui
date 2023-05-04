@@ -1,8 +1,9 @@
-import { CaretDown, Timer } from '@carbon/icons-react'
+import { CaretDown, InformationFilled, Timer } from '@carbon/icons-react'
 import { Governance, Proposal } from '@solana/spl-governance'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
 import { useCallback, useEffect, useState } from 'react'
+import Tooltip from './Tooltip'
 
 /** here's a horrible function chatgpt wrote for me :-) */
 function formatDuration(seconds: number) {
@@ -97,7 +98,7 @@ const ProposalTimer = ({
   const countdown = useCountdown({ proposal, governance })
 
   return countdown && countdown.state === 'voting' ? (
-    <>
+    <div className="flex items-center gap-1">
       <div className="min-w-[115px] bg-neutral-900 rounded-md py-1 px-2 flex flex-col">
         <div className="text-white flex justify-between items-center mb-1 gap-3 flex-nowrap">
           <Timer />
@@ -109,7 +110,34 @@ const ProposalTimer = ({
         </div>
         <TimerBar proposal={proposal} governance={governance} size="xs" />
       </div>
-    </>
+      <Tooltip
+        content={
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1">
+              <div className="flex gap-1 items-center">
+                <div className="rounded-sm h-2 w-2 bg-sky-500 inline-block" />
+                <div className="text-white">Unrestricted Voting Time</div>
+              </div>
+              <div>
+                The amount of time a voter has to approve or deny a proposal.
+              </div>
+            </div>
+            <div className="flex flex-col gap-1">
+              <div className="flex gap-1 items-center">
+                <div className="rounded-sm h-2 w-2 bg-amber-400 inline-block" />
+                <div className="text-white">Cool-Off Voting Time</div>
+              </div>
+              <div>
+                After the unrestricted voting time, this is the amount of time a
+                voter has to deny, veto, or withdraw a vote on a proposal.
+              </div>
+            </div>
+          </div>
+        }
+      >
+        <InformationFilled className="cursor-help h-3 w-3" />
+      </Tooltip>
+    </div>
   ) : null
 }
 
