@@ -8,6 +8,7 @@ import {
   Governance,
   ProposalState,
   pubkeyFilter,
+  VoteRecord,
   YesNoVote,
 } from '@solana/spl-governance'
 import { Connection, PublicKey } from '@solana/web3.js'
@@ -62,6 +63,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     councilMint,
     voteRecordByVoter,
     governances,
+    allProgramVoteRecords,
   ] = await Promise.all([
     conn.getParsedAccountInfo(realm.account.communityMint),
     realm.account.config.councilMint
@@ -71,7 +73,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     getGovernanceAccounts(conn, realm.owner, Governance, [
       pubkeyFilter(1, realm.pubkey)!,
     ]),
+    getGovernanceAccounts(conn, new PublicKey(realm!.owner), VoteRecord),
   ])
+
   const communityMintDecimals =
     communityMint.value?.data['parsed'].info.decimals
   const councilMintDecimals = councilMint?.value?.data['parsed'].info.decimals
@@ -131,6 +135,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         creationDateTimestamp: proposal?.account.signingOffAt
           ? proposal?.account.signingOffAt.toNumber()
           : proposal?.account.draftAt.toNumber(),
+        totalVotersNumber: allProgramVoteRecords.filter((x) =>
+          x.account.proposal.equals(proposal.pubkey)
+        ).length,
       }
     })
 
