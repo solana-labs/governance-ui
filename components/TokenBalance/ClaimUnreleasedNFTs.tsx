@@ -15,6 +15,7 @@ import {
 import { ProposalState } from '@solana/spl-governance'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 const NFT_SOL_BALANCE = 0.0014616
 
@@ -29,7 +30,7 @@ const ClaimUnreleasedNFTs = ({
   const [ownNftVoteRecords, setOwnNftVoteRecords] = useState<any[]>([])
   const [solToBeClaimed, setSolToBeClaimed] = useState(0)
   const ownNftVoteRecordsFilterd = ownNftVoteRecords
-  const { realm } = useWalletStore((s) => s.selectedRealm)
+  const realm = useRealmQuery().data?.result
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )

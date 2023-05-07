@@ -38,6 +38,7 @@ import {
   useUserCommunityTokenOwnerRecord,
   useUserCouncilTokenOwnerRecord,
 } from '@hooks/queries/tokenOwnerRecord'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 const MyProposalsBn = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
@@ -55,9 +56,10 @@ const MyProposalsBn = () => {
   const { data: tokenOwnerRecord } = useAddressQuery_CommunityTokenOwner()
 
   const maxVoterWeight = useMaxVoteRecord()?.pubkey || undefined
-  const { realm, programId, programVersion } = useWalletStore(
-    (s) => s.selectedRealm
-  )
+  const realm = useRealmQuery().data?.result
+  const programId = realm?.owner
+
+  const { programVersion } = useWalletStore((s) => s.selectedRealm)
   const { refetchProposals } = useWalletStore((s) => s.actions)
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
