@@ -1,13 +1,13 @@
-import useRealm from '@hooks/useRealm'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { getTokenOwnerRecordAddress } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
 import { tryParseKey } from '@tools/validators/pubkey'
 import useWalletStore from 'stores/useWalletStore'
+import { useRealmQuery } from '../realm'
 
 export const useAddressQuery_CouncilTokenOwner = () => {
-  const { realm } = useRealm()
+  const realm = useRealmQuery().data?.result
   const wallet = useWalletOnePointOh()
   const selectedCouncilDelegator = useWalletStore(
     (s) => s.selectedCouncilDelegate
@@ -29,7 +29,7 @@ export const useAddressQuery_CouncilTokenOwner = () => {
 }
 
 export const useAddressQuery_CommunityTokenOwner = () => {
-  const { realm } = useRealm()
+  const realm = useRealmQuery().data?.result
   const wallet = useWalletOnePointOh()
   const selectedCommunityDelegator = useWalletStore(
     (s) => s.selectedCommunityDelegate
