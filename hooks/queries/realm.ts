@@ -4,7 +4,7 @@ import { PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import asFindable from '@utils/queries/asFindable'
-import { useRouter } from 'next-router-mock'
+import { useRouter } from 'next/router'
 import useWalletStore from 'stores/useWalletStore'
 
 export const realmQueryKeys = {
@@ -19,6 +19,7 @@ export const useRealmQuery = () => {
   const connection = useWalletStore((s) => s.connection)
   const router = useRouter()
   const { symbol } = router.query
+  console.log('aaaaa', router)
   const pubkey = tryParsePublicKey(symbol as string)
 
   const enabled = pubkey !== undefined
