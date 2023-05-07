@@ -214,8 +214,10 @@ export default function useRealm() {
     heliumVotingPower
   )
   return {
+    /** @deprecated use useRealmQuery */
     realm,
     realmInfo,
+    /** @deprecated just use `useRouter().query` directly... */
     symbol,
     voteSymbol: realmInfo?.voteSymbol,
     mint,
@@ -225,6 +227,7 @@ export default function useRealm() {
     tokenRecords,
     realmTokenAccount,
     councilTokenAccount,
+    /** @deprecated just use the token owner record directly, ok? */
     ownVoterWeight,
     realmDisplayName: realmInfo?.displayName ?? realm?.account?.name,
     canChooseWhoVote,
