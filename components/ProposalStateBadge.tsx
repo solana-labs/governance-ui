@@ -5,6 +5,7 @@ import useRealm from '@hooks/useRealm'
 import useRealmGovernance from '../hooks/useRealmGovernance'
 import assertUnreachable from '@utils/typescript/assertUnreachable'
 import { isInCoolOffTime } from './VotePanel/hooks'
+import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 
 export const hasInstructions = (proposal: Proposal) => {
   if (proposal.instructionsCount) {
@@ -151,7 +152,8 @@ interface Props {
 }
 
 export default function ProposalStateBadge(props: Props) {
-  const { ownTokenRecord, ownCouncilTokenRecord } = useRealm()
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const { ownCouncilTokenRecord } = useRealm()
   const governance = useRealmGovernance(props.proposal.governance)
 
   const isCreator =

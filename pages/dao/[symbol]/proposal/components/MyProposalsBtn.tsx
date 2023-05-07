@@ -34,6 +34,7 @@ import useQueryContext from '@hooks/useQueryContext'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
+import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 
 const MyProposalsBn = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
@@ -62,13 +63,9 @@ const MyProposalsBn = () => {
     proposalsWithDepositedTokens,
     setProposalsWithDepositedTokens,
   ] = useState<ProgramAccount<ProposalDeposit>[]>([])
-  const {
-    proposals,
-    ownTokenRecord,
-    ownCouncilTokenRecord,
-    realmInfo,
-    isNftMode,
-  } = useRealm()
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+
+  const { proposals, ownCouncilTokenRecord, realmInfo, isNftMode } = useRealm()
   const myProposals = useMemo(
     () =>
       connected

@@ -30,6 +30,7 @@ import queryClient from '@hooks/queries/queryClient'
 import useSerumGovStore from 'stores/useSerumGovStore'
 import { WalletProvider } from '@hub/providers/Wallet'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
@@ -74,9 +75,11 @@ export function App(props: Props) {
   )
   const { getNfts } = useTreasuryAccountStore()
   const { getOwnedDeposits, resetDepositState } = useDepositStore()
+
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+
   const {
     realm,
-    ownTokenRecord,
     realmInfo,
     symbol,
     config,

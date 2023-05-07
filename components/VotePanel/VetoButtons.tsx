@@ -15,6 +15,7 @@ import {
   useIsVoting,
   useProposalVoteRecordQuery,
 } from './hooks'
+import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 
 /* 
   returns: undefined if loading, false if nobody can veto, 'council' if council can veto, 'community' if community can veto
@@ -50,7 +51,9 @@ const useIsVetoable = (): undefined | boolean => {
 }
 
 const useUserVetoTokenRecord = () => {
-  const { ownTokenRecord, ownCouncilTokenRecord } = useRealm()
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+
+  const { ownCouncilTokenRecord } = useRealm()
   const vetoingPop = useVetoingPop()
   const voterTokenRecord =
     vetoingPop === 'community' ? ownTokenRecord : ownCouncilTokenRecord

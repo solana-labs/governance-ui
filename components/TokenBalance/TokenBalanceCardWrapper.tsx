@@ -14,6 +14,7 @@ import ClaimUnreleasedNFTs from './ClaimUnreleasedNFTs'
 import Link from 'next/link'
 import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 
 const LockPluginTokenBalanceCard = dynamic(
   () =>
@@ -73,8 +74,8 @@ const TokenBalanceCardWrapper = ({
   proposal?: Option<Proposal>
   inAccountDetails?: boolean
 }) => {
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const {
-    ownTokenRecord,
     config,
     ownCouncilTokenRecord,
     councilTokenAccount,

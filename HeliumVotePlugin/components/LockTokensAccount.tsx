@@ -36,6 +36,7 @@ import { notify } from '@utils/notifications'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useSubDaos } from 'HeliumVotePlugin/hooks/useSubDaos'
 import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
+import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 
 export const LockTokensAccount: React.FC<{
   tokenOwnerRecordPk: string | string[] | undefined
@@ -50,6 +51,7 @@ export const LockTokensAccount: React.FC<{
     (s) => s.actions
   )
   const connected = !!wallet?.connected
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
 
   const {
     mint,
@@ -57,7 +59,6 @@ export const LockTokensAccount: React.FC<{
     realmTokenAccount,
     realmInfo,
     tokenRecords,
-    ownTokenRecord,
     councilMint,
     config,
   } = useRealm()

@@ -13,15 +13,16 @@ import getNumTokens from './getNumTokens'
 import depositTokens from './depositTokens'
 import VotingPowerPct from './VotingPowerPct'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 
 interface Props {
   className?: string
 }
 
 export default function CommunityVotingPower(props: Props) {
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const {
     mint,
-    ownTokenRecord,
     ownVoterWeight,
     realm,
     realmInfo,

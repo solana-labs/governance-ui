@@ -11,6 +11,7 @@ import { isYesVote } from '@models/voteRecords'
 import useRealm from '@hooks/useRealm'
 import useWalletStore from '../stores/useWalletStore'
 import Tooltip from './Tooltip'
+import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 
 interface VoteRecords {
   [proposal: string]: ProgramAccount<VoteRecord>
@@ -52,7 +53,9 @@ interface Props {
 }
 
 export default function ProposalMyVoteBadge(props: Props) {
-  const { realm, ownTokenRecord } = useRealm()
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+
+  const { realm } = useRealm()
   const [
     ownVoteRecords,
     communityDelegateVoteRecords,

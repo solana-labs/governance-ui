@@ -38,6 +38,7 @@ import ProposalSorting, {
   Sorting,
 } from '@components/ProposalSorting'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
@@ -56,6 +57,8 @@ const DepositLabel = dynamic(
 
 const REALM = () => {
   const pagination = useRef<{ setPage: (val) => void }>(null)
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+
   const {
     realm,
     realmInfo,
@@ -65,7 +68,6 @@ const REALM = () => {
     governances,
     tokenRecords,
     ownVoterWeight,
-    ownTokenRecord,
     councilTokenOwnerRecords,
     ownCouncilTokenRecord,
   } = useRealm()
