@@ -37,6 +37,10 @@ import { PublicKey } from '@solana/web3.js'
 import { useVsrMode } from './useVsrMode'
 import useWalletOnePointOh from './useWalletOnePointOh'
 import { useRealmQuery } from './queries/realm'
+import {
+  useUserCommunityTokenOwnerRecord,
+  useUserCouncilTokenOwnerRecord,
+} from './queries/tokenOwnerRecord'
 
 export default function useRealm() {
   const router = useRouter()
@@ -69,6 +73,9 @@ export default function useRealm() {
   const isPythclientMode =
     currentPluginPk && pythPluginsPks.includes(currentPluginPk?.toBase58())
 
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
+
   //Move to store + move useEffect to main app index,
   //useRealm is used very often across application
   //and in every instance of useRealm it will shot with getMainAccount spamming rpc.
@@ -89,12 +96,6 @@ export default function useRealm() {
   }, [wallet?.publicKey])
 
   const delegates = useMembersStore((s) => s.compact.delegates)
-  const selectedCouncilDelegate = useWalletStore(
-    (s) => s.selectedCouncilDelegate
-  )
-  const selectedCommunityDelegate = useWalletStore(
-    (s) => s.selectedCommunityDelegate
-  )
 
   useMemo(async () => {
     let realmInfo = isPublicKey(symbol as string)
@@ -128,20 +129,6 @@ export default function useRealm() {
     [realm, tokenAccounts]
   )
 
-  const ownTokenRecord = useMemo(() => {
-    if (wallet?.connected && wallet.publicKey) {
-      if (
-        selectedCommunityDelegate &&
-        tokenRecords[selectedCommunityDelegate]
-      ) {
-        return tokenRecords[selectedCommunityDelegate]
-      }
-
-      return tokenRecords[wallet.publicKey.toBase58()]
-    }
-    return undefined
-  }, [tokenRecords, wallet, selectedCommunityDelegate])
-
   // returns array of community tokenOwnerRecords that connected wallet has been delegated
   const ownDelegateTokenRecords = useMemo(() => {
     if (wallet?.connected && wallet.publicKey) {
@@ -174,21 +161,6 @@ export default function useRealm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     [realm, tokenAccounts]
   )
-
-  const ownCouncilTokenRecord = useMemo(() => {
-    if (wallet?.connected && councilMint && wallet.publicKey) {
-      if (
-        selectedCouncilDelegate &&
-        councilTokenOwnerRecords[selectedCouncilDelegate]
-      ) {
-        return councilTokenOwnerRecords[selectedCouncilDelegate]
-      }
-
-      return councilTokenOwnerRecords[wallet.publicKey.toBase58()]
-    }
-    return undefined
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [tokenRecords, wallet, connected, selectedCouncilDelegate])
 
   // returns array of council tokenOwnerRecords that connected wallet has been delegated
   const ownDelegateCouncilTokenRecords = useMemo(() => {

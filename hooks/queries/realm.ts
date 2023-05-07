@@ -19,7 +19,6 @@ export const useRealmQuery = () => {
   const connection = useWalletStore((s) => s.connection)
   const router = useRouter()
   const { symbol } = router.query
-  console.log('aaaaa', router)
   const pubkey = tryParsePublicKey(symbol as string)
 
   const enabled = pubkey !== undefined
