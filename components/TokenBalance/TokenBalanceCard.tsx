@@ -41,7 +41,10 @@ import getNumTokens from '@components/ProposalVotingPower/getNumTokens'
 import VotingPowerPct from '@components/ProposalVotingPower/VotingPowerPct'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
+import {
+  useUserCommunityTokenOwnerRecord,
+  useUserCouncilTokenOwnerRecord,
+} from '@hooks/queries/tokenOwnerRecord'
 
 const TokenBalanceCard = ({
   proposal,
@@ -156,12 +159,12 @@ export const TokenDeposit = ({
 
   const maxVoterWeight = useMaxVoteRecord()?.pubkey || undefined
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
 
   const {
     realm,
     realmInfo,
     realmTokenAccount,
-    ownCouncilTokenRecord,
     ownVoterWeight,
     councilMint,
     councilTokenAccount,

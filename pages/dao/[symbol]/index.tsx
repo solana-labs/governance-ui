@@ -38,7 +38,10 @@ import ProposalSorting, {
   Sorting,
 } from '@components/ProposalSorting'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
+import {
+  useUserCommunityTokenOwnerRecord,
+  useUserCouncilTokenOwnerRecord,
+} from '@hooks/queries/tokenOwnerRecord'
 
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
@@ -58,6 +61,7 @@ const DepositLabel = dynamic(
 const REALM = () => {
   const pagination = useRef<{ setPage: (val) => void }>(null)
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
 
   const {
     realm,
@@ -69,7 +73,6 @@ const REALM = () => {
     tokenRecords,
     ownVoterWeight,
     councilTokenOwnerRecords,
-    ownCouncilTokenRecord,
   } = useRealm()
   const proposalsPerPage = 20
   const [filters, setFilters] = useState<Filters>(InitialFilters)

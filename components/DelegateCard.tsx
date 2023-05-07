@@ -22,16 +22,15 @@ import { tryParseKey } from 'tools/validators/pubkey'
 import { XCircleIcon } from '@heroicons/react/outline'
 import Tooltip from './Tooltip'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
+import {
+  useUserCommunityTokenOwnerRecord,
+  useUserCouncilTokenOwnerRecord,
+} from '@hooks/queries/tokenOwnerRecord'
 
 const DelegateCard = () => {
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
-  const {
-    realm,
-    tokenRecords,
-    councilTokenOwnerRecords,
-    ownCouncilTokenRecord,
-  } = useRealm()
+  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
+  const { realm, tokenRecords, councilTokenOwnerRecords } = useRealm()
   const [isLoading, setLoading] = useState<boolean>(false)
   const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection.current)

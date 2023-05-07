@@ -3,7 +3,10 @@ import {
   useAddressQuery_CouncilTokenOwner,
 } from '@hooks/queries/addresses/tokenOwnerRecord'
 import { useAddressQuery_SelectedProposalVoteRecord } from '@hooks/queries/addresses/voteRecord'
-import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
+import {
+  useUserCommunityTokenOwnerRecord,
+  useUserCouncilTokenOwnerRecord,
+} from '@hooks/queries/tokenOwnerRecord'
 import { useVoteRecordByPubkeyQuery } from '@hooks/queries/voteRecord'
 import { useHasVoteTimeExpired } from '@hooks/useHasVoteTimeExpired'
 import useRealm from '@hooks/useRealm'
@@ -69,8 +72,7 @@ export const useVotingPop = () => {
 export const useVoterTokenRecord = () => {
   const { tokenRole } = useWalletStore((s) => s.selectedProposal)
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
-
-  const { ownCouncilTokenRecord } = useRealm()
+  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
 
   const voterTokenRecord =
     tokenRole === GoverningTokenRole.Community

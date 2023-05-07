@@ -4,7 +4,6 @@ import dynamic from 'next/dynamic'
 import React, { useEffect } from 'react'
 import Head from 'next/head'
 import Script from 'next/script'
-import { QueryClientProvider } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import { GatewayProvider } from '@components/Gateway/GatewayProvider'
 import { usePrevious } from '@hooks/usePrevious'
@@ -26,7 +25,6 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
 import NftVotingCountingModal from '@components/NftVotingCountingModal'
 import { getResourcePathPart } from '@tools/core/resources'
-import queryClient from '@hooks/queries/queryClient'
 import useSerumGovStore from 'stores/useSerumGovStore'
 import { WalletProvider } from '@hub/providers/Wallet'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
@@ -286,21 +284,19 @@ export function App(props: Props) {
       </Head>
       <GoogleTag />
       <ErrorBoundary>
-        <QueryClientProvider client={queryClient}>
-          <ThemeProvider defaultTheme="Dark">
-            <WalletIdentityProvider appName={'Realms'}>
-              <WalletProvider>
-                <GatewayProvider>
-                  <NavBar />
-                  <Notifications />
-                  <TransactionLoader></TransactionLoader>
-                  <NftVotingCountingModal />
-                  <PageBodyContainer>{props.children}</PageBodyContainer>
-                </GatewayProvider>
-              </WalletProvider>
-            </WalletIdentityProvider>
-          </ThemeProvider>
-        </QueryClientProvider>
+        <ThemeProvider defaultTheme="Dark">
+          <WalletIdentityProvider appName={'Realms'}>
+            <WalletProvider>
+              <GatewayProvider>
+                <NavBar />
+                <Notifications />
+                <TransactionLoader></TransactionLoader>
+                <NftVotingCountingModal />
+                <PageBodyContainer>{props.children}</PageBodyContainer>
+              </GatewayProvider>
+            </WalletProvider>
+          </WalletIdentityProvider>
+        </ThemeProvider>
       </ErrorBoundary>
     </div>
   )

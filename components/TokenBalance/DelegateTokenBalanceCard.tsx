@@ -6,7 +6,10 @@ import useMembersStore from 'stores/useMembersStore'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from 'hooks/useRealm'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
+import {
+  useUserCommunityTokenOwnerRecord,
+  useUserCouncilTokenOwnerRecord,
+} from '@hooks/queries/tokenOwnerRecord'
 
 const DelegateBalanceCard = () => {
   const delegates = useMembersStore((s) => s.compact.delegates)
@@ -14,11 +17,11 @@ const DelegateBalanceCard = () => {
   const connection = useWalletStore((s) => s.connection)
   const walletId = wallet?.publicKey?.toBase58()
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
 
   const {
     ownDelegateTokenRecords,
     ownDelegateCouncilTokenRecords,
-    ownCouncilTokenRecord,
     mint,
     councilMint,
   } = useRealm()
