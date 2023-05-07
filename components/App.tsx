@@ -29,6 +29,7 @@ import useSerumGovStore from 'stores/useSerumGovStore'
 import { WalletProvider } from '@hub/providers/Wallet'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
+import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
@@ -96,11 +97,12 @@ export function App(props: Props) {
   const updateSerumGovAccounts = useSerumGovStore(
     (s) => s.actions.updateSerumGovAccounts
   )
+  const { actions } = useWalletStore((s) => s)
+
   const {
-    actions,
-    selectedCommunityDelegate,
-    selectedCouncilDelegate,
-  } = useWalletStore((s) => s)
+    communityDelegator: selectedCommunityDelegate,
+    councilDelegator: selectedCouncilDelegate,
+  } = useSelectedDelegatorStore()
 
   const realmName = realmInfo?.displayName ?? realm?.account?.name
   const title = realmName ? `${realmName}` : 'Realms'
@@ -163,31 +165,6 @@ export function App(props: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [cluster])
 
-  useEffect(() => {
-    if (
-      ownDelegateCouncilTokenRecords &&
-      ownDelegateCouncilTokenRecords.length > 0
-    ) {
-      actions.selectCouncilDelegate(
-        ownDelegateCouncilTokenRecords[0]?.account?.governingTokenOwner?.toBase58()
-      )
-    } else {
-      actions.selectCouncilDelegate(undefined)
-    }
-
-    if (ownDelegateTokenRecords && ownDelegateTokenRecords.length > 0) {
-      actions.selectCommunityDelegate(
-        ownDelegateTokenRecords[0]?.account?.governingTokenOwner?.toBase58()
-      )
-    } else {
-      actions.selectCommunityDelegate(undefined)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [
-    walletId,
-    ownDelegateTokenRecords?.map((x) => x.pubkey.toBase58()).toString(),
-    ownDelegateCouncilTokenRecords?.map((x) => x.pubkey.toBase58()).toString(),
-  ])
   // whenever we change delegate, get that delegates vote record so we can display it
   useEffect(() => {
     actions.fetchDelegateVoteRecords()

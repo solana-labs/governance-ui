@@ -45,6 +45,7 @@ import { accountsToPubkeyMap } from '@tools/sdk/accounts'
 import { HIDDEN_PROPOSALS } from '@components/instructions/tools'
 import { getRealmConfigAccountOrDefault } from '@tools/governance/configs'
 import { getProposals } from '@utils/GovernanceTools'
+import { useSelectedDelegatorStore } from './useSelectedDelegatorStore'
 
 interface WalletStore extends State {
   connection: ConnectionContext
@@ -88,11 +89,11 @@ interface WalletStore extends State {
   tokenAccounts: TokenProgramAccount<TokenAccount>[]
   set: (x: any) => void
   actions: any
-  selectedCouncilDelegate: string | undefined
-  selectedCommunityDelegate: string | undefined
+  /** @deprecated no comment */
   councilDelegateVoteRecordsByProposal: {
     [proposal: string]: ProgramAccount<VoteRecord>
   }
+  /** @deprecated no comment */
   communityDelegateVoteRecordsByProposal: {
     [proposal: string]: ProgramAccount<VoteRecord>
   }
@@ -139,11 +140,10 @@ const useWalletStore = create<WalletStore>((set, get) => ({
   providerName: undefined,
   tokenAccounts: [],
   switchboardProgram: undefined,
-  selectedCouncilDelegate: undefined,
-  selectedCommunityDelegate: undefined,
   councilDelegateVoteRecordsByProposal: {},
   communityDelegateVoteRecordsByProposal: {},
   set: (fn) => set(produce(fn)),
+  /** @deprecated use react-query */
   actions: {
     async fetchRealmBySymbol(cluster: string, symbol: string) {
       const actions = get().actions
@@ -212,8 +212,10 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const connected = !!wallet?.connected
       const programId = get().selectedRealm.programId
       const realmId = get().selectedRealm.realm?.pubkey
-      const selectedCouncilDelegate = get().selectedCouncilDelegate
-      const selectedCommunityDelegate = get().selectedCommunityDelegate
+      const selectedCouncilDelegate = useSelectedDelegatorStore.getState()
+        .councilDelegator
+      const selectedCommunityDelegate = useSelectedDelegatorStore.getState()
+        .communityDelegator
 
       const set = get().set
 
@@ -291,21 +293,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const set = get().set
       set((s) => {
         s.selectedRealm = INITIAL_REALM_STATE
-      })
-    },
-
-    // TODO: When this happens fetch vote records for selected delegate?
-    selectCouncilDelegate(councilDelegate) {
-      const set = get().set
-      set((s) => {
-        s.selectedCouncilDelegate = councilDelegate
-      })
-    },
-
-    selectCommunityDelegate(communityDelegate) {
-      const set = get().set
-      set((s) => {
-        s.selectedCommunityDelegate = communityDelegate
       })
     },
 
