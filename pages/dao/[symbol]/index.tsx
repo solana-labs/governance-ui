@@ -42,6 +42,7 @@ import {
   useUserCommunityTokenOwnerRecord,
   useUserCouncilTokenOwnerRecord,
 } from '@hooks/queries/tokenOwnerRecord'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
@@ -62,9 +63,9 @@ const REALM = () => {
   const pagination = useRef<{ setPage: (val) => void }>(null)
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
+  const realm = useRealmQuery().data?.result
 
   const {
-    realm,
     realmInfo,
     mint,
     councilMint,

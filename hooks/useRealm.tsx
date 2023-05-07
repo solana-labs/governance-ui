@@ -36,6 +36,7 @@ import { BN } from '@coral-xyz/anchor'
 import { PublicKey } from '@solana/web3.js'
 import { useVsrMode } from './useVsrMode'
 import useWalletOnePointOh from './useWalletOnePointOh'
+import { useRealmQuery } from './queries/realm'
 
 export default function useRealm() {
   const router = useRouter()
@@ -44,8 +45,9 @@ export default function useRealm() {
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const tokenAccounts = useWalletStore((s) => s.tokenAccounts)
+  const realm = useRealmQuery().data?.result
+
   const {
-    realm,
     mint,
     councilMint,
     governances,

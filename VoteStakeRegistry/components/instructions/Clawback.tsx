@@ -1,5 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
-import useRealm from '@hooks/useRealm'
+import { useContext, useEffect, useState } from 'react'
 import { TransactionInstruction } from '@solana/web3.js'
 import useWalletStore from 'stores/useWalletStore'
 import { tryGetMint } from '@utils/tokens'
@@ -32,6 +31,7 @@ import { getClawbackInstruction } from 'VoteStakeRegistry/actions/getClawbackIns
 import { abbreviateAddress } from '@utils/formatting'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 const Clawback = ({
   index,
@@ -42,7 +42,8 @@ const Clawback = ({
 }) => {
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const connection = useWalletStore((s) => s.connection)
-  const { realm } = useRealm()
+  const realm = useRealmQuery().data?.result
+
   const {
     governedTokenAccountsWithoutNfts,
     governancesArray,

@@ -12,10 +12,13 @@ import { voteRegistryDepositWithoutLockup } from 'VoteStakeRegistry/actions/vote
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 const DepositCommunityTokensBtn = ({ className = '', inAccountDetails }) => {
   const { getOwnedDeposits } = useDepositStore()
-  const { realm, realmInfo, realmTokenAccount, tokenRecords } = useRealm()
+  const realm = useRealmQuery().data?.result
+
+  const { realmInfo, realmTokenAccount, tokenRecords } = useRealm()
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const [isLoading, setIsLoading] = useState(false)
   const wallet = useWalletOnePointOh()

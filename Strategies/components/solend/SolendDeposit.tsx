@@ -34,6 +34,7 @@ import {
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { PublicKey } from '@solana/web3.js'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 const SOL_BUFFER = 0.02
 
@@ -50,10 +51,11 @@ const SolendDeposit = ({
 }) => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
+  const realm = useRealmQuery().data?.result
+
   const {
     proposals,
     realmInfo,
-    realm,
     ownVoterWeight,
     mint,
     councilMint,

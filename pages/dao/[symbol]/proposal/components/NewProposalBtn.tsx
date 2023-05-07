@@ -5,6 +5,7 @@ import useRealm from '@hooks/useRealm'
 import React from 'react'
 import Tooltip from '@components/Tooltip'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 const NewProposalBtn = () => {
   const { fmtUrlWithCluster } = useQueryContext()
@@ -12,9 +13,10 @@ const NewProposalBtn = () => {
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
 
+  const realm = useRealmQuery().data?.result
+
   const {
     symbol,
-    realm,
     governances,
     ownVoterWeight,
     toManyCommunityOutstandingProposalsForUser,

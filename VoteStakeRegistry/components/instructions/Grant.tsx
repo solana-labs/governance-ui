@@ -38,6 +38,7 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import dayjs from 'dayjs'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 const Grant = ({
   index,
@@ -50,7 +51,9 @@ const Grant = ({
   const dateNow = dayjs().unix()
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletOnePointOh()
-  const { realm, tokenRecords, realmInfo } = useRealm()
+  const realm = useRealmQuery().data?.result
+
+  const { tokenRecords, realmInfo } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [startDate, setStartDate] = useState(dayjs().format('DD-MM-YYYY'))

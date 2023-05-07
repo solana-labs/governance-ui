@@ -45,6 +45,7 @@ import {
   useUserCommunityTokenOwnerRecord,
   useUserCouncilTokenOwnerRecord,
 } from '@hooks/queries/tokenOwnerRecord'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 const TokenBalanceCard = ({
   proposal,
@@ -160,9 +161,9 @@ export const TokenDeposit = ({
   const maxVoterWeight = useMaxVoteRecord()?.pubkey || undefined
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
+  const realm = useRealmQuery().data?.result
 
   const {
-    realm,
     realmInfo,
     realmTokenAccount,
     ownVoterWeight,
