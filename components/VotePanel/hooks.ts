@@ -9,7 +9,6 @@ import {
 } from '@hooks/queries/tokenOwnerRecord'
 import { useVoteRecordByPubkeyQuery } from '@hooks/queries/voteRecord'
 import { useHasVoteTimeExpired } from '@hooks/useHasVoteTimeExpired'
-import useRealm from '@hooks/useRealm'
 import {
   ProposalState,
   GoverningTokenRole,
