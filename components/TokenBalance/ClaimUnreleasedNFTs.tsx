@@ -14,7 +14,7 @@ import {
 } from '@utils/sendTransactions'
 import { ProposalState } from '@solana/spl-governance'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
+import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
 
 const NFT_SOL_BALANCE = 0.0014616
 

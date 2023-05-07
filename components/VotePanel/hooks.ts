@@ -1,7 +1,7 @@
 import {
   useAddressQuery_CommunityTokenOwner,
   useAddressQuery_CouncilTokenOwner,
-} from '@hooks/queries/addresses/tokenOwner'
+} from '@hooks/queries/addresses/tokenOwnerRecord'
 import { useAddressQuery_SelectedProposalVoteRecord } from '@hooks/queries/addresses/voteRecord'
 import { useVoteRecordByPubkeyQuery } from '@hooks/queries/voteRecord'
 import { useHasVoteTimeExpired } from '@hooks/useHasVoteTimeExpired'

@@ -12,7 +12,7 @@ import Link from 'next/link'
 import useQueryContext from '@hooks/useQueryContext'
 import InlineNotification from '@components/InlineNotification'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
+import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface Props {

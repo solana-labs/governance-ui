@@ -13,7 +13,7 @@ import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import { MintInfo } from '@solana/spl-token'
 import { VotingPowerBox } from './VotingPowerBox'
-import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
+import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export const VotingPowerCard: React.FC<{

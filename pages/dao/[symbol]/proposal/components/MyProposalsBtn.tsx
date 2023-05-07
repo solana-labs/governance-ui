@@ -33,7 +33,7 @@ import {
 import useQueryContext from '@hooks/useQueryContext'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
+import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
 
 const MyProposalsBn = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)

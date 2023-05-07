@@ -35,7 +35,7 @@ import { PublicKey } from '@solana/web3.js'
 import { notify } from '@utils/notifications'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useSubDaos } from 'HeliumVotePlugin/hooks/useSubDaos'
-import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
+import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
 
 export const LockTokensAccount: React.FC<{
   tokenOwnerRecordPk: string | string[] | undefined

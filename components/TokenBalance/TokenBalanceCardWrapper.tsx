@@ -12,7 +12,7 @@ import {
 import GatewayCard from '@components/Gateway/GatewayCard'
 import ClaimUnreleasedNFTs from './ClaimUnreleasedNFTs'
 import Link from 'next/link'
-import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
+import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const LockPluginTokenBalanceCard = dynamic(
