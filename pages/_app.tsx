@@ -11,6 +11,7 @@ import '../components/DropdownMenu/index.css'
 import '@multifarm/solana-realms/dist/multifarm-solana-realms.css'
 import queryClient from '@hooks/queries/queryClient'
 import { QueryClientProvider } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 export default function App({ Component, pageProps, router }: AppProps) {
   // **NOTE**
@@ -51,6 +52,7 @@ export default function App({ Component, pageProps, router }: AppProps) {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <ReactQueryDevtools initialIsOpen={false} />
       <BaseApp>
         <Component {...pageProps} />
       </BaseApp>
