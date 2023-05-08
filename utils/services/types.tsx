@@ -17,7 +17,7 @@ export type TokenInfo = {
   readonly extensions?: TokenExtensions
 }
 
-export interface TokenExtensions {
+interface TokenExtensions {
   readonly website?: string
   readonly bridgeContract?: string
   readonly assetContract?: string

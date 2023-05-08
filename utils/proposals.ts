@@ -45,7 +45,7 @@ export const compareProposals = (
   return p1.getStateTimestamp() - p2.getStateTimestamp()
 }
 
-export function getVotingStateRank(
+function getVotingStateRank(
   proposal: Proposal,
   governances: {
     [governance: string]: ProgramAccount<Governance>
