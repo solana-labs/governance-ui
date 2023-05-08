@@ -26,11 +26,13 @@ import {
   useUserCommunityTokenOwnerRecord,
   useUserCouncilTokenOwnerRecord,
 } from '@hooks/queries/tokenOwnerRecord'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 const DelegateCard = () => {
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
-  const { realm, tokenRecords, councilTokenOwnerRecords } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { tokenRecords, councilTokenOwnerRecords } = useRealm()
   const [isLoading, setLoading] = useState<boolean>(false)
   const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection.current)

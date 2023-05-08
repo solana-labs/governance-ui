@@ -14,6 +14,7 @@ import depositTokens from './depositTokens'
 import VotingPowerPct from './VotingPowerPct'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useUserCouncilTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 interface Props {
   className?: string
@@ -21,12 +22,11 @@ interface Props {
 
 export default function CouncilVotingPower(props: Props) {
   const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
-
+  const realm = useRealmQuery().data?.result
   const {
     councilMint,
     councilTokenAccount,
     ownVoterWeight,
-    realm,
     realmInfo,
   } = useRealm()
   const { proposal } = useProposal()

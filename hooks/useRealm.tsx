@@ -215,7 +215,7 @@ export default function useRealm() {
   )
   return {
     /** @deprecated use useRealmQuery */
-    realm,
+    //    realm,
     realmInfo,
     /** @deprecated just use `useRouter().query` directly... */
     symbol,

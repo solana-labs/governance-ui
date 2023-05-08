@@ -58,7 +58,8 @@ const TokenBalanceCard = ({
 }) => {
   const realmProgramId = useWalletStore((s) => s.selectedRealm.programId)
   const [hasGovPower, setHasGovPower] = useState<boolean>(false)
-  const { councilMint, mint, realm } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { councilMint, mint } = useRealm()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const isDepositVisible = (

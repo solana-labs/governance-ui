@@ -31,6 +31,7 @@ import {
   useUserCommunityTokenOwnerRecord,
   useUserCouncilTokenOwnerRecord,
 } from '@hooks/queries/tokenOwnerRecord'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 enum Type {
   Council,
@@ -118,8 +119,8 @@ export default function VotingPower(props: Props) {
   const { proposal } = useProposal()
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
-
-  const { config, councilMint, councilTokenAccount, mint, realm } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { config, councilMint, councilTokenAccount, mint } = useRealm()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const tokenRole = useWalletStore((s) => s.selectedProposal.tokenRole)

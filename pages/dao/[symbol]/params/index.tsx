@@ -26,10 +26,12 @@ import { AccountType } from '@utils/uiTypes/assets'
 import { MintMaxVoteWeightSourceType } from '@solana/spl-governance'
 import useQueryContext from '@hooks/useQueryContext'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 const Params = () => {
   const router = useRouter()
-  const { realm, mint, config, symbol } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { mint, config, symbol } = useRealm()
   const wallet = useWalletOnePointOh()
   const { fmtUrlWithCluster } = useQueryContext()
   const {

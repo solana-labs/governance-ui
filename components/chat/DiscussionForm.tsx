@@ -15,13 +15,14 @@ import {
   useUserCommunityTokenOwnerRecord,
   useUserCouncilTokenOwnerRecord,
 } from '@hooks/queries/tokenOwnerRecord'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 const DiscussionForm = () => {
   const [comment, setComment] = useState('')
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
-
-  const { ownVoterWeight, realmInfo, realm } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { ownVoterWeight, realmInfo } = useRealm()
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )

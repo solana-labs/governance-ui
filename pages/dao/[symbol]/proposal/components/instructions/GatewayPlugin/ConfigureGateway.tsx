@@ -21,6 +21,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getRegistrarPDA } from '@utils/plugin/accounts'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 interface ConfigureGatewayForm {
   governedAccount: AssetAccount | undefined
@@ -36,7 +37,7 @@ const ConfigureGatewayPlugin = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { realm } = useRealm()
+  const realm = useRealmQuery().data?.result
   const gatewayClient = useVotePluginsClientStore((s) => s.state.gatewayClient)
   const { assetAccounts } = useGovernanceAssets()
   const wallet = useWalletOnePointOh()

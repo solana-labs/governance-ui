@@ -155,7 +155,9 @@ const TokenDepositLock = ({
   inAccountDetails?: boolean
   setHasGovPower: (hasGovPower: boolean) => void
 }) => {
-  const { realm, realmTokenAccount, councilTokenAccount } = useRealm()
+  const realm = useRealmQuery().data?.result
+
+  const { realmTokenAccount, councilTokenAccount } = useRealm()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const deposits = useDepositStore((s) => s.state.deposits)

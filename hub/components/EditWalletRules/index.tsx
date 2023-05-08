@@ -29,6 +29,7 @@ import { EditWalletForm } from './Form';
 import * as gql from './gql';
 import { EditWalletSummary } from './Summary';
 import { CommunityRules, CouncilRules } from './types';
+import { useRealmQuery } from '@hooks/queries/realm';
 
 enum Step {
   Form,
@@ -62,7 +63,8 @@ export function EditWalletRules(props: Props) {
   const { fmtUrlWithCluster } = useQueryContext();
   const wallet = useWalletOnePointOh();
   const { propose } = useCreateProposal();
-  const { symbol, realm } = useRealm();
+  const realm = useRealmQuery().data?.result;
+  const { symbol } = useRealm();
 
   const [result] = useQuery(gql.getGovernanceRulesResp, {
     query: gql.getGovernanceRules,

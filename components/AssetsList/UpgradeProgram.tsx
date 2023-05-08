@@ -30,6 +30,7 @@ import { getProgramName } from '@components/instructions/programs/names'
 import useCreateProposal from '@hooks/useCreateProposal'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 interface UpgradeProgramCompactForm extends ProgramUpgradeForm {
   description: string
@@ -52,7 +53,8 @@ const UpgradeProgram = ({
   const { fmtUrlWithCluster } = useQueryContext()
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const { symbol } = router.query
-  const { realmInfo, canChooseWhoVote, realm } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { realmInfo, canChooseWhoVote } = useRealm()
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<UpgradeProgramCompactForm>({
     governedAccount: governedAccount,

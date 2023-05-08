@@ -20,6 +20,7 @@ import { getMaxVoterWeightRecord } from '@utils/plugin/accounts'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 interface CreateNftMaxVoterWeightRecord {
   governedAccount: AssetAccount | undefined
@@ -32,7 +33,9 @@ const CreateNftPluginMaxVoterWeightRecord = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { realm, realmInfo } = useRealm()
+  const realm = useRealmQuery().data?.result
+
+  const { realmInfo } = useRealm()
   const nftClient = useVotePluginsClientStore((s) => s.state.nftClient)
   const { assetAccounts } = useGovernanceAssets()
   const wallet = useWalletOnePointOh()

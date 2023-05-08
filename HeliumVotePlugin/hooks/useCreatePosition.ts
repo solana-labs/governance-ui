@@ -20,10 +20,12 @@ import {
   SequenceType,
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 export const useCreatePosition = () => {
   const { connection, wallet } = useWalletDeprecated()
-  const { realm, realmInfo } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { realmInfo } = useRealm()
   const [{ client }, registrarPk] = useVotePluginsClientStore((s) => [
     s.state.currentRealmVotingClient,
     s.state.voteStakeRegistryRegistrarPk,

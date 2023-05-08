@@ -27,6 +27,7 @@ import { PublicKey } from '@solana/web3.js'
 import { getATA } from '@utils/ataTools'
 import { sendTransactionsV3, SequenceType } from '@utils/sendTransactions'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 export interface CloseTokenAccountForm {
   governedAccount: AssetAccount | undefined
@@ -41,7 +42,7 @@ const CloseTokenAccount = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { realm } = useRealm()
+  const realm = useRealmQuery().data?.result
   const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
   const shouldBeGoverned = !!(index !== 0 && governance)

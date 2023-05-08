@@ -21,6 +21,7 @@ import Link from 'next/link'
 import { ChevronRightIcon } from '@heroicons/react/outline'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 interface Props {
   inAccountDetails?: boolean
@@ -38,7 +39,8 @@ const NftBalanceCard = ({ inAccountDetails, showView }: Props) => {
   const isLoading = useNftPluginStore((s) => s.state.isLoadingNfts)
   const connection = useWalletStore((s) => s.connection)
   const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
-  const { realm, symbol, mint, councilMint, config, realmInfo } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { symbol, mint, councilMint, config, realmInfo } = useRealm()
   const { fetchRealm } = useWalletStore((s) => s.actions)
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
 

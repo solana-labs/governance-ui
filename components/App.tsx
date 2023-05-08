@@ -9,7 +9,7 @@ import { GatewayProvider } from '@components/Gateway/GatewayProvider'
 import { usePrevious } from '@hooks/usePrevious'
 import { useVotingPlugins, vsrPluginsPks } from '@hooks/useVotingPlugins'
 import ErrorBoundary from '@components/ErrorBoundary'
-import handleGovernanceAssetsStore from '@hooks/handleGovernanceAssetsStore'
+import useHandleGovernanceAssetsStore from '@hooks/handleGovernanceAssetsStore'
 import handleRouterHistory from '@hooks/handleRouterHistory'
 import NavBar from '@components/NavBar'
 import PageBodyContainer from '@components/PageBodyContainer'
@@ -30,6 +30,7 @@ import { WalletProvider } from '@hub/providers/Wallet'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
@@ -63,7 +64,7 @@ export function App(props: Props) {
   useHydrateStore()
   handleRouterHistory()
   useVotingPlugins()
-  handleGovernanceAssetsStore()
+  useHandleGovernanceAssetsStore()
   useMembers()
   useEffect(() => {
     tokenPriceService.fetchSolanaTokenList()
@@ -76,22 +77,14 @@ export function App(props: Props) {
   const { getOwnedDeposits, resetDepositState } = useDepositStore()
 
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
-
-  const {
-    realm,
-    realmInfo,
-    symbol,
-    config,
-    ownDelegateTokenRecords,
-    ownDelegateCouncilTokenRecords,
-  } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { realmInfo, symbol, config } = useRealm()
   const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
   const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
   const prevStringifyPossibleNftsAccounts = usePrevious(
     JSON.stringify(possibleNftsAccounts)
   )
-  const walletId = wallet?.publicKey?.toBase58()
   const router = useRouter()
   const { cluster } = router.query
   const updateSerumGovAccounts = useSerumGovStore(

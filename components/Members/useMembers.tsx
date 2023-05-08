@@ -20,9 +20,11 @@ import useRealm from '@hooks/useRealm'
 import { usePrevious } from '@hooks/usePrevious'
 import useMembersStore from 'stores/useMembersStore'
 import useWalletStore from 'stores/useWalletStore'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 export default function useMembers() {
-  const { tokenRecords, councilTokenOwnerRecords, realm, config } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { tokenRecords, councilTokenOwnerRecords, config } = useRealm()
   const connection = useWalletStore((s) => s.connection)
   const previousRealmPubKey = usePrevious(realm?.pubkey.toBase58()) as string
   const setMembers = useMembersStore((s) => s.setMembers)

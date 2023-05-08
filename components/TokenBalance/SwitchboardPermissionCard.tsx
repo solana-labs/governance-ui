@@ -11,6 +11,7 @@ import { useState, useEffect } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import useSwitchboardPluginStore from 'SwitchboardVotePlugin/store/switchboardStore'
 import { sbRefreshWeight } from '../../actions/switchboardRefreshVoterWeight'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 const SwitchboardPermissionCard = () => {
   const { fmtUrlWithCluster } = useQueryContext()
@@ -25,7 +26,8 @@ const SwitchboardPermissionCard = () => {
   )
 
   const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
-  const { realm, symbol } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { symbol } = useRealm()
   const connection = useWalletStore((s) => s.connection)
 
   useEffect(() => {
