@@ -39,12 +39,14 @@ import { abbreviateAddress } from '@utils/formatting'
 import useGovernanceForGovernedAddress from '@hooks/useGovernanceForGovernedAddress'
 import useProposalCreationButtonTooltip from '@hooks/useProposalCreationButtonTooltip'
 import Tooltip from '@components/Tooltip'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 const RevokeMembership: FC<{ member: PublicKey; mint: PublicKey }> = ({
   member,
   mint,
 }) => {
-  const { symbol, realm } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { symbol } = useRealm()
 
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
@@ -97,7 +99,8 @@ const RevokeMembership: FC<{ member: PublicKey; mint: PublicKey }> = ({
 
 const MemberOverview = ({ member }: { member: Member }) => {
   const programVersion = useProgramVersion()
-  const { realm, config } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { config } = useRealm()
   const connection = useWalletStore((s) => s.connection)
   const selectedRealm = useWalletStore((s) => s.selectedRealm)
   const { mint, councilMint, proposals, symbol } = useRealm()

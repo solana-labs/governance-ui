@@ -38,6 +38,7 @@ import {
   transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig,
 } from './BaseGovernanceForm-data'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 interface NewProgramForm extends BaseGovernanceFormFieldsV2 {
   programId: string
   transferAuthority: boolean
@@ -64,9 +65,9 @@ const NewProgramForm = () => {
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
+  const realm = useRealmQuery().data?.result
   const {
     realmInfo,
-    realm,
     mint: realmMint,
     symbol,
     ownVoterWeight,

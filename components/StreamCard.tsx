@@ -22,6 +22,7 @@ import useRealm from '@hooks/useRealm'
 import { useEffect, useState } from 'react'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 const STREAMFLOW_PROGRAM_ID = 'strmRqUCoQUgGUan5YhzUZa6KqdzwX5L6FpUxfmKg5m'
 
@@ -33,7 +34,8 @@ export default function StreamCard({
   accounts: AccountMetaData[]
 }) {
   const router = useRouter()
-  const { realm, symbol } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { symbol } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
 
   const { fmtUrlWithCluster } = useQueryContext()

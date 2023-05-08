@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useEffect, useState } from 'react'
+import { useContext, useMemo, useEffect, useState } from 'react'
 import * as yup from 'yup'
 import {
   Governance,
@@ -8,7 +8,6 @@ import {
 import { validateInstruction } from '@utils/instructionTools'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
-import useRealm from '@hooks/useRealm'
 import { NewProposalContext } from '../../../new'
 import InstructionForm, {
   InstructionInput,
@@ -30,6 +29,7 @@ import { DEFAULT_VSR_ID, VsrClient } from 'VoteStakeRegistry/sdk/client'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import { heliumVsrPluginsPks, vsrPluginsPks } from '@hooks/useVotingPlugins'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 interface ConfigureVotingMintForm {
   programId: string | undefined
@@ -50,7 +50,7 @@ const VotingMintConfig = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { realm } = useRealm()
+  const realm = useRealmQuery().data?.result
   const { assetAccounts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [formErrors, setFormErrors] = useState({})

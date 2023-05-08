@@ -25,6 +25,7 @@ import { validateInstruction } from '@utils/instructionTools'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Loading from '@components/Loading'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 interface IProps {
   proposedInvestment
@@ -59,9 +60,10 @@ const EverlendDeposit = ({
   const [isDepositing, setIsDepositing] = useState(false)
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
+  const realm = useRealmQuery().data?.result
+
   const {
     realmInfo,
-    realm,
     mint,
     councilMint,
     ownVoterWeight,

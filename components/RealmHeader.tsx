@@ -9,17 +9,12 @@ import { getRealmExplorerHost } from 'tools/routing'
 
 import useMembersStore from 'stores/useMembersStore'
 import { tryParsePublicKey } from '@tools/core/pubkey'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 const RealmHeader = () => {
   const { fmtUrlWithCluster } = useQueryContext()
-  const {
-    realm,
-    realmInfo,
-    realmDisplayName,
-    symbol,
-    config,
-    vsrMode,
-  } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { realmInfo, realmDisplayName, symbol, config, vsrMode } = useRealm()
   const { REALM } = process.env
   const activeMembers = useMembersStore((s) => s.compact.activeMembers)
   const isBackNavVisible = realmInfo?.symbol !== REALM // hide backnav for the default realm

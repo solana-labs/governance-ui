@@ -21,6 +21,7 @@ import { web3 } from '@coral-xyz/anchor'
 import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import { heliumVsrPluginsPks, vsrPluginsPks } from '@hooks/useVotingPlugins'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 interface CreateVsrRegistrarForm {
   governedAccount: AssetAccount | undefined
@@ -53,7 +54,9 @@ const CreateVsrRegistrar = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { realm, realmInfo } = useRealm()
+  const realm = useRealmQuery().data?.result
+
+  const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<CreateVsrRegistrarForm>()

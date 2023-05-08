@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import {
   Governance,
   ProgramAccount,
@@ -9,7 +9,6 @@ import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import useWalletStore from 'stores/useWalletStore'
 
 import { NewProposalContext } from '../../new'
-import useRealm from '@hooks/useRealm'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, {
@@ -27,6 +26,7 @@ import { PublicKey } from '@solana/web3.js'
 import { getATA } from '@utils/ataTools'
 import { sendTransactionsV3, SequenceType } from '@utils/sendTransactions'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 export interface CloseTokenAccountForm {
   governedAccount: AssetAccount | undefined
@@ -41,7 +41,7 @@ const CloseTokenAccount = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { realm } = useRealm()
+  const realm = useRealmQuery().data?.result
   const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
   const shouldBeGoverned = !!(index !== 0 && governance)

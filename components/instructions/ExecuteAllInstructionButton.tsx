@@ -20,6 +20,7 @@ import useProgramVersion from '@hooks/useProgramVersion'
 import { abbreviateAddress } from '@utils/formatting'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 export enum PlayState {
   Played,
@@ -32,7 +33,7 @@ const useSignersNeeded = (
   proposalInstructions: ProgramAccount<ProposalTransaction>[],
   proposal: ProgramAccount<Proposal>
 ) => {
-  const { realm } = useRealm()
+  const realm = useRealmQuery().data?.result
   const programVersion = useProgramVersion()
   const { governancesArray, assetAccounts } = useGovernanceAssets()
   const [signersNeeded, setSignersNeeded] = useState<PublicKey[]>()

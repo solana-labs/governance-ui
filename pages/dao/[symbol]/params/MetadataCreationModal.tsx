@@ -29,6 +29,7 @@ import { LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { PublicKey } from '@solana/web3.js'
 import { Metaplex } from '@metaplex-foundation/js'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 interface GovernanceConfigForm {
   mintAccount: AssetAccount | undefined
@@ -49,7 +50,8 @@ const MetadataCreationModal = ({
   initialMintAccount?: AssetAccount | undefined
 }) => {
   const router = useRouter()
-  const { realm, canChooseWhoVote, symbol, realmInfo } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { canChooseWhoVote, symbol, realmInfo } = useRealm()
   const programId: PublicKey | undefined = realmInfo?.programId
 
   const { assetAccounts } = useGovernanceAssets()

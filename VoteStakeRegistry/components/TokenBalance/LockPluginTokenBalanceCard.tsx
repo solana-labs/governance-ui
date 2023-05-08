@@ -19,6 +19,7 @@ import Link from 'next/link'
 import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
 import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 const LockPluginTokenBalanceCard = ({
   proposal,
@@ -29,7 +30,9 @@ const LockPluginTokenBalanceCard = ({
 }) => {
   const [hasGovPower, setHasGovPower] = useState<boolean>(false)
   const { fmtUrlWithCluster } = useQueryContext()
-  const { councilMint, mint, realm, symbol, config } = useRealm()
+  const realm = useRealmQuery().data?.result
+
+  const { councilMint, mint, symbol, config } = useRealm()
   const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
@@ -152,7 +155,9 @@ const TokenDepositLock = ({
   inAccountDetails?: boolean
   setHasGovPower: (hasGovPower: boolean) => void
 }) => {
-  const { realm, realmTokenAccount, councilTokenAccount } = useRealm()
+  const realm = useRealmQuery().data?.result
+
+  const { realmTokenAccount, councilTokenAccount } = useRealm()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const deposits = useDepositStore((s) => s.state.deposits)

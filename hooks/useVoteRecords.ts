@@ -20,6 +20,7 @@ import { BN } from '@coral-xyz/anchor'
 import useWalletStore from 'stores/useWalletStore'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import { PublicKey } from '@solana/web3.js'
+import { useRealmQuery } from './queries/realm'
 
 export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
   const { getRpcContext } = useRpcContext()
@@ -29,7 +30,8 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
   const [tokenOwnerRecords, setTokenOwnerRecords] = useState<
     ProgramAccount<TokenOwnerRecord>[]
   >([])
-  const { mint, realm, vsrMode } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { mint, vsrMode } = useRealm()
 
   //for vsr
   const [

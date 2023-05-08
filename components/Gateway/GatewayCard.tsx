@@ -18,6 +18,7 @@ import { GatewayButton } from '@components/Gateway/GatewayButton'
 import { getRegistrarPDA, getVoterWeightRecord } from '@utils/plugin/accounts'
 import { useRecords } from '@components/Gateway/useRecords'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 // TODO lots of overlap with NftBalanceCard here - we need to separate the logic for creating the Token Owner Record
 // from the rest of this logic
@@ -32,8 +33,9 @@ const GatewayCard = () => {
   )
   const isLoading = useGatewayPluginStore((s) => s.state.isLoadingGatewayToken)
   const connection = useWalletStore((s) => s.connection)
-  const [, setTokenOwneRecordPk] = useState('')
-  const { realm, mint, councilMint, realmInfo } = useRealm()
+  const [, setTokenOwneRecordPk] = useState('') //@asktree: ?????????????????????????????????????????
+  const realm = useRealmQuery().data?.result
+  const { mint, councilMint, realmInfo } = useRealm()
   const { fetchRealm } = useWalletStore((s) => s.actions)
   const records = useRecords()
 

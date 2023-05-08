@@ -10,12 +10,12 @@ import Button from '@components/Button'
 import { createATA } from '@utils/ataTools'
 import { tryGetAta } from '@utils/validations'
 import { sendTransaction } from '@utils/send'
-import useRealm from '@hooks/useRealm'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import * as serum from '@project-serum/common'
 import TokenMintInput from '@components/inputs/TokenMintInput'
 import { TokenInfoWithoutDecimals } from '@utils/services/tokenPrice'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 const CreateAta = ({
   owner,
@@ -26,7 +26,7 @@ const CreateAta = ({
   governancePk: PublicKey
   createCallback: () => void
 }) => {
-  const { realm } = useRealm()
+  const realm = useRealmQuery().data?.result
   const refetchGovernanceAccounts = useGovernanceAssetsStore(
     (s) => s.refetchGovernanceAccounts
   )

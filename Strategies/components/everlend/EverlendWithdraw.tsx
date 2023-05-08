@@ -25,6 +25,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Loading from '@components/Loading'
 import { TreasuryStrategy } from '../../types/types'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 interface IProps {
   proposedInvestment: TreasuryStrategy & {
@@ -52,10 +53,10 @@ const EverlendWithdraw = ({
     description: '',
   })
   const [formErrors, setFormErrors] = useState({})
+  const realm = useRealmQuery().data?.result
 
   const {
     realmInfo,
-    realm,
     mint,
     councilMint,
     ownVoterWeight,
