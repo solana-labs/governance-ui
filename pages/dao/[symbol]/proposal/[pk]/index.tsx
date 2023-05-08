@@ -29,7 +29,7 @@ import ProposalWarnings from './ProposalWarnings'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const Proposal = () => {
-  const { realmInfo, symbol } = useRealm()
+  const { realmInfo, symbol, allowDiscussion } = useRealm()
   const { proposal, descriptionLink, governance } = useProposal()
   const [description, setDescription] = useState('')
   const voteData = useProposalVotes(proposal?.account)
@@ -113,7 +113,7 @@ const Proposal = () => {
             )}
             <ProposalWarnings />
             <InstructionPanel />
-            {isTwoCol && <DiscussionPanel />}
+            {isTwoCol && allowDiscussion && <DiscussionPanel />}
           </>
         ) : (
           <>
@@ -191,7 +191,7 @@ const Proposal = () => {
           <ProposalExecutionCard />
         )}
         <ProposalActionsPanel />
-        {!isTwoCol && proposal && (
+        {!isTwoCol && proposal && allowDiscussion && (
           <div className="bg-bkg-2 rounded-lg p-4 md:p-6 ">
             <DiscussionPanel />
           </div>
