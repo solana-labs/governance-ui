@@ -10,8 +10,8 @@ import {
 
 import useRpcContext from '@hooks/useRpcContext'
 import { getSignatories } from '@models/proposal'
-import useRealm from '@hooks/useRealm'
 import { fromOption } from 'fp-ts/Either'
+import { useRealmQuery } from './queries/realm'
 
 export default function useSignatories(
   proposal?: Pick<ProgramAccount<Proposal>, 'pubkey'>
@@ -21,7 +21,7 @@ export default function useSignatories(
     ProgramAccount<SignatoryRecord>[]
   >([])
   const [context, setContext] = useState<RpcContext | null>(null)
-  const { realm } = useRealm()
+  const realm = useRealmQuery().data?.result
 
   useEffect(() => {
     if (realm) {

@@ -1,23 +1,21 @@
-import useRealm from '@hooks/useRealm'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { getTokenOwnerRecordAddress } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
-import { tryParseKey } from '@tools/validators/pubkey'
-import useWalletStore from 'stores/useWalletStore'
+import { useRealmQuery } from '../realm'
+import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
 
 export const useAddressQuery_CouncilTokenOwner = () => {
-  const { realm } = useRealm()
+  const realm = useRealmQuery().data?.result
   const wallet = useWalletOnePointOh()
-  const selectedCouncilDelegator = useWalletStore(
-    (s) => s.selectedCouncilDelegate
+  const selectedCouncilDelegator = useSelectedDelegatorStore(
+    (s) => s.councilDelegator
   )
 
   // if we have a council token delegator selected (this is rare), use that. otherwise use user wallet.
   const owner =
-    selectedCouncilDelegator !== undefined &&
-    tryParseKey(selectedCouncilDelegator)
-      ? new PublicKey(selectedCouncilDelegator)
+    selectedCouncilDelegator !== undefined
+      ? selectedCouncilDelegator
       : wallet?.publicKey ?? undefined
 
   return useAddressQuery_TokenOwnerRecord(
@@ -29,17 +27,16 @@ export const useAddressQuery_CouncilTokenOwner = () => {
 }
 
 export const useAddressQuery_CommunityTokenOwner = () => {
-  const { realm } = useRealm()
+  const realm = useRealmQuery().data?.result
   const wallet = useWalletOnePointOh()
-  const selectedCommunityDelegator = useWalletStore(
-    (s) => s.selectedCommunityDelegate
+  const selectedCommunityDelegator = useSelectedDelegatorStore(
+    (s) => s.communityDelegator
   )
 
   // if we have a community token delegator selected (this is rare), use that. otherwise use user wallet.
   const owner =
-    selectedCommunityDelegator !== undefined &&
-    tryParseKey(selectedCommunityDelegator)
-      ? new PublicKey(selectedCommunityDelegator)
+    selectedCommunityDelegator !== undefined
+      ? selectedCommunityDelegator
       : // I wanted to eliminate `null` as a possible type
         wallet?.publicKey ?? undefined
 

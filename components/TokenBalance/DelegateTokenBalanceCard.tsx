@@ -6,21 +6,32 @@ import useMembersStore from 'stores/useMembersStore'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from 'hooks/useRealm'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import {
+  useUserCommunityTokenOwnerRecord,
+  useUserCouncilTokenOwnerRecord,
+} from '@hooks/queries/tokenOwnerRecord'
+import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
+import { PublicKey } from '@solana/web3.js'
 
 const DelegateBalanceCard = () => {
   const delegates = useMembersStore((s) => s.compact.delegates)
   const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
   const walletId = wallet?.publicKey?.toBase58()
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
+
   const {
     ownDelegateTokenRecords,
     ownDelegateCouncilTokenRecords,
-    ownTokenRecord,
-    ownCouncilTokenRecord,
     mint,
     councilMint,
   } = useRealm()
-  const { actions } = useWalletStore((s) => s)
+
+  const {
+    setCommunityDelegator,
+    setCouncilDelegator,
+  } = useSelectedDelegatorStore()
 
   const getCouncilTokenCount = () => {
     if (walletId && delegates?.[walletId]) {
@@ -57,11 +68,11 @@ const DelegateBalanceCard = () => {
   }
 
   const handleCouncilSelect = (councilTokenRecord: string) => {
-    actions.selectCouncilDelegate(councilTokenRecord)
+    setCouncilDelegator(new PublicKey(councilTokenRecord))
   }
 
   const handleCommunitySelect = (communityPubKey: string) => {
-    actions.selectCommunityDelegate(communityPubKey)
+    setCommunityDelegator(new PublicKey(communityPubKey))
   }
 
   if (!walletId || !delegates?.[walletId]) {

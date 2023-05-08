@@ -32,6 +32,7 @@ import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
 import BigNumber from 'bignumber.js'
 import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 interface AddMemberForm extends Omit<MintForm, 'mintAccount'> {
   description: string
@@ -56,7 +57,8 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const { symbol } = router.query
 
-  const { realmInfo, canChooseWhoVote, realm } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { realmInfo, canChooseWhoVote } = useRealm()
   const { data: mintInfo } = useMintInfoByPubkeyQuery(mintAccount.pubkey)
 
   const programId: PublicKey | undefined = realmInfo?.programId
@@ -381,7 +383,7 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
 }
 
 const useCouncilMintAccount = () => {
-  const { realm } = useRealm()
+  const realm = useRealmQuery().data?.result
   const { assetAccounts } = useGovernanceAssets()
   const councilMintAccount = useMemo(
     () =>

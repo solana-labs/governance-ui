@@ -33,6 +33,7 @@ import StreamCard from '@components/StreamCard'
 import { Metaplex, findMetadataPda } from '@metaplex-foundation/js'
 import { ConnectionContext } from '@utils/connection'
 import { abbreviateAddress } from '@utils/formatting'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 export default function InstructionCard({
   index,
@@ -48,7 +49,7 @@ export default function InstructionCard({
     governedTokenAccountsWithoutNfts,
   } = useGovernanceAssets()
   const connection = useWalletStore((s) => s.connection)
-  const realm = useWalletStore((s) => s.selectedRealm.realm)
+  const realm = useRealmQuery().data?.result
   const [descriptor, setDescriptor] = useState<InstructionDescriptor>()
   const [instructionOption, setInstructionOption] = useState<InstructionOption>(
     InstructionOptions.none

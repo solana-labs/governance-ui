@@ -48,6 +48,7 @@ import InlineNotification from '@components/InlineNotification'
 import Tooltip from '@components/Tooltip'
 import { notify } from '@utils/notifications'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 const YES = 'Yes'
 const NO = 'No'
@@ -62,7 +63,9 @@ const LockTokensModal = ({
   depositToUnlock?: DepositWithMintAccount | null
 }) => {
   const { getOwnedDeposits } = useDepositStore()
-  const { mint, realm, realmTokenAccount, realmInfo, tokenRecords } = useRealm()
+  const realm = useRealmQuery().data?.result
+
+  const { mint, realmTokenAccount, realmInfo, tokenRecords } = useRealm()
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const voteStakeRegistryRegistrar = useVotePluginsClientStore(
     (s) => s.state.voteStakeRegistryRegistrar

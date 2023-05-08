@@ -4,9 +4,11 @@ import { PublicKey } from '@solana/web3.js'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from './useRealm'
 import useWalletOnePointOh from './useWalletOnePointOh'
+import { useRealmQuery } from './queries/realm'
 
 export default function useRpcContext() {
-  const { realmInfo, realm } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { realmInfo } = useRealm()
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletOnePointOh()
   const getRpcContext = () =>

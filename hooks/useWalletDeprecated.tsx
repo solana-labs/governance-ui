@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import useWalletStore from '../stores/useWalletStore'
 import useWalletOnePointOh from './useWalletOnePointOh'
 
+/** @deprecated */
 export default function useWalletDeprecated() {
   const { connection } = useWalletStore((state) => state)
   const wallet = useWalletOnePointOh()

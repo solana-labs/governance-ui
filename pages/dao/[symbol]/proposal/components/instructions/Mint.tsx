@@ -17,6 +17,7 @@ import { getMintInstruction } from 'utils/instructionTools'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import { useDestination } from '@hooks/useDestination'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 const Mint = ({
   index,
@@ -28,7 +29,9 @@ const Mint = ({
   initialMintAccount?: AssetAccount | undefined
 }) => {
   const connection = useWalletStore((s) => s.connection)
-  const { realmInfo, realm, config } = useRealm()
+  const realm = useRealmQuery().data?.result
+
+  const { realmInfo, config } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
 
   const mintGovernancesWithMintInfo = assetAccounts

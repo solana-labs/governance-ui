@@ -31,6 +31,7 @@ import useCreateProposal from '@hooks/useCreateProposal'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { PublicKey } from '@solana/web3.js'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 const defaultFormState = {
   destinationAccount: undefined,
@@ -56,7 +57,8 @@ export const LIDO_PROGRAM_ID_DEVNET =
   'CbxVmURN74QZGuFj6qKjM8VDM8b8KKZrbPFLM2CC2hC8'
 
 const ConvertToStSol = () => {
-  const { canChooseWhoVote, realm, symbol } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { canChooseWhoVote, symbol } = useRealm()
   const { canUseTransferInstruction } = useGovernanceAssets()
   const { governedTokenAccounts } = useGovernanceAssets()
   const { fmtUrlWithCluster } = useQueryContext()

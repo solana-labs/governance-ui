@@ -15,14 +15,18 @@ import {
   useIsVoting,
   useProposalVoteRecordQuery,
 } from './hooks'
+import {
+  useUserCommunityTokenOwnerRecord,
+  useUserCouncilTokenOwnerRecord,
+} from '@hooks/queries/tokenOwnerRecord'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 /* 
   returns: undefined if loading, false if nobody can veto, 'council' if council can veto, 'community' if community can veto
 */
 export const useVetoingPop = () => {
   const { tokenRole, governance } = useWalletStore((s) => s.selectedProposal)
-  const { realm } = useRealm()
-
+  const realm = useRealmQuery().data?.result
   const vetoingPop = useMemo(() => {
     if (governance === undefined) return undefined
 
@@ -50,7 +54,9 @@ const useIsVetoable = (): undefined | boolean => {
 }
 
 const useUserVetoTokenRecord = () => {
-  const { ownTokenRecord, ownCouncilTokenRecord } = useRealm()
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
+
   const vetoingPop = useVetoingPop()
   const voterTokenRecord =
     vetoingPop === 'community' ? ownTokenRecord : ownCouncilTokenRecord

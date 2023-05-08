@@ -30,9 +30,11 @@ import { notify } from '@utils/notifications'
 import useCreateProposal from '@hooks/useCreateProposal'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 const ConvertToMsol = () => {
-  const { canChooseWhoVote, realm, symbol } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { canChooseWhoVote, symbol } = useRealm()
   const { canUseTransferInstruction } = useGovernanceAssets()
   const { governedTokenAccounts } = useGovernanceAssets()
   const { fmtUrlWithCluster } = useQueryContext()

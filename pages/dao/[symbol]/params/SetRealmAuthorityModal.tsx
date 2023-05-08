@@ -14,6 +14,7 @@ import { sendTransaction } from '@utils/send'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import GovernanceAccountSelect from '../proposal/components/GovernanceAccountSelect'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 const SetRealmAuthorityModal = ({
   closeModal,
@@ -22,7 +23,8 @@ const SetRealmAuthorityModal = ({
   closeModal: () => void
   isOpen: boolean
 }) => {
-  const { realmInfo, realm } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { realmInfo } = useRealm()
   const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
   const { fetchRealm, fetchAllRealms } = useWalletStore((s) => s.actions)

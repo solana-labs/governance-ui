@@ -12,8 +12,12 @@ import {
 import GatewayCard from '@components/Gateway/GatewayCard'
 import ClaimUnreleasedNFTs from './ClaimUnreleasedNFTs'
 import Link from 'next/link'
-import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
+import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import {
+  useUserCommunityTokenOwnerRecord,
+  useUserCouncilTokenOwnerRecord,
+} from '@hooks/queries/tokenOwnerRecord'
 
 const LockPluginTokenBalanceCard = dynamic(
   () =>
@@ -73,13 +77,10 @@ const TokenBalanceCardWrapper = ({
   proposal?: Option<Proposal>
   inAccountDetails?: boolean
 }) => {
-  const {
-    ownTokenRecord,
-    config,
-    ownCouncilTokenRecord,
-    councilTokenAccount,
-    vsrMode,
-  } = useRealm()
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
+
+  const { config, councilTokenAccount, vsrMode } = useRealm()
   const currentPluginPk = config?.account?.communityTokenConfig.voterWeightAddin
   const getTokenBalanceCard = () => {
     const isNftMode =

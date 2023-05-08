@@ -33,6 +33,7 @@ import {
 } from 'Strategies/protocols/solend'
 import { PublicKey } from '@solana/web3.js'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 const SolendWithdraw = ({
   proposedInvestment,
@@ -52,10 +53,11 @@ const SolendWithdraw = ({
   } = useGovernanceAssets()
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
+  const realm = useRealmQuery().data?.result
+
   const {
     proposals,
     realmInfo,
-    realm,
     ownVoterWeight,
     mint,
     councilMint,
