@@ -8,7 +8,6 @@ import {
 import classNames from 'classnames'
 import { ThumbUpIcon, ThumbDownIcon } from '@heroicons/react/solid'
 import { isYesVote } from '@models/voteRecords'
-import useRealm from '@hooks/useRealm'
 import useWalletStore from '../stores/useWalletStore'
 import Tooltip from './Tooltip'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'

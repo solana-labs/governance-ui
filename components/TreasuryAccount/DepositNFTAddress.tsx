@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import Input from '@components/inputs/Input'
 import { tryParseKey } from '@tools/validators/pubkey'
@@ -16,7 +16,6 @@ import {
 } from '@solana/spl-token'
 import Tooltip from '@components/Tooltip'
 import { tryGetAta } from '@utils/validations'
-import useRealm from '@hooks/useRealm'
 import { createATA } from '@utils/ataTools'
 import { abbreviateAddress } from '@utils/formatting'
 import { DuplicateIcon, ExclamationIcon } from '@heroicons/react/outline'

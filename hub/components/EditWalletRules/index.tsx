@@ -11,6 +11,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 import { getAccountName } from '@components/instructions/tools';
+import { useRealmQuery } from '@hooks/queries/realm';
 import useCreateProposal from '@hooks/useCreateProposal';
 import useQueryContext from '@hooks/useQueryContext';
 import useRealm from '@hooks/useRealm';
@@ -29,7 +30,6 @@ import { EditWalletForm } from './Form';
 import * as gql from './gql';
 import { EditWalletSummary } from './Summary';
 import { CommunityRules, CouncilRules } from './types';
-import { useRealmQuery } from '@hooks/queries/realm';
 
 enum Step {
   Form,
