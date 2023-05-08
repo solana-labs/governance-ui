@@ -38,7 +38,7 @@ import { PublicKey } from '@solana/web3.js'
 import { PromptModal } from './PromptModal'
 import { useRealmQuery } from '@hooks/queries/realm'
 
-export interface PositionCardProps {
+interface PositionCardProps {
   subDaos?: SubDaoWithMeta[]
   position: PositionWithMeta
   tokenOwnerRecordPk: PublicKey | null

@@ -224,7 +224,7 @@ export default function InstructionCard({
   )
 }
 
-export function InstructionProgram({
+function InstructionProgram({
   connection,
   programId,
 }: {
@@ -323,7 +323,7 @@ export function InstructionProgram({
   )
 }
 
-export function InstructionAccount({
+function InstructionAccount({
   endpoint,
   index,
   accountMeta,
@@ -397,7 +397,7 @@ export function InstructionAccount({
   )
 }
 
-export function InstructionData({
+function InstructionData({
   descriptor,
 }: {
   descriptor: InstructionDescriptor | undefined

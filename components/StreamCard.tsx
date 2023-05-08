@@ -24,18 +24,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 
-export interface TokenMintMetadata {
-  readonly decimals: number
-  readonly symbol: string
-}
-
-// Mint metadata for Well known tokens displayed on the instruction card
-export const MINT_METADATA = {
-  Gssm3vfi8s65R31SBdmQRq6cKeYojGgup7whkw4VCiQj: { symbol: 'STRM', decimals: 9 },
-}
-
-export const STREAMFLOW_PROGRAM_ID =
-  'strmRqUCoQUgGUan5YhzUZa6KqdzwX5L6FpUxfmKg5m'
+const STREAMFLOW_PROGRAM_ID = 'strmRqUCoQUgGUan5YhzUZa6KqdzwX5L6FpUxfmKg5m'
 
 export default function StreamCard({
   connection,

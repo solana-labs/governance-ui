@@ -3,7 +3,7 @@ import Modal from '@components/Modal'
 import Button, { SecondaryButton } from '@components/Button'
 import { notify } from '@utils/notifications'
 
-export interface PromptModalProps {
+interface PromptModalProps {
   isOpen: boolean
   title?: string
   message: string

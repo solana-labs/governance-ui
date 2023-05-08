@@ -66,7 +66,7 @@ export function createGovernanceThresholds(
   }
 }
 
-export function createDefaultRealmConfigAccount(realmPk: PublicKey) {
+function createDefaultRealmConfigAccount(realmPk: PublicKey) {
   const defaultTokenConfig = new GoverningTokenConfig({
     voterWeightAddin: undefined,
     maxVoterWeightAddin: undefined,
