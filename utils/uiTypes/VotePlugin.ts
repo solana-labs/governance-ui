@@ -198,7 +198,6 @@ export class VotingClient {
     }
 
     if (this.client instanceof HeliumVsrClient) {
-      console.log('WTF WHEN')
       const remainingAccounts: AccountData[] = []
       const [registrar] = registrarKey(
         realm.pubkey,
