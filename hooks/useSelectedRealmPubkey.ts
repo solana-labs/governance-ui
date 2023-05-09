@@ -27,7 +27,9 @@ const useSelectedRealmPubkey = () => {
       const realms: { symbol: string; realmId: string }[] =
         cluster === 'devnet' ? DEVNET_REALMS : MAINNET_REALMS
 
-      const realmPk = realms.find((x) => x.symbol === symbol)?.realmId
+      const realmPk = realms.find(
+        (x) => x.symbol.toLowerCase() === symbol.toLowerCase()
+      )?.realmId
 
       if (realmPk) return new PublicKey(realmPk)
       else throw new Error('DAO not found')
