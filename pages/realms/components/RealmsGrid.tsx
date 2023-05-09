@@ -69,7 +69,7 @@ const RealmBox = React.forwardRef<HTMLDivElement, IRealmBox>(
 
 function RealmsGrid({
   certifiedRealms,
-  unchartedRealms,
+  //unchartedRealms,
   filteredRealms,
   editing,
   searching,
