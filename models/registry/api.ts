@@ -49,6 +49,7 @@ export interface RealmInfo {
   communityMint?: PublicKey
 }
 
+/** @deprecated */
 export function getProgramVersionForRealm(realmInfo: RealmInfo) {
   // TODO: as a temp fix V1 is returned by default
   return realmInfo?.programVersion ?? PROGRAM_VERSION_V1
@@ -71,6 +72,7 @@ interface RealmInfoAsJSON
 const MAINNET_REALMS = parseCertifiedRealms(mainnetBetaRealms)
 const DEVNET_REALMS = parseCertifiedRealms(devnetRealms)
 
+/** @deprecated */
 function parseCertifiedRealms(realms: RealmInfoAsJSON[]) {
   return realms.map((realm) => ({
     ...realm,
@@ -90,7 +92,7 @@ function parseCertifiedRealms(realms: RealmInfoAsJSON[]) {
 export function getCertifiedRealmInfos({ cluster }: ConnectionContext) {
   return cluster === 'devnet' ? DEVNET_REALMS : MAINNET_REALMS
 }
-
+/** @deprecated */
 export function getCertifiedRealmInfo(
   realmId: string,
   connection: ConnectionContext
@@ -176,6 +178,7 @@ const EXCLUDED_REALMS = new Map<string, string>([
 ])
 
 // Returns all known realms from all known spl-gov instances which are not certified
+/** @deprecated */
 export async function getUnchartedRealmInfos(connection: ConnectionContext) {
   const certifiedRealms = getCertifiedRealmInfos(connection)
 
@@ -214,7 +217,7 @@ export async function getUnchartedRealmInfos(connection: ConnectionContext) {
     })
     .filter(Boolean) as readonly RealmInfo[]
 }
-
+/** @deprecated */
 export function createUnchartedRealmInfo(realm: UnchartedRealm) {
   return {
     symbol: realm.name,
