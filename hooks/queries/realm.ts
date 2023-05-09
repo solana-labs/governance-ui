@@ -1,10 +1,9 @@
+import useSelectedRealmPubkey from '@hooks/useSelectedRealmPubkey'
 import { EndpointTypes } from '@models/types'
 import { getRealm } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
-import { tryParsePublicKey } from '@tools/core/pubkey'
 import asFindable from '@utils/queries/asFindable'
-import { useRouter } from 'next/router'
 import useWalletStore from 'stores/useWalletStore'
 
 export const realmQueryKeys = {
@@ -17,9 +16,7 @@ export const realmQueryKeys = {
 
 export const useRealmQuery = () => {
   const connection = useWalletStore((s) => s.connection)
-  const router = useRouter()
-  const { symbol } = router.query
-  const pubkey = tryParsePublicKey(symbol as string)
+  const pubkey = useSelectedRealmPubkey()
 
   const enabled = pubkey !== undefined
   const query = useQuery({
@@ -30,6 +27,8 @@ export const useRealmQuery = () => {
       if (!enabled) throw new Error()
       return asFindable(getRealm)(connection.current, pubkey)
     },
+    staleTime: 3600000, // 1 hour
+    cacheTime: 3600000 * 24 * 10,
     enabled,
   })
 
