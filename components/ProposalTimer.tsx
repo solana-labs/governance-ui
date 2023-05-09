@@ -122,16 +122,18 @@ const ProposalTimer = ({
                 The amount of time a voter has to approve or deny a proposal.
               </div>
             </div>
-            <div className="flex flex-col gap-1">
-              <div className="flex gap-1 items-center">
-                <div className="rounded-sm h-2 w-2 bg-amber-400 inline-block" />
-                <div className="text-white">Cool-Off Voting Time</div>
+            {governance.config.votingCoolOffTime !== 0 && (
+              <div className="flex flex-col gap-1">
+                <div className="flex gap-1 items-center">
+                  <div className="rounded-sm h-2 w-2 bg-amber-400 inline-block" />
+                  <div className="text-white">Cool-Off Voting Time</div>
+                </div>
+                <div>
+                  After the unrestricted voting time, this is the amount of time
+                  a voter has to deny, veto, or withdraw a vote on a proposal.
+                </div>
               </div>
-              <div>
-                After the unrestricted voting time, this is the amount of time a
-                voter has to deny, veto, or withdraw a vote on a proposal.
-              </div>
-            </div>
+            )}
           </div>
         }
       >

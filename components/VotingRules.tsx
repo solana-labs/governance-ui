@@ -83,7 +83,7 @@ const VotingRules = () => {
         <h3 className="mb-0">Voting Rules</h3>
         <ChevronUp
           size={20}
-          className={clsx('transition-transform', showMore && 'rotate-180')}
+          className={clsx('transition-transform', !showMore && 'rotate-180')}
         />
       </div>
       <div /** Badges */ className="flex gap-1 flex-wrap text-xs">
@@ -101,12 +101,12 @@ const VotingRules = () => {
           </div>
         )}
         <div className="bg-neutral-900 rounded-sm py-1 px-2 text-neutral-300 flex items-center gap-1">
-          <ScalesTipped /> {tipping ? TIPPING[tipping] : null}
+          <ScalesTipped /> {tipping !== undefined ? TIPPING[tipping] : null}
         </div>
       </div>
       <div
         /** wallet rules */
-        className={clsx(showMore && 'hidden', 'text-xs flex flex-col gap-5')}
+        className={clsx(!showMore && 'hidden', 'text-xs flex flex-col gap-5')}
       >
         <div className="grid grid-cols-2 gap-4">
           <div className="col-span-2">
@@ -152,7 +152,7 @@ const VotingRules = () => {
           )}
           <div>
             <div className="text-neutral-500">Vote Tipping</div>
-            <div>{tipping ? TIPPING[tipping] : null}</div>
+            <div>{tipping !== undefined ? TIPPING[tipping] : null}</div>
           </div>
         </div>
         <div className=" h-0 border border-neutral-900" />
@@ -163,60 +163,67 @@ const VotingRules = () => {
               <div>{formatDays(voteDurationDays)}</div>
             )}
           </div>
-          <div>
-            <div className="text-neutral-500">
-              Unrestricted <br />
-              <div className="flex items-center gap-1">
-                <div>Voting Time </div>
-                <div className="">
-                  <Tooltip
-                    content={
-                      'The amount of time a voter has to approve or deny a proposal.'
-                    }
-                  >
-                    <InformationFilled className="cursor-help h-3 w-3" />
-                  </Tooltip>
+          {(governance?.account.config.votingCoolOffTime ?? 0) !== 0 && (
+            <>
+              <div>
+                <div className="text-neutral-500">
+                  Unrestricted <br />
+                  <div className="flex items-center gap-1">
+                    <div>Voting Time </div>
+                    <div className="">
+                      <Tooltip
+                        content={
+                          'The amount of time a voter has to approve or deny a proposal.'
+                        }
+                      >
+                        <InformationFilled className="cursor-help h-3 w-3" />
+                      </Tooltip>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="rounded-sm h-1 w-1 bg-sky-500 inline-block" />
+                  <div>
+                    {governance?.account.config.baseVotingTime !== undefined
+                      ? formatDays(
+                          governance.account.config.baseVotingTime /
+                            secondsInDay
+                        )
+                      : null}
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="rounded-sm h-1 w-1 bg-sky-500 inline-block" />
+
               <div>
-                {governance?.account.config.baseVotingTime !== undefined
-                  ? formatDays(
-                      governance.account.config.baseVotingTime / secondsInDay
-                    )
-                  : null}
-              </div>
-            </div>
-          </div>
-          <div>
-            <div className="text-neutral-500">
-              Cool-off <br />
-              <div className="flex items-center gap-1">
-                <div>Voting Time </div>
-                <div className="">
-                  <Tooltip
-                    content={
-                      'After the unrestricted voting time, this is the amount of time a voter has to deny, veto, or withdraw a vote on a proposal.'
-                    }
-                  >
-                    <InformationFilled className="cursor-help h-3 w-3" />
-                  </Tooltip>
+                <div className="text-neutral-500">
+                  Cool-off <br />
+                  <div className="flex items-center gap-1">
+                    <div>Voting Time </div>
+                    <div className="">
+                      <Tooltip
+                        content={
+                          'After the unrestricted voting time, this is the amount of time a voter has to deny, veto, or withdraw a vote on a proposal.'
+                        }
+                      >
+                        <InformationFilled className="cursor-help h-3 w-3" />
+                      </Tooltip>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="rounded-sm h-1 w-1 bg-amber-400 inline-block" />
+                  <div>
+                    {governance?.account.config.votingCoolOffTime !== undefined
+                      ? formatDays(
+                          governance.account.config.votingCoolOffTime /
+                            secondsInDay
+                        )
+                      : null}
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="rounded-sm h-1 w-1 bg-amber-400 inline-block" />
-              <div>
-                {governance?.account.config.votingCoolOffTime !== undefined
-                  ? formatDays(
-                      governance.account.config.votingCoolOffTime / secondsInDay
-                    )
-                  : null}
-              </div>
-            </div>
-          </div>
+            </>
+          )}
         </div>
         {governance?.account !== undefined &&
         proposal?.account !== undefined ? (
