@@ -1,6 +1,10 @@
-import { useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 
-import { getCertifiedRealmInfos, RealmInfo } from '../../models/registry/api'
+import {
+  getCertifiedRealmInfos,
+  getUnchartedRealmInfos,
+  RealmInfo,
+} from '../../models/registry/api'
 
 import { SearchIcon } from '@heroicons/react/outline'
 import useWalletStore from '../../stores/useWalletStore'
@@ -39,16 +43,11 @@ const Realms = () => {
       connection &&
       ((routeHasClusterInPath && cluster) || !routeHasClusterInPath)
     ) {
-      const [
-        certifiedRealms, //uncharteredRealms
-      ] = await Promise.all([
+      const [certifiedRealms, uncharteredRealms] = await Promise.all([
         getCertifiedRealmInfos(connection),
-        // getUnchartedRealmInfos(connection),
+        getUnchartedRealmInfos(connection),
       ])
-      const allRealms = [
-        ...certifiedRealms,
-        //...uncharteredRealms
-      ]
+      const allRealms = [...certifiedRealms, ...uncharteredRealms]
       setRealms(sortDaos(allRealms))
       setFilteredRealms(sortDaos(allRealms))
       setIsLoadingRealms(false)
