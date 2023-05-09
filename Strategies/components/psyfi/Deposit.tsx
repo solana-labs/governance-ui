@@ -38,7 +38,6 @@ import { PsyFiStrategy } from 'Strategies/types/types'
 import { usePsyFiProgram } from './hooks/usePsyFiProgram'
 import { notify } from '@utils/notifications'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useRealmQuery } from '@hooks/queries/realm'
 
 const SOL_BUFFER = 0.02
 
@@ -55,10 +54,9 @@ export const Deposit: React.FC<{
 }) => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
-  const realm = useRealmQuery().data?.result
-
   const {
     realmInfo,
+    realm,
     ownVoterWeight,
     mint,
     councilMint,

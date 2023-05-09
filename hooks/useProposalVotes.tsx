@@ -5,13 +5,10 @@ import { calculatePct, fmtTokenAmount } from '../utils/formatting'
 import { useMaxVoteRecord } from './useMaxVoteRecord'
 import useProgramVersion from './useProgramVersion'
 import useRealm from './useRealm'
-import { useRealmQuery } from './queries/realm'
 
 // TODO support council plugins
 export default function useProposalVotes(proposal?: Proposal) {
-  const realm = useRealmQuery().data?.result
-
-  const { mint, councilMint, governances } = useRealm()
+  const { realm, mint, councilMint, governances } = useRealm()
   const maxVoteRecord = useMaxVoteRecord()
   const governance =
     proposal && governances[proposal.governance?.toBase58()]?.account

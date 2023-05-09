@@ -9,6 +9,7 @@ import { BN } from '@coral-xyz/anchor'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { ConnectionContext } from '@utils/connection'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
+import numbro from 'numbro'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { Pool } from '@everlend/general-pool'
 import axios from 'axios'
@@ -162,4 +163,19 @@ export const calcUserTokenBalanceByPoolToken = (
       ? Math.ceil(tokenBalanceByDecimalMultiplier)
       : Math.round(tokenBalanceByDecimalMultiplier)) / decimalMultiplier
   )
+}
+
+export const convertToCurrency = (
+  amount: number,
+  rate: number,
+  mantissa?: number
+): number => {
+  if (mantissa) {
+    return Number(
+      numbro(amount * rate).format({
+        mantissa,
+      })
+    )
+  }
+  return amount * rate
 }

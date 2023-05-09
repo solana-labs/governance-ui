@@ -35,7 +35,7 @@ export function precision(a) {
   return p
 }
 
-const fmtMsToTime = (milliseconds: number) => {
+export const fmtMsToTime = (milliseconds: number) => {
   let seconds = Math.floor(milliseconds / 1000)
   let minutes = Math.floor(seconds / 60)
   let hours = Math.floor(minutes / 60)

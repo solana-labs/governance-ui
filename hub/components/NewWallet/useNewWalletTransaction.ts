@@ -10,12 +10,15 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore';
 import useWalletStore from 'stores/useWalletStore';
 
 import { rules2governanceConfig } from '../EditWalletRules/createTransaction';
-import { useRealmQuery } from '@hooks/queries/realm';
 import useProgramVersion from '@hooks/useProgramVersion';
 import useRealm from '@hooks/useRealm';
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh';
 import { trySentryLog } from '@utils/logs';
-import { SequenceType, sendTransactionsV3 } from '@utils/sendTransactions';
+import {
+  SequenceType,
+  sendTransactionsV3,
+  txBatchesToInstructionSetWithSigners,
+} from '@utils/sendTransactions';
 
 import useGovernanceDefaults from './useGovernanceDefaults';
 
@@ -28,8 +31,8 @@ const useNewWalletCallback = (
     (s) => s.state.currentRealmVotingClient,
   );
   const programVersion = useProgramVersion();
-  const realm = useRealmQuery().data?.result;
-  const { ownVoterWeight } = useRealm();
+
+  const { realm, ownVoterWeight } = useRealm();
 
   const tokenOwnerRecord = ownVoterWeight.canCreateGovernanceUsingCouncilTokens()
     ? ownVoterWeight.councilTokenRecord

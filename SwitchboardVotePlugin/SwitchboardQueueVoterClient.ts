@@ -18,10 +18,10 @@ export const SWITCHBOARD_GRANT_AUTHORITY = new PublicKey(
 export const SWITCHBOARD_REVOKE_AUTHORITY = new PublicKey(
   '9rkK8T8wnYXZ1SSC6g2ZhbnyL5K5v546XSbNJv7og87b'
 )
-/* 
-const QUEUE_LIST: PublicKey[] = [
+
+export const QUEUE_LIST: PublicKey[] = [
   new PublicKey('7QN4mJo9U58XMeHEyfY6ckKxAkVLkqVtcWjwgNU6xaE'),
-] */
+]
 
 export class SwitchboardQueueVoterClient {
   constructor(public program: Program<Switchboard>, public devnet?: boolean) {}

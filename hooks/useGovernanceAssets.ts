@@ -4,7 +4,6 @@ import { Instructions, PackageEnum } from '@utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import useRealm from './useRealm'
 import { heliumVsrPluginsPks, vsrPluginsPks } from './useVotingPlugins'
-import { useRealmQuery } from './queries/realm'
 
 type Package = {
   name: string
@@ -38,9 +37,7 @@ export type InstructionType = {
 }
 
 export default function useGovernanceAssets() {
-  const realm = useRealmQuery().data?.result
-
-  const { ownVoterWeight, symbol, governances, config } = useRealm()
+  const { ownVoterWeight, realm, symbol, governances, config } = useRealm()
 
   const governedTokenAccounts: AssetAccount[] = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
@@ -225,10 +222,10 @@ export default function useGovernanceAssets() {
     [PackageEnum.VsrPlugin]: {
       name: 'Vsr Plugin',
       isVisible:
-        currentPluginPk &&
-        [...vsrPluginsPks, ...heliumVsrPluginsPks].includes(
-          currentPluginPk.toBase58()
-        ),
+        currentPluginPk && [
+          ...vsrPluginsPks,
+          ...heliumVsrPluginsPks
+        ].includes(currentPluginPk.toBase58()),
     },
   }
 

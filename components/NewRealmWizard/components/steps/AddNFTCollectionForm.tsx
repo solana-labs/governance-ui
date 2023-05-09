@@ -116,7 +116,7 @@ export interface AddNFTCollection {
   numberOfNFTs: number
 }
 
-interface NFT_Creator {
+export interface NFT_Creator {
   address: string
   verified: number
   share: number
@@ -127,7 +127,7 @@ interface NFT_Attributes {
   trait_type: string
   value: number
 }
-interface NFT {
+export interface NFT {
   name: string
   symbol: string
   uri: string

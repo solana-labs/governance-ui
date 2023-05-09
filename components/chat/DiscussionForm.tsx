@@ -11,18 +11,16 @@ import Tooltip from '@components/Tooltip'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import {
-  useUserCommunityTokenOwnerRecord,
-  useUserCouncilTokenOwnerRecord,
-} from '@hooks/queries/tokenOwnerRecord'
-import { useRealmQuery } from '@hooks/queries/realm'
 
 const DiscussionForm = () => {
   const [comment, setComment] = useState('')
-  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
-  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
-  const realm = useRealmQuery().data?.result
-  const { ownVoterWeight, realmInfo } = useRealm()
+  const {
+    ownVoterWeight,
+    realmInfo,
+    realm,
+    ownTokenRecord,
+    ownCouncilTokenRecord,
+  } = useRealm()
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )

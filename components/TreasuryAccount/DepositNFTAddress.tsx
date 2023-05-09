@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import Input from '@components/inputs/Input'
 import { tryParseKey } from '@tools/validators/pubkey'
@@ -16,6 +16,7 @@ import {
 } from '@solana/spl-token'
 import Tooltip from '@components/Tooltip'
 import { tryGetAta } from '@utils/validations'
+import useRealm from '@hooks/useRealm'
 import { createATA } from '@utils/ataTools'
 import { abbreviateAddress } from '@utils/formatting'
 import { DuplicateIcon, ExclamationIcon } from '@heroicons/react/outline'
@@ -31,12 +32,11 @@ import {
   SftWithToken,
 } from '@metaplex-foundation/js/dist/types/plugins/nftModule/models'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useRealmQuery } from '@hooks/queries/realm'
 const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
 
   const wallet = useWalletOnePointOh()
-  const realm = useRealmQuery().data?.result
+  const { realm } = useRealm()
   const connected = !!wallet?.connected
   const [form, setForm] = useState({
     mint: '',

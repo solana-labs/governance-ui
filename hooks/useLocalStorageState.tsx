@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect, useCallback } from 'react'
 
 const localStorageListeners = {}
 
-function useLocalStorageStringState(
+export function useLocalStorageStringState(
   key: string,
   defaultState: string | null = null
 ): [string | null, (newState: string | null) => void] {

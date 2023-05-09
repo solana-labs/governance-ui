@@ -1,4 +1,5 @@
-type CountryMetadata = {
+/* eslint-disable sort-keys */
+export type CountryMetadata = {
   name: string
   dialCode: string
   flag: string

@@ -130,7 +130,6 @@ import SetMintAuthority from './components/instructions/SetMintAuthroity'
 import LiquidityStakingOption from './components/instructions/Dual/LiquidityStakingOption'
 import InitStrike from './components/instructions/Dual/InitStrike'
 import IdlSetBuffer from './components/instructions/Mango/MangoV4/IdlSetBuffer'
-import { useRealmQuery } from '@hooks/queries/realm'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -161,9 +160,7 @@ const New = () => {
   const router = useRouter()
   const { handleCreateProposal } = useCreateProposal()
   const { fmtUrlWithCluster } = useQueryContext()
-  const realm = useRealmQuery().data?.result
-
-  const { symbol, realmDisplayName, canChooseWhoVote } = useRealm()
+  const { symbol, realm, realmDisplayName, canChooseWhoVote } = useRealm()
   const { availableInstructions } = useGovernanceAssets()
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const [voteByCouncil, setVoteByCouncil] = useState(false)

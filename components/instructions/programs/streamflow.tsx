@@ -22,7 +22,7 @@ import {
 } from '@components/InstructionDataUI'
 import { tryGetMint } from '@utils/tokens'
 
-const PERIOD = {
+export const PERIOD = {
   SECOND: 1,
   MINUTE: 60,
   HOUR: 3600,
@@ -33,9 +33,9 @@ const PERIOD = {
   YEAR: 365 * 24 * 3600, // 365 days
 }
 
-const DEFAULT_DECIMAL_PLACES = 2
+export const DEFAULT_DECIMAL_PLACES = 2
 
-const formatPeriodOfTime = (period: number): string => {
+export const formatPeriodOfTime = (period: number): string => {
   if (!period) return '0 seconds'
 
   const years = period / PERIOD.YEAR
@@ -108,12 +108,12 @@ function deserializeStreamInformationFromData(
   }
 }
 
-interface TokenMintMetadata {
+export interface TokenMintMetadata {
   readonly decimals: number
   readonly symbol: string
 }
 
-async function getMintMetadata(
+export async function getMintMetadata(
   connection: Connection,
   tokenMintPk: PublicKey
 ): Promise<TokenMintMetadata> {
@@ -130,7 +130,7 @@ async function getMintMetadata(
 }
 
 // Mint metadata for Well known tokens displayed on the instruction card
-const MINT_METADATA = {
+export const MINT_METADATA = {
   Gssm3vfi8s65R31SBdmQRq6cKeYojGgup7whkw4VCiQj: { symbol: 'STRM', decimals: 9 },
 }
 

@@ -5,16 +5,15 @@ import Tooltip from '@components/Tooltip'
 import { LinkButton } from '@components/Button'
 import useQueryContext from '@hooks/useQueryContext'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useRealmQuery } from '@hooks/queries/realm'
 
 export const NEW_TREASURY_ROUTE = `/treasury/new`
 
 export default function NewWalletButton() {
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
-  const realm = useRealmQuery().data?.result
   const {
     ownVoterWeight,
+    realm,
     symbol,
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,

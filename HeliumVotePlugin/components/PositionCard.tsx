@@ -36,9 +36,8 @@ import { useClaimDelegatedPositionRewards } from '../hooks/useClaimDelegatedPosi
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { PublicKey } from '@solana/web3.js'
 import { PromptModal } from './PromptModal'
-import { useRealmQuery } from '@hooks/queries/realm'
 
-interface PositionCardProps {
+export interface PositionCardProps {
   subDaos?: SubDaoWithMeta[]
   position: PositionWithMeta
   tokenOwnerRecordPk: PublicKey | null
@@ -56,8 +55,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
   const [isExtendModalOpen, setIsExtendModalOpen] = useState(false)
   const [isSplitModalOpen, setIsSplitModalOpen] = useState(false)
   const [isDelegateModalOpen, setIsDelegateModalOpen] = useState(false)
-  const realm = useRealmQuery().data?.result
-  const { mint, realmInfo } = useRealm()
+  const { mint, realm, realmInfo } = useRealm()
   const [isLoading, positions, getPositions] = useHeliumVsrStore((s) => [
     s.state.isLoading,
     s.state.positions,

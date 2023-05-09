@@ -8,7 +8,6 @@ import { PublicKey } from '@solana/web3.js'
 import { AddressImage, DisplayAddress } from '@cardinal/namespaces-components'
 import { Member } from '@utils/uiTypes/members'
 import { MintInfo } from '@solana/spl-token'
-import { useRealmQuery } from '@hooks/queries/realm'
 
 interface MembersTabsProps {
   activeTab: Member
@@ -21,8 +20,7 @@ const MembersTabs: FunctionComponent<MembersTabsProps> = ({
   onChange,
   tabs,
 }) => {
-  const realm = useRealmQuery().data?.result
-  const { mint, councilMint } = useRealm()
+  const { mint, councilMint, realm } = useRealm()
   const tokenName = realm
     ? tokenPriceService.getTokenInfo(realm?.account.communityMint.toBase58())
         ?.symbol

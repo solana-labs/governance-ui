@@ -18,7 +18,6 @@ import { getTreasuryAccountItemInfoV2 } from '@utils/treasuryTools'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import Tooltip from '@components/Tooltip'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useRealmQuery } from '@hooks/queries/realm'
 
 export const NEW_TREASURY_ROUTE = `/treasury/new`
 
@@ -30,10 +29,10 @@ const Treasury = () => {
   } = useGovernanceAssets()
   const { setCurrentAccount } = useTreasuryAccountStore()
   const connection = useWalletStore((s) => s.connection)
-  const realm = useRealmQuery().data?.result
   const {
     ownVoterWeight,
     symbol,
+    realm,
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()

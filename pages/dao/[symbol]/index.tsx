@@ -38,12 +38,6 @@ import ProposalSorting, {
   Sorting,
 } from '@components/ProposalSorting'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import {
-  useUserCommunityTokenOwnerRecord,
-  useUserCouncilTokenOwnerRecord,
-} from '@hooks/queries/tokenOwnerRecord'
-import { useRealmQuery } from '@hooks/queries/realm'
-import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
 
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
@@ -62,11 +56,8 @@ const DepositLabel = dynamic(
 
 const REALM = () => {
   const pagination = useRef<{ setPage: (val) => void }>(null)
-  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
-  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
-  const realm = useRealmQuery().data?.result
-
   const {
+    realm,
     realmInfo,
     mint,
     councilMint,
@@ -74,7 +65,9 @@ const REALM = () => {
     governances,
     tokenRecords,
     ownVoterWeight,
+    ownTokenRecord,
     councilTokenOwnerRecords,
+    ownCouncilTokenRecord,
   } = useRealm()
   const proposalsPerPage = 20
   const [filters, setFilters] = useState<Filters>(InitialFilters)
@@ -104,12 +97,11 @@ const REALM = () => {
   const communityDelegateVoteRecordsByProposal = useWalletStore(
     (s) => s.communityDelegateVoteRecordsByProposal
   )
-
-  const selectedCouncilDelegate = useSelectedDelegatorStore(
-    (s) => s.councilDelegator
+  const selectedCouncilDelegate = useWalletStore(
+    (s) => s.selectedCouncilDelegate
   )
-  const selectedCommunityDelegate = useSelectedDelegatorStore(
-    (s) => s.communityDelegator
+  const selectedCommunityDelegate = useWalletStore(
+    (s) => s.selectedCommunityDelegate
   )
 
   const getCurrentVoteRecKeyVal = () => {
@@ -286,12 +278,12 @@ const REALM = () => {
           realm.account.communityMint.toBase58()
             ? tokenRecords[
                 selectedCommunityDelegate
-                  ? selectedCommunityDelegate.toString()
+                  ? selectedCommunityDelegate
                   : wallet.publicKey!.toBase58()
               ]
             : councilTokenOwnerRecords[
                 selectedCouncilDelegate
-                  ? selectedCouncilDelegate.toString()
+                  ? selectedCouncilDelegate
                   : wallet.publicKey!.toBase58()
               ]
 

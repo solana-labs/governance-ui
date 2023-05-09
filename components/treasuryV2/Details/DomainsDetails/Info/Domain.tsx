@@ -13,7 +13,6 @@ import useQueryContext from '@hooks/useQueryContext'
 
 import { Domain as DomainModel } from '@models/treasury/Domain'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useRealmQuery } from '@hooks/queries/realm'
 
 interface Props {
   domain: DomainModel
@@ -23,9 +22,9 @@ const Domain: React.FC<Props> = (props) => {
   const { fmtUrlWithCluster } = useQueryContext()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
-  const realm = useRealmQuery().data?.result
   const {
     symbol,
+    realm,
     governances,
     ownVoterWeight,
     toManyCommunityOutstandingProposalsForUser,

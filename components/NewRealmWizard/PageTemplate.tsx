@@ -14,7 +14,7 @@ import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
 import { PublicKey } from '@solana/web3.js'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
-const Section = ({ children }) => {
+export const Section = ({ children }) => {
   return (
     <div className="w-full mx-auto lg:w-5/6  max-w-[770px] px-0 pb-[130px] sm:pb-[250px] relative min-h-[calc(100vh_-_75px)]">
       {children}

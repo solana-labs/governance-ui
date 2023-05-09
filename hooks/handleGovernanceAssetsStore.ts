@@ -3,16 +3,19 @@ import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import useWalletStore from 'stores/useWalletStore'
 import { usePrevious } from './usePrevious'
 import useRealm from './useRealm'
-import { useRealmQuery } from './queries/realm'
 
-export default function useHandleGovernanceAssetsStore() {
-  const realm = useRealmQuery().data?.result
-  const { governances } = useRealm()
+export default function handleGovernanceAssetsStore() {
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
+  const { governances, realm } = useRealm()
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const previousStringifyGovernances = usePrevious(
     JSON.stringify(Object.keys(governances))
   )
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const connection = useWalletStore((s) => s.connection)
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const { setGovernancesArray } = useGovernanceAssetsStore()
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   useEffect(() => {
     if (
       realm &&

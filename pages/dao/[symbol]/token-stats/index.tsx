@@ -42,7 +42,6 @@ import {
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { abbreviateAddress } from '@utils/formatting'
 import { getDepositType } from 'VoteStakeRegistry/tools/deposits'
-import { useRealmQuery } from '@hooks/queries/realm'
 
 const VestingVsTime = dynamic(
   () => import('VoteStakeRegistry/components/LockTokenStats/VestingVsTime'),
@@ -58,9 +57,7 @@ const mainMangoVaultPk = 'Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z'
 const LockTokenStats = () => {
   const walletsPerPage = 10
   const pagination = useRef<{ setPage: (val) => void }>(null)
-  const realm = useRealmQuery().data?.result
-
-  const { realmInfo, symbol, mint, proposals } = useRealm()
+  const { realmInfo, realm, symbol, mint, proposals } = useRealm()
   const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
   const voteStakeRegistryRegistrarPk = useVotePluginsClientStore(
     (s) => s.state.voteStakeRegistryRegistrarPk

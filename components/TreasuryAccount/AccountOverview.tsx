@@ -40,10 +40,6 @@ import tokenPriceService from '@utils/services/tokenPrice'
 import { EVERLEND } from '../../Strategies/protocols/everlend/tools'
 import { findAssociatedTokenAccount } from '@everlend/common'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import {
-  useUserCommunityTokenOwnerRecord,
-  useUserCouncilTokenOwnerRecord,
-} from '@hooks/queries/tokenOwnerRecord'
 
 type InvestmentType = TreasuryStrategy & {
   investedAmount: number
@@ -51,9 +47,7 @@ type InvestmentType = TreasuryStrategy & {
 
 const AccountOverview = () => {
   const router = useRouter()
-  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
-  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
-
+  const { ownTokenRecord, ownCouncilTokenRecord } = useRealm()
   const {
     governedTokenAccounts,
     auxiliaryTokenAccounts,

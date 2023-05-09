@@ -2,11 +2,10 @@ import useVotePluginsClientStore from '../../stores/useVotePluginsClientStore'
 import { PublicKey } from '@solana/web3.js'
 import { useCallback, useEffect, useState } from 'react'
 import useWalletStore from '../../stores/useWalletStore'
+import useRealm from '@hooks/useRealm'
 import { getVoterWeightRecord as getPluginVoterWeightRecord } from '@utils/plugin/accounts'
 import { Client } from '@utils/uiTypes/VotePlugin'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
-import { useRealmQuery } from '@hooks/queries/realm'
 
 // A data structure that indicates if a record that a plugin relies on (token owner record or voter weight recird)
 // exists on chain or not - if not, it will trigger the "Join" button to create it.
@@ -29,8 +28,10 @@ export const useRecords = (): AvailableRecordAccounts => {
   )
   const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
-  const realm = useRealmQuery().data?.result
-  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const { tokenRecords, realm } = useRealm()
+  const ownTokenRecord = wallet?.publicKey
+    ? tokenRecords[wallet.publicKey!.toBase58()]
+    : null
 
   // TODO replace these with useDispatch
   const [tokenOwnerRecord, setTokenOwnerRecord] = useState<AvailableRecord>({

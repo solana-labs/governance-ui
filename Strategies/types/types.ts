@@ -1,4 +1,12 @@
-import { PublicKey } from '@solana/web3.js'
+import {
+  ProgramAccount,
+  Realm,
+  RpcContext,
+  TokenOwnerRecord,
+} from '@solana/spl-governance'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { VotingClient } from '@utils/uiTypes/VotePlugin'
+import { AssetAccount } from '@utils/uiTypes/assets'
 import {
   CreateSolendStrategyParams,
   SolendSubStrategy,
@@ -26,12 +34,12 @@ export interface TreasuryStrategy {
   /** When true, does not display protocol or name */
   noProtocol?: boolean
 }
-/* 
+
 export type MangoStrategy = TreasuryStrategy & {
   //async function that pass all props needed to create proposal
   // if promise is successfully resolved it will automatically redirect to created proposal
   createProposalFcn: HandleCreateProposalWithStrategy
-} */
+}
 
 export type SolendStrategy = TreasuryStrategy & {
   reserves: Array<SolendSubStrategy>
@@ -54,8 +62,7 @@ export type EverlendStrategy = TreasuryStrategy & {
   rateEToken: number
 }
 
-/* 
-type HandleCreateProposalWithStrategy = (
+export type HandleCreateProposalWithStrategy = (
   { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
   handledMint: string,
   form: MNGODepositForm,
@@ -67,9 +74,14 @@ type HandleCreateProposalWithStrategy = (
   prerequisiteInstructions: TransactionInstruction[],
   isDraft: boolean,
   client?: VotingClient
-) => Promise<PublicKey> */
-/* 
-type MNGODepositForm = {
+) => Promise<PublicKey>
+
+export interface NameVal {
+  name: string
+  val: string | null
+}
+
+export type MNGODepositForm = {
   mintAmount: number
   delegateDeposit: boolean
   delegateAddress: string
@@ -78,4 +90,3 @@ type MNGODepositForm = {
   description: string
   proposalCount: number
 }
- */
