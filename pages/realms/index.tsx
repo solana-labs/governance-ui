@@ -43,11 +43,16 @@ const Realms = () => {
       connection &&
       ((routeHasClusterInPath && cluster) || !routeHasClusterInPath)
     ) {
-      const [certifiedRealms, uncharteredRealms] = await Promise.all([
+      const [
+        certifiedRealms, //uncharteredRealms
+      ] = await Promise.all([
         getCertifiedRealmInfos(connection),
-        getUnchartedRealmInfos(connection),
+        // getUnchartedRealmInfos(connection),
       ])
-      const allRealms = [...certifiedRealms, ...uncharteredRealms]
+      const allRealms = [
+        ...certifiedRealms,
+        //...uncharteredRealms
+      ]
       setRealms(sortDaos(allRealms))
       setFilteredRealms(sortDaos(allRealms))
       setIsLoadingRealms(false)
