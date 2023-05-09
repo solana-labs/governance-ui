@@ -11,9 +11,12 @@ export const tokenMetadataQueryKeys = {
   all: (cluster: string) => [cluster, 'TokenMetadata'],
   byMint: (cluster: string, k: PublicKey) => [
     ...tokenMetadataQueryKeys.all(cluster),
-    k.toString(),
+    k,
   ],
-  byMints: (cluster: string, k: PublicKey[]) => [...k.toString()],
+  byMints: (cluster: string, k: PublicKey[]) => [
+    ...tokenMetadataQueryKeys.all(cluster),
+    ...k,
+  ],
 }
 
 export const useTokenMetadata = (
