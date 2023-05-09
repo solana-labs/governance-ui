@@ -24,10 +24,11 @@ const useSelectedRealmPubkey = () => {
       const urlPubkey = tryParsePublicKey(symbol)
       if (urlPubkey) return urlPubkey
 
-      const realms: { symbol: string }[] =
+      const realms: { symbol: string; realmId: string }[] =
         cluster === 'devnet' ? DEVNET_REALMS : MAINNET_REALMS
 
-      const realmPk = realms.find((x) => x.symbol === symbol)
+      const realmPk = realms.find((x) => x.symbol === symbol)?.realmId
+
       if (realmPk) return new PublicKey(realmPk)
       else throw new Error('DAO not found')
     },
