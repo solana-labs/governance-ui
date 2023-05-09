@@ -33,7 +33,8 @@ const useSelectedRealmPubkey = () => {
     },
   })
 
-  if (typeof symbol !== 'string') throw new Error('invalid url')
+  // commenting out for SSR reasons
+  //if (typeof symbol !== 'string') throw new Error('invalid url')
   return parsed ?? lookup
 }
 
