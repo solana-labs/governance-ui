@@ -148,10 +148,12 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
       })
     },
     handleSetVsrRegistrar: async (client, realm) => {
-      const clientProgramId = client!.program.programId
+      if (realm === undefined) return
+
+      const clientProgramId = client.program.programId
       const { registrar } = await getRegistrarPDA(
-        realm!.pubkey,
-        realm!.account.communityMint,
+        realm.pubkey,
+        realm.account.communityMint,
         clientProgramId
       )
       const existingRegistrar = await tryGetRegistrar(registrar, client!)
