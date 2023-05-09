@@ -1,10 +1,6 @@
-import React, { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 
-import {
-  getCertifiedRealmInfos,
-  getUnchartedRealmInfos,
-  RealmInfo,
-} from '../../models/registry/api'
+import { getCertifiedRealmInfos, RealmInfo } from '../../models/registry/api'
 
 import { SearchIcon } from '@heroicons/react/outline'
 import useWalletStore from '../../stores/useWalletStore'
