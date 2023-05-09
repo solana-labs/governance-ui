@@ -1,37 +1,40 @@
 import { PublicKey } from '@metaplex-foundation/js'
+import { useQuery } from '@tanstack/react-query'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { useRouter } from 'next/router'
 
 import DEVNET_REALMS from 'public/realms/devnet.json'
 import MAINNET_REALMS from 'public/realms/mainnet-beta.json'
-import { useMemo } from 'react'
 
 const useSelectedRealmPubkey = () => {
   const { symbol, cluster } = useRouter().query
 
-  return useMemo(() => {
-    if (symbol === undefined) return undefined
-    if (typeof symbol !== 'string') throw new Error('invalid url')
+  const parsed =
+    typeof symbol === 'string' ? tryParsePublicKey(symbol) : undefined
 
-    // url symbol can either be pubkey or the DAO's "symbol", eg 'MNGO'
-    const urlPubkey = tryParsePublicKey(symbol)
-    if (urlPubkey) return urlPubkey
+  // if we cant just parse the realm pk from the url, look it up.
+  // this happens a lot and might be slightly expensive so i decided to use react-query
+  const { data: lookup } = useQuery({
+    enabled: typeof symbol === 'string' && parsed === undefined,
+    queryKey: ['Realms symbol lookup', symbol],
+    queryFn: () => {
+      if (typeof symbol !== 'string') throw new Error()
 
-    const DEVNET_SYMBOL_MAP = Object.fromEntries(
-      DEVNET_REALMS.map((x) => [x.symbol, x.realmId])
-    )
+      // url symbol can either be pubkey or the DAO's "symbol", eg 'MNGO'
+      const urlPubkey = tryParsePublicKey(symbol)
+      if (urlPubkey) return urlPubkey
 
-    // if this is too expensive it should be react-queryized (or some other declarative global memo)
-    const MAINNET_SYMBOL_MAP = Object.fromEntries(
-      MAINNET_REALMS.map((x) => [x.symbol, x.realmId])
-    )
+      const realms: { symbol: string }[] =
+        cluster === 'devnet' ? DEVNET_REALMS : MAINNET_REALMS
 
-    const symbols =
-      cluster === 'devnet' ? DEVNET_SYMBOL_MAP : MAINNET_SYMBOL_MAP
-    const realmPk = symbols[symbol] as string | undefined
-    if (realmPk) return new PublicKey(realmPk)
-    else throw new Error('DAO not found')
-  }, [cluster, symbol])
+      const realmPk = realms.find((x) => x.symbol === symbol)
+      if (realmPk) return new PublicKey(realmPk)
+      else throw new Error('DAO not found')
+    },
+  })
+
+  if (typeof symbol !== 'string') throw new Error('invalid url')
+  return parsed ?? lookup
 }
 
 export default useSelectedRealmPubkey
