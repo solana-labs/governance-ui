@@ -3,12 +3,17 @@ import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
 import { PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
 import useWalletStore from 'stores/useWalletStore'
+import queryClient from './queryClient'
 
 const OneHMs = 3600000
 
-export const useTokenMetadataKeys = {
-  byMint: (k: PublicKey) => [k.toString()],
-  byMints: (k: PublicKey[]) => [...k.toString()],
+export const tokenMetadataQueryKeys = {
+  all: (cluster: string) => [cluster, 'TokenMetadata'],
+  byMint: (cluster: string, k: PublicKey) => [
+    ...tokenMetadataQueryKeys.all(cluster),
+    k.toString(),
+  ],
+  byMints: (cluster: string, k: PublicKey[]) => [...k.toString()],
 }
 
 export const useTokenMetadata = (
@@ -20,7 +25,9 @@ export const useTokenMetadata = (
   const enabled = !!mint && !!enableConditions
 
   const query = useQuery({
-    queryKey: enabled ? useTokenMetadataKeys.byMint(mint) : undefined,
+    queryKey: enabled
+      ? tokenMetadataQueryKeys.byMint(connection.cluster, mint)
+      : undefined,
     queryFn: async () => {
       const mintPubkey = new PublicKey(mint!)
       const metadataAccount = findMetadataPda(mintPubkey)
@@ -51,7 +58,9 @@ export const useTokensMetadata = (
   const enabled = !!mints.length && !!enableConditions
 
   const query = useQuery({
-    queryKey: enabled ? useTokenMetadataKeys.byMints(mints) : undefined,
+    queryKey: enabled
+      ? tokenMetadataQueryKeys.byMints(connection.cluster, mints)
+      : undefined,
     queryFn: async () => {
       const data: { symbol: string; name: string; mint: string }[] = []
       for (const mint of mints) {
@@ -67,6 +76,12 @@ export const useTokensMetadata = (
           symbol: metadata.data.symbol,
           name: metadata.data.name,
         })
+
+        // we dont want to re-fetch for the individual one
+        queryClient.setQueryData(
+          tokenMetadataQueryKeys.byMint(connection.cluster, mint),
+          metadata.data
+        )
       }
       return data
     },
