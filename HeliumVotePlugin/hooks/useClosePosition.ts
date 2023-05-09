@@ -14,13 +14,11 @@ import {
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
 import { withCreateTokenOwnerRecord } from '@solana/spl-governance'
-import { useRealmQuery } from '@hooks/queries/realm'
 
 export const useClosePosition = () => {
   const { unixNow } = useSolanaUnixNow()
   const { connection, wallet } = useWalletDeprecated()
-  const realm = useRealmQuery().data?.result
-  const { realmInfo } = useRealm()
+  const { realm, realmInfo } = useRealm()
   const [{ client }] = useVotePluginsClientStore((s) => [
     s.state.currentRealmVotingClient,
   ])

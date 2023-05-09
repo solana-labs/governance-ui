@@ -1,6 +1,6 @@
-import { validatePubkey } from '@utils/formValidation'
+import {validatePubkey} from '@utils/formValidation'
 
-interface Addresses {
+export interface Addresses {
   valid: string[]
   invalid: string[]
 }

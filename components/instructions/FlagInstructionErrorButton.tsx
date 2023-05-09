@@ -17,10 +17,6 @@ import { notify } from '@utils/notifications'
 import { PublicKey } from '@solana/web3.js'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import {
-  useUserCommunityTokenOwnerRecord,
-  useUserCouncilTokenOwnerRecord,
-} from '@hooks/queries/tokenOwnerRecord'
 
 export function FlagInstructionErrorButton({
   proposal,
@@ -31,10 +27,7 @@ export function FlagInstructionErrorButton({
   proposalInstruction: ProgramAccount<ProposalTransaction>
   playState: PlayState
 }) {
-  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
-  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
-
-  const { realmInfo } = useRealm()
+  const { realmInfo, ownTokenRecord, ownCouncilTokenRecord } = useRealm()
   const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
   const isProposalOwner =

@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import * as yup from 'yup'
 import {
   Governance,
@@ -8,6 +8,7 @@ import {
 import { validateInstruction } from '@utils/instructionTools'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
+import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NewProposalContext } from '../../../new'
 import InstructionForm, {
@@ -20,7 +21,6 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getRegistrarPDA } from '@utils/plugin/accounts'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useRealmQuery } from '@hooks/queries/realm'
 
 interface ConfigureGatewayForm {
   governedAccount: AssetAccount | undefined
@@ -36,7 +36,7 @@ const ConfigureGatewayPlugin = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const realm = useRealmQuery().data?.result
+  const { realm } = useRealm()
   const gatewayClient = useVotePluginsClientStore((s) => s.state.gatewayClient)
   const { assetAccounts } = useGovernanceAssets()
   const wallet = useWalletOnePointOh()

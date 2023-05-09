@@ -14,12 +14,10 @@ import {
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { withCreateTokenOwnerRecord } from '@solana/spl-governance'
-import { useRealmQuery } from '@hooks/queries/realm'
 
 export const useExtendPosition = () => {
   const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
-  const realm = useRealmQuery().data?.result
-  const { realmInfo } = useRealm()
+  const { realm, realmInfo } = useRealm()
   const [{ client }] = useVotePluginsClientStore((s) => [
     s.state.currentRealmVotingClient,
   ])

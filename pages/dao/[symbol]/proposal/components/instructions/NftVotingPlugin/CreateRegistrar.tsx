@@ -17,7 +17,6 @@ import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getRegistrarPDA } from '@utils/plugin/accounts'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useRealmQuery } from '@hooks/queries/realm'
 
 interface CreateNftRegistrarForm {
   governedAccount: AssetAccount | undefined
@@ -31,9 +30,7 @@ const CreateNftPluginRegistrar = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const realm = useRealmQuery().data?.result
-
-  const { realmInfo } = useRealm()
+  const { realm, realmInfo } = useRealm()
   const nftClient = useVotePluginsClientStore((s) => s.state.nftClient)
   const { assetAccounts } = useGovernanceAssets()
   const wallet = useWalletOnePointOh()

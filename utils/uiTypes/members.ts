@@ -11,7 +11,7 @@ export interface Member {
   delegateWalletCommunity?: PublicKey
 }
 
-interface Delegate {
+export interface Delegate {
   communityMembers?: Array<Member>
   councilMembers?: Array<Member>
   communityTokenCount?: BN

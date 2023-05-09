@@ -26,7 +26,7 @@ export const getGatekeeperNetwork = async (
   return registrarObject.gatekeeperNetwork
 }
 
-const getPredecessorProgramId = async (
+export const getPredecessorProgramId = async (
   client: GatewayClient,
   realm: ProgramAccount<Realm>
 ): Promise<PublicKey | null> => {

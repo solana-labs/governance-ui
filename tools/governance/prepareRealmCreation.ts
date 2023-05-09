@@ -43,7 +43,7 @@ export interface Web3Context {
   connection: Connection
   wallet: WalletSigner
 }
-interface RealmCreationV2 {
+export interface RealmCreationV2 {
   _programVersion: 2
 
   programIdAddress: string

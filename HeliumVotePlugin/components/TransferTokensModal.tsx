@@ -12,7 +12,7 @@ import Input from '@components/inputs/Input'
 import { useSolanaUnixNow } from '@hooks/useSolanaUnixNow'
 import { BN } from '@coral-xyz/anchor'
 
-interface TransferTokensModalProps {
+export interface TransferTokensModalProps {
   isOpen: boolean
   positions: PositionWithMeta[]
   maxTransferAmount: number

@@ -56,8 +56,8 @@ import { TokenInfo } from '@utils/services/types'
 
 export type TradeProps = { tokenAccount: AssetAccount }
 
-/* const SUPPORTED_TRADE_PLATFORMS = ['Raydium', 'Openbook']
- */
+export const SUPPORTED_TRADE_PLATFORMS = ['Raydium', 'Openbook']
+
 type TradeForm = {
   amount: number
   limitPrice: number
@@ -164,7 +164,7 @@ const formSchema = (
   )
 }
 
-const poseidonProgramId = new web3.PublicKey(
+export const poseidonProgramId = new web3.PublicKey(
   '8TJjyzq3iXc48MgV6TD5DumKKwfWKU14Jr9pwgnAbpzs'
 )
 

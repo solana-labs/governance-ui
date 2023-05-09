@@ -59,7 +59,7 @@ export function fmtTokenInfoWithMint(
 export function getMintDecimalAmount(mint: MintInfo, mintAmount: BN) {
   return new BigNumber(mintAmount.toString()).shiftedBy(-mint.decimals)
 }
-function getBigNumberAmount(amount: BN | number) {
+export function getBigNumberAmount(amount: BN | number) {
   return typeof amount === 'number'
     ? new BigNumber(amount)
     : new BigNumber(amount.toString())
@@ -135,8 +135,7 @@ export function getMintSupplyAsDecimal(mint: MintInfo) {
 }
 
 // Calculates percentage (provided as 0-100) of mint supply as BigNumber amount
-/** @deprecated why? why would you use a BigNumber for the range 0-100 */
-function getMintSupplyPercentageAsBigNumber(
+export function getMintSupplyPercentageAsBigNumber(
   mint: MintInfo,
   percentage: number
 ) {
@@ -151,6 +150,18 @@ export function getMintSupplyPercentageAsDecimal(
   percentage: number
 ) {
   return getMintSupplyPercentageAsBigNumber(mint, percentage).toNumber()
+}
+
+// Calculates percentage (provided as 0-100) of mint supply as rounded BN amount
+export function getMintSupplyPercentageAsBN(
+  mint: MintInfo,
+  percentage: number
+) {
+  return new BN(
+    getMintSupplyPercentageAsBigNumber(mint, percentage)
+      .dp(0, BigNumber.ROUND_DOWN) // BN doesn't support floating point and we have to round it
+      .toString()
+  )
 }
 
 // Formats percentage value showing it in human readable form

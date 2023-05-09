@@ -27,7 +27,6 @@ import assertUnreachable from '@utils/typescript/assertUnreachable'
 import { useHasVoteTimeExpired } from '@hooks/useHasVoteTimeExpired'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useRealmQuery } from '@hooks/queries/realm'
 
 export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
   const client = useVotePluginsClientStore(
@@ -36,8 +35,7 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
   const router = useRouter()
   const { pk } = router.query
   const { proposal } = useWalletStore((s) => s.selectedProposal)
-  const realm = useRealmQuery().data?.result
-  const { realmInfo } = useRealm()
+  const { realm, realmInfo } = useRealm()
   const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
   const connected = !!wallet?.connected

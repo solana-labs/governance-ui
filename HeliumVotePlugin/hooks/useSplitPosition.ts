@@ -24,12 +24,10 @@ import {
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
 import { chunks } from '@utils/helpers'
-import { useRealmQuery } from '@hooks/queries/realm'
 
 export const useSplitPosition = () => {
   const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
-  const realm = useRealmQuery().data?.result
-  const { mint, realmInfo } = useRealm()
+  const { mint, realm, realmInfo } = useRealm()
   const [{ client }, registrarPk] = useVotePluginsClientStore((s) => [
     s.state.currentRealmVotingClient,
     s.state.voteStakeRegistryRegistrarPk,

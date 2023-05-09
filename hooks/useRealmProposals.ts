@@ -20,7 +20,6 @@ import { TokenOwnerRecordAsset } from '@models/treasury/Asset'
 import { arrayToRecord } from '@tools/core/script'
 import { InitialSorting } from '@components/ProposalSorting'
 import useRealm from './useRealm'
-import { useRealmQuery } from './queries/realm'
 
 const VotingFilter: Filters = {
   Cancelled: false,
@@ -42,9 +41,7 @@ export default function useRealmProposals(
 ) {
   const router = useRouter()
   const { cluster } = router.query
-  const realm = useRealmQuery().data?.result
-
-  const { mint, councilMint } = useRealm()
+  const { realm, mint, councilMint } = useRealm()
   //Small hack to prevent race conditions with cluster change until we remove connection from store and move it to global dep.
   const routeHasClusterInPath = router.asPath.includes('cluster')
 

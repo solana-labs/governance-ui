@@ -33,12 +33,7 @@ import {
 import useQueryContext from '@hooks/useQueryContext'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
-import {
-  useUserCommunityTokenOwnerRecord,
-  useUserCouncilTokenOwnerRecord,
-} from '@hooks/queries/tokenOwnerRecord'
-import { useRealmQuery } from '@hooks/queries/realm'
+import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
 
 const MyProposalsBn = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
@@ -56,10 +51,9 @@ const MyProposalsBn = () => {
   const { data: tokenOwnerRecord } = useAddressQuery_CommunityTokenOwner()
 
   const maxVoterWeight = useMaxVoteRecord()?.pubkey || undefined
-  const realm = useRealmQuery().data?.result
-  const programId = realm?.owner
-
-  const { programVersion } = useWalletStore((s) => s.selectedRealm)
+  const { realm, programId, programVersion } = useWalletStore(
+    (s) => s.selectedRealm
+  )
   const { refetchProposals } = useWalletStore((s) => s.actions)
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
@@ -68,10 +62,13 @@ const MyProposalsBn = () => {
     proposalsWithDepositedTokens,
     setProposalsWithDepositedTokens,
   ] = useState<ProgramAccount<ProposalDeposit>[]>([])
-  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
-  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
-
-  const { proposals, realmInfo, isNftMode } = useRealm()
+  const {
+    proposals,
+    ownTokenRecord,
+    ownCouncilTokenRecord,
+    realmInfo,
+    isNftMode,
+  } = useRealm()
   const myProposals = useMemo(
     () =>
       connected

@@ -33,7 +33,6 @@ import { abbreviateAddress } from '@utils/formatting'
 import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useRealmQuery } from '@hooks/queries/realm'
 
 interface DepositBox {
   mintPk: PublicKey
@@ -44,9 +43,14 @@ interface DepositBox {
 const unlockedTypes: string[] = []
 
 const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
-  const realm = useRealmQuery().data?.result
-
-  const { realmInfo, mint, tokenRecords, councilMint, config } = useRealm()
+  const {
+    realm,
+    realmInfo,
+    mint,
+    tokenRecords,
+    councilMint,
+    config,
+  } = useRealm()
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
   const [client, setClient] = useState<VsrClient | undefined>(undefined)
   const [reducedDeposits, setReducedDeposits] = useState<DepositBox[]>([])

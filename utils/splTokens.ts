@@ -3,13 +3,13 @@ import SolendConfiguration, {
   SupportedCollateralMintNames as SolendSupportedCollateralMintNames,
 } from '@tools/sdk/solend/configuration'
 
-type SplTokenInformation = {
+export type SplTokenInformation = {
   name: string
   mint: PublicKey
   decimals: number
 }
 
-type SupportedSplTokenNames =
+export type SupportedSplTokenNames =
   | 'USDC'
   | 'WSOL'
   | SolendSupportedCollateralMintNames
@@ -31,3 +31,22 @@ export const SPL_TOKENS: {
 
   ...SolendConfiguration.getSupportedCollateralMintsInformation(),
 } as const
+
+export type SplTokenUIName = typeof SPL_TOKENS[keyof typeof SPL_TOKENS]['name']
+
+export function getSplTokenMintAddressByUIName(
+  nameToMatch: SplTokenUIName
+): PublicKey {
+  const item = Object.entries(SPL_TOKENS).find(
+    ([_, { name }]) => name === nameToMatch
+  )
+
+  // theoretically impossible case
+  if (!item) {
+    throw new Error('Unable to find SPL token mint address by UI name')
+  }
+
+  const [, { mint }] = item
+
+  return mint
+}

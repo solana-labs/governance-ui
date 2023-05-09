@@ -22,9 +22,19 @@ import useRealm from '@hooks/useRealm'
 import { useEffect, useState } from 'react'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useRealmQuery } from '@hooks/queries/realm'
 
-const STREAMFLOW_PROGRAM_ID = 'strmRqUCoQUgGUan5YhzUZa6KqdzwX5L6FpUxfmKg5m'
+export interface TokenMintMetadata {
+  readonly decimals: number
+  readonly symbol: string
+}
+
+// Mint metadata for Well known tokens displayed on the instruction card
+export const MINT_METADATA = {
+  Gssm3vfi8s65R31SBdmQRq6cKeYojGgup7whkw4VCiQj: { symbol: 'STRM', decimals: 9 },
+}
+
+export const STREAMFLOW_PROGRAM_ID =
+  'strmRqUCoQUgGUan5YhzUZa6KqdzwX5L6FpUxfmKg5m'
 
 export default function StreamCard({
   connection,
@@ -34,8 +44,7 @@ export default function StreamCard({
   accounts: AccountMetaData[]
 }) {
   const router = useRouter()
-  const realm = useRealmQuery().data?.result
-  const { symbol } = useRealm()
+  const { realm, symbol } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
 
   const { fmtUrlWithCluster } = useQueryContext()

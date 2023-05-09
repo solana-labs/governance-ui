@@ -21,17 +21,14 @@ import { useState } from 'react'
 import Loading from '@components/Loading'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
-import { useRealmQuery } from '@hooks/queries/realm'
 
 const WithDrawCommunityTokens = () => {
   const { getOwnedDeposits } = useDepositStore()
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
-  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
-  const realm = useRealmQuery().data?.result
-
   const {
+    realm,
     realmInfo,
+    ownTokenRecord,
     proposals,
     governances,
     tokenRecords,

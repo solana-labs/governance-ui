@@ -52,7 +52,6 @@ import { NFTWithMint } from '@utils/uiTypes/nfts'
 import useCreateProposal from '@hooks/useCreateProposal'
 import NFTAccountSelect from './NFTAccountSelect'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useRealmQuery } from '@hooks/queries/realm'
 
 const SendTokens = ({
   isNft = false,
@@ -65,8 +64,7 @@ const SendTokens = ({
   const connection = useWalletStore((s) => s.connection)
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
   const { setCurrentAccount } = useTreasuryAccountStore()
-  const realm = useRealmQuery().data?.result
-  const { realmInfo, symbol, canChooseWhoVote } = useRealm()
+  const { realmInfo, symbol, realm, canChooseWhoVote } = useRealm()
   const { handleCreateProposal } = useCreateProposal()
   const { canUseTransferInstruction } = useGovernanceAssets()
   const tokenInfo = useTreasuryAccountStore((s) => s.tokenInfo)

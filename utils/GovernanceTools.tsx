@@ -20,7 +20,7 @@ import axios from 'axios'
 import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes'
 import { PublicKey } from '@solana/web3.js'
 
-interface GovernanceConfigValues {
+export interface GovernanceConfigValues {
   minTokensToCreateProposal: number | string
   minInstructionHoldUpTime: number
   maxVotingTime: number
@@ -32,7 +32,10 @@ interface GovernanceConfigValues {
 }
 
 // Parses min tokens to create (proposal or governance)
-function parseMinTokensToCreate(value: string | number, mintDecimals: number) {
+export function parseMinTokensToCreate(
+  value: string | number,
+  mintDecimals: number
+) {
   return typeof value === 'string'
     ? parseMintNaturalAmountFromDecimal(value, mintDecimals)
     : getMintNaturalAmountFromDecimal(value, mintDecimals)

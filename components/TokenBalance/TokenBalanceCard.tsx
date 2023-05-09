@@ -41,11 +41,6 @@ import getNumTokens from '@components/ProposalVotingPower/getNumTokens'
 import VotingPowerPct from '@components/ProposalVotingPower/VotingPowerPct'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import {
-  useUserCommunityTokenOwnerRecord,
-  useUserCouncilTokenOwnerRecord,
-} from '@hooks/queries/tokenOwnerRecord'
-import { useRealmQuery } from '@hooks/queries/realm'
 
 const TokenBalanceCard = ({
   proposal,
@@ -58,8 +53,7 @@ const TokenBalanceCard = ({
 }) => {
   const realmProgramId = useWalletStore((s) => s.selectedRealm.programId)
   const [hasGovPower, setHasGovPower] = useState<boolean>(false)
-  const realm = useRealmQuery().data?.result
-  const { councilMint, mint } = useRealm()
+  const { councilMint, mint, realm } = useRealm()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const isDepositVisible = (
@@ -160,13 +154,12 @@ export const TokenDeposit = ({
   )
 
   const maxVoterWeight = useMaxVoteRecord()?.pubkey || undefined
-  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
-  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
-  const realm = useRealmQuery().data?.result
-
   const {
+    realm,
     realmInfo,
     realmTokenAccount,
+    ownTokenRecord,
+    ownCouncilTokenRecord,
     ownVoterWeight,
     councilMint,
     councilTokenAccount,

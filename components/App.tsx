@@ -4,12 +4,13 @@ import dynamic from 'next/dynamic'
 import React, { useEffect } from 'react'
 import Head from 'next/head'
 import Script from 'next/script'
+import { QueryClientProvider } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import { GatewayProvider } from '@components/Gateway/GatewayProvider'
 import { usePrevious } from '@hooks/usePrevious'
 import { useVotingPlugins, vsrPluginsPks } from '@hooks/useVotingPlugins'
 import ErrorBoundary from '@components/ErrorBoundary'
-import useHandleGovernanceAssetsStore from '@hooks/handleGovernanceAssetsStore'
+import handleGovernanceAssetsStore from '@hooks/handleGovernanceAssetsStore'
 import handleRouterHistory from '@hooks/handleRouterHistory'
 import NavBar from '@components/NavBar'
 import PageBodyContainer from '@components/PageBodyContainer'
@@ -25,12 +26,10 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
 import NftVotingCountingModal from '@components/NftVotingCountingModal'
 import { getResourcePathPart } from '@tools/core/resources'
+import queryClient from '@hooks/queries/queryClient'
 import useSerumGovStore from 'stores/useSerumGovStore'
 import { WalletProvider } from '@hub/providers/Wallet'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
-import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
-import { useRealmQuery } from '@hooks/queries/realm'
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
@@ -64,7 +63,7 @@ export function App(props: Props) {
   useHydrateStore()
   handleRouterHistory()
   useVotingPlugins()
-  useHandleGovernanceAssetsStore()
+  handleGovernanceAssetsStore()
   useMembers()
   useEffect(() => {
     tokenPriceService.fetchSolanaTokenList()
@@ -75,27 +74,32 @@ export function App(props: Props) {
   )
   const { getNfts } = useTreasuryAccountStore()
   const { getOwnedDeposits, resetDepositState } = useDepositStore()
-
-  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
-  const realm = useRealmQuery().data?.result
-  const { realmInfo, symbol, config } = useRealm()
+  const {
+    realm,
+    ownTokenRecord,
+    realmInfo,
+    symbol,
+    config,
+    ownDelegateTokenRecords,
+    ownDelegateCouncilTokenRecords,
+  } = useRealm()
   const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
   const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
   const prevStringifyPossibleNftsAccounts = usePrevious(
     JSON.stringify(possibleNftsAccounts)
   )
+  const walletId = wallet?.publicKey?.toBase58()
   const router = useRouter()
   const { cluster } = router.query
   const updateSerumGovAccounts = useSerumGovStore(
     (s) => s.actions.updateSerumGovAccounts
   )
-  const { actions } = useWalletStore((s) => s)
-
   const {
-    communityDelegator: selectedCommunityDelegate,
-    councilDelegator: selectedCouncilDelegate,
-  } = useSelectedDelegatorStore()
+    actions,
+    selectedCommunityDelegate,
+    selectedCouncilDelegate,
+  } = useWalletStore((s) => s)
 
   const realmName = realmInfo?.displayName ?? realm?.account?.name
   const title = realmName ? `${realmName}` : 'Realms'
@@ -158,6 +162,31 @@ export function App(props: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [cluster])
 
+  useEffect(() => {
+    if (
+      ownDelegateCouncilTokenRecords &&
+      ownDelegateCouncilTokenRecords.length > 0
+    ) {
+      actions.selectCouncilDelegate(
+        ownDelegateCouncilTokenRecords[0]?.account?.governingTokenOwner?.toBase58()
+      )
+    } else {
+      actions.selectCouncilDelegate(undefined)
+    }
+
+    if (ownDelegateTokenRecords && ownDelegateTokenRecords.length > 0) {
+      actions.selectCommunityDelegate(
+        ownDelegateTokenRecords[0]?.account?.governingTokenOwner?.toBase58()
+      )
+    } else {
+      actions.selectCommunityDelegate(undefined)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+  }, [
+    walletId,
+    ownDelegateTokenRecords?.map((x) => x.pubkey.toBase58()).toString(),
+    ownDelegateCouncilTokenRecords?.map((x) => x.pubkey.toBase58()).toString(),
+  ])
   // whenever we change delegate, get that delegates vote record so we can display it
   useEffect(() => {
     actions.fetchDelegateVoteRecords()
@@ -254,19 +283,21 @@ export function App(props: Props) {
       </Head>
       <GoogleTag />
       <ErrorBoundary>
-        <ThemeProvider defaultTheme="Dark">
-          <WalletIdentityProvider appName={'Realms'}>
-            <WalletProvider>
-              <GatewayProvider>
-                <NavBar />
-                <Notifications />
-                <TransactionLoader></TransactionLoader>
-                <NftVotingCountingModal />
-                <PageBodyContainer>{props.children}</PageBodyContainer>
-              </GatewayProvider>
-            </WalletProvider>
-          </WalletIdentityProvider>
-        </ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider defaultTheme="Dark">
+            <WalletIdentityProvider appName={'Realms'}>
+              <WalletProvider>
+                <GatewayProvider>
+                  <NavBar />
+                  <Notifications />
+                  <TransactionLoader></TransactionLoader>
+                  <NftVotingCountingModal />
+                  <PageBodyContainer>{props.children}</PageBodyContainer>
+                </GatewayProvider>
+              </WalletProvider>
+            </WalletIdentityProvider>
+          </ThemeProvider>
+        </QueryClientProvider>
       </ErrorBoundary>
     </div>
   )

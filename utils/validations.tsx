@@ -36,7 +36,7 @@ const supportedPlugins = [
   ...gatewayPluginsPks,
 ]
 
-const getValidateAccount = async (
+export const getValidateAccount = async (
   connection: Connection,
   pubKey: PublicKey
 ) => {
@@ -57,7 +57,7 @@ export const getValidatedPublickKey = (val: string) => {
   }
 }
 
-const validateDoseTokenAccountMatchMint = (
+export const validateDoseTokenAccountMatchMint = (
   tokenAccount: AccountInfo,
   mint: PublicKey
 ) => {
@@ -94,7 +94,7 @@ export const isExistingTokenAccount = async (
   return isExistingTokenAccount
 }
 
-const validateDestinationAccAddress = async (
+export const validateDestinationAccAddress = async (
   connection: ConnectionContext,
   val: any,
   governedAccount?: PublicKey
@@ -122,7 +122,7 @@ const validateDestinationAccAddress = async (
   return true
 }
 
-const validateDestinationAccAddressWithMint = async (
+export const validateDestinationAccAddressWithMint = async (
   connection: ConnectionContext,
   val: any,
   mintPubKey: PublicKey

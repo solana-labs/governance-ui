@@ -23,7 +23,6 @@ import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import { isDisabledVoterWeight } from '@tools/governance/units'
 import useProgramVersion from '@hooks/useProgramVersion'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useRealmQuery } from '@hooks/queries/realm'
 
 export interface RealmConfigForm {
   governedAccount: AssetAccount | undefined
@@ -41,9 +40,7 @@ const RealmConfig = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const realm = useRealmQuery().data?.result
-
-  const { mint, realmInfo } = useRealm()
+  const { realm, mint, realmInfo } = useRealm()
   const wallet = useWalletOnePointOh()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const { assetAccounts } = useGovernanceAssets()

@@ -14,13 +14,10 @@ import {
   sendTransactionsV3,
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
-import { useRealmQuery } from '@hooks/queries/realm'
 
 export const useTransferPosition = () => {
   const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
-  const realm = useRealmQuery().data?.result
-
-  const { mint } = useRealm()
+  const { mint, realm } = useRealm()
   const [{ client }] = useVotePluginsClientStore((s) => [
     s.state.currentRealmVotingClient,
     s.state.voteStakeRegistryRegistrarPk,

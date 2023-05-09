@@ -26,7 +26,7 @@ import {
 import { trySentryLog } from '@utils/logs'
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 
-type NFTRealm = Web3Context &
+export type NFTRealm = Web3Context &
   RealmCreation & {
     collectionAddress: string
     nftCollectionCount: number

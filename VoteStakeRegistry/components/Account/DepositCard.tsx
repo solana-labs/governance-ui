@@ -27,8 +27,6 @@ import {
 import { BN } from '@coral-xyz/anchor'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
-import { useRealmQuery } from '@hooks/queries/realm'
 
 const DepositCard = ({
   deposit,
@@ -38,10 +36,7 @@ const DepositCard = ({
   vsrClient?: VsrClient | undefined
 }) => {
   const { getOwnedDeposits } = useDepositStore()
-  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
-  const realm = useRealmQuery().data?.result
-
-  const { realmInfo, tokenRecords } = useRealm()
+  const { realm, realmInfo, tokenRecords, ownTokenRecord } = useRealm()
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const actualClient = vsrClient || client
   const wallet = useWalletOnePointOh()

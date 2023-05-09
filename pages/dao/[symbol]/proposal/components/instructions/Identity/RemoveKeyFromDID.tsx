@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import * as yup from 'yup'
 import {
   Governance,
@@ -9,6 +9,7 @@ import { validateInstruction } from '@utils/instructionTools'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
 import useWalletStore from 'stores/useWalletStore'
+import useRealm from '@hooks/useRealm'
 import { NewProposalContext } from '../../../new'
 import InstructionForm, { InstructionInput } from '../FormCreator'
 import { AssetAccount } from '@utils/uiTypes/assets'
@@ -20,7 +21,6 @@ import {
   instructionInputs,
   SchemaComponents,
 } from '@utils/instructions/Identity/util'
-import { useRealmQuery } from '@hooks/queries/realm'
 
 interface RemoveKeyFromDIDForm {
   governedAccount: AssetAccount | undefined
@@ -35,7 +35,7 @@ const RemoveKeyFromDID = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const realm = useRealmQuery().data?.result
+  const { realm } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const connection = useWalletStore((s) => s.connection)
   const shouldBeGoverned = index !== 0 && governance

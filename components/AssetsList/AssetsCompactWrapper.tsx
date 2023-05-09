@@ -14,14 +14,13 @@ import {
   renderAddNewAssetTooltip,
 } from 'pages/dao/[symbol]/assets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useRealmQuery } from '@hooks/queries/realm'
 
 const AssetsCompactWrapper = () => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
-  const realm = useRealmQuery().data?.result
   const {
     symbol,
+    realm,
     ownVoterWeight,
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,

@@ -1,11 +1,8 @@
-import { useRealmQuery } from '@hooks/queries/realm'
 import useRealm from '@hooks/useRealm'
 import { GoverningTokenType } from '@solana/spl-governance'
 
 const useMembershipTypes = () => {
-  const realm = useRealmQuery().data?.result
-
-  const { config } = useRealm()
+  const { realm, config } = useRealm()
   const maybeCouncil =
     realm?.account.config.councilMint &&
     config?.account.councilTokenConfig.tokenType ===

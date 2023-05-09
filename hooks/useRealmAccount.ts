@@ -16,7 +16,6 @@ const fetcher = async ({
   return getRealm(connection, realm)
 }
 
-/** @deprecated use react-query */
 const useRealmAccount = (realmId?: PublicKey) => {
   const connection = useWalletStore((s) => s.connection.current)
 

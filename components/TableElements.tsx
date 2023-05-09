@@ -1,6 +1,7 @@
 import { Disclosure, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/solid'
 import { Fragment, ReactNode } from 'react'
+import dayjs from 'dayjs'
 
 export const Table = ({ children }) => (
   <table className="min-w-full">{children}</table>
@@ -83,3 +84,24 @@ export const ExpandableRow = ({
     </Disclosure>
   )
 }
+
+type RowProps = {
+  children: React.ReactNode
+}
+
+export const Row = ({ children }: RowProps) => {
+  return (
+    <div
+      className={`default-transition w-full rounded-none border-t border-bkg-4 p-4 font-normal text-fgd-1`}
+    >
+      {children}
+    </div>
+  )
+}
+
+export const TableDateDisplay = ({ date }: { date: string | number }) => (
+  <>
+    <p className="mb-0 text-fgd-2">{dayjs(date).format('DD MMM YYYY')}</p>
+    <p className="mb-0 text-xs">{dayjs(date).format('h:mma')}</p>
+  </>
+)

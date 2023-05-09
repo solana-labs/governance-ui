@@ -8,11 +8,9 @@ import { AddressField, NumberField } from '../index'
 import useProgramVersion from '@hooks/useProgramVersion'
 import { useRouter } from 'next/router'
 import useQueryContext from '@hooks/useQueryContext'
-import { useRealmQuery } from '@hooks/queries/realm'
 
 const ParamsView = ({ activeGovernance }) => {
-  const realm = useRealmQuery().data?.result
-  const { mint, councilMint, ownVoterWeight, symbol } = useRealm()
+  const { realm, mint, councilMint, ownVoterWeight, symbol } = useRealm()
   const programVersion = useProgramVersion()
   const realmAccount = realm?.account
   const communityMint = realmAccount?.communityMint.toBase58()

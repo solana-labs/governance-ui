@@ -31,8 +31,6 @@ import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import * as heliumVsrSdk from '@helium/voter-stake-registry-sdk'
 import useWalletOnePointOh from './useWalletOnePointOh'
 import { DEFAULT_NFT_VOTER_PLUGIN } from '@tools/constants'
-import { useUserCommunityTokenOwnerRecord } from './queries/tokenOwnerRecord'
-import { useRealmQuery } from './queries/realm'
 
 export const vsrPluginsPks: string[] = [
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo',
@@ -61,9 +59,7 @@ export const switchboardPluginsPks: string[] = [SWITCHBOARD_ADDIN_ID.toBase58()]
 export const pythPluginsPks: string[] = [PYTH_STAKING_ADDRESS.toBase58()]
 
 export function useVotingPlugins() {
-  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
-  const realm = useRealmQuery().data?.result
-  const { config } = useRealm()
+  const { realm, config, ownTokenRecord } = useRealm()
   const currentPluginPk = config?.account.communityTokenConfig.voterWeightAddin
 
   const {

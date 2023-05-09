@@ -31,7 +31,7 @@ export function GenericTokenIcon() {
   )
 }
 
-function TokenInfoCell({ title = '', children }) {
+export function TokenInfoCell({ title = '', children }) {
   return (
     <div className="flex flex-col h-full px-5 pt-2 pb-3 space-y-1 rounded-md md:space-y-2 md:pt-5 md:pb-5 md:px-6 bg-bkg-2">
       <Text level="2" className="text-fgd-2">

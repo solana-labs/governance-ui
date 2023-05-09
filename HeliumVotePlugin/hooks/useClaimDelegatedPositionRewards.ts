@@ -19,13 +19,11 @@ import {
 import { notify } from '@utils/notifications'
 import { withCreateTokenOwnerRecord } from '@solana/spl-governance'
 import useRealm from '@hooks/useRealm'
-import { useRealmQuery } from '@hooks/queries/realm'
 
 export const useClaimDelegatedPositionRewards = () => {
   const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
   const { unixNow } = useSolanaUnixNow()
-  const realm = useRealmQuery().data?.result
-  const { realmInfo } = useRealm()
+  const { realm, realmInfo } = useRealm()
   const { error, loading, execute } = useAsyncCallback(
     async ({
       position,

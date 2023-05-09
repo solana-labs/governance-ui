@@ -18,15 +18,13 @@ import { getMintMetadata } from '../instructions/programs/splToken'
 import depositTokensVSR from './depositTokensVSR'
 import VotingPowerPct from './VotingPowerPct'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useRealmQuery } from '@hooks/queries/realm'
 
 interface Props {
   className?: string
 }
 
 export default function LockedCommunityVotingPower(props: Props) {
-  const realm = useRealmQuery().data?.result
-  const { mint, realmInfo, realmTokenAccount, tokenRecords } = useRealm()
+  const { mint, realm, realmInfo, realmTokenAccount, tokenRecords } = useRealm()
   const { proposal } = useProposal()
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const connection = useWalletStore((s) => s.connection.current)

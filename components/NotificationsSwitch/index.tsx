@@ -13,7 +13,7 @@ import DialectNotificationsModal from '@components/DialectNotificationsModal'
 import NotificationCardContainer from '@components/NotificationsCard/NotificationCardContainer'
 import TelegramIcon from './TelegramIcon'
 
-function useOutsideAlerter(
+export function useOutsideAlerter(
   ref: React.MutableRefObject<Element | null>,
   bellRef: React.MutableRefObject<Element | null>,
   setOpen: CallableFunction

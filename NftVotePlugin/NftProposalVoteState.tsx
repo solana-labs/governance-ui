@@ -7,16 +7,13 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
 import useNftProposalStore from './NftProposalStore'
 import useNftPluginStore from './store/nftPluginStore'
-import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 
 const NftProposalVoteState = ({
   proposal,
 }: {
   proposal?: ProgramAccount<Proposal>
 }) => {
-  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
-
-  const { config } = useRealm()
+  const { config, ownTokenRecord } = useRealm()
   const { voteRecordsByVoter } = useWalletStore((s) => s.selectedProposal)
   const plugin = useVotePluginsClientStore((s) => s.state.nftClient)
   const getCountedNfts = useNftProposalStore((s) => s.getCountedNfts)

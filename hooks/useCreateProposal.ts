@@ -8,7 +8,6 @@ import useRealm from './useRealm'
 import useRpcContext from './useRpcContext'
 import { fetchGovernanceByPubkey } from './queries/governance'
 import { PublicKey } from '@solana/web3.js'
-import { useRealmQuery } from './queries/realm'
 
 export default function useCreateProposal() {
   const client = useVotePluginsClientStore(
@@ -17,9 +16,9 @@ export default function useCreateProposal() {
   const { refetchProposals } = useWalletStore((s) => s.actions)
 
   const connection = useWalletStore((s) => s.connection)
-  const realm = useRealmQuery().data?.result
 
   const {
+    realm,
     ownVoterWeight,
     mint,
     councilMint,

@@ -12,10 +12,8 @@ import Link from 'next/link'
 import useQueryContext from '@hooks/useQueryContext'
 import InlineNotification from '@components/InlineNotification'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
+import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
-import { useRealmQuery } from '@hooks/queries/realm'
 
 interface Props {
   className?: string
@@ -24,9 +22,7 @@ interface Props {
 export default function LockedCommunityNFTRecordVotingPower(props: Props) {
   const { fmtUrlWithCluster } = useQueryContext()
   const [amount, setAmount] = useState(new BigNumber(0))
-  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
-  const realm = useRealmQuery().data?.result
-  const { mint, realmTokenAccount, symbol } = useRealm()
+  const { mint, realm, ownTokenRecord, realmTokenAccount, symbol } = useRealm()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const { data: tokenOwnerRecordPk } = useAddressQuery_CommunityTokenOwner()

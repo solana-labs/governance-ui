@@ -1,5 +1,7 @@
 import {
   getNativeTreasuryAddress,
+  Governance,
+  ProgramAccount,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
 import {
@@ -44,7 +46,89 @@ export const validateInstruction = async ({
   return isValid
 }
 
-/** @deprecated */
+export async function getGenericTransferInstruction({
+  schema,
+  form,
+  programId,
+  connection,
+  wallet,
+  setFormErrors,
+  requiredStateInfo,
+}: {
+  schema: any
+  form: any
+  programId: PublicKey | undefined
+  connection: ConnectionContext
+  wallet: WalletAdapter | undefined
+  requiredStateInfo: {
+    /// The mint that is being transfered
+    mint: PublicKey
+    /// The TokenAccount address that will be sending the tokens
+    tokenSource: PublicKey
+    /// The number of decimals for this token's mint
+    mintDecimals: number
+    /// The governance that controls this account
+    governance: ProgramAccount<Governance>
+    /// The key that has to sign for the token transfer
+    owner: PublicKey
+  }
+  setFormErrors: any
+}): Promise<UiInstruction> {
+  const isValid = await validateInstruction({ schema, form, setFormErrors })
+  let serializedInstruction = ''
+  const prerequisiteInstructions: TransactionInstruction[] = []
+  if (isValid && programId) {
+    const sourceAccount = requiredStateInfo.tokenSource
+    //this is the original owner
+    const destinationAccount = new PublicKey(form.destinationAccount)
+    const mintPK = requiredStateInfo.mint
+    const mintAmount = parseMintNaturalAmountFromDecimal(
+      form.amount!,
+      requiredStateInfo.mintDecimals
+    )
+
+    //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
+    const { currentAddress: receiverAddress, needToCreateAta } = await getATA({
+      connection: connection,
+      receiverAddress: destinationAccount,
+      mintPK,
+      wallet: wallet!,
+    })
+
+    //we push this createATA instruction to transactions to create right before creating proposal
+    //we don't want to create ata only when instruction is serialized
+    if (needToCreateAta) {
+      prerequisiteInstructions.push(
+        Token.createAssociatedTokenAccountInstruction(
+          ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+          TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+          mintPK, // mint
+          receiverAddress, // ata
+          destinationAccount, // owner of token account
+          wallet!.publicKey! // fee payer
+        )
+      )
+    }
+    const transferIx = Token.createTransferInstruction(
+      TOKEN_PROGRAM_ID,
+      sourceAccount,
+      receiverAddress,
+      requiredStateInfo.owner,
+      [],
+      new u64(mintAmount.toString())
+    )
+    serializedInstruction = serializeInstructionToBase64(transferIx)
+  }
+
+  const obj: UiInstruction = {
+    serializedInstruction,
+    isValid,
+    governance: requiredStateInfo.governance,
+    prerequisiteInstructions: prerequisiteInstructions,
+  }
+  return obj
+}
+
 export async function getTransferInstruction({
   schema,
   form,

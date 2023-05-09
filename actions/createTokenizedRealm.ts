@@ -12,7 +12,7 @@ import {
 } from '@tools/governance/prepareRealmCreation'
 import { trySentryLog } from '@utils/logs'
 
-type TokenizedRealm = Web3Context & RealmCreation
+export type TokenizedRealm = Web3Context & RealmCreation
 
 export default async function createTokenizedRealm({
   connection,
