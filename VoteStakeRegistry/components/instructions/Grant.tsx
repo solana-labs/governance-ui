@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import Input from '@components/inputs/Input'
 import useRealm from '@hooks/useRealm'
 import { AccountInfo } from '@solana/spl-token'
@@ -67,6 +67,23 @@ const Grant = ({
     allowClawback: true,
     lockupKind: lockupTypes[0],
   })
+  const schema = useCallback(
+    () =>
+      getTokenTransferSchema({ form, connection }).concat(
+        yup.object().shape({
+          startDateUnixSeconds: yup
+            .number()
+            .required('Start date required')
+            .min(1, 'Start date required'),
+          periods: yup
+            .number()
+            .required('End date required')
+            .min(1, 'End date cannot be prior to start date'),
+        })
+      ),
+    [form, connection]
+  )
+
   const [governedAccount, setGovernedAccount] = useState<
     ProgramAccount<Governance> | undefined
   >(undefined)
@@ -110,7 +127,7 @@ const Grant = ({
       propertyName: 'amount',
     })
   }
-  async function getInstruction(): Promise<UiInstruction> {
+  const getInstruction = useCallback(async () => {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     let serializedInstruction = ''
     const prerequisiteInstructions: TransactionInstruction[] = []
@@ -166,7 +183,16 @@ const Grant = ({
       chunkSplitByDefault: true,
     }
     return obj
-  }
+  }, [
+    client,
+    form,
+    realm,
+    realmInfo?.programVersion,
+    schema,
+    tokenRecords,
+    wallet,
+  ])
+
   const handleChangeStartDate = (e) => {
     const value = e.target.value
     setStartDate(value)
@@ -220,8 +246,7 @@ const Grant = ({
       { governedAccount: governedAccount, getInstruction },
       index
     )
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form])
+  }, [form, governedAccount, handleSetInstructions, index, getInstruction])
 
   useEffect(() => {
     setGovernedAccount(form.governedTokenAccount?.governance)
@@ -231,18 +256,7 @@ const Grant = ({
   const destinationAccountName =
     destinationAccount?.publicKey &&
     getAccountName(destinationAccount?.account.address)
-  const schema = getTokenTransferSchema({ form, connection }).concat(
-    yup.object().shape({
-      startDateUnixSeconds: yup
-        .number()
-        .required('Start date required')
-        .min(1, 'Start date required'),
-      periods: yup
-        .number()
-        .required('End date required')
-        .min(1, 'End date cannot be prior to start date'),
-    })
-  )
+
   useEffect(() => {
     const getGrantMints = async () => {
       const clientProgramId = client!.program.programId

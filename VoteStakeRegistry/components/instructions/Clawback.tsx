@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import useRealm from '@hooks/useRealm'
 import { TransactionInstruction } from '@solana/web3.js'
 import useWalletStore from 'stores/useWalletStore'
@@ -56,7 +62,20 @@ const Clawback = ({
     deposit: null,
   })
   const formDeposits = form.deposit
-
+  const schema = useMemo(
+    () =>
+      yup.object().shape({
+        governedTokenAccount: yup
+          .object()
+          .required('Clawback destination required'),
+        voter: yup.object().nullable().required('Voter required'),
+        deposit: yup.object().nullable().required('Deposit required'),
+      }),
+    []
+  )
+  const realmAuthorityGov = governancesArray.find(
+    (x) => x.pubkey.toBase58() === realm?.account.authority?.toBase58()
+  )
   const [governedAccount, setGovernedAccount] = useState<
     ProgramAccount<Governance> | undefined
   >(undefined)
@@ -66,7 +85,7 @@ const Clawback = ({
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-  async function getInstruction(): Promise<UiInstruction> {
+  const getInstruction = useCallback(async () => {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     let serializedInstruction = ''
     const prerequisiteInstructions: TransactionInstruction[] = []
@@ -97,21 +116,20 @@ const Clawback = ({
     const obj: UiInstruction = {
       serializedInstruction,
       isValid,
-      governance: governancesArray.find(
-        (x) => x.pubkey.toBase58() === realm?.account.authority?.toBase58()
-      ),
+      governance: realmAuthorityGov,
       prerequisiteInstructions: prerequisiteInstructions,
       chunkSplitByDefault: true,
     }
     return obj
-  }
+  }, [client, form, realmAuthorityGov, realm, schema])
+
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: governedAccount, getInstruction },
       index
     )
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form])
+  }, [form, getInstruction, governedAccount, handleSetInstructions, index])
+
   useEffect(() => {
     setGovernedAccount(
       governancesArray.find(
@@ -184,6 +202,7 @@ const Clawback = ({
     } else {
       setDeposits([])
     }
+
     setForm((prevForm) => ({
       ...prevForm,
       deposit: null,
@@ -194,14 +213,6 @@ const Clawback = ({
   useEffect(() => {
     setForm((prevForm) => ({ ...prevForm, governedTokenAccount: undefined }))
   }, [formDeposits])
-
-  const schema = yup.object().shape({
-    governedTokenAccount: yup
-      .object()
-      .required('Clawback destination required'),
-    voter: yup.object().nullable().required('Voter required'),
-    deposit: yup.object().nullable().required('Deposit required'),
-  })
 
   const getOwnedDepositsLabel = (deposit: DepositWithMintAccount | null) => {
     const symbol = deposit
