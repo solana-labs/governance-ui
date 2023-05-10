@@ -256,11 +256,11 @@ const PerpCreate = ({
       !mangoGroup || mangoGroup?.perpMarketsMapByMarketIndex.size === 0
         ? 0
         : Math.max(...[...mangoGroup!.perpMarketsMapByMarketIndex.keys()]) + 1
-    setForm({
-      ...form,
+    setForm((prevForm) => ({
+      ...prevForm,
       perpMarketIndex: perpMarketIndex,
-    })
-  }, [mangoGroup?.perpMarketsMapByMarketIndex.size])
+    }))
+  }, [mangoGroup])
 
   const inputs: InstructionInput[] = [
     {

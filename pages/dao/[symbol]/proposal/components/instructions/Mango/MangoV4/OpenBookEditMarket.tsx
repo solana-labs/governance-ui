@@ -115,22 +115,24 @@ const OpenBookEditMarket = ({
     if (mangoGroup) {
       getMarkets()
     }
-  }, [mangoGroup?.publicKey.toBase58()])
+  }, [mangoGroup])
+
   useEffect(() => {
     const getCurrentMarketProps = () => {
       const market = mangoGroup!.serum3MarketsMapByMarketIndex.get(
         Number(form.market?.value)
       )
-      setForm({
-        ...form,
+      setForm((prevForm) => ({
+        ...prevForm,
         reduceOnly: market?.reduceOnly || false,
         forceClose: market?.forceClose || false,
-      })
+      }))
     }
     if (form.market && mangoGroup) {
       getCurrentMarketProps()
     }
-  }, [form.market?.value])
+  }, [form.market, mangoGroup])
+
   const schema = yup.object().shape({
     governedAccount: yup
       .object()

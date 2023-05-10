@@ -307,6 +307,7 @@ const EditToken = ({
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form, forcedValues])
+
   useEffect(() => {
     const getTokens = async () => {
       const currentTokens = [...mangoGroup!.banksMapByMint.values()].map(
@@ -320,18 +321,16 @@ const EditToken = ({
     if (wallet?.publicKey && mangoGroup) {
       getTokens()
     }
-  }, [mangoGroup?.publicKey.toBase58()])
+  }, [mangoGroup, wallet?.publicKey])
+
+  const formTokenPk = form.token?.value.toBase58()
   useEffect(() => {
-    if (form.token && mangoGroup) {
-      const currentToken = mangoGroup!.banksMapByMint.get(
-        form.token.value.toBase58()
-      )![0]
-      const groupInsuranceFund = mangoGroup.mintInfosMapByMint.get(
-        form.token.value.toBase58()
-      )?.groupInsuranceFund
+    if (formTokenPk && mangoGroup) {
+      const currentToken = mangoGroup!.banksMapByMint.get(formTokenPk)![0]
+      const groupInsuranceFund = mangoGroup.mintInfosMapByMint.get(formTokenPk)
+        ?.groupInsuranceFund
 
       const vals = {
-        ...form,
         oraclePk: currentToken.oracle.toBase58(),
         oracleConfFilter: currentToken.oracleConfig.confFilter.toNumber(),
         maxStalenessSlots: currentToken.oracleConfig.maxStalenessSlots.toNumber(),
@@ -366,12 +365,13 @@ const EditToken = ({
         )!,
         forceClose: currentToken.forceClose,
       }
-      setForm({
+      setForm((prevForm) => ({
+        ...prevForm,
         ...vals,
-      })
-      setOriginalFormValues({ ...vals })
+      }))
+      setOriginalFormValues((prevForm) => ({ ...prevForm, ...vals }))
     }
-  }, [form.token?.value.toBase58()])
+  }, [formTokenPk, mangoGroup])
 
   const schema = yup.object().shape({
     governedAccount: yup
@@ -392,6 +392,7 @@ const EditToken = ({
       ),
     name: yup.string().required(),
   })
+
   const inputs: InstructionInput[] = [
     {
       label: 'Governance',
