@@ -167,7 +167,7 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
             </div>
           </Tooltip>
         ) : (
-          assertUnreachable(vote.voteType)
+          assertUnreachable(vote.voteType as never)
         )}
       </div>
       {(isVoting || isInCoolOffTime) && (
