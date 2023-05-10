@@ -662,8 +662,10 @@ export class VotingClient {
       // But we're not writing good code, there's no good place for it, I'm not bothering.
       const voterWeightRecord = await queryClient.fetchQuery({
         queryKey: [voterWeightPk],
-        queryFn: () => asFindable(connection.getAccountInfo)(voterWeightPk),
+        queryFn: () =>
+          asFindable(connection.getAccountInfo, connection)(voterWeightPk),
       })
+
       if (voterWeightRecord.result) {
         const firstFiveNfts = remainingAccounts.slice(0, 5)
         const remainingNftsChunk = chunks(
