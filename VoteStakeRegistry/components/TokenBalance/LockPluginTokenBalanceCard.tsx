@@ -33,6 +33,8 @@ const LockPluginTokenBalanceCard = ({
   const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
+  const walletPublicKey = wallet?.publicKey
+
   const isDepositVisible = (
     depositMint: MintInfo | undefined,
     realmMint: PublicKey | undefined
@@ -52,28 +54,28 @@ const LockPluginTokenBalanceCard = ({
     realm?.account.config.councilMint
   )
 
+  const defaultMint =
+    !mint?.supply.isZero() ||
+    config?.account.communityTokenConfig.maxVoterWeightAddin
+      ? realm!.account.communityMint
+      : !councilMint?.supply.isZero()
+      ? realm!.account.config.councilMint
+      : undefined
+
   useEffect(() => {
     const getTokenOwnerRecord = async () => {
-      const defaultMint =
-        !mint?.supply.isZero() ||
-        config?.account.communityTokenConfig.maxVoterWeightAddin
-          ? realm!.account.communityMint
-          : !councilMint?.supply.isZero()
-          ? realm!.account.config.councilMint
-          : undefined
       const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
         realm!.owner,
         realm!.pubkey,
         defaultMint!,
-        wallet!.publicKey!
+        walletPublicKey!
       )
       setTokenOwneRecordPk(tokenOwnerRecordAddress.toBase58())
     }
-    if (realm && wallet?.connected) {
+    if (realm && connected) {
       getTokenOwnerRecord()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [realm?.pubkey.toBase58(), wallet?.connected])
+  }, [defaultMint, realm, connected, walletPublicKey])
 
   const hasLoaded = mint || councilMint
   return (
@@ -173,10 +175,6 @@ const TokenDepositLock = ({
       x.mint.publicKey.toBase58() === realm!.account.communityMint.toBase58() &&
       x.lockup.kind.none
   )
-  // Do not show deposits for mints with zero supply because nobody can deposit anyway
-  if (!mint || mint.supply.isZero()) {
-    return null
-  }
 
   const depositTokenAccount =
     tokenRole === GoverningTokenRole.Community
@@ -208,12 +206,10 @@ const TokenDepositLock = ({
       ? fmtMintAmount(mint, depositRecord.amountDepositedNative)
       : '0'
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   useEffect(() => {
     if (availableTokens != '0' || hasTokensDeposited || hasTokensInWallet) {
       setHasGovPower(true)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [availableTokens, hasTokensDeposited, hasTokensInWallet])
 
   const canShowAvailableTokensMessage = hasTokensInWallet && connected
@@ -223,6 +219,11 @@ const TokenDepositLock = ({
       : hasTokensInWallet
       ? availableTokens
       : 0
+
+  // Do not show deposits for mints with zero supply because nobody can deposit anyway
+  if (!mint || mint.supply.isZero()) {
+    return null
+  }
 
   return (
     <>

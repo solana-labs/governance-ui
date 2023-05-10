@@ -80,13 +80,16 @@ const Grant = ({
     : 1
   const currentPrecision = precision(mintMinAmount)
   const { handleSetInstructions } = useContext(NewProposalContext)
+
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
+    setForm((prevForm) => ({ ...prevForm, [propertyName]: value }))
   }
+
   const setMintInfo = (value) => {
-    setForm({ ...form, mintInfo: value })
+    setForm((prevForm) => ({ ...prevForm, mintInfo: value }))
   }
+
   const setAmount = (event) => {
     const value = event.target.value
     handleSetForm({
@@ -194,8 +197,8 @@ const Grant = ({
         propertyName: 'periods',
       })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [startDate, endDate, form.lockupKind.value])
+
   useEffect(() => {
     if (form.destinationAccount) {
       debounce.debounceFcn(async () => {
@@ -210,8 +213,8 @@ const Grant = ({
     } else {
       setDestinationAccount(null)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form.destinationAccount])
+  }, [form.destinationAccount, connection])
+
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: governedAccount, getInstruction },
@@ -219,11 +222,12 @@ const Grant = ({
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
+
   useEffect(() => {
     setGovernedAccount(form.governedTokenAccount?.governance)
     setMintInfo(form.governedTokenAccount?.extensions.mint?.account)
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.governedTokenAccount])
+
   const destinationAccountName =
     destinationAccount?.publicKey &&
     getAccountName(destinationAccount?.account.address)
@@ -257,8 +261,8 @@ const Grant = ({
     if (client) {
       getGrantMints()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [client])
+  }, [client, realm])
+
   const isNotVested =
     form.lockupKind.value !== 'monthly' && form.lockupKind.value !== 'daily'
   return (

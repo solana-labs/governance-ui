@@ -32,6 +32,7 @@ import { getClawbackInstruction } from 'VoteStakeRegistry/actions/getClawbackIns
 import { abbreviateAddress } from '@utils/formatting'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import { usePrevious } from '@hooks/usePrevious'
 
 const Clawback = ({
   index,
@@ -55,6 +56,9 @@ const Clawback = ({
     voter: null,
     deposit: null,
   })
+  const formDeposits = form.deposit
+  const previousFormDeposits = usePrevious(form.deposit)
+
   const [governedAccount, setGovernedAccount] = useState<
     ProgramAccount<Governance> | undefined
   >(undefined)
@@ -116,8 +120,7 @@ const Clawback = ({
         (x) => x.pubkey.toBase58() === realm?.account.authority?.toBase58()
       )
     )
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form.governedTokenAccount])
+  }, [form.governedTokenAccount, governancesArray, realm?.account.authority])
   useEffect(() => {
     const getVoters = async () => {
       const { registrar } = await getRegistrarPDA(
@@ -148,8 +151,7 @@ const Clawback = ({
     if (client) {
       getVoters()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [client])
+  }, [client, realm])
   useEffect(() => {
     const getOwnedDepositsInfo = async () => {
       const { registrar } = await getRegistrarPDA(
@@ -184,13 +186,19 @@ const Clawback = ({
     } else {
       setDeposits([])
     }
-    setForm({ ...form, deposit: null, governedTokenAccount: undefined })
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form.voter])
+    setForm((prevForm) => ({
+      ...prevForm,
+      deposit: null,
+      governedTokenAccount: undefined,
+    }))
+  }, [client, connection, form.voter, realm])
+
   useEffect(() => {
-    setForm({ ...form, governedTokenAccount: undefined })
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form.deposit])
+    if (formDeposits !== previousFormDeposits) {
+      setForm({ ...form, governedTokenAccount: undefined })
+    }
+  }, [formDeposits, previousFormDeposits, form])
+
   const schema = yup.object().shape({
     governedTokenAccount: yup
       .object()
