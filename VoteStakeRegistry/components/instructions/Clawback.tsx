@@ -32,7 +32,6 @@ import { getClawbackInstruction } from 'VoteStakeRegistry/actions/getClawbackIns
 import { abbreviateAddress } from '@utils/formatting'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { AssetAccount } from '@utils/uiTypes/assets'
-import { usePrevious } from '@hooks/usePrevious'
 
 const Clawback = ({
   index,
@@ -57,7 +56,6 @@ const Clawback = ({
     deposit: null,
   })
   const formDeposits = form.deposit
-  const previousFormDeposits = usePrevious(form.deposit)
 
   const [governedAccount, setGovernedAccount] = useState<
     ProgramAccount<Governance> | undefined
@@ -194,10 +192,8 @@ const Clawback = ({
   }, [client, connection, form.voter, realm])
 
   useEffect(() => {
-    if (formDeposits !== previousFormDeposits) {
-      setForm({ ...form, governedTokenAccount: undefined })
-    }
-  }, [formDeposits, previousFormDeposits, form])
+    setForm((prevForm) => ({ ...prevForm, governedTokenAccount: undefined }))
+  }, [formDeposits])
 
   const schema = yup.object().shape({
     governedTokenAccount: yup

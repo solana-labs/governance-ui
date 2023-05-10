@@ -215,8 +215,7 @@ const LockTokensAccount: React.FC<{
             )?.index
         )
     )
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [deposits])
+  }, [deposits, realm?.account.communityMint])
 
   return (
     <div className="grid grid-cols-12 gap-4">

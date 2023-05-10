@@ -210,20 +210,23 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
         new PublicKey('4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo')
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [wallet?.publicKey?.toBase58() && realm?.pubkey.toBase58()])
+
+  const defaultMintOwnerRecordMint =
+    !mint?.supply.isZero() ||
+    config?.account.communityTokenConfig.maxVoterWeightAddin
+      ? realm!.account.communityMint
+      : !councilMint?.supply.isZero()
+      ? realm!.account.config.councilMint
+      : undefined
+
   useEffect(() => {
     const getTokenOwnerRecord = async () => {
-      const defaultMint =
-        !mint?.supply.isZero() ||
-        config?.account.communityTokenConfig.maxVoterWeightAddin
-          ? realm!.account.communityMint
-          : !councilMint?.supply.isZero()
-          ? realm!.account.config.councilMint
-          : undefined
       const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
         realm!.owner,
         realm!.pubkey,
-        defaultMint!,
+        defaultMintOwnerRecordMint!,
         wallet!.publicKey!
       )
       setIsOwnerOfDeposits(
@@ -233,8 +236,13 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
     if (realm && wallet?.connected) {
       getTokenOwnerRecord()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [realm?.pubkey.toBase58(), wallet?.connected, tokenOwnerRecordPk])
+  }, [
+    wallet?.connected,
+    tokenOwnerRecordPk,
+    defaultMintOwnerRecordMint,
+    realm,
+    wallet,
+  ])
 
   const hasLockedTokens = useMemo(() => {
     return reducedDeposits.find((d) => d.lockUpKind !== 'none')
@@ -242,7 +250,6 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
 
   const lockedTokens = useMemo(() => {
     return deposits
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [deposits])
 
   return (
