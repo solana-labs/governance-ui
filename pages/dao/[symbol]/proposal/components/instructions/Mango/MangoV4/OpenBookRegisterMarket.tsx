@@ -145,11 +145,11 @@ const OpenBookRegisterMarket = ({
       !mangoGroup || mangoGroup?.serum3MarketsMapByMarketIndex.size === 0
         ? 0
         : Math.max(...[...mangoGroup!.serum3MarketsMapByMarketIndex.keys()]) + 1
-    setForm({
-      ...form,
+    setForm((prevForm) => ({
+      ...prevForm,
       marketIndex: marketIndex,
-    })
-  }, [mangoGroup?.serum3MarketsMapByMarketIndex.size])
+    }))
+  }, [mangoGroup, mangoGroup?.serum3MarketsMapByMarketIndex.size])
 
   const inputs: InstructionInput[] = [
     {
