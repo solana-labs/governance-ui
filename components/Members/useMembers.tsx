@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import {
   AccountInfo,
   ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -30,7 +30,33 @@ export default function useMembers() {
   const setMembers = useMembersStore((s) => s.setMembers)
   const setDelegates = useMembersStore((s) => s.setDelegates)
 
-  const fetchCouncilMembersWithTokensOutsideRealm = async () => {
+  const tokenRecordArray: TokenRecordsWithWalletAddress[] = useMemo(
+    () =>
+      tokenRecords
+        ? Object.keys(tokenRecords).flatMap((x) => {
+            return {
+              walletAddress: x,
+              community: { ...tokenRecords[x] },
+            }
+          })
+        : [],
+    [tokenRecords]
+  )
+
+  const councilRecordArray: TokenRecordsWithWalletAddress[] = useMemo(
+    () =>
+      councilTokenOwnerRecords
+        ? Object.keys(councilTokenOwnerRecords).flatMap((x) => {
+            return {
+              walletAddress: x,
+              council: { ...councilTokenOwnerRecords[x] },
+            }
+          })
+        : [],
+    [councilTokenOwnerRecords]
+  )
+
+  const fetchCouncilMembersWithTokensOutsideRealm = useCallback(async () => {
     if (realm?.account.config.councilMint) {
       const tokenAccounts = await getTokenAccountsByMint(
         connection.current,
@@ -49,10 +75,10 @@ export default function useMembers() {
       )
     }
     return []
-  }
+  }, [connection, realm?.account.config.councilMint, realm?.pubkey])
 
   // This will need to be rewritten for better performance if some realm hits more then +-5k+ members
-  const fetchCommunityMembersATAS = async () => {
+  const fetchCommunityMembersATAS = useCallback(async () => {
     if (realm?.account.communityMint) {
       const ATAS: PublicKey[] = []
       // we filter out people who never voted and has tokens inside realm
@@ -86,7 +112,7 @@ export default function useMembers() {
       return ownersAtasParsed
     }
     return []
-  }
+  }, [connection, realm, tokenRecordArray])
 
   const matchMembers = (
     membersArray,
@@ -123,39 +149,11 @@ export default function useMembers() {
     return members
   }
 
-  const tokenRecordArray: TokenRecordsWithWalletAddress[] = useMemo(
-    () =>
-      tokenRecords
-        ? Object.keys(tokenRecords).flatMap((x) => {
-            return {
-              walletAddress: x,
-              community: { ...tokenRecords[x] },
-            }
-          })
-        : [],
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    [JSON.stringify(tokenRecords)]
-  )
-
-  const councilRecordArray: TokenRecordsWithWalletAddress[] = useMemo(
-    () =>
-      councilTokenOwnerRecords
-        ? Object.keys(councilTokenOwnerRecords).flatMap((x) => {
-            return {
-              walletAddress: x,
-              council: { ...councilTokenOwnerRecords[x] },
-            }
-          })
-        : [],
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    [JSON.stringify(councilTokenOwnerRecords)]
-  )
-
   // for community we exclude people who never vote
-  const communityAndCouncilTokenRecords = [
-    ...tokenRecordArray,
-    ...councilRecordArray,
-  ]
+  const communityAndCouncilTokenRecords = useMemo(
+    () => [...tokenRecordArray, ...councilRecordArray],
+    [councilRecordArray, tokenRecordArray]
+  )
   // merge community and council vote records to one big array of members
   // sort them by totalVotes sum of community and council votes
   const membersWithTokensDeposited = useMemo(
@@ -201,16 +199,7 @@ export default function useMembers() {
         })
         // .sort((a, b) => a.votesCasted - b.votesCasted)
         .reverse(),
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    [
-      // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-      JSON.stringify(tokenRecordArray),
-      // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-      JSON.stringify(councilRecordArray),
-      // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-      realm?.pubkey.toBase58(),
-    ]
+    [communityAndCouncilTokenRecords]
   )
 
   // Loop through Members list to get our delegates and their tokens
@@ -304,6 +293,14 @@ export default function useMembers() {
       getDelegates()
       setMembers([])
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [realm?.pubkey.toBase58()])
+  }, [
+    config?.account.communityTokenConfig.voterWeightAddin,
+    fetchCommunityMembersATAS,
+    fetchCouncilMembersWithTokensOutsideRealm,
+    membersWithTokensDeposited,
+    previousRealmPubKey,
+    realm?.pubkey,
+    setDelegates,
+    setMembers,
+  ])
 }
