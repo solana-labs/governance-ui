@@ -55,11 +55,11 @@ const LockPluginTokenBalanceCard = ({
   )
 
   const defaultMint =
-    !mint?.supply.isZero() ||
+    mint?.supply.isZero() ||
     config?.account.communityTokenConfig.maxVoterWeightAddin
-      ? realm!.account.communityMint
-      : !councilMint?.supply.isZero()
-      ? realm!.account.config.councilMint
+      ? realm?.account.communityMint
+      : councilMint?.supply.isZero()
+      ? realm?.account.config.councilMint
       : undefined
 
   useEffect(() => {

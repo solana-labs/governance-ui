@@ -177,11 +177,11 @@ const LockTokensAccount: React.FC<{
   }, [isOwnerOfDeposits, client, handleGetDeposits])
 
   const depositMint =
-    !mint?.supply.isZero() ||
+    mint?.supply.isZero() ||
     config?.account.communityTokenConfig.maxVoterWeightAddin
-      ? realm!.account.communityMint
-      : !councilMint?.supply.isZero()
-      ? realm!.account.config.councilMint
+      ? realm?.account.communityMint
+      : councilMint?.supply.isZero()
+      ? realm?.account.config.councilMint
       : undefined
 
   useEffect(() => {
