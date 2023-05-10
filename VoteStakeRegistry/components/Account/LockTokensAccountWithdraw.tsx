@@ -224,10 +224,10 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
   }, [connnectionContext, handleSetVsrClient, realm?.pubkey, wallet])
 
   const defaultMintOwnerRecordMint =
-    mint?.supply.isZero() ||
+    !mint?.supply.isZero() ||
     config?.account.communityTokenConfig.maxVoterWeightAddin
       ? realm?.account.communityMint
-      : councilMint?.supply.isZero()
+      : !councilMint?.supply.isZero()
       ? realm?.account.config.councilMint
       : undefined
 
@@ -243,7 +243,12 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
         tokenOwnerRecordAddress.toBase58() === tokenOwnerRecordPk
       )
     }
-    if (realm && wallet?.connected) {
+    if (
+      realm?.owner &&
+      wallet?.connected &&
+      realm.pubkey &&
+      defaultMintOwnerRecordMint
+    ) {
       getTokenOwnerRecord()
     }
   }, [

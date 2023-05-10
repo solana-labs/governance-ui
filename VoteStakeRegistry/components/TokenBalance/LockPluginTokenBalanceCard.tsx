@@ -30,7 +30,7 @@ const LockPluginTokenBalanceCard = ({
   const [hasGovPower, setHasGovPower] = useState<boolean>(false)
   const { fmtUrlWithCluster } = useQueryContext()
   const { councilMint, mint, realm, symbol, config } = useRealm()
-  const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
+  const [tokenOwnerRecordPk, setTokenOwnerRecordPk] = useState('')
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const walletPublicKey = wallet?.publicKey
@@ -55,10 +55,10 @@ const LockPluginTokenBalanceCard = ({
   )
 
   const defaultMint =
-    mint?.supply.isZero() ||
+    !mint?.supply.isZero() ||
     config?.account.communityTokenConfig.maxVoterWeightAddin
       ? realm?.account.communityMint
-      : councilMint?.supply.isZero()
+      : !councilMint?.supply.isZero()
       ? realm?.account.config.councilMint
       : undefined
 
@@ -70,9 +70,9 @@ const LockPluginTokenBalanceCard = ({
         defaultMint!,
         walletPublicKey!
       )
-      setTokenOwneRecordPk(tokenOwnerRecordAddress.toBase58())
+      setTokenOwnerRecordPk(tokenOwnerRecordAddress.toBase58())
     }
-    if (realm && connected) {
+    if (realm?.owner && connected && defaultMint) {
       getTokenOwnerRecord()
     }
   }, [defaultMint, realm, connected, walletPublicKey])

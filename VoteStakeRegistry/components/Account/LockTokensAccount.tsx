@@ -177,10 +177,10 @@ const LockTokensAccount: React.FC<{
   }, [isOwnerOfDeposits, client, handleGetDeposits])
 
   const depositMint =
-    mint?.supply.isZero() ||
+    !mint?.supply.isZero() ||
     config?.account.communityTokenConfig.maxVoterWeightAddin
       ? realm?.account.communityMint
-      : councilMint?.supply.isZero()
+      : !councilMint?.supply.isZero()
       ? realm?.account.config.councilMint
       : undefined
 
@@ -196,7 +196,7 @@ const LockTokensAccount: React.FC<{
         tokenOwnerRecordAddress.toBase58() === tokenOwnerRecordPk
       )
     }
-    if (realm && wallet?.connected) {
+    if (realm?.owner && realm.pubkey && wallet?.connected && depositMint) {
       getTokenOwnerRecord()
     }
   }, [tokenOwnerRecordPk, depositMint, realm, wallet])
