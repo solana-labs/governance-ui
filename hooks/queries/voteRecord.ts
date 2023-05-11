@@ -12,8 +12,6 @@ import asFindable from '@utils/queries/asFindable'
 import useWalletStore from 'stores/useWalletStore'
 import { useAddressQuery_SelectedProposalVoteRecord } from './addresses/voteRecord'
 import queryClient from './queryClient'
-import { cluster } from 'd3'
-import { useRouter } from 'next/router'
 import { useRealmQuery } from './realm'
 
 export const voteRecordQueryKeys = {
