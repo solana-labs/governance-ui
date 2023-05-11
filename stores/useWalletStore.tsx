@@ -132,8 +132,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
   providerName: undefined,
   tokenAccounts: [],
   switchboardProgram: undefined,
-  councilDelegateVoteRecordsByProposal: {},
-  communityDelegateVoteRecordsByProposal: {},
   set: (fn) => set(produce(fn)),
   /** @deprecated use react-query */
   actions: {
@@ -195,51 +193,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       } else {
         set((state) => {
           state.tokenAccounts = []
-        })
-      }
-    },
-    async fetchDelegateVoteRecords() {
-      const connection = get().connection.current
-      const wallet = get().mockWallet ?? get().current
-      const connected = !!wallet?.connected
-      const programId = get().selectedRealm.programId
-      const realmId = get().selectedRealm.realm?.pubkey
-      const selectedCouncilDelegate = useSelectedDelegatorStore.getState()
-        .councilDelegator
-      const selectedCommunityDelegate = useSelectedDelegatorStore.getState()
-        .communityDelegator
-
-      const set = get().set
-
-      if (connected && selectedCouncilDelegate && programId && realmId) {
-        const councilDelegateVoteRecordsByProposal = await getVoteRecordsByVoterMapByProposal(
-          connection,
-          programId,
-          new PublicKey(selectedCouncilDelegate)
-        )
-
-        set((state) => {
-          state.councilDelegateVoteRecordsByProposal = councilDelegateVoteRecordsByProposal
-        })
-      } else {
-        set((state) => {
-          state.councilDelegateVoteRecordsByProposal = []
-        })
-      }
-
-      if (connected && selectedCommunityDelegate && programId && realmId) {
-        const communityDelegateVoteRecordsByProposal = await getVoteRecordsByVoterMapByProposal(
-          connection,
-          programId,
-          new PublicKey(selectedCommunityDelegate)
-        )
-
-        set((state) => {
-          state.communityDelegateVoteRecordsByProposal = communityDelegateVoteRecordsByProposal
-        })
-      } else {
-        set((state) => {
-          state.communityDelegateVoteRecordsByProposal = []
         })
       }
     },

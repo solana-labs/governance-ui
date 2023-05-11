@@ -158,12 +158,6 @@ export function App(props: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [cluster])
 
-  // whenever we change delegate, get that delegates vote record so we can display it
-  useEffect(() => {
-    actions.fetchDelegateVoteRecords()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [selectedCommunityDelegate, selectedCouncilDelegate])
-
   return (
     <div className="relative bg-bkg-1 text-fgd-1">
       <Head>
