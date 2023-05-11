@@ -90,12 +90,6 @@ export function App(props: Props) {
   const updateSerumGovAccounts = useSerumGovStore(
     (s) => s.actions.updateSerumGovAccounts
   )
-  const { actions } = useWalletStore((s) => s)
-
-  const {
-    communityDelegator: selectedCommunityDelegate,
-    councilDelegator: selectedCouncilDelegate,
-  } = useSelectedDelegatorStore()
 
   const realmName = realmInfo?.displayName ?? realm?.account?.name
   const title = realmName ? `${realmName}` : 'Realms'
