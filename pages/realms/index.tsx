@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react'
 
 import {
+  createUnchartedRealmInfo,
   getCertifiedRealmInfos,
   getUnchartedRealmInfos,
   RealmInfo,
@@ -17,6 +18,9 @@ import dynamic from 'next/dynamic'
 
 import { BsLayoutWtf, BsCheck } from 'react-icons/bs'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { PublicKey } from '@solana/web3.js'
+import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
+import { useRealmsByProgramQuery } from '@hooks/queries/realm'
 
 const RealmsDashboard = dynamic(() => import('./components/RealmsDashboard'))
 
@@ -37,17 +41,33 @@ const Realms = () => {
   const { cluster } = router.query
   //Small hack to prevent race conditions with cluster change until we remove connection from store and move it to global dep.
   const routeHasClusterInPath = router.asPath.includes('cluster')
+  const programs = useMemo(
+    () => new PublicKey(DEFAULT_GOVERNANCE_PROGRAM_ID),
+    []
+  )
+  const { data: queryRealms } = useRealmsByProgramQuery(programs)
 
   useMemo(async () => {
     if (
       connection &&
       ((routeHasClusterInPath && cluster) || !routeHasClusterInPath)
     ) {
-      const [certifiedRealms, uncharteredRealms] = await Promise.all([
+      const [certifiedRealms] = await Promise.all([
         getCertifiedRealmInfos(connection),
-        getUnchartedRealmInfos(connection),
       ])
-      const allRealms = [...certifiedRealms, ...uncharteredRealms]
+      const unchartedRealms =
+        queryRealms
+          ?.filter(
+            (x) => !certifiedRealms.find((y) => y.realmId.equals(x.pubkey))
+          )
+          .map((x) =>
+            createUnchartedRealmInfo({
+              name: x.account.name,
+              programId: x.owner.toBase58(),
+              address: x.pubkey.toBase58(),
+            })
+          ) ?? []
+      const allRealms = [...certifiedRealms, ...unchartedRealms]
       setRealms(sortDaos(allRealms))
       setFilteredRealms(sortDaos(allRealms))
       setIsLoadingRealms(false)
@@ -56,8 +76,14 @@ const Realms = () => {
       // TODO dont have side effects in useMemo!!
       actions.deselectRealm()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [connection.cluster, connection.endpoint, connection.current.commitment])
+  }, [
+    connection,
+    routeHasClusterInPath,
+    cluster,
+    selectedRealm.realm,
+    queryRealms,
+    actions,
+  ])
 
   const handleCreateRealmButtonClick = async () => {
     if (!connected) {
