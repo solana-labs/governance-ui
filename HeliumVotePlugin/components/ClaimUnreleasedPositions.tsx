@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import useRealm from '@hooks/useRealm'
 import useWalletStore from 'stores/useWalletStore'
-import {
-  GetProgramAccountsFilter,
-  TransactionInstruction,
-} from '@solana/web3.js'
+import { TransactionInstruction } from '@solana/web3.js'
 import { SecondaryButton } from '@components/Button'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
