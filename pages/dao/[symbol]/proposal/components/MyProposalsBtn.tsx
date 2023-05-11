@@ -40,6 +40,7 @@ import {
   useUserCouncilTokenOwnerRecord,
 } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { useVoteRecordsForRealmByOwner } from '@hooks/queries/voteRecord'
 
 const MyProposalsBn = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
@@ -48,9 +49,18 @@ const MyProposalsBn = () => {
   const [isLoading, setIsLoading] = useState(false)
   const { governancesArray } = useGovernanceAssets()
   const { current: connection } = useWalletStore((s) => s.connection)
-  const ownVoteRecordsByProposal = useWalletStore(
-    (s) => s.ownVoteRecordsByProposal
-  )
+
+  const myVoteRecords = useVoteRecordsForRealmByOwner(
+    wallet?.publicKey ?? undefined
+  ).data
+  const ownVoteRecordsByProposal = useMemo(() => {
+    return myVoteRecords !== undefined
+      ? (Object.fromEntries(
+          myVoteRecords.map((x) => [x.account.proposal.toString, x] as const)
+        ) as Record<string, typeof myVoteRecords[number]>)
+      : undefined
+  }, [myVoteRecords])
+
   const [ownNftVoteRecords, setOwnNftVoteRecords] = useState<any[]>([])
   const ownNftVoteRecordsFilterd = ownNftVoteRecords
 
@@ -120,8 +130,8 @@ const MyProposalsBn = () => {
         x.account.state === ProposalState.Defeated ||
         x.account.state === ProposalState.Vetoed ||
         x.account.state === ProposalState.Cancelled) &&
-      ownVoteRecordsByProposal[x.pubkey.toBase58()] &&
-      !ownVoteRecordsByProposal[x.pubkey.toBase58()]?.account.isRelinquished
+      ownVoteRecordsByProposal?.[x.pubkey.toBase58()] &&
+      !ownVoteRecordsByProposal?.[x.pubkey.toBase58()]?.account.isRelinquished
   )
 
   const createdVoting = myProposals.filter((x) => {

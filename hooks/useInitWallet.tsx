@@ -112,7 +112,6 @@ export default function useInitWallet() {
           wallet!.publicKey!.toString().substr(-5),
       })
       await actions.fetchWalletTokenAccounts()
-      await actions.fetchOwnVoteRecords()
     })
     wallet.on('disconnect', () => {
       setWalletStore((state) => {

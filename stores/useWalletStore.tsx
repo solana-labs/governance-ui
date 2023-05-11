@@ -45,14 +45,12 @@ import { accountsToPubkeyMap } from '@tools/sdk/accounts'
 import { HIDDEN_PROPOSALS } from '@components/instructions/tools'
 import { getRealmConfigAccountOrDefault } from '@tools/governance/configs'
 import { getProposals } from '@utils/GovernanceTools'
-import { useSelectedDelegatorStore } from './useSelectedDelegatorStore'
 
 interface WalletStore extends State {
   connection: ConnectionContext
   current: SignerWalletAdapter | undefined
   mockWallet: SignerWalletAdapter | undefined
 
-  ownVoteRecordsByProposal: { [proposal: string]: ProgramAccount<VoteRecord> }
   realms: { [realm: string]: ProgramAccount<Realm> }
   selectedRealm: {
     realm?: ProgramAccount<Realm>
@@ -126,7 +124,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
   current: undefined,
   mockWallet: undefined,
   realms: {},
-  ownVoteRecordsByProposal: {},
   selectedRealm: INITIAL_REALM_STATE,
   selectedProposal: INITIAL_PROPOSAL_STATE,
   providerName: undefined,
@@ -200,40 +197,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
     // selectedCouncilDelegate: string | undefined
     // selectedCommunityDelegate: string | undefined
 
-    async fetchOwnVoteRecords() {
-      const connection = get().connection.current
-      const programId = get().selectedRealm.programId
-      const realmId = get().selectedRealm.realm?.pubkey
-      const realmMintPk = get().selectedRealm.realm?.account.communityMint
-      const wallet = get().mockWallet ?? get().current
-      const connected = !!wallet?.connected
-      const walletOwner = wallet?.publicKey
-      const set = get().set
-
-      if (connected && walletOwner && programId && realmId) {
-        const [ownVoteRecordsByProposal, tokenRecords] = await Promise.all([
-          getVoteRecordsByVoterMapByProposal(
-            connection,
-            programId,
-            walletOwner
-          ),
-          getTokenOwnerRecordsForRealmMintMapByOwner(
-            connection,
-            programId,
-            realmId,
-            realmMintPk
-          ),
-        ])
-        set((state) => {
-          state.ownVoteRecordsByProposal = ownVoteRecordsByProposal
-          state.selectedRealm.tokenRecords = tokenRecords
-        })
-      } else {
-        set((state) => {
-          state.ownVoteRecordsByProposal = []
-        })
-      }
-    },
     deselectRealm() {
       const set = get().set
       set((s) => {
@@ -338,7 +301,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.selectedRealm.tokenRecords = tokenRecords
         s.selectedRealm.councilTokenOwnerRecords = councilTokenOwnerRecords
       })
-      get().actions.fetchOwnVoteRecords()
 
       const proposalsByGovernance = await getProposals(
         governances.map((x) => x.pubkey),
@@ -378,7 +340,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       await set((s) => {
         s.selectedRealm.proposals = proposals
       })
-      await get().actions.fetchOwnVoteRecords()
     },
     // Fetches and updates governance for the selected realm
     async fetchRealmGovernance(governancePk: PublicKey) {
