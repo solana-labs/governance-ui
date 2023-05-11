@@ -12,6 +12,10 @@ import useWalletStore from '../stores/useWalletStore'
 import Tooltip from './Tooltip'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { useAddressQuery_VoteRecord } from '@hooks/queries/addresses/voteRecord'
+import { useAddressQuery_TokenOwnerRecord } from '@hooks/queries/addresses/tokenOwnerRecord'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useVoteRecordByPubkeyQuery } from '@hooks/queries/voteRecord'
 
 interface VoteRecords {
   [proposal: string]: ProgramAccount<VoteRecord>
@@ -53,43 +57,27 @@ interface Props {
 }
 
 export default function ProposalMyVoteBadge(props: Props) {
-  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
-
   const realm = useRealmQuery().data?.result
-  const [
-    ownVoteRecords,
-    communityDelegateVoteRecords,
-    councilDelegateVoteRecords,
-  ] = useWalletStore((s) => [
-    s.ownVoteRecordsByProposal,
-    s.communityDelegateVoteRecordsByProposal,
-    s.councilDelegateVoteRecordsByProposal,
-  ])
+  const wallet = useWalletOnePointOh()
 
-  const ownVoteRecord = useMemo(
-    () =>
-      getOwnVoteRecord(
-        communityDelegateVoteRecords,
-        councilDelegateVoteRecords,
-        ownVoteRecords,
-        props.proposal,
-        realm
-      ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    [
-      communityDelegateVoteRecords,
-      councilDelegateVoteRecords,
-      ownVoteRecords,
-      // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-      ownTokenRecord?.account.governingTokenOwner.toBase58(),
-    ]
+  const { data: tokenOwnerRecordPk } = useAddressQuery_TokenOwnerRecord(
+    realm?.owner,
+    realm?.pubkey,
+    props.proposal.account.governingTokenMint,
+    wallet?.publicKey ?? undefined
   )
+  const { data: voteRecordPk } = useAddressQuery_VoteRecord(
+    realm?.owner,
+    props.proposal.pubkey,
+    tokenOwnerRecordPk
+  )
+  const { data: ownVoteRecord } = useVoteRecordByPubkeyQuery(voteRecordPk)
 
-  if (!ownVoteRecord) {
+  if (!ownVoteRecord?.result?.account) {
     return null
   }
 
-  const isYes = isYesVote(ownVoteRecord.account)
+  const isYes = isYesVote(ownVoteRecord?.result?.account)
   return (
     <Tooltip content={isYes ? 'You voted "Yes"' : 'You voted "No"'}>
       <div

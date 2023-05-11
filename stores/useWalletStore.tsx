@@ -89,14 +89,6 @@ interface WalletStore extends State {
   tokenAccounts: TokenProgramAccount<TokenAccount>[]
   set: (x: any) => void
   actions: any
-  /** @deprecated no comment */
-  councilDelegateVoteRecordsByProposal: {
-    [proposal: string]: ProgramAccount<VoteRecord>
-  }
-  /** @deprecated no comment */
-  communityDelegateVoteRecordsByProposal: {
-    [proposal: string]: ProgramAccount<VoteRecord>
-  }
 }
 
 const INITIAL_REALM_STATE = {
