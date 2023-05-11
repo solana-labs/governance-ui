@@ -17,7 +17,6 @@ import { capitalize } from '@utils/helpers'
 import { TokenRecordsWithWalletAddress } from './types'
 import { Member, Delegates } from 'utils/uiTypes/members'
 import useRealm from '@hooks/useRealm'
-import { usePrevious } from '@hooks/usePrevious'
 import useMembersStore from 'stores/useMembersStore'
 import useWalletStore from 'stores/useWalletStore'
 import { useRealmQuery } from '@hooks/queries/realm'
@@ -26,7 +25,6 @@ export default function useMembers() {
   const realm = useRealmQuery().data?.result
   const { tokenRecords, councilTokenOwnerRecords, config } = useRealm()
   const connection = useWalletStore((s) => s.connection)
-  const previousRealmPubKey = usePrevious(realm?.pubkey.toBase58()) as string
   const setMembers = useMembersStore((s) => s.setMembers)
   const setDelegates = useMembersStore((s) => s.setDelegates)
 
@@ -258,6 +256,8 @@ export default function useMembers() {
 
   // Move to store if will be used more across application
   useEffect(() => {
+    console.log('useMembers is fetching')
+
     const handleSetMembers = async () => {
       let members = [...membersWithTokensDeposited]
 
@@ -273,7 +273,6 @@ export default function useMembers() {
     }
 
     const getDelegates = async () => {
-      console.log('bwarp')
       const members = [...membersWithTokensDeposited]
       const delegateMap = getDelegateWalletMap(members)
       setDelegates(delegateMap)
@@ -285,7 +284,6 @@ export default function useMembers() {
     fetchCommunityMembersATAS,
     fetchCouncilMembersWithTokensOutsideRealm,
     membersWithTokensDeposited,
-    previousRealmPubKey,
     realm?.pubkey,
     setDelegates,
     setMembers,
