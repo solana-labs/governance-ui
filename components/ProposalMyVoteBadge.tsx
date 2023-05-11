@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import {
   Proposal,
   ProgramAccount,
@@ -8,9 +7,7 @@ import {
 import classNames from 'classnames'
 import { ThumbUpIcon, ThumbDownIcon } from '@heroicons/react/solid'
 import { isYesVote } from '@models/voteRecords'
-import useWalletStore from '../stores/useWalletStore'
 import Tooltip from './Tooltip'
-import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useAddressQuery_VoteRecord } from '@hooks/queries/addresses/voteRecord'
 import { useAddressQuery_TokenOwnerRecord } from '@hooks/queries/addresses/tokenOwnerRecord'
