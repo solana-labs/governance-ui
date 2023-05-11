@@ -60,15 +60,15 @@ const ClaimUnreleasedPositions = ({
       votingPlugin.client!.program.programId
     )
 
-    const nfts = ownVoteRecordsFilterd
-    for (const i of nfts) {
+    const positions = ownVoteRecordsFilterd
+    for (const i of positions) {
       const proposal = proposals[i.account.proposal.toBase58()]
       if (proposal.account.state === ProposalState.Voting) {
         // ignore this one as it's still in voting
         continue
       }
 
-      const relinquishNftVoteIx = await (votingPlugin.client as HeliumVsrClient).program.methods
+      const relinquishVoteIx = await (votingPlugin.client as HeliumVsrClient).program.methods
         .relinquishVoteV0()
         .accounts({
           registrar,
@@ -84,7 +84,7 @@ const ClaimUnreleasedPositions = ({
           { pubkey: i.publicKey, isSigner: false, isWritable: true },
         ])
         .instruction()
-      instructions.push(relinquishNftVoteIx)
+      instructions.push(relinquishVoteIx)
     }
     try {
       const insertChunks = chunks(instructions, 10).map((txBatch, batchIdx) => {
@@ -141,7 +141,7 @@ const ClaimUnreleasedPositions = ({
           (inAccountDetails && solToBeClaimed != 0)) && (
           <div className="w-full">
             <div className="flex flex-col w-full gap-2 items-center">
-              <div className="mb-2 text-xs text-white/50 max-w-[300px] text-center">
+              <div className="mb-2 text-xs text-white/50 max-w-[400px] text-center">
                 You have {solToBeClaimed.toFixed(4)} SOL to reclaim from
                 proposal voting costs and unlock your positions.
               </div>
