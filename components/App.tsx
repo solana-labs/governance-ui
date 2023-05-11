@@ -29,7 +29,6 @@ import useSerumGovStore from 'stores/useSerumGovStore'
 import { WalletProvider } from '@hub/providers/Wallet'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
-import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
 import { useRealmQuery } from '@hooks/queries/realm'
 
 const Notifications = dynamic(() => import('../components/Notification'), {

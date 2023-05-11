@@ -64,7 +64,7 @@ const REALM = () => {
   const pagination = useRef<{ setPage: (val) => void }>(null)
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
-  const realm = useRealmQuery().data?.result
+  const realmQuery = useRealmQuery()
 
   const {
     realmInfo,
@@ -122,7 +122,7 @@ const REALM = () => {
       allProposals,
       filters,
       sorting,
-      realm,
+      realmQuery.data?.result,
       governances,
       councilMint,
       mint
@@ -144,7 +144,7 @@ const REALM = () => {
       allProposals,
       filters,
       sorting,
-      realm,
+      realmQuery.data?.result,
       governances,
       councilMint,
       mint
@@ -198,7 +198,7 @@ const REALM = () => {
         allProposals,
         filters,
         sorting,
-        realm,
+        realmQuery.data?.result,
         governances,
         councilMint,
         mint
@@ -246,6 +246,7 @@ const REALM = () => {
   }
 
   const voteOnSelected = async (vote: YesNoVote) => {
+    const realm = realmQuery.data?.result
     if (!wallet || !realmInfo!.programId || !realm) return
 
     const governanceAuthority = wallet.publicKey!
@@ -386,12 +387,23 @@ const REALM = () => {
         </div>
       </div>
       <div className="grid grid-cols-12 gap-4">
-        {realm ? (
+        {realmQuery.isLoading ? (
+          <>
+            <div className={`col-span-12 md:col-span-7 lg:col-span-8`}>
+              <div className="animate-pulse bg-bkg-3 h-full rounded-lg w-full" />
+            </div>
+            <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
+              <div className="animate-pulse bg-bkg-3 h-64 rounded-lg w-full" />
+              <div className="animate-pulse bg-bkg-3 h-64 rounded-lg w-full" />
+              <div className="animate-pulse bg-bkg-3 h-64 rounded-lg w-full" />
+            </div>
+          </>
+        ) : realmQuery.data?.result !== undefined ? (
           <>
             <div
               className={`bg-bkg-2 col-span-12 md:col-span-7 md:order-first lg:col-span-8 order-last rounded-lg`}
             >
-              {realm && <RealmHeader />}
+              <RealmHeader />
               <div className="p-4 md:p-6 ">
                 <div>
                   {realmInfo?.bannerImage ? (
@@ -515,16 +527,7 @@ const REALM = () => {
             </div>
           </>
         ) : (
-          <>
-            <div className={`col-span-12 md:col-span-7 lg:col-span-8`}>
-              <div className="animate-pulse bg-bkg-3 h-full rounded-lg w-full" />
-            </div>
-            <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
-              <div className="animate-pulse bg-bkg-3 h-64 rounded-lg w-full" />
-              <div className="animate-pulse bg-bkg-3 h-64 rounded-lg w-full" />
-              <div className="animate-pulse bg-bkg-3 h-64 rounded-lg w-full" />
-            </div>
-          </>
+          <>Realm not found</>
         )}
       </div>
     </>
