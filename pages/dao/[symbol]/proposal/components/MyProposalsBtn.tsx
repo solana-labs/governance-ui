@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import {
   getProposalDepositsByDepositPayer,
+  getVoteRecordAddress,
   ProgramAccount,
   Proposal,
   ProposalDeposit,
@@ -202,6 +203,13 @@ const MyProposalsBn = () => {
           : ownCouncilTokenRecord
       const governanceAuthority = wallet!.publicKey!
       const beneficiary = wallet!.publicKey!
+
+      const voteRecordPk = await getVoteRecordAddress(
+        realm!.owner,
+        proposal.pubkey,
+        voterTokenRecord!.pubkey
+      )
+
       const inst = await withRelinquishVote(
         instructions,
         realm!.owner,
@@ -211,14 +219,14 @@ const MyProposalsBn = () => {
         proposal.pubkey,
         voterTokenRecord!.pubkey,
         proposal.account.governingTokenMint,
-        ownVoteRecordsByProposal[proposal.pubkey.toBase58()].pubkey,
+        voteRecordPk,
         governanceAuthority,
         beneficiary
       )
       await client.withRelinquishVote(
         instructions,
         proposal,
-        ownVoteRecordsByProposal[proposal.pubkey.toBase58()].pubkey,
+        voteRecordPk,
         voterTokenRecord!.pubkey
       )
       return inst
