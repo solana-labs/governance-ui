@@ -1,33 +1,27 @@
 import React, { useEffect, useState } from 'react'
-import Link from 'next/link'
 import { BN } from '@coral-xyz/anchor'
 import { GoverningTokenRole } from '@solana/spl-governance'
 import useRealm from '@hooks/useRealm'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
-import useQueryContext from '@hooks/useQueryContext'
-import { ChevronRightIcon } from '@heroicons/react/solid'
 import InlineNotification from '@components/InlineNotification'
 import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
 import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import { MintInfo } from '@solana/spl-token'
 import { VotingPowerBox } from './VotingPowerBox'
-import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export const VotingPowerCard: React.FC<{
   inAccountDetails?: boolean
 }> = ({ inAccountDetails }) => {
-  const { fmtUrlWithCluster } = useQueryContext()
   const loading = useHeliumVsrStore((s) => s.state.isLoading)
   const [hasGovPower, setHasGovPower] = useState(false)
-  const { councilMint, ownTokenRecord, mint, symbol } = useRealm()
+  const { councilMint, ownTokenRecord, mint } = useRealm()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
 
   const councilDepositVisible = !!councilMint
-  const { data: tokenOwnerRecordPk } = useAddressQuery_CommunityTokenOwner()
 
   const isLoading = !mint || !councilMint || loading
   const isSameWallet =
@@ -38,25 +32,6 @@ export const VotingPowerCard: React.FC<{
 
   return (
     <>
-      <div className="flex items-center justify-between">
-        <h3 className="mb-0">My governance power</h3>
-        <Link
-          href={fmtUrlWithCluster(
-            `/dao/${symbol}/account/${tokenOwnerRecordPk}`
-          )}
-        >
-          <a
-            className={`default-transition flex items-center text-fgd-2 text-sm transition-all hover:text-fgd-3 ${
-              !connected || !tokenOwnerRecordPk
-                ? 'opacity-50 pointer-events-none'
-                : ''
-            }`}
-          >
-            View
-            <ChevronRightIcon className="flex-shrink-0 h-6 w-6" />
-          </a>
-        </Link>
-      </div>
       {!isLoading ? (
         <>
           {!hasGovPower && !inAccountDetails && connected && (
