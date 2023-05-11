@@ -1,9 +1,8 @@
-import React, { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import {
   createUnchartedRealmInfo,
   getCertifiedRealmInfos,
-  getUnchartedRealmInfos,
   RealmInfo,
 } from '../../models/registry/api'
 
