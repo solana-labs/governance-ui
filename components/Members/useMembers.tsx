@@ -273,26 +273,13 @@ export default function useMembers() {
     }
 
     const getDelegates = async () => {
+      console.log('bwarp')
       const members = [...membersWithTokensDeposited]
       const delegateMap = getDelegateWalletMap(members)
       setDelegates(delegateMap)
     }
-
-    if (
-      realm?.pubkey &&
-      previousRealmPubKey !== realm?.pubkey.toBase58() &&
-      !config?.account.communityTokenConfig.voterWeightAddin
-    ) {
-      handleSetMembers()
-      getDelegates()
-    }
-    if (
-      !realm?.pubkey ||
-      (realm.pubkey && config?.account.communityTokenConfig.voterWeightAddin)
-    ) {
-      getDelegates()
-      setMembers([])
-    }
+    handleSetMembers()
+    getDelegates()
   }, [
     config?.account.communityTokenConfig.voterWeightAddin,
     fetchCommunityMembersATAS,

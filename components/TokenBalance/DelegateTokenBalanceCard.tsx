@@ -67,12 +67,16 @@ const DelegateBalanceCard = () => {
     return 0
   }
 
-  const handleCouncilSelect = (councilTokenRecord: string) => {
-    setCouncilDelegator(new PublicKey(councilTokenRecord))
+  const handleCouncilSelect = (councilTokenRecord?: string) => {
+    setCouncilDelegator(
+      councilTokenRecord ? new PublicKey(councilTokenRecord) : undefined
+    )
   }
 
-  const handleCommunitySelect = (communityPubKey: string) => {
-    setCommunityDelegator(new PublicKey(communityPubKey))
+  const handleCommunitySelect = (communityPubKey?: string) => {
+    setCommunityDelegator(
+      communityPubKey ? new PublicKey(communityPubKey) : undefined
+    )
   }
 
   if (!walletId || !delegates?.[walletId]) {
@@ -128,7 +132,7 @@ const DelegateBalanceCard = () => {
                 )
               }
             >
-              <Select.Option key={'reset'} value={''}>
+              <Select.Option key={'reset'} value={undefined}>
                 Use own wallet
               </Select.Option>
               {ownDelegateCouncilTokenRecords?.map((councilDelegate) => (

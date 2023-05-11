@@ -5,8 +5,8 @@ import { persist } from 'zustand/middleware'
 type Store = {
   communityDelegator?: PublicKey
   councilDelegator?: PublicKey
-  setCommunityDelegator: (x: PublicKey) => void
-  setCouncilDelegator: (x: PublicKey) => void
+  setCommunityDelegator: (x?: PublicKey) => void
+  setCouncilDelegator: (x?: PublicKey) => void
 }
 
 export const useSelectedDelegatorStore = create<Store>(
