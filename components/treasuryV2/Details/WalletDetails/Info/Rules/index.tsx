@@ -26,6 +26,10 @@ import TokenIcon from '../../../../icons/TokenIcon'
 import useProgramVersion from '@hooks/useProgramVersion'
 import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
 import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
 
 const UNIX_SECOND = 1
 const UNIX_MINUTE = UNIX_SECOND * 60
@@ -84,8 +88,11 @@ interface Props {
 }
 
 export default function Rules(props: Props) {
-  const { ownVoterWeight, symbol, mint, councilMint } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { ownVoterWeight } = useRealm()
   const router = useRouter()
+  const { symbol } = router.query
   const { fmtUrlWithCluster } = useQueryContext()
 
   const programVersion = useProgramVersion()

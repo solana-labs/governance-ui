@@ -50,6 +50,7 @@ import { notify } from '@utils/notifications'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
+import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 
 const YES = 'Yes'
 const NO = 'No'
@@ -65,8 +66,8 @@ const LockTokensModal = ({
 }) => {
   const { getOwnedDeposits } = useDepositStore()
   const realm = useRealmQuery().data?.result
-
-  const { mint, realmTokenAccount, realmInfo } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const { realmTokenAccount, realmInfo } = useRealm()
   const { data: tokenOwnerRecordPk } = useAddressQuery_CommunityTokenOwner()
 
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)

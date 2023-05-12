@@ -25,6 +25,7 @@ import useProgramVersion from '@hooks/useProgramVersion'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
+import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 
 export interface RealmConfigForm {
   governedAccount: AssetAccount | undefined
@@ -43,8 +44,8 @@ const RealmConfig = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const realm = useRealmQuery().data?.result
-
-  const { mint, realmInfo } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const { realmInfo } = useRealm()
   const wallet = useWalletOnePointOh()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const { assetAccounts } = useGovernanceAssets()

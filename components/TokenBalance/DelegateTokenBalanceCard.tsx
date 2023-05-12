@@ -12,6 +12,10 @@ import {
 } from '@hooks/queries/tokenOwnerRecord'
 import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
 import { PublicKey } from '@solana/web3.js'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
 
 const DelegateBalanceCard = () => {
   const delegates = useMembersStore((s) => s.compact.delegates)
@@ -20,13 +24,10 @@ const DelegateBalanceCard = () => {
   const walletId = wallet?.publicKey?.toBase58()
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
 
-  const {
-    ownDelegateTokenRecords,
-    ownDelegateCouncilTokenRecords,
-    mint,
-    councilMint,
-  } = useRealm()
+  const { ownDelegateTokenRecords, ownDelegateCouncilTokenRecords } = useRealm()
 
   const {
     setCommunityDelegator,

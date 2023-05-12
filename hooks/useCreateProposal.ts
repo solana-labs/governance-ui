@@ -10,6 +10,10 @@ import { fetchGovernanceByPubkey } from './queries/governance'
 import { PublicKey } from '@solana/web3.js'
 import { useRealmQuery } from './queries/realm'
 import { useRealmConfigQuery } from './queries/realmConfig'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from './queries/mintInfo'
 
 export default function useCreateProposal() {
   const client = useVotePluginsClientStore(
@@ -20,8 +24,9 @@ export default function useCreateProposal() {
   const connection = useWalletStore((s) => s.connection)
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
-
-  const { ownVoterWeight, mint, councilMint, canChooseWhoVote } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { ownVoterWeight, canChooseWhoVote } = useRealm()
   const { getRpcContext } = useRpcContext()
 
   /** @deprecated because the api is goofy, use `propose` */

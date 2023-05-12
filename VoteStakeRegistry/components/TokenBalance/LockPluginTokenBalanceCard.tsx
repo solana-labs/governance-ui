@@ -22,6 +22,10 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRouter } from 'next/router'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
 
 const LockPluginTokenBalanceCard = ({
   proposal,
@@ -35,7 +39,8 @@ const LockPluginTokenBalanceCard = ({
   const realm = useRealmQuery().data?.result
   const { symbol } = useRouter().query
   const config = useRealmConfigQuery().data?.result
-  const { councilMint, mint } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
   const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected

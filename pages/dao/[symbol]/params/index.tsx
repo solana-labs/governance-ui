@@ -27,10 +27,11 @@ import useQueryContext from '@hooks/useQueryContext'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
-import useRealm from '@hooks/useRealm'
+import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 
 const Params = () => {
-  const { mint } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+
   const router = useRouter()
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result

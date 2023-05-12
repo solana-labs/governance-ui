@@ -1,6 +1,5 @@
 import { AddressImage, DisplayAddress } from '@cardinal/namespaces-components'
 import { UserCircleIcon } from '@heroicons/react/outline'
-import useRealm from '@hooks/useRealm'
 import { PublicKey } from '@solana/web3.js'
 import { getMintDecimalAmount } from '@tools/sdk/units'
 import { useMemo } from 'react'
@@ -8,6 +7,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { LockupType } from 'VoteStakeRegistry/sdk/accounts'
 import { getMinDurationFmt, getTimeLeftFromNowFmt } from '@utils/dateTools'
 import { DepositWithWallet } from './tools'
+import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 
 const LockTokenRow = ({
   depositWithWallet,
@@ -17,7 +17,7 @@ const LockTokenRow = ({
   index: number
 }) => {
   const connection = useWalletStore((s) => s.connection)
-  const { mint } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
   const fmtMangoAmount = (val) => {
     return mint ? getMintDecimalAmount(mint!, val).toFormat(0) : '0'
   }

@@ -15,6 +15,10 @@ import { getNfts } from './getNfts'
 import { getDomains } from './getDomains'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
 
 interface Data {
   auxiliaryWallets: AuxiliaryWallet[]
@@ -33,8 +37,9 @@ export default function useTreasuryInfo(
 ): Result<Data> {
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
-
-  const { realmInfo, mint, councilMint } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { realmInfo } = useRealm()
   const connection = useWalletStore((s) => s.connection)
   const accounts = useGovernanceAssetsStore((s) => s.assetAccounts)
   const loadingGovernedAccounts = useGovernanceAssetsStore(

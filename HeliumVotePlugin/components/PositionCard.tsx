@@ -37,6 +37,10 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { PublicKey } from '@solana/web3.js'
 import { PromptModal } from './PromptModal'
 import { useRealmQuery } from '@hooks/queries/realm'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
 
 export interface PositionCardProps {
   subDaos?: SubDaoWithMeta[]
@@ -57,7 +61,8 @@ export const PositionCard: React.FC<PositionCardProps> = ({
   const [isSplitModalOpen, setIsSplitModalOpen] = useState(false)
   const [isDelegateModalOpen, setIsDelegateModalOpen] = useState(false)
   const realm = useRealmQuery().data?.result
-  const { mint, realmInfo } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const { realmInfo } = useRealm()
   const [isLoading, positions, getPositions] = useHeliumVsrStore((s) => [
     s.state.isLoading,
     s.state.positions,

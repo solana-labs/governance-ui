@@ -20,6 +20,7 @@ import VotingPowerPct from './VotingPowerPct'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
+import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 
 interface Props {
   className?: string
@@ -27,7 +28,9 @@ interface Props {
 
 export default function LockedCommunityVotingPower(props: Props) {
   const realm = useRealmQuery().data?.result
-  const { mint, realmInfo, realmTokenAccount } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+
+  const { realmInfo, realmTokenAccount } = useRealm()
   const { proposal } = useProposal()
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const connection = useWalletStore((s) => s.connection.current)

@@ -13,6 +13,10 @@ import {
 } from '@tools/sdk/units'
 import React, { useEffect, useMemo } from 'react'
 import { BaseGovernanceFormFieldsV3 } from './BaseGovernanceForm-data'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
 
 //TODO validate bricking via disabling both yes vote thresholds
 
@@ -27,7 +31,8 @@ export const BaseGovernanceFormV3 = ({
   setFormErrors: any
   form: BaseGovernanceFormFieldsV3
 }) => {
-  const { mint: realmMint, councilMint } = useRealm()
+  const realmMint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
 
   // @asktree: unclear that this should not just be an effect in the parent, I am just replicating the behavior of previous components
   useEffect(() => {

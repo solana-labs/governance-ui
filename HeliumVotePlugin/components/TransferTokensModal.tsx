@@ -6,11 +6,11 @@ import { getMinDurationFmt, getTimeLeftFromNowFmt } from '@utils/dateTools'
 import { notify } from '@utils/notifications'
 import { PositionWithMeta } from '../sdk/types'
 import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
-import useRealm from '@hooks/useRealm'
 import { precision } from '@utils/formatting'
 import Input from '@components/inputs/Input'
 import { useSolanaUnixNow } from '@hooks/useSolanaUnixNow'
 import { BN } from '@coral-xyz/anchor'
+import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 
 export interface TransferTokensModalProps {
   isOpen: boolean
@@ -28,7 +28,7 @@ export const TransferTokensModal: React.FC<TransferTokensModalProps> = ({
   onSubmit,
 }) => {
   const { unixNow = 0 } = useSolanaUnixNow()
-  const { mint } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [amount, setAmount] = useState<number | null>(null)
   const [selectedPosPk, setSelectedPosPk] = useState<PublicKey | null>(null)

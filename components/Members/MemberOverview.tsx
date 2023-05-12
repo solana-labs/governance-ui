@@ -42,6 +42,10 @@ import Tooltip from '@components/Tooltip'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
 
 const RevokeMembership: FC<{ member: PublicKey; mint: PublicKey }> = ({
   member,
@@ -105,7 +109,10 @@ const MemberOverview = ({ member }: { member: Member }) => {
   const config = useRealmConfigQuery().data?.result
   const connection = useWalletStore((s) => s.connection)
   const selectedRealm = useWalletStore((s) => s.selectedRealm)
-  const { mint, councilMint, proposals, symbol } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { symbol } = useRouter().query
+  const { proposals } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
   const activeMembers = useMembersStore((s) => s.compact.activeMembers)
   const [ownVoteRecords, setOwnVoteRecords] = useState<

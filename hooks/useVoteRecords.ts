@@ -21,6 +21,7 @@ import useWalletStore from 'stores/useWalletStore'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import { PublicKey } from '@solana/web3.js'
 import { useRealmQuery } from './queries/realm'
+import { useRealmCommunityMintInfoQuery } from './queries/mintInfo'
 
 export { VoteType }
 
@@ -33,7 +34,8 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
     ProgramAccount<TokenOwnerRecord>[]
   >([])
   const realm = useRealmQuery().data?.result
-  const { mint, vsrMode } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const { vsrMode } = useRealm()
 
   //for vsr
   const [

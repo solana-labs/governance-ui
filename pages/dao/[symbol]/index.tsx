@@ -1,5 +1,5 @@
 import useRealm from 'hooks/useRealm'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import ProposalFilter, {
   InitialFilters,
   Filters,
@@ -43,7 +43,10 @@ import {
   useUserCouncilTokenOwnerRecord,
 } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
-import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
 
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
@@ -65,15 +68,9 @@ const REALM = () => {
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
   const realmQuery = useRealmQuery()
-
-  const {
-    realmInfo,
-    mint,
-    councilMint,
-    proposals,
-    governances,
-    ownVoterWeight,
-  } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { realmInfo, proposals, governances, ownVoterWeight } = useRealm()
   const proposalsPerPage = 20
   const [filters, setFilters] = useState<Filters>(InitialFilters)
   const [sorting, setSorting] = useState<Sorting>(InitialSorting)

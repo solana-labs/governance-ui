@@ -11,6 +11,7 @@ import { getFormattedStringFromDays, yearsToDays } from '@utils/dateTools'
 import Tooltip from '@components/Tooltip'
 import { QuestionMarkCircleIcon } from '@heroicons/react/solid'
 import { notify } from '@utils/notifications'
+import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 
 export const defaultLockupPeriods = [
   {
@@ -80,7 +81,8 @@ export const LockTokensModal: React.FC<{
   onClose,
   onSubmit,
 }) => {
-  const { mint } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showCustomDuration, setShowCustomDuration] = useState(false)
   const [showLockupKindInfo, setShowLockupKindInfo] = useState<boolean>(false)

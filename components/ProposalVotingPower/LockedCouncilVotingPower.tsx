@@ -10,6 +10,7 @@ import { fmtMintAmount, getMintDecimalAmount } from '@tools/sdk/units'
 import { getMintMetadata } from '../instructions/programs/splToken'
 import VotingPowerPct from './VotingPowerPct'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmCouncilMintInfoQuery } from '@hooks/queries/mintInfo'
 
 interface Props {
   className?: string
@@ -17,7 +18,8 @@ interface Props {
 
 export default function LockedCouncilVotingPower(props: Props) {
   const realm = useRealmQuery().data?.result
-  const { councilMint } = useRealm()
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+
   const { proposal } = useProposal()
   const deposits = useDepositStore((s) => s.state.deposits)
   const votingPower = useDepositStore((s) => s.state.votingPower)

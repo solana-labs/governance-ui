@@ -1,4 +1,3 @@
-import React from 'react'
 import cx from 'classnames'
 import {
   PencilIcon,
@@ -18,7 +17,6 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Tooltip from '@components/Tooltip'
 import { formatNumber } from '@utils/formatNumber'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
-import useRealm from '@hooks/useRealm'
 import Section from '../Section'
 import Address from '@components/Address'
 import useProgramVersion from '@hooks/useProgramVersion'
@@ -27,6 +25,7 @@ import TokenIcon from '@components/treasuryV2/icons/TokenIcon'
 import { NFTVotePluginSettingsDisplay } from '@components/NFTVotePluginSettingsDisplay'
 import useQueryContext from '@hooks/useQueryContext'
 import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
+import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 
 const DISABLED = new BigNumber(DISABLED_VOTER_WEIGHT.toString())
 
@@ -37,8 +36,9 @@ interface Props {
 
 export default function Config(props: Props) {
   const { canUseAuthorityInstruction } = useGovernanceAssets()
-  const { mint, symbol } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
   const router = useRouter()
+  const { symbol } = router.query
   const { fmtUrlWithCluster } = useQueryContext()
 
   const programVersion = useProgramVersion()

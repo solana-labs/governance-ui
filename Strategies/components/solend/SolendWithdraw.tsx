@@ -35,6 +35,10 @@ import { PublicKey } from '@solana/web3.js'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
 
 const SolendWithdraw = ({
   proposedInvestment,
@@ -57,8 +61,9 @@ const SolendWithdraw = ({
   const realm = useRealmQuery().data?.result
   const { symbol } = router.query
   const config = useRealmConfigQuery().data?.result
-
-  const { proposals, realmInfo, ownVoterWeight, mint, councilMint } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { proposals, realmInfo, ownVoterWeight } = useRealm()
   const [isWithdrawing, setIsWithdrawing] = useState(false)
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [deposits, setDeposits] = useState<{

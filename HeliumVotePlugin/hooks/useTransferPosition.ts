@@ -4,7 +4,6 @@ import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { useAsyncCallback } from 'react-async-hook'
 import { PositionWithMeta } from '../sdk/types'
 import { PROGRAM_ID, init, daoKey } from '@helium/helium-sub-daos-sdk'
-import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
@@ -15,12 +14,12 @@ import {
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 
 export const useTransferPosition = () => {
   const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
   const realm = useRealmQuery().data?.result
-
-  const { mint } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
   const [{ client }] = useVotePluginsClientStore((s) => [
     s.state.currentRealmVotingClient,
     s.state.voteStakeRegistryRegistrarPk,

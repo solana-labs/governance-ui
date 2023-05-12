@@ -23,6 +23,11 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
+import { useRouter } from 'next/router'
 
 interface Props {
   inAccountDetails?: boolean
@@ -42,8 +47,10 @@ const NftBalanceCard = ({ inAccountDetails, showView }: Props) => {
   const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
-
-  const { symbol, mint, councilMint, realmInfo } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { symbol } = useRouter().query
+  const { realmInfo } = useRealm()
   const { fetchRealm } = useWalletStore((s) => s.actions)
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
 

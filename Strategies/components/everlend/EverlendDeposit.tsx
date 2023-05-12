@@ -27,6 +27,10 @@ import Loading from '@components/Loading'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
 
 interface IProps {
   proposedInvestment
@@ -64,8 +68,9 @@ const EverlendDeposit = ({
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
   const { symbol } = router.query
-
-  const { realmInfo, mint, councilMint, ownVoterWeight } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { realmInfo, ownVoterWeight } = useRealm()
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient

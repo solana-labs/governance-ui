@@ -27,6 +27,10 @@ import { TreasuryStrategy } from '../../types/types'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
 
 interface IProps {
   proposedInvestment: TreasuryStrategy & {
@@ -56,8 +60,9 @@ const EverlendWithdraw = ({
   const [formErrors, setFormErrors] = useState({})
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
-
-  const { realmInfo, mint, councilMint, ownVoterWeight } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { realmInfo, ownVoterWeight } = useRealm()
   const { canUseTransferInstruction } = useGovernanceAssets()
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const client = useVotePluginsClientStore(

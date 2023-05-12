@@ -30,7 +30,6 @@ const Realms = () => {
   >([])
   const [isLoadingRealms, setIsLoadingRealms] = useState(true)
   const [editingGrid, setEditingGrid] = useState(false)
-  const { actions } = useWalletStore((s) => s)
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected

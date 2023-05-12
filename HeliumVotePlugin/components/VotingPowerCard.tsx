@@ -17,6 +17,11 @@ import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/to
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { useRouter } from 'next/router'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
 
 export const VotingPowerCard: React.FC<{
   inAccountDetails?: boolean
@@ -24,8 +29,9 @@ export const VotingPowerCard: React.FC<{
   const { fmtUrlWithCluster } = useQueryContext()
   const [hasGovPower, setHasGovPower] = useState(false)
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
-
-  const { councilMint, mint, symbol } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { symbol } = useRouter().query
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
 

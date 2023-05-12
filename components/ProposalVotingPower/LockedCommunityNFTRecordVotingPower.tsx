@@ -16,6 +16,7 @@ import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/to
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 
 interface Props {
   className?: string
@@ -26,7 +27,9 @@ export default function LockedCommunityNFTRecordVotingPower(props: Props) {
   const [amount, setAmount] = useState(new BigNumber(0))
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const realm = useRealmQuery().data?.result
-  const { mint, realmTokenAccount, symbol } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+
+  const { realmTokenAccount, symbol } = useRealm()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const { data: tokenOwnerRecordPk } = useAddressQuery_CommunityTokenOwner()

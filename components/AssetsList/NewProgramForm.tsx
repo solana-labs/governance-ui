@@ -39,6 +39,10 @@ import {
 } from './BaseGovernanceForm-data'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
 interface NewProgramForm extends BaseGovernanceFormFieldsV2 {
   programId: string
   transferAuthority: boolean
@@ -66,13 +70,10 @@ const NewProgramForm = () => {
     (s) => s.state.currentRealmVotingClient
   )
   const realm = useRealmQuery().data?.result
-  const {
-    realmInfo,
-    mint: realmMint,
-    symbol,
-    ownVoterWeight,
-    councilMint,
-  } = useRealm()
+  const realmMint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { symbol } = router.query
+  const { realmInfo, ownVoterWeight } = useRealm()
   const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
   const connected = !!wallet?.connected

@@ -36,6 +36,10 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useTokenOwnerRecordByPubkeyQuery } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
 
 interface DepositBox {
   mintPk: PublicKey
@@ -48,7 +52,9 @@ const unlockedTypes: string[] = []
 const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
-  const { realmInfo, councilMint, mint } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { realmInfo } = useRealm()
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
   const [client, setClient] = useState<VsrClient | undefined>(undefined)
   const [reducedDeposits, setReducedDeposits] = useState<DepositBox[]>([])

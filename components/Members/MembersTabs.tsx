@@ -9,6 +9,10 @@ import { AddressImage, DisplayAddress } from '@cardinal/namespaces-components'
 import { Member } from '@utils/uiTypes/members'
 import { MintInfo } from '@solana/spl-token'
 import { useRealmQuery } from '@hooks/queries/realm'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
 
 interface MembersTabsProps {
   activeTab: Member
@@ -22,7 +26,8 @@ const MembersTabs: FunctionComponent<MembersTabsProps> = ({
   tabs,
 }) => {
   const realm = useRealmQuery().data?.result
-  const { mint, councilMint } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
   const tokenName = realm
     ? tokenPriceService.getTokenInfo(realm?.account.communityMint.toBase58())
         ?.symbol

@@ -1,14 +1,13 @@
 import Tooltip from '@components/Tooltip'
 import { InformationCircleIcon } from '@heroicons/react/outline'
+import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 import { useRealmQuery } from '@hooks/queries/realm'
-import useRealm from '@hooks/useRealm'
 import { getMintDecimalAmount } from '@tools/sdk/units'
 import tokenPriceService from '@utils/services/tokenPrice'
 
 const InfoBox = ({ title, val, tooltip = '', className = '' }) => {
   const realm = useRealmQuery().data?.result
-
-  const { mint } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
   const formatter = Intl.NumberFormat('en', {
     notation: 'compact',
   })

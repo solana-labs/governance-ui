@@ -47,6 +47,10 @@ import {
 } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
 
 const TokenBalanceCard = ({
   proposal,
@@ -60,7 +64,8 @@ const TokenBalanceCard = ({
   const realmProgramId = useWalletStore((s) => s.selectedRealm.programId)
   const [hasGovPower, setHasGovPower] = useState<boolean>(false)
   const realm = useRealmQuery().data?.result
-  const { councilMint, mint } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const isDepositVisible = (
@@ -165,12 +170,12 @@ export const TokenDeposit = ({
   const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
 
   const {
     realmInfo,
     realmTokenAccount,
     ownVoterWeight,
-    councilMint,
     councilTokenAccount,
     proposals,
     governances,

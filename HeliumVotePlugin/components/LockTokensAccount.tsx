@@ -40,6 +40,10 @@ import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecor
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
 
 export const LockTokensAccount: React.FC<{
   // tokenOwnerRecordPk: string | string[] | undefined // @asktree: this was unused
@@ -57,8 +61,9 @@ export const LockTokensAccount: React.FC<{
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
-
-  const { mint, realmTokenAccount, realmInfo, councilMint } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { realmTokenAccount, realmInfo } = useRealm()
 
   const selectedCommunityDelegator = useSelectedDelegatorStore(
     (s) => s.communityDelegator

@@ -36,6 +36,10 @@ import { PublicKey } from '@solana/web3.js'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
 
 const SOL_BUFFER = 0.02
 
@@ -55,8 +59,9 @@ const SolendDeposit = ({
   const realm = useRealmQuery().data?.result
   const { symbol } = router.query
   const config = useRealmConfigQuery().data?.result
-
-  const { proposals, realmInfo, ownVoterWeight, mint, councilMint } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { proposals, realmInfo, ownVoterWeight } = useRealm()
   const [isDepositing, setIsDepositing] = useState(false)
   const [deposits, setDeposits] = useState<{
     [reserveAddress: string]: number

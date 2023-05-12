@@ -18,6 +18,10 @@ import InstructionForm, {
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
 
 export interface RealmConfigForm {
   governedAccount: AssetAccount | undefined
@@ -57,8 +61,9 @@ const RealmConfigFormComponent = ({
 }) => {
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
-
-  const { mint, realmInfo, councilMint } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const minCommunity = mint ? getMintMinAmountAsDecimal(mint) : 0
   const minCommunityTokensToCreateProposal =

@@ -10,14 +10,21 @@ import { useRouter } from 'next/router'
 import useQueryContext from '@hooks/useQueryContext'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
 
 const ParamsView = ({ activeGovernance }) => {
   const realm = useRealmQuery().data?.result
-  const { mint, councilMint, ownVoterWeight, symbol } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { ownVoterWeight } = useRealm()
   const programVersion = useProgramVersion()
   const realmAccount = realm?.account
   const communityMint = realmAccount?.communityMint.toBase58()
   const router = useRouter()
+  const { symbol } = router.query
   const { fmtUrlWithCluster } = useQueryContext()
 
   const minCommunityTokensToCreateProposal = activeGovernance?.account?.config

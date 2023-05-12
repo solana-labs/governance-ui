@@ -45,6 +45,10 @@ import {
 import useProgramVersion from './useProgramVersion'
 import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
 import { useRealmConfigQuery } from './queries/realmConfig'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from './queries/mintInfo'
 
 export default function useRealm() {
   const router = useRouter()
@@ -64,10 +68,10 @@ export default function useRealm() {
     useProgramVersion() ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION
 
   const config = useRealmConfigQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
 
-  const { mint, councilMint, governances, proposals } = useWalletStore(
-    (s) => s.selectedRealm
-  )
+  const { governances, proposals } = useWalletStore((s) => s.selectedRealm)
 
   const votingPower = useDepositStore((s) => s.state.votingPower)
   const heliumVotingPower = useHeliumVsrStore((s) => s.state.votingPower)
@@ -235,8 +239,8 @@ export default function useRealm() {
     /** @deprecated just use `useRouter().query` directly... */
     symbol,
     voteSymbol: realmInfo?.voteSymbol,
-    mint,
-    councilMint,
+    //mint,
+    //councilMint,
     governances,
     proposals,
     //tokenRecords,

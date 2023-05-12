@@ -52,9 +52,9 @@ interface WalletStore extends State {
   realms: { [realm: string]: ProgramAccount<Realm> }
   selectedRealm: {
     //config?: ProgramAccount<RealmConfigAccount>
-    mint?: MintAccount
+    //mint?: MintAccount
     programId?: PublicKey
-    councilMint?: MintAccount
+    //councilMint?: MintAccount
     governances: { [governance: string]: ProgramAccount<Governance> }
     proposals: { [proposal: string]: ProgramAccount<Proposal> }
     /* /// Community token records by owner
