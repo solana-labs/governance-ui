@@ -2,6 +2,7 @@ import Button, { LinkButton, SecondaryButton } from '@components/Button'
 import { getExplorerInspectorUrl } from '@components/explorer/tools'
 import Loading from '@components/Loading'
 import Modal from '@components/Modal'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { getInstructionDataFromBase64 } from '@solana/spl-governance'
 import { SimulatedTransactionResponse, Transaction } from '@solana/web3.js'
 import { notify } from '@utils/notifications'
@@ -18,7 +19,7 @@ const DryRunInstructionBtn = ({
   btnClassNames: string
 }) => {
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const [isPending, setIsPending] = useState(false)
   const [result, setResult] = useState<{
     response: SimulatedTransactionResponse

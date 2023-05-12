@@ -1,15 +1,15 @@
 import { BN } from '@coral-xyz/anchor'
 import { Proposal, ProposalState } from '@solana/spl-governance'
-import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { getProposalMaxVoteWeight } from '../models/voteWeights'
 import { calculatePct, fmtTokenAmount } from '../utils/formatting'
+import { useMaxVoteRecord } from './useMaxVoteRecord'
 import useProgramVersion from './useProgramVersion'
 import useRealm from './useRealm'
 
 // TODO support council plugins
 export default function useProposalVotes(proposal?: Proposal) {
   const { realm, mint, councilMint, governances } = useRealm()
-  const maxVoteRecord = useNftPluginStore((s) => s.state.maxVoteRecord)
+  const maxVoteRecord = useMaxVoteRecord()
   const governance =
     proposal && governances[proposal.governance?.toBase58()]?.account
   const programVersion = useProgramVersion()
@@ -44,8 +44,8 @@ export default function useProposalVotes(proposal?: Proposal) {
       ? governance.config.communityVoteThreshold.value
       : 0
     : programVersion > 2
-    ? governance.config.councilVoteThreshold.value
-    : governance.config.communityVoteThreshold.value
+    ? governance.config.councilVoteThreshold.value || 0
+    : governance.config.communityVoteThreshold.value || 0
 
   if (voteThresholdPct === undefined)
     throw new Error(
@@ -62,8 +62,6 @@ export default function useProposalVotes(proposal?: Proposal) {
     (voteThresholdPct / 100)
 
   const yesVotePct = calculatePct(proposal.getYesVoteCount(), maxVoteWeight)
-  const yesVoteProgress = (yesVotePct / voteThresholdPct) * 100
-
   const isMultiProposal = proposal?.options?.length > 1
   const yesVoteCount = !isMultiProposal
     ? fmtTokenAmount(proposal.getYesVoteCount(), proposalMint.decimals)
@@ -81,6 +79,9 @@ export default function useProposalVotes(proposal?: Proposal) {
   const relativeNoVotes = getRelativeVoteCount(noVoteCount)
   const rawYesVotesRequired = minimumYesVotes - yesVoteCount
   const actualVotesRequired = rawYesVotesRequired < 0 ? 0 : rawYesVotesRequired
+  const yesVoteProgress = actualVotesRequired
+    ? 100 - (actualVotesRequired / minimumYesVotes) * 100
+    : 100
 
   const yesVotesRequired =
     proposalMint.decimals == 0

@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
-import useRealm from '@hooks/useRealm'
 import {
   Keypair,
   PublicKey,
@@ -23,6 +22,7 @@ import InstructionForm, {
 } from '../../FormCreator'
 import UseMangoV4 from '@hooks/useMangoV4'
 import { BN } from '@coral-xyz/anchor'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface PerpCreateForm {
   governedAccount: AssetAccount | null
@@ -55,6 +55,7 @@ interface PerpCreateForm {
   settlePnlLimitWindowSize: number
   positivePnlLiquidationFee: number
   perpMarketIndex: number
+  holdupTime: number
 }
 
 const PerpCreate = ({
@@ -64,9 +65,8 @@ const PerpCreate = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const { mangoClient, mangoGroup, getAdditionalLabelInfo } = UseMangoV4()
-  const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const solAccounts = assetAccounts.filter(
     (x) =>
@@ -76,7 +76,6 @@ const PerpCreate = ({
   )
   const { connection } = useWalletStore()
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<PerpCreateForm>({
     governedAccount: null,
     oracleConfFilter: 0.1,
@@ -108,6 +107,7 @@ const PerpCreate = ({
     settlePnlLimitFactor: 1.0,
     settlePnlLimitWindowSize: 60 * 60,
     positivePnlLiquidationFee: 0,
+    holdupTime: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -124,7 +124,6 @@ const PerpCreate = ({
     let prerequisiteInstructionsSigners: Keypair[] = []
     if (
       isValid &&
-      programId &&
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
@@ -225,6 +224,7 @@ const PerpCreate = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
+      customHoldUpTime: form.holdupTime,
     }
     return obj
   }
@@ -256,11 +256,11 @@ const PerpCreate = ({
       !mangoGroup || mangoGroup?.perpMarketsMapByMarketIndex.size === 0
         ? 0
         : Math.max(...[...mangoGroup!.perpMarketsMapByMarketIndex.keys()]) + 1
-    setForm({
-      ...form,
+    setForm((prevForm) => ({
+      ...prevForm,
       perpMarketIndex: perpMarketIndex,
-    })
-  }, [mangoGroup?.perpMarketsMapByMarketIndex.size])
+    }))
+  }, [mangoGroup])
 
   const inputs: InstructionInput[] = [
     {
@@ -271,6 +271,13 @@ const PerpCreate = ({
       shouldBeGoverned: shouldBeGoverned as any,
       governance: governance,
       options: solAccounts,
+    },
+    {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
     },
     {
       label: 'Perp Name',

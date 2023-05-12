@@ -7,6 +7,10 @@ import {
   Wallet as BaseWallet,
 } from '@solana/wallet-adapter-react';
 import type { PublicKey } from '@solana/web3.js';
+import {
+  detectEmbeddedInSquadsIframe,
+  SquadsEmbeddedWalletAdapter,
+} from '@sqds/iframe-adapter';
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 
 import { RealmCircle } from '@hub/components/branding/RealmCircle';
@@ -62,9 +66,12 @@ function WalletSelectorInner(props: Props) {
 
   useEffect(() => {
     if (typeof localStorage !== 'undefined') {
-      const adapterName = JSON.parse(
-        localStorage.getItem('walletName') || '""',
-      );
+      let adapterName = '""';
+      try {
+        adapterName = JSON.parse(localStorage.getItem('walletName') || '""');
+      } catch (e) {
+        console.log(e);
+      }
 
       const adapter = wallets.find(
         (wallet) => wallet.adapter.name === adapterName,
@@ -216,7 +223,10 @@ export function WalletSelector(props: Props) {
   const [cluster] = useCluster();
 
   const supportedWallets = useMemo(
-    () => WALLET_PROVIDERS.map((provider) => provider.adapter),
+    () =>
+      detectEmbeddedInSquadsIframe()
+        ? [new SquadsEmbeddedWalletAdapter()]
+        : WALLET_PROVIDERS.map((provider) => provider.adapter),
     [],
   );
 

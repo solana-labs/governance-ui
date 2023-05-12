@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
-import useRealm from '@hooks/useRealm'
 import { PublicKey, SYSVAR_RENT_PUBKEY } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid, validatePubkey } from '@utils/formValidation'
@@ -9,7 +8,6 @@ import { NewProposalContext } from '../../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, {
@@ -17,6 +15,7 @@ import InstructionForm, {
   InstructionInputType,
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface TokenRegisterTrustlessForm {
   governedAccount: AssetAccount | null
@@ -24,6 +23,7 @@ interface TokenRegisterTrustlessForm {
   oraclePk: string
   name: string
   tokenIndex: number
+  holdupTime: number
 }
 
 const TokenRegisterTrustless = ({
@@ -33,24 +33,25 @@ const TokenRegisterTrustless = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const { mangoClient, mangoGroup } = UseMangoV4()
-  const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const solAccounts = assetAccounts.filter(
     (x) =>
       x.type === AccountType.SOL &&
-      mangoGroup?.fastListingAdmin &&
-      x.extensions.transferAddress?.equals(mangoGroup?.fastListingAdmin)
+      ((mangoGroup?.fastListingAdmin &&
+        x.extensions.transferAddress?.equals(mangoGroup?.fastListingAdmin)) ||
+        (mangoGroup?.admin &&
+          x.extensions.transferAddress?.equals(mangoGroup?.admin)))
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<TokenRegisterTrustlessForm>({
     governedAccount: null,
     mintPk: '',
     oraclePk: '',
     name: '',
     tokenIndex: 0,
+    holdupTime: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -65,7 +66,6 @@ const TokenRegisterTrustless = ({
     let serializedInstruction = ''
     if (
       isValid &&
-      programId &&
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
@@ -73,6 +73,7 @@ const TokenRegisterTrustless = ({
       const ix = await mangoClient!.program.methods
         .tokenRegisterTrustless(Number(form.tokenIndex), form.name)
         .accounts({
+          admin: form.governedAccount.extensions.transferAddress,
           group: mangoGroup!.publicKey,
           mint: new PublicKey(form.mintPk),
           oracle: new PublicKey(form.oraclePk),
@@ -87,6 +88,7 @@ const TokenRegisterTrustless = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
+      customHoldUpTime: form.holdupTime,
     }
     return obj
   }
@@ -124,11 +126,11 @@ const TokenRegisterTrustless = ({
       !mangoGroup || mangoGroup?.banksMapByTokenIndex.size === 0
         ? 0
         : Math.max(...[...mangoGroup!.banksMapByTokenIndex.keys()]) + 1
-    setForm({
-      ...form,
+    setForm((prevForm) => ({
+      ...prevForm,
       tokenIndex: tokenIndex,
-    })
-  }, [mangoGroup?.banksMapByTokenIndex.size])
+    }))
+  }, [mangoGroup])
 
   const inputs: InstructionInput[] = [
     {
@@ -139,6 +141,13 @@ const TokenRegisterTrustless = ({
       shouldBeGoverned: shouldBeGoverned as any,
       governance: governance,
       options: solAccounts,
+    },
+    {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
     },
     {
       label: 'Mint PublicKey',

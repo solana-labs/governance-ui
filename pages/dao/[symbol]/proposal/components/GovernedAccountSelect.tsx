@@ -71,7 +71,7 @@ const GovernedAccountSelect = ({
   type?: 'mint' | 'token' | 'wallet'
 }) => {
   const realm = useRealm()
-  const treasuryInfo = useTreasuryInfo()
+  const treasuryInfo = useTreasuryInfo(false)
   const { voteByCouncil } = useContext(NewProposalContext)
   const [wallets, setWallets] = useState<
     {
@@ -122,14 +122,28 @@ const GovernedAccountSelect = ({
       for (const account of governedAccounts) {
         governances.add(account.governance.pubkey.toBase58())
       }
-      const rawWallets = governedAccounts.map((x) => ({
-        account: x,
-        governance: x.governance.pubkey,
-        walletAddress: x.governance.nativeTreasuryAddress,
-      }))
 
-      const visited = new Set<string>()
-      const deduped: typeof rawWallets = []
+      Promise.all(
+        governedAccounts.map((account) => {
+          return getNativeTreasuryAddress(
+            programId,
+            account.governance.pubkey
+          ).then((walletAddress) => ({
+            //if there is materialized wallet we want to have it as main account of deduped wallet
+            account: governedAccounts.find((x) =>
+              x.extensions.transferAddress?.equals(walletAddress)
+            )
+              ? governedAccounts.find((x) =>
+                  x.extensions.transferAddress?.equals(walletAddress)
+                )!
+              : account,
+            governance: account.governance.pubkey,
+            walletAddress,
+          }))
+        })
+      ).then((rawWallets) => {
+        const visited = new Set<string>()
+        const deduped: typeof rawWallets = []
 
       for (const wallet of rawWallets) {
         if (!visited.has(wallet.walletAddress.toBase58())) {
@@ -155,12 +169,12 @@ const GovernedAccountSelect = ({
       return null
     }
 
-    const accountName = value.isSol
+    const name = value.isSol
       ? getSolAccountLabel(value).tokenAccountName
       : value.isToken
       ? getTokenAccountLabelInfo(value).tokenAccountName
       : getMintAccountLabelInfo(value).mintAccountName
-
+    const accountName = name ? name : getAccountName(wallet.walletAddress)
     const walletInfo = RE.isOk(treasuryInfo)
       ? treasuryInfo.data.wallets.find(
           (wallet) =>
@@ -237,7 +251,7 @@ const GovernedAccountSelect = ({
         )
       : null
 
-    const programName = getAccountName(value.governance.account.governedAccount)
+    const programName = getAccountName(value.pubkey)
 
     return (
       <div className="grid grid-cols-[40px,1fr,max-content] gap-x-4 text-fgd-1 items-center w-full">

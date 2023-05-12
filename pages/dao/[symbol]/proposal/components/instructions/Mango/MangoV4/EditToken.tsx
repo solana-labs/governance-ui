@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
-import useRealm from '@hooks/useRealm'
 import { AccountMeta, PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid, validatePubkey } from '@utils/formValidation'
@@ -9,7 +8,6 @@ import { NewProposalContext } from '../../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, {
@@ -21,6 +19,13 @@ import { getChangedValues, getNullOrTransform } from '@utils/mangoV4Tools'
 import { BN } from '@coral-xyz/anchor'
 import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
 import Switch from '@components/Switch'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+
+const REDUCE_ONLY_OPTIONS = [
+  { value: 0, name: 'Disabled' },
+  { value: 1, name: 'No borrows and no deposits' },
+  { value: 2, name: 'No borrows' },
+]
 
 const keyToLabel = {
   oraclePk: 'Oracle',
@@ -53,6 +58,7 @@ const keyToLabel = {
   resetStablePrice: 'Reset Stable Price',
   resetNetBorrowLimit: 'Reset Net Borrow Limit',
   reduceOnly: 'Reduce Only',
+  forceClose: 'Force Close',
 }
 
 type NamePkVal = {
@@ -92,10 +98,12 @@ interface EditTokenForm {
   depositWeightScaleStartQuote: number
   resetStablePrice: boolean
   resetNetBorrowLimit: boolean
-  reduceOnly: boolean
+  reduceOnly: { name: string; value: number }
+  holdupTime: number
+  forceClose: boolean
 }
 
-const defaultFormValues = {
+const defaultFormValues: EditTokenForm = {
   governedAccount: null,
   token: null,
   oraclePk: '',
@@ -127,7 +135,9 @@ const defaultFormValues = {
   groupInsuranceFund: false,
   resetStablePrice: false,
   resetNetBorrowLimit: false,
-  reduceOnly: false,
+  reduceOnly: REDUCE_ONLY_OPTIONS[0],
+  forceClose: false,
+  holdupTime: 0,
 }
 
 const EditToken = ({
@@ -137,9 +147,8 @@ const EditToken = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const { getAdditionalLabelInfo, mangoClient, mangoGroup } = UseMangoV4()
-  const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const [forcedValues, setForcedValues] = useState<string[]>([])
   const solAccounts = assetAccounts.filter(
@@ -152,7 +161,6 @@ const EditToken = ({
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [tokens, setTokens] = useState<NamePkVal[]>([])
-  const programId: PublicKey | undefined = realmInfo?.programId
   const [originalFormValues, setOriginalFormValues] = useState<EditTokenForm>({
     ...defaultFormValues,
   })
@@ -172,7 +180,6 @@ const EditToken = ({
     let serializedInstruction = ''
     if (
       isValid &&
-      programId &&
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
@@ -180,24 +187,32 @@ const EditToken = ({
       const mintInfo = mangoGroup!.mintInfosMapByTokenIndex.get(
         bank.tokenIndex
       )!
-      const values = getChangedValues<EditTokenForm>(
-        originalFormValues,
-        form,
+      const values = getChangedValues<
+        Omit<EditTokenForm, 'reduceOnly'> & { reduceOnly: number }
+      >(
+        {
+          ...originalFormValues,
+          reduceOnly: originalFormValues.reduceOnly.value,
+        },
+        {
+          ...form,
+          reduceOnly: form.reduceOnly.value,
+        },
         forcedValues
       )
-      const oracleConfFilter = getNullOrTransform(
-        values.oracleConfFilter,
-        null,
-        Number
-      )
-      const maxStalenessSlots = getNullOrTransform(
-        values.maxStalenessSlots,
-        null,
-        Number
-      )
-      const isThereNeedOfSendingOracleConfig =
-        oracleConfFilter || maxStalenessSlots
 
+      const oracleConfFilter =
+        (form.oracleConfFilter as number | string) === ''
+          ? null
+          : form.oracleConfFilter
+      const maxStalenessSlots =
+        (form.maxStalenessSlots as number | string) === ''
+          ? null
+          : form.maxStalenessSlots
+
+      const isThereNeedOfSendingOracleConfig =
+        originalFormValues.oracleConfFilter !== oracleConfFilter ||
+        originalFormValues.maxStalenessSlots !== maxStalenessSlots
       const rateConfigs = {
         adjustmentFactor: getNullOrTransform(
           values.adjustmentFactor,
@@ -223,7 +238,7 @@ const EditToken = ({
                 maxStalenessSlots: maxStalenessSlots,
               }
             : null,
-          values.groupInsuranceFund,
+          values.groupInsuranceFund!,
           isThereNeedOfSendingRateConfigs
             ? {
                 adjustmentFactor: Number(form.adjustmentFactor),
@@ -253,10 +268,11 @@ const EditToken = ({
           getNullOrTransform(values.netBorrowLimitWindowSizeTs, BN),
           getNullOrTransform(values.borrowWeightScaleStartQuote, null, Number),
           getNullOrTransform(values.depositWeightScaleStartQuote, null, Number),
-          values.resetStablePrice,
-          values.resetNetBorrowLimit,
-          values.reduceOnly,
-          getNullOrTransform(values.name, null)
+          values.resetStablePrice!,
+          values.resetNetBorrowLimit!,
+          getNullOrTransform(values.reduceOnly, null, Number),
+          getNullOrTransform(values.name, null, String),
+          values.forceClose!
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -279,6 +295,7 @@ const EditToken = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
+      customHoldUpTime: form.holdupTime,
     }
     return obj
   }
@@ -290,6 +307,7 @@ const EditToken = ({
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form, forcedValues])
+
   useEffect(() => {
     const getTokens = async () => {
       const currentTokens = [...mangoGroup!.banksMapByMint.values()].map(
@@ -303,17 +321,16 @@ const EditToken = ({
     if (wallet?.publicKey && mangoGroup) {
       getTokens()
     }
-  }, [mangoGroup?.publicKey.toBase58()])
+  }, [mangoGroup, wallet?.publicKey])
+
+  const formTokenPk = form.token?.value.toBase58()
   useEffect(() => {
-    if (form.token && mangoGroup) {
-      const currentToken = mangoGroup!.banksMapByMint.get(
-        form.token.value.toBase58()
-      )![0]
-      const groupInsuranceFund = mangoGroup.mintInfosMapByMint.get(
-        form.token.value.toBase58()
-      )?.groupInsuranceFund
+    if (formTokenPk && mangoGroup) {
+      const currentToken = mangoGroup!.banksMapByMint.get(formTokenPk)![0]
+      const groupInsuranceFund = mangoGroup.mintInfosMapByMint.get(formTokenPk)
+        ?.groupInsuranceFund
+
       const vals = {
-        ...form,
         oraclePk: currentToken.oracle.toBase58(),
         oracleConfFilter: currentToken.oracleConfig.confFilter.toNumber(),
         maxStalenessSlots: currentToken.oracleConfig.maxStalenessSlots.toNumber(),
@@ -343,14 +360,19 @@ const EditToken = ({
         borrowWeightScaleStartQuote: currentToken.borrowWeightScaleStartQuote,
         depositWeightScaleStartQuote: currentToken.depositWeightScaleStartQuote,
         groupInsuranceFund: !!groupInsuranceFund,
-        reduceOnly: currentToken.reduceOnly,
+        reduceOnly: REDUCE_ONLY_OPTIONS.find(
+          (x) => x.value === currentToken.reduceOnly
+        )!,
+        forceClose: currentToken.forceClose,
       }
-      setForm({
+      setForm((prevForm) => ({
+        ...prevForm,
         ...vals,
-      })
-      setOriginalFormValues({ ...vals })
+      }))
+      setOriginalFormValues((prevForm) => ({ ...prevForm, ...vals }))
     }
-  }, [form.token?.value.toBase58()])
+  }, [formTokenPk, mangoGroup])
+
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
@@ -370,6 +392,7 @@ const EditToken = ({
       ),
     name: yup.string().required(),
   })
+
   const inputs: InstructionInput[] = [
     {
       label: 'Governance',
@@ -379,6 +402,13 @@ const EditToken = ({
       shouldBeGoverned: shouldBeGoverned as any,
       governance: governance,
       options: solAccounts,
+    },
+    {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
     },
     {
       label: 'Token',
@@ -400,8 +430,8 @@ const EditToken = ({
       name: 'oraclePk',
     },
     {
-      label: keyToLabel['confFilter'],
-      subtitle: getAdditionalLabelInfo('confFilter'),
+      label: keyToLabel['oracleConfFilter'],
+      subtitle: getAdditionalLabelInfo('oracleConfFilter'),
       initialValue: form.oracleConfFilter,
       type: InstructionInputType.INPUT,
       inputType: 'number',
@@ -614,8 +644,16 @@ const EditToken = ({
       label: keyToLabel['reduceOnly'],
       subtitle: getAdditionalLabelInfo('reduceOnly'),
       initialValue: form.reduceOnly,
-      type: InstructionInputType.SWITCH,
+      type: InstructionInputType.SELECT,
+      options: REDUCE_ONLY_OPTIONS,
       name: 'reduceOnly',
+    },
+    {
+      label: keyToLabel['forceClose'],
+      subtitle: getAdditionalLabelInfo('forceClose'),
+      initialValue: form.forceClose,
+      type: InstructionInputType.SWITCH,
+      name: 'forceClose',
     },
   ]
 
@@ -636,28 +674,27 @@ const EditToken = ({
               {Object.keys(defaultFormValues)
                 .filter((x) => x !== 'governedAccount')
                 .filter((x) => x !== 'token')
+                .filter((x) => x !== 'holdupTime')
                 .map((key) => (
-                  <>
-                    <div className="text-sm mb-3">
-                      <div className="mb-2">{keyToLabel[key]}</div>
-                      <div className="flex flex-row text-xs items-center">
-                        <Switch
-                          checked={
-                            forcedValues.find((x) => x === key) ? true : false
+                  <div className="text-sm mb-3" key={key}>
+                    <div className="mb-2">{keyToLabel[key]}</div>
+                    <div className="flex flex-row text-xs items-center">
+                      <Switch
+                        checked={
+                          forcedValues.find((x) => x === key) ? true : false
+                        }
+                        onChange={(checked) => {
+                          if (checked) {
+                            setForcedValues([...forcedValues, key])
+                          } else {
+                            setForcedValues([
+                              ...forcedValues.filter((x) => x !== key),
+                            ])
                           }
-                          onChange={(checked) => {
-                            if (checked) {
-                              setForcedValues([...forcedValues, key])
-                            } else {
-                              setForcedValues([
-                                ...forcedValues.filter((x) => x !== key),
-                              ])
-                            }
-                          }}
-                        />
-                      </div>
+                        }}
+                      />
                     </div>
-                  </>
+                  </div>
                 ))}
             </div>
           </AdvancedOptionsDropdown>

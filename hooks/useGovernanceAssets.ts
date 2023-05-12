@@ -2,7 +2,7 @@ import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import { Instructions, PackageEnum } from '@utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import useRealm from './useRealm'
-import { vsrPluginsPks } from './useVotingPlugins'
+import { heliumVsrPluginsPks, vsrPluginsPks } from './useVotingPlugins'
 
 type Package = {
   name: string
@@ -207,7 +207,10 @@ export default function useGovernanceAssets() {
     [PackageEnum.VsrPlugin]: {
       name: 'Vsr Plugin',
       isVisible:
-        currentPluginPk && vsrPluginsPks.includes(currentPluginPk.toBase58()),
+        currentPluginPk && [
+          ...vsrPluginsPks,
+          ...heliumVsrPluginsPks
+        ].includes(currentPluginPk.toBase58()),
     },
   }
 
@@ -358,6 +361,16 @@ export default function useGovernanceAssets() {
 
     [Instructions.DualFinanceStakingOption]: {
       name: 'Staking Option',
+      isVisible: canUseTransferInstruction,
+      packageId: PackageEnum.Dual,
+    },
+    [Instructions.DualFinanceLiquidityStakingOption]: {
+      name: 'Liquidity Staking Option',
+      isVisible: canUseTransferInstruction,
+      packageId: PackageEnum.Dual,
+    },
+    [Instructions.DualFinanceInitStrike]: {
+      name: 'Init Staking Option Strike',
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Dual,
     },
@@ -607,6 +620,11 @@ export default function useGovernanceAssets() {
     },
     [Instructions.MangoV4TokenAddBank]: {
       name: 'Add additional Bank to an existing Token',
+      packageId: PackageEnum.MangoMarketV4,
+      isVisible: canUseAnyInstruction,
+    },
+    [Instructions.IdlSetBuffer]: {
+      name: 'Idl Set Buffer',
       packageId: PackageEnum.MangoMarketV4,
       isVisible: canUseAnyInstruction,
     },

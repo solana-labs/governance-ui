@@ -40,9 +40,9 @@ const NewProgramForm = () => {
     symbol,
     ownVoterWeight,
   } = useRealm()
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
-  const connected = useWalletStore((s) => s.connected)
+  const connected = !!wallet?.connected
   const { fetchRealm } = useWalletStore((s) => s.actions)
   const [form, setForm] = useState<NewProgramForm>({
     ...defaultFormValues,

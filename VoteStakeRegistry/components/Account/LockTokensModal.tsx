@@ -15,7 +15,7 @@ import {
   getMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
 import { precision } from '@utils/formatting'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { voteRegistryLockDeposit } from 'VoteStakeRegistry/actions/voteRegistryLockDeposit'
 import { DepositWithMintAccount } from 'VoteStakeRegistry/sdk/accounts'
@@ -27,7 +27,7 @@ import {
   getFormattedStringFromDays,
   secsToDays,
   yearsToSecs,
-} from 'VoteStakeRegistry/tools/dateTools'
+} from '@utils/dateTools'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { voteRegistryStartUnlock } from 'VoteStakeRegistry/actions/voteRegistryStartUnlock'
 import {
@@ -46,8 +46,8 @@ import { calcMintMultiplier } from 'VoteStakeRegistry/tools/deposits'
 import ButtonGroup from '@components/ButtonGroup'
 import InlineNotification from '@components/InlineNotification'
 import Tooltip from '@components/Tooltip'
-//import Switch from '@components/Switch'
 import { notify } from '@utils/notifications'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const YES = 'Yes'
 const NO = 'No'
@@ -69,7 +69,7 @@ const LockTokensModal = ({
   )
   const connection = useWalletStore((s) => s.connection.current)
   const endpoint = useWalletStore((s) => s.connection.endpoint)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const deposits = useDepositStore((s) => s.state.deposits)
   const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
     (s) => s.actions
@@ -82,39 +82,43 @@ const LockTokensModal = ({
         ?.lockupSaturationSecs.toNumber()) ||
     fiveYearsSecs
 
-  const lockupPeriods: Period[] = [
-    {
-      defaultValue: yearsToDays(1),
-      display: '1y',
-    },
-    {
-      defaultValue: yearsToDays(2),
-      display: '2y',
-    },
-    {
-      defaultValue: yearsToDays(3),
-      display: '3y',
-    },
-    {
-      defaultValue: yearsToDays(4),
-      display: '4y',
-    },
-    {
-      defaultValue: yearsToDays(5),
-      display: '5y',
-    },
-    {
-      defaultValue: 1,
-      display: 'Custom',
-    },
-  ]
-    .filter((x) =>
-      depositToUnlock
-        ? getMinDurationInDays(depositToUnlock) <= x.defaultValue ||
-          x.display === 'Custom'
-        : true
-    )
-    .filter((x) => x.defaultValue <= secsToDays(maxLockupSecs))
+  const lockupPeriods: Period[] = useMemo(() => {
+    return [
+      {
+        defaultValue: yearsToDays(1),
+        display: '1y',
+      },
+      {
+        defaultValue: yearsToDays(2),
+        display: '2y',
+      },
+      {
+        defaultValue: yearsToDays(3),
+        display: '3y',
+      },
+      {
+        defaultValue: yearsToDays(4),
+        display: '4y',
+      },
+      {
+        defaultValue: yearsToDays(5),
+        display: '5y',
+      },
+      {
+        defaultValue: 1,
+        display: 'Custom',
+      },
+    ]
+      .filter((x) =>
+        depositToUnlock
+          ? getMinDurationInDays(
+              depositToUnlock.lockup.startTs,
+              depositToUnlock.lockup.endTs
+            ) <= x.defaultValue || x.display === 'Custom'
+          : true
+      )
+      .filter((x) => x.defaultValue <= secsToDays(maxLockupSecs))
+  }, [depositToUnlock, maxLockupSecs])
 
   const maxNonCustomDaysLockup = lockupPeriods
     .map((x) => x.defaultValue)
@@ -210,7 +214,7 @@ const LockTokensModal = ({
   const goToStep = (val: number) => {
     setCurrentStep(val)
   }
-  const validateAmountOnBlur = () => {
+  const validateAmountOnBlur = useCallback(() => {
     const val = parseFloat(
       Math.max(
         Number(mintMinAmount),
@@ -218,7 +222,8 @@ const LockTokensModal = ({
       ).toFixed(currentPrecision)
     )
     setAmount(val)
-  }
+  }, [amount, currentPrecision, maxAmount, mintMinAmount])
+
   const handleSaveLock = async () => {
     const rpcContext = new RpcContext(
       realm!.owner,
@@ -550,25 +555,27 @@ const LockTokensModal = ({
         return 'Unknown step'
     }
   }
+
   useEffect(() => {
     if (amount) {
       validateAmountOnBlur()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [lockMoreThenDeposited])
+  }, [lockMoreThenDeposited, amount, validateAmountOnBlur])
+
   useEffect(() => {
     setLockupPeriod(lockupPeriods[0])
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [voteStakeRegistryRegistrar])
+  }, [voteStakeRegistryRegistrar, lockupPeriods])
+
   useEffect(() => {
     if (depositToUnlock) {
       goToStep(0)
     }
   }, [depositToUnlock])
+
   useEffect(() => {
     setLockupPeriodDays(lockupPeriod.defaultValue)
   }, [lockupPeriod.defaultValue])
-  // const isMainBtnVisible = !hasMoreTokensInWallet || currentStep !== 0
+
   const isTitleVisible = currentStep !== 3
   const getCurrentBtnForStep = () => {
     switch (currentStep) {

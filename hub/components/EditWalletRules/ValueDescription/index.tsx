@@ -7,7 +7,7 @@ interface Props {
 
 export function ValueDescription(props: Props) {
   return (
-    <div className={cx(props.className, 'text-sm', 'dark:text-neutral-300')}>
+    <div className={cx(props.className, 'text-sm', 'dark:text-neutral-500')}>
       {props.text}
     </div>
   );

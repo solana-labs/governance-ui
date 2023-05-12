@@ -113,7 +113,6 @@ const MemberOverview = ({ member }: { member: Member }) => {
     walletAddress,
     councilVotes,
     communityVotes,
-    votesCasted,
     hasCouncilTokenOutsideRealm,
     hasCommunityTokenOutsideRealm,
   } = member
@@ -321,7 +320,9 @@ const MemberOverview = ({ member }: { member: Member }) => {
         )}
         <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all">
           <p>Votes Cast</p>
-          <div className="font-bold text-fgd-1 text-2xl">{votesCasted}</div>
+          <div className="font-bold text-fgd-1 text-2xl">
+            {ownVoteRecords.length}
+          </div>
           <div className="flex">
             <p>
               Yes Votes:{' '}

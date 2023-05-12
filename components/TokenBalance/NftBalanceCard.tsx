@@ -3,7 +3,7 @@ import Button from '@components/Button'
 import Loading from '@components/Loading'
 import NFTSelector from '@components/NFTS/NFTSelector'
 import useRealm from '@hooks/useRealm'
-import { NftVoterClient } from '@solana/governance-program-library'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import {
   getTokenOwnerRecordAddress,
   SYSTEM_PROGRAM_ID,
@@ -19,6 +19,7 @@ import { FC, useEffect, useState } from 'react'
 import useQueryContext from '@hooks/useQueryContext'
 import Link from 'next/link'
 import { ChevronRightIcon } from '@heroicons/react/outline'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface Props {
   inAccountDetails?: boolean
@@ -27,8 +28,8 @@ interface Props {
 
 const NftBalanceCard = ({ inAccountDetails, showView }: Props) => {
   const { fmtUrlWithCluster } = useQueryContext()
-  const connected = useWalletStore((s) => s.connected)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )

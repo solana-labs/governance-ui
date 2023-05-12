@@ -312,6 +312,28 @@ const instructions = () => ({
       }
     },
   },
+  19895: {
+    name: 'Create Mango Account',
+    accounts: [
+      { name: 'Group' },
+      { name: 'Account' },
+      { name: 'Owner' },
+      { name: 'Payer' },
+    ],
+    getDataUI: async (
+      connection: Connection,
+      data: Uint8Array
+      //accounts: AccountMetaData[]
+    ) => {
+      const info = await displayArgs(connection, data)
+      try {
+        return <div>{info}</div>
+      } catch (e) {
+        console.log(e)
+        return <div>{JSON.stringify(data)}</div>
+      }
+    },
+  },
 })
 
 export const MANGO_V4_INSTRUCTIONS = {
@@ -376,12 +398,23 @@ const displayArgs = async (connection: Connection, data: Uint8Array) => {
   const args = await getArgs(connection, data)
   return (
     <div className="space-y-3">
-      {Object.keys(args).map((key) => (
-        <div key={key} className="flex">
-          <div className="mr-3">{key}:</div>
-          <div>{`${args[key]}`}</div>
-        </div>
-      ))}
+      {Object.keys(args)
+        .filter((key) => {
+          if (key === 'resetStablePrice' && args[key] === false) {
+            return false
+          }
+          if (key === 'resetNetBorrowLimit' && args[key] === false) {
+            return false
+          }
+
+          return true
+        })
+        .map((key) => (
+          <div key={key} className="flex">
+            <div className="mr-3">{key}:</div>
+            <div>{`${args[key]}`}</div>
+          </div>
+        ))}
     </div>
   )
 }

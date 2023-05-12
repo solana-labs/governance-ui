@@ -27,7 +27,7 @@ import ProposalSelectCard from '@components/ProposalSelectCard'
 import Checkbox from '@components/inputs/Checkbox'
 import Button from '@components/Button'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { NftVoterClient } from '@solana/governance-program-library'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { notify } from '@utils/notifications'
 import { sendSignedTransaction } from '@utils/send'
 import { compareProposals, filterProposals } from '@utils/proposals'
@@ -37,6 +37,7 @@ import ProposalSorting, {
   PROPOSAL_SORTING_LOCAL_STORAGE_KEY,
   Sorting,
 } from '@components/ProposalSorting'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
@@ -117,7 +118,7 @@ const REALM = () => {
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection.current)
 
   const allProposals = Object.entries(proposals).sort((a, b) =>

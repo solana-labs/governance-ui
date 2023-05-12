@@ -1,19 +1,22 @@
 import useRealm from '@hooks/useRealm'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { getTokenOwnerRecordAddress } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
+import { tryParseKey } from '@tools/validators/pubkey'
 import useWalletStore from 'stores/useWalletStore'
 
 export const useAddressQuery_CouncilTokenOwner = () => {
   const { realm } = useRealm()
-  const wallet = useWalletStore((x) => x.current)
+  const wallet = useWalletOnePointOh()
   const selectedCouncilDelegator = useWalletStore(
     (s) => s.selectedCouncilDelegate
   )
 
   // if we have a council token delegator selected (this is rare), use that. otherwise use user wallet.
   const owner =
-    selectedCouncilDelegator !== undefined
+    selectedCouncilDelegator !== undefined &&
+    tryParseKey(selectedCouncilDelegator)
       ? new PublicKey(selectedCouncilDelegator)
       : wallet?.publicKey ?? undefined
 
@@ -27,14 +30,15 @@ export const useAddressQuery_CouncilTokenOwner = () => {
 
 export const useAddressQuery_CommunityTokenOwner = () => {
   const { realm } = useRealm()
-  const wallet = useWalletStore((x) => x.current)
+  const wallet = useWalletOnePointOh()
   const selectedCommunityDelegator = useWalletStore(
     (s) => s.selectedCommunityDelegate
   )
 
   // if we have a community token delegator selected (this is rare), use that. otherwise use user wallet.
   const owner =
-    selectedCommunityDelegator !== undefined
+    selectedCommunityDelegator !== undefined &&
+    tryParseKey(selectedCommunityDelegator)
       ? new PublicKey(selectedCommunityDelegator)
       : // I wanted to eliminate `null` as a possible type
         wallet?.publicKey ?? undefined

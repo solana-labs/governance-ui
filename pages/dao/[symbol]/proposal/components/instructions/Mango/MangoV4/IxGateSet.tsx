@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
-import useRealm from '@hooks/useRealm'
-import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
@@ -9,7 +7,6 @@ import { NewProposalContext } from '../../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, {
@@ -19,8 +16,12 @@ import InstructionForm, {
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { buildIxGate } from '@blockworks-foundation/mango-v4'
 import { IxGateParams } from '@blockworks-foundation/mango-v4/dist/types/src/clientIxParamBuilder'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
-type IxGateSetForm = IxGateParams & { governedAccount: AssetAccount | null }
+type IxGateSetForm = IxGateParams & {
+  governedAccount: AssetAccount | null
+  holdupTime: number
+}
 
 const IxGateSet = ({
   index,
@@ -29,9 +30,8 @@ const IxGateSet = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const { mangoClient, mangoGroup } = UseMangoV4()
-  const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const solAccounts = assetAccounts.filter(
     (x) =>
@@ -42,9 +42,9 @@ const IxGateSet = ({
           x.extensions.transferAddress?.equals(mangoGroup.securityAdmin)))
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<IxGateSetForm>({
     governedAccount: null,
+    holdupTime: 0,
     AccountClose: true,
     AccountCreate: true,
     AccountEdit: true,
@@ -96,6 +96,10 @@ const IxGateSet = ({
     TokenRegisterTrustless: true,
     TokenUpdateIndexAndRate: true,
     TokenWithdraw: true,
+    AccountBuybackFeesWithMngo: true,
+    TokenForceCloseBorrowsWithToken: true,
+    PerpForceClosePosition: true,
+    GroupWithdrawInsuranceFund: true
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -110,7 +114,6 @@ const IxGateSet = ({
     let serializedInstruction = ''
     if (
       isValid &&
-      programId &&
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
@@ -135,6 +138,7 @@ const IxGateSet = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
+      customHoldUpTime: form.holdupTime,
     }
     return obj
   }
@@ -161,6 +165,13 @@ const IxGateSet = ({
       shouldBeGoverned: shouldBeGoverned as any,
       governance: governance,
       options: solAccounts,
+    },
+    {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
     },
     {
       label: 'Account Close',
@@ -468,6 +479,30 @@ const IxGateSet = ({
       type: InstructionInputType.SWITCH,
       name: 'TokenWithdraw',
     },
+    {
+      label: 'Account Buyback Fees With Mngo',
+      initialValue: form.AccountBuybackFeesWithMngo,
+      type: InstructionInputType.SWITCH,
+      name: 'AccountBuybackFeesWithMngo',
+    },
+    {
+      label: 'Token Force Close Borrows With Token',
+      initialValue: form.TokenForceCloseBorrowsWithToken,
+      type: InstructionInputType.SWITCH,
+      name: 'TokenForceCloseBorrowsWithToken',
+    },
+    {
+        label: 'Perp Force Close Position',
+        initialValue: form.PerpForceClosePosition,
+        type: InstructionInputType.SWITCH,
+        name: 'PerpForceClosePosition',
+      },
+      {
+        label: 'Group Withdraw Insurance Fund',
+        initialValue: form.GroupWithdrawInsuranceFund,
+        type: InstructionInputType.SWITCH,
+        name: 'GroupWithdrawInsuranceFund',
+      },
   ]
 
   return (

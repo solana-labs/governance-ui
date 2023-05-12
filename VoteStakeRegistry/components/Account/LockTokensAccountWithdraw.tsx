@@ -4,7 +4,7 @@ import {
   fmtMintAmount,
   getMintDecimalAmountFromNatural,
 } from '@tools/sdk/units'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import LockTokensModal from './LockTokensModal'
 import DepositCard from './DepositCard'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
@@ -32,6 +32,7 @@ import Account from './Account'
 import { abbreviateAddress } from '@utils/formatting'
 import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface DepositBox {
   mintPk: PublicKey
@@ -66,8 +67,8 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
   const [isLoading, setIsLoading] = useState(false)
   const connection = useWalletStore((s) => s.connection.current)
   const connnectionContext = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const mainBoxesClasses = 'bg-bkg-1 col-span-1 p-4 rounded-md'
   const isNextSameRecord = (x, next) => {
     const nextType = Object.keys(next.lockup.kind)[0]
@@ -79,28 +80,33 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
           unlockedTypes.includes(nextType)))
     )
   }
-  const handleSetVsrClient = async (wallet, connection, programId) => {
-    const options = AnchorProvider.defaultOptions()
-    const provider = new AnchorProvider(
-      connection.current,
-      (wallet as unknown) as Wallet,
-      options
-    )
-    const vsrClient = await VsrClient.connect(
-      provider,
-      programId,
-      connection.cluster === 'devnet'
-    )
-    const ownDeposits = await getOwnedDeposits({
-      realmPk: realm!.pubkey,
-      communityMintPk: realm!.account.communityMint,
-      walletPk: new PublicKey(tokenOwnerRecordWalletPk!),
-      client: vsrClient!,
-      connection: connection.current,
-    })
-    setClient(vsrClient)
-    setOwnDeposits(ownDeposits)
-  }
+
+  const handleSetVsrClient = useCallback(
+    async (wallet, connection, programId) => {
+      const options = AnchorProvider.defaultOptions()
+      const provider = new AnchorProvider(
+        connection.current,
+        (wallet as unknown) as Wallet,
+        options
+      )
+      const vsrClient = await VsrClient.connect(
+        provider,
+        programId,
+        connection.cluster === 'devnet'
+      )
+      const ownDeposits = await getOwnedDeposits({
+        realmPk: realm!.pubkey,
+        communityMintPk: realm!.account.communityMint,
+        walletPk: new PublicKey(tokenOwnerRecordWalletPk!),
+        client: vsrClient!,
+        connection: connection.current,
+      })
+      setClient(vsrClient)
+      setOwnDeposits(ownDeposits)
+    },
+    [realm, tokenOwnerRecordWalletPk]
+  )
+
   const getOwnedDeposits = async ({
     isUsed = true,
     realmPk,
@@ -119,7 +125,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
     })
     return deposits
   }
-  const handleGetDeposits = async () => {
+  const handleGetDeposits = useCallback(async () => {
     setIsLoading(true)
     try {
       if (realm!.pubkey && wallet?.publicKey && client) {
@@ -183,20 +189,26 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
       })
     }
     setIsLoading(false)
-  }
+  }, [
+    client,
+    connection,
+    realm,
+    tokenOwnerRecordWalletPk,
+    wallet?.connected,
+    wallet?.publicKey,
+  ])
+
+  const areLoadedDepositsSameAsOwned =
+    JSON.stringify(ownDeposits) === JSON.stringify(deposits)
   useEffect(() => {
-    if (
-      JSON.stringify(ownDeposits) !== JSON.stringify(deposits) &&
-      isOwnerOfDeposits
-    ) {
+    if (!areLoadedDepositsSameAsOwned && isOwnerOfDeposits) {
       handleGetDeposits()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [JSON.stringify(ownDeposits), ownDeposits.length])
+  }, [areLoadedDepositsSameAsOwned, isOwnerOfDeposits, handleGetDeposits])
   useEffect(() => {
     handleGetDeposits()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [isOwnerOfDeposits, client])
+  }, [isOwnerOfDeposits, client, handleGetDeposits])
+
   useEffect(() => {
     if (
       wallet?.publicKey?.toBase58() &&
@@ -209,31 +221,43 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
         new PublicKey('4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo')
       )
     }
-  }, [wallet?.publicKey?.toBase58() && realm?.pubkey.toBase58()])
+  }, [connnectionContext, handleSetVsrClient, realm?.pubkey, wallet])
+
+  const defaultMintOwnerRecordMint =
+    !mint?.supply.isZero() ||
+    config?.account.communityTokenConfig.maxVoterWeightAddin
+      ? realm?.account.communityMint
+      : !councilMint?.supply.isZero()
+      ? realm?.account.config.councilMint
+      : undefined
+
   useEffect(() => {
     const getTokenOwnerRecord = async () => {
-      const defaultMint =
-        !mint?.supply.isZero() ||
-        config?.account.communityTokenConfig.maxVoterWeightAddin
-          ? realm!.account.communityMint
-          : !councilMint?.supply.isZero()
-          ? realm!.account.config.councilMint
-          : undefined
       const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
         realm!.owner,
         realm!.pubkey,
-        defaultMint!,
+        defaultMintOwnerRecordMint!,
         wallet!.publicKey!
       )
       setIsOwnerOfDeposits(
         tokenOwnerRecordAddress.toBase58() === tokenOwnerRecordPk
       )
     }
-    if (realm && wallet?.connected) {
+    if (
+      realm?.owner &&
+      wallet?.connected &&
+      realm.pubkey &&
+      defaultMintOwnerRecordMint
+    ) {
       getTokenOwnerRecord()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [realm?.pubkey.toBase58(), wallet?.connected, tokenOwnerRecordPk])
+  }, [
+    wallet?.connected,
+    tokenOwnerRecordPk,
+    defaultMintOwnerRecordMint,
+    realm,
+    wallet,
+  ])
 
   const hasLockedTokens = useMemo(() => {
     return reducedDeposits.find((d) => d.lockUpKind !== 'none')
@@ -241,7 +265,6 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
 
   const lockedTokens = useMemo(() => {
     return deposits
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [deposits])
 
   return (

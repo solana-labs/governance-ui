@@ -6,10 +6,7 @@ import { getMintDecimalAmount } from '@tools/sdk/units'
 import { useMemo } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { LockupType } from 'VoteStakeRegistry/sdk/accounts'
-import {
-  getMinDurationFmt,
-  getTimeLeftFromNowFmt,
-} from 'VoteStakeRegistry/tools/dateTools'
+import { getMinDurationFmt, getTimeLeftFromNowFmt } from '@utils/dateTools'
 import { DepositWithWallet } from './tools'
 
 const LockTokenRow = ({
@@ -24,31 +21,33 @@ const LockTokenRow = ({
   const fmtMangoAmount = (val) => {
     return mint ? getMintDecimalAmount(mint!, val).toFormat(0) : '0'
   }
+
+  const depositWalletPk = depositWithWallet.wallet
+
   const renderAddressName = useMemo(() => {
     return (
       <DisplayAddress
         connection={connection.current}
-        address={new PublicKey(depositWithWallet.wallet)}
+        address={new PublicKey(depositWalletPk)}
         height="12px"
         width="100px"
         dark={true}
       />
     )
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [depositWithWallet.wallet.toBase58()])
+  }, [depositWalletPk, connection])
+
   const renderAddressImage = useMemo(
     () => (
       <AddressImage
         dark={true}
         connection={connection.current}
-        address={new PublicKey(depositWithWallet.wallet)}
+        address={new PublicKey(depositWalletPk)}
         height="25px"
         width="25px"
         placeholder={<UserCircleIcon className="h-6 text-fgd-3 w-6" />}
       />
     ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    [depositWithWallet.wallet.toBase58()]
+    [depositWalletPk, connection]
   )
   const type = Object.keys(
     depositWithWallet.deposit.lockup.kind
@@ -71,8 +70,11 @@ const LockTokenRow = ({
       <div>{typeName}</div>
       <div>
         {isConstant
-          ? getMinDurationFmt(depositWithWallet.deposit as any)
-          : getTimeLeftFromNowFmt(depositWithWallet.deposit as any)}
+          ? getMinDurationFmt(
+              depositWithWallet.deposit.lockup.startTs,
+              depositWithWallet.deposit.lockup.endTs
+            )
+          : getTimeLeftFromNowFmt(depositWithWallet.deposit.lockup.endTs)}
       </div>
       <div>{lockedTokens}</div>
     </div>

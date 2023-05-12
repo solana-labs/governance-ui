@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
-import useRealm from '@hooks/useRealm'
-import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
@@ -9,7 +7,6 @@ import { NewProposalContext } from '../../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, {
@@ -18,6 +15,7 @@ import InstructionForm, {
 } from '../../FormCreator'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { MarketIndex } from '@blockworks-foundation/mango-v4/dist/types/src/accounts/serum3'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 type NameMarketIndexVal = {
   name: string
@@ -28,6 +26,8 @@ interface OpenBookEditMarketForm {
   governedAccount: AssetAccount | null
   market: NameMarketIndexVal | null
   reduceOnly: boolean
+  forceClose: boolean
+  holdupTime: number
 }
 
 const OpenBookEditMarket = ({
@@ -37,9 +37,8 @@ const OpenBookEditMarket = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const { mangoClient, mangoGroup } = UseMangoV4()
-  const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const solAccounts = assetAccounts.filter(
     (x) =>
@@ -48,11 +47,12 @@ const OpenBookEditMarket = ({
       x.extensions.transferAddress?.equals(mangoGroup.admin)
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<OpenBookEditMarketForm>({
     governedAccount: null,
     reduceOnly: false,
+    forceClose: false,
     market: null,
+    holdupTime: 0,
   })
   const [currentMarkets, setCurrentMarkets] = useState<NameMarketIndexVal[]>([])
   const [formErrors, setFormErrors] = useState({})
@@ -68,7 +68,6 @@ const OpenBookEditMarket = ({
     let serializedInstruction = ''
     if (
       isValid &&
-      programId &&
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
@@ -77,7 +76,7 @@ const OpenBookEditMarket = ({
       )
 
       const ix = await mangoClient!.program.methods
-        .serum3EditMarket(form.reduceOnly)
+        .serum3EditMarket(form.reduceOnly, form.forceClose)
         .accounts({
           group: mangoGroup!.publicKey,
           admin: form.governedAccount.extensions.transferAddress,
@@ -91,6 +90,7 @@ const OpenBookEditMarket = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
+      customHoldUpTime: form.holdupTime,
     }
     return obj
   }
@@ -115,21 +115,24 @@ const OpenBookEditMarket = ({
     if (mangoGroup) {
       getMarkets()
     }
-  }, [mangoGroup?.publicKey.toBase58()])
+  }, [mangoGroup])
+
   useEffect(() => {
     const getCurrentMarketProps = () => {
       const market = mangoGroup!.serum3MarketsMapByMarketIndex.get(
         Number(form.market?.value)
       )
-      setForm({
-        ...form,
+      setForm((prevForm) => ({
+        ...prevForm,
         reduceOnly: market?.reduceOnly || false,
-      })
+        forceClose: market?.forceClose || false,
+      }))
     }
     if (form.market && mangoGroup) {
       getCurrentMarketProps()
     }
-  }, [form.market?.value])
+  }, [form.market, mangoGroup])
+
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
@@ -147,6 +150,13 @@ const OpenBookEditMarket = ({
       options: solAccounts,
     },
     {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
+    },
+    {
       label: 'Market',
       name: 'market',
       type: InstructionInputType.SELECT,
@@ -158,6 +168,12 @@ const OpenBookEditMarket = ({
       initialValue: form.reduceOnly,
       type: InstructionInputType.SWITCH,
       name: 'reduceOnly',
+    },
+    {
+      label: 'Force Close',
+      initialValue: form.forceClose,
+      type: InstructionInputType.SWITCH,
+      name: 'forceClose',
     },
   ]
 

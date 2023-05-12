@@ -17,12 +17,15 @@ export function SectionHeader(props: Props) {
         'items-center',
         'space-x-2',
         'text-neutral-500',
+        'pb-3',
+        'border-b',
+        'dark:border-neutral-800',
       )}
     >
       {cloneElement(props.icon, {
         className: cx(props.icon.props.className, 'fill-current', 'h-4', 'w-4'),
       })}
-      <div className="text-xl font-medium">{props.text}</div>
+      <div className="text-sm font-medium">{props.text}</div>
     </header>
   );
 }

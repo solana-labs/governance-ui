@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from 'react'
-import useRealm from '@hooks/useRealm'
 import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid, validatePubkey } from '@utils/formValidation'
@@ -8,7 +7,6 @@ import { NewProposalContext } from '../../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, {
@@ -20,6 +18,7 @@ import { BN } from '@coral-xyz/anchor'
 import { getChangedValues, getNullOrTransform } from '@utils/mangoV4Tools'
 import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
 import Switch from '@components/Switch'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const keyToLabel = {
   admin: 'Admin',
@@ -48,9 +47,10 @@ type GroupEditForm = {
   feesSwapMangoAccount: string | null
   feesMngoTokenIndex: number | null
   feesExpiryInterval: number | null
+  holdupTime: number
 }
 
-const defaultFormValues = {
+const defaultFormValues: GroupEditForm = {
   governedAccount: null,
   admin: '',
   fastListingAdmin: '',
@@ -63,6 +63,7 @@ const defaultFormValues = {
   feesSwapMangoAccount: '',
   feesMngoTokenIndex: 0,
   feesExpiryInterval: 0,
+  holdupTime: 0,
 }
 
 const GroupEdit = ({
@@ -72,9 +73,8 @@ const GroupEdit = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const { mangoClient, mangoGroup, getAdditionalLabelInfo } = UseMangoV4()
-  const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const solAccounts = assetAccounts.filter(
     (x) =>
@@ -85,7 +85,6 @@ const GroupEdit = ({
           x.extensions.transferAddress?.equals(mangoGroup.securityAdmin)))
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const programId: PublicKey | undefined = realmInfo?.programId
   const [originalFormValues, setOriginalFormValues] = useState<GroupEditForm>({
     ...defaultFormValues,
   })
@@ -104,7 +103,6 @@ const GroupEdit = ({
     let serializedInstruction = ''
     if (
       isValid &&
-      programId &&
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
@@ -122,7 +120,7 @@ const GroupEdit = ({
           getNullOrTransform(values.testing, null, Number),
           getNullOrTransform(values.version, null, Number),
           getNullOrTransform(values.depositLimitQuote, BN),
-          getNullOrTransform(values.feePayWithMngo, null),
+          getNullOrTransform(values.feePayWithMngo, null, Boolean),
           getNullOrTransform(values.feesMngoBonusRate, null, Number),
           getNullOrTransform(values.feesSwapMangoAccount, PublicKey),
           getNullOrTransform(values.feesMngoTokenIndex, null, Number),
@@ -140,6 +138,7 @@ const GroupEdit = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
+      customHoldUpTime: form.holdupTime,
     }
     return obj
   }
@@ -188,7 +187,6 @@ const GroupEdit = ({
   useEffect(() => {
     const getGroupParams = async () => {
       const vals = {
-        ...form,
         admin: mangoGroup!.admin.toBase58(),
         fastListingAdmin: mangoGroup!.fastListingAdmin.toBase58(),
         securityAdmin: mangoGroup!.securityAdmin.toBase58(),
@@ -200,15 +198,16 @@ const GroupEdit = ({
         feesMngoTokenIndex: mangoGroup!.mngoTokenIndex,
         feesExpiryInterval: mangoGroup!.buybackFeesExpiryInterval?.toNumber(),
       }
-      setForm({
+      setForm((prevForm) => ({
+        ...prevForm,
         ...vals,
-      })
-      setOriginalFormValues({ ...vals })
+      }))
+      setOriginalFormValues((prevForm) => ({ ...prevForm, ...vals }))
     }
     if (mangoGroup) {
       getGroupParams()
     }
-  }, [mangoGroup?.publicKey.toBase58()])
+  }, [mangoGroup])
 
   const inputs: InstructionInput[] = [
     {
@@ -219,6 +218,13 @@ const GroupEdit = ({
       shouldBeGoverned: shouldBeGoverned as any,
       governance: governance,
       options: solAccounts,
+    },
+    {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
     },
     {
       label: keyToLabel['admin'],
@@ -321,28 +327,27 @@ const GroupEdit = ({
             <div>
               {Object.keys(defaultFormValues)
                 .filter((x) => x !== 'governedAccount')
+                .filter((x) => x !== 'holdupTime')
                 .map((key) => (
-                  <>
-                    <div className="text-sm mb-3">
-                      <div className="mb-2">{keyToLabel[key]}</div>
-                      <div className="flex flex-row text-xs items-center">
-                        <Switch
-                          checked={
-                            forcedValues.find((x) => x === key) ? true : false
+                  <div className="text-sm mb-3" key={key}>
+                    <div className="mb-2">{keyToLabel[key]}</div>
+                    <div className="flex flex-row text-xs items-center">
+                      <Switch
+                        checked={
+                          forcedValues.find((x) => x === key) ? true : false
+                        }
+                        onChange={(checked) => {
+                          if (checked) {
+                            setForcedValues([...forcedValues, key])
+                          } else {
+                            setForcedValues([
+                              ...forcedValues.filter((x) => x !== key),
+                            ])
                           }
-                          onChange={(checked) => {
-                            if (checked) {
-                              setForcedValues([...forcedValues, key])
-                            } else {
-                              setForcedValues([
-                                ...forcedValues.filter((x) => x !== key),
-                              ])
-                            }
-                          }}
-                        />
-                      </div>
+                        }}
+                      />
                     </div>
-                  </>
+                  </div>
                 ))}
             </div>
           </AdvancedOptionsDropdown>

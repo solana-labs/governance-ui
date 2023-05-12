@@ -1,6 +1,7 @@
 import Input from '@components/inputs/Input'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useWallet from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import {
   Governance,
   ProgramAccount,
@@ -22,8 +23,8 @@ const UpdateConfigAuthority = ({
   const programId = useSerumGovStore((s) => s.programId)
   const actions = useSerumGovStore((s) => s.actions)
   const connection = useWalletStore((s) => s.connection.current)
-  const wallet = useWalletStore((s) => s.current)
-  const { anchorProvider } = useWallet()
+  const wallet = useWalletOnePointOh()
+  const { anchorProvider } = useWalletDeprecated()
 
   const [configAccount, setConfigAccount] = useState<ConfigAccountType | null>(
     null

@@ -45,7 +45,7 @@
 export default function Buy() {
   //   const DEFAULT_TITLE = `Buy tokens on auction`
   //   const DEFAULT_DESCRIPTION = `Buy tokens on auction`
-  //   const wallet = useWalletStore((s) => s.current)
+  //   const wallet = useWalletOnePointOh()
   //   const connection = useWalletStore((s) => s.connection)
   //   const { symbol } = useRealm()
   //   const router = useRouter()

@@ -3,7 +3,6 @@ import AssetsList from './AssetsList'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import useRealm from '@hooks/useRealm'
 import useQueryContext from '@hooks/useQueryContext'
-import useWalletStore from 'stores/useWalletStore'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { TerminalIcon } from '@heroicons/react/outline'
@@ -16,6 +15,7 @@ import {
 import { AccountType } from '@utils/uiTypes/assets'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import Loading from '@components/Loading'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const AssetsCompactWrapper = () => {
   const router = useRouter()
@@ -27,7 +27,8 @@ const AssetsCompactWrapper = () => {
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const canCreateGovernance = realm
     ? ownVoterWeight.canCreateGovernance(realm)
     : null

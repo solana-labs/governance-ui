@@ -78,9 +78,9 @@ function getLabel(
       return !hasInstructions(otherState.proposal) ? 'Completed' : 'Executable'
     case ProposalState.Voting:
       return otherState.votingEnded
-        ? otherState.coolOff
-          ? 'Cool Off'
-          : 'Finalizing'
+        ? 'Finalizing'
+        : otherState.coolOff
+        ? 'Cool Off'
         : 'Voting'
     case ProposalState.Vetoed:
       return 'Vetoed'
@@ -164,6 +164,7 @@ export default function ProposalStateBadge(props: Props) {
 
   const votingEnded =
     governance && props.proposal.getTimeToVoteEnd(governance) < 0
+
   const coolOff = isInCoolOffTime(props.proposal, governance)
 
   const otherState = {

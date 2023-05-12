@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import { UiInstruction } from 'utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../new'
 import {
@@ -17,6 +16,7 @@ import Input from '@components/inputs/Input'
 import { validatePubkey } from '@utils/formValidation'
 import * as yup from 'yup'
 import { PublicKey } from '@solana/web3.js'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 type Form = {
   governedAccount: AssetAccount | null
@@ -42,7 +42,7 @@ const SetMintAuthority = ({
     setAuthorityToNone: false,
     mintAuthority: '',
   })
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const [formErrors, setFormErrors] = useState({})
 
   const { handleSetInstructions } = useContext(NewProposalContext)

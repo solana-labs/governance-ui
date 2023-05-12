@@ -23,7 +23,7 @@ export type BaseGovernanceFormFieldsV3 = {
   /* in days */
   minInstructionHoldUpTime: string
   /* in days */
-  maxVotingTime: string
+  baseVotingTime: string
 
   // 'disabled' for disabled values
   minCommunityTokensToCreateProposal: string | 'disabled'
@@ -53,7 +53,7 @@ export const transformerGovernanceConfig_2_BaseGovernanceFormFieldsV3 = (
   BaseGovernanceFormFieldsV3
 > => ({
   minInstructionHoldUpTime: (x) => getDaysFromTimestamp(x).toString(),
-  maxVotingTime: (x) => getDaysFromTimestamp(x).toString(),
+  baseVotingTime: (x) => getDaysFromTimestamp(x).toString(),
   minCommunityTokensToCreateProposal: (x) =>
     isDisabledVoterWeight(x)
       ? 'disabled'
@@ -85,7 +85,7 @@ export const transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig = (
   Omit<GovernanceConfig & { _programVersion: 3 }, 'reserved'>
 > => ({
   minInstructionHoldUpTime: (x) => getTimestampFromDays(parseFloat(x)),
-  maxVotingTime: (x) => getTimestampFromDays(parseFloat(x)),
+  baseVotingTime: (x) => getTimestampFromDays(parseFloat(x)),
   minCommunityTokensToCreateProposal: (x) =>
     x === 'disabled'
       ? DISABLED_VOTER_WEIGHT

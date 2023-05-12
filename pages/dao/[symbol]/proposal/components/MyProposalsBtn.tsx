@@ -20,9 +20,8 @@ import dayjs from 'dayjs'
 import { notify } from '@utils/notifications'
 import Loading from '@components/Loading'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { sleep } from '@project-serum/common'
-import { NftVoterClient } from '@solana/governance-program-library'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { chunks } from '@utils/helpers'
 import { sendSignedTransaction } from '@utils/send'
 import { getRegistrarPDA, getVoterWeightRecord } from '@utils/plugin/accounts'
@@ -32,11 +31,14 @@ import {
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
 import useQueryContext from '@hooks/useQueryContext'
+import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
 
 const MyProposalsBn = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
-  const wallet = useWalletStore((s) => s.current)
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const [isLoading, setIsLoading] = useState(false)
   const { governancesArray } = useGovernanceAssets()
   const { current: connection } = useWalletStore((s) => s.connection)
@@ -45,8 +47,10 @@ const MyProposalsBn = () => {
   )
   const [ownNftVoteRecords, setOwnNftVoteRecords] = useState<any[]>([])
   const ownNftVoteRecordsFilterd = ownNftVoteRecords
-  const maxVoterWeight =
-    useNftPluginStore((s) => s.state.maxVoteRecord)?.pubkey || undefined
+
+  const { data: tokenOwnerRecord } = useAddressQuery_CommunityTokenOwner()
+
+  const maxVoterWeight = useMaxVoteRecord()?.pubkey || undefined
   const { realm, programId, programVersion } = useWalletStore(
     (s) => s.selectedRealm
   )
@@ -92,7 +96,7 @@ const MyProposalsBn = () => {
         ? 0 // If vote is finalized then set the timestamp to 0 to make it expired
         : x.account.votingAt && governance
         ? x.account.votingAt.toNumber() +
-          governance.account.config.maxVotingTime
+          governance.account.config.baseVotingTime
         : undefined
       : undefined
     return (
@@ -211,7 +215,8 @@ const MyProposalsBn = () => {
       await client.withRelinquishVote(
         instructions,
         proposal,
-        ownVoteRecordsByProposal[proposal.pubkey.toBase58()].pubkey
+        ownVoteRecordsByProposal[proposal.pubkey.toBase58()].pubkey,
+        voterTokenRecord!.pubkey
       )
       return inst
     }
@@ -243,6 +248,9 @@ const MyProposalsBn = () => {
     )
   }
   const releaseNfts = async (count: number | null = null) => {
+    if (!realm) throw new Error()
+    if (!wallet?.publicKey) throw new Error('no wallet')
+
     setIsLoading(true)
     const instructions: TransactionInstruction[] = []
     const { registrar } = await getRegistrarPDA(
@@ -256,6 +264,7 @@ const MyProposalsBn = () => {
       wallet!.publicKey!,
       client.client!.program.programId
     )
+
     const nfts = ownNftVoteRecordsFilterd.slice(
       0,
       count ? count : ownNftVoteRecordsFilterd.length
@@ -269,7 +278,8 @@ const MyProposalsBn = () => {
           governance:
             proposals[i.account.proposal.toBase58()].account.governance,
           proposal: i.account.proposal,
-          governingTokenOwner: wallet!.publicKey!,
+          voterTokenOwnerRecord: tokenOwnerRecord,
+          voterAuthority: wallet!.publicKey!,
           voteRecord: i.publicKey,
           beneficiary: wallet!.publicKey!,
         })

@@ -34,6 +34,7 @@ import { TOKEN_AUCTION_INSTRUCTIONS } from './programs/tokenAuction'
 import { VALIDATORDAO_INSTRUCTIONS } from './programs/validatordao'
 import { POSEIDON_INSTRUCTIONS } from './programs/poseidon'
 import { MANGO_V4_INSTRUCTIONS } from './programs/mangoV4'
+import { DUAL_INSTRUCTIONS } from './programs/dual'
 
 export const V3_DEFAULT_GOVERNANCE_PROGRAM_ID =
   '7e75Nwsz8i5i4NiDa43CNzKJ4AeQGyRimha46VKTM1Ls'
@@ -115,6 +116,31 @@ export const ACCOUNT_NAMES = {
     'Friends and Family Council Mint',
   FAFDfoUkaxoMqiNur9F1iigdBNrXFf4uNmS5XrhMewvf:
     'Friends and Family Community Mint',
+
+  // Physis DAO
+  '29epeLvAMyRXtpA1HaoKB1hGcAnrc1NvMCbaZ8AVRwEi': 'Physis DAO Treasury',
+  '4i2Yjk5bUiLeVNwqBpkRdFSECSCvMgKoeCSdRSx1TPcz': 'DAO: Rewards (PHY)',
+  'EUkYhtkRmxQpnKTvGayBJM3Pt1FQNjaMWP3UCUb38hJN': 'DAO: Grants (PHY)',
+  '3XwmcRf9R6TFqCwhLkftur8Baq45ZYE7DQDj9WUAPsmN': 'DAO: Governance (PHY)',
+
+  '6Va7K51FRbnPcYZTUwkoFfoYtnfh8qyJaZqT4W1GGxVi': 'Physis EcoSystem Treasury',
+  'C2KKuAq4UaUFYtm3zcxZMSDUuSEfPSk4yLcq5XaBr4wM': 'EcoSystem: Development (PHY)',
+  'F6EHstw5jkmHVLLXj9HEx3xCRsY7Whm7JK266jWFrFSB': 'EcoSystem: CapEX (PHY)',
+  '4gr1JjLD89VAbmQRrLeFDiLFSv2z2zn1tXRWRX4C3kow': 'EcoSystem: OpEX (PHY)',
+  '8eJoFYj8XtwJ9mER7qmb1EEnV8mGYGHyjxRct8ooJXQr': 'EcoSystem: Marketing (PHY)',
+
+  '2jfAMh48b37bBTKkoNwmvNZAqVQc1G7gh5vYv5FoWTUR': 'Physis Team Treasury',
+  '8vXYj8B567R8Di7BUvquiGC7usyPMtL756xx6KERfW9K': 'Team: Community (PHY)',
+  'AiGCc2YEwLNER7DETRwv5e82eqLwPL8FMcmmHEhED5Vr': 'Team: Core (PHY)',
+  'CpB6PDoxfkg2U8EC8XhyD6TdCAWkhRqZ4Fa3j3UFW6Rv': 'Team: Extraordinary (PHY)',
+
+  'BaT8NdFHAhrBpS7gTQX2YgSwazeNLcA4gKooDsAutvCk': 'Physis Alliance Treasury',
+  'H4WWxBJoDfGWfE212SF5tcyo75zBJnzCRAUmWpRMcxyH': 'Alliance: Partnerships (PHY)',
+  '5L84NZfjdfWHkkkUT9bJ8jKqtTMrpKsAobtTW4NKpJB1': 'Alliance: Advisors (PHY)',
+
+  'E26u3zGmYtR4tnmbhNSQS6kLVmSizSvPCQyu7qGnTWQ3': 'Physis Reserve Treasury',
+  'BgDFLAE25QybqyK6TMPdPF7vFTrBu1AjPs2cFkF8R3cb': 'Reserve: Seed (PHY)',
+  'GDJKzWrkxWHEPPt4k2Ao1TL7S1CEo4xNRnTAVk3jrmbk': 'Reserve: Launchpad (PHY)',
 
   // GM DAO
   '7WbRWL33mM3pbFLvuqNjBztihQtHWWFPGr4HLHyqViG9': 'Team funds',
@@ -253,7 +279,6 @@ export const WSOL_MINT_PK = new PublicKey(WSOL_MINT)
 const HIDDEN_MNGO_TREASURES = [
   'GZQSF4Fh9xK7rf9WBEhawXYFw8qPXeatZLUqVQeuW3X8',
   'J6jYLFDWeeGwg4u2TXhKDCcH4fSzJFQyDE2VSv2drRkg',
-  '9VEbrfajRanMXoR1ubQiuR1ni9cNWx4QcGv3WgUUikgu',
   'HXxjhCQwm496HAXsHBWfuVkiXBLinHJqUbVKomCjKsfo',
   'EwPgko6gXD5PAgQaFo1KD7R9tPUEgRcTAfsGvgdhkP4Z',
   '6VYcrmbK4QNC7WpfVRXBAXP59ZH2FkUMBoMYhtgENGMn',
@@ -328,6 +353,7 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...VALIDATORDAO_INSTRUCTIONS,
   ...POSEIDON_INSTRUCTIONS,
   ...MANGO_V4_INSTRUCTIONS,
+  ...DUAL_INSTRUCTIONS,
 }
 
 export async function getInstructionDescriptor(

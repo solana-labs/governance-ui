@@ -22,18 +22,19 @@ import Link from 'next/link'
 import useQueryContext from '@hooks/useQueryContext'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import ProposalExecutionCard from '@components/ProposalExecutionCard'
-import useWalletStore from 'stores/useWalletStore'
 import ProposalVotingPower from '@components/ProposalVotingPower'
 import { useMediaQuery } from 'react-responsive'
 import NftProposalVoteState from 'NftVotePlugin/NftProposalVoteState'
 import ProposalWarnings from './ProposalWarnings'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import VotingRules from '@components/VotingRules'
 
 const Proposal = () => {
   const { realmInfo, symbol } = useRealm()
   const { proposal, descriptionLink, governance } = useProposal()
   const [description, setDescription] = useState('')
   const voteData = useProposalVotes(proposal?.account)
-  const currentWallet = useWalletStore((s) => s.current)
+  const currentWallet = useWalletOnePointOh()
   const showResults =
     proposal &&
     proposal.account.state !== ProposalState.Cancelled &&
@@ -185,6 +186,7 @@ const Proposal = () => {
             </div>
           </div>
         ) : null}
+        <VotingRules />
         <VotePanel />
         <NftProposalVoteState proposal={proposal}></NftProposalVoteState>
         {proposal && currentWallet && showProposalExecution && (

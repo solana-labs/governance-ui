@@ -80,7 +80,6 @@ const MemberItems = ({
     walletAddress,
     councilVotes,
     communityVotes,
-    votesCasted,
     hasCommunityTokenOutsideRealm,
     hasCouncilTokenOutsideRealm,
   } = member
@@ -92,7 +91,7 @@ const MemberItems = ({
     councilVotes && !councilVotes.isZero()
       ? fmtMintAmount(councilMint, councilVotes)
       : null
-  const { connection } = useWalletStore((s) => s)
+  const connection = useWalletStore((s) => s.connection)
 
   const renderAddressName = useMemo(() => {
     return (
@@ -137,7 +136,7 @@ const MemberItems = ({
         </div>
         <div>
           <h3 className="flex mb-1 text-base font-bold">{renderAddressName}</h3>
-          <p className="mb-0 text-xs text-fgd-1">Votes Cast: {votesCasted}</p>
+          {/* <p className="mb-0 text-xs text-fgd-1">Votes Cast: {votesCasted}</p> */}
           <span className="text-xs text-fgd-3">
             {(communityAmount || !councilAmount) && (
               <span className="flex items-center">

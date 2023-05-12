@@ -73,12 +73,12 @@ interface GovernanceAssetsStore extends State {
   getGovernedAccounts: (
     connection: ConnectionContext,
     realm: ProgramAccount<Realm>
-  ) => void
+  ) => Promise<void>
   refetchGovernanceAccounts: (
     connection: ConnectionContext,
     realm: ProgramAccount<Realm>,
     governancePk: PublicKey
-  ) => void
+  ) => Promise<void>
 }
 
 const defaultState = {

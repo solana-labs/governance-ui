@@ -37,6 +37,7 @@ class RealmsDocument extends Document {
       ],
     }
   }
+
   render() {
     return (
       <Html>

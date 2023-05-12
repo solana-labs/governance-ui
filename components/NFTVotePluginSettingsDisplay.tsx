@@ -1,22 +1,17 @@
 import { PublicKey } from '@solana/web3.js'
 import type BN from 'bn.js'
-import { gql, request } from 'graphql-request'
 import React, { useEffect, useState } from 'react'
 import { pipe } from 'fp-ts/lib/function'
 import cx from 'classnames'
 // import ChevronRightIcon from '@carbon/icons-react/lib/ChevronRight'
 
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import {
-  HOLAPLEX_GRAPQL_URL_DEVNET,
-  HOLAPLEX_GRAPQL_URL_MAINNET,
-} from '@tools/constants'
 import useWalletStore from 'stores/useWalletStore'
 import { ConnectionContext } from '@utils/connection'
 import BigNumber from 'bignumber.js'
 import * as RE from '@utils/uiTypes/Result'
 import NFTIcon from '@components/treasuryV2/icons/NFTCollectionPreviewIcon'
-import { tryGetMint } from '@utils/tokens'
+import { tryGetMint, getNFTsByCollection } from '@utils/tokens'
 
 interface CollectionConfig {
   collection: PublicKey
@@ -24,47 +19,23 @@ interface CollectionConfig {
   weight: BN
 }
 
-const getCollectionQuery = gql`
-  query($collectionAddress: PublicKey!, $limit: Int!) {
-    nfts(collection: $collectionAddress, limit: $limit, offset: 0) {
-      name
-      owner {
-        address
-      }
-      collection {
-        nft {
-          name
-        }
-      }
-    }
-  }
-`
-
 async function fetchCollection(
   address: PublicKey,
   count: number,
   connection: ConnectionContext
 ) {
-  const endpoint =
+  const nfts = await getNFTsByCollection(
+    address,
     connection.cluster === 'devnet'
-      ? HOLAPLEX_GRAPQL_URL_DEVNET
-      : HOLAPLEX_GRAPQL_URL_MAINNET
-
-  const resp = await request(endpoint, getCollectionQuery, {
-    collectionAddress: address.toBase58(),
-    limit: 1,
-  })
-
-  const nftsRaw = resp.nfts || []
-  const collectionName =
-    nftsRaw[0]?.collection?.nft?.name || 'Unknown Collection'
+  )
+  const collectionName = nfts[0]?.collection.name
 
   return {
     name: collectionName,
-    nfts: nftsRaw
-      .map((nft: any) => ({
+    nfts: nfts
+      .map((nft) => ({
         name: nft.name,
-        owner: nft.owner?.address ? new PublicKey(nft.owner.address) : null,
+        owner: nft.owner,
       }))
       .sort((a, b) => {
         return a.name

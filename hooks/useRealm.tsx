@@ -27,18 +27,22 @@ import {
   switchboardPluginsPks,
   pythPluginsPks,
   gatewayPluginsPks,
+  heliumVsrPluginsPks,
 } from './useVotingPlugins'
 import useGatewayPluginStore from '../GatewayPlugin/store/gatewayPluginStore'
 import useSwitchboardPluginStore from 'SwitchboardVotePlugin/store/switchboardStore'
+import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import { BN } from '@coral-xyz/anchor'
 import { PublicKey } from '@solana/web3.js'
+import { useVsrMode } from './useVsrMode'
+import useWalletOnePointOh from './useWalletOnePointOh'
 
 export default function useRealm() {
   const router = useRouter()
   const { symbol } = router.query
   const connection = useWalletStore((s) => s.connection)
-  const connected = useWalletStore((s) => s.connected)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const tokenAccounts = useWalletStore((s) => s.tokenAccounts)
   const {
     realm,
@@ -52,6 +56,7 @@ export default function useRealm() {
     config,
   } = useWalletStore((s) => s.selectedRealm)
   const votingPower = useDepositStore((s) => s.state.votingPower)
+  const heliumVotingPower = useHeliumVsrStore((s) => s.state.votingPower)
   const nftVotingPower = useNftPluginStore((s) => s.state.votingPower)
   const gatewayVotingPower = useGatewayPluginStore((s) => s.state.votingPower)
   const sbVotingPower = useSwitchboardPluginStore((s) => s.state.votingPower)
@@ -219,9 +224,7 @@ export default function useRealm() {
     ownCouncilTokenRecord &&
     ownCouncilTokenRecord?.account.outstandingProposalCount >=
       realmCfgMaxOutstandingProposalCount
-  //based on realm config it will provide proper tokenBalanceCardComponent
-  const isLockTokensMode =
-    currentPluginPk && vsrPluginsPks.includes(currentPluginPk?.toBase58())
+  const vsrMode = useVsrMode()
   const isNftMode =
     currentPluginPk && nftPluginsPks.includes(currentPluginPk?.toBase58())
   const pythVotingPower = pythVoterWeight?.toBN() || new BN(0)
@@ -233,12 +236,14 @@ export default function useRealm() {
     sbVotingPower,
     pythVotingPower,
     gatewayVotingPower,
-    ownCouncilTokenRecord
+    ownCouncilTokenRecord,
+    heliumVotingPower
   )
   return {
     realm,
     realmInfo,
     symbol,
+    voteSymbol: realmInfo?.voteSymbol,
     mint,
     councilMint,
     governances,
@@ -258,7 +263,7 @@ export default function useRealm() {
     ownDelegateCouncilTokenRecords,
     config,
     currentPluginPk,
-    isLockTokensMode,
+    vsrMode,
     isNftMode,
   }
 }
@@ -271,7 +276,8 @@ const getVoterWeight = (
   sbVotingPower: BN,
   pythVotingPower: BN,
   gatewayVotingPower: BN,
-  ownCouncilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
+  ownCouncilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,
+  heliumVotingPower: BN
 ) => {
   if (currentPluginPk) {
     if (vsrPluginsPks.includes(currentPluginPk.toBase58())) {
@@ -279,6 +285,13 @@ const getVoterWeight = (
         ownTokenRecord,
         ownCouncilTokenRecord,
         votingPower
+      )
+    }
+    if (heliumVsrPluginsPks.includes(currentPluginPk.toBase58())) {
+      return new VoteRegistryVoterWeight(
+        ownTokenRecord,
+        ownCouncilTokenRecord,
+        heliumVotingPower
       )
     }
     if (nftPluginsPks.includes(currentPluginPk.toBase58())) {

@@ -13,19 +13,20 @@ import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import tokenPriceService from '@utils/services/tokenPrice'
 import LockTokensModal from './LockTokensModal'
 import { useState } from 'react'
-import {
-  getFormattedStringFromDays,
-  getMinDurationFmt,
-  getTimeLeftFromNowFmt,
-  SECS_PER_DAY,
-} from 'VoteStakeRegistry/tools/dateTools'
 import { closeDeposit } from 'VoteStakeRegistry/actions/closeDeposit'
 import { abbreviateAddress } from '@utils/formatting'
 import { notify } from '@utils/notifications'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import dayjs from 'dayjs'
+import {
+  getMinDurationFmt,
+  getTimeLeftFromNowFmt,
+  getFormattedStringFromDays,
+  SECS_PER_DAY,
+} from '@utils/dateTools'
 import { BN } from '@coral-xyz/anchor'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const DepositCard = ({
   deposit,
@@ -38,7 +39,7 @@ const DepositCard = ({
   const { realm, realmInfo, tokenRecords, ownTokenRecord } = useRealm()
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const actualClient = vsrClient || client
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection.current)
   const endpoint = useWalletStore((s) => s.connection.endpoint)
   const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false)
@@ -161,7 +162,7 @@ const DepositCard = ({
         className="p-4 rounded-lg flex flex-col h-full"
         style={{ minHeight: '290px' }}
       >
-        <div className="flex flex-row flex-wrap">
+        <div className="flex flex-wrap">
           <CardLabel
             label="Lockup Type"
             value={`${typeName.charAt(0).toUpperCase() + typeName.slice(1)} ${
@@ -199,12 +200,14 @@ const DepositCard = ({
           )}
           {isVest && deposit.nextVestingTimestamp !== null && (
             <CardLabel
-              label="Next Vesting in"
-              value={getFormattedStringFromDays(
+              label={`Next Vesting in ${getFormattedStringFromDays(
                 deposit!.nextVestingTimestamp
                   .sub(new BN(dayjs().unix()))
                   .toNumber() / SECS_PER_DAY
-              )}
+              )}`}
+              value={`${dayjs(
+                deposit!.nextVestingTimestamp!.toNumber() * 1000
+              ).format('DD-MM-YYYY HH:mm')}`}
             />
           )}
           {isRealmCommunityMint && (
@@ -222,8 +225,11 @@ const DepositCard = ({
             label={isConstant ? 'Min. Duration' : 'Time left'}
             value={
               isConstant
-                ? getMinDurationFmt(deposit)
-                : getTimeLeftFromNowFmt(deposit)
+                ? getMinDurationFmt(
+                    deposit.lockup.startTs,
+                    deposit.lockup.endTs
+                  )
+                : getTimeLeftFromNowFmt(deposit.lockup.endTs)
             }
           />
           <CardLabel

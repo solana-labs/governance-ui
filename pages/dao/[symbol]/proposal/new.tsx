@@ -127,6 +127,10 @@ import PsyFinanceExerciseOption from './components/instructions/PsyFinance/Exerc
 import RevokeGoverningTokens from './components/instructions/SplGov/RevokeGoverningTokens'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import SetMintAuthority from './components/instructions/SetMintAuthroity'
+import LiquidityStakingOption from './components/instructions/Dual/LiquidityStakingOption'
+import InitStrike from './components/instructions/Dual/InitStrike'
+import IdlSetBuffer from './components/instructions/Mango/MangoV4/IdlSetBuffer'
+import { usePrevious } from '@hooks/usePrevious'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -197,27 +201,29 @@ const New = () => {
   const [instructionsData, setInstructions] = useState<
     ComponentInstructionData[]
   >([{ type: undefined }])
-  const handleSetInstructions = (val: any, index) => {
-    const newInstructions = [...instructionsData]
-    newInstructions[index] = { ...instructionsData[index], ...val }
-    setInstructions(newInstructions)
-  }
+
+  const handleSetInstructions = useCallback((val: any, index) => {
+    setInstructions((prevInstructions) => {
+      const newInstructions = [...prevInstructions]
+      newInstructions[index] = { ...prevInstructions[index], ...val }
+      return newInstructions
+    })
+  }, [])
+
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-  const setInstructionType = ({
-    value,
-    idx,
-  }: {
-    value: InstructionType | null
-    idx: number
-  }) => {
-    const newInstruction = {
-      type: value,
-    }
-    handleSetInstructions(newInstruction, idx)
-  }
+  const setInstructionType = useCallback(
+    ({ value, idx }: { value: InstructionType | null; idx: number }) => {
+      const newInstruction = {
+        type: value,
+      }
+      handleSetInstructions(newInstruction, idx)
+    },
+    [handleSetInstructions]
+  )
+
   const addInstruction = () => {
     setInstructions([...instructionsData, { type: undefined }])
   }
@@ -357,12 +363,17 @@ const New = () => {
     handleTurnOffLoaders()
   }
 
+  const firstGovernancePk = instructionsData[0]?.governedAccount?.pubkey.toBase58()
+  const previousFirstGovernancePk = usePrevious(firstGovernancePk)
+
   useEffect(() => {
-    if (instructionsData?.length) {
+    if (
+      instructionsData?.length &&
+      firstGovernancePk !== previousFirstGovernancePk
+    ) {
       setInstructions([instructionsData[0]])
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [instructionsData[0]?.governedAccount?.pubkey])
+  }, [firstGovernancePk, previousFirstGovernancePk, instructionsData])
 
   useEffect(() => {
     const governedAccount = extractGovernanceAccountFromInstructionsData(
@@ -387,8 +398,12 @@ const New = () => {
         setInstructionType({ value: instruction, idx: 0 })
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [router.query, availableInstructions, instructionsData])
+  }, [
+    router.query,
+    availableInstructions,
+    instructionsData,
+    setInstructionType,
+  ])
 
   // Map instruction enum with components
   //
@@ -417,6 +432,7 @@ const New = () => {
       [Instructions.MangoV4TokenRegister]: TokenRegister,
       [Instructions.MangoV4TokenEdit]: EditToken,
       [Instructions.MangoV4GroupEdit]: GroupEdit,
+      [Instructions.IdlSetBuffer]: IdlSetBuffer,
       [Instructions.MangoV4OpenBookEditMarket]: OpenBookEditMarket,
       [Instructions.MangoV4IxGateSet]: IxGateSet,
       [Instructions.MangoV4AltExtend]: AltExtend,
@@ -438,6 +454,8 @@ const New = () => {
       [Instructions.DepositIntoCastle]: CastleDeposit,
       [Instructions.DualFinanceAirdrop]: DualAirdrop,
       [Instructions.DualFinanceStakingOption]: StakingOption,
+      [Instructions.DualFinanceInitStrike]: InitStrike,
+      [Instructions.DualFinanceLiquidityStakingOption]: LiquidityStakingOption,
       [Instructions.DualFinanceWithdraw]: DualWithdraw,
       [Instructions.DualFinanceExercise]: DualExercise,
       [Instructions.MeanCreateAccount]: MeanCreateAccount,

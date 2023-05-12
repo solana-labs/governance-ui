@@ -6,7 +6,7 @@ import {
   SYSTEM_PROGRAM_ID,
   withCreateTokenOwnerRecord,
 } from '@solana/spl-governance'
-import { NftVoterClient } from '@solana/governance-program-library'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import useWalletStore from 'stores/useWalletStore'
@@ -17,6 +17,7 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { sendTransaction } from '@utils/send'
 
 import VotingPowerPct from './VotingPowerPct'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface Props {
   className?: string
@@ -29,8 +30,8 @@ export default function NftVotingPower(props: Props) {
   const votingPower = useNftPluginStore((s) => s.state.votingPower)
   const maxWeight = useNftPluginStore((s) => s.state.maxVoteRecord)
   const isLoading = useNftPluginStore((s) => s.state.isLoadingNfts)
-  const connected = useWalletStore((s) => s.connected)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const connection = useWalletStore((s) => s.connection)
   const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
   const { ownTokenRecord, realm, realmInfo } = useRealm()

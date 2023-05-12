@@ -10,7 +10,7 @@ export interface Voter {
   //there are more fields but no use for them on ui yet
 }
 
-export interface votingMint {
+export interface VotingMint {
   baselineVoteWeightScaledFactor: BN
   digitShift: number
   grantAuthority: PublicKey
@@ -25,7 +25,7 @@ export interface Registrar {
   realm: PublicKey
   realmAuthority: PublicKey
   realmGoverningTokenMint: PublicKey
-  votingMints: votingMint[]
+  votingMints: VotingMint[]
   //there are more fields but no use for them on ui yet
 }
 interface LockupKind {
@@ -35,11 +35,13 @@ interface LockupKind {
   cliff: object
   constant: object
 }
-interface Lockup {
+
+export interface Lockup {
   endTs: BN
   kind: LockupKind
   startTs: BN
 }
+
 export interface Deposit {
   allowClawback: boolean
   amountDepositedNative: BN

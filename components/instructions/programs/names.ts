@@ -4,6 +4,7 @@ import {
   LIDO_PROGRAM_ID,
   LIDO_PROGRAM_ID_DEVNET,
 } from '@components/TreasuryAccount/ConvertToStSol'
+import { PROGRAM_ID as HELIUM_VSR_PROGRAM_ID } from '@helium/voter-stake-registry-sdk'
 import { NAME_PROGRAM_ID } from '@bonfida/spl-name-service'
 
 export const GOVERNANCE_PROGRAM_NAMES = {
@@ -24,6 +25,7 @@ export const GOVERNANCE_PROGRAM_NAMES = {
   GovHgfDPyQ1GwazJTDY2avSVY8GGcpmCapmmCsymRaGe: 'PSY DO Governance Program',
   '7e75Nwsz8i5i4NiDa43CNzKJ4AeQGyRimha46VKTM1Ls': 'spl-governance v3 test',
   MGovW65tDhMMcpEmsegpsdgvzb6zUwGsNjhXFxRAnjd: 'MEAN DAO Governance Program',
+  GovMaiHfpVPw8BAM1mbdzgmSZYDw2tdP32J2fapoQoYs: 'Marinade Governance Program',
 }
 
 // Well known program names displayed on the instruction card
@@ -53,6 +55,11 @@ export const PROGRAM_NAMES = {
   vsr2nfGVNHmSY8uxoBGqq8AQbwz3JwaEaHqGbsTPXqQ: 'Voter Stake Registry Program',
   VotEn9AWwTFtJPJSMV5F9jsMY6QwWM5qn3XP9PATGW7:
     'PsyDO Voter Stake Registry Program',
+  [HELIUM_VSR_PROGRAM_ID.toBase58()]: 'Helium Voter Stake Registry Program',
+  VoteWPk9yyGmkX4U77nEWRJWpcc8kUfrPoghxENpstL:
+    'Raydium Voter Stake Registry Program',
+  VoteMBhDCqGLRgYpp9o7DGyq81KNmwjXQRAHStjtJsS:
+    'Marinade Voter Stake Registry Program',
   [foresightConsts.PROGRAM_ID]: 'Foresight Dex',
   [NAME_PROGRAM_ID.toBase58()]: 'Solana Name Service Program',
   AwyKDr1Z5BfdvK3jX1UWopyjsJSV5cq4cuJpoYLofyEn: 'Validator Dao',

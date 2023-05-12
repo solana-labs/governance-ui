@@ -1,4 +1,4 @@
-import { Wallet } from '@project-serum/anchor';
+import { Wallet } from '@coral-xyz/anchor';
 import {
   serializeInstructionToBase64,
   getGovernance,
@@ -29,7 +29,6 @@ import {
   vsrPluginsPks,
   nftPluginsPks,
   gatewayPluginsPks,
-  switchboardPluginsPks,
   pythPluginsPks,
 } from '@hooks/useVotingPlugins';
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts';
@@ -48,7 +47,6 @@ interface Args {
   governingTokenMintPublicKey: PublicKey;
   instructions: TransactionInstruction[];
   isDraft: boolean;
-  programPublicKey: PublicKey;
   proposalDescription: string;
   proposalTitle: string;
   realmPublicKey: PublicKey;
@@ -57,10 +55,12 @@ interface Args {
   signAllTransactions(transactions: Transaction[]): Promise<Transaction[]>;
 }
 
+/** @deprecated */
 export async function createProposal(args: Args) {
+  const realm = await getRealm(args.connection, args.realmPublicKey);
+
   const [
     governance,
-    realm,
     tokenOwnerRecord,
     realmConfigPublicKey,
     // eslint-disable-next-line
@@ -69,19 +69,18 @@ export async function createProposal(args: Args) {
     communityTokenOwnerRecord,
   ] = await Promise.all([
     getGovernance(args.connection, args.governancePublicKey),
-    getRealm(args.connection, args.realmPublicKey),
     getTokenOwnerRecordForRealm(
       args.connection,
-      args.programPublicKey,
+      realm.owner,
       args.realmPublicKey,
       args.governingTokenMintPublicKey,
       args.requestingUserPublicKey,
-    ),
-    getRealmConfigAddress(args.programPublicKey, args.realmPublicKey),
+    ).catch(() => undefined),
+    getRealmConfigAddress(realm.owner, args.realmPublicKey),
     args.councilTokenMintPublicKey
       ? getTokenOwnerRecordForRealm(
           args.connection,
-          args.programPublicKey,
+          realm.owner,
           args.realmPublicKey,
           args.councilTokenMintPublicKey,
           args.requestingUserPublicKey,
@@ -90,7 +89,7 @@ export async function createProposal(args: Args) {
     args.communityTokenMintPublicKey
       ? getTokenOwnerRecordForRealm(
           args.connection,
-          args.programPublicKey,
+          realm.owner,
           args.realmPublicKey,
           args.communityTokenMintPublicKey,
           args.requestingUserPublicKey,
@@ -109,7 +108,7 @@ export async function createProposal(args: Args) {
       )
     : {
         pubkey: realmConfigPublicKey,
-        owner: args.programPublicKey,
+        owner: realm.owner,
         account: new RealmConfigAccount({
           realm: args.realmPublicKey,
           communityTokenConfig: new GoverningTokenConfig({
@@ -128,6 +127,30 @@ export async function createProposal(args: Args) {
         }),
       };
 
+  let userTOR = tokenOwnerRecord;
+
+  if (
+    councilTokenOwnerRecord &&
+    councilTokenOwnerRecord.account.governingTokenDepositAmount.gte(
+      governance.account.config.minCouncilTokensToCreateProposal,
+    )
+  ) {
+    userTOR = councilTokenOwnerRecord;
+  }
+
+  if (
+    communityTokenOwnerRecord &&
+    communityTokenOwnerRecord.account.governingTokenDepositAmount.gte(
+      governance.account.config.minCommunityTokensToCreateProposal,
+    )
+  ) {
+    userTOR = communityTokenOwnerRecord;
+  }
+
+  if (!userTOR) {
+    throw new Error('You do not have any voting power in this org');
+  }
+
   const serializedInstructions = args.instructions.map(
     serializeInstructionToBase64,
   );
@@ -145,16 +168,6 @@ export async function createProposal(args: Args) {
   );
 
   const proposalIndex = governance.account.proposalCount;
-  const votingPlugins = await fetchPlugins(
-    args.connection,
-    args.programPublicKey,
-    {
-      publicKey: args.requestingUserPublicKey,
-      signTransaction: args.signTransaction,
-      signAllTransactions: args.signAllTransactions,
-    } as Wallet,
-    args.cluster === 'devnet',
-  );
 
   const pluginPublicKey =
     realmConfig.account.communityTokenConfig.voterWeightAddin;
@@ -162,6 +175,16 @@ export async function createProposal(args: Args) {
   let votingNfts: NFTWithMeta[] = [];
 
   if (pluginPublicKey) {
+    const votingPlugins = await fetchPlugins(
+      args.connection,
+      pluginPublicKey,
+      {
+        publicKey: args.requestingUserPublicKey,
+        signTransaction: args.signTransaction,
+        signAllTransactions: args.signAllTransactions,
+      } as Wallet,
+      args.cluster === 'devnet',
+    );
     const pluginPublicKeyStr = pluginPublicKey.toBase58();
     let client: VotingClient['client'] = undefined;
     // Check for plugins in a particular order. I'm not sure why, but I
@@ -205,13 +228,6 @@ export async function createProposal(args: Args) {
       }
     }
 
-    // if (
-    //   switchboardPluginsPks.includes(pluginPublicKeyStr) &&
-    //   votingPlugins.switchboardClient
-    // ) {
-    //   client = votingPlugins.switchboardClient;
-    // }
-
     if (
       gatewayPluginsPks.includes(pluginPublicKeyStr) &&
       votingPlugins.gatewayClient
@@ -245,12 +261,12 @@ export async function createProposal(args: Args) {
         signTransaction: args.signTransaction,
         signAllTransactions: args.signAllTransactions,
       },
-      programId: args.programPublicKey,
+      programId: realm.owner,
       walletPubkey: args.requestingUserPublicKey,
     } as RpcContext,
     realm,
     args.governancePublicKey,
-    tokenOwnerRecord,
+    userTOR,
     args.proposalTitle,
     args.proposalDescription,
     args.governingTokenMintPublicKey,
