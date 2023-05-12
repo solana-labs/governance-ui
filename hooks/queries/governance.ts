@@ -25,6 +25,7 @@ export const governanceQueryKeys = {
   ],
 }
 
+// Note: I may need to insert some defaults from undefined fields here? or maybe the sdk does it already (that would make sense)
 export const useGovernanceByPubkeyQuery = (pubkey?: PublicKey) => {
   const connection = useWalletStore((s) => s.connection)
 
@@ -35,9 +36,7 @@ export const useGovernanceByPubkeyQuery = (pubkey?: PublicKey) => {
       : undefined,
     queryFn: async () => {
       if (!enabled) throw new Error()
-      return asFindable((...x: Parameters<typeof getGovernance>) =>
-        getGovernance(...x).then((x) => x?.account)
-      )(connection.current, pubkey)
+      return asFindable(getGovernance)(connection.current, pubkey)
     },
     enabled,
   })
@@ -89,9 +88,6 @@ export const fetchGovernanceByPubkey = (
   const cluster = getNetworkFromEndpoint(connection.rpcEndpoint)
   return queryClient.fetchQuery({
     queryKey: governanceQueryKeys.byPubkey(cluster, pubkey),
-    queryFn: () =>
-      asFindable((...x: Parameters<typeof getGovernance>) =>
-        getGovernance(...x).then((x) => x?.account)
-      )(connection, pubkey),
+    queryFn: () => asFindable(getGovernance)(connection, pubkey),
   })
 }

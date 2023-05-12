@@ -52,7 +52,7 @@ export default function useCreateProposal() {
     if (!selectedGovernance) throw new Error('governance not found')
 
     const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-      selectedGovernance.config,
+      selectedGovernance.account.config,
       voteByCouncil
     )
 
@@ -82,7 +82,7 @@ export default function useCreateProposal() {
       title,
       description,
       proposalMint,
-      selectedGovernance.proposalCount,
+      selectedGovernance.account.proposalCount,
       instructionsData,
       isDraft,
       client

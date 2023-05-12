@@ -1,13 +1,13 @@
 import { Proposal, ProposalState } from '@solana/spl-governance'
 import classNames from 'classnames'
 
-import useRealmGovernance from '../hooks/useRealmGovernance'
 import assertUnreachable from '@utils/typescript/assertUnreachable'
 import { isInCoolOffTime } from './VotePanel/hooks'
 import {
   useUserCommunityTokenOwnerRecord,
   useUserCouncilTokenOwnerRecord,
 } from '@hooks/queries/tokenOwnerRecord'
+import { useGovernanceByPubkeyQuery } from '@hooks/queries/governance'
 
 export const hasInstructions = (proposal: Proposal) => {
   if (proposal.instructionsCount) {
@@ -156,7 +156,8 @@ interface Props {
 export default function ProposalStateBadge(props: Props) {
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
-  const governance = useRealmGovernance(props.proposal.governance)
+  const governance = useGovernanceByPubkeyQuery(props.proposal.governance).data
+    ?.result
   const isCreator =
     ownTokenRecord?.pubkey.equals(props.proposal.tokenOwnerRecord) ||
     ownCouncilTokenRecord?.pubkey.equals(props.proposal.tokenOwnerRecord) ||
@@ -166,9 +167,10 @@ export default function ProposalStateBadge(props: Props) {
   const isSignatory = false
 
   const votingEnded =
-    governance && props.proposal.getTimeToVoteEnd(governance) < 0
+    governance !== undefined &&
+    props.proposal.getTimeToVoteEnd(governance.account) < 0
 
-  const coolOff = isInCoolOffTime(props.proposal, governance)
+  const coolOff = isInCoolOffTime(props.proposal, governance?.account)
 
   const otherState = {
     isCreator,

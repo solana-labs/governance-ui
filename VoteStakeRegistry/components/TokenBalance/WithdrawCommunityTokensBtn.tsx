@@ -23,6 +23,7 @@ import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { fetchGovernanceByPubkey } from '@hooks/queries/governance'
 
 const WithDrawCommunityTokens = () => {
   const { getOwnedDeposits } = useDepositStore()
@@ -33,7 +34,6 @@ const WithDrawCommunityTokens = () => {
   const {
     realmInfo,
     proposals,
-    governances,
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
@@ -73,8 +73,13 @@ const WithDrawCommunityTokens = () => {
           // If the Proposal is in Voting state refetch it to make sure we have the latest state to avoid false positives
           proposal = await getProposal(connection, proposal.pubkey)
           if (proposal.account.state === ProposalState.Voting) {
-            const governance =
-              governances[proposal.account.governance.toBase58()]
+            const governance = (
+              await fetchGovernanceByPubkey(
+                connection,
+                proposal.account.governance
+              )
+            ).result
+            if (!governance) throw new Error('failed to fetch governance')
             if (proposal.account.getTimeToVoteEnd(governance.account) > 0) {
               setIsLoading(false)
               // Note: It's technically possible to withdraw the vote here but I think it would be confusing and people would end up unconsciously withdrawing their votes

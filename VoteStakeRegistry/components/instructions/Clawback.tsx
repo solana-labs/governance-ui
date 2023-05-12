@@ -96,7 +96,7 @@ const Clawback = ({
     const obj: UiInstruction = {
       serializedInstruction,
       isValid,
-      governance: governancesArray.find(
+      governance: governancesArray?.find(
         (x) => x.pubkey.toBase58() === realm?.account.authority?.toBase58()
       ),
       prerequisiteInstructions: prerequisiteInstructions,
@@ -113,12 +113,11 @@ const Clawback = ({
   }, [form])
   useEffect(() => {
     setGovernedAccount(
-      governancesArray.find(
+      governancesArray?.find(
         (x) => x.pubkey.toBase58() === realm?.account.authority?.toBase58()
       )
     )
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form.governedTokenAccount])
+  }, [form.governedTokenAccount, governancesArray, realm?.account.authority])
   useEffect(() => {
     const getVoters = async () => {
       const { registrar } = await getRegistrarPDA(

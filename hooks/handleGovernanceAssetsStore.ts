@@ -1,32 +1,26 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import useWalletStore from 'stores/useWalletStore'
-import { usePrevious } from './usePrevious'
-import useRealm from './useRealm'
 import { useRealmQuery } from './queries/realm'
+import { useRealmGovernancesQuery } from './queries/governance'
 
 export default function useHandleGovernanceAssetsStore() {
   const realm = useRealmQuery().data?.result
-  const { governances } = useRealm()
-  const previousStringifyGovernances = usePrevious(
-    JSON.stringify(Object.keys(governances))
-  )
+
   const connection = useWalletStore((s) => s.connection)
+
+  const governancesArray = useRealmGovernancesQuery().data
+  const governancesByGovernance = useMemo(
+    () =>
+      governancesArray &&
+      Object.fromEntries(governancesArray.map((x) => [x.pubkey.toString(), x])),
+    [governancesArray]
+  )
   const { setGovernancesArray } = useGovernanceAssetsStore()
+
   useEffect(() => {
-    if (
-      realm &&
-      previousStringifyGovernances !== JSON.stringify(Object.keys(governances))
-    ) {
-      setGovernancesArray(connection, realm, governances)
+    if (realm) {
+      setGovernancesArray(connection, realm, governancesByGovernance ?? {})
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    JSON.stringify(Object.keys(governances)),
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    realm?.pubkey.toBase58(),
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    realm?.account.authority?.toBase58(),
-  ])
+  }, [connection, governancesByGovernance, realm, setGovernancesArray])
 }

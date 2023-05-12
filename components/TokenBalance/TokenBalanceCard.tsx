@@ -51,6 +51,7 @@ import {
   useRealmCommunityMintInfoQuery,
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
+import { fetchGovernanceByPubkey } from '@hooks/queries/governance'
 
 const TokenBalanceCard = ({
   proposal,
@@ -178,7 +179,6 @@ export const TokenDeposit = ({
     ownVoterWeight,
     councilTokenAccount,
     proposals,
-    governances,
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
@@ -287,8 +287,13 @@ export const TokenDeposit = ({
           // If the Proposal is in Voting state refetch it to make sure we have the latest state to avoid false positives
           proposal = await getProposal(connection, proposal.pubkey)
           if (proposal.account.state === ProposalState.Voting) {
-            const governance =
-              governances[proposal.account.governance.toBase58()]
+            const governance = (
+              await fetchGovernanceByPubkey(
+                connection,
+                proposal.account.governance
+              )
+            ).result
+            if (!governance) throw new Error('failed to fetch governance')
             if (proposal.account.getTimeToVoteEnd(governance.account) > 0) {
               // Note: It's technically possible to withdraw the vote here but I think it would be confusing and people would end up unconsciously withdrawing their votes
               notify({

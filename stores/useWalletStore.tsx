@@ -55,7 +55,7 @@ interface WalletStore extends State {
     //mint?: MintAccount
     programId?: PublicKey
     //councilMint?: MintAccount
-    governances: { [governance: string]: ProgramAccount<Governance> }
+    //governances: { [governance: string]: ProgramAccount<Governance> }
     proposals: { [proposal: string]: ProgramAccount<Proposal> }
     /* /// Community token records by owner
     tokenRecords: { [owner: string]: ProgramAccount<TokenOwnerRecord> }
@@ -319,24 +319,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 
     async refetchProposals() {
       console.log('REFETCH PROPOSALS')
-      const set = get().set
-      const connectionContext = get().connection
-      const programId = get().selectedRealm.programId
-      const governances = get().selectedRealm.governances
-      const proposalsByGovernance = await getProposals(
-        Object.keys(governances).map((x) => new PublicKey(x)),
-        connectionContext,
-        programId!
-      )
-      const proposals = accountsToPubkeyMap(
-        proposalsByGovernance
-          .flatMap((p) => p)
-          .filter((p) => !HIDDEN_PROPOSALS.has(p.pubkey.toBase58()))
-      )
-
-      await set((s) => {
-        s.selectedRealm.proposals = proposals
-      })
     },
     // Fetches and updates governance for the selected realm
     async fetchRealmGovernance(governancePk: PublicKey) {

@@ -47,6 +47,7 @@ import {
   useRealmCommunityMintInfoQuery,
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
+import { useRealmGovernancesQuery } from '@hooks/queries/governance'
 
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
@@ -70,7 +71,7 @@ const REALM = () => {
   const realmQuery = useRealmQuery()
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
-  const { realmInfo, proposals, governances, ownVoterWeight } = useRealm()
+  const { realmInfo, proposals, ownVoterWeight } = useRealm()
   const proposalsPerPage = 20
   const [filters, setFilters] = useState<Filters>(InitialFilters)
   const [sorting, setSorting] = useState<Sorting>(InitialSorting)
@@ -96,9 +97,19 @@ const REALM = () => {
   const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection.current)
 
-  const allProposals = Object.entries(proposals).sort((a, b) =>
-    compareProposals(b[1].account, a[1].account, governances)
+  const governancesArray = useRealmGovernancesQuery().data
+  const governancesByGovernance = useMemo(
+    () =>
+      governancesArray &&
+      Object.fromEntries(governancesArray.map((x) => [x.pubkey.toString(), x])),
+    [governancesArray]
   )
+
+  const allProposals =
+    governancesByGovernance &&
+    Object.entries(proposals).sort((a, b) =>
+      compareProposals(b[1].account, a[1].account, governancesByGovernance)
+    )
   useEffect(() => {
     setPaginatedProposals(paginateProposals(0))
     pagination?.current?.setPage(0)
@@ -106,39 +117,43 @@ const REALM = () => {
   }, [JSON.stringify(filteredProposals)])
 
   useEffect(() => {
-    let proposals = filterProposals(
-      allProposals,
-      filters,
-      sorting,
-      realmQuery.data?.result,
-      governances,
-      councilMint,
-      mint
-    )
-
-    if (proposalSearch) {
-      proposals = proposals.filter(([, v]) =>
-        v.account.name
-          .toLowerCase()
-          .includes(proposalSearch.toLocaleLowerCase())
+    if (governancesByGovernance && allProposals) {
+      let proposals = filterProposals(
+        allProposals,
+        filters,
+        sorting,
+        realmQuery.data?.result,
+        governancesByGovernance,
+        councilMint,
+        mint
       )
+
+      if (proposalSearch) {
+        proposals = proposals.filter(([, v]) =>
+          v.account.name
+            .toLowerCase()
+            .includes(proposalSearch.toLocaleLowerCase())
+        )
+      }
+      setFilteredProposals(proposals)
     }
-    setFilteredProposals(proposals)
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [filters, proposalSearch, sorting])
 
   useEffect(() => {
-    const proposals = filterProposals(
-      allProposals,
-      filters,
-      sorting,
-      realmQuery.data?.result,
-      governances,
-      councilMint,
-      mint
-    )
-    setDisplayedProposals(proposals)
-    setFilteredProposals(proposals)
+    if (governancesByGovernance && allProposals) {
+      const proposals = filterProposals(
+        allProposals,
+        filters,
+        sorting,
+        realmQuery.data?.result,
+        governancesByGovernance,
+        councilMint,
+        mint
+      )
+      setDisplayedProposals(proposals)
+      setFilteredProposals(proposals)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(proposals)])
 
@@ -165,8 +180,10 @@ const REALM = () => {
 
   const votingProposals = useMemo(
     () =>
-      allProposals.filter(([_k, v]) => {
-        const governance = governances[v.account.governance.toBase58()]?.account
+      governancesByGovernance &&
+      allProposals?.filter(([_k, v]) => {
+        const governance =
+          governancesByGovernance[v.account.governance.toBase58()]?.account
         return (
           v.account.state === ProposalState.Voting &&
           // !getCurrentVoteRecKeyVal()[k] &&
@@ -179,19 +196,22 @@ const REALM = () => {
 
   useEffect(() => {
     setSelectedProposals([])
+
     if (multiVoteMode) {
-      setFilteredProposals(votingProposals)
+      votingProposals && setFilteredProposals(votingProposals)
     } else {
-      const proposals = filterProposals(
-        allProposals,
-        filters,
-        sorting,
-        realmQuery.data?.result,
-        governances,
-        councilMint,
-        mint
-      )
-      setFilteredProposals(proposals)
+      const proposals =
+        governancesByGovernance &&
+        filterProposals(
+          allProposals ?? [],
+          filters,
+          sorting,
+          realmQuery.data?.result,
+          governancesByGovernance,
+          councilMint,
+          mint
+        )
+      setFilteredProposals(proposals ?? [])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [multiVoteMode])
@@ -205,7 +225,7 @@ const REALM = () => {
   }, [])
 
   const allVotingProposalsSelected =
-    selectedProposals.length === votingProposals.length
+    selectedProposals.length === votingProposals?.length
   const hasCommunityVoteWeight =
     ownTokenRecord &&
     ownVoterWeight.hasMinAmountToVote(ownTokenRecord.account.governingTokenMint)
@@ -225,10 +245,10 @@ const REALM = () => {
       setSelectedProposals([])
     } else {
       setSelectedProposals(
-        votingProposals.map(([k, v]) => ({
+        votingProposals?.map(([k, v]) => ({
           proposal: v.account,
           proposalPk: new PublicKey(k),
-        }))
+        })) ?? []
       )
     }
   }

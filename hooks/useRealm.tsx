@@ -49,6 +49,7 @@ import {
   useRealmCommunityMintInfoQuery,
   useRealmCouncilMintInfoQuery,
 } from './queries/mintInfo'
+import { useRealmGovernancesQuery } from './queries/governance'
 
 export default function useRealm() {
   const router = useRouter()
@@ -71,7 +72,11 @@ export default function useRealm() {
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
 
-  const { governances, proposals } = useWalletStore((s) => s.selectedRealm)
+  const { proposals } = useWalletStore((s) => s.selectedRealm)
+  const governancesQuery = useRealmGovernancesQuery()
+  const governances = useMemo(() => governancesQuery.data ?? [], [
+    governancesQuery.data,
+  ])
 
   const votingPower = useDepositStore((s) => s.state.votingPower)
   const heliumVotingPower = useHeliumVsrStore((s) => s.state.votingPower)
@@ -241,7 +246,7 @@ export default function useRealm() {
     voteSymbol: realmInfo?.voteSymbol,
     //mint,
     //councilMint,
-    governances,
+    //governances,
     proposals,
     //tokenRecords,
     realmTokenAccount,

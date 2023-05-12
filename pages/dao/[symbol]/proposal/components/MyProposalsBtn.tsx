@@ -105,7 +105,7 @@ const MyProposalsBn = () => {
     return x.account.state === ProposalState.Draft
   })
   const notfinalized = myProposals.filter((x) => {
-    const governance = governancesArray.find(
+    const governance = governancesArray?.find(
       (gov) => gov.pubkey.toBase58() === x.account.governance.toBase58()
     )
     const now = dayjs().unix()
