@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { ThumbUpIcon, ThumbDownIcon } from '@heroicons/react/solid'
 import Button from '../Button'
 import VoteCommentModal from '../VoteCommentModal'
-import { RpcContext } from '@solana/spl-governance'
 import {
   useIsInCoolOffTime,
   useIsVoting,
@@ -15,14 +14,6 @@ import useRealm from '@hooks/useRealm'
 import { VotingClientType } from '@utils/uiTypes/VotePlugin'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { castVote } from 'actions/castVote'
-import { getProgramVersionForRealm } from '@models/registry/api'
-import useWalletStore from 'stores/useWalletStore'
-import { nftPluginsPks } from '@hooks/useVotingPlugins'
-import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
-import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
-import queryClient from '@hooks/queries/queryClient'
-import { voteRecordQueryKeys } from '@hooks/queries/voteRecord'
 
 const useCanVote = () => {
   const client = useVotePluginsClientStore(
@@ -67,21 +58,6 @@ const useCanVote = () => {
 }
 
 export const CastVoteButtons = () => {
-  const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection)
-  const { realm, realmInfo, config, allowDiscussion } = useRealm()
-  const { refetchProposals } = useWalletStore((s) => s.actions)
-  const isNftPlugin =
-    config?.account.communityTokenConfig.voterWeightAddin &&
-    nftPluginsPks.includes(
-      config?.account.communityTokenConfig.voterWeightAddin?.toBase58()
-    )
-  const { closeNftVotingCountingModal } = useNftProposalStore.getState()
-  const client = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
-  )
-  const { proposal } = useWalletStore((s) => s.selectedProposal)
-  const [submitting, setSubmitting] = useState(false)
   const [showVoteModal, setShowVoteModal] = useState(false)
   const [vote, setVote] = useState<'yes' | 'no' | null>(null)
   const votingPop = useVotingPop()
@@ -93,56 +69,6 @@ export const CastVoteButtons = () => {
   const isVoteCast = !!ownVoteRecord?.found
   const isVoting = useIsVoting()
   const isInCoolOffTime = useIsInCoolOffTime()
-
-  const handleClick = async (vote: 'yes' | 'no') => {
-    setVote(vote)
-    setSubmitting(true)
-
-    if (allowDiscussion) {
-      setShowVoteModal(true)
-    } else {
-      const confirmationCallback = async () => {
-        await refetchProposals()
-        // TODO refine this to only invalidate the one query
-        await queryClient.invalidateQueries(
-          voteRecordQueryKeys.all(connection.cluster)
-        )
-      }
-
-      const rpcContext = new RpcContext(
-        proposal!.owner,
-        getProgramVersionForRealm(realmInfo!),
-        wallet!,
-        connection.current,
-        connection.endpoint
-      )
-
-      try {
-        await castVote(
-          rpcContext,
-          realm!,
-          proposal!,
-          voterTokenRecord!,
-          vote === 'yes' ? VoteKind.Approve : VoteKind.Deny,
-          undefined,
-          client,
-          confirmationCallback
-        )
-      } catch (ex) {
-        if (isNftPlugin) {
-          closeNftVotingCountingModal(
-            (client.client as unknown) as NftVoterClient,
-            proposal!,
-            wallet!.publicKey!
-          )
-        }
-        //TODO: How do we present transaction errors to users? Just the notification?
-        console.error("Can't cast vote", ex)
-      } finally {
-        setSubmitting(false)
-      }
-    }
-  }
 
   return (isVoting && !isVoteCast) || (isInCoolOffTime && !isVoteCast) ? (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-4">
@@ -160,8 +86,10 @@ export const CastVoteButtons = () => {
             <Button
               tooltipMessage={tooltipContent}
               className="w-1/2"
-              onClick={() => handleClick('yes')}
-              isLoading={submitting}
+              onClick={() => {
+                setVote('yes')
+                setShowVoteModal(true)
+              }}
               disabled={!canVote}
             >
               <div className="flex flex-row items-center justify-center">
@@ -174,8 +102,10 @@ export const CastVoteButtons = () => {
           <Button
             tooltipMessage={tooltipContent}
             className="w-1/2"
-            onClick={() => handleClick('no')}
-            isLoading={submitting}
+            onClick={() => {
+              setVote('no')
+              setShowVoteModal(true)
+            }}
             disabled={!canVote}
           >
             <div className="flex flex-row items-center justify-center">
@@ -186,7 +116,7 @@ export const CastVoteButtons = () => {
         </div>
       </div>
 
-      {allowDiscussion && showVoteModal && vote ? (
+      {showVoteModal && vote ? (
         <VoteCommentModal
           isOpen={showVoteModal}
           onClose={() => setShowVoteModal(false)}
