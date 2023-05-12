@@ -25,7 +25,6 @@ import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import queryClient from '@hooks/queries/queryClient'
 import { voteRecordQueryKeys } from '@hooks/queries/voteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { sub } from 'date-fns'
 
 interface VoteCommentModalProps {
   onClose: () => void
