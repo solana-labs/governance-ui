@@ -19,7 +19,6 @@ import {
   Proposal,
   ProposalTransaction,
   Realm,
-  RealmConfigAccount,
   SignatoryRecord,
   TokenOwnerRecord,
   VoteRecord,
@@ -39,7 +38,6 @@ import { pubkeyFilter } from '@solana/spl-governance'
 import {
   getTokenOwnerRecordsForRealmMintMapByOwner,
   getVoteRecordsByProposalMapByVoter,
-  getVoteRecordsByVoterMapByProposal,
 } from '@models/api'
 import { accountsToPubkeyMap } from '@tools/sdk/accounts'
 import { HIDDEN_PROPOSALS } from '@components/instructions/tools'
@@ -53,7 +51,7 @@ interface WalletStore extends State {
 
   realms: { [realm: string]: ProgramAccount<Realm> }
   selectedRealm: {
-    config?: ProgramAccount<RealmConfigAccount>
+    //config?: ProgramAccount<RealmConfigAccount>
     mint?: MintAccount
     programId?: PublicKey
     councilMint?: MintAccount

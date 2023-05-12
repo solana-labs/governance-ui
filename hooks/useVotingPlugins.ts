@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import useWalletStore from 'stores/useWalletStore'
-import useRealm from '@hooks/useRealm'
 import { getNfts } from '@utils/tokens'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
@@ -33,6 +32,7 @@ import useWalletOnePointOh from './useWalletOnePointOh'
 import { DEFAULT_NFT_VOTER_PLUGIN } from '@tools/constants'
 import { useUserCommunityTokenOwnerRecord } from './queries/tokenOwnerRecord'
 import { useRealmQuery } from './queries/realm'
+import { useRealmConfigQuery } from './queries/realmConfig'
 
 export const vsrPluginsPks: string[] = [
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo',
@@ -63,7 +63,7 @@ export const pythPluginsPks: string[] = [PYTH_STAKING_ADDRESS.toBase58()]
 export function useVotingPlugins() {
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const realm = useRealmQuery().data?.result
-  const { config } = useRealm()
+  const config = useRealmConfigQuery().data?.result
   const currentPluginPk = config?.account.communityTokenConfig.voterWeightAddin
 
   const {

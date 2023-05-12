@@ -26,6 +26,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Loading from '@components/Loading'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 
 interface IProps {
   proposedInvestment
@@ -61,15 +62,10 @@ const EverlendDeposit = ({
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
   const realm = useRealmQuery().data?.result
+  const config = useRealmConfigQuery().data?.result
+  const { symbol } = router.query
 
-  const {
-    realmInfo,
-    mint,
-    councilMint,
-    ownVoterWeight,
-    symbol,
-    config,
-  } = useRealm()
+  const { realmInfo, mint, councilMint, ownVoterWeight } = useRealm()
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient

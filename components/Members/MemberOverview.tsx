@@ -41,6 +41,7 @@ import useProposalCreationButtonTooltip from '@hooks/useProposalCreationButtonTo
 import Tooltip from '@components/Tooltip'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 
 const RevokeMembership: FC<{ member: PublicKey; mint: PublicKey }> = ({
   member,
@@ -101,7 +102,7 @@ const RevokeMembership: FC<{ member: PublicKey; mint: PublicKey }> = ({
 const MemberOverview = ({ member }: { member: Member }) => {
   const programVersion = useProgramVersion()
   const realm = useRealmQuery().data?.result
-  const { config } = useRealm()
+  const config = useRealmConfigQuery().data?.result
   const connection = useWalletStore((s) => s.connection)
   const selectedRealm = useWalletStore((s) => s.selectedRealm)
   const { mint, councilMint, proposals, symbol } = useRealm()

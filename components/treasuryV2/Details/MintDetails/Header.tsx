@@ -28,6 +28,7 @@ import { GoverningTokenType } from '@solana/spl-governance'
 import useProgramVersion from '@hooks/useProgramVersion'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 
 interface Props {
   className?: string
@@ -35,7 +36,7 @@ interface Props {
 }
 
 const useTokenType = (govpop: 'community' | 'council' | undefined) => {
-  const { config } = useRealm()
+  const config = useRealmConfigQuery().data?.result
   switch (govpop) {
     case undefined:
       return undefined

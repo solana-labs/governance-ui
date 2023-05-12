@@ -44,6 +44,7 @@ import {
 } from './queries/tokenOwnerRecord'
 import useProgramVersion from './useProgramVersion'
 import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
+import { useRealmConfigQuery } from './queries/realmConfig'
 
 export default function useRealm() {
   const router = useRouter()
@@ -62,7 +63,9 @@ export default function useRealm() {
   const programVersion =
     useProgramVersion() ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION
 
-  const { mint, councilMint, governances, proposals, config } = useWalletStore(
+  const config = useRealmConfigQuery().data?.result
+
+  const { mint, councilMint, governances, proposals } = useWalletStore(
     (s) => s.selectedRealm
   )
 
@@ -248,7 +251,7 @@ export default function useRealm() {
     toManyCommunityOutstandingProposalsForUser,
     ownDelegateTokenRecords,
     ownDelegateCouncilTokenRecords,
-    config,
+    //config,
     currentPluginPk,
     vsrMode,
     isNftMode,

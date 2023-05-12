@@ -46,6 +46,7 @@ import {
   useUserCouncilTokenOwnerRecord,
 } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 
 const TokenBalanceCard = ({
   proposal,
@@ -163,6 +164,7 @@ export const TokenDeposit = ({
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
   const realm = useRealmQuery().data?.result
+  const config = useRealmConfigQuery().data?.result
 
   const {
     realmInfo,
@@ -174,7 +176,6 @@ export const TokenDeposit = ({
     governances,
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
-    config,
   } = useRealm()
 
   const amount =

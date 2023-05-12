@@ -1,4 +1,3 @@
-import useRealm from '@hooks/useRealm'
 import { nftPluginsPks } from '@hooks/useVotingPlugins'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { ProgramAccount, Proposal, ProposalState } from '@solana/spl-governance'
@@ -8,6 +7,7 @@ import useWalletStore from 'stores/useWalletStore'
 import useNftProposalStore from './NftProposalStore'
 import useNftPluginStore from './store/nftPluginStore'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 
 const NftProposalVoteState = ({
   proposal,
@@ -15,8 +15,8 @@ const NftProposalVoteState = ({
   proposal?: ProgramAccount<Proposal>
 }) => {
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const config = useRealmConfigQuery().data?.result
 
-  const { config } = useRealm()
   const { voteRecordsByVoter } = useWalletStore((s) => s.selectedProposal)
   const plugin = useVotePluginsClientStore((s) => s.state.nftClient)
   const getCountedNfts = useNftProposalStore((s) => s.getCountedNfts)

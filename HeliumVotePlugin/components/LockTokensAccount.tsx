@@ -39,6 +39,7 @@ import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/to
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 
 export const LockTokensAccount: React.FC<{
   // tokenOwnerRecordPk: string | string[] | undefined // @asktree: this was unused
@@ -55,7 +56,9 @@ export const LockTokensAccount: React.FC<{
   const connected = !!wallet?.connected
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const realm = useRealmQuery().data?.result
-  const { mint, realmTokenAccount, realmInfo, councilMint, config } = useRealm()
+  const config = useRealmConfigQuery().data?.result
+
+  const { mint, realmTokenAccount, realmInfo, councilMint } = useRealm()
 
   const selectedCommunityDelegator = useSelectedDelegatorStore(
     (s) => s.communityDelegator

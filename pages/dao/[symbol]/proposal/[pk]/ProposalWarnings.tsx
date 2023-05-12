@@ -1,4 +1,5 @@
 import { ExclamationCircleIcon } from '@heroicons/react/solid'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import useProposal from '@hooks/useProposal'
 import useRealm from '@hooks/useRealm'
 import { useMemo } from 'react'
@@ -81,7 +82,9 @@ const SetGovernanceConfig = () => (
 )
 
 const useProposalSafetyCheck = () => {
-  const { config, realmInfo } = useRealm()
+  const config = useRealmConfigQuery().data?.result
+
+  const { realmInfo } = useRealm()
   const { instructions } = useProposal()
   const realmConfigWarnings = useMemo(() => {
     if (realmInfo === undefined || config === undefined) return undefined

@@ -27,6 +27,7 @@ import queryClient from '@hooks/queries/queryClient'
 import { voteRecordQueryKeys } from '@hooks/queries/voteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 
 interface VoteCommentModalProps {
   onClose: () => void
@@ -53,7 +54,9 @@ const useSubmitVote = ({
   const { proposal } = useWalletStore((s) => s.selectedProposal)
   const { fetchChatMessages } = useWalletStore((s) => s.actions)
   const realm = useRealmQuery().data?.result
-  const { realmInfo, config } = useRealm()
+  const config = useRealmConfigQuery().data?.result
+
+  const { realmInfo } = useRealm()
   const { refetchProposals } = useWalletStore((s) => s.actions)
   const isNftPlugin =
     config?.account.communityTokenConfig.voterWeightAddin &&

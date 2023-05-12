@@ -30,6 +30,7 @@ import { WalletProvider } from '@hub/providers/Wallet'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
@@ -78,7 +79,9 @@ export function App(props: Props) {
 
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const realm = useRealmQuery().data?.result
-  const { realmInfo, symbol, config } = useRealm()
+  const config = useRealmConfigQuery().data?.result
+
+  const { realmInfo } = useRealm()
   const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
   const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
@@ -86,7 +89,7 @@ export function App(props: Props) {
     JSON.stringify(possibleNftsAccounts)
   )
   const router = useRouter()
-  const { cluster } = router.query
+  const { cluster, symbol } = router.query
   const updateSerumGovAccounts = useSerumGovStore(
     (s) => s.actions.updateSerumGovAccounts
   )

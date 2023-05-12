@@ -5,6 +5,7 @@ import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import useRealm from './useRealm'
 import { heliumVsrPluginsPks, vsrPluginsPks } from './useVotingPlugins'
 import { useRealmQuery } from './queries/realm'
+import { useRealmConfigQuery } from './queries/realmConfig'
 
 type Package = {
   name: string
@@ -39,8 +40,9 @@ export type InstructionType = {
 
 export default function useGovernanceAssets() {
   const realm = useRealmQuery().data?.result
+  const config = useRealmConfigQuery().data?.result
 
-  const { ownVoterWeight, symbol, governances, config } = useRealm()
+  const { ownVoterWeight, symbol, governances } = useRealm()
 
   const governedTokenAccounts: AssetAccount[] = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts

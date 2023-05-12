@@ -20,6 +20,8 @@ import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBala
 import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { useRouter } from 'next/router'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 
 const LockPluginTokenBalanceCard = ({
   proposal,
@@ -31,8 +33,9 @@ const LockPluginTokenBalanceCard = ({
   const [hasGovPower, setHasGovPower] = useState<boolean>(false)
   const { fmtUrlWithCluster } = useQueryContext()
   const realm = useRealmQuery().data?.result
-
-  const { councilMint, mint, symbol, config } = useRealm()
+  const { symbol } = useRouter().query
+  const config = useRealmConfigQuery().data?.result
+  const { councilMint, mint } = useRealm()
   const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected

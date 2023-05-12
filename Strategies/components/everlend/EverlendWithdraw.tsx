@@ -26,6 +26,7 @@ import Loading from '@components/Loading'
 import { TreasuryStrategy } from '../../types/types'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 
 interface IProps {
   proposedInvestment: TreasuryStrategy & {
@@ -54,15 +55,9 @@ const EverlendWithdraw = ({
   })
   const [formErrors, setFormErrors] = useState({})
   const realm = useRealmQuery().data?.result
+  const config = useRealmConfigQuery().data?.result
 
-  const {
-    realmInfo,
-    mint,
-    councilMint,
-    ownVoterWeight,
-    symbol,
-    config,
-  } = useRealm()
+  const { realmInfo, mint, councilMint, ownVoterWeight } = useRealm()
   const { canUseTransferInstruction } = useGovernanceAssets()
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const client = useVotePluginsClientStore(
@@ -72,6 +67,7 @@ const EverlendWithdraw = ({
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletOnePointOh()
   const router = useRouter()
+  const { symbol } = router.query
 
   const tokenSymbol = tokenPriceService.getTokenInfo(
     governedTokenAccount.extensions.mint!.publicKey.toBase58()

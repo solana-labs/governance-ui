@@ -38,6 +38,7 @@ import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useTokenOwnerRecordByPubkeyQuery } from '@hooks/queries/tokenOwnerRecord'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 
 interface DepositBox {
   mintPk: PublicKey
@@ -52,8 +53,8 @@ const LockTokensAccount: React.FC<{
   children: React.ReactNode
 }> = ({ tokenOwnerRecordPk, children }) => {
   const realm = useRealmQuery().data?.result
-
-  const { realmInfo, mint, councilMint, config } = useRealm()
+  const config = useRealmConfigQuery().data?.result
+  const { realmInfo, mint, councilMint } = useRealm()
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const [reducedDeposits, setReducedDeposits] = useState<DepositBox[]>([])

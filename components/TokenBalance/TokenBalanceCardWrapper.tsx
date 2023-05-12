@@ -18,6 +18,7 @@ import {
   useUserCommunityTokenOwnerRecord,
   useUserCouncilTokenOwnerRecord,
 } from '@hooks/queries/tokenOwnerRecord'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 
 const LockPluginTokenBalanceCard = dynamic(
   () =>
@@ -79,8 +80,9 @@ const TokenBalanceCardWrapper = ({
 }) => {
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
+  const config = useRealmConfigQuery().data?.result
 
-  const { config, councilTokenAccount, vsrMode } = useRealm()
+  const { councilTokenAccount, vsrMode } = useRealm()
   const currentPluginPk = config?.account?.communityTokenConfig.voterWeightAddin
   const getTokenBalanceCard = () => {
     const isNftMode =

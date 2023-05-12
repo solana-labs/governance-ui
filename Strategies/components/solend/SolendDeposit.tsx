@@ -35,6 +35,7 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { PublicKey } from '@solana/web3.js'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 
 const SOL_BUFFER = 0.02
 
@@ -52,16 +53,10 @@ const SolendDeposit = ({
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
   const realm = useRealmQuery().data?.result
+  const { symbol } = router.query
+  const config = useRealmConfigQuery().data?.result
 
-  const {
-    proposals,
-    realmInfo,
-    ownVoterWeight,
-    mint,
-    councilMint,
-    symbol,
-    config,
-  } = useRealm()
+  const { proposals, realmInfo, ownVoterWeight, mint, councilMint } = useRealm()
   const [isDepositing, setIsDepositing] = useState(false)
   const [deposits, setDeposits] = useState<{
     [reserveAddress: string]: number

@@ -39,6 +39,7 @@ import { usePsyFiProgram } from './hooks/usePsyFiProgram'
 import { notify } from '@utils/notifications'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 
 const SOL_BUFFER = 0.02
 
@@ -56,15 +57,10 @@ export const Deposit: React.FC<{
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
   const realm = useRealmQuery().data?.result
+  const config = useRealmConfigQuery().data?.result
+  const { symbol } = router.query
 
-  const {
-    realmInfo,
-    ownVoterWeight,
-    mint,
-    councilMint,
-    config,
-    symbol,
-  } = useRealm()
+  const { realmInfo, ownVoterWeight, mint, councilMint } = useRealm()
   const {
     canUseTransferInstruction,
     governedTokenAccountsWithoutNfts,

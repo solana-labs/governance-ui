@@ -6,11 +6,11 @@ import {
   switchboardPluginsPks,
 } from '@hooks/useVotingPlugins'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
-import useRealm from '@hooks/useRealm'
 import useProposal from '@hooks/useProposal'
 import { option } from '@tools/core/option'
 
 import VotingPower from './VotingPower'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 
 interface Props {
   className?: string
@@ -18,7 +18,7 @@ interface Props {
 
 export default function ProposalVotingPower(props: Props) {
   const connected = !!useWalletStore((s) => s.current?.connected)
-  const { config } = useRealm()
+  const config = useRealmConfigQuery().data?.result
   const { proposal } = useProposal()
 
   const currentPluginPk = config?.account?.communityTokenConfig.voterWeightAddin

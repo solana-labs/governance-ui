@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import GovernedAccountsTabs from '@components/GovernedAccountsTabs'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
-import useRealm from '@hooks/useRealm'
 import { fmtBNAmount, fmtMintAmount } from '@tools/sdk/units'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import { capitalize } from '@utils/helpers'
@@ -27,11 +26,15 @@ import { MintMaxVoteWeightSourceType } from '@solana/spl-governance'
 import useQueryContext from '@hooks/useQueryContext'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import useRealm from '@hooks/useRealm'
 
 const Params = () => {
+  const { mint } = useRealm()
   const router = useRouter()
   const realm = useRealmQuery().data?.result
-  const { mint, config, symbol } = useRealm()
+  const config = useRealmConfigQuery().data?.result
+  const { symbol } = router.query
   const wallet = useWalletOnePointOh()
   const { fmtUrlWithCluster } = useQueryContext()
   const {

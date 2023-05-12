@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import { heliumVsrPluginsPks, vsrPluginsPks } from './useVotingPlugins'
+import { useRealmConfigQuery } from './queries/realmConfig'
 
 export const useVsrMode = (): undefined | 'default' | 'helium' => {
-  const config = useWalletStore((s) => s.selectedRealm.config)
+  const config = useRealmConfigQuery().data?.result
   const mode = useMemo(() => {
     const currentPluginPk =
       config?.account?.communityTokenConfig.voterWeightAddin
