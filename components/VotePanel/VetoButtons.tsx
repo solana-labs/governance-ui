@@ -16,7 +16,7 @@ import {
   useProposalVoteRecordQuery,
 } from './hooks'
 
-/* 
+/*
   returns: undefined if loading, false if nobody can veto, 'council' if council can veto, 'community' if community can veto
 */
 export const useVetoingPop = () => {
@@ -96,6 +96,7 @@ const useCanVeto = ():
 }
 
 const VetoButtons = () => {
+  const { allowDiscussion } = useRealm()
   const vetoable = useIsVetoable()
   const vetoingPop = useVetoingPop()
   const canVeto = useCanVeto()
@@ -134,6 +135,7 @@ const VetoButtons = () => {
           isOpen={openModal}
           voterTokenRecord={voterTokenRecord}
           vote={VoteKind.Veto}
+          allowDiscussion={allowDiscussion}
         />
       ) : null}
     </>
