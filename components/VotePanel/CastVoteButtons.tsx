@@ -58,6 +58,7 @@ const useCanVote = () => {
 }
 
 export const CastVoteButtons = () => {
+  const { allowDiscussion } = useRealm()
   const [showVoteModal, setShowVoteModal] = useState(false)
   const [vote, setVote] = useState<'yes' | 'no' | null>(null)
   const votingPop = useVotingPop()
@@ -122,6 +123,7 @@ export const CastVoteButtons = () => {
           onClose={() => setShowVoteModal(false)}
           vote={vote === 'yes' ? VoteKind.Approve : VoteKind.Deny}
           voterTokenRecord={voterTokenRecord!}
+          allowDiscussion={allowDiscussion}
         />
       ) : null}
     </div>
