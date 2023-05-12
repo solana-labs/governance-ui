@@ -1,6 +1,7 @@
 import {
   Governance,
   ProgramAccount,
+  getNativeTreasuryAddress,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
 import {

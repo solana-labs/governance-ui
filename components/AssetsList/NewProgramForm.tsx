@@ -19,6 +19,7 @@ import { AssetAccount } from '@utils/uiTypes/assets'
 import { sendTransaction } from '@utils/send'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/GovernedAccountSelect'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 interface NewProgramForm {
   programId: string
   authority: null | AssetAccount
