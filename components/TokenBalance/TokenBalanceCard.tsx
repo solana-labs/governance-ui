@@ -62,9 +62,9 @@ const TokenBalanceCard = ({
   inAccountDetails?: boolean
   children?: React.ReactNode
 }) => {
-  const realmProgramId = useWalletStore((s) => s.selectedRealm.programId)
   const [hasGovPower, setHasGovPower] = useState<boolean>(false)
   const realm = useRealmQuery().data?.result
+  const realmProgramId = realm?.owner
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
   const wallet = useWalletOnePointOh()

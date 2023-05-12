@@ -26,7 +26,7 @@ import { fmtMintAmount } from '@tools/sdk/units'
 import { notify } from '@utils/notifications'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { Member } from '@utils/uiTypes/members'
-import React, { FC, useEffect, useMemo, useState } from 'react'
+import { FC, useEffect, useMemo, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { WalletTokenRecordWithProposal } from './types'
 import PaginationComponent from '@components/Pagination'
@@ -108,7 +108,6 @@ const MemberOverview = ({ member }: { member: Member }) => {
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
   const connection = useWalletStore((s) => s.connection)
-  const selectedRealm = useWalletStore((s) => s.selectedRealm)
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
   const { symbol } = useRouter().query
@@ -153,13 +152,14 @@ const MemberOverview = ({ member }: { member: Member }) => {
   )
 
   const getVoteRecordsAndChatMsgs = async () => {
+    if (!realm) throw new Error()
     let voteRecords: { [pubKey: string]: ProgramAccount<VoteRecord> } = {}
     let chatMessages: { [pubKey: string]: ProgramAccount<ChatMessage> } = {}
     try {
       const results = await Promise.all([
         getVoteRecordsByVoterMapByProposal(
           connection.current,
-          selectedRealm!.programId!,
+          realm.owner,
           new PublicKey(walletAddress)
         ),
         getGovernanceChatMessagesByVoter(
@@ -180,43 +180,45 @@ const MemberOverview = ({ member }: { member: Member }) => {
   }
 
   useEffect(() => {
-    //we get voteRecords sorted by proposal date and match it with proposal name and chat msgs leaved by token holder.
-    const handleSetVoteRecords = async () => {
-      const { voteRecords, chat } = await getVoteRecordsAndChatMsgs()
-      const voteRecordsArray: WalletTokenRecordWithProposal[] = Object.keys(
-        voteRecords
-      )
-        .sort((a, b) => {
-          const prevProposal = proposals[a]
-          const nextProposal = proposals[b]
-          return (
-            prevProposal?.account.getStateTimestamp() -
-            nextProposal?.account.getStateTimestamp()
-          )
-        })
-        .reverse()
-        .filter((x) => proposals[x])
-        .flatMap((x) => {
-          const currentProposal = proposals[x]
-          const currentChatsMsgPk = Object.keys(chat).filter(
-            (c) =>
-              chat[c]?.account.proposal.toBase58() ===
-              currentProposal?.pubkey.toBase58()
-          )
-          const currentChatMsgs = currentChatsMsgPk.map(
-            (c) => chat[c].account.body.value
-          )
-          return {
-            proposalPublicKey: x,
-            proposalName: currentProposal?.account.name,
-            chatMessages: currentChatMsgs,
-            ...voteRecords[x],
-          }
-        })
+    if (realm) {
+      //we get voteRecords sorted by proposal date and match it with proposal name and chat msgs leaved by token holder.
+      const handleSetVoteRecords = async () => {
+        const { voteRecords, chat } = await getVoteRecordsAndChatMsgs()
+        const voteRecordsArray: WalletTokenRecordWithProposal[] = Object.keys(
+          voteRecords
+        )
+          .sort((a, b) => {
+            const prevProposal = proposals[a]
+            const nextProposal = proposals[b]
+            return (
+              prevProposal?.account.getStateTimestamp() -
+              nextProposal?.account.getStateTimestamp()
+            )
+          })
+          .reverse()
+          .filter((x) => proposals[x])
+          .flatMap((x) => {
+            const currentProposal = proposals[x]
+            const currentChatsMsgPk = Object.keys(chat).filter(
+              (c) =>
+                chat[c]?.account.proposal.toBase58() ===
+                currentProposal?.pubkey.toBase58()
+            )
+            const currentChatMsgs = currentChatsMsgPk.map(
+              (c) => chat[c].account.body.value
+            )
+            return {
+              proposalPublicKey: x,
+              proposalName: currentProposal?.account.name,
+              chatMessages: currentChatMsgs,
+              ...voteRecords[x],
+            }
+          })
 
-      setOwnVoteRecords(voteRecordsArray)
+        setOwnVoteRecords(voteRecordsArray)
+      }
+      handleSetVoteRecords()
     }
-    handleSetVoteRecords()
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [walletAddress])
 
