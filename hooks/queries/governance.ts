@@ -1,17 +1,27 @@
-import { EndpointTypes } from '@models/types'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
 import { getNetworkFromEndpoint } from '@utils/connection'
 import asFindable from '@utils/queries/asFindable'
 import useWalletStore from 'stores/useWalletStore'
 import queryClient from './queryClient'
-import { getGovernance } from '@solana/spl-governance'
+import {
+  Governance,
+  getGovernance,
+  getGovernanceAccounts,
+  pubkeyFilter,
+} from '@solana/spl-governance'
+import { useRealmQuery } from './realm'
 
 export const governanceQueryKeys = {
-  all: (cluster: EndpointTypes) => [cluster, 'Governance'],
-  byPubkey: (cluster, k: PublicKey) => [
+  all: (cluster: string) => [cluster, 'Governance'],
+  byPubkey: (cluster: string, k: PublicKey) => [
     ...governanceQueryKeys.all(cluster),
     k.toString(),
+  ],
+  byRealm: (cluster: string, realm: PublicKey) => [
+    ...governanceQueryKeys.all(cluster),
+    'by Realm (gPA)',
+    realm,
   ],
 }
 
@@ -28,6 +38,43 @@ export const useGovernanceByPubkeyQuery = (pubkey?: PublicKey) => {
       return asFindable((...x: Parameters<typeof getGovernance>) =>
         getGovernance(...x).then((x) => x?.account)
       )(connection.current, pubkey)
+    },
+    enabled,
+  })
+
+  return query
+}
+
+export const useRealmGovernancesQuery = () => {
+  const connection = useWalletStore((s) => s.connection)
+  const realm = useRealmQuery().data?.result
+
+  const enabled = realm !== undefined
+  const query = useQuery({
+    queryKey: enabled
+      ? governanceQueryKeys.byRealm(connection.cluster, realm.pubkey)
+      : undefined,
+    queryFn: async () => {
+      if (!enabled) throw new Error()
+
+      const filter = pubkeyFilter(1, realm.pubkey)
+      if (!filter) throw new Error() // unclear why this would ever happen, probably it just cannot
+
+      const results = await getGovernanceAccounts(
+        connection.current,
+        realm.owner,
+        Governance,
+        [filter]
+      )
+
+      results.forEach((x) => {
+        queryClient.setQueryData(
+          governanceQueryKeys.byPubkey(connection.cluster, x.pubkey),
+          { found: true, result: x }
+        )
+      })
+
+      return results
     },
     enabled,
   })
