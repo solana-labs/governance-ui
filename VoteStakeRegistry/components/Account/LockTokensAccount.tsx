@@ -37,6 +37,7 @@ import { abbreviateAddress } from '@utils/formatting'
 import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { useTokenOwnerRecordByPubkeyQuery } from '@hooks/queries/tokenOwnerRecord'
 
 interface DepositBox {
   mintPk: PublicKey
@@ -52,7 +53,7 @@ const LockTokensAccount: React.FC<{
 }> = ({ tokenOwnerRecordPk, children }) => {
   const realm = useRealmQuery().data?.result
 
-  const { realmInfo, mint, tokenRecords, councilMint, config } = useRealm()
+  const { realmInfo, mint, councilMint, config } = useRealm()
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const [reducedDeposits, setReducedDeposits] = useState<DepositBox[]>([])
@@ -63,9 +64,14 @@ const LockTokensAccount: React.FC<{
     new BN(0)
   )
   const [isOwnerOfDeposits, setIsOwnerOfDeposits] = useState(true)
-  const tokenOwnerRecordWalletPk = Object.keys(tokenRecords)?.find(
-    (key) => tokenRecords[key]?.pubkey?.toBase58() === tokenOwnerRecordPk
-  )
+
+  const lol = useMemo(() => new PublicKey(tokenOwnerRecordPk as string), [
+    tokenOwnerRecordPk,
+  ])
+  const { data: tokenOwnerRecord } = useTokenOwnerRecordByPubkeyQuery(lol)
+  const tokenOwnerRecordWalletPk =
+    tokenOwnerRecord?.result?.account.governingTokenOwner
+
   const [isLoading, setIsLoading] = useState(false)
   const connection = useWalletStore((s) => s.connection.current)
   const wallet = useWalletOnePointOh()

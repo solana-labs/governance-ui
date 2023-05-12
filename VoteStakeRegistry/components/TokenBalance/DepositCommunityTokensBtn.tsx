@@ -13,12 +13,13 @@ import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 
 const DepositCommunityTokensBtn = ({ className = '', inAccountDetails }) => {
   const { getOwnedDeposits } = useDepositStore()
   const realm = useRealmQuery().data?.result
 
-  const { realmInfo, realmTokenAccount, tokenRecords } = useRealm()
+  const { realmInfo, realmTokenAccount } = useRealm()
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const [isLoading, setIsLoading] = useState(false)
   const wallet = useWalletOnePointOh()
@@ -28,13 +29,14 @@ const DepositCommunityTokensBtn = ({ className = '', inAccountDetails }) => {
   const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
     (s) => s.actions
   )
+  const currentTokenOwnerRecord = useUserCommunityTokenOwnerRecord().data
+    ?.result
 
   const depositAllTokens = async function () {
     if (!realm) {
       throw 'No realm selected'
     }
     setIsLoading(true)
-    const currentTokenOwnerRecord = tokenRecords[wallet!.publicKey!.toBase58()]
     const tokenOwnerRecordPk =
       typeof currentTokenOwnerRecord !== 'undefined'
         ? currentTokenOwnerRecord.pubkey

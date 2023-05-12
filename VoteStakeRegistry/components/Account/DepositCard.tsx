@@ -41,7 +41,7 @@ const DepositCard = ({
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const realm = useRealmQuery().data?.result
 
-  const { realmInfo, tokenRecords } = useRealm()
+  const { realmInfo } = useRealm()
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const actualClient = vsrClient || client
   const wallet = useWalletOnePointOh()
@@ -80,8 +80,7 @@ const DepositCard = ({
       amount: depositEntry.available,
       communityMintPk: realm!.account.communityMint,
       closeDepositAfterOperation: depositEntry.currentlyLocked.isZero(),
-      tokenOwnerRecordPubKey:
-        tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey,
+      tokenOwnerRecordPubKey: ownTokenRecord?.pubkey,
       depositIndex: depositEntry.index,
       client: actualClient,
       splProgramId: realm!.owner!,

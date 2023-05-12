@@ -19,6 +19,7 @@ import depositTokensVSR from './depositTokensVSR'
 import VotingPowerPct from './VotingPowerPct'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 
 interface Props {
   className?: string
@@ -26,7 +27,7 @@ interface Props {
 
 export default function LockedCommunityVotingPower(props: Props) {
   const realm = useRealmQuery().data?.result
-  const { mint, realmInfo, realmTokenAccount, tokenRecords } = useRealm()
+  const { mint, realmInfo, realmTokenAccount } = useRealm()
   const { proposal } = useProposal()
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const connection = useWalletStore((s) => s.connection.current)
@@ -44,10 +45,9 @@ export default function LockedCommunityVotingPower(props: Props) {
   const wallet = useWalletOnePointOh()
   const isLoading = useDepositStore((s) => s.state.isLoading)
 
-  const currentTokenOwnerRecord =
-    wallet && wallet.publicKey
-      ? tokenRecords[wallet.publicKey.toBase58()]
-      : null
+  const currentTokenOwnerRecord = useUserCommunityTokenOwnerRecord().data
+    ?.result
+
   const tokenOwnerRecordPk = currentTokenOwnerRecord
     ? currentTokenOwnerRecord.pubkey
     : null

@@ -60,12 +60,12 @@ interface WalletStore extends State {
     councilMint?: MintAccount
     governances: { [governance: string]: ProgramAccount<Governance> }
     proposals: { [proposal: string]: ProgramAccount<Proposal> }
-    /// Community token records by owner
+    /* /// Community token records by owner
     tokenRecords: { [owner: string]: ProgramAccount<TokenOwnerRecord> }
     /// Council token records by owner
     councilTokenOwnerRecords: {
       [owner: string]: ProgramAccount<TokenOwnerRecord>
-    }
+    } */
     mints: { [pubkey: string]: MintAccount }
     programVersion: number
   }

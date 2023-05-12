@@ -38,6 +38,7 @@ import { useVsrMode } from './useVsrMode'
 import useWalletOnePointOh from './useWalletOnePointOh'
 import { useRealmQuery } from './queries/realm'
 import {
+  useTokenRecordsByOwnersMap,
   useUserCommunityTokenOwnerRecord,
   useUserCouncilTokenOwnerRecord,
 } from './queries/tokenOwnerRecord'
@@ -52,15 +53,19 @@ export default function useRealm() {
   const realm = useRealmQuery().data?.result
 
   const {
+    communityTORsByOwner: tokenRecords,
+    councilTORsByOwner: councilTokenOwnerRecords,
+  } = useTokenRecordsByOwnersMap()
+
+  const {
     mint,
     councilMint,
     governances,
     proposals,
-    tokenRecords,
-    councilTokenOwnerRecords,
     programVersion,
     config,
   } = useWalletStore((s) => s.selectedRealm)
+
   const votingPower = useDepositStore((s) => s.state.votingPower)
   const heliumVotingPower = useHeliumVsrStore((s) => s.state.votingPower)
   const nftVotingPower = useNftPluginStore((s) => s.state.votingPower)
@@ -129,9 +134,10 @@ export default function useRealm() {
     [realm, tokenAccounts]
   )
 
+  // TODO refactor as query
   // returns array of community tokenOwnerRecords that connected wallet has been delegated
   const ownDelegateTokenRecords = useMemo(() => {
-    if (wallet?.connected && wallet.publicKey) {
+    if (wallet?.connected && wallet.publicKey && tokenRecords) {
       const walletId = wallet.publicKey.toBase58()
       const delegatedWallets = delegates && delegates[walletId]
       if (delegatedWallets?.communityMembers) {
@@ -162,9 +168,15 @@ export default function useRealm() {
     [realm, tokenAccounts]
   )
 
+  // TODO refactor as query
   // returns array of council tokenOwnerRecords that connected wallet has been delegated
   const ownDelegateCouncilTokenRecords = useMemo(() => {
-    if (wallet?.connected && councilMint && wallet.publicKey) {
+    if (
+      wallet?.connected &&
+      councilMint &&
+      wallet.publicKey &&
+      councilTokenOwnerRecords
+    ) {
       const walletId = wallet.publicKey.toBase58()
       const delegatedWallets = delegates && delegates[walletId]
       if (delegatedWallets?.councilMembers) {
@@ -224,14 +236,14 @@ export default function useRealm() {
     councilMint,
     governances,
     proposals,
-    tokenRecords,
+    //tokenRecords,
     realmTokenAccount,
     councilTokenAccount,
     /** @deprecated just use the token owner record directly, ok? */
     ownVoterWeight,
     realmDisplayName: realmInfo?.displayName ?? realm?.account?.name,
     canChooseWhoVote,
-    councilTokenOwnerRecords,
+    //councilTokenOwnerRecords,
     toManyCouncilOutstandingProposalsForUse,
     toManyCommunityOutstandingProposalsForUser,
     ownDelegateTokenRecords,

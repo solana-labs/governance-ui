@@ -72,9 +72,7 @@ const REALM = () => {
     councilMint,
     proposals,
     governances,
-    tokenRecords,
     ownVoterWeight,
-    councilTokenOwnerRecords,
   } = useRealm()
   const proposalsPerPage = 20
   const [filters, setFilters] = useState<Filters>(InitialFilters)
@@ -93,13 +91,6 @@ const REALM = () => {
   const [selectedProposals, setSelectedProposals] = useState<
     SelectedProposal[]
   >([])
-
-  const selectedCouncilDelegate = useSelectedDelegatorStore(
-    (s) => s.councilDelegator
-  )
-  const selectedCommunityDelegate = useSelectedDelegatorStore(
-    (s) => s.communityDelegator
-  )
 
   const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
   const client = useVotePluginsClientStore(
@@ -261,19 +252,14 @@ const REALM = () => {
       const transactions: Transaction[] = []
       for (let i = 0; i < selectedProposals.length; i++) {
         const selectedProposal = selectedProposals[i]
-        const ownTokenRecord =
+        const relevantTokenRecord =
           selectedProposal.proposal.governingTokenMint.toBase58() ===
           realm.account.communityMint.toBase58()
-            ? tokenRecords[
-                selectedCommunityDelegate
-                  ? selectedCommunityDelegate.toString()
-                  : wallet.publicKey!.toBase58()
-              ]
-            : councilTokenOwnerRecords[
-                selectedCouncilDelegate
-                  ? selectedCouncilDelegate.toString()
-                  : wallet.publicKey!.toBase58()
-              ]
+            ? ownTokenRecord
+            : ownCouncilTokenRecord
+
+        if (relevantTokenRecord === undefined)
+          throw new Error('token owner record not found or not yet loaded')
 
         const instructions: TransactionInstruction[] = []
 
@@ -285,7 +271,7 @@ const REALM = () => {
             pubkey: selectedProposal.proposalPk,
             owner: realm.pubkey,
           },
-          ownTokenRecord
+          relevantTokenRecord
         )
         if (client.client instanceof NftVoterClient === false) {
           await withCastVote(
@@ -296,7 +282,7 @@ const REALM = () => {
             selectedProposal.proposal.governance,
             selectedProposal.proposalPk,
             selectedProposal.proposal.tokenOwnerRecord,
-            ownTokenRecord.pubkey,
+            relevantTokenRecord.pubkey,
             governanceAuthority,
             selectedProposal.proposal.governingTokenMint,
             Vote.fromYesNoVote(vote),

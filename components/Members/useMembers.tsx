@@ -16,14 +16,19 @@ import {
 import { capitalize } from '@utils/helpers'
 import { TokenRecordsWithWalletAddress } from './types'
 import { Member, Delegates } from 'utils/uiTypes/members'
-import useRealm from '@hooks/useRealm'
 import useMembersStore from 'stores/useMembersStore'
 import useWalletStore from 'stores/useWalletStore'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { useTokenRecordsByOwnersMap } from '@hooks/queries/tokenOwnerRecord'
 
 export default function useMembers() {
   const realm = useRealmQuery().data?.result
-  const { tokenRecords, councilTokenOwnerRecords, config } = useRealm()
+
+  const {
+    communityTORsByOwner: tokenRecords,
+    councilTORsByOwner: councilTokenOwnerRecords,
+  } = useTokenRecordsByOwnersMap()
+
   const connection = useWalletStore((s) => s.connection)
   const setMembers = useMembersStore((s) => s.setMembers)
   const setDelegates = useMembersStore((s) => s.setDelegates)
@@ -280,7 +285,6 @@ export default function useMembers() {
     handleSetMembers()
     getDelegates()
   }, [
-    config?.account.communityTokenConfig.voterWeightAddin,
     fetchCommunityMembersATAS,
     fetchCouncilMembersWithTokensOutsideRealm,
     membersWithTokensDeposited,

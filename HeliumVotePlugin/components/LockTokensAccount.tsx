@@ -38,9 +38,10 @@ import { useSubDaos } from 'HeliumVotePlugin/hooks/useSubDaos'
 import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
 
 export const LockTokensAccount: React.FC<{
-  tokenOwnerRecordPk: string | string[] | undefined
+  // tokenOwnerRecordPk: string | string[] | undefined // @asktree: this was unused
   children: React.ReactNode
 }> = (props) => {
   const { error, createPosition } = useCreatePosition()
@@ -54,19 +55,17 @@ export const LockTokensAccount: React.FC<{
   const connected = !!wallet?.connected
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const realm = useRealmQuery().data?.result
-  const {
-    mint,
-    realmTokenAccount,
-    realmInfo,
-    tokenRecords,
-    councilMint,
-    config,
-  } = useRealm()
+  const { mint, realmTokenAccount, realmInfo, councilMint, config } = useRealm()
 
-  const tokenOwnerRecordWalletPk = Object.keys(tokenRecords)?.find(
-    (key) =>
-      tokenRecords[key]?.pubkey?.toBase58() === tokenOwnerRecordPk?.toBase58()
+  const selectedCommunityDelegator = useSelectedDelegatorStore(
+    (s) => s.communityDelegator
   )
+  // if we have a community token delegator selected (this is rare), use that. otherwise use user wallet.
+  const tokenOwnerRecordWalletPk =
+    selectedCommunityDelegator !== undefined
+      ? selectedCommunityDelegator
+      : // I wanted to eliminate `null` as a possible type
+        wallet?.publicKey ?? undefined
 
   const [
     currentClient,
@@ -131,7 +130,7 @@ export const LockTokensAccount: React.FC<{
         message: 'Unable to fetch positions',
       })
     }
-  }, [props.tokenOwnerRecordPk, tokenOwnerRecordWalletPk, vsrClient])
+  }, [tokenOwnerRecordWalletPk, vsrClient])
 
   const hasTokensInWallet =
     realmTokenAccount && realmTokenAccount.account.amount.gt(new BN(0))
@@ -198,8 +197,7 @@ export const LockTokensAccount: React.FC<{
       amount: amountToLock,
       lockupPeriodsInDays: lockupPeriodInDays,
       lockupKind: lockupKind.value,
-      tokenOwnerRecordPk:
-        tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey || null,
+      tokenOwnerRecordPk: tokenOwnerRecordPk ?? null, //@asktree: using `null` in 2023 huh.. discusting...
     })
 
     if (!error) {
@@ -334,10 +332,7 @@ export const LockTokensAccount: React.FC<{
                       key={idx}
                       position={pos}
                       subDaos={subDaos}
-                      tokenOwnerRecordPk={
-                        tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey ||
-                        null
-                      }
+                      tokenOwnerRecordPk={tokenOwnerRecordPk ?? null}
                       isOwner={isSameWallet}
                     />
                   ))}

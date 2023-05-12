@@ -34,10 +34,10 @@ const WithDrawCommunityTokens = () => {
     realmInfo,
     proposals,
     governances,
-    tokenRecords,
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
+
   const [isLoading, setIsLoading] = useState(false)
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
@@ -128,8 +128,7 @@ const WithDrawCommunityTokens = () => {
       realmPk: realm!.pubkey!,
       amount: depositRecord!.amountDepositedNative,
       communityMintPk: realm!.account.communityMint,
-      tokenOwnerRecordPubKey: tokenRecords[wallet!.publicKey!.toBase58()]
-        .pubkey!,
+      tokenOwnerRecordPubKey: ownTokenRecord!.pubkey,
       depositIndex: depositRecord!.index,
       connection,
       client: client,

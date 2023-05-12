@@ -67,7 +67,7 @@ export const useTokenOwnerRecordsForRealmQuery = () => {
   return query
 }
 
-/** this hook exists for refactoring legacy code easily -- you should probably not be using it in any new code */
+/** @deprecated this hook exists for refactoring legacy code easily -- you should probably not be using it in any new code */
 export const useTokenRecordsByOwnersMap = () => {
   const { data: tors } = useTokenOwnerRecordsForRealmQuery()
   const realm = useRealmQuery().data?.result

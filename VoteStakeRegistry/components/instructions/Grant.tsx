@@ -19,6 +19,8 @@ import { getTokenTransferSchema } from '@utils/validations'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import {
   Governance,
+  getTokenOwnerRecord,
+  getTokenOwnerRecordAddress,
   serializeInstructionToBase64,
   withCreateTokenOwnerRecord,
 } from '@solana/spl-governance'
@@ -39,6 +41,9 @@ import dayjs from 'dayjs'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import queryClient from '@hooks/queries/queryClient'
+import asFindable from '@utils/queries/asFindable'
+import { tokenOwnerRecordQueryKeys } from '@hooks/queries/tokenOwnerRecord'
 
 const Grant = ({
   index,
@@ -53,7 +58,7 @@ const Grant = ({
   const wallet = useWalletOnePointOh()
   const realm = useRealmQuery().data?.result
 
-  const { tokenRecords, realmInfo } = useRealm()
+  const { realmInfo } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [startDate, setStartDate] = useState(dayjs().format('DD-MM-YYYY'))
@@ -111,6 +116,8 @@ const Grant = ({
     })
   }
   async function getInstruction(): Promise<UiInstruction> {
+    if (!realm) throw new Error()
+
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     let serializedInstruction = ''
     const prerequisiteInstructions: TransactionInstruction[] = []
@@ -127,7 +134,26 @@ const Grant = ({
         form.amount!,
         form.governedTokenAccount.extensions.mint.account.decimals
       )
-      const currentTokenOwnerRecord = tokenRecords[form.destinationAccount]
+      //const currentTokenOwnerRecord = tokenRecords[form.destinationAccount]
+
+      const destinationTokenOwnerRecordPk = await getTokenOwnerRecordAddress(
+        realm.owner,
+        realm.pubkey,
+        realm.account.communityMint,
+        destinationAccount
+      )
+      const currentTokenOwnerRecord = queryClient.fetchQuery({
+        queryKey: tokenOwnerRecordQueryKeys.byPubkey(
+          connection.cluster,
+          destinationTokenOwnerRecordPk
+        ),
+        queryFn: () =>
+          asFindable(getTokenOwnerRecord)(
+            connection.current,
+            destinationTokenOwnerRecordPk
+          ),
+      })
+
       if (!currentTokenOwnerRecord) {
         await withCreateTokenOwnerRecord(
           prerequisiteInstructions,

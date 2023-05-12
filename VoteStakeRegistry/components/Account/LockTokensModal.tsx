@@ -49,6 +49,7 @@ import Tooltip from '@components/Tooltip'
 import { notify } from '@utils/notifications'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
 
 const YES = 'Yes'
 const NO = 'No'
@@ -65,7 +66,9 @@ const LockTokensModal = ({
   const { getOwnedDeposits } = useDepositStore()
   const realm = useRealmQuery().data?.result
 
-  const { mint, realmTokenAccount, realmInfo, tokenRecords } = useRealm()
+  const { mint, realmTokenAccount, realmInfo } = useRealm()
+  const { data: tokenOwnerRecordPk } = useAddressQuery_CommunityTokenOwner()
+
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const voteStakeRegistryRegistrar = useVotePluginsClientStore(
     (s) => s.state.voteStakeRegistryRegistrar
@@ -225,6 +228,8 @@ const LockTokensModal = ({
     setAmount(val)
   }
   const handleSaveLock = async () => {
+    if (!tokenOwnerRecordPk) throw new Error()
+
     const rpcContext = new RpcContext(
       realm!.owner,
       getProgramVersionForRealm(realmInfo!),
@@ -266,8 +271,7 @@ const LockTokensModal = ({
       sourceDepositIdx: depositRecord!.index,
       sourceTokenAccount: realmTokenAccount!.publicKey,
       allowClawback: allowClawback,
-      tokenOwnerRecordPk:
-        tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey || null,
+      tokenOwnerRecordPk,
       client: client,
     })
     await getOwnedDeposits({
@@ -286,6 +290,7 @@ const LockTokensModal = ({
     if (!depositToUnlock) {
       throw 'No deposit to unlock selected'
     }
+    if (!tokenOwnerRecordPk) throw new Error()
 
     const rpcContext = new RpcContext(
       realm!.owner,
@@ -316,8 +321,7 @@ const LockTokensModal = ({
       lockUpPeriodInDays: lockupPeriodDays,
       sourceDepositIdx: depositToUnlock!.index,
       communityMintPk: realm!.account.communityMint,
-      tokenOwnerRecordPk:
-        tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey || null,
+      tokenOwnerRecordPk,
       client: client,
     })
     await getOwnedDeposits({
