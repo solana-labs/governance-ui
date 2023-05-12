@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from 'react'
+import React, { FunctionComponent, useState, useEffect } from 'react'
 import { BanIcon, ThumbDownIcon, ThumbUpIcon } from '@heroicons/react/solid'
 import {
   ChatMessageBody,
@@ -11,7 +11,6 @@ import useRealm from '../hooks/useRealm'
 import { castVote } from '../actions/castVote'
 
 import Button, { SecondaryButton } from './Button'
-// import { notify } from '../utils/notifications'
 import Loading from './Loading'
 import Modal from './Modal'
 import Input from './inputs/Input'
@@ -26,12 +25,14 @@ import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import queryClient from '@hooks/queries/queryClient'
 import { voteRecordQueryKeys } from '@hooks/queries/voteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { sub } from 'date-fns'
 
 interface VoteCommentModalProps {
   onClose: () => void
   isOpen: boolean
   vote: VoteKind
   voterTokenRecord: ProgramAccount<TokenOwnerRecord>
+  allowDiscussion?: boolean
 }
 
 const useSubmitVote = ({
@@ -129,6 +130,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   isOpen,
   vote,
   voterTokenRecord,
+  allowDiscussion = true,
 }) => {
   const [comment, setComment] = useState('')
   const { submitting, submitVote } = useSubmitVote({
@@ -138,6 +140,14 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   })
 
   const voteString = VOTE_STRINGS[vote]
+
+  useEffect(() => {
+    if (!allowDiscussion) {
+      submitVote(vote)
+    }
+  }, [allowDiscussion, submitVote, vote])
+
+  if (!allowDiscussion) return null
 
   return (
     <Modal onClose={onClose} isOpen={isOpen}>

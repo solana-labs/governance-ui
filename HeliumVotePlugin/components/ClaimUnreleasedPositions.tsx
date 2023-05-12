@@ -111,16 +111,15 @@ const ClaimUnreleasedPositions = ({
   }
   const getVoteRecords = async () => {
     const currentClient = votingPlugin.client as HeliumVsrClient
-    const voteRecords = await currentClient.program.account[
-      'nftVoteRecord'
-    ].all([
-      {
-        memcmp: {
-          offset: 72,
-          bytes: wallet!.publicKey!.toBase58(),
+    const voteRecords =
+      (await currentClient.program.account['nftVoteRecord']?.all([
+        {
+          memcmp: {
+            offset: 72,
+            bytes: wallet!.publicKey!.toBase58(),
+          },
         },
-      },
-    ])
+      ])) || []
 
     const voteRecordsFiltered = voteRecords.filter(
       (x) =>
