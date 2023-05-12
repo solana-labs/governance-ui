@@ -7,7 +7,6 @@ export default function useHydrateStore() {
   const router = useRouter()
   const { symbol, cluster, pk } = router.query
   const { proposals } = useRealm()
-  const selectedRealmMints = useWalletStore((s) => s.selectedRealm.mints)
   const { fetchRealmBySymbol, fetchProposal } = useWalletStore((s) => s.actions)
   //Small hack to prevent race conditions with cluster change until we remove connection from store and move it to global dep.
   const routeHasClusterInPath = router.asPath.includes('cluster')
@@ -18,9 +17,9 @@ export default function useHydrateStore() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [symbol, cluster])
   useEffect(() => {
-    if (pk && Object.entries(selectedRealmMints).length > 0) {
+    if (pk) {
       fetchProposal(pk)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [pk, selectedRealmMints, JSON.stringify(proposals)])
+  }, [pk, JSON.stringify(proposals)])
 }

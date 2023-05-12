@@ -63,7 +63,7 @@ interface WalletStore extends State {
     councilTokenOwnerRecords: {
       [owner: string]: ProgramAccount<TokenOwnerRecord>
     } */
-    mints: { [pubkey: string]: MintAccount }
+    //mints: { [pubkey: string]: MintAccount }
     // programVersion: number
   }
   selectedProposal: {
@@ -234,7 +234,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         )
       })
 
-      const realmMints = get().selectedRealm.mints
+      const realmMints = [] //get().selectedRealm.mints
       const realmMintPk = realm.account.communityMint
       const realmMint = realmMints[realmMintPk.toBase58()]
       const realmCouncilMintPk = realm.account.config.councilMint
@@ -340,7 +340,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       }
 
       const connection = get().connection.current
-      const realmMints = get().selectedRealm.mints
+      const realmMints = [] //get().selectedRealm.mints
       const set = get().set
 
       set((s) => {
