@@ -149,16 +149,16 @@ const ClaimUnreleasedPositions = ({
           (inAccountDetails && solToBeClaimed != 0)) && (
           <div className="w-full">
             <div className="flex flex-col w-full gap-2 items-center">
-              <div className="mb-2 text-xs text-white/50 max-w-[400px] text-center">
-                You have {solToBeClaimed.toFixed(4)} SOL to reclaim from
-                proposal voting costs and unlock your positions.
+              <div className="mb-2 text-xs text-white/50 max-w-[300px] text-center">
+                Relinquish your old votes and claim {solToBeClaimed.toFixed(4)}{' '}
+                SOL from past proposal voting costs.
               </div>
               <SecondaryButton
                 isLoading={isLoading}
                 onClick={() => releasePositions()}
                 className="w-1/2 max-w-[200px]"
               >
-                Claim
+                Relinquish
               </SecondaryButton>
             </div>
           </div>
