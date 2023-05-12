@@ -23,7 +23,7 @@ export default function useProposalVotes(proposal?: Proposal) {
       ? mint
       : councilMint
   // TODO: optimize using memo
-  if (!realm || !proposal || !governance || !proposalMint)
+  if (!realm || !proposal || !governance || !proposalMint || !programVersion)
     return {
       _programVersion: undefined,
       voteThresholdPct: undefined,

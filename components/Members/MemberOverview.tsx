@@ -40,6 +40,7 @@ import useGovernanceForGovernedAddress from '@hooks/useGovernanceForGovernedAddr
 import useProposalCreationButtonTooltip from '@hooks/useProposalCreationButtonTooltip'
 import Tooltip from '@components/Tooltip'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
 
 const RevokeMembership: FC<{ member: PublicKey; mint: PublicKey }> = ({
   member,
@@ -284,7 +285,7 @@ const MemberOverview = ({ member }: { member: Member }) => {
             Explorer
             <ExternalLinkIcon className="flex-shrink-0 h-4 ml-1 w-4" />
           </a>
-          {programVersion >= 3 &&
+          {(programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) >= 3 &&
             realm !== undefined &&
             (isRevokableCouncilMember || isRevokableCommunityMember) && (
               <RevokeMembership

@@ -40,6 +40,7 @@ const useNewWalletCallback = (
   return useCallback(async () => {
     if (rules === undefined) throw new Error();
     if (realm === undefined) throw new Error();
+    if (programVersion === undefined) throw new Error();
     if (!wallet?.publicKey) throw new Error('not signed in');
     if (tokenOwnerRecord === undefined)
       throw new Error('insufficient voting power');

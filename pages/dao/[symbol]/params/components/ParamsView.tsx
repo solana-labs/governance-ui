@@ -9,6 +9,7 @@ import useProgramVersion from '@hooks/useProgramVersion'
 import { useRouter } from 'next/router'
 import useQueryContext from '@hooks/useQueryContext'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
 
 const ParamsView = ({ activeGovernance }) => {
   const realm = useRealmQuery().data?.result
@@ -69,7 +70,7 @@ const ParamsView = ({ activeGovernance }) => {
             padding
             val={activeGovernance.account.config.minInstructionHoldUpTime}
           />
-          {programVersion >= 3 && (
+          {(programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) >= 3 && (
             <>
               <AddressField
                 label="Proposal Cool-off Time"
@@ -99,7 +100,7 @@ const ParamsView = ({ activeGovernance }) => {
               val={`${activeGovernance.account.config.councilVoteThreshold.value}%`}
             />
           )}
-          {programVersion >= 3 ? (
+          {(programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) >= 3 ? (
             <>
               <AddressField
                 label="Community Vote Tipping"

@@ -25,6 +25,7 @@ import Section from '../../../Section'
 import TokenIcon from '../../../../icons/TokenIcon'
 import useProgramVersion from '@hooks/useProgramVersion'
 import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
+import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
 
 const UNIX_SECOND = 1
 const UNIX_MINUTE = UNIX_SECOND * 60
@@ -176,7 +177,8 @@ export default function Rules(props: Props) {
                   value={durationStr(governanceConfig.minInstructionHoldUpTime)}
                 />
                 {/** Under versions < 3, vote tipping is just one field for both **/}
-                {programVersion <= 2 && (
+                {(programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) <=
+                  2 && (
                   <Section
                     icon={<HandIcon />}
                     name="Vote Tipping"
@@ -186,7 +188,8 @@ export default function Rules(props: Props) {
                   />
                 )}
                 {/** Under versions < 3, approval quorum is just one field for both **/}
-                {programVersion <= 2 && (
+                {(programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) <=
+                  2 && (
                   <Section
                     icon={<ScaleIcon />}
                     name="Approval Quorum"
@@ -269,7 +272,8 @@ export default function Rules(props: Props) {
                             )
                       }
                     />
-                    {programVersion >= 3 && (
+                    {(programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) >=
+                      3 && (
                       <Section
                         icon={<HandIcon />}
                         name="Vote Tipping"
@@ -277,7 +281,8 @@ export default function Rules(props: Props) {
                       />
                     )}
                     {/** Under versions < 3, approval quorum is just one field for both **/}
-                    {programVersion >= 3 && (
+                    {(programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) >=
+                      3 && (
                       <Section
                         icon={<ScaleIcon />}
                         name="Approval Quorum"
@@ -289,7 +294,8 @@ export default function Rules(props: Props) {
                       />
                     )}
                     {/** Under versions < 3, vetos dont exist **/}
-                    {programVersion >= 3 && (
+                    {(programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) >=
+                      3 && (
                       <Section
                         icon={<ScaleIcon />}
                         name="Veto Quorum"

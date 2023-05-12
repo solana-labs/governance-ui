@@ -67,7 +67,7 @@ interface WalletStore extends State {
       [owner: string]: ProgramAccount<TokenOwnerRecord>
     } */
     mints: { [pubkey: string]: MintAccount }
-    programVersion: number
+    // programVersion: number
   }
   selectedProposal: {
     proposal: ProgramAccount<Proposal> | undefined

@@ -27,6 +27,7 @@ import TokenIcon from '../../icons/TokenIcon'
 import { GoverningTokenType } from '@solana/spl-governance'
 import useProgramVersion from '@hooks/useProgramVersion'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
 
 interface Props {
   className?: string
@@ -68,7 +69,7 @@ export default function Header(props: Props) {
   const tokenType = useTokenType(props.mint.tokenRole)
 
   const membership =
-    programVersion >= 3
+    (programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) >= 3
       ? tokenType === GoverningTokenType.Membership
       : props.mint.tokenRole === 'council'
 
@@ -197,26 +198,27 @@ export default function Header(props: Props) {
             {membership ? 'Add Member' : 'Mint Tokens'}
           </div>
         </SecondaryButton>
-        {membership && programVersion >= 3 && (
-          <SecondaryButton
-            className="w-48"
-            small={membership}
-            disabled={!!addNewMemberTooltip}
-            tooltipMessage={addNewMemberTooltip}
-            onClick={() => {
-              router.push(
-                fmtUrlWithCluster(
-                  `/dao/${symbol}/proposal/new?i=${Instructions.RevokeGoverningTokens}&membershipPopulation=${props.mint.tokenRole}`
+        {membership &&
+          (programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) >= 3 && (
+            <SecondaryButton
+              className="w-48"
+              small={membership}
+              disabled={!!addNewMemberTooltip}
+              tooltipMessage={addNewMemberTooltip}
+              onClick={() => {
+                router.push(
+                  fmtUrlWithCluster(
+                    `/dao/${symbol}/proposal/new?i=${Instructions.RevokeGoverningTokens}&membershipPopulation=${props.mint.tokenRole}`
+                  )
                 )
-              )
-            }}
-          >
-            <div className="flex items-center justify-center">
-              <XCircleIcon className="h-4 w-4 mr-1" />
-              Remove Member
-            </div>
-          </SecondaryButton>
-        )}
+              }}
+            >
+              <div className="flex items-center justify-center">
+                <XCircleIcon className="h-4 w-4 mr-1" />
+                Remove Member
+              </div>
+            </SecondaryButton>
+          )}
         <SecondaryButton
           small={membership}
           className="w-48"

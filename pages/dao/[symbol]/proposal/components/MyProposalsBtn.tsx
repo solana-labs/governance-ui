@@ -41,6 +41,8 @@ import {
 } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useVoteRecordsForRealmByOwner } from '@hooks/queries/voteRecord'
+import useProgramVersion from '@hooks/useProgramVersion'
+import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
 
 const MyProposalsBn = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
@@ -70,7 +72,9 @@ const MyProposalsBn = () => {
   const realm = useRealmQuery().data?.result
   const programId = realm?.owner
 
-  const { programVersion } = useWalletStore((s) => s.selectedRealm)
+  const programVersion =
+    useProgramVersion() ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION
+
   const { refetchProposals } = useWalletStore((s) => s.actions)
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient

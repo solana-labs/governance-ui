@@ -42,6 +42,8 @@ import {
   useUserCommunityTokenOwnerRecord,
   useUserCouncilTokenOwnerRecord,
 } from './queries/tokenOwnerRecord'
+import useProgramVersion from './useProgramVersion'
+import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
 
 export default function useRealm() {
   const router = useRouter()
@@ -57,14 +59,12 @@ export default function useRealm() {
     councilTORsByOwner: councilTokenOwnerRecords,
   } = useTokenRecordsByOwnersMap()
 
-  const {
-    mint,
-    councilMint,
-    governances,
-    proposals,
-    programVersion,
-    config,
-  } = useWalletStore((s) => s.selectedRealm)
+  const programVersion =
+    useProgramVersion() ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION
+
+  const { mint, councilMint, governances, proposals, config } = useWalletStore(
+    (s) => s.selectedRealm
+  )
 
   const votingPower = useDepositStore((s) => s.state.votingPower)
   const heliumVotingPower = useHeliumVsrStore((s) => s.state.votingPower)

@@ -138,7 +138,8 @@ const RevokeGoverningTokens: FC<{
       programId === undefined ||
       mintInfo?.result === undefined ||
       governance === undefined ||
-      revokeTokenAuthority === undefined
+      revokeTokenAuthority === undefined ||
+      programVersion === undefined
     ) {
       throw new Error('proposal created before necessary data is fetched')
     }

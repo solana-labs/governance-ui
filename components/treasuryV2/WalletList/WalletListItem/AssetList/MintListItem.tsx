@@ -12,6 +12,7 @@ import { Mint } from '@models/treasury/Asset'
 import { GoverningTokenType } from '@solana/spl-governance'
 import { UsersIcon } from '@heroicons/react/outline'
 import useProgramVersion from '@hooks/useProgramVersion'
+import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
 
 interface Props {
   className?: string
@@ -38,7 +39,7 @@ export default function MintListItem(props: Props) {
   const programVersion = useProgramVersion()
 
   const membership =
-    programVersion >= 3
+    (programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) >= 3
       ? tokenType === GoverningTokenType.Membership
       : props.mint.tokenRole === 'council'
 

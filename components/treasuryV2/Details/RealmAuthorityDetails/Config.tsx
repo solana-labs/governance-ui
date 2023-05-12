@@ -26,6 +26,7 @@ import clsx from 'clsx'
 import TokenIcon from '@components/treasuryV2/icons/TokenIcon'
 import { NFTVotePluginSettingsDisplay } from '@components/NFTVotePluginSettingsDisplay'
 import useQueryContext from '@hooks/useQueryContext'
+import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
 
 const DISABLED = new BigNumber(DISABLED_VOTER_WEIGHT.toString())
 
@@ -41,7 +42,8 @@ export default function Config(props: Props) {
   const { fmtUrlWithCluster } = useQueryContext()
 
   const programVersion = useProgramVersion()
-  const councilRulesSupported = programVersion >= 3
+  const councilRulesSupported =
+    (programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) >= 3
 
   return (
     <div className={props.className}>
@@ -131,7 +133,7 @@ export default function Config(props: Props) {
               councilRulesSupported ? 'grid-cols-1' : 'grid-cols-2'
             )}
           >
-            {programVersion >= 3 && (
+            {(programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) >= 3 && (
               <Section
                 icon={<TokenIcon />}
                 name={'Token type'}

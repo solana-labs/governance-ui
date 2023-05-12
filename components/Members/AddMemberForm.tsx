@@ -33,6 +33,7 @@ import BigNumber from 'bignumber.js'
 import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
 
 interface AddMemberForm extends Omit<MintForm, 'mintAccount'> {
   description: string
@@ -125,7 +126,7 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
   }
 
   const getInstruction = async (): Promise<UiInstruction | false> => {
-    if (programVersion >= 3) {
+    if ((programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) >= 3) {
       const isValid = await validateInstruction({
         schema,
         form: { ...form, mintAccount },
@@ -147,11 +148,10 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
 
       const goofySillyArrayForBuilderPattern = []
       const tokenMint = mintAccount.pubkey
-      // eslint-disable-next-line
-      const tokenOwnerRecordPk = await withDepositGoverningTokens(
+      await withDepositGoverningTokens(
         goofySillyArrayForBuilderPattern,
         programId,
-        programVersion,
+        programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION,
         realm.pubkey,
         tokenMint,
         tokenMint,

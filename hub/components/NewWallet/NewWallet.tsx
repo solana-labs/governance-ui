@@ -138,7 +138,7 @@ function NewWalletWithDefaults({
                 depositExemptProposalCount={rules.depositExemptProposalCount}
                 maxVoteDays={rules.maxVoteDays}
                 minInstructionHoldupDays={rules.minInstructionHoldupDays}
-                programVersion={programVersion}
+                programVersion={programVersion ?? 3}
                 onCommunityRulesChange={setRule('communityTokenRules')}
                 onCoolOffHoursChange={setRule('coolOffHours')}
                 onCouncilRulesChange={setRule('councilTokenRules')}
