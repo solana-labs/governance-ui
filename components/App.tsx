@@ -124,15 +124,15 @@ export function App(props: Props) {
     } else if (!wallet?.connected || !ownTokenRecord) {
       resetDepositState()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    realm?.pubkey.toBase58(),
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    ownTokenRecord?.pubkey.toBase58(),
+    config?.account.communityTokenConfig.voterWeightAddin,
+    connection,
+    getOwnedDeposits,
+    ownTokenRecord,
+    realm,
+    resetDepositState,
+    vsrClient,
     wallet?.connected,
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    vsrClient?.program.programId.toBase58(),
   ])
 
   useEffect(() => {
