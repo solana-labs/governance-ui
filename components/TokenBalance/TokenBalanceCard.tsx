@@ -176,10 +176,6 @@ export const TokenDeposit = ({
     toManyCouncilOutstandingProposalsForUse,
     config,
   } = useRealm()
-  // Do not show deposits for mints with zero supply because nobody can deposit anyway
-  if (!mint || mint.supply.isZero()) {
-    return null
-  }
 
   const amount =
     councilMint && tokenRole === GoverningTokenRole.Council
@@ -191,10 +187,12 @@ export const TokenDeposit = ({
         )
       : getNumTokens(ownVoterWeight, ownCouncilTokenRecord, mint, realmInfo)
 
-  const max: BigNumber =
+  const max: BigNumber | undefined =
     councilMint && tokenRole === GoverningTokenRole.Council
       ? getMintDecimalAmount(councilMint, councilMint.supply)
-      : getMintDecimalAmount(mint, mint.supply)
+      : mint
+      ? getMintDecimalAmount(mint, mint.supply)
+      : undefined
 
   const depositTokenRecord =
     tokenRole === GoverningTokenRole.Community
@@ -429,13 +427,11 @@ export const TokenDeposit = ({
       )
     : '0'
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   useEffect(() => {
     if (availableTokens != '0' || hasTokensDeposited || hasTokensInWallet) {
       if (setHasGovPower) setHasGovPower(true)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [availableTokens, hasTokensDeposited, hasTokensInWallet])
+  }, [availableTokens, hasTokensDeposited, hasTokensInWallet, setHasGovPower])
 
   const canShowAvailableTokensMessage = hasTokensInWallet && connected
   const tokensToShow =
@@ -450,6 +446,11 @@ export const TokenDeposit = ({
       config?.account.communityTokenConfig.voterWeightAddin.toBase58()
     ) &&
     tokenRole === GoverningTokenRole.Community
+
+  // Do not show deposits for mints with zero supply because nobody can deposit anyway
+  if (!mint || mint.supply.isZero()) {
+    return null
+  }
 
   return (
     <TokenDepositWrapper inAccountDetails={inAccountDetails}>

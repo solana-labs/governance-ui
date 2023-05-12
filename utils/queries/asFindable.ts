@@ -15,7 +15,7 @@ const asFindable = <P extends any[], R>(f: (...p: P) => Promise<R>) => async (
     } as const
   } catch (e) {
     if ((e.message as string).includes('not found')) {
-      return { found: false, result: undefined } as const
+      return { found: false, result: undefined, err: e.message } as const
     }
 
     return Promise.reject(e)

@@ -1,5 +1,5 @@
 import { BigNumber } from 'bignumber.js'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import classNames from 'classnames'
 
 import useRealm from '@hooks/useRealm'
@@ -37,10 +37,13 @@ export default function CouncilVotingPower(props: Props) {
   const connection = useWalletStore((s) => s.connection.current)
   const wallet = useWalletOnePointOh()
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  const depositAmount = councilTokenAccount
-    ? new BigNumber(councilTokenAccount.account.amount.toString())
-    : new BigNumber(0)
+  const depositAmount = useMemo(
+    () =>
+      councilTokenAccount
+        ? new BigNumber(councilTokenAccount.account.amount.toString())
+        : new BigNumber(0),
+    [councilTokenAccount]
+  )
   const depositMint = realm?.account.config.councilMint
   const tokenName =
     getMintMetadata(depositMint)?.name ?? realm?.account.name ?? ''
@@ -95,7 +98,7 @@ export default function CouncilVotingPower(props: Props) {
     <div className={props.className}>
       {amount.isZero() ? (
         <div className={'text-xs text-white/50'}>
-          You do not have any voting power in this dao.
+          You do not have any council voting power in this dao.
         </div>
       ) : (
         <div className={'p-3 rounded-md bg-bkg-1'}>
