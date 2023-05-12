@@ -151,7 +151,7 @@ const NewProgramForm = () => {
   }, [connection])
 
   useEffect(() => {
-    if (form.programId !== prevFormProgramId) {
+    if (form.programId && form.programId !== prevFormProgramId) {
       //now validation contains only programId if more fields come it would be good to reconsider this method.
       debounce.debounceFcn(async () => {
         const { validationErrors } = await isFormValid(schema, form)
