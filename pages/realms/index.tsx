@@ -30,7 +30,7 @@ const Realms = () => {
   >([])
   const [isLoadingRealms, setIsLoadingRealms] = useState(true)
   const [editingGrid, setEditingGrid] = useState(false)
-  const { actions, selectedRealm } = useWalletStore((s) => s)
+  const { actions } = useWalletStore((s) => s)
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
@@ -71,18 +71,7 @@ const Realms = () => {
       setFilteredRealms(sortDaos(allRealms))
       setIsLoadingRealms(false)
     }
-    if (selectedRealm.realm) {
-      // TODO dont have side effects in useMemo!!
-      actions.deselectRealm()
-    }
-  }, [
-    connection,
-    routeHasClusterInPath,
-    cluster,
-    selectedRealm.realm,
-    queryRealms,
-    actions,
-  ])
+  }, [connection, routeHasClusterInPath, cluster, queryRealms])
 
   const handleCreateRealmButtonClick = async () => {
     if (!connected) {

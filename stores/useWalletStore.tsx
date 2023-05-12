@@ -53,7 +53,6 @@ interface WalletStore extends State {
 
   realms: { [realm: string]: ProgramAccount<Realm> }
   selectedRealm: {
-    realm?: ProgramAccount<Realm>
     config?: ProgramAccount<RealmConfigAccount>
     mint?: MintAccount
     programId?: PublicKey
