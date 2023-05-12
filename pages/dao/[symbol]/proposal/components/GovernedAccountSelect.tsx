@@ -1,6 +1,9 @@
 import Select from '@components/inputs/Select'
 import { Governance } from '@solana/spl-governance'
-import { ProgramAccount } from '@solana/spl-governance'
+import {
+  ProgramAccount,
+  getNativeTreasuryAddress,
+} from '@solana/spl-governance'
 import {
   getMintAccountLabelInfo,
   getSolAccountLabel,
@@ -145,14 +148,15 @@ const GovernedAccountSelect = ({
         const visited = new Set<string>()
         const deduped: typeof rawWallets = []
 
-      for (const wallet of rawWallets) {
-        if (!visited.has(wallet.walletAddress.toBase58())) {
-          visited.add(wallet.walletAddress.toBase58())
-          deduped.push(wallet)
+        for (const wallet of rawWallets) {
+          if (!visited.has(wallet.walletAddress.toBase58())) {
+            visited.add(wallet.walletAddress.toBase58())
+            deduped.push(wallet)
+          }
         }
-      }
 
-      setWallets(deduped)
+        setWallets(deduped)
+      })
     }
   }, [governedAccounts, programId])
 
