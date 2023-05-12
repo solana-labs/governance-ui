@@ -1,7 +1,7 @@
 import { ThemeProvider } from 'next-themes'
 import { WalletIdentityProvider } from '@cardinal/namespaces-components'
 import dynamic from 'next/dynamic'
-import React, { useEffect } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import Head from 'next/head'
 import Script from 'next/script'
 import { useRouter } from 'next/router'
@@ -69,8 +69,9 @@ export function App(props: Props) {
     tokenPriceService.fetchSolanaTokenList()
   }, [])
   const { governedTokenAccounts } = useGovernanceAssets()
-  const possibleNftsAccounts = governedTokenAccounts.filter(
-    (x) => x.isSol || x.isNft
+  const possibleNftsAccounts = useMemo(
+    () => governedTokenAccounts.filter((x) => x.isSol || x.isNft),
+    [governedTokenAccounts]
   )
   const { getNfts } = useTreasuryAccountStore()
   const { getOwnedDeposits, resetDepositState } = useDepositStore()
@@ -143,13 +144,17 @@ export function App(props: Props) {
     ) {
       getNfts(possibleNftsAccounts, connection)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [JSON.stringify(possibleNftsAccounts), realm?.pubkey.toBase58()])
+  }, [
+    connection,
+    getNfts,
+    possibleNftsAccounts,
+    prevStringifyPossibleNftsAccounts,
+    realm?.pubkey,
+  ])
 
   useEffect(() => {
     updateSerumGovAccounts(cluster as string | undefined)
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [cluster])
+  }, [cluster, updateSerumGovAccounts])
 
   return (
     <div className="relative bg-bkg-1 text-fgd-1">
