@@ -92,14 +92,10 @@ export const Deposit: React.FC<{
   const [formErrors, setFormErrors] = useState({})
   const psyFiProgram = usePsyFiProgram()
 
-  const handleSetForm = useCallback(
-    ({ propertyName, value }) => {
-      setFormErrors({})
-      setForm({ ...form, [propertyName]: value })
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    [setForm, setFormErrors]
-  )
+  const handleSetForm = useCallback(({ propertyName, value }) => {
+    setFormErrors({})
+    setForm((prevForm) => ({ ...prevForm, [propertyName]: value }))
+  }, [])
   const tokenInfo = tokenPriceService.getTokenInfo(handledMint)
   const tokenSymbol = tokenPriceService.getTokenInfo(
     governedTokenAccount.extensions.mint!.publicKey.toBase58()

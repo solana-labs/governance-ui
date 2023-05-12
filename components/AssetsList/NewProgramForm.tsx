@@ -10,7 +10,7 @@ import { tryParseKey } from 'tools/validators/pubkey'
 import { isFormValid } from 'utils/formValidation'
 import { notify } from 'utils/notifications'
 import { useRouter } from 'next/router'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import * as yup from 'yup'
 import { debounce } from '@utils/debounce'
@@ -20,6 +20,7 @@ import { sendTransaction } from '@utils/send'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/GovernedAccountSelect'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { usePrevious } from '@hooks/usePrevious'
 interface NewProgramForm {
   programId: string
   authority: null | AssetAccount
@@ -48,6 +49,7 @@ const NewProgramForm = () => {
   const [form, setForm] = useState<NewProgramForm>({
     ...defaultFormValues,
   })
+  const prevFormProgramId = usePrevious(form.programId)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
   const tokenOwnerRecord = ownVoterWeight.canCreateGovernanceUsingCouncilTokens()
@@ -56,10 +58,10 @@ const NewProgramForm = () => {
     ? ownVoterWeight.communityTokenRecord
     : undefined
 
-  const handleSetForm = ({ propertyName, value }) => {
+  const handleSetForm = useCallback(({ propertyName, value }) => {
     setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
-  }
+    setForm((prevForm) => ({ ...prevForm, [propertyName]: value }))
+  }, [])
   const handleCreate = async () => {
     try {
       if (!realm) {
@@ -106,55 +108,58 @@ const NewProgramForm = () => {
       setIsLoading(false)
     }
   }
-  //if you altering this look at useEffect for form.programId
-  const schema = yup.object().shape({
-    programId: yup
-      .string()
-      .test(
-        'programIdTest',
-        'program id validation error',
-        async function (val: string) {
-          if (val) {
-            try {
-              const pubKey = tryParseKey(val)
-              if (!pubKey) {
+
+  const schema = useMemo(() => {
+    return yup.object().shape({
+      programId: yup
+        .string()
+        .test(
+          'programIdTest',
+          'program id validation error',
+          async function (val: string) {
+            if (val) {
+              try {
+                const pubKey = tryParseKey(val)
+                if (!pubKey) {
+                  return this.createError({
+                    message: `Invalid account address`,
+                  })
+                }
+
+                const accountData = await connection.current.getParsedAccountInfo(
+                  pubKey
+                )
+                if (!accountData || !accountData.value) {
+                  return this.createError({
+                    message: `Account not found`,
+                  })
+                }
+                return true
+              } catch (e) {
                 return this.createError({
                   message: `Invalid account address`,
                 })
               }
-
-              const accountData = await connection.current.getParsedAccountInfo(
-                pubKey
-              )
-              if (!accountData || !accountData.value) {
-                return this.createError({
-                  message: `Account not found`,
-                })
-              }
-              return true
-            } catch (e) {
+            } else {
               return this.createError({
-                message: `Invalid account address`,
+                message: `Program id is required`,
               })
             }
-          } else {
-            return this.createError({
-              message: `Program id is required`,
-            })
           }
-        }
-      ),
-  })
+        ),
+    })
+  }, [connection])
+
   useEffect(() => {
-    if (form.programId) {
+    if (form.programId !== prevFormProgramId) {
       //now validation contains only programId if more fields come it would be good to reconsider this method.
       debounce.debounceFcn(async () => {
         const { validationErrors } = await isFormValid(schema, form)
         setFormErrors(validationErrors)
       })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form.programId])
+  }, [form, form.programId, schema, prevFormProgramId])
+
   useEffect(() => {
     const wallet = assetAccounts.find(
       (x) =>
@@ -163,7 +168,8 @@ const NewProgramForm = () => {
     if (wallet && router.query?.wallet) {
       handleSetForm({ value: wallet, propertyName: 'authority' })
     }
-  }, [router.query, assetAccounts])
+  }, [router.query, assetAccounts, handleSetForm])
+
   return (
     <div className="space-y-3">
       <PreviousRouteBtn />
