@@ -18,7 +18,6 @@ import {
 import { ProposalState } from '@solana/spl-governance'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
-import { current } from 'immer'
 
 const NFT_SOL_BALANCE = 0.0014616
 
@@ -112,20 +111,16 @@ const ClaimUnreleasedPositions = ({
   }
   const getVoteRecords = async () => {
     const currentClient = votingPlugin.client as HeliumVsrClient
-    const records = await currentClient.program.account['nftVoteRecord'].all()
-
-    console.log('tokenOwnerRecord', tokenOwnerRecord?.toBase58())
-    console.log('wallet', wallet?.publicKey?.toBase58())
-    console.log(
-      records.map((x) => ({
-        disc: x.account.accountDiscriminator,
-        proposal: x.account.proposal.toBase58(),
-        nftMint: x.account.nftMint.toBase58(),
-        governingTokenOwner: x.account.governingTokenOwner.toBase58(),
-      }))
-    )
-
-    const voteRecords: any = []
+    const voteRecords = await currentClient.program.account[
+      'nftVoteRecord'
+    ].all([
+      {
+        memcmp: {
+          offset: 72,
+          bytes: wallet!.publicKey!.toBase58(),
+        },
+      },
+    ])
 
     const voteRecordsFiltered = voteRecords.filter(
       (x) =>
