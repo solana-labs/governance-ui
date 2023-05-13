@@ -8,6 +8,7 @@ import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import { chunks } from '@utils/helpers'
 import {
   registrarKey,
+  positionKey,
   voterWeightRecordKey,
 } from '@helium/voter-stake-registry-sdk'
 import {
@@ -31,7 +32,6 @@ const ClaimUnreleasedPositions = ({
   const { current: connection } = useWalletStore((s) => s.connection)
   const [ownVoteRecords, setOwnVoteRecords] = useState<any[]>([])
   const [solToBeClaimed, setSolToBeClaimed] = useState(0)
-  const ownVoteRecordsFilterd = ownVoteRecords
   const { realm } = useWalletStore((s) => s.selectedRealm)
   const votingPlugin = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
@@ -60,9 +60,13 @@ const ClaimUnreleasedPositions = ({
       votingPlugin.client!.program.programId
     )
 
-    const positions = ownVoteRecordsFilterd
-    for (const i of positions) {
+    const voteRecords = ownVoteRecords
+    for (const i of voteRecords) {
       const proposal = proposals[i.account.proposal.toBase58()]
+      const [posKey] = positionKey(
+        i.account.nftMint,
+        votingPlugin.client!.program.programId
+      )
       if (proposal.account.state === ProposalState.Voting) {
         // ignore this one as it's still in voting
         continue
@@ -82,6 +86,7 @@ const ClaimUnreleasedPositions = ({
         })
         .remainingAccounts([
           { pubkey: i.publicKey, isSigner: false, isWritable: true },
+          { pubkey: posKey, isSigner: false, isWritable: true },
         ])
         .instruction()
       instructions.push(relinquishVoteIx)
