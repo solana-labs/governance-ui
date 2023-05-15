@@ -18,14 +18,14 @@ interface Props {
 }
 
 export default function ProposalExecutionCard(props: Props) {
-  const { instructions, proposal } = useProposal()
+  const { transactions, proposal } = useProposal()
   const [playState, setPlayState] = useState(PlayState.Unplayed)
   const [timeLeft, setTimeLeft] = useState<
     undefined | ReturnType<typeof diffTime>
   >()
   const timer = useRef<undefined | number>()
 
-  const allTransactions = Object.values(instructions)
+  const allTransactions = Object.values(transactions)
 
   const proposalTransactions = useProposalTransactions(
     allTransactions,
