@@ -1,5 +1,6 @@
 import { findMetadataPda } from '@metaplex-foundation/js'
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
+import { EndpointTypes } from '@models/types'
 import { PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
 import useWalletStore from 'stores/useWalletStore'
@@ -7,8 +8,9 @@ import useWalletStore from 'stores/useWalletStore'
 const OneHMs = 3600000
 
 export const useTokenMetadataKeys = {
+  all: (cluster: EndpointTypes) => [cluster, 'tokenMetadata'],
   byMint: (k: PublicKey) => [k.toString()],
-  byMints: (k: PublicKey[]) => [...k.toString()],
+  byMints: (k: PublicKey[]) => [...k.map((x) => x.toString())],
 }
 
 export const useTokenMetadata = (

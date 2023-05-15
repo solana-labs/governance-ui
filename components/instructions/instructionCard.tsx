@@ -11,8 +11,9 @@ import {
 import useWalletStore from 'stores/useWalletStore'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import axios from 'axios'
-import { Metaplex, findMetadataPda } from '@metaplex-foundation/js'
 import tokenPriceService from '@utils/services/tokenPrice'
+import { fetchNFTbyMint } from '@hooks/queries/nft'
+import { fetchTokenAccountByPubkey } from '@hooks/queries/tokenAccount'
 
 const InstructionCard = ({
   instructionData,
@@ -23,7 +24,11 @@ const InstructionCard = ({
 }) => {
   const connection = useWalletStore((s) => s.connection)
   const realm = useWalletStore((s) => s.selectedRealm.realm)
-  const { assetAccounts } = useGovernanceAssets()
+  const {
+    assetAccounts,
+    nftsGovernedTokenAccounts,
+    governedTokenAccountsWithoutNfts,
+  } = useGovernanceAssets()
 
   const [descriptor, setDescriptor] = useState<InstructionDescriptor>()
   const [nftImgUrl, setNftImgUrl] = useState('')
@@ -42,20 +47,26 @@ const InstructionCard = ({
 
   const getAmountImg = useCallback(async () => {
     const sourcePk = instructionData.accounts[0].pubkey
-    const sourceAccount = assetAccounts.find((x) =>
-      x.extensions?.transferAddress?.equals(sourcePk)
+    const tokenAccount = (
+      await fetchTokenAccountByPubkey(connection.current, sourcePk)
+    ).result
+
+    const isSol = governedTokenAccountsWithoutNfts.find(
+      (x) => x.extensions.transferAddress?.toBase58() === sourcePk.toBase58()
+    )?.isSol
+    const isNFTAccount = nftsGovernedTokenAccounts.find(
+      (x) =>
+        x.extensions.transferAddress?.toBase58() ===
+          tokenAccount?.owner.toBase58() ||
+        x.governance.pubkey.toBase58() === tokenAccount?.owner.toBase58()
     )
-    if (sourceAccount?.isNft) {
-      const mint = sourceAccount.extensions.mint?.publicKey
+
+    if (isNFTAccount) {
+      const mint = tokenAccount?.mint
       if (mint) {
         try {
-          const metaplex = new Metaplex(connection.current)
-          const metadataPDA = findMetadataPda(mint)
-          const tokenMetadata = await metaplex.nfts().findByMetadata({
-            metadata: metadataPDA,
-          })
-
-          const url = (await axios.get(tokenMetadata.uri)).data
+          const result = await fetchNFTbyMint(connection.current, mint)
+          const url = (await axios.get(result.result.uri)).data
           setNftImgUrl(url.image)
         } catch (e) {
           console.log(e)
@@ -64,13 +75,13 @@ const InstructionCard = ({
       return
     }
 
-    if (sourceAccount?.isSol) {
+    if (isSol) {
       const info = tokenPriceService.getTokenInfo(WSOL_MINT)
       const imgUrl = info?.logoURI ? info.logoURI : ''
       setTokenImgUrl(imgUrl)
       return
     }
-    const mint = sourceAccount?.extensions.mint?.publicKey
+    const mint = tokenAccount?.mint
     if (mint) {
       const info = tokenPriceService.getTokenInfo(mint.toBase58())
       const imgUrl = info?.logoURI ? info.logoURI : ''
@@ -89,7 +100,7 @@ const InstructionCard = ({
 
   return (
     <div>
-      <div className="pb-4">
+      <div className="pb-4 flex">
         {descriptor?.name && `instruction ${index + 1} - ${descriptor.name}`}{' '}
         {tokenImgUrl && (
           <img
