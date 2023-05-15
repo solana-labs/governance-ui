@@ -239,7 +239,7 @@ export class VotingClient {
             voterWeightRecord: voterWeightPk,
             voterTokenOwnerRecord: tokenOwnerRecord.pubkey,
           })
-          .remainingAccounts(remainingAccounts.slice(0, 6))
+          .remainingAccounts(remainingAccounts.slice(0, 10))
           .instruction()
       )
 
@@ -446,13 +446,8 @@ export class VotingClient {
       }
 
       //1 nft is 3 accounts
-      const firstThreePositions = remainingAccounts.slice(0, 9)
-      const remainingPositionsChunk = chunks(
-        remainingAccounts.slice(9, remainingAccounts.length),
-        8
-      )
-
-      for (const chunk of [firstThreePositions, ...remainingPositionsChunk]) {
+      const positionChunks = chunks(remainingAccounts, 12)
+      for (const chunk of positionChunks) {
         instructions.push(
           await this.client.program.methods
             .castVoteV0({
