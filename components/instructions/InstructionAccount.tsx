@@ -2,9 +2,9 @@ import { AccountMetaData } from '@solana/spl-governance'
 import { InstructionDescriptor, getAccountName } from './tools'
 import { getExplorerUrl } from '@components/explorer/tools'
 import { ExternalLinkIcon } from '@heroicons/react/solid'
-import { tryGetTokenAccount } from '@utils/tokens'
 import { useState, useRef, useEffect } from 'react'
 import useWalletStore from 'stores/useWalletStore'
+import { fetchTokenAccountByPubkey } from '@hooks/queries/tokenAccount'
 
 export default function InstructionAccount({
   endpoint,
@@ -27,12 +27,14 @@ export default function InstructionAccount({
     if (!accountLabel && !isFetching.current) {
       isFetching.current = true
       // Check if the account is SPL token account and if yes then display its owner
-      tryGetTokenAccount(connection.current, accountMeta.pubkey).then((ta) => {
-        if (ta) {
-          setAccountLabel(`owner: ${ta?.account.owner.toBase58()}`)
+      fetchTokenAccountByPubkey(connection.current, accountMeta.pubkey).then(
+        (ta) => {
+          if (ta.result) {
+            setAccountLabel(`owner: ${ta.result?.account.owner.toBase58()}`)
+          }
+          isFetching.current = false
         }
-        isFetching.current = false
-      })
+      )
       // TODO: Extend to other well known account types
     }
   }, [accountLabel, accountMeta.pubkey, connection])
