@@ -7,7 +7,6 @@ import { PublicKey } from '@solana/web3.js'
 import { abbreviateAddress } from '@utils/formatting'
 import { useState, useEffect } from 'react'
 import { fetchParsedAccountInfoByPubkey } from '@hooks/queries/parsedAccountInfo'
-import { fetchAnchorProgramInfoByPubkey } from '@hooks/queries/anchorProgramINfo'
 
 const InstructionProgram = ({
   connection,
@@ -17,7 +16,6 @@ const InstructionProgram = ({
   programId: PublicKey
 }) => {
   const isNativeSolProgram = isNativeSolanaProgram(programId)
-  const [isAnchorVerified, setIsAnchorVerified] = useState(false)
   const [isUpgradeable, setIsUpgradeable] = useState(false)
   const [authority, setAuthority] = useState('')
 
@@ -38,30 +36,13 @@ const InstructionProgram = ({
         const authority = info.authority
         const isUpgradeable =
           programInfo?.owner?.equals(BPF_UPGRADE_LOADER_ID) && authority
-        const deploymentSlot = info.slot
 
         setIsUpgradeable(isUpgradeable)
         setAuthority(authority)
-        tryGetAnchorInfo(programId, deploymentSlot)
         // eslint-disable-next-line no-empty
       } catch {}
     }
-    const tryGetAnchorInfo = async (
-      programId: PublicKey,
-      lastDeploymentSlot: number
-    ) => {
-      try {
-        const resp = (
-          await fetchAnchorProgramInfoByPubkey(connection.current, programId)
-        ).result
 
-        const isLastVersionVerified = resp.data[0].verified === 'Verified'
-        const lastDeploymentSlotMatch =
-          resp.data[0].verified_slot === lastDeploymentSlot
-        setIsAnchorVerified(isLastVersionVerified && lastDeploymentSlotMatch)
-        // eslint-disable-next-line no-empty
-      } catch {}
-    }
     if (connection.cluster === 'mainnet' && !isNativeSolProgram) {
       tryGetProgramInfo(programId)
     }
@@ -84,11 +65,6 @@ const InstructionProgram = ({
               Upgradeable: {isUpgradeable ? 'Yes' : 'No'}
             </div>
           </a>
-        )}
-        {!isNativeSolProgram && (
-          <div className="text-primary-light text-[10px]">
-            Anchor: {isAnchorVerified ? 'Verified' : 'Unverified'}
-          </div>
         )}
       </span>
       <div className="flex items-center pt-1 lg:pt-0">
