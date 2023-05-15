@@ -15,7 +15,7 @@ import tokenPriceService from '@utils/services/tokenPrice'
 import { fetchNFTbyMint } from '@hooks/queries/nft'
 import { fetchTokenAccountByPubkey } from '@hooks/queries/tokenAccount'
 
-const InstructionCard = ({
+const TransactionInstructionCard = ({
   instructionData,
   index,
 }: {
@@ -151,4 +151,4 @@ const InstructionCard = ({
   )
 }
 
-export default InstructionCard
+export default TransactionInstructionCard

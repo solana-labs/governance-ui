@@ -9,7 +9,7 @@ import InstructionOptionInput, {
   InstructionOption,
   InstructionOptions,
 } from '@components/InstructionOptions'
-import InstructionCard from './InstructionCard'
+import TransactionInstructionCard from './TransactionInstructionCard'
 
 export default function TransactionCard({
   index,
@@ -39,11 +39,11 @@ export default function TransactionCard({
     <div className="break-all">
       <h3 className="mb-4 flex">{`Transaction ${index} `}</h3>
       {instructions.map((x, idx) => (
-        <InstructionCard
+        <TransactionInstructionCard
           key={idx}
           index={idx}
           instructionData={x}
-        ></InstructionCard>
+        ></TransactionInstructionCard>
       ))}
       <div className="flex justify-end items-center gap-x-4 mt-6 mb-8">
         <InspectorButton proposalInstruction={proposalTransaction} />
