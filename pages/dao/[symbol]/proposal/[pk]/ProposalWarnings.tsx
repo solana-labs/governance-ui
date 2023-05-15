@@ -82,11 +82,11 @@ const SetGovernanceConfig = () => (
 
 const useProposalSafetyCheck = () => {
   const { config, realmInfo } = useRealm()
-  const { instructions } = useProposal()
+  const { transactions } = useProposal()
   const realmConfigWarnings = useMemo(() => {
     if (realmInfo === undefined || config === undefined) return undefined
 
-    const ixs = Object.values(instructions).flatMap((pix) =>
+    const ixs = Object.values(transactions).flatMap((pix) =>
       pix.account.getAllInstructions()
     )
 
@@ -111,7 +111,7 @@ const useProposalSafetyCheck = () => {
     })
 
     return realmConfigWarnings
-  }, [config, instructions, realmInfo])
+  }, [config, transactions, realmInfo])
 
   return realmConfigWarnings
 }
