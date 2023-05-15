@@ -15,6 +15,7 @@ import {
   useIsVoting,
   useProposalVoteRecordQuery,
 } from './hooks'
+import { useSubmitVote } from '@hooks/useSubmitVote'
 
 /*
   returns: undefined if loading, false if nobody can veto, 'council' if council can veto, 'community' if community can veto
@@ -103,6 +104,18 @@ const VetoButtons = () => {
   const [openModal, setOpenModal] = useState(false)
   const voterTokenRecord = useUserVetoTokenRecord()
   const { data: userVetoRecord } = useProposalVoteRecordQuery('veto')
+  const { submitting, submitVote } = useSubmitVote()
+
+  const handleVeto = async () => {
+    if (allowDiscussion) {
+      setOpenModal(true)
+    } else {
+      submitVote({
+        vote: VoteKind.Veto,
+        voterTokenRecord: voterTokenRecord!,
+      })
+    }
+  }
 
   return vetoable &&
     vetoingPop &&
@@ -119,8 +132,9 @@ const VetoButtons = () => {
               canVeto?.canVeto === false ? canVeto.message : undefined
             }
             className="w-full"
-            onClick={() => setOpenModal(true)}
-            disabled={!canVeto?.canVeto}
+            onClick={handleVeto}
+            disabled={!canVeto?.canVeto || submitting}
+            isLoading={submitting}
           >
             <div className="flex flex-row items-center justify-center">
               <BanIcon className="h-4 w-4 mr-2" />
@@ -135,7 +149,6 @@ const VetoButtons = () => {
           isOpen={openModal}
           voterTokenRecord={voterTokenRecord}
           vote={VoteKind.Veto}
-          allowDiscussion={allowDiscussion}
         />
       ) : null}
     </>

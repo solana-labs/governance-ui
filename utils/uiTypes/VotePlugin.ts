@@ -446,7 +446,7 @@ export class VotingClient {
       }
 
       //1 nft is 3 accounts
-      const positionChunks = chunks(remainingAccounts, 12)
+      const positionChunks = chunks(remainingAccounts, 9)
       for (const chunk of positionChunks) {
         instructions.push(
           await this.client.program.methods
