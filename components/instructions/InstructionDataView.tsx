@@ -1,10 +1,10 @@
 import { InstructionDescriptor } from './tools'
 
-export default function InstructionDataView({
+const InstructionDataView = ({
   descriptor,
 }: {
   descriptor: InstructionDescriptor | undefined
-}) {
+}) => {
   return (
     <div>
       <span className="break-all font-display text-fgd-1 text-xs">
@@ -13,3 +13,5 @@ export default function InstructionDataView({
     </div>
   )
 }
+
+export default InstructionDataView

@@ -25,7 +25,6 @@ const InstructionCard = ({
   const connection = useWalletStore((s) => s.connection)
   const realm = useWalletStore((s) => s.selectedRealm.realm)
   const {
-    assetAccounts,
     nftsGovernedTokenAccounts,
     governedTokenAccountsWithoutNfts,
   } = useGovernanceAssets()
@@ -50,6 +49,7 @@ const InstructionCard = ({
     const tokenAccount = (
       await fetchTokenAccountByPubkey(connection.current, sourcePk)
     ).result
+    const mint = tokenAccount?.mint
 
     const isSol = governedTokenAccountsWithoutNfts.find(
       (x) => x.extensions.transferAddress?.toBase58() === sourcePk.toBase58()
@@ -62,7 +62,6 @@ const InstructionCard = ({
     )
 
     if (isNFTAccount) {
-      const mint = tokenAccount?.mint
       if (mint) {
         try {
           const result = await fetchNFTbyMint(connection.current, mint)
@@ -81,14 +80,18 @@ const InstructionCard = ({
       setTokenImgUrl(imgUrl)
       return
     }
-    const mint = tokenAccount?.mint
     if (mint) {
       const info = tokenPriceService.getTokenInfo(mint.toBase58())
       const imgUrl = info?.logoURI ? info.logoURI : ''
       setTokenImgUrl(imgUrl)
     }
     return
-  }, [assetAccounts, connection, instructionData])
+  }, [
+    connection,
+    governedTokenAccountsWithoutNfts,
+    instructionData.accounts,
+    nftsGovernedTokenAccounts,
+  ])
 
   useEffect(() => {
     handleGetDescriptors()

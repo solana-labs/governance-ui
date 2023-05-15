@@ -5,37 +5,43 @@ import { ExternalLinkIcon } from '@heroicons/react/solid'
 import { BPF_UPGRADE_LOADER_ID } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import { abbreviateAddress } from '@utils/formatting'
-import axios from 'axios'
 import { useState, useEffect } from 'react'
+import { fetchParsedAccountInfoByPubkey } from '@hooks/queries/parsedAccountInfo'
+import { fetchAnchorProgramInfoByPubkey } from '@hooks/queries/anchorProgramINfo'
 
-export default function InstructionProgram({
+const InstructionProgram = ({
   connection,
   programId,
 }: {
   connection: ConnectionContext
   programId: PublicKey
-}) {
+}) => {
   const isNativeSolProgram = isNativeSolanaProgram(programId)
   const [isAnchorVerified, setIsAnchorVerified] = useState(false)
   const [isUpgradeable, setIsUpgradeable] = useState(false)
   const [authority, setAuthority] = useState('')
+
   const programLabel = getProgramName(programId)
   useEffect(() => {
     const tryGetProgramInfo = async (programId: PublicKey) => {
       try {
-        const programAccount = await connection.current.getParsedAccountInfo(
-          programId
-        )
-        const programInfo = await connection.current.getParsedAccountInfo(
-          new PublicKey(programAccount.value?.data['parsed']?.info?.programData)
-        )
-        const info = programInfo.value?.data['parsed']?.info
+        const programAccount = (
+          await fetchParsedAccountInfoByPubkey(connection.current, programId)
+        ).result
+        const programInfo = (
+          await fetchParsedAccountInfoByPubkey(
+            connection.current,
+            new PublicKey(programAccount?.data['parsed']?.info?.programData)
+          )
+        ).result
+        const info = programInfo?.data['parsed']?.info
         const authority = info.authority
         const isUpgradeable =
-          programInfo.value?.owner?.equals(BPF_UPGRADE_LOADER_ID) && authority
+          programInfo?.owner?.equals(BPF_UPGRADE_LOADER_ID) && authority
+        const deploymentSlot = info.slot
+
         setIsUpgradeable(isUpgradeable)
         setAuthority(authority)
-        const deploymentSlot = info.slot
         tryGetAnchorInfo(programId, deploymentSlot)
         // eslint-disable-next-line no-empty
       } catch {}
@@ -45,8 +51,10 @@ export default function InstructionProgram({
       lastDeploymentSlot: number
     ) => {
       try {
-        const apiUrl = `https://api.apr.dev/api/v0/program/${programId.toBase58()}/latest?limit=5`
-        const resp = await axios.get(apiUrl)
+        const resp = (
+          await fetchAnchorProgramInfoByPubkey(connection.current, programId)
+        ).result
+
         const isLastVersionVerified = resp.data[0].verified === 'Verified'
         const lastDeploymentSlotMatch =
           resp.data[0].verified_slot === lastDeploymentSlot
@@ -58,6 +66,7 @@ export default function InstructionProgram({
       tryGetProgramInfo(programId)
     }
   }, [programId, connection, isNativeSolProgram])
+
   return (
     <div className="border-t border-bkg-4 flex flex-col lg:flex-row lg:items-center lg:justify-between py-3">
       <span className="font-bold text-fgd-1 text-sm">
@@ -106,3 +115,5 @@ export default function InstructionProgram({
     </div>
   )
 }
+
+export default InstructionProgram
