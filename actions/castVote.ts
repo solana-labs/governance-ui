@@ -199,6 +199,13 @@ export async function castVote(
       connection,
       wallet,
       transactionInstructions: ixsChunks,
+      callbacks: {
+        afterAllTxConfirmed: () => {
+          if (runAfterConfirmation) {
+            runAfterConfirmation()
+          }
+        },
+      },
     })
   }
 
