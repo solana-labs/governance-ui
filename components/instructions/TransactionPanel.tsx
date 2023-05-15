@@ -58,23 +58,21 @@ export function TransactionPanel() {
         clearTimeout(timer)
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [ineligibleToSee, connection, currentSlot])
-
-  if (Object.values(transactions).length === 0) {
-    return null
-  }
+  }, [ineligibleToSee, connection, currentSlot, proposal, realmInfo, wallet])
 
   const proposalTransactions = Object.values(transactions).sort(
     (i1, i2) => i1.account.instructionIndex - i2.account.instructionIndex
   )
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
-  const [playing, setPlaying] = useState(
-    proposalTransactions.every((x) => x.account.executedAt)
-      ? PlayState.Played
-      : PlayState.Unplayed
-  )
+  const [playing, setPlaying] = useState(PlayState.Unplayed)
+
+  useEffect(() => {
+    setPlaying(
+      proposalTransactions.every((x) => x.account.executedAt)
+        ? PlayState.Played
+        : PlayState.Unplayed
+    )
+  }, [proposalTransactions])
 
   const simulate = async () => {
     const result = await dryRunInstruction(
@@ -90,6 +88,10 @@ export function TransactionPanel() {
       result.transaction
     )
     window.open(inspectUrl, '_blank')
+  }
+
+  if (Object.values(transactions).length === 0) {
+    return null
   }
 
   return (
