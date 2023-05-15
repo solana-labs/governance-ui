@@ -9,8 +9,14 @@ const OneHMs = 3600000
 
 export const useTokenMetadataKeys = {
   all: (cluster: EndpointTypes) => [cluster, 'tokenMetadata'],
-  byMint: (k: PublicKey) => [k.toString()],
-  byMints: (k: PublicKey[]) => [...k.map((x) => x.toString())],
+  byMint: (cluster: EndpointTypes, k: PublicKey) => [
+    ...useTokenMetadataKeys.all(cluster),
+    k.toString(),
+  ],
+  byMints: (cluster: EndpointTypes, k: PublicKey[]) => [
+    ...useTokenMetadataKeys.all(cluster),
+    ...k.map((x) => x.toString()),
+  ],
 }
 
 export const useTokenMetadata = (
@@ -22,7 +28,9 @@ export const useTokenMetadata = (
   const enabled = !!mint && !!enableConditions
 
   const query = useQuery({
-    queryKey: enabled ? useTokenMetadataKeys.byMint(mint) : undefined,
+    queryKey: enabled
+      ? useTokenMetadataKeys.byMint(connection.cluster, mint)
+      : undefined,
     queryFn: async () => {
       const mintPubkey = new PublicKey(mint!)
       const metadataAccount = findMetadataPda(mintPubkey)
@@ -53,7 +61,9 @@ export const useTokensMetadata = (
   const enabled = !!mints.length && !!enableConditions
 
   const query = useQuery({
-    queryKey: enabled ? useTokenMetadataKeys.byMints(mints) : undefined,
+    queryKey: enabled
+      ? useTokenMetadataKeys.byMints(connection.cluster, mints)
+      : undefined,
     queryFn: async () => {
       const data: { symbol: string; name: string; mint: string }[] = []
       for (const mint of mints) {
