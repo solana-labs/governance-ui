@@ -82,7 +82,7 @@ export function InstructionPanel() {
       wallet!,
       null,
       [],
-      proposalInstructions.map((x) => x.account.getSingleInstruction())
+      [...proposalInstructions.flatMap((x) => x.account.getAllInstructions())]
     )
 
     const inspectUrl = await getExplorerInspectorUrl(
