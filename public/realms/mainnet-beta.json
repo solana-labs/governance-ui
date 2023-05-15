@@ -1101,8 +1101,8 @@
     "website": "https://services.grapes.network/",
     "twitter": "@grapeprotocol",
     "ogImage": "/realms/Wen DAO/Wen DAO.png"
-   }, 
-   { 
+   },
+   {
     "symbol": "BOOT",
     "displayName": "Bootstrap DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -3061,9 +3061,9 @@
     "discord": "https://discord.gg/XcWVHM2Z",
     "github": "https://github.com/brdot",
     "website": "https://brdot.com.br"
-    
+
   },
-  { 
+  {
     "symbol": "SAO",
     "category":"nft",
     "displayName": "Sator DAO",
@@ -3074,9 +3074,9 @@
     "shortDescription": "Sator brings traditional TV and movies into Web3 through NFT-VOD and token-gated staking.",
     "website": "https://sator.io",
     "discord": "https://discord.gg/qftzCFrHNQ",
-    "twitter": "https://twitter.com/SatorSAO" 
+    "twitter": "https://twitter.com/SatorSAO"
   },
-  { 
+  {
     "symbol": "Safecows",
     "category":"web3",
     "displayName": "Safecows",
@@ -3088,7 +3088,7 @@
     "website": "https://safecows.com",
     "discord": "https://discord.gg/aQCeMSWs"
   },
-   { 
+   {
     "symbol": "BlueChickDAO",
     "category":"gaming",
     "displayName": "The Blue Chick NFTs DAO",
@@ -3100,10 +3100,11 @@
     "website": "https://bluechicknfts.wtf",
     "discord": "https://discord.gg/SHVcwHKUNG",
     "twitter": "@blueChickNFTs"
-  },  
+  },
   {
     "symbol": "HNT",
     "voteSymbol": "veHNT",
+    "allowDiscussion": false,
     "displayName": "Helium DAO",
     "programId": "hgovkRU6Ghe1Qoyb54HdSLdqN7VtxaifBzRmh9jtd3S",
     "realmId": "2VfPJn8ML1hNBnsEBo7SzmG11UJc7gbY8b23A3K8expd",
@@ -3114,6 +3115,7 @@
   {
     "symbol": "IOT",
     "voteSymbol": "veIOT",
+    "allowDiscussion": false,
     "displayName": "Helium IOT SubDAO",
     "programId": "hgovkRU6Ghe1Qoyb54HdSLdqN7VtxaifBzRmh9jtd3S",
     "realmId": "8UQNtD5Zw8ijB7ZpGiPLodKXMxtVyQmtu1AEztd3p6Po",
@@ -3124,6 +3126,7 @@
   {
     "symbol": "MOBILE",
     "voteSymbol": "veMOBILE",
+    "allowDiscussion": false,
     "displayName": "Helium MOBILE SubDAO",
     "programId": "hgovkRU6Ghe1Qoyb54HdSLdqN7VtxaifBzRmh9jtd3S",
     "realmId": "7yyaEqDNfgqS6cgmPmJGVoU5dkwayPFRq55VmNDR79ij",
