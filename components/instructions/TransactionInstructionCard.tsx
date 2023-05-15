@@ -61,17 +61,15 @@ const TransactionInstructionCard = ({
         x.governance.pubkey.toBase58() === tokenAccount?.owner.toBase58()
     )
 
-    if (isNFTAccount) {
-      if (mint) {
-        try {
-          const result = await fetchNFTbyMint(connection.current, mint)
-          if (result.found) {
-            const url = (await axios.get(result.result.uri)).data
-            setNftImgUrl(url.image)
-          }
-        } catch (e) {
-          console.log(e)
+    if (isNFTAccount && mint) {
+      try {
+        const result = await fetchNFTbyMint(connection.current, mint)
+        if (result.found) {
+          const url = (await axios.get(result.result.uri)).data
+          setNftImgUrl(url.image)
         }
+      } catch (e) {
+        console.log(e)
       }
       return
     }
