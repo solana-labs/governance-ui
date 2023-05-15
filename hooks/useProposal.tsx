@@ -8,7 +8,7 @@ export default function useProposal() {
   const {
     proposal,
     descriptionLink,
-    instructions,
+    transactions,
     proposalMint,
     governance,
     proposalOwner,
@@ -18,7 +18,7 @@ export default function useProposal() {
     pk,
     proposal,
     descriptionLink,
-    instructions,
+    transactions,
     proposalMint,
     governance,
     proposalOwner,

@@ -3,7 +3,7 @@ import remarkGfm from 'remark-gfm'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 import useProposal from 'hooks/useProposal'
 import ProposalStateBadge from '@components/ProposalStateBadge'
-import { InstructionPanel } from 'components/instructions/instructionPanel'
+import { TransactionPanel } from '@components/instructions/TransactionPanel'
 import DiscussionPanel from 'components/chat/DiscussionPanel'
 import VotePanel from '@components/VotePanel'
 import { ApprovalProgress, VetoProgress } from '@components/QuorumProgress'
@@ -113,7 +113,7 @@ const Proposal = () => {
               </div>
             )}
             <ProposalWarnings />
-            <InstructionPanel />
+            <TransactionPanel />
             {isTwoCol && <DiscussionPanel />}
           </>
         ) : (

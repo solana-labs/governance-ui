@@ -1,5 +1,5 @@
 import useProposal from '../../hooks/useProposal'
-import InstructionCard from './instructionCard'
+import TransactionCard from './TransactionCard'
 import { Disclosure } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/solid'
 import { useEffect, useRef, useState } from 'react'
@@ -16,8 +16,8 @@ import { dryRunInstruction } from 'actions/dryRunInstruction'
 import { getExplorerInspectorUrl } from '@components/explorer/tools'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
-export function InstructionPanel() {
-  const { instructions, proposal } = useProposal()
+export function TransactionPanel() {
+  const { transactions, proposal } = useProposal()
   const { realmInfo } = useRealm()
   const mounted = useRef(false)
   useEffect(() => {
@@ -61,17 +61,17 @@ export function InstructionPanel() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [ineligibleToSee, connection, currentSlot])
 
-  if (Object.values(instructions).length === 0) {
+  if (Object.values(transactions).length === 0) {
     return null
   }
 
-  const proposalInstructions = Object.values(instructions).sort(
+  const proposalTransactions = Object.values(transactions).sort(
     (i1, i2) => i1.account.instructionIndex - i2.account.instructionIndex
   )
 
   // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [playing, setPlaying] = useState(
-    proposalInstructions.every((x) => x.account.executedAt)
+    proposalTransactions.every((x) => x.account.executedAt)
       ? PlayState.Played
       : PlayState.Unplayed
   )
@@ -82,7 +82,7 @@ export function InstructionPanel() {
       wallet!,
       null,
       [],
-      [...proposalInstructions.flatMap((x) => x.account.getAllInstructions())]
+      [...proposalTransactions.flatMap((x) => x.account.getAllInstructions())]
     )
 
     const inspectUrl = await getExplorerInspectorUrl(
@@ -114,27 +114,27 @@ export function InstructionPanel() {
             <Disclosure.Panel
               className={`border border-fgd-4 border-t-0 p-4 md:p-6 pt-0 rounded-b-md`}
             >
-              {proposalInstructions.map((pi, idx) => (
+              {proposalTransactions.map((pi, idx) => (
                 <div key={pi.pubkey.toBase58()}>
                   {proposal && (
-                    <InstructionCard
+                    <TransactionCard
                       proposal={proposal}
                       index={idx + 1}
-                      proposalInstruction={pi}
+                      proposalTransaction={pi}
                     />
                   )}
                 </div>
               ))}
 
-              {proposal && proposalInstructions.length > 1 && (
+              {proposal && proposalTransactions.length > 1 && (
                 <div className="flex justify-end space-x-4">
-                  {proposalInstructions.filter((x) => !x.account.executedAt)
+                  {proposalTransactions.filter((x) => !x.account.executedAt)
                     .length !== 0 && (
                     <Button onClick={simulate}>Inspect all</Button>
                   )}
                   <ExecuteAllInstructionButton
                     proposal={proposal}
-                    proposalInstructions={proposalInstructions.filter(
+                    proposalInstructions={proposalTransactions.filter(
                       (x) =>
                         x.account.executionStatus ===
                         InstructionExecutionStatus.None
@@ -146,7 +146,7 @@ export function InstructionPanel() {
                   />
                   <ExecuteAllInstructionButton
                     proposal={proposal}
-                    proposalInstructions={proposalInstructions}
+                    proposalInstructions={proposalTransactions}
                     playing={playing}
                     setPlaying={setPlaying}
                   />
