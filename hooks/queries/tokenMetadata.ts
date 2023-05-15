@@ -1,5 +1,6 @@
 import { findMetadataPda } from '@metaplex-foundation/js'
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
+import { EndpointTypes } from '@models/types'
 import { PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
 import useWalletStore from 'stores/useWalletStore'
@@ -7,8 +8,15 @@ import useWalletStore from 'stores/useWalletStore'
 const OneHMs = 3600000
 
 export const useTokenMetadataKeys = {
-  byMint: (k: PublicKey) => [k.toString()],
-  byMints: (k: PublicKey[]) => [...k.toString()],
+  all: (cluster: EndpointTypes) => [cluster, 'tokenMetadata'],
+  byMint: (cluster: EndpointTypes, k: PublicKey) => [
+    ...useTokenMetadataKeys.all(cluster),
+    k.toString(),
+  ],
+  byMints: (cluster: EndpointTypes, k: PublicKey[]) => [
+    ...useTokenMetadataKeys.all(cluster),
+    ...k.map((x) => x.toString()),
+  ],
 }
 
 export const useTokenMetadata = (
@@ -20,7 +28,9 @@ export const useTokenMetadata = (
   const enabled = !!mint && !!enableConditions
 
   const query = useQuery({
-    queryKey: enabled ? useTokenMetadataKeys.byMint(mint) : undefined,
+    queryKey: enabled
+      ? useTokenMetadataKeys.byMint(connection.cluster, mint)
+      : undefined,
     queryFn: async () => {
       const mintPubkey = new PublicKey(mint!)
       const metadataAccount = findMetadataPda(mintPubkey)
@@ -51,7 +61,9 @@ export const useTokensMetadata = (
   const enabled = !!mints.length && !!enableConditions
 
   const query = useQuery({
-    queryKey: enabled ? useTokenMetadataKeys.byMints(mints) : undefined,
+    queryKey: enabled
+      ? useTokenMetadataKeys.byMints(connection.cluster, mints)
+      : undefined,
     queryFn: async () => {
       const data: { symbol: string; name: string; mint: string }[] = []
       for (const mint of mints) {

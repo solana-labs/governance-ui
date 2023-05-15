@@ -27,7 +27,7 @@
     ]
   },
   "dependencies": {
-    "@blockworks-foundation/mango-v4": "0.13.2",
+    "@blockworks-foundation/mango-v4": "0.14.1",
     "@blockworks-foundation/mangolana": "0.0.1-beta.11",
     "@bonfida/spl-name-service": "0.1.47",
     "@bundlr-network/client": "0.7.15",
@@ -142,7 +142,6 @@
     "next-themes": "0.1.1",
     "next-transpile-modules": "9.1.0",
     "node-fetch": "2.6.7",
-    "numbro": "2.3.6",
     "papaparse": "5.3.2",
     "promptly": "3.2.0",
     "psyfi-euros-test": "0.0.1-rc.33",

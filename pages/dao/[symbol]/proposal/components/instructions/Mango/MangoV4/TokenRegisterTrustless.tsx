@@ -126,11 +126,11 @@ const TokenRegisterTrustless = ({
       !mangoGroup || mangoGroup?.banksMapByTokenIndex.size === 0
         ? 0
         : Math.max(...[...mangoGroup!.banksMapByTokenIndex.keys()]) + 1
-    setForm({
-      ...form,
+    setForm((prevForm) => ({
+      ...prevForm,
       tokenIndex: tokenIndex,
-    })
-  }, [mangoGroup?.banksMapByTokenIndex.size])
+    }))
+  }, [mangoGroup])
 
   const inputs: InstructionInput[] = [
     {

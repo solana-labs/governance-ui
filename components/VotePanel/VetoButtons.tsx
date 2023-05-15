@@ -22,16 +22,20 @@ import { useSubmitVote } from '@hooks/useSubmitVote'
 */
 export const useVetoingPop = () => {
   const { tokenRole, governance } = useWalletStore((s) => s.selectedProposal)
+  const { realm } = useRealm()
 
   const vetoingPop = useMemo(() => {
     if (governance === undefined) return undefined
 
     return tokenRole === GoverningTokenRole.Community
       ? governance?.account.config.councilVetoVoteThreshold.type !==
-          VoteThresholdType.Disabled && 'council'
+          VoteThresholdType.Disabled &&
+          // if there is no council then there's not actually a vetoing population, in my opinion
+          realm?.account.config.councilMint !== undefined &&
+          'council'
       : governance?.account.config.communityVetoVoteThreshold.type !==
           VoteThresholdType.Disabled && 'community'
-  }, [governance, tokenRole])
+  }, [governance, tokenRole, realm?.account.config.councilMint])
 
   return vetoingPop
 }

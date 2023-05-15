@@ -1378,14 +1378,6 @@
     "discord": "https://discord.gg/garitoken"
   },
   {
-    "symbol": "df test",
-    "category": "defi",
-    "displayName": "df test",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "HnLuYmBxDxK1MCihHJVFnNudUTpLPc2km6xNcRQ8KPdj",
-    "sortRank": 3
-  },
-  {
     "symbol": "Dual DAO",
     "category": "defi",
     "bannerImage": "https://pbs.twimg.com/profile_banners/1488237042068819971/1652495773/1500x500",

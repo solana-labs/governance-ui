@@ -29,8 +29,8 @@ export interface PositionWithMeta extends Position {
   }
 }
 export type LockupKind = IdlTypes<HeliumVoterStakeRegistry>['LockupKind']
-export type InitializePositionV0Args = IdlTypes<HeliumVoterStakeRegistry>['InitializePositionArgsV0']
-
+/* export type InitializePositionV0Args = IdlTypes<HeliumVoterStakeRegistry>['InitializePositionArgsV0']
+ */
 export type SubDao = IdlAccounts<HeliumSubDaos>['subDaoV0']
 export interface SubDaoWithMeta extends Omit<SubDao, 'dntMint'> {
   pubkey: PublicKey

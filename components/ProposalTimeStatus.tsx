@@ -1,7 +1,7 @@
 import useRealm from '../hooks/useRealm'
 import { Proposal, ProposalState } from '@solana/spl-governance'
 import { fmtUnixTime } from '../utils/formatting'
-import { VoteCountdown } from './VoteCountdown'
+import ProposalTimer from './ProposalTimer'
 
 type ProposalTimeStatusProps = {
   proposal: Proposal
@@ -18,7 +18,7 @@ const ProposalTimeStatus = ({ proposal }: ProposalTimeStatusProps) => {
           proposal.votingCompletedAt
         )}`
       ) : proposal.votingAt ? (
-        <VoteCountdown proposal={proposal} governance={governance} />
+        <ProposalTimer proposal={proposal} governance={governance} />
       ) : (
         `Drafted ${fmtUnixTime(proposal.draftAt)}`
       )}
