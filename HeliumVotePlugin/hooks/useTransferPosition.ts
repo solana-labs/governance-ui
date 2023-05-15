@@ -42,7 +42,9 @@ export const useTransferPosition = () => {
         !mint ||
         !wallet ||
         !client ||
-        !(client instanceof HeliumVsrClient)
+        !(client instanceof HeliumVsrClient) ||
+        sourcePosition.numActiveVotes > 0 ||
+        targetPosition.numActiveVotes > 0
 
       const idl = await Program.fetchIdl(programId, provider)
       const hsdProgram = await init(provider as any, programId, idl)
