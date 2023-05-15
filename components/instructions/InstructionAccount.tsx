@@ -30,7 +30,7 @@ export default function InstructionAccount({
       fetchTokenAccountByPubkey(connection.current, accountMeta.pubkey).then(
         (ta) => {
           if (ta.result) {
-            setAccountLabel(`owner: ${ta.result?.account.owner.toBase58()}`)
+            setAccountLabel(`owner: ${ta.result?.owner.toBase58()}`)
           }
           isFetching.current = false
         }

@@ -65,7 +65,7 @@ const TransactionInstructionCard = ({
       if (mint) {
         try {
           const result = await fetchNFTbyMint(connection.current, mint)
-          const url = (await axios.get(result.result.uri)).data
+          const url = (await axios.get(result!.result!.uri)).data
           setNftImgUrl(url.image)
         } catch (e) {
           console.log(e)
