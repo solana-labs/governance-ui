@@ -18,7 +18,7 @@ const asFindable = <P extends any[], R>(
     }
     return {
       found: true,
-      result: result as R,
+      result: result as NonNullable<R>,
     } as const
   } catch (e) {
     if ((e.message as string).includes('not found')) {

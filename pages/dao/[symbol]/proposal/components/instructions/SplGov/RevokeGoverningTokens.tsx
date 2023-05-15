@@ -94,7 +94,8 @@ const RevokeGoverningTokens: FC<{
 
   const { data: mintInfo } = useMintInfoByPubkeyQuery(selectedMint)
   const governance = useGovernanceForGovernedAddress(selectedMint)
-  const revokeTokenAuthority = mintInfo?.result?.mintAuthority ?? governance?.pubkey
+  const revokeTokenAuthority =
+    mintInfo?.result?.mintAuthority ?? governance?.pubkey
 
   const getInstruction = useCallback(async (): Promise<UiInstruction> => {
     const errors: Errors = {}
