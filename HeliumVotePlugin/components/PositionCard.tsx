@@ -32,7 +32,7 @@ import { useClosePosition } from '../hooks/useClosePosition'
 import { DelegateTokensModal } from './DelegateTokensModal'
 import { useDelegatePosition } from '../hooks/useDelegatePosition'
 import { useUndelegatePosition } from '../hooks/useUndelegatePosition'
-import { useClaimDelegatedPositionRewards } from '../hooks/useClaimDelegatedPositionRewards'
+import { useClaimPositionRewards } from '../hooks/useClaimPositionRewards'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { PublicKey } from '@solana/web3.js'
 import { PromptModal } from './PromptModal'
@@ -150,8 +150,8 @@ export const PositionCard: React.FC<PositionCardProps> = ({
   const {
     loading: isClaimingRewards,
     error: claimingRewardsError,
-    claimDelegatedPositionRewards,
-  } = useClaimDelegatedPositionRewards()
+    claimPositionRewards,
+  } = useClaimPositionRewards()
 
   const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
     (s) => s.actions
@@ -295,7 +295,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
 
   const handleClaimRewards = async () => {
     try {
-      await claimDelegatedPositionRewards({ position, tokenOwnerRecordPk })
+      await claimPositionRewards({ position })
 
       if (!claimingRewardsError) {
         await refetchState()
