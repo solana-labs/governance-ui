@@ -14,6 +14,7 @@ import ClaimUnreleasedNFTs from './ClaimUnreleasedNFTs'
 import Link from 'next/link'
 import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import ClaimUnreleasedPositions from 'HeliumVotePlugin/components/ClaimUnreleasedPositions'
 
 const LockPluginTokenBalanceCard = dynamic(
   () =>
@@ -103,7 +104,13 @@ const TokenBalanceCardWrapper = ({
       (!ownTokenRecord ||
         ownTokenRecord.account.governingTokenDepositAmount.isZero())
     ) {
-      return <HeliumVotingPowerCard inAccountDetails={inAccountDetails} />
+      return (
+        <>
+          {!inAccountDetails && <GovernancePowerTitle />}
+          <HeliumVotingPowerCard inAccountDetails={inAccountDetails} />
+          <ClaimUnreleasedPositions inAccountDetails={inAccountDetails} />
+        </>
+      )
     }
 
     if (

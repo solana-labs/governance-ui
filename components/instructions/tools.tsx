@@ -120,27 +120,27 @@ export const ACCOUNT_NAMES = {
   // Physis DAO
   '29epeLvAMyRXtpA1HaoKB1hGcAnrc1NvMCbaZ8AVRwEi': 'Physis DAO Treasury',
   '4i2Yjk5bUiLeVNwqBpkRdFSECSCvMgKoeCSdRSx1TPcz': 'DAO: Rewards (PHY)',
-  'EUkYhtkRmxQpnKTvGayBJM3Pt1FQNjaMWP3UCUb38hJN': 'DAO: Grants (PHY)',
+  EUkYhtkRmxQpnKTvGayBJM3Pt1FQNjaMWP3UCUb38hJN: 'DAO: Grants (PHY)',
   '3XwmcRf9R6TFqCwhLkftur8Baq45ZYE7DQDj9WUAPsmN': 'DAO: Governance (PHY)',
 
   '6Va7K51FRbnPcYZTUwkoFfoYtnfh8qyJaZqT4W1GGxVi': 'Physis EcoSystem Treasury',
-  'C2KKuAq4UaUFYtm3zcxZMSDUuSEfPSk4yLcq5XaBr4wM': 'EcoSystem: Development (PHY)',
-  'F6EHstw5jkmHVLLXj9HEx3xCRsY7Whm7JK266jWFrFSB': 'EcoSystem: CapEX (PHY)',
+  C2KKuAq4UaUFYtm3zcxZMSDUuSEfPSk4yLcq5XaBr4wM: 'EcoSystem: Development (PHY)',
+  F6EHstw5jkmHVLLXj9HEx3xCRsY7Whm7JK266jWFrFSB: 'EcoSystem: CapEX (PHY)',
   '4gr1JjLD89VAbmQRrLeFDiLFSv2z2zn1tXRWRX4C3kow': 'EcoSystem: OpEX (PHY)',
   '8eJoFYj8XtwJ9mER7qmb1EEnV8mGYGHyjxRct8ooJXQr': 'EcoSystem: Marketing (PHY)',
 
   '2jfAMh48b37bBTKkoNwmvNZAqVQc1G7gh5vYv5FoWTUR': 'Physis Team Treasury',
   '8vXYj8B567R8Di7BUvquiGC7usyPMtL756xx6KERfW9K': 'Team: Community (PHY)',
-  'AiGCc2YEwLNER7DETRwv5e82eqLwPL8FMcmmHEhED5Vr': 'Team: Core (PHY)',
-  'CpB6PDoxfkg2U8EC8XhyD6TdCAWkhRqZ4Fa3j3UFW6Rv': 'Team: Extraordinary (PHY)',
+  AiGCc2YEwLNER7DETRwv5e82eqLwPL8FMcmmHEhED5Vr: 'Team: Core (PHY)',
+  CpB6PDoxfkg2U8EC8XhyD6TdCAWkhRqZ4Fa3j3UFW6Rv: 'Team: Extraordinary (PHY)',
 
-  'BaT8NdFHAhrBpS7gTQX2YgSwazeNLcA4gKooDsAutvCk': 'Physis Alliance Treasury',
-  'H4WWxBJoDfGWfE212SF5tcyo75zBJnzCRAUmWpRMcxyH': 'Alliance: Partnerships (PHY)',
+  BaT8NdFHAhrBpS7gTQX2YgSwazeNLcA4gKooDsAutvCk: 'Physis Alliance Treasury',
+  H4WWxBJoDfGWfE212SF5tcyo75zBJnzCRAUmWpRMcxyH: 'Alliance: Partnerships (PHY)',
   '5L84NZfjdfWHkkkUT9bJ8jKqtTMrpKsAobtTW4NKpJB1': 'Alliance: Advisors (PHY)',
 
-  'E26u3zGmYtR4tnmbhNSQS6kLVmSizSvPCQyu7qGnTWQ3': 'Physis Reserve Treasury',
-  'BgDFLAE25QybqyK6TMPdPF7vFTrBu1AjPs2cFkF8R3cb': 'Reserve: Seed (PHY)',
-  'GDJKzWrkxWHEPPt4k2Ao1TL7S1CEo4xNRnTAVk3jrmbk': 'Reserve: Launchpad (PHY)',
+  E26u3zGmYtR4tnmbhNSQS6kLVmSizSvPCQyu7qGnTWQ3: 'Physis Reserve Treasury',
+  BgDFLAE25QybqyK6TMPdPF7vFTrBu1AjPs2cFkF8R3cb: 'Reserve: Seed (PHY)',
+  GDJKzWrkxWHEPPt4k2Ao1TL7S1CEo4xNRnTAVk3jrmbk: 'Reserve: Launchpad (PHY)',
 
   // GM DAO
   '7WbRWL33mM3pbFLvuqNjBztihQtHWWFPGr4HLHyqViG9': 'Team funds',
@@ -267,10 +267,6 @@ export function getAccountName(accountPk: PublicKey | string) {
   return ACCOUNT_NAMES[key] ?? getProgramName(accountPk)
 }
 
-export const CHAT_PROGRAM_ID = new PublicKey(
-  '7fjWgipzcHFP3c5TMMWumFHNAL5Eme1gFqqRGnNPbbfG'
-)
-
 export const WSOL_MINT = 'So11111111111111111111111111111111111111112'
 export const WSOL_MINT_PK = new PublicKey(WSOL_MINT)
 
@@ -290,7 +286,7 @@ const HIDDEN_MNGO_TREASURES = [
 ]
 
 //owner and desired accounts we want to show
-export const MNGO_AUXILIARY_TOKEN_ACCOUNTS = [
+const MNGO_AUXILIARY_TOKEN_ACCOUNTS = [
   {
     owner: '9BVcYqEQxyccuwznvxXqDkSJFavvTyheiTYk231T1A8S',
     accounts: ['59BEyxwrFpt3x4sZ7TcXC3bHx3seGfqGkATcDx6siLWy'],
@@ -313,7 +309,7 @@ export const ALL_CASTLE_PROGRAMS = [
   PROGRAM_IDS['mainnet'],
 ]
 
-export interface AccountDescriptor {
+interface AccountDescriptor {
   name: string
   important?: boolean
 }

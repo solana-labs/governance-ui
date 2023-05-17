@@ -74,7 +74,9 @@ interface WalletStore extends State {
     proposal: ProgramAccount<Proposal> | undefined
     governance: ProgramAccount<Governance> | undefined
     realm: ProgramAccount<Realm> | undefined
-    instructions: { [instruction: string]: ProgramAccount<ProposalTransaction> }
+    transactions: {
+      [transaction: string]: ProgramAccount<ProposalTransaction>
+    }
     voteRecordsByVoter: { [voter: string]: ProgramAccount<VoteRecord> }
     signatories: { [signatory: string]: ProgramAccount<VoteRecord> }
     chatMessages: { [message: string]: ProgramAccount<ChatMessage> }
@@ -118,7 +120,7 @@ const INITIAL_PROPOSAL_STATE = {
   proposal: undefined,
   governance: undefined,
   realm: undefined,
-  instructions: {},
+  transactions: {},
   voteRecordsByVoter: {},
   signatories: {},
   chatMessages: {},
@@ -490,7 +492,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 
       const [
         governance,
-        instructions,
+        transactions,
         voteRecordsByVoter,
         signatories,
         chatMessages,
@@ -548,7 +550,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.selectedProposal.descriptionLink = proposal.account.descriptionLink
         s.selectedProposal.governance = governanceWithDefaultValues
         s.selectedProposal.realm = realm
-        s.selectedProposal.instructions = accountsToPubkeyMap(instructions)
+        s.selectedProposal.transactions = accountsToPubkeyMap(transactions)
         s.selectedProposal.voteRecordsByVoter = voteRecordsByVoter
         s.selectedProposal.signatories = accountsToPubkeyMap(signatories)
         s.selectedProposal.chatMessages = accountsToPubkeyMap(chatMessages)

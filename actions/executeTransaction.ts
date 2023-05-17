@@ -52,7 +52,7 @@ export const executeTransaction = async (
     proposal.account.governance,
     proposal.pubkey,
     instruction.pubkey,
-    [instruction.account.getSingleInstruction()]
+    [...instruction.account.getAllInstructions()]
   )
 
   // Create proposal transaction

@@ -1,123 +1,22 @@
 import React, { FunctionComponent, useState } from 'react'
 import { BanIcon, ThumbDownIcon, ThumbUpIcon } from '@heroicons/react/solid'
-import {
-  ChatMessageBody,
-  ChatMessageBodyType,
-  VoteKind,
-} from '@solana/spl-governance'
-import { RpcContext } from '@solana/spl-governance'
+import { VoteKind } from '@solana/spl-governance'
 import useWalletStore from '../stores/useWalletStore'
-import useRealm from '../hooks/useRealm'
-import { castVote } from '../actions/castVote'
 
 import Button, { SecondaryButton } from './Button'
-// import { notify } from '../utils/notifications'
 import Loading from './Loading'
 import Modal from './Modal'
 import Input from './inputs/Input'
 import Tooltip from './Tooltip'
 import { TokenOwnerRecord } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import { getProgramVersionForRealm } from '@models/registry/api'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { nftPluginsPks } from '@hooks/useVotingPlugins'
-import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
-import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
-import queryClient from '@hooks/queries/queryClient'
-import { voteRecordQueryKeys } from '@hooks/queries/voteRecord'
-import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useSubmitVote } from '@hooks/useSubmitVote'
 
 interface VoteCommentModalProps {
   onClose: () => void
   isOpen: boolean
   vote: VoteKind
   voterTokenRecord: ProgramAccount<TokenOwnerRecord>
-}
-
-const useSubmitVote = ({
-  comment,
-  onClose,
-  voterTokenRecord,
-}: {
-  comment: string
-  onClose: () => void
-  voterTokenRecord: ProgramAccount<TokenOwnerRecord>
-}) => {
-  const client = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
-  )
-  const [submitting, setSubmitting] = useState(false)
-  const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection)
-  const { proposal } = useWalletStore((s) => s.selectedProposal)
-  const { fetchChatMessages } = useWalletStore((s) => s.actions)
-  const { realm, realmInfo, config } = useRealm()
-  const { refetchProposals } = useWalletStore((s) => s.actions)
-  const isNftPlugin =
-    config?.account.communityTokenConfig.voterWeightAddin &&
-    nftPluginsPks.includes(
-      config?.account.communityTokenConfig.voterWeightAddin?.toBase58()
-    )
-  const { closeNftVotingCountingModal } = useNftProposalStore.getState()
-  const submitVote = async (vote: VoteKind) => {
-    setSubmitting(true)
-    const rpcContext = new RpcContext(
-      proposal!.owner,
-      getProgramVersionForRealm(realmInfo!),
-      wallet!,
-      connection.current,
-      connection.endpoint
-    )
-
-    const msg = comment
-      ? new ChatMessageBody({
-          type: ChatMessageBodyType.Text,
-          value: comment,
-        })
-      : undefined
-
-    const confirmationCallback = async () => {
-      await refetchProposals()
-      // TODO refine this to only invalidate the one query
-      await queryClient.invalidateQueries(
-        voteRecordQueryKeys.all(connection.cluster)
-      )
-    }
-
-    try {
-      await castVote(
-        rpcContext,
-        realm!,
-        proposal!,
-        voterTokenRecord,
-        vote,
-        msg,
-        client,
-        confirmationCallback
-      )
-      if (!isNftPlugin) {
-        await refetchProposals()
-      }
-    } catch (ex) {
-      if (isNftPlugin) {
-        closeNftVotingCountingModal(
-          (client.client as unknown) as NftVoterClient,
-          proposal!,
-          wallet!.publicKey!
-        )
-      }
-      //TODO: How do we present transaction errors to users? Just the notification?
-      console.error("Can't cast vote", ex)
-      onClose()
-    } finally {
-      setSubmitting(false)
-      onClose()
-    }
-
-    fetchChatMessages(proposal!.pubkey)
-  }
-
-  return { submitting, submitVote }
 }
 
 const VOTE_STRINGS = {
@@ -133,14 +32,22 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   vote,
   voterTokenRecord,
 }) => {
+  const { fetchChatMessages } = useWalletStore((s) => s.actions)
+  const { proposal } = useWalletStore((s) => s.selectedProposal)
   const [comment, setComment] = useState('')
-  const { submitting, submitVote } = useSubmitVote({
-    comment,
-    onClose,
-    voterTokenRecord,
-  })
+  const { submitting, submitVote } = useSubmitVote()
 
   const voteString = VOTE_STRINGS[vote]
+
+  const handleSubmit = async () => {
+    await submitVote({
+      vote,
+      voterTokenRecord,
+      comment,
+    })
+    onClose()
+    await fetchChatMessages(proposal!.pubkey)
+  }
 
   return (
     <Modal onClose={onClose} isOpen={isOpen}>
@@ -168,7 +75,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
 
         <Button
           className="w-44 flex items-center justify-center"
-          onClick={() => submitVote(vote)}
+          onClick={handleSubmit}
         >
           <div className="flex items-center">
             {!submitting &&

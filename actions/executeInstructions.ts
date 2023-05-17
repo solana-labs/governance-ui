@@ -38,7 +38,7 @@ export const executeInstructions = async (
         proposal.account.governance,
         proposal.pubkey,
         instruction.pubkey,
-        [instruction.account.getSingleInstruction()]
+        [...instruction.account.getAllInstructions()]
       )
     )
   )

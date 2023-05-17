@@ -1,3 +1,4 @@
+import React, { useMemo } from 'react'
 import DiscussionForm from './DiscussionForm'
 import Comment from './Comment'
 import useWalletStore from '../../stores/useWalletStore'
@@ -5,6 +6,15 @@ import useWalletStore from '../../stores/useWalletStore'
 const DiscussionPanel = () => {
   const { chatMessages, voteRecordsByVoter, proposalMint } = useWalletStore(
     (s) => s.selectedProposal
+  )
+
+  const sortedMessages = useMemo(
+    () =>
+      Object.values(chatMessages).sort(
+        (m1, m2) =>
+          m2.account.postedAt.toNumber() - m1.account.postedAt.toNumber()
+      ),
+    [chatMessages]
   )
 
   return (
@@ -18,21 +28,15 @@ const DiscussionPanel = () => {
       <div className="pb-4">
         <DiscussionForm />
       </div>
-      {Object.values(chatMessages)
-        .sort(
-          (m1, m2) =>
-            m2.account.postedAt.toNumber() - m1.account.postedAt.toNumber()
-        )
-        .map((cm) => (
-          <Comment
-            chatMessage={cm.account}
-            voteRecord={
-              voteRecordsByVoter[cm.account.author.toBase58()]?.account
-            }
-            key={cm.pubkey.toBase58()}
-            proposalMint={proposalMint}
-          />
-        ))}
+
+      {sortedMessages.map((cm) => (
+        <Comment
+          key={cm.pubkey.toBase58()}
+          chatMessage={cm.account}
+          voteRecord={voteRecordsByVoter[cm.account.author.toBase58()]?.account}
+          proposalMint={proposalMint}
+        />
+      ))}
     </div>
   )
 }

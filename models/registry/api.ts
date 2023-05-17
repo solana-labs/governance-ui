@@ -17,6 +17,7 @@ import { getAllSplGovernanceProgramIds } from 'pages/api/tools/realms'
 export interface RealmInfo {
   symbol: string
   voteSymbol?: string
+  allowDiscussion?: boolean
   programId: PublicKey
   programVersion?: number
   realmId: PublicKey

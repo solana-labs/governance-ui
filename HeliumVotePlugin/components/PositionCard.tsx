@@ -37,7 +37,7 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { PublicKey } from '@solana/web3.js'
 import { PromptModal } from './PromptModal'
 
-export interface PositionCardProps {
+interface PositionCardProps {
   subDaos?: SubDaoWithMeta[]
   position: PositionWithMeta
   tokenOwnerRecordPk: PublicKey | null

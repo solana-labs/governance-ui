@@ -27,7 +27,6 @@ import BigNumber from 'bignumber.js'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { NFTWithMeta } from './uiTypes/VotePlugin'
 import { ConnectionContext } from './connection'
-import { I80F48 } from '@blockworks-foundation/mango-v4'
 import {
   Metaplex,
   Nft,
@@ -257,11 +256,6 @@ export async function tryGetMint(
     )
     return undefined
   }
-}
-
-/** @deprecated -- why? */
-export const I80F48OptionalFromNumber = (val: number | undefined) => {
-  return val || val === 0 ? I80F48.fromNumber(val) : undefined
 }
 
 /** @deprecated -- use react-query by pubkey */
@@ -520,31 +514,6 @@ export type AccountInfoGen<T> = {
   rentEpoch?: number
 }
 
-export const deserializeMint = (data: Buffer) => {
-  if (data.length !== MintLayout.span) {
-    throw new Error('Not a valid Mint')
-  }
-
-  const mintInfo = MintLayout.decode(data)
-
-  if (mintInfo.mintAuthorityOption === 0) {
-    mintInfo.mintAuthority = null
-  } else {
-    mintInfo.mintAuthority = new PublicKey(mintInfo.mintAuthority)
-  }
-
-  mintInfo.supply = u64.fromBuffer(mintInfo.supply)
-  mintInfo.isInitialized = mintInfo.isInitialized !== 0
-
-  if (mintInfo.freezeAuthorityOption === 0) {
-    mintInfo.freezeAuthority = null
-  } else {
-    mintInfo.freezeAuthority = new PublicKey(mintInfo.freezeAuthority)
-  }
-
-  return mintInfo as MintInfo
-}
-
 /** @deprecated just use react-query by owner pubkey */
 export const getNfts = (
   ownerPk: PublicKey,
@@ -568,7 +537,7 @@ export const parseMintSupplyFraction = (fraction: string) => {
   })
 }
 
-export const SCALED_FACTOR_SHIFT = 9
+const SCALED_FACTOR_SHIFT = 9
 
 export function getScaledFactor(amount: number) {
   return new BN(
