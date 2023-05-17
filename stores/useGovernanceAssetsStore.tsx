@@ -453,7 +453,11 @@ const getProgramAssetAccounts = async (
       .map((x) => x.pubkey),
   ]
 
-  const programs = await getProgramAccountInfo(connection, possibleOwnersPk)
+  //until indexing for devnet we don't fetch devnet programs
+  const programs =
+    connection.cluster !== 'devnet'
+      ? await getProgramAccountInfo(connection, possibleOwnersPk)
+      : []
   return programs.map(
     (program) =>
       new AccountTypeProgram(
