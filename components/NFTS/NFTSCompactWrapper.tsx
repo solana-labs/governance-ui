@@ -16,9 +16,7 @@ const NFTSCompactWrapper = () => {
   const connection = useWalletStore((s) => s.connection)
   const realmNfts = useTreasuryAccountStore((s) => s.allNfts)
   const isLoading = useTreasuryAccountStore((s) => s.isLoadingNfts)
-  const isLoadingAssets = useGovernanceAssetsStore(
-    (s) => s.loadGovernedAccounts
-  )
+  const isLoadingAssets = useGovernanceAssetsStore((s) => s.loadTokenAccounts)
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
   return nftsGovernedTokenAccounts.length ? (
