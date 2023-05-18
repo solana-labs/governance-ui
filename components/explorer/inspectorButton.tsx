@@ -9,6 +9,7 @@ import { getExplorerInspectorUrl, getExplorerUrl } from './tools'
 import { SecondaryButton } from '../Button'
 import { notify } from '@utils/notifications'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import dayjs from 'dayjs'
 
 export default function InspectorButton({
   proposalInstruction,
@@ -18,9 +19,14 @@ export default function InspectorButton({
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
+
   const wasExecuted =
     proposalInstruction.account.executionStatus ===
     InstructionExecutionStatus.Success
+  const executedAtFormatted = dayjs(
+    proposalInstruction.account.executedAt!.toNumber() * 1000
+  ).format('DD-MM-YYYY HH:mm')
+
   const showInspector = async () => {
     let inspectUrl = ''
     if (!wasExecuted) {
@@ -65,7 +71,9 @@ export default function InspectorButton({
       disabled={!connected && !wasExecuted}
       onClick={() => showInspector()}
     >
-      {!wasExecuted ? 'Inspect' : 'View transaction'}
+      {!wasExecuted
+        ? 'Inspect'
+        : `Execution date: ${executedAtFormatted} - View transaction`}
     </SecondaryButton>
   )
 }
