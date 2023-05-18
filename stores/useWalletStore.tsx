@@ -76,7 +76,7 @@ interface WalletStore extends State {
     //chatMessages: { [message: string]: ProgramAccount<ChatMessage> }
     //descriptionLink?: string
     //proposalMint?: MintAccount
-    loading: boolean
+    //loading: boolean
     //tokenRole?: GoverningTokenRole
     //proposalOwner: ProgramAccount<TokenOwnerRecord> | undefined
   }
