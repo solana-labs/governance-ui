@@ -179,7 +179,6 @@ const SendTokens = ({
       data: getInstructionDataFromBase64(instruction.serializedInstruction),
       holdUpTime: governance.account.config.minInstructionHoldUpTime,
       prerequisiteInstructions: instruction.prerequisiteInstructions ?? [],
-      chunkSplitByDefault: true,
       chunkBy: 1,
     }))
 

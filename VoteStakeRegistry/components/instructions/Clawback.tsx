@@ -118,7 +118,6 @@ const Clawback = ({
       isValid,
       governance: realmAuthorityGov,
       prerequisiteInstructions: prerequisiteInstructions,
-      chunkSplitByDefault: true,
     }
     return obj
   }, [client, form, realmAuthorityGov, realm, schema])

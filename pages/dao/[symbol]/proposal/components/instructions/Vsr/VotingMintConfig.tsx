@@ -208,7 +208,6 @@ const VotingMintConfig = ({
       serializedInstruction: serializeInstructionToBase64(instruction),
       isValid: true,
       governance: form.governedAccount.governance,
-      chunkSplitByDefault: true,
     }
   }
 

@@ -200,7 +200,6 @@ const StakeValidator = ({
       isValid: true,
       governance: form.governedTokenAccount.governance,
       prerequisiteInstructions: prerequisiteInstructions,
-      shouldSplitIntoSeparateTxs: false,
     }
   }
 
