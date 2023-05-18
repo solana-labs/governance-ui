@@ -36,20 +36,26 @@ import { notify } from '@utils/notifications'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useSubDaos } from 'HeliumVotePlugin/hooks/useSubDaos'
 import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
+import { ClaimAllRewardsBtn } from './ClaimAllRewardsBtn'
+import { useClaimAllPositionsRewards } from 'HeliumVotePlugin/hooks/useClaimAllPositionsRewards'
 
 export const LockTokensAccount: React.FC<{
   tokenOwnerRecordPk: string | string[] | undefined
   children: React.ReactNode
 }> = (props) => {
-  const { error, createPosition } = useCreatePosition()
+  const { error: createError, createPosition } = useCreatePosition()
+  const {
+    error: claimingRewardsError,
+    claimAllPositionsRewards,
+  } = useClaimAllPositionsRewards()
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const { data: tokenOwnerRecordPk } = useAddressQuery_CommunityTokenOwner()
   const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
     (s) => s.actions
   )
-  const connected = !!wallet?.connected
 
   const {
     mint,
@@ -76,6 +82,7 @@ export const LockTokensAccount: React.FC<{
     s.state.heliumVsrClient,
     s.state.heliumVsrRegistrar,
   ])
+
   const {
     loading: loadingSubDaos,
     error: subDaosError,
@@ -108,6 +115,11 @@ export const LockTokensAccount: React.FC<{
 
         return a.amountDepositedNative.gt(b.amountDepositedNative) ? -1 : 0
       }),
+    [positions]
+  )
+
+  const positionsWithRewards = useMemo(
+    () => positions.filter((p) => p.hasRewards),
     [positions]
   )
 
@@ -202,6 +214,19 @@ export const LockTokensAccount: React.FC<{
     [realm, vsrRegistrar]
   )
 
+  const refetchState = async () => {
+    fetchWalletTokenAccounts()
+    fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+    await getPositions({
+      votingClient: currentClient,
+      realmPk: realm!.pubkey,
+      communityMintPk: realm!.account.communityMint,
+      walletPk: wallet!.publicKey!,
+      client: vsrClient!,
+      connection: connection.current,
+    })
+  }
+
   const handleLockTokens = async (values: LockTokensModalFormValues) => {
     const { amount, lockupPeriodInDays, lockupKind } = values
     const amountToLock = getMintNaturalAmountFromDecimalAsBN(
@@ -216,16 +241,22 @@ export const LockTokensAccount: React.FC<{
         tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey || null,
     })
 
-    if (!error) {
-      fetchWalletTokenAccounts()
-      fetchRealm(realmInfo!.programId, realmInfo!.realmId)
-      await getPositions({
-        votingClient: currentClient,
-        realmPk: realm!.pubkey,
-        communityMintPk: realm!.account.communityMint,
-        walletPk: wallet!.publicKey!,
-        client: vsrClient!,
-        connection: connection.current,
+    if (!createError) {
+      await refetchState()
+    }
+  }
+
+  const handleClaimAllRewards = async () => {
+    try {
+      await claimAllPositionsRewards({ positions: positionsWithRewards })
+
+      if (!claimingRewardsError) {
+        await refetchState()
+      }
+    } catch (e) {
+      notify({
+        type: 'error',
+        message: e.message || 'Unable to claim rewards',
       })
     }
   }
@@ -328,7 +359,12 @@ export const LockTokensAccount: React.FC<{
                 </>
               )}
             </div>
-            <h2 className="mb-4">Locked Positions</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="mb-4">Locked Positions</h2>
+              {isSameWallet && (
+                <ClaimAllRewardsBtn onClick={handleClaimAllRewards} />
+              )}
+            </div>
             <div
               className={`grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8 ${
                 !isSameWallet ? 'opacity-0.8 pointer-events-none' : ''

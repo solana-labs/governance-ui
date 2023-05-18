@@ -39,7 +39,7 @@ export const useClaimPositionRewards = () => {
         !wallet ||
         !realm ||
         !realmInfo ||
-        !position.isDelegated
+        !position.hasRewards
 
       const idl = await Program.fetchIdl(programId, provider)
       const hsdProgram = await init(provider as any, programId, idl)

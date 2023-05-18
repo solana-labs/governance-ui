@@ -1,6 +1,6 @@
 import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import { Program, BN } from '@coral-xyz/anchor'
-import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { useAsyncCallback } from 'react-async-hook'
 import { PositionWithMeta } from '../sdk/types'
 import {
@@ -19,7 +19,31 @@ import {
 import { notify } from '@utils/notifications'
 import useRealm from '@hooks/useRealm'
 
-export const useCliamAllPositionsRewards = () => {
+const combineArrays = (arr: Array<Array<any>>): Array<any> => {
+  const combinedArray: Array<any> = []
+
+  // Get the number of rows and the maximum number of columns
+  const numRows: number = arr.length
+  let maxCols = 0
+  for (let row = 0; row < numRows; row++) {
+    maxCols = Math.max(maxCols, arr[row].length)
+  }
+
+  // Iterate over each column
+  for (let col = 0; col < maxCols; col++) {
+    // Iterate over each row
+    for (let row = 0; row < numRows; row++) {
+      // Add the element to the combined array if it exists
+      if (arr[row][col] !== undefined) {
+        combinedArray.push(arr[row][col])
+      }
+    }
+  }
+
+  return combinedArray
+}
+
+export const useClaimAllPositionsRewards = () => {
   const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
   const { unixNow } = useSolanaUnixNow()
   const { realm, realmInfo } = useRealm()
@@ -39,7 +63,7 @@ export const useCliamAllPositionsRewards = () => {
         !wallet ||
         !realm ||
         !realmInfo ||
-        !positions.every((pos) => pos.isDelegated)
+        !positions.every((pos) => pos.hasRewards)
 
       const idl = await Program.fetchIdl(programId, provider)
       const hsdProgram = await init(provider as any, programId, idl)
@@ -50,10 +74,10 @@ export const useCliamAllPositionsRewards = () => {
         throw new Error('Unable to Claim All Rewards, Invalid params')
       } else {
         const currentEpoch = new BN(unixNow).div(new BN(EPOCH_LENGTH))
-        const instructions: TransactionInstruction[][] = []
+        const multiDemArray: TransactionInstruction[][] = []
 
         for (const [idx, position] of positions.entries()) {
-          instructions[idx] = instructions[idx] || []
+          multiDemArray[idx] = multiDemArray[idx] || []
           const delegatedPosKey = delegatedPositionKey(position.pubkey)[0]
           const delegatedPosAcc = await hsdProgram.account.delegatedPositionV0.fetch(
             delegatedPosKey
@@ -65,7 +89,7 @@ export const useCliamAllPositionsRewards = () => {
             epoch.lt(currentEpoch);
             epoch = epoch.add(new BN(1))
           ) {
-            instructions[idx].push(
+            multiDemArray[idx].push(
               await hsdProgram.methods
                 .claimRewardsV0({
                   epoch,
@@ -79,40 +103,34 @@ export const useCliamAllPositionsRewards = () => {
           }
         }
 
-        const txs: {
-          instructionsSet: {
-            transactionInstruction: TransactionInstruction
-            signers: Keypair[]
-          }[]
-          sequenceType: SequenceType
-        }[][] = []
-
-        for (const [idx, ixs] of instructions.entries()) {
-          txs[idx] = txs[idx] || []
-          // This is an arbitrary threshold and we assume that up to 4 instructions can be inserted as a single Tx
-          const ixsChunks = chunks(ixs, 4)
-          txs[idx].push(
-            ...ixsChunks.map((txBatch, batchIdx) => ({
-              instructionsSet: txBatchesToInstructionSetWithSigners(
-                txBatch,
-                [],
-                batchIdx
-              ),
-              sequenceType: SequenceType.Sequential,
-            }))
-          )
-        }
-
-        await Promise.all(
-          txs.map(
-            async (tx) =>
-              await sendTransactionsV3({
-                transactionInstructions: tx,
-                wallet,
-                connection: connection.current,
-              })
-          )
+        const instructions: TransactionInstruction[] = combineArrays(
+          multiDemArray
         )
+
+        // This is an arbitrary threshold and we assume that up to 4 instructions can be inserted as a single Tx
+        const ixsChunks = chunks(instructions, 4)
+        const txsChunks = ixsChunks.map((txBatch, batchIdx) => ({
+          instructionsSet: txBatchesToInstructionSetWithSigners(
+            txBatch,
+            [],
+            batchIdx
+          ),
+          sequenceType: SequenceType.Sequential,
+        }))
+
+        notify({ message: 'Claiming Rewards' })
+        await sendTransactionsV3({
+          transactionInstructions: txsChunks,
+          wallet,
+          connection: connection.current,
+          callbacks: {
+            afterAllTxConfirmed: () =>
+              notify({
+                message: 'Claiming Rewards successful',
+                type: 'success',
+              }),
+          },
+        })
       }
     }
   )
@@ -120,6 +138,6 @@ export const useCliamAllPositionsRewards = () => {
   return {
     error,
     loading,
-    useCliamAllPositionsRewards: execute,
+    claimAllPositionsRewards: execute,
   }
 }
