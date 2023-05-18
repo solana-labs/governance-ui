@@ -5,7 +5,6 @@ import { useCallback } from 'react'
 import classNames from 'classnames'
 
 import { calculateMaxVoteScore } from '@models/proposal/calulateMaxVoteScore'
-import useProposal from '@hooks/useProposal'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { getMintDecimalAmount } from '@tools/sdk/units'
 import Tooltip from '@components/Tooltip'
@@ -21,6 +20,7 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
+import { useRouteProposalQuery } from '@hooks/queries/proposal'
 
 interface Props {
   className?: string
@@ -31,7 +31,7 @@ export default function LockedCommunityVotingPower(props: Props) {
   const mint = useRealmCommunityMintInfoQuery().data?.result
 
   const { realmInfo, realmTokenAccount } = useRealm()
-  const { proposal } = useProposal()
+  const proposal = useRouteProposalQuery().data?.result
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const connection = useWalletStore((s) => s.connection.current)
   const deposits = useDepositStore((s) => s.state.deposits)

@@ -11,13 +11,13 @@ import {
 import { useVoteRecordByPubkeyQuery } from '@hooks/queries/voteRecord'
 import useRoleOfGovToken from '@hooks/selectedRealm/useRoleOfToken'
 import { useHasVoteTimeExpired } from '@hooks/useHasVoteTimeExpired'
+import { useProposalGovernanceQuery } from '@hooks/useProposal'
 import { ProposalState, Proposal, Governance } from '@solana/spl-governance'
 import dayjs from 'dayjs'
-import useWalletStore from 'stores/useWalletStore'
 
 export const useIsVoting = () => {
   const proposal = useRouteProposalQuery().data?.result
-  const { governance } = useWalletStore((s) => s.selectedProposal)
+  const governance = useProposalGovernanceQuery().data?.result
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
 
   const isVoting =
@@ -27,8 +27,7 @@ export const useIsVoting = () => {
 
 export const useIsInCoolOffTime = () => {
   const proposal = useRouteProposalQuery().data?.result
-
-  const { governance } = useWalletStore((s) => s.selectedProposal)
+  const governance = useProposalGovernanceQuery().data?.result
 
   return isInCoolOffTime(proposal?.account, governance?.account)
 }

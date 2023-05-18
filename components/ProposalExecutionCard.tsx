@@ -12,13 +12,15 @@ import { ntext } from '@utils/ntext'
 import Button from '@components/Button'
 import { diffTime } from '@components/ProposalRemainingVotingTime'
 import useProposalTransactions from '@hooks/useProposalTransactions'
+import { useRouteProposalQuery } from '@hooks/queries/proposal'
 
 interface Props {
   className?: string
 }
 
 export default function ProposalExecutionCard(props: Props) {
-  const { instructions, proposal } = useProposal()
+  const proposal = useRouteProposalQuery().data?.result
+  const { instructions } = useProposal()
   const [playState, setPlayState] = useState(PlayState.Unplayed)
   const [timeLeft, setTimeLeft] = useState<
     undefined | ReturnType<typeof diffTime>

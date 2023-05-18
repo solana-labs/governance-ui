@@ -15,9 +15,11 @@ import Button from '@components/Button'
 import { dryRunInstruction } from 'actions/dryRunInstruction'
 import { getExplorerInspectorUrl } from '@components/explorer/tools'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRouteProposalQuery } from '@hooks/queries/proposal'
 
 export function InstructionPanel() {
-  const { instructions, proposal } = useProposal()
+  const proposal = useRouteProposalQuery().data?.result
+  const { instructions } = useProposal()
   const { realmInfo } = useRealm()
   const mounted = useRef(false)
   useEffect(() => {

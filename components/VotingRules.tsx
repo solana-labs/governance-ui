@@ -10,7 +10,7 @@ import {
   Time,
 } from '@carbon/icons-react'
 import { capitalize } from '@utils/helpers'
-import useProposal from '@hooks/useProposal'
+import { useProposalGovernanceQuery } from '@hooks/useProposal'
 import { VoteTipping, getNativeTreasuryAddress } from '@solana/spl-governance'
 import { secondsInDay } from 'date-fns'
 import clsx from 'clsx'
@@ -22,6 +22,7 @@ import useRealm from '@hooks/useRealm'
 import { ACCOUNT_NAMES } from './instructions/tools'
 import { ExploreButton } from './treasuryV2/Details/ExploreLink'
 import Tooltip from './Tooltip'
+import { useRouteProposalQuery } from '@hooks/queries/proposal'
 
 const formatOneDecimal = (x: number) => x.toFixed(1).replace(/[.,]0$/, '')
 
@@ -36,7 +37,8 @@ const TIPPING = {
 } as const
 
 const VotingRules = () => {
-  const { proposal, governance } = useProposal()
+  const proposal = useRouteProposalQuery().data?.result
+  const governance = useProposalGovernanceQuery().data?.result
   const votingPop = useVotingPop()
   const vetoVotePop = useVetoingPop()
   const { symbol } = useRealm()

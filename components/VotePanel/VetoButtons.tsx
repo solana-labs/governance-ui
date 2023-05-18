@@ -5,7 +5,6 @@ import useRealm from '@hooks/useRealm'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { VoteThresholdType, VoteKind } from '@solana/spl-governance'
 import { useMemo, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import {
   useIsInCoolOffTime,
   useIsVoting,
@@ -17,13 +16,14 @@ import {
   useUserCouncilTokenOwnerRecord,
 } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { useProposalGovernanceQuery } from '@hooks/useProposal'
 
 /* 
   returns: undefined if loading, false if nobody can veto, 'council' if council can veto, 'community' if community can veto
 */
 export const useVetoingPop = () => {
   const tokenRole = useVotingPop()
-  const { governance } = useWalletStore((s) => s.selectedProposal)
+  const governance = useProposalGovernanceQuery().data?.result
   const realm = useRealmQuery().data?.result
   const vetoingPop = useMemo(() => {
     if (governance === undefined) return undefined

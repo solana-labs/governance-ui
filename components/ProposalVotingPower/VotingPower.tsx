@@ -16,7 +16,6 @@ import {
   nftPluginsPks,
   vsrPluginsPks,
 } from '@hooks/useVotingPlugins'
-import useProposal from '@hooks/useProposal'
 
 import CommunityVotingPower from './CommunityVotingPower'
 import CouncilVotingPower from './CouncilVotingPower'
@@ -36,6 +35,7 @@ import {
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
 import { useVotingPop } from '@components/VotePanel/hooks'
+import { useRouteProposalQuery } from '@hooks/queries/proposal'
 
 enum Type {
   Council,
@@ -120,7 +120,7 @@ interface Props {
 }
 
 export default function VotingPower(props: Props) {
-  const { proposal } = useProposal()
+  const proposal = useRouteProposalQuery().data?.result
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
   const realm = useRealmQuery().data?.result

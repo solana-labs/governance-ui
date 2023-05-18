@@ -4,7 +4,6 @@ import classNames from 'classnames'
 
 import useRealm from '@hooks/useRealm'
 import { calculateMaxVoteScore } from '@models/proposal/calulateMaxVoteScore'
-import useProposal from '@hooks/useProposal'
 import useWalletStore from 'stores/useWalletStore'
 import { SecondaryButton } from '@components/Button'
 
@@ -16,6 +15,7 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useUserCouncilTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmCouncilMintInfoQuery } from '@hooks/queries/mintInfo'
+import { useRouteProposalQuery } from '@hooks/queries/proposal'
 
 interface Props {
   className?: string
@@ -27,7 +27,8 @@ export default function CouncilVotingPower(props: Props) {
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
 
   const { councilTokenAccount, ownVoterWeight, realmInfo } = useRealm()
-  const { proposal } = useProposal()
+  const proposal = useRouteProposalQuery().data?.result
+
   const fetchWalletTokenAccounts = useWalletStore(
     (s) => s.actions.fetchWalletTokenAccounts
   )

@@ -23,12 +23,12 @@ import { diffTime } from './ProposalRemainingVotingTime'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
+import useProposal, { useProposalGovernanceQuery } from '@hooks/useProposal'
 
 const ProposalActionsPanel = () => {
   const proposal = useRouteProposalQuery().data?.result
-  const { governance, proposalOwner } = useWalletStore(
-    (s) => s.selectedProposal
-  )
+  const governance = useProposalGovernanceQuery().data?.result
+  const { proposalOwner } = useProposal()
   const { realmInfo } = useRealm()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected

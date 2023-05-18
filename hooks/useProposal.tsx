@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router'
 import useWalletStore from '../stores/useWalletStore'
 import { useRouteProposalQuery } from './queries/proposal'
+import { useGovernanceByPubkeyQuery } from './queries/governance'
 
 export default function useProposal() {
   const router = useRouter()
@@ -11,17 +12,21 @@ export default function useProposal() {
     descriptionLink,
     instructions,
     proposalMint,
-    governance,
     proposalOwner,
   } = useWalletStore((s) => s.selectedProposal)
 
   return {
     pk,
-    proposal,
+    //proposal,
     descriptionLink,
     instructions,
     proposalMint,
-    governance,
+    //governance,
     proposalOwner,
   }
+}
+
+export const useProposalGovernanceQuery = () => {
+  const proposal = useRouteProposalQuery().data?.result
+  return useGovernanceByPubkeyQuery(proposal?.account.governance)
 }

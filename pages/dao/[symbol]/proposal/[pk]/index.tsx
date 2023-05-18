@@ -1,7 +1,7 @@
 import ReactMarkdown from 'react-markdown/react-markdown.min'
 import remarkGfm from 'remark-gfm'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
-import useProposal from 'hooks/useProposal'
+import useProposal, { useProposalGovernanceQuery } from 'hooks/useProposal'
 import ProposalStateBadge from '@components/ProposalStateBadge'
 import { InstructionPanel } from 'components/instructions/instructionPanel'
 import DiscussionPanel from 'components/chat/DiscussionPanel'
@@ -10,7 +10,7 @@ import { ApprovalProgress, VetoProgress } from '@components/QuorumProgress'
 import useRealm from 'hooks/useRealm'
 import useProposalVotes from 'hooks/useProposalVotes'
 import ProposalTimeStatus from 'components/ProposalTimeStatus'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import ProposalActionsPanel from '@components/ProposalActions'
 import { getRealmExplorerHost } from 'tools/routing'
 import { ProposalState } from '@solana/spl-governance'
@@ -28,10 +28,14 @@ import NftProposalVoteState from 'NftVotePlugin/NftProposalVoteState'
 import ProposalWarnings from './ProposalWarnings'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import VotingRules from '@components/VotingRules'
+import { useRouteProposalQuery } from '@hooks/queries/proposal'
 
 const Proposal = () => {
   const { realmInfo, symbol } = useRealm()
-  const { proposal, descriptionLink, governance } = useProposal()
+  const proposal = useRouteProposalQuery().data?.result
+  const governance = useProposalGovernanceQuery().data?.result
+  const { descriptionLink } = useProposal()
+
   const [description, setDescription] = useState('')
   const voteData = useProposalVotes(proposal?.account)
   const currentWallet = useWalletOnePointOh()

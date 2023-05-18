@@ -29,6 +29,7 @@ import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
+import { useProposalGovernanceQuery } from '@hooks/useProposal'
 
 export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
   const client = useVotePluginsClientStore(
@@ -44,7 +45,7 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
   const connected = !!wallet?.connected
   const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
   const fetchProposal = useWalletStore((s) => s.actions.fetchProposal)
-  const { governance } = useWalletStore((s) => s.selectedProposal)
+  const governance = useProposalGovernanceQuery().data?.result
   const maxVoterWeight = useMaxVoteRecord()?.pubkey || undefined
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
   const isVoting = useIsVoting()
