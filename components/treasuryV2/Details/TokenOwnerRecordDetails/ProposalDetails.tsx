@@ -149,7 +149,6 @@ export default function ProposalDetails({
           data: getInstructionDataFromBase64(serializedIx),
           holdUpTime: currentGovernance.account.config.minInstructionHoldUpTime,
           prerequisiteInstructions: [],
-          shouldSplitIntoSeparateTxs: false,
         }
 
         instructionsData.push(ixData)

@@ -220,7 +220,6 @@ const PerpCreate = ({
     const obj: UiInstruction = {
       prerequisiteInstructions: prerequisiteInstructions,
       prerequisiteInstructionsSigners: prerequisiteInstructionsSigners,
-      shouldSplitIntoSeparateTxs: true,
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,

@@ -178,25 +178,6 @@ const New = () => {
   const [isLoadingDraft, setIsLoadingDraft] = useState(false)
 
   const isLoading = isLoadingSignedProposal || isLoadingDraft
-  //   const customInstructionFilterForSelectedGovernance = (
-  //     instructionType: Instructions
-  //   ) => {
-  //     if (!governance) {
-  //       return true
-  //     } else {
-  //       const governanceType = governance.account.accountType
-  //       const instructionsAvailiableAfterProgramGovernance = [Instructions.Base64]
-  //       switch (governanceType) {
-  //         case GovernanceAccountType.ProgramGovernanceV1:
-  //         case GovernanceAccountType.ProgramGovernanceV2:
-  //           return instructionsAvailiableAfterProgramGovernance.includes(
-  //             instructionType
-  //           )
-  //         default:
-  //           return true
-  //       }
-  //     }
-  //   }
 
   const [instructionsData, setInstructions] = useState<
     ComponentInstructionData[]
@@ -295,10 +276,7 @@ const New = () => {
                   instruction.prerequisiteInstructions || [],
                 prerequisiteInstructionsSigners:
                   instruction.prerequisiteInstructionsSigners || [],
-                chunkSplitByDefault: instruction.chunkSplitByDefault || false,
                 signers: instruction.signers,
-                shouldSplitIntoSeparateTxs:
-                  instruction.shouldSplitIntoSeparateTxs,
                 chunkBy: instruction.chunkBy || 2,
               }
             })
@@ -317,11 +295,9 @@ const New = () => {
               ? getTimestampFromDays(x.customHoldUpTime)
               : selectedGovernance?.account?.config.minInstructionHoldUpTime,
             prerequisiteInstructions: x.prerequisiteInstructions || [],
-            chunkSplitByDefault: x.chunkSplitByDefault || false,
             signers: x.signers,
             prerequisiteInstructionsSigners:
               x.prerequisiteInstructionsSigners || [],
-            shouldSplitIntoSeparateTxs: x.shouldSplitIntoSeparateTxs,
             chunkBy: x.chunkBy || 2,
           }
         }),

@@ -187,7 +187,6 @@ export async function getFriktionDepositInstruction({
     governance: governedTokenAccount?.governance,
     prerequisiteInstructions: prerequisiteInstructions,
     signers,
-    shouldSplitIntoSeparateTxs: true,
   }
   return obj
 }
@@ -306,7 +305,6 @@ export async function getFriktionWithdrawInstruction({
     governance: governedTokenAccount?.governance,
     prerequisiteInstructions: prerequisiteInstructions,
     signers,
-    shouldSplitIntoSeparateTxs: true,
   }
   return obj
 }
@@ -418,7 +416,6 @@ export async function getFriktionClaimPendingDepositInstruction({
     governance: governedTokenAccount?.governance,
     prerequisiteInstructions: prerequisiteInstructions,
     signers,
-    shouldSplitIntoSeparateTxs: true,
   }
   return obj
 }
@@ -534,7 +531,6 @@ export async function getFriktionClaimPendingWithdrawInstruction({
     governance: governedTokenAccount?.governance,
     prerequisiteInstructions: prerequisiteInstructions,
     signers,
-    shouldSplitIntoSeparateTxs: true,
   }
   return obj
 }
