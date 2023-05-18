@@ -23,9 +23,11 @@ export default function InspectorButton({
   const wasExecuted =
     proposalInstruction.account.executionStatus ===
     InstructionExecutionStatus.Success
-  const executedAtFormatted = dayjs(
-    proposalInstruction.account.executedAt!.toNumber() * 1000
-  ).format('DD-MM-YYYY HH:mm')
+  const executedAtFormatted = proposalInstruction.account.executedAt
+    ? dayjs(proposalInstruction.account.executedAt.toNumber() * 1000).format(
+        'DD-MM-YYYY HH:mm'
+      )
+    : ''
 
   const showInspector = async () => {
     let inspectUrl = ''
