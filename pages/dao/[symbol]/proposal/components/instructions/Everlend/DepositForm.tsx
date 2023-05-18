@@ -183,7 +183,6 @@ const DepositForm = ({
       additionalSerializedInstructions: additionalSerializedIxs,
       isValid: true,
       governance: form.governedAccount.governance,
-      shouldSplitIntoSeparateTxs: true,
     }
   }
 

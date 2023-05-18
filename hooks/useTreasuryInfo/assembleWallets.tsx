@@ -1,7 +1,6 @@
 import { BigNumber } from 'bignumber.js'
 import { MintInfo } from '@solana/spl-token'
 import {
-  getNativeTreasuryAddress,
   getProgramDataAccount,
   ProgramAccount,
   Realm,
@@ -70,9 +69,7 @@ export const assembleWallets = async (
     if (account.isSol && account.extensions.transferAddress) {
       walletAddress = account.extensions.transferAddress.toBase58()
     } else if (account.governance.pubkey) {
-      walletAddress = (
-        await getNativeTreasuryAddress(programId, account.governance.pubkey)
-      ).toBase58()
+      walletAddress = account.governance.nativeTreasuryAddress.toBase58()
     }
 
     if (!walletAddress) {

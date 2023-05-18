@@ -42,7 +42,7 @@ const TransactionInstructionCard = ({
       realm
     )
     setDescriptor(desc)
-  }, [connection, instructionData, realm])
+  }, [instructionData])
 
   const getAmountImg = useCallback(async () => {
     const sourcePk = instructionData.accounts[0].pubkey
@@ -86,12 +86,7 @@ const TransactionInstructionCard = ({
       setTokenImgUrl(imgUrl)
     }
     return
-  }, [
-    connection,
-    governedTokenAccountsWithoutNfts,
-    instructionData.accounts,
-    nftsGovernedTokenAccounts,
-  ])
+  }, [instructionData.accounts])
 
   useEffect(() => {
     handleGetDescriptors()

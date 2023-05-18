@@ -157,6 +157,19 @@ function extractGovernanceAccountFromInstructionsData(
   )
 }
 
+const getDefaultInstructionProps = (
+  x: UiInstruction,
+  selectedGovernance: ProgramAccount<Governance> | null
+) => ({
+  holdUpTime: x.customHoldUpTime
+    ? getTimestampFromDays(x.customHoldUpTime)
+    : selectedGovernance?.account?.config.minInstructionHoldUpTime,
+  prerequisiteInstructions: x.prerequisiteInstructions || [],
+  signers: x.signers,
+  prerequisiteInstructionsSigners: x.prerequisiteInstructionsSigners || [],
+  chunkBy: x.chunkBy || 2,
+})
+
 const New = () => {
   const router = useRouter()
   const { handleCreateProposal } = useCreateProposal()
@@ -178,25 +191,6 @@ const New = () => {
   const [isLoadingDraft, setIsLoadingDraft] = useState(false)
 
   const isLoading = isLoadingSignedProposal || isLoadingDraft
-  //   const customInstructionFilterForSelectedGovernance = (
-  //     instructionType: Instructions
-  //   ) => {
-  //     if (!governance) {
-  //       return true
-  //     } else {
-  //       const governanceType = governance.account.accountType
-  //       const instructionsAvailiableAfterProgramGovernance = [Instructions.Base64]
-  //       switch (governanceType) {
-  //         case GovernanceAccountType.ProgramGovernanceV1:
-  //         case GovernanceAccountType.ProgramGovernanceV2:
-  //           return instructionsAvailiableAfterProgramGovernance.includes(
-  //             instructionType
-  //           )
-  //         default:
-  //           return true
-  //       }
-  //     }
-  //   }
 
   const [instructionsData, setInstructions] = useState<
     ComponentInstructionData[]
@@ -280,51 +274,28 @@ const New = () => {
         throw Error('No governance selected')
       }
 
-      //TODO fix duplicated instructions when use only additional instruction
-      const additionalInstructions = [
-        ...(instructions
-          .flatMap((instruction) => {
-            return instruction.additionalSerializedInstructions?.map((x) => {
-              return {
-                data: x ? getInstructionDataFromBase64(x) : null,
-                holdUpTime: instruction.customHoldUpTime
-                  ? getTimestampFromDays(instruction.customHoldUpTime)
-                  : selectedGovernance?.account?.config
-                      .minInstructionHoldUpTime,
-                prerequisiteInstructions:
-                  instruction.prerequisiteInstructions || [],
-                prerequisiteInstructionsSigners:
-                  instruction.prerequisiteInstructionsSigners || [],
-                chunkSplitByDefault: instruction.chunkSplitByDefault || false,
-                signers: instruction.signers,
-                shouldSplitIntoSeparateTxs:
-                  instruction.shouldSplitIntoSeparateTxs,
-                chunkBy: instruction.chunkBy || 2,
-              }
-            })
-          })
-          .filter((x) => x) as InstructionDataWithHoldUpTime[]),
-      ]
+      const additionalInstructions = instructions
+        .flatMap((instruction) =>
+          instruction.additionalSerializedInstructions
+            ?.filter(
+              (value, index, self) =>
+                index === self.findIndex((t) => t === value)
+            )
+            .map((x) => ({
+              data: x ? getInstructionDataFromBase64(x) : null,
+              ...getDefaultInstructionProps(instruction, selectedGovernance),
+            }))
+        )
+        .filter((x) => x) as InstructionDataWithHoldUpTime[]
 
       const instructionsData = [
         ...additionalInstructions,
-        ...instructions.map((x) => {
-          return {
-            data: x.serializedInstruction
-              ? getInstructionDataFromBase64(x.serializedInstruction)
-              : null,
-            holdUpTime: x.customHoldUpTime
-              ? getTimestampFromDays(x.customHoldUpTime)
-              : selectedGovernance?.account?.config.minInstructionHoldUpTime,
-            prerequisiteInstructions: x.prerequisiteInstructions || [],
-            chunkSplitByDefault: x.chunkSplitByDefault || false,
-            signers: x.signers,
-            prerequisiteInstructionsSigners:
-              x.prerequisiteInstructionsSigners || [],
-            shouldSplitIntoSeparateTxs: x.shouldSplitIntoSeparateTxs,
-            chunkBy: x.chunkBy || 2,
-          }
-        }),
+        ...instructions.map((x) => ({
+          data: x.serializedInstruction
+            ? getInstructionDataFromBase64(x.serializedInstruction)
+            : null,
+          ...getDefaultInstructionProps(x, selectedGovernance),
+        })),
       ]
 
       try {

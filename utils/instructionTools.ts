@@ -530,10 +530,7 @@ export async function getCreateTokenMetadataInstruction({
   let payer = payerSolTreasury
 
   if (!payer && shouldMakeSolTreasury && governedMintInfoAccount) {
-    payer = await getNativeTreasuryAddress(
-      governedMintInfoAccount.governance.owner,
-      governedMintInfoAccount.governance.pubkey
-    )
+    payer = governedMintInfoAccount.governance.nativeTreasuryAddress
   }
 
   if (
@@ -675,3 +672,6 @@ export async function getUpdateTokenMetadataInstruction({
   }
   return obj
 }
+
+export const deduplicateObjsFilter = (value, index, self) =>
+  index === self.findIndex((t) => JSON.stringify(t) === JSON.stringify(value))

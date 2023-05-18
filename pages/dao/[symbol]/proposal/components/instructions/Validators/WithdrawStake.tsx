@@ -191,7 +191,6 @@ const WithdrawValidatorStake = ({
       ),
       isValid: true,
       governance: form.governedTokenAccount.governance,
-      shouldSplitIntoSeparateTxs: false,
     }
   }
 

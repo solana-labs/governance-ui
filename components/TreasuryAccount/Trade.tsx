@@ -321,8 +321,6 @@ const Trade: React.FC<TradeProps> = ({ tokenAccount }) => {
         holdUpTime:
           currentAccount?.governance?.account?.config.minInstructionHoldUpTime,
         prerequisiteInstructions,
-        shouldSplitIntoSeparateTxs: true,
-        chunkSplitByDefault: true,
       }
       proposalInstructions.push(instructionData)
 
