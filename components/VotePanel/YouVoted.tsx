@@ -28,6 +28,7 @@ import { useHasVoteTimeExpired } from '@hooks/useHasVoteTimeExpired'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { useRouteProposalQuery } from '@hooks/queries/proposal'
 
 export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
   const client = useVotePluginsClientStore(
@@ -35,7 +36,7 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
   )
   const router = useRouter()
   const { pk } = router.query
-  const { proposal } = useWalletStore((s) => s.selectedProposal)
+  const proposal = useRouteProposalQuery().data?.result
   const realm = useRealmQuery().data?.result
   const { realmInfo } = useRealm()
   const wallet = useWalletOnePointOh()

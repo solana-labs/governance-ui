@@ -16,6 +16,7 @@ import {
   useUserCouncilTokenOwnerRecord,
 } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { useRouteProposalQuery } from '@hooks/queries/proposal'
 
 const DiscussionForm = () => {
   const [comment, setComment] = useState('')
@@ -31,7 +32,7 @@ const DiscussionForm = () => {
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const connection = useWalletStore((s) => s.connection)
-  const { proposal } = useWalletStore((s) => s.selectedProposal)
+  const proposal = useRouteProposalQuery().data?.result
   const { fetchChatMessages } = useWalletStore((s) => s.actions)
   const { tokenRole } = useWalletStore((s) => s.selectedProposal)
   const commenterVoterTokenRecord =

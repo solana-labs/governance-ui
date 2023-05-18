@@ -10,6 +10,7 @@ import { ProposalTransaction } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRouteProposalQuery } from '@hooks/queries/proposal'
 
 type ExecuteInstructionProps = {
   onClose: () => void
@@ -24,7 +25,7 @@ const ExecuteInstruction = ({
 }: ExecuteInstructionProps) => {
   const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
-  const { proposal } = useWalletStore((s) => s.selectedProposal)
+  const proposal = useRouteProposalQuery().data?.result
   const { realmInfo } = useRealm()
 
   const handleExecuteInstruction = async () => {

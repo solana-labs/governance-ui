@@ -3,6 +3,7 @@ import {
   useAddressQuery_CouncilTokenOwner,
 } from '@hooks/queries/addresses/tokenOwnerRecord'
 import { useAddressQuery_SelectedProposalVoteRecord } from '@hooks/queries/addresses/voteRecord'
+import { useRouteProposalQuery } from '@hooks/queries/proposal'
 import {
   useUserCommunityTokenOwnerRecord,
   useUserCouncilTokenOwnerRecord,
@@ -19,7 +20,8 @@ import dayjs from 'dayjs'
 import useWalletStore from 'stores/useWalletStore'
 
 export const useIsVoting = () => {
-  const { governance, proposal } = useWalletStore((s) => s.selectedProposal)
+  const proposal = useRouteProposalQuery().data?.result
+  const { governance } = useWalletStore((s) => s.selectedProposal)
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
 
   const isVoting =
@@ -28,7 +30,9 @@ export const useIsVoting = () => {
 }
 
 export const useIsInCoolOffTime = () => {
-  const { governance, proposal } = useWalletStore((s) => s.selectedProposal)
+  const proposal = useRouteProposalQuery().data?.result
+
+  const { governance } = useWalletStore((s) => s.selectedProposal)
 
   return isInCoolOffTime(proposal?.account, governance?.account)
 }

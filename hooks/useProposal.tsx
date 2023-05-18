@@ -1,12 +1,13 @@
 import { useRouter } from 'next/router'
 import useWalletStore from '../stores/useWalletStore'
+import { useRouteProposalQuery } from './queries/proposal'
 
 export default function useProposal() {
   const router = useRouter()
   const { pk } = router.query
+  const proposal = useRouteProposalQuery().data?.result
 
   const {
-    proposal,
     descriptionLink,
     instructions,
     proposalMint,

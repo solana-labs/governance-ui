@@ -4,6 +4,9 @@ import asFindable from '@utils/queries/asFindable'
 import useWalletStore from 'stores/useWalletStore'
 import { getProposal } from '@solana/spl-governance'
 import { useRealmQuery } from './realm'
+import { useRouter } from 'next/router'
+import { tryParsePublicKey } from '@tools/core/pubkey'
+import { useMemo } from 'react'
 
 export const proposalQueryKeys = {
   all: (cluster: string) => [cluster, 'Proposal'],
@@ -34,6 +37,15 @@ export const useProposalByPubkeyQuery = (pubkey?: PublicKey) => {
   })
 
   return query
+}
+
+export const useRouteProposalQuery = () => {
+  const { pk } = useRouter().query
+  const proposalPk = useMemo(
+    () => (typeof pk === 'string' ? tryParsePublicKey(pk) : undefined),
+    [pk]
+  )
+  return useProposalByPubkeyQuery(proposalPk)
 }
 
 export const useRealmProposalsQuery = () => {

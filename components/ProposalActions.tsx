@@ -22,9 +22,11 @@ import dayjs from 'dayjs'
 import { diffTime } from './ProposalRemainingVotingTime'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRouteProposalQuery } from '@hooks/queries/proposal'
 
 const ProposalActionsPanel = () => {
-  const { governance, proposal, proposalOwner } = useWalletStore(
+  const proposal = useRouteProposalQuery().data?.result
+  const { governance, proposalOwner } = useWalletStore(
     (s) => s.selectedProposal
   )
   const { realmInfo } = useRealm()

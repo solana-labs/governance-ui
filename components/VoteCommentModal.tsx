@@ -28,6 +28,7 @@ import { voteRecordQueryKeys } from '@hooks/queries/voteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import { useRouteProposalQuery } from '@hooks/queries/proposal'
 
 interface VoteCommentModalProps {
   onClose: () => void
@@ -51,7 +52,7 @@ const useSubmitVote = ({
   const [submitting, setSubmitting] = useState(false)
   const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
-  const { proposal } = useWalletStore((s) => s.selectedProposal)
+  const proposal = useRouteProposalQuery().data?.result
   const { fetchChatMessages } = useWalletStore((s) => s.actions)
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
