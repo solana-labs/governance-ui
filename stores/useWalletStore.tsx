@@ -77,7 +77,7 @@ interface WalletStore extends State {
     descriptionLink?: string
     proposalMint?: MintAccount
     loading: boolean
-    tokenRole?: GoverningTokenRole
+    //tokenRole?: GoverningTokenRole
     proposalOwner: ProgramAccount<TokenOwnerRecord> | undefined
   }
   providerName: string | undefined

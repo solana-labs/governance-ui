@@ -3,17 +3,14 @@ import VoteCommentModal from '@components/VoteCommentModal'
 import { BanIcon } from '@heroicons/react/solid'
 import useRealm from '@hooks/useRealm'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import {
-  GoverningTokenRole,
-  VoteThresholdType,
-  VoteKind,
-} from '@solana/spl-governance'
+import { VoteThresholdType, VoteKind } from '@solana/spl-governance'
 import { useMemo, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import {
   useIsInCoolOffTime,
   useIsVoting,
   useProposalVoteRecordQuery,
+  useVotingPop,
 } from './hooks'
 import {
   useUserCommunityTokenOwnerRecord,
@@ -25,12 +22,13 @@ import { useRealmQuery } from '@hooks/queries/realm'
   returns: undefined if loading, false if nobody can veto, 'council' if council can veto, 'community' if community can veto
 */
 export const useVetoingPop = () => {
-  const { tokenRole, governance } = useWalletStore((s) => s.selectedProposal)
+  const tokenRole = useVotingPop()
+  const { governance } = useWalletStore((s) => s.selectedProposal)
   const realm = useRealmQuery().data?.result
   const vetoingPop = useMemo(() => {
     if (governance === undefined) return undefined
 
-    return tokenRole === GoverningTokenRole.Community
+    return tokenRole === 'community'
       ? governance?.account.config.councilVetoVoteThreshold.type !==
           VoteThresholdType.Disabled &&
           // if there is no council then there's not actually a vetoing population, in my opinion

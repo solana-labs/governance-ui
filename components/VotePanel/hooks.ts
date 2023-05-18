@@ -9,13 +9,9 @@ import {
   useUserCouncilTokenOwnerRecord,
 } from '@hooks/queries/tokenOwnerRecord'
 import { useVoteRecordByPubkeyQuery } from '@hooks/queries/voteRecord'
+import useRoleOfGovToken from '@hooks/selectedRealm/useRoleOfToken'
 import { useHasVoteTimeExpired } from '@hooks/useHasVoteTimeExpired'
-import {
-  ProposalState,
-  GoverningTokenRole,
-  Proposal,
-  Governance,
-} from '@solana/spl-governance'
+import { ProposalState, Proposal, Governance } from '@solana/spl-governance'
 import dayjs from 'dayjs'
 import useWalletStore from 'stores/useWalletStore'
 
@@ -64,41 +60,37 @@ export const isInCoolOffTime = (
 }
 
 export const useVotingPop = () => {
-  const { tokenRole } = useWalletStore((s) => s.selectedProposal)
+  const proposal = useRouteProposalQuery().data?.result
+  const role = useRoleOfGovToken(proposal?.account.governingTokenMint)
 
-  const votingPop =
-    tokenRole === GoverningTokenRole.Community ? 'community' : 'council'
-
-  return votingPop
+  return role !== 'not found' ? role : undefined
 }
 
 export const useVoterTokenRecord = () => {
-  const { tokenRole } = useWalletStore((s) => s.selectedProposal)
+  const votingPop = useVotingPop()
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
 
   const voterTokenRecord =
-    tokenRole === GoverningTokenRole.Community
-      ? ownTokenRecord
-      : ownCouncilTokenRecord
+    votingPop === 'community' ? ownTokenRecord : ownCouncilTokenRecord
   return voterTokenRecord
 }
 
 export const useProposalVoteRecordQuery = (quorum: 'electoral' | 'veto') => {
-  const tokenRole = useWalletStore((s) => s.selectedProposal.tokenRole)
+  const tokenRole = useVotingPop()
   const community = useAddressQuery_CommunityTokenOwner()
   const council = useAddressQuery_CouncilTokenOwner()
 
   const electoral =
     tokenRole === undefined
       ? undefined
-      : tokenRole === GoverningTokenRole.Community
+      : tokenRole === 'community'
       ? community
       : council
   const veto =
     tokenRole === undefined
       ? undefined
-      : tokenRole === GoverningTokenRole.Community
+      : tokenRole === 'community'
       ? council
       : community
 

@@ -3,7 +3,7 @@ import Button from '../Button'
 import Input from '../inputs/Input'
 import useWalletStore from '../../stores/useWalletStore'
 import useRealm from '../../hooks/useRealm'
-import { RpcContext, GoverningTokenRole } from '@solana/spl-governance'
+import { RpcContext } from '@solana/spl-governance'
 import { ChatMessageBody, ChatMessageBodyType } from '@solana/spl-governance'
 import { postChatMessage } from '../../actions/chat/postMessage'
 import Loading from '../Loading'
@@ -17,6 +17,7 @@ import {
 } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
+import { useVotingPop } from '@components/VotePanel/hooks'
 
 const DiscussionForm = () => {
   const [comment, setComment] = useState('')
@@ -34,11 +35,9 @@ const DiscussionForm = () => {
   const connection = useWalletStore((s) => s.connection)
   const proposal = useRouteProposalQuery().data?.result
   const { fetchChatMessages } = useWalletStore((s) => s.actions)
-  const { tokenRole } = useWalletStore((s) => s.selectedProposal)
+  const tokenRole = useVotingPop()
   const commenterVoterTokenRecord =
-    tokenRole === GoverningTokenRole.Community
-      ? ownTokenRecord
-      : ownCouncilTokenRecord
+    tokenRole === 'community' ? ownTokenRecord : ownCouncilTokenRecord
 
   const submitComment = async () => {
     setSubmitting(true)

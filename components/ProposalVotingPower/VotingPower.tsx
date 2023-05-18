@@ -8,7 +8,6 @@ import {
 } from '@solana/spl-governance'
 import { AccountInfo, MintInfo } from '@solana/spl-token'
 import type { PublicKey } from '@solana/web3.js'
-import { GoverningTokenRole } from '@solana/spl-governance'
 
 import { TokenProgramAccount } from '@utils/tokens'
 import useRealm from '@hooks/useRealm'
@@ -18,7 +17,6 @@ import {
   vsrPluginsPks,
 } from '@hooks/useVotingPlugins'
 import useProposal from '@hooks/useProposal'
-import useWalletStore from 'stores/useWalletStore'
 
 import CommunityVotingPower from './CommunityVotingPower'
 import CouncilVotingPower from './CouncilVotingPower'
@@ -37,6 +35,7 @@ import {
   useRealmCommunityMintInfoQuery,
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
+import { useVotingPop } from '@components/VotePanel/hooks'
 
 enum Type {
   Council,
@@ -56,7 +55,7 @@ function getTypes(
   ownTokenRecord?: ProgramAccount<TokenOwnerRecord>,
   proposal?: ProgramAccount<Proposal>,
   realm?: ProgramAccount<Realm>,
-  tokenRole?: GoverningTokenRole
+  tokenRole?: 'community' | 'council'
 ) {
   const types: Type[] = []
 
@@ -72,7 +71,7 @@ function getTypes(
   if (
     currentPluginPk &&
     nftPluginsPks.includes(currentPluginPk.toBase58()) &&
-    tokenRole === GoverningTokenRole.Community
+    tokenRole === 'community'
   ) {
     types.push(Type.NFT)
   } else if (
@@ -82,12 +81,12 @@ function getTypes(
     if (
       (!realm?.account.config.councilMint ||
         isDepositVisible(mint, realm?.account.communityMint)) &&
-      tokenRole === GoverningTokenRole.Community
+      tokenRole === 'community'
     ) {
       types.push(Type.LockedCommunity)
     } else if (
       isDepositVisible(councilMint, realm?.account.config.councilMint) &&
-      tokenRole === GoverningTokenRole.Council
+      tokenRole === 'council'
     ) {
       types.push(Type.LockedCouncil)
     }
@@ -98,18 +97,18 @@ function getTypes(
     if (
       (!realm?.account.config.councilMint ||
         isDepositVisible(mint, realm?.account.communityMint)) &&
-      tokenRole === GoverningTokenRole.Community
+      tokenRole === 'community'
     ) {
       types.push(Type.LockedCommunityNFTRecord)
     } else if (
       isDepositVisible(councilMint, realm?.account.config.councilMint) &&
-      tokenRole === GoverningTokenRole.Council
+      tokenRole === 'council'
     ) {
       types.push(Type.Council)
     }
-  } else if (tokenRole === GoverningTokenRole.Council) {
+  } else if (tokenRole === 'council') {
     types.push(Type.Council)
-  } else if (tokenRole === GoverningTokenRole.Community) {
+  } else if (tokenRole === 'community') {
     types.push(Type.Community)
   }
 
@@ -132,7 +131,7 @@ export default function VotingPower(props: Props) {
   const { councilTokenAccount } = useRealm()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
-  const tokenRole = useWalletStore((s) => s.selectedProposal.tokenRole)
+  const tokenRole = useVotingPop()
 
   const types = getTypes(
     config,
