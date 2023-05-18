@@ -38,6 +38,7 @@ import { useSubDaos } from 'HeliumVotePlugin/hooks/useSubDaos'
 import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
 import { ClaimAllRewardsBtn } from './ClaimAllRewardsBtn'
 import { useClaimAllPositionsRewards } from 'HeliumVotePlugin/hooks/useClaimAllPositionsRewards'
+import { HNT_MINT } from '@helium/spl-utils'
 
 export const LockTokensAccount: React.FC<{
   tokenOwnerRecordPk: string | string[] | undefined
@@ -102,6 +103,8 @@ export const LockTokensAccount: React.FC<{
     s.state.amountLocked,
     s.getPositions,
   ])
+
+  const canDelegate = realm?.account.communityMint.equals(HNT_MINT)
 
   const sortedPositions = useMemo(
     () =>
@@ -361,7 +364,7 @@ export const LockTokensAccount: React.FC<{
             </div>
             <div className="flex items-center justify-between mb-4">
               <h2 className="mb-4">Locked Positions</h2>
-              {isSameWallet && (
+              {isSameWallet && canDelegate && (
                 <ClaimAllRewardsBtn onClick={handleClaimAllRewards} />
               )}
             </div>
