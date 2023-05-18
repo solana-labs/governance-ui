@@ -163,7 +163,7 @@ const New = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const realm = useRealmQuery().data?.result
 
-  const { symbol, realmDisplayName, canChooseWhoVote } = useRealm()
+  const { symbol, realmInfo, canChooseWhoVote } = useRealm()
   const { availableInstructions } = useGovernanceAssets()
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const [voteByCouncil, setVoteByCouncil] = useState(false)
@@ -598,7 +598,9 @@ const New = () => {
             <div className="flex items-center justify-between">
               <h1>
                 Add a proposal
-                {realmDisplayName ? ` to ${realmDisplayName}` : ``}{' '}
+                {realmInfo?.displayName
+                  ? ` to ${realmInfo.displayName}`
+                  : ``}{' '}
               </h1>
             </div>
           </div>

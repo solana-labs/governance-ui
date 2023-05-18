@@ -52,7 +52,9 @@ import {
 import { useRealmGovernancesQuery } from './queries/governance'
 import { useSelectedRealmInfo } from './selectedRealm/useSelectedRealmRegistryEntry'
 
-/** @deprecated This hook has been broken up into many smaller hooks, use those instead, DO NOT use this */
+/**
+ * @deprecated This hook has been broken up into many smaller hooks, use those instead, DO NOT use this
+ */
 export default function useRealm() {
   const router = useRouter()
   const { symbol } = router.query
@@ -225,7 +227,7 @@ export default function useRealm() {
     realmInfo,
     /** @deprecated just use `useRouter().query` directly... */
     symbol,
-    voteSymbol: realmInfo?.voteSymbol,
+    //voteSymbol: realmInfo?.voteSymbol,
     //mint,
     //councilMint,
     //governances,
@@ -235,7 +237,7 @@ export default function useRealm() {
     councilTokenAccount,
     /** @deprecated just use the token owner record directly, ok? */
     ownVoterWeight,
-    realmDisplayName: realmInfo?.displayName ?? realm?.account?.name,
+    //realmDisplayName: realmInfo?.displayName ?? realm?.account?.name,
     canChooseWhoVote,
     //councilTokenOwnerRecords,
     toManyCouncilOutstandingProposalsForUse,

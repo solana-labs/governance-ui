@@ -17,7 +17,7 @@ const RealmHeader = () => {
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
 
-  const { realmInfo, realmDisplayName, symbol, vsrMode } = useRealm()
+  const { realmInfo, symbol, vsrMode } = useRealm()
   const { REALM } = process.env
   const activeMembers = useMembersStore((s) => s.compact.activeMembers)
   const isBackNavVisible = realmInfo?.symbol !== REALM // hide backnav for the default realm
@@ -42,7 +42,7 @@ const RealmHeader = () => {
         ) : null}
       </div>
       <div className="flex flex-col items-center md:flex-row md:justify-between">
-        {realmDisplayName ? (
+        {realmInfo?.displayName ? (
           <div className="flex items-center">
             <div className="flex flex-col items-center pb-3 md:flex-row md:pb-0">
               {realmInfo?.ogImage ? (
@@ -52,11 +52,11 @@ const RealmHeader = () => {
                 ></img>
               ) : (
                 <div className="bg-[rgba(255,255,255,0.1)] h-14 w-14 flex font-bold items-center justify-center rounded-full text-fgd-3">
-                  {realmDisplayName?.charAt(0)}
+                  {realmInfo.displayName.charAt(0)}
                 </div>
               )}
               <div className="flex items-center">
-                <h1 className="ml-3">{realmDisplayName}</h1>
+                <h1 className="ml-3">{realmInfo.displayName}</h1>
               </div>
             </div>
           </div>
