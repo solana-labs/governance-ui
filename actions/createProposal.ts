@@ -1,5 +1,4 @@
 import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js'
-
 import {
   getGovernanceProgramVersion,
   getInstructionDataFromBase64,
@@ -10,11 +9,12 @@ import {
   VoteType,
   withCreateProposal,
   getSignatoryRecordAddress,
+  RpcContext,
+  withInsertTransaction,
+  InstructionData,
+  withSignOffProposal,
+  withAddSignatory,
 } from '@solana/spl-governance'
-import { RpcContext } from '@solana/spl-governance'
-import { withInsertTransaction } from '@solana/spl-governance'
-import { InstructionData } from '@solana/spl-governance'
-import { withSignOffProposal } from '@solana/spl-governance'
 import {
   sendTransactionsV3,
   SequenceType,
@@ -23,8 +23,8 @@ import {
 import { chunks } from '@utils/helpers'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
-import { withAddSignatory } from '@solana/spl-governance'
 import { trySentryLog } from '@utils/logs'
+import { deduplicateObjsFilter } from '@utils/instructionTools'
 export interface InstructionDataWithHoldUpTime {
   data: InstructionData | null
   holdUpTime: number | undefined
@@ -144,7 +144,7 @@ export const createProposal = async (
     .filter((x) => x.chunkBy)
     .map((x) => x.chunkBy!)
 
-  const chunkBy = chunkBys.length ? Math.min(...chunkBys) : 2
+  const lowestChunkBy = chunkBys.length ? Math.min(...chunkBys) : 2
 
   for (const [index, instruction] of instructionsData
     .filter((x) => x.data)
@@ -189,39 +189,28 @@ export const createProposal = async (
     )
   }
 
-  const insertChunks = chunks(insertInstructions, chunkBy)
+  const insertChunks = chunks(insertInstructions, lowestChunkBy)
   const signerChunks = Array(insertChunks.length)
-  signerChunks.push(...chunks(signers, chunkBy))
+
+  signerChunks.push(...chunks(signers, lowestChunkBy))
   signerChunks.fill([])
+
   const deduplicatedPrerequisiteInstructions = prerequisiteInstructions.filter(
-    (value, index, self) =>
-      index ===
-      self.findIndex(
-        (t) =>
-          t.data.toString() === value.data.toString() &&
-          t.keys.every((x) =>
-            value.keys.find(
-              (key) => key.pubkey.toBase58() === x.pubkey.toBase58()
-            )
-          )
-      )
+    deduplicateObjsFilter
   )
+
   const deduplicatedPrerequisiteInstructionsSigners = prerequisiteInstructionsSigners.filter(
-    (value, index, self) =>
-      index ===
-      self.findIndex(
-        (t) =>
-          t.publicKey.toString() === value.publicKey.toString() &&
-          t.secretKey.toString() === value.secretKey.toString()
-      )
+    deduplicateObjsFilter
   )
+
   const signersSet = [
-    ...chunks([...deduplicatedPrerequisiteInstructionsSigners], 5),
+    ...chunks([...deduplicatedPrerequisiteInstructionsSigners], lowestChunkBy),
     [],
     ...signerChunks,
   ]
+
   const txes = [
-    ...chunks(deduplicatedPrerequisiteInstructions, 5),
+    ...chunks(deduplicatedPrerequisiteInstructions, lowestChunkBy),
     instructions,
     ...insertChunks,
   ].map((txBatch, batchIdx) => {
