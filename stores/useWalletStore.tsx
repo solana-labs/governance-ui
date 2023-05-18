@@ -74,7 +74,7 @@ interface WalletStore extends State {
     voteRecordsByVoter: { [voter: string]: ProgramAccount<VoteRecord> }
     signatories: { [signatory: string]: ProgramAccount<VoteRecord> }
     //chatMessages: { [message: string]: ProgramAccount<ChatMessage> }
-    descriptionLink?: string
+    //descriptionLink?: string
     proposalMint?: MintAccount
     loading: boolean
     //tokenRole?: GoverningTokenRole

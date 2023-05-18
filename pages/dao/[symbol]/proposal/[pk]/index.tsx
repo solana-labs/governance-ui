@@ -1,7 +1,7 @@
 import ReactMarkdown from 'react-markdown/react-markdown.min'
 import remarkGfm from 'remark-gfm'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
-import useProposal, { useProposalGovernanceQuery } from 'hooks/useProposal'
+import { useProposalGovernanceQuery } from 'hooks/useProposal'
 import ProposalStateBadge from '@components/ProposalStateBadge'
 import { InstructionPanel } from 'components/instructions/instructionPanel'
 import DiscussionPanel from 'components/chat/DiscussionPanel'
@@ -34,7 +34,7 @@ const Proposal = () => {
   const { realmInfo, symbol } = useRealm()
   const proposal = useRouteProposalQuery().data?.result
   const governance = useProposalGovernanceQuery().data?.result
-  const { descriptionLink } = useProposal()
+  const descriptionLink = proposal?.account.descriptionLink
 
   const [description, setDescription] = useState('')
   const voteData = useProposalVotes(proposal?.account)

@@ -8,17 +8,13 @@ export default function useProposal() {
   const { pk } = router.query
   const proposal = useRouteProposalQuery().data?.result
 
-  const {
-    descriptionLink,
-    instructions,
-    proposalMint,
-    proposalOwner,
-  } = useWalletStore((s) => s.selectedProposal)
+  const { instructions, proposalMint, proposalOwner } = useWalletStore(
+    (s) => s.selectedProposal
+  )
 
   return {
     pk,
     //proposal,
-    descriptionLink,
     instructions,
     proposalMint,
     //governance,
