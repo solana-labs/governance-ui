@@ -33,9 +33,7 @@ export const useChatMessagesByProposalQuery = (proposalPk?: PublicKey) => {
 const DiscussionPanel = () => {
   const { data: chatMessages } = useChatMessagesByProposalQuery()
 
-  const { voteRecordsByVoter, proposalMint } = useWalletStore(
-    (s) => s.selectedProposal
-  )
+  const { voteRecordsByVoter } = useWalletStore((s) => s.selectedProposal)
 
   return (
     <div className="border border-fgd-4 p-4 md:p-6 rounded-lg">
@@ -60,7 +58,6 @@ const DiscussionPanel = () => {
               voteRecordsByVoter[cm.account.author.toBase58()]?.account
             }
             key={cm.pubkey.toBase58()}
-            proposalMint={proposalMint}
           />
         ))}
     </div>
