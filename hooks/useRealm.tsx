@@ -240,7 +240,7 @@ export default function useRealm() {
   return {
     /** @deprecated use useRealmQuery */
     //    realm,
-    realmInfo,
+    // realmInfo,
     /** @deprecated just use `useRouter().query` directly... */
     symbol,
     voteSymbol: realmInfo?.voteSymbol,

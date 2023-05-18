@@ -1,4 +1,4 @@
-import useSelectedRealmPubkey from '@hooks/useSelectedRealmPubkey'
+import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
 import { getRealm, getRealms } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'

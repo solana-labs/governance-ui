@@ -64,7 +64,7 @@ interface RealmInfoAsJSON
 const MAINNET_REALMS = parseCertifiedRealms(mainnetBetaRealms)
 const DEVNET_REALMS = parseCertifiedRealms(devnetRealms)
 
-function parseCertifiedRealms(realms: RealmInfoAsJSON[]) {
+export function parseCertifiedRealms(realms: RealmInfoAsJSON[]) {
   return realms.map((realm) => ({
     ...realm,
     programId: new PublicKey(realm.programId),

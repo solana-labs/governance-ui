@@ -1,4 +1,4 @@
-import useSelectedRealmPubkey from './useSelectedRealmPubkey'
+import useSelectedRealmPubkey from './selectedRealm/useSelectedRealmPubkey'
 import { useProgramVersionByIdQuery } from './queries/useProgramVersionQuery'
 
 const useProgramVersion = () => {
