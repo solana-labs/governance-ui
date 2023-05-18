@@ -73,7 +73,7 @@ interface WalletStore extends State {
     instructions: { [instruction: string]: ProgramAccount<ProposalTransaction> }
     voteRecordsByVoter: { [voter: string]: ProgramAccount<VoteRecord> }
     signatories: { [signatory: string]: ProgramAccount<VoteRecord> }
-    chatMessages: { [message: string]: ProgramAccount<ChatMessage> }
+    //chatMessages: { [message: string]: ProgramAccount<ChatMessage> }
     descriptionLink?: string
     proposalMint?: MintAccount
     loading: boolean

@@ -39,12 +39,16 @@ export const useProposalByPubkeyQuery = (pubkey?: PublicKey) => {
   return query
 }
 
-export const useRouteProposalQuery = () => {
+export const useSelectedProposalPk = () => {
   const { pk } = useRouter().query
-  const proposalPk = useMemo(
+  return useMemo(
     () => (typeof pk === 'string' ? tryParsePublicKey(pk) : undefined),
     [pk]
   )
+}
+
+export const useRouteProposalQuery = () => {
+  const proposalPk = useSelectedProposalPk()
   return useProposalByPubkeyQuery(proposalPk)
 }
 
