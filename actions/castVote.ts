@@ -159,6 +159,9 @@ export async function castVote(
     transaction.add(...instructions)
 
     await sendTransaction({ transaction, wallet, connection, signers })
+    if (runAfterConfirmation) {
+      runAfterConfirmation()
+    }
   }
 
   // we need to chunk instructions

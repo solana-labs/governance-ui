@@ -434,6 +434,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const connectionContext = get().connection
       const programId = get().selectedRealm.programId
       const governances = get().selectedRealm.governances
+      const currentProposal = get().selectedProposal.proposal
       const proposalsByGovernance = await getProposals(
         Object.keys(governances).map((x) => new PublicKey(x)),
         connectionContext,
@@ -447,6 +448,9 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 
       await set((s) => {
         s.selectedRealm.proposals = proposals
+        s.selectedProposal.proposal = currentProposal
+          ? proposals[currentProposal?.pubkey.toBase58()]
+          : s.selectedProposal.proposal
       })
       await get().actions.fetchOwnVoteRecords()
     },
