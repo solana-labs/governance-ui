@@ -5,12 +5,15 @@ import { useRouter } from 'next/router'
 
 import DEVNET_REALMS from 'public/realms/devnet.json'
 import MAINNET_REALMS from 'public/realms/mainnet-beta.json'
+import { useMemo } from 'react'
 
 const useSelectedRealmPubkey = () => {
   const { symbol, cluster } = useRouter().query
 
-  const parsed =
-    typeof symbol === 'string' ? tryParsePublicKey(symbol) : undefined
+  const parsed = useMemo(
+    () => (typeof symbol === 'string' ? tryParsePublicKey(symbol) : undefined),
+    [symbol]
+  )
 
   // if we cant just parse the realm pk from the url, look it up.
   // this happens a lot and might be slightly expensive so i decided to use react-query
