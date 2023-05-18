@@ -78,7 +78,7 @@ interface WalletStore extends State {
     //proposalMint?: MintAccount
     loading: boolean
     //tokenRole?: GoverningTokenRole
-    proposalOwner: ProgramAccount<TokenOwnerRecord> | undefined
+    //proposalOwner: ProgramAccount<TokenOwnerRecord> | undefined
   }
   providerName: string | undefined
   tokenAccounts: TokenProgramAccount<TokenAccount>[]

@@ -6,11 +6,8 @@ import { useGovernanceByPubkeyQuery } from './queries/governance'
 export default function useProposal() {
   const router = useRouter()
   const { pk } = router.query
-  const proposal = useRouteProposalQuery().data?.result
 
-  const { instructions, proposalOwner } = useWalletStore(
-    (s) => s.selectedProposal
-  )
+  const { instructions } = useWalletStore((s) => s.selectedProposal)
 
   return {
     pk,
@@ -18,7 +15,7 @@ export default function useProposal() {
     instructions,
     //proposalMint,
     //governance,
-    proposalOwner,
+    //proposalOwner,
   }
 }
 
