@@ -69,7 +69,7 @@ interface WalletStore extends State {
   selectedProposal: {
     //proposal: ProgramAccount<Proposal> | undefined
     //governance: ProgramAccount<Governance> | undefined
-    realm: ProgramAccount<Realm> | undefined
+    //realm: ProgramAccount<Realm> | undefined
     instructions: { [instruction: string]: ProgramAccount<ProposalTransaction> }
     voteRecordsByVoter: { [voter: string]: ProgramAccount<VoteRecord> }
     signatories: { [signatory: string]: ProgramAccount<VoteRecord> }
