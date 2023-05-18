@@ -150,7 +150,7 @@ const REALM = () => {
     }
     setFilteredProposals(proposals)
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [filters, proposalSearch, sorting])
+  }, [filters, proposalSearch, sorting, proposals])
 
   useEffect(() => {
     const proposals = filterProposals(
