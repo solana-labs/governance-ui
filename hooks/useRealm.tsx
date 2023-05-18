@@ -50,7 +50,9 @@ import {
   useRealmCouncilMintInfoQuery,
 } from './queries/mintInfo'
 import { useRealmGovernancesQuery } from './queries/governance'
+import { useSelectedRealmInfo } from './selectedRealm/useSelectedRealmRegistryEntry'
 
+/** @deprecated This hook has been broken up into many smaller hooks, use those instead, DO NOT use this */
 export default function useRealm() {
   const router = useRouter()
   const { symbol } = router.query
@@ -59,6 +61,7 @@ export default function useRealm() {
   const connected = !!wallet?.connected
   const tokenAccounts = useWalletStore((s) => s.tokenAccounts)
   const realm = useRealmQuery().data?.result
+  const realmInfo = useSelectedRealmInfo()
 
   const {
     communityTORsByOwner: tokenRecords,
@@ -83,7 +86,6 @@ export default function useRealm() {
   const nftVotingPower = useNftPluginStore((s) => s.state.votingPower)
   const gatewayVotingPower = useGatewayPluginStore((s) => s.state.votingPower)
   const sbVotingPower = useSwitchboardPluginStore((s) => s.state.votingPower)
-  const [realmInfo, setRealmInfo] = useState<RealmInfo | undefined>(undefined)
   const currentPluginPk = config?.account?.communityTokenConfig.voterWeightAddin
   const pythClient = useVotePluginsClientStore((s) => s.state.pythClient)
   const [pythVoterWeight, setPythVoterWeight] = useState<PythBalance>()
@@ -113,29 +115,6 @@ export default function useRealm() {
   }, [wallet?.publicKey])
 
   const delegates = useMembersStore((s) => s.compact.delegates)
-
-  useMemo(async () => {
-    let realmInfo = isPublicKey(symbol as string)
-      ? realm
-        ? // Realm program data needs to contain config options to enable/disable things such as notifications
-          // Currently defaulting to false here for now
-          createUnchartedRealmInfo({
-            programId: realm.owner.toBase58(),
-            address: realm.pubkey.toBase58(),
-            name: realm.account.name,
-          })
-        : undefined
-      : getCertifiedRealmInfo(symbol as string, connection)
-
-    if (realmInfo) {
-      realmInfo = { ...realmInfo, programVersion: programVersion }
-    }
-    // Do not set realm info until the programVersion  is resolved
-    if (programVersion) {
-      setRealmInfo(realmInfo)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [symbol, realm, programVersion])
 
   const realmTokenAccount = useMemo(
     () =>
@@ -240,7 +219,10 @@ export default function useRealm() {
   return {
     /** @deprecated use useRealmQuery */
     //    realm,
-    // realmInfo,
+    /** @deprecated use useSelectedRealmInfo
+     * Legacy hook structure, I suggest using useSelectedRealmRegistryEntry if you want the resgistry entry and useRealmQuery for on-chain data
+     */
+    realmInfo,
     /** @deprecated just use `useRouter().query` directly... */
     symbol,
     voteSymbol: realmInfo?.voteSymbol,
