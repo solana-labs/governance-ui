@@ -57,7 +57,7 @@ export const useClaimPositionRewards = () => {
         )
 
         const { lastClaimedEpoch } = delegatedPosAcc
-        const epoch = lastClaimedEpoch.add(new BN(1))
+        let epoch = lastClaimedEpoch.add(new BN(1))
 
         while (epoch.lt(currentEpoch)) {
           instructions.push(
@@ -71,7 +71,7 @@ export const useClaimPositionRewards = () => {
               })
               .instruction()
           )
-          epoch.add(new BN(1))
+          epoch = epoch.add(new BN(1))
         }
 
         // This is an arbitrary threshold and we assume that up to 4 instructions can be inserted as a single Tx

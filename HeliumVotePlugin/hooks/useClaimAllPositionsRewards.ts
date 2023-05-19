@@ -84,7 +84,7 @@ export const useClaimAllPositionsRewards = () => {
           )
 
           const { lastClaimedEpoch } = delegatedPosAcc
-          const epoch = lastClaimedEpoch.add(new BN(1))
+          let epoch = lastClaimedEpoch.add(new BN(1))
 
           while (epoch.lt(currentEpoch)) {
             multiDemArray[idx].push(
@@ -98,7 +98,7 @@ export const useClaimAllPositionsRewards = () => {
                 })
                 .instruction()
             )
-            epoch.add(new BN(1))
+            epoch = epoch.add(new BN(1))
           }
         }
 
