@@ -191,17 +191,17 @@ export default function Program(props: Props) {
       </Tooltip>
       {!disabled && closeBuffersModalOpen && (
         <Modal isOpen onClose={() => setOpenCloseBuffersModalOpen(false)}>
-          <CloseBuffers program={props.program.raw.governance} />
+          <CloseBuffers program={props.program.raw} />
         </Modal>
       )}
       {!disabled && transferAuthorityModalOpen && (
         <Modal isOpen onClose={() => setOpenTransferAuthorityModalOpen(false)}>
-          <TransferUpgradeAuthority program={props.program.raw.governance} />
+          <TransferUpgradeAuthority program={props.program.raw} />
         </Modal>
       )}
       {!disabled && upgradeModalOpen && (
         <Modal isOpen onClose={() => setUpgradeModelOpen(false)}>
-          <UpgradeProgram program={props.program.raw.governance} />
+          <UpgradeProgram program={props.program.raw} />
         </Modal>
       )}
     </div>

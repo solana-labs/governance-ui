@@ -42,12 +42,27 @@ import {
   GovernanceProgramAccountWithNativeTreasuryAddress,
 } from '@utils/uiTypes/assets'
 import group from '@utils/group'
+import { fetchParsedAccountInfoByPubkey } from '@hooks/queries/parsedAccountInfo'
 
 const additionalPossibleMintAccounts = {
   Mango: [new PublicKey('EGk8Gw7Z484mzAKb7GwCcqrZd4KwwsyU2Dv9woY6uDQu')],
 }
 const tokenAccountOwnerOffset = 32
 const programAccountOwnerOffset = 13
+
+//until indexing for devnet we don't fetch devnet programs temp solution
+const devnetHardcodedPrograms = {
+  //governance dao
+  FMEWULPSGR1BKVJK4K7xTjhG23NfYxeAn2bamYgNoUck: [
+    'vsr2nfGVNHmSY8uxoBGqq8AQbwz3JwaEaHqGbsTPXqQ',
+    'DFYh1afNSQk4bSgLWidwxaeRpyYM2zm4c4WwE6S8fzS9',
+    'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw',
+    'GTesTBiEWE32WHXXE2S4XbZvA5CrEc4xs6ZgRe895dP',
+  ],
+  GsoJzs1Pb5J31huQki69G3Ng4zBco5d1Feu28tH7CJCu: [
+    'Fs9fJums4kmSUhEc5SFTUttzJQdicEYq54wgLqZVYqeP',
+  ],
+}
 
 interface SolAccInfo {
   governancePk: PublicKey
@@ -457,7 +472,8 @@ const getProgramAssetAccounts = async (
   const programs =
     connection.cluster !== 'devnet'
       ? await getProgramAccountInfo(connection, possibleOwnersPk)
-      : []
+      : await getHardcodedDevnetPrograms(connection, governancesArray)
+
   return programs.map(
     (program) =>
       new AccountTypeProgram(
@@ -466,7 +482,8 @@ const getProgramAssetAccounts = async (
             x.pubkey.equals(program.owner) ||
             x.nativeTreasuryAddress.equals(program.owner)
         )!,
-        program.programId
+        program.programId,
+        program.owner
       )
   )
 }
@@ -1031,4 +1048,41 @@ const getProgramAccountInfo = async (
   }
 
   return result
+}
+
+//until indexing for devnet we don't fetch devnet programs temp solution
+const getHardcodedDevnetPrograms = async (
+  connection: ConnectionContext,
+  governancesArray: GovernanceProgramAccountWithNativeTreasuryAddress[]
+) => {
+  const accounts: {
+    owner: PublicKey
+    programId: PublicKey
+  }[] = []
+  const realmId = governancesArray[0]?.account.realm.toBase58()
+  if (realmId) {
+    const programIds = devnetHardcodedPrograms[realmId] || []
+    for (const id of programIds) {
+      const programAccount = (
+        await fetchParsedAccountInfoByPubkey(
+          connection.current,
+          new PublicKey(id)
+        )
+      ).result
+      const programInfo = (
+        await fetchParsedAccountInfoByPubkey(
+          connection.current,
+          new PublicKey(programAccount?.data['parsed']?.info?.programData)
+        )
+      ).result
+      const info = programInfo?.data['parsed']?.info
+      const authority = info.authority
+      console.log(id, authority)
+      accounts.push({
+        owner: new PublicKey(authority),
+        programId: new PublicKey(id),
+      })
+    }
+  }
+  return accounts
 }
