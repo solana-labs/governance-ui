@@ -1,6 +1,6 @@
 import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import { Program, BN } from '@coral-xyz/anchor'
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { useAsyncCallback } from 'react-async-hook'
 import { PositionWithMeta } from '../sdk/types'
 import {
@@ -18,30 +18,6 @@ import {
 } from '@utils/sendTransactions'
 import { notify } from '@utils/notifications'
 import useRealm from '@hooks/useRealm'
-
-const combineArrays = (arr: Array<Array<any>>): Array<any> => {
-  const combinedArray: Array<any> = []
-
-  // Get the number of rows and the maximum number of columns
-  const numRows: number = arr.length
-  let maxCols = 0
-  for (let row = 0; row < numRows; row++) {
-    maxCols = Math.max(maxCols, arr[row].length)
-  }
-
-  // Iterate over each column
-  for (let col = 0; col < maxCols; col++) {
-    // Iterate over each row
-    for (let row = 0; row < numRows; row++) {
-      // Add the element to the combined array if it exists
-      if (arr[row][col] !== undefined) {
-        combinedArray.push(arr[row][col])
-      }
-    }
-  }
-
-  return combinedArray
-}
 
 export const useClaimAllPositionsRewards = () => {
   const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
@@ -102,20 +78,28 @@ export const useClaimAllPositionsRewards = () => {
           }
         }
 
-        const instructions: TransactionInstruction[] = combineArrays(
-          multiDemArray
-        )
+        const txchunks: {
+          instructionsSet: {
+            transactionInstruction: TransactionInstruction
+            signers: Keypair[]
+          }[]
+          sequenceType: SequenceType
+        }[] = []
 
-        // This is an arbitrary threshold and we assume that up to 4 instructions can be inserted as a single Tx
-        const ixsChunks = chunks(instructions, 4)
-        const txsChunks = ixsChunks.map((txBatch, batchIdx) => ({
-          instructionsSet: txBatchesToInstructionSetWithSigners(
-            txBatch,
-            [],
-            batchIdx
-          ),
-          sequenceType: SequenceType.Sequential,
-        }))
+        for (const positionInsturctions of multiDemArray) {
+          // This is an arbitrary threshold and we assume that up to 4 instructions can be inserted as a single Tx
+          const ixsChunks = chunks(positionInsturctions, 4)
+          txchunks.push(
+            ...ixsChunks.map((txBatch, batchIdx) => ({
+              instructionsSet: txBatchesToInstructionSetWithSigners(
+                txBatch,
+                [],
+                batchIdx
+              ),
+              sequenceType: SequenceType.Sequential,
+            }))
+          )
+        }
 
         notify({ message: 'Claiming Rewards' })
         await sendTransactionsV3({
