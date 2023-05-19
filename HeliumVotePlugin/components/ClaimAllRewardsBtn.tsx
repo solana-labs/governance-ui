@@ -33,7 +33,7 @@ export const ClaimAllRewardsBtn: React.FC<{
       onClick={onClick}
     >
       <div className="flex items-center">
-        <span>Claim Rewards</span>
+        <span>Claim All Rewards</span>
       </div>
     </SecondaryButton>
   )
