@@ -57,11 +57,9 @@ export const useClaimPositionRewards = () => {
         )
 
         const { lastClaimedEpoch } = delegatedPosAcc
-        for (
-          let epoch = lastClaimedEpoch.add(new BN(1));
-          epoch.lt(currentEpoch);
-          epoch = epoch.add(new BN(1))
-        ) {
+        const epoch = lastClaimedEpoch.add(new BN(1))
+
+        while (epoch.lt(currentEpoch)) {
           instructions.push(
             await hsdProgram.methods
               .claimRewardsV0({
@@ -73,6 +71,7 @@ export const useClaimPositionRewards = () => {
               })
               .instruction()
           )
+          epoch.add(new BN(1))
         }
 
         // This is an arbitrary threshold and we assume that up to 4 instructions can be inserted as a single Tx
