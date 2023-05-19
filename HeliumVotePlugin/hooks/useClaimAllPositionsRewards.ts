@@ -78,7 +78,7 @@ export const useClaimAllPositionsRewards = () => {
           }
         }
 
-        const txchunks: {
+        const txsChunks: {
           instructionsSet: {
             transactionInstruction: TransactionInstruction
             signers: Keypair[]
@@ -89,7 +89,7 @@ export const useClaimAllPositionsRewards = () => {
         for (const positionInsturctions of multiDemArray) {
           // This is an arbitrary threshold and we assume that up to 4 instructions can be inserted as a single Tx
           const ixsChunks = chunks(positionInsturctions, 4)
-          txchunks.push(
+          txsChunks.push(
             ...ixsChunks.map((txBatch, batchIdx) => ({
               instructionsSet: txBatchesToInstructionSetWithSigners(
                 txBatch,
