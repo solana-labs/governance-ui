@@ -18,8 +18,6 @@ import useCreateProposal from '@hooks/useCreateProposal'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import { createSetUpgradeAuthority } from '@tools/sdk/bpfUpgradeableLoader/createSetUpgradeAuthority'
 import { abbreviateAddress } from '@utils/formatting'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { Governance, ProgramAccount } from '@solana/spl-governance'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
@@ -31,25 +29,17 @@ interface CloseBuffersForm {
   title: string
 }
 
-const TransferUpgradeAuthority = ({
-  program,
-}: {
-  program: ProgramAccount<Governance>
-}) => {
+const TransferUpgradeAuthority = ({ program }: { program: AssetAccount }) => {
   const { handleCreateProposal } = useCreateProposal()
-  const { assetAccounts } = useGovernanceAssets()
   const router = useRouter()
   const wallet = useWalletOnePointOh()
-  const governedAccount = assetAccounts.find(
-    (x) => x.governance.pubkey.toBase58() === program.pubkey.toBase58()
-  )
   const { fmtUrlWithCluster } = useQueryContext()
   const { symbol } = router.query
   const { realmInfo, canChooseWhoVote, realm } = useRealm()
   const programId: PublicKey | undefined = realmInfo?.programId
 
   const [form, setForm] = useState<CloseBuffersForm>({
-    governedAccount: governedAccount,
+    governedAccount: program,
     programId: programId?.toString(),
     newUpgradeAuthority: wallet?.publicKey?.toBase58()
       ? wallet?.publicKey?.toBase58()

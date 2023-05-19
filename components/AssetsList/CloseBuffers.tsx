@@ -24,7 +24,6 @@ import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import { createCloseBuffer } from '@tools/sdk/bpfUpgradeableLoader/createCloseBuffer'
 import { abbreviateAddress } from '@utils/formatting'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { Governance, ProgramAccount } from '@solana/spl-governance'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
@@ -36,18 +35,12 @@ interface CloseBuffersForm {
   title: string
 }
 
-const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
+const CloseBuffers = ({ program }: { program: AssetAccount }) => {
   const { handleCreateProposal } = useCreateProposal()
-  const {
-    governedTokenAccountsWithoutNfts,
-    assetAccounts,
-  } = useGovernanceAssets()
+  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const router = useRouter()
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletOnePointOh()
-  const governedAccount = assetAccounts.find(
-    (x) => x.governance.pubkey.toBase58() === program.pubkey.toBase58()
-  )
   const { fmtUrlWithCluster } = useQueryContext()
   const { symbol } = router.query
   const { realmInfo, canChooseWhoVote, realm } = useRealm()
@@ -66,7 +59,7 @@ const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
   )
   const solAccounts = governedTokenAccountsWithoutNfts.filter((x) => x.isSol)
   const [form, setForm] = useState<CloseBuffersForm>({
-    governedAccount: governedAccount,
+    governedAccount: program,
     programId: programId?.toString(),
     solReceiverAddress: solAccounts.length
       ? solAccounts
