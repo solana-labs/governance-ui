@@ -493,12 +493,6 @@ export default function useGovernanceAssets() {
       packageId: PackageEnum.UXD,
       tag: 'beta',
     },
-    [InstructionEnum.UXDCollectProfitOfCredixLpDepository]: {
-      name: 'Collect profit of Credix Lp Depository',
-      isVisible: canUseAnyInstruction,
-      packageId: PackageEnum.UXD,
-      tag: 'beta',
-    },
     [InstructionEnum.UXDEditIdentityDepository]: {
       name: 'Edit Identity Depository',
       isVisible: canUseAnyInstruction,

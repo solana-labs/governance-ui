@@ -1,23 +1,19 @@
 import Input from './Input';
 
-const InputNumber = ({
+const InputText = ({
   value,
   label,
   onChange,
   className,
   error = '',
   disabled,
-  min,
-  max,
 }: {
-  value: number | undefined;
+  value: string | undefined;
   label?: string;
-  onChange: (nb: number) => void;
+  onChange: (text: string) => void;
   className?: string;
   error?: string;
   disabled?: boolean;
-  min?: number;
-  max?: number;
 }) => {
   return (
     <div className="flex flex-col">
@@ -26,14 +22,12 @@ const InputNumber = ({
         value={value ?? ""}
         className={className}
         disabled={disabled}
-        onChange={(event) => onChange(Number(event.target.value))}
+        onChange={(event) => onChange(event.target.value?.toString() ?? "")}
         error={error}
-        type="number"
-        min={min}
-        max={max}
+        type="text"
       />
     </div>
   );
 };
 
-export default InputNumber;
+export default InputText;

@@ -229,6 +229,8 @@ export interface UXDEditMercurialVaultDepositoryForm {
   uiRedeemableAmountUnderManagementCap?: number;
   mintingFeeInBps?: number;
   redeemingFeeInBps?: number;
+  mintingDisabled?: boolean;
+  profitsBeneficiaryCollateral?: string;
 }
 
 export interface UXDEditCredixLpDepositoryForm {
@@ -237,6 +239,8 @@ export interface UXDEditCredixLpDepositoryForm {
   uiRedeemableAmountUnderManagementCap?: number;
   mintingFeeInBps?: number;
   redeemingFeeInBps?: number;
+  mintingDisabled?: boolean;
+  profitsBeneficiaryCollateral?: string;
 }
 
 export interface UXDEditIdentityDepositoryForm {
@@ -276,11 +280,6 @@ export interface UXDRedeemFromCredixLpDepositoryForm {
   uxdProgram?: string;
   collateralName?: string;
   uiRedeemableAmount?: number;
-}
-
-export interface UXDCollectProfitOfCredixLpDepositoryForm {
-  governedAccount?: GovernedMultiTypeAccount;
-  collateralName?: string;
 }
 
 export interface SaberPoolsDepositForm {
@@ -717,7 +716,6 @@ export enum InstructionEnum {
   UXDRedeemFromIdentityDepository,
   UXDRedeemFromMercurialVaultDepository,
   UXDRedeemFromCredixLpDepository,
-  UXDCollectProfitOfCredixLpDepository,
   UXDEditIdentityDepository,
   UXDStakingInitializeStakingCampaign,
   UXDStakingFinalizeStakingCampaign,

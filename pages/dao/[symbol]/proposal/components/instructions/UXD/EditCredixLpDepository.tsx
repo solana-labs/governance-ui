@@ -9,6 +9,7 @@ import Switch from '@components/Switch';
 import { useState } from 'react';
 import createEditCredixLpDepositoryInstruction from '@tools/sdk/uxdProtocol/createEditCredixLpDepositoryInstruction';
 import InputNumber from '@components/inputs/InputNumber';
+import InputText from '@components/inputs/InputText';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -16,6 +17,9 @@ const schema = yup.object().shape({
     .nullable()
     .required('Governance account is required'),
   collateralName: yup.string().required('Valid Collateral name is required'),
+  uiRedeemableAmountUnderManagementCap: yup
+    .number()
+    .min(0, 'Redeemable amount under management cap should be min 0'),
   mintingFeeInBps: yup
     .number()
     .min(0, 'Minting fee in bps should be min 0')
@@ -24,9 +28,6 @@ const schema = yup.object().shape({
     .number()
     .min(0, 'Redeeming fee in bps should be min 0')
     .max(255, 'Redeeming fee in bps should be max 255'),
-  uiRedeemableAmountUnderManagementCap: yup
-    .number()
-    .min(0, 'Redeemable amount under management cap should be min 0'),
 });
 
 const EditCredixLpDepository = ({
@@ -36,6 +37,11 @@ const EditCredixLpDepository = ({
   index: number;
   governedAccount?: GovernedMultiTypeAccount;
 }) => {
+  const [
+    uiRedeemableAmountUnderManagementCapChange,
+    setUiRedeemableAmountUnderManagementCapChange,
+  ] = useState<boolean>(false);
+
   const [mintingFeesInBpsChange, setMintingFeesInBpsChange] = useState<boolean>(
     false,
   );
@@ -46,8 +52,13 @@ const EditCredixLpDepository = ({
   ] = useState<boolean>(false);
 
   const [
-    uiRedeemableAmountUnderManagementCapChange,
-    setUiRedeemableAmountUnderManagementCapChange,
+    mintingDisabledChange,
+    setMintingDisabledChange,
+  ] = useState<boolean>(false);
+
+  const [
+    profitsBeneficiaryCollateralChange,
+    setProfitsBeneficiaryCollateralChange,
   ] = useState<boolean>(false);
 
   const {
@@ -77,16 +88,22 @@ const EditCredixLpDepository = ({
         // ================
 
         depositoryMintName: form.collateralName!,
-        mintingFeeInBps: mintingFeesInBpsChange
-          ? form.mintingFeeInBps!
-          : undefined,
 
-        redeemingFeeInBps: redeemingFeesInBpsChange
-          ? form.redeemingFeeInBps!
-          : undefined,
 
         redeemableAmountUnderManagementCap: uiRedeemableAmountUnderManagementCapChange
           ? form.uiRedeemableAmountUnderManagementCap!
+          : undefined,
+        mintingFeeInBps: mintingFeesInBpsChange
+          ? form.mintingFeeInBps!
+          : undefined,
+        redeemingFeeInBps: redeemingFeesInBpsChange
+          ? form.redeemingFeeInBps!
+          : undefined,
+        mintingDisabled: mintingDisabledChange
+          ? form.mintingDisabled!
+          : undefined,
+        profitsBeneficiaryCollateral: profitsBeneficiaryCollateralChange
+          ? form.profitsBeneficiaryCollateral!
           : undefined,
       });
     },
@@ -105,6 +122,30 @@ const EditCredixLpDepository = ({
       >
         <SelectOptionList list={getDepositoryMintSymbols(connection.cluster)} />
       </Select>
+
+      <h5>Redeemable Depository Supply Cap</h5>
+
+      <Switch
+        checked={uiRedeemableAmountUnderManagementCapChange}
+        onChange={(checked) =>
+          setUiRedeemableAmountUnderManagementCapChange(checked)
+        }
+      />
+
+      {uiRedeemableAmountUnderManagementCapChange ? (
+        <InputNumber
+          value={form.uiRedeemableAmountUnderManagementCap}
+          min={0}
+          max={10 ** 12}
+          onChange={(value) =>
+            handleSetForm({
+              value,
+              propertyName: 'uiRedeemableAmountUnderManagementCap',
+            })
+          }
+          error={formErrors['uiRedeemableAmountUnderManagementCap']}
+        />
+      ) : null}
 
       <h5>Minting Fees in BPS</h5>
 
@@ -150,29 +191,49 @@ const EditCredixLpDepository = ({
         />
       ) : null}
 
-      <h5>Redeemable Depository Supply Cap</h5>
+      <h5>Minting Disabled</h5>
 
       <Switch
-        checked={uiRedeemableAmountUnderManagementCapChange}
+        checked={mintingDisabledChange}
         onChange={(checked) =>
-          setUiRedeemableAmountUnderManagementCapChange(checked)
+          setMintingDisabledChange(checked)
         }
       />
 
-      {uiRedeemableAmountUnderManagementCapChange ? (
-        <InputNumber
-          value={form.uiRedeemableAmountUnderManagementCap}
-          min={0}
-          max={10 ** 12}
+      {mintingDisabledChange ? (
+        <Switch
+          checked={form.mintingDisabled ?? false}
           onChange={(value) =>
             handleSetForm({
               value,
-              propertyName: 'uiRedeemableAmountUnderManagementCap',
+              propertyName: 'mintingDisabled',
             })
           }
-          error={formErrors['uiRedeemableAmountUnderManagementCap']}
         />
       ) : null}
+
+      <h5>Profits Beneficiary Collateral</h5>
+
+      <Switch
+        checked={profitsBeneficiaryCollateralChange}
+        onChange={(checked) =>
+          setProfitsBeneficiaryCollateralChange(checked)
+        }
+      />
+
+      {profitsBeneficiaryCollateralChange ? (
+        <InputText
+          value={form.profitsBeneficiaryCollateral}
+          onChange={(value) =>
+            handleSetForm({
+              value,
+              propertyName: 'profitsBeneficiaryCollateral',
+            })
+          }
+          error={formErrors['profitsBeneficiaryCollateral']}
+        />
+      ) : null}
+
     </>
   );
 };

@@ -1,7 +1,7 @@
 import { Connection } from '@solana/web3.js';
 import { struct, u8, nu64, Layout } from 'buffer-layout';
 import { AccountMetaData } from '@solana/spl-governance';
-import { bool, u128, u64 } from '@project-serum/borsh';
+import { bool, u128, u64, publicKey } from '@project-serum/borsh';
 import { nativeToUi, UXD_DECIMALS } from '@uxd-protocol/uxd-client';
 import { nativeAmountToFormattedUiAmount } from '@tools/sdk/units';
 import { BN } from '@project-serum/anchor';
@@ -333,6 +333,8 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
         let redeemableAmountUnderManagementCapOption = false;
         let mintingFeeInBpsOption = false;
         let redeemingFeeInBpsOption = false;
+        let mintingDisabledOption = false;
+        let profitsBeneficiaryCollateralOption = false;
 
         // Check if options are used or not
         if (data[8] == 1) {
@@ -351,6 +353,29 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
           ] == 1
         ) {
           redeemingFeeInBpsOption = true;
+        }
+
+        if (
+          data[
+            11 +
+              (redeemableAmountUnderManagementCapOption ? 16 : 0) +
+              (mintingFeeInBpsOption ? 1 : 0) + 
+              (redeemingFeeInBpsOption ? 1 : 0)
+          ] == 1
+        ) {
+          mintingDisabledOption = true;
+        }
+
+        if (
+          data[
+            12 +
+              (redeemableAmountUnderManagementCapOption ? 16 : 0) +
+              (mintingFeeInBpsOption ? 1 : 0) + 
+              (redeemingFeeInBpsOption ? 1 : 0) +
+              (mintingDisabledOption ? 1 : 0)
+          ] == 1
+        ) {
+          profitsBeneficiaryCollateralOption = true;
         }
 
         const layout: Layout<any>[] = [
@@ -373,12 +398,24 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
           layout.push(u8('redeemingFeeInBps'));
         }
 
+        layout.push(u8('mintingDisabledOption'));
+        if (mintingDisabledOption) {
+          layout.push(bool('mintingDisabled'));
+        }
+
+        layout.push(u8('profitsBeneficiaryCollateralOption'));
+        if (profitsBeneficiaryCollateralOption) {
+          layout.push(publicKey('profitsBeneficiaryCollateral'));
+        }
+
         const dataLayout = struct(layout);
 
         const {
           redeemableAmountUnderManagementCap,
           mintingFeeInBps,
           redeemingFeeInBps,
+          mintingDisabled,
+          profitsBeneficiaryCollateral,
         } = dataLayout.decode(Buffer.from(data)) as any;
 
         return (
@@ -394,6 +431,16 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
             <p>{`Redeeming fee in bps: ${
               redeemingFeeInBpsOption
                 ? redeemingFeeInBps.toString()
+                : 'Not used'
+            }`}</p>
+            <p>{`Minting disabled: ${
+              mintingDisabledOption
+                ? mintingDisabled.toString()
+                : 'Not used'
+            }`}</p>
+            <p>{`Profits beneficiary collateral: ${
+              profitsBeneficiaryCollateralOption
+                ? profitsBeneficiaryCollateral.toString()
                 : 'Not used'
             }`}</p>
           </>
@@ -576,98 +623,7 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
       },
     },
 
-    1000002: {
-      name: 'UXD - Redeem from Credix Lp Depository',
-      accounts: [
-        'User',
-        'Payer',
-        'Controller',
-        'Depository',
-        'Redeemable Mint',
-        'Collateral Mint',
-        'User Redeemable',
-        'User Collateral',
-        'Depository Collateral',
-        'Depository Shares',
-        'Credix Program State',
-        'Credix Global Market State',
-        'Credix Signing Authority',
-        'Credix Liquidity Collateral',
-        'Credix Shares Mint',
-        'Credix Pass',
-        'Credix Treasury Collateral',
-        'Credix Multisig Key',
-        'Credix Multisig Collateral',
-        'System Program',
-        'Token Program',
-        'Associated Token Program',
-        'Credix Program',
-        'Rent',
-      ],
-      getDataUI: (
-        _connection: Connection,
-        data: Uint8Array,
-        accounts: AccountMetaData[],
-      ) => {
-        const dataLayout = struct([
-          u8('instruction'),
-          ...ANCHOR_DISCRIMINATOR_LAYOUT,
-          nu64('redeemableAmount'),
-        ]);
-        const { redeemableAmount } = dataLayout.decode(
-          Buffer.from(data),
-        ) as any;
-        const redeemableMintName = getSplTokenNameByMint(accounts[4].pubkey);
-        return (
-          <>
-            <p>{`Redeemable amount: ${nativeToUi(
-              redeemableAmount,
-              6,
-            ).toLocaleString()}`}</p>
-            <p>Redeemable mint: {redeemableMintName}</p>
-          </>
-        );
-      },
-    },
-    1000003: {
-      name: 'UXD - Collect Profit of Credix Lp Depository',
-      accounts: [
-        'Authority',
-        'Payer',
-        'Controller',
-        'Depository',
-        'Collateral Mint',
-        'Depository Collateral',
-        'Depository Shares',
-        'Credix Program State',
-        'Credix Global Market State',
-        'Credix Signing Authority',
-        'Credix Liquidity Collateral',
-        'Credix Shares Mint',
-        'Credix Pass',
-        'Credix Treasury Collateral',
-        'Credix Multisig Key',
-        'Credix Multisig Collateral',
-        'Authority Collateral',
-        'System Program',
-        'Token Program',
-        'Associated Token Program',
-        'Credix Program',
-        'Rent',
-      ],
-      getDataUI: (
-        _connection: Connection,
-        _data: Uint8Array,
-        accounts: AccountMetaData[],
-      ) => {
-        return (
-          <>
-            <p>Profit collected into token account: {accounts[16].pubkey}</p>
-          </>
-        );
-      },
-    },
-    100004: {
+    103: {
       name: 'UXD - Edit Credix Lp Depository',
       accounts: ['Authority', 'Controller', 'Depository'],
       getDataUI: (
@@ -678,6 +634,8 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
         let redeemableAmountUnderManagementCapOption = false;
         let mintingFeeInBpsOption = false;
         let redeemingFeeInBpsOption = false;
+        let mintingDisabledOption = false;
+        let profitsBeneficiaryCollateralOption = false;
 
         // Check if options are used or not
         if (data[8] == 1) {
@@ -696,6 +654,29 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
           ] == 1
         ) {
           redeemingFeeInBpsOption = true;
+        }
+
+        if (
+          data[
+            11 +
+              (redeemableAmountUnderManagementCapOption ? 16 : 0) +
+              (mintingFeeInBpsOption ? 1 : 0) + 
+              (redeemingFeeInBpsOption ? 1 : 0)
+          ] == 1
+        ) {
+          mintingDisabledOption = true;
+        }
+
+        if (
+          data[
+            12 +
+              (redeemableAmountUnderManagementCapOption ? 16 : 0) +
+              (mintingFeeInBpsOption ? 1 : 0) + 
+              (redeemingFeeInBpsOption ? 1 : 0) +
+              (mintingDisabledOption ? 1 : 0)
+          ] == 1
+        ) {
+          profitsBeneficiaryCollateralOption = true;
         }
 
         const layout: Layout<any>[] = [
@@ -718,12 +699,24 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
           layout.push(u8('redeemingFeeInBps'));
         }
 
+        layout.push(u8('mintingDisabledOption'));
+        if (mintingDisabledOption) {
+          layout.push(bool('mintingDisabled'));
+        }
+
+        layout.push(u8('profitsBeneficiaryCollateralOption'));
+        if (profitsBeneficiaryCollateralOption) {
+          layout.push(publicKey('profitsBeneficiaryCollateral'));
+        }
+
         const dataLayout = struct(layout);
 
         const {
           redeemableAmountUnderManagementCap,
           mintingFeeInBps,
           redeemingFeeInBps,
+          mintingDisabled,
+          profitsBeneficiaryCollateral,
         } = dataLayout.decode(Buffer.from(data)) as any;
 
         return (
@@ -739,6 +732,16 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
             <p>{`Redeeming fee in bps: ${
               redeemingFeeInBpsOption
                 ? redeemingFeeInBps.toString()
+                : 'Not used'
+            }`}</p>
+            <p>{`Minting disabled: ${
+              mintingDisabledOption
+                ? mintingDisabled.toString()
+                : 'Not used'
+            }`}</p>
+            <p>{`Profits beneficiary collateral: ${
+              profitsBeneficiaryCollateralOption
+                ? profitsBeneficiaryCollateral.toString()
                 : 'Not used'
             }`}</p>
           </>
