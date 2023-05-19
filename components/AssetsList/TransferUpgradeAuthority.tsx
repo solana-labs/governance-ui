@@ -52,10 +52,8 @@ const TransferUpgradeAuthority = ({ program }: { program: AssetAccount }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
   const proposalTitle = `Transfer upgrade authority for program ${
-    form.governedAccount?.governance?.account.governedAccount
-      ? abbreviateAddress(
-          form.governedAccount?.governance?.account.governedAccount
-        )
+    form.governedAccount?.pubkey
+      ? abbreviateAddress(form.governedAccount?.pubkey)
       : ''
   }`
 
@@ -98,8 +96,8 @@ const TransferUpgradeAuthority = ({ program }: { program: AssetAccount }) => {
       wallet?.publicKey
     ) {
       const transferUpgradeAuthIx = await createSetUpgradeAuthority(
-        form.governedAccount.governance.account.governedAccount,
-        form.governedAccount.governance.pubkey,
+        form.governedAccount.pubkey,
+        form.governedAccount.extensions.program!.authority,
         new PublicKey(form.newUpgradeAuthority)
       )
       serializedInstruction = serializeInstructionToBase64(

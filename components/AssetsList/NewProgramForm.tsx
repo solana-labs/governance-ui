@@ -81,7 +81,7 @@ const NewProgramForm = () => {
         const transferUpgradeAuthIx = await createSetUpgradeAuthority(
           new PublicKey(form.programId),
           wallet!.publicKey!,
-          form.authority!.governance.nativeTreasuryAddress
+          form.authority!.governance.nativeTreasuryAddress!
         )
         const transaction = new Transaction()
         transaction.add(transferUpgradeAuthIx)

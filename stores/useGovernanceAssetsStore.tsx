@@ -473,7 +473,7 @@ const getProgramAssetAccounts = async (
     connection.cluster !== 'devnet'
       ? await getProgramAccountInfo(connection, possibleOwnersPk)
       : await getHardcodedDevnetPrograms(connection, governancesArray)
-  console.log(programs)
+
   return programs.map(
     (program) =>
       new AccountTypeProgram(
@@ -482,7 +482,8 @@ const getProgramAssetAccounts = async (
             x.pubkey.equals(program.owner) ||
             x.nativeTreasuryAddress.equals(program.owner)
         )!,
-        program.programId
+        program.programId,
+        program.owner
       )
   )
 }

@@ -276,9 +276,7 @@ const GovernedAccountSelect = ({
 
           <div className="space-y-0.5 text-xs text-fgd-3">
             Program:{' '}
-            {programName
-              ? programName
-              : abbreviateAddress(value.governance.account.governedAccount)}
+            {programName ? programName : abbreviateAddress(value.pubkey)}
           </div>
         </div>
         {walletInfo ? (

@@ -57,7 +57,7 @@ const UpgradeProgram = ({ program }: { program: AssetAccount }) => {
   const [showOptions, setShowOptions] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
-  const proposalTitle = `Upgrade ${form.governedAccount?.governance?.account.governedAccount.toBase58()}`
+  const proposalTitle = `Upgrade ${form.governedAccount?.pubkey.toBase58()}`
   const name = program ? getProgramName(program.pubkey) : ''
 
   const handleSetForm = ({ propertyName, value }) => {
@@ -73,7 +73,7 @@ const UpgradeProgram = ({ program }: { program: AssetAccount }) => {
             await validateBuffer(
               connection,
               val,
-              form.governedAccount?.governance?.pubkey
+              form.governedAccount?.extensions.program?.authority
             )
             return true
           } catch (e) {
@@ -102,9 +102,9 @@ const UpgradeProgram = ({ program }: { program: AssetAccount }) => {
       wallet?.publicKey
     ) {
       const upgradeIx = await createUpgradeInstruction(
-        form.governedAccount.governance.account.governedAccount,
+        form.governedAccount.pubkey,
         new PublicKey(form.bufferAddress),
-        form.governedAccount.governance.pubkey,
+        form.governedAccount.extensions.program!.authority,
         wallet!.publicKey
       )
       serializedInstruction = serializeInstructionToBase64(upgradeIx)
@@ -194,7 +194,7 @@ const UpgradeProgram = ({ program }: { program: AssetAccount }) => {
           error={formErrors['bufferAddress']}
         />
         <ProgramUpgradeInfo
-          governancePk={form.governedAccount?.governance?.pubkey}
+          authority={form.governedAccount?.extensions.program?.authority}
         />
         <LinkButton
           className="flex items-center text-primary-light"

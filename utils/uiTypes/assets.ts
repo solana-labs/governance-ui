@@ -10,6 +10,9 @@ interface AccountExtension {
   amount?: u64
   solAccount?: AccountInfoGen<Buffer | ParsedAccountData>
   token?: TokenProgramAccount<AccountInfo>
+  program?: {
+    authority: PublicKey
+  }
 }
 
 export type GovernanceProgramAccountWithNativeTreasuryAddress = ProgramAccount<Governance> & {
@@ -87,12 +90,17 @@ export class AccountTypeProgram implements AssetAccount {
   pubkey: PublicKey
   constructor(
     governance: GovernanceProgramAccountWithNativeTreasuryAddress,
-    programId: PublicKey
+    programId: PublicKey,
+    owner: PublicKey
   ) {
     this.governance = governance
     this.pubkey = programId
     this.type = AccountType.PROGRAM
-    this.extensions = {}
+    this.extensions = {
+      program: {
+        authority: owner,
+      },
+    }
   }
 }
 
