@@ -1,7 +1,6 @@
 import { ExclamationCircleIcon } from '@heroicons/react/solid'
 import { useSelectedProposalTransactions } from '@hooks/queries/proposalTransaction'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
-import useProposal from '@hooks/useProposal'
 import useRealm from '@hooks/useRealm'
 import { useMemo } from 'react'
 

@@ -1,9 +1,7 @@
-import useRealm from '@hooks/useRealm'
 import { BigNumber } from 'bignumber.js'
 import classNames from 'classnames'
 
 import { calculateMaxVoteScore } from '@models/proposal/calulateMaxVoteScore'
-import useProposal from '@hooks/useProposal'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { fmtMintAmount, getMintDecimalAmount } from '@tools/sdk/units'
 

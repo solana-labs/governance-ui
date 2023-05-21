@@ -4,7 +4,6 @@ import classNames from 'classnames'
 
 import useRealm from '@hooks/useRealm'
 import { calculateMaxVoteScore } from '@models/proposal/calulateMaxVoteScore'
-import useProposal from '@hooks/useProposal'
 import useWalletStore from 'stores/useWalletStore'
 import { SecondaryButton } from '@components/Button'
 

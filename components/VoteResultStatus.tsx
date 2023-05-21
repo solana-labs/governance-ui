@@ -1,6 +1,5 @@
 import { XCircleIcon, CheckCircleIcon } from '@heroicons/react/outline'
 import { BanIcon } from '@heroicons/react/solid'
-import useProposal from '@hooks/useProposal'
 import useProposalVotes from '@hooks/useProposalVotes'
 import { ProposalState } from '@solana/spl-governance'
 import { useVetoingPop } from './VotePanel/VetoButtons'

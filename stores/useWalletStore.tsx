@@ -4,7 +4,6 @@ import { PublicKey } from '@solana/web3.js'
 import {
   TokenProgramAccount,
   TokenAccount,
-  MintAccount,
   tryGetMint,
   getOwnedTokenAccounts,
 } from '../utils/tokens'
@@ -27,7 +26,6 @@ import {
 } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { getGovernanceChatMessages } from '@solana/spl-governance'
-import { ChatMessage } from '@solana/spl-governance'
 import { GoverningTokenRole } from '@solana/spl-governance'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { getCertifiedRealmInfo } from '@models/registry/api'
