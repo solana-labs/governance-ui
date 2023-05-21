@@ -50,6 +50,7 @@ interface WalletStore extends State {
   mockWallet: SignerWalletAdapter | undefined
 
   //realms: { [realm: string]: ProgramAccount<Realm> }
+  /* 
   selectedRealm: {
     //config?: ProgramAccount<RealmConfigAccount>
     //mint?: MintAccount
@@ -57,15 +58,16 @@ interface WalletStore extends State {
     //councilMint?: MintAccount
     //governances: { [governance: string]: ProgramAccount<Governance> }
     //proposals: { [proposal: string]: ProgramAccount<Proposal> }
-    /* /// Community token records by owner
-    tokenRecords: { [owner: string]: ProgramAccount<TokenOwnerRecord> }
+     /// Community token records by owner
+    //tokenRecords: { [owner: string]: ProgramAccount<TokenOwnerRecord> }
     /// Council token records by owner
     councilTokenOwnerRecords: {
       [owner: string]: ProgramAccount<TokenOwnerRecord>
-    } */
+    } 
     //mints: { [pubkey: string]: MintAccount }
     // programVersion: number
-  }
+  } */
+
   selectedProposal: {
     //proposal: ProgramAccount<Proposal> | undefined
     //governance: ProgramAccount<Governance> | undefined
