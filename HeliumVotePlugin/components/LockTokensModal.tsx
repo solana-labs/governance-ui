@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import Modal from '@components/Modal'
-import useRealm from '@hooks/useRealm'
 import { useForm } from 'react-hook-form'
 import Button, { LinkButton, SecondaryButton } from '@components/Button'
 import ButtonGroup from '@components/ButtonGroup'

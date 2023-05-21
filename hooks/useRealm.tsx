@@ -1,16 +1,10 @@
 import { ProgramAccount, TokenOwnerRecord } from '@solana/spl-governance'
-import { isPublicKey } from '@tools/core/pubkey'
 import { useRouter } from 'next/router'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { PythBalance } from 'pyth-staking-api'
 import { useEffect, useMemo, useState } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
-import {
-  createUnchartedRealmInfo,
-  getCertifiedRealmInfo,
-  RealmInfo,
-} from '../models/registry/api'
 import {
   PythVoterWeight,
   SimpleGatedVoterWeight,
@@ -42,14 +36,11 @@ import {
   useUserCommunityTokenOwnerRecord,
   useUserCouncilTokenOwnerRecord,
 } from './queries/tokenOwnerRecord'
-import useProgramVersion from './useProgramVersion'
-import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
 import { useRealmConfigQuery } from './queries/realmConfig'
 import {
   useRealmCommunityMintInfoQuery,
   useRealmCouncilMintInfoQuery,
 } from './queries/mintInfo'
-import { useRealmGovernancesQuery } from './queries/governance'
 import { useSelectedRealmInfo } from './selectedRealm/useSelectedRealmRegistryEntry'
 import { useRealmProposalsQuery } from './queries/proposal'
 
@@ -59,7 +50,7 @@ import { useRealmProposalsQuery } from './queries/proposal'
 export default function useRealm() {
   const router = useRouter()
   const { symbol } = router.query
-  const connection = useWalletStore((s) => s.connection)
+
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const tokenAccounts = useWalletStore((s) => s.tokenAccounts)
@@ -70,9 +61,6 @@ export default function useRealm() {
     communityTORsByOwner: tokenRecords,
     councilTORsByOwner: councilTokenOwnerRecords,
   } = useTokenRecordsByOwnersMap()
-
-  const programVersion =
-    useProgramVersion() ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION
 
   const config = useRealmConfigQuery().data?.result
   const mint = useRealmCommunityMintInfoQuery().data?.result
@@ -88,11 +76,6 @@ export default function useRealm() {
         : {},
     [proposalsArray]
   )
-
-  const governancesQuery = useRealmGovernancesQuery()
-  const governances = useMemo(() => governancesQuery.data ?? [], [
-    governancesQuery.data,
-  ])
 
   const votingPower = useDepositStore((s) => s.state.votingPower)
   const heliumVotingPower = useHeliumVsrStore((s) => s.state.votingPower)

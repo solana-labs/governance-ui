@@ -37,10 +37,7 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { PublicKey } from '@solana/web3.js'
 import { PromptModal } from './PromptModal'
 import { useRealmQuery } from '@hooks/queries/realm'
-import {
-  useRealmCommunityMintInfoQuery,
-  useRealmCouncilMintInfoQuery,
-} from '@hooks/queries/mintInfo'
+import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 
 export interface PositionCardProps {
   subDaos?: SubDaoWithMeta[]

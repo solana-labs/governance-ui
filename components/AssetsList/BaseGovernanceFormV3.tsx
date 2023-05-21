@@ -2,7 +2,6 @@ import Input from '@components/inputs/Input'
 import Select from '@components/inputs/Select'
 import AmountSlider from '@components/Slider'
 import Switch from '@components/Switch'
-import useRealm from '@hooks/useRealm'
 import { VoteTipping } from '@solana/spl-governance'
 import {
   fmtPercentage,
