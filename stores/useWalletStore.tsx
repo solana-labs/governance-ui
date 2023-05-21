@@ -49,7 +49,7 @@ interface WalletStore extends State {
   current: SignerWalletAdapter | undefined
   mockWallet: SignerWalletAdapter | undefined
 
-  realms: { [realm: string]: ProgramAccount<Realm> }
+  //realms: { [realm: string]: ProgramAccount<Realm> }
   selectedRealm: {
     //config?: ProgramAccount<RealmConfigAccount>
     //mint?: MintAccount
@@ -215,7 +215,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const set = get().set
       const connection = get().connection.current
       const connectionContext = get().connection
-      const realms = get().realms
+      const realms = {} //get().realms //commented out while refactoring
       const realm = realms[realmId.toBase58()]
       const mintsArray = (
         await Promise.all([
