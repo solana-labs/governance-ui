@@ -1,9 +1,14 @@
 import { PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
-import asFindable from '@utils/queries/asFindable'
 import useWalletStore from 'stores/useWalletStore'
-import { getProposal } from '@solana/spl-governance'
+import {
+  ProposalTransaction,
+  getGovernanceAccounts,
+  pubkeyFilter,
+} from '@solana/spl-governance'
 import { useRouteProposalQuery } from './proposal'
+import { useRealmQuery } from './realm'
+import queryClient from './queryClient'
 
 export const proposalTransactionQueryKeys = {
   all: (cluster: string) => [cluster, 'ProposalTransaction'],
@@ -17,23 +22,41 @@ export const proposalTransactionQueryKeys = {
     p,
   ],
 }
-/* 
+
 export const useSelectedProposalTransactions = () => {
   const proposal = useRouteProposalQuery().data?.result
   const connection = useWalletStore((s) => s.connection)
+  const realm = useRealmQuery().data?.result
 
-  const enabled = pubkey !== undefined
+  const enabled = realm !== undefined && proposal !== undefined
   const query = useQuery({
     queryKey: enabled
-      ? proposalTransactionQueryKeys.byPubkey(connection.cluster, pubkey)
+      ? proposalTransactionQueryKeys.byProposal(
+          connection.cluster,
+          proposal.pubkey
+        )
       : undefined,
     queryFn: async () => {
       if (!enabled) throw new Error()
 
-      return asFindable(getProposal)(connection.current, pubkey)
+      const results = await getGovernanceAccounts(
+        connection.current,
+        realm.owner,
+        ProposalTransaction,
+        [pubkeyFilter(1, proposal.pubkey)!]
+      )
+
+      results.forEach((x) => {
+        queryClient.setQueryData(
+          proposalTransactionQueryKeys.byPubkey(connection.cluster, x.pubkey),
+          { found: true, result: x }
+        )
+      })
+
+      return results
     },
     enabled,
   })
 
   return query
-} */
+}

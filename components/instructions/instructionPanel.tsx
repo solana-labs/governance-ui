@@ -1,8 +1,7 @@
-import useProposal from '../../hooks/useProposal'
 import InstructionCard from './instructionCard'
 import { Disclosure } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/solid'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { InstructionExecutionStatus, RpcContext } from '@solana/spl-governance'
 import useRealm from '@hooks/useRealm'
@@ -16,10 +15,12 @@ import { dryRunInstruction } from 'actions/dryRunInstruction'
 import { getExplorerInspectorUrl } from '@components/explorer/tools'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
+import { useSelectedProposalTransactions } from '@hooks/queries/proposalTransaction'
 
 export function InstructionPanel() {
   const proposal = useRouteProposalQuery().data?.result
-  const { instructions } = useProposal()
+  const { data: instructionsArray } = useSelectedProposalTransactions()
+
   const { realmInfo } = useRealm()
   const mounted = useRef(false)
   useEffect(() => {
@@ -60,18 +61,17 @@ export function InstructionPanel() {
         clearTimeout(timer)
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [ineligibleToSee, connection, currentSlot])
+  }, [ineligibleToSee, connection, currentSlot, proposal, realmInfo, wallet])
 
-  if (Object.values(instructions).length === 0) {
-    return null
-  }
-
-  const proposalInstructions = Object.values(instructions).sort(
-    (i1, i2) => i1.account.instructionIndex - i2.account.instructionIndex
+  const proposalInstructions = useMemo(
+    () =>
+      (instructionsArray ?? []).sort(
+        (i1, i2) => i1.account.instructionIndex - i2.account.instructionIndex
+      ),
+    [instructionsArray]
   )
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
+  // don't initialize state from queried stuff like this..
   const [playing, setPlaying] = useState(
     proposalInstructions.every((x) => x.account.executedAt)
       ? PlayState.Played
@@ -92,6 +92,10 @@ export function InstructionPanel() {
       result.transaction
     )
     window.open(inspectUrl, '_blank')
+  }
+
+  if (instructionsArray?.length === 0) {
+    return null
   }
 
   return (

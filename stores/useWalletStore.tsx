@@ -72,7 +72,7 @@ interface WalletStore extends State {
     //proposal: ProgramAccount<Proposal> | undefined
     //governance: ProgramAccount<Governance> | undefined
     //realm: ProgramAccount<Realm> | undefined
-    instructions: { [instruction: string]: ProgramAccount<ProposalTransaction> }
+    //instructions: { [instruction: string]: ProgramAccount<ProposalTransaction> }
     voteRecordsByVoter: { [voter: string]: ProgramAccount<VoteRecord> }
     signatories: { [signatory: string]: ProgramAccount<VoteRecord> }
     //chatMessages: { [message: string]: ProgramAccount<ChatMessage> }
@@ -82,6 +82,7 @@ interface WalletStore extends State {
     //tokenRole?: GoverningTokenRole
     //proposalOwner: ProgramAccount<TokenOwnerRecord> | undefined
   }
+
   providerName: string | undefined
   tokenAccounts: TokenProgramAccount<TokenAccount>[]
   set: (x: any) => void
