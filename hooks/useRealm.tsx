@@ -230,38 +230,56 @@ export default function useRealm() {
     heliumVotingPower
   )
 
-  return {
-    /** @deprecated use useRealmQuery */
-    //    realm,
-    /** @deprecated use useSelectedRealmInfo
-     * Legacy hook structure, I suggest using useSelectedRealmRegistryEntry if you want the resgistry entry and useRealmQuery for on-chain data
-     */
-    realmInfo,
-    /** @deprecated just use `useRouter().query` directly... */
-    symbol,
-    //voteSymbol: realmInfo?.voteSymbol,
-    //mint,
-    //councilMint,
-    //governances,
-    /** @deprecated use useRealmProposalsQuery */
-    proposals,
-    //tokenRecords,
-    realmTokenAccount,
-    councilTokenAccount,
-    /** @deprecated just use the token owner record directly, ok? */
-    ownVoterWeight,
-    //realmDisplayName: realmInfo?.displayName ?? realm?.account?.name,
-    canChooseWhoVote,
-    //councilTokenOwnerRecords,
-    toManyCouncilOutstandingProposalsForUse,
-    toManyCommunityOutstandingProposalsForUser,
-    ownDelegateTokenRecords,
-    ownDelegateCouncilTokenRecords,
-    //config,
-    currentPluginPk,
-    vsrMode,
-    isNftMode,
-  }
+  return useMemo(
+    () => ({
+      /** @deprecated use useRealmQuery */
+      //    realm,
+      /** @deprecated use useSelectedRealmInfo
+       * Legacy hook structure, I suggest using useSelectedRealmRegistryEntry if you want the resgistry entry and useRealmQuery for on-chain data
+       */
+      realmInfo,
+      /** @deprecated just use `useRouter().query` directly... */
+      symbol,
+      //voteSymbol: realmInfo?.voteSymbol,
+      //mint,
+      //councilMint,
+      //governances,
+      /** @deprecated use useRealmProposalsQuery */
+      proposals,
+      //tokenRecords,
+      realmTokenAccount,
+      councilTokenAccount,
+      /** @deprecated just use the token owner record directly, ok? */
+      ownVoterWeight,
+      //realmDisplayName: realmInfo?.displayName ?? realm?.account?.name,
+      canChooseWhoVote,
+      //councilTokenOwnerRecords,
+      toManyCouncilOutstandingProposalsForUse,
+      toManyCommunityOutstandingProposalsForUser,
+      ownDelegateTokenRecords,
+      ownDelegateCouncilTokenRecords,
+      //config,
+      currentPluginPk,
+      vsrMode,
+      isNftMode,
+    }),
+    [
+      canChooseWhoVote,
+      councilTokenAccount,
+      currentPluginPk,
+      isNftMode,
+      ownDelegateCouncilTokenRecords,
+      ownDelegateTokenRecords,
+      ownVoterWeight,
+      proposals,
+      realmInfo,
+      realmTokenAccount,
+      symbol,
+      toManyCommunityOutstandingProposalsForUser,
+      toManyCouncilOutstandingProposalsForUse,
+      vsrMode,
+    ]
+  )
 }
 
 const getVoterWeight = (
