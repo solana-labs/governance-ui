@@ -56,7 +56,7 @@ interface WalletStore extends State {
     //programId?: PublicKey
     //councilMint?: MintAccount
     //governances: { [governance: string]: ProgramAccount<Governance> }
-    proposals: { [proposal: string]: ProgramAccount<Proposal> }
+    //proposals: { [proposal: string]: ProgramAccount<Proposal> }
     /* /// Community token records by owner
     tokenRecords: { [owner: string]: ProgramAccount<TokenOwnerRecord> }
     /// Council token records by owner

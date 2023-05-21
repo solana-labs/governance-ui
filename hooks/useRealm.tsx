@@ -51,6 +51,7 @@ import {
 } from './queries/mintInfo'
 import { useRealmGovernancesQuery } from './queries/governance'
 import { useSelectedRealmInfo } from './selectedRealm/useSelectedRealmRegistryEntry'
+import { useRealmProposalsQuery } from './queries/proposal'
 
 /**
  * @deprecated This hook has been broken up into many smaller hooks, use those instead, DO NOT use this
@@ -77,7 +78,17 @@ export default function useRealm() {
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
 
-  const { proposals } = useWalletStore((s) => s.selectedRealm)
+  const proposalsArray = useRealmProposalsQuery().data
+  const proposals = useMemo(
+    () =>
+      proposalsArray !== undefined
+        ? Object.fromEntries(
+            proposalsArray.map((x) => [x.pubkey.toString(), x])
+          )
+        : {},
+    [proposalsArray]
+  )
+
   const governancesQuery = useRealmGovernancesQuery()
   const governances = useMemo(() => governancesQuery.data ?? [], [
     governancesQuery.data,
@@ -218,6 +229,7 @@ export default function useRealm() {
     ownCouncilTokenRecord,
     heliumVotingPower
   )
+
   return {
     /** @deprecated use useRealmQuery */
     //    realm,
@@ -231,6 +243,7 @@ export default function useRealm() {
     //mint,
     //councilMint,
     //governances,
+    /** @deprecated use useRealmProposalsQuery */
     proposals,
     //tokenRecords,
     realmTokenAccount,

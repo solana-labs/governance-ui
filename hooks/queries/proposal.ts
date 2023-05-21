@@ -2,11 +2,13 @@ import { PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
 import asFindable from '@utils/queries/asFindable'
 import useWalletStore from 'stores/useWalletStore'
-import { getProposal } from '@solana/spl-governance'
+import { getProposal, getProposalsByGovernance } from '@solana/spl-governance'
 import { useRealmQuery } from './realm'
 import { useRouter } from 'next/router'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { useMemo } from 'react'
+import { useRealmGovernancesQuery } from './governance'
+import queryClient from './queryClient'
 
 export const proposalQueryKeys = {
   all: (cluster: string) => [cluster, 'Proposal'],
@@ -55,24 +57,23 @@ export const useRouteProposalQuery = () => {
 export const useRealmProposalsQuery = () => {
   const connection = useWalletStore((s) => s.connection)
   const realm = useRealmQuery().data?.result
+  const { data: governances } = useRealmGovernancesQuery()
 
-  const enabled = realm !== undefined
+  const enabled = realm !== undefined && governances !== undefined
   const query = useQuery({
     queryKey: enabled
       ? proposalQueryKeys.byRealm(connection.cluster, realm.pubkey)
       : undefined,
     queryFn: async () => {
       if (!enabled) throw new Error()
-      /* 
-      const filter = pubkeyFilter(1, realm.pubkey)
-      if (!filter) throw new Error() // unclear why this would ever happen, probably it just cannot
 
-      const results = await getGovernanceAccounts(
-        connection.current,
-        realm.owner,
-        Governance,
-        [filter]
-      )
+      const results = (
+        await Promise.all(
+          governances.map((x) =>
+            getProposalsByGovernance(connection.current, realm.owner, x.pubkey)
+          )
+        )
+      ).flat()
 
       results.forEach((x) => {
         queryClient.setQueryData(
@@ -81,7 +82,7 @@ export const useRealmProposalsQuery = () => {
         )
       })
 
-      return results */
+      return results
     },
     enabled,
   })
