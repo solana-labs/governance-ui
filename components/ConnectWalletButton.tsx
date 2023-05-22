@@ -28,6 +28,7 @@ import { useWallet } from '@solana/wallet-adapter-react'
 import useInitWallet from '@hooks/useInitWallet'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const StyledWalletProviderLabel = styled.p`
   font-size: 0.65rem;
@@ -43,10 +44,9 @@ const ConnectWalletButton = (props) => {
     'mainnet'
   )
   const { wallets } = useWallet()
+  const connection = useLegacyConnectionContext()
 
-  const { providerName, connection, set: setWalletStore } = useWalletStore(
-    (s) => s
-  )
+  const { providerName, set: setWalletStore } = useWalletStore((s) => s)
 
   const current = useWalletOnePointOh()
   const connected = !!current?.connected

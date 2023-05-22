@@ -11,15 +11,16 @@ import {
 import useInterval from './useInterval'
 import useLocalStorageState from './useLocalStorageState'
 import useViewAsWallet from './useViewAsWallet'
+import useLegacyConnectionContext from './useLegacyConnectionContext'
 
 const SECONDS = 1000
 
 export default function useInitWallet() {
   const { wallets } = useWallet()
   const mockWallet = useViewAsWallet()
+  const connection = useLegacyConnectionContext()
 
   const {
-    connection,
     current: wallet,
     providerName: selectedProviderName,
     set: setWalletStore,

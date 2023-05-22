@@ -41,6 +41,7 @@ import {
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
 import { useConnection } from '@solana/wallet-adapter-react'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface DepositBox {
   mintPk: PublicKey
@@ -76,7 +77,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
     tokenOwnerRecord?.result?.account.governingTokenOwner
   const [isLoading, setIsLoading] = useState(false)
   const { connection } = useConnection()
-  const connnectionContext = useWalletStore((s) => s.connection)
+  const connnectionContext = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const mainBoxesClasses = 'bg-bkg-1 col-span-1 p-4 rounded-md'

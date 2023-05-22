@@ -36,7 +36,8 @@ export default function LockedCommunityVotingPower(props: Props) {
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const { connection } = useConnection()
   const deposits = useDepositStore((s) => s.state.deposits)
-  const endpoint = useWalletStore((s) => s.connection.endpoint)
+
+  const endpoint = connection.rpcEndpoint
 
   const getOwnedDeposits = useDepositStore((s) => s.getOwnedDeposits)
   const votingPower = useDepositStore((s) => s.state.votingPower)

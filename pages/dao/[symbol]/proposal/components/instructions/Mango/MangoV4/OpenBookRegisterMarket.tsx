@@ -18,6 +18,7 @@ import InstructionForm, {
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { OPENBOOK_PROGRAM_ID } from '@blockworks-foundation/mango-v4'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface OpenBookRegisterMarketForm {
   governedAccount: AssetAccount | null
@@ -46,7 +47,7 @@ const OpenBookRegisterMarket = ({
       mangoGroup?.admin &&
       x.extensions.transferAddress?.equals(mangoGroup.admin)
   )
-  const { connection } = useWalletStore()
+  const connection = useLegacyConnectionContext()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<OpenBookRegisterMarketForm>({
     governedAccount: null,

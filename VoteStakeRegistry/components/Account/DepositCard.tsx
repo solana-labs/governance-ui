@@ -47,7 +47,7 @@ const DepositCard = ({
   const actualClient = vsrClient || client
   const wallet = useWalletOnePointOh()
   const { connection } = useConnection()
-  const endpoint = useWalletStore((s) => s.connection.endpoint)
+  const endpoint = connection.rpcEndpoint
   const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false)
   const handleWithDrawFromDeposit = async (
     depositEntry: DepositWithMintAccount
