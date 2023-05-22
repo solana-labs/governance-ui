@@ -30,6 +30,8 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import { ConnectionProvider } from '@solana/wallet-adapter-react'
+import { getConnectionContext } from '@utils/connection'
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
@@ -157,6 +159,11 @@ export function App(props: Props) {
     updateSerumGovAccounts(cluster as string | undefined)
   }, [cluster, updateSerumGovAccounts])
 
+  const endpoint = useMemo(
+    () => getConnectionContext(cluster as string).endpoint,
+    [cluster]
+  )
+
   return (
     <div className="relative bg-bkg-1 text-fgd-1">
       <Head>
@@ -247,19 +254,21 @@ export function App(props: Props) {
       </Head>
       <GoogleTag />
       <ErrorBoundary>
-        <ThemeProvider defaultTheme="Dark">
-          <WalletIdentityProvider appName={'Realms'}>
-            <WalletProvider>
-              <GatewayProvider>
-                <NavBar />
-                <Notifications />
-                <TransactionLoader></TransactionLoader>
-                <NftVotingCountingModal />
-                <PageBodyContainer>{props.children}</PageBodyContainer>
-              </GatewayProvider>
-            </WalletProvider>
-          </WalletIdentityProvider>
-        </ThemeProvider>
+        <ConnectionProvider endpoint={endpoint}>
+          <ThemeProvider defaultTheme="Dark">
+            <WalletIdentityProvider appName={'Realms'}>
+              <WalletProvider>
+                <GatewayProvider>
+                  <NavBar />
+                  <Notifications />
+                  <TransactionLoader></TransactionLoader>
+                  <NftVotingCountingModal />
+                  <PageBodyContainer>{props.children}</PageBodyContainer>
+                </GatewayProvider>
+              </WalletProvider>
+            </WalletIdentityProvider>
+          </ThemeProvider>
+        </ConnectionProvider>
       </ErrorBoundary>
     </div>
   )
