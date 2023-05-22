@@ -1,6 +1,5 @@
 import create, { State } from 'zustand'
 import produce from 'immer'
-import { getOwnedTokenAccounts } from '../utils/tokens'
 
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { getConnectionContext } from 'utils/connection'

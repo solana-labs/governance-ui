@@ -2,7 +2,6 @@ import { findMetadataPda } from '@metaplex-foundation/js'
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
 import { PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
-import useWalletStore from 'stores/useWalletStore'
 import queryClient from './queryClient'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 

@@ -1,6 +1,5 @@
 import useRealm from '@hooks/useRealm'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import {
   getProposalDepositsByDepositPayer,
   getVoteRecordAddress,

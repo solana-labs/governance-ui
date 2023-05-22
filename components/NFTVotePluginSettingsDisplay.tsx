@@ -6,7 +6,6 @@ import cx from 'classnames'
 // import ChevronRightIcon from '@carbon/icons-react/lib/ChevronRight'
 
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import useWalletStore from 'stores/useWalletStore'
 import { ConnectionContext } from '@utils/connection'
 import BigNumber from 'bignumber.js'
 import * as RE from '@utils/uiTypes/Result'

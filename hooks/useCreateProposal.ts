@@ -2,7 +2,6 @@ import {
   createProposal,
   InstructionDataWithHoldUpTime,
 } from 'actions/createProposal'
-import useWalletStore from 'stores/useWalletStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useRealm from './useRealm'
 import useRpcContext from './useRpcContext'

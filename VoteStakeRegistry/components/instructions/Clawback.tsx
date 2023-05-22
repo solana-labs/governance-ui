@@ -1,6 +1,5 @@
 import { useContext, useEffect, useState } from 'react'
 import { TransactionInstruction } from '@solana/web3.js'
-import useWalletStore from 'stores/useWalletStore'
 import { tryGetMint } from '@utils/tokens'
 import {
   ClawbackForm,

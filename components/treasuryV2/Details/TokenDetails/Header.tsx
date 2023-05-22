@@ -16,7 +16,6 @@ import Modal from '@components/Modal'
 import SendTokens from '@components/TreasuryAccount/SendTokens'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import useWalletStore from 'stores/useWalletStore'
 import Address from '@components/Address'
 
 import AddAssetModal from '../WalletDetails/AddAssetModal'

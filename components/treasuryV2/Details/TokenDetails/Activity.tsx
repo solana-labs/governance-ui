@@ -7,7 +7,6 @@ import { Sol, Token } from '@models/treasury/Asset'
 import { Status } from '@utils/uiTypes/Result'
 import { fmtUnixTime } from '@utils/formatting'
 import { getExplorerUrl } from '@components/explorer/tools'
-import useWalletStore from 'stores/useWalletStore'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface Props {

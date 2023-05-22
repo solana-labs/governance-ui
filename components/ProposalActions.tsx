@@ -6,7 +6,6 @@ import {
   ProposalState,
   SignatoryRecord,
 } from '@solana/spl-governance'
-import useWalletStore from '../stores/useWalletStore'
 import Button, { SecondaryButton } from './Button'
 
 import { RpcContext } from '@solana/spl-governance'

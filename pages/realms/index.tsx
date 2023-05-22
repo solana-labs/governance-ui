@@ -7,7 +7,6 @@ import {
 } from '../../models/registry/api'
 
 import { SearchIcon } from '@heroicons/react/outline'
-import useWalletStore from '../../stores/useWalletStore'
 import useQueryContext from '@hooks/useQueryContext'
 import Button from '@components/Button'
 import { notify } from '@utils/notifications'

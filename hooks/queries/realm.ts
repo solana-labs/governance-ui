@@ -4,7 +4,6 @@ import { getRealm, getRealms } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
 import asFindable from '@utils/queries/asFindable'
-import useWalletStore from 'stores/useWalletStore'
 
 export const realmQueryKeys = {
   all: (cluster: string) => [cluster, 'Realm'],

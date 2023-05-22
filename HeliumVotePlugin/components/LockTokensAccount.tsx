@@ -13,7 +13,6 @@ import {
   getMintDecimalAmountFromNatural,
   getMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
-import useWalletStore from 'stores/useWalletStore'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
 import { GoverningTokenRole } from '@solana/spl-governance'

@@ -1,6 +1,5 @@
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 import useTransactionsStore from 'stores/useTransactionStore'
-import useWalletStore from 'stores/useWalletStore'
 import Button from './Button'
 import { getExplorerUrl } from './explorer/tools'
 import Loading from './Loading'

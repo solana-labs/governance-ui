@@ -1,7 +1,6 @@
 import useVotePluginsClientStore from '../../stores/useVotePluginsClientStore'
 import { PublicKey } from '@solana/web3.js'
 import { useCallback, useEffect, useState } from 'react'
-import useWalletStore from '../../stores/useWalletStore'
 import { getVoterWeightRecord as getPluginVoterWeightRecord } from '@utils/plugin/accounts'
 import { Client } from '@utils/uiTypes/VotePlugin'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'

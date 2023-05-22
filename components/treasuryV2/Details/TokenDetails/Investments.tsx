@@ -15,7 +15,6 @@ import ConvertToMsol from '@components/TreasuryAccount/ConvertToMsol'
 import ConvertToStSol from '@components/TreasuryAccount/ConvertToStSol'
 import Trade from '@components/TreasuryAccount/Trade'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import useWalletStore from 'stores/useWalletStore'
 import MangoModal from '@components/TreasuryAccount/MangoModal'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 

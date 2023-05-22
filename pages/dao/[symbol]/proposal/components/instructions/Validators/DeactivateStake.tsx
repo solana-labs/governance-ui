@@ -13,7 +13,6 @@ import {
   ValidatorDeactivateStakeForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
-import useWalletStore from 'stores/useWalletStore'
 import { web3 } from '@coral-xyz/anchor'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import GovernedAccountSelect from '../../GovernedAccountSelect'

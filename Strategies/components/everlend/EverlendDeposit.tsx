@@ -6,7 +6,6 @@ import { useRouter } from 'next/router'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import useWalletStore from 'stores/useWalletStore'
 import tokenPriceService from '@utils/services/tokenPrice'
 
 import {

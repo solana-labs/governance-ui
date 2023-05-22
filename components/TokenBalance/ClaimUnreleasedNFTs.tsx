@@ -1,6 +1,5 @@
 import useRealm from '@hooks/useRealm'
 import { useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import { TransactionInstruction } from '@solana/web3.js'
 import { SecondaryButton } from '@components/Button'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'

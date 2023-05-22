@@ -3,7 +3,6 @@ import { MintInfo, u64 } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
 
 import { getMintSupplyAsDecimal } from '@tools/sdk/units'
-import useWalletStore from 'stores/useWalletStore'
 import { tryGetMint } from '@utils/tokens'
 import { validatePubkey } from '@utils/formValidation'
 import { preventNegativeNumberInput } from '@utils/helpers'

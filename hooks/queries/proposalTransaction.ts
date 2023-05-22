@@ -1,6 +1,5 @@
 import { PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
-import useWalletStore from 'stores/useWalletStore'
 import {
   ProposalTransaction,
   getGovernanceAccounts,

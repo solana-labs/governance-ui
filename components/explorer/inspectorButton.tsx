@@ -4,7 +4,6 @@ import {
   ProgramAccount,
   ProposalTransaction,
 } from '@solana/spl-governance'
-import useWalletStore from '../../stores/useWalletStore'
 import { getExplorerInspectorUrl, getExplorerUrl } from './tools'
 import { SecondaryButton } from '../Button'
 import { notify } from '@utils/notifications'

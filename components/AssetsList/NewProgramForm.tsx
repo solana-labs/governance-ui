@@ -17,7 +17,6 @@ import { getGovernanceConfigFromV2Form } from 'utils/GovernanceTools'
 import { notify } from 'utils/notifications'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import * as yup from 'yup'
 import BaseGovernanceForm, {
   BaseGovernanceFormFieldsV2,

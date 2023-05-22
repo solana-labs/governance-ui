@@ -1,7 +1,6 @@
 import { PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
 import { getOwnedTokenAccounts } from '@utils/tokens'
-import useWalletStore from 'stores/useWalletStore'
 import queryClient from './queryClient'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 

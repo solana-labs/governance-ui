@@ -1,6 +1,5 @@
 import { PublicKey } from '@solana/web3.js'
 import { abbreviateAddress } from '@utils/formatting'
-import useWalletStore from '../../stores/useWalletStore'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import tokenPriceService from '@utils/services/tokenPrice'

@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import Button from '../Button'
 import Input from '../inputs/Input'
-import useWalletStore from '../../stores/useWalletStore'
 import useRealm from '../../hooks/useRealm'
 import { RpcContext } from '@solana/spl-governance'
 import { ChatMessageBody, ChatMessageBodyType } from '@solana/spl-governance'

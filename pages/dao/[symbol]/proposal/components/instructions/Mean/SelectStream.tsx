@@ -2,7 +2,6 @@ import { Stream } from '@mean-dao/payment-streaming'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import React, { useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 
 import Select from '@components/inputs/Select'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'

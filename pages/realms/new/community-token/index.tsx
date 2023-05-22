@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useRouter } from 'next/router'
 
 import { PublicKey } from '@solana/web3.js'
-import useWalletStore from 'stores/useWalletStore'
 import createTokenizedRealm from 'actions/createTokenizedRealm'
 import useQueryContext from '@hooks/useQueryContext'
 

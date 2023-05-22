@@ -7,7 +7,6 @@ import { Status, Result } from '@utils/uiTypes/Result'
 import { AuxiliaryWallet, Wallet } from '@models/treasury/Wallet'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import useRealm from '@hooks/useRealm'
-import useWalletStore from 'stores/useWalletStore'
 
 import { assembleWallets } from './assembleWallets'
 import { calculateTokenCountAndValue } from './calculateTokenCountAndValue'

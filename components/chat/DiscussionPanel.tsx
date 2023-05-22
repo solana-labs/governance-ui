@@ -1,6 +1,5 @@
 import DiscussionForm from './DiscussionForm'
 import Comment from './Comment'
-import useWalletStore from '../../stores/useWalletStore'
 import { useQuery } from '@tanstack/react-query'
 import { PublicKey } from '@solana/web3.js'
 import {

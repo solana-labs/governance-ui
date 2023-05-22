@@ -8,7 +8,6 @@ import {
   withSetRealmAuthority,
 } from '@solana/spl-governance'
 import useRealm from '@hooks/useRealm'
-import useWalletStore from 'stores/useWalletStore'
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
 import { sendTransaction } from '@utils/send'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'

@@ -1,7 +1,6 @@
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { RpcContext } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
-import useWalletStore from 'stores/useWalletStore'
 import useRealm from './useRealm'
 import useWalletOnePointOh from './useWalletOnePointOh'
 import { useRealmQuery } from './queries/realm'

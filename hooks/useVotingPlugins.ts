@@ -1,5 +1,4 @@
 import { useEffect } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import { getNfts } from '@utils/tokens'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'

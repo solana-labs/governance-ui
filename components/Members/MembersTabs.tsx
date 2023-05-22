@@ -1,5 +1,4 @@
 import { FunctionComponent, useMemo } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import { LogoutIcon, UserCircleIcon } from '@heroicons/react/outline'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { fmtMintAmount } from '@tools/sdk/units'

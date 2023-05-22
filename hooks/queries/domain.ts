@@ -3,7 +3,6 @@ import { EndpointTypes } from '@models/types'
 import { PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
 import { fetchDomainsByPubkey } from '@utils/domains'
-import useWalletStore from 'stores/useWalletStore'
 
 export const domainQueryKeys = {
   all: (cluster: EndpointTypes) => [cluster, 'Domain'],

@@ -18,7 +18,6 @@ import tokenPriceService from '@utils/services/tokenPrice'
 import BigNumber from 'bignumber.js'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import { SolendStrategy } from 'Strategies/types/types'
 import AdditionalProposalOptions from '@components/AdditionalProposalOptions'
 import { validateInstruction } from '@utils/instructionTools'
@@ -41,7 +40,6 @@ import {
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
-import { connection } from '@project-serum/common'
 
 const SOL_BUFFER = 0.02
 

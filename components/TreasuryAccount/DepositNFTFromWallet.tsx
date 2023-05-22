@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import useWalletStore from 'stores/useWalletStore'
 import Button from '@components/Button'
 import Tooltip from '@components/Tooltip'
 import { NFTWithMint } from '@utils/uiTypes/nfts'

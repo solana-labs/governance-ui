@@ -10,7 +10,6 @@ import { getMintDecimalAmount } from '@tools/sdk/units'
 import Tooltip from '@components/Tooltip'
 import { SecondaryButton } from '@components/Button'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import useWalletStore from 'stores/useWalletStore'
 import { notify } from '@utils/notifications'
 
 import { getMintMetadata } from '../instructions/programs/splToken'

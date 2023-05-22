@@ -25,7 +25,6 @@ import { notify } from '@utils/notifications'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 
 interface Props {
   onClose: () => void

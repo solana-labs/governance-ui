@@ -2,7 +2,6 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Stream } from '@mean-dao/payment-streaming'
 import { Governance, ProgramAccount } from '@solana/spl-governance'
 import React, { useContext, useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 
 import Input from '@components/inputs/Input'
 import getMeanTransferStreamInstruction from '@utils/instructions/Mean/getMeanTransferStreamInstruction'

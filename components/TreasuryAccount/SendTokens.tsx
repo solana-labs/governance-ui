@@ -19,7 +19,6 @@ import {
 } from '@utils/uiTypes/proposalCreationTypes'
 import { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import useWalletStore from 'stores/useWalletStore'
 
 import { getTokenTransferSchema } from '@utils/validations'
 import {

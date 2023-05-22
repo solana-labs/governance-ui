@@ -12,7 +12,6 @@ import {
 import { CreateEverlendProposal } from '../../protocols/everlend/tools'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useRealm from '@hooks/useRealm'
-import useWalletStore from 'stores/useWalletStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useQueryContext from '@hooks/useQueryContext'
 import { useRouter } from 'next/router'

@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import {
   Keypair,
   PublicKey,

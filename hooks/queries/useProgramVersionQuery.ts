@@ -3,7 +3,6 @@ import { EndpointTypes } from '@models/types'
 import { getGovernanceProgramVersion } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
-import useWalletStore from 'stores/useWalletStore'
 
 export const programVersionQueryKeys = {
   byProgramId: (cluster: EndpointTypes, programId: PublicKey) => [
