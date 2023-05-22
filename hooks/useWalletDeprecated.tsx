@@ -3,17 +3,18 @@ import { useMemo } from 'react'
 
 import useWalletStore from '../stores/useWalletStore'
 import useWalletOnePointOh from './useWalletOnePointOh'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 /** @deprecated */
 export default function useWalletDeprecated() {
-  const { connection } = useWalletStore((state) => state)
+  const { connection } = useConnection()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
 
   const anchorProvider = useMemo(() => {
     const options = AnchorProvider.defaultOptions()
     return new AnchorProvider(
-      connection.current,
+      connection,
       (wallet as unknown) as Wallet,
       options
     )

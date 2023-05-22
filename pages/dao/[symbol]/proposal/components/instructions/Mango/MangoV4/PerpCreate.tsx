@@ -23,6 +23,7 @@ import InstructionForm, {
 import UseMangoV4 from '@hooks/useMangoV4'
 import { BN } from '@coral-xyz/anchor'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface PerpCreateForm {
   governedAccount: AssetAccount | null
@@ -74,7 +75,7 @@ const PerpCreate = ({
       mangoGroup?.admin &&
       x.extensions.transferAddress?.equals(mangoGroup?.admin)
   )
-  const { connection } = useWalletStore()
+  const connection = useLegacyConnectionContext()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<PerpCreateForm>({
     governedAccount: null,

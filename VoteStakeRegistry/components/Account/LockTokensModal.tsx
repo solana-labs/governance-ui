@@ -76,7 +76,7 @@ const LockTokensModal = ({
     (s) => s.state.voteStakeRegistryRegistrar
   )
   const { connection } = useConnection()
-  const endpoint = useWalletStore((s) => s.connection.endpoint)
+  const endpoint = connection.rpcEndpoint
   const wallet = useWalletOnePointOh()
   const deposits = useDepositStore((s) => s.state.deposits)
   const fiveYearsSecs = yearsToSecs(5)

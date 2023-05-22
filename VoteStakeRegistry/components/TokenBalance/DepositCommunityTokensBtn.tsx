@@ -26,7 +26,7 @@ const DepositCommunityTokensBtn = ({ className = '', inAccountDetails }) => {
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const { connection } = useConnection()
-  const endpoint = useWalletStore((s) => s.connection.endpoint)
+  const endpoint = connection.rpcEndpoint
   const currentTokenOwnerRecord = useUserCommunityTokenOwnerRecord().data
     ?.result
 

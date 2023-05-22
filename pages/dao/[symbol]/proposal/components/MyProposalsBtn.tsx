@@ -42,6 +42,7 @@ import { useRealmQuery } from '@hooks/queries/realm'
 import { useVoteRecordsByOwnerQuery } from '@hooks/queries/voteRecord'
 import useProgramVersion from '@hooks/useProgramVersion'
 import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 const MyProposalsBn = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
@@ -49,8 +50,7 @@ const MyProposalsBn = () => {
   const connected = !!wallet?.connected
   const [isLoading, setIsLoading] = useState(false)
   const { governancesArray } = useGovernanceAssets()
-  const { current: connection } = useWalletStore((s) => s.connection)
-
+  const connection = useConnection()
   const myVoteRecords = useVoteRecordsByOwnerQuery(
     wallet?.publicKey ?? undefined
   ).data
