@@ -43,6 +43,7 @@ import {
 } from './queries/mintInfo'
 import { useSelectedRealmInfo } from './selectedRealm/useSelectedRealmRegistryEntry'
 import { useRealmProposalsQuery } from './queries/proposal'
+import { useTokenAccountsByOwnerQuery } from './queries/tokenAccount'
 
 /**
  * @deprecated This hook has been broken up into many smaller hooks, use those instead, DO NOT use this
@@ -53,7 +54,7 @@ export default function useRealm() {
 
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
-  const tokenAccounts = useWalletStore((s) => s.tokenAccounts)
+  const { data: tokenAccounts } = useTokenAccountsByOwnerQuery()
   const realm = useRealmQuery().data?.result
   const realmInfo = useSelectedRealmInfo()
 
@@ -115,7 +116,7 @@ export default function useRealm() {
   const realmTokenAccount = useMemo(
     () =>
       realm &&
-      tokenAccounts.find((a) =>
+      tokenAccounts?.find((a) =>
         a.account.mint.equals(realm.account.communityMint)
       ),
     [realm, tokenAccounts]
@@ -145,13 +146,11 @@ export default function useRealm() {
   const councilTokenAccount = useMemo(
     () =>
       realm &&
-      councilMint &&
-      tokenAccounts.find(
+      tokenAccounts?.find(
         (a) =>
           realm.account.config.councilMint &&
           a.account.mint.equals(realm.account.config.councilMint)
       ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     [realm, tokenAccounts]
   )
 

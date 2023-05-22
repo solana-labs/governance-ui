@@ -82,7 +82,7 @@ interface WalletStore extends State {
   } */
 
   providerName: string | undefined
-  tokenAccounts: TokenProgramAccount<TokenAccount>[]
+  //tokenAccounts: TokenProgramAccount<TokenAccount>[]
   set: (x: any) => void
   actions: any
 }
