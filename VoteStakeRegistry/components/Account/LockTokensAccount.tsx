@@ -16,7 +16,6 @@ import { PublicKey } from '@solana/web3.js'
 import { MintInfo } from '@solana/spl-token'
 import { BN } from '@coral-xyz/anchor'
 import tokenPriceService from '@utils/services/tokenPrice'
-import useWalletStore from 'stores/useWalletStore'
 import { getDeposits } from 'VoteStakeRegistry/tools/deposits'
 import { DepositWithMintAccount } from 'VoteStakeRegistry/sdk/accounts'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
@@ -43,6 +42,7 @@ import {
   useRealmCommunityMintInfoQuery,
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 interface DepositBox {
   mintPk: PublicKey
@@ -80,7 +80,7 @@ const LockTokensAccount: React.FC<{
     tokenOwnerRecord?.result?.account.governingTokenOwner
 
   const [isLoading, setIsLoading] = useState(false)
-  const connection = useWalletStore((s) => s.connection.current)
+  const { connection } = useConnection()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const mainBoxesClasses = 'bg-bkg-1 col-span-1 p-4 rounded-md'

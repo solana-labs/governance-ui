@@ -18,7 +18,6 @@ import { getUnrelinquishedVoteRecords } from '@models/api'
 import { withDepositGoverningTokens } from '@solana/spl-governance'
 import { withRelinquishVote } from '@solana/spl-governance'
 import { withWithdrawGoverningTokens } from '@solana/spl-governance'
-import useWalletStore from '../../stores/useWalletStore'
 import { sendTransaction } from '@utils/send'
 import { approveTokenTransfer } from '@utils/tokens'
 import Button, { SecondaryButton } from '../Button'
@@ -52,6 +51,7 @@ import {
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
 import { fetchGovernanceByPubkey } from '@hooks/queries/governance'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 const TokenBalanceCard = ({
   proposal,
@@ -158,7 +158,7 @@ export const TokenDeposit = ({
 }) => {
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
-  const connection = useWalletStore((s) => s.connection.current)
+  const { connection } = useConnection()
 
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient

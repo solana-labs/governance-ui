@@ -1,4 +1,3 @@
-import useWalletStore from '../stores/useWalletStore'
 import React, { useState, FunctionComponent } from 'react'
 import {
   Transaction,
@@ -26,6 +25,7 @@ import {
   useUserCouncilTokenOwnerRecord,
 } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 const DelegateCard = () => {
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
@@ -34,7 +34,7 @@ const DelegateCard = () => {
 
   const [isLoading, setLoading] = useState<boolean>(false)
   const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection.current)
+  const { connection } = useConnection()
 
   const [delegateKey, setDelegateKey] = useState('')
   const [delegateCouncilToken, setDelegateCouncilToken] = useState(true)

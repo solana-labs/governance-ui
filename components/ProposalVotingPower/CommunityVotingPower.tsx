@@ -4,7 +4,6 @@ import classNames from 'classnames'
 
 import useRealm from '@hooks/useRealm'
 import { calculateMaxVoteScore } from '@models/proposal/calulateMaxVoteScore'
-import useWalletStore from 'stores/useWalletStore'
 import { SecondaryButton } from '@components/Button'
 
 import { getMintMetadata } from '../instructions/programs/splToken'
@@ -16,6 +15,7 @@ import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecor
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 interface Props {
   className?: string
@@ -28,7 +28,7 @@ export default function CommunityVotingPower(props: Props) {
 
   const { ownVoterWeight, realmInfo, realmTokenAccount } = useRealm()
   const proposal = useRouteProposalQuery().data?.result
-  const connection = useWalletStore((s) => s.connection.current)
+  const { connection } = useConnection()
   const wallet = useWalletOnePointOh()
 
   // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree

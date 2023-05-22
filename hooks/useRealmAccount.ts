@@ -1,6 +1,6 @@
 import { getRealm } from '@solana/spl-governance'
+import { useConnection } from '@solana/wallet-adapter-react'
 import { Connection, PublicKey } from '@solana/web3.js'
-import useWalletStore from 'stores/useWalletStore'
 import useSWR from 'swr'
 
 const fetcher = async ({
@@ -18,7 +18,7 @@ const fetcher = async ({
 
 /** @deprecated use react-query */
 const useRealmAccount = (realmId?: PublicKey) => {
-  const connection = useWalletStore((s) => s.connection.current)
+  const { connection } = useConnection()
 
   const { data, mutate, isValidating, error } = useSWR(
     () => realmId && [realmId.toBase58(), connection.rpcEndpoint],

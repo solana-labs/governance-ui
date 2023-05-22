@@ -31,6 +31,7 @@ import { useCallback, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import VoteProposalModal from './VoteProposalModal'
 import ProposalStateBadge from '@components/ProposalStateBadge'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 interface Props {
   voteRecord?: ProgramAccount<VoteRecord>
@@ -57,7 +58,7 @@ export default function ProposalDetails({
 
   const { symbol } = useRealm()
   const { current: wallet } = useWalletStore()
-  const connection = useWalletStore((s) => s.connection.current)
+  const { connection } = useConnection()
   const { fmtUrlWithCluster } = useQueryContext()
 
   const [showVoteModal, setShowVoteModal] = useState(false)

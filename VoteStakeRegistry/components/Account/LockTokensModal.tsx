@@ -51,6 +51,7 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 const YES = 'Yes'
 const NO = 'No'
@@ -74,7 +75,7 @@ const LockTokensModal = ({
   const voteStakeRegistryRegistrar = useVotePluginsClientStore(
     (s) => s.state.voteStakeRegistryRegistrar
   )
-  const connection = useWalletStore((s) => s.connection.current)
+  const { connection } = useConnection()
   const endpoint = useWalletStore((s) => s.connection.endpoint)
   const wallet = useWalletOnePointOh()
   const deposits = useDepositStore((s) => s.state.deposits)

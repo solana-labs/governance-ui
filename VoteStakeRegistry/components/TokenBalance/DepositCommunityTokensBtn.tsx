@@ -14,6 +14,7 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 const DepositCommunityTokensBtn = ({ className = '', inAccountDetails }) => {
   const { getOwnedDeposits } = useDepositStore()
@@ -24,7 +25,7 @@ const DepositCommunityTokensBtn = ({ className = '', inAccountDetails }) => {
   const [isLoading, setIsLoading] = useState(false)
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
-  const connection = useWalletStore((s) => s.connection.current)
+  const { connection } = useConnection()
   const endpoint = useWalletStore((s) => s.connection.endpoint)
   const currentTokenOwnerRecord = useUserCommunityTokenOwnerRecord().data
     ?.result

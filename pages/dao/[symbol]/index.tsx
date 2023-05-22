@@ -12,7 +12,6 @@ import {
   withCastVote,
   YesNoVote,
 } from '@solana/spl-governance'
-import useWalletStore from 'stores/useWalletStore'
 import NewProposalBtn from './proposal/components/NewProposalBtn'
 import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
@@ -48,6 +47,7 @@ import {
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
 import { useRealmGovernancesQuery } from '@hooks/queries/governance'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
@@ -94,7 +94,7 @@ const REALM = () => {
     (s) => s.state.currentRealmVotingClient
   )
   const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection.current)
+  const { connection } = useConnection()
 
   const governancesArray = useRealmGovernancesQuery().data
   const governancesByGovernance = useMemo(

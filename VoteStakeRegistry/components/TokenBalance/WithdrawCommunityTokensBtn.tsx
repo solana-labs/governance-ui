@@ -11,7 +11,6 @@ import {
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
 import { chunks } from '@utils/helpers'
 import { sendTransaction } from '@utils/send'
-import useWalletStore from 'stores/useWalletStore'
 import { withVoteRegistryWithdraw } from 'VoteStakeRegistry/sdk/withVoteRegistryWithdraw'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { getProgramVersionForRealm } from '@models/registry/api'
@@ -24,6 +23,7 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { fetchGovernanceByPubkey } from '@hooks/queries/governance'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 const WithDrawCommunityTokens = () => {
   const { getOwnedDeposits } = useDepositStore()
@@ -41,7 +41,7 @@ const WithDrawCommunityTokens = () => {
   const [isLoading, setIsLoading] = useState(false)
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
-  const connection = useWalletStore((s) => s.connection.current)
+  const { connection } = useConnection()
   const deposits = useDepositStore((s) => s.state.deposits)
   const maxVoterWeight = useMaxVoteRecord()?.pubkey || undefined
   const depositRecord = deposits.find(

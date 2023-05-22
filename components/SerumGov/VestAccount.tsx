@@ -13,7 +13,6 @@ import useSerumGovStore, {
   SRM_DECIMALS,
   VestAccountType,
 } from 'stores/useSerumGovStore'
-import useWalletStore from 'stores/useWalletStore'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { notify } from '@utils/notifications'
 import { MSRM_DECIMALS } from '@project-serum/serum/lib/token-instructions'
@@ -34,6 +33,7 @@ import { dryRunInstruction } from 'actions/dryRunInstruction'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 import Link from 'next/link'
 import { getExplorerUrl } from '@components/explorer/tools'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 const BurnVestAccountSchema = {
   amount: yup.string().required(),
@@ -68,7 +68,7 @@ const VestAccount: FC<Props> = ({
   const actions = useSerumGovStore((s) => s.actions)
 
   const { anchorProvider, wallet } = useWalletDeprecated()
-  const connection = useWalletStore((s) => s.connection.current)
+  const { connection } = useConnection()
 
   const [isBurning, setIsBurning] = useState(false)
   const [currentTimestamp, setCurrentTimestamp] = useState(0)

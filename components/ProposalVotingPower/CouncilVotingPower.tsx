@@ -4,7 +4,6 @@ import classNames from 'classnames'
 
 import useRealm from '@hooks/useRealm'
 import { calculateMaxVoteScore } from '@models/proposal/calulateMaxVoteScore'
-import useWalletStore from 'stores/useWalletStore'
 import { SecondaryButton } from '@components/Button'
 
 import { getMintMetadata } from '../instructions/programs/splToken'
@@ -16,6 +15,7 @@ import { useUserCouncilTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmCouncilMintInfoQuery } from '@hooks/queries/mintInfo'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 interface Props {
   className?: string
@@ -28,7 +28,7 @@ export default function CouncilVotingPower(props: Props) {
 
   const { councilTokenAccount, ownVoterWeight, realmInfo } = useRealm()
   const proposal = useRouteProposalQuery().data?.result
-  const connection = useWalletStore((s) => s.connection.current)
+  const { connection } = useConnection()
   const wallet = useWalletOnePointOh()
 
   const depositAmount = useMemo(

@@ -21,6 +21,7 @@ import { useRealmQuery } from '@hooks/queries/realm'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 interface Props {
   className?: string
@@ -33,7 +34,7 @@ export default function LockedCommunityVotingPower(props: Props) {
   const { realmInfo, realmTokenAccount } = useRealm()
   const proposal = useRouteProposalQuery().data?.result
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
-  const connection = useWalletStore((s) => s.connection.current)
+  const { connection } = useConnection()
   const deposits = useDepositStore((s) => s.state.deposits)
   const endpoint = useWalletStore((s) => s.connection.endpoint)
 

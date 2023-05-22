@@ -29,6 +29,7 @@ import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 const DepositCard = ({
   deposit,
@@ -45,7 +46,7 @@ const DepositCard = ({
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const actualClient = vsrClient || client
   const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection.current)
+  const { connection } = useConnection()
   const endpoint = useWalletStore((s) => s.connection.endpoint)
   const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false)
   const handleWithDrawFromDeposit = async (
