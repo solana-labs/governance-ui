@@ -4,22 +4,27 @@ import { useMemo } from 'react'
 import useWalletStore from '../stores/useWalletStore'
 import useWalletOnePointOh from './useWalletOnePointOh'
 import { useConnection } from '@solana/wallet-adapter-react'
+import useLegacyConnectionContext from './useLegacyConnectionContext'
 
 /** @deprecated */
 export default function useWalletDeprecated() {
-  const { connection } = useConnection()
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
 
   const anchorProvider = useMemo(() => {
     const options = AnchorProvider.defaultOptions()
     return new AnchorProvider(
-      connection,
+      connection.current,
       (wallet as unknown) as Wallet,
       options
     )
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [wallet])
+  }, [connection, wallet])
 
-  return { connected, wallet, anchorProvider, connection }
+  return useMemo(() => ({ connected, wallet, anchorProvider, connection }), [
+    anchorProvider,
+    connected,
+    connection,
+    wallet,
+  ])
 }
