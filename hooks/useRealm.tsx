@@ -14,7 +14,6 @@ import {
   VoterWeight,
 } from '../models/voteWeights'
 import useMembersStore from 'stores/useMembersStore'
-import useWalletStore from '../stores/useWalletStore'
 import {
   nftPluginsPks,
   vsrPluginsPks,

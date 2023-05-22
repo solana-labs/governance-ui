@@ -1,5 +1,4 @@
 import React, { useCallback, useState, useMemo } from 'react'
-import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
 import { fmtMintAmount, getMintDecimalAmount } from '@tools/sdk/units'
@@ -61,7 +60,6 @@ export const PositionCard: React.FC<PositionCardProps> = ({
   const [isDelegateModalOpen, setIsDelegateModalOpen] = useState(false)
   const realm = useRealmQuery().data?.result
   const mint = useRealmCommunityMintInfoQuery().data?.result
-  const { realmInfo } = useRealm()
   const [isLoading, positions, getPositions] = useHeliumVsrStore((s) => [
     s.state.isLoading,
     s.state.positions,

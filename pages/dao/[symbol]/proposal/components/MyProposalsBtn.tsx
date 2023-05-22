@@ -1,5 +1,5 @@
 import useRealm from '@hooks/useRealm'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import {
   getProposalDepositsByDepositPayer,
@@ -21,7 +21,6 @@ import dayjs from 'dayjs'
 import { notify } from '@utils/notifications'
 import Loading from '@components/Loading'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { sleep } from '@project-serum/common'
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { chunks } from '@utils/helpers'
 import { sendSignedTransaction } from '@utils/send'

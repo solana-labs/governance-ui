@@ -19,11 +19,7 @@ import Tooltip from '@components/Tooltip'
 import useWalletStore from 'stores/useWalletStore'
 import { getStakeSchema } from '@utils/validations'
 import { getConvertToStSolInstruction } from '@utils/instructionTools'
-import {
-  getInstructionDataFromBase64,
-  Governance,
-  ProgramAccount,
-} from '@solana/spl-governance'
+import { getInstructionDataFromBase64 } from '@solana/spl-governance'
 import useQueryContext from '@hooks/useQueryContext'
 import { useRouter } from 'next/router'
 import { notify } from '@utils/notifications'

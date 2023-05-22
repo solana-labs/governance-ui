@@ -1,14 +1,8 @@
-import {
-  useAddressQuery_CommunityTokenOwner,
-  useAddressQuery_CouncilTokenOwner,
-} from '@hooks/queries/addresses/tokenOwnerRecord'
-import { useAddressQuery_SelectedProposalVoteRecord } from '@hooks/queries/addresses/voteRecord'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
 import {
   useUserCommunityTokenOwnerRecord,
   useUserCouncilTokenOwnerRecord,
 } from '@hooks/queries/tokenOwnerRecord'
-import { useVoteRecordByPubkeyQuery } from '@hooks/queries/voteRecord'
 import useRoleOfGovToken from '@hooks/selectedRealm/useRoleOfToken'
 import { useHasVoteTimeExpired } from '@hooks/useHasVoteTimeExpired'
 import { useProposalGovernanceQuery } from '@hooks/useProposal'

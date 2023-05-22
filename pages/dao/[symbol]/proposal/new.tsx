@@ -31,7 +31,6 @@ import {
   InstructionsContext,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
-import useWalletStore from 'stores/useWalletStore'
 import { notify } from 'utils/notifications'
 import Clawback from 'VoteStakeRegistry/components/instructions/Clawback'
 import Grant from 'VoteStakeRegistry/components/instructions/Grant'
@@ -131,7 +130,6 @@ import LiquidityStakingOption from './components/instructions/Dual/LiquidityStak
 import InitStrike from './components/instructions/Dual/InitStrike'
 import IdlSetBuffer from './components/instructions/Mango/MangoV4/IdlSetBuffer'
 import { useRealmQuery } from '@hooks/queries/realm'
-import { fetchGovernanceByPubkey } from '@hooks/queries/governance'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -163,7 +161,6 @@ const New = () => {
   const { handleCreateProposal } = useCreateProposal()
   const { fmtUrlWithCluster } = useQueryContext()
   const realm = useRealmQuery().data?.result
-  const connection = useWalletStore((s) => s.connection)
 
   const { symbol, realmInfo, canChooseWhoVote } = useRealm()
   const { availableInstructions } = useGovernanceAssets()

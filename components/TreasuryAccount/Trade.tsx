@@ -26,8 +26,6 @@ import { getValidatedPublickKey } from '@utils/validations'
 import { validateInstruction } from '@utils/instructionTools'
 import {
   getInstructionDataFromBase64,
-  Governance,
-  ProgramAccount,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
 import { notify } from '@utils/notifications'

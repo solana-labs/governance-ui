@@ -11,8 +11,6 @@ import { MintForm, UiInstruction } from 'utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssets from 'hooks/useGovernanceAssets'
 import {
   getInstructionDataFromBase64,
-  Governance,
-  ProgramAccount,
   serializeInstructionToBase64,
   withDepositGoverningTokens,
 } from '@solana/spl-governance'

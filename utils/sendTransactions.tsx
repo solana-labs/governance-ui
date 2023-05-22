@@ -27,11 +27,6 @@ interface TransactionInstructionWithType {
   instructionsSet: TransactionInstruction[]
   sequenceType?: SequenceType
 }
-interface TransactionsPlayingIndexes {
-  transactionsIdx: { [txIdx: number]: number }[]
-  sequenceType?: SequenceType
-}
-
 interface Block {
   blockhash: string
   lastValidBlockHeight: number

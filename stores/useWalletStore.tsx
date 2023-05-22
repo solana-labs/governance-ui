@@ -2,12 +2,6 @@ import create, { State } from 'zustand'
 import produce from 'immer'
 import { getOwnedTokenAccounts } from '../utils/tokens'
 
-import {
-  Governance,
-  VoteThreshold,
-  VoteThresholdType,
-} from '@solana/spl-governance'
-import { ProgramAccount } from '@solana/spl-governance'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import type { ConnectionContext } from 'utils/connection'
 import { getConnectionContext } from 'utils/connection'
@@ -434,7 +428,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
     }, */
   },
 }))
-
+/* 
 const getGovernanceWithDefaultValues = (
   governance: ProgramAccount<Governance>
 ) => {
@@ -457,5 +451,5 @@ const getGovernanceWithDefaultValues = (
     },
   }
 }
-
+ */
 export default useWalletStore
