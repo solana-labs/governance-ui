@@ -80,7 +80,7 @@ const INITIAL_PROPOSAL_STATE = {
   proposalOwner: undefined,
 } as const
 
-const useWalletStore = create<WalletStore>((set, get) => ({
+const useWalletStore = create<WalletStore>((set, _get) => ({
   connection: getConnectionContext('mainnet'),
   current: undefined,
   mockWallet: undefined,
