@@ -5,18 +5,14 @@ import useRealm from '@hooks/useRealm'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { VoteThresholdType, VoteKind } from '@solana/spl-governance'
 import { useMemo, useState } from 'react'
-import {
-  useIsInCoolOffTime,
-  useIsVoting,
-  useProposalVoteRecordQuery,
-  useVotingPop,
-} from './hooks'
+import { useIsInCoolOffTime, useIsVoting, useVotingPop } from './hooks'
 import {
   useUserCommunityTokenOwnerRecord,
   useUserCouncilTokenOwnerRecord,
 } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useProposalGovernanceQuery } from '@hooks/useProposal'
+import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
 
 /* 
   returns: undefined if loading, false if nobody can veto, 'council' if council can veto, 'community' if community can veto

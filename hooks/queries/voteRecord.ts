@@ -13,6 +13,11 @@ import useWalletStore from 'stores/useWalletStore'
 import { useAddressQuery_SelectedProposalVoteRecord } from './addresses/voteRecord'
 import queryClient from './queryClient'
 import { useRealmQuery } from './realm'
+import { useVotingPop } from '@components/VotePanel/hooks'
+import {
+  useAddressQuery_CommunityTokenOwner,
+  useAddressQuery_CouncilTokenOwner,
+} from './addresses/tokenOwnerRecord'
 
 export const voteRecordQueryKeys = {
   all: (cluster: EndpointTypes) => [cluster, 'VoteRecord'],
@@ -104,4 +109,31 @@ export const fetchVoteRecordByPubkey = (
     queryKey: voteRecordQueryKeys.byPubkey(cluster, pubkey),
     queryFn: () => asFindable(getVoteRecord)(connection, pubkey),
   })
+}
+
+export const useProposalVoteRecordQuery = (quorum: 'electoral' | 'veto') => {
+  const tokenRole = useVotingPop()
+  const community = useAddressQuery_CommunityTokenOwner()
+  const council = useAddressQuery_CouncilTokenOwner()
+
+  const electoral =
+    tokenRole === undefined
+      ? undefined
+      : tokenRole === 'community'
+      ? community
+      : council
+  const veto =
+    tokenRole === undefined
+      ? undefined
+      : tokenRole === 'community'
+      ? council
+      : community
+
+  const selectedTokenRecord = quorum === 'electoral' ? electoral : veto
+
+  const pda = useAddressQuery_SelectedProposalVoteRecord(
+    selectedTokenRecord?.data
+  )
+
+  return useVoteRecordByPubkeyQuery(pda.data)
 }

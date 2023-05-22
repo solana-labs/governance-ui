@@ -5,9 +5,10 @@ import Tooltip from '@components/Tooltip'
 import VetoButtons from './VetoButtons'
 import { CastVoteButtons } from './CastVoteButtons'
 import { YouVoted } from './YouVoted'
-import { useIsVoting, useProposalVoteRecordQuery } from './hooks'
+import { useIsVoting } from './hooks'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
+import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
 
 const VotePanel = () => {
   const proposal = useRouteProposalQuery().data?.result

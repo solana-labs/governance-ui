@@ -7,6 +7,7 @@ import {
   GOVERNANCE_CHAT_PROGRAM_ID,
   getGovernanceChatMessages,
 } from '@solana/spl-governance'
+import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
 
 export const useChatMessagesByProposalQuery = (proposalPk?: PublicKey) => {
   const connection = useWalletStore((s) => s.connection)
@@ -32,8 +33,7 @@ export const useChatMessagesByProposalQuery = (proposalPk?: PublicKey) => {
 
 const DiscussionPanel = () => {
   const { data: chatMessages } = useChatMessagesByProposalQuery()
-
-  const { voteRecordsByVoter } = useWalletStore((s) => s.selectedProposal)
+  const { data: voteRecord } = useProposalVoteRecordQuery('electoral')
 
   return (
     <div className="border border-fgd-4 p-4 md:p-6 rounded-lg">
@@ -54,9 +54,7 @@ const DiscussionPanel = () => {
         .map((cm) => (
           <Comment
             chatMessage={cm.account}
-            voteRecord={
-              voteRecordsByVoter[cm.account.author.toBase58()]?.account
-            }
+            voteRecord={voteRecord?.result?.account}
             key={cm.pubkey.toBase58()}
           />
         ))}

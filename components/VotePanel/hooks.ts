@@ -74,30 +74,3 @@ export const useVoterTokenRecord = () => {
     votingPop === 'community' ? ownTokenRecord : ownCouncilTokenRecord
   return voterTokenRecord
 }
-
-export const useProposalVoteRecordQuery = (quorum: 'electoral' | 'veto') => {
-  const tokenRole = useVotingPop()
-  const community = useAddressQuery_CommunityTokenOwner()
-  const council = useAddressQuery_CouncilTokenOwner()
-
-  const electoral =
-    tokenRole === undefined
-      ? undefined
-      : tokenRole === 'community'
-      ? community
-      : council
-  const veto =
-    tokenRole === undefined
-      ? undefined
-      : tokenRole === 'community'
-      ? council
-      : community
-
-  const selectedTokenRecord = quorum === 'electoral' ? electoral : veto
-
-  const pda = useAddressQuery_SelectedProposalVoteRecord(
-    selectedTokenRecord?.data
-  )
-
-  return useVoteRecordByPubkeyQuery(pda.data)
-}

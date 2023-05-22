@@ -17,12 +17,7 @@ import { getProgramVersionForRealm } from '@models/registry/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { useRouter } from 'next/router'
 import Tooltip from '@components/Tooltip'
-import {
-  useVoterTokenRecord,
-  useIsVoting,
-  useProposalVoteRecordQuery,
-  useIsInCoolOffTime,
-} from './hooks'
+import { useVoterTokenRecord, useIsVoting, useIsInCoolOffTime } from './hooks'
 import assertUnreachable from '@utils/typescript/assertUnreachable'
 import { useHasVoteTimeExpired } from '@hooks/useHasVoteTimeExpired'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
@@ -30,6 +25,7 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
 import { useProposalGovernanceQuery } from '@hooks/useProposal'
+import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
 
 export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
   const client = useVotePluginsClientStore(

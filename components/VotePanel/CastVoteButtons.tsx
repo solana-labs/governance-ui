@@ -6,7 +6,6 @@ import VoteCommentModal from '../VoteCommentModal'
 import {
   useIsInCoolOffTime,
   useIsVoting,
-  useProposalVoteRecordQuery,
   useVoterTokenRecord,
   useVotingPop,
 } from './hooks'
@@ -14,6 +13,7 @@ import useRealm from '@hooks/useRealm'
 import { VotingClientType } from '@utils/uiTypes/VotePlugin'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
 
 const useCanVote = () => {
   const client = useVotePluginsClientStore(

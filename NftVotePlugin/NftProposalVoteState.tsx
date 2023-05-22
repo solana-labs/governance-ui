@@ -3,21 +3,18 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { ProgramAccount, Proposal, ProposalState } from '@solana/spl-governance'
 import { useEffect } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import useWalletStore from 'stores/useWalletStore'
 import useNftProposalStore from './NftProposalStore'
 import useNftPluginStore from './store/nftPluginStore'
-import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
 
 const NftProposalVoteState = ({
   proposal,
 }: {
   proposal?: ProgramAccount<Proposal>
 }) => {
-  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const config = useRealmConfigQuery().data?.result
 
-  const { voteRecordsByVoter } = useWalletStore((s) => s.selectedProposal)
   const plugin = useVotePluginsClientStore((s) => s.state.nftClient)
   const getCountedNfts = useNftProposalStore((s) => s.getCountedNfts)
   const countedNfts = useNftProposalStore((s) => s.countedNftsForProposal)
@@ -29,9 +26,8 @@ const NftProposalVoteState = ({
       config?.account.communityTokenConfig.voterWeightAddin?.toBase58()
     )
 
-  const ownVoteRecord = ownTokenRecord
-    ? voteRecordsByVoter[ownTokenRecord.account.governingTokenOwner.toBase58()]
-    : wallet?.publicKey && voteRecordsByVoter[wallet.publicKey.toBase58()]
+  const ownVoteRecord = useProposalVoteRecordQuery('electoral').data?.result
+
   const showVoteRecords =
     countedNfts.length > 0 &&
     countedNfts.length < votingPower.toNumber() &&
