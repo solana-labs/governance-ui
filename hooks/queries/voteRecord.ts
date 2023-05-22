@@ -56,7 +56,8 @@ export const useVoteRecordByPubkeyQuery = (pubkey?: PublicKey) => {
   return query
 }
 
-export const useVoteRecordsForRealmByOwner = (owner?: PublicKey) => {
+// doesn't actually filter by realm !
+export const useVoteRecordsByOwnerQuery = (owner?: PublicKey) => {
   const connection = useWalletStore((s) => s.connection)
   const realm = useRealmQuery().data?.result
 

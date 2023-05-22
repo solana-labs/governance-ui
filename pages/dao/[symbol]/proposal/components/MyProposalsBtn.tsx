@@ -1,5 +1,5 @@
 import useRealm from '@hooks/useRealm'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import {
   getProposalDepositsByDepositPayer,
@@ -40,7 +40,7 @@ import {
   useUserCouncilTokenOwnerRecord,
 } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
-import { useVoteRecordsForRealmByOwner } from '@hooks/queries/voteRecord'
+import { useVoteRecordsByOwnerQuery } from '@hooks/queries/voteRecord'
 import useProgramVersion from '@hooks/useProgramVersion'
 import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
 
@@ -52,9 +52,10 @@ const MyProposalsBn = () => {
   const { governancesArray } = useGovernanceAssets()
   const { current: connection } = useWalletStore((s) => s.connection)
 
-  const myVoteRecords = useVoteRecordsForRealmByOwner(
+  const myVoteRecords = useVoteRecordsByOwnerQuery(
     wallet?.publicKey ?? undefined
   ).data
+
   const ownVoteRecordsByProposal = useMemo(() => {
     return myVoteRecords !== undefined
       ? (Object.fromEntries(
@@ -98,8 +99,12 @@ const MyProposalsBn = () => {
                 ownCouncilTokenRecord?.pubkey.toBase58()
           )
         : [],
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    [proposals, ownVoteRecordsByProposal, connected]
+    [
+      connected,
+      proposals,
+      ownTokenRecord?.pubkey,
+      ownCouncilTokenRecord?.pubkey,
+    ]
   )
   const drafts = myProposals.filter((x) => {
     return x.account.state === ProposalState.Draft
@@ -337,7 +342,8 @@ const MyProposalsBn = () => {
       console.log(e)
     }
   }
-  const getNftsVoteRecord = async () => {
+
+  const getNftsVoteRecord = useCallback(async () => {
     const nftClient = client.client as NftVoterClient
     const nftVoteRecords = await nftClient.program.account.nftVoteRecord.all([
       {
@@ -357,7 +363,8 @@ const MyProposalsBn = () => {
           realm?.account.communityMint.toBase58()
     )
     setOwnNftVoteRecords(nftVoteRecordsFiltered)
-  }
+  }, [client.client, proposals, realm?.account.communityMint, wallet])
+
   const releaseSol = async () => {
     const instructions: TransactionInstruction[] = []
     for (const proposalDeposit of proposalsWithDepositedTokens) {
@@ -379,7 +386,7 @@ const MyProposalsBn = () => {
     })
     getSolDeposits()
   }
-  const getSolDeposits = async () => {
+  const getSolDeposits = useCallback(async () => {
     const solDeposits = await getProposalDepositsByDepositPayer(
       connection,
       realm!.owner,
@@ -395,29 +402,36 @@ const MyProposalsBn = () => {
       )
     })
     setProposalsWithDepositedTokens(filterdSolDeposits)
-  }
+  }, [connection, proposals, realm, wallet])
   useEffect(() => {
     if (
       wallet?.publicKey &&
       modalIsOpen &&
-      realmInfo!.programVersion &&
-      realmInfo!.programVersion > 2 &&
+      realmInfo?.programVersion &&
+      realmInfo?.programVersion > 2 &&
       Object.keys(proposals).length
     ) {
       getSolDeposits()
     }
   }, [
-    wallet?.publicKey?.toBase58(),
+    getSolDeposits,
     modalIsOpen,
+    proposals,
+    realmInfo,
     realmInfo?.programVersion,
-    Object.keys(proposals).length,
+    wallet?.publicKey,
   ])
   useEffect(() => {
     if (wallet?.publicKey && isNftMode && client.client && modalIsOpen) {
       getNftsVoteRecord()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [client.clientType, isNftMode, wallet?.publicKey?.toBase58(), modalIsOpen])
+  }, [
+    client.client,
+    getNftsVoteRecord,
+    isNftMode,
+    modalIsOpen,
+    wallet?.publicKey,
+  ])
 
   return (
     <>
