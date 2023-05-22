@@ -62,6 +62,10 @@ const devnetHardcodedPrograms = {
   GsoJzs1Pb5J31huQki69G3Ng4zBco5d1Feu28tH7CJCu: [
     'Fs9fJums4kmSUhEc5SFTUttzJQdicEYq54wgLqZVYqeP',
   ],
+  //metaplex dao
+  CmfnQAJjgUWge1ACV8rCtKWS65GaQu7sVGoFd5qdJEfm: [
+    'metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s',
+  ],
 }
 
 interface SolAccInfo {
@@ -1078,10 +1082,18 @@ const getHardcodedDevnetPrograms = async (
       const info = programInfo?.data['parsed']?.info
       const authority = info.authority
       console.log(id, authority)
-      accounts.push({
-        owner: new PublicKey(authority),
-        programId: new PublicKey(id),
-      })
+      if (
+        governancesArray.find(
+          (x) =>
+            x.nativeTreasuryAddress.toBase58() === authority ||
+            x.pubkey.toBase58() === authority
+        )
+      ) {
+        accounts.push({
+          owner: new PublicKey(authority),
+          programId: new PublicKey(id),
+        })
+      }
     }
   }
   return accounts
