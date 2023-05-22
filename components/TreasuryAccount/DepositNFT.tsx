@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import Button, { SecondaryButton } from '@components/Button'
 import Tooltip from '@components/Tooltip'
 import DepositNFTFromWallet from './DepositNFTFromWallet'

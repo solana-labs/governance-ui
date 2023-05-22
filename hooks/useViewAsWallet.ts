@@ -3,7 +3,6 @@ import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { PublicKey, Transaction } from '@solana/web3.js'
 import { useRouter } from 'next/router'
 import { useCallback, useMemo } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import useLegacyConnectionContext from './useLegacyConnectionContext'
 
 const useViewAsWallet = () => {

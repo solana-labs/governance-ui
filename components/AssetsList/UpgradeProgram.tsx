@@ -5,7 +5,6 @@ import Input from 'components/inputs/Input'
 import Button, { LinkButton } from '@components/Button'
 import Textarea from 'components/inputs/Textarea'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
-import useWalletStore from 'stores/useWalletStore'
 import { validateBuffer } from 'utils/validations'
 import { useEffect, useState } from 'react'
 import {

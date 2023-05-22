@@ -16,7 +16,6 @@ import {
 } from '@tools/sdk/units'
 import { precision } from '@utils/formatting'
 import { useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import { voteRegistryLockDeposit } from 'VoteStakeRegistry/actions/voteRegistryLockDeposit'
 import { DepositWithMintAccount } from 'VoteStakeRegistry/sdk/accounts'
 import {

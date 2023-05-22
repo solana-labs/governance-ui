@@ -17,6 +17,7 @@ import useWalletStore from 'stores/useWalletStore';
 
 import { useRealmQuery } from '@hooks/queries/realm';
 import useCreateProposal from '@hooks/useCreateProposal';
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext';
 import useQueryContext from '@hooks/useQueryContext';
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh';
 import { Primary, Secondary } from '@hub/components/controls/Button';
@@ -32,7 +33,6 @@ import { Form } from './Form';
 import * as gql from './gql';
 import { RealmHeader } from './RealmHeader';
 import { Summary } from './Summary';
-import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext';
 
 type Governance = TypeOf<
   typeof gql.getGovernanceResp

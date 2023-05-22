@@ -9,7 +9,6 @@ import { SwitchboardAdmitOracleForm } from '@utils/uiTypes/proposalCreationTypes
 import { PublicKey } from '@solana/web3.js'
 import Input from '@components/inputs/Input'
 import * as sbv2 from '@switchboard-xyz/switchboard-v2'
-import useWalletStore from 'stores/useWalletStore'
 import * as anchor from '@coral-xyz/anchor'
 import sbIdl from 'SwitchboardVotePlugin/switchboard_v2.json'
 import gonIdl from 'SwitchboardVotePlugin/gameofnodes.json'

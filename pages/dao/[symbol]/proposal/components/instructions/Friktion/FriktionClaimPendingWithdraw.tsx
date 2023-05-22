@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import useRealm from '@hooks/useRealm'
 import { PublicKey } from '@solana/web3.js'
-import useWalletStore from 'stores/useWalletStore'
 import {
   FriktionClaimPendingWithdrawForm,
   UiInstruction,

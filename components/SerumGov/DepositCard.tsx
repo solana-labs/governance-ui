@@ -14,7 +14,6 @@ import {
   parseMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
 import { useMemo, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import Loading from '@components/Loading'
 import {
   getInstructionDataFromBase64,

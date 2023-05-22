@@ -15,7 +15,6 @@ import {
 } from '@utils/uiTypes/proposalCreationTypes'
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import useWalletStore from 'stores/useWalletStore'
 
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'

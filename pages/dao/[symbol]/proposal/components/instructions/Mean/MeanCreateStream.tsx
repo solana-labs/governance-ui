@@ -10,7 +10,6 @@ import getMint from '@utils/instructions/Mean/getMint'
 import { MeanCreateStream } from '@utils/uiTypes/proposalCreationTypes'
 import { getMeanCreateStreamSchema } from '@utils/validations'
 import React, { useContext, useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 
 import { NewProposalContext } from '../../../new'
 import SelectStreamingAccount from './SelectStreamingAccount'

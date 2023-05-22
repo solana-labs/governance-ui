@@ -1,6 +1,5 @@
 import React from 'react'
 import { RpcContext } from '@solana/spl-governance'
-import useWalletStore from 'stores/useWalletStore'
 import useRealm from 'hooks/useRealm'
 import Button, { SecondaryButton } from '@components/Button'
 import { notify } from 'utils/notifications'

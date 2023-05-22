@@ -8,7 +8,6 @@ import { updateUserInput, validatePubkey } from '@utils/formValidation'
 import { notify } from '@utils/notifications'
 import { abbreviateAddress } from '@utils/formatting'
 
-import useWalletStore from 'stores/useWalletStore'
 
 import { NewButton as Button } from '@components/Button'
 import Text from '@components/Text'

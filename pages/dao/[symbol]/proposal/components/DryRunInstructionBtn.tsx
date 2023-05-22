@@ -10,7 +10,6 @@ import { notify } from '@utils/notifications'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { dryRunInstruction } from 'actions/dryRunInstruction'
 import React, { useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 
 const DryRunInstructionBtn = ({
   getInstructionDataFcn,

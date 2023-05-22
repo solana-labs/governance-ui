@@ -6,7 +6,6 @@ import {
 } from '@solana/spl-governance'
 import { validateInstruction } from '@utils/instructionTools'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
-import useWalletStore from 'stores/useWalletStore'
 
 import { NewProposalContext } from '../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'

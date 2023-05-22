@@ -6,7 +6,6 @@ import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import { PublicKey } from '@solana/web3.js'
 import { precision } from '@utils/formatting'
 import { tryParseKey } from '@tools/validators/pubkey'
-import useWalletStore from 'stores/useWalletStore'
 import { TokenProgramAccount, tryGetTokenAccount } from '@utils/tokens'
 import {
   SplTokenTransferForm,

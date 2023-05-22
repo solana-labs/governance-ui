@@ -1,7 +1,6 @@
 import { PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
 import asFindable from '@utils/queries/asFindable'
-import useWalletStore from 'stores/useWalletStore'
 import { getProposal, getProposalsByGovernance } from '@solana/spl-governance'
 import { useRealmQuery } from './realm'
 import { useRouter } from 'next/router'

@@ -1,9 +1,7 @@
 import { AnchorProvider, Wallet } from '@coral-xyz/anchor'
 import { useMemo } from 'react'
 
-import useWalletStore from '../stores/useWalletStore'
 import useWalletOnePointOh from './useWalletOnePointOh'
-import { useConnection } from '@solana/wallet-adapter-react'
 import useLegacyConnectionContext from './useLegacyConnectionContext'
 
 /** @deprecated */

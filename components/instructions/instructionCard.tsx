@@ -14,7 +14,6 @@ import {
   WSOL_MINT,
 } from './tools'
 import React, { useEffect, useRef, useState } from 'react'
-import useWalletStore from '../../stores/useWalletStore'
 import { getExplorerUrl } from '../explorer/tools'
 import { getProgramName, isNativeSolanaProgram } from './programs/names'
 import { tryGetTokenAccount } from '@utils/tokens'

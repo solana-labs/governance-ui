@@ -26,7 +26,6 @@ import { useRouter } from 'next/router'
 import { pdas } from 'psyfi-euros-test'
 import React, { useCallback, useEffect, useState } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import useWalletStore from 'stores/useWalletStore'
 import {
   Action,
   CreatePsyFiStrategy,

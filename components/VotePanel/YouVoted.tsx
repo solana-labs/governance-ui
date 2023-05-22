@@ -11,7 +11,6 @@ import {
   BanIcon,
   MinusCircleIcon,
 } from '@heroicons/react/solid'
-import useWalletStore from '../../stores/useWalletStore'
 import { SecondaryButton } from '../Button'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'

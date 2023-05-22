@@ -8,7 +8,6 @@ import {
   getUpdateTokenMetadataInstruction,
   validateInstruction,
 } from '@utils/instructionTools'
-import useWalletStore from 'stores/useWalletStore'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import useCreateProposal from '@hooks/useCreateProposal'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'

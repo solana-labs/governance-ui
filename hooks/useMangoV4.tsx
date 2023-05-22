@@ -7,7 +7,6 @@ import {
   MangoClient,
   MANGO_V4_ID,
 } from '@blockworks-foundation/mango-v4'
-import useWalletStore from 'stores/useWalletStore'
 import { useEffect, useState } from 'react'
 import useWalletOnePointOh from './useWalletOnePointOh'
 import useLegacyConnectionContext from './useLegacyConnectionContext'

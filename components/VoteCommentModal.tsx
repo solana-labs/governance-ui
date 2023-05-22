@@ -6,7 +6,6 @@ import {
   VoteKind,
 } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
-import useWalletStore from '../stores/useWalletStore'
 import useRealm from '../hooks/useRealm'
 import { castVote } from '../actions/castVote'
 

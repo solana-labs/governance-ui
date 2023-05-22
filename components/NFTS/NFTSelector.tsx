@@ -11,7 +11,6 @@ import { PublicKey } from '@solana/web3.js'
 import Loading from '@components/Loading'
 import { getNfts } from '@utils/tokens'
 import ImgWithLoader from '@components/ImgWithLoader'
-import useWalletStore from 'stores/useWalletStore'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export interface NftSelectorFunctions {

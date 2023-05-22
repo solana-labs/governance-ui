@@ -3,7 +3,6 @@ import { DisplayAddress } from '@cardinal/namespaces-components'
 import Select from '@components/inputs/Select'
 import { fmtMintAmount } from '@tools/sdk/units'
 import useMembersStore from 'stores/useMembersStore'
-import useWalletStore from 'stores/useWalletStore'
 import useRealm from 'hooks/useRealm'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import {

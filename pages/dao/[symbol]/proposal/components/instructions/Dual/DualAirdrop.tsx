@@ -12,7 +12,6 @@ import {
   getGovernanceAirdropInstruction,
   getMerkleAirdropInstruction,
 } from '@utils/instructions/Dual/airdrop'
-import useWalletStore from 'stores/useWalletStore'
 import {
   getDualFinanceGovernanceAirdropSchema,
   getDualFinanceMerkleAirdropSchema,

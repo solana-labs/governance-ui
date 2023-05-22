@@ -9,7 +9,6 @@ import {
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
-import useWalletStore from 'stores/useWalletStore'
 import useRealm from '@hooks/useRealm'
 import Button from '@components/Button'
 import { getVoterWeightRecord } from '@utils/plugin/accounts'

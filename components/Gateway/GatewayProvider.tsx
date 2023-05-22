@@ -1,6 +1,5 @@
 import { FC } from 'react'
 import { GatewayProvider as InternalGatewayProvider } from '@civic/solana-gateway-react'
-import useWalletStore from '../../stores/useWalletStore'
 import useVotePluginsClientStore from '../../stores/useVotePluginsClientStore'
 import useGatewayPluginStore from '../../GatewayPlugin/store/gatewayPluginStore'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'

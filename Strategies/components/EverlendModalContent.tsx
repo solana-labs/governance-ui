@@ -11,7 +11,6 @@ import EverlendDeposit from './everlend/EverlendDeposit'
 import EverlendWithdraw from './everlend/EverlendWithdraw'
 import { findAssociatedTokenAccount } from '@everlend/common'
 import { PublicKey } from '@solana/web3.js'
-import useWalletStore from 'stores/useWalletStore'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 enum Tabs {

@@ -10,7 +10,6 @@ import tokenPriceService from '@utils/services/tokenPrice'
 import React, { useCallback, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import AccountLabel from './BaseAccountHeader'
-import useWalletStore from 'stores/useWalletStore'
 import {
   ArrowCircleDownIcon,
   ArrowCircleUpIcon,

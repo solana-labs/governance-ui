@@ -3,7 +3,6 @@ import useRealm from '@hooks/useRealm'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { RpcContext } from '@solana/spl-governance'
 import { fmtMintAmount, getMintDecimalAmount } from '@tools/sdk/units'
-import useWalletStore from 'stores/useWalletStore'
 import { voteRegistryWithdraw } from 'VoteStakeRegistry/actions/voteRegistryWithdraw'
 import {
   DepositWithMintAccount,

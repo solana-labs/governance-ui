@@ -6,7 +6,6 @@ import tokenPriceService, {
 } from '@utils/services/tokenPrice'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { TokenProgramAccount, tryGetMint } from '@utils/tokens'
-import useWalletStore from 'stores/useWalletStore'
 import { PublicKey } from '@solana/web3.js'
 import { MintInfo } from '@solana/spl-token'
 import { debounce } from '@utils/debounce'

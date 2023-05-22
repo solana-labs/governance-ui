@@ -1,6 +1,5 @@
 import { useEffect, useMemo } from 'react'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
-import useWalletStore from 'stores/useWalletStore'
 import { useRealmQuery } from './queries/realm'
 import { useRealmGovernancesQuery } from './queries/governance'
 import useLegacyConnectionContext from './useLegacyConnectionContext'

@@ -4,7 +4,6 @@ import { PublicKey } from '@solana/web3.js'
 import createNFTRealm from 'actions/createNFTRealm'
 import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
 
-import useWalletStore from 'stores/useWalletStore'
 
 import useQueryContext from '@hooks/useQueryContext'
 

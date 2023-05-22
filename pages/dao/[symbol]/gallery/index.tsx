@@ -1,7 +1,6 @@
 import { getExplorerUrl } from '@components/explorer/tools'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import { useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import { PhotographIcon, PlusCircleIcon } from '@heroicons/react/outline'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
