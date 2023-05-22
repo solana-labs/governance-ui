@@ -131,7 +131,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         actions.fetchRealm(programId, realmId)
       }
     }, */
-    async fetchWalletTokenAccounts() {
+    /* async fetchWalletTokenAccounts() {
       const connection = get().connection.current
       const wallet = get().mockWallet ?? get().current
       const connected = !!wallet?.connected
@@ -153,8 +153,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           state.tokenAccounts = []
         })
       }
-    },
-
+    }, */
     // selectedCouncilDelegate: string | undefined
     // selectedCommunityDelegate: string | undefined
     /* 
