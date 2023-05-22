@@ -15,6 +15,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import GovernanceAccountSelect from '../proposal/components/GovernanceAccountSelect'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const SetRealmAuthorityModal = ({
   closeModal,
@@ -26,7 +27,7 @@ const SetRealmAuthorityModal = ({
   const realm = useRealmQuery().data?.result
   const { realmInfo } = useRealm()
   const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const { governancesArray } = useGovernanceAssets()
   const [account, setAccount] = useState<ProgramAccount<Governance> | null>(
     null

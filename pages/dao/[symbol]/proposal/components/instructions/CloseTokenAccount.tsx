@@ -27,6 +27,7 @@ import { getATA } from '@utils/ataTools'
 import { sendTransactionsV3, SequenceType } from '@utils/sendTransactions'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export interface CloseTokenAccountForm {
   governedAccount: AssetAccount | undefined
@@ -43,7 +44,7 @@ const CloseTokenAccount = ({
 }) => {
   const realm = useRealmQuery().data?.result
   const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const [form, setForm] = useState<CloseTokenAccountForm>()

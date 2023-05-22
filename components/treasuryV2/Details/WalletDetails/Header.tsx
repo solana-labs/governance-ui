@@ -21,6 +21,7 @@ import Address from '@components/Address'
 import AddAssetModal from './AddAssetModal'
 import SelectedWalletIcon from '../../icons/SelectedWalletIcon'
 import { AssetAccount, AccountType } from '@utils/uiTypes/assets'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 enum ModalType {
   AddAsset,
@@ -40,7 +41,7 @@ export default function Header(props: Props) {
   const { assetAccounts, nftsGovernedTokenAccounts } = useGovernanceAssets()
   const { setCurrentAccount } = useTreasuryAccountStore()
   const { symbol } = useRealm()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const router = useRouter()
 
   return (

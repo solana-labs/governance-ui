@@ -20,6 +20,7 @@ import useMembersStore from 'stores/useMembersStore'
 import useWalletStore from 'stores/useWalletStore'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useTokenRecordsByOwnersMap } from '@hooks/queries/tokenOwnerRecord'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export default function useMembers() {
   const realm = useRealmQuery().data?.result
@@ -29,7 +30,7 @@ export default function useMembers() {
     councilTORsByOwner: councilTokenOwnerRecords,
   } = useTokenRecordsByOwnersMap()
 
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const setMembers = useMembersStore((s) => s.setMembers)
   const setDelegates = useMembersStore((s) => s.setDelegates)
 

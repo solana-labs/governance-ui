@@ -51,6 +51,7 @@ import useCreateProposal from '@hooks/useCreateProposal'
 import NFTAccountSelect from './NFTAccountSelect'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const SendTokens = ({
   isNft = false,
@@ -60,7 +61,7 @@ const SendTokens = ({
   selectedNft?: NFTWithMint | null
 }) => {
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
   const { setCurrentAccount } = useTreasuryAccountStore()
   const realm = useRealmQuery().data?.result

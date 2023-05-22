@@ -11,6 +11,7 @@ import { abbreviateAddress } from '@utils/formatting'
 import createPaymentStreaming from '@utils/instructions/Mean/createPaymentStreaming'
 import getMint from '@utils/instructions/Mean/getMint'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const getLabel = (
   paymentStreamingAccount: PaymentStreamingAccount | undefined,
@@ -71,7 +72,7 @@ const SelectStreamingAccount = ({
   shouldBeGoverned = false,
   governance,
 }: Props) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const { governedTokenAccountsWithoutNfts: accounts } = useGovernanceAssets()
   const [paymentStreamingAccounts, setPaymentStreamingAccounts] = useState<

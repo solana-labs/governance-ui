@@ -7,6 +7,7 @@ import { tryGetMint } from '@utils/tokens'
 import useWalletStore from 'stores/useWalletStore'
 import queryClient from './queryClient'
 import { useRealmQuery } from './realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export const mintInfoQueryKeys = {
   all: (cluster: EndpointTypes) => [cluster, 'MintInfo'],
@@ -17,7 +18,7 @@ export const mintInfoQueryKeys = {
 }
 
 export const useMintInfoByPubkeyQuery = (pubkey?: PublicKey) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const enabled = pubkey !== undefined
   const query = useQuery({

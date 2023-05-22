@@ -23,6 +23,7 @@ import { validateInstruction } from '@utils/instructionTools'
 import ProgramUpgradeInfo from './ProgramUpgradeInfo'
 import { AccountType } from '@utils/uiTypes/assets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const ProgramUpgrade = ({
   index,
@@ -31,7 +32,7 @@ const ProgramUpgrade = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()

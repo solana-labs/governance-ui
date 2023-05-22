@@ -1,3 +1,4 @@
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { GovernanceAccount, getGovernanceAccount } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
@@ -20,7 +21,7 @@ export function useGovernanceAccountByPubkeyQuery<T extends GovernanceAccount>(
   kindLabel: string,
   pubkey?: PublicKey
 ) {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const enabled = pubkey !== undefined
   const query = useQuery({

@@ -50,7 +50,7 @@
 
 export default function Sell() {
   //   const wallet = useWalletOnePointOh()
-  //   const connection = useWalletStore((s) => s.connection)
+  //   const connection = useLegacyConnectionContext()
   //   const formatter = Intl.NumberFormat('en', {
   //     notation: 'compact',
   //   })

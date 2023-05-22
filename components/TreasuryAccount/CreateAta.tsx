@@ -16,6 +16,7 @@ import TokenMintInput from '@components/inputs/TokenMintInput'
 import { TokenInfoWithoutDecimals } from '@utils/services/tokenPrice'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const CreateAta = ({
   owner,
@@ -30,7 +31,7 @@ const CreateAta = ({
   const refetchGovernanceAccounts = useGovernanceAssetsStore(
     (s) => s.refetchGovernanceAccounts
   )
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const [isLoading, setIsLoading] = useState(false)
   const [validatedTypedMint, setValidatedTypedMint] = useState<

@@ -7,6 +7,7 @@ import { Client } from '@utils/uiTypes/VotePlugin'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 // A data structure that indicates if a record that a plugin relies on (token owner record or voter weight recird)
 // exists on chain or not - if not, it will trigger the "Join" button to create it.
@@ -28,7 +29,7 @@ export const useRecords = (): AvailableRecordAccounts => {
     (s) => s.state.currentRealmVotingClient
   )
   const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const realm = useRealmQuery().data?.result
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
 

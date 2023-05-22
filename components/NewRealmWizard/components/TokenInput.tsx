@@ -18,6 +18,7 @@ import TokenInfoTable, {
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { TokenInfo } from '@utils/services/types'
 import tokenPriceService from '@utils/services/tokenPrice'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface MintInfoWithDecimalSupply extends MintInfo {
   supplyAsDecimal: number
@@ -60,7 +61,7 @@ export default function TokenInput({
   onValidation,
   disableMinTokenInput = false,
 }) {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const tokenList = tokenPriceService._tokenList

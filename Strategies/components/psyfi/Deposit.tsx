@@ -44,6 +44,7 @@ import {
   useRealmCommunityMintInfoQuery,
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const SOL_BUFFER = 0.02
 
@@ -73,7 +74,7 @@ export const Deposit: React.FC<{
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const [ownedStrategyTokenAccount, setOwnedStrategyTokenAccount] = useState<
     AssetAccount | undefined

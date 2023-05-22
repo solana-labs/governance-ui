@@ -20,6 +20,7 @@ import VotingPowerPct from './VotingPowerPct'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface Props {
   className?: string
@@ -34,7 +35,7 @@ export default function NftVotingPower(props: Props) {
   const isLoading = useNftPluginStore((s) => s.state.isLoadingNfts)
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const realm = useRealmQuery().data?.result
   const { realmInfo } = useRealm()

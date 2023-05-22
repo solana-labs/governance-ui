@@ -4,6 +4,7 @@ import { PublicKey, Transaction } from '@solana/web3.js'
 import { useRouter } from 'next/router'
 import { useCallback, useMemo } from 'react'
 import useWalletStore from 'stores/useWalletStore'
+import useLegacyConnectionContext from './useLegacyConnectionContext'
 
 const useViewAsWallet = () => {
   const router = useRouter()
@@ -16,7 +17,7 @@ const useViewAsWallet = () => {
     throw new Error(msg)
   }
 
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const signTransaction = useCallback(
     async (transaction: Transaction) => {

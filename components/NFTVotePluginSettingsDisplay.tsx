@@ -12,6 +12,7 @@ import BigNumber from 'bignumber.js'
 import * as RE from '@utils/uiTypes/Result'
 import NFTIcon from '@components/treasuryV2/icons/NFTCollectionPreviewIcon'
 import { tryGetMint, getNFTsByCollection } from '@utils/tokens'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface CollectionConfig {
   collection: PublicKey
@@ -128,7 +129,7 @@ interface Props {
 }
 
 export function NFTVotePluginSettingsDisplay(props: Props) {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const registrar = useVotePluginsClientStore((s) => s.state.nftMintRegistrar)
   const [collections, setCollections] = useState<RE.Result<Data>>(RE.pending())
 

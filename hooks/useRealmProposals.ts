@@ -24,6 +24,7 @@ import {
   useRealmCommunityMintInfoQuery,
   useRealmCouncilMintInfoQuery,
 } from './queries/mintInfo'
+import useLegacyConnectionContext from './useLegacyConnectionContext'
 
 const VotingFilter: Filters = {
   Cancelled: false,
@@ -51,7 +52,7 @@ export default function useRealmProposals(
   //Small hack to prevent race conditions with cluster change until we remove connection from store and move it to global dep.
   const routeHasClusterInPath = router.asPath.includes('cluster')
 
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const [governances, setGovernances] = useState<
     Record<string, ProgramAccount<Governance>>

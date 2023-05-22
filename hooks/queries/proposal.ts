@@ -9,6 +9,7 @@ import { tryParsePublicKey } from '@tools/core/pubkey'
 import { useMemo } from 'react'
 import { useRealmGovernancesQuery } from './governance'
 import queryClient from './queryClient'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export const proposalQueryKeys = {
   all: (cluster: string) => [cluster, 'Proposal'],
@@ -24,7 +25,7 @@ export const proposalQueryKeys = {
 }
 
 export const useProposalByPubkeyQuery = (pubkey?: PublicKey) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const enabled = pubkey !== undefined
   const query = useQuery({
@@ -55,7 +56,7 @@ export const useRouteProposalQuery = () => {
 }
 
 export const useRealmProposalsQuery = () => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const realm = useRealmQuery().data?.result
   const { data: governances } = useRealmGovernancesQuery()
 

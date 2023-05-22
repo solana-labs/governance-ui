@@ -7,6 +7,7 @@ import useWalletStore from 'stores/useWalletStore'
 import Select from '@components/inputs/Select'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import createPaymentStreaming from '@utils/instructions/Mean/createPaymentStreaming'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const getLabel = (stream: Stream | undefined) => {
   if (!stream) return undefined
@@ -34,7 +35,7 @@ const SelectStream = ({
   shouldBeGoverned = false,
   governance,
 }: Props) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const { governedTokenAccountsWithoutNfts: accounts } = useGovernanceAssets()
   const [streams, setStreams] = useState<Stream[]>([])

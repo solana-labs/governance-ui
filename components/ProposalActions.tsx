@@ -27,6 +27,7 @@ import { useProposalGovernanceQuery } from '@hooks/useProposal'
 import { useTokenOwnerRecordByPubkeyQuery } from '@hooks/queries/tokenOwnerRecord'
 import { useAsync } from 'react-async-hook'
 import { useGovernanceAccountByPubkeyQuery } from '@hooks/queries/governanceAccount'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const ProposalActionsPanel = () => {
   const proposal = useRouteProposalQuery().data?.result
@@ -39,7 +40,7 @@ const ProposalActionsPanel = () => {
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const maxVoteRecordPk = useMaxVoteRecord()?.pubkey
   const votePluginsClientMaxVoterWeight = useVotePluginsClientStore(

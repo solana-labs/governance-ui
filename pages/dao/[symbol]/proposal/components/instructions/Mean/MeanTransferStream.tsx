@@ -11,6 +11,7 @@ import { getMeanTransferStreamSchema } from '@utils/validations'
 
 import { NewProposalContext } from '../../../new'
 import SelectStream from './SelectStream'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface Props {
   index: number
@@ -33,7 +34,7 @@ const MeanTransferStreamComponent = ({ index, governance }: Props) => {
   }
 
   // instruction
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const schema = getMeanTransferStreamSchema()
   const { handleSetInstructions } = useContext(NewProposalContext)

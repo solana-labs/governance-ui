@@ -44,6 +44,7 @@ import { useRealmQuery } from '@hooks/queries/realm'
 import queryClient from '@hooks/queries/queryClient'
 import asFindable from '@utils/queries/asFindable'
 import { tokenOwnerRecordQueryKeys } from '@hooks/queries/tokenOwnerRecord'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const Grant = ({
   index,
@@ -54,7 +55,7 @@ const Grant = ({
 }) => {
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const dateNow = dayjs().unix()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const realm = useRealmQuery().data?.result
 

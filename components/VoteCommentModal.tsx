@@ -29,6 +29,7 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface VoteCommentModalProps {
   onClose: () => void
@@ -51,7 +52,7 @@ const useSubmitVote = ({
   )
   const [submitting, setSubmitting] = useState(false)
   const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const proposal = useRouteProposalQuery().data?.result
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result

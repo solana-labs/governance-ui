@@ -19,6 +19,7 @@ import { useDestination } from '@hooks/useDestination'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const Mint = ({
   index,
@@ -29,7 +30,7 @@ const Mint = ({
   governance: ProgramAccount<Governance> | null
   initialMintAccount?: AssetAccount | undefined
 }) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
 

@@ -20,6 +20,7 @@ import useWalletStore from 'stores/useWalletStore'
 import Address from '@components/Address'
 
 import AddAssetModal from '../WalletDetails/AddAssetModal'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface Props {
   className?: string
@@ -32,7 +33,7 @@ export default function Header(props: Props) {
   const [depositAssetModalOpen, setDepositAssetModalOpen] = useState(false)
   const [isATA, setIsATA] = useState(false)
   const setCurrentAccount = useTreasuryAccountStore((s) => s.setCurrentAccount)
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const { canUseTransferInstruction } = useGovernanceAssets()
 
   useEffect(() => {

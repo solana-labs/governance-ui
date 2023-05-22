@@ -14,6 +14,7 @@ import { getMeanCreateAccountSchema } from '@utils/validations'
 
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const typeSelectOptions = [AccountType.Open, AccountType.Lock] as const
 
@@ -91,7 +92,7 @@ const MeanCreateAccountComponent = ({ index, governance }: Props) => {
   const schema = getMeanCreateAccountSchema({ form })
   const { handleSetInstructions } = useContext(NewProposalContext)
 
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const getInstruction = () =>
     getMeanCreateAccountInstruction({
       connection,

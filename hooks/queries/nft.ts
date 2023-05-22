@@ -6,6 +6,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { Metaplex } from '@metaplex-foundation/js'
 import { getNetworkFromEndpoint } from '@utils/connection'
 import queryClient from './queryClient'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export const nftQueryKeys = {
   all: (cluster: EndpointTypes) => [cluster, 'NFT'],
@@ -17,7 +18,7 @@ export const nftQueryKeys = {
 }
 
 export const useNFTbyMintQuery = (pubkey?: PublicKey) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const enabled = pubkey !== undefined
   const query = useQuery({

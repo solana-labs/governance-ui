@@ -44,6 +44,7 @@ import {
   useRealmCommunityMintInfoQuery,
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export const LockTokensAccount: React.FC<{
   // tokenOwnerRecordPk: string | string[] | undefined // @asktree: this was unused
@@ -51,7 +52,7 @@ export const LockTokensAccount: React.FC<{
 }> = (props) => {
   const { error, createPosition } = useCreatePosition()
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const { data: tokenOwnerRecordPk } = useAddressQuery_CommunityTokenOwner()
 

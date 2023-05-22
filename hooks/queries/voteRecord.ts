@@ -18,6 +18,7 @@ import {
   useAddressQuery_CommunityTokenOwner,
   useAddressQuery_CouncilTokenOwner,
 } from './addresses/tokenOwnerRecord'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export const voteRecordQueryKeys = {
   all: (cluster: EndpointTypes) => [cluster, 'VoteRecord'],
@@ -44,7 +45,7 @@ export const useVoteRecordByTokenOwnerRecordQuery = (
 }
 
 export const useVoteRecordByPubkeyQuery = (pubkey?: PublicKey) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const enabled = pubkey !== undefined
   const query = useQuery({
@@ -63,7 +64,7 @@ export const useVoteRecordByPubkeyQuery = (pubkey?: PublicKey) => {
 
 // doesn't actually filter by realm !
 export const useVoteRecordsByOwnerQuery = (owner?: PublicKey) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const realm = useRealmQuery().data?.result
 
   const enabled = owner !== undefined && realm?.pubkey !== undefined

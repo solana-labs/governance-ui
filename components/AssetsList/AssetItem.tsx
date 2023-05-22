@@ -15,6 +15,7 @@ import UpgradeProgram from './UpgradeProgram'
 import CloseBuffers from './CloseBuffers'
 import { getExplorerUrl } from '@components/explorer/tools'
 import TransferUpgradeAuthority from './TransferUpgradeAuthority'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const AssetItem = ({
   item,
@@ -32,7 +33,7 @@ const AssetItem = ({
     false
   )
   const [loadData, setLoadData] = useState(false)
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const name = item ? getProgramName(item.account.governedAccount) : ''
   const governedAccount = item
     ? abbreviateAddress(item?.account.governedAccount as PublicKey)

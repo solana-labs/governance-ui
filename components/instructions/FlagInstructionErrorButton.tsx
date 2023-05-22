@@ -21,6 +21,7 @@ import {
   useUserCommunityTokenOwnerRecord,
   useUserCouncilTokenOwnerRecord,
 } from '@hooks/queries/tokenOwnerRecord'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export function FlagInstructionErrorButton({
   proposal,
@@ -36,7 +37,7 @@ export function FlagInstructionErrorButton({
 
   const { realmInfo } = useRealm()
   const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const isProposalOwner =
     proposal.account.tokenOwnerRecord.toBase58() ===
       ownTokenRecord?.pubkey.toBase58() ||

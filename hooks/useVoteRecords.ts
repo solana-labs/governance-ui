@@ -22,6 +22,7 @@ import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import { PublicKey } from '@solana/web3.js'
 import { useRealmQuery } from './queries/realm'
 import { useRealmCommunityMintInfoQuery } from './queries/mintInfo'
+import useLegacyConnectionContext from './useLegacyConnectionContext'
 
 export { VoteType }
 
@@ -50,7 +51,7 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
 
   const [context, setContext] = useState<RpcContext | null>(null)
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const governingTokenMintPk = proposal?.account.governingTokenMint
 
   useEffect(() => {

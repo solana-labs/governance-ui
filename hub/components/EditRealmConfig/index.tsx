@@ -32,6 +32,7 @@ import { Form } from './Form';
 import * as gql from './gql';
 import { RealmHeader } from './RealmHeader';
 import { Summary } from './Summary';
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext';
 
 type Governance = TypeOf<
   typeof gql.getGovernanceResp
@@ -66,7 +67,7 @@ interface Props {
 }
 
 export function EditRealmConfig(props: Props) {
-  const connection = useWalletStore((s) => s.connection);
+  const connection = useLegacyConnectionContext();
   const { fmtUrlWithCluster } = useQueryContext();
   const realm = useRealmQuery().data?.result;
   const wallet = useWalletOnePointOh();

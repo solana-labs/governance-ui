@@ -46,6 +46,7 @@ import {
   useRealmCommunityMintInfoQuery,
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const RevokeMembership: FC<{ member: PublicKey; mint: PublicKey }> = ({
   member,
@@ -107,7 +108,7 @@ const MemberOverview = ({ member }: { member: Member }) => {
   const programVersion = useProgramVersion()
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
   const { symbol } = useRouter().query

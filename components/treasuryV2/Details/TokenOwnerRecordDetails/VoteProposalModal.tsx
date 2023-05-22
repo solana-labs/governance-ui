@@ -3,6 +3,7 @@ import Loading from '@components/Loading'
 import Modal from '@components/Modal'
 import { ThumbDownIcon, ThumbUpIcon } from '@heroicons/react/solid'
 import useCreateProposal from '@hooks/useCreateProposal'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import useWalletDeprecated from '@hooks/useWalletDeprecated'
@@ -53,7 +54,7 @@ export default function VoteProposalModal({
   // const [comment, setComment] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const { wallet } = useWalletDeprecated()
 
   const { handleCreateProposal } = useCreateProposal()

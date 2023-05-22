@@ -25,6 +25,7 @@ import { useRealmQuery } from '@hooks/queries/realm'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
 import { useProposalGovernanceQuery } from '@hooks/useProposal'
 import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
   const client = useVotePluginsClientStore(
@@ -34,7 +35,7 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
   const realm = useRealmQuery().data?.result
   const { realmInfo } = useRealm()
   const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const connected = !!wallet?.connected
 
   const governance = useProposalGovernanceQuery().data?.result

@@ -5,6 +5,7 @@ import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { WSOL_MINT } from '@components/instructions/tools'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const AccountItemNFT = ({
   governedAccountTokenAccount,
@@ -17,7 +18,7 @@ const AccountItemNFT = ({
   onClick?: () => void
   border?: boolean
 }) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const nftsPerPubkey = useTreasuryAccountStore((s) => s.governanceNfts)
   const { setCurrentAccount } = useTreasuryAccountStore()
 

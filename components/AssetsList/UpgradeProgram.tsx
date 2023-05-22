@@ -31,6 +31,7 @@ import useCreateProposal from '@hooks/useCreateProposal'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface UpgradeProgramCompactForm extends ProgramUpgradeForm {
   description: string
@@ -43,7 +44,7 @@ const UpgradeProgram = ({
   program: ProgramAccount<Governance>
 }) => {
   const router = useRouter()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const { assetAccounts } = useGovernanceAssets()
   const governedAccount = assetAccounts.find(

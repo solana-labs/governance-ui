@@ -24,6 +24,7 @@ import { useRouter } from 'next/router'
 import useQueryContext from '@hooks/useQueryContext'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 import Link from 'next/link'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface Props {
   className?: string
@@ -37,7 +38,7 @@ export default function Header(props: Props) {
 
   const asset = props.tokenOwnerRecordAsset
 
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const { current: wallet } = useWalletStore()
 
   const [isLeaving, setIsLeaving] = useState(false)

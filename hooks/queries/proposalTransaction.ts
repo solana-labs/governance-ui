@@ -9,6 +9,7 @@ import {
 import { useRouteProposalQuery } from './proposal'
 import { useRealmQuery } from './realm'
 import queryClient from './queryClient'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export const proposalTransactionQueryKeys = {
   all: (cluster: string) => [cluster, 'ProposalTransaction'],
@@ -25,7 +26,7 @@ export const proposalTransactionQueryKeys = {
 
 export const useSelectedProposalTransactions = () => {
   const proposal = useRouteProposalQuery().data?.result
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const realm = useRealmQuery().data?.result
 
   const enabled = realm !== undefined && proposal !== undefined

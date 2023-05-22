@@ -23,6 +23,7 @@ import useWalletStore from 'stores/useWalletStore'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { notify } from '@utils/notifications'
 import { NewProposalContext } from '../../new'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const JoinDAO = ({
   index,
@@ -37,7 +38,7 @@ const JoinDAO = ({
   const routeHasClusterInPath = router.asPath.includes('cluster')
 
   const { current: wallet } = useWalletStore()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const { governedSPLTokenAccounts } = useGovernanceAssets()
 

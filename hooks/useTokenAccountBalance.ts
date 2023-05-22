@@ -50,7 +50,7 @@ export default function useTokenAccountBalance(
 //   owner?: PublicKey | null,
 //   mint?: PublicKey
 // ) {
-//   const connection = useWalletStore((s) => s.connection)
+//   const connection = useLegacyConnectionContext()
 
 //   const [isLoading, setIsLoading] = useState(true)
 //   const [balance, setBalance] = useState<TokenAmount | null>(null)

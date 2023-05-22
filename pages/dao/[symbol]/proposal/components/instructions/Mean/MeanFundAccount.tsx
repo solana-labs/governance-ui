@@ -15,6 +15,7 @@ import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 
 import SelectStreamingAccount from './SelectStreamingAccount'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface Props {
   index: number
@@ -48,7 +49,7 @@ const MeanFundAccountComponent = ({ index, governance }: Props) => {
   const schema = getMeanFundAccountSchema({ form })
   const { handleSetInstructions } = useContext(NewProposalContext)
 
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const getInstruction = () =>
     getMeanFundAccountInstruction({
       connection,

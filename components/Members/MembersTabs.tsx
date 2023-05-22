@@ -12,6 +12,7 @@ import {
   useRealmCommunityMintInfoQuery,
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface MembersTabsProps {
   activeTab: Member
@@ -97,7 +98,7 @@ const MemberItems = ({
     councilVotes && !councilVotes.isZero()
       ? fmtMintAmount(councilMint, councilVotes)
       : null
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const renderAddressName = useMemo(() => {
     return (

@@ -33,6 +33,7 @@ import { DEFAULT_NFT_VOTER_PLUGIN } from '@tools/constants'
 import { useUserCommunityTokenOwnerRecord } from './queries/tokenOwnerRecord'
 import { useRealmQuery } from './queries/realm'
 import { useRealmConfigQuery } from './queries/realmConfig'
+import useLegacyConnectionContext from './useLegacyConnectionContext'
 
 export const vsrPluginsPks: string[] = [
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo',
@@ -85,7 +86,7 @@ export function useVotingPlugins() {
   const gatewayStore = useGatewayPluginStore()
   const switchboardStore = useSwitchboardPluginStore()
   const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const connected = !!wallet?.connected
 
   const [

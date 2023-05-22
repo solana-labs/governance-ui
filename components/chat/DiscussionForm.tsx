@@ -18,6 +18,7 @@ import {
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
 import { useVotingPop } from '@components/VotePanel/hooks'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const DiscussionForm = () => {
   const [comment, setComment] = useState('')
@@ -32,7 +33,7 @@ const DiscussionForm = () => {
 
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const proposal = useRouteProposalQuery().data?.result
   const tokenRole = useVotingPop()
   const commenterVoterTokenRecord =

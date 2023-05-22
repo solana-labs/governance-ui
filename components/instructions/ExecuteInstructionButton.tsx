@@ -29,6 +29,7 @@ import {
 import Wallet from '@project-serum/sol-wallet-adapter'
 import { getFormattedStringFromDays, SECS_PER_DAY } from '@utils/dateTools'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export enum PlayState {
   Played,
@@ -52,7 +53,7 @@ export function ExecuteInstructionButton({
 }) {
   const { realmInfo } = useRealm()
   const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const connected = !!wallet?.connected
 
   const [currentSlot, setCurrentSlot] = useState(0)

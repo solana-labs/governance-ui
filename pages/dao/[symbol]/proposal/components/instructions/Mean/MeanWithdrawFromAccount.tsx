@@ -14,6 +14,7 @@ import { getMeanWithdrawFromAccountSchema } from '@utils/validations'
 
 import { NewProposalContext } from '../../../new'
 import SelectStreamingAccount from './SelectStreamingAccount'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface Props {
   index: number
@@ -38,7 +39,7 @@ const MeanWithdrawFromAccountComponent = ({ index, governance }: Props) => {
   }
 
   // instruction
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const schema = getMeanWithdrawFromAccountSchema({
     form,

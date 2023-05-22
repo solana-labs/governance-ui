@@ -25,6 +25,7 @@ import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes'
 import { StakeAccount, StakeState } from '@utils/uiTypes/assets'
 import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
 import { getFilteredProgramAccounts } from '@utils/helpers'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const WithdrawValidatorStake = ({
   index,
@@ -33,7 +34,7 @@ const WithdrawValidatorStake = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const programId: PublicKey = StakeProgram.programId
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)

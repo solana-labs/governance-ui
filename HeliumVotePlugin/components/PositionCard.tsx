@@ -39,6 +39,7 @@ import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 import queryClient from '@hooks/queries/queryClient'
 import { tokenAccountQueryKeys } from '@hooks/queries/tokenAccount'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export interface PositionCardProps {
   subDaos?: SubDaoWithMeta[]
@@ -157,7 +158,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
     claimDelegatedPositionRewards,
   } = useClaimDelegatedPositionRewards()
 
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
 
   const { lockup, hasGenesisMultiplier, votingMint } = position

@@ -14,6 +14,7 @@ import useWalletStore from 'stores/useWalletStore'
 
 import { NewProposalContext } from '../../../new'
 import SelectStreamingAccount from './SelectStreamingAccount'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const rateIntervalOptions = {
   0: { idx: 0, display: 'Per minute', value: 0 },
@@ -57,7 +58,7 @@ const MeanCreateStreamComponent = ({ index, governance }: Props) => {
   }
 
   // instruction
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const schema = getMeanCreateStreamSchema({
     form,

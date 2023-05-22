@@ -20,6 +20,7 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { PublicKey } from '@solana/web3.js'
 import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
 import { useRealmsByProgramQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const RealmsDashboard = dynamic(() => import('./components/RealmsDashboard'))
 
@@ -30,7 +31,7 @@ const Realms = () => {
   >([])
   const [isLoadingRealms, setIsLoadingRealms] = useState(true)
   const [editingGrid, setEditingGrid] = useState(false)
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const router = useRouter()

@@ -9,13 +9,14 @@ import { getExplorerInspectorUrl, getExplorerUrl } from './tools'
 import { SecondaryButton } from '../Button'
 import { notify } from '@utils/notifications'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export default function InspectorButton({
   proposalInstruction,
 }: {
   proposalInstruction: ProgramAccount<ProposalTransaction>
 }) {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const wasExecuted =

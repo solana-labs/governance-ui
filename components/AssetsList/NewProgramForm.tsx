@@ -43,6 +43,7 @@ import {
   useRealmCommunityMintInfoQuery,
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 interface NewProgramForm extends BaseGovernanceFormFieldsV2 {
   programId: string
   transferAuthority: boolean
@@ -75,7 +76,7 @@ const NewProgramForm = () => {
   const { symbol } = router.query
   const { realmInfo, ownVoterWeight } = useRealm()
   const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const connected = !!wallet?.connected
   const [form, setForm] = useState<NewProgramForm>({
     ...defaultFormValues,

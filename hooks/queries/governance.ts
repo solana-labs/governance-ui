@@ -11,6 +11,7 @@ import {
   pubkeyFilter,
 } from '@solana/spl-governance'
 import { useRealmQuery } from './realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export const governanceQueryKeys = {
   all: (cluster: string) => [cluster, 'Governance'],
@@ -27,7 +28,7 @@ export const governanceQueryKeys = {
 
 // Note: I may need to insert some defaults from undefined fields here? or maybe the sdk does it already (that would make sense)
 export const useGovernanceByPubkeyQuery = (pubkey?: PublicKey) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const enabled = pubkey !== undefined
   const query = useQuery({
@@ -45,7 +46,7 @@ export const useGovernanceByPubkeyQuery = (pubkey?: PublicKey) => {
 }
 
 export const useRealmGovernancesQuery = () => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const realm = useRealmQuery().data?.result
 
   const enabled = realm !== undefined

@@ -27,6 +27,7 @@ import {
   SchemaComponents,
 } from '@utils/instructions/Identity/util'
 import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface AddKeyToDIDForm {
   governedAccount: AssetAccount | undefined
@@ -44,7 +45,7 @@ const AddKeyToDID = ({
 }) => {
   const realm = useRealmQuery().data?.result
   const { assetAccounts } = useGovernanceAssets()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const shouldBeGoverned = index !== 0 && governance
   const [form, setForm] = useState<AddKeyToDIDForm>()
   const [formErrors, setFormErrors] = useState({})

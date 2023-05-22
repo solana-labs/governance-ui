@@ -14,12 +14,13 @@ import ProposalSignatories from '@components/ProposalSignatories'
 import ProposalVoteResult from '@components/ProposalVoteResults'
 import ProposalRemainingVotingTime from '@components/ProposalRemainingVotingTime'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export default function Explore() {
   const proposal = useRouteProposalQuery().data?.result
   const governance = useProposalGovernanceQuery().data?.result
   const [highlighted, setHighlighted] = useState<string | undefined>()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const records = useVoteRecords(proposal)
   const signatories = useSignatories(proposal)
   const router = useRouter()

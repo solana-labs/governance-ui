@@ -23,6 +23,7 @@ import { getGoblinGoldWithdrawInstruction } from '@utils/instructions/GoblinGold
 import { StrategyVault } from 'goblingold-sdk'
 import { getGoblinGoldWithdrawSchema } from '@utils/validations'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const GoblinGoldWithdraw = ({
   index,
@@ -31,7 +32,7 @@ const GoblinGoldWithdraw = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const { realmInfo } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()

@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import asFindable from '@utils/queries/asFindable'
 import useWalletStore from 'stores/useWalletStore'
 import { useRealmQuery } from './realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export const realmConfigQueryKeys = {
   all: (cluster: string) => [cluster, 'RealmConfig'],
@@ -15,7 +16,7 @@ export const realmConfigQueryKeys = {
 }
 
 export const useRealmConfigQuery = () => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const realm = useRealmQuery().data?.result
 
   const enabled = realm !== undefined

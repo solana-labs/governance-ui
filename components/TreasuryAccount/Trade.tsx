@@ -51,6 +51,7 @@ import {
 } from '@utils/instructions/PsyFinance/PoseidonIdl'
 import { deriveAllBoundedStrategyKeysV2 } from '@utils/instructions/PsyFinance/poseidon'
 import { TokenInfo } from '@utils/services/types'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export type TradeProps = { tokenAccount: AssetAccount }
 
@@ -169,7 +170,7 @@ export const poseidonProgramId = new web3.PublicKey(
 const Trade: React.FC<TradeProps> = ({ tokenAccount }) => {
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const router = useRouter()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const { wallet, anchorProvider } = useWalletDeprecated()
   const { handleCreateProposal } = useCreateProposal()
   const { canUseTransferInstruction } = useGovernanceAssets()

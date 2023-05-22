@@ -8,9 +8,10 @@ import {
   getGovernanceChatMessages,
 } from '@solana/spl-governance'
 import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export const useChatMessagesByProposalQuery = (proposalPk?: PublicKey) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const enabled = proposalPk !== undefined
   const query = useQuery({

@@ -28,6 +28,7 @@ import {
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
 import { useRouter } from 'next/router'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface Props {
   inAccountDetails?: boolean
@@ -43,7 +44,7 @@ const NftBalanceCard = ({ inAccountDetails, showView }: Props) => {
   )
   const nfts = useNftPluginStore((s) => s.state.votingNfts)
   const isLoading = useNftPluginStore((s) => s.state.isLoadingNfts)
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result

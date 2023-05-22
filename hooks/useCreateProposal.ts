@@ -14,13 +14,14 @@ import {
   useRealmCommunityMintInfoQuery,
   useRealmCouncilMintInfoQuery,
 } from './queries/mintInfo'
+import useLegacyConnectionContext from './useLegacyConnectionContext'
 
 export default function useCreateProposal() {
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
 
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
   const mint = useRealmCommunityMintInfoQuery().data?.result

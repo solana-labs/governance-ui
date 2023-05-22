@@ -19,6 +19,7 @@ import { getGoblinGoldDepositInstruction } from '@utils/instructions/GoblinGold'
 import { StrategyVault } from 'goblingold-sdk'
 import { getGoblinGoldDepositSchema } from '@utils/validations'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const GoblinGoldDeposit = ({
   index,
@@ -27,7 +28,7 @@ const GoblinGoldDeposit = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const { realmInfo } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()

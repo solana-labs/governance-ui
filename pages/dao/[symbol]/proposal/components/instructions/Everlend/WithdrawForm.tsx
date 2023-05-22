@@ -35,6 +35,7 @@ import {
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const WithdrawForm = ({
   index,
@@ -43,7 +44,7 @@ const WithdrawForm = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const { realmInfo } = useRealm()
   const [stratagies, setStratagies] = useState<any>([])

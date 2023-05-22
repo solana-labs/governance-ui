@@ -46,7 +46,7 @@ export default function Buy() {
   //   const DEFAULT_TITLE = `Buy tokens on auction`
   //   const DEFAULT_DESCRIPTION = `Buy tokens on auction`
   //   const wallet = useWalletOnePointOh()
-  //   const connection = useWalletStore((s) => s.connection)
+  //   const connection = useLegacyConnectionContext()
   //   const { symbol } = useRealm()
   //   const router = useRouter()
   //   const { handleCreateProposal } = useCreateProposal()

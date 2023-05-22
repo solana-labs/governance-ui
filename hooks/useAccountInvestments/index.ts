@@ -11,6 +11,7 @@ import { SOLEND } from 'Strategies/protocols/solend'
 import { TreasuryStrategy } from 'Strategies/types/types'
 import loadData from './loadData'
 import * as staticInvestments from './staticInvestments'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const cache: Map<string, Ok<Data>> = new Map()
 
@@ -39,7 +40,7 @@ export function useAccountInvestments(args: Args) {
   })
   const [calledGetStrategies, setCalledGetStrategies] = useState(false)
 
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const strategies = useStrategiesStore((s) => s.strategies)
   const getStrategies = useStrategiesStore((s) => s.getStrategies)
   const strategiesLoading = useStrategiesStore((s) => s.strategiesLoading)

@@ -11,6 +11,7 @@ import useWalletStore from 'stores/useWalletStore';
 
 import { rules2governanceConfig } from '../EditWalletRules/createTransaction';
 import { useRealmQuery } from '@hooks/queries/realm';
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext';
 import useProgramVersion from '@hooks/useProgramVersion';
 import useRealm from '@hooks/useRealm';
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh';
@@ -23,7 +24,7 @@ const useNewWalletCallback = (
   rules?: ReturnType<typeof useGovernanceDefaults>,
 ) => {
   const wallet = useWalletOnePointOh();
-  const connection = useWalletStore((s) => s.connection);
+  const connection = useLegacyConnectionContext();
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient,
   );

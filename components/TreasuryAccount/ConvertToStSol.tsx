@@ -28,6 +28,7 @@ import { AssetAccount } from '@utils/uiTypes/assets'
 import { PublicKey } from '@solana/web3.js'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const defaultFormState = {
   destinationAccount: undefined,
@@ -61,7 +62,7 @@ const ConvertToStSol = () => {
   const router = useRouter()
   const { handleCreateProposal } = useCreateProposal()
 
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
 

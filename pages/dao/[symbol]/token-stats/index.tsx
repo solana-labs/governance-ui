@@ -45,6 +45,7 @@ import { getDepositType } from 'VoteStakeRegistry/tools/deposits'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRouter } from 'next/router'
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const VestingVsTime = dynamic(
   () => import('VoteStakeRegistry/components/LockTokenStats/VestingVsTime'),
@@ -71,7 +72,7 @@ const LockTokenStats = () => {
   const voteStakeRegistryRegistrar = useVotePluginsClientStore(
     (s) => s.state.voteStakeRegistryRegistrar
   )
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const governedTokenAccounts = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
   )

@@ -44,6 +44,7 @@ import {
   useUserCommunityTokenOwnerRecord,
   useUserCouncilTokenOwnerRecord,
 } from '@hooks/queries/tokenOwnerRecord'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 type InvestmentType = TreasuryStrategy & {
   investedAmount: number
@@ -74,7 +75,7 @@ const AccountOverview = () => {
   const { canUseTransferInstruction } = useGovernanceAssets()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const recentActivity = useTreasuryAccountStore((s) => s.recentActivity)
   const isLoadingRecentActivity = useTreasuryAccountStore(
     (s) => s.isLoadingRecentActivity

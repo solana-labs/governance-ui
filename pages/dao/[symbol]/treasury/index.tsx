@@ -19,6 +19,7 @@ import { AssetAccount } from '@utils/uiTypes/assets'
 import Tooltip from '@components/Tooltip'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export const NEW_TREASURY_ROUTE = `/treasury/new`
 
@@ -29,7 +30,7 @@ const Treasury = () => {
     auxiliaryTokenAccounts,
   } = useGovernanceAssets()
   const { setCurrentAccount } = useTreasuryAccountStore()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const realm = useRealmQuery().data?.result
   const {
     ownVoterWeight,

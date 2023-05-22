@@ -4,6 +4,7 @@ import useWalletStore from '../../stores/useWalletStore'
 import useVotePluginsClientStore from '../../stores/useVotePluginsClientStore'
 import useGatewayPluginStore from '../../GatewayPlugin/store/gatewayPluginStore'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 /**
  * Wrapper for the Civic Gateway Provider react component. This component is responsible for
@@ -20,7 +21,7 @@ export const GatewayProvider: FC = ({ children }) => {
   const gatekeeperNetwork = useGatewayPluginStore(
     (s) => s.state.gatekeeperNetwork
   )
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const cluster =
     connection.cluster === 'mainnet' ? 'mainnet-beta' : connection.cluster
 

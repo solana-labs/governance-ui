@@ -1,3 +1,4 @@
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { EndpointTypes } from '@models/types'
 import { PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
@@ -13,7 +14,7 @@ export const domainQueryKeys = {
 }
 
 export const useDomainQuery = (pubKey: PublicKey | undefined) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const enabled = pubKey !== undefined
 

@@ -28,6 +28,7 @@ import { Governance, ProgramAccount } from '@solana/spl-governance'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface CloseBuffersForm {
   governedAccount: AssetAccount | undefined
@@ -44,7 +45,7 @@ const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
     assetAccounts,
   } = useGovernanceAssets()
   const router = useRouter()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const governedAccount = assetAccounts.find(
     (x) => x.governance.pubkey.toBase58() === program.pubkey.toBase58()

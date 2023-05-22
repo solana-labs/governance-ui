@@ -37,6 +37,7 @@ import {
   GoverningTokenType,
 } from '@solana/spl-governance'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export const FORM_NAME = 'tokenized'
 
@@ -105,7 +106,7 @@ const transformFormData2RealmCreation = (formData: CommunityTokenForm) => {
 }
 
 export default function CommunityTokenWizard() {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const { push } = useRouter()

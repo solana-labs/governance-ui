@@ -32,6 +32,7 @@ import { abbreviateAddress } from '@utils/formatting'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const Clawback = ({
   index,
@@ -41,7 +42,7 @@ const Clawback = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const realm = useRealmQuery().data?.result
 
   const {

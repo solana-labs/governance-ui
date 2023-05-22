@@ -32,6 +32,7 @@ import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface AddMemberForm extends Omit<MintForm, 'mintAccount'> {
   description: string
@@ -49,7 +50,7 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
   const [formErrors, setFormErrors] = useState({})
   const { handleCreateProposal } = useCreateProposal()
   const router = useRouter()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
 
   const { fmtUrlWithCluster } = useQueryContext()

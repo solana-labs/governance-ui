@@ -12,6 +12,7 @@ import Loading from '@components/Loading'
 import { getNfts } from '@utils/tokens'
 import ImgWithLoader from '@components/ImgWithLoader'
 import useWalletStore from 'stores/useWalletStore'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export interface NftSelectorFunctions {
   handleGetNfts: () => void
@@ -40,7 +41,7 @@ function NFTSelector(
   const isPredefinedMode = typeof predefinedNfts !== 'undefined'
   const [nfts, setNfts] = useState<NFTWithMint[]>([])
   const [selected, setSelected] = useState<NFTWithMint[]>([])
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const [isLoading, setIsLoading] = useState(false)
   const handleSelectNft = (nft: NFTWithMint) => {
     const nftMint: string[] = []

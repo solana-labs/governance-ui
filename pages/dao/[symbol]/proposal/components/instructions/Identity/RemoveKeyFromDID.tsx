@@ -21,6 +21,7 @@ import {
   SchemaComponents,
 } from '@utils/instructions/Identity/util'
 import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface RemoveKeyFromDIDForm {
   governedAccount: AssetAccount | undefined
@@ -37,7 +38,7 @@ const RemoveKeyFromDID = ({
 }) => {
   const realm = useRealmQuery().data?.result
   const { assetAccounts } = useGovernanceAssets()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const shouldBeGoverned = index !== 0 && governance
   const [form, setForm] = useState<RemoveKeyFromDIDForm>()
   const [formErrors, setFormErrors] = useState({})

@@ -14,6 +14,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { getDualFinanceExerciseSchema } from '@utils/validations'
 import Tooltip from '@components/Tooltip'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const DualExercise = ({
   index,
@@ -29,7 +30,7 @@ const DualExercise = ({
     quoteTreasury: undefined,
     optionAccount: undefined,
   })
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const { assetAccounts } = useGovernanceAssets()
@@ -58,7 +59,15 @@ const DualExercise = ({
       { governedAccount: governedAccount, getInstruction },
       index
     )
-  }, [form, governedAccount, handleSetInstructions, index, connection, schema, wallet])
+  }, [
+    form,
+    governedAccount,
+    handleSetInstructions,
+    index,
+    connection,
+    schema,
+    wallet,
+  ])
   useEffect(() => {
     setGovernedAccount(form.baseTreasury?.governance)
   }, [form.baseTreasury])

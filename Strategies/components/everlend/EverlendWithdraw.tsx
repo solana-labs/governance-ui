@@ -31,6 +31,7 @@ import {
   useRealmCommunityMintInfoQuery,
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface IProps {
   proposedInvestment: TreasuryStrategy & {
@@ -69,7 +70,7 @@ const EverlendWithdraw = ({
     (s) => s.state.currentRealmVotingClient
   )
   const { fmtUrlWithCluster } = useQueryContext()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const router = useRouter()
   const { symbol } = router.query

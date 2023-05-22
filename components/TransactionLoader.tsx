@@ -5,6 +5,7 @@ import Button from './Button'
 import { getExplorerUrl } from './explorer/tools'
 import Loading from './Loading'
 import Modal from './Modal'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const TransactionLoader = () => {
   const {
@@ -17,7 +18,7 @@ const TransactionLoader = () => {
     hasErrors,
     closeTransactionProcess,
   } = useTransactionsStore()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const currentlyProcessing = processedTransactions + 1
   return isProcessing ? (
     <Modal

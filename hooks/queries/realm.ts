@@ -1,4 +1,5 @@
 import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { getRealm, getRealms } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
@@ -19,7 +20,7 @@ export const realmQueryKeys = {
 }
 
 export const useRealmsByProgramQuery = (program: PublicKey) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const enabled = program !== undefined
   const query = useQuery({
@@ -39,7 +40,7 @@ export const useRealmsByProgramQuery = (program: PublicKey) => {
 }
 
 export const useRealmQuery = () => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const pubkey = useSelectedRealmPubkey()
 
   const enabled = pubkey !== undefined

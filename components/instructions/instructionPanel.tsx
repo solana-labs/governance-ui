@@ -16,6 +16,7 @@ import { getExplorerInspectorUrl } from '@components/explorer/tools'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
 import { useSelectedProposalTransactions } from '@hooks/queries/proposalTransaction'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export function InstructionPanel() {
   const proposal = useRouteProposalQuery().data?.result
@@ -31,7 +32,7 @@ export function InstructionPanel() {
     }
   }, [])
   const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const [currentSlot, setCurrentSlot] = useState(0)
 

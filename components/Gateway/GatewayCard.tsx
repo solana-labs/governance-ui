@@ -23,6 +23,7 @@ import {
   useRealmCommunityMintInfoQuery,
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 // TODO lots of overlap with NftBalanceCard here - we need to separate the logic for creating the Token Owner Record
 // from the rest of this logic
@@ -36,7 +37,7 @@ const GatewayCard = () => {
     (s) => s.state.gatekeeperNetwork
   )
   const isLoading = useGatewayPluginStore((s) => s.state.isLoadingGatewayToken)
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const [, setTokenOwneRecordPk] = useState('') //@asktree: ?????????????????????????????????????????
   const realm = useRealmQuery().data?.result
   const mint = useRealmCommunityMintInfoQuery().data?.result

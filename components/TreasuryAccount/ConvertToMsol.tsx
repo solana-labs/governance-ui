@@ -27,6 +27,7 @@ import useCreateProposal from '@hooks/useCreateProposal'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const ConvertToMsol = () => {
   const realm = useRealmQuery().data?.result
@@ -36,7 +37,7 @@ const ConvertToMsol = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const router = useRouter()
   const { handleCreateProposal } = useCreateProposal()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const notConnectedMessage =

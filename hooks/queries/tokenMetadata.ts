@@ -4,6 +4,7 @@ import { PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
 import useWalletStore from 'stores/useWalletStore'
 import queryClient from './queryClient'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const OneHMs = 3600000
 
@@ -23,7 +24,7 @@ export const useTokenMetadata = (
   mint: PublicKey | undefined,
   enableConditions = true
 ) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const enabled = !!mint && !!enableConditions
 
@@ -56,7 +57,7 @@ export const useTokensMetadata = (
   mints: PublicKey[],
   enableConditions = true
 ) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const enabled = !!mints.length && !!enableConditions
 

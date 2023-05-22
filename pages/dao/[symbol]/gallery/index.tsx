@@ -16,10 +16,11 @@ import SendTokens from '@components/TreasuryAccount/SendTokens'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { MdScheduleSend } from 'react-icons/md'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const gallery = () => {
   // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const realmNfts = useTreasuryAccountStore((s) => s.allNfts)
   // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree

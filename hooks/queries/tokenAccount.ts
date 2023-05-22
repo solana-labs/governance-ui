@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getOwnedTokenAccounts } from '@utils/tokens'
 import useWalletStore from 'stores/useWalletStore'
 import queryClient from './queryClient'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export const tokenAccountQueryKeys = {
   all: (cluster: string) => [cluster, 'TokenAccount'],
@@ -18,7 +19,7 @@ export const tokenAccountQueryKeys = {
 }
 
 export const useTokenAccountsByOwnerQuery = (pubkey?: PublicKey) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const enabled = pubkey !== undefined
   const query = useQuery({

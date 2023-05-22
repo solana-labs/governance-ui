@@ -5,11 +5,12 @@ import useWalletStore from 'stores/useWalletStore'
 import useRealm from './useRealm'
 import useWalletOnePointOh from './useWalletOnePointOh'
 import { useRealmQuery } from './queries/realm'
+import useLegacyConnectionContext from './useLegacyConnectionContext'
 
 export default function useRpcContext() {
   const realm = useRealmQuery().data?.result
   const { realmInfo } = useRealm()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const getRpcContext = () =>
     new RpcContext(

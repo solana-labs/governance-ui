@@ -13,6 +13,7 @@ import useWalletStore from 'stores/useWalletStore'
 import Address from '@components/Address'
 
 import NFTCollectionPreviewIcon from '../../icons/NFTCollectionPreviewIcon'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface Props {
   className?: string
@@ -26,7 +27,7 @@ export default function Header(props: Props) {
     nftsGovernedTokenAccounts,
   } = useGovernanceAssets()
   const { setCurrentAccount } = useTreasuryAccountStore()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const hasCount = !!props.nftCollection.totalCount
 

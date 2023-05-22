@@ -14,6 +14,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { getDualFinanceWithdrawSchema } from '@utils/validations'
 import Tooltip from '@components/Tooltip'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const DualWithdraw = ({
   index,
@@ -27,7 +28,7 @@ const DualWithdraw = ({
     baseTreasury: undefined,
     mintPk: undefined,
   })
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const { assetAccounts } = useGovernanceAssets()
@@ -55,7 +56,15 @@ const DualWithdraw = ({
       { governedAccount: governedAccount, getInstruction },
       index
     )
-  }, [form, governedAccount, handleSetInstructions, index, connection, schema, wallet])
+  }, [
+    form,
+    governedAccount,
+    handleSetInstructions,
+    index,
+    connection,
+    schema,
+    wallet,
+  ])
   useEffect(() => {
     handleSetForm({ value: undefined, propertyName: 'mintPk' })
   }, [form.baseTreasury])

@@ -16,6 +16,7 @@ import {
 import { useRealmQuery } from './realm'
 import queryClient from './queryClient'
 import { useMemo } from 'react'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export const tokenOwnerRecordQueryKeys = {
   all: (cluster: EndpointTypes) => [cluster, 'TokenOwnerRecord'],
@@ -31,7 +32,7 @@ export const tokenOwnerRecordQueryKeys = {
 }
 
 export const useTokenOwnerRecordsForRealmQuery = () => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const realm = useRealmQuery().data?.result
 
   const enabled = realm !== undefined
@@ -106,7 +107,7 @@ export const useTokenRecordsByOwnersMap = () => {
 }
 
 export const useTokenOwnerRecordByPubkeyQuery = (pubkey?: PublicKey) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const enabled = pubkey !== undefined
   const query = useQuery({

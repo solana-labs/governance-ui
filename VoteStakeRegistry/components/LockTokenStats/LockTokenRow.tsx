@@ -8,6 +8,7 @@ import { LockupType } from 'VoteStakeRegistry/sdk/accounts'
 import { getMinDurationFmt, getTimeLeftFromNowFmt } from '@utils/dateTools'
 import { DepositWithWallet } from './tools'
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const LockTokenRow = ({
   depositWithWallet,
@@ -16,7 +17,7 @@ const LockTokenRow = ({
   depositWithWallet: DepositWithWallet
   index: number
 }) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const fmtMangoAmount = (val) => {
     return mint ? getMintDecimalAmount(mint!, val).toFormat(0) : '0'

@@ -22,6 +22,7 @@ import {
 import { NewProposalContext } from '../../../new'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const SwitchboardAdmitOracle = ({
   index,
@@ -33,7 +34,7 @@ const SwitchboardAdmitOracle = ({
     oraclePubkey: undefined,
     queuePubkey: undefined,
   })
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const { handleSetInstructions } = useContext(NewProposalContext)
 

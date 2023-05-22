@@ -21,6 +21,7 @@ import { abbreviateAddress } from '@utils/formatting'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export enum PlayState {
   Played,
@@ -100,7 +101,7 @@ export function ExecuteAllInstructionButton({
 }) {
   const { realmInfo } = useRealm()
   const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const connected = !!wallet?.connected
 
   const [currentSlot, setCurrentSlot] = useState(0)
