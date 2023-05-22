@@ -3,11 +3,10 @@ import produce from 'immer'
 import { getOwnedTokenAccounts } from '../utils/tokens'
 
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
-import type { ConnectionContext } from 'utils/connection'
 import { getConnectionContext } from 'utils/connection'
 
 interface WalletStore extends State {
-  connection: ConnectionContext
+  //connection: ConnectionContext
   current: SignerWalletAdapter | undefined
   mockWallet: SignerWalletAdapter | undefined
 
