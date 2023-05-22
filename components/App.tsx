@@ -32,6 +32,7 @@ import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import { ConnectionProvider } from '@solana/wallet-adapter-react'
 import { getConnectionContext } from '@utils/connection'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
@@ -61,7 +62,24 @@ interface Props {
   children: React.ReactNode
 }
 
+/** AppContents depends on providers itself, sadly, so this is where providers go.  */
 export function App(props: Props) {
+  const router = useRouter()
+  const { cluster } = router.query
+
+  const endpoint = useMemo(
+    () => getConnectionContext(cluster as string).endpoint,
+    [cluster]
+  )
+
+  return (
+    <ConnectionProvider endpoint={endpoint}>
+      <AppContents {...props} />
+    </ConnectionProvider>
+  )
+}
+
+export function AppContents(props: Props) {
   handleRouterHistory()
   useVotingPlugins()
   useHandleGovernanceAssetsStore()
@@ -83,7 +101,7 @@ export function App(props: Props) {
 
   const { realmInfo } = useRealm()
   const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
   const prevStringifyPossibleNftsAccounts = usePrevious(
     JSON.stringify(possibleNftsAccounts)
@@ -158,11 +176,6 @@ export function App(props: Props) {
   useEffect(() => {
     updateSerumGovAccounts(cluster as string | undefined)
   }, [cluster, updateSerumGovAccounts])
-
-  const endpoint = useMemo(
-    () => getConnectionContext(cluster as string).endpoint,
-    [cluster]
-  )
 
   return (
     <div className="relative bg-bkg-1 text-fgd-1">
@@ -254,21 +267,19 @@ export function App(props: Props) {
       </Head>
       <GoogleTag />
       <ErrorBoundary>
-        <ConnectionProvider endpoint={endpoint}>
-          <ThemeProvider defaultTheme="Dark">
-            <WalletIdentityProvider appName={'Realms'}>
-              <WalletProvider>
-                <GatewayProvider>
-                  <NavBar />
-                  <Notifications />
-                  <TransactionLoader></TransactionLoader>
-                  <NftVotingCountingModal />
-                  <PageBodyContainer>{props.children}</PageBodyContainer>
-                </GatewayProvider>
-              </WalletProvider>
-            </WalletIdentityProvider>
-          </ThemeProvider>
-        </ConnectionProvider>
+        <ThemeProvider defaultTheme="Dark">
+          <WalletIdentityProvider appName={'Realms'}>
+            <WalletProvider>
+              <GatewayProvider>
+                <NavBar />
+                <Notifications />
+                <TransactionLoader></TransactionLoader>
+                <NftVotingCountingModal />
+                <PageBodyContainer>{props.children}</PageBodyContainer>
+              </GatewayProvider>
+            </WalletProvider>
+          </WalletIdentityProvider>
+        </ThemeProvider>
       </ErrorBoundary>
     </div>
   )
