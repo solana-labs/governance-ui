@@ -55,7 +55,6 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
   const wallet = useWalletOnePointOh()
 
   const { fmtUrlWithCluster } = useQueryContext()
-  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const { symbol } = router.query
 
   const realm = useRealmQuery().data?.result
@@ -230,14 +229,10 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
       }
 
       try {
-        const selectedGovernance = (await fetchRealmGovernance(
-          governance?.pubkey
-        )) as ProgramAccount<Governance>
-
         proposalAddress = await handleCreateProposal({
           title: form.title ? form.title : proposalTitle,
           description: form.description ? form.description : '',
-          governance: selectedGovernance,
+          governance,
           instructionsData: [instructionData],
           voteByCouncil,
           isDraft: false,

@@ -28,11 +28,6 @@ export default function CouncilVotingPower(props: Props) {
 
   const { councilTokenAccount, ownVoterWeight, realmInfo } = useRealm()
   const proposal = useRouteProposalQuery().data?.result
-
-  const fetchWalletTokenAccounts = useWalletStore(
-    (s) => s.actions.fetchWalletTokenAccounts
-  )
-  const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
   const connection = useWalletStore((s) => s.connection.current)
   const wallet = useWalletOnePointOh()
 
@@ -71,19 +66,8 @@ export default function CouncilVotingPower(props: Props) {
         amount: depositAmount,
         depositTokenAccount: councilTokenAccount,
       })
-      await fetchWalletTokenAccounts()
-      await fetchRealm(realmInfo.programId, realmInfo.realmId)
     }
-  }, [
-    depositAmount,
-    fetchRealm,
-    fetchWalletTokenAccounts,
-    connection,
-    councilTokenAccount,
-    realmInfo,
-    realm,
-    wallet,
-  ])
+  }, [depositAmount, connection, councilTokenAccount, realmInfo, realm, wallet])
 
   if (!(realm && realmInfo)) {
     return (

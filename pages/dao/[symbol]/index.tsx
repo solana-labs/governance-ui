@@ -90,7 +90,6 @@ const REALM = () => {
     SelectedProposal[]
   >([])
 
-  const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
@@ -324,7 +323,6 @@ const REALM = () => {
           sendSignedTransaction({ signedTransaction: transaction, connection })
         )
       )
-      await refetchProposals()
       toggleMultiVoteMode()
       notify({
         message: 'Successfully voted on all proposals',

@@ -36,10 +36,7 @@ export default function LockedCommunityVotingPower(props: Props) {
   const connection = useWalletStore((s) => s.connection.current)
   const deposits = useDepositStore((s) => s.state.deposits)
   const endpoint = useWalletStore((s) => s.connection.endpoint)
-  const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
-  const fetchWalletTokenAccounts = useWalletStore(
-    (s) => s.actions.fetchWalletTokenAccounts
-  )
+
   const getOwnedDeposits = useDepositStore((s) => s.getOwnedDeposits)
   const votingPower = useDepositStore((s) => s.state.votingPower)
   const votingPowerFromDeposits = useDepositStore(
@@ -132,9 +129,6 @@ export default function LockedCommunityVotingPower(props: Props) {
           realmPk: realm.pubkey,
           walletPk: wallet.publicKey,
         })
-
-        await fetchWalletTokenAccounts()
-        await fetchRealm(realmInfo.programId, realmInfo.realmId)
       } catch (e) {
         console.error(e)
         notify({ message: `Something went wrong ${e}`, type: 'error' })
@@ -144,8 +138,6 @@ export default function LockedCommunityVotingPower(props: Props) {
     client,
     connection,
     endpoint,
-    fetchWalletTokenAccounts,
-    fetchRealm,
     getOwnedDeposits,
     realm,
     realmInfo,

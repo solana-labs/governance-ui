@@ -34,7 +34,6 @@ const DiscussionForm = () => {
   const connected = !!wallet?.connected
   const connection = useWalletStore((s) => s.connection)
   const proposal = useRouteProposalQuery().data?.result
-  const { fetchChatMessages } = useWalletStore((s) => s.actions)
   const tokenRole = useVotingPop()
   const commenterVoterTokenRecord =
     tokenRole === 'community' ? ownTokenRecord : ownCouncilTokenRecord
@@ -73,8 +72,6 @@ const DiscussionForm = () => {
     } finally {
       setSubmitting(false)
     }
-
-    fetchChatMessages(proposal!.pubkey)
   }
 
   const postEnabled =

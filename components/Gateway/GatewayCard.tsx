@@ -43,7 +43,6 @@ const GatewayCard = () => {
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
 
   const { realmInfo } = useRealm()
-  const { fetchRealm } = useWalletStore((s) => s.actions)
   const records = useRecords()
 
   // show the join button if any of the records required by the chain of plugins are not yet created
@@ -116,7 +115,6 @@ const GatewayCard = () => {
       sendingMessage: `Registering`,
       successMessage: `Registered`,
     })
-    await fetchRealm(realm?.owner, realm?.pubkey)
   }
 
   useEffect(() => {

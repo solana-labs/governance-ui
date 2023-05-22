@@ -76,7 +76,6 @@ const MyProposalsBn = () => {
   const programVersion =
     useProgramVersion() ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION
 
-  const { refetchProposals } = useWalletStore((s) => s.actions)
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
@@ -186,8 +185,6 @@ const MyProposalsBn = () => {
           sendSignedTransaction({ signedTransaction: transaction, connection })
         )
       )
-      await sleep(500)
-      await refetchProposals()
     } catch (e) {
       console.log(e)
       notify({ type: 'error', message: `Something went wrong ${e}` })

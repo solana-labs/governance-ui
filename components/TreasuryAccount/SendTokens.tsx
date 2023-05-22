@@ -75,7 +75,6 @@ const SendTokens = ({
   const { fmtUrlWithCluster } = useQueryContext()
   const wallet = useWalletOnePointOh()
   const router = useRouter()
-  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<SendTokenCompactViewForm>({
     destinationAccount: '',
@@ -193,10 +192,6 @@ const SendTokens = ({
               ? abbreviateAddress(new PublicKey(form.destinationAccount))
               : ''
           }`
-    // Fetch governance to get up to date proposalCount
-    const selectedGovernance = (await fetchRealmGovernance(
-      governance?.pubkey
-    )) as ProgramAccount<Governance>
 
     try {
       const proposalAddress = await handleCreateProposal({
@@ -204,7 +199,7 @@ const SendTokens = ({
         description: form.description ? form.description : '',
         voteByCouncil,
         instructionsData,
-        governance: selectedGovernance!,
+        governance,
       })
       const url = fmtUrlWithCluster(
         `/dao/${symbol}/proposal/${proposalAddress}`
@@ -253,16 +248,12 @@ const SendTokens = ({
         prerequisiteInstructions: instruction.prerequisiteInstructions || [],
       }
       try {
-        // Fetch governance to get up to date proposalCount
-        const selectedGovernance = (await fetchRealmGovernance(
-          governance?.pubkey
-        )) as ProgramAccount<Governance>
         proposalAddress = await handleCreateProposal({
           title: form.title ? form.title : proposalTitle,
           description: form.description ? form.description : '',
           voteByCouncil,
           instructionsData: [instructionData],
-          governance: selectedGovernance!,
+          governance: governance!,
         })
         const url = fmtUrlWithCluster(
           `/dao/${symbol}/proposal/${proposalAddress}`

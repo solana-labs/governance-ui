@@ -53,12 +53,10 @@ const useSubmitVote = ({
   const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
   const proposal = useRouteProposalQuery().data?.result
-  const { fetchChatMessages } = useWalletStore((s) => s.actions)
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
 
   const { realmInfo } = useRealm()
-  const { refetchProposals } = useWalletStore((s) => s.actions)
   const isNftPlugin =
     config?.account.communityTokenConfig.voterWeightAddin &&
     nftPluginsPks.includes(
@@ -83,8 +81,6 @@ const useSubmitVote = ({
       : undefined
 
     const confirmationCallback = async () => {
-      await refetchProposals()
-      // TODO refine this to only invalidate the one query
       await queryClient.invalidateQueries(
         voteRecordQueryKeys.all(connection.cluster)
       )
@@ -101,9 +97,6 @@ const useSubmitVote = ({
         client,
         confirmationCallback
       )
-      if (!isNftPlugin) {
-        await refetchProposals()
-      }
     } catch (ex) {
       if (isNftPlugin) {
         closeNftVotingCountingModal(
@@ -119,8 +112,6 @@ const useSubmitVote = ({
       setSubmitting(false)
       onClose()
     }
-
-    fetchChatMessages(proposal!.pubkey)
   }
 
   return { submitting, submitVote }

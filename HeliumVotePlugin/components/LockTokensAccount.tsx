@@ -54,9 +54,7 @@ export const LockTokensAccount: React.FC<{
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletOnePointOh()
   const { data: tokenOwnerRecordPk } = useAddressQuery_CommunityTokenOwner()
-  const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
-    (s) => s.actions
-  )
+
   const connected = !!wallet?.connected
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const realm = useRealmQuery().data?.result
@@ -209,8 +207,6 @@ export const LockTokensAccount: React.FC<{
     })
 
     if (!error) {
-      fetchWalletTokenAccounts()
-      fetchRealm(realmInfo!.programId, realmInfo!.realmId)
       await getPositions({
         votingClient: currentClient,
         realmPk: realm!.pubkey,

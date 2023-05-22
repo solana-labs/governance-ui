@@ -35,7 +35,6 @@ export default function NftVotingPower(props: Props) {
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const connection = useWalletStore((s) => s.connection)
-  const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const realm = useRealmQuery().data?.result
   const { realmInfo } = useRealm()
@@ -90,7 +89,6 @@ export default function NftVotingPower(props: Props) {
       sendingMessage: `Registering`,
       successMessage: `Registered`,
     })
-    await fetchRealm(realm?.owner, realm?.pubkey)
   }
 
   if (isLoading) {

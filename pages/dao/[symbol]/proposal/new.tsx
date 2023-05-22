@@ -131,6 +131,7 @@ import LiquidityStakingOption from './components/instructions/Dual/LiquidityStak
 import InitStrike from './components/instructions/Dual/InitStrike'
 import IdlSetBuffer from './components/instructions/Mango/MangoV4/IdlSetBuffer'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { fetchGovernanceByPubkey } from '@hooks/queries/governance'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -162,10 +163,10 @@ const New = () => {
   const { handleCreateProposal } = useCreateProposal()
   const { fmtUrlWithCluster } = useQueryContext()
   const realm = useRealmQuery().data?.result
+  const connection = useWalletStore((s) => s.connection)
 
   const { symbol, realmInfo, canChooseWhoVote } = useRealm()
   const { availableInstructions } = useGovernanceAssets()
-  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [form, setForm] = useState({
     title: typeof router.query['t'] === 'string' ? router.query['t'] : '',
@@ -274,7 +275,6 @@ const New = () => {
     }
 
     if (isValid && instructions.every((x: UiInstruction) => x.isValid)) {
-      let selectedGovernance = governance
       if (!governance) {
         handleTurnOffLoaders()
         throw Error('No governance selected')
@@ -289,8 +289,7 @@ const New = () => {
                 data: x ? getInstructionDataFromBase64(x) : null,
                 holdUpTime: instruction.customHoldUpTime
                   ? getTimestampFromDays(instruction.customHoldUpTime)
-                  : selectedGovernance?.account?.config
-                      .minInstructionHoldUpTime,
+                  : governance.account?.config.minInstructionHoldUpTime,
                 prerequisiteInstructions:
                   instruction.prerequisiteInstructions || [],
                 prerequisiteInstructionsSigners:
@@ -315,7 +314,7 @@ const New = () => {
               : null,
             holdUpTime: x.customHoldUpTime
               ? getTimestampFromDays(x.customHoldUpTime)
-              : selectedGovernance?.account?.config.minInstructionHoldUpTime,
+              : governance.account?.config.minInstructionHoldUpTime,
             prerequisiteInstructions: x.prerequisiteInstructions || [],
             chunkSplitByDefault: x.chunkSplitByDefault || false,
             signers: x.signers,
@@ -330,19 +329,10 @@ const New = () => {
       try {
         // Fetch governance to get up to date proposalCount
 
-        if (governance.pubkey != undefined) {
-          selectedGovernance = (await fetchRealmGovernance(
-            governance.pubkey
-          )) as ProgramAccount<Governance>
-        } else {
-          selectedGovernance = (await fetchRealmGovernance(
-            governance
-          )) as ProgramAccount<Governance>
-        }
         proposalAddress = await handleCreateProposal({
           title: form.title,
           description: form.description,
-          governance: selectedGovernance,
+          governance,
           instructionsData,
           voteByCouncil,
           isDraft,

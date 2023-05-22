@@ -19,7 +19,6 @@ export default function useCreateProposal() {
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
-  const { refetchProposals } = useWalletStore((s) => s.actions)
 
   const connection = useWalletStore((s) => s.connection)
   const realm = useRealmQuery().data?.result
@@ -87,7 +86,6 @@ export default function useCreateProposal() {
       isDraft,
       client
     )
-    await refetchProposals()
     return proposalAddress
   }
 

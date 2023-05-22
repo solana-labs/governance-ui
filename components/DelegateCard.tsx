@@ -35,7 +35,6 @@ const DelegateCard = () => {
   const [isLoading, setLoading] = useState<boolean>(false)
   const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection.current)
-  const { fetchRealm } = useWalletStore((s) => s.actions)
 
   const [delegateKey, setDelegateKey] = useState('')
   const [delegateCouncilToken, setDelegateCouncilToken] = useState(true)
@@ -92,7 +91,6 @@ const DelegateCard = () => {
       transaction.add(...instructions)
 
       await sendTransaction({ transaction, wallet, connection, signers })
-      await fetchRealm(realm?.owner, realm?.pubkey)
       setLoading(false)
     } catch (error) {
       console.log('error', error)
@@ -134,8 +132,6 @@ const DelegateCard = () => {
       transaction.add(...instructions)
 
       await sendTransaction({ transaction, wallet, connection, signers })
-
-      await fetchRealm(realm?.owner, realm?.pubkey)
       setLoading(false)
     } catch (error) {
       console.log('error', error)

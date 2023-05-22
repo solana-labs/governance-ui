@@ -159,9 +159,7 @@ export const TokenDeposit = ({
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const connection = useWalletStore((s) => s.connection.current)
-  const { fetchWalletTokenAccounts, fetchRealm } = useWalletStore(
-    (s) => s.actions
-  )
+
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
@@ -259,9 +257,6 @@ export const TokenDeposit = ({
       sendingMessage: 'Depositing tokens',
       successMessage: 'Tokens have been deposited',
     })
-
-    await fetchWalletTokenAccounts()
-    await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
   }
 
   const depositAllTokens = async () =>
@@ -395,8 +390,6 @@ export const TokenDeposit = ({
               : `Released tokens (${index}/${ixChunks.length - 2})`,
         })
       }
-      await fetchWalletTokenAccounts()
-      await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
     } catch (ex) {
       //TODO change to more friendly notification
       notify({ type: 'error', message: `${ex}` })

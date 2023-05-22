@@ -51,7 +51,6 @@ const NftBalanceCard = ({ inAccountDetails, showView }: Props) => {
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
   const { symbol } = useRouter().query
   const { realmInfo } = useRealm()
-  const { fetchRealm } = useWalletStore((s) => s.actions)
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
 
   const handleRegister = async () => {
@@ -94,7 +93,6 @@ const NftBalanceCard = ({ inAccountDetails, showView }: Props) => {
       sendingMessage: `Registering`,
       successMessage: `Registered`,
     })
-    await fetchRealm(realm?.owner, realm?.pubkey)
   }
 
   useEffect(() => {

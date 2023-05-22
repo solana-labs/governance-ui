@@ -51,7 +51,6 @@ const UpgradeProgram = ({
   )
   const { handleCreateProposal } = useCreateProposal()
   const { fmtUrlWithCluster } = useQueryContext()
-  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const { symbol } = router.query
   const realm = useRealmQuery().data?.result
   const { realmInfo, canChooseWhoVote } = useRealm()
@@ -145,15 +144,10 @@ const UpgradeProgram = ({
         prerequisiteInstructions: instruction.prerequisiteInstructions || [],
       }
       try {
-        // Fetch governance to get up to date proposalCount
-        const selectedGovernance = (await fetchRealmGovernance(
-          governance?.pubkey
-        )) as ProgramAccount<Governance>
-
         proposalAddress = await handleCreateProposal({
           title: form.title ? form.title : proposalTitle,
           description: form.description ? form.description : '',
-          governance: selectedGovernance,
+          governance: governance!,
           instructionsData: [instructionData],
           voteByCouncil,
           isDraft: false,

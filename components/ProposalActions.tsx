@@ -40,7 +40,6 @@ const ProposalActionsPanel = () => {
   const connected = !!wallet?.connected
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
   const connection = useWalletStore((s) => s.connection)
-  const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
 
   const maxVoteRecordPk = useMaxVoteRecord()?.pubkey
   const votePluginsClientMaxVoterWeight = useVotePluginsClientStore(
@@ -155,7 +154,6 @@ const ProposalActionsPanel = () => {
           proposal,
           maxVoterWeight
         )
-        await refetchProposals()
       }
     } catch (error) {
       notify({
@@ -185,8 +183,6 @@ const ProposalActionsPanel = () => {
           proposal,
           signatoryRecord
         )
-
-        await refetchProposals()
       }
     } catch (error) {
       notify({
@@ -212,8 +208,6 @@ const ProposalActionsPanel = () => {
         )
 
         await cancelProposal(rpcContext, realmInfo.realmId, proposal)
-
-        await refetchProposals()
       }
     } catch (error) {
       notify({

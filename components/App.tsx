@@ -17,7 +17,6 @@ import tokenPriceService from '@utils/services/tokenPrice'
 import TransactionLoader from '@components/TransactionLoader'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useHydrateStore from '@hooks/useHydrateStore'
 import useMembers from '@components/Members/useMembers'
 import useRealm from '@hooks/useRealm'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
@@ -61,7 +60,6 @@ interface Props {
 }
 
 export function App(props: Props) {
-  useHydrateStore()
   handleRouterHistory()
   useVotingPlugins()
   useHandleGovernanceAssetsStore()

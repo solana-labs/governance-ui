@@ -38,6 +38,8 @@ import { PublicKey } from '@solana/web3.js'
 import { PromptModal } from './PromptModal'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
+import queryClient from '@hooks/queries/queryClient'
+import { tokenAccountQueryKeys } from '@hooks/queries/tokenAccount'
 
 export interface PositionCardProps {
   subDaos?: SubDaoWithMeta[]
@@ -157,9 +159,6 @@ export const PositionCard: React.FC<PositionCardProps> = ({
     claimDelegatedPositionRewards,
   } = useClaimDelegatedPositionRewards()
 
-  const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
-    (s) => s.actions
-  )
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletOnePointOh()
 
@@ -199,8 +198,9 @@ export const PositionCard: React.FC<PositionCardProps> = ({
   )
 
   const refetchState = async () => {
-    fetchWalletTokenAccounts()
-    fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+    queryClient.invalidateQueries({
+      queryKey: tokenAccountQueryKeys.all(connection.cluster),
+    })
     await getPositions({
       votingClient: currentClient,
       realmPk: realm!.pubkey,

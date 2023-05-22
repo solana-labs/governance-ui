@@ -77,7 +77,6 @@ const NewProgramForm = () => {
   const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
   const connected = !!wallet?.connected
-  const { fetchRealm } = useWalletStore((s) => s.actions)
   const [form, setForm] = useState<NewProgramForm>({
     ...defaultFormValues,
   })
@@ -169,7 +168,6 @@ const NewProgramForm = () => {
           client
         )
         setIsLoading(false)
-        fetchRealm(realmInfo!.programId, realmInfo!.realmId)
         router.push(fmtUrlWithCluster(`/dao/${symbol}/`))
       }
     } catch (e) {

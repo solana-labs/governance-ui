@@ -101,7 +101,6 @@ export function ExecuteAllInstructionButton({
   const { realmInfo } = useRealm()
   const wallet = useWalletOnePointOh()
   const connection = useWalletStore((s) => s.connection)
-  const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
   const connected = !!wallet?.connected
 
   const [currentSlot, setCurrentSlot] = useState(0)
@@ -153,7 +152,6 @@ export function ExecuteAllInstructionButton({
         proposalInstructions,
         multiTransactionMode
       )
-      await refetchProposals()
     } catch (error) {
       notify({ type: 'error', message: `error executing instruction ${error}` })
       console.error('error executing instruction', error)

@@ -67,7 +67,6 @@ const ConvertToStSol = () => {
 
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletOnePointOh()
-  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
 
   const [formErrors, setFormErrors] = useState({})
@@ -133,15 +132,10 @@ const ConvertToStSol = () => {
       }
 
       try {
-        // Fetch governance to get up to date proposalCount
-        const selectedGovernance = (await fetchRealmGovernance(
-          currentAccount?.governance?.pubkey
-        )) as ProgramAccount<Governance>
-
         const proposalAddress = await handleCreateProposal({
           title: form.title ? form.title : getProposalText(form.amount),
           description: form.description ? form.description : '',
-          governance: selectedGovernance,
+          governance: currentAccount!.governance!,
           instructionsData: [instructionData],
           voteByCouncil,
           isDraft: false,

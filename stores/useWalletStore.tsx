@@ -84,7 +84,7 @@ interface WalletStore extends State {
   providerName: string | undefined
   //tokenAccounts: TokenProgramAccount<TokenAccount>[]
   set: (x: any) => void
-  actions: any
+  //actions: any
 }
 
 const INITIAL_REALM_STATE = {
@@ -130,7 +130,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
   set: (fn) => set(produce(fn)),
   /** @deprecated use react-query */
   actions: {
-    async fetchRealmBySymbol(cluster: string, symbol: string) {
+    /* async fetchRealmBySymbol(cluster: string, symbol: string) {
       const actions = get().actions
       let connection = get().connection
       const set = get().set
@@ -167,7 +167,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         await actions.fetchAllRealms(programId)
         actions.fetchRealm(programId, realmId)
       }
-    },
+    }, */
     async fetchWalletTokenAccounts() {
       const connection = get().connection.current
       const wallet = get().mockWallet ?? get().current
@@ -194,7 +194,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 
     // selectedCouncilDelegate: string | undefined
     // selectedCommunityDelegate: string | undefined
-
+    /* 
     deselectRealm() {
       const set = get().set
       set((s) => {
@@ -461,7 +461,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       set((s) => {
         s.selectedProposal.voteRecordsByVoter = voteRecordsByVoter
       })
-    },
+    }, */
   },
 }))
 

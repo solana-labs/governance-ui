@@ -42,7 +42,6 @@ const ConvertToMsol = () => {
   const { handleCreateProposal } = useCreateProposal()
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletOnePointOh()
-  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const notConnectedMessage =
     'You need to be connected to your wallet to have the ability to create a staking proposal'
@@ -78,6 +77,8 @@ const ConvertToMsol = () => {
   }
 
   const handlePropose = async () => {
+    if (currentAccount?.governance === undefined) throw new Error()
+
     setIsLoading(true)
     const instruction: UiInstruction = await getConvertToMsolInstruction({
       schema,
@@ -105,15 +106,10 @@ const ConvertToMsol = () => {
       }
 
       try {
-        // Fetch governance to get up to date proposalCount
-        const selectedGovernance = (await fetchRealmGovernance(
-          currentAccount?.governance?.pubkey
-        )) as ProgramAccount<Governance>
-
         const proposalAddress = await handleCreateProposal({
           title: form.title ? form.title : proposalTitle,
           description: form.description ? form.description : '',
-          governance: selectedGovernance,
+          governance: currentAccount?.governance,
           instructionsData: [instructionData],
           voteByCouncil,
           isDraft: false,

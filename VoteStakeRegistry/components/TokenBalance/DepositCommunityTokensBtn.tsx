@@ -26,9 +26,7 @@ const DepositCommunityTokensBtn = ({ className = '', inAccountDetails }) => {
   const connected = !!wallet?.connected
   const connection = useWalletStore((s) => s.connection.current)
   const endpoint = useWalletStore((s) => s.connection.endpoint)
-  const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
-    (s) => s.actions
-  )
+  const { fetchWalletTokenAccounts } = useWalletStore((s) => s.actions)
   const currentTokenOwnerRecord = useUserCommunityTokenOwnerRecord().data
     ?.result
 
@@ -69,7 +67,6 @@ const DepositCommunityTokensBtn = ({ className = '', inAccountDetails }) => {
         connection,
       })
       await fetchWalletTokenAccounts()
-      await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
     } catch (e) {
       console.log(e)
       notify({ message: `Something went wrong ${e}`, type: 'error' })

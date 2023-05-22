@@ -173,7 +173,6 @@ const Trade: React.FC<TradeProps> = ({ tokenAccount }) => {
   const router = useRouter()
   const connection = useWalletStore((s) => s.connection)
   const { wallet, anchorProvider } = useWalletDeprecated()
-  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const { handleCreateProposal } = useCreateProposal()
   const { canUseTransferInstruction } = useGovernanceAssets()
   const { canChooseWhoVote, symbol } = useRealm()
@@ -327,15 +326,10 @@ const Trade: React.FC<TradeProps> = ({ tokenAccount }) => {
       proposalInstructions.push(instructionData)
 
       try {
-        // Fetch governance to get up to date proposalCount
-        const selectedGovernance = (await fetchRealmGovernance(
-          currentAccount?.governance?.pubkey
-        )) as ProgramAccount<Governance>
-
         const proposalAddress = await handleCreateProposal({
           title: form.title,
           description: form.description,
-          governance: selectedGovernance,
+          governance: currentAccount.governance,
           instructionsData: proposalInstructions,
           voteByCouncil,
           isDraft: false,
