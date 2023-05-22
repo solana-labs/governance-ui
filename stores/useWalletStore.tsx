@@ -65,7 +65,7 @@ interface WalletStore extends State {
     //mints: { [pubkey: string]: MintAccount }
     // programVersion: number
   } */
-
+  /* 
   selectedProposal: {
     //proposal: ProgramAccount<Proposal> | undefined
     //governance: ProgramAccount<Governance> | undefined
@@ -79,7 +79,7 @@ interface WalletStore extends State {
     //loading: boolean
     //tokenRole?: GoverningTokenRole
     //proposalOwner: ProgramAccount<TokenOwnerRecord> | undefined
-  }
+  } */
 
   providerName: string | undefined
   tokenAccounts: TokenProgramAccount<TokenAccount>[]
