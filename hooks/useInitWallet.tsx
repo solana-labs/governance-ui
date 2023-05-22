@@ -23,7 +23,6 @@ export default function useInitWallet() {
     current: wallet,
     providerName: selectedProviderName,
     set: setWalletStore,
-    actions,
   } = useWalletStore((state) => state)
 
   const [savedProviderName, setSavedProviderName] = useLocalStorageState(
@@ -111,7 +110,6 @@ export default function useInitWallet() {
           '...' +
           wallet!.publicKey!.toString().substr(-5),
       })
-      await actions.fetchWalletTokenAccounts()
     })
     wallet.on('disconnect', () => {
       setWalletStore((state) => {

@@ -78,7 +78,6 @@ const LockTokensModal = ({
   const endpoint = useWalletStore((s) => s.connection.endpoint)
   const wallet = useWalletOnePointOh()
   const deposits = useDepositStore((s) => s.state.deposits)
-  const { fetchWalletTokenAccounts } = useWalletStore((s) => s.actions)
   const fiveYearsSecs = yearsToSecs(5)
   const maxLockupSecs =
     (realm &&
@@ -280,7 +279,6 @@ const LockTokensModal = ({
       client: client!,
       connection,
     })
-    fetchWalletTokenAccounts()
     onClose()
   }
 

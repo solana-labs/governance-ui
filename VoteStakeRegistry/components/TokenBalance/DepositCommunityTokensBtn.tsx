@@ -26,7 +26,6 @@ const DepositCommunityTokensBtn = ({ className = '', inAccountDetails }) => {
   const connected = !!wallet?.connected
   const connection = useWalletStore((s) => s.connection.current)
   const endpoint = useWalletStore((s) => s.connection.endpoint)
-  const { fetchWalletTokenAccounts } = useWalletStore((s) => s.actions)
   const currentTokenOwnerRecord = useUserCommunityTokenOwnerRecord().data
     ?.result
 
@@ -66,7 +65,6 @@ const DepositCommunityTokensBtn = ({ className = '', inAccountDetails }) => {
         client: client!,
         connection,
       })
-      await fetchWalletTokenAccounts()
     } catch (e) {
       console.log(e)
       notify({ message: `Something went wrong ${e}`, type: 'error' })

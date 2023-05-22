@@ -48,7 +48,6 @@ const DepositCard = ({
   const connection = useWalletStore((s) => s.connection.current)
   const endpoint = useWalletStore((s) => s.connection.endpoint)
   const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false)
-  const { fetchWalletTokenAccounts } = useWalletStore((s) => s.actions)
   const handleWithDrawFromDeposit = async (
     depositEntry: DepositWithMintAccount
   ) => {
@@ -91,7 +90,6 @@ const DepositCard = ({
       client: actualClient!,
       connection,
     })
-    await fetchWalletTokenAccounts()
   }
   const handleStartUnlock = () => {
     setIsUnlockModalOpen(true)

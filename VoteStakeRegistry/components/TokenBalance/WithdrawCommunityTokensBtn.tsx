@@ -43,7 +43,6 @@ const WithDrawCommunityTokens = () => {
   const connected = !!wallet?.connected
   const connection = useWalletStore((s) => s.connection.current)
   const deposits = useDepositStore((s) => s.state.deposits)
-  const { fetchWalletTokenAccounts } = useWalletStore((s) => s.actions)
   const maxVoterWeight = useMaxVoteRecord()?.pubkey || undefined
   const depositRecord = deposits.find(
     (x) =>
@@ -159,7 +158,6 @@ const WithDrawCommunityTokens = () => {
               : `Released tokens (${index}/${ixChunks.length - 2})`,
         })
       }
-      await fetchWalletTokenAccounts()
       await getOwnedDeposits({
         realmPk: realm!.pubkey,
         communityMintPk: realm!.account.communityMint,
