@@ -65,7 +65,6 @@ const devnetHardcodedPrograms = {
   //metaplex dao
   CmfnQAJjgUWge1ACV8rCtKWS65GaQu7sVGoFd5qdJEfm: [
     'metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s',
-    'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw',
   ],
 }
 
