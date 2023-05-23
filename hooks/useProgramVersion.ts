@@ -1,9 +1,9 @@
-import useSelectedRealmPubkey from './selectedRealm/useSelectedRealmPubkey'
 import { useProgramVersionByIdQuery } from './queries/useProgramVersionQuery'
+import { useRealmQuery } from './queries/realm'
 
 const useProgramVersion = () => {
-  const realm = useSelectedRealmPubkey()
-  const queriedVersion = useProgramVersionByIdQuery(realm).data as
+  const realm = useRealmQuery().data?.result
+  const queriedVersion = useProgramVersionByIdQuery(realm?.owner).data as
     | 1
     | 2
     | 3
