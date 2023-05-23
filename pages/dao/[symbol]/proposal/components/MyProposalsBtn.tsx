@@ -50,7 +50,7 @@ const MyProposalsBn = () => {
   const connected = !!wallet?.connected
   const [isLoading, setIsLoading] = useState(false)
   const { governancesArray } = useGovernanceAssets()
-  const connection = useConnection()
+  const { connection } = useConnection()
   const myVoteRecords = useVoteRecordsByOwnerQuery(
     wallet?.publicKey ?? undefined
   ).data
