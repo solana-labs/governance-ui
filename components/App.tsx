@@ -24,14 +24,21 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import NftVotingCountingModal from '@components/NftVotingCountingModal'
 import { getResourcePathPart } from '@tools/core/resources'
 import useSerumGovStore from 'stores/useSerumGovStore'
-import { WalletProvider } from '@hub/providers/Wallet'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
-import { ConnectionProvider } from '@solana/wallet-adapter-react'
-import { getConnectionContext } from '@utils/connection'
+import {
+  ConnectionProvider,
+  WalletProvider,
+} from '@solana/wallet-adapter-react'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { DEVNET_RPC, MAINNET_RPC } from 'constants/endpoints'
+import {
+  SquadsEmbeddedWalletAdapter,
+  detectEmbeddedInSquadsIframe,
+} from '@sqds/iframe-adapter'
+import { WALLET_PROVIDERS } from '@utils/wallet-adapters'
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
@@ -67,7 +74,7 @@ export function App(props: Props) {
   const { cluster } = router.query
 
   const endpoint = useMemo(
-    () => getConnectionContext(cluster as string).endpoint,
+    () => (cluster === 'devnet' ? DEVNET_RPC : MAINNET_RPC),
     [cluster]
   )
 
@@ -176,6 +183,14 @@ export function AppContents(props: Props) {
     updateSerumGovAccounts(cluster as string | undefined)
   }, [cluster, updateSerumGovAccounts])
 
+  const supportedWallets = useMemo(
+    () =>
+      detectEmbeddedInSquadsIframe()
+        ? [new SquadsEmbeddedWalletAdapter()]
+        : WALLET_PROVIDERS.map((provider) => provider.adapter),
+    []
+  )
+
   return (
     <div className="relative bg-bkg-1 text-fgd-1">
       <Head>
@@ -268,7 +283,7 @@ export function AppContents(props: Props) {
       <ErrorBoundary>
         <ThemeProvider defaultTheme="Dark">
           <WalletIdentityProvider appName={'Realms'}>
-            <WalletProvider>
+            <WalletProvider wallets={supportedWallets}>
               <GatewayProvider>
                 <NavBar />
                 <Notifications />

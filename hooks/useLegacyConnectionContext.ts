@@ -1,5 +1,4 @@
 import { useConnection } from '@solana/wallet-adapter-react'
-import { getNetworkFromEndpoint } from '@utils/connection'
 import { useMemo } from 'react'
 
 /**
@@ -13,7 +12,9 @@ const useLegacyConnectionContext = () => {
     () => ({
       current: connection,
       endpoint: connection.rpcEndpoint,
-      cluster: getNetworkFromEndpoint(connection.rpcEndpoint),
+      cluster: connection.rpcEndpoint.includes('devnet')
+        ? ('devnet' as const)
+        : ('mainnet' as const),
     }),
     [connection]
   )
