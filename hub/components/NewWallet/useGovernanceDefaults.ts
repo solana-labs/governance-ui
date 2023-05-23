@@ -94,7 +94,7 @@ const configs2defaults = (configs: GovernanceConfig[]) => {
 const useGovernanceDefaults = ():
   | undefined
   | Omit<Rules, 'governanceAddress' | 'walletAddress'> => {
-  const data = useTreasuryInfo();
+  const data = useTreasuryInfo(false);
   const configs = pipe(
     data,
     RE.match(
