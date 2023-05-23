@@ -5,10 +5,10 @@ import dynamic from 'next/dynamic'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import useQueryContext from '@hooks/useQueryContext'
 import {
-  gatewayPluginsPks,
-  nftPluginsPks,
-  switchboardPluginsPks,
-} from '@hooks/useVotingPlugins'
+  GATEWAY_PLUGINS_PKS,
+  NFT_PLUGINS_PKS,
+  SWITCHBOARD_PLUGINS_PKS,
+} from '@constants/plugins'
 import GatewayCard from '@components/Gateway/GatewayCard'
 import ClaimUnreleasedNFTs from './ClaimUnreleasedNFTs'
 import Link from 'next/link'
@@ -86,12 +86,13 @@ const TokenBalanceCardWrapper = ({
   const currentPluginPk = config?.account?.communityTokenConfig.voterWeightAddin
   const getTokenBalanceCard = () => {
     const isNftMode =
-      currentPluginPk && nftPluginsPks.includes(currentPluginPk?.toBase58())
+      currentPluginPk && NFT_PLUGINS_PKS.includes(currentPluginPk?.toBase58())
     const isGatewayMode =
-      currentPluginPk && gatewayPluginsPks.includes(currentPluginPk?.toBase58())
+      currentPluginPk &&
+      GATEWAY_PLUGINS_PKS.includes(currentPluginPk?.toBase58())
     const isSwitchboardMode =
       currentPluginPk &&
-      switchboardPluginsPks.includes(currentPluginPk?.toBase58())
+      SWITCHBOARD_PLUGINS_PKS.includes(currentPluginPk?.toBase58())
 
     if (
       vsrMode === 'default' &&

@@ -7,7 +7,8 @@ import Script from 'next/script'
 import { useRouter } from 'next/router'
 import { GatewayProvider } from '@components/Gateway/GatewayProvider'
 import { usePrevious } from '@hooks/usePrevious'
-import { useVotingPlugins, vsrPluginsPks } from '@hooks/useVotingPlugins'
+import { useVotingPlugins } from '@hooks/useVotingPlugins'
+import { VSR_PLUGIN_PKS } from '@constants/plugins'
 import ErrorBoundary from '@components/ErrorBoundary'
 import useHandleGovernanceAssetsStore from '@hooks/handleGovernanceAssetsStore'
 import handleRouterHistory from '@hooks/handleRouterHistory'
@@ -134,7 +135,7 @@ export function AppContents(props: Props) {
     if (
       realm &&
       config?.account.communityTokenConfig.voterWeightAddin &&
-      vsrPluginsPks.includes(
+      VSR_PLUGIN_PKS.includes(
         config.account.communityTokenConfig.voterWeightAddin.toBase58()
       ) &&
       realm.pubkey &&

@@ -15,7 +15,7 @@ import BN from 'bn.js';
 
 import { tryGetNftRegistrar } from 'VoteStakeRegistry/sdk/api';
 
-import { nftPluginsPks } from '@hooks/useVotingPlugins';
+import { NFT_PLUGINS_PKS } from '@constants/plugins';
 import { getNetworkFromEndpoint } from '@utils/connection';
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts';
 import { parseMintAccountData, MintAccount } from '@utils/tokens';
@@ -90,7 +90,7 @@ export async function fetchConfig(
   const pluginPublicKey =
     configProgramAccount.account.communityTokenConfig.voterWeightAddin;
 
-  if (pluginPublicKey && nftPluginsPks.includes(pluginPublicKey.toBase58())) {
+  if (pluginPublicKey && NFT_PLUGINS_PKS.includes(pluginPublicKey.toBase58())) {
     if (nftClient && realm.account.communityMint) {
       const programId = nftClient.program.programId;
       const registrarPDA = (

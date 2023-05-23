@@ -19,7 +19,7 @@ import { getRegistrarPDA } from 'VoteStakeRegistry/sdk/accounts'
 import { DEFAULT_VSR_ID, VsrClient } from 'VoteStakeRegistry/sdk/client'
 import { web3 } from '@coral-xyz/anchor'
 import useWalletDeprecated from '@hooks/useWalletDeprecated'
-import { heliumVsrPluginsPks, vsrPluginsPks } from '@hooks/useVotingPlugins'
+import { HELIUM_VSR_PLUGINS_PKS, VSR_PLUGIN_PKS } from '@constants/plugins'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import { useRealmQuery } from '@hooks/queries/realm'
 
@@ -88,14 +88,14 @@ const CreateVsrRegistrar = ({
     let instruction: web3.TransactionInstruction
     let vsrClient: VsrClient | HeliumVsrClient | undefined
 
-    if (vsrPluginsPks.includes(form.programId)) {
+    if (VSR_PLUGIN_PKS.includes(form.programId)) {
       vsrClient = await VsrClient.connect(
         anchorProvider,
         new PublicKey(form.programId)
       )
     }
 
-    if (heliumVsrPluginsPks.includes(form.programId)) {
+    if (HELIUM_VSR_PLUGINS_PKS.includes(form.programId)) {
       vsrClient = await HeliumVsrClient.connect(
         anchorProvider,
         new PublicKey(form.programId)

@@ -12,10 +12,10 @@ import type { PublicKey } from '@solana/web3.js'
 import { TokenProgramAccount } from '@utils/tokens'
 import useRealm from '@hooks/useRealm'
 import {
-  heliumVsrPluginsPks,
-  nftPluginsPks,
-  vsrPluginsPks,
-} from '@hooks/useVotingPlugins'
+  HELIUM_VSR_PLUGINS_PKS,
+  NFT_PLUGINS_PKS,
+  VSR_PLUGIN_PKS,
+} from '@constants/plugins'
 
 import CommunityVotingPower from './CommunityVotingPower'
 import CouncilVotingPower from './CouncilVotingPower'
@@ -70,13 +70,13 @@ function getTypes(
 
   if (
     currentPluginPk &&
-    nftPluginsPks.includes(currentPluginPk.toBase58()) &&
+    NFT_PLUGINS_PKS.includes(currentPluginPk.toBase58()) &&
     tokenRole === 'community'
   ) {
     types.push(Type.NFT)
   } else if (
     currentPluginPk &&
-    vsrPluginsPks.includes(currentPluginPk.toBase58())
+    VSR_PLUGIN_PKS.includes(currentPluginPk.toBase58())
   ) {
     if (
       (!realm?.account.config.councilMint ||
@@ -92,7 +92,7 @@ function getTypes(
     }
   } else if (
     currentPluginPk &&
-    heliumVsrPluginsPks.includes(currentPluginPk.toBase58())
+    HELIUM_VSR_PLUGINS_PKS.includes(currentPluginPk.toBase58())
   ) {
     if (
       (!realm?.account.config.councilMint ||

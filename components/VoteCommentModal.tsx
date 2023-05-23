@@ -20,7 +20,7 @@ import { TokenOwnerRecord } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { nftPluginsPks } from '@hooks/useVotingPlugins'
+import { NFT_PLUGINS_PKS } from '@constants/plugins'
 import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import queryClient from '@hooks/queries/queryClient'
@@ -60,7 +60,7 @@ const useSubmitVote = ({
   const { realmInfo } = useRealm()
   const isNftPlugin =
     config?.account.communityTokenConfig.voterWeightAddin &&
-    nftPluginsPks.includes(
+    NFT_PLUGINS_PKS.includes(
       config?.account.communityTokenConfig.voterWeightAddin?.toBase58()
     )
   const { closeNftVotingCountingModal } = useNftProposalStore.getState()

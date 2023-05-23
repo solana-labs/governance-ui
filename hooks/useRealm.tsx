@@ -15,13 +15,13 @@ import {
 } from '../models/voteWeights'
 import useMembersStore from 'stores/useMembersStore'
 import {
-  nftPluginsPks,
-  vsrPluginsPks,
-  switchboardPluginsPks,
-  pythPluginsPks,
-  gatewayPluginsPks,
-  heliumVsrPluginsPks,
-} from './useVotingPlugins'
+  NFT_PLUGINS_PKS,
+  VSR_PLUGIN_PKS,
+  SWITCHBOARD_PLUGINS_PKS,
+  PYTH_PLUGINS_PKS,
+  GATEWAY_PLUGINS_PKS,
+  HELIUM_VSR_PLUGINS_PKS,
+} from '../constants/plugins'
 import useGatewayPluginStore from '../GatewayPlugin/store/gatewayPluginStore'
 import useSwitchboardPluginStore from 'SwitchboardVotePlugin/store/switchboardStore'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
@@ -86,7 +86,7 @@ export default function useRealm() {
   const pythClient = useVotePluginsClientStore((s) => s.state.pythClient)
   const [pythVoterWeight, setPythVoterWeight] = useState<PythBalance>()
   const isPythclientMode =
-    currentPluginPk && pythPluginsPks.includes(currentPluginPk?.toBase58())
+    currentPluginPk && PYTH_PLUGINS_PKS.includes(currentPluginPk?.toBase58())
 
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
@@ -197,7 +197,7 @@ export default function useRealm() {
       realmCfgMaxOutstandingProposalCount
   const vsrMode = useVsrMode()
   const isNftMode =
-    currentPluginPk && nftPluginsPks.includes(currentPluginPk?.toBase58())
+    currentPluginPk && NFT_PLUGINS_PKS.includes(currentPluginPk?.toBase58())
   const pythVotingPower = pythVoterWeight?.toBN() || new BN(0)
   const ownVoterWeight = getVoterWeight(
     currentPluginPk,
@@ -275,34 +275,34 @@ const getVoterWeight = (
   heliumVotingPower: BN
 ) => {
   if (currentPluginPk) {
-    if (vsrPluginsPks.includes(currentPluginPk.toBase58())) {
+    if (VSR_PLUGIN_PKS.includes(currentPluginPk.toBase58())) {
       return new VoteRegistryVoterWeight(
         ownTokenRecord,
         ownCouncilTokenRecord,
         votingPower
       )
     }
-    if (heliumVsrPluginsPks.includes(currentPluginPk.toBase58())) {
+    if (HELIUM_VSR_PLUGINS_PKS.includes(currentPluginPk.toBase58())) {
       return new VoteRegistryVoterWeight(
         ownTokenRecord,
         ownCouncilTokenRecord,
         heliumVotingPower
       )
     }
-    if (nftPluginsPks.includes(currentPluginPk.toBase58())) {
+    if (NFT_PLUGINS_PKS.includes(currentPluginPk.toBase58())) {
       return new VoteNftWeight(
         ownTokenRecord,
         ownCouncilTokenRecord,
         nftVotingPower
       )
     }
-    if (switchboardPluginsPks.includes(currentPluginPk.toBase58())) {
+    if (SWITCHBOARD_PLUGINS_PKS.includes(currentPluginPk.toBase58())) {
       return new SwitchboardQueueVoteWeight(ownTokenRecord, sbVotingPower)
     }
-    if (pythPluginsPks.includes(currentPluginPk.toBase58())) {
+    if (PYTH_PLUGINS_PKS.includes(currentPluginPk.toBase58())) {
       return new PythVoterWeight(ownTokenRecord, pythVotingPower)
     }
-    if (gatewayPluginsPks.includes(currentPluginPk.toBase58())) {
+    if (GATEWAY_PLUGINS_PKS.includes(currentPluginPk.toBase58())) {
       return new SimpleGatedVoterWeight(
         ownTokenRecord,
         ownCouncilTokenRecord,

@@ -28,7 +28,7 @@ import {
 import { DEFAULT_VSR_ID, VsrClient } from 'VoteStakeRegistry/sdk/client'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import useWalletDeprecated from '@hooks/useWalletDeprecated'
-import { heliumVsrPluginsPks, vsrPluginsPks } from '@hooks/useVotingPlugins'
+import { HELIUM_VSR_PLUGINS_PKS, VSR_PLUGIN_PKS } from '@constants/plugins'
 import { useRealmQuery } from '@hooks/queries/realm'
 
 interface ConfigureVotingMintForm {
@@ -68,7 +68,7 @@ const VotingMintConfig = ({
   const { handleSetInstructions } = useContext(NewProposalContext)
   const { wallet, anchorProvider } = useWalletDeprecated()
   const showGrantAuth = useMemo(
-    () => form?.programId && !heliumVsrPluginsPks.includes(form.programId),
+    () => form?.programId && !HELIUM_VSR_PLUGINS_PKS.includes(form.programId),
     [form?.programId]
   )
 
@@ -95,14 +95,14 @@ const VotingMintConfig = ({
     let instruction: web3.TransactionInstruction
     let vsrClient: VsrClient | HeliumVsrClient | undefined
 
-    if (vsrPluginsPks.includes(form.programId)) {
+    if (VSR_PLUGIN_PKS.includes(form.programId)) {
       vsrClient = await VsrClient.connect(
         anchorProvider,
         new PublicKey(form.programId)
       )
     }
 
-    if (heliumVsrPluginsPks.includes(form.programId)) {
+    if (HELIUM_VSR_PLUGINS_PKS.includes(form.programId)) {
       vsrClient = await HeliumVsrClient.connect(
         anchorProvider,
         new PublicKey(form.programId)

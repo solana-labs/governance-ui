@@ -2,9 +2,9 @@ import classNames from 'classnames'
 
 import useWalletStore from 'stores/useWalletStore'
 import {
-  gatewayPluginsPks,
-  switchboardPluginsPks,
-} from '@hooks/useVotingPlugins'
+  GATEWAY_PLUGINS_PKS,
+  SWITCHBOARD_PLUGINS_PKS,
+} from '@constants/plugins'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import { option } from '@tools/core/option'
 
@@ -23,11 +23,11 @@ export default function ProposalVotingPower(props: Props) {
   const currentPluginPk = config?.account?.communityTokenConfig.voterWeightAddin
 
   const isUsingGatewayPlugin =
-    currentPluginPk && gatewayPluginsPks.includes(currentPluginPk.toBase58())
+    currentPluginPk && GATEWAY_PLUGINS_PKS.includes(currentPluginPk.toBase58())
 
   const isUsingSwitchboardPlugin =
     currentPluginPk &&
-    switchboardPluginsPks.includes(currentPluginPk.toBase58())
+    SWITCHBOARD_PLUGINS_PKS.includes(currentPluginPk.toBase58())
 
   if (isUsingGatewayPlugin || isUsingSwitchboardPlugin) {
     return <TokenBalanceCardWrapper proposal={option(proposal?.account)} />

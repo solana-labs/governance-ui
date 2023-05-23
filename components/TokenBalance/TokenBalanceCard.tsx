@@ -32,7 +32,7 @@ import { notify } from '@utils/notifications'
 import { ExclamationIcon } from '@heroicons/react/outline'
 import { useEffect, useState } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { vsrPluginsPks } from '@hooks/useVotingPlugins'
+import { VSR_PLUGIN_PKS } from '@constants/plugins'
 import { REALM_ID as PYTH_REALM_ID } from 'pyth-staking-api'
 import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
 import SerumGovernanceTokenWrapper from './SerumGovernanceTokenWrapper'
@@ -446,7 +446,7 @@ export const TokenDeposit = ({
       : 0
   const isVsr =
     config?.account.communityTokenConfig.voterWeightAddin &&
-    vsrPluginsPks.includes(
+    VSR_PLUGIN_PKS.includes(
       config?.account.communityTokenConfig.voterWeightAddin.toBase58()
     ) &&
     tokenRole === GoverningTokenRole.Community

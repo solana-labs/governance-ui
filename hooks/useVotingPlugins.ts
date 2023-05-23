@@ -22,44 +22,24 @@ import * as sbv2 from '@switchboard-xyz/switchboard-v2'
 import sbIdl from 'SwitchboardVotePlugin/switchboard_v2.json'
 import gonIdl from 'SwitchboardVotePlugin/gameofnodes.json'
 
-import { STAKING_ADDRESS as PYTH_STAKING_ADDRESS } from 'pyth-staking-api'
 import useGatewayPluginStore from '../GatewayPlugin/store/gatewayPluginStore'
 import { getGatekeeperNetwork } from '../GatewayPlugin/sdk/accounts'
 import { NFTWithMeta } from '@utils/uiTypes/VotePlugin'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import * as heliumVsrSdk from '@helium/voter-stake-registry-sdk'
 import useWalletOnePointOh from './useWalletOnePointOh'
-import { DEFAULT_NFT_VOTER_PLUGIN } from '@tools/constants'
 import { useUserCommunityTokenOwnerRecord } from './queries/tokenOwnerRecord'
 import { useRealmQuery } from './queries/realm'
 import { useRealmConfigQuery } from './queries/realmConfig'
 import useLegacyConnectionContext from './useLegacyConnectionContext'
-
-export const vsrPluginsPks: string[] = [
-  '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo',
-  'vsr2nfGVNHmSY8uxoBGqq8AQbwz3JwaEaHqGbsTPXqQ',
-  'VotEn9AWwTFtJPJSMV5F9jsMY6QwWM5qn3XP9PATGW7',
-  'VoteWPk9yyGmkX4U77nEWRJWpcc8kUfrPoghxENpstL',
-  'VoteMBhDCqGLRgYpp9o7DGyq81KNmwjXQRAHStjtJsS',
-]
-
-export const heliumVsrPluginsPks: string[] = [
-  heliumVsrSdk.PROGRAM_ID.toBase58(),
-]
-
-export const nftPluginsPks: string[] = [
-  DEFAULT_NFT_VOTER_PLUGIN,
-  'GnftV5kLjd67tvHpNGyodwWveEKivz3ZWvvE3Z4xi2iw',
-]
-
-export const gatewayPluginsPks: string[] = [
-  'Ggatr3wgDLySEwA2qEjt1oiw4BUzp5yMLJyz21919dq6', // v1
-  'GgathUhdrCWRHowoRKACjgWhYHfxCEdBi5ViqYN6HVxk', // v2, supporting composition
-]
-
-export const switchboardPluginsPks: string[] = [SWITCHBOARD_ADDIN_ID.toBase58()]
-
-export const pythPluginsPks: string[] = [PYTH_STAKING_ADDRESS.toBase58()]
+import {
+  NFT_PLUGINS_PKS,
+  HELIUM_VSR_PLUGINS_PKS,
+  VSR_PLUGIN_PKS,
+  GATEWAY_PLUGINS_PKS,
+  PYTH_PLUGINS_PKS,
+  SWITCHBOARD_PLUGINS_PKS,
+} from '../constants/plugins'
 
 export function useVotingPlugins() {
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
@@ -112,7 +92,7 @@ export function useVotingPlugins() {
 
   const usedCollectionsPks: string[] =
     (currentPluginPk &&
-      nftPluginsPks.includes(currentPluginPk?.toBase58()) &&
+      NFT_PLUGINS_PKS.includes(currentPluginPk?.toBase58()) &&
       nftMintRegistrar?.collectionConfigs.map((x) =>
         x.collection.toBase58()
       )) ||
@@ -139,7 +119,7 @@ export function useVotingPlugins() {
     if (
       realm &&
       currentPluginPk &&
-      heliumVsrPluginsPks.includes(currentPluginPk.toBase58())
+      HELIUM_VSR_PLUGINS_PKS.includes(currentPluginPk.toBase58())
     ) {
       const [maxVoterRecord] = heliumVsrSdk.maxVoterWeightRecordKey(
         realm.pubkey,
@@ -370,10 +350,10 @@ export function useVotingPlugins() {
   useEffect(() => {
     if (wallet && connection) {
       if (currentPluginPk) {
-        if (vsrPluginsPks.includes(currentPluginPk.toBase58())) {
+        if (VSR_PLUGIN_PKS.includes(currentPluginPk.toBase58())) {
           handleSetVsrClient(wallet, connection, currentPluginPk)
         }
-        if (heliumVsrPluginsPks.includes(currentPluginPk.toBase58())) {
+        if (HELIUM_VSR_PLUGINS_PKS.includes(currentPluginPk.toBase58())) {
           handleSetHeliumVsrClient(wallet, connection, currentPluginPk)
         }
       }
@@ -398,7 +378,7 @@ export function useVotingPlugins() {
       if (
         vsrClient &&
         currentPluginPk &&
-        vsrPluginsPks.includes(currentPluginPk.toBase58())
+        VSR_PLUGIN_PKS.includes(currentPluginPk.toBase58())
       ) {
         handleSetVsrRegistrar(vsrClient, realm)
         if (connected) {
@@ -416,7 +396,7 @@ export function useVotingPlugins() {
       if (
         heliumVsrClient &&
         currentPluginPk &&
-        heliumVsrPluginsPks.includes(currentPluginPk.toBase58())
+        HELIUM_VSR_PLUGINS_PKS.includes(currentPluginPk.toBase58())
       ) {
         handleSetHeliumVsrRegistrar(heliumVsrClient, realm)
         if (connected) {
@@ -434,7 +414,7 @@ export function useVotingPlugins() {
       if (
         nftClient &&
         currentPluginPk &&
-        nftPluginsPks.includes(currentPluginPk.toBase58())
+        NFT_PLUGINS_PKS.includes(currentPluginPk.toBase58())
       ) {
         handleSetNftRegistrar(nftClient!, realm)
         if (connected) {
@@ -456,7 +436,7 @@ export function useVotingPlugins() {
       if (
         gatewayClient &&
         currentPluginPk &&
-        gatewayPluginsPks.includes(currentPluginPk.toBase58())
+        GATEWAY_PLUGINS_PKS.includes(currentPluginPk.toBase58())
       ) {
         handleSetGatewayRegistrar(gatewayClient!, realm)
         if (connected) {
@@ -475,7 +455,7 @@ export function useVotingPlugins() {
       if (
         pythClient &&
         currentPluginPk &&
-        pythPluginsPks.includes(currentPluginPk.toBase58())
+        PYTH_PLUGINS_PKS.includes(currentPluginPk.toBase58())
       ) {
         if (connected) {
           handleSetCurrentRealmVotingClient({
@@ -493,7 +473,7 @@ export function useVotingPlugins() {
       if (
         switchboardClient &&
         currentPluginPk &&
-        switchboardPluginsPks.includes(currentPluginPk.toBase58())
+        SWITCHBOARD_PLUGINS_PKS.includes(currentPluginPk.toBase58())
       ) {
         // Switchboard: don't think we need this
         //handleSetNftRegistrar(nftClient!, realm)
@@ -544,7 +524,7 @@ export function useVotingPlugins() {
   useEffect(() => {
     if (
       currentPluginPk &&
-      switchboardPluginsPks.includes(currentPluginPk.toBase58())
+      SWITCHBOARD_PLUGINS_PKS.includes(currentPluginPk.toBase58())
     ) {
       handleGetSwitchboardVoting()
     }

@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { heliumVsrPluginsPks, vsrPluginsPks } from './useVotingPlugins'
+import { HELIUM_VSR_PLUGINS_PKS, VSR_PLUGIN_PKS } from '../constants/plugins'
 import { useRealmConfigQuery } from './queries/realmConfig'
 
 export const useVsrMode = (): undefined | 'default' | 'helium' => {
@@ -8,8 +8,8 @@ export const useVsrMode = (): undefined | 'default' | 'helium' => {
     const currentPluginPk =
       config?.account?.communityTokenConfig.voterWeightAddin
     if (!currentPluginPk) return undefined
-    if (vsrPluginsPks.includes(currentPluginPk?.toBase58())) return 'default'
-    if (heliumVsrPluginsPks.includes(currentPluginPk?.toBase58()))
+    if (VSR_PLUGIN_PKS.includes(currentPluginPk?.toBase58())) return 'default'
+    if (HELIUM_VSR_PLUGINS_PKS.includes(currentPluginPk?.toBase58()))
       return 'helium'
   }, [config?.account?.communityTokenConfig])
 

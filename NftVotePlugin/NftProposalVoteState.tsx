@@ -1,4 +1,4 @@
-import { nftPluginsPks } from '@hooks/useVotingPlugins'
+import { NFT_PLUGINS_PKS } from '@constants/plugins'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { ProgramAccount, Proposal, ProposalState } from '@solana/spl-governance'
 import { useEffect } from 'react'
@@ -22,7 +22,7 @@ const NftProposalVoteState = ({
   const votingPower = useNftPluginStore((s) => s.state.votingPower)
   const isNftPlugin =
     config?.account.communityTokenConfig.voterWeightAddin &&
-    nftPluginsPks.includes(
+    NFT_PLUGINS_PKS.includes(
       config?.account.communityTokenConfig.voterWeightAddin?.toBase58()
     )
 
