@@ -1,6 +1,5 @@
 import create, { State } from 'zustand'
 import produce from 'immer'
-import { getOwnedTokenAccounts } from '../utils/tokens'
 
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { getConnectionContext } from 'utils/connection'
@@ -80,7 +79,7 @@ const INITIAL_PROPOSAL_STATE = {
   proposalOwner: undefined,
 } as const
 
-const useWalletStore = create<WalletStore>((set, get) => ({
+const useWalletStore = create<WalletStore>((set, _get) => ({
   connection: getConnectionContext('mainnet'),
   current: undefined,
   mockWallet: undefined,
@@ -91,8 +90,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
   tokenAccounts: [],
   switchboardProgram: undefined,
   set: (fn) => set(produce(fn)),
-  poopy: getOwnedTokenAccounts,
-  /** @deprecated use react-query */
 }))
 /* 
 const getGovernanceWithDefaultValues = (
