@@ -1,10 +1,6 @@
 import CheckmarkIcon from '@carbon/icons-react/lib/Checkmark';
 import ErrorIcon from '@carbon/icons-react/lib/Error';
 import WarningFilledIcon from '@carbon/icons-react/lib/WarningFilled';
-import { Program, AnchorProvider } from '@coral-xyz/anchor';
-import { PublicKey } from '@solana/web3.js';
-import React, { useEffect, useState } from 'react';
-
 import {
   VSR_PLUGIN_PKS,
   NFT_PLUGINS_PKS,
@@ -12,6 +8,10 @@ import {
   SWITCHBOARD_PLUGINS_PKS,
   PYTH_PLUGINS_PKS,
 } from '@constants/plugins';
+import { Program, AnchorProvider } from '@coral-xyz/anchor';
+import { PublicKey } from '@solana/web3.js';
+import React, { useEffect, useState } from 'react';
+
 import { Input } from '@hub/components/controls/Input';
 import { useCluster } from '@hub/hooks/useCluster';
 import { useWallet } from '@hub/hooks/useWallet';

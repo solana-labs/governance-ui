@@ -4,7 +4,6 @@ import { getUnrelinquishedVoteRecords } from '@models/api'
 import { BN } from '@coral-xyz/anchor'
 import {
   getProposal,
-  Proposal,
   ProposalState,
   withFinalizeVote,
   withRelinquishVote,
@@ -25,7 +24,6 @@ import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecor
 import { useRealmQuery } from '@hooks/queries/realm'
 import { fetchGovernanceByPubkey } from '@hooks/queries/governance'
 import { useConnection } from '@solana/wallet-adapter-react'
-import { fetchGovernanceAccountByPubkey } from '@hooks/queries/governanceAccount'
 import { proposalQueryKeys } from '@hooks/queries/proposal'
 import queryClient from '@hooks/queries/queryClient'
 import asFindable from '@utils/queries/asFindable'

@@ -1,3 +1,4 @@
+import { NFT_PLUGINS_PKS } from '@constants/plugins';
 import { AnchorProvider, Wallet } from '@project-serum/anchor';
 
 import {
@@ -15,7 +16,6 @@ import BN from 'bn.js';
 
 import { tryGetNftRegistrar } from 'VoteStakeRegistry/sdk/api';
 
-import { NFT_PLUGINS_PKS } from '@constants/plugins';
 import { getNetworkFromEndpoint } from '@utils/connection';
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts';
 import { parseMintAccountData, MintAccount } from '@utils/tokens';

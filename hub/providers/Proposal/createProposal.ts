@@ -1,3 +1,9 @@
+import {
+  VSR_PLUGIN_PKS,
+  NFT_PLUGINS_PKS,
+  GATEWAY_PLUGINS_PKS,
+  PYTH_PLUGINS_PKS,
+} from '@constants/plugins';
 import { Wallet } from '@coral-xyz/anchor';
 import {
   serializeInstructionToBase64,
@@ -25,12 +31,6 @@ import {
 } from 'actions/createProposal';
 import { tryGetNftRegistrar } from 'VoteStakeRegistry/sdk/api';
 
-import {
-  VSR_PLUGIN_PKS,
-  NFT_PLUGINS_PKS,
-  GATEWAY_PLUGINS_PKS,
-  PYTH_PLUGINS_PKS,
-} from '@constants/plugins';
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts';
 import { getNfts } from '@utils/tokens';
 import { NFTWithMeta, VotingClient } from '@utils/uiTypes/VotePlugin';
