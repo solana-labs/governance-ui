@@ -4,6 +4,7 @@ import { getUnrelinquishedVoteRecords } from '@models/api'
 import { BN } from '@coral-xyz/anchor'
 import {
   getProposal,
+  Proposal,
   ProposalState,
   withFinalizeVote,
   withRelinquishVote,
@@ -24,6 +25,10 @@ import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecor
 import { useRealmQuery } from '@hooks/queries/realm'
 import { fetchGovernanceByPubkey } from '@hooks/queries/governance'
 import { useConnection } from '@solana/wallet-adapter-react'
+import { fetchGovernanceAccountByPubkey } from '@hooks/queries/governanceAccount'
+import { proposalQueryKeys } from '@hooks/queries/proposal'
+import queryClient from '@hooks/queries/queryClient'
+import asFindable from '@utils/queries/asFindable'
 
 const WithDrawCommunityTokens = () => {
   const { getOwnedDeposits } = useDepositStore()
@@ -33,7 +38,6 @@ const WithDrawCommunityTokens = () => {
 
   const {
     realmInfo,
-    proposals,
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
@@ -61,14 +65,25 @@ const WithDrawCommunityTokens = () => {
       )
 
       for (const voteRecord of Object.values(voteRecords)) {
-        let proposal = proposals[voteRecord.account.proposal.toBase58()]
+        const proposalQuery = await queryClient.fetchQuery({
+          queryKey: proposalQueryKeys.byPubkey(
+            connection.rpcEndpoint,
+            voteRecord.account.proposal
+          ),
+          staleTime: 0,
+          queryFn: () =>
+            asFindable(() =>
+              getProposal(connection, voteRecord.account.proposal)
+            )(),
+        })
+        const proposal = proposalQuery.result
+
         if (!proposal) {
           continue
         }
 
         if (proposal.account.state === ProposalState.Voting) {
           // If the Proposal is in Voting state refetch it to make sure we have the latest state to avoid false positives
-          proposal = await getProposal(connection, proposal.pubkey)
           if (proposal.account.state === ProposalState.Voting) {
             const governance = (
               await fetchGovernanceByPubkey(

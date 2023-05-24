@@ -42,6 +42,7 @@ import { useVoteRecordsByOwnerQuery } from '@hooks/queries/voteRecord'
 import useProgramVersion from '@hooks/useProgramVersion'
 import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
 import { useConnection } from '@solana/wallet-adapter-react'
+import { useRealmProposalsQuery } from '@hooks/queries/proposal'
 
 const MyProposalsBn = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
@@ -84,11 +85,12 @@ const MyProposalsBn = () => {
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
 
-  const { proposals, realmInfo, isNftMode } = useRealm()
+  const { realmInfo, isNftMode } = useRealm()
+  const { data: proposals } = useRealmProposalsQuery()
   const myProposals = useMemo(
     () =>
       connected
-        ? Object.values(proposals).filter(
+        ? proposals?.filter(
             (p) =>
               p.account.tokenOwnerRecord.toBase58() ===
                 ownTokenRecord?.pubkey.toBase58() ||
@@ -103,10 +105,10 @@ const MyProposalsBn = () => {
       ownCouncilTokenRecord?.pubkey,
     ]
   )
-  const drafts = myProposals.filter((x) => {
+  const drafts = myProposals?.filter((x) => {
     return x.account.state === ProposalState.Draft
   })
-  const notfinalized = myProposals.filter((x) => {
+  const notfinalized = myProposals?.filter((x) => {
     const governance = governancesArray?.find(
       (gov) => gov.pubkey.toBase58() === x.account.governance.toBase58()
     )
@@ -126,7 +128,7 @@ const MyProposalsBn = () => {
       now > timestamp
     )
   })
-  const unReleased = [...Object.values(proposals)].filter(
+  const unReleased = proposals?.filter(
     (x) =>
       (x.account.state === ProposalState.Completed ||
         x.account.state === ProposalState.Executing ||
@@ -140,7 +142,7 @@ const MyProposalsBn = () => {
       !ownVoteRecordsByProposal?.[x.pubkey.toBase58()]?.account.isRelinquished
   )
 
-  const createdVoting = myProposals.filter((x) => {
+  const createdVoting = myProposals?.filter((x) => {
     return (
       x.account.state === ProposalState.Voting && !x.account.isVoteFinalized()
     )
@@ -191,6 +193,7 @@ const MyProposalsBn = () => {
   }
 
   const cleanDrafts = (toIndex = null) => {
+    if (!drafts) throw new Error()
     const withInstruction = (instructions, proposal) => {
       return withCancelProposal(
         instructions,
@@ -206,6 +209,7 @@ const MyProposalsBn = () => {
     cleanSelected(drafts.slice(0, toIndex || drafts.length), withInstruction)
   }
   const releaseAllTokens = (toIndex = null) => {
+    if (unReleased === undefined) throw new Error()
     const withInstruction = async (
       instructions,
       proposal: ProgramAccount<Proposal>
@@ -251,6 +255,7 @@ const MyProposalsBn = () => {
     )
   }
   const finalizeAll = (toIndex = null) => {
+    if (notfinalized === undefined) throw new Error()
     const withInstruction = (
       instructions,
       proposal: ProgramAccount<Proposal>
@@ -273,6 +278,7 @@ const MyProposalsBn = () => {
     )
   }
   const releaseNfts = async (count: number | null = null) => {
+    if (proposals === undefined) throw new Error()
     if (!realm) throw new Error()
     if (!wallet?.publicKey) throw new Error('no wallet')
 
@@ -295,13 +301,15 @@ const MyProposalsBn = () => {
       count ? count : ownNftVoteRecordsFilterd.length
     )
     for (const i of nfts) {
+      const proposal = proposals.find((p) =>
+        p.pubkey.equals(i.account.proposal)
+      )
       const relinquishNftVoteIx = await (client.client as NftVoterClient).program.methods
         .relinquishNftVote()
         .accounts({
           registrar,
           voterWeightRecord: voterWeightPk,
-          governance:
-            proposals[i.account.proposal.toBase58()].account.governance,
+          governance: proposal?.account.governance,
           proposal: i.account.proposal,
           voterTokenOwnerRecord: tokenOwnerRecord,
           voterAuthority: wallet!.publicKey!,
@@ -349,14 +357,17 @@ const MyProposalsBn = () => {
       },
     ])
 
-    const nftVoteRecordsFiltered = nftVoteRecords.filter(
-      (x) =>
-        proposals[x.account.proposal.toBase58()] &&
-        proposals[
-          x.account.proposal.toBase58()
-        ].account.governingTokenMint.toBase58() ===
+    const nftVoteRecordsFiltered = nftVoteRecords.filter((x) => {
+      const proposal = proposals?.find((p) =>
+        p.pubkey.equals(x.account.proposal)
+      )
+
+      return (
+        proposal &&
+        proposal.account.governingTokenMint.toBase58() ===
           realm?.account.communityMint.toBase58()
-    )
+      )
+    })
     setOwnNftVoteRecords(nftVoteRecordsFiltered)
   }, [client.client, proposals, realm?.account.communityMint, wallet])
 
@@ -388,8 +399,10 @@ const MyProposalsBn = () => {
       wallet!.publicKey!
     )
     const filterdSolDeposits = solDeposits.filter((x) => {
-      const proposalState =
-        proposals[x.account.proposal.toBase58()].account.state
+      const proposal = proposals?.find((p) =>
+        p.pubkey.equals(x.account.proposal)
+      )
+      const proposalState = proposal?.account.state
       return (
         proposalState !== ProposalState.Draft &&
         proposalState !== ProposalState.Voting &&
@@ -404,7 +417,7 @@ const MyProposalsBn = () => {
       modalIsOpen &&
       realmInfo?.programVersion &&
       realmInfo?.programVersion > 2 &&
-      Object.keys(proposals).length
+      proposals?.length
     ) {
       getSolDeposits()
     }
@@ -459,28 +472,28 @@ const MyProposalsBn = () => {
               title="Drafts"
               fcn={cleanDrafts}
               btnName="Cancel"
-              proposals={drafts}
+              proposals={drafts ?? []}
               isLoading={isLoading}
             ></ProposalList>
             <ProposalList
               title="Unfinalized"
               fcn={finalizeAll}
               btnName="Finalize"
-              proposals={notfinalized}
+              proposals={notfinalized ?? []}
               isLoading={isLoading}
             ></ProposalList>
             <ProposalList
               title="Unreleased proposals"
               fcn={releaseAllTokens}
               btnName="Release"
-              proposals={unReleased}
+              proposals={unReleased ?? []}
               isLoading={isLoading}
             ></ProposalList>
             <ProposalList
               title="Created vote in progress"
               fcn={() => null}
               btnName=""
-              proposals={createdVoting}
+              proposals={createdVoting ?? []}
               isLoading={isLoading}
             ></ProposalList>
             {isNftMode && ownNftVoteRecordsFilterd.length !== 0 && (

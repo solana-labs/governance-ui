@@ -11,11 +11,18 @@ import {
   SequenceType,
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
-import { ProposalState } from '@solana/spl-governance'
+import { ProposalState, getProposal } from '@solana/spl-governance'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useConnection } from '@solana/wallet-adapter-react'
+import queryClient from '@hooks/queries/queryClient'
+import asFindable from '@utils/queries/asFindable'
+import {
+  proposalQueryKeys,
+  useRealmProposalsQuery,
+} from '@hooks/queries/proposal'
+import useRealmProposals from '@hooks/useRealmProposals'
 
 const NFT_SOL_BALANCE = 0.0014616
 
@@ -34,9 +41,10 @@ const ClaimUnreleasedNFTs = ({
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
-  const { proposals, isNftMode } = useRealm()
+  const { isNftMode } = useRealm()
 
   const { data: tokenOwnerRecord } = useAddressQuery_CommunityTokenOwner()
+  const { data: proposals } = useRealmProposalsQuery()
 
   const releaseNfts = async (count: number | null = null) => {
     if (!wallet?.publicKey) throw new Error('no wallet')
@@ -62,8 +70,20 @@ const ClaimUnreleasedNFTs = ({
       count ? count : ownNftVoteRecordsFilterd.length
     )
     for (const i of nfts) {
-      const proposal = proposals[i.account.proposal.toBase58()]
-      if (proposal.account.state === ProposalState.Voting) {
+      const proposalQuery = await queryClient.fetchQuery({
+        queryKey: proposalQueryKeys.byPubkey(
+          connection.rpcEndpoint,
+          i.account.proposal
+        ),
+        staleTime: 0,
+        queryFn: () =>
+          asFindable(() => getProposal(connection, i.account.proposal))(),
+      })
+      const proposal = proposalQuery.result
+      if (
+        proposal === undefined ||
+        proposal.account.state === ProposalState.Voting
+      ) {
         // ignore this one as it's still in voting
         continue
       }
@@ -119,16 +139,17 @@ const ClaimUnreleasedNFTs = ({
       },
     ])
 
-    const nftVoteRecordsFiltered = nftVoteRecords.filter(
-      (x) =>
-        proposals[x.account.proposal.toBase58()] &&
-        proposals[
-          x.account.proposal.toBase58()
-        ].account.governingTokenMint.toBase58() ===
+    const nftVoteRecordsFiltered = nftVoteRecords.filter((x) => {
+      const proposal = proposals?.find((y) =>
+        y.pubkey.equals(x.account.proposal)
+      )
+      return (
+        proposal &&
+        proposal.account.governingTokenMint.toBase58() ===
           realm?.account.communityMint.toBase58() &&
-        proposals[x.account.proposal.toBase58()].account.state !==
-          ProposalState.Voting
-    )
+        proposal.account.state !== ProposalState.Voting
+      )
+    })
     setOwnNftVoteRecords(nftVoteRecordsFiltered)
     setSolToBeClaimed(nftVoteRecordsFiltered.length * NFT_SOL_BALANCE)
   }

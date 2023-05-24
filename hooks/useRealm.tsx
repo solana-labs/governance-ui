@@ -226,7 +226,7 @@ export default function useRealm() {
       //councilMint,
       //governances,
       /** @deprecated use useRealmProposalsQuery */
-      proposals,
+      //proposals,
       //tokenRecords,
       realmTokenAccount,
       councilTokenAccount,

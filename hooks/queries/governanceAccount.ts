@@ -1,13 +1,15 @@
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { GovernanceAccount, getGovernanceAccount } from '@solana/spl-governance'
-import { PublicKey } from '@solana/web3.js'
+import { Connection, PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
 import asFindable from '@utils/queries/asFindable'
+import queryClient from './queryClient'
 
 export const governanceAccountQueryKeys = {
   all: (cluster: string, kind: string) => [
     cluster,
-    `Governance Account: ${kind}`,
+    'Governance Account',
+    `${kind}`,
   ],
   byPubkey: (cluster: string, kind: string, k: PublicKey) => [
     ...governanceAccountQueryKeys.all(cluster, kind),
@@ -41,4 +43,23 @@ export function useGovernanceAccountByPubkeyQuery<T extends GovernanceAccount>(
   })
 
   return query
+}
+
+export async function fetchGovernanceAccountByPubkey<
+  T extends GovernanceAccount
+>(
+  connection: Connection,
+  kind: new (...args) => T,
+  kindLabel: string,
+  pubkey: PublicKey
+) {
+  const f = () => getGovernanceAccount(connection, pubkey, kind)
+  return queryClient.fetchQuery({
+    queryKey: governanceAccountQueryKeys.byPubkey(
+      connection.rpcEndpoint,
+      kindLabel,
+      pubkey
+    ),
+    queryFn: f,
+  })
 }

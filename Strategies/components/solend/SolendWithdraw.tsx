@@ -39,6 +39,7 @@ import {
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { useRealmProposalsQuery } from '@hooks/queries/proposal'
 
 const SolendWithdraw = ({
   proposedInvestment,
@@ -63,7 +64,7 @@ const SolendWithdraw = ({
   const config = useRealmConfigQuery().data?.result
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
-  const { proposals, realmInfo, ownVoterWeight } = useRealm()
+  const { realmInfo, ownVoterWeight } = useRealm()
   const [isWithdrawing, setIsWithdrawing] = useState(false)
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [deposits, setDeposits] = useState<{
@@ -72,6 +73,7 @@ const SolendWithdraw = ({
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
+  const proposals = useRealmProposalsQuery().data
   const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const tokenInfo = tokenPriceService.getTokenInfo(handledMint)
@@ -197,6 +199,7 @@ const SolendWithdraw = ({
   }
 
   const handleWithdraw = async () => {
+    if (proposals === undefined) throw new Error()
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     if (!isValid) {
       return
@@ -243,7 +246,7 @@ const SolendWithdraw = ({
           amountFmt: (
             (form.amount as number) / cTokenExchangeRate(reserveStat[0])
           ).toFixed(4),
-          proposalCount: Object.keys(proposals).length,
+          proposalCount: proposals.length,
           action: 'Withdraw',
         },
         realm!,

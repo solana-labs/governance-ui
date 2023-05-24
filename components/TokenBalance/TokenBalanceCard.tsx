@@ -52,6 +52,9 @@ import {
 } from '@hooks/queries/mintInfo'
 import { fetchGovernanceByPubkey } from '@hooks/queries/governance'
 import { useConnection } from '@solana/wallet-adapter-react'
+import queryClient from '@hooks/queries/queryClient'
+import { proposalQueryKeys } from '@hooks/queries/proposal'
+import asFindable from '@utils/queries/asFindable'
 
 const TokenBalanceCard = ({
   proposal,
@@ -176,7 +179,6 @@ export const TokenDeposit = ({
     realmTokenAccount,
     ownVoterWeight,
     councilTokenAccount,
-    proposals,
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
@@ -273,14 +275,23 @@ export const TokenDeposit = ({
       )
 
       for (const voteRecord of Object.values(voteRecords)) {
-        let proposal = proposals[voteRecord.account.proposal.toBase58()]
+        const proposalQuery = await queryClient.fetchQuery({
+          queryKey: proposalQueryKeys.byPubkey(
+            connection.rpcEndpoint,
+            voteRecord.account.proposal
+          ),
+          staleTime: 0,
+          queryFn: () =>
+            asFindable(() =>
+              getProposal(connection, voteRecord.account.proposal)
+            )(),
+        })
+        const proposal = proposalQuery.result
         if (!proposal) {
           continue
         }
 
         if (proposal.account.state === ProposalState.Voting) {
-          // If the Proposal is in Voting state refetch it to make sure we have the latest state to avoid false positives
-          proposal = await getProposal(connection, proposal.pubkey)
           if (proposal.account.state === ProposalState.Voting) {
             const governance = (
               await fetchGovernanceByPubkey(

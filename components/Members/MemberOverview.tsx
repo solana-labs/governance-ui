@@ -26,7 +26,7 @@ import { fmtMintAmount } from '@tools/sdk/units'
 import { notify } from '@utils/notifications'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { Member } from '@utils/uiTypes/members'
-import { FC, useEffect, useMemo, useState } from 'react'
+import { FC, useCallback, useEffect, useMemo, useState } from 'react'
 import { WalletTokenRecordWithProposal } from './types'
 import PaginationComponent from '@components/Pagination'
 import useMembersStore from 'stores/useMembersStore'
@@ -46,6 +46,7 @@ import {
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { useRealmProposalsQuery } from '@hooks/queries/proposal'
 
 const RevokeMembership: FC<{ member: PublicKey; mint: PublicKey }> = ({
   member,
@@ -111,7 +112,16 @@ const MemberOverview = ({ member }: { member: Member }) => {
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
   const { symbol } = useRouter().query
-  const { proposals } = useRealm()
+  const { data: proposalsArray } = useRealmProposalsQuery()
+  const proposalsByProposal = useMemo(
+    () =>
+      proposalsArray === undefined
+        ? {}
+        : Object.fromEntries(
+            proposalsArray.map((x) => [x.pubkey.toString(), x])
+          ),
+    [proposalsArray]
+  )
   const { fmtUrlWithCluster } = useQueryContext()
   const activeMembers = useMembersStore((s) => s.compact.activeMembers)
   const [ownVoteRecords, setOwnVoteRecords] = useState<
@@ -138,20 +148,17 @@ const MemberOverview = ({ member }: { member: Member }) => {
       communityVotes && communityVotes && !communityVotes.isZero()
         ? fmtMintAmount(mint, communityVotes)
         : '',
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    [walletAddress]
+    [communityVotes, mint]
   )
-
   const councilAmount = useMemo(
     () =>
       councilVotes && councilVotes && !councilVotes.isZero()
         ? fmtMintAmount(councilMint, councilVotes)
         : '',
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    [walletAddress]
+    [councilMint, councilVotes]
   )
 
-  const getVoteRecordsAndChatMsgs = async () => {
+  const getVoteRecordsAndChatMsgs = useCallback(async () => {
     if (!realm) throw new Error()
     let voteRecords: { [pubKey: string]: ProgramAccount<VoteRecord> } = {}
     let chatMessages: { [pubKey: string]: ProgramAccount<ChatMessage> } = {}
@@ -177,7 +184,7 @@ const MemberOverview = ({ member }: { member: Member }) => {
       })
     }
     return { voteRecords, chat: chatMessages }
-  }
+  }, [connection, realm, walletAddress])
 
   useEffect(() => {
     if (realm) {
@@ -188,17 +195,17 @@ const MemberOverview = ({ member }: { member: Member }) => {
           voteRecords
         )
           .sort((a, b) => {
-            const prevProposal = proposals[a]
-            const nextProposal = proposals[b]
+            const prevProposal = proposalsByProposal[a]
+            const nextProposal = proposalsByProposal[b]
             return (
               prevProposal?.account.getStateTimestamp() -
               nextProposal?.account.getStateTimestamp()
             )
           })
           .reverse()
-          .filter((x) => proposals[x])
+          .filter((x) => proposalsByProposal[x])
           .flatMap((x) => {
-            const currentProposal = proposals[x]
+            const currentProposal = proposalsByProposal[x]
             const currentChatsMsgPk = Object.keys(chat).filter(
               (c) =>
                 chat[c]?.account.proposal.toBase58() ===
@@ -219,8 +226,7 @@ const MemberOverview = ({ member }: { member: Member }) => {
       }
       handleSetVoteRecords()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [walletAddress])
+  }, [getVoteRecordsAndChatMsgs, proposalsByProposal, realm, walletAddress])
 
   const memberVotePowerRank = useMemo(() => {
     const sortedMembers = activeMembers.sort((a, b) =>
@@ -231,35 +237,23 @@ const MemberOverview = ({ member }: { member: Member }) => {
         (m) => m.walletAddress === member?.walletAddress
       ) + 1
     )
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [JSON.stringify(activeMembers.length), member.walletAddress])
+  }, [activeMembers, member?.walletAddress])
 
+  const paginateVotes = useCallback(
+    (page) => {
+      return ownVoteRecords.slice(page * perPage, (page + 1) * perPage)
+    },
+    [ownVoteRecords]
+  )
   useEffect(() => {
     setRecentVotes(paginateVotes(0))
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [JSON.stringify(ownVoteRecords)])
+  }, [paginateVotes])
 
   const perPage = 8
   const totalPages = Math.ceil(ownVoteRecords.length / perPage)
   const onPageChange = (page) => {
     setRecentVotes(paginateVotes(page))
   }
-  const paginateVotes = (page) => {
-    return ownVoteRecords.slice(page * perPage, (page + 1) * perPage)
-  }
-
-  const Address = useMemo(() => {
-    return (
-      <DisplayAddress
-        connection={connection.current}
-        address={walletPublicKey}
-        height="12px"
-        width="100px"
-        dark={true}
-      />
-    )
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [walletPublicKey?.toBase58()])
 
   const councilMintKey = realm?.account.config.councilMint
   const communityMintKey = realm?.account.communityMint
@@ -279,7 +273,15 @@ const MemberOverview = ({ member }: { member: Member }) => {
   return (
     <>
       <div className="flex items-center justify-between mb-2 py-2">
-        <h2 className="mb-0">{Address}</h2>
+        <h2 className="mb-0">
+          <DisplayAddress
+            connection={connection.current}
+            address={walletPublicKey}
+            height="12px"
+            width="100px"
+            dark={true}
+          />
+        </h2>
         <div className="flex gap-6">
           <a
             className="default-transition flex items-center text-primary-light hover:text-primary-dark text-sm"
