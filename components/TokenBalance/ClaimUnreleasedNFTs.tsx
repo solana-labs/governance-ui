@@ -22,7 +22,6 @@ import {
   proposalQueryKeys,
   useRealmProposalsQuery,
 } from '@hooks/queries/proposal'
-import useRealmProposals from '@hooks/useRealmProposals'
 
 const NFT_SOL_BALANCE = 0.0014616
 
