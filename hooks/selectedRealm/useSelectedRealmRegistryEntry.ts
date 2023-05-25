@@ -66,10 +66,13 @@ export const useSelectedRealmInfo = () => {
   const result =
     lookup !== undefined && lookup !== 'not found' ? lookup : queried
   const resultVersion = programVersion ?? result?.programVersion
-  const withVersion =
-    resultVersion === undefined || result === undefined
-      ? undefined
-      : { ...result, programVersion: resultVersion }
+  const withVersion = useMemo(
+    () =>
+      resultVersion === undefined || result === undefined
+        ? undefined
+        : { ...result, programVersion: resultVersion },
+    [result, resultVersion]
+  )
 
   return withVersion
 }
