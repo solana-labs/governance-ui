@@ -19,11 +19,11 @@ import { precision } from '@utils/formatting'
 import { JoinDAOForm } from '@utils/uiTypes/proposalCreationTypes'
 import { useRouter } from 'next/router'
 import { useContext, useEffect, useMemo, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { notify } from '@utils/notifications'
 import { NewProposalContext } from '../../new'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const JoinDAO = ({
   index,
@@ -37,7 +37,7 @@ const JoinDAO = ({
   //Small hack to prevent race conditions with cluster change until we remove connection from store and move it to global dep.
   const routeHasClusterInPath = router.asPath.includes('cluster')
 
-  const { current: wallet } = useWalletStore()
+  const wallet = useWalletOnePointOh()
   const connection = useLegacyConnectionContext()
 
   const { governedSPLTokenAccounts } = useGovernanceAssets()

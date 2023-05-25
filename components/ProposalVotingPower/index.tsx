@@ -1,6 +1,5 @@
 import classNames from 'classnames'
 
-import useWalletStore from 'stores/useWalletStore'
 import {
   GATEWAY_PLUGINS_PKS,
   SWITCHBOARD_PLUGINS_PKS,
@@ -11,13 +10,14 @@ import { option } from '@tools/core/option'
 import VotingPower from './VotingPower'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface Props {
   className?: string
 }
 
 export default function ProposalVotingPower(props: Props) {
-  const connected = !!useWalletStore((s) => s.current?.connected)
+  const connected = useWalletOnePointOh()?.connected
   const config = useRealmConfigQuery().data?.result
   const proposal = useRouteProposalQuery().data?.result
   const currentPluginPk = config?.account?.communityTokenConfig.voterWeightAddin

@@ -1,6 +1,5 @@
-import { WalletContextState, useWallet } from '@solana/wallet-adapter-react'
+import { useWallet } from '@solana/wallet-adapter-react'
 import useViewAsWallet from './useViewAsWallet'
-import { WalletSigner } from '@solana/spl-governance'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 
 /** Why does this have such a weird name?

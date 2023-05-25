@@ -22,7 +22,6 @@ import { Profile } from '@components/Profile'
 import Loading from './Loading'
 import { WalletName, WalletReadyState } from '@solana/wallet-adapter-base'
 import { useWallet } from '@solana/wallet-adapter-react'
-import useInitWallet from '@hooks/useInitWallet'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { DEFAULT_PROVIDER } from '../utils/wallet-adapters'
@@ -34,7 +33,6 @@ const StyledWalletProviderLabel = styled.p`
 `
 
 const ConnectWalletButton = (props) => {
-  useInitWallet()
   const { pathname, query, replace } = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const debugAdapter = useViewAsWallet()
