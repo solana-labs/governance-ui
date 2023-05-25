@@ -6,4 +6,4 @@ export const MAINNET_RPC =
 export const DEVNET_RPC =
   process.env.NEXT_PUBLIC_DEVNET_RPC ||
   process.env.DEVNET_RPC ||
-  'https://api.dao.devnet.solana.com/'
+  'https://mango.devnet.rpcpool.com'
