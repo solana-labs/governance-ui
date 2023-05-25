@@ -14,6 +14,8 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useConnection } from '@solana/wallet-adapter-react'
+import queryClient from '@hooks/queries/queryClient'
+import { tokenAccountQueryKeys } from '@hooks/queries/tokenAccount'
 
 const DepositCommunityTokensBtn = ({ className = '', inAccountDetails }) => {
   const { getOwnedDeposits } = useDepositStore()
@@ -65,6 +67,12 @@ const DepositCommunityTokensBtn = ({ className = '', inAccountDetails }) => {
         client: client!,
         connection,
       })
+      queryClient.invalidateQueries(
+        tokenAccountQueryKeys.byOwner(
+          connection.rpcEndpoint,
+          wallet!.publicKey!
+        )
+      )
     } catch (e) {
       console.log(e)
       notify({ message: `Something went wrong ${e}`, type: 'error' })

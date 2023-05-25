@@ -27,6 +27,7 @@ import { useConnection } from '@solana/wallet-adapter-react'
 import { proposalQueryKeys } from '@hooks/queries/proposal'
 import queryClient from '@hooks/queries/queryClient'
 import asFindable from '@utils/queries/asFindable'
+import { tokenAccountQueryKeys } from '@hooks/queries/tokenAccount'
 
 const WithDrawCommunityTokens = () => {
   const { getOwnedDeposits } = useDepositStore()
@@ -178,6 +179,12 @@ const WithDrawCommunityTokens = () => {
         client: client!,
         connection,
       })
+      queryClient.invalidateQueries(
+        tokenAccountQueryKeys.byOwner(
+          connection.rpcEndpoint,
+          wallet!.publicKey!
+        )
+      )
     } catch (ex) {
       console.error(
         "Can't withdraw tokens, go to my proposals in account view to check outstanding proposals",

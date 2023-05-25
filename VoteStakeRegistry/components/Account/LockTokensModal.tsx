@@ -51,6 +51,8 @@ import { useRealmQuery } from '@hooks/queries/realm'
 import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 import { useConnection } from '@solana/wallet-adapter-react'
+import { tokenAccountQueryKeys } from '@hooks/queries/tokenAccount'
+import queryClient from '@hooks/queries/queryClient'
 
 const YES = 'Yes'
 const NO = 'No'
@@ -282,6 +284,9 @@ const LockTokensModal = ({
       client: client!,
       connection,
     })
+    queryClient.invalidateQueries(
+      tokenAccountQueryKeys.byOwner(connection.rpcEndpoint, wallet!.publicKey!)
+    )
     onClose()
   }
 

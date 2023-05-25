@@ -29,6 +29,8 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useConnection } from '@solana/wallet-adapter-react'
+import queryClient from '@hooks/queries/queryClient'
+import { tokenAccountQueryKeys } from '@hooks/queries/tokenAccount'
 
 const DepositCard = ({
   deposit,
@@ -90,6 +92,9 @@ const DepositCard = ({
       client: actualClient!,
       connection,
     })
+    queryClient.invalidateQueries(
+      tokenAccountQueryKeys.byOwner(connection.rpcEndpoint, wallet!.publicKey!)
+    )
   }
   const handleStartUnlock = () => {
     setIsUnlockModalOpen(true)
