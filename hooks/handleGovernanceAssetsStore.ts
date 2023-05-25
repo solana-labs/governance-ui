@@ -19,8 +19,8 @@ export default function useHandleGovernanceAssetsStore() {
   const { setGovernancesArray } = useGovernanceAssetsStore()
 
   useEffect(() => {
-    if (realm) {
-      setGovernancesArray(connection, realm, governancesByGovernance ?? {})
+    if (realm && governancesByGovernance) {
+      setGovernancesArray(connection, realm, governancesByGovernance)
     }
   }, [connection, governancesByGovernance, realm, setGovernancesArray])
 }
