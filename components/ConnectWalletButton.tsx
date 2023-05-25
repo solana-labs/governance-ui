@@ -44,9 +44,9 @@ const ConnectWalletButton = (props) => {
     connect,
     wallet,
     publicKey: realPublicKey,
+    connected,
   } = useWallet()
   const connection = useLegacyConnectionContext()
-  const connected = !!wallet?.adapter.connected
 
   const publicKey = debugAdapter?.publicKey ?? realPublicKey
 
