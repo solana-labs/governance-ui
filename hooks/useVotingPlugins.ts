@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { getNfts } from '@utils/tokens'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
@@ -72,7 +72,7 @@ export function useVotingPlugins() {
     currentClient,
     vsrClient,
     gatewayClient,
-    switchboardClient,
+    //switchboardClient,
     pythClient,
     nftClient,
     nftMintRegistrar,
@@ -81,7 +81,7 @@ export function useVotingPlugins() {
     s.state.currentRealmVotingClient,
     s.state.vsrClient,
     s.state.gatewayClient,
-    s.state.switchboardClient,
+    //s.state.switchboardClient,
     s.state.pythClient,
     s.state.nftClient,
     s.state.nftMintRegistrar,
@@ -89,213 +89,18 @@ export function useVotingPlugins() {
     s.state.heliumVsrRegistrar,
   ])
 
-  const usedCollectionsPks: string[] =
-    (currentPluginPk &&
-      NFT_PLUGINS_PKS.includes(currentPluginPk?.toBase58()) &&
-      nftMintRegistrar?.collectionConfigs.map((x) =>
-        x.collection.toBase58()
-      )) ||
-    []
+  const usedCollectionsPks: string[] = useMemo(
+    () =>
+      (currentPluginPk &&
+        NFT_PLUGINS_PKS.includes(currentPluginPk?.toBase58()) &&
+        nftMintRegistrar?.collectionConfigs.map((x) =>
+          x.collection.toBase58()
+        )) ||
+      [],
+    [currentPluginPk, nftMintRegistrar?.collectionConfigs]
+  )
 
-  const handleGetNfts = async () => {
-    nftStore.setIsLoadingNfts(true)
-    try {
-      const nfts = await getNfts(wallet!.publicKey!, connection)
-      const votingNfts = nfts.filter(getIsFromCollection)
-      const nftsWithMeta = votingNfts
-      nftStore.setVotingNfts(nftsWithMeta, currentClient, nftMintRegistrar)
-    } catch (e) {
-      console.log(e)
-      notify({
-        message: `Something went wrong can't fetch nfts: ${e}`,
-        type: 'error',
-      })
-    }
-    nftStore.setIsLoadingNfts(false)
-  }
-
-  const handleGetHeliumVsrVoting = async () => {
-    if (
-      realm &&
-      currentPluginPk &&
-      HELIUM_VSR_PLUGINS_PKS.includes(currentPluginPk.toBase58())
-    ) {
-      const [maxVoterRecord] = heliumVsrSdk.maxVoterWeightRecordKey(
-        realm.pubkey,
-        realm.account.communityMint,
-        currentPluginPk
-      )
-      try {
-        const mvwr = await getMaxVoterWeightRecord(
-          connection.current,
-          maxVoterRecord
-        )
-        heliumStore.setMaxVoterWeight(mvwr)
-      } catch (_e) {
-        console.log("Couldn't get max voter weight record. Setting to null.")
-        heliumStore.setMaxVoterWeight(null)
-      }
-
-      if (currentClient.walletPk && heliumVsrClient) {
-        try {
-          await heliumStore.getPositions({
-            realmPk: realm.pubkey,
-            communityMintPk: realm.account.communityMint,
-            walletPk: currentClient.walletPk!,
-            connection: connection.current,
-            client: heliumVsrClient,
-            votingClient: currentClient,
-          })
-        } catch (e) {
-          console.log(e)
-        }
-      }
-    }
-  }
-
-  const handleGetSwitchboardVoting = async () => {
-    if (!wallet || !wallet.publicKey || !realm) {
-      return
-    }
-
-    switchboardStore.setIsLoading(true)
-
-    try {
-      const options = anchor.AnchorProvider.defaultOptions()
-      const provider = new anchor.AnchorProvider(
-        connection.current,
-        (wallet as unknown) as anchor.Wallet,
-        options
-      )
-
-      let idl = await anchor.Program.fetchIdl(sbv2.SBV2_MAINNET_PID, provider)
-      if (!idl) {
-        idl = sbIdl as anchor.Idl
-      }
-
-      let addinIdl = await anchor.Program.fetchIdl(
-        SWITCHBOARD_ADDIN_ID,
-        provider
-      )
-      if (!addinIdl) {
-        addinIdl = gonIdl as anchor.Idl
-      }
-
-      const switchboardProgram = new anchor.Program(
-        idl,
-        SWITCHBOARD_ID,
-        provider
-      )
-
-      const addinProgram = new anchor.Program(
-        addinIdl,
-        SWITCHBOARD_ADDIN_ID,
-        provider
-      )
-
-      const allOracles = await switchboardProgram.account.oracleAccountData.all()
-      const oData = allOracles.map(({ publicKey, account }) => {
-        return {
-          oracleData: account as any,
-          oracle: publicKey,
-        }
-      })
-
-      const myNodesForRealm: PublicKey[] = []
-      const setVoterWeightInstructions: TransactionInstruction[] = []
-
-      for (const { oracle, oracleData } of oData) {
-        if (!wallet || !wallet.publicKey || !realm || !oData) {
-          continue
-        }
-        const queuePk = oracleData.queuePubkey as PublicKey
-
-        const [addinState] = await PublicKey.findProgramAddress(
-          [Buffer.from('state')],
-          addinProgram.programId
-        )
-
-        const addinStateData = await addinProgram.account.state.fetch(
-          addinState
-        )
-        const queue = await switchboardProgram.account.oracleQueueAccountData.fetch(
-          queuePk
-        )
-        const queueAuthority = queue.authority as PublicKey
-        const grantAuthority = addinStateData.grantAuthority as PublicKey
-        try {
-          const g = await getGovernanceAccount(
-            provider.connection,
-            grantAuthority,
-            Governance
-          )
-          if (
-            g.account.realm.equals(realm.pubkey) &&
-            oracleData.oracleAuthority.equals(wallet.publicKey)
-          ) {
-            myNodesForRealm.push(oracle)
-            const [p] = sbv2.PermissionAccount.fromSeed(
-              switchboardProgram,
-              queueAuthority,
-              queuePk,
-              oracle
-            )
-
-            const ix = await p.setVoterWeightTx({
-              govProgram: realm.owner,
-              pubkeySigner: wallet.publicKey,
-              addinProgram: addinProgram,
-              realm: realm.pubkey,
-            })
-
-            setVoterWeightInstructions.push(ix.instructions[0])
-          }
-        } catch (e) {
-          console.log(e)
-        }
-      }
-
-      switchboardStore.setOracleKeys(myNodesForRealm, currentClient)
-      switchboardStore.setInstructions(
-        setVoterWeightInstructions,
-        currentClient
-      )
-
-      try {
-        const [
-          voterWeightRecord,
-        ] = anchor.utils.publicKey.findProgramAddressSync(
-          [Buffer.from('VoterWeightRecord'), myNodesForRealm[0].toBytes()],
-          SWITCHBOARD_ADDIN_ID
-        )
-
-        try {
-          const vwr = await getVoterWeightRecord(
-            connection.current,
-            voterWeightRecord
-          )
-          if (vwr && vwr.account.realm.equals(realm.pubkey)) {
-            // get voting power
-            switchboardStore.setVotingPower(vwr.account.voterWeight)
-          } else {
-            // 'no sb governance'
-            switchboardStore.setVotingPower(new anchor.BN(0))
-          }
-        } catch (e) {
-          console.log("Couldn't get voter weight record. Setting to zero.")
-          switchboardStore.setVotingPower(new anchor.BN(0))
-        }
-      } catch (e) {
-        console.log("Couldn't get VWR")
-        console.log(e)
-      }
-    } catch (e) {
-      console.log(e)
-    }
-    switchboardStore.setIsLoading(false)
-  }
-
-  const handleRegisterGatekeeperNetwork = async () => {
+  const handleRegisterGatekeeperNetwork = useCallback(async () => {
     if (realm && gatewayClient) {
       gatewayStore.setIsLoadingGatewayToken(true)
 
@@ -315,36 +120,21 @@ export function useVotingPlugins() {
       }
       gatewayStore.setIsLoadingGatewayToken(false)
     }
-  }
+  }, [gatewayClient, gatewayStore, realm])
 
-  const handleMaxVoterWeight = async () => {
-    const { maxVoterWeightRecord } = await getPluginMaxVoterWeightRecord(
-      realm!.pubkey,
-      realm!.account.communityMint,
-      nftClient!.program.programId
-    )
-    try {
-      const existingMaxVoterRecord = await getMaxVoterWeightRecord(
-        connection.current,
-        maxVoterWeightRecord
+  const getIsFromCollection = useCallback(
+    (nft: NFTWithMeta) => {
+      return (
+        nft.collection &&
+        nft.collection.mintAddress &&
+        (nft.collection.verified ||
+          typeof nft.collection.verified === 'undefined') &&
+        usedCollectionsPks.includes(nft.collection.mintAddress) &&
+        nft.collection.creators?.filter((x) => x.verified).length > 0
       )
-      nftStore.setMaxVoterWeight(existingMaxVoterRecord)
-    } catch (e) {
-      console.log(e)
-      nftStore.setMaxVoterWeight(null)
-    }
-  }
-
-  const getIsFromCollection = (nft: NFTWithMeta) => {
-    return (
-      nft.collection &&
-      nft.collection.mintAddress &&
-      (nft.collection.verified ||
-        typeof nft.collection.verified === 'undefined') &&
-      usedCollectionsPks.includes(nft.collection.mintAddress) &&
-      nft.collection.creators?.filter((x) => x.verified).length > 0
-    )
-  }
+    },
+    [usedCollectionsPks]
+  )
 
   useEffect(() => {
     if (wallet && connection) {
@@ -415,7 +205,7 @@ export function useVotingPlugins() {
         currentPluginPk &&
         NFT_PLUGINS_PKS.includes(currentPluginPk.toBase58())
       ) {
-        handleSetNftRegistrar(nftClient!, realm)
+        handleSetNftRegistrar(nftClient, realm)
         if (connected) {
           handleSetCurrentRealmVotingClient({
             client: nftClient,
@@ -437,7 +227,7 @@ export function useVotingPlugins() {
         currentPluginPk &&
         GATEWAY_PLUGINS_PKS.includes(currentPluginPk.toBase58())
       ) {
-        handleSetGatewayRegistrar(gatewayClient!, realm)
+        handleSetGatewayRegistrar(gatewayClient, realm)
         if (connected) {
           handleSetCurrentRealmVotingClient({
             client: gatewayClient,
@@ -466,8 +256,7 @@ export function useVotingPlugins() {
         }
       }
     }
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    /* 
     const handleSwitchboardPlugin = () => {
       if (
         switchboardClient &&
@@ -484,7 +273,7 @@ export function useVotingPlugins() {
           })
         }
       }
-    }
+    } */
     if (
       !currentClient ||
       currentClient.realm?.pubkey.toBase58() !== realm?.pubkey.toBase58() ||
@@ -499,28 +288,245 @@ export function useVotingPlugins() {
       //handleSwitchboardPlugin()
       handlePythPlugin()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    currentPluginPk?.toBase58(),
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    vsrClient?.program.programId.toBase58(),
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    heliumVsrClient?.program.programId.toBase58(),
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    nftClient?.program.programId.toBase58(),
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    gatewayClient?.program.programId.toBase58(),
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    pythClient?.program.programId.toBase58(),
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    realm?.pubkey.toBase58(),
-    connection.endpoint,
     connected,
-    ownTokenRecord,
+    currentClient,
+    currentPluginPk,
+    gatewayClient,
+    handleRegisterGatekeeperNetwork,
+    handleSetCurrentRealmVotingClient,
+    handleSetGatewayRegistrar,
+    handleSetHeliumVsrRegistrar,
+    handleSetNftRegistrar,
+    handleSetVsrRegistrar,
+    heliumVsrClient,
+    nftClient,
+    ownTokenRecord?.account?.governingTokenOwner,
+    pythClient,
+    realm,
+    vsrClient,
+    wallet?.publicKey,
   ])
 
   useEffect(() => {
+    const handleMaxVoterWeight = async () => {
+      if (!realm || !nftClient) return
+
+      const { maxVoterWeightRecord } = await getPluginMaxVoterWeightRecord(
+        realm.pubkey,
+        realm.account.communityMint,
+        nftClient.program.programId
+      )
+      try {
+        const existingMaxVoterRecord = await getMaxVoterWeightRecord(
+          connection.current,
+          maxVoterWeightRecord
+        )
+        nftStore.setMaxVoterWeight(existingMaxVoterRecord)
+      } catch (e) {
+        console.log(e)
+        nftStore.setMaxVoterWeight(null)
+      }
+    }
+
+    const handleGetSwitchboardVoting = async () => {
+      if (!wallet || !wallet.publicKey || !realm) {
+        return
+      }
+
+      switchboardStore.setIsLoading(true)
+
+      try {
+        const options = anchor.AnchorProvider.defaultOptions()
+        const provider = new anchor.AnchorProvider(
+          connection.current,
+          (wallet as unknown) as anchor.Wallet,
+          options
+        )
+
+        let idl = await anchor.Program.fetchIdl(sbv2.SBV2_MAINNET_PID, provider)
+        if (!idl) {
+          idl = sbIdl as anchor.Idl
+        }
+
+        let addinIdl = await anchor.Program.fetchIdl(
+          SWITCHBOARD_ADDIN_ID,
+          provider
+        )
+        if (!addinIdl) {
+          addinIdl = gonIdl as anchor.Idl
+        }
+
+        const switchboardProgram = new anchor.Program(
+          idl,
+          SWITCHBOARD_ID,
+          provider
+        )
+
+        const addinProgram = new anchor.Program(
+          addinIdl,
+          SWITCHBOARD_ADDIN_ID,
+          provider
+        )
+
+        const allOracles = await switchboardProgram.account.oracleAccountData.all()
+        const oData = allOracles.map(({ publicKey, account }) => {
+          return {
+            oracleData: account as any,
+            oracle: publicKey,
+          }
+        })
+
+        const myNodesForRealm: PublicKey[] = []
+        const setVoterWeightInstructions: TransactionInstruction[] = []
+
+        for (const { oracle, oracleData } of oData) {
+          if (!wallet || !wallet.publicKey || !realm || !oData) {
+            continue
+          }
+          const queuePk = oracleData.queuePubkey as PublicKey
+
+          const [addinState] = await PublicKey.findProgramAddress(
+            [Buffer.from('state')],
+            addinProgram.programId
+          )
+
+          const addinStateData = await addinProgram.account.state.fetch(
+            addinState
+          )
+          const queue = await switchboardProgram.account.oracleQueueAccountData.fetch(
+            queuePk
+          )
+          const queueAuthority = queue.authority as PublicKey
+          const grantAuthority = addinStateData.grantAuthority as PublicKey
+          try {
+            const g = await getGovernanceAccount(
+              provider.connection,
+              grantAuthority,
+              Governance
+            )
+            if (
+              g.account.realm.equals(realm.pubkey) &&
+              oracleData.oracleAuthority.equals(wallet.publicKey)
+            ) {
+              myNodesForRealm.push(oracle)
+              const [p] = sbv2.PermissionAccount.fromSeed(
+                switchboardProgram,
+                queueAuthority,
+                queuePk,
+                oracle
+              )
+
+              const ix = await p.setVoterWeightTx({
+                govProgram: realm.owner,
+                pubkeySigner: wallet.publicKey,
+                addinProgram: addinProgram,
+                realm: realm.pubkey,
+              })
+
+              setVoterWeightInstructions.push(ix.instructions[0])
+            }
+          } catch (e) {
+            console.log(e)
+          }
+        }
+
+        switchboardStore.setOracleKeys(myNodesForRealm, currentClient)
+        switchboardStore.setInstructions(
+          setVoterWeightInstructions,
+          currentClient
+        )
+
+        try {
+          const [
+            voterWeightRecord,
+          ] = anchor.utils.publicKey.findProgramAddressSync(
+            [Buffer.from('VoterWeightRecord'), myNodesForRealm[0].toBytes()],
+            SWITCHBOARD_ADDIN_ID
+          )
+
+          try {
+            const vwr = await getVoterWeightRecord(
+              connection.current,
+              voterWeightRecord
+            )
+            if (vwr && vwr.account.realm.equals(realm.pubkey)) {
+              // get voting power
+              switchboardStore.setVotingPower(vwr.account.voterWeight)
+            } else {
+              // 'no sb governance'
+              switchboardStore.setVotingPower(new anchor.BN(0))
+            }
+          } catch (e) {
+            console.log("Couldn't get voter weight record. Setting to zero.")
+            switchboardStore.setVotingPower(new anchor.BN(0))
+          }
+        } catch (e) {
+          console.log("Couldn't get VWR")
+          console.log(e)
+        }
+      } catch (e) {
+        console.log(e)
+      }
+      switchboardStore.setIsLoading(false)
+    }
+
+    const handleGetHeliumVsrVoting = async () => {
+      if (
+        realm &&
+        currentPluginPk &&
+        HELIUM_VSR_PLUGINS_PKS.includes(currentPluginPk.toBase58())
+      ) {
+        const [maxVoterRecord] = heliumVsrSdk.maxVoterWeightRecordKey(
+          realm.pubkey,
+          realm.account.communityMint,
+          currentPluginPk
+        )
+        try {
+          const mvwr = await getMaxVoterWeightRecord(
+            connection.current,
+            maxVoterRecord
+          )
+          heliumStore.setMaxVoterWeight(mvwr)
+        } catch (_e) {
+          console.log("Couldn't get max voter weight record. Setting to null.")
+          heliumStore.setMaxVoterWeight(null)
+        }
+
+        if (currentClient.walletPk && heliumVsrClient) {
+          try {
+            await heliumStore.getPositions({
+              realmPk: realm.pubkey,
+              communityMintPk: realm.account.communityMint,
+              walletPk: currentClient.walletPk,
+              connection: connection.current,
+              client: heliumVsrClient,
+              votingClient: currentClient,
+            })
+          } catch (e) {
+            console.log(e)
+          }
+        }
+      }
+    }
+    const handleGetNfts = async () => {
+      nftStore.setIsLoadingNfts(true)
+      if (!wallet?.publicKey) return
+      try {
+        const nfts = await getNfts(wallet.publicKey, connection)
+        const votingNfts = nfts.filter(getIsFromCollection)
+        const nftsWithMeta = votingNfts
+        nftStore.setVotingNfts(nftsWithMeta, currentClient, nftMintRegistrar)
+      } catch (e) {
+        console.log(e)
+        notify({
+          message: `Something went wrong can't fetch nfts: ${e}`,
+          type: 'error',
+        })
+      }
+      nftStore.setIsLoadingNfts(false)
+    }
+
     if (
       currentPluginPk &&
       SWITCHBOARD_PLUGINS_PKS.includes(currentPluginPk.toBase58())
@@ -540,17 +546,20 @@ export function useVotingPlugins() {
       nftStore.setVotingNfts([], currentClient, nftMintRegistrar)
       nftStore.setMaxVoterWeight(null)
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    JSON.stringify(usedCollectionsPks),
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    currentPluginPk?.toBase58(),
     connected,
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    realm?.pubkey.toBase58(),
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    currentClient.walletPk?.toBase58(),
+    connection,
+    currentClient,
+    currentPluginPk,
+    getIsFromCollection,
+    heliumStore,
+    heliumVsrClient,
+    nftClient,
+    nftMintRegistrar,
+    nftStore,
+    realm,
+    switchboardStore,
+    usedCollectionsPks.length,
+    wallet,
   ])
 }
