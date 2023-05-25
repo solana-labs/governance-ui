@@ -41,7 +41,6 @@ import {
   useRealmCouncilMintInfoQuery,
 } from './queries/mintInfo'
 import { useSelectedRealmInfo } from './selectedRealm/useSelectedRealmRegistryEntry'
-import { useRealmProposalsQuery } from './queries/proposal'
 import { useTokenAccountsByOwnerQuery } from './queries/tokenAccount'
 
 /**
@@ -65,17 +64,6 @@ export default function useRealm() {
   const config = useRealmConfigQuery().data?.result
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
-
-  const proposalsArray = useRealmProposalsQuery().data
-  const proposals = useMemo(
-    () =>
-      proposalsArray !== undefined
-        ? Object.fromEntries(
-            proposalsArray.map((x) => [x.pubkey.toString(), x])
-          )
-        : {},
-    [proposalsArray]
-  )
 
   const votingPower = useDepositStore((s) => s.state.votingPower)
   const heliumVotingPower = useHeliumVsrStore((s) => s.state.votingPower)
