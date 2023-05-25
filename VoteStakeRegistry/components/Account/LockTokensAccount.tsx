@@ -42,7 +42,7 @@ import {
   useRealmCommunityMintInfoQuery,
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
-import { useConnection, useWallet } from '@solana/wallet-adapter-react'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 interface DepositBox {
   mintPk: PublicKey
@@ -82,7 +82,8 @@ const LockTokensAccount: React.FC<{
   const [isLoading, setIsLoading] = useState(false)
   const { connection } = useConnection()
   const wallet = useWalletOnePointOh()
-  const { publicKey, connected } = useWallet()
+  const publicKey = wallet?.publicKey ?? null
+  const connected = wallet?.connected
   const mainBoxesClasses = 'bg-bkg-1 col-span-1 p-4 rounded-md'
   const isNextSameRecord = (x, next) => {
     const nextType = Object.keys(next.lockup.kind)[0]
