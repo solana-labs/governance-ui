@@ -13,8 +13,6 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState, useRef } from 'react';
 
-import useWalletStore from 'stores/useWalletStore';
-
 import { useRealmQuery } from '@hooks/queries/realm';
 import useCreateProposal from '@hooks/useCreateProposal';
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext';

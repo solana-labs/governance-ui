@@ -7,8 +7,6 @@ import { TransactionInstruction } from '@solana/web3.js';
 import { useCallback } from 'react';
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore';
 
-import useWalletStore from 'stores/useWalletStore';
-
 import { rules2governanceConfig } from '../EditWalletRules/createTransaction';
 import { useRealmQuery } from '@hooks/queries/realm';
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext';
