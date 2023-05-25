@@ -1,4 +1,5 @@
 import { useRealmQuery } from '@hooks/queries/realm'
+import useProgramVersion from '@hooks/useProgramVersion'
 import {
   createUnchartedRealmInfo,
   parseCertifiedRealms,
@@ -49,6 +50,7 @@ export default useSelectedRealmRegistryEntry
 export const useSelectedRealmInfo = () => {
   const lookup = useSelectedRealmRegistryEntry()
   const realm = useRealmQuery().data?.result
+  const programVersion = useProgramVersion()
   const queried = useMemo(
     () =>
       realm === undefined
@@ -60,5 +62,14 @@ export const useSelectedRealmInfo = () => {
           }),
     [realm]
   )
-  return lookup !== undefined && lookup !== 'not found' ? lookup : queried
+
+  const result =
+    lookup !== undefined && lookup !== 'not found' ? lookup : queried
+  const resultVersion = programVersion ?? result?.programVersion
+  const withVersion =
+    resultVersion === undefined || result === undefined
+      ? undefined
+      : { ...result, programVersion: resultVersion }
+
+  return withVersion
 }

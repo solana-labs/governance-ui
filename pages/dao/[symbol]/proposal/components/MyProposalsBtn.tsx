@@ -198,7 +198,7 @@ const MyProposalsBn = () => {
       return withCancelProposal(
         instructions,
         realm!.owner!,
-        realmInfo!.programVersion!,
+        programVersion,
         realm!.pubkey!,
         proposal!.account.governance,
         proposal!.pubkey,
@@ -263,8 +263,8 @@ const MyProposalsBn = () => {
       return withFinalizeVote(
         instructions,
         realm!.owner,
-        realmInfo!.programVersion!,
-        realm!.pubkey!,
+        programVersion,
+        realm!.pubkey,
         proposal.account.governance,
         proposal.pubkey,
         proposal.account.tokenOwnerRecord,

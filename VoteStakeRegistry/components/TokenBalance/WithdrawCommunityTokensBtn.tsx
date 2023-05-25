@@ -148,7 +148,7 @@ const WithDrawCommunityTokens = () => {
       connection,
       client: client,
       splProgramId: realm!.owner,
-      splProgramVersion: getProgramVersionForRealm(realmInfo!),
+      splProgramVersion: realmInfo!.programVersion,
     })
 
     try {
