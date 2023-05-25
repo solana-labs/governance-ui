@@ -27,6 +27,7 @@ import { useTokenOwnerRecordByPubkeyQuery } from '@hooks/queries/tokenOwnerRecor
 import { useAsync } from 'react-async-hook'
 import { useGovernanceAccountByPubkeyQuery } from '@hooks/queries/governanceAccount'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import queryClient from '@hooks/queries/queryClient'
 
 const ProposalActionsPanel = () => {
   const proposal = useRouteProposalQuery().data?.result
@@ -155,6 +156,9 @@ const ProposalActionsPanel = () => {
           maxVoterWeight
         )
       }
+      queryClient.invalidateQueries({
+        queryKey: ['Proposal'],
+      })
     } catch (error) {
       notify({
         type: 'error',
@@ -184,6 +188,9 @@ const ProposalActionsPanel = () => {
           signatoryRecord
         )
       }
+      queryClient.invalidateQueries({
+        queryKey: ['Proposal'],
+      })
     } catch (error) {
       notify({
         type: 'error',
@@ -209,6 +216,9 @@ const ProposalActionsPanel = () => {
 
         await cancelProposal(rpcContext, realmInfo.realmId, proposal)
       }
+      queryClient.invalidateQueries({
+        queryKey: ['Proposal'],
+      })
     } catch (error) {
       notify({
         type: 'error',

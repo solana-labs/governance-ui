@@ -25,6 +25,7 @@ import { useRouteProposalQuery } from '@hooks/queries/proposal'
 import { useProposalGovernanceQuery } from '@hooks/useProposal'
 import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import queryClient from '@hooks/queries/queryClient'
 
 export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
   const client = useVotePluginsClientStore(
@@ -120,6 +121,9 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
         instructions,
         client
       )
+      queryClient.invalidateQueries({
+        queryKey: ['Proposal'],
+      })
     } catch (ex) {
       console.error("Can't relinquish vote", ex)
     }

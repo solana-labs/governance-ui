@@ -31,6 +31,7 @@ import { useRealmQuery } from '@hooks/queries/realm'
 import { useConnection } from '@solana/wallet-adapter-react'
 import queryClient from '@hooks/queries/queryClient'
 import { tokenAccountQueryKeys } from '@hooks/queries/tokenAccount'
+import { voteRecordQueryKeys } from '@hooks/queries/voteRecord'
 
 const DepositCard = ({
   deposit,
@@ -95,6 +96,7 @@ const DepositCard = ({
     queryClient.invalidateQueries(
       tokenAccountQueryKeys.byOwner(connection.rpcEndpoint, wallet!.publicKey!)
     )
+    queryClient.invalidateQueries(['VoteRecord'])
   }
   const handleStartUnlock = () => {
     setIsUnlockModalOpen(true)

@@ -14,6 +14,7 @@ import {
   useRealmCouncilMintInfoQuery,
 } from './queries/mintInfo'
 import useLegacyConnectionContext from './useLegacyConnectionContext'
+import queryClient from './queries/queryClient'
 
 export default function useCreateProposal() {
   const client = useVotePluginsClientStore(
@@ -88,6 +89,9 @@ export default function useCreateProposal() {
       isDraft,
       client
     )
+    queryClient.invalidateQueries({
+      queryKey: ['Proposal'],
+    })
     return proposalAddress
   }
 

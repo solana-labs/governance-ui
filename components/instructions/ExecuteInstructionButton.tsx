@@ -29,6 +29,7 @@ import Wallet from '@project-serum/sol-wallet-adapter'
 import { getFormattedStringFromDays, SECS_PER_DAY } from '@utils/dateTools'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import queryClient from '@hooks/queries/queryClient'
 
 export enum PlayState {
   Played,
@@ -127,6 +128,9 @@ export function ExecuteInstructionButton({
         adjacentTransaction,
         preExecutionTransactions
       )
+      queryClient.invalidateQueries({
+        queryKey: ['Proposal'],
+      })
     } catch (error) {
       notify({ type: 'error', message: `error executing instruction ${error}` })
       console.log('error executing instruction', error)

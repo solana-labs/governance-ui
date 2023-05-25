@@ -42,7 +42,11 @@ import { useVoteRecordsByOwnerQuery } from '@hooks/queries/voteRecord'
 import useProgramVersion from '@hooks/useProgramVersion'
 import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
 import { useConnection } from '@solana/wallet-adapter-react'
-import { useRealmProposalsQuery } from '@hooks/queries/proposal'
+import {
+  proposalQueryKeys,
+  useRealmProposalsQuery,
+} from '@hooks/queries/proposal'
+import queryClient from '@hooks/queries/queryClient'
 
 const MyProposalsBn = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
@@ -185,6 +189,9 @@ const MyProposalsBn = () => {
           sendSignedTransaction({ signedTransaction: transaction, connection })
         )
       )
+      queryClient.invalidateQueries({
+        queryKey: ['Proposal'],
+      })
     } catch (e) {
       console.log(e)
       notify({ type: 'error', message: `Something went wrong ${e}` })

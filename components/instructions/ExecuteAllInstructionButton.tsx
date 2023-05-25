@@ -21,6 +21,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import queryClient from '@hooks/queries/queryClient'
 
 export enum PlayState {
   Played,
@@ -152,6 +153,9 @@ export function ExecuteAllInstructionButton({
         proposalInstructions,
         multiTransactionMode
       )
+      queryClient.invalidateQueries({
+        queryKey: ['Proposal'],
+      })
     } catch (error) {
       notify({ type: 'error', message: `error executing instruction ${error}` })
       console.error('error executing instruction', error)

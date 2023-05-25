@@ -49,6 +49,7 @@ import {
 import { useRealmGovernancesQuery } from '@hooks/queries/governance'
 import { useConnection } from '@solana/wallet-adapter-react'
 import { useRealmProposalsQuery } from '@hooks/queries/proposal'
+import queryClient from '@hooks/queries/queryClient'
 
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
@@ -316,6 +317,9 @@ const REALM = () => {
           sendSignedTransaction({ signedTransaction: transaction, connection })
         )
       )
+      queryClient.invalidateQueries({
+        queryKey: ['Proposal'],
+      })
       toggleMultiVoteMode()
       notify({
         message: 'Successfully voted on all proposals',

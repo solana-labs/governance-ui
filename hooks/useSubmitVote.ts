@@ -83,6 +83,9 @@ export const useSubmitVote = () => {
           client,
           confirmationCallback
         )
+        queryClient.invalidateQueries({
+          queryKey: ['Proposal'],
+        })
       } catch (e) {
         notify({ type: 'error', message: e.message })
       } finally {
