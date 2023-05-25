@@ -174,7 +174,6 @@ const WithdrawForm = ({
       ),
       isValid: true,
       governance: form.governedAccount.governance,
-      shouldSplitIntoSeparateTxs: true,
     }
   }
 

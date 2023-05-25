@@ -26,7 +26,6 @@ export default function ProposalExecutionCard(props: Props) {
     undefined | ReturnType<typeof diffTime>
   >()
   const timer = useRef<undefined | number>()
-
   const proposalTransactions = useProposalTransactions(
     allTransactions,
     proposal

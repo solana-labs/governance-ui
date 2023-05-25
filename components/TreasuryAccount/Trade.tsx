@@ -54,8 +54,8 @@ import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export type TradeProps = { tokenAccount: AssetAccount }
 
-export const SUPPORTED_TRADE_PLATFORMS = ['Raydium', 'Openbook']
-
+/* const SUPPORTED_TRADE_PLATFORMS = ['Raydium', 'Openbook']
+ */
 type TradeForm = {
   amount: number
   limitPrice: number
@@ -162,7 +162,7 @@ const formSchema = (
   )
 }
 
-export const poseidonProgramId = new web3.PublicKey(
+const poseidonProgramId = new web3.PublicKey(
   '8TJjyzq3iXc48MgV6TD5DumKKwfWKU14Jr9pwgnAbpzs'
 )
 
@@ -318,8 +318,6 @@ const Trade: React.FC<TradeProps> = ({ tokenAccount }) => {
         holdUpTime:
           currentAccount?.governance?.account?.config.minInstructionHoldUpTime,
         prerequisiteInstructions,
-        shouldSplitIntoSeparateTxs: true,
-        chunkSplitByDefault: true,
       }
       proposalInstructions.push(instructionData)
 

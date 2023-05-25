@@ -13,7 +13,7 @@ import {
 import useRpcContext from '@hooks/useRpcContext'
 import { getVoteRecords, getTokenOwnerRecords } from '@models/proposal'
 import useRealm from '@hooks/useRealm'
-import { buildTopVoters, VoteType } from '@models/proposal'
+import { buildTopVoters } from '@models/proposal'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { getLockTokensVotingPowerPerWallet } from 'VoteStakeRegistry/tools/deposits'
 import { BN } from '@coral-xyz/anchor'
@@ -22,8 +22,6 @@ import { PublicKey } from '@solana/web3.js'
 import { useRealmQuery } from './queries/realm'
 import { useRealmCommunityMintInfoQuery } from './queries/mintInfo'
 import useLegacyConnectionContext from './useLegacyConnectionContext'
-
-export { VoteType }
 
 export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
   const { getRpcContext } = useRpcContext()

@@ -10,6 +10,7 @@ import { equalsIgnoreCase } from '../../tools/core/strings'
 export interface RealmInfo {
   symbol: string
   voteSymbol?: string
+  allowDiscussion?: boolean
   programId: PublicKey
   programVersion?: number
   realmId: PublicKey

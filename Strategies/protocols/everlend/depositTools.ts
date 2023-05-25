@@ -244,7 +244,6 @@ export async function handleEverlendAction(
         holdUpTime: matchedTreasury.governance!.account!.config
           .minInstructionHoldUpTime,
         prerequisiteInstructions: [],
-        chunkSplitByDefault: true,
       })
     })
 
@@ -257,7 +256,6 @@ export async function handleEverlendAction(
           holdUpTime: matchedTreasury.governance!.account!.config
             .minInstructionHoldUpTime,
           prerequisiteInstructions: [],
-          chunkSplitByDefault: true,
         })
       })
     }
@@ -284,7 +282,6 @@ export async function handleEverlendAction(
         holdUpTime: matchedTreasury.governance!.account!.config
           .minInstructionHoldUpTime,
         prerequisiteInstructions: [],
-        chunkSplitByDefault: true,
       })
     })
   }

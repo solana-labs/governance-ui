@@ -189,7 +189,6 @@ const VestAccount: FC<Props> = ({
         holdUpTime:
           createProposal.governance?.account.config.minInstructionHoldUpTime,
         prerequisiteInstructions: [],
-        shouldSplitIntoSeparateTxs: false,
       }
 
       const { response: dryRunResponse } = await dryRunInstruction(

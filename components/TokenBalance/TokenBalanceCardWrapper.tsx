@@ -19,6 +19,7 @@ import {
   useUserCouncilTokenOwnerRecord,
 } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import ClaimUnreleasedPositions from 'HeliumVotePlugin/components/ClaimUnreleasedPositions'
 
 const LockPluginTokenBalanceCard = dynamic(
   () =>
@@ -107,7 +108,13 @@ const TokenBalanceCardWrapper = ({
       (!ownTokenRecord ||
         ownTokenRecord.account.governingTokenDepositAmount.isZero())
     ) {
-      return <HeliumVotingPowerCard inAccountDetails={inAccountDetails} />
+      return (
+        <>
+          {!inAccountDetails && <GovernancePowerTitle />}
+          <HeliumVotingPowerCard inAccountDetails={inAccountDetails} />
+          <ClaimUnreleasedPositions inAccountDetails={inAccountDetails} />
+        </>
+      )
     }
 
     if (

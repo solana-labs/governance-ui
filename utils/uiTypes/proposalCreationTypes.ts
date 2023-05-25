@@ -1,6 +1,5 @@
-import { Governance, InstructionData } from '@solana/spl-governance'
+import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import { RpcContext } from '@solana/spl-governance'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey, Keypair, TransactionInstruction } from '@solana/web3.js'
 import { getNameOf } from '@tools/core/script'
@@ -41,11 +40,9 @@ export interface UiInstruction {
   governance: ProgramAccount<Governance> | undefined
   customHoldUpTime?: number
   prerequisiteInstructions?: TransactionInstruction[]
-  chunkSplitByDefault?: boolean
   prerequisiteInstructionsSigners?: Keypair[]
   chunkBy?: number
   signers?: Keypair[]
-  shouldSplitIntoSeparateTxs?: boolean | undefined
 }
 
 export interface SplTokenTransferForm {
@@ -209,23 +206,6 @@ export interface ProgramUpgradeForm {
   bufferSpillAddress?: string | undefined
 }
 
-export interface CreateStreamForm {
-  recipient: string
-  tokenAccount?: AssetAccount
-  start: string
-  depositedAmount: number
-  releaseAmount: number
-  amountAtCliff: number
-  cancelable: boolean
-  period: number
-}
-
-export interface CancelStreamForm {
-  recipient: string
-  strmMetadata: string
-  tokenAccount?: AssetAccount
-}
-
 export const programUpgradeFormNameOf = getNameOf<ProgramUpgradeForm>()
 
 export interface MangoMakeAddOracleForm {
@@ -238,152 +218,6 @@ export interface MangoMakeAddOracleForm {
 export type NameValue = {
   name: string
   value: string
-}
-
-export interface MangoMakeSetMarketModeForm {
-  governedAccount: AssetAccount | null
-  mangoGroup: NameValue | null
-  marketIndex: NameValue | null
-  marketMode: NameValue | null
-  marketType: NameValue | null
-  adminPk: string
-}
-
-export interface MangoSwapSpotMarketForm {
-  governedAccount: AssetAccount | null
-  mangoGroup: NameValue | null
-  market: NameValue | null
-  adminPk: string
-  newSpotMarketPk: string
-}
-
-export interface MangoRemoveOracleForm {
-  governedAccount: AssetAccount | null
-  mangoGroup: NameValue | null
-  adminPk: string
-  oraclePk: NameValue | null
-}
-
-export interface MangoRemovePerpMarketForm {
-  governedAccount: AssetAccount | null
-  mangoGroup: NameValue | null
-  marketPk: NameValue | null
-  adminPk: string
-  mngoDaoVaultPk: string
-}
-
-export interface MangoDepositToMangoAccountForm {
-  governedAccount: AssetAccount | null
-  amount: number
-  mangoAccountPk: string
-}
-
-export interface MangoDepositToMangoAccountFormCsv {
-  governedAccount: AssetAccount | null
-  data: any[]
-}
-
-export interface MangoRemoveSpotMarketForm {
-  governedAccount: AssetAccount | null
-  mangoGroup: NameValue | null
-  marketIndex: NameValue | null
-  adminPk: string
-  adminVaultPk: string
-}
-
-export interface MangoMakeAddSpotMarketForm {
-  governedAccount: AssetAccount | undefined
-  programId: string | undefined
-  mangoGroup: string | undefined
-  oracleAccount: string | undefined
-  serumAccount: string | undefined
-  maintLeverage: number
-  initLeverage: number
-  liquidationFee: number
-  optUtil: number
-  optRate: number
-  maxRate: number
-}
-
-export interface MangoMakeChangeSpotMarketForm {
-  governedAccount: AssetAccount | undefined
-  programId: string | undefined
-  mangoGroup: string | undefined
-  baseSymbol: string | undefined
-  maintLeverage: number | undefined
-  initLeverage: number | undefined
-  liquidationFee: number | undefined
-  optUtil: number
-  optRate: number
-  maxRate: number
-  version: string | undefined
-}
-
-export interface MangoMakeChangePerpMarketForm {
-  governedAccount: AssetAccount | undefined
-  programId: string | undefined
-  mangoGroup: string | undefined
-  perpMarket: string | undefined
-  mngoPerPeriod: string | undefined
-  maxDepthBps: string | undefined
-  lmSizeShift: string | undefined
-  makerFee: string | undefined
-  takerFee: string | undefined
-  maintLeverage: string | undefined
-  initLeverage: string | undefined
-  liquidationFee: string | undefined
-  rate: string | undefined
-  exp: string | undefined
-  targetPeriodLength: string | undefined
-  version: string | undefined
-}
-
-export interface MangoMakeCreatePerpMarketForm {
-  governedAccount: AssetAccount | undefined
-  programId: string | undefined
-  mangoGroup: string | undefined
-  oracleAccount: string | undefined
-  baseDecimals: number
-  baseLotSize: number
-  quoteLotSize: number
-  mngoPerPeriod: number
-  maxDepthBps: number
-  lmSizeShift: number
-  makerFee: number
-  takerFee: number
-  maintLeverage: number
-  initLeverage: number
-  liquidationFee: number
-  rate: number
-  exp: number
-  targetPeriodLength: number
-  version: number
-}
-export interface MangoMakeChangeMaxAccountsForm {
-  governedAccount: AssetAccount | undefined
-  programId: string | undefined
-  mangoGroup: string | undefined
-  maxMangoAccounts: number
-}
-export interface MangoMakeChangeReferralFeeParams {
-  governedAccount: AssetAccount | undefined
-  programId: string | undefined
-  mangoGroup: string | undefined
-  refSurchargeCentibps: number
-  refShareCentibps: number
-  refMngoRequired: number
-}
-
-export interface MangoMakeChangeReferralFeeParams2 {
-  governedAccount: AssetAccount | undefined
-  programId: string | undefined
-  mangoGroup: string | undefined
-  refSurchargeCentibps: number
-  refShareCentibps: number
-  refMngoRequired: number
-  refSurchargeCentibps2: number
-  refShareCentibps2: number
-  refMngoRequired2: number
 }
 
 /* PsyOptions American options */
@@ -649,20 +483,6 @@ export enum Instructions {
   RevokeGoverningTokens,
   SetMintAuthority,
 }
-
-export type createParams = [
-  rpc: RpcContext,
-  realm: PublicKey,
-  governance: PublicKey,
-  tokenOwnerRecord: PublicKey,
-  name: string,
-  descriptionLink: string,
-  governingTokenMint: PublicKey,
-  holdUpTime: number,
-  proposalIndex: number,
-  instructionsData: InstructionData[],
-  isDraft: boolean
-]
 
 export interface ComponentInstructionData {
   governedAccount?: ProgramAccount<Governance> | undefined

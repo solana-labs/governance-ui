@@ -9,6 +9,7 @@ import { SecondaryButton } from '../Button'
 import { notify } from '@utils/notifications'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import dayjs from 'dayjs'
 
 export default function InspectorButton({
   proposalInstruction,
@@ -18,17 +19,26 @@ export default function InspectorButton({
   const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
+
   const wasExecuted =
     proposalInstruction.account.executionStatus ===
     InstructionExecutionStatus.Success
+  const executedAtFormatted = proposalInstruction.account.executedAt
+    ? dayjs(proposalInstruction.account.executedAt.toNumber() * 1000).format(
+        'DD-MM-YYYY HH:mm'
+      )
+    : ''
+
   const showInspector = async () => {
     let inspectUrl = ''
     if (!wasExecuted) {
-      const instructionData = proposalInstruction.account.getSingleInstruction()
+      const instructionData = proposalInstruction.account.getAllInstructions()
       const result = await dryRunInstruction(
         connection.current,
         wallet!,
-        instructionData
+        null,
+        [],
+        [...instructionData]
       )
 
       inspectUrl = await getExplorerInspectorUrl(connection, result.transaction)
@@ -63,7 +73,9 @@ export default function InspectorButton({
       disabled={!connected && !wasExecuted}
       onClick={() => showInspector()}
     >
-      {!wasExecuted ? 'Inspect' : 'View transaction'}
+      {!wasExecuted
+        ? 'Inspect'
+        : `Execution date: ${executedAtFormatted} - View transaction`}
     </SecondaryButton>
   )
 }

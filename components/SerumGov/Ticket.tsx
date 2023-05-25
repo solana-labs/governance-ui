@@ -130,7 +130,6 @@ const Ticket: FC<Props> = ({ ticket, createProposal, callback }) => {
                   createProposal.governance?.account.config
                     .minInstructionHoldUpTime,
                 prerequisiteInstructions: [],
-                shouldSplitIntoSeparateTxs: false,
               }
 
               instructionsData.push(ixData)
@@ -213,7 +212,6 @@ const Ticket: FC<Props> = ({ ticket, createProposal, callback }) => {
                   createProposal.governance?.account.config
                     .minInstructionHoldUpTime,
                 prerequisiteInstructions: [],
-                shouldSplitIntoSeparateTxs: false,
               }
 
               instructionsData.push(ixData)

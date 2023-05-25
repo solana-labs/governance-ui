@@ -7,7 +7,7 @@ import { SubDaoWithMeta } from 'HeliumVotePlugin/sdk/types'
 import { useSubDaos } from 'HeliumVotePlugin/hooks/useSubDaos'
 import { LoadingDots } from '@components/Loading'
 
-export interface DelegateTokensModalProps {
+interface DelegateTokensModalProps {
   isOpen: boolean
   onClose: () => void
   onSubmit: (subDao: SubDaoWithMeta) => Promise<void>

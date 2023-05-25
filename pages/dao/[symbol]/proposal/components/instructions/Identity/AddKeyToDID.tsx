@@ -97,7 +97,6 @@ const AddKeyToDID = ({
       additionalSerializedInstructions,
       isValid,
       governance: form!.governedAccount?.governance,
-      chunkSplitByDefault: true,
     }
   }
   useEffect(() => {

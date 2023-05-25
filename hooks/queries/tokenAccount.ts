@@ -1,8 +1,10 @@
-import { PublicKey } from '@solana/web3.js'
+import { Connection, PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
-import { getOwnedTokenAccounts } from '@utils/tokens'
+import { getOwnedTokenAccounts, tryGetTokenAccount } from '@utils/tokens'
 import queryClient from './queryClient'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { getNetworkFromEndpoint } from '@utils/connection'
+import asFindable from '@utils/queries/asFindable'
 
 export const tokenAccountQueryKeys = {
   all: (cluster: string) => [cluster, 'TokenAccount'],
@@ -43,4 +45,18 @@ export const useTokenAccountsByOwnerQuery = (pubkey?: PublicKey) => {
   })
 
   return query
+}
+
+export const fetchTokenAccountByPubkey = (
+  connection: Connection,
+  pubkey: PublicKey
+) => {
+  const cluster = getNetworkFromEndpoint(connection.rpcEndpoint)
+  return queryClient.fetchQuery({
+    queryKey: tokenAccountQueryKeys.byPubkey(cluster, pubkey),
+    queryFn: () =>
+      asFindable((...x: Parameters<typeof tryGetTokenAccount>) =>
+        tryGetTokenAccount(...x).then((x) => x?.account)
+      )(connection, pubkey),
+  })
 }

@@ -112,7 +112,6 @@ export default function Header(props: Props) {
           holdUpTime:
             asset.governanceOwner.account.config.minInstructionHoldUpTime,
           prerequisiteInstructions: [],
-          shouldSplitIntoSeparateTxs: false,
         }
 
         instructionsData.push(ixData)

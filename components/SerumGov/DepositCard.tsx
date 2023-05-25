@@ -172,7 +172,6 @@ const DepositCard = ({ mint, callback, createProposal }: DepositCardProps) => {
               createProposal.governance?.account.config
                 .minInstructionHoldUpTime,
             prerequisiteInstructions: [],
-            shouldSplitIntoSeparateTxs: false,
           }
 
           instructionsData.push(ixData)

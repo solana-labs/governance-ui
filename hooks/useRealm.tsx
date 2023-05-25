@@ -252,7 +252,6 @@ export default function useRealm() {
       ownDelegateCouncilTokenRecords,
       ownDelegateTokenRecords,
       ownVoterWeight,
-      proposals,
       realmInfo,
       realmTokenAccount,
       symbol,

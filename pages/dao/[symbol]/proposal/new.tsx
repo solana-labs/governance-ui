@@ -130,6 +130,7 @@ import LiquidityStakingOption from './components/instructions/Dual/LiquidityStak
 import InitStrike from './components/instructions/Dual/InitStrike'
 import IdlSetBuffer from './components/instructions/Mango/MangoV4/IdlSetBuffer'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { usePrevious } from '@hooks/usePrevious'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -156,6 +157,19 @@ function extractGovernanceAccountFromInstructionsData(
   )
 }
 
+const getDefaultInstructionProps = (
+  x: UiInstruction,
+  selectedGovernance: ProgramAccount<Governance> | null
+) => ({
+  holdUpTime: x.customHoldUpTime
+    ? getTimestampFromDays(x.customHoldUpTime)
+    : selectedGovernance?.account?.config.minInstructionHoldUpTime,
+  prerequisiteInstructions: x.prerequisiteInstructions || [],
+  signers: x.signers,
+  prerequisiteInstructionsSigners: x.prerequisiteInstructionsSigners || [],
+  chunkBy: x.chunkBy || 2,
+})
+
 const New = () => {
   const router = useRouter()
   const { handleCreateProposal } = useCreateProposal()
@@ -178,50 +192,33 @@ const New = () => {
   const [isLoadingDraft, setIsLoadingDraft] = useState(false)
 
   const isLoading = isLoadingSignedProposal || isLoadingDraft
-  //   const customInstructionFilterForSelectedGovernance = (
-  //     instructionType: Instructions
-  //   ) => {
-  //     if (!governance) {
-  //       return true
-  //     } else {
-  //       const governanceType = governance.account.accountType
-  //       const instructionsAvailiableAfterProgramGovernance = [Instructions.Base64]
-  //       switch (governanceType) {
-  //         case GovernanceAccountType.ProgramGovernanceV1:
-  //         case GovernanceAccountType.ProgramGovernanceV2:
-  //           return instructionsAvailiableAfterProgramGovernance.includes(
-  //             instructionType
-  //           )
-  //         default:
-  //           return true
-  //       }
-  //     }
-  //   }
 
   const [instructionsData, setInstructions] = useState<
     ComponentInstructionData[]
   >([{ type: undefined }])
-  const handleSetInstructions = (val: any, index) => {
-    const newInstructions = [...instructionsData]
-    newInstructions[index] = { ...instructionsData[index], ...val }
-    setInstructions(newInstructions)
-  }
+
+  const handleSetInstructions = useCallback((val: any, index) => {
+    setInstructions((prevInstructions) => {
+      const newInstructions = [...prevInstructions]
+      newInstructions[index] = { ...prevInstructions[index], ...val }
+      return newInstructions
+    })
+  }, [])
+
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-  const setInstructionType = ({
-    value,
-    idx,
-  }: {
-    value: InstructionType | null
-    idx: number
-  }) => {
-    const newInstruction = {
-      type: value,
-    }
-    handleSetInstructions(newInstruction, idx)
-  }
+  const setInstructionType = useCallback(
+    ({ value, idx }: { value: InstructionType | null; idx: number }) => {
+      const newInstruction = {
+        type: value,
+      }
+      handleSetInstructions(newInstruction, idx)
+    },
+    [handleSetInstructions]
+  )
+
   const addInstruction = () => {
     setInstructions([...instructionsData, { type: undefined }])
   }
@@ -277,50 +274,28 @@ const New = () => {
         throw Error('No governance selected')
       }
 
-      //TODO fix duplicated instructions when use only additional instruction
-      const additionalInstructions = [
-        ...(instructions
-          .flatMap((instruction) => {
-            return instruction.additionalSerializedInstructions?.map((x) => {
-              return {
-                data: x ? getInstructionDataFromBase64(x) : null,
-                holdUpTime: instruction.customHoldUpTime
-                  ? getTimestampFromDays(instruction.customHoldUpTime)
-                  : governance.account?.config.minInstructionHoldUpTime,
-                prerequisiteInstructions:
-                  instruction.prerequisiteInstructions || [],
-                prerequisiteInstructionsSigners:
-                  instruction.prerequisiteInstructionsSigners || [],
-                chunkSplitByDefault: instruction.chunkSplitByDefault || false,
-                signers: instruction.signers,
-                shouldSplitIntoSeparateTxs:
-                  instruction.shouldSplitIntoSeparateTxs,
-                chunkBy: instruction.chunkBy || 2,
-              }
-            })
-          })
-          .filter((x) => x) as InstructionDataWithHoldUpTime[]),
-      ]
+      const additionalInstructions = instructions
+        .flatMap((instruction) =>
+          instruction.additionalSerializedInstructions
+            ?.filter(
+              (value, index, self) =>
+                index === self.findIndex((t) => t === value)
+            )
+            .map((x) => ({
+              data: x ? getInstructionDataFromBase64(x) : null,
+              ...getDefaultInstructionProps(instruction, governance),
+            }))
+        )
+        .filter((x) => x) as InstructionDataWithHoldUpTime[]
 
       const instructionsData = [
         ...additionalInstructions,
-        ...instructions.map((x) => {
-          return {
-            data: x.serializedInstruction
-              ? getInstructionDataFromBase64(x.serializedInstruction)
-              : null,
-            holdUpTime: x.customHoldUpTime
-              ? getTimestampFromDays(x.customHoldUpTime)
-              : governance.account?.config.minInstructionHoldUpTime,
-            prerequisiteInstructions: x.prerequisiteInstructions || [],
-            chunkSplitByDefault: x.chunkSplitByDefault || false,
-            signers: x.signers,
-            prerequisiteInstructionsSigners:
-              x.prerequisiteInstructionsSigners || [],
-            shouldSplitIntoSeparateTxs: x.shouldSplitIntoSeparateTxs,
-            chunkBy: x.chunkBy || 2,
-          }
-        }),
+        ...instructions.map((x) => ({
+          data: x.serializedInstruction
+            ? getInstructionDataFromBase64(x.serializedInstruction)
+            : null,
+          ...getDefaultInstructionProps(x, governance),
+        })),
       ]
 
       try {
@@ -350,12 +325,17 @@ const New = () => {
     handleTurnOffLoaders()
   }
 
+  const firstGovernancePk = instructionsData[0]?.governedAccount?.pubkey.toBase58()
+  const previousFirstGovernancePk = usePrevious(firstGovernancePk)
+
   useEffect(() => {
-    if (instructionsData?.length) {
+    if (
+      instructionsData?.length &&
+      firstGovernancePk !== previousFirstGovernancePk
+    ) {
       setInstructions([instructionsData[0]])
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [instructionsData[0]?.governedAccount?.pubkey])
+  }, [firstGovernancePk, previousFirstGovernancePk, instructionsData])
 
   useEffect(() => {
     const governedAccount = extractGovernanceAccountFromInstructionsData(
@@ -380,8 +360,12 @@ const New = () => {
         setInstructionType({ value: instruction, idx: 0 })
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [router.query, availableInstructions, instructionsData])
+  }, [
+    router.query,
+    availableInstructions,
+    instructionsData,
+    setInstructionType,
+  ])
 
   // Map instruction enum with components
   //

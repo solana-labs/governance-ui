@@ -146,7 +146,6 @@ const DeactivateValidatorStake = ({
       ),
       isValid: true,
       governance: form.governedTokenAccount.governance,
-      shouldSplitIntoSeparateTxs: false,
     }
   }
 

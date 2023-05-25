@@ -405,7 +405,7 @@
     borsh "^0.6.0"
     bs58 "4.0.1"
 
-"@bonfida/spl-name-service@0.1.47":
+"@bonfida/spl-name-service@0.1.47", "@bonfida/spl-name-service@^0.1.24", "@bonfida/spl-name-service@^0.1.50":
   version "0.1.47"
   resolved "https://registry.yarnpkg.com/@bonfida/spl-name-service/-/spl-name-service-0.1.47.tgz#bb5b22ccbbb3135d70f2fa3e7bbfaee0c2c7f3dc"
   integrity sha512-BQrdvWm27KJowPvCuWmDWNC4vtYOnBNK9i+PFzfhKAMxa0X58DYpmk7ZSQDr4/EklAK8aR2noUMfvBInlsIfgg==
@@ -413,15 +413,7 @@
     "@bonfida/name-offers" "^0.0.1"
     "@ethersproject/sha2" "^5.5.0"
 
-"@bonfida/spl-name-service@^0.1.24", "@bonfida/spl-name-service@^0.1.50":
-  version "0.1.58"
-  resolved "https://registry.yarnpkg.com/@bonfida/spl-name-service/-/spl-name-service-0.1.58.tgz#4819c0d18e55495f3dac2437cc2fec59f64f3825"
-  integrity sha512-4M2RJViB+WFLwY5mvkC4A+u38j1+We2ODPG4OdllTWhUj4o3ncZQxQT5zxleEkdJH/eUhSHFVNcX/OB82c9/VA==
-  dependencies:
-    "@bonfida/name-offers" "^0.0.1"
-    "@ethersproject/sha2" "^5.5.0"
-
-"@bundlr-network/client@0.7.15":
+"@bundlr-network/client@0.7.15", "@bundlr-network/client@^0.8.8":
   version "0.7.15"
   resolved "https://registry.yarnpkg.com/@bundlr-network/client/-/client-0.7.15.tgz#099c5edf287878465686bd01e29638958badabb1"
   integrity sha512-PzKH6VVyK/Ii5+rRwG7/5kcXZK0WeZGIng7xVtYaA8eb/SvIfaufTfJQl6ff3xnCA0QO0Fr6wkIWoXU5lHuEXA==
@@ -431,31 +423,6 @@
     "@supercharge/promise-pool" "^2.1.0"
     algosdk "^1.13.1"
     arbundles "^0.6.19"
-    arweave "^1.11.4"
-    async-retry "^1.3.3"
-    axios "^0.25.0"
-    base64url "^3.0.1"
-    bignumber.js "^9.0.1"
-    bs58 "^4.0.1"
-    commander "^8.2.0"
-    csv "^6.0.5"
-    ethers "^5.5.1"
-    inquirer "^8.2.0"
-    js-sha256 "^0.9.0"
-    mime-types "^2.1.34"
-    near-api-js "^0.44.2"
-    near-seed-phrase "^0.2.0"
-
-"@bundlr-network/client@^0.8.8":
-  version "0.8.9"
-  resolved "https://registry.yarnpkg.com/@bundlr-network/client/-/client-0.8.9.tgz#58e969a5d80f8d25d212d46bb7a060730a3c1736"
-  integrity sha512-SJ7BAt/KhONeFQ0+nbqrw2DUWrsev6y6cmlXt+3x7fPCkw7OJwudtxV/h2nBteZd65NXjqw8yzkmLiLfZ7CCRA==
-  dependencies:
-    "@solana/wallet-adapter-base" "^0.9.2"
-    "@solana/web3.js" "^1.36.0"
-    "@supercharge/promise-pool" "^2.1.0"
-    algosdk "^1.13.1"
-    arbundles "^0.6.21"
     arweave "^1.11.4"
     async-retry "^1.3.3"
     axios "^0.25.0"
@@ -6827,7 +6794,7 @@ aproba@^1.0.3:
   resolved "https://registry.yarnpkg.com/aproba/-/aproba-2.0.0.tgz#52520b8ae5b569215b354efc0caa3fe1e45a8adc"
   integrity sha512-lYe4Gx7QT+MKGbDsA+Z+he/Wtef0BiwDOlK/XkBrdfsh9J/jPPXbX0tE9x9cl27Tmu5gg3QUbUrQYa/y+KOHPQ==
 
-arbundles@^0.6.19, arbundles@^0.6.21:
+arbundles@^0.6.19:
   version "0.6.22"
   resolved "https://registry.yarnpkg.com/arbundles/-/arbundles-0.6.22.tgz#0fd58ec76514f1d6c2db7c5870a6232314f52de6"
   integrity sha512-QlSavBHk59mNqgQ6ScxlqaBJlDbSmSrK/uTcF3HojLAZ/4aufTkVTBjl1hSfZ/ZN45oIPgJC05R8SmVARF+8VA==
@@ -7323,7 +7290,7 @@ bigint-buffer@^1.1.5:
   dependencies:
     bindings "^1.3.0"
 
-bignumber.js@9.0.2, bignumber.js@^8.1.1, bignumber.js@^9.0.0, bignumber.js@^9.0.1, bignumber.js@^9.0.2, bignumber.js@^9.1.0, bignumber.js@^9.1.1:
+bignumber.js@9.0.2, bignumber.js@^9.0.0, bignumber.js@^9.0.1, bignumber.js@^9.0.2, bignumber.js@^9.1.0, bignumber.js@^9.1.1:
   version "9.0.2"
   resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-9.0.2.tgz#71c6c6bed38de64e24a65ebe16cfcf23ae693673"
   integrity sha512-GAcQvbpsM0pUb0zw1EI0KhQEZ+lRwR5fYaAp3vPOYuP7aDvGy6cVN6XHLauvF8SOga2y0dcLcjt3iQDTSEliyw==
@@ -13927,13 +13894,6 @@ number-to-bn@1.7.0:
     bn.js "4.11.6"
     strip-hex-prefix "1.0.0"
 
-numbro@2.3.6:
-  version "2.3.6"
-  resolved "https://registry.yarnpkg.com/numbro/-/numbro-2.3.6.tgz#4bd622ebe59ccbc49dad365c5b9eed200781fa21"
-  integrity sha512-pxpoTT3hVxQGaOA2RTzXR/muonQNd1K1HPJbWo7QOmxPwiPmoFCFfsG9XXgW3uqjyzezJ0P9IvCPDXUtJexjwg==
-  dependencies:
-    bignumber.js "^8.1.1"
-
 nwsapi@^2.2.2:
   version "2.2.2"
   resolved "https://registry.yarnpkg.com/nwsapi/-/nwsapi-2.2.2.tgz#e5418863e7905df67d51ec95938d67bf801f0bb0"
@@ -15487,10 +15447,10 @@ react-virtualized-auto-sizer@1.0.6:
   resolved "https://registry.yarnpkg.com/react-virtualized-auto-sizer/-/react-virtualized-auto-sizer-1.0.6.tgz#66c5b1c9278064c5ef1699ed40a29c11518f97ca"
   integrity sha512-7tQ0BmZqfVF6YYEWcIGuoR3OdYe8I/ZFbNclFlGOC3pMqunkYF/oL30NCjSGl9sMEb17AnzixDz98Kqc3N76HQ==
 
-react-window@1.8.7:
-  version "1.8.7"
-  resolved "https://registry.yarnpkg.com/react-window/-/react-window-1.8.7.tgz#5e9fd0d23f48f432d7022cdb327219353a15f0d4"
-  integrity sha512-JHEZbPXBpKMmoNO1bNhoXOOLg/ujhL/BU4IqVU9r8eQPcy5KQnGHIHDRkJ0ns9IM5+Aq5LNwt3j8t3tIrePQzA==
+react-window@1.8.9:
+  version "1.8.9"
+  resolved "https://registry.yarnpkg.com/react-window/-/react-window-1.8.9.tgz#24bc346be73d0468cdf91998aac94e32bc7fa6a8"
+  integrity sha512-+Eqx/fj1Aa5WnhRfj9dJg4VYATGwIUP2ItwItiJ6zboKWA6EX3lYDAXfGF2hyNqplEprhbtjbipiADEcwQ823Q==
   dependencies:
     "@babel/runtime" "^7.0.0"
     memoize-one ">=3.1.1 <6"

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import Button from '@components/Button'
 import useRealm from '@hooks/useRealm'
 import {
@@ -94,7 +94,7 @@ const LockTokensAccount: React.FC<{
           unlockedTypes.includes(nextType)))
     )
   }
-  const handleGetDeposits = async () => {
+  const handleGetDeposits = useCallback(async () => {
     setIsLoading(true)
     try {
       if (
@@ -163,44 +163,51 @@ const LockTokensAccount: React.FC<{
       })
     }
     setIsLoading(false)
-  }
+  }, [
+    client,
+    config?.account.communityTokenConfig.voterWeightAddin,
+    connection,
+    realm,
+    tokenOwnerRecordWalletPk,
+    wallet,
+  ])
+
+  const areLoadedDepositsSameAsOwned =
+    JSON.stringify(ownDeposits) === JSON.stringify(deposits)
   useEffect(() => {
-    if (
-      JSON.stringify(ownDeposits) !== JSON.stringify(deposits) &&
-      isOwnerOfDeposits
-    ) {
+    if (!areLoadedDepositsSameAsOwned && isOwnerOfDeposits) {
       handleGetDeposits()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [JSON.stringify(ownDeposits), ownDeposits.length])
+  }, [areLoadedDepositsSameAsOwned, isOwnerOfDeposits, handleGetDeposits])
+
   useEffect(() => {
     handleGetDeposits()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [isOwnerOfDeposits, client])
+  }, [isOwnerOfDeposits, client, handleGetDeposits])
+
+  const depositMint =
+    !mint?.supply.isZero() ||
+    config?.account.communityTokenConfig.maxVoterWeightAddin
+      ? realm?.account.communityMint
+      : !councilMint?.supply.isZero()
+      ? realm?.account.config.councilMint
+      : undefined
+
   useEffect(() => {
     const getTokenOwnerRecord = async () => {
-      const defaultMint =
-        !mint?.supply.isZero() ||
-        config?.account.communityTokenConfig.maxVoterWeightAddin
-          ? realm!.account.communityMint
-          : !councilMint?.supply.isZero()
-          ? realm!.account.config.councilMint
-          : undefined
       const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
         realm!.owner,
         realm!.pubkey,
-        defaultMint!,
+        depositMint!,
         wallet!.publicKey!
       )
       setIsOwnerOfDeposits(
         tokenOwnerRecordAddress.toBase58() === tokenOwnerRecordPk
       )
     }
-    if (realm && wallet?.connected) {
+    if (realm?.owner && realm.pubkey && wallet?.connected && depositMint) {
       getTokenOwnerRecord()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [realm?.pubkey.toBase58(), wallet?.connected, tokenOwnerRecordPk])
+  }, [tokenOwnerRecordPk, depositMint, realm, wallet])
 
   const hasLockedTokens = useMemo(() => {
     return reducedDeposits.find((d) => d.lockUpKind !== 'none')
@@ -224,8 +231,7 @@ const LockTokensAccount: React.FC<{
             )?.index
         )
     )
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [deposits])
+  }, [deposits, realm?.account.communityMint])
 
   return (
     <div className="grid grid-cols-12 gap-4">

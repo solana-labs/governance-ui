@@ -262,10 +262,6 @@ export function getAccountName(accountPk: PublicKey | string) {
   return ACCOUNT_NAMES[key] ?? getProgramName(accountPk)
 }
 
-export const CHAT_PROGRAM_ID = new PublicKey(
-  '7fjWgipzcHFP3c5TMMWumFHNAL5Eme1gFqqRGnNPbbfG'
-)
-
 export const WSOL_MINT = 'So11111111111111111111111111111111111111112'
 export const WSOL_MINT_PK = new PublicKey(WSOL_MINT)
 
@@ -285,7 +281,7 @@ const HIDDEN_MNGO_TREASURES = [
 ]
 
 //owner and desired accounts we want to show
-export const MNGO_AUXILIARY_TOKEN_ACCOUNTS = [
+const MNGO_AUXILIARY_TOKEN_ACCOUNTS = [
   {
     owner: '9BVcYqEQxyccuwznvxXqDkSJFavvTyheiTYk231T1A8S',
     accounts: ['59BEyxwrFpt3x4sZ7TcXC3bHx3seGfqGkATcDx6siLWy'],
@@ -308,7 +304,7 @@ export const ALL_CASTLE_PROGRAMS = [
   PROGRAM_IDS['mainnet'],
 ]
 
-export interface AccountDescriptor {
+interface AccountDescriptor {
   name: string
   important?: boolean
 }

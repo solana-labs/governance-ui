@@ -95,7 +95,6 @@ const CreateGatewayPluginRegistrar = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form!.governedAccount?.governance,
-      chunkSplitByDefault: true,
     }
   }
   useEffect(() => {

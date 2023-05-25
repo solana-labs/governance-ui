@@ -85,17 +85,17 @@ const useProposalSafetyCheck = () => {
   const config = useRealmConfigQuery().data?.result
 
   const { realmInfo } = useRealm()
-  const { data: instructions } = useSelectedProposalTransactions()
+  const { data: transactions } = useSelectedProposalTransactions()
 
   const realmConfigWarnings = useMemo(() => {
     if (
       realmInfo === undefined ||
       config === undefined ||
-      instructions === undefined
+      transactions === undefined
     )
       return undefined
 
-    const ixs = instructions.flatMap((pix) => pix.account.getAllInstructions())
+    const ixs = transactions.flatMap((pix) => pix.account.getAllInstructions())
 
     const realmConfigWarnings = ixs.map((ix) => {
       if (ix.programId.equals(realmInfo.programId) && ix.data[0] === 19) {
@@ -118,7 +118,7 @@ const useProposalSafetyCheck = () => {
     })
 
     return realmConfigWarnings
-  }, [config, instructions, realmInfo])
+  }, [config, transactions, realmInfo])
 
   return realmConfigWarnings
 }

@@ -291,7 +291,7 @@ const PerpEdit = ({
     if (mangoGroup) {
       getTokens()
     }
-  }, [mangoGroup?.publicKey.toBase58()])
+  }, [mangoGroup])
 
   useEffect(() => {
     if (form.perp && mangoGroup) {
@@ -299,7 +299,6 @@ const PerpEdit = ({
         form.perp.value
       )!
       const vals = {
-        ...form,
         oraclePk: currentPerp.oracle.toBase58(),
         name: currentPerp.name,
         oracleConfFilter: currentPerp.oracleConfig.confFilter.toNumber(),
@@ -334,12 +333,14 @@ const PerpEdit = ({
         forceClose: currentPerp.forceClose,
         positivePnlLiquidationFee: currentPerp.positivePnlLiquidationFee.toNumber(),
       }
-      setForm({
+      setForm((prevForm) => ({
+        ...prevForm,
         ...vals,
-      })
-      setOriginalFormValues({ ...vals })
+      }))
+      setOriginalFormValues((prevForm) => ({ ...prevForm, ...vals }))
     }
-  }, [form.perp?.value])
+  }, [form.perp, mangoGroup])
+
   const inputs: InstructionInput[] = [
     {
       label: 'Governance',

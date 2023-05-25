@@ -19,7 +19,7 @@ class TransactionError extends Error {
   }
 }
 
-export function getUnixTs() {
+function getUnixTs() {
   return new Date().getTime() / 1000
 }
 

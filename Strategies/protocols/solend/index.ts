@@ -357,7 +357,6 @@ async function handleSolendAction(
       holdUpTime: matchedTreasury.governance!.account!.config
         .minInstructionHoldUpTime,
       prerequisiteInstructions: [],
-      chunkSplitByDefault: true,
     }
     insts.push(createAtaInstObj)
   }
@@ -391,7 +390,6 @@ async function handleSolendAction(
       holdUpTime: matchedTreasury.governance!.account!.config
         .minInstructionHoldUpTime,
       prerequisiteInstructions: [],
-      chunkSplitByDefault: true,
     }
 
     setupInsts.push(transferLamportInst)
@@ -411,7 +409,6 @@ async function handleSolendAction(
       holdUpTime: matchedTreasury.governance!.account!.config
         .minInstructionHoldUpTime,
       prerequisiteInstructions: [],
-      chunkSplitByDefault: true,
     }
 
     if (userWSOLAccountInfo) {
@@ -423,7 +420,6 @@ async function handleSolendAction(
         holdUpTime: matchedTreasury.governance!.account!.config
           .minInstructionHoldUpTime,
         prerequisiteInstructions: [],
-        chunkSplitByDefault: true,
       }
       if (sendAction) {
         setupInsts.push(syncInst)
@@ -446,7 +442,6 @@ async function handleSolendAction(
         holdUpTime: matchedTreasury.governance!.account!.config
           .minInstructionHoldUpTime,
         prerequisiteInstructions: [],
-        chunkSplitByDefault: true,
       }
       setupInsts.push(createUserWSOLAccountInst)
       cleanupInsts.push(closeWSOLInst)
@@ -485,7 +480,6 @@ async function handleSolendAction(
     holdUpTime: matchedTreasury.governance!.account!.config
       .minInstructionHoldUpTime,
     prerequisiteInstructions: [],
-    chunkSplitByDefault: true,
   }
   insts.push(depositSolendInsObj)
 

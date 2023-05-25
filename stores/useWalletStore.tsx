@@ -69,7 +69,7 @@ const INITIAL_PROPOSAL_STATE = {
   proposal: undefined,
   governance: undefined,
   realm: undefined,
-  instructions: {},
+  transactions: {},
   voteRecordsByVoter: {},
   signatories: {},
   chatMessages: {},

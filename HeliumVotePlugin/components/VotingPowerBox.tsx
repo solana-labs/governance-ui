@@ -6,7 +6,7 @@ import { getMintDecimalAmount } from '@tools/sdk/units'
 import { LightningBoltIcon } from '@heroicons/react/solid'
 import Tooltip from '@components/Tooltip'
 
-export interface VotingPowerBoxProps {
+interface VotingPowerBoxProps {
   votingPower: BN
   mint: MintInfo
   votingPowerFromDeposits: BN

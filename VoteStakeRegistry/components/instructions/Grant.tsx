@@ -1,5 +1,11 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
-import React, { useContext, useEffect, useState } from 'react'
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import Input from '@components/inputs/Input'
 import useRealm from '@hooks/useRealm'
 import { AccountInfo } from '@solana/spl-token'
@@ -75,6 +81,23 @@ const Grant = ({
     allowClawback: true,
     lockupKind: lockupTypes[0],
   })
+  const schema = useMemo(
+    () =>
+      getTokenTransferSchema({ form, connection }).concat(
+        yup.object().shape({
+          startDateUnixSeconds: yup
+            .number()
+            .required('Start date required')
+            .min(1, 'Start date required'),
+          periods: yup
+            .number()
+            .required('End date required')
+            .min(1, 'End date cannot be prior to start date'),
+        })
+      ),
+    [form, connection]
+  )
+
   const [governedAccount, setGovernedAccount] = useState<
     ProgramAccount<Governance> | undefined
   >(undefined)
@@ -88,13 +111,16 @@ const Grant = ({
     : 1
   const currentPrecision = precision(mintMinAmount)
   const { handleSetInstructions } = useContext(NewProposalContext)
+
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
+    setForm((prevForm) => ({ ...prevForm, [propertyName]: value }))
   }
+
   const setMintInfo = (value) => {
-    setForm({ ...form, mintInfo: value })
+    setForm((prevForm) => ({ ...prevForm, mintInfo: value }))
   }
+
   const setAmount = (event) => {
     const value = event.target.value
     handleSetForm({
@@ -115,7 +141,7 @@ const Grant = ({
       propertyName: 'amount',
     })
   }
-  async function getInstruction(): Promise<UiInstruction> {
+  const getInstruction = useCallback(async () => {
     if (!realm) throw new Error()
 
     const isValid = await validateInstruction({ schema, form, setFormErrors })
@@ -189,10 +215,18 @@ const Grant = ({
       isValid,
       governance: form.governedTokenAccount?.governance,
       prerequisiteInstructions: prerequisiteInstructions,
-      chunkSplitByDefault: true,
     }
     return obj
-  }
+  }, [
+    client,
+    connection,
+    form,
+    realm,
+    realmInfo?.programVersion,
+    schema,
+    wallet,
+  ])
+
   const handleChangeStartDate = (e) => {
     const value = e.target.value
     setStartDate(value)
@@ -223,8 +257,8 @@ const Grant = ({
         propertyName: 'periods',
       })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [startDate, endDate, form.lockupKind.value])
+
   useEffect(() => {
     if (form.destinationAccount) {
       debounce.debounceFcn(async () => {
@@ -239,35 +273,24 @@ const Grant = ({
     } else {
       setDestinationAccount(null)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form.destinationAccount])
+  }, [form.destinationAccount, connection])
+
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: governedAccount, getInstruction },
       index
     )
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form])
+  }, [form, governedAccount, handleSetInstructions, index, getInstruction])
+
   useEffect(() => {
     setGovernedAccount(form.governedTokenAccount?.governance)
     setMintInfo(form.governedTokenAccount?.extensions.mint?.account)
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.governedTokenAccount])
+
   const destinationAccountName =
     destinationAccount?.publicKey &&
     getAccountName(destinationAccount?.account.address)
-  const schema = getTokenTransferSchema({ form, connection }).concat(
-    yup.object().shape({
-      startDateUnixSeconds: yup
-        .number()
-        .required('Start date required')
-        .min(1, 'Start date required'),
-      periods: yup
-        .number()
-        .required('End date required')
-        .min(1, 'End date cannot be prior to start date'),
-    })
-  )
+
   useEffect(() => {
     const getGrantMints = async () => {
       const clientProgramId = client!.program.programId
@@ -286,8 +309,8 @@ const Grant = ({
     if (client) {
       getGrantMints()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [client])
+  }, [client, realm])
+
   const isNotVested =
     form.lockupKind.value !== 'monthly' && form.lockupKind.value !== 'daily'
   return (

@@ -90,7 +90,6 @@ const AddServiceToDID = ({
       additionalSerializedInstructions,
       isValid,
       governance: form!.governedAccount?.governance,
-      chunkSplitByDefault: true,
     }
   }
   useEffect(() => {

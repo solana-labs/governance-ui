@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAsync } from 'react-async-hook'
 import { BN } from '@coral-xyz/anchor'
 import {
@@ -101,6 +101,21 @@ export const LockTokensAccount: React.FC<{
     s.state.amountLocked,
     s.getPositions,
   ])
+
+  const sortedPositions = useMemo(
+    () =>
+      positions.sort((a, b) => {
+        if (a.hasGenesisMultiplier || b.hasGenesisMultiplier) {
+          if (b.hasGenesisMultiplier) {
+            return a.amountDepositedNative.gt(b.amountDepositedNative) ? 0 : -1
+          }
+          return -1
+        }
+
+        return a.amountDepositedNative.gt(b.amountDepositedNative) ? -1 : 0
+      }),
+    [positions]
+  )
 
   useEffect(() => {
     if (subDaosError) {
@@ -323,23 +338,15 @@ export const LockTokensAccount: React.FC<{
               }`}
             >
               {!loading &&
-                positions
-                  .sort((a, b) =>
-                    a.hasGenesisMultiplier
-                      ? b.hasGenesisMultiplier
-                        ? 0
-                        : -1
-                      : 1
-                  )
-                  .map((pos, idx) => (
-                    <PositionCard
-                      key={idx}
-                      position={pos}
-                      subDaos={subDaos}
-                      tokenOwnerRecordPk={tokenOwnerRecordPk ?? null}
-                      isOwner={isSameWallet}
-                    />
-                  ))}
+                sortedPositions.map((pos, idx) => (
+                  <PositionCard
+                    key={idx}
+                    position={pos}
+                    subDaos={subDaos}
+                    tokenOwnerRecordPk={tokenOwnerRecordPk ?? null}
+                    isOwner={isSameWallet}
+                  />
+                ))}
               {isSameWallet && (
                 <div className="border border-fgd-4 flex flex-col items-center justify-center p-6 rounded-lg">
                   <LightningBoltIcon className="h-8 mb-2 text-primary-light w-8" />

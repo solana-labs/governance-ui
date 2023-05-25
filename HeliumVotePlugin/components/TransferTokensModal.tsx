@@ -12,7 +12,7 @@ import { useSolanaUnixNow } from '@hooks/useSolanaUnixNow'
 import { BN } from '@coral-xyz/anchor'
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 
-export interface TransferTokensModalProps {
+interface TransferTokensModalProps {
   isOpen: boolean
   positions: PositionWithMeta[]
   maxTransferAmount: number

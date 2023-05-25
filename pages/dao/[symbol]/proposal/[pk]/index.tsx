@@ -3,9 +3,9 @@ import remarkGfm from 'remark-gfm'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 import { useProposalGovernanceQuery } from 'hooks/useProposal'
 import ProposalStateBadge from '@components/ProposalStateBadge'
-import { InstructionPanel } from 'components/instructions/instructionPanel'
+import { TransactionPanel } from '@components/instructions/TransactionPanel'
 import DiscussionPanel from 'components/chat/DiscussionPanel'
-import VotePanel from '@components/VotePanel/VotePanel'
+import VotePanel from '@components/VotePanel'
 import { ApprovalProgress, VetoProgress } from '@components/QuorumProgress'
 import useRealm from 'hooks/useRealm'
 import useProposalVotes from 'hooks/useProposalVotes'
@@ -35,6 +35,7 @@ const Proposal = () => {
   const proposal = useRouteProposalQuery().data?.result
   const governance = useProposalGovernanceQuery().data?.result
   const descriptionLink = proposal?.account.descriptionLink
+  const allowDiscussion = realmInfo?.allowDiscussion ?? true
 
   const [description, setDescription] = useState('')
   const voteData = useProposalVotes(proposal?.account)
@@ -117,8 +118,8 @@ const Proposal = () => {
               </div>
             )}
             <ProposalWarnings />
-            <InstructionPanel />
-            {isTwoCol && <DiscussionPanel />}
+            <TransactionPanel />
+            {isTwoCol && allowDiscussion && <DiscussionPanel />}
           </>
         ) : (
           <>
@@ -197,7 +198,7 @@ const Proposal = () => {
           <ProposalExecutionCard />
         )}
         <ProposalActionsPanel />
-        {!isTwoCol && proposal && (
+        {!isTwoCol && proposal && allowDiscussion && (
           <div className="bg-bkg-2 rounded-lg p-4 md:p-6 ">
             <DiscussionPanel />
           </div>

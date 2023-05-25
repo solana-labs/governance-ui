@@ -159,6 +159,9 @@ export async function castVote(
     transaction.add(...instructions)
 
     await sendTransaction({ transaction, wallet, connection, signers })
+    if (runAfterConfirmation) {
+      runAfterConfirmation()
+    }
   }
 
   // we need to chunk instructions
@@ -200,9 +203,11 @@ export async function castVote(
       wallet,
       transactionInstructions: ixsChunks,
       callbacks: {
-        afterFirstBatchSign: () => (ixsChunks.length > 2 ? null : null),
-        afterAllTxConfirmed: () =>
-          runAfterConfirmation ? runAfterConfirmation() : null,
+        afterAllTxConfirmed: () => {
+          if (runAfterConfirmation) {
+            runAfterConfirmation()
+          }
+        },
       },
     })
   }

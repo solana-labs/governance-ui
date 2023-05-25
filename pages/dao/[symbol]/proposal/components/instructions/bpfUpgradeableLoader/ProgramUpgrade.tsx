@@ -66,9 +66,9 @@ const ProgramUpgrade = ({
         : wallet.publicKey
 
       const upgradeIx = await createUpgradeInstruction(
-        form.governedAccount.governance.account.governedAccount,
+        form.governedAccount.pubkey,
         new PublicKey(form.bufferAddress),
-        form.governedAccount.governance.pubkey,
+        form.governedAccount.extensions.program!.authority!,
         bufferSpillAddress
       )
       serializedInstruction = serializeInstructionToBase64(upgradeIx)
@@ -197,7 +197,7 @@ const ProgramUpgrade = ({
       />
 
       <ProgramUpgradeInfo
-        governancePk={form.governedAccount?.governance?.pubkey}
+        authority={form.governedAccount?.extensions.program?.authority}
       ></ProgramUpgradeInfo>
 
       <Input

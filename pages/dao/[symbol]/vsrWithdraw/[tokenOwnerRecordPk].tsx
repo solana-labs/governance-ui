@@ -4,7 +4,7 @@ import LockTokensAccountWithdraw from 'VoteStakeRegistry/components/Account/Lock
 const account = () => {
   // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const router = useRouter()
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
+
   const tokenOwnerRecordPk = router?.query?.tokenOwnerRecordPk
 
   const getAccountView = () => {

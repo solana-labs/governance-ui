@@ -79,7 +79,6 @@ const RemoveKeyFromDID = ({
       additionalSerializedInstructions,
       isValid,
       governance: form!.governedAccount?.governance,
-      chunkSplitByDefault: true,
     }
   }
   useEffect(() => {

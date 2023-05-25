@@ -40,7 +40,7 @@ import queryClient from '@hooks/queries/queryClient'
 import { tokenAccountQueryKeys } from '@hooks/queries/tokenAccount'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
-export interface PositionCardProps {
+interface PositionCardProps {
   subDaos?: SubDaoWithMeta[]
   position: PositionWithMeta
   tokenOwnerRecordPk: PublicKey | null

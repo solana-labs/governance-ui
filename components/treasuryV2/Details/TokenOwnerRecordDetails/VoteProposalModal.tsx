@@ -130,7 +130,6 @@ export default function VoteProposalModal({
           data: getInstructionDataFromBase64(serialized),
           holdUpTime: currentGovernance.account.config.minInstructionHoldUpTime,
           prerequisiteInstructions: [],
-          shouldSplitIntoSeparateTxs: true,
         }
         instructionsData.push(data)
       })

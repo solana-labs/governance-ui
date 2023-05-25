@@ -220,7 +220,6 @@ const PerpCreate = ({
     const obj: UiInstruction = {
       prerequisiteInstructions: prerequisiteInstructions,
       prerequisiteInstructionsSigners: prerequisiteInstructionsSigners,
-      shouldSplitIntoSeparateTxs: true,
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
@@ -256,11 +255,11 @@ const PerpCreate = ({
       !mangoGroup || mangoGroup?.perpMarketsMapByMarketIndex.size === 0
         ? 0
         : Math.max(...[...mangoGroup!.perpMarketsMapByMarketIndex.keys()]) + 1
-    setForm({
-      ...form,
+    setForm((prevForm) => ({
+      ...prevForm,
       perpMarketIndex: perpMarketIndex,
-    })
-  }, [mangoGroup?.perpMarketsMapByMarketIndex.size])
+    }))
+  }, [mangoGroup])
 
   const inputs: InstructionInput[] = [
     {
