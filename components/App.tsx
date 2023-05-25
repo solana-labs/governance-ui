@@ -79,9 +79,19 @@ export function App(props: Props) {
     [cluster]
   )
 
+  const supportedWallets = useMemo(
+    () =>
+      detectEmbeddedInSquadsIframe()
+        ? [new SquadsEmbeddedWalletAdapter()]
+        : WALLET_PROVIDERS.map((provider) => provider.adapter),
+    []
+  )
+
   return (
     <ConnectionProvider endpoint={endpoint}>
-      <AppContents {...props} />
+      <WalletProvider wallets={supportedWallets}>
+        <AppContents {...props} />{' '}
+      </WalletProvider>
     </ConnectionProvider>
   )
 }
@@ -184,14 +194,6 @@ export function AppContents(props: Props) {
     updateSerumGovAccounts(cluster as string | undefined)
   }, [cluster, updateSerumGovAccounts])
 
-  const supportedWallets = useMemo(
-    () =>
-      detectEmbeddedInSquadsIframe()
-        ? [new SquadsEmbeddedWalletAdapter()]
-        : WALLET_PROVIDERS.map((provider) => provider.adapter),
-    []
-  )
-
   return (
     <div className="relative bg-bkg-1 text-fgd-1">
       <Head>
@@ -284,15 +286,13 @@ export function AppContents(props: Props) {
       <ErrorBoundary>
         <ThemeProvider defaultTheme="Dark">
           <WalletIdentityProvider appName={'Realms'}>
-            <WalletProvider wallets={supportedWallets}>
-              <GatewayProvider>
-                <NavBar />
-                <Notifications />
-                <TransactionLoader></TransactionLoader>
-                <NftVotingCountingModal />
-                <PageBodyContainer>{props.children}</PageBodyContainer>
-              </GatewayProvider>
-            </WalletProvider>
+            <GatewayProvider>
+              <NavBar />
+              <Notifications />
+              <TransactionLoader></TransactionLoader>
+              <NftVotingCountingModal />
+              <PageBodyContainer>{props.children}</PageBodyContainer>
+            </GatewayProvider>
           </WalletIdentityProvider>
         </ThemeProvider>
       </ErrorBoundary>

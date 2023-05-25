@@ -16,6 +16,7 @@ import {
   WalletAdapterNetwork,
   WalletReadyState,
 } from '@solana/wallet-adapter-base'
+import { Wallet } from '@solana/wallet-adapter-react'
 
 const BACKPACK_PROVIDER = {
   name: 'Backpack',
@@ -114,7 +115,7 @@ export const DEFAULT_PROVIDER =
 
 export const getWalletProviderByName = (
   nameOrNull: string | null | undefined,
-  wallets?
+  wallets: Wallet[]
 ) => {
   if (wallets) {
     return (
