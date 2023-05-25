@@ -48,7 +48,7 @@ const WithDrawCommunityTokens = () => {
   const maxVoterWeight = useMaxVoteRecord()?.pubkey || undefined
   const depositRecord = deposits.find(
     (x) =>
-      x.mint.publicKey.toBase58() === realm!.account.communityMint.toBase58() &&
+      x.mint.publicKey.toBase58() === realm?.account.communityMint.toBase58() &&
       x.lockup.kind.none
   )
   const withdrawAllTokens = async function () {

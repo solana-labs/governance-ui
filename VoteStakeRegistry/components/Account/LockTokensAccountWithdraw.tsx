@@ -242,31 +242,33 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
       : undefined
 
   useEffect(() => {
-    const getTokenOwnerRecord = async () => {
-      const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
-        realm!.owner,
-        realm!.pubkey,
-        defaultMintOwnerRecordMint!,
-        wallet!.publicKey!
-      )
-      setIsOwnerOfDeposits(
-        tokenOwnerRecordAddress.toBase58() === tokenOwnerRecordPk
-      )
-    }
+    const walletPubkey = wallet?.publicKey
     if (
       realm?.owner &&
-      wallet?.connected &&
+      walletPubkey &&
+      walletPubkey !== null &&
       realm.pubkey &&
       defaultMintOwnerRecordMint
     ) {
+      const getTokenOwnerRecord = async () => {
+        const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
+          realm.owner,
+          realm.pubkey,
+          defaultMintOwnerRecordMint,
+          walletPubkey
+        )
+        setIsOwnerOfDeposits(
+          tokenOwnerRecordAddress.toBase58() === tokenOwnerRecordPk
+        )
+      }
       getTokenOwnerRecord()
     }
   }, [
-    wallet?.connected,
-    tokenOwnerRecordPk,
     defaultMintOwnerRecordMint,
-    realm,
-    wallet,
+    realm?.owner,
+    realm?.pubkey,
+    tokenOwnerRecordPk,
+    wallet?.publicKey,
   ])
 
   const hasLockedTokens = useMemo(() => {

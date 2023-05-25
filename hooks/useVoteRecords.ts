@@ -87,11 +87,10 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
   }, [context, governingTokenMintPk, proposal, realm])
 
   useEffect(() => {
-    if (realm) {
-      setContext(getRpcContext())
+    if (getRpcContext) {
+      setContext(getRpcContext() ?? null)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [realm])
+  }, [getRpcContext])
   const topVoters = useMemo(() => {
     if (realm && proposal && mint) {
       return buildTopVoters(
@@ -114,18 +113,21 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
     undecidedDepositByVoteRecord,
   ])
 
-  //VSR only
-  const handleGetVsrVotingPowers = async (walletsPks: PublicKey[]) => {
-    const votingPerWallet = await getLockTokensVotingPowerPerWallet(
-      walletsPks,
-      realm!,
-      client!,
-      connection,
-      mintsUsedInRealm
-    )
-    setUndecidedDepositByVoteRecord(votingPerWallet)
-  }
   useEffect(() => {
+    //VSR only
+    const handleGetVsrVotingPowers = async (walletsPks: PublicKey[]) => {
+      if (!realm || !client) throw new Error()
+
+      const votingPerWallet = await getLockTokensVotingPowerPerWallet(
+        walletsPks,
+        realm,
+        client,
+        connection,
+        mintsUsedInRealm
+      )
+      setUndecidedDepositByVoteRecord(votingPerWallet)
+    }
+
     if (
       vsrMode === 'default' &&
       !Object.keys(undecidedDepositByVoteRecord).length
@@ -140,18 +142,24 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
                 tokenOwnerRecord.account.governingTokenOwner.toBase58()
             )
       )
-      if (undecidedData.length && mintsUsedInRealm.length) {
+      if (undecidedData.length && mintsUsedInRealm.length && realm && client) {
         handleGetVsrVotingPowers(
           undecidedData.map((x) => x.account.governingTokenOwner)
         )
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
     tokenOwnerRecords.length,
     voteRecords.length,
     vsrMode,
     mintsUsedInRealm.length,
+    undecidedDepositByVoteRecord,
+    tokenOwnerRecords,
+    voteRecords,
+    realm,
+    client,
+    connection,
+    mintsUsedInRealm,
   ])
   ///////
 

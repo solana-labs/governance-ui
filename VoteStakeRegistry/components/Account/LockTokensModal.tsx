@@ -137,7 +137,7 @@ const LockTokensModal = ({
 
   const depositRecord = deposits.find(
     (x) =>
-      x.mint.publicKey.toBase58() === realm!.account.communityMint.toBase58() &&
+      x.mint.publicKey.toBase58() === realm?.account.communityMint.toBase58() &&
       x.lockup.kind.none
   )
   const [lockupPeriodDays, setLockupPeriodDays] = useState<number>(0)

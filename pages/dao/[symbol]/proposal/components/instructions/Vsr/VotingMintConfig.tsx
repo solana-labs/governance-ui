@@ -125,9 +125,9 @@ const VotingMintConfig = ({
     }
 
     const { registrar } = await getRegistrarPDA(
-      realm!.pubkey,
-      realm!.account.communityMint,
-      vsrClient!.program.programId!
+      realm.pubkey,
+      realm.account.communityMint,
+      vsrClient.program.programId
     )
 
     const mint = new PublicKey(form.mint)

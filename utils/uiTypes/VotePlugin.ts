@@ -392,7 +392,7 @@ export class VotingClient {
       instructions.push(instruction)
 
       const { voterWeightPk } = await this._withHandleGatewayVoterWeight(
-        realm!,
+        realm,
         walletPk,
         clientProgramId,
         instructions
@@ -474,14 +474,14 @@ export class VotingClient {
       const { registrar } = await getPluginRegistrarPDA(
         realm.pubkey,
         realm.account.communityMint,
-        this.client!.program.programId
+        this.client.program.programId
       )
 
       const {
         voterWeightPk,
         maxVoterWeightRecord,
       } = await this._withHandleNftVoterWeight(
-        realm!,
+        realm,
         walletPk,
         clientProgramId,
         instructions

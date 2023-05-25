@@ -94,7 +94,7 @@ export default function useMembers() {
         const ata = await Token.getAssociatedTokenAddress(
           ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
           TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-          realm!.account.communityMint, // mint
+          realm.account.communityMint, // mint
           new PublicKey(walletAddress), // owner
           true
         )

@@ -74,19 +74,19 @@ const LockPluginTokenBalanceCard = ({
       : undefined
 
   useEffect(() => {
-    const getTokenOwnerRecord = async () => {
-      const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
-        realm!.owner,
-        realm!.pubkey,
-        defaultMint!,
-        walletPublicKey!
-      )
-      setTokenOwnerRecordPk(tokenOwnerRecordAddress.toBase58())
-    }
-    if (realm?.owner && connected && defaultMint) {
+    if (realm?.owner && walletPublicKey && defaultMint) {
+      const getTokenOwnerRecord = async () => {
+        const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
+          realm.owner,
+          realm.pubkey,
+          defaultMint,
+          walletPublicKey
+        )
+        setTokenOwnerRecordPk(tokenOwnerRecordAddress.toBase58())
+      }
       getTokenOwnerRecord()
     }
-  }, [defaultMint, realm, connected, walletPublicKey])
+  }, [defaultMint, realm, walletPublicKey])
 
   const hasLoaded = mint || councilMint
   return (
@@ -185,7 +185,7 @@ const TokenDepositLock = ({
 
   const depositRecord = deposits.find(
     (x) =>
-      x.mint.publicKey.toBase58() === realm!.account.communityMint.toBase58() &&
+      x.mint.publicKey.toBase58() === realm?.account.communityMint.toBase58() &&
       x.lockup.kind.none
   )
 

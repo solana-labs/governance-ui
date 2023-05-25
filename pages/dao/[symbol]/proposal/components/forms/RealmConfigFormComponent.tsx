@@ -85,8 +85,9 @@ const RealmConfigFormComponent = ({
       .toNumber()
 
   const getMintSupplyFraction = () => {
-    const communityMintMaxVoteWeightSource = realm!.account.config
-      .communityMintMaxVoteWeightSource
+    if (!realm) throw new Error()
+    const communityMintMaxVoteWeightSource =
+      realm.account.config.communityMintMaxVoteWeightSource
 
     return new BigNumber(communityMintMaxVoteWeightSource.value.toString())
       .shiftedBy(-MintMaxVoteWeightSource.SUPPLY_FRACTION_DECIMALS)

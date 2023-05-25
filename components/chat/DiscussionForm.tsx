@@ -40,11 +40,19 @@ const DiscussionForm = () => {
 
   const submitComment = async () => {
     setSubmitting(true)
+    if (
+      !realm ||
+      !proposal ||
+      !commenterVoterTokenRecord ||
+      !wallet ||
+      !realmInfo
+    )
+      throw new Error()
 
     const rpcContext = new RpcContext(
-      proposal!.owner,
-      getProgramVersionForRealm(realmInfo!),
-      wallet!,
+      proposal.owner,
+      getProgramVersionForRealm(realmInfo),
+      wallet,
       connection.current,
       connection.endpoint
     )
@@ -57,9 +65,9 @@ const DiscussionForm = () => {
     try {
       await postChatMessage(
         rpcContext,
-        realm!,
-        proposal!,
-        commenterVoterTokenRecord!,
+        realm,
+        proposal,
+        commenterVoterTokenRecord,
         msg,
         undefined,
         client

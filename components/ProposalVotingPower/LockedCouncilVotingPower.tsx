@@ -26,7 +26,7 @@ export default function LockedCouncilVotingPower(props: Props) {
   const depositRecord = deposits.find(
     (deposit) =>
       deposit.mint.publicKey.toBase58() ===
-        realm!.account.communityMint.toBase58() && deposit.lockup.kind.none
+        realm?.account.communityMint.toBase58() && deposit.lockup.kind.none
   )
 
   const depositMint = realm?.account.config.councilMint

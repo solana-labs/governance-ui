@@ -407,18 +407,18 @@ export const getLockTokensVotingPowerPerWallet = async (
   mintsUsedInRealm: TokenProgramAccount<MintInfo>[]
 ) => {
   const { registrar } = await getRegistrarPDA(
-    realm!.pubkey,
-    realm!.account.communityMint,
-    client!.program.programId
+    realm.pubkey,
+    realm.account.communityMint,
+    client.program.programId
   )
-  const existingRegistrar = await tryGetRegistrar(registrar, client!)
+  const existingRegistrar = await tryGetRegistrar(registrar, client)
   const latestBlockhash = await connection.current.getLatestBlockhash()
   const votingPowers = await getVotingPowersForWallets({
-    client: client!,
+    client: client,
     registrarPk: registrar,
     existingRegistrar: existingRegistrar!,
     walletPks: walletsPks,
-    communityMint: realm!.account.communityMint,
+    communityMint: realm.account.communityMint,
     connection: connection.current,
     mintsUsedInRealm,
     latestBlockhash,

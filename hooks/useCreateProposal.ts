@@ -49,6 +49,7 @@ export default function useCreateProposal() {
       governance.pubkey
     )
     if (!selectedGovernance) throw new Error('governance not found')
+    if (!realm) throw new Error()
 
     const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
       selectedGovernance.account.config,
@@ -58,24 +59,25 @@ export default function useCreateProposal() {
     const defaultProposalMint =
       !mint?.supply.isZero() ||
       config?.account.communityTokenConfig.voterWeightAddin
-        ? realm!.account.communityMint
+        ? realm?.account.communityMint
         : !councilMint?.supply.isZero()
-        ? realm!.account.config.councilMint
+        ? realm?.account.config.councilMint
         : undefined
 
     const proposalMint =
       canChooseWhoVote && voteByCouncil
-        ? realm!.account.config.councilMint
+        ? realm?.account.config.councilMint
         : defaultProposalMint
 
     if (!proposalMint) {
       throw new Error('There is no suitable governing token for the proposal')
     }
     const rpcContext = getRpcContext()
+    if (!rpcContext) throw new Error()
 
     const proposalAddress = await createProposal(
       rpcContext,
-      realm!,
+      realm,
       governance.pubkey,
       ownTokenRecord!,
       title,

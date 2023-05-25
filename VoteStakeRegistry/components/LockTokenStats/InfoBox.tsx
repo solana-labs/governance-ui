@@ -13,16 +13,14 @@ const InfoBox = ({ title, val, tooltip = '', className = '' }) => {
   })
   const fmtAmount = (val) => {
     return mint
-      ? formatter.format(getMintDecimalAmount(mint!, val).toNumber())
+      ? formatter.format(getMintDecimalAmount(mint, val).toNumber())
       : '0'
   }
   const price = realm
-    ? tokenPriceService.getUSDTokenPrice(
-        realm!.account.communityMint.toBase58()
-      )
+    ? tokenPriceService.getUSDTokenPrice(realm.account.communityMint.toBase58())
     : 0
   const totalPrice = mint
-    ? formatter.format(getMintDecimalAmount(mint!, val).toNumber() * price)
+    ? formatter.format(getMintDecimalAmount(mint, val).toNumber() * price)
     : ''
   return (
     <div

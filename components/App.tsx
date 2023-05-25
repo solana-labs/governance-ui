@@ -154,10 +154,10 @@ export function AppContents(props: Props) {
       vsrClient
     ) {
       getOwnedDeposits({
-        realmPk: realm!.pubkey,
-        communityMintPk: realm!.account.communityMint,
+        realmPk: realm.pubkey,
+        communityMintPk: realm.account.communityMint,
         walletPk: ownTokenRecord!.account!.governingTokenOwner,
-        client: vsrClient!,
+        client: vsrClient,
         connection: connection.current,
       })
     } else if (!wallet?.connected || !ownTokenRecord) {

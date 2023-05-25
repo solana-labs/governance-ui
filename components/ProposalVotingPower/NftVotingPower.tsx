@@ -50,40 +50,42 @@ export default function NftVotingPower(props: Props) {
   const amount = new BigNumber(votingPower.toString())
 
   const handleRegister = async () => {
+    if (!realm || !wallet?.publicKey || !client.client || !realmInfo)
+      throw new Error()
     const instructions: TransactionInstruction[] = []
     const { voterWeightPk } = await getVoterWeightRecord(
-      realm!.pubkey,
-      realm!.account.communityMint,
-      wallet!.publicKey!,
-      client.client!.program.programId
+      realm.pubkey,
+      realm.account.communityMint,
+      wallet.publicKey,
+      client.client.program.programId
     )
     const createVoterWeightRecordIx = await (client.client as NftVoterClient).program.methods
-      .createVoterWeightRecord(wallet!.publicKey!)
+      .createVoterWeightRecord(wallet.publicKey)
       .accounts({
         voterWeightRecord: voterWeightPk,
-        governanceProgramId: realm!.owner,
-        realm: realm!.pubkey,
-        realmGoverningTokenMint: realm!.account.communityMint,
-        payer: wallet!.publicKey!,
+        governanceProgramId: realm.owner,
+        realm: realm.pubkey,
+        realmGoverningTokenMint: realm.account.communityMint,
+        payer: wallet.publicKey,
         systemProgram: SYSTEM_PROGRAM_ID,
       })
       .instruction()
     instructions.push(createVoterWeightRecordIx)
     await withCreateTokenOwnerRecord(
       instructions,
-      realm!.owner!,
-      realmInfo?.programVersion!,
-      realm!.pubkey,
-      wallet!.publicKey!,
-      realm!.account.communityMint,
-      wallet!.publicKey!
+      realm.owner,
+      realmInfo.programVersion!,
+      realm.pubkey,
+      wallet.publicKey,
+      realm.account.communityMint,
+      wallet.publicKey
     )
     const transaction = new Transaction()
     transaction.add(...instructions)
 
     await sendTransaction({
       transaction: transaction,
-      wallet: wallet!,
+      wallet: wallet,
       connection: connection.current,
       signers: [],
       sendingMessage: `Registering`,

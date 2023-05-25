@@ -40,6 +40,7 @@ const CreateAta = ({
     TokenInfoWithoutDecimals | undefined
   >()
   const handleCreate = async () => {
+    if (!realm) throw new Error()
     const mintPk = validatedTypedMint
       ? new PublicKey(validatedTypedMint)
       : new PublicKey(foundByNameToken!.address)
@@ -57,7 +58,7 @@ const CreateAta = ({
         wallet,
         mintPk,
         owner,
-        wallet!.publicKey!
+        wallet.publicKey!
       )
     } else {
       const instructions: TransactionInstruction[] = []
@@ -82,12 +83,12 @@ const CreateAta = ({
 
       await sendTransaction({
         transaction,
-        wallet: wallet!,
-        connection: connection.current!,
+        wallet: wallet,
+        connection: connection.current,
         signers,
       })
     }
-    await refetchGovernanceAccounts(connection, realm!, governancePk)
+    await refetchGovernanceAccounts(connection, realm, governancePk)
     setIsLoading(false)
     createCallback()
   }
