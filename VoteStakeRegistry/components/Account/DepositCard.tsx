@@ -31,7 +31,6 @@ import { useRealmQuery } from '@hooks/queries/realm'
 import { useConnection } from '@solana/wallet-adapter-react'
 import queryClient from '@hooks/queries/queryClient'
 import { tokenAccountQueryKeys } from '@hooks/queries/tokenAccount'
-import { voteRecordQueryKeys } from '@hooks/queries/voteRecord'
 
 const DepositCard = ({
   deposit,
