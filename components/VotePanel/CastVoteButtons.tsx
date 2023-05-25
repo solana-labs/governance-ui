@@ -63,7 +63,7 @@ export const CastVoteButtons = () => {
   const [showVoteModal, setShowVoteModal] = useState(false)
   const [vote, setVote] = useState<'yes' | 'no' | null>(null)
   const realmInfo = useSelectedRealmInfo()
-  const allowDiscussion = realmInfo?.allowDiscussion
+  const allowDiscussion = realmInfo?.allowDiscussion ?? true
   const { submitting, submitVote } = useSubmitVote()
   const votingPop = useVotingPop()
   const voterTokenRecord = useVoterTokenRecord()

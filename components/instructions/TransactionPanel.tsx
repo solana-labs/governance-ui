@@ -17,8 +17,6 @@ import { useRouteProposalQuery } from '@hooks/queries/proposal'
 import { useSelectedProposalTransactions } from '@hooks/queries/proposalTransaction'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
-export function InstructionPanel() {
-
 export function TransactionPanel() {
   const proposal = useRouteProposalQuery().data?.result
   const { data: transactions } = useSelectedProposalTransactions()

@@ -3,8 +3,8 @@ import { Connection, PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
 import { getNetworkFromEndpoint } from '@utils/connection'
 import asFindable from '@utils/queries/asFindable'
-import useWalletStore from 'stores/useWalletStore'
 import queryClient from './queryClient'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export const parsedAccountInfoQueryKeys = {
   all: (cluster: EndpointTypes) => [cluster, 'ParsedAccountInfo'],
@@ -15,7 +15,7 @@ export const parsedAccountInfoQueryKeys = {
 }
 
 export const useParsedAccountInfoQuery = (pubkey?: PublicKey) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const enabled = pubkey !== undefined
   const query = useQuery({

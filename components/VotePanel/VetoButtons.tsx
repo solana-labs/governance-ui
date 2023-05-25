@@ -103,7 +103,7 @@ const useCanVeto = ():
 
 const VetoButtons = () => {
   const realmInfo = useSelectedRealmInfo()
-  const allowDiscussion = realmInfo?.allowDiscussion
+  const allowDiscussion = realmInfo?.allowDiscussion ?? true
   const vetoable = useIsVetoable()
   const vetoingPop = useVetoingPop()
   const canVeto = useCanVeto()

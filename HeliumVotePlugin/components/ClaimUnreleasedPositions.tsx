@@ -1,6 +1,4 @@
-import React, { useEffect, useState } from 'react'
-import useRealm from '@hooks/useRealm'
-import useWalletStore from 'stores/useWalletStore'
+import { useEffect, useState } from 'react'
 import { TransactionInstruction } from '@solana/web3.js'
 import { SecondaryButton } from '@components/Button'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
@@ -18,7 +16,10 @@ import {
 } from '@utils/sendTransactions'
 import { ProposalState } from '@solana/spl-governance'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
+import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
+import { useConnection } from '@solana/wallet-adapter-react'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmProposalsQuery } from '@hooks/queries/proposal'
 
 const NFT_SOL_BALANCE = 0.0014616
 
@@ -29,15 +30,14 @@ const ClaimUnreleasedPositions = ({
 }) => {
   const wallet = useWalletOnePointOh()
   const [isLoading, setIsLoading] = useState(false)
-  const { current: connection } = useWalletStore((s) => s.connection)
+  const { connection } = useConnection()
   const [ownVoteRecords, setOwnVoteRecords] = useState<any[]>([])
   const [solToBeClaimed, setSolToBeClaimed] = useState(0)
-  const { realm } = useWalletStore((s) => s.selectedRealm)
+  const realm = useRealmQuery().data?.result
   const votingPlugin = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
-
-  const { proposals } = useRealm()
+  const { data: proposalsArray } = useRealmProposalsQuery()
   const { data: tokenOwnerRecord } = useAddressQuery_CommunityTokenOwner()
   const isHeliumVsr = votingPlugin.client instanceof HeliumVsrClient
 
@@ -62,12 +62,17 @@ const ClaimUnreleasedPositions = ({
 
     const voteRecords = ownVoteRecords
     for (const i of voteRecords) {
-      const proposal = proposals[i.account.proposal.toBase58()]
+      const proposal = proposalsArray?.find((x) =>
+        x.pubkey.equals(i.account.proposal)
+      )
       const [posKey] = positionKey(
         i.account.nftMint,
         votingPlugin.client!.program.programId
       )
-      if (proposal.account.state === ProposalState.Voting) {
+      if (
+        proposal === undefined ||
+        proposal.account.state === ProposalState.Voting
+      ) {
         // ignore this one as it's still in voting
         continue
       }
@@ -126,16 +131,18 @@ const ClaimUnreleasedPositions = ({
         },
       ])) || []
 
-    const voteRecordsFiltered = voteRecords.filter(
-      (x) =>
-        proposals[x.account.proposal.toBase58()] &&
-        proposals[
-          x.account.proposal.toBase58()
-        ].account.governingTokenMint.toBase58() ===
+    const voteRecordsFiltered = voteRecords.filter((x) => {
+      const proposal = proposalsArray?.find((p) =>
+        p.pubkey.equals(x.account.proposal)
+      )
+
+      return (
+        proposal &&
+        proposal.account.governingTokenMint.toBase58() ===
           realm?.account.communityMint.toBase58() &&
-        proposals[x.account.proposal.toBase58()].account.state !==
-          ProposalState.Voting
-    )
+        proposal.account.state !== ProposalState.Voting
+      )
+    })
     setOwnVoteRecords(voteRecordsFiltered)
     setSolToBeClaimed(voteRecordsFiltered.length * NFT_SOL_BALANCE)
   }

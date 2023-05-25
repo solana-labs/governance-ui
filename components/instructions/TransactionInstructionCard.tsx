@@ -8,12 +8,13 @@ import {
   WSOL_MINT,
   getInstructionDescriptor,
 } from './tools'
-import useWalletStore from 'stores/useWalletStore'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import axios from 'axios'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { fetchNFTbyMint } from '@hooks/queries/nft'
 import { fetchTokenAccountByPubkey } from '@hooks/queries/tokenAccount'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 const TransactionInstructionCard = ({
   instructionData,
@@ -22,8 +23,8 @@ const TransactionInstructionCard = ({
   instructionData: InstructionData
   index: number
 }) => {
-  const connection = useWalletStore((s) => s.connection)
-  const realm = useWalletStore((s) => s.selectedRealm.realm)
+  const connection = useLegacyConnectionContext()
+  const realm = useRealmQuery().data?.result
   const {
     nftsGovernedTokenAccounts,
     governedTokenAccountsWithoutNfts,
@@ -42,7 +43,7 @@ const TransactionInstructionCard = ({
       realm
     )
     setDescriptor(desc)
-  }, [instructionData])
+  }, [connection, instructionData, realm])
 
   const getAmountImg = useCallback(async () => {
     const sourcePk = instructionData.accounts[0].pubkey
