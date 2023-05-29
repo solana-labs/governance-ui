@@ -197,7 +197,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
 
   const refetchState = async () => {
     queryClient.invalidateQueries({
-      queryKey: tokenAccountQueryKeys.all(connection.cluster),
+      queryKey: tokenAccountQueryKeys.all(connection.endpoint),
     })
     await getPositions({
       votingClient: currentClient,

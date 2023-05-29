@@ -15,6 +15,7 @@ import {
 } from './queries/mintInfo'
 import useLegacyConnectionContext from './useLegacyConnectionContext'
 import queryClient from './queries/queryClient'
+import { proposalQueryKeys } from './queries/proposal'
 
 export default function useCreateProposal() {
   const client = useVotePluginsClientStore(
@@ -90,7 +91,7 @@ export default function useCreateProposal() {
       client
     )
     queryClient.invalidateQueries({
-      queryKey: ['Proposal'],
+      queryKey: proposalQueryKeys.all(connection.endpoint),
     })
     return proposalAddress
   }

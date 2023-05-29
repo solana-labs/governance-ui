@@ -13,5 +13,9 @@ export const invalidateInstructionAccounts = async (
     ix.keys
       .filter((x) => x.isWritable)
       .map((x) => x.pubkey)
-      .map((x) => queryClient.invalidateQueries([x]))
+      .map((x) =>
+        queryClient.invalidateQueries({
+          predicate: (q) => q.queryKey?.includes(x.toString()),
+        })
+      )
   )
