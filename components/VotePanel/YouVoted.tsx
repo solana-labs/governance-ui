@@ -21,7 +21,10 @@ import { useHasVoteTimeExpired } from '@hooks/useHasVoteTimeExpired'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
-import { useRouteProposalQuery } from '@hooks/queries/proposal'
+import {
+  proposalQueryKeys,
+  useRouteProposalQuery,
+} from '@hooks/queries/proposal'
 import { useProposalGovernanceQuery } from '@hooks/useProposal'
 import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
@@ -122,7 +125,7 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
         client
       )
       queryClient.invalidateQueries({
-        queryKey: ['Proposal'],
+        queryKey: proposalQueryKeys.all(connection.endpoint),
       })
     } catch (ex) {
       console.error("Can't relinquish vote", ex)

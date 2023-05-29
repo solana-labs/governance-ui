@@ -30,6 +30,7 @@ import { getFormattedStringFromDays, SECS_PER_DAY } from '@utils/dateTools'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import queryClient from '@hooks/queries/queryClient'
+import { proposalQueryKeys } from '@hooks/queries/proposal'
 
 export enum PlayState {
   Played,
@@ -129,7 +130,7 @@ export function ExecuteInstructionButton({
         preExecutionTransactions
       )
       queryClient.invalidateQueries({
-        queryKey: ['Proposal'],
+        queryKey: proposalQueryKeys.all(connection.endpoint),
       })
     } catch (error) {
       notify({ type: 'error', message: `error executing instruction ${error}` })

@@ -21,7 +21,10 @@ import dayjs from 'dayjs'
 import { diffTime } from './ProposalRemainingVotingTime'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useRouteProposalQuery } from '@hooks/queries/proposal'
+import {
+  proposalQueryKeys,
+  useRouteProposalQuery,
+} from '@hooks/queries/proposal'
 import { useProposalGovernanceQuery } from '@hooks/useProposal'
 import { useTokenOwnerRecordByPubkeyQuery } from '@hooks/queries/tokenOwnerRecord'
 import { useAsync } from 'react-async-hook'
@@ -157,7 +160,7 @@ const ProposalActionsPanel = () => {
         )
       }
       queryClient.invalidateQueries({
-        queryKey: ['Proposal'],
+        queryKey: proposalQueryKeys.all(connection.endpoint),
       })
     } catch (error) {
       notify({
@@ -189,7 +192,7 @@ const ProposalActionsPanel = () => {
         )
       }
       queryClient.invalidateQueries({
-        queryKey: ['Proposal'],
+        queryKey: proposalQueryKeys.all(connection.endpoint),
       })
     } catch (error) {
       notify({
@@ -217,7 +220,7 @@ const ProposalActionsPanel = () => {
         await cancelProposal(rpcContext, realmInfo.realmId, proposal)
       }
       queryClient.invalidateQueries({
-        queryKey: ['Proposal'],
+        queryKey: proposalQueryKeys.all(connection.endpoint),
       })
     } catch (error) {
       notify({

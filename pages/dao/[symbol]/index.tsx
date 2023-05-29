@@ -48,7 +48,10 @@ import {
 } from '@hooks/queries/mintInfo'
 import { useRealmGovernancesQuery } from '@hooks/queries/governance'
 import { useConnection } from '@solana/wallet-adapter-react'
-import { useRealmProposalsQuery } from '@hooks/queries/proposal'
+import {
+  proposalQueryKeys,
+  useRealmProposalsQuery,
+} from '@hooks/queries/proposal'
 import queryClient from '@hooks/queries/queryClient'
 
 const AccountsCompactWrapper = dynamic(
@@ -318,7 +321,7 @@ const REALM = () => {
         )
       )
       queryClient.invalidateQueries({
-        queryKey: ['Proposal'],
+        queryKey: proposalQueryKeys.all(connection.rpcEndpoint),
       })
       toggleMultiVoteMode()
       notify({

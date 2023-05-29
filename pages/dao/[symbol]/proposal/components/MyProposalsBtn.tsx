@@ -43,6 +43,7 @@ import useProgramVersion from '@hooks/useProgramVersion'
 import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
 import { useConnection } from '@solana/wallet-adapter-react'
 import {
+  proposalQueryKeys,
   useRealmProposalsQuery,
 } from '@hooks/queries/proposal'
 import queryClient from '@hooks/queries/queryClient'
@@ -189,7 +190,7 @@ const MyProposalsBn = () => {
         )
       )
       queryClient.invalidateQueries({
-        queryKey: ['Proposal'],
+        queryKey: proposalQueryKeys.all(connection.rpcEndpoint),
       })
     } catch (e) {
       console.log(e)
