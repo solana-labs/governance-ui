@@ -100,8 +100,6 @@ export default function useRealm() {
 
   const delegates = useMembersStore((s) => s.compact.delegates)
 
-  console.log('aa', tokenAccounts)
-
   const realmTokenAccount = useMemo(
     () =>
       realm &&
