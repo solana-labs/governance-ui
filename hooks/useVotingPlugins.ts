@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { getNfts } from '@utils/tokens'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
@@ -290,11 +290,11 @@ export function useVotingPlugins() {
       }
     } */
     if (
-      !currentClient ||
-      currentClient.realm?.pubkey.toBase58() !== realm?.pubkey.toBase58() ||
-      currentClient.walletPk?.toBase58() !== wallet?.publicKey?.toBase58() ||
-      currentClient.walletPk?.toBase58() !==
-        ownTokenRecord?.account?.governingTokenOwner.toBase58()
+      ownTokenRecord?.account !== undefined &&
+      (!currentClient ||
+        currentClient.realm?.pubkey.toBase58() !== realm?.pubkey.toBase58() ||
+        currentClient.walletPk?.toBase58() !==
+          ownTokenRecord.account.governingTokenOwner.toBase58())
     ) {
       handleNftplugin()
       handleGatewayPlugin()
