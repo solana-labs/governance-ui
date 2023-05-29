@@ -344,6 +344,7 @@ export function useVotingPlugins() {
   }, [connection, nftClient, setNftMaxVoterWeight, realm])
 
   const handleGetSwitchboardVoting = useCallback(async () => {
+    console.log('im doing switchboard stuff')
     if (!wallet || !wallet.publicKey || !realm) {
       return
     }
@@ -581,7 +582,8 @@ export function useVotingPlugins() {
       handleMaxVoterWeight()
     } else if (realm) {
       handleGetHeliumVsrVoting()
-      handleGetSwitchboardVoting()
+      // @asktree: guys please dont spam network reqs even if your plugin isnt used
+      // handleGetSwitchboardVoting()
     } else {
       setVotingNfts([], currentClient, nftMintRegistrar)
       setNftMaxVoterWeight(null)
