@@ -11,13 +11,13 @@ import queryClient from './queryClient'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export const proposalQueryKeys = {
-  all: (cluster: string) => [cluster, 'Proposal'],
-  byPubkey: (cluster: string, k: PublicKey) => [
-    ...proposalQueryKeys.all(cluster),
+  all: (endpoint: string) => [endpoint, 'Proposal'],
+  byPubkey: (endpoint: string, k: PublicKey) => [
+    ...proposalQueryKeys.all(endpoint),
     k.toString(),
   ],
-  byRealm: (cluster: string, realm: PublicKey) => [
-    ...proposalQueryKeys.all(cluster),
+  byRealm: (endpoint: string, realm: PublicKey) => [
+    ...proposalQueryKeys.all(endpoint),
     'by Realm (gPA)',
     realm,
   ],
@@ -29,7 +29,7 @@ export const useProposalByPubkeyQuery = (pubkey: PublicKey | undefined) => {
   const enabled = pubkey !== undefined
   const query = useQuery({
     queryKey: enabled
-      ? proposalQueryKeys.byPubkey(connection.cluster, pubkey)
+      ? proposalQueryKeys.byPubkey(connection.endpoint, pubkey)
       : undefined,
     queryFn: async () => {
       if (!enabled) throw new Error()
@@ -62,7 +62,7 @@ export const useRealmProposalsQuery = () => {
   const enabled = realm !== undefined && governances !== undefined
   const query = useQuery({
     queryKey: enabled
-      ? proposalQueryKeys.byRealm(connection.cluster, realm.pubkey)
+      ? proposalQueryKeys.byRealm(connection.endpoint, realm.pubkey)
       : undefined,
     queryFn: async () => {
       if (!enabled) throw new Error()
@@ -77,7 +77,7 @@ export const useRealmProposalsQuery = () => {
 
       results.forEach((x) => {
         queryClient.setQueryData(
-          proposalQueryKeys.byPubkey(connection.cluster, x.pubkey),
+          proposalQueryKeys.byPubkey(connection.endpoint, x.pubkey),
           { found: true, result: x }
         )
       })
