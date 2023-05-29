@@ -8,6 +8,9 @@ import {
   getGovernance,
   getGovernanceAccounts,
   pubkeyFilter,
+  ProgramAccount,
+  VoteThreshold,
+  VoteThresholdType,
 } from '@solana/spl-governance'
 import { useRealmQuery } from './realm'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
@@ -25,6 +28,34 @@ export const governanceQueryKeys = {
   ],
 }
 
+const governanceWithDefaults = (governance: ProgramAccount<Governance>) => {
+  const isGovernanceInNeedForDefaultValues =
+    governance.account.config.councilVoteThreshold.value === 0 &&
+    governance.account.config.councilVoteThreshold.type ===
+      VoteThresholdType.YesVotePercentage
+  return isGovernanceInNeedForDefaultValues
+    ? ({
+        ...governance,
+        account: {
+          ...governance.account,
+          config: {
+            ...governance.account.config,
+            votingCoolOffTime: 0,
+            depositExemptProposalCount: 10,
+            councilVoteThreshold:
+              governance.account.config.communityVoteThreshold,
+            councilVetoVoteThreshold:
+              governance.account.config.communityVoteThreshold,
+            councilVoteTipping: governance.account.config.communityVoteTipping,
+            communityVetoVoteThreshold: new VoteThreshold({
+              type: VoteThresholdType.Disabled,
+            }),
+          },
+        },
+      } as ProgramAccount<Governance>)
+    : governance
+}
+
 // Note: I may need to insert some defaults from undefined fields here? or maybe the sdk does it already (that would make sense)
 export const useGovernanceByPubkeyQuery = (pubkey: PublicKey | undefined) => {
   const connection = useLegacyConnectionContext()
@@ -36,7 +67,9 @@ export const useGovernanceByPubkeyQuery = (pubkey: PublicKey | undefined) => {
       : undefined,
     queryFn: async () => {
       if (!enabled) throw new Error()
-      return asFindable(getGovernance)(connection.current, pubkey)
+      return asFindable(() =>
+        getGovernance(connection.current, pubkey).then(governanceWithDefaults)
+      )()
     },
     enabled,
   })
@@ -59,12 +92,14 @@ export const useRealmGovernancesQuery = () => {
       const filter = pubkeyFilter(1, realm.pubkey)
       if (!filter) throw new Error() // unclear why this would ever happen, probably it just cannot
 
-      const results = await getGovernanceAccounts(
-        connection.current,
-        realm.owner,
-        Governance,
-        [filter]
-      )
+      const results = (
+        await getGovernanceAccounts(
+          connection.current,
+          realm.owner,
+          Governance,
+          [filter]
+        )
+      ).map(governanceWithDefaults)
 
       results.forEach((x) => {
         queryClient.setQueryData(
@@ -88,6 +123,9 @@ export const fetchGovernanceByPubkey = (
   const cluster = getNetworkFromEndpoint(connection.rpcEndpoint)
   return queryClient.fetchQuery({
     queryKey: governanceQueryKeys.byPubkey(cluster, pubkey),
-    queryFn: () => asFindable(getGovernance)(connection, pubkey),
+    queryFn: () =>
+      asFindable(() =>
+        getGovernance(connection, pubkey).then(governanceWithDefaults)
+      )(),
   })
 }
