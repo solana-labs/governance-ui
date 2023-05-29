@@ -316,7 +316,7 @@ export function useVotingPlugins() {
     handleSetVsrRegistrar,
     heliumVsrClient,
     nftClient,
-    ownTokenRecord?.account?.governingTokenOwner,
+    ownTokenRecord?.account,
     pythClient,
     realm,
     vsrClient,
