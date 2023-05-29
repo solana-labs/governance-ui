@@ -20,7 +20,7 @@ export const governanceAccountQueryKeys = {
 export function useGovernanceAccountByPubkeyQuery<T extends GovernanceAccount>(
   kind: new (...args) => T,
   kindLabel: string,
-  pubkey?: PublicKey
+  pubkey: PublicKey | undefined
 ) {
   const connection = useLegacyConnectionContext()
 

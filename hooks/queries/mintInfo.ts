@@ -16,7 +16,7 @@ export const mintInfoQueryKeys = {
   ],
 }
 
-export const useMintInfoByPubkeyQuery = (pubkey?: PublicKey) => {
+export const useMintInfoByPubkeyQuery = (pubkey: PublicKey | undefined) => {
   const connection = useLegacyConnectionContext()
 
   const enabled = pubkey !== undefined

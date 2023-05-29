@@ -43,7 +43,7 @@ export const useVoteRecordByTokenOwnerRecordQuery = (
   return query
 }
 
-export const useVoteRecordByPubkeyQuery = (pubkey?: PublicKey) => {
+export const useVoteRecordByPubkeyQuery = (pubkey: PublicKey | undefined) => {
   const connection = useLegacyConnectionContext()
 
   const enabled = pubkey !== undefined
@@ -62,7 +62,7 @@ export const useVoteRecordByPubkeyQuery = (pubkey?: PublicKey) => {
 }
 
 // doesn't actually filter by realm !
-export const useVoteRecordsByOwnerQuery = (owner?: PublicKey) => {
+export const useVoteRecordsByOwnerQuery = (owner: PublicKey | undefined) => {
   const connection = useLegacyConnectionContext()
   const realm = useRealmQuery().data?.result
 

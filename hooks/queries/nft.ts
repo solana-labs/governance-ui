@@ -16,7 +16,7 @@ export const nftQueryKeys = {
   ],
 }
 
-export const useNFTbyMintQuery = (pubkey?: PublicKey) => {
+export const useNFTbyMintQuery = (pubkey: PublicKey | undefined) => {
   const connection = useLegacyConnectionContext()
 
   const enabled = pubkey !== undefined

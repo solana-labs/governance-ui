@@ -23,7 +23,7 @@ export const proposalQueryKeys = {
   ],
 }
 
-export const useProposalByPubkeyQuery = (pubkey?: PublicKey) => {
+export const useProposalByPubkeyQuery = (pubkey: PublicKey | undefined) => {
   const connection = useLegacyConnectionContext()
 
   const enabled = pubkey !== undefined

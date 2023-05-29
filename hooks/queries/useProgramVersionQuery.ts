@@ -12,7 +12,9 @@ export const programVersionQueryKeys = {
   ],
 }
 
-export function useProgramVersionByIdQuery(realmsProgramId?: PublicKey) {
+export function useProgramVersionByIdQuery(
+  realmsProgramId: PublicKey | undefined
+) {
   // @asktree is unsure why we use this instead of `useConnection` (which has no corresponding provider in the BaseApp)
   const connection = useLegacyConnectionContext()
   const query = useQuery({

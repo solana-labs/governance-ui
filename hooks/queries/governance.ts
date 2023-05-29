@@ -26,7 +26,7 @@ export const governanceQueryKeys = {
 }
 
 // Note: I may need to insert some defaults from undefined fields here? or maybe the sdk does it already (that would make sense)
-export const useGovernanceByPubkeyQuery = (pubkey?: PublicKey) => {
+export const useGovernanceByPubkeyQuery = (pubkey: PublicKey | undefined) => {
   const connection = useLegacyConnectionContext()
 
   const enabled = pubkey !== undefined

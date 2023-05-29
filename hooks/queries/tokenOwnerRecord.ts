@@ -105,7 +105,9 @@ export const useTokenRecordsByOwnersMap = () => {
   ])
 }
 
-export const useTokenOwnerRecordByPubkeyQuery = (pubkey?: PublicKey) => {
+export const useTokenOwnerRecordByPubkeyQuery = (
+  pubkey: PublicKey | undefined
+) => {
   const connection = useLegacyConnectionContext()
 
   const enabled = pubkey !== undefined

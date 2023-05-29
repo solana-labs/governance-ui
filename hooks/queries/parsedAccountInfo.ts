@@ -14,7 +14,7 @@ export const parsedAccountInfoQueryKeys = {
   ],
 }
 
-export const useParsedAccountInfoQuery = (pubkey?: PublicKey) => {
+export const useParsedAccountInfoQuery = (pubkey: PublicKey | undefined) => {
   const connection = useLegacyConnectionContext()
 
   const enabled = pubkey !== undefined
