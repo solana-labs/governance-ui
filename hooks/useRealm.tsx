@@ -41,7 +41,7 @@ import {
   useRealmCouncilMintInfoQuery,
 } from './queries/mintInfo'
 import { useSelectedRealmInfo } from './selectedRealm/useSelectedRealmRegistryEntry'
-import { useTokenAccountsByOwnerQuery } from './queries/tokenAccount'
+import { useUserTokenAccountsQuery } from './queries/tokenAccount'
 
 /**
  * @deprecated This hook has been broken up into many smaller hooks, use those instead, DO NOT use this
@@ -52,7 +52,7 @@ export default function useRealm() {
 
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
-  const { data: tokenAccounts } = useTokenAccountsByOwnerQuery()
+  const { data: tokenAccounts } = useUserTokenAccountsQuery()
   const realm = useRealmQuery().data?.result
   const realmInfo = useSelectedRealmInfo()
 
@@ -99,6 +99,8 @@ export default function useRealm() {
   }, [wallet?.publicKey])
 
   const delegates = useMembersStore((s) => s.compact.delegates)
+
+  console.log('aa', tokenAccounts)
 
   const realmTokenAccount = useMemo(
     () =>

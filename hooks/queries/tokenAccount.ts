@@ -4,6 +4,7 @@ import { getOwnedTokenAccounts, tryGetTokenAccount } from '@utils/tokens'
 import queryClient from './queryClient'
 import asFindable from '@utils/queries/asFindable'
 import { useConnection } from '@solana/wallet-adapter-react'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export const tokenAccountQueryKeys = {
   all: (endpoint: string) => [endpoint, 'TokenAccount'],
@@ -18,7 +19,7 @@ export const tokenAccountQueryKeys = {
   ],
 }
 
-export const useTokenAccountsByOwnerQuery = (pubkey?: PublicKey) => {
+export const useTokenAccountsByOwnerQuery = (pubkey: PublicKey | undefined) => {
   const { connection } = useConnection()
 
   const enabled = pubkey !== undefined
@@ -44,6 +45,12 @@ export const useTokenAccountsByOwnerQuery = (pubkey?: PublicKey) => {
   })
 
   return query
+}
+
+export const useUserTokenAccountsQuery = () => {
+  const wallet = useWalletOnePointOh()
+  const pubkey = wallet?.publicKey ?? undefined
+  return useTokenAccountsByOwnerQuery(pubkey)
 }
 
 export const fetchTokenAccountByPubkey = (
