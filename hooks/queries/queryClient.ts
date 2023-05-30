@@ -2,7 +2,9 @@ import { TransactionInstruction } from '@solana/web3.js'
 import { QueryClient } from '@tanstack/react-query'
 
 const queryClient = new QueryClient({
-  defaultOptions: { queries: { staleTime: 10 * 60 * 1000 } },
+  defaultOptions: {
+    queries: { staleTime: 10 * 60 * 1000, cacheTime: 30 * 60 * 1000 },
+  },
 })
 export default queryClient
 
