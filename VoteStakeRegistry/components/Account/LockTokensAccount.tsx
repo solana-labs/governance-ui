@@ -175,17 +175,14 @@ const LockTokensAccount: React.FC<{
     wallet?.connected,
   ])
 
-  const areLoadedDepositsSameAsOwned =
-    JSON.stringify(ownDeposits) === JSON.stringify(deposits)
-  useEffect(() => {
-    if (!areLoadedDepositsSameAsOwned && isOwnerOfDeposits) {
-      handleGetDeposits()
-    }
-  }, [areLoadedDepositsSameAsOwned, isOwnerOfDeposits, handleGetDeposits])
-
   useEffect(() => {
     handleGetDeposits()
-  }, [isOwnerOfDeposits, client, handleGetDeposits])
+  }, [
+    isOwnerOfDeposits,
+    client,
+    handleGetDeposits,
+    ownDeposits, //side effect
+  ])
 
   const depositMint =
     !mint?.supply.isZero() ||
