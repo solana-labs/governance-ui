@@ -168,9 +168,11 @@ const LockTokensAccount: React.FC<{
     client,
     config?.account.communityTokenConfig.voterWeightAddin,
     connection,
-    realm,
+    publicKey,
+    realm?.account.communityMint,
+    realm?.pubkey,
     tokenOwnerRecordWalletPk,
-    wallet,
+    wallet?.connected,
   ])
 
   const areLoadedDepositsSameAsOwned =
