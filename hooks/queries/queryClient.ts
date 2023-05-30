@@ -13,9 +13,14 @@ export const invalidateInstructionAccounts = async (
     ix.keys
       .filter((x) => x.isWritable)
       .map((x) => x.pubkey)
-      .map((x) =>
-        queryClient.invalidateQueries({
+      .map(async (x) => {
+        // await new Promise((r) => setTimeout(r, 1000))
+        console.log(
+          'automatically invalidating due to mutating transaction:',
+          x.toString()
+        )
+        await queryClient.invalidateQueries({
           predicate: (q) => q.queryKey?.includes(x.toString()),
         })
-      )
+      })
   )

@@ -100,6 +100,7 @@ export const sendTransactionsV3 = ({
     timeoutStrategy,
     callbacks: callbacksWithUiComponent,
     config: cfg,
+    confirmLevel: 'confirmed', //TODO base this on connection confirmation level
   })
 }
 
