@@ -25,9 +25,6 @@ export const executeInstructions = async (
 ) => {
   const instructions: TransactionInstruction[] = []
 
-  instructions.push(
-    ComputeBudgetProgram.setComputeUnitLimit({ units: 1_000_000 })
-  )
   await Promise.all(
     proposalInstructions.map((instruction) =>
       // withExecuteTransaction function mutate the given 'instructions' parameter
@@ -44,9 +41,13 @@ export const executeInstructions = async (
   )
   if (multiTransactionMode) {
     const txes = [...instructions.map((x) => [x])].map((txBatch, batchIdx) => {
+      const batchWithComputeBudget = [
+        ComputeBudgetProgram.setComputeUnitLimit({ units: 1_000_000 }),
+        ...txBatch,
+      ]
       return {
         instructionsSet: txBatchesToInstructionSetWithSigners(
-          txBatch,
+          batchWithComputeBudget,
           [],
           batchIdx
         ),
