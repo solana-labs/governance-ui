@@ -40,6 +40,7 @@ import {
   detectEmbeddedInSquadsIframe,
 } from '@sqds/iframe-adapter'
 import { WALLET_PROVIDERS } from '@utils/wallet-adapters'
+import { tryParsePublicKey } from '@tools/core/pubkey'
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
@@ -137,6 +138,7 @@ export function AppContents(props: Props) {
   // https://stackoverflow.com/questions/2208933/how-do-i-force-a-favicon-refresh
   const faviconUrl =
     symbol &&
+    tryParsePublicKey(symbol as string) === undefined && // don't try to use a custom favicon if this is a pubkey-based url
     `/realms/${getResourcePathPart(
       symbol as string
     )}/favicon.ico?v=${Date.now()}`
