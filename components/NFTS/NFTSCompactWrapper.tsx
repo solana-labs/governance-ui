@@ -1,27 +1,16 @@
-import { getExplorerUrl } from '@components/explorer/tools'
-import ImgWithLoader from '@components/ImgWithLoader'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
-import React from 'react'
-import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import Link from 'next/link'
-import Loading from '@components/Loading'
-import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
-import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const NFTSCompactWrapper = () => {
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
-  const connection = useLegacyConnectionContext()
-  const realmNfts = useTreasuryAccountStore((s) => s.allNfts)
-  const isLoading = useTreasuryAccountStore((s) => s.isLoadingNfts)
-  const isLoadingAssets = useGovernanceAssetsStore((s) => s.loadTokenAccounts)
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
   return nftsGovernedTokenAccounts.length ? (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg transition-all">
-      <div className="flex items-center justify-between pb-4">
+      <div className="flex items-center justify-between">
         <h3 className="mb-0">NFTs</h3>
         <Link href={fmtUrlWithCluster(`/dao/${symbol}/gallery`)}>
           <a
@@ -32,7 +21,7 @@ const NFTSCompactWrapper = () => {
           </a>
         </Link>
       </div>
-      <div
+      {/*  <div
         className="overflow-y-auto"
         style={{
           maxHeight: '210px',
@@ -62,7 +51,7 @@ const NFTSCompactWrapper = () => {
             ))
           ) : null}
         </div>
-      </div>
+      </div> */}
     </div>
   ) : null
 }
