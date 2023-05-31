@@ -38,6 +38,7 @@ import { abbreviateAddress } from '@utils/formatting'
 import useGovernanceForGovernedAddress from '@hooks/useGovernanceForGovernedAddress'
 import useProposalCreationButtonTooltip from '@hooks/useProposalCreationButtonTooltip'
 import Tooltip from '@components/Tooltip'
+import RevokeMyMembership from './RevokeMyMembership'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
@@ -47,11 +48,13 @@ import {
 } from '@hooks/queries/mintInfo'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { useRealmProposalsQuery } from '@hooks/queries/proposal'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const RevokeMembership: FC<{ member: PublicKey; mint: PublicKey }> = ({
   member,
   mint,
 }) => {
+  const wallet = useWalletOnePointOh()
   const realm = useRealmQuery().data?.result
   const { symbol } = useRealm()
 
@@ -80,7 +83,7 @@ const RevokeMembership: FC<{ member: PublicKey; mint: PublicKey }> = ({
     governance ? [governance] : []
   )
 
-  return (
+  return !wallet?.publicKey?.equals(member) ? (
     <>
       <Tooltip content={tooltipContent}>
         <LinkButton
@@ -101,6 +104,8 @@ const RevokeMembership: FC<{ member: PublicKey; mint: PublicKey }> = ({
         </LinkButton>
       </Tooltip>
     </>
+  ) : (
+    <RevokeMyMembership />
   )
 }
 
