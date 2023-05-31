@@ -4,16 +4,17 @@ import TokenAmountInput from '@components/inputs/TokenAmountInput'
 import Modal from '@components/Modal'
 import { ExclamationCircleIcon, XCircleIcon } from '@heroicons/react/outline'
 import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
+import { useRealmQuery } from '@hooks/queries/realm'
 import useGovernanceForGovernedAddress from '@hooks/useGovernanceForGovernedAddress'
 import useProgramVersion from '@hooks/useProgramVersion'
-import useRealm from '@hooks/useRealm'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { createRevokeGoverningTokens } from '@solana/spl-governance'
+import { useConnection } from '@solana/wallet-adapter-react'
 import { PublicKey } from '@solana/web3.js'
 import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
 import { sendTransactionsV3 } from '@utils/sendTransactions'
 import useMembershipTypes from 'pages/dao/[symbol]/proposal/components/instructions/SplGov/useMembershipTypes'
 import { FC, useCallback, useEffect, useMemo, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 
 type Form = {
   membershipPopulation?: 'council' | 'community'
@@ -28,10 +29,10 @@ function capitalizeFirstLetter(string) {
 }
 
 const Form: FC<{ closeModal: () => void }> = ({ closeModal }) => {
-  const wallet = useWalletStore((s) => s.current)
-  const connection = useWalletStore((s) => s.connection)
+  const wallet = useWalletOnePointOh()
+  const { connection } = useConnection()
+  const realm = useRealmQuery().data?.result
 
-  const { realm } = useRealm()
   const programVersion = useProgramVersion()
 
   const [isLoading, setIsLoading] = useState(false)
@@ -70,6 +71,7 @@ const Form: FC<{ closeModal: () => void }> = ({ closeModal }) => {
   }, [form])
 
   const submit = useCallback(async () => {
+    if (!programVersion) throw new Error()
     const errors: Errors = {}
     // START jank validation
     if (selectedMint === undefined) {
@@ -115,14 +117,14 @@ const Form: FC<{ closeModal: () => void }> = ({ closeModal }) => {
 
     try {
       await sendTransactionsV3({
-        connection: connection.current,
+        connection: connection,
         wallet: wallet,
         transactionInstructions: [
           { instructionsSet: [{ transactionInstruction: ix }] },
         ],
       })
       closeModal()
-      // refresh window?
+      location.reload() //TODO invalidate queries (atm there are none used)
     } catch {
       setIsLoading(false)
     }
