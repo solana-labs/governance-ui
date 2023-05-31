@@ -92,6 +92,7 @@ export const withCreateNewDeposit = async ({
       walletPk
     )
   }
+
   if (!existingVoter) {
     const createVoterIx = await client?.program.methods
       .createVoter(voterBump, voterWeightBump)

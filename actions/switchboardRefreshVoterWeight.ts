@@ -7,8 +7,8 @@ export const sbRefreshWeight = async (
   wallet
 ) => {
   /*const voterWeightInstructions = useSwitchboardPluginStore((s) => s.state.instructions);
-  const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)*/
+  const connection = useLegacyConnectionContext()
+  const wallet = useWalletOnePointOh()*/
 
   const transaction = new Transaction().add(voterWeightInstructions)
 

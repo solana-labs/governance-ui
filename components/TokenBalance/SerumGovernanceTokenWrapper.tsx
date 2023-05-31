@@ -1,14 +1,14 @@
 import { FC } from 'react'
 
 import Ticket from '@components/SerumGov/Ticket'
-import useWallet from '@hooks/useWallet'
+import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import LockedAccount from '@components/SerumGov/LockedAccount'
 import VestAccount from '@components/SerumGov/VestAccount'
 import useSerumGov from '@hooks/useSerumGov'
 import DepositCard from '@components/SerumGov/DepositCard'
 
 const SerumGovernanceTokenWrapper: FC = () => {
-  const { wallet } = useWallet()
+  const { wallet } = useWalletDeprecated()
 
   const {
     claimTickets,

@@ -1,9 +1,13 @@
-import { GovernanceAccountType } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import { Instructions, PackageEnum } from '@utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import useRealm from './useRealm'
-import { vsrPluginsPks } from './useVotingPlugins'
+import { HELIUM_VSR_PLUGINS_PKS, VSR_PLUGIN_PKS } from '../constants/plugins'
+import { useRealmQuery } from './queries/realm'
+import { useRealmConfigQuery } from './queries/realmConfig'
+import { useRouter } from 'next/router'
+import { useRealmGovernancesQuery } from './queries/governance'
+import { useMemo } from 'react'
 
 type Package = {
   name: string
@@ -37,7 +41,10 @@ export type InstructionType = {
 }
 
 export default function useGovernanceAssets() {
-  const { ownVoterWeight, realm, symbol, governances, config } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const config = useRealmConfigQuery().data?.result
+  const { symbol } = useRouter().query
+  const { ownVoterWeight } = useRealm()
 
   const governedTokenAccounts: AssetAccount[] = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
@@ -50,49 +57,26 @@ export default function useGovernanceAssets() {
     (s) => s.assetAccounts
   ).filter((x) => x.type === AccountType.AuxiliaryToken)
   const currentPluginPk = config?.account.communityTokenConfig.voterWeightAddin
-  const governancesArray = useGovernanceAssetsStore((s) => s.governancesArray)
+  const governancesQuery = useRealmGovernancesQuery()
+  const governancesArray = useMemo(() => governancesQuery.data ?? [], [
+    governancesQuery.data,
+  ])
 
-  const getGovernancesByAccountType = (type: GovernanceAccountType) => {
-    const governancesFiltered = governancesArray.filter(
-      (gov) => gov.account?.accountType === type
-    )
-    return governancesFiltered
-  }
-
-  const getGovernancesByAccountTypes = (types: GovernanceAccountType[]) => {
-    const governancesFiltered = governancesArray.filter((gov) =>
-      types.some((t) => gov.account?.accountType === t)
-    )
-    return governancesFiltered
-  }
-
-  function canUseGovernanceForInstruction(types: GovernanceAccountType[]) {
+  function canUseGovernanceForInstruction(types: AccountType[]) {
     return (
       realm &&
-      getGovernancesByAccountTypes(types).some((govAcc) =>
-        ownVoterWeight.canCreateProposal(govAcc.account.config)
-      )
+      assetAccounts
+        .filter((x) => types.find((t) => t === x.type))
+        .some((govAcc) =>
+          ownVoterWeight.canCreateProposal(govAcc.governance.account.config)
+        )
     )
   }
-  const canMintRealmCommunityToken = () => {
-    const governances = getGovernancesByAccountTypes([
-      GovernanceAccountType.MintGovernanceV1,
-      GovernanceAccountType.MintGovernanceV2,
-    ])
-    return !!governances.find((govAcc) =>
-      realm?.account.communityMint.equals(govAcc.account.governedAccount)
-    )
-  }
-  const canMintRealmCouncilToken = () => {
-    const governances = getGovernancesByAccountTypes([
-      GovernanceAccountType.MintGovernanceV1,
-      GovernanceAccountType.MintGovernanceV2,
-    ])
 
-    return !!governances.find(
+  const canMintRealmCouncilToken = () => {
+    return !!assetAccounts.find(
       (x) =>
-        x.account.governedAccount.toBase58() ==
-        realm?.account.config.councilMint?.toBase58()
+        x.pubkey.toBase58() == realm?.account.config.councilMint?.toBase58()
     )
   }
   const canUseTransferInstruction = governedTokenAccounts.some((acc) => {
@@ -106,13 +90,11 @@ export default function useGovernanceAssets() {
   })
 
   const canUseProgramUpgradeInstruction = canUseGovernanceForInstruction([
-    GovernanceAccountType.ProgramGovernanceV1,
-    GovernanceAccountType.ProgramGovernanceV2,
+    AccountType.PROGRAM,
   ])
 
   const canUseMintInstruction = canUseGovernanceForInstruction([
-    GovernanceAccountType.MintGovernanceV1,
-    GovernanceAccountType.MintGovernanceV2,
+    AccountType.MINT,
   ])
 
   const canUseAnyInstruction =
@@ -202,11 +184,6 @@ export default function useGovernanceAssets() {
     [PackageEnum.NftPlugin]: {
       name: 'NFT Plugin',
     },
-    [PackageEnum.MangoMarketV3]: {
-      name: 'Mango Market v3',
-      isVisible: symbol === 'MNGO',
-      image: '/img/mango.png',
-    },
     [PackageEnum.MangoMarketV4]: {
       name: 'Mango Market v4',
       image: '/img/mango.png',
@@ -240,6 +217,11 @@ export default function useGovernanceAssets() {
     },
     [PackageEnum.VsrPlugin]: {
       name: 'Vsr Plugin',
+      isVisible:
+        currentPluginPk &&
+        [...VSR_PLUGIN_PKS, ...HELIUM_VSR_PLUGINS_PKS].includes(
+          currentPluginPk.toBase58()
+        ),
     },
   }
 
@@ -291,7 +273,7 @@ export default function useGovernanceAssets() {
       isVisible:
         canUseTokenTransferInstruction &&
         currentPluginPk &&
-        vsrPluginsPks.includes(currentPluginPk.toBase58()),
+        VSR_PLUGIN_PKS.includes(currentPluginPk.toBase58()),
       packageId: PackageEnum.Common,
     },
     [Instructions.CloseTokenAccount]: {
@@ -323,7 +305,7 @@ export default function useGovernanceAssets() {
       isVisible:
         canUseTokenTransferInstruction &&
         currentPluginPk &&
-        vsrPluginsPks.includes(currentPluginPk.toBase58()),
+        VSR_PLUGIN_PKS.includes(currentPluginPk.toBase58()),
       packageId: PackageEnum.Common,
     },
     [Instructions.JoinDAO]: {
@@ -339,7 +321,7 @@ export default function useGovernanceAssets() {
       name: 'None',
       isVisible:
         realm &&
-        Object.values(governances).some((g) =>
+        governancesArray.some((g) =>
           ownVoterWeight.canCreateProposal(g.account.config)
         ),
       packageId: PackageEnum.Common,
@@ -376,7 +358,10 @@ export default function useGovernanceAssets() {
       name: 'Withdraw validator stake',
       packageId: PackageEnum.Common,
     },
-
+    [Instructions.SetMintAuthority]: {
+      name: 'Set Mint Authority',
+      packageId: PackageEnum.Common,
+    },
     /*
       ██████  ██    ██  █████  ██          ███████ ██ ███    ██  █████  ███    ██  ██████ ███████
       ██   ██ ██    ██ ██   ██ ██          ██      ██ ████   ██ ██   ██ ████   ██ ██      ██
@@ -390,6 +375,16 @@ export default function useGovernanceAssets() {
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Dual,
     },
+    [Instructions.DualFinanceLiquidityStakingOption]: {
+      name: 'Liquidity Staking Option',
+      isVisible: canUseTransferInstruction,
+      packageId: PackageEnum.Dual,
+    },
+    [Instructions.DualFinanceInitStrike]: {
+      name: 'Init Staking Option Strike',
+      isVisible: canUseTransferInstruction,
+      packageId: PackageEnum.Dual,
+    },
     [Instructions.DualFinanceExercise]: {
       name: 'Exercise',
       isVisible: canUseTransferInstruction,
@@ -397,6 +392,11 @@ export default function useGovernanceAssets() {
     },
     [Instructions.DualFinanceWithdraw]: {
       name: 'Withdraw',
+      isVisible: canUseTransferInstruction,
+      packageId: PackageEnum.Dual,
+    },
+    [Instructions.DualFinanceAirdrop]: {
+      name: 'Airdrop',
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Dual,
     },
@@ -557,100 +557,6 @@ export default function useGovernanceAssets() {
     },
 
     /*
-      ███    ███  █████  ███    ██  ██████   ██████      ██    ██ ██████
-      ████  ████ ██   ██ ████   ██ ██       ██    ██     ██    ██      ██
-      ██ ████ ██ ███████ ██ ██  ██ ██   ███ ██    ██     ██    ██  █████
-      ██  ██  ██ ██   ██ ██  ██ ██ ██    ██ ██    ██      ██  ██       ██
-      ██      ██ ██   ██ ██   ████  ██████   ██████        ████   ██████
-    */
-
-    [Instructions.ClaimMangoTokens]: {
-      name: 'Claim Tokens',
-      isVisible: false,
-      packageId: PackageEnum.MangoMarketV3,
-    },
-    [Instructions.DepositToMangoAccount]: {
-      name: 'Deposit to mango account',
-      isVisible: false,
-      packageId: PackageEnum.MangoMarketV3,
-    },
-    [Instructions.DepositToMangoAccountCsv]: {
-      name: 'Deposit to mango account with CSV',
-      isVisible: false,
-      packageId: PackageEnum.MangoMarketV3,
-    },
-    [Instructions.MangoAddOracle]: {
-      name: 'Add Oracle',
-      isVisible: false,
-      packageId: PackageEnum.MangoMarketV3,
-    },
-    [Instructions.MangoAddSpotMarket]: {
-      name: 'Add Spot Market',
-      isVisible: false,
-      packageId: PackageEnum.MangoMarketV3,
-    },
-    [Instructions.MangoChangeMaxAccounts]: {
-      name: 'Change Max Accounts',
-      isVisible: false,
-      packageId: PackageEnum.MangoMarketV3,
-    },
-    [Instructions.MangoChangePerpMarket]: {
-      name: 'Change Perp Market',
-      isVisible: false,
-      packageId: PackageEnum.MangoMarketV3,
-    },
-    [Instructions.MangoChangeQuoteParams]: {
-      name: 'Change Quote Params',
-      isVisible: false,
-      packageId: PackageEnum.MangoMarketV3,
-    },
-    [Instructions.MangoChangeReferralFeeParams]: {
-      name: 'Change Referral Fee Params',
-      isVisible: false,
-      packageId: PackageEnum.MangoMarketV3,
-    },
-    [Instructions.MangoChangeReferralFeeParams2]: {
-      name: 'Change Referral Fee Params V2',
-      isVisible: false,
-      packageId: PackageEnum.MangoMarketV3,
-    },
-    [Instructions.MangoChangeSpotMarket]: {
-      name: 'Change Spot Market',
-      isVisible: false,
-      packageId: PackageEnum.MangoMarketV3,
-    },
-    [Instructions.MangoCreatePerpMarket]: {
-      name: 'Create Perp Market',
-      isVisible: false,
-      packageId: PackageEnum.MangoMarketV3,
-    },
-    [Instructions.MangoRemoveOracle]: {
-      name: 'Remove Oracle',
-      isVisible: false,
-      packageId: PackageEnum.MangoMarketV3,
-    },
-    [Instructions.MangoRemovePerpMarket]: {
-      name: 'Remove Perp Market',
-      isVisible: false,
-      packageId: PackageEnum.MangoMarketV3,
-    },
-    [Instructions.MangoRemoveSpotMarket]: {
-      name: 'Remove Spot Market',
-      isVisible: false,
-      packageId: PackageEnum.MangoMarketV3,
-    },
-    [Instructions.MangoSetMarketMode]: {
-      name: 'Set Market Mode',
-      isVisible: false,
-      packageId: PackageEnum.MangoMarketV3,
-    },
-    [Instructions.MangoSwapSpotMarket]: {
-      name: 'Swap Spot Market',
-      isVisible: false,
-      packageId: PackageEnum.MangoMarketV3,
-    },
-
-    /*
       ███    ███  █████  ███    ██  ██████   ██████      ██    ██ ██   ██
       ████  ████ ██   ██ ████   ██ ██       ██    ██     ██    ██ ██   ██
       ██ ████ ██ ███████ ██ ██  ██ ██   ███ ██    ██     ██    ██ ███████
@@ -725,6 +631,11 @@ export default function useGovernanceAssets() {
     },
     [Instructions.MangoV4TokenAddBank]: {
       name: 'Add additional Bank to an existing Token',
+      packageId: PackageEnum.MangoMarketV4,
+      isVisible: canUseAnyInstruction,
+    },
+    [Instructions.IdlSetBuffer]: {
+      name: 'Idl Set Buffer',
       packageId: PackageEnum.MangoMarketV4,
       isVisible: canUseAnyInstruction,
     },
@@ -936,25 +847,42 @@ export default function useGovernanceAssets() {
     )
   }
 
-  return {
-    assetAccounts,
-    auxiliaryTokenAccounts,
-    availableInstructions,
-    availablePackages,
-    canMintRealmCommunityToken,
-    canMintRealmCouncilToken,
-    canUseAuthorityInstruction,
-    canUseMintInstruction,
-    canUseProgramUpgradeInstruction,
-    canUseTransferInstruction,
-    getGovernancesByAccountType,
-    getGovernancesByAccountTypes,
-    getPackageTypeById,
-    governancesArray,
-    governedNativeAccounts,
-    governedSPLTokenAccounts,
-    governedTokenAccounts,
-    governedTokenAccountsWithoutNfts,
-    nftsGovernedTokenAccounts,
-  }
+  return useMemo(
+    () => ({
+      assetAccounts,
+      auxiliaryTokenAccounts,
+      availableInstructions,
+      availablePackages,
+      canMintRealmCouncilToken,
+      canUseAuthorityInstruction,
+      canUseMintInstruction,
+      canUseProgramUpgradeInstruction,
+      canUseTransferInstruction,
+      getPackageTypeById,
+      governancesArray,
+      governedNativeAccounts,
+      governedSPLTokenAccounts,
+      governedTokenAccounts,
+      governedTokenAccountsWithoutNfts,
+      nftsGovernedTokenAccounts,
+    }),
+    [
+      assetAccounts,
+      auxiliaryTokenAccounts,
+      availableInstructions,
+      availablePackages,
+      canMintRealmCouncilToken,
+      canUseAuthorityInstruction,
+      canUseMintInstruction,
+      canUseProgramUpgradeInstruction,
+      canUseTransferInstruction,
+      getPackageTypeById,
+      governancesArray,
+      governedNativeAccounts,
+      governedSPLTokenAccounts,
+      governedTokenAccounts,
+      governedTokenAccountsWithoutNfts,
+      nftsGovernedTokenAccounts,
+    ]
+  )
 }

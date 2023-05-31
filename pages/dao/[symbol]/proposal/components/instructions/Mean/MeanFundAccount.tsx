@@ -1,7 +1,6 @@
-import { Treasury } from '@mean-dao/msp'
+import { PaymentStreamingAccount } from '@mean-dao/payment-streaming'
 import { Governance, ProgramAccount } from '@solana/spl-governance'
 import React, { useContext, useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 
 import Input from '@components/inputs/Input'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -15,6 +14,7 @@ import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 
 import SelectStreamingAccount from './SelectStreamingAccount'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface Props {
   index: number
@@ -28,7 +28,7 @@ const MeanFundAccountComponent = ({ index, governance }: Props) => {
     governedTokenAccount: undefined,
     mintInfo: undefined,
     amount: undefined,
-    treasury: undefined,
+    paymentStreamingAccount: undefined,
   })
 
   const [formErrors, setFormErrors] = useState({})
@@ -48,7 +48,7 @@ const MeanFundAccountComponent = ({ index, governance }: Props) => {
   const schema = getMeanFundAccountSchema({ form })
   const { handleSetInstructions } = useContext(NewProposalContext)
 
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const getInstruction = () =>
     getMeanFundAccountInstruction({
       connection,
@@ -78,6 +78,7 @@ const MeanFundAccountComponent = ({ index, governance }: Props) => {
       ...form,
       mintInfo: form.governedTokenAccount?.extensions.mint?.account,
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.governedTokenAccount])
 
   // amount
@@ -104,29 +105,34 @@ const MeanFundAccountComponent = ({ index, governance }: Props) => {
     })
   }
 
-  // treasury
+  // paymentStreamingAccount
 
-  const formTreasury = form.treasury as Treasury | undefined
+  const formPaymentStreamingAccount = form.paymentStreamingAccount as
+    | PaymentStreamingAccount
+    | undefined
 
   return (
     <React.Fragment>
       <SelectStreamingAccount
         label="Select streaming account destination"
-        onChange={(treasury) => {
+        onChange={(paymentStreamingAccount) => {
           handleSetForm(
-            { value: treasury, propertyName: 'treasury' },
+            {
+              value: paymentStreamingAccount,
+              propertyName: 'paymentStreamingAccount',
+            },
             { governedTokenAccount: undefined }
           )
         }}
-        value={formTreasury}
-        error={formErrors['treasury']}
+        value={formPaymentStreamingAccount}
+        error={formErrors['paymentStreamingAccount']}
       />
       <GovernedAccountSelect
         label="Select source of funds"
         governedAccounts={governedTokenAccountsWithoutNfts.filter(
           (a) =>
             a.extensions.mint?.publicKey.toBase58() ===
-            formTreasury?.associatedToken.toString()
+            formPaymentStreamingAccount?.mint.toString()
         )}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedTokenAccount' })

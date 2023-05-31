@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import Input from '@components/inputs/Input'
 import { tryParseKey } from '@tools/validators/pubkey'
 import { debounce } from '@utils/debounce'
-import useWalletStore from 'stores/useWalletStore'
 import axios from 'axios'
 import { notify } from '@utils/notifications'
 import Loading from '@components/Loading'
@@ -16,7 +15,6 @@ import {
 } from '@solana/spl-token'
 import Tooltip from '@components/Tooltip'
 import { tryGetAta } from '@utils/validations'
-import useRealm from '@hooks/useRealm'
 import { createATA } from '@utils/ataTools'
 import { abbreviateAddress } from '@utils/formatting'
 import { DuplicateIcon, ExclamationIcon } from '@heroicons/react/outline'
@@ -31,12 +29,15 @@ import {
   Sft,
   SftWithToken,
 } from '@metaplex-foundation/js/dist/types/plugins/nftModule/models'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
 
-  const wallet = useWalletStore((s) => s.current)
-  const { realm } = useRealm()
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const realm = useRealmQuery().data?.result
+  const connected = !!wallet?.connected
   const [form, setForm] = useState({
     mint: '',
   })
@@ -50,7 +51,7 @@ const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
   const [ataAddress, setAtaAddress] = useState('')
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
   const { setCurrentAccount } = useTreasuryAccountStore()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })

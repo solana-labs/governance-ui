@@ -1,17 +1,25 @@
 import { BN } from '@coral-xyz/anchor'
 import { Proposal, ProposalState } from '@solana/spl-governance'
-import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { getProposalMaxVoteWeight } from '../models/voteWeights'
 import { calculatePct, fmtTokenAmount } from '../utils/formatting'
+import { useMaxVoteRecord } from './useMaxVoteRecord'
 import useProgramVersion from './useProgramVersion'
-import useRealm from './useRealm'
+import { useRealmQuery } from './queries/realm'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from './queries/mintInfo'
+import { useGovernanceByPubkeyQuery } from './queries/governance'
 
 // TODO support council plugins
 export default function useProposalVotes(proposal?: Proposal) {
-  const { realm, mint, councilMint, governances } = useRealm()
-  const maxVoteRecord = useNftPluginStore((s) => s.state.maxVoteRecord)
-  const governance =
-    proposal && governances[proposal.governance?.toBase58()]?.account
+  const realm = useRealmQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const maxVoteRecord = useMaxVoteRecord()
+  const governance = useGovernanceByPubkeyQuery(proposal?.governance).data
+    ?.result?.account
+
   const programVersion = useProgramVersion()
 
   const proposalMint =
@@ -20,7 +28,7 @@ export default function useProposalVotes(proposal?: Proposal) {
       ? mint
       : councilMint
   // TODO: optimize using memo
-  if (!realm || !proposal || !governance || !proposalMint)
+  if (!realm || !proposal || !governance || !proposalMint || !programVersion)
     return {
       _programVersion: undefined,
       voteThresholdPct: undefined,
@@ -38,11 +46,14 @@ export default function useProposalVotes(proposal?: Proposal) {
     proposal?.governingTokenMint.toBase58() ===
     realm?.account.communityMint.toBase58()
   const isPluginCommunityVoting = maxVoteRecord && isCommunityVote
+
   const voteThresholdPct = isCommunityVote
     ? governance.config.communityVoteThreshold.value
+      ? governance.config.communityVoteThreshold.value
+      : 0
     : programVersion > 2
-    ? governance.config.councilVoteThreshold.value
-    : governance.config.communityVoteThreshold.value
+    ? governance.config.councilVoteThreshold.value || 0
+    : governance.config.communityVoteThreshold.value || 0
 
   if (voteThresholdPct === undefined)
     throw new Error(
@@ -59,8 +70,6 @@ export default function useProposalVotes(proposal?: Proposal) {
     (voteThresholdPct / 100)
 
   const yesVotePct = calculatePct(proposal.getYesVoteCount(), maxVoteWeight)
-  const yesVoteProgress = (yesVotePct / voteThresholdPct) * 100
-
   const isMultiProposal = proposal?.options?.length > 1
   const yesVoteCount = !isMultiProposal
     ? fmtTokenAmount(proposal.getYesVoteCount(), proposalMint.decimals)
@@ -78,6 +87,9 @@ export default function useProposalVotes(proposal?: Proposal) {
   const relativeNoVotes = getRelativeVoteCount(noVoteCount)
   const rawYesVotesRequired = minimumYesVotes - yesVoteCount
   const actualVotesRequired = rawYesVotesRequired < 0 ? 0 : rawYesVotesRequired
+  const yesVoteProgress = actualVotesRequired
+    ? 100 - (actualVotesRequired / minimumYesVotes) * 100
+    : 100
 
   const yesVotesRequired =
     proposalMint.decimals == 0

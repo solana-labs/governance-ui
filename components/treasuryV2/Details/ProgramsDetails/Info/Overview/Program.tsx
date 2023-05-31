@@ -18,8 +18,8 @@ import Modal from '@components/Modal'
 import Tooltip from '@components/Tooltip'
 import TransferUpgradeAuthority from '@components/AssetsList/TransferUpgradeAuthority'
 import UpgradeProgram from '@components/AssetsList/UpgradeProgram'
-import useWalletStore from 'stores/useWalletStore'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface Props {
   className?: string
@@ -28,7 +28,8 @@ interface Props {
 
 export default function Program(props: Props) {
   const { canUseProgramUpgradeInstruction } = useGovernanceAssets()
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const [closeBuffersModalOpen, setOpenCloseBuffersModalOpen] = useState(false)
   const [
     transferAuthorityModalOpen,
@@ -147,6 +148,7 @@ export default function Program(props: Props) {
             </DropdownMenu.Trigger>
             <DropdownMenu.Portal>
               <DropdownMenu.Content
+                // @asktree isn't sure, but suspects, that this needs z-20 or something
                 className="bg-black py-5 px-4 rounded"
                 side="top"
               >
@@ -189,17 +191,17 @@ export default function Program(props: Props) {
       </Tooltip>
       {!disabled && closeBuffersModalOpen && (
         <Modal isOpen onClose={() => setOpenCloseBuffersModalOpen(false)}>
-          <CloseBuffers program={props.program.raw.governance} />
+          <CloseBuffers program={props.program.raw} />
         </Modal>
       )}
       {!disabled && transferAuthorityModalOpen && (
         <Modal isOpen onClose={() => setOpenTransferAuthorityModalOpen(false)}>
-          <TransferUpgradeAuthority program={props.program.raw.governance} />
+          <TransferUpgradeAuthority program={props.program.raw} />
         </Modal>
       )}
       {!disabled && upgradeModalOpen && (
         <Modal isOpen onClose={() => setUpgradeModelOpen(false)}>
-          <UpgradeProgram program={props.program.raw.governance} />
+          <UpgradeProgram program={props.program.raw} />
         </Modal>
       )}
     </div>

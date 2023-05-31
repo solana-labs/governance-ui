@@ -13,8 +13,7 @@ import useSerumGovStore, {
   SRM_DECIMALS,
 } from 'stores/useSerumGovStore'
 import { notify } from '@utils/notifications'
-import useWallet from '@hooks/useWallet'
-import useWalletStore from 'stores/useWalletStore'
+import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import { useRouter } from 'next/router'
 import useRealm from '@hooks/useRealm'
 import useQueryContext from '@hooks/useQueryContext'
@@ -31,6 +30,7 @@ import { dryRunInstruction } from 'actions/dryRunInstruction'
 import Link from 'next/link'
 import { getExplorerUrl } from '@components/explorer/tools'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 const BurnLockedAccountSchema = {
   amount: yup.string().required(),
@@ -63,8 +63,8 @@ const LockedAccount: FC<Props> = ({
 
   const actions = useSerumGovStore((s) => s.actions)
 
-  const { anchorProvider, wallet } = useWallet()
-  const connection = useWalletStore((s) => s.connection.current)
+  const { anchorProvider, wallet } = useWalletDeprecated()
+  const { connection } = useConnection()
 
   const [isBurning, setIsBurning] = useState(false)
 
@@ -148,7 +148,6 @@ const LockedAccount: FC<Props> = ({
         holdUpTime:
           createProposal.governance?.account.config.minInstructionHoldUpTime,
         prerequisiteInstructions: [],
-        shouldSplitIntoSeparateTxs: false,
       }
 
       const { response: dryRunResponse } = await dryRunInstruction(

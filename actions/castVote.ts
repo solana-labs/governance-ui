@@ -24,9 +24,10 @@ import {
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
 import { sendTransaction } from '@utils/send'
-import { NftVoterClient } from '@solana/governance-program-library'
 import { calcCostOfNftVote, checkHasEnoughSolToVote } from '@tools/nftVoteCalc'
 import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
+import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 
 const getVetoTokenMint = (
   proposal: ProgramAccount<Proposal>,
@@ -47,7 +48,7 @@ export async function castVote(
   { connection, wallet, programId, walletPubkey }: RpcContext,
   realm: ProgramAccount<Realm>,
   proposal: ProgramAccount<Proposal>,
-  tokeOwnerRecord: ProgramAccount<TokenOwnerRecord>,
+  tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>,
   voteKind: VoteKind,
   message?: ChatMessageBody | undefined,
   votingPlugin?: VotingClient,
@@ -60,7 +61,6 @@ export async function castVote(
   const payer = walletPubkey
   // Explicitly request the version before making RPC calls to work around race conditions in resolving
   // the version for RealmInfo
-
   const programVersion = await getGovernanceProgramVersion(
     connection,
     programId
@@ -70,7 +70,7 @@ export async function castVote(
   const plugin = await votingPlugin?.withCastPluginVote(
     instructions,
     proposal,
-    tokeOwnerRecord
+    tokenOwnerRecord
   )
 
   // It is not clear that defining these extraneous fields, `deny` and `veto`, is actually necessary.
@@ -117,7 +117,7 @@ export async function castVote(
     proposal.account.governance,
     proposal.pubkey,
     proposal.account.tokenOwnerRecord,
-    tokeOwnerRecord.pubkey,
+    tokenOwnerRecord.pubkey,
     governanceAuthority,
     tokenMint,
     vote,
@@ -129,9 +129,10 @@ export async function castVote(
   if (message) {
     const plugin = await votingPlugin?.withUpdateVoterWeightRecord(
       instructions,
-      tokeOwnerRecord,
+      tokenOwnerRecord,
       'commentProposal'
     )
+
     await withPostChatMessage(
       instructions,
       signers,
@@ -140,7 +141,7 @@ export async function castVote(
       realm.pubkey,
       proposal.account.governance,
       proposal.pubkey,
-      tokeOwnerRecord.pubkey,
+      tokenOwnerRecord.pubkey,
       governanceAuthority,
       payer,
       undefined,
@@ -148,28 +149,84 @@ export async function castVote(
       plugin?.voterWeightPk
     )
   }
-  const shouldChunk = votingPlugin?.client instanceof NftVoterClient
-  const instructionsCountThatMustHaveTheirOwnChunk = message ? 4 : 2
-  if (shouldChunk) {
+
+  const ixChunkCount = message ? 4 : 2
+  const isNftVoter = votingPlugin?.client instanceof NftVoterClient
+  const isHeliumVoter = votingPlugin?.client instanceof HeliumVsrClient
+
+  if (!isNftVoter && !isHeliumVoter) {
+    const transaction = new Transaction()
+    transaction.add(...instructions)
+
+    await sendTransaction({ transaction, wallet, connection, signers })
+    if (runAfterConfirmation) {
+      runAfterConfirmation()
+    }
+  }
+
+  // we need to chunk instructions
+  if (isHeliumVoter) {
+    // update voter weight + cast vote from spl gov need to be in one transaction
+    const ixsWithOwnChunk = instructions.slice(-ixChunkCount)
+    const remainingIxsToChunk = instructions.slice(
+      0,
+      instructions.length - ixChunkCount
+    )
+
+    const splIxsWithAccountsChunk = chunks(ixsWithOwnChunk, 2)
+    const positionsAccountsChunks = chunks(remainingIxsToChunk, 2)
+    const ixsChunks = [
+      ...positionsAccountsChunks.map((txBatch, batchIdx) => {
+        return {
+          instructionsSet: txBatchesToInstructionSetWithSigners(
+            txBatch,
+            [],
+            batchIdx
+          ),
+          sequenceType: SequenceType.Parallel,
+        }
+      }),
+      ...splIxsWithAccountsChunk.map((txBatch, batchIdx) => {
+        return {
+          instructionsSet: txBatchesToInstructionSetWithSigners(
+            txBatch,
+            message ? [[], signers] : [],
+            batchIdx
+          ),
+          sequenceType: SequenceType.Sequential,
+        }
+      }),
+    ]
+
+    await sendTransactionsV3({
+      connection,
+      wallet,
+      transactionInstructions: ixsChunks,
+      callbacks: {
+        afterAllTxConfirmed: () => {
+          if (runAfterConfirmation) {
+            runAfterConfirmation()
+          }
+        },
+      },
+    })
+  }
+
+  // we need to chunk instructions
+  if (isNftVoter) {
     const {
       openNftVotingCountingModal,
       closeNftVotingCountingModal,
     } = useNftProposalStore.getState()
     //update voter weight + cast vote from spl gov need to be in one transaction
-    const instructionsWithTheirOwnChunk = instructions.slice(
-      -instructionsCountThatMustHaveTheirOwnChunk
-    )
-    const remainingInstructionsToChunk = instructions.slice(
+    const ixsWithOwnChunk = instructions.slice(-ixChunkCount)
+    const remainingIxsToChunk = instructions.slice(
       0,
-      instructions.length - instructionsCountThatMustHaveTheirOwnChunk
+      instructions.length - ixChunkCount
     )
 
-    const splInstructionsWithAccountsChunk = chunks(
-      instructionsWithTheirOwnChunk,
-      2
-    )
-    const nftsAccountsChunks = chunks(remainingInstructionsToChunk, 2)
-
+    const splIxsWithAccountsChunk = chunks(ixsWithOwnChunk, 2)
+    const nftsAccountsChunks = chunks(remainingIxsToChunk, 2)
     const instructionsChunks = [
       ...nftsAccountsChunks.map((txBatch, batchIdx) => {
         return {
@@ -181,7 +238,7 @@ export async function castVote(
           sequenceType: SequenceType.Parallel,
         }
       }),
-      ...splInstructionsWithAccountsChunk.map((txBatch, batchIdx) => {
+      ...splIxsWithAccountsChunk.map((txBatch, batchIdx) => {
         return {
           instructionsSet: txBatchesToInstructionSetWithSigners(
             txBatch,
@@ -227,10 +284,5 @@ export async function castVote(
         },
       },
     })
-  } else {
-    const transaction = new Transaction()
-    transaction.add(...instructions)
-
-    await sendTransaction({ transaction, wallet, connection, signers })
   }
 }

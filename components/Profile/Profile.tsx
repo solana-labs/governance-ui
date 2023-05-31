@@ -3,7 +3,7 @@ import { useProfile, ProfileImage } from '@components/Profile'
 import { PublicKey } from '@solana/web3.js'
 import { LoadingDots } from '@components/Loading'
 import { CivicIcon } from '@components/icons'
-import useWalletStore from '../../stores/useWalletStore'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const VisitLink: FC<{ address: PublicKey }> = ({ address }) => (
   <a
@@ -32,7 +32,7 @@ const ClaimLink: FC<{ address: PublicKey; expanded }> = ({
 
 type Props = { publicKey?: PublicKey; expanded?: boolean }
 export const Profile: FC<Props> = ({ publicKey, expanded }) => {
-  const connectedWallet = useWalletStore((s) => s.current)
+  const connectedWallet = useWalletOnePointOh()
   const { profile, loading } = useProfile(publicKey)
 
   if (!profile && loading) return <LoadingDots />

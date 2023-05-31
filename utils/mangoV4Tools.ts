@@ -1,6 +1,7 @@
 export function getChangedValues<T extends Record<keyof T, any>>(
   originalValues: T,
-  newValues: T
+  newValues: T,
+  ignoredFields?: string[]
 ) {
   const values: any = {}
   for (const key of Object.keys(originalValues)) {
@@ -14,13 +15,16 @@ export function getChangedValues<T extends Record<keyof T, any>>(
     } else {
       values[key] = null
     }
+    if (ignoredFields?.length && ignoredFields.find((x) => x === key)) {
+      values[key] = newValues[key]
+    }
   }
-  return values
+  return values as Partial<T>
 }
 
 export function getNullOrTransform<T>(
-  val: string | null,
-  classTransformer: (new (val: string) => T) | null,
+  val: any,
+  classTransformer: (new (val: any) => T) | null,
   functionTransformer?: (val) => T
 ): T | null {
   if (val === null) {

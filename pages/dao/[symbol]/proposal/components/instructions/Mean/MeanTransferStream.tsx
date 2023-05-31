@@ -1,8 +1,7 @@
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { Stream } from '@mean-dao/msp'
+import { Stream } from '@mean-dao/payment-streaming'
 import { Governance, ProgramAccount } from '@solana/spl-governance'
 import React, { useContext, useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 
 import Input from '@components/inputs/Input'
 import getMeanTransferStreamInstruction from '@utils/instructions/Mean/getMeanTransferStreamInstruction'
@@ -11,6 +10,7 @@ import { getMeanTransferStreamSchema } from '@utils/validations'
 
 import { NewProposalContext } from '../../../new'
 import SelectStream from './SelectStream'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface Props {
   index: number
@@ -33,7 +33,7 @@ const MeanTransferStreamComponent = ({ index, governance }: Props) => {
   }
 
   // instruction
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const schema = getMeanTransferStreamSchema()
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -54,9 +54,10 @@ const MeanTransferStreamComponent = ({ index, governance }: Props) => {
       },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form])
 
-  // treasury
+  // stream
 
   const shouldBeGoverned = index !== 0 && !!governance
   const formStream = form.stream as Stream | undefined
@@ -64,7 +65,9 @@ const MeanTransferStreamComponent = ({ index, governance }: Props) => {
   // governedTokenAccount
 
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
-
+  const governedTokenAccountsWithoutNftsJson = JSON.stringify(
+    governedTokenAccountsWithoutNfts
+  )
   useEffect(() => {
     const value =
       formStream &&
@@ -77,7 +80,8 @@ const MeanTransferStreamComponent = ({ index, governance }: Props) => {
       ...prevForm,
       governedTokenAccount: value,
     }))
-  }, [JSON.stringify(governedTokenAccountsWithoutNfts), formStream])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [governedTokenAccountsWithoutNftsJson, formStream])
 
   return (
     <React.Fragment>

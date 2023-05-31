@@ -6,6 +6,8 @@ export function useWallet() {
   const {
     connect,
     publicKey,
+    softConnect,
+    setSoftConnect,
     signMessage,
     signTransaction,
     signAllTransactions,
@@ -13,6 +15,8 @@ export function useWallet() {
   return {
     connect,
     publicKey,
+    softConnect,
+    setSoftConnect,
     signMessage,
     signTransaction,
     signAllTransactions,

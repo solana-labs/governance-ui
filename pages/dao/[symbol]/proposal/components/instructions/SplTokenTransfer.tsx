@@ -4,7 +4,6 @@ import useRealm from '@hooks/useRealm'
 import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import { PublicKey } from '@solana/web3.js'
 import { precision } from '@utils/formatting'
-import useWalletStore from 'stores/useWalletStore'
 import {
   SplTokenTransferForm,
   UiInstruction,
@@ -21,6 +20,8 @@ import {
   getTransferInstruction,
 } from '@utils/instructionTools'
 import { useDestination } from '@hooks/useDestination'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const SplTokenTransfer = ({
   index,
@@ -29,8 +30,8 @@ const SplTokenTransfer = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const connection = useLegacyConnectionContext()
+  const wallet = useWalletOnePointOh()
   const { realmInfo } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)

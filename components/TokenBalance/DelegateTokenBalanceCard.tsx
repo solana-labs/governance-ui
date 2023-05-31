@@ -1,84 +1,34 @@
-import { useEffect } from 'react'
-import { BN_ZERO } from '@solana/spl-governance'
 import { DisplayAddress } from '@cardinal/namespaces-components'
 import Select from '@components/inputs/Select'
-import { fmtMintAmount } from '@tools/sdk/units'
 import useMembersStore from 'stores/useMembersStore'
-import useWalletStore from 'stores/useWalletStore'
 import useRealm from 'hooks/useRealm'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import {
+  useUserCommunityTokenOwnerRecord,
+  useUserCouncilTokenOwnerRecord,
+} from '@hooks/queries/tokenOwnerRecord'
+import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
+import { PublicKey } from '@solana/web3.js'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const DelegateBalanceCard = () => {
   const delegates = useMembersStore((s) => s.compact.delegates)
-  const wallet = useWalletStore((s) => s.current)
-  const connection = useWalletStore((s) => s.connection)
-
+  const wallet = useWalletOnePointOh()
+  const connection = useLegacyConnectionContext()
   const walletId = wallet?.publicKey?.toBase58()
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
+
+  const { ownDelegateTokenRecords, ownDelegateCouncilTokenRecords } = useRealm()
+
   const {
-    ownDelegateTokenRecords,
-    ownDelegateCouncilTokenRecords,
-    ownTokenRecord,
-    ownCouncilTokenRecord,
-    mint,
-    councilMint,
-  } = useRealm()
-  const {
-    actions,
-    selectedCommunityDelegate,
-    selectedCouncilDelegate,
-  } = useWalletStore((s) => s)
-
-  useEffect(() => {
-    if (
-      !ownCouncilTokenRecord &&
-      ownDelegateCouncilTokenRecords &&
-      ownDelegateCouncilTokenRecords.length > 0
-    ) {
-      actions.selectCouncilDelegate(
-        ownDelegateCouncilTokenRecords[0]?.account?.governingTokenOwner?.toBase58()
-      )
-    }
-
-    if (
-      !ownTokenRecord &&
-      ownDelegateTokenRecords &&
-      ownDelegateTokenRecords.length > 0
-    ) {
-      actions.selectCommunityDelegate(
-        ownDelegateTokenRecords[0]?.account?.governingTokenOwner?.toBase58()
-      )
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [walletId])
-
-  // whenever we change delegate, get that delegates vote record so we can display it
-  useEffect(() => {
-    actions.fetchDelegateVoteRecords()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [selectedCommunityDelegate, selectedCouncilDelegate])
-
-  const getCouncilTokenCount = () => {
-    if (walletId && delegates?.[walletId]) {
-      return fmtMintAmount(
-        councilMint,
-        delegates?.[walletId].councilTokenCount ?? BN_ZERO
-      )
-    }
-    return 0
-  }
+    setCommunityDelegator,
+    setCouncilDelegator,
+  } = useSelectedDelegatorStore()
 
   const getCouncilDelegateAmt = () => {
     if (walletId && delegates?.[walletId]) {
       return delegates?.[walletId]?.councilMembers?.length ?? 0
-    }
-    return 0
-  }
-
-  const getCommunityTokenCount = () => {
-    if (walletId && delegates?.[walletId]) {
-      return fmtMintAmount(
-        mint,
-        delegates?.[walletId].communityTokenCount ?? BN_ZERO
-      )
     }
     return 0
   }
@@ -90,12 +40,16 @@ const DelegateBalanceCard = () => {
     return 0
   }
 
-  const handleCouncilSelect = (councilTokenRecord: string) => {
-    actions.selectCouncilDelegate(councilTokenRecord)
+  const handleCouncilSelect = (councilTokenRecord?: string) => {
+    setCouncilDelegator(
+      councilTokenRecord ? new PublicKey(councilTokenRecord) : undefined
+    )
   }
 
-  const handleCommunitySelect = (communityPubKey: string) => {
-    actions.selectCommunityDelegate(communityPubKey)
+  const handleCommunitySelect = (communityPubKey?: string) => {
+    setCommunityDelegator(
+      communityPubKey ? new PublicKey(communityPubKey) : undefined
+    )
   }
 
   if (!walletId || !delegates?.[walletId]) {
@@ -109,12 +63,6 @@ const DelegateBalanceCard = () => {
         <div className="flex space-x-4 items-center mt-4">
           <div className="bg-bkg-1 px-4 py-2 justify-between rounded-md w-full">
             <div className="flex flex-row justify-between w-full mb-2">
-              <div>
-                <p className="text-fgd-3 text-xs"> Council Votes</p>
-                <p className="font-bold mb-0 text-fgd-1 text-xl">
-                  {getCouncilTokenCount()}
-                </p>
-              </div>
               <div>
                 <p className="text-fgd-3 text-xs">Delegate Accounts</p>
                 <p className="font-bold mb-0 text-fgd-1 text-xl">
@@ -151,7 +99,7 @@ const DelegateBalanceCard = () => {
                 )
               }
             >
-              <Select.Option key={'reset'} value={''}>
+              <Select.Option key={'reset'} value={undefined}>
                 Use own wallet
               </Select.Option>
               {ownDelegateCouncilTokenRecords?.map((councilDelegate) => (
@@ -179,12 +127,6 @@ const DelegateBalanceCard = () => {
         <div className="flex space-x-4 items-center mt-4">
           <div className="bg-bkg-1 px-4 py-2 justify-between rounded-md w-full">
             <div className="flex flex-row justify-between w-full mb-2">
-              <div>
-                <p className="text-fgd-3 text-xs">Community Votes</p>
-                <p className="font-bold mb-0 text-fgd-1 text-xl">
-                  {getCommunityTokenCount()}
-                </p>
-              </div>
               <div>
                 <p className="text-fgd-3 text-xs">Delegate Accounts</p>
                 <p className="font-bold mb-0 text-fgd-1 text-xl">

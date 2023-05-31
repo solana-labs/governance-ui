@@ -1,4 +1,4 @@
-import { Stream } from '@mean-dao/msp'
+import { Stream } from '@mean-dao/payment-streaming'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 
@@ -9,7 +9,7 @@ import {
   MeanTransferStream,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
-import createMsp from './createMsp'
+import createPaymentStreaming from './createPaymentStreaming'
 
 interface Args {
   connection: ConnectionContext
@@ -37,18 +37,21 @@ export default async function getMeanWithdrawFromAccountInstruction({
   const formStream = form.stream as Stream | undefined
 
   if (isValid && governedTokenAccount && formStream && form.destination) {
-    const msp = createMsp(connection)
+    const paymentStreaming = createPaymentStreaming(connection)
 
     const beneficiary = getGovernedAccountPk(governedTokenAccount)
-
+    const feePayer = beneficiary
     const stream = new PublicKey(formStream.id)
     const newBeneficiary = new PublicKey(form.destination)
 
-    const transaction = await msp.transferStream(
+    const {
+      transaction,
+    } = await paymentStreaming.buildTransferStreamTransaction({
       beneficiary,
       newBeneficiary,
-      stream
-    )
+      stream,
+      feePayer,
+    })
 
     const additionalSerializedInstructions = transaction.instructions.map(
       serializeInstructionToBase64
@@ -59,7 +62,6 @@ export default async function getMeanWithdrawFromAccountInstruction({
       isValid: true,
       governance: governedTokenAccount?.governance,
       additionalSerializedInstructions,
-      shouldSplitIntoSeparateTxs: true,
     }
     return obj
   }
@@ -69,7 +71,6 @@ export default async function getMeanWithdrawFromAccountInstruction({
     isValid: false,
     governance: governedTokenAccount?.governance,
     additionalSerializedInstructions: [],
-    shouldSplitIntoSeparateTxs: true,
   }
 
   return obj

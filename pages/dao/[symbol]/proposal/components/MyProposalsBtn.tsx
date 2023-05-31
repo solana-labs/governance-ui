@@ -1,8 +1,8 @@
 import useRealm from '@hooks/useRealm'
-import React, { useEffect, useMemo, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   getProposalDepositsByDepositPayer,
+  getVoteRecordAddress,
   ProgramAccount,
   Proposal,
   ProposalDeposit,
@@ -20,9 +20,7 @@ import dayjs from 'dayjs'
 import { notify } from '@utils/notifications'
 import Loading from '@components/Loading'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
-import { sleep } from '@project-serum/common'
-import { NftVoterClient } from '@solana/governance-program-library'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { chunks } from '@utils/helpers'
 import { sendSignedTransaction } from '@utils/send'
 import { getRegistrarPDA, getVoterWeightRecord } from '@utils/plugin/accounts'
@@ -31,25 +29,56 @@ import {
   SequenceType,
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
+import useQueryContext from '@hooks/useQueryContext'
+import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
+import {
+  useUserCommunityTokenOwnerRecord,
+  useUserCouncilTokenOwnerRecord,
+} from '@hooks/queries/tokenOwnerRecord'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useVoteRecordsByOwnerQuery } from '@hooks/queries/voteRecord'
+import useProgramVersion from '@hooks/useProgramVersion'
+import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
+import { useConnection } from '@solana/wallet-adapter-react'
+import {
+  proposalQueryKeys,
+  useRealmProposalsQuery,
+} from '@hooks/queries/proposal'
+import queryClient from '@hooks/queries/queryClient'
 
 const MyProposalsBn = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
-  const wallet = useWalletStore((s) => s.current)
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const [isLoading, setIsLoading] = useState(false)
   const { governancesArray } = useGovernanceAssets()
-  const { current: connection } = useWalletStore((s) => s.connection)
-  const ownVoteRecordsByProposal = useWalletStore(
-    (s) => s.ownVoteRecordsByProposal
-  )
+  const { connection } = useConnection()
+  const myVoteRecords = useVoteRecordsByOwnerQuery(
+    wallet?.publicKey ?? undefined
+  ).data
+
+  const ownVoteRecordsByProposal = useMemo(() => {
+    return myVoteRecords !== undefined
+      ? (Object.fromEntries(
+          myVoteRecords.map((x) => [x.account.proposal.toString, x] as const)
+        ) as Record<string, typeof myVoteRecords[number]>)
+      : undefined
+  }, [myVoteRecords])
+
   const [ownNftVoteRecords, setOwnNftVoteRecords] = useState<any[]>([])
   const ownNftVoteRecordsFilterd = ownNftVoteRecords
-  const maxVoterWeight =
-    useNftPluginStore((s) => s.state.maxVoteRecord)?.pubkey || undefined
-  const { realm, programId, programVersion } = useWalletStore(
-    (s) => s.selectedRealm
-  )
-  const { refetchProposals } = useWalletStore((s) => s.actions)
+
+  const { data: tokenOwnerRecord } = useAddressQuery_CommunityTokenOwner()
+
+  const maxVoterWeight = useMaxVoteRecord()?.pubkey || undefined
+  const realm = useRealmQuery().data?.result
+  const programId = realm?.owner
+
+  const programVersion =
+    useProgramVersion() ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION
+
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
@@ -57,17 +86,15 @@ const MyProposalsBn = () => {
     proposalsWithDepositedTokens,
     setProposalsWithDepositedTokens,
   ] = useState<ProgramAccount<ProposalDeposit>[]>([])
-  const {
-    proposals,
-    ownTokenRecord,
-    ownCouncilTokenRecord,
-    realmInfo,
-    isNftMode,
-  } = useRealm()
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
+
+  const { realmInfo, isNftMode } = useRealm()
+  const { data: proposals } = useRealmProposalsQuery()
   const myProposals = useMemo(
     () =>
       connected
-        ? Object.values(proposals).filter(
+        ? proposals?.filter(
             (p) =>
               p.account.tokenOwnerRecord.toBase58() ===
                 ownTokenRecord?.pubkey.toBase58() ||
@@ -75,14 +102,18 @@ const MyProposalsBn = () => {
                 ownCouncilTokenRecord?.pubkey.toBase58()
           )
         : [],
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    [proposals, ownVoteRecordsByProposal, connected]
+    [
+      connected,
+      proposals,
+      ownTokenRecord?.pubkey,
+      ownCouncilTokenRecord?.pubkey,
+    ]
   )
-  const drafts = myProposals.filter((x) => {
+  const drafts = myProposals?.filter((x) => {
     return x.account.state === ProposalState.Draft
   })
-  const notfinalized = myProposals.filter((x) => {
-    const governance = governancesArray.find(
+  const notfinalized = myProposals?.filter((x) => {
+    const governance = governancesArray?.find(
       (gov) => gov.pubkey.toBase58() === x.account.governance.toBase58()
     )
     const now = dayjs().unix()
@@ -91,7 +122,7 @@ const MyProposalsBn = () => {
         ? 0 // If vote is finalized then set the timestamp to 0 to make it expired
         : x.account.votingAt && governance
         ? x.account.votingAt.toNumber() +
-          governance.account.config.maxVotingTime
+          governance.account.config.baseVotingTime
         : undefined
       : undefined
     return (
@@ -101,7 +132,7 @@ const MyProposalsBn = () => {
       now > timestamp
     )
   })
-  const unReleased = [...Object.values(proposals)].filter(
+  const unReleased = proposals?.filter(
     (x) =>
       (x.account.state === ProposalState.Completed ||
         x.account.state === ProposalState.Executing ||
@@ -111,11 +142,11 @@ const MyProposalsBn = () => {
         x.account.state === ProposalState.Defeated ||
         x.account.state === ProposalState.Vetoed ||
         x.account.state === ProposalState.Cancelled) &&
-      ownVoteRecordsByProposal[x.pubkey.toBase58()] &&
-      !ownVoteRecordsByProposal[x.pubkey.toBase58()]?.account.isRelinquished
+      ownVoteRecordsByProposal?.[x.pubkey.toBase58()] &&
+      !ownVoteRecordsByProposal?.[x.pubkey.toBase58()]?.account.isRelinquished
   )
 
-  const createdVoting = myProposals.filter((x) => {
+  const createdVoting = myProposals?.filter((x) => {
     return (
       x.account.state === ProposalState.Voting && !x.account.isVoteFinalized()
     )
@@ -158,21 +189,23 @@ const MyProposalsBn = () => {
           sendSignedTransaction({ signedTransaction: transaction, connection })
         )
       )
-      await sleep(500)
-      await refetchProposals()
+      queryClient.invalidateQueries({
+        queryKey: proposalQueryKeys.all(connection.rpcEndpoint),
+      })
     } catch (e) {
       console.log(e)
-      notify({ type: 'error', message: 'Something wnet wrong' })
+      notify({ type: 'error', message: `Something went wrong ${e}` })
     }
     setIsLoading(false)
   }
 
   const cleanDrafts = (toIndex = null) => {
+    if (!drafts) throw new Error()
     const withInstruction = (instructions, proposal) => {
       return withCancelProposal(
         instructions,
         realm!.owner!,
-        realmInfo!.programVersion!,
+        programVersion,
         realm!.pubkey!,
         proposal!.account.governance,
         proposal!.pubkey,
@@ -183,6 +216,7 @@ const MyProposalsBn = () => {
     cleanSelected(drafts.slice(0, toIndex || drafts.length), withInstruction)
   }
   const releaseAllTokens = (toIndex = null) => {
+    if (unReleased === undefined) throw new Error()
     const withInstruction = async (
       instructions,
       proposal: ProgramAccount<Proposal>
@@ -194,6 +228,13 @@ const MyProposalsBn = () => {
           : ownCouncilTokenRecord
       const governanceAuthority = wallet!.publicKey!
       const beneficiary = wallet!.publicKey!
+
+      const voteRecordPk = await getVoteRecordAddress(
+        realm!.owner,
+        proposal.pubkey,
+        voterTokenRecord!.pubkey
+      )
+
       const inst = await withRelinquishVote(
         instructions,
         realm!.owner,
@@ -203,14 +244,15 @@ const MyProposalsBn = () => {
         proposal.pubkey,
         voterTokenRecord!.pubkey,
         proposal.account.governingTokenMint,
-        ownVoteRecordsByProposal[proposal.pubkey.toBase58()].pubkey,
+        voteRecordPk,
         governanceAuthority,
         beneficiary
       )
       await client.withRelinquishVote(
         instructions,
         proposal,
-        ownVoteRecordsByProposal[proposal.pubkey.toBase58()].pubkey
+        voteRecordPk,
+        voterTokenRecord!.pubkey
       )
       return inst
     }
@@ -220,6 +262,7 @@ const MyProposalsBn = () => {
     )
   }
   const finalizeAll = (toIndex = null) => {
+    if (notfinalized === undefined) throw new Error()
     const withInstruction = (
       instructions,
       proposal: ProgramAccount<Proposal>
@@ -227,8 +270,8 @@ const MyProposalsBn = () => {
       return withFinalizeVote(
         instructions,
         realm!.owner,
-        realmInfo!.programVersion!,
-        realm!.pubkey!,
+        programVersion,
+        realm!.pubkey,
         proposal.account.governance,
         proposal.pubkey,
         proposal.account.tokenOwnerRecord,
@@ -242,6 +285,10 @@ const MyProposalsBn = () => {
     )
   }
   const releaseNfts = async (count: number | null = null) => {
+    if (proposals === undefined) throw new Error()
+    if (!realm) throw new Error()
+    if (!wallet?.publicKey) throw new Error('no wallet')
+
     setIsLoading(true)
     const instructions: TransactionInstruction[] = []
     const { registrar } = await getRegistrarPDA(
@@ -255,20 +302,24 @@ const MyProposalsBn = () => {
       wallet!.publicKey!,
       client.client!.program.programId
     )
+
     const nfts = ownNftVoteRecordsFilterd.slice(
       0,
       count ? count : ownNftVoteRecordsFilterd.length
     )
     for (const i of nfts) {
+      const proposal = proposals.find((p) =>
+        p.pubkey.equals(i.account.proposal)
+      )
       const relinquishNftVoteIx = await (client.client as NftVoterClient).program.methods
         .relinquishNftVote()
         .accounts({
           registrar,
           voterWeightRecord: voterWeightPk,
-          governance:
-            proposals[i.account.proposal.toBase58()].account.governance,
+          governance: proposal?.account.governance,
           proposal: i.account.proposal,
-          governingTokenOwner: wallet!.publicKey!,
+          voterTokenOwnerRecord: tokenOwnerRecord,
+          voterAuthority: wallet!.publicKey!,
           voteRecord: i.publicKey,
           beneficiary: wallet!.publicKey!,
         })
@@ -279,7 +330,7 @@ const MyProposalsBn = () => {
       instructions.push(relinquishNftVoteIx)
     }
     try {
-      const insertChunks = chunks(instructions, 10).map((txBatch, batchIdx) => {
+      const insertChunks = chunks(instructions, 5).map((txBatch, batchIdx) => {
         return {
           instructionsSet: txBatchesToInstructionSetWithSigners(
             txBatch,
@@ -301,7 +352,8 @@ const MyProposalsBn = () => {
       console.log(e)
     }
   }
-  const getNftsVoteRecord = async () => {
+
+  const getNftsVoteRecord = useCallback(async () => {
     const nftClient = client.client as NftVoterClient
     const nftVoteRecords = await nftClient.program.account.nftVoteRecord.all([
       {
@@ -312,16 +364,20 @@ const MyProposalsBn = () => {
       },
     ])
 
-    const nftVoteRecordsFiltered = nftVoteRecords.filter(
-      (x) =>
-        proposals[x.account.proposal.toBase58()] &&
-        proposals[
-          x.account.proposal.toBase58()
-        ].account.governingTokenMint.toBase58() ===
+    const nftVoteRecordsFiltered = nftVoteRecords.filter((x) => {
+      const proposal = proposals?.find((p) =>
+        p.pubkey.equals(x.account.proposal)
+      )
+
+      return (
+        proposal &&
+        proposal.account.governingTokenMint.toBase58() ===
           realm?.account.communityMint.toBase58()
-    )
+      )
+    })
     setOwnNftVoteRecords(nftVoteRecordsFiltered)
-  }
+  }, [client.client, proposals, realm?.account.communityMint, wallet])
+
   const releaseSol = async () => {
     const instructions: TransactionInstruction[] = []
     for (const proposalDeposit of proposalsWithDepositedTokens) {
@@ -343,31 +399,54 @@ const MyProposalsBn = () => {
     })
     getSolDeposits()
   }
-  const getSolDeposits = async () => {
+  const getSolDeposits = useCallback(async () => {
     const solDeposits = await getProposalDepositsByDepositPayer(
       connection,
       realm!.owner,
       wallet!.publicKey!
     )
-
-    setProposalsWithDepositedTokens(solDeposits)
-  }
+    const filterdSolDeposits = solDeposits.filter((x) => {
+      const proposal = proposals?.find((p) =>
+        p.pubkey.equals(x.account.proposal)
+      )
+      const proposalState = proposal?.account.state
+      return (
+        proposalState !== ProposalState.Draft &&
+        proposalState !== ProposalState.Voting &&
+        proposalState !== ProposalState.SigningOff
+      )
+    })
+    setProposalsWithDepositedTokens(filterdSolDeposits)
+  }, [connection, proposals, realm, wallet])
   useEffect(() => {
     if (
       wallet?.publicKey &&
       modalIsOpen &&
-      realmInfo!.programVersion &&
-      realmInfo!.programVersion > 2
+      realmInfo?.programVersion &&
+      realmInfo?.programVersion > 2 &&
+      proposals?.length
     ) {
       getSolDeposits()
     }
-  }, [wallet?.publicKey?.toBase58(), modalIsOpen, realmInfo?.programVersion])
+  }, [
+    getSolDeposits,
+    modalIsOpen,
+    proposals,
+    realmInfo,
+    realmInfo?.programVersion,
+    wallet?.publicKey,
+  ])
   useEffect(() => {
     if (wallet?.publicKey && isNftMode && client.client && modalIsOpen) {
       getNftsVoteRecord()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [client.clientType, isNftMode, wallet?.publicKey?.toBase58(), modalIsOpen])
+  }, [
+    client.client,
+    getNftsVoteRecord,
+    isNftMode,
+    modalIsOpen,
+    wallet?.publicKey,
+  ])
 
   return (
     <>
@@ -400,28 +479,28 @@ const MyProposalsBn = () => {
               title="Drafts"
               fcn={cleanDrafts}
               btnName="Cancel"
-              proposals={drafts}
+              proposals={drafts ?? []}
               isLoading={isLoading}
             ></ProposalList>
             <ProposalList
               title="Unfinalized"
               fcn={finalizeAll}
               btnName="Finalize"
-              proposals={notfinalized}
+              proposals={notfinalized ?? []}
               isLoading={isLoading}
             ></ProposalList>
             <ProposalList
               title="Unreleased proposals"
               fcn={releaseAllTokens}
               btnName="Release"
-              proposals={unReleased}
+              proposals={unReleased ?? []}
               isLoading={isLoading}
             ></ProposalList>
             <ProposalList
               title="Created vote in progress"
               fcn={() => null}
               btnName=""
-              proposals={createdVoting}
+              proposals={createdVoting ?? []}
               isLoading={isLoading}
             ></ProposalList>
             {isNftMode && ownNftVoteRecordsFilterd.length !== 0 && (
@@ -469,6 +548,8 @@ const ProposalList = ({
   proposals: ProgramAccount<Proposal>[]
   isLoading: boolean
 }) => {
+  const { fmtUrlWithCluster } = useQueryContext()
+  const { symbol } = useRealm()
   return (
     <>
       {' '}
@@ -502,7 +583,16 @@ const ProposalList = ({
             className="text-xs border-fgd-4 border px-3 py-2 mb-3 rounded-lg"
             key={x.pubkey.toBase58()}
           >
-            {x.account.name}
+            <a
+              className="underline cursor-pointer"
+              href={fmtUrlWithCluster(
+                `/dao/${symbol}/proposal/${x.pubkey.toBase58()}`
+              )}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {x.account.name}
+            </a>
           </div>
         ))}
       </div>

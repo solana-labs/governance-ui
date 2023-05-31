@@ -14,7 +14,8 @@ import { getCreateTokenMetadataSchema } from 'utils/validations'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { getCreateTokenMetadataInstruction } from 'utils/instructionTools'
 import { AccountType } from '@utils/uiTypes/assets'
-import useWalletStore from 'stores/useWalletStore'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const CreateTokenMetadata = ({
   index,
@@ -23,7 +24,7 @@ const CreateTokenMetadata = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const mintGovernancesWithMintInfo = assetAccounts.filter(
@@ -38,7 +39,7 @@ const CreateTokenMetadata = ({
     mintAccount: undefined,
     programId: programId?.toString(),
   })
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const [governedAccount, setGovernedAccount] = useState<
     ProgramAccount<Governance> | undefined
   >(undefined)

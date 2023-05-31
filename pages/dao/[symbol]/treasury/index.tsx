@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import AccountsTabs from '@components/TreasuryAccount/AccountsTabs'
 import AccountOverview from '@components/TreasuryAccount/AccountOverview'
-import useWalletStore from 'stores/useWalletStore'
 import useRealm from 'hooks/useRealm'
 import { CurrencyDollarIcon, PlusCircleIcon } from '@heroicons/react/outline'
 import { LinkButton } from '@components/Button'
@@ -17,6 +16,9 @@ import Select from '@components/inputs/Select'
 import { getTreasuryAccountItemInfoV2 } from '@utils/treasuryTools'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import Tooltip from '@components/Tooltip'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export const NEW_TREASURY_ROUTE = `/treasury/new`
 
@@ -27,17 +29,18 @@ const Treasury = () => {
     auxiliaryTokenAccounts,
   } = useGovernanceAssets()
   const { setCurrentAccount } = useTreasuryAccountStore()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
+  const realm = useRealmQuery().data?.result
   const {
     ownVoterWeight,
     symbol,
-    realm,
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const [treasuryAccounts, setTreasuryAccounts] = useState<AssetAccount[]>([])
   const [activeAccount, setActiveAccount] = useState<AssetAccount | null>(null)
   const [accountInfo, setAccountInfo] = useState<any>(null)

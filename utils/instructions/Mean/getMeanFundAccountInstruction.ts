@@ -1,4 +1,4 @@
-import { Treasury } from '@mean-dao/msp'
+import { PaymentStreamingAccount } from '@mean-dao/payment-streaming'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 
@@ -10,7 +10,7 @@ import {
   MeanFundAccount,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
-import createMsp from './createMsp'
+import createPaymentStreaming from './createPaymentStreaming'
 
 function getGovernedAccountPk(acc: AssetAccount): PublicKey {
   return (acc.isSol
@@ -35,29 +35,30 @@ export default async function getMeanCreateAccountInstruction({
   const serializedInstruction = ''
   const governedTokenAccount = form.governedTokenAccount
 
-  const formTreasury = form.treasury as Treasury | undefined
+  const formPaymentStreamingAccount = form.paymentStreamingAccount as
+    | PaymentStreamingAccount
+    | undefined
 
   if (
     isValid &&
     governedTokenAccount &&
-    formTreasury &&
+    formPaymentStreamingAccount &&
     form.amount &&
     governedTokenAccount.extensions.mint
   ) {
-    const msp = createMsp(connection)
-    const payer = getGovernedAccountPk(governedTokenAccount)
-    const contributor = payer
+    const paymentStreaming = createPaymentStreaming(connection)
+    const feePayer = getGovernedAccountPk(governedTokenAccount)
+    const contributor = feePayer
     const mint = governedTokenAccount.extensions.mint.publicKey
-    const treasury = new PublicKey(formTreasury.id)
+    const psAccount = new PublicKey(formPaymentStreamingAccount.id)
     const amount = parseMintNaturalAmountFromDecimal(
       form.amount,
       governedTokenAccount.extensions.mint.account.decimals
     )
-    const transaction = await msp.addFunds(
-      payer,
-      contributor,
-      treasury,
-      mint,
+    const {
+      transaction,
+    } = await paymentStreaming.buildAddFundsToAccountTransaction(
+      { psAccount, psAccountMint: mint, contributor, feePayer },
       amount
     )
 
@@ -70,7 +71,6 @@ export default async function getMeanCreateAccountInstruction({
       isValid: true,
       governance: governedTokenAccount?.governance,
       additionalSerializedInstructions,
-      shouldSplitIntoSeparateTxs: true,
     }
     return obj
   }
@@ -80,7 +80,6 @@ export default async function getMeanCreateAccountInstruction({
     isValid: false,
     governance: governedTokenAccount?.governance,
     additionalSerializedInstructions: [],
-    shouldSplitIntoSeparateTxs: true,
   }
 
   return obj

@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useRouter } from 'next/router'
 import { PublicKey } from '@solana/web3.js'
 
-import useWalletStore from 'stores/useWalletStore'
 import createMultisigWallet from 'actions/createMultisigWallet'
 
 import useQueryContext from '@hooks/useQueryContext'
@@ -28,6 +27,8 @@ import {
   GoverningTokenConfigAccountArgs,
   GoverningTokenType,
 } from '@solana/spl-governance'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export const FORM_NAME = 'multisig'
 
@@ -92,7 +93,9 @@ const transformMultisigForm2RealmCreation = ({ ...formData }: MultisigForm) => {
 }
 
 export default function MultiSigWizard() {
-  const { connected, connection, current: wallet } = useWalletStore((s) => s)
+  const connection = useLegacyConnectionContext()
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const { push } = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
   const [requestPending, setRequestPending] = useState(false)

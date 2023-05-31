@@ -4,35 +4,32 @@ import classNames from 'classnames'
 
 import useRealm from '@hooks/useRealm'
 import { calculateMaxVoteScore } from '@models/proposal/calulateMaxVoteScore'
-import useProposal from '@hooks/useProposal'
-import useWalletStore from 'stores/useWalletStore'
 import { SecondaryButton } from '@components/Button'
 
 import { getMintMetadata } from '../instructions/programs/splToken'
 import getNumTokens from './getNumTokens'
 import depositTokens from './depositTokens'
 import VotingPowerPct from './VotingPowerPct'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
+import { useRouteProposalQuery } from '@hooks/queries/proposal'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 interface Props {
   className?: string
 }
 
 export default function CommunityVotingPower(props: Props) {
-  const {
-    mint,
-    ownTokenRecord,
-    ownVoterWeight,
-    realm,
-    realmInfo,
-    realmTokenAccount,
-  } = useRealm()
-  const { proposal } = useProposal()
-  const fetchWalletTokenAccounts = useWalletStore(
-    (s) => s.actions.fetchWalletTokenAccounts
-  )
-  const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
-  const connection = useWalletStore((s) => s.connection.current)
-  const wallet = useWalletStore((s) => s.current)
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const realm = useRealmQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+
+  const { ownVoterWeight, realmInfo, realmTokenAccount } = useRealm()
+  const proposal = useRouteProposalQuery().data?.result
+  const { connection } = useConnection()
+  const wallet = useWalletOnePointOh()
 
   // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   const depositAmount = realmTokenAccount
@@ -61,19 +58,8 @@ export default function CommunityVotingPower(props: Props) {
         amount: depositAmount,
         depositTokenAccount: realmTokenAccount,
       })
-      await fetchWalletTokenAccounts()
-      await fetchRealm(realmInfo.programId, realmInfo.realmId)
     }
-  }, [
-    depositAmount,
-    fetchRealm,
-    fetchWalletTokenAccounts,
-    connection,
-    realmTokenAccount,
-    realmInfo,
-    realm,
-    wallet,
-  ])
+  }, [depositAmount, connection, realmTokenAccount, realmInfo, realm, wallet])
 
   if (!(realm && realmInfo)) {
     return (

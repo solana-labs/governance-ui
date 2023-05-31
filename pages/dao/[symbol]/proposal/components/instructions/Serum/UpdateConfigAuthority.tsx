@@ -1,6 +1,7 @@
 import Input from '@components/inputs/Input'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useWallet from '@hooks/useWallet'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import {
   Governance,
   ProgramAccount,
@@ -10,8 +11,8 @@ import { tryParseKey } from '@tools/validators/pubkey'
 import { SerumUpdateConfigAuthority } from '@utils/uiTypes/proposalCreationTypes'
 import { useContext, useEffect, useState } from 'react'
 import useSerumGovStore, { ConfigAccountType } from 'stores/useSerumGovStore'
-import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 const UpdateConfigAuthority = ({
   index,
@@ -21,9 +22,9 @@ const UpdateConfigAuthority = ({
 }) => {
   const programId = useSerumGovStore((s) => s.programId)
   const actions = useSerumGovStore((s) => s.actions)
-  const connection = useWalletStore((s) => s.connection.current)
-  const wallet = useWalletStore((s) => s.current)
-  const { anchorProvider } = useWallet()
+  const { connection } = useConnection()
+  const wallet = useWalletOnePointOh()
+  const { anchorProvider } = useWalletDeprecated()
 
   const [configAccount, setConfigAccount] = useState<ConfigAccountType | null>(
     null

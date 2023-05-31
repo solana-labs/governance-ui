@@ -1,14 +1,4 @@
-import { MangoAccount } from '@blockworks-foundation/mango-client'
-import {
-  ProgramAccount,
-  Realm,
-  RpcContext,
-  TokenOwnerRecord,
-} from '@solana/spl-governance'
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
-import { VotingClient } from '@utils/uiTypes/VotePlugin'
-import { AssetAccount } from '@utils/uiTypes/assets'
-import { MarketStore } from 'Strategies/store/marketStore'
+import { PublicKey } from '@solana/web3.js'
 import {
   CreateSolendStrategyParams,
   SolendSubStrategy,
@@ -33,13 +23,15 @@ export interface TreasuryStrategy {
   //item and modal to strategywrapper component based on generic components
   isGenericItem?: boolean
   createProposalFcn: any
+  /** When true, does not display protocol or name */
+  noProtocol?: boolean
 }
-
+/* 
 export type MangoStrategy = TreasuryStrategy & {
   //async function that pass all props needed to create proposal
   // if promise is successfully resolved it will automatically redirect to created proposal
   createProposalFcn: HandleCreateProposalWithStrategy
-}
+} */
 
 export type SolendStrategy = TreasuryStrategy & {
   reserves: Array<SolendSubStrategy>
@@ -62,7 +54,8 @@ export type EverlendStrategy = TreasuryStrategy & {
   rateEToken: number
 }
 
-export type HandleCreateProposalWithStrategy = (
+/* 
+type HandleCreateProposalWithStrategy = (
   { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
   handledMint: string,
   form: MNGODepositForm,
@@ -73,22 +66,16 @@ export type HandleCreateProposalWithStrategy = (
   proposalIndex: number,
   prerequisiteInstructions: TransactionInstruction[],
   isDraft: boolean,
-  market?: MarketStore,
   client?: VotingClient
-) => Promise<PublicKey>
-
-export interface NameVal {
-  name: string
-  val: string | null
-}
-
-export type MNGODepositForm = {
+) => Promise<PublicKey> */
+/* 
+type MNGODepositForm = {
   mintAmount: number
   delegateDeposit: boolean
   delegateAddress: string
   mangoAccountPk: PublicKey | null
-  mangoAccounts: MangoAccount[]
   title: string
   description: string
   proposalCount: number
 }
+ */

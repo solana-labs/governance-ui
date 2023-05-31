@@ -9,8 +9,6 @@ import {
 import { validateInstruction } from '@utils/instructionTools'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
-import useWalletStore from 'stores/useWalletStore'
-
 import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NewProposalContext } from '../../../new'
@@ -21,6 +19,8 @@ import InstructionForm, {
 import { getMaxVoterWeightRecord } from '@utils/plugin/accounts'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 interface CreateNftMaxVoterWeightRecord {
   governedAccount: AssetAccount | undefined
@@ -33,10 +33,12 @@ const CreateNftPluginMaxVoterWeightRecord = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { realm, realmInfo } = useRealm()
+  const realm = useRealmQuery().data?.result
+
+  const { realmInfo } = useRealm()
   const nftClient = useVotePluginsClientStore((s) => s.state.nftClient)
   const { assetAccounts } = useGovernanceAssets()
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<CreateNftMaxVoterWeightRecord>()
   const [formErrors, setFormErrors] = useState({})
@@ -106,7 +108,6 @@ const CreateNftPluginMaxVoterWeightRecord = ({
   ]
   return (
     <>
-      {form && (
       <InstructionForm
         outerForm={form}
         setForm={setForm}
@@ -114,7 +115,6 @@ const CreateNftPluginMaxVoterWeightRecord = ({
         setFormErrors={setFormErrors}
         formErrors={formErrors}
       ></InstructionForm>
-      )}
     </>
   )
 }

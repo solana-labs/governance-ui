@@ -1,11 +1,14 @@
-import { useState } from 'react'
+import { ImgHTMLAttributes, useState } from 'react'
 import { RadioGroup } from '@headlessui/react'
 import Header from '@components/Header'
 import Text from '@components/Text'
 import GradientCheckmarkCircle from './GradientCheckmarkCircle'
 import { LoadingDots } from '@components/Loading'
 
-function ImageWithLoader({ className, ...props }) {
+function ImageWithLoader({
+  className,
+  ...props
+}: ImgHTMLAttributes<HTMLImageElement>) {
   const [loading, setLoading] = useState(true)
   const loadingClassName = `${loading ? '' : 'hidden'} ${className}`
   const imageClassName = `${loading ? 'hidden' : ''} ${className}`
@@ -16,6 +19,7 @@ function ImageWithLoader({ className, ...props }) {
       </div>
       <img
         {...props}
+        src={props.src}
         className={imageClassName}
         onLoad={() => setLoading(false)}
       />
@@ -57,7 +61,7 @@ const NFTCollectionSelector = ({ collections = {}, onChange, value }) => {
                 >
                   <div className="">
                     <ImageWithLoader
-                      src={collection?.image}
+                      src={collection?.image || ''}
                       className="flex justify-center w-16 h-16 border rounded-full border-fgd-4 md:w-20 md:h-20"
                       alt="Collection icon"
                     />
@@ -74,7 +78,7 @@ const NFTCollectionSelector = ({ collections = {}, onChange, value }) => {
                         <div key={index}>
                           {src && (
                             <ImageWithLoader
-                              src={src}
+                              src={src || ''}
                               alt={`NFT ${index + 1}`}
                               className="flex justify-center w-12 h-12 rounded-md md:h-16 md:w-16 bg-bkg-2"
                             />

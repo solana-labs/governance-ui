@@ -11,7 +11,6 @@ import { CheckCircleIcon, PlayIcon, RefreshIcon } from '@heroicons/react/solid'
 import Button from '@components/Button'
 import { RpcContext } from '@solana/spl-governance'
 import useRealm from '@hooks/useRealm'
-import useWalletStore from 'stores/useWalletStore'
 import { ProgramAccount } from '@solana/spl-governance'
 import { PublicKey, Transaction } from '@solana/web3.js'
 import Tooltip from '@components/Tooltip'
@@ -23,14 +22,15 @@ import {
 } from '@components/InstructionOptions'
 import dayjs from 'dayjs'
 import {
-  getFormattedStringFromDays,
-  SECS_PER_DAY,
-} from 'VoteStakeRegistry/tools/dateTools'
-import {
   getCastleReconcileInstruction,
   getCastleRefreshInstructions,
 } from '@utils/instructions/Castle'
 import Wallet from '@project-serum/sol-wallet-adapter'
+import { getFormattedStringFromDays, SECS_PER_DAY } from '@utils/dateTools'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import queryClient from '@hooks/queries/queryClient'
+import { proposalQueryKeys } from '@hooks/queries/proposal'
 
 export enum PlayState {
   Played,
@@ -53,10 +53,9 @@ export function ExecuteInstructionButton({
   instructionOption: InstructionOption
 }) {
   const { realmInfo } = useRealm()
-  const wallet = useWalletStore((s) => s.current)
-  const connection = useWalletStore((s) => s.connection)
-  const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connection = useLegacyConnectionContext()
+  const connected = !!wallet?.connected
 
   const [currentSlot, setCurrentSlot] = useState(0)
 
@@ -99,11 +98,11 @@ export function ExecuteInstructionButton({
       switch (instructionOption) {
         case InstructionOptions.castleRefresh:
           adjacentTransaction = new Transaction().add(
-              ...await getCastleRefreshInstructions(
-                  rpcContext.connection,
-                  (wallet as unknown) as Wallet,
-                  proposalInstruction
-              )
+            ...(await getCastleRefreshInstructions(
+              rpcContext.connection,
+              (wallet as unknown) as Wallet,
+              proposalInstruction
+            ))
           )
           break
         case InstructionOptions.castleReconcileRefresh: {
@@ -113,11 +112,11 @@ export function ExecuteInstructionButton({
             proposalInstruction
           )
           adjacentTransaction = new Transaction().add(
-              ...await getCastleRefreshInstructions(
-                rpcContext.connection,
-                (wallet as unknown) as Wallet,
-                proposalInstruction
-              )
+            ...(await getCastleRefreshInstructions(
+              rpcContext.connection,
+              (wallet as unknown) as Wallet,
+              proposalInstruction
+            ))
           )
           break
         }
@@ -130,8 +129,9 @@ export function ExecuteInstructionButton({
         adjacentTransaction,
         preExecutionTransactions
       )
-
-      await refetchProposals()
+      queryClient.invalidateQueries({
+        queryKey: proposalQueryKeys.all(connection.endpoint),
+      })
     } catch (error) {
       notify({ type: 'error', message: `error executing instruction ${error}` })
       console.log('error executing instruction', error)

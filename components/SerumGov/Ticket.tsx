@@ -5,13 +5,14 @@ import { ExternalLinkIcon } from '@heroicons/react/outline'
 import useCreateProposal from '@hooks/useCreateProposal'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
-import useWallet from '@hooks/useWallet'
+import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import {
   getInstructionDataFromBase64,
   Governance,
   ProgramAccount,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
+import { useConnection } from '@solana/wallet-adapter-react'
 import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 import { fmtBnMintDecimals } from '@tools/sdk/units'
 import { createAssociatedTokenAccount } from '@utils/associated'
@@ -29,7 +30,6 @@ import useSerumGovStore, {
   RedeemTicketType,
   SRM_DECIMALS,
 } from 'stores/useSerumGovStore'
-import useWalletStore from 'stores/useWalletStore'
 
 type TicketType = ClaimTicketType | RedeemTicketType
 
@@ -57,8 +57,8 @@ const Ticket: FC<Props> = ({ ticket, createProposal, callback }) => {
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
 
-  const connection = useWalletStore((s) => s.connection.current)
-  const { anchorProvider, wallet } = useWallet()
+  const { connection } = useConnection()
+  const { anchorProvider, wallet } = useWalletDeprecated()
 
   const actions = useSerumGovStore((s) => s.actions)
   const gsrmMint = useSerumGovStore((s) => s.gsrmMint)
@@ -130,7 +130,6 @@ const Ticket: FC<Props> = ({ ticket, createProposal, callback }) => {
                   createProposal.governance?.account.config
                     .minInstructionHoldUpTime,
                 prerequisiteInstructions: [],
-                shouldSplitIntoSeparateTxs: false,
               }
 
               instructionsData.push(ixData)
@@ -213,7 +212,6 @@ const Ticket: FC<Props> = ({ ticket, createProposal, callback }) => {
                   createProposal.governance?.account.config
                     .minInstructionHoldUpTime,
                 prerequisiteInstructions: [],
-                shouldSplitIntoSeparateTxs: false,
               }
 
               instructionsData.push(ixData)

@@ -14,19 +14,18 @@ import {
   ChevronDownIcon,
 } from '@heroicons/react/solid'
 import { abbreviateAddress } from '@utils/formatting'
-import { useEffect, useMemo, useState } from 'react'
-import useLocalStorageState from '../hooks/useLocalStorageState'
-import useWalletStore from '../stores/useWalletStore'
-import { getWalletProviderByUrl } from '../utils/wallet-adapters'
+import { useCallback, useEffect, useState } from 'react'
 import Switch from './Switch'
 import { TwitterIcon } from './icons'
 import { notify } from '@utils/notifications'
 import { Profile } from '@components/Profile'
 import Loading from './Loading'
-import { WalletReadyState } from '@solana/wallet-adapter-base'
+import { WalletName, WalletReadyState } from '@solana/wallet-adapter-base'
 import { useWallet } from '@solana/wallet-adapter-react'
-import useInitWallet from '@hooks/useInitWallet'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { DEFAULT_PROVIDER } from '../utils/wallet-adapters'
+import useViewAsWallet from '@hooks/useViewAsWallet'
 
 const StyledWalletProviderLabel = styled.p`
   font-size: 0.65rem;
@@ -34,34 +33,48 @@ const StyledWalletProviderLabel = styled.p`
 `
 
 const ConnectWalletButton = (props) => {
-  useInitWallet()
   const { pathname, query, replace } = useRouter()
   const [isLoading, setIsLoading] = useState(false)
-  const [currentCluster, setCurrentCluster] = useLocalStorageState(
-    'cluster',
-    'mainnet'
-  )
-  const { wallets } = useWallet()
+  const debugAdapter = useViewAsWallet()
 
   const {
-    connected,
-    current,
-    providerUrl,
-    connection,
-    set: setWalletStore,
-  } = useWalletStore((s) => s)
-
-  const provider = useMemo(() => getWalletProviderByUrl(providerUrl, wallets), [
-    providerUrl,
     wallets,
-  ])
+    select,
+    disconnect,
+    connect,
+    wallet,
+    publicKey: realPublicKey,
+    connected,
+  } = useWallet()
+  const connection = useLegacyConnectionContext()
+
+  const publicKey = debugAdapter?.publicKey ?? realPublicKey
 
   useEffect(() => {
-    if (connection.cluster !== currentCluster) {
-      setCurrentCluster(connection.cluster)
+    if (wallet === null) select(DEFAULT_PROVIDER.name as WalletName)
+  }, [select, wallet])
+
+  const handleConnectDisconnect = useCallback(async () => {
+    setIsLoading(true)
+    try {
+      if (connected) {
+        await disconnect()
+      } else {
+        await connect()
+      }
+    } catch (e: any) {
+      if (e.name === 'WalletNotReadyError') {
+        notify({
+          type: 'error',
+          message: 'You must have a wallet installed to connect',
+        })
+      }
+      console.warn('handleConnectDisconnect', e)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [connection.cluster])
+    setIsLoading(false)
+  }, [connect, connected, disconnect])
+
+  const currentCluster = query.cluster
 
   function updateClusterParam(cluster) {
     const newQuery = {
@@ -77,77 +90,17 @@ const ConnectWalletButton = (props) => {
   }
 
   function handleToggleDevnet() {
-    const isDevnet = !(currentCluster === 'devnet')
-    setCurrentCluster(isDevnet ? 'devnet' : 'mainnet')
-    updateClusterParam(isDevnet ? 'devnet' : null)
-  }
-
-  const handleConnectDisconnect = async () => {
-    setIsLoading(true)
-    try {
-      if (connected) {
-        await current?.disconnect()
-      } else {
-        await current?.connect()
-      }
-    } catch (e: any) {
-      if (e.name === 'WalletNotReadyError') {
-        notify({
-          type: 'error',
-          message: 'You must have a wallet installed to connect',
-        })
-      }
-      console.warn('handleConnectDisconnect', e)
-    }
-    setIsLoading(false)
+    updateClusterParam(currentCluster !== 'devnet' ? 'devnet' : null)
   }
 
   const { show } = useWalletIdentity()
 
   const { displayName } = useAddressName(
     connection.current,
-    current?.publicKey || undefined
+    publicKey ?? undefined
   )
 
-  const walletAddressFormatted = current?.publicKey
-    ? abbreviateAddress(current?.publicKey)
-    : ''
-  const displayAddressComponent = useMemo(() => {
-    return connected && current?.publicKey ? (
-      <DisplayAddress
-        connection={connection.current}
-        address={current.publicKey!}
-        width="100px"
-        height="20px"
-        dark={true}
-      />
-    ) : null
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [current?.publicKey?.toBase58()])
-
-  const displayAddressImage = useMemo(() => {
-    return connected && current?.publicKey ? (
-      <div className="hidden w-12 pr-2 sm:block">
-        <AddressImage
-          dark={true}
-          connection={connection.current}
-          address={current?.publicKey}
-          height="40px"
-          width="40px"
-          placeholder={
-            <div className="flex items-center justify-center flex-shrink-0 w-10 h-10 mr-2 rounded-full bg-bkg-4">
-              <UserCircleIcon className="h-9 text-fgd-3 w-9" />
-            </div>
-          }
-        />{' '}
-      </div>
-    ) : (
-      <div className="hidden pl-2 pr-2 sm:block">
-        <img src={provider?.adapter.icon} className="w-5 h-5" />
-      </div>
-    )
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [provider])
+  const walletAddressFormatted = publicKey ? abbreviateAddress(publicKey) : ''
 
   return (
     <div className="flex">
@@ -162,11 +115,46 @@ const ConnectWalletButton = (props) => {
         {...props}
       >
         <div className="relative flex items-center text-sm font-bold text-left text-fgd-1">
-          {displayAddressImage}
+          {
+            // TODO bring back debug wallet
+          }
+          {debugAdapter ? (
+            <div className="absolute -left-4 h-full text-red-400 opacity-90 pointer-events-none text-2xl drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)] -rotate-45">
+              DEBUG
+            </div>
+          ) : null}
+          {connected && publicKey ? (
+            <div className="hidden w-12 pr-2 sm:block">
+              <AddressImage
+                dark={true}
+                connection={connection.current}
+                address={publicKey}
+                height="40px"
+                width="40px"
+                placeholder={
+                  <div className="flex items-center justify-center flex-shrink-0 w-10 h-10 mr-2 rounded-full bg-bkg-4">
+                    <UserCircleIcon className="h-9 text-fgd-3 w-9" />
+                  </div>
+                }
+              />{' '}
+            </div>
+          ) : (
+            <div className="hidden pl-2 pr-2 sm:block">
+              <img src={wallet?.adapter.icon} className="w-5 h-5" />
+            </div>
+          )}
           <div>
-            {connected && current?.publicKey ? (
+            {connected && publicKey ? (
               <>
-                {displayAddressComponent}
+                {connected && publicKey ? (
+                  <DisplayAddress
+                    connection={connection.current}
+                    address={publicKey!}
+                    width="100px"
+                    height="20px"
+                    dark={true}
+                  />
+                ) : null}
                 <StyledWalletProviderLabel className="font-normal text-fgd-3">
                   {walletAddressFormatted}
                 </StyledWalletProviderLabel>
@@ -175,7 +163,7 @@ const ConnectWalletButton = (props) => {
               <>
                 {isLoading ? <Loading></Loading> : 'Connect'}
                 <StyledWalletProviderLabel className="font-normal text-fgd-3">
-                  {provider?.name}
+                  {wallet?.adapter.name}
                 </StyledWalletProviderLabel>
               </>
             )}
@@ -203,20 +191,16 @@ const ConnectWalletButton = (props) => {
                       ({ adapter }) =>
                         adapter.readyState !== WalletReadyState.Unsupported
                     )
-                    .map(({ adapter: { icon, name, url } }) => (
+                    .map(({ adapter: { icon, name } }) => (
                       <Menu.Item key={name}>
                         <button
                           className="flex items-center w-full p-2 font-normal default-transition h-9 hover:bg-bkg-3 hover:cursor-pointer hover:rounded focus:outline-none"
-                          onClick={() =>
-                            setWalletStore((s) => {
-                              s.providerUrl = url
-                            })
-                          }
+                          onClick={() => select(name)}
                         >
                           <img src={icon} className="w-4 h-4 mr-2" />
                           <span className="text-sm">{name}</span>
 
-                          {provider?.url === url ? (
+                          {wallet?.adapter.name === name ? (
                             <CheckCircleIcon className="w-5 h-5 ml-2 text-green" />
                           ) : null}
                         </button>
@@ -233,7 +217,7 @@ const ConnectWalletButton = (props) => {
                       />
                     </div>
                   </Menu.Item>
-                  {current && current.publicKey && (
+                  {wallet && publicKey && (
                     <>
                       <hr
                         className={`border border-fgd-3 opacity-50 mt-2 mb-2`}
@@ -251,8 +235,8 @@ const ConnectWalletButton = (props) => {
                           className="flex items-center w-full p-2 font-normal default-transition h-9 hover:bg-bkg-3 hover:cursor-pointer hover:rounded focus:outline-none"
                           onClick={() =>
                             show(
-                              // @ts-ignore
-                              current,
+                              //@ts-expect-error cardinal uses the `Wallet` class from uhh saberhq, so, the types dont line up. nice!
+                              wallet?.adapter,
                               connection.current,
                               connection.cluster
                             )

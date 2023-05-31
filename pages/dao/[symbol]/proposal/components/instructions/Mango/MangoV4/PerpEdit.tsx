@@ -1,17 +1,14 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
-import useRealm from '@hooks/useRealm'
 import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
-import { isFormValid } from '@utils/formValidation'
+import { isFormValid, validatePubkey } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
-import { BN } from '@blockworks-foundation/mango-client'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, {
   InstructionInput,
@@ -20,6 +17,44 @@ import InstructionForm, {
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { PerpMarketIndex } from '@blockworks-foundation/mango-v4'
 import { getChangedValues, getNullOrTransform } from '@utils/mangoV4Tools'
+import { BN } from '@coral-xyz/anchor'
+import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
+import Switch from '@components/Switch'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+
+const keyToLabel = {
+  oraclePk: 'Oracle',
+  oracleConfFilter: 'Oracle Confidence Filter',
+  maxStalenessSlots: 'Max Staleness Slots',
+  name: 'Name',
+  perp: 'Perp',
+  baseDecimals: 'Base Decimals',
+  maintBaseAssetWeight: 'Maintenance Base Asset Weight',
+  initBaseAssetWeight: 'Init Base Asset Weight',
+  maintBaseLiabWeight: 'Maintenance Base Liab Weight',
+  initBaseLiabWeight: 'Init Base Liab Weight',
+  maintOverallAssetWeight: 'Maint Overall Asset Weight',
+  initOverallAssetWeight: 'Init Overall Asset Weight',
+  baseLiquidationFee: 'Base Liquidation Fee',
+  makerFee: 'Maker Fee',
+  takerFee: 'Taker Fee',
+  feePenalty: 'Fee Penalty',
+  minFunding: 'Min Funding',
+  maxFunding: 'Max Funding',
+  impactQuantity: 'Impact Quantity',
+  groupInsuranceFund: 'Group Insurance Fund',
+  settleFeeFlat: 'Settle Fee Flat',
+  settleFeeAmountThreshold: 'Settle Fee Amount Threshold',
+  settleFeeFractionLowHealth: 'Settle Fee Fraction Low Health',
+  stablePriceDelayIntervalSeconds: 'Stable Price Delay Interval Seconds',
+  stablePriceDelayGrowthLimit: 'Stable Price Delay Growth Limit',
+  stablePriceGrowthLimit: 'Stable Price Growth Limit',
+  settlePnlLimitFactor: 'Settle Pnl Limit Factor',
+  settlePnlLimitWindowSize: 'Settle Pnl Limit Window Size',
+  reduceOnly: 'Reduce Only',
+  resetStablePrice: 'Reset Stable Price',
+  positivePnlLiquidationFee: 'Positive Pnl Liquidation Fee',
+}
 
 type NameMarketIndexVal = {
   name: string
@@ -29,15 +64,17 @@ interface PerpEditForm {
   governedAccount: AssetAccount | null
   perp: null | NameMarketIndexVal
   oraclePk: string
+  name: string
   oracleConfFilter: number
+  maxStalenessSlots: number
   baseDecimals: number
   maintBaseAssetWeight: number
   initBaseAssetWeight: number
   maintBaseLiabWeight: number
   initBaseLiabWeight: number
-  maintPnlAssetWeight: number
-  initPnlAssetWeight: number
-  liquidationFee: number
+  maintOverallAssetWeight: number
+  initOverallAssetWeight: number
+  baseLiquidationFee: number
   makerFee: number
   takerFee: number
   feePenalty: number
@@ -55,21 +92,26 @@ interface PerpEditForm {
   settlePnlLimitWindowSize: number
   reduceOnly: boolean
   resetStablePrice: boolean
+  positivePnlLiquidationFee: number
+  holdupTime: number
+  forceClose: boolean
 }
 
 const defaultFormValues = {
   governedAccount: null,
+  name: '',
   perp: null,
   oraclePk: '',
   oracleConfFilter: 0,
+  maxStalenessSlots: 0,
   baseDecimals: 0,
   maintBaseAssetWeight: 0,
   initBaseAssetWeight: 0,
   maintBaseLiabWeight: 0,
   initBaseLiabWeight: 0,
-  maintPnlAssetWeight: 0,
-  initPnlAssetWeight: 0,
-  liquidationFee: 0,
+  maintOverallAssetWeight: 0,
+  initOverallAssetWeight: 0,
+  baseLiquidationFee: 0,
   makerFee: 0,
   takerFee: 0,
   feePenalty: 0,
@@ -87,6 +129,9 @@ const defaultFormValues = {
   settlePnlLimitWindowSize: 0,
   reduceOnly: false,
   resetStablePrice: false,
+  positivePnlLiquidationFee: 0,
+  holdupTime: 0,
+  forceClose: false,
 }
 
 const PerpEdit = ({
@@ -96,26 +141,27 @@ const PerpEdit = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const { mangoClient, mangoGroup, getAdditionalLabelInfo } = UseMangoV4()
-  const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const [perps, setPerps] = useState<NameMarketIndexVal[]>([])
-  const governedProgramAccounts = assetAccounts.filter(
-    (x) => x.type === AccountType.SOL
+  const [forcedValues, setForcedValues] = useState<string[]>([])
+  const solAccounts = assetAccounts.filter(
+    (x) =>
+      x.type === AccountType.SOL &&
+      ((mangoGroup?.admin &&
+        x.extensions.transferAddress?.equals(mangoGroup.admin)) ||
+        (mangoGroup?.securityAdmin &&
+          x.extensions.transferAddress?.equals(mangoGroup.securityAdmin)))
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<PerpEditForm>({ ...defaultFormValues })
   const [originalFormValues, setOriginalFormValues] = useState<PerpEditForm>({
     ...defaultFormValues,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
-  const handleSetForm = ({ propertyName, value }) => {
-    setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
-  }
+
   const validateInstruction = async (): Promise<boolean> => {
     const { isValid, validationErrors } = await isFormValid(schema, form)
     setFormErrors(validationErrors)
@@ -126,36 +172,54 @@ const PerpEdit = ({
     let serializedInstruction = ''
     if (
       isValid &&
-      programId &&
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
       const perpMarket = mangoGroup!.perpMarketsMapByMarketIndex.get(
         form.perp!.value
       )!
-      const values = getChangedValues<PerpEditForm>(originalFormValues, form)
+      const values = getChangedValues<PerpEditForm>(
+        originalFormValues,
+        form,
+        forcedValues
+      )
+
+      const oracleConfFilter =
+        (form.oracleConfFilter as number | string) === ''
+          ? null
+          : form.oracleConfFilter
+      const maxStalenessSlots =
+        (form.maxStalenessSlots as number | string) === ''
+          ? null
+          : form.maxStalenessSlots
+
+      const isThereNeedOfSendingOracleConfig =
+        originalFormValues.oracleConfFilter !== oracleConfFilter ||
+        originalFormValues.maxStalenessSlots !== maxStalenessSlots
       //Mango instruction call and serialize
       const ix = await mangoClient!.program.methods
         .perpEditMarket(
           getNullOrTransform(values.oraclePk, PublicKey),
-          {
-            confFilter: Number(form.oracleConfFilter),
-            maxStalenessSlots: null,
-          },
+          isThereNeedOfSendingOracleConfig
+            ? {
+                confFilter: Number(form.oracleConfFilter),
+                maxStalenessSlots: maxStalenessSlots,
+              }
+            : null,
           getNullOrTransform(values.baseDecimals, null, Number),
           getNullOrTransform(values.maintBaseAssetWeight, null, Number),
           getNullOrTransform(values.initBaseAssetWeight, null, Number),
           getNullOrTransform(values.maintBaseLiabWeight, null, Number),
           getNullOrTransform(values.initBaseLiabWeight, null, Number),
-          getNullOrTransform(values.maintPnlAssetWeight, null, Number),
-          getNullOrTransform(values.initPnlAssetWeight, null, Number),
-          getNullOrTransform(values.liquidationFee, null, Number),
+          getNullOrTransform(values.maintOverallAssetWeight, null, Number),
+          getNullOrTransform(values.initOverallAssetWeight, null, Number),
+          getNullOrTransform(values.baseLiquidationFee, null, Number),
           getNullOrTransform(values.makerFee, null, Number),
           getNullOrTransform(values.takerFee, null, Number),
           getNullOrTransform(values.minFunding, null, Number),
           getNullOrTransform(values.maxFunding, null, Number),
           getNullOrTransform(values.impactQuantity, BN),
-          values.groupInsuranceFund,
+          values.groupInsuranceFund!,
           getNullOrTransform(values.feePenalty, null, Number),
           getNullOrTransform(values.settleFeeFlat, null, Number),
           getNullOrTransform(values.settleFeeAmountThreshold, null, Number),
@@ -169,8 +233,11 @@ const PerpEdit = ({
           getNullOrTransform(values.stablePriceGrowthLimit, null, Number),
           getNullOrTransform(values.settlePnlLimitFactor, null, Number),
           getNullOrTransform(values.settlePnlLimitWindowSize, BN),
-          values.reduceOnly,
-          values.resetStablePrice
+          values.reduceOnly!,
+          values.resetStablePrice!,
+          getNullOrTransform(values.positivePnlLiquidationFee, null, Number),
+          getNullOrTransform(values.name, null, String),
+          values.forceClose!
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -187,28 +254,29 @@ const PerpEdit = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
+      customHoldUpTime: form.holdupTime,
     }
     return obj
   }
-  useEffect(() => {
-    handleSetForm({
-      propertyName: 'programId',
-      value: programId?.toString(),
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [realmInfo?.programId])
+
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form])
+  }, [form, forcedValues])
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
       .nullable()
       .required('Program governed account is required'),
+    oraclePk: yup
+      .string()
+      .required()
+      .test('is-valid-address', 'Please enter a valid PublicKey', (value) =>
+        value ? validatePubkey(value) : true
+      ),
   })
   useEffect(() => {
     const getTokens = async () => {
@@ -223,7 +291,7 @@ const PerpEdit = ({
     if (mangoGroup) {
       getTokens()
     }
-  }, [mangoGroup?.publicKey.toBase58()])
+  }, [mangoGroup])
 
   useEffect(() => {
     if (form.perp && mangoGroup) {
@@ -231,17 +299,18 @@ const PerpEdit = ({
         form.perp.value
       )!
       const vals = {
-        ...form,
         oraclePk: currentPerp.oracle.toBase58(),
+        name: currentPerp.name,
         oracleConfFilter: currentPerp.oracleConfig.confFilter.toNumber(),
+        maxStalenessSlots: currentPerp.oracleConfig.maxStalenessSlots.toNumber(),
         baseDecimals: currentPerp.baseDecimals,
         maintBaseAssetWeight: currentPerp.maintBaseAssetWeight.toNumber(),
         initBaseAssetWeight: currentPerp.initBaseAssetWeight.toNumber(),
         maintBaseLiabWeight: currentPerp.maintBaseLiabWeight.toNumber(),
         initBaseLiabWeight: currentPerp.initBaseLiabWeight.toNumber(),
-        maintPnlAssetWeight: currentPerp.maintPnlAssetWeight.toNumber(),
-        initPnlAssetWeight: currentPerp.initPnlAssetWeight.toNumber(),
-        liquidationFee: currentPerp.liquidationFee.toNumber(),
+        maintOverallAssetWeight: currentPerp.maintOverallAssetWeight.toNumber(),
+        initOverallAssetWeight: currentPerp.initOverallAssetWeight.toNumber(),
+        liquidationFee: currentPerp.baseLiquidationFee.toNumber(),
         makerFee: currentPerp.makerFee.toNumber(),
         takerFee: currentPerp.takerFee.toNumber(),
         feePenalty: currentPerp.feePenalty,
@@ -261,13 +330,17 @@ const PerpEdit = ({
         settlePnlLimitWindowSize: currentPerp.settlePnlLimitWindowSizeTs.toNumber(),
         reduceOnly: currentPerp.reduceOnly,
         resetStablePrice: false,
+        forceClose: currentPerp.forceClose,
+        positivePnlLiquidationFee: currentPerp.positivePnlLiquidationFee.toNumber(),
       }
-      setForm({
+      setForm((prevForm) => ({
+        ...prevForm,
         ...vals,
-      })
-      setOriginalFormValues({ ...vals })
+      }))
+      setOriginalFormValues((prevForm) => ({ ...prevForm, ...vals }))
     }
-  }, [form.perp?.value])
+  }, [form.perp, mangoGroup])
+
   const inputs: InstructionInput[] = [
     {
       label: 'Governance',
@@ -276,23 +349,36 @@ const PerpEdit = ({
       type: InstructionInputType.GOVERNED_ACCOUNT,
       shouldBeGoverned: shouldBeGoverned as any,
       governance: governance,
-      options: governedProgramAccounts,
+      options: solAccounts,
     },
     {
-      label: 'Perp',
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
+    },
+    {
+      label: keyToLabel['perp'],
       name: 'perp',
       type: InstructionInputType.SELECT,
       initialValue: form.perp,
       options: perps,
     },
     {
-      label: 'Oracle',
+      label: keyToLabel['name'],
+      initialValue: form.name,
+      type: InstructionInputType.INPUT,
+      name: 'name',
+    },
+    {
+      label: keyToLabel['oraclePk'],
       initialValue: form.oraclePk,
       type: InstructionInputType.INPUT,
       name: 'oraclePk',
     },
     {
-      label: `Oracle Confidence Filter`,
+      label: keyToLabel['oracleConfFilter'],
       subtitle: getAdditionalLabelInfo('confFilter'),
       initialValue: form.oracleConfFilter,
       type: InstructionInputType.INPUT,
@@ -300,14 +386,22 @@ const PerpEdit = ({
       name: 'oracleConfFilter',
     },
     {
-      label: 'Base Decimals',
+      label: keyToLabel['maxStalenessSlots'],
+      subtitle: getAdditionalLabelInfo('maxStalenessSlots'),
+      initialValue: form.maxStalenessSlots,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'maxStalenessSlots',
+    },
+    {
+      label: keyToLabel['baseDecimals'],
       initialValue: form.baseDecimals,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'baseDecimals',
     },
     {
-      label: `Stable Price Delay Growth Limit`,
+      label: keyToLabel['stablePriceDelayGrowthLimit'],
       subtitle: getAdditionalLabelInfo('stablePriceDelayGrowthLimit'),
       initialValue: form.stablePriceDelayGrowthLimit,
       type: InstructionInputType.INPUT,
@@ -315,7 +409,7 @@ const PerpEdit = ({
       name: 'stablePriceDelayGrowthLimit',
     },
     {
-      label: `Stable Price Growth Limit`,
+      label: keyToLabel['stablePriceGrowthLimit'],
       subtitle: getAdditionalLabelInfo('stablePriceGrowthLimit'),
       initialValue: form.stablePriceGrowthLimit,
       type: InstructionInputType.INPUT,
@@ -323,7 +417,7 @@ const PerpEdit = ({
       name: 'stablePriceGrowthLimit',
     },
     {
-      label: `Maintenance Base Asset Weight`,
+      label: keyToLabel['maintBaseAssetWeight'],
       subtitle: getAdditionalLabelInfo('maintBaseAssetWeight'),
       initialValue: form.maintBaseAssetWeight,
       type: InstructionInputType.INPUT,
@@ -331,7 +425,7 @@ const PerpEdit = ({
       name: 'maintBaseAssetWeight',
     },
     {
-      label: `Init Base Asset Weight`,
+      label: keyToLabel['initBaseAssetWeight'],
       subtitle: getAdditionalLabelInfo('initBaseAssetWeight'),
       initialValue: form.initBaseAssetWeight,
       type: InstructionInputType.INPUT,
@@ -339,7 +433,7 @@ const PerpEdit = ({
       name: 'initBaseAssetWeight',
     },
     {
-      label: `Maintenance Base Liab Weight`,
+      label: keyToLabel['maintBaseLiabWeight'],
       subtitle: getAdditionalLabelInfo('maintBaseLiabWeight'),
       initialValue: form.maintBaseLiabWeight,
       type: InstructionInputType.INPUT,
@@ -347,7 +441,7 @@ const PerpEdit = ({
       name: 'maintBaseLiabWeight',
     },
     {
-      label: `Init Base Liab Weight`,
+      label: keyToLabel['initBaseLiabWeight'],
       subtitle: getAdditionalLabelInfo('initBaseLiabWeight'),
       initialValue: form.initBaseLiabWeight,
       type: InstructionInputType.INPUT,
@@ -355,31 +449,31 @@ const PerpEdit = ({
       name: 'initBaseLiabWeight',
     },
     {
-      label: `Maintenance Pnl Asset Weight`,
-      subtitle: getAdditionalLabelInfo('maintPnlAssetWeight'),
-      initialValue: form.maintPnlAssetWeight,
+      label: keyToLabel['maintOverallAssetWeight'],
+      subtitle: getAdditionalLabelInfo('maintOverallAssetWeight'),
+      initialValue: form.maintOverallAssetWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
-      name: 'maintPnlAssetWeight',
+      name: 'maintOverallAssetWeight',
     },
     {
-      label: `Liquidation Fee`,
-      subtitle: getAdditionalLabelInfo('liquidationFee'),
-      initialValue: form.liquidationFee,
+      label: keyToLabel['initOverallAssetWeight'],
+      subtitle: getAdditionalLabelInfo('initOverallAssetWeight'),
+      initialValue: form.initOverallAssetWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
-      name: 'liquidationFee',
+      name: 'initOverallAssetWeight',
     },
     {
-      label: `Init Pnl Asset Weight`,
-      subtitle: getAdditionalLabelInfo('initPnlAssetWeight'),
-      initialValue: form.initPnlAssetWeight,
+      label: keyToLabel['baseLiquidationFee'],
+      subtitle: getAdditionalLabelInfo('baseLiquidationFee'),
+      initialValue: form.baseLiquidationFee,
       type: InstructionInputType.INPUT,
       inputType: 'number',
-      name: 'initPnlAssetWeight',
+      name: 'baseLiquidationFee',
     },
     {
-      label: `Maker Fee`,
+      label: keyToLabel['makerFee'],
       subtitle: getAdditionalLabelInfo('makerFee'),
       initialValue: form.makerFee,
       type: InstructionInputType.INPUT,
@@ -387,7 +481,7 @@ const PerpEdit = ({
       name: 'makerFee',
     },
     {
-      label: `Taker Fee`,
+      label: keyToLabel['takerFee'],
       subtitle: getAdditionalLabelInfo('takerFee'),
       initialValue: form.takerFee,
       type: InstructionInputType.INPUT,
@@ -395,7 +489,7 @@ const PerpEdit = ({
       name: 'takerFee',
     },
     {
-      label: `Fee Penalty`,
+      label: keyToLabel['feePenalty'],
       subtitle: getAdditionalLabelInfo('feePenalty'),
       initialValue: form.feePenalty,
       type: InstructionInputType.INPUT,
@@ -403,28 +497,7 @@ const PerpEdit = ({
       name: 'feePenalty',
     },
     {
-      label: `Group Insurance Fund`,
-      subtitle: getAdditionalLabelInfo('groupInsuranceFund'),
-      initialValue: form.groupInsuranceFund,
-      type: InstructionInputType.SWITCH,
-      name: 'groupInsuranceFund',
-    },
-    {
-      label: `Reduce Only`,
-      subtitle: getAdditionalLabelInfo('reduceOnly'),
-      initialValue: form.reduceOnly,
-      type: InstructionInputType.SWITCH,
-      name: 'reduceOnly',
-    },
-    {
-      label: `Reset Stable Price`,
-      subtitle: getAdditionalLabelInfo('resetStablePrice'),
-      initialValue: form.resetStablePrice,
-      type: InstructionInputType.SWITCH,
-      name: 'resetStablePrice',
-    },
-    {
-      label: `Settle Fee Flat`,
+      label: keyToLabel['settleFeeFlat'],
       subtitle: getAdditionalLabelInfo('settleFeeFlat'),
       initialValue: form.settleFeeFlat,
       type: InstructionInputType.INPUT,
@@ -432,7 +505,7 @@ const PerpEdit = ({
       name: 'settleFeeFlat',
     },
     {
-      label: `Settle Fee Amount Threshold`,
+      label: keyToLabel['settleFeeAmountThreshold'],
       subtitle: getAdditionalLabelInfo('settleFeeAmountThreshold'),
       initialValue: form.settleFeeAmountThreshold,
       type: InstructionInputType.INPUT,
@@ -440,7 +513,7 @@ const PerpEdit = ({
       name: 'settleFeeAmountThreshold',
     },
     {
-      label: `Settle Fee Fraction Low Health`,
+      label: keyToLabel['settleFeeFractionLowHealth'],
       subtitle: getAdditionalLabelInfo('settleFeeFractionLowHealth'),
       initialValue: form.settleFeeFractionLowHealth,
       type: InstructionInputType.INPUT,
@@ -448,7 +521,7 @@ const PerpEdit = ({
       name: 'settleFeeFractionLowHealth',
     },
     {
-      label: `Stable Price Delay Interval Seconds`,
+      label: keyToLabel['stablePriceDelayIntervalSeconds'],
       subtitle: getAdditionalLabelInfo('stablePriceDelayIntervalSeconds'),
       initialValue: form.stablePriceDelayIntervalSeconds,
       type: InstructionInputType.INPUT,
@@ -456,7 +529,7 @@ const PerpEdit = ({
       name: 'stablePriceDelayIntervalSeconds',
     },
     {
-      label: `Settle Pnl Limit Factor`,
+      label: keyToLabel['settlePnlLimitFactor'],
       subtitle: getAdditionalLabelInfo('settlePnlLimitFactor'),
       initialValue: form.settlePnlLimitFactor,
       type: InstructionInputType.INPUT,
@@ -464,7 +537,7 @@ const PerpEdit = ({
       name: 'settlePnlLimitFactor',
     },
     {
-      label: `Settle Pnl Limit Window Size`,
+      label: keyToLabel['settlePnlLimitWindowSize'],
       subtitle: getAdditionalLabelInfo('settlePnlLimitWindowSize'),
       initialValue: form.settlePnlLimitWindowSize,
       type: InstructionInputType.INPUT,
@@ -472,7 +545,7 @@ const PerpEdit = ({
       name: 'settlePnlLimitWindowSize',
     },
     {
-      label: `Min Funding`,
+      label: keyToLabel['minFunding'],
       subtitle: getAdditionalLabelInfo('minFunding'),
       initialValue: form.minFunding,
       type: InstructionInputType.INPUT,
@@ -480,7 +553,7 @@ const PerpEdit = ({
       name: 'minFunding',
     },
     {
-      label: `Max Funding`,
+      label: keyToLabel['maxFunding'],
       subtitle: getAdditionalLabelInfo('maxFunding'),
       initialValue: form.maxFunding,
       type: InstructionInputType.INPUT,
@@ -488,24 +561,92 @@ const PerpEdit = ({
       name: 'maxFunding',
     },
     {
-      label: `Impact Quantity`,
+      label: keyToLabel['impactQuantity'],
       subtitle: getAdditionalLabelInfo('impactQuantity'),
       initialValue: form.impactQuantity,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'impactQuantity',
     },
+    {
+      label: keyToLabel['positivePnlLiquidationFee'],
+      subtitle: getAdditionalLabelInfo('positivePnlLiquidationFee'),
+      initialValue: form.positivePnlLiquidationFee,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'positivePnlLiquidationFee',
+    },
+    {
+      label: keyToLabel['groupInsuranceFund'],
+      subtitle: getAdditionalLabelInfo('groupInsuranceFund'),
+      initialValue: form.groupInsuranceFund,
+      type: InstructionInputType.SWITCH,
+      name: 'groupInsuranceFund',
+    },
+    {
+      label: keyToLabel['reduceOnly'],
+      subtitle: getAdditionalLabelInfo('reduceOnly'),
+      initialValue: form.reduceOnly,
+      type: InstructionInputType.SWITCH,
+      name: 'reduceOnly',
+    },
+    {
+      label: keyToLabel['resetStablePrice'],
+      subtitle: getAdditionalLabelInfo('resetStablePrice'),
+      initialValue: form.resetStablePrice,
+      type: InstructionInputType.SWITCH,
+      name: 'resetStablePrice',
+    },
+    {
+      label: keyToLabel['forceClose'],
+      subtitle: getAdditionalLabelInfo('forceClose'),
+      initialValue: form.forceClose,
+      type: InstructionInputType.SWITCH,
+      name: 'forceClose',
+    },
   ]
   return (
     <>
       {form && (
-        <InstructionForm
-          outerForm={form}
-          setForm={setForm}
-          inputs={inputs}
-          setFormErrors={setFormErrors}
-          formErrors={formErrors}
-        ></InstructionForm>
+        <>
+          <InstructionForm
+            outerForm={form}
+            setForm={setForm}
+            inputs={inputs}
+            setFormErrors={setFormErrors}
+            formErrors={formErrors}
+          ></InstructionForm>
+          <AdvancedOptionsDropdown title="More">
+            <h3>Force values</h3>
+            <div>
+              {Object.keys(defaultFormValues)
+                .filter((x) => x !== 'governedAccount')
+                .filter((x) => x !== 'perp')
+                .filter((x) => x !== 'holdupTime')
+                .map((key) => (
+                  <div className="text-sm mb-3" key={key}>
+                    <div className="mb-2">{keyToLabel[key]}</div>
+                    <div className="flex flex-row text-xs items-center">
+                      <Switch
+                        checked={
+                          forcedValues.find((x) => x === key) ? true : false
+                        }
+                        onChange={(checked) => {
+                          if (checked) {
+                            setForcedValues([...forcedValues, key])
+                          } else {
+                            setForcedValues([
+                              ...forcedValues.filter((x) => x !== key),
+                            ])
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </AdvancedOptionsDropdown>
+        </>
       )}
     </>
   )

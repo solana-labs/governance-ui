@@ -9,6 +9,7 @@ import {
 import Wallet from '@project-serum/sol-wallet-adapter'
 import { sleep } from '@project-serum/common'
 import { WalletSigner } from '@solana/spl-governance'
+import { invalidateInstructionAccounts } from '@hooks/queries/queryClient'
 
 class TransactionError extends Error {
   public txid: string
@@ -18,12 +19,13 @@ class TransactionError extends Error {
   }
 }
 
-export function getUnixTs() {
+function getUnixTs() {
   return new Date().getTime() / 1000
 }
 
 const DEFAULT_TIMEOUT = 31000
 
+/** @deprecated use sendTransactionsV3 */
 export async function sendTransaction({
   transaction,
   wallet,
@@ -212,7 +214,7 @@ export async function sendSignedTransaction({
   }
 
   notify({ message: successMessage, type: 'success', txid })
-
+  signedTransaction.instructions.forEach(invalidateInstructionAccounts)
   console.log('Latency', txid, getUnixTs() - startTime)
   return txid
 }

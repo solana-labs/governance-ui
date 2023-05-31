@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
-import useRealm from '@hooks/useRealm'
 import {
   Keypair,
   PublicKey,
@@ -8,27 +7,29 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js'
 import * as yup from 'yup'
-import { isFormValid } from '@utils/formValidation'
+import { isFormValid, validatePubkey } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
-import { BN } from '@blockworks-foundation/mango-client'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, {
   InstructionInput,
   InstructionInputType,
 } from '../../FormCreator'
 import UseMangoV4 from '@hooks/useMangoV4'
+import { BN } from '@coral-xyz/anchor'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface PerpCreateForm {
   governedAccount: AssetAccount | null
   oraclePk: string
   name: string
   oracleConfFilter: number
+  maxStalenessSlots: string
   baseDecimals: number
   quoteLotSize: number
   baseLotSize: number
@@ -36,9 +37,9 @@ interface PerpCreateForm {
   initBaseAssetWeight: number
   maintBaseLiabWeight: number
   initBaseLiabWeight: number
-  maintPnlAssetWeight: number
-  initPnlAssetWeight: number
-  liquidationFee: number
+  maintOverallAssetWeight: number
+  initOverallAssetWeight: number
+  baseLiquidationFee: number
   makerFee: number
   takerFee: number
   feePenalty: number
@@ -52,6 +53,9 @@ interface PerpCreateForm {
   settleTokenIndex: number
   settlePnlLimitFactor: number
   settlePnlLimitWindowSize: number
+  positivePnlLiquidationFee: number
+  perpMarketIndex: number
+  holdupTime: number
 }
 
 const PerpCreate = ({
@@ -61,21 +65,24 @@ const PerpCreate = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const { mangoClient, mangoGroup, getAdditionalLabelInfo } = UseMangoV4()
-  const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
-  const governedProgramAccounts = assetAccounts.filter(
-    (x) => x.type === AccountType.SOL
+  const solAccounts = assetAccounts.filter(
+    (x) =>
+      x.type === AccountType.SOL &&
+      mangoGroup?.admin &&
+      x.extensions.transferAddress?.equals(mangoGroup?.admin)
   )
-  const { connection } = useWalletStore()
+  const connection = useLegacyConnectionContext()
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<PerpCreateForm>({
     governedAccount: null,
     oracleConfFilter: 0.1,
+    maxStalenessSlots: '',
     oraclePk: '',
     name: '',
+    perpMarketIndex: 0,
     baseDecimals: 6,
     quoteLotSize: 10,
     baseLotSize: 100,
@@ -83,9 +90,9 @@ const PerpCreate = ({
     initBaseAssetWeight: 0.95,
     maintBaseLiabWeight: 1.025,
     initBaseLiabWeight: 1.05,
-    maintPnlAssetWeight: 1,
-    initPnlAssetWeight: 1,
-    liquidationFee: 0.0125,
+    maintOverallAssetWeight: 1,
+    initOverallAssetWeight: 1,
+    baseLiquidationFee: 0.0125,
     makerFee: -0.0001,
     takerFee: 0.0004,
     feePenalty: 5,
@@ -98,14 +105,13 @@ const PerpCreate = ({
     settleFeeFractionLowHealth: 0.01,
     settleTokenIndex: 0,
     settlePnlLimitFactor: 1.0,
-    settlePnlLimitWindowSize: 2 * 60 * 60,
+    settlePnlLimitWindowSize: 60 * 60,
+    positivePnlLiquidationFee: 0,
+    holdupTime: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
-  const handleSetForm = ({ propertyName, value }) => {
-    setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
-  }
+
   const validateInstruction = async (): Promise<boolean> => {
     const { isValid, validationErrors } = await isFormValid(schema, form)
     setFormErrors(validationErrors)
@@ -118,14 +124,13 @@ const PerpCreate = ({
     let prerequisiteInstructionsSigners: Keypair[] = []
     if (
       isValid &&
-      programId &&
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
       const bids = new Keypair()
       const asks = new Keypair()
       const eventQueue = new Keypair()
-      const perpMarketIndex = mangoGroup!.perpMarketsMapByName.size
+
       const bookSideSize = mangoClient!.program.coder.accounts.size(
         (mangoClient!.program.account.bookSide as any)._idlAccount
       )
@@ -164,11 +169,14 @@ const PerpCreate = ({
       ]
       const ix = await mangoClient!.program.methods
         .perpCreateMarket(
-          Number(perpMarketIndex),
+          Number(form.perpMarketIndex),
           form.name,
           {
             confFilter: Number(form.oracleConfFilter),
-            maxStalenessSlots: null,
+            maxStalenessSlots:
+              form.maxStalenessSlots !== ''
+                ? Number(form.maxStalenessSlots)
+                : null,
           },
           Number(form.baseDecimals),
           new BN(form.quoteLotSize),
@@ -177,9 +185,9 @@ const PerpCreate = ({
           Number(form.initBaseAssetWeight),
           Number(form.maintBaseLiabWeight),
           Number(form.initBaseLiabWeight),
-          Number(form.maintPnlAssetWeight),
-          Number(form.initPnlAssetWeight),
-          Number(form.liquidationFee),
+          Number(form.maintOverallAssetWeight),
+          Number(form.initOverallAssetWeight),
+          Number(form.baseLiquidationFee),
           Number(form.makerFee),
           Number(form.takerFee),
           Number(form.minFunding),
@@ -192,7 +200,8 @@ const PerpCreate = ({
           Number(form.settleFeeFractionLowHealth),
           Number(form.settleTokenIndex),
           Number(form.settlePnlLimitFactor),
-          new BN(form.settlePnlLimitWindowSize)
+          new BN(form.settlePnlLimitWindowSize),
+          Number(form.positivePnlLiquidationFee)
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -211,20 +220,14 @@ const PerpCreate = ({
     const obj: UiInstruction = {
       prerequisiteInstructions: prerequisiteInstructions,
       prerequisiteInstructionsSigners: prerequisiteInstructionsSigners,
-      shouldSplitIntoSeparateTxs: true,
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
+      customHoldUpTime: form.holdupTime,
     }
     return obj
   }
-  useEffect(() => {
-    handleSetForm({
-      propertyName: 'programId',
-      value: programId?.toString(),
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [realmInfo?.programId])
+
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
@@ -237,7 +240,27 @@ const PerpCreate = ({
       .object()
       .nullable()
       .required('Program governed account is required'),
+    name: yup.string().required(),
+    perpMarketIndex: yup.string().required(),
+    oraclePk: yup
+      .string()
+      .required()
+      .test('is-valid-address', 'Please enter a valid PublicKey', (value) =>
+        value ? validatePubkey(value) : true
+      ),
   })
+
+  useEffect(() => {
+    const perpMarketIndex =
+      !mangoGroup || mangoGroup?.perpMarketsMapByMarketIndex.size === 0
+        ? 0
+        : Math.max(...[...mangoGroup!.perpMarketsMapByMarketIndex.keys()]) + 1
+    setForm((prevForm) => ({
+      ...prevForm,
+      perpMarketIndex: perpMarketIndex,
+    }))
+  }, [mangoGroup])
+
   const inputs: InstructionInput[] = [
     {
       label: 'Governance',
@@ -246,7 +269,14 @@ const PerpCreate = ({
       type: InstructionInputType.GOVERNED_ACCOUNT,
       shouldBeGoverned: shouldBeGoverned as any,
       governance: governance,
-      options: governedProgramAccounts,
+      options: solAccounts,
+    },
+    {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
     },
     {
       label: 'Perp Name',
@@ -255,12 +285,18 @@ const PerpCreate = ({
       name: 'name',
     },
     {
+      label: `Perp Market Index`,
+      initialValue: form.perpMarketIndex,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'perpMarketIndex',
+    },
+    {
       label: 'Oracle PublicKey',
       initialValue: form.oraclePk,
       type: InstructionInputType.INPUT,
       name: 'oraclePk',
     },
-
     {
       label: `Oracle Confidence Filter`,
       subtitle: getAdditionalLabelInfo('confFilter'),
@@ -268,6 +304,15 @@ const PerpCreate = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'oracleConfFilter',
+    },
+
+    {
+      label: `Max Staleness Slots`,
+      subtitle: getAdditionalLabelInfo('maxStalenessSlots'),
+      initialValue: form.maxStalenessSlots,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'maxStalenessSlots',
     },
     {
       label: 'Base Decimals',
@@ -309,14 +354,6 @@ const PerpCreate = ({
       name: 'initBaseAssetWeight',
     },
     {
-      label: `Init Base Liab Weight`,
-      subtitle: getAdditionalLabelInfo('initBaseLiabWeight'),
-      initialValue: form.initBaseLiabWeight,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'initBaseLiabWeight',
-    },
-    {
       label: `Maintenance Base Liab Weight`,
       subtitle: getAdditionalLabelInfo('maintBaseLiabWeight'),
       initialValue: form.maintBaseLiabWeight,
@@ -325,28 +362,36 @@ const PerpCreate = ({
       name: 'maintBaseLiabWeight',
     },
     {
-      label: `Maintenance Pnl Asset Weight`,
-      subtitle: getAdditionalLabelInfo('maintPnlAssetWeight'),
-      initialValue: form.maintPnlAssetWeight,
+      label: `Init Base Liab Weight`,
+      subtitle: getAdditionalLabelInfo('initBaseLiabWeight'),
+      initialValue: form.initBaseLiabWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
-      name: 'maintPnlAssetWeight',
+      name: 'initBaseLiabWeight',
     },
     {
-      label: `Liquidation Fee`,
-      subtitle: getAdditionalLabelInfo('liquidationFee'),
-      initialValue: form.liquidationFee,
+      label: `Maint Overall Asset Weight`,
+      subtitle: getAdditionalLabelInfo('maintOverallAssetWeight'),
+      initialValue: form.maintOverallAssetWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
-      name: 'liquidationFee',
+      name: 'maintOverallAssetWeight',
     },
     {
-      label: `Init Pnl Asset Weight`,
-      subtitle: getAdditionalLabelInfo('initPnlAssetWeight'),
-      initialValue: form.initPnlAssetWeight,
+      label: `Init Overall Asset Weight`,
+      subtitle: getAdditionalLabelInfo('initOverallAssetWeight'),
+      initialValue: form.initOverallAssetWeight,
       type: InstructionInputType.INPUT,
       inputType: 'number',
-      name: 'initPnlAssetWeight',
+      name: 'initOverallAssetWeight',
+    },
+    {
+      label: `Base Liquidation Fee`,
+      subtitle: getAdditionalLabelInfo('baseLiquidationFee'),
+      initialValue: form.baseLiquidationFee,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'baseLiquidationFee',
     },
     {
       label: `Maker Fee`,
@@ -450,6 +495,14 @@ const PerpCreate = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'impactQuantity',
+    },
+    {
+      label: `Positive Pnl Liquidation Fee`,
+      subtitle: getAdditionalLabelInfo('positivePnlLiquidationFee'),
+      initialValue: form.positivePnlLiquidationFee,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'positivePnlLiquidationFee',
     },
   ]
   return (

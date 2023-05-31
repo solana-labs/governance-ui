@@ -1,7 +1,6 @@
-import { TreasuryType } from '@mean-dao/msp'
+import { AccountType } from '@mean-dao/payment-streaming'
 import { Governance, ProgramAccount } from '@solana/spl-governance'
 import React, { useContext, useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 
 import Input from '@components/inputs/Input'
 import Select from '@components/inputs/Select'
@@ -14,16 +13,17 @@ import { getMeanCreateAccountSchema } from '@utils/validations'
 
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
-const typeSelectOptions = [TreasuryType.Open, TreasuryType.Lock] as const
+const typeSelectOptions = [AccountType.Open, AccountType.Lock] as const
 
-const TypeSelectOption = ({ value }: { value: TreasuryType }) => {
+const TypeSelectOption = ({ value }: { value: AccountType }) => {
   const name =
-    value === TreasuryType.Open
+    value === AccountType.Open
       ? 'Open money streaming account'
       : 'Locked money streaming account'
   const description =
-    value === TreasuryType.Open
+    value === AccountType.Open
       ? 'With an open streaming account, you can create money streams that run indefinitely. When the account runs out of money all streams stop, until it gets replenished.'
       : 'With a locked streaming account you can create streams that act like a vesting contract for reserved allocations, like the ones needed for investors. They usually have a fixed end date.'
 
@@ -36,8 +36,8 @@ const TypeSelectOption = ({ value }: { value: TreasuryType }) => {
 }
 
 interface TypeSelectProps {
-  onChange: (value: TreasuryType) => void
-  value: TreasuryType
+  onChange: (value: AccountType) => void
+  value: AccountType
 }
 
 const TypeSelect = ({ onChange, value }: TypeSelectProps) => {
@@ -71,7 +71,7 @@ const MeanCreateAccountComponent = ({ index, governance }: Props) => {
     label: undefined,
     mintInfo: undefined,
     amount: undefined,
-    type: TreasuryType.Open,
+    type: AccountType.Open,
   })
 
   const [formErrors, setFormErrors] = useState({})
@@ -91,7 +91,7 @@ const MeanCreateAccountComponent = ({ index, governance }: Props) => {
   const schema = getMeanCreateAccountSchema({ form })
   const { handleSetInstructions } = useContext(NewProposalContext)
 
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const getInstruction = () =>
     getMeanCreateAccountInstruction({
       connection,
@@ -108,6 +108,7 @@ const MeanCreateAccountComponent = ({ index, governance }: Props) => {
       },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form])
 
   // mint info
@@ -122,6 +123,7 @@ const MeanCreateAccountComponent = ({ index, governance }: Props) => {
       ...form,
       mintInfo: form.governedTokenAccount?.extensions.mint?.account,
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.governedTokenAccount])
 
   // amount

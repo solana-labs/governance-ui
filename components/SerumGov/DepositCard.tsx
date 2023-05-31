@@ -2,7 +2,7 @@ import * as yup from 'yup'
 import * as anchor from '@coral-xyz/anchor'
 import { yupResolver } from '@hookform/resolvers/yup'
 import useTokenAccountBalance from '@hooks/useTokenAccountBalance'
-import useWallet from '@hooks/useWallet'
+import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import useSerumGovStore, {
   MSRM_DECIMALS,
   SRM_DECIMALS,
@@ -14,7 +14,6 @@ import {
   parseMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
 import { useMemo, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import Loading from '@components/Loading'
 import {
   getInstructionDataFromBase64,
@@ -29,6 +28,7 @@ import useRealm from '@hooks/useRealm'
 import { useRouter } from 'next/router'
 import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 type DepositCardProps = {
   mint: 'SRM' | 'MSRM'
@@ -52,9 +52,9 @@ const DepositCard = ({ mint, callback, createProposal }: DepositCardProps) => {
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
 
-  const { wallet, anchorProvider } = useWallet()
+  const { wallet, anchorProvider } = useWalletDeprecated()
 
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const actions = useSerumGovStore((s) => s.actions)
   const { srmMint, msrmMint } = useSerumGovStore((s) => ({
     srmMint: s.srmMint,
@@ -172,7 +172,6 @@ const DepositCard = ({ mint, callback, createProposal }: DepositCardProps) => {
               createProposal.governance?.account.config
                 .minInstructionHoldUpTime,
             prerequisiteInstructions: [],
-            shouldSplitIntoSeparateTxs: false,
           }
 
           instructionsData.push(ixData)

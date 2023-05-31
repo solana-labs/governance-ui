@@ -1,17 +1,14 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
-import useRealm from '@hooks/useRealm'
 import { AccountMeta, PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
-import { isFormValid } from '@utils/formValidation'
+import { isFormValid, validatePubkey } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
-import { BN } from '@blockworks-foundation/mango-client'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, {
   InstructionInput,
@@ -19,6 +16,50 @@ import InstructionForm, {
 } from '../../FormCreator'
 import UseMangoV4 from '@hooks/useMangoV4'
 import { getChangedValues, getNullOrTransform } from '@utils/mangoV4Tools'
+import { BN } from '@coral-xyz/anchor'
+import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
+import Switch from '@components/Switch'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+
+const REDUCE_ONLY_OPTIONS = [
+  { value: 0, name: 'Disabled' },
+  { value: 1, name: 'No borrows and no deposits' },
+  { value: 2, name: 'No borrows' },
+]
+
+const keyToLabel = {
+  oraclePk: 'Oracle',
+  oracleConfFilter: 'Oracle Confidence Filter',
+  maxStalenessSlots: 'Max Staleness Slots',
+  mintPk: 'Mint',
+  name: 'Name',
+  adjustmentFactor: 'Interest rate adjustment factor',
+  util0: 'Interest rate utilization point 0',
+  rate0: 'Interest rate point 0',
+  util1: 'Interest rate utilization point 1',
+  rate1: 'Interest rate point 1',
+  maxRate: 'Interest rate max rate',
+  loanFeeRate: 'Loan Fee Rate',
+  loanOriginationFeeRate: 'Loan Origination Fee Rate',
+  maintAssetWeight: 'Maintenance Asset Weight',
+  initAssetWeight: 'Init Asset Weight',
+  maintLiabWeight: 'Maintenance Liab Weight',
+  initLiabWeight: 'Init Liab Weight',
+  liquidationFee: 'Liquidation Fee',
+  groupInsuranceFund: 'Group Insurance Fund',
+  stablePriceDelayIntervalSeconds: 'Stable Price Delay Interval Seconds',
+  stablePriceDelayGrowthLimit: 'Stable Price Delay Growth Limit',
+  stablePriceGrowthLimit: 'Stable Price Growth Limit',
+  minVaultToDepositsRatio: 'Min Vault To Deposits Ratio',
+  netBorrowLimitPerWindowQuote: 'Net Borrow Limit Per Window Quote',
+  netBorrowLimitWindowSizeTs: 'Net Borrow Limit Window Size Ts',
+  borrowWeightScaleStartQuote: 'Borrow Weight Scale Start Quote',
+  depositWeightScaleStartQuote: 'Deposit Weight Scale Start Quote',
+  resetStablePrice: 'Reset Stable Price',
+  resetNetBorrowLimit: 'Reset Net Borrow Limit',
+  reduceOnly: 'Reduce Only',
+  forceClose: 'Force Close',
+}
 
 type NamePkVal = {
   name: string
@@ -30,6 +71,7 @@ interface EditTokenForm {
   token: null | NamePkVal
   oraclePk: string
   oracleConfFilter: number
+  maxStalenessSlots: number
   mintPk: string
   name: string
   adjustmentFactor: number
@@ -56,14 +98,17 @@ interface EditTokenForm {
   depositWeightScaleStartQuote: number
   resetStablePrice: boolean
   resetNetBorrowLimit: boolean
-  reduceOnly: boolean
+  reduceOnly: { name: string; value: number }
+  holdupTime: number
+  forceClose: boolean
 }
 
-const defaultFormValues = {
+const defaultFormValues: EditTokenForm = {
   governedAccount: null,
   token: null,
   oraclePk: '',
   oracleConfFilter: 0,
+  maxStalenessSlots: 0,
   mintPk: '',
   name: '',
   adjustmentFactor: 0,
@@ -90,7 +135,9 @@ const defaultFormValues = {
   groupInsuranceFund: false,
   resetStablePrice: false,
   resetNetBorrowLimit: false,
-  reduceOnly: false,
+  reduceOnly: REDUCE_ONLY_OPTIONS[0],
+  forceClose: false,
+  holdupTime: 0,
 }
 
 const EditToken = ({
@@ -100,16 +147,20 @@ const EditToken = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const { getAdditionalLabelInfo, mangoClient, mangoGroup } = UseMangoV4()
-  const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
-  const governedProgramAccounts = assetAccounts.filter(
-    (x) => x.type === AccountType.SOL
+  const [forcedValues, setForcedValues] = useState<string[]>([])
+  const solAccounts = assetAccounts.filter(
+    (x) =>
+      x.type === AccountType.SOL &&
+      ((mangoGroup?.admin &&
+        x.extensions.transferAddress?.equals(mangoGroup.admin)) ||
+        (mangoGroup?.securityAdmin &&
+          x.extensions.transferAddress?.equals(mangoGroup.securityAdmin)))
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [tokens, setTokens] = useState<NamePkVal[]>([])
-  const programId: PublicKey | undefined = realmInfo?.programId
   const [originalFormValues, setOriginalFormValues] = useState<EditTokenForm>({
     ...defaultFormValues,
   })
@@ -118,10 +169,7 @@ const EditToken = ({
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
-  const handleSetForm = ({ propertyName, value }) => {
-    setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
-  }
+
   const validateInstruction = async (): Promise<boolean> => {
     const { isValid, validationErrors } = await isFormValid(schema, form)
     setFormErrors(validationErrors)
@@ -132,7 +180,6 @@ const EditToken = ({
     let serializedInstruction = ''
     if (
       isValid &&
-      programId &&
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
@@ -140,24 +187,68 @@ const EditToken = ({
       const mintInfo = mangoGroup!.mintInfosMapByTokenIndex.get(
         bank.tokenIndex
       )!
-      const values = getChangedValues<EditTokenForm>(originalFormValues, form)
+      const values = getChangedValues<
+        Omit<EditTokenForm, 'reduceOnly'> & { reduceOnly: number }
+      >(
+        {
+          ...originalFormValues,
+          reduceOnly: originalFormValues.reduceOnly.value,
+        },
+        {
+          ...form,
+          reduceOnly: form.reduceOnly.value,
+        },
+        forcedValues
+      )
+
+      const oracleConfFilter =
+        (form.oracleConfFilter as number | string) === ''
+          ? null
+          : form.oracleConfFilter
+      const maxStalenessSlots =
+        (form.maxStalenessSlots as number | string) === ''
+          ? null
+          : form.maxStalenessSlots
+
+      const isThereNeedOfSendingOracleConfig =
+        originalFormValues.oracleConfFilter !== oracleConfFilter ||
+        originalFormValues.maxStalenessSlots !== maxStalenessSlots
+      const rateConfigs = {
+        adjustmentFactor: getNullOrTransform(
+          values.adjustmentFactor,
+          null,
+          Number
+        ),
+        util0: getNullOrTransform(values.util0, null, Number),
+        rate0: getNullOrTransform(values.rate0, null, Number),
+        util1: getNullOrTransform(values.util1, null, Number),
+        rate1: getNullOrTransform(values.rate1, null, Number),
+        maxRate: getNullOrTransform(values.maxRate, null, Number),
+      }
+      const isThereNeedOfSendingRateConfigs = Object.values(rateConfigs).filter(
+        (x) => x !== null
+      ).length
       //Mango instruction call and serialize
       const ix = await mangoClient!.program.methods
         .tokenEdit(
           getNullOrTransform(values.oraclePk, PublicKey),
-          {
-            confFilter: Number(form.oracleConfFilter),
-            maxStalenessSlots: null,
-          },
-          values.groupInsuranceFund,
-          {
-            adjustmentFactor: Number(form.adjustmentFactor),
-            util0: Number(form.util0),
-            rate0: Number(form.rate0),
-            util1: Number(form.util1),
-            rate1: Number(form.rate1),
-            maxRate: Number(form.maxRate),
-          },
+          isThereNeedOfSendingOracleConfig
+            ? {
+                confFilter: Number(form.oracleConfFilter),
+                maxStalenessSlots: maxStalenessSlots,
+              }
+            : null,
+          values.groupInsuranceFund!,
+          isThereNeedOfSendingRateConfigs
+            ? {
+                adjustmentFactor: Number(form.adjustmentFactor),
+                util0: Number(form.util0),
+                rate0: Number(form.rate0),
+                util1: Number(form.util1),
+                rate1: Number(form.rate1),
+                maxRate: Number(form.maxRate),
+              }
+            : null,
           getNullOrTransform(values.loanFeeRate, null, Number),
           getNullOrTransform(values.loanOriginationFeeRate, null, Number),
           getNullOrTransform(values.maintAssetWeight, null, Number),
@@ -177,9 +268,11 @@ const EditToken = ({
           getNullOrTransform(values.netBorrowLimitWindowSizeTs, BN),
           getNullOrTransform(values.borrowWeightScaleStartQuote, null, Number),
           getNullOrTransform(values.depositWeightScaleStartQuote, null, Number),
-          values.resetStablePrice,
-          values.resetNetBorrowLimit,
-          values.reduceOnly
+          values.resetStablePrice!,
+          values.resetNetBorrowLimit!,
+          getNullOrTransform(values.reduceOnly, null, Number),
+          getNullOrTransform(values.name, null, String),
+          values.forceClose!
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -202,23 +295,19 @@ const EditToken = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
+      customHoldUpTime: form.holdupTime,
     }
     return obj
   }
-  useEffect(() => {
-    handleSetForm({
-      propertyName: 'programId',
-      value: programId?.toString(),
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [realmInfo?.programId])
+
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form])
+  }, [form, forcedValues])
+
   useEffect(() => {
     const getTokens = async () => {
       const currentTokens = [...mangoGroup!.banksMapByMint.values()].map(
@@ -229,22 +318,22 @@ const EditToken = ({
       )
       setTokens(currentTokens)
     }
-    if (wallet?.publicKey) {
+    if (wallet?.publicKey && mangoGroup) {
       getTokens()
     }
-  }, [mangoGroup?.publicKey.toBase58()])
+  }, [mangoGroup, wallet?.publicKey])
+
+  const formTokenPk = form.token?.value.toBase58()
   useEffect(() => {
-    if (form.token && mangoGroup) {
-      const currentToken = mangoGroup!.banksMapByMint.get(
-        form.token.value.toBase58()
-      )![0]
-      const groupInsuranceFund = mangoGroup.mintInfosMapByMint.get(
-        form.token.value.toBase58()
-      )?.groupInsuranceFund
+    if (formTokenPk && mangoGroup) {
+      const currentToken = mangoGroup!.banksMapByMint.get(formTokenPk)![0]
+      const groupInsuranceFund = mangoGroup.mintInfosMapByMint.get(formTokenPk)
+        ?.groupInsuranceFund
+
       const vals = {
-        ...form,
         oraclePk: currentToken.oracle.toBase58(),
         oracleConfFilter: currentToken.oracleConfig.confFilter.toNumber(),
+        maxStalenessSlots: currentToken.oracleConfig.maxStalenessSlots.toNumber(),
         mintPk: currentToken.mint.toBase58(),
         name: currentToken.name,
         adjustmentFactor: currentToken.adjustmentFactor.toNumber(),
@@ -271,20 +360,39 @@ const EditToken = ({
         borrowWeightScaleStartQuote: currentToken.borrowWeightScaleStartQuote,
         depositWeightScaleStartQuote: currentToken.depositWeightScaleStartQuote,
         groupInsuranceFund: !!groupInsuranceFund,
-        reduceOnly: currentToken.reduceOnly,
+        reduceOnly: REDUCE_ONLY_OPTIONS.find(
+          (x) => x.value === currentToken.reduceOnly
+        )!,
+        forceClose: currentToken.forceClose,
       }
-      setForm({
+      setForm((prevForm) => ({
+        ...prevForm,
         ...vals,
-      })
-      setOriginalFormValues({ ...vals })
+      }))
+      setOriginalFormValues((prevForm) => ({ ...prevForm, ...vals }))
     }
-  }, [form.token?.value.toBase58()])
+  }, [formTokenPk, mangoGroup])
+
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
       .nullable()
       .required('Program governed account is required'),
+    mintPk: yup
+      .string()
+      .required()
+      .test('is-valid-address1', 'Please enter a valid PublicKey', (value) =>
+        value ? validatePubkey(value) : true
+      ),
+    oraclePk: yup
+      .string()
+      .required()
+      .test('is-valid-address2', 'Please enter a valid PublicKey', (value) =>
+        value ? validatePubkey(value) : true
+      ),
+    name: yup.string().required(),
   })
+
   const inputs: InstructionInput[] = [
     {
       label: 'Governance',
@@ -293,43 +401,58 @@ const EditToken = ({
       type: InstructionInputType.GOVERNED_ACCOUNT,
       shouldBeGoverned: shouldBeGoverned as any,
       governance: governance,
-      options: governedProgramAccounts,
+      options: solAccounts,
     },
     {
-      label: 'Tokens',
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
+    },
+    {
+      label: 'Token',
       name: 'token',
       type: InstructionInputType.SELECT,
       initialValue: form.token,
       options: tokens,
     },
     {
-      label: 'Mint PublicKey',
+      label: keyToLabel['mintPk'],
       initialValue: form.mintPk,
       type: InstructionInputType.INPUT,
       name: 'mintPk',
     },
     {
-      label: 'Oracle PublicKey',
+      label: keyToLabel['oraclePk'],
       initialValue: form.oraclePk,
       type: InstructionInputType.INPUT,
       name: 'oraclePk',
     },
     {
-      label: `Oracle Confidence Filter`,
-      subtitle: getAdditionalLabelInfo('confFilter'),
+      label: keyToLabel['oracleConfFilter'],
+      subtitle: getAdditionalLabelInfo('oracleConfFilter'),
       initialValue: form.oracleConfFilter,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'oracleConfFilter',
     },
     {
-      label: 'Token Name',
+      label: keyToLabel['maxStalenessSlots'],
+      subtitle: getAdditionalLabelInfo('maxStalenessSlots'),
+      initialValue: form.maxStalenessSlots,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'maxStalenessSlots',
+    },
+    {
+      label: keyToLabel['name'],
       initialValue: form.name,
       type: InstructionInputType.INPUT,
       name: 'name',
     },
     {
-      label: `Interest rate adjustment factor`,
+      label: keyToLabel['adjustmentFactor'],
       subtitle: getAdditionalLabelInfo('adjustmentFactor'),
       initialValue: form.adjustmentFactor,
       type: InstructionInputType.INPUT,
@@ -337,7 +460,7 @@ const EditToken = ({
       name: 'adjustmentFactor',
     },
     {
-      label: `Interest rate utilization point 0`,
+      label: keyToLabel['util0'],
       initialValue: form.util0,
       subtitle: getAdditionalLabelInfo('util0'),
       type: InstructionInputType.INPUT,
@@ -345,7 +468,7 @@ const EditToken = ({
       name: 'util0',
     },
     {
-      label: `Interest rate point 0`,
+      label: keyToLabel['rate0'],
       subtitle: getAdditionalLabelInfo('rate0'),
       initialValue: form.rate0,
       type: InstructionInputType.INPUT,
@@ -353,7 +476,7 @@ const EditToken = ({
       name: 'rate0',
     },
     {
-      label: ` Interest rate utilization point 1`,
+      label: keyToLabel['util1'],
       subtitle: getAdditionalLabelInfo('util1'),
       initialValue: form.util1,
       type: InstructionInputType.INPUT,
@@ -361,7 +484,7 @@ const EditToken = ({
       name: 'util1',
     },
     {
-      label: `Interest rate point 1`,
+      label: keyToLabel['rate1'],
       subtitle: getAdditionalLabelInfo('rate1'),
       initialValue: form.rate1,
       type: InstructionInputType.INPUT,
@@ -369,7 +492,7 @@ const EditToken = ({
       name: 'rate1',
     },
     {
-      label: `Interest rate max rate`,
+      label: keyToLabel['maxRate'],
       subtitle: getAdditionalLabelInfo('maxRate'),
       initialValue: form.maxRate,
       type: InstructionInputType.INPUT,
@@ -377,7 +500,7 @@ const EditToken = ({
       name: 'maxRate',
     },
     {
-      label: `Loan Fee Rate`,
+      label: keyToLabel['loanFeeRate'],
       subtitle: getAdditionalLabelInfo('loanFeeRate'),
       initialValue: form.loanFeeRate,
       type: InstructionInputType.INPUT,
@@ -385,7 +508,7 @@ const EditToken = ({
       name: 'loanFeeRate',
     },
     {
-      label: `Loan Origination Fee Rate`,
+      label: keyToLabel['loanOriginationFeeRate'],
       subtitle: getAdditionalLabelInfo('loanOriginationFeeRate'),
       initialValue: form.loanOriginationFeeRate,
       type: InstructionInputType.INPUT,
@@ -393,7 +516,7 @@ const EditToken = ({
       name: 'loanOriginationFeeRate',
     },
     {
-      label: `Maintenance Asset Weight`,
+      label: keyToLabel['maintAssetWeight'],
       subtitle: getAdditionalLabelInfo('maintAssetWeight'),
       initialValue: form.maintAssetWeight,
       type: InstructionInputType.INPUT,
@@ -401,7 +524,7 @@ const EditToken = ({
       name: 'maintAssetWeight',
     },
     {
-      label: `Init Asset Weight`,
+      label: keyToLabel['initAssetWeight'],
       subtitle: getAdditionalLabelInfo('initAssetWeight'),
       initialValue: form.initAssetWeight,
       type: InstructionInputType.INPUT,
@@ -409,7 +532,7 @@ const EditToken = ({
       name: 'initAssetWeight',
     },
     {
-      label: `Maintenance Liab Weight`,
+      label: keyToLabel['maintLiabWeight'],
       subtitle: getAdditionalLabelInfo('maintLiabWeight'),
       initialValue: form.maintLiabWeight,
       type: InstructionInputType.INPUT,
@@ -417,7 +540,7 @@ const EditToken = ({
       name: 'maintLiabWeight',
     },
     {
-      label: `Init Liab Weight`,
+      label: keyToLabel['initLiabWeight'],
       subtitle: getAdditionalLabelInfo('initLiabWeight'),
       initialValue: form.initLiabWeight,
       type: InstructionInputType.INPUT,
@@ -425,7 +548,7 @@ const EditToken = ({
       name: 'initLiabWeight',
     },
     {
-      label: `Liquidation Fee`,
+      label: keyToLabel['liquidationFee'],
       subtitle: getAdditionalLabelInfo('liquidationFee'),
       initialValue: form.liquidationFee,
       type: InstructionInputType.INPUT,
@@ -433,14 +556,14 @@ const EditToken = ({
       name: 'liquidationFee',
     },
     {
-      label: `Group Insurance Fund`,
+      label: keyToLabel['groupInsuranceFund'],
       subtitle: getAdditionalLabelInfo('groupInsuranceFund'),
       initialValue: form.groupInsuranceFund,
       type: InstructionInputType.SWITCH,
       name: 'groupInsuranceFund',
     },
     {
-      label: `Stable Price Delay Interval Seconds`,
+      label: keyToLabel['stablePriceDelayIntervalSeconds'],
       subtitle: getAdditionalLabelInfo('stablePriceDelayIntervalSeconds'),
       initialValue: form.stablePriceDelayIntervalSeconds,
       type: InstructionInputType.INPUT,
@@ -448,7 +571,7 @@ const EditToken = ({
       name: 'stablePriceDelayIntervalSeconds',
     },
     {
-      label: `Stable Price Delay Growth Limit`,
+      label: keyToLabel['stablePriceDelayGrowthLimit'],
       subtitle: getAdditionalLabelInfo('stablePriceDelayGrowthLimit'),
       initialValue: form.stablePriceDelayGrowthLimit,
       type: InstructionInputType.INPUT,
@@ -456,7 +579,7 @@ const EditToken = ({
       name: 'stablePriceDelayGrowthLimit',
     },
     {
-      label: `Stable Price Growth Limit`,
+      label: keyToLabel['stablePriceGrowthLimit'],
       subtitle: getAdditionalLabelInfo('stablePriceGrowthLimit'),
       initialValue: form.stablePriceGrowthLimit,
       type: InstructionInputType.INPUT,
@@ -464,7 +587,7 @@ const EditToken = ({
       name: 'stablePriceGrowthLimit',
     },
     {
-      label: `Min Vault To Deposits Ratio`,
+      label: keyToLabel['minVaultToDepositsRatio'],
       subtitle: getAdditionalLabelInfo('minVaultToDepositsRatio'),
       initialValue: form.minVaultToDepositsRatio,
       type: InstructionInputType.INPUT,
@@ -472,7 +595,7 @@ const EditToken = ({
       name: 'minVaultToDepositsRatio',
     },
     {
-      label: `Net Borrow Limit Per Window Quote`,
+      label: keyToLabel['netBorrowLimitPerWindowQuote'],
       subtitle: getAdditionalLabelInfo('netBorrowLimitPerWindowQuote'),
       initialValue: form.netBorrowLimitPerWindowQuote,
       type: InstructionInputType.INPUT,
@@ -480,7 +603,7 @@ const EditToken = ({
       name: 'netBorrowLimitPerWindowQuote',
     },
     {
-      label: `Net Borrow Limit Window Size Ts`,
+      label: keyToLabel['netBorrowLimitWindowSizeTs'],
       subtitle: getAdditionalLabelInfo('netBorrowLimitWindowSizeTs'),
       initialValue: form.netBorrowLimitWindowSizeTs,
       type: InstructionInputType.INPUT,
@@ -488,7 +611,7 @@ const EditToken = ({
       name: 'netBorrowLimitWindowSizeTs',
     },
     {
-      label: `Borrow Weight Scale Start Quote`,
+      label: keyToLabel['borrowWeightScaleStartQuote'],
       subtitle: getAdditionalLabelInfo('borrowWeightScaleStartQuote'),
       initialValue: form.borrowWeightScaleStartQuote,
       type: InstructionInputType.INPUT,
@@ -496,7 +619,7 @@ const EditToken = ({
       name: 'borrowWeightScaleStartQuote',
     },
     {
-      label: `Deposit Weight Scale Start Quote`,
+      label: keyToLabel['depositWeightScaleStartQuote'],
       subtitle: getAdditionalLabelInfo('depositWeightScaleStartQuote'),
       initialValue: form.depositWeightScaleStartQuote,
       type: InstructionInputType.INPUT,
@@ -504,38 +627,78 @@ const EditToken = ({
       name: 'depositWeightScaleStartQuote',
     },
     {
-      label: `Reset Stable Price`,
+      label: keyToLabel['resetStablePrice'],
       subtitle: getAdditionalLabelInfo('resetStablePrice'),
       initialValue: form.resetStablePrice,
       type: InstructionInputType.SWITCH,
       name: 'resetStablePrice',
     },
     {
-      label: `Reset Net Borrow Limit`,
+      label: keyToLabel['resetNetBorrowLimit'],
       subtitle: getAdditionalLabelInfo('resetNetBorrowLimit'),
       initialValue: form.resetNetBorrowLimit,
       type: InstructionInputType.SWITCH,
       name: 'resetNetBorrowLimit',
     },
     {
-      label: `Reduce Only`,
+      label: keyToLabel['reduceOnly'],
       subtitle: getAdditionalLabelInfo('reduceOnly'),
       initialValue: form.reduceOnly,
-      type: InstructionInputType.SWITCH,
+      type: InstructionInputType.SELECT,
+      options: REDUCE_ONLY_OPTIONS,
       name: 'reduceOnly',
+    },
+    {
+      label: keyToLabel['forceClose'],
+      subtitle: getAdditionalLabelInfo('forceClose'),
+      initialValue: form.forceClose,
+      type: InstructionInputType.SWITCH,
+      name: 'forceClose',
     },
   ]
 
   return (
     <>
       {form && (
-        <InstructionForm
-          outerForm={form}
-          setForm={setForm}
-          inputs={inputs}
-          setFormErrors={setFormErrors}
-          formErrors={formErrors}
-        ></InstructionForm>
+        <>
+          <InstructionForm
+            outerForm={form}
+            setForm={setForm}
+            inputs={inputs}
+            setFormErrors={setFormErrors}
+            formErrors={formErrors}
+          ></InstructionForm>
+          <AdvancedOptionsDropdown title="More">
+            <h3>Force values</h3>
+            <div>
+              {Object.keys(defaultFormValues)
+                .filter((x) => x !== 'governedAccount')
+                .filter((x) => x !== 'token')
+                .filter((x) => x !== 'holdupTime')
+                .map((key) => (
+                  <div className="text-sm mb-3" key={key}>
+                    <div className="mb-2">{keyToLabel[key]}</div>
+                    <div className="flex flex-row text-xs items-center">
+                      <Switch
+                        checked={
+                          forcedValues.find((x) => x === key) ? true : false
+                        }
+                        onChange={(checked) => {
+                          if (checked) {
+                            setForcedValues([...forcedValues, key])
+                          } else {
+                            setForcedValues([
+                              ...forcedValues.filter((x) => x !== key),
+                            ])
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </AdvancedOptionsDropdown>
+        </>
       )}
     </>
   )

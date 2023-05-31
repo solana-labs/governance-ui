@@ -7,12 +7,18 @@ import { Status, Result } from '@utils/uiTypes/Result'
 import { AuxiliaryWallet, Wallet } from '@models/treasury/Wallet'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import useRealm from '@hooks/useRealm'
-import useWalletStore from 'stores/useWalletStore'
 
 import { assembleWallets } from './assembleWallets'
 import { calculateTokenCountAndValue } from './calculateTokenCountAndValue'
 import { getNfts } from './getNfts'
 import { getDomains } from './getDomains'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface Data {
   auxiliaryWallets: AuxiliaryWallet[]
@@ -26,20 +32,26 @@ interface Data {
   wallets: Wallet[]
 }
 
-export default function useTreasuryInfo(): Result<Data> {
-  const { realmInfo, realm, mint, councilMint, config } = useRealm()
-  const connection = useWalletStore((s) => s.connection)
+export default function useTreasuryInfo(
+  getNftsAndDomains = true
+): Result<Data> {
+  const realm = useRealmQuery().data?.result
+  const config = useRealmConfigQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { realmInfo } = useRealm()
+  const connection = useLegacyConnectionContext()
   const accounts = useGovernanceAssetsStore((s) => s.assetAccounts)
   const loadingGovernedAccounts = useGovernanceAssetsStore(
     (s) => s.loadGovernedAccounts
   )
   const [nfts, setNfts] = useState<NFT[]>([])
-  const [nftsLoading, setNftsLoading] = useState(true)
-  const [domainsLoading, setDomainsLoading] = useState(true)
+  const [nftsLoading, setNftsLoading] = useState(getNftsAndDomains)
+  const [domainsLoading, setDomainsLoading] = useState(getNftsAndDomains)
   const [auxWallets, setAuxWallets] = useState<AuxiliaryWallet[]>([])
   const [wallets, setWallets] = useState<Wallet[]>([])
   const [domains, setDomains] = useState<Domain[]>([])
-  const [buildingWallets, setBuildingWallets] = useState(true)
+  const [buildingWallets, setBuildingWallets] = useState(getNftsAndDomains)
 
   const { counts, values } = useMemo(
     () => calculateTokenCountAndValue(accounts),
@@ -47,7 +59,7 @@ export default function useTreasuryInfo(): Result<Data> {
   )
 
   useEffect(() => {
-    if (!loadingGovernedAccounts && accounts.length) {
+    if (!loadingGovernedAccounts && accounts.length && getNftsAndDomains) {
       setNftsLoading(true)
       setDomainsLoading(true)
       setBuildingWallets(true)

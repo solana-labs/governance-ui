@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import * as yup from 'yup'
 import {
   Governance,
@@ -8,8 +8,6 @@ import {
 import { validateInstruction } from '@utils/instructionTools'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
-import useWalletStore from 'stores/useWalletStore'
-import useRealm from '@hooks/useRealm'
 import { NewProposalContext } from '../../../new'
 import InstructionForm, { InstructionInput } from '../FormCreator'
 import { AssetAccount } from '@utils/uiTypes/assets'
@@ -27,6 +25,8 @@ import {
   instructionInputs,
   SchemaComponents,
 } from '@utils/instructions/Identity/util'
+import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface AddKeyToDIDForm {
   governedAccount: AssetAccount | undefined
@@ -42,9 +42,9 @@ const AddKeyToDID = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { realm } = useRealm()
+  const realm = useRealmQuery().data?.result
   const { assetAccounts } = useGovernanceAssets()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const shouldBeGoverned = index !== 0 && governance
   const [form, setForm] = useState<AddKeyToDIDForm>()
   const [formErrors, setFormErrors] = useState({})
@@ -97,7 +97,6 @@ const AddKeyToDID = ({
       additionalSerializedInstructions,
       isValid,
       governance: form!.governedAccount?.governance,
-      chunkSplitByDefault: true,
     }
   }
   useEffect(() => {
@@ -121,7 +120,6 @@ const AddKeyToDID = ({
 
   return (
     <>
-      {form && (
       <InstructionForm
         outerForm={form}
         setForm={setForm}
@@ -129,7 +127,6 @@ const AddKeyToDID = ({
         setFormErrors={setFormErrors}
         formErrors={formErrors}
       ></InstructionForm>
-      )}
     </>
   )
 }

@@ -1,4 +1,4 @@
-import { Treasury } from '@mean-dao/msp'
+import { PaymentStreamingAccount } from '@mean-dao/payment-streaming'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 
@@ -10,7 +10,7 @@ import {
   MeanWithdrawFromAccount,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
-import createMsp from './createMsp'
+import createPaymentStreaming from './createPaymentStreaming'
 
 interface Args {
   connection: ConnectionContext
@@ -36,29 +36,31 @@ export default async function getMeanWithdrawFromAccountInstruction({
   const serializedInstruction = ''
   const governedTokenAccount = form.governedTokenAccount
 
-  const formTreasury = form.treasury as Treasury | undefined
+  const formPaymentStreamingAccount = form.paymentStreamingAccount as
+    | PaymentStreamingAccount
+    | undefined
 
   if (
     isValid &&
     governedTokenAccount &&
-    formTreasury &&
+    formPaymentStreamingAccount &&
     form.amount &&
     form.destination &&
     form.mintInfo
   ) {
-    const msp = createMsp(connection)
-    const payer = getGovernedAccountPk(governedTokenAccount)
-    const treasury = new PublicKey(formTreasury.id) // treasury
+    const paymentStreaming = createPaymentStreaming(connection)
+    const feePayer = getGovernedAccountPk(governedTokenAccount)
+    const psAccount = new PublicKey(formPaymentStreamingAccount.id) // treasury
     const amount = parseMintNaturalAmountFromDecimal(
       form.amount,
       form.mintInfo.decimals
     )
     const autoWSol = true
     const destination = new PublicKey(form.destination)
-    const transaction = await msp.treasuryWithdraw(
-      payer,
-      destination,
-      treasury,
+    const {
+      transaction,
+    } = await paymentStreaming.buildWithdrawFromAccountTransaction(
+      { psAccount, feePayer, destination },
       amount,
       autoWSol
     )
@@ -72,7 +74,6 @@ export default async function getMeanWithdrawFromAccountInstruction({
       isValid: true,
       governance: governedTokenAccount?.governance,
       additionalSerializedInstructions,
-      shouldSplitIntoSeparateTxs: true,
     }
     return obj
   }
@@ -82,7 +83,6 @@ export default async function getMeanWithdrawFromAccountInstruction({
     isValid: false,
     governance: governedTokenAccount?.governance,
     additionalSerializedInstructions: [],
-    shouldSplitIntoSeparateTxs: true,
   }
 
   return obj

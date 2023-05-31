@@ -1,9 +1,13 @@
 import { Proposal, ProposalState } from '@solana/spl-governance'
 import classNames from 'classnames'
 
-import useRealm from '@hooks/useRealm'
-import useRealmGovernance from '../hooks/useRealmGovernance'
 import assertUnreachable from '@utils/typescript/assertUnreachable'
+import { isInCoolOffTime } from './VotePanel/hooks'
+import {
+  useUserCommunityTokenOwnerRecord,
+  useUserCouncilTokenOwnerRecord,
+} from '@hooks/queries/tokenOwnerRecord'
+import { useGovernanceByPubkeyQuery } from '@hooks/queries/governance'
 
 export const hasInstructions = (proposal: Proposal) => {
   if (proposal.instructionsCount) {
@@ -26,6 +30,7 @@ interface OtherState {
   isSignatory: boolean
   proposal: Proposal
   votingEnded: boolean
+  coolOff: boolean
 }
 
 function getBorderColor(proposalState: ProposalState, otherState: OtherState) {
@@ -55,7 +60,7 @@ function getBorderColor(proposalState: ProposalState, otherState: OtherState) {
 
 function getLabel(
   proposalState: ProposalState,
-  otherState: Pick<OtherState, 'proposal' | 'votingEnded'>
+  otherState: Pick<OtherState, 'proposal' | 'votingEnded' | 'coolOff'>
 ) {
   switch (proposalState) {
     case ProposalState.Cancelled:
@@ -75,7 +80,11 @@ function getLabel(
     case ProposalState.Succeeded:
       return !hasInstructions(otherState.proposal) ? 'Completed' : 'Executable'
     case ProposalState.Voting:
-      return otherState.votingEnded ? 'Finalizing' : 'Voting'
+      return otherState.votingEnded
+        ? 'Finalizing'
+        : otherState.coolOff
+        ? 'Cool Off'
+        : 'Voting'
     case ProposalState.Vetoed:
       return 'Vetoed'
     default:
@@ -145,9 +154,10 @@ interface Props {
 }
 
 export default function ProposalStateBadge(props: Props) {
-  const { ownTokenRecord, ownCouncilTokenRecord } = useRealm()
-  const governance = useRealmGovernance(props.proposal.governance)
-
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
+  const governance = useGovernanceByPubkeyQuery(props.proposal.governance).data
+    ?.result
   const isCreator =
     ownTokenRecord?.pubkey.equals(props.proposal.tokenOwnerRecord) ||
     ownCouncilTokenRecord?.pubkey.equals(props.proposal.tokenOwnerRecord) ||
@@ -157,13 +167,17 @@ export default function ProposalStateBadge(props: Props) {
   const isSignatory = false
 
   const votingEnded =
-    governance && props.proposal.getTimeToVoteEnd(governance) < 0
+    governance !== undefined &&
+    props.proposal.getTimeToVoteEnd(governance.account) < 0
+
+  const coolOff = isInCoolOffTime(props.proposal, governance?.account)
 
   const otherState = {
     isCreator,
     isSignatory,
     votingEnded,
     proposal: props.proposal,
+    coolOff,
   }
 
   return (

@@ -5,16 +5,16 @@ import Head from 'next/head'
 import { isWizardValid, validateSolAddress } from '@utils/formValidation'
 
 import CreateDAOWizard from '@components/NewRealmWizard/CreateDAOWizard'
-import useWalletStore from 'stores/useWalletStore'
 
 // import { FORM_NAME as NFT_FORM } from 'pages/realms/new/nft'
 import { FORM_NAME as MULTISIG_WALLET_FORM } from 'pages/realms/new/multisig'
 import { FORM_NAME as COMMUNITY_TOKEN_FORM } from 'pages/realms/new/community-token'
 import { useProgramVersionByIdQuery } from '@hooks/queries/useProgramVersionQuery'
-import { PublicKey } from '@blockworks-foundation/mango-client'
 import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
+import { PublicKey } from '@solana/web3.js'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
-export const Section = ({ children }) => {
+const Section = ({ children }) => {
   return (
     <div className="w-full mx-auto lg:w-5/6  max-w-[770px] px-0 pb-[130px] sm:pb-[250px] relative min-h-[calc(100vh_-_75px)]">
       {children}
@@ -29,7 +29,8 @@ export default function FormPage({
   handleSubmit,
   submissionPending,
 }) {
-  const { connected, current: wallet } = useWalletStore((s) => s)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const userAddress = wallet?.publicKey?.toBase58()
 
   const { query, push } = useRouter()

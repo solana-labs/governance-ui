@@ -1,4 +1,3 @@
-import React, { useState } from 'react'
 import cx from 'classnames'
 import {
   PencilIcon,
@@ -10,20 +9,23 @@ import {
   OfficeBuildingIcon,
 } from '@heroicons/react/outline'
 import { BigNumber } from 'bignumber.js'
+import { useRouter } from 'next/router'
+import { MintMaxVoteWeightSourceType } from '@solana/spl-governance'
 
-import RealmConfigModal from 'pages/dao/[symbol]/params/RealmConfigModal'
 import { RealmAuthority } from '@models/treasury/Asset'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Tooltip from '@components/Tooltip'
 import { formatNumber } from '@utils/formatNumber'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
-import useRealm from '@hooks/useRealm'
 import Section from '../Section'
 import Address from '@components/Address'
 import useProgramVersion from '@hooks/useProgramVersion'
 import clsx from 'clsx'
 import TokenIcon from '@components/treasuryV2/icons/TokenIcon'
 import { NFTVotePluginSettingsDisplay } from '@components/NFTVotePluginSettingsDisplay'
+import useQueryContext from '@hooks/useQueryContext'
+import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
+import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 
 const DISABLED = new BigNumber(DISABLED_VOTER_WEIGHT.toString())
 
@@ -34,11 +36,14 @@ interface Props {
 
 export default function Config(props: Props) {
   const { canUseAuthorityInstruction } = useGovernanceAssets()
-  const { mint } = useRealm()
-  const [editRealmOpen, setEditRealmOpen] = useState(false)
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const router = useRouter()
+  const { symbol } = router.query
+  const { fmtUrlWithCluster } = useQueryContext()
 
   const programVersion = useProgramVersion()
-  const councilRulesSupported = programVersion >= 3
+  const councilRulesSupported =
+    (programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) >= 3
 
   return (
     <div className={props.className}>
@@ -65,7 +70,9 @@ export default function Config(props: Props) {
               'disabled:opacity-50'
             )}
             disabled={!canUseAuthorityInstruction}
-            onClick={() => setEditRealmOpen(true)}
+            onClick={() =>
+              router.push(fmtUrlWithCluster(`/dao/${symbol}/editConfig`))
+            }
           >
             <PencilIcon className="h-4 w-4" />
             <div>Edit Rules</div>
@@ -77,7 +84,16 @@ export default function Config(props: Props) {
           <Section
             icon={<ScaleIcon />}
             name="Community mint max vote weight source"
-            value={props.realmAuthority.config.communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}
+            value={
+              props.realmAuthority.config.communityMintMaxVoteWeightSource
+                .type === MintMaxVoteWeightSourceType.Absolute
+                ? formatNumber(
+                    new BigNumber(
+                      props.realmAuthority.config.communityMintMaxVoteWeightSource.value.toString()
+                    ).shiftedBy(-(mint ? mint.decimals : 0))
+                  )
+                : `${props.realmAuthority.config.communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}%`
+            }
           />
         )}
         <Section
@@ -117,7 +133,7 @@ export default function Config(props: Props) {
               councilRulesSupported ? 'grid-cols-1' : 'grid-cols-2'
             )}
           >
-            {programVersion >= 3 && (
+            {(programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) >= 3 && (
               <Section
                 icon={<TokenIcon />}
                 name={'Token type'}
@@ -248,12 +264,6 @@ export default function Config(props: Props) {
         )}
       </div>
       <NFTVotePluginSettingsDisplay className="mt-24" />
-      {editRealmOpen && (
-        <RealmConfigModal
-          isProposalModalOpen
-          closeProposalModal={() => setEditRealmOpen(false)}
-        />
-      )}
     </div>
   )
 }

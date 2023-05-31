@@ -1,12 +1,12 @@
-import { Stream } from '@mean-dao/msp'
+import { Stream } from '@mean-dao/payment-streaming'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import React, { useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 
 import Select from '@components/inputs/Select'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import createMsp from '@utils/instructions/Mean/createMsp'
+import createPaymentStreaming from '@utils/instructions/Mean/createPaymentStreaming'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const getLabel = (stream: Stream | undefined) => {
   if (!stream) return undefined
@@ -18,7 +18,7 @@ const getLabel = (stream: Stream | undefined) => {
 }
 
 interface Props {
-  onChange: (treasury: Stream) => void
+  onChange: (stream: Stream) => void
   value: Stream | undefined
   label: string
   error?: string
@@ -34,13 +34,14 @@ const SelectStream = ({
   shouldBeGoverned = false,
   governance,
 }: Props) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const { governedTokenAccountsWithoutNfts: accounts } = useGovernanceAssets()
   const [streams, setStreams] = useState<Stream[]>([])
+  const accountsJson = JSON.stringify(accounts)
   useEffect(() => {
     ;(async () => {
-      const msp = createMsp(connection)
+      const paymentStreaming = createPaymentStreaming(connection)
 
       const nextStreams = await Promise.all(
         accounts
@@ -52,14 +53,15 @@ const SelectStream = ({
           )
           .filter((a) => a.isSol)
           .map((a) =>
-            msp.listStreams({
+            paymentStreaming.listStreams({
               beneficiary: a.extensions.transferAddress,
             })
           )
       )
       setStreams(nextStreams.flat())
     })()
-  }, [JSON.stringify(accounts)])
+    //eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accountsJson, connection, governance?.pubkey, shouldBeGoverned])
 
   return (
     <Select

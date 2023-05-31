@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { CivicProfile, Profile as BaseProfile } from '@civic/profile'
-import useWalletStore from 'stores/useWalletStore'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 type Profile = BaseProfile & {
   exists: boolean
@@ -23,8 +24,8 @@ const profileIsSet = (profile: BaseProfile): boolean =>
 export const useProfile = (
   publicKey?: PublicKey
 ): { profile: Profile | undefined; loading: boolean } => {
-  const connection = useWalletStore((s) => s.connection)
-  const connectedWallet = useWalletStore((s) => s.current)
+  const connection = useLegacyConnectionContext()
+  const connectedWallet = useWalletOnePointOh()
   const [profile, setProfile] = useState<Profile>()
   const [loading, setLoading] = useState(true)
 

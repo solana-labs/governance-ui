@@ -14,11 +14,16 @@ import { accountsToPubkeyMap } from '@tools/sdk/accounts'
 import { filterProposals } from '@utils/proposals'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import { Filters } from '@components/ProposalFilter'
 import { TokenOwnerRecordAsset } from '@models/treasury/Asset'
 import { arrayToRecord } from '@tools/core/script'
 import { InitialSorting } from '@components/ProposalSorting'
+import { useRealmQuery } from './queries/realm'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from './queries/mintInfo'
+import useLegacyConnectionContext from './useLegacyConnectionContext'
 
 const VotingFilter: Filters = {
   Cancelled: false,
@@ -30,6 +35,7 @@ const VotingFilter: Filters = {
   SigningOff: false,
   Voting: true,
   Vetoed: false,
+  withoutQuorum: false,
 }
 
 export default function useRealmProposals(
@@ -39,10 +45,13 @@ export default function useRealmProposals(
 ) {
   const router = useRouter()
   const { cluster } = router.query
+  const realm = useRealmQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
   //Small hack to prevent race conditions with cluster change until we remove connection from store and move it to global dep.
   const routeHasClusterInPath = router.asPath.includes('cluster')
 
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const [governances, setGovernances] = useState<
     Record<string, ProgramAccount<Governance>>
@@ -130,7 +139,11 @@ export default function useRealmProposals(
         const votingProposals = filterProposals(
           Object.entries(proposals),
           VotingFilter,
-          InitialSorting
+          InitialSorting,
+          realm,
+          accountsToPubkeyMap(governances),
+          mint,
+          councilMint
         )
 
         if (!active) return

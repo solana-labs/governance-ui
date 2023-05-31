@@ -17,6 +17,7 @@ import BigNumber from 'bignumber.js'
 import React, { useEffect, useState } from 'react'
 import { BaseGovernanceFormFieldsV3 } from './BaseGovernanceForm-data'
 import { BaseGovernanceFormV3 } from './BaseGovernanceFormV3'
+import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 
 export interface BaseGovernanceFormFieldsV2 {
   _programVersion: 2
@@ -38,7 +39,8 @@ const BaseGovernanceFormV2 = ({
   setFormErrors: any
   form: BaseGovernanceFormFieldsV2
 }) => {
-  const { realmInfo, mint: realmMint } = useRealm()
+  const realmMint = useRealmCommunityMintInfoQuery().data?.result
+  const { realmInfo } = useRealm()
   const [minTokensPercentage, setMinTokensPercentage] = useState<
     number | undefined
   >()

@@ -1,10 +1,17 @@
 import {
+  getAllDomains,
   getDomainKey,
   MINT_PREFIX,
   NameRegistryState,
   NAME_TOKENIZER_ID,
+  performReverseLookupBatch,
 } from '@bonfida/spl-name-service'
 import { Connection, ParsedAccountData, PublicKey } from '@solana/web3.js'
+
+interface Domain {
+  domainName: string | undefined
+  domainAddress: string
+}
 
 export const resolveDomain = async (
   connection: Connection,
@@ -56,4 +63,25 @@ export const resolveDomain = async (
   } catch (error) {
     return undefined
   }
+}
+
+export const fetchDomainsByPubkey = async (
+  connection: Connection,
+  pubkey: PublicKey | undefined
+) => {
+  if (!pubkey) return []
+  const domains = await getAllDomains(connection, pubkey)
+  const results: Domain[] = []
+
+  if (domains.length > 0) {
+    const reverse = await performReverseLookupBatch(connection, domains)
+
+    for (let i = 0; i < domains.length; i++) {
+      results.push({
+        domainAddress: domains[i].toBase58(),
+        domainName: reverse[i],
+      })
+    }
+  }
+  return results
 }

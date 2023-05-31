@@ -17,7 +17,6 @@ import {
   getMaxVoterWeightRecord,
   getRegistrarPDA,
 } from '@utils/plugin/accounts'
-import { NftVoterClient } from '@solana/governance-program-library'
 
 import {
   prepareRealmCreation,
@@ -25,8 +24,9 @@ import {
   Web3Context,
 } from '@tools/governance/prepareRealmCreation'
 import { trySentryLog } from '@utils/logs'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 
-export type NFTRealm = Web3Context &
+type NFTRealm = Web3Context &
   RealmCreation & {
     collectionAddress: string
     nftCollectionCount: number
@@ -46,7 +46,7 @@ export default async function createNFTRealm({
   const { nftCollectionCount } = params
 
   const {
-    communityMintGovPk,
+    mainGovernancePk,
     communityMintPk,
     councilMintPk,
     realmPk,
@@ -77,7 +77,7 @@ export default async function createNFTRealm({
       registrar,
       realm: realmPk,
       governanceProgramId: programIdPk,
-      // realmAuthority: communityMintGovPk,
+      // realmAuthority: mainGovernancePk,
       realmAuthority: walletPk,
       governingTokenMint: communityMintPk,
       payer: walletPk,
@@ -121,7 +121,7 @@ export default async function createNFTRealm({
     .accounts({
       registrar,
       realm: realmPk,
-      // realmAuthority: communityMintGovPk,
+      // realmAuthority: mainGovernancePk,
       realmAuthority: walletPk,
       collection: new PublicKey(collectionAddress),
       maxVoterWeightRecord: maxVoterWeightRecord,
@@ -147,7 +147,7 @@ export default async function createNFTRealm({
     programVersion,
     realmPk,
     walletPk,
-    communityMintGovPk,
+    mainGovernancePk,
     SetRealmAuthorityAction.SetChecked
   )
 

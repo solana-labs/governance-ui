@@ -1,7 +1,7 @@
 import Input from '@components/inputs/Input'
 import Select from '@components/inputs/Select'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { Treasury } from '@mean-dao/msp'
+import { PaymentStreamingAccount } from '@mean-dao/payment-streaming'
 import { Governance, ProgramAccount } from '@solana/spl-governance'
 import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import { precision } from '@utils/formatting'
@@ -10,10 +10,10 @@ import getMint from '@utils/instructions/Mean/getMint'
 import { MeanCreateStream } from '@utils/uiTypes/proposalCreationTypes'
 import { getMeanCreateStreamSchema } from '@utils/validations'
 import React, { useContext, useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 
 import { NewProposalContext } from '../../../new'
 import SelectStreamingAccount from './SelectStreamingAccount'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const rateIntervalOptions = {
   0: { idx: 0, display: 'Per minute', value: 0 },
@@ -39,7 +39,7 @@ const MeanCreateStreamComponent = ({ index, governance }: Props) => {
   // form
   const [form, setForm] = useState<MeanCreateStream>({
     governedTokenAccount: undefined,
-    treasury: undefined,
+    paymentStreamingAccount: undefined,
     streamName: undefined,
     destination: undefined,
     mintInfo: undefined,
@@ -57,7 +57,7 @@ const MeanCreateStreamComponent = ({ index, governance }: Props) => {
   }
 
   // instruction
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const schema = getMeanCreateStreamSchema({
     form,
@@ -82,12 +82,15 @@ const MeanCreateStreamComponent = ({ index, governance }: Props) => {
       },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form])
 
-  // treasury
+  // paymentStreamingAccount
 
   const shouldBeGoverned = index !== 0 && !!governance
-  const formTreasury = form.treasury as Treasury | undefined
+  const formPaymentStreamingAccount = form.paymentStreamingAccount as
+    | PaymentStreamingAccount
+    | undefined
 
   // governedTokenAccount
 
@@ -95,17 +98,21 @@ const MeanCreateStreamComponent = ({ index, governance }: Props) => {
 
   useEffect(() => {
     const value =
-      formTreasury &&
+      formPaymentStreamingAccount &&
       governedTokenAccountsWithoutNfts.find(
         (acc) =>
           acc.governance.pubkey.toBase58() ===
-            formTreasury.treasurer.toString() && acc.isSol
+            formPaymentStreamingAccount.owner.toString() && acc.isSol
       )
     setForm((prevForm) => ({
       ...prevForm,
       governedTokenAccount: value,
     }))
-  }, [JSON.stringify(governedTokenAccountsWithoutNfts), formTreasury])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    JSON.stringify(governedTokenAccountsWithoutNfts),
+    formPaymentStreamingAccount,
+  ])
 
   // mint info
 
@@ -118,8 +125,10 @@ const MeanCreateStreamComponent = ({ index, governance }: Props) => {
     setForm({
       ...form,
       mintInfo:
-        formTreasury && getMint(governedTokenAccountsWithoutNfts, formTreasury),
+        formPaymentStreamingAccount &&
+        getMint(governedTokenAccountsWithoutNfts, formPaymentStreamingAccount),
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.governedTokenAccount])
 
   // amount
@@ -184,11 +193,14 @@ const MeanCreateStreamComponent = ({ index, governance }: Props) => {
     <React.Fragment>
       <SelectStreamingAccount
         label="Select streaming account source"
-        onChange={(treasury) => {
-          handleSetForm({ value: treasury, propertyName: 'treasury' })
+        onChange={(paymentStreamingAccount) => {
+          handleSetForm({
+            value: paymentStreamingAccount,
+            propertyName: 'paymentStreamingAccount',
+          })
         }}
-        value={formTreasury}
-        error={formErrors['treasury']}
+        value={formPaymentStreamingAccount}
+        error={formErrors['paymentStreamingAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
       />

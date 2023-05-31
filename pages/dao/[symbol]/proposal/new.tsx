@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, {
   createContext,
@@ -8,11 +7,7 @@ import React, {
   useState,
 } from 'react'
 import * as yup from 'yup'
-import {
-  ArrowLeftIcon,
-  PlusCircleIcon,
-  XCircleIcon,
-} from '@heroicons/react/outline'
+import { PlusCircleIcon, XCircleIcon } from '@heroicons/react/outline'
 import {
   getInstructionDataFromBase64,
   Governance,
@@ -36,7 +31,6 @@ import {
   InstructionsContext,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
-import useWalletStore from 'stores/useWalletStore'
 import { notify } from 'utils/notifications'
 import Clawback from 'VoteStakeRegistry/components/instructions/Clawback'
 import Grant from 'VoteStakeRegistry/components/instructions/Grant'
@@ -45,8 +39,6 @@ import ProgramUpgrade from './components/instructions/bpfUpgradeableLoader/Progr
 import CreateAssociatedTokenAccount from './components/instructions/CreateAssociatedTokenAccount'
 import CustomBase64 from './components/instructions/CustomBase64'
 import Empty from './components/instructions/Empty'
-import MakeChangeMaxAccounts from './components/instructions/Mango/MakeChangeMaxAccounts'
-import MakeChangeReferralFeeParams from './components/instructions/Mango/MakeChangeReferralFeeParams'
 import Mint from './components/instructions/Mint'
 import CreateObligationAccount from './components/instructions/Solend/CreateObligationAccount'
 import DepositReserveLiquidityAndObligationCollateral from './components/instructions/Solend/DepositReserveLiquidityAndObligationCollateral'
@@ -65,14 +57,9 @@ import SwitchboardRevokeOracle from './components/instructions/Switchboard/Revok
 import FriktionWithdraw from './components/instructions/Friktion/FriktionWithdraw'
 import FriktionClaimPendingDeposit from './components/instructions/Friktion/FriktionClaimPendingDeposit'
 import FriktionClaimPendingWithdraw from './components/instructions/Friktion/FriktionClaimPendingWithdraw'
-import MakeChangePerpMarket from './components/instructions/Mango/MakeChangePerpMarket'
-import MakeAddOracle from './components/instructions/Mango/MakeAddOracle'
-import MakeAddSpotMarket from './components/instructions/Mango/MakeAddSpotMarket'
 import StakeValidator from './components/instructions/Validators/StakeValidator'
 import DeactivateValidatorStake from './components/instructions/Validators/DeactivateStake'
 import WithdrawValidatorStake from './components/instructions/Validators/WithdrawStake'
-import MakeChangeSpotMarket from './components/instructions/Mango/MakeChangeSpotMarket'
-import MakeCreatePerpMarket from './components/instructions/Mango/MakeCreatePerpMarket'
 import useCreateProposal from '@hooks/useCreateProposal'
 import CastleDeposit from './components/instructions/Castle/CastleDeposit'
 import MakeInitMarketParams from './components/instructions/Foresight/MakeInitMarketParams'
@@ -96,19 +83,11 @@ import VotingMintConfig from './components/instructions/Vsr/VotingMintConfig'
 import CreateVsrRegistrar from './components/instructions/Vsr/CreateRegistrar'
 import GoblinGoldDeposit from './components/instructions/GoblinGold/GoblinGoldDeposit'
 import GoblinGoldWithdraw from './components/instructions/GoblinGold/GoblinGoldWithdraw'
-import MakeSetMarketMode from './components/instructions/Mango/MakeSetMarketMode'
 import CreateGatewayPluginRegistrar from './components/instructions/GatewayPlugin/CreateRegistrar'
 import ConfigureGatewayPlugin from './components/instructions/GatewayPlugin/ConfigureGateway'
-import MakeChangeQuoteParams from './components/instructions/Mango/MakeChangeQuoteParams'
 import CreateTokenMetadata from './components/instructions/CreateTokenMetadata'
 import UpdateTokenMetadata from './components/instructions/UpdateTokenMetadata'
 import classNames from 'classnames'
-import MakeRemoveSpotMarket from './components/instructions/Mango/MakeRemoveSpotMarket'
-import MakeRemovePerpMarket from './components/instructions/Mango/MakeRemovePerpMarket'
-import MakeSwapSpotMarket from './components/instructions/Mango/MakeSwapSpotMarket'
-import MakeRemoveOracle from './components/instructions/Mango/MakeRemoveOracle'
-import MakeDepositToMangoAccount from './components/instructions/Mango/MakeDepositToMangoAccount'
-import MakeDepositToMangoAccountCsv from './components/instructions/Mango/MakeDepositToMangoAccountCsv'
 import TokenRegister from './components/instructions/Mango/MangoV4/TokenRegister'
 import EditToken from './components/instructions/Mango/MangoV4/EditToken'
 import PerpEdit from './components/instructions/Mango/MangoV4/PerpEdit'
@@ -121,18 +100,17 @@ import TransferDomainName from './components/instructions/TransferDomainName'
 import DepositForm from './components/instructions/Everlend/DepositForm'
 import WithdrawForm from './components/instructions/Everlend/WithdrawForm'
 import InitUser from './components/instructions/Serum/InitUser'
-import MakeChangeReferralFeeParams2 from './components/instructions/Mango/MakeChangeReferralFeeParams2'
 import GrantForm from './components/instructions/Serum/GrantForm'
 import JoinDAO from './components/instructions/JoinDAO'
 import UpdateConfigAuthority from './components/instructions/Serum/UpdateConfigAuthority'
 import UpdateConfigParams from './components/instructions/Serum/UpdateConfigParams'
-import ClaimMangoTokens from './components/instructions/Mango/ClaimTokens'
 import { StyledLabel } from '@components/inputs/styles'
 import SelectInstructionType from '@components/SelectInstructionType'
 import AddKeyToDID from './components/instructions/Identity/AddKeyToDID'
 import RemoveKeyFromDID from './components/instructions/Identity/RemoveKeyFromDID'
 import AddServiceToDID from './components/instructions/Identity/AddServiceToDID'
 import RemoveServiceFromDID from './components/instructions/Identity/RemoveServiceFromDID'
+import DualAirdrop from './components/instructions/Dual/DualAirdrop'
 import DualWithdraw from './components/instructions/Dual/DualWithdraw'
 import DualExercise from './components/instructions/Dual/DualExercise'
 import PsyFinanceMintAmericanOptions from './components/instructions/PsyFinance/MintAmericanOptions'
@@ -146,6 +124,13 @@ import PsyFinanceBurnWriterTokenForQuote from './components/instructions/PsyFina
 import PsyFinanceClaimUnderlyingPostExpiration from './components/instructions/PsyFinance/ClaimUnderlyingPostExpiration'
 import PsyFinanceExerciseOption from './components/instructions/PsyFinance/ExerciseOption'
 import RevokeGoverningTokens from './components/instructions/SplGov/RevokeGoverningTokens'
+import PreviousRouteBtn from '@components/PreviousRouteBtn'
+import SetMintAuthority from './components/instructions/SetMintAuthroity'
+import LiquidityStakingOption from './components/instructions/Dual/LiquidityStakingOption'
+import InitStrike from './components/instructions/Dual/InitStrike'
+import IdlSetBuffer from './components/instructions/Mango/MangoV4/IdlSetBuffer'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { usePrevious } from '@hooks/usePrevious'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -172,13 +157,27 @@ function extractGovernanceAccountFromInstructionsData(
   )
 }
 
+const getDefaultInstructionProps = (
+  x: UiInstruction,
+  selectedGovernance: ProgramAccount<Governance> | null
+) => ({
+  holdUpTime: x.customHoldUpTime
+    ? getTimestampFromDays(x.customHoldUpTime)
+    : selectedGovernance?.account?.config.minInstructionHoldUpTime,
+  prerequisiteInstructions: x.prerequisiteInstructions || [],
+  signers: x.signers,
+  prerequisiteInstructionsSigners: x.prerequisiteInstructionsSigners || [],
+  chunkBy: x.chunkBy || 2,
+})
+
 const New = () => {
   const router = useRouter()
   const { handleCreateProposal } = useCreateProposal()
   const { fmtUrlWithCluster } = useQueryContext()
-  const { symbol, realm, realmDisplayName, canChooseWhoVote } = useRealm()
+  const realm = useRealmQuery().data?.result
+
+  const { symbol, realmInfo, canChooseWhoVote } = useRealm()
   const { availableInstructions } = useGovernanceAssets()
-  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [form, setForm] = useState({
     title: typeof router.query['t'] === 'string' ? router.query['t'] : '',
@@ -193,50 +192,33 @@ const New = () => {
   const [isLoadingDraft, setIsLoadingDraft] = useState(false)
 
   const isLoading = isLoadingSignedProposal || isLoadingDraft
-  //   const customInstructionFilterForSelectedGovernance = (
-  //     instructionType: Instructions
-  //   ) => {
-  //     if (!governance) {
-  //       return true
-  //     } else {
-  //       const governanceType = governance.account.accountType
-  //       const instructionsAvailiableAfterProgramGovernance = [Instructions.Base64]
-  //       switch (governanceType) {
-  //         case GovernanceAccountType.ProgramGovernanceV1:
-  //         case GovernanceAccountType.ProgramGovernanceV2:
-  //           return instructionsAvailiableAfterProgramGovernance.includes(
-  //             instructionType
-  //           )
-  //         default:
-  //           return true
-  //       }
-  //     }
-  //   }
 
   const [instructionsData, setInstructions] = useState<
     ComponentInstructionData[]
   >([{ type: undefined }])
-  const handleSetInstructions = (val: any, index) => {
-    const newInstructions = [...instructionsData]
-    newInstructions[index] = { ...instructionsData[index], ...val }
-    setInstructions(newInstructions)
-  }
+
+  const handleSetInstructions = useCallback((val: any, index) => {
+    setInstructions((prevInstructions) => {
+      const newInstructions = [...prevInstructions]
+      newInstructions[index] = { ...prevInstructions[index], ...val }
+      return newInstructions
+    })
+  }, [])
+
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-  const setInstructionType = ({
-    value,
-    idx,
-  }: {
-    value: InstructionType | null
-    idx: number
-  }) => {
-    const newInstruction = {
-      type: value,
-    }
-    handleSetInstructions(newInstruction, idx)
-  }
+  const setInstructionType = useCallback(
+    ({ value, idx }: { value: InstructionType | null; idx: number }) => {
+      const newInstruction = {
+        type: value,
+      }
+      handleSetInstructions(newInstruction, idx)
+    },
+    [handleSetInstructions]
+  )
+
   const addInstruction = () => {
     setInstructions([...instructionsData, { type: undefined }])
   }
@@ -287,75 +269,42 @@ const New = () => {
     }
 
     if (isValid && instructions.every((x: UiInstruction) => x.isValid)) {
-      let selectedGovernance = governance
       if (!governance) {
         handleTurnOffLoaders()
         throw Error('No governance selected')
       }
 
-      //TODO fix duplicated instructions when use only additional instruction
-      const additionalInstructions = [
-        ...(instructions
-          .flatMap((instruction) => {
-            return instruction.additionalSerializedInstructions?.map((x) => {
-              return {
-                data: x ? getInstructionDataFromBase64(x) : null,
-                holdUpTime: instruction.customHoldUpTime
-                  ? getTimestampFromDays(instruction.customHoldUpTime)
-                  : selectedGovernance?.account?.config
-                      .minInstructionHoldUpTime,
-                prerequisiteInstructions:
-                  instruction.prerequisiteInstructions || [],
-                prerequisiteInstructionsSigners:
-                  instruction.prerequisiteInstructionsSigners || [],
-                chunkSplitByDefault: instruction.chunkSplitByDefault || false,
-                signers: instruction.signers,
-                shouldSplitIntoSeparateTxs:
-                  instruction.shouldSplitIntoSeparateTxs,
-                chunkBy: instruction.chunkBy || 2,
-              }
-            })
-          })
-          .filter((x) => x) as InstructionDataWithHoldUpTime[]),
-      ]
+      const additionalInstructions = instructions
+        .flatMap((instruction) =>
+          instruction.additionalSerializedInstructions
+            ?.filter(
+              (value, index, self) =>
+                index === self.findIndex((t) => t === value)
+            )
+            .map((x) => ({
+              data: x ? getInstructionDataFromBase64(x) : null,
+              ...getDefaultInstructionProps(instruction, governance),
+            }))
+        )
+        .filter((x) => x) as InstructionDataWithHoldUpTime[]
 
       const instructionsData = [
         ...additionalInstructions,
-        ...instructions.map((x) => {
-          return {
-            data: x.serializedInstruction
-              ? getInstructionDataFromBase64(x.serializedInstruction)
-              : null,
-            holdUpTime: x.customHoldUpTime
-              ? getTimestampFromDays(x.customHoldUpTime)
-              : selectedGovernance?.account?.config.minInstructionHoldUpTime,
-            prerequisiteInstructions: x.prerequisiteInstructions || [],
-            chunkSplitByDefault: x.chunkSplitByDefault || false,
-            signers: x.signers,
-            prerequisiteInstructionsSigners:
-              x.prerequisiteInstructionsSigners || [],
-            shouldSplitIntoSeparateTxs: x.shouldSplitIntoSeparateTxs,
-            chunkBy: x.chunkBy || 2,
-          }
-        }),
+        ...instructions.map((x) => ({
+          data: x.serializedInstruction
+            ? getInstructionDataFromBase64(x.serializedInstruction)
+            : null,
+          ...getDefaultInstructionProps(x, governance),
+        })),
       ]
 
       try {
         // Fetch governance to get up to date proposalCount
 
-        if (governance.pubkey != undefined) {
-          selectedGovernance = (await fetchRealmGovernance(
-            governance.pubkey
-          )) as ProgramAccount<Governance>
-        } else {
-          selectedGovernance = (await fetchRealmGovernance(
-            governance
-          )) as ProgramAccount<Governance>
-        }
         proposalAddress = await handleCreateProposal({
           title: form.title,
           description: form.description,
-          governance: selectedGovernance,
+          governance,
           instructionsData,
           voteByCouncil,
           isDraft,
@@ -376,12 +325,17 @@ const New = () => {
     handleTurnOffLoaders()
   }
 
+  const firstGovernancePk = instructionsData[0]?.governedAccount?.pubkey.toBase58()
+  const previousFirstGovernancePk = usePrevious(firstGovernancePk)
+
   useEffect(() => {
-    if (instructionsData?.length) {
+    if (
+      instructionsData?.length &&
+      firstGovernancePk !== previousFirstGovernancePk
+    ) {
       setInstructions([instructionsData[0]])
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [instructionsData[0]?.governedAccount?.pubkey])
+  }, [firstGovernancePk, previousFirstGovernancePk, instructionsData])
 
   useEffect(() => {
     const governedAccount = extractGovernanceAccountFromInstructionsData(
@@ -406,8 +360,12 @@ const New = () => {
         setInstructionType({ value: instruction, idx: 0 })
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [router.query, availableInstructions, instructionsData])
+  }, [
+    router.query,
+    availableInstructions,
+    instructionsData,
+    setInstructionType,
+  ])
 
   // Map instruction enum with components
   //
@@ -433,23 +391,10 @@ const New = () => {
       [Instructions.Mint]: Mint,
       [Instructions.Base64]: CustomBase64,
       [Instructions.None]: Empty,
-      [Instructions.MangoAddOracle]: MakeAddOracle,
-      [Instructions.MangoAddSpotMarket]: MakeAddSpotMarket,
-      [Instructions.MangoChangeMaxAccounts]: MakeChangeMaxAccounts,
-      [Instructions.MangoChangePerpMarket]: MakeChangePerpMarket,
-      [Instructions.MangoChangeReferralFeeParams]: MakeChangeReferralFeeParams,
-      [Instructions.MangoChangeReferralFeeParams2]: MakeChangeReferralFeeParams2,
-      [Instructions.MangoChangeSpotMarket]: MakeChangeSpotMarket,
-      [Instructions.MangoCreatePerpMarket]: MakeCreatePerpMarket,
-      [Instructions.MangoSetMarketMode]: MakeSetMarketMode,
-      [Instructions.MangoChangeQuoteParams]: MakeChangeQuoteParams,
-      [Instructions.MangoRemoveSpotMarket]: MakeRemoveSpotMarket,
-      [Instructions.MangoRemovePerpMarket]: MakeRemovePerpMarket,
-      [Instructions.MangoSwapSpotMarket]: MakeSwapSpotMarket,
-      [Instructions.MangoRemoveOracle]: MakeRemoveOracle,
       [Instructions.MangoV4TokenRegister]: TokenRegister,
       [Instructions.MangoV4TokenEdit]: EditToken,
       [Instructions.MangoV4GroupEdit]: GroupEdit,
+      [Instructions.IdlSetBuffer]: IdlSetBuffer,
       [Instructions.MangoV4OpenBookEditMarket]: OpenBookEditMarket,
       [Instructions.MangoV4IxGateSet]: IxGateSet,
       [Instructions.MangoV4AltExtend]: AltExtend,
@@ -469,7 +414,10 @@ const New = () => {
       [Instructions.ClaimPendingDeposit]: FriktionClaimPendingDeposit,
       [Instructions.ClaimPendingWithdraw]: FriktionClaimPendingWithdraw,
       [Instructions.DepositIntoCastle]: CastleDeposit,
+      [Instructions.DualFinanceAirdrop]: DualAirdrop,
       [Instructions.DualFinanceStakingOption]: StakingOption,
+      [Instructions.DualFinanceInitStrike]: InitStrike,
+      [Instructions.DualFinanceLiquidityStakingOption]: LiquidityStakingOption,
       [Instructions.DualFinanceWithdraw]: DualWithdraw,
       [Instructions.DualFinanceExercise]: DualExercise,
       [Instructions.MeanCreateAccount]: MeanCreateAccount,
@@ -510,8 +458,6 @@ const New = () => {
       [Instructions.ChangeMakeDonation]: ChangeDonation,
       [Instructions.CreateTokenMetadata]: CreateTokenMetadata,
       [Instructions.UpdateTokenMetadata]: UpdateTokenMetadata,
-      [Instructions.DepositToMangoAccount]: MakeDepositToMangoAccount,
-      [Instructions.DepositToMangoAccountCsv]: MakeDepositToMangoAccountCsv,
       [Instructions.StakeValidator]: StakeValidator,
       [Instructions.DeactivateValidatorStake]: DeactivateValidatorStake,
       [Instructions.WithdrawValidatorStake]: WithdrawValidatorStake,
@@ -563,12 +509,12 @@ const New = () => {
       [Instructions.SerumUpdateGovConfigParams]: UpdateConfigParams,
       [Instructions.SerumUpdateGovConfigAuthority]: UpdateConfigAuthority,
       [Instructions.JoinDAO]: JoinDAO,
-      [Instructions.ClaimMangoTokens]: ClaimMangoTokens,
       [Instructions.AddKeyToDID]: AddKeyToDID,
       [Instructions.RemoveKeyFromDID]: RemoveKeyFromDID,
       [Instructions.AddServiceToDID]: AddServiceToDID,
       [Instructions.RemoveServiceFromDID]: RemoveServiceFromDID,
       [Instructions.RevokeGoverningTokens]: RevokeGoverningTokens,
+      [Instructions.SetMintAuthority]: SetMintAuthority,
     }),
     [governance?.pubkey.toBase58()]
   )
@@ -618,17 +564,14 @@ const New = () => {
         }`}
       >
         <>
-          <Link href={fmtUrlWithCluster(`/dao/${symbol}/`)}>
-            <a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">
-              <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
-              Back
-            </a>
-          </Link>
+          <PreviousRouteBtn></PreviousRouteBtn>
           <div className="border-b border-fgd-4 pb-4 pt-2">
             <div className="flex items-center justify-between">
               <h1>
                 Add a proposal
-                {realmDisplayName ? ` to ${realmDisplayName}` : ``}{' '}
+                {realmInfo?.displayName
+                  ? ` to ${realmInfo.displayName}`
+                  : ``}{' '}
               </h1>
             </div>
           </div>

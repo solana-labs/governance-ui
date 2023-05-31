@@ -1,6 +1,6 @@
 import { getRealm } from '@solana/spl-governance'
+import { useConnection } from '@solana/wallet-adapter-react'
 import { Connection, PublicKey } from '@solana/web3.js'
-import useWalletStore from 'stores/useWalletStore'
 import useSWR from 'swr'
 
 const fetcher = async ({
@@ -16,8 +16,9 @@ const fetcher = async ({
   return getRealm(connection, realm)
 }
 
+/** @deprecated use react-query */
 const useRealmAccount = (realmId?: PublicKey) => {
-  const connection = useWalletStore((s) => s.connection.current)
+  const { connection } = useConnection()
 
   const { data, mutate, isValidating, error } = useSWR(
     () => realmId && [realmId.toBase58(), connection.rpcEndpoint],
@@ -42,7 +43,7 @@ const useRealmAccount = (realmId?: PublicKey) => {
 //   //Small hack to prevent race conditions with cluster change until we remove connection from store and move it to global dep.
 //   const routeHasClusterInPath = router.asPath.includes('cluster')
 
-//   const connection = useWalletStore((s) => s.connection)
+//   const connection = useLegacyConnectionContext()
 //   const [
 //     realmAccount,
 //     setRealmAccount,

@@ -1,10 +1,11 @@
 import { PublicKey } from '@solana/web3.js'
 import { abbreviateAddress } from '@utils/formatting'
-import useWalletStore from '../../stores/useWalletStore'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { WSOL_MINT } from '@components/instructions/tools'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+
 const AccountItemNFT = ({
   governedAccountTokenAccount,
   className,
@@ -16,7 +17,7 @@ const AccountItemNFT = ({
   onClick?: () => void
   border?: boolean
 }) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const nftsPerPubkey = useTreasuryAccountStore((s) => s.governanceNfts)
   const { setCurrentAccount } = useTreasuryAccountStore()
 
@@ -49,7 +50,7 @@ const AccountItemNFT = ({
     >
       {governedAccountTokenAccount.isSol ? (
         <img
-          src={info?.logoURI}
+          src={info?.logoURI || ''}
           className="flex-shrink-0 h-5 w-5 mr-2.5 rounded-full"
         />
       ) : (

@@ -3,7 +3,6 @@ import { PublicKey } from '@solana/web3.js'
 
 export interface Member {
   walletAddress: string
-  votesCasted: number
   councilVotes: BN
   communityVotes: BN
   hasCouncilTokenOutsideRealm?: boolean
@@ -12,7 +11,7 @@ export interface Member {
   delegateWalletCommunity?: PublicKey
 }
 
-export interface Delegate {
+interface Delegate {
   communityMembers?: Array<Member>
   councilMembers?: Array<Member>
   communityTokenCount?: BN

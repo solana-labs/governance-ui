@@ -1,7 +1,7 @@
 import * as yup from 'yup'
 import * as anchor from '@coral-xyz/anchor'
 import { yupResolver } from '@hookform/resolvers/yup'
-import useWallet from '@hooks/useWallet'
+import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import {
   fmtBnMintDecimals,
   parseMintNaturalAmountFromDecimalAsBN,
@@ -13,7 +13,6 @@ import useSerumGovStore, {
   SRM_DECIMALS,
   VestAccountType,
 } from 'stores/useSerumGovStore'
-import useWalletStore from 'stores/useWalletStore'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { notify } from '@utils/notifications'
 import { MSRM_DECIMALS } from '@project-serum/serum/lib/token-instructions'
@@ -34,6 +33,7 @@ import { dryRunInstruction } from 'actions/dryRunInstruction'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 import Link from 'next/link'
 import { getExplorerUrl } from '@components/explorer/tools'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 const BurnVestAccountSchema = {
   amount: yup.string().required(),
@@ -67,8 +67,8 @@ const VestAccount: FC<Props> = ({
   const gsrmMint = useSerumGovStore((s) => s.gsrmMint)
   const actions = useSerumGovStore((s) => s.actions)
 
-  const { anchorProvider, wallet } = useWallet()
-  const connection = useWalletStore((s) => s.connection.current)
+  const { anchorProvider, wallet } = useWalletDeprecated()
+  const { connection } = useConnection()
 
   const [isBurning, setIsBurning] = useState(false)
   const [currentTimestamp, setCurrentTimestamp] = useState(0)
@@ -189,7 +189,6 @@ const VestAccount: FC<Props> = ({
         holdUpTime:
           createProposal.governance?.account.config.minInstructionHoldUpTime,
         prerequisiteInstructions: [],
-        shouldSplitIntoSeparateTxs: false,
       }
 
       const { response: dryRunResponse } = await dryRunInstruction(

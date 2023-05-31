@@ -4,13 +4,9 @@ import {
   VoteTipping,
 } from '@solana/spl-governance'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
-import { isDisabledVoterWeight } from '@tools/governance/units'
 import {
   getTimestampFromDays,
-  getDaysFromTimestamp,
   parseMintNaturalAmountFromDecimalAsBN,
-  fmtBnMintDecimalsUndelimited,
-  getHoursFromTimestamp,
   getTimestampFromHours,
 } from '@tools/sdk/units'
 
@@ -23,7 +19,7 @@ export type BaseGovernanceFormFieldsV3 = {
   /* in days */
   minInstructionHoldUpTime: string
   /* in days */
-  maxVotingTime: string
+  baseVotingTime: string
 
   // 'disabled' for disabled values
   minCommunityTokensToCreateProposal: string | 'disabled'
@@ -44,39 +40,6 @@ type Transformer<T extends Record<keyof U, any>, U> = {
   [K in keyof U]: (x: T[K]) => U[K]
 }
 
-// @agrippa I use this functional pattern instead of referencing values directly when transforming, so as to reduce surface area for typos
-export const transformerGovernanceConfig_2_BaseGovernanceFormFieldsV3 = (
-  communityMintDecimals: number,
-  councilMintDecimals: number
-): Transformer<
-  GovernanceConfig & { _programVersion: 3 },
-  BaseGovernanceFormFieldsV3
-> => ({
-  minInstructionHoldUpTime: (x) => getDaysFromTimestamp(x).toString(),
-  maxVotingTime: (x) => getDaysFromTimestamp(x).toString(),
-  minCommunityTokensToCreateProposal: (x) =>
-    isDisabledVoterWeight(x)
-      ? 'disabled'
-      : fmtBnMintDecimalsUndelimited(x, communityMintDecimals),
-  minCouncilTokensToCreateProposal: (x) =>
-    isDisabledVoterWeight(x)
-      ? 'disabled'
-      : fmtBnMintDecimalsUndelimited(x, councilMintDecimals),
-  communityVoteThreshold: (x) =>
-    x.type === VoteThresholdType.Disabled ? 'disabled' : x.value!.toString(),
-  communityVetoVoteThreshold: (x) =>
-    x.type === VoteThresholdType.Disabled ? 'disabled' : x.value!.toString(),
-  councilVoteThreshold: (x) =>
-    x.type === VoteThresholdType.Disabled ? 'disabled' : x.value!.toString(),
-  councilVetoVoteThreshold: (x) =>
-    x.type === VoteThresholdType.Disabled ? 'disabled' : x.value!.toString(),
-  communityVoteTipping: (x) => x,
-  councilVoteTipping: (x) => x,
-  votingCoolOffTime: (x) => getHoursFromTimestamp(x).toString(),
-  depositExemptProposalCount: (x) => x.toString(),
-  _programVersion: (x) => x,
-})
-
 export const transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig = (
   communityMintDecimals: number,
   councilMintDecimals: number
@@ -85,7 +48,7 @@ export const transformerBaseGovernanceFormFieldsV3_2_GovernanceConfig = (
   Omit<GovernanceConfig & { _programVersion: 3 }, 'reserved'>
 > => ({
   minInstructionHoldUpTime: (x) => getTimestampFromDays(parseFloat(x)),
-  maxVotingTime: (x) => getTimestampFromDays(parseFloat(x)),
+  baseVotingTime: (x) => getTimestampFromDays(parseFloat(x)),
   minCommunityTokensToCreateProposal: (x) =>
     x === 'disabled'
       ? DISABLED_VOTER_WEIGHT
@@ -131,10 +94,4 @@ export const transform = <T extends Record<keyof U, any>, U>(
     }
   }
   return [obj, errs] as [U, FormErrors<U>]
-}
-
-export type BaseGovernanceFormErrorsV3 = FormErrors<
-  Omit<GovernanceConfig, 'reserved'>
-> & {
-  _programVersion: 3
 }

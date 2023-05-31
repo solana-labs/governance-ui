@@ -1,4 +1,3 @@
-import { Config, MangoClient } from '@blockworks-foundation/mango-client'
 import Input from '@components/inputs/Input'
 import { GrantInstruction } from '@components/instructions/programs/voteStakeRegistry'
 import { MANGO_DAO_TREASURY } from '@components/instructions/tools'
@@ -17,18 +16,14 @@ import dynamic from 'next/dynamic'
 import { useEffect, useRef, useState } from 'react'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import useWalletStore from 'stores/useWalletStore'
 import {
   DAYS_PER_MONTH,
-  SECS_PER_MONTH,
-} from 'VoteStakeRegistry/tools/dateTools'
+  getMinDurationFmt,
+  getTimeLeftFromNowFmt,
+} from '@utils/dateTools'
 import InfoBox from 'VoteStakeRegistry/components/LockTokenStats/InfoBox'
 import { AddressImage, DisplayAddress } from '@cardinal/namespaces-components'
 import { LockupType } from 'VoteStakeRegistry/sdk/accounts'
-import {
-  getMinDurationFmt,
-  getTimeLeftFromNowFmt,
-} from 'VoteStakeRegistry/tools/dateTools'
 import {
   DepoistWithVoter,
   DepositWithWallet,
@@ -46,6 +41,12 @@ import {
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { abbreviateAddress } from '@utils/formatting'
 import { getDepositType } from 'VoteStakeRegistry/tools/deposits'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useRouter } from 'next/router'
+import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { useRealmProposalsQuery } from '@hooks/queries/proposal'
+
 const VestingVsTime = dynamic(
   () => import('VoteStakeRegistry/components/LockTokenStats/VestingVsTime'),
   {
@@ -55,10 +56,16 @@ const VestingVsTime = dynamic(
 const isBetween = require('dayjs/plugin/isBetween')
 dayjs.extend(isBetween)
 
+const mainMangoVaultPk = 'Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z'
+
 const LockTokenStats = () => {
   const walletsPerPage = 10
   const pagination = useRef<{ setPage: (val) => void }>(null)
-  const { realmInfo, realm, symbol, mint, proposals } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const { symbol } = useRouter().query
+  const { data: proposals } = useRealmProposalsQuery()
+  const { realmInfo } = useRealm()
   const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
   const voteStakeRegistryRegistrarPk = useVotePluginsClientStore(
     (s) => s.state.voteStakeRegistryRegistrarPk
@@ -66,7 +73,7 @@ const LockTokenStats = () => {
   const voteStakeRegistryRegistrar = useVotePluginsClientStore(
     (s) => s.state.voteStakeRegistryRegistrar
   )
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const governedTokenAccounts = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
   )
@@ -84,10 +91,7 @@ const LockTokenStats = () => {
     DepoistWithVoter[]
   >([])
   const [unlockedFromGrants, setUnlockedFromGrants] = useState(new BN(0))
-  const [
-    liquidityMiningEmissionPerMonth,
-    setLiqudiityMiningEmissionPerMonth,
-  ] = useState(new BN(0))
+  const [liquidityMiningEmissionPerMonth] = useState(new BN(0))
   const [vestPerMonthStats, setVestPerMonthStats] = useState<{
     [key: string]: { vestingDate: dayjs.Dayjs; vestingAmount: BN }[]
   }>({})
@@ -102,7 +106,7 @@ const LockTokenStats = () => {
     (acc, curr) => acc.add(curr.amount!),
     new BN(0)
   )
-  const possibleGrantProposals = Object.values(proposals).filter(
+  const possibleGrantProposals = proposals?.filter(
     (x) =>
       x.account.governance.toBase58() === MANGO_DAO_TREASURY &&
       x.account.accountType === GovernanceAccountType.ProposalV2
@@ -121,12 +125,14 @@ const LockTokenStats = () => {
   const mngoValut = governedTokenAccounts.find(
     (x) =>
       x.extensions.mint?.publicKey.toBase58() ===
-      realm?.account.communityMint.toBase58()
+        realm?.account.communityMint.toBase58() &&
+      x.extensions.transferAddress?.toBase58() === mainMangoVaultPk
   )
   const mngoLocked = depositsWithWallets.reduce(
     (acc, curr) => acc.add(curr.deposit.amountDepositedNative),
     new BN(0)
   )
+
   const circulatingSupply =
     mngoValut && mint
       ? mint.supply.sub(mngoValut.extensions.amount!).sub(mngoLocked)
@@ -249,7 +255,7 @@ const LockTokenStats = () => {
   useEffect(() => {
     const getProposalsInstructions = async () => {
       const accounts = await getProposalsTransactions(
-        possibleGrantProposals.map((x) => x.pubkey),
+        possibleGrantProposals?.map((x) => x.pubkey) ?? [],
         connection,
         realmInfo!.programId
       )
@@ -285,7 +291,7 @@ const LockTokenStats = () => {
       getProposalsInstructions()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [possibleGrantProposals.length, realmInfo?.programId])
+  }, [possibleGrantProposals, realmInfo?.programId])
   useEffect(() => {
     const depositsWithWalletsInner: DepositWithWallet[] = []
     for (const voter of voters) {
@@ -375,40 +381,6 @@ const LockTokenStats = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [depositsWithWallets.length, givenGrantsTokenAmounts.length])
-  useEffect(() => {
-    const mngoPerpMarket = async () => {
-      const GROUP = connection.cluster === 'devnet' ? 'devnet.2' : 'mainnet.1'
-      const groupConfig = Config.ids().getGroupWithName(GROUP)!
-      const client = new MangoClient(
-        connection.current,
-        groupConfig.mangoProgramId
-      )
-      const group = await client.getMangoGroup(groupConfig.publicKey)
-      const perpMarkets = await Promise.all([
-        ...groupConfig!.perpMarkets.map((x) =>
-          group.loadPerpMarket(
-            connection.current,
-            x.marketIndex,
-            x.baseDecimals,
-            x.quoteDecimals
-          )
-        ),
-      ])
-
-      const emissionPerMonth = perpMarkets
-        .reduce(
-          (acc, next) => acc.iadd(next.liquidityMiningInfo.mngoPerPeriod),
-          new BN(0)
-        )
-        .muln(SECS_PER_MONTH)
-        .div(perpMarkets[0].liquidityMiningInfo.targetPeriodLength)
-      setLiqudiityMiningEmissionPerMonth(emissionPerMonth)
-    }
-    if (symbol === 'MNGO') {
-      mngoPerpMarket()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [connection.cluster])
   useEffect(() => {
     setPaginatedWallets(paginateWallets(0))
     pagination?.current?.setPage(0)
@@ -611,8 +583,11 @@ const LockTokenStats = () => {
                       </Td>
                       <Td>
                         {isConstant
-                          ? getMinDurationFmt(x.deposit as any)
-                          : getTimeLeftFromNowFmt(x.deposit as any)}
+                          ? getMinDurationFmt(
+                              x.deposit.lockup.startTs,
+                              x.deposit.lockup.endTs
+                            )
+                          : getTimeLeftFromNowFmt(x.deposit.lockup.endTs)}
                       </Td>
                       <Td>{lockedTokens}</Td>
                     </TrBody>
@@ -664,8 +639,11 @@ const LockTokenStats = () => {
                         </div>
                         <div className="text-fgd-2 text-sm">
                           {isConstant
-                            ? getMinDurationFmt(x.deposit as any)
-                            : getTimeLeftFromNowFmt(x.deposit as any)}
+                            ? getMinDurationFmt(
+                                x.deposit.lockup.startTs,
+                                x.deposit.lockup.endTs
+                              )
+                            : getTimeLeftFromNowFmt(x.deposit.lockup.endTs)}
                         </div>
                       </div>
                     </div>

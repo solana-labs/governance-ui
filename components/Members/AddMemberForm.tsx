@@ -4,15 +4,12 @@ import Input from 'components/inputs/Input'
 import Button, { SecondaryButton } from '@components/Button'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
 import { abbreviateAddress, precision } from 'utils/formatting'
-import useWalletStore from 'stores/useWalletStore'
 import { getMintSchema } from 'utils/validations'
 import { FC, useMemo, useState } from 'react'
 import { MintForm, UiInstruction } from 'utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssets from 'hooks/useGovernanceAssets'
 import {
   getInstructionDataFromBase64,
-  Governance,
-  ProgramAccount,
   serializeInstructionToBase64,
   withDepositGoverningTokens,
 } from '@solana/spl-governance'
@@ -31,6 +28,10 @@ import useProgramVersion from '@hooks/useProgramVersion'
 import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
 import BigNumber from 'bignumber.js'
 import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface AddMemberForm extends Omit<MintForm, 'mintAccount'> {
   description: string
@@ -48,14 +49,14 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
   const [formErrors, setFormErrors] = useState({})
   const { handleCreateProposal } = useCreateProposal()
   const router = useRouter()
-  const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const connection = useLegacyConnectionContext()
+  const wallet = useWalletOnePointOh()
 
   const { fmtUrlWithCluster } = useQueryContext()
-  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const { symbol } = router.query
 
-  const { realmInfo, canChooseWhoVote, realm } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { realmInfo, canChooseWhoVote } = useRealm()
   const { data: mintInfo } = useMintInfoByPubkeyQuery(mintAccount.pubkey)
 
   const programId: PublicKey | undefined = realmInfo?.programId
@@ -71,8 +72,7 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
   const schema = getMintSchema({ form: { ...form, mintAccount }, connection })
 
   const mintMinAmount = mintInfo?.found
-    ? // @ts-expect-error this discrimination fails on 4.6 but not future versions of TS
-      new BigNumber(1).shiftedBy(mintInfo.result.decimals).toNumber()
+    ? new BigNumber(1).shiftedBy(mintInfo.result.decimals).toNumber()
     : 1
 
   const currentPrecision = precision(mintMinAmount)
@@ -123,7 +123,7 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
   }
 
   const getInstruction = async (): Promise<UiInstruction | false> => {
-    if (programVersion >= 3) {
+    if ((programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) >= 3) {
       const isValid = await validateInstruction({
         schema,
         form: { ...form, mintAccount },
@@ -144,18 +144,16 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
       }
 
       const goofySillyArrayForBuilderPattern = []
-      const tokenMint = mintAccount.governance.account.governedAccount
-
-      // eslint-disable-next-line
-      const tokenOwnerRecordPk = await withDepositGoverningTokens(
+      const tokenMint = mintAccount.pubkey
+      await withDepositGoverningTokens(
         goofySillyArrayForBuilderPattern,
         programId,
-        programVersion,
+        programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION,
         realm.pubkey,
         tokenMint,
         tokenMint,
         new PublicKey(form.destinationAccount),
-        mintAccount.governance.pubkey,
+        mintAccount.extensions.mint!.account.mintAuthority!,
         new PublicKey(form.destinationAccount),
         getMintNaturalAmountFromDecimalAsBN(
           form.amount ?? 1,
@@ -229,14 +227,10 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
       }
 
       try {
-        const selectedGovernance = (await fetchRealmGovernance(
-          governance?.pubkey
-        )) as ProgramAccount<Governance>
-
         proposalAddress = await handleCreateProposal({
           title: form.title ? form.title : proposalTitle,
           description: form.description ? form.description : '',
-          governance: selectedGovernance,
+          governance,
           instructionsData: [instructionData],
           voteByCouncil,
           isDraft: false,
@@ -382,14 +376,13 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
 }
 
 const useCouncilMintAccount = () => {
-  const { realm } = useRealm()
+  const realm = useRealmQuery().data?.result
   const { assetAccounts } = useGovernanceAssets()
   const councilMintAccount = useMemo(
     () =>
       assetAccounts.find(
         (x) =>
-          x.governance?.account.governedAccount.toBase58() ===
-          realm?.account.config.councilMint?.toBase58()
+          x.pubkey.toBase58() === realm?.account.config.councilMint?.toBase58()
       ),
     [assetAccounts, realm?.account.config.councilMint]
   )

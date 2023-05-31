@@ -8,16 +8,13 @@ import {
   ScaleIcon,
   UserGroupIcon,
 } from '@heroicons/react/outline'
-import { VoteTipping } from '@solana/spl-governance'
+import { VoteThresholdType, VoteTipping } from '@solana/spl-governance'
 import cx from 'classnames'
-import React, { useState } from 'react'
-import { BigNumber } from 'bignumber.js'
+import React from 'react'
 import { useRouter } from 'next/router'
 
-import { formatNumber } from '@utils/formatNumber'
 import { ntext } from '@utils/ntext'
 import { Wallet } from '@models/treasury/Wallet'
-import GovernanceConfigModal from 'pages/dao/[symbol]/params/GovernanceConfigModal'
 import useRealm from '@hooks/useRealm'
 import Tooltip from '@components/Tooltip'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
@@ -27,6 +24,12 @@ import useQueryContext from '@hooks/useQueryContext'
 import Section from '../../../Section'
 import TokenIcon from '../../../../icons/TokenIcon'
 import useProgramVersion from '@hooks/useProgramVersion'
+import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
+import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
 
 const UNIX_SECOND = 1
 const UNIX_MINUTE = UNIX_SECOND * 60
@@ -85,17 +88,23 @@ interface Props {
 }
 
 export default function Rules(props: Props) {
-  const [editRulesOpen, setEditRulesOpen] = useState(false)
-  const { ownVoterWeight, symbol } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { ownVoterWeight } = useRealm()
   const router = useRouter()
+  const { symbol } = router.query
   const { fmtUrlWithCluster } = useQueryContext()
 
   const programVersion = useProgramVersion()
 
-  const hasCommon = !!props.wallet.rules.common
-  const hasCommunity = !!props.wallet.rules.community
-  const hasCouncil = !!props.wallet.rules.council
-  const hasRules = hasCommon || hasCommunity || hasCouncil
+  const governanceConfig = props.wallet.governanceAccount?.account.config
+
+  const communityEnabled =
+    governanceConfig &&
+    governanceConfig.communityVoteThreshold.type !== VoteThresholdType.Disabled
+  const councilEnabled =
+    governanceConfig &&
+    governanceConfig.councilVoteThreshold.type !== VoteThresholdType.Disabled
 
   const canEditRules =
     ownVoterWeight &&
@@ -142,7 +151,7 @@ export default function Rules(props: Props) {
                 if (props.wallet.governanceAccount) {
                   router.push(
                     fmtUrlWithCluster(
-                      `/realm/${symbol}/governance/${props.wallet.governanceAccount.pubkey.toBase58()}/edit`
+                      `/dao/${symbol}/treasury/governance/${props.wallet.governanceAccount.pubkey.toBase58()}/edit`
                     )
                   )
                 }
@@ -154,7 +163,7 @@ export default function Rules(props: Props) {
           </Tooltip>
         </div>
       )}
-      {hasRules ? (
+      {governanceConfig !== undefined ? (
         <div>
           {props.wallet.rules.common && (
             <div className="mt-12">
@@ -162,44 +171,39 @@ export default function Rules(props: Props) {
                 <Section
                   icon={<CalendarIcon />}
                   name="Unrestricted Voting Time"
-                  value={votingLengthText(
-                    props.wallet.rules.common.maxVotingTime
-                  )}
+                  value={votingLengthText(governanceConfig.baseVotingTime)}
                 />
                 <Section
                   icon={<CalendarIcon />}
                   name="Voting Cool-Off Time"
-                  value={durationStr(
-                    props.wallet.rules.common.votingCoolOffSeconds
-                  )}
+                  value={durationStr(governanceConfig.votingCoolOffTime)}
                 />
                 <Section
                   icon={<ClockIcon />}
                   name="Min Instruction Holdup Time"
-                  value={durationStr(
-                    props.wallet.rules.common.minInstructionHoldupTime
-                  )}
+                  value={durationStr(governanceConfig.minInstructionHoldUpTime)}
                 />
                 {/** Under versions < 3, vote tipping is just one field for both **/}
-                {programVersion <= 2 && (
+                {(programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) <=
+                  2 && (
                   <Section
                     icon={<HandIcon />}
                     name="Vote Tipping"
                     value={voteTippingText(
-                      props.wallet.rules.community!.voteTipping
+                      governanceConfig.communityVoteTipping
                     )}
                   />
                 )}
                 {/** Under versions < 3, approval quorum is just one field for both **/}
-                {programVersion <= 2 && (
+                {(programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) <=
+                  2 && (
                   <Section
                     icon={<ScaleIcon />}
                     name="Approval Quorum"
                     value={
-                      props.wallet.rules.community?.voteThresholdPercentage !==
+                      governanceConfig.communityVoteThreshold.value !==
                       undefined
-                        ? props.wallet.rules.community
-                            ?.voteThresholdPercentage + '%'
+                        ? governanceConfig.communityVoteThreshold.value + '%'
                         : 'Disabled'
                     }
                   />
@@ -211,15 +215,39 @@ export default function Rules(props: Props) {
           <div
             className={
               'mt-12 grid gap-x-8 ' +
-              (props.wallet.rules.community && props.wallet.rules.council
+              (communityEnabled && councilEnabled
                 ? 'grid-cols-2'
                 : 'grid-cols-1')
             }
           >
-            {(['community', 'council'] as const).map((govpop) => {
-              const rules = props.wallet.rules[govpop]
-              if (!rules) return null
-              return (
+            {([
+              ...(communityEnabled ? ['community'] : []),
+              ...(councilEnabled ? ['council'] : []),
+            ] as const).map((govpop) => {
+              const governingTokenMintInfo =
+                govpop === 'community' ? mint : councilMint
+
+              const minTokensToCreateProposal =
+                govpop === 'community'
+                  ? governanceConfig.minCommunityTokensToCreateProposal
+                  : governanceConfig.minCouncilTokensToCreateProposal
+
+              const voteTipping =
+                govpop === 'community'
+                  ? governanceConfig.communityVoteTipping
+                  : governanceConfig.councilVoteTipping
+
+              const voteThreshold =
+                govpop === 'community'
+                  ? governanceConfig.communityVoteThreshold
+                  : governanceConfig.councilVoteThreshold
+
+              const vetoVoteThreshold =
+                govpop === 'community'
+                  ? governanceConfig.communityVetoVoteThreshold
+                  : governanceConfig.councilVetoVoteThreshold
+
+              return governingTokenMintInfo === undefined ? null : (
                 <div key={govpop} className="border-t border-white/10 pt-6">
                   <div className="flex items-center space-x-2 text-fgd-1 mb-4">
                     {govpop === 'community' ? (
@@ -234,8 +262,7 @@ export default function Rules(props: Props) {
                   <div
                     className={
                       'grid grid-cols-1 gap-8 ' +
-                      (props.wallet.rules.community &&
-                      props.wallet.rules.council
+                      (communityEnabled && councilEnabled
                         ? 'grid-cols-1'
                         : 'grid-cols-2')
                     }
@@ -244,44 +271,44 @@ export default function Rules(props: Props) {
                       icon={<TokenIcon />}
                       name="Min Governance Power to Create a Proposal"
                       value={
-                        new BigNumber(DISABLED_VOTER_WEIGHT.toString())
-                          .shiftedBy(-(rules.decimals || 0))
-                          .isLessThanOrEqualTo(rules.minTokensToCreateProposal)
+                        DISABLED_VOTER_WEIGHT.eq(minTokensToCreateProposal)
                           ? 'Disabled'
-                          : formatNumber(
-                              rules.minTokensToCreateProposal,
-                              undefined,
-                              { maximumFractionDigits: 0 }
+                          : formatMintNaturalAmountAsDecimal(
+                              governingTokenMintInfo,
+                              minTokensToCreateProposal
                             )
                       }
                     />
-                    {programVersion >= 3 && (
+                    {(programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) >=
+                      3 && (
                       <Section
                         icon={<HandIcon />}
                         name="Vote Tipping"
-                        value={voteTippingText(rules.voteTipping)}
+                        value={voteTippingText(voteTipping)}
                       />
                     )}
                     {/** Under versions < 3, approval quorum is just one field for both **/}
-                    {programVersion >= 3 && (
+                    {(programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) >=
+                      3 && (
                       <Section
                         icon={<ScaleIcon />}
                         name="Approval Quorum"
                         value={
-                          rules.voteThresholdPercentage !== 'disabled'
-                            ? rules?.voteThresholdPercentage + '%'
+                          voteThreshold.value !== undefined
+                            ? voteThreshold.value + '%'
                             : 'Disabled'
                         }
                       />
                     )}
                     {/** Under versions < 3, vetos dont exist **/}
-                    {programVersion >= 3 && (
+                    {(programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) >=
+                      3 && (
                       <Section
                         icon={<ScaleIcon />}
                         name="Veto Quorum"
                         value={
-                          rules.vetoVoteThresholdPercentage !== 'disabled'
-                            ? rules.vetoVoteThresholdPercentage + '%'
+                          vetoVoteThreshold.value !== undefined
+                            ? vetoVoteThreshold.value + '%'
                             : 'Disabled'
                         }
                       />
@@ -294,13 +321,6 @@ export default function Rules(props: Props) {
         </div>
       ) : (
         <div>This Wallet has no rules</div>
-      )}
-      {editRulesOpen && props.wallet.governanceAccount && (
-        <GovernanceConfigModal
-          isProposalModalOpen
-          governance={props.wallet.governanceAccount}
-          closeProposalModal={() => setEditRulesOpen(false)}
-        />
       )}
     </section>
   )

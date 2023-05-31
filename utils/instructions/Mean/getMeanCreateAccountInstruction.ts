@@ -9,7 +9,7 @@ import {
   MeanCreateAccount,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
-import createMsp from './createMsp'
+import createPaymentStreaming from './createPaymentStreaming'
 
 interface Args {
   connection: ConnectionContext
@@ -42,33 +42,38 @@ export default async function getMeanCreateAccountInstruction({
     form.amount &&
     governedTokenAccount.extensions.mint
   ) {
-    const msp = createMsp(connection)
-    const payer = getGovernedAccountPk(governedTokenAccount)
+    const paymentStreaming = createPaymentStreaming(connection)
+    const feePayer = getGovernedAccountPk(governedTokenAccount)
     const mint = governedTokenAccount.extensions.mint.publicKey
     const label = form.label
-    const treasurer = governedTokenAccount.governance.pubkey
+    const owner = governedTokenAccount.governance.pubkey
     const type = form.type
 
-    const [transaction1, treasuryPublicKey] = await msp.createTreasury2(
-      payer,
-      treasurer,
-      mint,
+    console.log('111111', { owner, feePayer, mint }, label, type)
+    const {
+      transaction: transaction1,
+      psAccount,
+    } = await paymentStreaming.buildCreateAccountTransaction(
+      { owner, feePayer, mint },
       label,
       type
     )
 
-    const contributor = payer
-    const treasury = treasuryPublicKey
+    const contributor = feePayer
 
     const amount = parseMintNaturalAmountFromDecimal(
       form.amount,
       governedTokenAccount.extensions.mint.account.decimals
     )
-    const transaction2 = await msp.addFunds(
-      payer,
-      contributor,
-      treasury,
-      mint,
+    console.log(
+      '2222[',
+      { psAccount, psAccountMint: mint, contributor, feePayer },
+      amount
+    )
+    const {
+      transaction: transaction2,
+    } = await paymentStreaming.buildAddFundsToAccountTransaction(
+      { psAccount, psAccountMint: mint, contributor, feePayer },
       amount
     )
 
@@ -82,7 +87,6 @@ export default async function getMeanCreateAccountInstruction({
       isValid: true,
       governance: governedTokenAccount?.governance,
       additionalSerializedInstructions,
-      chunkSplitByDefault: true,
       chunkBy: 1,
     }
     return obj
@@ -93,7 +97,6 @@ export default async function getMeanCreateAccountInstruction({
     isValid: false,
     governance: governedTokenAccount?.governance,
     additionalSerializedInstructions: [],
-    chunkSplitByDefault: true,
     chunkBy: 1,
   }
   return obj

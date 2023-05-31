@@ -25,9 +25,6 @@ export const executeInstructions = async (
 ) => {
   const instructions: TransactionInstruction[] = []
 
-  instructions.push(
-    ComputeBudgetProgram.setComputeUnitLimit({ units: 1_000_000 })
-  )
   await Promise.all(
     proposalInstructions.map((instruction) =>
       // withExecuteTransaction function mutate the given 'instructions' parameter
@@ -38,23 +35,25 @@ export const executeInstructions = async (
         proposal.account.governance,
         proposal.pubkey,
         instruction.pubkey,
-        [instruction.account.getSingleInstruction()]
+        [...instruction.account.getAllInstructions()]
       )
     )
   )
-
   if (multiTransactionMode) {
     const txes = [...instructions.map((x) => [x])].map((txBatch, batchIdx) => {
+      const batchWithComputeBudget = [
+        ComputeBudgetProgram.setComputeUnitLimit({ units: 1_000_000 }),
+        ...txBatch,
+      ]
       return {
         instructionsSet: txBatchesToInstructionSetWithSigners(
-          txBatch,
+          batchWithComputeBudget,
           [],
           batchIdx
         ),
         sequenceType: SequenceType.Sequential,
       }
     })
-
     await sendTransactionsV3({
       connection,
       wallet,
@@ -62,7 +61,6 @@ export const executeInstructions = async (
     })
   } else {
     const transaction = new Transaction()
-
     transaction.add(...instructions)
     const signedTransaction = await signTransaction({
       transaction,
@@ -70,7 +68,6 @@ export const executeInstructions = async (
       connection,
       signers: [],
     })
-
     await sendSignedTransaction({
       signedTransaction,
       connection,

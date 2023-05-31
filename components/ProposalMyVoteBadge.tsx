@@ -1,50 +1,13 @@
-import {
-  Proposal,
-  ProgramAccount,
-  VoteRecord,
-  Realm,
-} from '@solana/spl-governance'
+import { Proposal, ProgramAccount } from '@solana/spl-governance'
 import classNames from 'classnames'
 import { ThumbUpIcon, ThumbDownIcon } from '@heroicons/react/solid'
-
 import { isYesVote } from '@models/voteRecords'
-import useRealm from '@hooks/useRealm'
-import useWalletStore from '../stores/useWalletStore'
 import Tooltip from './Tooltip'
-
-interface VoteRecords {
-  [proposal: string]: ProgramAccount<VoteRecord>
-}
-
-export function getOwnVoteRecord(
-  communityDelegateVoteRecords: VoteRecords,
-  councilDelegateVoteRecords: VoteRecords,
-  ownVoteRecords: VoteRecords,
-  proposal: Omit<ProgramAccount<Proposal>, 'owner'>,
-  realm?: ProgramAccount<Realm>
-): ProgramAccount<VoteRecord> | undefined {
-  const proposalKey = proposal.pubkey.toBase58()
-  const councilDelegateVote = councilDelegateVoteRecords[proposalKey]
-  const communityDelegateVote = communityDelegateVoteRecords[proposalKey]
-  const ownRecord = ownVoteRecords[proposalKey]
-  const governingTokenMint = proposal.account.governingTokenMint.toBase58()
-
-  if (
-    councilDelegateVote &&
-    governingTokenMint === realm?.account?.config?.councilMint?.toBase58()
-  ) {
-    return councilDelegateVote
-  }
-
-  if (
-    communityDelegateVote &&
-    governingTokenMint === realm?.account?.communityMint.toBase58()
-  ) {
-    return communityDelegateVote
-  }
-
-  return ownRecord
-}
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useAddressQuery_VoteRecord } from '@hooks/queries/addresses/voteRecord'
+import { useAddressQuery_TokenOwnerRecord } from '@hooks/queries/addresses/tokenOwnerRecord'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useVoteRecordByPubkeyQuery } from '@hooks/queries/voteRecord'
 
 interface Props {
   className?: string
@@ -52,29 +15,27 @@ interface Props {
 }
 
 export default function ProposalMyVoteBadge(props: Props) {
-  const { realm } = useRealm()
-  const communityDelegateVoteRecords = useWalletStore(
-    (s) => s.communityDelegateVoteRecordsByProposal
-  )
-  const councilDelegateVoteRecords = useWalletStore(
-    (s) => s.councilDelegateVoteRecordsByProposal
-  )
-  const ownVoteRecords = useWalletStore((s) => s.ownVoteRecordsByProposal)
+  const realm = useRealmQuery().data?.result
+  const wallet = useWalletOnePointOh()
 
-  const ownVoteRecord = getOwnVoteRecord(
-    communityDelegateVoteRecords,
-    councilDelegateVoteRecords,
-    ownVoteRecords,
-    props.proposal,
-    realm
+  const { data: tokenOwnerRecordPk } = useAddressQuery_TokenOwnerRecord(
+    realm?.owner,
+    realm?.pubkey,
+    props.proposal.account.governingTokenMint,
+    wallet?.publicKey ?? undefined
   )
+  const { data: voteRecordPk } = useAddressQuery_VoteRecord(
+    realm?.owner,
+    props.proposal.pubkey,
+    tokenOwnerRecordPk
+  )
+  const { data: ownVoteRecord } = useVoteRecordByPubkeyQuery(voteRecordPk)
 
-  if (!ownVoteRecord) {
+  if (!ownVoteRecord?.result?.account) {
     return null
   }
 
-  const isYes = isYesVote(ownVoteRecord.account)
-
+  const isYes = isYesVote(ownVoteRecord?.result?.account)
   return (
     <Tooltip content={isYes ? 'You voted "Yes"' : 'You voted "No"'}>
       <div

@@ -1,5 +1,6 @@
-import { NftVoterClient } from '@solana/governance-program-library'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { PublicKey } from '@solana/web3.js'
+import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import { Registrar, Voter } from './accounts'
 import { VsrClient } from './client'
 
@@ -11,6 +12,7 @@ export const tryGetVoter = async (voterPk: PublicKey, client: VsrClient) => {
     return null
   }
 }
+
 export const tryGetRegistrar = async (
   registrarPk: PublicKey,
   client: VsrClient
@@ -20,6 +22,21 @@ export const tryGetRegistrar = async (
       registrarPk
     )
     return existingRegistrar as Registrar
+  } catch (e) {
+    return null
+  }
+}
+
+export const tryGetHeliumRegistrar = async (
+  registrarPk: PublicKey,
+  client: HeliumVsrClient
+) => {
+  try {
+    const existingRegistrar = await client.program.account.registrar.fetch(
+      registrarPk
+    )
+
+    return existingRegistrar
   } catch (e) {
     return null
   }

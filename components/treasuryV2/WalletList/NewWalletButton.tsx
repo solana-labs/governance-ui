@@ -1,19 +1,20 @@
 import { PlusCircleIcon } from '@heroicons/react/outline'
 import { useRouter } from 'next/router'
-
-import useWalletStore from 'stores/useWalletStore'
 import useRealm from '@hooks/useRealm'
 import Tooltip from '@components/Tooltip'
 import { LinkButton } from '@components/Button'
 import useQueryContext from '@hooks/useQueryContext'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 export const NEW_TREASURY_ROUTE = `/treasury/new`
 
 export default function NewWalletButton() {
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
+  const realm = useRealmQuery().data?.result
   const {
     ownVoterWeight,
-    realm,
     symbol,
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,

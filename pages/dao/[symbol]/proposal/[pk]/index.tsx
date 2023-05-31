@@ -1,16 +1,16 @@
 import ReactMarkdown from 'react-markdown/react-markdown.min'
 import remarkGfm from 'remark-gfm'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
-import useProposal from 'hooks/useProposal'
+import { useProposalGovernanceQuery } from 'hooks/useProposal'
 import ProposalStateBadge from '@components/ProposalStateBadge'
-import { InstructionPanel } from 'components/instructions/instructionPanel'
+import { TransactionPanel } from '@components/instructions/TransactionPanel'
 import DiscussionPanel from 'components/chat/DiscussionPanel'
-import VotePanel from '@components/VotePanel/VotePanel'
+import VotePanel from '@components/VotePanel'
 import { ApprovalProgress, VetoProgress } from '@components/QuorumProgress'
 import useRealm from 'hooks/useRealm'
 import useProposalVotes from 'hooks/useProposalVotes'
 import ProposalTimeStatus from 'components/ProposalTimeStatus'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import ProposalActionsPanel from '@components/ProposalActions'
 import { getRealmExplorerHost } from 'tools/routing'
 import { ProposalState } from '@solana/spl-governance'
@@ -22,18 +22,24 @@ import Link from 'next/link'
 import useQueryContext from '@hooks/useQueryContext'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import ProposalExecutionCard from '@components/ProposalExecutionCard'
-import useWalletStore from 'stores/useWalletStore'
 import ProposalVotingPower from '@components/ProposalVotingPower'
 import { useMediaQuery } from 'react-responsive'
 import NftProposalVoteState from 'NftVotePlugin/NftProposalVoteState'
 import ProposalWarnings from './ProposalWarnings'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import VotingRules from '@components/VotingRules'
+import { useRouteProposalQuery } from '@hooks/queries/proposal'
 
 const Proposal = () => {
   const { realmInfo, symbol } = useRealm()
-  const { proposal, descriptionLink, governance } = useProposal()
+  const proposal = useRouteProposalQuery().data?.result
+  const governance = useProposalGovernanceQuery().data?.result
+  const descriptionLink = proposal?.account.descriptionLink
+  const allowDiscussion = realmInfo?.allowDiscussion ?? true
+
   const [description, setDescription] = useState('')
   const voteData = useProposalVotes(proposal?.account)
-  const currentWallet = useWalletStore((s) => s.current)
+  const currentWallet = useWalletOnePointOh()
   const showResults =
     proposal &&
     proposal.account.state !== ProposalState.Cancelled &&
@@ -112,8 +118,8 @@ const Proposal = () => {
               </div>
             )}
             <ProposalWarnings />
-            <InstructionPanel />
-            {isTwoCol && <DiscussionPanel />}
+            <TransactionPanel />
+            {isTwoCol && allowDiscussion && <DiscussionPanel />}
           </>
         ) : (
           <>
@@ -185,13 +191,14 @@ const Proposal = () => {
             </div>
           </div>
         ) : null}
+        <VotingRules />
         <VotePanel />
         <NftProposalVoteState proposal={proposal}></NftProposalVoteState>
         {proposal && currentWallet && showProposalExecution && (
           <ProposalExecutionCard />
         )}
         <ProposalActionsPanel />
-        {!isTwoCol && proposal && (
+        {!isTwoCol && proposal && allowDiscussion && (
           <div className="bg-bkg-2 rounded-lg p-4 md:p-6 ">
             <DiscussionPanel />
           </div>

@@ -20,20 +20,23 @@ import {
 import { Connection } from '@solana/web3.js'
 import { BN } from '@coral-xyz/anchor'
 import {
-  nftPluginsPks,
-  vsrPluginsPks,
-  gatewayPluginsPks,
-} from '@hooks/useVotingPlugins'
+  NFT_PLUGINS_PKS,
+  VSR_PLUGIN_PKS,
+  HELIUM_VSR_PLUGINS_PKS,
+  GATEWAY_PLUGINS_PKS,
+} from '@constants/plugins'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import { validatePubkey } from './formValidation'
 
 // Plugins supported by Realms
 const supportedPlugins = [
-  ...nftPluginsPks,
-  ...vsrPluginsPks,
-  ...gatewayPluginsPks,
+  ...NFT_PLUGINS_PKS,
+  ...VSR_PLUGIN_PKS,
+  ...HELIUM_VSR_PLUGINS_PKS,
+  ...GATEWAY_PLUGINS_PKS,
 ]
 
-export const getValidateAccount = async (
+const getValidateAccount = async (
   connection: Connection,
   pubKey: PublicKey
 ) => {
@@ -54,7 +57,7 @@ export const getValidatedPublickKey = (val: string) => {
   }
 }
 
-export const validateDoseTokenAccountMatchMint = (
+const validateDoseTokenAccountMatchMint = (
   tokenAccount: AccountInfo,
   mint: PublicKey
 ) => {
@@ -91,7 +94,7 @@ export const isExistingTokenAccount = async (
   return isExistingTokenAccount
 }
 
-export const validateDestinationAccAddress = async (
+const validateDestinationAccAddress = async (
   connection: ConnectionContext,
   val: any,
   governedAccount?: PublicKey
@@ -119,7 +122,7 @@ export const validateDestinationAccAddress = async (
   return true
 }
 
-export const validateDestinationAccAddressWithMint = async (
+const validateDestinationAccAddressWithMint = async (
   connection: ConnectionContext,
   val: any,
   mintPubKey: PublicKey
@@ -351,7 +354,7 @@ export const getMeanFundAccountSchema = ({ form }) => {
 
   return yup.object().shape({
     governedTokenAccount: yup.object().required('Source of funds is required'),
-    treasury: yup
+    paymentStreamingAccount: yup
       .object()
       .required('Streaming account destination is required'),
     amount: yup
@@ -402,7 +405,9 @@ export const getMeanWithdrawFromAccountSchema = ({
 }) => {
   return yup.object().shape({
     governedTokenAccount: yup.object().required('Governance is required'),
-    treasury: yup.object().required('Streaming account source is required'),
+    paymentStreamingAccount: yup
+      .object()
+      .required('Streaming account source is required'),
 
     destination: yup
       .string()
@@ -412,7 +417,7 @@ export const getMeanWithdrawFromAccountSchema = ({
         async function (val: string) {
           if (val) {
             try {
-              if (form.treasury?.id.toString() == val) {
+              if (form.paymentStreamingAccount?.id.toString() == val) {
                 return this.createError({
                   message: `Destination account address can't be same as source account`,
                 })
@@ -420,7 +425,7 @@ export const getMeanWithdrawFromAccountSchema = ({
               await validateDestinationAccAddress(
                 connection,
                 val,
-                new PublicKey(form.treasury?.id)
+                new PublicKey(form.paymentStreamingAccount?.id)
               )
               return true
             } catch (e) {
@@ -443,17 +448,17 @@ export const getMeanWithdrawFromAccountSchema = ({
         'amount',
         'Transfer amount must be less than the source of funds available amount',
         async function (val: number) {
-          if (val && !form.treasury) {
+          if (val && !form.paymentStreamingAccount) {
             return this.createError({
               message: `Please select source of funds to validate the amount`,
             })
           }
-          if (val && form.treasury && mintInfo) {
+          if (val && form.paymentStreamingAccount && mintInfo) {
             const mintValue = getMintNaturalAmountFromDecimalAsBN(
               val,
               mintInfo.decimals
             )
-            return new BN(form.treasury.balance).gte(mintValue)
+            return new BN(form.paymentStreamingAccount.balance).gte(mintValue)
           }
           return this.createError({
             message: `Amount is required`,
@@ -474,7 +479,9 @@ export const getMeanCreateStreamSchema = ({
 }) => {
   return yup.object().shape({
     governedTokenAccount: yup.object().required('Governance is required'),
-    treasury: yup.object().required('Streaming account source is required'),
+    paymentStreamingAccount: yup
+      .object()
+      .required('Streaming account source is required'),
     streamName: yup.string().required('Stream name is required'),
     destination: yup
       .string()
@@ -484,7 +491,7 @@ export const getMeanCreateStreamSchema = ({
         async function (val: string) {
           if (val) {
             try {
-              if (form.treasury?.id.toString() == val) {
+              if (form.paymentStreamingAccount?.id.toString() == val) {
                 return this.createError({
                   message: `Destination account address can't be same as source account`,
                 })
@@ -492,7 +499,7 @@ export const getMeanCreateStreamSchema = ({
               await validateDestinationAccAddress(
                 connection,
                 val,
-                new PublicKey(form.treasury?.id)
+                new PublicKey(form.paymentStreamingAccount?.id)
               )
               return true
             } catch (e) {
@@ -515,17 +522,17 @@ export const getMeanCreateStreamSchema = ({
         'amount',
         'Transfer amount must be less than the source of funds available amount',
         async function (val: number) {
-          if (val && !form.treasury) {
+          if (val && !form.paymentStreamingAccount) {
             return this.createError({
               message: `Please select source of funds to validate the amount`,
             })
           }
-          if (val && form.treasury && mintInfo) {
+          if (val && form.paymentStreamingAccount && mintInfo) {
             const mintValue = getMintNaturalAmountFromDecimalAsBN(
               val,
               mintInfo.decimals
             )
-            return new BN(form.treasury.balance).gte(mintValue)
+            return new BN(form.paymentStreamingAccount.balance).gte(mintValue)
           }
           return this.createError({
             message: `Amount is required`,
@@ -551,6 +558,85 @@ export const getFriktionWithdrawSchema = () => {
   })
 }
 
+export const getDualFinanceGovernanceAirdropSchema = () => {
+  return yup.object().shape({
+    amountPerVoter: yup.number().typeError('Amount per voter is required'),
+    eligibilityStart: yup.number().typeError('Eligibility start is required'),
+    eligibilityEnd: yup.number().typeError('Eligibility end is required'),
+    treasury: yup.object().typeError('Treasury is required'),
+    amount: yup.number().typeError('Amount is required'),
+  })
+}
+
+export const getDualFinanceMerkleAirdropSchema = () => {
+  return yup.object().shape({
+    root: yup
+      .string()
+      .required('Root is required')
+      .test(
+        'destination',
+        'Account validation error',
+        async function (val: string) {
+          if (val) {
+            try {
+              const arr = Uint8Array.from(Buffer.from(val, 'hex'))
+              if (arr.length !== 32) {
+                return this.createError({
+                  message: 'Expected 32 bytes',
+                })
+              }
+              return true
+            } catch (e) {
+              console.log(e)
+            }
+            try {
+              const root = val.split(',').map(function (item) {
+                return parseInt(item, 10)
+              })
+              if (root.length !== 32) {
+                return this.createError({
+                  message: 'Expected 32 bytes',
+                })
+              }
+              for (const byte of root) {
+                if (byte < 0 || byte >= 256) {
+                  return this.createError({
+                    message: 'Invalid byte',
+                  })
+                }
+              }
+              return true
+            } catch (e) {
+              console.log(e)
+            }
+            return this.createError({
+              message: `Could not parse`,
+            })
+          } else {
+            return this.createError({
+              message: `Root is required`,
+            })
+          }
+        }
+      ),
+    treasury: yup.object().typeError('Treasury is required'),
+    amount: yup.number().typeError('Amount is required'),
+  })
+}
+
+export const getDualFinanceLiquidityStakingOptionSchema = () => {
+  return yup.object().shape({
+    optionExpirationUnixSeconds: yup
+      .number()
+      .typeError('Expiration is required'),
+    numTokens: yup.number().typeError('Num tokens is required'),
+    lotSize: yup.number().typeError('lotSize is required'),
+    baseTreasury: yup.object().typeError('baseTreasury is required'),
+    quoteTreasury: yup.object().typeError('quoteTreasury is required'),
+    payer: yup.object().typeError('payer is required'),
+  })
+}
+
 export const getDualFinanceStakingOptionSchema = () => {
   return yup.object().shape({
     soName: yup.string().required('Staking option name is required'),
@@ -564,6 +650,15 @@ export const getDualFinanceStakingOptionSchema = () => {
     baseTreasury: yup.object().typeError('baseTreasury is required'),
     quoteTreasury: yup.object().typeError('quoteTreasury is required'),
     payer: yup.object().typeError('payer is required'),
+  })
+}
+
+export const getDualFinanceInitStrikeSchema = () => {
+  return yup.object().shape({
+    soName: yup.string().required('Staking option name is required'),
+    strikes: yup.string().typeError('Strike is required'),
+    payer: yup.object().typeError('payer is required'),
+    baseTreasury: yup.object().typeError('baseTreasury is required'),
   })
 }
 
@@ -581,6 +676,11 @@ export const getDualFinanceWithdrawSchema = () => {
   return yup.object().shape({
     soName: yup.string().required('Staking option name is required'),
     baseTreasury: yup.object().typeError('baseTreasury is required'),
+    mintPk: yup
+      .string()
+      .test('is-valid-address1', 'Please enter a valid PublicKey', (value) =>
+        value ? validatePubkey(value) : true
+      ),
   })
 }
 
@@ -761,9 +861,7 @@ export const getMintSchema = ({ form, connection }) => {
             val,
             form.mintAccount?.extensions.mint.account.decimals
           )
-          return !!(
-            form.mintAccount.governance?.account.governedAccount && mintValue
-          )
+          return !!(form.mintAccount.extensions.mint.publicKey && mintValue)
         }
         return this.createError({
           message: `Amount is required`,
@@ -781,7 +879,7 @@ export const getMintSchema = ({ form, connection }) => {
                 await validateDestinationAccAddressWithMint(
                   connection,
                   val,
-                  form.mintAccount.governance.account.governedAccount
+                  form.mintAccount.extensions.mint.publicKey
                 )
               } else {
                 return this.createError({
@@ -909,7 +1007,11 @@ export const getRealmCfgSchema = ({
               if (val) {
                 try {
                   getValidatedPublickKey(val)
-                  if ([...nftPluginsPks].includes(val)) {
+                  if (
+                    [...NFT_PLUGINS_PKS, ...HELIUM_VSR_PLUGINS_PKS].includes(
+                      val
+                    )
+                  ) {
                     return true
                   } else {
                     return this.createError({
@@ -973,7 +1075,7 @@ export const getRealmCfgSchema = ({
               if (val) {
                 try {
                   getValidatedPublickKey(val)
-                  if ([...nftPluginsPks].includes(val)) {
+                  if ([...NFT_PLUGINS_PKS].includes(val)) {
                     return true
                   } else {
                     return this.createError({
@@ -1046,7 +1148,11 @@ export const getRealmCfgSchema = ({
               if (val) {
                 try {
                   getValidatedPublickKey(val)
-                  if ([...nftPluginsPks].includes(val)) {
+                  if (
+                    [...NFT_PLUGINS_PKS, ...HELIUM_VSR_PLUGINS_PKS].includes(
+                      val
+                    )
+                  ) {
                     return true
                   } else {
                     return this.createError({

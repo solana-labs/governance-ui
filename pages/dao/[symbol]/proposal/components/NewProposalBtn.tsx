@@ -2,26 +2,31 @@ import Link from 'next/link'
 import { PlusCircleIcon } from '@heroicons/react/outline'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
-import React from 'react'
-import useWalletStore from 'stores/useWalletStore'
+import React, { useMemo } from 'react'
 import Tooltip from '@components/Tooltip'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmGovernancesQuery } from '@hooks/queries/governance'
 
 const NewProposalBtn = () => {
   const { fmtUrlWithCluster } = useQueryContext()
 
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
+
+  const realm = useRealmQuery().data?.result
 
   const {
     symbol,
-    realm,
-    governances,
     ownVoterWeight,
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
 
-  const governanceItems = Object.values(governances)
-
+  const governancesQuery = useRealmGovernancesQuery()
+  const governanceItems = useMemo(() => governancesQuery.data ?? [], [
+    governancesQuery.data,
+  ])
   const canCreateProposal =
     realm &&
     governanceItems.some((g) =>

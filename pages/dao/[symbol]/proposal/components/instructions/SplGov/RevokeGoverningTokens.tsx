@@ -24,6 +24,7 @@ import React, {
 } from 'react'
 import { NewProposalContext } from '../../../new'
 import useMembershipTypes from './useMembershipTypes'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 type Form = {
   memberKey?: string
@@ -48,7 +49,9 @@ const RevokeGoverningTokens: FC<{
   })
   const [formErrors, setFormErrors] = useState<Errors>({})
   const membershipTypes = useMembershipTypes()
-  const { realmInfo, realm } = useRealm()
+  const realm = useRealmQuery().data?.result
+
+  const { realmInfo } = useRealm()
   const programId: PublicKey | undefined = realmInfo?.programId
   const programVersion = useProgramVersion()
 
@@ -94,6 +97,8 @@ const RevokeGoverningTokens: FC<{
 
   const { data: mintInfo } = useMintInfoByPubkeyQuery(selectedMint)
   const governance = useGovernanceForGovernedAddress(selectedMint)
+  const revokeTokenAuthority =
+    mintInfo?.result?.mintAuthority ?? governance?.pubkey
 
   const getInstruction = useCallback(async (): Promise<UiInstruction> => {
     const errors: Errors = {}
@@ -132,7 +137,9 @@ const RevokeGoverningTokens: FC<{
       realm === undefined ||
       programId === undefined ||
       mintInfo?.result === undefined ||
-      governance === undefined
+      governance === undefined ||
+      revokeTokenAuthority === undefined ||
+      programVersion === undefined
     ) {
       throw new Error('proposal created before necessary data is fetched')
     }
@@ -142,7 +149,7 @@ const RevokeGoverningTokens: FC<{
       realm.pubkey,
       member,
       selectedMint,
-      governance.pubkey,
+      revokeTokenAuthority,
       getMintNaturalAmountFromDecimalAsBN(
         parseFloat(form.amount),
         mintInfo.result.decimals
@@ -174,7 +181,19 @@ const RevokeGoverningTokens: FC<{
       { governedAccount: governance, getInstruction },
       index
     )
-  }, [getInstruction, handleSetInstructions, index, governance])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    form.amount,
+    form.memberKey,
+    governance,
+    mintInfo?.result,
+    programId,
+    programVersion,
+    realm,
+    selectedMint,
+    index,
+    governance,
+  ])
 
   return (
     <>
