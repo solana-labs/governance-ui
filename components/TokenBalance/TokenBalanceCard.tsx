@@ -18,7 +18,6 @@ import { getUnrelinquishedVoteRecords } from '@models/api'
 import { withDepositGoverningTokens } from '@solana/spl-governance'
 import { withRelinquishVote } from '@solana/spl-governance'
 import { withWithdrawGoverningTokens } from '@solana/spl-governance'
-import useWalletStore from '../../stores/useWalletStore'
 import { sendTransaction } from '@utils/send'
 import { approveTokenTransfer } from '@utils/tokens'
 import Button, { SecondaryButton } from '../Button'
@@ -33,7 +32,7 @@ import { notify } from '@utils/notifications'
 import { ExclamationIcon } from '@heroicons/react/outline'
 import { useEffect, useState } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { vsrPluginsPks } from '@hooks/useVotingPlugins'
+import { VSR_PLUGIN_PKS } from '@constants/plugins'
 import { REALM_ID as PYTH_REALM_ID } from 'pyth-staking-api'
 import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
 import SerumGovernanceTokenWrapper from './SerumGovernanceTokenWrapper'
@@ -41,6 +40,21 @@ import getNumTokens from '@components/ProposalVotingPower/getNumTokens'
 import VotingPowerPct from '@components/ProposalVotingPower/VotingPowerPct'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import {
+  useUserCommunityTokenOwnerRecord,
+  useUserCouncilTokenOwnerRecord,
+} from '@hooks/queries/tokenOwnerRecord'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
+import { fetchGovernanceByPubkey } from '@hooks/queries/governance'
+import { useConnection } from '@solana/wallet-adapter-react'
+import queryClient from '@hooks/queries/queryClient'
+import { proposalQueryKeys } from '@hooks/queries/proposal'
+import asFindable from '@utils/queries/asFindable'
 
 const TokenBalanceCard = ({
   proposal,
@@ -51,9 +65,11 @@ const TokenBalanceCard = ({
   inAccountDetails?: boolean
   children?: React.ReactNode
 }) => {
-  const realmProgramId = useWalletStore((s) => s.selectedRealm.programId)
   const [hasGovPower, setHasGovPower] = useState<boolean>(false)
-  const { councilMint, mint, realm } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const realmProgramId = realm?.owner
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const isDepositVisible = (
@@ -145,34 +161,27 @@ export const TokenDeposit = ({
 }) => {
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
-  const connection = useWalletStore((s) => s.connection.current)
-  const { fetchWalletTokenAccounts, fetchRealm } = useWalletStore(
-    (s) => s.actions
-  )
+  const { connection } = useConnection()
+
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
 
   const maxVoterWeight = useMaxVoteRecord()?.pubkey || undefined
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
+  const realm = useRealmQuery().data?.result
+  const config = useRealmConfigQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+
   const {
-    realm,
     realmInfo,
     realmTokenAccount,
-    ownTokenRecord,
-    ownCouncilTokenRecord,
     ownVoterWeight,
-    councilMint,
     councilTokenAccount,
-    proposals,
-    governances,
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
-    config,
   } = useRealm()
-  // Do not show deposits for mints with zero supply because nobody can deposit anyway
-  if (!mint || mint.supply.isZero()) {
-    return null
-  }
 
   const amount =
     councilMint && tokenRole === GoverningTokenRole.Council
@@ -184,10 +193,12 @@ export const TokenDeposit = ({
         )
       : getNumTokens(ownVoterWeight, ownCouncilTokenRecord, mint, realmInfo)
 
-  const max: BigNumber =
+  const max: BigNumber | undefined =
     councilMint && tokenRole === GoverningTokenRole.Council
       ? getMintDecimalAmount(councilMint, councilMint.supply)
-      : getMintDecimalAmount(mint, mint.supply)
+      : mint
+      ? getMintDecimalAmount(mint, mint.supply)
+      : undefined
 
   const depositTokenRecord =
     tokenRole === GoverningTokenRole.Community
@@ -248,9 +259,6 @@ export const TokenDeposit = ({
       sendingMessage: 'Depositing tokens',
       successMessage: 'Tokens have been deposited',
     })
-
-    await fetchWalletTokenAccounts()
-    await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
   }
 
   const depositAllTokens = async () =>
@@ -267,17 +275,31 @@ export const TokenDeposit = ({
       )
 
       for (const voteRecord of Object.values(voteRecords)) {
-        let proposal = proposals[voteRecord.account.proposal.toBase58()]
+        const proposalQuery = await queryClient.fetchQuery({
+          queryKey: proposalQueryKeys.byPubkey(
+            connection.rpcEndpoint,
+            voteRecord.account.proposal
+          ),
+          staleTime: 0,
+          queryFn: () =>
+            asFindable(() =>
+              getProposal(connection, voteRecord.account.proposal)
+            )(),
+        })
+        const proposal = proposalQuery.result
         if (!proposal) {
           continue
         }
 
         if (proposal.account.state === ProposalState.Voting) {
-          // If the Proposal is in Voting state refetch it to make sure we have the latest state to avoid false positives
-          proposal = await getProposal(connection, proposal.pubkey)
           if (proposal.account.state === ProposalState.Voting) {
-            const governance =
-              governances[proposal.account.governance.toBase58()]
+            const governance = (
+              await fetchGovernanceByPubkey(
+                connection,
+                proposal.account.governance
+              )
+            ).result
+            if (!governance) throw new Error('failed to fetch governance')
             if (proposal.account.getTimeToVoteEnd(governance.account) > 0) {
               // Note: It's technically possible to withdraw the vote here but I think it would be confusing and people would end up unconsciously withdrawing their votes
               notify({
@@ -379,8 +401,6 @@ export const TokenDeposit = ({
               : `Released tokens (${index}/${ixChunks.length - 2})`,
         })
       }
-      await fetchWalletTokenAccounts()
-      await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
     } catch (ex) {
       //TODO change to more friendly notification
       notify({ type: 'error', message: `${ex}` })
@@ -422,13 +442,11 @@ export const TokenDeposit = ({
       )
     : '0'
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   useEffect(() => {
     if (availableTokens != '0' || hasTokensDeposited || hasTokensInWallet) {
       if (setHasGovPower) setHasGovPower(true)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [availableTokens, hasTokensDeposited, hasTokensInWallet])
+  }, [availableTokens, hasTokensDeposited, hasTokensInWallet, setHasGovPower])
 
   const canShowAvailableTokensMessage = hasTokensInWallet && connected
   const tokensToShow =
@@ -439,10 +457,15 @@ export const TokenDeposit = ({
       : 0
   const isVsr =
     config?.account.communityTokenConfig.voterWeightAddin &&
-    vsrPluginsPks.includes(
+    VSR_PLUGIN_PKS.includes(
       config?.account.communityTokenConfig.voterWeightAddin.toBase58()
     ) &&
     tokenRole === GoverningTokenRole.Community
+
+  // Do not show deposits for mints with zero supply because nobody can deposit anyway
+  if (!mint || mint.supply.isZero()) {
+    return null
+  }
 
   return (
     <TokenDepositWrapper inAccountDetails={inAccountDetails}>

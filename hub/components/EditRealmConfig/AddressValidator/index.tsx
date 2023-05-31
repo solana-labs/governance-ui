@@ -1,28 +1,28 @@
 import CheckmarkIcon from '@carbon/icons-react/lib/Checkmark';
 import ErrorIcon from '@carbon/icons-react/lib/Error';
 import WarningFilledIcon from '@carbon/icons-react/lib/WarningFilled';
+import {
+  VSR_PLUGIN_PKS,
+  NFT_PLUGINS_PKS,
+  GATEWAY_PLUGINS_PKS,
+  SWITCHBOARD_PLUGINS_PKS,
+  PYTH_PLUGINS_PKS,
+} from '@constants/plugins';
 import { Program, AnchorProvider } from '@coral-xyz/anchor';
 import { PublicKey } from '@solana/web3.js';
 import React, { useEffect, useState } from 'react';
 
-import {
-  vsrPluginsPks,
-  nftPluginsPks,
-  gatewayPluginsPks,
-  switchboardPluginsPks,
-  pythPluginsPks,
-} from '@hooks/useVotingPlugins';
 import { Input } from '@hub/components/controls/Input';
 import { useCluster } from '@hub/hooks/useCluster';
 import { useWallet } from '@hub/hooks/useWallet';
 import { DEFAULT_NFT_VOTER_PLUGIN } from '@tools/constants';
 
 const RECOGNIZED_PLUGINS = new Set([
-  ...vsrPluginsPks,
-  ...nftPluginsPks,
-  ...gatewayPluginsPks,
-  ...switchboardPluginsPks,
-  ...pythPluginsPks,
+  ...VSR_PLUGIN_PKS,
+  ...NFT_PLUGINS_PKS,
+  ...GATEWAY_PLUGINS_PKS,
+  ...SWITCHBOARD_PLUGINS_PKS,
+  ...PYTH_PLUGINS_PKS,
 ]);
 
 interface Props {

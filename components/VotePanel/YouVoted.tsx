@@ -11,37 +11,37 @@ import {
   BanIcon,
   MinusCircleIcon,
 } from '@heroicons/react/solid'
-import useWalletStore from '../../stores/useWalletStore'
 import { SecondaryButton } from '../Button'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { useRouter } from 'next/router'
 import Tooltip from '@components/Tooltip'
-import {
-  useVoterTokenRecord,
-  useIsVoting,
-  useProposalVoteRecordQuery,
-  useIsInCoolOffTime,
-} from './hooks'
+import { useVoterTokenRecord, useIsVoting, useIsInCoolOffTime } from './hooks'
 import assertUnreachable from '@utils/typescript/assertUnreachable'
 import { useHasVoteTimeExpired } from '@hooks/useHasVoteTimeExpired'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import {
+  proposalQueryKeys,
+  useRouteProposalQuery,
+} from '@hooks/queries/proposal'
+import { useProposalGovernanceQuery } from '@hooks/useProposal'
+import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import queryClient from '@hooks/queries/queryClient'
 
 export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
-  const router = useRouter()
-  const { pk } = router.query
-  const { proposal } = useWalletStore((s) => s.selectedProposal)
-  const { realm, realmInfo } = useRealm()
+  const proposal = useRouteProposalQuery().data?.result
+  const realm = useRealmQuery().data?.result
+  const { realmInfo } = useRealm()
   const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const connected = !!wallet?.connected
-  const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
-  const fetchProposal = useWalletStore((s) => s.actions.fetchProposal)
-  const { governance } = useWalletStore((s) => s.selectedProposal)
+
+  const governance = useProposalGovernanceQuery().data?.result
   const maxVoterWeight = useMaxVoteRecord()?.pubkey || undefined
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
   const isVoting = useIsVoting()
@@ -124,10 +124,9 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
         instructions,
         client
       )
-      await refetchProposals()
-      if (pk) {
-        fetchProposal(pk)
-      }
+      queryClient.invalidateQueries({
+        queryKey: proposalQueryKeys.all(connection.endpoint),
+      })
     } catch (ex) {
       console.error("Can't relinquish vote", ex)
     }

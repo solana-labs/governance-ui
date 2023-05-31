@@ -19,7 +19,6 @@ import {
 } from '@utils/uiTypes/proposalCreationTypes'
 import { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import useWalletStore from 'stores/useWalletStore'
 
 import { getTokenTransferSchema } from '@utils/validations'
 import {
@@ -31,8 +30,6 @@ import tokenPriceService from '@utils/services/tokenPrice'
 import BigNumber from 'bignumber.js'
 import { getInstructionDataFromBase64 } from '@solana/spl-governance'
 import useQueryContext from '@hooks/useQueryContext'
-import { Governance } from '@solana/spl-governance'
-import { ProgramAccount } from '@solana/spl-governance'
 import { useRouter } from 'next/router'
 import { notify } from '@utils/notifications'
 import Textarea from '@components/inputs/Textarea'
@@ -52,6 +49,8 @@ import { NFTWithMint } from '@utils/uiTypes/nfts'
 import useCreateProposal from '@hooks/useCreateProposal'
 import NFTAccountSelect from './NFTAccountSelect'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const SendTokens = ({
   isNft = false,
@@ -61,10 +60,11 @@ const SendTokens = ({
   selectedNft?: NFTWithMint | null
 }) => {
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
   const { setCurrentAccount } = useTreasuryAccountStore()
-  const { realmInfo, symbol, realm, canChooseWhoVote } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { realmInfo, symbol, canChooseWhoVote } = useRealm()
   const { handleCreateProposal } = useCreateProposal()
   const { canUseTransferInstruction } = useGovernanceAssets()
   const tokenInfo = useTreasuryAccountStore((s) => s.tokenInfo)
@@ -73,7 +73,6 @@ const SendTokens = ({
   const { fmtUrlWithCluster } = useQueryContext()
   const wallet = useWalletOnePointOh()
   const router = useRouter()
-  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<SendTokenCompactViewForm>({
     destinationAccount: '',
@@ -190,10 +189,6 @@ const SendTokens = ({
               ? abbreviateAddress(new PublicKey(form.destinationAccount))
               : ''
           }`
-    // Fetch governance to get up to date proposalCount
-    const selectedGovernance = (await fetchRealmGovernance(
-      governance?.pubkey
-    )) as ProgramAccount<Governance>
 
     try {
       const proposalAddress = await handleCreateProposal({
@@ -201,7 +196,7 @@ const SendTokens = ({
         description: form.description ? form.description : '',
         voteByCouncil,
         instructionsData,
-        governance: selectedGovernance!,
+        governance,
       })
       const url = fmtUrlWithCluster(
         `/dao/${symbol}/proposal/${proposalAddress}`
@@ -250,16 +245,12 @@ const SendTokens = ({
         prerequisiteInstructions: instruction.prerequisiteInstructions || [],
       }
       try {
-        // Fetch governance to get up to date proposalCount
-        const selectedGovernance = (await fetchRealmGovernance(
-          governance?.pubkey
-        )) as ProgramAccount<Governance>
         proposalAddress = await handleCreateProposal({
           title: form.title ? form.title : proposalTitle,
           description: form.description ? form.description : '',
           voteByCouncil,
           instructionsData: [instructionData],
-          governance: selectedGovernance!,
+          governance: governance!,
         })
         const url = fmtUrlWithCluster(
           `/dao/${symbol}/proposal/${proposalAddress}`

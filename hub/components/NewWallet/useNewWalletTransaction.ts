@@ -7,18 +7,14 @@ import { TransactionInstruction } from '@solana/web3.js';
 import { useCallback } from 'react';
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore';
 
-import useWalletStore from 'stores/useWalletStore';
-
 import { rules2governanceConfig } from '../EditWalletRules/createTransaction';
+import { useRealmQuery } from '@hooks/queries/realm';
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext';
 import useProgramVersion from '@hooks/useProgramVersion';
 import useRealm from '@hooks/useRealm';
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh';
 import { trySentryLog } from '@utils/logs';
-import {
-  SequenceType,
-  sendTransactionsV3,
-  txBatchesToInstructionSetWithSigners,
-} from '@utils/sendTransactions';
+import { SequenceType, sendTransactionsV3 } from '@utils/sendTransactions';
 
 import useGovernanceDefaults from './useGovernanceDefaults';
 
@@ -26,13 +22,13 @@ const useNewWalletCallback = (
   rules?: ReturnType<typeof useGovernanceDefaults>,
 ) => {
   const wallet = useWalletOnePointOh();
-  const connection = useWalletStore((s) => s.connection);
+  const connection = useLegacyConnectionContext();
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient,
   );
   const programVersion = useProgramVersion();
-
-  const { realm, ownVoterWeight } = useRealm();
+  const realm = useRealmQuery().data?.result;
+  const { ownVoterWeight } = useRealm();
 
   const tokenOwnerRecord = ownVoterWeight.canCreateGovernanceUsingCouncilTokens()
     ? ownVoterWeight.councilTokenRecord
@@ -43,6 +39,7 @@ const useNewWalletCallback = (
   return useCallback(async () => {
     if (rules === undefined) throw new Error();
     if (realm === undefined) throw new Error();
+    if (programVersion === undefined) throw new Error();
     if (!wallet?.publicKey) throw new Error('not signed in');
     if (tokenOwnerRecord === undefined)
       throw new Error('insufficient voting power');

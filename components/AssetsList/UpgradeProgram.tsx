@@ -5,7 +5,6 @@ import Input from 'components/inputs/Input'
 import Button, { LinkButton } from '@components/Button'
 import Textarea from 'components/inputs/Textarea'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
-import useWalletStore from 'stores/useWalletStore'
 import { validateBuffer } from 'utils/validations'
 import { useEffect, useState } from 'react'
 import {
@@ -16,7 +15,6 @@ import {
   getInstructionDataFromBase64,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
-import { Governance, ProgramAccount } from '@solana/spl-governance'
 import { useRouter } from 'next/router'
 import { notify } from 'utils/notifications'
 import useQueryContext from 'hooks/useQueryContext'
@@ -29,6 +27,8 @@ import ProgramUpgradeInfo from 'pages/dao/[symbol]/proposal/components/instructi
 import { getProgramName } from '@components/instructions/programs/names'
 import useCreateProposal from '@hooks/useCreateProposal'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { AssetAccount } from '@utils/uiTypes/assets'
 
 interface UpgradeProgramCompactForm extends ProgramUpgradeForm {
@@ -38,13 +38,13 @@ interface UpgradeProgramCompactForm extends ProgramUpgradeForm {
 
 const UpgradeProgram = ({ program }: { program: AssetAccount }) => {
   const router = useRouter()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const { handleCreateProposal } = useCreateProposal()
   const { fmtUrlWithCluster } = useQueryContext()
-  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const { symbol } = router.query
-  const { realmInfo, canChooseWhoVote, realm } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { realmInfo, canChooseWhoVote } = useRealm()
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<UpgradeProgramCompactForm>({
     governedAccount: program,
@@ -135,15 +135,10 @@ const UpgradeProgram = ({ program }: { program: AssetAccount }) => {
         prerequisiteInstructions: instruction.prerequisiteInstructions || [],
       }
       try {
-        // Fetch governance to get up to date proposalCount
-        const selectedGovernance = (await fetchRealmGovernance(
-          governance?.pubkey
-        )) as ProgramAccount<Governance>
-
         proposalAddress = await handleCreateProposal({
           title: form.title ? form.title : proposalTitle,
           description: form.description ? form.description : '',
-          governance: selectedGovernance,
+          governance: governance!,
           instructionsData: [instructionData],
           voteByCouncil,
           isDraft: false,

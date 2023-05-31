@@ -31,7 +31,6 @@ import {
   InstructionsContext,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
-import useWalletStore from 'stores/useWalletStore'
 import { notify } from 'utils/notifications'
 import Clawback from 'VoteStakeRegistry/components/instructions/Clawback'
 import Grant from 'VoteStakeRegistry/components/instructions/Grant'
@@ -130,6 +129,7 @@ import SetMintAuthority from './components/instructions/SetMintAuthroity'
 import LiquidityStakingOption from './components/instructions/Dual/LiquidityStakingOption'
 import InitStrike from './components/instructions/Dual/InitStrike'
 import IdlSetBuffer from './components/instructions/Mango/MangoV4/IdlSetBuffer'
+import { useRealmQuery } from '@hooks/queries/realm'
 import { usePrevious } from '@hooks/usePrevious'
 
 const TITLE_LENGTH_LIMIT = 130
@@ -174,9 +174,10 @@ const New = () => {
   const router = useRouter()
   const { handleCreateProposal } = useCreateProposal()
   const { fmtUrlWithCluster } = useQueryContext()
-  const { symbol, realm, realmDisplayName, canChooseWhoVote } = useRealm()
+  const realm = useRealmQuery().data?.result
+
+  const { symbol, realmInfo, canChooseWhoVote } = useRealm()
   const { availableInstructions } = useGovernanceAssets()
-  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [form, setForm] = useState({
     title: typeof router.query['t'] === 'string' ? router.query['t'] : '',
@@ -268,7 +269,6 @@ const New = () => {
     }
 
     if (isValid && instructions.every((x: UiInstruction) => x.isValid)) {
-      let selectedGovernance = governance
       if (!governance) {
         handleTurnOffLoaders()
         throw Error('No governance selected')
@@ -283,7 +283,7 @@ const New = () => {
             )
             .map((x) => ({
               data: x ? getInstructionDataFromBase64(x) : null,
-              ...getDefaultInstructionProps(instruction, selectedGovernance),
+              ...getDefaultInstructionProps(instruction, governance),
             }))
         )
         .filter((x) => x) as InstructionDataWithHoldUpTime[]
@@ -294,26 +294,17 @@ const New = () => {
           data: x.serializedInstruction
             ? getInstructionDataFromBase64(x.serializedInstruction)
             : null,
-          ...getDefaultInstructionProps(x, selectedGovernance),
+          ...getDefaultInstructionProps(x, governance),
         })),
       ]
 
       try {
         // Fetch governance to get up to date proposalCount
 
-        if (governance.pubkey != undefined) {
-          selectedGovernance = (await fetchRealmGovernance(
-            governance.pubkey
-          )) as ProgramAccount<Governance>
-        } else {
-          selectedGovernance = (await fetchRealmGovernance(
-            governance
-          )) as ProgramAccount<Governance>
-        }
         proposalAddress = await handleCreateProposal({
           title: form.title,
           description: form.description,
-          governance: selectedGovernance,
+          governance,
           instructionsData,
           voteByCouncil,
           isDraft,
@@ -578,7 +569,9 @@ const New = () => {
             <div className="flex items-center justify-between">
               <h1>
                 Add a proposal
-                {realmDisplayName ? ` to ${realmDisplayName}` : ``}{' '}
+                {realmInfo?.displayName
+                  ? ` to ${realmInfo.displayName}`
+                  : ``}{' '}
               </h1>
             </div>
           </div>

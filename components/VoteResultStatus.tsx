@@ -1,9 +1,9 @@
 import { XCircleIcon, CheckCircleIcon } from '@heroicons/react/outline'
 import { BanIcon } from '@heroicons/react/solid'
-import useProposal from '@hooks/useProposal'
 import useProposalVotes from '@hooks/useProposalVotes'
 import { ProposalState } from '@solana/spl-governance'
 import { useVetoingPop } from './VotePanel/VetoButtons'
+import { useRouteProposalQuery } from '@hooks/queries/proposal'
 
 const VetoResult = () => {
   const vetoingPop = useVetoingPop()
@@ -23,7 +23,7 @@ const ApprovalResult = () => (
 )
 
 const FailResult = () => {
-  const { proposal } = useProposal()
+  const proposal = useRouteProposalQuery().data?.result
   const voteData = useProposalVotes(proposal?.account)
 
   return voteData.yesVotesRequired === undefined ? null : (
@@ -55,7 +55,7 @@ const FailResult = () => {
 }
 
 const VoteResultStatus = () => {
-  const { proposal } = useProposal()
+  const proposal = useRouteProposalQuery().data?.result
 
   const status =
     proposal &&

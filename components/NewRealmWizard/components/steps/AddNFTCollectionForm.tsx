@@ -8,7 +8,6 @@ import { updateUserInput, validatePubkey } from '@utils/formValidation'
 import { notify } from '@utils/notifications'
 import { abbreviateAddress } from '@utils/formatting'
 
-import useWalletStore from 'stores/useWalletStore'
 
 import { NewButton as Button } from '@components/Button'
 import Text from '@components/Text'
@@ -24,6 +23,7 @@ import { Metaplex } from '@metaplex-foundation/js'
 import { Connection, PublicKey } from '@solana/web3.js'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import asFindable from '@utils/queries/asFindable'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 function filterAndMapVerifiedCollections(nfts) {
   return nfts
@@ -202,7 +202,7 @@ export default function AddNFTCollectionForm({
   onSubmit,
   onPrevClick,
 }) {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const [walletConnecting, setWalletConnecting] = useState(false)

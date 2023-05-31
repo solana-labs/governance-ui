@@ -19,6 +19,13 @@ import Link from 'next/link'
 import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
 import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useRouter } from 'next/router'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
 
 const LockPluginTokenBalanceCard = ({
   proposal,
@@ -29,7 +36,11 @@ const LockPluginTokenBalanceCard = ({
 }) => {
   const [hasGovPower, setHasGovPower] = useState<boolean>(false)
   const { fmtUrlWithCluster } = useQueryContext()
-  const { councilMint, mint, realm, symbol, config } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { symbol } = useRouter().query
+  const config = useRealmConfigQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
   const [tokenOwnerRecordPk, setTokenOwnerRecordPk] = useState('')
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
@@ -63,19 +74,19 @@ const LockPluginTokenBalanceCard = ({
       : undefined
 
   useEffect(() => {
-    const getTokenOwnerRecord = async () => {
-      const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
-        realm!.owner,
-        realm!.pubkey,
-        defaultMint!,
-        walletPublicKey!
-      )
-      setTokenOwnerRecordPk(tokenOwnerRecordAddress.toBase58())
-    }
-    if (realm?.owner && connected && defaultMint) {
+    if (realm?.owner && walletPublicKey && defaultMint) {
+      const getTokenOwnerRecord = async () => {
+        const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
+          realm.owner,
+          realm.pubkey,
+          defaultMint,
+          walletPublicKey
+        )
+        setTokenOwnerRecordPk(tokenOwnerRecordAddress.toBase58())
+      }
       getTokenOwnerRecord()
     }
-  }, [defaultMint, realm, connected, walletPublicKey])
+  }, [defaultMint, realm, walletPublicKey])
 
   const hasLoaded = mint || councilMint
   return (
@@ -154,7 +165,9 @@ const TokenDepositLock = ({
   inAccountDetails?: boolean
   setHasGovPower: (hasGovPower: boolean) => void
 }) => {
-  const { realm, realmTokenAccount, councilTokenAccount } = useRealm()
+  const realm = useRealmQuery().data?.result
+
+  const { realmTokenAccount, councilTokenAccount } = useRealm()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const deposits = useDepositStore((s) => s.state.deposits)
@@ -172,7 +185,7 @@ const TokenDepositLock = ({
 
   const depositRecord = deposits.find(
     (x) =>
-      x.mint.publicKey.toBase58() === realm!.account.communityMint.toBase58() &&
+      x.mint.publicKey.toBase58() === realm?.account.communityMint.toBase58() &&
       x.lockup.kind.none
   )
 

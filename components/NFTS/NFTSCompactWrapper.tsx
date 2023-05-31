@@ -6,14 +6,14 @@ import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import React from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import useWalletStore from 'stores/useWalletStore'
 import Link from 'next/link'
 import Loading from '@components/Loading'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const NFTSCompactWrapper = () => {
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const realmNfts = useTreasuryAccountStore((s) => s.allNfts)
   const isLoading = useTreasuryAccountStore((s) => s.isLoadingNfts)
   const isLoadingAssets = useGovernanceAssetsStore((s) => s.loadTokenAccounts)

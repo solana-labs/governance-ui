@@ -14,7 +14,6 @@ import {
   parseMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
 import { useMemo, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import Loading from '@components/Loading'
 import {
   getInstructionDataFromBase64,
@@ -29,6 +28,7 @@ import useRealm from '@hooks/useRealm'
 import { useRouter } from 'next/router'
 import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 type DepositCardProps = {
   mint: 'SRM' | 'MSRM'
@@ -54,7 +54,7 @@ const DepositCard = ({ mint, callback, createProposal }: DepositCardProps) => {
 
   const { wallet, anchorProvider } = useWalletDeprecated()
 
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const actions = useSerumGovStore((s) => s.actions)
   const { srmMint, msrmMint } = useSerumGovStore((s) => ({
     srmMint: s.srmMint,

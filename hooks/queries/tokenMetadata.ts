@@ -1,21 +1,21 @@
 import { findMetadataPda } from '@metaplex-foundation/js'
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
-import { EndpointTypes } from '@models/types'
 import { PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
-import useWalletStore from 'stores/useWalletStore'
+import queryClient from './queryClient'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const OneHMs = 3600000
 
-export const useTokenMetadataKeys = {
-  all: (cluster: EndpointTypes) => [cluster, 'tokenMetadata'],
-  byMint: (cluster: EndpointTypes, k: PublicKey) => [
-    ...useTokenMetadataKeys.all(cluster),
-    k.toString(),
+export const tokenMetadataQueryKeys = {
+  all: (cluster: string) => [cluster, 'TokenMetadata'],
+  byMint: (cluster: string, k: PublicKey) => [
+    ...tokenMetadataQueryKeys.all(cluster),
+    k,
   ],
-  byMints: (cluster: EndpointTypes, k: PublicKey[]) => [
-    ...useTokenMetadataKeys.all(cluster),
-    ...k.map((x) => x.toString()),
+  byMints: (cluster: string, k: PublicKey[]) => [
+    ...tokenMetadataQueryKeys.all(cluster),
+    ...k,
   ],
 }
 
@@ -23,13 +23,13 @@ export const useTokenMetadata = (
   mint: PublicKey | undefined,
   enableConditions = true
 ) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const enabled = !!mint && !!enableConditions
 
   const query = useQuery({
     queryKey: enabled
-      ? useTokenMetadataKeys.byMint(connection.cluster, mint)
+      ? tokenMetadataQueryKeys.byMint(connection.cluster, mint)
       : undefined,
     queryFn: async () => {
       const mintPubkey = new PublicKey(mint!)
@@ -56,13 +56,13 @@ export const useTokensMetadata = (
   mints: PublicKey[],
   enableConditions = true
 ) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const enabled = !!mints.length && !!enableConditions
 
   const query = useQuery({
     queryKey: enabled
-      ? useTokenMetadataKeys.byMints(connection.cluster, mints)
+      ? tokenMetadataQueryKeys.byMints(connection.cluster, mints)
       : undefined,
     queryFn: async () => {
       const data: { symbol: string; name: string; mint: string }[] = []
@@ -79,6 +79,12 @@ export const useTokensMetadata = (
           symbol: metadata.data.symbol,
           name: metadata.data.name,
         })
+
+        // we dont want to re-fetch for the individual one
+        queryClient.setQueryData(
+          tokenMetadataQueryKeys.byMint(connection.cluster, mint),
+          metadata.data
+        )
       }
       return data
     },

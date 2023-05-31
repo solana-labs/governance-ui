@@ -14,12 +14,15 @@ import Tooltip from '@components/Tooltip'
 import useRealm from '@hooks/useRealm'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { executeInstructions } from 'actions/executeInstructions'
-import useWalletStore from 'stores/useWalletStore'
 import { notify } from '@utils/notifications'
 import useProgramVersion from '@hooks/useProgramVersion'
 import { abbreviateAddress } from '@utils/formatting'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import queryClient from '@hooks/queries/queryClient'
+import { proposalQueryKeys } from '@hooks/queries/proposal'
 
 export enum PlayState {
   Played,
@@ -32,7 +35,7 @@ const useSignersNeeded = (
   proposalInstructions: ProgramAccount<ProposalTransaction>[],
   proposal: ProgramAccount<Proposal>
 ) => {
-  const { realm } = useRealm()
+  const realm = useRealmQuery().data?.result
   const programVersion = useProgramVersion()
   const { governancesArray, assetAccounts } = useGovernanceAssets()
   const [signersNeeded, setSignersNeeded] = useState<PublicKey[]>()
@@ -99,8 +102,7 @@ export function ExecuteAllInstructionButton({
 }) {
   const { realmInfo } = useRealm()
   const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection)
-  const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
+  const connection = useLegacyConnectionContext()
   const connected = !!wallet?.connected
 
   const [currentSlot, setCurrentSlot] = useState(0)
@@ -152,7 +154,9 @@ export function ExecuteAllInstructionButton({
         proposalInstructions,
         multiTransactionMode
       )
-      await refetchProposals()
+      queryClient.invalidateQueries({
+        queryKey: proposalQueryKeys.all(connection.endpoint),
+      })
     } catch (error) {
       notify({ type: 'error', message: `error executing instruction ${error}` })
       console.error('error executing instruction', error)

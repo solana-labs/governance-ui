@@ -1,22 +1,17 @@
+import { useRouteProposalQuery } from '@hooks/queries/proposal'
 import {
-  useAddressQuery_CommunityTokenOwner,
-  useAddressQuery_CouncilTokenOwner,
-} from '@hooks/queries/addresses/tokenOwner'
-import { useAddressQuery_SelectedProposalVoteRecord } from '@hooks/queries/addresses/voteRecord'
-import { useVoteRecordByPubkeyQuery } from '@hooks/queries/voteRecord'
+  useUserCommunityTokenOwnerRecord,
+  useUserCouncilTokenOwnerRecord,
+} from '@hooks/queries/tokenOwnerRecord'
+import useRoleOfGovToken from '@hooks/selectedRealm/useRoleOfToken'
 import { useHasVoteTimeExpired } from '@hooks/useHasVoteTimeExpired'
-import useRealm from '@hooks/useRealm'
-import {
-  ProposalState,
-  GoverningTokenRole,
-  Proposal,
-  Governance,
-} from '@solana/spl-governance'
+import { useProposalGovernanceQuery } from '@hooks/useProposal'
+import { ProposalState, Proposal, Governance } from '@solana/spl-governance'
 import dayjs from 'dayjs'
-import useWalletStore from 'stores/useWalletStore'
 
 export const useIsVoting = () => {
-  const { governance, proposal } = useWalletStore((s) => s.selectedProposal)
+  const proposal = useRouteProposalQuery().data?.result
+  const governance = useProposalGovernanceQuery().data?.result
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
 
   const isVoting =
@@ -25,7 +20,8 @@ export const useIsVoting = () => {
 }
 
 export const useIsInCoolOffTime = () => {
-  const { governance, proposal } = useWalletStore((s) => s.selectedProposal)
+  const proposal = useRouteProposalQuery().data?.result
+  const governance = useProposalGovernanceQuery().data?.result
 
   return isInCoolOffTime(proposal?.account, governance?.account)
 }
@@ -57,48 +53,18 @@ export const isInCoolOffTime = (
 }
 
 export const useVotingPop = () => {
-  const { tokenRole } = useWalletStore((s) => s.selectedProposal)
+  const proposal = useRouteProposalQuery().data?.result
+  const role = useRoleOfGovToken(proposal?.account.governingTokenMint)
 
-  const votingPop =
-    tokenRole === GoverningTokenRole.Community ? 'community' : 'council'
-
-  return votingPop
+  return role !== 'not found' ? role : undefined
 }
 
 export const useVoterTokenRecord = () => {
-  const { tokenRole } = useWalletStore((s) => s.selectedProposal)
-  const { ownTokenRecord, ownCouncilTokenRecord } = useRealm()
+  const votingPop = useVotingPop()
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
 
   const voterTokenRecord =
-    tokenRole === GoverningTokenRole.Community
-      ? ownTokenRecord
-      : ownCouncilTokenRecord
+    votingPop === 'community' ? ownTokenRecord : ownCouncilTokenRecord
   return voterTokenRecord
-}
-
-export const useProposalVoteRecordQuery = (quorum: 'electoral' | 'veto') => {
-  const tokenRole = useWalletStore((s) => s.selectedProposal.tokenRole)
-  const community = useAddressQuery_CommunityTokenOwner()
-  const council = useAddressQuery_CouncilTokenOwner()
-
-  const electoral =
-    tokenRole === undefined
-      ? undefined
-      : tokenRole === GoverningTokenRole.Community
-      ? community
-      : council
-  const veto =
-    tokenRole === undefined
-      ? undefined
-      : tokenRole === GoverningTokenRole.Community
-      ? council
-      : community
-
-  const selectedTokenRecord = quorum === 'electoral' ? electoral : veto
-
-  const pda = useAddressQuery_SelectedProposalVoteRecord(
-    selectedTokenRecord?.data
-  )
-
-  return useVoteRecordByPubkeyQuery(pda.data)
 }

@@ -2,7 +2,12 @@ import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import { Instructions, PackageEnum } from '@utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import useRealm from './useRealm'
-import { heliumVsrPluginsPks, vsrPluginsPks } from './useVotingPlugins'
+import { HELIUM_VSR_PLUGINS_PKS, VSR_PLUGIN_PKS } from '../constants/plugins'
+import { useRealmQuery } from './queries/realm'
+import { useRealmConfigQuery } from './queries/realmConfig'
+import { useRouter } from 'next/router'
+import { useRealmGovernancesQuery } from './queries/governance'
+import { useMemo } from 'react'
 
 type Package = {
   name: string
@@ -36,7 +41,10 @@ export type InstructionType = {
 }
 
 export default function useGovernanceAssets() {
-  const { ownVoterWeight, realm, symbol, governances, config } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const config = useRealmConfigQuery().data?.result
+  const { symbol } = useRouter().query
+  const { ownVoterWeight } = useRealm()
 
   const governedTokenAccounts: AssetAccount[] = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
@@ -49,7 +57,10 @@ export default function useGovernanceAssets() {
     (s) => s.assetAccounts
   ).filter((x) => x.type === AccountType.AuxiliaryToken)
   const currentPluginPk = config?.account.communityTokenConfig.voterWeightAddin
-  const governancesArray = useGovernanceAssetsStore((s) => s.governancesArray)
+  const governancesQuery = useRealmGovernancesQuery()
+  const governancesArray = useMemo(() => governancesQuery.data ?? [], [
+    governancesQuery.data,
+  ])
 
   function canUseGovernanceForInstruction(types: AccountType[]) {
     return (
@@ -207,10 +218,10 @@ export default function useGovernanceAssets() {
     [PackageEnum.VsrPlugin]: {
       name: 'Vsr Plugin',
       isVisible:
-        currentPluginPk && [
-          ...vsrPluginsPks,
-          ...heliumVsrPluginsPks
-        ].includes(currentPluginPk.toBase58()),
+        currentPluginPk &&
+        [...VSR_PLUGIN_PKS, ...HELIUM_VSR_PLUGINS_PKS].includes(
+          currentPluginPk.toBase58()
+        ),
     },
   }
 
@@ -262,7 +273,7 @@ export default function useGovernanceAssets() {
       isVisible:
         canUseTokenTransferInstruction &&
         currentPluginPk &&
-        vsrPluginsPks.includes(currentPluginPk.toBase58()),
+        VSR_PLUGIN_PKS.includes(currentPluginPk.toBase58()),
       packageId: PackageEnum.Common,
     },
     [Instructions.CloseTokenAccount]: {
@@ -294,7 +305,7 @@ export default function useGovernanceAssets() {
       isVisible:
         canUseTokenTransferInstruction &&
         currentPluginPk &&
-        vsrPluginsPks.includes(currentPluginPk.toBase58()),
+        VSR_PLUGIN_PKS.includes(currentPluginPk.toBase58()),
       packageId: PackageEnum.Common,
     },
     [Instructions.JoinDAO]: {
@@ -310,7 +321,7 @@ export default function useGovernanceAssets() {
       name: 'None',
       isVisible:
         realm &&
-        Object.values(governances).some((g) =>
+        governancesArray.some((g) =>
           ownVoterWeight.canCreateProposal(g.account.config)
         ),
       packageId: PackageEnum.Common,
@@ -836,22 +847,42 @@ export default function useGovernanceAssets() {
     )
   }
 
-  return {
-    assetAccounts,
-    auxiliaryTokenAccounts,
-    availableInstructions,
-    availablePackages,
-    canMintRealmCouncilToken,
-    canUseAuthorityInstruction,
-    canUseMintInstruction,
-    canUseProgramUpgradeInstruction,
-    canUseTransferInstruction,
-    getPackageTypeById,
-    governancesArray,
-    governedNativeAccounts,
-    governedSPLTokenAccounts,
-    governedTokenAccounts,
-    governedTokenAccountsWithoutNfts,
-    nftsGovernedTokenAccounts,
-  }
+  return useMemo(
+    () => ({
+      assetAccounts,
+      auxiliaryTokenAccounts,
+      availableInstructions,
+      availablePackages,
+      canMintRealmCouncilToken,
+      canUseAuthorityInstruction,
+      canUseMintInstruction,
+      canUseProgramUpgradeInstruction,
+      canUseTransferInstruction,
+      getPackageTypeById,
+      governancesArray,
+      governedNativeAccounts,
+      governedSPLTokenAccounts,
+      governedTokenAccounts,
+      governedTokenAccountsWithoutNfts,
+      nftsGovernedTokenAccounts,
+    }),
+    [
+      assetAccounts,
+      auxiliaryTokenAccounts,
+      availableInstructions,
+      availablePackages,
+      canMintRealmCouncilToken,
+      canUseAuthorityInstruction,
+      canUseMintInstruction,
+      canUseProgramUpgradeInstruction,
+      canUseTransferInstruction,
+      getPackageTypeById,
+      governancesArray,
+      governedNativeAccounts,
+      governedSPLTokenAccounts,
+      governedTokenAccounts,
+      governedTokenAccountsWithoutNfts,
+      nftsGovernedTokenAccounts,
+    ]
+  )
 }

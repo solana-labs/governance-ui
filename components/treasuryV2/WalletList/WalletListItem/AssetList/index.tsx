@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import cx from 'classnames'
 
 import {
@@ -31,10 +31,11 @@ import {
 
 import { PublicKey } from '@solana/web3.js'
 import TokenOwnerRecordsList from './TokenOwnerRecordsList'
-import useRealm from '@hooks/useRealm'
 import { GoverningTokenType } from '@solana/spl-governance'
 import TokenIcon from '@components/treasuryV2/icons/TokenIcon'
 import { useTokensMetadata } from '@hooks/queries/tokenMetadata'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 
 export type Section = 'tokens' | 'nfts' | 'others'
 
@@ -87,8 +88,8 @@ export default function AssetList(props: Props) {
     ...otherFromPropsFiltred.map((x) => new PublicKey(x.address)),
   ])
   const [tokens, setTokens] = useState<(Token | Sol)[]>(tokensFromProps)
-
-  const { config, realm } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const config = useRealmConfigQuery().data?.result
   const isCommunityMintDisabled =
     config?.account.communityTokenConfig?.tokenType ===
       GoverningTokenType.Dormant || false

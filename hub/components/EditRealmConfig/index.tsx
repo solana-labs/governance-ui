@@ -13,11 +13,10 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState, useRef } from 'react';
 
-import useWalletStore from 'stores/useWalletStore';
-
+import { useRealmQuery } from '@hooks/queries/realm';
 import useCreateProposal from '@hooks/useCreateProposal';
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext';
 import useQueryContext from '@hooks/useQueryContext';
-import useRealm from '@hooks/useRealm';
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh';
 import { Primary, Secondary } from '@hub/components/controls/Button';
 import { useQuery } from '@hub/hooks/useQuery';
@@ -66,9 +65,9 @@ interface Props {
 }
 
 export function EditRealmConfig(props: Props) {
-  const connection = useWalletStore((s) => s.connection);
+  const connection = useLegacyConnectionContext();
   const { fmtUrlWithCluster } = useQueryContext();
-  const { realm } = useRealm();
+  const realm = useRealmQuery().data?.result;
   const wallet = useWalletOnePointOh();
   const [step, setStep] = useState(Step.Form);
   const [realmAuthority, setRealmAuthority] = useState<PublicKey | undefined>(

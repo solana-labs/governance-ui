@@ -11,7 +11,6 @@ import { CheckCircleIcon, PlayIcon, RefreshIcon } from '@heroicons/react/solid'
 import Button from '@components/Button'
 import { RpcContext } from '@solana/spl-governance'
 import useRealm from '@hooks/useRealm'
-import useWalletStore from 'stores/useWalletStore'
 import { ProgramAccount } from '@solana/spl-governance'
 import { PublicKey, Transaction } from '@solana/web3.js'
 import Tooltip from '@components/Tooltip'
@@ -29,6 +28,9 @@ import {
 import Wallet from '@project-serum/sol-wallet-adapter'
 import { getFormattedStringFromDays, SECS_PER_DAY } from '@utils/dateTools'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import queryClient from '@hooks/queries/queryClient'
+import { proposalQueryKeys } from '@hooks/queries/proposal'
 
 export enum PlayState {
   Played,
@@ -52,8 +54,7 @@ export function ExecuteInstructionButton({
 }) {
   const { realmInfo } = useRealm()
   const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection)
-  const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
+  const connection = useLegacyConnectionContext()
   const connected = !!wallet?.connected
 
   const [currentSlot, setCurrentSlot] = useState(0)
@@ -128,8 +129,9 @@ export function ExecuteInstructionButton({
         adjacentTransaction,
         preExecutionTransactions
       )
-
-      await refetchProposals()
+      queryClient.invalidateQueries({
+        queryKey: proposalQueryKeys.all(connection.endpoint),
+      })
     } catch (error) {
       notify({ type: 'error', message: `error executing instruction ${error}` })
       console.log('error executing instruction', error)

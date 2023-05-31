@@ -1,7 +1,6 @@
 import React, { FunctionComponent, useState } from 'react'
 import { BanIcon, ThumbDownIcon, ThumbUpIcon } from '@heroicons/react/solid'
 import { VoteKind } from '@solana/spl-governance'
-import useWalletStore from '../stores/useWalletStore'
 
 import Button, { SecondaryButton } from './Button'
 import Loading from './Loading'
@@ -32,8 +31,6 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   vote,
   voterTokenRecord,
 }) => {
-  const { fetchChatMessages } = useWalletStore((s) => s.actions)
-  const { proposal } = useWalletStore((s) => s.selectedProposal)
   const [comment, setComment] = useState('')
   const { submitting, submitVote } = useSubmitVote()
 
@@ -46,7 +43,6 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
       comment,
     })
     onClose()
-    await fetchChatMessages(proposal!.pubkey)
   }
 
   return (

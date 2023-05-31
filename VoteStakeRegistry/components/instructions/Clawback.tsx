@@ -5,9 +5,7 @@ import React, {
   useMemo,
   useState,
 } from 'react'
-import useRealm from '@hooks/useRealm'
 import { TransactionInstruction } from '@solana/web3.js'
-import useWalletStore from 'stores/useWalletStore'
 import { tryGetMint } from '@utils/tokens'
 import {
   ClawbackForm,
@@ -38,6 +36,8 @@ import { getClawbackInstruction } from 'VoteStakeRegistry/actions/getClawbackIns
 import { abbreviateAddress } from '@utils/formatting'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const Clawback = ({
   index,
@@ -47,8 +47,9 @@ const Clawback = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
-  const connection = useWalletStore((s) => s.connection)
-  const { realm } = useRealm()
+  const connection = useLegacyConnectionContext()
+  const realm = useRealmQuery().data?.result
+
   const {
     governedTokenAccountsWithoutNfts,
     governancesArray,
@@ -131,7 +132,7 @@ const Clawback = ({
 
   useEffect(() => {
     setGovernedAccount(
-      governancesArray.find(
+      governancesArray?.find(
         (x) => x.pubkey.toBase58() === realm?.account.authority?.toBase58()
       )
     )

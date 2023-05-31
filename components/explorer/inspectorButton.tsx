@@ -4,11 +4,11 @@ import {
   ProgramAccount,
   ProposalTransaction,
 } from '@solana/spl-governance'
-import useWalletStore from '../../stores/useWalletStore'
 import { getExplorerInspectorUrl, getExplorerUrl } from './tools'
 import { SecondaryButton } from '../Button'
 import { notify } from '@utils/notifications'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import dayjs from 'dayjs'
 
 export default function InspectorButton({
@@ -16,7 +16,7 @@ export default function InspectorButton({
 }: {
   proposalInstruction: ProgramAccount<ProposalTransaction>
 }) {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
 

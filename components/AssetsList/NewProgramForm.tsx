@@ -10,8 +10,7 @@ import { tryParseKey } from 'tools/validators/pubkey'
 import { isFormValid } from 'utils/formValidation'
 import { notify } from 'utils/notifications'
 import { useRouter } from 'next/router'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import * as yup from 'yup'
 import { debounce } from '@utils/debounce'
 import { createSetUpgradeAuthority } from '@tools/sdk/bpfUpgradeableLoader/createSetUpgradeAuthority'
@@ -20,6 +19,9 @@ import { sendTransaction } from '@utils/send'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/GovernedAccountSelect'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { usePrevious } from '@hooks/usePrevious'
 interface NewProgramForm {
   programId: string
@@ -34,18 +36,16 @@ const defaultFormValues = {
 const NewProgramForm = () => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
+
+  const realm = useRealmQuery().data?.result
+  const realmMint = useRealmCommunityMintInfoQuery().data?.result
+  const { symbol } = router.query
+  const { ownVoterWeight } = useRealm()
   const { assetAccounts } = useGovernanceAssetsStore()
-  const {
-    realmInfo,
-    realm,
-    mint: realmMint,
-    symbol,
-    ownVoterWeight,
-  } = useRealm()
+
   const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const connected = !!wallet?.connected
-  const { fetchRealm } = useWalletStore((s) => s.actions)
   const [form, setForm] = useState<NewProgramForm>({
     ...defaultFormValues,
   })
@@ -95,7 +95,6 @@ const NewProgramForm = () => {
           successMessage: 'Authority has been transferred',
         })
         setIsLoading(false)
-        fetchRealm(realmInfo!.programId, realmInfo!.realmId)
         router.push(fmtUrlWithCluster(`/dao/${symbol}/`))
       }
     } catch (e) {

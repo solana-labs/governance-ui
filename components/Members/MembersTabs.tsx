@@ -1,13 +1,17 @@
 import { FunctionComponent, useMemo } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import { LogoutIcon, UserCircleIcon } from '@heroicons/react/outline'
-import useRealm from '@hooks/useRealm'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { PublicKey } from '@solana/web3.js'
 import { AddressImage, DisplayAddress } from '@cardinal/namespaces-components'
 import { Member } from '@utils/uiTypes/members'
 import { MintInfo } from '@solana/spl-token'
+import { useRealmQuery } from '@hooks/queries/realm'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface MembersTabsProps {
   activeTab: Member
@@ -20,7 +24,9 @@ const MembersTabs: FunctionComponent<MembersTabsProps> = ({
   onChange,
   tabs,
 }) => {
-  const { mint, councilMint, realm } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
   const tokenName = realm
     ? tokenPriceService.getTokenInfo(realm?.account.communityMint.toBase58())
         ?.symbol
@@ -91,7 +97,7 @@ const MemberItems = ({
     councilVotes && !councilVotes.isZero()
       ? fmtMintAmount(councilMint, councilVotes)
       : null
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const renderAddressName = useMemo(() => {
     return (

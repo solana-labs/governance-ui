@@ -1,33 +1,45 @@
-import { EndpointTypes } from '@models/types'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
-import { getNetworkFromEndpoint } from '@utils/connection'
-import asFindable from '@utils/queries/asFindable'
-import { tryGetTokenAccount } from '@utils/tokens'
-import useWalletStore from 'stores/useWalletStore'
+import { getOwnedTokenAccounts, tryGetTokenAccount } from '@utils/tokens'
 import queryClient from './queryClient'
+import asFindable from '@utils/queries/asFindable'
+import { useConnection } from '@solana/wallet-adapter-react'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export const tokenAccountQueryKeys = {
-  all: (cluster: EndpointTypes) => [cluster, 'TokenAccount'],
-  byPubkey: (cluster: EndpointTypes, k: PublicKey) => [
-    ...tokenAccountQueryKeys.all(cluster),
+  all: (endpoint: string) => [endpoint, 'TokenAccount'],
+  byPubkey: (endpoint: string, k: PublicKey) => [
+    ...tokenAccountQueryKeys.all(endpoint),
     k.toString(),
+  ],
+  byOwner: (endpoint: string, o: PublicKey) => [
+    ...tokenAccountQueryKeys.all(endpoint),
+    'by Owner',
+    o.toString(),
   ],
 }
 
-export const useTokenAccountByPubKeyQuery = (pubkey?: PublicKey) => {
-  const connection = useWalletStore((s) => s.connection)
+export const useTokenAccountsByOwnerQuery = (pubkey: PublicKey | undefined) => {
+  const { connection } = useConnection()
 
   const enabled = pubkey !== undefined
   const query = useQuery({
     queryKey: enabled
-      ? tokenAccountQueryKeys.byPubkey(connection.cluster, pubkey)
+      ? tokenAccountQueryKeys.byOwner(connection.rpcEndpoint, pubkey)
       : undefined,
     queryFn: async () => {
       if (!enabled) throw new Error()
-      return asFindable((...x: Parameters<typeof tryGetTokenAccount>) =>
-        tryGetTokenAccount(...x).then((x) => x?.account)
-      )(connection.current, pubkey)
+      const results = await getOwnedTokenAccounts(connection, pubkey)
+
+      // since we got the data for these accounts, lets save it
+      results.forEach((x) => {
+        queryClient.setQueryData(
+          tokenAccountQueryKeys.byPubkey(connection.rpcEndpoint, x.publicKey),
+          { found: true, result: x }
+        )
+      })
+
+      return results
     },
     enabled,
   })
@@ -35,13 +47,18 @@ export const useTokenAccountByPubKeyQuery = (pubkey?: PublicKey) => {
   return query
 }
 
+export const useUserTokenAccountsQuery = () => {
+  const wallet = useWalletOnePointOh()
+  const pubkey = wallet?.publicKey ?? undefined
+  return useTokenAccountsByOwnerQuery(pubkey)
+}
+
 export const fetchTokenAccountByPubkey = (
   connection: Connection,
   pubkey: PublicKey
 ) => {
-  const cluster = getNetworkFromEndpoint(connection.rpcEndpoint)
   return queryClient.fetchQuery({
-    queryKey: tokenAccountQueryKeys.byPubkey(cluster, pubkey),
+    queryKey: tokenAccountQueryKeys.byPubkey(connection.rpcEndpoint, pubkey),
     queryFn: () =>
       asFindable((...x: Parameters<typeof tryGetTokenAccount>) =>
         tryGetTokenAccount(...x).then((x) => x?.account)

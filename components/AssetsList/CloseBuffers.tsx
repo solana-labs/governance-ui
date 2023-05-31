@@ -6,7 +6,6 @@ import Input from 'components/inputs/Input'
 import Button, { LinkButton } from '@components/Button'
 import Textarea from 'components/inputs/Textarea'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
-import useWalletStore from 'stores/useWalletStore'
 import { getValidatedPublickKey } from 'utils/validations'
 import { useEffect, useState } from 'react'
 import { UiInstruction } from 'utils/uiTypes/proposalCreationTypes'
@@ -26,6 +25,8 @@ import { abbreviateAddress } from '@utils/formatting'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface CloseBuffersForm {
   governedAccount: AssetAccount | undefined
@@ -39,11 +40,12 @@ const CloseBuffers = ({ program }: { program: AssetAccount }) => {
   const { handleCreateProposal } = useCreateProposal()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const router = useRouter()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const { fmtUrlWithCluster } = useQueryContext()
   const { symbol } = router.query
-  const { realmInfo, canChooseWhoVote, realm } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { realmInfo, canChooseWhoVote } = useRealm()
   const [isBuffersLoading, setIsBuffersLoading] = useState(false)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [buffers, setBuffers] = useState<

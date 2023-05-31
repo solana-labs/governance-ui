@@ -7,26 +7,25 @@ import {
   ExecuteAllInstructionButton,
   PlayState,
 } from '@components/instructions/ExecuteAllInstructionButton'
-import useProposal from '@hooks/useProposal'
 import { ntext } from '@utils/ntext'
 import Button from '@components/Button'
 import { diffTime } from '@components/ProposalRemainingVotingTime'
 import useProposalTransactions from '@hooks/useProposalTransactions'
+import { useRouteProposalQuery } from '@hooks/queries/proposal'
+import { useSelectedProposalTransactions } from '@hooks/queries/proposalTransaction'
 
 interface Props {
   className?: string
 }
 
 export default function ProposalExecutionCard(props: Props) {
-  const { transactions, proposal } = useProposal()
+  const proposal = useRouteProposalQuery().data?.result
+  const { data: allTransactions } = useSelectedProposalTransactions()
   const [playState, setPlayState] = useState(PlayState.Unplayed)
   const [timeLeft, setTimeLeft] = useState<
     undefined | ReturnType<typeof diffTime>
   >()
   const timer = useRef<undefined | number>()
-
-  const allTransactions = Object.values(transactions)
-
   const proposalTransactions = useProposalTransactions(
     allTransactions,
     proposal
@@ -49,6 +48,7 @@ export default function ProposalExecutionCard(props: Props) {
   }, [proposalTransactions?.nextExecuteAt])
 
   if (
+    allTransactions === undefined ||
     allTransactions.length === 0 ||
     !proposal ||
     !proposalTransactions ||

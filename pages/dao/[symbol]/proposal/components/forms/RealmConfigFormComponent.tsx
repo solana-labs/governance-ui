@@ -16,6 +16,12 @@ import InstructionForm, {
   InstructionInputType,
 } from '../instructions/FormCreator'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
 
 export interface RealmConfigForm {
   governedAccount: AssetAccount | undefined
@@ -53,7 +59,11 @@ const RealmConfigFormComponent = ({
   form: any
   hideGovSelector?: boolean
 }) => {
-  const { realm, mint, realmInfo, councilMint, config } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const config = useRealmConfigQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const minCommunity = mint ? getMintMinAmountAsDecimal(mint) : 0
   const minCommunityTokensToCreateProposal =
@@ -75,8 +85,9 @@ const RealmConfigFormComponent = ({
       .toNumber()
 
   const getMintSupplyFraction = () => {
-    const communityMintMaxVoteWeightSource = realm!.account.config
-      .communityMintMaxVoteWeightSource
+    if (!realm) throw new Error()
+    const communityMintMaxVoteWeightSource =
+      realm.account.config.communityMintMaxVoteWeightSource
 
     return new BigNumber(communityMintMaxVoteWeightSource.value.toString())
       .shiftedBy(-MintMaxVoteWeightSource.SUPPLY_FRACTION_DECIMALS)

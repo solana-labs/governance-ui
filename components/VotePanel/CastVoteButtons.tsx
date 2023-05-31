@@ -6,7 +6,6 @@ import VoteCommentModal from '../VoteCommentModal'
 import {
   useIsInCoolOffTime,
   useIsVoting,
-  useProposalVoteRecordQuery,
   useVoterTokenRecord,
   useVotingPop,
 } from './hooks'
@@ -14,7 +13,9 @@ import useRealm from '@hooks/useRealm'
 import { VotingClientType } from '@utils/uiTypes/VotePlugin'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
 import { useSubmitVote } from '@hooks/useSubmitVote'
+import { useSelectedRealmInfo } from '@hooks/selectedRealm/useSelectedRealmRegistryEntry'
 
 const useCanVote = () => {
   const client = useVotePluginsClientStore(
@@ -61,7 +62,8 @@ const useCanVote = () => {
 export const CastVoteButtons = () => {
   const [showVoteModal, setShowVoteModal] = useState(false)
   const [vote, setVote] = useState<'yes' | 'no' | null>(null)
-  const { allowDiscussion } = useRealm()
+  const realmInfo = useSelectedRealmInfo()
+  const allowDiscussion = realmInfo?.allowDiscussion ?? true
   const { submitting, submitVote } = useSubmitVote()
   const votingPop = useVotingPop()
   const voterTokenRecord = useVoterTokenRecord()

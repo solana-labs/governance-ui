@@ -28,9 +28,10 @@ import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useCallback, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import VoteProposalModal from './VoteProposalModal'
 import ProposalStateBadge from '@components/ProposalStateBadge'
+import { useConnection } from '@solana/wallet-adapter-react'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface Props {
   voteRecord?: ProgramAccount<VoteRecord>
@@ -56,8 +57,8 @@ export default function ProposalDetails({
   const { cluster } = router.query
 
   const { symbol } = useRealm()
-  const { current: wallet } = useWalletStore()
-  const connection = useWalletStore((s) => s.connection.current)
+  const wallet = useWalletOnePointOh()
+  const { connection } = useConnection()
   const { fmtUrlWithCluster } = useQueryContext()
 
   const [showVoteModal, setShowVoteModal] = useState(false)

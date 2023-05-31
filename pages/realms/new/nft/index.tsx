@@ -4,7 +4,6 @@ import { PublicKey } from '@solana/web3.js'
 import createNFTRealm from 'actions/createNFTRealm'
 import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
 
-import useWalletStore from 'stores/useWalletStore'
 
 import useQueryContext from '@hooks/useQueryContext'
 
@@ -38,13 +37,14 @@ import YesVotePercentageForm, {
 } from '@components/NewRealmWizard/components/steps/YesVotePercentageThresholdForm'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { DEFAULT_NFT_VOTER_PLUGIN } from '@tools/constants'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export const FORM_NAME = 'nft'
 
 type NFTForm = BasicDetails & AddNFTCollection & AddCouncil & InviteMembers
 
 export default function NFTWizard() {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const { push } = useRouter()

@@ -16,10 +16,13 @@ import {
 } from '@utils/sendTransactions'
 import { withCreateTokenOwnerRecord } from '@solana/spl-governance'
 import useRealm from '@hooks/useRealm'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 export const useUndelegatePosition = () => {
   const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
-  const { realm, realmInfo } = useRealm()
+  const realm = useRealmQuery().data?.result
+
+  const { realmInfo } = useRealm()
   const { error, loading, execute } = useAsyncCallback(
     async ({
       position,

@@ -1,12 +1,12 @@
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { Metaplex, walletAdapterIdentity } from '@metaplex-foundation/js'
 import { TokenStandard } from '@metaplex-foundation/mpl-token-metadata'
 import { Keypair } from '@solana/web3.js'
-import useWalletStore from 'stores/useWalletStore'
 
 const MintPnft = () => {
   const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const mint = async () => {
     if (!wallet?.publicKey) throw new Error()

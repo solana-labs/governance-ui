@@ -59,32 +59,28 @@ function parseTransactions(
   }
 }
 
+/** @deprecated this needs to be rewritten */
 export default function useProposalTransactions(
-  allTransactions: ProgramAccount<ProposalTransaction>[],
+  allTransactions: ProgramAccount<ProposalTransaction>[] = [],
   proposal?: ProgramAccount<Proposal>
 ) {
-  if (!proposal) return null
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [executed, setExecuted] = useState<
     ProgramAccount<ProposalTransaction>[]
   >([])
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [ready, setReady] = useState<ProgramAccount<ProposalTransaction>[]>([])
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [notReady, setNotReady] = useState<
     ProgramAccount<ProposalTransaction>[]
   >([])
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [nextExecuteAt, setNextExecuteAt] = useState<number | null>(null)
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null
 
     if (allTransactions.length !== executed.length) {
       interval = setInterval(() => {
+        if (!proposal) return
+
         const { executed, ready, notReady, nextExecuteAt } = parseTransactions(
           allTransactions,
           proposal
@@ -105,6 +101,8 @@ export default function useProposalTransactions(
       if (interval) clearInterval(interval)
     }
   }, [allTransactions, executed, proposal])
+
+  if (!proposal) return null
 
   return {
     executed,

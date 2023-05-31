@@ -5,7 +5,6 @@ import { abbreviateAddress } from '@utils/formatting'
 import { PublicKey } from '@solana/web3.js'
 import Button, { SecondaryButton } from '@components/Button'
 import Tooltip from '@components/Tooltip'
-import useWalletStore from 'stores/useWalletStore'
 import { getProgramData } from '@tools/sdk/bpfUpgradeableLoader/accounts'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Modal from '@components/Modal'
@@ -13,6 +12,7 @@ import UpgradeProgram from './UpgradeProgram'
 import CloseBuffers from './CloseBuffers'
 import { getExplorerUrl } from '@components/explorer/tools'
 import TransferUpgradeAuthority from './TransferUpgradeAuthority'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { AssetAccount } from '@utils/uiTypes/assets'
 
 const AssetItem = ({
@@ -30,7 +30,7 @@ const AssetItem = ({
     false
   )
   const [loadData, setLoadData] = useState(false)
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const name = item ? getProgramName(item.pubkey) : ''
   const governedAccount = item
     ? abbreviateAddress(item.pubkey as PublicKey)

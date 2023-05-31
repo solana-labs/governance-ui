@@ -1,5 +1,6 @@
 import { ExclamationCircleIcon } from '@heroicons/react/solid'
-import useProposal from '@hooks/useProposal'
+import { useSelectedProposalTransactions } from '@hooks/queries/proposalTransaction'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import useRealm from '@hooks/useRealm'
 import { useMemo } from 'react'
 
@@ -81,14 +82,20 @@ const SetGovernanceConfig = () => (
 )
 
 const useProposalSafetyCheck = () => {
-  const { config, realmInfo } = useRealm()
-  const { transactions } = useProposal()
-  const realmConfigWarnings = useMemo(() => {
-    if (realmInfo === undefined || config === undefined) return undefined
+  const config = useRealmConfigQuery().data?.result
 
-    const ixs = Object.values(transactions).flatMap((pix) =>
-      pix.account.getAllInstructions()
+  const { realmInfo } = useRealm()
+  const { data: transactions } = useSelectedProposalTransactions()
+
+  const realmConfigWarnings = useMemo(() => {
+    if (
+      realmInfo === undefined ||
+      config === undefined ||
+      transactions === undefined
     )
+      return undefined
+
+    const ixs = transactions.flatMap((pix) => pix.account.getAllInstructions())
 
     const realmConfigWarnings = ixs.map((ix) => {
       if (ix.programId.equals(realmInfo.programId) && ix.data[0] === 19) {

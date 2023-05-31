@@ -1,7 +1,6 @@
 import { getExplorerUrl } from '@components/explorer/tools'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import { useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import { PhotographIcon, PlusCircleIcon } from '@heroicons/react/outline'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -16,10 +15,11 @@ import SendTokens from '@components/TreasuryAccount/SendTokens'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { MdScheduleSend } from 'react-icons/md'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const gallery = () => {
   // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const realmNfts = useTreasuryAccountStore((s) => s.allNfts)
   // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree

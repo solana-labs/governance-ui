@@ -12,7 +12,6 @@ import {
   getGovernanceAirdropInstruction,
   getMerkleAirdropInstruction,
 } from '@utils/instructions/Dual/airdrop'
-import useWalletStore from 'stores/useWalletStore'
 import {
   getDualFinanceGovernanceAirdropSchema,
   getDualFinanceMerkleAirdropSchema,
@@ -20,6 +19,7 @@ import {
 import Tooltip from '@components/Tooltip'
 import Select from '@components/inputs/Select'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const DualAirdrop = ({
   index,
@@ -36,7 +36,7 @@ const DualAirdrop = ({
     amount: 0,
     treasury: undefined,
   })
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const { assetAccounts } = useGovernanceAssets()

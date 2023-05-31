@@ -3,8 +3,8 @@ import { InstructionDescriptor, getAccountName } from './tools'
 import { getExplorerUrl } from '@components/explorer/tools'
 import { ExternalLinkIcon } from '@heroicons/react/solid'
 import { useState, useRef, useEffect } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import { fetchTokenAccountByPubkey } from '@hooks/queries/tokenAccount'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export default function InstructionAccount({
   endpoint,
@@ -17,7 +17,7 @@ export default function InstructionAccount({
   accountMeta: AccountMetaData
   descriptor: InstructionDescriptor | undefined
 }) {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const [accountLabel, setAccountLabel] = useState(
     getAccountName(accountMeta.pubkey)
   )

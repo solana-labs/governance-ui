@@ -17,9 +17,11 @@ import { buildTopVoters } from '@models/proposal'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { getLockTokensVotingPowerPerWallet } from 'VoteStakeRegistry/tools/deposits'
 import { BN } from '@coral-xyz/anchor'
-import useWalletStore from 'stores/useWalletStore'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import { PublicKey } from '@solana/web3.js'
+import { useRealmQuery } from './queries/realm'
+import { useRealmCommunityMintInfoQuery } from './queries/mintInfo'
+import useLegacyConnectionContext from './useLegacyConnectionContext'
 
 export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
   const { getRpcContext } = useRpcContext()
@@ -29,7 +31,9 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
   const [tokenOwnerRecords, setTokenOwnerRecords] = useState<
     ProgramAccount<TokenOwnerRecord>[]
   >([])
-  const { mint, realm, vsrMode } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const { vsrMode } = useRealm()
 
   //for vsr
   const [
@@ -44,7 +48,7 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
 
   const [context, setContext] = useState<RpcContext | null>(null)
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const governingTokenMintPk = proposal?.account.governingTokenMint
 
   useEffect(() => {
@@ -83,11 +87,10 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
   }, [context, governingTokenMintPk, proposal, realm])
 
   useEffect(() => {
-    if (realm) {
-      setContext(getRpcContext())
+    if (getRpcContext) {
+      setContext(getRpcContext() ?? null)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [realm])
+  }, [getRpcContext])
   const topVoters = useMemo(() => {
     if (realm && proposal && mint) {
       return buildTopVoters(
@@ -110,18 +113,21 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
     undecidedDepositByVoteRecord,
   ])
 
-  //VSR only
-  const handleGetVsrVotingPowers = async (walletsPks: PublicKey[]) => {
-    const votingPerWallet = await getLockTokensVotingPowerPerWallet(
-      walletsPks,
-      realm!,
-      client!,
-      connection,
-      mintsUsedInRealm
-    )
-    setUndecidedDepositByVoteRecord(votingPerWallet)
-  }
   useEffect(() => {
+    //VSR only
+    const handleGetVsrVotingPowers = async (walletsPks: PublicKey[]) => {
+      if (!realm || !client) throw new Error()
+
+      const votingPerWallet = await getLockTokensVotingPowerPerWallet(
+        walletsPks,
+        realm,
+        client,
+        connection,
+        mintsUsedInRealm
+      )
+      setUndecidedDepositByVoteRecord(votingPerWallet)
+    }
+
     if (
       vsrMode === 'default' &&
       !Object.keys(undecidedDepositByVoteRecord).length
@@ -136,18 +142,24 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
                 tokenOwnerRecord.account.governingTokenOwner.toBase58()
             )
       )
-      if (undecidedData.length && mintsUsedInRealm.length) {
+      if (undecidedData.length && mintsUsedInRealm.length && realm && client) {
         handleGetVsrVotingPowers(
           undecidedData.map((x) => x.account.governingTokenOwner)
         )
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
     tokenOwnerRecords.length,
     voteRecords.length,
     vsrMode,
     mintsUsedInRealm.length,
+    undecidedDepositByVoteRecord,
+    tokenOwnerRecords,
+    voteRecords,
+    realm,
+    client,
+    connection,
+    mintsUsedInRealm,
   ])
   ///////
 

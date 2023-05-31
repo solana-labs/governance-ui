@@ -13,7 +13,6 @@ import { PublicKey } from '@solana/web3.js'
 import { MintInfo } from '@solana/spl-token'
 import { AnchorProvider, BN, Wallet } from '@coral-xyz/anchor'
 import tokenPriceService from '@utils/services/tokenPrice'
-import useWalletStore from 'stores/useWalletStore'
 import { getDeposits } from 'VoteStakeRegistry/tools/deposits'
 import { DepositWithMintAccount } from 'VoteStakeRegistry/sdk/accounts'
 import { notify } from '@utils/notifications'
@@ -33,6 +32,15 @@ import { abbreviateAddress } from '@utils/formatting'
 import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useTokenOwnerRecordByPubkeyQuery } from '@hooks/queries/tokenOwnerRecord'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
+import { useConnection } from '@solana/wallet-adapter-react'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface DepositBox {
   mintPk: PublicKey
@@ -43,14 +51,11 @@ interface DepositBox {
 const unlockedTypes: string[] = []
 
 const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
-  const {
-    realm,
-    realmInfo,
-    mint,
-    tokenRecords,
-    councilMint,
-    config,
-  } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const config = useRealmConfigQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { realmInfo } = useRealm()
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
   const [client, setClient] = useState<VsrClient | undefined>(undefined)
   const [reducedDeposits, setReducedDeposits] = useState<DepositBox[]>([])
@@ -61,12 +66,17 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
     new BN(0)
   )
   const [isOwnerOfDeposits, setIsOwnerOfDeposits] = useState(true)
-  const tokenOwnerRecordWalletPk = Object.keys(tokenRecords)?.find(
-    (key) => tokenRecords[key]?.pubkey?.toBase58() === tokenOwnerRecordPk
-  )
+
+  const lol = useMemo(() => new PublicKey(tokenOwnerRecordPk), [
+    tokenOwnerRecordPk,
+  ])
+  const { data: tokenOwnerRecord } = useTokenOwnerRecordByPubkeyQuery(lol)
+
+  const tokenOwnerRecordWalletPk =
+    tokenOwnerRecord?.result?.account.governingTokenOwner
   const [isLoading, setIsLoading] = useState(false)
-  const connection = useWalletStore((s) => s.connection.current)
-  const connnectionContext = useWalletStore((s) => s.connection)
+  const { connection } = useConnection()
+  const connnectionContext = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const mainBoxesClasses = 'bg-bkg-1 col-span-1 p-4 rounded-md'
@@ -232,31 +242,33 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
       : undefined
 
   useEffect(() => {
-    const getTokenOwnerRecord = async () => {
-      const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
-        realm!.owner,
-        realm!.pubkey,
-        defaultMintOwnerRecordMint!,
-        wallet!.publicKey!
-      )
-      setIsOwnerOfDeposits(
-        tokenOwnerRecordAddress.toBase58() === tokenOwnerRecordPk
-      )
-    }
+    const walletPubkey = wallet?.publicKey
     if (
       realm?.owner &&
-      wallet?.connected &&
+      walletPubkey &&
+      walletPubkey !== null &&
       realm.pubkey &&
       defaultMintOwnerRecordMint
     ) {
+      const getTokenOwnerRecord = async () => {
+        const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
+          realm.owner,
+          realm.pubkey,
+          defaultMintOwnerRecordMint,
+          walletPubkey
+        )
+        setIsOwnerOfDeposits(
+          tokenOwnerRecordAddress.toBase58() === tokenOwnerRecordPk
+        )
+      }
       getTokenOwnerRecord()
     }
   }, [
-    wallet?.connected,
-    tokenOwnerRecordPk,
     defaultMintOwnerRecordMint,
-    realm,
-    wallet,
+    realm?.owner,
+    realm?.pubkey,
+    tokenOwnerRecordPk,
+    wallet?.publicKey,
   ])
 
   const hasLockedTokens = useMemo(() => {

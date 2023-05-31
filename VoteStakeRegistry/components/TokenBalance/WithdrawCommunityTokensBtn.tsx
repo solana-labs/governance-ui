@@ -11,7 +11,6 @@ import {
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
 import { chunks } from '@utils/helpers'
 import { sendTransaction } from '@utils/send'
-import useWalletStore from 'stores/useWalletStore'
 import { withVoteRegistryWithdraw } from 'VoteStakeRegistry/sdk/withVoteRegistryWithdraw'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { getProgramVersionForRealm } from '@models/registry/api'
@@ -21,32 +20,36 @@ import { useState } from 'react'
 import Loading from '@components/Loading'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { fetchGovernanceByPubkey } from '@hooks/queries/governance'
+import { useConnection } from '@solana/wallet-adapter-react'
+import { proposalQueryKeys } from '@hooks/queries/proposal'
+import queryClient from '@hooks/queries/queryClient'
+import asFindable from '@utils/queries/asFindable'
+import { tokenAccountQueryKeys } from '@hooks/queries/tokenAccount'
 
 const WithDrawCommunityTokens = () => {
   const { getOwnedDeposits } = useDepositStore()
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const realm = useRealmQuery().data?.result
+
   const {
-    realm,
     realmInfo,
-    ownTokenRecord,
-    proposals,
-    governances,
-    tokenRecords,
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
+
   const [isLoading, setIsLoading] = useState(false)
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
-  const connection = useWalletStore((s) => s.connection.current)
+  const { connection } = useConnection()
   const deposits = useDepositStore((s) => s.state.deposits)
-  const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
-    (s) => s.actions
-  )
   const maxVoterWeight = useMaxVoteRecord()?.pubkey || undefined
   const depositRecord = deposits.find(
     (x) =>
-      x.mint.publicKey.toBase58() === realm!.account.communityMint.toBase58() &&
+      x.mint.publicKey.toBase58() === realm?.account.communityMint.toBase58() &&
       x.lockup.kind.none
   )
   const withdrawAllTokens = async function () {
@@ -61,17 +64,33 @@ const WithDrawCommunityTokens = () => {
       )
 
       for (const voteRecord of Object.values(voteRecords)) {
-        let proposal = proposals[voteRecord.account.proposal.toBase58()]
+        const proposalQuery = await queryClient.fetchQuery({
+          queryKey: proposalQueryKeys.byPubkey(
+            connection.rpcEndpoint,
+            voteRecord.account.proposal
+          ),
+          staleTime: 0,
+          queryFn: () =>
+            asFindable(() =>
+              getProposal(connection, voteRecord.account.proposal)
+            )(),
+        })
+        const proposal = proposalQuery.result
+
         if (!proposal) {
           continue
         }
 
         if (proposal.account.state === ProposalState.Voting) {
           // If the Proposal is in Voting state refetch it to make sure we have the latest state to avoid false positives
-          proposal = await getProposal(connection, proposal.pubkey)
           if (proposal.account.state === ProposalState.Voting) {
-            const governance =
-              governances[proposal.account.governance.toBase58()]
+            const governance = (
+              await fetchGovernanceByPubkey(
+                connection,
+                proposal.account.governance
+              )
+            ).result
+            if (!governance) throw new Error('failed to fetch governance')
             if (proposal.account.getTimeToVoteEnd(governance.account) > 0) {
               setIsLoading(false)
               // Note: It's technically possible to withdraw the vote here but I think it would be confusing and people would end up unconsciously withdrawing their votes
@@ -125,13 +144,12 @@ const WithDrawCommunityTokens = () => {
       realmPk: realm!.pubkey!,
       amount: depositRecord!.amountDepositedNative,
       communityMintPk: realm!.account.communityMint,
-      tokenOwnerRecordPubKey: tokenRecords[wallet!.publicKey!.toBase58()]
-        .pubkey!,
+      tokenOwnerRecordPubKey: ownTokenRecord!.pubkey,
       depositIndex: depositRecord!.index,
       connection,
       client: client,
       splProgramId: realm!.owner,
-      splProgramVersion: getProgramVersionForRealm(realmInfo!),
+      splProgramVersion: realmInfo!.programVersion,
     })
 
     try {
@@ -154,8 +172,6 @@ const WithDrawCommunityTokens = () => {
               : `Released tokens (${index}/${ixChunks.length - 2})`,
         })
       }
-      await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
-      await fetchWalletTokenAccounts()
       await getOwnedDeposits({
         realmPk: realm!.pubkey,
         communityMintPk: realm!.account.communityMint,
@@ -163,6 +179,12 @@ const WithDrawCommunityTokens = () => {
         client: client!,
         connection,
       })
+      queryClient.invalidateQueries(
+        tokenAccountQueryKeys.byOwner(
+          connection.rpcEndpoint,
+          wallet!.publicKey!
+        )
+      )
     } catch (ex) {
       console.error(
         "Can't withdraw tokens, go to my proposals in account view to check outstanding proposals",

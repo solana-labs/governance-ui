@@ -8,13 +8,23 @@ import { AddressField, NumberField } from '../index'
 import useProgramVersion from '@hooks/useProgramVersion'
 import { useRouter } from 'next/router'
 import useQueryContext from '@hooks/useQueryContext'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
 
 const ParamsView = ({ activeGovernance }) => {
-  const { realm, mint, councilMint, ownVoterWeight, symbol } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { ownVoterWeight } = useRealm()
   const programVersion = useProgramVersion()
   const realmAccount = realm?.account
   const communityMint = realmAccount?.communityMint.toBase58()
   const router = useRouter()
+  const { symbol } = router.query
   const { fmtUrlWithCluster } = useQueryContext()
 
   const minCommunityTokensToCreateProposal = activeGovernance?.account?.config
@@ -67,7 +77,7 @@ const ParamsView = ({ activeGovernance }) => {
             padding
             val={activeGovernance.account.config.minInstructionHoldUpTime}
           />
-          {programVersion >= 3 && (
+          {(programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) >= 3 && (
             <>
               <AddressField
                 label="Proposal Cool-off Time"
@@ -97,7 +107,7 @@ const ParamsView = ({ activeGovernance }) => {
               val={`${activeGovernance.account.config.councilVoteThreshold.value}%`}
             />
           )}
-          {programVersion >= 3 ? (
+          {(programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) >= 3 ? (
             <>
               <AddressField
                 label="Community Vote Tipping"

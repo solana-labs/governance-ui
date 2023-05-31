@@ -16,13 +16,14 @@ import { AccountType } from '@utils/uiTypes/assets'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import Loading from '@components/Loading'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 const AssetsCompactWrapper = () => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
+  const realm = useRealmQuery().data?.result
   const {
     symbol,
-    realm,
     ownVoterWeight,
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,

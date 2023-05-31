@@ -1,7 +1,5 @@
 import React, { useCallback, useState, useMemo } from 'react'
-import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import useWalletStore from 'stores/useWalletStore'
 import { fmtMintAmount, getMintDecimalAmount } from '@tools/sdk/units'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { abbreviateAddress } from '@utils/formatting'
@@ -36,6 +34,11 @@ import { useClaimDelegatedPositionRewards } from '../hooks/useClaimDelegatedPosi
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { PublicKey } from '@solana/web3.js'
 import { PromptModal } from './PromptModal'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
+import queryClient from '@hooks/queries/queryClient'
+import { tokenAccountQueryKeys } from '@hooks/queries/tokenAccount'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface PositionCardProps {
   subDaos?: SubDaoWithMeta[]
@@ -55,7 +58,8 @@ export const PositionCard: React.FC<PositionCardProps> = ({
   const [isExtendModalOpen, setIsExtendModalOpen] = useState(false)
   const [isSplitModalOpen, setIsSplitModalOpen] = useState(false)
   const [isDelegateModalOpen, setIsDelegateModalOpen] = useState(false)
-  const { mint, realm, realmInfo } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
   const [isLoading, positions, getPositions] = useHeliumVsrStore((s) => [
     s.state.isLoading,
     s.state.positions,
@@ -153,10 +157,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
     claimDelegatedPositionRewards,
   } = useClaimDelegatedPositionRewards()
 
-  const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
-    (s) => s.actions
-  )
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
 
   const { lockup, hasGenesisMultiplier, votingMint } = position
@@ -195,8 +196,9 @@ export const PositionCard: React.FC<PositionCardProps> = ({
   )
 
   const refetchState = async () => {
-    fetchWalletTokenAccounts()
-    fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+    queryClient.invalidateQueries({
+      queryKey: tokenAccountQueryKeys.all(connection.endpoint),
+    })
     await getPositions({
       votingClient: currentClient,
       realmPk: realm!.pubkey,

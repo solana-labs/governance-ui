@@ -1,9 +1,8 @@
 import { useState } from 'react'
 import Button from '../Button'
 import Input from '../inputs/Input'
-import useWalletStore from '../../stores/useWalletStore'
 import useRealm from '../../hooks/useRealm'
-import { RpcContext, GoverningTokenRole } from '@solana/spl-governance'
+import { RpcContext } from '@solana/spl-governance'
 import { ChatMessageBody, ChatMessageBodyType } from '@solana/spl-governance'
 import { postChatMessage } from '../../actions/chat/postMessage'
 import Loading from '../Loading'
@@ -11,16 +10,21 @@ import Tooltip from '@components/Tooltip'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import {
+  useUserCommunityTokenOwnerRecord,
+  useUserCouncilTokenOwnerRecord,
+} from '@hooks/queries/tokenOwnerRecord'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useRouteProposalQuery } from '@hooks/queries/proposal'
+import { useVotingPop } from '@components/VotePanel/hooks'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const DiscussionForm = () => {
   const [comment, setComment] = useState('')
-  const {
-    ownVoterWeight,
-    realmInfo,
-    realm,
-    ownTokenRecord,
-    ownCouncilTokenRecord,
-  } = useRealm()
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
+  const realm = useRealmQuery().data?.result
+  const { ownVoterWeight, realmInfo } = useRealm()
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
@@ -28,22 +32,27 @@ const DiscussionForm = () => {
 
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
-  const connection = useWalletStore((s) => s.connection)
-  const { proposal } = useWalletStore((s) => s.selectedProposal)
-  const { fetchChatMessages } = useWalletStore((s) => s.actions)
-  const { tokenRole } = useWalletStore((s) => s.selectedProposal)
+  const connection = useLegacyConnectionContext()
+  const proposal = useRouteProposalQuery().data?.result
+  const tokenRole = useVotingPop()
   const commenterVoterTokenRecord =
-    tokenRole === GoverningTokenRole.Community
-      ? ownTokenRecord
-      : ownCouncilTokenRecord
+    tokenRole === 'community' ? ownTokenRecord : ownCouncilTokenRecord
 
   const submitComment = async () => {
     setSubmitting(true)
+    if (
+      !realm ||
+      !proposal ||
+      !commenterVoterTokenRecord ||
+      !wallet ||
+      !realmInfo
+    )
+      throw new Error()
 
     const rpcContext = new RpcContext(
-      proposal!.owner,
-      getProgramVersionForRealm(realmInfo!),
-      wallet!,
+      proposal.owner,
+      getProgramVersionForRealm(realmInfo),
+      wallet,
       connection.current,
       connection.endpoint
     )
@@ -56,9 +65,9 @@ const DiscussionForm = () => {
     try {
       await postChatMessage(
         rpcContext,
-        realm!,
-        proposal!,
-        commenterVoterTokenRecord!,
+        realm,
+        proposal,
+        commenterVoterTokenRecord,
         msg,
         undefined,
         client
@@ -71,8 +80,6 @@ const DiscussionForm = () => {
     } finally {
       setSubmitting(false)
     }
-
-    fetchChatMessages(proposal!.pubkey)
   }
 
   const postEnabled =

@@ -20,8 +20,8 @@ import { notify } from '@utils/notifications'
 import { SerumGrantLockedForm } from '@utils/uiTypes/proposalCreationTypes'
 import { useContext, useEffect, useState } from 'react'
 import useSerumGovStore from 'stores/useSerumGovStore'
-import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 const GrantForm = ({
   isLocked,
@@ -40,7 +40,7 @@ const GrantForm = ({
     vestIndex: number
   } | null>(null)
 
-  const connection = useWalletStore((s) => s.connection.current)
+  const { connection } = useConnection()
   const { anchorProvider, wallet } = useWalletDeprecated()
   const actions = useSerumGovStore((s) => s.actions)
   const programId = useSerumGovStore((s) => s.programId)

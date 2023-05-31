@@ -26,7 +26,6 @@ import { useRouter } from 'next/router'
 import { pdas } from 'psyfi-euros-test'
 import React, { useCallback, useEffect, useState } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import useWalletStore from 'stores/useWalletStore'
 import {
   Action,
   CreatePsyFiStrategy,
@@ -38,6 +37,13 @@ import { PsyFiStrategy } from 'Strategies/types/types'
 import { usePsyFiProgram } from './hooks/usePsyFiProgram'
 import { notify } from '@utils/notifications'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const SOL_BUFFER = 0.02
 
@@ -54,15 +60,12 @@ export const Deposit: React.FC<{
 }) => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
-  const {
-    realmInfo,
-    realm,
-    ownVoterWeight,
-    mint,
-    councilMint,
-    config,
-    symbol,
-  } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const config = useRealmConfigQuery().data?.result
+  const { symbol } = router.query
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { realmInfo, ownVoterWeight } = useRealm()
   const {
     canUseTransferInstruction,
     governedTokenAccountsWithoutNfts,
@@ -70,7 +73,7 @@ export const Deposit: React.FC<{
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const [ownedStrategyTokenAccount, setOwnedStrategyTokenAccount] = useState<
     AssetAccount | undefined

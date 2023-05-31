@@ -1,9 +1,7 @@
-import useProposal from '../../hooks/useProposal'
 import TransactionCard from './TransactionCard'
 import { Disclosure } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/solid'
-import { useEffect, useRef, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { InstructionExecutionStatus, RpcContext } from '@solana/spl-governance'
 import useRealm from '@hooks/useRealm'
 import { getProgramVersionForRealm } from '@models/registry/api'
@@ -15,9 +13,14 @@ import Button from '@components/Button'
 import { dryRunInstruction } from 'actions/dryRunInstruction'
 import { getExplorerInspectorUrl } from '@components/explorer/tools'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRouteProposalQuery } from '@hooks/queries/proposal'
+import { useSelectedProposalTransactions } from '@hooks/queries/proposalTransaction'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export function TransactionPanel() {
-  const { transactions, proposal } = useProposal()
+  const proposal = useRouteProposalQuery().data?.result
+  const { data: transactions } = useSelectedProposalTransactions()
+
   const { realmInfo } = useRealm()
   const mounted = useRef(false)
   useEffect(() => {
@@ -28,7 +31,7 @@ export function TransactionPanel() {
     }
   }, [])
   const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const [currentSlot, setCurrentSlot] = useState(0)
 
@@ -60,10 +63,13 @@ export function TransactionPanel() {
     }
   }, [ineligibleToSee, connection, currentSlot, proposal, realmInfo, wallet])
 
-  const proposalTransactions = Object.values(transactions).sort(
-    (i1, i2) => i1.account.instructionIndex - i2.account.instructionIndex
+  const proposalTransactions = useMemo(
+    () =>
+      (transactions ?? []).sort(
+        (i1, i2) => i1.account.instructionIndex - i2.account.instructionIndex
+      ),
+    [transactions]
   )
-
   const [playing, setPlaying] = useState(PlayState.Unplayed)
 
   useEffect(() => {
@@ -90,7 +96,7 @@ export function TransactionPanel() {
     window.open(inspectUrl, '_blank')
   }
 
-  if (Object.values(transactions).length === 0) {
+  if (transactions?.length === 0) {
     return null
   }
 

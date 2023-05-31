@@ -10,6 +10,7 @@ import {
   sendSignAndConfirmTransactions,
   sendSignAndConfirmTransactionsProps,
 } from '@blockworks-foundation/mangolana/lib/transactions'
+import { invalidateInstructionAccounts } from '@hooks/queries/queryClient'
 
 export type WalletSigner = Pick<
   SignerWalletAdapter,
@@ -56,6 +57,12 @@ export const sendTransactionsV3 = ({
         callbacks?.afterEveryTxConfirmation()
       }
       incrementProcessedTransactions()
+      // TODO could optimize to only invalidate the accts associated with this tx, current api doesnt allow this
+      transactionInstructions.forEach((x) =>
+        x.instructionsSet.forEach((x) =>
+          invalidateInstructionAccounts(x.transactionInstruction)
+        )
+      )
     },
     onError: (e, notProcessedTransactions, originalProps) => {
       if (callbacks?.onError) {
@@ -93,6 +100,7 @@ export const sendTransactionsV3 = ({
     timeoutStrategy,
     callbacks: callbacksWithUiComponent,
     config: cfg,
+    confirmLevel: 'confirmed', //TODO base this on connection confirmation level
   })
 }
 

@@ -24,6 +24,7 @@ import React, {
 } from 'react'
 import { NewProposalContext } from '../../../new'
 import useMembershipTypes from './useMembershipTypes'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 type Form = {
   memberKey?: string
@@ -48,7 +49,9 @@ const RevokeGoverningTokens: FC<{
   })
   const [formErrors, setFormErrors] = useState<Errors>({})
   const membershipTypes = useMembershipTypes()
-  const { realmInfo, realm } = useRealm()
+  const realm = useRealmQuery().data?.result
+
+  const { realmInfo } = useRealm()
   const programId: PublicKey | undefined = realmInfo?.programId
   const programVersion = useProgramVersion()
 
@@ -135,7 +138,8 @@ const RevokeGoverningTokens: FC<{
       programId === undefined ||
       mintInfo?.result === undefined ||
       governance === undefined ||
-      revokeTokenAuthority === undefined
+      revokeTokenAuthority === undefined ||
+      programVersion === undefined
     ) {
       throw new Error('proposal created before necessary data is fetched')
     }

@@ -1,8 +1,6 @@
-import useWalletStore from 'stores/useWalletStore'
 import useWalletOnePointOh from './useWalletOnePointOh'
 import useRealm from './useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { nftPluginsPks } from './useVotingPlugins'
 import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
 import { useAsyncCallback } from 'react-async-hook'
 import {
@@ -19,13 +17,19 @@ import { voteRecordQueryKeys } from './queries/voteRecord'
 import { castVote } from 'actions/castVote'
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { notify } from '@utils/notifications'
+import { useRealmQuery } from './queries/realm'
+import { useRealmConfigQuery } from './queries/realmConfig'
+import { useRouteProposalQuery } from './queries/proposal'
+import useLegacyConnectionContext from './useLegacyConnectionContext'
+import { NFT_PLUGINS_PKS } from '@constants/plugins'
 
 export const useSubmitVote = () => {
   const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection)
-  const { proposal } = useWalletStore((s) => s.selectedProposal)
-  const { refetchProposals } = useWalletStore((s) => s.actions)
-  const { realm, realmInfo, config } = useRealm()
+  const connection = useLegacyConnectionContext()
+  const realm = useRealmQuery().data?.result
+  const config = useRealmConfigQuery().data?.result
+  const proposal = useRouteProposalQuery().data?.result
+  const { realmInfo } = useRealm()
   const { closeNftVotingCountingModal } = useNftProposalStore.getState()
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
@@ -33,7 +37,7 @@ export const useSubmitVote = () => {
 
   const isNftPlugin =
     config?.account.communityTokenConfig.voterWeightAddin &&
-    nftPluginsPks.includes(
+    NFT_PLUGINS_PKS.includes(
       config?.account.communityTokenConfig.voterWeightAddin?.toBase58()
     )
 
@@ -63,8 +67,6 @@ export const useSubmitVote = () => {
         : undefined
 
       const confirmationCallback = async () => {
-        await refetchProposals()
-        // TODO refine this to only invalidate the one query
         await queryClient.invalidateQueries(
           voteRecordQueryKeys.all(connection.cluster)
         )
@@ -81,6 +83,9 @@ export const useSubmitVote = () => {
           client,
           confirmationCallback
         )
+        queryClient.invalidateQueries({
+          queryKey: ['Proposal'],
+        })
       } catch (e) {
         notify({ type: 'error', message: e.message })
       } finally {

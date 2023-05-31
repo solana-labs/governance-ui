@@ -1,5 +1,5 @@
 import useRealm from 'hooks/useRealm'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ProposalFilter, {
   InitialFilters,
   Filters,
@@ -12,7 +12,6 @@ import {
   withCastVote,
   YesNoVote,
 } from '@solana/spl-governance'
-import useWalletStore from 'stores/useWalletStore'
 import NewProposalBtn from './proposal/components/NewProposalBtn'
 import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
@@ -38,6 +37,22 @@ import ProposalSorting, {
   Sorting,
 } from '@components/ProposalSorting'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import {
+  useUserCommunityTokenOwnerRecord,
+  useUserCouncilTokenOwnerRecord,
+} from '@hooks/queries/tokenOwnerRecord'
+import { useRealmQuery } from '@hooks/queries/realm'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
+import { useRealmGovernancesQuery } from '@hooks/queries/governance'
+import { useConnection } from '@solana/wallet-adapter-react'
+import {
+  proposalQueryKeys,
+  useRealmProposalsQuery,
+} from '@hooks/queries/proposal'
+import queryClient from '@hooks/queries/queryClient'
 
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
@@ -56,125 +71,67 @@ const DepositLabel = dynamic(
 
 const REALM = () => {
   const pagination = useRef<{ setPage: (val) => void }>(null)
-  const {
-    realm,
-    realmInfo,
-    mint,
-    councilMint,
-    proposals,
-    governances,
-    tokenRecords,
-    ownVoterWeight,
-    ownTokenRecord,
-    councilTokenOwnerRecords,
-    ownCouncilTokenRecord,
-  } = useRealm()
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
+  const realmQuery = useRealmQuery()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { realmInfo, ownVoterWeight } = useRealm()
   const proposalsPerPage = 20
   const [filters, setFilters] = useState<Filters>(InitialFilters)
   const [sorting, setSorting] = useState<Sorting>(InitialSorting)
-  const [displayedProposals, setDisplayedProposals] = useState(
-    Object.entries(proposals)
-  )
+
   const [paginatedProposals, setPaginatedProposals] = useState<
     [string, ProgramAccount<Proposal>][]
   >([])
   const [isMultiVoting, setIsMultiVoting] = useState(false)
   const [proposalSearch, setProposalSearch] = useState('')
-  const [filteredProposals, setFilteredProposals] = useState(displayedProposals)
   const [activeTab, setActiveTab] = useState('Proposals')
   const [multiVoteMode, setMultiVoteMode] = useState(false)
   const [selectedProposals, setSelectedProposals] = useState<
     SelectedProposal[]
   >([])
-  const ownVoteRecordsByProposal = useWalletStore(
-    (s) => s.ownVoteRecordsByProposal
-  )
 
-  const councilDelegateVoteRecordsByProposal = useWalletStore(
-    (s) => s.councilDelegateVoteRecordsByProposal
-  )
-
-  const communityDelegateVoteRecordsByProposal = useWalletStore(
-    (s) => s.communityDelegateVoteRecordsByProposal
-  )
-  const selectedCouncilDelegate = useWalletStore(
-    (s) => s.selectedCouncilDelegate
-  )
-  const selectedCommunityDelegate = useWalletStore(
-    (s) => s.selectedCommunityDelegate
-  )
-
-  const getCurrentVoteRecKeyVal = () => {
-    if (selectedCommunityDelegate) {
-      return communityDelegateVoteRecordsByProposal
-    }
-    if (selectedCouncilDelegate) {
-      return councilDelegateVoteRecordsByProposal
-    }
-    return ownVoteRecordsByProposal
-  }
-
-  const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
   const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection.current)
+  const { connection } = useConnection()
 
-  const allProposals = Object.entries(proposals).sort((a, b) =>
-    compareProposals(b[1].account, a[1].account, governances)
+  const governancesArray = useRealmGovernancesQuery().data
+  const governancesByGovernance = useMemo(
+    () =>
+      governancesArray &&
+      Object.fromEntries(governancesArray.map((x) => [x.pubkey.toString(), x])),
+    [governancesArray]
   )
-  useEffect(() => {
-    setPaginatedProposals(paginateProposals(0))
-    pagination?.current?.setPage(0)
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [JSON.stringify(filteredProposals)])
+  const { data: proposalsArray } = useRealmProposalsQuery()
+  const proposalsByProposal = useMemo(
+    () =>
+      proposalsArray === undefined
+        ? undefined
+        : Object.fromEntries(
+            proposalsArray.map((x) => [x.pubkey.toString(), x])
+          ),
+    [proposalsArray]
+  )
 
-  useEffect(() => {
-    let proposals = filterProposals(
-      allProposals,
-      filters,
-      sorting,
-      realm,
-      governances,
-      councilMint,
-      mint
-    )
-
-    if (proposalSearch) {
-      proposals = proposals.filter(([, v]) =>
-        v.account.name
-          .toLowerCase()
-          .includes(proposalSearch.toLocaleLowerCase())
-      )
-    }
-    setFilteredProposals(proposals)
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [filters, proposalSearch, sorting, proposals])
-
-  useEffect(() => {
-    const proposals = filterProposals(
-      allProposals,
-      filters,
-      sorting,
-      realm,
-      governances,
-      councilMint,
-      mint
-    )
-    setDisplayedProposals(proposals)
-    setFilteredProposals(proposals)
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [JSON.stringify(proposals)])
+  const allProposals = useMemo(
+    () =>
+      governancesByGovernance !== undefined && proposalsByProposal !== undefined
+        ? Object.entries(proposalsByProposal ?? {}).sort((a, b) =>
+            compareProposals(
+              b[1].account,
+              a[1].account,
+              governancesByGovernance
+            )
+          )
+        : [],
+    [governancesByGovernance, proposalsByProposal]
+  )
 
   const onProposalPageChange = (page) => {
     setPaginatedProposals(paginateProposals(page))
-  }
-  const paginateProposals = (page) => {
-    return filteredProposals.slice(
-      page * proposalsPerPage,
-      (page + 1) * proposalsPerPage
-    )
   }
 
   const toggleMultiVoteMode = () => {
@@ -190,37 +147,71 @@ const REALM = () => {
 
   const votingProposals = useMemo(
     () =>
-      allProposals.filter(([k, v]) => {
-        const governance = governances[v.account.governance.toBase58()]?.account
+      governancesByGovernance &&
+      allProposals?.filter(([_k, v]) => {
+        const governance =
+          governancesByGovernance[v.account.governance.toBase58()]?.account
         return (
           v.account.state === ProposalState.Voting &&
-          !getCurrentVoteRecKeyVal()[k] &&
+          // !getCurrentVoteRecKeyVal()[k] &&
           !v.account.hasVoteTimeEnded(governance)
         )
       }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    [allProposals]
+    [allProposals, governancesByGovernance]
   )
 
+  const filteredProposals = useMemo(() => {
+    if (votingProposals && multiVoteMode) return votingProposals
+
+    let proposals = filterProposals(
+      allProposals,
+      filters,
+      sorting,
+      realmQuery.data?.result,
+      governancesByGovernance ?? {},
+      councilMint,
+      mint
+    )
+
+    if (proposalSearch) {
+      proposals = proposals.filter(([, v]) =>
+        v.account.name
+          .toLowerCase()
+          .includes(proposalSearch.toLocaleLowerCase())
+      )
+    }
+    return proposals
+  }, [
+    allProposals,
+    councilMint,
+    filters,
+    governancesByGovernance,
+    mint,
+    multiVoteMode,
+    proposalSearch,
+    realmQuery.data?.result,
+    sorting,
+    votingProposals,
+  ])
+
+  const paginateProposals = useCallback(
+    (page) => {
+      return filteredProposals.slice(
+        page * proposalsPerPage,
+        (page + 1) * proposalsPerPage
+      )
+    },
+    [filteredProposals]
+  )
+
+  // TODO stop using side effects
+  /** side effect:  */
   useEffect(() => {
     setSelectedProposals([])
-    if (multiVoteMode) {
-      setFilteredProposals(votingProposals)
-    } else {
-      const proposals = filterProposals(
-        allProposals,
-        filters,
-        sorting,
-        realm,
-        governances,
-        councilMint,
-        mint
-      )
-      setFilteredProposals(proposals)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [multiVoteMode])
 
+  // TODO stop using side effects
+  /** side effect: update sorting based on localstorage */
   useEffect(() => {
     const initialSort = localStorage.getItem(PROPOSAL_SORTING_LOCAL_STORAGE_KEY)
     if (initialSort) {
@@ -230,7 +221,7 @@ const REALM = () => {
   }, [])
 
   const allVotingProposalsSelected =
-    selectedProposals.length === votingProposals.length
+    selectedProposals.length === votingProposals?.length
   const hasCommunityVoteWeight =
     ownTokenRecord &&
     ownVoterWeight.hasMinAmountToVote(ownTokenRecord.account.governingTokenMint)
@@ -250,15 +241,16 @@ const REALM = () => {
       setSelectedProposals([])
     } else {
       setSelectedProposals(
-        votingProposals.map(([k, v]) => ({
+        votingProposals?.map(([k, v]) => ({
           proposal: v.account,
           proposalPk: new PublicKey(k),
-        }))
+        })) ?? []
       )
     }
   }
 
   const voteOnSelected = async (vote: YesNoVote) => {
+    const realm = realmQuery.data?.result
     if (!wallet || !realmInfo!.programId || !realm) return
 
     const governanceAuthority = wallet.publicKey!
@@ -273,19 +265,14 @@ const REALM = () => {
       const transactions: Transaction[] = []
       for (let i = 0; i < selectedProposals.length; i++) {
         const selectedProposal = selectedProposals[i]
-        const ownTokenRecord =
+        const relevantTokenRecord =
           selectedProposal.proposal.governingTokenMint.toBase58() ===
           realm.account.communityMint.toBase58()
-            ? tokenRecords[
-                selectedCommunityDelegate
-                  ? selectedCommunityDelegate
-                  : wallet.publicKey!.toBase58()
-              ]
-            : councilTokenOwnerRecords[
-                selectedCouncilDelegate
-                  ? selectedCouncilDelegate
-                  : wallet.publicKey!.toBase58()
-              ]
+            ? ownTokenRecord
+            : ownCouncilTokenRecord
+
+        if (relevantTokenRecord === undefined)
+          throw new Error('token owner record not found or not yet loaded')
 
         const instructions: TransactionInstruction[] = []
 
@@ -297,7 +284,7 @@ const REALM = () => {
             pubkey: selectedProposal.proposalPk,
             owner: realm.pubkey,
           },
-          ownTokenRecord
+          relevantTokenRecord
         )
         if (client.client instanceof NftVoterClient === false) {
           await withCastVote(
@@ -308,7 +295,7 @@ const REALM = () => {
             selectedProposal.proposal.governance,
             selectedProposal.proposalPk,
             selectedProposal.proposal.tokenOwnerRecord,
-            ownTokenRecord.pubkey,
+            relevantTokenRecord.pubkey,
             governanceAuthority,
             selectedProposal.proposal.governingTokenMint,
             Vote.fromYesNoVote(vote),
@@ -333,7 +320,9 @@ const REALM = () => {
           sendSignedTransaction({ signedTransaction: transaction, connection })
         )
       )
-      await refetchProposals()
+      queryClient.invalidateQueries({
+        queryKey: proposalQueryKeys.all(connection.rpcEndpoint),
+      })
       toggleMultiVoteMode()
       notify({
         message: 'Successfully voted on all proposals',
@@ -344,6 +333,12 @@ const REALM = () => {
     }
     setIsMultiVoting(false)
   }
+
+  /** side effect: whenever filter changes, paginate to zero  */
+  useEffect(() => {
+    setPaginatedProposals(paginateProposals(0))
+    pagination?.current?.setPage(0)
+  }, [paginateProposals, filteredProposals])
 
   //Todo: move to own components with refactor to dao folder structure
   const isPyth = realmInfo?.realmId.toBase58() === PYTH_REALM_ID.toBase58()
@@ -399,12 +394,23 @@ const REALM = () => {
         </div>
       </div>
       <div className="grid grid-cols-12 gap-4">
-        {realm ? (
+        {realmQuery.isLoading ? (
+          <>
+            <div className={`col-span-12 md:col-span-7 lg:col-span-8`}>
+              <div className="animate-pulse bg-bkg-3 h-full rounded-lg w-full" />
+            </div>
+            <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
+              <div className="animate-pulse bg-bkg-3 h-64 rounded-lg w-full" />
+              <div className="animate-pulse bg-bkg-3 h-64 rounded-lg w-full" />
+              <div className="animate-pulse bg-bkg-3 h-64 rounded-lg w-full" />
+            </div>
+          </>
+        ) : realmQuery.data?.result !== undefined ? (
           <>
             <div
               className={`bg-bkg-2 col-span-12 md:col-span-7 md:order-first lg:col-span-8 order-last rounded-lg`}
             >
-              {realm && <RealmHeader />}
+              <RealmHeader />
               <div className="p-4 md:p-6 ">
                 <div>
                   {realmInfo?.bannerImage ? (
@@ -528,16 +534,7 @@ const REALM = () => {
             </div>
           </>
         ) : (
-          <>
-            <div className={`col-span-12 md:col-span-7 lg:col-span-8`}>
-              <div className="animate-pulse bg-bkg-3 h-full rounded-lg w-full" />
-            </div>
-            <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
-              <div className="animate-pulse bg-bkg-3 h-64 rounded-lg w-full" />
-              <div className="animate-pulse bg-bkg-3 h-64 rounded-lg w-full" />
-              <div className="animate-pulse bg-bkg-3 h-64 rounded-lg w-full" />
-            </div>
-          </>
+          <>Realm not found</>
         )}
       </div>
     </>

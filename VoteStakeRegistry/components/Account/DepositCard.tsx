@@ -3,7 +3,6 @@ import useRealm from '@hooks/useRealm'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { RpcContext } from '@solana/spl-governance'
 import { fmtMintAmount, getMintDecimalAmount } from '@tools/sdk/units'
-import useWalletStore from 'stores/useWalletStore'
 import { voteRegistryWithdraw } from 'VoteStakeRegistry/actions/voteRegistryWithdraw'
 import {
   DepositWithMintAccount,
@@ -27,6 +26,11 @@ import {
 import { BN } from '@coral-xyz/anchor'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useConnection } from '@solana/wallet-adapter-react'
+import queryClient from '@hooks/queries/queryClient'
+import { tokenAccountQueryKeys } from '@hooks/queries/tokenAccount'
 
 const DepositCard = ({
   deposit,
@@ -36,18 +40,16 @@ const DepositCard = ({
   vsrClient?: VsrClient | undefined
 }) => {
   const { getOwnedDeposits } = useDepositStore()
-  const { realm, realmInfo, tokenRecords, ownTokenRecord } = useRealm()
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const realm = useRealmQuery().data?.result
+
+  const { realmInfo } = useRealm()
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const actualClient = vsrClient || client
   const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection.current)
-  const endpoint = useWalletStore((s) => s.connection.endpoint)
+  const { connection } = useConnection()
+  const endpoint = connection.rpcEndpoint
   const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false)
-  const {
-    fetchRealm,
-    fetchWalletTokenAccounts,
-    fetchOwnVoteRecords,
-  } = useWalletStore((s) => s.actions)
   const handleWithDrawFromDeposit = async (
     depositEntry: DepositWithMintAccount
   ) => {
@@ -77,8 +79,7 @@ const DepositCard = ({
       amount: depositEntry.available,
       communityMintPk: realm!.account.communityMint,
       closeDepositAfterOperation: depositEntry.currentlyLocked.isZero(),
-      tokenOwnerRecordPubKey:
-        tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey,
+      tokenOwnerRecordPubKey: ownTokenRecord?.pubkey,
       depositIndex: depositEntry.index,
       client: actualClient,
       splProgramId: realm!.owner!,
@@ -91,9 +92,10 @@ const DepositCard = ({
       client: actualClient!,
       connection,
     })
-    await fetchWalletTokenAccounts()
-    await fetchOwnVoteRecords()
-    await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+    queryClient.invalidateQueries(
+      tokenAccountQueryKeys.byOwner(connection.rpcEndpoint, wallet!.publicKey!)
+    )
+    queryClient.invalidateQueries(['VoteRecord'])
   }
   const handleStartUnlock = () => {
     setIsUnlockModalOpen(true)

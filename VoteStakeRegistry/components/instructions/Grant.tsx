@@ -16,7 +16,6 @@ import {
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { precision } from '@utils/formatting'
 import { tryParseKey } from '@tools/validators/pubkey'
-import useWalletStore from 'stores/useWalletStore'
 import { TokenProgramAccount, tryGetTokenAccount } from '@utils/tokens'
 import { GrantForm, UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { getAccountName } from '@components/instructions/tools'
@@ -25,6 +24,8 @@ import { getTokenTransferSchema } from '@utils/validations'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import {
   Governance,
+  getTokenOwnerRecord,
+  getTokenOwnerRecordAddress,
   serializeInstructionToBase64,
   withCreateTokenOwnerRecord,
 } from '@solana/spl-governance'
@@ -44,6 +45,11 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import dayjs from 'dayjs'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import queryClient from '@hooks/queries/queryClient'
+import asFindable from '@utils/queries/asFindable'
+import { tokenOwnerRecordQueryKeys } from '@hooks/queries/tokenOwnerRecord'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const Grant = ({
   index,
@@ -54,9 +60,11 @@ const Grant = ({
 }) => {
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const dateNow = dayjs().unix()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
-  const { realm, tokenRecords, realmInfo } = useRealm()
+  const realm = useRealmQuery().data?.result
+
+  const { realmInfo } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [startDate, setStartDate] = useState(dayjs().format('DD-MM-YYYY'))
@@ -134,6 +142,8 @@ const Grant = ({
     })
   }
   const getInstruction = useCallback(async () => {
+    if (!realm) throw new Error()
+
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     let serializedInstruction = ''
     const prerequisiteInstructions: TransactionInstruction[] = []
@@ -150,7 +160,26 @@ const Grant = ({
         form.amount!,
         form.governedTokenAccount.extensions.mint.account.decimals
       )
-      const currentTokenOwnerRecord = tokenRecords[form.destinationAccount]
+      //const currentTokenOwnerRecord = tokenRecords[form.destinationAccount]
+
+      const destinationTokenOwnerRecordPk = await getTokenOwnerRecordAddress(
+        realm.owner,
+        realm.pubkey,
+        realm.account.communityMint,
+        destinationAccount
+      )
+      const currentTokenOwnerRecord = queryClient.fetchQuery({
+        queryKey: tokenOwnerRecordQueryKeys.byPubkey(
+          connection.cluster,
+          destinationTokenOwnerRecordPk
+        ),
+        queryFn: () =>
+          asFindable(getTokenOwnerRecord)(
+            connection.current,
+            destinationTokenOwnerRecordPk
+          ),
+      })
+
       if (!currentTokenOwnerRecord) {
         await withCreateTokenOwnerRecord(
           prerequisiteInstructions,
@@ -190,11 +219,11 @@ const Grant = ({
     return obj
   }, [
     client,
+    connection,
     form,
     realm,
     realmInfo?.programVersion,
     schema,
-    tokenRecords,
     wallet,
   ])
 

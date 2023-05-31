@@ -2,10 +2,10 @@ import { EndpointTypes } from '@models/types'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
 import asFindable from '@utils/queries/asFindable'
-import useWalletStore from 'stores/useWalletStore'
 import { Metaplex } from '@metaplex-foundation/js'
 import { getNetworkFromEndpoint } from '@utils/connection'
 import queryClient from './queryClient'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export const nftQueryKeys = {
   all: (cluster: EndpointTypes) => [cluster, 'NFT'],
@@ -16,8 +16,8 @@ export const nftQueryKeys = {
   ],
 }
 
-export const useNFTbyMintQuery = (pubkey?: PublicKey) => {
-  const connection = useWalletStore((s) => s.connection)
+export const useNFTbyMintQuery = (pubkey: PublicKey | undefined) => {
+  const connection = useLegacyConnectionContext()
 
   const enabled = pubkey !== undefined
   const query = useQuery({

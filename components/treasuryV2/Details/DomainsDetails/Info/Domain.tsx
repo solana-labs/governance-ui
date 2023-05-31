@@ -13,6 +13,8 @@ import useQueryContext from '@hooks/useQueryContext'
 
 import { Domain as DomainModel } from '@models/treasury/Domain'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmGovernancesQuery } from '@hooks/queries/governance'
 
 interface Props {
   domain: DomainModel
@@ -22,20 +24,18 @@ const Domain: React.FC<Props> = (props) => {
   const { fmtUrlWithCluster } = useQueryContext()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
+  const realm = useRealmQuery().data?.result
+  const governanceItems = useRealmGovernancesQuery().data
   const {
     symbol,
-    realm,
-    governances,
     ownVoterWeight,
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
 
-  const governanceItems = Object.values(governances)
-
   const canCreateProposal =
     realm &&
-    governanceItems.some((g) =>
+    governanceItems?.some((g) =>
       ownVoterWeight.canCreateProposal(g.account.config)
     ) &&
     !toManyCommunityOutstandingProposalsForUser &&
@@ -43,9 +43,9 @@ const Domain: React.FC<Props> = (props) => {
 
   const tooltipContent = !connected
     ? 'Connect your wallet to create new proposal'
-    : governanceItems.length === 0
+    : governanceItems?.length === 0
     ? 'There is no governance configuration to create a new proposal'
-    : !governanceItems.some((g) =>
+    : !governanceItems?.some((g) =>
         ownVoterWeight.canCreateProposal(g.account.config)
       )
     ? "You don't have enough governance power to create a new proposal"

@@ -16,7 +16,6 @@ import dynamic from 'next/dynamic'
 import { useEffect, useRef, useState } from 'react'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import useWalletStore from 'stores/useWalletStore'
 import {
   DAYS_PER_MONTH,
   getMinDurationFmt,
@@ -42,6 +41,11 @@ import {
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { abbreviateAddress } from '@utils/formatting'
 import { getDepositType } from 'VoteStakeRegistry/tools/deposits'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useRouter } from 'next/router'
+import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { useRealmProposalsQuery } from '@hooks/queries/proposal'
 
 const VestingVsTime = dynamic(
   () => import('VoteStakeRegistry/components/LockTokenStats/VestingVsTime'),
@@ -57,7 +61,11 @@ const mainMangoVaultPk = 'Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z'
 const LockTokenStats = () => {
   const walletsPerPage = 10
   const pagination = useRef<{ setPage: (val) => void }>(null)
-  const { realmInfo, realm, symbol, mint, proposals } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const { symbol } = useRouter().query
+  const { data: proposals } = useRealmProposalsQuery()
+  const { realmInfo } = useRealm()
   const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
   const voteStakeRegistryRegistrarPk = useVotePluginsClientStore(
     (s) => s.state.voteStakeRegistryRegistrarPk
@@ -65,7 +73,7 @@ const LockTokenStats = () => {
   const voteStakeRegistryRegistrar = useVotePluginsClientStore(
     (s) => s.state.voteStakeRegistryRegistrar
   )
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const governedTokenAccounts = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
   )
@@ -98,7 +106,7 @@ const LockTokenStats = () => {
     (acc, curr) => acc.add(curr.amount!),
     new BN(0)
   )
-  const possibleGrantProposals = Object.values(proposals).filter(
+  const possibleGrantProposals = proposals?.filter(
     (x) =>
       x.account.governance.toBase58() === MANGO_DAO_TREASURY &&
       x.account.accountType === GovernanceAccountType.ProposalV2
@@ -247,7 +255,7 @@ const LockTokenStats = () => {
   useEffect(() => {
     const getProposalsInstructions = async () => {
       const accounts = await getProposalsTransactions(
-        possibleGrantProposals.map((x) => x.pubkey),
+        possibleGrantProposals?.map((x) => x.pubkey) ?? [],
         connection,
         realmInfo!.programId
       )
@@ -283,7 +291,7 @@ const LockTokenStats = () => {
       getProposalsInstructions()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [possibleGrantProposals.length, realmInfo?.programId])
+  }, [possibleGrantProposals, realmInfo?.programId])
   useEffect(() => {
     const depositsWithWalletsInner: DepositWithWallet[] = []
     for (const voter of voters) {

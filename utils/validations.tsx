@@ -20,20 +20,20 @@ import {
 import { Connection } from '@solana/web3.js'
 import { BN } from '@coral-xyz/anchor'
 import {
-  nftPluginsPks,
-  vsrPluginsPks,
-  heliumVsrPluginsPks,
-  gatewayPluginsPks,
-} from '@hooks/useVotingPlugins'
+  NFT_PLUGINS_PKS,
+  VSR_PLUGIN_PKS,
+  HELIUM_VSR_PLUGINS_PKS,
+  GATEWAY_PLUGINS_PKS,
+} from '@constants/plugins'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { validatePubkey } from './formValidation'
 
 // Plugins supported by Realms
 const supportedPlugins = [
-  ...nftPluginsPks,
-  ...vsrPluginsPks,
-  ...heliumVsrPluginsPks,
-  ...gatewayPluginsPks,
+  ...NFT_PLUGINS_PKS,
+  ...VSR_PLUGIN_PKS,
+  ...HELIUM_VSR_PLUGINS_PKS,
+  ...GATEWAY_PLUGINS_PKS,
 ]
 
 const getValidateAccount = async (
@@ -1008,7 +1008,9 @@ export const getRealmCfgSchema = ({
                 try {
                   getValidatedPublickKey(val)
                   if (
-                    [...nftPluginsPks, ...heliumVsrPluginsPks].includes(val)
+                    [...NFT_PLUGINS_PKS, ...HELIUM_VSR_PLUGINS_PKS].includes(
+                      val
+                    )
                   ) {
                     return true
                   } else {
@@ -1073,7 +1075,7 @@ export const getRealmCfgSchema = ({
               if (val) {
                 try {
                   getValidatedPublickKey(val)
-                  if ([...nftPluginsPks].includes(val)) {
+                  if ([...NFT_PLUGINS_PKS].includes(val)) {
                     return true
                   } else {
                     return this.createError({
@@ -1147,7 +1149,9 @@ export const getRealmCfgSchema = ({
                 try {
                   getValidatedPublickKey(val)
                   if (
-                    [...nftPluginsPks, ...heliumVsrPluginsPks].includes(val)
+                    [...NFT_PLUGINS_PKS, ...HELIUM_VSR_PLUGINS_PKS].includes(
+                      val
+                    )
                   ) {
                     return true
                   } else {

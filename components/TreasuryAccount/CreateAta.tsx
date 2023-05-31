@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import {
   Keypair,
   PublicKey,
@@ -10,12 +9,13 @@ import Button from '@components/Button'
 import { createATA } from '@utils/ataTools'
 import { tryGetAta } from '@utils/validations'
 import { sendTransaction } from '@utils/send'
-import useRealm from '@hooks/useRealm'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import * as serum from '@project-serum/common'
 import TokenMintInput from '@components/inputs/TokenMintInput'
 import { TokenInfoWithoutDecimals } from '@utils/services/tokenPrice'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const CreateAta = ({
   owner,
@@ -26,11 +26,11 @@ const CreateAta = ({
   governancePk: PublicKey
   createCallback: () => void
 }) => {
-  const { realm } = useRealm()
+  const realm = useRealmQuery().data?.result
   const refetchGovernanceAccounts = useGovernanceAssetsStore(
     (s) => s.refetchGovernanceAccounts
   )
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const [isLoading, setIsLoading] = useState(false)
   const [validatedTypedMint, setValidatedTypedMint] = useState<
@@ -40,6 +40,7 @@ const CreateAta = ({
     TokenInfoWithoutDecimals | undefined
   >()
   const handleCreate = async () => {
+    if (!realm) throw new Error()
     const mintPk = validatedTypedMint
       ? new PublicKey(validatedTypedMint)
       : new PublicKey(foundByNameToken!.address)
@@ -57,7 +58,7 @@ const CreateAta = ({
         wallet,
         mintPk,
         owner,
-        wallet!.publicKey!
+        wallet.publicKey!
       )
     } else {
       const instructions: TransactionInstruction[] = []
@@ -82,12 +83,12 @@ const CreateAta = ({
 
       await sendTransaction({
         transaction,
-        wallet: wallet!,
-        connection: connection.current!,
+        wallet: wallet,
+        connection: connection.current,
         signers,
       })
     }
-    await refetchGovernanceAccounts(connection, realm!, governancePk)
+    await refetchGovernanceAccounts(connection, realm, governancePk)
     setIsLoading(false)
     createCallback()
   }

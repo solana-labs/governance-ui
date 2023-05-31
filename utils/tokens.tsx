@@ -193,7 +193,6 @@ export async function getNFTsByOwner(owner: PublicKey, isDevnet?: boolean) {
   return nfts.map(enhanceNFT)
 }
 
-/** @deprecated -- use react-query by pubkey */
 export async function getOwnedTokenAccounts(
   connection: Connection,
   publicKey: PublicKey
@@ -300,7 +299,7 @@ export const BPF_UPGRADE_LOADER_ID = new PublicKey(
   'BPFLoaderUpgradeab1e11111111111111111111111'
 )
 
-/** @deprecated -- why not just use the normal accountLayout */
+/** @asktree its very unclear why this must exist, like... why doesn't spl-token do this? */
 export function parseTokenAccountData(
   account: PublicKey,
   data: Buffer

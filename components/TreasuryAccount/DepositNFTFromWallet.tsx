@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import useWalletStore from 'stores/useWalletStore'
 import Button from '@components/Button'
 import Tooltip from '@components/Tooltip'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
@@ -19,10 +18,11 @@ import { createATA } from '@utils/ataTools'
 import { createIx_transferNft } from '@utils/metaplex'
 import { SequenceType, sendTransactionsV3 } from '@utils/sendTransactions'
 import { getNativeTreasuryAddress } from '@solana/spl-governance'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const useMetaplexDeposit = () => {
   const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
 
   return async (address: PublicKey) => {
@@ -65,7 +65,7 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
   const [selectedNfts, setSelectedNfts] = useState<NFTWithMint[]>([])
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const [isLoading, setIsLoading] = useState(false)
   const [sendingSuccess, setSendingSuccess] = useState(false)
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()

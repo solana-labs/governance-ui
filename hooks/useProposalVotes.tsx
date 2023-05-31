@@ -4,14 +4,22 @@ import { getProposalMaxVoteWeight } from '../models/voteWeights'
 import { calculatePct, fmtTokenAmount } from '../utils/formatting'
 import { useMaxVoteRecord } from './useMaxVoteRecord'
 import useProgramVersion from './useProgramVersion'
-import useRealm from './useRealm'
+import { useRealmQuery } from './queries/realm'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from './queries/mintInfo'
+import { useGovernanceByPubkeyQuery } from './queries/governance'
 
 // TODO support council plugins
 export default function useProposalVotes(proposal?: Proposal) {
-  const { realm, mint, councilMint, governances } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
   const maxVoteRecord = useMaxVoteRecord()
-  const governance =
-    proposal && governances[proposal.governance?.toBase58()]?.account
+  const governance = useGovernanceByPubkeyQuery(proposal?.governance).data
+    ?.result?.account
+
   const programVersion = useProgramVersion()
 
   const proposalMint =
@@ -20,7 +28,7 @@ export default function useProposalVotes(proposal?: Proposal) {
       ? mint
       : councilMint
   // TODO: optimize using memo
-  if (!realm || !proposal || !governance || !proposalMint)
+  if (!realm || !proposal || !governance || !proposalMint || !programVersion)
     return {
       _programVersion: undefined,
       voteThresholdPct: undefined,

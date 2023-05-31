@@ -10,7 +10,6 @@ import tokenPriceService from '@utils/services/tokenPrice'
 import React, { useCallback, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import AccountLabel from './BaseAccountHeader'
-import useWalletStore from 'stores/useWalletStore'
 import {
   ArrowCircleDownIcon,
   ArrowCircleUpIcon,
@@ -26,8 +25,6 @@ import { getValidatedPublickKey } from '@utils/validations'
 import { validateInstruction } from '@utils/instructionTools'
 import {
   getInstructionDataFromBase64,
-  Governance,
-  ProgramAccount,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
 import { notify } from '@utils/notifications'
@@ -53,6 +50,7 @@ import {
 } from '@utils/instructions/PsyFinance/PoseidonIdl'
 import { deriveAllBoundedStrategyKeysV2 } from '@utils/instructions/PsyFinance/poseidon'
 import { TokenInfo } from '@utils/services/types'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export type TradeProps = { tokenAccount: AssetAccount }
 
@@ -171,9 +169,8 @@ const poseidonProgramId = new web3.PublicKey(
 const Trade: React.FC<TradeProps> = ({ tokenAccount }) => {
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const router = useRouter()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const { wallet, anchorProvider } = useWalletDeprecated()
-  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const { handleCreateProposal } = useCreateProposal()
   const { canUseTransferInstruction } = useGovernanceAssets()
   const { canChooseWhoVote, symbol } = useRealm()
@@ -325,15 +322,10 @@ const Trade: React.FC<TradeProps> = ({ tokenAccount }) => {
       proposalInstructions.push(instructionData)
 
       try {
-        // Fetch governance to get up to date proposalCount
-        const selectedGovernance = (await fetchRealmGovernance(
-          currentAccount?.governance?.pubkey
-        )) as ProgramAccount<Governance>
-
         const proposalAddress = await handleCreateProposal({
           title: form.title,
           description: form.description,
-          governance: selectedGovernance,
+          governance: currentAccount.governance,
           instructionsData: proposalInstructions,
           voteByCouncil,
           isDraft: false,

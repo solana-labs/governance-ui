@@ -1,8 +1,8 @@
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { EndpointTypes } from '@models/types'
 import { getGovernanceProgramVersion } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
-import useWalletStore from 'stores/useWalletStore'
 
 export const programVersionQueryKeys = {
   byProgramId: (cluster: EndpointTypes, programId: PublicKey) => [
@@ -12,10 +12,11 @@ export const programVersionQueryKeys = {
   ],
 }
 
-export function useProgramVersionByIdQuery(realmsProgramId?: PublicKey) {
+export function useProgramVersionByIdQuery(
+  realmsProgramId: PublicKey | undefined
+) {
   // @asktree is unsure why we use this instead of `useConnection` (which has no corresponding provider in the BaseApp)
-  const { connection } = useWalletStore()
-
+  const connection = useLegacyConnectionContext()
   const query = useQuery({
     queryKey:
       realmsProgramId &&

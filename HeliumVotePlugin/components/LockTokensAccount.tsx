@@ -13,7 +13,6 @@ import {
   getMintDecimalAmountFromNatural,
   getMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
-import useWalletStore from 'stores/useWalletStore'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
 import { GoverningTokenRole } from '@solana/spl-governance'
@@ -35,37 +34,44 @@ import { PublicKey } from '@solana/web3.js'
 import { notify } from '@utils/notifications'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useSubDaos } from 'HeliumVotePlugin/hooks/useSubDaos'
-import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
+import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
+import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export const LockTokensAccount: React.FC<{
-  tokenOwnerRecordPk: string | string[] | undefined
+  // tokenOwnerRecordPk: string | string[] | undefined // @asktree: this was unused
   children: React.ReactNode
 }> = (props) => {
   const { error, createPosition } = useCreatePosition()
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const { data: tokenOwnerRecordPk } = useAddressQuery_CommunityTokenOwner()
-  const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
-    (s) => s.actions
-  )
+
   const connected = !!wallet?.connected
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const realm = useRealmQuery().data?.result
+  const config = useRealmConfigQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { realmTokenAccount, realmInfo } = useRealm()
 
-  const {
-    mint,
-    realm,
-    realmTokenAccount,
-    realmInfo,
-    tokenRecords,
-    ownTokenRecord,
-    councilMint,
-    config,
-  } = useRealm()
-
-  const tokenOwnerRecordWalletPk = Object.keys(tokenRecords)?.find(
-    (key) =>
-      tokenRecords[key]?.pubkey?.toBase58() === tokenOwnerRecordPk?.toBase58()
+  const selectedCommunityDelegator = useSelectedDelegatorStore(
+    (s) => s.communityDelegator
   )
+  // if we have a community token delegator selected (this is rare), use that. otherwise use user wallet.
+  const tokenOwnerRecordWalletPk =
+    selectedCommunityDelegator !== undefined
+      ? selectedCommunityDelegator
+      : // I wanted to eliminate `null` as a possible type
+        wallet?.publicKey ?? undefined
 
   const [
     currentClient,
@@ -145,7 +151,7 @@ export const LockTokensAccount: React.FC<{
         message: 'Unable to fetch positions',
       })
     }
-  }, [props.tokenOwnerRecordPk, tokenOwnerRecordWalletPk, vsrClient])
+  }, [tokenOwnerRecordWalletPk, vsrClient])
 
   const hasTokensInWallet =
     realmTokenAccount && realmTokenAccount.account.amount.gt(new BN(0))
@@ -212,13 +218,10 @@ export const LockTokensAccount: React.FC<{
       amount: amountToLock,
       lockupPeriodsInDays: lockupPeriodInDays,
       lockupKind: lockupKind.value,
-      tokenOwnerRecordPk:
-        tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey || null,
+      tokenOwnerRecordPk: tokenOwnerRecordPk ?? null, //@asktree: using `null` in 2023 huh.. discusting...
     })
 
     if (!error) {
-      fetchWalletTokenAccounts()
-      fetchRealm(realmInfo!.programId, realmInfo!.realmId)
       await getPositions({
         votingClient: currentClient,
         realmPk: realm!.pubkey,
@@ -340,10 +343,7 @@ export const LockTokensAccount: React.FC<{
                     key={idx}
                     position={pos}
                     subDaos={subDaos}
-                    tokenOwnerRecordPk={
-                      tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey ||
-                      null
-                    }
+                    tokenOwnerRecordPk={tokenOwnerRecordPk ?? null}
                     isOwner={isSameWallet}
                   />
                 ))}

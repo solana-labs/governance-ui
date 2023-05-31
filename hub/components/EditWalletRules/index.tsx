@@ -11,6 +11,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 import { getAccountName } from '@components/instructions/tools';
+import { useRealmQuery } from '@hooks/queries/realm';
 import useCreateProposal from '@hooks/useCreateProposal';
 import useQueryContext from '@hooks/useQueryContext';
 import useRealm from '@hooks/useRealm';
@@ -62,7 +63,8 @@ export function EditWalletRules(props: Props) {
   const { fmtUrlWithCluster } = useQueryContext();
   const wallet = useWalletOnePointOh();
   const { propose } = useCreateProposal();
-  const { symbol, realm } = useRealm();
+  const realm = useRealmQuery().data?.result;
+  const { symbol } = useRealm();
 
   const [result] = useQuery(gql.getGovernanceRulesResp, {
     query: gql.getGovernanceRules,

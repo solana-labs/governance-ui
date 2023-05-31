@@ -14,7 +14,6 @@ import useSerumGovStore, {
 } from 'stores/useSerumGovStore'
 import { notify } from '@utils/notifications'
 import useWalletDeprecated from '@hooks/useWalletDeprecated'
-import useWalletStore from 'stores/useWalletStore'
 import { useRouter } from 'next/router'
 import useRealm from '@hooks/useRealm'
 import useQueryContext from '@hooks/useQueryContext'
@@ -31,6 +30,7 @@ import { dryRunInstruction } from 'actions/dryRunInstruction'
 import Link from 'next/link'
 import { getExplorerUrl } from '@components/explorer/tools'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 const BurnLockedAccountSchema = {
   amount: yup.string().required(),
@@ -64,7 +64,7 @@ const LockedAccount: FC<Props> = ({
   const actions = useSerumGovStore((s) => s.actions)
 
   const { anchorProvider, wallet } = useWalletDeprecated()
-  const connection = useWalletStore((s) => s.connection.current)
+  const { connection } = useConnection()
 
   const [isBurning, setIsBurning] = useState(false)
 
