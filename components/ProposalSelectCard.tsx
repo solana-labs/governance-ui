@@ -44,14 +44,12 @@ const ProposalSelectCard = ({
   const votesData = useProposalVotes(proposal)
 
   const checked = !!selectedProposals.find(
-    // @ts-ignore
     (p) => p.proposalPk.toString() === proposalPk.toString()
   )
 
   const toggleCheckbox = () => {
     if (checked) {
       const proposals = selectedProposals.filter(
-        // @ts-ignore
         (p) => p.proposalPk.toString() !== proposalPk.toString()
       )
       setSelectedProposals(proposals)
@@ -62,64 +60,62 @@ const ProposalSelectCard = ({
 
   const myVoteExists = ownVoteRecord?.result !== undefined
 
-  return (
-    !myVoteExists && (
-      <button
-        className={`border ${
-          checked ? 'border-primary-light' : 'border-fgd-4'
-        } default-transition rounded-lg text-left w-full hover:bg-bkg-3`}
-        onClick={() => toggleCheckbox()}
-      >
-        <div className="p-4">
-          <div className="flex items-start justify-between">
-            <h3 className="text-fgd-1">{proposal.name}</h3>
-            <div className="flex items-center pl-4 pt-1">
-              <ProposalStateBadge proposal={proposal} />
-              <div
-                className={`bg-bkg-1 border ${
-                  checked ? 'border-primary-light' : 'border-fgd-4'
-                } flex items-center justify-center ml-3 h-6 rounded-md w-6`}
-              >
-                {checked ? (
-                  <CheckIcon className="h-5 text-primary-light w-5" />
-                ) : null}
-              </div>
+  return myVoteExists ? undefined : (
+    <button
+      className={`border ${
+        checked ? 'border-primary-light' : 'border-fgd-4'
+      } default-transition rounded-lg text-left w-full hover:bg-bkg-3`}
+      onClick={() => toggleCheckbox()}
+    >
+      <div className="p-4">
+        <div className="flex items-start justify-between">
+          <h3 className="text-fgd-1">{proposal.name}</h3>
+          <div className="flex items-center pl-4 pt-1">
+            <ProposalStateBadge proposal={proposal} />
+            <div
+              className={`bg-bkg-1 border ${
+                checked ? 'border-primary-light' : 'border-fgd-4'
+              } flex items-center justify-center ml-3 h-6 rounded-md w-6`}
+            >
+              {checked ? (
+                <CheckIcon className="h-5 text-primary-light w-5" />
+              ) : null}
             </div>
           </div>
-          <ProposalTimeStatus proposal={proposal} />
         </div>
-        {proposal.state === ProposalState.Voting && (
-          <div className="border-t border-fgd-4 flex flex-col lg:flex-row mt-2 p-4 gap-x-4 gap-y-3">
-            <div className="w-full lg:w-auto flex-1">
-              <VoteResults isListView proposal={proposal} />
-            </div>
-            <div className="border-r border-fgd-4 hidden lg:block" />
-            <div className="w-full lg:w-auto flex-1">
-              <ApprovalProgress
-                progress={votesData.yesVoteProgress}
-                votesRequired={votesData.yesVotesRequired}
-              />
-            </div>
-            {votesData._programVersion !== undefined &&
-            // @asktree: here is some typescript gore because typescript doesn't know that a number being > 3 means it isn't 1 or 2
-            votesData._programVersion !== 1 &&
-            votesData._programVersion !== 2 &&
-            votesData.veto !== undefined &&
-            (votesData.veto.voteProgress ?? 0) > 0 ? (
-              <>
-                <div className="border-r border-fgd-4 hidden lg:block" />
-                <div className="w-full lg:w-auto flex-1">
-                  <VetoProgress
-                    progress={votesData.veto.voteProgress}
-                    votesRequired={votesData.veto.votesRequired}
-                  />
-                </div>
-              </>
-            ) : undefined}
+        <ProposalTimeStatus proposal={proposal} />
+      </div>
+      {proposal.state === ProposalState.Voting && (
+        <div className="border-t border-fgd-4 flex flex-col lg:flex-row mt-2 p-4 gap-x-4 gap-y-3">
+          <div className="w-full lg:w-auto flex-1">
+            <VoteResults isListView proposal={proposal} />
           </div>
-        )}
-      </button>
-    )
+          <div className="border-r border-fgd-4 hidden lg:block" />
+          <div className="w-full lg:w-auto flex-1">
+            <ApprovalProgress
+              progress={votesData.yesVoteProgress}
+              votesRequired={votesData.yesVotesRequired}
+            />
+          </div>
+          {votesData._programVersion !== undefined &&
+          // @asktree: here is some typescript gore because typescript doesn't know that a number being > 3 means it isn't 1 or 2
+          votesData._programVersion !== 1 &&
+          votesData._programVersion !== 2 &&
+          votesData.veto !== undefined &&
+          (votesData.veto.voteProgress ?? 0) > 0 ? (
+            <>
+              <div className="border-r border-fgd-4 hidden lg:block" />
+              <div className="w-full lg:w-auto flex-1">
+                <VetoProgress
+                  progress={votesData.veto.voteProgress}
+                  votesRequired={votesData.veto.votesRequired}
+                />
+              </div>
+            </>
+          ) : undefined}
+        </div>
+      )}
+    </button>
   )
 }
 
