@@ -60,7 +60,7 @@ const ProposalSelectCard = ({
 
   const myVoteExists = ownVoteRecord?.result !== undefined
 
-  return myVoteExists ? undefined : (
+  return myVoteExists ? null : (
     <button
       className={`border ${
         checked ? 'border-primary-light' : 'border-fgd-4'
