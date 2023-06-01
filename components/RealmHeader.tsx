@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import useRealm from 'hooks/useRealm'
 import { ChartPieIcon, CogIcon, UsersIcon } from '@heroicons/react/outline'
 import { ChevronLeftIcon } from '@heroicons/react/solid'
@@ -16,14 +16,19 @@ const RealmHeader = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
+  const { REALM } = process.env
 
   const { realmInfo, symbol, vsrMode } = useRealm()
-  const { REALM } = process.env
   const activeMembers = useMembersStore((s) => s.compact.activeMembers)
-  const isBackNavVisible = realmInfo?.symbol !== REALM // hide backnav for the default realm
 
   const explorerHost = getRealmExplorerHost(realmInfo)
   const realmUrl = `https://${explorerHost}/#/realm/${realmInfo?.realmId.toBase58()}?programId=${realmInfo?.programId.toBase58()}`
+
+  const [isBackNavVisible, setIsBackNavVisible] = useState(true)
+
+  useEffect(() => {
+    setIsBackNavVisible(realmInfo?.symbol !== REALM)
+  }, [realmInfo?.symbol, REALM])
 
   return (
     <div className="px-4 pt-4 pb-4 rounded-t-lg bg-bkg-2 md:px-6 md:pt-6">

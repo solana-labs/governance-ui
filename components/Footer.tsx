@@ -3,11 +3,19 @@ import cx from 'classnames'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 
 import SocialIcons from '@components/SocialIcons'
+import { useEffect, useState } from 'react'
 
 const Footer = () => {
   const { REALM } = process.env
+  const [usingRealmFromProcessEnv, setUsingRealmFromProcessEnv] = useState(
+    false
+  )
 
-  if (REALM) {
+  useEffect(() => {
+    setUsingRealmFromProcessEnv(!!REALM)
+  }, [REALM])
+
+  if (usingRealmFromProcessEnv) {
     return null
   }
 
