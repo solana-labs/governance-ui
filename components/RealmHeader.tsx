@@ -24,7 +24,7 @@ const RealmHeader = () => {
   const explorerHost = getRealmExplorerHost(realmInfo)
   const realmUrl = `https://${explorerHost}/#/realm/${realmInfo?.realmId.toBase58()}?programId=${realmInfo?.programId.toBase58()}`
 
-  const [isBackNavVisible, setIsBackNavVisible] = useState(false)
+  const [isBackNavVisible, setIsBackNavVisible] = useState(true)
 
   useEffect(() => {
     setIsBackNavVisible(realmInfo?.symbol !== REALM)
