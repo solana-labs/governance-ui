@@ -62,7 +62,7 @@ const Select = ({
                 >
                   {componentLabel
                     ? componentLabel
-                    : React.isValidElement(value) || typeof value === 'string'
+                    : typeof value === 'string'
                     ? value
                     : placeholder}
                   <ChevronDownIcon
