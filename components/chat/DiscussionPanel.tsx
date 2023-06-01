@@ -1,17 +1,18 @@
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import DiscussionForm from './DiscussionForm'
 import Comment from './Comment'
 import { useQuery } from '@tanstack/react-query'
-import { PublicKey } from '@solana/web3.js'
 import {
   GOVERNANCE_CHAT_PROGRAM_ID,
   getGovernanceChatMessages,
 } from '@solana/spl-governance'
 import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { useSelectedProposalPk } from '@hooks/queries/proposal'
 
-export const useChatMessagesByProposalQuery = (proposalPk?: PublicKey) => {
+export const useChatMessagesQuery = () => {
   const connection = useLegacyConnectionContext()
+  const proposalPk = useSelectedProposalPk()
 
   const enabled = proposalPk !== undefined
   const query = useQuery({
@@ -33,8 +34,10 @@ export const useChatMessagesByProposalQuery = (proposalPk?: PublicKey) => {
 }
 
 const DiscussionPanel = () => {
-  const { data: chatMessages } = useChatMessagesByProposalQuery()
+  const { data: chatMessages } = useChatMessagesQuery()
   const { data: voteRecord } = useProposalVoteRecordQuery('electoral')
+
+  console.log('borp', chatMessages)
 
   const sortedMessages = useMemo(
     () =>
