@@ -2,6 +2,7 @@ import { Listbox } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/solid'
 import { StyledLabel, inputClasses } from './styles'
 import ErrorField from './ErrorField'
+import React from 'react'
 
 const Select = ({
   value,
@@ -61,7 +62,7 @@ const Select = ({
                 >
                   {componentLabel
                     ? componentLabel
-                    : value
+                    : React.isValidElement('value') || typeof value === 'string'
                     ? value
                     : placeholder}
                   <ChevronDownIcon
