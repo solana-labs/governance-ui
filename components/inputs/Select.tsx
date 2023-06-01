@@ -4,6 +4,10 @@ import { StyledLabel, inputClasses } from './styles'
 import ErrorField from './ErrorField'
 import React from 'react'
 
+/**
+ * @deprecated
+ * doesn't really have a replacement but needs one
+ */
 const Select = ({
   value,
   onChange,
@@ -29,7 +33,7 @@ const Select = ({
   disabled?: boolean | undefined
   label?: string | undefined
   subtitle?: string | undefined
-  componentLabel?: any | undefined
+  componentLabel?: React.ReactNode
   useDefaultStyle?: boolean
   noMaxWidth?: boolean
   wrapperClassNames?: string
