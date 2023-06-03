@@ -13,7 +13,7 @@ import { PublicKey } from '@solana/web3.js'
 import { getMintDecimalAmount } from '@tools/sdk/units'
 import dayjs from 'dayjs'
 import dynamic from 'next/dynamic'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import {
@@ -106,10 +106,14 @@ const LockTokenStats = () => {
     (acc, curr) => acc.add(curr.amount!),
     new BN(0)
   )
-  const possibleGrantProposals = proposals?.filter(
-    (x) =>
-      x.account.governance.toBase58() === MANGO_DAO_TREASURY &&
-      x.account.accountType === GovernanceAccountType.ProposalV2
+  const possibleGrantProposals = useMemo(
+    () =>
+      proposals?.filter(
+        (x) =>
+          x.account.governance.toBase58() === MANGO_DAO_TREASURY &&
+          x.account.accountType === GovernanceAccountType.ProposalV2
+      ),
+    [proposals]
   )
   const currentMonthName = statsMonths.length ? statsMonths[0] : ''
   const vestingThisMonth =
@@ -292,6 +296,7 @@ const LockTokenStats = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [possibleGrantProposals, realmInfo?.programId])
+
   useEffect(() => {
     const depositsWithWalletsInner: DepositWithWallet[] = []
     for (const voter of voters) {

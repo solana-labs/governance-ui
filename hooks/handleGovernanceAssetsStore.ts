@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import { useRealmQuery } from './queries/realm'
 import { useRealmGovernancesQuery } from './queries/governance'
@@ -10,17 +10,12 @@ export default function useHandleGovernanceAssetsStore() {
   const connection = useLegacyConnectionContext()
 
   const governancesArray = useRealmGovernancesQuery().data
-  const governancesByGovernance = useMemo(
-    () =>
-      governancesArray &&
-      Object.fromEntries(governancesArray.map((x) => [x.pubkey.toString(), x])),
-    [governancesArray]
-  )
+
   const { setGovernancesArray } = useGovernanceAssetsStore()
 
   useEffect(() => {
-    if (realm && governancesByGovernance) {
-      setGovernancesArray(connection, realm, governancesByGovernance)
+    if (realm && governancesArray) {
+      setGovernancesArray(connection, realm, governancesArray)
     }
-  }, [connection, governancesByGovernance, realm, setGovernancesArray])
+  }, [connection, governancesArray, realm, setGovernancesArray])
 }
