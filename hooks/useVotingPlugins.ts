@@ -41,7 +41,7 @@ import {
 } from '../constants/plugins'
 
 export function useVotingPlugins() {
-  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const ownTokenRecordData = useUserCommunityTokenOwnerRecord().data
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
   const currentPluginPk = config?.account.communityTokenConfig.voterWeightAddin
@@ -190,7 +190,8 @@ export function useVotingPlugins() {
             client: vsrClient,
             realm,
             walletPk:
-              ownTokenRecord?.account?.governingTokenOwner || wallet?.publicKey,
+              ownTokenRecordData?.result?.account?.governingTokenOwner ||
+              wallet?.publicKey,
           })
         }
       }
@@ -208,7 +209,8 @@ export function useVotingPlugins() {
             client: heliumVsrClient,
             realm,
             walletPk:
-              ownTokenRecord?.account?.governingTokenOwner || wallet?.publicKey,
+              ownTokenRecordData?.result?.account?.governingTokenOwner ||
+              wallet?.publicKey,
           })
         }
       }
@@ -226,7 +228,8 @@ export function useVotingPlugins() {
             client: nftClient,
             realm,
             walletPk:
-              ownTokenRecord?.account?.governingTokenOwner || wallet?.publicKey,
+              ownTokenRecordData?.result?.account?.governingTokenOwner ||
+              wallet?.publicKey,
           })
         }
       }
@@ -266,7 +269,8 @@ export function useVotingPlugins() {
             client: pythClient,
             realm,
             walletPk:
-              ownTokenRecord?.account?.governingTokenOwner || wallet?.publicKey,
+              ownTokenRecordData?.result?.account.governingTokenOwner ||
+              wallet?.publicKey,
           })
         }
       }
@@ -290,11 +294,12 @@ export function useVotingPlugins() {
       }
     } */
     if (
-      ownTokenRecord?.account !== undefined &&
+      ownTokenRecordData &&
       (!currentClient ||
         currentClient.realm?.pubkey.toBase58() !== realm?.pubkey.toBase58() ||
-        currentClient.walletPk?.toBase58() !==
-          ownTokenRecord.account.governingTokenOwner.toBase58())
+        (ownTokenRecordData.result &&
+          currentClient.walletPk?.toBase58() !==
+            ownTokenRecordData.result?.account.governingTokenOwner.toBase58()))
     ) {
       handleNftplugin()
       handleGatewayPlugin()
@@ -316,7 +321,7 @@ export function useVotingPlugins() {
     handleSetVsrRegistrar,
     heliumVsrClient,
     nftClient,
-    ownTokenRecord?.account,
+    ownTokenRecordData,
     pythClient,
     realm,
     vsrClient,
@@ -546,7 +551,9 @@ export function useVotingPlugins() {
     if (!wallet?.publicKey) return
     try {
       const nfts = await getNfts(wallet.publicKey, connection)
+      console.log('NFTS', nfts)
       const votingNfts = nfts.filter(getIsFromCollection)
+      console.log('votingNFts', votingNfts)
       const nftsWithMeta = votingNfts
       setVotingNfts(nftsWithMeta, currentClient, nftMintRegistrar)
     } catch (e) {
@@ -575,6 +582,12 @@ export function useVotingPlugins() {
       handleGetSwitchboardVoting()
     }
 
+    console.log(
+      'bbb',
+      usedCollectionsPks.length,
+      connected,
+      currentClient.walletPk?.toBase58()
+    )
     if (usedCollectionsPks.length && realm) {
       if (connected && currentClient.walletPk?.toBase58()) {
         handleGetNfts()
