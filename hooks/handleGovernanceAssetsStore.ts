@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import { useRealmQuery } from './queries/realm'
 import { useRealmGovernancesQuery } from './queries/governance'
