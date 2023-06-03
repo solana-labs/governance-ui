@@ -420,13 +420,17 @@ const displayArgs = async (connection: Connection, data: Uint8Array) => {
 }
 
 function commify(n) {
-  const parts = n.toString().split('.')
-  const numberPart = parts[0]
-  const decimalPart = parts[1]
-  const thousands = /\B(?=(\d{3})+(?!\d))/g
-  return (
-    numberPart.replace(thousands, ',') + (decimalPart ? '.' + decimalPart : '')
-  )
+  if (n?.toString) {
+    const parts = n.toString().split('.')
+    const numberPart = parts[0]
+    const decimalPart = parts[1]
+    const thousands = /\B(?=(\d{3})+(?!\d))/g
+    return (
+      numberPart.replace(thousands, ',') +
+      (decimalPart ? '.' + decimalPart : '')
+    )
+  }
+  return n
 }
 
 //need yarn add js-sha256 snakeCase
