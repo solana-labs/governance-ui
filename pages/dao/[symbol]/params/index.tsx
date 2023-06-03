@@ -28,6 +28,7 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
+import { useRealmGovernancesQuery } from '@hooks/queries/governance'
 
 const Params = () => {
   const mint = useRealmCommunityMintInfoQuery().data?.result
@@ -43,12 +44,12 @@ const Params = () => {
     assetAccounts,
     auxiliaryTokenAccounts,
   } = useGovernanceAssets()
-  const governancesArray = useGovernanceAssetsStore((s) => s.governancesArray)
+  const governancesArray = useRealmGovernancesQuery().data
   const mintGovernancesWithMintInfo = assetAccounts.filter((x) => {
     return x.type === AccountType.MINT
   })
 
-  const hasAuthorityGovernances = governancesArray.filter((governance) => {
+  const hasAuthorityGovernances = governancesArray?.filter((governance) => {
     const filteredMintGovernances = mintGovernancesWithMintInfo.filter(
       (mintGovernance) =>
         mintGovernance.governance.pubkey.toString() ===
@@ -64,12 +65,12 @@ const Params = () => {
       governance.pubkey.toString()
     )
   })
-  const showCreateMetadataButton = !!hasAuthorityGovernances.length
+  const showCreateMetadataButton = !!hasAuthorityGovernances?.length
   const loadGovernedAccounts = useGovernanceAssetsStore(
     (s) => s.loadGovernedAccounts
   )
 
-  const realmAuthorityGovernance = governancesArray.find(
+  const realmAuthorityGovernance = governancesArray?.find(
     (x) => x.pubkey.toBase58() === realm?.account.authority?.toBase58()
   )
 
@@ -111,7 +112,7 @@ const Params = () => {
         fmtMintAmount(mint, realmConfig.minCommunityTokensToCreateGovernance)
 
   useEffect(() => {
-    if (governancesArray.length > 0) {
+    if (governancesArray !== undefined && governancesArray.length > 0) {
       setActiveGovernance(governancesArray[0])
     }
   }, [governancesArray])
@@ -272,7 +273,7 @@ const Params = () => {
             </>
           )}
         </div>
-        {!loadGovernedAccounts ? (
+        {!loadGovernedAccounts && governancesArray !== undefined ? (
           <>
             <div className="grid grid-cols-12 gap-4 p-6 mb-6 border rounded-md border-fgd-4 lg:gap-6">
               <div className="col-span-12 lg:hidden">
