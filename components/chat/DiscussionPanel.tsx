@@ -37,8 +37,6 @@ const DiscussionPanel = () => {
   const { data: chatMessages } = useChatMessagesQuery()
   const { data: voteRecord } = useProposalVoteRecordQuery('electoral')
 
-  console.log('borp', chatMessages)
-
   const sortedMessages = useMemo(
     () =>
       chatMessages?.sort(
