@@ -192,7 +192,7 @@ const instructions = () => ({
     ) => {
       const info = await displayArgs(connection, data)
       const args = (await getArgs(connection, data)) as any
-      console.log(args)
+
       const parsedArgs = {
         tokenIndex: args.tokenIndex,
         tokenName: args.name,
@@ -232,7 +232,7 @@ const instructions = () => ({
           args.netBorrowLimitWindowSizeTs
         ),
       }
-      console.log(parsedArgs)
+
       try {
         return (
           <div>
