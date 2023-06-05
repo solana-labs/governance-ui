@@ -11,7 +11,7 @@ import EverlendDeposit from './everlend/EverlendDeposit'
 import EverlendWithdraw from './everlend/EverlendWithdraw'
 import { findAssociatedTokenAccount } from '@everlend/common'
 import { PublicKey } from '@solana/web3.js'
-import useWalletStore from 'stores/useWalletStore'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 enum Tabs {
   DEPOSIT = 'Deposit',
@@ -40,7 +40,7 @@ const EverlendModalContent = ({
   const [depositedAmount, setDepositedAmount] = useState(0)
   const [maxDepositAmount, setMaxDepositAmount] = useState(0)
   const tabs = Object.values(Tabs)
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const isSol = governedTokenAccount.isSol
   const owner = isSol
@@ -86,6 +86,7 @@ const EverlendModalContent = ({
       setMaxDepositAmount(tokenMintATABalance)
     }
     loadMaxAmount()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [proposedInvestment, handledMint])
 
   return (

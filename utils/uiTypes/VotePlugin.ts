@@ -1,7 +1,4 @@
-import {
-  NftVoterClient,
-  GatewayClient,
-} from '@solana/governance-program-library'
+import { GatewayClient } from '@solana/governance-program-library'
 import {
   SwitchboardQueueVoterClient,
   SWITCHBOARD_ADDIN_ID,
@@ -36,6 +33,20 @@ import {
   getNftVoteRecordProgramAddress,
   getUsedNftsForProposal,
 } from 'NftVotePlugin/accounts'
+import { PositionWithMeta } from 'HeliumVotePlugin/sdk/types'
+import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
+import {
+  nftVoteRecordKey,
+  registrarKey,
+  voterWeightRecordKey,
+  maxVoterWeightRecordKey,
+} from '@helium/voter-stake-registry-sdk'
+import { getUnusedPositionsForProposal } from 'HeliumVotePlugin/utils/getUnusedPositionsForProposal'
+import { getUsedPositionsForProposal } from 'HeliumVotePlugin/utils/getUsedPositionsForProposal'
+import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
+import { NftVoterClient } from './NftVoterClient'
+import queryClient from '@hooks/queries/queryClient'
+import asFindable from '@utils/queries/asFindable'
 
 type UpdateVoterWeightRecordTypes =
   | 'castVote'
@@ -57,6 +68,7 @@ export interface NFTWithMeta extends NFTWithMint {
 export enum VotingClientType {
   NoClient,
   VsrClient,
+  HeliumVsrClient,
   NftVoterClient,
   SwitchboardVoterClient,
   PythClient,
@@ -85,6 +97,7 @@ interface ProgramAddresses {
 
 export type Client =
   | VsrClient
+  | HeliumVsrClient
   | NftVoterClient
   | SwitchboardQueueVoterClient
   | PythClient
@@ -96,6 +109,7 @@ export class VotingClient {
   realm: ProgramAccount<Realm> | undefined
   walletPk: PublicKey | null | undefined
   votingNfts: NFTWithMeta[]
+  heliumVsrVotingPositions: PositionWithMeta[]
   gatewayToken: PublicKey
   oracles: PublicKey[]
   instructions: TransactionInstruction[]
@@ -106,12 +120,17 @@ export class VotingClient {
     this.realm = realm
     this.walletPk = walletPk
     this.votingNfts = []
+    this.heliumVsrVotingPositions = []
     this.oracles = []
     this.instructions = []
     this.noClient = true
     this.clientType = VotingClientType.NoClient
     if (this.client instanceof VsrClient) {
       this.clientType = VotingClientType.VsrClient
+      this.noClient = false
+    }
+    if (this.client instanceof HeliumVsrClient) {
+      this.clientType = VotingClientType.HeliumVsrClient
       this.noClient = false
     }
     if (this.client instanceof NftVoterClient) {
@@ -178,11 +197,63 @@ export class VotingClient {
       return { voterWeightPk, maxVoterWeightRecord: undefined }
     }
 
+    if (this.client instanceof HeliumVsrClient) {
+      const remainingAccounts: AccountData[] = []
+      const [registrar] = registrarKey(
+        realm.pubkey,
+        realm.account.communityMint,
+        clientProgramId
+      )
+
+      for (const pos of this.heliumVsrVotingPositions) {
+        const tokenAccount = await getAssociatedTokenAddress(pos.mint, walletPk)
+
+        remainingAccounts.push(
+          new AccountData(tokenAccount),
+          new AccountData(pos.pubkey)
+        )
+      }
+
+      const [voterWeightPk] = voterWeightRecordKey(
+        registrar,
+        walletPk,
+        clientProgramId
+      )
+
+      const [maxVoterWeightPk] = maxVoterWeightRecordKey(
+        realm.pubkey,
+        realm.account.communityMint,
+        clientProgramId
+      )
+
+      instructions.push(
+        await (this.client as HeliumVsrClient).program.methods
+          .updateVoterWeightRecordV0({
+            owner: walletPk,
+            voterWeightAction: {
+              [type]: {},
+            },
+          } as any)
+          .accounts({
+            registrar,
+            voterWeightRecord: voterWeightPk,
+            voterTokenOwnerRecord: tokenOwnerRecord.pubkey,
+          })
+          .remainingAccounts(remainingAccounts.slice(0, 10))
+          .instruction()
+      )
+
+      return {
+        voterWeightPk,
+        maxVoterWeightRecord: maxVoterWeightPk,
+      }
+    }
+
     if (this.client instanceof NftVoterClient) {
       const { registrar } = await getPluginRegistrarPDA(
         realm.pubkey,
         realm.account.communityMint,
-        this.client!.program.programId
+        clientProgramId
       )
       const {
         voterWeightPk,
@@ -266,7 +337,7 @@ export class VotingClient {
   withCastPluginVote = async (
     instructions: TransactionInstruction[],
     proposal: ProgramAccount<Proposal>,
-    tokeOwnerRecord: ProgramAccount<TokenOwnerRecord>
+    tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>
   ): Promise<ProgramAddresses | undefined> => {
     if (this.noClient) {
       return
@@ -281,26 +352,141 @@ export class VotingClient {
       return
     }
 
-    if (this.client instanceof NftVoterClient) {
-      const { registrar } = await getPluginRegistrarPDA(
-        realm.pubkey,
-        realm.account.communityMint,
-        this.client!.program.programId
+    if (this.client instanceof VsrClient) {
+      const props = await this.withUpdateVoterWeightRecord(
+        instructions,
+        tokenOwnerRecord,
+        'castVote'
       )
-      const {
-        voterWeightPk,
-        maxVoterWeightRecord,
-      } = await this._withHandleNftVoterWeight(
-        realm!,
+      return props
+    }
+
+    if (this.client instanceof SwitchboardQueueVoterClient) {
+      const props = await this.withUpdateVoterWeightRecord(
+        instructions,
+        tokenOwnerRecord,
+        'castVote'
+      )
+      return props
+    }
+
+    if (this.client instanceof PythClient) {
+      const props = await this.withUpdateVoterWeightRecord(
+        instructions,
+        tokenOwnerRecord,
+        'castVote',
+        proposal.pubkey
+      )
+      return props
+    }
+
+    if (this.client instanceof GatewayClient) {
+      // get the gateway plugin vote instruction
+      const instruction = await getVoteInstruction(
+        this.client,
+        this.gatewayToken,
+        realm,
+        walletPk
+      )
+
+      instructions.push(instruction)
+
+      const { voterWeightPk } = await this._withHandleGatewayVoterWeight(
+        realm,
         walletPk,
         clientProgramId,
         instructions
       )
-      const remainingAccounts: {
-        pubkey: PublicKey
-        isSigner: boolean
-        isWritable: boolean
-      }[] = []
+
+      return { voterWeightPk, maxVoterWeightRecord: undefined }
+    }
+
+    if (this.client instanceof HeliumVsrClient) {
+      const remainingAccounts: AccountData[] = []
+
+      const [registrar] = registrarKey(
+        realm.pubkey,
+        realm.account.communityMint,
+        clientProgramId
+      )
+
+      const unusedPositions = await getUnusedPositionsForProposal({
+        connection: this.client.program.provider.connection,
+        client: this.client,
+        positions: this.heliumVsrVotingPositions,
+        proposalPk: proposal.pubkey,
+      })
+
+      const [voterWeightPk] = voterWeightRecordKey(
+        registrar,
+        walletPk,
+        clientProgramId
+      )
+
+      const [maxVoterWeightPk] = maxVoterWeightRecordKey(
+        realm.pubkey,
+        realm.account.communityMint,
+        clientProgramId
+      )
+
+      for (let i = 0; i < unusedPositions.length; i++) {
+        const pos = unusedPositions[i]
+        const tokenAccount = await getAssociatedTokenAddress(pos.mint, walletPk)
+        const [nftVoteRecord] = nftVoteRecordKey(
+          proposal.pubkey,
+          pos.mint,
+          clientProgramId
+        )
+
+        remainingAccounts.push(
+          new AccountData(tokenAccount),
+          new AccountData(pos.pubkey, false, true),
+          new AccountData(nftVoteRecord, false, true)
+        )
+      }
+
+      //1 nft is 3 accounts
+      const positionChunks = chunks(remainingAccounts, 9)
+      for (const chunk of positionChunks) {
+        instructions.push(
+          await this.client.program.methods
+            .castVoteV0({
+              proposal: proposal.pubkey,
+              owner: walletPk,
+            })
+            .accounts({
+              registrar,
+              voterTokenOwnerRecord: tokenOwnerRecord.pubkey,
+            })
+            .remainingAccounts(chunk)
+            .instruction()
+        )
+      }
+
+      return {
+        voterWeightPk,
+        maxVoterWeightRecord: maxVoterWeightPk,
+      }
+    }
+
+    if (this.client instanceof NftVoterClient) {
+      const remainingAccounts: AccountData[] = []
+      const { registrar } = await getPluginRegistrarPDA(
+        realm.pubkey,
+        realm.account.communityMint,
+        this.client.program.programId
+      )
+
+      const {
+        voterWeightPk,
+        maxVoterWeightRecord,
+      } = await this._withHandleNftVoterWeight(
+        realm,
+        walletPk,
+        clientProgramId,
+        instructions
+      )
+
       const nftVoteRecordsFiltered = await getUsedNftsForProposal(
         this.client,
         proposal.pubkey
@@ -324,94 +510,35 @@ export class VotingClient {
             new AccountData(nftVoteRecord, false, true)
           )
       }
+
       //1 nft is 3 accounts
-      const firstFiveNfts = remainingAccounts.slice(0, 15)
-      const remainingNftsToChunk = remainingAccounts.slice(
-        15,
-        remainingAccounts.length
-      )
-      const nftsChunk = chunks(remainingNftsToChunk, 12)
-      for (const i of nftsChunk) {
-        const castNftVoteIx = await this.client.program.methods
-          .castNftVote(proposal.pubkey)
-          .accounts({
-            registrar,
-            voterWeightRecord: voterWeightPk,
-            governingTokenOwner: walletPk,
-            payer: walletPk,
-            systemProgram: SYSTEM_PROGRAM_ID,
-          })
-          .remainingAccounts(i)
-          .instruction()
+      const nftChunks = chunks(remainingAccounts, 12)
 
-        instructions.push(castNftVoteIx)
+      for (const chunk of [...nftChunks]) {
+        instructions.push(
+          await this.client.program.methods
+            .castNftVote(proposal.pubkey)
+            .accounts({
+              registrar,
+              voterWeightRecord: voterWeightPk,
+              voterTokenOwnerRecord: tokenOwnerRecord.pubkey,
+              voterAuthority: walletPk,
+              payer: walletPk,
+              systemProgram: SYSTEM_PROGRAM_ID,
+            })
+            .remainingAccounts(chunk)
+            .instruction()
+        )
       }
-      const castNftVoteIx2 = await this.client.program.methods
-        .castNftVote(proposal.pubkey)
-        .accounts({
-          registrar,
-          voterWeightRecord: voterWeightPk,
-          governingTokenOwner: walletPk,
-          payer: walletPk,
-          systemProgram: SYSTEM_PROGRAM_ID,
-        })
-        .remainingAccounts(firstFiveNfts)
-        .instruction()
-      instructions.push(castNftVoteIx2)
+
       return { voterWeightPk, maxVoterWeightRecord }
-    }
-
-    if (this.client instanceof VsrClient) {
-      const props = await this.withUpdateVoterWeightRecord(
-        instructions,
-        tokeOwnerRecord,
-        'castVote'
-      )
-      return props
-    }
-    if (this.client instanceof SwitchboardQueueVoterClient) {
-      const props = await this.withUpdateVoterWeightRecord(
-        instructions,
-        tokeOwnerRecord,
-        'castVote'
-      )
-      return props
-    }
-    if (this.client instanceof PythClient) {
-      const props = await this.withUpdateVoterWeightRecord(
-        instructions,
-        tokeOwnerRecord,
-        'castVote',
-        proposal.pubkey
-      )
-      return props
-    }
-
-    if (this.client instanceof GatewayClient) {
-      // get the gateway plugin vote instruction
-      const instruction = await getVoteInstruction(
-        this.client,
-        this.gatewayToken,
-        realm,
-        walletPk
-      )
-
-      instructions.push(instruction)
-
-      const { voterWeightPk } = await this._withHandleGatewayVoterWeight(
-        realm!,
-        walletPk,
-        clientProgramId,
-        instructions
-      )
-
-      return { voterWeightPk, maxVoterWeightRecord: undefined }
     }
   }
   withRelinquishVote = async (
     instructions,
     proposal: ProgramAccount<Proposal>,
-    voteRecordPk: PublicKey
+    voteRecordPk: PublicKey,
+    tokenOwnerRecord: PublicKey
   ): Promise<ProgramAddresses | undefined> => {
     if (this.noClient) {
       return
@@ -426,7 +553,73 @@ export class VotingClient {
       return
     }
 
+    if (this.client instanceof HeliumVsrClient) {
+      const remainingAccounts: AccountData[] = []
+      const [registrar] = registrarKey(
+        realm.pubkey,
+        realm.account.communityMint,
+        clientProgramId
+      )
+
+      const [voterWeightPk] = voterWeightRecordKey(
+        registrar,
+        walletPk,
+        clientProgramId
+      )
+
+      const usedPositions = await getUsedPositionsForProposal({
+        connection: this.client.program.provider.connection,
+        client: this.client,
+        positions: this.heliumVsrVotingPositions,
+        proposalPk: proposal.pubkey,
+      })
+
+      for (let i = 0; i < usedPositions.length; i++) {
+        const pos = usedPositions[i]
+        const [nftVoteRecord] = nftVoteRecordKey(
+          proposal.pubkey,
+          pos.mint,
+          clientProgramId
+        )
+
+        remainingAccounts.push(
+          new AccountData(nftVoteRecord, false, true),
+          new AccountData(pos.pubkey, false, true)
+        )
+      }
+
+      const firstFivePositions = remainingAccounts.slice(0, 10)
+      const remainingPositionsChunk = chunks(
+        remainingAccounts.slice(10, remainingAccounts.length),
+        12
+      )
+
+      for (const chunk of [firstFivePositions, ...remainingPositionsChunk]) {
+        instructions.push(
+          await this.client.program.methods
+            .relinquishVoteV0()
+            .accounts({
+              registrar,
+              voterTokenOwnerRecord: tokenOwnerRecord,
+              proposal: proposal.pubkey,
+              governance: proposal.account.governance,
+              voterWeightRecord: voterWeightPk,
+              voteRecord: voteRecordPk,
+              beneficiary: walletPk,
+            })
+            .remainingAccounts(chunk)
+            .instruction()
+        )
+      }
+
+      return {
+        voterWeightPk,
+        maxVoterWeightRecord: undefined,
+      }
+    }
+
     if (this.client instanceof NftVoterClient) {
+      const remainingAccounts: AccountData[] = []
       const { registrar } = await getPluginRegistrarPDA(
         realm.pubkey,
         realm.account.communityMint,
@@ -441,11 +634,6 @@ export class VotingClient {
         clientProgramId,
         instructions
       )
-      const remainingAccounts: {
-        pubkey: PublicKey
-        isSigner: boolean
-        isWritable: boolean
-      }[] = []
       const nftVoteRecordsFiltered = (
         await getUsedNftsForProposal(this.client, proposal.pubkey)
       ).filter(
@@ -456,46 +644,47 @@ export class VotingClient {
           new AccountData(voteRecord.publicKey, false, true)
         )
       }
+      const connection = this.client.program.provider.connection
 
-      const firstFiveNfts = remainingAccounts.slice(0, 5)
-      const remainingNftsToChunk = remainingAccounts.slice(
-        5,
-        remainingAccounts.length
-      )
-      const nftsChunk = chunks(remainingNftsToChunk, 12)
-      const relinquishNftVoteIx = await this.client.program.methods
-        .relinquishNftVote()
-        .accounts({
-          registrar,
-          voterWeightRecord: voterWeightPk,
-          governance: proposal.account.governance,
-          proposal: proposal.pubkey,
-          governingTokenOwner: walletPk,
-          voteRecord: voteRecordPk,
-          beneficiary: walletPk,
-        })
-        .remainingAccounts(firstFiveNfts)
-        .instruction()
-      instructions.push(relinquishNftVoteIx)
-      for (const i of nftsChunk) {
-        const relinquishNftVote2Ix = await this.client.program.methods
-          .relinquishNftVote()
-          .accounts({
-            registrar,
-            voterWeightRecord: voterWeightPk,
-            governance: proposal.account.governance,
-            proposal: proposal.pubkey,
-            governingTokenOwner: walletPk,
-            voteRecord: voteRecordPk,
-            beneficiary: walletPk,
-          })
-          .remainingAccounts(i)
-          .instruction()
-        instructions.push(relinquishNftVote2Ix)
+      // if this was good code, this would appear outside of this fn.
+      // But we're not writing good code, there's no good place for it, I'm not bothering.
+      const voterWeightRecord = await queryClient.fetchQuery({
+        queryKey: [voterWeightPk],
+        queryFn: () =>
+          asFindable(connection.getAccountInfo, connection)(voterWeightPk),
+      })
+
+      if (voterWeightRecord.result) {
+        const firstFiveNfts = remainingAccounts.slice(0, 5)
+        const remainingNftsChunk = chunks(
+          remainingAccounts.slice(5, remainingAccounts.length),
+          12
+        )
+
+        for (const chunk of [firstFiveNfts, ...remainingNftsChunk]) {
+          instructions.push(
+            await this.client.program.methods
+              .relinquishNftVote()
+              .accounts({
+                registrar,
+                voterWeightRecord: voterWeightPk,
+                governance: proposal.account.governance,
+                proposal: proposal.pubkey,
+                voterTokenOwnerRecord: tokenOwnerRecord,
+                voterAuthority: walletPk,
+                voteRecord: voteRecordPk,
+                beneficiary: walletPk,
+              })
+              .remainingAccounts(chunk)
+              .instruction()
+          )
+        }
       }
+
       return { voterWeightPk, maxVoterWeightRecord }
     }
   }
+
   _withHandleNftVoterWeight = async (
     realm: ProgramAccount<Realm>,
     walletPk: PublicKey,
@@ -566,6 +755,9 @@ export class VotingClient {
   }
   _setCurrentVoterNfts = (nfts: NFTWithMeta[]) => {
     this.votingNfts = nfts
+  }
+  _setCurrentHeliumVsrPositions = (positions: PositionWithMeta[]) => {
+    this.heliumVsrVotingPositions = positions
   }
   _setCurrentVoterGatewayToken = (gatewayToken: PublicKey) => {
     this.gatewayToken = gatewayToken

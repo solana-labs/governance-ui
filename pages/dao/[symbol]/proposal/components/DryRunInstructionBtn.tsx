@@ -2,13 +2,14 @@ import Button, { LinkButton, SecondaryButton } from '@components/Button'
 import { getExplorerInspectorUrl } from '@components/explorer/tools'
 import Loading from '@components/Loading'
 import Modal from '@components/Modal'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { getInstructionDataFromBase64 } from '@solana/spl-governance'
 import { SimulatedTransactionResponse, Transaction } from '@solana/web3.js'
 import { notify } from '@utils/notifications'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { dryRunInstruction } from 'actions/dryRunInstruction'
 import React, { useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 
 const DryRunInstructionBtn = ({
   getInstructionDataFcn,
@@ -17,8 +18,8 @@ const DryRunInstructionBtn = ({
   getInstructionDataFcn: (() => Promise<UiInstruction>) | undefined
   btnClassNames: string
 }) => {
-  const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const connection = useLegacyConnectionContext()
+  const wallet = useWalletOnePointOh()
   const [isPending, setIsPending] = useState(false)
   const [result, setResult] = useState<{
     response: SimulatedTransactionResponse
@@ -26,10 +27,10 @@ const DryRunInstructionBtn = ({
   } | null>(null)
   const [isOpen, setIsOpen] = useState(false)
 
-  const onInspect = () => {
+  const onInspect = async () => {
     if (result) {
-      const inspectUrl = getExplorerInspectorUrl(
-        connection.endpoint,
+      const inspectUrl = await getExplorerInspectorUrl(
+        connection,
         result.transaction
       )
       window.open(inspectUrl, '_blank')
@@ -103,7 +104,7 @@ const DryRunInstructionBtn = ({
       </SecondaryButton>
 
       {result?.response && (
-        <Modal onClose={onClose} isOpen={isOpen}>
+        <Modal sizeClassName={'sm:max-w-2xl'} onClose={onClose} isOpen={isOpen}>
           <h2>
             {result?.response.err
               ? 'Simulation error'

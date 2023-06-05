@@ -1,6 +1,6 @@
-import { BN, ProgramAccount } from '@project-serum/anchor'
+import { BN, ProgramAccount } from '@coral-xyz/anchor'
 import { MintInfo } from '@solana/spl-token'
-import { TokenInfo } from '@solana/spl-token-registry'
+import { TokenInfoWithoutDecimals } from '@utils/services/tokenPrice'
 import { BigNumber } from 'bignumber.js'
 
 const SECONDS_PER_DAY = 86400
@@ -9,12 +9,27 @@ export function getDaysFromTimestamp(unixTimestamp: number) {
   return unixTimestamp / SECONDS_PER_DAY
 }
 
+export function getHoursFromTimestamp(unixTimestamp: number) {
+  return unixTimestamp / (60 * 60)
+}
+
 export function getTimestampFromDays(days: number) {
   return days * SECONDS_PER_DAY
 }
 
+export function getTimestampFromHours(hours: number) {
+  return hours * 60 * 60
+}
+
 export function fmtBnMintDecimals(amount: BN, decimals: number) {
   return new BigNumber(amount.toString()).shiftedBy(-decimals).toFormat()
+}
+
+export function fmtBnMintDecimalsUndelimited(amount: BN, decimals: number) {
+  return new BigNumber(amount.toString())
+    .shiftedBy(-decimals)
+    .toFormat()
+    .replaceAll(',', '')
 }
 
 export function fmtBNAmount(amount: BN | number | string) {
@@ -31,7 +46,7 @@ export function fmtMintAmount(mint: MintInfo | undefined, mintAmount: BN) {
 export function fmtTokenInfoWithMint(
   amount: BN,
   mintInfo: ProgramAccount<MintInfo>,
-  tokenInfo: TokenInfo | undefined = undefined
+  tokenInfo: TokenInfoWithoutDecimals | undefined = undefined
 ) {
   return `${fmtBnMintDecimals(amount, mintInfo.account.decimals)} ${
     tokenInfo?.symbol
@@ -44,7 +59,7 @@ export function fmtTokenInfoWithMint(
 export function getMintDecimalAmount(mint: MintInfo, mintAmount: BN) {
   return new BigNumber(mintAmount.toString()).shiftedBy(-mint.decimals)
 }
-export function getBigNumberAmount(amount: BN | number) {
+function getBigNumberAmount(amount: BN | number) {
   return typeof amount === 'number'
     ? new BigNumber(amount)
     : new BigNumber(amount.toString())
@@ -120,7 +135,8 @@ export function getMintSupplyAsDecimal(mint: MintInfo) {
 }
 
 // Calculates percentage (provided as 0-100) of mint supply as BigNumber amount
-export function getMintSupplyPercentageAsBigNumber(
+/** @deprecated why? why would you use a BigNumber for the range 0-100 */
+function getMintSupplyPercentageAsBigNumber(
   mint: MintInfo,
   percentage: number
 ) {
@@ -135,18 +151,6 @@ export function getMintSupplyPercentageAsDecimal(
   percentage: number
 ) {
   return getMintSupplyPercentageAsBigNumber(mint, percentage).toNumber()
-}
-
-// Calculates percentage (provided as 0-100) of mint supply as rounded BN amount
-export function getMintSupplyPercentageAsBN(
-  mint: MintInfo,
-  percentage: number
-) {
-  return new BN(
-    getMintSupplyPercentageAsBigNumber(mint, percentage)
-      .dp(0, BigNumber.ROUND_DOWN) // BN doesn't support floating point and we have to round it
-      .toString()
-  )
 }
 
 // Formats percentage value showing it in human readable form

@@ -8,19 +8,34 @@ import {
 } from '@solana/spl-governance'
 import { AccountInfo, MintInfo } from '@solana/spl-token'
 import type { PublicKey } from '@solana/web3.js'
-import { GoverningTokenRole } from '@solana/spl-governance'
 
 import { TokenProgramAccount } from '@utils/tokens'
 import useRealm from '@hooks/useRealm'
-import { nftPluginsPks, vsrPluginsPks } from '@hooks/useVotingPlugins'
-import useProposal from '@hooks/useProposal'
-import useWalletStore from 'stores/useWalletStore'
+import {
+  HELIUM_VSR_PLUGINS_PKS,
+  NFT_PLUGINS_PKS,
+  VSR_PLUGIN_PKS,
+} from '@constants/plugins'
 
 import CommunityVotingPower from './CommunityVotingPower'
 import CouncilVotingPower from './CouncilVotingPower'
 import LockedCommunityVotingPower from './LockedCommunityVotingPower'
 import LockedCouncilVotingPower from './LockedCouncilVotingPower'
 import NftVotingPower from './NftVotingPower'
+import LockedCommunityNFTRecordVotingPower from './LockedCommunityNFTRecordVotingPower'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import {
+  useUserCommunityTokenOwnerRecord,
+  useUserCouncilTokenOwnerRecord,
+} from '@hooks/queries/tokenOwnerRecord'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
+import { useVotingPop } from '@components/VotePanel/hooks'
+import { useRouteProposalQuery } from '@hooks/queries/proposal'
 
 enum Type {
   Council,
@@ -28,6 +43,7 @@ enum Type {
   LockedCommunity,
   NFT,
   Community,
+  LockedCommunityNFTRecord,
 }
 
 function getTypes(
@@ -39,46 +55,60 @@ function getTypes(
   ownTokenRecord?: ProgramAccount<TokenOwnerRecord>,
   proposal?: ProgramAccount<Proposal>,
   realm?: ProgramAccount<Realm>,
-  tokenRole?: GoverningTokenRole
+  tokenRole?: 'community' | 'council'
 ) {
   const types: Type[] = []
 
   const currentPluginPk = config?.account?.communityTokenConfig.voterWeightAddin
+  const isDepositVisible = (
+    depositMint: MintInfo | undefined,
+    realmMint: PublicKey | undefined
+  ) =>
+    depositMint &&
+    (!proposal ||
+      proposal.account.governingTokenMint.toBase58() === realmMint?.toBase58())
 
   if (
     currentPluginPk &&
-    nftPluginsPks.includes(currentPluginPk.toBase58()) &&
-    tokenRole === GoverningTokenRole.Community
+    NFT_PLUGINS_PKS.includes(currentPluginPk.toBase58()) &&
+    tokenRole === 'community'
   ) {
     types.push(Type.NFT)
   } else if (
     currentPluginPk &&
-    vsrPluginsPks.includes(currentPluginPk.toBase58())
+    VSR_PLUGIN_PKS.includes(currentPluginPk.toBase58())
   ) {
-    const isDepositVisible = (
-      depositMint: MintInfo | undefined,
-      realmMint: PublicKey | undefined
-    ) =>
-      depositMint &&
-      (!proposal ||
-        proposal.account.governingTokenMint.toBase58() ===
-          realmMint?.toBase58())
-
     if (
       (!realm?.account.config.councilMint ||
         isDepositVisible(mint, realm?.account.communityMint)) &&
-      tokenRole === GoverningTokenRole.Community
+      tokenRole === 'community'
     ) {
       types.push(Type.LockedCommunity)
     } else if (
       isDepositVisible(councilMint, realm?.account.config.councilMint) &&
-      tokenRole === GoverningTokenRole.Council
+      tokenRole === 'council'
     ) {
       types.push(Type.LockedCouncil)
     }
-  } else if (tokenRole === GoverningTokenRole.Council) {
+  } else if (
+    currentPluginPk &&
+    HELIUM_VSR_PLUGINS_PKS.includes(currentPluginPk.toBase58())
+  ) {
+    if (
+      (!realm?.account.config.councilMint ||
+        isDepositVisible(mint, realm?.account.communityMint)) &&
+      tokenRole === 'community'
+    ) {
+      types.push(Type.LockedCommunityNFTRecord)
+    } else if (
+      isDepositVisible(councilMint, realm?.account.config.councilMint) &&
+      tokenRole === 'council'
+    ) {
+      types.push(Type.Council)
+    }
+  } else if (tokenRole === 'council') {
     types.push(Type.Council)
-  } else if (tokenRole === GoverningTokenRole.Community) {
+  } else if (tokenRole === 'community') {
     types.push(Type.Community)
   }
 
@@ -90,18 +120,18 @@ interface Props {
 }
 
 export default function VotingPower(props: Props) {
-  const { proposal } = useProposal()
-  const {
-    config,
-    councilMint,
-    councilTokenAccount,
-    mint,
-    ownCouncilTokenRecord,
-    ownTokenRecord,
-    realm,
-  } = useRealm()
-  const connected = useWalletStore((s) => s.connected)
-  const tokenRole = useWalletStore((s) => s.selectedProposal.tokenRole)
+  const proposal = useRouteProposalQuery().data?.result
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
+  const realm = useRealmQuery().data?.result
+  const config = useRealmConfigQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+
+  const { councilTokenAccount } = useRealm()
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
+  const tokenRole = useVotingPop()
 
   const types = getTypes(
     config,
@@ -145,6 +175,8 @@ export default function VotingPower(props: Props) {
             return <CommunityVotingPower key={type} />
           case Type.NFT:
             return <NftVotingPower key={type} />
+          case Type.LockedCommunityNFTRecord:
+            return <LockedCommunityNFTRecordVotingPower key={type} />
         }
       })}
     </div>

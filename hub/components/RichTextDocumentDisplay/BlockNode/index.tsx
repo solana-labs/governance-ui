@@ -25,21 +25,17 @@ function getTag(style: BlockStyle) {
         <pre className="text-current rounded bg-neutral-200 p-2 text-[1em]" />
       );
     case BlockStyle.H1:
-      return <h1 className="text-current m-0 text-[3em] leading-[1]" />;
+      return <h1 className="text-current m-0 text-[3em] leading-[1.5]" />;
     case BlockStyle.H2:
-      return <h2 className="text-current m-0 text-[2.25em] leading-[2.5em]" />;
+      return <h2 className="text-current m-0 text-[2.25em] leading-[1.5]" />;
     case BlockStyle.H3:
-      return (
-        <h3 className="text-current m-0 text-[1.875em] leading-[2.25em]" />
-      );
+      return <h3 className="text-current m-0 text-[1.875em] leading-[1.5]" />;
     case BlockStyle.H4:
-      return <h4 className="text-current m-0 text-[1.5em] leading-[2em]" />;
+      return <h4 className="text-current m-0 text-[1.5em] leading-[1.5]" />;
     case BlockStyle.H5:
-      return <h5 className="text-current m-0 text-[1.25em] leading-[1.75em]" />;
+      return <h5 className="text-current m-0 text-[1.25em] leading-[1.5]" />;
     case BlockStyle.H6:
-      return (
-        <h6 className="text-current m-0 text-[1.125em] leading-[1.75em]" />
-      );
+      return <h6 className="text-current m-0 text-[1.125em] leading-[1.5]" />;
     case BlockStyle.OL:
       return <ol className="text-current m-0" />;
     case BlockStyle.P:

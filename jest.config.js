@@ -20,6 +20,10 @@ const customConfig = {
   moduleNameMapper: directories,
   setupFilesAfterEnv: ['<rootDir>/test/setup.js'],
   moduleDirectories: ['node_modules', '<rootDir>/'],
+  transform: {
+    '^.+\\.(t|j)sx?$': 'ts-jest',
+  },
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
 }
 
 module.exports = nextJest({ dir: './' })(customConfig)

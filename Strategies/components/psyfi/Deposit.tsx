@@ -9,7 +9,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { RpcContext } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import {
@@ -19,14 +19,13 @@ import {
   getMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
 import { precision } from '@utils/formatting'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import BigNumber from 'bignumber.js'
 import { useRouter } from 'next/router'
 import { pdas } from 'psyfi-euros-test'
 import React, { useCallback, useEffect, useState } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import useWalletStore from 'stores/useWalletStore'
 import {
   Action,
   CreatePsyFiStrategy,
@@ -37,6 +36,14 @@ import {
 import { PsyFiStrategy } from 'Strategies/types/types'
 import { usePsyFiProgram } from './hooks/usePsyFiProgram'
 import { notify } from '@utils/notifications'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const SOL_BUFFER = 0.02
 
@@ -53,15 +60,12 @@ export const Deposit: React.FC<{
 }) => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
-  const {
-    realmInfo,
-    realm,
-    ownVoterWeight,
-    mint,
-    councilMint,
-    config,
-    symbol,
-  } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const config = useRealmConfigQuery().data?.result
+  const { symbol } = router.query
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { realmInfo, ownVoterWeight } = useRealm()
   const {
     canUseTransferInstruction,
     governedTokenAccountsWithoutNfts,
@@ -69,8 +73,8 @@ export const Deposit: React.FC<{
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
-  const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const connection = useLegacyConnectionContext()
+  const wallet = useWalletOnePointOh()
   const [ownedStrategyTokenAccount, setOwnedStrategyTokenAccount] = useState<
     AssetAccount | undefined
   >()
@@ -91,15 +95,12 @@ export const Deposit: React.FC<{
   const [formErrors, setFormErrors] = useState({})
   const psyFiProgram = usePsyFiProgram()
 
-  const handleSetForm = useCallback(
-    ({ propertyName, value }) => {
-      setFormErrors({})
-      setForm({ ...form, [propertyName]: value })
-    },
-    [setForm, setFormErrors]
-  )
-  const tokenInfo = tokenService.getTokenInfo(handledMint)
-  const tokenSymbol = tokenService.getTokenInfo(
+  const handleSetForm = useCallback(({ propertyName, value }) => {
+    setFormErrors({})
+    setForm((prevForm) => ({ ...prevForm, [propertyName]: value }))
+  }, [])
+  const tokenInfo = tokenPriceService.getTokenInfo(handledMint)
+  const tokenSymbol = tokenPriceService.getTokenInfo(
     governedTokenAccount.extensions.mint!.publicKey.toBase58()
   )?.symbol
   const mintInfo = governedTokenAccount.extensions?.mint?.account
@@ -152,6 +153,7 @@ export const Deposit: React.FC<{
       )) as unknown) as DepositReceipt | undefined
       setDepositReceipt(currentDepositReceipt)
     })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.strategy, psyFiProgram])
 
   // Find the owned strategy token account, if one exists
@@ -261,6 +263,7 @@ export const Deposit: React.FC<{
       notify({ type: 'error', message: `Error ${error}` })
       setIsDepositing(false)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
     client,
     config,

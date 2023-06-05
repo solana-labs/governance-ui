@@ -4,6 +4,7 @@ import { gql } from 'urql';
 import { FeedItemClippedDocument } from '@hub/components/Home/Feed/gql';
 import { FeedItemVoteType } from '@hub/types/decoders/FeedItemVoteType';
 import { ProposalState } from '@hub/types/decoders/ProposalState';
+import { PublicKey } from '@hub/types/decoders/PublicKey';
 
 export const getTrending = gql`
   query getTrending($realm: PublicKey!) {
@@ -32,6 +33,7 @@ export const getTrending = gql`
               isClipped
             }
             proposal {
+              publicKey
               state
             }
           }
@@ -56,6 +58,7 @@ export const getTrendingResp = IT.type({
             IT.undefined,
             IT.null,
             IT.type({
+              publicKey: PublicKey,
               state: ProposalState,
             }),
           ]),

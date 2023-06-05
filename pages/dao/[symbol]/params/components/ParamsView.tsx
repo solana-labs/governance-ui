@@ -1,19 +1,31 @@
 import useRealm from '@hooks/useRealm'
-import { fmtMintAmount } from '@tools/sdk/units'
+import { fmtMintAmount, getHoursFromTimestamp } from '@tools/sdk/units'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
-import {
-  getFormattedStringFromDays,
-  SECS_PER_DAY,
-} from 'VoteStakeRegistry/tools/dateTools'
+import { getFormattedStringFromDays, SECS_PER_DAY } from '@utils/dateTools'
 import Button from '@components/Button'
 import { VoteTipping } from '@solana/spl-governance'
 import { AddressField, NumberField } from '../index'
+import useProgramVersion from '@hooks/useProgramVersion'
+import { useRouter } from 'next/router'
+import useQueryContext from '@hooks/useQueryContext'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
 
-const ParamsView = ({ activeGovernance, openGovernanceProposalModal }) => {
-  const { realm, mint, councilMint, ownVoterWeight } = useRealm()
-
+const ParamsView = ({ activeGovernance }) => {
+  const realm = useRealmQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { ownVoterWeight } = useRealm()
+  const programVersion = useProgramVersion()
   const realmAccount = realm?.account
   const communityMint = realmAccount?.communityMint.toBase58()
+  const router = useRouter()
+  const { symbol } = router.query
+  const { fmtUrlWithCluster } = useQueryContext()
 
   const minCommunityTokensToCreateProposal = activeGovernance?.account?.config
     ?.minCommunityTokensToCreateProposal
@@ -40,7 +52,7 @@ const ParamsView = ({ activeGovernance, openGovernanceProposalModal }) => {
             label="Max Voting Time"
             padding
             val={getFormattedStringFromDays(
-              activeGovernance.account.config.maxVotingTime / SECS_PER_DAY
+              activeGovernance.account.config.baseVotingTime / SECS_PER_DAY
             )}
           />
           {communityMint && (
@@ -65,24 +77,67 @@ const ParamsView = ({ activeGovernance, openGovernanceProposalModal }) => {
             padding
             val={activeGovernance.account.config.minInstructionHoldUpTime}
           />
-          {/* NOT NEEDED RIGHT NOW */}
-          {/* <AddressField
-          label="Proposal Cool-off Time"
-          padding
-          val={activeGovernance.account.config.proposalCoolOffTime}
-          /> */}
-          <AddressField
-            label="Vote Threshold Percentage"
-            padding
-            val={`${activeGovernance.account.config.communityVoteThreshold.value}%`}
-          />
-          <AddressField
-            label="Vote Tipping"
-            padding
-            val={
-              VoteTipping[activeGovernance.account.config.voteTipping as any]
-            }
-          />
+          {(programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) >= 3 && (
+            <>
+              <AddressField
+                label="Proposal Cool-off Time"
+                padding
+                val={`${getHoursFromTimestamp(
+                  activeGovernance.account.config.votingCoolOffTime
+                )} hour(s)`}
+              />
+              <AddressField
+                label="Deposit Exempt Proposal Count"
+                padding
+                val={`${activeGovernance.account.config.depositExemptProposalCount}`}
+              />
+            </>
+          )}
+          {activeGovernance.account.config?.communityVoteThreshold?.value && (
+            <AddressField
+              label="Community Vote Threshold Percentage"
+              padding
+              val={`${activeGovernance.account.config.communityVoteThreshold.value}%`}
+            />
+          )}
+          {activeGovernance.account.config?.councilVoteThreshold?.value && (
+            <AddressField
+              label="Council Vote Threshold Percentage"
+              padding
+              val={`${activeGovernance.account.config.councilVoteThreshold.value}%`}
+            />
+          )}
+          {(programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) >= 3 ? (
+            <>
+              <AddressField
+                label="Community Vote Tipping"
+                padding
+                val={
+                  VoteTipping[
+                    activeGovernance.account.config.communityVoteTipping as any
+                  ]
+                }
+              />
+              <AddressField
+                label="Council Vote Tipping"
+                padding
+                val={
+                  VoteTipping[
+                    activeGovernance.account.config.councilVoteTipping as any
+                  ]
+                }
+              />
+            </>
+          ) : (
+            <AddressField
+              label="Vote Tipping"
+              padding
+              val={
+                VoteTipping[activeGovernance.account.config.voteTipping as any]
+              }
+            />
+          )}
+
           <div className="flex">
             <Button
               disabled={
@@ -93,7 +148,19 @@ const ParamsView = ({ activeGovernance, openGovernanceProposalModal }) => {
               tooltipMessage={
                 'Please connect wallet with enough voting power to create governance config proposals'
               }
-              onClick={openGovernanceProposalModal}
+              onClick={() => {
+                if (
+                  ownVoterWeight.canCreateProposal(
+                    activeGovernance.account.config
+                  )
+                ) {
+                  router.push(
+                    fmtUrlWithCluster(
+                      `/dao/${symbol}/treasury/governance/${activeGovernance.pubkey.toString()}/edit`
+                    )
+                  )
+                }
+              }}
               className="ml-auto"
             >
               Change config

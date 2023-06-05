@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import Button, { SecondaryButton } from '@components/Button'
 import Tooltip from '@components/Tooltip'
 import DepositNFTFromWallet from './DepositNFTFromWallet'
@@ -7,6 +6,8 @@ import DepositNFTAddress from './DepositNFTAddress'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import { ArrowLeftIcon, ExternalLinkIcon } from '@heroicons/react/solid'
 import { getExplorerUrl } from '@components/explorer/tools'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 enum DepositState {
   DepositNFTFromWallet,
@@ -15,8 +16,9 @@ enum DepositState {
 
 const DepositNFT = ({ onClose }) => {
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
-  const connection = useWalletStore((s) => s.connection)
-  const connected = useWalletStore((s) => s.connected)
+  const connection = useLegacyConnectionContext()
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const [
     currentDepositView,
     setCurrentDepositView,

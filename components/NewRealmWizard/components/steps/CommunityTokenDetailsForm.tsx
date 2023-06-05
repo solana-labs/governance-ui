@@ -44,11 +44,8 @@ export const CommunityTokenSchema = {
     .number()
     .positive('Must be greater than 0')
     .transform((value) => (isNaN(value) ? undefined : value))
-    .when(['suggestedMinTokenAmount', 'useExistingCommunityToken'], {
-      is: (suggestedMinTokenAmount, useExistingCommunityToken) => {
-        if (useExistingCommunityToken === false) return false
-        return suggestedMinTokenAmount > 0
-      },
+    .when('useExistingCommunityToken', {
+      is: false,
       then: (schema) => schema.required('Required'),
       otherwise: (schema) => schema.optional(),
     }),
@@ -95,7 +92,11 @@ export default function CommunityTokenForm({
     setValue,
     handleSubmit,
     formState: { isValid },
-  } = useForm({
+  } = useForm<any>({
+    // @asktree: I set default values here in order to eliminate a bug where a value was only being set as a side effect of opening advanced options
+    defaultValues: {
+      useSupplyFactor: true,
+    },
     mode: 'all',
     resolver: yupResolver(schema),
   })
@@ -107,24 +108,25 @@ export default function CommunityTokenForm({
 
   useEffect(() => {
     updateUserInput(formData, CommunityTokenSchema, setValue)
-  }, [])
+  }, [formData, setValue])
 
   useEffect(() => {
     if (!useExistingCommunityToken) {
       setValue('communityTokenMintAddress', undefined)
+      // @asktree: it seems wrong that this would be a form value at all given that it has no corresponding user input.
       setValue('suggestedMinTokenAmount', undefined)
       setValue('minimumNumberOfCommunityTokensToGovern', undefined)
       setValue('transferCommunityMintAuthority', undefined, {
         shouldValidate: true,
       })
     }
-  }, [useExistingCommunityToken])
+  }, [setValue, useExistingCommunityToken])
 
   useEffect(() => {
     if (useSupplyFactor) {
       setValue('communityAbsoluteMaxVoteWeight', undefined)
     } else setValue('communityMintSupplyFactor', undefined)
-  }, [useSupplyFactor])
+  }, [setValue, useSupplyFactor])
 
   function handleTokenInput({ suggestedMinTokenAmount, tokenInfo }) {
     setCommunityTokenInfo(tokenInfo)
@@ -187,8 +189,7 @@ export default function CommunityTokenForm({
           name="useExistingCommunityToken"
           control={control}
           defaultValue={undefined}
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          render={({ field: { ref, ...field } }) => (
+          render={({ field: { ref: _, ...field } }) => (
             <div className="pt-3">
               <FormField
                 title="Do you have an existing token for your DAO's community?"
@@ -246,8 +247,7 @@ export default function CommunityTokenForm({
           name="useSupplyFactor"
           control={control}
           defaultValue={true}
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          render={({ field: { ref, ...field } }) => (
+          render={({ field: { ref: _, ...field } }) => (
             <div className="pt-3">
               <FormField
                 title="What type of max voter weight do you want to use?"

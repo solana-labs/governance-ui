@@ -30,7 +30,8 @@ export default function WalletList(props: Props) {
       const expandedKey = expanded
         ? 'address' in expanded
           ? expanded.address
-          : expanded.name
+          : //@ts-ignore
+            expanded.name
         : undefined
 
       setExpanded((current) => {
@@ -41,37 +42,17 @@ export default function WalletList(props: Props) {
         }
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [props.data._tag])
 
   switch (props.data._tag) {
     case Status.Failed:
-      return (
-        <div className={cx(props.className, 'h-full')}>
-          <div className="flex-shrink-0 flex items-center justify-between pb-5">
-            <div className="w-40 bg-bkg-1 rounded-sm text-lg opacity-50">
-              &nbsp;
-            </div>
-            <div className="w-40 bg-bkg-1 rounded-sm text-lg opacity-50">
-              &nbsp;
-            </div>
-          </div>
-          <div className="overflow-y-auto flex-grow space-y-4">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div className="h-24 rounded bg-bkg-1 opacity-50" key={i} />
-            ))}
-          </div>
-        </div>
-      )
     case Status.Pending:
       return (
         <div className={cx(props.className, 'h-full')}>
           <div className="flex-shrink-0 flex items-center justify-between pb-5">
-            <div className="w-40 bg-bkg-1 rounded-sm text-lg animate-pulse">
-              &nbsp;
-            </div>
-            <div className="w-40 bg-bkg-1 rounded-sm text-lg animate-pulse">
-              &nbsp;
-            </div>
+            <div className="font-bold text-base">DAO Wallets</div>
+            <NewWalletButton />
           </div>
           <div className="overflow-y-auto flex-grow space-y-4">
             {Array.from({ length: 3 }).map((_, i) => (

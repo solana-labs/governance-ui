@@ -13,7 +13,6 @@ import Modal from '@components/Modal'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import CreateAta from '@components/TreasuryAccount/CreateAta'
-import useWalletStore from 'stores/useWalletStore'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import Address from '@components/Address'
@@ -21,6 +20,7 @@ import Address from '@components/Address'
 import AddAssetModal from './AddAssetModal'
 import SelectedWalletIcon from '../../icons/SelectedWalletIcon'
 import { AssetAccount, AccountType } from '@utils/uiTypes/assets'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 enum ModalType {
   AddAsset,
@@ -40,7 +40,7 @@ export default function Header(props: Props) {
   const { assetAccounts, nftsGovernedTokenAccounts } = useGovernanceAssets()
   const { setCurrentAccount } = useTreasuryAccountStore()
   const { symbol } = useRealm()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const router = useRouter()
 
   return (
@@ -85,7 +85,11 @@ export default function Header(props: Props) {
         <AddAssetModal
           wallet={props.wallet}
           onAddProgramSelected={() =>
-            router.push(fmtUrlWithCluster(`/dao/${symbol}${NEW_PROGRAM_VIEW}`))
+            router.push(
+              fmtUrlWithCluster(
+                `/dao/${symbol}${NEW_PROGRAM_VIEW}?wallet=${props.wallet.address}`
+              )
+            )
           }
           onAddTokenAccount={() => setOpenModal(ModalType.NewTokenAccount)}
           onClose={() => setOpenModal(ModalType.None)}

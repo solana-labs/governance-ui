@@ -15,7 +15,6 @@ import {
   DepositReserveLiquidityAndObligationCollateralForm,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
-import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -34,6 +33,8 @@ import {
   Token,
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const WithdrawForm = ({
   index,
@@ -42,8 +43,8 @@ const WithdrawForm = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const connection = useLegacyConnectionContext()
+  const wallet = useWalletOnePointOh()
   const { realmInfo } = useRealm()
   const [stratagies, setStratagies] = useState<any>([])
 
@@ -56,9 +57,10 @@ const WithdrawForm = ({
     }
 
     fetchStratagies()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [])
 
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [
     form,
@@ -79,7 +81,6 @@ const WithdrawForm = ({
     setFormErrors(validationErrors)
     return isValid
   }
-  console.log(form.governedAccount)
 
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
@@ -112,8 +113,6 @@ const WithdrawForm = ({
         el.handledMint ===
         form.governedAccount?.extensions.mint?.publicKey.toString()
     )
-
-    console.log(matchedStratagie)
 
     const [rewardPool] = PublicKey.findProgramAddressSync(
       [
@@ -175,7 +174,6 @@ const WithdrawForm = ({
       ),
       isValid: true,
       governance: form.governedAccount.governance,
-      shouldSplitIntoSeparateTxs: true,
     }
   }
 
@@ -184,6 +182,7 @@ const WithdrawForm = ({
       propertyName: 'programId',
       value: programId?.toString(),
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [programId])
 
   useEffect(() => {
@@ -194,6 +193,7 @@ const WithdrawForm = ({
       },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
 
   const schema = yup.object().shape({
@@ -210,7 +210,7 @@ const WithdrawForm = ({
   return (
     <>
       <GovernedAccountSelect
-        label="Governance"
+        label="Wallet"
         governedAccounts={assetAccounts}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedAccount' })

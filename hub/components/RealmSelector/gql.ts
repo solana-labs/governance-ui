@@ -9,6 +9,7 @@ export const getRealmsList = gql`
       name
       publicKey
       iconUrl
+      urlId
     }
   }
 `;
@@ -19,6 +20,7 @@ export const getRealmsListResp = IT.type({
       name: IT.string,
       publicKey: PublicKey,
       iconUrl: IT.union([IT.null, IT.string]),
+      urlId: IT.string,
     }),
   ),
 });

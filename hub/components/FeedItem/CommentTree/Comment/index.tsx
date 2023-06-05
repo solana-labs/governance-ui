@@ -11,6 +11,7 @@ import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay
 import { abbreviateAddress } from '@hub/lib/abbreviateAddress';
 import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
 import cx from '@hub/lib/cx';
+import { filterUniqueBy } from '@hub/lib/filterUniqueBy';
 import { useUserCreatedFeedItemCommentRepliesStore } from '@hub/stores/userCreatedFeedItemCommentReplies';
 import { BlockNodeType } from '@hub/types/RichTextDocument';
 
@@ -25,6 +26,8 @@ interface Props extends BaseProps {
   feedItemId: string;
   realm: PublicKey;
   realmUrlId: string;
+  userIsAdmin?: boolean;
+  onDelete?(): void;
 }
 
 export function Content(props: Props) {
@@ -122,7 +125,9 @@ export function Content(props: Props) {
             commentId={props.comment.id}
             realm={props.realm}
             score={props.comment.score}
+            userIsAdmin={props.userIsAdmin}
             userVote={props.comment.myVote}
+            onDelete={props.onDelete}
             onReply={() => setReplyBoxOpen(true)}
           />
         </div>
@@ -170,7 +175,7 @@ export function Content(props: Props) {
           </div>
         </div>
       )}
-      {replies.map((comment, i) => {
+      {replies.filter(filterUniqueBy('id')).map((comment, i) => {
         const isLast = replies && i === replies.length - 1;
 
         return (
@@ -211,6 +216,8 @@ export function Content(props: Props) {
                 feedItemId={props.feedItemId}
                 realm={props.realm}
                 realmUrlId={props.realmUrlId}
+                userIsAdmin={props.userIsAdmin}
+                onDelete={props.onDelete}
               />
             </div>
           </div>

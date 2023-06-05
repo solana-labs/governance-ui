@@ -1,3 +1,4 @@
+import React, { useCallback } from 'react'
 import Button from '@components/Button'
 import useRealm from '@hooks/useRealm'
 import {
@@ -13,9 +14,8 @@ import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import VotingPowerBox from '../TokenBalance/VotingPowerBox'
 import { PublicKey } from '@solana/web3.js'
 import { MintInfo } from '@solana/spl-token'
-import { BN } from '@project-serum/anchor'
-import tokenService from '@utils/services/token'
-import useWalletStore from 'stores/useWalletStore'
+import { BN } from '@coral-xyz/anchor'
+import tokenPriceService from '@utils/services/tokenPrice'
 import { getDeposits } from 'VoteStakeRegistry/tools/deposits'
 import { DepositWithMintAccount } from 'VoteStakeRegistry/sdk/accounts'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
@@ -32,9 +32,17 @@ import {
   LockClosedIcon,
 } from '@heroicons/react/outline'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
-import Account from './Account'
 import { abbreviateAddress } from '@utils/formatting'
 import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useTokenOwnerRecordByPubkeyQuery } from '@hooks/queries/tokenOwnerRecord'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 interface DepositBox {
   mintPk: PublicKey
@@ -44,15 +52,15 @@ interface DepositBox {
 }
 const unlockedTypes = ['none']
 
-const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
-  const {
-    realm,
-    realmInfo,
-    mint,
-    tokenRecords,
-    councilMint,
-    config,
-  } = useRealm()
+const LockTokensAccount: React.FC<{
+  tokenOwnerRecordPk: string | string[] | undefined
+  children: React.ReactNode
+}> = ({ tokenOwnerRecordPk, children }) => {
+  const realm = useRealmQuery().data?.result
+  const config = useRealmConfigQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { realmInfo } = useRealm()
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const [reducedDeposits, setReducedDeposits] = useState<DepositBox[]>([])
@@ -63,13 +71,19 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
     new BN(0)
   )
   const [isOwnerOfDeposits, setIsOwnerOfDeposits] = useState(true)
-  const tokenOwnerRecordWalletPk = Object.keys(tokenRecords)?.find(
-    (key) => tokenRecords[key]?.pubkey?.toBase58() === tokenOwnerRecordPk
-  )
+
+  const lol = useMemo(() => new PublicKey(tokenOwnerRecordPk as string), [
+    tokenOwnerRecordPk,
+  ])
+  const { data: tokenOwnerRecord } = useTokenOwnerRecordByPubkeyQuery(lol)
+  const tokenOwnerRecordWalletPk =
+    tokenOwnerRecord?.result?.account.governingTokenOwner
+
   const [isLoading, setIsLoading] = useState(false)
-  const connection = useWalletStore((s) => s.connection.current)
-  const wallet = useWalletStore((s) => s.current)
-  const connected = useWalletStore((s) => s.connected)
+  const { connection } = useConnection()
+  const wallet = useWalletOnePointOh()
+  const publicKey = wallet?.publicKey ?? null
+  const connected = wallet?.connected
   const mainBoxesClasses = 'bg-bkg-1 col-span-1 p-4 rounded-md'
   const isNextSameRecord = (x, next) => {
     const nextType = Object.keys(next.lockup.kind)[0]
@@ -81,13 +95,13 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
           unlockedTypes.includes(nextType)))
     )
   }
-  const handleGetDeposits = async () => {
+  const handleGetDeposits = useCallback(async () => {
     setIsLoading(true)
     try {
       if (
         config?.account.communityTokenConfig.voterWeightAddin &&
-        realm!.pubkey &&
-        wallet?.publicKey &&
+        realm?.pubkey &&
+        publicKey &&
         client
       ) {
         const {
@@ -95,12 +109,12 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
           votingPower,
           votingPowerFromDeposits,
         } = await getDeposits({
-          realmPk: realm!.pubkey,
-          communityMintPk: realm!.account.communityMint,
+          realmPk: realm.pubkey,
+          communityMintPk: realm.account.communityMint,
           walletPk: tokenOwnerRecordWalletPk
             ? new PublicKey(tokenOwnerRecordWalletPk)
-            : wallet.publicKey,
-          client: client!,
+            : publicKey,
+          client: client,
           connection: connection,
         })
         const reducedDeposits = deposits.reduce((curr, next) => {
@@ -150,41 +164,50 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
       })
     }
     setIsLoading(false)
-  }
-  useEffect(() => {
-    if (
-      JSON.stringify(ownDeposits) !== JSON.stringify(deposits) &&
-      isOwnerOfDeposits
-    ) {
-      handleGetDeposits()
-    }
-  }, [JSON.stringify(ownDeposits), ownDeposits.length])
+  }, [
+    client,
+    config?.account.communityTokenConfig.voterWeightAddin,
+    connection,
+    publicKey,
+    realm?.account.communityMint,
+    realm?.pubkey,
+    tokenOwnerRecordWalletPk,
+    wallet?.connected,
+  ])
+
   useEffect(() => {
     handleGetDeposits()
-  }, [isOwnerOfDeposits, client])
+  }, [
+    isOwnerOfDeposits,
+    client,
+    handleGetDeposits,
+    ownDeposits, //side effect
+  ])
+
+  const depositMint =
+    !mint?.supply.isZero() ||
+    config?.account.communityTokenConfig.maxVoterWeightAddin
+      ? realm?.account.communityMint
+      : !councilMint?.supply.isZero()
+      ? realm?.account.config.councilMint
+      : undefined
+
   useEffect(() => {
-    const getTokenOwnerRecord = async () => {
-      const defaultMint =
-        !mint?.supply.isZero() ||
-        config?.account.communityTokenConfig.maxVoterWeightAddin
-          ? realm!.account.communityMint
-          : !councilMint?.supply.isZero()
-          ? realm!.account.config.councilMint
-          : undefined
-      const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
-        realm!.owner,
-        realm!.pubkey,
-        defaultMint!,
-        wallet!.publicKey!
-      )
-      setIsOwnerOfDeposits(
-        tokenOwnerRecordAddress.toBase58() === tokenOwnerRecordPk
-      )
-    }
-    if (realm && wallet?.connected) {
+    if (realm?.owner && realm.pubkey && publicKey !== null && depositMint) {
+      const getTokenOwnerRecord = async () => {
+        const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
+          realm.owner,
+          realm.pubkey,
+          depositMint,
+          publicKey
+        )
+        setIsOwnerOfDeposits(
+          tokenOwnerRecordAddress.toBase58() === tokenOwnerRecordPk
+        )
+      }
       getTokenOwnerRecord()
     }
-  }, [realm?.pubkey.toBase58(), wallet?.connected, tokenOwnerRecordPk])
+  }, [tokenOwnerRecordPk, depositMint, realm, publicKey])
 
   const hasLockedTokens = useMemo(() => {
     return reducedDeposits.find((d) => d.lockUpKind !== 'none')
@@ -208,7 +231,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
             )?.index
         )
     )
-  }, [deposits])
+  }, [deposits, realm?.account.communityMint])
 
   return (
     <div className="grid grid-cols-12 gap-4">
@@ -277,10 +300,11 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
                         x.mint,
                         x.currentAmount
                       ).toNumber() *
-                      tokenService.getUSDTokenPrice(x.mintPk.toBase58())
+                      tokenPriceService.getUSDTokenPrice(x.mintPk.toBase58())
                     const tokenName =
                       getMintMetadata(x.mintPk)?.name ||
-                      tokenService.getTokenInfo(x.mintPk.toBase58())?.name ||
+                      tokenPriceService.getTokenInfo(x.mintPk.toBase58())
+                        ?.name ||
                       abbreviateAddress(x.mintPk)
                     const formatter = Intl.NumberFormat('en', {
                       notation: 'compact',
@@ -393,7 +417,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
           />
         </div>
       </div>
-      {connected && <Account withHeader={false} displayPanel={false}></Account>}
+      {connected && children}
     </div>
   )
 }

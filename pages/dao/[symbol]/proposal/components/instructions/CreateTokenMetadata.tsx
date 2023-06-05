@@ -14,7 +14,8 @@ import { getCreateTokenMetadataSchema } from 'utils/validations'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { getCreateTokenMetadataInstruction } from 'utils/instructionTools'
 import { AccountType } from '@utils/uiTypes/assets'
-import useWalletStore from 'stores/useWalletStore'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const CreateTokenMetadata = ({
   index,
@@ -23,13 +24,13 @@ const CreateTokenMetadata = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const mintGovernancesWithMintInfo = assetAccounts.filter(
     (x) => x.type === AccountType.MINT
   )
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<CreateTokenMetadataForm>({
     name: '',
@@ -38,7 +39,7 @@ const CreateTokenMetadata = ({
     mintAccount: undefined,
     programId: programId?.toString(),
   })
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const [governedAccount, setGovernedAccount] = useState<
     ProgramAccount<Governance> | undefined
   >(undefined)
@@ -77,6 +78,7 @@ const CreateTokenMetadata = ({
       propertyName: 'programId',
       value: programId?.toString(),
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [realmInfo?.programId])
 
   useEffect(() => {
@@ -84,6 +86,7 @@ const CreateTokenMetadata = ({
       { governedAccount: governedAccount, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form, governedAccount])
   useEffect(() => {
     setGovernedAccount(form?.mintAccount?.governance)
@@ -124,6 +127,7 @@ const CreateTokenMetadata = ({
         error={formErrors['mintAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
+        type="mint"
       />
 
       {shouldMakeSolTreasury && (

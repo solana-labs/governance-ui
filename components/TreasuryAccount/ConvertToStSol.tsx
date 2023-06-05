@@ -16,20 +16,18 @@ import useRealm from '@hooks/useRealm'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
 import Button from '@components/Button'
 import Tooltip from '@components/Tooltip'
-import useWalletStore from 'stores/useWalletStore'
 import { getStakeSchema } from '@utils/validations'
 import { getConvertToStSolInstruction } from '@utils/instructionTools'
-import {
-  getInstructionDataFromBase64,
-  Governance,
-  ProgramAccount,
-} from '@solana/spl-governance'
+import { getInstructionDataFromBase64 } from '@solana/spl-governance'
 import useQueryContext from '@hooks/useQueryContext'
 import { useRouter } from 'next/router'
 import { notify } from '@utils/notifications'
 import useCreateProposal from '@hooks/useCreateProposal'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { PublicKey } from '@solana/web3.js'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const defaultFormState = {
   destinationAccount: undefined,
@@ -55,16 +53,16 @@ export const LIDO_PROGRAM_ID_DEVNET =
   'CbxVmURN74QZGuFj6qKjM8VDM8b8KKZrbPFLM2CC2hC8'
 
 const ConvertToStSol = () => {
-  const { canChooseWhoVote, realm, symbol } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { canChooseWhoVote, symbol } = useRealm()
   const { canUseTransferInstruction } = useGovernanceAssets()
   const { governedTokenAccounts } = useGovernanceAssets()
   const { fmtUrlWithCluster } = useQueryContext()
   const router = useRouter()
   const { handleCreateProposal } = useCreateProposal()
 
-  const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
-  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
+  const connection = useLegacyConnectionContext()
+  const wallet = useWalletOnePointOh()
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
 
   const [formErrors, setFormErrors] = useState({})
@@ -130,15 +128,10 @@ const ConvertToStSol = () => {
       }
 
       try {
-        // Fetch governance to get up to date proposalCount
-        const selectedGovernance = (await fetchRealmGovernance(
-          currentAccount?.governance?.pubkey
-        )) as ProgramAccount<Governance>
-
         const proposalAddress = await handleCreateProposal({
           title: form.title ? form.title : getProposalText(form.amount),
           description: form.description ? form.description : '',
-          governance: selectedGovernance,
+          governance: currentAccount!.governance!,
           instructionsData: [instructionData],
           voteByCouncil,
           isDraft: false,
@@ -159,6 +152,7 @@ const ConvertToStSol = () => {
       value: currentAccount,
       propertyName: 'governedTokenAccount',
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [currentAccount, form.destinationAccount])
 
   useEffect(() => {
@@ -168,6 +162,7 @@ const ConvertToStSol = () => {
       return acc.extensions.mint?.publicKey.toString() === stSolMint
     })
     setStSolTokenAccounts(stSolAccounts)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [connection.cluster])
 
   return (

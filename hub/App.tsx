@@ -1,8 +1,10 @@
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import Script from 'next/script';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { GlobalHeader } from '@hub/components/GlobalHeader';
+import { MinimalHeader } from '@hub/components/GlobalHeader/MinimalHeader';
 import { RootProvider } from '@hub/providers/Root';
 
 const GoogleTag = React.memo(
@@ -51,12 +53,37 @@ const Twitter = React.memo(
 
 interface Props {
   children?: React.ReactNode;
+  minimal?: boolean;
 }
 
 export function App(props: Props) {
+  const router = useRouter();
+  const isDarkMode =
+    router.pathname.startsWith('/realm/[id]/governance') ||
+    router.pathname.startsWith('/realm/[id]/config');
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDarkMode]);
+
   return (
     <RootProvider>
       <Head>
+        {isDarkMode && (
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `
+                html {
+                  background-color: #171717;
+                }
+              `,
+            }}
+          />
+        )}
         <link
           rel="apple-touch-icon"
           sizes="57x57"
@@ -132,10 +159,18 @@ export function App(props: Props) {
             letter-spacing: normal !important;
           }
         `}</style>
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1"
+        />
       </Head>
       <GoogleTag />
       <Twitter />
-      <GlobalHeader className="fixed h-14 top-0 left-0 right-0 z-30" />
+      {props.minimal ? (
+        <MinimalHeader className="fixed h-14 top-0 left-0 right-0 z-30" />
+      ) : (
+        <GlobalHeader className="fixed h-14 top-0 left-0 right-0 z-30" />
+      )}
       {props.children}
     </RootProvider>
   );

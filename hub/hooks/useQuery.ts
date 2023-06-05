@@ -13,11 +13,13 @@ import * as RE from '@hub/types/Result';
 
 export function useQuery<Variables = any, A = any, O = any, I = any>(
   responseType: Type<A, O, I>,
+  //@ts-ignore
   args: UseQueryArgs<Variables, TypeOf<Type<A, O, I>>>,
 ): [
   RE.Result<TypeOf<Type<A, O, I>>, CombinedError>,
   (opts?: Partial<OperationContext> | undefined) => void,
 ] {
+  //@ts-ignore
   const [resp, fn] = _useQuery<I, Variables>(args);
 
   if (resp.fetching) {

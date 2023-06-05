@@ -1,11 +1,11 @@
 import { usePrevious } from '@hooks/usePrevious'
-import { NftVoterClient } from '@solana/governance-program-library'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { useEffect, useState } from 'react'
 import useTransactionsStore from 'stores/useTransactionStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import useWalletStore from 'stores/useWalletStore'
 import Modal from './Modal'
 
 const NftVotingCountingModal = () => {
@@ -24,7 +24,7 @@ const NftVotingComponent = () => {
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const { votingNfts } = useNftPluginStore((s) => s.state)
   const votingInProgress = useNftProposalStore((s) => s.votingInProgress)
   const usedNfts = countedNftsForProposal.length
@@ -47,7 +47,8 @@ const NftVotingComponent = () => {
   }, [usedNfts, remainingNftsToCount])
 
   useEffect(() => {
-    const multiplier = processedTransactions - prevProcessedTransactions
+    const multiplier =
+      processedTransactions - (prevProcessedTransactions as number)
     if (processedTransactions !== 0) {
       if (remainingVotingPower <= lastTransactionNftsCount) {
         handleCalcCountedNfts(remainingVotingPower)
@@ -69,6 +70,7 @@ const NftVotingComponent = () => {
         )
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [processedTransactions])
 
   return votingInProgress ? (
@@ -79,7 +81,7 @@ const NftVotingComponent = () => {
       wrapperStyle={{ top: '-350px' }}
       onClose={() =>
         closeNftVotingCountingModal(
-          client.client as NftVoterClient,
+          (client.client as unknown) as NftVoterClient,
           proposal!,
           wallet!.publicKey!
         )

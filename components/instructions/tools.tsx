@@ -5,12 +5,16 @@ import {
   // Account,
   // Transaction,
 } from '@solana/web3.js'
-import { AccountMetaData, InstructionData } from '@solana/spl-governance'
+import {
+  AccountMetaData,
+  InstructionData,
+  ProgramAccount,
+  Realm,
+} from '@solana/spl-governance'
 
 import { BPF_UPGRADEABLE_LOADER_INSTRUCTIONS } from './programs/bpfUpgradeableLoader'
 import { GOVERNANCE_INSTRUCTIONS } from './programs/governance'
-import { MANGO_INSTRUCTIONS } from './programs/mango'
-import { getProgramName, isGovernanceProgram } from './programs/names'
+import { getProgramName } from './programs/names'
 import { RAYDIUM_INSTRUCTIONS } from './programs/raydium'
 import { SPL_TOKEN_INSTRUCTIONS } from './programs/splToken'
 import { SYSTEM_INSTRUCTIONS } from './programs/system'
@@ -24,23 +28,20 @@ import { ConnectionContext } from '@utils/connection'
 import { NFT_VOTER_INSTRUCTIONS } from './programs/nftVotingClient'
 import { PROGRAM_IDS } from '@castlefinance/vault-sdk'
 import { FORESIGHT_INSTRUCTIONS } from './programs/foresight'
-import { SAGA_PHONE } from './programs/SagaPhone'
 import { LIDO_INSTRUCTIONS } from './programs/lido'
 import { NAME_SERVICE_INSTRUCTIONS } from './programs/nameService'
 import { TOKEN_AUCTION_INSTRUCTIONS } from './programs/tokenAuction'
 import { VALIDATORDAO_INSTRUCTIONS } from './programs/validatordao'
+import { POSEIDON_INSTRUCTIONS } from './programs/poseidon'
+import { MANGO_V4_INSTRUCTIONS } from './programs/mangoV4'
+import { DUAL_INSTRUCTIONS } from './programs/dual'
 
 /**
  * Default governance program id instance
  */
 export const DEFAULT_GOVERNANCE_PROGRAM_ID =
   'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'
-
-/**
- * Default TEST governance program id instance
- */
-export const DEFAULT_TEST_GOVERNANCE_PROGRAM_ID =
-  'GTesTBiEWE32WHXXE2S4XbZvA5CrEc4xs6ZgRe895dP'
+export const DEFAULT_GOVERNANCE_PROGRAM_VERSION = 3
 
 export const MANGO_DAO_TREASURY = '9RGoboEjmaAjSCXsKi6p6zJucnwF3Eg5NUN9jPS6ziL3'
 
@@ -49,17 +50,21 @@ export const ACCOUNT_NAMES = {
   AQeo6r6jdwnmf48AMejgoKdUGtV8qzbVJH42Gb5sWdi: 'Deprecated: Mango IDO program',
   '9pDEi3yT9ooT1uw1PApQDYK65advJs4Nt65EJG1m59Yq':
     'Mango Developer Council Mint',
-
   Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z: 'Mango DAO MNGO Treasury Vault',
-  '7zGXUAeUkY9pEGfApsY26amibvqsf2dmty1cbtxHdfaQ':
-    'Mango DAO SOL Treasury Vault Governance',
-  '5tgfd6XgwiXB9otEnzFpXK11m7Q7yZUaAJzWK4oT5UGF':
-    'Mango DAO SOL Treasury Vault',
+  '7zGXUAeUkY9pEGfApsY26amibvqsf2dmty1cbtxHdfaQ': 'Mango DAO Wallet Governance',
+  '7D6tGmaMyC8i73Q8X2Fec2S1Zb5rkyai6pctdMqHpHWT':
+    'Mango DAO Fast Listing Governance',
+  Fmt4596j4uBvYutwQ2ZBw7RGw9EngR8yNijdqemnpiaB: 'Mango DAO Fast Listing Wallet',
+  '5tgfd6XgwiXB9otEnzFpXK11m7Q7yZUaAJzWK4oT5UGF': 'Mango DAO Wallet',
   '9RGoboEjmaAjSCXsKi6p6zJucnwF3Eg5NUN9jPS6ziL3': 'Mango DAO MNGO Treasury',
-  '3r1tQ2qaR5teYPEyGoHwZeZfMU1zxD5FAAmtAJPbj9xX': 'Mango DAO Opinion Voting',
+  '3r1tQ2qaR5teYPEyGoHwZeZfMU1zxD5FAAmtAJPbj9xX':
+    'Mango DAO Opinion Voting Governance',
+  '36LbigK7RRiw12u7rb83Ztb9SFrUFUCDfYPxtfZndtyV':
+    'Mango DAO Opinion Voting Wallet',
+  '65u1A86RC2U6whcHeD2mRG1tXCSmH2GsiktmEFQmzZgq': 'Mango DAO USDC Governance',
   '4PdEyhrV3gaUj4ffwjKGXBLo42jF2CQCCBoXenwCRWXf':
     'Mango DAO USDC Treasury Vault',
-  '65u1A86RC2U6whcHeD2mRG1tXCSmH2GsiktmEFQmzZgq': 'Mango DAO USDC Treasury',
+  '6h29sTzK4XsL4Gjo8uXLWXgKLNSXvnnax45RJ4NSCziP': 'Mango DAO USDC Treasury',
   '4WQSYg21RrJNYhF4251XFpoy1uYbMHcMfZNLMXA3x5Mp':
     'Mango DAO Voter Stake Registry Registrar',
   DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE: 'Mango DAO Governance Realm',
@@ -106,6 +111,31 @@ export const ACCOUNT_NAMES = {
     'Friends and Family Council Mint',
   FAFDfoUkaxoMqiNur9F1iigdBNrXFf4uNmS5XrhMewvf:
     'Friends and Family Community Mint',
+
+  // Physis DAO
+  '29epeLvAMyRXtpA1HaoKB1hGcAnrc1NvMCbaZ8AVRwEi': 'Physis DAO Treasury',
+  '4i2Yjk5bUiLeVNwqBpkRdFSECSCvMgKoeCSdRSx1TPcz': 'DAO: Rewards (PHY)',
+  EUkYhtkRmxQpnKTvGayBJM3Pt1FQNjaMWP3UCUb38hJN: 'DAO: Grants (PHY)',
+  '3XwmcRf9R6TFqCwhLkftur8Baq45ZYE7DQDj9WUAPsmN': 'DAO: Governance (PHY)',
+
+  '6Va7K51FRbnPcYZTUwkoFfoYtnfh8qyJaZqT4W1GGxVi': 'Physis EcoSystem Treasury',
+  C2KKuAq4UaUFYtm3zcxZMSDUuSEfPSk4yLcq5XaBr4wM: 'EcoSystem: Development (PHY)',
+  F6EHstw5jkmHVLLXj9HEx3xCRsY7Whm7JK266jWFrFSB: 'EcoSystem: CapEX (PHY)',
+  '4gr1JjLD89VAbmQRrLeFDiLFSv2z2zn1tXRWRX4C3kow': 'EcoSystem: OpEX (PHY)',
+  '8eJoFYj8XtwJ9mER7qmb1EEnV8mGYGHyjxRct8ooJXQr': 'EcoSystem: Marketing (PHY)',
+
+  '2jfAMh48b37bBTKkoNwmvNZAqVQc1G7gh5vYv5FoWTUR': 'Physis Team Treasury',
+  '8vXYj8B567R8Di7BUvquiGC7usyPMtL756xx6KERfW9K': 'Team: Community (PHY)',
+  AiGCc2YEwLNER7DETRwv5e82eqLwPL8FMcmmHEhED5Vr: 'Team: Core (PHY)',
+  CpB6PDoxfkg2U8EC8XhyD6TdCAWkhRqZ4Fa3j3UFW6Rv: 'Team: Extraordinary (PHY)',
+
+  BaT8NdFHAhrBpS7gTQX2YgSwazeNLcA4gKooDsAutvCk: 'Physis Alliance Treasury',
+  H4WWxBJoDfGWfE212SF5tcyo75zBJnzCRAUmWpRMcxyH: 'Alliance: Partnerships (PHY)',
+  '5L84NZfjdfWHkkkUT9bJ8jKqtTMrpKsAobtTW4NKpJB1': 'Alliance: Advisors (PHY)',
+
+  E26u3zGmYtR4tnmbhNSQS6kLVmSizSvPCQyu7qGnTWQ3: 'Physis Reserve Treasury',
+  BgDFLAE25QybqyK6TMPdPF7vFTrBu1AjPs2cFkF8R3cb: 'Reserve: Seed (PHY)',
+  GDJKzWrkxWHEPPt4k2Ao1TL7S1CEo4xNRnTAVk3jrmbk: 'Reserve: Launchpad (PHY)',
 
   // GM DAO
   '7WbRWL33mM3pbFLvuqNjBztihQtHWWFPGr4HLHyqViG9': 'Team funds',
@@ -170,10 +200,28 @@ export const ACCOUNT_NAMES = {
   '3AtD8oiBUWttbnNCpKk1enRoquN9V88Nv6Rn7ESHPWHa':
     'DAO Instance Authority Governance',
   jdaoDN37BrVRvxuXSeyR7xE5Z9CAoQApexGrQJbnj6V: 'Jungle DeFi Governance Program',
+
+  //Serum DAO
+  '5xinfvkvL5NZ6BG3cDtFdTbVuMutqGXkDBuhncfmzPr2': 'Serum SRM Grant Treasury',
+
+  //Kaimana DAO
+
+  '3X9EEzWbpCzRmLxbTFoddux9faLxTMVFwjTSTXQ4W8ar': 'Kaiman dao community wallet',
+  '4Amtnu7TjDHYLyKMMvoCTDHW18a2dEMdS3sAoE96JwQz':
+    'Kaiman dao community wallet governance',
+  FXCgiZvkm9mAr6ZC9NnqNSeWZWZSmHDDZxCmzgaeShki: 'Kaiman dao council wallet',
+  yrtHtvgyPgWFrRDDMpBEva2f888kDrGnwHYEdM7fSFT:
+    'Kaiman dao council wallet governance',
+  '714JsESwkxjDZTaxD2TNe7vqMG52yxug8vaXug5VKBqd':
+    'Kaiman dao council mint governance',
+  '9rFYGii2nQz74qg5PTYViPj46E82PrJguEC2QvbZVuwk': 'Kaiman dao council mint',
 }
 
-// Blacklisted governances which should not be displayed in the UI
 // TODO: Add this to on-chain metadata to Governance account
+// Blacklisted governances which should not be displayed in the UI
+// Hidden accounts that are unusable due to wrong configuration e.g
+// 60% vote threshold on 5b token supply
+// hidden legacy accounts to declutter UI
 export const HIDDEN_GOVERNANCES = new Map<string, string>([
   ['HfWc8M6Df5wtLg8xg5vti4QKAo9KG4nL5gKQ8B2sjfYC', ''],
   ['A3Fb876sEiUmDWgrJ1fShASstw8b5wHB6XETzQa8VM7S', ''],
@@ -184,8 +232,9 @@ export const HIDDEN_GOVERNANCES = new Map<string, string>([
   ['G8JgCHfca7PehBwRp1Q91smJ9CXAd8K9e9CpfVjyD2MP', ''],
 ])
 
-// Blacklisted proposals which should not be displayed in the UI
 // TODO: Add this to on-chain metadata to Proposal account
+// Blacklisted proposals which should not be displayed in the UI
+// hidden legacy accounts to declutter UI
 export const HIDDEN_PROPOSALS = new Map<string, string>([
   ['E8XgiVpDJgDf4XgBKjZnMs3S1K7cmibtbDqjw5aNobCZ', ''],
   ['DrhhwYXaY4fvTBoQdNtgwEoTjuQswvDQLfVcgUXgP1Mx', ''],
@@ -213,17 +262,14 @@ export function getAccountName(accountPk: PublicKey | string) {
   return ACCOUNT_NAMES[key] ?? getProgramName(accountPk)
 }
 
-export const CHAT_PROGRAM_ID = new PublicKey(
-  '7fjWgipzcHFP3c5TMMWumFHNAL5Eme1gFqqRGnNPbbfG'
-)
-
 export const WSOL_MINT = 'So11111111111111111111111111111111111111112'
 export const WSOL_MINT_PK = new PublicKey(WSOL_MINT)
 
+//Hidden accounts that has some shit coins with 0 value inside but freeze authority
+//blocks closing them
 const HIDDEN_MNGO_TREASURES = [
   'GZQSF4Fh9xK7rf9WBEhawXYFw8qPXeatZLUqVQeuW3X8',
   'J6jYLFDWeeGwg4u2TXhKDCcH4fSzJFQyDE2VSv2drRkg',
-  '9VEbrfajRanMXoR1ubQiuR1ni9cNWx4QcGv3WgUUikgu',
   'HXxjhCQwm496HAXsHBWfuVkiXBLinHJqUbVKomCjKsfo',
   'EwPgko6gXD5PAgQaFo1KD7R9tPUEgRcTAfsGvgdhkP4Z',
   '6VYcrmbK4QNC7WpfVRXBAXP59ZH2FkUMBoMYhtgENGMn',
@@ -235,7 +281,7 @@ const HIDDEN_MNGO_TREASURES = [
 ]
 
 //owner and desired accounts we want to show
-export const MNGO_AUXILIARY_TOKEN_ACCOUNTS = [
+const MNGO_AUXILIARY_TOKEN_ACCOUNTS = [
   {
     owner: '9BVcYqEQxyccuwznvxXqDkSJFavvTyheiTYk231T1A8S',
     accounts: ['59BEyxwrFpt3x4sZ7TcXC3bHx3seGfqGkATcDx6siLWy'],
@@ -258,7 +304,7 @@ export const ALL_CASTLE_PROGRAMS = [
   PROGRAM_IDS['mainnet'],
 ]
 
-export interface AccountDescriptor {
+interface AccountDescriptor {
   name: string
   important?: boolean
 }
@@ -283,7 +329,6 @@ export interface InstructionDescriptor {
 export const INSTRUCTION_DESCRIPTORS = {
   ...SPL_TOKEN_INSTRUCTIONS,
   ...BPF_UPGRADEABLE_LOADER_INSTRUCTIONS,
-  ...MANGO_INSTRUCTIONS,
   ...RAYDIUM_INSTRUCTIONS,
   ...MARINADE_INSTRUCTIONS,
   ...LIDO_INSTRUCTIONS,
@@ -295,17 +340,20 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...NFT_VOTER_INSTRUCTIONS,
   ...STREAMFLOW_INSTRUCTIONS,
   ...NAME_SERVICE_INSTRUCTIONS,
-  ...SAGA_PHONE,
   ...TOKEN_AUCTION_INSTRUCTIONS,
   ...VALIDATORDAO_INSTRUCTIONS,
+  ...POSEIDON_INSTRUCTIONS,
+  ...MANGO_V4_INSTRUCTIONS,
+  ...DUAL_INSTRUCTIONS,
 }
 
 export async function getInstructionDescriptor(
   connection: ConnectionContext,
-  instruction: InstructionData
+  instruction: InstructionData,
+  realm?: ProgramAccount<Realm> | undefined
 ) {
   let descriptors: any
-  if (isGovernanceProgram(instruction.programId)) {
+  if (realm && instruction.programId.equals(realm.owner)) {
     descriptors =
       GOVERNANCE_INSTRUCTIONS['GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw']
   } else {
@@ -317,6 +365,12 @@ export async function getInstructionDescriptor(
   const descriptor = !instruction.data.length
     ? descriptors
     : descriptors && descriptors[instruction.data[0]]
+    ? descriptors[instruction.data[0]]
+    : //backup if first number is same for couple of instructions inside same idl
+    descriptors && descriptors[`${instruction.data[0]}${instruction.data[1]}`]
+    ? descriptors[`${instruction.data[0]}${instruction.data[1]}`]
+    : descriptors
+
   const dataUI = (descriptor?.getDataUI &&
     (await descriptor?.getDataUI(
       connection.current,

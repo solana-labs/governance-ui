@@ -6,10 +6,9 @@ import {
   SYSTEM_PROGRAM_ID,
   withCreateTokenOwnerRecord,
 } from '@solana/spl-governance'
-import { NftVoterClient } from '@solana/governance-program-library'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
-import useWalletStore from 'stores/useWalletStore'
 import useRealm from '@hooks/useRealm'
 import Button from '@components/Button'
 import { getVoterWeightRecord } from '@utils/plugin/accounts'
@@ -17,6 +16,10 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { sendTransaction } from '@utils/send'
 
 import VotingPowerPct from './VotingPowerPct'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
+import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface Props {
   className?: string
@@ -29,11 +32,12 @@ export default function NftVotingPower(props: Props) {
   const votingPower = useNftPluginStore((s) => s.state.votingPower)
   const maxWeight = useNftPluginStore((s) => s.state.maxVoteRecord)
   const isLoading = useNftPluginStore((s) => s.state.isLoadingNfts)
-  const connected = useWalletStore((s) => s.connected)
-  const wallet = useWalletStore((s) => s.current)
-  const connection = useWalletStore((s) => s.connection)
-  const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
-  const { ownTokenRecord, realm, realmInfo } = useRealm()
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
+  const connection = useLegacyConnectionContext()
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const realm = useRealmQuery().data?.result
+  const { realmInfo } = useRealm()
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
@@ -46,46 +50,47 @@ export default function NftVotingPower(props: Props) {
   const amount = new BigNumber(votingPower.toString())
 
   const handleRegister = async () => {
+    if (!realm || !wallet?.publicKey || !client.client || !realmInfo)
+      throw new Error()
     const instructions: TransactionInstruction[] = []
     const { voterWeightPk } = await getVoterWeightRecord(
-      realm!.pubkey,
-      realm!.account.communityMint,
-      wallet!.publicKey!,
-      client.client!.program.programId
+      realm.pubkey,
+      realm.account.communityMint,
+      wallet.publicKey,
+      client.client.program.programId
     )
     const createVoterWeightRecordIx = await (client.client as NftVoterClient).program.methods
-      .createVoterWeightRecord(wallet!.publicKey!)
+      .createVoterWeightRecord(wallet.publicKey)
       .accounts({
         voterWeightRecord: voterWeightPk,
-        governanceProgramId: realm!.owner,
-        realm: realm!.pubkey,
-        realmGoverningTokenMint: realm!.account.communityMint,
-        payer: wallet!.publicKey!,
+        governanceProgramId: realm.owner,
+        realm: realm.pubkey,
+        realmGoverningTokenMint: realm.account.communityMint,
+        payer: wallet.publicKey,
         systemProgram: SYSTEM_PROGRAM_ID,
       })
       .instruction()
     instructions.push(createVoterWeightRecordIx)
     await withCreateTokenOwnerRecord(
       instructions,
-      realm!.owner!,
-      realmInfo?.programVersion!,
-      realm!.pubkey,
-      wallet!.publicKey!,
-      realm!.account.communityMint,
-      wallet!.publicKey!
+      realm.owner,
+      realmInfo.programVersion!,
+      realm.pubkey,
+      wallet.publicKey,
+      realm.account.communityMint,
+      wallet.publicKey
     )
     const transaction = new Transaction()
     transaction.add(...instructions)
 
     await sendTransaction({
       transaction: transaction,
-      wallet: wallet!,
+      wallet: wallet,
       connection: connection.current,
       signers: [],
       sendingMessage: `Registering`,
       successMessage: `Registered`,
     })
-    await fetchRealm(realm?.owner, realm?.pubkey)
   }
 
   if (isLoading) {

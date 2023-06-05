@@ -4,9 +4,8 @@ import MemberOverview from '@components/Members/MemberOverview'
 import { PlusCircleIcon, SearchIcon, UsersIcon } from '@heroicons/react/outline'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Tooltip from '@components/Tooltip'
-import useWalletStore from 'stores/useWalletStore'
 import Modal from '@components/Modal'
-import AddMemberForm from '@components/Members/AddMemberForm'
+import { AddCouncilMemberForm } from '@components/Members/AddMemberForm'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import { LinkButton } from '@components/Button'
 import MembersTabs from '@components/Members/MembersTabs'
@@ -15,6 +14,7 @@ import Input from '@components/inputs/Input'
 import { Member } from '@utils/uiTypes/members'
 import useMembersStore from 'stores/useMembersStore'
 import PaginationComponent from '@components/Pagination'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const Members = () => {
   const {
@@ -25,7 +25,8 @@ const Members = () => {
   const pagination = useRef<{ setPage: (val) => void }>(null)
   const membersPerPage = 10
   const activeMembers = useMembersStore((s) => s.compact.activeMembers)
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const {
     canUseMintInstruction,
     canMintRealmCouncilToken,
@@ -72,10 +73,12 @@ const Members = () => {
       setActiveMember(activeMembers[0])
       setFilteredMembers(activeMembers)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(activeMembers)])
   useEffect(() => {
     setPaginatedMembers(paginateMembers(0))
     pagination?.current?.setPage(0)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(filteredMembers)])
   return (
     <div className="bg-bkg-2 rounded-lg p-4 md:p-6">
@@ -192,7 +195,7 @@ const Members = () => {
           onClose={() => setOpenAddMemberModal(false)}
           isOpen={openAddMemberModal}
         >
-          <AddMemberForm close={() => setOpenAddMemberModal(false)} />
+          <AddCouncilMemberForm close={() => setOpenAddMemberModal(false)} />
         </Modal>
       )}
     </div>

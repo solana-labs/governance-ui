@@ -4,6 +4,7 @@ import { MintInfo } from '@solana/spl-token'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { Wallet } from '@models/treasury/Wallet'
 
+// @asktree: this function and file should not exist. Taking an account and slightly modifying every field before serving it to components should be done almost never.
 export function getRulesFromAccount(
   account: AssetAccount,
   existingRules: Wallet['rules'],
@@ -15,10 +16,9 @@ export function getRulesFromAccount(
 
   if (!rules.common) {
     rules.common = {
-      maxVotingTime: govConfig.maxVotingTime,
+      maxVotingTime: govConfig.baseVotingTime,
       minInstructionHoldupTime: govConfig.minInstructionHoldUpTime,
-      voteThresholdPercentage: govConfig.communityVoteThreshold.value!,
-      voteTipping: govConfig.communityVoteTipping,
+      votingCoolOffSeconds: govConfig.votingCoolOffTime,
     }
   }
 
@@ -28,7 +28,12 @@ export function getRulesFromAccount(
     !rules.community
   ) {
     rules.community = {
+      voteTipping: govConfig.communityVoteTipping,
       decimals: communityMint?.decimals,
+      voteThresholdPercentage:
+        govConfig.communityVoteThreshold.value ?? 'disabled',
+      vetoVoteThresholdPercentage:
+        govConfig.communityVetoVoteThreshold.value ?? 'disabled',
       minTokensToCreateProposal: new BigNumber(
         govConfig.minCommunityTokensToCreateProposal.toString()
       ).shiftedBy(communityMint ? -communityMint.decimals : 0),
@@ -41,7 +46,12 @@ export function getRulesFromAccount(
     !rules.council
   ) {
     rules.council = {
+      voteTipping: govConfig.councilVoteTipping,
       decimals: councilMint?.decimals,
+      voteThresholdPercentage:
+        govConfig.councilVoteThreshold.value ?? 'disabled',
+      vetoVoteThresholdPercentage:
+        govConfig.councilVetoVoteThreshold.value ?? 'disabled',
       minTokensToCreateProposal: new BigNumber(
         govConfig.minCouncilTokensToCreateProposal.toString()
       ).shiftedBy(councilMint ? -councilMint.decimals : 0),

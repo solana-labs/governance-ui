@@ -17,9 +17,8 @@ import {
   SendTokenCompactViewForm,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import useWalletStore from 'stores/useWalletStore'
 
 import { getTokenTransferSchema } from '@utils/validations'
 import {
@@ -27,12 +26,10 @@ import {
   ArrowCircleUpIcon,
   //   InformationCircleIcon,
 } from '@heroicons/react/solid'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import BigNumber from 'bignumber.js'
 import { getInstructionDataFromBase64 } from '@solana/spl-governance'
 import useQueryContext from '@hooks/useQueryContext'
-import { Governance } from '@solana/spl-governance'
-import { ProgramAccount } from '@solana/spl-governance'
 import { useRouter } from 'next/router'
 import { notify } from '@utils/notifications'
 import Textarea from '@components/inputs/Textarea'
@@ -44,12 +41,16 @@ import {
   getSolTransferInstruction,
   getTransferInstruction,
   getTransferNftInstruction,
+  validateInstruction,
 } from '@utils/instructionTools'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
 import NFTSelector from '@components/NFTS/NFTSelector'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
 import useCreateProposal from '@hooks/useCreateProposal'
 import NFTAccountSelect from './NFTAccountSelect'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const SendTokens = ({
   isNft = false,
@@ -59,19 +60,19 @@ const SendTokens = ({
   selectedNft?: NFTWithMint | null
 }) => {
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
   const { setCurrentAccount } = useTreasuryAccountStore()
-  const { realmInfo, symbol, realm, canChooseWhoVote } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { realmInfo, symbol, canChooseWhoVote } = useRealm()
   const { handleCreateProposal } = useCreateProposal()
   const { canUseTransferInstruction } = useGovernanceAssets()
   const tokenInfo = useTreasuryAccountStore((s) => s.tokenInfo)
   const isNFT = isNft || currentAccount?.isNft
   const isSol = currentAccount?.isSol
   const { fmtUrlWithCluster } = useQueryContext()
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const router = useRouter()
-  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<SendTokenCompactViewForm>({
     destinationAccount: '',
@@ -126,7 +127,7 @@ const SendTokens = ({
     })
   }
   const calcTransactionDolarAmount = (amount) => {
-    const price = tokenService.getUSDTokenPrice(
+    const price = tokenPriceService.getUSDTokenPrice(
       currentAccount!.extensions.mint!.publicKey.toBase58()
     )
     const totalPrice = amount * price
@@ -135,76 +136,79 @@ const SendTokens = ({
     return totalPriceFormatted
   }
 
-  async function getNftInstruction(x: NFTWithMint): Promise<UiInstruction> {
-    const selectedNftMint = x.mintAddress
-    const defaultProps = {
-      schema,
-      form,
-      programId,
-      connection,
-      wallet,
-      currentAccount,
-      setFormErrors,
-    }
-    return getTransferNftInstruction({
-      ...defaultProps,
-      nftMint: selectedNftMint,
-    })
-  }
-
   const handleProposeNftSend = async () => {
-    for (const x of selectedNfts) {
-      const nftName = x?.name
-      const nftTitle = `Send ${nftName ? nftName : 'NFT'} to ${
-        tryParseKey(form.destinationAccount)
-          ? abbreviateAddress(new PublicKey(form.destinationAccount))
-          : ''
-      }`
-      const proposalTitle = isNFT
-        ? nftTitle
-        : `Pay ${form.amount}${tokenInfo ? ` ${tokenInfo?.symbol} ` : ' '}to ${
+    if (!realm || !programId) {
+      throw new Error()
+    }
+    if (!wallet?.publicKey) {
+      throw 'connect wallet'
+    }
+    if (!currentAccount) {
+      throw new Error()
+    }
+    const assetAccount = form.governedTokenAccount
+    if (assetAccount === undefined) {
+      throw 'no governance/asset account selected'
+    }
+    setIsLoading(true)
+
+    const governance = currentAccount.governance
+
+    //validate
+    const valid = await validateInstruction({ schema, form, setFormErrors })
+    if (!valid) {
+      setIsLoading(false)
+      return
+    }
+    const instructions = await Promise.all(
+      selectedNfts.map((x) =>
+        getTransferNftInstruction({
+          programId,
+          assetAccount,
+          connection,
+          currentAccount,
+          nftMint: x.mintAddress,
+          toOwner: new PublicKey(form.destinationAccount),
+          ataCreationPayer: wallet.publicKey!, //typescript why are you like this? its not null, wtf
+        })
+      )
+    )
+
+    const instructionsData = instructions.map((instruction) => ({
+      data: getInstructionDataFromBase64(instruction.serializedInstruction),
+      holdUpTime: governance.account.config.minInstructionHoldUpTime,
+      prerequisiteInstructions: instruction.prerequisiteInstructions ?? [],
+      chunkBy: 1,
+    }))
+
+    const proposalTitle =
+      selectedNfts.length > 1
+        ? 'Send NFTs'
+        : `Send ${selectedNfts[0].name} to ${
             tryParseKey(form.destinationAccount)
               ? abbreviateAddress(new PublicKey(form.destinationAccount))
               : ''
           }`
-      setIsLoading(true)
-      const instruction: UiInstruction = await getNftInstruction(x)
-      if (instruction.isValid) {
-        const governance = currentAccount?.governance
-        let proposalAddress: PublicKey | null = null
-        if (!realm) {
-          setIsLoading(false)
-          throw 'No realm selected'
-        }
-        const instructionData = {
-          data: instruction.serializedInstruction
-            ? getInstructionDataFromBase64(instruction.serializedInstruction)
-            : null,
-          holdUpTime: governance?.account?.config.minInstructionHoldUpTime,
-          prerequisiteInstructions: instruction.prerequisiteInstructions || [],
-        }
-        try {
-          // Fetch governance to get up to date proposalCount
-          const selectedGovernance = (await fetchRealmGovernance(
-            governance?.pubkey
-          )) as ProgramAccount<Governance>
-          proposalAddress = await handleCreateProposal({
-            title: form.title ? form.title : proposalTitle,
-            description: form.description ? form.description : '',
-            voteByCouncil,
-            instructionsData: [instructionData],
-            governance: selectedGovernance!,
-          })
-          const url = fmtUrlWithCluster(
-            `/dao/${symbol}/proposal/${proposalAddress}`
-          )
-          router.push(url)
-        } catch (ex) {
-          notify({ type: 'error', message: `${ex}` })
-        }
-      }
+
+    try {
+      const proposalAddress = await handleCreateProposal({
+        title: form.title ? form.title : proposalTitle,
+        description: form.description ? form.description : '',
+        voteByCouncil,
+        instructionsData,
+        governance,
+      })
+      const url = fmtUrlWithCluster(
+        `/dao/${symbol}/proposal/${proposalAddress}`
+      )
+      router.push(url)
+    } catch (ex) {
+      notify({ type: 'error', message: `${ex}` })
+      //console.error(ex)
       setIsLoading(false)
+      throw ex
     }
+    setIsLoading(false)
   }
 
   async function getInstruction(): Promise<UiInstruction> {
@@ -241,16 +245,12 @@ const SendTokens = ({
         prerequisiteInstructions: instruction.prerequisiteInstructions || [],
       }
       try {
-        // Fetch governance to get up to date proposalCount
-        const selectedGovernance = (await fetchRealmGovernance(
-          governance?.pubkey
-        )) as ProgramAccount<Governance>
         proposalAddress = await handleCreateProposal({
           title: form.title ? form.title : proposalTitle,
           description: form.description ? form.description : '',
           voteByCouncil,
           instructionsData: [instructionData],
-          governance: selectedGovernance!,
+          governance: governance!,
         })
         const url = fmtUrlWithCluster(
           `/dao/${symbol}/proposal/${proposalAddress}`
@@ -283,6 +283,7 @@ const SendTokens = ({
         propertyName: 'governedTokenAccount',
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [currentAccount])
   useEffect(() => {
     if (form.destinationAccount) {
@@ -298,6 +299,7 @@ const SendTokens = ({
     } else {
       setDestinationAccount(null)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.destinationAccount])
 
   const schema = getTokenTransferSchema({ form, connection, nftMode: isNft })
@@ -471,11 +473,6 @@ const SendTokens = ({
       </div>
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
         <Button
-          disabled={
-            !canUseTransferInstruction ||
-            isLoading ||
-            (isNFT && !selectedNfts.length)
-          }
           className="ml-auto"
           onClick={isNft ? handleProposeNftSend : handleProposeTransfer}
           isLoading={isLoading}

@@ -51,8 +51,20 @@ export const graphcache = async (
     storage,
     keys: {
       ClippedRichTextDocument: () => null,
+      DiscoverPage: (page) => String(page.version as number),
+      DiscoverPageSpotlightItem: (item) => item.publicKey as string,
+      DiscoverPageSpotlightItemStat: () => null,
+      GovernanceRules: (rules) => rules.governanceAddress as string,
       Realm: (realm) => realm.publicKey as string,
-      RealmDropdownListItem: (item) => item.publicKey as string,
+      RealmAboutSection: () => null,
+      RealmDocumentation: () => null,
+      RealmFaqItem: () => null,
+      RealmGalleryItem: () => null,
+      RealmResource: () => null,
+      RealmRoadmap: () => null,
+      RealmRoadmapItem: () => null,
+      RealmTeamMember: () => null,
+      RealmTokenDetails: (details) => details.mint as string,
       RealmHub: (hub) => hub.realm as string,
       RealmHubInfo: () => null,
       RealmHubInfoAboutSection: () => null,
@@ -72,6 +84,7 @@ export const graphcache = async (
       RealmProposalUserVote: () => null,
       RealmProposalVoteBreakdown: () => null,
       RealmTreasury: (treasury) => treasury.belongsTo as string,
+      TokenBasedGovernanceRules: () => null,
       User: (user) => user.publicKey as string,
     },
     updates: {
@@ -90,6 +103,22 @@ export const graphcache = async (
               },
             );
           }
+        },
+        followRealm(_result, args, cache) {
+          cache
+            .inspectFields('Query')
+            .filter((field) => field.fieldName.startsWith('followedRealmsFeed'))
+            .forEach((field) => {
+              cache.invalidate('Query', field.fieldKey);
+            });
+        },
+        unfollowRealm(_result, args, cache) {
+          cache
+            .inspectFields('Query')
+            .filter((field) => field.fieldName.startsWith('followedRealmsFeed'))
+            .forEach((field) => {
+              cache.invalidate('Query', field.fieldKey);
+            });
         },
       },
     },

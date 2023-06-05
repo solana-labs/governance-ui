@@ -1,9 +1,8 @@
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { PublicKey } from '@solana/web3.js'
 
 export interface Member {
   walletAddress: string
-  votesCasted: number
   councilVotes: BN
   communityVotes: BN
   hasCouncilTokenOutsideRealm?: boolean
@@ -12,11 +11,11 @@ export interface Member {
   delegateWalletCommunity?: PublicKey
 }
 
-export interface Delegate {
+interface Delegate {
   communityMembers?: Array<Member>
   councilMembers?: Array<Member>
-  communityTokenCount?: number
-  councilTokenCount?: number
+  communityTokenCount?: BN
+  councilTokenCount?: BN
 }
 
 export interface Delegates {

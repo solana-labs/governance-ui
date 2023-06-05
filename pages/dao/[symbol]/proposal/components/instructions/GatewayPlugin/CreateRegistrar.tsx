@@ -9,7 +9,6 @@ import {
 import { validateInstruction } from '@utils/instructionTools'
 import { NameValue, UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
-import useWalletStore from 'stores/useWalletStore'
 import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NewProposalContext } from '../../../new'
@@ -23,6 +22,8 @@ import { PublicKey } from '@solana/web3.js'
 import { InformationCircleIcon } from '@heroicons/react/outline'
 import Tooltip from '@components/Tooltip'
 import { getRegistrarPDA } from '@utils/plugin/accounts'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 interface CreateGatewayRegistrarForm {
   governedAccount: AssetAccount | undefined
@@ -38,11 +39,12 @@ const CreateGatewayPluginRegistrar = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { realm, realmInfo } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { realmInfo } = useRealm()
   const gatewayClient = useVotePluginsClientStore((s) => s.state.gatewayClient)
   const { assetAccounts } = useGovernanceAssets()
-  const wallet = useWalletStore((s) => s.current)
-  const shouldBeGoverned = index !== 0 && governance
+  const wallet = useWalletOnePointOh()
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<CreateGatewayRegistrarForm>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -93,7 +95,6 @@ const CreateGatewayPluginRegistrar = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form!.governedAccount?.governance,
-      chunkSplitByDefault: true,
     }
   }
   useEffect(() => {
@@ -101,6 +102,7 @@ const CreateGatewayPluginRegistrar = ({
       { governedAccount: form?.governedAccount?.governance, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
   const schema = yup.object().shape({
     governedAccount: yup
@@ -110,7 +112,7 @@ const CreateGatewayPluginRegistrar = ({
   })
   const inputs: InstructionInput[] = [
     {
-      label: 'Governance',
+      label: 'Wallet',
       initialValue: null,
       name: 'governedAccount',
       type: InstructionInputType.GOVERNED_ACCOUNT,

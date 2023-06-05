@@ -7,26 +7,25 @@ import {
   ExecuteAllInstructionButton,
   PlayState,
 } from '@components/instructions/ExecuteAllInstructionButton'
-import useProposal from '@hooks/useProposal'
 import { ntext } from '@utils/ntext'
 import Button from '@components/Button'
 import { diffTime } from '@components/ProposalRemainingVotingTime'
 import useProposalTransactions from '@hooks/useProposalTransactions'
+import { useRouteProposalQuery } from '@hooks/queries/proposal'
+import { useSelectedProposalTransactions } from '@hooks/queries/proposalTransaction'
 
 interface Props {
   className?: string
 }
 
 export default function ProposalExecutionCard(props: Props) {
-  const { instructions, proposal } = useProposal()
+  const proposal = useRouteProposalQuery().data?.result
+  const { data: allTransactions } = useSelectedProposalTransactions()
   const [playState, setPlayState] = useState(PlayState.Unplayed)
   const [timeLeft, setTimeLeft] = useState<
     undefined | ReturnType<typeof diffTime>
   >()
   const timer = useRef<undefined | number>()
-
-  const allTransactions = Object.values(instructions)
-
   const proposalTransactions = useProposalTransactions(
     allTransactions,
     proposal
@@ -45,9 +44,11 @@ export default function ProposalExecutionCard(props: Props) {
     }
 
     return () => clearInterval(timer.current)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [proposalTransactions?.nextExecuteAt])
 
   if (
+    allTransactions === undefined ||
     allTransactions.length === 0 ||
     !proposal ||
     !proposalTransactions ||
@@ -94,6 +95,7 @@ export default function ProposalExecutionCard(props: Props) {
               setPlaying={setPlayState}
               small={false}
               proposalInstructions={ready}
+              multiTransactionMode={true}
             />
           ) : (
             <Button className="w-48" disabled>

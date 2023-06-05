@@ -12,17 +12,23 @@ import { Transaction, TransactionInstruction } from '@solana/web3.js'
 import { sendTransaction } from '@utils/send'
 import { useState, useEffect, useMemo } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import useWalletStore from 'stores/useWalletStore'
 import useGatewayPluginStore from '../../GatewayPlugin/store/gatewayPluginStore'
 import { GatewayButton } from '@components/Gateway/GatewayButton'
 import { getRegistrarPDA, getVoterWeightRecord } from '@utils/plugin/accounts'
 import { useRecords } from '@components/Gateway/useRecords'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 // TODO lots of overlap with NftBalanceCard here - we need to separate the logic for creating the Token Owner Record
 // from the rest of this logic
 const GatewayCard = () => {
-  const connected = useWalletStore((s) => s.connected)
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
@@ -30,10 +36,13 @@ const GatewayCard = () => {
     (s) => s.state.gatekeeperNetwork
   )
   const isLoading = useGatewayPluginStore((s) => s.state.isLoadingGatewayToken)
-  const connection = useWalletStore((s) => s.connection)
-  const [, setTokenOwneRecordPk] = useState('')
-  const { realm, mint, councilMint, realmInfo } = useRealm()
-  const { fetchRealm } = useWalletStore((s) => s.actions)
+  const connection = useLegacyConnectionContext()
+  const [, setTokenOwneRecordPk] = useState('') //@asktree: ?????????????????????????????????????????
+  const realm = useRealmQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+
+  const { realmInfo } = useRealm()
   const records = useRecords()
 
   // show the join button if any of the records required by the chain of plugins are not yet created
@@ -44,6 +53,7 @@ const GatewayCard = () => {
       (!records.voteWeightRecord.accountExists &&
         records.voteWeightRecord.accountRequired)
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [records, client])
 
   const handleRegister = async () => {
@@ -105,7 +115,6 @@ const GatewayCard = () => {
       sendingMessage: `Registering`,
       successMessage: `Registered`,
     })
-    await fetchRealm(realm?.owner, realm?.pubkey)
   }
 
   useEffect(() => {
@@ -126,6 +135,7 @@ const GatewayCard = () => {
     if (realm && wallet?.connected) {
       getTokenOwnerRecord()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [realm?.pubkey.toBase58(), wallet?.connected])
 
   return (

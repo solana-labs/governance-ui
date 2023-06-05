@@ -13,14 +13,14 @@ import {
   ValidatorDeactivateStakeForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
-import useWalletStore from 'stores/useWalletStore'
-import { web3 } from '@project-serum/anchor'
+import { web3 } from '@coral-xyz/anchor'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
-import { getFilteredProgramAccounts } from '@blockworks-foundation/mango-client'
-import { bs58 } from '@project-serum/anchor/dist/cjs/utils/bytes'
+import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes'
 import { StakeAccount, StakeState } from '@utils/uiTypes/assets'
 import StakeAccountSelect from '../../StakeAccountSelect'
+import { getFilteredProgramAccounts } from '@utils/helpers'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const DeactivateValidatorStake = ({
   index,
@@ -29,10 +29,10 @@ const DeactivateValidatorStake = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const programId: PublicKey = StakeProgram.programId
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
 
   const [form, setForm] = useState<ValidatorDeactivateStakeForm>({
     stakingAccount: undefined,
@@ -146,7 +146,6 @@ const DeactivateValidatorStake = ({
       ),
       isValid: true,
       governance: form.governedTokenAccount.governance,
-      shouldSplitIntoSeparateTxs: false,
     }
   }
 
@@ -158,6 +157,7 @@ const DeactivateValidatorStake = ({
       },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
 
   useEffect(() => {
@@ -165,12 +165,14 @@ const DeactivateValidatorStake = ({
       { governedAccount: governedAccount, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
   useEffect(() => {
     setGovernedAccount(form.governedTokenAccount?.governance)
     if (form.governedTokenAccount) {
       getStakeAccounts().then((x) => setStakeAccounts(x))
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.governedTokenAccount])
 
   return (

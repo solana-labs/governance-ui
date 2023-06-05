@@ -1,5 +1,5 @@
 import Select from '@components/inputs/Select'
-import { Governance, GovernanceAccountType } from '@solana/spl-governance'
+import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import {
   getMintAccountLabelInfo,
@@ -8,7 +8,7 @@ import {
 } from '@utils/tokens'
 import React, { useEffect } from 'react'
 import { getProgramName } from '@components/instructions/programs/names'
-import { AssetAccount } from '@utils/uiTypes/assets'
+import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 
 const GovernedAccountSelect = ({
   onChange,
@@ -19,21 +19,20 @@ const GovernedAccountSelect = ({
   governance,
   label,
   noMaxWidth,
-  autoselectFirst = true,
+  autoSelectFirst = true,
 }: {
   onChange
   value
   error?
   governedAccounts: AssetAccount[]
-  shouldBeGoverned?
+  shouldBeGoverned?: boolean
   governance?: ProgramAccount<Governance> | null | undefined
   label?
   noMaxWidth?: boolean
-  autoselectFirst?: boolean
+  autoSelectFirst?: boolean
 }) => {
   function getLabel(value: AssetAccount) {
     if (value) {
-      const accountType = value.governance.account.accountType
       if (value.isSol || value.isToken) {
         return getTokenAccountLabelComponent(
           value.isSol
@@ -41,15 +40,16 @@ const GovernedAccountSelect = ({
             : getTokenAccountLabelInfo(value)
         )
       } else {
-        switch (accountType) {
-          case GovernanceAccountType.MintGovernanceV1:
-          case GovernanceAccountType.MintGovernanceV2:
+        switch (value.type) {
+          case AccountType.MINT:
             return getMintAccountLabelComponent(getMintAccountLabelInfo(value))
-          case GovernanceAccountType.ProgramGovernanceV1:
-          case GovernanceAccountType.ProgramGovernanceV2:
-            return getProgramAccountLabel(value.governance)
+          case AccountType.PROGRAM:
+            return getProgramAccountLabel(value)
           default:
-            return value.governance.account.governedAccount.toBase58()
+            return (
+              value.extensions.transferAddress?.toBase58() ||
+              value.pubkey.toBase58()
+            )
         }
       }
     } else {
@@ -104,22 +104,23 @@ const GovernedAccountSelect = ({
       </div>
     )
   }
-  function getProgramAccountLabel(val: ProgramAccount<Governance>) {
-    const name = val ? getProgramName(val.account.governedAccount) : ''
+  function getProgramAccountLabel(val: AssetAccount) {
+    const name = val ? getProgramName(val.pubkey) : ''
     return (
       <div className="flex flex-col">
         {name && <div>{name}</div>}
-        <div>{val?.account?.governedAccount?.toBase58()}</div>
+        <div>{val?.pubkey?.toBase58()}</div>
       </div>
     )
   }
   useEffect(() => {
-    if (governedAccounts.length == 1 && autoselectFirst) {
+    if (governedAccounts.length == 1 && autoSelectFirst) {
       //wait for microtask queue to be empty
       setTimeout(() => {
         onChange(governedAccounts[0])
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(governedAccounts)])
   return (
     <Select

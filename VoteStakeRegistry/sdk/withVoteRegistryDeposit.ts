@@ -1,6 +1,6 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import { LockupType } from 'VoteStakeRegistry/sdk/accounts'
 import { withCreateNewDeposit } from './withCreateNewDeposit'
 import { VsrClient } from './client'

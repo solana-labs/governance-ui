@@ -1,4 +1,3 @@
-import * as Separator from '@radix-ui/react-separator';
 import type { PublicKey } from '@solana/web3.js';
 import { pipe } from 'fp-ts/function';
 import React from 'react';
@@ -25,8 +24,10 @@ interface BaseProps {
   sort: FeedItemSort;
   realm: PublicKey;
   realmUrlId: string;
+  userIsAdmin?: boolean;
   onLoadMore?(after: string): void;
   onNoAdditionalPages?(): void;
+  onRefresh?(): void;
 }
 
 interface Props extends BaseProps {
@@ -62,14 +63,14 @@ export function Content(props: Props) {
         }}
       />
       {feedItems.map((feedItem) => (
-        <React.Fragment key={feedItem.node.id}>
-          <FeedItem.Content
-            feedItem={feedItem.node}
-            realm={props.realm}
-            realmUrlId={props.realmUrlId}
-          />
-          <Separator.Root className="w-full h-[1px] bg-neutral-300 my-4" />
-        </React.Fragment>
+        <FeedItem.Content
+          className="mb-16"
+          key={feedItem.node.id}
+          feedItem={feedItem.node}
+          realm={props.realm}
+          realmUrlId={props.realmUrlId}
+          userIsAdmin={props.userIsAdmin}
+        />
       ))}
     </div>
   );
@@ -101,6 +102,7 @@ export function AdditionalPage(props: BaseProps) {
           realmUrlId={props.realmUrlId}
           onLoadMore={props.onLoadMore}
           onNoAdditionalPages={props.onNoAdditionalPages}
+          onRefresh={props.onRefresh}
         />
       ),
     ),

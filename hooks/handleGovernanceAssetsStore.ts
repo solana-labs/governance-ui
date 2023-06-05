@@ -1,26 +1,21 @@
 import { useEffect } from 'react'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
-import useWalletStore from 'stores/useWalletStore'
-import { usePrevious } from './usePrevious'
-import useRealm from './useRealm'
+import { useRealmQuery } from './queries/realm'
+import { useRealmGovernancesQuery } from './queries/governance'
+import useLegacyConnectionContext from './useLegacyConnectionContext'
 
-export default function handleGovernanceAssetsStore() {
-  const { governances, realm } = useRealm()
-  const previousStringifyGovernances = usePrevious(
-    JSON.stringify(Object.keys(governances))
-  )
-  const connection = useWalletStore((s) => s.connection)
+export default function useHandleGovernanceAssetsStore() {
+  const realm = useRealmQuery().data?.result
+
+  const connection = useLegacyConnectionContext()
+
+  const governancesArray = useRealmGovernancesQuery().data
+
   const { setGovernancesArray } = useGovernanceAssetsStore()
+
   useEffect(() => {
-    if (
-      realm &&
-      previousStringifyGovernances !== JSON.stringify(Object.keys(governances))
-    ) {
-      setGovernancesArray(connection, realm, governances)
+    if (realm && governancesArray) {
+      setGovernancesArray(connection, realm, governancesArray)
     }
-  }, [
-    JSON.stringify(Object.keys(governances)),
-    realm?.pubkey.toBase58(),
-    realm?.account.authority?.toBase58(),
-  ])
+  }, [connection, governancesArray, realm, setGovernancesArray])
 }

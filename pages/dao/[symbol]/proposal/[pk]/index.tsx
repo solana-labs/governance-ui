@@ -1,16 +1,16 @@
 import ReactMarkdown from 'react-markdown/react-markdown.min'
 import remarkGfm from 'remark-gfm'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
-import useProposal from 'hooks/useProposal'
-import ProposalStateBadge from 'components/ProposalStatusBadge'
-import { InstructionPanel } from 'components/instructions/instructionPanel'
+import { useProposalGovernanceQuery } from 'hooks/useProposal'
+import ProposalStateBadge from '@components/ProposalStateBadge'
+import { TransactionPanel } from '@components/instructions/TransactionPanel'
 import DiscussionPanel from 'components/chat/DiscussionPanel'
-import VotePanel from 'components/VotePanel'
-import ApprovalQuorum from 'components/ApprovalQuorum'
+import VotePanel from '@components/VotePanel'
+import { ApprovalProgress, VetoProgress } from '@components/QuorumProgress'
 import useRealm from 'hooks/useRealm'
 import useProposalVotes from 'hooks/useProposalVotes'
 import ProposalTimeStatus from 'components/ProposalTimeStatus'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import ProposalActionsPanel from '@components/ProposalActions'
 import { getRealmExplorerHost } from 'tools/routing'
 import { ProposalState } from '@solana/spl-governance'
@@ -22,31 +22,28 @@ import Link from 'next/link'
 import useQueryContext from '@hooks/useQueryContext'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import ProposalExecutionCard from '@components/ProposalExecutionCard'
-import useWalletStore from 'stores/useWalletStore'
 import ProposalVotingPower from '@components/ProposalVotingPower'
 import { useMediaQuery } from 'react-responsive'
 import NftProposalVoteState from 'NftVotePlugin/NftProposalVoteState'
+import ProposalWarnings from './ProposalWarnings'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import VotingRules from '@components/VotingRules'
+import { useRouteProposalQuery } from '@hooks/queries/proposal'
 
 const Proposal = () => {
   const { realmInfo, symbol } = useRealm()
-  const { proposal, descriptionLink, governance } = useProposal()
+  const proposal = useRouteProposalQuery().data?.result
+  const governance = useProposalGovernanceQuery().data?.result
+  const descriptionLink = proposal?.account.descriptionLink
+  const allowDiscussion = realmInfo?.allowDiscussion ?? true
+
   const [description, setDescription] = useState('')
-  const { yesVoteProgress, yesVotesRequired } = useProposalVotes(
-    proposal?.account
-  )
-  const currentWallet = useWalletStore((s) => s.current)
+  const voteData = useProposalVotes(proposal?.account)
+  const currentWallet = useWalletOnePointOh()
   const showResults =
     proposal &&
     proposal.account.state !== ProposalState.Cancelled &&
     proposal.account.state !== ProposalState.Draft
-
-  const votePassed =
-    proposal &&
-    (proposal.account.state === ProposalState.Completed ||
-      proposal.account.state === ProposalState.Executing ||
-      proposal.account.state === ProposalState.SigningOff ||
-      proposal.account.state === ProposalState.Succeeded ||
-      proposal.account.state === ProposalState.ExecutingWithErrors)
 
   const votingEnded =
     !!governance &&
@@ -120,9 +117,9 @@ const Proposal = () => {
                 </ReactMarkdown>
               </div>
             )}
-
-            <InstructionPanel />
-            {isTwoCol && <DiscussionPanel />}
+            <ProposalWarnings />
+            <TransactionPanel />
+            {isTwoCol && allowDiscussion && <DiscussionPanel />}
           </>
         ) : (
           <>
@@ -147,20 +144,32 @@ const Proposal = () => {
                 <h3 className="mb-4">Results</h3>
               )}
               {proposal?.account.state === ProposalState.Voting ? (
-                <div className="pb-3">
-                  <ApprovalQuorum
-                    yesVotesRequired={yesVotesRequired}
-                    progress={yesVoteProgress}
-                    showBg
-                  />
-                </div>
+                <>
+                  <div className="pb-3">
+                    <ApprovalProgress
+                      votesRequired={voteData.yesVotesRequired}
+                      progress={voteData.yesVoteProgress}
+                      showBg
+                    />
+                  </div>
+                  {voteData._programVersion !== undefined &&
+                  // @asktree: here is some typescript gore because typescript doesn't know that a number being > 3 means it isn't 1 or 2
+                  voteData._programVersion !== 1 &&
+                  voteData._programVersion !== 2 &&
+                  voteData.veto !== undefined &&
+                  (voteData.veto.voteProgress ?? 0) > 0 ? (
+                    <div className="pb-3">
+                      <VetoProgress
+                        votesRequired={voteData.veto.votesRequired}
+                        progress={voteData.veto.voteProgress}
+                        showBg
+                      />
+                    </div>
+                  ) : undefined}
+                </>
               ) : (
                 <div className="pb-3">
-                  <VoteResultStatus
-                    progress={yesVoteProgress}
-                    votePassed={votePassed}
-                    yesVotesRequired={yesVotesRequired}
-                  />
+                  <VoteResultStatus />
                 </div>
               )}
               <VoteResults proposal={proposal.account} />
@@ -182,13 +191,14 @@ const Proposal = () => {
             </div>
           </div>
         ) : null}
+        <VotingRules />
         <VotePanel />
         <NftProposalVoteState proposal={proposal}></NftProposalVoteState>
         {proposal && currentWallet && showProposalExecution && (
           <ProposalExecutionCard />
         )}
         <ProposalActionsPanel />
-        {!isTwoCol && proposal && (
+        {!isTwoCol && proposal && allowDiscussion && (
           <div className="bg-bkg-2 rounded-lg p-4 md:p-6 ">
             <DiscussionPanel />
           </div>

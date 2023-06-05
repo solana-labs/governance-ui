@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useRouter } from 'next/router'
 
 import { PublicKey } from '@solana/web3.js'
-import useWalletStore from 'stores/useWalletStore'
 import createTokenizedRealm from 'actions/createTokenizedRealm'
 import useQueryContext from '@hooks/useQueryContext'
 
@@ -22,6 +21,7 @@ import CommunityTokenDetailsForm, {
 import YesVotePercentageForm, {
   CommunityYesVotePercentageSchema,
   CommunityYesVotePercentage,
+  CouncilYesVotePercentageSchema,
 } from '@components/NewRealmWizard/components/steps/YesVotePercentageThresholdForm'
 import AddCouncilForm, {
   AddCouncilSchema,
@@ -31,6 +31,12 @@ import InviteMembersForm, {
   InviteMembersSchema,
   InviteMembers,
 } from '@components/NewRealmWizard/components/steps/InviteMembersForm'
+import {
+  GoverningTokenConfigAccountArgs,
+  GoverningTokenType,
+} from '@solana/spl-governance'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export const FORM_NAME = 'tokenized'
 
@@ -40,36 +46,103 @@ type CommunityTokenForm = BasicDetails &
   AddCouncil &
   InviteMembers
 
+// All transformation of form data to business logical program inputs should occur here
+const transformFormData2RealmCreation = (formData: CommunityTokenForm) => {
+  const createCouncil = formData.addCouncil ?? false
+  const existingCouncilMintPk = formData.councilTokenMintAddress
+    ? new PublicKey(formData.councilTokenMintAddress)
+    : undefined
+
+  const programIdAddress = formData?.programId || DEFAULT_GOVERNANCE_PROGRAM_ID
+
+  const params = {
+    ...{
+      programIdAddress,
+      realmName: formData.name,
+      // COMMUNITY INFO
+      tokensToGovernThreshold: formData.minimumNumberOfCommunityTokensToGovern,
+      useSupplyFactor: formData.useSupplyFactor,
+      communityAbsoluteMaxVoteWeight: formData.communityAbsoluteMaxVoteWeight,
+      communityMintSupplyFactor: formData.communityMintSupplyFactor,
+      communityYesVotePercentage: formData.communityYesVotePercentage,
+      existingCommunityMintPk: formData.communityTokenMintAddress
+        ? new PublicKey(formData.communityTokenMintAddress)
+        : undefined,
+      transferCommunityMintAuthority:
+        formData.transferCommunityMintAuthority ?? true,
+      // COUNCIL INFO
+      createCouncil: formData.addCouncil ?? false,
+
+      existingCouncilMintPk: formData.councilTokenMintAddress
+        ? new PublicKey(formData.councilTokenMintAddress)
+        : undefined,
+      transferCouncilMintAuthority:
+        formData.transferCouncilMintAuthority ?? true,
+      councilWalletPks:
+        formData?.memberAddresses?.map((w) => new PublicKey(w)) || [],
+    },
+    ...(formData._programVersion === 3
+      ? ({
+          _programVersion: 3,
+          councilYesVotePercentage: formData.councilYesVotePercentage,
+          councilTokenConfig:
+            createCouncil || existingCouncilMintPk
+              ? new GoverningTokenConfigAccountArgs({
+                  tokenType: GoverningTokenType.Membership,
+                  voterWeightAddin: undefined,
+                  maxVoterWeightAddin: undefined,
+                })
+              : new GoverningTokenConfigAccountArgs({
+                  tokenType: GoverningTokenType.Dormant,
+                  voterWeightAddin: undefined,
+                  maxVoterWeightAddin: undefined,
+                }),
+        } as const)
+      : ({ _programVersion: 2 } as const)),
+  } as const
+
+  return params
+}
+
 export default function CommunityTokenWizard() {
-  const { connected, connection, current: wallet } = useWalletStore((s) => s)
+  const connection = useLegacyConnectionContext()
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const { push } = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
   const [requestPending, setRequestPending] = useState(false)
   const steps = [
-    { Form: BasicDetailsForm, schema: BasicDetailsSchema, required: 'true' },
+    {
+      Form: BasicDetailsForm,
+      schema: BasicDetailsSchema,
+      required: () => true,
+    },
     {
       Form: CommunityTokenDetailsForm,
       schema: CommunityTokenSchema,
-      required: 'true',
+      required: () => true,
     },
     {
       Form: YesVotePercentageForm,
       schema: CommunityYesVotePercentageSchema,
-      required: 'true',
+      required: () => true,
       forCommunity: true,
+      title: "Next, set your DAO's community approval threshold.",
     },
-    { Form: AddCouncilForm, schema: AddCouncilSchema, required: 'true' },
+    { Form: AddCouncilForm, schema: AddCouncilSchema, required: () => true },
     {
       Form: InviteMembersForm,
       schema: InviteMembersSchema,
-      required: 'form.addCouncil',
+      required: (form: CommunityTokenForm) => form.addCouncil,
     },
-    // {
-    //   Form: YesVotePercentageForm,
-    //   schema: CouncilYesVotePercentageSchema,
-    //   required: 'true',
-    //   forCouncil: true,
-    // },
+    {
+      Form: YesVotePercentageForm,
+      schema: CouncilYesVotePercentageSchema,
+      required: (form: CommunityTokenForm) =>
+        form.addCouncil && form._programVersion >= 3,
+      forCouncil: true,
+      title: "Next, set your DAO's council approval threshold.",
+    },
   ]
 
   async function handleSubmit(formData: CommunityTokenForm) {
@@ -84,34 +157,10 @@ export default function CommunityTokenWizard() {
         throw new Error('No valid wallet connected')
       }
 
-      const programIdAddress =
-        formData?.programId || DEFAULT_GOVERNANCE_PROGRAM_ID
-
       const results = await createTokenizedRealm({
         wallet,
         connection: connection.current,
-        programIdAddress,
-        realmName: formData.name,
-        // COMMUNITY INFO
-        tokensToGovernThreshold:
-          formData.minimumNumberOfCommunityTokensToGovern,
-        useSupplyFactor: formData.useSupplyFactor,
-        communityAbsoluteMaxVoteWeight: formData.communityAbsoluteMaxVoteWeight,
-        communityMintSupplyFactor: formData.communityMintSupplyFactor,
-        communityYesVotePercentage: formData.communityYesVotePercentage,
-        existingCommunityMintPk: formData.communityTokenMintAddress
-          ? new PublicKey(formData.communityTokenMintAddress)
-          : undefined,
-        transferCommunityMintAuthority: formData.transferCommunityMintAuthority,
-        // COUNCIL INFO
-        createCouncil: formData.addCouncil,
-        // councilVotePercentage: formData.communityYesVotePercentage,
-        existingCouncilMintPk: formData.councilTokenMintAddress
-          ? new PublicKey(formData.councilTokenMintAddress)
-          : undefined,
-        transferCouncilMintAuthority: formData.transferCouncilMintAuthority,
-        councilWalletPks:
-          formData?.memberAddresses?.map((w) => new PublicKey(w)) || [],
+        ...transformFormData2RealmCreation(formData),
       })
 
       if (results) {

@@ -45,7 +45,7 @@ export function getNetworkFromEndpoint(endpoint: string) {
   const network = ENDPOINTS.find((e) => e.url === endpoint)
   if (!network) {
     console.log(endpoint, ENDPOINTS)
-    throw new Error('Network not found')
+    throw new Error(`Network not found for endpoint: ${endpoint}`)
   }
   return network?.name
 }

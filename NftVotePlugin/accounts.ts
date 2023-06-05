@@ -1,4 +1,4 @@
-import { NftVoterClient } from '@solana/governance-program-library'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { PublicKey } from '@solana/web3.js'
 export interface NftVoteRecord {
   account: {

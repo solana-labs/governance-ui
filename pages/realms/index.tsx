@@ -1,13 +1,12 @@
-import React, { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import {
+  createUnchartedRealmInfo,
   getCertifiedRealmInfos,
-  getUnchartedRealmInfos,
   RealmInfo,
 } from '../../models/registry/api'
 
 import { SearchIcon } from '@heroicons/react/outline'
-import useWalletStore from '../../stores/useWalletStore'
 import useQueryContext from '@hooks/useQueryContext'
 import Button from '@components/Button'
 import { notify } from '@utils/notifications'
@@ -16,6 +15,11 @@ import Input from '@components/inputs/Input'
 import dynamic from 'next/dynamic'
 
 import { BsLayoutWtf, BsCheck } from 'react-icons/bs'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { PublicKey } from '@solana/web3.js'
+import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
+import { useRealmsByProgramQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const RealmsDashboard = dynamic(() => import('./components/RealmsDashboard'))
 
@@ -26,33 +30,47 @@ const Realms = () => {
   >([])
   const [isLoadingRealms, setIsLoadingRealms] = useState(true)
   const [editingGrid, setEditingGrid] = useState(false)
-  const { actions, selectedRealm, connection } = useWalletStore((s) => s)
-  const { connected, current: wallet } = useWalletStore((s) => s)
+  const connection = useLegacyConnectionContext()
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
   const [searchString, setSearchString] = useState('')
   const { cluster } = router.query
   //Small hack to prevent race conditions with cluster change until we remove connection from store and move it to global dep.
   const routeHasClusterInPath = router.asPath.includes('cluster')
+  const programs = useMemo(
+    () => new PublicKey(DEFAULT_GOVERNANCE_PROGRAM_ID),
+    []
+  )
+  const { data: queryRealms } = useRealmsByProgramQuery(programs)
 
   useMemo(async () => {
     if (
       connection &&
       ((routeHasClusterInPath && cluster) || !routeHasClusterInPath)
     ) {
-      const [certifiedRealms, uncharteredRealms] = await Promise.all([
+      const [certifiedRealms] = await Promise.all([
         getCertifiedRealmInfos(connection),
-        getUnchartedRealmInfos(connection),
       ])
-      const allRealms = [...certifiedRealms, ...uncharteredRealms]
+      const unchartedRealms =
+        queryRealms
+          ?.filter(
+            (x) => !certifiedRealms.find((y) => y.realmId.equals(x.pubkey))
+          )
+          .map((x) =>
+            createUnchartedRealmInfo({
+              name: x.account.name,
+              programId: x.owner.toBase58(),
+              address: x.pubkey.toBase58(),
+            })
+          ) ?? []
+      const allRealms = [...certifiedRealms, ...unchartedRealms]
       setRealms(sortDaos(allRealms))
       setFilteredRealms(sortDaos(allRealms))
       setIsLoadingRealms(false)
     }
-    if (selectedRealm.realm) {
-      actions.deselectRealm()
-    }
-  }, [connection])
+  }, [connection, routeHasClusterInPath, cluster, queryRealms])
 
   const handleCreateRealmButtonClick = async () => {
     if (!connected) {

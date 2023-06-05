@@ -7,11 +7,11 @@ import { FeedItemAuthor } from '../../gql';
 import { AuthorAvatar } from '@hub/components/AuthorAvatar';
 import { AuthorHovercard } from '@hub/components/AuthorHovercard';
 import { ProposalStateBadge } from '@hub/components/ProposalStateBadge';
+import { RealmHovercard } from '@hub/components/RealmHovercard';
 import { RealmIcon } from '@hub/components/RealmIcon';
 import { abbreviateAddress } from '@hub/lib/abbreviateAddress';
 import { ECOSYSTEM_PAGE } from '@hub/lib/constants';
 import cx from '@hub/lib/cx';
-import { estimateRealmUrlId } from '@hub/lib/estimateRealmUrlId';
 import { ProposalState } from '@hub/types/ProposalState';
 
 const EDIT_GRACE_PERIOD = 3; // minutes
@@ -25,6 +25,7 @@ interface Props {
     iconUrl?: null | string;
     name: string;
     symbol?: null | string;
+    urlId: string;
   };
   proposal?: {
     state: ProposalState;
@@ -66,16 +67,18 @@ export function Header(props: Props) {
         'w-full',
       )}
     >
-      <div className="flex items-baseline space-x-2">
+      <div className="flex items-baseline">
         {props.realm &&
           (props.realmPublicKey.equals(ECOSYSTEM_PAGE) ? (
             <div
               className={cx(
                 'cursor-default',
                 'font-medium',
-                'mr-2',
+                'hidden',
                 'text-neutral-900',
                 'text-sm',
+                'sm:block',
+                'sm:mr-2',
               )}
               onClick={(e) => e.stopPropagation()}
             >
@@ -90,21 +93,27 @@ export function Header(props: Props) {
                   : `/realm/${props.realmPublicKey.toBase58()}`
               }
             >
-              <a
-                className={cx(
-                  'font-medium',
-                  'mr-2',
-                  'text-neutral-900',
-                  'text-sm',
-                  'hover:underline',
-                )}
-                onClick={(e) => e.stopPropagation()}
-              >
-                {props.realm.name}
-              </a>
+              <RealmHovercard asChild publicKey={props.realmPublicKey}>
+                <a
+                  className={cx(
+                    'block',
+                    'font-medium',
+                    'hidden',
+                    'text-neutral-900',
+                    'text-sm',
+                    'truncate',
+                    'hover:underline',
+                    'sm:block',
+                    'sm:mr-2',
+                  )}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {props.realm.name}
+                </a>
+              </RealmHovercard>
             </Link>
           ))}
-        <div className="flex items-center">
+        <div className="flex items-center mr-2">
           {props.author ? (
             <AuthorHovercard
               asChild
@@ -141,12 +150,7 @@ export function Header(props: Props) {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="text-neutral-500">posted in</div>
-              <Link
-                passHref
-                href={`/realm/${estimateRealmUrlId(
-                  props.feedItemRealmPublicKey,
-                )}`}
-              >
+              <Link passHref href={`/realm/${props.feedItemRealm.urlId}`}>
                 <a
                   className={cx(
                     'bg-white',

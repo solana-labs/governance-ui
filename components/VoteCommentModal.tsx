@@ -1,34 +1,28 @@
 import React, { FunctionComponent, useState } from 'react'
-import { ThumbDownIcon, ThumbUpIcon } from '@heroicons/react/solid'
-import {
-  ChatMessageBody,
-  ChatMessageBodyType,
-  YesNoVote,
-} from '@solana/spl-governance'
-import { RpcContext } from '@solana/spl-governance'
-import useWalletStore from '../stores/useWalletStore'
-import useRealm from '../hooks/useRealm'
-import { castVote } from '../actions/castVote'
+import { BanIcon, ThumbDownIcon, ThumbUpIcon } from '@heroicons/react/solid'
+import { VoteKind } from '@solana/spl-governance'
 
 import Button, { SecondaryButton } from './Button'
-// import { notify } from '../utils/notifications'
 import Loading from './Loading'
 import Modal from './Modal'
 import Input from './inputs/Input'
 import Tooltip from './Tooltip'
 import { TokenOwnerRecord } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import { getProgramVersionForRealm } from '@models/registry/api'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { nftPluginsPks } from '@hooks/useVotingPlugins'
-import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
-import { NftVoterClient } from '@solana/governance-program-library'
+import { useSubmitVote } from '@hooks/useSubmitVote'
 
 interface VoteCommentModalProps {
   onClose: () => void
   isOpen: boolean
-  vote: YesNoVote
+  vote: VoteKind
   voterTokenRecord: ProgramAccount<TokenOwnerRecord>
+}
+
+const VOTE_STRINGS = {
+  [VoteKind.Approve]: 'Yes',
+  [VoteKind.Deny]: 'No',
+  [VoteKind.Veto]: 'Veto',
+  [VoteKind.Abstain]: 'Abstain',
 }
 
 const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
@@ -37,74 +31,19 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   vote,
   voterTokenRecord,
 }) => {
-  const client = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
-  )
-  const [submitting, setSubmitting] = useState(false)
   const [comment, setComment] = useState('')
-  const wallet = useWalletStore((s) => s.current)
-  const connection = useWalletStore((s) => s.connection)
-  const { proposal } = useWalletStore((s) => s.selectedProposal)
-  const { fetchChatMessages } = useWalletStore((s) => s.actions)
-  const { realm, realmInfo, config } = useRealm()
-  const { refetchProposals } = useWalletStore((s) => s.actions)
-  const isNftPlugin =
-    config?.account.communityTokenConfig.voterWeightAddin &&
-    nftPluginsPks.includes(
-      config?.account.communityTokenConfig.voterWeightAddin?.toBase58()
-    )
-  const { closeNftVotingCountingModal } = useNftProposalStore.getState()
-  const submitVote = async (vote: YesNoVote) => {
-    setSubmitting(true)
-    const rpcContext = new RpcContext(
-      proposal!.owner,
-      getProgramVersionForRealm(realmInfo!),
-      wallet!,
-      connection.current,
-      connection.endpoint
-    )
+  const { submitting, submitVote } = useSubmitVote()
 
-    const msg = comment
-      ? new ChatMessageBody({
-          type: ChatMessageBodyType.Text,
-          value: comment,
-        })
-      : undefined
+  const voteString = VOTE_STRINGS[vote]
 
-    try {
-      await castVote(
-        rpcContext,
-        realm!,
-        proposal!,
-        voterTokenRecord,
-        vote,
-        msg,
-        client,
-        refetchProposals
-      )
-      if (!isNftPlugin) {
-        await refetchProposals()
-      }
-    } catch (ex) {
-      if (isNftPlugin) {
-        closeNftVotingCountingModal(
-          client.client as NftVoterClient,
-          proposal!,
-          wallet!.publicKey!
-        )
-      }
-      //TODO: How do we present transaction errors to users? Just the notification?
-      console.error("Can't cast vote", ex)
-      onClose()
-    } finally {
-      setSubmitting(false)
-      onClose()
-    }
-
-    fetchChatMessages(proposal!.pubkey)
+  const handleSubmit = async () => {
+    await submitVote({
+      vote,
+      voterTokenRecord,
+      comment,
+    })
+    onClose()
   }
-
-  const voteString = vote === YesNoVote.Yes ? 'Yes' : 'No'
 
   return (
     <Modal onClose={onClose} isOpen={isOpen}>
@@ -132,14 +71,16 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
 
         <Button
           className="w-44 flex items-center justify-center"
-          onClick={() => submitVote(vote)}
+          onClick={handleSubmit}
         >
           <div className="flex items-center">
             {!submitting &&
-              (vote === YesNoVote.Yes ? (
+              (vote === VoteKind.Approve ? (
                 <ThumbUpIcon className="h-4 w-4 fill-black mr-2" />
-              ) : (
+              ) : vote === VoteKind.Deny ? (
                 <ThumbDownIcon className="h-4 w-4 fill-black mr-2" />
+              ) : (
+                <BanIcon className="h-4 w-4 fill-black mr-2" />
               ))}
             {submitting ? <Loading /> : <span>Vote {voteString}</span>}
           </div>

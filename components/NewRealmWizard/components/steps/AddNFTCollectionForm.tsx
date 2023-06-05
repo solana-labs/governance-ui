@@ -1,15 +1,13 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
-import { deprecated } from '@metaplex-foundation/mpl-token-metadata'
 import axios from 'axios'
 
 import { updateUserInput, validatePubkey } from '@utils/formValidation'
 import { notify } from '@utils/notifications'
 import { abbreviateAddress } from '@utils/formatting'
 
-import useWalletStore from 'stores/useWalletStore'
 
 import { NewButton as Button } from '@components/Button'
 import Text from '@components/Text'
@@ -21,6 +19,11 @@ import Input, {
 } from '@components/NewRealmWizard/components/Input'
 import AdviceBox from '@components/NewRealmWizard/components/AdviceBox'
 import NFTCollectionModal from '@components/NewRealmWizard/components/NFTCollectionModal'
+import { Metaplex } from '@metaplex-foundation/js'
+import { Connection, PublicKey } from '@solana/web3.js'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import asFindable from '@utils/queries/asFindable'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 function filterAndMapVerifiedCollections(nfts) {
   return nfts
@@ -32,7 +35,7 @@ function filterAndMapVerifiedCollections(nfts) {
       }
     })
     .map((nft) => {
-      if (nft.data.collection) {
+      if (nft.data?.collection) {
         return nft.data
       } else {
         return nft
@@ -59,11 +62,16 @@ async function enrichItemInfo(item, uri) {
   }
 }
 
-async function enrichCollectionInfo(connection, collectionKey) {
-  const data = await deprecated.Metadata.findByMint(connection, collectionKey)
+async function enrichCollectionInfo(
+  connection: Connection,
+  collectionKey: string
+) {
+  const metaplex = new Metaplex(connection)
+  const data = await metaplex
+    .nfts()
+    .findByMint({ mintAddress: new PublicKey(collectionKey) })
 
-  const collectionData = data!.data!.data
-
+  const collectionData = data
   return enrichItemInfo(
     {
       ...collectionData,
@@ -73,48 +81,17 @@ async function enrichCollectionInfo(connection, collectionKey) {
   )
 }
 
-async function getNFTCollectionInfo(connection, collectionKey) {
-  const { data: result } = await deprecated.Metadata.findByMint(
-    connection,
-    collectionKey
-  )
-  console.log('NFT findByMint result', result)
-  if (result?.collection?.verified && result.collection?.key) {
-    // here we were given a child of the collection (hence the "collection" property is present)
-    const collectionInfo = await enrichCollectionInfo(
-      connection,
-      result.collection.key
-    )
-    const nft = await enrichItemInfo(result.data, result.data.uri)
-    collectionInfo.nfts = [nft]
-    return collectionInfo
-  } else {
-    // assume we've been given the collection address already, so we need to go find it's children
-    const children = await deprecated.Metadata.findMany(connection, {
-      updateAuthority: result!.updateAuthority,
-    })
+async function getNFTCollectionInfo(
+  connection: Connection,
+  collectionKey: string
+) {
+  const metaplex = new Metaplex(connection)
+  const data = await metaplex.nfts().findByMint({
+    mintAddress: new PublicKey(collectionKey),
+  })
+  console.log('collection', collectionKey, data)
 
-    const verifiedCollections = filterAndMapVerifiedCollections(children)
-    if (verifiedCollections[collectionKey]) {
-      const collectionInfo = await enrichCollectionInfo(
-        connection,
-        collectionKey
-      )
-      const nfts = await Promise.all(
-        verifiedCollections[collectionKey].map((item) => {
-          return enrichItemInfo(item.data, item.data.uri)
-        })
-      )
-      collectionInfo.nfts = nfts
-      return collectionInfo
-    } else {
-      throw new Error(
-        'Address did not return collection with children whose "collection.key" matched'
-      )
-    }
-  }
-
-  // 3iBYdnzA418tD2o7vm85jBeXgxbdUyXzX9Qfm2XJuKME
+  return [data, await enrichCollectionInfo(connection, collectionKey)] as const
 }
 
 export const AddNFTCollectionSchema = {
@@ -139,7 +116,7 @@ export interface AddNFTCollection {
   numberOfNFTs: number
 }
 
-export interface NFT_Creator {
+interface NFT_Creator {
   address: string
   verified: number
   share: number
@@ -150,7 +127,7 @@ interface NFT_Attributes {
   trait_type: string
   value: number
 }
-export interface NFT {
+interface NFT {
   name: string
   symbol: string
   uri: string
@@ -225,7 +202,9 @@ export default function AddNFTCollectionForm({
   onSubmit,
   onPrevClick,
 }) {
-  const { connected, connection, current: wallet } = useWalletStore((s) => s)
+  const connection = useLegacyConnectionContext()
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
   const [walletConnecting, setWalletConnecting] = useState(false)
   const [requestPending, setRequestPending] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -252,7 +231,12 @@ export default function AddNFTCollectionForm({
     mode: 'all',
     resolver: yupResolver(schema),
   })
-  const [unverifiedCollection, setUnverifiedCollection] = useState(false)
+  const [
+    collectionVerificationState,
+    setCollectionVerificationState,
+  ] = useState<
+    'none' | 'invalid' | 'verified' | 'is nft but no collection details'
+  >('none')
   const collectionKey = watch('collectionKey')
   const numberOfNFTs = watch('numberOfNFTs') || 10000
   const approvalPercent = watch('communityYesVotePercentage', 60) || 60
@@ -263,15 +247,17 @@ export default function AddNFTCollectionForm({
   useEffect(() => {
     updateUserInput(formData, AddNFTCollectionSchema, setValue)
     setSelectedNFTCollection(formData?.collectionMetadata)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [])
 
   useEffect(() => {
-    if (unverifiedCollection || selectedNFTCollection) {
+    if (collectionVerificationState === 'invalid' || selectedNFTCollection) {
       setFocus('numberOfNFTs')
     } else {
       // setFocus('collectionInput')
     }
-  }, [unverifiedCollection, selectedNFTCollection])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+  }, [collectionVerificationState, selectedNFTCollection])
 
   function serializeValues(values) {
     const data = {
@@ -290,18 +276,23 @@ export default function AddNFTCollectionForm({
       handleClearSelectedNFT(false)
       setRequestPending(true)
       try {
-        const collectionInfo = await getNFTCollectionInfo(
+        const [nft, collectionInfo] = await getNFTCollectionInfo(
           connection.current,
           collectionInput
         )
         console.log('NFT collection info from user input:', collectionInfo)
-        setValue('collectionKey', collectionInfo.collectionMintAddress)
+        setValue('collectionKey', collectionInput)
+        setCollectionVerificationState(
+          nft.collectionDetails !== null
+            ? 'verified'
+            : 'is nft but no collection details'
+        )
         setSelectedNFTCollection(collectionInfo)
         setRequestPending(false)
       } catch (err) {
         setRequestPending(false)
         setValue('collectionKey', collectionInput)
-        setUnverifiedCollection(true)
+        setCollectionVerificationState('invalid')
       }
     } else {
       setError('collectionInput', {
@@ -317,7 +308,7 @@ export default function AddNFTCollectionForm({
     }
     clearErrors('collectionInput')
     setValue('collectionKey', '')
-    setUnverifiedCollection(false)
+    setCollectionVerificationState('none')
     setSelectedNFTCollection(undefined)
   }
 
@@ -339,30 +330,31 @@ export default function AddNFTCollectionForm({
       if (!wallet?.publicKey) {
         throw new Error('No valid wallet connected')
       }
-
-      const ownedNfts = await deprecated.Metadata.findDataByOwner(
-        connection.current,
-        wallet.publicKey
-      )
+      const metaplex = new Metaplex(connection.current)
+      const ownedNfts = await metaplex.nfts().findAllByOwner({
+        owner: wallet.publicKey,
+      })
       console.log('NFT wallet contents', ownedNfts)
       const verfiedNfts = filterAndMapVerifiedCollections(ownedNfts)
       console.log('NFT verified nft by collection', verfiedNfts)
 
       const verifiedCollections = {}
       for (const collectionKey in verfiedNfts) {
-        const collectionInfo = await enrichCollectionInfo(
+        const collectionInfo = await asFindable(enrichCollectionInfo)(
           connection.current,
           collectionKey
         )
-        const nftsWithInfo = await Promise.all(
-          verfiedNfts[collectionKey].slice(0, 2).map((nft) => {
-            return enrichItemInfo(nft.data, nft.data.uri)
-          })
-        )
+        if (collectionInfo.result !== undefined) {
+          const nftsWithInfo = await Promise.all(
+            verfiedNfts[collectionKey].slice(0, 2).map((nft) => {
+              return enrichItemInfo(nft, nft.uri)
+            })
+          )
 
-        verifiedCollections[collectionKey] = {
-          ...collectionInfo,
-          nfts: nftsWithInfo,
+          verifiedCollections[collectionKey] = {
+            ...collectionInfo.result,
+            nfts: nftsWithInfo,
+          }
         }
       }
 
@@ -445,10 +437,15 @@ export default function AddNFTCollectionForm({
               <Input
                 placeholder="e.g. SMBH3wF6baUj6JWtzYvqcKuj2XCKWDqQxzspY12xPND"
                 data-testid="nft-address"
-                error={error?.message || ''}
+                error={
+                  error?.message ?? collectionVerificationState === 'invalid'
+                    ? 'Error: this is not an nft collection'
+                    : ''
+                }
                 warning={
-                  unverifiedCollection
-                    ? 'Caution: we could not verify this address is a "certified" collection.'
+                  collectionVerificationState ===
+                  'is nft but no collection details'
+                    ? 'Caution: This is an nft, but has no collection details. It may be an old collection, or just a regular nft. Please double check before proceeding.'
                     : ''
                 }
                 {...field}
@@ -485,7 +482,7 @@ export default function AddNFTCollectionForm({
         />
         <input className="hidden" {...register('collectionKey')} disabled />
 
-        {!unverifiedCollection && (
+        {collectionVerificationState === 'none' && (
           <div
             className={`flex flex-col w-full px-4 py-5 rounded-md bg-bkg-3  ${
               requestPending ? 'animate-pulse' : ''

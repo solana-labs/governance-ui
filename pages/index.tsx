@@ -1,13 +1,16 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
+
 const Index = () => {
   const router = useRouter()
+  const REALM = process?.env?.REALM
 
   useEffect(() => {
-    const { REALM } = process.env
     const mainUrl = REALM ? `/dao/${REALM}` : '/realms'
-    router.replace(mainUrl)
-  }, [])
+    if (!router.asPath.includes(mainUrl)) {
+      router.replace(mainUrl)
+    }
+  }, [REALM])
 
   return null
 }

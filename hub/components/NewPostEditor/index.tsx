@@ -41,6 +41,7 @@ export function NewPostEditor(props: Props) {
   const [, createPost] = useMutation(gql.createPostResp, gql.createPost);
   const [error, setError] = useState<CombinedError | null>(null);
   const [realm, setRealm] = useState(props.realm);
+  // eslint-disable-next-line
   const [crosspostTo, setCrosspostTo] = useState<
     { name: string; publicKey: PublicKey; iconUrl?: null | string }[]
   >([]);

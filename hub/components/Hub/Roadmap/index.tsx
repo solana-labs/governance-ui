@@ -2,8 +2,8 @@ import ToolKit from '@carbon/icons-react/lib/ToolKit';
 
 import { RichTextDocumentDisplay } from '@hub/components/RichTextDocumentDisplay';
 import cx from '@hub/lib/cx';
-import { HubInfoRoadmapItemStatus } from '@hub/types/HubInfoRoadmapItemStatus';
 import { RichTextDocument } from '@hub/types/RichTextDocument';
+import { RoadmapItemStatus } from '@hub/types/RoadmapItemStatus';
 
 import { DashesSvg } from './DashesSvg';
 import { Item } from './Item';
@@ -21,7 +21,7 @@ interface Props {
       title: string;
       url: string;
     };
-    status?: null | HubInfoRoadmapItemStatus;
+    status?: null | RoadmapItemStatus;
     title: string;
   }[];
 }
@@ -75,12 +75,12 @@ export function Roadmap(props: Props) {
           </div>
         )}
       </div>
-      <div className="text-4xl font-semibold my-1">
+      <div className="font-semibold my-1 text-2xl md:text-4xl">
         The {props.name} Roadmap
       </div>
       {props.description && (
         <RichTextDocumentDisplay
-          className="mt-2 mb-1 text-neutral-700 max-w-2xl text-center"
+          className="mt-2 mb-1 text-neutral-700 max-w-2xl text-center text-sm md:text-base"
           document={props.description}
         />
       )}

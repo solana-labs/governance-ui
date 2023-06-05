@@ -15,8 +15,12 @@ import {
 } from '@tools/sdk/units'
 import BigNumber from 'bignumber.js'
 import React, { useEffect, useState } from 'react'
+import { BaseGovernanceFormFieldsV3 } from './BaseGovernanceForm-data'
+import { BaseGovernanceFormV3 } from './BaseGovernanceFormV3'
+import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 
-export interface BaseGovernanceFormFields {
+export interface BaseGovernanceFormFieldsV2 {
+  _programVersion: 2
   minCommunityTokensToCreateProposal: number | string
   minInstructionHoldUpTime: number
   maxVotingTime: number
@@ -24,8 +28,19 @@ export interface BaseGovernanceFormFields {
   voteTipping: VoteTipping
 }
 
-const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
-  const { realmInfo, mint: realmMint } = useRealm()
+const BaseGovernanceFormV2 = ({
+  formErrors,
+  form,
+  setForm,
+  setFormErrors,
+}: {
+  formErrors: any
+  setForm: any
+  setFormErrors: any
+  form: BaseGovernanceFormFieldsV2
+}) => {
+  const realmMint = useRealmCommunityMintInfoQuery().data?.result
+  const { realmInfo } = useRealm()
   const [minTokensPercentage, setMinTokensPercentage] = useState<
     number | undefined
   >()
@@ -99,6 +114,7 @@ const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
 
   useEffect(() => {
     onMinTokensChange(form.minCommunityTokensToCreateProposal)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.minCommunityTokensToCreateProposal, realmInfo?.symbol])
 
   return (
@@ -225,6 +241,21 @@ const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
           ))}
       </Select>
     </>
+  )
+}
+const BaseGovernanceForm = ({
+  form,
+  ...props
+}: {
+  formErrors: any
+  setForm: any
+  setFormErrors: any
+  form: BaseGovernanceFormFieldsV3 | BaseGovernanceFormFieldsV2
+}) => {
+  return form._programVersion === 3 ? (
+    <BaseGovernanceFormV3 form={form} {...props} />
+  ) : (
+    <BaseGovernanceFormV2 form={form} {...props} />
   )
 }
 

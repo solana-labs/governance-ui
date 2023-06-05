@@ -24,7 +24,15 @@ config = withTM({
     if (!isServer) config.resolve.fallback.fs = false
     return config
   },
+
+  pageExtensions: ['mdx', 'md', 'jsx', 'tsx', 'api.ts'], // .ts files are not pages
+
+  reactStrictMode: true,
+
   env: {
+    MAIN_VIEW_SHOW_MAX_TOP_TOKENS_NUM:
+      process.env.MAIN_VIEW_SHOW_MAX_TOP_TOKENS_NUM,
+    DISABLE_NFTS: process.env.DISABLE_NFTS,
     REALM: process.env.REALM,
     MAINNET_RPC: process.env.MAINNET_RPC,
     DEVNET_RPC: process.env.DEVNET_RPC,

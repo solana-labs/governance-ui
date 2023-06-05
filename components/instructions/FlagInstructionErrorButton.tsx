@@ -8,7 +8,6 @@ import {
 import { ProgramAccount } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import useRealm from '@hooks/useRealm'
-import useWalletStore from 'stores/useWalletStore'
 import { PlayState } from './ExecuteInstructionButton'
 import { ExclamationCircleIcon } from '@heroicons/react/solid'
 import Button from '@components/Button'
@@ -16,6 +15,12 @@ import Tooltip from '@components/Tooltip'
 import { notify } from '@utils/notifications'
 import { PublicKey } from '@solana/web3.js'
 import { getProgramVersionForRealm } from '@models/registry/api'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import {
+  useUserCommunityTokenOwnerRecord,
+  useUserCouncilTokenOwnerRecord,
+} from '@hooks/queries/tokenOwnerRecord'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export function FlagInstructionErrorButton({
   proposal,
@@ -26,9 +31,12 @@ export function FlagInstructionErrorButton({
   proposalInstruction: ProgramAccount<ProposalTransaction>
   playState: PlayState
 }) {
-  const { realmInfo, ownTokenRecord, ownCouncilTokenRecord } = useRealm()
-  const wallet = useWalletStore((s) => s.current)
-  const connection = useWalletStore((s) => s.connection)
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
+
+  const { realmInfo } = useRealm()
+  const wallet = useWalletOnePointOh()
+  const connection = useLegacyConnectionContext()
   const isProposalOwner =
     proposal.account.tokenOwnerRecord.toBase58() ===
       ownTokenRecord?.pubkey.toBase58() ||

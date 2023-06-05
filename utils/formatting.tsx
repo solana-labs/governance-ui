@@ -5,19 +5,15 @@ const relativeTime = require('dayjs/plugin/relativeTime')
 
 import { abbreviateAddress } from '@hub/lib/abbreviateAddress'
 
-const votePrecision = 10000
-export const calculatePct = (c: BN, total?: BN) => {
+export const calculatePct = (c = new BN(0), total?: BN) => {
   if (total?.isZero()) {
     return 0
   }
 
-  return (
-    c
-      .mul(new BN(votePrecision))
-      .div(total ?? new BN(1))
-      .toNumber() *
-    (100 / votePrecision)
-  )
+  return new BN(100)
+    .mul(c)
+    .div(total ?? new BN(1))
+    .toNumber()
 }
 
 export const fmtTokenAmount = (c: BN, decimals?: number) =>
@@ -37,6 +33,47 @@ export function precision(a) {
     p++
   }
   return p
+}
+
+const fmtMsToTime = (milliseconds: number) => {
+  let seconds = Math.floor(milliseconds / 1000)
+  let minutes = Math.floor(seconds / 60)
+  let hours = Math.floor(minutes / 60)
+  const days = Math.floor(hours / 24)
+
+  seconds = seconds % 60
+  minutes = minutes % 60
+
+  hours = hours % 24
+
+  return {
+    days,
+    hours,
+    minutes,
+    seconds,
+  }
+}
+
+export const fmtSecsToTime = (secs: number) => {
+  return fmtMsToTime(secs * 1000)
+}
+
+export const fmtTimeToString = ({
+  days,
+  hours,
+  minutes,
+  seconds,
+}: {
+  days: number
+  hours: number
+  minutes: number
+  seconds: number
+}) => {
+  const daysStr = days > 0 ? `${days}d : ` : ''
+  const hoursStr = hours > 0 ? `${hours}h : ` : ''
+  const minutesStr = minutes > 0 ? `${minutes}m` : ''
+
+  return `${daysStr}${hoursStr}${minutesStr}${seconds}s`
 }
 
 export { abbreviateAddress }

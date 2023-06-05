@@ -57,6 +57,7 @@ export function AuthorAvatar(props: Props) {
           'rounded-full',
           'border',
           'border-neutral-400',
+          'dark:border-neutral-600',
           props.className,
         )}
         src={props.author.civicInfo.avatarUrl}
@@ -69,6 +70,7 @@ export function AuthorAvatar(props: Props) {
           'rounded-full',
           'border',
           'border-neutral-400',
+          'dark:border-neutral-600',
           props.className,
         )}
         src={props.author.twitterInfo.avatarUrl}

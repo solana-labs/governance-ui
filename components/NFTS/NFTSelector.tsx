@@ -11,7 +11,7 @@ import { PublicKey } from '@solana/web3.js'
 import Loading from '@components/Loading'
 import { getNfts } from '@utils/tokens'
 import ImgWithLoader from '@components/ImgWithLoader'
-import useWalletStore from 'stores/useWalletStore'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export interface NftSelectorFunctions {
   handleGetNfts: () => void
@@ -40,7 +40,7 @@ function NFTSelector(
   const isPredefinedMode = typeof predefinedNfts !== 'undefined'
   const [nfts, setNfts] = useState<NFTWithMint[]>([])
   const [selected, setSelected] = useState<NFTWithMint[]>([])
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const [isLoading, setIsLoading] = useState(false)
   const handleSelectNft = (nft: NFTWithMint) => {
     const nftMint: string[] = []
@@ -78,21 +78,25 @@ function NFTSelector(
     if (selectedNft) {
       setSelected([selectedNft])
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [])
   useEffect(() => {
     if (ownersPk.length && !isPredefinedMode) {
       handleGetNfts()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(ownersPk.map((x) => x.toBase58()))])
   useEffect(() => {
     if (!isPredefinedMode && selected) {
       onNftSelect(selected)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [selected])
   useEffect(() => {
     if (predefinedNfts && isPredefinedMode) {
       setNfts(predefinedNfts)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [predefinedNfts])
   return (
     <>
@@ -112,13 +116,10 @@ function NFTSelector(
                     height: nftHeight,
                   }}
                 >
-                  {selected?.map((i) => (
-                    <>
-                      {selected && x.mintAddress === i.mintAddress && (
-                        <CheckCircleIcon className="w-10 h-10 absolute text-green z-10"></CheckCircleIcon>
-                      )}
-                    </>
-                  ))}
+                  {selected.find((k) => x.mintAddress === k.mintAddress) && (
+                    <CheckCircleIcon className="w-10 h-10 absolute text-green z-10" />
+                  )}
+
                   <ImgWithLoader style={{ width: '150px' }} src={x.image} />
                 </div>
               ))}

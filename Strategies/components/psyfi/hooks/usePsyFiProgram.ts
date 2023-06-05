@@ -1,12 +1,13 @@
-import { AnchorProvider, Program } from '@project-serum/anchor'
+import { AnchorProvider, Program } from '@coral-xyz/anchor'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { PsyFiEuros, PsyFiIdl } from 'psyfi-euros-test'
 import { useMemo } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import { MAINNET_PROGRAM_KEYS } from '../programIds'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export const usePsyFiProgram = () => {
-  const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const connection = useLegacyConnectionContext()
+  const wallet = useWalletOnePointOh()
 
   // construct the PsyFi program. This could be pulled into a hook
   return useMemo(() => {
@@ -20,5 +21,6 @@ export const usePsyFiProgram = () => {
       MAINNET_PROGRAM_KEYS.PSYFI_V2,
       anchorProvider
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [connection.current, wallet])
 }

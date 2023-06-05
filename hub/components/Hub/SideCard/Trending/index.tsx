@@ -131,6 +131,11 @@ export function Trending(props: Props) {
 
             return (
               <div className="space-y-5">
+                {!edges.length && (
+                  <div className="my-4 text-center text-neutral-500 text-sm">
+                    There are no trending posts
+                  </div>
+                )}
                 {edges.map((edge, i) => {
                   const isNew =
                     Math.abs(
@@ -139,11 +144,27 @@ export function Trending(props: Props) {
 
                   return (
                     <button
-                      className="grid grid-cols-[20px,1fr] gap-x-3 group tracking-normal text-left w-full"
+                      className={cx(
+                        'gap-x-3',
+                        'grid-cols-[20px,1fr]',
+                        'grid',
+                        'group',
+                        'overflow-hidden',
+                        'text-left',
+                        'tracking-normal',
+                        'w-full',
+                      )}
                       key={edge.node.id}
                       onClick={() => {
-                        const url = `/realm/${props.realmUrlId}/${edge.node.id}`;
-                        router.push(url);
+                        if (edge.node.proposal) {
+                          const url = `/dao/${
+                            props.realmUrlId
+                          }/proposal/${edge.node.proposal.publicKey.toBase58()}`;
+                          router.push(url);
+                        } else {
+                          const url = `/realm/${props.realmUrlId}/${edge.node.id}`;
+                          router.push(url);
+                        }
                       }}
                     >
                       <div className="text-xs leading-6 text-neutral-900 font-medium">
@@ -155,6 +176,7 @@ export function Trending(props: Props) {
                             'font-bold',
                             'text-neutral-900',
                             'transition-colors',
+                            'whitespace-pre-wrap',
                             'group-hover:text-sky-500',
                           )}
                         >

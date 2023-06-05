@@ -12,7 +12,6 @@ import { NewProposalContext } from '../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import useWalletStore from 'stores/useWalletStore'
 import { createUpgradeInstruction } from '@tools/sdk/bpfUpgradeableLoader/createUpgradeInstruction'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import Input from '@components/inputs/Input'
@@ -22,6 +21,8 @@ import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { validateInstruction } from '@utils/instructionTools'
 import ProgramUpgradeInfo from './ProgramUpgradeInfo'
 import { AccountType } from '@utils/uiTypes/assets'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const ProgramUpgrade = ({
   index,
@@ -30,14 +31,14 @@ const ProgramUpgrade = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const connection = useLegacyConnectionContext()
+  const wallet = useWalletOnePointOh()
   const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const governedProgramAccounts = assetAccounts.filter(
     (x) => x.type === AccountType.PROGRAM
   )
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<ProgramUpgradeForm>({
     governedAccount: undefined,
@@ -65,9 +66,9 @@ const ProgramUpgrade = ({
         : wallet.publicKey
 
       const upgradeIx = await createUpgradeInstruction(
-        form.governedAccount.governance.account.governedAccount,
+        form.governedAccount.pubkey,
         new PublicKey(form.bufferAddress),
-        form.governedAccount.governance.pubkey,
+        form.governedAccount.extensions.program!.authority!,
         bufferSpillAddress
       )
       serializedInstruction = serializeInstructionToBase64(upgradeIx)
@@ -84,6 +85,7 @@ const ProgramUpgrade = ({
       propertyName: programUpgradeFormNameOf('programId'),
       value: programId?.toString(),
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [realmInfo?.programId])
 
   useEffect(() => {
@@ -91,6 +93,7 @@ const ProgramUpgrade = ({
       propertyName: programUpgradeFormNameOf('bufferSpillAddress'),
       value: wallet?.publicKey?.toBase58(),
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [wallet?.publicKey?.toBase58()])
 
   useEffect(() => {
@@ -100,6 +103,7 @@ const ProgramUpgrade = ({
         setFormErrors(validationErrors)
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.bufferAddress])
 
   useEffect(() => {
@@ -107,6 +111,7 @@ const ProgramUpgrade = ({
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
 
   const schema = yup.object().shape({
@@ -192,7 +197,7 @@ const ProgramUpgrade = ({
       />
 
       <ProgramUpgradeInfo
-        governancePk={form.governedAccount?.governance?.pubkey}
+        authority={form.governedAccount?.extensions.program?.authority}
       ></ProgramUpgradeInfo>
 
       <Input

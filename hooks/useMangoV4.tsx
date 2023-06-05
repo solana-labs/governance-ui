@@ -1,32 +1,32 @@
-//temp solution for mango client
-
-import { AnchorProvider } from '@project-serum/anchor'
+import { AnchorProvider } from '@coral-xyz/anchor'
 import { PublicKey } from '@solana/web3.js'
 import { ConnectionContext } from '@utils/connection'
 import { WalletSigner } from '@solana/spl-governance'
-import { MangoClient, MANGO_V4_ID } from '@blockworks-foundation/mango-v4'
+import {
+  Group,
+  MangoClient,
+  MANGO_V4_ID,
+} from '@blockworks-foundation/mango-v4'
+import { useEffect, useState } from 'react'
+import useWalletOnePointOh from './useWalletOnePointOh'
+import useLegacyConnectionContext from './useLegacyConnectionContext'
 
 export default function UseMangoV4() {
-  const DEVNET_SERUM3_MARKETS = new Map([
-    ['BTC/USDC', 'DW83EpHFywBxCHmyARxwj3nzxJd7MUdSeznmrdzZKNZB'],
-    ['SOL/USDC', '5xWpt56U1NCuHoAEtpLeUrQcxDkEpNfScjfLFaRzLPgR'],
-  ])
-  const DEVNET_MINTS = new Map([
-    ['USDC', '8FRFC6MoGGkMFQwngccyu69VnYbzykGeez7ignHVAFSN'], // use devnet usdc
-    ['BTC', '3UNBZ6o52WTWwjac2kPUb4FyodhU1vFkRJheu1Sh2TvU'],
-    ['SOL', 'So11111111111111111111111111111111111111112'],
-    ['ORCA', 'orcarKHSqC5CDDsGbho8GKvwExejWHxTqGzXgcewB9L'],
-    ['MNGO', 'Bb9bsTQa1bGEtQ5KagGkvSHyuLqDWumFUcRqFusFNJWC'],
-  ])
-  const DEVNET_ORACLES = new Map([
-    ['BTC', 'HovQMDrbAgAYPCmHVSrezcSmkMtXSSUsLDFANExrZh2J'],
-    ['SOL', 'J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix'],
-    ['ORCA', 'A1WttWF7X3Rg6ZRpB2YQUFHCRh1kiXV8sKKLV3S9neJV'],
-    ['MNGO', '8k7F9Xb36oFJsjpCKpsXvg4cgBRoZtwNTc3EzG5Ttd2o'],
-  ])
+  const connection = useLegacyConnectionContext()
+  const cluster = connection.cluster
+  const wallet = useWalletOnePointOh()
   const GROUP_NUM = 0
   const ADMIN_PK = new PublicKey('BJFYN2ZbcxRSTFGCAVkUEn4aJF99xaPFuyQj2rq5pFpo')
-  const insuranceMint = new PublicKey(DEVNET_MINTS.get('USDC')!)
+  const DEVNET_GROUP = new PublicKey(
+    'Bpk8VzppSEkygd4KgXSgVzgVHib4EArhbDzyRpiS4yaf'
+  )
+  const MAINNET_GROUP = new PublicKey(
+    '78b8f4cGCwmZ9ysPFMWLaLTkkaYnUjwMJYStWe5RTSSX'
+  )
+  const clientCluster = cluster === 'devnet' ? 'devnet' : 'mainnet-beta'
+  const GROUP = cluster === 'devnet' ? DEVNET_GROUP : MAINNET_GROUP
+  const [mangoClient, setMangoClient] = useState<MangoClient | null>(null)
+  const [mangoGroup, setMangoGroup] = useState<Group | null>(null)
   const getClient = async (
     connection: ConnectionContext,
     wallet: WalletSigner
@@ -39,18 +39,49 @@ export default function UseMangoV4() {
     )
     const client = await MangoClient.connect(
       adminProvider,
-      'devnet',
-      MANGO_V4_ID['devnet']
+      clientCluster,
+      MANGO_V4_ID[clientCluster]
     )
+
     return client
   }
+
+  useEffect(() => {
+    const handleSetClient = async () => {
+      const client = await getClient(connection, wallet!)
+      const group = await client.getGroup(GROUP)
+      setMangoClient(client)
+      setMangoGroup(group)
+    }
+    if (wallet?.publicKey && connection) {
+      console.log('SET NEW CLIENT')
+      handleSetClient()
+    }
+  }, [connection.cluster, wallet?.publicKey?.toBase58()])
+
+  const docs = mangoClient?.program.idl.accounts
+    .flatMap((x) => x.type.fields as any)
+    .filter((x) => x)
+    .filter((x) => (x as any).docs?.length)
+    .map((x) => ({ ...x, docs: x.docs.join(' ') }))
+
+  const getAdditionalLabelInfo = (name: string) => {
+    const val = docs?.find((x) => x.name === name)
+
+    if (val) {
+      return `${val.docs}`
+    } else {
+      return ''
+    }
+  }
+
   return {
-    DEVNET_SERUM3_MARKETS,
-    DEVNET_MINTS,
-    DEVNET_ORACLES,
     ADMIN_PK,
-    insuranceMint,
     GROUP_NUM,
+    GROUP,
     getClient,
+    mangoClient,
+    mangoGroup,
+    getAdditionalLabelInfo,
   }
 }

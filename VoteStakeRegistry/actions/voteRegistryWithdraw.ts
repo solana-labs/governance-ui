@@ -1,14 +1,9 @@
-import {
-  Keypair,
-  PublicKey,
-  Transaction,
-  TransactionInstruction,
-} from '@solana/web3.js'
-import { BN } from '@project-serum/anchor'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { BN } from '@coral-xyz/anchor'
 import { withVoteRegistryWithdraw } from '../sdk/withVoteRegistryWithdraw'
 import { RpcContext } from '@solana/spl-governance'
-import { sendTransaction } from '@utils/send'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
+import { sendTransactionsV3, SequenceType } from '@utils/sendTransactions'
 
 export const voteRegistryWithdraw = async ({
   rpcContext,
@@ -18,6 +13,8 @@ export const voteRegistryWithdraw = async ({
   tokenOwnerRecordPubKey,
   depositIndex,
   closeDepositAfterOperation,
+  splProgramId,
+  splProgramVersion,
   communityMintPk,
   client,
 }: {
@@ -26,15 +23,17 @@ export const voteRegistryWithdraw = async ({
   realmPk: PublicKey
   communityMintPk: PublicKey
   amount: BN
-  tokenOwnerRecordPubKey: PublicKey
+  tokenOwnerRecordPubKey: PublicKey | undefined
   depositIndex: number
+  splProgramId: PublicKey
+  splProgramVersion: number
   //if we want to close deposit after doing operation we need to fill this because we can close only deposits that have 0 tokens inside
   closeDepositAfterOperation?: boolean
   client?: VsrClient
 }) => {
-  const signers: Keypair[] = []
   const { wallet, connection } = rpcContext
   const instructions: TransactionInstruction[] = []
+  //spl governance tokenownerrecord pubkey
   await withVoteRegistryWithdraw({
     instructions,
     walletPk: wallet!.publicKey!,
@@ -47,17 +46,23 @@ export const voteRegistryWithdraw = async ({
     communityMintPk,
     connection,
     client,
+    splProgramId,
+    splProgramVersion,
+  })
+  const txes = [instructions].map((txBatch) => {
+    return {
+      instructionsSet: txBatch.map((x) => {
+        return {
+          transactionInstruction: x,
+        }
+      }),
+      sequenceType: SequenceType.Sequential,
+    }
   })
 
-  const transaction = new Transaction()
-  transaction.add(...instructions)
-
-  await sendTransaction({
-    transaction,
-    wallet,
+  await sendTransactionsV3({
     connection,
-    signers,
-    sendingMessage: `Withdrawing`,
-    successMessage: `Withdraw successful`,
+    wallet,
+    transactionInstructions: txes,
   })
 }

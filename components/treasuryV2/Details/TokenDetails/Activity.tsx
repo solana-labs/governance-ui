@@ -7,7 +7,7 @@ import { Sol, Token } from '@models/treasury/Asset'
 import { Status } from '@utils/uiTypes/Result'
 import { fmtUnixTime } from '@utils/formatting'
 import { getExplorerUrl } from '@components/explorer/tools'
-import useWalletStore from 'stores/useWalletStore'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface Props {
   className?: string
@@ -17,8 +17,7 @@ interface Props {
 
 export default function Activity(props: Props) {
   const activity = useAccountActivity(props.assets.map((a) => a.address))
-  const cluster = useWalletStore((s) => s.connection.cluster)
-
+  const cluster = useLegacyConnectionContext().cluster
   switch (activity._tag) {
     case Status.Failed:
       return (
@@ -76,7 +75,7 @@ export default function Activity(props: Props) {
                 No activity
               </div>
             )}
-            {activity.data.map((item) => (
+            {activity.data.map((item, i) => (
               <a
                 className={cx(
                   'border-white/30',
@@ -88,7 +87,7 @@ export default function Activity(props: Props) {
                   'px-4',
                   'rounded-md'
                 )}
-                key={item.signature}
+                key={item.signature + i}
                 href={
                   item.signature
                     ? getExplorerUrl(cluster, item.signature, 'tx')

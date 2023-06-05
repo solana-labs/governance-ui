@@ -6,8 +6,7 @@ import { useRouter } from 'next/router'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import useWalletStore from 'stores/useWalletStore'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 
 import {
   getMintMinAmountAsDecimal,
@@ -24,6 +23,14 @@ import { precision } from '@utils/formatting'
 import { validateInstruction } from '@utils/instructionTools'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Loading from '@components/Loading'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface IProps {
   proposedInvestment
@@ -42,7 +49,7 @@ const EverlendDeposit = ({
   maxDepositAmount,
 }: IProps) => {
   const [amount, setAmount] = useState(0)
-  const tokenSymbol = tokenService.getTokenInfo(
+  const tokenSymbol = tokenPriceService.getTokenInfo(
     governedTokenAccount.extensions.mint!.publicKey.toBase58()
   )?.symbol
 
@@ -58,21 +65,18 @@ const EverlendDeposit = ({
   const [isDepositing, setIsDepositing] = useState(false)
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
-  const {
-    realmInfo,
-    realm,
-    mint,
-    councilMint,
-    ownVoterWeight,
-    symbol,
-    config,
-  } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const config = useRealmConfigQuery().data?.result
+  const { symbol } = router.query
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { realmInfo, ownVoterWeight } = useRealm()
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
-  const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const connection = useLegacyConnectionContext()
+  const wallet = useWalletOnePointOh()
 
   const { canUseTransferInstruction } = useGovernanceAssets()
 
@@ -185,7 +189,7 @@ const EverlendDeposit = ({
       </div>
       <Input
         type="number"
-        onChange={(e) => setAmount(e.target.value)}
+        onChange={(e) => setAmount(e.target.value as any)}
         value={amount}
         onBlur={validateAmountOnBlur}
         error={formErrors['amount']}

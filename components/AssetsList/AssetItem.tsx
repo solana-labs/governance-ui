@@ -1,13 +1,10 @@
 import { useEffect, useState } from 'react'
 import { ExternalLinkIcon, TerminalIcon } from '@heroicons/react/outline'
-import { ProgramAccount } from '@solana/spl-governance'
-import { Governance } from '@solana/spl-governance'
 import { getProgramName } from '@components/instructions/programs/names'
 import { abbreviateAddress } from '@utils/formatting'
 import { PublicKey } from '@solana/web3.js'
 import Button, { SecondaryButton } from '@components/Button'
 import Tooltip from '@components/Tooltip'
-import useWalletStore from 'stores/useWalletStore'
 import { getProgramData } from '@tools/sdk/bpfUpgradeableLoader/accounts'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Modal from '@components/Modal'
@@ -15,16 +12,17 @@ import UpgradeProgram from './UpgradeProgram'
 import CloseBuffers from './CloseBuffers'
 import { getExplorerUrl } from '@components/explorer/tools'
 import TransferUpgradeAuthority from './TransferUpgradeAuthority'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 const AssetItem = ({
   item,
   panelView,
 }: {
-  item: ProgramAccount<Governance>
+  item: AssetAccount
   panelView?: boolean
 }) => {
   const { canUseProgramUpgradeInstruction } = useGovernanceAssets()
-  const [isAuthority, setIsAuthority] = useState(true)
   const [slot, setSlot] = useState(0)
   const [openUpgradeModal, setOpenUpgradeModal] = useState(false)
   const [openCloseBuffersModal, setOpenCloseBuffersModal] = useState(false)
@@ -32,29 +30,30 @@ const AssetItem = ({
     false
   )
   const [loadData, setLoadData] = useState(false)
-  const connection = useWalletStore((s) => s.connection)
-  const name = item ? getProgramName(item.account.governedAccount) : ''
+  const connection = useLegacyConnectionContext()
+  const name = item ? getProgramName(item.pubkey) : ''
   const governedAccount = item
-    ? abbreviateAddress(item?.account.governedAccount as PublicKey)
+    ? abbreviateAddress(item.pubkey as PublicKey)
     : ''
-  const programId = item!.account.governedAccount.toBase58()
+  const programId = item!.pubkey.toBase58()
 
   useEffect(() => {
     const handleSetProgramVersion = async () => {
       try {
         setLoadData(true)
         const programData = await getProgramData(connection.current, programId)
-        const isAuthority =
-          item.pubkey.toString() === programData?.authority?.toString()
-        setIsAuthority(isAuthority)
         setSlot(programData.slot)
       } catch (e) {
         console.log(e)
       }
       setLoadData(false)
     }
-    handleSetProgramVersion()
-  }, [JSON.stringify(item)])
+    if (!panelView) {
+      handleSetProgramVersion()
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+  }, [JSON.stringify(item), panelView])
 
   return (
     <div className="text-fgd-1 border border-fgd-4 p-3 rounded-lg w-full">
@@ -68,10 +67,7 @@ const AssetItem = ({
           </h3>
           <a
             className="default-transition flex items-center mt-0.5 text-fgd-3 hover:text-fgd-2 text-xs"
-            href={getExplorerUrl(
-              connection.cluster,
-              item?.account.governedAccount
-            )}
+            href={getExplorerUrl(connection.cluster, item.pubkey)}
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
@@ -95,61 +91,54 @@ const AssetItem = ({
           <div
             className={`flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mb-4 justify-center`}
           >
-            {' '}
-            {isAuthority ? (
-              <>
-                <Button
-                  disabled={!canUseProgramUpgradeInstruction}
-                  className="sm:w-1/2 text-sm"
-                  onClick={() => setOpenUpgradeModal(true)}
+            <>
+              <Button
+                disabled={!canUseProgramUpgradeInstruction}
+                className="sm:w-1/2 text-sm"
+                onClick={() => setOpenUpgradeModal(true)}
+              >
+                <Tooltip
+                  content={
+                    !canUseProgramUpgradeInstruction &&
+                    'You need to have connected wallet with ability to create upgrade proposals'
+                  }
                 >
-                  <Tooltip
-                    content={
-                      !canUseProgramUpgradeInstruction &&
-                      'You need to have connected wallet with ability to create upgrade proposals'
-                    }
-                  >
-                    <div>Upgrade</div>
-                  </Tooltip>
-                </Button>
-                <SecondaryButton
-                  className="sm:w-1/2 text-sm"
-                  onClick={() => setOpenCloseBuffersModal(true)}
-                  disabled={!canUseProgramUpgradeInstruction}
+                  <div>Upgrade</div>
+                </Tooltip>
+              </Button>
+              <SecondaryButton
+                className="sm:w-1/2 text-sm"
+                onClick={() => setOpenCloseBuffersModal(true)}
+                disabled={!canUseProgramUpgradeInstruction}
+              >
+                <Tooltip
+                  content={
+                    !canUseProgramUpgradeInstruction &&
+                    'You need to have connected wallet with ability to create upgrade proposals'
+                  }
                 >
-                  <Tooltip
-                    content={
-                      !canUseProgramUpgradeInstruction &&
-                      'You need to have connected wallet with ability to create upgrade proposals'
-                    }
-                  >
-                    <div>Close Buffers</div>
-                  </Tooltip>
-                </SecondaryButton>
-                <SecondaryButton
-                  className="sm:w-1/2 text-sm"
-                  onClick={() => setOpenTransferAuthorityModal(true)}
-                  disabled={!canUseProgramUpgradeInstruction}
+                  <div>Close Buffers</div>
+                </Tooltip>
+              </SecondaryButton>
+              <SecondaryButton
+                className="sm:w-1/2 text-sm"
+                onClick={() => setOpenTransferAuthorityModal(true)}
+                disabled={!canUseProgramUpgradeInstruction}
+              >
+                <Tooltip
+                  content={
+                    !canUseProgramUpgradeInstruction &&
+                    'You need to have connected wallet with ability to create upgrade proposals'
+                  }
                 >
-                  <Tooltip
-                    content={
-                      !canUseProgramUpgradeInstruction &&
-                      'You need to have connected wallet with ability to create upgrade proposals'
-                    }
-                  >
-                    <div>Transfer Authority</div>
-                  </Tooltip>
-                </SecondaryButton>
-              </>
-            ) : (
-              <div className="flex items-center text-sm text-fgd-3">
-                This governance is no longer the upgrade authority
-              </div>
-            )}
+                  <div>Transfer Authority</div>
+                </Tooltip>
+              </SecondaryButton>
+            </>
           </div>
         </>
       )}
-      {isAuthority && openUpgradeModal && (
+      {openUpgradeModal && (
         <Modal
           onClose={() => {
             setOpenUpgradeModal(false)
@@ -159,7 +148,7 @@ const AssetItem = ({
           <UpgradeProgram program={item} />
         </Modal>
       )}
-      {isAuthority && openCloseBuffersModal && (
+      {openCloseBuffersModal && (
         <Modal
           onClose={() => {
             setOpenCloseBuffersModal(false)
@@ -169,7 +158,7 @@ const AssetItem = ({
           <CloseBuffers program={item} />
         </Modal>
       )}
-      {isAuthority && openTransferAuthorityModal && (
+      {openTransferAuthorityModal && (
         <Modal
           onClose={() => {
             setOpenTransferAuthorityModal(false)

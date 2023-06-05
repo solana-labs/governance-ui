@@ -28,15 +28,16 @@ import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import * as yup from 'yup'
 import { ObjectSchema, StringSchema, NumberSchema } from 'yup'
 import useRealm from '@hooks/useRealm'
-import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../pages/dao/[symbol]/proposal/new'
 import Select from '@components/inputs/Select'
 import TextareaProps from '@components/inputs/Textarea'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 type EmptyObject = Record<string, never>
 type SetFormErrors = Dispatch<React.SetStateAction<EmptyObject>>
 
-export function getFilteredTokenAccounts(): AssetAccount[] {
+function getFilteredTokenAccounts(): AssetAccount[] {
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   return governedTokenAccountsWithoutNfts.filter((x) => {
     const transferAddress = x.extensions.transferAddress
@@ -160,10 +161,14 @@ export function commonAssets<T extends ForesightHasGovernedAccount>(
     defaultValToYupSchema
   )
   const schema = getSchema<T>(extraSchemaFields)
-  const wallet = useWalletStore((s) => s.current)
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
+  const wallet = useWalletOnePointOh()
   const filteredTokenAccounts = getFilteredTokenAccounts()
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [formErrors, setFormErrors] = useState({})
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const { handleSetInstructions } = useContext(NewProposalContext)
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [form, setForm] = useState<T>({
     governedAccount: filteredTokenAccounts[0],
     ...formDefaults,
@@ -232,6 +237,7 @@ function ForesightUseEffects<T extends ForesightHasGovernedAccount>(
       propertyName: 'programId',
       value: programId?.toString(),
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [programId])
 
   useEffect(() => {
@@ -239,10 +245,11 @@ function ForesightUseEffects<T extends ForesightHasGovernedAccount>(
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
 }
 
-export function getSchema<T extends ForesightHasGovernedAccount>(
+function getSchema<T extends ForesightHasGovernedAccount>(
   extraFields: {
     [name in keyof Omit<T, 'governedAccount'>]: StringSchema | NumberSchema
   }
@@ -275,7 +282,7 @@ function ForesightGovernedAccountSelect(props: {
   index: number
   governance: ProgramAccount<Governance> | null
 }) {
-  const shouldBeGoverned = props.index !== 0 && props.governance
+  const shouldBeGoverned = !!(props.index !== 0 && props.governance)
   return (
     <GovernedAccountSelect
       label="Program"

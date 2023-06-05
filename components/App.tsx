@@ -1,32 +1,46 @@
 import { ThemeProvider } from 'next-themes'
 import { WalletIdentityProvider } from '@cardinal/namespaces-components'
 import dynamic from 'next/dynamic'
-import React, { useEffect } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import Head from 'next/head'
 import Script from 'next/script'
-
+import { useRouter } from 'next/router'
 import { GatewayProvider } from '@components/Gateway/GatewayProvider'
 import { usePrevious } from '@hooks/usePrevious'
-import { useVotingPlugins, vsrPluginsPks } from '@hooks/useVotingPlugins'
+import { useVotingPlugins } from '@hooks/useVotingPlugins'
+import { VSR_PLUGIN_PKS } from '@constants/plugins'
 import ErrorBoundary from '@components/ErrorBoundary'
-import handleGovernanceAssetsStore from '@hooks/handleGovernanceAssetsStore'
+import useHandleGovernanceAssetsStore from '@hooks/handleGovernanceAssetsStore'
 import handleRouterHistory from '@hooks/handleRouterHistory'
 import NavBar from '@components/NavBar'
 import PageBodyContainer from '@components/PageBodyContainer'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import TransactionLoader from '@components/TransactionLoader'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useHydrateStore from '@hooks/useHydrateStore'
-import useMarketStore from 'Strategies/store/marketStore'
 import useMembers from '@components/Members/useMembers'
 import useRealm from '@hooks/useRealm'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import useWallet from '@hooks/useWallet'
-import useWalletStore from 'stores/useWalletStore'
 import NftVotingCountingModal from '@components/NftVotingCountingModal'
 import { getResourcePathPart } from '@tools/core/resources'
+import useSerumGovStore from 'stores/useSerumGovStore'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import {
+  ConnectionProvider,
+  WalletProvider,
+} from '@solana/wallet-adapter-react'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { DEVNET_RPC, MAINNET_RPC } from 'constants/endpoints'
+import {
+  SquadsEmbeddedWalletAdapter,
+  detectEmbeddedInSquadsIframe,
+} from '@sqds/iframe-adapter'
+import { WALLET_PROVIDERS } from '@utils/wallet-adapters'
+import { tryParsePublicKey } from '@tools/core/pubkey'
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
@@ -56,30 +70,66 @@ interface Props {
   children: React.ReactNode
 }
 
+/** AppContents depends on providers itself, sadly, so this is where providers go.  */
 export function App(props: Props) {
-  useHydrateStore()
-  useWallet()
+  const router = useRouter()
+  const { cluster } = router.query
+
+  const endpoint = useMemo(
+    () => (cluster === 'devnet' ? DEVNET_RPC : MAINNET_RPC),
+    [cluster]
+  )
+
+  const supportedWallets = useMemo(
+    () =>
+      detectEmbeddedInSquadsIframe()
+        ? [new SquadsEmbeddedWalletAdapter()]
+        : WALLET_PROVIDERS.map((provider) => provider.adapter),
+    []
+  )
+
+  return (
+    <ConnectionProvider endpoint={endpoint}>
+      <WalletProvider wallets={supportedWallets}>
+        <AppContents {...props} />{' '}
+      </WalletProvider>
+    </ConnectionProvider>
+  )
+}
+
+export function AppContents(props: Props) {
   handleRouterHistory()
   useVotingPlugins()
-  handleGovernanceAssetsStore()
+  useHandleGovernanceAssetsStore()
   useMembers()
   useEffect(() => {
-    tokenService.fetchSolanaTokenList()
+    tokenPriceService.fetchSolanaTokenList()
   }, [])
-  const { loadMarket } = useMarketStore()
   const { governedTokenAccounts } = useGovernanceAssets()
-  const possibleNftsAccounts = governedTokenAccounts.filter(
-    (x) => x.isSol || x.isNft
+  const possibleNftsAccounts = useMemo(
+    () => governedTokenAccounts.filter((x) => x.isSol || x.isNft),
+    [governedTokenAccounts]
   )
   const { getNfts } = useTreasuryAccountStore()
   const { getOwnedDeposits, resetDepositState } = useDepositStore()
-  const { realm, ownTokenRecord, realmInfo, symbol, config } = useRealm()
-  const wallet = useWalletStore((s) => s.current)
-  const connection = useWalletStore((s) => s.connection)
-  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
+
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const realm = useRealmQuery().data?.result
+  const config = useRealmConfigQuery().data?.result
+
+  const { realmInfo } = useRealm()
+  const wallet = useWalletOnePointOh()
+  const connection = useLegacyConnectionContext()
+  const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
   const prevStringifyPossibleNftsAccounts = usePrevious(
     JSON.stringify(possibleNftsAccounts)
   )
+  const router = useRouter()
+  const { cluster, symbol } = router.query
+  const updateSerumGovAccounts = useSerumGovStore(
+    (s) => s.actions.updateSerumGovAccounts
+  )
+
   const realmName = realmInfo?.displayName ?? realm?.account?.name
   const title = realmName ? `${realmName}` : 'Realms'
 
@@ -88,42 +138,42 @@ export function App(props: Props) {
   // https://stackoverflow.com/questions/2208933/how-do-i-force-a-favicon-refresh
   const faviconUrl =
     symbol &&
+    tryParsePublicKey(symbol as string) === undefined && // don't try to use a custom favicon if this is a pubkey-based url
     `/realms/${getResourcePathPart(
       symbol as string
     )}/favicon.ico?v=${Date.now()}`
 
   useEffect(() => {
-    if (realm?.pubkey) {
-      loadMarket(connection, connection.cluster)
-    }
-  }, [connection.cluster, realm?.pubkey.toBase58()])
-  useEffect(() => {
     if (
       realm &&
       config?.account.communityTokenConfig.voterWeightAddin &&
-      vsrPluginsPks.includes(
+      VSR_PLUGIN_PKS.includes(
         config.account.communityTokenConfig.voterWeightAddin.toBase58()
       ) &&
       realm.pubkey &&
       wallet?.connected &&
       ownTokenRecord &&
-      client
+      vsrClient
     ) {
       getOwnedDeposits({
-        realmPk: realm!.pubkey,
-        communityMintPk: realm!.account.communityMint,
+        realmPk: realm.pubkey,
+        communityMintPk: realm.account.communityMint,
         walletPk: ownTokenRecord!.account!.governingTokenOwner,
-        client: client!,
+        client: vsrClient,
         connection: connection.current,
       })
     } else if (!wallet?.connected || !ownTokenRecord) {
       resetDepositState()
     }
   }, [
-    realm?.pubkey.toBase58(),
-    ownTokenRecord?.pubkey.toBase58(),
+    config?.account.communityTokenConfig.voterWeightAddin,
+    connection,
+    getOwnedDeposits,
+    ownTokenRecord,
+    realm,
+    resetDepositState,
+    vsrClient,
     wallet?.connected,
-    client?.program.programId.toBase58(),
   ])
 
   useEffect(() => {
@@ -134,7 +184,17 @@ export function App(props: Props) {
     ) {
       getNfts(possibleNftsAccounts, connection)
     }
-  }, [JSON.stringify(possibleNftsAccounts), realm?.pubkey.toBase58()])
+  }, [
+    connection,
+    getNfts,
+    possibleNftsAccounts,
+    prevStringifyPossibleNftsAccounts,
+    realm?.pubkey,
+  ])
+
+  useEffect(() => {
+    updateSerumGovAccounts(cluster as string | undefined)
+  }, [cluster, updateSerumGovAccounts])
 
   return (
     <div className="relative bg-bkg-1 text-fgd-1">

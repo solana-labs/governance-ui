@@ -5,7 +5,6 @@ import * as yup from 'yup'
 import type { ConditionBuilder } from 'yup/lib/Condition'
 import clsx from 'clsx'
 
-import useWalletStore from 'stores/useWalletStore'
 import FormHeader from '@components/NewRealmWizard/components/FormHeader'
 import FormField from '@components/NewRealmWizard/components/FormField'
 import FormFooter from '@components/NewRealmWizard/components/FormFooter'
@@ -14,6 +13,7 @@ import Input from '@components/NewRealmWizard/components/Input'
 import { updateUserInput, validateSolAddress } from '@utils/formValidation'
 import { FORM_NAME as MULTISIG_FORM } from 'pages/realms/new/multisig'
 import { textToAddressList } from '@utils/textToAddressList'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 /**
  * Convert a list of addresses into a list of uniques and duplicates
@@ -140,7 +140,7 @@ export default function InviteMembersForm({
   currentStep,
   totalSteps,
 }) {
-  const { current } = useWalletStore((s) => s)
+  const current = useWalletOnePointOh()
   const userAddress = current?.publicKey?.toBase58()
   const inputElement = useRef<HTMLInputElement>(null)
   const [inviteList, setInviteList] = useState<string[]>([])
@@ -182,6 +182,7 @@ export default function InviteMembersForm({
       // go to next step:
       serializeValues({ memberAddresses: null })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [formData])
 
   useEffect(() => {
@@ -189,6 +190,7 @@ export default function InviteMembersForm({
       shouldValidate: true,
       shouldDirty: true,
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [inviteList])
 
   // The user can get to this screen without connecting their wallet. If they
@@ -202,6 +204,7 @@ export default function InviteMembersForm({
     ) {
       setInviteList((currentList) => currentList.concat(userAddress))
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [userAddress])
 
   function serializeValues(values) {

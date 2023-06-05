@@ -1,11 +1,10 @@
-import { BN, WalletAdapter } from '@blockworks-foundation/mango-client'
 import {
   VaultConfig,
   DeploymentEnvs,
   Clusters,
 } from '@castlefinance/vault-core'
 import { VaultClient } from '@castlefinance/vault-sdk'
-import { Provider } from '@castlefinance/vault-sdk/node_modules/@project-serum/anchor'
+import { AnchorProvider, BN } from '@coral-xyz/anchor'
 import { AnchorWallet } from '@friktion-labs/friktion-sdk/dist/cjs/src/miscUtils'
 import {
   serializeInstructionToBase64,
@@ -24,6 +23,7 @@ import {
   TransactionInstruction,
   Keypair,
   Connection,
+  Transaction,
 } from '@solana/web3.js'
 import { ConnectionContext, getNetworkFromEndpoint } from '@utils/connection'
 import { validateInstruction } from '@utils/instructionTools'
@@ -105,7 +105,7 @@ export async function getCastleDepositInstruction({
 
     // Get the deposit instruction
     const { decimals } = governedTokenAccount.extensions.mint.account
-    const depositIx = vaultClient.getDepositIx(
+    const depositIx = await vaultClient.getDepositIx(
       new BN(amount * Math.pow(10, decimals)),
       reserveTokenOwner,
       userLpTokenAccount,
@@ -127,7 +127,6 @@ export async function getCastleDepositInstruction({
     governance: governedTokenAccount?.governance,
     prerequisiteInstructions: prerequisiteInstructions,
     signers,
-    shouldSplitIntoSeparateTxs: true,
   }
 
   return obj
@@ -207,7 +206,7 @@ export async function getCastleWithdrawInstruction({
     // into the vault in exchange for the reserve token
     const { decimals } = governedTokenAccount.extensions.mint.account
 
-    const withdrawIx = vaultClient.getWithdrawIx(
+    const withdrawIx = await vaultClient.getWithdrawIx(
       new BN(amount * Math.pow(10, decimals)),
       lpTokenAccountOwner,
       governedTokenAccount.pubkey,
@@ -229,7 +228,6 @@ export async function getCastleWithdrawInstruction({
     governance: governedTokenAccount?.governance,
     prerequisiteInstructions: prerequisiteInstructions,
     signers,
-    shouldSplitIntoSeparateTxs: true,
   }
 
   return obj
@@ -274,7 +272,7 @@ export async function getCastleReconcileInstruction(
  * @param instructionOption
  * @returns Refresh transaction for the specified mint vault
  */
-export async function getCastleRefreshInstruction(
+export async function getCastleRefreshInstructions(
   connection: Connection,
   wallet: any,
   instruction: ProgramAccount<ProposalTransaction>
@@ -285,9 +283,9 @@ export async function getCastleRefreshInstruction(
     instruction
   )
 
-  const refreshIx = vaultClient.getRefreshIx()
+  const refreshIxs = vaultClient.getRefreshIxs()
 
-  return refreshIx
+  return refreshIxs
 }
 
 /**
@@ -303,7 +301,7 @@ const getCastleVaultClientFromForm = async (
   form: CastleDepositForm | CastleWithdrawForm
 ) => {
   // Create a new provider
-  const provider = new Provider(
+  const provider = new AnchorProvider(
     connection.current,
     (wallet as unknown) as AnchorWallet,
     {
@@ -350,7 +348,7 @@ const getCastleVaultClientFromProposal = async (
   instruction: ProgramAccount<ProposalTransaction>
 ) => {
   // Create a new provider
-  const provider = new Provider(
+  const provider = new AnchorProvider(
     connection,
     (wallet as unknown) as AnchorWallet,
     {
@@ -395,4 +393,13 @@ export const getCastleVaults = async () => {
   const configResponse = await fetch('https://api.castle.finance/configs')
   const vaults = (await configResponse.json()) as VaultConfig<DeploymentEnvs>[]
   return vaults
+}
+
+interface WalletAdapter {
+  publicKey: PublicKey
+  connected: boolean
+  signTransaction: (transaction: Transaction) => Promise<Transaction>
+  signAllTransactions: (transaction: Transaction[]) => Promise<Transaction[]>
+  connect: () => any
+  disconnect: () => any
 }

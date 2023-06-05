@@ -1,13 +1,11 @@
 import { BigNumber } from 'bignumber.js'
 import { MintInfo } from '@solana/spl-token'
 import {
-  getNativeTreasuryAddress,
   getProgramDataAccount,
   ProgramAccount,
   Realm,
   RealmConfigAccount,
 } from '@solana/spl-governance'
-import { Connection, PublicKey } from '@solana/web3.js'
 import { SparklesIcon } from '@heroicons/react/outline'
 
 import { AssetAccount, AccountType } from '@utils/uiTypes/assets'
@@ -27,15 +25,22 @@ import {
 } from './groupProgramsByWallet'
 import { getRulesFromAccount } from './getRulesFromAccount'
 import { abbreviateAddress } from '@utils/formatting'
+import { Domain } from '@models/treasury/Domain'
+import { groupDomainsByWallet } from './groupDomainsByWallet'
+import { ConnectionContext } from '@utils/connection'
+import { PublicKey } from '@solana/web3.js'
+import getTokenOwnerRecordsForWallet from './getTokenOwnerRecordsForWallet'
+import { tryParseKey } from '@tools/validators/pubkey'
 
 function isNotNull<T>(x: T | null): x is T {
   return x !== null
 }
 
 export const assembleWallets = async (
-  connection: Connection,
+  connection: ConnectionContext,
   accounts: AssetAccount[],
   nfts: NFT[],
+  domains: Domain[],
   programId: PublicKey,
   councilMintAddress?: string,
   communityMintAddress?: string,
@@ -54,6 +59,7 @@ export const assembleWallets = async (
     programId,
     programs
   )
+  const domainsGroupedByWallet = groupDomainsByWallet(domains)
   const ungovernedAssets: AssetAccount[] = []
   const governanceToWallet: { [address: string]: string } = {}
 
@@ -63,9 +69,7 @@ export const assembleWallets = async (
     if (account.isSol && account.extensions.transferAddress) {
       walletAddress = account.extensions.transferAddress.toBase58()
     } else if (account.governance.pubkey) {
-      walletAddress = (
-        await getNativeTreasuryAddress(programId, account.governance.pubkey)
-      ).toBase58()
+      walletAddress = account.governance.nativeTreasuryAddress.toBase58()
     }
 
     if (!walletAddress) {
@@ -105,7 +109,9 @@ export const assembleWallets = async (
 
     if (!walletMap[walletAddress].stats.votingProposalCount) {
       walletMap[walletAddress].stats.votingProposalCount =
-        account.governance.account.votingProposalCount || 0
+        account.governance.account?.activeProposalCount?.toNumber() ||
+        account.governance.account?.proposalCount ||
+        0
     }
 
     // We're going to handle NFTs & programs specially
@@ -122,6 +128,15 @@ export const assembleWallets = async (
       if (asset) {
         walletMap[walletAddress].assets.push(asset)
       }
+    }
+
+    if (account.type === AccountType.SOL) {
+      const tokenOwnerRecords = await getTokenOwnerRecordsForWallet(
+        connection,
+        account.governance,
+        tryParseKey(walletAddress)
+      )
+      walletMap[walletAddress].assets.push(...tokenOwnerRecords)
     }
   }
 
@@ -140,7 +155,7 @@ export const assembleWallets = async (
 
     const dataAccounts = await Promise.all(
       programList.map((p) =>
-        getProgramDataAccount(connection, p.pubkey).then((account) => ({
+        getProgramDataAccount(connection.current, p.pubkey).then((account) => ({
           address: p.pubkey.toBase58(),
           lastDeployedSlot: account.slot,
           upgradeAuthority: account.authority?.toBase58(),
@@ -158,6 +173,27 @@ export const assembleWallets = async (
       id: 'program-list',
       count: new BigNumber(dataAccounts.length),
       list: dataAccounts,
+    })
+  }
+
+  for (const [walletAddress, domainList] of Object.entries(
+    domainsGroupedByWallet
+  )) {
+    if (!walletMap[walletAddress]) {
+      walletMap[walletAddress] = {
+        address: walletAddress,
+        assets: [],
+        rules: {},
+        stats: {},
+        totalValue: new BigNumber(0),
+      }
+    }
+
+    walletMap[walletAddress].assets.push({
+      type: AssetType.Domain,
+      id: 'domain-list',
+      count: new BigNumber(domainList.length),
+      list: domainList,
     })
   }
 
@@ -279,12 +315,8 @@ export const assembleWallets = async (
             minCommunityTokensToCreateGovernance: new BigNumber(
               config.minCommunityTokensToCreateGovernance.toString()
             ).shiftedBy(communityMint ? -communityMint.decimals : 0),
-            useCommunityVoterWeightAddin:
-              realmConfig?.account.communityTokenConfig.voterWeightAddin ??
-              false,
-            useMaxCommunityVoterWeightAddin:
-              realmConfig?.account.communityTokenConfig.maxVoterWeightAddin ??
-              false,
+            communityTokenConfig: realmConfig?.account.communityTokenConfig,
+            councilTokenConfig: realmConfig?.account.councilTokenConfig,
           },
           icon: realmInfo?.ogImage ? (
             <img src={realmInfo.ogImage} />

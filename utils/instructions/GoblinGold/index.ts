@@ -1,7 +1,7 @@
 import { UiInstruction } from '../../uiTypes/proposalCreationTypes'
 import { WSOL_MINT_PK } from '@components/instructions/tools'
-import { Wallet, BN } from '@project-serum/anchor'
-import { publicKey, struct, u32, u64, u8 } from '@project-serum/borsh'
+import { Wallet, BN } from '@coral-xyz/anchor'
+import { publicKey, struct, u32, u64, u8 } from '@coral-xyz/borsh'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -239,7 +239,6 @@ export async function getGoblinGoldDepositInstruction({
     governance: governedTokenAccount?.governance,
     prerequisiteInstructions: prerequisiteInstructions,
     signers,
-    shouldSplitIntoSeparateTxs: true,
   }
 
   return obj
@@ -345,7 +344,6 @@ export async function getGoblinGoldWithdrawInstruction({
     governance: governedTokenAccount?.governance,
     prerequisiteInstructions: prerequisiteInstructions,
     signers,
-    shouldSplitIntoSeparateTxs: true,
   }
 
   return obj

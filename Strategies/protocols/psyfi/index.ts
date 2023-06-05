@@ -11,14 +11,14 @@ import {
   TokenGroupedVaults,
   VaultInfo,
 } from './types'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import {
   ProgramAccount,
   Realm,
   RpcContext,
   TokenOwnerRecord,
 } from '@solana/spl-governance'
-import { Program } from '@project-serum/anchor'
+import { Program } from '@coral-xyz/anchor'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { PublicKey } from '@solana/web3.js'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
@@ -102,7 +102,7 @@ export const convertVaultInfoToStrategy = async (
     strategyName = vaultInfo.name
   }
   const handledMint = vaultInfo.accounts.collateralAssetMint
-  const tokenInfo = await tokenService.getTokenInfo(handledMint)
+  const tokenInfo = await tokenPriceService.getTokenInfo(handledMint)
   if (!tokenInfo) {
     return
   }

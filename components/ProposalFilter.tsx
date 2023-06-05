@@ -3,6 +3,7 @@ import { ChevronDownIcon } from '@heroicons/react/solid'
 import { Disclosure } from '@headlessui/react'
 import Switch from './Switch'
 import classNames from 'classnames'
+import Button from './Button'
 
 export const InitialFilters = {
   Cancelled: false,
@@ -13,6 +14,8 @@ export const InitialFilters = {
   ExecutingWithErrors: true,
   SigningOff: true,
   Voting: true,
+  Vetoed: true,
+  withoutQuorum: false,
 }
 
 export type Filters = typeof InitialFilters
@@ -21,6 +24,8 @@ function getFilterLabel(filter: keyof Filters) {
   switch (filter) {
     case 'ExecutingWithErrors':
       return 'Executing w/ errors'
+    case 'withoutQuorum':
+      return 'Voting without quorum'
     default:
       return filter
   }
@@ -91,6 +96,21 @@ const ProposalFilter = ({ className, disabled, filters, onChange }: Props) => {
                 )
               )}
             </div>
+            <Button
+              onClick={() => {
+                const newFilters = {
+                  ...Object.keys(InitialFilters).reduce(
+                    (reduced, key) => ({ ...reduced, [key]: false }),
+                    {}
+                  ),
+                }
+                onChange({ ...(newFilters as any) })
+              }}
+              className="float-right mt-3"
+              small={true}
+            >
+              Deselect all
+            </Button>
           </Disclosure.Panel>
         </>
       )}

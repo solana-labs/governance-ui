@@ -12,18 +12,25 @@ import {
 import { CreateEverlendProposal } from '../../protocols/everlend/tools'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useRealm from '@hooks/useRealm'
-import useWalletStore from 'stores/useWalletStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useQueryContext from '@hooks/useQueryContext'
 import { useRouter } from 'next/router'
 import AdditionalProposalOptions from '@components/AdditionalProposalOptions'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import * as yup from 'yup'
 import { precision } from '@utils/formatting'
 import { validateInstruction } from '@utils/instructionTools'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Loading from '@components/Loading'
 import { TreasuryStrategy } from '../../types/types'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface IProps {
   proposedInvestment: TreasuryStrategy & {
@@ -51,27 +58,23 @@ const EverlendWithdraw = ({
     description: '',
   })
   const [formErrors, setFormErrors] = useState({})
-
-  const {
-    realmInfo,
-    realm,
-    mint,
-    councilMint,
-    ownVoterWeight,
-    symbol,
-    config,
-  } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const config = useRealmConfigQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { realmInfo, ownVoterWeight } = useRealm()
   const { canUseTransferInstruction } = useGovernanceAssets()
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
   const { fmtUrlWithCluster } = useQueryContext()
-  const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const connection = useLegacyConnectionContext()
+  const wallet = useWalletOnePointOh()
   const router = useRouter()
+  const { symbol } = router.query
 
-  const tokenSymbol = tokenService.getTokenInfo(
+  const tokenSymbol = tokenPriceService.getTokenInfo(
     governedTokenAccount.extensions.mint!.publicKey.toBase58()
   )?.symbol
 
@@ -187,7 +190,7 @@ const EverlendWithdraw = ({
 
       <Input
         type="number"
-        onChange={(e) => setAmount(e.target.value)}
+        onChange={(e) => setAmount(e.target.value as any)}
         value={amount}
         onBlur={validateAmountOnBlur}
         error={formErrors['amount']}

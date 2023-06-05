@@ -7,7 +7,7 @@ import {
   Proposal,
   VoteTipping,
 } from '@solana/spl-governance'
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import {
   getMintNaturalAmountFromDecimal,
   getTimestampFromDays,
@@ -15,31 +15,30 @@ import {
 } from '@tools/sdk/units'
 import { isDisabledVoterWeight } from '@tools/governance/units'
 import { createGovernanceThresholds } from '@tools/governance/configs'
-import { PublicKey } from '@blockworks-foundation/mango-client'
 import { ConnectionContext } from './connection'
 import axios from 'axios'
-import { bs58 } from '@project-serum/anchor/dist/cjs/utils/bytes'
+import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes'
+import { PublicKey } from '@solana/web3.js'
 
-export interface GovernanceConfigValues {
+interface GovernanceConfigValues {
   minTokensToCreateProposal: number | string
   minInstructionHoldUpTime: number
   maxVotingTime: number
   voteThresholdPercentage: number
   mintDecimals: number
   voteTipping?: VoteTipping
+  votingCoolOffTime?: number
+  depositExemptProposalCount?: number
 }
 
 // Parses min tokens to create (proposal or governance)
-export function parseMinTokensToCreate(
-  value: string | number,
-  mintDecimals: number
-) {
+function parseMinTokensToCreate(value: string | number, mintDecimals: number) {
   return typeof value === 'string'
     ? parseMintNaturalAmountFromDecimal(value, mintDecimals)
     : getMintNaturalAmountFromDecimal(value, mintDecimals)
 }
 
-export function getGovernanceConfig(
+export function getGovernanceConfigFromV2Form(
   programVersion: number,
   values: GovernanceConfigValues
 ) {
@@ -69,7 +68,7 @@ export function getGovernanceConfig(
     minInstructionHoldUpTime: getTimestampFromDays(
       values.minInstructionHoldUpTime
     ),
-    maxVotingTime: getTimestampFromDays(values.maxVotingTime),
+    baseVotingTime: getTimestampFromDays(values.maxVotingTime),
     // Use 1 as default for council tokens.
     // Council tokens are rare and possession of any amount of council tokens should be sufficient to be allowed to create proposals
     // If it turns to be a wrong assumption then it should be exposed in the UI
@@ -79,6 +78,9 @@ export function getGovernanceConfig(
     councilVoteThreshold: councilVoteThreshold,
     councilVetoVoteThreshold: councilVetoVoteThreshold,
     communityVetoVoteThreshold: communityVetoVoteThreshold,
+    //defaults in v2 there is no votingCoolOffTime and depositExemptProposalCount
+    votingCoolOffTime: 0,
+    depositExemptProposalCount: 10,
   })
 }
 

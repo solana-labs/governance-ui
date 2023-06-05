@@ -75,6 +75,7 @@ export const RealmInfo = IT.type({
   iconUrl: IT.union([IT.null, IT.string]),
   name: IT.string,
   symbol: IT.union([IT.null, IT.string]),
+  urlId: IT.string,
 });
 
 export type RealmInfo = IT.TypeOf<typeof RealmInfo>;

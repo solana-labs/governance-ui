@@ -16,14 +16,15 @@ import {
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
 import { isFormValid } from '@utils/formValidation'
-import useWalletStore from 'stores/useWalletStore'
-import { web3 } from '@project-serum/anchor'
+import { web3 } from '@coral-xyz/anchor'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
-import * as anchor from '@project-serum/anchor'
+import * as anchor from '@coral-xyz/anchor'
 import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
 import useRealm from '@hooks/useRealm'
 import { SOLANA_VALIDATOR_DAO_PROGRAM_ID } from '@components/instructions/programs/validatordao'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const StakeValidator = ({
   index,
@@ -32,11 +33,11 @@ const StakeValidator = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const programId: PublicKey = StakeProgram.programId
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
-  const shouldBeGoverned = index !== 0 && governance
-  const wallet = useWalletStore((s) => s.current)
+  const shouldBeGoverned = !!(index !== 0 && governance)
+  const wallet = useWalletOnePointOh()
 
   const [form, setForm] = useState<ValidatorStakingForm>({
     validatorVoteKey: '',
@@ -199,26 +200,17 @@ const StakeValidator = ({
       isValid: true,
       governance: form.governedTokenAccount.governance,
       prerequisiteInstructions: prerequisiteInstructions,
-      shouldSplitIntoSeparateTxs: false,
     }
   }
-
-  useEffect(() => {
-    handleSetInstructions(
-      {
-        governedAccount: governedAccount,
-        getInstruction,
-      },
-      index
-    )
-  }, [form])
 
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: governedAccount, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
+
   useEffect(() => {
     setGovernedAccount(form.governedTokenAccount?.governance)
   }, [form.governedTokenAccount])
@@ -237,6 +229,7 @@ const StakeValidator = ({
         error={formErrors['governedTokenAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
+        type="token"
       ></GovernedAccountSelect>
       <Input
         label="Validator Vote Address"
@@ -246,7 +239,7 @@ const StakeValidator = ({
         onChange={setValidatorVoteKey}
       />
       <Input
-        label="Seed for stake address (will be added with validator address)"
+        label="(optional, advanced) Seed for stake address"
         value={form.seed}
         error={formErrors['seed']}
         type="number"

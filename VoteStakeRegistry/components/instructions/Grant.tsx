@@ -1,5 +1,11 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
-import React, { useContext, useEffect, useState } from 'react'
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import Input from '@components/inputs/Input'
 import useRealm from '@hooks/useRealm'
 import { AccountInfo } from '@solana/spl-token'
@@ -10,7 +16,6 @@ import {
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { precision } from '@utils/formatting'
 import { tryParseKey } from '@tools/validators/pubkey'
-import useWalletStore from 'stores/useWalletStore'
 import { TokenProgramAccount, tryGetTokenAccount } from '@utils/tokens'
 import { GrantForm, UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { getAccountName } from '@components/instructions/tools'
@@ -19,6 +24,8 @@ import { getTokenTransferSchema } from '@utils/validations'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import {
   Governance,
+  getTokenOwnerRecord,
+  getTokenOwnerRecordAddress,
   serializeInstructionToBase64,
   withCreateTokenOwnerRecord,
 } from '@solana/spl-governance'
@@ -29,7 +36,7 @@ import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/Govern
 import { lockupTypes } from 'VoteStakeRegistry/tools/types'
 import Select from '@components/inputs/Select'
 import Switch from '@components/Switch'
-import { getFormattedStringFromDays } from 'VoteStakeRegistry/tools/dateTools'
+import { getFormattedStringFromDays } from '@utils/dateTools'
 import * as yup from 'yup'
 import { getGrantInstruction } from 'VoteStakeRegistry/actions/getGrantInstruction'
 import { getRegistrarPDA } from 'VoteStakeRegistry/sdk/accounts'
@@ -37,6 +44,12 @@ import { tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import dayjs from 'dayjs'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import queryClient from '@hooks/queries/queryClient'
+import asFindable from '@utils/queries/asFindable'
+import { tokenOwnerRecordQueryKeys } from '@hooks/queries/tokenOwnerRecord'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const Grant = ({
   index,
@@ -47,11 +60,13 @@ const Grant = ({
 }) => {
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const dateNow = dayjs().unix()
-  const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
-  const { realm, tokenRecords, realmInfo } = useRealm()
+  const connection = useLegacyConnectionContext()
+  const wallet = useWalletOnePointOh()
+  const realm = useRealmQuery().data?.result
+
+  const { realmInfo } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
-  const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const [startDate, setStartDate] = useState(dayjs().format('DD-MM-YYYY'))
   const [endDate, setEndDate] = useState('')
   const [useableGrantMints, setUseableGrantMints] = useState<string[]>([])
@@ -66,6 +81,23 @@ const Grant = ({
     allowClawback: true,
     lockupKind: lockupTypes[0],
   })
+  const schema = useMemo(
+    () =>
+      getTokenTransferSchema({ form, connection }).concat(
+        yup.object().shape({
+          startDateUnixSeconds: yup
+            .number()
+            .required('Start date required')
+            .min(1, 'Start date required'),
+          periods: yup
+            .number()
+            .required('End date required')
+            .min(1, 'End date cannot be prior to start date'),
+        })
+      ),
+    [form, connection]
+  )
+
   const [governedAccount, setGovernedAccount] = useState<
     ProgramAccount<Governance> | undefined
   >(undefined)
@@ -79,13 +111,16 @@ const Grant = ({
     : 1
   const currentPrecision = precision(mintMinAmount)
   const { handleSetInstructions } = useContext(NewProposalContext)
+
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
+    setForm((prevForm) => ({ ...prevForm, [propertyName]: value }))
   }
+
   const setMintInfo = (value) => {
-    setForm({ ...form, mintInfo: value })
+    setForm((prevForm) => ({ ...prevForm, mintInfo: value }))
   }
+
   const setAmount = (event) => {
     const value = event.target.value
     handleSetForm({
@@ -106,7 +141,9 @@ const Grant = ({
       propertyName: 'amount',
     })
   }
-  async function getInstruction(): Promise<UiInstruction> {
+  const getInstruction = useCallback(async () => {
+    if (!realm) throw new Error()
+
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     let serializedInstruction = ''
     const prerequisiteInstructions: TransactionInstruction[] = []
@@ -123,7 +160,26 @@ const Grant = ({
         form.amount!,
         form.governedTokenAccount.extensions.mint.account.decimals
       )
-      const currentTokenOwnerRecord = tokenRecords[form.destinationAccount]
+      //const currentTokenOwnerRecord = tokenRecords[form.destinationAccount]
+
+      const destinationTokenOwnerRecordPk = await getTokenOwnerRecordAddress(
+        realm.owner,
+        realm.pubkey,
+        realm.account.communityMint,
+        destinationAccount
+      )
+      const currentTokenOwnerRecord = queryClient.fetchQuery({
+        queryKey: tokenOwnerRecordQueryKeys.byPubkey(
+          connection.cluster,
+          destinationTokenOwnerRecordPk
+        ),
+        queryFn: () =>
+          asFindable(getTokenOwnerRecord)(
+            connection.current,
+            destinationTokenOwnerRecordPk
+          ),
+      })
+
       if (!currentTokenOwnerRecord) {
         await withCreateTokenOwnerRecord(
           prerequisiteInstructions,
@@ -159,10 +215,18 @@ const Grant = ({
       isValid,
       governance: form.governedTokenAccount?.governance,
       prerequisiteInstructions: prerequisiteInstructions,
-      chunkSplitByDefault: true,
     }
     return obj
-  }
+  }, [
+    client,
+    connection,
+    form,
+    realm,
+    realmInfo?.programVersion,
+    schema,
+    wallet,
+  ])
+
   const handleChangeStartDate = (e) => {
     const value = e.target.value
     setStartDate(value)
@@ -194,6 +258,7 @@ const Grant = ({
       })
     }
   }, [startDate, endDate, form.lockupKind.value])
+
   useEffect(() => {
     if (form.destinationAccount) {
       debounce.debounceFcn(async () => {
@@ -208,32 +273,24 @@ const Grant = ({
     } else {
       setDestinationAccount(null)
     }
-  }, [form.destinationAccount])
+  }, [form.destinationAccount, connection])
+
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: governedAccount, getInstruction },
       index
     )
-  }, [form])
+  }, [form, governedAccount, handleSetInstructions, index, getInstruction])
+
   useEffect(() => {
     setGovernedAccount(form.governedTokenAccount?.governance)
     setMintInfo(form.governedTokenAccount?.extensions.mint?.account)
   }, [form.governedTokenAccount])
+
   const destinationAccountName =
     destinationAccount?.publicKey &&
     getAccountName(destinationAccount?.account.address)
-  const schema = getTokenTransferSchema({ form, connection }).concat(
-    yup.object().shape({
-      startDateUnixSeconds: yup
-        .number()
-        .required('Start date required')
-        .min(1, 'Start date required'),
-      periods: yup
-        .number()
-        .required('End date required')
-        .min(1, 'End date cannot be prior to start date'),
-    })
-  )
+
   useEffect(() => {
     const getGrantMints = async () => {
       const clientProgramId = client!.program.programId
@@ -252,7 +309,10 @@ const Grant = ({
     if (client) {
       getGrantMints()
     }
-  }, [client])
+  }, [client, realm])
+
+  const isNotVested =
+    form.lockupKind.value !== 'monthly' && form.lockupKind.value !== 'daily'
   return (
     <>
       <Select
@@ -288,6 +348,7 @@ const Grant = ({
         error={formErrors['governedTokenAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
+        type="token"
       ></GovernedAccountSelect>
       <div className="text-sm mb-3">
         <div className="mb-2">Allow dao to clawback</div>
@@ -310,7 +371,7 @@ const Grant = ({
         onChange={handleChangeStartDate}
         error={formErrors['startDateUnixSeconds']}
       />
-      {form.lockupKind.value !== 'monthly' ? (
+      {isNotVested && (
         <Input
           label="End date"
           type="date"
@@ -318,10 +379,26 @@ const Grant = ({
           onChange={handleChangeEndDate}
           error={formErrors['periods']}
         />
-      ) : (
+      )}
+      {form.lockupKind.value === 'monthly' && (
         <Input
           type="number"
           label="Number of months"
+          min="1"
+          value={form.periods}
+          onChange={(e) => {
+            handleSetForm({
+              value: e.target.value,
+              propertyName: 'periods',
+            })
+          }}
+          error={formErrors['periods']}
+        ></Input>
+      )}
+      {form.lockupKind.value === 'daily' && (
+        <Input
+          type="number"
+          label="Number of days"
           min="1"
           value={form.periods}
           onChange={(e) => {
@@ -384,6 +461,13 @@ const Grant = ({
         !isNaN(form.amount) &&
         !isNaN(form.periods) && (
           <div>Vesting rate: {(form.amount / form.periods).toFixed(2)} p/m</div>
+        )}
+
+      {form.lockupKind.value === 'daily' &&
+        form.amount &&
+        !isNaN(form.amount) &&
+        !isNaN(form.periods) && (
+          <div>Vesting rate: {(form.amount / form.periods).toFixed(2)} p/d</div>
         )}
     </>
   )

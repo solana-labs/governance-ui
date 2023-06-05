@@ -1,4 +1,9 @@
-import { Keypair, Transaction, TransactionInstruction } from '@solana/web3.js'
+import {
+  ComputeBudgetProgram,
+  Keypair,
+  Transaction,
+  TransactionInstruction,
+} from '@solana/web3.js'
 
 import {
   sendSignedAndAdjacentTransactions,
@@ -47,11 +52,14 @@ export const executeTransaction = async (
     proposal.account.governance,
     proposal.pubkey,
     instruction.pubkey,
-    [instruction.account.getSingleInstruction()]
+    [...instruction.account.getAllInstructions()]
   )
 
   // Create proposal transaction
-  const proposalTransaction = new Transaction().add(...instructions)
+  const proposalTransaction = new Transaction().add(
+    ComputeBudgetProgram.setComputeUnitLimit({ units: 1000000 }),
+    ...instructions
+  )
 
   // Sign and send all pre-execution transactions
   if (preExecutionTransactions && !preExecutionTransactions?.length) {
@@ -66,7 +74,6 @@ export const executeTransaction = async (
         })
       )
     )
-    console.log('sent preExecutionTransactions', preExecutionTransactions)
   }
 
   // Some proposals require additional adjacent transactions due to tx size limits

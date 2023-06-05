@@ -8,7 +8,6 @@ import {
   getUpdateTokenMetadataInstruction,
   validateInstruction,
 } from '@utils/instructionTools'
-import useWalletStore from 'stores/useWalletStore'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import useCreateProposal from '@hooks/useCreateProposal'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
@@ -26,8 +25,11 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { AccountType } from '@utils/uiTypes/assets'
 import { WebBundlr } from '@bundlr-network/client'
 import { LAMPORTS_PER_SOL } from '@solana/web3.js'
-import { deprecated } from '@metaplex-foundation/mpl-token-metadata'
 import { PublicKey } from '@solana/web3.js'
+import { Metaplex } from '@metaplex-foundation/js'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface GovernanceConfigForm {
   mintAccount: AssetAccount | undefined
@@ -48,17 +50,18 @@ const MetadataCreationModal = ({
   initialMintAccount?: AssetAccount | undefined
 }) => {
   const router = useRouter()
-  const { realm, canChooseWhoVote, symbol, realmInfo } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { canChooseWhoVote, symbol, realmInfo } = useRealm()
   const programId: PublicKey | undefined = realmInfo?.programId
 
   const { assetAccounts } = useGovernanceAssets()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const mintGovernancesWithMintInfo = assetAccounts.filter((x) => {
     return x.type === AccountType.MINT
   })
   const shouldBeGoverned = false
   const { fmtUrlWithCluster } = useQueryContext()
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletOnePointOh()
   const { handleCreateProposal } = useCreateProposal()
   const [formErrors, setFormErrors] = useState({})
   const [creatingProposal, setCreatingProposal] = useState(false)
@@ -178,11 +181,9 @@ const MetadataCreationModal = ({
         : 'https://node1.bundlr.network',
       'solana',
       wallet,
-      connection.cluster == 'devnet'
-        ? {
-            providerUrl: connection.current.rpcEndpoint,
-          }
-        : undefined
+      {
+        providerUrl: connection.current.rpcEndpoint,
+      }
     )
     try {
       await bundlr.utils.getBundlerAddress('solana')
@@ -265,15 +266,15 @@ const MetadataCreationModal = ({
   const checkCurrentMetadataExist = async () => {
     if (form.mintAccount) {
       try {
-        const tokenMetaPubkey = await deprecated.Metadata.getPDA(
-          form.mintAccount.pubkey
-        )
-
-        const tokenMeta = await deprecated.Metadata.load(
-          connection.current,
-          tokenMetaPubkey
-        )
-        if (tokenMeta) return true
+        const metaplex = new Metaplex(connection.current)
+        const metadataPDA = await metaplex
+          .nfts()
+          .pdas()
+          .metadata({ mint: form.mintAccount.pubkey })
+        const tokenMetadata = await metaplex.nfts().findByMetadata({
+          metadata: metadataPDA,
+        })
+        if (tokenMetadata) return true
         return false
       } catch (e) {
         return false
@@ -297,6 +298,7 @@ const MetadataCreationModal = ({
       setShouldMakeSolTreasury(true)
       setPayerSolTreasury(undefined)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
     form,
     setMintAuthority,

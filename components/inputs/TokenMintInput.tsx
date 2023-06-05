@@ -1,15 +1,16 @@
 import Input from './Input'
 import { inputClasses } from './styles'
 import { useEffect, useState } from 'react'
-import tokenService from '@utils/services/token'
+import tokenPriceService, {
+  TokenInfoWithoutDecimals,
+} from '@utils/services/tokenPrice'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { TokenProgramAccount, tryGetMint } from '@utils/tokens'
-import useWalletStore from 'stores/useWalletStore'
 import { PublicKey } from '@solana/web3.js'
 import { MintInfo } from '@solana/spl-token'
 import { debounce } from '@utils/debounce'
 import { InformationCircleIcon } from '@heroicons/react/outline'
-import { TokenInfo } from '@solana/spl-token-registry'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const TokenMintInput = ({
   noMaxWidth = true,
@@ -24,16 +25,16 @@ const TokenMintInput = ({
   label?: string
   onValidMintChange: (
     mintAddress: string | undefined,
-    foundByNameToken: TokenInfo | undefined
+    foundByNameToken: TokenInfoWithoutDecimals | undefined
   ) => void
 }) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const [isTyping, setIsTyping] = useState(false)
   const [query, setQuery] = useState<string>('')
   const [mintInfo, setMintInfo] = useState<
     TokenProgramAccount<MintInfo> | undefined
   >(undefined)
-  const tokenList = tokenService._tokenList
+  const tokenList = tokenPriceService._tokenList
   const foundByNameToken = tokenList.find(
     (x) =>
       x.address.toLowerCase() === query.toLowerCase() ||
@@ -62,6 +63,7 @@ const TokenMintInput = ({
       setMintInfo(undefined)
       onValidMintChange(undefined, undefined)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [typedMint, foundByNameToken])
   useEffect(() => {
     if (isTyping !== !!query) {
@@ -70,6 +72,7 @@ const TokenMintInput = ({
     debounce.debounceFcn(async () => {
       setIsTyping(false)
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [query])
   return (
     <>

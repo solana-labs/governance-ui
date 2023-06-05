@@ -1,83 +1,52 @@
 import {
-  GoverningTokenConfigAccountArgs,
-  GoverningTokenType,
   SetRealmAuthorityAction,
   SYSTEM_PROGRAM_ID,
   withCreateTokenOwnerRecord,
   withSetRealmAuthority,
 } from '@solana/spl-governance'
-
-import {
-  Connection,
-  Keypair,
-  PublicKey,
-  TransactionInstruction,
-} from '@solana/web3.js'
-import { AnchorProvider, Wallet } from '@project-serum/anchor'
-
+import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { AnchorProvider, Wallet } from '@coral-xyz/anchor'
 import {
   SequenceType,
-  WalletSigner,
   sendTransactionsV3,
   txBatchesToInstructionSetWithSigners,
 } from 'utils/sendTransactions'
 import { chunks } from '@utils/helpers'
-import { nftPluginsPks } from '@hooks/useVotingPlugins'
-
 import {
   getVoterWeightRecord,
   getMaxVoterWeightRecord,
   getRegistrarPDA,
 } from '@utils/plugin/accounts'
-import { NftVoterClient } from '@solana/governance-program-library'
 
-import { prepareRealmCreation } from '@tools/governance/prepareRealmCreation'
-interface NFTRealm {
-  connection: Connection
-  wallet: WalletSigner
-  programIdAddress: string
+import {
+  prepareRealmCreation,
+  RealmCreation,
+  Web3Context,
+} from '@tools/governance/prepareRealmCreation'
+import { trySentryLog } from '@utils/logs'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 
-  realmName: string
-  collectionAddress: string
-  collectionCount: number
-  tokensToGovernThreshold: number | undefined
-
-  communityYesVotePercentage: number
-  existingCommunityMintPk: PublicKey | undefined
-  // communityMintSupplyFactor: number | undefined
-
-  createCouncil: boolean
-  existingCouncilMintPk: PublicKey | undefined
-  transferCouncilMintAuthority: boolean | undefined
-  councilWalletPks: PublicKey[]
-}
+type NFTRealm = Web3Context &
+  RealmCreation & {
+    collectionAddress: string
+    nftCollectionCount: number
+  }
 
 export default async function createNFTRealm({
   connection,
   wallet,
-  programIdAddress,
-  realmName,
-  tokensToGovernThreshold = 1,
 
   collectionAddress,
-  collectionCount,
 
-  existingCommunityMintPk,
-  communityYesVotePercentage,
-  // communityMintSupplyFactor: rawCMSF,
-
-  createCouncil = false,
-  existingCouncilMintPk,
-  transferCouncilMintAuthority = true,
-  // councilYesVotePercentage,
-  councilWalletPks,
+  ...params
 }: NFTRealm) {
   const options = AnchorProvider.defaultOptions()
   const provider = new AnchorProvider(connection, wallet as Wallet, options)
   const nftClient = await NftVoterClient.connect(provider)
+  const { nftCollectionCount } = params
 
   const {
-    communityMintGovPk,
+    mainGovernancePk,
     communityMintPk,
     councilMintPk,
     realmPk,
@@ -91,33 +60,9 @@ export default async function createNFTRealm({
     mintsSetupSigners,
     councilMembersInstructions,
   } = await prepareRealmCreation({
+    ...params,
     connection,
     wallet,
-    programIdAddress,
-
-    realmName,
-    tokensToGovernThreshold,
-
-    existingCommunityMintPk,
-    nftCollectionCount: collectionCount,
-    transferCommunityMintAuthority: false, // delay this until we have created NFT instructions
-    communityYesVotePercentage,
-
-    // (useSupplyFactor = true && communityMintSupplyFactor = undefined) => FULL_SUPPLY_FRACTION
-    useSupplyFactor: true,
-    communityMintSupplyFactor: undefined,
-    communityAbsoluteMaxVoteWeight: undefined,
-
-    createCouncil,
-    existingCouncilMintPk,
-    transferCouncilMintAuthority,
-    councilWalletPks,
-
-    communityTokenConfig: new GoverningTokenConfigAccountArgs({
-      voterWeightAddin: new PublicKey(nftPluginsPks[0]),
-      maxVoterWeightAddin: new PublicKey(nftPluginsPks[0]),
-      tokenType: GoverningTokenType.Liquid,
-    }),
   })
 
   console.log('NFT REALM realm public-key', realmPk.toBase58())
@@ -132,7 +77,7 @@ export default async function createNFTRealm({
       registrar,
       realm: realmPk,
       governanceProgramId: programIdPk,
-      // realmAuthority: communityMintGovPk,
+      // realmAuthority: mainGovernancePk,
       realmAuthority: walletPk,
       governingTokenMint: communityMintPk,
       payer: walletPk,
@@ -169,11 +114,14 @@ export default async function createNFTRealm({
   )
 
   const instructionCC = await nftClient!.program.methods
-    .configureCollection(minCommunityTokensToCreateAsMintValue, collectionCount)
+    .configureCollection(
+      minCommunityTokensToCreateAsMintValue,
+      nftCollectionCount
+    )
     .accounts({
       registrar,
       realm: realmPk,
-      // realmAuthority: communityMintGovPk,
+      // realmAuthority: mainGovernancePk,
       realmAuthority: walletPk,
       collection: new PublicKey(collectionAddress),
       maxVoterWeightRecord: maxVoterWeightRecord,
@@ -199,7 +147,7 @@ export default async function createNFTRealm({
     programVersion,
     realmPk,
     walletPk,
-    communityMintGovPk,
+    mainGovernancePk,
     SetRealmAuthorityAction.SetChecked
   )
 
@@ -270,6 +218,17 @@ export default async function createNFTRealm({
       connection,
       wallet,
       transactionInstructions: txes,
+    })
+
+    const logInfo = {
+      realmId: realmPk,
+      realmSymbol: params.realmName,
+      wallet: wallet.publicKey?.toBase58(),
+      cluster: connection.rpcEndpoint.includes('devnet') ? 'devnet' : 'mainnet',
+    }
+    trySentryLog({
+      tag: 'realmCreated',
+      objToStringify: logInfo,
     })
 
     return {

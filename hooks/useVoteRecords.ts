@@ -7,14 +7,21 @@ import {
   VoteRecord,
   TokenOwnerRecord,
   RpcContext,
+  VoteKind,
 } from '@solana/spl-governance'
 
 import useRpcContext from '@hooks/useRpcContext'
 import { getVoteRecords, getTokenOwnerRecords } from '@models/proposal'
 import useRealm from '@hooks/useRealm'
-import { buildTopVoters, VoteType } from '@models/proposal'
-
-export { VoteType }
+import { buildTopVoters } from '@models/proposal'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import { getLockTokensVotingPowerPerWallet } from 'VoteStakeRegistry/tools/deposits'
+import { BN } from '@coral-xyz/anchor'
+import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
+import { PublicKey } from '@solana/web3.js'
+import { useRealmQuery } from './queries/realm'
+import { useRealmCommunityMintInfoQuery } from './queries/mintInfo'
+import useLegacyConnectionContext from './useLegacyConnectionContext'
 
 export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
   const { getRpcContext } = useRpcContext()
@@ -24,12 +31,25 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
   const [tokenOwnerRecords, setTokenOwnerRecords] = useState<
     ProgramAccount<TokenOwnerRecord>[]
   >([])
-  const [context, setContext] = useState<RpcContext | null>(null)
-  const { mint, realm } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const { vsrMode } = useRealm()
 
-  const governingTokenMintPk = proposal?.account.isVoteFinalized()
-    ? undefined
-    : proposal?.account.governingTokenMint
+  //for vsr
+  const [
+    undecidedDepositByVoteRecord,
+    setUndecidedDepositByVoteRecord,
+  ] = useState<{ [walletPk: string]: BN }>({})
+  const assetAccounts = useGovernanceAssetsStore((s) => s.assetAccounts)
+  const mintsUsedInRealm = assetAccounts
+    .filter((x) => x.isToken)
+    .map((x) => x.extensions.mint!)
+  ///
+
+  const [context, setContext] = useState<RpcContext | null>(null)
+  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
+  const connection = useLegacyConnectionContext()
+  const governingTokenMintPk = proposal?.account.governingTokenMint
 
   useEffect(() => {
     if (context && proposal && realm) {
@@ -67,11 +87,10 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
   }, [context, governingTokenMintPk, proposal, realm])
 
   useEffect(() => {
-    if (realm) {
-      setContext(getRpcContext())
+    if (getRpcContext) {
+      setContext(getRpcContext() ?? null)
     }
-  }, [realm])
-
+  }, [getRpcContext])
   const topVoters = useMemo(() => {
     if (realm && proposal && mint) {
       return buildTopVoters(
@@ -79,12 +98,70 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
         tokenOwnerRecords,
         realm,
         proposal,
-        mint
+        mint,
+        undecidedDepositByVoteRecord
       )
     }
 
     return []
-  }, [voteRecords, tokenOwnerRecords, realm, proposal, mint])
+  }, [
+    voteRecords,
+    tokenOwnerRecords,
+    realm,
+    proposal,
+    mint,
+    undecidedDepositByVoteRecord,
+  ])
+
+  useEffect(() => {
+    //VSR only
+    const handleGetVsrVotingPowers = async (walletsPks: PublicKey[]) => {
+      if (!realm || !client) throw new Error()
+
+      const votingPerWallet = await getLockTokensVotingPowerPerWallet(
+        walletsPks,
+        realm,
+        client,
+        connection,
+        mintsUsedInRealm
+      )
+      setUndecidedDepositByVoteRecord(votingPerWallet)
+    }
+
+    if (
+      vsrMode === 'default' &&
+      !Object.keys(undecidedDepositByVoteRecord).length
+    ) {
+      const undecidedData = tokenOwnerRecords.filter(
+        (tokenOwnerRecord) =>
+          !voteRecords
+            .filter((x) => x.account.vote?.voteType !== VoteKind.Veto)
+            .some(
+              (voteRecord) =>
+                voteRecord.account.governingTokenOwner.toBase58() ===
+                tokenOwnerRecord.account.governingTokenOwner.toBase58()
+            )
+      )
+      if (undecidedData.length && mintsUsedInRealm.length && realm && client) {
+        handleGetVsrVotingPowers(
+          undecidedData.map((x) => x.account.governingTokenOwner)
+        )
+      }
+    }
+  }, [
+    tokenOwnerRecords.length,
+    voteRecords.length,
+    vsrMode,
+    mintsUsedInRealm.length,
+    undecidedDepositByVoteRecord,
+    tokenOwnerRecords,
+    voteRecords,
+    realm,
+    client,
+    connection,
+    mintsUsedInRealm,
+  ])
+  ///////
 
   return topVoters
 }

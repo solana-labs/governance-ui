@@ -16,8 +16,7 @@ import { SwitchboardRevokeOracleForm } from '@utils/uiTypes/proposalCreationType
 import { PublicKey } from '@solana/web3.js'
 import Input from '@components/inputs/Input'
 import * as sbv2 from '@switchboard-xyz/switchboard-v2'
-import useWalletStore from 'stores/useWalletStore'
-import * as anchor from '@project-serum/anchor'
+import * as anchor from '@coral-xyz/anchor'
 import sbIdl from 'SwitchboardVotePlugin/switchboard_v2.json'
 import gonIdl from 'SwitchboardVotePlugin/gameofnodes.json'
 import {
@@ -28,20 +27,21 @@ import {
 } from 'SwitchboardVotePlugin/SwitchboardQueueVoterClient'
 import { NewProposalContext } from '../../../new'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const SwitchboardRevokeOracle = ({
   index,
-  _governance,
 }: {
   index: number
-  _governance: ProgramAccount<Governance> | null
+  governance: ProgramAccount<Governance> | null
 }) => {
   const [form, setForm] = useState<SwitchboardRevokeOracleForm>({
     oraclePubkey: undefined,
     queuePubkey: undefined,
   })
-  const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const connection = useLegacyConnectionContext()
+  const wallet = useWalletOnePointOh()
   const { handleSetInstructions } = useContext(NewProposalContext)
 
   useEffect(() => {
@@ -52,6 +52,7 @@ const SwitchboardRevokeOracle = ({
       },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
 
   async function getInstruction(): Promise<UiInstruction> {

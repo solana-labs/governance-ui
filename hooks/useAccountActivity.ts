@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Connection, PublicKey, ConfirmedSignatureInfo } from '@solana/web3.js'
 
-import useWalletStore from 'stores/useWalletStore'
 import { Result, Status, Ok, isFailed, isOk } from '@utils/uiTypes/Result'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 const TEN_MINUTES = 1000 * 60 * 10
 
@@ -45,7 +45,7 @@ export default function useAccountActivity(accountAddress: string | string[]) {
   const [result, setResult] = useState<Result<ConfirmedSignatureInfo[]>>({
     _tag: Status.Pending,
   })
-  const connection = useWalletStore((s) => s.connection.current)
+  const { connection } = useConnection()
   const addresses = Array.isArray(accountAddress)
     ? accountAddress
     : [accountAddress]
@@ -82,6 +82,7 @@ export default function useAccountActivity(accountAddress: string | string[]) {
         }
       }
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [addresses.join('-')])
 
   return result

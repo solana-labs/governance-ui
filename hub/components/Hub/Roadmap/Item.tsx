@@ -6,8 +6,8 @@ import { format } from 'date-fns';
 
 import { ExternalLink } from '@hub/components/icons/ExternalLink';
 import cx from '@hub/lib/cx';
-import { HubInfoRoadmapItemStatus } from '@hub/types/HubInfoRoadmapItemStatus';
 import { RichTextDocument } from '@hub/types/RichTextDocument';
+import { RoadmapItemStatus } from '@hub/types/RoadmapItemStatus';
 
 import { CompletedSvg } from './CompletedSvg';
 import { DashesSvg } from './DashesSvg';
@@ -22,7 +22,7 @@ interface Props {
     title: string;
     url: string;
   };
-  status?: null | HubInfoRoadmapItemStatus;
+  status?: null | RoadmapItemStatus;
   title: string;
 }
 
@@ -54,7 +54,7 @@ export function Item(props: Props) {
           'w-full',
         )}
       >
-        {props.status === HubInfoRoadmapItemStatus.Completed ? (
+        {props.status === RoadmapItemStatus.Completed ? (
           <CompletedSvg
             className={cx(
               '-top-5',
@@ -66,8 +66,8 @@ export function Item(props: Props) {
               'w-8',
             )}
           />
-        ) : props.status === HubInfoRoadmapItemStatus.InProgress ||
-          props.status === HubInfoRoadmapItemStatus.Delayed ? (
+        ) : props.status === RoadmapItemStatus.InProgress ||
+          props.status === RoadmapItemStatus.Delayed ? (
           <NotCompletedSvg
             className={cx(
               '-top-5',
@@ -92,7 +92,7 @@ export function Item(props: Props) {
             )}
           />
         )}
-        <div className="text-2xl font-semibold text-netural-900">
+        <div className="font-semibold text-netural-900 text-xl md:text-2xl">
           {props.title}
         </div>
         {props.date && (
@@ -100,17 +100,17 @@ export function Item(props: Props) {
             {format(props.date, 'MMMM yyyy')}
           </div>
         )}
-        {props.status === HubInfoRoadmapItemStatus.Completed ? (
+        {props.status === RoadmapItemStatus.Completed ? (
           <div className="py-1.5 px-3 rounded bg-neutral-100 flex items-center mt-2">
             <CheckmarkOutlineIcon className="fill-emerald-600" />
             <div className="ml-1 text-xs text-emerald-600">Completed</div>
           </div>
-        ) : props.status === HubInfoRoadmapItemStatus.Delayed ? (
+        ) : props.status === RoadmapItemStatus.Delayed ? (
           <div className="py-1.5 px-3 rounded bg-neutral-100 flex items-center mt-2">
             <WarningOtherIcon className="fill-rose-500" />
             <div className="ml-1 text-xs text-rose-500">Delayed</div>
           </div>
-        ) : props.status === HubInfoRoadmapItemStatus.InProgress ? (
+        ) : props.status === RoadmapItemStatus.InProgress ? (
           <div className="py-1.5 px-3 rounded bg-neutral-100 flex items-center mt-2">
             <InProgressIcon className="fill-neutral-700" />
             <div className="ml-1 text-xs text-neutral-700">In progress</div>

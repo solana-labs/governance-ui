@@ -1,7 +1,6 @@
 import { getExplorerUrl } from '@components/explorer/tools'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import { useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import { PhotographIcon, PlusCircleIcon } from '@heroicons/react/outline'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -16,21 +15,34 @@ import SendTokens from '@components/TreasuryAccount/SendTokens'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { MdScheduleSend } from 'react-icons/md'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const gallery = () => {
-  const connection = useWalletStore((s) => s.connection)
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
+  const connection = useLegacyConnectionContext()
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const realmNfts = useTreasuryAccountStore((s) => s.allNfts)
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const isLoading = useTreasuryAccountStore((s) => s.isLoadingNfts)
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const isLoadingGovernances = useGovernanceAssetsStore(
     (s) => s.loadGovernedAccounts
   )
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const nftsPerPubkey = useTreasuryAccountStore((s) => s.governanceNfts)
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const { setCurrentAccount } = useTreasuryAccountStore()
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [currentAccount, setStateAccount] = useState<AssetAccount | null>(null)
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [nfts, setNfts] = useState<NFTWithMint[]>([])
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [openNftDepositModal, setOpenNftDepositModal] = useState(false)
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [openSendNftsModal, setOpenSendNftsModal] = useState(false)
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [selectedNft, setSelectedNft] = useState<NFTWithMint | null>(null)
   const handleCloseModal = () => {
     setOpenNftDepositModal(false)
@@ -38,6 +50,7 @@ const gallery = () => {
   const handleCloseSendModal = () => {
     setOpenSendNftsModal(false)
   }
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   useEffect(() => {
     if (currentAccount === null) {
       setNfts(realmNfts)
@@ -63,9 +76,12 @@ const gallery = () => {
       }
       setNfts(curretnAccountNfts)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
     realmNfts.length,
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     JSON.stringify(nftsPerPubkey),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     currentAccount?.extensions.transferAddress?.toBase58(),
   ])
   return (

@@ -12,11 +12,16 @@ const AccountsItems = () => {
     ...governedTokenAccountsWithoutNfts,
     ...auxiliaryTokenAccounts,
   ]
-  const accountsSorted = accounts.sort((a, b) => {
-    const infoA = getTreasuryAccountItemInfoV2(a)
-    const infoB = getTreasuryAccountItemInfoV2(b)
-    return infoB.totalPrice - infoA.totalPrice
-  })
+  const accountsSorted = accounts
+    .sort((a, b) => {
+      const infoA = getTreasuryAccountItemInfoV2(a)
+      const infoB = getTreasuryAccountItemInfoV2(b)
+      return infoB.totalPrice - infoA.totalPrice
+    })
+    .splice(
+      0,
+      Number(process?.env?.MAIN_VIEW_SHOW_MAX_TOP_TOKENS_NUM || accounts.length)
+    )
   return (
     <div className="space-y-3">
       {accountsSorted.map((account) => {

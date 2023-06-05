@@ -1,4 +1,4 @@
-import { BN } from '@project-serum/anchor'
+import { BN } from '@coral-xyz/anchor'
 import {
   ProgramAccount,
   Realm,
@@ -19,7 +19,7 @@ import {
   redeemReserveCollateralInstruction,
   syncNative,
 } from '@solendprotocol/solend-sdk'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import {
   createProposal,
   InstructionDataWithHoldUpTime,
@@ -357,7 +357,6 @@ async function handleSolendAction(
       holdUpTime: matchedTreasury.governance!.account!.config
         .minInstructionHoldUpTime,
       prerequisiteInstructions: [],
-      chunkSplitByDefault: true,
     }
     insts.push(createAtaInstObj)
   }
@@ -391,7 +390,6 @@ async function handleSolendAction(
       holdUpTime: matchedTreasury.governance!.account!.config
         .minInstructionHoldUpTime,
       prerequisiteInstructions: [],
-      chunkSplitByDefault: true,
     }
 
     setupInsts.push(transferLamportInst)
@@ -411,7 +409,6 @@ async function handleSolendAction(
       holdUpTime: matchedTreasury.governance!.account!.config
         .minInstructionHoldUpTime,
       prerequisiteInstructions: [],
-      chunkSplitByDefault: true,
     }
 
     if (userWSOLAccountInfo) {
@@ -423,7 +420,6 @@ async function handleSolendAction(
         holdUpTime: matchedTreasury.governance!.account!.config
           .minInstructionHoldUpTime,
         prerequisiteInstructions: [],
-        chunkSplitByDefault: true,
       }
       if (sendAction) {
         setupInsts.push(syncInst)
@@ -446,7 +442,6 @@ async function handleSolendAction(
         holdUpTime: matchedTreasury.governance!.account!.config
           .minInstructionHoldUpTime,
         prerequisiteInstructions: [],
-        chunkSplitByDefault: true,
       }
       setupInsts.push(createUserWSOLAccountInst)
       cleanupInsts.push(closeWSOLInst)
@@ -485,7 +480,6 @@ async function handleSolendAction(
     holdUpTime: matchedTreasury.governance!.account!.config
       .minInstructionHoldUpTime,
     prerequisiteInstructions: [],
-    chunkSplitByDefault: true,
   }
   insts.push(depositSolendInsObj)
 
@@ -496,7 +490,7 @@ async function handleSolendAction(
     tokenOwnerRecord,
     form.title ||
       `${form.action} ${form.amountFmt} ${
-        tokenService.getTokenInfo(
+        tokenPriceService.getTokenInfo(
           matchedTreasury.extensions.mint!.publicKey.toBase58()
         )?.symbol || 'tokens'
       } ${form.action === 'Deposit' ? 'into' : 'from'} the Solend ${

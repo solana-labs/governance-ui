@@ -1,6 +1,4 @@
-import { useEffect } from 'react'
-import useWalletStore from 'stores/useWalletStore'
-import useRealm from '@hooks/useRealm'
+import { useCallback, useEffect, useMemo } from 'react'
 import { getNfts } from '@utils/tokens'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
@@ -18,111 +16,340 @@ import {
 } from '@solana/spl-governance'
 import { getMaxVoterWeightRecord as getPluginMaxVoterWeightRecord } from '@utils/plugin/accounts'
 import { notify } from '@utils/notifications'
-import * as anchor from '@project-serum/anchor'
+import * as anchor from '@coral-xyz/anchor'
 import * as sbv2 from '@switchboard-xyz/switchboard-v2'
 import sbIdl from 'SwitchboardVotePlugin/switchboard_v2.json'
 import gonIdl from 'SwitchboardVotePlugin/gameofnodes.json'
 
-import { STAKING_ADDRESS as PYTH_STAKING_ADDRESS } from 'pyth-staking-api'
 import useGatewayPluginStore from '../GatewayPlugin/store/gatewayPluginStore'
 import { getGatekeeperNetwork } from '../GatewayPlugin/sdk/accounts'
 import { NFTWithMeta } from '@utils/uiTypes/VotePlugin'
-
-export const vsrPluginsPks: string[] = [
-  '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo',
-  'vsr2nfGVNHmSY8uxoBGqq8AQbwz3JwaEaHqGbsTPXqQ',
-  'VotEn9AWwTFtJPJSMV5F9jsMY6QwWM5qn3XP9PATGW7',
-]
-
-export const nftPluginsPks: string[] = [
-  'GnftV5kLjd67tvHpNGyodwWveEKivz3ZWvvE3Z4xi2iw',
-]
-
-export const gatewayPluginsPks: string[] = [
-  'Ggatr3wgDLySEwA2qEjt1oiw4BUzp5yMLJyz21919dq6', // v1
-  'GgathUhdrCWRHowoRKACjgWhYHfxCEdBi5ViqYN6HVxk', // v2, supporting composition
-]
-
-export const switchboardPluginsPks: string[] = [SWITCHBOARD_ADDIN_ID.toBase58()]
-
-export const pythPluginsPks: string[] = [PYTH_STAKING_ADDRESS.toBase58()]
+import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
+import * as heliumVsrSdk from '@helium/voter-stake-registry-sdk'
+import useWalletOnePointOh from './useWalletOnePointOh'
+import { useUserCommunityTokenOwnerRecord } from './queries/tokenOwnerRecord'
+import { useRealmQuery } from './queries/realm'
+import { useRealmConfigQuery } from './queries/realmConfig'
+import useLegacyConnectionContext from './useLegacyConnectionContext'
+import {
+  NFT_PLUGINS_PKS,
+  HELIUM_VSR_PLUGINS_PKS,
+  VSR_PLUGIN_PKS,
+  GATEWAY_PLUGINS_PKS,
+  PYTH_PLUGINS_PKS,
+  SWITCHBOARD_PLUGINS_PKS,
+} from '../constants/plugins'
 
 export function useVotingPlugins() {
-  const { realm, config, ownTokenRecord } = useRealm()
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const realm = useRealmQuery().data?.result
+  const config = useRealmConfigQuery().data?.result
+  const currentPluginPk = config?.account.communityTokenConfig.voterWeightAddin
+
   const {
     handleSetVsrRegistrar,
     handleSetVsrClient,
+    handleSetHeliumVsrRegistrar,
+    handleSetHeliumVsrClient,
     handleSetNftClient,
     handleSetGatewayClient,
-    handleSetSwitchboardClient,
+    //handleSetSwitchboardClient,
     handleSetNftRegistrar,
     handleSetGatewayRegistrar,
     handleSetPythClient,
     handleSetCurrentRealmVotingClient,
   } = useVotePluginsClientStore()
-  const {
-    setVotingNfts,
-    setMaxVoterWeight,
+
+  const [
     setIsLoadingNfts,
-  } = useNftPluginStore()
-  const {
-    setIsLoadingGatewayToken,
-    setGatekeeperNetwork,
-  } = useGatewayPluginStore()
-  const {
-    setIsLoading,
-    setVotingPower,
-    setOracleKeys,
-    setInstructions,
-  } = useSwitchboardPluginStore()
+    setNftMaxVoterWeight,
+    setVotingNfts,
+  ] = useNftPluginStore((s) => [
+    s.setIsLoadingNfts,
+    s.setMaxVoterWeight,
+    s.setVotingNfts,
+  ])
 
-  const wallet = useWalletStore((s) => s.current)
-  const connection = useWalletStore((s) => s.connection)
-  const connected = useWalletStore((s) => s.connected)
-  const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
-  const nftClient = useVotePluginsClientStore((s) => s.state.nftClient)
-  const gatewayClient = useVotePluginsClientStore((s) => s.state.gatewayClient)
-  const switchboardClient = useVotePluginsClientStore(
-    (s) => s.state.switchboardClient
-  )
-  const pythClient = useVotePluginsClientStore((s) => s.state.pythClient)
+  // @asktree: you should select what you need from stores, not use entire thing
+  const heliumStore = useHeliumVsrStore()
+  const gatewayStore = useGatewayPluginStore()
+  const switchboardStore = useSwitchboardPluginStore()
+  const wallet = useWalletOnePointOh()
+  const connection = useLegacyConnectionContext()
+  const connected = !!wallet?.connected
 
-  const currentClient = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
+  const [
+    currentClient,
+    vsrClient,
+    gatewayClient,
+    //switchboardClient,
+    pythClient,
+    nftClient,
+    nftMintRegistrar,
+    heliumVsrClient,
+  ] = useVotePluginsClientStore((s) => [
+    s.state.currentRealmVotingClient,
+    s.state.vsrClient,
+    s.state.gatewayClient,
+    //s.state.switchboardClient,
+    s.state.pythClient,
+    s.state.nftClient,
+    s.state.nftMintRegistrar,
+    s.state.heliumVsrClient,
+    s.state.heliumVsrRegistrar,
+  ])
+
+  const usedCollectionsPks: string[] = useMemo(
+    () =>
+      (currentPluginPk &&
+        NFT_PLUGINS_PKS.includes(currentPluginPk?.toBase58()) &&
+        nftMintRegistrar?.collectionConfigs.map((x) =>
+          x.collection.toBase58()
+        )) ||
+      [],
+    [currentPluginPk, nftMintRegistrar?.collectionConfigs]
   )
-  const currentPluginPk = config?.account.communityTokenConfig.voterWeightAddin
-  const nftMintRegistrar = useVotePluginsClientStore(
-    (s) => s.state.nftMintRegistrar
+
+  const handleRegisterGatekeeperNetwork = useCallback(async () => {
+    if (realm && gatewayClient) {
+      gatewayStore.setIsLoadingGatewayToken(true)
+
+      try {
+        const gatekeeperNetwork = await getGatekeeperNetwork(
+          gatewayClient,
+          realm
+        )
+
+        gatewayStore.setGatekeeperNetwork(gatekeeperNetwork)
+      } catch (e) {
+        console.log(e)
+        notify({
+          message: 'Error fetching gateway token',
+          type: 'error',
+        })
+      }
+      gatewayStore.setIsLoadingGatewayToken(false)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    gatewayClient,
+    //gatewayStore,
+    realm,
+  ])
+
+  const getIsFromCollection = useCallback(
+    (nft: NFTWithMeta) => {
+      return (
+        nft.collection &&
+        nft.collection.mintAddress &&
+        (nft.collection.verified ||
+          typeof nft.collection.verified === 'undefined') &&
+        usedCollectionsPks.includes(nft.collection.mintAddress) &&
+        nft.collection.creators?.filter((x) => x.verified).length > 0
+      )
+    },
+    [usedCollectionsPks]
   )
-  const usedCollectionsPks: string[] =
-    (currentPluginPk &&
-      nftPluginsPks.includes(currentPluginPk?.toBase58()) &&
-      nftMintRegistrar?.collectionConfigs.map((x) =>
-        x.collection.toBase58()
-      )) ||
-    []
-  const handleGetNfts = async () => {
-    setIsLoadingNfts(true)
+
+  useEffect(() => {
+    if (wallet && connection) {
+      if (currentPluginPk) {
+        if (VSR_PLUGIN_PKS.includes(currentPluginPk.toBase58())) {
+          handleSetVsrClient(wallet, connection, currentPluginPk)
+        }
+        if (HELIUM_VSR_PLUGINS_PKS.includes(currentPluginPk.toBase58())) {
+          handleSetHeliumVsrClient(wallet, connection, currentPluginPk)
+        }
+      }
+      handleSetNftClient(wallet, connection)
+      //handleSetSwitchboardClient(wallet, connection)
+      handleSetGatewayClient(wallet, connection)
+      handleSetPythClient(wallet, connection)
+    }
+  }, [
+    connection,
+    currentPluginPk,
+    handleSetGatewayClient,
+    handleSetHeliumVsrClient,
+    handleSetNftClient,
+    handleSetPythClient,
+    handleSetVsrClient,
+    wallet,
+  ])
+
+  useEffect(() => {
+    const handleVsrPlugin = () => {
+      if (
+        vsrClient &&
+        currentPluginPk &&
+        VSR_PLUGIN_PKS.includes(currentPluginPk.toBase58())
+      ) {
+        handleSetVsrRegistrar(vsrClient, realm)
+        if (connected) {
+          handleSetCurrentRealmVotingClient({
+            client: vsrClient,
+            realm,
+            walletPk:
+              ownTokenRecord?.account?.governingTokenOwner || wallet?.publicKey,
+          })
+        }
+      }
+    }
+
+    const handleHeliumVsrPlugin = () => {
+      if (
+        heliumVsrClient &&
+        currentPluginPk &&
+        HELIUM_VSR_PLUGINS_PKS.includes(currentPluginPk.toBase58())
+      ) {
+        handleSetHeliumVsrRegistrar(heliumVsrClient, realm)
+        if (connected) {
+          handleSetCurrentRealmVotingClient({
+            client: heliumVsrClient,
+            realm,
+            walletPk:
+              ownTokenRecord?.account?.governingTokenOwner || wallet?.publicKey,
+          })
+        }
+      }
+    }
+
+    const handleNftplugin = () => {
+      if (
+        nftClient &&
+        currentPluginPk &&
+        NFT_PLUGINS_PKS.includes(currentPluginPk.toBase58())
+      ) {
+        handleSetNftRegistrar(nftClient, realm)
+        if (connected) {
+          handleSetCurrentRealmVotingClient({
+            client: nftClient,
+            realm,
+            walletPk:
+              ownTokenRecord?.account?.governingTokenOwner || wallet?.publicKey,
+          })
+        }
+      }
+    }
+
+    // If the current realm uses Civic Pass
+    // register the gatekeeper network (the "type" of Civic)
+    // in the Civic GatewayProvider.
+    // This updates the UI to show if the user has a gateway token
+    const handleGatewayPlugin = () => {
+      if (
+        gatewayClient &&
+        currentPluginPk &&
+        GATEWAY_PLUGINS_PKS.includes(currentPluginPk.toBase58())
+      ) {
+        handleSetGatewayRegistrar(gatewayClient, realm)
+        if (connected) {
+          handleSetCurrentRealmVotingClient({
+            client: gatewayClient,
+            realm,
+            walletPk: wallet?.publicKey,
+          })
+        }
+
+        handleRegisterGatekeeperNetwork()
+      }
+    }
+
+    const handlePythPlugin = () => {
+      if (
+        pythClient &&
+        currentPluginPk &&
+        PYTH_PLUGINS_PKS.includes(currentPluginPk.toBase58())
+      ) {
+        if (connected) {
+          handleSetCurrentRealmVotingClient({
+            client: pythClient,
+            realm,
+            walletPk:
+              ownTokenRecord?.account?.governingTokenOwner || wallet?.publicKey,
+          })
+        }
+      }
+    }
+    /* 
+    const handleSwitchboardPlugin = () => {
+      if (
+        switchboardClient &&
+        currentPluginPk &&
+        SWITCHBOARD_PLUGINS_PKS.includes(currentPluginPk.toBase58())
+      ) {
+        // Switchboard: don't think we need this
+        //handleSetNftRegistrar(nftClient!, realm)
+        if (connected) {
+          handleSetCurrentRealmVotingClient({
+            client: switchboardClient,
+            realm,
+            walletPk: wallet?.publicKey,
+          })
+        }
+      }
+    } */
+    if (
+      ownTokenRecord?.account !== undefined &&
+      (!currentClient ||
+        currentClient.realm?.pubkey.toBase58() !== realm?.pubkey.toBase58() ||
+        currentClient.walletPk?.toBase58() !==
+          ownTokenRecord.account.governingTokenOwner.toBase58())
+    ) {
+      handleNftplugin()
+      handleGatewayPlugin()
+      handleVsrPlugin()
+      handleHeliumVsrPlugin()
+      //handleSwitchboardPlugin()
+      handlePythPlugin()
+    }
+  }, [
+    connected,
+    currentClient,
+    currentPluginPk,
+    gatewayClient,
+    handleRegisterGatekeeperNetwork,
+    handleSetCurrentRealmVotingClient,
+    handleSetGatewayRegistrar,
+    handleSetHeliumVsrRegistrar,
+    handleSetNftRegistrar,
+    handleSetVsrRegistrar,
+    heliumVsrClient,
+    nftClient,
+    ownTokenRecord?.account,
+    pythClient,
+    realm,
+    vsrClient,
+    wallet?.publicKey,
+  ])
+
+  const handleMaxVoterWeight = useCallback(async () => {
+    if (!realm || !nftClient) return
+
+    const { maxVoterWeightRecord } = await getPluginMaxVoterWeightRecord(
+      realm.pubkey,
+      realm.account.communityMint,
+      nftClient.program.programId
+    )
     try {
-      const nfts = await getNfts(wallet!.publicKey!, connection)
-      const votingNfts = nfts.filter(getIsFromCollection)
-      const nftsWithMeta = votingNfts
-      setVotingNfts(nftsWithMeta, currentClient, nftMintRegistrar)
+      const existingMaxVoterRecord = await getMaxVoterWeightRecord(
+        connection.current,
+        maxVoterWeightRecord
+      )
+      setNftMaxVoterWeight(existingMaxVoterRecord)
     } catch (e) {
       console.log(e)
-      notify({
-        message: "Something went wrong can't fetch nfts",
-        type: 'error',
-      })
+      setNftMaxVoterWeight(null)
     }
-    setIsLoadingNfts(false)
-  }
-  const handleGetSwitchboardVoting = async () => {
+  }, [connection, nftClient, setNftMaxVoterWeight, realm])
+
+  const handleGetSwitchboardVoting = useCallback(async () => {
+    console.log('im doing switchboard stuff')
     if (!wallet || !wallet.publicKey || !realm) {
       return
     }
 
-    setIsLoading(true)
+    switchboardStore.setIsLoading(true)
 
     try {
       const options = anchor.AnchorProvider.defaultOptions()
@@ -219,8 +446,11 @@ export function useVotingPlugins() {
         }
       }
 
-      setOracleKeys(myNodesForRealm, currentClient)
-      setInstructions(setVoterWeightInstructions, currentClient)
+      switchboardStore.setOracleKeys(myNodesForRealm, currentClient)
+      switchboardStore.setInstructions(
+        setVoterWeightInstructions,
+        currentClient
+      )
 
       try {
         const [
@@ -237,14 +467,14 @@ export function useVotingPlugins() {
           )
           if (vwr && vwr.account.realm.equals(realm.pubkey)) {
             // get voting power
-            setVotingPower(vwr.account.voterWeight)
+            switchboardStore.setVotingPower(vwr.account.voterWeight)
           } else {
             // 'no sb governance'
-            setVotingPower(new anchor.BN(0))
+            switchboardStore.setVotingPower(new anchor.BN(0))
           }
         } catch (e) {
           console.log("Couldn't get voter weight record. Setting to zero.")
-          setVotingPower(new anchor.BN(0))
+          switchboardStore.setVotingPower(new anchor.BN(0))
         }
       } catch (e) {
         console.log("Couldn't get VWR")
@@ -253,190 +483,94 @@ export function useVotingPlugins() {
     } catch (e) {
       console.log(e)
     }
-    setIsLoading(false)
-  }
+    switchboardStore.setIsLoading(false)
 
-  const handleRegisterGatekeeperNetwork = async () => {
-    if (realm && gatewayClient) {
-      setIsLoadingGatewayToken(true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    connection,
+    currentClient,
+    realm,
+    //switchboardStore,
+    wallet,
+  ])
 
-      try {
-        const gatekeeperNetwork = await getGatekeeperNetwork(
-          gatewayClient,
-          realm
-        )
-
-        setGatekeeperNetwork(gatekeeperNetwork)
-      } catch (e) {
-        console.log(e)
-        notify({
-          message: 'Error fetching gateway token',
-          type: 'error',
-        })
-      }
-      setIsLoadingGatewayToken(false)
-    }
-  }
-
-  const handleMaxVoterWeight = async () => {
-    const { maxVoterWeightRecord } = await getPluginMaxVoterWeightRecord(
-      realm!.pubkey,
-      realm!.account.communityMint,
-      nftClient!.program.programId
-    )
-    try {
-      const existingMaxVoterRecord = await getMaxVoterWeightRecord(
-        connection.current,
-        maxVoterWeightRecord
+  const handleGetHeliumVsrVoting = useCallback(async () => {
+    if (
+      realm &&
+      currentPluginPk &&
+      HELIUM_VSR_PLUGINS_PKS.includes(currentPluginPk.toBase58())
+    ) {
+      const [maxVoterRecord] = heliumVsrSdk.maxVoterWeightRecordKey(
+        realm.pubkey,
+        realm.account.communityMint,
+        currentPluginPk
       )
-      setMaxVoterWeight(existingMaxVoterRecord)
+      try {
+        const mvwr = await getMaxVoterWeightRecord(
+          connection.current,
+          maxVoterRecord
+        )
+        heliumStore.setMaxVoterWeight(mvwr)
+      } catch (_e) {
+        console.log("Couldn't get max voter weight record. Setting to null.")
+        heliumStore.setMaxVoterWeight(null)
+      }
+
+      if (currentClient.walletPk && heliumVsrClient) {
+        try {
+          await heliumStore.getPositions({
+            realmPk: realm.pubkey,
+            communityMintPk: realm.account.communityMint,
+            walletPk: currentClient.walletPk,
+            connection: connection.current,
+            client: heliumVsrClient,
+            votingClient: currentClient,
+          })
+        } catch (e) {
+          console.log(e)
+        }
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    connection,
+    currentClient,
+    currentPluginPk,
+    //heliumStore,
+    heliumVsrClient,
+    realm,
+  ])
+
+  const handleGetNfts = useCallback(async () => {
+    setIsLoadingNfts(true)
+    if (!wallet?.publicKey) return
+    try {
+      const nfts = await getNfts(wallet.publicKey, connection)
+      const votingNfts = nfts.filter(getIsFromCollection)
+      const nftsWithMeta = votingNfts
+      setVotingNfts(nftsWithMeta, currentClient, nftMintRegistrar)
     } catch (e) {
       console.log(e)
-      setMaxVoterWeight(null)
+      notify({
+        message: `Something went wrong can't fetch nfts: ${e}`,
+        type: 'error',
+      })
     }
-  }
-  const getIsFromCollection = (nft: NFTWithMeta) => {
-    return (
-      nft.collection &&
-      nft.collection.mintAddress &&
-      (nft.collection.verified ||
-        typeof nft.collection.verified === 'undefined') &&
-      usedCollectionsPks.includes(nft.collection.mintAddress) &&
-      nft.collection.creators?.filter((x) => x.verified).length > 0
-    )
-  }
-  useEffect(() => {
-    if (wallet) {
-      handleSetVsrClient(wallet, connection, currentPluginPk)
-      handleSetNftClient(wallet, connection)
-      handleSetSwitchboardClient(wallet, connection)
-      handleSetGatewayClient(wallet, connection)
-      handleSetPythClient(wallet, connection)
-    }
-  }, [connection.endpoint, wallet, currentPluginPk])
-
-  useEffect(() => {
-    const handleVsrPlugin = () => {
-      if (
-        vsrClient &&
-        currentPluginPk &&
-        vsrPluginsPks.includes(currentPluginPk.toBase58())
-      ) {
-        handleSetVsrRegistrar(vsrClient, realm)
-        if (connected) {
-          handleSetCurrentRealmVotingClient({
-            client: vsrClient,
-            realm,
-            walletPk:
-              ownTokenRecord?.account?.governingTokenOwner || wallet?.publicKey,
-          })
-        }
-      }
-    }
-    const handleNftplugin = () => {
-      if (
-        nftClient &&
-        currentPluginPk &&
-        nftPluginsPks.includes(currentPluginPk.toBase58())
-      ) {
-        handleSetNftRegistrar(nftClient!, realm)
-        if (connected) {
-          handleSetCurrentRealmVotingClient({
-            client: nftClient,
-            realm,
-            walletPk:
-              ownTokenRecord?.account?.governingTokenOwner || wallet?.publicKey,
-          })
-        }
-      }
-    }
-
-    // If the current realm uses Civic Pass
-    // register the gatekeeper network (the "type" of Civic)
-    // in the Civic GatewayProvider.
-    // This updates the UI to show if the user has a gateway token
-    const handleGatewayPlugin = () => {
-      if (
-        gatewayClient &&
-        currentPluginPk &&
-        gatewayPluginsPks.includes(currentPluginPk.toBase58())
-      ) {
-        handleSetGatewayRegistrar(gatewayClient!, realm)
-        if (connected) {
-          handleSetCurrentRealmVotingClient({
-            client: gatewayClient,
-            realm,
-            walletPk: wallet?.publicKey,
-          })
-        }
-
-        handleRegisterGatekeeperNetwork()
-      }
-    }
-
-    const handlePythPlugin = () => {
-      if (
-        pythClient &&
-        currentPluginPk &&
-        pythPluginsPks.includes(currentPluginPk.toBase58())
-      ) {
-        if (connected) {
-          handleSetCurrentRealmVotingClient({
-            client: pythClient,
-            realm,
-            walletPk:
-              ownTokenRecord?.account?.governingTokenOwner || wallet?.publicKey,
-          })
-        }
-      }
-    }
-    const handleSwitchboardPlugin = () => {
-      if (
-        switchboardClient &&
-        currentPluginPk &&
-        switchboardPluginsPks.includes(currentPluginPk.toBase58())
-      ) {
-        // Switchboard: don't think we need this
-        //handleSetNftRegistrar(nftClient!, realm)
-        console.log('Switchboard')
-        if (connected) {
-          handleSetCurrentRealmVotingClient({
-            client: switchboardClient,
-            realm,
-            walletPk: wallet?.publicKey,
-          })
-        }
-      }
-    }
-    if (
-      !currentClient ||
-      currentClient.realm?.pubkey.toBase58() !== realm?.pubkey.toBase58() ||
-      currentClient.walletPk?.toBase58() !== wallet?.publicKey?.toBase58() ||
-      currentClient.walletPk?.toBase58() !==
-        ownTokenRecord?.account?.governingTokenOwner.toBase58()
-    ) {
-      handleNftplugin()
-      handleGatewayPlugin()
-      handleVsrPlugin()
-      handleSwitchboardPlugin()
-      handlePythPlugin()
-    }
+    setIsLoadingNfts(false)
   }, [
-    currentPluginPk?.toBase58(),
-    vsrClient?.program.programId.toBase58(),
-    nftClient?.program.programId.toBase58(),
-    gatewayClient?.program.programId.toBase58(),
-    pythClient?.program.programId.toBase58(),
-    realm?.pubkey.toBase58(),
-    connection.endpoint,
-    connected,
-    ownTokenRecord,
+    connection,
+    currentClient,
+    getIsFromCollection,
+    nftMintRegistrar,
+    setIsLoadingNfts,
+    setVotingNfts,
+    wallet?.publicKey,
   ])
 
   useEffect(() => {
     if (
       currentPluginPk &&
-      switchboardPluginsPks.includes(currentPluginPk.toBase58())
+      SWITCHBOARD_PLUGINS_PKS.includes(currentPluginPk.toBase58())
     ) {
       handleGetSwitchboardVoting()
     }
@@ -447,16 +581,25 @@ export function useVotingPlugins() {
       }
       handleMaxVoterWeight()
     } else if (realm) {
-      handleGetSwitchboardVoting()
+      handleGetHeliumVsrVoting()
+      // @asktree: guys please dont spam network reqs even if your plugin isnt used
+      // handleGetSwitchboardVoting()
     } else {
       setVotingNfts([], currentClient, nftMintRegistrar)
-      setMaxVoterWeight(null)
+      setNftMaxVoterWeight(null)
     }
   }, [
-    JSON.stringify(usedCollectionsPks),
-    currentPluginPk?.toBase58(),
     connected,
-    realm?.pubkey.toBase58(),
-    currentClient.walletPk?.toBase58(),
+    currentClient,
+    currentPluginPk,
+    handleGetHeliumVsrVoting,
+    handleGetNfts,
+    handleGetSwitchboardVoting,
+    handleMaxVoterWeight,
+    nftMintRegistrar,
+    realm,
+    setNftMaxVoterWeight,
+    setVotingNfts,
+    usedCollectionsPks.length,
   ])
 }

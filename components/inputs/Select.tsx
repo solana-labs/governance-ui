@@ -2,7 +2,12 @@ import { Listbox } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/solid'
 import { StyledLabel, inputClasses } from './styles'
 import ErrorField from './ErrorField'
+import React from 'react'
 
+/**
+ * @deprecated
+ * doesn't really have a replacement but needs one
+ */
 const Select = ({
   value,
   onChange,
@@ -12,6 +17,7 @@ const Select = ({
   error = '',
   disabled = false,
   label = '',
+  subtitle = '',
   componentLabel,
   useDefaultStyle = true,
   noMaxWidth = false,
@@ -26,7 +32,8 @@ const Select = ({
   error?: string | undefined
   disabled?: boolean | undefined
   label?: string | undefined
-  componentLabel?: any | undefined
+  subtitle?: string | undefined
+  componentLabel?: React.ReactNode
   useDefaultStyle?: boolean
   noMaxWidth?: boolean
   wrapperClassNames?: string
@@ -38,6 +45,7 @@ const Select = ({
       style={minWidth ? { minWidth: minWidth } : {}}
     >
       {label && <StyledLabel>{label}</StyledLabel>}
+      {subtitle && <p className="text-fgd-3 mb-1 -mt-2">{subtitle}</p>}
       <div className={`relative ${className} ${error && 'pb-1'}`}>
         <Listbox value={value} onChange={onChange} disabled={disabled}>
           {({ open }) => (
@@ -58,7 +66,7 @@ const Select = ({
                 >
                   {componentLabel
                     ? componentLabel
-                    : value
+                    : typeof value === 'string'
                     ? value
                     : placeholder}
                   <ChevronDownIcon

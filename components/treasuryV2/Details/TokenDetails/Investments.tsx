@@ -13,9 +13,10 @@ import DepositModal from 'Strategies/components/DepositModal'
 import Modal from '@components/Modal'
 import ConvertToMsol from '@components/TreasuryAccount/ConvertToMsol'
 import ConvertToStSol from '@components/TreasuryAccount/ConvertToStSol'
-import TradeOnSerum from '@components/TreasuryAccount/TradeOnSerum'
+import Trade from '@components/TreasuryAccount/Trade'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import useWalletStore from 'stores/useWalletStore'
+import MangoModal from '@components/TreasuryAccount/MangoModal'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface Props {
   className?: string
@@ -26,7 +27,7 @@ interface Props {
 
 export default function Investments(props: Props) {
   const { currentAccount, setCurrentAccount } = useTreasuryAccountStore()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const [showAvailableInvestments, setShowAvailableInvestments] = useState(
     false
   )
@@ -37,7 +38,7 @@ export default function Investments(props: Props) {
   ] = useState<ActiveInvestment | null>(null)
 
   const [alternativeInvestment, setAlternativeInvestment] = useState<
-    'Marinade' | 'Lido' | 'Serum' | null
+    'Marinade' | 'Lido' | 'Poseidon' | 'Mango' | null
   >(null)
 
   const investments = useAccountInvestments({
@@ -56,6 +57,7 @@ export default function Investments(props: Props) {
     if (!currentAccount) {
       setCurrentAccount(props.asset.raw, connection)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [connection, props])
 
   switch (investments._tag) {
@@ -140,7 +142,8 @@ export default function Investments(props: Props) {
                       switch (investment.protocolName) {
                         case 'Marinade':
                         case 'Lido':
-                        case 'Serum': {
+                        case 'Mango':
+                        case 'Poseidon': {
                           setAlternativeInvestment(investment.protocolName)
                           setProposedInvestment(null)
                           break
@@ -179,8 +182,6 @@ export default function Investments(props: Props) {
           {proposedInvestment && (
             <DepositModal
               governedTokenAccount={props.asset.raw}
-              mangoAccounts={investments.data.mangoAccounts}
-              currentPosition={proposedInvestment.investedAmount}
               apy={proposedInvestment.apy}
               handledMint={proposedInvestment.handledMint}
               onClose={() => {
@@ -193,6 +194,15 @@ export default function Investments(props: Props) {
               strategyName={proposedInvestment.strategyName}
               createProposalFcn={proposedInvestment.createProposalFcn}
             />
+          )}
+          {alternativeInvestment === 'Mango' && (
+            <Modal
+              isOpen
+              sizeClassName="sm:max-w-3xl"
+              onClose={() => setAlternativeInvestment(null)}
+            >
+              <MangoModal account={props.asset.raw}></MangoModal>
+            </Modal>
           )}
           {alternativeInvestment === 'Marinade' && (
             <Modal
@@ -212,13 +222,13 @@ export default function Investments(props: Props) {
               <ConvertToStSol />
             </Modal>
           )}
-          {alternativeInvestment === 'Serum' && (
+          {alternativeInvestment === 'Poseidon' && (
             <Modal
               isOpen
               sizeClassName="sm:max-w-3xl"
               onClose={() => setAlternativeInvestment(null)}
             >
-              <TradeOnSerum tokenAccount={props.asset.raw} />
+              <Trade tokenAccount={props.asset.raw} />
             </Modal>
           )}
         </div>

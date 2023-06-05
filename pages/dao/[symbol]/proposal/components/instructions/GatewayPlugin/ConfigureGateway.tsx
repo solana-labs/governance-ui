@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
 import * as yup from 'yup'
 import {
   Governance,
@@ -8,9 +8,6 @@ import {
 import { validateInstruction } from '@utils/instructionTools'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
-import useWalletStore from 'stores/useWalletStore'
-
-import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NewProposalContext } from '../../../new'
 import InstructionForm, {
@@ -22,6 +19,8 @@ import { getValidatedPublickKey } from '@utils/validations'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getRegistrarPDA } from '@utils/plugin/accounts'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 interface ConfigureGatewayForm {
   governedAccount: AssetAccount | undefined
@@ -37,11 +36,11 @@ const ConfigureGatewayPlugin = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { realm } = useRealm()
+  const realm = useRealmQuery().data?.result
   const gatewayClient = useVotePluginsClientStore((s) => s.state.gatewayClient)
   const { assetAccounts } = useGovernanceAssets()
-  const wallet = useWalletStore((s) => s.current)
-  const shouldBeGoverned = index !== 0 && governance
+  const wallet = useWalletOnePointOh()
+  const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<ConfigureGatewayForm>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -89,6 +88,7 @@ const ConfigureGatewayPlugin = ({
       { governedAccount: form?.governedAccount?.governance, getInstruction },
       index
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
   const schema = yup.object().shape({
     governedAccount: yup
@@ -120,7 +120,7 @@ const ConfigureGatewayPlugin = ({
   })
   const inputs: InstructionInput[] = [
     {
-      label: 'Governance',
+      label: 'Wallet',
       initialValue: null,
       name: 'governedAccount',
       type: InstructionInputType.GOVERNED_ACCOUNT,

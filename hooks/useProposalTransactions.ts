@@ -59,12 +59,11 @@ function parseTransactions(
   }
 }
 
+/** @deprecated this needs to be rewritten */
 export default function useProposalTransactions(
-  allTransactions: ProgramAccount<ProposalTransaction>[],
+  allTransactions: ProgramAccount<ProposalTransaction>[] = [],
   proposal?: ProgramAccount<Proposal>
 ) {
-  if (!proposal) return null
-
   const [executed, setExecuted] = useState<
     ProgramAccount<ProposalTransaction>[]
   >([])
@@ -80,6 +79,8 @@ export default function useProposalTransactions(
 
     if (allTransactions.length !== executed.length) {
       interval = setInterval(() => {
+        if (!proposal) return
+
         const { executed, ready, notReady, nextExecuteAt } = parseTransactions(
           allTransactions,
           proposal
@@ -99,7 +100,9 @@ export default function useProposalTransactions(
     return () => {
       if (interval) clearInterval(interval)
     }
-  }, [executed])
+  }, [allTransactions, executed, proposal])
+
+  if (!proposal) return null
 
   return {
     executed,

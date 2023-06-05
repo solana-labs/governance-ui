@@ -11,7 +11,11 @@ import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import { getVoteRecordsByVoterMapByProposal } from '@models/api'
 import { isYesVote } from '@models/voteRecords'
-import { GOVERNANCE_CHAT_PROGRAM_ID, VoteRecord } from '@solana/spl-governance'
+import {
+  GOVERNANCE_CHAT_PROGRAM_ID,
+  GoverningTokenType,
+  VoteRecord,
+} from '@solana/spl-governance'
 import { ChatMessage, ProgramAccount } from '@solana/spl-governance'
 import { getGovernanceChatMessagesByVoter } from '@solana/spl-governance'
 
@@ -20,19 +24,109 @@ import { tryParsePublicKey } from '@tools/core/pubkey'
 import { accountsToPubkeyMap } from '@tools/sdk/accounts'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { notify } from '@utils/notifications'
-import tokenService from '@utils/services/token'
+import tokenPriceService from '@utils/services/tokenPrice'
 import { Member } from '@utils/uiTypes/members'
-import React, { useEffect, useMemo, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
+import { FC, useCallback, useEffect, useMemo, useState } from 'react'
 import { WalletTokenRecordWithProposal } from './types'
 import PaginationComponent from '@components/Pagination'
 import useMembersStore from 'stores/useMembersStore'
+import { LinkButton } from '@components/Button'
+import useProgramVersion from '@hooks/useProgramVersion'
+import { useRouter } from 'next/router'
+import { Instructions } from '@utils/uiTypes/proposalCreationTypes'
+import { abbreviateAddress } from '@utils/formatting'
+import useGovernanceForGovernedAddress from '@hooks/useGovernanceForGovernedAddress'
+import useProposalCreationButtonTooltip from '@hooks/useProposalCreationButtonTooltip'
+import Tooltip from '@components/Tooltip'
+import RevokeMyMembership from './RevokeMyMembership'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { useRealmProposalsQuery } from '@hooks/queries/proposal'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+
+const RevokeMembership: FC<{ member: PublicKey; mint: PublicKey }> = ({
+  member,
+  mint,
+}) => {
+  const wallet = useWalletOnePointOh()
+  const realm = useRealmQuery().data?.result
+  const { symbol } = useRealm()
+
+  const router = useRouter()
+  const { fmtUrlWithCluster } = useQueryContext()
+  const governance = useGovernanceForGovernedAddress(mint)
+
+  const govpop =
+    realm !== undefined &&
+    (mint.equals(realm.account.communityMint)
+      ? 'community '
+      : realm.account.config.councilMint &&
+        mint.equals(realm.account.config.councilMint)
+      ? 'council '
+      : '')
+  let abbrevAddress: string
+  try {
+    abbrevAddress = abbreviateAddress(member)
+  } catch {
+    abbrevAddress = ''
+  }
+  // note the lack of space is not a typo
+  const proposalTitle = `Remove ${govpop}member ${abbrevAddress}`
+
+  const tooltipContent = useProposalCreationButtonTooltip(
+    governance ? [governance] : []
+  )
+
+  return !wallet?.publicKey?.equals(member) ? (
+    <>
+      <Tooltip content={tooltipContent}>
+        <LinkButton
+          disabled={!!tooltipContent}
+          className=" fill-red-400 text-red-400 flex items-center whitespace-nowrap"
+          onClick={() =>
+            router.push(
+              fmtUrlWithCluster(
+                `/dao/${symbol}/proposal/new?i=${
+                  Instructions.RevokeGoverningTokens
+                }&t=${proposalTitle}&memberKey=${member.toString()}`
+              )
+            )
+          }
+        >
+          <XCircleIcon className="flex-shrink-0 h-5 mr-2 w-5" />
+          Revoke Membership
+        </LinkButton>
+      </Tooltip>
+    </>
+  ) : (
+    <RevokeMyMembership />
+  )
+}
 
 const MemberOverview = ({ member }: { member: Member }) => {
-  const { realm } = useRealm()
-  const connection = useWalletStore((s) => s.connection)
-  const selectedRealm = useWalletStore((s) => s.selectedRealm)
-  const { mint, councilMint, proposals, symbol } = useRealm()
+  const programVersion = useProgramVersion()
+  const realm = useRealmQuery().data?.result
+  const config = useRealmConfigQuery().data?.result
+  const connection = useLegacyConnectionContext()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { symbol } = useRouter().query
+  const { data: proposalsArray } = useRealmProposalsQuery()
+  const proposalsByProposal = useMemo(
+    () =>
+      proposalsArray === undefined
+        ? {}
+        : Object.fromEntries(
+            proposalsArray.map((x) => [x.pubkey.toString(), x])
+          ),
+    [proposalsArray]
+  )
   const { fmtUrlWithCluster } = useQueryContext()
   const activeMembers = useMembersStore((s) => s.compact.activeMembers)
   const [ownVoteRecords, setOwnVoteRecords] = useState<
@@ -45,39 +139,39 @@ const MemberOverview = ({ member }: { member: Member }) => {
     walletAddress,
     councilVotes,
     communityVotes,
-    votesCasted,
     hasCouncilTokenOutsideRealm,
     hasCommunityTokenOutsideRealm,
   } = member
 
   const walletPublicKey = tryParsePublicKey(walletAddress)
   const tokenName = realm
-    ? tokenService.getTokenInfo(realm?.account.communityMint.toBase58())?.symbol
+    ? tokenPriceService.getTokenInfo(realm?.account.communityMint.toBase58())
+        ?.symbol
     : ''
   const communityAmount = useMemo(
     () =>
       communityVotes && communityVotes && !communityVotes.isZero()
         ? fmtMintAmount(mint, communityVotes)
         : '',
-    [walletAddress]
+    [communityVotes, mint]
   )
-
   const councilAmount = useMemo(
     () =>
       councilVotes && councilVotes && !councilVotes.isZero()
         ? fmtMintAmount(councilMint, councilVotes)
         : '',
-    [walletAddress]
+    [councilMint, councilVotes]
   )
 
-  const getVoteRecordsAndChatMsgs = async () => {
+  const getVoteRecordsAndChatMsgs = useCallback(async () => {
+    if (!realm) throw new Error()
     let voteRecords: { [pubKey: string]: ProgramAccount<VoteRecord> } = {}
     let chatMessages: { [pubKey: string]: ProgramAccount<ChatMessage> } = {}
     try {
       const results = await Promise.all([
         getVoteRecordsByVoterMapByProposal(
           connection.current,
-          selectedRealm!.programId!,
+          realm.owner,
           new PublicKey(walletAddress)
         ),
         getGovernanceChatMessagesByVoter(
@@ -95,47 +189,49 @@ const MemberOverview = ({ member }: { member: Member }) => {
       })
     }
     return { voteRecords, chat: chatMessages }
-  }
+  }, [connection, realm, walletAddress])
 
   useEffect(() => {
-    //we get voteRecords sorted by proposal date and match it with proposal name and chat msgs leaved by token holder.
-    const handleSetVoteRecords = async () => {
-      const { voteRecords, chat } = await getVoteRecordsAndChatMsgs()
-      const voteRecordsArray: WalletTokenRecordWithProposal[] = Object.keys(
-        voteRecords
-      )
-        .sort((a, b) => {
-          const prevProposal = proposals[a]
-          const nextProposal = proposals[b]
-          return (
-            prevProposal?.account.getStateTimestamp() -
-            nextProposal?.account.getStateTimestamp()
-          )
-        })
-        .reverse()
-        .filter((x) => proposals[x])
-        .flatMap((x) => {
-          const currentProposal = proposals[x]
-          const currentChatsMsgPk = Object.keys(chat).filter(
-            (c) =>
-              chat[c]?.account.proposal.toBase58() ===
-              currentProposal?.pubkey.toBase58()
-          )
-          const currentChatMsgs = currentChatsMsgPk.map(
-            (c) => chat[c].account.body.value
-          )
-          return {
-            proposalPublicKey: x,
-            proposalName: currentProposal?.account.name,
-            chatMessages: currentChatMsgs,
-            ...voteRecords[x],
-          }
-        })
+    if (realm) {
+      //we get voteRecords sorted by proposal date and match it with proposal name and chat msgs leaved by token holder.
+      const handleSetVoteRecords = async () => {
+        const { voteRecords, chat } = await getVoteRecordsAndChatMsgs()
+        const voteRecordsArray: WalletTokenRecordWithProposal[] = Object.keys(
+          voteRecords
+        )
+          .sort((a, b) => {
+            const prevProposal = proposalsByProposal[a]
+            const nextProposal = proposalsByProposal[b]
+            return (
+              prevProposal?.account.getStateTimestamp() -
+              nextProposal?.account.getStateTimestamp()
+            )
+          })
+          .reverse()
+          .filter((x) => proposalsByProposal[x])
+          .flatMap((x) => {
+            const currentProposal = proposalsByProposal[x]
+            const currentChatsMsgPk = Object.keys(chat).filter(
+              (c) =>
+                chat[c]?.account.proposal.toBase58() ===
+                currentProposal?.pubkey.toBase58()
+            )
+            const currentChatMsgs = currentChatsMsgPk.map(
+              (c) => chat[c].account.body.value
+            )
+            return {
+              proposalPublicKey: x,
+              proposalName: currentProposal?.account.name,
+              chatMessages: currentChatMsgs,
+              ...voteRecords[x],
+            }
+          })
 
-      setOwnVoteRecords(voteRecordsArray)
+        setOwnVoteRecords(voteRecordsArray)
+      }
+      handleSetVoteRecords()
     }
-    handleSetVoteRecords()
-  }, [walletAddress])
+  }, [getVoteRecordsAndChatMsgs, proposalsByProposal, realm, walletAddress])
 
   const memberVotePowerRank = useMemo(() => {
     const sortedMembers = activeMembers.sort((a, b) =>
@@ -146,50 +242,77 @@ const MemberOverview = ({ member }: { member: Member }) => {
         (m) => m.walletAddress === member?.walletAddress
       ) + 1
     )
-  }, [JSON.stringify(activeMembers.length), member.walletAddress])
+  }, [activeMembers, member?.walletAddress])
 
+  const paginateVotes = useCallback(
+    (page) => {
+      return ownVoteRecords.slice(page * perPage, (page + 1) * perPage)
+    },
+    [ownVoteRecords]
+  )
   useEffect(() => {
     setRecentVotes(paginateVotes(0))
-  }, [JSON.stringify(ownVoteRecords)])
+  }, [paginateVotes])
 
   const perPage = 8
   const totalPages = Math.ceil(ownVoteRecords.length / perPage)
   const onPageChange = (page) => {
     setRecentVotes(paginateVotes(page))
   }
-  const paginateVotes = (page) => {
-    return ownVoteRecords.slice(page * perPage, (page + 1) * perPage)
-  }
 
-  const Address = useMemo(() => {
-    return (
-      <DisplayAddress
-        connection={connection.current}
-        address={walletPublicKey}
-        height="12px"
-        width="100px"
-        dark={true}
-      />
-    )
-  }, [walletPublicKey?.toBase58()])
+  const councilMintKey = realm?.account.config.councilMint
+  const communityMintKey = realm?.account.communityMint
+
+  const isRevokableCouncilMember =
+    !councilVotes.isZero() &&
+    councilMintKey &&
+    config?.account.councilTokenConfig.tokenType ===
+      GoverningTokenType.Membership
+
+  const isRevokableCommunityMember =
+    !communityVotes.isZero() &&
+    communityMintKey &&
+    config?.account.communityTokenConfig.tokenType ===
+      GoverningTokenType.Membership
+
   return (
     <>
       <div className="flex items-center justify-between mb-2 py-2">
-        <h2 className="mb-0">{Address}</h2>
-        <a
-          className="default-transition flex items-center text-primary-light hover:text-primary-dark text-sm"
-          href={
-            walletAddress
-              ? getExplorerUrl(connection.cluster, walletAddress)
-              : ''
-          }
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={(e) => e.stopPropagation()}
-        >
-          Explorer
-          <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 w-4" />
-        </a>
+        <h2 className="mb-0">
+          <DisplayAddress
+            connection={connection.current}
+            address={walletPublicKey}
+            height="12px"
+            width="100px"
+            dark={true}
+          />
+        </h2>
+        <div className="flex gap-6">
+          <a
+            className="default-transition flex items-center text-primary-light hover:text-primary-dark text-sm"
+            href={
+              walletAddress
+                ? getExplorerUrl(connection.cluster, walletAddress)
+                : ''
+            }
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+          >
+            Explorer
+            <ExternalLinkIcon className="flex-shrink-0 h-4 ml-1 w-4" />
+          </a>
+          {(programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) >= 3 &&
+            realm !== undefined &&
+            (isRevokableCouncilMember || isRevokableCommunityMember) && (
+              <RevokeMembership
+                member={new PublicKey(member.walletAddress)}
+                mint={
+                  isRevokableCouncilMember ? councilMintKey : communityMintKey! // Typescript is wrong!
+                }
+              />
+            )}
+        </div>
       </div>
       <div className="flex flex-col space-y-3 md:space-y-0 md:flex-row md:space-x-3">
         {(communityAmount || !councilAmount) && (
@@ -218,7 +341,9 @@ const MemberOverview = ({ member }: { member: Member }) => {
         )}
         <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all">
           <p>Votes Cast</p>
-          <div className="font-bold text-fgd-1 text-2xl">{votesCasted}</div>
+          <div className="font-bold text-fgd-1 text-2xl">
+            {ownVoteRecords.length}
+          </div>
           <div className="flex">
             <p>
               Yes Votes:{' '}

@@ -1,10 +1,8 @@
+import { useMemo } from 'react'
 import { getTreasuryAccountItemInfoV2 } from '@utils/treasuryTools'
 import { AssetAccount } from '@utils/uiTypes/assets'
-import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
-import { useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
-import { findMetadataPda } from '@metaplex-foundation/js'
-import { PublicKey } from '@solana/web3.js'
+import TokenIcon from '@components/treasuryV2/icons/TokenIcon'
+import { useTokenMetadata } from '@hooks/queries/tokenMetadata'
 
 const AccountItem = ({
   governedAccountTokenAccount,
@@ -19,46 +17,14 @@ const AccountItem = ({
     displayPrice,
   } = getTreasuryAccountItemInfoV2(governedAccountTokenAccount)
 
-  const [logoFromMeta, setLogoFromMeta] = useState<undefined | string>(
-    undefined
+  const { data } = useTokenMetadata(
+    governedAccountTokenAccount.extensions.mint?.publicKey,
+    !logo
   )
-  const [symbolFromMeta, setSymbolFromMeta] = useState<undefined | string>(
-    undefined
-  )
-  const connection = useWalletStore((s) => s.connection)
 
-  useEffect(() => {
-    const getTokenMetadata = async (mintAddress: string) => {
-      try {
-        const mintPubkey = new PublicKey(mintAddress)
-        const metadataAccount = findMetadataPda(mintPubkey)
-        const accountData = await connection.current.getAccountInfo(
-          metadataAccount
-        )
-
-        const state = Metadata.deserialize(accountData!.data)
-        const jsonUri = state[0].data.uri.slice(
-          0,
-          state[0].data.uri.indexOf('\x00')
-        )
-
-        const data = await (await fetch(jsonUri)).json()
-
-        setLogoFromMeta(data.image)
-        setSymbolFromMeta(data.symbol)
-      } catch (e) {
-        console.log(e)
-      }
-    }
-    if (
-      !logo &&
-      governedAccountTokenAccount.extensions.mint?.publicKey.toBase58()
-    ) {
-      getTokenMetadata(
-        governedAccountTokenAccount.extensions.mint?.publicKey.toBase58()
-      )
-    }
-  }, [governedAccountTokenAccount.extensions.mint?.publicKey.toBase58()])
+  const symbolFromMeta = useMemo(() => {
+    return data?.symbol
+  }, [data?.symbol])
 
   return (
     <div className="flex items-center w-full p-3 border rounded-lg text-fgd-1 border-fgd-4">
@@ -73,18 +39,11 @@ const AccountItem = ({
             currentTarget.hidden = true
           }}
         />
-      ) : logoFromMeta ? (
-        <img
-          className={`flex-shrink-0 h-6 w-6 mr-2.5 mt-0.5 ${
-            governedAccountTokenAccount.isSol && 'rounded-full'
-          }`}
-          src={logoFromMeta}
-          onError={({ currentTarget }) => {
-            currentTarget.onerror = null // prevents looping
-            currentTarget.hidden = true
-          }}
-        />
-      ) : undefined}
+      ) : (
+        <TokenIcon
+          className={`flex-shrink-0 h-6 w-6 mr-2.5 mt-0.5 fill-current`}
+        ></TokenIcon>
+      )}
       <div className="w-full">
         <div className="flex items-start justify-between mb-1">
           <div className="text-sm font-semibold text-th-fgd-1">{name}</div>

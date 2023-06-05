@@ -2,6 +2,7 @@ import type { PublicKey } from '@solana/web3.js';
 
 import { FeedItemComment } from '../gql';
 import cx from '@hub/lib/cx';
+import { filterUniqueBy } from '@hub/lib/filterUniqueBy';
 import { useUserCreatedTopLevelFeedItemRepliesStore } from '@hub/stores/userCreatedTopLevelFeedItemRepliesStore';
 
 import * as Comment from './Comment';
@@ -16,11 +17,19 @@ interface Props extends BaseProps {
   realm: PublicKey;
   realmUrlId: string;
   showClientSideComments?: boolean;
+  userIsAdmin?: boolean;
+  onRefresh?(): void;
 }
 
 export function Content(props: Props) {
   const userCreatedReplies = useUserCreatedTopLevelFeedItemRepliesStore(
     (state) => state.comments[props.feedItemId],
+  );
+  const deletedComments = useUserCreatedTopLevelFeedItemRepliesStore(
+    (state) => state.deletedComments,
+  );
+  const deleteComment = useUserCreatedTopLevelFeedItemRepliesStore(
+    (state) => state.deleteComment,
   );
 
   return (
@@ -28,22 +37,34 @@ export function Content(props: Props) {
       {userCreatedReplies &&
         !!userCreatedReplies.length &&
         props.showClientSideComments &&
-        userCreatedReplies.map((comment) => (
-          <Comment.Content
-            comment={comment}
-            feedItemId={props.feedItemId}
-            key={comment.id}
-            realm={props.realm}
-            realmUrlId={props.realmUrlId}
-          />
-        ))}
-      {props.comments.map((comment) => (
+        userCreatedReplies
+          .filter((comment) => !deletedComments.includes(comment.id))
+          .map((comment) => (
+            <Comment.Content
+              comment={comment}
+              feedItemId={props.feedItemId}
+              key={comment.id}
+              realm={props.realm}
+              realmUrlId={props.realmUrlId}
+              userIsAdmin={props.userIsAdmin}
+              onDelete={() => {
+                deleteComment(comment.id);
+                props.onRefresh?.();
+              }}
+            />
+          ))}
+      {props.comments.filter(filterUniqueBy('id')).map((comment) => (
         <Comment.Content
           comment={comment}
           feedItemId={props.feedItemId}
           key={comment.id}
           realm={props.realm}
           realmUrlId={props.realmUrlId}
+          userIsAdmin={props.userIsAdmin}
+          onDelete={() => {
+            deleteComment(comment.id);
+            props.onRefresh?.();
+          }}
         />
       ))}
     </div>
