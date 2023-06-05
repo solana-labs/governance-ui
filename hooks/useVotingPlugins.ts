@@ -551,9 +551,7 @@ export function useVotingPlugins() {
     if (!wallet?.publicKey) return
     try {
       const nfts = await getNfts(wallet.publicKey, connection)
-      console.log('NFTS', nfts)
       const votingNfts = nfts.filter(getIsFromCollection)
-      console.log('votingNFts', votingNfts)
       const nftsWithMeta = votingNfts
       setVotingNfts(nftsWithMeta, currentClient, nftMintRegistrar)
     } catch (e) {
@@ -581,13 +579,6 @@ export function useVotingPlugins() {
     ) {
       handleGetSwitchboardVoting()
     }
-
-    console.log(
-      'bbb',
-      usedCollectionsPks.length,
-      connected,
-      currentClient.walletPk?.toBase58()
-    )
     if (usedCollectionsPks.length && realm) {
       if (connected && currentClient.walletPk?.toBase58()) {
         handleGetNfts()
