@@ -21,7 +21,7 @@ export const tokenOwnerRecordQueryKeys = {
   all: (cluster: EndpointTypes) => [cluster, 'TokenOwnerRecord'],
   byPubkey: (cluster: EndpointTypes, k: PublicKey) => [
     ...tokenOwnerRecordQueryKeys.all(cluster),
-    k,
+    k.toString(),
   ],
   byRealm: (cluster: EndpointTypes, realm: PublicKey) => [
     ...tokenOwnerRecordQueryKeys.all(cluster),
@@ -109,7 +109,6 @@ export const useTokenOwnerRecordByPubkeyQuery = (
   pubkey: PublicKey | undefined
 ) => {
   const connection = useLegacyConnectionContext()
-
   const enabled = pubkey !== undefined
   const query = useQuery({
     queryKey: enabled
@@ -121,7 +120,6 @@ export const useTokenOwnerRecordByPubkeyQuery = (
     },
     enabled,
   })
-
   return query
 }
 
