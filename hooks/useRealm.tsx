@@ -30,7 +30,6 @@ import { useVsrMode } from './useVsrMode'
 import useWalletOnePointOh from './useWalletOnePointOh'
 import { useRealmQuery } from './queries/realm'
 import {
-  useTokenRecordsByOwnersMap,
   useUserCommunityTokenOwnerRecord,
   useUserCouncilTokenOwnerRecord,
 } from './queries/tokenOwnerRecord'
@@ -54,11 +53,6 @@ export default function useRealm() {
   const { data: tokenAccounts } = useUserTokenAccountsQuery()
   const realm = useRealmQuery().data?.result
   const realmInfo = useSelectedRealmInfo()
-
-  const {
-    communityTORsByOwner: tokenRecords,
-    councilTORsByOwner: councilTokenOwnerRecords,
-  } = useTokenRecordsByOwnersMap()
 
   const config = useRealmConfigQuery().data?.result
   const mint = useRealmCommunityMintInfoQuery().data?.result
