@@ -10,14 +10,3 @@ export interface Member {
   delegateWalletCouncil?: PublicKey
   delegateWalletCommunity?: PublicKey
 }
-
-interface Delegate {
-  communityMembers?: Array<Member>
-  councilMembers?: Array<Member>
-  communityTokenCount?: BN
-  councilTokenCount?: BN
-}
-
-export interface Delegates {
-  [key: string]: Delegate
-}
