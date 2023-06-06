@@ -75,21 +75,24 @@ const useGivenGrantsTokenAmounts = () => {
     [proposals]
   )
 
+  const enabled =
+    realmInfo?.programId !== undefined && possibleGrantProposals !== undefined
   const { data: proposalTxs } = useQuery({
+    enabled,
     queryKey: [
       connection.current.rpcEndpoint,
       realmInfo?.programId,
       'fetch proposals transactions',
       possibleGrantProposals,
     ],
-    queryFn: () =>
-      realmInfo?.programId &&
-      possibleGrantProposals &&
-      getProposalsTransactions(
+    queryFn: () => {
+      if (!enabled) throw new Error('query ran while disabled :o')
+      return getProposalsTransactions(
         possibleGrantProposals.map((x) => x.pubkey) ?? [],
         connection,
         realmInfo.programId
-      ),
+      )
+    },
   })
 
   const givenGrantsTokenAmounts = useMemo(
