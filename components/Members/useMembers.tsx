@@ -31,7 +31,6 @@ export default function useMembers() {
 
   const connection = useLegacyConnectionContext()
   const setMembers = useMembersStore((s) => s.setMembers)
-  const setDelegates = useMembersStore((s) => s.setDelegates)
 
   const tokenRecordArray: TokenRecordsWithWalletAddress[] = useMemo(
     () =>
@@ -277,19 +276,12 @@ export default function useMembers() {
       setMembers(members)
     }
 
-    const getDelegates = async () => {
-      const members = [...membersWithTokensDeposited]
-      const delegateMap = getDelegateWalletMap(members)
-      setDelegates(delegateMap)
-    }
     handleSetMembers()
-    getDelegates()
   }, [
     fetchCommunityMembersATAS,
     fetchCouncilMembersWithTokensOutsideRealm,
     membersWithTokensDeposited,
     realm?.pubkey,
-    setDelegates,
     setMembers,
   ])
 }

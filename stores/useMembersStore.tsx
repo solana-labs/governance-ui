@@ -8,13 +8,13 @@ interface MembersStore extends State {
     currentMember: Member | null
     members: Member[]
     activeMembers: Member[]
-    delegates: Delegates | null
+    //delegates: Delegates | null
   }
   setCurrentCompactViewMember: (item: Member) => void
   setCurrentCompactView: (viewState: ViewState) => void
   resetCompactViewState: () => void
   setMembers: (members: Member[]) => void
-  setDelegates: (delegates: Delegates) => void
+  //setDelegates: (delegates: Delegates) => void
 }
 
 const compactDefaultState = {
@@ -22,7 +22,7 @@ const compactDefaultState = {
   currentMember: null,
   members: [],
   activeMembers: [],
-  delegates: null,
+  //delegates: null,
 }
 
 const useMembersStore = create<MembersStore>((set, _get) => ({
@@ -51,11 +51,6 @@ const useMembersStore = create<MembersStore>((set, _get) => ({
     set((s) => {
       s.compact.members = members
       s.compact.activeMembers = activeMembers
-    })
-  },
-  setDelegates: (delegates: Delegates) => {
-    set((s) => {
-      s.compact.delegates = delegates
     })
   },
 }))
