@@ -15,7 +15,7 @@ import {
 } from '@utils/tokens'
 import { capitalize } from '@utils/helpers'
 import { TokenRecordsWithWalletAddress } from './types'
-import { Member, Delegates } from 'utils/uiTypes/members'
+import { Member } from 'utils/uiTypes/members'
 import useMembersStore from 'stores/useMembersStore'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useTokenRecordsByOwnersMap } from '@hooks/queries/tokenOwnerRecord'
@@ -31,7 +31,6 @@ export default function useMembers() {
 
   const connection = useLegacyConnectionContext()
   const setMembers = useMembersStore((s) => s.setMembers)
-  const setDelegates = useMembersStore((s) => s.setDelegates)
 
   const tokenRecordArray: TokenRecordsWithWalletAddress[] = useMemo(
     () =>
@@ -205,60 +204,6 @@ export default function useMembers() {
     [communityAndCouncilTokenRecords]
   )
 
-  // Loop through Members list to get our delegates and their tokens
-  // Return a object of key: walletId and value: object of arrays for council/community tokenOwnerRecords.
-  const getDelegateWalletMap = (members: Array<Member>): Delegates => {
-    const delegateMap = {} as Delegates
-    members.forEach((member: Member) => {
-      if (member?.delegateWalletCouncil) {
-        const walletId = member?.delegateWalletCouncil.toBase58()
-        if (delegateMap[walletId]) {
-          const oldCouncilRecords = delegateMap[walletId].councilMembers || []
-
-          delegateMap[walletId] = {
-            ...delegateMap[walletId],
-            councilMembers: [...oldCouncilRecords, member],
-            councilTokenCount: (
-              delegateMap[walletId]?.councilTokenCount ?? BN_ZERO
-            ).add(member.councilVotes),
-          }
-        } else {
-          delegateMap[walletId] = {
-            councilMembers: [member],
-            councilTokenCount: member.councilVotes
-              ? member.councilVotes
-              : BN_ZERO,
-          }
-        }
-      }
-
-      if (member?.delegateWalletCommunity) {
-        const walletId = member?.delegateWalletCommunity.toBase58()
-        if (delegateMap[walletId]) {
-          const oldCommunityRecords =
-            delegateMap[walletId].communityMembers || []
-
-          delegateMap[walletId] = {
-            ...delegateMap[walletId],
-            communityMembers: [...oldCommunityRecords, member],
-            communityTokenCount: (
-              delegateMap[walletId]?.communityTokenCount ?? BN_ZERO
-            ).add(member.communityVotes),
-          }
-        } else {
-          delegateMap[walletId] = {
-            communityMembers: [member],
-            communityTokenCount: member.communityVotes
-              ? member.communityVotes
-              : BN_ZERO,
-          }
-        }
-      }
-    })
-
-    return delegateMap
-  }
-
   // Move to store if will be used more across application
   useEffect(() => {
     console.log('useMembers is fetching')
@@ -277,19 +222,12 @@ export default function useMembers() {
       setMembers(members)
     }
 
-    const getDelegates = async () => {
-      const members = [...membersWithTokensDeposited]
-      const delegateMap = getDelegateWalletMap(members)
-      setDelegates(delegateMap)
-    }
     handleSetMembers()
-    getDelegates()
   }, [
     fetchCommunityMembersATAS,
     fetchCouncilMembersWithTokensOutsideRealm,
     membersWithTokensDeposited,
     realm?.pubkey,
-    setDelegates,
     setMembers,
   ])
 }

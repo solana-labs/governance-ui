@@ -13,7 +13,6 @@ import {
   VoteRegistryVoterWeight,
   VoterWeight,
 } from '../models/voteWeights'
-import useMembersStore from 'stores/useMembersStore'
 import {
   NFT_PLUGINS_PKS,
   VSR_PLUGIN_PKS,
@@ -31,7 +30,6 @@ import { useVsrMode } from './useVsrMode'
 import useWalletOnePointOh from './useWalletOnePointOh'
 import { useRealmQuery } from './queries/realm'
 import {
-  useTokenRecordsByOwnersMap,
   useUserCommunityTokenOwnerRecord,
   useUserCouncilTokenOwnerRecord,
 } from './queries/tokenOwnerRecord'
@@ -55,11 +53,6 @@ export default function useRealm() {
   const { data: tokenAccounts } = useUserTokenAccountsQuery()
   const realm = useRealmQuery().data?.result
   const realmInfo = useSelectedRealmInfo()
-
-  const {
-    communityTORsByOwner: tokenRecords,
-    councilTORsByOwner: councilTokenOwnerRecords,
-  } = useTokenRecordsByOwnersMap()
 
   const config = useRealmConfigQuery().data?.result
   const mint = useRealmCommunityMintInfoQuery().data?.result
@@ -98,8 +91,6 @@ export default function useRealm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [wallet?.publicKey])
 
-  const delegates = useMembersStore((s) => s.compact.delegates)
-
   const realmTokenAccount = useMemo(
     () =>
       realm &&
@@ -108,27 +99,6 @@ export default function useRealm() {
       ),
     [realm, tokenAccounts]
   )
-
-  // TODO refactor as query
-  // returns array of community tokenOwnerRecords that connected wallet has been delegated
-  const ownDelegateTokenRecords = useMemo(() => {
-    if (wallet?.connected && wallet.publicKey && tokenRecords) {
-      const walletId = wallet.publicKey.toBase58()
-      const delegatedWallets = delegates && delegates[walletId]
-      if (delegatedWallets?.communityMembers) {
-        const communityTokenRecords = delegatedWallets.communityMembers.map(
-          (member) => {
-            return tokenRecords[member.walletAddress]
-          }
-        )
-
-        return communityTokenRecords
-      }
-    }
-
-    return undefined
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [tokenRecords, wallet, connected])
 
   const councilTokenAccount = useMemo(
     () =>
@@ -140,31 +110,6 @@ export default function useRealm() {
       ),
     [realm, tokenAccounts]
   )
-
-  // TODO refactor as query
-  // returns array of council tokenOwnerRecords that connected wallet has been delegated
-  const ownDelegateCouncilTokenRecords = useMemo(() => {
-    if (
-      wallet?.connected &&
-      councilMint &&
-      wallet.publicKey &&
-      councilTokenOwnerRecords
-    ) {
-      const walletId = wallet.publicKey.toBase58()
-      const delegatedWallets = delegates && delegates[walletId]
-      if (delegatedWallets?.councilMembers) {
-        const councilTokenRecords = delegatedWallets.councilMembers.map(
-          (member) => {
-            return councilTokenOwnerRecords[member.walletAddress]
-          }
-        )
-
-        return councilTokenRecords
-      }
-    }
-    return undefined
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [tokenRecords, wallet, connected])
 
   const canChooseWhoVote =
     realm?.account.communityMint &&
@@ -225,8 +170,7 @@ export default function useRealm() {
       //councilTokenOwnerRecords,
       toManyCouncilOutstandingProposalsForUse,
       toManyCommunityOutstandingProposalsForUser,
-      ownDelegateTokenRecords,
-      ownDelegateCouncilTokenRecords,
+
       //config,
       currentPluginPk,
       vsrMode,
@@ -237,8 +181,7 @@ export default function useRealm() {
       councilTokenAccount,
       currentPluginPk,
       isNftMode,
-      ownDelegateCouncilTokenRecords,
-      ownDelegateTokenRecords,
+
       ownVoterWeight,
       realmInfo,
       realmTokenAccount,

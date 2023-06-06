@@ -22,7 +22,8 @@ export const invalidateInstructionAccounts = async (
           x.toString()
         )
         await queryClient.invalidateQueries({
-          predicate: (q) => q.queryKey?.includes(x.toString()),
+          predicate: (q) =>
+            q.queryKey?.includes(x.toString()) || q.queryKey?.includes(x),
         })
       })
   )
