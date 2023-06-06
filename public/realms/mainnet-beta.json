@@ -3160,5 +3160,14 @@
     "website": "https://thenudiemagazine.com",
     "twitter": "@nudie_mag",
     "ogImage": "/realms/ComradeDAO/img/comradedaologo.png"
+  },
+     {
+    "symbol": "PPWT",
+    "displayName": "Poodle Paws DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "ABh3GrrTQqnYofrcbhajSbuvDB1si7PHzxL2s4RZ4Ef",
+    "website": "https://twitter.com/PoodlePawsWT",
+    "twitter": "@PoodlePawsWT",
+    "ogImage": "/realms/PoodlePawsDAO/PoodlePawsDAO.png"
   }
 ]
