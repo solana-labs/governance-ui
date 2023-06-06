@@ -412,8 +412,199 @@ const instructions = () => ({
       //accounts: AccountMetaData[]
     ) => {
       const info = await displayArgs(connection, data)
+      const args = (await getArgs(connection, data)) as any
+
+      const parsedArgs = {
+        tokenIndex: args.tokenIndex,
+        tokenName: args.name,
+        oracleConfidenceFilter: args['oracleConfigOpt.confFilter']
+          ? (args['oracleConfigOpt.confFilter'] * 100)?.toFixed(2)
+          : '',
+        oracleMaxStalenessSlots: args['oracleConfigOpt.maxStalenessSlots'],
+        interestRateUtilizationPoint0: args['interestRateParamsOpt.util0']
+          ? (args['interestRateParamsOpt.util0'] * 100)?.toFixed(2)
+          : '',
+        interestRatePoint0: args['interestRateParamsOpt.rate0']
+          ? (args['interestRateParamsOpt.rate0'] * 100)?.toFixed(2)
+          : '',
+        interestRateUtilizationPoint1: args['interestRateParamsOpt.util1']
+          ? (args['interestRateParamsOpt.util1'] * 100)?.toFixed(2)
+          : '',
+        interestRatePoint1: args['interestRateParamsOpt.rate1']
+          ? (args['interestRateParamsOpt.rate1'] * 100)?.toFixed(2)
+          : '',
+        maxRate: args['interestRateParamsOpt.maxRate']
+          ? (args['interestRateParamsOpt.maxRate'] * 100)?.toFixed(2)
+          : '',
+        adjustmentFactor: args['interestRateParamsOpt.adjustmentFactor']
+          ? (args['interestRateParamsOpt.adjustmentFactor'] * 100).toFixed(2)
+          : '',
+        loanFeeRate: args.loanFeeRate
+          ? (args.loanFeeRate * 10000)?.toFixed(2)
+          : '',
+        loanOriginationFeeRate: args.loanOriginationFeeRate
+          ? (args.loanOriginationFeeRate * 10000)?.toFixed(2)
+          : '',
+        maintAssetWeight: args.maintAssetWeight?.toFixed(2),
+        initAssetWeight: args.initAssetWeight?.toFixed(2),
+        maintLiabWeight: args.maintLiabWeight?.toFixed(2),
+        initLiabWeight: args.initLiabWeight?.toFixed(2),
+        liquidationFee: args['liquidationFeeOpt']
+          ? (args['liquidationFeeOpt'] * 100)?.toFixed(2)
+          : '',
+        minVaultToDepositsRatio: args['minVaultToDepositsRatioOpt']
+          ? (args['minVaultToDepositsRatioOpt'] * 100)?.toFixed(2)
+          : '',
+        netBorrowLimitPerWindowQuote: args['netBorrowLimitPerWindowQuoteOpt']
+          ? toUiDecimals(args['netBorrowLimitPerWindowQuoteOpt'], 6)
+          : '',
+        netBorrowLimitWindowSizeTs: args.netBorrowLimitWindowSizeTs
+          ? secondsToHours(args.netBorrowLimitWindowSizeTs)
+          : '',
+        borrowWeightScaleStartQuote: args.borrowWeightScaleStartQuoteOpt
+          ? toUiDecimals(args.borrowWeightScaleStartQuoteOpt, 6)
+          : '',
+        depositWeightScaleStartQuote: args.depositWeightScaleStartQuoteOpt
+          ? toUiDecimals(args.depositWeightScaleStartQuoteOpt, 6)
+          : '',
+      }
       try {
-        return <div>{info}</div>
+        return (
+          <div>
+            <div className="border-b mb-4 pb-4 space-y-3">
+              <DisplayProperty
+                label="Token index"
+                value={parsedArgs.tokenIndex}
+              />
+              <DisplayProperty
+                label="Token name"
+                value={parsedArgs.tokenName}
+              />
+              <DisplayProperty
+                label="Oracle Confidence Filter"
+                value={
+                  parsedArgs.oracleConfidenceFilter &&
+                  `${parsedArgs.oracleConfidenceFilter}%`
+                }
+              />
+              <DisplayProperty
+                label="Oracle Max Staleness Slots"
+                value={parsedArgs.oracleMaxStalenessSlots}
+              />
+              <DisplayProperty
+                label="Interest rate adjustment factor"
+                value={
+                  parsedArgs.adjustmentFactor &&
+                  `${parsedArgs.adjustmentFactor}%`
+                }
+              />
+              <DisplayProperty
+                label="Interest rate utilization point 0"
+                value={
+                  parsedArgs.interestRateUtilizationPoint0 &&
+                  `${parsedArgs.interestRateUtilizationPoint0}%`
+                }
+              />
+              <DisplayProperty
+                label="Interest rate point 0"
+                value={
+                  parsedArgs.interestRatePoint0 &&
+                  `${parsedArgs.interestRatePoint0}%`
+                }
+              />
+              <DisplayProperty
+                label="Interest rate utilization point 1"
+                value={
+                  parsedArgs.interestRateUtilizationPoint1 &&
+                  `${parsedArgs.interestRateUtilizationPoint1}%`
+                }
+              />
+              <DisplayProperty
+                label="Interest rate point 1"
+                value={
+                  parsedArgs.interestRatePoint1 &&
+                  `${parsedArgs.interestRatePoint1}%`
+                }
+              />
+              <DisplayProperty
+                label="Interest rate max rate"
+                value={parsedArgs.maxRate && `${parsedArgs.maxRate}%`}
+              />
+              <DisplayProperty
+                label="Loan Fee Rate"
+                value={
+                  parsedArgs.loanFeeRate && `${parsedArgs.loanFeeRate} bps`
+                }
+              />
+              <DisplayProperty
+                label="Loan Origination Fee Rate"
+                value={
+                  parsedArgs.loanOriginationFeeRate &&
+                  `${parsedArgs.loanOriginationFeeRate} bps`
+                }
+              />
+              <DisplayProperty
+                label="Maintenance Asset Weight"
+                value={parsedArgs.maintAssetWeight}
+              />
+              <DisplayProperty
+                label="Init Asset Weight"
+                value={parsedArgs.initAssetWeight}
+              />
+              <DisplayProperty
+                label="Maintenance Liab Weight"
+                value={parsedArgs.maintLiabWeight}
+              />
+              <DisplayProperty
+                label="Init Liab Weight"
+                value={parsedArgs.initLiabWeight}
+              />
+              <DisplayProperty
+                label="Liquidation Fee"
+                value={
+                  parsedArgs.liquidationFee && `${parsedArgs.liquidationFee}%`
+                }
+              />
+              <DisplayProperty
+                label="Min Vault To Deposits Ratio"
+                value={
+                  parsedArgs.minVaultToDepositsRatio &&
+                  `${parsedArgs.minVaultToDepositsRatio}%`
+                }
+              />
+              <DisplayProperty
+                label="Net Borrow Limit Window Size"
+                value={
+                  parsedArgs.netBorrowLimitWindowSizeTs &&
+                  `${parsedArgs.netBorrowLimitWindowSizeTs}H`
+                }
+              />
+              <DisplayProperty
+                label="Net Borrow Limit Per Window Quote"
+                value={
+                  parsedArgs.netBorrowLimitPerWindowQuote &&
+                  `$${parsedArgs.netBorrowLimitPerWindowQuote}`
+                }
+              />
+              <DisplayProperty
+                label="Borrow Weight Scale Start Quote"
+                value={
+                  parsedArgs.borrowWeightScaleStartQuote &&
+                  `$${parsedArgs.borrowWeightScaleStartQuote}`
+                }
+              />
+              <DisplayProperty
+                label="Deposit Weight Scale Start Quote"
+                value={
+                  parsedArgs.depositWeightScaleStartQuote &&
+                  `$${parsedArgs.depositWeightScaleStartQuote}`
+                }
+              />
+            </div>
+            <h3>Raw values</h3>
+            <div>{info}</div>
+          </div>
+        )
       } catch (e) {
         console.log(e)
         return <div>{JSON.stringify(data)}</div>
@@ -562,6 +753,15 @@ function commify(n) {
   }
   return n
 }
+
+// Define the reusable component
+const DisplayProperty = ({ label, value }) =>
+  value && (
+    <div className="flex space-x-3">
+      <div>{label}:</div>
+      <div>{value}</div>
+    </div>
+  )
 
 //need yarn add js-sha256 snakeCase
 // function sighash(nameSpace: string, ixName: string): Buffer {
