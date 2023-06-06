@@ -439,16 +439,16 @@ const instructions = () => ({
         adjustmentFactor: args['interestRateParamsOpt.adjustmentFactor']
           ? (args['interestRateParamsOpt.adjustmentFactor'] * 100).toFixed(2)
           : '',
-        loanFeeRate: args.loanFeeRate
-          ? (args.loanFeeRate * 10000)?.toFixed(2)
+        loanFeeRate: args.loanFeeRateOpt
+          ? (args.loanFeeRateOpt * 10000)?.toFixed(2)
           : '',
-        loanOriginationFeeRate: args.loanOriginationFeeRate
-          ? (args.loanOriginationFeeRate * 10000)?.toFixed(2)
+        loanOriginationFeeRate: args.loanOriginationFeeRateOpt
+          ? (args.loanOriginationFeeRateOpt * 10000)?.toFixed(2)
           : '',
-        maintAssetWeight: args.maintAssetWeight?.toFixed(2),
-        initAssetWeight: args.initAssetWeight?.toFixed(2),
-        maintLiabWeight: args.maintLiabWeight?.toFixed(2),
-        initLiabWeight: args.initLiabWeight?.toFixed(2),
+        maintAssetWeight: args.maintAssetWeightOpt?.toFixed(2),
+        initAssetWeight: args.initAssetWeightOpt?.toFixed(2),
+        maintLiabWeight: args.maintLiabWeightOpt?.toFixed(2),
+        initLiabWeight: args.initLiabWeightOpt?.toFixed(2),
         liquidationFee: args['liquidationFeeOpt']
           ? (args['liquidationFeeOpt'] * 100)?.toFixed(2)
           : '',
@@ -458,8 +458,8 @@ const instructions = () => ({
         netBorrowLimitPerWindowQuote: args['netBorrowLimitPerWindowQuoteOpt']
           ? toUiDecimals(args['netBorrowLimitPerWindowQuoteOpt'], 6)
           : '',
-        netBorrowLimitWindowSizeTs: args.netBorrowLimitWindowSizeTs
-          ? secondsToHours(args.netBorrowLimitWindowSizeTs)
+        netBorrowLimitWindowSizeTs: args.netBorrowLimitWindowSizeTsOpt
+          ? secondsToHours(args.netBorrowLimitWindowSizeTsOpt)
           : '',
         borrowWeightScaleStartQuote: args.borrowWeightScaleStartQuoteOpt
           ? toUiDecimals(args.borrowWeightScaleStartQuoteOpt, 6)
