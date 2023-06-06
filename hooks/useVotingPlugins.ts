@@ -294,13 +294,15 @@ export function useVotingPlugins() {
       }
     } */
     if (
-      ownTokenRecordData &&
-      (!currentClient ||
-        currentClient.realm?.pubkey.toBase58() !== realm?.pubkey.toBase58() ||
-        (ownTokenRecordData.result &&
-          currentClient.walletPk?.toBase58() !==
-            ownTokenRecordData.result?.account.governingTokenOwner.toBase58()))
+      !currentClient ||
+      currentClient.realm?.pubkey.toBase58() !== realm?.pubkey.toBase58() ||
+      (ownTokenRecordData?.result &&
+        currentClient.walletPk?.toBase58() !==
+          ownTokenRecordData.result?.account.governingTokenOwner.toBase58())
     ) {
+      console.log(
+        'setting plugin; if this is getting spammed, this store just needs to be refactored away'
+      )
       handleNftplugin()
       handleGatewayPlugin()
       handleVsrPlugin()

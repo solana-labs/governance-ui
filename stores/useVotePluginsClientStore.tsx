@@ -148,6 +148,7 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
       })
     },
     handleSetVsrRegistrar: async (client, realm) => {
+      console.log('setting vsr registrar')
       if (realm === undefined) return
 
       const clientProgramId = client.program.programId
