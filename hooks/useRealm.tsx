@@ -13,7 +13,6 @@ import {
   VoteRegistryVoterWeight,
   VoterWeight,
 } from '../models/voteWeights'
-import useMembersStore from 'stores/useMembersStore'
 import {
   NFT_PLUGINS_PKS,
   VSR_PLUGIN_PKS,
@@ -31,7 +30,6 @@ import { useVsrMode } from './useVsrMode'
 import useWalletOnePointOh from './useWalletOnePointOh'
 import { useRealmQuery } from './queries/realm'
 import {
-  useTokenOwnerRecordsDelegatedToUser,
   useTokenRecordsByOwnersMap,
   useUserCommunityTokenOwnerRecord,
   useUserCouncilTokenOwnerRecord,

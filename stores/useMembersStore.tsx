@@ -1,6 +1,6 @@
 import create, { State } from 'zustand'
 import { ViewState } from '@components/Members/types'
-import { Member, Delegates } from '@utils/uiTypes/members'
+import { Member } from '@utils/uiTypes/members'
 
 interface MembersStore extends State {
   compact: {
