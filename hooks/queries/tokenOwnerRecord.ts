@@ -16,6 +16,7 @@ import { useRealmQuery } from './realm'
 import queryClient from './queryClient'
 import { useMemo } from 'react'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export const tokenOwnerRecordQueryKeys = {
   all: (cluster: EndpointTypes) => [cluster, 'TokenOwnerRecord'],
@@ -65,6 +66,25 @@ export const useTokenOwnerRecordsForRealmQuery = () => {
   })
 
   return query
+}
+
+// TODO filter in the gPA (would need rpc to also index)
+export const useTokenOwnerRecordsDelegatedToUser = () => {
+  const { data: tors } = useTokenOwnerRecordsForRealmQuery()
+  const wallet = useWalletOnePointOh()
+  const delagatingTors = useMemo(
+    () =>
+      tors?.filter(
+        (x) =>
+          wallet?.publicKey !== undefined &&
+          wallet?.publicKey !== null &&
+          x.account.governanceDelegate !== undefined &&
+          x.account.governanceDelegate.equals(wallet.publicKey)
+      ),
+    [tors, wallet?.publicKey]
+  )
+
+  return delagatingTors
 }
 
 /** @deprecated this hook exists for refactoring legacy code easily -- you should probably not be using it in any new code */
