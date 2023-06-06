@@ -467,6 +467,8 @@ const instructions = () => ({
         depositWeightScaleStartQuote: args.depositWeightScaleStartQuoteOpt
           ? toUiDecimals(args.depositWeightScaleStartQuoteOpt, 6)
           : '',
+        groupInsuranceFund:
+          args.groupInsuranceFundOpt !== null ? args.groupInsuranceFundOpt : '',
       }
       try {
         return (
@@ -599,6 +601,10 @@ const instructions = () => ({
                   parsedArgs.depositWeightScaleStartQuote &&
                   `$${parsedArgs.depositWeightScaleStartQuote}`
                 }
+              />
+              <DisplayProperty
+                label="Group Insurance Fund"
+                value={parsedArgs.groupInsuranceFund?.toString()}
               />
             </div>
             <h3>Raw values</h3>
