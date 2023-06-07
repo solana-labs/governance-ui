@@ -27,7 +27,6 @@ import { NFTWithMeta } from '@utils/uiTypes/VotePlugin'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import * as heliumVsrSdk from '@helium/voter-stake-registry-sdk'
 import useWalletOnePointOh from './useWalletOnePointOh'
-import { useUserCommunityTokenOwnerRecord } from './queries/tokenOwnerRecord'
 import { useRealmQuery } from './queries/realm'
 import { useRealmConfigQuery } from './queries/realmConfig'
 import useLegacyConnectionContext from './useLegacyConnectionContext'
@@ -39,12 +38,13 @@ import {
   PYTH_PLUGINS_PKS,
   SWITCHBOARD_PLUGINS_PKS,
 } from '../constants/plugins'
+import useUserOrDelegator from './useUserOrDelegator'
 
 export function useVotingPlugins() {
-  const ownTokenRecordData = useUserCommunityTokenOwnerRecord().data
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
   const currentPluginPk = config?.account.communityTokenConfig.voterWeightAddin
+  const voterPk = useUserOrDelegator()
 
   const {
     handleSetVsrRegistrar,
@@ -185,13 +185,11 @@ export function useVotingPlugins() {
         VSR_PLUGIN_PKS.includes(currentPluginPk.toBase58())
       ) {
         handleSetVsrRegistrar(vsrClient, realm)
-        if (connected) {
+        if (voterPk) {
           handleSetCurrentRealmVotingClient({
             client: vsrClient,
             realm,
-            walletPk:
-              ownTokenRecordData?.result?.account?.governingTokenOwner ||
-              wallet?.publicKey,
+            walletPk: voterPk,
           })
         }
       }
@@ -204,13 +202,11 @@ export function useVotingPlugins() {
         HELIUM_VSR_PLUGINS_PKS.includes(currentPluginPk.toBase58())
       ) {
         handleSetHeliumVsrRegistrar(heliumVsrClient, realm)
-        if (connected) {
+        if (voterPk) {
           handleSetCurrentRealmVotingClient({
             client: heliumVsrClient,
             realm,
-            walletPk:
-              ownTokenRecordData?.result?.account?.governingTokenOwner ||
-              wallet?.publicKey,
+            walletPk: voterPk,
           })
         }
       }
@@ -223,13 +219,11 @@ export function useVotingPlugins() {
         NFT_PLUGINS_PKS.includes(currentPluginPk.toBase58())
       ) {
         handleSetNftRegistrar(nftClient, realm)
-        if (connected) {
+        if (voterPk) {
           handleSetCurrentRealmVotingClient({
             client: nftClient,
             realm,
-            walletPk:
-              ownTokenRecordData?.result?.account?.governingTokenOwner ||
-              wallet?.publicKey,
+            walletPk: voterPk,
           })
         }
       }
@@ -246,11 +240,11 @@ export function useVotingPlugins() {
         GATEWAY_PLUGINS_PKS.includes(currentPluginPk.toBase58())
       ) {
         handleSetGatewayRegistrar(gatewayClient, realm)
-        if (connected) {
+        if (voterPk) {
           handleSetCurrentRealmVotingClient({
             client: gatewayClient,
             realm,
-            walletPk: wallet?.publicKey,
+            walletPk: voterPk,
           })
         }
 
@@ -264,13 +258,11 @@ export function useVotingPlugins() {
         currentPluginPk &&
         PYTH_PLUGINS_PKS.includes(currentPluginPk.toBase58())
       ) {
-        if (connected) {
+        if (voterPk) {
           handleSetCurrentRealmVotingClient({
             client: pythClient,
             realm,
-            walletPk:
-              ownTokenRecordData?.result?.account.governingTokenOwner ||
-              wallet?.publicKey,
+            walletPk: voterPk,
           })
         }
       }
@@ -294,11 +286,10 @@ export function useVotingPlugins() {
       }
     } */
     if (
-      !currentClient ||
-      currentClient.realm?.pubkey.toBase58() !== realm?.pubkey.toBase58() ||
-      (ownTokenRecordData?.result &&
-        currentClient.walletPk?.toBase58() !==
-          ownTokenRecordData.result?.account.governingTokenOwner.toBase58())
+      realm &&
+      (!currentClient ||
+        currentClient.realm?.pubkey.toBase58() !== realm.pubkey.toBase58() ||
+        (voterPk && currentClient.walletPk?.toBase58() !== voterPk.toBase58()))
     ) {
       console.log(
         'setting plugin; if this is getting spammed, this store just needs to be refactored away'
@@ -311,7 +302,6 @@ export function useVotingPlugins() {
       handlePythPlugin()
     }
   }, [
-    connected,
     currentClient,
     currentPluginPk,
     gatewayClient,
@@ -323,11 +313,10 @@ export function useVotingPlugins() {
     handleSetVsrRegistrar,
     heliumVsrClient,
     nftClient,
-    ownTokenRecordData,
+    voterPk,
     pythClient,
     realm,
     vsrClient,
-    wallet?.publicKey,
   ])
 
   const handleMaxVoterWeight = useCallback(async () => {
