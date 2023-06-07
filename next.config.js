@@ -43,7 +43,7 @@ config = withTM({
 
 // STEP 2: Enable bundle analyzer when `ANALYZE=true`.
 config = withBundleAnalyzer(config)
-
+/* 
 if (process.env.SENTRY_AUTH_TOKEN) {
   // STEP 3: Sentry error reporting. MUST COME LAST to work with sourcemaps.
   config = withSentryConfig(config, {
@@ -56,6 +56,6 @@ if (process.env.SENTRY_AUTH_TOKEN) {
     // For all available options, see:
     // https://github.com/getsentry/sentry-webpack-plugin#options.
   })
-}
+} */
 
 module.exports = config

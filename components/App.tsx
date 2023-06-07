@@ -144,13 +144,6 @@ export function AppContents(props: Props) {
     )}/favicon.ico?v=${Date.now()}`
 
   useEffect(() => {
-    const f = async () => {
-      throw new Error('test error')
-    }
-    f()
-  }, [])
-
-  useEffect(() => {
     if (
       realm &&
       config?.account.communityTokenConfig.voterWeightAddin &&
