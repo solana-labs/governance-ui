@@ -28,6 +28,7 @@ config = withTM({
   pageExtensions: ['mdx', 'md', 'jsx', 'tsx', 'api.ts'], // .ts files are not pages
 
   reactStrictMode: true,
+  productionBrowserSourceMaps: true,
 
   env: {
     MAIN_VIEW_SHOW_MAX_TOP_TOKENS_NUM:
