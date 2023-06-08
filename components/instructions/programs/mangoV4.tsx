@@ -2,12 +2,18 @@ import { MangoClient, toUiDecimals } from '@blockworks-foundation/mango-v4'
 import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
 import { AnchorProvider, BN, BorshInstructionCoder } from '@coral-xyz/anchor'
 import { Wallet } from '@marinade.finance/marinade-ts-sdk'
+import { AccountMetaData } from '@solana/spl-governance'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import {
-  ListingArgs,
+  LISTING_PRESETS,
   getFormattedListingValues,
+  getSuggestedCoinTier,
+  compareObjectsAndGetDifferentKeys,
+  ListingArgs,
+  ListingArgsFormatted,
 } from '@utils/Mango/listingTools'
 import { secondsToHours } from 'date-fns'
+import WarningFilledIcon from '@carbon/icons-react/lib/WarningFilled'
 // import { snakeCase } from 'snake-case'
 // import { sha256 } from 'js-sha256'
 
@@ -192,21 +198,48 @@ const instructions = () => ({
     ],
     getDataUI: async (
       connection: Connection,
-      data: Uint8Array
-      //accounts: AccountMetaData[]
+      data: Uint8Array,
+      accounts: AccountMetaData[]
     ) => {
       const info = await displayArgs(connection, data)
       const args = (await getDataObjectFlattened(
         connection,
         data
       )) as ListingArgs
-
+      const proposedMint = accounts[2].pubkey
       const formattedProposedArgs = getFormattedListingValues(args)
-
+      const suggestedTier = await getSuggestedCoinTier(proposedMint.toBase58())
+      const suggestedPreset = LISTING_PRESETS[suggestedTier.tier]
+      const invalidKeys: (keyof ListingArgsFormatted)[] = Object.keys(
+        suggestedPreset
+      ).length
+        ? compareObjectsAndGetDifferentKeys<ListingArgsFormatted>(
+            formattedProposedArgs,
+            getFormattedListingValues({
+              tokenIndex: args.tokenIndex,
+              name: args.name,
+              ...suggestedPreset,
+            } as ListingArgs)
+          )
+        : []
       try {
         return (
           <div>
             <div className="pb-4 space-y-3">
+              {suggestedTier.tier === 'UNTRUSTED' && (
+                <>
+                  <h3 className="text-orange flex items-center">
+                    <WarningFilledIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
+                    Suggested token tier: UNTRUSTED.
+                  </h3>
+                  <h3 className="text-orange flex">
+                    Low liquidity Price impact of {suggestedTier.priceImpact}%
+                    on $1000 swap. This token should probably be listed using
+                    the Register Trustless Token instruction check params
+                    carefully
+                  </h3>
+                </>
+              )}
               <div className="flex space-x-3">
                 <div>Token index:</div>
                 <div>{formattedProposedArgs.tokenIndex}</div>
