@@ -6,17 +6,17 @@ import {
   VoteTipping,
 } from '@solana/spl-governance';
 import type { Connection, PublicKey } from '@solana/web3.js';
+import BigNumber from 'bignumber.js';
 import BN from 'bn.js';
 
+import { fetchGovernanceAccountByPubkey } from '@hooks/queries/governanceAccount';
+import { fetchMintInfoByPubkey } from '@hooks/queries/mintInfo';
+import queryClient from '@hooks/queries/queryClient';
 import { GovernanceVoteTipping } from '@hub/types/GovernanceVoteTipping';
 
 import { MAX_NUM } from './constants';
 
 import { Rules } from './types';
-import queryClient from '@hooks/queries/queryClient';
-import { fetchGovernanceAccountByPubkey } from '@hooks/queries/governanceAccount';
-import { fetchMintInfoByPubkey } from '@hooks/queries/mintInfo';
-import BigNumber from 'bignumber.js';
 
 function hoursToSeconds(hours: number) {
   return hours * 60 * 60;
