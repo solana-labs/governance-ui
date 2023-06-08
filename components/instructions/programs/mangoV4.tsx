@@ -212,11 +212,13 @@ const instructions = () => ({
       const formattedProposedArgs = getFormattedListingValues(args)
       const suggestedTier = await getSuggestedCoinTier(proposedMint.toBase58())
       const suggestedPreset = LISTING_PRESETS[suggestedTier.tier]
-      const suggestedFormattedPreset = getFormattedListingValues({
-        tokenIndex: args.tokenIndex,
-        name: args.name,
-        ...suggestedPreset,
-      } as ListingArgs)
+      const suggestedFormattedPreset = Object.keys(suggestedPreset).length
+        ? getFormattedListingValues({
+            tokenIndex: args.tokenIndex,
+            name: args.name,
+            ...suggestedPreset,
+          } as ListingArgs)
+        : ({} as ListingArgsFormatted)
       const suggestedUntrusted = suggestedTier.tier === 'UNTRUSTED'
       const invalidKeys: (keyof ListingArgsFormatted)[] = Object.keys(
         suggestedPreset
@@ -235,7 +237,7 @@ const instructions = () => ({
         },
         {}
       )
-      const DisplayListingProp = ({
+      const DisplayListingPropertyWrapped = ({
         label,
         suggestedUntrusted,
         valKey,
@@ -249,13 +251,13 @@ const instructions = () => ({
         prefix?: string
       }) => {
         return (
-          <DisplayListingProperty
+          <DisplayListingPropertyWrapederty
             label={label}
             suggestedUntrusted={suggestedUntrusted}
             val={formattedProposedArgs[valKey]}
             suggestedVal={invalidFields[valKey]}
             suffix={suffix}
-            perfix={perfix}
+            prefix={perfix}
           />
         )
       }
@@ -281,125 +283,125 @@ const instructions = () => ({
               {!suggestedUntrusted && !invalidKeys.length && (
                 <h3 className="text-green flex items-center">
                   <CheckCircleIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
-                  Proposal match suggested token tier -{' '}
+                  Proposal params match suggested token tier -{' '}
                   {coinTiersToNames[suggestedTier.tier]}.
                 </h3>
               )}
               {!suggestedUntrusted && invalidKeys.length && (
                 <h3 className="text-orange flex items-center">
                   <WarningFilledIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
-                  Proposal do not match suggested token tier -{' '}
+                  Proposal params do not match suggested token tier -{' '}
                   {coinTiersToNames[suggestedTier.tier]} check params carefully
                 </h3>
               )}
-              <DisplayListingProp
+              <DisplayListingPropertyWrapped
                 label="Token index"
                 suggestedUntrusted={false}
                 valKey={`tokenIndex`}
               />
-              <DisplayListingProp
+              <DisplayListingPropertyWrapped
                 label="Token name"
                 suggestedUntrusted={false}
                 valKey={`tokenName`}
               />
-              <DisplayListingProp
+              <DisplayListingPropertyWrapped
                 label="Oracle Confidence Filter"
                 suggestedUntrusted={suggestedUntrusted}
                 valKey={'oracleConfidenceFilter'}
                 suffix="%"
               />
-              <DisplayListingProp
+              <DisplayListingPropertyWrapped
                 label="Oracle Max Staleness Slots"
                 suggestedUntrusted={suggestedUntrusted}
                 valKey={'oracleMaxStalenessSlots'}
               />
-              <DisplayListingProp
+              <DisplayListingPropertyWrapped
                 label="Interest rate adjustment factor"
                 suggestedUntrusted={suggestedUntrusted}
                 valKey={'adjustmentFactor'}
                 suffix="%"
               />
-              <DisplayListingProp
+              <DisplayListingPropertyWrapped
                 label="Interest rate utilization point 0"
                 suggestedUntrusted={suggestedUntrusted}
                 valKey={'interestRateUtilizationPoint0'}
                 suffix="%"
               />
-              <DisplayListingProp
+              <DisplayListingPropertyWrapped
                 label="Interest rate point 0"
                 suggestedUntrusted={suggestedUntrusted}
                 valKey={'interestRatePoint0'}
                 suffix="%"
               />
-              <DisplayListingProp
+              <DisplayListingPropertyWrapped
                 label="Interest rate utilization point 1"
                 suggestedUntrusted={suggestedUntrusted}
                 valKey={'interestRateUtilizationPoint1'}
                 suffix="%"
               />
-              <DisplayListingProp
+              <DisplayListingPropertyWrapped
                 label="Interest rate point 1"
                 suggestedUntrusted={suggestedUntrusted}
                 valKey={'interestRatePoint1'}
                 suffix="%"
               />
-              <DisplayListingProp
+              <DisplayListingPropertyWrapped
                 label="Interest rate max rate"
                 suggestedUntrusted={suggestedUntrusted}
                 valKey={'maxRate'}
                 suffix="%"
               />
-              <DisplayListingProp
+              <DisplayListingPropertyWrapped
                 label="Loan Fee Rate"
                 suggestedUntrusted={suggestedUntrusted}
                 valKey={'loanFeeRate'}
                 suffix=" bps"
               />
-              <DisplayListingProp
+              <DisplayListingPropertyWrapped
                 label="Loan Origination Fee Rate"
                 suggestedUntrusted={suggestedUntrusted}
                 valKey={'loanOriginationFeeRate'}
                 suffix=" bps"
               />
-              <DisplayListingProp
+              <DisplayListingPropertyWrapped
                 label="Maintenance Asset Weight"
                 suggestedUntrusted={suggestedUntrusted}
                 valKey={'maintAssetWeight'}
               />
-              <DisplayListingProp
+              <DisplayListingPropertyWrapped
                 label="Init Asset Weight"
                 suggestedUntrusted={suggestedUntrusted}
                 valKey={'initAssetWeight'}
               />
-              <DisplayListingProp
+              <DisplayListingPropertyWrapped
                 label="Maintenance Liab Weight"
                 suggestedUntrusted={suggestedUntrusted}
                 valKey={'maintLiabWeight'}
               />
-              <DisplayListingProp
+              <DisplayListingPropertyWrapped
                 label="Init Liab Weight"
                 suggestedUntrusted={suggestedUntrusted}
                 valKey={'initLiabWeight'}
               />
-              <DisplayListingProp
+              <DisplayListingPropertyWrapped
                 label="Liquidation Fee"
                 suggestedUntrusted={suggestedUntrusted}
                 valKey="liquidationFee"
                 suffix="%"
               />
-              <DisplayListingProp
+              <DisplayListingPropertyWrapped
                 label="Min Vault To Deposits Ratio"
                 suggestedUntrusted={suggestedUntrusted}
                 valKey="minVaultToDepositsRatio"
                 suffix="%"
               />
-              <DisplayListingProp
+              <DisplayListingPropertyWrapped
                 label="Net Borrow Limit Window Size"
                 suggestedUntrusted={suggestedUntrusted}
                 valKey="netBorrowLimitWindowSizeTs"
                 suffix="H"
               />
-              <DisplayListingProp
+              <DisplayListingPropertyWrapped
                 label="Net Borrow Limit Per Window Quote"
                 suggestedUntrusted={suggestedUntrusted}
                 valKey="netBorrowLimitPerWindowQuote"
@@ -861,20 +863,20 @@ const DisplayNullishProperty = ({ label, value }) =>
     </div>
   )
 
-const DisplayListingProperty = ({
+const DisplayListingPropertyWrapederty = ({
   label,
   suggestedUntrusted,
   val,
   suggestedVal,
   suffix,
-  perfix,
+  prefix,
 }: {
   label: string
   suggestedUntrusted: boolean
   val: any
   suggestedVal?: any
   suffix?: string
-  perfix?: string
+  prefix?: string
 }) => (
   <div className="flex space-x-3">
     <div>{label}:</div>
@@ -882,7 +884,7 @@ const DisplayListingProperty = ({
       <div
         className={`${suggestedUntrusted || suggestedVal ? 'text-orange' : ''}`}
       >
-        {perfix}
+        {prefix}
         {val}
         {suffix}
       </div>
@@ -890,7 +892,7 @@ const DisplayListingProperty = ({
       {suggestedVal && (
         <div className="text-green">
           {' '}
-          {perfix}
+          {prefix}
           {suggestedVal}
           {suffix}
         </div>
