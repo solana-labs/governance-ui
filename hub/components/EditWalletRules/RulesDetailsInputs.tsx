@@ -126,8 +126,6 @@ export function VotingPowerToCreateProposals(props: Props) {
       ? communityTokenInfo
       : councilTokenInfo;
 
-  console.log('aaa', tokenInfoQuery.data?.result);
-
   const supply = tokenInfoQuery.data?.result
     ? new BigNumber(
         tokenInfoQuery.data?.result.supply
