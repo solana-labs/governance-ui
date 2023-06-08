@@ -44,7 +44,11 @@ const useNewWalletCallback = (
     if (tokenOwnerRecord === undefined)
       throw new Error('insufficient voting power');
 
-    const config = rules2governanceConfig(rules);
+    const config = await rules2governanceConfig(
+      connection.current,
+      realm.pubkey,
+      rules,
+    );
 
     const instructions: TransactionInstruction[] = [];
 

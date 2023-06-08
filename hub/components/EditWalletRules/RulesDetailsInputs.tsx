@@ -1,6 +1,11 @@
+import { BN } from '@coral-xyz/anchor';
 import { BigNumber } from 'bignumber.js';
 import { produce } from 'immer';
 
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo';
 import { ButtonToggle } from '@hub/components/controls/ButtonToggle';
 import { Input } from '@hub/components/controls/Input';
 import { Slider } from '@hub/components/controls/Slider';
@@ -11,6 +16,8 @@ import {
 import { capitalize } from '@hub/lib/capitalize';
 import { formatNumber } from '@hub/lib/formatNumber';
 import { FormProps } from '@hub/types/FormProps';
+
+import { GovernanceTokenType } from '@hub/types/GovernanceTokenType';
 
 import { SliderValue } from './SliderValue';
 import { ValueBlock } from './ValueBlock';
@@ -111,9 +118,29 @@ export function CanVote(props: Props) {
 }
 
 export function VotingPowerToCreateProposals(props: Props) {
-  const councilPowerPercent = props.rules.votingPowerToCreateProposals
-    .dividedBy(props.rules.totalSupply)
-    .multipliedBy(100);
+  const communityTokenInfo = useRealmCommunityMintInfoQuery();
+  const councilTokenInfo = useRealmCouncilMintInfoQuery();
+
+  const tokenInfoQuery =
+    props.rules.tokenType === GovernanceTokenType.Community
+      ? communityTokenInfo
+      : councilTokenInfo;
+
+  console.log('aaa', tokenInfoQuery.data?.result);
+
+  const supply = tokenInfoQuery.data?.result
+    ? new BigNumber(
+        tokenInfoQuery.data?.result.supply
+          .div(new BN(Math.pow(10, tokenInfoQuery.data.result.decimals)))
+          .toString(),
+      )
+    : undefined;
+
+  const councilPowerPercent = supply
+    ? props.rules.votingPowerToCreateProposals
+        .dividedBy(supply)
+        .multipliedBy(100)
+    : undefined;
 
   return (
     <ValueBlock
@@ -144,8 +171,8 @@ export function VotingPowerToCreateProposals(props: Props) {
           Tokens
         </div>
       </div>
-      <div className="flex items-center justify-end">
-        {props.rules.totalSupply.isGreaterThan(0) && (
+      {councilPowerPercent && supply?.isGreaterThan(0) && (
+        <div className="flex items-center justify-end">
           <div className="mt-1 text-xs text-neutral-500">
             {councilPowerPercent.isGreaterThan(0)
               ? councilPowerPercent.isLessThan(0.01)
@@ -157,8 +184,8 @@ export function VotingPowerToCreateProposals(props: Props) {
               : 0}
             % of token supply
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </ValueBlock>
   );
 }

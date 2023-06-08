@@ -6,11 +6,7 @@ import asFindable from '@utils/queries/asFindable'
 import queryClient from './queryClient'
 
 export const governanceAccountQueryKeys = {
-  all: (cluster: string, kind: string) => [
-    cluster,
-    'Governance Account',
-    `${kind}`,
-  ],
+  all: (cluster: string, kind: string) => [cluster, `${kind}`],
   byPubkey: (cluster: string, kind: string, k: PublicKey) => [
     ...governanceAccountQueryKeys.all(cluster, kind),
     k.toString(),
@@ -53,7 +49,8 @@ export async function fetchGovernanceAccountByPubkey<
   kindLabel: string,
   pubkey: PublicKey
 ) {
-  const f = () => getGovernanceAccount(connection, pubkey, kind)
+  const f = () =>
+    asFindable(() => getGovernanceAccount(connection, pubkey, kind))()
   return queryClient.fetchQuery({
     queryKey: governanceAccountQueryKeys.byPubkey(
       connection.rpcEndpoint,

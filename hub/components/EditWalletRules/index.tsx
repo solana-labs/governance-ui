@@ -2,6 +2,7 @@ import CheckmarkIcon from '@carbon/icons-react/lib/Checkmark';
 import ChevronLeftIcon from '@carbon/icons-react/lib/ChevronLeft';
 import EditIcon from '@carbon/icons-react/lib/Edit';
 import { createInstructionData } from '@solana/spl-governance';
+import { useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { BigNumber } from 'bignumber.js';
 import { hoursToSeconds, secondsToHours } from 'date-fns';
@@ -65,6 +66,7 @@ export function EditWalletRules(props: Props) {
   const { propose } = useCreateProposal();
   const realm = useRealmQuery().data?.result;
   const { symbol } = useRealm();
+  const { connection } = useConnection();
 
   const [result] = useQuery(gql.getGovernanceRulesResp, {
     query: gql.getGovernanceRules,
@@ -87,12 +89,12 @@ export function EditWalletRules(props: Props) {
     canVeto: false,
     canVote: false,
     quorumPercent: 1,
+    tokenType: GovernanceTokenType.Community,
     // this isn't a valid value, but it's just to satisfy the types for the
     // default initialized value
-    tokenMintAddress: props.governanceAddress,
-    tokenMintDecimals: new BigNumber(0),
-    tokenType: GovernanceTokenType.Community,
-    totalSupply: new BigNumber(1),
+    //tokenMintAddress: props.governanceAddress,
+    //tokenMintDecimals: new BigNumber(0),
+    //totalSupply: new BigNumber(1),
     vetoQuorumPercent: 100,
     voteTipping: GovernanceVoteTipping.Disabled,
     votingPowerToCreateProposals: new BigNumber(1),
@@ -311,10 +313,12 @@ export function EditWalletRules(props: Props) {
 
                           setSubmitting(true);
 
-                          const instruction = createTransaction(
+                          const instruction = await createTransaction(
+                            connection,
                             realm.owner,
                             governance.version,
                             governance.governanceAddress,
+                            realm.pubkey,
                             {
                               coolOffHours,
                               depositExemptProposalCount,
