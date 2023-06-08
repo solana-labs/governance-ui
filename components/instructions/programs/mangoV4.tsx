@@ -11,9 +11,11 @@ import {
   compareObjectsAndGetDifferentKeys,
   ListingArgs,
   ListingArgsFormatted,
+  coinTiersToNames,
 } from '@utils/Mango/listingTools'
 import { secondsToHours } from 'date-fns'
 import WarningFilledIcon from '@carbon/icons-react/lib/WarningFilled'
+import { CheckCircleIcon } from '@heroicons/react/solid'
 // import { snakeCase } from 'snake-case'
 // import { sha256 } from 'js-sha256'
 
@@ -210,120 +212,199 @@ const instructions = () => ({
       const formattedProposedArgs = getFormattedListingValues(args)
       const suggestedTier = await getSuggestedCoinTier(proposedMint.toBase58())
       const suggestedPreset = LISTING_PRESETS[suggestedTier.tier]
+      const suggestedFormattedPreset = getFormattedListingValues({
+        tokenIndex: args.tokenIndex,
+        name: args.name,
+        ...suggestedPreset,
+      } as ListingArgs)
+      const suggestedUntrusted = suggestedTier.tier === 'UNTRUSTED'
       const invalidKeys: (keyof ListingArgsFormatted)[] = Object.keys(
         suggestedPreset
       ).length
         ? compareObjectsAndGetDifferentKeys<ListingArgsFormatted>(
             formattedProposedArgs,
-            getFormattedListingValues({
-              tokenIndex: args.tokenIndex,
-              name: args.name,
-              ...suggestedPreset,
-            } as ListingArgs)
+            suggestedFormattedPreset
           )
         : []
+      const invalidFields: Partial<ListingArgsFormatted> = invalidKeys.reduce(
+        (obj, key) => {
+          return {
+            ...obj,
+            [key]: suggestedFormattedPreset[key],
+          }
+        },
+        {}
+      )
+      const DisplayListingProp = ({
+        label,
+        suggestedUntrusted,
+        valKey,
+        suffix,
+        prefix: perfix,
+      }: {
+        label: string
+        suggestedUntrusted: boolean
+        valKey: string
+        suffix?: string
+        prefix?: string
+      }) => {
+        return (
+          <DisplayListingProperty
+            label={label}
+            suggestedUntrusted={suggestedUntrusted}
+            val={formattedProposedArgs[valKey]}
+            suggestedVal={invalidFields[valKey]}
+            suffix={suffix}
+            perfix={perfix}
+          />
+        )
+      }
+
       try {
         return (
           <div>
             <div className="pb-4 space-y-3">
-              {suggestedTier.tier === 'UNTRUSTED' && (
+              {suggestedUntrusted && (
                 <>
                   <h3 className="text-orange flex items-center">
                     <WarningFilledIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
                     Suggested token tier: UNTRUSTED.
                   </h3>
                   <h3 className="text-orange flex">
-                    Low liquidity Price impact of {suggestedTier.priceImpact}%
-                    on $1000 swap. This token should probably be listed using
-                    the Register Trustless Token instruction check params
-                    carefully
+                    Very low liquidity Price impact of{' '}
+                    {suggestedTier.priceImpact}% on $1000 swap. This token
+                    should probably be listed using the Register Trustless Token
+                    instruction check params carefully
                   </h3>
                 </>
               )}
-              <div className="flex space-x-3">
-                <div>Token index:</div>
-                <div>{formattedProposedArgs.tokenIndex}</div>
-              </div>
-              <div className="flex space-x-3">
-                <div>Token name:</div>
-                <div>{formattedProposedArgs.tokenName}</div>
-              </div>
-              <div className="flex space-x-3">
-                <div>Oracle Confidence Filter:</div>
-                <div>{formattedProposedArgs.oracleConfidenceFilter}%</div>
-              </div>
-              <div className="flex space-x-3">
-                <div>Oracle Max Staleness Slots:</div>
-                <div>{formattedProposedArgs.oracleMaxStalenessSlots}</div>
-              </div>
-              <div className="flex space-x-3">
-                <div>Interest rate adjustment factor:</div>
-                <div>{formattedProposedArgs.adjustmentFactor}%</div>
-              </div>
-              <div className="flex space-x-3">
-                <div>Interest rate utilization point 0:</div>
-                <div>
-                  {formattedProposedArgs.interestRateUtilizationPoint0}%
-                </div>
-              </div>
-              <div className="flex space-x-3">
-                <div>Interest rate point 0:</div>
-                <div>{formattedProposedArgs.interestRatePoint0}%</div>
-              </div>
-              <div className="flex space-x-3">
-                <div>Interest rate utilization point 1:</div>
-                <div>
-                  {formattedProposedArgs.interestRateUtilizationPoint1}%
-                </div>
-              </div>
-              <div className="flex space-x-3">
-                <div>Interest rate point 1:</div>
-                <div>{formattedProposedArgs.interestRatePoint1}%</div>
-              </div>
-              <div className="flex space-x-3">
-                <div>Interest rate max rate:</div>
-                <div>{formattedProposedArgs.maxRate}%</div>
-              </div>
-              <div className="flex space-x-3">
-                <div>Loan Fee Rate:</div>
-                <div>{formattedProposedArgs.loanFeeRate} bps</div>
-              </div>
-              <div className="flex space-x-3">
-                <div>Loan Origination Fee Rate:</div>
-                <div>{formattedProposedArgs.loanOriginationFeeRate} bps</div>
-              </div>
-              <div className="flex space-x-3">
-                <div>Maintenance Asset Weight:</div>
-                <div>{formattedProposedArgs.maintAssetWeight}</div>
-              </div>
-              <div className="flex space-x-3">
-                <div>Init Asset Weight:</div>
-                <div>{formattedProposedArgs.initAssetWeight}</div>
-              </div>
-              <div className="flex space-x-3">
-                <div>Maintenance Liab Weight:</div>
-                <div>{formattedProposedArgs.maintLiabWeight}</div>
-              </div>
-              <div className="flex space-x-3">
-                <div>Init Liab Weight:</div>
-                <div>{formattedProposedArgs.initLiabWeight}</div>
-              </div>
-              <div className="flex space-x-3">
-                <div>Liquidation Fee:</div>
-                <div>{formattedProposedArgs.liquidationFee}%</div>
-              </div>
-              <div className="flex space-x-3">
-                <div>Min Vault To Deposits Ratio:</div>
-                <div>{formattedProposedArgs.minVaultToDepositsRatio}%</div>
-              </div>
-              <div className="flex space-x-3">
-                <div>Net Borrow Limit Window Size:</div>
-                <div>{formattedProposedArgs.netBorrowLimitWindowSizeTs}H</div>
-              </div>
-              <div className="flex space-x-3">
-                <div>Net Borrow Limit Per Window Quote:</div>
-                <div>${formattedProposedArgs.netBorrowLimitPerWindowQuote}</div>
-              </div>
+              {!suggestedUntrusted && !invalidKeys.length && (
+                <h3 className="text-green flex items-center">
+                  <CheckCircleIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
+                  Proposal match suggested token tier -{' '}
+                  {coinTiersToNames[suggestedTier.tier]}.
+                </h3>
+              )}
+              {!suggestedUntrusted && invalidKeys.length && (
+                <h3 className="text-orange flex items-center">
+                  <WarningFilledIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
+                  Proposal do not match suggested token tier -{' '}
+                  {coinTiersToNames[suggestedTier.tier]} check params carefully
+                </h3>
+              )}
+              <DisplayListingProp
+                label="Token index"
+                suggestedUntrusted={false}
+                valKey={`tokenIndex`}
+              />
+              <DisplayListingProp
+                label="Token name"
+                suggestedUntrusted={false}
+                valKey={`tokenName`}
+              />
+              <DisplayListingProp
+                label="Oracle Confidence Filter"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey={'oracleConfidenceFilter'}
+                suffix="%"
+              />
+              <DisplayListingProp
+                label="Oracle Max Staleness Slots"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey={'oracleMaxStalenessSlots'}
+              />
+              <DisplayListingProp
+                label="Interest rate adjustment factor"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey={'adjustmentFactor'}
+                suffix="%"
+              />
+              <DisplayListingProp
+                label="Interest rate utilization point 0"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey={'interestRateUtilizationPoint0'}
+                suffix="%"
+              />
+              <DisplayListingProp
+                label="Interest rate point 0"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey={'interestRatePoint0'}
+                suffix="%"
+              />
+              <DisplayListingProp
+                label="Interest rate utilization point 1"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey={'interestRateUtilizationPoint1'}
+                suffix="%"
+              />
+              <DisplayListingProp
+                label="Interest rate point 1"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey={'interestRatePoint1'}
+                suffix="%"
+              />
+              <DisplayListingProp
+                label="Interest rate max rate"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey={'maxRate'}
+                suffix="%"
+              />
+              <DisplayListingProp
+                label="Loan Fee Rate"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey={'loanFeeRate'}
+                suffix=" bps"
+              />
+              <DisplayListingProp
+                label="Loan Origination Fee Rate"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey={'loanOriginationFeeRate'}
+                suffix=" bps"
+              />
+              <DisplayListingProp
+                label="Maintenance Asset Weight"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey={'maintAssetWeight'}
+              />
+              <DisplayListingProp
+                label="Init Asset Weight"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey={'initAssetWeight'}
+              />
+              <DisplayListingProp
+                label="Maintenance Liab Weight"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey={'maintLiabWeight'}
+              />
+              <DisplayListingProp
+                label="Init Liab Weight"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey={'initLiabWeight'}
+              />
+              <DisplayListingProp
+                label="Liquidation Fee"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey="liquidationFee"
+                suffix="%"
+              />
+              <DisplayListingProp
+                label="Min Vault To Deposits Ratio"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey="minVaultToDepositsRatio"
+                suffix="%"
+              />
+              <DisplayListingProp
+                label="Net Borrow Limit Window Size"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey="netBorrowLimitWindowSizeTs"
+                suffix="H"
+              />
+              <DisplayListingProp
+                label="Net Borrow Limit Per Window Quote"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey="netBorrowLimitPerWindowQuote"
+                prefix="$"
+              />
             </div>
             <AdvancedOptionsDropdown className="mt-4" title="Raw values">
               <div>{info}</div>
@@ -482,135 +563,135 @@ const instructions = () => ({
         return (
           <div>
             <div className="border-b mb-4 pb-4 space-y-3">
-              <DisplayProperty
+              <DisplayNullishProperty
                 label="Token index"
                 value={parsedArgs.tokenIndex}
               />
-              <DisplayProperty
+              <DisplayNullishProperty
                 label="Token name"
                 value={parsedArgs.tokenName}
               />
-              <DisplayProperty
+              <DisplayNullishProperty
                 label="Oracle Confidence Filter"
                 value={
                   parsedArgs.oracleConfidenceFilter &&
                   `${parsedArgs.oracleConfidenceFilter}%`
                 }
               />
-              <DisplayProperty
+              <DisplayNullishProperty
                 label="Oracle Max Staleness Slots"
                 value={parsedArgs.oracleMaxStalenessSlots}
               />
-              <DisplayProperty
+              <DisplayNullishProperty
                 label="Interest rate adjustment factor"
                 value={
                   parsedArgs.adjustmentFactor &&
                   `${parsedArgs.adjustmentFactor}%`
                 }
               />
-              <DisplayProperty
+              <DisplayNullishProperty
                 label="Interest rate utilization point 0"
                 value={
                   parsedArgs.interestRateUtilizationPoint0 &&
                   `${parsedArgs.interestRateUtilizationPoint0}%`
                 }
               />
-              <DisplayProperty
+              <DisplayNullishProperty
                 label="Interest rate point 0"
                 value={
                   parsedArgs.interestRatePoint0 &&
                   `${parsedArgs.interestRatePoint0}%`
                 }
               />
-              <DisplayProperty
+              <DisplayNullishProperty
                 label="Interest rate utilization point 1"
                 value={
                   parsedArgs.interestRateUtilizationPoint1 &&
                   `${parsedArgs.interestRateUtilizationPoint1}%`
                 }
               />
-              <DisplayProperty
+              <DisplayNullishProperty
                 label="Interest rate point 1"
                 value={
                   parsedArgs.interestRatePoint1 &&
                   `${parsedArgs.interestRatePoint1}%`
                 }
               />
-              <DisplayProperty
+              <DisplayNullishProperty
                 label="Interest rate max rate"
                 value={parsedArgs.maxRate && `${parsedArgs.maxRate}%`}
               />
-              <DisplayProperty
+              <DisplayNullishProperty
                 label="Loan Fee Rate"
                 value={
                   parsedArgs.loanFeeRate && `${parsedArgs.loanFeeRate} bps`
                 }
               />
-              <DisplayProperty
+              <DisplayNullishProperty
                 label="Loan Origination Fee Rate"
                 value={
                   parsedArgs.loanOriginationFeeRate &&
                   `${parsedArgs.loanOriginationFeeRate} bps`
                 }
               />
-              <DisplayProperty
+              <DisplayNullishProperty
                 label="Maintenance Asset Weight"
                 value={parsedArgs.maintAssetWeight}
               />
-              <DisplayProperty
+              <DisplayNullishProperty
                 label="Init Asset Weight"
                 value={parsedArgs.initAssetWeight}
               />
-              <DisplayProperty
+              <DisplayNullishProperty
                 label="Maintenance Liab Weight"
                 value={parsedArgs.maintLiabWeight}
               />
-              <DisplayProperty
+              <DisplayNullishProperty
                 label="Init Liab Weight"
                 value={parsedArgs.initLiabWeight}
               />
-              <DisplayProperty
+              <DisplayNullishProperty
                 label="Liquidation Fee"
                 value={
                   parsedArgs.liquidationFee && `${parsedArgs.liquidationFee}%`
                 }
               />
-              <DisplayProperty
+              <DisplayNullishProperty
                 label="Min Vault To Deposits Ratio"
                 value={
                   parsedArgs.minVaultToDepositsRatio &&
                   `${parsedArgs.minVaultToDepositsRatio}%`
                 }
               />
-              <DisplayProperty
+              <DisplayNullishProperty
                 label="Net Borrow Limit Window Size"
                 value={
                   parsedArgs.netBorrowLimitWindowSizeTs &&
                   `${parsedArgs.netBorrowLimitWindowSizeTs}H`
                 }
               />
-              <DisplayProperty
+              <DisplayNullishProperty
                 label="Net Borrow Limit Per Window Quote"
                 value={
                   parsedArgs.netBorrowLimitPerWindowQuote &&
                   `$${parsedArgs.netBorrowLimitPerWindowQuote}`
                 }
               />
-              <DisplayProperty
+              <DisplayNullishProperty
                 label="Borrow Weight Scale Start Quote"
                 value={
                   parsedArgs.borrowWeightScaleStartQuote &&
                   `$${parsedArgs.borrowWeightScaleStartQuote}`
                 }
               />
-              <DisplayProperty
+              <DisplayNullishProperty
                 label="Deposit Weight Scale Start Quote"
                 value={
                   parsedArgs.depositWeightScaleStartQuote &&
                   `$${parsedArgs.depositWeightScaleStartQuote}`
                 }
               />
-              <DisplayProperty
+              <DisplayNullishProperty
                 label="Group Insurance Fund"
                 value={parsedArgs.groupInsuranceFund?.toString()}
               />
@@ -772,13 +853,51 @@ function commify(n) {
 }
 
 // Define the reusable component
-const DisplayProperty = ({ label, value }) =>
+const DisplayNullishProperty = ({ label, value }) =>
   value && (
     <div className="flex space-x-3">
       <div>{label}:</div>
       <div>{value}</div>
     </div>
   )
+
+const DisplayListingProperty = ({
+  label,
+  suggestedUntrusted,
+  val,
+  suggestedVal,
+  suffix,
+  perfix,
+}: {
+  label: string
+  suggestedUntrusted: boolean
+  val: any
+  suggestedVal?: any
+  suffix?: string
+  perfix?: string
+}) => (
+  <div className="flex space-x-3">
+    <div>{label}:</div>
+    <div className="flex">
+      <div
+        className={`${suggestedUntrusted || suggestedVal ? 'text-orange' : ''}`}
+      >
+        {perfix}
+        {val}
+        {suffix}
+      </div>
+      {suggestedVal && <div className="mx-1">/</div>}
+      {suggestedVal && (
+        <div className="text-green">
+          {' '}
+          {perfix}
+          {suggestedVal}
+          {suffix}
+        </div>
+      )}
+    </div>
+  </div>
+)
 
 //need yarn add js-sha256 snakeCase
 // function sighash(nameSpace: string, ixName: string): Buffer {

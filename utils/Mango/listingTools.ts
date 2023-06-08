@@ -56,7 +56,6 @@ export type ListingArgsFormatted = {
 }
 
 export const getFormattedListingValues = (args: ListingArgs) => {
-  console.log(args)
   const formattedArgs: ListingArgsFormatted = {
     tokenIndex: args.tokenIndex,
     tokenName: args.name,
@@ -185,7 +184,7 @@ export const coinTiersToNames: {
   [key in LISTING_PRESETS_KEYS]: string
 } = {
   PREMIUM: 'Blue Chip',
-  MID: 'Mid-wit',
+  MID: 'Midwit',
   MEME: 'Meme',
   SHIT: 'Shit Coin',
   UNTRUSTED: 'Untrusted',
