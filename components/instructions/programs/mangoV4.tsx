@@ -854,7 +854,6 @@ function commify(n) {
   return n
 }
 
-// Define the reusable component
 const DisplayNullishProperty = ({ label, value }) =>
   value && (
     <div className="flex space-x-3">
