@@ -52,11 +52,6 @@ const configs2defaults = (configs: GovernanceConfig[]) => {
         highestMinCommunityTokensToCreateProposal.toString(),
       ),
       tokenType: GovernanceTokenType.Community,
-      // START totally fake dummy values 💀
-      //tokenMintAddress: new PublicKey(0),
-      //tokenMintDecimals: new BigNumber(0),
-      //totalSupply: new BigNumber(1),
-      // END
       canVeto: false,
       vetoQuorumPercent: 60,
       canVote: enableCommunityVote,
@@ -71,11 +66,6 @@ const configs2defaults = (configs: GovernanceConfig[]) => {
         highestMinCouncilTokensToCreateProposal.toString(),
       ),
       tokenType: GovernanceTokenType.Council,
-      // START totally fake dummy values 💀
-      //tokenMintAddress: new PublicKey(0),
-      //tokenMintDecimals: new BigNumber(0),
-      //totalSupply: new BigNumber(1),
-      // END
       canVeto: enableCouncilVetoVote,
       vetoQuorumPercent: 60,
       canVote: enableCouncilVote,
