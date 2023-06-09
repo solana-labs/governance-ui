@@ -3,8 +3,15 @@ import {
   toNative,
   toUiDecimals,
 } from '@blockworks-foundation/mango-v4'
+import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
 import { MAINNET_USDC_MINT } from '@foresight-tmp/foresight-sdk/dist/consts'
+import { PythHttpClient } from '@pythnetwork/client'
+import { Connection, Keypair, PublicKey, Transaction } from '@solana/web3.js'
 import { secondsToHours } from 'date-fns'
+
+export const MAINNET_PYTH_PROGRAM = new PublicKey(
+  'FsJ3A3u2vn5cTVofAjvy6y5kwABJAqYWpe4975bi2epH'
+)
 
 export type ListingArgs = {
   name: string
@@ -274,4 +281,89 @@ export const compareObjectsAndGetDifferentKeys = <T extends object>(
   })
 
   return diffKeys as (keyof T)[]
+}
+
+export const isSwitchboardOracle = async (
+  connection: Connection,
+  feedPk: PublicKey
+) => {
+  const SWITCHBOARD_PROGRAM_ID = 'SW1TCH7qEPTdLsDHRgPuMQjbQxKdH2aBStViMFnt64f'
+
+  const options = AnchorProvider.defaultOptions()
+  const provider = new AnchorProvider(
+    connection,
+    new EmptyWallet(Keypair.generate()),
+    options
+  )
+  const idl = await Program.fetchIdl(
+    new PublicKey(SWITCHBOARD_PROGRAM_ID),
+    provider
+  )
+  const switchboardProgram = new Program(
+    idl!,
+    new PublicKey(SWITCHBOARD_PROGRAM_ID),
+    provider
+  )
+  const feeds = await switchboardProgram.account.aggregatorAccountData.all()
+  const feed = feeds.find((x) => x.publicKey.equals(feedPk))
+  return feed
+    ? `https://app.switchboard.xyz/solana/mainnet-beta/feed/${feedPk.toBase58()}`
+    : ''
+}
+
+export const isPythOracle = async (
+  connection: Connection,
+  feedPk: PublicKey
+) => {
+  const pythClient = new PythHttpClient(connection, MAINNET_PYTH_PROGRAM)
+  const pythAccounts = await pythClient.getData()
+  const feed = pythAccounts.products.find(
+    (x) => x.price_account === feedPk.toBase58()
+  )
+
+  if (feed) {
+    return `https://pyth.network/price-feeds/${feed.asset_type.toLowerCase()}-${feed.base.toLowerCase()}-${feed.quote_currency.toLowerCase()}?cluster=mainnet-beta`
+  }
+  return ''
+}
+
+export const getOracle = async (connection: Connection, feedPk: PublicKey) => {
+  const switchboardUrl = await isSwitchboardOracle(connection, feedPk)
+  if (switchboardUrl) {
+    return {
+      type: 'Switchboard',
+      url: switchboardUrl,
+    }
+  }
+  const pythUrl = await isPythOracle(connection, feedPk)
+  if (pythUrl) {
+    return {
+      type: 'Pyth',
+      url: pythUrl,
+    }
+  }
+  return {
+    type: 'Unknown',
+    url: '',
+  }
+}
+
+export default class EmptyWallet implements Wallet {
+  constructor(readonly payer: Keypair) {}
+
+  async signTransaction(tx: Transaction): Promise<Transaction> {
+    tx.partialSign(this.payer)
+    return tx
+  }
+
+  async signAllTransactions(txs: Transaction[]): Promise<Transaction[]> {
+    return txs.map((t) => {
+      t.partialSign(this.payer)
+      return t
+    })
+  }
+
+  get publicKey(): PublicKey {
+    return this.payer.publicKey
+  }
 }

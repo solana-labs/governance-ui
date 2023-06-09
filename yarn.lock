@@ -3240,6 +3240,15 @@
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
   integrity sha512-Vvn3zZrhQZkkBE8LSuW3em98c0FwgO4nxzv6OdSxPKJIEKY2bGbHn+mhGIPerzI4twdxaP8/0+06HBpwf345Lw==
 
+"@pythnetwork/client@2.17.0":
+  version "2.17.0"
+  resolved "https://registry.yarnpkg.com/@pythnetwork/client/-/client-2.17.0.tgz#b155af06958f4b729bfee1c07130c556598cf168"
+  integrity sha512-hv285vehmLH6N762Z4jqvPTM+hCYnXQaUp6DMgLUpDHvE0mTbwW9PvlxYoUJZGtyeCDkgn9HrTWXPtnaXTRr+Q==
+  dependencies:
+    "@coral-xyz/anchor" "^0.26.0"
+    "@coral-xyz/borsh" "^0.26.0"
+    buffer "^6.0.1"
+
 "@pythnetwork/client@^2.5.1", "@pythnetwork/client@~2.14.0":
   version "2.14.0"
   resolved "https://registry.yarnpkg.com/@pythnetwork/client/-/client-2.14.0.tgz#0c12a7e1bcc66ff198fdb64c003b8d4a24431efc"

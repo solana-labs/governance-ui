@@ -12,6 +12,7 @@ import {
   ListingArgs,
   ListingArgsFormatted,
   coinTiersToNames,
+  getOracle,
 } from '@utils/Mango/listingTools'
 import { secondsToHours } from 'date-fns'
 import WarningFilledIcon from '@carbon/icons-react/lib/WarningFilled'
@@ -203,15 +204,18 @@ const instructions = () => ({
       data: Uint8Array,
       accounts: AccountMetaData[]
     ) => {
-      const info = await displayArgs(connection, data)
-      const args = (await getDataObjectFlattened(
-        connection,
-        data
-      )) as ListingArgs
       const proposedMint = accounts[2].pubkey
+      const oracle = accounts[6].pubkey
+
+      const [info, proposedOracle, suggestedTier, args] = await Promise.all([
+        displayArgs(connection, data),
+        getOracle(connection, oracle),
+        getSuggestedCoinTier(proposedMint.toBase58()),
+        getDataObjectFlattened<ListingArgs>(connection, data),
+      ])
       const formattedProposedArgs = getFormattedListingValues(args)
-      const suggestedTier = await getSuggestedCoinTier(proposedMint.toBase58())
       const suggestedPreset = LISTING_PRESETS[suggestedTier.tier]
+
       const suggestedFormattedPreset = Object.keys(suggestedPreset).length
         ? getFormattedListingValues({
             tokenIndex: args.tokenIndex,
@@ -294,6 +298,28 @@ const instructions = () => ({
                   {coinTiersToNames[suggestedTier.tier]} check params carefully
                 </h3>
               )}
+              <div
+                className={`py-4 ${
+                  proposedOracle.type === 'Unknown' ? 'text-red' : ''
+                }`}
+              >
+                Oracle provider: {proposedOracle.type}{' '}
+                {proposedOracle.url && (
+                  <>
+                    {' '}
+                    -{' '}
+                    <a
+                      className="underline"
+                      target="_blank"
+                      href={proposedOracle.url}
+                      rel="noreferrer"
+                    >
+                      Link
+                    </a>
+                  </>
+                )}
+              </div>
+
               <DisplayListingPropertyWrapped
                 label="Token index"
                 suggestedUntrusted={false}
@@ -434,12 +460,27 @@ const instructions = () => ({
     ],
     getDataUI: async (
       connection: Connection,
-      data: Uint8Array
-      //accounts: AccountMetaData[]
+      data: Uint8Array,
+      accounts: AccountMetaData[]
     ) => {
       const info = await displayArgs(connection, data)
+      const openbookMarketPk = accounts[3].pubkey
       try {
-        return <div>{info}</div>
+        return (
+          <div>
+            <div className="py-3">
+              <a
+                className="underline"
+                target="_blank"
+                href={`https://openserum.io/${openbookMarketPk.toBase58()}`}
+                rel="noreferrer"
+              >
+                Openbook market link
+              </a>
+            </div>
+            {info}
+          </div>
+        )
       } catch (e) {
         console.log(e)
         return <div>{JSON.stringify(data)}</div>
@@ -774,10 +815,10 @@ const getClient = async (connection: Connection) => {
   return client
 }
 
-const getDataObjectFlattened = async (
+async function getDataObjectFlattened<T>(
   connection: Connection,
   data: Uint8Array
-) => {
+) {
   const client = await getClient(connection)
   const decodedInstructionData = new BorshInstructionCoder(
     client.program.idl
@@ -812,11 +853,11 @@ const getDataObjectFlattened = async (
       }
     }
   }
-  return args
+  return args as T
 }
 
 const displayArgs = async (connection: Connection, data: Uint8Array) => {
-  const args = await getDataObjectFlattened(connection, data)
+  const args = await getDataObjectFlattened<any>(connection, data)
   return (
     <div className="space-y-3">
       {Object.keys(args)
