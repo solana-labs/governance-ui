@@ -309,7 +309,7 @@ const instructions = () => ({
                     {' '}
                     -{' '}
                     <a
-                      className="underline"
+                      className="underline mr-2"
                       target="_blank"
                       href={proposedOracle.url}
                       rel="noreferrer"
@@ -318,6 +318,14 @@ const instructions = () => ({
                     </a>
                   </>
                 )}
+                {proposedOracle.type === 'Switchboard' &&
+                  (suggestedTier.tier === 'PREMIUM' ||
+                    suggestedTier.tier === 'MID') && (
+                    <span className="text-orange">
+                      Midwit or Bluechip tokens should be listed with pyth
+                      oracle
+                    </span>
+                  )}
               </div>
 
               <DisplayListingPropertyWrapped
