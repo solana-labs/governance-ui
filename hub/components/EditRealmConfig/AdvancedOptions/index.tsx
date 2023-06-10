@@ -11,7 +11,7 @@ import { clamp } from 'ramda';
 import { useEffect } from 'react';
 
 import { Config } from '../fetchConfig';
-import { ButtonToggle } from '@hub/components/controls/ButtonToggle';
+import { ButtonToggle } from '@components/core/controls/ButtonToggle';
 import { Input } from '@hub/components/controls/Input';
 import { SectionBlock } from '@hub/components/EditWalletRules/SectionBlock';
 import { SectionHeader } from '@hub/components/EditWalletRules/SectionHeader';

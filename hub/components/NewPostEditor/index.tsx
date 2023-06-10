@@ -6,7 +6,7 @@ import { TypeOf } from 'io-ts';
 import { useState } from 'react';
 import { CombinedError } from 'urql';
 
-import * as Button from '@hub/components/controls/Button';
+import * as Button from '@components/core/controls/Button';
 import { RichTextEditor } from '@hub/components/controls/RichTextEditor';
 // import { RealmIcon } from '@hub/components/RealmIcon';
 import { RealmSelector } from '@hub/components/RealmSelector';

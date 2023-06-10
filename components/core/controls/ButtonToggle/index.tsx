@@ -1,17 +1,17 @@
-import RadioButtonIcon from '@carbon/icons-react/lib/RadioButton';
-import RadioButtonCheckedIcon from '@carbon/icons-react/lib/RadioButtonChecked';
+import RadioButtonIcon from '@carbon/icons-react/lib/RadioButton'
+import RadioButtonCheckedIcon from '@carbon/icons-react/lib/RadioButtonChecked'
 
-import * as Button from '@hub/components/controls/Button';
-import cx from '@hub/lib/cx';
+import * as Button from '@components/core/controls/Button'
+import cx from '@hub/lib/cx'
 
 interface Props {
-  className?: string;
-  value: boolean;
-  valueFalseText: string;
-  valueTrueText: string;
-  disableValueTrue?: boolean;
-  disableValueFalse?: boolean;
-  onChange?(value: boolean): void;
+  className?: string
+  value: boolean
+  valueFalseText: string
+  valueTrueText: string
+  disableValueTrue?: boolean
+  disableValueFalse?: boolean
+  onChange?(value: boolean): void
 }
 
 export function ButtonToggle(props: Props) {
@@ -56,10 +56,10 @@ export function ButtonToggle(props: Props) {
         </Button.SecondaryAlt>
       )}
     </div>
-  );
+  )
 }
 
 ButtonToggle.defaultProps = {
   valueFalseText: 'No',
   valueTrueText: 'Yes',
-};
+}

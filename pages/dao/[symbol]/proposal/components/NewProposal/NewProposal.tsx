@@ -18,7 +18,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/solid'
 // import useQueryContext from '@hooks/useQueryContext'
 // import useRealm from '@hooks/useRealm'
 // import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-// import { Primary, Secondary } from '@hub/components/controls/Button'
+// import { Primary, Secondary } from '@components/core/controls/Button'
 // import cx from '@hub/lib/cx'
 
 // import useGovernanceDefaults from './useGovernanceDefaults'

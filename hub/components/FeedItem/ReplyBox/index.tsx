@@ -3,7 +3,7 @@ import { pipe } from 'fp-ts/function';
 import { useState } from 'react';
 
 import { AuthorAvatar } from '@hub/components/AuthorAvatar';
-import * as Button from '@hub/components/controls/Button';
+import * as Button from '@components/core/controls/Button';
 import { RichTextEditor } from '@hub/components/controls/RichTextEditor';
 import { useMutation } from '@hub/hooks/useMutation';
 import { useQuery } from '@hub/hooks/useQuery';

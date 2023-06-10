@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { FieldDescription } from '../common/FieldDescription';
 import { FieldHeader } from '../common/FieldHeader';
 import { FieldIconPreview } from '../common/FieldIconPreview';
-import { SecondaryRed } from '@hub/components/controls/Button';
+import { SecondaryRed } from '@components/core/controls/Button';
 import { Input } from '@hub/components/controls/Input';
 
 interface Props {

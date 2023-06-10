@@ -11,7 +11,7 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import { RealmCircle } from '@hub/components/branding/RealmCircle';
-import * as Button from '@hub/components/controls/Button';
+import * as Button from '@components/core/controls/Button';
 import * as Dialog from '@hub/components/controls/Dialog';
 import { Input } from '@hub/components/controls/Input';
 import * as Radio from '@hub/components/controls/Radio';

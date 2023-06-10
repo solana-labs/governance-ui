@@ -6,7 +6,7 @@ import { produce } from 'immer';
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
 
-import * as Button from '@hub/components/controls/Button';
+import * as Button from '@components/core/controls/Button';
 import { Input } from '@hub/components/controls/Input';
 import { useMutation } from '@hub/hooks/useMutation';
 import { useQuery } from '@hub/hooks/useQuery';

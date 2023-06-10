@@ -4,7 +4,7 @@ import { Connection, PublicKey } from '@solana/web3.js';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { useEffect, useRef, useState } from 'react';
 
-import * as Button from '@hub/components/controls/Button';
+import * as Button from '@components/core/controls/Button';
 
 import { DataFetch } from './DataFetch';
 import { Logger, Logs } from './Logs';

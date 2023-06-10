@@ -11,7 +11,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
-import { Primary, Secondary } from '@hub/components/controls/Button';
+import { Primary, Secondary } from '@components/core/controls/Button';
 import { FaqOutline as FaqIcon } from '@hub/components/icons/FaqOutline';
 import { useQuery } from '@hub/hooks/useQuery';
 import cx from '@hub/lib/cx';

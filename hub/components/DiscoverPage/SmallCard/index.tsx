@@ -5,7 +5,7 @@ import { pipe } from 'fp-ts/lib/function';
 import Link from 'next/link';
 import { cloneElement } from 'react';
 
-import * as Button from '@hub/components/controls/Button';
+import * as Button from '@components/core/controls/Button';
 import { Tooltip } from '@hub/components/controls/Tooltip';
 import { Twitter as TwitterIcon } from '@hub/components/icons/Twitter';
 import { getCategoryIcon, getCategoryName } from '@hub/components/OrgCategory';

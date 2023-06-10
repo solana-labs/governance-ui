@@ -6,7 +6,7 @@ import { PublicKey } from '@solana/web3.js';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
-import * as Button from '@hub/components/controls/Button';
+import * as Button from '@components/core/controls/Button';
 import * as Dialog from '@hub/components/controls/Dialog';
 import { Select } from '@hub/components/controls/Select';
 import { NewPostEditor } from '@hub/components/NewPostEditor';

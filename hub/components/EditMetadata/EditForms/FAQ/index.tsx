@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 import { FieldHeader } from '../common/FieldHeader';
 import { FieldRichTextEditor } from '../common/FieldRichTextEditor';
-import { SecondaryRed } from '@hub/components/controls/Button';
+import { SecondaryRed } from '@components/core/controls/Button';
 import { Input } from '@hub/components/controls/Input';
 import { FaqOutline as FaqIcon } from '@hub/components/icons/FaqOutline';
 import { isEmpty } from '@hub/lib/richText';

@@ -18,7 +18,7 @@ import useCreateProposal from '@hooks/useCreateProposal';
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext';
 import useQueryContext from '@hooks/useQueryContext';
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh';
-import { Primary, Secondary } from '@hub/components/controls/Button';
+import { Primary, Secondary } from '@components/core/controls/Button';
 import { useQuery } from '@hub/hooks/useQuery';
 import cx from '@hub/lib/cx';
 import * as RE from '@hub/types/Result';

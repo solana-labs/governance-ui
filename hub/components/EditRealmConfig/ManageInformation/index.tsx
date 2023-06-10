@@ -5,7 +5,7 @@ import BN from 'bn.js';
 import { produce } from 'immer';
 
 import { Config } from '../fetchConfig';
-import { ButtonToggle } from '@hub/components/controls/ButtonToggle';
+import { ButtonToggle } from '@components/core/controls/ButtonToggle';
 import { Input } from '@hub/components/controls/Input';
 import { MAX_NUM } from '@hub/components/EditWalletRules/constants';
 import { SectionBlock } from '@hub/components/EditWalletRules/SectionBlock';

@@ -11,7 +11,7 @@ import { CommunityRules, CouncilRules } from '../types';
 import { ValueBlock } from '../ValueBlock';
 import { getLabel } from '../VoteTippingSelector';
 
-import { ButtonToggle } from '@hub/components/controls/ButtonToggle';
+import { ButtonToggle } from '@components/core/controls/ButtonToggle';
 import cx from '@hub/lib/cx';
 import { ntext } from '@hub/lib/ntext';
 import { FormProps } from '@hub/types/FormProps';

@@ -5,7 +5,7 @@ import { FieldDescription } from '../common/FieldDescription';
 import { FieldHeader } from '../common/FieldHeader';
 import { FieldIconPreview } from '../common/FieldIconPreview';
 import { FieldRichTextEditor } from '../common/FieldRichTextEditor';
-import { SecondaryRed } from '@hub/components/controls/Button';
+import { SecondaryRed } from '@components/core/controls/Button';
 import { Input } from '@hub/components/controls/Input';
 import { isEmpty } from '@hub/lib/richText';
 import { RichTextDocument } from '@hub/types/RichTextDocument';

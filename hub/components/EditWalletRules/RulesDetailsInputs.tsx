@@ -6,7 +6,7 @@ import {
   useRealmCommunityMintInfoQuery,
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo';
-import { ButtonToggle } from '@hub/components/controls/ButtonToggle';
+import { ButtonToggle } from '@components/core/controls/ButtonToggle';
 import { Input } from '@hub/components/controls/Input';
 import { Slider } from '@hub/components/controls/Slider';
 import {

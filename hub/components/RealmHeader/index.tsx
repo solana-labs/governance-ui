@@ -18,7 +18,7 @@ import Link from 'next/link';
 import { useMemo } from 'react';
 import { useMediaQuery } from 'react-responsive';
 
-import * as Button from '@hub/components/controls/Button';
+import * as Button from '@components/core/controls/Button';
 import { HeaderTokenPrice } from '@hub/components/HeaderTokenPrice';
 import { Twitter } from '@hub/components/icons/Twitter';
 import * as RealmBanner from '@hub/components/RealmBanner';
