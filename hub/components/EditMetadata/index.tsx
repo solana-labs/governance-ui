@@ -30,6 +30,7 @@ export function EditMetadata(props: Props) {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [, saveMetadata] = useMutation(gql.saveMetadataResp, gql.saveMetadata);
 
+  console.log('Hello');
   useEffect(() => {
     setData(
       pipe(

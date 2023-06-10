@@ -1,17 +1,17 @@
-import { forwardRef } from 'react';
+import { forwardRef } from 'react'
 
-import { LoadingDots } from '@hub/components/LoadingDots';
-import cx from '@hub/lib/cx';
+import { LoadingDots } from '@hub/components/LoadingDots'
+import cx from '@hub/lib/cx'
 
 interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  pending?: boolean;
+  pending?: boolean
 }
 
 export const Primary = forwardRef<HTMLButtonElement, Props>(function Primary(
   props,
-  ref,
+  ref
 ) {
-  const { pending, ...rest } = props;
+  const { pending, ...rest } = props
 
   return (
     <button
@@ -39,11 +39,11 @@ export const Primary = forwardRef<HTMLButtonElement, Props>(function Primary(
         'disabled:cursor-not-allowed',
         !pending && 'hover:bg-sky-400',
         !pending && 'dark:hover:bg-sky-300',
-        pending && 'cursor-not-allowed',
+        pending && 'cursor-not-allowed'
       )}
       onClick={(e) => {
         if (!pending && !rest.disabled) {
-          rest.onClick?.(e);
+          rest.onClick?.(e)
         }
       }}
     >
@@ -56,7 +56,7 @@ export const Primary = forwardRef<HTMLButtonElement, Props>(function Primary(
           'text-sm',
           'transition-all',
           'group-disabled:text-neutral-400',
-          pending ? 'opacity-0' : 'opacity-100',
+          pending ? 'opacity-0' : 'opacity-100'
         )}
       >
         {rest.children}
@@ -65,5 +65,5 @@ export const Primary = forwardRef<HTMLButtonElement, Props>(function Primary(
         <LoadingDots className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
       )}
     </button>
-  );
-});
+  )
+})
