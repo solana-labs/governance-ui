@@ -467,6 +467,7 @@ export enum Instructions {
   StakeValidator,
   SwitchboardAdmitOracle,
   SwitchboardRevokeOracle,
+  SwitchboardFundOracle,
   Transfer,
   TransferDomainName,
   UpdateTokenMetadata,
