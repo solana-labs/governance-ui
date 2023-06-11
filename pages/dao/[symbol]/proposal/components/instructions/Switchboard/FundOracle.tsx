@@ -133,7 +133,7 @@ const SwitchboardFundOracle = ({
       const transferWSolIx = SystemProgram.transfer({
         fromPubkey: form.governedAccount.extensions.transferAddress!,
         toPubkey: wsolAddress,
-        lamports: Math.round(amountToFund! * LAMPORTS_PER_SOL), // 1 sol
+        lamports: Math.round(amountToFund! * LAMPORTS_PER_SOL),
       })
       const syncIx = syncNative(wsolAddress)
       additionalSerializedInstructions.push(
