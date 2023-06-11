@@ -129,7 +129,7 @@ const SwitchboardFundOracle = ({
         )
         prerequisiteInstructions.push(createWsolacc)
       }
-      console.log(Math.round(amountToFund! * LAMPORTS_PER_SOL))
+
       const transferWSolIx = SystemProgram.transfer({
         fromPubkey: form.governedAccount.extensions.transferAddress!,
         toPubkey: wsolAddress,
