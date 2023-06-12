@@ -1,4 +1,7 @@
-import { VoteRecord } from '@solana/spl-governance'
+import {
+  getTokenOwnerRecordAddress,
+  getVoteRecordAddress,
+} from '@solana/spl-governance'
 import { ThumbUpIcon, ThumbDownIcon } from '@heroicons/react/solid'
 import { ExternalLinkIcon } from '@heroicons/react/solid'
 import { ChatMessage } from '@solana/spl-governance'
@@ -10,15 +13,12 @@ import dayjs from 'dayjs'
 import { ProfilePopup, ProfileImage, useProfile } from '@components/Profile'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
 import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
+import { useAsync } from 'react-async-hook'
+import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
+import { useVoteRecordByPubkeyQuery } from '@hooks/queries/voteRecord'
 
 const relativeTime = require('dayjs/plugin/relativeTime')
-const Comment = ({
-  chatMessage,
-  voteRecord,
-}: {
-  chatMessage: ChatMessage
-  voteRecord: VoteRecord | undefined
-}) => {
+const Comment = ({ chatMessage }: { chatMessage: ChatMessage }) => {
   dayjs.extend(relativeTime)
   const { author, postedAt, body } = chatMessage
   const { realmInfo } = useRealm()
@@ -38,6 +38,22 @@ const Comment = ({
   const proposalMint = useMintInfoByPubkeyQuery(
     proposal?.account.governingTokenMint
   ).data?.result
+
+  const realmPk = useSelectedRealmPubkey()
+
+  const { result: voteRecordPk } = useAsync(async () => {
+    if (!proposal || !realmPk) return undefined
+    const tokenPk = proposal.account.governingTokenMint
+    const torPk = await getTokenOwnerRecordAddress(
+      proposal.owner,
+      realmPk,
+      tokenPk,
+      author
+    )
+    return getVoteRecordAddress(proposal.owner, proposal.pubkey, torPk)
+  }, [proposal, realmPk, author])
+  const voteRecord = useVoteRecordByPubkeyQuery(voteRecordPk).data?.result
+    ?.account
 
   return (
     <div className="border-b border-fgd-4 mt-4 pb-4 last:pb-0 last:border-b-0">
