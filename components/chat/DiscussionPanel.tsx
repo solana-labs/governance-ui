@@ -6,7 +6,6 @@ import {
   GOVERNANCE_CHAT_PROGRAM_ID,
   getGovernanceChatMessages,
 } from '@solana/spl-governance'
-import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { useSelectedProposalPk } from '@hooks/queries/proposal'
 
