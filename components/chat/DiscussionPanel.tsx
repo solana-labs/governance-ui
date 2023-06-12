@@ -35,7 +35,6 @@ export const useChatMessagesQuery = () => {
 
 const DiscussionPanel = () => {
   const { data: chatMessages } = useChatMessagesQuery()
-  const { data: voteRecord } = useProposalVoteRecordQuery('electoral')
 
   const sortedMessages = useMemo(
     () =>
@@ -59,11 +58,7 @@ const DiscussionPanel = () => {
       </div>
 
       {sortedMessages?.map((cm) => (
-        <Comment
-          key={cm.pubkey.toBase58()}
-          chatMessage={cm.account}
-          voteRecord={voteRecord?.result?.account}
-        />
+        <Comment key={cm.pubkey.toBase58()} chatMessage={cm.account} />
       ))}
     </div>
   )
