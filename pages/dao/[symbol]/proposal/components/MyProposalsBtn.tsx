@@ -62,7 +62,7 @@ const MyProposalsBn = () => {
   const ownVoteRecordsByProposal = useMemo(() => {
     return myVoteRecords !== undefined
       ? (Object.fromEntries(
-          myVoteRecords.map((x) => [x.account.proposal.toString, x] as const)
+          myVoteRecords.map((x) => [x.account.proposal.toString(), x] as const)
         ) as Record<string, typeof myVoteRecords[number]>)
       : undefined
   }, [myVoteRecords])
