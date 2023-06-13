@@ -17,11 +17,10 @@ import {
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
 import { notify } from '@utils/notifications'
-import { withCreateTokenOwnerRecord } from '@solana/spl-governance'
 import useRealm from '@hooks/useRealm'
 import { useRealmQuery } from '@hooks/queries/realm'
 
-export const useClaimDelegatedPositionRewards = () => {
+export const useClaimPositionRewards = () => {
   const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
   const { unixNow } = useSolanaUnixNow()
   const realm = useRealmQuery().data?.result
@@ -29,11 +28,9 @@ export const useClaimDelegatedPositionRewards = () => {
   const { error, loading, execute } = useAsyncCallback(
     async ({
       position,
-      tokenOwnerRecordPk,
       programId = PROGRAM_ID,
     }: {
       position: PositionWithMeta
-      tokenOwnerRecordPk: PublicKey | null
       programId?: PublicKey
     }) => {
       const isInvalid =
@@ -44,7 +41,7 @@ export const useClaimDelegatedPositionRewards = () => {
         !wallet ||
         !realm ||
         !realmInfo ||
-        !position.isDelegated
+        !position.hasRewards
 
       const idl = await Program.fetchIdl(programId, provider)
       const hsdProgram = await init(provider as any, programId, idl)
@@ -52,7 +49,7 @@ export const useClaimDelegatedPositionRewards = () => {
       if (loading) return
 
       if (isInvalid || !hsdProgram) {
-        throw new Error('Unable to Undelegate Position, Invalid params')
+        throw new Error('Unable to Claim Rewards, Invalid params')
       } else {
         const currentEpoch = new BN(unixNow).div(new BN(EPOCH_LENGTH))
         const instructions: TransactionInstruction[] = []
@@ -61,24 +58,10 @@ export const useClaimDelegatedPositionRewards = () => {
           delegatedPosKey
         )
 
-        if (!tokenOwnerRecordPk) {
-          await withCreateTokenOwnerRecord(
-            instructions,
-            realm.owner,
-            realmInfo.programVersion!,
-            realm.pubkey,
-            wallet!.publicKey!,
-            realm.account.communityMint,
-            wallet!.publicKey!
-          )
-        }
-
         const { lastClaimedEpoch } = delegatedPosAcc
-        for (
-          let epoch = lastClaimedEpoch.add(new BN(1));
-          epoch.lt(currentEpoch);
-          epoch = epoch.add(new BN(1))
-        ) {
+        let epoch = lastClaimedEpoch.add(new BN(1))
+
+        while (epoch.lt(currentEpoch)) {
           instructions.push(
             await hsdProgram.methods
               .claimRewardsV0({
@@ -90,10 +73,11 @@ export const useClaimDelegatedPositionRewards = () => {
               })
               .instruction()
           )
+          epoch = epoch.add(new BN(1))
         }
 
-        // This is an arbitrary threshold and we assume that up to 3 instructions can be inserted as a single Tx
-        const ixsChunks = chunks(instructions, 3)
+        // This is an arbitrary threshold and we assume that up to 4 instructions can be inserted as a single Tx
+        const ixsChunks = chunks(instructions, 4)
         const txsChunks = ixsChunks.map((txBatch, batchIdx) => ({
           instructionsSet: txBatchesToInstructionSetWithSigners(
             txBatch,
@@ -123,6 +107,6 @@ export const useClaimDelegatedPositionRewards = () => {
   return {
     error,
     loading,
-    claimDelegatedPositionRewards: execute,
+    claimPositionRewards: execute,
   }
 }
