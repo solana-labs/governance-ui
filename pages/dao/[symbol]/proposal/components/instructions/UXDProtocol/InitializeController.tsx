@@ -14,9 +14,10 @@ import {
   UXDInitializeControllerForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { Controller } from '@uxd-protocol/uxd-client'
-import useWalletStore from 'stores/useWalletStore'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 const schema = yup.object().shape({
   mintDecimals: yup
@@ -37,8 +38,8 @@ const InitializeController = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const connection = useConnection()
+  const wallet = useWalletOnePointOh()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -91,7 +92,6 @@ const InitializeController = ({
       serializedInstruction: serializeInstructionToBase64(ix),
       isValid: true,
       governance: form.governedAccount.governance,
-      shouldSplitIntoSeparateTxs: true,
     }
   }
 

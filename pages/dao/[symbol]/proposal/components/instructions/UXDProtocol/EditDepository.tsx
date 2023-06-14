@@ -20,10 +20,10 @@ import {
   UiInstruction,
   UXDEditDepositoryForm,
 } from '@utils/uiTypes/proposalCreationTypes'
-import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import SelectOptionList from '../../SelectOptionList'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -66,7 +66,7 @@ const EditDepository = ({
     setRedeemableAmountUnderManagementCapChange,
   ] = useState<boolean>(false)
 
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -140,7 +140,6 @@ const EditDepository = ({
       serializedInstruction: serializeInstructionToBase64(ix),
       isValid: true,
       governance: form.governedAccount.governance,
-      shouldSplitIntoSeparateTxs: true,
     }
   }
 

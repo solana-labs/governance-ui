@@ -5,6 +5,7 @@ import {
   ProgramAccount,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
+import { useConnection } from '@solana/wallet-adapter-react'
 import {
   Controller,
   IdentityDepository,
@@ -13,13 +14,14 @@ import {
   UXD_DECIMALS,
 } from '@uxd-protocol/uxd-client'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { uxdClient } from '@tools/sdk/uxdProtocol/uxdClient'
 import { isFormValid } from '@utils/formValidation'
 import {
   UiInstruction,
   UXDInitializeIdentityDepositoryForm,
 } from '@utils/uiTypes/proposalCreationTypes'
-import useWalletStore from 'stores/useWalletStore'
+
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 
@@ -37,8 +39,8 @@ const InitializeIdentityDepository = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const connection = useConnection()
+  const wallet = useWalletOnePointOh()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -98,7 +100,6 @@ const InitializeIdentityDepository = ({
       serializedInstruction: serializeInstructionToBase64(ix),
       isValid: true,
       governance: form.governedAccount.governance,
-      shouldSplitIntoSeparateTxs: true,
     }
   }
 

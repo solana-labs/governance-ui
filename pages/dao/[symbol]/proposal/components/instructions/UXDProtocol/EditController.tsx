@@ -15,9 +15,9 @@ import {
   UiInstruction,
   UXDEditControllerForm,
 } from '@utils/uiTypes/proposalCreationTypes'
-import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -41,7 +41,7 @@ const EditController = ({
     setRedeemableGlobalSupplyCapChange,
   ] = useState<boolean>(false)
 
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useConnection()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -94,7 +94,6 @@ const EditController = ({
       serializedInstruction: serializeInstructionToBase64(ix),
       isValid: true,
       governance: form.governedAccount.governance,
-      shouldSplitIntoSeparateTxs: true,
     }
   }
 

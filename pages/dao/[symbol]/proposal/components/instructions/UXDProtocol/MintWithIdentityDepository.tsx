@@ -28,9 +28,10 @@ import {
   UiInstruction,
   UXDMintWithIdentityDepositoryForm,
 } from '@utils/uiTypes/proposalCreationTypes'
-import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 async function checkInitTokenAccount(
   account: PublicKey,
@@ -74,8 +75,8 @@ const MintWithIdentityDepository = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const connection = useConnection()
+  const wallet = useWalletOnePointOh()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -146,7 +147,6 @@ const MintWithIdentityDepository = ({
       serializedInstruction: serializeInstructionToBase64(ix),
       isValid: true,
       governance: form.governedAccount.governance,
-      shouldSplitIntoSeparateTxs: true,
       prerequisiteInstructions,
     }
   }

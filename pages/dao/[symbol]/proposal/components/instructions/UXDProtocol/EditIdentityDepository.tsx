@@ -21,9 +21,9 @@ import {
   UiInstruction,
   UXDEditIdentityDepositoryForm,
 } from '@utils/uiTypes/proposalCreationTypes'
-import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -51,7 +51,7 @@ const EditIdentityDepository = ({
     setRedeemableAmountUnderManagementCapChange,
   ] = useState<boolean>(false)
 
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useConnection()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -119,7 +119,6 @@ const EditIdentityDepository = ({
       serializedInstruction: serializeInstructionToBase64(ix),
       isValid: true,
       governance: form.governedAccount.governance,
-      shouldSplitIntoSeparateTxs: true,
     }
   }
 
