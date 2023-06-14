@@ -3160,5 +3160,18 @@
     "website": "https://thenudiemagazine.com",
     "twitter": "@nudie_mag",
     "ogImage": "/realms/ComradeDAO/img/comradedaologo.png"
+  },
+  {
+    "category": "nft",
+    "discord": "https://discord.gg/Decod3rsNFT",
+    "displayName": "$VIEWS DAO",
+    "bannerImage": "/realms/VIEWSDAO/img/views_banner.png",
+    "ogImage": "/realms/VIEWSDAO/img/views_logo.png",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "9mJUsn6pwUytW2TdytEDRajKDHBjqXsbXyKFP28fzaZ6",
+    "shortDescription": "$VIEWS DAO - Building the Watch-to-Earn meta",
+    "sortRank": 3,
+    "symbol": "VIEWSDAO",
+    "twitter": "@Decod3rsNFT"
   }
 ]
