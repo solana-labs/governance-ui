@@ -59,6 +59,8 @@ export const ACCOUNT_NAMES = {
   '5tgfd6XgwiXB9otEnzFpXK11m7Q7yZUaAJzWK4oT5UGF': 'Mango DAO Wallet',
   '9RGoboEjmaAjSCXsKi6p6zJucnwF3Eg5NUN9jPS6ziL3': 'Mango DAO MNGO Treasury',
   Ccg4zf9V2U4PKyx5DBANf9sF2pu4s4XgRNLkaP6yqJZF: 'Mango DAO Checking Wallet',
+  Db8aq5EvSS2DXpKjNxkaZChEc3jy7W3wUq4xFy35AWbo:
+    'Mango DAO Checking Wallet Governance',
   '3r1tQ2qaR5teYPEyGoHwZeZfMU1zxD5FAAmtAJPbj9xX':
     'Mango DAO Opinion Voting Governance',
   '36LbigK7RRiw12u7rb83Ztb9SFrUFUCDfYPxtfZndtyV':
