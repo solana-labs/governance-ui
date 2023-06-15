@@ -1,7 +1,7 @@
 import { AccountMetaData } from '@solana/spl-governance'
 import { InstructionDescriptor, getAccountName } from './tools'
 import { getExplorerUrl } from '@components/explorer/tools'
-import { ExclamationCircleIcon, ExternalLinkIcon } from '@heroicons/react/solid'
+import { ExternalLinkIcon } from '@heroicons/react/solid'
 import { useState, useRef, useEffect } from 'react'
 import { fetchTokenAccountByPubkey } from '@hooks/queries/tokenAccount'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
@@ -12,7 +12,6 @@ import {
   isGovernanceProgram,
   isNativeSolanaProgram,
 } from './programs/names'
-import WarningIcon from '@carbon/icons-react/lib/Warning'
 import { ExclamationIcon } from '@heroicons/react/outline'
 
 export default function InstructionAccount({
