@@ -114,7 +114,7 @@ export async function getTransferInstruction({
     )
     serializedInstruction = serializeInstructionToBase64(transferIx)
   }
-  console.log(serializedInstruction.length)
+
   const obj: UiInstruction = {
     serializedInstruction,
     isValid,
@@ -160,7 +160,6 @@ export async function getSolTransferInstruction({
     })
     serializedInstruction = serializeInstructionToBase64(transferIx)
   }
-  console.log(serializedInstruction.length)
   const obj: UiInstruction = {
     serializedInstruction,
     isValid,
