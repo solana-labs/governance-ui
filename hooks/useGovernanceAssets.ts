@@ -796,6 +796,10 @@ export default function useGovernanceAssets() {
       name: 'Remove Oracle from Queue',
       packageId: PackageEnum.Switchboard,
     },
+    [Instructions.SwitchboardFundOracle]: {
+      name: 'Fund Oracle',
+      packageId: PackageEnum.Switchboard,
+    },
 
     /*
       ██    ██ ███████ ██████      ██████  ██      ██    ██  ██████  ██ ███    ██

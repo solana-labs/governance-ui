@@ -35,6 +35,7 @@ import { VALIDATORDAO_INSTRUCTIONS } from './programs/validatordao'
 import { POSEIDON_INSTRUCTIONS } from './programs/poseidon'
 import { MANGO_V4_INSTRUCTIONS } from './programs/mangoV4'
 import { DUAL_INSTRUCTIONS } from './programs/dual'
+import { SWITCHBOARD_INSTRUCTIONS } from './programs/switchboard'
 
 /**
  * Default governance program id instance
@@ -332,6 +333,7 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...RAYDIUM_INSTRUCTIONS,
   ...MARINADE_INSTRUCTIONS,
   ...LIDO_INSTRUCTIONS,
+  ...SWITCHBOARD_INSTRUCTIONS,
   ...SOLEND_PROGRAM_INSTRUCTIONS,
   ...FORESIGHT_INSTRUCTIONS,
   ...ATA_PROGRAM_INSTRUCTIONS,

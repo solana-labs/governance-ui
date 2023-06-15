@@ -54,6 +54,7 @@ import CreateNftPluginMaxVoterWeightRecord from './components/instructions/NftVo
 import ConfigureNftPluginCollection from './components/instructions/NftVotingPlugin/ConfigureCollection'
 import SwitchboardAdmitOracle from './components/instructions/Switchboard/AdmitOracle'
 import SwitchboardRevokeOracle from './components/instructions/Switchboard/RevokeOracle'
+import SwitchboardFundOracle from './components/instructions/Switchboard/FundOracle'
 import FriktionWithdraw from './components/instructions/Friktion/FriktionWithdraw'
 import FriktionClaimPendingDeposit from './components/instructions/Friktion/FriktionClaimPendingDeposit'
 import FriktionClaimPendingWithdraw from './components/instructions/Friktion/FriktionClaimPendingWithdraw'
@@ -325,7 +326,7 @@ const New = () => {
     handleTurnOffLoaders()
   }
 
-  const firstGovernancePk = instructionsData[0]?.governedAccount?.pubkey.toBase58()
+  const firstGovernancePk = instructionsData[0]?.governedAccount?.pubkey?.toBase58()
   const previousFirstGovernancePk = usePrevious(firstGovernancePk)
 
   useEffect(() => {
@@ -438,6 +439,7 @@ const New = () => {
       [Instructions.PsyFinanceExerciseOption]: PsyFinanceExerciseOption,
       [Instructions.SwitchboardAdmitOracle]: SwitchboardAdmitOracle,
       [Instructions.SwitchboardRevokeOracle]: SwitchboardRevokeOracle,
+      [Instructions.SwitchboardFundOracle]: SwitchboardFundOracle,
       [Instructions.RefreshSolendObligation]: RefreshObligation,
       [Instructions.RefreshSolendReserve]: RefreshReserve,
       [Instructions.ForesightInitMarket]: MakeInitMarketParams,
@@ -516,7 +518,7 @@ const New = () => {
       [Instructions.RevokeGoverningTokens]: RevokeGoverningTokens,
       [Instructions.SetMintAuthority]: SetMintAuthority,
     }),
-    [governance?.pubkey.toBase58()]
+    [governance?.pubkey?.toBase58()]
   )
 
   const getCurrentInstruction = useCallback(
@@ -551,7 +553,7 @@ const New = () => {
       )
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    [governance?.pubkey.toBase58()]
+    [governance?.pubkey?.toBase58()]
   )
 
   const titleTooLong = form.title.length > TITLE_LENGTH_LIMIT
