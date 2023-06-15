@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useEffect, useState } from 'react'
+import { useContext, useMemo, useEffect, useState } from 'react'
 import * as yup from 'yup'
 import {
   Governance,
@@ -8,7 +8,6 @@ import {
 import { validateInstruction } from '@utils/instructionTools'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
-import useRealm from '@hooks/useRealm'
 import { NewProposalContext } from '../../../new'
 import InstructionForm, {
   InstructionInput,
@@ -29,7 +28,8 @@ import {
 import { DEFAULT_VSR_ID, VsrClient } from 'VoteStakeRegistry/sdk/client'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import useWalletDeprecated from '@hooks/useWalletDeprecated'
-import { heliumVsrPluginsPks, vsrPluginsPks } from '@hooks/useVotingPlugins'
+import { HELIUM_VSR_PLUGINS_PKS, VSR_PLUGIN_PKS } from '@constants/plugins'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 interface ConfigureVotingMintForm {
   programId: string | undefined
@@ -50,15 +50,25 @@ const VotingMintConfig = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { realm } = useRealm()
+  const realm = useRealmQuery().data?.result
   const { assetAccounts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [formErrors, setFormErrors] = useState({})
-  const [form, setForm] = useState<ConfigureVotingMintForm>()
+  const [form, setForm] = useState<ConfigureVotingMintForm>({
+    programId: DEFAULT_VSR_ID.toBase58(),
+    governedAccount: undefined,
+    grantAuthority: undefined,
+    mint: realm?.account.communityMint.toBase58() || '',
+    mintIndex: 0,
+    mintDigitShift: 0,
+    maxLockupFactor: 0,
+    lockupSaturation: 0,
+    baselineVoteWeightFactor: 0,
+  })
   const { handleSetInstructions } = useContext(NewProposalContext)
   const { wallet, anchorProvider } = useWalletDeprecated()
   const showGrantAuth = useMemo(
-    () => form?.programId && !heliumVsrPluginsPks.includes(form.programId),
+    () => form?.programId && !HELIUM_VSR_PLUGINS_PKS.includes(form.programId),
     [form?.programId]
   )
 
@@ -85,14 +95,14 @@ const VotingMintConfig = ({
     let instruction: web3.TransactionInstruction
     let vsrClient: VsrClient | HeliumVsrClient | undefined
 
-    if (vsrPluginsPks.includes(form.programId)) {
+    if (VSR_PLUGIN_PKS.includes(form.programId)) {
       vsrClient = await VsrClient.connect(
         anchorProvider,
         new PublicKey(form.programId)
       )
     }
 
-    if (heliumVsrPluginsPks.includes(form.programId)) {
+    if (HELIUM_VSR_PLUGINS_PKS.includes(form.programId)) {
       vsrClient = await HeliumVsrClient.connect(
         anchorProvider,
         new PublicKey(form.programId)
@@ -115,9 +125,9 @@ const VotingMintConfig = ({
     }
 
     const { registrar } = await getRegistrarPDA(
-      realm!.pubkey,
-      realm!.account.communityMint,
-      vsrClient!.program.programId!
+      realm.pubkey,
+      realm.account.communityMint,
+      vsrClient.program.programId
     )
 
     const mint = new PublicKey(form.mint)
@@ -198,7 +208,6 @@ const VotingMintConfig = ({
       serializedInstruction: serializeInstructionToBase64(instruction),
       isValid: true,
       governance: form.governedAccount.governance,
-      chunkSplitByDefault: true,
     }
   }
 
@@ -261,13 +270,13 @@ const VotingMintConfig = ({
   const inputs: InstructionInput[] = [
     {
       label: 'Voter Stake Registry Program ID',
-      initialValue: form?.programId || DEFAULT_VSR_ID,
+      initialValue: form?.programId,
       name: 'programId',
       type: InstructionInputType.INPUT,
     },
     {
       label: 'Wallet',
-      initialValue: form?.governedAccount || undefined,
+      initialValue: form?.governedAccount,
       name: 'governedAccount',
       type: InstructionInputType.GOVERNED_ACCOUNT,
       shouldBeGoverned: shouldBeGoverned,
@@ -280,14 +289,14 @@ const VotingMintConfig = ({
     },
     {
       label: 'mint',
-      initialValue: form?.mint || realm?.account.communityMint.toBase58() || '',
+      initialValue: form?.mint,
       inputType: 'text',
       name: 'mint',
       type: InstructionInputType.INPUT,
     },
     {
       label: 'mint index',
-      initialValue: form?.mintIndex || 0,
+      initialValue: form?.mintIndex,
       min: 0,
       inputType: 'number',
       name: 'mintIndex',
@@ -297,7 +306,7 @@ const VotingMintConfig = ({
       ? [
           {
             label: 'Grant authority (Governance)',
-            initialValue: form?.grantAuthority || null,
+            initialValue: form?.grantAuthority,
             name: 'grantAuthority',
             type: InstructionInputType.GOVERNED_ACCOUNT,
             options: assetAccounts.filter(
@@ -308,7 +317,7 @@ const VotingMintConfig = ({
       : []),
     {
       label: 'mint digit shift',
-      initialValue: form?.mintDigitShift || 0,
+      initialValue: form?.mintDigitShift,
       min: 0,
       inputType: 'number',
       name: 'mintDigitShift',
@@ -316,7 +325,7 @@ const VotingMintConfig = ({
     },
     {
       label: 'mint unlocked factor',
-      initialValue: form?.baselineVoteWeightFactor || 0,
+      initialValue: form?.baselineVoteWeightFactor,
       min: 0,
       inputType: 'number',
       name: 'baselineVoteWeightFactor',
@@ -324,7 +333,7 @@ const VotingMintConfig = ({
     },
     {
       label: 'max extra vote weight',
-      initialValue: form?.maxLockupFactor || 0,
+      initialValue: form?.maxLockupFactor,
       min: 0,
       inputType: 'number',
       name: 'maxLockupFactor',
@@ -332,7 +341,7 @@ const VotingMintConfig = ({
     },
     {
       label: 'mint lockup saturation (years)',
-      initialValue: form?.lockupSaturation || 0,
+      initialValue: form?.lockupSaturation,
       min: 0,
       inputType: 'number',
       name: 'lockupSaturation',

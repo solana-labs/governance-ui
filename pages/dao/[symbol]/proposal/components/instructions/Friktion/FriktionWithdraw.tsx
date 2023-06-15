@@ -4,7 +4,6 @@ import useRealm from '@hooks/useRealm'
 import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import { PublicKey } from '@solana/web3.js'
 import { precision } from '@utils/formatting'
-import useWalletStore from 'stores/useWalletStore'
 import {
   FriktionWithdrawForm,
   UiInstruction,
@@ -19,6 +18,7 @@ import { getFriktionWithdrawInstruction } from '@utils/instructions/Friktion'
 import Select from '@components/inputs/Select'
 import { FriktionSnapshot, VoltSnapshot } from '@friktion-labs/friktion-sdk'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const FriktionWithdraw = ({
   index,
@@ -27,7 +27,7 @@ const FriktionWithdraw = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const { realmInfo } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()

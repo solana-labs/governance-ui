@@ -96,7 +96,10 @@ const IxGateSet = ({
     TokenRegisterTrustless: true,
     TokenUpdateIndexAndRate: true,
     TokenWithdraw: true,
-    AccountSettleFeesWithMngo: true,
+    AccountBuybackFeesWithMngo: true,
+    TokenForceCloseBorrowsWithToken: true,
+    PerpForceClosePosition: true,
+    GroupWithdrawInsuranceFund: true
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -477,11 +480,29 @@ const IxGateSet = ({
       name: 'TokenWithdraw',
     },
     {
-      label: 'Account Settle Fees With Mngo',
-      initialValue: form.AccountSettleFeesWithMngo,
+      label: 'Account Buyback Fees With Mngo',
+      initialValue: form.AccountBuybackFeesWithMngo,
       type: InstructionInputType.SWITCH,
-      name: 'AccountSettleFeesWithMngo',
+      name: 'AccountBuybackFeesWithMngo',
     },
+    {
+      label: 'Token Force Close Borrows With Token',
+      initialValue: form.TokenForceCloseBorrowsWithToken,
+      type: InstructionInputType.SWITCH,
+      name: 'TokenForceCloseBorrowsWithToken',
+    },
+    {
+        label: 'Perp Force Close Position',
+        initialValue: form.PerpForceClosePosition,
+        type: InstructionInputType.SWITCH,
+        name: 'PerpForceClosePosition',
+      },
+      {
+        label: 'Group Withdraw Insurance Fund',
+        initialValue: form.GroupWithdrawInsuranceFund,
+        type: InstructionInputType.SWITCH,
+        name: 'GroupWithdrawInsuranceFund',
+      },
   ]
 
   return (

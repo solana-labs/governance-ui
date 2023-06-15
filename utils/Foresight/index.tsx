@@ -36,7 +36,7 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 type EmptyObject = Record<string, never>
 type SetFormErrors = Dispatch<React.SetStateAction<EmptyObject>>
 
-export function getFilteredTokenAccounts(): AssetAccount[] {
+function getFilteredTokenAccounts(): AssetAccount[] {
   // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   return governedTokenAccountsWithoutNfts.filter((x) => {
@@ -249,7 +249,7 @@ function ForesightUseEffects<T extends ForesightHasGovernedAccount>(
   }, [form])
 }
 
-export function getSchema<T extends ForesightHasGovernedAccount>(
+function getSchema<T extends ForesightHasGovernedAccount>(
   extraFields: {
     [name in keyof Omit<T, 'governedAccount'>]: StringSchema | NumberSchema
   }

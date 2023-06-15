@@ -1,3 +1,9 @@
+import {
+  VSR_PLUGIN_PKS,
+  NFT_PLUGINS_PKS,
+  GATEWAY_PLUGINS_PKS,
+  PYTH_PLUGINS_PKS,
+} from '@constants/plugins';
 import { Wallet } from '@coral-xyz/anchor';
 import {
   serializeInstructionToBase64,
@@ -25,12 +31,6 @@ import {
 } from 'actions/createProposal';
 import { tryGetNftRegistrar } from 'VoteStakeRegistry/sdk/api';
 
-import {
-  vsrPluginsPks,
-  nftPluginsPks,
-  gatewayPluginsPks,
-  pythPluginsPks,
-} from '@hooks/useVotingPlugins';
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts';
 import { getNfts } from '@utils/tokens';
 import { NFTWithMeta, VotingClient } from '@utils/uiTypes/VotePlugin';
@@ -47,7 +47,6 @@ interface Args {
   governingTokenMintPublicKey: PublicKey;
   instructions: TransactionInstruction[];
   isDraft: boolean;
-  programPublicKey: PublicKey;
   proposalDescription: string;
   proposalTitle: string;
   realmPublicKey: PublicKey;
@@ -56,10 +55,12 @@ interface Args {
   signAllTransactions(transactions: Transaction[]): Promise<Transaction[]>;
 }
 
+/** @deprecated */
 export async function createProposal(args: Args) {
+  const realm = await getRealm(args.connection, args.realmPublicKey);
+
   const [
     governance,
-    realm,
     tokenOwnerRecord,
     realmConfigPublicKey,
     // eslint-disable-next-line
@@ -68,19 +69,18 @@ export async function createProposal(args: Args) {
     communityTokenOwnerRecord,
   ] = await Promise.all([
     getGovernance(args.connection, args.governancePublicKey),
-    getRealm(args.connection, args.realmPublicKey),
     getTokenOwnerRecordForRealm(
       args.connection,
-      args.programPublicKey,
+      realm.owner,
       args.realmPublicKey,
       args.governingTokenMintPublicKey,
       args.requestingUserPublicKey,
     ).catch(() => undefined),
-    getRealmConfigAddress(args.programPublicKey, args.realmPublicKey),
+    getRealmConfigAddress(realm.owner, args.realmPublicKey),
     args.councilTokenMintPublicKey
       ? getTokenOwnerRecordForRealm(
           args.connection,
-          args.programPublicKey,
+          realm.owner,
           args.realmPublicKey,
           args.councilTokenMintPublicKey,
           args.requestingUserPublicKey,
@@ -89,20 +89,13 @@ export async function createProposal(args: Args) {
     args.communityTokenMintPublicKey
       ? getTokenOwnerRecordForRealm(
           args.connection,
-          args.programPublicKey,
+          realm.owner,
           args.realmPublicKey,
           args.communityTokenMintPublicKey,
           args.requestingUserPublicKey,
         ).catch(() => undefined)
       : undefined,
   ]);
-
-  const userTOR =
-    tokenOwnerRecord || communityTokenOwnerRecord || councilTokenOwnerRecord;
-
-  if (!userTOR) {
-    throw new Error('You do not have any voting power in this org');
-  }
 
   const realmConfigAccountInfo = await args.connection.getAccountInfo(
     realmConfigPublicKey,
@@ -115,7 +108,7 @@ export async function createProposal(args: Args) {
       )
     : {
         pubkey: realmConfigPublicKey,
-        owner: args.programPublicKey,
+        owner: realm.owner,
         account: new RealmConfigAccount({
           realm: args.realmPublicKey,
           communityTokenConfig: new GoverningTokenConfig({
@@ -134,6 +127,30 @@ export async function createProposal(args: Args) {
         }),
       };
 
+  let userTOR = tokenOwnerRecord;
+
+  if (
+    councilTokenOwnerRecord &&
+    councilTokenOwnerRecord.account.governingTokenDepositAmount.gte(
+      governance.account.config.minCouncilTokensToCreateProposal,
+    )
+  ) {
+    userTOR = councilTokenOwnerRecord;
+  }
+
+  if (
+    communityTokenOwnerRecord &&
+    communityTokenOwnerRecord.account.governingTokenDepositAmount.gte(
+      governance.account.config.minCommunityTokensToCreateProposal,
+    )
+  ) {
+    userTOR = communityTokenOwnerRecord;
+  }
+
+  if (!userTOR) {
+    throw new Error('You do not have any voting power in this org');
+  }
+
   const serializedInstructions = args.instructions.map(
     serializeInstructionToBase64,
   );
@@ -151,16 +168,6 @@ export async function createProposal(args: Args) {
   );
 
   const proposalIndex = governance.account.proposalCount;
-  const votingPlugins = await fetchPlugins(
-    args.connection,
-    args.programPublicKey,
-    {
-      publicKey: args.requestingUserPublicKey,
-      signTransaction: args.signTransaction,
-      signAllTransactions: args.signAllTransactions,
-    } as Wallet,
-    args.cluster === 'devnet',
-  );
 
   const pluginPublicKey =
     realmConfig.account.communityTokenConfig.voterWeightAddin;
@@ -168,15 +175,31 @@ export async function createProposal(args: Args) {
   let votingNfts: NFTWithMeta[] = [];
 
   if (pluginPublicKey) {
+    const votingPlugins = await fetchPlugins(
+      args.connection,
+      pluginPublicKey,
+      {
+        publicKey: args.requestingUserPublicKey,
+        signTransaction: args.signTransaction,
+        signAllTransactions: args.signAllTransactions,
+      } as Wallet,
+      args.cluster === 'devnet',
+    );
     const pluginPublicKeyStr = pluginPublicKey.toBase58();
     let client: VotingClient['client'] = undefined;
     // Check for plugins in a particular order. I'm not sure why, but I
     // borrowed this from /hooks/useVotingPlugins.ts
-    if (vsrPluginsPks.includes(pluginPublicKeyStr) && votingPlugins.vsrClient) {
+    if (
+      VSR_PLUGIN_PKS.includes(pluginPublicKeyStr) &&
+      votingPlugins.vsrClient
+    ) {
       client = votingPlugins.vsrClient;
     }
 
-    if (nftPluginsPks.includes(pluginPublicKeyStr) && votingPlugins.nftClient) {
+    if (
+      NFT_PLUGINS_PKS.includes(pluginPublicKeyStr) &&
+      votingPlugins.nftClient
+    ) {
       client = votingPlugins.nftClient;
 
       if (client && args.communityTokenMintPublicKey) {
@@ -212,14 +235,14 @@ export async function createProposal(args: Args) {
     }
 
     if (
-      gatewayPluginsPks.includes(pluginPublicKeyStr) &&
+      GATEWAY_PLUGINS_PKS.includes(pluginPublicKeyStr) &&
       votingPlugins.gatewayClient
     ) {
       client = votingPlugins.gatewayClient;
     }
 
     if (
-      pythPluginsPks.includes(pluginPublicKeyStr) &&
+      PYTH_PLUGINS_PKS.includes(pluginPublicKeyStr) &&
       votingPlugins.pythClient
     ) {
       client = votingPlugins.pythClient;
@@ -244,7 +267,7 @@ export async function createProposal(args: Args) {
         signTransaction: args.signTransaction,
         signAllTransactions: args.signAllTransactions,
       },
-      programId: args.programPublicKey,
+      programId: realm.owner,
       walletPubkey: args.requestingUserPublicKey,
     } as RpcContext,
     realm,

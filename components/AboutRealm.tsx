@@ -2,13 +2,13 @@ import React from 'react'
 import useRealm from 'hooks/useRealm'
 
 const AboutRealm = () => {
-  const { realmInfo, realmDisplayName, symbol } = useRealm()
+  const { realmInfo, symbol } = useRealm()
 
   return (
     <div className="pb-4 space-y-3">
       <div>
         <p className="text-xs text-fgd-3">Name</p>
-        <p className="text-fgd-1">{realmDisplayName || symbol}</p>
+        <p className="text-fgd-1">{realmInfo?.displayName || symbol}</p>
       </div>
       {realmInfo?.isCertified ? (
         <div>

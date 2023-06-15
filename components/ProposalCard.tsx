@@ -48,12 +48,10 @@ const ProposalCard = ({ proposalPk, proposal }: ProposalCardProps) => {
                   {proposal.name}
                 </h3>
                 <div className="flex items-center pl-4 pt-1">
-                  {proposal.state === ProposalState.Voting && (
-                    <ProposalMyVoteBadge
-                      className="mr-2"
-                      proposal={{ account: proposal, pubkey: proposalPk }}
-                    />
-                  )}
+                  <ProposalMyVoteBadge
+                    className="mr-2"
+                    proposal={{ account: proposal, pubkey: proposalPk }}
+                  />
                   <ProposalStateBadge proposal={proposal} />
                   <StyledSvg className="default-transition h-6 ml-3 text-fgd-2 w-6" />
                 </div>

@@ -1,4 +1,4 @@
-import { NftVoterClient } from '@solana/governance-program-library'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { PublicKey } from '@solana/web3.js'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import { Registrar, Voter } from './accounts'

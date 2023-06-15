@@ -13,7 +13,6 @@ import {
   serializeInstructionToBase64,
   withWithdrawGoverningTokens,
 } from '@solana/spl-governance'
-import useWalletStore from 'stores/useWalletStore'
 import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
 import { createAssociatedTokenAccount } from '@utils/associated'
 import useCreateProposal from '@hooks/useCreateProposal'
@@ -24,6 +23,8 @@ import { useRouter } from 'next/router'
 import useQueryContext from '@hooks/useQueryContext'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 import Link from 'next/link'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface Props {
   className?: string
@@ -37,8 +38,8 @@ export default function Header(props: Props) {
 
   const asset = props.tokenOwnerRecordAsset
 
-  const connection = useWalletStore((s) => s.connection)
-  const { current: wallet } = useWalletStore()
+  const connection = useLegacyConnectionContext()
+  const wallet = useWalletOnePointOh()
 
   const [isLeaving, setIsLeaving] = useState(false)
 
@@ -111,7 +112,6 @@ export default function Header(props: Props) {
           holdUpTime:
             asset.governanceOwner.account.config.minInstructionHoldUpTime,
           prerequisiteInstructions: [],
-          shouldSplitIntoSeparateTxs: false,
         }
 
         instructionsData.push(ixData)

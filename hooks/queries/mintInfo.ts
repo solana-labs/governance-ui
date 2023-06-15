@@ -4,19 +4,20 @@ import { useQuery } from '@tanstack/react-query'
 import { getNetworkFromEndpoint } from '@utils/connection'
 import asFindable from '@utils/queries/asFindable'
 import { tryGetMint } from '@utils/tokens'
-import useWalletStore from 'stores/useWalletStore'
 import queryClient from './queryClient'
+import { useRealmQuery } from './realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export const mintInfoQueryKeys = {
   all: (cluster: EndpointTypes) => [cluster, 'MintInfo'],
-  byPubkey: (cluster, k: PublicKey) => [
+  byPubkey: (cluster: EndpointTypes, k: PublicKey) => [
     ...mintInfoQueryKeys.all(cluster),
     k.toString(),
   ],
 }
 
-export const useMintInfoByPubkeyQuery = (pubkey?: PublicKey) => {
-  const connection = useWalletStore((s) => s.connection)
+export const useMintInfoByPubkeyQuery = (pubkey: PublicKey | undefined) => {
+  const connection = useLegacyConnectionContext()
 
   const enabled = pubkey !== undefined
   const query = useQuery({
@@ -33,6 +34,18 @@ export const useMintInfoByPubkeyQuery = (pubkey?: PublicKey) => {
   })
 
   return query
+}
+
+export const useRealmCouncilMintInfoQuery = () => {
+  const realm = useRealmQuery().data?.result
+  const mint = realm?.account.config.councilMint
+  return useMintInfoByPubkeyQuery(mint)
+}
+
+export const useRealmCommunityMintInfoQuery = () => {
+  const realm = useRealmQuery().data?.result
+  const mint = realm?.account.communityMint
+  return useMintInfoByPubkeyQuery(mint)
 }
 
 export const fetchMintInfoByPubkey = (

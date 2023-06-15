@@ -85,7 +85,8 @@ export function TokenTypeSelector(props: Props) {
         </DropdownMenu.Trigger>
         <DropdownMenu.Portal>
           <DropdownMenu.Content
-            className="space-y-0.5 bg-white dark:bg-black"
+            // weo weo there is z-index stuff here
+            className="dark space-y-0.5 z-20"
             sideOffset={2}
             style={{ width }}
           >

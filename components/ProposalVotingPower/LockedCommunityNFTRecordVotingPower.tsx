@@ -1,22 +1,21 @@
 import React, { useState, useEffect } from 'react'
-import classNames from 'classnames'
 import { BigNumber } from 'bignumber.js'
 import useRealm from '@hooks/useRealm'
-import useProposal from '@hooks/useProposal'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import { fmtMintAmount, getMintDecimalAmount } from '@tools/sdk/units'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import Tooltip from '@components/Tooltip'
 import { ChevronRightIcon, LightningBoltIcon } from '@heroicons/react/solid'
-import { calculateMaxVoteScore } from '@models/proposal/calulateMaxVoteScore'
-import VotingPowerPct from './VotingPowerPct'
 import { BN } from '@coral-xyz/anchor'
 import Link from 'next/link'
 import useQueryContext from '@hooks/useQueryContext'
 import InlineNotification from '@components/InlineNotification'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
+import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 
 interface Props {
   className?: string
@@ -25,8 +24,11 @@ interface Props {
 export default function LockedCommunityNFTRecordVotingPower(props: Props) {
   const { fmtUrlWithCluster } = useQueryContext()
   const [amount, setAmount] = useState(new BigNumber(0))
-  const { mint, realm, ownTokenRecord, realmTokenAccount, symbol } = useRealm()
-  const { proposal } = useProposal()
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const realm = useRealmQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+
+  const { realmTokenAccount, symbol } = useRealm()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const { data: tokenOwnerRecordPk } = useAddressQuery_CommunityTokenOwner()
@@ -74,15 +76,10 @@ export default function LockedCommunityNFTRecordVotingPower(props: Props) {
       : '0'
 
   const multiplier =
-    !votingPower.isZero() && !amountLocked.isZero()
-      ? (votingPower.toNumber() / amountLocked.toNumber()).toFixed(2) + 'x'
-      : null
-
-  const max =
-    realm && proposal && mint
-      ? new BigNumber(
-          calculateMaxVoteScore(realm, proposal, mint).toString()
-        ).shiftedBy(-mint.decimals)
+    !votingPower.isZero() && !amountLocked.isZero() && mint
+      ? getMintDecimalAmount(mint, votingPower)
+          .div(getMintDecimalAmount(mint, amountLocked))
+          .toFixed(2) + 'x'
       : null
 
   const lockTokensFmt =
@@ -97,9 +94,10 @@ export default function LockedCommunityNFTRecordVotingPower(props: Props) {
 
   if (isLoading) {
     return (
-      <div
-        className={classNames(props.className, 'rounded-md bg-bkg-1 h-[76px]')}
-      />
+      <>
+        <div className="animate-pulse bg-bkg-3 h-12 mb-4 rounded-lg" />
+        <div className="animate-pulse bg-bkg-3 h-10 rounded-lg" />
+      </>
     )
   }
 
@@ -146,7 +144,7 @@ export default function LockedCommunityNFTRecordVotingPower(props: Props) {
       ) : (
         <>
           <div className={'p-3 rounded-md bg-bkg-1'}>
-            <div className="text-white/50 text-xs">{tokenName} Votes</div>
+            <div className="text-white/50 text-xs">Votes</div>
             <div className="flex items-center justify-between mt-1">
               <div className="text-white font-bold text-2xl flex items-center">
                 {amount.toFormat(2)}{' '}
@@ -159,9 +157,6 @@ export default function LockedCommunityNFTRecordVotingPower(props: Props) {
                   </Tooltip>
                 )}
               </div>
-              {max && !max.isZero() && (
-                <VotingPowerPct amount={amount} total={max} />
-              )}
             </div>
           </div>
           <div className="pt-4 px-4">

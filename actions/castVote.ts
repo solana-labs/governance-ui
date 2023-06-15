@@ -24,10 +24,10 @@ import {
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
 import { sendTransaction } from '@utils/send'
-import { NftVoterClient } from '@solana/governance-program-library'
 import { calcCostOfNftVote, checkHasEnoughSolToVote } from '@tools/nftVoteCalc'
 import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 
 const getVetoTokenMint = (
   proposal: ProgramAccount<Proposal>,
@@ -159,6 +159,9 @@ export async function castVote(
     transaction.add(...instructions)
 
     await sendTransaction({ transaction, wallet, connection, signers })
+    if (runAfterConfirmation) {
+      runAfterConfirmation()
+    }
   }
 
   // we need to chunk instructions
@@ -200,9 +203,11 @@ export async function castVote(
       wallet,
       transactionInstructions: ixsChunks,
       callbacks: {
-        afterFirstBatchSign: () => (ixsChunks.length > 2 ? null : null),
-        afterAllTxConfirmed: () =>
-          runAfterConfirmation ? runAfterConfirmation() : null,
+        afterAllTxConfirmed: () => {
+          if (runAfterConfirmation) {
+            runAfterConfirmation()
+          }
+        },
       },
     })
   }

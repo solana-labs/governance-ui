@@ -13,7 +13,6 @@ import { NewProposalContext } from '../../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, {
@@ -23,6 +22,7 @@ import InstructionForm, {
 import UseMangoV4 from '@hooks/useMangoV4'
 import { BN } from '@coral-xyz/anchor'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface PerpCreateForm {
   governedAccount: AssetAccount | null
@@ -74,7 +74,7 @@ const PerpCreate = ({
       mangoGroup?.admin &&
       x.extensions.transferAddress?.equals(mangoGroup?.admin)
   )
-  const { connection } = useWalletStore()
+  const connection = useLegacyConnectionContext()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<PerpCreateForm>({
     governedAccount: null,
@@ -220,9 +220,9 @@ const PerpCreate = ({
     const obj: UiInstruction = {
       prerequisiteInstructions: prerequisiteInstructions,
       prerequisiteInstructionsSigners: prerequisiteInstructionsSigners,
-      shouldSplitIntoSeparateTxs: true,
       serializedInstruction: serializedInstruction,
       isValid,
+      chunkBy: 1,
       governance: form.governedAccount?.governance,
       customHoldUpTime: form.holdupTime,
     }
@@ -256,11 +256,11 @@ const PerpCreate = ({
       !mangoGroup || mangoGroup?.perpMarketsMapByMarketIndex.size === 0
         ? 0
         : Math.max(...[...mangoGroup!.perpMarketsMapByMarketIndex.keys()]) + 1
-    setForm({
-      ...form,
+    setForm((prevForm) => ({
+      ...prevForm,
       perpMarketIndex: perpMarketIndex,
-    })
-  }, [mangoGroup?.perpMarketsMapByMarketIndex.size])
+    }))
+  }, [mangoGroup])
 
   const inputs: InstructionInput[] = [
     {

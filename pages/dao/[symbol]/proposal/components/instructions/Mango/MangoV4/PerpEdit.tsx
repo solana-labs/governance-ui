@@ -54,6 +54,7 @@ const keyToLabel = {
   reduceOnly: 'Reduce Only',
   resetStablePrice: 'Reset Stable Price',
   positivePnlLiquidationFee: 'Positive Pnl Liquidation Fee',
+  forceClose: 'Force Close',
 }
 
 type NameMarketIndexVal = {
@@ -94,6 +95,7 @@ interface PerpEditForm {
   resetStablePrice: boolean
   positivePnlLiquidationFee: number
   holdupTime: number
+  forceClose: boolean
 }
 
 const defaultFormValues = {
@@ -130,6 +132,7 @@ const defaultFormValues = {
   resetStablePrice: false,
   positivePnlLiquidationFee: 0,
   holdupTime: 0,
+  forceClose: false,
 }
 
 const PerpEdit = ({
@@ -217,7 +220,7 @@ const PerpEdit = ({
           getNullOrTransform(values.minFunding, null, Number),
           getNullOrTransform(values.maxFunding, null, Number),
           getNullOrTransform(values.impactQuantity, BN),
-          values.groupInsuranceFund,
+          values.groupInsuranceFund!,
           getNullOrTransform(values.feePenalty, null, Number),
           getNullOrTransform(values.settleFeeFlat, null, Number),
           getNullOrTransform(values.settleFeeAmountThreshold, null, Number),
@@ -231,10 +234,11 @@ const PerpEdit = ({
           getNullOrTransform(values.stablePriceGrowthLimit, null, Number),
           getNullOrTransform(values.settlePnlLimitFactor, null, Number),
           getNullOrTransform(values.settlePnlLimitWindowSize, BN),
-          values.reduceOnly,
-          values.resetStablePrice,
+          values.reduceOnly!,
+          values.resetStablePrice!,
           getNullOrTransform(values.positivePnlLiquidationFee, null, Number),
-          getNullOrTransform(values.name, null, String)
+          getNullOrTransform(values.name, null, String),
+          values.forceClose!
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -250,6 +254,7 @@ const PerpEdit = ({
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
       isValid,
+      chunkBy: 1,
       governance: form.governedAccount?.governance,
       customHoldUpTime: form.holdupTime,
     }
@@ -288,7 +293,7 @@ const PerpEdit = ({
     if (mangoGroup) {
       getTokens()
     }
-  }, [mangoGroup?.publicKey.toBase58()])
+  }, [mangoGroup])
 
   useEffect(() => {
     if (form.perp && mangoGroup) {
@@ -296,7 +301,6 @@ const PerpEdit = ({
         form.perp.value
       )!
       const vals = {
-        ...form,
         oraclePk: currentPerp.oracle.toBase58(),
         name: currentPerp.name,
         oracleConfFilter: currentPerp.oracleConfig.confFilter.toNumber(),
@@ -328,14 +332,17 @@ const PerpEdit = ({
         settlePnlLimitWindowSize: currentPerp.settlePnlLimitWindowSizeTs.toNumber(),
         reduceOnly: currentPerp.reduceOnly,
         resetStablePrice: false,
+        forceClose: currentPerp.forceClose,
         positivePnlLiquidationFee: currentPerp.positivePnlLiquidationFee.toNumber(),
       }
-      setForm({
+      setForm((prevForm) => ({
+        ...prevForm,
         ...vals,
-      })
-      setOriginalFormValues({ ...vals })
+      }))
+      setOriginalFormValues((prevForm) => ({ ...prevForm, ...vals }))
     }
-  }, [form.perp?.value])
+  }, [form.perp, mangoGroup])
+
   const inputs: InstructionInput[] = [
     {
       label: 'Governance',
@@ -492,27 +499,6 @@ const PerpEdit = ({
       name: 'feePenalty',
     },
     {
-      label: keyToLabel['groupInsuranceFund'],
-      subtitle: getAdditionalLabelInfo('groupInsuranceFund'),
-      initialValue: form.groupInsuranceFund,
-      type: InstructionInputType.SWITCH,
-      name: 'groupInsuranceFund',
-    },
-    {
-      label: keyToLabel['reduceOnly'],
-      subtitle: getAdditionalLabelInfo('reduceOnly'),
-      initialValue: form.reduceOnly,
-      type: InstructionInputType.SWITCH,
-      name: 'reduceOnly',
-    },
-    {
-      label: keyToLabel['resetStablePrice'],
-      subtitle: getAdditionalLabelInfo('resetStablePrice'),
-      initialValue: form.resetStablePrice,
-      type: InstructionInputType.SWITCH,
-      name: 'resetStablePrice',
-    },
-    {
       label: keyToLabel['settleFeeFlat'],
       subtitle: getAdditionalLabelInfo('settleFeeFlat'),
       initialValue: form.settleFeeFlat,
@@ -591,6 +577,34 @@ const PerpEdit = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'positivePnlLiquidationFee',
+    },
+    {
+      label: keyToLabel['groupInsuranceFund'],
+      subtitle: getAdditionalLabelInfo('groupInsuranceFund'),
+      initialValue: form.groupInsuranceFund,
+      type: InstructionInputType.SWITCH,
+      name: 'groupInsuranceFund',
+    },
+    {
+      label: keyToLabel['reduceOnly'],
+      subtitle: getAdditionalLabelInfo('reduceOnly'),
+      initialValue: form.reduceOnly,
+      type: InstructionInputType.SWITCH,
+      name: 'reduceOnly',
+    },
+    {
+      label: keyToLabel['resetStablePrice'],
+      subtitle: getAdditionalLabelInfo('resetStablePrice'),
+      initialValue: form.resetStablePrice,
+      type: InstructionInputType.SWITCH,
+      name: 'resetStablePrice',
+    },
+    {
+      label: keyToLabel['forceClose'],
+      subtitle: getAdditionalLabelInfo('forceClose'),
+      initialValue: form.forceClose,
+      type: InstructionInputType.SWITCH,
+      name: 'forceClose',
     },
   ]
   return (

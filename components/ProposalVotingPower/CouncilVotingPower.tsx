@@ -1,11 +1,9 @@
 import { BigNumber } from 'bignumber.js'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import classNames from 'classnames'
 
 import useRealm from '@hooks/useRealm'
 import { calculateMaxVoteScore } from '@models/proposal/calulateMaxVoteScore'
-import useProposal from '@hooks/useProposal'
-import useWalletStore from 'stores/useWalletStore'
 import { SecondaryButton } from '@components/Button'
 
 import { getMintMetadata } from '../instructions/programs/splToken'
@@ -13,32 +11,33 @@ import getNumTokens from './getNumTokens'
 import depositTokens from './depositTokens'
 import VotingPowerPct from './VotingPowerPct'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useUserCouncilTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmCouncilMintInfoQuery } from '@hooks/queries/mintInfo'
+import { useRouteProposalQuery } from '@hooks/queries/proposal'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 interface Props {
   className?: string
 }
 
 export default function CouncilVotingPower(props: Props) {
-  const {
-    councilMint,
-    councilTokenAccount,
-    ownCouncilTokenRecord,
-    ownVoterWeight,
-    realm,
-    realmInfo,
-  } = useRealm()
-  const { proposal } = useProposal()
-  const fetchWalletTokenAccounts = useWalletStore(
-    (s) => s.actions.fetchWalletTokenAccounts
-  )
-  const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
-  const connection = useWalletStore((s) => s.connection.current)
+  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
+  const realm = useRealmQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+
+  const { councilTokenAccount, ownVoterWeight, realmInfo } = useRealm()
+  const proposal = useRouteProposalQuery().data?.result
+  const { connection } = useConnection()
   const wallet = useWalletOnePointOh()
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  const depositAmount = councilTokenAccount
-    ? new BigNumber(councilTokenAccount.account.amount.toString())
-    : new BigNumber(0)
+  const depositAmount = useMemo(
+    () =>
+      councilTokenAccount
+        ? new BigNumber(councilTokenAccount.account.amount.toString())
+        : new BigNumber(0),
+    [councilTokenAccount]
+  )
   const depositMint = realm?.account.config.councilMint
   const tokenName =
     getMintMetadata(depositMint)?.name ?? realm?.account.name ?? ''
@@ -67,19 +66,8 @@ export default function CouncilVotingPower(props: Props) {
         amount: depositAmount,
         depositTokenAccount: councilTokenAccount,
       })
-      await fetchWalletTokenAccounts()
-      await fetchRealm(realmInfo.programId, realmInfo.realmId)
     }
-  }, [
-    depositAmount,
-    fetchRealm,
-    fetchWalletTokenAccounts,
-    connection,
-    councilTokenAccount,
-    realmInfo,
-    realm,
-    wallet,
-  ])
+  }, [depositAmount, connection, councilTokenAccount, realmInfo, realm, wallet])
 
   if (!(realm && realmInfo)) {
     return (
@@ -93,7 +81,7 @@ export default function CouncilVotingPower(props: Props) {
     <div className={props.className}>
       {amount.isZero() ? (
         <div className={'text-xs text-white/50'}>
-          You do not have any voting power in this dao.
+          You do not have any council voting power in this dao.
         </div>
       ) : (
         <div className={'p-3 rounded-md bg-bkg-1'}>

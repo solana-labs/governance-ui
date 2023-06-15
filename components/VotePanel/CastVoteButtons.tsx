@@ -6,7 +6,6 @@ import VoteCommentModal from '../VoteCommentModal'
 import {
   useIsInCoolOffTime,
   useIsVoting,
-  useProposalVoteRecordQuery,
   useVoterTokenRecord,
   useVotingPop,
 } from './hooks'
@@ -14,6 +13,9 @@ import useRealm from '@hooks/useRealm'
 import { VotingClientType } from '@utils/uiTypes/VotePlugin'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
+import { useSubmitVote } from '@hooks/useSubmitVote'
+import { useSelectedRealmInfo } from '@hooks/selectedRealm/useSelectedRealmRegistryEntry'
 
 const useCanVote = () => {
   const client = useVotePluginsClientStore(
@@ -60,15 +62,30 @@ const useCanVote = () => {
 export const CastVoteButtons = () => {
   const [showVoteModal, setShowVoteModal] = useState(false)
   const [vote, setVote] = useState<'yes' | 'no' | null>(null)
+  const realmInfo = useSelectedRealmInfo()
+  const allowDiscussion = realmInfo?.allowDiscussion ?? true
+  const { submitting, submitVote } = useSubmitVote()
   const votingPop = useVotingPop()
   const voterTokenRecord = useVoterTokenRecord()
-
   const [canVote, tooltipContent] = useCanVote()
   const { data: ownVoteRecord } = useProposalVoteRecordQuery('electoral')
 
   const isVoteCast = !!ownVoteRecord?.found
   const isVoting = useIsVoting()
   const isInCoolOffTime = useIsInCoolOffTime()
+
+  const handleVote = async (vote: 'yes' | 'no') => {
+    setVote(vote)
+
+    if (allowDiscussion) {
+      setShowVoteModal(true)
+    } else {
+      await submitVote({
+        vote: vote === 'yes' ? VoteKind.Approve : VoteKind.Deny,
+        voterTokenRecord: voterTokenRecord!,
+      })
+    }
+  }
 
   return (isVoting && !isVoteCast) || (isInCoolOffTime && !isVoteCast) ? (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-4">
@@ -86,11 +103,9 @@ export const CastVoteButtons = () => {
             <Button
               tooltipMessage={tooltipContent}
               className="w-1/2"
-              onClick={() => {
-                setVote('yes')
-                setShowVoteModal(true)
-              }}
-              disabled={!canVote}
+              onClick={() => handleVote('yes')}
+              disabled={!canVote || submitting}
+              isLoading={submitting}
             >
               <div className="flex flex-row items-center justify-center">
                 <ThumbUpIcon className="h-4 w-4 mr-2" />
@@ -102,11 +117,9 @@ export const CastVoteButtons = () => {
           <Button
             tooltipMessage={tooltipContent}
             className="w-1/2"
-            onClick={() => {
-              setVote('no')
-              setShowVoteModal(true)
-            }}
-            disabled={!canVote}
+            onClick={() => handleVote('no')}
+            disabled={!canVote || submitting}
+            isLoading={submitting}
           >
             <div className="flex flex-row items-center justify-center">
               <ThumbDownIcon className="h-4 w-4 mr-2" />

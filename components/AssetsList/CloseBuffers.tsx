@@ -6,7 +6,6 @@ import Input from 'components/inputs/Input'
 import Button, { LinkButton } from '@components/Button'
 import Textarea from 'components/inputs/Textarea'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
-import useWalletStore from 'stores/useWalletStore'
 import { getValidatedPublickKey } from 'utils/validations'
 import { useEffect, useState } from 'react'
 import { UiInstruction } from 'utils/uiTypes/proposalCreationTypes'
@@ -24,9 +23,10 @@ import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import { createCloseBuffer } from '@tools/sdk/bpfUpgradeableLoader/createCloseBuffer'
 import { abbreviateAddress } from '@utils/formatting'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { Governance, ProgramAccount } from '@solana/spl-governance'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface CloseBuffersForm {
   governedAccount: AssetAccount | undefined
@@ -36,21 +36,16 @@ interface CloseBuffersForm {
   title: string
 }
 
-const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
+const CloseBuffers = ({ program }: { program: AssetAccount }) => {
   const { handleCreateProposal } = useCreateProposal()
-  const {
-    governedTokenAccountsWithoutNfts,
-    assetAccounts,
-  } = useGovernanceAssets()
+  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const router = useRouter()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
-  const governedAccount = assetAccounts.find(
-    (x) => x.governance.pubkey.toBase58() === program.pubkey.toBase58()
-  )
   const { fmtUrlWithCluster } = useQueryContext()
   const { symbol } = router.query
-  const { realmInfo, canChooseWhoVote, realm } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { realmInfo, canChooseWhoVote } = useRealm()
   const [isBuffersLoading, setIsBuffersLoading] = useState(false)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [buffers, setBuffers] = useState<
@@ -66,7 +61,7 @@ const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
   )
   const solAccounts = governedTokenAccountsWithoutNfts.filter((x) => x.isSol)
   const [form, setForm] = useState<CloseBuffersForm>({
-    governedAccount: governedAccount,
+    governedAccount: program,
     programId: programId?.toString(),
     solReceiverAddress: solAccounts.length
       ? solAccounts
@@ -87,10 +82,8 @@ const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
   const proposalTitle = `Close buffers for program ${
-    form.governedAccount?.governance?.account.governedAccount
-      ? abbreviateAddress(
-          form.governedAccount?.governance?.account.governedAccount
-        )
+    form.governedAccount?.pubkey
+      ? abbreviateAddress(form.governedAccount?.pubkey)
       : ''
   }`
 
@@ -136,7 +129,7 @@ const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
         const closeIx = await createCloseBuffer(
           buffers[i].pubkey,
           new PublicKey(form.solReceiverAddress),
-          form.governedAccount.governance.pubkey
+          form.governedAccount.extensions.program!.authority
         )
         serializedInstruction = serializeInstructionToBase64(closeIx)
       }
@@ -205,7 +198,7 @@ const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
               {
                 memcmp: {
                   offset: 5,
-                  bytes: form.governedAccount!.governance!.pubkey.toBase58(),
+                  bytes: form.governedAccount!.extensions.program!.authority.toBase58(),
                 },
               },
             ],
@@ -217,11 +210,11 @@ const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
       }
       setIsBuffersLoading(false)
     }
-    if (form.governedAccount?.governance?.pubkey.toBase58()) {
+    if (form.governedAccount?.extensions.program!.authority.toBase58()) {
       getBuffers()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form.governedAccount?.governance?.pubkey.toBase58()])
+  }, [form.governedAccount?.extensions.program!.authority.toBase58()])
   return (
     <>
       <h3 className="mb-4 flex items-center hover:cursor-pointer">

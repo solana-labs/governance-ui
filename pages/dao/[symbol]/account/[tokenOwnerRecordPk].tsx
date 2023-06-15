@@ -13,7 +13,7 @@ const Account: React.FC = () => {
   if (vsrMode) {
     if (vsrMode === 'helium') {
       return (
-        <HeliumLockTokensAccount tokenOwnerRecordPk={tokenOwnerRecordPk}>
+        <HeliumLockTokensAccount /* tokenOwnerRecordPk={tokenOwnerRecordPk} */>
           <VoteStakeRegistryAccount withHeader={false} displayPanel={false} />
         </HeliumLockTokensAccount>
       )

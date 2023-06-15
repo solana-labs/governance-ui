@@ -8,13 +8,14 @@ import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import { LinkButton } from '@components/Button'
 import { PlusCircleIcon } from '@heroicons/react/outline'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 export const NEW_PROGRAM_VIEW = `/program/new`
 
 const Assets = () => {
   const router = useRouter()
+  const realm = useRealmQuery().data?.result
   const {
     symbol,
-    realm,
     ownVoterWeight,
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,

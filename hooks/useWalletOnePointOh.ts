@@ -1,5 +1,6 @@
-import useWalletStore from '../stores/useWalletStore'
+import { useWallet } from '@solana/wallet-adapter-react'
 import useViewAsWallet from './useViewAsWallet'
+import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 
 /** Why does this have such a weird name?
  * I wanted to differentiate it from the solana-wallet-adapter hook, useWallet, which is used by Hubs
@@ -7,8 +8,10 @@ import useViewAsWallet from './useViewAsWallet'
  * Feel free to direct questions to @asktree
  */
 export default function useWalletOnePointOh() {
-  const wallet = useWalletStore((s) => s.current)
-  const debugWallet = useViewAsWallet()
+  const { wallet } = useWallet()
+  const debugAdapter = useViewAsWallet()
 
-  return debugWallet ?? wallet
+  const adapter =
+    wallet !== null ? (wallet.adapter as SignerWalletAdapter) : undefined
+  return debugAdapter ?? adapter
 }

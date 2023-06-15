@@ -15,7 +15,6 @@ import {
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
 import { isFormValid } from '@utils/formValidation'
-import useWalletStore from 'stores/useWalletStore'
 import { web3 } from '@coral-xyz/anchor'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
@@ -25,6 +24,7 @@ import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes'
 import { StakeAccount, StakeState } from '@utils/uiTypes/assets'
 import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
 import { getFilteredProgramAccounts } from '@utils/helpers'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const WithdrawValidatorStake = ({
   index,
@@ -33,7 +33,7 @@ const WithdrawValidatorStake = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const programId: PublicKey = StakeProgram.programId
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)
@@ -191,7 +191,6 @@ const WithdrawValidatorStake = ({
       ),
       isValid: true,
       governance: form.governedTokenAccount.governance,
-      shouldSplitIntoSeparateTxs: false,
     }
   }
 

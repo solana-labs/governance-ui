@@ -8,16 +8,14 @@ import { useEffect, useRef, useState } from 'react';
 import { Config } from '../fetchConfig';
 import cx from '@hub/lib/cx';
 
+import { DEFAULT_NFT_VOTER_PLUGIN } from '@tools/constants';
+
 import { Custom } from './Custom';
 import { NFT } from './NFT';
 
 export const DEFAULT_NFT_CONFIG = {
-  votingProgramId: new PublicKey(
-    'GnftV5kLjd67tvHpNGyodwWveEKivz3ZWvvE3Z4xi2iw',
-  ),
-  maxVotingProgramId: new PublicKey(
-    'GnftV5kLjd67tvHpNGyodwWveEKivz3ZWvvE3Z4xi2iw',
-  ),
+  votingProgramId: new PublicKey(DEFAULT_NFT_VOTER_PLUGIN),
+  maxVotingProgramId: new PublicKey(DEFAULT_NFT_VOTER_PLUGIN),
 };
 
 export const DEFAULT_VSR_CONFIG = {
@@ -262,7 +260,8 @@ export function VotingStructureSelector(props: Props) {
         )}
         <DropdownMenu.Portal>
           <DropdownMenu.Content
-            className="space-y-0.5 bg-white dark:bg-black"
+            // weo weo z-index crap
+            className="dark space-y-0.5 z-20"
             sideOffset={2}
             style={{ width }}
           >

@@ -1,12 +1,17 @@
 import {
   createSetGovernanceConfig,
   GovernanceConfig,
+  Realm,
   VoteThresholdType,
   VoteTipping,
 } from '@solana/spl-governance';
-import type { PublicKey } from '@solana/web3.js';
+import type { Connection, PublicKey } from '@solana/web3.js';
+import BigNumber from 'bignumber.js';
 import BN from 'bn.js';
 
+import { fetchGovernanceAccountByPubkey } from '@hooks/queries/governanceAccount';
+import { fetchMintInfoByPubkey } from '@hooks/queries/mintInfo';
+import queryClient from '@hooks/queries/queryClient';
 import { GovernanceVoteTipping } from '@hub/types/GovernanceVoteTipping';
 
 import { MAX_NUM } from './constants';
@@ -32,18 +37,60 @@ function convertVoteTipping(tipping: GovernanceVoteTipping): VoteTipping {
   }
 }
 
-export function createTransaction(
+export async function createTransaction(
+  connection: Connection,
   programId: PublicKey,
   programVersion: number,
   governance: PublicKey,
+  realmPk: PublicKey,
   rules: Rules,
 ) {
+  const newConfig = await rules2governanceConfig(connection, realmPk, rules);
+
+  const instruction = createSetGovernanceConfig(
+    programId,
+    programVersion,
+    governance,
+    newConfig,
+  );
+
+  return instruction;
+}
+
+export async function rules2governanceConfig(
+  connection: Connection,
+  realmPk: PublicKey,
+  rules: Omit<Rules, 'governanceAddress' | 'walletAddress'>,
+) {
+  const realm = await fetchGovernanceAccountByPubkey(
+    connection,
+    Realm,
+    'Realm',
+    realmPk,
+  );
+  if (!realm.result) throw new Error('realm fetch failed');
+  const communityMintInfo = await fetchMintInfoByPubkey(
+    connection,
+    realm.result.account.communityMint,
+  );
+  const councilMintInfo =
+    realm.result.account.config.councilMint !== undefined
+      ? await fetchMintInfoByPubkey(
+          connection,
+          realm.result.account.config.councilMint,
+        )
+      : undefined;
+
   const communityRules = rules.communityTokenRules;
   const councilRules = rules.councilTokenRules;
+
   const minCommunityTokensToCreateProposal = new BN(
     (communityRules.canCreateProposal
       ? communityRules.votingPowerToCreateProposals.shiftedBy(
-          communityRules.tokenMintDecimals.toNumber(),
+          communityMintInfo.result?.decimals ??
+            (() => {
+              throw new Error('communityMintInfo failed to fetch');
+            })(),
         )
       : MAX_NUM
     ).toString(),
@@ -52,7 +99,12 @@ export function createTransaction(
   const minCouncilTokensToCreateProposal = new BN(
     (councilRules && councilRules.canCreateProposal
       ? councilRules.votingPowerToCreateProposals.shiftedBy(
-          councilRules.tokenMintDecimals.toNumber(),
+          councilMintInfo?.result?.decimals ??
+            (() => {
+              throw new Error(
+                'councilMintInfo failed to fetch or doesnt exist',
+              );
+            })(),
         )
       : MAX_NUM
     ).toString(),
@@ -107,13 +159,5 @@ export function createTransaction(
     votingCoolOffTime: hoursToSeconds(rules.coolOffHours),
     depositExemptProposalCount: rules.depositExemptProposalCount,
   });
-
-  const instruction = createSetGovernanceConfig(
-    programId,
-    programVersion,
-    governance,
-    newConfig,
-  );
-
-  return instruction;
+  return newConfig;
 }

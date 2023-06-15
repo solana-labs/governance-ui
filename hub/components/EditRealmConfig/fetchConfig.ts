@@ -1,5 +1,6 @@
+import { NFT_PLUGINS_PKS } from '@constants/plugins';
 import { AnchorProvider, Wallet } from '@project-serum/anchor';
-import { NftVoterClient } from '@solana/governance-program-library';
+
 import {
   RealmConfig,
   RealmConfigAccount,
@@ -15,9 +16,10 @@ import BN from 'bn.js';
 
 import { tryGetNftRegistrar } from 'VoteStakeRegistry/sdk/api';
 
-import { nftPluginsPks } from '@hooks/useVotingPlugins';
+import { getNetworkFromEndpoint } from '@utils/connection';
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts';
 import { parseMintAccountData, MintAccount } from '@utils/tokens';
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient';
 
 export interface Config {
   config: RealmConfig;
@@ -35,14 +37,16 @@ export interface Config {
 export async function fetchConfig(
   connection: Connection,
   realmPublicKey: PublicKey,
-  programPublicKey: PublicKey,
   wallet: Pick<Wallet, 'publicKey' | 'signTransaction' | 'signAllTransactions'>,
-  isDevnet?: boolean,
 ): Promise<Config> {
-  const [realm, realmConfigPublicKey] = await Promise.all([
-    getRealm(connection, realmPublicKey),
-    getRealmConfigAddress(programPublicKey, realmPublicKey),
-  ]);
+  const realm = await getRealm(connection, realmPublicKey);
+
+  const programPublicKey = realm.owner;
+
+  const realmConfigPublicKey = await getRealmConfigAddress(
+    programPublicKey,
+    realmPublicKey,
+  );
 
   const realmConfig = realm.account.config;
   const configAccountInfo = await connection.getAccountInfo(
@@ -80,11 +84,13 @@ export async function fetchConfig(
   let nftCollectionWeight = new BN(0);
   const defaultOptions = AnchorProvider.defaultOptions();
   const anchorProvider = new AnchorProvider(connection, wallet, defaultOptions);
+
+  const isDevnet = getNetworkFromEndpoint(connection.rpcEndpoint) === 'devnet';
   const nftClient = await NftVoterClient.connect(anchorProvider, isDevnet);
   const pluginPublicKey =
     configProgramAccount.account.communityTokenConfig.voterWeightAddin;
 
-  if (pluginPublicKey && nftPluginsPks.includes(pluginPublicKey.toBase58())) {
+  if (pluginPublicKey && NFT_PLUGINS_PKS.includes(pluginPublicKey.toBase58())) {
     if (nftClient && realm.account.communityMint) {
       const programId = nftClient.program.programId;
       const registrarPDA = (

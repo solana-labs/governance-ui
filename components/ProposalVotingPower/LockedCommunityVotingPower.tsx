@@ -5,35 +5,39 @@ import { useCallback } from 'react'
 import classNames from 'classnames'
 
 import { calculateMaxVoteScore } from '@models/proposal/calulateMaxVoteScore'
-import useProposal from '@hooks/useProposal'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { getMintDecimalAmount } from '@tools/sdk/units'
 import Tooltip from '@components/Tooltip'
 import { SecondaryButton } from '@components/Button'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import useWalletStore from 'stores/useWalletStore'
 import { notify } from '@utils/notifications'
 
 import { getMintMetadata } from '../instructions/programs/splToken'
 import depositTokensVSR from './depositTokensVSR'
 import VotingPowerPct from './VotingPowerPct'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
+import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
+import { useRouteProposalQuery } from '@hooks/queries/proposal'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 interface Props {
   className?: string
 }
 
 export default function LockedCommunityVotingPower(props: Props) {
-  const { mint, realm, realmInfo, realmTokenAccount, tokenRecords } = useRealm()
-  const { proposal } = useProposal()
+  const realm = useRealmQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+
+  const { realmInfo, realmTokenAccount } = useRealm()
+  const proposal = useRouteProposalQuery().data?.result
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
-  const connection = useWalletStore((s) => s.connection.current)
+  const { connection } = useConnection()
   const deposits = useDepositStore((s) => s.state.deposits)
-  const endpoint = useWalletStore((s) => s.connection.endpoint)
-  const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
-  const fetchWalletTokenAccounts = useWalletStore(
-    (s) => s.actions.fetchWalletTokenAccounts
-  )
+
+  const endpoint = connection.rpcEndpoint
+
   const getOwnedDeposits = useDepositStore((s) => s.getOwnedDeposits)
   const votingPower = useDepositStore((s) => s.state.votingPower)
   const votingPowerFromDeposits = useDepositStore(
@@ -42,10 +46,9 @@ export default function LockedCommunityVotingPower(props: Props) {
   const wallet = useWalletOnePointOh()
   const isLoading = useDepositStore((s) => s.state.isLoading)
 
-  const currentTokenOwnerRecord =
-    wallet && wallet.publicKey
-      ? tokenRecords[wallet.publicKey.toBase58()]
-      : null
+  const currentTokenOwnerRecord = useUserCommunityTokenOwnerRecord().data
+    ?.result
+
   const tokenOwnerRecordPk = currentTokenOwnerRecord
     ? currentTokenOwnerRecord.pubkey
     : null
@@ -53,7 +56,7 @@ export default function LockedCommunityVotingPower(props: Props) {
   const depositRecord = deposits.find(
     (deposit) =>
       deposit.mint.publicKey.toBase58() ===
-        realm!.account.communityMint.toBase58() && deposit.lockup.kind.none
+        realm?.account.communityMint.toBase58() && deposit.lockup.kind.none
   )
 
   const depositMint = realm?.account.communityMint
@@ -71,9 +74,7 @@ export default function LockedCommunityVotingPower(props: Props) {
 
   const multiplier =
     !votingPower.isZero() && !votingPowerFromDeposits.isZero()
-      ? (votingPower.toNumber() / votingPowerFromDeposits.toNumber()).toFixed(
-          2
-        ) + 'x'
+      ? votingPower.div(votingPowerFromDeposits).toNumber().toFixed(2) + 'x'
       : null
 
   const tokenAmount =
@@ -129,9 +130,6 @@ export default function LockedCommunityVotingPower(props: Props) {
           realmPk: realm.pubkey,
           walletPk: wallet.publicKey,
         })
-
-        await fetchWalletTokenAccounts()
-        await fetchRealm(realmInfo.programId, realmInfo.realmId)
       } catch (e) {
         console.error(e)
         notify({ message: `Something went wrong ${e}`, type: 'error' })
@@ -141,8 +139,6 @@ export default function LockedCommunityVotingPower(props: Props) {
     client,
     connection,
     endpoint,
-    fetchWalletTokenAccounts,
-    fetchRealm,
     getOwnedDeposits,
     realm,
     realmInfo,

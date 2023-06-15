@@ -7,31 +7,35 @@ import { BN } from '@coral-xyz/anchor'
 import { RpcContext } from '@solana/spl-governance'
 import { notify } from '@utils/notifications'
 import { useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import { voteRegistryDepositWithoutLockup } from 'VoteStakeRegistry/actions/voteRegistryDepositWithoutLockup'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
+import { useConnection } from '@solana/wallet-adapter-react'
+import queryClient from '@hooks/queries/queryClient'
+import { tokenAccountQueryKeys } from '@hooks/queries/tokenAccount'
 
 const DepositCommunityTokensBtn = ({ className = '', inAccountDetails }) => {
   const { getOwnedDeposits } = useDepositStore()
-  const { realm, realmInfo, realmTokenAccount, tokenRecords } = useRealm()
+  const realm = useRealmQuery().data?.result
+
+  const { realmInfo, realmTokenAccount } = useRealm()
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const [isLoading, setIsLoading] = useState(false)
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
-  const connection = useWalletStore((s) => s.connection.current)
-  const endpoint = useWalletStore((s) => s.connection.endpoint)
-  const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
-    (s) => s.actions
-  )
+  const { connection } = useConnection()
+  const endpoint = connection.rpcEndpoint
+  const currentTokenOwnerRecord = useUserCommunityTokenOwnerRecord().data
+    ?.result
 
   const depositAllTokens = async function () {
     if (!realm) {
       throw 'No realm selected'
     }
     setIsLoading(true)
-    const currentTokenOwnerRecord = tokenRecords[wallet!.publicKey!.toBase58()]
     const tokenOwnerRecordPk =
       typeof currentTokenOwnerRecord !== 'undefined'
         ? currentTokenOwnerRecord.pubkey
@@ -63,8 +67,12 @@ const DepositCommunityTokensBtn = ({ className = '', inAccountDetails }) => {
         client: client!,
         connection,
       })
-      await fetchWalletTokenAccounts()
-      await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+      queryClient.invalidateQueries(
+        tokenAccountQueryKeys.byOwner(
+          connection.rpcEndpoint,
+          wallet!.publicKey!
+        )
+      )
     } catch (e) {
       console.log(e)
       notify({ message: `Something went wrong ${e}`, type: 'error' })

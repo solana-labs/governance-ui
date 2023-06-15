@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAsync } from 'react-async-hook'
 import { BN } from '@coral-xyz/anchor'
 import {
@@ -13,13 +13,9 @@ import {
   getMintDecimalAmountFromNatural,
   getMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
-import useWalletStore from 'stores/useWalletStore'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
-import {
-  getTokenOwnerRecordAddress,
-  GoverningTokenRole,
-} from '@solana/spl-governance'
+import { GoverningTokenRole } from '@solana/spl-governance'
 import InlineNotification from '@components/InlineNotification'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
@@ -37,24 +33,45 @@ import useHeliumVsrStore from '../hooks/useHeliumVsrStore'
 import { PublicKey } from '@solana/web3.js'
 import { notify } from '@utils/notifications'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useSubDaos } from 'HeliumVotePlugin/hooks/useSubDaos'
+import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
+import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export const LockTokensAccount: React.FC<{
-  tokenOwnerRecordPk: string | string[] | undefined
+  // tokenOwnerRecordPk: string | string[] | undefined // @asktree: this was unused
   children: React.ReactNode
-}> = ({ tokenOwnerRecordPk, children }) => {
-  const {
-    mint,
-    realm,
-    realmTokenAccount,
-    realmInfo,
-    tokenRecords,
-    councilMint,
-    config,
-  } = useRealm()
+}> = (props) => {
+  const { error, createPosition } = useCreatePosition()
+  const [isLockModalOpen, setIsLockModalOpen] = useState(false)
+  const connection = useLegacyConnectionContext()
+  const wallet = useWalletOnePointOh()
+  const { data: tokenOwnerRecordPk } = useAddressQuery_CommunityTokenOwner()
 
-  const tokenOwnerRecordWalletPk = Object.keys(tokenRecords)?.find(
-    (key) => tokenRecords[key]?.pubkey?.toBase58() === tokenOwnerRecordPk
+  const connected = !!wallet?.connected
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const realm = useRealmQuery().data?.result
+  const config = useRealmConfigQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { realmTokenAccount, realmInfo } = useRealm()
+
+  const selectedCommunityDelegator = useSelectedDelegatorStore(
+    (s) => s.communityDelegator
   )
+  // if we have a community token delegator selected (this is rare), use that. otherwise use user wallet.
+  const tokenOwnerRecordWalletPk =
+    selectedCommunityDelegator !== undefined
+      ? selectedCommunityDelegator
+      : // I wanted to eliminate `null` as a possible type
+        wallet?.publicKey ?? undefined
 
   const [
     currentClient,
@@ -65,18 +82,14 @@ export const LockTokensAccount: React.FC<{
     s.state.heliumVsrClient,
     s.state.heliumVsrRegistrar,
   ])
-  const { error, createPosition } = useCreatePosition()
-  const [isOwnerOfPositions, setIsOwnerOfPositions] = useState(true)
-  const [isLockModalOpen, setIsLockModalOpen] = useState(false)
-  const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletOnePointOh()
-  const connected = !!wallet?.connected
-  const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
-    (s) => s.actions
-  )
+  const {
+    loading: loadingSubDaos,
+    error: subDaosError,
+    result: subDaos,
+  } = useSubDaos()
 
   const [
-    isLoading,
+    loading,
     positions,
     votingPower,
     amountLocked,
@@ -88,6 +101,30 @@ export const LockTokensAccount: React.FC<{
     s.state.amountLocked,
     s.getPositions,
   ])
+
+  const sortedPositions = useMemo(
+    () =>
+      positions.sort((a, b) => {
+        if (a.hasGenesisMultiplier || b.hasGenesisMultiplier) {
+          if (b.hasGenesisMultiplier) {
+            return a.amountDepositedNative.gt(b.amountDepositedNative) ? 0 : -1
+          }
+          return -1
+        }
+
+        return a.amountDepositedNative.gt(b.amountDepositedNative) ? -1 : 0
+      }),
+    [positions]
+  )
+
+  useEffect(() => {
+    if (subDaosError) {
+      notify({
+        type: 'error',
+        message: subDaosError.message || 'Unable to fetch subdaos',
+      })
+    }
+  }, [subDaosError])
 
   useAsync(async () => {
     try {
@@ -114,35 +151,7 @@ export const LockTokensAccount: React.FC<{
         message: 'Unable to fetch positions',
       })
     }
-  }, [isOwnerOfPositions, vsrClient])
-
-  useEffect(() => {
-    const getTokenOwnerRecord = async () => {
-      const defaultMint =
-        !mint?.supply.isZero() ||
-        config?.account.communityTokenConfig.maxVoterWeightAddin
-          ? realm!.account.communityMint
-          : !councilMint?.supply.isZero()
-          ? realm!.account.config.councilMint
-          : undefined
-
-      const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
-        realm!.owner,
-        realm!.pubkey,
-        defaultMint!,
-        wallet!.publicKey!
-      )
-
-      setIsOwnerOfPositions(
-        tokenOwnerRecordAddress.toBase58() === tokenOwnerRecordPk
-      )
-    }
-
-    if (realm && wallet?.connected) {
-      getTokenOwnerRecord()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [realm?.pubkey.toBase58(), wallet?.connected, tokenOwnerRecordPk])
+  }, [tokenOwnerRecordWalletPk, vsrClient])
 
   const hasTokensInWallet =
     realmTokenAccount && realmTokenAccount.account.amount.gt(new BN(0))
@@ -205,18 +214,14 @@ export const LockTokensAccount: React.FC<{
       amount,
       mint!.decimals
     )
-
     await createPosition({
       amount: amountToLock,
       lockupPeriodsInDays: lockupPeriodInDays,
       lockupKind: lockupKind.value,
-      tokenOwnerRecordPk:
-        tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey || null,
+      tokenOwnerRecordPk: tokenOwnerRecordPk ?? null, //@asktree: using `null` in 2023 huh.. discusting...
     })
 
     if (!error) {
-      fetchWalletTokenAccounts()
-      fetchRealm(realmInfo!.programId, realmInfo!.realmId)
       await getPositions({
         votingClient: currentClient,
         realmPk: realm!.pubkey,
@@ -229,6 +234,13 @@ export const LockTokensAccount: React.FC<{
   }
 
   const mainBoxesClasses = 'bg-bkg-1 col-span-1 p-4 rounded-md'
+  const isLoading = loading || loadingSubDaos
+  const isSameWallet =
+    (connected && !ownTokenRecord) ||
+    (connected &&
+      !!ownTokenRecord &&
+      wallet!.publicKey!.equals(ownTokenRecord!.account.governingTokenOwner))
+
   return (
     <div className="grid grid-cols-12 gap-4">
       <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12">
@@ -249,7 +261,7 @@ export const LockTokensAccount: React.FC<{
             My governance power{' '}
           </h1>
 
-          {isOwnerOfPositions && (
+          {isSameWallet && (
             <div className="ml-auto flex flex-row">
               <LockCommunityTokensBtn
                 onClick={() => setIsLockModalOpen(true)}
@@ -257,7 +269,7 @@ export const LockTokensAccount: React.FC<{
             </div>
           )}
         </div>
-        {!isOwnerOfPositions && connected && (
+        {!isSameWallet && connected && (
           <div className="pb-6">
             <InlineNotification
               desc="You do not own this account"
@@ -286,7 +298,7 @@ export const LockTokensAccount: React.FC<{
                       />
                     )}
                   </div>
-                  {isOwnerOfPositions && (
+                  {isSameWallet && (
                     <>
                       <div className={mainBoxesClasses}>
                         <p className="text-fgd-3">{`${tokenName} Available`}</p>
@@ -321,27 +333,21 @@ export const LockTokensAccount: React.FC<{
             </div>
             <h2 className="mb-4">Locked Positions</h2>
             <div
-              className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8 ${
-                !isOwnerOfPositions ? 'opacity-0.8 pointer-events-none' : ''
+              className={`grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8 ${
+                !isSameWallet ? 'opacity-0.8 pointer-events-none' : ''
               }`}
             >
-              {!isLoading &&
-                positions
-                  .sort((a, b) =>
-                    a.hasGenesisMultiplier
-                      ? b.hasGenesisMultiplier
-                        ? 0
-                        : -1
-                      : 1
-                  )
-                  .map((pos, idx) => (
-                    <PositionCard
-                      key={idx}
-                      position={pos}
-                      isOwner={isOwnerOfPositions}
-                    />
-                  ))}
-              {isOwnerOfPositions && (
+              {!loading &&
+                sortedPositions.map((pos, idx) => (
+                  <PositionCard
+                    key={idx}
+                    position={pos}
+                    subDaos={subDaos}
+                    tokenOwnerRecordPk={tokenOwnerRecordPk ?? null}
+                    isOwner={isSameWallet}
+                  />
+                ))}
+              {isSameWallet && (
                 <div className="border border-fgd-4 flex flex-col items-center justify-center p-6 rounded-lg">
                   <LightningBoltIcon className="h-8 mb-2 text-primary-light w-8" />
                   <p className="flex text-center pb-6">
@@ -383,7 +389,7 @@ export const LockTokensAccount: React.FC<{
         )}
         <div
           className={`mt-4 ${
-            !isOwnerOfPositions ? 'opacity-0.8 pointer-events-none' : ''
+            !isSameWallet ? 'opacity-0.8 pointer-events-none' : ''
           }`}
         >
           <TokenDeposit
@@ -394,7 +400,7 @@ export const LockTokensAccount: React.FC<{
           />
         </div>
       </div>
-      {connected && isOwnerOfPositions && children}
+      {connected && isSameWallet && props.children}
     </div>
   )
 }

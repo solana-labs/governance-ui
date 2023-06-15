@@ -8,7 +8,6 @@ import {
   getUpdateTokenMetadataInstruction,
   validateInstruction,
 } from '@utils/instructionTools'
-import useWalletStore from 'stores/useWalletStore'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import useCreateProposal from '@hooks/useCreateProposal'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
@@ -29,6 +28,8 @@ import { LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { PublicKey } from '@solana/web3.js'
 import { Metaplex } from '@metaplex-foundation/js'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface GovernanceConfigForm {
   mintAccount: AssetAccount | undefined
@@ -49,11 +50,12 @@ const MetadataCreationModal = ({
   initialMintAccount?: AssetAccount | undefined
 }) => {
   const router = useRouter()
-  const { realm, canChooseWhoVote, symbol, realmInfo } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { canChooseWhoVote, symbol, realmInfo } = useRealm()
   const programId: PublicKey | undefined = realmInfo?.programId
 
   const { assetAccounts } = useGovernanceAssets()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const mintGovernancesWithMintInfo = assetAccounts.filter((x) => {
     return x.type === AccountType.MINT
   })
@@ -179,11 +181,9 @@ const MetadataCreationModal = ({
         : 'https://node1.bundlr.network',
       'solana',
       wallet,
-      connection.cluster == 'devnet'
-        ? {
-            providerUrl: connection.current.rpcEndpoint,
-          }
-        : undefined
+      {
+        providerUrl: connection.current.rpcEndpoint,
+      }
     )
     try {
       await bundlr.utils.getBundlerAddress('solana')

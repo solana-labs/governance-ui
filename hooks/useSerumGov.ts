@@ -11,10 +11,10 @@ import useSerumGovStore, {
   VestAccountType,
 } from 'stores/useSerumGovStore'
 import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
-import useWalletStore from 'stores/useWalletStore'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 export default function useSerumGov(ownerAddress?: PublicKey | string | null) {
-  const connection = useWalletStore((s) => s.connection.current)
+  const { connection } = useConnection()
   const { anchorProvider } = useWalletDeprecated()
   const serumGovProgramId = useSerumGovStore((s) => s.programId)
   const gsrmMint = useSerumGovStore((s) => s.gsrmMint)
@@ -309,7 +309,7 @@ const fetchVestAccounts = async (
 //   const routeHasClusterInPath = router.asPath.includes('cluster')
 //   const { cluster } = router.query
 
-//   const connection = useWalletStore((s) => s.connection.current)
+//   const { connection } = useConnection()
 //   const { anchorProvider } = useWallet()
 
 //   const actions = useSerumGovStore((s) => s.actions)

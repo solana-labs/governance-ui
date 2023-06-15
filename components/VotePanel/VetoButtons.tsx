@@ -3,34 +3,38 @@ import VoteCommentModal from '@components/VoteCommentModal'
 import { BanIcon } from '@heroicons/react/solid'
 import useRealm from '@hooks/useRealm'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import {
-  GoverningTokenRole,
-  VoteThresholdType,
-  VoteKind,
-} from '@solana/spl-governance'
+import { VoteThresholdType, VoteKind } from '@solana/spl-governance'
 import { useMemo, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
+import { useIsInCoolOffTime, useIsVoting, useVotingPop } from './hooks'
 import {
-  useIsInCoolOffTime,
-  useIsVoting,
-  useProposalVoteRecordQuery,
-} from './hooks'
+  useUserCommunityTokenOwnerRecord,
+  useUserCouncilTokenOwnerRecord,
+} from '@hooks/queries/tokenOwnerRecord'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useProposalGovernanceQuery } from '@hooks/useProposal'
+import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
+import { useSubmitVote } from '@hooks/useSubmitVote'
+import { useSelectedRealmInfo } from '@hooks/selectedRealm/useSelectedRealmRegistryEntry'
 
-/* 
+/*
   returns: undefined if loading, false if nobody can veto, 'council' if council can veto, 'community' if community can veto
 */
 export const useVetoingPop = () => {
-  const { tokenRole, governance } = useWalletStore((s) => s.selectedProposal)
-
+  const tokenRole = useVotingPop()
+  const governance = useProposalGovernanceQuery().data?.result
+  const realm = useRealmQuery().data?.result
   const vetoingPop = useMemo(() => {
     if (governance === undefined) return undefined
 
-    return tokenRole === GoverningTokenRole.Community
+    return tokenRole === 'community'
       ? governance?.account.config.councilVetoVoteThreshold.type !==
-          VoteThresholdType.Disabled && 'council'
+          VoteThresholdType.Disabled &&
+          // if there is no council then there's not actually a vetoing population, in my opinion
+          realm?.account.config.councilMint !== undefined &&
+          'council'
       : governance?.account.config.communityVetoVoteThreshold.type !==
           VoteThresholdType.Disabled && 'community'
-  }, [governance, tokenRole])
+  }, [governance, tokenRole, realm?.account.config.councilMint])
 
   return vetoingPop
 }
@@ -46,7 +50,9 @@ const useIsVetoable = (): undefined | boolean => {
 }
 
 const useUserVetoTokenRecord = () => {
-  const { ownTokenRecord, ownCouncilTokenRecord } = useRealm()
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
+
   const vetoingPop = useVetoingPop()
   const voterTokenRecord =
     vetoingPop === 'community' ? ownTokenRecord : ownCouncilTokenRecord
@@ -96,12 +102,26 @@ const useCanVeto = ():
 }
 
 const VetoButtons = () => {
+  const realmInfo = useSelectedRealmInfo()
+  const allowDiscussion = realmInfo?.allowDiscussion ?? true
   const vetoable = useIsVetoable()
   const vetoingPop = useVetoingPop()
   const canVeto = useCanVeto()
   const [openModal, setOpenModal] = useState(false)
   const voterTokenRecord = useUserVetoTokenRecord()
   const { data: userVetoRecord } = useProposalVoteRecordQuery('veto')
+  const { submitting, submitVote } = useSubmitVote()
+
+  const handleVeto = async () => {
+    if (allowDiscussion) {
+      setOpenModal(true)
+    } else {
+      submitVote({
+        vote: VoteKind.Veto,
+        voterTokenRecord: voterTokenRecord!,
+      })
+    }
+  }
 
   return vetoable &&
     vetoingPop &&
@@ -118,8 +138,9 @@ const VetoButtons = () => {
               canVeto?.canVeto === false ? canVeto.message : undefined
             }
             className="w-full"
-            onClick={() => setOpenModal(true)}
-            disabled={!canVeto?.canVeto}
+            onClick={handleVeto}
+            disabled={!canVeto?.canVeto || submitting}
+            isLoading={submitting}
           >
             <div className="flex flex-row items-center justify-center">
               <BanIcon className="h-4 w-4 mr-2" />

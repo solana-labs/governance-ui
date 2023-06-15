@@ -3,7 +3,7 @@ import { Governance, Proposal, Realm } from '@solana/spl-governance'
 import { calculatePct, fmtTokenAmount } from '@utils/formatting'
 import { tryGetMint } from '@utils/tokens'
 import { useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
+import useLegacyConnectionContext from './useLegacyConnectionContext'
 
 const DEFAULT_VOTE = {
   voteThresholdPct: 100,
@@ -22,7 +22,7 @@ export default function useRealmProposalVotes(
   realm?: Realm,
   governance?: Governance
 ) {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const [voteData, setVoteData] = useState<UseRealmProposalVoteReturnType>(
     DEFAULT_VOTE

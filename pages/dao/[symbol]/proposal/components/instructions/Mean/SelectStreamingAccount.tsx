@@ -2,7 +2,6 @@ import { PaymentStreamingAccount } from '@mean-dao/payment-streaming'
 import { BN } from '@coral-xyz/anchor'
 import { Governance, ProgramAccount } from '@solana/spl-governance'
 import { useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 
 import Select from '@components/inputs/Select'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -11,6 +10,7 @@ import { abbreviateAddress } from '@utils/formatting'
 import createPaymentStreaming from '@utils/instructions/Mean/createPaymentStreaming'
 import getMint from '@utils/instructions/Mean/getMint'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const getLabel = (
   paymentStreamingAccount: PaymentStreamingAccount | undefined,
@@ -71,7 +71,7 @@ const SelectStreamingAccount = ({
   shouldBeGoverned = false,
   governance,
 }: Props) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const { governedTokenAccountsWithoutNfts: accounts } = useGovernanceAssets()
   const [paymentStreamingAccounts, setPaymentStreamingAccounts] = useState<

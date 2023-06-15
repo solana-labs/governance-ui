@@ -1,34 +1,37 @@
 import React, { useEffect, useState } from 'react'
-import Link from 'next/link'
 import { BN } from '@coral-xyz/anchor'
 import { GoverningTokenRole } from '@solana/spl-governance'
 import useRealm from '@hooks/useRealm'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
-import useQueryContext from '@hooks/useQueryContext'
-import { ChevronRightIcon } from '@heroicons/react/solid'
 import InlineNotification from '@components/InlineNotification'
 import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
 import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import { MintInfo } from '@solana/spl-token'
 import { VotingPowerBox } from './VotingPowerBox'
-import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
+import { useRealmQuery } from '@hooks/queries/realm'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
 
 export const VotingPowerCard: React.FC<{
   inAccountDetails?: boolean
 }> = ({ inAccountDetails }) => {
-  const { fmtUrlWithCluster } = useQueryContext()
+  const loading = useHeliumVsrStore((s) => s.state.isLoading)
   const [hasGovPower, setHasGovPower] = useState(false)
-  const { councilMint, ownTokenRecord, mint, symbol } = useRealm()
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
 
   const councilDepositVisible = !!councilMint
-  const { data: tokenOwnerRecordPk } = useAddressQuery_CommunityTokenOwner()
 
-  const isLoading = !mint || !councilMint
+  const isLoading = !mint || !councilMint || loading
   const isSameWallet =
     (connected && !ownTokenRecord) ||
     (connected &&
@@ -37,25 +40,6 @@ export const VotingPowerCard: React.FC<{
 
   return (
     <>
-      <div className="flex items-center justify-between">
-        <h3 className="mb-0">My governance power</h3>
-        <Link
-          href={fmtUrlWithCluster(
-            `/dao/${symbol}/account/${tokenOwnerRecordPk}`
-          )}
-        >
-          <a
-            className={`default-transition flex items-center text-fgd-2 text-sm transition-all hover:text-fgd-3 ${
-              !connected || !tokenOwnerRecordPk
-                ? 'opacity-50 pointer-events-none'
-                : ''
-            }`}
-          >
-            View
-            <ChevronRightIcon className="flex-shrink-0 h-6 w-6" />
-          </a>
-        </Link>
-      </div>
       {!isLoading ? (
         <>
           {!hasGovPower && !inAccountDetails && connected && (
@@ -106,7 +90,8 @@ const TokenDepositLock = ({
   setHasGovPower: (hasGovPower: boolean) => void
   isSameWallet: boolean
 }) => {
-  const { realm, realmTokenAccount } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { realmTokenAccount } = useRealm()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const [amountLocked, votingPower] = useHeliumVsrStore((s) => [
@@ -160,7 +145,7 @@ const TokenDepositLock = ({
           />
         </div>
       ) : null}
-      {votingPower.toNumber() > 0 && (
+      {votingPower.gt(new BN(0)) && (
         <div className="flex space-x-4 items-center mt-4">
           <VotingPowerBox
             votingPower={votingPower}

@@ -10,10 +10,10 @@ import GovernedAccountSelect from '../../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Input from '@components/inputs/Input'
 import { getWithdrawInstruction } from '@utils/instructions/Dual'
-import useWalletStore from 'stores/useWalletStore'
 import { getDualFinanceWithdrawSchema } from '@utils/validations'
 import Tooltip from '@components/Tooltip'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const DualWithdraw = ({
   index,
@@ -27,7 +27,7 @@ const DualWithdraw = ({
     baseTreasury: undefined,
     mintPk: undefined,
   })
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const { assetAccounts } = useGovernanceAssets()
@@ -40,28 +40,36 @@ const DualWithdraw = ({
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-  function getInstruction(): Promise<UiInstruction> {
-    return getWithdrawInstruction({
-      connection,
-      form,
-      schema,
-      setFormErrors,
-      wallet,
-    })
-  }
+  const schema = getDualFinanceWithdrawSchema()
   useEffect(() => {
+    function getInstruction(): Promise<UiInstruction> {
+      return getWithdrawInstruction({
+        connection,
+        form,
+        schema,
+        setFormErrors,
+        wallet,
+      })
+    }
     handleSetInstructions(
       { governedAccount: governedAccount, getInstruction },
       index
     )
-  }, [form])
+  }, [
+    form,
+    governedAccount,
+    handleSetInstructions,
+    index,
+    connection,
+    schema,
+    wallet,
+  ])
   useEffect(() => {
     handleSetForm({ value: undefined, propertyName: 'mintPk' })
   }, [form.baseTreasury])
   useEffect(() => {
     setGovernedAccount(form.baseTreasury?.governance)
   }, [form.baseTreasury])
-  const schema = getDualFinanceWithdrawSchema()
 
   // TODO: Include this in the config instruction which can optionally be done
   // if the project doesnt need to change where the tokens get returned to.

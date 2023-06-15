@@ -127,7 +127,6 @@ export async function getCastleDepositInstruction({
     governance: governedTokenAccount?.governance,
     prerequisiteInstructions: prerequisiteInstructions,
     signers,
-    shouldSplitIntoSeparateTxs: true,
   }
 
   return obj
@@ -229,7 +228,6 @@ export async function getCastleWithdrawInstruction({
     governance: governedTokenAccount?.governance,
     prerequisiteInstructions: prerequisiteInstructions,
     signers,
-    shouldSplitIntoSeparateTxs: true,
   }
 
   return obj

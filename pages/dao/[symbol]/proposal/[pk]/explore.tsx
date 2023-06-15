@@ -3,21 +3,23 @@ import { useRouter } from 'next/router'
 import classNames from 'classnames'
 import { ChevronLeftIcon } from '@heroicons/react/solid'
 
-import useProposal from '@hooks/useProposal'
+import { useProposalGovernanceQuery } from '@hooks/useProposal'
 import useVoteRecords from '@hooks/useVoteRecords'
 import ProposalStateBadge from '@components/ProposalStateBadge'
 import ProposalTopVotersList from '@components/ProposalTopVotersList'
 import ProposalTopVotersBubbleChart from '@components/ProposalTopVotersBubbleChart'
-import useWalletStore from 'stores/useWalletStore'
 import useSignatories from '@hooks/useSignatories'
 import ProposalSignatories from '@components/ProposalSignatories'
 import ProposalVoteResult from '@components/ProposalVoteResults'
 import ProposalRemainingVotingTime from '@components/ProposalRemainingVotingTime'
+import { useRouteProposalQuery } from '@hooks/queries/proposal'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export default function Explore() {
-  const { proposal, governance } = useProposal()
+  const proposal = useRouteProposalQuery().data?.result
+  const governance = useProposalGovernanceQuery().data?.result
   const [highlighted, setHighlighted] = useState<string | undefined>()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const records = useVoteRecords(proposal)
   const signatories = useSignatories(proposal)
   const router = useRouter()

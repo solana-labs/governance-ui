@@ -17,7 +17,6 @@ import {
   getMaxVoterWeightRecord,
   getRegistrarPDA,
 } from '@utils/plugin/accounts'
-import { NftVoterClient } from '@solana/governance-program-library'
 
 import {
   prepareRealmCreation,
@@ -25,8 +24,9 @@ import {
   Web3Context,
 } from '@tools/governance/prepareRealmCreation'
 import { trySentryLog } from '@utils/logs'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 
-export type NFTRealm = Web3Context &
+type NFTRealm = Web3Context &
   RealmCreation & {
     collectionAddress: string
     nftCollectionCount: number

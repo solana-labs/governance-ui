@@ -4,7 +4,6 @@ import useRealm from 'hooks/useRealm'
 import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import { PublicKey } from '@solana/web3.js'
 import { precision } from 'utils/formatting'
-import useWalletStore from 'stores/useWalletStore'
 import { UiInstruction, MintForm } from 'utils/uiTypes/proposalCreationTypes'
 import { getAccountName } from 'components/instructions/tools'
 import { NewProposalContext } from '../../new'
@@ -17,6 +16,9 @@ import { getMintInstruction } from 'utils/instructionTools'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import { useDestination } from '@hooks/useDestination'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const Mint = ({
   index,
@@ -27,8 +29,11 @@ const Mint = ({
   governance: ProgramAccount<Governance> | null
   initialMintAccount?: AssetAccount | undefined
 }) => {
-  const connection = useWalletStore((s) => s.connection)
-  const { realmInfo, realm, config } = useRealm()
+  const connection = useLegacyConnectionContext()
+  const realm = useRealmQuery().data?.result
+  const config = useRealmConfigQuery().data?.result
+
+  const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
 
   const mintGovernancesWithMintInfo = assetAccounts

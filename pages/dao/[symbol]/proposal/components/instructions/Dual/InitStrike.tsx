@@ -10,10 +10,10 @@ import GovernedAccountSelect from '../../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Input from '@components/inputs/Input'
 import { getInitStrikeInstruction } from '@utils/instructions/Dual'
-import useWalletStore from 'stores/useWalletStore'
 import { getDualFinanceInitStrikeSchema } from '@utils/validations'
 import Tooltip from '@components/Tooltip'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const InitStrike = ({
   index,
@@ -28,7 +28,7 @@ const InitStrike = ({
     soName: '',
     strikes: '',
   })
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const { assetAccounts } = useGovernanceAssets()

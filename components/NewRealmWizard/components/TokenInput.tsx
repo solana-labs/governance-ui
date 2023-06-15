@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react'
-import { TokenListProvider, TokenInfo } from '@solana/spl-token-registry'
 import { MintInfo, u64 } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
 
 import { getMintSupplyAsDecimal } from '@tools/sdk/units'
-import useWalletStore from 'stores/useWalletStore'
 import { tryGetMint } from '@utils/tokens'
 import { validatePubkey } from '@utils/formValidation'
 import { preventNegativeNumberInput } from '@utils/helpers'
@@ -17,6 +15,9 @@ import TokenInfoTable, {
   GenericTokenIcon,
 } from '@components/NewRealmWizard/components/TokenInfoTable'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { TokenInfo } from '@utils/services/types'
+import tokenPriceService from '@utils/services/tokenPrice'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface MintInfoWithDecimalSupply extends MintInfo {
   supplyAsDecimal: number
@@ -59,10 +60,10 @@ export default function TokenInput({
   onValidation,
   disableMinTokenInput = false,
 }) {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
-  const [tokenList, setTokenList] = useState<TokenInfo[] | undefined>()
+  const tokenList = tokenPriceService._tokenList
   const [tokenMintAddress, setTokenMintAddress] = useState('')
   const [tokenInfo, setTokenInfo] = useState<TokenWithMintInfo | undefined>()
   const validMintAddress = tokenInfo && tokenInfo !== PENDING_COIN
@@ -79,20 +80,6 @@ export default function TokenInput({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [wallet])
-
-  useEffect(() => {
-    async function getTokenList() {
-      const tokenList = await new TokenListProvider().resolve()
-      const filteredTokenList = tokenList
-        .filterByClusterSlug(
-          connection.cluster === 'mainnet' ? 'mainnet-beta' : connection.cluster
-        )
-        .getList()
-      setTokenList(filteredTokenList)
-    }
-
-    getTokenList()
-  }, [connection.cluster])
 
   useEffect(() => {
     async function getTokenInfo(tokenMintAddress) {

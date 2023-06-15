@@ -73,6 +73,7 @@ const TokenRegisterTrustless = ({
       const ix = await mangoClient!.program.methods
         .tokenRegisterTrustless(Number(form.tokenIndex), form.name)
         .accounts({
+          admin: form.governedAccount.extensions.transferAddress,
           group: mangoGroup!.publicKey,
           mint: new PublicKey(form.mintPk),
           oracle: new PublicKey(form.oraclePk),
@@ -125,11 +126,11 @@ const TokenRegisterTrustless = ({
       !mangoGroup || mangoGroup?.banksMapByTokenIndex.size === 0
         ? 0
         : Math.max(...[...mangoGroup!.banksMapByTokenIndex.keys()]) + 1
-    setForm({
-      ...form,
+    setForm((prevForm) => ({
+      ...prevForm,
       tokenIndex: tokenIndex,
-    })
-  }, [mangoGroup?.banksMapByTokenIndex.size])
+    }))
+  }, [mangoGroup])
 
   const inputs: InstructionInput[] = [
     {

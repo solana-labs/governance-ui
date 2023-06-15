@@ -5,15 +5,21 @@ import dynamic from 'next/dynamic'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import useQueryContext from '@hooks/useQueryContext'
 import {
-  gatewayPluginsPks,
-  nftPluginsPks,
-  switchboardPluginsPks,
-} from '@hooks/useVotingPlugins'
+  GATEWAY_PLUGINS_PKS,
+  NFT_PLUGINS_PKS,
+  SWITCHBOARD_PLUGINS_PKS,
+} from '@constants/plugins'
 import GatewayCard from '@components/Gateway/GatewayCard'
 import ClaimUnreleasedNFTs from './ClaimUnreleasedNFTs'
 import Link from 'next/link'
-import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwner'
+import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import {
+  useUserCommunityTokenOwnerRecord,
+  useUserCouncilTokenOwnerRecord,
+} from '@hooks/queries/tokenOwnerRecord'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import ClaimUnreleasedPositions from 'HeliumVotePlugin/components/ClaimUnreleasedPositions'
 
 const LockPluginTokenBalanceCard = dynamic(
   () =>
@@ -66,6 +72,98 @@ const GovernancePowerTitle = () => {
   )
 }
 
+const TokenBalanceCardInner = ({
+  proposal,
+  inAccountDetails,
+}: {
+  proposal?: Option<Proposal>
+  inAccountDetails?: boolean
+}) => {
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
+  const config = useRealmConfigQuery().data?.result
+
+  const { councilTokenAccount, vsrMode } = useRealm()
+  const currentPluginPk = config?.account?.communityTokenConfig.voterWeightAddin
+  const isNftMode =
+    currentPluginPk && NFT_PLUGINS_PKS.includes(currentPluginPk?.toBase58())
+  const isGatewayMode =
+    currentPluginPk && GATEWAY_PLUGINS_PKS.includes(currentPluginPk?.toBase58())
+  const isSwitchboardMode =
+    currentPluginPk &&
+    SWITCHBOARD_PLUGINS_PKS.includes(currentPluginPk?.toBase58())
+
+  if (
+    vsrMode === 'default' &&
+    (!ownTokenRecord ||
+      ownTokenRecord.account.governingTokenDepositAmount.isZero())
+  ) {
+    return <LockPluginTokenBalanceCard inAccountDetails={inAccountDetails} />
+  }
+
+  if (
+    vsrMode === 'helium' &&
+    (!ownTokenRecord ||
+      ownTokenRecord.account.governingTokenDepositAmount.isZero())
+  ) {
+    return (
+      <>
+        {!inAccountDetails && <GovernancePowerTitle />}
+        <HeliumVotingPowerCard inAccountDetails={inAccountDetails} />
+        <ClaimUnreleasedPositions inAccountDetails={inAccountDetails} />
+      </>
+    )
+  }
+
+  if (
+    isNftMode &&
+    (!ownTokenRecord ||
+      ownTokenRecord.account.governingTokenDepositAmount.isZero())
+  ) {
+    return (
+      <>
+        {(ownCouncilTokenRecord &&
+          !ownCouncilTokenRecord?.account.governingTokenDepositAmount.isZero()) ||
+        (councilTokenAccount &&
+          !councilTokenAccount?.account.amount.isZero()) ? (
+          <>
+            {!inAccountDetails && <GovernancePowerTitle />}
+            <NftVotingPower inAccountDetails={inAccountDetails} />
+            <TokenBalanceCard
+              proposal={proposal}
+              inAccountDetails={inAccountDetails}
+            />
+            <ClaimUnreleasedNFTs inAccountDetails={inAccountDetails} />
+          </>
+        ) : (
+          <>
+            {!inAccountDetails && <GovernancePowerTitle />}
+            <NftVotingPower inAccountDetails={inAccountDetails} />
+            <ClaimUnreleasedNFTs inAccountDetails={inAccountDetails} />
+          </>
+        )}
+      </>
+    )
+  }
+  if (
+    isSwitchboardMode &&
+    (!ownTokenRecord ||
+      ownTokenRecord.account.governingTokenDepositAmount.isZero())
+  ) {
+    return <SwitchboardPermissionCard></SwitchboardPermissionCard>
+  }
+  //Default
+  return (
+    <>
+      {!inAccountDetails && <GovernancePowerTitle />}
+      <TokenBalanceCard proposal={proposal} inAccountDetails={inAccountDetails}>
+        {/*Add the gateway card if this is a gated DAO*/}
+        {isGatewayMode && <GatewayCard></GatewayCard>}
+      </TokenBalanceCard>
+    </>
+  )
+}
+
 const TokenBalanceCardWrapper = ({
   proposal,
   inAccountDetails,
@@ -73,95 +171,14 @@ const TokenBalanceCardWrapper = ({
   proposal?: Option<Proposal>
   inAccountDetails?: boolean
 }) => {
-  const {
-    ownTokenRecord,
-    config,
-    ownCouncilTokenRecord,
-    councilTokenAccount,
-    vsrMode,
-  } = useRealm()
-  const currentPluginPk = config?.account?.communityTokenConfig.voterWeightAddin
-  const getTokenBalanceCard = () => {
-    const isNftMode =
-      currentPluginPk && nftPluginsPks.includes(currentPluginPk?.toBase58())
-    const isGatewayMode =
-      currentPluginPk && gatewayPluginsPks.includes(currentPluginPk?.toBase58())
-    const isSwitchboardMode =
-      currentPluginPk &&
-      switchboardPluginsPks.includes(currentPluginPk?.toBase58())
-
-    if (
-      vsrMode === 'default' &&
-      (!ownTokenRecord ||
-        ownTokenRecord.account.governingTokenDepositAmount.isZero())
-    ) {
-      return <LockPluginTokenBalanceCard inAccountDetails={inAccountDetails} />
-    }
-
-    if (
-      vsrMode === 'helium' &&
-      (!ownTokenRecord ||
-        ownTokenRecord.account.governingTokenDepositAmount.isZero())
-    ) {
-      return <HeliumVotingPowerCard inAccountDetails={inAccountDetails} />
-    }
-
-    if (
-      isNftMode &&
-      (!ownTokenRecord ||
-        ownTokenRecord.account.governingTokenDepositAmount.isZero())
-    ) {
-      return (
-        <>
-          {(ownCouncilTokenRecord &&
-            !ownCouncilTokenRecord?.account.governingTokenDepositAmount.isZero()) ||
-          (councilTokenAccount &&
-            !councilTokenAccount?.account.amount.isZero()) ? (
-            <>
-              {!inAccountDetails && <GovernancePowerTitle />}
-              <NftVotingPower inAccountDetails={inAccountDetails} />
-              <TokenBalanceCard
-                proposal={proposal}
-                inAccountDetails={inAccountDetails}
-              />
-              <ClaimUnreleasedNFTs inAccountDetails={inAccountDetails} />
-            </>
-          ) : (
-            <>
-              {!inAccountDetails && <GovernancePowerTitle />}
-              <NftVotingPower inAccountDetails={inAccountDetails} />
-              <ClaimUnreleasedNFTs inAccountDetails={inAccountDetails} />
-            </>
-          )}
-        </>
-      )
-    }
-    if (
-      isSwitchboardMode &&
-      (!ownTokenRecord ||
-        ownTokenRecord.account.governingTokenDepositAmount.isZero())
-    ) {
-      return <SwitchboardPermissionCard></SwitchboardPermissionCard>
-    }
-    //Default
-    return (
-      <>
-        {!inAccountDetails && <GovernancePowerTitle />}
-        <TokenBalanceCard
-          proposal={proposal}
-          inAccountDetails={inAccountDetails}
-        >
-          {/*Add the gateway card if this is a gated DAO*/}
-          {isGatewayMode && <GatewayCard></GatewayCard>}
-        </TokenBalanceCard>
-      </>
-    )
-  }
   return (
     <div
       className={`rounded-lg bg-bkg-2 ${inAccountDetails ? `` : `p-4 md:p-6`}`}
     >
-      {getTokenBalanceCard()}
+      <TokenBalanceCardInner
+        proposal={proposal}
+        inAccountDetails={inAccountDetails}
+      />
     </div>
   )
 }

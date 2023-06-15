@@ -1,8 +1,5 @@
 import create, { State } from 'zustand'
-import {
-  NftVoterClient,
-  GatewayClient,
-} from '@solana/governance-program-library'
+import { GatewayClient } from '@solana/governance-program-library'
 import { SwitchboardQueueVoterClient } from '../SwitchboardVotePlugin/SwitchboardQueueVoterClient'
 import { getRegistrarPDA, Registrar } from 'VoteStakeRegistry/sdk/accounts'
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts'
@@ -23,6 +20,7 @@ import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import { Registrar as HeliumVsrRegistrar } from 'HeliumVotePlugin/sdk/types'
 import * as heliumVsrSdk from '@helium/voter-stake-registry-sdk'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 
 interface UseVotePluginsClientStore extends State {
   state: {
@@ -150,27 +148,32 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
       })
     },
     handleSetVsrRegistrar: async (client, realm) => {
-      const clientProgramId = client!.program.programId
+      console.log('setting vsr registrar')
+      if (realm === undefined) return
+
+      const clientProgramId = client.program.programId
       const { registrar } = await getRegistrarPDA(
-        realm!.pubkey,
-        realm!.account.communityMint,
+        realm.pubkey,
+        realm.account.communityMint,
         clientProgramId
       )
-      const existingRegistrar = await tryGetRegistrar(registrar, client!)
+      const existingRegistrar = await tryGetRegistrar(registrar, client)
       set((s) => {
         s.state.voteStakeRegistryRegistrar = existingRegistrar
         s.state.voteStakeRegistryRegistrarPk = registrar
       })
     },
     handleSetHeliumVsrRegistrar: async (client, realm) => {
-      const clientProgramId = client!.program.programId
+      if (realm === undefined) return
+
+      const clientProgramId = client.program.programId
       const [registrar] = heliumVsrSdk.registrarKey(
-        realm!.pubkey,
-        realm!.account.communityMint,
+        realm.pubkey,
+        realm.account.communityMint,
         clientProgramId
       )
 
-      const existingRegistrar = await tryGetHeliumRegistrar(registrar, client!)
+      const existingRegistrar = await tryGetHeliumRegistrar(registrar, client)
 
       set((s) => {
         s.state.heliumVsrRegistrar = existingRegistrar as HeliumVsrRegistrar
@@ -193,25 +196,29 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
       })
     },
     handleSetNftRegistrar: async (client, realm) => {
-      const clientProgramId = client!.program.programId
+      if (realm === undefined) return
+
+      const clientProgramId = client.program.programId
       const { registrar } = await getPluginRegistrarPDA(
-        realm!.pubkey,
-        realm!.account.communityMint,
+        realm.pubkey,
+        realm.account.communityMint,
         clientProgramId
       )
-      const existingRegistrar = await tryGetNftRegistrar(registrar, client!)
+      const existingRegistrar = await tryGetNftRegistrar(registrar, client)
       set((s) => {
         s.state.nftMintRegistrar = existingRegistrar
       })
     },
     handleSetGatewayRegistrar: async (client, realm) => {
-      const clientProgramId = client!.program.programId
+      if (realm === undefined) return
+
+      const clientProgramId = client.program.programId
       const { registrar } = await getPluginRegistrarPDA(
-        realm!.pubkey,
-        realm!.account.communityMint,
+        realm.pubkey,
+        realm.account.communityMint,
         clientProgramId
       )
-      const existingRegistrar = await tryGetGatewayRegistrar(registrar, client!)
+      const existingRegistrar = await tryGetGatewayRegistrar(registrar, client)
       set((s) => {
         s.state.gatewayRegistrar = existingRegistrar
       })

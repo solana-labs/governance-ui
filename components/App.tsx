@@ -1,16 +1,16 @@
 import { ThemeProvider } from 'next-themes'
 import { WalletIdentityProvider } from '@cardinal/namespaces-components'
 import dynamic from 'next/dynamic'
-import React, { useEffect } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import Head from 'next/head'
 import Script from 'next/script'
-import { QueryClientProvider } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import { GatewayProvider } from '@components/Gateway/GatewayProvider'
 import { usePrevious } from '@hooks/usePrevious'
-import { useVotingPlugins, vsrPluginsPks } from '@hooks/useVotingPlugins'
+import { useVotingPlugins } from '@hooks/useVotingPlugins'
+import { VSR_PLUGIN_PKS } from '@constants/plugins'
 import ErrorBoundary from '@components/ErrorBoundary'
-import handleGovernanceAssetsStore from '@hooks/handleGovernanceAssetsStore'
+import useHandleGovernanceAssetsStore from '@hooks/handleGovernanceAssetsStore'
 import handleRouterHistory from '@hooks/handleRouterHistory'
 import NavBar from '@components/NavBar'
 import PageBodyContainer from '@components/PageBodyContainer'
@@ -18,18 +18,29 @@ import tokenPriceService from '@utils/services/tokenPrice'
 import TransactionLoader from '@components/TransactionLoader'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useHydrateStore from '@hooks/useHydrateStore'
 import useMembers from '@components/Members/useMembers'
 import useRealm from '@hooks/useRealm'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import useWalletStore from 'stores/useWalletStore'
 import NftVotingCountingModal from '@components/NftVotingCountingModal'
 import { getResourcePathPart } from '@tools/core/resources'
-import queryClient from '@hooks/queries/queryClient'
 import useSerumGovStore from 'stores/useSerumGovStore'
-import { WalletProvider } from '@hub/providers/Wallet'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import {
+  ConnectionProvider,
+  WalletProvider,
+} from '@solana/wallet-adapter-react'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { DEVNET_RPC, MAINNET_RPC } from 'constants/endpoints'
+import {
+  SquadsEmbeddedWalletAdapter,
+  detectEmbeddedInSquadsIframe,
+} from '@sqds/iframe-adapter'
+import { WALLET_PROVIDERS } from '@utils/wallet-adapters'
+import { tryParsePublicKey } from '@tools/core/pubkey'
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
@@ -59,47 +70,65 @@ interface Props {
   children: React.ReactNode
 }
 
+/** AppContents depends on providers itself, sadly, so this is where providers go.  */
 export function App(props: Props) {
-  useHydrateStore()
+  const router = useRouter()
+  const { cluster } = router.query
+
+  const endpoint = useMemo(
+    () => (cluster === 'devnet' ? DEVNET_RPC : MAINNET_RPC),
+    [cluster]
+  )
+
+  const supportedWallets = useMemo(
+    () =>
+      detectEmbeddedInSquadsIframe()
+        ? [new SquadsEmbeddedWalletAdapter()]
+        : WALLET_PROVIDERS.map((provider) => provider.adapter),
+    []
+  )
+
+  return (
+    <ConnectionProvider endpoint={endpoint}>
+      <WalletProvider wallets={supportedWallets}>
+        <AppContents {...props} />{' '}
+      </WalletProvider>
+    </ConnectionProvider>
+  )
+}
+
+export function AppContents(props: Props) {
   handleRouterHistory()
   useVotingPlugins()
-  handleGovernanceAssetsStore()
+  useHandleGovernanceAssetsStore()
   useMembers()
   useEffect(() => {
     tokenPriceService.fetchSolanaTokenList()
   }, [])
   const { governedTokenAccounts } = useGovernanceAssets()
-  const possibleNftsAccounts = governedTokenAccounts.filter(
-    (x) => x.isSol || x.isNft
+  const possibleNftsAccounts = useMemo(
+    () => governedTokenAccounts.filter((x) => x.isSol || x.isNft),
+    [governedTokenAccounts]
   )
   const { getNfts } = useTreasuryAccountStore()
   const { getOwnedDeposits, resetDepositState } = useDepositStore()
-  const {
-    realm,
-    ownTokenRecord,
-    realmInfo,
-    symbol,
-    config,
-    ownDelegateTokenRecords,
-    ownDelegateCouncilTokenRecords,
-  } = useRealm()
+
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const realm = useRealmQuery().data?.result
+  const config = useRealmConfigQuery().data?.result
+
+  const { realmInfo } = useRealm()
   const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
   const prevStringifyPossibleNftsAccounts = usePrevious(
     JSON.stringify(possibleNftsAccounts)
   )
-  const walletId = wallet?.publicKey?.toBase58()
   const router = useRouter()
-  const { cluster } = router.query
+  const { cluster, symbol } = router.query
   const updateSerumGovAccounts = useSerumGovStore(
     (s) => s.actions.updateSerumGovAccounts
   )
-  const {
-    actions,
-    selectedCommunityDelegate,
-    selectedCouncilDelegate,
-  } = useWalletStore((s) => s)
 
   const realmName = realmInfo?.displayName ?? realm?.account?.name
   const title = realmName ? `${realmName}` : 'Realms'
@@ -109,6 +138,7 @@ export function App(props: Props) {
   // https://stackoverflow.com/questions/2208933/how-do-i-force-a-favicon-refresh
   const faviconUrl =
     symbol &&
+    tryParsePublicKey(symbol as string) === undefined && // don't try to use a custom favicon if this is a pubkey-based url
     `/realms/${getResourcePathPart(
       symbol as string
     )}/favicon.ico?v=${Date.now()}`
@@ -117,7 +147,7 @@ export function App(props: Props) {
     if (
       realm &&
       config?.account.communityTokenConfig.voterWeightAddin &&
-      vsrPluginsPks.includes(
+      VSR_PLUGIN_PKS.includes(
         config.account.communityTokenConfig.voterWeightAddin.toBase58()
       ) &&
       realm.pubkey &&
@@ -126,24 +156,24 @@ export function App(props: Props) {
       vsrClient
     ) {
       getOwnedDeposits({
-        realmPk: realm!.pubkey,
-        communityMintPk: realm!.account.communityMint,
+        realmPk: realm.pubkey,
+        communityMintPk: realm.account.communityMint,
         walletPk: ownTokenRecord!.account!.governingTokenOwner,
-        client: vsrClient!,
+        client: vsrClient,
         connection: connection.current,
       })
     } else if (!wallet?.connected || !ownTokenRecord) {
       resetDepositState()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    realm?.pubkey.toBase58(),
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    ownTokenRecord?.pubkey.toBase58(),
+    config?.account.communityTokenConfig.voterWeightAddin,
+    connection,
+    getOwnedDeposits,
+    ownTokenRecord,
+    realm,
+    resetDepositState,
+    vsrClient,
     wallet?.connected,
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    vsrClient?.program.programId.toBase58(),
   ])
 
   useEffect(() => {
@@ -154,44 +184,17 @@ export function App(props: Props) {
     ) {
       getNfts(possibleNftsAccounts, connection)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [JSON.stringify(possibleNftsAccounts), realm?.pubkey.toBase58()])
+  }, [
+    connection,
+    getNfts,
+    possibleNftsAccounts,
+    prevStringifyPossibleNftsAccounts,
+    realm?.pubkey,
+  ])
 
   useEffect(() => {
     updateSerumGovAccounts(cluster as string | undefined)
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [cluster])
-
-  useEffect(() => {
-    if (
-      ownDelegateCouncilTokenRecords &&
-      ownDelegateCouncilTokenRecords.length > 0
-    ) {
-      actions.selectCouncilDelegate(
-        ownDelegateCouncilTokenRecords[0]?.account?.governingTokenOwner?.toBase58()
-      )
-    } else {
-      actions.selectCouncilDelegate(undefined)
-    }
-
-    if (ownDelegateTokenRecords && ownDelegateTokenRecords.length > 0) {
-      actions.selectCommunityDelegate(
-        ownDelegateTokenRecords[0]?.account?.governingTokenOwner?.toBase58()
-      )
-    } else {
-      actions.selectCommunityDelegate(undefined)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [
-    walletId,
-    ownDelegateTokenRecords?.map((x) => x.pubkey.toBase58()).toString(),
-    ownDelegateCouncilTokenRecords?.map((x) => x.pubkey.toBase58()).toString(),
-  ])
-  // whenever we change delegate, get that delegates vote record so we can display it
-  useEffect(() => {
-    actions.fetchDelegateVoteRecords()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [selectedCommunityDelegate, selectedCouncilDelegate])
+  }, [cluster, updateSerumGovAccounts])
 
   return (
     <div className="relative bg-bkg-1 text-fgd-1">
@@ -283,21 +286,17 @@ export function App(props: Props) {
       </Head>
       <GoogleTag />
       <ErrorBoundary>
-        <QueryClientProvider client={queryClient}>
-          <ThemeProvider defaultTheme="Dark">
-            <WalletIdentityProvider appName={'Realms'}>
-              <WalletProvider>
-                <GatewayProvider>
-                  <NavBar />
-                  <Notifications />
-                  <TransactionLoader></TransactionLoader>
-                  <NftVotingCountingModal />
-                  <PageBodyContainer>{props.children}</PageBodyContainer>
-                </GatewayProvider>
-              </WalletProvider>
-            </WalletIdentityProvider>
-          </ThemeProvider>
-        </QueryClientProvider>
+        <ThemeProvider defaultTheme="Dark">
+          <WalletIdentityProvider appName={'Realms'}>
+            <GatewayProvider>
+              <NavBar />
+              <Notifications />
+              <TransactionLoader></TransactionLoader>
+              <NftVotingCountingModal />
+              <PageBodyContainer>{props.children}</PageBodyContainer>
+            </GatewayProvider>
+          </WalletIdentityProvider>
+        </ThemeProvider>
       </ErrorBoundary>
     </div>
   )

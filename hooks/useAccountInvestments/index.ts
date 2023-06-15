@@ -5,12 +5,12 @@ import { WSOL_MINT } from '@components/instructions/tools'
 import useStrategiesStore from 'Strategies/store/useStrategiesStore'
 import { AssetType, Sol, Token } from '@models/treasury/Asset'
 import { Result, Status, Ok } from '@utils/uiTypes/Result'
-import useWalletStore from 'stores/useWalletStore'
 import { EVERLEND } from 'Strategies/protocols/everlend/tools'
 import { SOLEND } from 'Strategies/protocols/solend'
 import { TreasuryStrategy } from 'Strategies/types/types'
 import loadData from './loadData'
 import * as staticInvestments from './staticInvestments'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const cache: Map<string, Ok<Data>> = new Map()
 
@@ -39,7 +39,7 @@ export function useAccountInvestments(args: Args) {
   })
   const [calledGetStrategies, setCalledGetStrategies] = useState(false)
 
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const strategies = useStrategiesStore((s) => s.strategies)
   const getStrategies = useStrategiesStore((s) => s.getStrategies)
   const strategiesLoading = useStrategiesStore((s) => s.strategiesLoading)

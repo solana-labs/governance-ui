@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import Modal from '@components/Modal'
-import useRealm from '@hooks/useRealm'
 import { useForm } from 'react-hook-form'
 import Button, { LinkButton, SecondaryButton } from '@components/Button'
 import ButtonGroup from '@components/ButtonGroup'
@@ -11,8 +10,13 @@ import { getFormattedStringFromDays, yearsToDays } from '@utils/dateTools'
 import Tooltip from '@components/Tooltip'
 import { QuestionMarkCircleIcon } from '@heroicons/react/solid'
 import { notify } from '@utils/notifications'
+import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 
 export const defaultLockupPeriods = [
+  {
+    value: 183,
+    display: '6m',
+  },
   {
     value: yearsToDays(1),
     display: '1y',
@@ -28,10 +32,6 @@ export const defaultLockupPeriods = [
   {
     value: yearsToDays(4),
     display: '4y',
-  },
-  {
-    value: yearsToDays(5),
-    display: '5y',
   },
 ]
 
@@ -63,7 +63,7 @@ export interface LockTokensModalFormValues {
 
 export const LockTokensModal: React.FC<{
   isOpen: boolean
-  mode?: 'lock' | 'extend'
+  mode?: 'lock' | 'extend' | 'split'
   minLockupTimeInDays?: number
   maxLockupTimeInDays?: number
   maxLockupAmount: number
@@ -80,7 +80,8 @@ export const LockTokensModal: React.FC<{
   onClose,
   onSubmit,
 }) => {
-  const { mint } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showCustomDuration, setShowCustomDuration] = useState(false)
   const [showLockupKindInfo, setShowLockupKindInfo] = useState<boolean>(false)
@@ -89,7 +90,7 @@ export const LockTokensModal: React.FC<{
   const hasMinLockup = minLockupTimeInDays && minLockupTimeInDays > 0
   const hasMaxLockup = maxLockupTimeInDays && maxLockupTimeInDays !== Infinity
   const lockupKindOptions = [
-    { value: LockupKind.cliff, display: 'Cliff' },
+    { value: LockupKind.cliff, display: 'Decaying' },
     { value: LockupKind.constant, display: 'Constant' },
   ]
 
@@ -171,16 +172,25 @@ export const LockTokensModal: React.FC<{
         {hasMinLockup && !showLockupKindInfo ? (
           <div className="bg-bkg-3 rounded-md w-full p-4 mb-4 font-normal text-xs">
             <div>
-              There is a minimum required lockup time of{' '}
-              <span className="bont-bold text-sm text-primary-light">
+              Select a new lockup period longer than the existing{' '}
+              <span className="bkg-font-bold text-primary-light">
                 {getFormattedStringFromDays(minLockupTimeInDays)}
               </span>
             </div>
+            {mode === 'split' ? (
+              <>
+                <br />
+                <div className="text-red">
+                  Splitting a Landrush position after the Landrush period will
+                  result in the split tokens losing the multiplier!
+                </div>
+              </>
+            ) : null}
           </div>
         ) : null}
         {!showLockupKindInfo && (
           <>
-            {mode === 'lock' && (
+            {['lock', 'split'].includes(mode) && (
               <>
                 <div className="flex items-center justify-between">
                   <div className={labelClasses}>Lockup Type</div>
@@ -303,10 +313,8 @@ export const LockTokensModal: React.FC<{
         {showLockupKindInfo ? (
           <>
             {lockupKindOptions.map((type) => (
-              <>
-                <h2 className="text-base" key={type.value}>
-                  {type.display}
-                </h2>
+              <div className="mb-6" key={type.value}>
+                <h2 className="text-primary-light">{type.display}</h2>
                 <p className="mb-2">
                   {lockupInfosByType[type.value].map((info) => (
                     <p className="mb-2" key={info}>
@@ -314,9 +322,8 @@ export const LockTokensModal: React.FC<{
                     </p>
                   ))}
                 </p>
-              </>
+              </div>
             ))}
-
             <Button
               className="mt-4 w-full"
               onClick={() => setShowLockupKindInfo(false)}
@@ -332,21 +339,31 @@ export const LockTokensModal: React.FC<{
                 type="submit"
                 isLoading={isSubmitting}
                 disabled={
-                  mode == 'lock'
-                    ? !amount ||
+                  {
+                    lock:
+                      !amount ||
                       !maxLockupAmount ||
                       !lockupPeriodInDays ||
                       lockupPeriodInDays === 0 ||
-                      isSubmitting
-                    : !lockupPeriodInDays ||
+                      isSubmitting,
+                    extend:
+                      !lockupPeriodInDays ||
                       lockupPeriodInDays === 0 ||
-                      isSubmitting
+                      isSubmitting,
+                    split:
+                      !amount ||
+                      !maxLockupAmount ||
+                      !lockupPeriodInDays ||
+                      lockupPeriodInDays === 0 ||
+                      isSubmitting,
+                  }[mode]
                 }
               >
                 {
                   {
                     lock: 'Lock Tokens',
                     extend: 'Extend Lockup',
+                    split: 'Split Position',
                   }[mode]
                 }
               </Button>

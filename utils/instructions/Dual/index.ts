@@ -63,12 +63,12 @@ function getStakingOptionsApi(connection: ConnectionContext) {
 }
 
 function toBeBytes(x: number) {
-  const y = Math.floor(x / 2 ** 32);
+  const y = Math.floor(x / 2 ** 32)
   return Uint8Array.from(
     [y, y << 8, y << 16, y << 24, x, x << 8, x << 16, x << 24].map(
-      (z) => z >>> 24,
-    ),
-  );
+      (z) => z >>> 24
+    )
+  )
 }
 
 export async function getConfigInstruction({
@@ -148,7 +148,6 @@ export async function getConfigInstruction({
         isValid: false,
         governance: form.baseTreasury?.governance,
         additionalSerializedInstructions: [],
-        chunkSplitByDefault: true,
         chunkBy: 1,
       }
     }
@@ -243,7 +242,6 @@ export async function getConfigInstruction({
       prerequisiteInstructionsSigners: [helperTokenAccount],
       governance: form.baseTreasury?.governance,
       additionalSerializedInstructions,
-      chunkSplitByDefault: true,
       chunkBy: 2,
     }
   }
@@ -253,7 +251,6 @@ export async function getConfigInstruction({
     isValid: false,
     governance: form.baseTreasury?.governance,
     additionalSerializedInstructions,
-    chunkSplitByDefault: true,
     chunkBy: 1,
   }
   return obj
@@ -309,25 +306,79 @@ export async function getExerciseInstruction({
       additionalSerializedInstructions.push(serializeInstructionToBase64(ataIx))
     }
 
+    const prerequisiteInstructions: TransactionInstruction[] = []
+    const space = 165
+    const rent = await connection.current.getMinimumBalanceForRentExemption(
+      space,
+      'processed'
+    )
+    const quoteHelperTokenAccount = new Keypair()
+    // run as prerequsite instructions payer is connected wallet
+    prerequisiteInstructions.push(
+      SystemProgram.createAccount({
+        fromPubkey: wallet.publicKey,
+        newAccountPubkey: quoteHelperTokenAccount.publicKey,
+        lamports: rent,
+        space: space,
+        programId: TOKEN_PROGRAM_ID,
+      }),
+      initializeAccount({
+        account: quoteHelperTokenAccount.publicKey,
+        mint: quoteMint,
+        owner: form.baseTreasury.isSol
+          ? form.baseTreasury.governance.pubkey
+          : form.baseTreasury.extensions.token?.account.owner,
+      })
+    )
+
+    const baseAmountAtoms = form.numTokens * Number(state.lotSize)
+    const quoteAmountAtoms = form.numTokens * strike
+
+    additionalSerializedInstructions.push(
+      serializeInstructionToBase64(
+        Token.createTransferInstruction(
+          TOKEN_PROGRAM_ID,
+          form.quoteTreasury!.extensions.transferAddress!,
+          quoteHelperTokenAccount.publicKey,
+          form.quoteTreasury!.extensions!.token!.account.owner,
+          [],
+          quoteAmountAtoms
+        )
+      )
+    )
+
     const exerciseInstruction = await so.createExerciseInstruction(
       new BN(form.numTokens),
       new BN(strike),
       form.soName,
       form.baseTreasury.extensions.token!.account.owner!,
       form.optionAccount!.pubkey!,
-      form.quoteTreasury!.pubkey!,
-      form.baseTreasury.pubkey
+      quoteHelperTokenAccount.publicKey,
+      form.baseTreasury!.extensions.transferAddress!
     )
     additionalSerializedInstructions.push(
       serializeInstructionToBase64(exerciseInstruction)
     )
 
+    additionalSerializedInstructions.push(
+      serializeInstructionToBase64(
+        closeAccount({
+          source: quoteHelperTokenAccount.publicKey,
+          destination: wallet.publicKey,
+          owner: form.baseTreasury.isSol
+            ? form.baseTreasury.governance.pubkey
+            : form.baseTreasury.extensions.token?.account.owner,
+        })
+      )
+    )
+
     return {
       serializedInstruction,
       isValid: true,
+      prerequisiteInstructions: prerequisiteInstructions,
+      prerequisiteInstructionsSigners: [quoteHelperTokenAccount],
       governance: form.baseTreasury?.governance,
       additionalSerializedInstructions,
-      chunkSplitByDefault: true,
       chunkBy: 1,
     }
   }
@@ -337,7 +388,6 @@ export async function getExerciseInstruction({
     isValid: false,
     governance: form.baseTreasury?.governance,
     additionalSerializedInstructions: [],
-    chunkSplitByDefault: true,
     chunkBy: 1,
   }
 }
@@ -420,7 +470,6 @@ export async function getWithdrawInstruction({
       isValid: true,
       governance: form.baseTreasury?.governance,
       additionalSerializedInstructions,
-      chunkSplitByDefault: true,
       chunkBy: 2,
     }
   }
@@ -508,19 +557,21 @@ export async function getConfigLsoInstruction({
         isValid: false,
         governance: form.baseTreasury?.governance,
         additionalSerializedInstructions: [],
-        chunkSplitByDefault: true,
         chunkBy: 1,
       }
     }
 
-    const soName = `LSO-${form.optionExpirationUnixSeconds}`;
-    const [issueAuthority, _issueAuthorityBump] = await web3.PublicKey.findProgramAddress(
+    const soName = `LSO-${form.optionExpirationUnixSeconds}`
+    const [
+      issueAuthority,
+      _issueAuthorityBump,
+    ] = await web3.PublicKey.findProgramAddress(
       [
         Buffer.from(utils.bytes.utf8.encode('LSO')),
         toBeBytes(form.optionExpirationUnixSeconds),
       ],
       new PublicKey('DiPbvUUJkDhV9jFtQsDFnMEMRJyjW5iS6NMwoySiW8ki')
-    );
+    )
 
     const configInstruction = await so.createConfigInstruction(
       form.optionExpirationUnixSeconds,
@@ -536,7 +587,7 @@ export async function getConfigLsoInstruction({
       quoteMint,
       form.quoteTreasury.pubkey,
       form.payer.extensions.transferAddress!,
-      issueAuthority,
+      issueAuthority
     )
 
     additionalSerializedInstructions.push(
@@ -563,7 +614,6 @@ export async function getConfigLsoInstruction({
       prerequisiteInstructionsSigners: [helperTokenAccount],
       governance: form.baseTreasury?.governance,
       additionalSerializedInstructions,
-      chunkSplitByDefault: true,
       chunkBy: 1,
     }
   }
@@ -573,7 +623,6 @@ export async function getConfigLsoInstruction({
     isValid: false,
     governance: form.baseTreasury?.governance,
     additionalSerializedInstructions,
-    chunkSplitByDefault: true,
     chunkBy: 1,
   }
   return obj
@@ -641,7 +690,6 @@ export async function getInitStrikeInstruction({
       prerequisiteInstructions: prerequisiteInstructions,
       governance: form.payer?.governance,
       additionalSerializedInstructions,
-      chunkSplitByDefault: true,
       chunkBy: 1,
     }
   }
@@ -651,7 +699,6 @@ export async function getInitStrikeInstruction({
     isValid: false,
     governance: form.payer?.governance,
     additionalSerializedInstructions,
-    chunkSplitByDefault: true,
     chunkBy: 1,
   }
   return obj

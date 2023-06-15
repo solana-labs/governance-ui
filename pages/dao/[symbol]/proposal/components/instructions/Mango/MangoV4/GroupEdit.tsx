@@ -187,7 +187,6 @@ const GroupEdit = ({
   useEffect(() => {
     const getGroupParams = async () => {
       const vals = {
-        ...form,
         admin: mangoGroup!.admin.toBase58(),
         fastListingAdmin: mangoGroup!.fastListingAdmin.toBase58(),
         securityAdmin: mangoGroup!.securityAdmin.toBase58(),
@@ -199,15 +198,16 @@ const GroupEdit = ({
         feesMngoTokenIndex: mangoGroup!.mngoTokenIndex,
         feesExpiryInterval: mangoGroup!.buybackFeesExpiryInterval?.toNumber(),
       }
-      setForm({
+      setForm((prevForm) => ({
+        ...prevForm,
         ...vals,
-      })
-      setOriginalFormValues({ ...vals })
+      }))
+      setOriginalFormValues((prevForm) => ({ ...prevForm, ...vals }))
     }
     if (mangoGroup) {
       getGroupParams()
     }
-  }, [mangoGroup?.publicKey.toBase58()])
+  }, [mangoGroup])
 
   const inputs: InstructionInput[] = [
     {

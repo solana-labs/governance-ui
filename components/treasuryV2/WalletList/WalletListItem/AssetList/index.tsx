@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import cx from 'classnames'
 
 import {
@@ -30,12 +30,12 @@ import {
 } from '../typeGuards'
 
 import { PublicKey } from '@solana/web3.js'
-import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
-import { findMetadataPda } from '@metaplex-foundation/js'
-import useWalletStore from 'stores/useWalletStore'
 import TokenOwnerRecordsList from './TokenOwnerRecordsList'
-import useRealm from '@hooks/useRealm'
 import { GoverningTokenType } from '@solana/spl-governance'
+import TokenIcon from '@components/treasuryV2/icons/TokenIcon'
+import { useTokensMetadata } from '@hooks/queries/tokenMetadata'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 
 export type Section = 'tokens' | 'nfts' | 'others'
 
@@ -71,10 +71,25 @@ export default function AssetList(props: Props) {
       .sort((a, b) => b.value.comparedTo(a.value))
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [])
+  const tokensFromPropsFiltered = tokensFromProps.filter(
+    (token) =>
+      token.type != AssetType.Sol &&
+      token.logo == undefined &&
+      token.mintAddress
+  ) as Token[]
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+  const othersFromProps = useMemo(() => props.assets.filter(isOther), [])
+  const otherFromPropsFiltred = othersFromProps.filter((token) =>
+    isMint(token)
+  ) as Mint[]
 
+  const { data } = useTokensMetadata([
+    ...tokensFromPropsFiltered.map((x) => new PublicKey(x.mintAddress!)),
+    ...otherFromPropsFiltred.map((x) => new PublicKey(x.address)),
+  ])
   const [tokens, setTokens] = useState<(Token | Sol)[]>(tokensFromProps)
-  const connection = useWalletStore((s) => s.connection)
-  const { config, realm } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const config = useRealmConfigQuery().data?.result
   const isCommunityMintDisabled =
     config?.account.communityTokenConfig?.tokenType ===
       GoverningTokenType.Dormant || false
@@ -83,31 +98,6 @@ export default function AssetList(props: Props) {
       GoverningTokenType.Dormant || false
 
   useEffect(() => {
-    const getTokenMetadata = async (mintAddress: string) => {
-      try {
-        const mintPubkey = new PublicKey(mintAddress)
-        const metadataAccount = findMetadataPda(mintPubkey)
-        const accountData = await connection.current.getAccountInfo(
-          metadataAccount
-        )
-
-        const state = Metadata.deserialize(accountData!.data)
-        const jsonUri = state[0].data.uri.slice(
-          0,
-          state[0].data.uri.indexOf('\x00')
-        )
-
-        const data = await (await fetch(jsonUri)).json()
-        return {
-          image: data.image,
-          symbol: data.symbol,
-          name: data.name,
-        }
-      } catch (e) {
-        console.log(e)
-      }
-    }
-
     const getTokenData = async () => {
       const newTokens: (Token | Sol)[] = []
       for await (const token of tokensFromProps) {
@@ -116,7 +106,7 @@ export default function AssetList(props: Props) {
           token.logo == undefined &&
           token.mintAddress
         ) {
-          const newTokenData = await getTokenMetadata(token.mintAddress)
+          const newTokenData = data?.find((x) => x.mint === token.mintAddress)
 
           if (!newTokenData) {
             newTokens.push(token)
@@ -125,7 +115,7 @@ export default function AssetList(props: Props) {
 
           newTokens.push({
             ...token,
-            icon: <img src={newTokenData.image} className="rounded-full" />,
+            icon: <TokenIcon></TokenIcon>,
             name: newTokenData.name,
             symbol: newTokenData.symbol,
           })
@@ -135,9 +125,10 @@ export default function AssetList(props: Props) {
       }
       setTokens(newTokens)
     }
-    getTokenData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [tokensFromProps])
+    if (data) {
+      getTokenData()
+    }
+  }, [tokensFromProps, data])
 
   const nfts = props.assets.filter(isNFTCollection).sort((a, b) => {
     if (b.name && !a.name) {
@@ -148,9 +139,6 @@ export default function AssetList(props: Props) {
       return b.count.comparedTo(a.count)
     }
   })
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  const othersFromProps = useMemo(() => props.assets.filter(isOther), [])
 
   const tokenOwnerRecordsFromProps = useMemo(
     () => props.assets.filter(isTokenOwnerRecord),
@@ -174,31 +162,6 @@ export default function AssetList(props: Props) {
   }, [isCommunityMintDisabled, isCouncilMintDisabled])
 
   useEffect(() => {
-    const getTokenMetadata = async (mintAddress: string) => {
-      try {
-        const mintPubkey = new PublicKey(mintAddress)
-        const metadataAccount = findMetadataPda(mintPubkey)
-        const accountData = await connection.current.getAccountInfo(
-          metadataAccount
-        )
-
-        const state = Metadata.deserialize(accountData!.data)
-        const jsonUri = state[0].data.uri.slice(
-          0,
-          state[0].data.uri.indexOf('\x00')
-        )
-
-        const data = await (await fetch(jsonUri)).json()
-        return {
-          image: data.image,
-          symbol: data.symbol,
-          name: data.name,
-        }
-      } catch (e) {
-        console.log(e)
-      }
-    }
-
     const getTokenData = async () => {
       const newTokens: (
         | Mint
@@ -209,7 +172,7 @@ export default function AssetList(props: Props) {
       )[] = []
       for await (const token of othersFromProps) {
         if (isMint(token)) {
-          const newTokenData = await getTokenMetadata(token.address)
+          const newTokenData = data?.find((x) => x.mint === token.address)
 
           if (!newTokenData) {
             newTokens.push(token)
@@ -227,9 +190,12 @@ export default function AssetList(props: Props) {
       }
       setOthers(newTokens)
     }
-    getTokenData()
+    if (data) {
+      getTokenData()
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [othersFromProps])
+  }, [othersFromProps, data])
 
   const diplayingMultipleAssetTypes =
     (tokens.length > 0 ? 1 : 0) +

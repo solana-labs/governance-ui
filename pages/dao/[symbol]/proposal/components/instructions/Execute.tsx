@@ -1,6 +1,5 @@
 import React from 'react'
 import { RpcContext } from '@solana/spl-governance'
-import useWalletStore from 'stores/useWalletStore'
 import useRealm from 'hooks/useRealm'
 import Button, { SecondaryButton } from '@components/Button'
 import { notify } from 'utils/notifications'
@@ -10,6 +9,8 @@ import { ProposalTransaction } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRouteProposalQuery } from '@hooks/queries/proposal'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 type ExecuteInstructionProps = {
   onClose: () => void
@@ -23,8 +24,8 @@ const ExecuteInstruction = ({
   instruction,
 }: ExecuteInstructionProps) => {
   const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection)
-  const { proposal } = useWalletStore((s) => s.selectedProposal)
+  const connection = useLegacyConnectionContext()
+  const proposal = useRouteProposalQuery().data?.result
   const { realmInfo } = useRealm()
 
   const handleExecuteInstruction = async () => {

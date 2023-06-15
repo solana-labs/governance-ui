@@ -43,7 +43,7 @@ export interface Web3Context {
   connection: Connection
   wallet: WalletSigner
 }
-export interface RealmCreationV2 {
+interface RealmCreationV2 {
   _programVersion: 2
 
   programIdAddress: string
@@ -146,7 +146,7 @@ export async function prepareRealmCreation({
   const councilMintAccount =
     existingCouncilMintPk &&
     (await tryGetMint(connection, existingCouncilMintPk))
-  const zeroCouncilTokenSupply = existingCommunityMintPk
+  const zeroCouncilTokenSupply = existingCouncilMintPk
     ? councilMintAccount?.account.supply.isZero()
     : true
   const councilMintHasMintAuthority = councilMintAccount

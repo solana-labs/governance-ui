@@ -1,22 +1,24 @@
-import useRealm from '@hooks/useRealm'
 import { BigNumber } from 'bignumber.js'
 import classNames from 'classnames'
 
 import { calculateMaxVoteScore } from '@models/proposal/calulateMaxVoteScore'
-import useProposal from '@hooks/useProposal'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { fmtMintAmount, getMintDecimalAmount } from '@tools/sdk/units'
 
 import { getMintMetadata } from '../instructions/programs/splToken'
 import VotingPowerPct from './VotingPowerPct'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmCouncilMintInfoQuery } from '@hooks/queries/mintInfo'
+import { useRouteProposalQuery } from '@hooks/queries/proposal'
 
 interface Props {
   className?: string
 }
 
 export default function LockedCouncilVotingPower(props: Props) {
-  const { councilMint, realm } = useRealm()
-  const { proposal } = useProposal()
+  const realm = useRealmQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const proposal = useRouteProposalQuery().data?.result
   const deposits = useDepositStore((s) => s.state.deposits)
   const votingPower = useDepositStore((s) => s.state.votingPower)
   const isLoading = useDepositStore((s) => s.state.isLoading)
@@ -24,7 +26,7 @@ export default function LockedCouncilVotingPower(props: Props) {
   const depositRecord = deposits.find(
     (deposit) =>
       deposit.mint.publicKey.toBase58() ===
-        realm!.account.communityMint.toBase58() && deposit.lockup.kind.none
+        realm?.account.communityMint.toBase58() && deposit.lockup.kind.none
   )
 
   const depositMint = realm?.account.config.councilMint

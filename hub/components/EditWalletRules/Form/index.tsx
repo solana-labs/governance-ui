@@ -21,37 +21,37 @@ interface Props
     minInstructionHoldupDays: number;
   }> {
   className?: string;
-  currentCommunityRules: CommunityRules;
-  currentCouncilRules: CouncilRules;
-  governanceAddress: PublicKey;
+  initialCommunityRules: CommunityRules;
+  initialCouncilRules: CouncilRules;
+  governanceAddress?: PublicKey;
   programVersion: number;
-  walletAddress: PublicKey;
+  walletAddress?: PublicKey;
 }
 
-export function Form(props: Props) {
+function Form(props: Props & { title: string; description: string }) {
+  console.log('form props', props);
   const [showCouncilOptions, setShowCouncilOptions] = useState(
-    props.currentCouncilRules?.canVote || false,
+    props.initialCouncilRules?.canVote || false,
   );
   const [showCommunityOptions, setShowCommunityOptions] = useState(
-    props.currentCommunityRules.canVote,
+    props.initialCommunityRules.canVote,
   );
   const [showAdvanceOptions, setShowAdvanceOptions] = useState(false);
-  const showCommunityFirst = props.currentCommunityRules.canVote;
+  const showCommunityFirst = props.initialCommunityRules.canVote;
 
   return (
     <article className={props.className}>
-      <WalletDescription
-        className="mb-3"
-        governanceAddress={props.governanceAddress}
-        walletAddress={props.walletAddress}
-      />
+      {props.governanceAddress && props.walletAddress && (
+        <WalletDescription
+          className="mb-3"
+          governanceAddress={props.governanceAddress}
+          walletAddress={props.walletAddress}
+        />
+      )}
       <h1 className="text-5xl font-medium m-0 mb-4 dark:text-white ">
-        What changes would you like to make to this wallet?
+        {props.title}
       </h1>
-      <p className="m-0 mb-16 dark:text-neutral-300">
-        Submitting updates to a wallet’s rules will create a proposal for the
-        DAO to vote on. If approved, the updates will be ready to be executed.
-      </p>
+      <p className="m-0 mb-16 dark:text-neutral-300">{props.description}</p>
       <div>
         <VotingDuration
           className="mb-8"
@@ -65,13 +65,13 @@ export function Form(props: Props) {
           <CommunityDetails
             className="mb-8"
             communityRules={props.communityRules}
-            currentCommunityRules={props.currentCommunityRules}
-            currentCouncilRules={props.currentCouncilRules}
+            initialCommunityRules={props.initialCommunityRules}
+            initialCouncilRules={props.initialCouncilRules}
             programVersion={props.programVersion}
             onCommunityRulesChange={props.onCommunityRulesChange}
           />
         )}
-        {!props.currentCouncilRules?.canVote && props.currentCouncilRules && (
+        {!props.initialCouncilRules?.canVote && props.initialCouncilRules && (
           <button
             className="flex items-center text-sm text-neutral-500 mt-16 mb-2.5"
             onClick={() => setShowCouncilOptions((cur) => !cur)}
@@ -90,17 +90,17 @@ export function Form(props: Props) {
         )}
         {showCouncilOptions &&
           props.councilRules &&
-          props.currentCouncilRules && (
+          props.initialCouncilRules && (
             <CouncilDetails
               className="mb-8"
               councilRules={props.councilRules}
-              currentCouncilRules={props.currentCouncilRules}
-              currentCommunityRules={props.currentCommunityRules}
+              initialCouncilRules={props.initialCouncilRules}
+              initialCommunityRules={props.initialCommunityRules}
               programVersion={props.programVersion}
               onCouncilRulesChange={props.onCouncilRulesChange}
             />
           )}
-        {!props.currentCommunityRules.canVote && !showCommunityFirst && (
+        {!props.initialCommunityRules.canVote && !showCommunityFirst && (
           <button
             className="flex items-center text-sm text-neutral-500 mt-16 mb-2.5"
             onClick={() => setShowCommunityOptions((cur) => !cur)}
@@ -120,8 +120,8 @@ export function Form(props: Props) {
         {showCommunityOptions && !showCommunityFirst && (
           <CommunityDetails
             communityRules={props.communityRules}
-            currentCommunityRules={props.currentCommunityRules}
-            currentCouncilRules={props.currentCouncilRules}
+            initialCommunityRules={props.initialCommunityRules}
+            initialCouncilRules={props.initialCouncilRules}
             programVersion={props.programVersion}
             onCommunityRulesChange={props.onCommunityRulesChange}
           />
@@ -161,3 +161,31 @@ export function Form(props: Props) {
     </article>
   );
 }
+
+export const EditWalletForm = (
+  props: Props & {
+    governanceAddress: NonNullable<Props['governanceAddress']>;
+    walletAddress: NonNullable<Props['walletAddress']>;
+  },
+) => (
+  <Form
+    title="What changes would you like to make to this wallet?"
+    description={
+      'Submitting updates to a wallet’s rules will create a proposal for the DAO to vote on.' +
+      ' ' +
+      'If approved, the updates will be ready to be executed.'
+    }
+    {...props}
+  />
+);
+export const NewWalletForm = (
+  props: Omit<Props, 'walletAddress' | 'governanceAddress'>,
+) => (
+  <Form
+    title="What rules would you like this wallet to have?"
+    description={
+      'Once configured, you will be able to create a new DAO wallet immediately.'
+    }
+    {...props}
+  />
+);

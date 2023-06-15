@@ -148,6 +148,7 @@ export default function Program(props: Props) {
             </DropdownMenu.Trigger>
             <DropdownMenu.Portal>
               <DropdownMenu.Content
+                // @asktree isn't sure, but suspects, that this needs z-20 or something
                 className="bg-black py-5 px-4 rounded"
                 side="top"
               >
@@ -190,17 +191,17 @@ export default function Program(props: Props) {
       </Tooltip>
       {!disabled && closeBuffersModalOpen && (
         <Modal isOpen onClose={() => setOpenCloseBuffersModalOpen(false)}>
-          <CloseBuffers program={props.program.raw.governance} />
+          <CloseBuffers program={props.program.raw} />
         </Modal>
       )}
       {!disabled && transferAuthorityModalOpen && (
         <Modal isOpen onClose={() => setOpenTransferAuthorityModalOpen(false)}>
-          <TransferUpgradeAuthority program={props.program.raw.governance} />
+          <TransferUpgradeAuthority program={props.program.raw} />
         </Modal>
       )}
       {!disabled && upgradeModalOpen && (
         <Modal isOpen onClose={() => setUpgradeModelOpen(false)}>
-          <UpgradeProgram program={props.program.raw.governance} />
+          <UpgradeProgram program={props.program.raw} />
         </Modal>
       )}
     </div>

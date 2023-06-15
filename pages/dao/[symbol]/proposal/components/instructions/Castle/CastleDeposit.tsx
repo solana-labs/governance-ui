@@ -4,7 +4,6 @@ import useRealm from '@hooks/useRealm'
 import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import { PublicKey } from '@solana/web3.js'
 import { precision } from '@utils/formatting'
-import useWalletStore from 'stores/useWalletStore'
 import {
   CastleDepositForm,
   UiInstruction,
@@ -26,6 +25,7 @@ import {
   getCastleDepositInstruction,
 } from '@utils/instructions/Castle'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const CastleDeposit = ({
   index,
@@ -34,7 +34,7 @@ const CastleDeposit = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const { realmInfo } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()

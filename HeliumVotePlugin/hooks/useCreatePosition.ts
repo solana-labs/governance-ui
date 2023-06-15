@@ -6,20 +6,26 @@ import {
   Keypair,
   PublicKey,
   SystemProgram,
-  Transaction,
   TransactionInstruction,
 } from '@solana/web3.js'
 import { useAsyncCallback } from 'react-async-hook'
 import { positionKey } from '@helium/voter-stake-registry-sdk'
-import { sendTransaction } from '@utils/send'
 import useRealm from '@hooks/useRealm'
 import { LockupKind } from 'HeliumVotePlugin/components/LockTokensModal'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
+import { notify } from '@utils/notifications'
+import {
+  sendTransactionsV3,
+  SequenceType,
+  txBatchesToInstructionSetWithSigners,
+} from '@utils/sendTransactions'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 export const useCreatePosition = () => {
   const { connection, wallet } = useWalletDeprecated()
-  const { realm, realmInfo } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { realmInfo } = useRealm()
   const [{ client }, registrarPk] = useVotePluginsClientStore((s) => [
     s.state.currentRealmVotingClient,
     s.state.voteStakeRegistryRegistrarPk,
@@ -119,15 +125,27 @@ export const useCreatePosition = () => {
             .instruction()
         )
 
-        const tx = new Transaction()
-        tx.add(...instructions)
-        await sendTransaction({
-          transaction: tx,
+        notify({ message: 'Locking' })
+        await sendTransactionsV3({
+          transactionInstructions: [
+            {
+              instructionsSet: txBatchesToInstructionSetWithSigners(
+                instructions,
+                [[mintKeypair]],
+                0
+              ),
+              sequenceType: SequenceType.Sequential,
+            },
+          ],
           wallet,
           connection: connection.current,
-          signers: [mintKeypair].filter(Boolean),
-          sendingMessage: `Locking`,
-          successMessage: `Locking successful`,
+          callbacks: {
+            afterAllTxConfirmed: () =>
+              notify({
+                message: 'Locking successful',
+                type: 'success',
+              }),
+          },
         })
       }
     }

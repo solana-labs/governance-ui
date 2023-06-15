@@ -1,16 +1,16 @@
 import { AnchorProvider, Wallet } from '@coral-xyz/anchor';
-import {
-  NftVoterClient,
-  GatewayClient,
-} from '@solana/governance-program-library';
+import { GatewayClient } from '@solana/governance-program-library';
 import { Connection, PublicKey } from '@solana/web3.js';
 
 import { PythClient } from 'pyth-staking-api';
 import { VsrClient } from 'VoteStakeRegistry/sdk/client';
 
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient';
+
+/** @deprecated */
 export async function fetchPlugins(
   connection: Connection,
-  programPublicKey: PublicKey,
+  pluginProgram: PublicKey,
   wallet: Wallet,
   isDevnet?: boolean,
 ) {
@@ -18,7 +18,7 @@ export async function fetchPlugins(
   const anchorProvider = new AnchorProvider(connection, wallet, defaultOptions);
 
   const [vsrClient, nftClient, gatewayClient, pythClient] = await Promise.all([
-    VsrClient.connect(anchorProvider, programPublicKey, isDevnet),
+    VsrClient.connect(anchorProvider, pluginProgram, isDevnet),
     NftVoterClient.connect(anchorProvider, isDevnet),
     GatewayClient.connect(anchorProvider, isDevnet),
     PythClient.connect(anchorProvider, connection.rpcEndpoint),

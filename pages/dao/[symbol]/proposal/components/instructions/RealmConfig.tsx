@@ -23,6 +23,9 @@ import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import { isDisabledVoterWeight } from '@tools/governance/units'
 import useProgramVersion from '@hooks/useProgramVersion'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
+import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 
 export interface RealmConfigForm {
   governedAccount: AssetAccount | undefined
@@ -40,7 +43,9 @@ const RealmConfig = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { realm, mint, realmInfo } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const { realmInfo } = useRealm()
   const wallet = useWalletOnePointOh()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const { assetAccounts } = useGovernanceAssets()
@@ -52,7 +57,10 @@ const RealmConfig = ({
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
   const programVersion = useProgramVersion()
-  const schema = getRealmCfgSchema({ programVersion, form })
+  const schema = getRealmCfgSchema({
+    programVersion: programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION,
+    form,
+  })
 
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })

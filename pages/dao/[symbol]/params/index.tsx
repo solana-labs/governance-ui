@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import GovernedAccountsTabs from '@components/GovernedAccountsTabs'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
-import useRealm from '@hooks/useRealm'
 import { fmtBNAmount, fmtMintAmount } from '@tools/sdk/units'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import { capitalize } from '@utils/helpers'
@@ -12,7 +11,6 @@ import Button from '@components/Button'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { useRouter } from 'next/router'
 
-import RealmConfigModal from './RealmConfigModal'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { getAccountName } from '@components/instructions/tools'
 import SetRealmAuthorityModal from './SetRealmAuthorityModal'
@@ -27,10 +25,18 @@ import { AccountType } from '@utils/uiTypes/assets'
 import { MintMaxVoteWeightSourceType } from '@solana/spl-governance'
 import useQueryContext from '@hooks/useQueryContext'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
+import { useRealmGovernancesQuery } from '@hooks/queries/governance'
 
 const Params = () => {
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+
   const router = useRouter()
-  const { realm, mint, config, symbol } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const config = useRealmConfigQuery().data?.result
+  const { symbol } = router.query
   const wallet = useWalletOnePointOh()
   const { fmtUrlWithCluster } = useQueryContext()
   const {
@@ -38,12 +44,12 @@ const Params = () => {
     assetAccounts,
     auxiliaryTokenAccounts,
   } = useGovernanceAssets()
-  const governancesArray = useGovernanceAssetsStore((s) => s.governancesArray)
+  const governancesArray = useRealmGovernancesQuery().data
   const mintGovernancesWithMintInfo = assetAccounts.filter((x) => {
     return x.type === AccountType.MINT
   })
 
-  const hasAuthorityGovernances = governancesArray.filter((governance) => {
+  const hasAuthorityGovernances = governancesArray?.filter((governance) => {
     const filteredMintGovernances = mintGovernancesWithMintInfo.filter(
       (mintGovernance) =>
         mintGovernance.governance.pubkey.toString() ===
@@ -59,17 +65,15 @@ const Params = () => {
       governance.pubkey.toString()
     )
   })
-  const showCreateMetadataButton = !!hasAuthorityGovernances.length
+  const showCreateMetadataButton = !!hasAuthorityGovernances?.length
   const loadGovernedAccounts = useGovernanceAssetsStore(
     (s) => s.loadGovernedAccounts
   )
 
-  const realmAuthorityGovernance = governancesArray.find(
+  const realmAuthorityGovernance = governancesArray?.find(
     (x) => x.pubkey.toBase58() === realm?.account.authority?.toBase58()
   )
-  const [isRealmProposalModalOpen, setIsRealmProposalModalOpen] = useState(
-    false
-  )
+
   const [activeGovernance, setActiveGovernance] = useState<any>(null)
   const [activeTab, setActiveTab] = useState('Params')
   const [isRealmAuthorityModalOpen, setRealmAuthorityModalIsOpen] = useState(
@@ -85,9 +89,6 @@ const Params = () => {
   const communityMintMaxVoteWeightSource =
     realmAccount?.config.communityMintMaxVoteWeightSource
   const realmConfig = realmAccount?.config
-  const closeRealmProposalModal = () => {
-    setIsRealmProposalModalOpen(false)
-  }
   const openMetadataCreationModal = () => {
     setIsMetadataCreationModalOpen(true)
   }
@@ -111,19 +112,13 @@ const Params = () => {
         fmtMintAmount(mint, realmConfig.minCommunityTokensToCreateGovernance)
 
   useEffect(() => {
-    if (governancesArray.length > 0) {
+    if (governancesArray !== undefined && governancesArray.length > 0) {
       setActiveGovernance(governancesArray[0])
     }
   }, [governancesArray])
 
   return (
     <div className="grid grid-cols-12 gap-4">
-      {isRealmProposalModalOpen && (
-        <RealmConfigModal
-          isProposalModalOpen={isRealmProposalModalOpen}
-          closeProposalModal={closeRealmProposalModal}
-        ></RealmConfigModal>
-      )}
       {isRealmAuthorityModalOpen && (
         <SetRealmAuthorityModal
           isOpen={isRealmAuthorityModalOpen}
@@ -261,7 +256,7 @@ const Params = () => {
                     }
                     onClick={() => {
                       router.push(
-                        fmtUrlWithCluster(`/realm/${symbol}/config/edit`)
+                        fmtUrlWithCluster(`/dao/${symbol}/editConfig`)
                       )
                     }}
                     className="ml-auto"
@@ -278,7 +273,7 @@ const Params = () => {
             </>
           )}
         </div>
-        {!loadGovernedAccounts ? (
+        {!loadGovernedAccounts && governancesArray !== undefined ? (
           <>
             <div className="grid grid-cols-12 gap-4 p-6 mb-6 border rounded-md border-fgd-4 lg:gap-6">
               <div className="col-span-12 lg:hidden">

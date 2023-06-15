@@ -1,5 +1,5 @@
 import { AnchorProvider, Wallet } from '@project-serum/anchor';
-import { NftVoterClient } from '@solana/governance-program-library';
+
 import {
   createSetRealmConfig,
   GoverningTokenType,
@@ -19,6 +19,7 @@ import {
   getMaxVoterWeightRecord,
   getRegistrarPDA,
 } from '@utils/plugin/accounts';
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient';
 
 import { Config } from './fetchConfig';
 import { buildUpdates, diff } from './UpdatesList';
@@ -44,8 +45,7 @@ function shouldAddConfigInstruction(config: Config, currentConfig: Config) {
 }
 
 export async function createTransaction(
-  programId: PublicKey,
-  realm: PublicKey,
+  realmPublicKey: PublicKey,
   governance: PublicKey,
   config: Config,
   currentConfig: Config,
@@ -53,13 +53,19 @@ export async function createTransaction(
   isDevnet?: boolean,
   wallet?: Omit<Wallet, 'payer'>,
 ) {
+  const realmAccount = await getRealm(connection, realmPublicKey);
+
+  const programId = realmAccount.owner;
   const instructions: TransactionInstruction[] = [];
-  const realmConfig = await tryGetRealmConfig(connection, programId, realm);
+  const realmConfig = await tryGetRealmConfig(
+    connection,
+    programId,
+    realmPublicKey,
+  );
   const programVersion = await getGovernanceProgramVersion(
     connection,
     programId,
   );
-  const realmAccount = await getRealm(connection, realm);
 
   if (
     realmAccount.account.authority &&
@@ -79,12 +85,12 @@ export async function createTransaction(
 
     const nftClient = await NftVoterClient.connect(anchorProvider, isDevnet);
     const { registrar } = await getRegistrarPDA(
-      realm,
+      realmPublicKey,
       config.communityMint.publicKey,
       nftClient.program.programId,
     );
     const { maxVoterWeightRecord } = await getMaxVoterWeightRecord(
-      realm,
+      realmPublicKey,
       config.communityMint.publicKey,
       nftClient.program.programId,
     );
@@ -94,7 +100,7 @@ export async function createTransaction(
         .createRegistrar(10)
         .accounts({
           registrar,
-          realm,
+          realm: realmPublicKey,
           governanceProgramId: programId,
           realmAuthority: realmAccount.account.authority,
           governingTokenMint: config.communityMint.publicKey,
@@ -109,7 +115,7 @@ export async function createTransaction(
         .createMaxVoterWeightRecord()
         .accounts({
           maxVoterWeightRecord,
-          realm,
+          realm: realmPublicKey,
           governanceProgramId: programId,
           realmGoverningTokenMint: config.communityMint.publicKey,
           payer: wallet.publicKey,
@@ -126,7 +132,7 @@ export async function createTransaction(
         )
         .accounts({
           registrar,
-          realm,
+          realm: realmPublicKey,
           maxVoterWeightRecord,
           realmAuthority: realmAccount.account.authority,
           collection: config.nftCollection,
@@ -140,7 +146,7 @@ export async function createTransaction(
       await createSetRealmConfig(
         programId,
         programVersion,
-        realm,
+        realmPublicKey,
         governance,
         config.configAccount.councilTokenConfig.tokenType ===
           GoverningTokenType.Dormant

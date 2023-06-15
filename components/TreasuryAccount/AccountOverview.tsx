@@ -11,7 +11,6 @@ import BN from 'bn.js'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import useWalletStore from 'stores/useWalletStore'
 import AccountHeader from './AccountHeader'
 import DepositNFT from './DepositNFT'
 import SendTokens from './SendTokens'
@@ -40,6 +39,11 @@ import tokenPriceService from '@utils/services/tokenPrice'
 import { EVERLEND } from '../../Strategies/protocols/everlend/tools'
 import { findAssociatedTokenAccount } from '@everlend/common'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import {
+  useUserCommunityTokenOwnerRecord,
+  useUserCouncilTokenOwnerRecord,
+} from '@hooks/queries/tokenOwnerRecord'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 type InvestmentType = TreasuryStrategy & {
   investedAmount: number
@@ -47,7 +51,9 @@ type InvestmentType = TreasuryStrategy & {
 
 const AccountOverview = () => {
   const router = useRouter()
-  const { ownTokenRecord, ownCouncilTokenRecord } = useRealm()
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
+
   const {
     governedTokenAccounts,
     auxiliaryTokenAccounts,
@@ -68,7 +74,7 @@ const AccountOverview = () => {
   const { canUseTransferInstruction } = useGovernanceAssets()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const recentActivity = useTreasuryAccountStore((s) => s.recentActivity)
   const isLoadingRecentActivity = useTreasuryAccountStore(
     (s) => s.isLoadingRecentActivity

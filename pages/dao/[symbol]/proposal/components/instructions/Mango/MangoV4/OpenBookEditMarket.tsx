@@ -26,6 +26,7 @@ interface OpenBookEditMarketForm {
   governedAccount: AssetAccount | null
   market: NameMarketIndexVal | null
   reduceOnly: boolean
+  forceClose: boolean
   holdupTime: number
 }
 
@@ -49,6 +50,7 @@ const OpenBookEditMarket = ({
   const [form, setForm] = useState<OpenBookEditMarketForm>({
     governedAccount: null,
     reduceOnly: false,
+    forceClose: false,
     market: null,
     holdupTime: 0,
   })
@@ -74,7 +76,7 @@ const OpenBookEditMarket = ({
       )
 
       const ix = await mangoClient!.program.methods
-        .serum3EditMarket(form.reduceOnly)
+        .serum3EditMarket(form.reduceOnly, form.forceClose)
         .accounts({
           group: mangoGroup!.publicKey,
           admin: form.governedAccount.extensions.transferAddress,
@@ -87,6 +89,7 @@ const OpenBookEditMarket = ({
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
       isValid,
+      chunkBy: 1,
       governance: form.governedAccount?.governance,
       customHoldUpTime: form.holdupTime,
     }
@@ -113,21 +116,24 @@ const OpenBookEditMarket = ({
     if (mangoGroup) {
       getMarkets()
     }
-  }, [mangoGroup?.publicKey.toBase58()])
+  }, [mangoGroup])
+
   useEffect(() => {
     const getCurrentMarketProps = () => {
       const market = mangoGroup!.serum3MarketsMapByMarketIndex.get(
         Number(form.market?.value)
       )
-      setForm({
-        ...form,
+      setForm((prevForm) => ({
+        ...prevForm,
         reduceOnly: market?.reduceOnly || false,
-      })
+        forceClose: market?.forceClose || false,
+      }))
     }
     if (form.market && mangoGroup) {
       getCurrentMarketProps()
     }
-  }, [form.market?.value])
+  }, [form.market, mangoGroup])
+
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
@@ -163,6 +169,12 @@ const OpenBookEditMarket = ({
       initialValue: form.reduceOnly,
       type: InstructionInputType.SWITCH,
       name: 'reduceOnly',
+    },
+    {
+      label: 'Force Close',
+      initialValue: form.forceClose,
+      type: InstructionInputType.SWITCH,
+      name: 'forceClose',
     },
   ]
 

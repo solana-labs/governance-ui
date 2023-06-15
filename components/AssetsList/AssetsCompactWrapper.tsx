@@ -7,20 +7,23 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { TerminalIcon } from '@heroicons/react/outline'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { GovernanceAccountType } from '@solana/spl-governance'
 import EmptyState from '@components/EmptyState'
 import {
   NEW_PROGRAM_VIEW,
   renderAddNewAssetTooltip,
 } from 'pages/dao/[symbol]/assets'
+import { AccountType } from '@utils/uiTypes/assets'
+import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
+import Loading from '@components/Loading'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 const AssetsCompactWrapper = () => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
+  const realm = useRealmQuery().data?.result
   const {
     symbol,
-    realm,
     ownVoterWeight,
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
@@ -41,12 +44,13 @@ const AssetsCompactWrapper = () => {
   const goToNewAssetForm = () => {
     router.push(fmtUrlWithCluster(`/dao/${symbol}${NEW_PROGRAM_VIEW}`))
   }
-  const { getGovernancesByAccountTypes } = useGovernanceAssets()
-  const programGovernances = getGovernancesByAccountTypes([
-    GovernanceAccountType.ProgramGovernanceV1,
-    GovernanceAccountType.ProgramGovernanceV2,
-  ])
-
+  const { assetAccounts } = useGovernanceAssets()
+  const programGovernances = assetAccounts
+    .filter((x) => x.type === AccountType.PROGRAM)
+    .map((x) => x.governance)
+  const isLoadingGovernances = useGovernanceAssetsStore(
+    (s) => s.loadProgramAccounts
+  )
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
       <div className="flex items-center justify-between pb-4">
@@ -66,7 +70,7 @@ const AssetsCompactWrapper = () => {
         <div className="overflow-y-auto" style={{ maxHeight: '350px' }}>
           <AssetsList panelView />
         </div>
-      ) : (
+      ) : !isLoadingGovernances ? (
         <EmptyState
           desc="No programs found"
           disableButton={!!newAssetToolTip}
@@ -75,6 +79,8 @@ const AssetsCompactWrapper = () => {
           onClickButton={goToNewAssetForm}
           toolTipContent={newAssetToolTip}
         />
+      ) : (
+        <Loading></Loading>
       )}
     </div>
   )

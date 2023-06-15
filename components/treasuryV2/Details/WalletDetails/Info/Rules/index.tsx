@@ -25,6 +25,11 @@ import Section from '../../../Section'
 import TokenIcon from '../../../../icons/TokenIcon'
 import useProgramVersion from '@hooks/useProgramVersion'
 import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
+import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
 
 const UNIX_SECOND = 1
 const UNIX_MINUTE = UNIX_SECOND * 60
@@ -83,8 +88,11 @@ interface Props {
 }
 
 export default function Rules(props: Props) {
-  const { ownVoterWeight, symbol, mint, councilMint } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { ownVoterWeight } = useRealm()
   const router = useRouter()
+  const { symbol } = router.query
   const { fmtUrlWithCluster } = useQueryContext()
 
   const programVersion = useProgramVersion()
@@ -143,7 +151,7 @@ export default function Rules(props: Props) {
                 if (props.wallet.governanceAccount) {
                   router.push(
                     fmtUrlWithCluster(
-                      `/realm/${symbol}/governance/${props.wallet.governanceAccount.pubkey.toBase58()}/edit`
+                      `/dao/${symbol}/treasury/governance/${props.wallet.governanceAccount.pubkey.toBase58()}/edit`
                     )
                   )
                 }
@@ -176,7 +184,8 @@ export default function Rules(props: Props) {
                   value={durationStr(governanceConfig.minInstructionHoldUpTime)}
                 />
                 {/** Under versions < 3, vote tipping is just one field for both **/}
-                {programVersion <= 2 && (
+                {(programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) <=
+                  2 && (
                   <Section
                     icon={<HandIcon />}
                     name="Vote Tipping"
@@ -186,7 +195,8 @@ export default function Rules(props: Props) {
                   />
                 )}
                 {/** Under versions < 3, approval quorum is just one field for both **/}
-                {programVersion <= 2 && (
+                {(programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) <=
+                  2 && (
                   <Section
                     icon={<ScaleIcon />}
                     name="Approval Quorum"
@@ -269,7 +279,8 @@ export default function Rules(props: Props) {
                             )
                       }
                     />
-                    {programVersion >= 3 && (
+                    {(programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) >=
+                      3 && (
                       <Section
                         icon={<HandIcon />}
                         name="Vote Tipping"
@@ -277,7 +288,8 @@ export default function Rules(props: Props) {
                       />
                     )}
                     {/** Under versions < 3, approval quorum is just one field for both **/}
-                    {programVersion >= 3 && (
+                    {(programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) >=
+                      3 && (
                       <Section
                         icon={<ScaleIcon />}
                         name="Approval Quorum"
@@ -289,7 +301,8 @@ export default function Rules(props: Props) {
                       />
                     )}
                     {/** Under versions < 3, vetos dont exist **/}
-                    {programVersion >= 3 && (
+                    {(programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) >=
+                      3 && (
                       <Section
                         icon={<ScaleIcon />}
                         name="Veto Quorum"

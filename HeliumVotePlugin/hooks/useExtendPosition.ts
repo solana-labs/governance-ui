@@ -1,27 +1,49 @@
 import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import { Program } from '@coral-xyz/anchor'
-import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { useAsyncCallback } from 'react-async-hook'
-import { sendTransaction } from '@utils/send'
 import { PositionWithMeta } from '../sdk/types'
 import { PROGRAM_ID, init, daoKey } from '@helium/helium-sub-daos-sdk'
 import useRealm from '@hooks/useRealm'
+import { notify } from '@utils/notifications'
+import {
+  SequenceType,
+  sendTransactionsV3,
+  txBatchesToInstructionSetWithSigners,
+} from '@utils/sendTransactions'
+import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import { withCreateTokenOwnerRecord } from '@solana/spl-governance'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 export const useExtendPosition = () => {
   const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
-  const { realm } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { realmInfo } = useRealm()
+  const [{ client }] = useVotePluginsClientStore((s) => [
+    s.state.currentRealmVotingClient,
+  ])
   const { error, loading, execute } = useAsyncCallback(
     async ({
       position,
       lockupPeriodsInDays,
+      tokenOwnerRecordPk,
       programId = PROGRAM_ID,
     }: {
       position: PositionWithMeta
       lockupPeriodsInDays: number
+      tokenOwnerRecordPk: PublicKey | null
       programId?: PublicKey
     }) => {
       const isInvalid =
-        !connection || !connection.current || !provider || !realm || !wallet
+        !connection ||
+        !connection.current ||
+        !provider ||
+        !realm ||
+        !wallet ||
+        !client ||
+        !realmInfo ||
+        !(client instanceof HeliumVsrClient)
 
       const idl = await Program.fetchIdl(programId, provider)
       const hsdProgram = await init(provider as any, programId, idl)
@@ -33,29 +55,68 @@ export const useExtendPosition = () => {
       } else {
         const instructions: TransactionInstruction[] = []
         const [dao] = daoKey(realm.account.communityMint)
+        const isDao = Boolean(await connection.current.getAccountInfo(dao))
 
-        instructions.push(
-          await hsdProgram.methods
-            .resetLockupV0({
-              kind: position.lockup.kind,
-              periods: lockupPeriodsInDays,
-            } as any)
-            .accounts({
-              position: position.pubkey,
-              dao: dao,
-            })
-            .instruction()
-        )
+        if (!tokenOwnerRecordPk) {
+          await withCreateTokenOwnerRecord(
+            instructions,
+            realm.owner,
+            realmInfo.programVersion!,
+            realm.pubkey,
+            wallet!.publicKey!,
+            realm.account.communityMint,
+            wallet!.publicKey!
+          )
+        }
 
-        const tx = new Transaction()
-        tx.add(...instructions)
-        await sendTransaction({
-          transaction: tx,
+        if (isDao) {
+          instructions.push(
+            await hsdProgram.methods
+              .resetLockupV0({
+                kind: position.lockup.kind,
+                periods: lockupPeriodsInDays,
+              } as any)
+              .accounts({
+                position: position.pubkey,
+                dao: dao,
+              })
+              .instruction()
+          )
+        } else {
+          instructions.push(
+            await client.program.methods
+              .resetLockupV0({
+                kind: position.lockup.kind,
+                periods: lockupPeriodsInDays,
+              } as any)
+              .accounts({
+                position: position.pubkey,
+              })
+              .instruction()
+          )
+        }
+
+        notify({ message: 'Extending' })
+        await sendTransactionsV3({
+          transactionInstructions: [
+            {
+              instructionsSet: txBatchesToInstructionSetWithSigners(
+                instructions,
+                [],
+                0
+              ),
+              sequenceType: SequenceType.Sequential,
+            },
+          ],
           wallet,
           connection: connection.current,
-          signers: [],
-          sendingMessage: `Extending`,
-          successMessage: `Extension successful`,
+          callbacks: {
+            afterAllTxConfirmed: () =>
+              notify({
+                message: 'Extension successful',
+                type: 'success',
+              }),
+          },
         })
       }
     }

@@ -21,6 +21,12 @@ import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/Advan
 import Switch from '@components/Switch'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
+const REDUCE_ONLY_OPTIONS = [
+  { value: 0, name: 'Disabled' },
+  { value: 1, name: 'No borrows and no deposits' },
+  { value: 2, name: 'No borrows' },
+]
+
 const keyToLabel = {
   oraclePk: 'Oracle',
   oracleConfFilter: 'Oracle Confidence Filter',
@@ -52,6 +58,7 @@ const keyToLabel = {
   resetStablePrice: 'Reset Stable Price',
   resetNetBorrowLimit: 'Reset Net Borrow Limit',
   reduceOnly: 'Reduce Only',
+  forceClose: 'Force Close',
 }
 
 type NamePkVal = {
@@ -91,8 +98,9 @@ interface EditTokenForm {
   depositWeightScaleStartQuote: number
   resetStablePrice: boolean
   resetNetBorrowLimit: boolean
-  reduceOnly: boolean
+  reduceOnly: { name: string; value: number }
   holdupTime: number
+  forceClose: boolean
 }
 
 const defaultFormValues: EditTokenForm = {
@@ -127,7 +135,8 @@ const defaultFormValues: EditTokenForm = {
   groupInsuranceFund: false,
   resetStablePrice: false,
   resetNetBorrowLimit: false,
-  reduceOnly: false,
+  reduceOnly: REDUCE_ONLY_OPTIONS[0],
+  forceClose: false,
   holdupTime: 0,
 }
 
@@ -178,9 +187,17 @@ const EditToken = ({
       const mintInfo = mangoGroup!.mintInfosMapByTokenIndex.get(
         bank.tokenIndex
       )!
-      const values = getChangedValues<EditTokenForm>(
-        originalFormValues,
-        form,
+      const values = getChangedValues<
+        Omit<EditTokenForm, 'reduceOnly'> & { reduceOnly: number }
+      >(
+        {
+          ...originalFormValues,
+          reduceOnly: originalFormValues.reduceOnly.value,
+        },
+        {
+          ...form,
+          reduceOnly: form.reduceOnly.value,
+        },
         forcedValues
       )
 
@@ -221,7 +238,7 @@ const EditToken = ({
                 maxStalenessSlots: maxStalenessSlots,
               }
             : null,
-          values.groupInsuranceFund,
+          values.groupInsuranceFund!,
           isThereNeedOfSendingRateConfigs
             ? {
                 adjustmentFactor: Number(form.adjustmentFactor),
@@ -251,10 +268,11 @@ const EditToken = ({
           getNullOrTransform(values.netBorrowLimitWindowSizeTs, BN),
           getNullOrTransform(values.borrowWeightScaleStartQuote, null, Number),
           getNullOrTransform(values.depositWeightScaleStartQuote, null, Number),
-          values.resetStablePrice,
-          values.resetNetBorrowLimit,
-          values.reduceOnly,
-          getNullOrTransform(values.name, null, String)
+          values.resetStablePrice!,
+          values.resetNetBorrowLimit!,
+          getNullOrTransform(values.reduceOnly, null, Number),
+          getNullOrTransform(values.name, null, String),
+          values.forceClose!
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -276,6 +294,7 @@ const EditToken = ({
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
       isValid,
+      chunkBy: 1,
       governance: form.governedAccount?.governance,
       customHoldUpTime: form.holdupTime,
     }
@@ -289,6 +308,7 @@ const EditToken = ({
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form, forcedValues])
+
   useEffect(() => {
     const getTokens = async () => {
       const currentTokens = [...mangoGroup!.banksMapByMint.values()].map(
@@ -302,17 +322,16 @@ const EditToken = ({
     if (wallet?.publicKey && mangoGroup) {
       getTokens()
     }
-  }, [mangoGroup?.publicKey.toBase58()])
+  }, [mangoGroup, wallet?.publicKey])
+
+  const formTokenPk = form.token?.value.toBase58()
   useEffect(() => {
-    if (form.token && mangoGroup) {
-      const currentToken = mangoGroup!.banksMapByMint.get(
-        form.token.value.toBase58()
-      )![0]
-      const groupInsuranceFund = mangoGroup.mintInfosMapByMint.get(
-        form.token.value.toBase58()
-      )?.groupInsuranceFund
+    if (formTokenPk && mangoGroup) {
+      const currentToken = mangoGroup!.banksMapByMint.get(formTokenPk)![0]
+      const groupInsuranceFund = mangoGroup.mintInfosMapByMint.get(formTokenPk)
+        ?.groupInsuranceFund
+
       const vals = {
-        ...form,
         oraclePk: currentToken.oracle.toBase58(),
         oracleConfFilter: currentToken.oracleConfig.confFilter.toNumber(),
         maxStalenessSlots: currentToken.oracleConfig.maxStalenessSlots.toNumber(),
@@ -342,14 +361,19 @@ const EditToken = ({
         borrowWeightScaleStartQuote: currentToken.borrowWeightScaleStartQuote,
         depositWeightScaleStartQuote: currentToken.depositWeightScaleStartQuote,
         groupInsuranceFund: !!groupInsuranceFund,
-        reduceOnly: currentToken.reduceOnly,
+        reduceOnly: REDUCE_ONLY_OPTIONS.find(
+          (x) => x.value === currentToken.reduceOnly
+        )!,
+        forceClose: currentToken.forceClose,
       }
-      setForm({
+      setForm((prevForm) => ({
+        ...prevForm,
         ...vals,
-      })
-      setOriginalFormValues({ ...vals })
+      }))
+      setOriginalFormValues((prevForm) => ({ ...prevForm, ...vals }))
     }
-  }, [form.token?.value.toBase58()])
+  }, [formTokenPk, mangoGroup])
+
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
@@ -369,6 +393,7 @@ const EditToken = ({
       ),
     name: yup.string().required(),
   })
+
   const inputs: InstructionInput[] = [
     {
       label: 'Governance',
@@ -620,8 +645,16 @@ const EditToken = ({
       label: keyToLabel['reduceOnly'],
       subtitle: getAdditionalLabelInfo('reduceOnly'),
       initialValue: form.reduceOnly,
-      type: InstructionInputType.SWITCH,
+      type: InstructionInputType.SELECT,
+      options: REDUCE_ONLY_OPTIONS,
       name: 'reduceOnly',
+    },
+    {
+      label: keyToLabel['forceClose'],
+      subtitle: getAdditionalLabelInfo('forceClose'),
+      initialValue: form.forceClose,
+      type: InstructionInputType.SWITCH,
+      name: 'forceClose',
     },
   ]
 

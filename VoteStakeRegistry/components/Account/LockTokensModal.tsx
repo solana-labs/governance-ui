@@ -15,8 +15,7 @@ import {
   getMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
 import { precision } from '@utils/formatting'
-import { useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { voteRegistryLockDeposit } from 'VoteStakeRegistry/actions/voteRegistryLockDeposit'
 import { DepositWithMintAccount } from 'VoteStakeRegistry/sdk/accounts'
 import {
@@ -48,6 +47,12 @@ import InlineNotification from '@components/InlineNotification'
 import Tooltip from '@components/Tooltip'
 import { notify } from '@utils/notifications'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
+import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
+import { useConnection } from '@solana/wallet-adapter-react'
+import { tokenAccountQueryKeys } from '@hooks/queries/tokenAccount'
+import queryClient from '@hooks/queries/queryClient'
 
 const YES = 'Yes'
 const NO = 'No'
@@ -62,18 +67,19 @@ const LockTokensModal = ({
   depositToUnlock?: DepositWithMintAccount | null
 }) => {
   const { getOwnedDeposits } = useDepositStore()
-  const { mint, realm, realmTokenAccount, realmInfo, tokenRecords } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const { realmTokenAccount, realmInfo } = useRealm()
+  const { data: tokenOwnerRecordPk } = useAddressQuery_CommunityTokenOwner()
+
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const voteStakeRegistryRegistrar = useVotePluginsClientStore(
     (s) => s.state.voteStakeRegistryRegistrar
   )
-  const connection = useWalletStore((s) => s.connection.current)
-  const endpoint = useWalletStore((s) => s.connection.endpoint)
+  const { connection } = useConnection()
+  const endpoint = connection.rpcEndpoint
   const wallet = useWalletOnePointOh()
   const deposits = useDepositStore((s) => s.state.deposits)
-  const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
-    (s) => s.actions
-  )
   const fiveYearsSecs = yearsToSecs(5)
   const maxLockupSecs =
     (realm &&
@@ -82,41 +88,43 @@ const LockTokensModal = ({
         ?.lockupSaturationSecs.toNumber()) ||
     fiveYearsSecs
 
-  const lockupPeriods: Period[] = [
-    {
-      defaultValue: yearsToDays(1),
-      display: '1y',
-    },
-    {
-      defaultValue: yearsToDays(2),
-      display: '2y',
-    },
-    {
-      defaultValue: yearsToDays(3),
-      display: '3y',
-    },
-    {
-      defaultValue: yearsToDays(4),
-      display: '4y',
-    },
-    {
-      defaultValue: yearsToDays(5),
-      display: '5y',
-    },
-    {
-      defaultValue: 1,
-      display: 'Custom',
-    },
-  ]
-    .filter((x) =>
-      depositToUnlock
-        ? getMinDurationInDays(
-            depositToUnlock.lockup.startTs,
-            depositToUnlock.lockup.endTs
-          ) <= x.defaultValue || x.display === 'Custom'
-        : true
-    )
-    .filter((x) => x.defaultValue <= secsToDays(maxLockupSecs))
+  const lockupPeriods: Period[] = useMemo(() => {
+    return [
+      {
+        defaultValue: yearsToDays(1),
+        display: '1y',
+      },
+      {
+        defaultValue: yearsToDays(2),
+        display: '2y',
+      },
+      {
+        defaultValue: yearsToDays(3),
+        display: '3y',
+      },
+      {
+        defaultValue: yearsToDays(4),
+        display: '4y',
+      },
+      {
+        defaultValue: yearsToDays(5),
+        display: '5y',
+      },
+      {
+        defaultValue: 1,
+        display: 'Custom',
+      },
+    ]
+      .filter((x) =>
+        depositToUnlock
+          ? getMinDurationInDays(
+              depositToUnlock.lockup.startTs,
+              depositToUnlock.lockup.endTs
+            ) <= x.defaultValue || x.display === 'Custom'
+          : true
+      )
+      .filter((x) => x.defaultValue <= secsToDays(maxLockupSecs))
+  }, [depositToUnlock, maxLockupSecs])
 
   const maxNonCustomDaysLockup = lockupPeriods
     .map((x) => x.defaultValue)
@@ -131,7 +139,7 @@ const LockTokensModal = ({
 
   const depositRecord = deposits.find(
     (x) =>
-      x.mint.publicKey.toBase58() === realm!.account.communityMint.toBase58() &&
+      x.mint.publicKey.toBase58() === realm?.account.communityMint.toBase58() &&
       x.lockup.kind.none
   )
   const [lockupPeriodDays, setLockupPeriodDays] = useState<number>(0)
@@ -212,7 +220,7 @@ const LockTokensModal = ({
   const goToStep = (val: number) => {
     setCurrentStep(val)
   }
-  const validateAmountOnBlur = () => {
+  const validateAmountOnBlur = useCallback(() => {
     const val = parseFloat(
       Math.max(
         Number(mintMinAmount),
@@ -220,8 +228,11 @@ const LockTokensModal = ({
       ).toFixed(currentPrecision)
     )
     setAmount(val)
-  }
+  }, [amount, currentPrecision, maxAmount, mintMinAmount])
+
   const handleSaveLock = async () => {
+    if (!tokenOwnerRecordPk) throw new Error()
+
     const rpcContext = new RpcContext(
       realm!.owner,
       getProgramVersionForRealm(realmInfo!),
@@ -263,8 +274,7 @@ const LockTokensModal = ({
       sourceDepositIdx: depositRecord!.index,
       sourceTokenAccount: realmTokenAccount!.publicKey,
       allowClawback: allowClawback,
-      tokenOwnerRecordPk:
-        tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey || null,
+      tokenOwnerRecordPk,
       client: client,
     })
     await getOwnedDeposits({
@@ -274,8 +284,9 @@ const LockTokensModal = ({
       client: client!,
       connection,
     })
-    fetchWalletTokenAccounts()
-    fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+    queryClient.invalidateQueries(
+      tokenAccountQueryKeys.byOwner(connection.rpcEndpoint, wallet!.publicKey!)
+    )
     onClose()
   }
 
@@ -283,6 +294,7 @@ const LockTokensModal = ({
     if (!depositToUnlock) {
       throw 'No deposit to unlock selected'
     }
+    if (!tokenOwnerRecordPk) throw new Error()
 
     const rpcContext = new RpcContext(
       realm!.owner,
@@ -313,8 +325,7 @@ const LockTokensModal = ({
       lockUpPeriodInDays: lockupPeriodDays,
       sourceDepositIdx: depositToUnlock!.index,
       communityMintPk: realm!.account.communityMint,
-      tokenOwnerRecordPk:
-        tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey || null,
+      tokenOwnerRecordPk,
       client: client,
     })
     await getOwnedDeposits({
@@ -552,25 +563,27 @@ const LockTokensModal = ({
         return 'Unknown step'
     }
   }
+
   useEffect(() => {
     if (amount) {
       validateAmountOnBlur()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [lockMoreThenDeposited])
+  }, [lockMoreThenDeposited, amount, validateAmountOnBlur])
+
   useEffect(() => {
     setLockupPeriod(lockupPeriods[0])
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [voteStakeRegistryRegistrar])
+  }, [voteStakeRegistryRegistrar, lockupPeriods])
+
   useEffect(() => {
     if (depositToUnlock) {
       goToStep(0)
     }
   }, [depositToUnlock])
+
   useEffect(() => {
     setLockupPeriodDays(lockupPeriod.defaultValue)
   }, [lockupPeriod.defaultValue])
-  // const isMainBtnVisible = !hasMoreTokensInWallet || currentStep !== 0
+
   const isTitleVisible = currentStep !== 3
   const getCurrentBtnForStep = () => {
     switch (currentStep) {
