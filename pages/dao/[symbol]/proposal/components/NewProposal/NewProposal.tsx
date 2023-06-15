@@ -3,12 +3,14 @@ import { NewProposalForm } from './Form/Form'
 import { Secondary } from '@components/core/controls/Button/Secondary'
 import { useState } from 'react'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/solid'
-import useGovernanceDefaults from '@hub/components/NewWallet/useGovernanceDefaults'
+// import useGovernanceDefaults from '@hub/components/NewWallet/useGovernanceDefaults'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import cx from '@hub/lib/cx'
 import Head from 'next/head'
 import { Primary } from '@components/core/controls/Button'
 import CheckmarkIcon from '@carbon/icons-react/lib/Checkmark'
+import { NewProposalSummary } from './Summary'
+// import useGovernanceAssets from '@hooks/useGovernanceAssets'
 
 enum Step {
   Form,
@@ -38,8 +40,10 @@ interface Props {
 }
 
 export const NewProposal = (props: Props) => {
-  const defaults = useGovernanceDefaults()
-  console.log('Defaults is: ', defaults)
+  // const defaults = useGovernanceDefaults()
+  // console.log('Defaults is: ', defaults)
+  // const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
+  // console.log('Governed tokens are: ', governedTokenAccountsWithoutNfts)
 
   const wallet = useWalletOnePointOh()
   const [step, setStep] = useState(Step.Form)
@@ -114,32 +118,31 @@ export const NewProposal = (props: Props) => {
             )}
             {step === Step.Summary && (
               <>
-                <h1>Hi summary</h1>
-                {/* <NewWalletSummary
+                <NewProposalSummary
                   className="mb-16"
-                  communityRules={rules.communityTokenRules}
-                  coolOffHours={rules.coolOffHours}
-                  councilRules={rules.councilTokenRules}
-                  initialCommunityRules={defaults.communityTokenRules}
-                  initialCoolOffHours={defaults.coolOffHours}
-                  initialCouncilRules={defaults.councilTokenRules}
-                  initialDepositExemptProposalCount={
-                    defaults.depositExemptProposalCount
-                  }
-                  initialBaseVoteDays={defaults.maxVoteDays}
-                  initialMinInstructionHoldupDays={
-                    defaults.minInstructionHoldupDays
-                  }
-                  depositExemptProposalCount={rules.depositExemptProposalCount}
-                  baseVoteDays={baseVoteDays}
-                  minInstructionHoldupDays={rules.minInstructionHoldupDays}
-                  proposalDescription={proposalDescription}
-                  proposalTitle={proposalTitle}
-                  proposalVoteType={proposalVoteType}
-                  onProposalDescriptionChange={setProposalDescription}
-                  onProposalTitleChange={setProposalTitle}
-                  onProposalVoteTypeChange={setProposalVoteType}
-                /> */}
+                  // communityRules={rules.communityTokenRules}
+                  // coolOffHours={rules.coolOffHours}
+                  // councilRules={rules.councilTokenRules}
+                  // initialCommunityRules={defaults.communityTokenRules}
+                  // initialCoolOffHours={defaults.coolOffHours}
+                  // initialCouncilRules={defaults.councilTokenRules}
+                  // initialDepositExemptProposalCount={
+                  //   defaults.depositExemptProposalCount
+                  // }
+                  // initialBaseVoteDays={defaults.maxVoteDays}
+                  // initialMinInstructionHoldupDays={
+                  //   defaults.minInstructionHoldupDays
+                  // }
+                  // depositExemptProposalCount={rules.depositExemptProposalCount}
+                  // baseVoteDays={baseVoteDays}
+                  // minInstructionHoldupDays={rules.minInstructionHoldupDays}
+                  // proposalDescription={proposalDescription}
+                  // proposalTitle={proposalTitle}
+                  // proposalVoteType={proposalVoteType}
+                  // onProposalDescriptionChange={setProposalDescription}
+                  // onProposalTitleChange={setProposalTitle}
+                  // onProposalVoteTypeChange={setProposalVoteType}
+                />
                 <footer className="flex items-center justify-end">
                   <button
                     className="flex items-center text-sm text-neutral-500"

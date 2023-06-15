@@ -341,7 +341,8 @@ const New = () => {
     const governedAccount = extractGovernanceAccountFromInstructionsData(
       instructionsData
     )
-
+    console.log("Hohoho, look who's here. ", governedAccount)
+    console.log('The insturctionsdata is: ', instructionsData)
     setGovernance(governedAccount)
   }, [instructionsData])
 

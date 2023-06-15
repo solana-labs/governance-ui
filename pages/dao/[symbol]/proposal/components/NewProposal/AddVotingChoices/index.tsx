@@ -4,8 +4,9 @@ import { SectionBlock } from '@components/core/SectionBlock'
 import { SectionHeader } from '@components/core/SectionHeader'
 import { Primary } from '@components/core/controls/Button/Primary'
 import { MultipleChoiceOptionForm } from '../MultipleChoiceOptionForm'
-import { useState } from 'react'
+import { useContext } from 'react'
 import { ExclamationCircleIcon } from '@heroicons/react/solid'
+import { NewMultiPropContext, NewMultiPropType } from '../../../new'
 // import { FormProps } from '@hub/types/FormProps'
 // import { durationStr } from '@components/treasuryV2/Details/WalletDetails/Info/Rules'
 // import * as RE from '@utils/uiTypes/Result'
@@ -17,7 +18,14 @@ interface Props {
 }
 
 export function AddVotingChoices(props: Props) {
-  const [choices, setChoices] = useState<string[]>([''])
+  const {
+    multiOptions,
+    newMultiOption,
+    updateMultiOption,
+    removeMultiOption,
+  } = useContext(NewMultiPropContext) as NewMultiPropType
+
+  console.log('Multi options is: ', multiOptions)
   // 0 is executable, 1 is non-executable
   // const treasuryInfo = useTreasuryInfo(false)
 
@@ -28,23 +36,21 @@ export function AddVotingChoices(props: Props) {
   //       )
   //     : null
 
-  console.log(choices)
-
   function setChoice(index: number, choice: string) {
-    setChoices((prevChoices) => {
-      const newChoices = [...prevChoices]
-      newChoices[index] = choice
-      return newChoices
-    })
+    console.log('Setting a choice osf: ', choice)
+    updateMultiOption(choice, index)
   }
 
   const addChoice = () => {
-    setChoices([...choices, ''])
-    console.log(choices)
+    newMultiOption('')
+    // setChoices([...choices, ''])
+    // console.log(choices)
   }
 
   const removeChoice = (idx: number) => {
-    setChoices([...choices.filter((x, index) => index !== idx)])
+    console.log('Removing: ', idx)
+    removeMultiOption(idx)
+    // setChoices([...choices.filter((x, index) => index !== idx)])
   }
 
   return (
@@ -55,7 +61,7 @@ export function AddVotingChoices(props: Props) {
         text="Add voting choices"
       />
 
-      {choices.map((choice, idx) => {
+      {multiOptions.map((choice, idx) => {
         return (
           <MultipleChoiceOptionForm
             key={idx}
