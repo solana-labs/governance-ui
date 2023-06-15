@@ -120,6 +120,7 @@ export async function getTransferInstruction({
     isValid,
     governance: currentAccount?.governance,
     prerequisiteInstructions: prerequisiteInstructions,
+    chunkBy: 4,
   }
   return obj
 }
@@ -159,12 +160,12 @@ export async function getSolTransferInstruction({
     })
     serializedInstruction = serializeInstructionToBase64(transferIx)
   }
-
   const obj: UiInstruction = {
     serializedInstruction,
     isValid,
     governance: currentAccount?.governance,
     prerequisiteInstructions: prerequisiteInstructions,
+    chunkBy: 4,
   }
   return obj
 }

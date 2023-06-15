@@ -120,6 +120,7 @@ const TransactionInstructionCard = ({
             index={idx}
             accountMeta={am}
             descriptor={descriptor}
+            programId={instructionData.programId}
           />
         ))}
       </div>
