@@ -17,32 +17,22 @@ import { NewProposalContext } from '../../../new'
 import {
   AggregatorAccount,
   SwitchboardProgram,
-  LeaseAccount,
 } from '@switchboard-xyz/solana.js'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
-import {
-  Keypair,
-  LAMPORTS_PER_SOL,
-  PublicKey,
-  SystemProgram,
-  TransactionInstruction,
-} from '@solana/web3.js'
-import { notify } from '@utils/notifications'
+import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   TOKEN_PROGRAM_ID,
   Token,
 } from '@solana/spl-token'
 import { WSOL_MINT } from '@components/instructions/tools'
-import { syncNative } from '@solendprotocol/solend-sdk'
 
 interface TokenAddBankForm {
   governedAccount: AssetAccount | null
-  solAmount: number
   oraclePublicKey: string
 }
 
-const SwitchboardFundOracle = ({
+const WithdrawFromOracle = ({
   index,
   governance,
 }: {
@@ -56,7 +46,6 @@ const SwitchboardFundOracle = ({
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<TokenAddBankForm>({
     governedAccount: null,
-    solAmount: 0,
     oraclePublicKey: '',
   })
   const [formErrors, setFormErrors] = useState({})
@@ -87,49 +76,10 @@ const SwitchboardFundOracle = ({
         form.oraclePublicKey
       )
 
-      const [leaseAccount, leaseAccountData] = await LeaseAccount.load(
-        program,
-        oracleAccountData.queuePubkey,
-        oracle.publicKey
-      )
-      if (
-        leaseAccountData.withdrawAuthority.toBase58() ===
-        wallet.publicKey.toBase58()
-      ) {
-        const transferWithdrawAuthIx = leaseAccount.setAuthorityInstruction(
-          wallet.publicKey,
-          {
-            newAuthority: form.governedAccount.extensions.transferAddress!,
-          }
-        )
-        prerequsieInstructionsSigners.push(...transferWithdrawAuthIx.signers)
-        prerequisiteInstructions.push(...transferWithdrawAuthIx.ixns)
-      }
-
-      if (
-        oracleAccountData.authority.toBase58() === wallet.publicKey.toBase58()
-      ) {
-        const transferAuthIx = oracle.setAuthorityInstruction(
-          wallet.publicKey,
-          {
-            newAuthority: form.governedAccount.extensions.transferAddress!,
-          }
-        )
-        prerequsieInstructionsSigners.push(...transferAuthIx.signers)
-        prerequisiteInstructions.push(...transferAuthIx.ixns)
-      }
-      const [ix, amountToFund] = await oracle.fundUpToInstruction(
-        form.governedAccount.extensions.transferAddress!,
-        form.solAmount,
-        false
+      const [leaseAccount] = await oracle.getLeaseAccount(
+        oracleAccountData.queuePubkey
       )
 
-      if (ix === undefined) {
-        notify({
-          type: 'error',
-          message: 'Amount lower then current lease amount',
-        })
-      }
       const wsolAddress = await Token.getAssociatedTokenAddress(
         ASSOCIATED_TOKEN_PROGRAM_ID,
         TOKEN_PROGRAM_ID,
@@ -151,20 +101,28 @@ const SwitchboardFundOracle = ({
         prerequisiteInstructions.push(createWsolacc)
       }
 
-      const transferWSolIx = SystemProgram.transfer({
-        fromPubkey: form.governedAccount.extensions.transferAddress!,
-        toPubkey: wsolAddress,
-        lamports: Math.round(amountToFund! * LAMPORTS_PER_SOL),
-      })
-      const syncIx = syncNative(wsolAddress)
-      additionalSerializedInstructions.push(
-        serializeInstructionToBase64(transferWSolIx)
+      const ix = await leaseAccount.withdrawInstruction(
+        form.governedAccount.extensions.transferAddress!,
+        {
+          withdrawWallet: wsolAddress!,
+          amount: 'all',
+          unwrap: false,
+        }
       )
-      additionalSerializedInstructions.push(
-        serializeInstructionToBase64(syncIx)
+      const closeWSOLAccountIx = Token.createCloseAccountInstruction(
+        TOKEN_PROGRAM_ID,
+        wsolAddress,
+        form.governedAccount.extensions.transferAddress!,
+        form.governedAccount.extensions.transferAddress!,
+        []
       )
+
       additionalSerializedInstructions.push(
         serializeInstructionToBase64(ix!.ixns[0])
+      )
+
+      additionalSerializedInstructions.push(
+        serializeInstructionToBase64(closeWSOLAccountIx)
       )
 
       serializedInstruction = ''
@@ -211,14 +169,6 @@ const SwitchboardFundOracle = ({
       inputType: 'text',
       name: 'oraclePublicKey',
     },
-    {
-      label:
-        'Fund up to SOL (Number must be higher then current sol amount inside oracle)',
-      initialValue: form.solAmount,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'solAmount',
-    },
   ]
 
   return (
@@ -236,4 +186,4 @@ const SwitchboardFundOracle = ({
   )
 }
 
-export default SwitchboardFundOracle
+export default WithdrawFromOracle

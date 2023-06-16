@@ -55,6 +55,7 @@ import ConfigureNftPluginCollection from './components/instructions/NftVotingPlu
 import SwitchboardAdmitOracle from './components/instructions/Switchboard/AdmitOracle'
 import SwitchboardRevokeOracle from './components/instructions/Switchboard/RevokeOracle'
 import SwitchboardFundOracle from './components/instructions/Switchboard/FundOracle'
+import WithdrawFromOracle from './components/instructions/Switchboard/WithdrawFromOracle'
 import FriktionWithdraw from './components/instructions/Friktion/FriktionWithdraw'
 import FriktionClaimPendingDeposit from './components/instructions/Friktion/FriktionClaimPendingDeposit'
 import FriktionClaimPendingWithdraw from './components/instructions/Friktion/FriktionClaimPendingWithdraw'
@@ -440,6 +441,7 @@ const New = () => {
       [Instructions.SwitchboardAdmitOracle]: SwitchboardAdmitOracle,
       [Instructions.SwitchboardRevokeOracle]: SwitchboardRevokeOracle,
       [Instructions.SwitchboardFundOracle]: SwitchboardFundOracle,
+      [Instructions.WithdrawFromOracle]: WithdrawFromOracle,
       [Instructions.RefreshSolendObligation]: RefreshObligation,
       [Instructions.RefreshSolendReserve]: RefreshReserve,
       [Instructions.ForesightInitMarket]: MakeInitMarketParams,
