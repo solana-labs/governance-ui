@@ -800,6 +800,10 @@ export default function useGovernanceAssets() {
       name: 'Fund Oracle',
       packageId: PackageEnum.Switchboard,
     },
+    [Instructions.WithdrawFromOracle]: {
+      name: 'Withdraw from Oracle',
+      packageId: PackageEnum.Switchboard,
+    },
 
     /*
       ██    ██ ███████ ██████      ██████  ██      ██    ██  ██████  ██ ███    ██

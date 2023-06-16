@@ -468,6 +468,7 @@ export enum Instructions {
   SwitchboardAdmitOracle,
   SwitchboardRevokeOracle,
   SwitchboardFundOracle,
+  WithdrawFromOracle,
   Transfer,
   TransferDomainName,
   UpdateTokenMetadata,
