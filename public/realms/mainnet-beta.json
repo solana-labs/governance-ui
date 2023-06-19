@@ -3173,5 +3173,15 @@
     "sortRank": 3,
     "symbol": "VIEWSDAO",
     "twitter": "@Decod3rsNFT"
-  }
+  }, 
+   { 
+   "symbol": "YDAO",
+   "displayName": "yourDAO",
+   "programId": "GovRp7uazvmYkQ7gqjdfjKFwr6pHDcYFWH3SP9DHzdtR",
+   "realmId": "eSkHn3pytkDRnifeULCpUPmKTFmuxiAbSc7jLVEYqbrv",
+   "ogImage": "/realms/yourDAO/yourDAO_logo.jpg", 
+   "bannerImage": "/realms/yourDAO/yourDAO_banner.png", 
+   "website": "https://www.yourDAOexample.com", 
+   "twitter": "@yDAO"
+  },
 ]
