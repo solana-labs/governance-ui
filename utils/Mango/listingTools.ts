@@ -1,10 +1,12 @@
 import {
+  OPENBOOK_PROGRAM_ID,
   RouteInfo,
   toNative,
   toUiDecimals,
 } from '@blockworks-foundation/mango-v4'
 import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
 import { MAINNET_USDC_MINT } from '@foresight-tmp/foresight-sdk/dist/consts'
+import { Market } from '@project-serum/serum'
 import { PythHttpClient } from '@pythnetwork/client'
 import { Connection, Keypair, PublicKey, Transaction } from '@solana/web3.js'
 import { secondsToHours } from 'date-fns'
@@ -365,5 +367,49 @@ export default class EmptyWallet implements Wallet {
 
   get publicKey(): PublicKey {
     return this.payer.publicKey
+  }
+}
+
+export const getBestMarket = async ({
+  baseMint,
+  quoteMint,
+  cluster,
+  connection,
+}: {
+  baseMint: string
+  quoteMint: string
+  cluster: 'devnet' | 'mainnet-beta'
+  connection: Connection
+}) => {
+  try {
+    const dexProgramPk = OPENBOOK_PROGRAM_ID[cluster]
+
+    const markets = await Market.findAccountsByMints(
+      connection,
+      new PublicKey(baseMint),
+      new PublicKey(quoteMint),
+      dexProgramPk
+    )
+    console.log(baseMint, quoteMint, markets)
+    if (!markets.length) {
+      return undefined
+    }
+    if (markets.length === 1) {
+      return markets[0].publicKey
+    }
+    const marketsDataJsons = await Promise.all([
+      ...markets.map((x) =>
+        fetch(`/openSerumApi/market/${x.publicKey.toBase58()}`)
+      ),
+    ])
+    const marketsData = await Promise.all([
+      ...marketsDataJsons.map((x) => x.json()),
+    ])
+    const bestMarket = marketsData.sort((a, b) => b.volume24h - a.volume24h)
+    return bestMarket.length
+      ? new PublicKey(bestMarket[0].id)
+      : markets[0].publicKey
+  } catch (e) {
+    return null
   }
 }

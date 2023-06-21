@@ -1,4 +1,8 @@
-import { MangoClient, toUiDecimals } from '@blockworks-foundation/mango-v4'
+import {
+  MANGO_V4_ID,
+  MangoClient,
+  toUiDecimals,
+} from '@blockworks-foundation/mango-v4'
 import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
 import { AnchorProvider, BN, BorshInstructionCoder } from '@coral-xyz/anchor'
 import { Wallet } from '@marinade.finance/marinade-ts-sdk'
@@ -13,6 +17,7 @@ import {
   ListingArgsFormatted,
   coinTiersToNames,
   getOracle,
+  getBestMarket,
 } from '@utils/Mango/listingTools'
 import { secondsToHours } from 'date-fns'
 import WarningFilledIcon from '@carbon/icons-react/lib/WarningFilled'
@@ -471,11 +476,42 @@ const instructions = () => ({
       data: Uint8Array,
       accounts: AccountMetaData[]
     ) => {
-      const info = await displayArgs(connection, data)
+      const group = accounts[0].pubkey
+      const baseBank = accounts[7].pubkey
+      const quoteBank = accounts[6].pubkey
       const openbookMarketPk = accounts[3].pubkey
+
+      const info = await displayArgs(connection, data)
+      const client = await getClient(connection)
+      const mangoGroup = await client.getGroup(group)
+      const banks = [...mangoGroup.banksMapByMint.values()].map((x) => x[0])
+      const baseMint = banks.find((x) => x.publicKey.equals(baseBank))?.mint
+      const quoteMint = banks.find((x) => x.publicKey.equals(quoteBank))?.mint
+
+      const bestMarket = await getBestMarket({
+        baseMint: baseMint!.toBase58(),
+        quoteMint: quoteMint!.toBase58(),
+        cluster: 'mainnet-beta',
+        connection,
+      })
+
       try {
         return (
           <div>
+            {bestMarket && openbookMarketPk.equals(bestMarket) && (
+              <div className="text-green flex items-center">
+                <CheckCircleIcon className="w-5 mr-2"></CheckCircleIcon>
+                Proposed market match the best market according to listing
+                presets
+              </div>
+            )}
+            {(!bestMarket || !openbookMarketPk.equals(bestMarket)) && (
+              <div className="text-orange flex items-center">
+                <WarningFilledIcon className="w-5 mr-2"></WarningFilledIcon>
+                Best market not found or proposed market not matching listing
+                preset check market carefully
+              </div>
+            )}
             <div className="py-3">
               <a
                 className="underline"
@@ -817,7 +853,7 @@ const getClient = async (connection: Connection) => {
   const client = await MangoClient.connect(
     adminProvider,
     'mainnet-beta',
-    new PublicKey('78b8f4cGCwmZ9ysPFMWLaLTkkaYnUjwMJYStWe5RTSSX')
+    MANGO_V4_ID['mainnet-beta']
   )
 
   return client
