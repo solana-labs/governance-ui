@@ -64,6 +64,12 @@ export type ListingArgsFormatted = {
   netBorrowLimitWindowSizeTs: number
 }
 
+export type EditTokenArgsFormatted = ListingArgsFormatted & {
+  borrowWeightScaleStartQuote: number
+  depositWeightScaleStartQuote: number
+  groupInsuranceFund: boolean
+}
+
 export const getFormattedListingValues = (args: ListingArgs) => {
   const formattedArgs: ListingArgsFormatted = {
     tokenIndex: args.tokenIndex,
