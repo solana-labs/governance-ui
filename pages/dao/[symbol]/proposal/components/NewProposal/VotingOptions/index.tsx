@@ -5,7 +5,7 @@ import { SummaryItem } from '../SummaryItem'
 import cx from '@hub/lib/cx'
 import Idea from '@carbon/icons-react/lib/Idea'
 import { useContext } from 'react'
-import { NewMultiPropContext, NewMultiPropType } from '../../../new'
+import { NewMultiPropContext, NewMultiPropType } from '../../../multioption'
 
 interface Props {
   className?: string
@@ -31,6 +31,10 @@ export function VotingOptions(props: Props) {
               />
             )
           })}
+          <SummaryItem
+            label={`Option ${multiOptions.length + 1}`}
+            value="None of the above"
+          />
         </div>
       </ValueBlock>
     </SectionBlock>

@@ -66,6 +66,7 @@ export function ProposalType(props: Props) {
       <ValueBlock description="" title="What type of proposal are you creating">
         <ButtonToggle
           className="h-14"
+          disableValueTrue={true}
           valueTrueText="Executable (on-chain)"
           valueFalseText="Multiple Choice Poll (off-chain)"
           value={props.isOnChainProposal}

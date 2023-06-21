@@ -22,7 +22,7 @@ import {
 } from '@components/treasuryV2/Details/WalletDetails/Info/Rules'
 import { ClockIcon, HandIcon, ScaleIcon } from '@heroicons/react/outline'
 import cx from 'classnames'
-import { NewProposalContext } from 'pages/dao/[symbol]/proposal/new.temp'
+import { NewProposalContext } from 'pages/dao/[symbol]/proposal/new'
 import useRealm from '@hooks/useRealm'
 import { PublicKey } from '@solana/web3.js'
 import Tooltip from '@components/Tooltip'

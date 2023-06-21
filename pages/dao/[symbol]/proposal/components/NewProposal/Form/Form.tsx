@@ -24,8 +24,7 @@ interface Props {
 }
 
 function Form(props: Props & { title: string; description: string }) {
-  const [isOnChainProposal, setIsOnChainProposal] = useState(true)
-  console.log('form props', props)
+  const [isOnChainProposal, setIsOnChainProposal] = useState(false)
   //   const [showCouncilOptions, setShowCouncilOptions] = useState(
   //     props.initialCouncilRules?.canVote || false
   //   )

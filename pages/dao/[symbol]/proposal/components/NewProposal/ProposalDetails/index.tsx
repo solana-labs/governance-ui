@@ -11,17 +11,40 @@ import { SummaryItem } from '../SummaryItem'
 // import { ntext } from '@hub/lib/ntext'
 // import { FormProps } from '@hub/types/FormProps'
 import cx from '@hub/lib/cx'
+// import { formatNumber } from '@hub/lib/formatNumber'
+import { ntext } from '@hub/lib/ntext'
+import { FormProps } from '@hub/types/FormProps'
+// import { formatNumber } from '@hub/lib/formatNumber'
+import { getLabel } from '../../WalletSelector'
+import {
+  CommunityRules,
+  CouncilRules,
+} from '@hub/components/EditWalletRules/types'
 
-interface Props {
+interface Props
+  extends FormProps<{
+    maxVoteDays: number
+    proposalVoteType: 'council' | 'community'
+  }> {
   className?: string
-  //   programVersion: number
+  initialCoolOffHours: number
+  initialCommunityRules: CommunityRules
+  initialCouncilRules: CouncilRules
+  initialBaseVoteDays: number
+  // programVersion: number
 }
 
 export function ProposalDetails(props: Props) {
-  //   const unrestrictedVotingHours = 24 * props.maxVoteDays - props.coolOffHours
-  //   const unrestrictedVotingDays = Math.floor(unrestrictedVotingHours / 24)
-  //   const unrestrictedVotingRemainingHours =
-  // unrestrictedVotingHours - unrestrictedVotingDays * 24
+  const rules =
+    props.proposalVoteType === 'council' && props.initialCouncilRules
+      ? props.initialCouncilRules
+      : props.initialCommunityRules
+
+  const unrestrictedVotingHours =
+    24 * props.initialBaseVoteDays - props.initialCoolOffHours
+  const unrestrictedVotingDays = Math.floor(unrestrictedVotingHours / 24)
+  const unrestrictedVotingRemainingHours =
+    unrestrictedVotingHours - unrestrictedVotingDays * 24
 
   return (
     <>
@@ -47,19 +70,11 @@ export function ProposalDetails(props: Props) {
             />
             <SummaryItem
               label="Approval Quorum"
-              value="60%"
-              //   value={`${formatNumber(props.coolOffHours, undefined, {
-              //     minimumFractionDigits: 0,
-              //     maximumFractionDigits: 2,
-              //   })} ${ntext(props.coolOffHours, 'hour')}`}
+              value={`${rules.quorumPercent}%`}
             />
             <SummaryItem
               label="Vote Tipping"
-              value="Strict"
-              //   value={`${formatNumber(props.coolOffHours, undefined, {
-              //     minimumFractionDigits: 0,
-              //     maximumFractionDigits: 2,
-              //   })} ${ntext(props.coolOffHours, 'hour')}`}
+              value={getLabel(rules.voteTipping)}
             />
             <SummaryItem
               label="Veto Power"
@@ -159,28 +174,34 @@ export function ProposalDetails(props: Props) {
         <ValueBlock title="" description="">
           <SummaryItem
             label="Total Voting Duration"
-            value="3 days"
-            //   value={`${formatNumber(props.coolOffHours, undefined, {
-            //     minimumFractionDigits: 0,
-            //     maximumFractionDigits: 2,
-            //   })} ${ntext(props.coolOffHours, 'hour')}`}
+            value="Demmy"
+            // value={`${formatNumber(props.maxVoteDays, undefined, {
+            //   minimumFractionDigits: 0,
+            //   maximumFractionDigits: 2,
+            // })} ${ntext(props.maxVoteDays, 'day')}`}
           />
           <div className="grid grid-cols-2 gap-x-4 gap-y-10 mt-10 pb-4">
             <SummaryItem
               label="Unrestricted Voting Time"
-              value="3 days"
-              //   value={`${formatNumber(props.coolOffHours, undefined, {
-              //     minimumFractionDigits: 0,
-              //     maximumFractionDigits: 2,
-              //   })} ${ntext(props.coolOffHours, 'hour')}`}
+              value={
+                `${unrestrictedVotingDays} ${ntext(
+                  unrestrictedVotingDays,
+                  'day'
+                )}` +
+                (unrestrictedVotingRemainingHours
+                  ? ` ${unrestrictedVotingRemainingHours} ${ntext(
+                      unrestrictedVotingRemainingHours,
+                      'hour'
+                    )}`
+                  : '')
+              }
             />
             <SummaryItem
-              label="Cool-Off Voting Time"
-              value="12 hours"
-              //   value={`${formatNumber(props.coolOffHours, undefined, {
-              //     minimumFractionDigits: 0,
-              //     maximumFractionDigits: 2,
-              //   })} ${ntext(props.coolOffHours, 'hour')}`}
+              label="Voting Cool-off Hours"
+              value={`${props.initialCoolOffHours} ${ntext(
+                props.initialCoolOffHours,
+                'hour'
+              )}`}
             />
           </div>
         </ValueBlock>

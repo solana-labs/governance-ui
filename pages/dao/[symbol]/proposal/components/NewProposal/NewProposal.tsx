@@ -3,13 +3,13 @@ import { NewProposalForm } from './Form/Form'
 import { Secondary } from '@components/core/controls/Button/Secondary'
 import { useState } from 'react'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/solid'
-// import useGovernanceDefaults from '@hub/components/NewWallet/useGovernanceDefaults'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import cx from '@hub/lib/cx'
 import Head from 'next/head'
 import { Primary } from '@components/core/controls/Button'
 import CheckmarkIcon from '@carbon/icons-react/lib/Checkmark'
 import { NewProposalSummary } from './Summary'
+import useGovernanceDefaults from '@hub/components/NewWallet/useGovernanceDefaults'
 // import useGovernanceAssets from '@hooks/useGovernanceAssets'
 
 enum Step {
@@ -39,12 +39,12 @@ interface Props {
   className?: string
 }
 
-export const NewProposal = (props: Props) => {
-  // const defaults = useGovernanceDefaults()
-  // console.log('Defaults is: ', defaults)
-  // const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
-  // console.log('Governed tokens are: ', governedTokenAccountsWithoutNfts)
-
+function NewProposalWithDefaults({
+  defaults,
+  ...props
+}: Props & {
+  defaults: NonNullable<ReturnType<typeof useGovernanceDefaults>>
+}) {
   const wallet = useWalletOnePointOh()
   const [step, setStep] = useState(Step.Form)
 
@@ -67,6 +67,7 @@ export const NewProposal = (props: Props) => {
   }
 
   console.log('Step is: ', step)
+
   return (
     <>
       <div className={cx(props.className, 'dark:bg-neutral-900')}>
@@ -120,16 +121,19 @@ export const NewProposal = (props: Props) => {
               <>
                 <NewProposalSummary
                   className="mb-16"
+                  maxVoteDays={1}
+                  initialCommunityRules={defaults.communityTokenRules}
+                  initialCouncilRules={defaults.councilTokenRules}
                   // communityRules={rules.communityTokenRules}
                   // coolOffHours={rules.coolOffHours}
                   // councilRules={rules.councilTokenRules}
                   // initialCommunityRules={defaults.communityTokenRules}
-                  // initialCoolOffHours={defaults.coolOffHours}
+                  initialCoolOffHours={defaults.coolOffHours}
                   // initialCouncilRules={defaults.councilTokenRules}
                   // initialDepositExemptProposalCount={
                   //   defaults.depositExemptProposalCount
                   // }
-                  // initialBaseVoteDays={defaults.maxVoteDays}
+                  initialBaseVoteDays={defaults.maxVoteDays}
                   // initialMinInstructionHoldupDays={
                   //   defaults.minInstructionHoldupDays
                   // }
@@ -138,7 +142,7 @@ export const NewProposal = (props: Props) => {
                   // minInstructionHoldupDays={rules.minInstructionHoldupDays}
                   // proposalDescription={proposalDescription}
                   // proposalTitle={proposalTitle}
-                  // proposalVoteType={proposalVoteType}
+                  proposalVoteType="community"
                   // onProposalDescriptionChange={setProposalDescription}
                   // onProposalTitleChange={setProposalTitle}
                   // onProposalVoteTypeChange={setProposalVoteType}
@@ -183,8 +187,12 @@ export const NewProposal = (props: Props) => {
       </div>
     </>
   )
-  //   return <h1>NewProposal {props.className}</h1>
-  //   return defaults ? (
-  //     <NewWalletWithDefaults {...props} defaults={defaults} />
-  //   ) : null
+}
+
+export const NewProposal = (props: Props) => {
+  const defaults = useGovernanceDefaults()
+
+  return defaults ? (
+    <NewProposalWithDefaults {...props} defaults={defaults} />
+  ) : null
 }

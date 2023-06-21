@@ -6,7 +6,7 @@ import { SectionHeader } from '@components/core/SectionHeader'
 // import { SummaryItem } from '../SummaryItem'
 import { ValueBlock } from '@components/core/ValueBlock'
 import { Input } from '@components/core/controls/Input'
-import Textarea from '@components/inputs/Textarea'
+import TextareaProps from '@components/core/controls/TextArea'
 import { useState } from 'react'
 // import { Slider } from '@hub/components/controls/Slider'
 // import { formatNumber } from '@hub/lib/formatNumber'
@@ -32,7 +32,7 @@ export function ProposalTitle(props: Props) {
         icon={<TimeIcon />}
         text="Title and Description"
       />
-      <ValueBlock title="Proposal Title" description="">
+      <ValueBlock className="mb-8" title="Proposal Title" description="">
         <Input
           className="w-full pr-24"
           placeholder="eg. Send USDC to wallet address"
@@ -48,9 +48,8 @@ export function ProposalTitle(props: Props) {
         description="This will help voters understand more details about your proposed changes."
       >
         {/* ToDO Adi: CHANGE THIS TO HAVE SAME DESIGN CONSISTENCY */}
-        <Textarea
+        <TextareaProps
           className="mb-3"
-          label="Description"
           placeholder="Description of your proposal or use a github gist link (optional)"
           value={description}
           onChange={
@@ -60,7 +59,7 @@ export function ProposalTitle(props: Props) {
             //   propertyName: 'description',
             // })
           }
-        ></Textarea>
+        ></TextareaProps>
       </ValueBlock>
       {/* {props.programVersion >= 3 && (
         <ValueBlock

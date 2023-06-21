@@ -69,6 +69,24 @@ const NewProposalBtn = () => {
           </Link>
         </div>
       </Tooltip>
+      <Tooltip content={tooltipContent}>
+        <div
+          className={!canCreateProposal ? 'cursor-not-allowed opacity-60' : ''}
+        >
+          <Link href={fmtUrlWithCluster(`/dao/${symbol}/proposal/multioption`)}>
+            <a
+              className={`${
+                !canCreateProposal
+                  ? 'cursor-not-allowed pointer-events-none'
+                  : ''
+              } flex items-center cursor-pointer text-primary-light hover:text-primary-dark text-sm`}
+            >
+              <PlusCircleIcon className="flex-shrink-0 h-5 mr-1 w-5" />
+              New Multi Option Proposal
+            </a>
+          </Link>
+        </div>
+      </Tooltip>
     </>
   )
 }

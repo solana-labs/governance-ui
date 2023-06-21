@@ -3,6 +3,7 @@ import type { PublicKey } from '@solana/web3.js'
 import { ProposalTitle } from '../ProposalTitle'
 import { ProposalDetails } from '../ProposalDetails'
 import { VotingOptions } from '../VotingOptions'
+import Bot from '@carbon/icons-react/lib/Bot'
 
 // import { ProposalDetails } from '@components/core/ProposalDetails'
 // import { ProposalVoteType } from '@components/core/ProposalVoteType'
@@ -10,23 +11,28 @@ import { VotingOptions } from '../VotingOptions'
 // import { UpdatesList } from '../UpdatesList'
 // import { NewRulesList } from '../UpdatesList/NewRulesList'
 // import { WalletDescription } from '../WalletDescription'
-// import { FormProps } from '@hub/types/FormProps'
+import { FormProps } from '@hub/types/FormProps'
+import {
+  CommunityRules,
+  CouncilRules,
+} from '@hub/components/EditWalletRules/types'
 
-interface Props {
-  // extends FormProps<{
-  //   proposalDescription: string
-  //   proposalTitle: string
-  //   proposalVoteType: 'council' | 'community'
-  // }> {
+interface Props
+  extends FormProps<{
+    // proposalDescription: string
+    maxVoteDays: number
+    // proposalTitle: string
+    proposalVoteType: 'council' | 'community'
+  }> {
   className?: string
   // communityRules: CommunityRules
   // coolOffHours: number
   // councilRules: CouncilRules
-  // initialCommunityRules: CommunityRules
-  // initialCoolOffHours: number
-  // initialCouncilRules: CouncilRules
+  initialCommunityRules: CommunityRules
+  initialCoolOffHours: number
+  initialCouncilRules: CouncilRules
   // initialDepositExemptProposalCount: number
-  // initialBaseVoteDays: number
+  initialBaseVoteDays: number
   // initialMinInstructionHoldupDays: number
   // depositExemptProposalCount: number
   // baseVoteDays: number
@@ -60,7 +66,25 @@ function Summary(
         <ProposalTitle className="mb-8" />
       </>
       <>
-        <ProposalDetails />
+        <div className="text-lg text-white font-bold mb-3">
+          Proposal Details
+        </div>
+
+        <div className="flex items-center mb-4">
+          <Bot className="text-emerald-400 mr-1" />
+          <div className="text-xs text-emerald-400">
+            This section is automatically generated
+          </div>
+        </div>
+
+        <ProposalDetails
+          initialCommunityRules={props.initialCommunityRules}
+          initialCouncilRules={props.initialCouncilRules}
+          maxVoteDays={props.maxVoteDays}
+          proposalVoteType={props.proposalVoteType}
+          initialBaseVoteDays={props.initialBaseVoteDays}
+          initialCoolOffHours={props.initialCoolOffHours}
+        />
       </>
       <>
         <VotingOptions />
