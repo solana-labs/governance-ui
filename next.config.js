@@ -39,6 +39,15 @@ config = withTM({
     DEVNET_RPC: process.env.DEVNET_RPC,
     DEFAULT_GOVERNANCE_PROGRAM_ID: process.env.DEFAULT_GOVERNANCE_PROGRAM_ID,
   },
+  //proxy for openserum api cors
+  rewrites: async () => {
+    return [
+      {
+        source: '/openSerumApi/:path*',
+        destination: 'https://openserum.io/api/serum/:path*',
+      },
+    ]
+  },
 })
 
 // STEP 2: Enable bundle analyzer when `ANALYZE=true`.
