@@ -224,9 +224,11 @@ export const getSuggestedCoinTier = async (outputMint: string) => {
       toNative(1000, 6).toNumber()
     ),
   ])
+
   const indexForTierFromSwaps = swaps.findIndex(
     (x) => x.bestRoute?.priceImpactPct && x.bestRoute?.priceImpactPct * 100 < 1
   )
+
   const tier =
     indexForTierFromSwaps > -1 ? TIERS[indexForTierFromSwaps] : 'UNTRUSTED'
   return {

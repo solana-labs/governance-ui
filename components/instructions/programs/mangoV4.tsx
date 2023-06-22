@@ -23,6 +23,7 @@ import {
 import { secondsToHours } from 'date-fns'
 import WarningFilledIcon from '@carbon/icons-react/lib/WarningFilled'
 import { CheckCircleIcon } from '@heroicons/react/solid'
+import { Market } from '@project-serum/serum'
 // import { snakeCase } from 'snake-case'
 // import { sha256 } from 'js-sha256'
 
@@ -299,7 +300,7 @@ const instructions = () => ({
                   {coinTiersToNames[suggestedTier.tier]}.
                 </h3>
               )}
-              {!suggestedUntrusted && invalidKeys.length && (
+              {!suggestedUntrusted && invalidKeys.length > 0 && (
                 <h3 className="text-orange flex items-center">
                   <WarningFilledIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
                   Proposal params do not match suggested token tier -{' '}
@@ -483,13 +484,24 @@ const instructions = () => ({
       const baseBank = accounts[7].pubkey
       const quoteBank = accounts[6].pubkey
       const openbookMarketPk = accounts[3].pubkey
+      const openBookProgram = accounts[2].pubkey
 
       const info = await displayArgs(connection, data)
       const client = await getClient(connection)
       const mangoGroup = await client.getGroup(group)
       const banks = [...mangoGroup.banksMapByMint.values()].map((x) => x[0])
-      const baseMint = banks.find((x) => x.publicKey.equals(baseBank))?.mint
-      const quoteMint = banks.find((x) => x.publicKey.equals(quoteBank))?.mint
+      let baseMint = banks.find((x) => x.publicKey.equals(baseBank))?.mint
+      let quoteMint = banks.find((x) => x.publicKey.equals(quoteBank))?.mint
+      if (!baseMint || !quoteMint) {
+        const currentMarket = await Market.load(
+          connection,
+          openbookMarketPk,
+          undefined,
+          openBookProgram
+        )
+        baseMint = currentMarket.baseMintAddress
+        quoteMint = currentMarket.quoteMintAddress
+      }
 
       const bestMarket = await getBestMarket({
         baseMint: baseMint!.toBase58(),
@@ -735,13 +747,16 @@ const instructions = () => ({
                 {coinTiersToNames[suggestedTier.tier]}.
               </h3>
             )}
-            {!suggestedUntrusted && invalidKeys?.length && suggestedTier.tier && (
-              <h3 className="text-orange flex items-center">
-                <WarningFilledIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
-                Proposal params do not match suggested token tier -{' '}
-                {coinTiersToNames[suggestedTier.tier]} check params carefully
-              </h3>
-            )}
+            {!suggestedUntrusted &&
+              invalidKeys &&
+              invalidKeys!.length > 0 &&
+              suggestedTier.tier && (
+                <h3 className="text-orange flex items-center">
+                  <WarningFilledIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
+                  Proposal params do not match suggested token tier -{' '}
+                  {coinTiersToNames[suggestedTier.tier]} check params carefully
+                </h3>
+              )}
             <div className="border-b mb-4 pb-4 space-y-3">
               <DisplayNullishProperty
                 label="Token index"
