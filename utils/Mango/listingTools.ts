@@ -2,14 +2,12 @@ import {
   OPENBOOK_PROGRAM_ID,
   RouteInfo,
   toNative,
-  toUiDecimals,
 } from '@blockworks-foundation/mango-v4'
 import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
 import { MAINNET_USDC_MINT } from '@foresight-tmp/foresight-sdk/dist/consts'
 import { Market } from '@project-serum/serum'
 import { PythHttpClient } from '@pythnetwork/client'
 import { Connection, Keypair, PublicKey, Transaction } from '@solana/web3.js'
-import { secondsToHours } from 'date-fns'
 
 export const MAINNET_PYTH_PROGRAM = new PublicKey(
   'FsJ3A3u2vn5cTVofAjvy6y5kwABJAqYWpe4975bi2epH'
@@ -68,41 +66,6 @@ export type EditTokenArgsFormatted = ListingArgsFormatted & {
   borrowWeightScaleStartQuote: number
   depositWeightScaleStartQuote: number
   groupInsuranceFund: boolean
-}
-
-export const getFormattedListingValues = (args: ListingArgs) => {
-  const formattedArgs: ListingArgsFormatted = {
-    tokenIndex: args.tokenIndex,
-    tokenName: args.name,
-    oracleConfidenceFilter: (args['oracleConfig.confFilter'] * 100).toFixed(2),
-    oracleMaxStalenessSlots: args['oracleConfig.maxStalenessSlots'],
-    interestRateUtilizationPoint0: (
-      args['interestRateParams.util0'] * 100
-    ).toFixed(2),
-    interestRatePoint0: (args['interestRateParams.rate0'] * 100).toFixed(2),
-    interestRateUtilizationPoint1: (
-      args['interestRateParams.util1'] * 100
-    ).toFixed(2),
-    interestRatePoint1: (args['interestRateParams.rate1'] * 100).toFixed(2),
-    maxRate: (args['interestRateParams.maxRate'] * 100).toFixed(2),
-    adjustmentFactor: (
-      args['interestRateParams.adjustmentFactor'] * 100
-    ).toFixed(2),
-    loanFeeRate: (args.loanFeeRate * 10000).toFixed(2),
-    loanOriginationFeeRate: (args.loanOriginationFeeRate * 10000).toFixed(2),
-    maintAssetWeight: args.maintAssetWeight.toFixed(2),
-    initAssetWeight: args.initAssetWeight.toFixed(2),
-    maintLiabWeight: args.maintLiabWeight.toFixed(2),
-    initLiabWeight: args.initLiabWeight.toFixed(2),
-    liquidationFee: (args['liquidationFee'] * 100).toFixed(2),
-    minVaultToDepositsRatio: (args['minVaultToDepositsRatio'] * 100).toFixed(2),
-    netBorrowLimitPerWindowQuote: toUiDecimals(
-      args['netBorrowLimitPerWindowQuote'],
-      6
-    ),
-    netBorrowLimitWindowSizeTs: secondsToHours(args.netBorrowLimitWindowSizeTs),
-  }
-  return formattedArgs
 }
 
 const listingBase: Omit<ListingArgs, 'name' | 'tokenIndex'> = {
