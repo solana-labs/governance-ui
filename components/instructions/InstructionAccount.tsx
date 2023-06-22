@@ -5,19 +5,42 @@ import { ExternalLinkIcon } from '@heroicons/react/solid'
 import { useState, useRef, useEffect } from 'react'
 import { fetchTokenAccountByPubkey } from '@hooks/queries/tokenAccount'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import { PublicKey } from '@solana/web3.js'
+import {
+  getProgramName,
+  isGovernanceProgram,
+  isNativeSolanaProgram,
+} from './programs/names'
+import { ExclamationIcon } from '@heroicons/react/outline'
 
 export default function InstructionAccount({
   endpoint,
   index,
   accountMeta,
   descriptor,
+  programId,
 }: {
   endpoint: string
   index: number
   accountMeta: AccountMetaData
   descriptor: InstructionDescriptor | undefined
+  programId: PublicKey
 }) {
   const connection = useLegacyConnectionContext()
+  const { assetAccounts } = useGovernanceAssets()
+  const solAndTokenAccounts = assetAccounts.filter((x) => x.isSol || x.isToken)
+  const possibleDangerousInstruction = !!(
+    !isNativeSolanaProgram(programId) &&
+    !isGovernanceProgram(programId) &&
+    !getProgramName(programId) &&
+    accountMeta.isSigner &&
+    accountMeta.isWritable &&
+    solAndTokenAccounts.find((x) =>
+      x.extensions?.transferAddress?.equals(accountMeta.pubkey)
+    )
+  )
+
   const [accountLabel, setAccountLabel] = useState(
     getAccountName(accountMeta.pubkey)
   )
@@ -30,7 +53,7 @@ export default function InstructionAccount({
       fetchTokenAccountByPubkey(connection.current, accountMeta.pubkey).then(
         (ta) => {
           if (ta.result) {
-            setAccountLabel(`owner: ${ta.result?.owner.toBase58()}`)
+            setAccountLabel(`owner: ${ta.result?.owner?.toBase58()}`)
           }
           isFetching.current = false
         }
@@ -54,6 +77,9 @@ export default function InstructionAccount({
           )}{' '}
           {accountMeta.isWritable && (
             <div className="text-[#b45be1]">Writable</div>
+          )}
+          {possibleDangerousInstruction && (
+            <ExclamationIcon className="w-5 text-yellow-400"></ExclamationIcon>
           )}
         </div>
       </div>

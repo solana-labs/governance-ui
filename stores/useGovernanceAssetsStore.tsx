@@ -61,6 +61,7 @@ const devnetHardcodedPrograms = {
   ],
   GsoJzs1Pb5J31huQki69G3Ng4zBco5d1Feu28tH7CJCu: [
     'Fs9fJums4kmSUhEc5SFTUttzJQdicEYq54wgLqZVYqeP',
+    'FUP8CyQ5UkxTkZgkkQEZbpAixb5Kwbz4RqAPitBQyW7p',
   ],
   //metaplex dao
   CmfnQAJjgUWge1ACV8rCtKWS65GaQu7sVGoFd5qdJEfm: [
@@ -85,9 +86,7 @@ interface GovernanceAssetsStore extends State {
   setGovernancesArray: (
     connection: ConnectionContext,
     realm: ProgramAccount<Realm>,
-    governances: {
-      [governance: string]: ProgramAccount<Governance>
-    }
+    governances: ProgramAccount<Governance>[]
   ) => void
   getGovernedAccounts: (
     connection: ConnectionContext,
@@ -116,13 +115,11 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
   setGovernancesArray: (
     connection: ConnectionContext,
     realm: ProgramAccount<Realm>,
-    governances: {
-      [governance: string]: ProgramAccount<Governance>
-    }
+    governances: ProgramAccount<Governance>[]
   ) => {
-    const array: ProgramAccount<Governance>[] = Object.keys(governances)
-      .filter((gpk) => !HIDDEN_GOVERNANCES.has(gpk))
-      .map((key) => governances[key])
+    const array: ProgramAccount<Governance>[] = governances.filter(
+      (gov) => !HIDDEN_GOVERNANCES.has(gov.pubkey.toString())
+    )
 
     set((s) => {
       s.governancesArray = array

@@ -51,18 +51,17 @@ export const sendTransactionsV3 = ({
         callbacks?.afterAllTxConfirmed()
       }
       closeTransactionProcessUi()
+      transactionInstructions.forEach((x) =>
+        x.instructionsSet.forEach((x) =>
+          invalidateInstructionAccounts(x.transactionInstruction)
+        )
+      )
     },
     afterEveryTxConfirmation: () => {
       if (callbacks?.afterEveryTxConfirmation) {
         callbacks?.afterEveryTxConfirmation()
       }
       incrementProcessedTransactions()
-      // TODO could optimize to only invalidate the accts associated with this tx, current api doesnt allow this
-      transactionInstructions.forEach((x) =>
-        x.instructionsSet.forEach((x) =>
-          invalidateInstructionAccounts(x.transactionInstruction)
-        )
-      )
     },
     onError: (e, notProcessedTransactions, originalProps) => {
       if (callbacks?.onError) {
@@ -76,6 +75,11 @@ export const sendTransactionsV3 = ({
           }),
         getErrorMsg(e),
         e.txid
+      )
+      transactionInstructions.forEach((x) =>
+        x.instructionsSet.forEach((x) =>
+          invalidateInstructionAccounts(x.transactionInstruction)
+        )
       )
     },
   }

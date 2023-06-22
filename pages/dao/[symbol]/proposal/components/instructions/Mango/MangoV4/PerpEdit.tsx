@@ -54,6 +54,7 @@ const keyToLabel = {
   reduceOnly: 'Reduce Only',
   resetStablePrice: 'Reset Stable Price',
   positivePnlLiquidationFee: 'Positive Pnl Liquidation Fee',
+  forceClose: 'Force Close',
 }
 
 type NameMarketIndexVal = {
@@ -253,6 +254,7 @@ const PerpEdit = ({
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
       isValid,
+      chunkBy: 1,
       governance: form.governedAccount?.governance,
       customHoldUpTime: form.holdupTime,
     }

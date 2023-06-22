@@ -6,7 +6,6 @@ import {
   GOVERNANCE_CHAT_PROGRAM_ID,
   getGovernanceChatMessages,
 } from '@solana/spl-governance'
-import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { useSelectedProposalPk } from '@hooks/queries/proposal'
 
@@ -35,9 +34,6 @@ export const useChatMessagesQuery = () => {
 
 const DiscussionPanel = () => {
   const { data: chatMessages } = useChatMessagesQuery()
-  const { data: voteRecord } = useProposalVoteRecordQuery('electoral')
-
-  console.log('borp', chatMessages)
 
   const sortedMessages = useMemo(
     () =>
@@ -61,11 +57,7 @@ const DiscussionPanel = () => {
       </div>
 
       {sortedMessages?.map((cm) => (
-        <Comment
-          key={cm.pubkey.toBase58()}
-          chatMessage={cm.account}
-          voteRecord={voteRecord?.result?.account}
-        />
+        <Comment key={cm.pubkey.toBase58()} chatMessage={cm.account} />
       ))}
     </div>
   )

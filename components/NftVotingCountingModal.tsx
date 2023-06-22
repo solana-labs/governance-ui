@@ -47,7 +47,8 @@ const NftVotingComponent = () => {
   }, [usedNfts, remainingNftsToCount])
 
   useEffect(() => {
-    const multiplier = processedTransactions - prevProcessedTransactions
+    const multiplier =
+      processedTransactions - (prevProcessedTransactions as number)
     if (processedTransactions !== 0) {
       if (remainingVotingPower <= lastTransactionNftsCount) {
         handleCalcCountedNfts(remainingVotingPower)
