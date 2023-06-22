@@ -684,6 +684,34 @@ export const getDualFinanceWithdrawSchema = () => {
   })
 }
 
+export const getDualFinanceDelegateSchema = () => {
+  return yup.object().shape({
+    delegateAccount: yup
+      .string()
+      .test('is-valid-address1', 'Please enter a valid PublicKey', (value) =>
+        value ? validatePubkey(value) : true
+      ),
+      payer: yup.object().typeError('payer is required'),
+      mintPk: yup
+      .string()
+      .test('is-valid-address1', 'Please enter a valid PublicKey', (value) =>
+        value ? validatePubkey(value) : true
+      ),
+  })
+}
+
+export const getDualFinanceVoteDepositSchema = () => {
+  return yup.object().shape({
+    numTokens: yup.number().typeError('Num tokens is required'),
+    payer: yup.object().typeError('payer is required'),
+    mintPk: yup
+      .string()
+      .test('is-valid-address1', 'Please enter a valid PublicKey', (value) =>
+        value ? validatePubkey(value) : true
+      ),
+  })
+}
+
 export const getGoblinGoldDepositSchema = ({ form }) => {
   const governedTokenAccount = form.governedTokenAccount as AssetAccount
   return yup.object().shape({

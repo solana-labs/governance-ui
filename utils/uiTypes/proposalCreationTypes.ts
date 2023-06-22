@@ -416,6 +416,8 @@ export enum Instructions {
   DualFinanceInitStrike,
   DualFinanceStakingOption,
   DualFinanceWithdraw,
+  DualFinanceDelegate,
+  DualFinanceVoteDeposit,
   EverlendDeposit,
   EverlendWithdraw,
   ForesightAddMarketListToCategory,
@@ -589,5 +591,17 @@ export interface DualFinanceExerciseForm {
 export interface DualFinanceWithdrawForm {
   soName: string | undefined
   baseTreasury: AssetAccount | undefined
+  mintPk: string | undefined
+}
+
+export interface DualFinanceDelegateForm {
+  delegateAccount: string | undefined
+  payer: AssetAccount | undefined
+  mintPk: string | undefined
+}
+
+export interface DualFinanceVoteDepositForm {
+  numTokens: number
+  payer: AssetAccount | undefined
   mintPk: string | undefined
 }
