@@ -520,21 +520,40 @@ const instructions = () => ({
                 presets
               </div>
             )}
-            {(!bestMarket || !openbookMarketPk.equals(bestMarket)) && (
+            {!bestMarket && (
               <div className="text-orange flex items-center">
                 <WarningFilledIcon className="w-5 mr-2"></WarningFilledIcon>
-                Best market not found or proposed market not matching listing
-                preset check market carefully
+                Best market not found check market carefully
               </div>
             )}
-            <div className="py-3">
+            {bestMarket && !openbookMarketPk.equals(bestMarket) && (
+              <div className="flex flex-row text-orange ">
+                <div className="flex items-center">
+                  <WarningFilledIcon className="w-5 mr-2"></WarningFilledIcon>
+                  <div>
+                    proposed market not matching the one with most liquidity,
+                    check market carefully. Suggested market -{' '}
+                    <a
+                      className="underline"
+                      target="_blank"
+                      href={`https://openserum.io/${bestMarket.toBase58()}`}
+                      rel="noreferrer"
+                    >
+                      Suggested Openbook market link
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
+            <div className="py-3 flex">
+              <div className="mr-2">Proposed market: </div>
               <a
                 className="underline"
                 target="_blank"
                 href={`https://openserum.io/${openbookMarketPk.toBase58()}`}
                 rel="noreferrer"
               >
-                Openbook market link
+                Proposed Openbook market link
               </a>
             </div>
             {info}
