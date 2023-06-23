@@ -18,12 +18,15 @@
     "displayName": "Dean's List Network State",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "F9V4Lwo49aUe8fFujMbU6uhdFyDRqKY54WpzdpncUSk9",
-    "bannerImage": "/realms/Deans_List_Network_State/DeansList_Network_State_logo.png",
+    "bannerImage": "/realms/Deans_List_Network_State/banner-deanslist.png",
     "website": "https://www.deanslist.services/",
     "twitter": "@deanslistDAO",
-    "ogImage": "/realms/Deans_List_Network_State/DeansList_Network_State_logo.png"
-   },
-   {
+    "discord": "https://discord.gg/deanslist",
+    "ogImage": "/realms/Deans_List_Network_State/avatar-deanslist.png",
+    "github": "https://github.com/Deans-List/",
+    "shortDescription": "A Service DAO turned Network State, consisting of Web3 power users providing feedback sessions. Join us in changing the future of work!"
+  },
+  {
     "symbol": "Ukraine",
     "displayName": "Ukraine.SOL",
     "programId": "gUAedF544JeE6NYbQakQvribHykUNgaPJqcgf3UQVnY",
@@ -1063,8 +1066,8 @@
     "website": "https://flipsidecrypto.xyz/",
     "twitter": "@flipsidecrypto",
     "ogImage": "/realms/FSLOGO/FLIPSIDE-LOGO-WHITE.png"
-   },
-   {
+  },
+  {
     "symbol": "Legacy Dean's List Classic (moved to new one)",
     "displayName": "Dean's List",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1073,8 +1076,8 @@
     "website": "https://deans-list.strataprotocol.com/",
     "twitter": "@GrapeDeanslist",
     "ogImage": "/realms/DeanListGrape/deans-list-logo.png"
-   },
-   {
+  },
+  {
     "symbol": "GrapeCCSubDAO",
     "displayName": "Grape CC SubDAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1082,8 +1085,8 @@
     "website": "https://services.grapes.network/",
     "twitter": "@grapeprotocol",
     "ogImage": "/realms/GrapeCCSubDAO/GrapeCCSubDAO.png"
-   },
-   {
+  },
+  {
     "symbol": "AthensDAO",
     "displayName": "AthensDAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1092,8 +1095,8 @@
     "website": "https://athensdao.net/",
     "twitter": "@GrapeAthensDAO",
     "ogImage": "/realms/AthensDAO/AthensDAO_Logo.jpg"
-   },
-   {
+  },
+  {
     "symbol": "Wen DAO",
     "displayName": "Wen DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1101,8 +1104,8 @@
     "website": "https://services.grapes.network/",
     "twitter": "@grapeprotocol",
     "ogImage": "/realms/Wen DAO/Wen DAO.png"
-   },
-   {
+  },
+  {
     "symbol": "BOOT",
     "displayName": "Bootstrap DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1147,7 +1150,7 @@
     "ogImage": "/realms/bacDao/logo_bulls.png",
     "website": "https://bullsarmyclub.com/"
   },
- {
+  {
     "symbol": "EPCT",
     "category": "web3",
     "bannerImage": "https://bafybeih52um4tvyggeja36kmbyg5b4pfod547qxdite4krwoe4nwtareji.ipfs.w3s.link/EpicsBetaTwitterHeaderLogo.png",
@@ -3061,11 +3064,10 @@
     "discord": "https://discord.gg/XcWVHM2Z",
     "github": "https://github.com/brdot",
     "website": "https://brdot.com.br"
-
   },
   {
     "symbol": "SAO",
-    "category":"nft",
+    "category": "nft",
     "displayName": "Sator DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "7yAiT2bUg5MwBzT3K9BvhcZdtHr5z8AnCGWa2iPJjB3T",
@@ -3078,7 +3080,7 @@
   },
   {
     "symbol": "Safecows",
-    "category":"web3",
+    "category": "web3",
     "displayName": "Safecows",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "6RQAna7aWHLVwfYRFGyM8kpnBXNGkMNCGfvuwYuuvpFU",
@@ -3088,9 +3090,9 @@
     "website": "https://safecows.com",
     "discord": "https://discord.gg/aQCeMSWs"
   },
-   {
+  {
     "symbol": "BlueChickDAO",
-    "category":"gaming",
+    "category": "gaming",
     "displayName": "The Blue Chick NFTs DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "99c96qFUwLiGcbudDeTLVxYTbtQ4CkDsstvHHmGPGGWj",
@@ -3134,7 +3136,7 @@
     "twitter": "@Helium",
     "ogImage": "/realms/Helium/img/mobilelogo.png"
   },
-    {
+  {
     "symbol": "CRYSTAL",
     "displayName": "Polar Dao",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
