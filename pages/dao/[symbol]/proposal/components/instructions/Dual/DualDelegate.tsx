@@ -24,8 +24,8 @@ const DualDelegate = ({
 }) => {
   const [form, setForm] = useState<DualFinanceDelegateForm>({
     delegateAccount: undefined,
-    payer: undefined,
-    mintPk: undefined,
+    realm: undefined,
+    delegateToken: undefined,
   })
   const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
@@ -68,8 +68,8 @@ const DualDelegate = ({
     handleSetForm({ value: undefined, propertyName: 'delegateAccount' })
   }, [form.delegateAccount])
   useEffect(() => {
-    setGovernedAccount(form.payer?.governance)
-  }, [form.payer?.governance])
+    setGovernedAccount(form.delegateToken?.governance)
+  }, [form.delegateToken?.governance])
 
   // TODO: Include this in the config instruction which can optionally be done
   // if the project doesnt need to change where the tokens get returned to.
@@ -89,36 +89,32 @@ const DualDelegate = ({
           error={formErrors['userPk']}
         />
       </Tooltip>
-      <Tooltip content="Rent payer. Should be the governance wallet with same governance as base treasury">
-        <GovernedAccountSelect
-          label="Payer Account"
-          governedAccounts={assetAccounts.filter(
-            (x) =>
-              x.isSol &&
-              form.payer?.governance &&
-              x.governance.pubkey.equals(form.payer.governance.pubkey)
-          )}
-          onChange={(value) => {
-            handleSetForm({ value, propertyName: 'payer' })
-          }}
-          value={form.payer}
-          error={formErrors['payer']}
-          shouldBeGoverned={shouldBeGoverned}
-          governance={governance}
-        ></GovernedAccountSelect>
-      </Tooltip>
       <Input
-          label="Mint"
-          value={form.mintPk}
+          label="Realm"
+          value={form.realm}
           type="text"
           onChange={(evt) =>
             handleSetForm({
               value: evt.target.value,
-              propertyName: 'mintPk',
+              propertyName: 'realm',
             })
           }
-          error={formErrors['mintPk']}
+          error={formErrors['realm']}
         />
+        <Tooltip content="Token to be delegated.">
+          <GovernedAccountSelect
+            label="Delegate Token"
+            governedAccounts={assetAccounts}
+            onChange={(value) => {
+              handleSetForm({ value, propertyName: 'delegateToken' })
+            }}
+            value={form.delegateToken}
+            error={formErrors['delegateToken']}
+            shouldBeGoverned={shouldBeGoverned}
+            governance={governance}
+            type="token"
+          ></GovernedAccountSelect>
+      </Tooltip>
     </>
   )
 }

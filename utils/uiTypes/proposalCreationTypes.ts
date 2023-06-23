@@ -598,12 +598,12 @@ export interface DualFinanceWithdrawForm {
 
 export interface DualFinanceDelegateForm {
   delegateAccount: string | undefined
-  payer: AssetAccount | undefined
-  mintPk: string | undefined
+  realm: string | undefined
+  delegateToken: AssetAccount | undefined
 }
 
 export interface DualFinanceVoteDepositForm {
   numTokens: number
-  payer: AssetAccount | undefined
-  mintPk: string | undefined
+  realm: string | undefined
+  delegateToken: AssetAccount | undefined
 }

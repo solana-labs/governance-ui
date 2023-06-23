@@ -691,24 +691,36 @@ export const getDualFinanceDelegateSchema = () => {
       .test('is-valid-address1', 'Please enter a valid PublicKey', (value) =>
         value ? validatePubkey(value) : true
       ),
-      payer: yup.object().typeError('payer is required'),
-      mintPk: yup
+      realm: yup
       .string()
       .test('is-valid-address1', 'Please enter a valid PublicKey', (value) =>
         value ? validatePubkey(value) : true
       ),
+      token: yup.object().typeError('baseTreasury is required'),
+      mintPk: yup
+        .string()
+        .test('is-valid-address1', 'Please enter a valid PublicKey', (value) =>
+          value ? validatePubkey(value) : true
+        ),
+      payer: yup.object().typeError('payer is required'),
   })
 }
 
 export const getDualFinanceVoteDepositSchema = () => {
   return yup.object().shape({
     numTokens: yup.number().typeError('Num tokens is required'),
-    payer: yup.object().typeError('payer is required'),
+    realm: yup
+    .string()
+    .test('is-valid-address1', 'Please enter a valid PublicKey', (value) =>
+      value ? validatePubkey(value) : true
+    ),
+    token: yup.object().typeError('baseTreasury is required'),
     mintPk: yup
       .string()
       .test('is-valid-address1', 'Please enter a valid PublicKey', (value) =>
         value ? validatePubkey(value) : true
       ),
+    payer: yup.object().typeError('payer is required'),
   })
 }
 

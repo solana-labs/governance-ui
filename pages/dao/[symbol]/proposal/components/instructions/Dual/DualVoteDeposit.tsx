@@ -14,6 +14,7 @@ import { getDualFinanceVoteDepositSchema } from '@utils/validations'
 import Tooltip from '@components/Tooltip'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 
 const DualVoteDeposit = ({
   index,
@@ -24,8 +25,8 @@ const DualVoteDeposit = ({
 }) => {
   const [form, setForm] = useState<DualFinanceVoteDepositForm>({
     numTokens: 0,
-    payer: undefined,
-    mintPk: undefined,
+    realm: undefined,
+    delegateToken: undefined,
   })
   const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
@@ -40,6 +41,7 @@ const DualVoteDeposit = ({
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
+  const tokenOwnerRecord = useUserCommunityTokenOwnerRecord().data?.result;
   const schema = getDualFinanceVoteDepositSchema()
   useEffect(() => {
     function getInstruction(): Promise<UiInstruction> {
@@ -49,27 +51,20 @@ const DualVoteDeposit = ({
         schema,
         setFormErrors,
         wallet,
+        tokenOwnerRecord,
       })
     }
     handleSetInstructions(
       { governedAccount: governedAccount, getInstruction },
       index
     )
-  }, [
-    form,
-    governedAccount,
-    handleSetInstructions,
-    index,
-    connection,
-    schema,
-    wallet,
-  ])
+  }, [form, governedAccount, handleSetInstructions, index, connection, schema, wallet, tokenOwnerRecord])
   useEffect(() => {
     handleSetForm({ value: undefined, propertyName: 'mintPk' })
-  }, [form.payer])
+  }, [form.delegateToken])
   useEffect(() => {
-    setGovernedAccount(form.payer?.governance)
-  }, [form.payer])
+    setGovernedAccount(form.delegateToken?.governance)
+  }, [form.delegateToken])
 
   // TODO: Include this in the config instruction which can optionally be done
   // if the project doesnt need to change where the tokens get returned to.
@@ -89,36 +84,32 @@ const DualVoteDeposit = ({
           error={formErrors['numTokens']}
         />
       </Tooltip>
-      <Tooltip content="Rent payer. Should be the governance wallet with same governance as base treasury">
-        <GovernedAccountSelect
-          label="Payer Account"
-          governedAccounts={assetAccounts.filter(
-            (x) =>
-              x.isSol &&
-              form.payer?.governance &&
-              x.governance.pubkey.equals(form.payer.governance.pubkey)
-          )}
-          onChange={(value) => {
-            handleSetForm({ value, propertyName: 'payer' })
-          }}
-          value={form.payer}
-          error={formErrors['payer']}
-          shouldBeGoverned={shouldBeGoverned}
-          governance={governance}
-        ></GovernedAccountSelect>
-      </Tooltip>
       <Input
-          label="Mint"
-          value={form.mintPk}
+          label="Realm"
+          value={form.realm}
           type="text"
           onChange={(evt) =>
             handleSetForm({
               value: evt.target.value,
-              propertyName: 'mintPk',
+              propertyName: 'realm',
             })
           }
-          error={formErrors['mintPk']}
+          error={formErrors['realm']}
         />
+        <Tooltip content="Token to be delegated.">
+          <GovernedAccountSelect
+            label="Delegate Token"
+            governedAccounts={assetAccounts}
+            onChange={(value) => {
+              handleSetForm({ value, propertyName: 'delegateToken' })
+            }}
+            value={form.delegateToken}
+            error={formErrors['delegateToken']}
+            shouldBeGoverned={shouldBeGoverned}
+            governance={governance}
+            type="token"
+          ></GovernedAccountSelect>
+      </Tooltip>
     </>
   )
 }
