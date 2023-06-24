@@ -1,4 +1,11 @@
-import { TOKEN_PROGRAM_ID, getGovernanceProgramVersion, getTokenOwnerRecordAddress, serializeInstructionToBase64, withDepositGoverningTokens, withSetGovernanceDelegate } from '@solana/spl-governance'
+import {
+  getGovernanceProgramVersion,
+  getTokenOwnerRecordAddress,
+  serializeInstructionToBase64,
+  withCreateTokenOwnerRecord,
+  withDepositGoverningTokens,
+  withSetGovernanceDelegate,
+} from '@solana/spl-governance'
 import { ConnectionContext } from '@utils/connection'
 import { validateInstruction } from '@utils/instructionTools'
 import {
@@ -7,7 +14,7 @@ import {
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { WalletAdapter } from '@solana/wallet-adapter-base'
-import { PublicKey, SystemProgram, TransactionInstruction } from '@solana/web3.js'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { BN } from '@coral-xyz/anchor'
 
 interface DelegateArgs {
@@ -37,13 +44,14 @@ export async function getDelegateInstruction({
   const serializedInstruction = ''
   const additionalSerializedInstructions: string[] = []
   const prerequisiteInstructions: TransactionInstruction[] = []
-  if (isValid
-    && form.delegateAccount
-    && wallet?.publicKey
-    && form.realm
-    && form.delegateToken
-    && form.delegateToken.extensions.mint?.publicKey
-    ) {
+  if (
+    isValid &&
+    form.delegateAccount &&
+    wallet?.publicKey &&
+    form.realm &&
+    form.delegateToken &&
+    form.delegateToken.extensions.mint?.publicKey
+  ) {
     const programVersion = await getGovernanceProgramVersion(
       connection.current,
       form.delegateToken?.governance.owner // governance program public key
@@ -60,15 +68,15 @@ export async function getDelegateInstruction({
       new PublicKey(form.delegateAccount) // public key of wallet who to delegated vote to
     )
   }
-    return {
-      serializedInstruction,
-      isValid: true,
-      prerequisiteInstructions: prerequisiteInstructions,
-      governance: form.delegateToken?.governance,
-      additionalSerializedInstructions,
-      chunkBy: 1,
-    }
+  return {
+    serializedInstruction,
+    isValid: true,
+    prerequisiteInstructions: prerequisiteInstructions,
+    governance: form.delegateToken?.governance,
+    additionalSerializedInstructions,
+    chunkBy: 1,
   }
+}
 
 export async function getVoteDepositInstruction({
   connection,
@@ -83,13 +91,14 @@ export async function getVoteDepositInstruction({
   const additionalSerializedInstructions: string[] = []
   const prerequisiteInstructions: TransactionInstruction[] = []
   const instructions: TransactionInstruction[] = []
-  if (isValid
-    && form.numTokens
-    && wallet?.publicKey
-    && form.realm
-    && form.delegateToken
-    && form.delegateToken.extensions.mint?.publicKey
-    ) {
+  if (
+    isValid &&
+    form.numTokens &&
+    wallet?.publicKey &&
+    form.realm &&
+    form.delegateToken &&
+    form.delegateToken.extensions.mint?.publicKey
+  ) {
     const programVersion = await getGovernanceProgramVersion(
       connection.current,
       form.delegateToken.governance.owner // governance program public key
@@ -99,23 +108,25 @@ export async function getVoteDepositInstruction({
       new PublicKey(form.realm),
       form.delegateToken.extensions.mint.publicKey,
       form.delegateToken.pubkey
-    );
+    )
 
-    if((await connection.current.getAccountInfo(tokenOwnerRecordAddress)) === null) {
-      console.log('Creating new vote record', tokenOwnerRecordAddress.toBase58(), connection.current.rpcEndpoint)
-      const space = 165
-      const rent = await connection.current.getMinimumBalanceForRentExemption(
-        space,
-        'processed'
+    if (
+      (await connection.current.getAccountInfo(tokenOwnerRecordAddress)) ===
+      null
+    ) {
+      console.log(
+        'Creating new vote record',
+        tokenOwnerRecordAddress.toBase58(),
+        connection.current.rpcEndpoint
       )
-      prerequisiteInstructions.push(
-        SystemProgram.createAccount({
-          fromPubkey: wallet.publicKey,
-          newAccountPubkey: tokenOwnerRecordAddress,
-          lamports: rent,
-          space: space,
-          programId: TOKEN_PROGRAM_ID,
-        }), 
+      await withCreateTokenOwnerRecord(
+        instructions,
+        form.delegateToken.governance.owner,
+        programVersion,
+        new PublicKey(form.realm),
+        form.delegateToken.governance.nativeTreasuryAddress,
+        form.delegateToken.extensions.mint.publicKey,
+        form.delegateToken.governance.nativeTreasuryAddress
       )
     }
 
@@ -129,22 +140,22 @@ export async function getVoteDepositInstruction({
       tokenOwnerRecordAddress, // governingTokenOwner (walletId) publicKey of tokenOwnerRecord of this wallet
       form.delegateToken.governance.nativeTreasuryAddress, // governanceAuthority: publicKey of connected wallet
       wallet.publicKey,
-      new BN(form.numTokens),
+      new BN(form.numTokens)
     )
-    for (const ix of instructions){
+    for (const ix of instructions) {
       additionalSerializedInstructions.push(serializeInstructionToBase64(ix))
-     }
+    }
+    console.log(instructions)
   }
 
-    return {
-      serializedInstruction,
-      isValid: true,
-      prerequisiteInstructions: prerequisiteInstructions,
-      governance: form.delegateToken?.governance,
-      additionalSerializedInstructions,
-      chunkBy: 1,
-    }
+  return {
+    serializedInstruction,
+    isValid: true,
+    prerequisiteInstructions: prerequisiteInstructions,
+    governance: form.delegateToken?.governance,
+    additionalSerializedInstructions,
+    chunkBy: 1,
+  }
 }
 
 // TODO: Add withdraw delegate instructions withWithdrawGoverningTokens
-
