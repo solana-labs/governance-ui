@@ -47,6 +47,7 @@ export async function getDelegateInstruction({
   const serializedInstruction = ''
   const additionalSerializedInstructions: string[] = []
   const prerequisiteInstructions: TransactionInstruction[] = []
+  const instructions: TransactionInstruction[] = []
   if (
     isValid &&
     form.delegateAccount &&
@@ -59,17 +60,20 @@ export async function getDelegateInstruction({
       connection.current,
       form.delegateToken?.governance.owner // governance program public key
     )
-    // TODO: Make this instruction work
+    
     await withSetGovernanceDelegate(
-      prerequisiteInstructions,
-      form.delegateToken?.governance.owner, // publicKey of program/programId
+      instructions,
+      form.delegateToken.governance.owner, // publicKey of program/programId
       programVersion, // program version of realm
       new PublicKey(form.realm), // realm public key
       form.delegateToken.extensions.mint.publicKey, // mint of governance token
-      wallet.publicKey, // governingTokenOwner (walletId) publicKey of tokenOwnerRecord of this wallet
-      wallet.publicKey, // governanceAuthority: publicKey of connected wallet
+      form.delegateToken.governance.nativeTreasuryAddress, // governingTokenOwner (walletId) publicKey of tokenOwnerRecord of this wallet
+      form.delegateToken.governance.nativeTreasuryAddress, // governanceAuthority: publicKey of connected wallet
       new PublicKey(form.delegateAccount) // public key of wallet who to delegated vote to
     )
+    for (const ix of instructions) {
+      additionalSerializedInstructions.push(serializeInstructionToBase64(ix))
+    }
   }
   return {
     serializedInstruction,
@@ -161,7 +165,6 @@ export async function getVoteDepositInstruction({
     for (const ix of instructions) {
       additionalSerializedInstructions.push(serializeInstructionToBase64(ix))
     }
-    console.log(instructions)
   }
 
   return {

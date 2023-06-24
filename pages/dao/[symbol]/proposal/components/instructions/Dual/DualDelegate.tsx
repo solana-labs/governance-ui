@@ -65,9 +65,6 @@ const DualDelegate = ({
     wallet,
   ])
   useEffect(() => {
-    handleSetForm({ value: undefined, propertyName: 'delegateAccount' })
-  }, [form.delegateAccount])
-  useEffect(() => {
     setGovernedAccount(form.delegateToken?.governance)
   }, [form.delegateToken?.governance])
 
@@ -83,10 +80,10 @@ const DualDelegate = ({
           onChange={(evt) =>
             handleSetForm({
               value: evt.target.value,
-              propertyName: 'userPk',
+              propertyName: 'delegateAccount',
             })
           }
-          error={formErrors['userPk']}
+          error={formErrors['delegateAccount']}
         />
       </Tooltip>
       <Input
