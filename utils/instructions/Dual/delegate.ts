@@ -1,10 +1,13 @@
 import {
+  TokenOwnerRecord,
   getGovernanceProgramVersion,
   getTokenOwnerRecordAddress,
   serializeInstructionToBase64,
   withCreateTokenOwnerRecord,
   withDepositGoverningTokens,
   withSetGovernanceDelegate,
+  ProgramAccount,
+  getTokenOwnerRecordForRealm,
 } from '@solana/spl-governance'
 import { ConnectionContext } from '@utils/connection'
 import { validateInstruction } from '@utils/instructionTools'
@@ -15,7 +18,7 @@ import {
 } from '@utils/uiTypes/proposalCreationTypes'
 import { WalletAdapter } from '@solana/wallet-adapter-base'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
-import { BN } from '@coral-xyz/anchor'
+import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
 
 interface DelegateArgs {
   connection: ConnectionContext
@@ -107,13 +110,23 @@ export async function getVoteDepositInstruction({
       form.delegateToken.governance.owner,
       new PublicKey(form.realm),
       form.delegateToken.extensions.mint.publicKey,
-      form.delegateToken.pubkey
+      form.delegateToken.governance.nativeTreasuryAddress
     )
+    let existingTokenOwnerRecord: null | ProgramAccount<TokenOwnerRecord> = null
+    try {
+      existingTokenOwnerRecord = await getTokenOwnerRecordForRealm(
+        connection.current,
+        form.delegateToken.governance.owner,
+        new PublicKey(form.realm),
+        form.delegateToken.extensions.mint.publicKey,
+        form.delegateToken.governance.nativeTreasuryAddress
+      )
+    } catch (e) {
+      console.log(e)
+    }
 
-    if (
-      (await connection.current.getAccountInfo(tokenOwnerRecordAddress)) ===
-      null
-    ) {
+    console.log(existingTokenOwnerRecord)
+    if (!existingTokenOwnerRecord) {
       console.log(
         'Creating new vote record',
         tokenOwnerRecordAddress.toBase58(),
@@ -137,10 +150,13 @@ export async function getVoteDepositInstruction({
       new PublicKey(form.realm), // realm public key
       form.delegateToken.pubkey,
       form.delegateToken.extensions.mint.publicKey, // mint of governance token
-      tokenOwnerRecordAddress, // governingTokenOwner (walletId) publicKey of tokenOwnerRecord of this wallet
+      form.delegateToken.governance.nativeTreasuryAddress, // governingTokenOwner (walletId) publicKey of tokenOwnerRecord of this wallet
       form.delegateToken.governance.nativeTreasuryAddress, // governanceAuthority: publicKey of connected wallet
-      wallet.publicKey,
-      new BN(form.numTokens)
+      form.delegateToken.governance.nativeTreasuryAddress,
+      getMintNaturalAmountFromDecimalAsBN(
+        form.numTokens,
+        form.delegateToken.extensions.mint.account.decimals
+      )
     )
     for (const ix of instructions) {
       additionalSerializedInstructions.push(serializeInstructionToBase64(ix))
