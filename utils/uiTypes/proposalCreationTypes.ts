@@ -417,6 +417,7 @@ export enum Instructions {
   DualFinanceStakingOption,
   DualFinanceWithdraw,
   DualFinanceDelegate,
+  DualFinanceDelegateWithdraw,
   DualFinanceVoteDeposit,
   EverlendDeposit,
   EverlendWithdraw,
@@ -598,6 +599,11 @@ export interface DualFinanceWithdrawForm {
 
 export interface DualFinanceDelegateForm {
   delegateAccount: string | undefined
+  realm: string | undefined
+  delegateToken: AssetAccount | undefined
+}
+
+export interface DualFinanceDelegateWithdrawForm {
   realm: string | undefined
   delegateToken: AssetAccount | undefined
 }

@@ -696,13 +696,18 @@ export const getDualFinanceDelegateSchema = () => {
       .test('is-valid-address1', 'Please enter a valid PublicKey', (value) =>
         value ? validatePubkey(value) : true
       ),
-      token: yup.object().typeError('baseTreasury is required'),
-      mintPk: yup
-        .string()
-        .test('is-valid-address1', 'Please enter a valid PublicKey', (value) =>
-          value ? validatePubkey(value) : true
-        ),
-      payer: yup.object().typeError('payer is required'),
+      token: yup.object().typeError('Delegate Token is required'),
+  })
+}
+
+export const getDualFinanceDelegateWithdrawSchema = () => {
+  return yup.object().shape({
+      realm: yup
+      .string()
+      .test('is-valid-address1', 'Please enter a valid PublicKey', (value) =>
+        value ? validatePubkey(value) : true
+      ),
+      token: yup.object().typeError('Delegate Token is required'),
   })
 }
 
@@ -714,13 +719,7 @@ export const getDualFinanceVoteDepositSchema = () => {
     .test('is-valid-address1', 'Please enter a valid PublicKey', (value) =>
       value ? validatePubkey(value) : true
     ),
-    token: yup.object().typeError('baseTreasury is required'),
-    mintPk: yup
-      .string()
-      .test('is-valid-address1', 'Please enter a valid PublicKey', (value) =>
-        value ? validatePubkey(value) : true
-      ),
-    payer: yup.object().typeError('payer is required'),
+    token: yup.object().typeError('Delegate Token is required'),
   })
 }
 
