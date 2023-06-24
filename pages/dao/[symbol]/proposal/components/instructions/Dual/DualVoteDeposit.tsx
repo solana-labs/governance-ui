@@ -14,7 +14,6 @@ import { getDualFinanceVoteDepositSchema } from '@utils/validations'
 import Tooltip from '@components/Tooltip'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
-import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 
 const DualVoteDeposit = ({
   index,
@@ -41,7 +40,6 @@ const DualVoteDeposit = ({
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-  const tokenOwnerRecord = useUserCommunityTokenOwnerRecord().data?.result;
   const schema = getDualFinanceVoteDepositSchema()
   useEffect(() => {
     function getInstruction(): Promise<UiInstruction> {
@@ -51,14 +49,13 @@ const DualVoteDeposit = ({
         schema,
         setFormErrors,
         wallet,
-        tokenOwnerRecord,
       })
     }
     handleSetInstructions(
       { governedAccount: governedAccount, getInstruction },
       index
     )
-  }, [form, governedAccount, handleSetInstructions, index, connection, schema, wallet, tokenOwnerRecord])
+  }, [form, governedAccount, handleSetInstructions, index, connection, schema, wallet])
   useEffect(() => {
     handleSetForm({ value: undefined, propertyName: 'mintPk' })
   }, [form.delegateToken])

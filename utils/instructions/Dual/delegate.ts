@@ -1,4 +1,4 @@
-import { ProgramAccount, TOKEN_PROGRAM_ID, TokenOwnerRecord, getGovernanceProgramVersion, serializeInstructionToBase64, withDepositGoverningTokens, withSetGovernanceDelegate } from '@solana/spl-governance'
+import { TOKEN_PROGRAM_ID, getGovernanceProgramVersion, getTokenOwnerRecordAddress, serializeInstructionToBase64, withDepositGoverningTokens, withSetGovernanceDelegate } from '@solana/spl-governance'
 import { ConnectionContext } from '@utils/connection'
 import { validateInstruction } from '@utils/instructionTools'
 import {
@@ -24,7 +24,6 @@ interface VoteDepositArgs {
   setFormErrors: any
   schema: any
   wallet: WalletAdapter | undefined
-  tokenOwnerRecord: ProgramAccount<TokenOwnerRecord> | undefined
 }
 
 export async function getDelegateInstruction({
@@ -49,7 +48,7 @@ export async function getDelegateInstruction({
       connection.current,
       form.delegateToken?.governance.owner // governance program public key
     )
-    // TODO: Make this instructions
+    // TODO: Make this instruction work
     await withSetGovernanceDelegate(
       prerequisiteInstructions,
       form.delegateToken?.governance.owner, // publicKey of program/programId
@@ -77,7 +76,6 @@ export async function getVoteDepositInstruction({
   form,
   schema,
   setFormErrors,
-  tokenOwnerRecord,
 }: VoteDepositArgs): Promise<UiInstruction> {
   const isValid = await validateInstruction({ schema, form, setFormErrors })
 
@@ -88,7 +86,6 @@ export async function getVoteDepositInstruction({
   if (isValid
     && form.numTokens
     && wallet?.publicKey
-    && tokenOwnerRecord?.pubkey
     && form.realm
     && form.delegateToken
     && form.delegateToken.extensions.mint?.publicKey
@@ -97,7 +94,15 @@ export async function getVoteDepositInstruction({
       connection.current,
       form.delegateToken.governance.owner // governance program public key
     )
-    if(tokenOwnerRecord.pubkey ===  undefined) {
+    const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
+      form.delegateToken.governance.owner,
+      new PublicKey(form.realm),
+      form.delegateToken.extensions.mint.publicKey,
+      form.delegateToken.pubkey
+    );
+
+    if((await connection.current.getAccountInfo(tokenOwnerRecordAddress)) === null) {
+      console.log('Creating new vote record', tokenOwnerRecordAddress.toBase58(), connection.current.rpcEndpoint)
       const space = 165
       const rent = await connection.current.getMinimumBalanceForRentExemption(
         space,
@@ -106,30 +111,29 @@ export async function getVoteDepositInstruction({
       prerequisiteInstructions.push(
         SystemProgram.createAccount({
           fromPubkey: wallet.publicKey,
-          newAccountPubkey: tokenOwnerRecord.pubkey,
+          newAccountPubkey: tokenOwnerRecordAddress,
           lamports: rent,
           space: space,
           programId: TOKEN_PROGRAM_ID,
         }), 
       )
     }
-    
-    const voteDepositIx = await withDepositGoverningTokens(
+
+    await withDepositGoverningTokens(
       instructions,
       form.delegateToken.governance.owner, // publicKey of program/programId
       programVersion, // program version of realm
       new PublicKey(form.realm), // realm public key
       form.delegateToken.pubkey,
       form.delegateToken.extensions.mint.publicKey, // mint of governance token
-      tokenOwnerRecord.pubkey, // governingTokenOwner (walletId) publicKey of tokenOwnerRecord of this wallet
-      wallet.publicKey, // governanceAuthority: publicKey of connected wallet
-      form.delegateToken.governance.nativeTreasuryAddress,
+      tokenOwnerRecordAddress, // governingTokenOwner (walletId) publicKey of tokenOwnerRecord of this wallet
+      form.delegateToken.governance.nativeTreasuryAddress, // governanceAuthority: publicKey of connected wallet
+      wallet.publicKey,
       new BN(form.numTokens),
     )
     for (const ix of instructions){
       additionalSerializedInstructions.push(serializeInstructionToBase64(ix))
      }
-    console.log('VOTEDEPOSITIX', additionalSerializedInstructions, voteDepositIx.toBase58());
   }
 
     return {
