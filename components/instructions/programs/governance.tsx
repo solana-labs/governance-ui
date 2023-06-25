@@ -80,6 +80,8 @@ export const GOVERNANCE_INSTRUCTIONS = {
           connection,
           realm.owner
         )
+
+        //accounts[2] is token account not mint account
         const mintInfoQuery = await fetchMintInfoByPubkey(
           connection,
           accounts[2].pubkey
@@ -90,7 +92,11 @@ export const GOVERNANCE_INSTRUCTIONS = {
           DepositGoverningTokensArgs,
           Buffer.from(data)
         ) as DepositGoverningTokensArgs
-
+        console.log(
+          args.amount,
+          mintInfoQuery?.result,
+          accounts[2].pubkey.toBase58()
+        )
         return (
           <>
             <p>
