@@ -52,8 +52,7 @@ export const useTokenOwnerRecordsForRealmQuery = () => {
         [filter]
       )
 
-      // This is blocking and not really useful.
-      // I'm not sure the best way to make it non blocking.
+      // This may or may not be resource intensive for big DAOs, and is not too useful
       /* 
       results.forEach((x) => {
         queryClient.setQueryData(
