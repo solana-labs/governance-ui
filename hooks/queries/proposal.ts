@@ -75,6 +75,7 @@ export const useRealmProposalsQuery = () => {
         )
       ).flat()
 
+      // TODO instead of using setQueryData, prefetch queries on mouseover ?
       results.forEach((x) => {
         queryClient.setQueryData(
           proposalQueryKeys.byPubkey(connection.endpoint, x.pubkey),
