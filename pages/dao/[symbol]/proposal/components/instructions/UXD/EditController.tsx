@@ -65,16 +65,16 @@ const EditControllerDepository = ({
           ? form.uiRedeemableGlobalSupplyCap!
           : undefined,
         
-          depositoriesRoutingWeightBps: depositoriesRoutingWeightBpsChange ? {
-            identityDepositoryWeightBps: form.identityDepositoryWeightBps!,
-            mercurialVaultDepositoryWeightBps: form.mercurialVaultDepositoryWeightBps!,
-            credixLpDepositoryWeightBps: form.credixLpDepositoryWeightBps!,
-          } : undefined,
-          routerDepositories: routerDepositoriesChange ? {
-            identityDepository: new PublicKey(form.identityDepository!),
-            mercurialVaultDepository: new PublicKey(form.mercurialVaultDepository!),
-            credixLpDepository: new PublicKey(form.credixLpDepository!),
-          } : undefined,
+        depositoriesRoutingWeightBps: depositoriesRoutingWeightBpsChange ? {
+          identityDepositoryWeightBps: form.identityDepositoryWeightBps!,
+          mercurialVaultDepositoryWeightBps: form.mercurialVaultDepositoryWeightBps!,
+          credixLpDepositoryWeightBps: form.credixLpDepositoryWeightBps!,
+        } : undefined,
+        routerDepositories: routerDepositoriesChange ? {
+          identityDepository: new PublicKey(form.identityDepository!),
+          mercurialVaultDepository: new PublicKey(form.mercurialVaultDepository!),
+          credixLpDepository: new PublicKey(form.credixLpDepository!),
+        } : undefined,
     
       });
     },
@@ -109,45 +109,45 @@ const EditControllerDepository = ({
       />
       {depositoriesRoutingWeightBpsChange ? (
         <>
-        <InputNumber
-          label="Identity Depository Weight (Bps)"
-          value={form.identityDepositoryWeightBps}
-          min={0}
-          max={100 * 100}
-          onChange={(value) =>
-            handleSetForm({
-              value,
-              propertyName: 'identityDepositoryWeightBps',
-            })
-          }
-          error={formErrors['identityDepositoryWeightBps']}
-        />
-        <InputNumber
-          label="Mercurial Vault Depository Weight (Bps)"
-          value={form.mercurialVaultDepositoryWeightBps}
-          min={0}
-          max={100 * 100}
-          onChange={(value) =>
-            handleSetForm({
-              value,
-              propertyName: 'mercurialVaultDepositoryWeightBps',
-            })
-          }
-          error={formErrors['mercurialVaultDepositoryWeightBps']}
-        />
-        <InputNumber
-          label="Credix Lp Depository Weight (Bps)"
-          value={form.credixLpDepositoryWeightBps}
-          min={0}
-          max={100 * 100}
-          onChange={(value) =>
-            handleSetForm({
-              value,
-              propertyName: 'credixLpDepositoryWeightBps',
-            })
-          }
-          error={formErrors['credixLpDepositoryWeightBps']}
-        />
+          <InputNumber
+            label="Identity Depository Weight (Bps)"
+            value={form.identityDepositoryWeightBps}
+            min={0}
+            max={100 * 100}
+            onChange={(value) =>
+              handleSetForm({
+                value,
+                propertyName: 'identityDepositoryWeightBps',
+              })
+            }
+            error={formErrors['identityDepositoryWeightBps']}
+          />
+          <InputNumber
+            label="Mercurial Vault Depository Weight (Bps)"
+            value={form.mercurialVaultDepositoryWeightBps}
+            min={0}
+            max={100 * 100}
+            onChange={(value) =>
+              handleSetForm({
+                value,
+                propertyName: 'mercurialVaultDepositoryWeightBps',
+              })
+            }
+            error={formErrors['mercurialVaultDepositoryWeightBps']}
+          />
+          <InputNumber
+            label="Credix Lp Depository Weight (Bps)"
+            value={form.credixLpDepositoryWeightBps}
+            min={0}
+            max={100 * 100}
+            onChange={(value) =>
+              handleSetForm({
+                value,
+                propertyName: 'credixLpDepositoryWeightBps',
+              })
+            }
+            error={formErrors['credixLpDepositoryWeightBps']}
+          />
         </>
       ) : null}
       <h5>Router Depositories</h5>
@@ -157,41 +157,41 @@ const EditControllerDepository = ({
       />
       {routerDepositoriesChange ? (
         <>
-        <InputText
-          label="Identity Depository"
-          value={form.identityDepository}
-          onChange={(value) =>
-            handleSetForm({
-              value,
-              propertyName: 'identityDepository',
-            })
-          }
-          error={formErrors['identityDepository']}
-        />
-        <InputText
-          label="Mercurial Vault Depository"
-          value={form.mercurialVaultDepository}
-          onChange={(value) =>
-            handleSetForm({
-              value,
-              propertyName: 'mercurialVaultDepository',
-            })
-          }
-          error={formErrors['mercurialVaultDepository']}
-        />
-        <InputText
-          label="Credix Lp Depository"
-          value={form.credixLpDepository}
-          onChange={(value) =>
-            handleSetForm({
-              value,
-              propertyName: 'credixLpDepository',
-            })
-          }
-          error={formErrors['credixLpDepository']}
-        />
-        </>
-      ) : null}
+          <InputText
+            label="Identity Depository"
+            value={form.identityDepository}
+            onChange={(value) =>
+              handleSetForm({
+                value,
+                propertyName: 'identityDepository',
+              })
+            }
+            error={formErrors['identityDepository']}
+          />
+          <InputText
+            label="Mercurial Vault Depository"
+            value={form.mercurialVaultDepository}
+            onChange={(value) =>
+              handleSetForm({
+                value,
+                propertyName: 'mercurialVaultDepository',
+              })
+            }
+            error={formErrors['mercurialVaultDepository']}
+          />
+          <InputText
+            label="Credix Lp Depository"
+            value={form.credixLpDepository}
+            onChange={(value) =>
+              handleSetForm({
+                value,
+                propertyName: 'credixLpDepository',
+              })
+            }
+            error={formErrors['credixLpDepository']}
+          />
+          </>
+        ) : null}
     </>
   );
 };
