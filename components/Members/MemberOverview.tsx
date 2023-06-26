@@ -29,7 +29,6 @@ import { Member } from '@utils/uiTypes/members'
 import { FC, useCallback, useEffect, useMemo, useState } from 'react'
 import { WalletTokenRecordWithProposal } from './types'
 import PaginationComponent from '@components/Pagination'
-import useMembersStore from 'stores/useMembersStore'
 import { LinkButton } from '@components/Button'
 import useProgramVersion from '@hooks/useProgramVersion'
 import { useRouter } from 'next/router'
@@ -49,6 +48,7 @@ import {
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { useRealmProposalsQuery } from '@hooks/queries/proposal'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useMembersQuery } from './useMembers'
 
 const RevokeMembership: FC<{ member: PublicKey; mint: PublicKey }> = ({
   member,
@@ -128,7 +128,7 @@ const MemberOverview = ({ member }: { member: Member }) => {
     [proposalsArray]
   )
   const { fmtUrlWithCluster } = useQueryContext()
-  const activeMembers = useMembersStore((s) => s.compact.activeMembers)
+  const { data: activeMembers } = useMembersQuery()
   const [ownVoteRecords, setOwnVoteRecords] = useState<
     WalletTokenRecordWithProposal[]
   >([])
@@ -234,6 +234,7 @@ const MemberOverview = ({ member }: { member: Member }) => {
   }, [getVoteRecordsAndChatMsgs, proposalsByProposal, realm, walletAddress])
 
   const memberVotePowerRank = useMemo(() => {
+    if (activeMembers === undefined) return undefined
     const sortedMembers = activeMembers.sort((a, b) =>
       a.communityVotes.cmp(b.communityVotes) === 1 ? -1 : 1
     )

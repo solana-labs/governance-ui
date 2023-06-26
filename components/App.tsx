@@ -18,7 +18,6 @@ import tokenPriceService from '@utils/services/tokenPrice'
 import TransactionLoader from '@components/TransactionLoader'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useMembers from '@components/Members/useMembers'
 import useRealm from '@hooks/useRealm'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
@@ -101,7 +100,6 @@ export function AppContents(props: Props) {
   handleRouterHistory()
   useVotingPlugins()
   useHandleGovernanceAssetsStore()
-  useMembers()
   useEffect(() => {
     tokenPriceService.fetchSolanaTokenList()
   }, [])

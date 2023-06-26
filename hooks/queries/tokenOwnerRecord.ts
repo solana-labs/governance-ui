@@ -13,7 +13,6 @@ import {
   useAddressQuery_CouncilTokenOwner,
 } from './addresses/tokenOwnerRecord'
 import { useRealmQuery } from './realm'
-import queryClient from './queryClient'
 import { useMemo } from 'react'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
@@ -53,12 +52,15 @@ export const useTokenOwnerRecordsForRealmQuery = () => {
         [filter]
       )
 
+      // This is blocking and not really useful.
+      // I'm not sure the best way to make it non blocking.
+      /* 
       results.forEach((x) => {
         queryClient.setQueryData(
           tokenOwnerRecordQueryKeys.byPubkey(connection.cluster, x.pubkey),
           { found: true, result: x }
         )
-      })
+      }) */
 
       return results
     },
@@ -85,44 +87,6 @@ export const useTokenOwnerRecordsDelegatedToUser = () => {
   )
 
   return delagatingTors
-}
-
-/** @deprecated this hook exists for refactoring legacy code easily -- you should probably not be using it in any new code */
-export const useTokenRecordsByOwnersMap = () => {
-  const { data: tors } = useTokenOwnerRecordsForRealmQuery()
-  const realm = useRealmQuery().data?.result
-
-  const councilMint = realm?.account.config.councilMint
-  const councilTORsByOwner = useMemo(
-    () =>
-      councilMint === undefined || tors === undefined
-        ? undefined
-        : (Object.fromEntries(
-            tors
-              .filter((x) => x.account.governingTokenMint.equals(councilMint))
-              .map((x) => [x.account.governingTokenOwner.toString(), x])
-          ) as Record<string, typeof tors[number]>),
-    [councilMint, tors]
-  )
-
-  const communityMint = realm?.account.communityMint
-  const communityTORsByOwner = useMemo(
-    () =>
-      communityMint === undefined || tors === undefined
-        ? undefined
-        : (Object.fromEntries(
-            tors
-              .filter((x) => x.account.governingTokenMint.equals(communityMint))
-              .map((x) => [x.account.governingTokenOwner.toString(), x])
-          ) as Record<string, typeof tors[number]>),
-    [communityMint, tors]
-  )
-
-  // I think this is needed to prevent rerender spam
-  return useMemo(() => ({ councilTORsByOwner, communityTORsByOwner }), [
-    communityTORsByOwner,
-    councilTORsByOwner,
-  ])
 }
 
 export const useTokenOwnerRecordByPubkeyQuery = (
