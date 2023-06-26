@@ -10,6 +10,7 @@ import { useState } from 'react';
 import createEditMercurialVaultDepositoryInstruction from '@tools/sdk/uxdProtocol/createEditMercurialVaultDepositoryInstruction';
 import InputNumber from '@components/inputs/InputNumber';
 import InputText from '@components/inputs/InputText';
+import { PublicKey } from '@solana/web3.js';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -102,7 +103,7 @@ const EditMercurialVaultDepository = ({
           ? form.mintingDisabled!
           : undefined,
         profitsBeneficiaryCollateral: profitsBeneficiaryCollateralChange
-          ? form.profitsBeneficiaryCollateral!
+          ? new PublicKey(form.profitsBeneficiaryCollateral!)
           : undefined,
       });
     },

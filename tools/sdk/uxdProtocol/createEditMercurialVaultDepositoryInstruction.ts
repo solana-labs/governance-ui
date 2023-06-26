@@ -27,7 +27,7 @@ const createEditMercurialVaultDepositoryInstruction = async ({
   mintingFeeInBps?: number;
   redeemingFeeInBps?: number;
   mintingDisabled?: boolean;
-  profitsBeneficiaryCollateral?: string;
+  profitsBeneficiaryCollateral?: PublicKey;
 }): Promise<TransactionInstruction> => {
   const {
     address: collateralMint,
@@ -56,7 +56,7 @@ const createEditMercurialVaultDepositoryInstruction = async ({
       mintingFeeInBps,
       redeemingFeeInBps,
       mintingDisabled,
-      profitsBeneficiaryCollateral: new PublicKey(profitsBeneficiaryCollateral ?? ""),
+      profitsBeneficiaryCollateral,
     },
     Provider.defaultOptions(),
   );

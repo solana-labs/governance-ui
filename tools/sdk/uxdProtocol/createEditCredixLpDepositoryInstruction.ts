@@ -42,7 +42,7 @@ const createEditCredixLpDepositoryInstruction = async ({
       mintingFeeInBps,
       redeemingFeeInBps,
       mintingDisabled,
-      profitsBeneficiaryCollateral: new PublicKey(profitsBeneficiaryCollateral ?? ""),
+      profitsBeneficiaryCollateral,
     },
     Provider.defaultOptions(),
   );

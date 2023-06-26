@@ -252,6 +252,12 @@ export interface UXDEditIdentityDepositoryForm {
 export interface UXDEditControllerForm {
   governedAccount?: GovernedMultiTypeAccount;
   uiRedeemableGlobalSupplyCap?: number;
+  identityDepositoryWeightBps?: number;
+  mercurialVaultDepositoryWeightBps?: number;
+  credixLpDepositoryWeightBps?: number;
+  identityDepository?: string;
+  mercurialVaultDepository?: string;
+  credixLpDepository?: string;
 }
 
 export interface UXDMintWithMercurialVaultDepositoryForm {

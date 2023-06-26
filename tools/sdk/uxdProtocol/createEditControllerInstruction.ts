@@ -7,10 +7,22 @@ const createEditControllerInstruction = ({
   uxdProgramId,
   authority,
   redeemableGlobalSupplyCap,
+  depositoriesRoutingWeightBps,
+  routerDepositories,
 }: {
   uxdProgramId: PublicKey;
   authority: PublicKey;
   redeemableGlobalSupplyCap?: number;
+  depositoriesRoutingWeightBps?: {
+    identityDepositoryWeightBps: number;
+    mercurialVaultDepositoryWeightBps: number;
+    credixLpDepositoryWeightBps: number;
+  };
+  routerDepositories?: {
+    identityDepository: PublicKey;
+    mercurialVaultDepository: PublicKey;
+    credixLpDepository: PublicKey;
+  };
 }): TransactionInstruction => {
   const client = uxdClient(uxdProgramId);
 
@@ -19,6 +31,8 @@ const createEditControllerInstruction = ({
     authority,
     {
       redeemableGlobalSupplyCap,
+      depositoriesRoutingWeightBps,
+      routerDepositories,
     },
     Provider.defaultOptions(),
   );
