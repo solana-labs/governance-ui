@@ -28,7 +28,7 @@ import { UiInstruction } from './uiTypes/proposalCreationTypes'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import {
   createCreateMetadataAccountV3Instruction,
-  createUpdateMetadataAccountV2Instruction
+  createUpdateMetadataAccountV2Instruction,
 } from '@metaplex-foundation/mpl-token-metadata'
 import { findMetadataPda } from '@metaplex-foundation/js'
 import { lidoStake } from '@utils/lidoStake'
@@ -600,7 +600,7 @@ export async function getCreateTokenMetadataInstruction({
       },
       {
         createMetadataAccountArgsV3: {
-          collectionDetails: null,
+          collectionDetails: null, // note: likely this field should be supported by the forms, but I don't know what it does
           data: tokenMetadata,
           isMutable: true,
         },
