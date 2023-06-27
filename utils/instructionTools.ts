@@ -27,8 +27,8 @@ import { isFormValid } from './formValidation'
 import { UiInstruction } from './uiTypes/proposalCreationTypes'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import {
-  createCreateMetadataAccountV2Instruction,
-  createUpdateMetadataAccountV2Instruction,
+  createCreateMetadataAccountV3Instruction,
+  createUpdateMetadataAccountV2Instruction
 } from '@metaplex-foundation/mpl-token-metadata'
 import { findMetadataPda } from '@metaplex-foundation/js'
 import { lidoStake } from '@utils/lidoStake'
@@ -590,7 +590,7 @@ export async function getCreateTokenMetadataInstruction({
       prerequisiteInstructions.push(preTransferIx)
     }
 
-    const transferIx = createCreateMetadataAccountV2Instruction(
+    const transferIx = createCreateMetadataAccountV3Instruction(
       {
         metadata: metadataPDA,
         mint: form.mintAccount?.pubkey,
@@ -599,7 +599,8 @@ export async function getCreateTokenMetadataInstruction({
         updateAuthority: mintAuthority,
       },
       {
-        createMetadataAccountArgsV2: {
+        createMetadataAccountArgsV3: {
+          collectionDetails: null,
           data: tokenMetadata,
           isMutable: true,
         },
