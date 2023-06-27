@@ -1070,26 +1070,28 @@ const getHardcodedDevnetPrograms = async (
           new PublicKey(id)
         )
       ).result
-      const programInfo = (
-        await fetchParsedAccountInfoByPubkey(
-          connection.current,
-          new PublicKey(programAccount?.data['parsed']?.info?.programData)
-        )
-      ).result
-      const info = programInfo?.data['parsed']?.info
-      const authority = info.authority
-      console.log(id, authority)
-      if (
-        governancesArray.find(
-          (x) =>
-            x.nativeTreasuryAddress.toBase58() === authority ||
-            x.pubkey.toBase58() === authority
-        )
-      ) {
-        accounts.push({
-          owner: new PublicKey(authority),
-          programId: new PublicKey(id),
-        })
+      const programDataPk = programAccount?.data['parsed']?.info?.programData
+      if (programDataPk) {
+        const programInfo = (
+          await fetchParsedAccountInfoByPubkey(
+            connection.current,
+            new PublicKey(programDataPk)
+          )
+        ).result
+        const info = programInfo?.data['parsed']?.info
+        const authority = info.authority
+        if (
+          governancesArray.find(
+            (x) =>
+              x.nativeTreasuryAddress.toBase58() === authority ||
+              x.pubkey.toBase58() === authority
+          )
+        ) {
+          accounts.push({
+            owner: new PublicKey(authority),
+            programId: new PublicKey(id),
+          })
+        }
       }
     }
   }
