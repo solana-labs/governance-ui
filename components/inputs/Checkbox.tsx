@@ -1,7 +1,16 @@
-import React from 'react'
 import { CheckIcon } from '@heroicons/react/solid'
+import { ReactNode } from 'react'
 
-const Checkbox = ({ checked, label = '', disabled = false, ...props }) => (
+const Checkbox = ({
+  checked,
+  label = '',
+  disabled = false,
+  ...props
+}: {
+  checked: boolean
+  label?: ReactNode
+  disabled?: boolean
+} & React.ComponentProps<'input'>) => (
   <label className="default-transition flex cursor-pointer items-center text-fgd-3 hover:text-fgd-2">
     <input
       checked={checked}
