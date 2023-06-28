@@ -66,7 +66,8 @@ export default async function depositTokens({
     wallet!.publicKey,
     transferAuthority.publicKey,
     wallet!.publicKey,
-    amountBN
+    amountBN,
+    true
   )
 
   const transaction = new Transaction()
