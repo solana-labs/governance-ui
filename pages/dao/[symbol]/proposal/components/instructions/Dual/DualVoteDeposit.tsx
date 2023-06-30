@@ -40,22 +40,22 @@ const DualVoteDeposit = ({
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
+  function getInstruction(): Promise<UiInstruction> {
+    return getVoteDepositInstruction({
+      connection,
+      form,
+      schema,
+      setFormErrors,
+      wallet,
+    })
+  }
   const schema = getDualFinanceVoteDepositSchema()
   useEffect(() => {
-    function getInstruction(): Promise<UiInstruction> {
-      return getVoteDepositInstruction({
-        connection,
-        form,
-        schema,
-        setFormErrors,
-        wallet,
-      })
-    }
     handleSetInstructions(
       { governedAccount: governedAccount, getInstruction },
       index
     )
-  }, [form, governedAccount, handleSetInstructions, index, connection, schema, wallet])
+  }, [form, governedAccount, handleSetInstructions, index, connection, wallet])
   useEffect(() => {
     handleSetForm({ value: undefined, propertyName: 'mintPk' })
   }, [form.delegateToken])
@@ -82,30 +82,30 @@ const DualVoteDeposit = ({
         />
       </Tooltip>
       <Input
-          label="Realm"
-          value={form.realm}
-          type="text"
-          onChange={(evt) =>
-            handleSetForm({
-              value: evt.target.value,
-              propertyName: 'realm',
-            })
-          }
-          error={formErrors['realm']}
-        />
-        <Tooltip content="Token to be delegated.">
-          <GovernedAccountSelect
-            label="Delegate Token"
-            governedAccounts={assetAccounts}
-            onChange={(value) => {
-              handleSetForm({ value, propertyName: 'delegateToken' })
-            }}
-            value={form.delegateToken}
-            error={formErrors['delegateToken']}
-            shouldBeGoverned={shouldBeGoverned}
-            governance={governance}
-            type="token"
-          ></GovernedAccountSelect>
+        label="Realm"
+        value={form.realm}
+        type="text"
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: 'realm',
+          })
+        }
+        error={formErrors['realm']}
+      />
+      <Tooltip content="Token to be delegated.">
+        <GovernedAccountSelect
+          label="Delegate Token"
+          governedAccounts={assetAccounts}
+          onChange={(value) => {
+            handleSetForm({ value, propertyName: 'delegateToken' })
+          }}
+          value={form.delegateToken}
+          error={formErrors['delegateToken']}
+          shouldBeGoverned={shouldBeGoverned}
+          governance={governance}
+          type="token"
+        ></GovernedAccountSelect>
       </Tooltip>
     </>
   )

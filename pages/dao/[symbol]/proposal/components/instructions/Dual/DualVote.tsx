@@ -12,6 +12,7 @@ import {
   serializeInstructionToBase64,
   getProposal,
   getTokenOwnerRecordAddress,
+  getTokenOwnerRecord,
 } from '@solana/spl-governance'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
@@ -51,7 +52,7 @@ const DualVote = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const [form, setForm] = useState<DualFinanceVoteForm>({
-    realm: 'EGYbpow8V9gt8JFmadFYai4sjfwc7Vc9gazU735hE6u7',
+    realm: '7ZKzmgzUxVcthfAKdwZ7jToQLhnrw5njN7VyJJK1UFpX',
     governanceProgram: 'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw',
     proposal: '',
     voteOption: 'Yes',
@@ -96,7 +97,7 @@ const DualVote = ({
         wallet?.publicKey
       ) {
         const DUAL_MINT = new PublicKey(
-          'DUALa4FC2yREwZ59PHeu1un4wis36vHRv5hWVBmzykCJ'
+          'HTJDuYroZjEbmvYn7muWkHQher8yn6EdNjoLrLzNVtjy'
         )
         const programId = new PublicKey(form.governanceProgram)
         const walletPk = form.delegateToken.governance.nativeTreasuryAddress
@@ -107,6 +108,7 @@ const DualVote = ({
           DUAL_MINT,
           walletPk
         )
+
         const options = AnchorProvider.defaultOptions()
         const provider = new AnchorProvider(
           connection.current,
@@ -136,6 +138,7 @@ const DualVote = ({
           walletPk,
           DEFAULT_VSR_ID
         )
+
         const updateVoterWeightRecordIx = await vsrClient!.program.methods
           .updateVoterWeightRecord()
           .accounts({
@@ -180,7 +183,8 @@ const DualVote = ({
           tokenMint,
           vote,
           payer,
-          voterWeightPk
+          voterWeightPk,
+          undefined
         )
 
         serializedInstruction = ''
@@ -206,7 +210,6 @@ const DualVote = ({
     handleSetInstructions,
     index,
     connection,
-    schema,
     wallet,
     validateInstruction,
   ])
