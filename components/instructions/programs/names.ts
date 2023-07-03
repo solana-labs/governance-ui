@@ -3,7 +3,7 @@ import { consts as foresightConsts } from '@foresight-tmp/foresight-sdk/'
 import {
   LIDO_PROGRAM_ID,
   LIDO_PROGRAM_ID_DEVNET,
-} from '@components/TreasuryAccount/ConvertToStSol'
+} from '@constants/pubkeys/lido'
 import { PROGRAM_ID as HELIUM_VSR_PROGRAM_ID } from '@helium/voter-stake-registry-sdk'
 import { NAME_PROGRAM_ID } from '@bonfida/spl-name-service'
 
