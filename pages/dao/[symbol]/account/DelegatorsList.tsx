@@ -68,15 +68,12 @@ const DelegatorsList = () => {
   )
 
   return (
-    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
-      <h3 className="mb-4">Your delegators</h3>
-      <div className="space-y-5 flex flex-col">
-        {communityTorsDelegatedToUser?.map((x) => (
-          <React.Fragment key={x.pubkey.toString()}>
-            <DelegatorCheckbox tokenOwnerRecord={x}></DelegatorCheckbox>
-          </React.Fragment>
-        ))}
-      </div>
+    <div className="space-y-5 flex flex-col">
+      {communityTorsDelegatedToUser?.map((x) => (
+        <React.Fragment key={x.pubkey.toString()}>
+          <DelegatorCheckbox tokenOwnerRecord={x}></DelegatorCheckbox>
+        </React.Fragment>
+      ))}
     </div>
   )
 }
