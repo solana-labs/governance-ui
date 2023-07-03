@@ -2,9 +2,7 @@ import Checkbox from '@components/inputs/Checkbox'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useTokenOwnerRecordsDelegatedToUser } from '@hooks/queries/tokenOwnerRecord'
 import useFormatTokenAmount from '@hooks/useFormatTokenAmount'
-import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { ProgramAccount, TokenOwnerRecord } from '@solana/spl-governance'
-import { useConnection } from '@solana/wallet-adapter-react'
 import React, { useState } from 'react'
 import { useMemo } from 'react'
 
@@ -37,8 +35,6 @@ const DelegatorCheckbox = ({
 }
 
 const DelegatorsList = () => {
-  const wallet = useWalletOnePointOh()
-  const { connection } = useConnection()
   const realm = useRealmQuery().data?.result
 
   const delegatesArray = useTokenOwnerRecordsDelegatedToUser()
