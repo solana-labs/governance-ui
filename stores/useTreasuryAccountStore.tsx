@@ -42,6 +42,7 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
   isLoadingRecentActivity: false,
   isLoadingTokenAccounts: false,
   getNfts: async (nftsGovernedTokenAccounts, connection) => {
+    console.log('getNfts has been called')
     set((s) => {
       s.isLoadingNfts = true
     })

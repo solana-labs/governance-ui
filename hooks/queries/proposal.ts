@@ -66,6 +66,7 @@ export const useRealmProposalsQuery = () => {
       : undefined,
     queryFn: async () => {
       if (!enabled) throw new Error()
+      console.log('query: fetching realm proposals')
 
       const results = (
         await Promise.all(
