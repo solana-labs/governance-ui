@@ -5,6 +5,7 @@ import DelegateCard from '@components/DelegateCard'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import useRealm from '@hooks/useRealm'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import DelegatorsList from './DelegatorsList'
 
 const AccountInner = ({
   displayPanel,
@@ -67,8 +68,11 @@ const Account = ({
     return (
       <div className="grid grid-cols-12 gap-4">
         <AccountInner withHeader={withHeader} displayPanel={displayPanel} />
-        <div className="md:w-1/2 col-span-12">
+        <div className="md:col-span-6 col-span-12">
           <DelegateCard />
+        </div>
+        <div className="md:col-span-6 col-span-12">
+          <DelegatorsList />
         </div>
       </div>
     )
@@ -76,7 +80,7 @@ const Account = ({
     return (
       <>
         <AccountInner withHeader={withHeader} displayPanel={displayPanel} />
-        <div className="md:w-1/2 col-span-12">
+        <div className="md:w-col-span-6 md:max-w- col-span-12">
           <DelegateCard />
         </div>
       </>
