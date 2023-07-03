@@ -34,7 +34,6 @@ import { useEffect, useState } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { VSR_PLUGIN_PKS } from '@constants/plugins'
 import { REALM_ID as PYTH_REALM_ID } from 'pyth-staking-api'
-import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
 import SerumGovernanceTokenWrapper from './SerumGovernanceTokenWrapper'
 import getNumTokens from '@components/ProposalVotingPower/getNumTokens'
 import VotingPowerPct from '@components/ProposalVotingPower/VotingPowerPct'
@@ -128,7 +127,6 @@ const TokenBalanceCard = ({
               setHasGovPower={setHasGovPower}
             />
           )}
-          <DelegateTokenBalanceCard />
         </div>
       ) : (
         <>
