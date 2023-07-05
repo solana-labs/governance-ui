@@ -55,7 +55,7 @@ const useNewWalletCallback = (
     // client is typed such that it cant be undefined, but whatever.
     const plugin = await client?.withUpdateVoterWeightRecord(
       instructions,
-      tokenOwnerRecord,
+      tokenOwnerRecord.pubkey,
       'createGovernance',
     );
 
