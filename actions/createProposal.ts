@@ -96,7 +96,7 @@ export const createProposal = async (
   //will run only if plugin is connected with realm
   const plugin = await client?.withUpdateVoterWeightRecord(
     instructions,
-    tokenOwnerRecord,
+    tokenOwnerRecord.pubkey,
     'createProposal',
     governance
   )
