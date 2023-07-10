@@ -13,7 +13,6 @@ import {
   Vote,
   VoteChoice,
   VoteKind,
-  getTokenOwnerRecordAddress,
   withCastVote,
 } from '@solana/spl-governance'
 import { getProgramVersionForRealm } from '@models/registry/api'
@@ -29,6 +28,7 @@ import useLegacyConnectionContext from './useLegacyConnectionContext'
 import { NFT_PLUGINS_PKS } from '@constants/plugins'
 import { TransactionInstruction } from '@solana/web3.js'
 import useProgramVersion from './useProgramVersion'
+import useVotingTokenOwnerRecords from './useVotingTokenOwnerRecords'
 
 export const useSubmitVote = () => {
   const wallet = useWalletOnePointOh()
@@ -129,6 +129,7 @@ export const useSubmitVoteAwesome = () => {
   const votingPluginClient = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
+  const getVotingTokenOwnerRecords = useVotingTokenOwnerRecords()
 
   // get delegates
 
@@ -152,40 +153,32 @@ export const useSubmitVoteAwesome = () => {
 
           const vote = formatVote(voteKind)
 
-          // START we have to do this for each delegate now
+          const votingTors = await getVotingTokenOwnerRecords(governingBody)
+          for (const torPk of votingTors) {
+            //will run only if any plugin is connected with realm
+            const votingPluginHelpers = await votingPluginClient?.withCastPluginVote(
+              instructions,
+              proposal,
+              torPk
+            )
 
-          const torPk = await getTokenOwnerRecordAddress(
-            realm.owner,
-            realm.pubkey,
-            governingTokenMint,
-            walletPk
-          )
-
-          //will run only if any plugin is connected with realm
-          const votingPluginHelpers = await votingPluginClient?.withCastPluginVote(
-            instructions,
-            proposal,
-            torPk
-          )
-
-          await withCastVote(
-            instructions,
-            realm.owner,
-            programVersion,
-            realm.pubkey,
-            proposal.account.governance,
-            proposal.pubkey,
-            proposal.account.tokenOwnerRecord,
-            torPk,
-            walletPk,
-            governingTokenMint,
-            vote,
-            walletPk
-            //plugin?.voterWeightPk,
-            //plugin?.maxVoterWeightRecord
-          )
-
-          // END
+            await withCastVote(
+              instructions,
+              realm.owner,
+              programVersion,
+              realm.pubkey,
+              proposal.account.governance,
+              proposal.pubkey,
+              proposal.account.tokenOwnerRecord,
+              torPk,
+              walletPk,
+              governingTokenMint,
+              vote,
+              walletPk,
+              votingPluginHelpers?.voterWeightPk,
+              votingPluginHelpers?.maxVoterWeightRecord
+            )
+          }
         }
       : undefined
 }
