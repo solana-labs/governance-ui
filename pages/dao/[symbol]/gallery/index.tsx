@@ -1,6 +1,6 @@
 import { getExplorerUrl } from '@components/explorer/tools'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { PhotographIcon, PlusCircleIcon } from '@heroicons/react/outline'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -16,33 +16,22 @@ import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { MdScheduleSend } from 'react-icons/md'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { useRealmDigitalAssetsQuery } from '@hooks/queries/digitalAssets'
 
-const gallery = () => {
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
+const Gallery = () => {
   const connection = useLegacyConnectionContext()
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const realmNfts = useTreasuryAccountStore((s) => s.allNfts)
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const isLoading = useTreasuryAccountStore((s) => s.isLoadingNfts)
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const isLoadingGovernances = useGovernanceAssetsStore(
     (s) => s.loadGovernedAccounts
   )
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const nftsPerPubkey = useTreasuryAccountStore((s) => s.governanceNfts)
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const { setCurrentAccount } = useTreasuryAccountStore()
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [currentAccount, setStateAccount] = useState<AssetAccount | null>(null)
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [nfts, setNfts] = useState<NFTWithMint[]>([])
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [openNftDepositModal, setOpenNftDepositModal] = useState(false)
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [openSendNftsModal, setOpenSendNftsModal] = useState(false)
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [selectedNft, setSelectedNft] = useState<NFTWithMint | null>(null)
   const handleCloseModal = () => {
     setOpenNftDepositModal(false)
@@ -50,7 +39,13 @@ const gallery = () => {
   const handleCloseSendModal = () => {
     setOpenSendNftsModal(false)
   }
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
+
+  const { data: nftsDAS } = useRealmDigitalAssetsQuery()
+  const DASnftsFlat = useMemo(
+    () => nftsDAS?.flat().filter((x) => !x.compression.compressed), //TODO support compressed nfts
+    [nftsDAS]
+  )
+
   useEffect(() => {
     if (currentAccount === null) {
       setNfts(realmNfts)
@@ -160,24 +155,24 @@ const gallery = () => {
             </Select>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 grid-flow-row gap-6">
-            {isLoading || isLoadingGovernances ? (
+            {DASnftsFlat === undefined ? (
               <>
                 <div className="animate-pulse bg-bkg-3 col-span-1 h-48 rounded-lg" />
                 <div className="animate-pulse bg-bkg-3 col-span-1 h-48 rounded-lg" />
                 <div className="animate-pulse bg-bkg-3 col-span-1 h-48 rounded-lg" />
                 <div className="animate-pulse bg-bkg-3 col-span-1 h-48 rounded-lg" />
               </>
-            ) : nfts.length ? (
-              nfts.map((x, idx) => (
+            ) : DASnftsFlat?.length ? (
+              DASnftsFlat.map((x, idx) => (
                 <div
-                  key={idx}
+                  key={x.id}
                   className="relative group bg-bkg-4 col-span-1 flex items-center justify-center rounded-lg filter drop-shadow-xl"
                 >
                   <a
-                    key={idx}
+                    className="bg-bkg-2 cursor-pointer default-transition h-full w-full rounded-md border border-transparent transform scale-90 group-hover:scale-95 group-hover:opacity-50"
                     href={
-                      connection.endpoint && x.mintAddress
-                        ? getExplorerUrl(connection.cluster, x.mintAddress)
+                      connection.endpoint && x.id
+                        ? getExplorerUrl(connection.cluster, x.id)
                         : ''
                     }
                     target="_blank"
@@ -185,8 +180,10 @@ const gallery = () => {
                     onClick={(e) => e.stopPropagation()}
                   >
                     <ImgWithLoader
-                      className="bg-bkg-2 cursor-pointer default-transition h-full w-full rounded-md border border-transparent transform scale-90 group-hover:scale-95 group-hover:opacity-50"
-                      src={x.image}
+                      className="h-full w-full"
+                      src={
+                        x.content.files[0]?.cdn_uri ?? x.content.files[0]?.uri
+                      }
                     />
                   </a>
                   <button
@@ -195,7 +192,7 @@ const gallery = () => {
                       setCurrentAccount(
                         nftsGovernedTokenAccounts[0],
                         connection
-                      )
+                      ) //TODO
                       setSelectedNft(x)
                       setOpenSendNftsModal(true)
                     }}
@@ -236,4 +233,4 @@ const gallery = () => {
   )
 }
 
-export default gallery
+export default Gallery
