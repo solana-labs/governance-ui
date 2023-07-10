@@ -278,10 +278,9 @@ export const getSuggestedCoinTier = async (outputMint: string) => {
     indexForTierFromSwaps > -1 ? TIERS[indexForTierFromSwaps] : 'UNTRUSTED'
   return {
     tier,
-    priceImpact: (
-      (indexForTierFromSwaps > -1
-        ? averageSwaps[indexForTierFromSwaps]!.priceImpactPct
-        : averageSwaps[swaps.length - 1]!.priceImpactPct) * 100
+    priceImpact: (indexForTierFromSwaps > -1
+      ? averageSwaps[indexForTierFromSwaps]!.priceImpactPct
+      : 100
     ).toFixed(2),
   }
 }
