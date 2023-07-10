@@ -172,8 +172,8 @@ export const fetchJupiterRoutes = async (
   inputMint = 'So11111111111111111111111111111111111111112',
   outputMint = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
   amount = 0,
-  slippage = 50,
   swapMode = 'ExactIn',
+  slippage = 50,
   feeBps = 0
 ) => {
   {
@@ -223,20 +223,64 @@ export const getSuggestedCoinTier = async (outputMint: string) => {
       outputMint,
       toNative(1000, 6).toNumber()
     ),
+    fetchJupiterRoutes(
+      MAINNET_USDC_MINT.toBase58(),
+      outputMint,
+      toNative(100000, 6).toNumber(),
+      'ExactOut'
+    ),
+    fetchJupiterRoutes(
+      MAINNET_USDC_MINT.toBase58(),
+      outputMint,
+      toNative(20000, 6).toNumber(),
+      'ExactOut'
+    ),
+    fetchJupiterRoutes(
+      MAINNET_USDC_MINT.toBase58(),
+      outputMint,
+      toNative(5000, 6).toNumber(),
+      'ExactOut'
+    ),
+    fetchJupiterRoutes(
+      MAINNET_USDC_MINT.toBase58(),
+      outputMint,
+      toNative(1000, 6).toNumber(),
+      'ExactOut'
+    ),
   ])
+  const bestRoutesSwaps = swaps
+    .filter((x) => x.bestRoute)
+    .map((x) => x.bestRoute!)
 
-  const indexForTierFromSwaps = swaps.findIndex(
-    (x) => x.bestRoute?.priceImpactPct && x.bestRoute?.priceImpactPct * 100 < 1
+  const averageSwaps = bestRoutesSwaps.reduce(
+    (acc: { amount: string; priceImpactPct: number }[], val) => {
+      if (val.swapMode === 'ExactIn') {
+        const exactOutRoute = bestRoutesSwaps.find(
+          (x) => x.amount === val.amount && x.swapMode === 'ExactOut'
+        )
+        acc.push({
+          amount: val.amount.toString(),
+          priceImpactPct: exactOutRoute?.priceImpactPct
+            ? (val.priceImpactPct + exactOutRoute.priceImpactPct) / 2
+            : val.priceImpactPct,
+        })
+      }
+      return acc
+    },
+    []
+  )
+
+  const indexForTierFromSwaps = averageSwaps.findIndex(
+    (x) => x?.priceImpactPct && x?.priceImpactPct * 100 < 1
   )
 
   const tier =
     indexForTierFromSwaps > -1 ? TIERS[indexForTierFromSwaps] : 'UNTRUSTED'
   return {
     tier,
-    priceImpact: (
-      (indexForTierFromSwaps > -1
-        ? swaps[indexForTierFromSwaps].bestRoute!.priceImpactPct
-        : swaps[swaps.length - 1].bestRoute!.priceImpactPct) * 100
+    priceImpact: (indexForTierFromSwaps > -1
+      ? averageSwaps[indexForTierFromSwaps]!.priceImpactPct
+      : 100
     ).toFixed(2),
   }
 }
