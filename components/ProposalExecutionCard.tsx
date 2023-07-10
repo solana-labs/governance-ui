@@ -13,6 +13,9 @@ import { diffTime } from '@components/ProposalRemainingVotingTime'
 import useProposalTransactions from '@hooks/useProposalTransactions'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
 import { useSelectedProposalTransactions } from '@hooks/queries/proposalTransaction'
+import { DEFAULT_VSR_ID } from 'VoteStakeRegistry/sdk/client'
+import { DEFAULT_GOVERNANCE_PROGRAM_ID } from './instructions/tools'
+import { PublicKey } from '@solana/web3.js'
 
 interface Props {
   className?: string
@@ -59,6 +62,31 @@ export default function ProposalExecutionCard(props: Props) {
 
   const { ready, notReady, executed, nextExecuteAt } = proposalTransactions
 
+  //Temp solutions for dao to dao vote until there is option to create proposal with only one transaction
+  //in stand of current solution where every instruction is one tx
+  const isDaoToDaoVote = () => {
+    if (!ready.length) {
+      return false
+    }
+    const firstInstruction = ready[0].account.getAllInstructions()[0]
+    const secondInstruction = ready[1].account.getAllInstructions()[0]
+    if (!firstInstruction || !secondInstruction) {
+      return false
+    }
+
+    const isUpdateVoterWeightInstruction =
+      firstInstruction.data[0] === 45 &&
+      firstInstruction.programId.equals(DEFAULT_VSR_ID)
+    const isCastVoteInstruction =
+      secondInstruction.data[0] === 13 &&
+      secondInstruction.programId.equals(
+        new PublicKey(DEFAULT_GOVERNANCE_PROGRAM_ID)
+      )
+    return isUpdateVoterWeightInstruction && isCastVoteInstruction
+  }
+
+  const executeAllInOneTx = isDaoToDaoVote() ? true : false
+
   return (
     <div
       className={classNames(
@@ -95,7 +123,7 @@ export default function ProposalExecutionCard(props: Props) {
               setPlaying={setPlayState}
               small={false}
               proposalInstructions={ready}
-              multiTransactionMode={true}
+              multiTransactionMode={!executeAllInOneTx}
             />
           ) : (
             <Button className="w-48" disabled>

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import { ProgramAccount, Governance } from '@solana/spl-governance'
 import {
   UiInstruction,
@@ -24,7 +24,7 @@ const DualVoteDeposit = ({
 }) => {
   const [form, setForm] = useState<DualFinanceVoteDepositForm>({
     numTokens: 0,
-    realm: undefined,
+    realm: 'EGYbpow8V9gt8JFmadFYai4sjfwc7Vc9gazU735hE6u7',
     delegateToken: undefined,
   })
   const connection = useLegacyConnectionContext()
@@ -49,7 +49,7 @@ const DualVoteDeposit = ({
       wallet,
     })
   }
-  const schema = getDualFinanceVoteDepositSchema()
+  const schema = useMemo(getDualFinanceVoteDepositSchema, [])
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: governedAccount, getInstruction },
@@ -85,6 +85,7 @@ const DualVoteDeposit = ({
         label="Realm"
         value={form.realm}
         type="text"
+        disabled={true}
         onChange={(evt) =>
           handleSetForm({
             value: evt.target.value,

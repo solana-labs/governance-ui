@@ -144,7 +144,7 @@ export async function getVoteDepositInstruction({
       form.numTokens,
       form.delegateToken.extensions.mint.account.decimals
     )
-    console.log({ realmPk, communityMintPk, daoWallet, amount })
+
     const programVersion = await getGovernanceProgramVersion(
       connection.current,
       govProgramId // governance program public key

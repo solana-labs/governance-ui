@@ -1,5 +1,11 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useContext, useEffect, useState } from 'react'
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import {
   ProgramAccount,
   Governance,
@@ -12,7 +18,6 @@ import {
   serializeInstructionToBase64,
   getProposal,
   getTokenOwnerRecordAddress,
-  getTokenOwnerRecord,
 } from '@solana/spl-governance'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
@@ -52,7 +57,7 @@ const DualVote = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const [form, setForm] = useState<DualFinanceVoteForm>({
-    realm: '7ZKzmgzUxVcthfAKdwZ7jToQLhnrw5njN7VyJJK1UFpX',
+    realm: 'EGYbpow8V9gt8JFmadFYai4sjfwc7Vc9gazU735hE6u7',
     governanceProgram: 'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw',
     proposal: '',
     voteOption: 'Yes',
@@ -71,20 +76,25 @@ const DualVote = ({
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-  const validateInstruction = async (): Promise<boolean> => {
+  const schema = useMemo(
+    () =>
+      yup.object().shape({
+        delegateToken: yup
+          .object()
+          .nullable()
+          .required('Program governed account is required'),
+        realm: yup.string().required(),
+        proposal: yup.string().required(),
+        voteOption: yup.string().required(),
+      }),
+    []
+  )
+  const validateInstruction = useCallback(async () => {
     const { isValid, validationErrors } = await isFormValid(schema, form)
     setFormErrors(validationErrors)
     return isValid
-  }
-  const schema = yup.object().shape({
-    delegateToken: yup
-      .object()
-      .nullable()
-      .required('Program governed account is required'),
-    realm: yup.string().required(),
-    proposal: yup.string().required(),
-    voteOption: yup.string().required(),
-  })
+  }, [form, schema])
+
   useEffect(() => {
     async function getInstruction(): Promise<UiInstruction> {
       const isValid = await validateInstruction()
@@ -97,7 +107,7 @@ const DualVote = ({
         wallet?.publicKey
       ) {
         const DUAL_MINT = new PublicKey(
-          'HTJDuYroZjEbmvYn7muWkHQher8yn6EdNjoLrLzNVtjy'
+          'DUALa4FC2yREwZ59PHeu1un4wis36vHRv5hWVBmzykCJ'
         )
         const programId = new PublicKey(form.governanceProgram)
         const walletPk = form.delegateToken.governance.nativeTreasuryAddress

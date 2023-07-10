@@ -6,12 +6,9 @@ import {
   DualFinanceWithdrawForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
-import GovernedAccountSelect from '../../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import Input from '@components/inputs/Input'
 import { getWithdrawInstruction } from '@utils/instructions/Dual'
 import { getDualFinanceWithdrawSchema } from '@utils/validations'
-import Tooltip from '@components/Tooltip'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
@@ -35,6 +32,7 @@ const DualWithdraw = ({
     ProgramAccount<Governance> | undefined
   >(undefined)
   const [formErrors, setFormErrors] = useState({})
+  console.log(shouldBeGoverned, assetAccounts, formErrors)
   const { handleSetInstructions } = useContext(NewProposalContext)
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
@@ -55,15 +53,7 @@ const DualWithdraw = ({
       { governedAccount: governedAccount, getInstruction },
       index
     )
-  }, [
-    form,
-    governedAccount,
-    handleSetInstructions,
-    index,
-    connection,
-    schema,
-    wallet,
-  ])
+  }, [form, governedAccount, handleSetInstructions, index, connection, wallet])
   useEffect(() => {
     handleSetForm({ value: undefined, propertyName: 'mintPk' })
   }, [form.baseTreasury])
@@ -75,7 +65,8 @@ const DualWithdraw = ({
   // if the project doesnt need to change where the tokens get returned to.
   return (
     <>
-      <Tooltip content="Identifier for the Staking Option">
+      Not implemented
+      {/* <Tooltip content="Identifier for the Staking Option">
         <Input
           label="Name"
           value={form.soName}
@@ -116,7 +107,7 @@ const DualWithdraw = ({
           }
           error={formErrors['mintPk']}
         />
-      )}
+      )} */}
     </>
   )
 }
