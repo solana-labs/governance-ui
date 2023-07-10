@@ -163,7 +163,7 @@ const Gallery = () => {
                 <div className="animate-pulse bg-bkg-3 col-span-1 h-48 rounded-lg" />
               </>
             ) : DASnftsFlat?.length ? (
-              DASnftsFlat.map((x, idx) => (
+              DASnftsFlat.map((x) => (
                 <div
                   key={x.id}
                   className="relative group bg-bkg-4 col-span-1 flex items-center justify-center rounded-lg filter drop-shadow-xl"
