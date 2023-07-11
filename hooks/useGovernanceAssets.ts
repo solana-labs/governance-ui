@@ -415,6 +415,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Dual,
     },
+    [Instructions.DualFinanceVote]: {
+      name: 'Vote',
+      isVisible: canUseTransferInstruction,
+      packageId: PackageEnum.Dual,
+    },
 
     /*
       ███████ ██    ██ ███████ ██████  ██      ███████ ███    ██ ██████

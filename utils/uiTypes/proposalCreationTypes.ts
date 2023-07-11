@@ -419,6 +419,7 @@ export enum Instructions {
   DualFinanceDelegate,
   DualFinanceDelegateWithdraw,
   DualFinanceVoteDeposit,
+  DualFinanceVote,
   EverlendDeposit,
   EverlendWithdraw,
   ForesightAddMarketListToCategory,

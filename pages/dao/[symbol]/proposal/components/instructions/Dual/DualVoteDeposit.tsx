@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import { ProgramAccount, Governance } from '@solana/spl-governance'
 import {
   UiInstruction,
@@ -24,7 +24,7 @@ const DualVoteDeposit = ({
 }) => {
   const [form, setForm] = useState<DualFinanceVoteDepositForm>({
     numTokens: 0,
-    realm: undefined,
+    realm: 'EGYbpow8V9gt8JFmadFYai4sjfwc7Vc9gazU735hE6u7',
     delegateToken: undefined,
   })
   const connection = useLegacyConnectionContext()
@@ -40,22 +40,22 @@ const DualVoteDeposit = ({
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-  const schema = getDualFinanceVoteDepositSchema()
+  function getInstruction(): Promise<UiInstruction> {
+    return getVoteDepositInstruction({
+      connection,
+      form,
+      schema,
+      setFormErrors,
+      wallet,
+    })
+  }
+  const schema = useMemo(getDualFinanceVoteDepositSchema, [])
   useEffect(() => {
-    function getInstruction(): Promise<UiInstruction> {
-      return getVoteDepositInstruction({
-        connection,
-        form,
-        schema,
-        setFormErrors,
-        wallet,
-      })
-    }
     handleSetInstructions(
       { governedAccount: governedAccount, getInstruction },
       index
     )
-  }, [form, governedAccount, handleSetInstructions, index, connection, schema, wallet])
+  }, [form, governedAccount, handleSetInstructions, index, connection, wallet])
   useEffect(() => {
     handleSetForm({ value: undefined, propertyName: 'mintPk' })
   }, [form.delegateToken])
@@ -82,30 +82,31 @@ const DualVoteDeposit = ({
         />
       </Tooltip>
       <Input
-          label="Realm"
-          value={form.realm}
-          type="text"
-          onChange={(evt) =>
-            handleSetForm({
-              value: evt.target.value,
-              propertyName: 'realm',
-            })
-          }
-          error={formErrors['realm']}
-        />
-        <Tooltip content="Token to be delegated.">
-          <GovernedAccountSelect
-            label="Delegate Token"
-            governedAccounts={assetAccounts}
-            onChange={(value) => {
-              handleSetForm({ value, propertyName: 'delegateToken' })
-            }}
-            value={form.delegateToken}
-            error={formErrors['delegateToken']}
-            shouldBeGoverned={shouldBeGoverned}
-            governance={governance}
-            type="token"
-          ></GovernedAccountSelect>
+        label="Realm"
+        value={form.realm}
+        type="text"
+        disabled={true}
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: 'realm',
+          })
+        }
+        error={formErrors['realm']}
+      />
+      <Tooltip content="Token to be delegated.">
+        <GovernedAccountSelect
+          label="Delegate Token"
+          governedAccounts={assetAccounts}
+          onChange={(value) => {
+            handleSetForm({ value, propertyName: 'delegateToken' })
+          }}
+          value={form.delegateToken}
+          error={formErrors['delegateToken']}
+          shouldBeGoverned={shouldBeGoverned}
+          governance={governance}
+          type="token"
+        ></GovernedAccountSelect>
       </Tooltip>
     </>
   )

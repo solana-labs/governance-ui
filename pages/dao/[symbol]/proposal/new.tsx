@@ -136,6 +136,7 @@ import InitStrike from './components/instructions/Dual/InitStrike'
 import IdlSetBuffer from './components/instructions/Mango/MangoV4/IdlSetBuffer'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { usePrevious } from '@hooks/usePrevious'
+import DualVote from './components/instructions/Dual/DualVote'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -428,6 +429,7 @@ const New = () => {
       [Instructions.DualFinanceDelegate]: DualDelegate,
       [Instructions.DualFinanceDelegateWithdraw]: DualDelegateWithdraw,
       [Instructions.DualFinanceVoteDeposit]: DualVoteDeposit,
+      [Instructions.DualFinanceVote]: DualVote,
       [Instructions.MeanCreateAccount]: MeanCreateAccount,
       [Instructions.MeanFundAccount]: MeanFundAccount,
       [Instructions.MeanWithdrawFromAccount]: MeanWithdrawFromAccount,
