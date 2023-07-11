@@ -65,7 +65,10 @@ export default function ProposalExecutionCard(props: Props) {
   //Temp solutions for dao to dao vote until there is option to create proposal with only one transaction
   //in stand of current solution where every instruction is one tx
   const isDaoToDaoVote = () => {
-    if (!ready.length) {
+    if (!ready || !ready.length || ready.length < 2) {
+      return false
+    }
+    if (!ready[0] || !ready[1]) {
       return false
     }
     const firstInstruction = ready[0].account.getAllInstructions()[0]
