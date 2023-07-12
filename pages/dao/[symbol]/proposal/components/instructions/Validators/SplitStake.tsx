@@ -7,7 +7,7 @@ import {
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
 
-import { PublicKey, StakeProgram } from '@solana/web3.js'
+import { Connection, PublicKey, StakeProgram } from '@solana/web3.js'
 
 import {
   UiInstruction,
@@ -26,7 +26,7 @@ import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
 import { getFilteredProgramAccounts } from '@utils/helpers'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
-const WithdrawValidatorStake = ({
+const SplitStake = ({
   index,
   governance,
 }: {
@@ -37,7 +37,6 @@ const WithdrawValidatorStake = ({
   const programId: PublicKey = StakeProgram.programId
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)
-
   const [form, setForm] = useState<ValidatorWithdrawStakeForm>({
     stakingAccount: undefined,
     governedTokenAccount: undefined,
@@ -179,18 +178,33 @@ const WithdrawValidatorStake = ({
       return returnInvalid()
     }
     const realAmount = parseMintNaturalAmountFromDecimal(form.amount!, 9)
-    const instruction = web3.StakeProgram.withdraw({
-      stakePubkey: new PublicKey(form.stakingAccount.stakeAccount),
-      authorizedPubkey: form.governedTokenAccount.pubkey,
-      lamports: realAmount,
-      toPubkey: form.governedTokenAccount.pubkey,
+    const authorizedPubkey = form.governedTokenAccount.extensions
+      .transferAddress!
+    const stakePubkey = new PublicKey(form.stakingAccount.stakeAccount)
+    const rent = await connection.current.getMinimumBalanceForRentExemption(200)
+    const splitStakeAccount = await genShortestUnusedSeed(
+      connection.current,
+      authorizedPubkey,
+      StakeProgram.programId
+    )
+
+    const instruction = web3.StakeProgram.splitWithSeed({
+      stakePubkey,
+      authorizedPubkey,
+      splitStakePubkey: splitStakeAccount.derived,
+      lamports: realAmount + rent,
+      basePubkey: authorizedPubkey,
+      seed: splitStakeAccount.seed!,
     })
+
     return {
-      serializedInstruction: serializeInstructionToBase64(
-        instruction.instructions[0]
+      serializedInstruction: '',
+      additionalSerializedInstructions: instruction.instructions.map((x) =>
+        serializeInstructionToBase64(x)
       ),
       isValid: true,
       governance: form.governedTokenAccount.governance,
+      chunkBy: 1,
     }
   }
 
@@ -244,24 +258,59 @@ const WithdrawValidatorStake = ({
         onChange={setStakingAccount}
       />
       <Input
-        label="Amount"
+        label="Split Amount"
         value={form.amount}
         error={formErrors['amount']}
         type="number"
         onChange={setAmount}
       />
-      <div
-        style={{
-          fontSize: '14px',
-          color: 'rgba(164, 172, 183, 1)',
-          marginTop: '18px',
-        }}
-      >
-        Withraw from staking account for a validator. You can only withdraw from
-        inactivated stake accounts.
-      </div>
     </>
   )
 }
 
-export default WithdrawValidatorStake
+const genShortestUnusedSeed = async (
+  connection: Connection,
+  basePubkey: PublicKey,
+  programId: PublicKey
+) => {
+  const MAX_SEED_LEN = 32
+  const ASCII_MAX = 127
+  let len = 1
+  // find the smallest available seed to optimize for small tx size
+  while (len <= MAX_SEED_LEN) {
+    const codes = new Array(len).fill(0)
+    while (!codes.every((c) => c === ASCII_MAX)) {
+      // check current seed unused
+      const seed = String.fromCharCode(...codes)
+      // eslint-disable-next-line no-await-in-loop
+      const derived = await PublicKey.createWithSeed(
+        basePubkey,
+        seed,
+        programId
+      )
+      // eslint-disable-next-line no-await-in-loop
+      const balance = await connection.getBalance(derived)
+      if (balance === 0) {
+        return {
+          base: basePubkey,
+          derived,
+          seed,
+        }
+      }
+      // current seed used, increment code
+      codes[codes.length - 1]++
+      for (let i = codes.length - 1; i > 0; i--) {
+        const prevI = i - 1
+        if (codes[i] > ASCII_MAX) {
+          codes[i] = 0
+          codes[prevI]++
+        }
+      }
+    }
+    // all seeds of current len are used
+    len++
+  }
+  throw new Error('No unused seeds found')
+}
+
+export default SplitStake

@@ -482,6 +482,7 @@ export enum Instructions {
   WithdrawObligationCollateralAndRedeemReserveLiquidity,
   WithdrawValidatorStake,
   WithdrawFromVolt,
+  SplitStake,
   AddKeyToDID,
   RemoveKeyFromDID,
   AddServiceToDID,

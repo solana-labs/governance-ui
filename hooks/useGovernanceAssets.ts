@@ -362,6 +362,10 @@ export default function useGovernanceAssets() {
       name: 'Set Mint Authority',
       packageId: PackageEnum.Common,
     },
+    [Instructions.SplitStake]: {
+      name: 'Split Stake Validator',
+      packageId: PackageEnum.Common,
+    },
     /*
       ██████  ██    ██  █████  ██          ███████ ██ ███    ██  █████  ███    ██  ██████ ███████
       ██   ██ ██    ██ ██   ██ ██          ██      ██ ████   ██ ██   ██ ████   ██ ██      ██
