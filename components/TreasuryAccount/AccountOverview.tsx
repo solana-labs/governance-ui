@@ -70,7 +70,8 @@ const AccountOverview = () => {
   const isSol = currentAccount?.isSol
   const [loading, setLoading] = useState(true)
   const isSplToken = currentAccount?.type === AccountType.TOKEN
-  const isAuxiliaryAccount = currentAccount?.type === AccountType.AuxiliaryToken
+  const isAuxiliaryAccount =
+    currentAccount?.type === AccountType.AUXILIARY_TOKEN
   const { canUseTransferInstruction } = useGovernanceAssets()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected

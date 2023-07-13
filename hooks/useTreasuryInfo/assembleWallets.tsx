@@ -65,7 +65,6 @@ export const assembleWallets = async (
 
   for (const account of accounts) {
     let walletAddress = ''
-
     if (account.isSol && account.extensions.transferAddress) {
       walletAddress = account.extensions.transferAddress.toBase58()
     } else if (account.governance.pubkey) {

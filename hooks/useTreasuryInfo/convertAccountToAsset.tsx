@@ -19,7 +19,7 @@ export const convertAccountToAsset = (
   const info = getTreasuryAccountItemInfoV2(account)
 
   switch (account.type) {
-    case AccountType.AuxiliaryToken:
+    case AccountType.AUXILIARY_TOKEN:
     case AccountType.GENERIC: {
       return null
     }
@@ -100,6 +100,11 @@ export const convertAccountToAsset = (
         value: getAccountValue(account),
       }
 
+    case AccountType.STAKE:
+      return {
+        type: AssetType.Stake,
+        raw: account,
+      }
     case AccountType.PROGRAM:
       throw new Error('Handle Programs separately')
 

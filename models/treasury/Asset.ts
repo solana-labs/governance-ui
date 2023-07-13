@@ -29,6 +29,7 @@ export enum AssetType {
   Token,
   Unknown,
   TokenOwnerRecordAsset,
+  Stake,
 }
 
 export interface Mint {
@@ -100,6 +101,11 @@ export interface Token {
   value: BigNumber
 }
 
+export interface Stake {
+  type: AssetType.Stake
+  raw: AssetAccount
+}
+
 export interface Unknown {
   type: AssetType.Unknown
   address: string
@@ -142,3 +148,4 @@ export type Asset =
   | Token
   | Unknown
   | TokenOwnerRecordAsset
+  | Stake
