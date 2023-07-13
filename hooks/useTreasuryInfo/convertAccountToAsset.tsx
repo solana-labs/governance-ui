@@ -103,6 +103,7 @@ export const convertAccountToAsset = (
     case AccountType.STAKE:
       return {
         type: AssetType.Stake,
+        id: account.extensions.stake!.stakeAccount.toBase58() + account.type,
         pubkey: account.extensions.stake!.stakeAccount,
         amount: account.extensions.stake!.amount,
         state: account.extensions.stake!.state,

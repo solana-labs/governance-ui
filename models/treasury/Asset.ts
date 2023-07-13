@@ -105,6 +105,7 @@ export interface Stake {
   type: AssetType.Stake
   pubkey: PublicKey
   amount: number
+  id: string
   state: StakeState
   raw: AssetAccount
 }
