@@ -36,6 +36,7 @@ import { POSEIDON_INSTRUCTIONS } from './programs/poseidon'
 import { MANGO_V4_INSTRUCTIONS } from './programs/mangoV4'
 import { DUAL_INSTRUCTIONS } from './programs/dual'
 import { SWITCHBOARD_INSTRUCTIONS } from './programs/switchboard'
+import { STAKE_INSTRUCTIONS } from './programs/stake'
 
 /**
  * Default governance program id instance
@@ -354,6 +355,7 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...POSEIDON_INSTRUCTIONS,
   ...MANGO_V4_INSTRUCTIONS,
   ...DUAL_INSTRUCTIONS,
+  ...STAKE_INSTRUCTIONS,
 }
 
 export async function getInstructionDescriptor(
