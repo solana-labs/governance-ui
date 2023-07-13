@@ -98,6 +98,7 @@ export default function OtherAssetsList(props: Props) {
               return (
                 <StakeListItem
                   key={i}
+                  amount={asset.amount}
                   publicKey={
                     asset.raw.extensions.stake?.stakeAccount &&
                     abbreviateAddress(asset.raw.extensions.stake.stakeAccount!)

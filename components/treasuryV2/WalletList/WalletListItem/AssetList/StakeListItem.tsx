@@ -3,10 +3,12 @@ import cx from 'classnames'
 
 import ListItem from './ListItem'
 import { DesktopComputerIcon } from '@heroicons/react/solid'
+import { abbreviateAddress } from '@utils/formatting'
 
 interface Props {
   className?: string
   selected?: boolean
+  amount: number
   publicKey: string | undefined
   onSelect?(): void
 }
@@ -15,14 +17,13 @@ export default function StakeListItem(props: Props) {
   return (
     <ListItem
       className={props.className}
-      name="Stake Account"
+      name={`Stake Account - ${abbreviateAddress(props.publicKey!)}`}
       rhs={
         <div
           className={cx(
-            'bg-bkg-1',
             'flex',
             'h-6',
-            'items-center',
+
             'justify-center',
             'rounded-full',
             'text-sm',
@@ -30,7 +31,7 @@ export default function StakeListItem(props: Props) {
             'w-24'
           )}
         >
-          <small>{props.publicKey}</small>
+          {props.amount} SOL
         </div>
       }
       selected={props.selected}

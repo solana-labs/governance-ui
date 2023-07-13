@@ -8,7 +8,7 @@ import type {
   TokenOwnerRecord,
 } from '@solana/spl-governance'
 
-import type { AssetAccount } from '@utils/uiTypes/assets'
+import type { AssetAccount, StakeState } from '@utils/uiTypes/assets'
 
 import { NFT } from './NFT'
 import { Program } from './Program'
@@ -103,6 +103,9 @@ export interface Token {
 
 export interface Stake {
   type: AssetType.Stake
+  pubkey: PublicKey
+  amount: number
+  state: StakeState
   raw: AssetAccount
 }
 
