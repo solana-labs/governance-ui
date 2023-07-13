@@ -10,6 +10,7 @@ import {
   Domains,
   Unknown,
   TokenOwnerRecordAsset,
+  Stake,
 } from '@models/treasury/Asset'
 
 export function isToken(asset: Asset): asset is Token {
@@ -34,6 +35,10 @@ export function isPrograms(asset: Asset): asset is Programs {
 
 export function isRealmAuthority(asset: Asset): asset is RealmAuthority {
   return asset.type === AssetType.RealmAuthority
+}
+
+export function isStake(asset: Asset): asset is Stake {
+  return asset.type === AssetType.Stake
 }
 
 export function isSol(asset: Asset): asset is Sol {
