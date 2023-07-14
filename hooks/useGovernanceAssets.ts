@@ -410,7 +410,7 @@ export default function useGovernanceAssets() {
       packageId: PackageEnum.Dual,
     },
     [Instructions.DualFinanceDelegateWithdraw]: {
-      name: 'Withdraw Delegate',
+      name: 'Withdraw Vote Deposit',
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Dual,
     },

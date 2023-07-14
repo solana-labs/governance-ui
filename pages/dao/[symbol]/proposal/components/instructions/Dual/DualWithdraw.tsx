@@ -11,6 +11,9 @@ import { getWithdrawInstruction } from '@utils/instructions/Dual'
 import { getDualFinanceWithdrawSchema } from '@utils/validations'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import Input from '@components/inputs/Input'
+import GovernedAccountSelect from '../../GovernedAccountSelect'
+import Tooltip from '@components/Tooltip'
 
 const DualWithdraw = ({
   index,
@@ -32,7 +35,6 @@ const DualWithdraw = ({
     ProgramAccount<Governance> | undefined
   >(undefined)
   const [formErrors, setFormErrors] = useState({})
-  console.log(shouldBeGoverned, assetAccounts, formErrors)
   const { handleSetInstructions } = useContext(NewProposalContext)
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
@@ -65,8 +67,7 @@ const DualWithdraw = ({
   // if the project doesnt need to change where the tokens get returned to.
   return (
     <>
-      Not implemented
-      {/* <Tooltip content="Identifier for the Staking Option">
+      <Tooltip content="Identifier for the Staking Option">
         <Input
           label="Name"
           value={form.soName}
@@ -107,7 +108,7 @@ const DualWithdraw = ({
           }
           error={formErrors['mintPk']}
         />
-      )} */}
+      )}
     </>
   )
 }
