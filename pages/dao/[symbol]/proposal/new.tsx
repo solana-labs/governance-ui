@@ -117,7 +117,7 @@ import DualAirdrop from './components/instructions/Dual/DualAirdrop'
 import DualWithdraw from './components/instructions/Dual/DualWithdraw'
 import DualExercise from './components/instructions/Dual/DualExercise'
 import DualDelegate from './components/instructions/Dual/DualDelegate'
-import DualDelegateWithdraw from './components/instructions/Dual/DualDelegateWithdraw'
+import DualVoteDepositWithdraw from './components/instructions/Dual/DualVoteDepositWithdraw'
 import DualVoteDeposit from './components/instructions/Dual/DualVoteDeposit'
 import PsyFinanceMintAmericanOptions from './components/instructions/PsyFinance/MintAmericanOptions'
 import IxGateSet from './components/instructions/Mango/MangoV4/IxGateSet'
@@ -428,7 +428,7 @@ const New = () => {
       [Instructions.DualFinanceWithdraw]: DualWithdraw,
       [Instructions.DualFinanceExercise]: DualExercise,
       [Instructions.DualFinanceDelegate]: DualDelegate,
-      [Instructions.DualFinanceDelegateWithdraw]: DualDelegateWithdraw,
+      [Instructions.DualFinanceDelegateWithdraw]: DualVoteDepositWithdraw,
       [Instructions.DualFinanceVoteDeposit]: DualVoteDeposit,
       [Instructions.DualFinanceVote]: DualVote,
       [Instructions.MeanCreateAccount]: MeanCreateAccount,

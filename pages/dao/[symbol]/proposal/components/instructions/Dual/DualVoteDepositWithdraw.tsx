@@ -6,16 +6,13 @@ import {
   DualFinanceDelegateWithdrawForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
-import GovernedAccountSelect from '../../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import Input from '@components/inputs/Input'
 import { getDelegateWithdrawInstruction } from '@utils/instructions/Dual/delegate'
 import { getDualFinanceDelegateWithdrawSchema } from '@utils/validations'
-import Tooltip from '@components/Tooltip'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
-const DualDelegateWithdraw = ({
+const DualVoteDepositWithdraw = ({
   index,
   governance,
 }: {
@@ -39,6 +36,7 @@ const DualDelegateWithdraw = ({
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
+  console.log(shouldBeGoverned, assetAccounts, formErrors, handleSetForm)
   const schema = useMemo(getDualFinanceDelegateWithdrawSchema, [])
   useEffect(() => {
     function getInstruction(): Promise<UiInstruction> {
@@ -71,7 +69,7 @@ const DualDelegateWithdraw = ({
   // if the project doesnt need to change where the tokens get returned to.
   return (
     <>
-      <Input
+      {/* <Input
         label="Realm"
         value={form.realm}
         type="text"
@@ -96,9 +94,10 @@ const DualDelegateWithdraw = ({
           governance={governance}
           type="token"
         ></GovernedAccountSelect>
-      </Tooltip>
+      </Tooltip> */}
+      <div>Not implemented</div>
     </>
   )
 }
 
-export default DualDelegateWithdraw
+export default DualVoteDepositWithdraw
