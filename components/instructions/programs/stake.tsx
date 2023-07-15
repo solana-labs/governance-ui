@@ -29,5 +29,25 @@ export const STAKE_INSTRUCTIONS = {
         )
       },
     },
+    4: {
+      name: 'Stake Program - Withdraw',
+      accounts: [],
+      getDataUI: async (
+        _connection: Connection,
+        _data: Uint8Array,
+        _accounts: AccountMetaData[]
+      ) => {
+        const { lamports } = BufferLayout.struct<any['Withdraw']>([
+          BufferLayout.u32('instruction'),
+          BufferLayout.ns64('lamports'),
+        ]).decode(Buffer.from(_data))
+        return (
+          <>
+            <p>Withdraw amount: {lamports / LAMPORTS_PER_SOL}</p>
+            <p></p>
+          </>
+        )
+      },
+    },
   },
 }
