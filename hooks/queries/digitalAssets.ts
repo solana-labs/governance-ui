@@ -137,7 +137,7 @@ export const useRealmDigitalAssetsQuery = () => {
       const governancePks = governances.map((x) => x.pubkey)
 
       const results = await Promise.all(
-        [...treasuries, ...governancePks].map(async (x, i) => {
+        [...treasuries, ...governancePks].map(async (x) => {
           // https://docs.helius.xyz/solana-compression/digital-asset-standard-das-api/get-assets-by-owner
           const response = await fetch(url, {
             method: 'POST',
