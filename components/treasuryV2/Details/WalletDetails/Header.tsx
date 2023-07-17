@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import cx from 'classnames'
 import { PlusCircleIcon } from '@heroicons/react/outline'
 import { useRouter } from 'next/router'
@@ -8,7 +8,7 @@ import { formatNumber } from '@utils/formatNumber'
 import { NEW_PROGRAM_VIEW } from 'pages/dao/[symbol]/assets'
 import { Wallet } from '@models/treasury/Wallet'
 import { SecondaryButton } from '@components/Button'
-import DepositNFT from '@components/TreasuryAccount/DepositNFTFromWallet'
+import DepositNFTFromWallet from '@components/TreasuryAccount/DepositNFTFromWallet'
 import Modal from '@components/Modal'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
@@ -127,7 +127,7 @@ export default function Header(props: Props) {
           sizeClassName="sm:max-w-3xl"
           onClose={() => setOpenModal(ModalType.None)}
         >
-          <DepositNFT
+          <DepositNFTFromWallet
             additionalBtns={
               <SecondaryButton onClick={() => setOpenModal(ModalType.None)}>
                 Close

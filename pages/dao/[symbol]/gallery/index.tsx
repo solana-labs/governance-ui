@@ -6,7 +6,6 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import ImgWithLoader from '@components/ImgWithLoader'
 import Modal from '@components/Modal'
-import DepositNFT from '@components/TreasuryAccount/DepositNFT'
 import { LinkButton } from '@components/Button'
 import { MdScheduleSend } from 'react-icons/md'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
@@ -15,6 +14,7 @@ import SendNft from '@components/SendNft'
 import { PublicKey } from '@solana/web3.js'
 import { SUPPORT_CNFTS } from '@constants/flags'
 import useFindGovernanceByTreasury from '@hooks/useFindGovernanceByTreasury'
+import DepositNFTFromWallet from '@components/TreasuryAccount/DepositNFTFromWallet'
 
 const Gallery = () => {
   const connection = useLegacyConnectionContext()
@@ -180,7 +180,7 @@ const Gallery = () => {
           onClose={handleCloseModal}
           isOpen={openNftDepositModal}
         >
-          <DepositNFT onClose={handleCloseModal}></DepositNFT>
+          <DepositNFTFromWallet />
         </Modal>
       )}
       {openSendNftsModal && (
