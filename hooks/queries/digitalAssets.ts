@@ -21,6 +21,88 @@ export const digitalAssetsQueryKeys = {
   ],
 }
 
+/*** Here is an example item from the DAS Api, since it's not typed and the docs dont give the full schema.
+ * {
+    "interface": "V1_NFT",
+    "id": "9yPMUjM1GpahXpiojwL9jFnVh4622uaqF6KprWRSTWG8",
+    "content": {
+        "$schema": "https://schema.metaplex.com/nft1.0.json",
+        "json_uri": "https://updg8.com/jsondata/CzUyAtJPrz4xSZCntSN84tfbWjaGVftzgcdiDgWUq6qR",
+        "files": [
+            {
+                "uri": "https://updg8.com/imgdata/CzUyAtJPrz4xSZCntSN84tfbWjaGVftzgcdiDgWUq6qR"
+            }
+        ],
+        "metadata": {
+            "description": "What's up nerds",
+            "name": "Tony with no shirt",
+            "symbol": "TONY"
+        },
+        "links": {
+            "image": "https://updg8.com/imgdata/CzUyAtJPrz4xSZCntSN84tfbWjaGVftzgcdiDgWUq6qR"
+        }
+    },
+    "authorities": [
+        {
+            "address": "2ehTohbzCY9NGVyPktRoJDSNgMLTqtont9uWt5BPaqK2",
+            "scopes": [
+                "full"
+            ]
+        }
+    ],
+    "compression": {
+        "eligible": false,
+        "compressed": true,
+        "data_hash": "6jjJ8EUKDsmbaeBgxXh584zeTdnnLWLi5gAgpxLUwHS8",
+        "creator_hash": "7x1C2W4gC2JmJcYvqJpqsjAJJFFuJgedgiQim5hAcWvo",
+        "asset_hash": "DUn4acgypJU2aLkW4fUmAcHHGvc4BmAUBvxHKDnSPwde",
+        "tree": "8eVM3YWkUjAMMzM57Ysah6wW3wWqdkDwjh536KKrQk3Z",
+        "seq": 32,
+        "leaf_id": 31
+    },
+    "grouping": [
+        {
+            "group_key": "collection",
+            "group_value": "CzUyAtJPrz4xSZCntSN84tfbWjaGVftzgcdiDgWUq6qR"
+        }
+    ],
+    "royalty": {
+        "royalty_model": "creators",
+        "target": null,
+        "percent": 0,
+        "basis_points": 0,
+        "primary_sale_happened": true,
+        "locked": false
+    },
+    "creators": [
+        {
+            "address": "FMJQkroRvWmypYLGaNdvy9T24J4vpb6kj9KTyjtQhXZ8",
+            "share": 100,
+            "verified": true
+        },
+        {
+            "address": "5umCoyU1fMDLs6byXAd97xLydarNV4CKWSCBGQyivcjM",
+            "share": 0,
+            "verified": true
+        }
+    ],
+    "ownership": {
+        "frozen": false,
+        "delegated": false,
+        "delegate": null,
+        "ownership_model": "single",
+        "owner": "DKdBj8KF9sieWq2XWkZVnRPyDrw9PwAHinkCMvjAkRdZ"
+    },
+    "supply": {
+        "print_max_supply": 0,
+        "print_current_supply": 0,
+        "edition_nonce": 0
+    },
+    "mutable": true,
+    "burnt": false
+}
+ */
+
 export const useRealmDigitalAssetsQuery = () => {
   const { connection } = useConnection()
   const realm = useRealmQuery().data?.result
@@ -55,7 +137,7 @@ export const useRealmDigitalAssetsQuery = () => {
       const governancePks = governances.map((x) => x.pubkey)
 
       const results = await Promise.all(
-        [...treasuries, ...governancePks].map(async (x) => {
+        [...treasuries, ...governancePks].map(async (x, i) => {
           // https://docs.helius.xyz/solana-compression/digital-asset-standard-das-api/get-assets-by-owner
           const response = await fetch(url, {
             method: 'POST',
@@ -76,9 +158,9 @@ export const useRealmDigitalAssetsQuery = () => {
           const { result } = await response.json()
           queryClient.setQueryData(
             digitalAssetsQueryKeys.byOwner(connection.rpcEndpoint, x),
-            result.items
+            result.items as any[]
           )
-          return result.items
+          return result.items as any[]
         })
       )
       console.log('results', results)

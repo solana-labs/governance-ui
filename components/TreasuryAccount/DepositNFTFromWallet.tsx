@@ -19,6 +19,7 @@ import { createIx_transferNft } from '@utils/metaplex'
 import { SequenceType, sendTransactionsV3 } from '@utils/sendTransactions'
 import { getNativeTreasuryAddress } from '@solana/spl-governance'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import useGovernanceSelect from '@hooks/useGovernanceSelect'
 
 const useMetaplexDeposit = () => {
   const wallet = useWalletOnePointOh()
@@ -71,6 +72,10 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
 
   const deposit = useMetaplexDeposit()
+
+  const [selectedGovernance, setSelectedGovernance] = useGovernanceSelect(
+    currentAccount?.governance.pubkey
+  )
 
   const handleDeposit = async () => {
     // really these should probably get batched into one TX or whatever.
@@ -132,11 +137,12 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
 
   return (
     <>
-      <NFTAccountSelect
-        onChange={(value) => setCurrentAccount(value, connection)}
-        currentAccount={currentAccount}
-        nftsGovernedTokenAccounts={nftsGovernedTokenAccounts}
-      ></NFTAccountSelect>
+      {selectedGovernance && (
+        <NFTAccountSelect
+          onChange={setSelectedGovernance}
+          selectedGovernance={selectedGovernance}
+        />
+      )}
       <NFTSelector
         ref={nftSelectorRef}
         ownersPk={[wallet!.publicKey!]}

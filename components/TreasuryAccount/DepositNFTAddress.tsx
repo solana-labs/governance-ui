@@ -20,7 +20,6 @@ import { abbreviateAddress } from '@utils/formatting'
 import { DuplicateIcon, ExclamationIcon } from '@heroicons/react/outline'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import DepositLabel from './DepositLabel'
-import NFTAccountSelect from './NFTAccountSelect'
 import ImgWithLoader from '@components/ImgWithLoader'
 import { Metaplex } from '@metaplex-foundation/js'
 import {
@@ -158,11 +157,15 @@ const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
   }, [JSON.stringify(nftMetaData)])
   return (
     <>
+      {
+        /* 
       <NFTAccountSelect
         onChange={(value) => setCurrentAccount(value, connection)}
         currentAccount={currentAccount}
         nftsGovernedTokenAccounts={nftsGovernedTokenAccounts}
-      ></NFTAccountSelect>
+      ></NFTAccountSelect> */
+        // TODO das-fetch-tokens figure out of this component should even exist?
+      }
       <DepositLabel
         transferAddress={currentAccount?.extensions.transferAddress}
       ></DepositLabel>

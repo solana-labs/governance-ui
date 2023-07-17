@@ -1,34 +1,36 @@
 import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
-import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { getRealm, getRealms } from '@solana/spl-governance'
-import { PublicKey } from '@solana/web3.js'
+import { Connection, PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
+import { getNetworkFromEndpoint } from '@utils/connection'
 import asFindable from '@utils/queries/asFindable'
+import queryClient from './queryClient'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 export const realmQueryKeys = {
-  all: (cluster: string) => [cluster, 'Realm'],
-  byPubkey: (cluster: string, k: PublicKey) => [
-    ...realmQueryKeys.all(cluster),
+  all: (endpoint: string) => [endpoint, 'Realm'],
+  byPubkey: (endpoint: string, k: PublicKey) => [
+    ...realmQueryKeys.all(endpoint),
     k.toString(),
   ],
-  byProgram: (cluster: string, program: PublicKey) => [
-    ...realmQueryKeys.all(cluster),
+  byProgram: (endpoint: string, program: PublicKey) => [
+    ...realmQueryKeys.all(endpoint),
     'by Program',
     program,
   ],
 }
 
 export const useRealmsByProgramQuery = (program: PublicKey) => {
-  const connection = useLegacyConnectionContext()
+  const { connection } = useConnection()
 
   const enabled = program !== undefined
   const query = useQuery({
     queryKey: enabled
-      ? realmQueryKeys.byProgram(connection.cluster, program)
+      ? realmQueryKeys.byProgram(connection.rpcEndpoint, program)
       : undefined,
     queryFn: async () => {
       if (!enabled) throw new Error()
-      return getRealms(connection.current, program)
+      return getRealms(connection, program)
     },
     staleTime: 3600000, // 1 hour
     cacheTime: 3600000 * 24 * 10,
@@ -39,17 +41,17 @@ export const useRealmsByProgramQuery = (program: PublicKey) => {
 }
 
 export const useRealmQuery = () => {
-  const connection = useLegacyConnectionContext()
+  const { connection } = useConnection()
   const pubkey = useSelectedRealmPubkey()
 
   const enabled = pubkey !== undefined
   const query = useQuery({
     queryKey: enabled
-      ? realmQueryKeys.byPubkey(connection.cluster, pubkey)
+      ? realmQueryKeys.byPubkey(connection.rpcEndpoint, pubkey)
       : undefined,
     queryFn: async () => {
       if (!enabled) throw new Error()
-      return asFindable(getRealm)(connection.current, pubkey)
+      return asFindable(getRealm)(connection, pubkey)
     },
     staleTime: 3600000, // 1 hour
     cacheTime: 3600000 * 24 * 10,
@@ -57,4 +59,15 @@ export const useRealmQuery = () => {
   })
 
   return query
+}
+
+export const fetchRealmByPubkey = (
+  connection: Connection,
+  pubkey: PublicKey
+) => {
+  const endpoint = getNetworkFromEndpoint(connection.rpcEndpoint)
+  return queryClient.fetchQuery({
+    queryKey: realmQueryKeys.byPubkey(endpoint, pubkey),
+    queryFn: () => asFindable(() => getRealm(connection, pubkey))(),
+  })
 }
