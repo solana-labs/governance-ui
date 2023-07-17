@@ -49,7 +49,9 @@ import clsx from 'clsx'
 const SendNft = ({
   initialNftAndGovernanceSelected,
 }: {
-  initialNftAndGovernanceSelected?: [PublicKey, PublicKey]
+  initialNftAndGovernanceSelected?:
+    | [PublicKey, PublicKey]
+    | [undefined, PublicKey]
 }) => {
   const { connection } = useConnection()
   const realm = useRealmQuery().data?.result
@@ -61,7 +63,9 @@ const SendNft = ({
   const router = useRouter()
 
   const [selectedNfts, setSelectedNfts] = useState<PublicKey[]>(
-    initialNftAndGovernanceSelected ? [initialNftAndGovernanceSelected[0]] : []
+    initialNftAndGovernanceSelected?.[0]
+      ? [initialNftAndGovernanceSelected[0]]
+      : []
   )
   const [selectedGovernance, setSelectedGovernance] = useGovernanceSelect(
     initialNftAndGovernanceSelected?.[1]

@@ -25,7 +25,7 @@ import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 enum ModalType {
   AddAsset,
   DepositNFTs,
-  NewTokenAccount,
+  NewTokenAccount, // this should probably get removed
   None,
 }
 
