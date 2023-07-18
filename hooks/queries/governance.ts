@@ -12,17 +12,17 @@ import {
   VoteThreshold,
   VoteThresholdType,
 } from '@solana/spl-governance'
-import { useRealmQuery } from './realm'
-import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { fetchRealmByPubkey, useRealmQuery } from './realm'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 export const governanceQueryKeys = {
-  all: (cluster: string) => [cluster, 'Governance'],
-  byPubkey: (cluster: string, k: PublicKey) => [
-    ...governanceQueryKeys.all(cluster),
+  all: (endpoint: string) => [endpoint, 'Governance'],
+  byPubkey: (endpoint: string, k: PublicKey) => [
+    ...governanceQueryKeys.all(endpoint),
     k.toString(),
   ],
-  byRealm: (cluster: string, realm: PublicKey) => [
-    ...governanceQueryKeys.all(cluster),
+  byRealm: (endpoint: string, realm: PublicKey) => [
+    ...governanceQueryKeys.all(endpoint),
     'by Realm (gPA)',
     realm,
   ],
@@ -58,17 +58,17 @@ const governanceWithDefaults = (governance: ProgramAccount<Governance>) => {
 
 // Note: I may need to insert some defaults from undefined fields here? or maybe the sdk does it already (that would make sense)
 export const useGovernanceByPubkeyQuery = (pubkey: PublicKey | undefined) => {
-  const connection = useLegacyConnectionContext()
+  const { connection } = useConnection()
 
   const enabled = pubkey !== undefined
   const query = useQuery({
     queryKey: enabled
-      ? governanceQueryKeys.byPubkey(connection.cluster, pubkey)
+      ? governanceQueryKeys.byPubkey(connection.rpcEndpoint, pubkey)
       : undefined,
     queryFn: async () => {
       if (!enabled) throw new Error()
       return asFindable(() =>
-        getGovernance(connection.current, pubkey).then(governanceWithDefaults)
+        getGovernance(connection, pubkey).then(governanceWithDefaults)
       )()
     },
     enabled,
@@ -77,43 +77,60 @@ export const useGovernanceByPubkeyQuery = (pubkey: PublicKey | undefined) => {
   return query
 }
 
+const realmGoverancesQueryFn = async (
+  connection: Connection,
+  realmPk: PublicKey,
+  realmOwner: PublicKey
+) => {
+  const filter = pubkeyFilter(1, realmPk)
+  if (!filter) throw new Error() // unclear why this would ever happen, probably it just cannot
+
+  const results = (
+    await getGovernanceAccounts(connection, realmOwner, Governance, [filter])
+  ).map(governanceWithDefaults)
+
+  results.forEach((x) => {
+    queryClient.setQueryData(
+      governanceQueryKeys.byPubkey(connection.rpcEndpoint, x.pubkey),
+      { found: true, result: x }
+    )
+  })
+
+  return results
+}
+
 export const useRealmGovernancesQuery = () => {
-  const connection = useLegacyConnectionContext()
+  const { connection } = useConnection()
   const realm = useRealmQuery().data?.result
 
   const enabled = realm !== undefined
   const query = useQuery({
     queryKey: enabled
-      ? governanceQueryKeys.byRealm(connection.cluster, realm.pubkey)
+      ? governanceQueryKeys.byRealm(connection.rpcEndpoint, realm.pubkey)
       : undefined,
     queryFn: async () => {
       if (!enabled) throw new Error()
-
-      const filter = pubkeyFilter(1, realm.pubkey)
-      if (!filter) throw new Error() // unclear why this would ever happen, probably it just cannot
-
-      const results = (
-        await getGovernanceAccounts(
-          connection.current,
-          realm.owner,
-          Governance,
-          [filter]
-        )
-      ).map(governanceWithDefaults)
-
-      results.forEach((x) => {
-        queryClient.setQueryData(
-          governanceQueryKeys.byPubkey(connection.cluster, x.pubkey),
-          { found: true, result: x }
-        )
-      })
-
-      return results
+      return realmGoverancesQueryFn(connection, realm.pubkey, realm.owner)
     },
     enabled,
   })
 
   return query
+}
+
+export const fetchRealmGovernances = (
+  connection: Connection,
+  realmPk: PublicKey
+) => {
+  return queryClient.fetchQuery({
+    queryKey: governanceQueryKeys.byRealm(connection.rpcEndpoint, realmPk),
+    staleTime: Infinity,
+    queryFn: async () => {
+      const { result: realm } = await fetchRealmByPubkey(connection, realmPk)
+      if (realm === undefined) throw new Error()
+      return realmGoverancesQueryFn(connection, realmPk, realm.owner)
+    },
+  })
 }
 
 export const fetchGovernanceByPubkey = (

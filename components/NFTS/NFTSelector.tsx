@@ -58,6 +58,7 @@ function NFTSelector(
       setSelected((current) => [...current, nft])
     }
   }
+  // TODO just use DAS
   const handleGetNfts = async () => {
     setIsLoading(true)
     const response = await Promise.all(

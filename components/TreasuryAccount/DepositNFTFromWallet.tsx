@@ -19,6 +19,7 @@ import { createIx_transferNft } from '@utils/metaplex'
 import { SequenceType, sendTransactionsV3 } from '@utils/sendTransactions'
 import { getNativeTreasuryAddress } from '@solana/spl-governance'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import useGovernanceSelect from '@hooks/useGovernanceSelect'
 
 const useMetaplexDeposit = () => {
   const wallet = useWalletOnePointOh()
@@ -71,6 +72,10 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
 
   const deposit = useMetaplexDeposit()
+
+  const [selectedGovernance, setSelectedGovernance] = useGovernanceSelect(
+    currentAccount?.governance.pubkey
+  )
 
   const handleDeposit = async () => {
     // really these should probably get batched into one TX or whatever.
@@ -130,18 +135,25 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [connected, sendingSuccess])
 
+  const walletPk = wallet?.publicKey
+
   return (
     <>
-      <NFTAccountSelect
-        onChange={(value) => setCurrentAccount(value, connection)}
-        currentAccount={currentAccount}
-        nftsGovernedTokenAccounts={nftsGovernedTokenAccounts}
-      ></NFTAccountSelect>
-      <NFTSelector
-        ref={nftSelectorRef}
-        ownersPk={[wallet!.publicKey!]}
-        onNftSelect={(selected) => setSelectedNfts(selected)}
-      ></NFTSelector>
+      {selectedGovernance && (
+        <NFTAccountSelect
+          onChange={setSelectedGovernance}
+          selectedGovernance={selectedGovernance}
+        />
+      )}
+      {walletPk ? (
+        <NFTSelector
+          ref={nftSelectorRef}
+          ownersPk={[walletPk]}
+          onNftSelect={(selected) => setSelectedNfts(selected)}
+        />
+      ) : (
+        'Please connect your wallet'
+      )}
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
         <div className="ml-auto">
           {additionalBtns}

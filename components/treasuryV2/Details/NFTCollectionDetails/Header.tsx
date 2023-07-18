@@ -6,13 +6,13 @@ import { formatNumber } from '@utils/formatNumber'
 import { NFTCollection } from '@models/treasury/Asset'
 import { SecondaryButton } from '@components/Button'
 import Modal from '@components/Modal'
-import SendTokens from '@components/TreasuryAccount/SendTokens'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import Address from '@components/Address'
 
 import NFTCollectionPreviewIcon from '../../icons/NFTCollectionPreviewIcon'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import SendNft from '@components/SendNft'
 
 interface Props {
   className?: string
@@ -100,7 +100,7 @@ export default function Header(props: Props) {
               : undefined
           }
           onClick={() => {
-            setCurrentAccount(nftsGovernedTokenAccounts[0], connection)
+            setCurrentAccount(nftsGovernedTokenAccounts[0], connection) // this does nothing desireable ?
             setSendNFTsModalOpen(true)
           }}
         >
@@ -116,7 +116,7 @@ export default function Header(props: Props) {
           sizeClassName="sm:max-w-3xl"
           onClose={() => setSendNFTsModalOpen(false)}
         >
-          <SendTokens isNft />
+          <SendNft />
         </Modal>
       )}
     </div>

@@ -9,10 +9,9 @@ import { PublicKey } from '@solana/web3.js'
 import { abbreviateAddress, fmtUnixTime } from '@utils/formatting'
 import BN from 'bn.js'
 import { useRouter } from 'next/router'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import AccountHeader from './AccountHeader'
-import DepositNFT from './DepositNFT'
 import SendTokens from './SendTokens'
 import {
   ExternalLinkIcon,
@@ -80,7 +79,6 @@ const AccountOverview = () => {
   const isLoadingRecentActivity = useTreasuryAccountStore(
     (s) => s.isLoadingRecentActivity
   )
-  const [openNftDepositModal, setOpenNftDepositModal] = useState(false)
   const [openCommonSendModal, setOpenCommonSendModal] = useState(false)
   const [openMsolConvertModal, setOpenMsolConvertModal] = useState(false)
   const [openStSolConvertModal, setOpenStSolConvertModal] = useState(false)
@@ -385,14 +383,12 @@ const AccountOverview = () => {
           <Button
             className="w-full max-w-lg"
             onClick={() =>
-              isNFT
-                ? setOpenNftDepositModal(true)
-                : handleCopyAddress(
-                    currentAccount?.extensions.transferAddress!.toBase58()
-                  )
+              handleCopyAddress(
+                currentAccount?.extensions.transferAddress!.toBase58()
+              )
             }
           >
-            {isNFT ? 'Deposit' : 'Copy Deposit Address'}
+            Copy Deposit Address
           </Button>
         </div>
         {!isAuxiliaryAccount && (
@@ -534,21 +530,6 @@ const AccountOverview = () => {
           strategyName={proposedInvestment.strategyName}
           createProposalFcn={proposedInvestment.createProposalFcn}
         />
-      )}
-      {openNftDepositModal && (
-        <Modal
-          sizeClassName="sm:max-w-3xl"
-          onClose={() => {
-            setOpenNftDepositModal(false)
-          }}
-          isOpen={openNftDepositModal}
-        >
-          <DepositNFT
-            onClose={() => {
-              setOpenNftDepositModal(false)
-            }}
-          ></DepositNFT>
-        </Modal>
       )}
       {openCommonSendModal && (
         <Modal

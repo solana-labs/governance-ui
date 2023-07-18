@@ -174,8 +174,7 @@ export async function getTransferNftInstruction({
   toOwner,
   connection,
   ataCreationPayer,
-  currentAccount,
-  nftMint,
+  mint,
   assetAccount,
   programId,
 }: {
@@ -183,11 +182,9 @@ export async function getTransferNftInstruction({
   programId: PublicKey
   connection: ConnectionContext
   ataCreationPayer: PublicKey
-  currentAccount: AssetAccount
-  nftMint: string
+  mint: PublicKey
   assetAccount: AssetAccount
-}): Promise<UiInstruction> {
-  const mint = new PublicKey(nftMint)
+}) {
   //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
 
   const destinationAtaPk = await Token.getAssociatedTokenAddress(
@@ -218,7 +215,6 @@ export async function getTransferNftInstruction({
   return {
     serializedInstruction: serializeInstructionToBase64(transferIx),
     isValid: true,
-    governance: currentAccount.governance,
     prerequisiteInstructions:
       destinationAtaQueried === null
         ? [
