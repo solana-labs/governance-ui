@@ -23,7 +23,7 @@ import {
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
 
-export interface RealmConfigForm {
+interface RealmConfigForm {
   governedAccount: AssetAccount | undefined
   minCommunityTokensToCreateGovernance: number
   communityVoterWeightAddin: string

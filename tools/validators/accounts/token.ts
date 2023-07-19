@@ -1,7 +1,5 @@
 // Copied from Explorer code https://github.com/solana-labs/solana/blob/master/explorer/src/validators/accounts/token.ts
 
-import { PublicKey } from '@solana/web3.js'
-import { TokenProgramAccount, TokenAccount } from '@utils/tokens'
 import {
   Infer,
   number,
@@ -34,12 +32,3 @@ export const TokenAccountInfo = type({
   delegatedAmount: optional(TokenAmount),
   closeAuthority: optional(PublicKeyFromString),
 })
-
-export function validateTokenAccountMint(
-  tokenAccount: TokenProgramAccount<TokenAccount>,
-  mint: PublicKey | undefined
-) {
-  if (mint && tokenAccount.account.mint.toBase58() !== mint.toBase58()) {
-    throw new Error("Account mint doesn't match source account")
-  }
-}
