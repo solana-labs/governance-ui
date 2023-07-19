@@ -1,8 +1,8 @@
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import { useRealmDigitalAssetsQuery } from '@hooks/queries/digitalAssets'
 import useQueryContext from '@hooks/useQueryContext'
-import { useRouter } from 'next-router-mock'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 
 const NFTSCompactWrapper = () => {
