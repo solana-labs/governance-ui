@@ -28,7 +28,7 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
-export interface CloseTokenAccountForm {
+interface CloseTokenAccountForm {
   governedAccount: AssetAccount | undefined
   fundsDestinationAccount: string
   solRentDestination: string

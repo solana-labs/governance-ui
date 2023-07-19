@@ -7,7 +7,7 @@ import {
 import { PROGRAM_ID as HELIUM_VSR_PROGRAM_ID } from '@helium/voter-stake-registry-sdk'
 import { NAME_PROGRAM_ID } from '@bonfida/spl-name-service'
 
-export const GOVERNANCE_PROGRAM_NAMES = {
+const GOVERNANCE_PROGRAM_NAMES = {
   GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J: 'Mango Governance Program',
   FP4PxqHTVzeG2c6eZd7974F9WvKUSdBeduUK3rjYyvBw: 'Mango v4 Program Governance ',
   AVoAYTs36yB5izAaBkxRG67wL1AMwG3vo41hKtUSb8is:
@@ -30,7 +30,7 @@ export const GOVERNANCE_PROGRAM_NAMES = {
 }
 
 // Well known program names displayed on the instruction card
-export const PROGRAM_NAMES = {
+const PROGRAM_NAMES = {
   TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA: 'Token Program',
   ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL: 'ATA Program',
   '11111111111111111111111111111111': 'System Program',
@@ -70,7 +70,7 @@ export const PROGRAM_NAMES = {
   ...GOVERNANCE_PROGRAM_NAMES,
 }
 
-export const NATIVE_SOLANA_PROGRAMS = {
+const NATIVE_SOLANA_PROGRAMS = {
   //Token
   TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA: '',
   '11111111111111111111111111111111': '',

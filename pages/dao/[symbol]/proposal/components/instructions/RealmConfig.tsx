@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import {
   createSetRealmConfig,
   Governance,
@@ -27,7 +27,7 @@ import { useRealmQuery } from '@hooks/queries/realm'
 import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 
-export interface RealmConfigForm {
+interface RealmConfigForm {
   governedAccount: AssetAccount | undefined
   minCommunityTokensToCreateGovernance: number
   communityVoterWeightAddin: string
