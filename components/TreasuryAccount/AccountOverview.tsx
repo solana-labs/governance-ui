@@ -9,7 +9,7 @@ import { PublicKey } from '@solana/web3.js'
 import { abbreviateAddress, fmtUnixTime } from '@utils/formatting'
 import BN from 'bn.js'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import AccountHeader from './AccountHeader'
 import SendTokens from './SendTokens'
@@ -43,6 +43,7 @@ import {
   useUserCouncilTokenOwnerRecord,
 } from '@hooks/queries/tokenOwnerRecord'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { useRealmDigitalAssetsQuery } from '@hooks/queries/digitalAssets'
 
 type InvestmentType = TreasuryStrategy & {
   investedAmount: number
@@ -58,11 +59,24 @@ const AccountOverview = () => {
     auxiliaryTokenAccounts,
   } = useGovernanceAssets()
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
-  const nftsPerPubkey = useTreasuryAccountStore((s) => s.governanceNfts)
-  const nftsCount =
-    currentAccount?.governance && currentAccount.isNft
-      ? nftsPerPubkey[currentAccount?.governance?.pubkey.toBase58()]?.length
-      : 0
+  const { data: nfts } = useRealmDigitalAssetsQuery()
+  const nftsCount = useMemo(
+    () =>
+      nfts
+        ?.flat()
+        .filter(
+          (x) =>
+            x.ownership.owner ===
+              currentAccount?.governance.pubkey.toString() ||
+            x.ownership.owner ===
+              currentAccount?.extensions.transferAddress?.toString()
+        ).length ?? 0,
+    [
+      currentAccount?.extensions.transferAddress,
+      currentAccount?.governance.pubkey,
+      nfts,
+    ]
+  )
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
   const isNFT = currentAccount?.isNft

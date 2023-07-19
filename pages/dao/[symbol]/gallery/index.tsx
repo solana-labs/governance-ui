@@ -2,8 +2,6 @@ import { getExplorerUrl } from '@components/explorer/tools'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import { useMemo, useState } from 'react'
 import { PhotographIcon, PlusCircleIcon } from '@heroicons/react/outline'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import ImgWithLoader from '@components/ImgWithLoader'
 import Modal from '@components/Modal'
 import { LinkButton } from '@components/Button'
@@ -18,8 +16,6 @@ import DepositNFTFromWallet from '@components/TreasuryAccount/DepositNFTFromWall
 
 const Gallery = () => {
   const connection = useLegacyConnectionContext()
-  const { nftsGovernedTokenAccounts } = useGovernanceAssets()
-  const { setCurrentAccount } = useTreasuryAccountStore()
   const [openNftDepositModal, setOpenNftDepositModal] = useState(false)
   const [openSendNftsModal, setOpenSendNftsModal] = useState(false)
   const [
@@ -56,7 +52,6 @@ const Gallery = () => {
                 <LinkButton
                   onClick={() => {
                     setSelectedNftAndItsGovernance(undefined)
-                    setCurrentAccount(nftsGovernedTokenAccounts[0], connection)
                     setOpenSendNftsModal(true)
                   }}
                   className="flex items-center text-primary-light whitespace-nowrap mr-3"
@@ -66,7 +61,6 @@ const Gallery = () => {
                 </LinkButton>
                 <LinkButton
                   onClick={() => {
-                    setCurrentAccount(nftsGovernedTokenAccounts[0], connection)
                     setOpenNftDepositModal(true)
                   }}
                   className="flex items-center text-primary-light whitespace-nowrap"

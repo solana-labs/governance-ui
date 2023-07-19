@@ -4,14 +4,29 @@ import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
 import BigNumber from 'bignumber.js'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import BaseAccountHeader from './BaseAccountHeader'
+import { useRealmDigitalAssetsQuery } from '@hooks/queries/digitalAssets'
+import { useMemo } from 'react'
 
 const AccountHeader = () => {
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
-  const nftsPerPubkey = useTreasuryAccountStore((s) => s.governanceNfts)
-  const nftsCount =
-    currentAccount?.governance && currentAccount.isNft
-      ? nftsPerPubkey[currentAccount?.governance?.pubkey.toBase58()]?.length
-      : 0
+  const { data: nfts } = useRealmDigitalAssetsQuery()
+  const nftsCount = useMemo(
+    () =>
+      nfts
+        ?.flat()
+        .filter(
+          (x) =>
+            x.ownership.owner ===
+              currentAccount?.governance.pubkey.toString() ||
+            x.ownership.owner ===
+              currentAccount?.extensions.transferAddress?.toString()
+        ).length ?? 0,
+    [
+      currentAccount?.extensions.transferAddress,
+      currentAccount?.governance.pubkey,
+      nfts,
+    ]
+  )
   const isNFT = currentAccount?.isNft
   const tokenInfo = useTreasuryAccountStore((s) => s.tokenInfo)
   const amount =

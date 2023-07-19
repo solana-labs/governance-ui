@@ -1,11 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import Button from '@components/Button'
 import Tooltip from '@components/Tooltip'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
 import { PublicKey } from '@solana/web3.js'
 import NFTSelector, { NftSelectorFunctions } from '@components/NFTS/NFTSelector'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import NFTAccountSelect from './NFTAccountSelect'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { notify } from '@utils/notifications'
@@ -20,6 +19,9 @@ import { SequenceType, sendTransactionsV3 } from '@utils/sendTransactions'
 import { getNativeTreasuryAddress } from '@solana/spl-governance'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import useGovernanceSelect from '@hooks/useGovernanceSelect'
+import queryClient from '@hooks/queries/queryClient'
+import { digitalAssetsQueryKeys } from '@hooks/queries/digitalAssets'
+import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
 
 const useMetaplexDeposit = () => {
   const wallet = useWalletOnePointOh()
@@ -62,14 +64,12 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
   const nftSelectorRef = useRef<NftSelectorFunctions>(null)
   const { setCurrentAccount } = useTreasuryAccountStore()
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
-  const { getNfts } = useTreasuryAccountStore()
   const [selectedNfts, setSelectedNfts] = useState<NFTWithMint[]>([])
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const connection = useLegacyConnectionContext()
   const [isLoading, setIsLoading] = useState(false)
-  const [sendingSuccess, setSendingSuccess] = useState(false)
-  const { nftsGovernedTokenAccounts } = useGovernanceAssets()
+  const realmPk = useSelectedRealmPubkey()
 
   const deposit = useMetaplexDeposit()
 
@@ -83,7 +83,6 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
 
     for (const nft of selectedNfts) {
       setIsLoading(true)
-      setSendingSuccess(false)
 
       const owner = currentAccount.isSol
         ? currentAccount.extensions.transferAddress!
@@ -111,7 +110,16 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
       }
 
       await deposit(new PublicKey(nft.mintAddress))
-        .then(() => setSendingSuccess(true))
+        .then(() => {
+          setCurrentAccount(currentAccount!, connection)
+          realmPk &&
+            queryClient.invalidateQueries(
+              digitalAssetsQueryKeys.byRealm(
+                connection.current.rpcEndpoint,
+                realmPk
+              )
+            )
+        })
         .catch((e) => {
           notify({
             type: 'error',
@@ -123,17 +131,9 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
       setIsLoading(false)
     }
 
+    // high odds this does nothing at all
     nftSelectorRef.current?.handleGetNfts()
-    // @asktree: as far as I can tell this doesn't have the effect of refreshing any queries properly
-    getNfts(nftsGovernedTokenAccounts, connection)
   }
-
-  useEffect(() => {
-    if (sendingSuccess) {
-      setCurrentAccount(currentAccount!, connection)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [connected, sendingSuccess])
 
   const walletPk = wallet?.publicKey
 

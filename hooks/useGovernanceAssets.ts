@@ -120,11 +120,6 @@ export default function useGovernanceAssets() {
   const governedNativeAccounts = governedTokenAccounts.filter(
     (x) => x.type === AccountType.SOL
   )
-  const nftsGovernedTokenAccounts = governedTokenAccounts.filter(
-    (govTokenAcc) =>
-      govTokenAcc.type === AccountType.NFT ||
-      govTokenAcc.type === AccountType.SOL
-  )
   const canUseTokenTransferInstruction = governedTokenAccountsWithoutNfts.some(
     (acc) => {
       const governance = governancesArray.find(
@@ -879,42 +874,21 @@ export default function useGovernanceAssets() {
     )
   }
 
-  return useMemo(
-    () => ({
-      assetAccounts,
-      auxiliaryTokenAccounts,
-      availableInstructions,
-      availablePackages,
-      canMintRealmCouncilToken,
-      canUseAuthorityInstruction,
-      canUseMintInstruction,
-      canUseProgramUpgradeInstruction,
-      canUseTransferInstruction,
-      getPackageTypeById,
-      governancesArray,
-      governedNativeAccounts,
-      governedSPLTokenAccounts,
-      governedTokenAccounts,
-      governedTokenAccountsWithoutNfts,
-      nftsGovernedTokenAccounts,
-    }),
-    [
-      assetAccounts,
-      auxiliaryTokenAccounts,
-      availableInstructions,
-      availablePackages,
-      canMintRealmCouncilToken,
-      canUseAuthorityInstruction,
-      canUseMintInstruction,
-      canUseProgramUpgradeInstruction,
-      canUseTransferInstruction,
-      getPackageTypeById,
-      governancesArray,
-      governedNativeAccounts,
-      governedSPLTokenAccounts,
-      governedTokenAccounts,
-      governedTokenAccountsWithoutNfts,
-      nftsGovernedTokenAccounts,
-    ]
-  )
+  return {
+    assetAccounts,
+    auxiliaryTokenAccounts,
+    availableInstructions,
+    availablePackages,
+    canMintRealmCouncilToken,
+    canUseAuthorityInstruction,
+    canUseMintInstruction,
+    canUseProgramUpgradeInstruction,
+    canUseTransferInstruction,
+    getPackageTypeById,
+    governancesArray,
+    governedNativeAccounts,
+    governedSPLTokenAccounts,
+    governedTokenAccounts,
+    governedTokenAccountsWithoutNfts,
+  }
 }
