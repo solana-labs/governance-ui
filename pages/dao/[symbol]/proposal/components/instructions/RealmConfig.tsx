@@ -36,6 +36,9 @@ interface RealmConfigForm {
   communityMintSupplyFactor: number
 }
 
+/** @deprecated
+ *  This is the less maintained way to do the same thing in the wallet and assets view. rather than editing it, just kill it probably
+ * */
 const RealmConfig = ({
   index,
   governance,
