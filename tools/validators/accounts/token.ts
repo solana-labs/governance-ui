@@ -11,7 +11,6 @@ import {
 } from 'superstruct'
 import { PublicKeyFromString } from '../pubkey'
 
-export type TokenAccountState = Infer<typeof AccountState>
 const AccountState = enums(['initialized', 'uninitialized', 'frozen'])
 
 const TokenAmount = type({
@@ -21,7 +20,7 @@ const TokenAmount = type({
 })
 
 export type TokenAccountInfo = Infer<typeof TokenAccountInfo>
-export const TokenAccountInfo = type({
+const TokenAccountInfo = type({
   mint: PublicKeyFromString,
   owner: PublicKeyFromString,
   tokenAmount: TokenAmount,
