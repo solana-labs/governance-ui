@@ -1,4 +1,4 @@
-import { PublicKey } from '@solana/web3.js'
+import { Connection, PublicKey } from '@solana/web3.js'
 import { useRealmGovernancesQuery } from './governance'
 import { useQuery } from '@tanstack/react-query'
 import { useRealmQuery } from './realm'
@@ -6,9 +6,15 @@ import { useConnection } from '@solana/wallet-adapter-react'
 import { useRouter } from 'next/router'
 import { getNativeTreasuryAddress } from '@solana/spl-governance'
 import queryClient from './queryClient'
+import { getNetworkFromEndpoint } from '@utils/connection'
 
 export const digitalAssetsQueryKeys = {
   all: (endpoint: string) => [endpoint, 'DigitalAssets'],
+  byId: (endpoint: string, id: PublicKey) => [
+    ...digitalAssetsQueryKeys.all(endpoint),
+    'by Id',
+    id.toString(),
+  ],
   byOwner: (endpoint: string, owner: PublicKey) => [
     ...digitalAssetsQueryKeys.all(endpoint),
     'by Owner',
@@ -102,6 +108,41 @@ export const digitalAssetsQueryKeys = {
     "burnt": false
 }
  */
+
+export const dasByIdQueryFn = async (connection: Connection, id: PublicKey) => {
+  const cluster = getNetworkFromEndpoint(connection.rpcEndpoint)
+  const url =
+    cluster === 'devnet'
+      ? process.env.NEXT_PUBLIC_HELIUS_DEVNET_RPC
+      : process.env.NEXT_PUBLIC_HELIUS_MAINNET_RPC
+  if (url === undefined)
+    throw new Error(
+      `Helius RPC endpoint not set in env: ${
+        cluster === 'devnet'
+          ? 'NEXT_PUBLIC_HELIUS_DEVNET_RPC'
+          : 'NEXT_PUBLIC_HELIUS_MAINNET_RPC'
+      }`
+    )
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      id: 'Realms user',
+      method: 'getAsset',
+      params: {
+        id: id.toString(),
+      },
+    }),
+  })
+
+  const x = await response.json()
+  if (x.error) return { found: false, result: undefined, err: x.error }
+  return { result: x.result, found: true }
+}
 
 export const useRealmDigitalAssetsQuery = () => {
   const { connection } = useConnection()
