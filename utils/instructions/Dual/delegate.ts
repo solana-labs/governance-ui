@@ -1,5 +1,6 @@
 import {
   getGovernanceProgramVersion,
+  getTokenOwnerRecord,
   getTokenOwnerRecordAddress,
   serializeInstructionToBase64,
   withCreateTokenOwnerRecord,
@@ -155,6 +156,12 @@ export async function getVoteDepositInstruction({
       form.delegateToken.extensions.mint.publicKey,
       daoWallet
     )
+    let isExisintgTokenOwnerRecord = false
+    try {
+      await getTokenOwnerRecord(connection.current, tokenOwnerRecordAddress)
+      isExisintgTokenOwnerRecord = true
+      // eslint-disable-next-line no-empty
+    } catch (e) {}
 
     const lockUpPeriodInDays = 0
     const lockupKind = 'none'
@@ -167,7 +174,6 @@ export async function getVoteDepositInstruction({
     const vsrClient = await VsrClient.connect(provider, DEFAULT_VSR_ID)
     const systemProgram = SystemProgram.programId
     const clientProgramId = vsrClient!.program.programId
-    let tokenOwnerRecordPubKey = tokenOwnerRecordAddress
 
     const { registrar } = await getRegistrarPDA(
       realmPk,
@@ -195,8 +201,8 @@ export async function getVoteDepositInstruction({
     )
 
     //spl governance tokenownerrecord pubkey
-    if (!tokenOwnerRecordPubKey) {
-      tokenOwnerRecordPubKey = await withCreateTokenOwnerRecord(
+    if (!isExisintgTokenOwnerRecord) {
+      await withCreateTokenOwnerRecord(
         prerequisiteInstructions,
         govProgramId,
         programVersion,
