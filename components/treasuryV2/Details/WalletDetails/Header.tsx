@@ -37,7 +37,7 @@ interface Props {
 export default function Header(props: Props) {
   const [openModal, setOpenModal] = useState<ModalType>(ModalType.None)
   const { fmtUrlWithCluster } = useQueryContext()
-  const { assetAccounts, nftsGovernedTokenAccounts } = useGovernanceAssets()
+  const { assetAccounts } = useGovernanceAssets()
   const { setCurrentAccount } = useTreasuryAccountStore()
   const { symbol } = useRealm()
   const connection = useLegacyConnectionContext()
@@ -94,6 +94,9 @@ export default function Header(props: Props) {
           onAddTokenAccount={() => setOpenModal(ModalType.NewTokenAccount)}
           onClose={() => setOpenModal(ModalType.None)}
           onDepositNFTsSelected={async () => {
+            // @asktree is really not sure whats going on here, but it should probably not exist anymore?
+            // we used to have a much weirder process for depositing nfts
+
             let account: AssetAccount | undefined
 
             for (const acc of assetAccounts) {
@@ -113,9 +116,9 @@ export default function Header(props: Props) {
 
             if (account) {
               setCurrentAccount(account, connection)
-            } else if (nftsGovernedTokenAccounts[0]) {
+            } /* else if (nftsGovernedTokenAccounts[0]) {
               setCurrentAccount(nftsGovernedTokenAccounts[0], connection)
-            }
+            } */
 
             setOpenModal(ModalType.DepositNFTs)
           }}
