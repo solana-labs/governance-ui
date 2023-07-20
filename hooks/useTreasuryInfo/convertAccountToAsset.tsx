@@ -8,8 +8,8 @@ import { WSOL_MINT } from '@components/instructions/tools'
 import { abbreviateAddress } from '@utils/formatting'
 
 import { getAccountAssetCount } from './getAccountAssetCount'
-import { getAccountValue } from './getAccountValue'
 import { getJupiterPriceSync } from '@hooks/queries/jupiterPrice'
+import { getAccountValue, getStakeAccountValue } from './getAccountValue'
 
 export const convertAccountToAsset = (
   account: AssetAccount,
@@ -104,6 +104,7 @@ export const convertAccountToAsset = (
         amount: account.extensions.stake!.amount,
         state: account.extensions.stake!.state,
         raw: account,
+        value: getStakeAccountValue(account),
       }
     case AccountType.PROGRAM:
       throw new Error('Handle Programs separately')

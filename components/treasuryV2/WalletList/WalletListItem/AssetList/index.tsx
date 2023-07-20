@@ -128,7 +128,7 @@ export default function AssetList(props: Props) {
       }
       setTokens(newTokens)
     }
-    if (data) {
+    if (data && data?.length) {
       getTokenData()
     }
   }, [tokensFromProps, data])
