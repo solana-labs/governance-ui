@@ -126,6 +126,7 @@ export const ACCOUNT_NAMES = {
   '4i2Yjk5bUiLeVNwqBpkRdFSECSCvMgKoeCSdRSx1TPcz': 'DAO: Rewards (PHY)',
   EUkYhtkRmxQpnKTvGayBJM3Pt1FQNjaMWP3UCUb38hJN: 'DAO: Grants (PHY)',
   '3XwmcRf9R6TFqCwhLkftur8Baq45ZYE7DQDj9WUAPsmN': 'DAO: Governance (PHY)',
+  '8z7gPvwC8bs1vRc4e4bxPnkKpdY1L4UHyueHfzSecf19' : 'DAO: SmartSpot Allocation (ASTRALIS)',
 
   '6Va7K51FRbnPcYZTUwkoFfoYtnfh8qyJaZqT4W1GGxVi': 'Physis EcoSystem Treasury',
   C2KKuAq4UaUFYtm3zcxZMSDUuSEfPSk4yLcq5XaBr4wM: 'EcoSystem: Development (PHY)',
