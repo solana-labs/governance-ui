@@ -66,6 +66,14 @@ export const fetchJupiterPrice = async (mint: PublicKey) =>
     queryFn: () => jupQueryFn(mint),
   })
 
+/**
+ * @deprecated
+ * do not use this! it only exists to replace a previously existing synchronous function. use fetchJupiterPrice
+ * */
+export const getJupiterPriceSync = (mint: PublicKey) =>
+  ((queryClient.getQueryData(jupiterPriceQueryKeys.byMint(mint)) as any)?.result
+    ?.price as number) ?? 0
+
 export const useJupiterPricesByMintsQuery = (mints: PublicKey[]) => {
   const enabled = mints.length > 0
   return useQuery({
