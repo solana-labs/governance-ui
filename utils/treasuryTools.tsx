@@ -6,7 +6,6 @@ import BigNumber from 'bignumber.js'
 import { abbreviateAddress } from './formatting'
 import tokenPriceService from './services/tokenPrice'
 import { AccountType, AssetAccount } from './uiTypes/assets'
-import { getJupiterPriceSync } from '@hooks/queries/jupiterPrice'
 
 export const getTreasuryAccountItemInfoV2 = (account: AssetAccount) => {
   const mintAddress =
@@ -25,7 +24,7 @@ export const getTreasuryAccountItemInfoV2 = (account: AssetAccount) => {
           )
         ).toNumber()
       : 0
-  const price = getJupiterPriceSync(new PublicKey(mintAddress!)) // Update to fetchJupiterPrice ASAP, this is a race condition
+  const price = tokenPriceService.getUSDTokenPrice(mintAddress!)
   const totalPrice = amount * price
   const totalPriceFormatted = amount
     ? new BigNumber(totalPrice).toFormat(0)

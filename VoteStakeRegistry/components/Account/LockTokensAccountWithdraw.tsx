@@ -41,7 +41,6 @@ import {
 } from '@hooks/queries/mintInfo'
 import { useConnection } from '@solana/wallet-adapter-react'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
-import { getJupiterPriceSync } from '@hooks/queries/jupiterPrice'
 
 interface DepositBox {
   mintPk: PublicKey
@@ -340,7 +339,8 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
                       getMintDecimalAmountFromNatural(
                         x.mint,
                         x.currentAmount
-                      ).toNumber() * getJupiterPriceSync(x.mintPk) // this is a race condition
+                      ).toNumber() *
+                      tokenPriceService.getUSDTokenPrice(x.mintPk.toBase58())
                     const tokenName =
                       getMintMetadata(x.mintPk)?.name ||
                       tokenPriceService.getTokenInfo(x.mintPk.toBase58())

@@ -43,7 +43,6 @@ import {
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
 import { useConnection } from '@solana/wallet-adapter-react'
-import { getJupiterPriceSync } from '@hooks/queries/jupiterPrice'
 
 interface DepositBox {
   mintPk: PublicKey
@@ -307,7 +306,8 @@ const LockTokensAccount: React.FC<{
                       getMintDecimalAmountFromNatural(
                         x.mint,
                         x.currentAmount
-                      ).toNumber() * getJupiterPriceSync(x.mintPk)
+                      ).toNumber() *
+                      tokenPriceService.getUSDTokenPrice(x.mintPk.toBase58())
                     const tokenName =
                       getMintMetadata(x.mintPk)?.name ||
                       tokenPriceService.getTokenInfo(x.mintPk.toBase58())
