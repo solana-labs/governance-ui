@@ -108,6 +108,7 @@ export interface Stake {
   id: string
   state: StakeState
   raw: AssetAccount
+  value: BigNumber
 }
 
 export interface Unknown {
