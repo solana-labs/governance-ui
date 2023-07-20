@@ -1,9 +1,11 @@
 import React from 'react'
-import cx from 'classnames'
 
 import ListItem from './ListItem'
 import { DesktopComputerIcon } from '@heroicons/react/solid'
 import { abbreviateAddress } from '@utils/formatting'
+import { formatNumber } from '@utils/formatNumber'
+import tokenPriceService from '@utils/services/tokenPrice'
+import { WSOL_MINT } from '@components/instructions/tools'
 
 interface Props {
   className?: string
@@ -14,24 +16,24 @@ interface Props {
 }
 
 export default function StakeListItem(props: Props) {
+  const price = tokenPriceService.getUSDTokenPrice(WSOL_MINT)
   return (
     <ListItem
       className={props.className}
       name={`Stake Account - ${abbreviateAddress(props.publicKey!)}`}
       rhs={
-        <div
-          className={cx(
-            'flex',
-            'h-6',
-
-            'justify-center',
-            'rounded-full',
-            'text-sm',
-            'text-white',
-            'w-24'
+        <div className="flex items-end flex-col">
+          <div className="flex items-center space-x-1">
+            <div className="text-xs text-fgd-1 font-bold">
+              {formatNumber(props.amount)}
+            </div>
+            <div className="text-xs text-fgd-1">SOL</div>
+          </div>
+          {price && (
+            <div className="text-xs text-white/50">
+              ${formatNumber(props.amount * price)}
+            </div>
           )}
-        >
-          {props.amount} SOL
         </div>
       }
       selected={props.selected}

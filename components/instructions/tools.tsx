@@ -292,12 +292,8 @@ const HIDDEN_MNGO_TREASURES = [
 //owner and desired accounts we want to show
 const MNGO_AUXILIARY_TOKEN_ACCOUNTS = [
   {
-    owner: '9BVcYqEQxyccuwznvxXqDkSJFavvTyheiTYk231T1A8S',
-    accounts: ['59BEyxwrFpt3x4sZ7TcXC3bHx3seGfqGkATcDx6siLWy'],
-  },
-  {
-    owner: 'GHsErpcUbwiw1eci65HCDQzySKwQCxYRi5MrGeGpq5dn',
-    accounts: ['8tKwcKM4obpoPmTZNZKDt5cCkAatrwHBNteXNrZRvjWj'],
+    owner: '58apybWwtWwgVfARs7uJ75Vs1csPimnCCFth7cKwTJAe',
+    accounts: ['DiSDgMz4DeNKHXkpqUGoukr1YM9xxc1wH9gusZnMa1ga'],
   },
 ]
 
@@ -364,7 +360,10 @@ export async function getInstructionDescriptor(
   realm?: ProgramAccount<Realm> | undefined
 ) {
   let descriptors: any
-  if (realm && instruction.programId.equals(realm.owner)) {
+  if (
+    (realm && instruction.programId.equals(realm.owner)) ||
+    instruction.programId.equals(new PublicKey(DEFAULT_GOVERNANCE_PROGRAM_ID))
+  ) {
     descriptors =
       GOVERNANCE_INSTRUCTIONS['GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw']
   } else {
