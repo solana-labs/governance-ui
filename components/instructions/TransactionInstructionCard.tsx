@@ -18,6 +18,7 @@ import {
   dasByIdQueryFn,
   digitalAssetsQueryKeys,
 } from '@hooks/queries/digitalAssets'
+import { getNetworkFromEndpoint } from '@utils/connection'
 
 const TransactionInstructionCard = ({
   instructionData,
@@ -57,12 +58,12 @@ const TransactionInstructionCard = ({
     )?.isSol
 
     if (mint) {
+      const network = getNetworkFromEndpoint(connection.current.rpcEndpoint)
+      if (network === 'localnet') throw new Error()
+
       const { result: nft } = await queryClient.fetchQuery({
-        queryKey: digitalAssetsQueryKeys.byId(
-          connection.current.rpcEndpoint,
-          mint
-        ),
-        queryFn: () => dasByIdQueryFn(connection.current, mint),
+        queryKey: digitalAssetsQueryKeys.byId(network, mint),
+        queryFn: () => dasByIdQueryFn(network, mint),
         staleTime: Infinity,
       })
       if (nft !== undefined) {

@@ -22,6 +22,7 @@ import useGovernanceSelect from '@hooks/useGovernanceSelect'
 import queryClient from '@hooks/queries/queryClient'
 import { digitalAssetsQueryKeys } from '@hooks/queries/digitalAssets'
 import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
+import { getNetworkFromEndpoint } from '@utils/connection'
 
 const useMetaplexDeposit = () => {
   const wallet = useWalletOnePointOh()
@@ -112,12 +113,12 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
       await deposit(new PublicKey(nft.mintAddress))
         .then(() => {
           setCurrentAccount(currentAccount!, connection)
+
+          const network = getNetworkFromEndpoint(connection.current.rpcEndpoint)
           realmPk &&
+            network !== 'localnet' &&
             queryClient.invalidateQueries(
-              digitalAssetsQueryKeys.byRealm(
-                connection.current.rpcEndpoint,
-                realmPk
-              )
+              digitalAssetsQueryKeys.byRealm(network, realmPk)
             )
         })
         .catch((e) => {
