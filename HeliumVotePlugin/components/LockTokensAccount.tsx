@@ -44,6 +44,7 @@ import {
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { fetchJupiterPrice } from '@hooks/queries/jupiterPrice'
 
 export const LockTokensAccount: React.FC<{
   // tokenOwnerRecordPk: string | string[] | undefined // @asktree: this was unused
@@ -172,23 +173,28 @@ export const LockTokensAccount: React.FC<{
         ).toNumber()
       : 0
 
+  const { result: tokenPrice } = useAsync(
+    async () =>
+      realm
+        ? await fetchJupiterPrice(realm.account.communityMint).then((x) =>
+            x.found ? x.result.price : 0
+          )
+        : undefined,
+    [realm]
+  )
+
   const availableTokensPrice =
     hasTokensInWallet && mint && realm?.account.communityMint
       ? getMintDecimalAmountFromNatural(
           mint,
           realmTokenAccount?.account.amount
-        ).toNumber() *
-        tokenPriceService.getUSDTokenPrice(
-          realm?.account.communityMint.toBase58()
-        )
+        ).toNumber() * (tokenPrice ?? 0)
       : 0
 
   const lockedTokensPrice =
     amountLocked.gte(new BN(0)) && mint && realm?.account.communityMint
       ? getMintDecimalAmountFromNatural(mint, amountLocked).toNumber() *
-        tokenPriceService.getUSDTokenPrice(
-          realm?.account.communityMint.toBase58()
-        )
+        (tokenPrice ?? 0)
       : 0
 
   const tokenName = realm?.account.communityMint
