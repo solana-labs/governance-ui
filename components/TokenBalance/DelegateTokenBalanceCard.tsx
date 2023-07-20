@@ -64,9 +64,8 @@ const DelegateBalanceCard = () => {
   }
 
   const hasDelegators =
-    communityTorsDelegatedToUser?.length ??
-    (0 > 0 || councilTorsDelegatedToUser?.length) ??
-    0 > 0
+    (communityTorsDelegatedToUser?.length ?? 0) > 0 ||
+    (councilTorsDelegatedToUser?.length ?? 0) > 0
 
   if (!walletId || !hasDelegators) {
     return null

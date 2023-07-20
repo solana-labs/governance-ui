@@ -15,6 +15,7 @@ import TokenDetails from './TokenDetails'
 import WalletDetails from './WalletDetails'
 import DomainsDetails from './DomainsDetails'
 import TokenOwnerRecordDetails from './TokenOwnerRecordDetails'
+import StakeDetails from './StakeDetails'
 
 function walletIsNotAuxiliary(
   wallet: AuxiliaryWallet | Wallet
@@ -97,6 +98,11 @@ const Details = forwardRef<HTMLDivElement, Props>((props, ref) => {
                   domains={props.data.data.asset}
                   isStickied={props.isStickied}
                 />
+              ) : props.data.data.asset.type === AssetType.Stake ? (
+                <StakeDetails
+                  isStickied={props.isStickied}
+                  account={props.data.data.asset}
+                ></StakeDetails>
               ) : props.data.data.asset.type ===
                   AssetType.TokenOwnerRecordAsset &&
                 walletIsNotAuxiliary(props.data.data.wallet) ? (

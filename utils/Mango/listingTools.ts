@@ -9,7 +9,7 @@ import { Market } from '@project-serum/serum'
 import { PythHttpClient } from '@pythnetwork/client'
 import { Connection, Keypair, PublicKey, Transaction } from '@solana/web3.js'
 
-export const MAINNET_PYTH_PROGRAM = new PublicKey(
+const MAINNET_PYTH_PROGRAM = new PublicKey(
   'FsJ3A3u2vn5cTVofAjvy6y5kwABJAqYWpe4975bi2epH'
 )
 
@@ -168,12 +168,12 @@ export const coinTiersToNames: {
   UNTRUSTED: 'Untrusted',
 }
 
-export const fetchJupiterRoutes = async (
+const fetchJupiterRoutes = async (
   inputMint = 'So11111111111111111111111111111111111111112',
   outputMint = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
   amount = 0,
-  slippage = 50,
   swapMode = 'ExactIn',
+  slippage = 50,
   feeBps = 0
 ) => {
   {
@@ -223,20 +223,64 @@ export const getSuggestedCoinTier = async (outputMint: string) => {
       outputMint,
       toNative(1000, 6).toNumber()
     ),
+    fetchJupiterRoutes(
+      MAINNET_USDC_MINT.toBase58(),
+      outputMint,
+      toNative(100000, 6).toNumber(),
+      'ExactOut'
+    ),
+    fetchJupiterRoutes(
+      MAINNET_USDC_MINT.toBase58(),
+      outputMint,
+      toNative(20000, 6).toNumber(),
+      'ExactOut'
+    ),
+    fetchJupiterRoutes(
+      MAINNET_USDC_MINT.toBase58(),
+      outputMint,
+      toNative(5000, 6).toNumber(),
+      'ExactOut'
+    ),
+    fetchJupiterRoutes(
+      MAINNET_USDC_MINT.toBase58(),
+      outputMint,
+      toNative(1000, 6).toNumber(),
+      'ExactOut'
+    ),
   ])
+  const bestRoutesSwaps = swaps
+    .filter((x) => x.bestRoute)
+    .map((x) => x.bestRoute!)
 
-  const indexForTierFromSwaps = swaps.findIndex(
-    (x) => x.bestRoute?.priceImpactPct && x.bestRoute?.priceImpactPct * 100 < 1
+  const averageSwaps = bestRoutesSwaps.reduce(
+    (acc: { amount: string; priceImpactPct: number }[], val) => {
+      if (val.swapMode === 'ExactIn') {
+        const exactOutRoute = bestRoutesSwaps.find(
+          (x) => x.amount === val.amount && x.swapMode === 'ExactOut'
+        )
+        acc.push({
+          amount: val.amount.toString(),
+          priceImpactPct: exactOutRoute?.priceImpactPct
+            ? (val.priceImpactPct + exactOutRoute.priceImpactPct) / 2
+            : val.priceImpactPct,
+        })
+      }
+      return acc
+    },
+    []
+  )
+
+  const indexForTierFromSwaps = averageSwaps.findIndex(
+    (x) => x?.priceImpactPct && x?.priceImpactPct * 100 < 1
   )
 
   const tier =
     indexForTierFromSwaps > -1 ? TIERS[indexForTierFromSwaps] : 'UNTRUSTED'
   return {
     tier,
-    priceImpact: (
-      (indexForTierFromSwaps > -1
-        ? swaps[indexForTierFromSwaps].bestRoute!.priceImpactPct
-        : swaps[swaps.length - 1].bestRoute!.priceImpactPct) * 100
+    priceImpact: (indexForTierFromSwaps > -1
+      ? averageSwaps[indexForTierFromSwaps]!.priceImpactPct
+      : 100
     ).toFixed(2),
   }
 }
@@ -256,7 +300,7 @@ export const compareObjectsAndGetDifferentKeys = <T extends object>(
   return diffKeys as (keyof T)[]
 }
 
-export const isSwitchboardOracle = async (
+const isSwitchboardOracle = async (
   connection: Connection,
   feedPk: PublicKey
 ) => {
@@ -284,10 +328,7 @@ export const isSwitchboardOracle = async (
     : ''
 }
 
-export const isPythOracle = async (
-  connection: Connection,
-  feedPk: PublicKey
-) => {
+const isPythOracle = async (connection: Connection, feedPk: PublicKey) => {
   const pythClient = new PythHttpClient(connection, MAINNET_PYTH_PROGRAM)
   const pythAccounts = await pythClient.getData()
   const feed = pythAccounts.products.find(

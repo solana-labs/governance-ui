@@ -51,11 +51,11 @@ export default function useGovernanceAssets() {
   )
 
   const assetAccounts = useGovernanceAssetsStore((s) =>
-    s.assetAccounts.filter((x) => x.type !== AccountType.AuxiliaryToken)
+    s.assetAccounts.filter((x) => x.type !== AccountType.AUXILIARY_TOKEN)
   )
   const auxiliaryTokenAccounts = useGovernanceAssetsStore(
     (s) => s.assetAccounts
-  ).filter((x) => x.type === AccountType.AuxiliaryToken)
+  ).filter((x) => x.type === AccountType.AUXILIARY_TOKEN)
   const currentPluginPk = config?.account.communityTokenConfig.voterWeightAddin
   const governancesQuery = useRealmGovernancesQuery()
   const governancesArray = useMemo(() => governancesQuery.data ?? [], [
@@ -119,11 +119,6 @@ export default function useGovernanceAssets() {
   )
   const governedNativeAccounts = governedTokenAccounts.filter(
     (x) => x.type === AccountType.SOL
-  )
-  const nftsGovernedTokenAccounts = governedTokenAccounts.filter(
-    (govTokenAcc) =>
-      govTokenAcc.type === AccountType.NFT ||
-      govTokenAcc.type === AccountType.SOL
   )
   const canUseTokenTransferInstruction = governedTokenAccountsWithoutNfts.some(
     (acc) => {
@@ -362,6 +357,10 @@ export default function useGovernanceAssets() {
       name: 'Set Mint Authority',
       packageId: PackageEnum.Common,
     },
+    [Instructions.SplitStake]: {
+      name: 'Split Stake Validator',
+      packageId: PackageEnum.Common,
+    },
     /*
       ██████  ██    ██  █████  ██          ███████ ██ ███    ██  █████  ███    ██  ██████ ███████
       ██   ██ ██    ██ ██   ██ ██          ██      ██ ████   ██ ██   ██ ████   ██ ██      ██
@@ -406,12 +405,17 @@ export default function useGovernanceAssets() {
       packageId: PackageEnum.Dual,
     },
     [Instructions.DualFinanceDelegateWithdraw]: {
-      name: 'Withdraw Delegate',
+      name: 'Withdraw Vote Deposit',
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Dual,
     },
     [Instructions.DualFinanceVoteDeposit]: {
       name: 'Vote Deposit',
+      isVisible: canUseTransferInstruction,
+      packageId: PackageEnum.Dual,
+    },
+    [Instructions.DualFinanceVote]: {
+      name: 'Vote',
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Dual,
     },
@@ -870,42 +874,21 @@ export default function useGovernanceAssets() {
     )
   }
 
-  return useMemo(
-    () => ({
-      assetAccounts,
-      auxiliaryTokenAccounts,
-      availableInstructions,
-      availablePackages,
-      canMintRealmCouncilToken,
-      canUseAuthorityInstruction,
-      canUseMintInstruction,
-      canUseProgramUpgradeInstruction,
-      canUseTransferInstruction,
-      getPackageTypeById,
-      governancesArray,
-      governedNativeAccounts,
-      governedSPLTokenAccounts,
-      governedTokenAccounts,
-      governedTokenAccountsWithoutNfts,
-      nftsGovernedTokenAccounts,
-    }),
-    [
-      assetAccounts,
-      auxiliaryTokenAccounts,
-      availableInstructions,
-      availablePackages,
-      canMintRealmCouncilToken,
-      canUseAuthorityInstruction,
-      canUseMintInstruction,
-      canUseProgramUpgradeInstruction,
-      canUseTransferInstruction,
-      getPackageTypeById,
-      governancesArray,
-      governedNativeAccounts,
-      governedSPLTokenAccounts,
-      governedTokenAccounts,
-      governedTokenAccountsWithoutNfts,
-      nftsGovernedTokenAccounts,
-    ]
-  )
+  return {
+    assetAccounts,
+    auxiliaryTokenAccounts,
+    availableInstructions,
+    availablePackages,
+    canMintRealmCouncilToken,
+    canUseAuthorityInstruction,
+    canUseMintInstruction,
+    canUseProgramUpgradeInstruction,
+    canUseTransferInstruction,
+    getPackageTypeById,
+    governancesArray,
+    governedNativeAccounts,
+    governedSPLTokenAccounts,
+    governedTokenAccounts,
+    governedTokenAccountsWithoutNfts,
+  }
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import cx from 'classnames'
 import { PlusCircleIcon } from '@heroicons/react/outline'
 import { useRouter } from 'next/router'
@@ -8,7 +8,7 @@ import { formatNumber } from '@utils/formatNumber'
 import { NEW_PROGRAM_VIEW } from 'pages/dao/[symbol]/assets'
 import { Wallet } from '@models/treasury/Wallet'
 import { SecondaryButton } from '@components/Button'
-import DepositNFT from '@components/TreasuryAccount/DepositNFTFromWallet'
+import DepositNFTFromWallet from '@components/TreasuryAccount/DepositNFTFromWallet'
 import Modal from '@components/Modal'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
@@ -25,7 +25,7 @@ import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 enum ModalType {
   AddAsset,
   DepositNFTs,
-  NewTokenAccount,
+  NewTokenAccount, // this should probably get removed
   None,
 }
 
@@ -37,7 +37,7 @@ interface Props {
 export default function Header(props: Props) {
   const [openModal, setOpenModal] = useState<ModalType>(ModalType.None)
   const { fmtUrlWithCluster } = useQueryContext()
-  const { assetAccounts, nftsGovernedTokenAccounts } = useGovernanceAssets()
+  const { assetAccounts } = useGovernanceAssets()
   const { setCurrentAccount } = useTreasuryAccountStore()
   const { symbol } = useRealm()
   const connection = useLegacyConnectionContext()
@@ -94,6 +94,9 @@ export default function Header(props: Props) {
           onAddTokenAccount={() => setOpenModal(ModalType.NewTokenAccount)}
           onClose={() => setOpenModal(ModalType.None)}
           onDepositNFTsSelected={async () => {
+            // @asktree is really not sure whats going on here, but it should probably not exist anymore?
+            // we used to have a much weirder process for depositing nfts
+
             let account: AssetAccount | undefined
 
             for (const acc of assetAccounts) {
@@ -113,9 +116,9 @@ export default function Header(props: Props) {
 
             if (account) {
               setCurrentAccount(account, connection)
-            } else if (nftsGovernedTokenAccounts[0]) {
+            } /* else if (nftsGovernedTokenAccounts[0]) {
               setCurrentAccount(nftsGovernedTokenAccounts[0], connection)
-            }
+            } */
 
             setOpenModal(ModalType.DepositNFTs)
           }}
@@ -127,7 +130,7 @@ export default function Header(props: Props) {
           sizeClassName="sm:max-w-3xl"
           onClose={() => setOpenModal(ModalType.None)}
         >
-          <DepositNFT
+          <DepositNFTFromWallet
             additionalBtns={
               <SecondaryButton onClick={() => setOpenModal(ModalType.None)}>
                 Close

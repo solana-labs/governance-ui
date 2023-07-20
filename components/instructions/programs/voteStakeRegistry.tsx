@@ -21,6 +21,9 @@ import {
 import { calcMultiplier } from 'VoteStakeRegistry/tools/deposits'
 import { VoterStakeRegistry as HeliumVSR } from '@helium/idls/lib/types/voter_stake_registry'
 import { PROGRAM_ID as HELIUM_VSR_PROGRAM_ID } from '@helium/voter-stake-registry-sdk'
+import { fetchTokenAccountByPubkey } from '@hooks/queries/tokenAccount'
+import { fetchMintInfoByPubkey } from '@hooks/queries/mintInfo'
+import { toUiDecimals } from '@blockworks-foundation/mango-v4'
 
 interface ClawbackInstruction {
   depositEntryIndex: number
@@ -116,6 +119,54 @@ const createRegistrarIx = (_programId: PublicKey) => ({
     ],
     getDataUI: async () => {
       return <div></div>
+    },
+  },
+})
+
+const UpdateVoterWeight = (_programId: PublicKey) => ({
+  45: {
+    name: 'Vote Stake Registry Update Voter Weight',
+    accounts: [],
+    getDataUI: async () => {
+      return <div></div>
+    },
+  },
+})
+
+const deposit = (programId: PublicKey) => ({
+  242: {
+    name: 'Vote stake registry deposit',
+    accounts: [
+      { name: 'Registrar' },
+      { name: 'Voter' },
+      { name: 'Vault' },
+      { name: 'Deposit Token' },
+      { name: 'Deposit Authority' },
+    ],
+    getDataUI: async (
+      connection: Connection,
+      data: Uint8Array,
+      accounts: AccountMetaData[]
+    ) => {
+      const tokenAccountPk = accounts[3].pubkey
+      const tokenAccount = (
+        await fetchTokenAccountByPubkey(connection, tokenAccountPk)
+      ).result
+      const mint = (await fetchMintInfoByPubkey(connection, tokenAccount!.mint))
+        .result
+      const options = AnchorProvider.defaultOptions()
+      const provider = new AnchorProvider(
+        connection,
+        new Wallet(Keypair.generate()),
+        options
+      )
+      const vsrClient = await VsrClient.connect(provider, programId)
+
+      const decodedInstructionData = new BorshInstructionCoder(
+        vsrClient.program.idl
+      ).decode(Buffer.from(data))?.data as any
+      const amount = toUiDecimals(decodedInstructionData.amount, mint!.decimals)
+      return <div>Amount: {amount}</div>
     },
   },
 })
@@ -398,7 +449,14 @@ const heliumConfigVotingMintIx = (programId: PublicKey) => ({
 })
 
 const common_instructions = (programId: PublicKey) =>
-  [clawbackIx, createRegistrarIx, configVotingMintIx, grantIx].reduce(
+  [
+    clawbackIx,
+    createRegistrarIx,
+    configVotingMintIx,
+    grantIx,
+    deposit,
+    UpdateVoterWeight,
+  ].reduce(
     (acc, ix) => ({
       ...acc,
       ...ix(programId),

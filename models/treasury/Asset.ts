@@ -8,7 +8,7 @@ import type {
   TokenOwnerRecord,
 } from '@solana/spl-governance'
 
-import type { AssetAccount } from '@utils/uiTypes/assets'
+import type { AssetAccount, StakeState } from '@utils/uiTypes/assets'
 
 import { NFT } from './NFT'
 import { Program } from './Program'
@@ -29,6 +29,7 @@ export enum AssetType {
   Token,
   Unknown,
   TokenOwnerRecordAsset,
+  Stake,
 }
 
 export interface Mint {
@@ -100,6 +101,16 @@ export interface Token {
   value: BigNumber
 }
 
+export interface Stake {
+  type: AssetType.Stake
+  pubkey: PublicKey
+  amount: number
+  id: string
+  state: StakeState
+  raw: AssetAccount
+  value: BigNumber
+}
+
 export interface Unknown {
   type: AssetType.Unknown
   address: string
@@ -142,3 +153,4 @@ export type Asset =
   | Token
   | Unknown
   | TokenOwnerRecordAsset
+  | Stake

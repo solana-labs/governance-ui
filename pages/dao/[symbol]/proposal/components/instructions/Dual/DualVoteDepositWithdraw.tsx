@@ -1,21 +1,18 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import { ProgramAccount, Governance } from '@solana/spl-governance'
 import {
   UiInstruction,
   DualFinanceDelegateWithdrawForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
-import GovernedAccountSelect from '../../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import Input from '@components/inputs/Input'
 import { getDelegateWithdrawInstruction } from '@utils/instructions/Dual/delegate'
 import { getDualFinanceDelegateWithdrawSchema } from '@utils/validations'
-import Tooltip from '@components/Tooltip'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
-const DualDelegateWithdraw = ({
+const DualVoteDepositWithdraw = ({
   index,
   governance,
 }: {
@@ -39,7 +36,8 @@ const DualDelegateWithdraw = ({
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-  const schema = getDualFinanceDelegateWithdrawSchema()
+  console.log(shouldBeGoverned, assetAccounts, formErrors, handleSetForm)
+  const schema = useMemo(getDualFinanceDelegateWithdrawSchema, [])
   useEffect(() => {
     function getInstruction(): Promise<UiInstruction> {
       return getDelegateWithdrawInstruction({
@@ -71,34 +69,35 @@ const DualDelegateWithdraw = ({
   // if the project doesnt need to change where the tokens get returned to.
   return (
     <>
-      <Input
-          label="Realm"
-          value={form.realm}
-          type="text"
-          onChange={(evt) =>
-            handleSetForm({
-              value: evt.target.value,
-              propertyName: 'realm',
-            })
-          }
-          error={formErrors['realm']}
-        />
-        <Tooltip content="Token to be delegated.">
-          <GovernedAccountSelect
-            label="Delegate Token"
-            governedAccounts={assetAccounts}
-            onChange={(value) => {
-              handleSetForm({ value, propertyName: 'delegateToken' })
-            }}
-            value={form.delegateToken}
-            error={formErrors['delegateToken']}
-            shouldBeGoverned={shouldBeGoverned}
-            governance={governance}
-            type="token"
-          ></GovernedAccountSelect>
-      </Tooltip>
+      {/* <Input
+        label="Realm"
+        value={form.realm}
+        type="text"
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: 'realm',
+          })
+        }
+        error={formErrors['realm']}
+      />
+      <Tooltip content="Token to be delegated.">
+        <GovernedAccountSelect
+          label="Delegate Token"
+          governedAccounts={assetAccounts}
+          onChange={(value) => {
+            handleSetForm({ value, propertyName: 'delegateToken' })
+          }}
+          value={form.delegateToken}
+          error={formErrors['delegateToken']}
+          shouldBeGoverned={shouldBeGoverned}
+          governance={governance}
+          type="token"
+        ></GovernedAccountSelect>
+      </Tooltip> */}
+      <div>Not implemented</div>
     </>
   )
 }
 
-export default DualDelegateWithdraw
+export default DualVoteDepositWithdraw

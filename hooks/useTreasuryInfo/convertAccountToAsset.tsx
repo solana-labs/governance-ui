@@ -9,7 +9,7 @@ import { WSOL_MINT } from '@components/instructions/tools'
 import { abbreviateAddress } from '@utils/formatting'
 
 import { getAccountAssetCount } from './getAccountAssetCount'
-import { getAccountValue } from './getAccountValue'
+import { getAccountValue, getStakeAccountValue } from './getAccountValue'
 
 export const convertAccountToAsset = (
   account: AssetAccount,
@@ -19,7 +19,7 @@ export const convertAccountToAsset = (
   const info = getTreasuryAccountItemInfoV2(account)
 
   switch (account.type) {
-    case AccountType.AuxiliaryToken:
+    case AccountType.AUXILIARY_TOKEN:
     case AccountType.GENERIC: {
       return null
     }
@@ -100,6 +100,16 @@ export const convertAccountToAsset = (
         value: getAccountValue(account),
       }
 
+    case AccountType.STAKE:
+      return {
+        type: AssetType.Stake,
+        id: account.extensions.stake!.stakeAccount.toBase58() + account.type,
+        pubkey: account.extensions.stake!.stakeAccount,
+        amount: account.extensions.stake!.amount,
+        state: account.extensions.stake!.state,
+        raw: account,
+        value: getStakeAccountValue(account),
+      }
     case AccountType.PROGRAM:
       throw new Error('Handle Programs separately')
 

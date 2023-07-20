@@ -11,6 +11,7 @@ import {
   Unknown,
   AssetType,
   Domains,
+  Stake,
 } from '@models/treasury/Asset'
 
 import TokenList from './TokenList'
@@ -27,6 +28,7 @@ import {
   isUnknown,
   isDomain,
   isTokenOwnerRecord,
+  isStake,
 } from '../typeGuards'
 
 import { PublicKey } from '@solana/web3.js'
@@ -45,13 +47,14 @@ function isTokenLike(asset: Asset): asset is Token | Sol {
 
 function isOther(
   asset: Asset
-): asset is Mint | Programs | Unknown | Domains | RealmAuthority {
+): asset is Mint | Programs | Unknown | Domains | RealmAuthority | Stake {
   return (
     isMint(asset) ||
     isPrograms(asset) ||
     isUnknown(asset) ||
     isRealmAuthority(asset) ||
-    isDomain(asset)
+    isDomain(asset) ||
+    isStake(asset)
   )
 }
 
@@ -125,7 +128,7 @@ export default function AssetList(props: Props) {
       }
       setTokens(newTokens)
     }
-    if (data) {
+    if (data && data?.length) {
       getTokenData()
     }
   }, [tokensFromProps, data])
@@ -147,7 +150,7 @@ export default function AssetList(props: Props) {
 
   // NOTE possible source of bugs, state wont update if props do.
   const [others, setOthers] = useState<
-    (Mint | Programs | Unknown | Domains | RealmAuthority)[]
+    (Mint | Programs | Unknown | Domains | RealmAuthority | Stake)[]
   >(othersFromProps)
   const [itemsToHide, setItemsToHide] = useState<string[]>([])
   useEffect(() => {
@@ -169,6 +172,7 @@ export default function AssetList(props: Props) {
         | Unknown
         | Domains
         | RealmAuthority
+        | Stake
       )[] = []
       for await (const token of othersFromProps) {
         if (isMint(token)) {
@@ -220,6 +224,7 @@ export default function AssetList(props: Props) {
           onToggleExpand={() => props.onToggleExpandSection?.('tokens')}
         />
       )}
+      {}
       {nfts.length > 0 && (
         <NFTList
           disableCollapse={!diplayingMultipleAssetTypes}

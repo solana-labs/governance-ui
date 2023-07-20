@@ -1,14 +1,11 @@
 import create, { State } from 'zustand'
-import { getNfts } from '@utils/tokens'
 import tokenPriceService, {
   TokenInfoWithoutDecimals,
 } from '@utils/services/tokenPrice'
-import { ConfirmedSignatureInfo, PublicKey } from '@solana/web3.js'
+import { ConfirmedSignatureInfo } from '@solana/web3.js'
 import { notify } from '@utils/notifications'
-import { NFTWithMint } from '@utils/uiTypes/nfts'
 import { WSOL_MINT } from '@components/instructions/tools'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
-import { ConnectionContext } from '@utils/connection'
 
 interface TreasuryAccountStore extends State {
   currentAccount: AssetAccount | null
@@ -16,19 +13,10 @@ interface TreasuryAccountStore extends State {
   tokenInfo?: TokenInfoWithoutDecimals
   recentActivity: ConfirmedSignatureInfo[]
 
-  allNfts: NFTWithMint[]
-  governanceNfts: {
-    [governance: string]: NFTWithMint[]
-  }
-  isLoadingNfts: boolean
   isLoadingRecentActivity: boolean
   isLoadingTokenAccounts: boolean
   setCurrentAccount: (account: AssetAccount, connection) => void
   handleFetchRecentActivity: (account: AssetAccount, connection) => void
-  getNfts: (
-    nftsGovernedTokenAccounts: AssetAccount[],
-    connection: ConnectionContext
-  ) => void
 }
 
 const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
@@ -36,58 +24,8 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
   mintAddress: '',
   tokenInfo: undefined,
   recentActivity: [],
-  allNfts: [],
-  governanceNfts: {},
-  isLoadingNfts: false,
   isLoadingRecentActivity: false,
   isLoadingTokenAccounts: false,
-  getNfts: async (nftsGovernedTokenAccounts, connection) => {
-    console.log('getNfts has been called')
-    set((s) => {
-      s.isLoadingNfts = true
-    })
-    let realmNfts: NFTWithMint[] = []
-    const nftsPerPubkey = {}
-    for (const acc of nftsGovernedTokenAccounts) {
-      const governance = acc.governance.pubkey.toBase58()
-      try {
-        const nfts = acc.governance.pubkey
-          ? await getNfts(acc.governance.pubkey, connection)
-          : []
-        if (acc.isSol) {
-          const solAccountNfts = acc.extensions.transferAddress
-            ? await getNfts(
-                new PublicKey(acc.extensions.transferAddress!),
-                connection
-              )
-            : []
-          realmNfts = [...realmNfts, ...solAccountNfts]
-
-          nftsPerPubkey[acc.extensions.transferAddress!.toBase58()] = [
-            ...solAccountNfts,
-          ]
-        }
-        realmNfts = [...realmNfts, ...nfts]
-        if (governance) {
-          if (nftsPerPubkey[governance]) {
-            nftsPerPubkey[governance] = [...nftsPerPubkey[governance], ...nfts]
-          } else {
-            nftsPerPubkey[governance] = [...nfts]
-          }
-        }
-      } catch (e) {
-        console.log(e)
-        notify({
-          message: `Unable to fetch nfts for governance ${governance}`,
-        })
-      }
-    }
-    set((s) => {
-      s.allNfts = realmNfts
-      s.governanceNfts = nftsPerPubkey
-      s.isLoadingNfts = false
-    })
-  },
   setCurrentAccount: async (account, connection) => {
     if (!account) {
       set((s) => {
