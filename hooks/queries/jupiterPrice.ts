@@ -40,21 +40,31 @@ export const jupiterPriceQueryKeys = {
   ],
 }
 
+const jupQueryFn = async (mint: PublicKey) => {
+  const x = await fetch(`${URL}/ids=${mint?.toString()}`)
+  const response = (await x.json()) as Response
+  const result = response.data[mint.toString()]
+  return result !== undefined
+    ? ({ found: true, result } as const)
+    : ({ found: false, result: undefined } as const)
+}
+
 export const useJupiterPriceByMintQuery = (mint: PublicKey | undefined) => {
   const enabled = mint !== undefined
   return useQuery({
     queryKey: enabled ? jupiterPriceQueryKeys.byMint(mint) : undefined,
     queryFn: async () => {
       if (!enabled) throw new Error()
-      const x = await fetch(`${URL}/ids=${mint?.toString()}`)
-      const response = (await x.json()) as Response
-      const result = response.data[mint.toString()]
-      return result !== undefined
-        ? ({ found: true, result } as const)
-        : ({ found: false, result: undefined } as const)
+      return jupQueryFn(mint)
     },
   })
 }
+
+export const fetchJupiterPrice = async (mint: PublicKey) =>
+  queryClient.fetchQuery({
+    queryKey: jupiterPriceQueryKeys.byMint(mint),
+    queryFn: () => jupQueryFn(mint),
+  })
 
 export const useJupiterPricesByMintsQuery = (mints: PublicKey[]) => {
   const enabled = mints.length > 0
