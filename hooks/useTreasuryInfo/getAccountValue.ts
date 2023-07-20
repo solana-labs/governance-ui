@@ -1,9 +1,10 @@
 import { BigNumber } from 'bignumber.js'
 
 import { AssetAccount } from '@utils/uiTypes/assets'
-import tokenPriceService from '@utils/services/tokenPrice'
 import { getAccountAssetCount } from './getAccountAssetCount'
+import { getJupiterPriceSync } from '@hooks/queries/jupiterPrice'
 
+/** @deprecated */
 export const getAccountValue = (account: AssetAccount) => {
   if (!account.extensions.mint) {
     return new BigNumber(0)
@@ -11,9 +12,7 @@ export const getAccountValue = (account: AssetAccount) => {
 
   const count = getAccountAssetCount(account)
   const value = new BigNumber(
-    tokenPriceService.getUSDTokenPrice(
-      account.extensions.mint.publicKey.toBase58()
-    )
+    getJupiterPriceSync(account.extensions.mint.publicKey)
   )
 
   return count.multipliedBy(value)
