@@ -9,10 +9,8 @@ import { validateInstruction } from '@utils/instructionTools'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
 import { NewProposalContext } from '../../../new'
-import InstructionForm, {
-  InstructionInput,
-  InstructionInputType,
-} from '../FormCreator'
+import InstructionForm, { InstructionInput } from '../FormCreator'
+import { InstructionInputType } from '../inputInstructionType'
 import { getValidatedPublickKey } from '@utils/validations'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
