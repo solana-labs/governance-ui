@@ -364,7 +364,10 @@ export async function getInstructionDescriptor(
   realm?: ProgramAccount<Realm> | undefined
 ) {
   let descriptors: any
-  if (realm && instruction.programId.equals(realm.owner)) {
+  if (
+    (realm && instruction.programId.equals(realm.owner)) ||
+    instruction.programId.equals(new PublicKey(DEFAULT_GOVERNANCE_PROGRAM_ID))
+  ) {
     descriptors =
       GOVERNANCE_INSTRUCTIONS['GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw']
   } else {

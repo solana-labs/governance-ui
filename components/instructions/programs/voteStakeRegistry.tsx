@@ -125,7 +125,7 @@ const createRegistrarIx = (_programId: PublicKey) => ({
 
 const UpdateVoterWeight = (_programId: PublicKey) => ({
   45: {
-    name: 'Vote stake registry update voter weight',
+    name: 'Vote Stake Registry Update Voter Weight',
     accounts: [],
     getDataUI: async () => {
       return <div></div>
