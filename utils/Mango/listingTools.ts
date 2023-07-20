@@ -9,7 +9,7 @@ import { Market } from '@project-serum/serum'
 import { PythHttpClient } from '@pythnetwork/client'
 import { Connection, Keypair, PublicKey, Transaction } from '@solana/web3.js'
 
-export const MAINNET_PYTH_PROGRAM = new PublicKey(
+const MAINNET_PYTH_PROGRAM = new PublicKey(
   'FsJ3A3u2vn5cTVofAjvy6y5kwABJAqYWpe4975bi2epH'
 )
 
@@ -168,7 +168,7 @@ export const coinTiersToNames: {
   UNTRUSTED: 'Untrusted',
 }
 
-export const fetchJupiterRoutes = async (
+const fetchJupiterRoutes = async (
   inputMint = 'So11111111111111111111111111111111111111112',
   outputMint = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
   amount = 0,
@@ -300,7 +300,7 @@ export const compareObjectsAndGetDifferentKeys = <T extends object>(
   return diffKeys as (keyof T)[]
 }
 
-export const isSwitchboardOracle = async (
+const isSwitchboardOracle = async (
   connection: Connection,
   feedPk: PublicKey
 ) => {
@@ -328,10 +328,7 @@ export const isSwitchboardOracle = async (
     : ''
 }
 
-export const isPythOracle = async (
-  connection: Connection,
-  feedPk: PublicKey
-) => {
+const isPythOracle = async (connection: Connection, feedPk: PublicKey) => {
   const pythClient = new PythHttpClient(connection, MAINNET_PYTH_PROGRAM)
   const pythAccounts = await pythClient.getData()
   const feed = pythAccounts.products.find(

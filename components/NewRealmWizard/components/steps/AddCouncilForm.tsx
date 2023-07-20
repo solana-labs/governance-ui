@@ -52,14 +52,14 @@ export const AddCouncilSchema = {
     }),
 }
 
-export type AddCouncilV2 = {
+type AddCouncilV2 = {
   _programVersion: 2
   addCouncil: boolean
   useExistingCouncilToken?: boolean
   councilTokenMintAddress?: string
   transferCouncilMintAuthority?: boolean
 }
-export type AddCouncilV3 = {
+type AddCouncilV3 = {
   _programVersion: 3
   councilYesVotePercentage: number
 } & Omit<AddCouncilV2, '_programVersion'>

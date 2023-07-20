@@ -52,7 +52,7 @@ import { deriveAllBoundedStrategyKeysV2 } from '@utils/instructions/PsyFinance/p
 import { TokenInfo } from '@utils/services/types'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
-export type TradeProps = { tokenAccount: AssetAccount }
+type TradeProps = { tokenAccount: AssetAccount }
 
 /* const SUPPORTED_TRADE_PLATFORMS = ['Raydium', 'Openbook']
  */

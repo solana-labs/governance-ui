@@ -2,87 +2,13 @@ import {
   deserializeBorsh,
   getGovernanceSchemaForAccount,
   GovernanceAccountType,
-  GovernanceConfig,
   ProgramAccount,
   Proposal,
-  VoteTipping,
 } from '@solana/spl-governance'
-import { BN } from '@coral-xyz/anchor'
-import {
-  getMintNaturalAmountFromDecimal,
-  getTimestampFromDays,
-  parseMintNaturalAmountFromDecimal,
-} from '@tools/sdk/units'
-import { isDisabledVoterWeight } from '@tools/governance/units'
-import { createGovernanceThresholds } from '@tools/governance/configs'
 import { ConnectionContext } from './connection'
 import axios from 'axios'
 import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes'
 import { PublicKey } from '@solana/web3.js'
-
-interface GovernanceConfigValues {
-  minTokensToCreateProposal: number | string
-  minInstructionHoldUpTime: number
-  maxVotingTime: number
-  voteThresholdPercentage: number
-  mintDecimals: number
-  voteTipping?: VoteTipping
-  votingCoolOffTime?: number
-  depositExemptProposalCount?: number
-}
-
-// Parses min tokens to create (proposal or governance)
-function parseMinTokensToCreate(value: string | number, mintDecimals: number) {
-  return typeof value === 'string'
-    ? parseMintNaturalAmountFromDecimal(value, mintDecimals)
-    : getMintNaturalAmountFromDecimal(value, mintDecimals)
-}
-
-export function getGovernanceConfigFromV2Form(
-  programVersion: number,
-  values: GovernanceConfigValues
-) {
-  const {
-    communityVoteThreshold,
-    councilVoteThreshold,
-    councilVetoVoteThreshold,
-    communityVetoVoteThreshold,
-  } = createGovernanceThresholds(programVersion, values.voteThresholdPercentage)
-
-  const minTokensToCreateProposal = isDisabledVoterWeight(
-    values.minTokensToCreateProposal
-  )
-    ? values.minTokensToCreateProposal
-    : parseMinTokensToCreate(
-        values.minTokensToCreateProposal,
-        values.mintDecimals
-      )
-
-  const voteTippig = values.voteTipping || 0
-
-  return new GovernanceConfig({
-    communityVoteThreshold: communityVoteThreshold,
-    minCommunityTokensToCreateProposal: new BN(
-      minTokensToCreateProposal.toString()
-    ),
-    minInstructionHoldUpTime: getTimestampFromDays(
-      values.minInstructionHoldUpTime
-    ),
-    baseVotingTime: getTimestampFromDays(values.maxVotingTime),
-    // Use 1 as default for council tokens.
-    // Council tokens are rare and possession of any amount of council tokens should be sufficient to be allowed to create proposals
-    // If it turns to be a wrong assumption then it should be exposed in the UI
-    minCouncilTokensToCreateProposal: new BN(1),
-    communityVoteTipping: voteTippig,
-    councilVoteTipping: voteTippig,
-    councilVoteThreshold: councilVoteThreshold,
-    councilVetoVoteThreshold: councilVetoVoteThreshold,
-    communityVetoVoteThreshold: communityVetoVoteThreshold,
-    //defaults in v2 there is no votingCoolOffTime and depositExemptProposalCount
-    votingCoolOffTime: 0,
-    depositExemptProposalCount: 10,
-  })
-}
 
 export const getProposals = async (
   pubkeys: PublicKey[],

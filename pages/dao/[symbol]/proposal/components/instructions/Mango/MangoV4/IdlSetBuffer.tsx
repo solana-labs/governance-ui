@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid, validatePubkey } from '@utils/formValidation'
@@ -162,7 +162,7 @@ const IdlSetBuffer = ({
 
 export default IdlSetBuffer
 
-export async function createIdlUpgradeInstruction(
+async function createIdlUpgradeInstruction(
   programId: PublicKey,
   bufferAddress: PublicKey,
   upgradeAuthority: PublicKey,
