@@ -44,7 +44,7 @@ const NFTCollectionSelector = ({ collections = {}, onChange, value }) => {
       <div className={`w-full space-y-3`}>
         {Object.keys(collections).map((key) => {
           const collection = collections[key]
-          const totalNfts = collection.nfts.length
+          const totalNfts = collection.totalNfts
           const images = collection.nfts.slice(0, 2).map((nft) => nft.image)
 
           for (let i = images.length; i < 3; i++) {

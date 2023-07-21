@@ -8,7 +8,6 @@ import { updateUserInput, validatePubkey } from '@utils/formValidation'
 import { notify } from '@utils/notifications'
 import { abbreviateAddress } from '@utils/formatting'
 
-
 import { NewButton as Button } from '@components/Button'
 import Text from '@components/Text'
 import FormHeader from '@components/NewRealmWizard/components/FormHeader'
@@ -350,10 +349,10 @@ export default function AddNFTCollectionForm({
               return enrichItemInfo(nft, nft.uri)
             })
           )
-
           verifiedCollections[collectionKey] = {
             ...collectionInfo.result,
             nfts: nftsWithInfo,
+            totalNfts: verfiedNfts[collectionKey].length,
           }
         }
       }
