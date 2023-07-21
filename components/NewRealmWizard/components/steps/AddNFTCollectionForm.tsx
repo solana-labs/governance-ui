@@ -22,33 +22,9 @@ import { Metaplex } from '@metaplex-foundation/js'
 import { Connection, PublicKey } from '@solana/web3.js'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
-
-export function filterAndMapVerifiedCollections(nfts) {
-  return nfts
-    ?.filter((nft) => {
-      if (
-        nft.grouping &&
-        nft.grouping.find((x) => x.group_key === 'collection')
-      ) {
-        return true
-      } else {
-        return false
-      }
-    })
-    .reduce((prev, curr) => {
-      const collectionKey = curr.grouping.find(
-        (x) => x.group_key === 'collection'
-      )?.group_value
-      if (typeof collectionKey === 'undefined') return prev
-
-      if (prev[collectionKey]) {
-        prev[collectionKey].push(curr)
-      } else {
-        prev[collectionKey] = [curr]
-      }
-      return prev
-    }, {})
-}
+// import { dasByIdQueryFn } from '@hooks/queries/digitalAssets'
+// import { getNetworkFromEndpoint } from '@utils/connection'
+// import Network from 'arweave/node/network'
 
 async function enrichItemInfo(item, uri) {
   const { data: response } = await axios.get(uri)
@@ -75,6 +51,25 @@ async function enrichCollectionInfo(
     },
     collectionData.uri
   )
+}
+
+function transitToNFT(nft) {
+  return {
+    name: nft.content.metadata.name || '',
+    symbol: nft.content.metadata.symbol || '',
+    uri: nft.content.metadata.json_uri || '',
+    sellerFeeBasisPoints: nft.content.seller_fee_basis_points || 0,
+    creators: nft.creators,
+    description: nft.content.metadata.description || '',
+    seller_fee_basis_points: nft.content.seller_fee_basis_points || 0,
+    image: nft.content.links.image || '',
+    animation_url: nft.content.animation_url || '',
+    external_url: nft.content.external_url || '',
+    attributes: nft.content.attributes || [],
+    collection: nft.grouping.find((x) => x.group_key === 'collection')
+      ?.group_value,
+    properties: nft.properties || {},
+  }
 }
 
 async function getNFTCollectionInfo(
@@ -276,6 +271,13 @@ export default function AddNFTCollectionForm({
           connection.current,
           collectionInput
         )
+        // const network = getNetworkFromEndpoint(connection.endpoint)
+        // if (network === 'localnet') throw new Error()
+        // const { result: collectionInfo } = await dasByIdQueryFn(
+        //   network,
+        //   collectionInput
+        // )
+
         console.log('NFT collection info from user input:', collectionInfo)
         setValue('collectionKey', collectionInput)
         setCollectionVerificationState(
@@ -325,8 +327,9 @@ export default function AddNFTCollectionForm({
       if (!wallet?.publicKey) {
         throw new Error('No valid wallet connected')
       }
-      setWalletConnecting(false)
+
       setIsModalOpen(true)
+      setWalletConnecting(false)
     } catch (error) {
       setWalletConnecting(false)
       const err = error as Error
@@ -353,7 +356,9 @@ export default function AddNFTCollectionForm({
             if (key && collection) {
               handleClearSelectedNFT(true)
               setValue('collectionKey', key)
-              setSelectedNFTCollection(collection)
+              const enhancedCollection = transitToNFT(collection)
+              const nfts = collection.nfts.map((nft) => transitToNFT(nft))
+              setSelectedNFTCollection({ ...enhancedCollection, nfts })
             }
           }}
         />
@@ -472,8 +477,8 @@ export default function AddNFTCollectionForm({
                       .map((nft, index) => {
                         return (
                           <img
-                            key={nft.name + index}
-                            src={nft.image}
+                            key={nft?.name + index}
+                            src={nft?.image}
                             alt="collection item"
                             className={`absolute w-24 rounded-md ${
                               index === 0
