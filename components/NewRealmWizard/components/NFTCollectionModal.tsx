@@ -6,7 +6,7 @@ import Button from '@components/Button'
 import NFTCollectionSelector from '@components/NewRealmWizard/components/NFTCollectionSelector'
 import { WalletIcon } from './steps/AddNFTCollectionForm'
 import Modal from '@components/Modal'
-import { useOwnerVerifiecCollectionsQuery } from '@hooks/queries/nft'
+import { useOwnerVerifiedCollectionsQuery } from '@hooks/queries/nft'
 
 export default function NFTCollectionModal({
   isShow,
@@ -17,7 +17,7 @@ export default function NFTCollectionModal({
 }) {
   const [selected, setSelected] = useState('')
   const [show, setShow] = useState(false)
-  const { isLoading, data: collections } = useOwnerVerifiecCollectionsQuery(
+  const { isLoading, data: collections } = useOwnerVerifiedCollectionsQuery(
     walletPk
   )
 
