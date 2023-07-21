@@ -98,8 +98,6 @@ export default function NFTCollectionModal({
   }
 
   function handleChoose() {
-    console.log(collections![selected])
-    console.log(selected)
     onSelect({ key: selected, collection: collections![selected] })
     close()
   }

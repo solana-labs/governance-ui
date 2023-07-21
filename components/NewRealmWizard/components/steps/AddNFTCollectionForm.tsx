@@ -22,10 +22,8 @@ import { Metaplex } from '@metaplex-foundation/js'
 import { Connection, PublicKey } from '@solana/web3.js'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
-// import { dasByIdQueryFn } from '@hooks/queries/digitalAssets'
-// import { getNetworkFromEndpoint } from '@utils/connection'
-// import Network from 'arweave/node/network'
-
+import { dasByIdQueryFn } from '@hooks/queries/digitalAssets'
+import { getNetworkFromEndpoint } from '@utils/connection'
 async function enrichItemInfo(item, uri) {
   const { data: response } = await axios.get(uri)
   return {
@@ -53,6 +51,11 @@ async function enrichCollectionInfo(
   )
 }
 
+/***
+ * This function is used to convert the DAS format to the NFTCollection format for creating a new NFT DAO
+ * @note To be check if necessary
+ * @param nfts
+ */
 function transitToNFT(nft) {
   return {
     name: nft.content.metadata.name || '',
@@ -72,18 +75,18 @@ function transitToNFT(nft) {
   }
 }
 
-async function getNFTCollectionInfo(
-  connection: Connection,
-  collectionKey: string
-) {
-  const metaplex = new Metaplex(connection)
-  const data = await metaplex.nfts().findByMint({
-    mintAddress: new PublicKey(collectionKey),
-  })
-  console.log('collection', collectionKey, data)
+// async function getNFTCollectionInfo(
+//   connection: Connection,
+//   collectionKey: string
+// ) {
+//   const metaplex = new Metaplex(connection)
+//   const data = await metaplex.nfts().findByMint({
+//     mintAddress: new PublicKey(collectionKey),
+//   })
+//   console.log('collection', collectionKey, data)
 
-  return [data, await enrichCollectionInfo(connection, collectionKey)] as const
-}
+//   return [data, await enrichCollectionInfo(connection, collectionKey)] as const
+// }
 
 export const AddNFTCollectionSchema = {
   collectionKey: yup.string().required(),
@@ -267,21 +270,21 @@ export default function AddNFTCollectionForm({
       handleClearSelectedNFT(false)
       setRequestPending(true)
       try {
-        const [nft, collectionInfo] = await getNFTCollectionInfo(
-          connection.current,
-          collectionInput
-        )
-        // const network = getNetworkFromEndpoint(connection.endpoint)
-        // if (network === 'localnet') throw new Error()
-        // const { result: collectionInfo } = await dasByIdQueryFn(
-        //   network,
+        // const [nft, collectionInfo] = await getNFTCollectionInfo(
+        //   connection.current,
         //   collectionInput
         // )
+        const network = getNetworkFromEndpoint(connection.endpoint)
+        if (network === 'localnet') throw new Error()
+        const { result: collectionInfo } = await dasByIdQueryFn(
+          network,
+          collectionInput
+        )
 
         console.log('NFT collection info from user input:', collectionInfo)
         setValue('collectionKey', collectionInput)
         setCollectionVerificationState(
-          nft.collectionDetails !== null
+          collectionInfo.grouping.length === 0
             ? 'verified'
             : 'is nft but no collection details'
         )
