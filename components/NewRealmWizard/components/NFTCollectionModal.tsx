@@ -6,7 +6,81 @@ import Button from '@components/Button'
 import NFTCollectionSelector from '@components/NewRealmWizard/components/NFTCollectionSelector'
 import { WalletIcon } from './steps/AddNFTCollectionForm'
 import Modal from '@components/Modal'
-import { useOwnerVerifiedCollectionsQuery } from '@hooks/queries/nft'
+
+import {
+  dasByIdQueryFn,
+  digitalAssetsQueryKeys,
+  useDigitalAssetsByOwner,
+} from '@hooks/queries/digitalAssets'
+import { useConnection } from '@solana/wallet-adapter-react'
+import { useAsync } from 'react-async-hook'
+import queryClient from '@hooks/queries/queryClient'
+import { getNetworkFromEndpoint } from '@utils/connection'
+import { PublicKey } from '@solana/web3.js'
+
+function filterAndMapVerifiedCollections(nfts) {
+  return nfts
+    ?.filter((nft) => {
+      if (
+        nft.grouping &&
+        nft.grouping.find((x) => x.group_key === 'collection')
+      ) {
+        return true
+      } else {
+        return false
+      }
+    })
+    .reduce((prev, curr) => {
+      const collectionKey = curr.grouping.find(
+        (x) => x.group_key === 'collection'
+      )?.group_value
+      if (typeof collectionKey === 'undefined') return prev
+
+      if (prev[collectionKey]) {
+        prev[collectionKey].push(curr)
+      } else {
+        prev[collectionKey] = [curr]
+      }
+      return prev
+    }, {})
+}
+
+export const useOwnerVerifiedCollections = (owner: PublicKey) => {
+  const { connection } = useConnection()
+  const network = getNetworkFromEndpoint(connection.rpcEndpoint)
+  if (network === 'localnet') throw new Error()
+  const { data: ownedNfts } = useDigitalAssetsByOwner(owner)
+
+  const enabled = owner !== undefined && ownedNfts !== undefined
+  return useAsync(async () => {
+    if (!enabled) throw new Error()
+
+    const verifiedNfts = filterAndMapVerifiedCollections(ownedNfts)
+    const verifiedCollections = await Promise.all(
+      Object.keys(verifiedNfts).map(async (collectionKey) => {
+        const { result: collection } = await queryClient.fetchQuery({
+          queryKey: digitalAssetsQueryKeys.byId(
+            network,
+            new PublicKey(collectionKey)
+          ),
+          queryFn: () => dasByIdQueryFn(network, new PublicKey(collectionKey)),
+          staleTime: Infinity,
+        })
+        if (collection !== undefined) {
+          return {
+            ...collection,
+            collectionMintAddress: collectionKey,
+            nfts: verifiedNfts[collectionKey],
+          }
+        } else {
+          return null
+        }
+      })
+    )
+
+    return verifiedCollections.filter((x) => x !== null)
+  }, [connection, ownedNfts, enabled])
+}
 
 export default function NFTCollectionModal({
   isShow,
@@ -15,18 +89,17 @@ export default function NFTCollectionModal({
   onClose,
   onSelect,
 }) {
-  const [selected, setSelected] = useState('')
+  const { result: collections } = useOwnerVerifiedCollections(walletPk)
   const [show, setShow] = useState(false)
-  const { isLoading, data: collections } = useOwnerVerifiedCollectionsQuery(
-    walletPk
-  )
-
+  const [selected, setSelected] = useState('')
   function close() {
     onClose()
     setSelected('')
   }
 
   function handleChoose() {
+    console.log(collections![selected])
+    console.log(selected)
     onSelect({ key: selected, collection: collections![selected] })
     close()
   }
@@ -42,14 +115,13 @@ export default function NFTCollectionModal({
         { shouldFocus: true }
       )
     } else {
-      setShow(true)
+      setShow(isShow)
     }
-  }, [setError, collections, setShow, isShow])
+  }, [isShow, collections, setError])
 
   if (!show) {
     return <></>
   }
-
   return (
     show && (
       <Modal isOpen={show} onClose={onClose} sizeClassName="sm:max-w-2xl">
@@ -66,7 +138,6 @@ export default function NFTCollectionModal({
           </Header>
         </div>
         <NFTCollectionSelector
-          isLoading={isLoading}
           collections={collections}
           onChange={setSelected}
           value={selected}
