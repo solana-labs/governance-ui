@@ -89,7 +89,7 @@ export default function NFTCollectionModal({
   onClose,
   onSelect,
 }) {
-  const { result: collections } = useOwnerVerifiedCollections(walletPk)
+  const { result: collections, loading } = useOwnerVerifiedCollections(walletPk)
   const [show, setShow] = useState(false)
   const [selected, setSelected] = useState('')
   function close() {
@@ -136,6 +136,7 @@ export default function NFTCollectionModal({
           </Header>
         </div>
         <NFTCollectionSelector
+          isLoading={loading}
           collections={collections}
           onChange={setSelected}
           value={selected}
