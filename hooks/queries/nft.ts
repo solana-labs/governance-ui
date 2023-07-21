@@ -6,6 +6,10 @@ import { Metaplex } from '@metaplex-foundation/js'
 import { getNetworkFromEndpoint } from '@utils/connection'
 import queryClient from './queryClient'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { useDigitalAssetsByOwner } from './digitalAssets'
+import { useConnection } from '@solana/wallet-adapter-react'
+import { filterAndMapVerifiedCollections } from '@components/NewRealmWizard/components/steps/AddNFTCollectionForm'
+import axios from 'axios'
 
 export const nftQueryKeys = {
   all: (cluster: EndpointTypes) => [cluster, 'NFT'],
@@ -56,4 +60,41 @@ export const fetchNFTbyMint = (connection: Connection, pubkey: PublicKey) => {
       return asFindable(f)(pubkey)
     },
   })
+}
+
+export const useOwnerVerifiedCollectionsQuery = (owner: PublicKey) => {
+  const { connection } = useConnection()
+  const { data: ownedNfts } = useDigitalAssetsByOwner(owner)
+  const network = getNetworkFromEndpoint(connection.rpcEndpoint)
+  const verifiedNfts = filterAndMapVerifiedCollections(ownedNfts)
+
+  const enabled = owner !== undefined && ownedNfts !== undefined
+  const query = useQuery({
+    queryKey: enabled ? nftQueryKeys.byMint(network, owner) : undefined,
+    queryFn: async () => {
+      if (!enabled) throw new Error()
+
+      const verifiedCollections = {}
+      for (const collectionKey in verifiedNfts) {
+        const collectionInfo = await fetchNFTbyMint(
+          connection,
+          new PublicKey(collectionKey)
+        )
+
+        if (collectionInfo.result !== undefined) {
+          const { data: response } = await axios.get(collectionInfo.result.uri)
+          verifiedCollections[collectionKey] = {
+            ...collectionInfo.result,
+            ...response,
+            collectionMintAddress: collectionKey,
+            nfts: verifiedNfts[collectionKey],
+          }
+        }
+      }
+
+      return verifiedCollections
+    },
+    enabled,
+  })
+  return query
 }

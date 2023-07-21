@@ -27,9 +27,18 @@ function ImageWithLoader({
   )
 }
 
-const NFTCollectionSelector = ({ collections = {}, onChange, value }) => {
+const NFTCollectionSelector = ({
+  isLoading,
+  collections = {},
+  onChange,
+  value,
+}) => {
   const optionClass =
     'z-0 group flex flex-wrap md:items-center md:space-x-8 flex-wrap py-4 px-2 md:px-8 relative w-full default-transition rounded-md hover:cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 hover:opacity-100 hover:bg-bkg-3'
+
+  if (isLoading) {
+    return <Header as="h3">Loading your verified NFT collections...</Header>
+  }
 
   if (Object.keys(collections).length === 0) {
     return (
@@ -44,9 +53,10 @@ const NFTCollectionSelector = ({ collections = {}, onChange, value }) => {
       <div className={`w-full space-y-3`}>
         {Object.keys(collections).map((key) => {
           const collection = collections[key]
-          const totalNfts = collection.totalNfts
-          const images = collection.nfts.slice(0, 2).map((nft) => nft.image)
-
+          const totalNfts = collection.nfts.length
+          const images = collection.nfts
+            .slice(0, 2)
+            .map((nft) => nft.content.links?.image)
           for (let i = images.length; i < 3; i++) {
             images.unshift('')
           }

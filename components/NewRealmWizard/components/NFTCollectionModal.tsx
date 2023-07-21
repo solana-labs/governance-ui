@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { abbreviateAddress } from '@utils/formatting'
 
 import Header from '@components/Header'
@@ -6,15 +6,20 @@ import Button from '@components/Button'
 import NFTCollectionSelector from '@components/NewRealmWizard/components/NFTCollectionSelector'
 import { WalletIcon } from './steps/AddNFTCollectionForm'
 import Modal from '@components/Modal'
+import { useOwnerVerifiecCollectionsQuery } from '@hooks/queries/nft'
 
 export default function NFTCollectionModal({
-  show,
+  isShow,
   walletPk,
-  collections,
+  setError,
   onClose,
   onSelect,
 }) {
   const [selected, setSelected] = useState('')
+  const [show, setShow] = useState(false)
+  const { isLoading, data: collections } = useOwnerVerifiecCollectionsQuery(
+    walletPk
+  )
 
   function close() {
     onClose()
@@ -22,8 +27,27 @@ export default function NFTCollectionModal({
   }
 
   function handleChoose() {
-    onSelect({ key: selected, collection: collections[selected] })
+    onSelect({ key: selected, collection: collections![selected] })
     close()
+  }
+
+  useEffect(() => {
+    if (collections && Object.keys(collections).length === 0) {
+      setError(
+        'collectionInput',
+        {
+          type: 'error',
+          message: 'Current wallet has no verified collection',
+        },
+        { shouldFocus: true }
+      )
+    } else {
+      setShow(true)
+    }
+  }, [setError, collections, setShow, isShow])
+
+  if (!show) {
+    return <></>
   }
 
   return (
@@ -42,6 +66,7 @@ export default function NFTCollectionModal({
           </Header>
         </div>
         <NFTCollectionSelector
+          isLoading={isLoading}
           collections={collections}
           onChange={setSelected}
           value={selected}
