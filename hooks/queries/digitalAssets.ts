@@ -185,8 +185,11 @@ export const useDigitalAssetsByOwner = (owner: undefined | PublicKey) => {
   return useQuery({
     enabled,
     queryKey: owner && digitalAssetsQueryKeys.byOwner(network, owner),
-    queryFn: async () =>
-      enabled ? dasByOwnerQueryFn(network, owner) : new Error(),
+    queryFn: async () => {
+      if (!enabled) throw new Error()
+      return dasByOwnerQueryFn(network, owner)
+    },
+    // enabled ? dasByOwnerQueryFn(network, owner) : new Error(),
   })
 }
 
