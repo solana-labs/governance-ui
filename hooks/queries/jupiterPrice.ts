@@ -41,7 +41,7 @@ export const jupiterPriceQueryKeys = {
 }
 
 const jupQueryFn = async (mint: PublicKey) => {
-  const x = await fetch(`${URL}/ids=${mint?.toString()}`)
+  const x = await fetch(`${URL}?ids=${mint?.toString()}`)
   const response = (await x.json()) as Response
   const result = response.data[mint.toString()]
   return result !== undefined
@@ -83,7 +83,7 @@ export const useJupiterPricesByMintsQuery = (mints: PublicKey[]) => {
       const batches = [...chunks(mints, 100)]
       const responses = await Promise.all(
         batches.map(async (batch) => {
-          const x = await fetch(`${URL}/ids=${batch.join(',')}`)
+          const x = await fetch(`${URL}?ids=${batch.join(',')}`)
           const response = (await x.json()) as Response
           return response
         })
