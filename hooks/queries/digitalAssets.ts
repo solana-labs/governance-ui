@@ -43,6 +43,11 @@ export const digitalAssetsQueryKeys = {
   ],
 }
 
+export type DasNftObject = {
+  grouping: { group_key: 'collection'; group_value: string }[]
+  compression: { compressed: boolean }
+}
+
 /*** Here is an example item from the DAS Api, since it's not typed and the docs dont give the full schema.
  * {
     "interface": "V1_NFT",
@@ -186,7 +191,7 @@ export const useDigitalAssetsByOwner = (owner: undefined | PublicKey) => {
     enabled,
     queryKey: owner && digitalAssetsQueryKeys.byOwner(network, owner),
     queryFn: async () =>
-      enabled ? dasByOwnerQueryFn(network, owner) : new Error(),
+      enabled ? dasByOwnerQueryFn(network, owner) : (new Error() as never),
   })
 }
 

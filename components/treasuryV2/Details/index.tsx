@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react'
+import { forwardRef } from 'react'
 import cx from 'classnames'
 
 import { Asset, AssetType } from '@models/treasury/Asset'
@@ -90,6 +90,7 @@ const Details = forwardRef<HTMLDivElement, Props>((props, ref) => {
                 />
               ) : props.data.data.asset.type === AssetType.NFTCollection ? (
                 <NFTCollectionDetails
+                  governance={(props.data.data.wallet as any).governanceAddress}
                   nftCollection={props.data.data.asset}
                   isStickied={props.isStickied}
                 />

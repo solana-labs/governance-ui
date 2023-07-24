@@ -4,25 +4,61 @@ import { NFTCollection } from '@models/treasury/Asset'
 
 import Header from './Header'
 import StickyScrolledContainer from '../StickyScrolledContainer'
+import { useDigitalAssetsByOwner } from '@hooks/queries/digitalAssets'
+import useTreasuryAddressForGovernance from '@hooks/useTreasuryAddressForGovernance'
+import { useMemo } from 'react'
+import { SUPPORT_CNFTS } from '@constants/flags'
+import NFTGallery from '@components/NFTGallery'
+import { PublicKey } from '@solana/web3.js'
 
 interface Props {
   className?: string
   nftCollection: NFTCollection
   isStickied?: boolean
+  governance: string
 }
 
-const NftCollectionGallery = () => {
-  const { data: governanceNfts } = useRealmDigitalAssetsQuery()
-  const DASnftsFlat = useMemo(
+const NftCollectionGallery = ({
+  collectionId,
+  governance,
+  ...props
+}: Omit<Parameters<typeof NFTGallery>[0], 'nfts'> & {
+  collectionId: PublicKey
+  governance: PublicKey
+}) => {
+  const { result: treasury } = useTreasuryAddressForGovernance(governance)
+  const { data: governanceNfts } = useDigitalAssetsByOwner(governance)
+  const { data: treasuryNfts } = useDigitalAssetsByOwner(treasury)
+
+  const nfts = useMemo(
     () =>
-      nftsDAS?.flat().filter((x) => SUPPORT_CNFTS || !x.compression.compressed),
-    [nftsDAS]
+      governanceNfts && treasuryNfts
+        ? [...governanceNfts, ...treasuryNfts]
+            .flat()
+            .filter((x) => SUPPORT_CNFTS || !x.compression.compressed)
+            .filter((x) =>
+              (x.grouping as any[]).find(
+                (y) => y.group_value === collectionId.toString()
+              )
+            )
+        : undefined,
+    [collectionId, governanceNfts, treasuryNfts]
   )
 
-  return <div>bingus</div>
+  console.log('go', governanceNfts)
+  console.log('trea', treasuryNfts)
+  console.log('nfts', nfts)
+
+  return <NFTGallery nfts={nfts} {...props} />
 }
 
 export default function NFTCollectionDetails(props: Props) {
+  const collectionId = useMemo(() => new PublicKey(props.nftCollection.id), [
+    props.nftCollection.id,
+  ])
+  const governance = useMemo(() => new PublicKey(props.governance), [
+    props.governance,
+  ])
   return (
     <div className={cx(props.className, 'rounded', 'overflow-hidden')}>
       <StickyScrolledContainer
@@ -31,7 +67,13 @@ export default function NFTCollectionDetails(props: Props) {
       >
         <Header nftCollection={props.nftCollection} />
         <section className="p-6 bg-bkg-3">
-          <NftCollectionGallery />
+          <NftCollectionGallery
+            governance={governance}
+            collectionId={collectionId}
+            onClickSendNft={() => {
+              return
+            }}
+          />
         </section>
       </StickyScrolledContainer>
     </div>
