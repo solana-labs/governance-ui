@@ -284,7 +284,7 @@ const REALM = () => {
             pubkey: selectedProposal.proposalPk,
             owner: realm.pubkey,
           },
-          relevantTokenRecord.pubkey
+          relevantTokenRecord
         )
         if (client.client instanceof NftVoterClient === false) {
           await withCastVote(
