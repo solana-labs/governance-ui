@@ -2,12 +2,9 @@ import { useEffect, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
-import axios from 'axios'
-
 import { updateUserInput, validatePubkey } from '@utils/formValidation'
 import { notify } from '@utils/notifications'
 import { abbreviateAddress } from '@utils/formatting'
-
 
 import { NewButton as Button } from '@components/Button'
 import Text from '@components/Text'
@@ -19,80 +16,10 @@ import Input, {
 } from '@components/NewRealmWizard/components/Input'
 import AdviceBox from '@components/NewRealmWizard/components/AdviceBox'
 import NFTCollectionModal from '@components/NewRealmWizard/components/NFTCollectionModal'
-import { Metaplex } from '@metaplex-foundation/js'
-import { Connection, PublicKey } from '@solana/web3.js'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import asFindable from '@utils/queries/asFindable'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
-
-function filterAndMapVerifiedCollections(nfts) {
-  return nfts
-    .filter((nft) => {
-      if (nft.data?.collection) {
-        return nft.data?.collection?.verified
-      } else {
-        return nft.collection?.verified
-      }
-    })
-    .map((nft) => {
-      if (nft.data?.collection) {
-        return nft.data
-      } else {
-        return nft
-      }
-    })
-    .reduce((prev, curr) => {
-      const collectionKey = curr.collection?.key
-      if (typeof collectionKey === 'undefined') return prev
-
-      if (prev[collectionKey]) {
-        prev[collectionKey].push(curr)
-      } else {
-        prev[collectionKey] = [curr]
-      }
-      return prev
-    }, {})
-}
-
-async function enrichItemInfo(item, uri) {
-  const { data: response } = await axios.get(uri)
-  return {
-    ...item,
-    ...response,
-  }
-}
-
-async function enrichCollectionInfo(
-  connection: Connection,
-  collectionKey: string
-) {
-  const metaplex = new Metaplex(connection)
-  const data = await metaplex
-    .nfts()
-    .findByMint({ mintAddress: new PublicKey(collectionKey) })
-
-  const collectionData = data
-  return enrichItemInfo(
-    {
-      ...collectionData,
-      collectionMintAddress: collectionKey,
-    },
-    collectionData.uri
-  )
-}
-
-async function getNFTCollectionInfo(
-  connection: Connection,
-  collectionKey: string
-) {
-  const metaplex = new Metaplex(connection)
-  const data = await metaplex.nfts().findByMint({
-    mintAddress: new PublicKey(collectionKey),
-  })
-  console.log('collection', collectionKey, data)
-
-  return [data, await enrichCollectionInfo(connection, collectionKey)] as const
-}
+import { dasByIdQueryFn } from '@hooks/queries/digitalAssets'
+import { getNetworkFromEndpoint } from '@utils/connection'
 
 export const AddNFTCollectionSchema = {
   collectionKey: yup.string().required(),
@@ -209,12 +136,9 @@ export default function AddNFTCollectionForm({
   const [requestPending, setRequestPending] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const [collectionsInWallet, setCollectionsInWallet] = useState({})
+  // const [collectionsInWallet, setCollectionsInWallet] = useState({})
 
-  const [
-    selectedNFTCollection,
-    setSelectedNFTCollection,
-  ] = useState<NFTCollection>()
+  const [selectedNFTCollection, setSelectedNFTCollection] = useState<any>()
 
   const schema = yup.object(AddNFTCollectionSchema).required()
   const {
@@ -276,14 +200,17 @@ export default function AddNFTCollectionForm({
       handleClearSelectedNFT(false)
       setRequestPending(true)
       try {
-        const [nft, collectionInfo] = await getNFTCollectionInfo(
-          connection.current,
+        const network = getNetworkFromEndpoint(connection.endpoint)
+        if (network === 'localnet') throw new Error()
+        const { result: collectionInfo } = await dasByIdQueryFn(
+          network,
           collectionInput
         )
+
         console.log('NFT collection info from user input:', collectionInfo)
         setValue('collectionKey', collectionInput)
         setCollectionVerificationState(
-          nft.collectionDetails !== null
+          collectionInfo.grouping.length === 0
             ? 'verified'
             : 'is nft but no collection details'
         )
@@ -323,58 +250,14 @@ export default function AddNFTCollectionForm({
   async function handleSelectFromWallet() {
     try {
       setWalletConnecting(true)
-
       if (!connected) {
         if (wallet) await wallet.connect()
       }
       if (!wallet?.publicKey) {
         throw new Error('No valid wallet connected')
       }
-      const metaplex = new Metaplex(connection.current)
-      const ownedNfts = await metaplex.nfts().findAllByOwner({
-        owner: wallet.publicKey,
-      })
-      console.log('NFT wallet contents', ownedNfts)
-      const verfiedNfts = filterAndMapVerifiedCollections(ownedNfts)
-      console.log('NFT verified nft by collection', verfiedNfts)
 
-      const verifiedCollections = {}
-      for (const collectionKey in verfiedNfts) {
-        const collectionInfo = await asFindable(enrichCollectionInfo)(
-          connection.current,
-          collectionKey
-        )
-        if (collectionInfo.result !== undefined) {
-          const nftsWithInfo = await Promise.all(
-            verfiedNfts[collectionKey].slice(0, 2).map((nft) => {
-              return enrichItemInfo(nft, nft.uri)
-            })
-          )
-
-          verifiedCollections[collectionKey] = {
-            ...collectionInfo.result,
-            nfts: nftsWithInfo,
-          }
-        }
-      }
-
-      console.log(
-        'NFT verified collection metadata with nfts',
-        verifiedCollections
-      )
-      if (Object.keys(verifiedCollections).length === 0) {
-        setError(
-          'collectionInput',
-          {
-            type: 'error',
-            message: 'Current wallet has no verified collection',
-          },
-          { shouldFocus: true }
-        )
-      } else {
-        setCollectionsInWallet(verifiedCollections)
-        setIsModalOpen(true)
-      }
+      setIsModalOpen(true)
       setWalletConnecting(false)
     } catch (error) {
       setWalletConnecting(false)
@@ -392,19 +275,24 @@ export default function AddNFTCollectionForm({
       onSubmit={handleSubmit(serializeValues)}
       data-testid="add-nft-collection-form"
     >
-      <NFTCollectionModal
-        show={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        walletPk={wallet?.publicKey}
-        collections={collectionsInWallet}
-        onSelect={({ key, collection }) => {
-          if (key && collection) {
-            handleClearSelectedNFT(true)
-            setValue('collectionKey', key)
-            setSelectedNFTCollection(collection)
-          }
-        }}
-      />
+      {isModalOpen && (
+        <NFTCollectionModal
+          isShow={isModalOpen}
+          walletPk={wallet?.publicKey}
+          setError={setError}
+          onClose={() => setIsModalOpen(false)}
+          onSelect={({ key, collection }) => {
+            if (key && collection) {
+              handleClearSelectedNFT(true)
+              setValue('collectionKey', collection.id)
+              // const enhancedCollection = transitToNFT(collection)
+              // const nfts = collection.nfts.map((nft) => transitToNFT(nft))
+              // setSelectedNFTCollection({ ...enhancedCollection, nfts })
+              setSelectedNFTCollection(collection)
+            }
+          }}
+        />
+      )}
       <FormHeader
         type={type}
         currentStep={currentStep}
@@ -492,7 +380,7 @@ export default function AddNFTCollectionForm({
               <Text level="2">Getting collection data</Text>
             ) : (
               <Text level="2" className="flex space-x-4">
-                {!selectedNFTCollection?.name ? (
+                {!selectedNFTCollection?.content.metadata.name ? (
                   'Select a collection to preview...'
                 ) : (
                   <>
@@ -509,7 +397,7 @@ export default function AddNFTCollectionForm({
             )}
 
             <div className="flex mt-5 space-x-2">
-              {!selectedNFTCollection?.name ? (
+              {!selectedNFTCollection?.content.metadata.name ? (
                 <SkeletonNFTCollectionInfo />
               ) : (
                 <div className="flex w-full">
@@ -519,8 +407,8 @@ export default function AddNFTCollectionForm({
                       .map((nft, index) => {
                         return (
                           <img
-                            key={nft.name}
-                            src={nft.image}
+                            key={nft?.content.metadata.name + index}
+                            src={nft?.content.links?.image}
                             alt="collection item"
                             className={`absolute w-24 rounded-md ${
                               index === 0
@@ -535,13 +423,13 @@ export default function AddNFTCollectionForm({
                         )
                       })}
                     <img
-                      src={selectedNFTCollection?.image}
+                      src={selectedNFTCollection?.content.links?.image}
                       className="absolute w-24 rounded-md"
                     />
                   </div>
                   <div className="grid w-full pl-4">
                     <Text level="1" className="break-words">
-                      {selectedNFTCollection?.name ||
+                      {selectedNFTCollection?.content.metadata.name ||
                         '(Collection has no name)'}
                     </Text>
                     <Text level="2" className="truncate text-fgd-2">
