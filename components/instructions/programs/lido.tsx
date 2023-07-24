@@ -7,7 +7,7 @@ import BufferLayout from 'buffer-layout'
 import {
   LIDO_PROGRAM_ID,
   LIDO_PROGRAM_ID_DEVNET,
-} from '@components/TreasuryAccount/ConvertToStSol'
+} from '@constants/pubkeys/lido'
 
 const INSTRUCTIONS = {
   1: {

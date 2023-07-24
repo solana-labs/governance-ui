@@ -799,6 +799,7 @@ const loadGovernedTokenAccounts = async (
   realm: ProgramAccount<Realm>,
   governancesArray: GovernanceProgramAccountWithNativeTreasuryAddress[]
 ): Promise<AssetAccount[]> => {
+  console.log('loadGovernedTokenAccounts has been called')
   const auxiliaryTokenAccounts: typeof AUXILIARY_TOKEN_ACCOUNTS[keyof typeof AUXILIARY_TOKEN_ACCOUNTS] = AUXILIARY_TOKEN_ACCOUNTS[
     realm.account.name
   ]?.length

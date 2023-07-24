@@ -11,10 +11,9 @@ import {
 import { precision } from '@utils/formatting'
 import BigNumber from 'bignumber.js'
 import { AssetAccount } from '@utils/uiTypes/assets'
-import InstructionForm, {
-  InstructionInput,
-  InstructionInputType,
-} from '../instructions/FormCreator'
+import type { InstructionInput } from '../instructions/FormCreator'
+import { InstructionInputType } from '../instructions/inputInstructionType'
+import InstructionForm from '../instructions/FormCreator'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
