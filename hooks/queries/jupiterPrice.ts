@@ -92,11 +92,11 @@ export const useJupiterPricesByMintsQuery = (mints: PublicKey[]) => {
         (acc, next) => ({ ...acc, ...next.data }),
         {} as Response['data']
       )
-      Object.keys(data).forEach((mint) =>
+      mints.forEach((mint) =>
         queryClient.setQueryData(
-          jupiterPriceQueryKeys.byMint(new PublicKey(mint)),
-          data[mint]
-            ? ({ found: true, result: data[mint] } as const)
+          jupiterPriceQueryKeys.byMint(mint),
+          data[mint.toString()]
+            ? ({ found: true, result: data[mint.toString()] } as const)
             : ({ found: false, result: undefined } as const)
         )
       )
