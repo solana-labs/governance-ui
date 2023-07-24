@@ -1,11 +1,9 @@
-import React from 'react'
 import cx from 'classnames'
 
 import { NFTCollection } from '@models/treasury/Asset'
 
 import Header from './Header'
 import StickyScrolledContainer from '../StickyScrolledContainer'
-import Info from './Info'
 
 interface Props {
   className?: string
@@ -13,7 +11,18 @@ interface Props {
   isStickied?: boolean
 }
 
-export default function MintDetails(props: Props) {
+const NftCollectionGallery = () => {
+  const { data: governanceNfts } = useRealmDigitalAssetsQuery()
+  const DASnftsFlat = useMemo(
+    () =>
+      nftsDAS?.flat().filter((x) => SUPPORT_CNFTS || !x.compression.compressed),
+    [nftsDAS]
+  )
+
+  return <div>bingus</div>
+}
+
+export default function NFTCollectionDetails(props: Props) {
   return (
     <div className={cx(props.className, 'rounded', 'overflow-hidden')}>
       <StickyScrolledContainer
@@ -22,7 +31,7 @@ export default function MintDetails(props: Props) {
       >
         <Header nftCollection={props.nftCollection} />
         <section className="p-6 bg-bkg-3">
-          <Info nftCollection={props.nftCollection} />
+          <NftCollectionGallery />
         </section>
       </StickyScrolledContainer>
     </div>
