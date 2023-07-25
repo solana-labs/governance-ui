@@ -8,6 +8,7 @@ import {
   Realm,
   SYSTEM_PROGRAM_ID,
   Proposal,
+  TokenOwnerRecord,
 } from '@solana/spl-governance'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { chunks } from '@utils/helpers'
@@ -155,15 +156,21 @@ export class VotingClient {
   }
   withUpdateVoterWeightRecord = async (
     instructions: TransactionInstruction[],
-    tokenOwnerRecord: PublicKey,
+    tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>,
     type: UpdateVoterWeightRecordTypes,
     voterWeightTarget?: PublicKey
   ): Promise<ProgramAddresses | undefined> => {
-    if (this.noClient) {
+    const realm = this.realm!
+
+    if (
+      this.noClient ||
+      !realm.account.communityMint.equals(
+        tokenOwnerRecord.account.governingTokenMint
+      )
+    ) {
       return
     }
     const clientProgramId = this.client!.program.programId
-    const realm = this.realm!
     const walletPk = this.walletPk!
 
     if (this.client instanceof VsrClient) {
@@ -230,7 +237,7 @@ export class VotingClient {
           .accounts({
             registrar,
             voterWeightRecord: voterWeightPk,
-            voterTokenOwnerRecord: tokenOwnerRecord,
+            voterTokenOwnerRecord: tokenOwnerRecord.pubkey,
           })
           .remainingAccounts(remainingAccounts.slice(0, 10))
           .instruction()
@@ -330,7 +337,7 @@ export class VotingClient {
   withCastPluginVote = async (
     instructions: TransactionInstruction[],
     proposal: ProgramAccount<Proposal>,
-    tokenOwnerRecord: PublicKey
+    tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>
   ): Promise<ProgramAddresses | undefined> => {
     if (this.noClient) {
       return
@@ -449,7 +456,7 @@ export class VotingClient {
             })
             .accounts({
               registrar,
-              voterTokenOwnerRecord: tokenOwnerRecord,
+              voterTokenOwnerRecord: tokenOwnerRecord.pubkey,
             })
             .remainingAccounts(chunk)
             .instruction()
@@ -514,7 +521,7 @@ export class VotingClient {
             .accounts({
               registrar,
               voterWeightRecord: voterWeightPk,
-              voterTokenOwnerRecord: tokenOwnerRecord,
+              voterTokenOwnerRecord: tokenOwnerRecord.pubkey,
               voterAuthority: walletPk,
               payer: walletPk,
               systemProgram: SYSTEM_PROGRAM_ID,

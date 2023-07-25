@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
@@ -9,10 +9,8 @@ import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
-import InstructionForm, {
-  InstructionInput,
-  InstructionInputType,
-} from '../../FormCreator'
+import InstructionForm, { InstructionInput } from '../../FormCreator'
+import { InstructionInputType } from '../../inputInstructionType'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { MarketIndex } from '@blockworks-foundation/mango-v4/dist/types/src/accounts/serum3'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'

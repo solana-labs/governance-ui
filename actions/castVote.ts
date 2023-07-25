@@ -70,7 +70,7 @@ export async function castVote(
   const plugin = await votingPlugin?.withCastPluginVote(
     instructions,
     proposal,
-    tokenOwnerRecord.pubkey
+    tokenOwnerRecord
   )
 
   // It is not clear that defining these extraneous fields, `deny` and `veto`, is actually necessary.
@@ -129,7 +129,7 @@ export async function castVote(
   if (message) {
     const plugin = await votingPlugin?.withUpdateVoterWeightRecord(
       instructions,
-      tokenOwnerRecord.pubkey,
+      tokenOwnerRecord,
       'commentProposal'
     )
 
