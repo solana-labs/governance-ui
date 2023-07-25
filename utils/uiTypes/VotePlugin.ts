@@ -47,7 +47,6 @@ import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
 import { NftVoterClient } from './NftVoterClient'
 import queryClient from '@hooks/queries/queryClient'
 import asFindable from '@utils/queries/asFindable'
-import { SUPPORT_CNFTS } from '@constants/flags'
 
 type UpdateVoterWeightRecordTypes =
   | 'castVote'
@@ -266,9 +265,7 @@ export class VotingClient {
         instructions
       )
       const remainingAccounts: AccountData[] = []
-      const nfts = this.votingNfts.filter(
-        (x) => SUPPORT_CNFTS || !x.compression.compressed
-      )
+      const nfts = this.votingNfts.filter((x) => !x.compression.compressed)
       for (let i = 0; i < nfts.length; i++) {
         const nft = nfts[i]
         const tokenAccount = await getAssociatedTokenAddress(
@@ -276,7 +273,7 @@ export class VotingClient {
           walletPk,
           true
         )
-
+        console.log(tokenAccount.toBase58())
         remainingAccounts.push(
           new AccountData(tokenAccount),
           new AccountData(nft.id)
