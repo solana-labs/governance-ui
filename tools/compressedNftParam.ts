@@ -91,7 +91,7 @@ export async function getCompressedNftParamAndProof(
 
   const proofs = reducedProofs.map((proof) => new AccountData(proof))
   const additionalAccounts = [
-    new AccountData(compressedNft.treeAddress),
+    new AccountData(compressedNft.compression.tree),
     ...proofs,
   ]
 

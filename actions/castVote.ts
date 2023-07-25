@@ -226,7 +226,7 @@ export async function castVote(
     )
 
     const splIxsWithAccountsChunk = chunks(ixsWithOwnChunk, 2)
-    const nftsAccountsChunks = chunks(remainingIxsToChunk, 2)
+    const nftsAccountsChunks = chunks(remainingIxsToChunk, 1)
     const instructionsChunks = [
       ...nftsAccountsChunks.map((txBatch, batchIdx) => {
         return {
