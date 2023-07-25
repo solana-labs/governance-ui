@@ -5,14 +5,19 @@ import useGovernanceAssets from './useGovernanceAssets'
 import { useJupiterPricesByMintsQuery } from './queries/jupiterPrice'
 import { PublicKey } from '@metaplex-foundation/js'
 import { WSOL_MINT } from '@components/instructions/tools'
+import { AccountType } from '@utils/uiTypes/assets'
 
 export function useTotalTreasuryPrice() {
   const {
     governedTokenAccountsWithoutNfts,
     assetAccounts,
+    auxiliaryTokenAccounts,
   } = useGovernanceAssets()
 
-  const mintsToFetch = governedTokenAccountsWithoutNfts
+  const mintsToFetch = [
+    ...governedTokenAccountsWithoutNfts,
+    ...auxiliaryTokenAccounts,
+  ]
     .filter((x) => typeof x.extensions.mint !== 'undefined')
     .map((x) => x.extensions.mint!.publicKey)
 
@@ -21,7 +26,10 @@ export function useTotalTreasuryPrice() {
     new PublicKey(WSOL_MINT),
   ])
 
-  const totalTokensPrice = governedTokenAccountsWithoutNfts
+  const totalTokensPrice = [
+    ...governedTokenAccountsWithoutNfts,
+    ...auxiliaryTokenAccounts,
+  ]
     .filter((x) => typeof x.extensions.mint !== 'undefined')
     .map((x) => {
       return (
@@ -30,7 +38,7 @@ export function useTotalTreasuryPrice() {
           new BN(
             x.isSol
               ? x.extensions.solAccount!.lamports
-              : x.isToken
+              : x.isToken || x.type === AccountType.AUXILIARY_TOKEN
               ? x.extensions.token!.account?.amount
               : 0
           )

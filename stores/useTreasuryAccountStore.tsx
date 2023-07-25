@@ -26,7 +26,6 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
   recentActivity: [],
   isLoadingRecentActivity: false,
   isLoadingTokenAccounts: false,
-
   setCurrentAccount: async (account, connection) => {
     if (!account) {
       set((s) => {

@@ -7,7 +7,7 @@ import useQueryContext from '@hooks/useQueryContext'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 
-export const NEW_TREASURY_ROUTE = `/treasury/new`
+const NEW_TREASURY_ROUTE = `/treasury/new`
 
 export default function NewWalletButton() {
   const wallet = useWalletOnePointOh()

@@ -1,27 +1,43 @@
-import { Connection, PublicKey } from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js'
 import { useRealmGovernancesQuery } from './governance'
 import { useQuery } from '@tanstack/react-query'
 import { useRealmQuery } from './realm'
 import { useConnection } from '@solana/wallet-adapter-react'
-import { useRouter } from 'next/router'
 import { getNativeTreasuryAddress } from '@solana/spl-governance'
 import queryClient from './queryClient'
 import { getNetworkFromEndpoint } from '@utils/connection'
 
+type Network = 'devnet' | 'mainnet'
+const getHeliusEndpoint = (network: Network) => {
+  const url =
+    network === 'devnet'
+      ? process.env.NEXT_PUBLIC_HELIUS_DEVNET_RPC
+      : process.env.NEXT_PUBLIC_HELIUS_MAINNET_RPC
+  if (url === undefined)
+    throw new Error(
+      `Helius RPC endpoint not set in env: ${
+        network === 'devnet'
+          ? 'NEXT_PUBLIC_HELIUS_DEVNET_RPC'
+          : 'NEXT_PUBLIC_HELIUS_MAINNET_RPC'
+      }`
+    )
+  return url
+}
+
 export const digitalAssetsQueryKeys = {
-  all: (endpoint: string) => [endpoint, 'DigitalAssets'],
-  byId: (endpoint: string, id: PublicKey) => [
-    ...digitalAssetsQueryKeys.all(endpoint),
+  all: (network: Network) => [network, 'DigitalAssets'], //TBH endpoint is stupid for this. it should be either 'devnet' or 'mainnet'.
+  byId: (network: Network, id: PublicKey) => [
+    ...digitalAssetsQueryKeys.all(network),
     'by Id',
     id.toString(),
   ],
-  byOwner: (endpoint: string, owner: PublicKey) => [
-    ...digitalAssetsQueryKeys.all(endpoint),
+  byOwner: (network: Network, owner: PublicKey) => [
+    ...digitalAssetsQueryKeys.all(network),
     'by Owner',
     owner.toString(),
   ],
-  byRealm: (endpoint: string, realm: PublicKey) => [
-    ...digitalAssetsQueryKeys.all(endpoint),
+  byRealm: (network: Network, realm: PublicKey) => [
+    ...digitalAssetsQueryKeys.all(network),
     'by Realm',
     realm.toString(),
   ],
@@ -109,21 +125,8 @@ export const digitalAssetsQueryKeys = {
 }
  */
 
-export const dasByIdQueryFn = async (connection: Connection, id: PublicKey) => {
-  const cluster = getNetworkFromEndpoint(connection.rpcEndpoint)
-  const url =
-    cluster === 'devnet'
-      ? process.env.NEXT_PUBLIC_HELIUS_DEVNET_RPC
-      : process.env.NEXT_PUBLIC_HELIUS_MAINNET_RPC
-  if (url === undefined)
-    throw new Error(
-      `Helius RPC endpoint not set in env: ${
-        cluster === 'devnet'
-          ? 'NEXT_PUBLIC_HELIUS_DEVNET_RPC'
-          : 'NEXT_PUBLIC_HELIUS_MAINNET_RPC'
-      }`
-    )
-
+export const dasByIdQueryFn = async (network: Network, id: PublicKey) => {
+  const url = getHeliusEndpoint(network)
   const response = await fetch(url, {
     method: 'POST',
     headers: {
@@ -144,33 +147,66 @@ export const dasByIdQueryFn = async (connection: Connection, id: PublicKey) => {
   return { result: x.result, found: true }
 }
 
+const dasByOwnerQueryFn = async (network: Network, owner: PublicKey) => {
+  const url = getHeliusEndpoint(network)
+
+  // https://docs.helius.xyz/solana-compression/digital-asset-standard-das-api/get-assets-by-owner
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      id: 'Realms user',
+      method: 'getAssetsByOwner',
+      params: {
+        ownerAddress: owner.toString(),
+        page: 1, // Starts at 1
+        limit: 1000, // TODO support having >1k nfts
+      },
+    }),
+  })
+  const { result } = await response.json()
+  return result.items as any[]
+}
+
+export const fetchDigitalAssetsByOwner = (network: Network, owner: PublicKey) =>
+  queryClient.fetchQuery({
+    queryKey: digitalAssetsQueryKeys.byOwner(network, owner),
+    queryFn: () => dasByOwnerQueryFn(network, owner),
+  })
+
+export const useDigitalAssetsByOwner = (owner: undefined | PublicKey) => {
+  const { connection } = useConnection()
+  const network = getNetworkFromEndpoint(connection.rpcEndpoint) as Network
+  const enabled = owner !== undefined
+  return useQuery({
+    enabled,
+    queryKey: owner && digitalAssetsQueryKeys.byOwner(network, owner),
+    queryFn: async () => {
+      if (!enabled) throw new Error()
+      return dasByOwnerQueryFn(network, owner)
+    },
+    // enabled ? dasByOwnerQueryFn(network, owner) : new Error(),
+  })
+}
+
 export const useRealmDigitalAssetsQuery = () => {
   const { connection } = useConnection()
   const realm = useRealmQuery().data?.result
-  const { cluster } = useRouter().query
+  const network = getNetworkFromEndpoint(connection.rpcEndpoint) as Network
 
   const { data: governances } = useRealmGovernancesQuery()
 
   const enabled = realm !== undefined && governances !== undefined
   const query = useQuery({
     queryKey: enabled
-      ? digitalAssetsQueryKeys.byRealm(connection.rpcEndpoint, realm.pubkey)
+      ? digitalAssetsQueryKeys.byRealm(network, realm.pubkey)
       : undefined,
     queryFn: async () => {
       if (!enabled) throw new Error()
-
-      const url =
-        cluster === 'devnet'
-          ? process.env.NEXT_PUBLIC_HELIUS_DEVNET_RPC
-          : process.env.NEXT_PUBLIC_HELIUS_MAINNET_RPC
-      if (url === undefined)
-        throw new Error(
-          `Helius RPC endpoint not set in env: ${
-            cluster === 'devnet'
-              ? 'NEXT_PUBLIC_HELIUS_DEVNET_RPC'
-              : 'NEXT_PUBLIC_HELIUS_MAINNET_RPC'
-          }`
-        )
 
       const treasuries = await Promise.all(
         governances.map((x) => getNativeTreasuryAddress(realm.owner, x.pubkey))
@@ -178,31 +214,9 @@ export const useRealmDigitalAssetsQuery = () => {
       const governancePks = governances.map((x) => x.pubkey)
 
       const results = await Promise.all(
-        [...treasuries, ...governancePks].map(async (x) => {
-          // https://docs.helius.xyz/solana-compression/digital-asset-standard-das-api/get-assets-by-owner
-          const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              jsonrpc: '2.0',
-              id: 'Realms user',
-              method: 'getAssetsByOwner',
-              params: {
-                ownerAddress: x.toString(),
-                page: 1, // Starts at 1
-                limit: 1000, // TODO support having >1k nfts
-              },
-            }),
-          })
-          const { result } = await response.json()
-          queryClient.setQueryData(
-            digitalAssetsQueryKeys.byOwner(connection.rpcEndpoint, x),
-            result.items as any[]
-          )
-          return result.items as any[]
-        })
+        [...treasuries, ...governancePks].map((x) =>
+          fetchDigitalAssetsByOwner(network, x)
+        )
       )
       console.log('results', results)
       return results

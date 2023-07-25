@@ -10,10 +10,8 @@ import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NewProposalContext } from '../../../new'
-import InstructionForm, {
-  InstructionInput,
-  InstructionInputType,
-} from '../FormCreator'
+import InstructionForm, { InstructionInput } from '../FormCreator'
+import { InstructionInputType } from '../inputInstructionType'
 import { PublicKey } from '@solana/web3.js'
 import { getValidatedPublickKey } from '@utils/validations'
 import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
