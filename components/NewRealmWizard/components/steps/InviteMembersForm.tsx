@@ -302,7 +302,7 @@ export default function InviteMembersForm({
             <div className="py-5 space-y-5">
               {inviteList.map((address, index) => (
                 <InviteAddress
-                  key={address}
+                  key={address + index}
                   address={address}
                   currentUser={address === userAddress}
                   index={index + 1}
