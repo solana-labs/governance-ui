@@ -1,21 +1,21 @@
 import { BN } from '@coral-xyz/anchor'
 import { MaxVoterWeightRecord, ProgramAccount } from '@solana/spl-governance'
-import { NFTWithMeta, VotingClient } from '@utils/uiTypes/VotePlugin'
+import { VotingClient } from '@utils/uiTypes/VotePlugin'
 import create, { State } from 'zustand'
 
 interface nftPluginStore extends State {
   state: {
-    votingNfts: NFTWithMeta[]
+    votingNfts: any[]
     votingPower: BN
     maxVoteRecord: ProgramAccount<MaxVoterWeightRecord> | null
     isLoadingNfts: boolean
   }
   setVotingNfts: (
-    nfts: NFTWithMeta[],
+    nfts: any[],
     votingClient: VotingClient,
     nftMintRegistrar: any
   ) => void
-  setVotingPower: (nfts: NFTWithMeta[], nftMintRegistrar: any) => void
+  setVotingPower: (nfts: any[], nftMintRegistrar: any) => void
   setMaxVoterWeight: (
     maxVoterRecord: ProgramAccount<MaxVoterWeightRecord> | null
   ) => void
@@ -49,8 +49,12 @@ const useNftPluginStore = create<nftPluginStore>((set, _get) => ({
     const votingPower = nfts
       .map(
         (x) =>
-          nftMintRegistrar?.collectionConfigs?.find(
-            (j) => j.collection?.toBase58() === x.collection.mintAddress
+          nftMintRegistrar?.collectionConfigs?.find((j) =>
+            x.grouping.find(
+              (k) =>
+                k.group_key === 'collection' &&
+                k.group_value === j.collection?.toBase58()
+            )
           )?.weight || new BN(0)
       )
       .reduce((prev, next) => prev.add(next), new BN(0))
