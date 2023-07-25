@@ -3,6 +3,7 @@ import {
   SwitchboardQueueVoterClient,
   SWITCHBOARD_ADDIN_ID,
 } from '../../SwitchboardVotePlugin/SwitchboardQueueVoterClient'
+import { PROGRAM_ID as ACCOUNT_COMPACTION_PROGRAM_ID } from '@solana/spl-account-compression'
 import {
   ProgramAccount,
   Realm,
@@ -47,6 +48,8 @@ import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
 import { NftVoterClient } from './NftVoterClient'
 import queryClient from '@hooks/queries/queryClient'
 import asFindable from '@utils/queries/asFindable'
+import { fetchNFTbyMint } from '@hooks/queries/nft'
+import { getCompressedNftParamAndProof } from '@tools/compressedNftParam'
 
 type UpdateVoterWeightRecordTypes =
   | 'castVote'
@@ -266,29 +269,59 @@ export class VotingClient {
       )
       const remainingAccounts: AccountData[] = []
       const nfts = this.votingNfts.filter((x) => !x.compression.compressed)
-      for (let i = 0; i < nfts.length; i++) {
-        const nft = nfts[i]
-        const tokenAccount = await getAssociatedTokenAddress(
-          new PublicKey(nft.id),
-          walletPk,
-          true
+      const compressedNfts = this.votingNfts.filter(
+        (x) => x.compression.compressed
+      )
+      if (nfts.length > compressedNfts.length) {
+        for (let i = 0; i < nfts.length; i++) {
+          const nft = nfts[i]
+          const tokenAccount = await getAssociatedTokenAddress(
+            new PublicKey(nft.id),
+            walletPk,
+            true
+          )
+          const metadata = await fetchNFTbyMint(
+            this.client.program.provider.connection,
+            new PublicKey(nft.id)
+          )
+          remainingAccounts.push(
+            new AccountData(tokenAccount),
+            new AccountData(metadata?.result?.metadataAddress || '')
+          )
+        }
+        const updateVoterWeightRecordIx = await this.client.program.methods
+          .updateNftVoterWeightRecord({ [type]: {} })
+          .accounts({
+            registrar: registrar,
+            voterWeightRecord: voterWeightPk,
+          })
+          .remainingAccounts(remainingAccounts.slice(0, 10))
+          .instruction()
+        instructions.push(updateVoterWeightRecordIx)
+        return { voterWeightPk, maxVoterWeightRecord }
+      } else {
+        const compressedNft = compressedNfts[0]
+        const {
+          param,
+          additionalAccounts,
+        } = await getCompressedNftParamAndProof(
+          this.client.program.provider.connection,
+          compressedNft
         )
-        console.log(tokenAccount.toBase58())
-        remainingAccounts.push(
-          new AccountData(tokenAccount),
-          new AccountData(nft.id)
-        )
+        const updateVoterWeightRecordIx = await this.client.program.methods
+          .updateCnftVoterWeightRecord({ [type]: {} }, [param])
+          .accounts({
+            registrar,
+            voterWeightRecord: voterWeightPk,
+            leafOwner: new PublicKey(compressedNft.ownership.owner),
+            compressionProgram: ACCOUNT_COMPACTION_PROGRAM_ID,
+          })
+          .remainingAccounts(additionalAccounts)
+          .instruction()
+
+        instructions.push(updateVoterWeightRecordIx)
+        return { voterWeightPk, maxVoterWeightRecord }
       }
-      const updateVoterWeightRecordIx = await this.client.program.methods
-        .updateNftVoterWeightRecord({ [type]: {} })
-        .accounts({
-          registrar: registrar,
-          voterWeightRecord: voterWeightPk,
-        })
-        .remainingAccounts(remainingAccounts.slice(0, 10))
-        .instruction()
-      instructions.push(updateVoterWeightRecordIx)
-      return { voterWeightPk, maxVoterWeightRecord }
     }
     if (this.client instanceof GatewayClient) {
       const { voterWeightPk } = await this._withHandleGatewayVoterWeight(
