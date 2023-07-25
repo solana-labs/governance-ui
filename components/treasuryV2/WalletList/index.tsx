@@ -157,7 +157,11 @@ export default function WalletList(props: Props) {
                     : // @ts-ignore
                       props.selectedWallet?.name === wallet.name
                 }
-                selectedAsset={props.selectedAsset}
+                selectedAsset={
+                  props.selectedAsset !== 'USE NON-LEGACY STATE'
+                    ? props.selectedAsset
+                    : null
+                }
                 wallet={wallet}
                 onExpand={() => {
                   setExpanded((list) => {

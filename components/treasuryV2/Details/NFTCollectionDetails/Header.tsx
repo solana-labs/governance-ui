@@ -74,7 +74,6 @@ export default function Header({ collectionId, governance }: Props) {
               : undefined
           }
           onClick={() => {
-            // setCurrentAccount(nftsGovernedTokenAccounts[0], connection) // @asktree: this does nothing identifiably desireable at all? there is no reason this value would correspond to anything the user is doing
             setSendNFTsModalOpen(true)
           }}
         >

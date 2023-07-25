@@ -67,7 +67,7 @@ interface Props {
   selectedAssetId?: string | null
   onSelectAsset?(asset: Asset): void
   onToggleExpandSection?(section: Section): void
-  governance: PublicKey
+  governance: PublicKey | undefined
 }
 
 export default function AssetList(props: Props) {
@@ -231,7 +231,7 @@ export default function AssetList(props: Props) {
           onToggleExpand={() => props.onToggleExpandSection?.('tokens')}
         />
       )}
-      {nfts && nfts.length > 0 && (
+      {nfts && nfts.length > 0 && props.governance !== undefined && (
         <NFTList
           governance={props.governance}
           disableCollapse={!diplayingMultipleAssetTypes}
