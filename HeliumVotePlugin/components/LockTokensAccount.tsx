@@ -44,12 +44,19 @@ import {
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { ClaimAllRewardsBtn } from './ClaimAllRewardsBtn'
+import { useClaimAllPositionsRewards } from 'HeliumVotePlugin/hooks/useClaimAllPositionsRewards'
+import { HNT_MINT } from '@helium/spl-utils'
 
 export const LockTokensAccount: React.FC<{
   // tokenOwnerRecordPk: string | string[] | undefined // @asktree: this was unused
   children: React.ReactNode
 }> = (props) => {
-  const { error, createPosition } = useCreatePosition()
+  const { error: createError, createPosition } = useCreatePosition()
+  const {
+    error: claimingRewardsError,
+    claimAllPositionsRewards,
+  } = useClaimAllPositionsRewards()
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
   const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
@@ -102,6 +109,8 @@ export const LockTokensAccount: React.FC<{
     s.getPositions,
   ])
 
+  const canDelegate = realm?.account.communityMint.equals(HNT_MINT)
+
   const sortedPositions = useMemo(
     () =>
       positions.sort((a, b) => {
@@ -114,6 +123,11 @@ export const LockTokensAccount: React.FC<{
 
         return a.amountDepositedNative.gt(b.amountDepositedNative) ? -1 : 0
       }),
+    [positions]
+  )
+
+  const positionsWithRewards = useMemo(
+    () => positions.filter((p) => p.hasRewards),
     [positions]
   )
 
@@ -152,6 +166,17 @@ export const LockTokensAccount: React.FC<{
       })
     }
   }, [tokenOwnerRecordWalletPk, vsrClient])
+
+  const refetchState = async () => {
+    await getPositions({
+      votingClient: currentClient,
+      realmPk: realm!.pubkey,
+      communityMintPk: realm!.account.communityMint,
+      walletPk: wallet!.publicKey!,
+      client: vsrClient!,
+      connection: connection.current,
+    })
+  }
 
   const hasTokensInWallet =
     realmTokenAccount && realmTokenAccount.account.amount.gt(new BN(0))
@@ -221,14 +246,22 @@ export const LockTokensAccount: React.FC<{
       tokenOwnerRecordPk: tokenOwnerRecordPk ?? null, //@asktree: using `null` in 2023 huh.. discusting...
     })
 
-    if (!error) {
-      await getPositions({
-        votingClient: currentClient,
-        realmPk: realm!.pubkey,
-        communityMintPk: realm!.account.communityMint,
-        walletPk: wallet!.publicKey!,
-        client: vsrClient!,
-        connection: connection.current,
+    if (!createError) {
+      await refetchState()
+    }
+  }
+
+  const handleClaimAllRewards = async () => {
+    try {
+      await claimAllPositionsRewards({ positions: positionsWithRewards })
+
+      if (!claimingRewardsError) {
+        await refetchState()
+      }
+    } catch (e) {
+      notify({
+        type: 'error',
+        message: e.message || 'Unable to claim rewards',
       })
     }
   }
@@ -331,7 +364,12 @@ export const LockTokensAccount: React.FC<{
                 </>
               )}
             </div>
-            <h2 className="mb-4">Locked Positions</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="mb-4">Locked Positions</h2>
+              {isSameWallet && canDelegate && (
+                <ClaimAllRewardsBtn onClick={handleClaimAllRewards} />
+              )}
+            </div>
             <div
               className={`grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8 ${
                 !isSameWallet ? 'opacity-0.8 pointer-events-none' : ''

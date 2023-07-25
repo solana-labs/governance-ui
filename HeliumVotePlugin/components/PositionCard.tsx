@@ -30,7 +30,6 @@ import { useClosePosition } from '../hooks/useClosePosition'
 import { DelegateTokensModal } from './DelegateTokensModal'
 import { useDelegatePosition } from '../hooks/useDelegatePosition'
 import { useUndelegatePosition } from '../hooks/useUndelegatePosition'
-import { useClaimDelegatedPositionRewards } from '../hooks/useClaimDelegatedPositionRewards'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { PublicKey } from '@solana/web3.js'
 import { PromptModal } from './PromptModal'
@@ -39,6 +38,7 @@ import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 import queryClient from '@hooks/queries/queryClient'
 import { tokenAccountQueryKeys } from '@hooks/queries/tokenAccount'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { useClaimPositionRewards } from '../hooks/useClaimPositionRewards'
 
 interface PositionCardProps {
   subDaos?: SubDaoWithMeta[]
@@ -154,8 +154,8 @@ export const PositionCard: React.FC<PositionCardProps> = ({
   const {
     loading: isClaimingRewards,
     error: claimingRewardsError,
-    claimDelegatedPositionRewards,
-  } = useClaimDelegatedPositionRewards()
+    claimPositionRewards,
+  } = useClaimPositionRewards()
 
   const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
@@ -297,7 +297,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
 
   const handleClaimRewards = async () => {
     try {
-      await claimDelegatedPositionRewards({ position, tokenOwnerRecordPk })
+      await claimPositionRewards({ position })
 
       if (!claimingRewardsError) {
         await refetchState()
