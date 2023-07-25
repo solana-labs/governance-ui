@@ -3,41 +3,17 @@ import VoteCommentModal from '@components/VoteCommentModal'
 import { BanIcon } from '@heroicons/react/solid'
 import useRealm from '@hooks/useRealm'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { VoteThresholdType, VoteKind } from '@solana/spl-governance'
-import { useMemo, useState } from 'react'
-import { useIsInCoolOffTime, useIsVoting, useVotingPop } from './hooks'
+import { VoteKind } from '@solana/spl-governance'
+import { useState } from 'react'
 import {
-  useUserCommunityTokenOwnerRecord,
-  useUserCouncilTokenOwnerRecord,
-} from '@hooks/queries/tokenOwnerRecord'
-import { useRealmQuery } from '@hooks/queries/realm'
-import { useProposalGovernanceQuery } from '@hooks/useProposal'
+  useIsInCoolOffTime,
+  useIsVoting,
+  useUserVetoTokenRecord,
+  useVetoingPop,
+} from './hooks'
 import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
 import { useSubmitVote } from '@hooks/useSubmitVote'
 import { useSelectedRealmInfo } from '@hooks/selectedRealm/useSelectedRealmRegistryEntry'
-
-/*
-  returns: undefined if loading, false if nobody can veto, 'council' if council can veto, 'community' if community can veto
-*/
-export const useVetoingPop = () => {
-  const tokenRole = useVotingPop()
-  const governance = useProposalGovernanceQuery().data?.result
-  const realm = useRealmQuery().data?.result
-  const vetoingPop = useMemo(() => {
-    if (governance === undefined) return undefined
-
-    return tokenRole === 'community'
-      ? governance?.account.config.councilVetoVoteThreshold.type !==
-          VoteThresholdType.Disabled &&
-          // if there is no council then there's not actually a vetoing population, in my opinion
-          realm?.account.config.councilMint !== undefined &&
-          'council'
-      : governance?.account.config.communityVetoVoteThreshold.type !==
-          VoteThresholdType.Disabled && 'community'
-  }, [governance, tokenRole, realm?.account.config.councilMint])
-
-  return vetoingPop
-}
 
 const useIsVetoable = (): undefined | boolean => {
   const vetoingPop = useVetoingPop()
@@ -47,16 +23,6 @@ const useIsVetoable = (): undefined | boolean => {
   if (isVoting === false && isInCoolOffTime === false) return false
   if (vetoingPop === undefined) return undefined
   return !!vetoingPop
-}
-
-const useUserVetoTokenRecord = () => {
-  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
-  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
-
-  const vetoingPop = useVetoingPop()
-  const voterTokenRecord =
-    vetoingPop === 'community' ? ownTokenRecord : ownCouncilTokenRecord
-  return voterTokenRecord
 }
 
 const useCanVeto = ():
