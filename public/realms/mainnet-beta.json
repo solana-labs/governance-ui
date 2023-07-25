@@ -54,6 +54,21 @@
     "github": "https://github.com/blockworks-foundation/"
   },
   {
+    "symbol": "MNGO-TC",
+    "category": "defi",
+    "displayName": "Mango Treasury Council",
+    "programId": "GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J",
+    "realmId": "7CWXhWsMXbfx8caHcpCbSQKDpsaLNu65YoBLoGfogzk6",
+    "communityMint": "DYg9LHzbhk9pg7h3Zhda2CW1berCp7NZQYxUEW6Eex35",
+    "ogImage": "https://i.imgur.com/448n6bC.jpg",
+    "shortDescription": "Every market, all the power, none of the fuss. Simplifying decentralized finance through easy-to-use products and developer tools.",
+    "website": "https://mango.markets",
+    "keywords": "Mango Markets, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
+    "twitter": "@mangomarkets",
+    "discord": "https://discord.com/invite/2uwjsBc5yw",
+    "github": "https://github.com/blockworks-foundation/"
+  },
+  {
     "symbol": "Metaplex",
     "bannerImage": "https://dao.metaplex.com/img/bg-metaplex.svg",
     "displayName": "Metaplex DAO",
@@ -208,7 +223,7 @@
     "website": "https://mango.markets",
     "keywords": "Mango Markets, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
     "twitter": "@mangomarkets",
-    "ogImage": "https://trade.mango.markets/assets/icons/logo.svg"
+    "ogImage": "https://i.imgur.com/448n6bC.jpg"
   },
   {
     "symbol": "MangolanaCouncil",

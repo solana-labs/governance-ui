@@ -5,16 +5,21 @@ import BigNumber from 'bignumber.js'
 import { useState, useEffect } from 'react'
 import useGovernanceAssets from './useGovernanceAssets'
 import { WSOL_MINT } from '@components/instructions/tools'
+import { AccountType } from '@utils/uiTypes/assets'
 
 export function useTotalTreasuryPrice() {
   const {
     governedTokenAccountsWithoutNfts,
     assetAccounts,
+    auxiliaryTokenAccounts,
   } = useGovernanceAssets()
   const [totalPriceFormatted, setTotalPriceFormatted] = useState('')
   useEffect(() => {
     async function calcTotalTokensPrice() {
-      const tokenAccountsTotalPrice = governedTokenAccountsWithoutNfts
+      const tokenAccountsTotalPrice = [
+        ...governedTokenAccountsWithoutNfts,
+        ...auxiliaryTokenAccounts,
+      ]
         .filter((x) => typeof x.extensions.mint !== 'undefined')
         .map((x) => {
           return (
@@ -23,7 +28,7 @@ export function useTotalTreasuryPrice() {
               new BN(
                 x.isSol
                   ? x.extensions.solAccount!.lamports
-                  : x.isToken
+                  : x.isToken || x.type === AccountType.AUXILIARY_TOKEN
                   ? x.extensions.token!.account?.amount
                   : 0
               )
