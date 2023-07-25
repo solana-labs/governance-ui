@@ -257,7 +257,7 @@ export const assembleWallets = async (
         convertAccountToAsset({ ...account, type: AccountType.TOKEN }) as Token
     )
     .filter(isNotNull)
-  console.log(auxiliaryAssets)
+
   const auxiliaryWallets: AuxiliaryWallet[] = auxiliaryAssets.length
     ? [
         {
