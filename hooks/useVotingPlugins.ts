@@ -144,8 +144,7 @@ export function useVotingPlugins() {
     (nft: any) => {
       const collection = nft.grouping.find((x) => x.group_key === 'collection')
       return (
-        SUPPORT_CNFTS &&
-        !nft.compression.compressed &&
+        (SUPPORT_CNFTS || !nft.compression.compressed) &&
         nft.grouping &&
         collection &&
         collection.group_value &&

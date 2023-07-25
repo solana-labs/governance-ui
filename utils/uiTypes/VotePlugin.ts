@@ -47,6 +47,7 @@ import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
 import { NftVoterClient } from './NftVoterClient'
 import queryClient from '@hooks/queries/queryClient'
 import asFindable from '@utils/queries/asFindable'
+import { SUPPORT_CNFTS } from '@constants/flags'
 
 type UpdateVoterWeightRecordTypes =
   | 'castVote'
@@ -108,7 +109,7 @@ export class VotingClient {
   client: Client | undefined
   realm: ProgramAccount<Realm> | undefined
   walletPk: PublicKey | null | undefined
-  votingNfts: NFTWithMeta[]
+  votingNfts: any[]
   heliumVsrVotingPositions: PositionWithMeta[]
   gatewayToken: PublicKey
   oracles: PublicKey[]
@@ -265,17 +266,24 @@ export class VotingClient {
         instructions
       )
       const remainingAccounts: AccountData[] = []
-      for (let i = 0; i < this.votingNfts.length; i++) {
-        const nft = this.votingNfts[i]
-        const tokenAccount = await nft.getAssociatedTokenAccount()
+      const nfts = this.votingNfts.filter(
+        (x) => SUPPORT_CNFTS || !x.compression.compressed
+      )
+      for (let i = 0; i < nfts.length; i++) {
+        const nft = nfts[i]
+        const tokenAccount = await getAssociatedTokenAddress(
+          new PublicKey(nft.id),
+          walletPk,
+          true
+        )
 
         remainingAccounts.push(
           new AccountData(tokenAccount),
-          new AccountData(nft.address)
+          new AccountData(nft.id)
         )
       }
       const updateVoterWeightRecordIx = await this.client.program.methods
-        .updateVoterWeightRecord({ [type]: {} })
+        .updateNftVoterWeightRecord({ [type]: {} })
         .accounts({
           registrar: registrar,
           voterWeightRecord: voterWeightPk,
@@ -753,7 +761,7 @@ export class VotingClient {
       voterWeightRecordBump,
     }
   }
-  _setCurrentVoterNfts = (nfts: NFTWithMeta[]) => {
+  _setCurrentVoterNfts = (nfts: any[]) => {
     this.votingNfts = nfts
   }
   _setCurrentHeliumVsrPositions = (positions: PositionWithMeta[]) => {
