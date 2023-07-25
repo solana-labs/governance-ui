@@ -16,6 +16,7 @@ import WalletDetails from './WalletDetails'
 import DomainsDetails from './DomainsDetails'
 import TokenOwnerRecordDetails from './TokenOwnerRecordDetails'
 import StakeDetails from './StakeDetails'
+import { useTreasurySelectState } from './treasurySelectStore'
 
 function walletIsNotAuxiliary(
   wallet: AuxiliaryWallet | Wallet
@@ -26,13 +27,15 @@ function walletIsNotAuxiliary(
 interface Props {
   className?: string
   data: Result<{
-    asset?: Asset | null
-    wallet?: AuxiliaryWallet | Wallet | null
+    asset?: Asset | null | 'USE NON-LEGACY STATE'
+    wallet?: AuxiliaryWallet | Wallet | null | 'USE NON-LEGACY STATE'
   }>
   isStickied?: boolean
 }
 
 const Details = forwardRef<HTMLDivElement, Props>((props, ref) => {
+  const [treasurySelect] = useTreasurySelectState()
+
   switch (props.data._tag) {
     case Status.Failed:
       return (
@@ -55,7 +58,18 @@ const Details = forwardRef<HTMLDivElement, Props>((props, ref) => {
           )}
           ref={ref}
         >
-          {props.data.data.wallet && props.data.data.asset ? (
+          {props.data.data.wallet === 'USE NON-LEGACY STATE' ||
+          props.data.data.asset === 'USE NON-LEGACY STATE' ? (
+            treasurySelect?._kind === 'NftCollection' ? (
+              <NFTCollectionDetails
+                governance={treasurySelect.selectedGovernance}
+                collectionId={treasurySelect.collectionId}
+                isStickied={props.isStickied}
+              />
+            ) : (
+              (null as never)
+            )
+          ) : props.data.data.wallet && props.data.data.asset ? (
             <>
               {props.data.data.asset.type === AssetType.Sol ||
               props.data.data.asset.type === AssetType.Token ? (
@@ -86,12 +100,6 @@ const Details = forwardRef<HTMLDivElement, Props>((props, ref) => {
               ) : props.data.data.asset.type === AssetType.RealmAuthority ? (
                 <RealmAuthorityDetails
                   realmAuthority={props.data.data.asset}
-                  isStickied={props.isStickied}
-                />
-              ) : props.data.data.asset.type === AssetType.NFTCollection ? (
-                <NFTCollectionDetails
-                  governance={(props.data.data.wallet as any).governanceAddress}
-                  nftCollection={props.data.data.asset}
                   isStickied={props.isStickied}
                 />
               ) : props.data.data.asset.type === AssetType.Domain ? (

@@ -8,17 +8,16 @@ import NFTCollectionPreviewIcon from '@components/treasuryV2/icons/NFTCollection
 import useTreasuryAddressForGovernance from '@hooks/useTreasuryAddressForGovernance'
 import { useMemo } from 'react'
 import { SUPPORT_CNFTS } from '@constants/flags'
+import { useTreasurySelectState } from '@components/treasuryV2/Details/treasurySelectStore'
 
 interface Props {
   collectionId: PublicKey | 'none'
-  onSelect?(): void
   governance: PublicKey
 }
 
 const Collection = ({
   governance,
   collectionId,
-  ...props
 }: Props & { collectionId: PublicKey }) => {
   const { result: treasury } = useTreasuryAddressForGovernance(governance)
   const { data: governanceNfts } = useDigitalAssetsByOwner(governance)
@@ -44,6 +43,13 @@ const Collection = ({
     collectionNft?.result.content.files[0]?.cdn_uri ??
     collectionNft?.result.content.files[0]?.uri
 
+  const [treasurySelect, setTreasurySelect] = useTreasurySelectState()
+
+  const isSelected =
+    treasurySelect?._kind === 'NftCollection' &&
+    treasurySelect.selectedGovernance === governance.toString() &&
+    treasurySelect.collectionId === collectionId.toString()
+
   return (
     <ListItem
       //className={props.className}
@@ -58,17 +64,20 @@ const Collection = ({
           </div>
         </div>
       }
-      //selected={props.selected}
+      selected={isSelected}
+      onSelect={() =>
+        setTreasurySelect({
+          selectedGovernance: governance.toString(),
+          _kind: 'NftCollection',
+          collectionId: collectionId.toString(),
+        })
+      }
       thumbnail={<img src={imageUri} className="h-6 w-6 rounded-sm" />}
-      {...props}
     />
   )
 }
 
-const UncollectedNfts = ({
-  governance,
-  ...props
-}: Omit<Props, 'collectionId'>) => {
+const UncollectedNfts = ({ governance }: Omit<Props, 'collectionId'>) => {
   const { result: treasury } = useTreasuryAddressForGovernance(governance)
   const { data: governanceNfts } = useDigitalAssetsByOwner(governance)
   const { data: treasuryNfts } = useDigitalAssetsByOwner(treasury)
@@ -82,6 +91,13 @@ const UncollectedNfts = ({
         : undefined,
     [governanceNfts, treasuryNfts]
   )
+
+  const [treasurySelect, setTreasurySelect] = useTreasurySelectState()
+
+  const isSelected =
+    treasurySelect?._kind === 'NftCollection' &&
+    treasurySelect.selectedGovernance === governance.toString() &&
+    treasurySelect.collectionId === 'none'
 
   return (
     <ListItem
@@ -97,9 +113,15 @@ const UncollectedNfts = ({
           </div>
         </div>
       }
-      //selected={props.selected}
+      selected={isSelected}
+      onSelect={() =>
+        setTreasurySelect({
+          selectedGovernance: governance.toString(),
+          _kind: 'NftCollection',
+          collectionId: 'none',
+        })
+      }
       thumbnail={<NFTCollectionPreviewIcon className="stroke-fgd-1 h-6 w-6" />}
-      {...props}
     />
   )
 }

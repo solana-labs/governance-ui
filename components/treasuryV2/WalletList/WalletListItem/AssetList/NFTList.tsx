@@ -1,7 +1,5 @@
 import { useMemo } from 'react'
 
-import { NFTCollection } from '@models/treasury/Asset'
-
 import Collapsible from './Collapsible'
 import NFTCollectionPreviewIcon from '../../../icons/NFTCollectionPreviewIcon'
 import NFTListItem from './NFTListItem'
@@ -13,16 +11,6 @@ import {
 import { PublicKey } from '@solana/web3.js'
 import { SUPPORT_CNFTS } from '@constants/flags'
 import cx from '@hub/lib/cx'
-
-interface Poops {
-  className?: string
-  disableCollapse?: boolean
-  expanded?: boolean
-  nfts: NFTCollection[]
-  selectedAssetId?: string | null
-  onSelect?(nft: NFTCollection): void
-  onToggleExpand?(): void
-}
 
 interface Props {
   className?: string
@@ -85,9 +73,6 @@ export default function NFTList({ governance, ...props }: Props) {
                 governance={governance}
                 key={'none'}
                 collectionId={'none'}
-                onSelect={() => {
-                  return
-                }}
               />,
             ]
           : []),
@@ -97,10 +82,6 @@ export default function NFTList({ governance, ...props }: Props) {
                 governance={governance}
                 key={id.toString()}
                 collectionId={id}
-                onSelect={() => {
-                  return
-                }}
-                //onSelect={() => props.onSelect?.(collection)}
               />
             ))
           : []),

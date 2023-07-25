@@ -1,32 +1,37 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import cx from 'classnames'
 import { ReplyIcon } from '@heroicons/react/outline'
 
-import { formatNumber } from '@utils/formatNumber'
-import { NFTCollection } from '@models/treasury/Asset'
 import { SecondaryButton } from '@components/Button'
 import Modal from '@components/Modal'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Address from '@components/Address'
 
-import NFTCollectionPreviewIcon from '../../icons/NFTCollectionPreviewIcon'
 import SendNft from '@components/SendNft'
+import { PublicKey } from '@solana/web3.js'
+import { useDigitalAssetById } from '@hooks/queries/digitalAssets'
+import NFTCollectionPreviewIcon from '@components/treasuryV2/icons/NFTCollectionPreviewIcon'
 
 interface Props {
-  className?: string
-  nftCollection: NFTCollection
+  collectionId: PublicKey | 'none'
+  governance: PublicKey
 }
 
-export default function Header(props: Props) {
+export default function Header({ collectionId, governance }: Props) {
   const [sendNFTsModalOpen, setSendNFTsModalOpen] = useState(false)
   const { canUseTransferInstruction } = useGovernanceAssets()
 
-  const hasCount = !!props.nftCollection.totalCount
+  const { data: collectionNft } = useDigitalAssetById(
+    collectionId !== 'none' ? collectionId : undefined
+  )
+  const name = collectionNft?.result.content.metadata.name
+  const imageUri =
+    collectionNft?.result.content.files[0]?.cdn_uri ??
+    collectionNft?.result.content.files[0]?.uri
 
   return (
     <div
       className={cx(
-        props.className,
         'bg-bkg-1',
         'gap-x-4',
         'grid-cols-[1fr_max-content]',
@@ -36,57 +41,33 @@ export default function Header(props: Props) {
         'py-4'
       )}
     >
-      <div
-        className={cx(
-          'grid',
-          'items-center',
-          hasCount && 'gap-4',
-          hasCount && 'grid-cols-[repeat(auto-fill,minmax(275px,1fr))]'
-        )}
-      >
+      <div className={cx('grid', 'items-center')}>
         <div>
           <div className="grid items-center grid-cols-[40px_1fr] gap-x-4">
-            {React.cloneElement(props.nftCollection.icon, {
-              className: cx(
-                props.nftCollection.icon.props.classname,
-                'h-10',
-                'stroke-fgd-1',
-                'rounded',
-                'w-10'
-              ),
-            })}
+            {collectionId === 'none' ? (
+              <NFTCollectionPreviewIcon className="stroke-fgd-1 h-10 w-10" />
+            ) : (
+              <img src={imageUri} className="h-10 w-10 rounded stroke-fgd-1" />
+            )}
+
             <div className="overflow-hidden">
-              {props.nftCollection.name && (
+              {name && (
                 <div className="text-white/50 text-sm">NFT Collection</div>
               )}
               <div className="text-fgd-1 font-bold text-2xl whitespace-nowrap text-ellipsis overflow-hidden">
-                {props.nftCollection.name || 'NFTs without a collection'}
+                {collectionId !== 'none' ? name : 'NFTs with no collection'}
               </div>
             </div>
           </div>
-          {props.nftCollection.address && (
-            <Address
-              address={props.nftCollection.address}
-              className="ml-14 text-xs"
-            />
+          {collectionId !== 'none' && (
+            <Address address={collectionId} className="ml-14 text-xs" />
           )}
         </div>
-        {props.nftCollection.totalCount && (
-          <div className="pl-14">
-            <div className="text-sm text-white/50 flex items-center space-x-1">
-              <NFTCollectionPreviewIcon className="h-4 w-4 fill-white/50" />
-              <div>NFTs in Collection</div>
-            </div>
-            <div className="text-xl text-fgd-1 font-bold">
-              {formatNumber(props.nftCollection.totalCount, undefined, {})}
-            </div>
-          </div>
-        )}
       </div>
       <div className="flex flex-col items-center space-y-2 max-h-[128px] justify-center">
         <SecondaryButton
           className="w-48"
-          disabled={!canUseTransferInstruction}
+          disabled={/* !canUseTransferInstruction */ false}
           tooltipMessage={
             !canUseTransferInstruction
               ? 'You need to have connected wallet with ability to create token transfer proposals'
@@ -109,7 +90,7 @@ export default function Header(props: Props) {
           sizeClassName="sm:max-w-3xl"
           onClose={() => setSendNFTsModalOpen(false)}
         >
-          <SendNft />
+          <SendNft initialNftAndGovernanceSelected={[undefined, governance]} />
         </Modal>
       )}
     </div>
