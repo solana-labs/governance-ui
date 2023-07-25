@@ -2,8 +2,8 @@ import { XCircleIcon, CheckCircleIcon } from '@heroicons/react/outline'
 import { BanIcon } from '@heroicons/react/solid'
 import useProposalVotes from '@hooks/useProposalVotes'
 import { ProposalState } from '@solana/spl-governance'
-import { useVetoingPop } from './VotePanel/VetoButtons'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
+import { useVetoingPop } from './VotePanel/hooks'
 
 const VetoResult = () => {
   const vetoingPop = useVetoingPop()
