@@ -67,7 +67,7 @@ export default function Header({ collectionId, governance }: Props) {
       <div className="flex flex-col items-center space-y-2 max-h-[128px] justify-center">
         <SecondaryButton
           className="w-48"
-          disabled={/* !canUseTransferInstruction */ false}
+          disabled={!canUseTransferInstruction}
           tooltipMessage={
             !canUseTransferInstruction
               ? 'You need to have connected wallet with ability to create token transfer proposals'
