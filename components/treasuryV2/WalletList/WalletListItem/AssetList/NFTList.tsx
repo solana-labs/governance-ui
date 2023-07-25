@@ -1,5 +1,4 @@
 import { useMemo } from 'react'
-import { BigNumber } from 'bignumber.js'
 
 import { NFTCollection } from '@models/treasury/Asset'
 
@@ -13,6 +12,7 @@ import {
 } from '@hooks/queries/digitalAssets'
 import { PublicKey } from '@solana/web3.js'
 import { SUPPORT_CNFTS } from '@constants/flags'
+import cx from '@hub/lib/cx'
 
 interface Poops {
   className?: string
@@ -25,10 +25,18 @@ interface Poops {
 }
 
 interface Props {
+  className?: string
+  expanded?: boolean
+  onToggleExpand?(): void
+  disableCollapse?: boolean
   governance: PublicKey
 }
 
-export default function NFTList({ governance }: Props) {
+function onlyUnique(value, index, array) {
+  return array.indexOf(value) === index
+}
+
+export default function NFTList({ governance, ...props }: Props) {
   const { result: treasury } = useTreasuryAddressForGovernance(governance)
   const { data: governanceNfts } = useDigitalAssetsByOwner(governance)
   const { data: treasuryNfts } = useDigitalAssetsByOwner(treasury)
@@ -45,39 +53,58 @@ export default function NFTList({ governance }: Props) {
 
   const collectionIds = useMemo(
     () =>
-      new Set(
-        nfts
-          ?.map((x) => x.grouping)
-          .flat()
-          .map((x) => new PublicKey(x.group_value))
-      ),
+      nfts &&
+      nfts
+        .map((x) => x.grouping)
+        .flat()
+        .map((x) => x.group_value)
+        .filter(onlyUnique)
+        .map((x) => new PublicKey(x)),
     [nfts]
   )
+  console.log('collectionIds', JSON.stringify(collectionIds))
 
-  const totalCount = nfts.reduce((acc, cur) => {
-    return acc.plus(cur.count)
-  }, new BigNumber(0))
+  const hasNftWithoutCollection = nfts?.find((x) => x.grouping.length < 1)
+
+  const totalCount = nfts?.length ?? 0
 
   return (
     <Collapsible
-      //className={cx(props.className)}
-      count={totalCount.toNumber()}
-      //disableCollapse={props.disableCollapse}
-      //expanded={props.expanded}
+      className={cx(props.className)}
+      count={totalCount}
+      disableCollapse={props.disableCollapse}
+      expanded={props.expanded}
       icon={<NFTCollectionPreviewIcon className="stroke-white/50" />}
       title="NFTs"
-      //onToggleExpand={props.onToggleExpand}
+      onToggleExpand={props.onToggleExpand}
     >
-      {nfts.map((collection) => (
-        <NFTListItem
-          amount={collection.count}
-          key={collection.id}
-          name={collection.name || 'NFTs without a collection'}
-          thumbnail={collection.icon}
-          selected={props.selectedAssetId === collection.id}
-          onSelect={() => props.onSelect?.(collection)}
-        />
-      ))}
+      {[
+        ...(hasNftWithoutCollection
+          ? [
+              <NFTListItem
+                governance={governance}
+                key={'none'}
+                collectionId={'none'}
+                onSelect={() => {
+                  return
+                }}
+              />,
+            ]
+          : []),
+        ...(collectionIds
+          ? collectionIds.map((id) => (
+              <NFTListItem
+                governance={governance}
+                key={id.toString()}
+                collectionId={id}
+                onSelect={() => {
+                  return
+                }}
+                //onSelect={() => props.onSelect?.(collection)}
+              />
+            ))
+          : []),
+      ]}
     </Collapsible>
   )
 }
