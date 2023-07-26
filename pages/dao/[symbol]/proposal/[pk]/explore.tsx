@@ -29,16 +29,12 @@ function filterVerifiedCollections(nfts, usedCollectionsPks, voteType) {
   return nfts
     ?.filter((nft) => {
       const collection = nft.grouping.find((x) => x.group_key === 'collection')
-      if (
+      return (
         collection &&
         usedCollectionsPks.includes(collection.group_value) &&
         (collection.verified || typeof collection.verified === 'undefined') &&
         nft.creators?.filter((x) => x.verified).length > 0
-      ) {
-        return true
-      } else {
-        return false
-      }
+      )
     })
     .map((nft) => {
       return {
@@ -74,7 +70,8 @@ export const useOwnersVerifiedNfts = (records) => {
   const [nftMintRegistrar] = useVotePluginsClientStore((s) => [
     s.state.nftMintRegistrar,
   ])
-
+  const isNftMode =
+    currentPluginPk && NFT_PLUGINS_PKS.includes(currentPluginPk?.toBase58())
   const usedCollectionsPks: string[] = useMemo(
     () =>
       (currentPluginPk &&
@@ -86,13 +83,13 @@ export const useOwnersVerifiedNfts = (records) => {
     [currentPluginPk, nftMintRegistrar?.collectionConfigs]
   )
 
-  const enabled = records !== undefined && usedCollectionsPks !== undefined
+  const enabled =
+    records !== undefined && usedCollectionsPks !== undefined && isNftMode
   return useAsync(async () => {
     if (!enabled) throw new Error()
 
     const ownersNfts = await Promise.all(
       records.map(async (record) => {
-        console.log(record)
         const ownedNfts = await fetchDigitalAssetsByOwner(
           network,
           new PublicKey(record.key)
@@ -122,7 +119,7 @@ export default function Explore() {
   const router = useRouter()
   const [isNftMode, setIsNftMode] = useState(false)
   const [showNfts, setShowNfts] = useState(false)
-  const { result: votersNfts, loading } = useOwnersVerifiedNfts(records)
+  // const { result: votersNfts, loading } = useOwnersVerifiedNfts(records)
   const config = useRealmConfigQuery().data?.result
   const currentPluginPk = config?.account.communityTokenConfig.voterWeightAddin
 
@@ -137,6 +134,7 @@ export default function Explore() {
       currentPluginPk &&
       NFT_PLUGINS_PKS.includes(currentPluginPk?.toBase58())
     ) {
+      console.log(currentPluginPk.toBase58())
       setIsNftMode(true)
     } else {
       setIsNftMode(false)
@@ -187,29 +185,33 @@ export default function Explore() {
             className="grid gap-4 grid-cols-1 items-center lg:grid-cols-2"
             onMouseLeave={() => setHighlighted(undefined)}
           >
-            <ProposalTopVotersList
-              className="h-[500px]"
-              data={records}
-              endpoint={endpoint}
-              highlighted={highlighted}
-              onHighlight={setHighlighted}
-            />
-            <div>
-              <ProposalTopVotersBubbleChart
-                className="h-[500px]"
+            <div className="flex flex-col gap-5 h-[500px]">
+              <ProposalTopVotersList
+                className={showNfts ? 'h-[275px]' : 'h-[500px]'}
                 data={records}
                 endpoint={endpoint}
                 highlighted={highlighted}
                 onHighlight={setHighlighted}
               />
               <ProposalTopVotersNftChart
+                isNftMode={isNftMode}
                 showNfts={showNfts}
-                isLoading={loading}
-                className="h-[100px]"
-                data={votersNfts}
+                className="h-[205px]"
                 highlighted={highlighted}
+                voteType={
+                  highlighted && records
+                    ? records.find((x) => x.key === highlighted)?.voteType
+                    : undefined
+                }
               />
             </div>
+            <ProposalTopVotersBubbleChart
+              className="h-[500px]"
+              data={records}
+              endpoint={endpoint}
+              highlighted={highlighted}
+              onHighlight={setHighlighted}
+            />
           </div>
           <div className="grid gap-4 grid-cols-1 mt-16 lg:grid-cols-3">
             <ProposalSignatories
