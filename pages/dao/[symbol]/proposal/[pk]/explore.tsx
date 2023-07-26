@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import classNames from 'classnames'
 import { ChevronLeftIcon } from '@heroicons/react/solid'
@@ -16,98 +16,8 @@ import ProposalRemainingVotingTime from '@components/ProposalRemainingVotingTime
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import Switch from '@components/Switch'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NFT_PLUGINS_PKS } from '@constants/plugins'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
-import { fetchDigitalAssetsByOwner } from '@hooks/queries/digitalAssets'
-import { PublicKey } from '@solana/web3.js'
-import { getNetworkFromEndpoint } from '@utils/connection'
-import { useConnection } from '@solana/wallet-adapter-react'
-import { useAsync } from 'react-async-hook'
-
-function filterVerifiedCollections(nfts, usedCollectionsPks, voteType) {
-  return nfts
-    ?.filter((nft) => {
-      const collection = nft.grouping.find((x) => x.group_key === 'collection')
-      return (
-        collection &&
-        usedCollectionsPks.includes(collection.group_value) &&
-        (collection.verified || typeof collection.verified === 'undefined') &&
-        nft.creators?.filter((x) => x.verified).length > 0
-      )
-    })
-    .map((nft) => {
-      return {
-        id: nft.id,
-        owner: nft.ownership.owner,
-        voteType: voteType,
-        image: nft.content.links?.image,
-      }
-    })
-}
-
-function mapNftsToVoter(nfts) {
-  return nfts?.reduce((prev, curr) => {
-    const collectionKey = curr.owner
-    if (typeof collectionKey === 'undefined') return prev
-
-    if (prev[collectionKey]) {
-      prev[collectionKey].push(curr)
-    } else {
-      prev[collectionKey] = [curr]
-    }
-    return prev
-  }, {})
-}
-
-export const useOwnersVerifiedNfts = (records) => {
-  const { connection } = useConnection()
-  const network = getNetworkFromEndpoint(connection.rpcEndpoint)
-  if (network === 'localnet') throw new Error()
-  const config = useRealmConfigQuery().data?.result
-  const currentPluginPk = config?.account.communityTokenConfig.voterWeightAddin
-
-  const [nftMintRegistrar] = useVotePluginsClientStore((s) => [
-    s.state.nftMintRegistrar,
-  ])
-  const isNftMode =
-    currentPluginPk && NFT_PLUGINS_PKS.includes(currentPluginPk?.toBase58())
-  const usedCollectionsPks: string[] = useMemo(
-    () =>
-      (currentPluginPk &&
-        NFT_PLUGINS_PKS.includes(currentPluginPk?.toBase58()) &&
-        nftMintRegistrar?.collectionConfigs.map((x) =>
-          x.collection.toBase58()
-        )) ||
-      [],
-    [currentPluginPk, nftMintRegistrar?.collectionConfigs]
-  )
-
-  const enabled =
-    records !== undefined && usedCollectionsPks !== undefined && isNftMode
-  return useAsync(async () => {
-    if (!enabled) throw new Error()
-
-    const ownersNfts = await Promise.all(
-      records.map(async (record) => {
-        const ownedNfts = await fetchDigitalAssetsByOwner(
-          network,
-          new PublicKey(record.key)
-        )
-
-        const verifiedNfts = filterVerifiedCollections(
-          ownedNfts,
-          usedCollectionsPks,
-          record.voteType
-        )
-        return verifiedNfts
-      })
-    )
-    const votingNfts = ownersNfts.flat().filter((x) => x !== null)
-    const votersNfts = mapNftsToVoter(votingNfts)
-    return votersNfts
-  }, [enabled, usedCollectionsPks, records])
-}
 
 export default function Explore() {
   const proposal = useRouteProposalQuery().data?.result
@@ -119,7 +29,6 @@ export default function Explore() {
   const router = useRouter()
   const [isNftMode, setIsNftMode] = useState(false)
   const [showNfts, setShowNfts] = useState(false)
-  // const { result: votersNfts, loading } = useOwnersVerifiedNfts(records)
   const config = useRealmConfigQuery().data?.result
   const currentPluginPk = config?.account.communityTokenConfig.voterWeightAddin
 
