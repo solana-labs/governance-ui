@@ -15,7 +15,12 @@ import { SecondaryButton } from '../Button'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import Tooltip from '@components/Tooltip'
-import { useVoterTokenRecord, useIsVoting, useIsInCoolOffTime } from './hooks'
+import {
+  useVoterTokenRecord,
+  useIsVoting,
+  useIsInCoolOffTime,
+  useUserVetoTokenRecord,
+} from './hooks'
 import assertUnreachable from '@utils/typescript/assertUnreachable'
 import { useHasVoteTimeExpired } from '@hooks/useHasVoteTimeExpired'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
@@ -50,7 +55,10 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
 
   const { data } = useProposalVoteRecordQuery(quorum)
   const ownVoteRecord = data?.result
-  const voterTokenRecord = useVoterTokenRecord()
+  const electoralVoterTokenRecord = useVoterTokenRecord()
+  const vetoVotertokenRecord = useUserVetoTokenRecord()
+  const voterTokenRecord =
+    quorum === 'electoral' ? electoralVoterTokenRecord : vetoVotertokenRecord
 
   const isWithdrawEnabled =
     connected &&

@@ -1,9 +1,9 @@
-import React, { ReactNode } from 'react'
+import { ReactNode } from 'react'
 import Tippy from '@tippyjs/react'
 import 'tippy.js/animations/scale.css'
 
 type TooltipProps = {
-  content: ReactNode
+  content: ReactNode | undefined
   placement?: any
   className?: string
   children?: ReactNode

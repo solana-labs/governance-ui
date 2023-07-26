@@ -26,7 +26,6 @@ import {
   ArrowCircleUpIcon,
   //   InformationCircleIcon,
 } from '@heroicons/react/solid'
-import tokenPriceService from '@utils/services/tokenPrice'
 import BigNumber from 'bignumber.js'
 import { getInstructionDataFromBase64 } from '@solana/spl-governance'
 import useQueryContext from '@hooks/useQueryContext'
@@ -46,6 +45,8 @@ import useCreateProposal from '@hooks/useCreateProposal'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { fetchJupiterPrice } from '@hooks/queries/jupiterPrice'
+import { useAsync } from 'react-async-hook'
 
 const SendTokens = () => {
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
@@ -110,15 +111,6 @@ const SendTokens = () => {
       ),
       propertyName: 'amount',
     })
-  }
-  const calcTransactionDolarAmount = (amount) => {
-    const price = tokenPriceService.getUSDTokenPrice(
-      currentAccount!.extensions.mint!.publicKey.toBase58()
-    )
-    const totalPrice = amount * price
-    const totalPriceFormatted =
-      amount && price ? new BigNumber(totalPrice).toFormat(2) : ''
-    return totalPriceFormatted
   }
 
   async function getInstruction(): Promise<UiInstruction> {
@@ -213,7 +205,19 @@ const SendTokens = () => {
   }, [form.destinationAccount])
 
   const schema = getTokenTransferSchema({ form, connection, nftMode: false })
-  const transactionDolarAmount = calcTransactionDolarAmount(form.amount)
+
+  const { result: transactionDolarAmount } = useAsync(async () => {
+    const mint = currentAccount?.extensions.mint?.publicKey
+    if (mint === undefined) return undefined
+    const amount = form.amount ?? 0
+    const priceData = await fetchJupiterPrice(mint)
+    const price = priceData.result?.price ?? 0
+
+    const totalPrice = amount * price
+    const totalPriceFormatted =
+      amount && price ? new BigNumber(totalPrice).toFormat(2) : ''
+    return totalPriceFormatted
+  }, [form.amount, currentAccount?.extensions.mint?.publicKey])
 
   const proposalTitle = `Pay ${form.amount}${
     tokenInfo ? ` ${tokenInfo?.symbol} ` : ' '

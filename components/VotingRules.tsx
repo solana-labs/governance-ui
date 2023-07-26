@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useVotingPop } from './VotePanel/hooks'
+import { useVetoingPop, useVotingPop } from './VotePanel/hooks'
 import {
   ChevronRight,
   ChevronUp,
@@ -17,7 +17,6 @@ import clsx from 'clsx'
 import { TimerBar } from './ProposalTimer'
 import { formatShortAddress } from '@cardinal/namespaces-components'
 import { useAsync } from 'react-async-hook'
-import { useVetoingPop } from './VotePanel/VetoButtons'
 import useRealm from '@hooks/useRealm'
 import { ACCOUNT_NAMES } from './instructions/tools'
 import { ExploreButton } from './treasuryV2/Details/ExploreLink'

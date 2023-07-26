@@ -14,6 +14,7 @@ const tokenListUrl = 'https://token.jup.ag/strict'
 
 export type TokenInfoWithoutDecimals = Omit<TokenInfo, 'decimals'>
 
+/** @deprecated */
 class TokenPriceService {
   _tokenList: TokenInfo[]
   _tokenPriceToUSDlist: {
@@ -82,6 +83,10 @@ class TokenPriceService {
       }
     }
   }
+  /**
+   * @deprecated
+   * seriously do not use this. use fetchJupiterPrice
+   */
   getUSDTokenPrice(mintAddress: string): number {
     return mintAddress ? this._tokenPriceToUSDlist[mintAddress]?.price || 0 : 0
   }
