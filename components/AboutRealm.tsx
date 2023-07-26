@@ -1,8 +1,9 @@
-import React from 'react'
 import useRealm from 'hooks/useRealm'
+import useProgramVersion from '@hooks/useProgramVersion'
 
 const AboutRealm = () => {
   const { realmInfo, symbol } = useRealm()
+  const programVersion = useProgramVersion()
 
   return (
     <div className="pb-4 space-y-3">
@@ -44,7 +45,7 @@ const AboutRealm = () => {
       ) : null}
       <div>
         <p className="text-xs text-fgd-3">Program Version</p>
-        <p className="text-fgd-1">{realmInfo?.programVersion}</p>
+        <p className="text-fgd-1">{programVersion}</p>
       </div>
     </div>
   )

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import cx from 'classnames'
 import {
   PencilIcon,
@@ -28,7 +28,7 @@ import { GoverningTokenType } from '@solana/spl-governance'
 import useProgramVersion from '@hooks/useProgramVersion'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
-import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import { useEffectiveRealmConfig } from '@hooks/queries/realmConfig'
 
 interface Props {
   className?: string
@@ -36,14 +36,14 @@ interface Props {
 }
 
 const useTokenType = (govpop: 'community' | 'council' | undefined) => {
-  const config = useRealmConfigQuery().data?.result
+  const config = useEffectiveRealmConfig()
   switch (govpop) {
     case undefined:
       return undefined
     case 'community':
-      return config?.account.communityTokenConfig.tokenType
+      return config?.communityTokenConfig.tokenType
     case 'council':
-      return config?.account.councilTokenConfig.tokenType
+      return config?.councilTokenConfig.tokenType
   }
 }
 
