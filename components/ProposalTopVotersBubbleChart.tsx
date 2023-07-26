@@ -120,6 +120,12 @@ function Content(props: Props) {
         )
         .attr('y', '0.5em')
         .text((d) => abbreviateAddress(d.data.name))
+
+      // show nfts
+      group
+        .append('div')
+        .attr('fill', 'black')
+        .style('opacity', (d) => (d.data.key === props.highlighted ? 0.7 : 0))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
