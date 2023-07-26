@@ -53,7 +53,16 @@ export const ACCOUNT_NAMES = {
   '9pDEi3yT9ooT1uw1PApQDYK65advJs4Nt65EJG1m59Yq':
     'Mango Developer Council Mint',
   Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z: 'Mango DAO MNGO Treasury Vault',
+  DiSDgMz4DeNKHXkpqUGoukr1YM9xxc1wH9gusZnMa1ga: 'Mango DAO Dual Realm Deposit',
+  '8gjzxiqcU87cvRc7hFiUJgxqLSV7AQnSttfWC5fD9aim':
+    'Mango DAO Treasury Council Mint',
+  A9xaHx54B9bRYBga4V6LKFrRaARpMJFYVooEXRAanru5:
+    'Mango DAO Treasury Council USDC Treasury',
   '7zGXUAeUkY9pEGfApsY26amibvqsf2dmty1cbtxHdfaQ': 'Mango DAO Wallet Governance',
+  '9so7UTo6b6LXBSqdDfh18hjVj8Ng5BmLbYXLB7UrhaaJ':
+    'Mango Treasury Council Wallet',
+  BxZ974q4zsrSThN54rZqNaA6E2CFoj77mUikqK68Lgrf:
+    'Mango Treasury Council Wallet Governance',
   FnrgYLrpftdsBj5gd4qeaFwDUQZCg2cfo7aqQ1kJmWJy:
     'Mango Dao -> Dual Dao Vote Wallet',
   EWaYDnKhcqS4tVjyhUBoJR1Yx755imqzBm5tb2vQTNtK:
@@ -294,6 +303,10 @@ const MNGO_AUXILIARY_TOKEN_ACCOUNTS = [
   {
     owner: '58apybWwtWwgVfARs7uJ75Vs1csPimnCCFth7cKwTJAe',
     accounts: ['DiSDgMz4DeNKHXkpqUGoukr1YM9xxc1wH9gusZnMa1ga'],
+  },
+  {
+    owner: '9so7UTo6b6LXBSqdDfh18hjVj8Ng5BmLbYXLB7UrhaaJ',
+    accounts: ['A9xaHx54B9bRYBga4V6LKFrRaARpMJFYVooEXRAanru5'],
   },
 ]
 

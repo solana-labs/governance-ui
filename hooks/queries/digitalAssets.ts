@@ -25,7 +25,7 @@ const getHeliusEndpoint = (network: Network) => {
 }
 
 export const digitalAssetsQueryKeys = {
-  all: (network: Network) => [network, 'DigitalAssets'], //TBH endpoint is stupid for this. it should be either 'devnet' or 'mainnet'.
+  all: (network: Network) => [network, 'DigitalAssets'], // TBH endpoint is stupid for this. it should be either 'devnet' or 'mainnet'.
   byId: (network: Network, id: PublicKey) => [
     ...digitalAssetsQueryKeys.all(network),
     'by Id',
