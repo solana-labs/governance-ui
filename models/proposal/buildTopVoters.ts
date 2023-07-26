@@ -61,7 +61,6 @@ export function buildTopVoters(
   const electoralVotes = voteRecords.filter(
     (x) => x.account.vote?.voteType !== VoteKind.Veto
   )
-
   const undecidedData = tokenOwnerRecords
     .filter(
       (tokenOwnerRecord) =>
@@ -109,6 +108,65 @@ export function buildTopVoters(
         record.account.getYesVoteWeight()!,
         VoteType.Yes,
         maxVote,
+        governingTokenMint.decimals
+      )
+    )
+
+  return undecidedData
+    .concat(yesVoteData)
+    .concat(noVoteData)
+    .sort((a, b) => b.votesCast.cmp(a.votesCast))
+}
+
+export function buildTopNftVoters(
+  voteRecords: ProgramAccount<VoteRecord>[],
+  tokenOwnerRecords: ProgramAccount<TokenOwnerRecord>[],
+  governingTokenMint: MintInfo,
+  nftVoterPluginTotalWeight: BN
+): VoterDisplayData[] {
+  const electoralVotes = voteRecords.filter(
+    (x) => x.account.vote?.voteType !== VoteKind.Veto
+  )
+  const undecidedData = tokenOwnerRecords
+    .filter(
+      (tokenOwnerRecord) =>
+        !electoralVotes.some(
+          (voteRecord) =>
+            voteRecord.account.governingTokenOwner.toBase58() ===
+            tokenOwnerRecord.account.governingTokenOwner.toBase58()
+        )
+    )
+    .map((record) => {
+      const tokenAmount = new BN(0)
+      return buildResults(
+        record.account.governingTokenOwner,
+        tokenAmount,
+        VoteType.Undecided,
+        nftVoterPluginTotalWeight,
+        governingTokenMint.decimals
+      )
+    })
+
+  const noVoteData = electoralVotes
+    .filter((record) => record.account.getNoVoteWeight()?.gt(ZERO))
+    .map((record) =>
+      buildResults(
+        record.account.governingTokenOwner,
+        record.account.getNoVoteWeight()!,
+        VoteType.No,
+        nftVoterPluginTotalWeight,
+        governingTokenMint.decimals
+      )
+    )
+
+  const yesVoteData = electoralVotes
+    .filter((record) => record.account.getYesVoteWeight()?.gt(ZERO))
+    .map((record) =>
+      buildResults(
+        record.account.governingTokenOwner,
+        record.account.getYesVoteWeight()!,
+        VoteType.Yes,
+        nftVoterPluginTotalWeight,
         governingTokenMint.decimals
       )
     )

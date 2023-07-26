@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/router'
 import classNames from 'classnames'
 import { ChevronLeftIcon } from '@heroicons/react/solid'
@@ -8,6 +8,7 @@ import useVoteRecords from '@hooks/useVoteRecords'
 import ProposalStateBadge from '@components/ProposalStateBadge'
 import ProposalTopVotersList from '@components/ProposalTopVotersList'
 import ProposalTopVotersBubbleChart from '@components/ProposalTopVotersBubbleChart'
+import ProposalTopVotersNftChart from '@components/ProposalTopVotersNftChart'
 import useSignatories from '@hooks/useSignatories'
 import ProposalSignatories from '@components/ProposalSignatories'
 import ProposalVoteResult from '@components/ProposalVoteResults'
@@ -24,7 +25,7 @@ import { getNetworkFromEndpoint } from '@utils/connection'
 import { useConnection } from '@solana/wallet-adapter-react'
 import { useAsync } from 'react-async-hook'
 
-function filterAndMapVerifiedCollections(nfts, usedCollectionsPks) {
+function filterVerifiedCollections(nfts, usedCollectionsPks, voteType) {
   return nfts
     ?.filter((nft) => {
       const collection = nft.grouping.find((x) => x.group_key === 'collection')
@@ -39,20 +40,31 @@ function filterAndMapVerifiedCollections(nfts, usedCollectionsPks) {
         return false
       }
     })
-    .reduce((prev, curr) => {
-      const collectionKey = curr.ownership.owner
-      if (typeof collectionKey === 'undefined') return prev
-
-      if (prev[collectionKey]) {
-        prev[collectionKey].push(curr)
-      } else {
-        prev[collectionKey] = [curr]
+    .map((nft) => {
+      return {
+        id: nft.id,
+        owner: nft.ownership.owner,
+        voteType: voteType,
+        image: nft.content.links?.image,
       }
-      return prev
-    }, {})
+    })
 }
 
-export const useOwnerVerifiedCollections = (records) => {
+function mapNftsToVoter(nfts) {
+  return nfts?.reduce((prev, curr) => {
+    const collectionKey = curr.owner
+    if (typeof collectionKey === 'undefined') return prev
+
+    if (prev[collectionKey]) {
+      prev[collectionKey].push(curr)
+    } else {
+      prev[collectionKey] = [curr]
+    }
+    return prev
+  }, {})
+}
+
+export const useOwnersVerifiedNfts = (records) => {
   const { connection } = useConnection()
   const network = getNetworkFromEndpoint(connection.rpcEndpoint)
   if (network === 'localnet') throw new Error()
@@ -80,21 +92,24 @@ export const useOwnerVerifiedCollections = (records) => {
 
     const ownersNfts = await Promise.all(
       records.map(async (record) => {
+        console.log(record)
         const ownedNfts = await fetchDigitalAssetsByOwner(
           network,
           new PublicKey(record.key)
         )
 
-        const verifiedNfts = filterAndMapVerifiedCollections(
+        const verifiedNfts = filterVerifiedCollections(
           ownedNfts,
-          usedCollectionsPks
+          usedCollectionsPks,
+          record.voteType
         )
-        console.log(verifiedNfts)
         return verifiedNfts
       })
     )
-    return ownersNfts.filter((x) => x !== null)
-  }, [connection, enabled, usedCollectionsPks])
+    const votingNfts = ownersNfts.flat().filter((x) => x !== null)
+    const votersNfts = mapNftsToVoter(votingNfts)
+    return votersNfts
+  }, [enabled, usedCollectionsPks, records])
 }
 
 export default function Explore() {
@@ -105,8 +120,9 @@ export default function Explore() {
   const records = useVoteRecords(proposal)
   const signatories = useSignatories(proposal)
   const router = useRouter()
+  const [isNftMode, setIsNftMode] = useState(false)
   const [showNfts, setShowNfts] = useState(false)
-  const { result: votersNfts } = useOwnerVerifiedCollections(records)
+  const { result: votersNfts, loading } = useOwnersVerifiedNfts(records)
   const config = useRealmConfigQuery().data?.result
   const currentPluginPk = config?.account.communityTokenConfig.voterWeightAddin
 
@@ -115,6 +131,17 @@ export default function Explore() {
   const toggleShowNfts = () => {
     setShowNfts(!showNfts)
   }
+
+  useEffect(() => {
+    if (
+      currentPluginPk &&
+      NFT_PLUGINS_PKS.includes(currentPluginPk?.toBase58())
+    ) {
+      setIsNftMode(true)
+    } else {
+      setIsNftMode(false)
+    }
+  }, [currentPluginPk])
 
   return (
     <div className="bg-bkg-2 rounded-lg p-4 space-y-3 md:p-6">
@@ -143,10 +170,7 @@ export default function Explore() {
             <h3 className="">Top Voters</h3>
             <div
               className={`${
-                currentPluginPk &&
-                NFT_PLUGINS_PKS.includes(currentPluginPk.toBase58())
-                  ? 'visible'
-                  : 'hidden'
+                isNftMode ? 'visible' : 'hidden'
               } flex items-center`}
             >
               <p className="mb-0 mr-1 text-fgd-3">Show NFTs</p>
@@ -170,13 +194,22 @@ export default function Explore() {
               highlighted={highlighted}
               onHighlight={setHighlighted}
             />
-            <ProposalTopVotersBubbleChart
-              className="h-[500px]"
-              data={records}
-              endpoint={endpoint}
-              highlighted={highlighted}
-              onHighlight={setHighlighted}
-            />
+            <div>
+              <ProposalTopVotersBubbleChart
+                className="h-[500px]"
+                data={records}
+                endpoint={endpoint}
+                highlighted={highlighted}
+                onHighlight={setHighlighted}
+              />
+              <ProposalTopVotersNftChart
+                showNfts={showNfts}
+                isLoading={loading}
+                className="h-[100px]"
+                data={votersNfts}
+                highlighted={highlighted}
+              />
+            </div>
           </div>
           <div className="grid gap-4 grid-cols-1 mt-16 lg:grid-cols-3">
             <ProposalSignatories

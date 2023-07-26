@@ -50,7 +50,6 @@ import queryClient from '@hooks/queries/queryClient'
 import asFindable from '@utils/queries/asFindable'
 import { fetchNFTbyMint } from '@hooks/queries/nft'
 import { getCompressedNftParamAndProof } from '@tools/compressedNftParam'
-
 /***
  * @description: zip two arrays into one
  * @param {U} a

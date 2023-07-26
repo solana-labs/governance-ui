@@ -249,12 +249,14 @@ export async function castVote(
         }
       }),
     ]
+
     const totalVoteCost = await calcCostOfNftVote(
       message,
       instructionsChunks.length,
       proposal.pubkey,
       votingPlugin
     )
+
     const hasEnoughSol = await checkHasEnoughSolToVote(
       totalVoteCost,
       wallet.publicKey!,

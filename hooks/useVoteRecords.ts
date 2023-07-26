@@ -11,7 +11,11 @@ import {
 } from '@solana/spl-governance'
 
 import useRpcContext from '@hooks/useRpcContext'
-import { getVoteRecords, getTokenOwnerRecords } from '@models/proposal'
+import {
+  getVoteRecords,
+  getTokenOwnerRecords,
+  buildTopNftVoters,
+} from '@models/proposal'
 import useRealm from '@hooks/useRealm'
 import { buildTopVoters } from '@models/proposal'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
@@ -33,7 +37,7 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
   >([])
   const realm = useRealmQuery().data?.result
   const mint = useRealmCommunityMintInfoQuery().data?.result
-  const { vsrMode } = useRealm()
+  const { vsrMode, isNftMode } = useRealm()
 
   //for vsr
   const [
@@ -50,6 +54,18 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const connection = useLegacyConnectionContext()
   const governingTokenMintPk = proposal?.account.governingTokenMint
+  const [nftMintRegistrar] = useVotePluginsClientStore((s) => [
+    s.state.nftMintRegistrar,
+  ])
+  const nftVoterPluginTotalWeight = useMemo(() => {
+    return nftMintRegistrar?.collectionConfigs.reduce((prev, curr) => {
+      const size = curr.size
+      const weight = curr.weight
+      if (typeof size === 'undefined' || typeof weight === 'undefined')
+        return prev
+      return prev + size * weight
+    }, 0)
+  }, [nftMintRegistrar])
 
   useEffect(() => {
     if (context && proposal && realm) {
@@ -92,7 +108,7 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
     }
   }, [getRpcContext])
   const topVoters = useMemo(() => {
-    if (realm && proposal && mint) {
+    if (realm && proposal && mint && !isNftMode) {
       return buildTopVoters(
         voteRecords,
         tokenOwnerRecords,
@@ -101,8 +117,14 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
         mint,
         undecidedDepositByVoteRecord
       )
+    } else if (realm && proposal && mint && isNftMode) {
+      return buildTopNftVoters(
+        voteRecords,
+        tokenOwnerRecords,
+        mint,
+        new BN(nftVoterPluginTotalWeight)
+      )
     }
-
     return []
   }, [
     voteRecords,
@@ -111,6 +133,8 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
     proposal,
     mint,
     undecidedDepositByVoteRecord,
+    isNftMode,
+    nftVoterPluginTotalWeight,
   ])
 
   useEffect(() => {
