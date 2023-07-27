@@ -41,6 +41,11 @@ export const digitalAssetsQueryKeys = {
     'by Realm',
     realm.toString(),
   ],
+  proofById: (network: Network, id: PublicKey) => [
+    ...digitalAssetsQueryKeys.all(network),
+    'proof By Id',
+    id.toString(),
+  ],
 }
 
 /*** Here is an example item from the DAS Api, since it's not typed and the docs dont give the full schema.
@@ -225,3 +230,30 @@ export const useRealmDigitalAssetsQuery = () => {
   })
   return query
 }
+
+const dasProofByIdQueryFn = async (network: Network, id: PublicKey) => {
+  const url = getHeliusEndpoint(network)
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      id: 'Realms user',
+      method: 'getAssetProof',
+      params: {
+        id: id.toString(),
+      },
+    }),
+  })
+
+  const { result, error } = await response.json()
+  if (error) return undefined
+  return result.items as any
+}
+export const fetchDasAssetProofById = (network: Network, assetId: PublicKey) =>
+  queryClient.fetchQuery({
+    queryKey: digitalAssetsQueryKeys.proofById(network, assetId),
+    queryFn: () => dasProofByIdQueryFn(network, assetId),
+  })
