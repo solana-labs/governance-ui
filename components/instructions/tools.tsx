@@ -164,10 +164,6 @@ export const ACCOUNT_NAMES = {
     'GSAIL VAULT 2022-2026 VESTING SCHEDULE',
   GAMpPYx4DcJdPhnr7sM84gxym4NiNpzo4G6WufpRLemP: 'GSAIL TREASURY VAULT',
 
-  // Marinade DAO
-  B7ux5n2LYxJhS2TsMAcE98eMbkY3dBHUWyrZPBnDmMT5: 'MNDE Treasury',
-  GewCM8ipoPnEraZZqEp6VgVPLZfxr8xwJREmidXVU1EH: 'mSOL Treasury',
-
   // MonkOG DAO
   CVuCjHrqj97fSTsnSKzEBVPeYzXEEv6uiRjzBLRvnouj: 'MonkOG DAO Treasury Vault',
 
@@ -233,6 +229,29 @@ export const ACCOUNT_NAMES = {
   '714JsESwkxjDZTaxD2TNe7vqMG52yxug8vaXug5VKBqd':
     'Kaiman dao council mint governance',
   '9rFYGii2nQz74qg5PTYViPj46E82PrJguEC2QvbZVuwk': 'Kaiman dao council mint',
+
+  // Marinade DAO
+  '899YG3yk4F66ZgbNWLHriZHTXSKk9e1kvsKEquW7L6Mo': 'Marinade DAO Realm',
+  'MNDEFzGvMt87ueuHvVU9VcTqsAP5b3fTGPsHuuPA5ey': 'MNDE Token Mint',
+  'FsrqQfLGdFVtySSSsyZJUzVBA9bvGZSKyhp7nsJCqgJe': 'Marinade Realm Config Governance',
+  '26Pw2qvaHgnvHPD73pWr6EUWchpTF3bEzVbEoDPLS21D': 'Marinade Realm Config Wallet',
+  '6MGwpuJ5YE1c8jJaF8FKurQdDJeYRf1adX76dovkXxRs': 'Marinade Council Mint',
+  'CnPBhNLpwPDY5rw8Wa8bt8DCkRNJ2GoGVf9xb7VYNrRr': 'Marinade Admin Authorities Governance',
+  'BD9XxcmnvbJHgCcX8b2QMXjmcXHQ332NskFvjq6DTByU': 'Marinade Admin Authorities Wallet',
+  'M5Fg6GipNvPzWgXNr5wj1EDcp8GB9J53cgyE7YGYLbL': 'Marinade Liquid Staking Admin Authority Governance',
+  '42VJbDihcS81YJPbuhHnHgvo1ehu42j8VK9sNwrnAarR': 'Marinade Liquid Staking Admin Authority Wallet',
+  '8z6A4qSfL9FFvwX12zqt6HrbzaWthGUqBe4czCn9iXtq': 'Marinade MNDE Treasury Governance',
+  'B56RWQGf9RFw7t8gxPzrRvk5VRmB5DoF94aLoJ25YtvG': 'Marinade MNDE Treasury Wallet',
+  'GR1LBT4cU89cJWE74CP6BsJTf2kriQ9TX59tbDsfxgSi': 'Marinade MNDE Treasury Vault',
+  '23xVZXQrHAZ4rm4nWKAM5eTLeUFmstbs42KF21PA4Ayo': 'Marinade Opinion Voting Governance',
+  'AyCAAAd7wsw6zy6cVhDf8gp6Mv4K46T84dUrkg7KX7fy': 'Marinade Opinion Voting Wallet',
+  'CWRgRr4udD66JbVtS9u2Gu7LHBi5m6SM3ytvmWobThEQ': 'Marinade Tokadapt Program Governance',
+  'AEej7Lywu8EzMznXnxhb1493yCVnmLNXaCKYfUNvQQaJ': 'Marinade Escrow Relocker Program Governance',
+  '3cBS14yanCZPRKgdCLnmxHWXFfGjW8bid5zxj7UPqWW5': 'Marinade Liquidity Gauges Program Governance',
+  'CLydpgqZty5HQq1uMtbXpH1vtmN7erhdBSPbn12NGLmb': 'Marinade Validator Gauges Program Governance',
+  'G6yWqM2RVjhepkVEayeNVqgKNtpMuwtgqDY3s2N3uzas': 'Marinade Referral v1 Program Governance',
+  '6XQFdWeogb5C8c1KsSCkK6rzzxLxzxsPQqoXge9oJ9xR': 'Marinade Referral v2 Program Governance',
+  '2aQP7NGhktKR92EsHKSoRzcw5FfcZ8oBWgyoGdB3ouww': 'Marinade Directed Stake Program Governance',
 }
 
 // TODO: Add this to on-chain metadata to Governance account
@@ -388,11 +407,11 @@ export async function getInstructionDescriptor(
   const descriptor = !instruction.data.length
     ? descriptors
     : descriptors && descriptors[instruction.data[0]]
-    ? descriptors[instruction.data[0]]
-    : //backup if first number is same for couple of instructions inside same idl
-    descriptors && descriptors[`${instruction.data[0]}${instruction.data[1]}`]
-    ? descriptors[`${instruction.data[0]}${instruction.data[1]}`]
-    : descriptors
+      ? descriptors[instruction.data[0]]
+      : //backup if first number is same for couple of instructions inside same idl
+      descriptors && descriptors[`${instruction.data[0]}${instruction.data[1]}`]
+        ? descriptors[`${instruction.data[0]}${instruction.data[1]}`]
+        : descriptors
 
   const dataUI = (descriptor?.getDataUI &&
     (await descriptor?.getDataUI(
