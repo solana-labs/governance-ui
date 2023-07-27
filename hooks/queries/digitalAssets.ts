@@ -19,7 +19,7 @@ const getHeliusEndpoint = (network: Network) => {
         network === 'devnet'
           ? 'NEXT_PUBLIC_HELIUS_DEVNET_RPC'
           : 'NEXT_PUBLIC_HELIUS_MAINNET_RPC'
-      }`,
+      }`
     )
   return url
 }
@@ -260,14 +260,14 @@ export const useRealmDigitalAssetsQuery = () => {
       if (!enabled) throw new Error()
 
       const treasuries = await Promise.all(
-        governances.map((x) => getNativeTreasuryAddress(realm.owner, x.pubkey)),
+        governances.map((x) => getNativeTreasuryAddress(realm.owner, x.pubkey))
       )
       const governancePks = governances.map((x) => x.pubkey)
 
       const results = await Promise.all(
         [...treasuries, ...governancePks].map((x) =>
-          fetchDigitalAssetsByOwner(network, x),
-        ),
+          fetchDigitalAssetsByOwner(network, x)
+        )
       )
       console.log('results', results)
       return results
