@@ -38,7 +38,7 @@ const MultiChoiceVotes = ({proposal, limit} : {proposal: Proposal, limit: number
 
                 return (
                 <div className="border border-fgd-4 p-4" key={index}>
-                    <div className="flex flex-row justify-between">
+                    <div className="flex flex-row justify-between gap-2">
                         <div className="flex flex-row justify-start">
                             <StyledLabel>{option.label}</StyledLabel>
                             <StyledSubLabel>{optionVotes.toLocaleString()} votes</StyledSubLabel>
