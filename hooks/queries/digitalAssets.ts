@@ -29,18 +29,23 @@ export const digitalAssetsQueryKeys = {
   byId: (network: Network, id: PublicKey) => [
     ...digitalAssetsQueryKeys.all(network),
     'by Id',
-    id.toString(),
+    id.toString()
   ],
   byOwner: (network: Network, owner: PublicKey) => [
     ...digitalAssetsQueryKeys.all(network),
     'by Owner',
-    owner.toString(),
+    owner.toString()
   ],
   byRealm: (network: Network, realm: PublicKey) => [
     ...digitalAssetsQueryKeys.all(network),
     'by Realm',
-    realm.toString(),
+    realm.toString()
   ],
+  proofById: (network: Network, id: PublicKey) => [
+    ...digitalAssetsQueryKeys.all(network),
+    'by Owner',
+    id.toString()
+  ]
 }
 
 /*** Here is an example item from the DAS Api, since it's not typed and the docs dont give the full schema.
@@ -130,16 +135,16 @@ export const dasByIdQueryFn = async (network: Network, id: PublicKey) => {
   const response = await fetch(url, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify({
       jsonrpc: '2.0',
       id: 'Realms user',
       method: 'getAsset',
       params: {
-        id: id.toString(),
-      },
-    }),
+        id: id.toString()
+      }
+    })
   })
 
   const x = await response.json()
@@ -155,7 +160,7 @@ const dasByOwnerQueryFn = async (network: Network, owner: PublicKey) => {
   const response = await fetch(url, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify({
       jsonrpc: '2.0',
@@ -164,18 +169,39 @@ const dasByOwnerQueryFn = async (network: Network, owner: PublicKey) => {
       params: {
         ownerAddress: owner.toString(),
         page: 1, // Starts at 1
-        limit: 1000, // TODO support having >1k nfts
-      },
-    }),
+        limit: 1000 // TODO support having >1k nfts
+      }
+    })
   })
   const { result } = await response.json()
   return result.items as any[]
 }
 
+const dasProofByIdQueryFn = async (network: Network, id: PublicKey) => {
+  const url = getHeliusEndpoint(network)
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      id: 'Realms user',
+      method: 'getAssetProof',
+      params: {
+        id: id.toString()
+      }
+    })
+  })
+
+  const { result } = await response.json()
+  return result.items as any
+}
+
 export const fetchDigitalAssetsByOwner = (network: Network, owner: PublicKey) =>
   queryClient.fetchQuery({
     queryKey: digitalAssetsQueryKeys.byOwner(network, owner),
-    queryFn: () => dasByOwnerQueryFn(network, owner),
+    queryFn: () => dasByOwnerQueryFn(network, owner)
   })
 
 export const useDigitalAssetsByOwner = (owner: undefined | PublicKey) => {
@@ -188,10 +214,16 @@ export const useDigitalAssetsByOwner = (owner: undefined | PublicKey) => {
     queryFn: async () => {
       if (!enabled) throw new Error()
       return dasByOwnerQueryFn(network, owner)
-    },
+    }
     // enabled ? dasByOwnerQueryFn(network, owner) : new Error(),
   })
 }
+
+export const fetchDasAssetProofById = (network: Network, assetId: PublicKey) =>
+  queryClient.fetchQuery({
+    queryKey: digitalAssetsQueryKeys.proofById(network, assetId),
+    queryFn: () => dasProofByIdQueryFn(network, assetId)
+  })
 
 export const useRealmDigitalAssetsQuery = () => {
   const { connection } = useConnection()
@@ -221,7 +253,7 @@ export const useRealmDigitalAssetsQuery = () => {
       console.log('results', results)
       return results
     },
-    enabled,
+    enabled
   })
   return query
 }
