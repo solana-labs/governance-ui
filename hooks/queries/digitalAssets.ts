@@ -43,7 +43,7 @@ export const digitalAssetsQueryKeys = {
   ],
   proofById: (network: Network, id: PublicKey) => [
     ...digitalAssetsQueryKeys.all(network),
-    'by Owner',
+    'Proof by Id',
     id.toString(),
   ],
 }
