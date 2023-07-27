@@ -10,19 +10,25 @@ import {
   ConcurrentMerkleTreeAccount,
 } from '@solana/spl-account-compression'
 
-import { fetchDasAssetProofById } from '@hooks/queries/digitalAssets'
+import {
+  fetchDasAssetProofById,
+  fetchDigitalAssetById,
+} from '@hooks/queries/digitalAssets'
 import { useConnection } from '@solana/wallet-adapter-react'
 import { getNetworkFromEndpoint } from '@utils/connection'
 
 // cnft assetId is the same concept of nft's mintAddress
-const useTransferCnftInstruction = (to: PublicKey) => {
+const useTransferCnftInstruction = () => {
   const { connection } = useConnection()
-  const network = getNetworkFromEndpoint(connection.rpcEndpoint)
 
-  const enable = network !== 'localnet' && to !== undefined
   return useCallback(
-    async (cnft: any) => {
-      if (!cnft.compression.compressed || !enable) throw new Error()
+    async (cnftId: PublicKey, toOwner: PublicKey) => {
+      const network = getNetworkFromEndpoint(connection.rpcEndpoint)
+      if (network === 'localnet') throw new Error()
+
+      const cnft = (await fetchDigitalAssetById(network, cnftId)).result
+      if (cnft === undefined) throw new Error('cnft not found')
+      if (!cnft.compression.compressed) throw new Error('not a compressed nft')
 
       const assetId = new PublicKey(cnft.id)
       const assetProof = await fetchDasAssetProofById(network, assetId)
@@ -56,7 +62,7 @@ const useTransferCnftInstruction = (to: PublicKey) => {
           treeAuthority,
           leafOwner,
           leafDelegate,
-          newLeafOwner: to,
+          newLeafOwner: toOwner,
           logWrapper: SPL_NOOP_PROGRAM_ID,
           compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
           anchorRemainingAccounts: proofPath,
@@ -75,7 +81,7 @@ const useTransferCnftInstruction = (to: PublicKey) => {
         BUBBLEGUM_PROGRAM_ID
       )
     },
-    [connection, to, network, enable]
+    [connection]
   )
 }
 

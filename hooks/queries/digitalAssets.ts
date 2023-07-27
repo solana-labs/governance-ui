@@ -50,7 +50,24 @@ export const digitalAssetsQueryKeys = {
 
 export type DasNftObject = {
   grouping: { group_key: 'collection'; group_value: string }[]
-  compression: { compressed: boolean }
+  compression: {
+    eligible: boolean
+    compressed: boolean
+    data_hash: string
+    creator_hash: string
+    asset_hash: string
+    tree: string
+    seq: number
+    leaf_id: number
+  }
+  ownership: {
+    frozen: boolean
+    delegated: boolean
+    delegate: null | string
+    ownership_model: string
+    owner: string
+  }
+  id: string
 }
 
 /*** Here is an example item from the DAS Api, since it's not typed and the docs dont give the full schema.
@@ -154,8 +171,14 @@ export const dasByIdQueryFn = async (network: Network, id: PublicKey) => {
 
   const x = await response.json()
   if (x.error) return { found: false, result: undefined, err: x.error }
-  return { result: x.result, found: true }
+  return { result: x.result as DasNftObject, found: true }
 }
+
+export const fetchDigitalAssetById = (network: Network, id: PublicKey) =>
+  queryClient.fetchQuery({
+    queryKey: digitalAssetsQueryKeys.byOwner(network, id),
+    queryFn: () => dasByIdQueryFn(network, id),
+  })
 
 export const useDigitalAssetById = (id: PublicKey | undefined) => {
   const { connection } = useConnection()
