@@ -14,18 +14,19 @@ import { fetchDasAssetProofById } from '@hooks/queries/digitalAssets'
 import { useConnection } from '@solana/wallet-adapter-react'
 import { getNetworkFromEndpoint } from '@utils/connection'
 
+// cnft assetId is the same concept of nft's mintAddress
 const useTransferCnftInstruction = (to: PublicKey) => {
   const { connection } = useConnection()
   const network = getNetworkFromEndpoint(connection.rpcEndpoint)
-  if (network === 'localnet') throw new Error()
 
+  const enable = network !== 'localnet' && to !== undefined
   return useCallback(
     async (cnft: any) => {
-      if (!cnft.compression.compressed)
-        throw new Error('The asset is not compressed Nft.')
+      if (!cnft.compression.compressed || !enable) throw new Error()
 
       const assetId = new PublicKey(cnft.id)
       const assetProof = await fetchDasAssetProofById(network, assetId)
+      if (!assetProof) throw new Error('The asset proof is not found.')
 
       const treeAddress = new PublicKey(cnft.compression.tree)
       const treeAccount = await ConcurrentMerkleTreeAccount.fromAccountAddress(
@@ -74,7 +75,7 @@ const useTransferCnftInstruction = (to: PublicKey) => {
         BUBBLEGUM_PROGRAM_ID
       )
     },
-    [connection, to, network]
+    [connection, to, network, enable]
   )
 }
 

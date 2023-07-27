@@ -194,7 +194,8 @@ const dasProofByIdQueryFn = async (network: Network, id: PublicKey) => {
     })
   })
 
-  const { result } = await response.json()
+  const { result, error } = await response.json()
+  if (error) return undefined
   return result.items as any
 }
 
