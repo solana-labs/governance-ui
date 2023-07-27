@@ -25,7 +25,7 @@ const useStore = create<{
   state: TreasurySelectState | undefined
   set: (x: TreasurySelectState | undefined) => void
 }>((set) => ({
-  state: undefined,
+  state: { _kind: 'Legacy' },
   set: (x) => set(() => ({ state: x })),
 }))
 

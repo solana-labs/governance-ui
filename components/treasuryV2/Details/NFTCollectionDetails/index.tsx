@@ -3,11 +3,14 @@ import cx from 'classnames'
 import StickyScrolledContainer from '../StickyScrolledContainer'
 import { useDigitalAssetsByOwner } from '@hooks/queries/digitalAssets'
 import useTreasuryAddressForGovernance from '@hooks/useTreasuryAddressForGovernance'
-import { useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { SUPPORT_CNFTS } from '@constants/flags'
 import NFTGallery from '@components/NFTGallery'
 import { PublicKey } from '@solana/web3.js'
 import Header from './Header'
+import useFindGovernanceByTreasury from '@hooks/useFindGovernanceByTreasury'
+import SendNft from '@components/SendNft'
+import Modal from '@components/Modal'
 
 interface Props {
   className?: string
@@ -59,23 +62,61 @@ export default function NFTCollectionDetails(props: Props) {
   const governance = useMemo(() => new PublicKey(props.governance), [
     props.governance,
   ])
+  const [openSendNftsModal, setOpenSendNftsModal] = useState(false)
+
+  const [
+    selectedNftAndItsGovernance,
+    setSelectedNftAndItsGovernance,
+  ] = useState<[PublicKey | undefined, PublicKey]>()
+
+  const findGovernanceByTreasury = useFindGovernanceByTreasury()
+  // x is an nft object from the DAS api
+  const onClickSendNft = useCallback(
+    async (x: any) => {
+      const owner = new PublicKey(x.ownership.owner)
+      const governance = (await findGovernanceByTreasury(owner)) ?? owner
+      setSelectedNftAndItsGovernance([new PublicKey(x.id), governance])
+      setOpenSendNftsModal(true)
+    },
+    [findGovernanceByTreasury]
+  )
+
+  const onHeaderClickSendNft = useCallback(async () => {
+    setSelectedNftAndItsGovernance([undefined, governance])
+    setOpenSendNftsModal(true)
+  }, [governance])
+
   return (
-    <div className={cx(props.className, 'rounded', 'overflow-hidden')}>
-      <StickyScrolledContainer
-        className="h-full"
-        isAncestorStickied={props.isStickied}
-      >
-        <Header governance={governance} collectionId={collectionId} />
-        <section className="p-6 bg-bkg-3">
-          <NftCollectionGallery
-            governance={governance}
+    <>
+      <div className={cx(props.className, 'rounded', 'overflow-hidden')}>
+        <StickyScrolledContainer
+          className="h-full"
+          isAncestorStickied={props.isStickied}
+        >
+          <Header
             collectionId={collectionId}
-            onClickSendNft={() => {
-              return
-            }}
+            onClickSendNft={onHeaderClickSendNft}
           />
-        </section>
-      </StickyScrolledContainer>
-    </div>
+          <section className="p-6 bg-bkg-3">
+            <NftCollectionGallery
+              governance={governance}
+              collectionId={collectionId}
+              onClickSendNft={onClickSendNft}
+            />
+          </section>
+        </StickyScrolledContainer>
+      </div>
+      {openSendNftsModal && (
+        <Modal
+          sizeClassName="sm:max-w-3xl"
+          onClose={() => setOpenSendNftsModal(false)}
+          isOpen={openSendNftsModal}
+        >
+          <SendNft
+            initialNftAndGovernanceSelected={selectedNftAndItsGovernance}
+          />
+        </Modal>
+      )}
+    </>
   )
 }

@@ -1,24 +1,20 @@
-import { useState } from 'react'
 import cx from 'classnames'
 import { ReplyIcon } from '@heroicons/react/outline'
 
 import { SecondaryButton } from '@components/Button'
-import Modal from '@components/Modal'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Address from '@components/Address'
 
-import SendNft from '@components/SendNft'
 import { PublicKey } from '@solana/web3.js'
 import { useDigitalAssetById } from '@hooks/queries/digitalAssets'
 import NFTCollectionPreviewIcon from '@components/treasuryV2/icons/NFTCollectionPreviewIcon'
 
 interface Props {
   collectionId: PublicKey | 'none'
-  governance: PublicKey
+  onClickSendNft: () => void
 }
 
-export default function Header({ collectionId, governance }: Props) {
-  const [sendNFTsModalOpen, setSendNFTsModalOpen] = useState(false)
+export default function Header({ onClickSendNft, collectionId }: Props) {
   const { canUseTransferInstruction } = useGovernanceAssets()
 
   const { data: collectionNft } = useDigitalAssetById(
@@ -73,9 +69,7 @@ export default function Header({ collectionId, governance }: Props) {
               ? 'You need to have connected wallet with ability to create token transfer proposals'
               : undefined
           }
-          onClick={() => {
-            setSendNFTsModalOpen(true)
-          }}
+          onClick={onClickSendNft}
         >
           <div className="flex items-center justify-center">
             <ReplyIcon className="h-4 w-4 mr-1 scale-x-[-1]" />
@@ -83,15 +77,6 @@ export default function Header({ collectionId, governance }: Props) {
           </div>
         </SecondaryButton>
       </div>
-      {sendNFTsModalOpen && (
-        <Modal
-          isOpen
-          sizeClassName="sm:max-w-3xl"
-          onClose={() => setSendNFTsModalOpen(false)}
-        >
-          <SendNft initialNftAndGovernanceSelected={[undefined, governance]} />
-        </Modal>
-      )}
     </div>
   )
 }
