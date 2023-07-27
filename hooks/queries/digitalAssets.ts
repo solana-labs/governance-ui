@@ -48,6 +48,11 @@ export const digitalAssetsQueryKeys = {
   ],
 }
 
+export type DasNftObject = {
+  grouping: { group_key: 'collection'; group_value: string }[]
+  compression: { compressed: boolean }
+}
+
 /*** Here is an example item from the DAS Api, since it's not typed and the docs dont give the full schema.
  * {
     "interface": "V1_NFT",
@@ -152,6 +157,20 @@ export const dasByIdQueryFn = async (network: Network, id: PublicKey) => {
   return { result: x.result, found: true }
 }
 
+export const useDigitalAssetById = (id: PublicKey | undefined) => {
+  const { connection } = useConnection()
+  const network = getNetworkFromEndpoint(connection.rpcEndpoint) as Network
+  const enabled = id !== undefined
+  return useQuery({
+    enabled,
+    queryKey: id && digitalAssetsQueryKeys.byId(network, id),
+    queryFn: async () => {
+      if (!enabled) throw new Error()
+      return dasByIdQueryFn(network, id)
+    },
+  })
+}
+
 const dasByOwnerQueryFn = async (network: Network, owner: PublicKey) => {
   const url = getHeliusEndpoint(network)
 
@@ -194,7 +213,6 @@ export const useDigitalAssetsByOwner = (owner: undefined | PublicKey) => {
       if (!enabled) throw new Error()
       return dasByOwnerQueryFn(network, owner)
     },
-    // enabled ? dasByOwnerQueryFn(network, owner) : new Error(),
   })
 }
 
