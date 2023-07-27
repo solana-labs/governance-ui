@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import classNames from 'classnames'
 import { ChevronLeftIcon } from '@heroicons/react/solid'
@@ -8,12 +8,16 @@ import useVoteRecords from '@hooks/useVoteRecords'
 import ProposalStateBadge from '@components/ProposalStateBadge'
 import ProposalTopVotersList from '@components/ProposalTopVotersList'
 import ProposalTopVotersBubbleChart from '@components/ProposalTopVotersBubbleChart'
+import ProposalTopVotersNftChart from '@components/ProposalTopVotersNftChart'
 import useSignatories from '@hooks/useSignatories'
 import ProposalSignatories from '@components/ProposalSignatories'
 import ProposalVoteResult from '@components/ProposalVoteResults'
 import ProposalRemainingVotingTime from '@components/ProposalRemainingVotingTime'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import Switch from '@components/Switch'
+import { NFT_PLUGINS_PKS } from '@constants/plugins'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 
 export default function Explore() {
   const proposal = useRouteProposalQuery().data?.result
@@ -23,8 +27,28 @@ export default function Explore() {
   const records = useVoteRecords(proposal)
   const signatories = useSignatories(proposal)
   const router = useRouter()
+  const [isNftMode, setIsNftMode] = useState(false)
+  const [showNfts, setShowNfts] = useState(false)
+  const config = useRealmConfigQuery().data?.result
+  const currentPluginPk = config?.account.communityTokenConfig.voterWeightAddin
 
   const endpoint = connection.endpoint
+
+  const toggleShowNfts = () => {
+    setShowNfts(!showNfts)
+  }
+
+  useEffect(() => {
+    if (
+      currentPluginPk &&
+      NFT_PLUGINS_PKS.includes(currentPluginPk?.toBase58())
+    ) {
+      console.log(currentPluginPk.toBase58())
+      setIsNftMode(true)
+    } else {
+      setIsNftMode(false)
+    }
+  }, [currentPluginPk])
 
   return (
     <div className="bg-bkg-2 rounded-lg p-4 space-y-3 md:p-6">
@@ -49,18 +73,47 @@ export default function Explore() {
             <h1 className="mr-2">{proposal?.account.name}</h1>
             <ProposalStateBadge proposal={proposal.account} />
           </div>
-          <h3 className="mb-4 mt-16">Top Voters</h3>
+          <div className="mb-4 mt-16 flex justify-between">
+            <h3 className="">Top Voters</h3>
+            <div
+              className={`${
+                isNftMode ? 'visible' : 'hidden'
+              } flex items-center`}
+            >
+              <p className="mb-0 mr-1 text-fgd-3">Show NFTs</p>
+              <Switch
+                checked={showNfts}
+                onChange={() => {
+                  toggleShowNfts()
+                }}
+              />
+            </div>
+          </div>
+
           <div
             className="grid gap-4 grid-cols-1 items-center lg:grid-cols-2"
             onMouseLeave={() => setHighlighted(undefined)}
           >
-            <ProposalTopVotersList
-              className="h-[500px]"
-              data={records}
-              endpoint={endpoint}
-              highlighted={highlighted}
-              onHighlight={setHighlighted}
-            />
+            <div className="flex flex-col gap-5 h-[500px]">
+              <ProposalTopVotersList
+                className={showNfts ? 'h-[275px]' : 'h-[500px]'}
+                data={records}
+                endpoint={endpoint}
+                highlighted={highlighted}
+                onHighlight={setHighlighted}
+              />
+              <ProposalTopVotersNftChart
+                isNftMode={isNftMode}
+                showNfts={showNfts}
+                className="h-[205px]"
+                highlighted={highlighted}
+                voteType={
+                  highlighted && records
+                    ? records.find((x) => x.key === highlighted)?.voteType
+                    : undefined
+                }
+              />
+            </div>
             <ProposalTopVotersBubbleChart
               className="h-[500px]"
               data={records}
@@ -95,6 +148,14 @@ export default function Explore() {
           <div className="animate-pulse bg-bkg-3 h-52 rounded-lg mt-16" />
         </div>
       )}
+      {/* {highlighted && position && (
+        <div
+          className="w-32 bg-white absolute"
+          style={{ left: position?.x + 300, top: position?.y + 100 }}
+        >
+          Helloworkd
+        </div>
+      )} */}
     </div>
   )
 }

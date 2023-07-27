@@ -33,9 +33,10 @@ export const calcCostOfNftVote = async (
     for (const nft of voterNfts) {
       const { nftVoteRecord } = await getNftVoteRecordProgramAddress(
         proposalPk,
-        nft.mintAddress,
+        nft.id,
         votingPlugin.client!.program.programId!
       )
+
       if (
         !nftsAlreadyUsedToVote.find(
           (x) => x.publicKey.toBase58() === nftVoteRecord.toBase58()

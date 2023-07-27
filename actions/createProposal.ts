@@ -223,7 +223,7 @@ export const createProposal = async (
       sequenceType: SequenceType.Sequential,
     }
   })
-
+  console.log('txes', txes)
   await sendTransactionsV3({
     callbacks,
     connection,

@@ -226,7 +226,7 @@ export async function castVote(
     )
 
     const splIxsWithAccountsChunk = chunks(ixsWithOwnChunk, 2)
-    const nftsAccountsChunks = chunks(remainingIxsToChunk, 2)
+    const nftsAccountsChunks = chunks(remainingIxsToChunk, 1)
     const instructionsChunks = [
       ...nftsAccountsChunks.map((txBatch, batchIdx) => {
         return {
@@ -249,12 +249,14 @@ export async function castVote(
         }
       }),
     ]
+
     const totalVoteCost = await calcCostOfNftVote(
       message,
       instructionsChunks.length,
       proposal.pubkey,
       votingPlugin
     )
+
     const hasEnoughSol = await checkHasEnoughSolToVote(
       totalVoteCost,
       wallet.publicKey!,
