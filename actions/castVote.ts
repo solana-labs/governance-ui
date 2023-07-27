@@ -50,9 +50,11 @@ export async function castVote(
   proposal: ProgramAccount<Proposal>,
   tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>,
   voteKind: VoteKind,
+  isMulti: boolean,
   message?: ChatMessageBody | undefined,
   votingPlugin?: VotingClient,
-  runAfterConfirmation?: (() => void) | null
+  runAfterConfirmation?: (() => void) | null,
+  voteWeights?: number[]
 ) {
   const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []
@@ -73,9 +75,29 @@ export async function castVote(
     tokenOwnerRecord
   )
 
+  // If the proposal is multi-choice
+  const approveChoices: VoteChoice[] = [];
+  
+  if (isMulti) {
+    for (let i = 0; i < proposal.account.options.length; i++) {
+      if (voteWeights?.includes(i)) {
+        approveChoices.push(new VoteChoice({rank: 0, weightPercentage: 100}))
+      } else {
+        approveChoices.push(new VoteChoice({rank: 0, weightPercentage: 0}))
+      }
+    }
+  }
+
   // It is not clear that defining these extraneous fields, `deny` and `veto`, is actually necessary.
   // See:  https://discord.com/channels/910194960941338677/910630743510777926/1044741454175674378
-  const vote =
+  const vote = isMulti ?
+    new Vote({
+      voteType: VoteKind.Approve,
+      approveChoices,
+      deny: undefined,
+      veto: undefined
+    })
+  :
     voteKind === VoteKind.Approve
       ? new Vote({
           voteType: VoteKind.Approve,

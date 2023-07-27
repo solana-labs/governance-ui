@@ -9,6 +9,7 @@ import {
   Proposal,
   ProposalState,
   Vote,
+  VoteType,
   withCastVote,
   YesNoVote,
 } from '@solana/spl-governance'
@@ -153,6 +154,7 @@ const REALM = () => {
           governancesByGovernance[v.account.governance.toBase58()]?.account
         return (
           v.account.state === ProposalState.Voting &&
+          v.account.voteType === VoteType.SINGLE_CHOICE &&
           // !getCurrentVoteRecKeyVal()[k] &&
           !v.account.hasVoteTimeEnded(governance)
         )

@@ -16,6 +16,7 @@ interface VoteCommentModalProps {
   isOpen: boolean
   vote: VoteKind
   voterTokenRecord: ProgramAccount<TokenOwnerRecord>
+  isMulti?: number[]
 }
 
 const VOTE_STRINGS = {
@@ -30,18 +31,30 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   isOpen,
   vote,
   voterTokenRecord,
+  isMulti,
 }) => {
   const [comment, setComment] = useState('')
-  const { submitting, submitVote } = useSubmitVote()
+  const { submitting, submitVote, multiChoiceSubmitting, multiChoiceSubmitVote } = useSubmitVote()
 
   const voteString = VOTE_STRINGS[vote]
 
   const handleSubmit = async () => {
-    await submitVote({
-      vote,
-      voterTokenRecord,
-      comment,
-    })
+    if (isMulti) {
+      console.log(isMulti)
+      await multiChoiceSubmitVote({
+        vote,
+        voterTokenRecord,
+        voteWeights: isMulti,
+        comment,
+      })
+    } else {
+      await submitVote({
+        vote,
+        voterTokenRecord,
+        comment,
+      })
+    }
+
     onClose()
   }
 
@@ -74,7 +87,8 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
           onClick={handleSubmit}
         >
           <div className="flex items-center">
-            {!submitting &&
+            {!submitting && !multiChoiceSubmitting &&
+              isMulti ? "" :
               (vote === VoteKind.Approve ? (
                 <ThumbUpIcon className="h-4 w-4 fill-black mr-2" />
               ) : vote === VoteKind.Deny ? (
@@ -82,7 +96,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
               ) : (
                 <BanIcon className="h-4 w-4 fill-black mr-2" />
               ))}
-            {submitting ? <Loading /> : <span>Vote {voteString}</span>}
+            {submitting || multiChoiceSubmitting ? <Loading /> : <span>Vote {isMulti ? "" : voteString}</span>}
           </div>
         </Button>
       </div>

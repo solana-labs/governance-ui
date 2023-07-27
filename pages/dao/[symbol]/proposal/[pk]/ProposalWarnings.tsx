@@ -81,6 +81,29 @@ const SetGovernanceConfig = () => (
   </div>
 )
 
+const MultiChoiceProp = () => (
+  <div className="rounded-md bg-green-50 p-3">
+    <div className="flex">
+      <div className="flex-shrink-0">
+        <ExclamationCircleIcon
+          className="h-5 w-5 text-green-400"
+          aria-hidden="true"
+        />
+      </div>
+      <div className="ml-3">
+        <h3 className="text-sm font-medium text-green-800">
+          This is a multi-choice proposal
+        </h3>
+        <div className="mt-2">
+          <p className="text-sm text-green-700">
+            You can vote on one or more options.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+)
+
 const useProposalSafetyCheck = () => {
   const config = useRealmConfigQuery().data?.result
 
@@ -123,7 +146,7 @@ const useProposalSafetyCheck = () => {
   return realmConfigWarnings
 }
 
-const ProposalWarnings = () => {
+const ProposalWarnings = ({isMulti} : {isMulti: boolean}) => {
   const warnings = useProposalSafetyCheck()
   return (
     <>
@@ -132,6 +155,7 @@ const ProposalWarnings = () => {
       {warnings?.includes('ThirdPartyInstructionWritesConfig') && (
         <ThirdPartyInstructionWritesConfigWarning />
       )}
+      {isMulti && <MultiChoiceProp />}
     </>
   )
 }

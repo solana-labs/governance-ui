@@ -8,13 +8,14 @@ import React, {
 } from 'react'
 import * as yup from 'yup'
 import { PlusCircleIcon, XCircleIcon } from '@heroicons/react/outline'
+import {TableOfContents, AddAlt} from '@carbon/icons-react'
 import {
   getInstructionDataFromBase64,
   Governance,
   ProgramAccount,
 } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
-import Button, { LinkButton, SecondaryButton } from '@components/Button'
+import Button, { LinkButton, ProposalTypeRadioButton, SecondaryButton } from '@components/Button'
 import Input from '@components/inputs/Input'
 import Textarea from '@components/inputs/Textarea'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
@@ -29,6 +30,7 @@ import {
   ComponentInstructionData,
   Instructions,
   InstructionsContext,
+  MultiChoiceProposalForm,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { notify } from 'utils/notifications'
@@ -138,12 +140,15 @@ import IdlSetBuffer from './components/instructions/Mango/MangoV4/IdlSetBuffer'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { usePrevious } from '@hooks/usePrevious'
 import DualVote from './components/instructions/Dual/DualVote'
+import GovernedAccountSelect from './components/GovernedAccountSelect'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 const TITLE_LENGTH_LIMIT = 130
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
 })
+
 const defaultGovernanceCtx: InstructionsContext = {
   instructionsData: [],
   voteByCouncil: null,
@@ -179,30 +184,62 @@ const getDefaultInstructionProps = (
 
 const New = () => {
   const router = useRouter()
-  const { handleCreateProposal } = useCreateProposal()
+  const { handleCreateProposal, proposeMultiChoice } = useCreateProposal()
   const { fmtUrlWithCluster } = useQueryContext()
   const realm = useRealmQuery().data?.result
 
-  const { symbol, realmInfo, canChooseWhoVote } = useRealm()
-  const { availableInstructions } = useGovernanceAssets()
+  const { symbol, realmInfo, canChooseWhoVote, ownVoterWeight } = useRealm()
+  const { availableInstructions, assetAccounts } = useGovernanceAssets()
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [form, setForm] = useState({
     title: typeof router.query['t'] === 'string' ? router.query['t'] : '',
     description: '',
   })
+  const [multiChoiceForm, setMultiChoiceForm] = useState<MultiChoiceProposalForm>({
+    governedAccount: undefined,
+    options: ['']
+  });
+
   const [formErrors, setFormErrors] = useState({})
+  const [multiFormErrors, setMultiFormErrors] = useState({})
+
   const [
     governance,
     setGovernance,
   ] = useState<ProgramAccount<Governance> | null>(null)
   const [isLoadingSignedProposal, setIsLoadingSignedProposal] = useState(false)
   const [isLoadingDraft, setIsLoadingDraft] = useState(false)
+  const [isMulti, setIsMulti] = useState<boolean | undefined>(undefined);
+  const [isMultiFormValidated, setIsMultiFormValidated] = useState(false);
+  const [maxOptionLength, setMaxOptionLength] = useState(0);
 
   const isLoading = isLoadingSignedProposal || isLoadingDraft
 
   const [instructionsData, setInstructions] = useState<
     ComponentInstructionData[]
   >([{ type: undefined }])
+
+  const multiChoiceSchema = useMemo(() => yup.object().shape({
+    governedAccount: yup
+    .object()
+    .nullable()
+    .required('Governed account is required'),
+  
+    options: yup.array().of(yup.string().required('Option cannot be empty').max(maxOptionLength))
+  }), [maxOptionLength]);
+
+  const handleOptionLength = () => {
+    // All Options + Title + Description
+    const MAX_LENGTH = 614;
+
+    const formDetailsLength = new TextEncoder().encode(form.title).length + 
+    new TextEncoder().encode(form.description).length;
+    
+    setMaxOptionLength(
+      Math.floor((MAX_LENGTH - formDetailsLength) / multiChoiceForm.options.length)
+    );
+    
+  }
 
   const handleSetInstructions = useCallback((val: any, index) => {
     setInstructions((prevInstructions) => {
@@ -215,7 +252,37 @@ const New = () => {
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
+    handleOptionLength()
   }
+
+  const handleMultiForm = ({ propertyName, value }) => {
+    setMultiFormErrors({})
+    setMultiChoiceForm({ ...multiChoiceForm, [propertyName]: value })
+    handleOptionLength()
+  }
+
+  const updateOptions = (odx: number, value: string, addOption: boolean)  => {
+    const updatedOptions = multiChoiceForm.options;
+
+    if (addOption) {
+      if (odx === -1) {
+        // add another voting choice button is clicked
+        if (updatedOptions.length > 8) {
+          return;
+        }
+  
+        updatedOptions.push(value);
+      } else {
+        updatedOptions[odx] = value;
+      }
+
+      handleMultiForm({value: updatedOptions, propertyName: "options"});
+    } else {
+      handleMultiForm({value: updatedOptions.filter((option, index) => index !== odx), propertyName: "options"});
+    }
+
+  }
+
   const setInstructionType = useCallback(
     ({ value, idx }: { value: InstructionType | null; idx: number }) => {
       const newInstruction = {
@@ -249,6 +316,8 @@ const New = () => {
 
   const handleCreate = async (isDraft) => {
     setFormErrors({})
+    setMultiFormErrors({})
+
     if (isDraft) {
       setIsLoadingDraft(true)
     } else {
@@ -261,70 +330,112 @@ const New = () => {
     )
 
     let instructions: UiInstruction[] = []
-    try {
-      instructions = await handleGetInstructions()
-    } catch (e) {
-      handleTurnOffLoaders()
-      notify({ type: 'error', message: `${e}` })
-      throw e
+
+    if (!isMulti) {
+      try {
+        instructions = await handleGetInstructions()
+      } catch (e) {
+        handleTurnOffLoaders()
+        notify({ type: 'error', message: `${e}` })
+        throw e
+      }
     }
 
     let proposalAddress: PublicKey | null = null
+
     if (!realm) {
       handleTurnOffLoaders()
       throw 'No realm selected'
     }
 
     if (isValid && instructions.every((x: UiInstruction) => x.isValid)) {
-      if (!governance) {
-        handleTurnOffLoaders()
-        throw Error('No governance selected')
-      }
+      if (isMulti) {
+        handleOptionLength()
 
-      const additionalInstructions = instructions
-        .flatMap((instruction) =>
-          instruction.additionalSerializedInstructions
-            ?.filter(
-              (value, index, self) =>
-                index === self.findIndex((t) => t === value)
+        const { isValid: isMultiFormValid, validationErrors: multiValidationErrors }: formValidation = await isFormValid(
+          multiChoiceSchema,
+          multiChoiceForm
+        )
+
+        if (isMultiFormValid && multiChoiceForm.governedAccount) {
+          // Create Multi-Choice Proposal
+          try {
+            const options = multiChoiceForm.options;
+            options.push("None of the Above");
+
+            proposalAddress = await proposeMultiChoice({
+              title: form.title,
+              description: form.description,
+              governance: multiChoiceForm.governedAccount.governance.pubkey,
+              instructionsData: [],
+              voteByCouncil,
+              options,
+              isDraft
+            });
+    
+            const url = fmtUrlWithCluster(
+              `/dao/${symbol}/proposal/${proposalAddress}`
             )
-            .map((x) => ({
-              data: x ? getInstructionDataFromBase64(x) : null,
-              ...getDefaultInstructionProps(instruction, governance),
-            }))
-        )
-        .filter((x) => x) as InstructionDataWithHoldUpTime[]
+    
+            router.push(url)
+          } catch (ex) {
+            console.log(ex)
+            notify({ type: 'error', message: `${ex}` })
+          }
+        } else {
+          setIsMultiFormValidated(true)
+          setMultiFormErrors(multiValidationErrors);
+        }
+      } else {
+        if (!governance) {
+          handleTurnOffLoaders()
+          throw Error('No governance selected')
+        }
 
-      const instructionsData = [
-        ...additionalInstructions,
-        ...instructions.map((x) => ({
-          data: x.serializedInstruction
-            ? getInstructionDataFromBase64(x.serializedInstruction)
-            : null,
-          ...getDefaultInstructionProps(x, governance),
-        })),
-      ]
+        const additionalInstructions = instructions
+          .flatMap((instruction) =>
+            instruction.additionalSerializedInstructions
+              ?.filter(
+                (value, index, self) =>
+                  index === self.findIndex((t) => t === value)
+              )
+              .map((x) => ({
+                data: x ? getInstructionDataFromBase64(x) : null,
+                ...getDefaultInstructionProps(instruction, governance),
+              }))
+          )
+          .filter((x) => x) as InstructionDataWithHoldUpTime[]
 
-      try {
-        // Fetch governance to get up to date proposalCount
+        const instructionsData = [
+          ...additionalInstructions,
+          ...instructions.map((x) => ({
+            data: x.serializedInstruction
+              ? getInstructionDataFromBase64(x.serializedInstruction)
+              : null,
+            ...getDefaultInstructionProps(x, governance),
+          })),
+        ]
 
-        proposalAddress = await handleCreateProposal({
-          title: form.title,
-          description: form.description,
-          governance,
-          instructionsData,
-          voteByCouncil,
-          isDraft,
-        })
+        try {
+          // Fetch governance to get up to date proposalCount
+          proposalAddress = await handleCreateProposal({
+            title: form.title,
+            description: form.description,
+            governance,
+            instructionsData,
+            voteByCouncil,
+            isDraft,
+          })
 
-        const url = fmtUrlWithCluster(
-          `/dao/${symbol}/proposal/${proposalAddress}`
-        )
+          const url = fmtUrlWithCluster(
+            `/dao/${symbol}/proposal/${proposalAddress}`
+          )
 
-        router.push(url)
-      } catch (ex) {
-        console.log(ex)
-        notify({ type: 'error', message: `${ex}` })
+          router.push(url)
+        } catch (ex) {
+          console.log(ex)
+          notify({ type: 'error', message: `${ex}` })
+        }
       }
     } else {
       setFormErrors(validationErrors)
@@ -639,6 +750,110 @@ const New = () => {
                 }}
               ></VoteBySwitch>
             )}
+            <div className='mt-5 max-w-lg w-full flex flex-col'>
+              <div className="bg-[#10B981] text-black flex flex-row items-center px-2 py-1 w-fit rounded-md mb-2">
+                <TableOfContents />
+                <div className="text-sm ml-2">New: Multiple Choice Polls</div>
+              </div>
+              <StyledLabel>
+                What type of proposal are you creating?
+              </StyledLabel>
+              <div className='text-sm font-extralight text-fgd-3 mt-1'>
+                In addition to creating a proposal with Yes/No choices, you may create polls with 
+                several voting options. Note that these multiple choice polls cannot have actions 
+                and are therefore non-executable.
+              </div>
+            </div>
+            <div className="max-w-lg w-full mt-5 mb-4 flex flex-wrap justify-between">
+              <ProposalTypeRadioButton
+                    onClick={() => setIsMulti(false)}
+                    selected={isMulti !== undefined && !isMulti}
+                    disabled={false}
+                    className="w-60"
+                  >
+                    Executable
+              </ProposalTypeRadioButton>
+              <ProposalTypeRadioButton
+                    onClick={() => setIsMulti(true)}
+                    selected={isMulti}
+                    disabled={false}
+                    className="w-60"
+                  >
+                    Non-Executable <br /> (Multiple-Choice)
+              </ProposalTypeRadioButton>
+            </div>
+            {isMulti ?
+              <div className="mt-8 mb-8">
+                <GovernedAccountSelect
+                  label="Which wallet’s rules should this proposal follow?"
+                  governedAccounts={assetAccounts.filter((x) =>
+                    ownVoterWeight.canCreateProposal(x.governance.account.config))
+                  }
+                  onChange={(value: AssetAccount) => {
+                    handleMultiForm({ value, propertyName: 'governedAccount' })
+                  }}
+                  value={multiChoiceForm.governedAccount}
+                  error={multiFormErrors['governedAccount']}
+                  shouldBeGoverned={null}
+                  governance={multiChoiceForm.governedAccount?.governance}
+                />
+                <h2 className='mt-8'>Add Choices</h2>
+                <div className='text-sm font-extralight text-fgd-3 mt-1 max-w-lg'>
+                  For all proposals, Realms auto-generates a voting option for “none of the above”, 
+                  which will display below the last option added by the proposal creator.
+                </div>
+                {multiChoiceForm.options.map((option, index) => {
+                  // copy index to keep its value for onChange function
+                  const odx = index;
+
+                  return (
+                    <div key={odx} className="mb-3 mt-8 border border-fgd-4 p-4 md:p-6 rounded-lg">
+                    <div className="flex flex-row justify-between">
+                      <h2 className='mb-4'>Choice {odx + 1}</h2>
+                      {odx > 0 ?
+                        <LinkButton
+                          className="flex font-bold items-center ml-4 text-fgd-1 text-sm"
+                          onClick={() => updateOptions(odx, "", false)}
+                        >
+                          <XCircleIcon className="h-5 mr-1.5 text-red w-5" />
+                            Remove
+                        </LinkButton>
+                      : ""}
+                    </div>
+                    <StyledLabel>Add a Label</StyledLabel>
+                    <div className='text-sm font-extralight text-fgd-3 mt-1 mb-2 max-w-lg'>
+                      This is the text voters will see when they vote.
+                    </div>
+                    <Input
+                      placeholder={`Voting Choice ${odx + 1}`}
+                      value={option}
+                      type="text"
+                      error={
+                        option.length ?
+                          maxOptionLength < 0 && isMultiFormValidated ? "Title or description length too long" :
+                          option.length <= maxOptionLength ? "" 
+                          : isMultiFormValidated ? `The length must be lower than ${maxOptionLength} characters` : ""
+                        : 
+                          isMultiFormValidated ? "The option can't be empty" : ""
+                      }
+                      showErrorState={option.length === 0 && isMultiFormValidated}
+                      onChange={(event) => updateOptions(odx, event.target.value, true)}
+                    />
+                  </div>)}
+                )}
+                <Button
+                  onClick={() => updateOptions(-1, "", true)}
+                  disabled={multiChoiceForm.options.length > 8}
+                >
+                  <div className="flex flex-row items-center">
+                    <AddAlt />
+                    <div className='ml-2'>Add another voting choice</div>
+                  </div>
+                </Button>
+              </div>
+              :
+              isMulti !== undefined && !isMulti ?
+            <div>
             <NewProposalContext.Provider
               value={{
                 instructionsData,
@@ -704,6 +919,9 @@ const New = () => {
                 Add instruction
               </LinkButton>
             </div>
+            </div>
+              : " "
+            }
             <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
               <SecondaryButton
                 disabled={isLoading}

@@ -89,7 +89,7 @@
     "@solana-mobile/wallet-adapter-mobile": "2.0.0",
     "@solana/buffer-layout": "4.0.0",
     "@solana/governance-program-library": "npm:@civic/governance-program-library@0.16.9-beta.2",
-    "@solana/spl-governance": "0.3.26",
+    "@solana/spl-governance": "0.3.28",
     "@solana/spl-token": "0.1.8",
     "@solana/wallet-adapter-backpack": "0.1.13",
     "@solana/wallet-adapter-base": "0.9.22",
