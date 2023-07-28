@@ -45,7 +45,7 @@ const VotePanel = () => {
       <YouVoted quorum="electoral" />
       {proposal && isMulti ? <CastMultiVoteButtons proposal={proposal.account} /> : <CastVoteButtons /> }
       <YouVoted quorum="veto" />
-      <VetoButtons />
+      {!isMulti && <VetoButtons />}
       {/* END */}
     </>
   )

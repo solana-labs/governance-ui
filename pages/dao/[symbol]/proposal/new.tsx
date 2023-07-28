@@ -197,7 +197,7 @@ const New = () => {
   })
   const [multiChoiceForm, setMultiChoiceForm] = useState<MultiChoiceProposalForm>({
     governedAccount: undefined,
-    options: ['']
+    options: ['', '']
   });
 
   const [formErrors, setFormErrors] = useState({})
@@ -209,10 +209,10 @@ const New = () => {
   ] = useState<ProgramAccount<Governance> | null>(null)
   const [isLoadingSignedProposal, setIsLoadingSignedProposal] = useState(false)
   const [isLoadingDraft, setIsLoadingDraft] = useState(false)
-  const [isMulti, setIsMulti] = useState<boolean | undefined>(undefined);
+  const [isMulti, setIsMulti] = useState<boolean>(false);
   const [isMultiFormValidated, setIsMultiFormValidated] = useState(false);
   const [maxOptionLength, setMaxOptionLength] = useState(0);
-
+  const [hideNotaButton, setHideNotaButton] = useState(false);
   const isLoading = isLoadingSignedProposal || isLoadingDraft
 
   const [instructionsData, setInstructions] = useState<
@@ -261,24 +261,47 @@ const New = () => {
     handleOptionLength()
   }
 
+  const handleNotaButton = () => {
+    const options = multiChoiceForm.options;
+    const last = options.length - 1;
+
+    if (options[last] !== "None of the Above") {
+      options.push("None of the Above");
+      handleMultiForm({propertyName: "options", value: options});
+      setHideNotaButton(true);
+    }
+  }
+
   const updateOptions = (odx: number, value: string, addOption: boolean)  => {
     const updatedOptions = multiChoiceForm.options;
+    const nota = "None of the Above";
 
     if (addOption) {
       if (odx === -1) {
         // add another voting choice button is clicked
-        if (updatedOptions.length > 8) {
+        if (updatedOptions.length > 9) {
           return;
         }
-  
-        updatedOptions.push(value);
+        const len = updatedOptions.length-1;
+
+        if (updatedOptions[len] === nota) {
+          // insert option at second last position if NOTA
+          updatedOptions.splice(len, 0, value);
+        } else {
+          // insert option at last position if not NOTA
+          updatedOptions.push(value);
+        }
       } else {
+        // Update the option if exists
         updatedOptions[odx] = value;
       }
 
       handleMultiForm({value: updatedOptions, propertyName: "options"});
     } else {
-      handleMultiForm({value: updatedOptions.filter((option, index) => index !== odx), propertyName: "options"});
+      if (value === nota) {
+        setHideNotaButton(false);
+      }
+      handleMultiForm({value: updatedOptions.filter((_option, index) => index !== odx), propertyName: "options"});
     }
 
   }
@@ -361,7 +384,6 @@ const New = () => {
           // Create Multi-Choice Proposal
           try {
             const options = multiChoiceForm.options;
-            options.push("None of the Above");
 
             proposalAddress = await proposeMultiChoice({
               title: form.title,
@@ -750,11 +772,7 @@ const New = () => {
                 }}
               ></VoteBySwitch>
             )}
-            <div className='mt-5 max-w-lg w-full flex flex-col'>
-              <div className="bg-[#10B981] text-black flex flex-row items-center px-2 py-1 w-fit rounded-md mb-2">
-                <TableOfContents />
-                <div className="text-sm ml-2">New: Multiple Choice Polls</div>
-              </div>
+            {/* <div className='mt-5 max-w-lg w-full flex flex-col'>
               <StyledLabel>
                 What type of proposal are you creating?
               </StyledLabel>
@@ -763,24 +781,31 @@ const New = () => {
                 several voting options. Note that these multiple choice polls cannot have actions 
                 and are therefore non-executable.
               </div>
-            </div>
-            <div className="max-w-lg w-full mt-5 mb-4 flex flex-wrap justify-between">
+            </div> */}
+            <div className="max-w-lg w-full mb-4 flex flex-wrap justify-between items-end">
               <ProposalTypeRadioButton
-                    onClick={() => setIsMulti(false)}
-                    selected={isMulti !== undefined && !isMulti}
-                    disabled={false}
-                    className="w-60"
-                  >
-                    Executable
+                onClick={() => setIsMulti(false)}
+                selected={!isMulti}
+                disabled={false}
+                className="w-60"
+              >
+                Executable
               </ProposalTypeRadioButton>
-              <ProposalTypeRadioButton
-                    onClick={() => setIsMulti(true)}
-                    selected={isMulti}
-                    disabled={false}
-                    className="w-60"
-                  >
-                    Non-Executable <br /> (Multiple-Choice)
-              </ProposalTypeRadioButton>
+              <div className="flex flex-col items-center justify-between">
+                <div className="bg-[#10B981] text-black flex flex-row gap-2 text-sm 
+                items-center px-2 py-1 rounded-md mb-2 w-60">
+                  <TableOfContents />
+                  <div>New: Multiple Choice Polls</div>
+                </div>
+                <ProposalTypeRadioButton
+                  onClick={() => setIsMulti(true)}
+                  selected={isMulti}
+                  disabled={false}
+                  className="w-60"
+                >
+                  Non-Executable <br /> (Multiple-Choice)
+                </ProposalTypeRadioButton>
+              </div>
             </div>
             {isMulti ?
               <div className="mt-8 mb-8">
@@ -798,22 +823,22 @@ const New = () => {
                   governance={multiChoiceForm.governedAccount?.governance}
                 />
                 <h2 className='mt-8'>Add Choices</h2>
-                <div className='text-sm font-extralight text-fgd-3 mt-1 max-w-lg'>
+                {/* <div className='text-sm font-extralight text-fgd-3 mt-1 max-w-lg'>
                   For all proposals, Realms auto-generates a voting option for “none of the above”, 
                   which will display below the last option added by the proposal creator.
-                </div>
+                </div> */}
                 {multiChoiceForm.options.map((option, index) => {
                   // copy index to keep its value for onChange function
                   const odx = index;
 
                   return (
-                    <div key={odx} className="mb-3 mt-8 border border-fgd-4 p-4 md:p-6 rounded-lg">
+                    <div key={odx} className="mb-3 mt-3 border border-fgd-4 p-4 md:p-6 rounded-lg">
                     <div className="flex flex-row justify-between">
                       <h2 className='mb-4'>Choice {odx + 1}</h2>
-                      {odx > 0 ?
+                      {odx > 1 ?
                         <LinkButton
                           className="flex font-bold items-center ml-4 text-fgd-1 text-sm"
-                          onClick={() => updateOptions(odx, "", false)}
+                          onClick={() => updateOptions(odx, option, false)}
                         >
                           <XCircleIcon className="h-5 mr-1.5 text-red w-5" />
                             Remove
@@ -838,21 +863,35 @@ const New = () => {
                       }
                       showErrorState={option.length === 0 && isMultiFormValidated}
                       onChange={(event) => updateOptions(odx, event.target.value, true)}
+                      disabled={option === "None of the Above"}
                     />
                   </div>)}
                 )}
-                <Button
-                  onClick={() => updateOptions(-1, "", true)}
-                  disabled={multiChoiceForm.options.length > 8}
-                >
-                  <div className="flex flex-row items-center">
-                    <AddAlt />
-                    <div className='ml-2'>Add another voting choice</div>
+                <div className="flex flex-row justify-between">
+                  <div>
+                    <LinkButton
+                      onClick={() => updateOptions(-1, "", true)}
+                      disabled={multiChoiceForm.options.length > 9}
+                      className='flex flex-row items-center gap-2 font-bold pt-2'
+                    >
+                        <AddAlt className='text-green'/>
+                        <div>Add another voting choice</div>
+                    </LinkButton>
                   </div>
-                </Button>
+                  <div>
+                    <LinkButton
+                      onClick={() => handleNotaButton()}
+                      disabled={hideNotaButton || multiChoiceForm.options.length > 9}
+                      className='flex flex-row items-center gap-2 font-bold pt-2'
+                    >
+                        <AddAlt className='text-green'/>
+                        <div>Add &apos;None of the Above&apos; choice</div>
+                    </LinkButton>
+                  </div>
+                </div>
               </div>
               :
-              isMulti !== undefined && !isMulti ?
+              !isMulti ?
             <div>
             <NewProposalContext.Provider
               value={{

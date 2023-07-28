@@ -119,7 +119,7 @@ const Proposal = () => {
                 </ReactMarkdown>
               </div>
             )}
-            <ProposalWarnings isMulti={isMulti}/>
+            <ProposalWarnings />
             <TransactionPanel />
             {isTwoCol && allowDiscussion && <DiscussionPanel />}
           </>

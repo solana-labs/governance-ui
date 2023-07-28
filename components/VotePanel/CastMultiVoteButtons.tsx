@@ -89,13 +89,33 @@ export const CastMultiVoteButtons = ({proposal} : {proposal: Proposal}) => {
 
   const handleOption = (index: number, insert: boolean) => {
     let options = [...selectedOptions];
-    const status = [...optionStatus];
+    let status = [...optionStatus];
+    const nota = "None of the Above";
+    const last = proposal.options.length - 1;
+    const isNota = proposal.options[last].label === nota;
 
     if (insert) {
-      if (!options.includes(index)) {
-        options.push(index)
+      if (isNota) {
+        if (index === last) {
+          // if nota is clicked, unselect all other options
+          status = status.map(() => false);
+          status[index] = true;
+          options = [index];
+        } else {
+          // remove nota from the selected if any other option is clicked
+          status[last] = false;
+          options = options.filter(option => option !== last);
+          if (!options.includes(index)) {
+            options.push(index)
+          }
+          status[index] = true;
+        }
+      } else {
+        if (!options.includes(index)) {
+          options.push(index)
+        }
+        status[index] = true;
       }
-      status[index] = true;
     } else {
       options = options.filter(option => option !== index);
       status[index] = false
@@ -143,6 +163,9 @@ export const CastMultiVoteButtons = ({proposal} : {proposal: Proposal}) => {
             </div>
             )}
           )}
+          <div className="text-sm">
+            Note: You can select one or more options
+          </div>
           <Button
             tooltipMessage={
               tooltipContent === "" && !selectedOptions.length ? 
