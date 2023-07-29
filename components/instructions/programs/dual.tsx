@@ -8,6 +8,7 @@ import { AccountMetaData } from '@solana/spl-governance'
 import { tryGetMint } from '@utils/tokens'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
 
+// TODO: Update with configV3 and initStrikeReversible
 interface configV2Instruction {
   lotSize: BN
   numTokens: BN
