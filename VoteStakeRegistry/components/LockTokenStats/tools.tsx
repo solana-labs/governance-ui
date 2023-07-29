@@ -1,4 +1,3 @@
-import { BN } from '@coral-xyz/anchor'
 import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes'
 import {
   ProposalTransaction,
@@ -18,11 +17,6 @@ export interface DepositWithWallet {
   voter: PublicKey
   wallet: PublicKey
   deposit: Deposit
-}
-export interface DepoistWithVoter {
-  amount: BN | undefined
-  voterPk: PublicKey
-  startTs: BN | undefined
 }
 
 //TODO fcn specific to grant instruction => make it generic for all governanceAccounts and move to sdk

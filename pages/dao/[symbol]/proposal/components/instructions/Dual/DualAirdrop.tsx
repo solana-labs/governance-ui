@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useMemo, useContext, useEffect, useState } from 'react'
 import { ProgramAccount, Governance } from '@solana/spl-governance'
 import {
   UiInstruction,
@@ -79,8 +79,9 @@ const DualAirdrop = ({
     setGovernedAccount(form.treasury?.governance)
   }, [form.treasury])
 
-  const merkleSchema = getDualFinanceMerkleAirdropSchema()
-  const governanceSchema = getDualFinanceGovernanceAirdropSchema()
+  const merkleSchema = useMemo(getDualFinanceMerkleAirdropSchema, [])
+
+  const governanceSchema = useMemo(getDualFinanceGovernanceAirdropSchema, [])
 
   return (
     <>

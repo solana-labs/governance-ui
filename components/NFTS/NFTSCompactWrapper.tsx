@@ -1,14 +1,17 @@
 import { ChevronRightIcon } from '@heroicons/react/solid'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import { useRealmDigitalAssetsQuery } from '@hooks/queries/digitalAssets'
 import useQueryContext from '@hooks/useQueryContext'
-import useRealm from '@hooks/useRealm'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useMemo } from 'react'
 
 const NFTSCompactWrapper = () => {
-  const { nftsGovernedTokenAccounts } = useGovernanceAssets()
-  const { symbol } = useRealm()
+  const { data: nfts } = useRealmDigitalAssetsQuery()
+  const nftsCount = useMemo(() => nfts?.flat().length ?? 0, [nfts])
+
+  const { symbol } = useRouter().query
   const { fmtUrlWithCluster } = useQueryContext()
-  return nftsGovernedTokenAccounts.length ? (
+  return nftsCount > 0 ? (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg transition-all">
       <div className="flex items-center justify-between">
         <h3 className="mb-0">NFTs</h3>

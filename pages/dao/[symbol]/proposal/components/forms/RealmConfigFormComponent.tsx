@@ -23,19 +23,6 @@ import {
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
 
-export interface RealmConfigForm {
-  governedAccount: AssetAccount | undefined
-  minCommunityTokensToCreateGovernance: number
-  communityVoterWeightAddin: string
-  removeCouncil: boolean
-  maxCommunityVoterWeightAddin: string
-  communityMintSupplyFactor: number
-  communityTokenType: typeof TOKEN_TYPE_NAME_VALUES[number] // programVersion >= v3
-  councilTokenType: typeof TOKEN_TYPE_NAME_VALUES[number] // programVersion >= v3
-  councilVoterWeightAddin: string // programVersion >= v3
-  maxCouncilVoterWeightAddin: string // programVersion >= v3
-}
-
 const TOKEN_TYPE_NAME_VALUES = [
   { name: 'Liquid', value: GoverningTokenType.Liquid },
   { name: 'Membership', value: GoverningTokenType.Membership },

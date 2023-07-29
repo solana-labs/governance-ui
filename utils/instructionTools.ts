@@ -1,7 +1,4 @@
-import {
-  getNativeTreasuryAddress,
-  serializeInstructionToBase64,
-} from '@solana/spl-governance'
+import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
@@ -32,7 +29,6 @@ import {
 } from '@metaplex-foundation/mpl-token-metadata'
 import { findMetadataPda } from '@metaplex-foundation/js'
 import { lidoStake } from '@utils/lidoStake'
-import { createIx_transferNft } from './metaplex'
 
 export const validateInstruction = async ({
   schema,
@@ -168,71 +164,6 @@ export async function getSolTransferInstruction({
     chunkBy: 4,
   }
   return obj
-}
-
-export async function getTransferNftInstruction({
-  toOwner,
-  connection,
-  ataCreationPayer,
-  currentAccount,
-  nftMint,
-  assetAccount,
-  programId,
-}: {
-  toOwner: PublicKey
-  programId: PublicKey
-  connection: ConnectionContext
-  ataCreationPayer: PublicKey
-  currentAccount: AssetAccount
-  nftMint: string
-  assetAccount: AssetAccount
-}): Promise<UiInstruction> {
-  const mint = new PublicKey(nftMint)
-  //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
-
-  const destinationAtaPk = await Token.getAssociatedTokenAddress(
-    ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-    TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-    mint, // mint
-    toOwner, // owner
-    true
-  )
-  const destinationAtaQueried = await connection.current.getAccountInfo(
-    destinationAtaPk
-  )
-  // typically this should just be the same as the account that owns the NFT, but I'm just trying to be safe
-  const nativeTreasury = await getNativeTreasuryAddress(
-    programId,
-    assetAccount.governance.pubkey
-  )
-
-  const transferIx = await createIx_transferNft(
-    connection.current,
-    assetAccount.pubkey,
-    toOwner,
-    mint,
-    assetAccount.pubkey,
-    nativeTreasury
-  )
-
-  return {
-    serializedInstruction: serializeInstructionToBase64(transferIx),
-    isValid: true,
-    governance: currentAccount.governance,
-    prerequisiteInstructions:
-      destinationAtaQueried === null
-        ? [
-            Token.createAssociatedTokenAccountInstruction(
-              ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-              TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-              mint, // mint
-              destinationAtaPk, // ata
-              toOwner, // owner of token account
-              ataCreationPayer // fee payer
-            ),
-          ]
-        : [],
-  }
 }
 
 export async function getMintInstruction({

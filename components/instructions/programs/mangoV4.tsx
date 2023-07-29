@@ -213,6 +213,7 @@ const instructions = () => ({
     ) => {
       const proposedMint = accounts[2].pubkey
       const oracle = accounts[6].pubkey
+      const isMintOnCurve = PublicKey.isOnCurve(proposedMint)
 
       const [info, proposedOracle, suggestedTier, args] = await Promise.all([
         displayArgs(connection, data),
@@ -307,6 +308,11 @@ const instructions = () => ({
                   {coinTiersToNames[suggestedTier.tier]} check params carefully
                 </h3>
               )}
+              {isMintOnCurve && (
+                <div className="text-orange pt-4">
+                  Proposed token has open mint
+                </div>
+              )}
               <div
                 className={`py-4 ${
                   proposedOracle.type === 'Unknown' ? 'text-red' : ''
@@ -336,7 +342,6 @@ const instructions = () => ({
                     </span>
                   )}
               </div>
-
               <DisplayListingPropertyWrapped
                 label="Token index"
                 suggestedUntrusted={false}

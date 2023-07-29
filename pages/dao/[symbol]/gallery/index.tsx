@@ -1,89 +1,43 @@
 import { getExplorerUrl } from '@components/explorer/tools'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
-import { useEffect, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { PhotographIcon, PlusCircleIcon } from '@heroicons/react/outline'
-import { NFTWithMint } from '@utils/uiTypes/nfts'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import Select from '@components/inputs/Select'
-import AccountItemNFT from '@components/TreasuryAccount/AccountItemNFT'
-import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import ImgWithLoader from '@components/ImgWithLoader'
 import Modal from '@components/Modal'
-import DepositNFT from '@components/TreasuryAccount/DepositNFT'
 import { LinkButton } from '@components/Button'
-import SendTokens from '@components/TreasuryAccount/SendTokens'
-import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
-import { AssetAccount } from '@utils/uiTypes/assets'
 import { MdScheduleSend } from 'react-icons/md'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { useRealmDigitalAssetsQuery } from '@hooks/queries/digitalAssets'
+import SendNft from '@components/SendNft'
+import { PublicKey } from '@solana/web3.js'
+import { SUPPORT_CNFTS } from '@constants/flags'
+import useFindGovernanceByTreasury from '@hooks/useFindGovernanceByTreasury'
+import DepositNFTFromWallet from '@components/TreasuryAccount/DepositNFTFromWallet'
 
-const gallery = () => {
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
+const Gallery = () => {
   const connection = useLegacyConnectionContext()
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
-  const realmNfts = useTreasuryAccountStore((s) => s.allNfts)
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
-  const isLoading = useTreasuryAccountStore((s) => s.isLoadingNfts)
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
-  const isLoadingGovernances = useGovernanceAssetsStore(
-    (s) => s.loadGovernedAccounts
-  )
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
-  const nftsPerPubkey = useTreasuryAccountStore((s) => s.governanceNfts)
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
-  const { nftsGovernedTokenAccounts } = useGovernanceAssets()
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
-  const { setCurrentAccount } = useTreasuryAccountStore()
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
-  const [currentAccount, setStateAccount] = useState<AssetAccount | null>(null)
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
-  const [nfts, setNfts] = useState<NFTWithMint[]>([])
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [openNftDepositModal, setOpenNftDepositModal] = useState(false)
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   const [openSendNftsModal, setOpenSendNftsModal] = useState(false)
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
-  const [selectedNft, setSelectedNft] = useState<NFTWithMint | null>(null)
+  const [
+    selectedNftAndItsGovernance,
+    setSelectedNftAndItsGovernance,
+  ] = useState<[PublicKey, PublicKey]>()
   const handleCloseModal = () => {
     setOpenNftDepositModal(false)
   }
   const handleCloseSendModal = () => {
     setOpenSendNftsModal(false)
   }
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
-  useEffect(() => {
-    if (currentAccount === null) {
-      setNfts(realmNfts)
-    } else {
-      const curretnAccountNfts: NFTWithMint[] = []
-      const hasNftsInWithGovernanceOwner =
-        nftsPerPubkey[currentAccount.governance.pubkey.toBase58()].length
-      const hasNftsInSolAccount =
-        currentAccount.isSol &&
-        nftsPerPubkey[currentAccount.extensions.transferAddress!.toBase58()]
-          .length
-      if (hasNftsInWithGovernanceOwner) {
-        curretnAccountNfts.push(
-          ...nftsPerPubkey[currentAccount.governance.pubkey.toBase58()]
-        )
-      }
-      if (hasNftsInSolAccount) {
-        curretnAccountNfts.push(
-          ...nftsPerPubkey[
-            currentAccount.extensions.transferAddress!.toBase58()
-          ]
-        )
-      }
-      setNfts(curretnAccountNfts)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [
-    realmNfts.length,
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    JSON.stringify(nftsPerPubkey),
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    currentAccount?.extensions.transferAddress?.toBase58(),
-  ])
+
+  const { data: nftsDAS } = useRealmDigitalAssetsQuery()
+  const DASnftsFlat = useMemo(
+    () =>
+      nftsDAS?.flat().filter((x) => SUPPORT_CNFTS || !x.compression.compressed),
+    [nftsDAS]
+  )
+
+  const findGovernanceByTreasury = useFindGovernanceByTreasury()
+
   return (
     <div className="bg-bkg-2 rounded-lg p-4 md:p-6">
       <div className="grid grid-cols-12 gap-6">
@@ -97,8 +51,7 @@ const gallery = () => {
               <div className="flex ">
                 <LinkButton
                   onClick={() => {
-                    setSelectedNft(null)
-                    setCurrentAccount(nftsGovernedTokenAccounts[0], connection)
+                    setSelectedNftAndItsGovernance(undefined)
                     setOpenSendNftsModal(true)
                   }}
                   className="flex items-center text-primary-light whitespace-nowrap mr-3"
@@ -108,7 +61,6 @@ const gallery = () => {
                 </LinkButton>
                 <LinkButton
                   onClick={() => {
-                    setCurrentAccount(nftsGovernedTokenAccounts[0], connection)
                     setOpenNftDepositModal(true)
                   }}
                   className="flex items-center text-primary-light whitespace-nowrap"
@@ -118,7 +70,7 @@ const gallery = () => {
                 </LinkButton>
               </div>
             </div>
-            <Select
+            {/* <Select
               className="sm:w-44 mt-2 sm:mt-0"
               onChange={(value) => setStateAccount(value)}
               value={currentAccount}
@@ -126,8 +78,7 @@ const gallery = () => {
                 currentAccount ? (
                   <AccountItemNFT
                     className="m-0 p-0 py-0 px-0 border-0 hover:bg-bkg-1"
-                    onClick={() => null}
-                    governedAccountTokenAccount={currentAccount}
+                    governance={currentAccount.governance.pubkey}
                   />
                 ) : (
                   <div>
@@ -151,33 +102,32 @@ const gallery = () => {
               {nftsGovernedTokenAccounts.map((accountWithGovernance, index) => (
                 <Select.Option key={index} value={accountWithGovernance}>
                   <AccountItemNFT
-                    onClick={() => null}
                     className="m-0 p-0 py-0 px-0 border-0 hover:bg-bkg-2"
-                    governedAccountTokenAccount={accountWithGovernance}
+                    governance={accountWithGovernance.governance.pubkey}
                   />
                 </Select.Option>
               ))}
-            </Select>
+            </Select> */}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 grid-flow-row gap-6">
-            {isLoading || isLoadingGovernances ? (
+            {DASnftsFlat === undefined ? (
               <>
                 <div className="animate-pulse bg-bkg-3 col-span-1 h-48 rounded-lg" />
                 <div className="animate-pulse bg-bkg-3 col-span-1 h-48 rounded-lg" />
                 <div className="animate-pulse bg-bkg-3 col-span-1 h-48 rounded-lg" />
                 <div className="animate-pulse bg-bkg-3 col-span-1 h-48 rounded-lg" />
               </>
-            ) : nfts.length ? (
-              nfts.map((x, idx) => (
+            ) : DASnftsFlat?.length ? (
+              DASnftsFlat.map((x) => (
                 <div
-                  key={idx}
+                  key={x.id}
                   className="relative group bg-bkg-4 col-span-1 flex items-center justify-center rounded-lg filter drop-shadow-xl"
                 >
                   <a
-                    key={idx}
+                    className="bg-bkg-2 cursor-pointer default-transition h-full w-full rounded-md border border-transparent transform scale-90 group-hover:scale-95 group-hover:opacity-50"
                     href={
-                      connection.endpoint && x.mintAddress
-                        ? getExplorerUrl(connection.cluster, x.mintAddress)
+                      connection.endpoint && x.id
+                        ? getExplorerUrl(connection.cluster, x.id)
                         : ''
                     }
                     target="_blank"
@@ -185,18 +135,22 @@ const gallery = () => {
                     onClick={(e) => e.stopPropagation()}
                   >
                     <ImgWithLoader
-                      className="bg-bkg-2 cursor-pointer default-transition h-full w-full rounded-md border border-transparent transform scale-90 group-hover:scale-95 group-hover:opacity-50"
-                      src={x.image}
+                      className="h-full w-full"
+                      src={
+                        x.content.files[0]?.cdn_uri ?? x.content.files[0]?.uri
+                      }
                     />
                   </a>
                   <button
                     className="hidden group-hover:block absolute w-20 h-20 items-center justify-center flex-auto text-primary-light"
-                    onClick={() => {
-                      setCurrentAccount(
-                        nftsGovernedTokenAccounts[0],
-                        connection
-                      )
-                      setSelectedNft(x)
+                    onClick={async () => {
+                      const owner = new PublicKey(x.ownership.owner)
+                      const governance =
+                        (await findGovernanceByTreasury(owner)) ?? owner
+                      setSelectedNftAndItsGovernance([
+                        new PublicKey(x.id),
+                        governance,
+                      ])
                       setOpenSendNftsModal(true)
                     }}
                   >
@@ -220,7 +174,7 @@ const gallery = () => {
           onClose={handleCloseModal}
           isOpen={openNftDepositModal}
         >
-          <DepositNFT onClose={handleCloseModal}></DepositNFT>
+          <DepositNFTFromWallet />
         </Modal>
       )}
       {openSendNftsModal && (
@@ -229,11 +183,13 @@ const gallery = () => {
           onClose={handleCloseSendModal}
           isOpen={openSendNftsModal}
         >
-          <SendTokens isNft selectedNft={selectedNft}></SendTokens>
+          <SendNft
+            initialNftAndGovernanceSelected={selectedNftAndItsGovernance}
+          />
         </Modal>
       )}
     </div>
   )
 }
 
-export default gallery
+export default Gallery

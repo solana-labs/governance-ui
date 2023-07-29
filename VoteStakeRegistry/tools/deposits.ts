@@ -130,7 +130,7 @@ export const getDeposits = async ({
   return { votingPower, deposits, votingPowerFromDeposits }
 }
 
-export const getVotingPowersForWallets = async ({
+const getVotingPowersForWallets = async ({
   client,
   registrarPk,
   existingRegistrar,

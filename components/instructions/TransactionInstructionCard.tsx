@@ -9,12 +9,16 @@ import {
   getInstructionDescriptor,
 } from './tools'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import axios from 'axios'
 import tokenPriceService from '@utils/services/tokenPrice'
-import { fetchNFTbyMint } from '@hooks/queries/nft'
 import { fetchTokenAccountByPubkey } from '@hooks/queries/tokenAccount'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { useRealmQuery } from '@hooks/queries/realm'
+import queryClient from '@hooks/queries/queryClient'
+import {
+  dasByIdQueryFn,
+  digitalAssetsQueryKeys,
+} from '@hooks/queries/digitalAssets'
+import { getNetworkFromEndpoint } from '@utils/connection'
 
 const TransactionInstructionCard = ({
   instructionData,
@@ -25,10 +29,7 @@ const TransactionInstructionCard = ({
 }) => {
   const connection = useLegacyConnectionContext()
   const realm = useRealmQuery().data?.result
-  const {
-    nftsGovernedTokenAccounts,
-    governedTokenAccountsWithoutNfts,
-  } = useGovernanceAssets()
+  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
 
   const [descriptor, setDescriptor] = useState<InstructionDescriptor>()
   const [nftImgUrl, setNftImgUrl] = useState('')
@@ -55,24 +56,19 @@ const TransactionInstructionCard = ({
     const isSol = governedTokenAccountsWithoutNfts.find(
       (x) => x.extensions.transferAddress?.toBase58() === sourcePk.toBase58()
     )?.isSol
-    const isNFTAccount = nftsGovernedTokenAccounts.find(
-      (x) =>
-        x.extensions.transferAddress?.toBase58() ===
-          tokenAccount?.owner.toBase58() ||
-        x.governance.pubkey.toBase58() === tokenAccount?.owner.toBase58()
-    )
 
-    if (isNFTAccount && mint) {
-      try {
-        const result = await fetchNFTbyMint(connection.current, mint)
-        if (result.found) {
-          const url = (await axios.get(result.result.uri)).data
-          setNftImgUrl(url.image)
-        }
-      } catch (e) {
-        console.log(e)
+    if (mint) {
+      const network = getNetworkFromEndpoint(connection.current.rpcEndpoint)
+      if (network === 'localnet') throw new Error()
+
+      const { result: nft } = await queryClient.fetchQuery({
+        queryKey: digitalAssetsQueryKeys.byId(network, mint),
+        queryFn: () => dasByIdQueryFn(network, mint),
+        staleTime: Infinity,
+      })
+      if (nft !== undefined) {
+        setNftImgUrl(nft.content.files[0]?.cdn_uri ?? nft.content.files[0]?.uri)
       }
-      return
     }
 
     if (isSol) {
@@ -87,7 +83,7 @@ const TransactionInstructionCard = ({
       setTokenImgUrl(imgUrl)
     }
     return
-  }, [instructionData.accounts])
+  }, [connection, governedTokenAccountsWithoutNfts, instructionData.accounts])
 
   useEffect(() => {
     handleGetDescriptors()

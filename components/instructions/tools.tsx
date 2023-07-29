@@ -36,6 +36,7 @@ import { POSEIDON_INSTRUCTIONS } from './programs/poseidon'
 import { MANGO_V4_INSTRUCTIONS } from './programs/mangoV4'
 import { DUAL_INSTRUCTIONS } from './programs/dual'
 import { SWITCHBOARD_INSTRUCTIONS } from './programs/switchboard'
+import { STAKE_INSTRUCTIONS } from './programs/stake'
 
 /**
  * Default governance program id instance
@@ -53,6 +54,10 @@ export const ACCOUNT_NAMES = {
     'Mango Developer Council Mint',
   Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z: 'Mango DAO MNGO Treasury Vault',
   '7zGXUAeUkY9pEGfApsY26amibvqsf2dmty1cbtxHdfaQ': 'Mango DAO Wallet Governance',
+  FnrgYLrpftdsBj5gd4qeaFwDUQZCg2cfo7aqQ1kJmWJy:
+    'Mango Dao -> Dual Dao Vote Wallet',
+  EWaYDnKhcqS4tVjyhUBoJR1Yx755imqzBm5tb2vQTNtK:
+    'Mango Dao -> Dual Dao Vote Wallet Governance',
   '7D6tGmaMyC8i73Q8X2Fec2S1Zb5rkyai6pctdMqHpHWT':
     'Mango DAO Fast Listing Governance',
   Fmt4596j4uBvYutwQ2ZBw7RGw9EngR8yNijdqemnpiaB: 'Mango DAO Fast Listing Wallet',
@@ -287,12 +292,8 @@ const HIDDEN_MNGO_TREASURES = [
 //owner and desired accounts we want to show
 const MNGO_AUXILIARY_TOKEN_ACCOUNTS = [
   {
-    owner: '9BVcYqEQxyccuwznvxXqDkSJFavvTyheiTYk231T1A8S',
-    accounts: ['59BEyxwrFpt3x4sZ7TcXC3bHx3seGfqGkATcDx6siLWy'],
-  },
-  {
-    owner: 'GHsErpcUbwiw1eci65HCDQzySKwQCxYRi5MrGeGpq5dn',
-    accounts: ['8tKwcKM4obpoPmTZNZKDt5cCkAatrwHBNteXNrZRvjWj'],
+    owner: '58apybWwtWwgVfARs7uJ75Vs1csPimnCCFth7cKwTJAe',
+    accounts: ['DiSDgMz4DeNKHXkpqUGoukr1YM9xxc1wH9gusZnMa1ga'],
   },
 ]
 
@@ -350,6 +351,7 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...POSEIDON_INSTRUCTIONS,
   ...MANGO_V4_INSTRUCTIONS,
   ...DUAL_INSTRUCTIONS,
+  ...STAKE_INSTRUCTIONS,
 }
 
 export async function getInstructionDescriptor(
@@ -358,7 +360,10 @@ export async function getInstructionDescriptor(
   realm?: ProgramAccount<Realm> | undefined
 ) {
   let descriptors: any
-  if (realm && instruction.programId.equals(realm.owner)) {
+  if (
+    (realm && instruction.programId.equals(realm.owner)) ||
+    instruction.programId.equals(new PublicKey(DEFAULT_GOVERNANCE_PROGRAM_ID))
+  ) {
     descriptors =
       GOVERNANCE_INSTRUCTIONS['GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw']
   } else {

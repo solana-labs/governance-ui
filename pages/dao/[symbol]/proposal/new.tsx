@@ -62,6 +62,7 @@ import FriktionClaimPendingWithdraw from './components/instructions/Friktion/Fri
 import StakeValidator from './components/instructions/Validators/StakeValidator'
 import DeactivateValidatorStake from './components/instructions/Validators/DeactivateStake'
 import WithdrawValidatorStake from './components/instructions/Validators/WithdrawStake'
+import SplitStake from './components/instructions/Validators/SplitStake'
 import useCreateProposal from '@hooks/useCreateProposal'
 import CastleDeposit from './components/instructions/Castle/CastleDeposit'
 import MakeInitMarketParams from './components/instructions/Foresight/MakeInitMarketParams'
@@ -116,7 +117,7 @@ import DualAirdrop from './components/instructions/Dual/DualAirdrop'
 import DualWithdraw from './components/instructions/Dual/DualWithdraw'
 import DualExercise from './components/instructions/Dual/DualExercise'
 import DualDelegate from './components/instructions/Dual/DualDelegate'
-import DualDelegateWithdraw from './components/instructions/Dual/DualDelegateWithdraw'
+import DualVoteDepositWithdraw from './components/instructions/Dual/DualVoteDepositWithdraw'
 import DualVoteDeposit from './components/instructions/Dual/DualVoteDeposit'
 import PsyFinanceMintAmericanOptions from './components/instructions/PsyFinance/MintAmericanOptions'
 import IxGateSet from './components/instructions/Mango/MangoV4/IxGateSet'
@@ -136,6 +137,7 @@ import InitStrike from './components/instructions/Dual/InitStrike'
 import IdlSetBuffer from './components/instructions/Mango/MangoV4/IdlSetBuffer'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { usePrevious } from '@hooks/usePrevious'
+import DualVote from './components/instructions/Dual/DualVote'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -426,8 +428,9 @@ const New = () => {
       [Instructions.DualFinanceWithdraw]: DualWithdraw,
       [Instructions.DualFinanceExercise]: DualExercise,
       [Instructions.DualFinanceDelegate]: DualDelegate,
-      [Instructions.DualFinanceDelegateWithdraw]: DualDelegateWithdraw,
+      [Instructions.DualFinanceDelegateWithdraw]: DualVoteDepositWithdraw,
       [Instructions.DualFinanceVoteDeposit]: DualVoteDeposit,
+      [Instructions.DualFinanceVote]: DualVote,
       [Instructions.MeanCreateAccount]: MeanCreateAccount,
       [Instructions.MeanFundAccount]: MeanFundAccount,
       [Instructions.MeanWithdrawFromAccount]: MeanWithdrawFromAccount,
@@ -471,6 +474,7 @@ const New = () => {
       [Instructions.StakeValidator]: StakeValidator,
       [Instructions.DeactivateValidatorStake]: DeactivateValidatorStake,
       [Instructions.WithdrawValidatorStake]: WithdrawValidatorStake,
+      [Instructions.SplitStake]: SplitStake,
       [Instructions.DifferValidatorStake]: null,
       [Instructions.TransferDomainName]: TransferDomainName,
       [Instructions.EverlendDeposit]: DepositForm,
