@@ -67,6 +67,19 @@ export type DasNftObject = {
     ownership_model: string
     owner: string
   }
+  content: {
+    $schema: string
+    json_uri: string
+    files: any
+    metadata: {
+      description: string
+      name: string
+      symbol: string
+    }
+    links: {
+      image: string
+    }
+  }
   id: string
 }
 

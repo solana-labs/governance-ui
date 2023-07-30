@@ -35,7 +35,10 @@ import {
   Token,
 } from '@solana/spl-token'
 import { createIx_transferNft } from '@utils/metaplex'
-import { useRealmDigitalAssetsQuery } from '@hooks/queries/digitalAssets'
+import {
+  fetchDigitalAssetById,
+  useRealmDigitalAssetsQuery,
+} from '@hooks/queries/digitalAssets'
 import { SetStateAction } from 'react'
 import ImgWithLoader from './ImgWithLoader'
 import useTreasuryAddressForGovernance from '@hooks/useTreasuryAddressForGovernance'
@@ -45,6 +48,8 @@ import { useConnection } from '@solana/wallet-adapter-react'
 import useGovernanceSelect from '@hooks/useGovernanceSelect'
 import { SUPPORT_CNFTS } from '@constants/flags'
 import clsx from 'clsx'
+import { getNetworkFromEndpoint } from '@utils/connection'
+import { buildTransferCnftInstruction } from '@hooks/instructions/useTransferCnftInstruction'
 
 const SendNft = ({
   initialNftAndGovernanceSelected,
@@ -85,8 +90,6 @@ const SendNft = ({
       : '...'
   }`
 
-  const { data: nfts } = useRealmDigitalAssetsQuery() // TODO somewhat better use a more narrow query
-
   const walletPk = wallet?.publicKey ?? undefined
   const handleProposeNftSend = async () => {
     if (!realm || !selectedGovernance) {
@@ -104,55 +107,71 @@ const SendNft = ({
 
     const instructions = await Promise.all(
       selectedNfts.map(async (nftMint) => {
-        const destinationAtaPk = await Token.getAssociatedTokenAddress(
-          ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-          TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-          nftMint, // mint
-          toOwner, // owner
-          true
-        )
-        const destinationAtaQueried = await connection.getAccountInfo(
-          destinationAtaPk
-        )
+        const network = getNetworkFromEndpoint(connection.rpcEndpoint)
+        if (network === 'localnet') throw new Error()
+        const nft = (await fetchDigitalAssetById(network, nftMint)).result
+        if (nft === undefined) throw new Error('nft not found')
 
-        // typically this should just be the same as the account that owns the NFT, but sometimes the governance owns it
-        const nativeTreasury = await getNativeTreasuryAddress(
-          realm.owner,
-          selectedGovernance
-        )
+        if (nft.compression?.compressed) {
+          const ix = await buildTransferCnftInstruction(
+            connection,
+            nftMint,
+            toOwner
+          )
+          return {
+            serializedInstruction: serializeInstructionToBase64(ix),
+            isValid: true,
+            prerequisiteInstructions: [],
+          }
+        } else {
+          const destinationAtaPk = await Token.getAssociatedTokenAddress(
+            ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+            TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+            nftMint, // mint
+            toOwner, // owner
+            true
+          )
+          const destinationAtaQueried = await connection.getAccountInfo(
+            destinationAtaPk
+          )
 
-        const fromOwnerString = nfts
-          ?.flat()
-          .find((x) => x.id === nftMint.toString()).ownership.owner
-        const fromOwner = tryParseKey(fromOwnerString)
-        // should be impossible, but stuff isn't typed
-        if (fromOwner === null) throw new Error()
+          // typically this should just be the same as the account that owns the NFT, but sometimes the governance owns it
+          const nativeTreasury = await getNativeTreasuryAddress(
+            realm.owner,
+            selectedGovernance
+          )
 
-        const transferIx = await createIx_transferNft(
-          connection,
-          fromOwner,
-          toOwner,
-          nftMint,
-          fromOwner,
-          nativeTreasury
-        )
+          const fromOwnerString = nft.ownership.owner
+          const fromOwner = tryParseKey(fromOwnerString)
+          // should be impossible, but stuff isn't typed
+          if (fromOwner === null) throw new Error()
 
-        return {
-          serializedInstruction: serializeInstructionToBase64(transferIx),
-          isValid: true,
-          prerequisiteInstructions:
-            destinationAtaQueried === null
-              ? [
-                  Token.createAssociatedTokenAccountInstruction(
-                    ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-                    TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-                    nftMint, // mint
-                    destinationAtaPk, // ata
-                    toOwner, // owner of token account
-                    walletPk // fee payer
-                  ),
-                ]
-              : [],
+          const transferIx = await createIx_transferNft(
+            connection,
+            fromOwner,
+            toOwner,
+            nftMint,
+            fromOwner,
+            nativeTreasury
+          )
+
+          return {
+            serializedInstruction: serializeInstructionToBase64(transferIx),
+            isValid: true,
+            prerequisiteInstructions:
+              destinationAtaQueried === null
+                ? [
+                    Token.createAssociatedTokenAccountInstruction(
+                      ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+                      TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+                      nftMint, // mint
+                      destinationAtaPk, // ata
+                      toOwner, // owner of token account
+                      walletPk // fee payer
+                    ),
+                  ]
+                : [],
+          }
         }
       })
     )

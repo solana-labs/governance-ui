@@ -210,7 +210,7 @@ export default function AddNFTCollectionForm({
         console.log('NFT collection info from user input:', collectionInfo)
         setValue('collectionKey', collectionInput)
         setCollectionVerificationState(
-          collectionInfo.grouping.length === 0
+          collectionInfo?.grouping.length === 0
             ? 'verified'
             : 'is nft but no collection details'
         )

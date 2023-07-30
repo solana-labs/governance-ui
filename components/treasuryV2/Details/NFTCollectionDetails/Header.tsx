@@ -20,10 +20,10 @@ export default function Header({ onClickSendNft, collectionId }: Props) {
   const { data: collectionNft } = useDigitalAssetById(
     collectionId !== 'none' ? collectionId : undefined
   )
-  const name = collectionNft?.result.content.metadata.name
+  const name = collectionNft?.result?.content.metadata.name
   const imageUri =
-    collectionNft?.result.content.files[0]?.cdn_uri ??
-    collectionNft?.result.content.files[0]?.uri
+    collectionNft?.result?.content.files[0]?.cdn_uri ??
+    collectionNft?.result?.content.files[0]?.uri
 
   return (
     <div

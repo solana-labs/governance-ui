@@ -1,4 +1,4 @@
-import { AccountMeta, PublicKey } from '@solana/web3.js'
+import { AccountMeta, Connection, PublicKey } from '@solana/web3.js'
 import { useCallback } from 'react'
 import {
   PROGRAM_ID as BUBBLEGUM_PROGRAM_ID,
@@ -16,6 +16,72 @@ import {
 } from '@hooks/queries/digitalAssets'
 import { useConnection } from '@solana/wallet-adapter-react'
 import { getNetworkFromEndpoint } from '@utils/connection'
+
+export const buildTransferCnftInstruction = async (
+  connection: Connection,
+  cnftId: PublicKey,
+  toOwner: PublicKey
+) => {
+  {
+    const network = getNetworkFromEndpoint(connection.rpcEndpoint)
+    if (network === 'localnet') throw new Error()
+
+    const cnft = (await fetchDigitalAssetById(network, cnftId)).result
+    if (cnft === undefined) throw new Error('cnft not found')
+    if (!cnft.compression.compressed) throw new Error('not a compressed nft')
+
+    const assetId = new PublicKey(cnft.id)
+    const assetProof = await fetchDasAssetProofById(network, assetId)
+    if (!assetProof) throw new Error('The asset proof is not found.')
+
+    const treeAddress = new PublicKey(cnft.compression.tree)
+    const treeAccount = await ConcurrentMerkleTreeAccount.fromAccountAddress(
+      connection,
+      treeAddress
+    )
+
+    const leafOwner = new PublicKey(cnft.ownership.owner)
+    const leafDelegate = cnft.ownership?.delegate
+      ? new PublicKey(cnft.ownership.delegate)
+      : leafOwner
+
+    const treeAuthority = treeAccount.getAuthority()
+    const canopyDepth = treeAccount.getCanopyDepth()
+
+    const proofPath: AccountMeta[] = assetProof.proof
+      .map((node: string) => ({
+        pubkey: new PublicKey(node),
+        isSigner: false,
+        isWritable: false,
+      }))
+      .slice(0, assetProof.proof.length - (canopyDepth ? canopyDepth : 0))
+
+    return createTransferInstruction(
+      {
+        merkleTree: treeAddress,
+        treeAuthority,
+        leafOwner,
+        leafDelegate,
+        newLeafOwner: toOwner,
+        logWrapper: SPL_NOOP_PROGRAM_ID,
+        compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
+        anchorRemainingAccounts: proofPath,
+      },
+      {
+        root: [...new PublicKey(assetProof.root.trim()).toBytes()],
+        dataHash: [
+          ...new PublicKey(cnft.compression.data_hash.trim()).toBytes(),
+        ],
+        creatorHash: [
+          ...new PublicKey(cnft.compression.creator_hash.trim()).toBytes(),
+        ],
+        nonce: cnft.compression.leaf_id,
+        index: cnft.compression.leaf_id,
+      },
+      BUBBLEGUM_PROGRAM_ID
+    )
+  }
+}
 
 // cnft assetId is the same concept of nft's mintAddress
 const useTransferCnftInstruction = () => {

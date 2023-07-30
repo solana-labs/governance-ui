@@ -20,16 +20,20 @@ import { getNativeTreasuryAddress } from '@solana/spl-governance'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import useGovernanceSelect from '@hooks/useGovernanceSelect'
 import queryClient from '@hooks/queries/queryClient'
-import { digitalAssetsQueryKeys } from '@hooks/queries/digitalAssets'
+import {
+  digitalAssetsQueryKeys,
+  fetchDigitalAssetById,
+} from '@hooks/queries/digitalAssets'
 import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
 import { getNetworkFromEndpoint } from '@utils/connection'
+import { buildTransferCnftInstruction } from '@hooks/instructions/useTransferCnftInstruction'
 
 const useMetaplexDeposit = () => {
   const wallet = useWalletOnePointOh()
   const connection = useLegacyConnectionContext()
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
 
-  return async (address: PublicKey) => {
+  return async (nftId: PublicKey) => {
     if (!wallet?.publicKey) throw new Error()
     if (!currentAccount) throw new Error()
 
@@ -39,14 +43,21 @@ const useMetaplexDeposit = () => {
       currentAccount.governance.pubkey
     )
 
-    const ix = await createIx_transferNft(
-      connection.current,
-      wallet.publicKey,
-      toOwner,
-      address,
-      wallet.publicKey,
-      wallet.publicKey
-    )
+    const network = getNetworkFromEndpoint(connection.current.rpcEndpoint)
+    if (network === 'localnet') throw new Error()
+    const nft = (await fetchDigitalAssetById(network, nftId)).result
+    if (nft === undefined) throw new Error('nft not found')
+
+    const ix = nft.compression?.compressed
+      ? await buildTransferCnftInstruction(connection.current, nftId, toOwner)
+      : await createIx_transferNft(
+          connection.current,
+          wallet.publicKey,
+          toOwner,
+          nftId,
+          wallet.publicKey,
+          wallet.publicKey
+        )
 
     await sendTransactionsV3({
       connection: connection.current,
