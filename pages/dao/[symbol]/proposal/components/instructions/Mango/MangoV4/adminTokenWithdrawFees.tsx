@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useContext, useEffect, useState } from 'react'
+import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
-import { isFormValid } from '@utils/formValidation'
+import { isFormValid, validatePubkey } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -12,24 +13,16 @@ import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, { InstructionInput } from '../../FormCreator'
 import { InstructionInputType } from '../../inputInstructionType'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
-import { MarketIndex } from '@blockworks-foundation/mango-v4/dist/types/src/accounts/serum3'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
-type NameMarketIndexVal = {
-  name: string
-  value: MarketIndex
-}
-
-interface OpenBookEditMarketForm {
+interface AltSetForm {
   governedAccount: AssetAccount | null
-  market: NameMarketIndexVal | null
-  name: string
-  reduceOnly: boolean
-  forceClose: boolean
+  index: number
+  addressLookupTable: string
   holdupTime: number
 }
 
-const OpenBookEditMarket = ({
+const AltSet = ({
   index,
   governance,
 }: {
@@ -46,15 +39,12 @@ const OpenBookEditMarket = ({
       x.extensions.transferAddress?.equals(mangoGroup.admin)
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const [form, setForm] = useState<OpenBookEditMarketForm>({
+  const [form, setForm] = useState<AltSetForm>({
     governedAccount: null,
-    reduceOnly: false,
-    forceClose: false,
-    market: null,
+    addressLookupTable: '',
+    index: 0,
     holdupTime: 0,
-    name: '',
   })
-  const [currentMarkets, setCurrentMarkets] = useState<NameMarketIndexVal[]>([])
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
 
@@ -71,16 +61,12 @@ const OpenBookEditMarket = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const market = mangoGroup!.serum3MarketsMapByMarketIndex.get(
-        Number(form.market?.value)
-      )
-
       const ix = await mangoClient!.program.methods
-        .serum3EditMarket(form.reduceOnly, form.forceClose, form.name)
+        .altSet(Number(form.index))
         .accounts({
           group: mangoGroup!.publicKey,
           admin: form.governedAccount.extensions.transferAddress,
-          market: market!.publicKey,
+          addressLookupTable: new PublicKey(form.addressLookupTable),
         })
         .instruction()
 
@@ -89,7 +75,6 @@ const OpenBookEditMarket = ({
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
       isValid,
-      chunkBy: 1,
       governance: form.governedAccount?.governance,
       customHoldUpTime: form.holdupTime,
     }
@@ -103,43 +88,18 @@ const OpenBookEditMarket = ({
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
-  useEffect(() => {
-    const getMarkets = async () => {
-      const markets = [...mangoGroup!.serum3MarketsMapByExternal.values()].map(
-        (x) => ({
-          name: x.name,
-          value: x.marketIndex,
-        })
-      )
-      setCurrentMarkets(markets)
-    }
-    if (mangoGroup) {
-      getMarkets()
-    }
-  }, [mangoGroup])
-
-  useEffect(() => {
-    const getCurrentMarketProps = () => {
-      const market = mangoGroup!.serum3MarketsMapByMarketIndex.get(
-        Number(form.market?.value)
-      )
-      setForm((prevForm) => ({
-        ...prevForm,
-        reduceOnly: market?.reduceOnly || false,
-        forceClose: market?.forceClose || false,
-        name: market?.name || '',
-      }))
-    }
-    if (form.market && mangoGroup) {
-      getCurrentMarketProps()
-    }
-  }, [form.market, mangoGroup])
-
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
       .nullable()
       .required('Program governed account is required'),
+    addressLookupTable: yup
+      .string()
+      .required()
+      .test('is-valid-address', 'Please enter a valid PublicKey', (value) =>
+        value ? validatePubkey(value) : true
+      ),
+    index: yup.string().required(),
   })
   const inputs: InstructionInput[] = [
     {
@@ -159,30 +119,17 @@ const OpenBookEditMarket = ({
       name: 'holdupTime',
     },
     {
-      label: 'Market',
-      name: 'market',
-      type: InstructionInputType.SELECT,
-      initialValue: form.market,
-      options: currentMarkets,
-    },
-    {
-      label: 'Name',
-      name: 'name',
+      label: 'Address Lookup Table',
+      initialValue: form.addressLookupTable,
       type: InstructionInputType.INPUT,
-      initialValue: form.name,
-      inputType: 'text',
+      name: 'addressLookupTable',
     },
     {
-      label: 'Reduce Only',
-      initialValue: form.reduceOnly,
-      type: InstructionInputType.SWITCH,
-      name: 'reduceOnly',
-    },
-    {
-      label: 'Force Close',
-      initialValue: form.forceClose,
-      type: InstructionInputType.SWITCH,
-      name: 'forceClose',
+      label: 'Index',
+      initialValue: form.index,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'index',
     },
   ]
 
@@ -201,4 +148,4 @@ const OpenBookEditMarket = ({
   )
 }
 
-export default OpenBookEditMarket
+export default AltSet

@@ -356,12 +356,12 @@
     toformat "^2.0.0"
     yargs "^17.0.1"
 
-"@blockworks-foundation/mango-v4@0.14.1":
-  version "0.14.1"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4/-/mango-v4-0.14.1.tgz#fc5cd558e518207804acfbb80b80d6d21933d8de"
-  integrity sha512-P1cjN+96lyf45rELDLUTQaC6PpAuAAXPqjynFSBV6CswW87r8sdHLPgnYaUnfJMBAqHGwd0rVuT/YMJpoHfejA==
+"@blockworks-foundation/mango-v4@0.18.3":
+  version "0.18.3"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4/-/mango-v4-0.18.3.tgz#a3d41cfb85f9b7121469d2ac3d52a7915f677701"
+  integrity sha512-j45GXiLPncKaSnBPLg0JLYEW2kSRRCWklE0usmhPlPD99KcX/iKqwFEzWtcOuGC5sQJTn4cblTOj5V6iiUiGAw==
   dependencies:
-    "@coral-xyz/anchor" "^0.26.0"
+    "@coral-xyz/anchor" "^0.27.0"
     "@project-serum/serum" "0.13.65"
     "@pythnetwork/client" "~2.14.0"
     "@solana/spl-token" "0.3.7"
@@ -374,10 +374,10 @@
     dotenv "^16.0.3"
     node-kraken-api "^2.2.2"
 
-"@blockworks-foundation/mangolana@0.0.1-beta.14":
-  version "0.0.1-beta.14"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mangolana/-/mangolana-0.0.1-beta.14.tgz#79dfc522e6033384eb5b288ed4000eaf9aeb8f4c"
-  integrity sha512-eQDoDaXIZixInaEx2XkaGPU0NempBBLTr6QnKBh1K+rxeO8+cgWGh0NQwBYTUHU7e2J021c3r4HLJ8PsLull5g==
+"@blockworks-foundation/mangolana@0.0.1-beta.15":
+  version "0.0.1-beta.15"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mangolana/-/mangolana-0.0.1-beta.15.tgz#5442044ecb54c2f57128155665c0b1d9ecbdda39"
+  integrity sha512-VDSRGHhrtR4nyjGEqQGLBLWbQLFn1Kh1SoaqwwV3De0Ls0WDhe8C5aTDQ8k028XKrlHRC5O1QkJrwWskqKvqNw==
   dependencies:
     "@solana/web3.js" "^1.63.1"
     bs58 "^5.0.0"
