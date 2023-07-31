@@ -82,7 +82,7 @@ const INSTRUCTIONS = {
         soHelper.getIdl()
       ).decode(Buffer.from(data))?.data as configV3Instruction
 
-      const baseMint = await tryGetMint(connection, accounts[7].pubkey)
+      const baseMint = await tryGetMint(connection, accounts[8].pubkey)
 
       const rawAmount = decodedInstructionData.numTokens
       const tokenAmount = baseMint
