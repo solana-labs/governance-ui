@@ -303,8 +303,8 @@ const dasProofByIdQueryFn = async (network: Network, id: PublicKey) => {
   })
 
   const { result, error } = await response.json()
-  if (error) return undefined
-  return result.items as any
+  if (error) return { found: false, result: undefined, err: error } as const
+  else return { found: true, result } as const
 }
 export const fetchDasAssetProofById = (network: Network, assetId: PublicKey) =>
   queryClient.fetchQuery({
