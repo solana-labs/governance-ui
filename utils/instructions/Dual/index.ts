@@ -202,7 +202,7 @@ export async function getConfigInstruction({
     if (!(await connection.current.getAccountInfo(userSoAccount))) {
       const [ataIx] = await createAssociatedTokenAccount(
         wallet.publicKey,
-        new PublicKey(form.userPk),
+        form.payer.extensions.transferAddress!,
         soMint
       )
       additionalSerializedInstructions.push(serializeInstructionToBase64(ataIx))

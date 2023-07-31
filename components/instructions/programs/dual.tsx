@@ -54,7 +54,7 @@ interface exerciseReversibleInstruction {
 // TODO: Include withdrawAll
 
 const INSTRUCTIONS = {
-  12345: {
+  45: {
     name: 'Staking Option ConfigV3',
     accounts: [
       { name: 'authority' },
@@ -188,7 +188,7 @@ const INSTRUCTIONS = {
       )
     },
   },
-  123456: {
+  61: {
     name: 'Staking Option InitStrikeReversible',
     accounts: [
       { name: 'authority' },
