@@ -171,7 +171,7 @@ export async function getConfigInstruction({
       serializeInstructionToBase64(configInstruction)
     )
 
-    const initStrikeInstruction = await so.createInitStrikeInstruction(
+    const initStrikeInstruction = await so.createInitStrikeReversibleInstruction(
       new BN(form.strike),
       form.soName,
       //authority sol wallet
@@ -201,7 +201,7 @@ export async function getConfigInstruction({
 
     if (!(await connection.current.getAccountInfo(userSoAccount))) {
       const [ataIx] = await createAssociatedTokenAccount(
-        wallet.publicKey,
+        form.payer.extensions.transferAddress!,
         new PublicKey(form.userPk),
         soMint
       )
@@ -347,6 +347,7 @@ export async function getExerciseInstruction({
       )
     )
 
+    // TODO: Consider using reversible
     const exerciseInstruction = await so.createExerciseInstruction(
       new BN(form.numTokens),
       new BN(strike),
