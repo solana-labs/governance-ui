@@ -66,6 +66,7 @@ export const useRealmProposalsQuery = () => {
       : undefined,
     queryFn: async () => {
       if (!enabled) throw new Error()
+      console.log('query: fetching realm proposals')
 
       const results = (
         await Promise.all(
@@ -75,6 +76,7 @@ export const useRealmProposalsQuery = () => {
         )
       ).flat()
 
+      // TODO instead of using setQueryData, prefetch queries on mouseover ?
       results.forEach((x) => {
         queryClient.setQueryData(
           proposalQueryKeys.byPubkey(connection.endpoint, x.pubkey),

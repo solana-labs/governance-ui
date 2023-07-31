@@ -63,6 +63,13 @@ const LockTokensAccount: React.FC<{
   const { realmInfo } = useRealm()
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
+  const registrar = useVotePluginsClientStore(
+    (s) => s.state.voteStakeRegistryRegistrar
+  )
+  const isZeroMultiplierConfig = !registrar?.votingMints.filter(
+    (x) => !x.maxExtraLockupVoteWeightScaledFactor.isZero()
+  ).length
+
   const [reducedDeposits, setReducedDeposits] = useState<DepositBox[]>([])
   const ownDeposits = useDepositStore((s) => s.state.deposits)
   const [deposits, setDeposits] = useState<DepositWithMintAccount[]>([])
@@ -368,20 +375,23 @@ const LockTokensAccount: React.FC<{
                   ?.map((x, idx) => (
                     <DepositCard deposit={x} key={idx}></DepositCard>
                   ))}
-                <div className="border border-fgd-4 flex flex-col items-center justify-center p-6 rounded-lg">
-                  <LightningBoltIcon className="h-8 mb-2 text-primary-light w-8" />
-                  <p className="flex text-center pb-6">
-                    Increase your voting power by<br></br> locking your tokens.
-                  </p>
-                  <Button onClick={() => setIsLockModalOpen(true)}>
-                    <div className="flex items-center">
-                      <LockClosedIcon className="h-5 mr-1.5 w-5" />
-                      <span>Lock Tokens</span>
-                    </div>
-                  </Button>
-                </div>
+                {!isZeroMultiplierConfig && (
+                  <div className="border border-fgd-4 flex flex-col items-center justify-center p-6 rounded-lg">
+                    <LightningBoltIcon className="h-8 mb-2 text-primary-light w-8" />
+                    <p className="flex text-center pb-6">
+                      Increase your voting power by<br></br> locking your
+                      tokens.
+                    </p>
+                    <Button onClick={() => setIsLockModalOpen(true)}>
+                      <div className="flex items-center">
+                        <LockClosedIcon className="h-5 mr-1.5 w-5" />
+                        <span>Lock Tokens</span>
+                      </div>
+                    </Button>
+                  </div>
+                )}
               </div>
-            ) : (
+            ) : !isZeroMultiplierConfig ? (
               <div className="border border-fgd-4 flex flex-col items-center justify-center p-6 rounded-lg mb-3">
                 <LightningBoltIcon className="h-8 mb-2 text-primary-light w-8" />
                 <p className="flex text-center pb-6">
@@ -394,7 +404,7 @@ const LockTokensAccount: React.FC<{
                   </div>
                 </Button>
               </div>
-            )}
+            ) : null}
           </div>
         ) : (
           <div className="border border-fgd-4 flex flex-col items-center justify-center p-6 rounded-lg">

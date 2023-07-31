@@ -45,7 +45,6 @@ interface Props {
   className?: string;
 }
 
-// TODO generate defaults
 function NewWalletWithDefaults({
   defaults,
   ...props

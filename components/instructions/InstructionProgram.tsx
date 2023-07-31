@@ -26,6 +26,7 @@ const InstructionProgram = ({
         const programAccount = (
           await fetchParsedAccountInfoByPubkey(connection.current, programId)
         ).result
+
         const programInfo = (
           await fetchParsedAccountInfoByPubkey(
             connection.current,

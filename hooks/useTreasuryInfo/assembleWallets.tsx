@@ -65,7 +65,6 @@ export const assembleWallets = async (
 
   for (const account of accounts) {
     let walletAddress = ''
-
     if (account.isSol && account.extensions.transferAddress) {
       walletAddress = account.extensions.transferAddress.toBase58()
     } else if (account.governance.pubkey) {
@@ -119,7 +118,7 @@ export const assembleWallets = async (
       account.type !== AccountType.NFT &&
       account.type !== AccountType.PROGRAM
     ) {
-      const asset = convertAccountToAsset(
+      const asset = await convertAccountToAsset(
         account,
         councilMintAddress,
         communityMintAddress
@@ -252,12 +251,17 @@ export const assembleWallets = async (
       return b.totalValue.comparedTo(a.totalValue)
     })
 
-  const auxiliaryAssets = ungovernedAssets
-    .map(
-      (account) =>
-        convertAccountToAsset({ ...account, type: AccountType.TOKEN }) as Token
+  const auxiliaryAssets = (
+    await Promise.all(
+      ungovernedAssets.map(
+        (account) =>
+          convertAccountToAsset({
+            ...account,
+            type: AccountType.TOKEN,
+          }) as Promise<Token>
+      )
     )
-    .filter(isNotNull)
+  ).filter(isNotNull)
 
   const auxiliaryWallets: AuxiliaryWallet[] = auxiliaryAssets.length
     ? [

@@ -160,18 +160,18 @@ export class VotingClient {
     type: UpdateVoterWeightRecordTypes,
     voterWeightTarget?: PublicKey
   ): Promise<ProgramAddresses | undefined> => {
-    if (this.noClient) {
-      return
-    }
-    const clientProgramId = this.client!.program.programId
     const realm = this.realm!
-    const walletPk = this.walletPk!
+
     if (
-      realm.account.communityMint.toBase58() !==
-      tokenOwnerRecord.account.governingTokenMint.toBase58()
+      this.noClient ||
+      !realm.account.communityMint.equals(
+        tokenOwnerRecord.account.governingTokenMint
+      )
     ) {
       return
     }
+    const clientProgramId = this.client!.program.programId
+    const walletPk = this.walletPk!
 
     if (this.client instanceof VsrClient) {
       const { registrar } = await getRegistrarPDA(

@@ -58,6 +58,7 @@ function NFTSelector(
       setSelected((current) => [...current, nft])
     }
   }
+  // TODO just use DAS
   const handleGetNfts = async () => {
     setIsLoading(true)
     const response = await Promise.all(
@@ -108,7 +109,7 @@ function NFTSelector(
                 <div
                   onClick={() => (selectable ? handleSelectNft(x) : null)}
                   key={x.mintAddress}
-                  className={`bg-bkg-2 flex items-center justify-center cursor-pointer default-transition rounded-lg border border-transparent ${
+                  className={`bg-bkg-2 flex-shrink-0 flex items-center justify-center cursor-pointer default-transition rounded-lg border border-transparent ${
                     selectable ? 'hover:border-primary-dark' : ''
                   } relative overflow-hidden`}
                   style={{

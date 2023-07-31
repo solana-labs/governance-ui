@@ -2,12 +2,10 @@ import * as Tabs from '@radix-ui/react-tabs'
 import React from 'react'
 import cx from 'classnames'
 
-import { NFTCollection } from '@models/treasury/Asset'
-import { formatNumber } from '@utils/formatNumber'
-
 import Overview from './Overview'
 import Tab from '../../WalletDetails/Info/Tab'
 import { useTabState } from '../../tabState'
+import { Stake } from '@models/treasury/Asset'
 
 enum Choice {
   Overview = 'Overview',
@@ -16,7 +14,7 @@ enum Choice {
 
 interface Props {
   className?: string
-  nftCollection: NFTCollection
+  account: Stake
 }
 
 export default function Info(props: Props) {
@@ -25,21 +23,14 @@ export default function Info(props: Props) {
   return (
     <article className={cx(props.className, 'bg-bkg-3')}>
       <Tabs.Root
-        value={get('nftCollection') || Choice.Overview}
-        onValueChange={(newValue) => set('nftCollection', newValue)}
+        value={get('programs') || Choice.Overview}
+        onValueChange={(newValue) => set('programs', newValue)}
       >
         <Tabs.List className="flex items-center border-b border-white/30 w-full">
-          <Tab value={Choice.Overview}>
-            <div className="flex items-center space-x-2">
-              <div>NFTs</div>
-              <div className="px-1 rounded-full bg-white/10 text-center min-w-[32px]">
-                {formatNumber(props.nftCollection.count, undefined, {})}
-              </div>
-            </div>
-          </Tab>
+          <Tab value={Choice.Overview}>Overview</Tab>
         </Tabs.List>
         <Tabs.Content value={Choice.Overview}>
-          <Overview className="py-8" nftCollection={props.nftCollection} />
+          <Overview className="py-8" account={props.account} />
         </Tabs.Content>
       </Tabs.Root>
     </article>

@@ -18,12 +18,15 @@
     "displayName": "Dean's List Network State",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "F9V4Lwo49aUe8fFujMbU6uhdFyDRqKY54WpzdpncUSk9",
-    "bannerImage": "/realms/Deans_List_Network_State/DeansList_Network_State_logo.png",
+    "bannerImage": "/realms/Deans_List_Network_State/banner-deanslist.png",
     "website": "https://www.deanslist.services/",
     "twitter": "@deanslistDAO",
-    "ogImage": "/realms/Deans_List_Network_State/DeansList_Network_State_logo.png"
-   },
-   {
+    "discord": "https://discord.gg/deanslist",
+    "ogImage": "/realms/Deans_List_Network_State/avatar-deanslist.png",
+    "github": "https://github.com/Deans-List/",
+    "shortDescription": "A Service DAO turned Network State, consisting of Web3 power users providing feedback sessions. Join us in changing the future of work!"
+  },
+  {
     "symbol": "Ukraine",
     "displayName": "Ukraine.SOL",
     "programId": "gUAedF544JeE6NYbQakQvribHykUNgaPJqcgf3UQVnY",
@@ -44,6 +47,21 @@
     "ogImage": "https://i.imgur.com/448n6bC.jpg",
     "shortDescription": "Every market, all the power, none of the fuss. Simplifying decentralized finance through easy-to-use products and developer tools.",
     "sortRank": 3,
+    "website": "https://mango.markets",
+    "keywords": "Mango Markets, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
+    "twitter": "@mangomarkets",
+    "discord": "https://discord.com/invite/2uwjsBc5yw",
+    "github": "https://github.com/blockworks-foundation/"
+  },
+  {
+    "symbol": "MNGO-TC",
+    "category": "defi",
+    "displayName": "Mango Treasury Council",
+    "programId": "GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J",
+    "realmId": "7CWXhWsMXbfx8caHcpCbSQKDpsaLNu65YoBLoGfogzk6",
+    "communityMint": "DYg9LHzbhk9pg7h3Zhda2CW1berCp7NZQYxUEW6Eex35",
+    "ogImage": "https://i.imgur.com/448n6bC.jpg",
+    "shortDescription": "Every market, all the power, none of the fuss. Simplifying decentralized finance through easy-to-use products and developer tools.",
     "website": "https://mango.markets",
     "keywords": "Mango Markets, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
     "twitter": "@mangomarkets",
@@ -205,7 +223,7 @@
     "website": "https://mango.markets",
     "keywords": "Mango Markets, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
     "twitter": "@mangomarkets",
-    "ogImage": "https://trade.mango.markets/assets/icons/logo.svg"
+    "ogImage": "https://i.imgur.com/448n6bC.jpg"
   },
   {
     "symbol": "MangolanaCouncil",
@@ -513,7 +531,7 @@
     "symbol": "MNDE",
     "category": "defi",
     "bannerImage": "https://i.imgur.com/I30J9NT.png",
-    "displayName": "Marinade.Finance",
+    "displayName": "Marinade",
     "programId": "GovMaiHfpVPw8BAM1mbdzgmSZYDw2tdP32J2fapoQoYs",
     "realmId": "899YG3yk4F66ZgbNWLHriZHTXSKk9e1kvsKEquW7L6Mo",
     "ogImage": "https://i.imgur.com/vEFzgY4.png",
@@ -1063,8 +1081,8 @@
     "website": "https://flipsidecrypto.xyz/",
     "twitter": "@flipsidecrypto",
     "ogImage": "/realms/FSLOGO/FLIPSIDE-LOGO-WHITE.png"
-   },
-   {
+  },
+  {
     "symbol": "Legacy Dean's List Classic (moved to new one)",
     "displayName": "Dean's List",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1073,8 +1091,8 @@
     "website": "https://deans-list.strataprotocol.com/",
     "twitter": "@GrapeDeanslist",
     "ogImage": "/realms/DeanListGrape/deans-list-logo.png"
-   },
-   {
+  },
+  {
     "symbol": "GrapeCCSubDAO",
     "displayName": "Grape CC SubDAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1082,8 +1100,8 @@
     "website": "https://services.grapes.network/",
     "twitter": "@grapeprotocol",
     "ogImage": "/realms/GrapeCCSubDAO/GrapeCCSubDAO.png"
-   },
-   {
+  },
+  {
     "symbol": "AthensDAO",
     "displayName": "AthensDAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1092,8 +1110,8 @@
     "website": "https://athensdao.net/",
     "twitter": "@GrapeAthensDAO",
     "ogImage": "/realms/AthensDAO/AthensDAO_Logo.jpg"
-   },
-   {
+  },
+  {
     "symbol": "Wen DAO",
     "displayName": "Wen DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1101,8 +1119,8 @@
     "website": "https://services.grapes.network/",
     "twitter": "@grapeprotocol",
     "ogImage": "/realms/Wen DAO/Wen DAO.png"
-   },
-   {
+  },
+  {
     "symbol": "BOOT",
     "displayName": "Bootstrap DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1147,7 +1165,7 @@
     "ogImage": "/realms/bacDao/logo_bulls.png",
     "website": "https://bullsarmyclub.com/"
   },
- {
+  {
     "symbol": "EPCT",
     "category": "web3",
     "bannerImage": "https://bafybeih52um4tvyggeja36kmbyg5b4pfod547qxdite4krwoe4nwtareji.ipfs.w3s.link/EpicsBetaTwitterHeaderLogo.png",
@@ -3061,11 +3079,10 @@
     "discord": "https://discord.gg/XcWVHM2Z",
     "github": "https://github.com/brdot",
     "website": "https://brdot.com.br"
-
   },
   {
     "symbol": "SAO",
-    "category":"nft",
+    "category": "nft",
     "displayName": "Sator DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "7yAiT2bUg5MwBzT3K9BvhcZdtHr5z8AnCGWa2iPJjB3T",
@@ -3078,7 +3095,7 @@
   },
   {
     "symbol": "Safecows",
-    "category":"web3",
+    "category": "web3",
     "displayName": "Safecows",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "6RQAna7aWHLVwfYRFGyM8kpnBXNGkMNCGfvuwYuuvpFU",
@@ -3088,9 +3105,9 @@
     "website": "https://safecows.com",
     "discord": "https://discord.gg/aQCeMSWs"
   },
-   {
+  {
     "symbol": "BlueChickDAO",
-    "category":"gaming",
+    "category": "gaming",
     "displayName": "The Blue Chick NFTs DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "99c96qFUwLiGcbudDeTLVxYTbtQ4CkDsstvHHmGPGGWj",
@@ -3134,7 +3151,7 @@
     "twitter": "@Helium",
     "ogImage": "/realms/Helium/img/mobilelogo.png"
   },
-    {
+  {
     "symbol": "CRYSTAL",
     "displayName": "Polar Dao",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -3161,13 +3178,27 @@
     "twitter": "@nudie_mag",
     "ogImage": "/realms/ComradeDAO/img/comradedaologo.png"
   },
-     {
+  {
     "symbol": "PPWT",
     "displayName": "Poodle Paws DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "ABh3GrrTQqnYofrcbhajSbuvDB1si7PHzxL2s4RZ4Ef",
-    "website": "https://twitter.com/PoodlePawsWT",
+    "website": "https://poodlepaws.vercel.app/",
     "twitter": "@PoodlePawsWT",
     "ogImage": "/realms/PoodlePawsDAO/PoodlePawsDAO.png"
+  },
+  {
+    "category": "nft",
+    "discord": "https://discord.gg/Decod3rsNFT",
+    "displayName": "$VIEWS DAO",
+    "bannerImage": "/realms/VIEWSDAO/img/views_banner.jpg",
+    "ogImage": "/realms/VIEWSDAO/img/views_logo.png",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "9mJUsn6pwUytW2TdytEDRajKDHBjqXsbXyKFP28fzaZ6",
+    "shortDescription": "$VIEWS DAO - Building the Watch-to-Earn meta",
+    "sortRank": 3,
+    "symbol": "VIEWSDAO",
+    "twitter": "@Decod3rsNFT"
+
   }
 ]

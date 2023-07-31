@@ -6,6 +6,7 @@ import {
   ProposalState,
   ProposalTransaction,
   RpcContext,
+  getNativeTreasuryAddress,
 } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import { CheckCircleIcon, PlayIcon, RefreshIcon } from '@heroicons/react/solid'
@@ -15,9 +16,7 @@ import useRealm from '@hooks/useRealm'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { executeInstructions } from 'actions/executeInstructions'
 import { notify } from '@utils/notifications'
-import useProgramVersion from '@hooks/useProgramVersion'
 import { abbreviateAddress } from '@utils/formatting'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
@@ -36,47 +35,31 @@ const useSignersNeeded = (
   proposal: ProgramAccount<Proposal>
 ) => {
   const realm = useRealmQuery().data?.result
-  const programVersion = useProgramVersion()
-  const { governancesArray, assetAccounts } = useGovernanceAssets()
   const [signersNeeded, setSignersNeeded] = useState<PublicKey[]>()
+
+  const governance = proposal.account.governance
 
   useEffect(() => {
     const handleGetSigners = async () => {
       if (realm?.owner === undefined) return undefined
-      const pksToFilterOut = [
-        ...governancesArray.map((x) => x.pubkey),
-        ...assetAccounts
-          .filter((x) => x.isSol)
-          .map((x) => x.extensions.transferAddress),
-      ]
+
       const propInstructions = Object.values(proposalInstructions) || []
 
-      //we need to remmove governances and sol wallets from singers
+      const treasury = await getNativeTreasuryAddress(realm.owner, governance)
+
+      //we need to remove the governance and its treasury from the signers
       const signers = propInstructions
         .map((x) => x.account.instructions.flatMap((inst) => inst.accounts))
         .filter((x) => x)
         .flatMap((x) => x)
-        .filter(
-          (x) =>
-            !pksToFilterOut.find((filteredOutPk) =>
-              filteredOutPk?.equals(x.pubkey)
-            )
-        )
         .filter((x) => x.isSigner)
         .map((x) => x.pubkey)
+        .filter((x) => !x.equals(governance) && !x.equals(treasury))
 
       setSignersNeeded(signers)
     }
     handleGetSigners()
-  }, [
-    programVersion,
-    proposal.account.governance,
-    proposal.pubkey,
-    proposalInstructions,
-    governancesArray.length,
-    assetAccounts.length,
-    realm?.owner,
-  ])
+  }, [governance, proposalInstructions, realm?.owner])
 
   return signersNeeded
 }

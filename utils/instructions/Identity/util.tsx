@@ -3,13 +3,10 @@ import { DidSolIdentifier, Wallet } from '@identity.com/sol-did-client'
 import { PublicKey } from '@solana/web3.js'
 import Tooltip from '@components/Tooltip'
 import { InformationCircleIcon } from '@heroicons/react/outline'
-import React from 'react'
 import { Governance, ProgramAccount, Realm } from '@solana/spl-governance'
 import { AssetAccount } from '@utils/uiTypes/assets'
-import {
-  InstructionInput,
-  InstructionInputType,
-} from 'pages/dao/[symbol]/proposal/components/instructions/FormCreator'
+import { InstructionInput } from 'pages/dao/[symbol]/proposal/components/instructions/FormCreator'
+import { InstructionInputType } from 'pages/dao/[symbol]/proposal/components/instructions/inputInstructionType'
 
 const MAX_ALIAS_LENGTH = 32 // the key alias is used as the key id, so it must be a valid URI fragment
 

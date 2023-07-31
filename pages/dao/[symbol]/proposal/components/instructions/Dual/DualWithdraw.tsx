@@ -6,14 +6,14 @@ import {
   DualFinanceWithdrawForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
-import GovernedAccountSelect from '../../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import Input from '@components/inputs/Input'
 import { getWithdrawInstruction } from '@utils/instructions/Dual'
 import { getDualFinanceWithdrawSchema } from '@utils/validations'
-import Tooltip from '@components/Tooltip'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import Input from '@components/inputs/Input'
+import GovernedAccountSelect from '../../GovernedAccountSelect'
+import Tooltip from '@components/Tooltip'
 
 const DualWithdraw = ({
   index,
@@ -55,15 +55,7 @@ const DualWithdraw = ({
       { governedAccount: governedAccount, getInstruction },
       index
     )
-  }, [
-    form,
-    governedAccount,
-    handleSetInstructions,
-    index,
-    connection,
-    schema,
-    wallet,
-  ])
+  }, [form, governedAccount, handleSetInstructions, index, connection, wallet])
   useEffect(() => {
     handleSetForm({ value: undefined, propertyName: 'mintPk' })
   }, [form.baseTreasury])

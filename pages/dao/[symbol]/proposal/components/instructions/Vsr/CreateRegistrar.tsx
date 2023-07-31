@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import * as yup from 'yup'
 import {
   Governance,
@@ -11,7 +11,8 @@ import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
 import useRealm from '@hooks/useRealm'
 import { NewProposalContext } from '../../../new'
-import InstructionForm, { InstructionInputType } from '../FormCreator'
+import InstructionForm from '../FormCreator'
+import { InstructionInputType } from '../inputInstructionType'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { PublicKey, SYSVAR_RENT_PUBKEY } from '@solana/web3.js'

@@ -26,7 +26,6 @@ import {
   ArrowCircleUpIcon,
   //   InformationCircleIcon,
 } from '@heroicons/react/solid'
-import tokenPriceService from '@utils/services/tokenPrice'
 import BigNumber from 'bignumber.js'
 import { getInstructionDataFromBase64 } from '@solana/spl-governance'
 import useQueryContext from '@hooks/useQueryContext'
@@ -40,35 +39,23 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import {
   getSolTransferInstruction,
   getTransferInstruction,
-  getTransferNftInstruction,
-  validateInstruction,
 } from '@utils/instructionTools'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
-import NFTSelector from '@components/NFTS/NFTSelector'
-import { NFTWithMint } from '@utils/uiTypes/nfts'
 import useCreateProposal from '@hooks/useCreateProposal'
-import NFTAccountSelect from './NFTAccountSelect'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { fetchJupiterPrice } from '@hooks/queries/jupiterPrice'
+import { useAsync } from 'react-async-hook'
 
-const SendTokens = ({
-  isNft = false,
-  selectedNft,
-}: {
-  isNft?: boolean
-  selectedNft?: NFTWithMint | null
-}) => {
+const SendTokens = () => {
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const connection = useLegacyConnectionContext()
-  const { nftsGovernedTokenAccounts } = useGovernanceAssets()
-  const { setCurrentAccount } = useTreasuryAccountStore()
   const realm = useRealmQuery().data?.result
   const { realmInfo, symbol, canChooseWhoVote } = useRealm()
   const { handleCreateProposal } = useCreateProposal()
   const { canUseTransferInstruction } = useGovernanceAssets()
   const tokenInfo = useTreasuryAccountStore((s) => s.tokenInfo)
-  const isNFT = isNft || currentAccount?.isNft
   const isSol = currentAccount?.isSol
   const { fmtUrlWithCluster } = useQueryContext()
   const wallet = useWalletOnePointOh()
@@ -76,14 +63,13 @@ const SendTokens = ({
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<SendTokenCompactViewForm>({
     destinationAccount: '',
-    amount: isNFT ? 1 : undefined,
+    amount: undefined,
     governedTokenAccount: undefined,
     programId: programId?.toString(),
     mintInfo: undefined,
     title: '',
     description: '',
   })
-  const [selectedNfts, setSelectedNfts] = useState<NFTWithMint[]>([])
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [showOptions, setShowOptions] = useState(false)
   const [
@@ -125,90 +111,6 @@ const SendTokens = ({
       ),
       propertyName: 'amount',
     })
-  }
-  const calcTransactionDolarAmount = (amount) => {
-    const price = tokenPriceService.getUSDTokenPrice(
-      currentAccount!.extensions.mint!.publicKey.toBase58()
-    )
-    const totalPrice = amount * price
-    const totalPriceFormatted =
-      amount && price ? new BigNumber(totalPrice).toFormat(2) : ''
-    return totalPriceFormatted
-  }
-
-  const handleProposeNftSend = async () => {
-    if (!realm || !programId) {
-      throw new Error()
-    }
-    if (!wallet?.publicKey) {
-      throw 'connect wallet'
-    }
-    if (!currentAccount) {
-      throw new Error()
-    }
-    const assetAccount = form.governedTokenAccount
-    if (assetAccount === undefined) {
-      throw 'no governance/asset account selected'
-    }
-    setIsLoading(true)
-
-    const governance = currentAccount.governance
-
-    //validate
-    const valid = await validateInstruction({ schema, form, setFormErrors })
-    if (!valid) {
-      setIsLoading(false)
-      return
-    }
-    const instructions = await Promise.all(
-      selectedNfts.map((x) =>
-        getTransferNftInstruction({
-          programId,
-          assetAccount,
-          connection,
-          currentAccount,
-          nftMint: x.mintAddress,
-          toOwner: new PublicKey(form.destinationAccount),
-          ataCreationPayer: wallet.publicKey!, //typescript why are you like this? its not null, wtf
-        })
-      )
-    )
-
-    const instructionsData = instructions.map((instruction) => ({
-      data: getInstructionDataFromBase64(instruction.serializedInstruction),
-      holdUpTime: governance.account.config.minInstructionHoldUpTime,
-      prerequisiteInstructions: instruction.prerequisiteInstructions ?? [],
-      chunkBy: 1,
-    }))
-
-    const proposalTitle =
-      selectedNfts.length > 1
-        ? 'Send NFTs'
-        : `Send ${selectedNfts[0].name} to ${
-            tryParseKey(form.destinationAccount)
-              ? abbreviateAddress(new PublicKey(form.destinationAccount))
-              : ''
-          }`
-
-    try {
-      const proposalAddress = await handleCreateProposal({
-        title: form.title ? form.title : proposalTitle,
-        description: form.description ? form.description : '',
-        voteByCouncil,
-        instructionsData,
-        governance,
-      })
-      const url = fmtUrlWithCluster(
-        `/dao/${symbol}/proposal/${proposalAddress}`
-      )
-      router.push(url)
-    } catch (ex) {
-      notify({ type: 'error', message: `${ex}` })
-      //console.error(ex)
-      setIsLoading(false)
-      throw ex
-    }
-    setIsLoading(false)
   }
 
   async function getInstruction(): Promise<UiInstruction> {
@@ -302,21 +204,28 @@ const SendTokens = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.destinationAccount])
 
-  const schema = getTokenTransferSchema({ form, connection, nftMode: isNft })
-  const transactionDolarAmount = calcTransactionDolarAmount(form.amount)
-  const nftName: string | undefined = undefined
-  const nftTitle = `Send ${nftName ? nftName : 'NFT'} to ${
+  const schema = getTokenTransferSchema({ form, connection, nftMode: false })
+
+  const { result: transactionDolarAmount } = useAsync(async () => {
+    const mint = currentAccount?.extensions.mint?.publicKey
+    if (mint === undefined) return undefined
+    const amount = form.amount ?? 0
+    const priceData = await fetchJupiterPrice(mint)
+    const price = priceData.result?.price ?? 0
+
+    const totalPrice = amount * price
+    const totalPriceFormatted =
+      amount && price ? new BigNumber(totalPrice).toFormat(2) : ''
+    return totalPriceFormatted
+  }, [form.amount, currentAccount?.extensions.mint?.publicKey])
+
+  const proposalTitle = `Pay ${form.amount}${
+    tokenInfo ? ` ${tokenInfo?.symbol} ` : ' '
+  }to ${
     tryParseKey(form.destinationAccount)
       ? abbreviateAddress(new PublicKey(form.destinationAccount))
       : ''
   }`
-  const proposalTitle = isNFT
-    ? nftTitle
-    : `Pay ${form.amount}${tokenInfo ? ` ${tokenInfo?.symbol} ` : ' '}to ${
-        tryParseKey(form.destinationAccount)
-          ? abbreviateAddress(new PublicKey(form.destinationAccount))
-          : ''
-      }`
 
   if (!currentAccount) {
     return null
@@ -325,19 +234,9 @@ const SendTokens = ({
   return (
     <>
       <h3 className="mb-4 flex items-center">
-        <>
-          Send {!isNft && tokenInfo && tokenInfo?.symbol} {isNFT && 'NFT'}
-        </>
+        <>Send {tokenInfo && tokenInfo?.symbol}</>
       </h3>
-      {isNFT ? (
-        <NFTAccountSelect
-          onChange={(value) => setCurrentAccount(value, connection)}
-          currentAccount={currentAccount}
-          nftsGovernedTokenAccounts={nftsGovernedTokenAccounts}
-        ></NFTAccountSelect>
-      ) : (
-        <AccountLabel></AccountLabel>
-      )}
+      <AccountLabel />
       <div className="space-y-4 w-full pb-4">
         <Input
           label="Destination account"
@@ -366,36 +265,21 @@ const SendTokens = ({
             <div className="text-xs break-all">{destinationAccountName}</div>
           </div>
         )}
-        {isNFT ? (
-          <>
-            <NFTSelector
-              selectedNft={selectedNft}
-              onNftSelect={(nfts) => setSelectedNfts(nfts)}
-              ownersPk={
-                currentAccount.isSol
-                  ? [
-                      currentAccount.extensions.transferAddress!,
-                      currentAccount.governance.pubkey,
-                    ]
-                  : [currentAccount.governance.pubkey]
-              }
-            ></NFTSelector>
-          </>
-        ) : (
-          <Input
-            min={mintMinAmount}
-            label={`Amount ${tokenInfo ? tokenInfo?.symbol : ''}`}
-            value={form.amount}
-            type="number"
-            onChange={setAmount}
-            step={mintMinAmount}
-            error={formErrors['amount']}
-            onBlur={validateAmountOnBlur}
-            noMaxWidth={true}
-          />
-        )}
+
+        <Input
+          min={mintMinAmount}
+          label={`Amount ${tokenInfo ? tokenInfo?.symbol : ''}`}
+          value={form.amount}
+          type="number"
+          onChange={setAmount}
+          step={mintMinAmount}
+          error={formErrors['amount']}
+          onBlur={validateAmountOnBlur}
+          noMaxWidth={true}
+        />
+
         <small className="text-red">
-          {transactionDolarAmount && !isNft
+          {transactionDolarAmount
             ? IsAmountNotHigherThenBalance()
               ? `~$${transactionDolarAmount}`
               : 'Insufficient balance'
@@ -474,15 +358,13 @@ const SendTokens = ({
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
         <Button
           className="ml-auto"
-          onClick={isNft ? handleProposeNftSend : handleProposeTransfer}
+          onClick={handleProposeTransfer}
           isLoading={isLoading}
         >
           <Tooltip
             content={
               !canUseTransferInstruction
                 ? 'You need to have connected wallet with ability to create token transfer proposals'
-                : isNFT && !selectedNfts.length
-                ? 'Please select nft'
                 : ''
             }
           >

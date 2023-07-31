@@ -54,12 +54,15 @@ import CreateNftPluginMaxVoterWeightRecord from './components/instructions/NftVo
 import ConfigureNftPluginCollection from './components/instructions/NftVotingPlugin/ConfigureCollection'
 import SwitchboardAdmitOracle from './components/instructions/Switchboard/AdmitOracle'
 import SwitchboardRevokeOracle from './components/instructions/Switchboard/RevokeOracle'
+import SwitchboardFundOracle from './components/instructions/Switchboard/FundOracle'
+import WithdrawFromOracle from './components/instructions/Switchboard/WithdrawFromOracle'
 import FriktionWithdraw from './components/instructions/Friktion/FriktionWithdraw'
 import FriktionClaimPendingDeposit from './components/instructions/Friktion/FriktionClaimPendingDeposit'
 import FriktionClaimPendingWithdraw from './components/instructions/Friktion/FriktionClaimPendingWithdraw'
 import StakeValidator from './components/instructions/Validators/StakeValidator'
 import DeactivateValidatorStake from './components/instructions/Validators/DeactivateStake'
 import WithdrawValidatorStake from './components/instructions/Validators/WithdrawStake'
+import SplitStake from './components/instructions/Validators/SplitStake'
 import useCreateProposal from '@hooks/useCreateProposal'
 import CastleDeposit from './components/instructions/Castle/CastleDeposit'
 import MakeInitMarketParams from './components/instructions/Foresight/MakeInitMarketParams'
@@ -113,6 +116,9 @@ import RemoveServiceFromDID from './components/instructions/Identity/RemoveServi
 import DualAirdrop from './components/instructions/Dual/DualAirdrop'
 import DualWithdraw from './components/instructions/Dual/DualWithdraw'
 import DualExercise from './components/instructions/Dual/DualExercise'
+import DualDelegate from './components/instructions/Dual/DualDelegate'
+import DualVoteDepositWithdraw from './components/instructions/Dual/DualVoteDepositWithdraw'
+import DualVoteDeposit from './components/instructions/Dual/DualVoteDeposit'
 import PsyFinanceMintAmericanOptions from './components/instructions/PsyFinance/MintAmericanOptions'
 import IxGateSet from './components/instructions/Mango/MangoV4/IxGateSet'
 import StubOracleCreate from './components/instructions/Mango/MangoV4/StubOracleCreate'
@@ -131,6 +137,7 @@ import InitStrike from './components/instructions/Dual/InitStrike'
 import IdlSetBuffer from './components/instructions/Mango/MangoV4/IdlSetBuffer'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { usePrevious } from '@hooks/usePrevious'
+import DualVote from './components/instructions/Dual/DualVote'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -325,7 +332,7 @@ const New = () => {
     handleTurnOffLoaders()
   }
 
-  const firstGovernancePk = instructionsData[0]?.governedAccount?.pubkey.toBase58()
+  const firstGovernancePk = instructionsData[0]?.governedAccount?.pubkey?.toBase58()
   const previousFirstGovernancePk = usePrevious(firstGovernancePk)
 
   useEffect(() => {
@@ -420,6 +427,10 @@ const New = () => {
       [Instructions.DualFinanceLiquidityStakingOption]: LiquidityStakingOption,
       [Instructions.DualFinanceWithdraw]: DualWithdraw,
       [Instructions.DualFinanceExercise]: DualExercise,
+      [Instructions.DualFinanceDelegate]: DualDelegate,
+      [Instructions.DualFinanceDelegateWithdraw]: DualVoteDepositWithdraw,
+      [Instructions.DualFinanceVoteDeposit]: DualVoteDeposit,
+      [Instructions.DualFinanceVote]: DualVote,
       [Instructions.MeanCreateAccount]: MeanCreateAccount,
       [Instructions.MeanFundAccount]: MeanFundAccount,
       [Instructions.MeanWithdrawFromAccount]: MeanWithdrawFromAccount,
@@ -438,6 +449,8 @@ const New = () => {
       [Instructions.PsyFinanceExerciseOption]: PsyFinanceExerciseOption,
       [Instructions.SwitchboardAdmitOracle]: SwitchboardAdmitOracle,
       [Instructions.SwitchboardRevokeOracle]: SwitchboardRevokeOracle,
+      [Instructions.SwitchboardFundOracle]: SwitchboardFundOracle,
+      [Instructions.WithdrawFromOracle]: WithdrawFromOracle,
       [Instructions.RefreshSolendObligation]: RefreshObligation,
       [Instructions.RefreshSolendReserve]: RefreshReserve,
       [Instructions.ForesightInitMarket]: MakeInitMarketParams,
@@ -461,6 +474,7 @@ const New = () => {
       [Instructions.StakeValidator]: StakeValidator,
       [Instructions.DeactivateValidatorStake]: DeactivateValidatorStake,
       [Instructions.WithdrawValidatorStake]: WithdrawValidatorStake,
+      [Instructions.SplitStake]: SplitStake,
       [Instructions.DifferValidatorStake]: null,
       [Instructions.TransferDomainName]: TransferDomainName,
       [Instructions.EverlendDeposit]: DepositForm,
@@ -516,7 +530,7 @@ const New = () => {
       [Instructions.RevokeGoverningTokens]: RevokeGoverningTokens,
       [Instructions.SetMintAuthority]: SetMintAuthority,
     }),
-    [governance?.pubkey.toBase58()]
+    [governance?.pubkey?.toBase58()]
   )
 
   const getCurrentInstruction = useCallback(
@@ -551,7 +565,7 @@ const New = () => {
       )
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-    [governance?.pubkey.toBase58()]
+    [governance?.pubkey?.toBase58()]
   )
 
   const titleTooLong = form.title.length > TITLE_LENGTH_LIMIT

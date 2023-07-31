@@ -3,11 +3,11 @@ import { consts as foresightConsts } from '@foresight-tmp/foresight-sdk/'
 import {
   LIDO_PROGRAM_ID,
   LIDO_PROGRAM_ID_DEVNET,
-} from '@components/TreasuryAccount/ConvertToStSol'
+} from '@constants/pubkeys/lido'
 import { PROGRAM_ID as HELIUM_VSR_PROGRAM_ID } from '@helium/voter-stake-registry-sdk'
 import { NAME_PROGRAM_ID } from '@bonfida/spl-name-service'
 
-export const GOVERNANCE_PROGRAM_NAMES = {
+const GOVERNANCE_PROGRAM_NAMES = {
   GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J: 'Mango Governance Program',
   FP4PxqHTVzeG2c6eZd7974F9WvKUSdBeduUK3rjYyvBw: 'Mango v4 Program Governance ',
   AVoAYTs36yB5izAaBkxRG67wL1AMwG3vo41hKtUSb8is:
@@ -26,10 +26,11 @@ export const GOVERNANCE_PROGRAM_NAMES = {
   '7e75Nwsz8i5i4NiDa43CNzKJ4AeQGyRimha46VKTM1Ls': 'spl-governance v3 test',
   MGovW65tDhMMcpEmsegpsdgvzb6zUwGsNjhXFxRAnjd: 'MEAN DAO Governance Program',
   GovMaiHfpVPw8BAM1mbdzgmSZYDw2tdP32J2fapoQoYs: 'Marinade Governance Program',
+  hgovkRU6Ghe1Qoyb54HdSLdqN7VtxaifBzRmh9jtd3S: 'Helium Governance Program',
 }
 
 // Well known program names displayed on the instruction card
-export const PROGRAM_NAMES = {
+const PROGRAM_NAMES = {
   TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA: 'Token Program',
   ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL: 'ATA Program',
   '11111111111111111111111111111111': 'System Program',
@@ -69,7 +70,7 @@ export const PROGRAM_NAMES = {
   ...GOVERNANCE_PROGRAM_NAMES,
 }
 
-export const NATIVE_SOLANA_PROGRAMS = {
+const NATIVE_SOLANA_PROGRAMS = {
   //Token
   TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA: '',
   '11111111111111111111111111111111': '',

@@ -6,7 +6,6 @@ import Head from 'next/head'
 import Script from 'next/script'
 import { useRouter } from 'next/router'
 import { GatewayProvider } from '@components/Gateway/GatewayProvider'
-import { usePrevious } from '@hooks/usePrevious'
 import { useVotingPlugins } from '@hooks/useVotingPlugins'
 import { VSR_PLUGIN_PKS } from '@constants/plugins'
 import ErrorBoundary from '@components/ErrorBoundary'
@@ -17,10 +16,7 @@ import PageBodyContainer from '@components/PageBodyContainer'
 import tokenPriceService from '@utils/services/tokenPrice'
 import TransactionLoader from '@components/TransactionLoader'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useMembers from '@components/Members/useMembers'
 import useRealm from '@hooks/useRealm'
-import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import NftVotingCountingModal from '@components/NftVotingCountingModal'
 import { getResourcePathPart } from '@tools/core/resources'
@@ -101,16 +97,10 @@ export function AppContents(props: Props) {
   handleRouterHistory()
   useVotingPlugins()
   useHandleGovernanceAssetsStore()
-  useMembers()
   useEffect(() => {
     tokenPriceService.fetchSolanaTokenList()
   }, [])
-  const { governedTokenAccounts } = useGovernanceAssets()
-  const possibleNftsAccounts = useMemo(
-    () => governedTokenAccounts.filter((x) => x.isSol || x.isNft),
-    [governedTokenAccounts]
-  )
-  const { getNfts } = useTreasuryAccountStore()
+
   const { getOwnedDeposits, resetDepositState } = useDepositStore()
 
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
@@ -121,9 +111,7 @@ export function AppContents(props: Props) {
   const wallet = useWalletOnePointOh()
   const connection = useLegacyConnectionContext()
   const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
-  const prevStringifyPossibleNftsAccounts = usePrevious(
-    JSON.stringify(possibleNftsAccounts)
-  )
+
   const router = useRouter()
   const { cluster, symbol } = router.query
   const updateSerumGovAccounts = useSerumGovStore(
@@ -174,22 +162,6 @@ export function AppContents(props: Props) {
     resetDepositState,
     vsrClient,
     wallet?.connected,
-  ])
-
-  useEffect(() => {
-    if (
-      prevStringifyPossibleNftsAccounts !==
-        JSON.stringify(possibleNftsAccounts) &&
-      realm?.pubkey
-    ) {
-      getNfts(possibleNftsAccounts, connection)
-    }
-  }, [
-    connection,
-    getNfts,
-    possibleNftsAccounts,
-    prevStringifyPossibleNftsAccounts,
-    realm?.pubkey,
   ])
 
   useEffect(() => {

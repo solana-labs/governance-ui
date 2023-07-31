@@ -2,6 +2,7 @@ import Loading from '@components/Loading'
 import { fetchMintInfoByPubkey } from '@hooks/queries/mintInfo'
 import {
   AccountMetaData,
+  CastVoteArgs,
   DepositGoverningTokensArgs,
   deserializeBorsh,
   getGovernance,
@@ -80,6 +81,8 @@ export const GOVERNANCE_INSTRUCTIONS = {
           connection,
           realm.owner
         )
+
+        //accounts[2] is token account not mint account
         const mintInfoQuery = await fetchMintInfoByPubkey(
           connection,
           accounts[2].pubkey
@@ -90,7 +93,11 @@ export const GOVERNANCE_INSTRUCTIONS = {
           DepositGoverningTokensArgs,
           Buffer.from(data)
         ) as DepositGoverningTokensArgs
-
+        console.log(
+          args.amount,
+          mintInfoQuery?.result,
+          accounts[2].pubkey.toBase58()
+        )
         return (
           <>
             <p>
@@ -463,6 +470,42 @@ export const GOVERNANCE_INSTRUCTIONS = {
               {`action:
                ${SetRealmAuthorityAction[args.action!]}`}
             </p>
+          </>
+        )
+      },
+    },
+    13: {
+      name: 'Cast Vote',
+      accounts: [],
+      getDataUI: async (
+        connection: Connection,
+        data: Uint8Array,
+        accounts: AccountMetaData[]
+      ) => {
+        const realm = await getRealm(connection, accounts[0].pubkey)
+        const programVersion = await getGovernanceProgramVersion(
+          connection,
+          realm.owner
+        )
+
+        const args = deserializeBorsh(
+          getGovernanceInstructionSchema(programVersion),
+          CastVoteArgs,
+          Buffer.from(data)
+        ) as CastVoteArgs
+        return (
+          <>
+            <div>{args.vote?.deny ? 'Cast No Vote' : 'Cast Yes Vote'}</div>
+            <div className="pt-4">
+              <a
+                className="underline"
+                target="_blank"
+                rel="noreferrer"
+                href={`https://app.realms.today/dao/${accounts[0].pubkey.toBase58()}/proposal/${accounts[2].pubkey.toBase58()}`}
+              >
+                Proposal link
+              </a>
+            </div>
           </>
         )
       },

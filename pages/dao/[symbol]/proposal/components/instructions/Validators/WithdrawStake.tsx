@@ -147,7 +147,7 @@ const WithdrawValidatorStake = ({
     const schema = yup.object().shape({
       amount: yup
         .number()
-        .min(1, 'Amount must be positive number')
+        .min(0.001, 'Amount must be positive number')
         .required('Amount is required'),
     })
     const { isValid, validationErrors } = await isFormValid(schema, form)
