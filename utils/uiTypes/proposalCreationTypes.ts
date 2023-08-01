@@ -415,6 +415,7 @@ export enum Instructions {
   DualFinanceLiquidityStakingOption,
   DualFinanceInitStrike,
   DualFinanceStakingOption,
+  DualFinanceLockupStakingOption,
   DualFinanceWithdraw,
   DualFinanceDelegate,
   DualFinanceDelegateWithdraw,
@@ -567,6 +568,19 @@ export interface DualFinanceStakingOptionForm {
   quoteTreasury: AssetAccount | undefined
   payer: AssetAccount | undefined
   userPk: string | undefined
+}
+
+export interface DualFinanceLockupStakingOptionForm {
+  strike: number
+  soName: string | undefined
+  optionExpirationUnixSeconds: number
+  numTokens: number
+  lotSize: number
+  subscriptionPeriodEnd: number
+  lockupRatio: number
+  baseTreasury: AssetAccount | undefined
+  quoteTreasury: AssetAccount | undefined
+  payer: AssetAccount | undefined
 }
 
 export interface DualFinanceLiquidityStakingOptionForm {

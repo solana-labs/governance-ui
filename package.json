@@ -42,6 +42,7 @@
     "@dialectlabs/react-sdk-blockchain-solana": "1.0.0-beta.3",
     "@dialectlabs/react-ui": "1.1.0-beta.5",
     "@dual-finance/airdrop": "0.2.2",
+    "@dual-finance/gso": "0.0.14",
     "@dual-finance/staking-options": "0.0.21",
     "@emotion/react": "11.9.0",
     "@emotion/styled": "11.8.1",

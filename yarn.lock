@@ -870,10 +870,31 @@
     "@solana/web3.js" "^1.73.2"
     js-sha3 "^0.8.0"
 
+"@dual-finance/gso@0.0.14":
+  version "0.0.14"
+  resolved "https://registry.yarnpkg.com/@dual-finance/gso/-/gso-0.0.14.tgz#48990ae01295453d4428f6dbea2b83e73d0d9232"
+  integrity sha512-DjnP/VkT64oNaiyyHrtzwuCe4jEiFkt+9XTfJeLs88TmyUPULel/xmt4PQP2gzjCFrKcj160C+Sb7Q3SjaQB4w==
+  dependencies:
+    "@dual-finance/staking-options" "^0.0.17"
+    "@project-serum/anchor" "^0.25.0"
+    "@project-serum/associated-token" "^0.1.1"
+    "@solana/spl-token" "^0.3.6"
+    "@solana/web3.js" "^1.66.2"
+    dotenv "^16.0.3"
+
 "@dual-finance/staking-options@0.0.21":
   version "0.0.21"
   resolved "https://registry.yarnpkg.com/@dual-finance/staking-options/-/staking-options-0.0.21.tgz#618a5633e22ab6078808abbe669eaf65e899d463"
   integrity sha512-6XmpavPwalguOx1mDXB5XeJY1o+QyDFrdqJOlkXktpAeIzml/esm1sDrLQU8tb8RiwV6jUDV0pFUrZyrI5cQtw==
+  dependencies:
+    "@project-serum/anchor" "^0.25.0"
+    "@solana/spl-token" "^0.3.6"
+    "@solana/web3.js" "^1.66.2"
+
+"@dual-finance/staking-options@^0.0.17":
+  version "0.0.17"
+  resolved "https://registry.yarnpkg.com/@dual-finance/staking-options/-/staking-options-0.0.17.tgz#e56f7eb8be7d1364ac7fac6e0d0e8b79cab833cf"
+  integrity sha512-ecpHUGjENVUUZJfAtclec5MQU0KwLc6y/1taMxIkk36dAcsV2431kOLayHYRfRFaBph6lVGDzj+OfJHYhsFKEQ==
   dependencies:
     "@project-serum/anchor" "^0.25.0"
     "@solana/spl-token" "^0.3.6"

@@ -138,6 +138,7 @@ import IdlSetBuffer from './components/instructions/Mango/MangoV4/IdlSetBuffer'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { usePrevious } from '@hooks/usePrevious'
 import DualVote from './components/instructions/Dual/DualVote'
+import LockupStakingOption from './components/instructions/Dual/LockupStakingOption'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -423,6 +424,7 @@ const New = () => {
       [Instructions.DepositIntoCastle]: CastleDeposit,
       [Instructions.DualFinanceAirdrop]: DualAirdrop,
       [Instructions.DualFinanceStakingOption]: StakingOption,
+      [Instructions.DualFinanceLockupStakingOption]: LockupStakingOption,
       [Instructions.DualFinanceInitStrike]: InitStrike,
       [Instructions.DualFinanceLiquidityStakingOption]: LiquidityStakingOption,
       [Instructions.DualFinanceWithdraw]: DualWithdraw,

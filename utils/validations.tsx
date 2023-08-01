@@ -653,6 +653,23 @@ export const getDualFinanceStakingOptionSchema = () => {
   })
 }
 
+export const getDualFinanceLockupStakingOptionSchema = () => {
+  return yup.object().shape({
+    soName: yup.string().required('Staking option name is required'),
+    optionExpirationUnixSeconds: yup
+      .number()
+      .typeError('Expiration is required'),
+    numTokens: yup.number().typeError('Num tokens is required'),
+    strike: yup.number().typeError('Strike is required'),
+    lotSize: yup.number().typeError('lotSize is required'),
+    baseTreasury: yup.object().typeError('baseTreasury is required'),
+    quoteTreasury: yup.object().typeError('quoteTreasury is required'),
+    payer: yup.object().typeError('payer is required'),
+    subscriptionPeriodEnd: yup.number().typeError('Subscription Period is required'),
+    lockupRatio: yup.number().typeError('Lockup Ratio is required'),
+  })
+}
+
 export const getDualFinanceInitStrikeSchema = () => {
   return yup.object().shape({
     soName: yup.string().required('Staking option name is required'),
