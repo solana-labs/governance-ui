@@ -1,7 +1,7 @@
 import React from 'react'
 import useRealm from '@hooks/useRealm'
 import { useRouter } from 'next/router'
-import { default as VoteStakeRegistryAccount } from 'VoteStakeRegistry/components/Account/Account'
+import { default as VoteStakeRegistryAccount } from '@components/Account'
 import LockTokensAccount from 'VoteStakeRegistry/components/Account/LockTokensAccount'
 import { LockTokensAccount as HeliumLockTokensAccount } from 'HeliumVotePlugin/components/LockTokensAccount'
 
