@@ -36,7 +36,7 @@
     "@castlefinance/vault-core": "0.1.3",
     "@castlefinance/vault-sdk": "3.6.2",
     "@civic/profile": "0.1.2",
-    "@civic/solana-gateway-react": "0.11.0",
+    "@civic/solana-gateway-react": "0.15.0",
     "@coral-xyz/anchor": "0.26.0",
     "@coral-xyz/borsh": "0.26.0",
     "@dialectlabs/react-sdk-blockchain-solana": "1.0.0-beta.3",
