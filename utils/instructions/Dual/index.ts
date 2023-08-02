@@ -239,10 +239,10 @@ export async function getConfigInstruction({
       serializedInstruction,
       isValid: true,
       prerequisiteInstructions: prerequisiteInstructions,
-      prerequisiteInstructionsSigners: [helperTokenAccount, null],
+      prerequisiteInstructionsSigners: [helperTokenAccount],
       governance: form.baseTreasury?.governance,
       additionalSerializedInstructions,
-      chunkBy: 2,
+      chunkBy: 1,
     }
   }
 
