@@ -31,7 +31,7 @@ export interface InstructionDataWithHoldUpTime {
   prerequisiteInstructions: TransactionInstruction[]
   chunkBy?: number
   signers?: Keypair[]
-  prerequisiteInstructionsSigners?: Keypair[]
+  prerequisiteInstructionsSigners?: (Keypair | null)[]
 }
 
 export class InstructionDataWithHoldUpTime {
@@ -75,7 +75,7 @@ export const createProposal = async (
   const signatory = walletPubkey
   const payer = walletPubkey
   const prerequisiteInstructions: TransactionInstruction[] = []
-  const prerequisiteInstructionsSigners: Keypair[] = []
+  const prerequisiteInstructionsSigners: (Keypair | null)[] = []
   // sum up signers
   const signers: Keypair[] = instructionsData.flatMap((x) => x.signers ?? [])
 
@@ -203,14 +203,24 @@ export const createProposal = async (
     deduplicateObjsFilter
   )
 
+  const prerequisiteInstructionsChunks = chunks(
+    deduplicatedPrerequisiteInstructions,
+    lowestChunkBy
+  )
+
+  const prerequisiteInstructionsSignersChunks = chunks(
+    deduplicatedPrerequisiteInstructionsSigners,
+    lowestChunkBy
+  ).filter((keypairArray) => keypairArray.filter((keypair) => keypair))
+
   const signersSet = [
-    ...chunks([...deduplicatedPrerequisiteInstructionsSigners], lowestChunkBy),
+    ...prerequisiteInstructionsSignersChunks,
     [],
     ...signerChunks,
   ]
 
   const txes = [
-    ...chunks(deduplicatedPrerequisiteInstructions, lowestChunkBy),
+    ...prerequisiteInstructionsChunks,
     instructions,
     ...insertChunks,
   ].map((txBatch, batchIdx) => {
