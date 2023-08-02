@@ -198,6 +198,7 @@ const SendNft = ({
         voteByCouncil,
         instructionsData,
         governance: selectedGovernance,
+        utilizeLookupTable: true,
       })
       const url = fmtUrlWithCluster(
         `/dao/${router.query.symbol}/proposal/${proposalAddress}`

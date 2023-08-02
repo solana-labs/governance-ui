@@ -57,7 +57,7 @@ export const buildTransferCnftInstruction = async (
       }))
       .slice(0, assetProof.proof.length - (canopyDepth ? canopyDepth : 0))
 
-    return createTransferInstruction(
+    const ix = createTransferInstruction(
       {
         merkleTree: treeAddress,
         treeAuthority,
@@ -81,5 +81,13 @@ export const buildTransferCnftInstruction = async (
       },
       BUBBLEGUM_PROGRAM_ID
     )
+    ix.keys.forEach((x) => {
+      if (x.pubkey.equals(leafDelegate)) {
+        x.isSigner = true
+      }
+    })
+    console.log('cnft ix', ix)
+
+    return ix
   }
 }
