@@ -252,6 +252,11 @@ export const ACCOUNT_NAMES = {
   'G6yWqM2RVjhepkVEayeNVqgKNtpMuwtgqDY3s2N3uzas': 'Marinade Referral v1 Program Governance',
   '6XQFdWeogb5C8c1KsSCkK6rzzxLxzxsPQqoXge9oJ9xR': 'Marinade Referral v2 Program Governance',
   '2aQP7NGhktKR92EsHKSoRzcw5FfcZ8oBWgyoGdB3ouww': 'Marinade Directed Stake Program Governance',
+  'A8tioq6Joznftd2b6GLY8rrgCka6F81vVztFciWDxEAe': 'Marinade Council Budget Governance',
+  'J5BEceL5z1EQ7JBqEFu4BfPN4PYCeQaW3GXrzXFfCzhs': 'Marinade Council Budget Wallet',
+  'H988v6sNu4dw911AeUo6fy5RsTkDtyfcTAMNpdq1Mo6u': 'Marinade Council Budget MNDE Vault',
+  '2w6ny74cU6yRxkD6ZACh5M1JznLQ1KB6AUsB7zo2NBHX': 'Marinade Voter Stake Registry Program Governance',
+  '6egAu2HDLcSgeUYmiBvNLgp7Bd4nPk16gX9MvWuJpeX2': 'Marinade SPL Program Governance',
 }
 
 // TODO: Add this to on-chain metadata to Governance account

@@ -2,7 +2,7 @@ import { tryParseDomain } from '@tools/validators/pubkey'
 
 describe('Public Key Resolves ', () => {
   const domain = 'realms.sol'
-  const pubkey = '33m47vH6Eav6jr5Ry86XjhRft2jRBLDnDgPSHoquXi2Z'
+  const pubkey = '8aHFSYp3K2X2qEfUqQhfCuCHvjDumdiMzfCyrJhdJxmQ'
 
   test('domains to publicKey', async () => {
     const resolvedKey = await tryParseDomain(domain)
