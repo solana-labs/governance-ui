@@ -394,6 +394,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Dual,
     },
+    [Instructions.DualFinanceGsoWithdraw]: {
+      name: 'GSO Withdraw',
+      isVisible: canUseTransferInstruction,
+      packageId: PackageEnum.Dual,
+    },
     [Instructions.DualFinanceWithdraw]: {
       name: 'Withdraw',
       isVisible: canUseTransferInstruction,

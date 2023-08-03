@@ -416,6 +416,7 @@ export enum Instructions {
   DualFinanceInitStrike,
   DualFinanceStakingOption,
   DualFinanceLockupStakingOption,
+  DualFinanceGsoWithdraw,
   DualFinanceWithdraw,
   DualFinanceDelegate,
   DualFinanceDelegateWithdraw,
