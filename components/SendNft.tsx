@@ -105,6 +105,7 @@ const SendNft = ({
 
     setIsLoading(true)
 
+    let anyCompressed = false
     const instructions = await Promise.all(
       selectedNfts.map(async (nftMint) => {
         const network = getNetworkFromEndpoint(connection.rpcEndpoint)
@@ -113,6 +114,7 @@ const SendNft = ({
         if (nft === undefined) throw new Error('nft not found')
 
         if (nft.compression?.compressed) {
+          anyCompressed = true
           const ix = await buildTransferCnftInstruction(
             connection,
             nftMint,
@@ -198,7 +200,7 @@ const SendNft = ({
         voteByCouncil,
         instructionsData,
         governance: selectedGovernance,
-        utilizeLookupTable: true,
+        utilizeLookupTable: anyCompressed,
       })
       const url = fmtUrlWithCluster(
         `/dao/${router.query.symbol}/proposal/${proposalAddress}`

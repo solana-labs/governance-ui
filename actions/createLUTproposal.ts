@@ -62,6 +62,8 @@ export class InstructionDataWithHoldUpTime {
   }
 }
 
+/** This is a modified version of createProposal that makes a lookup table, which is useful for especially large instructions */
+// TODO make a more generic, less redundant solution
 export const createLUTProposal = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
   realm: ProgramAccount<Realm>,
@@ -272,6 +274,7 @@ export const createLUTProposal = async (
     resolve = r
   })
 
+  // TODO merge all into one call of sendSignAndConfirmTransactions, so the user only signs once
   await sendSignAndConfirmTransactions({
     connection,
     wallet,
