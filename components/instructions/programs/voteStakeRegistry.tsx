@@ -1,9 +1,9 @@
-import { Wallet } from '@marinade.finance/marinade-ts-sdk'
 import {
   AnchorProvider,
   BN,
   BorshInstructionCoder,
   IdlTypes,
+  Wallet,
 } from '@coral-xyz/anchor'
 import { AccountMetaData } from '@solana/spl-governance'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'

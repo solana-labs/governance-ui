@@ -1,33 +1,38 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useContext, useEffect, useState } from 'react'
-import { PublicKey, SYSVAR_RENT_PUBKEY } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { Governance, SYSTEM_PROGRAM_ID } from '@solana/spl-governance'
+import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, { InstructionInput } from '../../FormCreator'
 import { InstructionInputType } from '../../inputInstructionType'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  TOKEN_PROGRAM_ID,
+  Token,
+} from '@solana/spl-token'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 type NamePkVal = {
   name: string
   value: PublicKey
 }
 
-interface TokenAddBankForm {
+interface AdminTokenWithdrawTokenFeesForm {
   governedAccount: AssetAccount | null
   token: null | NamePkVal
   holdupTime: number
 }
 
-const TokenAddBank = ({
+const AdminTokenWithdrawTokenFees = ({
   index,
   governance,
 }: {
@@ -35,17 +40,18 @@ const TokenAddBank = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletOnePointOh()
-  const { mangoGroup, mangoClient } = UseMangoV4()
+  const { mangoClient, mangoGroup } = UseMangoV4()
   const { assetAccounts } = useGovernanceAssets()
+  const { connection } = useConnection()
   const solAccounts = assetAccounts.filter(
     (x) =>
       x.type === AccountType.SOL &&
       mangoGroup?.admin &&
       x.extensions.transferAddress?.equals(mangoGroup.admin)
   )
-  const [tokens, setTokens] = useState<NamePkVal[]>([])
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const [form, setForm] = useState<TokenAddBankForm>({
+  const [tokens, setTokens] = useState<NamePkVal[]>([])
+  const [form, setForm] = useState<AdminTokenWithdrawTokenFeesForm>({
     governedAccount: null,
     token: null,
     holdupTime: 0,
@@ -61,37 +67,54 @@ const TokenAddBank = ({
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
+    const prerequisiteInstructions: TransactionInstruction[] = []
     if (
       isValid &&
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const token = mangoGroup!.banksMapByMint.get(
+      const bank = mangoGroup!.banksMapByMint.get(
         form.token!.value.toBase58()
       )![0]
-      const mintInfo = mangoGroup!.mintInfosMapByTokenIndex.get(
-        token.tokenIndex
+      const ataAddress = await Token.getAssociatedTokenAddress(
+        ASSOCIATED_TOKEN_PROGRAM_ID,
+        TOKEN_PROGRAM_ID,
+        bank.mint,
+        form.governedAccount.extensions.transferAddress!,
+        true
       )
-      const banks = mangoGroup!.banksMapByTokenIndex.get(token.tokenIndex)
+
+      const depositAccountInfo = await connection.getAccountInfo(ataAddress)
+      if (!depositAccountInfo) {
+        // generate the instruction for creating the ATA
+        prerequisiteInstructions.push(
+          Token.createAssociatedTokenAccountInstruction(
+            ASSOCIATED_TOKEN_PROGRAM_ID,
+            TOKEN_PROGRAM_ID,
+            bank.mint,
+            ataAddress,
+            form.governedAccount.extensions.transferAddress!,
+            form.governedAccount.extensions.transferAddress!
+          )
+        )
+      }
+
       const ix = await mangoClient!.program.methods
-        .tokenAddBank(Number(token.tokenIndex), Number(banks!.length))
+        .admingTokenWithdrawFees()
         .accounts({
           group: mangoGroup!.publicKey,
           admin: form.governedAccount.extensions.transferAddress,
-          mint: token.mint,
-          payer: form.governedAccount.extensions.transferAddress,
-          rent: SYSVAR_RENT_PUBKEY,
           tokenProgram: TOKEN_PROGRAM_ID,
-          systemProgram: SYSTEM_PROGRAM_ID,
-          existingBank: banks![banks!.length - 1].publicKey,
-          mintInfo: mintInfo!.publicKey,
-          vault: token.vault,
+          bank: bank.publicKey,
+          vault: bank.vault,
+          tokenAccount: ataAddress,
         })
         .instruction()
 
       serializedInstruction = serializeInstructionToBase64(ix)
     }
     const obj: UiInstruction = {
+      prerequisiteInstructions,
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
@@ -99,14 +122,6 @@ const TokenAddBank = ({
     }
     return obj
   }
-
-  useEffect(() => {
-    handleSetInstructions(
-      { governedAccount: form.governedAccount?.governance, getInstruction },
-      index
-    )
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form])
 
   useEffect(() => {
     const getTokens = async () => {
@@ -123,6 +138,13 @@ const TokenAddBank = ({
     }
   }, [mangoGroup])
 
+  useEffect(() => {
+    handleSetInstructions(
+      { governedAccount: form.governedAccount?.governance, getInstruction },
+      index
+    )
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+  }, [form])
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
@@ -140,18 +162,18 @@ const TokenAddBank = ({
       options: solAccounts,
     },
     {
-      label: 'Instruction hold up time (days)',
-      initialValue: form.holdupTime,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'holdupTime',
-    },
-    {
       label: 'Token',
       name: 'token',
       type: InstructionInputType.SELECT,
       initialValue: form.token,
       options: tokens,
+    },
+    {
+      label: 'Instruction hold up time (days)',
+      initialValue: form.holdupTime,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'holdupTime',
     },
   ]
 
@@ -170,4 +192,4 @@ const TokenAddBank = ({
   )
 }
 
-export default TokenAddBank
+export default AdminTokenWithdrawTokenFees

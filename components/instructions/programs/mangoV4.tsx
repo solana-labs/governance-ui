@@ -4,8 +4,12 @@ import {
   toUiDecimals,
 } from '@blockworks-foundation/mango-v4'
 import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
-import { AnchorProvider, BN, BorshInstructionCoder } from '@coral-xyz/anchor'
-import { Wallet } from '@marinade.finance/marinade-ts-sdk'
+import {
+  AnchorProvider,
+  BN,
+  BorshInstructionCoder,
+  Wallet,
+} from '@coral-xyz/anchor'
 import { AccountMetaData } from '@solana/spl-governance'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import {

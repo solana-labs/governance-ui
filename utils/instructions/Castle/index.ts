@@ -4,8 +4,7 @@ import {
   Clusters,
 } from '@castlefinance/vault-core'
 import { VaultClient } from '@castlefinance/vault-sdk'
-import { AnchorProvider, BN } from '@coral-xyz/anchor'
-import { AnchorWallet } from '@friktion-labs/friktion-sdk/dist/cjs/src/miscUtils'
+import { AnchorProvider, BN, Wallet } from '@coral-xyz/anchor'
 import {
   serializeInstructionToBase64,
   ProposalTransaction,
@@ -303,7 +302,7 @@ const getCastleVaultClientFromForm = async (
   // Create a new provider
   const provider = new AnchorProvider(
     connection.current,
-    (wallet as unknown) as AnchorWallet,
+    (wallet as unknown) as Wallet,
     {
       preflightCommitment: 'confirmed',
       commitment: 'confirmed',
@@ -350,7 +349,7 @@ const getCastleVaultClientFromProposal = async (
   // Create a new provider
   const provider = new AnchorProvider(
     connection,
-    (wallet as unknown) as AnchorWallet,
+    (wallet as unknown) as Wallet,
     {
       preflightCommitment: 'confirmed',
       commitment: 'confirmed',
