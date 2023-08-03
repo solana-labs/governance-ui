@@ -149,6 +149,15 @@ const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
 })
 
+const multiChoiceSchema = yup.object().shape({
+  governedAccount: yup
+  .object()
+  .nullable()
+  .required('Governed account is required'),
+
+  options: yup.array().of(yup.string().required('Option cannot be empty'))
+});
+
 const defaultGovernanceCtx: InstructionsContext = {
   instructionsData: [],
   voteByCouncil: null,
@@ -199,10 +208,8 @@ const New = () => {
     governedAccount: undefined,
     options: ['', '']
   });
-
   const [formErrors, setFormErrors] = useState({})
   const [multiFormErrors, setMultiFormErrors] = useState({})
-
   const [
     governance,
     setGovernance,
@@ -211,35 +218,12 @@ const New = () => {
   const [isLoadingDraft, setIsLoadingDraft] = useState(false)
   const [isMulti, setIsMulti] = useState<boolean>(false);
   const [isMultiFormValidated, setIsMultiFormValidated] = useState(false);
-  const [maxOptionLength, setMaxOptionLength] = useState(0);
   const [hideNotaButton, setHideNotaButton] = useState(false);
   const isLoading = isLoadingSignedProposal || isLoadingDraft
 
   const [instructionsData, setInstructions] = useState<
     ComponentInstructionData[]
   >([{ type: undefined }])
-
-  const multiChoiceSchema = useMemo(() => yup.object().shape({
-    governedAccount: yup
-    .object()
-    .nullable()
-    .required('Governed account is required'),
-  
-    options: yup.array().of(yup.string().required('Option cannot be empty').max(maxOptionLength))
-  }), [maxOptionLength]);
-
-  const handleOptionLength = () => {
-    // All Options + Title + Description
-    const MAX_LENGTH = 614;
-
-    const formDetailsLength = new TextEncoder().encode(form.title).length + 
-    new TextEncoder().encode(form.description).length;
-    
-    setMaxOptionLength(
-      Math.floor((MAX_LENGTH - formDetailsLength) / multiChoiceForm.options.length)
-    );
-    
-  }
 
   const handleSetInstructions = useCallback((val: any, index) => {
     setInstructions((prevInstructions) => {
@@ -252,13 +236,11 @@ const New = () => {
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
-    handleOptionLength()
   }
 
   const handleMultiForm = ({ propertyName, value }) => {
     setMultiFormErrors({})
     setMultiChoiceForm({ ...multiChoiceForm, [propertyName]: value })
-    handleOptionLength()
   }
 
   const handleNotaButton = () => {
@@ -275,27 +257,24 @@ const New = () => {
   const updateOptions = (odx: number, value: string, addOption: boolean)  => {
     const updatedOptions = multiChoiceForm.options;
     const nota = "None of the Above";
+    const len = updatedOptions.length-1;
 
     if (addOption) {
-      if (odx === -1) {
-        // add another voting choice button is clicked
+      if (odx === -1) { // 'add another voting choice' button is clicked
         if (updatedOptions.length > 9) {
           return;
         }
-        const len = updatedOptions.length-1;
-
         if (updatedOptions[len] === nota) {
-          // insert option at second last position if NOTA
+          // insert new empty option at the second last position if NOTA exists
           updatedOptions.splice(len, 0, value);
         } else {
-          // insert option at last position if not NOTA
+          // insert new empty option at the last position if not NOTA not exists
           updatedOptions.push(value);
         }
       } else {
         // Update the option if exists
         updatedOptions[odx] = value;
       }
-
       handleMultiForm({value: updatedOptions, propertyName: "options"});
     } else {
       if (value === nota) {
@@ -303,7 +282,6 @@ const New = () => {
       }
       handleMultiForm({value: updatedOptions.filter((_option, index) => index !== odx), propertyName: "options"});
     }
-
   }
 
   const setInstructionType = useCallback(
@@ -373,8 +351,6 @@ const New = () => {
 
     if (isValid && instructions.every((x: UiInstruction) => x.isValid)) {
       if (isMulti) {
-        handleOptionLength()
-
         const { isValid: isMultiFormValid, validationErrors: multiValidationErrors }: formValidation = await isFormValid(
           multiChoiceSchema,
           multiChoiceForm
@@ -772,16 +748,6 @@ const New = () => {
                 }}
               ></VoteBySwitch>
             )}
-            {/* <div className='mt-5 max-w-lg w-full flex flex-col'>
-              <StyledLabel>
-                What type of proposal are you creating?
-              </StyledLabel>
-              <div className='text-sm font-extralight text-fgd-3 mt-1'>
-                In addition to creating a proposal with Yes/No choices, you may create polls with 
-                several voting options. Note that these multiple choice polls cannot have actions 
-                and are therefore non-executable.
-              </div>
-            </div> */}
             <div className="max-w-lg w-full mb-4 flex flex-wrap justify-between items-end">
               <ProposalTypeRadioButton
                 onClick={() => setIsMulti(false)}
@@ -791,7 +757,7 @@ const New = () => {
               >
                 Executable
               </ProposalTypeRadioButton>
-              <div className="flex flex-col items-center justify-between">
+              <div className="flex flex-col items-center justify-evenly">
                 <div className="bg-[#10B981] text-black flex flex-row gap-2 text-sm 
                 items-center px-2 py-1 rounded-md mb-2 w-60">
                   <TableOfContents />
@@ -823,10 +789,6 @@ const New = () => {
                   governance={multiChoiceForm.governedAccount?.governance}
                 />
                 <h2 className='mt-8'>Add Choices</h2>
-                {/* <div className='text-sm font-extralight text-fgd-3 mt-1 max-w-lg'>
-                  For all proposals, Realms auto-generates a voting option for “none of the above”, 
-                  which will display below the last option added by the proposal creator.
-                </div> */}
                 {multiChoiceForm.options.map((option, index) => {
                   // copy index to keep its value for onChange function
                   const odx = index;
@@ -854,12 +816,7 @@ const New = () => {
                       value={option}
                       type="text"
                       error={
-                        option.length ?
-                          maxOptionLength < 0 && isMultiFormValidated ? "Title or description length too long" :
-                          option.length <= maxOptionLength ? "" 
-                          : isMultiFormValidated ? `The length must be lower than ${maxOptionLength} characters` : ""
-                        : 
-                          isMultiFormValidated ? "The option can't be empty" : ""
+                        !option.length && isMultiFormValidated ? "The option can't be empty" : ""
                       }
                       showErrorState={option.length === 0 && isMultiFormValidated}
                       onChange={(event) => updateOptions(odx, event.target.value, true)}
