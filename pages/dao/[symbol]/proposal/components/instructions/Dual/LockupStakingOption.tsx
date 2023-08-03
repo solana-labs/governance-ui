@@ -177,7 +177,7 @@ const LockupStakingOption = ({
       <Tooltip content="Lockup Ratio for GSO. This determines how many tokens are needed to earn an option.">
         <Input
           label="Lockup Ratio"
-          value={form.lotSize}
+          value={form.lockupRatio}
           type="number"
           onChange={(evt) =>
             handleSetForm({

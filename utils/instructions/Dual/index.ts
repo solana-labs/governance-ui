@@ -290,7 +290,6 @@ export async function getConfigGsoInstruction({
     form.payer &&
     wallet?.publicKey
   ) {
-    const so = getStakingOptionsApi(connection)
     const baseMint = form.baseTreasury.extensions.mint?.publicKey
     const space = 165
     const rent = await connection.current.getMinimumBalanceForRentExemption(
@@ -382,17 +381,6 @@ export async function getConfigGsoInstruction({
 
     additionalSerializedInstructions.push(
       serializeInstructionToBase64(configInstruction)
-    )
-
-    const initStrikeInstruction = await so.createInitStrikeInstruction(
-      new BN(form.strike),
-      form.soName,
-      //authority sol wallet
-      form.payer.extensions.transferAddress!,
-      baseMint
-    )
-    additionalSerializedInstructions.push(
-      serializeInstructionToBase64(initStrikeInstruction)
     )
 
     const nameInstruction = await gso.createNameTokensInstruction(
