@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useContext, useEffect, useState } from 'react'
-import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid, validatePubkey } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
@@ -14,15 +13,26 @@ import InstructionForm, { InstructionInput } from '../../FormCreator'
 import { InstructionInputType } from '../../inputInstructionType'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  TOKEN_PROGRAM_ID,
+  Token,
+} from '@solana/spl-token'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { useConnection } from '@solana/wallet-adapter-react'
 
-interface AltSetForm {
+type NamePkVal = {
+  name: string
+  value: PublicKey
+}
+
+interface AdminTokenWithdrawTokenFeesForm {
   governedAccount: AssetAccount | null
-  index: number
-  addressLookupTable: string
+  token: null | NamePkVal
   holdupTime: number
 }
 
-const AltSet = ({
+const AdminTokenWithdrawTokenFees = ({
   index,
   governance,
 }: {
@@ -32,6 +42,7 @@ const AltSet = ({
   const wallet = useWalletOnePointOh()
   const { mangoClient, mangoGroup } = UseMangoV4()
   const { assetAccounts } = useGovernanceAssets()
+  const { connection } = useConnection()
   const solAccounts = assetAccounts.filter(
     (x) =>
       x.type === AccountType.SOL &&
@@ -39,10 +50,10 @@ const AltSet = ({
       x.extensions.transferAddress?.equals(mangoGroup.admin)
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const [form, setForm] = useState<AltSetForm>({
+  const [tokens, setTokens] = useState<NamePkVal[]>([])
+  const [form, setForm] = useState<AdminTokenWithdrawTokenFeesForm>({
     governedAccount: null,
-    addressLookupTable: '',
-    index: 0,
+    token: null,
     holdupTime: 0,
   })
   const [formErrors, setFormErrors] = useState({})
@@ -56,23 +67,54 @@ const AltSet = ({
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
+    const prerequisiteInstructions: TransactionInstruction[] = []
     if (
       isValid &&
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
+      const bank = mangoGroup!.banksMapByMint.get(
+        form.token!.value.toBase58()
+      )![0]
+      const ataAddress = await Token.getAssociatedTokenAddress(
+        ASSOCIATED_TOKEN_PROGRAM_ID,
+        TOKEN_PROGRAM_ID,
+        bank.mint,
+        form.governedAccount.extensions.transferAddress!,
+        true
+      )
+
+      const depositAccountInfo = await connection.getAccountInfo(ataAddress)
+      if (!depositAccountInfo) {
+        // generate the instruction for creating the ATA
+        prerequisiteInstructions.push(
+          Token.createAssociatedTokenAccountInstruction(
+            ASSOCIATED_TOKEN_PROGRAM_ID,
+            TOKEN_PROGRAM_ID,
+            bank.mint,
+            ataAddress,
+            form.governedAccount.extensions.transferAddress!,
+            form.governedAccount.extensions.transferAddress!
+          )
+        )
+      }
+
       const ix = await mangoClient!.program.methods
-        .altSet(Number(form.index))
+        .admingTokenWithdrawFees()
         .accounts({
           group: mangoGroup!.publicKey,
           admin: form.governedAccount.extensions.transferAddress,
-          addressLookupTable: new PublicKey(form.addressLookupTable),
+          tokenProgram: TOKEN_PROGRAM_ID,
+          bank: bank.publicKey,
+          vault: bank.vault,
+          tokenAccount: ataAddress,
         })
         .instruction()
 
       serializedInstruction = serializeInstructionToBase64(ix)
     }
     const obj: UiInstruction = {
+      prerequisiteInstructions,
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
@@ -80,6 +122,21 @@ const AltSet = ({
     }
     return obj
   }
+
+  useEffect(() => {
+    const getTokens = async () => {
+      const currentTokens = [...mangoGroup!.banksMapByMint.values()].map(
+        (x) => ({
+          name: x[0].name,
+          value: x[0].mint,
+        })
+      )
+      setTokens(currentTokens)
+    }
+    if (mangoGroup) {
+      getTokens()
+    }
+  }, [mangoGroup])
 
   useEffect(() => {
     handleSetInstructions(
@@ -112,24 +169,18 @@ const AltSet = ({
       options: solAccounts,
     },
     {
+      label: 'Token',
+      name: 'token',
+      type: InstructionInputType.SELECT,
+      initialValue: form.token,
+      options: tokens,
+    },
+    {
       label: 'Instruction hold up time (days)',
       initialValue: form.holdupTime,
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'holdupTime',
-    },
-    {
-      label: 'Address Lookup Table',
-      initialValue: form.addressLookupTable,
-      type: InstructionInputType.INPUT,
-      name: 'addressLookupTable',
-    },
-    {
-      label: 'Index',
-      initialValue: form.index,
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      name: 'index',
     },
   ]
 
@@ -148,4 +199,4 @@ const AltSet = ({
   )
 }
 
-export default AltSet
+export default AdminTokenWithdrawTokenFees

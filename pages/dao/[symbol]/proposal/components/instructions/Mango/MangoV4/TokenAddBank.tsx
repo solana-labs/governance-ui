@@ -147,7 +147,7 @@ const TokenAddBank = ({
       name: 'holdupTime',
     },
     {
-      label: 'Tokens',
+      label: 'Token',
       name: 'token',
       type: InstructionInputType.SELECT,
       initialValue: form.token,

@@ -446,6 +446,7 @@ export enum Instructions {
   MangoV4StubOracleCreate,
   MangoV4StubOracleSet,
   MangoV4TokenAddBank,
+  MangoV4AdminWithdrawTokenFees,
   MeanCreateAccount,
   MeanCreateStream,
   MeanFundAccount,

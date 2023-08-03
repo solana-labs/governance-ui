@@ -213,8 +213,10 @@ const GroupEdit = ({
         feesSwapMangoAccount: mangoGroup!.buybackFeesSwapMangoAccount?.toBase58(),
         feesMngoTokenIndex: mangoGroup!.mngoTokenIndex,
         feesExpiryInterval: mangoGroup!.buybackFeesExpiryInterval?.toNumber(),
-        tokenConditionalSwapTakerFeeFraction: null,
-        tokenConditionalSwapMakerFeeFraction: null,
+        tokenConditionalSwapTakerFeeFraction: mangoGroup!
+          .tokenConditionalSwapTakerFeeFraction,
+        tokenConditionalSwapMakerFeeFraction: mangoGroup!
+          .tokenConditionalSwapMakerFeeFraction,
       }
       setForm((prevForm) => ({
         ...prevForm,
