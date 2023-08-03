@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useContext, useEffect, useState } from 'react'
 import * as yup from 'yup'
-import { isFormValid, validatePubkey } from '@utils/formValidation'
+import { isFormValid } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -150,13 +150,6 @@ const AdminTokenWithdrawTokenFees = ({
       .object()
       .nullable()
       .required('Program governed account is required'),
-    addressLookupTable: yup
-      .string()
-      .required()
-      .test('is-valid-address', 'Please enter a valid PublicKey', (value) =>
-        value ? validatePubkey(value) : true
-      ),
-    index: yup.string().required(),
   })
   const inputs: InstructionInput[] = [
     {
