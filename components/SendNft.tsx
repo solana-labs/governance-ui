@@ -299,6 +299,7 @@ const SendNft = ({
           className="ml-auto"
           onClick={handleProposeNftSend}
           isLoading={isLoading}
+          disabled={selectedNfts.length < 1}
         >
           <Tooltip
             content={
