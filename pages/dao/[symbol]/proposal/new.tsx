@@ -96,6 +96,7 @@ import EditToken from './components/instructions/Mango/MangoV4/EditToken'
 import PerpEdit from './components/instructions/Mango/MangoV4/PerpEdit'
 import GroupEdit from './components/instructions/Mango/MangoV4/GroupEdit'
 import AdminTokenWithdrawFees from './components/instructions/Mango/MangoV4/WithdrawTokenFees'
+import WithdrawPerpFees from './components/instructions/Mango/MangoV4/WithdrawPerpFees'
 import OpenBookRegisterMarket from './components/instructions/Mango/MangoV4/OpenBookRegisterMarket'
 import OpenBookEditMarket from './components/instructions/Mango/MangoV4/OpenBookEditMarket'
 import PerpCreate from './components/instructions/Mango/MangoV4/PerpCreate'
@@ -403,6 +404,7 @@ const New = () => {
       [Instructions.MangoV4TokenEdit]: EditToken,
       [Instructions.MangoV4GroupEdit]: GroupEdit,
       [Instructions.MangoV4AdminWithdrawTokenFees]: AdminTokenWithdrawFees,
+      [Instructions.MangoV4WithdrawPerpFees]: WithdrawPerpFees,
       [Instructions.IdlSetBuffer]: IdlSetBuffer,
       [Instructions.MangoV4OpenBookEditMarket]: OpenBookEditMarket,
       [Instructions.MangoV4IxGateSet]: IxGateSet,
