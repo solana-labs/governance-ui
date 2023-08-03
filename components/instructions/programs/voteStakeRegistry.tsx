@@ -3,7 +3,6 @@ import {
   BN,
   BorshInstructionCoder,
   IdlTypes,
-  Wallet,
 } from '@coral-xyz/anchor'
 import { AccountMetaData } from '@solana/spl-governance'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
@@ -24,6 +23,7 @@ import { PROGRAM_ID as HELIUM_VSR_PROGRAM_ID } from '@helium/voter-stake-registr
 import { fetchTokenAccountByPubkey } from '@hooks/queries/tokenAccount'
 import { fetchMintInfoByPubkey } from '@hooks/queries/mintInfo'
 import { toUiDecimals } from '@blockworks-foundation/mango-v4'
+import EmptyWallet from '@utils/Mango/listingTools'
 
 interface ClawbackInstruction {
   depositEntryIndex: number
@@ -70,7 +70,7 @@ const clawbackIx = (programId: PublicKey) => ({
         const options = AnchorProvider.defaultOptions()
         const provider = new AnchorProvider(
           connection,
-          new Wallet(Keypair.generate()),
+          new EmptyWallet(Keypair.generate()),
           options
         )
         const vsrClient = await VsrClient.connect(provider, programId)
@@ -157,7 +157,7 @@ const deposit = (programId: PublicKey) => ({
       const options = AnchorProvider.defaultOptions()
       const provider = new AnchorProvider(
         connection,
-        new Wallet(Keypair.generate()),
+        new EmptyWallet(Keypair.generate()),
         options
       )
       const vsrClient = await VsrClient.connect(provider, programId)
@@ -184,7 +184,7 @@ const configVotingMintIx = (programId: PublicKey) => ({
         const options = AnchorProvider.defaultOptions()
         const provider = new AnchorProvider(
           connection,
-          new Wallet(Keypair.generate()),
+          new EmptyWallet(Keypair.generate()),
           options
         )
         const vsrClient = await VsrClient.connect(provider, programId)
@@ -265,7 +265,7 @@ const grantIx = (programId: PublicKey) => ({
         const options = AnchorProvider.defaultOptions()
         const provider = new AnchorProvider(
           connection,
-          new Wallet(Keypair.generate()),
+          new EmptyWallet(Keypair.generate()),
           options
         )
         const vsrClient = await VsrClient.connect(provider, programId)
@@ -386,7 +386,7 @@ const heliumConfigVotingMintIx = (programId: PublicKey) => ({
         const options = AnchorProvider.defaultOptions()
         const provider = new AnchorProvider(
           connection,
-          new Wallet(Keypair.generate()),
+          new EmptyWallet(Keypair.generate()),
           options
         )
         const vsrClient = await VsrClient.connect(provider, programId)
