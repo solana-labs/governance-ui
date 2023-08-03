@@ -54,9 +54,7 @@ const GovernancePowerTitle = () => {
   return (
     <div className="flex items-center justify-between mb-4">
       <h3 className="mb-0">My governance power</h3>
-      <Link
-        href={fmtUrlWithCluster(`/dao/${symbol}/account/${tokenOwnerRecordPk}`)}
-      >
+      <Link href={fmtUrlWithCluster(`/dao/${symbol}/account/me`)}>
         <a
           className={`default-transition flex items-center text-fgd-2 text-sm transition-all hover:text-fgd-3 ${
             !connected || !tokenOwnerRecordPk
