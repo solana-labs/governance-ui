@@ -422,7 +422,7 @@ export function useVotingPlugins() {
           ) {
             myNodesForRealm.push(oracle)
             const [p] = sbv2.PermissionAccount.fromSeed(
-              switchboardProgram,
+              switchboardProgram as any,
               queueAuthority,
               queuePk,
               oracle
@@ -431,7 +431,7 @@ export function useVotingPlugins() {
             const ix = await p.setVoterWeightTx({
               govProgram: realm.owner,
               pubkeySigner: wallet.publicKey,
-              addinProgram: addinProgram,
+              addinProgram: addinProgram as any,
               realm: realm.pubkey,
             })
 
@@ -449,9 +449,7 @@ export function useVotingPlugins() {
       )
 
       try {
-        const [
-          voterWeightRecord,
-        ] = anchor.utils.publicKey.findProgramAddressSync(
+        const [voterWeightRecord] = PublicKey.findProgramAddressSync(
           [Buffer.from('VoterWeightRecord'), myNodesForRealm[0].toBytes()],
           SWITCHBOARD_ADDIN_ID
         )

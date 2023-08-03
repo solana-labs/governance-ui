@@ -7,7 +7,13 @@ import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
 import { MAINNET_USDC_MINT } from '@foresight-tmp/foresight-sdk/dist/consts'
 import { Market } from '@project-serum/serum'
 import { PythHttpClient } from '@pythnetwork/client'
-import { Connection, Keypair, PublicKey, Transaction } from '@solana/web3.js'
+import {
+  Connection,
+  Keypair,
+  PublicKey,
+  Transaction,
+  VersionedTransaction,
+} from '@solana/web3.js'
 
 const MAINNET_PYTH_PROGRAM = new PublicKey(
   'FsJ3A3u2vn5cTVofAjvy6y5kwABJAqYWpe4975bi2epH'
@@ -365,14 +371,23 @@ export const getOracle = async (connection: Connection, feedPk: PublicKey) => {
 export default class EmptyWallet implements Wallet {
   constructor(readonly payer: Keypair) {}
 
-  async signTransaction(tx: Transaction): Promise<Transaction> {
-    tx.partialSign(this.payer)
+  async signTransaction<T extends Transaction | VersionedTransaction>(
+    tx: T
+  ): Promise<T> {
+    if (tx instanceof Transaction) {
+      tx.partialSign(this.payer)
+    }
+
     return tx
   }
 
-  async signAllTransactions(txs: Transaction[]): Promise<Transaction[]> {
+  async signAllTransactions<T extends Transaction | VersionedTransaction>(
+    txs: T[]
+  ): Promise<T[]> {
     return txs.map((t) => {
-      t.partialSign(this.payer)
+      if (t instanceof Transaction) {
+        t.partialSign(this.payer)
+      }
       return t
     })
   }

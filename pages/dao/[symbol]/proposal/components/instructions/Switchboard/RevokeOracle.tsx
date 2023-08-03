@@ -94,7 +94,7 @@ const SwitchboardRevokeOracle = ({
     }
 
     const p = sbv2.PermissionAccount.fromSeed(
-      switchboardProgram,
+      switchboardProgram as any,
       addinState,
       new PublicKey(qPk),
       new PublicKey(oPk)
