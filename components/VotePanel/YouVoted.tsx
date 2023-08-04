@@ -11,7 +11,7 @@ import {
   BanIcon,
   MinusCircleIcon,
 } from '@heroicons/react/solid'
-import Button, { SecondaryButton } from '../Button'
+import Button from '../Button'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import Tooltip from '@components/Tooltip'
@@ -199,37 +199,20 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
       {(isVoting || isInCoolOffTime) && (
         <div className="items-center justify-center flex w-full gap-5">
           <div className="flex flex-col gap-6 items-center">
-            {isMulti ?
-              <Button
-                className="min-w-[200px]"
-                isLoading={isLoading}
-                tooltipMessage={withdrawTooltipContent}
-                onClick={() => submitRelinquishVote()}
-                disabled={!isWithdrawEnabled || isLoading}
-              >
-                Change Vote
-              </Button> 
-            :
-              <SecondaryButton
-                className="min-w-[200px]"
-                isLoading={isLoading}
-                tooltipMessage={withdrawTooltipContent}
-                onClick={() => submitRelinquishVote()}
-                disabled={!isWithdrawEnabled || isLoading}
-              >
-                Relinquish Vote
-              </SecondaryButton>
-            }
+            <Button
+              className="min-w-[200px]"
+              isLoading={isLoading}
+              tooltipMessage={withdrawTooltipContent}
+              onClick={() => submitRelinquishVote()}
+              disabled={!isWithdrawEnabled || isLoading}
+            >
+              Withdraw Vote
+            </Button>
 
             {isInCoolOffTime && (
               <div className="text-xs">
-                {isMulti ?
-                  `Warning: If you change your vote now you can't 
-                  re-vote, its not possible to add new votes during cool off time`
-                :
-                  `Warning: If you withdraw your vote now you can only deny the
-                  proposal its not possible to vote yes during cool off time`
-                }
+                Warning: If you withdraw your vote now you can only deny the
+                proposal its not possible to vote yes during cool off time
               </div>
             )}
           </div>

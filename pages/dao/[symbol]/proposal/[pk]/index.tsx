@@ -133,7 +133,7 @@ const Proposal = () => {
       </div>
 
       <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
-        {isMulti ? <VotePanel />: ""}
+        <VotePanel />
         {showTokenBalance && <ProposalVotingPower />}
         {showResults ? (
           <div className="bg-bkg-2 rounded-lg">
@@ -176,10 +176,10 @@ const Proposal = () => {
                 </div>
               )}
 
-              {!isMulti ?
-                <VoteResults proposal={proposal.account} />
-              :
+              {isMulti ?
                 <MultiChoiceVotes proposal={proposal.account} limit={proposal.account.options.length}/>
+              :
+                <VoteResults proposal={proposal.account} />
               }
               {proposal && !isMulti && (
                 <div className="flex justify-end mt-4">
@@ -200,7 +200,6 @@ const Proposal = () => {
           </div>
         ) : null}
         <VotingRules />
-        {isMulti ? " " : <VotePanel />}
         <NftProposalVoteState proposal={proposal}></NftProposalVoteState>
         {proposal && currentWallet && showProposalExecution && (
           <ProposalExecutionCard />

@@ -615,8 +615,3 @@ export interface DualFinanceVoteDepositForm {
   realm: string | undefined
   delegateToken: AssetAccount | undefined
 }
-
-export interface MultiChoiceProposalForm {
-  governedAccount: AssetAccount | undefined
-  options: string[]
-}

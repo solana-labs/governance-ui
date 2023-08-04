@@ -299,7 +299,6 @@ export async function handleEverlendAction(
     proposalIndex,
     [...setupInsts, ...insts, ...cleanupInsts],
     isDraft,
-    false,
     ["Approve"],
     client
   )

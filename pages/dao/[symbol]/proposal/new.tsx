@@ -8,7 +8,7 @@ import React, {
 } from 'react'
 import * as yup from 'yup'
 import { PlusCircleIcon, XCircleIcon } from '@heroicons/react/outline'
-import {TableOfContents, AddAlt} from '@carbon/icons-react'
+import {TableOfContents} from '@carbon/icons-react'
 import {
   getInstructionDataFromBase64,
   Governance,
@@ -30,7 +30,6 @@ import {
   ComponentInstructionData,
   Instructions,
   InstructionsContext,
-  MultiChoiceProposalForm,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { notify } from 'utils/notifications'
@@ -140,7 +139,7 @@ import IdlSetBuffer from './components/instructions/Mango/MangoV4/IdlSetBuffer'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { usePrevious } from '@hooks/usePrevious'
 import DualVote from './components/instructions/Dual/DualVote'
-import GovernedAccountSelect from './components/GovernedAccountSelect'
+import { MultiChoiceForm } from './components/forms/MultiChoiceForm'
 import { AssetAccount } from '@utils/uiTypes/assets'
 
 const TITLE_LENGTH_LIMIT = 130
@@ -157,6 +156,7 @@ const multiChoiceSchema = yup.object().shape({
 
   options: yup.array().of(yup.string().required('Option cannot be empty'))
 });
+
 
 const defaultGovernanceCtx: InstructionsContext = {
   instructionsData: [],
@@ -197,28 +197,31 @@ const New = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const realm = useRealmQuery().data?.result
 
-  const { symbol, realmInfo, canChooseWhoVote, ownVoterWeight } = useRealm()
-  const { availableInstructions, assetAccounts } = useGovernanceAssets()
+  const { symbol, realmInfo, canChooseWhoVote} = useRealm()
+  const { availableInstructions } = useGovernanceAssets()
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [form, setForm] = useState({
     title: typeof router.query['t'] === 'string' ? router.query['t'] : '',
     description: '',
   })
-  const [multiChoiceForm, setMultiChoiceForm] = useState<MultiChoiceProposalForm>({
+  const [multiChoiceForm, setMultiChoiceForm] = useState<{
+    governedAccount: AssetAccount | undefined
+    options: string[]
+  }>({
     governedAccount: undefined,
     options: ['', '']
-  });
+  })
   const [formErrors, setFormErrors] = useState({})
-  const [multiFormErrors, setMultiFormErrors] = useState({})
   const [
     governance,
     setGovernance,
   ] = useState<ProgramAccount<Governance> | null>(null)
   const [isLoadingSignedProposal, setIsLoadingSignedProposal] = useState(false)
   const [isLoadingDraft, setIsLoadingDraft] = useState(false)
-  const [isMulti, setIsMulti] = useState<boolean>(false);
-  const [isMultiFormValidated, setIsMultiFormValidated] = useState(false);
-  const [hideNotaButton, setHideNotaButton] = useState(false);
+  const [isMulti, setIsMulti] = useState<boolean>(false)
+  const [isMultiFormValidated, setIsMultiFormValidated] = useState(false)
+  const [multiFormErrors, setMultiFormErrors] = useState({})
+
   const isLoading = isLoadingSignedProposal || isLoadingDraft
 
   const [instructionsData, setInstructions] = useState<
@@ -236,52 +239,6 @@ const New = () => {
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
-  }
-
-  const handleMultiForm = ({ propertyName, value }) => {
-    setMultiFormErrors({})
-    setMultiChoiceForm({ ...multiChoiceForm, [propertyName]: value })
-  }
-
-  const handleNotaButton = () => {
-    const options = multiChoiceForm.options;
-    const last = options.length - 1;
-
-    if (options[last] !== "None of the Above") {
-      options.push("None of the Above");
-      handleMultiForm({propertyName: "options", value: options});
-      setHideNotaButton(true);
-    }
-  }
-
-  const updateOptions = (odx: number, value: string, addOption: boolean)  => {
-    const updatedOptions = multiChoiceForm.options;
-    const nota = "None of the Above";
-    const len = updatedOptions.length-1;
-
-    if (addOption) {
-      if (odx === -1) { // 'add another voting choice' button is clicked
-        if (updatedOptions.length > 9) {
-          return;
-        }
-        if (updatedOptions[len] === nota) {
-          // insert new empty option at the second last position if NOTA exists
-          updatedOptions.splice(len, 0, value);
-        } else {
-          // insert new empty option at the last position if not NOTA not exists
-          updatedOptions.push(value);
-        }
-      } else {
-        // Update the option if exists
-        updatedOptions[odx] = value;
-      }
-      handleMultiForm({value: updatedOptions, propertyName: "options"});
-    } else {
-      if (value === nota) {
-        setHideNotaButton(false);
-      }
-      handleMultiForm({value: updatedOptions.filter((_option, index) => index !== odx), propertyName: "options"});
-    }
   }
 
   const setInstructionType = useCallback(
@@ -317,7 +274,6 @@ const New = () => {
 
   const handleCreate = async (isDraft) => {
     setFormErrors({})
-    setMultiFormErrors({})
 
     if (isDraft) {
       setIsLoadingDraft(true)
@@ -774,81 +730,13 @@ const New = () => {
               </div>
             </div>
             {isMulti ?
-              <div className="mt-8 mb-8">
-                <GovernedAccountSelect
-                  label="Which wallet’s rules should this proposal follow?"
-                  governedAccounts={assetAccounts.filter((x) =>
-                    ownVoterWeight.canCreateProposal(x.governance.account.config))
-                  }
-                  onChange={(value: AssetAccount) => {
-                    handleMultiForm({ value, propertyName: 'governedAccount' })
-                  }}
-                  value={multiChoiceForm.governedAccount}
-                  error={multiFormErrors['governedAccount']}
-                  shouldBeGoverned={null}
-                  governance={multiChoiceForm.governedAccount?.governance}
-                />
-                <h2 className='mt-8'>Add Choices</h2>
-                {multiChoiceForm.options.map((option, index) => {
-                  // copy index to keep its value for onChange function
-                  const odx = index;
-
-                  return (
-                    <div key={odx} className="mb-3 mt-3 border border-fgd-4 p-4 md:p-6 rounded-lg">
-                    <div className="flex flex-row justify-between">
-                      <h2 className='mb-4'>Choice {odx + 1}</h2>
-                      {odx > 1 ?
-                        <LinkButton
-                          className="flex font-bold items-center ml-4 text-fgd-1 text-sm"
-                          onClick={() => updateOptions(odx, option, false)}
-                        >
-                          <XCircleIcon className="h-5 mr-1.5 text-red w-5" />
-                            Remove
-                        </LinkButton>
-                      : ""}
-                    </div>
-                    <StyledLabel>Add a Label</StyledLabel>
-                    <div className='text-sm font-extralight text-fgd-3 mt-1 mb-2 max-w-lg'>
-                      This is the text voters will see when they vote.
-                    </div>
-                    <Input
-                      placeholder={`Voting Choice ${odx + 1}`}
-                      value={option}
-                      type="text"
-                      error={
-                        !option.length && isMultiFormValidated ? "The option can't be empty" : ""
-                      }
-                      showErrorState={option.length === 0 && isMultiFormValidated}
-                      onChange={(event) => updateOptions(odx, event.target.value, true)}
-                      disabled={option === "None of the Above"}
-                    />
-                  </div>)}
-                )}
-                <div className="flex flex-row justify-between">
-                  <div>
-                    <LinkButton
-                      onClick={() => updateOptions(-1, "", true)}
-                      disabled={multiChoiceForm.options.length > 9}
-                      className='flex flex-row items-center gap-2 font-bold pt-2'
-                    >
-                        <AddAlt className='text-green'/>
-                        <div>Add another voting choice</div>
-                    </LinkButton>
-                  </div>
-                  <div>
-                    <LinkButton
-                      onClick={() => handleNotaButton()}
-                      disabled={hideNotaButton || multiChoiceForm.options.length > 9}
-                      className='flex flex-row items-center gap-2 font-bold pt-2'
-                    >
-                        <AddAlt className='text-green'/>
-                        <div>Add &apos;None of the Above&apos; choice</div>
-                    </LinkButton>
-                  </div>
-                </div>
-              </div>
-              :
-              !isMulti ?
+            <MultiChoiceForm 
+              multiChoiceForm={multiChoiceForm} 
+              updateMultiChoiceForm={setMultiChoiceForm}
+              isMultiFormValidated={isMultiFormValidated}
+              multiFormErrors={multiFormErrors}
+              updateMultiFormErrors={setMultiFormErrors}
+            /> :
             <div>
             <NewProposalContext.Provider
               value={{
@@ -916,7 +804,6 @@ const New = () => {
               </LinkButton>
             </div>
             </div>
-              : " "
             }
             <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
               <SecondaryButton

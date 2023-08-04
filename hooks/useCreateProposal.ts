@@ -88,7 +88,6 @@ export default function useCreateProposal() {
       selectedGovernance.account.proposalCount,
       instructionsData,
       isDraft,
-      false,
       ["Approve"],
       client
     )
@@ -98,27 +97,37 @@ export default function useCreateProposal() {
     return proposalAddress
   }
 
-  /** @deprecated because the api is goofy, use `proposeMultiChoice` */
-  const handleCreateMultiChoiceProposal = async ({
-    title,
-    description,
-    governance,
-    instructionsData,
-    voteByCouncil = false,
-    options,
-    isDraft = false,
-  }: {
-    title: string
-    description: string
-    governance: { pubkey: PublicKey }
-    instructionsData: InstructionDataWithHoldUpTime[]
-    voteByCouncil?: boolean
-    options: string[]
-    isDraft?: boolean
-  }) => {
+  const propose = (
+    params: Omit<Parameters<typeof handleCreateProposal>[0], 'governance'> & {
+      governance: PublicKey
+    }
+  ) => {
+    const { governance, ...rest } = params
+    return handleCreateProposal({ ...rest, governance: { pubkey: governance } })
+  }
+
+  const proposeMultiChoice = async(
+    {
+      title,
+      description,
+      governance,
+      instructionsData,
+      voteByCouncil = false,
+      options,
+      isDraft = false,
+    }: {
+      title: string
+      description: string
+      governance: PublicKey
+      instructionsData: InstructionDataWithHoldUpTime[]
+      voteByCouncil?: boolean
+      options: string[]
+      isDraft?: boolean
+    }
+  ) => {
     const { result: selectedGovernance } = await fetchGovernanceByPubkey(
       connection.current,
-      governance.pubkey
+      governance
     )
     if (!selectedGovernance) throw new Error('governance not found')
     if (!realm) throw new Error()
@@ -150,7 +159,7 @@ export default function useCreateProposal() {
     const proposalAddress = await createProposal(
       rpcContext,
       realm,
-      governance.pubkey,
+      governance,
       ownTokenRecord!,
       title,
       description,
@@ -158,7 +167,6 @@ export default function useCreateProposal() {
       selectedGovernance.account.proposalCount,
       instructionsData,
       isDraft,
-      true,
       options,
       client
     )
@@ -166,24 +174,6 @@ export default function useCreateProposal() {
       queryKey: proposalQueryKeys.all(connection.endpoint),
     })
     return proposalAddress
-  }
-
-  const propose = (
-    params: Omit<Parameters<typeof handleCreateProposal>[0], 'governance'> & {
-      governance: PublicKey
-    }
-  ) => {
-    const { governance, ...rest } = params
-    return handleCreateProposal({ ...rest, governance: { pubkey: governance } })
-  }
-
-  const proposeMultiChoice = (
-    params: Omit<Parameters<typeof handleCreateMultiChoiceProposal>[0], 'governance'> & {
-      governance: PublicKey
-    }
-  ) => {
-    const { governance, ...rest } = params
-    return handleCreateMultiChoiceProposal({ ...rest, governance: { pubkey: governance } })
   }
 
   return { handleCreateProposal, propose, proposeMultiChoice }

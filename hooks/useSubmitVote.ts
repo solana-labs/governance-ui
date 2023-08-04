@@ -46,10 +46,12 @@ export const useSubmitVote = () => {
       vote,
       voterTokenRecord,
       comment,
+      voteWeights
     }: {
       vote: VoteKind
       voterTokenRecord: ProgramAccount<TokenOwnerRecord>
-      comment?: string
+      comment?: string,
+      voteWeights?: number[]
     }) => {
       const rpcContext = new RpcContext(
         proposal!.owner,
@@ -79,69 +81,6 @@ export const useSubmitVote = () => {
           proposal!,
           voterTokenRecord,
           vote,
-          false,
-          msg,
-          client,
-          confirmationCallback
-        )
-        queryClient.invalidateQueries({
-          queryKey: ['Proposal'],
-        })
-      } catch (e) {
-        notify({ type: 'error', message: e.message })
-      } finally {
-        if (isNftPlugin) {
-          closeNftVotingCountingModal(
-            client.client as NftVoterClient,
-            proposal!,
-            wallet!.publicKey!
-          )
-        }
-      }
-    }
-  )
-
-  const { error: multiChoiceError, loading: multiChoiceLoading, execute: multiChoiceExecute } = useAsyncCallback(
-    async ({
-      vote,
-      voterTokenRecord,
-      voteWeights,
-      comment,
-    }: {
-      vote: VoteKind
-      voterTokenRecord: ProgramAccount<TokenOwnerRecord>
-      voteWeights: number[]
-      comment?: string
-    }) => {
-      const rpcContext = new RpcContext(
-        proposal!.owner,
-        getProgramVersionForRealm(realmInfo!),
-        wallet!,
-        connection.current,
-        connection.endpoint
-      )
-
-      const msg = comment
-        ? new ChatMessageBody({
-            type: ChatMessageBodyType.Text,
-            value: comment,
-          })
-        : undefined
-
-      const confirmationCallback = async () => {
-        await queryClient.invalidateQueries(
-          voteRecordQueryKeys.all(connection.cluster)
-        )
-      }
-
-      try {
-        await castVote(
-          rpcContext,
-          realm!,
-          proposal!,
-          voterTokenRecord,
-          vote,
-          true,
           msg,
           client,
           confirmationCallback,
@@ -168,8 +107,5 @@ export const useSubmitVote = () => {
     error,
     submitting: loading,
     submitVote: execute,
-    multiChoiceError,
-    multiChoiceSubmitting: multiChoiceLoading,
-    multiChoiceSubmitVote: multiChoiceExecute
   }
 }

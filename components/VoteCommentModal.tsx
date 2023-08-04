@@ -34,26 +34,17 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   isMulti,
 }) => {
   const [comment, setComment] = useState('')
-  const { submitting, submitVote, multiChoiceSubmitting, multiChoiceSubmitVote } = useSubmitVote()
+  const { submitting, submitVote } = useSubmitVote()
 
   const voteString = VOTE_STRINGS[vote]
 
   const handleSubmit = async () => {
-    if (isMulti) {
-      console.log(isMulti)
-      await multiChoiceSubmitVote({
-        vote,
-        voterTokenRecord,
-        voteWeights: isMulti,
-        comment,
-      })
-    } else {
-      await submitVote({
-        vote,
-        voterTokenRecord,
-        comment,
-      })
-    }
+    await submitVote({
+      vote,
+      voterTokenRecord,
+      comment,
+      voteWeights: isMulti
+    })
 
     onClose()
   }
@@ -87,7 +78,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
           onClick={handleSubmit}
         >
           <div className="flex items-center">
-            {!submitting && !multiChoiceSubmitting &&
+            {!submitting &&
               isMulti ? "" :
               (vote === VoteKind.Approve ? (
                 <ThumbUpIcon className="h-4 w-4 fill-black mr-2" />
@@ -96,7 +87,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
               ) : (
                 <BanIcon className="h-4 w-4 fill-black mr-2" />
               ))}
-            {submitting || multiChoiceSubmitting ? <Loading /> : <span>Vote {isMulti ? "" : voteString}</span>}
+            {submitting ? <Loading /> : <span>Vote {isMulti ? "" : voteString}</span>}
           </div>
         </Button>
       </div>

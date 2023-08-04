@@ -1,4 +1,5 @@
 import { Proposal, VoteKind } from '@solana/spl-governance'
+import { CheckCircleIcon } from "@heroicons/react/solid";
 import { useState } from 'react'
 import Button, { SecondaryButton } from '../Button'
 import VoteCommentModal from '../VoteCommentModal'
@@ -7,62 +8,17 @@ import {
   useVoterTokenRecord,
   useVotingPop,
 } from './hooks'
-import useRealm from '@hooks/useRealm'
-import { VotingClientType } from '@utils/uiTypes/VotePlugin'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
 import { useSubmitVote } from '@hooks/useSubmitVote'
 import { useSelectedRealmInfo } from '@hooks/selectedRealm/useSelectedRealmRegistryEntry'
-
-const useCanVote = () => {
-  const client = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
-  )
-  const { ownVoterWeight } = useRealm()
-  const wallet = useWalletOnePointOh()
-  const connected = !!wallet?.connected
-
-  const { data: ownVoteRecord } = useProposalVoteRecordQuery('electoral')
-  const voterTokenRecord = useVoterTokenRecord()
-
-  const isVoteCast = !!ownVoteRecord?.found
-
-  const hasMinAmountToVote =
-    voterTokenRecord &&
-    ownVoterWeight.hasMinAmountToVote(
-      voterTokenRecord.account.governingTokenMint
-    )
-
-  const canVote =
-    connected &&
-    !(
-      client.clientType === VotingClientType.NftVoterClient && !voterTokenRecord
-    ) &&
-    !(
-      client.clientType === VotingClientType.HeliumVsrClient &&
-      !voterTokenRecord
-    ) &&
-    !isVoteCast &&
-    hasMinAmountToVote
-
-  const voteTooltipContent = !connected
-    ? 'You need to connect your wallet to be able to vote'
-    : client.clientType === VotingClientType.NftVoterClient && !voterTokenRecord
-    ? 'You must join the Realm to be able to vote'
-    : !hasMinAmountToVote
-    ? 'You don’t have governance power to vote in this dao'
-    : ''
-
-  return [canVote, voteTooltipContent] as const
-}
+import { useCanVote } from './CastVoteButtons'
 
 export const CastMultiVoteButtons = ({proposal} : {proposal: Proposal}) => {
   const [showVoteModal, setShowVoteModal] = useState(false)
   const [vote, setVote] = useState<'yes' | 'no' | null>(null)
   const realmInfo = useSelectedRealmInfo()
   const allowDiscussion = realmInfo?.allowDiscussion ?? true
-  const { multiChoiceSubmitting, multiChoiceSubmitVote } = useSubmitVote()
+  const { submitting, submitVote } = useSubmitVote()
   const votingPop = useVotingPop()
   const voterTokenRecord = useVoterTokenRecord()
   const [canVote, tooltipContent] = useCanVote()
@@ -79,7 +35,7 @@ export const CastMultiVoteButtons = ({proposal} : {proposal: Proposal}) => {
     if (allowDiscussion) {
       setShowVoteModal(true)
     } else {
-      await multiChoiceSubmitVote({
+      await submitVote({
         vote: vote === 'yes' ? VoteKind.Approve : VoteKind.Deny,
         voterTokenRecord: voterTokenRecord!,
         voteWeights: selectedOptions
@@ -87,14 +43,19 @@ export const CastMultiVoteButtons = ({proposal} : {proposal: Proposal}) => {
     }
   }
 
-  const handleOption = (index: number, insert: boolean) => {
+  const handleOption = (index: number) => {
     let options = [...selectedOptions];
     let status = [...optionStatus];
     const nota = "None of the Above";
     const last = proposal.options.length - 1;
     const isNota = proposal.options[last].label === nota;
 
-    if (insert) {
+    const selected = status[index];
+
+    if (selected) {
+      options = options.filter(option => option !== index);
+      status[index] = false
+    } else {
       if (isNota) {
         if (index === last) {
           // if nota is clicked, unselect all other options
@@ -116,9 +77,6 @@ export const CastMultiVoteButtons = ({proposal} : {proposal: Proposal}) => {
         }
         status[index] = true;
       }
-    } else {
-      options = options.filter(option => option !== index);
-      status[index] = false
     }
 
     setSelectedOptions(options);
@@ -137,33 +95,26 @@ export const CastMultiVoteButtons = ({proposal} : {proposal: Proposal}) => {
         >
           {proposal.options.map((option, index) => {
             return (
-            <div className="w-full" key={index}>
-              {optionStatus[index] 
-              ?
-                <Button
-                  tooltipMessage={tooltipContent}
-                  className='w-full bg-fgd-1'
-                  onClick={() => handleOption(index, false)}
-                  disabled={!canVote || multiChoiceSubmitting}
-                  isLoading={multiChoiceSubmitting}
-                >
-                  {option.label}
-                </Button> 
-              :
+              <div className="w-full" key={index}>
                 <SecondaryButton
-                tooltipMessage={tooltipContent}
-                className='w-full'
-                onClick={() => handleOption(index, true)}
-                disabled={!canVote || multiChoiceSubmitting}
-                isLoading={multiChoiceSubmitting}
-              >
-                {option.label}
-              </SecondaryButton>
-              }  
-            </div>
+                  tooltipMessage={tooltipContent}
+                  className={`
+                    ${optionStatus[index] ? 
+                      'bg-primary-light text-bkg-2 hover:text-bkg-2 hover:border-primary-light' : 
+                      'bg-transparent'}
+                    rounded-lg w-full
+                  `}
+                  onClick={() => handleOption(index)}
+                  disabled={!canVote || submitting}
+                  isLoading={submitting}
+                >
+                  {optionStatus[index] && <CheckCircleIcon  className="inline w-4 mr-1"/>}
+                  {option.label}
+                </SecondaryButton>
+              </div>
             )}
           )}
-          <div className="text-sm">
+          <div className="text-xs">
             Note: You can select one or more options
           </div>
           <Button
@@ -174,8 +125,8 @@ export const CastMultiVoteButtons = ({proposal} : {proposal: Proposal}) => {
             }
             className="w-full"
             onClick={() => handleVote('yes')}
-            disabled={!canVote || multiChoiceSubmitting || !selectedOptions.length}
-            isLoading={multiChoiceSubmitting}
+            disabled={!canVote || submitting || !selectedOptions.length}
+            isLoading={submitting}
           >
             <div className="flex flex-row items-center justify-center">
               Vote

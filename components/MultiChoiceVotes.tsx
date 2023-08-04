@@ -31,13 +31,13 @@ const MultiChoiceVotes = ({proposal, limit} : {proposal: Proposal, limit: number
     }
 
     return (
-        <div className="">
+        <div className="border border-fgd-4 rounded-md">
             {proposal.options.slice(0, limit).map((option, index) => {
                 const optionVotes = fmtTokenAmount(option.voteWeight, proposalMint?.decimals);
                 const optionWeightPct = totalVoteWeight ? (optionVotes/totalVoteWeight) * 100 : 0;
 
                 return (
-                <div className="border border-fgd-4 p-4" key={index}>
+                <div className="border-b border-fgd-4 p-5" key={index}>
                     <div className="flex flex-row justify-between gap-2">
                         <div className="flex flex-row justify-start">
                             <StyledLabel>{option.label}</StyledLabel>
@@ -66,7 +66,7 @@ const MultiChoiceVotes = ({proposal, limit} : {proposal: Proposal, limit: number
             )}
             )}
             {limit < proposal.options.length &&
-                <div className="border border-fgd-4 p-4">
+                <div className="border border-fgd-4 rounded-lg p-4">
                     <StyledSubLabel className="flex flex-row gap-2">
                         <div className="">{proposal.options.length - limit} more choice{
                             proposal.options.length - limit !== 1 && "s"
