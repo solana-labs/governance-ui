@@ -38,7 +38,7 @@ export default function Explore() {
           'transition-all',
           'hover:text-fgd-3'
         )}
-        onClick={router.back}
+        onCLick={router.asPath.replace(/\/explore$/, '')}
       >
         <ChevronLeftIcon className="h-6 w-6 " />
         Back
