@@ -23,6 +23,7 @@ type NameMarketIndexVal = {
 interface OpenBookEditMarketForm {
   governedAccount: AssetAccount | null
   market: NameMarketIndexVal | null
+  name: string
   reduceOnly: boolean
   forceClose: boolean
   holdupTime: number
@@ -51,6 +52,7 @@ const OpenBookEditMarket = ({
     forceClose: false,
     market: null,
     holdupTime: 0,
+    name: '',
   })
   const [currentMarkets, setCurrentMarkets] = useState<NameMarketIndexVal[]>([])
   const [formErrors, setFormErrors] = useState({})
@@ -74,7 +76,7 @@ const OpenBookEditMarket = ({
       )
 
       const ix = await mangoClient!.program.methods
-        .serum3EditMarket(form.reduceOnly, form.forceClose)
+        .serum3EditMarket(form.reduceOnly, form.forceClose, form.name)
         .accounts({
           group: mangoGroup!.publicKey,
           admin: form.governedAccount.extensions.transferAddress,
@@ -125,6 +127,7 @@ const OpenBookEditMarket = ({
         ...prevForm,
         reduceOnly: market?.reduceOnly || false,
         forceClose: market?.forceClose || false,
+        name: market?.name || '',
       }))
     }
     if (form.market && mangoGroup) {
@@ -161,6 +164,13 @@ const OpenBookEditMarket = ({
       type: InstructionInputType.SELECT,
       initialValue: form.market,
       options: currentMarkets,
+    },
+    {
+      label: 'Name',
+      name: 'name',
+      type: InstructionInputType.INPUT,
+      initialValue: form.name,
+      inputType: 'text',
     },
     {
       label: 'Reduce Only',

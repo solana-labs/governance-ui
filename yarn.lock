@@ -477,12 +477,12 @@
     toformat "^2.0.0"
     yargs "^17.0.1"
 
-"@blockworks-foundation/mango-v4@0.14.1":
-  version "0.14.1"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4/-/mango-v4-0.14.1.tgz#fc5cd558e518207804acfbb80b80d6d21933d8de"
-  integrity sha512-P1cjN+96lyf45rELDLUTQaC6PpAuAAXPqjynFSBV6CswW87r8sdHLPgnYaUnfJMBAqHGwd0rVuT/YMJpoHfejA==
+"@blockworks-foundation/mango-v4@0.18.6":
+  version "0.18.6"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4/-/mango-v4-0.18.6.tgz#1f7d071ffb8b737fa2055fa32358181cb744ac4f"
+  integrity sha512-F3/JNFyUqxVjw4tA7QRX6f1cHgZAALwVKnL9+Ds7MxSr4/IMEZWZO1qr8y8j+7fch0wx/6ck7t4gDYG2c2UrZA==
   dependencies:
-    "@coral-xyz/anchor" "^0.26.0"
+    "@coral-xyz/anchor" "^0.27.0"
     "@project-serum/serum" "0.13.65"
     "@pythnetwork/client" "~2.14.0"
     "@solana/spl-token" "0.3.7"
@@ -495,10 +495,10 @@
     dotenv "^16.0.3"
     node-kraken-api "^2.2.2"
 
-"@blockworks-foundation/mangolana@0.0.1-beta.14":
-  version "0.0.1-beta.14"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mangolana/-/mangolana-0.0.1-beta.14.tgz#79dfc522e6033384eb5b288ed4000eaf9aeb8f4c"
-  integrity sha512-eQDoDaXIZixInaEx2XkaGPU0NempBBLTr6QnKBh1K+rxeO8+cgWGh0NQwBYTUHU7e2J021c3r4HLJ8PsLull5g==
+"@blockworks-foundation/mangolana@0.0.1-beta.15":
+  version "0.0.1-beta.15"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mangolana/-/mangolana-0.0.1-beta.15.tgz#5442044ecb54c2f57128155665c0b1d9ecbdda39"
+  integrity sha512-VDSRGHhrtR4nyjGEqQGLBLWbQLFn1Kh1SoaqwwV3De0Ls0WDhe8C5aTDQ8k028XKrlHRC5O1QkJrwWskqKvqNw==
   dependencies:
     "@solana/web3.js" "^1.63.1"
     bs58 "^5.0.0"
@@ -874,7 +874,7 @@
     superstruct "^0.15.4"
     toml "^3.0.0"
 
-"@coral-xyz/anchor@^0.27.0":
+"@coral-xyz/anchor@0.27.0", "@coral-xyz/anchor@^0.27.0":
   version "0.27.0"
   resolved "https://registry.yarnpkg.com/@coral-xyz/anchor/-/anchor-0.27.0.tgz#621e5ef123d05811b97e49973b4ed7ede27c705c"
   integrity sha512-+P/vPdORawvg3A9Wj02iquxb4T0C5m4P6aZBVYysKl4Amk+r6aMPZkUhilBkD6E4Nuxnoajv3CFykUfkGE0n5g==
@@ -916,10 +916,10 @@
     superstruct "^0.15.4"
     toml "^3.0.0"
 
-"@coral-xyz/borsh@0.26.0", "@coral-xyz/borsh@^0.26.0", "@coral-xyz/borsh@^0.27.0", "@coral-xyz/borsh@^0.28.0":
-  version "0.26.0"
-  resolved "https://registry.yarnpkg.com/@coral-xyz/borsh/-/borsh-0.26.0.tgz#d054f64536d824634969e74138f9f7c52bbbc0d5"
-  integrity sha512-uCZ0xus0CszQPHYfWAqKS5swS1UxvePu83oOF+TWpUkedsNlg6p2p4azxZNSSqwXb9uXMFgxhuMBX9r3Xoi0vQ==
+"@coral-xyz/borsh@0.27.0", "@coral-xyz/borsh@^0.26.0", "@coral-xyz/borsh@^0.27.0", "@coral-xyz/borsh@^0.28.0":
+  version "0.27.0"
+  resolved "https://registry.yarnpkg.com/@coral-xyz/borsh/-/borsh-0.27.0.tgz#700c647ea5262b1488957ac7fb4e8acf72c72b63"
+  integrity sha512-tJKzhLukghTWPLy+n8K8iJKgBq1yLT/AxaNd10yJrX8mI56ao5+OFAKAqW/h0i79KCvb4BK0VGO5ECmmolFz9A==
   dependencies:
     bn.js "^5.1.2"
     buffer-layout "^1.2.0"
