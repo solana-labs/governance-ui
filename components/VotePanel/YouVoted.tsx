@@ -155,7 +155,7 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
           isMulti ? 
             vote.approveChoices?.map((choice, index) => (
               choice.weightPercentage ?
-              <div className="p-1 w-full">
+              <div className="p-1 w-full" key={index}>
                 <Button
                   className='w-full border border-primary-light text-primary-light bg-transparent'
                   disabled={true}
@@ -166,7 +166,7 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
                   </div>
                 </Button>
               </div>
-              : ""
+              : null
             )) 
           : (
           <Tooltip content={`You voted "Yes"`}>
