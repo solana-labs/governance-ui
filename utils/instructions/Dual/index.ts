@@ -413,13 +413,17 @@ export async function getWithdrawInstruction({
   const serializedInstruction = ''
   const additionalSerializedInstructions: string[] = []
   const prerequisiteInstructions: TransactionInstruction[] = []
+  // First is for base token, second is for quote token.
   let helperTokenAccount: Keypair | null = null
-  if (isValid && form.soName && form.baseTreasury && wallet?.publicKey) {
+  let helperTokenAccount2: Keypair | null = null
+  if (isValid && form.soName && form.baseTreasury && wallet?.publicKey && form.mintPk) {
     const so = getStakingOptionsApi(connection)
     const authority = form.baseTreasury.isSol
       ? form.baseTreasury.extensions.transferAddress
       : form.baseTreasury.extensions.token!.account.owner!
-    let destination = form.baseTreasury.pubkey
+    let baseDestination = form.baseTreasury.pubkey
+    let quoteDestination = (await so.getState(form.soName, new PublicKey(form.mintPk))).quoteAccount as PublicKey;
+
     if (form.baseTreasury.isSol) {
       const baseMint = form.mintPk
       const space = 165
@@ -446,17 +450,38 @@ export async function getWithdrawInstruction({
           owner: form.baseTreasury.governance.pubkey,
         })
       )
-      destination = helperTokenAccount.publicKey
+      baseDestination = helperTokenAccount.publicKey
+
+      const quoteMint = (await so.getState(form.soName, new PublicKey(form.mintPk))).quoteMint;
+      helperTokenAccount2 = new Keypair()
+      //run as prerequsite instructions payer is connected wallet
+      prerequisiteInstructions.push(
+        SystemProgram.createAccount({
+          fromPubkey: wallet.publicKey,
+          newAccountPubkey: helperTokenAccount2.publicKey,
+          lamports: rent,
+          space: space,
+          programId: TOKEN_PROGRAM_ID,
+        }),
+        //initialized account with same mint as quote
+        initializeAccount({
+          account: helperTokenAccount2.publicKey,
+          mint: new PublicKey(quoteMint!),
+          owner: form.baseTreasury.governance.pubkey,
+        })
+      )
+      quoteDestination = helperTokenAccount2.publicKey
     }
 
     const withdrawInstruction = form.baseTreasury.isSol
       ? await so.createWithdrawInstructionWithMint(
           form.soName,
           authority!,
-          destination,
+          baseDestination,
+          quoteDestination,
           new PublicKey(form.mintPk!)
         )
-      : await so.createWithdrawInstruction(form.soName, authority!, destination)
+      : await so.createWithdrawInstruction(form.soName, authority!, baseDestination, quoteDestination)
 
     additionalSerializedInstructions.push(
       serializeInstructionToBase64(withdrawInstruction)

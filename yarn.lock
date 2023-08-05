@@ -916,10 +916,17 @@
     superstruct "^0.15.4"
     toml "^3.0.0"
 
+<<<<<<< Updated upstream
 "@coral-xyz/borsh@0.27.0", "@coral-xyz/borsh@^0.26.0", "@coral-xyz/borsh@^0.27.0", "@coral-xyz/borsh@^0.28.0":
   version "0.27.0"
   resolved "https://registry.yarnpkg.com/@coral-xyz/borsh/-/borsh-0.27.0.tgz#700c647ea5262b1488957ac7fb4e8acf72c72b63"
   integrity sha512-tJKzhLukghTWPLy+n8K8iJKgBq1yLT/AxaNd10yJrX8mI56ao5+OFAKAqW/h0i79KCvb4BK0VGO5ECmmolFz9A==
+=======
+"@coral-xyz/borsh@0.26.0", "@coral-xyz/borsh@^0.26.0", "@coral-xyz/borsh@^0.27.0", "@coral-xyz/borsh@^0.28.0":
+  version "0.26.0"
+  resolved "https://registry.yarnpkg.com/@coral-xyz/borsh/-/borsh-0.26.0.tgz#d054f64536d824634969e74138f9f7c52bbbc0d5"
+  integrity sha512-uCZ0xus0CszQPHYfWAqKS5swS1UxvePu83oOF+TWpUkedsNlg6p2p4azxZNSSqwXb9uXMFgxhuMBX9r3Xoi0vQ==
+>>>>>>> Stashed changes
   dependencies:
     bn.js "^5.1.2"
     buffer-layout "^1.2.0"
@@ -1013,10 +1020,10 @@
     "@solana/web3.js" "^1.73.2"
     js-sha3 "^0.8.0"
 
-"@dual-finance/staking-options@0.0.24":
-  version "0.0.24"
-  resolved "https://registry.yarnpkg.com/@dual-finance/staking-options/-/staking-options-0.0.24.tgz#376568dee9389a4133ef700fd55b3143802fdd7f"
-  integrity sha512-SMcER1lW2QgcZuHNa9PQmAQu5CyTMXeiZMmbRbEzMmhkSTqVPMauWaiVDeGZ35MxwN0pARGrVl7pf0gOVmHdsw==
+"@dual-finance/staking-options@0.0.25":
+  version "0.0.25"
+  resolved "https://registry.yarnpkg.com/@dual-finance/staking-options/-/staking-options-0.0.25.tgz#195b40fd95d4cc3432c06b0ceb0aad147bbc237f"
+  integrity sha512-5+N2eMWO0PcOIwEXSf0UgbTIaofKlAzN92TVDGLskg4EN+GJLRxg48OJs9I9jIWKb1jIGjdKOSKR4lGn0eUn2w==
   dependencies:
     "@coral-xyz/anchor" "^0.28.0"
     "@dual-finance/staking-options" "^0.0.21"
