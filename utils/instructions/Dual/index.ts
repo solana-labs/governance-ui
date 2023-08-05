@@ -10,7 +10,7 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js'
 
-import { StakingOptions } from '@dual-finance/staking-options'
+import { DUAL_DAO_WALLET_PK, StakingOptions } from '@dual-finance/staking-options'
 import { ConnectionContext } from '@utils/connection'
 import { validateInstruction } from '@utils/instructionTools'
 import {
@@ -471,6 +471,18 @@ export async function getWithdrawInstruction({
         })
       )
       quoteDestination = helperTokenAccount2.publicKey
+
+      // Initialize the fee account so the tx succeeds. This happens when there
+      // is a base token that DUAL DAO has never received before.
+      const feeAccount = await StakingOptions.getFeeAccount(new PublicKey(quoteMint!));
+      if (!(await connection.current.getAccountInfo(feeAccount))) {
+        const [ataIx] = await createAssociatedTokenAccount(
+          wallet.publicKey,
+          DUAL_DAO_WALLET_PK,
+          new PublicKey(quoteMint!)
+        )
+        additionalSerializedInstructions.push(serializeInstructionToBase64(ataIx))
+      }
     }
 
     const withdrawInstruction = form.baseTreasury.isSol
@@ -478,8 +490,8 @@ export async function getWithdrawInstruction({
           form.soName,
           authority!,
           baseDestination,
+          new PublicKey(form.mintPk!),
           quoteDestination,
-          new PublicKey(form.mintPk!)
         )
       : await so.createWithdrawInstruction(form.soName, authority!, baseDestination, quoteDestination)
 
