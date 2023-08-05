@@ -491,7 +491,7 @@ export async function getWithdrawInstruction({
       serializedInstruction,
       prerequisiteInstructions: prerequisiteInstructions,
       prerequisiteInstructionsSigners: helperTokenAccount
-        ? [helperTokenAccount]
+        ? [helperTokenAccount, helperTokenAccount2]
         : [],
       isValid: true,
       governance: form.baseTreasury?.governance,
