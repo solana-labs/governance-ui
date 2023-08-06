@@ -1013,10 +1013,10 @@
     "@solana/web3.js" "^1.73.2"
     js-sha3 "^0.8.0"
 
-"@dual-finance/staking-options@0.0.24":
-  version "0.0.24"
-  resolved "https://registry.yarnpkg.com/@dual-finance/staking-options/-/staking-options-0.0.24.tgz#376568dee9389a4133ef700fd55b3143802fdd7f"
-  integrity sha512-SMcER1lW2QgcZuHNa9PQmAQu5CyTMXeiZMmbRbEzMmhkSTqVPMauWaiVDeGZ35MxwN0pARGrVl7pf0gOVmHdsw==
+"@dual-finance/staking-options@0.0.26":
+  version "0.0.26"
+  resolved "https://registry.yarnpkg.com/@dual-finance/staking-options/-/staking-options-0.0.26.tgz#37bce685e1b8a2c8a3dca00606899249d897ab62"
+  integrity sha512-jwtMpoQzIliKlp+Nlu2Js/UaXL7/0tk+NqtMZLdKf997OdfHgxoDJrUC/sha1oZgBEuPjAwThWtwlY+Ku/tc8w==
   dependencies:
     "@coral-xyz/anchor" "^0.28.0"
     "@dual-finance/staking-options" "^0.0.21"
