@@ -35,7 +35,6 @@ import {
   HELIUM_VSR_PLUGINS_PKS,
   VSR_PLUGIN_PKS,
   GATEWAY_PLUGINS_PKS,
-  PYTH_PLUGINS_PKS,
   SWITCHBOARD_PLUGINS_PKS,
 } from '../constants/plugins'
 import useUserOrDelegator from './useUserOrDelegator'
@@ -252,21 +251,6 @@ export function useVotingPlugins() {
       }
     }
 
-    const handlePythPlugin = () => {
-      if (
-        pythClient &&
-        currentPluginPk &&
-        PYTH_PLUGINS_PKS.includes(currentPluginPk.toBase58())
-      ) {
-        if (voterPk) {
-          handleSetCurrentRealmVotingClient({
-            client: pythClient,
-            realm,
-            walletPk: voterPk,
-          })
-        }
-      }
-    }
     /* 
     const handleSwitchboardPlugin = () => {
       if (
@@ -299,7 +283,6 @@ export function useVotingPlugins() {
       handleVsrPlugin()
       handleHeliumVsrPlugin()
       //handleSwitchboardPlugin()
-      handlePythPlugin()
     }
   }, [
     currentClient,

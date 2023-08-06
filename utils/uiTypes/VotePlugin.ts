@@ -12,7 +12,6 @@ import {
 } from '@solana/spl-governance'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { chunks } from '@utils/helpers'
-import { PythClient } from 'pyth-staking-api'
 import {
   getRegistrarPDA,
   getVoterPDA,
@@ -71,7 +70,6 @@ export enum VotingClientType {
   HeliumVsrClient,
   NftVoterClient,
   SwitchboardVoterClient,
-  PythClient,
   GatewayClient,
 }
 
@@ -100,7 +98,6 @@ export type Client =
   | HeliumVsrClient
   | NftVoterClient
   | SwitchboardQueueVoterClient
-  | PythClient
   | GatewayClient
 
 //Abstract for common functions that plugins will implement
@@ -147,10 +144,6 @@ export class VotingClient {
     }
     if (this.client instanceof GatewayClient) {
       this.clientType = VotingClientType.GatewayClient
-      this.noClient = false
-    }
-    if (this.client instanceof PythClient) {
-      this.clientType = VotingClientType.PythClient
       this.noClient = false
     }
   }
@@ -305,26 +298,7 @@ export class VotingClient {
       instructions.push(updateVoterWeightRecordIx)
       return { voterWeightPk, maxVoterWeightRecord: undefined }
     }
-    if (this.client instanceof PythClient) {
-      const stakeAccount = await this.client!.stakeConnection.getMainAccount(
-        walletPk
-      )
 
-      const {
-        voterWeightAccount,
-        maxVoterWeightRecord,
-      } = await this.client.stakeConnection.withUpdateVoterWeight(
-        instructions,
-        stakeAccount!,
-        { [type]: {} },
-        voterWeightTarget
-      )
-
-      return {
-        voterWeightPk: voterWeightAccount,
-        maxVoterWeightRecord,
-      }
-    }
     if (this.client instanceof SwitchboardQueueVoterClient) {
       instructions.push(this.instructions[0])
       const [vwr] = await PublicKey.findProgramAddress(
@@ -366,16 +340,6 @@ export class VotingClient {
         instructions,
         tokenOwnerRecord,
         'castVote'
-      )
-      return props
-    }
-
-    if (this.client instanceof PythClient) {
-      const props = await this.withUpdateVoterWeightRecord(
-        instructions,
-        tokenOwnerRecord,
-        'castVote',
-        proposal.pubkey
       )
       return props
     }
