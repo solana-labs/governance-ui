@@ -1,6 +1,6 @@
 import {
-  createProposal,
   InstructionDataWithHoldUpTime,
+  createProposal,
 } from 'actions/createProposal'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useRealm from './useRealm'
@@ -16,6 +16,7 @@ import {
 import useLegacyConnectionContext from './useLegacyConnectionContext'
 import queryClient from './queries/queryClient'
 import { proposalQueryKeys } from './queries/proposal'
+import { createLUTProposal } from 'actions/createLUTproposal'
 
 export default function useCreateProposal() {
   const client = useVotePluginsClientStore(
@@ -38,6 +39,7 @@ export default function useCreateProposal() {
     instructionsData,
     voteByCouncil = false,
     isDraft = false,
+    utilizeLookupTable,
   }: {
     title: string
     description: string
@@ -45,6 +47,7 @@ export default function useCreateProposal() {
     instructionsData: InstructionDataWithHoldUpTime[]
     voteByCouncil?: boolean
     isDraft?: boolean
+    utilizeLookupTable?: boolean
   }) => {
     const { result: selectedGovernance } = await fetchGovernanceByPubkey(
       connection.current,
@@ -77,7 +80,8 @@ export default function useCreateProposal() {
     const rpcContext = getRpcContext()
     if (!rpcContext) throw new Error()
 
-    const proposalAddress = await createProposal(
+    const create = utilizeLookupTable ? createLUTProposal : createProposal
+    const proposalAddress = await create(
       rpcContext,
       realm,
       governance.pubkey,
