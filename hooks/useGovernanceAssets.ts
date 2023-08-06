@@ -156,10 +156,7 @@ export default function useGovernanceAssets() {
       isVisible: symbol === 'FORE',
       image: '/img/foresight.png',
     },
-    [PackageEnum.Friktion]: {
-      name: 'Friktion',
-      image: '/img/friktion.png',
-    },
+
     [PackageEnum.GatewayPlugin]: {
       name: 'Gateway Plugin',
       image: '/img/civic.svg',
@@ -447,31 +444,6 @@ export default function useGovernanceAssets() {
     [Instructions.ForesightSetMarketMetadata]: {
       name: 'Set Market Metadata',
       packageId: PackageEnum.Foresight,
-    },
-
-    /*
-      ███████ ██████  ██ ██   ██ ████████ ██  ██████  ███    ██
-      ██      ██   ██ ██ ██  ██     ██    ██ ██    ██ ████   ██
-      █████   ██████  ██ █████      ██    ██ ██    ██ ██ ██  ██
-      ██      ██   ██ ██ ██  ██     ██    ██ ██    ██ ██  ██ ██
-      ██      ██   ██ ██ ██   ██    ██    ██  ██████  ██   ████
-    */
-
-    [Instructions.ClaimPendingDeposit]: {
-      name: 'Claim Volt Tokens',
-      packageId: PackageEnum.Friktion,
-    },
-    [Instructions.ClaimPendingWithdraw]: {
-      name: 'Claim Pending Withdraw',
-      packageId: PackageEnum.Friktion,
-    },
-    [Instructions.DepositIntoVolt]: {
-      name: 'Deposit into Volt',
-      packageId: PackageEnum.Friktion,
-    },
-    [Instructions.WithdrawFromVolt]: {
-      name: 'Withdraw from Volt',
-      packageId: PackageEnum.Friktion,
     },
 
     /*

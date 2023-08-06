@@ -16,7 +16,6 @@ export enum PackageEnum {
   Castle = 1,
   Common,
   Foresight,
-  Friktion,
   GatewayPlugin,
   GoblinGold,
   Identity,
@@ -113,36 +112,6 @@ export interface MeanTransferStream {
   governedTokenAccount: AssetAccount | undefined
   stream: PaymentStreaming.Stream | undefined
   destination: string | undefined
-}
-
-export interface FriktionDepositForm {
-  amount: number | undefined
-  governedTokenAccount: AssetAccount | undefined
-  voltVaultId: string
-  programId: string | undefined
-  mintInfo: MintInfo | undefined
-}
-
-export interface FriktionWithdrawForm {
-  amount: number | undefined
-  governedTokenAccount: AssetAccount | undefined
-  voltVaultId: string
-  programId: string | undefined
-  mintInfo: MintInfo | undefined
-}
-
-export interface FriktionClaimPendingDepositForm {
-  governedTokenAccount: AssetAccount | undefined
-  voltVaultId: string
-  programId: string | undefined
-  mintInfo: MintInfo | undefined
-}
-
-export interface FriktionClaimPendingWithdrawForm {
-  governedTokenAccount: AssetAccount | undefined
-  voltVaultId: string
-  programId: string | undefined
-  mintInfo: MintInfo | undefined
 }
 
 export interface GoblinGoldDepositForm {
@@ -390,8 +359,6 @@ export interface JoinDAOForm {
 export enum Instructions {
   Base64,
   ChangeMakeDonation,
-  ClaimPendingDeposit,
-  ClaimPendingWithdraw,
   Clawback,
   CloseTokenAccount,
   ConfigureGatewayPlugin,
@@ -406,7 +373,6 @@ export enum Instructions {
   DeactivateValidatorStake,
   DepositIntoCastle,
   DepositIntoGoblinGold,
-  DepositIntoVolt,
   DepositReserveLiquidityAndObligationCollateral,
   DifferValidatorStake,
   DualFinanceAirdrop,
@@ -480,7 +446,6 @@ export enum Instructions {
   WithdrawFromGoblinGold,
   WithdrawObligationCollateralAndRedeemReserveLiquidity,
   WithdrawValidatorStake,
-  WithdrawFromVolt,
   SplitStake,
   AddKeyToDID,
   RemoveKeyFromDID,
