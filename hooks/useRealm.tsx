@@ -187,7 +187,6 @@ const getVoterWeight = (
         nftVotingPower
       )
     }
-
     if (GATEWAY_PLUGINS_PKS.includes(currentPluginPk.toBase58())) {
       return new SimpleGatedVoterWeight(
         ownTokenRecord,
