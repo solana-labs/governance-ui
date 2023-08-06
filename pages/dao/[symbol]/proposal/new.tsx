@@ -78,8 +78,6 @@ import MeanTransferStream from './components/instructions/Mean/MeanTransferStrea
 import ChangeDonation from './components/instructions/Change/ChangeDonation'
 import VotingMintConfig from './components/instructions/Vsr/VotingMintConfig'
 import CreateVsrRegistrar from './components/instructions/Vsr/CreateRegistrar'
-import GoblinGoldDeposit from './components/instructions/GoblinGold/GoblinGoldDeposit'
-import GoblinGoldWithdraw from './components/instructions/GoblinGold/GoblinGoldWithdraw'
 import CreateGatewayPluginRegistrar from './components/instructions/GatewayPlugin/CreateRegistrar'
 import ConfigureGatewayPlugin from './components/instructions/GatewayPlugin/ConfigureGateway'
 import CreateTokenMetadata from './components/instructions/CreateTokenMetadata'
@@ -427,8 +425,6 @@ const New = () => {
       [Instructions.MeanWithdrawFromAccount]: MeanWithdrawFromAccount,
       [Instructions.MeanCreateStream]: MeanCreateStream,
       [Instructions.MeanTransferStream]: MeanTransferStream,
-      [Instructions.DepositIntoGoblinGold]: GoblinGoldDeposit,
-      [Instructions.WithdrawFromGoblinGold]: GoblinGoldWithdraw,
       [Instructions.CreateSolendObligationAccount]: CreateObligationAccount,
       [Instructions.InitSolendObligationAccount]: InitObligationAccount,
       [Instructions.DepositReserveLiquidityAndObligationCollateral]: DepositReserveLiquidityAndObligationCollateral,

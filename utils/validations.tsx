@@ -621,57 +621,6 @@ export const getDualFinanceVoteDepositSchema = () => {
   })
 }
 
-export const getGoblinGoldDepositSchema = ({ form }) => {
-  const governedTokenAccount = form.governedTokenAccount as AssetAccount
-  return yup.object().shape({
-    governedTokenAccount: yup.object().required('Source account is required'),
-    goblinGoldVaultId: yup.string().required('Vault ID is required'),
-    amount: yup
-      .number()
-      .typeError('Amount is required')
-      .test(
-        'amount',
-        'Transfer amount must be less than the source account available amount',
-        async function (val: number) {
-          if (val && !form.governedTokenAccount) {
-            return this.createError({
-              message: `Please select source account to validate the amount`,
-            })
-          }
-          if (
-            val &&
-            governedTokenAccount &&
-            governedTokenAccount.extensions.mint
-          ) {
-            const mintValue = getMintNaturalAmountFromDecimalAsBN(
-              val,
-              governedTokenAccount?.extensions.mint.account.decimals
-            )
-            return !!(governedTokenAccount?.extensions.token?.publicKey &&
-            !governedTokenAccount.isSol
-              ? governedTokenAccount.extensions.token.account.amount.gte(
-                  mintValue
-                )
-              : new BN(
-                  governedTokenAccount.extensions.solAccount!.lamports
-                ).gte(mintValue))
-          }
-          return this.createError({
-            message: `Amount is required`,
-          })
-        }
-      ),
-  })
-}
-
-export const getGoblinGoldWithdrawSchema = () => {
-  return yup.object().shape({
-    governedTokenAccount: yup.object().required('Source account is required'),
-    goblinGoldVaultId: yup.string().required('Vault ID is required'),
-    amount: yup.number().typeError('Amount is required'),
-  })
-}
-
 export const getTokenTransferSchema = ({
   form,
   connection,

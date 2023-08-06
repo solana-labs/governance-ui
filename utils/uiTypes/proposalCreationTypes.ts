@@ -16,7 +16,6 @@ export enum PackageEnum {
   Common,
   Foresight,
   GatewayPlugin,
-  GoblinGold,
   Identity,
   NftPlugin,
   MangoMarketV4,
@@ -94,22 +93,6 @@ export interface MeanTransferStream {
   governedTokenAccount: AssetAccount | undefined
   stream: PaymentStreaming.Stream | undefined
   destination: string | undefined
-}
-
-export interface GoblinGoldDepositForm {
-  amount: number | undefined
-  governedTokenAccount?: AssetAccount | undefined
-  goblinGoldVaultId: string
-  mintName?: SupportedMintName | undefined
-  mintInfo: MintInfo | undefined
-}
-
-export interface GoblinGoldWithdrawForm {
-  amount: number | undefined
-  governedTokenAccount?: AssetAccount | undefined
-  goblinGoldVaultId?: string
-  mintName?: SupportedMintName
-  mintInfo: MintInfo | undefined
 }
 
 export interface GrantForm {
@@ -353,7 +336,6 @@ export enum Instructions {
   CreateTokenMetadata,
   CreateVsrRegistrar,
   DeactivateValidatorStake,
-  DepositIntoGoblinGold,
   DepositReserveLiquidityAndObligationCollateral,
   DifferValidatorStake,
   DualFinanceAirdrop,
@@ -423,7 +405,6 @@ export enum Instructions {
   TransferDomainName,
   UpdateTokenMetadata,
   VotingMintConfig,
-  WithdrawFromGoblinGold,
   WithdrawObligationCollateralAndRedeemReserveLiquidity,
   WithdrawValidatorStake,
   SplitStake,

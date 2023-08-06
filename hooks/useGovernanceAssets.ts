@@ -157,10 +157,6 @@ export default function useGovernanceAssets() {
       name: 'Gateway Plugin',
       image: '/img/civic.svg',
     },
-    [PackageEnum.GoblinGold]: {
-      name: 'Goblin Gold',
-      image: '/img/goblingold.png',
-    },
     [PackageEnum.Identity]: {
       name: 'Identity',
       image: '/img/identity.png',
@@ -419,23 +415,6 @@ export default function useGovernanceAssets() {
     [Instructions.ForesightSetMarketMetadata]: {
       name: 'Set Market Metadata',
       packageId: PackageEnum.Foresight,
-    },
-
-    /*
-       ██████   ██████  ██████  ██      ██ ███    ██  ██████   ██████  ██      ██████
-      ██       ██    ██ ██   ██ ██      ██ ████   ██ ██       ██    ██ ██      ██   ██
-      ██   ███ ██    ██ ██████  ██      ██ ██ ██  ██ ██   ███ ██    ██ ██      ██   ██
-      ██    ██ ██    ██ ██   ██ ██      ██ ██  ██ ██ ██    ██ ██    ██ ██      ██   ██
-       ██████   ██████  ██████  ███████ ██ ██   ████  ██████   ██████  ███████ ██████
-    */
-
-    [Instructions.DepositIntoGoblinGold]: {
-      name: 'Deposit',
-      packageId: PackageEnum.GoblinGold,
-    },
-    [Instructions.WithdrawFromGoblinGold]: {
-      name: 'Withdraw',
-      packageId: PackageEnum.GoblinGold,
     },
 
     /*
