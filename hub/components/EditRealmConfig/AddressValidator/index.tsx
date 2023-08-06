@@ -5,7 +5,6 @@ import {
   VSR_PLUGIN_PKS,
   NFT_PLUGINS_PKS,
   GATEWAY_PLUGINS_PKS,
-  SWITCHBOARD_PLUGINS_PKS,
 } from '@constants/plugins';
 import { Program, AnchorProvider } from '@coral-xyz/anchor';
 import { PublicKey } from '@solana/web3.js';
@@ -20,7 +19,6 @@ const RECOGNIZED_PLUGINS = new Set([
   ...VSR_PLUGIN_PKS,
   ...NFT_PLUGINS_PKS,
   ...GATEWAY_PLUGINS_PKS,
-  ...SWITCHBOARD_PLUGINS_PKS,
 ]);
 
 interface Props {

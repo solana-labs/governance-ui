@@ -6,7 +6,6 @@ import { getMintDecimalAmount } from '@tools/sdk/units'
 import type {
   VoteRegistryVoterWeight,
   VoteNftWeight,
-  SwitchboardQueueVoteWeight,
   SimpleGatedVoterWeight,
   VoterWeight,
 } from '../../models/voteWeights'
@@ -15,7 +14,6 @@ import type { RealmInfo } from '../../models/registry/api'
 type OwnVoterWeight =
   | VoteRegistryVoterWeight
   | VoteNftWeight
-  | SwitchboardQueueVoteWeight
   | SimpleGatedVoterWeight
   | VoterWeight
 

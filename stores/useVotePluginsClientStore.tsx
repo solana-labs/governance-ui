@@ -1,6 +1,5 @@
 import create, { State } from 'zustand'
 import { GatewayClient } from '@solana/governance-program-library'
-import { SwitchboardQueueVoterClient } from '../SwitchboardVotePlugin/SwitchboardQueueVoterClient'
 import { getRegistrarPDA, Registrar } from 'VoteStakeRegistry/sdk/accounts'
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts'
 import { AnchorProvider, Wallet } from '@coral-xyz/anchor'
@@ -28,7 +27,6 @@ interface UseVotePluginsClientStore extends State {
     heliumVsrClient: HeliumVsrClient | undefined
     nftClient: NftVoterClient | undefined
     gatewayClient: GatewayClient | undefined
-    switchboardClient: SwitchboardQueueVoterClient | undefined
     nftMintRegistrar: any
     gatewayRegistrar: any
     currentRealmVotingClient: VotingClient
@@ -48,10 +46,6 @@ interface UseVotePluginsClientStore extends State {
     programId: PublicKey
   ) => void
   handleSetNftClient: (
-    wallet: SignerWalletAdapter | undefined,
-    connection: ConnectionContext
-  ) => void
-  handleSetSwitchboardClient: (
     wallet: SignerWalletAdapter | undefined,
     connection: ConnectionContext
   ) => void
@@ -87,7 +81,6 @@ const defaultState = {
   heliumVsrClient: undefined,
   nftClient: undefined,
   gatewayClient: undefined,
-  switchboardClient: undefined,
   voteStakeRegistryRegistrar: null,
   heliumVsrRegistrar: null,
   voteStakeRegistryRegistrarPk: null,
@@ -214,21 +207,6 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
       const existingRegistrar = await tryGetGatewayRegistrar(registrar, client)
       set((s) => {
         s.state.gatewayRegistrar = existingRegistrar
-      })
-    },
-    handleSetSwitchboardClient: async (wallet, connection) => {
-      const options = AnchorProvider.defaultOptions()
-      const provider = new AnchorProvider(
-        connection.current,
-        (wallet as unknown) as Wallet,
-        options
-      )
-      const switchboardClient = await SwitchboardQueueVoterClient.connect(
-        provider,
-        connection.cluster === 'devnet'
-      )
-      set((s) => {
-        s.state.switchboardClient = switchboardClient
       })
     },
     handleSetCurrentRealmVotingClient: ({ client, realm, walletPk }) => {
