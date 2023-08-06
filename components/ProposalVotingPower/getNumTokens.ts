@@ -7,7 +7,6 @@ import type {
   VoteRegistryVoterWeight,
   VoteNftWeight,
   SwitchboardQueueVoteWeight,
-  PythVoterWeight,
   SimpleGatedVoterWeight,
   VoterWeight,
 } from '../../models/voteWeights'
@@ -17,7 +16,6 @@ type OwnVoterWeight =
   | VoteRegistryVoterWeight
   | VoteNftWeight
   | SwitchboardQueueVoteWeight
-  | PythVoterWeight
   | SimpleGatedVoterWeight
   | VoterWeight
 

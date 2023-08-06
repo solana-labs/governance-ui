@@ -6,11 +6,10 @@ import {
   NFT_PLUGINS_PKS,
   GATEWAY_PLUGINS_PKS,
   SWITCHBOARD_PLUGINS_PKS,
-  PYTH_PLUGINS_PKS,
 } from '@constants/plugins';
 import { Program, AnchorProvider } from '@coral-xyz/anchor';
 import { PublicKey } from '@solana/web3.js';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Input } from '@hub/components/controls/Input';
 import { useCluster } from '@hub/hooks/useCluster';
@@ -22,7 +21,6 @@ const RECOGNIZED_PLUGINS = new Set([
   ...NFT_PLUGINS_PKS,
   ...GATEWAY_PLUGINS_PKS,
   ...SWITCHBOARD_PLUGINS_PKS,
-  ...PYTH_PLUGINS_PKS,
 ]);
 
 interface Props {
