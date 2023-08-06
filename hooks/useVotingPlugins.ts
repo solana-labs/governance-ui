@@ -55,7 +55,6 @@ export function useVotingPlugins() {
     //handleSetSwitchboardClient,
     handleSetNftRegistrar,
     handleSetGatewayRegistrar,
-    handleSetPythClient,
     handleSetCurrentRealmVotingClient,
   } = useVotePluginsClientStore()
 
@@ -82,7 +81,7 @@ export function useVotingPlugins() {
     vsrClient,
     gatewayClient,
     //switchboardClient,
-    pythClient,
+    //pythClient,
     nftClient,
     nftMintRegistrar,
     heliumVsrClient,
@@ -91,7 +90,6 @@ export function useVotingPlugins() {
     s.state.vsrClient,
     s.state.gatewayClient,
     //s.state.switchboardClient,
-    s.state.pythClient,
     s.state.nftClient,
     s.state.nftMintRegistrar,
     s.state.heliumVsrClient,
@@ -163,7 +161,6 @@ export function useVotingPlugins() {
       handleSetNftClient(wallet, connection)
       //handleSetSwitchboardClient(wallet, connection)
       handleSetGatewayClient(wallet, connection)
-      handleSetPythClient(wallet, connection)
     }
   }, [
     connection,
@@ -171,7 +168,6 @@ export function useVotingPlugins() {
     handleSetGatewayClient,
     handleSetHeliumVsrClient,
     handleSetNftClient,
-    handleSetPythClient,
     handleSetVsrClient,
     wallet,
   ])
@@ -297,7 +293,6 @@ export function useVotingPlugins() {
     heliumVsrClient,
     nftClient,
     voterPk,
-    pythClient,
     realm,
     vsrClient,
   ])
