@@ -151,10 +151,6 @@ export default function useGovernanceAssets() {
       name: 'Dual Finance',
       image: '/img/dual-logo.png',
     },
-    [PackageEnum.Everlend]: {
-      name: 'Everlend',
-      image: '/img/everlend.png',
-    },
     [PackageEnum.Foresight]: {
       name: 'Foresight',
       isVisible: symbol === 'FORE',
@@ -418,23 +414,6 @@ export default function useGovernanceAssets() {
       name: 'Vote',
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Dual,
-    },
-
-    /*
-      ███████ ██    ██ ███████ ██████  ██      ███████ ███    ██ ██████
-      ██      ██    ██ ██      ██   ██ ██      ██      ████   ██ ██   ██
-      █████   ██    ██ █████   ██████  ██      █████   ██ ██  ██ ██   ██
-      ██       ██  ██  ██      ██   ██ ██      ██      ██  ██ ██ ██   ██
-      ███████   ████   ███████ ██   ██ ███████ ███████ ██   ████ ██████
-    */
-
-    [Instructions.EverlendDeposit]: {
-      name: 'Deposit Funds',
-      packageId: PackageEnum.Everlend,
-    },
-    [Instructions.EverlendWithdraw]: {
-      name: 'Withdraw Funds',
-      packageId: PackageEnum.Everlend,
     },
 
     /*

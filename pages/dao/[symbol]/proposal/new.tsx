@@ -102,8 +102,6 @@ import OpenBookEditMarket from './components/instructions/Mango/MangoV4/OpenBook
 import PerpCreate from './components/instructions/Mango/MangoV4/PerpCreate'
 import TokenRegisterTrustless from './components/instructions/Mango/MangoV4/TokenRegisterTrustless'
 import TransferDomainName from './components/instructions/TransferDomainName'
-import DepositForm from './components/instructions/Everlend/DepositForm'
-import WithdrawForm from './components/instructions/Everlend/WithdrawForm'
 import InitUser from './components/instructions/Serum/InitUser'
 import GrantForm from './components/instructions/Serum/GrantForm'
 import JoinDAO from './components/instructions/JoinDAO'
@@ -481,8 +479,6 @@ const New = () => {
       [Instructions.SplitStake]: SplitStake,
       [Instructions.DifferValidatorStake]: null,
       [Instructions.TransferDomainName]: TransferDomainName,
-      [Instructions.EverlendDeposit]: DepositForm,
-      [Instructions.EverlendWithdraw]: WithdrawForm,
       [Instructions.SerumInitUser]: InitUser,
       [Instructions.SerumGrantLockedSRM]: {
         componentBuilderFunction: ({ index, governance }) => (

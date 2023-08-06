@@ -45,7 +45,6 @@
     "@dual-finance/staking-options": "0.0.24",
     "@emotion/react": "11.9.0",
     "@emotion/styled": "11.8.1",
-    "@everlend/general-pool": "0.0.27",
     "@foresight-tmp/foresight-sdk": "0.1.46",
     "@friktion-labs/friktion-sdk": "1.1.118",
     "@headlessui/react": "1.6.6",

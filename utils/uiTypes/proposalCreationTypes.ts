@@ -15,7 +15,6 @@ import * as PaymentStreaming from '@mean-dao/payment-streaming'
 export enum PackageEnum {
   Castle = 1,
   Common,
-  Everlend,
   Foresight,
   Friktion,
   GatewayPlugin,
@@ -420,8 +419,6 @@ export enum Instructions {
   DualFinanceDelegateWithdraw,
   DualFinanceVoteDeposit,
   DualFinanceVote,
-  EverlendDeposit,
-  EverlendWithdraw,
   ForesightAddMarketListToCategory,
   ForesightInitCategory,
   ForesightInitMarket,
