@@ -705,14 +705,6 @@ export default function useGovernanceAssets() {
       ███████  ███ ███  ██    ██     ██████ ██   ██ ██████   ██████  ██   ██ ██   ██ ██████
     */
 
-    [Instructions.SwitchboardAdmitOracle]: {
-      name: 'Admit Oracle to Queue',
-      packageId: PackageEnum.Switchboard,
-    },
-    [Instructions.SwitchboardRevokeOracle]: {
-      name: 'Remove Oracle from Queue',
-      packageId: PackageEnum.Switchboard,
-    },
     [Instructions.SwitchboardFundOracle]: {
       name: 'Fund Oracle',
       packageId: PackageEnum.Switchboard,

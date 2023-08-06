@@ -1,8 +1,5 @@
 import { GatewayClient } from '@solana/governance-program-library'
-import {
-  SwitchboardQueueVoterClient,
-  SWITCHBOARD_ADDIN_ID,
-} from '../../SwitchboardVotePlugin/SwitchboardQueueVoterClient'
+
 import {
   ProgramAccount,
   Realm,
@@ -69,7 +66,6 @@ export enum VotingClientType {
   VsrClient,
   HeliumVsrClient,
   NftVoterClient,
-  SwitchboardVoterClient,
   GatewayClient,
 }
 
@@ -97,7 +93,6 @@ export type Client =
   | VsrClient
   | HeliumVsrClient
   | NftVoterClient
-  | SwitchboardQueueVoterClient
   | GatewayClient
 
 //Abstract for common functions that plugins will implement
@@ -134,10 +129,7 @@ export class VotingClient {
       this.clientType = VotingClientType.NftVoterClient
       this.noClient = false
     }
-    if (this.client instanceof SwitchboardQueueVoterClient) {
-      this.clientType = VotingClientType.SwitchboardVoterClient
-      this.noClient = false
-    }
+
     if (this.client instanceof GatewayClient) {
       this.clientType = VotingClientType.GatewayClient
       this.noClient = false
@@ -297,15 +289,6 @@ export class VotingClient {
       instructions.push(updateVoterWeightRecordIx)
       return { voterWeightPk, maxVoterWeightRecord: undefined }
     }
-
-    if (this.client instanceof SwitchboardQueueVoterClient) {
-      instructions.push(this.instructions[0])
-      const [vwr] = await PublicKey.findProgramAddress(
-        [Buffer.from('VoterWeightRecord'), this.oracles[0].toBytes()],
-        SWITCHBOARD_ADDIN_ID
-      )
-      return { voterWeightPk: vwr, maxVoterWeightRecord: undefined }
-    }
   }
   withCastPluginVote = async (
     instructions: TransactionInstruction[],
@@ -326,15 +309,6 @@ export class VotingClient {
     }
 
     if (this.client instanceof VsrClient) {
-      const props = await this.withUpdateVoterWeightRecord(
-        instructions,
-        tokenOwnerRecord,
-        'castVote'
-      )
-      return props
-    }
-
-    if (this.client instanceof SwitchboardQueueVoterClient) {
       const props = await this.withUpdateVoterWeightRecord(
         instructions,
         tokenOwnerRecord,
@@ -724,9 +698,6 @@ export class VotingClient {
   }
   _setCurrentVoterGatewayToken = (gatewayToken: PublicKey) => {
     this.gatewayToken = gatewayToken
-  }
-  _setOracles = (oracles: PublicKey[]) => {
-    this.oracles = oracles
   }
   _setInstructions = (instructions: TransactionInstruction[]) => {
     this.instructions = instructions

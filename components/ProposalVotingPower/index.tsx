@@ -1,9 +1,6 @@
 import classNames from 'classnames'
 
-import {
-  GATEWAY_PLUGINS_PKS,
-  SWITCHBOARD_PLUGINS_PKS,
-} from '@constants/plugins'
+import { GATEWAY_PLUGINS_PKS } from '@constants/plugins'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import { option } from '@tools/core/option'
 
@@ -25,11 +22,7 @@ export default function ProposalVotingPower(props: Props) {
   const isUsingGatewayPlugin =
     currentPluginPk && GATEWAY_PLUGINS_PKS.includes(currentPluginPk.toBase58())
 
-  const isUsingSwitchboardPlugin =
-    currentPluginPk &&
-    SWITCHBOARD_PLUGINS_PKS.includes(currentPluginPk.toBase58())
-
-  if (isUsingGatewayPlugin || isUsingSwitchboardPlugin) {
+  if (isUsingGatewayPlugin) {
     return <TokenBalanceCardWrapper proposal={option(proposal?.account)} />
   }
 
