@@ -140,10 +140,6 @@ export default function useGovernanceAssets() {
   //
   // Packages are visible by default
   const packages: Packages = {
-    [PackageEnum.Castle]: {
-      name: 'Castle',
-      image: '/img/castle.png',
-    },
     [PackageEnum.Common]: {
       name: 'Common',
     },
@@ -216,23 +212,6 @@ export default function useGovernanceAssets() {
   //
   // If isVisible is not set, it is equal to canUseAnyInstruction
   const instructionsMap: InstructionsMap = {
-    /*
-       ██████  █████  ███████ ████████ ██      ███████
-      ██      ██   ██ ██         ██    ██      ██
-      ██      ███████ ███████    ██    ██      █████
-      ██      ██   ██      ██    ██    ██      ██
-       ██████ ██   ██ ███████    ██    ███████ ███████
-    */
-
-    [Instructions.DepositIntoCastle]: {
-      name: 'Deposit into Vault',
-      packageId: PackageEnum.Castle,
-    },
-    [Instructions.WithdrawFromCastle]: {
-      name: 'Withdraw from Vault',
-      packageId: PackageEnum.Castle,
-    },
-
     /*
         ██████  ██████  ███    ███ ███    ███  ██████  ███    ██
        ██      ██    ██ ████  ████ ████  ████ ██    ██ ████   ██

@@ -60,7 +60,6 @@ import DeactivateValidatorStake from './components/instructions/Validators/Deact
 import WithdrawValidatorStake from './components/instructions/Validators/WithdrawStake'
 import SplitStake from './components/instructions/Validators/SplitStake'
 import useCreateProposal from '@hooks/useCreateProposal'
-import CastleDeposit from './components/instructions/Castle/CastleDeposit'
 import MakeInitMarketParams from './components/instructions/Foresight/MakeInitMarketParams'
 import MakeInitMarketListParams from './components/instructions/Foresight/MakeInitMarketListParams'
 import MakeInitCategoryParams from './components/instructions/Foresight/MakeInitCategoryParams'
@@ -70,7 +69,6 @@ import RealmConfig from './components/instructions/RealmConfig'
 import MakeSetMarketMetadataParams from './components/instructions/Foresight/MakeSetMarketMetadataParams'
 import CloseTokenAccount from './components/instructions/CloseTokenAccount'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
-import CastleWithdraw from './components/instructions/Castle/CastleWithdraw'
 import StakingOption from './components/instructions/Dual/StakingOption'
 import MeanCreateAccount from './components/instructions/Mean/MeanCreateAccount'
 import MeanFundAccount from './components/instructions/Mean/MeanFundAccount'
@@ -414,7 +412,6 @@ const New = () => {
       [Instructions.Grant]: Grant,
       [Instructions.Clawback]: Clawback,
       [Instructions.CreateAssociatedTokenAccount]: CreateAssociatedTokenAccount,
-      [Instructions.DepositIntoCastle]: CastleDeposit,
       [Instructions.DualFinanceAirdrop]: DualAirdrop,
       [Instructions.DualFinanceStakingOption]: StakingOption,
       [Instructions.DualFinanceInitStrike]: InitStrike,
@@ -430,7 +427,6 @@ const New = () => {
       [Instructions.MeanWithdrawFromAccount]: MeanWithdrawFromAccount,
       [Instructions.MeanCreateStream]: MeanCreateStream,
       [Instructions.MeanTransferStream]: MeanTransferStream,
-      [Instructions.WithdrawFromCastle]: CastleWithdraw,
       [Instructions.DepositIntoGoblinGold]: GoblinGoldDeposit,
       [Instructions.WithdrawFromGoblinGold]: GoblinGoldWithdraw,
       [Instructions.CreateSolendObligationAccount]: CreateObligationAccount,

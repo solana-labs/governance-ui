@@ -13,7 +13,6 @@ import * as PaymentStreaming from '@mean-dao/payment-streaming'
 
 // Alphabetical order
 export enum PackageEnum {
-  Castle = 1,
   Common,
   Foresight,
   GatewayPlugin,
@@ -54,22 +53,6 @@ export interface DomainNameTransferForm {
   destinationAccount: string
   governedAccount: AssetAccount | undefined
   domainAddress: string | undefined
-}
-
-export interface CastleDepositForm {
-  amount: number | undefined
-  governedTokenAccount: AssetAccount | undefined
-  castleVaultId: string
-  programId: string | undefined
-  mintInfo: MintInfo | undefined
-}
-
-export interface CastleWithdrawForm {
-  amount: number | undefined
-  governedTokenAccount: AssetAccount | undefined
-  castleVaultId: string
-  programId: string | undefined
-  mintInfo: MintInfo | undefined
 }
 
 export interface MeanCreateAccount {
@@ -370,7 +353,6 @@ export enum Instructions {
   CreateTokenMetadata,
   CreateVsrRegistrar,
   DeactivateValidatorStake,
-  DepositIntoCastle,
   DepositIntoGoblinGold,
   DepositReserveLiquidityAndObligationCollateral,
   DifferValidatorStake,
@@ -441,7 +423,6 @@ export enum Instructions {
   TransferDomainName,
   UpdateTokenMetadata,
   VotingMintConfig,
-  WithdrawFromCastle,
   WithdrawFromGoblinGold,
   WithdrawObligationCollateralAndRedeemReserveLiquidity,
   WithdrawValidatorStake,

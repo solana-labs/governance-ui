@@ -25,7 +25,6 @@ import { ATA_PROGRAM_INSTRUCTIONS } from './programs/associatedTokenAccount'
 import { governance as foresightGov } from '@foresight-tmp/foresight-sdk'
 import { ConnectionContext } from '@utils/connection'
 import { NFT_VOTER_INSTRUCTIONS } from './programs/nftVotingClient'
-import { PROGRAM_IDS } from '@castlefinance/vault-sdk'
 import { FORESIGHT_INSTRUCTIONS } from './programs/foresight'
 import { LIDO_INSTRUCTIONS } from './programs/lido'
 import { NAME_SERVICE_INSTRUCTIONS } from './programs/nameService'
@@ -359,12 +358,6 @@ export const AUXILIARY_TOKEN_ACCOUNTS = {
 }
 
 export const HIDDEN_TREASURES = [...HIDDEN_MNGO_TREASURES]
-
-export const ALL_CASTLE_PROGRAMS = [
-  PROGRAM_IDS['devnet-parity'],
-  PROGRAM_IDS['devnet-staging'],
-  PROGRAM_IDS['mainnet'],
-]
 
 interface AccountDescriptor {
   name: string
