@@ -6,24 +6,20 @@ import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import {
   SimpleGatedVoterWeight,
   VoteNftWeight,
-  SwitchboardQueueVoteWeight,
   VoteRegistryVoterWeight,
   VoterWeight,
 } from '../models/voteWeights'
 import {
   NFT_PLUGINS_PKS,
   VSR_PLUGIN_PKS,
-  SWITCHBOARD_PLUGINS_PKS,
   GATEWAY_PLUGINS_PKS,
   HELIUM_VSR_PLUGINS_PKS,
 } from '../constants/plugins'
 import useGatewayPluginStore from '../GatewayPlugin/store/gatewayPluginStore'
-import useSwitchboardPluginStore from 'SwitchboardVotePlugin/store/switchboardStore'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import { BN } from '@coral-xyz/anchor'
 import { PublicKey } from '@solana/web3.js'
 import { useVsrMode } from './useVsrMode'
-import useWalletOnePointOh from './useWalletOnePointOh'
 import { useRealmQuery } from './queries/realm'
 import {
   useUserCommunityTokenOwnerRecord,
@@ -44,8 +40,6 @@ export default function useRealm() {
   const router = useRouter()
   const { symbol } = router.query
 
-  const wallet = useWalletOnePointOh()
-  const connected = !!wallet?.connected
   const { data: tokenAccounts } = useUserTokenAccountsQuery()
   const realm = useRealmQuery().data?.result
   const realmInfo = useSelectedRealmInfo()
@@ -58,7 +52,6 @@ export default function useRealm() {
   const heliumVotingPower = useHeliumVsrStore((s) => s.state.votingPower)
   const nftVotingPower = useNftPluginStore((s) => s.state.votingPower)
   const gatewayVotingPower = useGatewayPluginStore((s) => s.state.votingPower)
-  const sbVotingPower = useSwitchboardPluginStore((s) => s.state.votingPower)
   const currentPluginPk = config?.account?.communityTokenConfig.voterWeightAddin
 
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
@@ -109,7 +102,6 @@ export default function useRealm() {
     ownTokenRecord,
     votingPower,
     nftVotingPower,
-    sbVotingPower,
     gatewayVotingPower,
     ownCouncilTokenRecord,
     heliumVotingPower
@@ -169,7 +161,6 @@ const getVoterWeight = (
   ownTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,
   votingPower: BN,
   nftVotingPower: BN,
-  sbVotingPower: BN,
   gatewayVotingPower: BN,
   ownCouncilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,
   heliumVotingPower: BN
@@ -196,9 +187,7 @@ const getVoterWeight = (
         nftVotingPower
       )
     }
-    if (SWITCHBOARD_PLUGINS_PKS.includes(currentPluginPk.toBase58())) {
-      return new SwitchboardQueueVoteWeight(ownTokenRecord, sbVotingPower)
-    }
+
     if (GATEWAY_PLUGINS_PKS.includes(currentPluginPk.toBase58())) {
       return new SimpleGatedVoterWeight(
         ownTokenRecord,
