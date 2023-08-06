@@ -182,10 +182,10 @@ export const ProposalTypeRadioButton: FunctionComponent<NewButtonProps> = ({
   ...props
 }) => {
   let classNames =
-    'group default-transition px-2 py-1 h-[72px] min-w-[250px] text-fgd-3 rounded-lg border disabled:cursor-not-allowed'
+    'group default-transition px-2 py-1 min-h-[72px] min-w-[186px] rounded-lg border disabled:cursor-not-allowed'
 
   if (selected) {
-    classNames += ' bg-bkg-4 border-fgd-1 focus:border-blue'
+    classNames += ' bg-fgd-1 border-fgd-1 focus:border-blue'
   } else {
     classNames += ' focus:bg-fgd-3 focus:border-none'
   }
@@ -199,9 +199,9 @@ export const ProposalTypeRadioButton: FunctionComponent<NewButtonProps> = ({
   classNames += ` ${className}`
   return (
     <button className={classNames} type="button" disabled={disabled} {...props}>
-      <div className="flex items-center pl-4 space-x-3 md:pl-0 md:justify-center">
+      <div className="flex items-center pl-4 space-x-3 md:pl-0 justify-center">
         <SimpleCheckmarkCircle selected={selected} />
-        <div className='inline ml-2 text-sm'>{children}</div>
+        <div className={`inline ml-2 text-sm ${selected ? 'text-bkg-1' : 'text-fgd-3'}`}>{children}</div>
       </div>
     </button>
   )

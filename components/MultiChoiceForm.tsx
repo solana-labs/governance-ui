@@ -5,9 +5,9 @@ import { XCircleIcon } from "@heroicons/react/solid";
 import useGovernanceAssets from "@hooks/useGovernanceAssets";
 import useRealm from "@hooks/useRealm";
 import Input from '@components/inputs/Input';
-import { AssetAccount } from "@utils/uiTypes/assets";
-import { useState } from "react";
 import GovernedAccountSelect from "../pages/dao/[symbol]/proposal/components/GovernedAccountSelect";
+import { PublicKey } from "@solana/web3.js";
+import { AssetAccount } from "@utils/uiTypes/assets";
 
 const MultiChoiceForm = ({
     multiChoiceForm,
@@ -17,7 +17,7 @@ const MultiChoiceForm = ({
     updateMultiFormErrors
 } : {
     multiChoiceForm: {
-        governedAccount: AssetAccount | undefined
+        governance: PublicKey | undefined
         options: string[]
     }
     updateMultiChoiceForm: any
@@ -27,38 +27,30 @@ const MultiChoiceForm = ({
 }) => {
     const {ownVoterWeight} = useRealm()
     const { assetAccounts } = useGovernanceAssets()
-
-    const [hideNotaButton, setHideNotaButton] = useState(false)
+    const nota = "none of the above";
+    const hideNotaButton = multiChoiceForm.options.map(i => i.toLowerCase()).includes(nota);
+    const notaCount = multiChoiceForm.options.filter(i => i.toLowerCase() === nota).length;
+    const governance = multiChoiceForm.governance;
 
     const handleMultiForm = ({ propertyName, value }) => {
         updateMultiFormErrors({})
         updateMultiChoiceForm({ ...multiChoiceForm, [propertyName]: value })
-      }
+    }
     
-      const handleNotaButton = () => {
-        const options = multiChoiceForm.options;
-        const last = options.length - 1;
+    const handleNotaButton = () => {
+        const options = [...multiChoiceForm.options];
+        options.push("None of the Above");
+        handleMultiForm({propertyName: "options", value: options});
+    }
     
-        if (options[last] !== "None of the Above") {
-          options.push("None of the Above");
-          handleMultiForm({propertyName: "options", value: options});
-          setHideNotaButton(true);
-        }
-      }
-    
-      const updateOption = (odx: number, value: string)  => {
+    const updateOption = (odx: number, value: string)  => {
         const updatedOptions = [...multiChoiceForm.options];
         updatedOptions[odx] = value;
         handleMultiForm({value: updatedOptions, propertyName: "options"});
     }
 
-    const removeOption = (odx: number, value: string) => {
+    const removeOption = (odx: number) => {
         const updatedOptions = [...multiChoiceForm.options];
-
-        if (value === "None of the Above") {
-            setHideNotaButton(false);
-        }
-
         handleMultiForm({value: updatedOptions.filter((_o, i) => i !== odx), propertyName: "options"});
     }
 
@@ -69,7 +61,7 @@ const MultiChoiceForm = ({
         if (updatedOptions.length > 9) {
             return;
         }
-        if (updatedOptions[len] === "None of the Above") {
+        if (updatedOptions[len].toLowerCase() === nota) {
             // insert new empty option at the second last position if NOTA exists
             updatedOptions.splice(len, 0, "");
         } else {
@@ -83,16 +75,20 @@ const MultiChoiceForm = ({
         <div className="mt-8 mb-8">
             <GovernedAccountSelect
                 label="Which wallet’s rules should this proposal follow?"
-                governedAccounts={assetAccounts.filter((x) =>
-                ownVoterWeight.canCreateProposal(x.governance.account.config))
+                governedAccounts={
+                    assetAccounts.filter((x) =>
+                    ownVoterWeight.canCreateProposal(x.governance.account.config))
                 }
-                onChange={(value: AssetAccount) => {
-                handleMultiForm({ value, propertyName: 'governedAccount' })
+                onChange={(value:AssetAccount) => {
+                handleMultiForm({ value: value.governance.pubkey, propertyName: 'governance' })
                 }}
-                value={multiChoiceForm.governedAccount}
-                error={multiFormErrors['governedAccount']}
+                value={
+                    governance ? assetAccounts.find(x => x.governance.pubkey.equals(governance))
+                    : null
+                }
+                error={multiFormErrors['governance']}
                 shouldBeGoverned={null}
-                governance={multiChoiceForm.governedAccount?.governance}
+                governance={null}
             />
             <h2 className='mt-8'>Add Choices</h2>
             {multiChoiceForm.options.map((option, index) => {
@@ -106,7 +102,7 @@ const MultiChoiceForm = ({
                     {odx > 1 ?
                     <LinkButton
                         className="flex font-bold items-center ml-4 text-fgd-1 text-sm"
-                        onClick={() => removeOption(odx, option)}
+                        onClick={() => removeOption(odx)}
                     >
                         <XCircleIcon className="h-5 mr-1.5 text-red w-5" />
                         Remove
@@ -122,11 +118,13 @@ const MultiChoiceForm = ({
                     value={option}
                     type="text"
                     error={
-                    !option.length && isMultiFormValidated ? "The option can't be empty" : ""
+                        !option.length && isMultiFormValidated ? "The option can't be empty" :
+                        option.toLowerCase() === nota && notaCount > 1 ? 
+                        "Only single 'None of the Above' option can be added"
+                        : ""
                     }
-                    showErrorState={option.length === 0 && isMultiFormValidated}
+                    showErrorState={!option.length && isMultiFormValidated}
                     onChange={(event) => updateOption(odx, event.target.value)}
-                    disabled={option === "None of the Above"}
                 />
                 </div>)}
             )}

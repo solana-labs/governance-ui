@@ -142,7 +142,6 @@ import { useRealmQuery } from '@hooks/queries/realm'
 import { usePrevious } from '@hooks/usePrevious'
 import DualVote from './components/instructions/Dual/DualVote'
 import MultiChoiceForm from '../../../../components/MultiChoiceForm'
-import { AssetAccount } from '@utils/uiTypes/assets'
 
 const TITLE_LENGTH_LIMIT = 130
 
@@ -207,11 +206,11 @@ const New = () => {
     description: '',
   })
   const [multiChoiceForm, setMultiChoiceForm] = useState<{
-    governedAccount: AssetAccount | undefined
+    governance: PublicKey | undefined
     options: string[]
   }>({
-    governedAccount: undefined,
-    options: ['', '']
+    governance: undefined,
+    options: ['', ''] // the multichoice form starts with 2 blank options for the poll
   })
   const [formErrors, setFormErrors] = useState({})
   const [
@@ -313,16 +312,25 @@ const New = () => {
           multiChoiceSchema,
           multiChoiceForm
         )
+        
+        const nota = "none of the above";
+        const isMultiNota = multiChoiceForm.options.filter(i => i.toLowerCase() === nota).length > 1;
 
-        if (isMultiFormValid && multiChoiceForm.governedAccount) {
+        if (isMultiFormValid && multiChoiceForm.governance && !isMultiNota) {
           // Create Multi-Choice Proposal
           try {
-            const options = multiChoiceForm.options;
+            const options = [...multiChoiceForm.options];
+            
+            // shift NOTA to the end, if exists
+            const notaIndex = options.findIndex(el => el.toLowerCase() === nota);
+            if (notaIndex !== -1) {
+              options.push(options.splice(notaIndex, 1)[0]);
+            }
 
             proposalAddress = await proposeMultiChoice({
               title: form.title,
               description: form.description,
-              governance: multiChoiceForm.governedAccount.governance.pubkey,
+              governance: multiChoiceForm.governance,
               instructionsData: [],
               voteByCouncil,
               options,
@@ -708,18 +716,20 @@ const New = () => {
                 }}
               ></VoteBySwitch>
             )}
-            <div className="max-w-lg w-full mb-4 flex flex-wrap justify-between items-end">
-              <ProposalTypeRadioButton
-                onClick={() => setIsMulti(false)}
-                selected={!isMulti}
-                disabled={false}
-                className="w-60"
-              >
-                Executable
-              </ProposalTypeRadioButton>
-              <div className="flex flex-col items-center justify-evenly">
+            <div className="max-w-lg w-full mb-4 flex flex-wrap gap-2 justify-between items-end">
+              <div className='flex grow basis-0'>
+                <ProposalTypeRadioButton
+                  onClick={() => setIsMulti(false)}
+                  selected={!isMulti}
+                  disabled={false}
+                  className='grow'
+                >
+                  Executable
+                </ProposalTypeRadioButton>
+              </div>
+              <div className="flex flex-col items-center justify-evenly grow basis-0">
                 <div className="bg-[#10B981] text-black flex flex-row gap-2 text-sm 
-                items-center px-2 py-1 rounded-md mb-2 w-60">
+                items-center justify-center px-2 py-1 rounded-md mb-2 w-full">
                   <TableOfContents />
                   <div>New: Multiple Choice Polls</div>
                 </div>
@@ -727,7 +737,7 @@ const New = () => {
                   onClick={() => setIsMulti(true)}
                   selected={isMulti}
                   disabled={false}
-                  className="w-60"
+                  className='w-full'
                 >
                   Non-Executable <br /> (Multiple-Choice)
                 </ProposalTypeRadioButton>
