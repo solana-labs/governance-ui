@@ -150,8 +150,7 @@ export class VotingClient {
   withUpdateVoterWeightRecord = async (
     instructions: TransactionInstruction[],
     tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>,
-    type: UpdateVoterWeightRecordTypes,
-    voterWeightTarget?: PublicKey
+    type: UpdateVoterWeightRecordTypes
   ): Promise<ProgramAddresses | undefined> => {
     const realm = this.realm!
 
