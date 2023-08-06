@@ -30,7 +30,6 @@ import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { notify } from '@utils/notifications'
 import { sendSignedTransaction } from '@utils/send'
 import { compareProposals, filterProposals } from '@utils/proposals'
-import { REALM_ID as PYTH_REALM_ID } from 'pyth-staking-api'
 import ProposalSorting, {
   InitialSorting,
   PROPOSAL_SORTING_LOCAL_STORAGE_KEY,
@@ -340,9 +339,6 @@ const REALM = () => {
     pagination?.current?.setPage(0)
   }, [paginateProposals, filteredProposals])
 
-  //Todo: move to own components with refactor to dao folder structure
-  const isPyth = realmInfo?.realmId.toBase58() === PYTH_REALM_ID.toBase58()
-
   return (
     <>
       <div
@@ -528,7 +524,7 @@ const REALM = () => {
             </div>
             <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
               <TokenBalanceCardWrapper />
-              {!isPyth && !process?.env?.DISABLE_NFTS && <NFTSCompactWrapper />}
+              {!process?.env?.DISABLE_NFTS && <NFTSCompactWrapper />}
               <AccountsCompactWrapper />
               <AssetsCompactWrapper />
             </div>

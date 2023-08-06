@@ -4162,18 +4162,6 @@
     js-sha3 "^0.8.0"
     typescript-collections "^1.3.3"
 
-"@solana/spl-governance@0.3.15":
-  version "0.3.15"
-  resolved "https://registry.yarnpkg.com/@solana/spl-governance/-/spl-governance-0.3.15.tgz#4fd8b016394dbe6161009209b1521d4fe3b97791"
-  integrity sha512-VSrzmIXGq5hlCm1JHFCIJGJ2fujqH3GVstyDNTvquxMZioWckmDO5Q/X9oSDft7sziY12tkOW9FDA3Z5m45hBg==
-  dependencies:
-    "@solana/web3.js" "^1.22.0"
-    bignumber.js "^9.0.1"
-    bn.js "^5.1.3"
-    borsh "^0.3.1"
-    bs58 "^4.0.1"
-    superstruct "^0.15.2"
-
 "@solana/spl-governance@0.3.26":
   version "0.3.26"
   resolved "https://registry.yarnpkg.com/@solana/spl-governance/-/spl-governance-0.3.26.tgz#1a6c56037063654d243cc3ee9503b5b3140bbd6f"
@@ -13303,25 +13291,6 @@ purgecss@^4.0.3:
     postcss "^8.3.5"
     postcss-selector-parser "^6.0.6"
 
-pyth-staking-api@1.3.2:
-  version "1.3.2"
-  resolved "https://registry.yarnpkg.com/pyth-staking-api/-/pyth-staking-api-1.3.2.tgz#1c4ae412bd8aa9198a6f8ec44ea7aec785e8ca33"
-  integrity sha512-pmoMh/T58aBWWanm433TcXxgWVojDtPUAwISe+tauPT2zqtWXbyWN2jmp4uKzkWbcrxeSTNTGcCmg4n8cf5uaQ==
-  dependencies:
-    "@project-serum/anchor" "0.24.2"
-    "@solana/spl-governance" "0.3.15"
-    "@solana/spl-token" "^0.1.8"
-    "@solana/web3.js" "^1.36.0"
-    encoding "^0.1.13"
-    pyth-staking-wasm "0.3.3"
-    ts-node "^10.7.0"
-    typescript "^4.3.5"
-
-pyth-staking-wasm@0.3.3:
-  version "0.3.3"
-  resolved "https://registry.yarnpkg.com/pyth-staking-wasm/-/pyth-staking-wasm-0.3.3.tgz#fe6d70ff02efe1857aba99fc4a376c3b840a7a55"
-  integrity sha512-9i5l5N9YHzhZDo5lDJQh8797nYS4e3Mn65yXb+Ksp/J+iUzBEwHenPIHsv+/g9bzTadxr9+pvb3RsC/oWwJf8Q==
-
 qr-code-styling@1.6.0-rc.1:
   version "1.6.0-rc.1"
   resolved "https://registry.yarnpkg.com/qr-code-styling/-/qr-code-styling-1.6.0-rc.1.tgz#6c89e185fa50cc9135101085c12ae95b06f1b290"
@@ -15061,7 +15030,7 @@ ts-mocha@^9.0.2:
   optionalDependencies:
     tsconfig-paths "^3.5.0"
 
-ts-node@10.9.1, ts-node@^10.7.0, ts-node@^10.9.1:
+ts-node@10.9.1, ts-node@^10.9.1:
   version "10.9.1"
   resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-10.9.1.tgz#e73de9102958af9e1f0b168a6ff320e25adcff4b"
   integrity sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==

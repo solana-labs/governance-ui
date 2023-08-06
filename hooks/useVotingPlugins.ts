@@ -35,7 +35,6 @@ import {
   HELIUM_VSR_PLUGINS_PKS,
   VSR_PLUGIN_PKS,
   GATEWAY_PLUGINS_PKS,
-  PYTH_PLUGINS_PKS,
   SWITCHBOARD_PLUGINS_PKS,
 } from '../constants/plugins'
 import useUserOrDelegator from './useUserOrDelegator'
@@ -56,7 +55,6 @@ export function useVotingPlugins() {
     //handleSetSwitchboardClient,
     handleSetNftRegistrar,
     handleSetGatewayRegistrar,
-    handleSetPythClient,
     handleSetCurrentRealmVotingClient,
   } = useVotePluginsClientStore()
 
@@ -83,7 +81,7 @@ export function useVotingPlugins() {
     vsrClient,
     gatewayClient,
     //switchboardClient,
-    pythClient,
+    //pythClient,
     nftClient,
     nftMintRegistrar,
     heliumVsrClient,
@@ -92,7 +90,6 @@ export function useVotingPlugins() {
     s.state.vsrClient,
     s.state.gatewayClient,
     //s.state.switchboardClient,
-    s.state.pythClient,
     s.state.nftClient,
     s.state.nftMintRegistrar,
     s.state.heliumVsrClient,
@@ -164,7 +161,6 @@ export function useVotingPlugins() {
       handleSetNftClient(wallet, connection)
       //handleSetSwitchboardClient(wallet, connection)
       handleSetGatewayClient(wallet, connection)
-      handleSetPythClient(wallet, connection)
     }
   }, [
     connection,
@@ -172,7 +168,6 @@ export function useVotingPlugins() {
     handleSetGatewayClient,
     handleSetHeliumVsrClient,
     handleSetNftClient,
-    handleSetPythClient,
     handleSetVsrClient,
     wallet,
   ])
@@ -252,21 +247,6 @@ export function useVotingPlugins() {
       }
     }
 
-    const handlePythPlugin = () => {
-      if (
-        pythClient &&
-        currentPluginPk &&
-        PYTH_PLUGINS_PKS.includes(currentPluginPk.toBase58())
-      ) {
-        if (voterPk) {
-          handleSetCurrentRealmVotingClient({
-            client: pythClient,
-            realm,
-            walletPk: voterPk,
-          })
-        }
-      }
-    }
     /* 
     const handleSwitchboardPlugin = () => {
       if (
@@ -299,7 +279,6 @@ export function useVotingPlugins() {
       handleVsrPlugin()
       handleHeliumVsrPlugin()
       //handleSwitchboardPlugin()
-      handlePythPlugin()
     }
   }, [
     currentClient,
@@ -314,7 +293,6 @@ export function useVotingPlugins() {
     heliumVsrClient,
     nftClient,
     voterPk,
-    pythClient,
     realm,
     vsrClient,
   ])
