@@ -46,9 +46,9 @@ export const CastMultiVoteButtons = ({proposal} : {proposal: Proposal}) => {
   const handleOption = (index: number) => {
     let options = [...selectedOptions];
     let status = [...optionStatus];
-    const nota = "None of the Above";
+    const nota = "none of the above";
     const last = proposal.options.length - 1;
-    const isNota = proposal.options[last].label === nota;
+    const isNota = proposal.options[last].label.toLowerCase() === nota;
 
     const selected = status[index];
 

@@ -8,7 +8,7 @@ export default function ({ selected = false }) {
         } group-disabled:text-fgd-4 group-disabled:group-hover:border-fgd-4 group-disabled:hover:border-fgd-4`}
       >
         {selected &&
-          <div className="w-[6.4px] h-[6.4px] border-0 bg-bkg-1 rounded-full"></div>
+          <div className="w-2 h-2 border-0 bg-bkg-1 rounded-full"></div>
         }
       </div>
     )

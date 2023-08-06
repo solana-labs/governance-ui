@@ -150,10 +150,7 @@ const schema = yup.object().shape({
 })
 
 const multiChoiceSchema = yup.object().shape({
-  governedAccount: yup
-  .object()
-  .nullable()
-  .required('Governed account is required'),
+  governance: yup.string().required('Governance is required'),
 
   options: yup.array().of(yup.string().required('Option cannot be empty'))
 });
@@ -206,7 +203,7 @@ const New = () => {
     description: '',
   })
   const [multiChoiceForm, setMultiChoiceForm] = useState<{
-    governance: PublicKey | undefined
+    governance: string | undefined
     options: string[]
   }>({
     governance: undefined,
@@ -315,7 +312,7 @@ const New = () => {
         
         const nota = "none of the above";
         const isMultiNota = multiChoiceForm.options.filter(i => i.toLowerCase() === nota).length > 1;
-
+        
         if (isMultiFormValid && multiChoiceForm.governance && !isMultiNota) {
           // Create Multi-Choice Proposal
           try {
@@ -330,7 +327,7 @@ const New = () => {
             proposalAddress = await proposeMultiChoice({
               title: form.title,
               description: form.description,
-              governance: multiChoiceForm.governance,
+              governance: new PublicKey(multiChoiceForm.governance),
               instructionsData: [],
               voteByCouncil,
               options,

@@ -17,7 +17,7 @@ const MultiChoiceForm = ({
     updateMultiFormErrors
 } : {
     multiChoiceForm: {
-        governance: PublicKey | undefined
+        governance: string | undefined
         options: string[]
     }
     updateMultiChoiceForm: any
@@ -80,10 +80,10 @@ const MultiChoiceForm = ({
                     ownVoterWeight.canCreateProposal(x.governance.account.config))
                 }
                 onChange={(value:AssetAccount) => {
-                handleMultiForm({ value: value.governance.pubkey, propertyName: 'governance' })
+                handleMultiForm({ value: value.governance.pubkey.toBase58(), propertyName: 'governance' })
                 }}
                 value={
-                    governance ? assetAccounts.find(x => x.governance.pubkey.equals(governance))
+                    governance ? assetAccounts.find(x => x.governance.pubkey.equals(new PublicKey(governance)))
                     : null
                 }
                 error={multiFormErrors['governance']}
