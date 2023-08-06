@@ -6,8 +6,6 @@ import {
 } from '@solana/web3.js'
 import {
   getGovernanceProgramVersion,
-  getInstructionDataFromBase64,
-  Governance,
   ProgramAccount,
   Realm,
   TokenOwnerRecord,
@@ -15,7 +13,6 @@ import {
   withCreateProposal,
   getSignatoryRecordAddress,
   withInsertTransaction,
-  InstructionData,
   withSignOffProposal,
   withAddSignatory,
   RpcContext,
@@ -26,41 +23,11 @@ import {
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
 import { chunks } from '@utils/helpers'
-import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
 import { trySentryLog } from '@utils/logs'
 import { deduplicateObjsFilter } from '@utils/instructionTools'
 import { sendSignAndConfirmTransactions } from '@utils/modifiedMangolana'
-export interface InstructionDataWithHoldUpTime {
-  data: InstructionData | null
-  holdUpTime: number | undefined
-  prerequisiteInstructions: TransactionInstruction[]
-  chunkBy?: number
-  signers?: Keypair[]
-  prerequisiteInstructionsSigners?: Keypair[]
-}
-
-export class InstructionDataWithHoldUpTime {
-  constructor({
-    instruction,
-    governance,
-  }: {
-    instruction: UiInstruction
-    governance?: ProgramAccount<Governance>
-  }) {
-    this.data = instruction.serializedInstruction
-      ? getInstructionDataFromBase64(instruction.serializedInstruction)
-      : null
-    this.holdUpTime =
-      typeof instruction.customHoldUpTime !== 'undefined'
-        ? instruction.customHoldUpTime
-        : governance?.account?.config.minInstructionHoldUpTime
-    this.prerequisiteInstructions = instruction.prerequisiteInstructions || []
-    this.chunkBy = instruction.chunkBy || 2
-    this.prerequisiteInstructionsSigners =
-      instruction.prerequisiteInstructionsSigners || []
-  }
-}
+import { InstructionDataWithHoldUpTime } from './createProposal'
 
 /** This is a modified version of createProposal that makes a lookup table, which is useful for especially large instructions */
 // TODO make a more generic, less redundant solution
@@ -87,7 +54,7 @@ export const createLUTProposal = async (
   const governanceAuthority = walletPubkey
   const signatory = walletPubkey
   const prerequisiteInstructions: TransactionInstruction[] = []
-  const prerequisiteInstructionsSigners: Keypair[] = []
+  const prerequisiteInstructionsSigners: (Keypair | null)[] = []
   // sum up signers
   const signers: Keypair[] = instructionsData.flatMap((x) => x.signers ?? [])
 
