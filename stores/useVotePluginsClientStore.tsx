@@ -13,7 +13,6 @@ import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { ConnectionContext } from '@utils/connection'
 import { ProgramAccount, Realm } from '@solana/spl-governance'
 import { VotingClient, VotingClientProps } from '@utils/uiTypes/VotePlugin'
-import { PythClient } from 'pyth-staking-api'
 import { PublicKey } from '@solana/web3.js'
 import { tryGetGatewayRegistrar } from '../GatewayPlugin/sdk/api'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
@@ -30,7 +29,6 @@ interface UseVotePluginsClientStore extends State {
     nftClient: NftVoterClient | undefined
     gatewayClient: GatewayClient | undefined
     switchboardClient: SwitchboardQueueVoterClient | undefined
-    pythClient: PythClient | undefined
     nftMintRegistrar: any
     gatewayRegistrar: any
     currentRealmVotingClient: VotingClient
@@ -58,10 +56,6 @@ interface UseVotePluginsClientStore extends State {
     connection: ConnectionContext
   ) => void
   handleSetGatewayClient: (
-    wallet: SignerWalletAdapter | undefined,
-    connection: ConnectionContext
-  ) => void
-  handleSetPythClient: (
     wallet: SignerWalletAdapter | undefined,
     connection: ConnectionContext
   ) => void
@@ -94,7 +88,6 @@ const defaultState = {
   nftClient: undefined,
   gatewayClient: undefined,
   switchboardClient: undefined,
-  pythClient: undefined,
   voteStakeRegistryRegistrar: null,
   heliumVsrRegistrar: null,
   voteStakeRegistryRegistrarPk: null,
@@ -237,32 +230,6 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
       set((s) => {
         s.state.switchboardClient = switchboardClient
       })
-    },
-    handleSetPythClient: async (wallet, connection) => {
-      const options = AnchorProvider.defaultOptions()
-      const provider = new AnchorProvider(
-        connection.current,
-        (wallet as unknown) as Wallet,
-        options
-      )
-      try {
-        const pythClient = await PythClient.connect(
-          provider,
-          connection.cluster
-        )
-
-        const updateMaxVoterWeightKeys = await pythClient.stakeConnection.program.methods
-          .updateMaxVoterWeight()
-          .pubkeys()
-        const maxVoterWeight = updateMaxVoterWeightKeys.maxVoterRecord as PublicKey
-
-        set((s) => {
-          s.state.pythClient = pythClient
-          s.state.maxVoterWeight = maxVoterWeight
-        })
-      } catch (e) {
-        console.error(e)
-      }
     },
     handleSetCurrentRealmVotingClient: ({ client, realm, walletPk }) => {
       set((s) => {

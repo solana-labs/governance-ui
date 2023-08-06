@@ -2,7 +2,6 @@ import {
   VSR_PLUGIN_PKS,
   NFT_PLUGINS_PKS,
   GATEWAY_PLUGINS_PKS,
-  PYTH_PLUGINS_PKS,
 } from '@constants/plugins';
 import { Wallet } from '@coral-xyz/anchor';
 import {
@@ -239,13 +238,6 @@ export async function createProposal(args: Args) {
       votingPlugins.gatewayClient
     ) {
       client = votingPlugins.gatewayClient;
-    }
-
-    if (
-      PYTH_PLUGINS_PKS.includes(pluginPublicKeyStr) &&
-      votingPlugins.pythClient
-    ) {
-      client = votingPlugins.pythClient;
     }
 
     if (client) {

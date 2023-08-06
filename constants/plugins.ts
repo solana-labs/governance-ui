@@ -1,5 +1,4 @@
 import { SWITCHBOARD_ADDIN_ID } from 'SwitchboardVotePlugin/SwitchboardQueueVoterClient'
-import { STAKING_ADDRESS as PYTH_STAKING_ADDRESS } from 'pyth-staking-api'
 import * as heliumVsrSdk from '@helium/voter-stake-registry-sdk'
 import { DEFAULT_NFT_VOTER_PLUGIN } from '@tools/constants'
 
@@ -28,5 +27,3 @@ export const GATEWAY_PLUGINS_PKS: string[] = [
 export const SWITCHBOARD_PLUGINS_PKS: string[] = [
   SWITCHBOARD_ADDIN_ID.toBase58(),
 ]
-
-export const PYTH_PLUGINS_PKS: string[] = [PYTH_STAKING_ADDRESS.toBase58()]
