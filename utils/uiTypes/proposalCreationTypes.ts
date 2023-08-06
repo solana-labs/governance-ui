@@ -25,7 +25,6 @@ export enum PackageEnum {
   PsyFinance,
   Serum,
   Solend,
-  Streamflow,
   Switchboard,
   VsrPlugin,
   Dual,

@@ -195,10 +195,6 @@ export default function useGovernanceAssets() {
       name: 'Solend',
       image: '/img/solend.png',
     },
-    [PackageEnum.Streamflow]: {
-      name: 'Streamflow',
-      image: '/img/streamflow.png',
-    },
     [PackageEnum.Switchboard]: {
       name: 'Switchboard',
       image: '/img/switchboard.png',
@@ -742,23 +738,6 @@ export default function useGovernanceAssets() {
       name: 'Withdraw Funds',
       packageId: PackageEnum.Solend,
     },
-
-    /*
-      ███████ ████████ ██████  ███████  █████  ███    ███ ███████ ██       ██████  ██     ██
-      ██         ██    ██   ██ ██      ██   ██ ████  ████ ██      ██      ██    ██ ██     ██
-      ███████    ██    ██████  █████   ███████ ██ ████ ██ █████   ██      ██    ██ ██  █  ██
-           ██    ██    ██   ██ ██      ██   ██ ██  ██  ██ ██      ██      ██    ██ ██ ███ ██
-      ███████    ██    ██   ██ ███████ ██   ██ ██      ██ ██      ███████  ██████   ███ ███
-    */
-
-    // [Instructions.CancelStream]: {
-    //   name: 'Cancel Vesting Contract',
-    //   packageId: PackageEnum.Streamflow,
-    // },
-    // [Instructions.CreateStream]: {
-    //   name: 'Create Vesting Contract',
-    //   packageId: PackageEnum.Streamflow,
-    // },
 
     /*
       ███████ ██     ██ ██ ████████  ██████ ██   ██ ██████   ██████   █████  ██████  ██████
