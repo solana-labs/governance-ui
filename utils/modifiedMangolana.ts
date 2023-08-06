@@ -114,7 +114,7 @@ const awaitTransactionSignatureConfirmation = async ({
       try {
         subscriptionId = connection.onSignature(
           txid,
-          (result, context) => {
+          (result, _context) => {
             subscriptionId = undefined
             done = true
             if (result.err) {
@@ -528,6 +528,7 @@ export const sendSignAndConfirmTransactions = async ({
           fcn.transactionsIdx.map((idx) => {
             const transactionIdx = Number(Object.keys(idx)[0])
             const transactionInstructionIdx = idx[transactionIdx]
+            // eslint-disable-next-line
             return new Promise(async (resolve, reject) => {
               try {
                 const resp = await sendAndConfirmSignedTransaction({
