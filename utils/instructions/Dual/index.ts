@@ -355,9 +355,6 @@ export async function getConfigGsoInstruction({
     const baseDecimals = form.baseTreasury.extensions.mint!.account.decimals
     const quoteDecimals = form.quoteTreasury.extensions.mint!.account.decimals
     const optionsPerMillion = Math.floor(form.lockupRatio * 1_000_000)
-    const numTokensAtoms = new BN(form.numTokens).mul(
-      new BN(10 ** baseDecimals)
-    )
     const strikeAtomsPerLot = Math.round(
       form.strike * form.lotSize * 10 ** (quoteDecimals - baseDecimals)
     )
@@ -368,7 +365,7 @@ export async function getConfigGsoInstruction({
       lockupPeriodEnd,
       form.optionExpirationUnixSeconds,
       form.subscriptionPeriodEnd,
-      numTokensAtoms,
+      new BN(form.numTokens),
       form.soName,
       strikeAtomsPerLot,
       form.payer.extensions.transferAddress!,
@@ -392,6 +389,19 @@ export async function getConfigGsoInstruction({
 
     additionalSerializedInstructions.push(
       serializeInstructionToBase64(nameInstruction)
+    )
+
+    //after everything we close helper account
+    additionalSerializedInstructions.push(
+      serializeInstructionToBase64(
+        closeAccount({
+          source: helperTokenAccount.publicKey,
+          //sol wallet
+          destination: form.payer.extensions.transferAddress,
+          //owner governance or sol wallet same as baseTokenAccount
+          owner: form.baseTreasury.extensions.token?.account.owner,
+        })
+      )
     )
 
     return {
@@ -696,7 +706,12 @@ export async function getGsoWithdrawInstruction({
           destination,
           new PublicKey(form.mintPk!)
         )
-      : await gso.createWithdrawInstruction(form.soName, authority!, destination, destination)
+      : await gso.createWithdrawInstruction(
+          form.soName,
+          authority!,
+          destination,
+          destination
+        )
 
     additionalSerializedInstructions.push(
       serializeInstructionToBase64(withdrawInstruction)
