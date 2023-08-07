@@ -28,6 +28,8 @@ export const CastMultiVoteButtons = ({proposal} : {proposal: Proposal}) => {
   const isVoteCast = !!ownVoteRecord?.found
   const isVoting = useIsVoting()
 
+  const nota = "$$_NOTA_$$";
+  const last = proposal.options.length - 1;
 
   const handleVote = async (vote: 'yes' | 'no') => {
     setVote(vote)
@@ -46,9 +48,7 @@ export const CastMultiVoteButtons = ({proposal} : {proposal: Proposal}) => {
   const handleOption = (index: number) => {
     let options = [...selectedOptions];
     let status = [...optionStatus];
-    const nota = "none of the above";
-    const last = proposal.options.length - 1;
-    const isNota = proposal.options[last].label.toLowerCase() === nota;
+    const isNota = proposal.options[last].label === nota;
 
     const selected = status[index];
 
@@ -109,7 +109,7 @@ export const CastMultiVoteButtons = ({proposal} : {proposal: Proposal}) => {
                   isLoading={submitting}
                 >
                   {optionStatus[index] && <CheckCircleIcon  className="inline w-4 mr-1"/>}
-                  {option.label}
+                  {option.label === nota && index === last ? "None of the Above" : option.label}
                 </SecondaryButton>
               </div>
             )}

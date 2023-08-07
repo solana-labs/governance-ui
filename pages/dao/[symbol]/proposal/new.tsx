@@ -203,7 +203,7 @@ const New = () => {
     description: '',
   })
   const [multiChoiceForm, setMultiChoiceForm] = useState<{
-    governance: string | undefined
+    governance: PublicKey | undefined
     options: string[]
   }>({
     governance: undefined,
@@ -310,24 +310,15 @@ const New = () => {
           multiChoiceForm
         )
         
-        const nota = "none of the above";
-        const isMultiNota = multiChoiceForm.options.filter(i => i.toLowerCase() === nota).length > 1;
-        
-        if (isMultiFormValid && multiChoiceForm.governance && !isMultiNota) {
+        if (isMultiFormValid && multiChoiceForm.governance) {
           // Create Multi-Choice Proposal
           try {
             const options = [...multiChoiceForm.options];
             
-            // shift NOTA to the end, if exists
-            const notaIndex = options.findIndex(el => el.toLowerCase() === nota);
-            if (notaIndex !== -1) {
-              options.push(options.splice(notaIndex, 1)[0]);
-            }
-
             proposalAddress = await proposeMultiChoice({
               title: form.title,
               description: form.description,
-              governance: new PublicKey(multiChoiceForm.governance),
+              governance: multiChoiceForm.governance,
               instructionsData: [],
               voteByCouncil,
               options,

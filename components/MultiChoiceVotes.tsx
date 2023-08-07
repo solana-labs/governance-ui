@@ -30,6 +30,9 @@ const MultiChoiceVotes = ({proposal, limit} : {proposal: Proposal, limit: number
         highestWeight = option.voteWeight.gt(highestWeight) ? option.voteWeight : highestWeight;
     }
 
+    const nota = "$$_NOTA_$$";
+    const last = proposal.options.length - 1;
+
     return (
         <div className="border border-fgd-4 rounded-md">
             {proposal.options.slice(0, limit).map((option, index) => {
@@ -40,7 +43,9 @@ const MultiChoiceVotes = ({proposal, limit} : {proposal: Proposal, limit: number
                 <div className="border-b border-fgd-4 p-5" key={index}>
                     <div className="flex flex-row justify-between gap-2">
                         <div className="flex flex-row justify-start">
-                            <StyledLabel>{option.label}</StyledLabel>
+                            <StyledLabel>
+                                {option.label === nota && index === last ? "None of the Above" : option.label}
+                            </StyledLabel>
                             <StyledSubLabel>{optionVotes.toLocaleString()} votes</StyledSubLabel>
                         </div>
                         <div className="text-sm">

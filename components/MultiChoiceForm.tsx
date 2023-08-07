@@ -7,7 +7,7 @@ import useRealm from "@hooks/useRealm";
 import Input from '@components/inputs/Input';
 import GovernedAccountSelect from "../pages/dao/[symbol]/proposal/components/GovernedAccountSelect";
 import { PublicKey } from "@solana/web3.js";
-import { AssetAccount } from "@utils/uiTypes/assets";
+import { AccountType, AssetAccount } from "@utils/uiTypes/assets";
 
 const MultiChoiceForm = ({
     multiChoiceForm,
@@ -17,7 +17,7 @@ const MultiChoiceForm = ({
     updateMultiFormErrors
 } : {
     multiChoiceForm: {
-        governance: string | undefined
+        governance: PublicKey | undefined
         options: string[]
     }
     updateMultiChoiceForm: any
@@ -27,10 +27,10 @@ const MultiChoiceForm = ({
 }) => {
     const {ownVoterWeight} = useRealm()
     const { assetAccounts } = useGovernanceAssets()
-    const nota = "none of the above";
-    const hideNotaButton = multiChoiceForm.options.map(i => i.toLowerCase()).includes(nota);
-    const notaCount = multiChoiceForm.options.filter(i => i.toLowerCase() === nota).length;
+    const nota = "$$_NOTA_$$";
+    const lastOptIndex = multiChoiceForm.options.length - 1;
     const governance = multiChoiceForm.governance;
+    const hideNotaButton = multiChoiceForm.options[lastOptIndex] === nota;
 
     const handleMultiForm = ({ propertyName, value }) => {
         updateMultiFormErrors({})
@@ -39,7 +39,7 @@ const MultiChoiceForm = ({
     
     const handleNotaButton = () => {
         const options = [...multiChoiceForm.options];
-        options.push("None of the Above");
+        options.push(nota);
         handleMultiForm({propertyName: "options", value: options});
     }
     
@@ -61,7 +61,7 @@ const MultiChoiceForm = ({
         if (updatedOptions.length > 9) {
             return;
         }
-        if (updatedOptions[len].toLowerCase() === nota) {
+        if (updatedOptions[len] === nota) {
             // insert new empty option at the second last position if NOTA exists
             updatedOptions.splice(len, 0, "");
         } else {
@@ -80,10 +80,13 @@ const MultiChoiceForm = ({
                     ownVoterWeight.canCreateProposal(x.governance.account.config))
                 }
                 onChange={(value:AssetAccount) => {
-                handleMultiForm({ value: value.governance.pubkey.toBase58(), propertyName: 'governance' })
+                handleMultiForm({ value: value.governance.pubkey, propertyName: 'governance' })
                 }}
                 value={
-                    governance ? assetAccounts.find(x => x.governance.pubkey.equals(new PublicKey(governance)))
+                    governance ? assetAccounts.find(
+                        x => x.governance.pubkey.equals(governance) &&
+                        x.type !== AccountType.TOKEN
+                    )
                     : null
                 }
                 error={multiFormErrors['governance']}
@@ -115,16 +118,15 @@ const MultiChoiceForm = ({
                 </div>
                 <Input
                     placeholder={`Voting Choice ${odx + 1}`}
-                    value={option}
+                    value={option === nota && index === lastOptIndex ? "None of the Above" : option}
                     type="text"
                     error={
-                        !option.length && isMultiFormValidated ? "The option can't be empty" :
-                        option.toLowerCase() === nota && notaCount > 1 ? 
-                        "Only single 'None of the Above' option can be added"
+                        !option.length && isMultiFormValidated ? "The option can't be empty"
                         : ""
                     }
                     showErrorState={!option.length && isMultiFormValidated}
                     onChange={(event) => updateOption(odx, event.target.value)}
+                    disabled={option === nota && index > 1 && index === lastOptIndex}
                 />
                 </div>)}
             )}
