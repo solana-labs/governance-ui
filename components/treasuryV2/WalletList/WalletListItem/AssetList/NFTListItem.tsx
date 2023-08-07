@@ -38,10 +38,10 @@ const Collection = ({
   )
 
   const { data: collectionNft } = useDigitalAssetById(collectionId)
-  const name = collectionNft?.result.content.metadata.name
+  const name = collectionNft?.result?.content.metadata.name
   const imageUri =
-    collectionNft?.result.content.files[0]?.cdn_uri ??
-    collectionNft?.result.content.files[0]?.uri
+    collectionNft?.result?.content.files[0]?.cdn_uri ??
+    collectionNft?.result?.content.files[0]?.uri
 
   const [treasurySelect, setTreasurySelect] = useTreasurySelectState()
 
@@ -53,7 +53,7 @@ const Collection = ({
   return (
     <ListItem
       //className={props.className}
-      name={name}
+      name={name ?? '...'}
       rhs={
         <div className="flex items-center space-x-1">
           <div className="text-xs text-fgd-1 font-bold">

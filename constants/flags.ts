@@ -1,1 +1,1 @@
-export const SUPPORT_CNFTS = false
+export const SUPPORT_CNFTS = true

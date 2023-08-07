@@ -1,19 +1,21 @@
-import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js'
+import {
+  AddressLookupTableProgram,
+  Keypair,
+  PublicKey,
+  TransactionInstruction,
+} from '@solana/web3.js'
 import {
   getGovernanceProgramVersion,
-  getInstructionDataFromBase64,
-  Governance,
   ProgramAccount,
   Realm,
   TokenOwnerRecord,
   VoteType,
   withCreateProposal,
   getSignatoryRecordAddress,
-  RpcContext,
   withInsertTransaction,
-  InstructionData,
   withSignOffProposal,
   withAddSignatory,
+  RpcContext,
 } from '@solana/spl-governance'
 import {
   sendTransactionsV3,
@@ -21,42 +23,15 @@ import {
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
 import { chunks } from '@utils/helpers'
-import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
 import { trySentryLog } from '@utils/logs'
 import { deduplicateObjsFilter } from '@utils/instructionTools'
-export interface InstructionDataWithHoldUpTime {
-  data: InstructionData | null
-  holdUpTime: number | undefined
-  prerequisiteInstructions: TransactionInstruction[]
-  chunkBy?: number
-  signers?: Keypair[]
-  prerequisiteInstructionsSigners?: (Keypair | null)[]
-}
+import { sendSignAndConfirmTransactions } from '@utils/modifiedMangolana'
+import { InstructionDataWithHoldUpTime } from './createProposal'
 
-export class InstructionDataWithHoldUpTime {
-  constructor({
-    instruction,
-    governance,
-  }: {
-    instruction: UiInstruction
-    governance?: ProgramAccount<Governance>
-  }) {
-    this.data = instruction.serializedInstruction
-      ? getInstructionDataFromBase64(instruction.serializedInstruction)
-      : null
-    this.holdUpTime =
-      typeof instruction.customHoldUpTime !== 'undefined'
-        ? instruction.customHoldUpTime
-        : governance?.account?.config.minInstructionHoldUpTime
-    this.prerequisiteInstructions = instruction.prerequisiteInstructions || []
-    this.chunkBy = instruction.chunkBy || 2
-    this.prerequisiteInstructionsSigners =
-      instruction.prerequisiteInstructionsSigners || []
-  }
-}
-
-export const createProposal = async (
+/** This is a modified version of createProposal that makes a lookup table, which is useful for especially large instructions */
+// TODO make a more generic, less redundant solution
+export const createLUTProposal = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
   realm: ProgramAccount<Realm>,
   governance: PublicKey,
@@ -70,10 +45,14 @@ export const createProposal = async (
   client?: VotingClient,
   callbacks?: Parameters<typeof sendTransactionsV3>[0]['callbacks']
 ): Promise<PublicKey> => {
+  // Assumption:
+  // `payer` is a valid `Keypair` with enough SOL to pay for the execution
+
+  const payer = walletPubkey
+
   const instructions: TransactionInstruction[] = []
   const governanceAuthority = walletPubkey
   const signatory = walletPubkey
-  const payer = walletPubkey
   const prerequisiteInstructions: TransactionInstruction[] = []
   const prerequisiteInstructionsSigners: (Keypair | null)[] = []
   // sum up signers
@@ -202,24 +181,14 @@ export const createProposal = async (
     deduplicateObjsFilter
   )
 
-  const prerequisiteInstructionsChunks = chunks(
-    deduplicatedPrerequisiteInstructions,
-    lowestChunkBy
-  )
-
-  const prerequisiteInstructionsSignersChunks = chunks(
-    deduplicatedPrerequisiteInstructionsSigners,
-    lowestChunkBy
-  ).filter((keypairArray) => keypairArray.filter((keypair) => keypair))
-
   const signersSet = [
-    ...prerequisiteInstructionsSignersChunks,
+    ...chunks([...deduplicatedPrerequisiteInstructionsSigners], lowestChunkBy),
     [],
     ...signerChunks,
   ]
 
   const txes = [
-    ...prerequisiteInstructionsChunks,
+    ...chunks(deduplicatedPrerequisiteInstructions, lowestChunkBy),
     instructions,
     ...insertChunks,
   ].map((txBatch, batchIdx) => {
@@ -233,11 +202,74 @@ export const createProposal = async (
     }
   })
 
+  const keys = txes
+    .map((x) =>
+      x.instructionsSet.map((y) =>
+        y.transactionInstruction.keys.map((z) => z.pubkey)
+      )
+    )
+    .flat()
+    .flat()
+  const slot = await connection.getSlot()
+
+  const [
+    lookupTableInst,
+    lookupTableAddress,
+  ] = AddressLookupTableProgram.createLookupTable({
+    authority: payer,
+    payer: payer,
+    recentSlot: slot,
+  })
+
+  // add addresses to the `lookupTableAddress` table via an `extend` instruction
+  const extendInstruction = AddressLookupTableProgram.extendLookupTable({
+    payer: payer,
+    authority: payer,
+    lookupTable: lookupTableAddress,
+    addresses: keys,
+  })
+
+  // Send this `extendInstruction` in a transaction to the cluster
+  // to insert the listing of `addresses` into your lookup table with address `lookupTableAddress`
+
+  console.log('lookup table address:', lookupTableAddress.toBase58())
+
+  let resolve = undefined
+  const promise = new Promise((r) => {
+    //@ts-ignore
+    resolve = r
+  })
+
+  // TODO merge all into one call of sendSignAndConfirmTransactions, so the user only signs once
+  await sendSignAndConfirmTransactions({
+    connection,
+    wallet,
+    transactionInstructions: [
+      {
+        instructionsSet: [
+          { transactionInstruction: lookupTableInst },
+          { transactionInstruction: extendInstruction },
+        ],
+        sequenceType: SequenceType.Sequential,
+      },
+    ],
+    callbacks: {
+      afterAllTxConfirmed: resolve,
+    },
+  })
+  await promise
+
+  const lookupTableAccount = await connection
+    .getAddressLookupTable(lookupTableAddress, { commitment: 'singleGossip' })
+    .then((res) => res.value)
+  if (lookupTableAccount === null) throw new Error()
+
   await sendTransactionsV3({
     callbacks,
     connection,
     wallet,
     transactionInstructions: txes,
+    lookupTableAccounts: [lookupTableAccount],
   })
 
   const logInfo = {

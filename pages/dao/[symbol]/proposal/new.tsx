@@ -52,8 +52,6 @@ import FriktionDeposit from './components/instructions/Friktion/FriktionDeposit'
 import CreateNftPluginRegistrar from './components/instructions/NftVotingPlugin/CreateRegistrar'
 import CreateNftPluginMaxVoterWeightRecord from './components/instructions/NftVotingPlugin/CreateMaxVoterWeightRecord'
 import ConfigureNftPluginCollection from './components/instructions/NftVotingPlugin/ConfigureCollection'
-import SwitchboardAdmitOracle from './components/instructions/Switchboard/AdmitOracle'
-import SwitchboardRevokeOracle from './components/instructions/Switchboard/RevokeOracle'
 import SwitchboardFundOracle from './components/instructions/Switchboard/FundOracle'
 import WithdrawFromOracle from './components/instructions/Switchboard/WithdrawFromOracle'
 import FriktionWithdraw from './components/instructions/Friktion/FriktionWithdraw'
@@ -451,8 +449,6 @@ const New = () => {
       [Instructions.PsyFinanceBurnWriterForQuote]: PsyFinanceBurnWriterTokenForQuote,
       [Instructions.PsyFinanceClaimUnderlyingPostExpiration]: PsyFinanceClaimUnderlyingPostExpiration,
       [Instructions.PsyFinanceExerciseOption]: PsyFinanceExerciseOption,
-      [Instructions.SwitchboardAdmitOracle]: SwitchboardAdmitOracle,
-      [Instructions.SwitchboardRevokeOracle]: SwitchboardRevokeOracle,
       [Instructions.SwitchboardFundOracle]: SwitchboardFundOracle,
       [Instructions.WithdrawFromOracle]: WithdrawFromOracle,
       [Instructions.RefreshSolendObligation]: RefreshObligation,

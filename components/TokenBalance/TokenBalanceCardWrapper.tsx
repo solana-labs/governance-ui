@@ -4,11 +4,7 @@ import useRealm from '@hooks/useRealm'
 import dynamic from 'next/dynamic'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import useQueryContext from '@hooks/useQueryContext'
-import {
-  GATEWAY_PLUGINS_PKS,
-  NFT_PLUGINS_PKS,
-  SWITCHBOARD_PLUGINS_PKS,
-} from '@constants/plugins'
+import { GATEWAY_PLUGINS_PKS, NFT_PLUGINS_PKS } from '@constants/plugins'
 import GatewayCard from '@components/Gateway/GatewayCard'
 import ClaimUnreleasedNFTs from './ClaimUnreleasedNFTs'
 import Link from 'next/link'
@@ -38,10 +34,6 @@ const HeliumVotingPowerCard = dynamic(() =>
 const TokenBalanceCard = dynamic(() => import('./TokenBalanceCard'))
 const NftVotingPower = dynamic(
   () => import('../ProposalVotingPower/NftVotingPower')
-)
-// const NftBalanceCard = dynamic(() => import('./NftBalanceCard'))
-const SwitchboardPermissionCard = dynamic(
-  () => import('./SwitchboardPermissionCard')
 )
 
 const GovernancePowerTitle = () => {
@@ -87,9 +79,6 @@ const TokenBalanceCardInner = ({
     currentPluginPk && NFT_PLUGINS_PKS.includes(currentPluginPk?.toBase58())
   const isGatewayMode =
     currentPluginPk && GATEWAY_PLUGINS_PKS.includes(currentPluginPk?.toBase58())
-  const isSwitchboardMode =
-    currentPluginPk &&
-    SWITCHBOARD_PLUGINS_PKS.includes(currentPluginPk?.toBase58())
 
   if (
     vsrMode === 'default' &&
@@ -143,13 +132,7 @@ const TokenBalanceCardInner = ({
       </>
     )
   }
-  if (
-    isSwitchboardMode &&
-    (!ownTokenRecord ||
-      ownTokenRecord.account.governingTokenDepositAmount.isZero())
-  ) {
-    return <SwitchboardPermissionCard></SwitchboardPermissionCard>
-  }
+
   //Default
   return (
     <>
