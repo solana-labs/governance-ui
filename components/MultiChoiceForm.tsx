@@ -85,7 +85,7 @@ const MultiChoiceForm = ({
                 value={
                     governance ? assetAccounts.find(
                         x => x.governance.pubkey.equals(governance) &&
-                        x.type !== AccountType.TOKEN
+                        x.type === AccountType.SOL
                     )
                     : null
                 }
