@@ -270,7 +270,7 @@ export const createLUTProposal = async (
     connection,
     wallet,
     transactionInstructions: txes,
-    lookupTableAccounts: [lookupTableAccount],
+    //lookupTableAccounts: [lookupTableAccount],
   })
 
   const logInfo = {
