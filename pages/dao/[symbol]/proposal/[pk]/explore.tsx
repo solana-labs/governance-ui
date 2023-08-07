@@ -26,6 +26,11 @@ export default function Explore() {
 
   const endpoint = connection.endpoint
 
+  const handleExploreBackClick = () => {
+    const newPath = router.asPath.replace(/\/explore$/, '');
+    router.push(newPath);
+  };
+
   return (
     <div className="bg-bkg-2 rounded-lg p-4 space-y-3 md:p-6">
       <button
@@ -38,7 +43,7 @@ export default function Explore() {
           'transition-all',
           'hover:text-fgd-3'
         )}
-        onClick={router.asPath.replace(/\/explore$/, '')}
+        onClick={handleExploreBackClick}
       >
         <ChevronLeftIcon className="h-6 w-6 " />
         Back
