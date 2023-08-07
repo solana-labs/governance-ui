@@ -40,7 +40,7 @@ export interface UiInstruction {
   governance: ProgramAccount<Governance> | undefined
   customHoldUpTime?: number
   prerequisiteInstructions?: TransactionInstruction[]
-  prerequisiteInstructionsSigners?: Keypair[]
+  prerequisiteInstructionsSigners?: (Keypair | null)[]
   chunkBy?: number
   signers?: Keypair[]
 }
@@ -448,6 +448,8 @@ export enum Instructions {
   MangoV4StubOracleCreate,
   MangoV4StubOracleSet,
   MangoV4TokenAddBank,
+  MangoV4AdminWithdrawTokenFees,
+  MangoV4WithdrawPerpFees,
   MeanCreateAccount,
   MeanCreateStream,
   MeanFundAccount,

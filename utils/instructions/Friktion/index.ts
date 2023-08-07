@@ -4,7 +4,6 @@ import {
   PendingDepositWithKey,
   VoltSDK,
 } from '@friktion-labs/friktion-sdk'
-import { AnchorWallet } from '@friktion-labs/friktion-sdk/dist/cjs/src/miscUtils'
 import { WSOL_MINT } from '@components/instructions/tools'
 import Decimal from 'decimal.js'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
@@ -25,6 +24,7 @@ import { getATA } from '../../ataTools'
 import { UiInstruction } from '../../uiTypes/proposalCreationTypes'
 import { validateInstruction } from '@utils/instructionTools'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import { Wallet } from '@coral-xyz/anchor'
 
 export async function getFriktionDepositInstruction({
   schema,
@@ -61,7 +61,7 @@ export async function getFriktionDepositInstruction({
     const sdk = new FriktionSDK({
       provider: {
         connection: connection.current,
-        wallet: (wallet as unknown) as AnchorWallet,
+        wallet: (wallet as unknown) as Wallet,
       },
     })
     const cVoltSDK = new ConnectedVoltSDK(
@@ -225,7 +225,7 @@ export async function getFriktionWithdrawInstruction({
     const sdk = new FriktionSDK({
       provider: {
         connection: connection.current,
-        wallet: (wallet as unknown) as AnchorWallet,
+        wallet: (wallet as unknown) as Wallet,
       },
     })
     const cVoltSDK = new ConnectedVoltSDK(
@@ -340,7 +340,7 @@ export async function getFriktionClaimPendingDepositInstruction({
     const sdk = new FriktionSDK({
       provider: {
         connection: connection.current,
-        wallet: (wallet as unknown) as AnchorWallet,
+        wallet: (wallet as unknown) as Wallet,
       },
     })
     const cVoltSDK = new ConnectedVoltSDK(
@@ -451,7 +451,7 @@ export async function getFriktionClaimPendingWithdrawInstruction({
     const sdk = new FriktionSDK({
       provider: {
         connection: connection.current,
-        wallet: (wallet as unknown) as AnchorWallet,
+        wallet: (wallet as unknown) as Wallet,
       },
     })
     const cVoltSDK = new ConnectedVoltSDK(

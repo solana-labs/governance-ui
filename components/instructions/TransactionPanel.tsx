@@ -156,6 +156,7 @@ export function TransactionPanel() {
                     proposal={proposal}
                     proposalInstructions={proposalTransactions}
                     playing={playing}
+                    label="Execute all in one transaction"
                     setPlaying={setPlaying}
                   />
                 </div>

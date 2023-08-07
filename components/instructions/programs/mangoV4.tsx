@@ -5,10 +5,9 @@ import {
 } from '@blockworks-foundation/mango-v4'
 import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
 import { AnchorProvider, BN, BorshInstructionCoder } from '@coral-xyz/anchor'
-import { Wallet } from '@marinade.finance/marinade-ts-sdk'
 import { AccountMetaData } from '@solana/spl-governance'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
-import {
+import EmptyWallet, {
   LISTING_PRESETS,
   getSuggestedCoinTier,
   compareObjectsAndGetDifferentKeys,
@@ -24,6 +23,9 @@ import { secondsToHours } from 'date-fns'
 import WarningFilledIcon from '@carbon/icons-react/lib/WarningFilled'
 import { CheckCircleIcon } from '@heroicons/react/solid'
 import { Market } from '@project-serum/serum'
+import tokenPriceService, {
+  TokenInfoWithoutDecimals,
+} from '@utils/services/tokenPrice'
 // import { snakeCase } from 'snake-case'
 // import { sha256 } from 'js-sha256'
 
@@ -627,6 +629,7 @@ const instructions = () => ({
       data: Uint8Array,
       accounts: AccountMetaData[]
     ) => {
+      let mintData: null | TokenInfoWithoutDecimals | undefined = null
       const mintInfo = accounts[2].pubkey
       const group = accounts[0].pubkey
 
@@ -708,6 +711,7 @@ const instructions = () => ({
       }
 
       if (mint) {
+        mintData = tokenPriceService.getTokenInfo(mint.toBase58())
         suggestedTier = await getSuggestedCoinTier(mint.toBase58())
         const suggestedPreset = LISTING_PRESETS[suggestedTier.tier!]
         suggestedUntrusted = suggestedTier.tier === 'UNTRUSTED'
@@ -751,6 +755,7 @@ const instructions = () => ({
       try {
         return (
           <div>
+            <h3>{mintData && <div>Token: {mintData.symbol}</div>}</h3>
             {suggestedUntrusted && (
               <>
                 <h3 className="text-orange flex items-center">
@@ -1044,7 +1049,7 @@ const getClient = async (connection: Connection) => {
   const options = AnchorProvider.defaultOptions()
   const adminProvider = new AnchorProvider(
     connection,
-    new Wallet(Keypair.generate()),
+    new EmptyWallet(Keypair.generate()),
     options
   )
   const client = await MangoClient.connect(
