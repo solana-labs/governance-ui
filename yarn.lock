@@ -1013,7 +1013,6 @@
     "@solana/web3.js" "^1.73.2"
     js-sha3 "^0.8.0"
 
-<<<<<<< HEAD
 "@dual-finance/gso@0.0.14":
   version "0.0.14"
   resolved "https://registry.yarnpkg.com/@dual-finance/gso/-/gso-0.0.14.tgz#48990ae01295453d4428f6dbea2b83e73d0d9232"
@@ -1026,8 +1025,6 @@
     "@solana/web3.js" "^1.66.2"
     dotenv "^16.0.3"
 
-"@dual-finance/staking-options@0.0.21":
-=======
 "@dual-finance/staking-options@0.0.24":
   version "0.0.24"
   resolved "https://registry.yarnpkg.com/@dual-finance/staking-options/-/staking-options-0.0.24.tgz#376568dee9389a4133ef700fd55b3143802fdd7f"
@@ -1040,7 +1037,6 @@
     "@solana/web3.js" "^1.66.2"
 
 "@dual-finance/staking-options@^0.0.21":
->>>>>>> d4c0d451d3ba11152ab97419d3d886f3eb7583d7
   version "0.0.21"
   resolved "https://registry.yarnpkg.com/@dual-finance/staking-options/-/staking-options-0.0.21.tgz#618a5633e22ab6078808abbe669eaf65e899d463"
   integrity sha512-6XmpavPwalguOx1mDXB5XeJY1o+QyDFrdqJOlkXktpAeIzml/esm1sDrLQU8tb8RiwV6jUDV0pFUrZyrI5cQtw==
