@@ -76,8 +76,7 @@ export const createLUTProposal = async (
   const plugin = await client?.withUpdateVoterWeightRecord(
     instructions,
     tokenOwnerRecord,
-    'createProposal',
-    governance
+    'createProposal'
   )
 
   const proposalAddress = await withCreateProposal(
@@ -270,7 +269,7 @@ export const createLUTProposal = async (
     connection,
     wallet,
     transactionInstructions: txes,
-    lookupTableAccounts: [lookupTableAccount],
+    //lookupTableAccounts: [lookupTableAccount],
   })
 
   const logInfo = {

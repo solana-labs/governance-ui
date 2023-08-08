@@ -103,8 +103,7 @@ export const createProposal = async (
   const plugin = await client?.withUpdateVoterWeightRecord(
     instructions,
     tokenOwnerRecord,
-    'createProposal',
-    governance
+    'createProposal'
   )
 
   const proposalAddress = await withCreateProposal(
