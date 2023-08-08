@@ -4709,10 +4709,10 @@
     js-sha3 "^0.8.0"
     typescript-collections "^1.3.3"
 
-"@solana/spl-governance@0.3.26":
-  version "0.3.26"
-  resolved "https://registry.yarnpkg.com/@solana/spl-governance/-/spl-governance-0.3.26.tgz#1a6c56037063654d243cc3ee9503b5b3140bbd6f"
-  integrity sha512-L84AWKcAmEMIWhh5gcfasfDesOMT+IU4i+s0ELgKCN0O9MC/hVrSjTkn68vBhDfCElnJyJTFMAN7NqSbrweD9A==
+"@solana/spl-governance@0.3.28":
+  version "0.3.28"
+  resolved "https://registry.yarnpkg.com/@solana/spl-governance/-/spl-governance-0.3.28.tgz#63ff71f235206f069f8ea1e66a40e7cdb6252d3f"
+  integrity sha512-CUi1hMvzId2rAtMFTlxMwOy0EmFeT0VcmiC+iQnDhRBuM8LLLvRrbTYBWZo3xIvtPQW9HfhVBoL7P/XNFIqYVQ==
   dependencies:
     "@solana/web3.js" "^1.22.0"
     axios "^1.1.3"

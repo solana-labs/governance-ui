@@ -86,6 +86,7 @@ const handleVaultAction: CreatePsyFiStrategy = async (
     proposalIndex,
     instructions,
     isDraft,
+    ["Approve"],
     client
   )
   return proposalAddress

@@ -14,6 +14,7 @@ import {
   InstructionData,
   withSignOffProposal,
   withAddSignatory,
+  MultiChoiceType
 } from '@solana/spl-governance'
 import {
   sendTransactionsV3,
@@ -67,6 +68,7 @@ export const createProposal = async (
   proposalIndex: number,
   instructionsData: InstructionDataWithHoldUpTime[],
   isDraft: boolean,
+  options: string[],
   client?: VotingClient,
   callbacks?: Parameters<typeof sendTransactionsV3>[0]['callbacks']
 ): Promise<PublicKey> => {
@@ -89,10 +91,14 @@ export const createProposal = async (
   )
 
   // V2 Approve/Deny configuration
-  const voteType = VoteType.SINGLE_CHOICE
-  const options = ['Approve']
-  const useDenyOption = true
+  const isMulti = options.length > 1;
 
+  const useDenyOption = !isMulti
+
+  const voteType = isMulti ? VoteType.MULTI_CHOICE(
+    MultiChoiceType.FullWeight, 1, options.length, options.length
+  ) : VoteType.SINGLE_CHOICE
+  
   //will run only if plugin is connected with realm
   const plugin = await client?.withUpdateVoterWeightRecord(
     instructions,

@@ -42,6 +42,7 @@ export const createLUTProposal = async (
   proposalIndex: number,
   instructionsData: InstructionDataWithHoldUpTime[],
   isDraft: boolean,
+  options: string[],
   client?: VotingClient,
   callbacks?: Parameters<typeof sendTransactionsV3>[0]['callbacks']
 ): Promise<PublicKey> => {
@@ -69,7 +70,6 @@ export const createLUTProposal = async (
 
   // V2 Approve/Deny configuration
   const voteType = VoteType.SINGLE_CHOICE
-  const options = ['Approve']
   const useDenyOption = true
 
   //will run only if plugin is connected with realm
