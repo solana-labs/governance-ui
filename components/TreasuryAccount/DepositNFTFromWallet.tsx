@@ -25,6 +25,7 @@ import {
 import { getNetworkFromEndpoint } from '@utils/connection'
 import { buildTransferCnftInstruction } from '@hooks/instructions/useTransferCnftInstruction'
 import { useRealmQuery } from '@hooks/queries/realm'
+import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 
 const useMetaplexDeposit = () => {
   const wallet = useWalletOnePointOh()
@@ -67,6 +68,7 @@ const useMetaplexDeposit = () => {
 }
 
 const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
+  const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const [selectedNfts, setSelectedNfts] = useState<PublicKey[]>([])
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
@@ -75,7 +77,9 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
 
   const deposit = useMetaplexDeposit()
 
-  const [selectedGovernance, setSelectedGovernance] = useGovernanceSelect()
+  const [selectedGovernance, setSelectedGovernance] = useGovernanceSelect(
+    currentAccount?.governance.pubkey
+  )
   const realm = useRealmQuery().data?.result
 
   const handleDeposit = async () => {
