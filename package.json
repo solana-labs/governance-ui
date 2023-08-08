@@ -60,6 +60,7 @@
     "@next/bundle-analyzer": "12.1.5",
     "@nivo/bar": "0.79.1",
     "@nivo/core": "0.79.0",
+    "@notifi-network/notifi-core": "0.18.2",
     "@notifi-network/notifi-react-hooks": "0.18.2",
     "@project-serum/common": "0.0.1-beta.3",
     "@project-serum/serum": "0.13.65",

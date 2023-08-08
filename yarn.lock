@@ -2659,6 +2659,11 @@
   resolved "https://registry.yarnpkg.com/@notifi-network/notifi-axios-utils/-/notifi-axios-utils-0.18.2.tgz#805e28554c5fd83bb66212b7ee42d777a4f5379d"
   integrity sha512-tKeBB35XqB4nDGDtV+iZogNEt+wrwJ6w7Lw4tw1+SkhV65socs8gnXQgcDT/xtzXCNikaEr3Rfm4knw9XaGXOQ==
 
+"@notifi-network/notifi-core@0.18.2":
+  version "0.18.2"
+  resolved "https://registry.yarnpkg.com/@notifi-network/notifi-core/-/notifi-core-0.18.2.tgz#f2a5742efe2cf80b02539f2f95ee8469c1788639"
+  integrity sha512-CFU76YbYQ5ztvMtu2dPzPisOm1Wgm12g8R6wOgwQc9dNiBW+B/IL2uuT2k4uxgtRW1Bz03kxGVmaH0VjYUkF8A==
+
 "@notifi-network/notifi-react-hooks@0.18.2":
   version "0.18.2"
   resolved "https://registry.yarnpkg.com/@notifi-network/notifi-react-hooks/-/notifi-react-hooks-0.18.2.tgz#6c24744857480945071f6ab5cda25c46128a650b"
@@ -6225,12 +6230,12 @@ ansi-escapes@^4.2.1:
   dependencies:
     type-fest "^0.21.3"
 
-ansi-regex@3.0.1, ansi-regex@^2.0.0:
+ansi-regex@3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-3.0.1.tgz#123d6479e92ad45ad897d4054e3c7ca7db4944e1"
   integrity sha512-+O9Jct8wf++lXxxFc4hc8LsjaSq0HFzzL7cVsw8pRDIPdjKD2mT4ytDZlLuSBZ4cLKZFXIrMGO7DbQCtMJJMKw==
 
-"ansi-regex@>=3.0.1 <=5.0.1", ansi-regex@^3.0.0, ansi-regex@^4.1.0, ansi-regex@^5.0.0, ansi-regex@^5.0.1:
+"ansi-regex@>=3.0.1 <=5.0.1", ansi-regex@^2.0.0, ansi-regex@^3.0.0, ansi-regex@^4.1.0, ansi-regex@^5.0.0, ansi-regex@^5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-5.0.1.tgz#082cb2c89c9fe8659a311a53bd6a4dc5301db304"
   integrity sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==
