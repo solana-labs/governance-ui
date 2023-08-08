@@ -475,8 +475,6 @@ export const sendSignAndConfirmTransactions = async ({
   // but I have no idea what the above code is doing with this transactionCallOrchestrator stuff.
   // So I'm just taking the outputs and converting them to the new object
 
-  console.log('lookup', lookupTableAccounts)
-
   const versionedTxs = oldTransactionsThatShouldGetRefactored.map(
     (tx) =>
       new VersionedTransaction(
@@ -488,10 +486,11 @@ export const sendSignAndConfirmTransactions = async ({
       )
   )
 
-  const allSigners = currentTransactions.flatMap((x) =>
+  const signers = currentTransactions.map((x) =>
     x.instructionsSet.flatMap((y) => y.signers ?? [])
   )
-  versionedTxs.forEach((tx) => tx.sign(allSigners))
+
+  versionedTxs.forEach((tx, i) => tx.sign(signers[i]))
 
   logger.log(transactionCallOrchestrator)
   const signedTxns = ((await wallet.signAllTransactions(
