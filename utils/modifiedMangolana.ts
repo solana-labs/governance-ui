@@ -261,6 +261,7 @@ export const sendAndConfirmSignedTransaction = async ({
     skipPreflight:
       config?.skipPreflight === undefined ? true : config.skipPreflight,
   })
+  console.log('sent transaction:', txid)
   if (callbacks?.postSendTxCallback) {
     try {
       callbacks.postSendTxCallback({ txid })
