@@ -21,6 +21,7 @@ import {
   UiInstruction,
   DualFinanceInitStrikeForm,
   DualFinanceGsoForm,
+  DualFinanceGsoWithdrawForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import {
   createAssociatedTokenAccount,
@@ -652,13 +653,21 @@ export async function getWithdrawInstruction({
   }
 }
 
+interface GsoWithdrawArgs {
+  connection: ConnectionContext
+  form: DualFinanceGsoWithdrawForm
+  setFormErrors: any
+  schema: any
+  wallet: WalletAdapter | undefined
+}
+
 export async function getGsoWithdrawInstruction({
   connection,
   wallet,
   form,
   schema,
   setFormErrors,
-}: WithdrawArgs): Promise<UiInstruction> {
+}: GsoWithdrawArgs): Promise<UiInstruction> {
   const isValid = await validateInstruction({ schema, form, setFormErrors })
 
   const serializedInstruction = ''
