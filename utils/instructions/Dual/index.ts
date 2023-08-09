@@ -119,7 +119,7 @@ export async function getConfigInstruction({
         account: helperTokenAccount.publicKey,
         mint: baseMint,
         owner: form.baseTreasury.isSol
-          ? form.baseTreasury.governance.pubkey
+          ? form.baseTreasury.extensions.transferAddress
           : form.baseTreasury.extensions.token?.account.owner,
       })
     )
@@ -329,7 +329,7 @@ export async function getExerciseInstruction({
         account: quoteHelperTokenAccount.publicKey,
         mint: quoteMint,
         owner: form.baseTreasury.isSol
-          ? form.baseTreasury.governance.pubkey
+          ? form.baseTreasury.extensions.transferAddress
           : form.baseTreasury.extensions.token?.account.owner,
       })
     )
@@ -370,7 +370,7 @@ export async function getExerciseInstruction({
           source: quoteHelperTokenAccount.publicKey,
           destination: wallet.publicKey,
           owner: form.baseTreasury.isSol
-            ? form.baseTreasury.governance.pubkey
+            ? form.baseTreasury.extensions.transferAddress
             : form.baseTreasury.extensions.token?.account.owner,
         })
       )
@@ -458,7 +458,7 @@ export async function getWithdrawInstruction({
         initializeAccount({
           account: helperTokenAccount.publicKey,
           mint: new PublicKey(baseMint!),
-          owner: form.baseTreasury.governance.pubkey,
+          owner: authority,
         })
       )
       baseDestination = helperTokenAccount.publicKey
@@ -480,7 +480,7 @@ export async function getWithdrawInstruction({
         initializeAccount({
           account: helperTokenAccount2.publicKey,
           mint: new PublicKey(quoteMint!),
-          owner: form.baseTreasury.governance.pubkey,
+          owner: authority,
         })
       )
       quoteDestination = helperTokenAccount2.publicKey
@@ -585,7 +585,7 @@ export async function getConfigLsoInstruction({
         account: helperTokenAccount.publicKey,
         mint: baseMint,
         owner: form.baseTreasury.isSol
-          ? form.baseTreasury.governance.pubkey
+          ? form.baseTreasury.extensions.transferAddress
           : form.baseTreasury.extensions.token?.account.owner,
       })
     )
