@@ -292,16 +292,6 @@ export interface EmptyInstructionForm {
   governedAccount: AssetAccount | undefined
 }
 
-export interface SwitchboardAdmitOracleForm {
-  oraclePubkey: PublicKey | undefined
-  queuePubkey: PublicKey | undefined
-}
-
-export interface SwitchboardRevokeOracleForm {
-  oraclePubkey: PublicKey | undefined
-  queuePubkey: PublicKey | undefined
-}
-
 export interface CreateAssociatedTokenAccountForm {
   governedAccount?: AssetAccount
   splTokenMint?: string
@@ -422,6 +412,7 @@ export enum Instructions {
   DualFinanceDelegateWithdraw,
   DualFinanceVoteDeposit,
   DualFinanceVote,
+  DelegateStake,
   EverlendDeposit,
   EverlendWithdraw,
   ForesightAddMarketListToCategory,
@@ -473,8 +464,6 @@ export enum Instructions {
   SerumUpdateGovConfigAuthority,
   SerumUpdateGovConfigParams,
   StakeValidator,
-  SwitchboardAdmitOracle,
-  SwitchboardRevokeOracle,
   SwitchboardFundOracle,
   WithdrawFromOracle,
   Transfer,
@@ -550,6 +539,12 @@ export interface ValidatorWithdrawStakeForm {
   governedTokenAccount: AssetAccount | undefined
   stakingAccount: StakeAccount | undefined
   amount: number
+}
+
+export interface DelegateStakeForm {
+  governedTokenAccount: AssetAccount | undefined
+  stakingAccount: StakeAccount | undefined
+  votePubkey: string
 }
 
 export interface DualFinanceAirdropForm {

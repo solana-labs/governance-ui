@@ -299,6 +299,7 @@ export async function handleEverlendAction(
     proposalIndex,
     [...setupInsts, ...insts, ...cleanupInsts],
     isDraft,
+    ["Approve"],
     client
   )
   proposalsAdresses.push(proposalAddress)

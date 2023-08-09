@@ -51,8 +51,6 @@ interface exerciseReversibleInstruction {
   strike: BN
 }
 
-// TODO: Include withdrawAll
-
 const INSTRUCTIONS = {
   45: {
     name: 'Staking Option ConfigV3',
@@ -324,6 +322,27 @@ const INSTRUCTIONS = {
             Amount atoms of base: {decodedInstructionData.amount.toNumber()}
           </div>
           <div>Strike: {decodedInstructionData.strike.toNumber()}</div>
+        </div>
+      )
+    },
+  },
+  96: {
+    name: 'Staking Option WithdrawAll',
+    accounts: [
+      { name: 'authority' },
+      { name: 'state' },
+      { name: 'baseVault' },
+      { name: 'baseAccount' },
+      { name: 'quoteVault' },
+      { name: 'quoteAccount' },
+      { name: 'feeQuoteAccount' },
+      { name: 'tokenProgram' },
+      { name: 'systemProgram' },
+    ],
+    getDataUI: async () => {
+      return (
+        <div className="space-y-3">
+          Withdrawing remaining collateral tokens and payments from SO
         </div>
       )
     },

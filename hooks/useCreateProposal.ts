@@ -1,6 +1,6 @@
 import {
-  createProposal,
   InstructionDataWithHoldUpTime,
+  createProposal,
 } from 'actions/createProposal'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useRealm from './useRealm'
@@ -16,6 +16,7 @@ import {
 import useLegacyConnectionContext from './useLegacyConnectionContext'
 import queryClient from './queries/queryClient'
 import { proposalQueryKeys } from './queries/proposal'
+import { createLUTProposal } from 'actions/createLUTproposal'
 
 export default function useCreateProposal() {
   const client = useVotePluginsClientStore(
@@ -38,6 +39,7 @@ export default function useCreateProposal() {
     instructionsData,
     voteByCouncil = false,
     isDraft = false,
+    utilizeLookupTable,
   }: {
     title: string
     description: string
@@ -45,6 +47,7 @@ export default function useCreateProposal() {
     instructionsData: InstructionDataWithHoldUpTime[]
     voteByCouncil?: boolean
     isDraft?: boolean
+    utilizeLookupTable?: boolean
   }) => {
     const { result: selectedGovernance } = await fetchGovernanceByPubkey(
       connection.current,
@@ -77,7 +80,8 @@ export default function useCreateProposal() {
     const rpcContext = getRpcContext()
     if (!rpcContext) throw new Error()
 
-    const proposalAddress = await createProposal(
+    const create = utilizeLookupTable ? createLUTProposal : createProposal
+    const proposalAddress = await create(
       rpcContext,
       realm,
       governance.pubkey,
@@ -88,6 +92,7 @@ export default function useCreateProposal() {
       selectedGovernance.account.proposalCount,
       instructionsData,
       isDraft,
+      ["Approve"],
       client
     )
     queryClient.invalidateQueries({
@@ -105,5 +110,75 @@ export default function useCreateProposal() {
     return handleCreateProposal({ ...rest, governance: { pubkey: governance } })
   }
 
-  return { handleCreateProposal, propose }
+  const proposeMultiChoice = async(
+    {
+      title,
+      description,
+      governance,
+      instructionsData,
+      voteByCouncil = false,
+      options,
+      isDraft = false,
+    }: {
+      title: string
+      description: string
+      governance: PublicKey
+      instructionsData: InstructionDataWithHoldUpTime[]
+      voteByCouncil?: boolean
+      options: string[]
+      isDraft?: boolean
+    }
+  ) => {
+    const { result: selectedGovernance } = await fetchGovernanceByPubkey(
+      connection.current,
+      governance
+    )
+    if (!selectedGovernance) throw new Error('governance not found')
+    if (!realm) throw new Error()
+
+    const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
+      selectedGovernance.account.config,
+      voteByCouncil
+    )
+
+    const defaultProposalMint =
+      !mint?.supply.isZero() ||
+      config?.account.communityTokenConfig.voterWeightAddin
+        ? realm?.account.communityMint
+        : !councilMint?.supply.isZero()
+        ? realm?.account.config.councilMint
+        : undefined
+
+    const proposalMint =
+      canChooseWhoVote && voteByCouncil
+        ? realm?.account.config.councilMint
+        : defaultProposalMint
+
+    if (!proposalMint) {
+      throw new Error('There is no suitable governing token for the proposal')
+    }
+    const rpcContext = getRpcContext()
+    if (!rpcContext) throw new Error()
+
+    const proposalAddress = await createProposal(
+      rpcContext,
+      realm,
+      governance,
+      ownTokenRecord!,
+      title,
+      description,
+      proposalMint,
+      selectedGovernance.account.proposalCount,
+      instructionsData,
+      isDraft,
+      options,
+      client
+    )
+    queryClient.invalidateQueries({
+      queryKey: proposalQueryKeys.all(connection.endpoint),
+    })
+    return proposalAddress
+  }
+
+  return { handleCreateProposal, propose, proposeMultiChoice }
 }

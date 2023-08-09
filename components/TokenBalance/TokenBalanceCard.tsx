@@ -33,7 +33,6 @@ import { ExclamationIcon } from '@heroicons/react/outline'
 import { useEffect, useState } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { VSR_PLUGIN_PKS } from '@constants/plugins'
-import { REALM_ID as PYTH_REALM_ID } from 'pyth-staking-api'
 import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
 import SerumGovernanceTokenWrapper from './SerumGovernanceTokenWrapper'
 import getNumTokens from '@components/ProposalVotingPower/getNumTokens'
@@ -430,17 +429,13 @@ export const TokenDeposit = ({
     ? 'You have to many outstanding proposals to withdraw.'
     : ''
 
-  //Todo: move to own components with refactor to dao folder structure
-  const isPyth = realmInfo?.realmId.toBase58() === PYTH_REALM_ID.toBase58()
-
-  const availableTokens = isPyth
-    ? fmtMintAmount(mint, ownVoterWeight.votingPower!)
-    : depositTokenRecord && mint
-    ? fmtMintAmount(
-        mint,
-        depositTokenRecord.account.governingTokenDepositAmount
-      )
-    : '0'
+  const availableTokens =
+    depositTokenRecord && mint
+      ? fmtMintAmount(
+          mint,
+          depositTokenRecord.account.governingTokenDepositAmount
+        )
+      : '0'
 
   useEffect(() => {
     if (availableTokens != '0' || hasTokensDeposited || hasTokensInWallet) {
@@ -494,7 +489,7 @@ export const TokenDeposit = ({
         </div>
       )}
 
-      {!isPyth && (
+      {
         <>
           <div
             className={`my-4 opacity-70 text-xs  ${
@@ -545,7 +540,7 @@ export const TokenDeposit = ({
             )}
           </div>
         </>
-      )}
+      }
       {isVsr && (
         <small className="flex items-center mt-3 text-xs">
           <ExclamationIcon className="w-5 h-5 mr-2"></ExclamationIcon>

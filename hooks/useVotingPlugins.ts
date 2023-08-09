@@ -1,25 +1,10 @@
 import { useCallback, useEffect, useMemo } from 'react'
 import { getNfts } from '@utils/tokens'
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
-import useSwitchboardPluginStore from 'SwitchboardVotePlugin/store/switchboardStore'
-import {
-  SWITCHBOARD_ID,
-  SWITCHBOARD_ADDIN_ID,
-} from 'SwitchboardVotePlugin/SwitchboardQueueVoterClient'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import {
-  getMaxVoterWeightRecord,
-  getVoterWeightRecord,
-  getGovernanceAccount,
-  Governance,
-} from '@solana/spl-governance'
+import { getMaxVoterWeightRecord } from '@solana/spl-governance'
 import { getMaxVoterWeightRecord as getPluginMaxVoterWeightRecord } from '@utils/plugin/accounts'
 import { notify } from '@utils/notifications'
-import * as anchor from '@coral-xyz/anchor'
-import * as sbv2 from '@switchboard-xyz/switchboard-v2'
-import sbIdl from 'SwitchboardVotePlugin/switchboard_v2.json'
-import gonIdl from 'SwitchboardVotePlugin/gameofnodes.json'
 
 import useGatewayPluginStore from '../GatewayPlugin/store/gatewayPluginStore'
 import { getGatekeeperNetwork } from '../GatewayPlugin/sdk/accounts'
@@ -35,8 +20,6 @@ import {
   HELIUM_VSR_PLUGINS_PKS,
   VSR_PLUGIN_PKS,
   GATEWAY_PLUGINS_PKS,
-  PYTH_PLUGINS_PKS,
-  SWITCHBOARD_PLUGINS_PKS,
 } from '../constants/plugins'
 import useUserOrDelegator from './useUserOrDelegator'
 
@@ -53,10 +36,8 @@ export function useVotingPlugins() {
     handleSetHeliumVsrClient,
     handleSetNftClient,
     handleSetGatewayClient,
-    //handleSetSwitchboardClient,
     handleSetNftRegistrar,
     handleSetGatewayRegistrar,
-    handleSetPythClient,
     handleSetCurrentRealmVotingClient,
   } = useVotePluginsClientStore()
 
@@ -73,7 +54,6 @@ export function useVotingPlugins() {
   // @asktree: you should select what you need from stores, not use entire thing
   const heliumStore = useHeliumVsrStore()
   const gatewayStore = useGatewayPluginStore()
-  const switchboardStore = useSwitchboardPluginStore()
   const wallet = useWalletOnePointOh()
   const connection = useLegacyConnectionContext()
   const connected = !!wallet?.connected
@@ -82,8 +62,6 @@ export function useVotingPlugins() {
     currentClient,
     vsrClient,
     gatewayClient,
-    //switchboardClient,
-    pythClient,
     nftClient,
     nftMintRegistrar,
     heliumVsrClient,
@@ -91,8 +69,6 @@ export function useVotingPlugins() {
     s.state.currentRealmVotingClient,
     s.state.vsrClient,
     s.state.gatewayClient,
-    //s.state.switchboardClient,
-    s.state.pythClient,
     s.state.nftClient,
     s.state.nftMintRegistrar,
     s.state.heliumVsrClient,
@@ -162,9 +138,7 @@ export function useVotingPlugins() {
         }
       }
       handleSetNftClient(wallet, connection)
-      //handleSetSwitchboardClient(wallet, connection)
       handleSetGatewayClient(wallet, connection)
-      handleSetPythClient(wallet, connection)
     }
   }, [
     connection,
@@ -172,7 +146,6 @@ export function useVotingPlugins() {
     handleSetGatewayClient,
     handleSetHeliumVsrClient,
     handleSetNftClient,
-    handleSetPythClient,
     handleSetVsrClient,
     wallet,
   ])
@@ -252,39 +225,6 @@ export function useVotingPlugins() {
       }
     }
 
-    const handlePythPlugin = () => {
-      if (
-        pythClient &&
-        currentPluginPk &&
-        PYTH_PLUGINS_PKS.includes(currentPluginPk.toBase58())
-      ) {
-        if (voterPk) {
-          handleSetCurrentRealmVotingClient({
-            client: pythClient,
-            realm,
-            walletPk: voterPk,
-          })
-        }
-      }
-    }
-    /* 
-    const handleSwitchboardPlugin = () => {
-      if (
-        switchboardClient &&
-        currentPluginPk &&
-        SWITCHBOARD_PLUGINS_PKS.includes(currentPluginPk.toBase58())
-      ) {
-        // Switchboard: don't think we need this
-        //handleSetNftRegistrar(nftClient!, realm)
-        if (connected) {
-          handleSetCurrentRealmVotingClient({
-            client: switchboardClient,
-            realm,
-            walletPk: wallet?.publicKey,
-          })
-        }
-      }
-    } */
     if (
       realm &&
       (!currentClient ||
@@ -298,8 +238,6 @@ export function useVotingPlugins() {
       handleGatewayPlugin()
       handleVsrPlugin()
       handleHeliumVsrPlugin()
-      //handleSwitchboardPlugin()
-      handlePythPlugin()
     }
   }, [
     currentClient,
@@ -314,7 +252,6 @@ export function useVotingPlugins() {
     heliumVsrClient,
     nftClient,
     voterPk,
-    pythClient,
     realm,
     vsrClient,
   ])
@@ -338,155 +275,6 @@ export function useVotingPlugins() {
       setNftMaxVoterWeight(null)
     }
   }, [connection, nftClient, setNftMaxVoterWeight, realm])
-
-  const handleGetSwitchboardVoting = useCallback(async () => {
-    console.log('im doing switchboard stuff')
-    if (!wallet || !wallet.publicKey || !realm) {
-      return
-    }
-
-    switchboardStore.setIsLoading(true)
-
-    try {
-      const options = anchor.AnchorProvider.defaultOptions()
-      const provider = new anchor.AnchorProvider(
-        connection.current,
-        (wallet as unknown) as anchor.Wallet,
-        options
-      )
-
-      let idl = await anchor.Program.fetchIdl(sbv2.SBV2_MAINNET_PID, provider)
-      if (!idl) {
-        idl = sbIdl as anchor.Idl
-      }
-
-      let addinIdl = await anchor.Program.fetchIdl(
-        SWITCHBOARD_ADDIN_ID,
-        provider
-      )
-      if (!addinIdl) {
-        addinIdl = gonIdl as anchor.Idl
-      }
-
-      const switchboardProgram = new anchor.Program(
-        idl,
-        SWITCHBOARD_ID,
-        provider
-      )
-
-      const addinProgram = new anchor.Program(
-        addinIdl,
-        SWITCHBOARD_ADDIN_ID,
-        provider
-      )
-
-      const allOracles = await switchboardProgram.account.oracleAccountData.all()
-      const oData = allOracles.map(({ publicKey, account }) => {
-        return {
-          oracleData: account as any,
-          oracle: publicKey,
-        }
-      })
-
-      const myNodesForRealm: PublicKey[] = []
-      const setVoterWeightInstructions: TransactionInstruction[] = []
-
-      for (const { oracle, oracleData } of oData) {
-        if (!wallet || !wallet.publicKey || !realm || !oData) {
-          continue
-        }
-        const queuePk = oracleData.queuePubkey as PublicKey
-
-        const [addinState] = await PublicKey.findProgramAddress(
-          [Buffer.from('state')],
-          addinProgram.programId
-        )
-
-        const addinStateData = await addinProgram.account.state.fetch(
-          addinState
-        )
-        const queue = await switchboardProgram.account.oracleQueueAccountData.fetch(
-          queuePk
-        )
-        const queueAuthority = queue.authority as PublicKey
-        const grantAuthority = addinStateData.grantAuthority as PublicKey
-        try {
-          const g = await getGovernanceAccount(
-            provider.connection,
-            grantAuthority,
-            Governance
-          )
-          if (
-            g.account.realm.equals(realm.pubkey) &&
-            oracleData.oracleAuthority.equals(wallet.publicKey)
-          ) {
-            myNodesForRealm.push(oracle)
-            const [p] = sbv2.PermissionAccount.fromSeed(
-              switchboardProgram as any,
-              queueAuthority,
-              queuePk,
-              oracle
-            )
-
-            const ix = await p.setVoterWeightTx({
-              govProgram: realm.owner,
-              pubkeySigner: wallet.publicKey,
-              addinProgram: addinProgram as any,
-              realm: realm.pubkey,
-            })
-
-            setVoterWeightInstructions.push(ix.instructions[0])
-          }
-        } catch (e) {
-          console.log(e)
-        }
-      }
-
-      switchboardStore.setOracleKeys(myNodesForRealm, currentClient)
-      switchboardStore.setInstructions(
-        setVoterWeightInstructions,
-        currentClient
-      )
-
-      try {
-        const [voterWeightRecord] = PublicKey.findProgramAddressSync(
-          [Buffer.from('VoterWeightRecord'), myNodesForRealm[0].toBytes()],
-          SWITCHBOARD_ADDIN_ID
-        )
-
-        try {
-          const vwr = await getVoterWeightRecord(
-            connection.current,
-            voterWeightRecord
-          )
-          if (vwr && vwr.account.realm.equals(realm.pubkey)) {
-            // get voting power
-            switchboardStore.setVotingPower(vwr.account.voterWeight)
-          } else {
-            // 'no sb governance'
-            switchboardStore.setVotingPower(new anchor.BN(0))
-          }
-        } catch (e) {
-          console.log("Couldn't get voter weight record. Setting to zero.")
-          switchboardStore.setVotingPower(new anchor.BN(0))
-        }
-      } catch (e) {
-        console.log("Couldn't get VWR")
-        console.log(e)
-      }
-    } catch (e) {
-      console.log(e)
-    }
-    switchboardStore.setIsLoading(false)
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    connection,
-    currentClient,
-    realm,
-    //switchboardStore,
-    wallet,
-  ])
 
   const handleGetHeliumVsrVoting = useCallback(async () => {
     if (
@@ -562,12 +350,6 @@ export function useVotingPlugins() {
   ])
 
   useEffect(() => {
-    if (
-      currentPluginPk &&
-      SWITCHBOARD_PLUGINS_PKS.includes(currentPluginPk.toBase58())
-    ) {
-      handleGetSwitchboardVoting()
-    }
     if (usedCollectionsPks.length && realm) {
       if (connected && currentClient.walletPk?.toBase58()) {
         handleGetNfts()
@@ -575,8 +357,6 @@ export function useVotingPlugins() {
       handleMaxVoterWeight()
     } else if (realm) {
       handleGetHeliumVsrVoting()
-      // @asktree: guys please dont spam network reqs even if your plugin isnt used
-      // handleGetSwitchboardVoting()
     } else {
       setVotingNfts([], currentClient, nftMintRegistrar)
       setNftMaxVoterWeight(null)
@@ -587,7 +367,6 @@ export function useVotingPlugins() {
     currentPluginPk,
     handleGetHeliumVsrVoting,
     handleGetNfts,
-    handleGetSwitchboardVoting,
     handleMaxVoterWeight,
     nftMintRegistrar,
     realm,
