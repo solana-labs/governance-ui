@@ -289,6 +289,10 @@ export default function useGovernanceAssets() {
       name: 'Deactivate validator stake',
       packageId: PackageEnum.Common,
     },
+    [Instructions.DelegateStake]: {
+      name: 'Delegate Stake Account',
+      packageId: PackageEnum.Common,
+    },
     [Instructions.DifferValidatorStake]: {
       name: 'Differ validator stake',
       // Not to be used for now
