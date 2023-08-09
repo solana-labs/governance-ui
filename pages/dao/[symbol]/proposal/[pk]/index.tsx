@@ -181,7 +181,7 @@ const Proposal = () => {
               :
                 <VoteResults proposal={proposal.account} />
               }
-              {proposal && !isMulti && (
+              {proposal && (
                 <div className="flex justify-end mt-4">
                   <Link
                     href={fmtUrlWithCluster(
