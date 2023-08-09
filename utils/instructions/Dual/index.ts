@@ -700,19 +700,12 @@ export async function getGsoWithdrawInstruction({
       destination = helperTokenAccount.publicKey
     }
 
-    const withdrawInstruction = form.baseTreasury.isSol
-      ? await gso.createWithdrawInstruction(
-          form.soName,
-          authority!,
-          destination,
-          new PublicKey(form.mintPk!)
-        )
-      : await gso.createWithdrawInstruction(
-          form.soName,
-          authority!,
-          destination,
-          destination
-        )
+    const withdrawInstruction = await gso.createWithdrawInstruction(
+      form.soName,
+      authority!,
+      destination,
+      destination
+    )
 
     additionalSerializedInstructions.push(
       serializeInstructionToBase64(withdrawInstruction)
