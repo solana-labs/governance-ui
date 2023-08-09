@@ -415,7 +415,7 @@ export enum Instructions {
   DualFinanceLiquidityStakingOption,
   DualFinanceInitStrike,
   DualFinanceStakingOption,
-  DualFinanceLockupStakingOption,
+  DualFinanceGso,
   DualFinanceGsoWithdraw,
   DualFinanceWithdraw,
   DualFinanceDelegate,
@@ -573,7 +573,7 @@ export interface DualFinanceStakingOptionForm {
   userPk: string | undefined
 }
 
-export interface DualFinanceLockupStakingOptionForm {
+export interface DualFinanceGsoForm {
   strike: number
   soName: string | undefined
   optionExpirationUnixSeconds: number
@@ -611,6 +611,12 @@ export interface DualFinanceExerciseForm {
 }
 
 export interface DualFinanceWithdrawForm {
+  soName: string | undefined
+  baseTreasury: AssetAccount | undefined
+  mintPk: string | undefined
+}
+
+export interface DualFinanceGsoWithdrawForm {
   soName: string | undefined
   baseTreasury: AssetAccount | undefined
   mintPk: string | undefined

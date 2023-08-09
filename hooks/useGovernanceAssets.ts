@@ -374,8 +374,8 @@ export default function useGovernanceAssets() {
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Dual,
     },
-    [Instructions.DualFinanceLockupStakingOption]: {
-      name: 'GSO',
+    [Instructions.DualFinanceGso]: {
+      name: 'Lockup Staking Option',
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Dual,
     },
@@ -395,7 +395,7 @@ export default function useGovernanceAssets() {
       packageId: PackageEnum.Dual,
     },
     [Instructions.DualFinanceGsoWithdraw]: {
-      name: 'GSO Withdraw',
+      name: 'Lockup SO Withdrawal',
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Dual,
     },

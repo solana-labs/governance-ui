@@ -20,7 +20,7 @@ import {
   DualFinanceWithdrawForm,
   UiInstruction,
   DualFinanceInitStrikeForm,
-  DualFinanceLockupStakingOptionForm,
+  DualFinanceGsoForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import {
   createAssociatedTokenAccount,
@@ -177,7 +177,7 @@ export async function getConfigInstruction({
       serializeInstructionToBase64(configInstruction)
     )
 
-    const initStrikeInstruction = await so.createInitStrikeReversibleInstruction(
+    const initStrikeInstruction = await so.createInitStrikeInstruction(
       new BN(form.strike),
       form.soName,
       //authority sol wallet
@@ -264,7 +264,7 @@ export async function getConfigInstruction({
 
 interface StakingOptionGsoArgs {
   connection: ConnectionContext
-  form: DualFinanceLockupStakingOptionForm
+  form: DualFinanceGsoForm
   setFormErrors: any
   schema: any
   wallet: WalletAdapter | undefined

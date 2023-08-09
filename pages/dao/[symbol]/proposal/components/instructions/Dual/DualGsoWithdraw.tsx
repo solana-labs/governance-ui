@@ -1,15 +1,14 @@
-
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { ProgramAccount, Governance } from '@solana/spl-governance'
 import {
   UiInstruction,
-  DualFinanceWithdrawForm,
+  DualFinanceGsoWithdrawForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getGsoWithdrawInstruction } from '@utils/instructions/Dual'
-import { getDualFinanceWithdrawSchema } from '@utils/validations'
+import { getDualFinanceGsoWithdrawSchema } from '@utils/validations'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import Input from '@components/inputs/Input'
@@ -23,7 +22,7 @@ const DualGsoWithdraw = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const [form, setForm] = useState<DualFinanceWithdrawForm>({
+  const [form, setForm] = useState<DualFinanceGsoWithdrawForm>({
     soName: undefined,
     baseTreasury: undefined,
     mintPk: undefined,
@@ -41,7 +40,7 @@ const DualGsoWithdraw = ({
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }, [form])
-  const schema = getDualFinanceWithdrawSchema()
+  const schema = getDualFinanceGsoWithdrawSchema()
   useEffect(() => {
     function getInstruction(): Promise<UiInstruction> {
       return getGsoWithdrawInstruction({
@@ -64,8 +63,6 @@ const DualGsoWithdraw = ({
     setGovernedAccount(form.baseTreasury?.governance)
   }, [form.baseTreasury])
 
-  // TODO: Include this in the config instruction which can optionally be done
-  // if the project doesnt need to change where the tokens get returned to.
   return (
     <>
       <Tooltip content="Identifier for the Staking Option">

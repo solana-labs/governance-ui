@@ -3,26 +3,26 @@ import React, { useContext, useEffect, useState } from 'react'
 import { ProgramAccount, Governance } from '@solana/spl-governance'
 import {
   UiInstruction,
-  DualFinanceLockupStakingOptionForm,
+  DualFinanceGsoForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Input from '@components/inputs/Input'
 import { getConfigGsoInstruction } from '@utils/instructions/Dual'
-import { getDualFinanceLockupStakingOptionSchema } from '@utils/validations'
+import { getDualFinanceGsoSchema } from '@utils/validations'
 import Tooltip from '@components/Tooltip'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
-const LockupStakingOption = ({
+const DualGso = ({
   index,
   governance,
 }: {
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const [form, setForm] = useState<DualFinanceLockupStakingOptionForm>({
+  const [form, setForm] = useState<DualFinanceGsoForm>({
     soName: undefined,
     optionExpirationUnixSeconds: 0,
     numTokens: 0,
@@ -48,7 +48,7 @@ const LockupStakingOption = ({
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-  const schema = getDualFinanceLockupStakingOptionSchema()
+  const schema = getDualFinanceGsoSchema()
   useEffect(() => {
     function getInstruction(): Promise<UiInstruction> {
       return getConfigGsoInstruction({
@@ -78,7 +78,7 @@ const LockupStakingOption = ({
 
   return (
     <>
-      <Tooltip content="Custom name to identify the GSO">
+      <Tooltip content="Custom name to identify the Staking Option">
         <Input
           label="Name"
           value={form.soName}
@@ -146,7 +146,7 @@ const LockupStakingOption = ({
           error={formErrors['optionExpirationUnixSeconds']}
         />
       </Tooltip>
-      <Tooltip content="Subscription Period in unix seconds for option subscription">
+      <Tooltip content="Date in unix seconds to establish cutoff period for staking">
         <Input
           label="Subscription Period"
           value={form.subscriptionPeriodEnd}
@@ -188,7 +188,7 @@ const LockupStakingOption = ({
           error={formErrors['lockupRatio']}
         />
       </Tooltip>
-      <Tooltip content="Lot size for base atoms. This is the min size of an option.">
+      <Tooltip content="Lot size in base atoms. This is the min size of an option.">
         <Input
           label="Lot Size"
           value={form.lotSize}
@@ -224,4 +224,4 @@ const LockupStakingOption = ({
   )
 }
 
-export default LockupStakingOption
+export default DualGso
