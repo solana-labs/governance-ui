@@ -25,7 +25,6 @@ const DualGsoWithdraw = ({
   const [form, setForm] = useState<DualFinanceGsoWithdrawForm>({
     soName: undefined,
     baseTreasury: undefined,
-    mintPk: undefined,
   })
   const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
@@ -93,20 +92,6 @@ const DualGsoWithdraw = ({
           type="token"
         ></GovernedAccountSelect>
       </Tooltip>
-      {form.baseTreasury?.isSol && (
-        <Input
-          label="Mint"
-          value={form.mintPk}
-          type="text"
-          onChange={(evt) =>
-            handleSetForm({
-              value: evt.target.value,
-              propertyName: 'mintPk',
-            })
-          }
-          error={formErrors['mintPk']}
-        />
-      )}
     </>
   )
 }

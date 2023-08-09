@@ -705,11 +705,6 @@ export const getDualFinanceGsoWithdrawSchema = () => {
   return yup.object().shape({
     soName: yup.string().required('Staking option name is required'),
     baseTreasury: yup.object().typeError('baseTreasury is required'),
-    mintPk: yup
-      .string()
-      .test('is-valid-address1', 'Please enter a valid PublicKey', (value) =>
-        value ? validatePubkey(value) : true
-      ),
   })
 }
 

@@ -664,41 +664,11 @@ export async function getGsoWithdrawInstruction({
   const serializedInstruction = ''
   const additionalSerializedInstructions: string[] = []
   const prerequisiteInstructions: TransactionInstruction[] = []
-  let helperTokenAccount: Keypair | null = null
-  if (isValid && form.soName && form.baseTreasury && wallet?.publicKey) {
+  const helperTokenAccount: Keypair | null = null
+  if (isValid && form.soName && form.baseTreasury && !!form.baseTreasury.isSol && wallet?.publicKey) {
     const gso = getGsoApi(connection)
-    const authority = form.baseTreasury.isSol
-      ? form.baseTreasury.extensions.transferAddress
-      : form.baseTreasury.extensions.token!.account.owner!
-    let destination = form.baseTreasury.pubkey
-    if (form.baseTreasury.isSol) {
-      const baseMint = form.mintPk
-      const space = 165
-      const rent = await connection.current.getMinimumBalanceForRentExemption(
-        space,
-        'processed'
-      )
-      //Creating checking account on the fly with given mint
-      //made to be more safe - instructions don't have access to main treasury
-      helperTokenAccount = new Keypair()
-      //run as prerequsite instructions payer is connected wallet
-      prerequisiteInstructions.push(
-        SystemProgram.createAccount({
-          fromPubkey: wallet.publicKey,
-          newAccountPubkey: helperTokenAccount.publicKey,
-          lamports: rent,
-          space: space,
-          programId: TOKEN_PROGRAM_ID,
-        }),
-        //initialized account with same mint as base
-        initializeAccount({
-          account: helperTokenAccount.publicKey,
-          mint: new PublicKey(baseMint!),
-          owner: form.baseTreasury.governance.pubkey,
-        })
-      )
-      destination = helperTokenAccount.publicKey
-    }
+    const authority = form.baseTreasury.extensions.token!.account.owner!
+    const destination = form.baseTreasury.pubkey
 
     const withdrawInstruction = await gso.createWithdrawInstruction(
       form.soName,
