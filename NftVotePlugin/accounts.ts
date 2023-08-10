@@ -1,10 +1,19 @@
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { PublicKey } from '@solana/web3.js'
+import { BN } from '@coral-xyz/anchor'
 export interface NftVoteRecord {
   account: {
     governingTokenOwner: PublicKey
     nftMint: PublicKey
     proposal: PublicKey
+  }
+  publicKey: PublicKey
+}
+
+export interface NftActionTicket {
+  account: {
+    nft_owner: PublicKey
+    weight: BN
   }
   publicKey: PublicKey
 }
@@ -43,5 +52,55 @@ export const getNftVoteRecordProgramAddress = async (
   return {
     nftVoteRecord,
     nftVoteRecordBump,
+  }
+}
+
+export const getNftActionTicketsForVoter = async (
+  client: NftVoterClient,
+  registrar: PublicKey,
+  voter: PublicKey
+) => {
+  const nftActionTicketsFiltered = ((await client.program.account.nftActionTicket.all(
+    [
+      {
+        memcmp: {
+          offset: 8,
+          bytes: registrar.toBase58(),
+        },
+      },
+      {
+        memcmp: {
+          offset: 40,
+          bytes: voter.toBase58(),
+        },
+      },
+    ]
+  )) as unknown) as NftActionTicket[]
+  return nftActionTicketsFiltered
+}
+
+export const getNftActionTicketProgramAddress = async (
+  ticketType: string,
+  registrar: PublicKey,
+  owner: PublicKey,
+  nftMintAddress: string,
+  clientProgramId: PublicKey
+) => {
+  const [
+    nftActionTicket,
+    nftActionTicketBump,
+  ] = await PublicKey.findProgramAddress(
+    [
+      Buffer.from(ticketType),
+      registrar.toBuffer(),
+      owner.toBuffer(),
+      new PublicKey(nftMintAddress).toBuffer(),
+    ],
+    clientProgramId
+  )
+
+  return {
+    nftActionTicket,
+    nftActionTicketBump,
   }
 }

@@ -8,11 +8,7 @@ import {
 } from '@tools/constants'
 import { ON_NFT_VOTER_V2 } from '@constants/flags'
 
-const programPk = new PublicKey(
-  ON_NFT_VOTER_V2 ? DEFAULT_NFT_VOTER_PLUGIN_V2 : DEFAULT_NFT_VOTER_PLUGIN
-)
-
-export class NftVoterClient {
+class NftVoterClientV1 {
   constructor(
     public program: Program<NftVoter | NftVoterV2>,
     public devnet?: boolean
@@ -21,15 +17,32 @@ export class NftVoterClient {
   static connect(
     provider: Provider,
     devnet?: boolean,
-    programId = programPk
-  ): NftVoterClient {
-    return new NftVoterClient(
-      new Program<NftVoter | NftVoterV2>(
-        ON_NFT_VOTER_V2 ? IDLV2 : IDL,
-        programId,
-        provider
-      ),
+    programId = new PublicKey(DEFAULT_NFT_VOTER_PLUGIN)
+  ): NftVoterClientV1 {
+    console.log('connecting to', programId.toBase58())
+    return new NftVoterClientV1(
+      new Program<NftVoter | NftVoterV2>(IDL, programId, provider),
       devnet
     )
   }
 }
+
+class NftVoterClientV2 {
+  constructor(public program: Program<NftVoterV2>, public devnet?: boolean) {}
+
+  static connect(
+    provider: Provider,
+    devnet?: boolean,
+    programId = new PublicKey(DEFAULT_NFT_VOTER_PLUGIN_V2)
+  ): NftVoterClientV2 {
+    console.log('connecting to', programId.toBase58())
+    return new NftVoterClientV2(
+      new Program<NftVoterV2>(IDLV2, programId, provider),
+      devnet
+    )
+  }
+}
+
+export class NftVoterClient extends (ON_NFT_VOTER_V2
+  ? NftVoterClientV2
+  : NftVoterClientV1) {}
