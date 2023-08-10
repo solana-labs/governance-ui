@@ -154,7 +154,8 @@ export class VotingClient {
   withUpdateVoterWeightRecord = async (
     instructions: TransactionInstruction[],
     tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>,
-    type: UpdateVoterWeightRecordTypes
+    type: UpdateVoterWeightRecordTypes,
+    createNftActionTicketIxs?: TransactionInstruction[]
   ): Promise<ProgramAddresses | undefined> => {
     const realm = this.realm!
 
@@ -273,7 +274,7 @@ export class VotingClient {
         instructions.push(updateVoterWeightRecordIx)
       } else {
         const {
-          createNftActionTicketIxs,
+          createNftTicketIxs,
           updateVoterWeightRecordIx,
         } = await getUpdateVoterWeightRecordInstructionV2(
           this.client,
@@ -283,10 +284,8 @@ export class VotingClient {
           this.votingNfts,
           type
         )
-        instructions.push(
-          ...createNftActionTicketIxs,
-          updateVoterWeightRecordIx
-        )
+        createNftActionTicketIxs?.push(...createNftTicketIxs)
+        instructions.push(updateVoterWeightRecordIx)
       }
 
       return { voterWeightPk, maxVoterWeightRecord }
@@ -315,7 +314,8 @@ export class VotingClient {
   withCastPluginVote = async (
     instructions: TransactionInstruction[],
     proposal: ProgramAccount<Proposal>,
-    tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>
+    tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>,
+    createNftActionTicketIxs?: TransactionInstruction[]
   ): Promise<ProgramAddresses | undefined> => {
     if (this.noClient) {
       return
@@ -475,7 +475,8 @@ export class VotingClient {
           this.votingNfts,
           nftVoteRecordsFiltered
         )
-        instructions.push(...castNftVoteTicketIxs, ...castNftVoteIxs)
+        createNftActionTicketIxs?.push(...castNftVoteTicketIxs)
+        instructions.push(...castNftVoteIxs)
       }
 
       return { voterWeightPk, maxVoterWeightRecord }

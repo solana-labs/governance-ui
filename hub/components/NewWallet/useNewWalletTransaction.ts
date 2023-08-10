@@ -13,8 +13,13 @@ import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext';
 import useProgramVersion from '@hooks/useProgramVersion';
 import useRealm from '@hooks/useRealm';
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh';
+import { chunks } from '@utils/helpers';
 import { trySentryLog } from '@utils/logs';
-import { SequenceType, sendTransactionsV3 } from '@utils/sendTransactions';
+import {
+  SequenceType,
+  sendTransactionsV3,
+  txBatchesToInstructionSetWithSigners,
+} from '@utils/sendTransactions';
 
 import useGovernanceDefaults from './useGovernanceDefaults';
 
@@ -51,12 +56,14 @@ const useNewWalletCallback = (
     );
 
     const instructions: TransactionInstruction[] = [];
+    const createCreateGovernanceTicketIxs: TransactionInstruction[] = [];
 
     // client is typed such that it cant be undefined, but whatever.
     const plugin = await client?.withUpdateVoterWeightRecord(
       instructions,
       tokenOwnerRecord,
       'createGovernance',
+      createCreateGovernanceTicketIxs,
     );
 
     const governanceAddress = await withCreateGovernance(
@@ -79,8 +86,25 @@ const useNewWalletCallback = (
       wallet.publicKey,
     );
 
+    // the list will have elements only if the plugin is NFTVoterClient2
+    // so we can just add the instructions to transactionInstructions
+    const createGovernanceAccountsChunks = chunks(
+      createCreateGovernanceTicketIxs,
+      1,
+    );
+
     await sendTransactionsV3({
       transactionInstructions: [
+        ...createGovernanceAccountsChunks.map((txBatch, batchIdx) => {
+          return {
+            instructionsSet: txBatchesToInstructionSetWithSigners(
+              txBatch,
+              [],
+              batchIdx,
+            ),
+            sequenceType: SequenceType.Parallel,
+          };
+        }),
         {
           instructionsSet: instructions.map((x) => ({
             transactionInstruction: x,

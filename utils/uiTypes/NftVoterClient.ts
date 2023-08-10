@@ -19,7 +19,6 @@ class NftVoterClientV1 {
     devnet?: boolean,
     programId = new PublicKey(DEFAULT_NFT_VOTER_PLUGIN)
   ): NftVoterClientV1 {
-    console.log('connecting to', programId.toBase58())
     return new NftVoterClientV1(
       new Program<NftVoter | NftVoterV2>(IDL, programId, provider),
       devnet
@@ -35,7 +34,6 @@ class NftVoterClientV2 {
     devnet?: boolean,
     programId = new PublicKey(DEFAULT_NFT_VOTER_PLUGIN_V2)
   ): NftVoterClientV2 {
-    console.log('connecting to', programId.toBase58())
     return new NftVoterClientV2(
       new Program<NftVoterV2>(IDLV2, programId, provider),
       devnet

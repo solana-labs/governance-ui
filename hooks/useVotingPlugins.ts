@@ -336,6 +336,7 @@ export function useVotingPlugins() {
       const network = getNetworkFromEndpoint(connection.endpoint)
       if (network === 'localnet') throw new Error()
       const nfts = await fetchDigitalAssetsByOwner(network, wallet.publicKey)
+      console.log('nfts', nfts)
       const votingNfts = nfts.filter(getIsFromCollection)
       const nftsWithMeta = votingNfts
       setVotingNfts(nftsWithMeta, currentClient, nftMintRegistrar)

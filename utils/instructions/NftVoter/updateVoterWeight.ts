@@ -73,7 +73,7 @@ export const getUpdateVoterWeightRecordInstructionV2 = async (
   votingNfts: DasNftObject[],
   type: UpdateVoterWeightRecordTypes
 ) => {
-  const createNftActionTicketIxs: TransactionInstruction[] = []
+  const createNftTicketIxs: TransactionInstruction[] = []
   const ticketType = `nft-${type}-ticket`
   const firstTenNfts = votingNfts.slice(0, 10)
   const nftActionTicketAccounts: AccountData[] = []
@@ -110,7 +110,7 @@ export const getUpdateVoterWeightRecordInstructionV2 = async (
 
   const nftChunks = chunks(nftRemainingAccounts, 15)
   for (const chunk of [...nftChunks]) {
-    createNftActionTicketIxs.push(
+    createNftTicketIxs.push(
       await (client as NftVoterClient).program.methods
         .createNftActionTicket({ [type]: {} })
         .accounts({
@@ -153,7 +153,7 @@ export const getUpdateVoterWeightRecordInstructionV2 = async (
         new AccountData(nftActionTicket, false, true),
       ])
       .instruction()
-    createNftActionTicketIxs.push(instruction)
+    createNftTicketIxs.push(instruction)
 
     nftActionTicketAccounts.push(new AccountData(nftActionTicket, false, true))
   }
@@ -168,5 +168,5 @@ export const getUpdateVoterWeightRecordInstructionV2 = async (
     .remainingAccounts(nftActionTicketAccounts)
     .instruction()
 
-  return { createNftActionTicketIxs, updateVoterWeightRecordIx }
+  return { createNftTicketIxs, updateVoterWeightRecordIx }
 }
