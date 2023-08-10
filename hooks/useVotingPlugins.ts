@@ -25,7 +25,7 @@ import {
 import useUserOrDelegator from './useUserOrDelegator'
 import { getNetworkFromEndpoint } from '@utils/connection'
 import { fetchDigitalAssetsByOwner } from './queries/digitalAssets'
-import { SUPPORT_CNFTS } from '@constants/flags'
+import { ON_NFT_VOTER_V2, SUPPORT_CNFTS } from '@constants/flags'
 
 export function useVotingPlugins() {
   const realm = useRealmQuery().data?.result
@@ -336,7 +336,9 @@ export function useVotingPlugins() {
       const network = getNetworkFromEndpoint(connection.endpoint)
       if (network === 'localnet') throw new Error()
       const nfts = await fetchDigitalAssetsByOwner(network, wallet.publicKey)
-      const votingNfts = nfts.filter(getIsFromCollection)
+      const votingNfts = nfts
+        .filter(getIsFromCollection)
+        .filter((x) => ON_NFT_VOTER_V2 || !x.compression.compressed)
       const nftsWithMeta = votingNfts
       setVotingNfts(nftsWithMeta, currentClient, nftMintRegistrar)
     } catch (e) {
