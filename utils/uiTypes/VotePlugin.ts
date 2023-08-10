@@ -158,7 +158,7 @@ export class VotingClient {
     createNftActionTicketIxs?: TransactionInstruction[]
   ): Promise<ProgramAddresses | undefined> => {
     const realm = this.realm!
-
+    console.log(this.client)
     if (
       this.noClient ||
       !realm.account.communityMint.equals(
@@ -263,6 +263,7 @@ export class VotingClient {
       )
 
       if (!ON_NFT_VOTER_V2) {
+        console.log('on nft voter v1')
         const updateVoterWeightRecordIx = await getUpdateVoterWeightRecordInstruction(
           this.client,
           walletPk,
@@ -273,6 +274,7 @@ export class VotingClient {
         )
         instructions.push(updateVoterWeightRecordIx)
       } else {
+        console.log('on nft voter v2')
         const {
           createNftTicketIxs,
           updateVoterWeightRecordIx,

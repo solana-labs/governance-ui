@@ -49,9 +49,14 @@ export const getUpdateVoterWeightRecordInstruction = async (
       true
     )
 
+    const metadata = await fetchNFTbyMint(
+      client.program.provider.connection,
+      new PublicKey(nft.id)
+    )
+
     remainingAccounts.push(
       new AccountData(tokenAccount),
-      new AccountData(nft.id)
+      new AccountData(metadata?.result?.metadataAddress || '')
     )
   }
   const updateVoterWeightRecordIx = await client.program.methods
