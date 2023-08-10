@@ -13,3 +13,6 @@ export const SIMULATION_WALLET = 'ENmcpFCpxN1CqyUjuog9yyUVfdXBKF3LVCwLr7grJZpk'
 
 export const DEFAULT_NFT_VOTER_PLUGIN =
   'GnftV5kLjd67tvHpNGyodwWveEKivz3ZWvvE3Z4xi2iw'
+
+export const DEFAULT_NFT_VOTER_PLUGIN_V2 =
+  'GnftVc21v2BRchsRa9dGdrVmJPLZiRHe9j2offnFTZFg'
