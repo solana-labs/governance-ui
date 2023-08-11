@@ -3,10 +3,12 @@ import {
   StakingOptions,
   STAKING_OPTIONS_PK,
 } from '@dual-finance/staking-options'
-import { BN, BorshInstructionCoder } from '@coral-xyz/anchor'
+import { BN, BorshInstructionCoder, Idl } from '@coral-xyz/anchor'
 import { AccountMetaData } from '@solana/spl-governance'
 import { tryGetMint } from '@utils/tokens'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
+import { GSO_PK } from '@dual-finance/gso'
+import gsoIdl from '@dual-finance/gso/lib/gso.json'
 
 interface configV2Instruction {
   lotSize: BN
@@ -22,6 +24,15 @@ interface configV3Instruction {
   optionExpiration: BN
   soName: string
   subscriptionPeriodEnd: BN
+}
+
+interface configGsoInstruction {
+  lotSize: BN
+  numTokens: BN
+  optionExpiration: BN
+  soName: string
+  subscriptionPeriodEnd: BN
+  lockupRatio: BN
 }
 
 interface initStrikeReversibleInstruction {
@@ -367,6 +378,64 @@ const INSTRUCTIONS = {
   },
 }
 
+const GSO_INSTRUCTIONS = {
+  61: {
+    name: 'GSO Config',
+    accounts: [
+      { name: 'authority' },
+      { name: 'soAuthority' },
+      { name: 'issueAuthority' },
+      { name: 'state' },
+      { name: 'baseVault' },
+      { name: 'quoteVault' },
+      { name: 'baseAccount' },
+      { name: 'quoteAccount' },
+      { name: 'baseMint' },
+      { name: 'quoteMint' },
+      { name: 'tokenProgram' },
+      { name: 'systemProgram' },
+      { name: 'rent' },
+    ],
+    getDataUI: async (
+      connection: Connection,
+      data: Uint8Array,
+      accounts: AccountMetaData[]
+    ) => {
+      const decodedInstructionData = new BorshInstructionCoder(
+        gsoIdl as Idl
+      ).decode(Buffer.from(data))?.data as configGsoInstruction
+
+      const baseMint = await tryGetMint(connection, accounts[8].pubkey)
+
+      const rawAmount = decodedInstructionData.numTokens
+      const tokenAmount = baseMint
+        ? getMintDecimalAmountFromNatural(baseMint.account, rawAmount)
+        : rawAmount
+
+      return (
+        <div className="space-y-3">
+          <div>
+            Expiration:{' '}
+            {new Date(
+              decodedInstructionData.optionExpiration.toNumber() * 1000
+            ).toDateString()}
+          </div>
+          <div>
+            Subscription Period End:{' '}
+            {new Date(
+              decodedInstructionData.subscriptionPeriodEnd.toNumber() * 1000
+            ).toDateString()}
+          </div>
+          <div>Num Tokens: {tokenAmount.toNumber()}</div>
+          <div>Lot size: {decodedInstructionData.lotSize.toNumber()}</div>
+          <div>SoName: {decodedInstructionData.soName}</div>
+        </div>
+      )
+    },
+  },
+}
+
 export const DUAL_INSTRUCTIONS = {
   [STAKING_OPTIONS_PK.toBase58()]: INSTRUCTIONS,
+  [GSO_PK.toBase58()]: GSO_INSTRUCTIONS,
 }
