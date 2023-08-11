@@ -16,7 +16,7 @@ import PaginationComponent from '@components/Pagination'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useMembersQuery } from '@components/Members/useMembers'
 
-const Members = () => {
+const Members = ({ isNftMode }: { isNftMode: boolean }) => {
   const {
     realmInfo,
     toManyCouncilOutstandingProposalsForUse,
@@ -24,6 +24,7 @@ const Members = () => {
   } = useRealm()
   const pagination = useRef<{ setPage: (val) => void }>(null)
   const membersPerPage = 10
+
   const { data: activeMembers } = useMembersQuery()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
@@ -182,6 +183,7 @@ const Members = () => {
                 activeTab={activeMember}
                 onChange={(t) => setActiveMember(t)}
                 tabs={paginatedMembers}
+                isNftMode={isNftMode}
               />
             )}
             <PaginationComponent
@@ -192,7 +194,13 @@ const Members = () => {
           </div>
         </div>
         <div className="col-span-12 lg:col-span-8">
-          {activeMember ? <MemberOverview member={activeMember} /> : null}
+          {activeMember ? (
+            <MemberOverview
+              member={activeMember}
+              activeMembers={activeMembers}
+              isNftMode={isNftMode}
+            />
+          ) : null}
         </div>
       </div>
       {openAddMemberModal && (

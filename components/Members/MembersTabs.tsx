@@ -17,12 +17,14 @@ interface MembersTabsProps {
   activeTab: Member
   onChange: (x) => void
   tabs: Array<Member>
+  isNftMode?: boolean
 }
 
 const MembersTabs: FunctionComponent<MembersTabsProps> = ({
   activeTab,
   onChange,
   tabs,
+  isNftMode,
 }) => {
   const realm = useRealmQuery().data?.result
   const mint = useRealmCommunityMintInfoQuery().data?.result
@@ -31,6 +33,8 @@ const MembersTabs: FunctionComponent<MembersTabsProps> = ({
     ? tokenPriceService.getTokenInfo(realm?.account.communityMint.toBase58())
         ?.symbol
     : ''
+
+  const nftName = isNftMode ? 'NFT' : ''
   return (
     <div
       className={`overflow-y-auto relative thin-scroll`}
@@ -55,7 +59,7 @@ const MembersTabs: FunctionComponent<MembersTabsProps> = ({
               mint={mint}
               councilMint={councilMint}
               activeTab={activeTab}
-              tokenName={tokenName || ''}
+              tokenName={tokenName || nftName || ''}
               onChange={onChange}
             ></MemberItems>
           )
