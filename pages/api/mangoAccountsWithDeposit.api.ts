@@ -5,7 +5,6 @@ import { withSentry } from '@sentry/nextjs'
 import { AnchorProvider } from '@coral-xyz/anchor'
 import EmptyWallet from '@utils/Mango/listingTools'
 import { MANGO_V4_ID, MangoClient } from '@blockworks-foundation/mango-v4'
-import { MAINNET_RPC } from '@constants/endpoints'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
@@ -13,7 +12,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (!mint) {
       return res.status(403).json('Please provide mint param')
     }
-    const conn = new Connection(MAINNET_RPC, 'recent')
+    if (!process.env.BACKEND_MAINNET_RPC)
+      return res.status(500).json('BACKEND_MAINNET_RPC not provided in env')
+    const conn = new Connection(process.env.BACKEND_MAINNET_RPC, 'recent')
     const MAINNET_GROUP = new PublicKey(
       '78b8f4cGCwmZ9ysPFMWLaLTkkaYnUjwMJYStWe5RTSSX'
     )
