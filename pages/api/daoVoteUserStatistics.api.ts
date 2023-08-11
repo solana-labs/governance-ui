@@ -20,7 +20,8 @@ import mainnetList from 'public/realms/mainnet-beta.json'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const conn = new Connection(
-    'http://realms-realms-c335.mainnet.rpcpool.com/258d3727-bb96-409d-abea-0b1b4c48af29/',
+    process.env.MAINNET_RPC ||
+      'http://realms-realms-c335.mainnet.rpcpool.com/258d3727-bb96-409d-abea-0b1b4c48af29/',
     'recent'
   )
 
