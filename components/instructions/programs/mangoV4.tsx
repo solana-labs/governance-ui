@@ -8,16 +8,14 @@ import { AnchorProvider, BN, BorshInstructionCoder } from '@coral-xyz/anchor'
 import { AccountMetaData } from '@solana/spl-governance'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import EmptyWallet, {
-  LISTING_PRESETS,
   getSuggestedCoinTier,
   compareObjectsAndGetDifferentKeys,
   ListingArgs,
   ListingArgsFormatted,
-  coinTiersToNames,
   getOracle,
   getBestMarket,
   EditTokenArgsFormatted,
-  LISTING_PRESETS_KEYS,
+  PROPOSED_LISTING_PRESETS,
 } from '@utils/Mango/listingTools'
 import { secondsToHours } from 'date-fns'
 import WarningFilledIcon from '@carbon/icons-react/lib/WarningFilled'
@@ -26,6 +24,10 @@ import { Market } from '@project-serum/serum'
 import tokenPriceService, {
   TokenInfoWithoutDecimals,
 } from '@utils/services/tokenPrice'
+import {
+  LISTING_PRESETS_KEYS,
+  coinTiersToNames,
+} from '@blockworks-foundation/mango-v4-settings/lib/helpers/listingTools'
 // import { snakeCase } from 'snake-case'
 // import { sha256 } from 'js-sha256'
 
@@ -224,7 +226,7 @@ const instructions = () => ({
         getDataObjectFlattened<ListingArgs>(connection, data),
       ])
       const formattedProposedArgs = getFormattedListingValues(args)
-      const suggestedPreset = LISTING_PRESETS[suggestedTier.tier]
+      const suggestedPreset = PROPOSED_LISTING_PRESETS[suggestedTier.tier]
       const suggestedUntrusted = suggestedTier.tier === 'UNTRUSTED'
 
       const suggestedFormattedPreset: ListingArgsFormatted = Object.keys(
@@ -713,7 +715,7 @@ const instructions = () => ({
       if (mint) {
         mintData = tokenPriceService.getTokenInfo(mint.toBase58())
         suggestedTier = await getSuggestedCoinTier(mint.toBase58())
-        const suggestedPreset = LISTING_PRESETS[suggestedTier.tier!]
+        const suggestedPreset = PROPOSED_LISTING_PRESETS[suggestedTier.tier!]
         suggestedUntrusted = suggestedTier.tier === 'UNTRUSTED'
         const suggestedFormattedPreset:
           | EditTokenArgsFormatted

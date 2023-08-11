@@ -3,6 +3,11 @@ import {
   RouteInfo,
   toNative,
 } from '@blockworks-foundation/mango-v4'
+import {
+  LISTING_PRESETS,
+  LISTING_PRESETS_KEYS,
+  ListingPreset,
+} from '@blockworks-foundation/mango-v4-settings/lib/helpers/listingTools'
 import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
 import { MAINNET_USDC_MINT } from '@foresight-tmp/foresight-sdk/dist/consts'
 import { Market } from '@project-serum/serum'
@@ -74,105 +79,43 @@ export type EditTokenArgsFormatted = ListingArgsFormatted & {
   groupInsuranceFund: boolean
 }
 
-const listingBase: Omit<ListingArgs, 'name' | 'tokenIndex'> = {
-  'oracleConfig.maxStalenessSlots': 120,
-  'oracleConfig.confFilter': 0.1,
-  'interestRateParams.adjustmentFactor': 0.004,
-  'interestRateParams.util0': 0.5,
-  'interestRateParams.rate0': 0.052,
-  'interestRateParams.util1': 0.8,
-  'interestRateParams.rate1': 0.1446,
-  'interestRateParams.maxRate': 1.4456,
-  loanFeeRate: 0.005,
-  loanOriginationFeeRate: 0.001,
-  maintAssetWeight: 0.9,
-  initAssetWeight: 0.8,
-  maintLiabWeight: 1.1,
-  initLiabWeight: 1.2,
-  liquidationFee: 0.05,
-  minVaultToDepositsRatio: 0.2,
-  netBorrowLimitWindowSizeTs: 24 * 60 * 60,
-  netBorrowLimitPerWindowQuote: toNative(50000, 6).toNumber(),
-  insuranceFound: true,
-  borrowWeightScale: toNative(250000, 6).toNumber(),
-  depositWeightScale: toNative(250000, 6).toNumber(),
+const transformPresetToProposed = (
+  listingPreset: ListingPreset | Record<string, never>
+) => {
+  const proposedPreset: PureListingArgsOrEmptyObj =
+    Object.keys(listingPreset).length !== 0
+      ? {
+          ...(listingPreset as ListingPreset),
+          'oracleConfig.maxStalenessSlots': listingPreset.maxStalenessSlots!,
+          'oracleConfig.confFilter': listingPreset.oracleConfFilter,
+          'interestRateParams.adjustmentFactor': listingPreset.adjustmentFactor,
+          'interestRateParams.util0': listingPreset.util0,
+          'interestRateParams.rate0': listingPreset.rate0,
+          'interestRateParams.util1': listingPreset.util1,
+          'interestRateParams.rate1': listingPreset.rate1,
+          'interestRateParams.maxRate': listingPreset.maxRate,
+        }
+      : {}
+
+  return proposedPreset
 }
 
-export type LISTING_PRESETS_KEYS =
-  | 'PREMIUM'
-  | 'MID'
-  | 'MEME'
-  | 'SHIT'
-  | 'UNTRUSTED'
+type PureListingArgsOrEmptyObj =
+  | Record<string, never>
+  | (Omit<ListingArgs, 'name' | 'tokenIndex'> & {
+      preset_name: string
+    })
 
-export const LISTING_PRESETS: {
-  [key in LISTING_PRESETS_KEYS]:
-    | (typeof listingBase & { presetName: string })
-    | Record<string, never>
-} = {
-  //Price impact $100,000 < 1%
-  PREMIUM: {
-    ...listingBase,
-    presetName: 'Premium',
-  },
-  //Price impact $20,000 < 1%
-  MID: {
-    ...listingBase,
-    maintAssetWeight: 0.75,
-    initAssetWeight: 0.5,
-    maintLiabWeight: 1.2,
-    initLiabWeight: 1.4,
-    liquidationFee: 0.1,
-    netBorrowLimitPerWindowQuote: toNative(20000, 6).toNumber(),
-    presetName: 'Mid',
-    borrowWeightScale: toNative(50000, 6).toNumber(),
-    depositWeightScale: toNative(50000, 6).toNumber(),
-    insuranceFound: false,
-  },
-  //Price impact $5,000 < 1%
-  MEME: {
-    ...listingBase,
-    'oracleConfig.maxStalenessSlots': 800,
-    loanOriginationFeeRate: 0.002,
-    maintAssetWeight: 0,
-    initAssetWeight: 0,
-    maintLiabWeight: 1.25,
-    initLiabWeight: 1.5,
-    liquidationFee: 0.125,
-    netBorrowLimitPerWindowQuote: toNative(5000, 6).toNumber(),
-    borrowWeightScale: toNative(20000, 6).toNumber(),
-    depositWeightScale: toNative(20000, 6).toNumber(),
-    insuranceFound: false,
-    presetName: 'Meme',
-  },
-  //Price impact $1,000 < 1%
-  SHIT: {
-    ...listingBase,
-    'oracleConfig.maxStalenessSlots': 800,
-    loanOriginationFeeRate: 0.002,
-    maintAssetWeight: 0,
-    initAssetWeight: 0,
-    maintLiabWeight: 1.4,
-    initLiabWeight: 1.8,
-    liquidationFee: 0.2,
-    netBorrowLimitPerWindowQuote: toNative(1000, 6).toNumber(),
-    borrowWeightScale: toNative(5000, 6).toNumber(),
-    depositWeightScale: toNative(5000, 6).toNumber(),
-    insuranceFound: false,
-    presetName: 'Shit',
-  },
-  UNTRUSTED: {},
+type ProposedListingPresets = {
+  [key in LISTING_PRESETS_KEYS]: PureListingArgsOrEmptyObj
 }
 
-export const coinTiersToNames: {
-  [key in LISTING_PRESETS_KEYS]: string
-} = {
-  PREMIUM: 'Blue Chip',
-  MID: 'Midwit',
-  MEME: 'Meme',
-  SHIT: 'Shit Coin',
-  UNTRUSTED: 'Untrusted',
-}
+export const PROPOSED_LISTING_PRESETS: ProposedListingPresets = Object.keys(
+  LISTING_PRESETS
+).reduce((accumulator, key) => {
+  accumulator[key] = transformPresetToProposed(LISTING_PRESETS[key])
+  return accumulator
+}, {} as ProposedListingPresets)
 
 const fetchJupiterRoutes = async (
   inputMint = 'So11111111111111111111111111111111111111112',
