@@ -28,6 +28,7 @@ import {
   LISTING_PRESETS_KEYS,
   coinTiersToNames,
 } from '@blockworks-foundation/mango-v4-settings/lib/helpers/listingTools'
+import { tryParseKey } from '@tools/validators/pubkey'
 // import { snakeCase } from 'snake-case'
 // import { sha256 } from 'js-sha256'
 
@@ -631,130 +632,129 @@ const instructions = () => ({
       data: Uint8Array,
       accounts: AccountMetaData[]
     ) => {
-      let mintData: null | TokenInfoWithoutDecimals | undefined = null
-      const mintInfo = accounts[2].pubkey
-      const group = accounts[0].pubkey
-
-      const client = await getClient(connection)
-      const [mangoGroup, info, args] = await Promise.all([
-        client.getGroup(group),
-        displayArgs(connection, data),
-        getDataObjectFlattened<any>(connection, data),
-      ])
-      const mint = [...mangoGroup.mintInfosMapByMint.values()].find((x) =>
-        x.publicKey.equals(mintInfo)
-      )?.mint
-
-      let suggestedTier: Partial<{
-        tier: LISTING_PRESETS_KEYS
-        priceImpact: string
-      }> = {}
-      let suggestedUntrusted = false
-      let invalidKeys: (keyof EditTokenArgsFormatted)[] = []
-      let invalidFields: Partial<EditTokenArgsFormatted> = {}
-
-      const parsedArgs: Partial<EditTokenArgsFormatted> = {
-        tokenIndex: args.tokenIndex,
-        tokenName: args.name,
-        oracleConfidenceFilter: args['oracleConfigOpt.confFilter']
-          ? (args['oracleConfigOpt.confFilter'] * 100)?.toFixed(2)
-          : undefined,
-        oracleMaxStalenessSlots: args['oracleConfigOpt.maxStalenessSlots'],
-        interestRateUtilizationPoint0: args['interestRateParamsOpt.util0']
-          ? (args['interestRateParamsOpt.util0'] * 100)?.toFixed(2)
-          : undefined,
-        interestRatePoint0: args['interestRateParamsOpt.rate0']
-          ? (args['interestRateParamsOpt.rate0'] * 100)?.toFixed(2)
-          : undefined,
-        interestRateUtilizationPoint1: args['interestRateParamsOpt.util1']
-          ? (args['interestRateParamsOpt.util1'] * 100)?.toFixed(2)
-          : undefined,
-        interestRatePoint1: args['interestRateParamsOpt.rate1']
-          ? (args['interestRateParamsOpt.rate1'] * 100)?.toFixed(2)
-          : undefined,
-        maxRate: args['interestRateParamsOpt.maxRate']
-          ? (args['interestRateParamsOpt.maxRate'] * 100)?.toFixed(2)
-          : undefined,
-        adjustmentFactor: args['interestRateParamsOpt.adjustmentFactor']
-          ? (args['interestRateParamsOpt.adjustmentFactor'] * 100).toFixed(2)
-          : undefined,
-        loanFeeRate: args.loanFeeRateOpt
-          ? (args.loanFeeRateOpt * 10000)?.toFixed(2)
-          : undefined,
-        loanOriginationFeeRate: args.loanOriginationFeeRateOpt
-          ? (args.loanOriginationFeeRateOpt * 10000)?.toFixed(2)
-          : undefined,
-        maintAssetWeight: args.maintAssetWeightOpt?.toFixed(2),
-        initAssetWeight: args.initAssetWeightOpt?.toFixed(2),
-        maintLiabWeight: args.maintLiabWeightOpt?.toFixed(2),
-        initLiabWeight: args.initLiabWeightOpt?.toFixed(2),
-        liquidationFee: args['liquidationFeeOpt']
-          ? (args['liquidationFeeOpt'] * 100)?.toFixed(2)
-          : undefined,
-        minVaultToDepositsRatio: args['minVaultToDepositsRatioOpt']
-          ? (args['minVaultToDepositsRatioOpt'] * 100)?.toFixed(2)
-          : undefined,
-        netBorrowLimitPerWindowQuote: args['netBorrowLimitPerWindowQuoteOpt']
-          ? toUiDecimals(args['netBorrowLimitPerWindowQuoteOpt'], 6)
-          : undefined,
-        netBorrowLimitWindowSizeTs: args.netBorrowLimitWindowSizeTsOpt
-          ? secondsToHours(args.netBorrowLimitWindowSizeTsOpt)
-          : undefined,
-        borrowWeightScaleStartQuote: args.borrowWeightScaleStartQuoteOpt
-          ? toUiDecimals(args.borrowWeightScaleStartQuoteOpt, 6)
-          : undefined,
-        depositWeightScaleStartQuote: args.depositWeightScaleStartQuoteOpt
-          ? toUiDecimals(args.depositWeightScaleStartQuoteOpt, 6)
-          : undefined,
-        groupInsuranceFund:
-          args.groupInsuranceFundOpt !== null
-            ? args.groupInsuranceFundOpt
-            : undefined,
-      }
-
-      if (mint) {
-        mintData = tokenPriceService.getTokenInfo(mint.toBase58())
-        suggestedTier = await getSuggestedCoinTier(mint.toBase58())
-        const suggestedPreset = PROPOSED_LISTING_PRESETS[suggestedTier.tier!]
-        suggestedUntrusted = suggestedTier.tier === 'UNTRUSTED'
-        const suggestedFormattedPreset:
-          | EditTokenArgsFormatted
-          | Record<string, never> = Object.keys(suggestedPreset).length
-          ? {
-              ...getFormattedListingValues({
-                tokenIndex: args.tokenIndex,
-                name: args.name,
-                ...suggestedPreset,
-              } as ListingArgs),
-              borrowWeightScaleStartQuote: toUiDecimals(
-                suggestedPreset.borrowWeightScale,
-                6
-              ),
-              depositWeightScaleStartQuote: toUiDecimals(
-                suggestedPreset.depositWeightScale,
-                6
-              ),
-              groupInsuranceFund: suggestedPreset.insuranceFound,
-            }
-          : {}
-
-        invalidKeys = (Object.keys(suggestedPreset).length
-          ? compareObjectsAndGetDifferentKeys<Partial<EditTokenArgsFormatted>>(
-              parsedArgs,
-              suggestedFormattedPreset
-            )
-          : []
-        ).filter((x) => parsedArgs[x] !== undefined)
-
-        invalidFields = invalidKeys.reduce((obj, key) => {
-          return {
-            ...obj,
-            [key]: suggestedFormattedPreset[key],
-          }
-        }, {})
-      }
-
       try {
+        let mintData: null | TokenInfoWithoutDecimals | undefined = null
+        const mintInfo = accounts[2].pubkey
+        const group = accounts[0].pubkey
+
+        const client = await getClient(connection)
+        const [mangoGroup, info, args] = await Promise.all([
+          client.getGroup(group),
+          displayArgs(connection, data),
+          getDataObjectFlattened<any>(connection, data),
+        ])
+        const mint = [...mangoGroup.mintInfosMapByMint.values()].find((x) =>
+          x.publicKey.equals(mintInfo)
+        )?.mint
+
+        let suggestedTier: Partial<{
+          tier: LISTING_PRESETS_KEYS
+          priceImpact: string
+        }> = {}
+        let suggestedUntrusted = false
+        let invalidKeys: (keyof EditTokenArgsFormatted)[] = []
+        let invalidFields: Partial<EditTokenArgsFormatted> = {}
+
+        const parsedArgs: Partial<EditTokenArgsFormatted> = {
+          tokenIndex: args.tokenIndex,
+          tokenName: args.name,
+          oracleConfidenceFilter: args['oracleConfigOpt.confFilter']
+            ? (args['oracleConfigOpt.confFilter'] * 100)?.toFixed(2)
+            : undefined,
+          oracleMaxStalenessSlots: args['oracleConfigOpt.maxStalenessSlots'],
+          interestRateUtilizationPoint0: args['interestRateParamsOpt.util0']
+            ? (args['interestRateParamsOpt.util0'] * 100)?.toFixed(2)
+            : undefined,
+          interestRatePoint0: args['interestRateParamsOpt.rate0']
+            ? (args['interestRateParamsOpt.rate0'] * 100)?.toFixed(2)
+            : undefined,
+          interestRateUtilizationPoint1: args['interestRateParamsOpt.util1']
+            ? (args['interestRateParamsOpt.util1'] * 100)?.toFixed(2)
+            : undefined,
+          interestRatePoint1: args['interestRateParamsOpt.rate1']
+            ? (args['interestRateParamsOpt.rate1'] * 100)?.toFixed(2)
+            : undefined,
+          maxRate: args['interestRateParamsOpt.maxRate']
+            ? (args['interestRateParamsOpt.maxRate'] * 100)?.toFixed(2)
+            : undefined,
+          adjustmentFactor: args['interestRateParamsOpt.adjustmentFactor']
+            ? (args['interestRateParamsOpt.adjustmentFactor'] * 100).toFixed(2)
+            : undefined,
+          loanFeeRate: args.loanFeeRateOpt
+            ? (args.loanFeeRateOpt * 10000)?.toFixed(2)
+            : undefined,
+          loanOriginationFeeRate: args.loanOriginationFeeRateOpt
+            ? (args.loanOriginationFeeRateOpt * 10000)?.toFixed(2)
+            : undefined,
+          maintAssetWeight: args.maintAssetWeightOpt?.toFixed(2),
+          initAssetWeight: args.initAssetWeightOpt?.toFixed(2),
+          maintLiabWeight: args.maintLiabWeightOpt?.toFixed(2),
+          initLiabWeight: args.initLiabWeightOpt?.toFixed(2),
+          liquidationFee: args['liquidationFeeOpt']
+            ? (args['liquidationFeeOpt'] * 100)?.toFixed(2)
+            : undefined,
+          minVaultToDepositsRatio: args['minVaultToDepositsRatioOpt']
+            ? (args['minVaultToDepositsRatioOpt'] * 100)?.toFixed(2)
+            : undefined,
+          netBorrowLimitPerWindowQuote: args['netBorrowLimitPerWindowQuoteOpt']
+            ? toUiDecimals(args['netBorrowLimitPerWindowQuoteOpt'], 6)
+            : undefined,
+          netBorrowLimitWindowSizeTs: args.netBorrowLimitWindowSizeTsOpt
+            ? secondsToHours(args.netBorrowLimitWindowSizeTsOpt)
+            : undefined,
+          borrowWeightScaleStartQuote: args.borrowWeightScaleStartQuoteOpt
+            ? toUiDecimals(args.borrowWeightScaleStartQuoteOpt, 6)
+            : undefined,
+          depositWeightScaleStartQuote: args.depositWeightScaleStartQuoteOpt
+            ? toUiDecimals(args.depositWeightScaleStartQuoteOpt, 6)
+            : undefined,
+          groupInsuranceFund:
+            args.groupInsuranceFundOpt !== null
+              ? args.groupInsuranceFundOpt
+              : undefined,
+        }
+
+        if (mint) {
+          mintData = tokenPriceService.getTokenInfo(mint.toBase58())
+          suggestedTier = await getSuggestedCoinTier(mint.toBase58())
+          const suggestedPreset = PROPOSED_LISTING_PRESETS[suggestedTier.tier!]
+          suggestedUntrusted = suggestedTier.tier === 'UNTRUSTED'
+          const suggestedFormattedPreset:
+            | EditTokenArgsFormatted
+            | Record<string, never> = Object.keys(suggestedPreset).length
+            ? {
+                ...getFormattedListingValues({
+                  tokenIndex: args.tokenIndex,
+                  name: args.name,
+                  ...suggestedPreset,
+                } as ListingArgs),
+                borrowWeightScaleStartQuote: toUiDecimals(
+                  suggestedPreset.borrowWeightScale,
+                  6
+                ),
+                depositWeightScaleStartQuote: toUiDecimals(
+                  suggestedPreset.depositWeightScale,
+                  6
+                ),
+                groupInsuranceFund: suggestedPreset.insuranceFound,
+              }
+            : {}
+
+          invalidKeys = (Object.keys(suggestedPreset).length
+            ? compareObjectsAndGetDifferentKeys<
+                Partial<EditTokenArgsFormatted>
+              >(parsedArgs, suggestedFormattedPreset)
+            : []
+          ).filter((x) => parsedArgs[x] !== undefined)
+
+          invalidFields = invalidKeys.reduce((obj, key) => {
+            return {
+              ...obj,
+              [key]: suggestedFormattedPreset[key],
+            }
+          }, {})
+        }
+
         return (
           <div>
             <h3>{mintData && <div>Token: {mintData.symbol}</div>}</h3>
@@ -992,8 +992,14 @@ const instructions = () => ({
           </div>
         )
       } catch (e) {
-        console.log(e)
-        return <div>{JSON.stringify(data)}</div>
+        const info = await displayArgs(connection, data)
+
+        try {
+          return <div>{info}</div>
+        } catch (e) {
+          console.log(e)
+          return <div>{JSON.stringify(data)}</div>
+        }
       }
     },
   },
@@ -1119,12 +1125,15 @@ const displayArgs = async (connection: Connection, data: Uint8Array) => {
 
           return true
         })
-        .map((key) => (
-          <div key={key} className="flex">
-            <div className="mr-3">{key}:</div>
-            <div>{`${commify(args[key])}`}</div>
-          </div>
-        ))}
+        .map((key) => {
+          const isPublicKey = tryParseKey(args[key])
+          return (
+            <div key={key} className="flex">
+              <div className="mr-3">{key}:</div>
+              <div>{`${isPublicKey ? args[key] : commify(args[key])}`}</div>
+            </div>
+          )
+        })}
     </div>
   )
 }

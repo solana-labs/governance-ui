@@ -5,16 +5,14 @@ import { withSentry } from '@sentry/nextjs'
 import { AnchorProvider } from '@coral-xyz/anchor'
 import EmptyWallet from '@utils/Mango/listingTools'
 import { MANGO_V4_ID, MangoClient } from '@blockworks-foundation/mango-v4'
+import { MAINNET_RPC } from '@constants/endpoints'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const mint = req.query.mint
   if (!mint) {
     return res.status(403).json('Please provide mint param')
   }
-  const conn = new Connection(
-    'http://realms-realms-c335.mainnet.rpcpool.com/258d3727-bb96-409d-abea-0b1b4c48af29',
-    'recent'
-  )
+  const conn = new Connection(MAINNET_RPC, 'recent')
   const MAINNET_GROUP = new PublicKey(
     '78b8f4cGCwmZ9ysPFMWLaLTkkaYnUjwMJYStWe5RTSSX'
   )
