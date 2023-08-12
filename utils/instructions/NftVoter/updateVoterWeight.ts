@@ -8,6 +8,9 @@ import { getNftActionTicketProgramAddress } from 'NftVotePlugin/accounts'
 import { PROGRAM_ID as ACCOUNT_COMPACTION_PROGRAM_ID } from '@solana/spl-account-compression'
 import { SYSTEM_PROGRAM_ID } from '@solana/spl-governance'
 import { getCompressedNftParamAndProof } from '@tools/cnftParams'
+import { NftVoter } from 'idls/nft_voter'
+import { NftVoterV2 } from 'idls/nft_voter_v2'
+import { Program } from '@project-serum/anchor'
 
 type UpdateVoterWeightRecordTypes =
   | 'castVote'
@@ -59,7 +62,7 @@ export const getUpdateVoterWeightRecordInstruction = async (
       new AccountData(metadata?.result?.metadataAddress || '')
     )
   }
-  const updateVoterWeightRecordIx = await client.program.methods
+  const updateVoterWeightRecordIx = await (client.program as Program<NftVoter>).methods
     .updateVoterWeightRecord({ [type]: {} })
     .accounts({
       registrar: registrar,
@@ -116,7 +119,7 @@ export const getUpdateVoterWeightRecordInstructionV2 = async (
   const nftChunks = chunks(nftRemainingAccounts, 15)
   for (const chunk of [...nftChunks]) {
     createNftTicketIxs.push(
-      await (client as NftVoterClient).program.methods
+      await (client.program as Program<NftVoterV2>).methods
         .createNftActionTicket({ [type]: {} })
         .accounts({
           registrar,
@@ -144,7 +147,7 @@ export const getUpdateVoterWeightRecordInstructionV2 = async (
       client.program.provider.connection,
       cnft
     )
-    const instruction = await client.program.methods
+    const instruction = await (client.program as Program<NftVoterV2>).methods
       .createCnftActionTicket({ [type]: {} }, [param])
       .accounts({
         registrar,
@@ -163,7 +166,7 @@ export const getUpdateVoterWeightRecordInstructionV2 = async (
     nftActionTicketAccounts.push(new AccountData(nftActionTicket, false, true))
   }
 
-  const updateVoterWeightRecordIx = await client.program.methods
+  const updateVoterWeightRecordIx = await (client.program as Program<NftVoterV2>).methods
     .updateVoterWeightRecord({ [type]: {} })
     .accounts({
       registrar: registrar,

@@ -12,6 +12,9 @@ import {
 import { PROGRAM_ID as ACCOUNT_COMPACTION_PROGRAM_ID } from '@solana/spl-account-compression'
 import { SYSTEM_PROGRAM_ID } from '@solana/spl-governance'
 import { getCompressedNftParamAndProof } from '@tools/cnftParams'
+import { NftVoter } from 'idls/nft_voter'
+import { NftVoterV2 } from 'idls/nft_voter_v2'
+import { Program } from '@project-serum/anchor'
 
 type UpdateVoterWeightRecordTypes =
   | 'castVote'
@@ -81,7 +84,7 @@ export const getCastNftVoteInstruction = async (
   const nftChunks = chunks(remainingAccounts, 12)
   for (const chunk of [...nftChunks]) {
     castNftVoteIxs.push(
-      await client.program.methods
+      await (client.program as Program<NftVoter>).methods
         .castNftVote(proposal)
         .accounts({
           registrar,
@@ -161,7 +164,7 @@ export const getCastNftVoteInstructionV2 = async (
   const createNftVoteTicketChunks = chunks(nftRemainingAccounts, 15)
   for (const chunk of [...createNftVoteTicketChunks]) {
     castNftVoteTicketIxs.push(
-      await client.program.methods
+      await (client.program as Program<NftVoterV2>).methods
         .createNftActionTicket({ [type]: {} })
         .accounts({
           registrar,
@@ -201,7 +204,7 @@ export const getCastNftVoteInstructionV2 = async (
         cnft
       )
 
-      const instruction = await client.program.methods
+      const instruction = await (client.program as Program<NftVoterV2>).methods
         .createCnftActionTicket({ [type]: {} }, [param])
         .accounts({
           registrar,
@@ -228,7 +231,7 @@ export const getCastNftVoteInstructionV2 = async (
   const castVoteRemainingAccountsChunks = chunks(castVoteRemainingAccounts, 12)
   for (const chunk of [...castVoteRemainingAccountsChunks]) {
     castNftVoteIxs.push(
-      await client.program.methods
+      await (client.program as Program<NftVoterV2>).methods
         .castNftVote(proposal)
         .accounts({
           registrar,
