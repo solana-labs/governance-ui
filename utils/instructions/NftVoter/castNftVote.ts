@@ -48,6 +48,7 @@ export const getCastNftVoteInstruction = async (
   votingNfts: DasNftObject[],
   nftVoteRecordsFiltered: NftVoteRecord[]
 ) => {
+  console.log('getCastNftVoteInstruction')
   const clientProgramId = client.program.programId
   const remainingAccounts: AccountData[] = []
   for (let i = 0; i < votingNfts.length; i++) {
@@ -111,6 +112,7 @@ export const getCastNftVoteInstructionV2 = async (
   votingNfts: DasNftObject[],
   nftVoteRecordsFiltered: NftVoteRecord[]
 ) => {
+  console.log('getCastNftVoteInstructionV2')
   const clientProgramId = client.program.programId
   const castNftVoteTicketIxs: TransactionInstruction[] = []
   const castVoteRemainingAccounts: AccountData[] = []

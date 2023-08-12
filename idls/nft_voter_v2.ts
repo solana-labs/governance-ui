@@ -1080,7 +1080,7 @@ export type NftVoterV2 = {
   ]
 };
 
-export const IDLV2: NftVoter = {
+export const IDLV2: NftVoterV2 = {
   "version": "0.2.3",
   "name": "nft_voter",
   "instructions": [

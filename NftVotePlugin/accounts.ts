@@ -1,6 +1,9 @@
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { PublicKey } from '@solana/web3.js'
 import { BN } from '@coral-xyz/anchor'
+import { NftVoterV2 } from 'idls/nft_voter_v2'
+import { Program } from '@project-serum/anchor'
+
 export interface NftVoteRecord {
   account: {
     governingTokenOwner: PublicKey
@@ -60,7 +63,7 @@ export const getNftActionTicketsForVoter = async (
   registrar: PublicKey,
   voter: PublicKey
 ) => {
-  const nftActionTicketsFiltered = ((await client.program.account.nftActionTicket.all(
+  const nftActionTicketsFiltered = ((await (client.program as Program<NftVoterV2>).account.nftActionTicket.all(
     [
       {
         memcmp: {
