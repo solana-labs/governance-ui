@@ -81,9 +81,7 @@ export async function getCompressedNftParamAndProof(
       verified: true,
     },
     root,
-    leafOwner: new PublicKey(
-      compressedNft.ownership.delegate || compressedNft.ownership.owner
-    ),
+    leafOwner: new PublicKey(compressedNft.ownership.owner),
     leafDelegate: new PublicKey(
       compressedNft.ownership.delegate || compressedNft.ownership.owner
     ),
