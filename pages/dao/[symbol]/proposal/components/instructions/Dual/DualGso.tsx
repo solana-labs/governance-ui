@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
 import { ProgramAccount, Governance } from '@solana/spl-governance'
 import {
@@ -92,7 +91,7 @@ const DualGso = ({
           error={formErrors['soName']}
         />
       </Tooltip>
-      <Tooltip content="Treasury owned account providing the assets for the option. When the recipient exercises, these are the tokens they receive. For SOL/USDC Calls, enter SOL. For SOL/USDC Puts, enter USDC.">
+      <Tooltip content="Treasury owned account providing the assets for the option. When the recipient exercises, these are the tokens they receive.">
         <GovernedAccountSelect
           label="Base Treasury"
           governedAccounts={assetAccounts}
@@ -105,7 +104,7 @@ const DualGso = ({
           type="token"
         ></GovernedAccountSelect>
       </Tooltip>
-      <Tooltip content="Treasury owned account receiving payment for the option exercise. This is where payments from exercise accumulate. For SOL/USDC Calls, enter USDC. For SOL/USDC Puts, enter SOL.">
+      <Tooltip content="Treasury owned account receiving payment for the option exercise. This is where payments from exercise accumulate.">
         <GovernedAccountSelect
           label="Quote Treasury"
           governedAccounts={assetAccounts}
@@ -146,7 +145,7 @@ const DualGso = ({
           error={formErrors['optionExpirationUnixSeconds']}
         />
       </Tooltip>
-      <Tooltip content="Date in unix seconds to establish cutoff period for staking">
+      <Tooltip content="Date in unix seconds when users can no longer subscribe">
         <Input
           label="Subscription Period"
           value={form.subscriptionPeriodEnd}
@@ -160,7 +159,7 @@ const DualGso = ({
           error={formErrors['subscriptionPeriodEnd']}
         />
       </Tooltip>
-      <Tooltip content="Strike price for the staking option. Units are quote atoms per lot. So if it is a SOL/USDC put with a lot size of 1 USDC, then this is lamports per USDC.">
+      <Tooltip content="Strike price for the staking option. Units are quote atoms per lot.">
         <Input
           label="Strike"
           value={form.strike}

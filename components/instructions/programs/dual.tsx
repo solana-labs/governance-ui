@@ -30,9 +30,10 @@ interface configGsoInstruction {
   lotSize: BN
   numTokens: BN
   optionExpiration: BN
-  soName: string
+  projectName: string
   subscriptionPeriodEnd: BN
-  lockupRatio: BN
+  lockupRatioTokensPerMillion: BN
+  strikePrice: BN
 }
 
 interface initStrikeReversibleInstruction {
@@ -379,19 +380,22 @@ const INSTRUCTIONS = {
 }
 
 const GSO_INSTRUCTIONS = {
-  61: {
-    name: 'GSO Config',
+  173: {
+    name: 'Lockup Staking Option Config',
     accounts: [
       { name: 'authority' },
+      { name: 'gsoState' },
       { name: 'soAuthority' },
-      { name: 'issueAuthority' },
-      { name: 'state' },
+      { name: 'soState' },
+      { name: 'soBaseVault' },
+      { name: 'soBaseAccount' },
+      { name: 'soQuoteAccount' },
+      { name: 'soBaseMint' },
+      { name: 'soQuoteMint' },
+      { name: 'soOptionMint' },
+      { name: 'stakingOptionsProgram' },
+      { name: 'xBaseMint' },
       { name: 'baseVault' },
-      { name: 'quoteVault' },
-      { name: 'baseAccount' },
-      { name: 'quoteAccount' },
-      { name: 'baseMint' },
-      { name: 'quoteMint' },
       { name: 'tokenProgram' },
       { name: 'systemProgram' },
       { name: 'rent' },
@@ -414,24 +418,57 @@ const GSO_INSTRUCTIONS = {
 
       return (
         <div className="space-y-3">
+          <div>Num Tokens: {tokenAmount.toNumber()}</div>
           <div>
             Expiration:{' '}
             {new Date(
-              decodedInstructionData.optionExpiration.toNumber() * 1000
+              decodedInstructionData.optionExpiration.toNumber() * 1_000
             ).toDateString()}
           </div>
           <div>
             Subscription Period End:{' '}
             {new Date(
-              decodedInstructionData.subscriptionPeriodEnd.toNumber() * 1000
+              decodedInstructionData.subscriptionPeriodEnd.toNumber() * 1_000
             ).toDateString()}
           </div>
-          <div>Num Tokens: {tokenAmount.toNumber()}</div>
+          <div>Strike: { decodedInstructionData.strikePrice.toNumber() }</div>
+          <div>Lockup Ratio: { decodedInstructionData.lockupRatioTokensPerMillion.toNumber() / 1_000_000 }</div>
           <div>Lot size: {decodedInstructionData.lotSize.toNumber()}</div>
-          <div>SoName: {decodedInstructionData.soName}</div>
+          <div>SoName: {decodedInstructionData.projectName}</div>
         </div>
       )
     },
+  },
+  245: {
+    name: 'Lockup Staking Option Name Token',
+    accounts: [
+      { name: 'authority' },
+      { name: 'soState' },
+      { name: 'gsoState' },
+      { name: 'xBaseMint' },
+      { name: 'xBaseMetadata' },
+      { name: 'tokenMetadataProgram' },
+      { name: 'soAuthority' },
+      { name: 'soOptionMint' },
+      { name: 'optionMetadata' },
+      { name: 'stakingOptionsProgram' },
+      { name: 'systemProgram' },
+      { name: 'rent' },
+    ],
+  },
+  183: {
+    name: 'Lockup Staking Option Withdraw',
+    accounts: [
+      { name: 'authority' },
+      { name: 'gsoState' },
+      { name: 'soAuthority' },
+      { name: 'userBaseAccount' },
+      { name: 'soBaseVault' },
+      { name: 'soState' },
+      { name: 'stakingOptionsProgram' },
+      { name: 'tokenProgram' },
+      { name: 'systemProgram' },
+    ],
   },
 }
 

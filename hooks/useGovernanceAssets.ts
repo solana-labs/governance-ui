@@ -399,7 +399,7 @@ export default function useGovernanceAssets() {
       packageId: PackageEnum.Dual,
     },
     [Instructions.DualFinanceGsoWithdraw]: {
-      name: 'Lockup SO Withdrawal',
+      name: 'Lockup Staking Option Withdraw',
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Dual,
     },

@@ -181,7 +181,7 @@ export async function getConfigInstruction({
       serializeInstructionToBase64(configInstruction)
     )
 
-    const initStrikeInstruction = await so.createInitStrikeInstruction(
+    const initStrikeInstruction = await so.createInitStrikeReversibleInstruction(
       new BN(form.strike),
       form.soName,
       //authority sol wallet
@@ -329,7 +329,7 @@ export async function getConfigGsoInstruction({
           TOKEN_PROGRAM_ID,
           form.baseTreasury.extensions.transferAddress!,
           helperTokenAccount.publicKey,
-          //owner is sol wallet or governance same as baseTokenAccount
+          //owner is sol wallet or governance same as baseTreasury
           form.baseTreasury.extensions!.token!.account.owner,
           [],
           form.numTokens
@@ -343,6 +343,7 @@ export async function getConfigGsoInstruction({
     )
     const quoteMint = quoteTreasuryAccount?.account.mint
 
+    // Should not happen.
     if (!baseMint || !quoteMint) {
       return {
         serializedInstruction,
@@ -362,7 +363,8 @@ export async function getConfigGsoInstruction({
     const strikeAtomsPerLot = Math.round(
       form.strike * form.lotSize * 10 ** (quoteDecimals - baseDecimals)
     )
-    // Set all GSOs to have the same expiration & lockup period
+    // Set all GSOs to have the same expiration and lockup period. This means
+    // that users will be able to unstake at the same time as option expiration.
     const lockupPeriodEnd = form.optionExpirationUnixSeconds
     const configInstruction = await gso.createConfigInstruction(
       optionsPerMillion,
@@ -415,7 +417,9 @@ export async function getConfigGsoInstruction({
       prerequisiteInstructionsSigners: [helperTokenAccount],
       governance: form.baseTreasury?.governance,
       additionalSerializedInstructions,
-      chunkBy: 2,
+      // chunkBy 1 because the config instruction uses a lot of accounts, so
+      // isolate it.
+      chunkBy: 1,
     }
   }
 
@@ -731,30 +735,30 @@ export async function getGsoWithdrawInstruction({
 
   const serializedInstruction = ''
   const additionalSerializedInstructions: string[] = []
-  const prerequisiteInstructions: TransactionInstruction[] = []
-  const helperTokenAccount: Keypair | null = null
   if (isValid && form.soName && form.baseTreasury && !!form.baseTreasury.isSol && wallet?.publicKey) {
     const gso = getGsoApi(connection)
     const authority = form.baseTreasury.extensions.token!.account.owner!
+    const baseMint = form.baseTreasury.extensions.mint?.publicKey
     const destination = form.baseTreasury.pubkey
 
-    const withdrawInstruction = await gso.createWithdrawInstruction(
-      form.soName,
-      authority!,
-      destination,
-      destination
-    )
+    // Should always exist because of validations.
+    if (baseMint) {
+      const withdrawInstruction = await gso.createWithdrawInstruction(
+        form.soName,
+        baseMint,
+        authority!,
+        destination
+      )
 
-    additionalSerializedInstructions.push(
-      serializeInstructionToBase64(withdrawInstruction)
-    )
+      additionalSerializedInstructions.push(
+        serializeInstructionToBase64(withdrawInstruction)
+      )
+    }
 
+    // Does not use a helper token account. If the DAO requires that, they need
+    // to just set the baseTreasury to be an empty token account.
     return {
       serializedInstruction,
-      prerequisiteInstructions: prerequisiteInstructions,
-      prerequisiteInstructionsSigners: helperTokenAccount
-        ? [helperTokenAccount]
-        : [],
       isValid: true,
       governance: form.baseTreasury?.governance,
       additionalSerializedInstructions,
