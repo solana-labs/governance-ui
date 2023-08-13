@@ -29,13 +29,17 @@ const VotePanel = () => {
     proposal.account.state !== ProposalState.Draft &&
     !isVoteCast
 
-  const isMulti = proposal?.account.voteType !== VoteType.SINGLE_CHOICE;
+  const isMulti = proposal?.account.voteType !== VoteType.SINGLE_CHOICE
 
   return (
     <>
       {didNotVote && (
         <div className="bg-bkg-2 p-4 md:p-6 rounded-lg flex flex-col items-center justify-center">
-          <h3 className="text-center mb-0">{isMulti ? "You did not vote on this proposal" : "You did not vote electorally"}</h3>
+          <h3 className="text-center mb-0">
+            {isMulti
+              ? 'You did not vote on this proposal'
+              : 'You did not vote electorally'}
+          </h3>
           <Tooltip content="You did not vote on this proposal">
             <BanIcon className="h-[34px] w-[34px] fill-white/50 mt-2" />
           </Tooltip>
@@ -43,7 +47,11 @@ const VotePanel = () => {
       )}
       {/* START: Note that these components control for themselves whether they are displayed and may not be visible */}
       <YouVoted quorum="electoral" />
-      {proposal && isMulti ? <CastMultiVoteButtons proposal={proposal.account} /> : <CastVoteButtons /> }
+      {proposal && isMulti && proposal.account.options ? (
+        <CastMultiVoteButtons proposal={proposal.account} />
+      ) : (
+        <CastVoteButtons />
+      )}
       <YouVoted quorum="veto" />
       {!isMulti && <VetoButtons />}
       {/* END */}
