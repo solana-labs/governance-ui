@@ -37,7 +37,7 @@ const Proposal = () => {
   const governance = useProposalGovernanceQuery().data?.result
   const descriptionLink = proposal?.account.descriptionLink
   const allowDiscussion = realmInfo?.allowDiscussion ?? true
-  const isMulti = proposal?.account.voteType !== VoteType.SINGLE_CHOICE;
+  const isMulti = proposal?.account.voteType !== VoteType.SINGLE_CHOICE
 
   const [description, setDescription] = useState('')
   const voteData = useProposalVotes(proposal?.account)
@@ -176,11 +176,14 @@ const Proposal = () => {
                 </div>
               )}
 
-              {isMulti ?
-                <MultiChoiceVotes proposal={proposal.account} limit={proposal.account.options.length}/>
-              :
+              {isMulti && proposal.account.options ? (
+                <MultiChoiceVotes
+                  proposal={proposal.account}
+                  limit={proposal.account.options.length}
+                />
+              ) : (
                 <VoteResults proposal={proposal.account} />
-              }
+              )}
               {proposal && (
                 <div className="flex justify-end mt-4">
                   <Link
