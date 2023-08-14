@@ -2,16 +2,12 @@ import {
   ProgramAccount,
   VoteRecord,
   TokenOwnerRecord,
-  // Realm,
-  // Proposal,
   VoteKind,
 } from '@solana/spl-governance'
 import { MintInfo } from '@solana/spl-token'
 import BN from 'bn.js'
 import { PublicKey } from '@solana/web3.js'
 import { BigNumber } from 'bignumber.js'
-
-// import { calculateMaxVoteScore } from '@models/proposal/calulateMaxVoteScore'
 
 export enum VoteType {
   No,

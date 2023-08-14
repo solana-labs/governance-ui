@@ -12,29 +12,37 @@ import {
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import { NFT_PLUGINS_PKS } from '@constants/plugins'
 
 interface MembersTabsProps {
   activeTab: Member
   onChange: (x) => void
   tabs: Array<Member>
-  isNftMode?: boolean
 }
 
 const MembersTabs: FunctionComponent<MembersTabsProps> = ({
   activeTab,
   onChange,
   tabs,
-  isNftMode,
 }) => {
   const realm = useRealmQuery().data?.result
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
+
+  const config = useRealmConfigQuery().data?.result
+  const currentPluginPk = config?.account.communityTokenConfig.voterWeightAddin
+  const isNftMode =
+    (currentPluginPk &&
+      NFT_PLUGINS_PKS.includes(currentPluginPk?.toBase58())) ||
+    false
+
   const tokenName = realm
     ? tokenPriceService.getTokenInfo(realm?.account.communityMint.toBase58())
         ?.symbol
     : ''
 
-  const nftName = isNftMode ? 'NFT' : ''
+  const nftName = isNftMode ? 'NFT' : undefined
   return (
     <div
       className={`overflow-y-auto relative thin-scroll`}

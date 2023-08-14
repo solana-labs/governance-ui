@@ -53,6 +53,7 @@ import {
   useDigitalAssetsByOwner,
 } from '@hooks/queries/digitalAssets'
 import { useNftRegistrarCollection } from '@hooks/useNftRegistrarCollection'
+import { NFT_PLUGINS_PKS } from '@constants/plugins'
 
 const RevokeMembership: FC<{ member: PublicKey; mint: PublicKey }> = ({
   member,
@@ -220,11 +221,9 @@ const NftDisplayList = ({
 const MemberOverview = ({
   member,
   activeMembers,
-  isNftMode,
 }: {
   member: Member
   activeMembers: any[] | undefined
-  isNftMode?: boolean
 }) => {
   const programVersion = useProgramVersion()
   const realm = useRealmQuery().data?.result
@@ -243,6 +242,12 @@ const MemberOverview = ({
           ),
     [proposalsArray]
   )
+
+  const currentPluginPk = config?.account.communityTokenConfig.voterWeightAddin
+  const isNftMode =
+    (currentPluginPk &&
+      NFT_PLUGINS_PKS.includes(currentPluginPk?.toBase58())) ||
+    false
 
   const { fmtUrlWithCluster } = useQueryContext()
   const [ownVoteRecords, setOwnVoteRecords] = useState<

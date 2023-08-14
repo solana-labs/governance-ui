@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo } from 'react'
-// import { getNfts } from '@utils/tokens'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { getMaxVoterWeightRecord } from '@solana/spl-governance'
@@ -8,7 +7,6 @@ import { notify } from '@utils/notifications'
 
 import useGatewayPluginStore from '../GatewayPlugin/store/gatewayPluginStore'
 import { getGatekeeperNetwork } from '../GatewayPlugin/sdk/accounts'
-// import { NFTWithMeta } from '@utils/uiTypes/VotePlugin'
 import { DasNftObject } from '@hooks/queries/digitalAssets'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import * as heliumVsrSdk from '@helium/voter-stake-registry-sdk'

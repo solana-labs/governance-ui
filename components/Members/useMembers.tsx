@@ -256,7 +256,6 @@ export const useMembersQuery = () => {
       console.log('useMembers is fetching')
 
       let members = [...membersWithTokensDeposited]
-      console.log(members.map((x) => x.communityVotes.toString()))
       const [councilMembers, communityMembers] = await Promise.all([
         fetchCouncilMembersWithTokensOutsideRealm(),
         fetchCommunityMembersATAS(),
@@ -268,7 +267,6 @@ export const useMembersQuery = () => {
       const activeMembers = members.filter(
         (x) => !x.councilVotes.isZero() || !x.communityVotes.isZero()
       )
-      console.log(activeMembers.map((x) => x.communityVotes.toString()))
       return activeMembers
     },
   })

@@ -26,6 +26,7 @@ import { calculateMaxVoteScore } from '@models/proposal/calulateMaxVoteScore'
 import { getNetworkFromEndpoint } from '@utils/connection'
 import { fetchDigitalAssetsByOwner } from './queries/digitalAssets'
 import { useNftRegistrarCollection } from './useNftRegistrarCollection'
+import { useAsync } from 'react-async-hook'
 
 export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
   const { getRpcContext } = useRpcContext()
@@ -60,9 +61,50 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
     s.state.nftMintRegistrar,
   ])
   const usedCollectionsPks: string[] = useNftRegistrarCollection()
-  const [undecidedNftsByVoteRecord, setUndecidedNftsByVoteRecord] = useState<{
-    [walletPk: string]: BN
-  }>({})
+  // const [undecidedNftsByVoteRecord, setUndecidedNftsByVoteRecord] = useState<{
+  //   [walletPk: string]: BN
+  // }>({})
+
+  const { result: undecidedNftsByVoteRecord } = useAsync(async () => {
+    const network = getNetworkFromEndpoint(connection.endpoint)
+    const enabled =
+      isNftMode && usedCollectionsPks !== undefined && network !== 'localnet'
+    if (!enabled) return {}
+
+    const undecidedData = tokenOwnerRecords.filter(
+      (tokenOwnerRecord) =>
+        !voteRecords
+          .filter((x) => x.account.vote?.voteType !== VoteKind.Veto)
+          .some(
+            (voteRecord) =>
+              voteRecord.account.governingTokenOwner.toBase58() ===
+              tokenOwnerRecord.account.governingTokenOwner.toBase58()
+          )
+    )
+    const walletsPks = undecidedData.map((x) => x.account.governingTokenOwner)
+    const undecidedVoters = await Promise.all(
+      walletsPks.map(async (walletPk) => {
+        const ownedNfts = await fetchDigitalAssetsByOwner(network, walletPk)
+        const verifiedNfts = ownedNfts.filter((nft) => {
+          const collection = nft.grouping.find(
+            (x) => x.group_key === 'collection'
+          )
+          return (
+            collection && usedCollectionsPks.includes(collection.group_value)
+          )
+        })
+        return {
+          walletPk: walletPk,
+          votingPower: verifiedNfts.length * 10 ** 6, //default decimal wieight is 10^6
+        }
+      })
+    )
+
+    const undecidedNftsByVoteRecord = Object.fromEntries(
+      undecidedVoters.map((x) => [x.walletPk.toBase58(), new BN(x.votingPower)])
+    )
+    return undecidedNftsByVoteRecord
+  }, [tokenOwnerRecords, voteRecords, usedCollectionsPks, isNftMode])
   ///
 
   useEffect(() => {
@@ -130,7 +172,7 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
         voteRecords,
         tokenOwnerRecords,
         mint,
-        undecidedNftsByVoteRecord,
+        undecidedNftsByVoteRecord ?? {},
         new BN(nftVoterPluginTotalWeight)
       )
     }
@@ -196,72 +238,6 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
     mintsUsedInRealm,
   ])
   ///////
-
-  // for nft-voter
-  useEffect(() => {
-    const handleGetNftsVotingPowers = async (walletsPks: PublicKey[]) => {
-      const network = getNetworkFromEndpoint(connection.endpoint)
-      if (network === 'localnet') throw new Error()
-
-      const enabled =
-        walletsPks !== undefined && usedCollectionsPks !== undefined
-      if (!enabled) throw new Error()
-      const votingPower = await Promise.all(
-        walletsPks.map(async (walletPk) => {
-          const ownedNfts = await fetchDigitalAssetsByOwner(network, walletPk)
-          const verifiedNfts = ownedNfts.filter((nft) => {
-            const collection = nft.grouping.find(
-              (x) => x.group_key === 'collection'
-            )
-            return (
-              collection && usedCollectionsPks.includes(collection.group_value)
-            )
-          })
-          return {
-            walletPk: walletPk,
-            votingPower: verifiedNfts.length * 10 ** 6, //default decimal wieight is 10^6
-          }
-        })
-      )
-
-      if (votingPower) {
-        const votingPowerObj = {}
-        for (const record of votingPower) {
-          votingPowerObj[record.walletPk.toBase58()] = new BN(
-            record.votingPower
-          )
-        }
-        setUndecidedNftsByVoteRecord(votingPowerObj)
-      } else {
-        setUndecidedNftsByVoteRecord({})
-      }
-    }
-
-    if (isNftMode && !Object.keys(undecidedNftsByVoteRecord).length) {
-      const undecidedData = tokenOwnerRecords.filter(
-        (tokenOwnerRecord) =>
-          !voteRecords
-            .filter((x) => x.account.vote?.voteType !== VoteKind.Veto)
-            .some(
-              (voteRecord) =>
-                voteRecord.account.governingTokenOwner.toBase58() ===
-                tokenOwnerRecord.account.governingTokenOwner.toBase58()
-            )
-      )
-      if (undecidedData.length) {
-        handleGetNftsVotingPowers(
-          undecidedData.map((x) => x.account.governingTokenOwner)
-        )
-      }
-    }
-  }, [
-    isNftMode,
-    connection,
-    usedCollectionsPks,
-    undecidedNftsByVoteRecord,
-    tokenOwnerRecords,
-    voteRecords,
-  ])
 
   return topVoters
 }

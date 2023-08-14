@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/router'
 import classNames from 'classnames'
 import { ChevronLeftIcon } from '@heroicons/react/solid'
@@ -17,9 +17,8 @@ import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { VoteType } from '@solana/spl-governance'
 import MultiChoiceVotes from '@components/MultiChoiceVotes'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
-import ProposalTopVotersNftChart from '@components/ProposalTopVotersNftChart'
+import ProposalVoterNftChart from '@components/ProposalVoterNftChart'
 import { NFT_PLUGINS_PKS } from '@constants/plugins'
-import Switch from '@components/Switch'
 
 export default function Explore() {
   const proposal = useRouteProposalQuery().data?.result
@@ -30,30 +29,14 @@ export default function Explore() {
   const signatories = useSignatories(proposal)
   const router = useRouter()
 
-  const [isNftMode, setIsNftMode] = useState(false)
-  const [showNfts, setShowNfts] = useState(false)
   const config = useRealmConfigQuery().data?.result
   const currentPluginPk = config?.account.communityTokenConfig.voterWeightAddin
+  const isNftMode =
+    currentPluginPk && NFT_PLUGINS_PKS.includes(currentPluginPk?.toBase58())
 
   const endpoint = connection.endpoint
 
   const isMulti = proposal?.account.voteType !== VoteType.SINGLE_CHOICE
-
-  const toggleShowNfts = () => {
-    setShowNfts(!showNfts)
-  }
-
-  useEffect(() => {
-    if (
-      currentPluginPk &&
-      NFT_PLUGINS_PKS.includes(currentPluginPk?.toBase58())
-    ) {
-      console.log(currentPluginPk.toBase58())
-      setIsNftMode(true)
-    } else {
-      setIsNftMode(false)
-    }
-  }, [currentPluginPk])
 
   return (
     <div className="bg-bkg-2 rounded-lg p-4 space-y-3 md:p-6">
@@ -80,19 +63,6 @@ export default function Explore() {
           </div>
           <div className="mb-4 mt-16 flex justify-between">
             <h3 className="">Top Voters</h3>
-            <div
-              className={`${
-                isNftMode ? 'visible' : 'hidden'
-              } flex items-center`}
-            >
-              <p className="mb-0 mr-1 text-fgd-3">Show NFTs</p>
-              <Switch
-                checked={showNfts}
-                onChange={() => {
-                  toggleShowNfts()
-                }}
-              />
-            </div>
           </div>
           <div
             className="grid gap-4 grid-cols-1 items-center lg:grid-cols-2"
@@ -100,16 +70,15 @@ export default function Explore() {
           >
             <div className="flex flex-col gap-5 h-[500px]">
               <ProposalTopVotersList
-                className={showNfts ? 'h-[275px]' : 'h-[500px]'}
+                className={isNftMode ? 'h-[275px]' : 'h-[500px]'}
                 data={records}
                 endpoint={endpoint}
                 isMulti={isMulti}
                 highlighted={highlighted}
                 onHighlight={setHighlighted}
               />
-              <ProposalTopVotersNftChart
-                isNftMode={isNftMode}
-                showNfts={showNfts}
+              {/* when hovering over a top voter, ProposalVoterNftChart shows he/her NFTs when isNftMode */}
+              <ProposalVoterNftChart
                 className="h-[205px]"
                 highlighted={highlighted}
                 voteType={

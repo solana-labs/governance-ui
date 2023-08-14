@@ -11,7 +11,7 @@ const MembersPage = () => {
   return (
     <div>
       {!config?.account.communityTokenConfig.voterWeightAddin || isNftMode ? (
-        <Members isNftMode={isNftMode} />
+        <Members />
       ) : null}
     </div>
   )
