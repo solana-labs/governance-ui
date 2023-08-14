@@ -445,10 +445,18 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@blockworks-foundation/mango-v4@0.18.6":
-  version "0.18.6"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4/-/mango-v4-0.18.6.tgz#1f7d071ffb8b737fa2055fa32358181cb744ac4f"
-  integrity sha512-F3/JNFyUqxVjw4tA7QRX6f1cHgZAALwVKnL9+Ds7MxSr4/IMEZWZO1qr8y8j+7fch0wx/6ck7t4gDYG2c2UrZA==
+"@blockworks-foundation/mango-v4-settings@0.2.6":
+  version "0.2.6"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4-settings/-/mango-v4-settings-0.2.6.tgz#725a8cf669e164cd7694d97989472f7852afad68"
+  integrity sha512-RK8O8lbflIN9IgNE1uUkjrtlv/7f0BjIqTwcuLNFos6/e/Q2/AnlXRlD5Y9WnO6xS7mXNsw9kr05xCxeYZzM1Q==
+  dependencies:
+    bn.js "^5.2.1"
+    eslint-config-prettier "^9.0.0"
+
+"@blockworks-foundation/mango-v4@0.18.17":
+  version "0.18.17"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4/-/mango-v4-0.18.17.tgz#e6ed1895df7c5ebdcae2ded04fd219f2964323a7"
+  integrity sha512-LT2rgFumxESRjHXZ7bke9A/6OK5Y8yMZLEH8z2kF8nzAtQP7RPB42pVTY2l5vjHKYAz+Wo73WwdrpoLqjeXL/w==
   dependencies:
     "@coral-xyz/anchor" "^0.27.0"
     "@project-serum/serum" "0.13.65"
@@ -929,10 +937,10 @@
     "@solana/web3.js" "^1.73.2"
     js-sha3 "^0.8.0"
 
-"@dual-finance/staking-options@0.0.24":
-  version "0.0.24"
-  resolved "https://registry.yarnpkg.com/@dual-finance/staking-options/-/staking-options-0.0.24.tgz#376568dee9389a4133ef700fd55b3143802fdd7f"
-  integrity sha512-SMcER1lW2QgcZuHNa9PQmAQu5CyTMXeiZMmbRbEzMmhkSTqVPMauWaiVDeGZ35MxwN0pARGrVl7pf0gOVmHdsw==
+"@dual-finance/staking-options@0.0.26":
+  version "0.0.26"
+  resolved "https://registry.yarnpkg.com/@dual-finance/staking-options/-/staking-options-0.0.26.tgz#37bce685e1b8a2c8a3dca00606899249d897ab62"
+  integrity sha512-jwtMpoQzIliKlp+Nlu2Js/UaXL7/0tk+NqtMZLdKf997OdfHgxoDJrUC/sha1oZgBEuPjAwThWtwlY+Ku/tc8w==
   dependencies:
     "@coral-xyz/anchor" "^0.28.0"
     "@dual-finance/staking-options" "^0.0.21"
@@ -4167,10 +4175,10 @@
     js-sha3 "^0.8.0"
     typescript-collections "^1.3.3"
 
-"@solana/spl-governance@0.3.26":
-  version "0.3.26"
-  resolved "https://registry.yarnpkg.com/@solana/spl-governance/-/spl-governance-0.3.26.tgz#1a6c56037063654d243cc3ee9503b5b3140bbd6f"
-  integrity sha512-L84AWKcAmEMIWhh5gcfasfDesOMT+IU4i+s0ELgKCN0O9MC/hVrSjTkn68vBhDfCElnJyJTFMAN7NqSbrweD9A==
+"@solana/spl-governance@0.3.28":
+  version "0.3.28"
+  resolved "https://registry.yarnpkg.com/@solana/spl-governance/-/spl-governance-0.3.28.tgz#63ff71f235206f069f8ea1e66a40e7cdb6252d3f"
+  integrity sha512-CUi1hMvzId2rAtMFTlxMwOy0EmFeT0VcmiC+iQnDhRBuM8LLLvRrbTYBWZo3xIvtPQW9HfhVBoL7P/XNFIqYVQ==
   dependencies:
     "@solana/web3.js" "^1.22.0"
     axios "^1.1.3"
@@ -6230,12 +6238,12 @@ ansi-escapes@^4.2.1:
   dependencies:
     type-fest "^0.21.3"
 
-ansi-regex@3.0.1:
+ansi-regex@3.0.1, ansi-regex@^2.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-3.0.1.tgz#123d6479e92ad45ad897d4054e3c7ca7db4944e1"
   integrity sha512-+O9Jct8wf++lXxxFc4hc8LsjaSq0HFzzL7cVsw8pRDIPdjKD2mT4ytDZlLuSBZ4cLKZFXIrMGO7DbQCtMJJMKw==
 
-"ansi-regex@>=3.0.1 <=5.0.1", ansi-regex@^2.0.0, ansi-regex@^3.0.0, ansi-regex@^4.1.0, ansi-regex@^5.0.0, ansi-regex@^5.0.1:
+"ansi-regex@>=3.0.1 <=5.0.1", ansi-regex@^3.0.0, ansi-regex@^4.1.0, ansi-regex@^5.0.0, ansi-regex@^5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-5.0.1.tgz#082cb2c89c9fe8659a311a53bd6a4dc5301db304"
   integrity sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==
@@ -8806,6 +8814,11 @@ eslint-config-prettier@8.5.0:
   version "8.5.0"
   resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-8.5.0.tgz#5a81680ec934beca02c7b1a61cf8ca34b66feab1"
   integrity sha512-obmWKLUNCnhtQRKc+tmnYuQl0pFU1ibYJQ5BGhTVB08bHe9wC8qUeG7c08dj9XX+AuPj1YSGSQIHl1pnDHZR0Q==
+
+eslint-config-prettier@^9.0.0:
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-9.0.0.tgz#eb25485946dd0c66cd216a46232dc05451518d1f"
+  integrity sha512-IcJsTkJae2S35pRsRAwoCE+925rJJStOdkKnLVgtE+tEpqU0EVVM7OqrwxqgptKdX29NUwC82I5pXsGFIgSevw==
 
 eslint-import-resolver-node@^0.3.6:
   version "0.3.6"

@@ -338,6 +338,7 @@ export enum Instructions {
   DualFinanceDelegateWithdraw,
   DualFinanceVoteDeposit,
   DualFinanceVote,
+  DelegateStake,
   ForesightAddMarketListToCategory,
   ForesightInitCategory,
   ForesightInitMarket,
@@ -459,6 +460,12 @@ export interface ValidatorWithdrawStakeForm {
   governedTokenAccount: AssetAccount | undefined
   stakingAccount: StakeAccount | undefined
   amount: number
+}
+
+export interface DelegateStakeForm {
+  governedTokenAccount: AssetAccount | undefined
+  stakingAccount: StakeAccount | undefined
+  votePubkey: string
 }
 
 export interface DualFinanceAirdropForm {

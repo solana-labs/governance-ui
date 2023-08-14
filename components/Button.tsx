@@ -3,6 +3,7 @@ import Loading, { LoadingDots } from './Loading'
 import Tooltip from './Tooltip'
 import Header from './Header'
 import GradientCheckmarkCircle from './NewRealmWizard/components/GradientCheckmarkCircle'
+import SimpleCheckmarkCircle from './NewRealmWizard/components/SimpleCheckmarkCircle'
 interface ButtonProps {
   className?: string
   isLoading?: boolean
@@ -168,6 +169,39 @@ export const RadioButton: FunctionComponent<NewButtonProps> = ({
       <div className="flex items-center pl-4 space-x-3 md:pl-0 md:justify-center">
         <GradientCheckmarkCircle selected={selected} />
         <Header as="cta">{children}</Header>
+      </div>
+    </button>
+  )
+}
+
+export const ProposalTypeRadioButton: FunctionComponent<NewButtonProps> = ({
+  className = '',
+  selected = false,
+  disabled = false,
+  children,
+  ...props
+}) => {
+  let classNames =
+    'group default-transition px-2 py-1 min-h-[72px] min-w-[186px] rounded-lg border disabled:cursor-not-allowed'
+
+  if (selected) {
+    classNames += ' bg-fgd-1 border-fgd-1 focus:border-blue'
+  } else {
+    classNames += ' focus:bg-fgd-3 focus:border-none'
+  }
+
+  if (!disabled) {
+    classNames += 'hover:bg-bkg-4 hover:border-fgd-1 hover:bg-white/30 hover:text-black border-fgd-3'
+  } else {
+    classNames += ' bg-none text-fgd-4 border-bkg-4'
+  }
+
+  classNames += ` ${className}`
+  return (
+    <button className={classNames} type="button" disabled={disabled} {...props}>
+      <div className="flex items-center pl-4 space-x-3 md:pl-0 justify-center">
+        <SimpleCheckmarkCircle selected={selected} />
+        <div className={`inline ml-2 text-sm ${selected ? 'text-bkg-1' : 'text-fgd-3'}`}>{children}</div>
       </div>
     </button>
   )

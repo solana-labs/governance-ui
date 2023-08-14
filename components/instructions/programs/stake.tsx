@@ -49,5 +49,16 @@ export const STAKE_INSTRUCTIONS = {
         )
       },
     },
+    2: {
+      name: 'Stake Program - Delegate',
+      accounts: [{ name: 'Stake Account' }, { name: 'Vote Account' }],
+      getDataUI: async (
+        _connection: Connection,
+        _data: Uint8Array,
+        _accounts: AccountMetaData[]
+      ) => {
+        return <></>
+      },
+    },
   },
 }
