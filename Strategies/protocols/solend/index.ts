@@ -501,6 +501,7 @@ async function handleSolendAction(
     proposalIndex,
     [...setupInsts, ...insts, ...cleanupInsts],
     isDraft,
+    ["Approve"],
     client
   )
   return proposalAddress

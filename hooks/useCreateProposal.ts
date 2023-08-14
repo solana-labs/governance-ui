@@ -92,6 +92,7 @@ export default function useCreateProposal() {
       selectedGovernance.account.proposalCount,
       instructionsData,
       isDraft,
+      ["Approve"],
       client
     )
     queryClient.invalidateQueries({
@@ -109,5 +110,75 @@ export default function useCreateProposal() {
     return handleCreateProposal({ ...rest, governance: { pubkey: governance } })
   }
 
-  return { handleCreateProposal, propose }
+  const proposeMultiChoice = async(
+    {
+      title,
+      description,
+      governance,
+      instructionsData,
+      voteByCouncil = false,
+      options,
+      isDraft = false,
+    }: {
+      title: string
+      description: string
+      governance: PublicKey
+      instructionsData: InstructionDataWithHoldUpTime[]
+      voteByCouncil?: boolean
+      options: string[]
+      isDraft?: boolean
+    }
+  ) => {
+    const { result: selectedGovernance } = await fetchGovernanceByPubkey(
+      connection.current,
+      governance
+    )
+    if (!selectedGovernance) throw new Error('governance not found')
+    if (!realm) throw new Error()
+
+    const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
+      selectedGovernance.account.config,
+      voteByCouncil
+    )
+
+    const defaultProposalMint =
+      !mint?.supply.isZero() ||
+      config?.account.communityTokenConfig.voterWeightAddin
+        ? realm?.account.communityMint
+        : !councilMint?.supply.isZero()
+        ? realm?.account.config.councilMint
+        : undefined
+
+    const proposalMint =
+      canChooseWhoVote && voteByCouncil
+        ? realm?.account.config.councilMint
+        : defaultProposalMint
+
+    if (!proposalMint) {
+      throw new Error('There is no suitable governing token for the proposal')
+    }
+    const rpcContext = getRpcContext()
+    if (!rpcContext) throw new Error()
+
+    const proposalAddress = await createProposal(
+      rpcContext,
+      realm,
+      governance,
+      ownTokenRecord!,
+      title,
+      description,
+      proposalMint,
+      selectedGovernance.account.proposalCount,
+      instructionsData,
+      isDraft,
+      options,
+      client
+    )
+    queryClient.invalidateQueries({
+      queryKey: proposalQueryKeys.all(connection.endpoint),
+    })
+    return proposalAddress
+  }
+
+  return { handleCreateProposal, propose, proposeMultiChoice }
 }

@@ -405,11 +405,14 @@ export enum Instructions {
   DualFinanceLiquidityStakingOption,
   DualFinanceInitStrike,
   DualFinanceStakingOption,
+  DualFinanceGso,
+  DualFinanceGsoWithdraw,
   DualFinanceWithdraw,
   DualFinanceDelegate,
   DualFinanceDelegateWithdraw,
   DualFinanceVoteDeposit,
   DualFinanceVote,
+  DelegateStake,
   EverlendDeposit,
   EverlendWithdraw,
   ForesightAddMarketListToCategory,
@@ -538,6 +541,12 @@ export interface ValidatorWithdrawStakeForm {
   amount: number
 }
 
+export interface DelegateStakeForm {
+  governedTokenAccount: AssetAccount | undefined
+  stakingAccount: StakeAccount | undefined
+  votePubkey: string
+}
+
 export interface DualFinanceAirdropForm {
   root: string
   amount: number
@@ -557,6 +566,19 @@ export interface DualFinanceStakingOptionForm {
   quoteTreasury: AssetAccount | undefined
   payer: AssetAccount | undefined
   userPk: string | undefined
+}
+
+export interface DualFinanceGsoForm {
+  strike: number
+  soName: string | undefined
+  optionExpirationUnixSeconds: number
+  numTokens: number
+  lotSize: number
+  subscriptionPeriodEnd: number
+  lockupRatio: number
+  baseTreasury: AssetAccount | undefined
+  quoteTreasury: AssetAccount | undefined
+  payer: AssetAccount | undefined
 }
 
 export interface DualFinanceLiquidityStakingOptionForm {
@@ -587,6 +609,11 @@ export interface DualFinanceWithdrawForm {
   soName: string | undefined
   baseTreasury: AssetAccount | undefined
   mintPk: string | undefined
+}
+
+export interface DualFinanceGsoWithdrawForm {
+  soName: string | undefined
+  baseTreasury: AssetAccount | undefined
 }
 
 export interface DualFinanceDelegateForm {

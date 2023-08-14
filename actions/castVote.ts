@@ -8,6 +8,7 @@ import {
   TokenOwnerRecord,
   VoteChoice,
   VoteKind,
+  VoteType,
   withPostChatMessage,
 } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
@@ -52,7 +53,8 @@ export async function castVote(
   voteKind: VoteKind,
   message?: ChatMessageBody | undefined,
   votingPlugin?: VotingClient,
-  runAfterConfirmation?: (() => void) | null
+  runAfterConfirmation?: (() => void) | null,
+  voteWeights?: number[]
 ) {
   const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []
@@ -73,9 +75,24 @@ export async function castVote(
     tokenOwnerRecord
   )
 
+  const isMulti = proposal.account.voteType !== VoteType.SINGLE_CHOICE;
+
   // It is not clear that defining these extraneous fields, `deny` and `veto`, is actually necessary.
   // See:  https://discord.com/channels/910194960941338677/910630743510777926/1044741454175674378
-  const vote =
+  const vote = isMulti ?
+    new Vote({
+      voteType: VoteKind.Approve,
+      approveChoices: proposal.account.options.map((_o, index) => {
+        if (voteWeights?.includes(index)) {
+          return new VoteChoice({rank: 0, weightPercentage: 100});
+        } else {
+          return new VoteChoice({rank: 0, weightPercentage: 0});
+        }
+      }),
+      deny: undefined,
+      veto: undefined
+    })
+  :
     voteKind === VoteKind.Approve
       ? new Vote({
           voteType: VoteKind.Approve,

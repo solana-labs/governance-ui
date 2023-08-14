@@ -14,6 +14,8 @@ import ProposalVoteResult from '@components/ProposalVoteResults'
 import ProposalRemainingVotingTime from '@components/ProposalRemainingVotingTime'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { VoteType } from '@solana/spl-governance'
+import MultiChoiceVotes from '@components/MultiChoiceVotes'
 
 export default function Explore() {
   const proposal = useRouteProposalQuery().data?.result
@@ -27,9 +29,11 @@ export default function Explore() {
   const endpoint = connection.endpoint
 
   const handleExploreBackClick = () => {
-    const newPath = router.asPath.replace(/\/explore$/, '');
-    router.push(newPath);
-  };
+    const newPath = router.asPath.replace(/\/explore$/, '')
+    router.push(newPath)
+  }
+  
+  const isMulti = proposal?.account.voteType !== VoteType.SINGLE_CHOICE
 
   return (
     <div className="bg-bkg-2 rounded-lg p-4 space-y-3 md:p-6">
@@ -63,6 +67,7 @@ export default function Explore() {
               className="h-[500px]"
               data={records}
               endpoint={endpoint}
+              isMulti={isMulti}
               highlighted={highlighted}
               onHighlight={setHighlighted}
             />
@@ -80,12 +85,20 @@ export default function Explore() {
               proposal={proposal}
               signatories={signatories}
             />
-            <ProposalVoteResult
-              className="text-center"
-              data={records}
-              governance={governance}
-              proposal={proposal}
-            />
+            {
+              isMulti ? 
+              <div className='text-center'>
+                <h3 className='mb-3'>Vote Result</h3>
+                <MultiChoiceVotes proposal={proposal.account} limit={proposal.account.options.length}/>
+              </div>
+              :
+              <ProposalVoteResult
+                className="text-center"
+                data={records}
+                governance={governance}
+                proposal={proposal}
+              />
+            }
             <ProposalRemainingVotingTime
               align="right"
               governance={governance}

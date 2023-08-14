@@ -1,5 +1,5 @@
 import { BN } from '@coral-xyz/anchor'
-import { Proposal, ProposalState } from '@solana/spl-governance'
+import { Proposal, ProposalState, VoteType } from '@solana/spl-governance'
 import { getProposalMaxVoteWeight } from '../models/voteWeights'
 import { calculatePct, fmtTokenAmount } from '../utils/formatting'
 import { useMaxVoteRecord } from './useMaxVoteRecord'
@@ -28,7 +28,7 @@ export default function useProposalVotes(proposal?: Proposal) {
       ? mint
       : councilMint
   // TODO: optimize using memo
-  if (!realm || !proposal || !governance || !proposalMint || !programVersion)
+  if (!realm || !proposal || !governance || !proposalMint || !programVersion || proposal.voteType != VoteType.SINGLE_CHOICE)
     return {
       _programVersion: undefined,
       voteThresholdPct: undefined,

@@ -289,6 +289,10 @@ export default function useGovernanceAssets() {
       name: 'Deactivate validator stake',
       packageId: PackageEnum.Common,
     },
+    [Instructions.DelegateStake]: {
+      name: 'Delegate Stake Account',
+      packageId: PackageEnum.Common,
+    },
     [Instructions.DifferValidatorStake]: {
       name: 'Differ validator stake',
       // Not to be used for now
@@ -374,6 +378,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Dual,
     },
+    [Instructions.DualFinanceGso]: {
+      name: 'Lockup Staking Option',
+      isVisible: canUseTransferInstruction,
+      packageId: PackageEnum.Dual,
+    },
     [Instructions.DualFinanceLiquidityStakingOption]: {
       name: 'Liquidity Staking Option',
       isVisible: canUseTransferInstruction,
@@ -386,6 +395,11 @@ export default function useGovernanceAssets() {
     },
     [Instructions.DualFinanceExercise]: {
       name: 'Exercise',
+      isVisible: canUseTransferInstruction,
+      packageId: PackageEnum.Dual,
+    },
+    [Instructions.DualFinanceGsoWithdraw]: {
+      name: 'Lockup Staking Option Withdraw',
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Dual,
     },

@@ -653,6 +653,23 @@ export const getDualFinanceStakingOptionSchema = () => {
   })
 }
 
+export const getDualFinanceGsoSchema = () => {
+  return yup.object().shape({
+    soName: yup.string().required('Staking option name is required'),
+    optionExpirationUnixSeconds: yup
+      .number()
+      .typeError('expiration is required'),
+    numTokens: yup.number().typeError('numTokens is required'),
+    strike: yup.number().typeError('strike is required'),
+    lotSize: yup.number().typeError('lotSize is required'),
+    baseTreasury: yup.object().typeError('baseTreasury is required'),
+    quoteTreasury: yup.object().typeError('quoteTreasury is required'),
+    payer: yup.object().typeError('payer is required'),
+    subscriptionPeriodEnd: yup.number().typeError('subscriptionPeriodEnd is required'),
+    lockupRatio: yup.number().typeError('lockupRatio is required'),
+  })
+}
+
 export const getDualFinanceInitStrikeSchema = () => {
   return yup.object().shape({
     soName: yup.string().required('Staking option name is required'),
@@ -683,6 +700,14 @@ export const getDualFinanceWithdrawSchema = () => {
       ),
   })
 }
+
+export const getDualFinanceGsoWithdrawSchema = () => {
+  return yup.object().shape({
+    soName: yup.string().required('Staking option name is required'),
+    baseTreasury: yup.object().typeError('baseTreasury is required'),
+  })
+}
+
 
 export const getDualFinanceDelegateSchema = () => {
   return yup.object().shape({
