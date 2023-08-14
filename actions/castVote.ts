@@ -57,10 +57,10 @@ export async function castVote(
   voteWeights?: number[]
 ) {
   const signers: Keypair[] = []
-  const castVoteIxs: TransactionInstruction[] = []
-  const postMessageIxs: TransactionInstruction[] = []
+  const instructions: TransactionInstruction[] = []
 
-  const createTicketIxs: TransactionInstruction[] = []
+  const createCastNftVoteTicketIxs: TransactionInstruction[] = []
+  const createPostMessageTicketIxs: TransactionInstruction[] = []
 
   const governanceAuthority = walletPubkey
   const payer = walletPubkey
@@ -73,10 +73,10 @@ export async function castVote(
 
   //will run only if any plugin is connected with realm
   const plugin = await votingPlugin?.withCastPluginVote(
-    castVoteIxs,
+    instructions,
     proposal,
     tokenOwnerRecord,
-    createTicketIxs
+    createCastNftVoteTicketIxs
   )
 
   const isMulti = proposal.account.voteType !== VoteType.SINGLE_CHOICE
@@ -130,7 +130,7 @@ export async function castVote(
       : proposal.account.governingTokenMint
 
   await withCastVote(
-    castVoteIxs,
+    instructions,
     programId,
     programVersion,
     realm.pubkey,
@@ -148,13 +148,14 @@ export async function castVote(
 
   if (message) {
     const plugin = await votingPlugin?.withUpdateVoterWeightRecord(
-      postMessageIxs,
+      instructions,
       tokenOwnerRecord,
-      'commentProposal'
+      'commentProposal',
+      createPostMessageTicketIxs
     )
 
     await withPostChatMessage(
-      postMessageIxs,
+      instructions,
       signers,
       GOVERNANCE_CHAT_PROGRAM_ID,
       programId,
@@ -175,7 +176,6 @@ export async function castVote(
   const isHeliumVoter = votingPlugin?.client instanceof HeliumVsrClient
 
   if (!isNftVoter && !isHeliumVoter) {
-    const instructions = [...castVoteIxs, ...postMessageIxs]
     const transaction = new Transaction()
     transaction.add(...instructions)
 
@@ -188,7 +188,6 @@ export async function castVote(
   // we need to chunk instructions
   if (isHeliumVoter) {
     // update voter weight + cast vote from spl gov need to be in one transaction
-    const instructions = [...castVoteIxs, ...postMessageIxs]
     const ixsWithOwnChunk = instructions.slice(-ixChunkCount)
     const remainingIxsToChunk = instructions.slice(
       0,
@@ -240,13 +239,14 @@ export async function castVote(
       openNftVotingCountingModal,
       closeNftVotingCountingModal,
     } = useNftProposalStore.getState()
-    // postMessageIxs.slice(0, -2) will be the ixs for create post message tickets
-    // Only for nft-voter-v2. it will be empty for nft-voter
-    createTicketIxs.push(...postMessageIxs.slice(0, -2))
-    const createNftVoteTicketsChunks = chunks(createTicketIxs, 1)
 
-    const splIxs = [...castVoteIxs.slice(-2), ...postMessageIxs.slice(-2)]
-    const nftAccountIxs = castVoteIxs.slice(0, -2)
+    const createNftVoteTicketsChunks = chunks(
+      [...createCastNftVoteTicketIxs, ...createPostMessageTicketIxs],
+      1
+    )
+
+    const splIxs = instructions.slice(-ixChunkCount)
+    const nftAccountIxs = instructions.slice(0, -ixChunkCount)
 
     const splIxsWithAccountsChunk = chunks(splIxs, 2)
     const nftsAccountsChunks = chunks(nftAccountIxs, 2)

@@ -56,12 +56,14 @@ const useNewWalletCallback = (
     );
 
     const instructions: TransactionInstruction[] = [];
+    const createNftTicketsIxs: TransactionInstruction[] = [];
 
     // client is typed such that it cant be undefined, but whatever.
     const plugin = await client?.withUpdateVoterWeightRecord(
       instructions,
       tokenOwnerRecord,
       'createGovernance',
+      createNftTicketsIxs,
     );
 
     const governanceAddress = await withCreateGovernance(
@@ -86,8 +88,7 @@ const useNewWalletCallback = (
 
     // createTicketIxs is a list of instructions that create nftActionTicket only for nft-voter-v2 plugin
     // so it will be empty for other plugins
-    const createTicketIxs = instructions.slice(0, -3);
-    const nftTicketAccountsChuncks = chunks(createTicketIxs, 1);
+    const nftTicketAccountsChuncks = chunks(createNftTicketsIxs, 1);
 
     await sendTransactionsV3({
       transactionInstructions: [
@@ -102,7 +103,7 @@ const useNewWalletCallback = (
           };
         }),
         {
-          instructionsSet: instructions.slice(-3).map((x) => ({
+          instructionsSet: instructions.map((x) => ({
             transactionInstruction: x,
           })),
           sequenceType: SequenceType.Sequential,

@@ -50,6 +50,9 @@ import {
   getCastNftVoteInstruction,
   getCastNftVoteInstructionV2,
 } from '@utils/instructions/NftVoter/castNftVote'
+import { NftVoter } from 'idls/nft_voter'
+import { NftVoterV2 } from 'idls/nft_voter_v2'
+import { Program } from '@project-serum/anchor'
 
 export type UpdateVoterWeightRecordTypes =
   | 'castVote'
@@ -149,7 +152,8 @@ export class VotingClient {
   withUpdateVoterWeightRecord = async (
     instructions: TransactionInstruction[],
     tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>,
-    type: UpdateVoterWeightRecordTypes
+    type: UpdateVoterWeightRecordTypes,
+    createNftActionTicketIxs?: TransactionInstruction[]
   ): Promise<ProgramAddresses | undefined> => {
     const realm = this.realm!
     console.log(this.client)
@@ -259,7 +263,7 @@ export class VotingClient {
       if (!ON_NFT_VOTER_V2) {
         console.log('on nft voter v1')
         const updateVoterWeightRecordIx = await getUpdateVoterWeightRecordInstruction(
-          this.client,
+          this.client.program as Program<NftVoter>,
           walletPk,
           registrar,
           voterWeightPk,
@@ -273,14 +277,15 @@ export class VotingClient {
           createNftTicketIxs,
           updateVoterWeightRecordIx,
         } = await getUpdateVoterWeightRecordInstructionV2(
-          this.client,
+          this.client.program as Program<NftVoterV2>,
           walletPk,
           registrar,
           voterWeightPk,
           this.votingNfts,
           type
         )
-        instructions.push(...createNftTicketIxs, updateVoterWeightRecordIx)
+        createNftActionTicketIxs?.push(...createNftTicketIxs)
+        instructions.push(updateVoterWeightRecordIx)
       }
 
       return { voterWeightPk, maxVoterWeightRecord }
@@ -446,7 +451,7 @@ export class VotingClient {
       )
       if (!ON_NFT_VOTER_V2) {
         const castNftVoteIxs = await getCastNftVoteInstruction(
-          this.client,
+          this.client.program as Program<NftVoter>,
           walletPk,
           registrar,
           proposal.pubkey,
@@ -461,7 +466,7 @@ export class VotingClient {
           castNftVoteTicketIxs,
           castNftVoteIxs,
         } = await getCastNftVoteInstructionV2(
-          this.client,
+          this.client.program as Program<NftVoterV2>,
           walletPk,
           registrar,
           proposal.pubkey,

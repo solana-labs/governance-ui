@@ -1,7 +1,6 @@
 import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
 import { DasNftObject } from '@hooks/queries/digitalAssets'
 import { fetchNFTbyMint } from '@hooks/queries/nft'
-import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { chunks } from '@utils/helpers'
 import {
@@ -21,7 +20,7 @@ import {
 import { getCnftParamAndProof } from 'NftVotePlugin/getCnftParamAndProof'
 
 export const getCastNftVoteInstruction = async (
-  client: NftVoterClient,
+  program: Program<NftVoter>,
   walletPk: PublicKey,
   registrar: PublicKey,
   proposal: PublicKey,
@@ -31,7 +30,7 @@ export const getCastNftVoteInstruction = async (
   nftVoteRecordsFiltered: NftVoteRecord[]
 ) => {
   console.log('getCastNftVoteInstruction')
-  const clientProgramId = client.program.programId
+  const clientProgramId = program.programId
   const remainingAccounts: AccountData[] = []
   for (let i = 0; i < votingNfts.length; i++) {
     const nft = votingNfts[i]
@@ -42,7 +41,7 @@ export const getCastNftVoteInstruction = async (
       true
     )
     const metadata = await fetchNFTbyMint(
-      client.program.provider.connection,
+      program.provider.connection,
       new PublicKey(nft.id)
     )
     const { nftVoteRecord } = await getNftVoteRecordProgramAddress(
@@ -67,7 +66,7 @@ export const getCastNftVoteInstruction = async (
   const nftChunks = chunks(remainingAccounts, 12)
   for (const chunk of [...nftChunks]) {
     castNftVoteIxs.push(
-      await (client.program as Program<NftVoter>).methods
+      await program.methods
         .castNftVote(proposal)
         .accounts({
           registrar,
@@ -85,7 +84,7 @@ export const getCastNftVoteInstruction = async (
 }
 
 export const getCastNftVoteInstructionV2 = async (
-  client: NftVoterClient,
+  program: Program<NftVoterV2>,
   walletPk: PublicKey,
   registrar: PublicKey,
   proposal: PublicKey,
@@ -95,7 +94,7 @@ export const getCastNftVoteInstructionV2 = async (
   nftVoteRecordsFiltered: NftVoteRecord[]
 ) => {
   console.log('getCastNftVoteInstructionV2')
-  const clientProgramId = client.program.programId
+  const clientProgramId = program.programId
   const castNftVoteTicketIxs: TransactionInstruction[] = []
   const castVoteRemainingAccounts: AccountData[] = []
   const type: UpdateVoterWeightRecordTypes = 'castVote'
@@ -128,7 +127,7 @@ export const getCastNftVoteInstructionV2 = async (
         true
       )
       const metadata = await fetchNFTbyMint(
-        client.program.provider.connection,
+        program.provider.connection,
         new PublicKey(nft.id)
       )
 
@@ -148,7 +147,7 @@ export const getCastNftVoteInstructionV2 = async (
   const createNftVoteTicketChunks = chunks(nftRemainingAccounts, 15)
   for (const chunk of [...createNftVoteTicketChunks]) {
     castNftVoteTicketIxs.push(
-      await (client.program as Program<NftVoterV2>).methods
+      await program.methods
         .createNftActionTicket({ [type]: {} })
         .accounts({
           registrar,
@@ -184,11 +183,11 @@ export const getCastNftVoteInstructionV2 = async (
       )
 
       const { param, additionalAccounts } = await getCnftParamAndProof(
-        client.program.provider.connection,
+        program.provider.connection,
         cnft
       )
 
-      const instruction = await (client.program as Program<NftVoterV2>).methods
+      const instruction = await program.methods
         .createCnftActionTicket({ [type]: {} }, [param])
         .accounts({
           registrar,
@@ -215,7 +214,7 @@ export const getCastNftVoteInstructionV2 = async (
   const castVoteRemainingAccountsChunks = chunks(castVoteRemainingAccounts, 12)
   for (const chunk of [...castVoteRemainingAccountsChunks]) {
     castNftVoteIxs.push(
-      await (client.program as Program<NftVoterV2>).methods
+      await program.methods
         .castNftVote(proposal)
         .accounts({
           registrar,

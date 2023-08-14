@@ -1,7 +1,6 @@
 import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
 import { DasNftObject } from '@hooks/queries/digitalAssets'
 import { fetchNFTbyMint } from '@hooks/queries/nft'
-import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { chunks } from '@utils/helpers'
 import { getNftActionTicketProgramAddress } from 'NftVotePlugin/accounts'
@@ -17,7 +16,7 @@ import {
 import { getCnftParamAndProof } from 'NftVotePlugin/getCnftParamAndProof'
 
 export const getUpdateVoterWeightRecordInstruction = async (
-  client: NftVoterClient,
+  program: Program<NftVoter>,
   walletPk: PublicKey,
   registrar: PublicKey,
   voterWeightPk: PublicKey,
@@ -36,7 +35,7 @@ export const getUpdateVoterWeightRecordInstruction = async (
     )
 
     const metadata = await fetchNFTbyMint(
-      client.program.provider.connection,
+      program.provider.connection,
       new PublicKey(nft.id)
     )
 
@@ -45,7 +44,7 @@ export const getUpdateVoterWeightRecordInstruction = async (
       new AccountData(metadata?.result?.metadataAddress || '')
     )
   }
-  const updateVoterWeightRecordIx = await (client.program as Program<NftVoter>).methods
+  const updateVoterWeightRecordIx = await program.methods
     .updateVoterWeightRecord({ [type]: {} })
     .accounts({
       registrar: registrar,
@@ -57,7 +56,7 @@ export const getUpdateVoterWeightRecordInstruction = async (
 }
 
 export const getUpdateVoterWeightRecordInstructionV2 = async (
-  client: NftVoterClient,
+  program: Program<NftVoterV2>,
   walletPk: PublicKey,
   registrar: PublicKey,
   voterWeightPk: PublicKey,
@@ -72,7 +71,7 @@ export const getUpdateVoterWeightRecordInstructionV2 = async (
 
   const nfts = firstTenNfts.filter((x) => !x.compression.compressed)
   const nftRemainingAccounts: AccountData[] = []
-  const clientProgramId = client.program.programId
+  const clientProgramId = program.programId
   for (const nft of nfts) {
     const { nftActionTicket } = getNftActionTicketProgramAddress(
       ticketType,
@@ -88,7 +87,7 @@ export const getUpdateVoterWeightRecordInstructionV2 = async (
       true
     )
     const metadata = await fetchNFTbyMint(
-      client.program.provider.connection,
+      program.provider.connection,
       new PublicKey(nft.id)
     )
     nftRemainingAccounts.push(
@@ -103,7 +102,7 @@ export const getUpdateVoterWeightRecordInstructionV2 = async (
   const nftChunks = chunks(nftRemainingAccounts, 15)
   for (const chunk of [...nftChunks]) {
     createNftTicketIxs.push(
-      await (client.program as Program<NftVoterV2>).methods
+      await program.methods
         .createNftActionTicket({ [type]: {} })
         .accounts({
           registrar,
@@ -128,10 +127,10 @@ export const getUpdateVoterWeightRecordInstructionV2 = async (
     )
 
     const { param, additionalAccounts } = await getCnftParamAndProof(
-      client.program.provider.connection,
+      program.provider.connection,
       cnft
     )
-    const instruction = await (client.program as Program<NftVoterV2>).methods
+    const instruction = await program.methods
       .createCnftActionTicket({ [type]: {} }, [param])
       .accounts({
         registrar,
@@ -150,7 +149,7 @@ export const getUpdateVoterWeightRecordInstructionV2 = async (
     nftActionTicketAccounts.push(new AccountData(nftActionTicket, false, true))
   }
 
-  const updateVoterWeightRecordIx = await (client.program as Program<NftVoterV2>).methods
+  const updateVoterWeightRecordIx = await program.methods
     .updateVoterWeightRecord({ [type]: {} })
     .accounts({
       registrar: registrar,

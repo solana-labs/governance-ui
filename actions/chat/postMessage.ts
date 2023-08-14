@@ -33,6 +33,7 @@ export async function postChatMessage(
 ) {
   const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []
+  const createNftTicketsIxs: TransactionInstruction[] = []
 
   const governanceAuthority = walletPubkey
   const payer = walletPubkey
@@ -40,7 +41,8 @@ export async function postChatMessage(
   const plugin = await client?.withUpdateVoterWeightRecord(
     instructions,
     tokeOwnerRecord,
-    'commentProposal'
+    'commentProposal',
+    createNftTicketsIxs
   )
 
   await withPostChatMessage(
@@ -59,15 +61,11 @@ export async function postChatMessage(
     plugin?.voterWeightPk
   )
 
-  // the list will have element only if the plugin is NFTVoterClient and ON_NFT_VOTER_V2 = true
-  // so we can just add the chuncks to the instructionsChunks
-  const createTicketIxs = instructions.slice(0, -2)
-  const nftTicketAccountsChuncks = chunks(createTicketIxs, 1)
-
   // createTicketIxs is a list of instructions that create nftActionTicket only for nft-voter-v2 plugin
-  // so it will be empty for other plugins
+  // so it will be empty for other plugins or just spl-governance
+  const nftTicketAccountsChuncks = chunks(createNftTicketsIxs, 1)
 
-  const postMessageIxsChunk = [instructions.slice(-2)]
+  const postMessageIxsChunk = [instructions]
 
   const instructionsChunks = [
     ...nftTicketAccountsChuncks.map((txBatch, batchIdx) => {
