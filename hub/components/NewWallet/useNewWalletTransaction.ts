@@ -56,14 +56,12 @@ const useNewWalletCallback = (
     );
 
     const instructions: TransactionInstruction[] = [];
-    const createCreateGovernanceTicketIxs: TransactionInstruction[] = [];
 
     // client is typed such that it cant be undefined, but whatever.
     const plugin = await client?.withUpdateVoterWeightRecord(
       instructions,
       tokenOwnerRecord,
       'createGovernance',
-      createCreateGovernanceTicketIxs,
     );
 
     const governanceAddress = await withCreateGovernance(
@@ -86,16 +84,14 @@ const useNewWalletCallback = (
       wallet.publicKey,
     );
 
-    // the list will have elements only if the plugin is NFTVoterClient2
-    // so we can just add the instructions to transactionInstructions
-    const createGovernanceAccountsChunks = chunks(
-      createCreateGovernanceTicketIxs,
-      1,
-    );
+    // createTicketIxs is a list of instructions that create nftActionTicket only for nft-voter-v2 plugin
+    // so it will be empty for other plugins
+    const createTicketIxs = instructions.slice(0, -3);
+    const nftTicketAccountsChuncks = chunks(createTicketIxs, 1);
 
     await sendTransactionsV3({
       transactionInstructions: [
-        ...createGovernanceAccountsChunks.map((txBatch, batchIdx) => {
+        ...nftTicketAccountsChuncks.map((txBatch, batchIdx) => {
           return {
             instructionsSet: txBatchesToInstructionSetWithSigners(
               txBatch,
@@ -106,7 +102,7 @@ const useNewWalletCallback = (
           };
         }),
         {
-          instructionsSet: instructions.map((x) => ({
+          instructionsSet: instructions.slice(-3).map((x) => ({
             transactionInstruction: x,
           })),
           sequenceType: SequenceType.Sequential,

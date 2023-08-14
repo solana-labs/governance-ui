@@ -11,32 +11,14 @@ import {
 } from 'NftVotePlugin/accounts'
 import { PROGRAM_ID as ACCOUNT_COMPACTION_PROGRAM_ID } from '@solana/spl-account-compression'
 import { SYSTEM_PROGRAM_ID } from '@solana/spl-governance'
-import { getCompressedNftParamAndProof } from '@tools/cnftParams'
 import { NftVoter } from 'idls/nft_voter'
 import { NftVoterV2 } from 'idls/nft_voter_v2'
 import { Program } from '@project-serum/anchor'
-
-type UpdateVoterWeightRecordTypes =
-  | 'castVote'
-  | 'commentProposal'
-  | 'createGovernance'
-  | 'createProposal'
-  | 'signOffProposal'
-
-class AccountData {
-  pubkey: PublicKey
-  isSigner: boolean
-  isWritable: boolean
-  constructor(
-    pubkey: PublicKey | string,
-    isSigner = false,
-    isWritable = false
-  ) {
-    this.pubkey = typeof pubkey === 'string' ? new PublicKey(pubkey) : pubkey
-    this.isSigner = isSigner
-    this.isWritable = isWritable
-  }
-}
+import {
+  AccountData,
+  UpdateVoterWeightRecordTypes,
+} from '@utils/uiTypes/VotePlugin'
+import { getCnftParamAndProof } from 'NftVotePlugin/getCnftParamAndProof'
 
 export const getCastNftVoteInstruction = async (
   client: NftVoterClient,
@@ -132,7 +114,7 @@ export const getCastNftVoteInstructionV2 = async (
         (x) => x.publicKey.toBase58() === nftVoteRecord.toBase58()
       )
     ) {
-      const { nftActionTicket } = await getNftActionTicketProgramAddress(
+      const { nftActionTicket } = getNftActionTicketProgramAddress(
         ticketType,
         registrar,
         walletPk,
@@ -193,7 +175,7 @@ export const getCastNftVoteInstructionV2 = async (
         (x) => x.publicKey.toBase58() === nftVoteRecord.toBase58()
       )
     ) {
-      const { nftActionTicket } = await getNftActionTicketProgramAddress(
+      const { nftActionTicket } = getNftActionTicketProgramAddress(
         ticketType,
         registrar,
         walletPk,
@@ -201,7 +183,7 @@ export const getCastNftVoteInstructionV2 = async (
         clientProgramId
       )
 
-      const { param, additionalAccounts } = await getCompressedNftParamAndProof(
+      const { param, additionalAccounts } = await getCnftParamAndProof(
         client.program.provider.connection,
         cnft
       )
@@ -216,7 +198,7 @@ export const getCastNftVoteInstructionV2 = async (
           systemProgram: SYSTEM_PROGRAM_ID,
         })
         .remainingAccounts([
-          ...additionalAccounts,
+          ...additionalAccounts.map((x) => new AccountData(x)),
           new AccountData(nftActionTicket, false, true),
         ])
         .instruction()

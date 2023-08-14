@@ -14,7 +14,6 @@ import { ChatMessageBody } from '@solana/spl-governance'
 import { withPostChatMessage } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
-// import { sendTransaction } from '../../utils/send'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
 import { chunks } from '@utils/helpers'
 import {
@@ -34,7 +33,6 @@ export async function postChatMessage(
 ) {
   const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []
-  const createPostMessageTicketIxs: TransactionInstruction[] = []
 
   const governanceAuthority = walletPubkey
   const payer = walletPubkey
@@ -42,8 +40,7 @@ export async function postChatMessage(
   const plugin = await client?.withUpdateVoterWeightRecord(
     instructions,
     tokeOwnerRecord,
-    'commentProposal',
-    createPostMessageTicketIxs
+    'commentProposal'
   )
 
   await withPostChatMessage(
@@ -62,10 +59,15 @@ export async function postChatMessage(
     plugin?.voterWeightPk
   )
 
-  // the list will have element only if the plugin is NFTVoterClient2
+  // the list will have element only if the plugin is NFTVoterClient and ON_NFT_VOTER_V2 = true
   // so we can just add the chuncks to the instructionsChunks
-  const nftTicketAccountsChuncks = chunks(createPostMessageTicketIxs, 1)
-  const postMessageIxsChunk = [instructions]
+  const createTicketIxs = instructions.slice(0, -2)
+  const nftTicketAccountsChuncks = chunks(createTicketIxs, 1)
+
+  // createTicketIxs is a list of instructions that create nftActionTicket only for nft-voter-v2 plugin
+  // so it will be empty for other plugins
+
+  const postMessageIxsChunk = [instructions.slice(-2)]
 
   const instructionsChunks = [
     ...nftTicketAccountsChuncks.map((txBatch, batchIdx) => {

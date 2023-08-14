@@ -1,25 +1,9 @@
-// import { PublicKey } from "@solana/web3.js"
 import { Connection, PublicKey } from '@solana/web3.js'
 import { ConcurrentMerkleTreeAccount } from '@solana/spl-account-compression'
 import * as bs58 from 'bs58'
 import { fetchDasAssetProofById } from '@hooks/queries/digitalAssets'
 import { getNetworkFromEndpoint } from '@utils/connection'
 import * as anchor from '@coral-xyz/anchor'
-
-class AccountData {
-  pubkey: PublicKey
-  isSigner: boolean
-  isWritable: boolean
-  constructor(
-    pubkey: PublicKey | string,
-    isSigner = false,
-    isWritable = false
-  ) {
-    this.pubkey = typeof pubkey === 'string' ? new PublicKey(pubkey) : pubkey
-    this.isSigner = isSigner
-    this.isWritable = isWritable
-  }
-}
 
 export function decode(stuff: string) {
   return bufferToArray(bs58.decode(stuff))
@@ -33,7 +17,15 @@ function bufferToArray(buffer: Buffer): number[] {
   return nums
 }
 
-export async function getCompressedNftParamAndProof(
+/**
+ * This is a helper function only for nft-voter-v2 used.
+ * Given a cNFT, getCnftParamAndProof will to get its the metadata, leaf information and merkle proof.
+ * All these data will be sent to the program to verify the ownership of the cNFT.
+ * @param connection
+ * @param compressedNft
+ * @returns {param, additionalAccounts}
+ */
+export async function getCnftParamAndProof(
   connection: Connection,
   compressedNft: any
 ) {
@@ -90,11 +82,7 @@ export async function getCompressedNftParamAndProof(
     proofLen: reducedProofs.length,
   }
 
-  const proofs = reducedProofs.map((proof) => new AccountData(proof))
-  const additionalAccounts = [
-    new AccountData(compressedNft.compression.tree),
-    ...proofs,
-  ]
+  const additionalAccounts = [compressedNft.compression.tree, ...reducedProofs]
 
   return { param: param, additionalAccounts: additionalAccounts }
 }

@@ -16,7 +16,7 @@ export const useNftRegistrarCollection = () => {
         NFT_PLUGINS_PKS.includes(currentPluginPk?.toBase58()) &&
         nftMintRegistrar?.collectionConfigs.map((x) =>
           x.collection.toBase58()
-        )) ||
+        )) ??
       [],
     [currentPluginPk, nftMintRegistrar?.collectionConfigs]
   )

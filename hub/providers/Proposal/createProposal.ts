@@ -37,8 +37,6 @@ import {
 } from '@hooks/queries/digitalAssets';
 import { getNetworkFromEndpoint } from '@utils/connection';
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts';
-// import { getNfts } from '@utils/tokens';
-// import { NFTWithMeta, VotingClient } from '@utils/uiTypes/VotePlugin';
 import { VotingClient } from '@utils/uiTypes/VotePlugin';
 
 import { fetchPlugins } from './fetchPlugins';

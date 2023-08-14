@@ -74,7 +74,6 @@ export const createProposal = async (
   callbacks?: Parameters<typeof sendTransactionsV3>[0]['callbacks']
 ): Promise<PublicKey> => {
   const instructions: TransactionInstruction[] = []
-  const createNftProposalTicketIxs: TransactionInstruction[] = []
   const governanceAuthority = walletPubkey
   const signatory = walletPubkey
   const payer = walletPubkey
@@ -110,8 +109,7 @@ export const createProposal = async (
   const plugin = await client?.withUpdateVoterWeightRecord(
     instructions,
     tokenOwnerRecord,
-    'createProposal',
-    createNftProposalTicketIxs
+    'createProposal'
   )
 
   const proposalAddress = await withCreateProposal(
@@ -259,10 +257,11 @@ export const createProposal = async (
 
   if (isNftVoter) {
     // update voter weight records
-    const nftTicketAccountsChuncks = chunks(createNftProposalTicketIxs, 1)
+    const createTicketIxs = instructions.slice(0, -3)
+    const nftTicketAccountsChuncks = chunks(createTicketIxs, 1)
     const splIxsWithAccountsChunk = [
       ...prerequisiteInstructionsChunks,
-      instructions,
+      instructions.slice(-3),
       ...insertChunks,
     ]
 

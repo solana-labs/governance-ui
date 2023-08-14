@@ -26,10 +26,7 @@ import {
   getMaxVoterWeightRecord as getPluginMaxVoterWeightRecord,
 } from '@utils/plugin/accounts'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
-import {
-  // getNftVoteRecordProgramAddress,
-  getUsedNftsForProposal,
-} from 'NftVotePlugin/accounts'
+import { getUsedNftsForProposal } from 'NftVotePlugin/accounts'
 import { PositionWithMeta } from 'HeliumVotePlugin/sdk/types'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import {
@@ -45,18 +42,16 @@ import { NftVoterClient } from './NftVoterClient'
 import queryClient from '@hooks/queries/queryClient'
 import asFindable from '@utils/queries/asFindable'
 import { ON_NFT_VOTER_V2 } from '@constants/flags'
-// import { fetchNFTbyMint } from '@hooks/queries/nft'
 import {
   getUpdateVoterWeightRecordInstruction,
   getUpdateVoterWeightRecordInstructionV2,
-  // getUpdateVoterWeightRecordV2Instruction,
 } from '@utils/instructions/NftVoter/updateVoterWeight'
 import {
   getCastNftVoteInstruction,
   getCastNftVoteInstructionV2,
 } from '@utils/instructions/NftVoter/castNftVote'
 
-type UpdateVoterWeightRecordTypes =
+export type UpdateVoterWeightRecordTypes =
   | 'castVote'
   | 'commentProposal'
   | 'createGovernance'
@@ -81,7 +76,7 @@ export enum VotingClientType {
   GatewayClient,
 }
 
-class AccountData {
+export class AccountData {
   pubkey: PublicKey
   isSigner: boolean
   isWritable: boolean
@@ -154,8 +149,7 @@ export class VotingClient {
   withUpdateVoterWeightRecord = async (
     instructions: TransactionInstruction[],
     tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>,
-    type: UpdateVoterWeightRecordTypes,
-    createNftActionTicketIxs?: TransactionInstruction[]
+    type: UpdateVoterWeightRecordTypes
   ): Promise<ProgramAddresses | undefined> => {
     const realm = this.realm!
     console.log(this.client)
@@ -286,8 +280,7 @@ export class VotingClient {
           this.votingNfts,
           type
         )
-        createNftActionTicketIxs?.push(...createNftTicketIxs)
-        instructions.push(updateVoterWeightRecordIx)
+        instructions.push(...createNftTicketIxs, updateVoterWeightRecordIx)
       }
 
       return { voterWeightPk, maxVoterWeightRecord }
