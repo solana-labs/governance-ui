@@ -357,8 +357,6 @@ export async function getConfigGsoInstruction({
     const gso = getGsoApi(connection)
     const baseAccount = helperTokenAccount.publicKey
     const quoteAccount = form.quoteTreasury.pubkey
-    const baseDecimals = form.baseTreasury.extensions.mint!.account.decimals
-    const quoteDecimals = form.quoteTreasury.extensions.mint!.account.decimals
     const optionsPerMillion = Math.floor(form.lockupRatio * 1_000_000)
     const strikeAtomsPerLot = form.strike;
     // Set all GSOs to have the same expiration and lockup period. This means
