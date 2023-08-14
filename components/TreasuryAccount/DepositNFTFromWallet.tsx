@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import Button from '@components/Button'
 import Tooltip from '@components/Tooltip'
 import { PublicKey } from '@solana/web3.js'
@@ -25,22 +24,20 @@ import {
 } from '@hooks/queries/digitalAssets'
 import { getNetworkFromEndpoint } from '@utils/connection'
 import { buildTransferCnftInstruction } from '@hooks/instructions/useTransferCnftInstruction'
+import { useRealmQuery } from '@hooks/queries/realm'
+import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 
 const useMetaplexDeposit = () => {
   const wallet = useWalletOnePointOh()
   const connection = useLegacyConnectionContext()
-  const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
+  const realm = useRealmQuery().data?.result
 
-  return async (nftId: PublicKey) => {
+  return async (nftId: PublicKey, governance: PublicKey) => {
     if (!wallet?.publicKey) throw new Error()
-    if (!currentAccount) throw new Error()
+    if (realm === undefined) throw new Error()
 
     // ostensibly currentAccount should in fact be a native treasury, but I haven't verified this.
-    const toOwner = await getNativeTreasuryAddress(
-      currentAccount.governance.owner,
-      currentAccount.governance.pubkey
-    )
-
+    const toOwner = await getNativeTreasuryAddress(realm.owner, governance)
     const network = getNetworkFromEndpoint(connection.current.rpcEndpoint)
     if (network === 'localnet') throw new Error()
     const nft = (await fetchDigitalAssetById(network, nftId)).result
@@ -71,7 +68,6 @@ const useMetaplexDeposit = () => {
 }
 
 const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
-  const { setCurrentAccount } = useTreasuryAccountStore()
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const [selectedNfts, setSelectedNfts] = useState<PublicKey[]>([])
   const wallet = useWalletOnePointOh()
@@ -84,23 +80,27 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
   const [selectedGovernance, setSelectedGovernance] = useGovernanceSelect(
     currentAccount?.governance.pubkey
   )
+  const realm = useRealmQuery().data?.result
 
   const handleDeposit = async () => {
-    // really these should probably get batched into one TX or whatever.
-    if (!currentAccount) throw new Error()
+    if (selectedGovernance === undefined) throw new Error()
+    if (realm === undefined) throw new Error()
 
+    // really these should probably get batched into one TX or whatever.
     for (const nftMint of selectedNfts) {
       setIsLoading(true)
 
-      const owner = currentAccount.isSol
-        ? currentAccount.extensions.transferAddress!
-        : currentAccount.governance!.pubkey
       const network = getNetworkFromEndpoint(connection.current.rpcEndpoint)
       if (network === 'localnet') throw new Error()
 
       const nft = (await fetchDigitalAssetById(network, nftMint)).result
       if (nft === undefined) throw new Error('nft not found')
       if (nft.compression.compressed === false) {
+        const owner = await getNativeTreasuryAddress(
+          realm.owner,
+          selectedGovernance
+        )
+
         const ataPk = await Token.getAssociatedTokenAddress(
           ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
           TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
@@ -122,10 +122,8 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
         }
       }
 
-      await deposit(new PublicKey(nftMint))
+      await deposit(new PublicKey(nftMint), selectedGovernance)
         .then(() => {
-          setCurrentAccount(currentAccount!, connection)
-
           queryClient.invalidateQueries(digitalAssetsQueryKeys.all(network))
         })
         .catch((e) => {
