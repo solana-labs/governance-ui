@@ -28,7 +28,12 @@ export default function Explore() {
 
   const endpoint = connection.endpoint
 
-  const isMulti = proposal?.account.voteType !== VoteType.SINGLE_CHOICE;
+  const handleExploreBackClick = () => {
+    const newPath = router.asPath.replace(/\/explore$/, '')
+    router.push(newPath)
+  }
+  
+  const isMulti = proposal?.account.voteType !== VoteType.SINGLE_CHOICE
 
   return (
     <div className="bg-bkg-2 rounded-lg p-4 space-y-3 md:p-6">
@@ -42,7 +47,7 @@ export default function Explore() {
           'transition-all',
           'hover:text-fgd-3'
         )}
-        onClick={router.back}
+        onClick={handleExploreBackClick}
       >
         <ChevronLeftIcon className="h-6 w-6 " />
         Back
