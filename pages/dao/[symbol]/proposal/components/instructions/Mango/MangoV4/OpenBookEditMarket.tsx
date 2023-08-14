@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
@@ -9,10 +9,8 @@ import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
-import InstructionForm, {
-  InstructionInput,
-  InstructionInputType,
-} from '../../FormCreator'
+import InstructionForm, { InstructionInput } from '../../FormCreator'
+import { InstructionInputType } from '../../inputInstructionType'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { MarketIndex } from '@blockworks-foundation/mango-v4/dist/types/src/accounts/serum3'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
@@ -25,6 +23,7 @@ type NameMarketIndexVal = {
 interface OpenBookEditMarketForm {
   governedAccount: AssetAccount | null
   market: NameMarketIndexVal | null
+  name: string
   reduceOnly: boolean
   forceClose: boolean
   holdupTime: number
@@ -53,6 +52,7 @@ const OpenBookEditMarket = ({
     forceClose: false,
     market: null,
     holdupTime: 0,
+    name: '',
   })
   const [currentMarkets, setCurrentMarkets] = useState<NameMarketIndexVal[]>([])
   const [formErrors, setFormErrors] = useState({})
@@ -76,7 +76,7 @@ const OpenBookEditMarket = ({
       )
 
       const ix = await mangoClient!.program.methods
-        .serum3EditMarket(form.reduceOnly, form.forceClose)
+        .serum3EditMarket(form.reduceOnly, form.forceClose, form.name)
         .accounts({
           group: mangoGroup!.publicKey,
           admin: form.governedAccount.extensions.transferAddress,
@@ -127,6 +127,7 @@ const OpenBookEditMarket = ({
         ...prevForm,
         reduceOnly: market?.reduceOnly || false,
         forceClose: market?.forceClose || false,
+        name: market?.name || '',
       }))
     }
     if (form.market && mangoGroup) {
@@ -163,6 +164,13 @@ const OpenBookEditMarket = ({
       type: InstructionInputType.SELECT,
       initialValue: form.market,
       options: currentMarkets,
+    },
+    {
+      label: 'Name',
+      name: 'name',
+      type: InstructionInputType.INPUT,
+      initialValue: form.name,
+      inputType: 'text',
     },
     {
       label: 'Reduce Only',

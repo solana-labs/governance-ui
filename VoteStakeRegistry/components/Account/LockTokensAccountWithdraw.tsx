@@ -27,7 +27,7 @@ import {
   LockClosedIcon,
 } from '@heroicons/react/outline'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
-import Account from './Account'
+import Account from '../../../components/Account'
 import { abbreviateAddress } from '@utils/formatting'
 import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'

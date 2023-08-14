@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState, useMemo } from 'react'
 import { ProgramAccount, Governance } from '@solana/spl-governance'
 import {
   UiInstruction,
@@ -47,7 +47,7 @@ const StakingOption = ({
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-  const schema = getDualFinanceStakingOptionSchema()
+  const schema = useMemo(getDualFinanceStakingOptionSchema, [])
   useEffect(() => {
     function getInstruction(): Promise<UiInstruction> {
       return getConfigInstruction({

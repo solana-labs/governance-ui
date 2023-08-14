@@ -140,10 +140,6 @@ export default function useGovernanceAssets() {
   //
   // Packages are visible by default
   const packages: Packages = {
-    [PackageEnum.Castle]: {
-      name: 'Castle',
-      image: '/img/castle.png',
-    },
     [PackageEnum.Common]: {
       name: 'Common',
     },
@@ -151,26 +147,15 @@ export default function useGovernanceAssets() {
       name: 'Dual Finance',
       image: '/img/dual-logo.png',
     },
-    [PackageEnum.Everlend]: {
-      name: 'Everlend',
-      image: '/img/everlend.png',
-    },
     [PackageEnum.Foresight]: {
       name: 'Foresight',
       isVisible: symbol === 'FORE',
       image: '/img/foresight.png',
     },
-    [PackageEnum.Friktion]: {
-      name: 'Friktion',
-      image: '/img/friktion.png',
-    },
+
     [PackageEnum.GatewayPlugin]: {
       name: 'Gateway Plugin',
       image: '/img/civic.svg',
-    },
-    [PackageEnum.GoblinGold]: {
-      name: 'Goblin Gold',
-      image: '/img/goblingold.png',
     },
     [PackageEnum.Identity]: {
       name: 'Identity',
@@ -202,10 +187,6 @@ export default function useGovernanceAssets() {
       name: 'Solend',
       image: '/img/solend.png',
     },
-    [PackageEnum.Streamflow]: {
-      name: 'Streamflow',
-      image: '/img/streamflow.png',
-    },
     [PackageEnum.Switchboard]: {
       name: 'Switchboard',
       image: '/img/switchboard.png',
@@ -227,23 +208,6 @@ export default function useGovernanceAssets() {
   //
   // If isVisible is not set, it is equal to canUseAnyInstruction
   const instructionsMap: InstructionsMap = {
-    /*
-       ██████  █████  ███████ ████████ ██      ███████
-      ██      ██   ██ ██         ██    ██      ██
-      ██      ███████ ███████    ██    ██      █████
-      ██      ██   ██      ██    ██    ██      ██
-       ██████ ██   ██ ███████    ██    ███████ ███████
-    */
-
-    [Instructions.DepositIntoCastle]: {
-      name: 'Deposit into Vault',
-      packageId: PackageEnum.Castle,
-    },
-    [Instructions.WithdrawFromCastle]: {
-      name: 'Withdraw from Vault',
-      packageId: PackageEnum.Castle,
-    },
-
     /*
         ██████  ██████  ███    ███ ███    ███  ██████  ███    ██
        ██      ██    ██ ████  ████ ████  ████ ██    ██ ████   ██
@@ -287,6 +251,10 @@ export default function useGovernanceAssets() {
     },
     [Instructions.DeactivateValidatorStake]: {
       name: 'Deactivate validator stake',
+      packageId: PackageEnum.Common,
+    },
+    [Instructions.DelegateStake]: {
+      name: 'Delegate Stake Account',
       packageId: PackageEnum.Common,
     },
     [Instructions.DifferValidatorStake]: {
@@ -374,6 +342,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Dual,
     },
+    [Instructions.DualFinanceGso]: {
+      name: 'Lockup Staking Option',
+      isVisible: canUseTransferInstruction,
+      packageId: PackageEnum.Dual,
+    },
     [Instructions.DualFinanceLiquidityStakingOption]: {
       name: 'Liquidity Staking Option',
       isVisible: canUseTransferInstruction,
@@ -386,6 +359,11 @@ export default function useGovernanceAssets() {
     },
     [Instructions.DualFinanceExercise]: {
       name: 'Exercise',
+      isVisible: canUseTransferInstruction,
+      packageId: PackageEnum.Dual,
+    },
+    [Instructions.DualFinanceGsoWithdraw]: {
+      name: 'Lockup Staking Option Withdraw',
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Dual,
     },
@@ -421,23 +399,6 @@ export default function useGovernanceAssets() {
     },
 
     /*
-      ███████ ██    ██ ███████ ██████  ██      ███████ ███    ██ ██████
-      ██      ██    ██ ██      ██   ██ ██      ██      ████   ██ ██   ██
-      █████   ██    ██ █████   ██████  ██      █████   ██ ██  ██ ██   ██
-      ██       ██  ██  ██      ██   ██ ██      ██      ██  ██ ██ ██   ██
-      ███████   ████   ███████ ██   ██ ███████ ███████ ██   ████ ██████
-    */
-
-    [Instructions.EverlendDeposit]: {
-      name: 'Deposit Funds',
-      packageId: PackageEnum.Everlend,
-    },
-    [Instructions.EverlendWithdraw]: {
-      name: 'Withdraw Funds',
-      packageId: PackageEnum.Everlend,
-    },
-
-    /*
       ███████  ██████  ██████  ███████ ███████ ██  ██████  ██   ██ ████████
       ██      ██    ██ ██   ██ ██      ██      ██ ██       ██   ██    ██
       █████   ██    ██ ██████  █████   ███████ ██ ██   ███ ███████    ██
@@ -468,48 +429,6 @@ export default function useGovernanceAssets() {
     [Instructions.ForesightSetMarketMetadata]: {
       name: 'Set Market Metadata',
       packageId: PackageEnum.Foresight,
-    },
-
-    /*
-      ███████ ██████  ██ ██   ██ ████████ ██  ██████  ███    ██
-      ██      ██   ██ ██ ██  ██     ██    ██ ██    ██ ████   ██
-      █████   ██████  ██ █████      ██    ██ ██    ██ ██ ██  ██
-      ██      ██   ██ ██ ██  ██     ██    ██ ██    ██ ██  ██ ██
-      ██      ██   ██ ██ ██   ██    ██    ██  ██████  ██   ████
-    */
-
-    [Instructions.ClaimPendingDeposit]: {
-      name: 'Claim Volt Tokens',
-      packageId: PackageEnum.Friktion,
-    },
-    [Instructions.ClaimPendingWithdraw]: {
-      name: 'Claim Pending Withdraw',
-      packageId: PackageEnum.Friktion,
-    },
-    [Instructions.DepositIntoVolt]: {
-      name: 'Deposit into Volt',
-      packageId: PackageEnum.Friktion,
-    },
-    [Instructions.WithdrawFromVolt]: {
-      name: 'Withdraw from Volt',
-      packageId: PackageEnum.Friktion,
-    },
-
-    /*
-       ██████   ██████  ██████  ██      ██ ███    ██  ██████   ██████  ██      ██████
-      ██       ██    ██ ██   ██ ██      ██ ████   ██ ██       ██    ██ ██      ██   ██
-      ██   ███ ██    ██ ██████  ██      ██ ██ ██  ██ ██   ███ ██    ██ ██      ██   ██
-      ██    ██ ██    ██ ██   ██ ██      ██ ██  ██ ██ ██    ██ ██    ██ ██      ██   ██
-       ██████   ██████  ██████  ███████ ██ ██   ████  ██████   ██████  ███████ ██████
-    */
-
-    [Instructions.DepositIntoGoblinGold]: {
-      name: 'Deposit',
-      packageId: PackageEnum.GoblinGold,
-    },
-    [Instructions.WithdrawFromGoblinGold]: {
-      name: 'Withdraw',
-      packageId: PackageEnum.GoblinGold,
     },
 
     /*
@@ -615,6 +534,16 @@ export default function useGovernanceAssets() {
     },
     [Instructions.MangoV4GroupEdit]: {
       name: 'Edit Group',
+      packageId: PackageEnum.MangoMarketV4,
+      isVisible: canUseAnyInstruction,
+    },
+    [Instructions.MangoV4AdminWithdrawTokenFees]: {
+      name: 'Withdraw Token Fees',
+      packageId: PackageEnum.MangoMarketV4,
+      isVisible: canUseAnyInstruction,
+    },
+    [Instructions.MangoV4WithdrawPerpFees]: {
+      name: 'Withdraw Perp Fees',
       packageId: PackageEnum.MangoMarketV4,
       isVisible: canUseAnyInstruction,
     },
@@ -783,23 +712,6 @@ export default function useGovernanceAssets() {
     },
 
     /*
-      ███████ ████████ ██████  ███████  █████  ███    ███ ███████ ██       ██████  ██     ██
-      ██         ██    ██   ██ ██      ██   ██ ████  ████ ██      ██      ██    ██ ██     ██
-      ███████    ██    ██████  █████   ███████ ██ ████ ██ █████   ██      ██    ██ ██  █  ██
-           ██    ██    ██   ██ ██      ██   ██ ██  ██  ██ ██      ██      ██    ██ ██ ███ ██
-      ███████    ██    ██   ██ ███████ ██   ██ ██      ██ ██      ███████  ██████   ███ ███
-    */
-
-    // [Instructions.CancelStream]: {
-    //   name: 'Cancel Vesting Contract',
-    //   packageId: PackageEnum.Streamflow,
-    // },
-    // [Instructions.CreateStream]: {
-    //   name: 'Create Vesting Contract',
-    //   packageId: PackageEnum.Streamflow,
-    // },
-
-    /*
       ███████ ██     ██ ██ ████████  ██████ ██   ██ ██████   ██████   █████  ██████  ██████
       ██      ██     ██ ██    ██    ██      ██   ██ ██   ██ ██    ██ ██   ██ ██   ██ ██   ██
       ███████ ██  █  ██ ██    ██    ██      ███████ ██████  ██    ██ ███████ ██████  ██   ██
@@ -807,14 +719,6 @@ export default function useGovernanceAssets() {
       ███████  ███ ███  ██    ██     ██████ ██   ██ ██████   ██████  ██   ██ ██   ██ ██████
     */
 
-    [Instructions.SwitchboardAdmitOracle]: {
-      name: 'Admit Oracle to Queue',
-      packageId: PackageEnum.Switchboard,
-    },
-    [Instructions.SwitchboardRevokeOracle]: {
-      name: 'Remove Oracle from Queue',
-      packageId: PackageEnum.Switchboard,
-    },
     [Instructions.SwitchboardFundOracle]: {
       name: 'Fund Oracle',
       packageId: PackageEnum.Switchboard,

@@ -14,6 +14,7 @@ import {
   InstructionData,
   withSignOffProposal,
   withAddSignatory,
+  MultiChoiceType
 } from '@solana/spl-governance'
 import {
   sendTransactionsV3,
@@ -31,7 +32,7 @@ export interface InstructionDataWithHoldUpTime {
   prerequisiteInstructions: TransactionInstruction[]
   chunkBy?: number
   signers?: Keypair[]
-  prerequisiteInstructionsSigners?: Keypair[]
+  prerequisiteInstructionsSigners?: (Keypair | null)[]
 }
 
 export class InstructionDataWithHoldUpTime {
@@ -67,6 +68,7 @@ export const createProposal = async (
   proposalIndex: number,
   instructionsData: InstructionDataWithHoldUpTime[],
   isDraft: boolean,
+  options: string[],
   client?: VotingClient,
   callbacks?: Parameters<typeof sendTransactionsV3>[0]['callbacks']
 ): Promise<PublicKey> => {
@@ -75,7 +77,7 @@ export const createProposal = async (
   const signatory = walletPubkey
   const payer = walletPubkey
   const prerequisiteInstructions: TransactionInstruction[] = []
-  const prerequisiteInstructionsSigners: Keypair[] = []
+  const prerequisiteInstructionsSigners: (Keypair | null)[] = []
   // sum up signers
   const signers: Keypair[] = instructionsData.flatMap((x) => x.signers ?? [])
 
@@ -89,16 +91,19 @@ export const createProposal = async (
   )
 
   // V2 Approve/Deny configuration
-  const voteType = VoteType.SINGLE_CHOICE
-  const options = ['Approve']
-  const useDenyOption = true
+  const isMulti = options.length > 1;
 
+  const useDenyOption = !isMulti
+
+  const voteType = isMulti ? VoteType.MULTI_CHOICE(
+    MultiChoiceType.FullWeight, 1, options.length, options.length
+  ) : VoteType.SINGLE_CHOICE
+  
   //will run only if plugin is connected with realm
   const plugin = await client?.withUpdateVoterWeightRecord(
     instructions,
-    tokenOwnerRecord.pubkey,
-    'createProposal',
-    governance
+    tokenOwnerRecord,
+    'createProposal'
   )
 
   const proposalAddress = await withCreateProposal(
@@ -203,14 +208,24 @@ export const createProposal = async (
     deduplicateObjsFilter
   )
 
+  const prerequisiteInstructionsChunks = chunks(
+    deduplicatedPrerequisiteInstructions,
+    lowestChunkBy
+  )
+
+  const prerequisiteInstructionsSignersChunks = chunks(
+    deduplicatedPrerequisiteInstructionsSigners,
+    lowestChunkBy
+  ).filter((keypairArray) => keypairArray.filter((keypair) => keypair))
+
   const signersSet = [
-    ...chunks([...deduplicatedPrerequisiteInstructionsSigners], lowestChunkBy),
+    ...prerequisiteInstructionsSignersChunks,
     [],
     ...signerChunks,
   ]
 
   const txes = [
-    ...chunks(deduplicatedPrerequisiteInstructions, lowestChunkBy),
+    ...prerequisiteInstructionsChunks,
     instructions,
     ...insertChunks,
   ].map((txBatch, batchIdx) => {

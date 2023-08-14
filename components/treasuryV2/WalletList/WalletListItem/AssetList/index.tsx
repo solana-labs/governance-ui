@@ -21,7 +21,6 @@ import OtherAssetsList from './OtherAssetsList'
 import {
   isToken,
   isSol,
-  isNFTCollection,
   isMint,
   isPrograms,
   isRealmAuthority,
@@ -38,6 +37,9 @@ import TokenIcon from '@components/treasuryV2/icons/TokenIcon'
 import { useTokensMetadata } from '@hooks/queries/tokenMetadata'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import useTreasuryAddressForGovernance from '@hooks/useTreasuryAddressForGovernance'
+import { useDigitalAssetsByOwner } from '@hooks/queries/digitalAssets'
+import { SUPPORT_CNFTS } from '@constants/flags'
 
 export type Section = 'tokens' | 'nfts' | 'others'
 
@@ -65,6 +67,7 @@ interface Props {
   selectedAssetId?: string | null
   onSelectAsset?(asset: Asset): void
   onToggleExpandSection?(section: Section): void
+  governance: PublicKey | undefined
 }
 
 export default function AssetList(props: Props) {
@@ -133,15 +136,19 @@ export default function AssetList(props: Props) {
     }
   }, [tokensFromProps, data])
 
-  const nfts = props.assets.filter(isNFTCollection).sort((a, b) => {
-    if (b.name && !a.name) {
-      return 1
-    } else if (!b.name && a.name) {
-      return -1
-    } else {
-      return b.count.comparedTo(a.count)
-    }
-  })
+  const { result: treasury } = useTreasuryAddressForGovernance(props.governance)
+  const { data: governanceNfts } = useDigitalAssetsByOwner(props.governance)
+  const { data: treasuryNfts } = useDigitalAssetsByOwner(treasury)
+
+  const nfts = useMemo(
+    () =>
+      governanceNfts && treasuryNfts
+        ? [...governanceNfts, ...treasuryNfts]
+            .flat()
+            .filter((x) => SUPPORT_CNFTS || !x.compression.compressed)
+        : undefined,
+    [governanceNfts, treasuryNfts]
+  )
 
   const tokenOwnerRecordsFromProps = useMemo(
     () => props.assets.filter(isTokenOwnerRecord),
@@ -203,7 +210,7 @@ export default function AssetList(props: Props) {
 
   const diplayingMultipleAssetTypes =
     (tokens.length > 0 ? 1 : 0) +
-      (nfts.length > 0 ? 1 : 0) +
+      ((nfts?.length ?? 0) > 0 ? 1 : 0) +
       (others.length > 0 ? 1 : 0) >
     1
 
@@ -224,14 +231,11 @@ export default function AssetList(props: Props) {
           onToggleExpand={() => props.onToggleExpandSection?.('tokens')}
         />
       )}
-      {}
-      {nfts.length > 0 && (
+      {nfts && nfts.length > 0 && props.governance !== undefined && (
         <NFTList
+          governance={props.governance}
           disableCollapse={!diplayingMultipleAssetTypes}
           expanded={props.expandedSections?.includes('nfts')}
-          nfts={nfts}
-          selectedAssetId={props.selectedAssetId}
-          onSelect={props.onSelectAsset}
           onToggleExpand={() => props.onToggleExpandSection?.('nfts')}
         />
       )}

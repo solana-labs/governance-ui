@@ -10,10 +10,8 @@ import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { AssetAccount } from '@utils/uiTypes/assets'
-import InstructionForm, {
-  InstructionInput,
-  InstructionInputType,
-} from './FormCreator'
+import InstructionForm, { InstructionInput } from './FormCreator'
+import { InstructionInputType } from './inputInstructionType'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid, validatePubkey } from '@utils/formValidation'
@@ -9,10 +9,8 @@ import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
-import InstructionForm, {
-  InstructionInput,
-  InstructionInputType,
-} from '../../FormCreator'
+import InstructionForm, { InstructionInput } from '../../FormCreator'
+import { InstructionInputType } from '../../inputInstructionType'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { BN } from '@coral-xyz/anchor'
 import { getChangedValues, getNullOrTransform } from '@utils/mangoV4Tools'
@@ -32,6 +30,10 @@ const keyToLabel = {
   feesSwapMangoAccount: 'Fees Swap Mango Account',
   feesMngoTokenIndex: 'Fees MNGO Token Index',
   feesExpiryInterval: 'Fees Expiry Interval',
+  tokenConditionalSwapTakerFeeFraction:
+    'Token Conditional Swap Taker Fee Fraction',
+  tokenConditionalSwapMakerFeeFraction:
+    'Token Conditional Swap Maker Fee Fraction',
 }
 
 type GroupEditForm = {
@@ -47,6 +49,8 @@ type GroupEditForm = {
   feesSwapMangoAccount: string | null
   feesMngoTokenIndex: number | null
   feesExpiryInterval: number | null
+  tokenConditionalSwapTakerFeeFraction: number | null
+  tokenConditionalSwapMakerFeeFraction: number | null
   holdupTime: number
 }
 
@@ -63,6 +67,8 @@ const defaultFormValues: GroupEditForm = {
   feesSwapMangoAccount: '',
   feesMngoTokenIndex: 0,
   feesExpiryInterval: 0,
+  tokenConditionalSwapTakerFeeFraction: 0,
+  tokenConditionalSwapMakerFeeFraction: 0,
   holdupTime: 0,
 }
 
@@ -124,7 +130,17 @@ const GroupEdit = ({
           getNullOrTransform(values.feesMngoBonusRate, null, Number),
           getNullOrTransform(values.feesSwapMangoAccount, PublicKey),
           getNullOrTransform(values.feesMngoTokenIndex, null, Number),
-          getNullOrTransform(values.feesExpiryInterval, BN)
+          getNullOrTransform(values.feesExpiryInterval, BN),
+          getNullOrTransform(
+            values.tokenConditionalSwapTakerFeeFraction,
+            null,
+            Number
+          ),
+          getNullOrTransform(
+            values.tokenConditionalSwapMakerFeeFraction,
+            null,
+            Number
+          )
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -197,6 +213,10 @@ const GroupEdit = ({
         feesSwapMangoAccount: mangoGroup!.buybackFeesSwapMangoAccount?.toBase58(),
         feesMngoTokenIndex: mangoGroup!.mngoTokenIndex,
         feesExpiryInterval: mangoGroup!.buybackFeesExpiryInterval?.toNumber(),
+        tokenConditionalSwapTakerFeeFraction: mangoGroup!
+          .tokenConditionalSwapTakerFeeFraction,
+        tokenConditionalSwapMakerFeeFraction: mangoGroup!
+          .tokenConditionalSwapMakerFeeFraction,
       }
       setForm((prevForm) => ({
         ...prevForm,
@@ -308,6 +328,22 @@ const GroupEdit = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'feesExpiryInterval',
+    },
+    {
+      label: keyToLabel['tokenConditionalSwapTakerFeeFraction'],
+      subtitle: getAdditionalLabelInfo('tokenConditionalSwapTakerFeeFraction'),
+      initialValue: form.tokenConditionalSwapTakerFeeFraction,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'tokenConditionalSwapTakerFeeFraction',
+    },
+    {
+      label: keyToLabel['tokenConditionalSwapMakerFeeFraction'],
+      subtitle: getAdditionalLabelInfo('tokenConditionalSwapMakerFeeFraction'),
+      initialValue: form.tokenConditionalSwapMakerFeeFraction,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'tokenConditionalSwapMakerFeeFraction',
     },
   ]
 

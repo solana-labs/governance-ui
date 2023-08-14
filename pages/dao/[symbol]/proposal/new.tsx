@@ -8,13 +8,14 @@ import React, {
 } from 'react'
 import * as yup from 'yup'
 import { PlusCircleIcon, XCircleIcon } from '@heroicons/react/outline'
+import {TableOfContents} from '@carbon/icons-react'
 import {
   getInstructionDataFromBase64,
   Governance,
   ProgramAccount,
 } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
-import Button, { LinkButton, SecondaryButton } from '@components/Button'
+import Button, { LinkButton, ProposalTypeRadioButton, SecondaryButton } from '@components/Button'
 import Input from '@components/inputs/Input'
 import Textarea from '@components/inputs/Textarea'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
@@ -48,23 +49,17 @@ import RefreshReserve from './components/instructions/Solend/RefreshReserve'
 import WithdrawObligationCollateralAndRedeemReserveLiquidity from './components/instructions/Solend/WithdrawObligationCollateralAndRedeemReserveLiquidity'
 import SplTokenTransfer from './components/instructions/SplTokenTransfer'
 import VoteBySwitch from './components/VoteBySwitch'
-import FriktionDeposit from './components/instructions/Friktion/FriktionDeposit'
 import CreateNftPluginRegistrar from './components/instructions/NftVotingPlugin/CreateRegistrar'
 import CreateNftPluginMaxVoterWeightRecord from './components/instructions/NftVotingPlugin/CreateMaxVoterWeightRecord'
 import ConfigureNftPluginCollection from './components/instructions/NftVotingPlugin/ConfigureCollection'
-import SwitchboardAdmitOracle from './components/instructions/Switchboard/AdmitOracle'
-import SwitchboardRevokeOracle from './components/instructions/Switchboard/RevokeOracle'
 import SwitchboardFundOracle from './components/instructions/Switchboard/FundOracle'
 import WithdrawFromOracle from './components/instructions/Switchboard/WithdrawFromOracle'
-import FriktionWithdraw from './components/instructions/Friktion/FriktionWithdraw'
-import FriktionClaimPendingDeposit from './components/instructions/Friktion/FriktionClaimPendingDeposit'
-import FriktionClaimPendingWithdraw from './components/instructions/Friktion/FriktionClaimPendingWithdraw'
 import StakeValidator from './components/instructions/Validators/StakeValidator'
 import DeactivateValidatorStake from './components/instructions/Validators/DeactivateStake'
 import WithdrawValidatorStake from './components/instructions/Validators/WithdrawStake'
+import DelegateStake from './components/instructions/Validators/DelegateStake'
 import SplitStake from './components/instructions/Validators/SplitStake'
 import useCreateProposal from '@hooks/useCreateProposal'
-import CastleDeposit from './components/instructions/Castle/CastleDeposit'
 import MakeInitMarketParams from './components/instructions/Foresight/MakeInitMarketParams'
 import MakeInitMarketListParams from './components/instructions/Foresight/MakeInitMarketListParams'
 import MakeInitCategoryParams from './components/instructions/Foresight/MakeInitCategoryParams'
@@ -74,7 +69,6 @@ import RealmConfig from './components/instructions/RealmConfig'
 import MakeSetMarketMetadataParams from './components/instructions/Foresight/MakeSetMarketMetadataParams'
 import CloseTokenAccount from './components/instructions/CloseTokenAccount'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
-import CastleWithdraw from './components/instructions/Castle/CastleWithdraw'
 import StakingOption from './components/instructions/Dual/StakingOption'
 import MeanCreateAccount from './components/instructions/Mean/MeanCreateAccount'
 import MeanFundAccount from './components/instructions/Mean/MeanFundAccount'
@@ -84,8 +78,6 @@ import MeanTransferStream from './components/instructions/Mean/MeanTransferStrea
 import ChangeDonation from './components/instructions/Change/ChangeDonation'
 import VotingMintConfig from './components/instructions/Vsr/VotingMintConfig'
 import CreateVsrRegistrar from './components/instructions/Vsr/CreateRegistrar'
-import GoblinGoldDeposit from './components/instructions/GoblinGold/GoblinGoldDeposit'
-import GoblinGoldWithdraw from './components/instructions/GoblinGold/GoblinGoldWithdraw'
 import CreateGatewayPluginRegistrar from './components/instructions/GatewayPlugin/CreateRegistrar'
 import ConfigureGatewayPlugin from './components/instructions/GatewayPlugin/ConfigureGateway'
 import CreateTokenMetadata from './components/instructions/CreateTokenMetadata'
@@ -95,13 +87,13 @@ import TokenRegister from './components/instructions/Mango/MangoV4/TokenRegister
 import EditToken from './components/instructions/Mango/MangoV4/EditToken'
 import PerpEdit from './components/instructions/Mango/MangoV4/PerpEdit'
 import GroupEdit from './components/instructions/Mango/MangoV4/GroupEdit'
+import AdminTokenWithdrawFees from './components/instructions/Mango/MangoV4/WithdrawTokenFees'
+import WithdrawPerpFees from './components/instructions/Mango/MangoV4/WithdrawPerpFees'
 import OpenBookRegisterMarket from './components/instructions/Mango/MangoV4/OpenBookRegisterMarket'
 import OpenBookEditMarket from './components/instructions/Mango/MangoV4/OpenBookEditMarket'
 import PerpCreate from './components/instructions/Mango/MangoV4/PerpCreate'
 import TokenRegisterTrustless from './components/instructions/Mango/MangoV4/TokenRegisterTrustless'
 import TransferDomainName from './components/instructions/TransferDomainName'
-import DepositForm from './components/instructions/Everlend/DepositForm'
-import WithdrawForm from './components/instructions/Everlend/WithdrawForm'
 import InitUser from './components/instructions/Serum/InitUser'
 import GrantForm from './components/instructions/Serum/GrantForm'
 import JoinDAO from './components/instructions/JoinDAO'
@@ -138,12 +130,23 @@ import IdlSetBuffer from './components/instructions/Mango/MangoV4/IdlSetBuffer'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { usePrevious } from '@hooks/usePrevious'
 import DualVote from './components/instructions/Dual/DualVote'
+import DualGso from './components/instructions/Dual/DualGso'
+import DualGsoWithdraw from './components/instructions/Dual/DualGsoWithdraw'
+import MultiChoiceForm from '../../../../components/MultiChoiceForm'
 
 const TITLE_LENGTH_LIMIT = 130
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
 })
+
+const multiChoiceSchema = yup.object().shape({
+  governance: yup.string().required('Governance is required'),
+
+  options: yup.array().of(yup.string().required('Option cannot be empty'))
+});
+
+
 const defaultGovernanceCtx: InstructionsContext = {
   instructionsData: [],
   voteByCouncil: null,
@@ -179,16 +182,23 @@ const getDefaultInstructionProps = (
 
 const New = () => {
   const router = useRouter()
-  const { handleCreateProposal } = useCreateProposal()
+  const { handleCreateProposal, proposeMultiChoice } = useCreateProposal()
   const { fmtUrlWithCluster } = useQueryContext()
   const realm = useRealmQuery().data?.result
 
-  const { symbol, realmInfo, canChooseWhoVote } = useRealm()
+  const { symbol, realmInfo, canChooseWhoVote} = useRealm()
   const { availableInstructions } = useGovernanceAssets()
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [form, setForm] = useState({
     title: typeof router.query['t'] === 'string' ? router.query['t'] : '',
     description: '',
+  })
+  const [multiChoiceForm, setMultiChoiceForm] = useState<{
+    governance: PublicKey | undefined
+    options: string[]
+  }>({
+    governance: undefined,
+    options: ['', ''] // the multichoice form starts with 2 blank options for the poll
   })
   const [formErrors, setFormErrors] = useState({})
   const [
@@ -197,6 +207,9 @@ const New = () => {
   ] = useState<ProgramAccount<Governance> | null>(null)
   const [isLoadingSignedProposal, setIsLoadingSignedProposal] = useState(false)
   const [isLoadingDraft, setIsLoadingDraft] = useState(false)
+  const [isMulti, setIsMulti] = useState<boolean>(false)
+  const [isMultiFormValidated, setIsMultiFormValidated] = useState(false)
+  const [multiFormErrors, setMultiFormErrors] = useState({})
 
   const isLoading = isLoadingSignedProposal || isLoadingDraft
 
@@ -216,6 +229,7 @@ const New = () => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
+
   const setInstructionType = useCallback(
     ({ value, idx }: { value: InstructionType | null; idx: number }) => {
       const newInstruction = {
@@ -249,6 +263,7 @@ const New = () => {
 
   const handleCreate = async (isDraft) => {
     setFormErrors({})
+
     if (isDraft) {
       setIsLoadingDraft(true)
     } else {
@@ -261,70 +276,109 @@ const New = () => {
     )
 
     let instructions: UiInstruction[] = []
-    try {
-      instructions = await handleGetInstructions()
-    } catch (e) {
-      handleTurnOffLoaders()
-      notify({ type: 'error', message: `${e}` })
-      throw e
+
+    if (!isMulti) {
+      try {
+        instructions = await handleGetInstructions()
+      } catch (e) {
+        handleTurnOffLoaders()
+        notify({ type: 'error', message: `${e}` })
+        throw e
+      }
     }
 
     let proposalAddress: PublicKey | null = null
+
     if (!realm) {
       handleTurnOffLoaders()
       throw 'No realm selected'
     }
 
     if (isValid && instructions.every((x: UiInstruction) => x.isValid)) {
-      if (!governance) {
-        handleTurnOffLoaders()
-        throw Error('No governance selected')
-      }
-
-      const additionalInstructions = instructions
-        .flatMap((instruction) =>
-          instruction.additionalSerializedInstructions
-            ?.filter(
-              (value, index, self) =>
-                index === self.findIndex((t) => t === value)
+      if (isMulti) {
+        const { isValid: isMultiFormValid, validationErrors: multiValidationErrors }: formValidation = await isFormValid(
+          multiChoiceSchema,
+          multiChoiceForm
+        )
+        
+        if (isMultiFormValid && multiChoiceForm.governance) {
+          // Create Multi-Choice Proposal
+          try {
+            const options = [...multiChoiceForm.options];
+            
+            proposalAddress = await proposeMultiChoice({
+              title: form.title,
+              description: form.description,
+              governance: multiChoiceForm.governance,
+              instructionsData: [],
+              voteByCouncil,
+              options,
+              isDraft
+            });
+    
+            const url = fmtUrlWithCluster(
+              `/dao/${symbol}/proposal/${proposalAddress}`
             )
-            .map((x) => ({
-              data: x ? getInstructionDataFromBase64(x) : null,
-              ...getDefaultInstructionProps(instruction, governance),
-            }))
-        )
-        .filter((x) => x) as InstructionDataWithHoldUpTime[]
+    
+            router.push(url)
+          } catch (ex) {
+            console.log(ex)
+            notify({ type: 'error', message: `${ex}` })
+          }
+        } else {
+          setIsMultiFormValidated(true)
+          setMultiFormErrors(multiValidationErrors);
+        }
+      } else {
+        if (!governance) {
+          handleTurnOffLoaders()
+          throw Error('No governance selected')
+        }
 
-      const instructionsData = [
-        ...additionalInstructions,
-        ...instructions.map((x) => ({
-          data: x.serializedInstruction
-            ? getInstructionDataFromBase64(x.serializedInstruction)
-            : null,
-          ...getDefaultInstructionProps(x, governance),
-        })),
-      ]
+        const additionalInstructions = instructions
+          .flatMap((instruction) =>
+            instruction.additionalSerializedInstructions
+              ?.filter(
+                (value, index, self) =>
+                  index === self.findIndex((t) => t === value)
+              )
+              .map((x) => ({
+                data: x ? getInstructionDataFromBase64(x) : null,
+                ...getDefaultInstructionProps(instruction, governance),
+              }))
+          )
+          .filter((x) => x) as InstructionDataWithHoldUpTime[]
 
-      try {
-        // Fetch governance to get up to date proposalCount
+        const instructionsData = [
+          ...additionalInstructions,
+          ...instructions.map((x) => ({
+            data: x.serializedInstruction
+              ? getInstructionDataFromBase64(x.serializedInstruction)
+              : null,
+            ...getDefaultInstructionProps(x, governance),
+          })),
+        ]
 
-        proposalAddress = await handleCreateProposal({
-          title: form.title,
-          description: form.description,
-          governance,
-          instructionsData,
-          voteByCouncil,
-          isDraft,
-        })
+        try {
+          // Fetch governance to get up to date proposalCount
+          proposalAddress = await handleCreateProposal({
+            title: form.title,
+            description: form.description,
+            governance,
+            instructionsData,
+            voteByCouncil,
+            isDraft,
+          })
 
-        const url = fmtUrlWithCluster(
-          `/dao/${symbol}/proposal/${proposalAddress}`
-        )
+          const url = fmtUrlWithCluster(
+            `/dao/${symbol}/proposal/${proposalAddress}`
+          )
 
-        router.push(url)
-      } catch (ex) {
-        console.log(ex)
-        notify({ type: 'error', message: `${ex}` })
+          router.push(url)
+        } catch (ex) {
+          console.log(ex)
+          notify({ type: 'error', message: `${ex}` })
+        }
       }
     } else {
       setFormErrors(validationErrors)
@@ -401,6 +455,8 @@ const New = () => {
       [Instructions.MangoV4TokenRegister]: TokenRegister,
       [Instructions.MangoV4TokenEdit]: EditToken,
       [Instructions.MangoV4GroupEdit]: GroupEdit,
+      [Instructions.MangoV4AdminWithdrawTokenFees]: AdminTokenWithdrawFees,
+      [Instructions.MangoV4WithdrawPerpFees]: WithdrawPerpFees,
       [Instructions.IdlSetBuffer]: IdlSetBuffer,
       [Instructions.MangoV4OpenBookEditMarket]: OpenBookEditMarket,
       [Instructions.MangoV4IxGateSet]: IxGateSet,
@@ -416,13 +472,10 @@ const New = () => {
       [Instructions.Grant]: Grant,
       [Instructions.Clawback]: Clawback,
       [Instructions.CreateAssociatedTokenAccount]: CreateAssociatedTokenAccount,
-      [Instructions.DepositIntoVolt]: FriktionDeposit,
-      [Instructions.WithdrawFromVolt]: FriktionWithdraw,
-      [Instructions.ClaimPendingDeposit]: FriktionClaimPendingDeposit,
-      [Instructions.ClaimPendingWithdraw]: FriktionClaimPendingWithdraw,
-      [Instructions.DepositIntoCastle]: CastleDeposit,
       [Instructions.DualFinanceAirdrop]: DualAirdrop,
       [Instructions.DualFinanceStakingOption]: StakingOption,
+      [Instructions.DualFinanceGso]: DualGso,
+      [Instructions.DualFinanceGsoWithdraw]: DualGsoWithdraw,
       [Instructions.DualFinanceInitStrike]: InitStrike,
       [Instructions.DualFinanceLiquidityStakingOption]: LiquidityStakingOption,
       [Instructions.DualFinanceWithdraw]: DualWithdraw,
@@ -436,9 +489,6 @@ const New = () => {
       [Instructions.MeanWithdrawFromAccount]: MeanWithdrawFromAccount,
       [Instructions.MeanCreateStream]: MeanCreateStream,
       [Instructions.MeanTransferStream]: MeanTransferStream,
-      [Instructions.WithdrawFromCastle]: CastleWithdraw,
-      [Instructions.DepositIntoGoblinGold]: GoblinGoldDeposit,
-      [Instructions.WithdrawFromGoblinGold]: GoblinGoldWithdraw,
       [Instructions.CreateSolendObligationAccount]: CreateObligationAccount,
       [Instructions.InitSolendObligationAccount]: InitObligationAccount,
       [Instructions.DepositReserveLiquidityAndObligationCollateral]: DepositReserveLiquidityAndObligationCollateral,
@@ -447,8 +497,6 @@ const New = () => {
       [Instructions.PsyFinanceBurnWriterForQuote]: PsyFinanceBurnWriterTokenForQuote,
       [Instructions.PsyFinanceClaimUnderlyingPostExpiration]: PsyFinanceClaimUnderlyingPostExpiration,
       [Instructions.PsyFinanceExerciseOption]: PsyFinanceExerciseOption,
-      [Instructions.SwitchboardAdmitOracle]: SwitchboardAdmitOracle,
-      [Instructions.SwitchboardRevokeOracle]: SwitchboardRevokeOracle,
       [Instructions.SwitchboardFundOracle]: SwitchboardFundOracle,
       [Instructions.WithdrawFromOracle]: WithdrawFromOracle,
       [Instructions.RefreshSolendObligation]: RefreshObligation,
@@ -474,11 +522,10 @@ const New = () => {
       [Instructions.StakeValidator]: StakeValidator,
       [Instructions.DeactivateValidatorStake]: DeactivateValidatorStake,
       [Instructions.WithdrawValidatorStake]: WithdrawValidatorStake,
+      [Instructions.DelegateStake]: DelegateStake,
       [Instructions.SplitStake]: SplitStake,
       [Instructions.DifferValidatorStake]: null,
       [Instructions.TransferDomainName]: TransferDomainName,
-      [Instructions.EverlendDeposit]: DepositForm,
-      [Instructions.EverlendWithdraw]: WithdrawForm,
       [Instructions.SerumInitUser]: InitUser,
       [Instructions.SerumGrantLockedSRM]: {
         componentBuilderFunction: ({ index, governance }) => (
@@ -639,6 +686,42 @@ const New = () => {
                 }}
               ></VoteBySwitch>
             )}
+            <div className="max-w-lg w-full mb-4 flex flex-wrap gap-2 justify-between items-end">
+              <div className='flex grow basis-0'>
+                <ProposalTypeRadioButton
+                  onClick={() => setIsMulti(false)}
+                  selected={!isMulti}
+                  disabled={false}
+                  className='grow'
+                >
+                  Executable
+                </ProposalTypeRadioButton>
+              </div>
+              <div className="flex flex-col items-center justify-evenly grow basis-0">
+                <div className="bg-[#10B981] text-black flex flex-row gap-2 text-sm 
+                items-center justify-center px-2 py-1 rounded-md mb-2 w-full">
+                  <TableOfContents />
+                  <div>New: Multiple Choice Polls</div>
+                </div>
+                <ProposalTypeRadioButton
+                  onClick={() => setIsMulti(true)}
+                  selected={isMulti}
+                  disabled={false}
+                  className='w-full'
+                >
+                  Non-Executable <br /> (Multiple-Choice)
+                </ProposalTypeRadioButton>
+              </div>
+            </div>
+            {isMulti ?
+            <MultiChoiceForm 
+              multiChoiceForm={multiChoiceForm} 
+              updateMultiChoiceForm={setMultiChoiceForm}
+              isMultiFormValidated={isMultiFormValidated}
+              multiFormErrors={multiFormErrors}
+              updateMultiFormErrors={setMultiFormErrors}
+            /> :
+            <div>
             <NewProposalContext.Provider
               value={{
                 instructionsData,
@@ -704,6 +787,8 @@ const New = () => {
                 Add instruction
               </LinkButton>
             </div>
+            </div>
+            }
             <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
               <SecondaryButton
                 disabled={isLoading}

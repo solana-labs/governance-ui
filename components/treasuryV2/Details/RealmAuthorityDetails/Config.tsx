@@ -138,9 +138,12 @@ export default function Config(props: Props) {
                 icon={<TokenIcon />}
                 name={'Token type'}
                 value={
-                  { 0: 'Liquid', 1: 'Membership', 2: 'Disabled' }[
-                    props.realmAuthority.config.communityTokenConfig!.tokenType
-                  ]
+                  props.realmAuthority.config.communityTokenConfig
+                    ? { 0: 'Liquid', 1: 'Membership', 2: 'Disabled' }[
+                        props.realmAuthority.config.communityTokenConfig
+                          .tokenType
+                      ]
+                    : 'Liquid'
                 }
               />
             )}
@@ -202,15 +205,20 @@ export default function Config(props: Props) {
               <div className="font-bold">Council Rules</div>
             </div>
             <div className="grid grid-cols-1 gap-8">
-              <Section
-                icon={<TokenIcon />}
-                name={'Token type'}
-                value={
-                  { 0: 'Liquid', 1: 'Membership', 2: 'Disabled' }[
-                    props.realmAuthority.config.councilTokenConfig!.tokenType
-                  ]
-                }
-              />
+              {
+                <Section
+                  icon={<TokenIcon />}
+                  name={'Token type'}
+                  value={
+                    props.realmAuthority.config.councilTokenConfig
+                      ? { 0: 'Liquid', 1: 'Membership', 2: 'Disabled' }[
+                          props.realmAuthority.config.councilTokenConfig
+                            .tokenType
+                        ]
+                      : 'Liquid'
+                  }
+                />
+              }
               <Section
                 icon={<BeakerIcon />}
                 name={'Use council voter weight add‑in'}

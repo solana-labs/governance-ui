@@ -53,7 +53,10 @@ import { getFilteredProgramAccounts } from '@utils/helpers'
 import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes'
 
 const additionalPossibleMintAccounts = {
-  Mango: [new PublicKey('EGk8Gw7Z484mzAKb7GwCcqrZd4KwwsyU2Dv9woY6uDQu')],
+  Mango: [
+    new PublicKey('EGk8Gw7Z484mzAKb7GwCcqrZd4KwwsyU2Dv9woY6uDQu'),
+    new PublicKey('8gjzxiqcU87cvRc7hFiUJgxqLSV7AQnSttfWC5fD9aim'),
+  ],
 }
 const tokenAccountOwnerOffset = 32
 const programAccountOwnerOffset = 13
@@ -799,6 +802,7 @@ const loadGovernedTokenAccounts = async (
   realm: ProgramAccount<Realm>,
   governancesArray: GovernanceProgramAccountWithNativeTreasuryAddress[]
 ): Promise<AssetAccount[]> => {
+  console.log('loadGovernedTokenAccounts has been called')
   const auxiliaryTokenAccounts: typeof AUXILIARY_TOKEN_ACCOUNTS[keyof typeof AUXILIARY_TOKEN_ACCOUNTS] = AUXILIARY_TOKEN_ACCOUNTS[
     realm.account.name
   ]?.length

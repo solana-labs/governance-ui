@@ -37,6 +37,7 @@ export default function UseMangoV4() {
       wallet as any,
       options
     )
+
     const client = await MangoClient.connect(
       adminProvider,
       clientCluster,
