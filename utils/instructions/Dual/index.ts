@@ -23,6 +23,8 @@ import {
   DualFinanceWithdrawForm,
   UiInstruction,
   DualFinanceInitStrikeForm,
+  DualFinanceGsoForm,
+  DualFinanceGsoWithdrawForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import {
   createAssociatedTokenAccount,
@@ -36,6 +38,7 @@ import {
 } from '@project-serum/serum/lib/token-instructions'
 import { BN, web3, utils } from '@coral-xyz/anchor'
 import { Token } from '@solana/spl-token'
+import { GSO } from '@dual-finance/gso'
 
 interface StakingOptionArgs {
   connection: ConnectionContext
@@ -63,6 +66,10 @@ interface InitStrikeArgs {
 
 function getStakingOptionsApi(connection: ConnectionContext) {
   return new StakingOptions(connection.endpoint, 'confirmed')
+}
+
+function getGsoApi(connection: ConnectionContext) {
+  return new GSO(connection.endpoint, 'confirmed')
 }
 
 function toBeBytes(x: number) {
@@ -246,6 +253,169 @@ export async function getConfigInstruction({
       governance: form.baseTreasury?.governance,
       additionalSerializedInstructions,
       chunkBy: 2,
+    }
+  }
+
+  const obj: UiInstruction = {
+    serializedInstruction,
+    isValid: false,
+    governance: form.baseTreasury?.governance,
+    additionalSerializedInstructions,
+    chunkBy: 1,
+  }
+  return obj
+}
+
+interface StakingOptionGsoArgs {
+  connection: ConnectionContext
+  form: DualFinanceGsoForm
+  setFormErrors: any
+  schema: any
+  wallet: WalletAdapter | undefined
+}
+
+export async function getConfigGsoInstruction({
+  connection,
+  wallet,
+  form,
+  schema,
+  setFormErrors,
+}: StakingOptionGsoArgs): Promise<UiInstruction> {
+  const isValid = await validateInstruction({ schema, form, setFormErrors })
+
+  const serializedInstruction = ''
+  const additionalSerializedInstructions: string[] = []
+  const prerequisiteInstructions: TransactionInstruction[] = []
+  if (
+    isValid &&
+    form.soName &&
+    form.baseTreasury &&
+    form.quoteTreasury &&
+    form.payer &&
+    wallet?.publicKey
+  ) {
+    const baseMint = form.baseTreasury.extensions.mint?.publicKey
+    const space = 165
+    const rent = await connection.current.getMinimumBalanceForRentExemption(
+      space,
+      'processed'
+    )
+    //Creating checking account on the fly with same mint as base and owner
+    //made to be more safe - instructions don't have access to main treasury
+    const helperTokenAccount = new Keypair()
+    //run as prerequsite instructions payer is connected wallet
+    prerequisiteInstructions.push(
+      SystemProgram.createAccount({
+        fromPubkey: wallet.publicKey,
+        newAccountPubkey: helperTokenAccount.publicKey,
+        lamports: rent,
+        space: space,
+        programId: TOKEN_PROGRAM_ID,
+      }),
+      //initialized account with same mint as base
+      initializeAccount({
+        account: helperTokenAccount.publicKey,
+        mint: baseMint,
+        owner: form.baseTreasury.isSol
+          ? form.baseTreasury.governance.pubkey
+          : form.baseTreasury.extensions.token?.account.owner,
+      })
+    )
+
+    additionalSerializedInstructions.push(
+      //transfer funds from base treasury to the helper checking account
+      serializeInstructionToBase64(
+        Token.createTransferInstruction(
+          TOKEN_PROGRAM_ID,
+          form.baseTreasury.extensions.transferAddress!,
+          helperTokenAccount.publicKey,
+          //owner is sol wallet or governance same as baseTreasury
+          form.baseTreasury.extensions!.token!.account.owner,
+          [],
+          form.numTokens
+        )
+      )
+    )
+
+    const quoteTreasuryAccount = await tryGetTokenAccount(
+      connection.current,
+      form.quoteTreasury.pubkey
+    )
+    const quoteMint = quoteTreasuryAccount?.account.mint
+
+    // Should not happen.
+    if (!baseMint || !quoteMint) {
+      return {
+        serializedInstruction,
+        isValid: false,
+        governance: form.baseTreasury?.governance,
+        additionalSerializedInstructions: [],
+        chunkBy: 1,
+      }
+    }
+
+    const gso = getGsoApi(connection)
+    const baseAccount = helperTokenAccount.publicKey
+    const quoteAccount = form.quoteTreasury.pubkey
+    const optionsPerMillion = Math.floor(form.lockupRatio * 1_000_000)
+    const strikeAtomsPerLot = form.strike;
+    // Set all GSOs to have the same expiration and lockup period. This means
+    // that users will be able to unstake at the same time as option expiration.
+    const lockupPeriodEnd = form.optionExpirationUnixSeconds
+    const configInstruction = await gso.createConfigInstruction(
+      optionsPerMillion,
+      lockupPeriodEnd,
+      form.optionExpirationUnixSeconds,
+      form.subscriptionPeriodEnd,
+      new BN(form.numTokens),
+      form.soName,
+      strikeAtomsPerLot,
+      form.payer.extensions.transferAddress!,
+      baseMint,
+      quoteMint,
+      baseAccount,
+      quoteAccount,
+      form.lotSize
+    )
+
+    additionalSerializedInstructions.push(
+      serializeInstructionToBase64(configInstruction)
+    )
+
+    const nameInstruction = await gso.createNameTokensInstruction(
+      form.soName,
+      strikeAtomsPerLot,
+      form.payer.extensions.transferAddress!,
+      baseMint
+    )
+
+    additionalSerializedInstructions.push(
+      serializeInstructionToBase64(nameInstruction)
+    )
+
+    //after everything we close helper account
+    additionalSerializedInstructions.push(
+      serializeInstructionToBase64(
+        closeAccount({
+          source: helperTokenAccount.publicKey,
+          //sol wallet
+          destination: form.payer.extensions.transferAddress,
+          //owner governance or sol wallet same as baseTokenAccount
+          owner: form.baseTreasury.extensions.token?.account.owner,
+        })
+      )
+    )
+
+    return {
+      serializedInstruction,
+      isValid: true,
+      prerequisiteInstructions: prerequisiteInstructions,
+      prerequisiteInstructionsSigners: [helperTokenAccount],
+      governance: form.baseTreasury?.governance,
+      additionalSerializedInstructions,
+      // chunkBy 1 because the config instruction uses a lot of accounts, so
+      // isolate it.
+      chunkBy: 1,
     }
   }
 
@@ -527,6 +697,64 @@ export async function getWithdrawInstruction({
       prerequisiteInstructionsSigners: helperTokenAccount
         ? [null, helperTokenAccount, null, helperTokenAccount2]
         : [],
+      isValid: true,
+      governance: form.baseTreasury?.governance,
+      additionalSerializedInstructions,
+      chunkBy: 2,
+    }
+  }
+
+  return {
+    serializedInstruction,
+    isValid: false,
+    governance: form.baseTreasury?.governance,
+    additionalSerializedInstructions: [],
+  }
+}
+
+interface GsoWithdrawArgs {
+  connection: ConnectionContext
+  form: DualFinanceGsoWithdrawForm
+  setFormErrors: any
+  schema: any
+  wallet: WalletAdapter | undefined
+}
+
+export async function getGsoWithdrawInstruction({
+  connection,
+  wallet,
+  form,
+  schema,
+  setFormErrors,
+}: GsoWithdrawArgs): Promise<UiInstruction> {
+  const isValid = await validateInstruction({ schema, form, setFormErrors })
+
+  const serializedInstruction = ''
+  const additionalSerializedInstructions: string[] = []
+  if (isValid && form.soName && form.baseTreasury && !!form.baseTreasury.isSol && wallet?.publicKey) {
+    const gso = getGsoApi(connection)
+    const authority = form.baseTreasury.extensions.token!.account.owner!
+    const baseMint = form.baseTreasury.extensions.mint?.publicKey
+    const destination = form.baseTreasury.pubkey
+
+    // Should always exist because of validations.
+    if (baseMint) {
+      const withdrawInstruction = await gso.createWithdrawInstruction(
+        form.soName,
+        baseMint,
+        authority!,
+        destination
+      )
+
+      additionalSerializedInstructions.push(
+        serializeInstructionToBase64(withdrawInstruction)
+      )
+    }
+
+    // Does not use a helper token account. If the DAO requires that, they need
+    // to just set the baseTreasury to be an empty token account.
+    return {
+      serializedInstruction,
       isValid: true,
       governance: form.baseTreasury?.governance,
       additionalSerializedInstructions,

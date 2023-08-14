@@ -49,22 +49,17 @@ import RefreshReserve from './components/instructions/Solend/RefreshReserve'
 import WithdrawObligationCollateralAndRedeemReserveLiquidity from './components/instructions/Solend/WithdrawObligationCollateralAndRedeemReserveLiquidity'
 import SplTokenTransfer from './components/instructions/SplTokenTransfer'
 import VoteBySwitch from './components/VoteBySwitch'
-import FriktionDeposit from './components/instructions/Friktion/FriktionDeposit'
 import CreateNftPluginRegistrar from './components/instructions/NftVotingPlugin/CreateRegistrar'
 import CreateNftPluginMaxVoterWeightRecord from './components/instructions/NftVotingPlugin/CreateMaxVoterWeightRecord'
 import ConfigureNftPluginCollection from './components/instructions/NftVotingPlugin/ConfigureCollection'
 import SwitchboardFundOracle from './components/instructions/Switchboard/FundOracle'
 import WithdrawFromOracle from './components/instructions/Switchboard/WithdrawFromOracle'
-import FriktionWithdraw from './components/instructions/Friktion/FriktionWithdraw'
-import FriktionClaimPendingDeposit from './components/instructions/Friktion/FriktionClaimPendingDeposit'
-import FriktionClaimPendingWithdraw from './components/instructions/Friktion/FriktionClaimPendingWithdraw'
 import StakeValidator from './components/instructions/Validators/StakeValidator'
 import DeactivateValidatorStake from './components/instructions/Validators/DeactivateStake'
 import WithdrawValidatorStake from './components/instructions/Validators/WithdrawStake'
 import DelegateStake from './components/instructions/Validators/DelegateStake'
 import SplitStake from './components/instructions/Validators/SplitStake'
 import useCreateProposal from '@hooks/useCreateProposal'
-import CastleDeposit from './components/instructions/Castle/CastleDeposit'
 import MakeInitMarketParams from './components/instructions/Foresight/MakeInitMarketParams'
 import MakeInitMarketListParams from './components/instructions/Foresight/MakeInitMarketListParams'
 import MakeInitCategoryParams from './components/instructions/Foresight/MakeInitCategoryParams'
@@ -74,7 +69,6 @@ import RealmConfig from './components/instructions/RealmConfig'
 import MakeSetMarketMetadataParams from './components/instructions/Foresight/MakeSetMarketMetadataParams'
 import CloseTokenAccount from './components/instructions/CloseTokenAccount'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
-import CastleWithdraw from './components/instructions/Castle/CastleWithdraw'
 import StakingOption from './components/instructions/Dual/StakingOption'
 import MeanCreateAccount from './components/instructions/Mean/MeanCreateAccount'
 import MeanFundAccount from './components/instructions/Mean/MeanFundAccount'
@@ -84,8 +78,6 @@ import MeanTransferStream from './components/instructions/Mean/MeanTransferStrea
 import ChangeDonation from './components/instructions/Change/ChangeDonation'
 import VotingMintConfig from './components/instructions/Vsr/VotingMintConfig'
 import CreateVsrRegistrar from './components/instructions/Vsr/CreateRegistrar'
-import GoblinGoldDeposit from './components/instructions/GoblinGold/GoblinGoldDeposit'
-import GoblinGoldWithdraw from './components/instructions/GoblinGold/GoblinGoldWithdraw'
 import CreateGatewayPluginRegistrar from './components/instructions/GatewayPlugin/CreateRegistrar'
 import ConfigureGatewayPlugin from './components/instructions/GatewayPlugin/ConfigureGateway'
 import CreateTokenMetadata from './components/instructions/CreateTokenMetadata'
@@ -102,8 +94,6 @@ import OpenBookEditMarket from './components/instructions/Mango/MangoV4/OpenBook
 import PerpCreate from './components/instructions/Mango/MangoV4/PerpCreate'
 import TokenRegisterTrustless from './components/instructions/Mango/MangoV4/TokenRegisterTrustless'
 import TransferDomainName from './components/instructions/TransferDomainName'
-import DepositForm from './components/instructions/Everlend/DepositForm'
-import WithdrawForm from './components/instructions/Everlend/WithdrawForm'
 import InitUser from './components/instructions/Serum/InitUser'
 import GrantForm from './components/instructions/Serum/GrantForm'
 import JoinDAO from './components/instructions/JoinDAO'
@@ -140,6 +130,8 @@ import IdlSetBuffer from './components/instructions/Mango/MangoV4/IdlSetBuffer'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { usePrevious } from '@hooks/usePrevious'
 import DualVote from './components/instructions/Dual/DualVote'
+import DualGso from './components/instructions/Dual/DualGso'
+import DualGsoWithdraw from './components/instructions/Dual/DualGsoWithdraw'
 import MultiChoiceForm from '../../../../components/MultiChoiceForm'
 
 const TITLE_LENGTH_LIMIT = 130
@@ -480,13 +472,10 @@ const New = () => {
       [Instructions.Grant]: Grant,
       [Instructions.Clawback]: Clawback,
       [Instructions.CreateAssociatedTokenAccount]: CreateAssociatedTokenAccount,
-      [Instructions.DepositIntoVolt]: FriktionDeposit,
-      [Instructions.WithdrawFromVolt]: FriktionWithdraw,
-      [Instructions.ClaimPendingDeposit]: FriktionClaimPendingDeposit,
-      [Instructions.ClaimPendingWithdraw]: FriktionClaimPendingWithdraw,
-      [Instructions.DepositIntoCastle]: CastleDeposit,
       [Instructions.DualFinanceAirdrop]: DualAirdrop,
       [Instructions.DualFinanceStakingOption]: StakingOption,
+      [Instructions.DualFinanceGso]: DualGso,
+      [Instructions.DualFinanceGsoWithdraw]: DualGsoWithdraw,
       [Instructions.DualFinanceInitStrike]: InitStrike,
       [Instructions.DualFinanceLiquidityStakingOption]: LiquidityStakingOption,
       [Instructions.DualFinanceWithdraw]: DualWithdraw,
@@ -500,9 +489,6 @@ const New = () => {
       [Instructions.MeanWithdrawFromAccount]: MeanWithdrawFromAccount,
       [Instructions.MeanCreateStream]: MeanCreateStream,
       [Instructions.MeanTransferStream]: MeanTransferStream,
-      [Instructions.WithdrawFromCastle]: CastleWithdraw,
-      [Instructions.DepositIntoGoblinGold]: GoblinGoldDeposit,
-      [Instructions.WithdrawFromGoblinGold]: GoblinGoldWithdraw,
       [Instructions.CreateSolendObligationAccount]: CreateObligationAccount,
       [Instructions.InitSolendObligationAccount]: InitObligationAccount,
       [Instructions.DepositReserveLiquidityAndObligationCollateral]: DepositReserveLiquidityAndObligationCollateral,
@@ -540,8 +526,6 @@ const New = () => {
       [Instructions.SplitStake]: SplitStake,
       [Instructions.DifferValidatorStake]: null,
       [Instructions.TransferDomainName]: TransferDomainName,
-      [Instructions.EverlendDeposit]: DepositForm,
-      [Instructions.EverlendWithdraw]: WithdrawForm,
       [Instructions.SerumInitUser]: InitUser,
       [Instructions.SerumGrantLockedSRM]: {
         componentBuilderFunction: ({ index, governance }) => (
