@@ -206,101 +206,6 @@ export const validateBuffer = async (
   }
 }
 
-export const getFriktionDepositSchema = ({ form }) => {
-  const governedTokenAccount = form.governedTokenAccount as AssetAccount
-  return yup.object().shape({
-    governedTokenAccount: yup.object().required('Source account is required'),
-    amount: yup
-      .number()
-      .typeError('Amount is required')
-      .test(
-        'amount',
-        'Transfer amount must be less than the source account available amount',
-        async function (val: number) {
-          if (val && !form.governedTokenAccount) {
-            return this.createError({
-              message: `Please select source account to validate the amount`,
-            })
-          }
-          if (
-            val &&
-            governedTokenAccount &&
-            governedTokenAccount.extensions.mint
-          ) {
-            const mintValue = getMintNaturalAmountFromDecimalAsBN(
-              val,
-              governedTokenAccount?.extensions.mint.account.decimals
-            )
-            return !!(governedTokenAccount?.extensions.token?.publicKey &&
-            !governedTokenAccount.isSol
-              ? governedTokenAccount.extensions.token.account.amount.gte(
-                  mintValue
-                )
-              : new BN(
-                  governedTokenAccount.extensions.solAccount!.lamports
-                ).gte(mintValue))
-          }
-          return this.createError({
-            message: `Amount is required`,
-          })
-        }
-      ),
-  })
-}
-
-export const getCastleDepositSchema = ({ form }) => {
-  const governedTokenAccount = form.governedTokenAccount as AssetAccount
-  return yup.object().shape({
-    governedTokenAccount: yup.object().required('Source account is required'),
-    amount: yup
-      .number()
-      .typeError('Amount is required')
-      .test(
-        'amount',
-        'Transfer amount must be less than the source account available amount',
-        async function (val: number) {
-          const isNft = governedTokenAccount?.isNft
-          if (isNft) {
-            return true
-          }
-          if (val && !form.governedTokenAccount) {
-            return this.createError({
-              message: `Please select source account to validate the amount`,
-            })
-          }
-          if (
-            val &&
-            governedTokenAccount &&
-            governedTokenAccount?.extensions.mint
-          ) {
-            const mintValue = getMintNaturalAmountFromDecimalAsBN(
-              val,
-              governedTokenAccount?.extensions.mint.account.decimals
-            )
-            return !!(governedTokenAccount?.extensions.token?.publicKey &&
-            !governedTokenAccount.isSol
-              ? governedTokenAccount.extensions.token.account.amount.gte(
-                  mintValue
-                )
-              : new BN(
-                  governedTokenAccount.extensions.solAccount!.lamports
-                ).gte(mintValue))
-          }
-          return this.createError({
-            message: `Amount is required`,
-          })
-        }
-      ),
-  })
-}
-
-export const getCastleWithdrawSchema = () => {
-  return yup.object().shape({
-    governedTokenAccount: yup.object().required('Source account is required'),
-    amount: yup.number().typeError('Amount is required'),
-  })
-}
-
 export const getMeanCreateAccountSchema = ({ form }) => {
   const governedTokenAccount = form.governedTokenAccount as
     | AssetAccount
@@ -551,13 +456,6 @@ export const getMeanTransferStreamSchema = () => {
   })
 }
 
-export const getFriktionWithdrawSchema = () => {
-  return yup.object().shape({
-    governedTokenAccount: yup.object().required('Source account is required'),
-    amount: yup.number().typeError('Amount is required'),
-  })
-}
-
 export const getDualFinanceGovernanceAirdropSchema = () => {
   return yup.object().shape({
     amountPerVoter: yup.number().typeError('Amount per voter is required'),
@@ -716,23 +614,23 @@ export const getDualFinanceDelegateSchema = () => {
       .test('is-valid-address1', 'Please enter a valid PublicKey', (value) =>
         value ? validatePubkey(value) : true
       ),
-      realm: yup
+    realm: yup
       .string()
       .test('is-valid-address1', 'Please enter a valid PublicKey', (value) =>
         value ? validatePubkey(value) : true
       ),
-      token: yup.object().typeError('Delegate Token is required'),
+    token: yup.object().typeError('Delegate Token is required'),
   })
 }
 
 export const getDualFinanceDelegateWithdrawSchema = () => {
   return yup.object().shape({
-      realm: yup
+    realm: yup
       .string()
       .test('is-valid-address1', 'Please enter a valid PublicKey', (value) =>
         value ? validatePubkey(value) : true
       ),
-      token: yup.object().typeError('Delegate Token is required'),
+    token: yup.object().typeError('Delegate Token is required'),
   })
 }
 
@@ -740,74 +638,11 @@ export const getDualFinanceVoteDepositSchema = () => {
   return yup.object().shape({
     numTokens: yup.number().typeError('Num tokens is required'),
     realm: yup
-    .string()
-    .test('is-valid-address1', 'Please enter a valid PublicKey', (value) =>
-      value ? validatePubkey(value) : true
-    ),
-    token: yup.object().typeError('Delegate Token is required'),
-  })
-}
-
-export const getGoblinGoldDepositSchema = ({ form }) => {
-  const governedTokenAccount = form.governedTokenAccount as AssetAccount
-  return yup.object().shape({
-    governedTokenAccount: yup.object().required('Source account is required'),
-    goblinGoldVaultId: yup.string().required('Vault ID is required'),
-    amount: yup
-      .number()
-      .typeError('Amount is required')
-      .test(
-        'amount',
-        'Transfer amount must be less than the source account available amount',
-        async function (val: number) {
-          if (val && !form.governedTokenAccount) {
-            return this.createError({
-              message: `Please select source account to validate the amount`,
-            })
-          }
-          if (
-            val &&
-            governedTokenAccount &&
-            governedTokenAccount.extensions.mint
-          ) {
-            const mintValue = getMintNaturalAmountFromDecimalAsBN(
-              val,
-              governedTokenAccount?.extensions.mint.account.decimals
-            )
-            return !!(governedTokenAccount?.extensions.token?.publicKey &&
-            !governedTokenAccount.isSol
-              ? governedTokenAccount.extensions.token.account.amount.gte(
-                  mintValue
-                )
-              : new BN(
-                  governedTokenAccount.extensions.solAccount!.lamports
-                ).gte(mintValue))
-          }
-          return this.createError({
-            message: `Amount is required`,
-          })
-        }
+      .string()
+      .test('is-valid-address1', 'Please enter a valid PublicKey', (value) =>
+        value ? validatePubkey(value) : true
       ),
-  })
-}
-
-export const getGoblinGoldWithdrawSchema = () => {
-  return yup.object().shape({
-    governedTokenAccount: yup.object().required('Source account is required'),
-    goblinGoldVaultId: yup.string().required('Vault ID is required'),
-    amount: yup.number().typeError('Amount is required'),
-  })
-}
-
-export const getFriktionClaimPendingDepositSchema = () => {
-  return yup.object().shape({
-    governedTokenAccount: yup.object().required('Source account is required'),
-  })
-}
-
-export const getFriktionClaimPendingWithdrawSchema = () => {
-  return yup.object().shape({
-    governedTokenAccount: yup.object().required('Source account is required'),
+    token: yup.object().typeError('Delegate Token is required'),
   })
 }
 
