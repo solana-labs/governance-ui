@@ -57,13 +57,14 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
   const governingTokenMintPk = proposal?.account.governingTokenMint
 
   // for nft-voter
+  // This part is to get the undecided nft-voter information for each proposal.
+  // In buildTopVoters.ts, it checks whether the token_owner_record is in the vote_record.
+  // If not, the function use record.account.governingTokenDepositAmount as the undecided vote weight, where nft-voter should be 0.
+  // Thus, pre-calculating the undecided weight for each nft voter is necessary.
   const [nftMintRegistrar] = useVotePluginsClientStore((s) => [
     s.state.nftMintRegistrar,
   ])
   const usedCollectionsPks: string[] = useNftRegistrarCollection()
-  // const [undecidedNftsByVoteRecord, setUndecidedNftsByVoteRecord] = useState<{
-  //   [walletPk: string]: BN
-  // }>({})
 
   const { result: undecidedNftsByVoteRecord } = useAsync(async () => {
     const network = getNetworkFromEndpoint(connection.endpoint)
@@ -71,7 +72,8 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
       isNftMode && usedCollectionsPks !== undefined && network !== 'localnet'
     if (!enabled) return {}
 
-    const undecidedData = tokenOwnerRecords.filter(
+    // this filter out the token_owner_record that has already voted
+    const undecidedVoter = tokenOwnerRecords.filter(
       (tokenOwnerRecord) =>
         !voteRecords
           .filter((x) => x.account.vote?.voteType !== VoteKind.Veto)
@@ -81,7 +83,9 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
               tokenOwnerRecord.account.governingTokenOwner.toBase58()
           )
     )
-    const walletsPks = undecidedData.map((x) => x.account.governingTokenOwner)
+
+    // get every nft owned by the undecided voter, then sum it up as the undecided weight(voting power)
+    const walletsPks = undecidedVoter.map((x) => x.account.governingTokenOwner)
     const undecidedVoters = await Promise.all(
       walletsPks.map(async (walletPk) => {
         const ownedNfts = await fetchDigitalAssetsByOwner(network, walletPk)
@@ -99,7 +103,7 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
         }
       })
     )
-
+    // make it a dictionary structure
     const undecidedNftsByVoteRecord = Object.fromEntries(
       undecidedVoters.map((x) => [x.walletPk.toBase58(), new BN(x.votingPower)])
     )

@@ -51,7 +51,6 @@ export function buildTopVoters(
   undecidedVoterWeightByWallets: { [walletPk: string]: BN },
   maxVote: BN
 ): VoterDisplayData[] {
-  // const maxVote = calculateMaxVoteScore(realm, proposal, governingTokenMint)
   const electoralVotes = voteRecords.filter(
     (x) => x.account.vote?.voteType !== VoteKind.Veto
   )
