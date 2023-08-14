@@ -360,9 +360,7 @@ export async function getConfigGsoInstruction({
     const baseDecimals = form.baseTreasury.extensions.mint!.account.decimals
     const quoteDecimals = form.quoteTreasury.extensions.mint!.account.decimals
     const optionsPerMillion = Math.floor(form.lockupRatio * 1_000_000)
-    const strikeAtomsPerLot = Math.round(
-      form.strike * form.lotSize * 10 ** (quoteDecimals - baseDecimals)
-    )
+    const strikeAtomsPerLot = form.strike;
     // Set all GSOs to have the same expiration and lockup period. This means
     // that users will be able to unstake at the same time as option expiration.
     const lockupPeriodEnd = form.optionExpirationUnixSeconds
