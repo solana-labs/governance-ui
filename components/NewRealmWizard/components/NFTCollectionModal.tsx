@@ -8,6 +8,7 @@ import { WalletIcon } from './steps/AddNFTCollectionForm'
 import Modal from '@components/Modal'
 
 import {
+  DasNftObject,
   dasByIdQueryFn,
   digitalAssetsQueryKeys,
   useDigitalAssetsByOwner,
@@ -17,8 +18,9 @@ import { useAsync } from 'react-async-hook'
 import queryClient from '@hooks/queries/queryClient'
 import { getNetworkFromEndpoint } from '@utils/connection'
 import { PublicKey } from '@solana/web3.js'
+import { ON_NFT_VOTER_V2 } from '@constants/flags'
 
-function filterAndMapVerifiedCollections(nfts) {
+function filterAndMapVerifiedCollections(nfts: DasNftObject[]) {
   return nfts
     ?.filter((nft) => {
       if (
@@ -30,6 +32,7 @@ function filterAndMapVerifiedCollections(nfts) {
         return false
       }
     })
+    .filter((nft) => ON_NFT_VOTER_V2 || !nft.compression.compressed)
     .reduce((prev, curr) => {
       const collectionKey = curr.grouping.find(
         (x) => x.group_key === 'collection'

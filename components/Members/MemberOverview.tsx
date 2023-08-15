@@ -48,7 +48,12 @@ import {
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { useRealmProposalsQuery } from '@hooks/queries/proposal'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useMembersQuery } from './useMembers'
+import {
+  DasNftObject,
+  useDigitalAssetsByOwner,
+} from '@hooks/queries/digitalAssets'
+import { useNftRegistrarCollection } from '@hooks/useNftRegistrarCollection'
+import { NFT_PLUGINS_PKS } from '@constants/plugins'
 
 const RevokeMembership: FC<{ member: PublicKey; mint: PublicKey }> = ({
   member,
@@ -109,7 +114,117 @@ const RevokeMembership: FC<{ member: PublicKey; mint: PublicKey }> = ({
   )
 }
 
-const MemberOverview = ({ member }: { member: Member }) => {
+const getNftMetadataTooltip = (nft) => {
+  // console.log(nft)
+  const collection = nft.grouping.find((x) => x.group_key === 'collection')
+    ?.group_value
+  return (
+    <div>
+      <div className="w-full text-center text-lg">
+        {nft.compression.compressed ? 'Compressed NFT' : 'NFT'}
+      </div>
+      <div className="w-full">
+        <p>
+          Name: <span className="font-bold">{nft.content.metadata.name}</span>
+        </p>
+        <p>
+          Symbol:{' '}
+          <span className="font-bold">{nft.content.metadata.symbol}</span>
+        </p>
+        <p>
+          Description:{' '}
+          <span className="font-bold">{nft.content.metadata.description}</span>
+        </p>
+        <p>
+          {nft.compression.compressed ? 'Asset ID: ' : 'Address: '}{' '}
+          <span className="font-bold">{nft.id}</span>
+        </p>
+        <p>
+          Ownership: <span className="font-bold">{nft.ownership.owner}</span>
+        </p>
+        <p>
+          Collection: <span className="font-bold">{collection}</span>
+        </p>
+      </div>
+    </div>
+  )
+}
+
+const NftDisplayList = ({
+  member,
+  communityAmount,
+  councilAmount,
+}: {
+  member: Member
+  communityAmount: string
+  councilAmount: string
+}) => {
+  const { data: nfts, isLoading } = useDigitalAssetsByOwner(
+    new PublicKey(member.walletAddress)
+  )
+
+  const usedCollectionsPks: string[] = useNftRegistrarCollection()
+  const verifiedNfts: DasNftObject[] | undefined = useMemo(
+    () =>
+      nfts?.filter((nft) => {
+        const collection = nft.grouping.find(
+          (x) => x.group_key === 'collection'
+        )
+        return (
+          collection &&
+          usedCollectionsPks.includes(collection.group_value) &&
+          nft.creators?.filter((x) => x.verified).length > 0
+        )
+      }),
+    [nfts, usedCollectionsPks]
+  )
+
+  if (isLoading) {
+    return (
+      <div className="py-3 flex flex-col space-y-3 md:space-y-3 md:flex-row md:space-x-3 max-h-64">
+        <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all flex items-center justify-center max-h-64">
+          Loading NFTs...
+        </div>
+      </div>
+    )
+  }
+
+  if (!verifiedNfts || verifiedNfts.length === 0) {
+    return (
+      <div className="py-3 flex flex-col space-y-3 md:space-y-3 md:flex-row md:space-x-3 max-h-64">
+        <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all flex items-center justify-center max-h-64">
+          Something went wrong, fail to fetch..
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="py-3 flex flex-col space-y-3 md:space-y-3 md:flex-row md:space-x-3 max-h-64">
+      <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all flex items-center justify-center max-h-64">
+        {(communityAmount || !councilAmount) && (
+          <span className="w-full mt-2 grid grid-cols-10 items-center gap-4 max-h-64 overflow-y-scroll">
+            {verifiedNfts?.map((nft) => {
+              return (
+                <Tooltip key={nft.id} content={getNftMetadataTooltip(nft)}>
+                  <img className="w-12 h-12" src={nft.content.links?.image} />
+                </Tooltip>
+              )
+            })}
+          </span>
+        )}
+      </div>
+    </div>
+  )
+}
+
+const MemberOverview = ({
+  member,
+  activeMembers,
+}: {
+  member: Member
+  activeMembers: any[] | undefined
+}) => {
   const programVersion = useProgramVersion()
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
@@ -127,8 +242,14 @@ const MemberOverview = ({ member }: { member: Member }) => {
           ),
     [proposalsArray]
   )
+
+  const currentPluginPk = config?.account.communityTokenConfig.voterWeightAddin
+  const isNftMode =
+    (currentPluginPk &&
+      NFT_PLUGINS_PKS.includes(currentPluginPk?.toBase58())) ||
+    false
+
   const { fmtUrlWithCluster } = useQueryContext()
-  const { data: activeMembers } = useMembersQuery()
   const [ownVoteRecords, setOwnVoteRecords] = useState<
     WalletTokenRecordWithProposal[]
   >([])
@@ -358,6 +479,14 @@ const MemberOverview = ({ member }: { member: Member }) => {
           </div>
         </div>
       </div>
+      {isNftMode && (
+        <NftDisplayList
+          member={member}
+          communityAmount={communityAmount}
+          councilAmount={councilAmount}
+        />
+      )}
+
       <div className="pt-4">
         <h3 className="mb-3 text-base">
           {ownVoteRecords?.length} Recent Votes
