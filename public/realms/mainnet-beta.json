@@ -3170,6 +3170,18 @@
     "ogImage": "/realms/LavaDAO/img/lavalogo.png"
   },
   {
+    "symbol": "WKC",
+    "displayName": "wikicious",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "3TLsPzuWD4vyoZqrGC6r5pqadBJEbLZcuZZVxwK7JY3r",
+    "bannerImage": "/realms/wikicious/wikicious.png",
+    "website": "https://wikicious.com",
+    "twitter": "@Wiki_cious",
+    "ogImage": "/realms/wikicious/wikicious.png",
+    "github": "https://github.com/wikicious",
+    "shortDescription": "Decentralized Exchange",
+  },
+  {
     "symbol": "COMRADE",
     "displayName": "ComradeDAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
