@@ -221,27 +221,19 @@ const instructions = () => ({
       const oracle = accounts[6].pubkey
       const isMintOnCurve = PublicKey.isOnCurve(proposedMint)
 
-      const [info, proposedOracle, liqudityTier, args] = await Promise.all([
+      const [info, proposedOracle, args] = await Promise.all([
         displayArgs(connection, data),
         getOracle(connection, oracle),
-        getSuggestedCoinTier(proposedMint.toBase58()),
         getDataObjectFlattened<ListingArgs>(connection, data),
       ])
-      const tierLowerThenCurrent =
-        liqudityTier.tier === 'PREMIUM'
-          ? 'MID'
-          : liqudityTier.tier === 'MID'
-          ? 'MEME'
-          : liqudityTier.tier
-      const isMidOrPremium =
-        liqudityTier.tier === 'MID' || liqudityTier.tier === 'PREMIUM'
-      const listingTier =
-        isMidOrPremium && proposedOracle.type !== 'Pyth'
-          ? tierLowerThenCurrent
-          : liqudityTier.tier
+      const liqudityTier = await getSuggestedCoinTier(
+        proposedMint.toBase58(),
+        proposedOracle.type === 'Pyth'
+      )
+
       const formattedProposedArgs = getFormattedListingValues(args)
-      const suggestedPreset = PROPOSED_LISTING_PRESETS[listingTier]
-      const suggestedUntrusted = listingTier === 'UNTRUSTED'
+      const suggestedPreset = PROPOSED_LISTING_PRESETS[liqudityTier.tier]
+      const suggestedUntrusted = liqudityTier.tier === 'UNTRUSTED'
 
       const suggestedFormattedPreset: ListingArgsFormatted = Object.keys(
         suggestedPreset
@@ -316,14 +308,14 @@ const instructions = () => ({
                 <h3 className="text-green flex items-center">
                   <CheckCircleIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
                   Proposal params match suggested token tier -{' '}
-                  {coinTiersToNames[listingTier]}.
+                  {coinTiersToNames[liqudityTier.tier]}.
                 </h3>
               )}
               {!suggestedUntrusted && invalidKeys.length > 0 && (
                 <h3 className="text-orange flex items-center">
                   <WarningFilledIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
                   Proposal params do not match suggested token tier -{' '}
-                  {coinTiersToNames[listingTier]} check params carefully
+                  {coinTiersToNames[liqudityTier.tier]} check params carefully
                 </h3>
               )}
               {isMintOnCurve && (
@@ -656,7 +648,6 @@ const instructions = () => ({
           tier: LISTING_PRESETS_KEYS
           priceImpact: string
         }> = {}
-        let listingTier: LISTING_PRESETS_KEYS | undefined = undefined
         let suggestedUntrusted = false
         let invalidKeys: (keyof EditTokenArgsFormatted)[] = []
         let invalidFields: Partial<EditTokenArgsFormatted> = {}
@@ -725,22 +716,10 @@ const instructions = () => ({
           const oracle = mangoGroup.banksMapByMint.get(mint.toBase58())![0]!
             .oracle
           const isPyth = await isPythOracle(connection, oracle)
-          liqudityTier = await getSuggestedCoinTier(mint.toBase58())
-          const tierLowerThenCurrent =
-            liqudityTier.tier === 'PREMIUM'
-              ? 'MID'
-              : liqudityTier.tier === 'MID'
-              ? 'MEME'
-              : liqudityTier.tier
-          const isMidOrPremium =
-            liqudityTier.tier === 'MID' || liqudityTier.tier === 'PREMIUM'
-          listingTier =
-            isMidOrPremium && !isPyth
-              ? tierLowerThenCurrent!
-              : liqudityTier.tier!
+          liqudityTier = await getSuggestedCoinTier(mint.toBase58(), !!isPyth)
 
-          const suggestedPreset = PROPOSED_LISTING_PRESETS[listingTier]
-          suggestedUntrusted = listingTier === 'UNTRUSTED'
+          const suggestedPreset = PROPOSED_LISTING_PRESETS[liqudityTier.tier!]
+          suggestedUntrusted = liqudityTier.tier === 'UNTRUSTED'
 
           const suggestedFormattedPreset:
             | EditTokenArgsFormatted
@@ -793,21 +772,21 @@ const instructions = () => ({
                 </h3>
               </>
             )}
-            {!suggestedUntrusted && !invalidKeys.length && listingTier && (
+            {!suggestedUntrusted && !invalidKeys.length && liqudityTier.tier && (
               <h3 className="text-green flex items-center">
                 <CheckCircleIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
                 Proposal params match suggested token tier -{' '}
-                {coinTiersToNames[listingTier]}.
+                {coinTiersToNames[liqudityTier.tier]}.
               </h3>
             )}
             {!suggestedUntrusted &&
               invalidKeys &&
               invalidKeys!.length > 0 &&
-              listingTier && (
+              liqudityTier.tier && (
                 <h3 className="text-orange flex items-center">
                   <WarningFilledIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
                   Proposal params do not match suggested token tier -{' '}
-                  {coinTiersToNames[listingTier]} check params carefully
+                  {coinTiersToNames[liqudityTier.tier]} check params carefully
                 </h3>
               )}
             <div className="border-b mb-4 pb-4 space-y-3">
