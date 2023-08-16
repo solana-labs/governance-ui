@@ -104,7 +104,7 @@
     "@solana/web3.js": "1.73.3",
     "@solendprotocol/solend-sdk": "0.5.5",
     "@sqds/iframe-adapter": "1.0.16",
-    "@switchboard-xyz/solana.js": "2.2.0",
+    "@switchboard-xyz/solana.js": "2.5.4",
     "@tailwindcss/line-clamp": "0.4.2",
     "@tanstack/react-query": "4.14.3",
     "@tippyjs/react": "4.2.6",
