@@ -262,7 +262,7 @@ export const createLUTProposal = async (
       ...extendInstructions.map((x) => {
         return {
           instructionsSet: [{ transactionInstruction: x }],
-          sequenceType: SequenceType.Parallel,
+          sequenceType: SequenceType.Sequential,
         }
       }),
     ],
