@@ -123,7 +123,8 @@ export const createLUTProposal = async (
     .map((x) => x.chunkBy!)
 
   const lowestChunkBy = chunkBys.length ? Math.min(...chunkBys) : 2
-
+  console.log(instructionsData)
+  console.log('lowestChunkBy', lowestChunkBy)
   for (const [index, instruction] of instructionsData
     .filter((x) => x.data)
     .entries()) {
@@ -222,12 +223,22 @@ export const createLUTProposal = async (
   })
 
   // add addresses to the `lookupTableAddress` table via an `extend` instruction
-  const extendInstruction = AddressLookupTableProgram.extendLookupTable({
-    payer: payer,
-    authority: payer,
-    lookupTable: lookupTableAddress,
-    addresses: keys,
-  })
+  // need to split into multiple instructions because of the ~20 address limit
+  // https://docs.solana.com/developing/lookup-tables#:~:text=NOTE%3A%20Due%20to,transaction%27s%20memory%20limits.
+  // const extendInstruction = AddressLookupTableProgram.extendLookupTable({
+  //   payer: payer,
+  //   authority: payer,
+  //   lookupTable: lookupTableAddress,
+  //   addresses: keys,
+  // })
+  const extendInstructions = chunks(keys, 15).map((chunk) =>
+    AddressLookupTableProgram.extendLookupTable({
+      payer: payer,
+      authority: payer,
+      lookupTable: lookupTableAddress,
+      addresses: chunk,
+    })
+  )
 
   // Send this `extendInstruction` in a transaction to the cluster
   // to insert the listing of `addresses` into your lookup table with address `lookupTableAddress`
@@ -246,12 +257,15 @@ export const createLUTProposal = async (
     wallet,
     transactionInstructions: [
       {
-        instructionsSet: [
-          { transactionInstruction: lookupTableInst },
-          { transactionInstruction: extendInstruction },
-        ],
+        instructionsSet: [{ transactionInstruction: lookupTableInst }],
         sequenceType: SequenceType.Sequential,
       },
+      ...extendInstructions.map((x) => {
+        return {
+          instructionsSet: [{ transactionInstruction: x }],
+          sequenceType: SequenceType.Parallel,
+        }
+      }),
     ],
     callbacks: {
       afterAllTxConfirmed: resolve,
