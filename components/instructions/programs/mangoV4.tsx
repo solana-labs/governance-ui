@@ -16,6 +16,7 @@ import EmptyWallet, {
   getBestMarket,
   EditTokenArgsFormatted,
   PROPOSED_LISTING_PRESETS,
+  isPythOracle,
 } from '@utils/Mango/listingTools'
 import { secondsToHours } from 'date-fns'
 import WarningFilledIcon from '@carbon/icons-react/lib/WarningFilled'
@@ -220,15 +221,19 @@ const instructions = () => ({
       const oracle = accounts[6].pubkey
       const isMintOnCurve = PublicKey.isOnCurve(proposedMint)
 
-      const [info, proposedOracle, suggestedTier, args] = await Promise.all([
+      const [info, proposedOracle, args] = await Promise.all([
         displayArgs(connection, data),
         getOracle(connection, oracle),
-        getSuggestedCoinTier(proposedMint.toBase58()),
         getDataObjectFlattened<ListingArgs>(connection, data),
       ])
+      const liqudityTier = await getSuggestedCoinTier(
+        proposedMint.toBase58(),
+        proposedOracle.type === 'Pyth'
+      )
+
       const formattedProposedArgs = getFormattedListingValues(args)
-      const suggestedPreset = PROPOSED_LISTING_PRESETS[suggestedTier.tier]
-      const suggestedUntrusted = suggestedTier.tier === 'UNTRUSTED'
+      const suggestedPreset = PROPOSED_LISTING_PRESETS[liqudityTier.tier]
+      const suggestedUntrusted = liqudityTier.tier === 'UNTRUSTED'
 
       const suggestedFormattedPreset: ListingArgsFormatted = Object.keys(
         suggestedPreset
@@ -293,8 +298,8 @@ const instructions = () => ({
                   </h3>
                   <h3 className="text-orange flex">
                     Very low liquidity Price impact of{' '}
-                    {suggestedTier.priceImpact}% on $1000 swap. This token
-                    should probably be listed using the Register Trustless Token
+                    {liqudityTier.priceImpact}% on $1000 swap. This token should
+                    probably be listed using the Register Trustless Token
                     instruction check params carefully
                   </h3>
                 </>
@@ -303,14 +308,14 @@ const instructions = () => ({
                 <h3 className="text-green flex items-center">
                   <CheckCircleIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
                   Proposal params match suggested token tier -{' '}
-                  {coinTiersToNames[suggestedTier.tier]}.
+                  {coinTiersToNames[liqudityTier.tier]}.
                 </h3>
               )}
               {!suggestedUntrusted && invalidKeys.length > 0 && (
                 <h3 className="text-orange flex items-center">
                   <WarningFilledIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
                   Proposal params do not match suggested token tier -{' '}
-                  {coinTiersToNames[suggestedTier.tier]} check params carefully
+                  {coinTiersToNames[liqudityTier.tier]} check params carefully
                 </h3>
               )}
               {isMintOnCurve && (
@@ -338,14 +343,6 @@ const instructions = () => ({
                     </a>
                   </>
                 )}
-                {proposedOracle.type === 'Switchboard' &&
-                  (suggestedTier.tier === 'PREMIUM' ||
-                    suggestedTier.tier === 'MID') && (
-                    <span className="text-orange">
-                      Midwit or Bluechip tokens should be listed with pyth
-                      oracle
-                    </span>
-                  )}
               </div>
               <DisplayListingPropertyWrapped
                 label="Token index"
@@ -647,7 +644,7 @@ const instructions = () => ({
           x.publicKey.equals(mintInfo)
         )?.mint
 
-        let suggestedTier: Partial<{
+        let liqudityTier: Partial<{
           tier: LISTING_PRESETS_KEYS
           priceImpact: string
         }> = {}
@@ -716,9 +713,14 @@ const instructions = () => ({
 
         if (mint) {
           mintData = tokenPriceService.getTokenInfo(mint.toBase58())
-          suggestedTier = await getSuggestedCoinTier(mint.toBase58())
-          const suggestedPreset = PROPOSED_LISTING_PRESETS[suggestedTier.tier!]
-          suggestedUntrusted = suggestedTier.tier === 'UNTRUSTED'
+          const oracle = mangoGroup.banksMapByMint.get(mint.toBase58())![0]!
+            .oracle
+          const isPyth = await isPythOracle(connection, oracle)
+          liqudityTier = await getSuggestedCoinTier(mint.toBase58(), !!isPyth)
+
+          const suggestedPreset = PROPOSED_LISTING_PRESETS[liqudityTier.tier!]
+          suggestedUntrusted = liqudityTier.tier === 'UNTRUSTED'
+
           const suggestedFormattedPreset:
             | EditTokenArgsFormatted
             | Record<string, never> = Object.keys(suggestedPreset).length
@@ -765,27 +767,26 @@ const instructions = () => ({
                   Suggested token tier: UNTRUSTED.
                 </h3>
                 <h3 className="text-orange flex">
-                  Very low liquidity Price impact of{' '}
-                  {suggestedTier?.priceImpact}% on $1000 swap. Check params
-                  carefully
+                  Very low liquidity Price impact of {liqudityTier?.priceImpact}
+                  % on $1000 swap. Check params carefully
                 </h3>
               </>
             )}
-            {!suggestedUntrusted && !invalidKeys.length && suggestedTier.tier && (
+            {!suggestedUntrusted && !invalidKeys.length && liqudityTier.tier && (
               <h3 className="text-green flex items-center">
                 <CheckCircleIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
                 Proposal params match suggested token tier -{' '}
-                {coinTiersToNames[suggestedTier.tier]}.
+                {coinTiersToNames[liqudityTier.tier]}.
               </h3>
             )}
             {!suggestedUntrusted &&
               invalidKeys &&
               invalidKeys!.length > 0 &&
-              suggestedTier.tier && (
+              liqudityTier.tier && (
                 <h3 className="text-orange flex items-center">
                   <WarningFilledIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
                   Proposal params do not match suggested token tier -{' '}
-                  {coinTiersToNames[suggestedTier.tier]} check params carefully
+                  {coinTiersToNames[liqudityTier.tier]} check params carefully
                 </h3>
               )}
             <div className="border-b mb-4 pb-4 space-y-3">

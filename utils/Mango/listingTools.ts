@@ -149,7 +149,10 @@ const fetchJupiterRoutes = async (
   }
 }
 
-export const getSuggestedCoinTier = async (outputMint: string) => {
+export const getSuggestedCoinTier = async (
+  outputMint: string,
+  hasPythOracle: boolean
+) => {
   const TIERS: LISTING_PRESETS_KEYS[] = ['PREMIUM', 'MID', 'MEME', 'SHIT']
   const swaps = await Promise.all([
     fetchJupiterRoutes(
@@ -225,8 +228,15 @@ export const getSuggestedCoinTier = async (outputMint: string) => {
 
   const tier =
     indexForTierFromSwaps > -1 ? TIERS[indexForTierFromSwaps] : 'UNTRUSTED'
+
+  const tierLowerThenCurrent =
+    tier === 'PREMIUM' ? 'MID' : tier === 'MID' ? 'MEME' : tier
+  const isMidOrPremium = tier === 'MID' || tier === 'PREMIUM'
+  const listingTier =
+    isMidOrPremium && !hasPythOracle ? tierLowerThenCurrent : tier
+
   return {
-    tier,
+    tier: listingTier,
     priceImpact: (indexForTierFromSwaps > -1
       ? averageSwaps[indexForTierFromSwaps]!.priceImpactPct
       : 100
@@ -277,7 +287,10 @@ const isSwitchboardOracle = async (
     : ''
 }
 
-const isPythOracle = async (connection: Connection, feedPk: PublicKey) => {
+export const isPythOracle = async (
+  connection: Connection,
+  feedPk: PublicKey
+) => {
   const pythClient = new PythHttpClient(connection, MAINNET_PYTH_PROGRAM)
   const pythAccounts = await pythClient.getData()
   const feed = pythAccounts.products.find(
