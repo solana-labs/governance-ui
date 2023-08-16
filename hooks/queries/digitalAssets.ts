@@ -80,6 +80,11 @@ export type DasNftObject = {
       image: string
     }
   }
+  creators: {
+    address: string
+    share: number
+    verified: boolean
+  }[]
   id: string
 }
 
