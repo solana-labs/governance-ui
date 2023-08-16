@@ -204,6 +204,7 @@
     }
   },
   "resolutions": {
+    "**/@switchboard-xyz/common/protobufjs": "7.2.4",
     "port-sdk/@saberhq/token-utils": "1.12.53",
     "@solana/web3.js": "1.73.3",
     "react": "18.2.0",
