@@ -123,8 +123,7 @@ export const createLUTProposal = async (
     .map((x) => x.chunkBy!)
 
   const lowestChunkBy = chunkBys.length ? Math.min(...chunkBys) : 2
-  console.log(instructionsData)
-  console.log('lowestChunkBy', lowestChunkBy)
+
   for (const [index, instruction] of instructionsData
     .filter((x) => x.data)
     .entries()) {
