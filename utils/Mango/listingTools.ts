@@ -277,7 +277,10 @@ const isSwitchboardOracle = async (
     : ''
 }
 
-const isPythOracle = async (connection: Connection, feedPk: PublicKey) => {
+export const isPythOracle = async (
+  connection: Connection,
+  feedPk: PublicKey
+) => {
   const pythClient = new PythHttpClient(connection, MAINNET_PYTH_PROGRAM)
   const pythAccounts = await pythClient.getData()
   const feed = pythAccounts.products.find(
