@@ -218,8 +218,7 @@ const DepositCard = ({
               value={(deposit.votingPower.isZero() ||
               deposit.votingPowerBaseline.isZero()
                 ? 0
-                : deposit.votingPower.toNumber() /
-                  deposit.votingPowerBaseline.toNumber()
+                : deposit.votingPower.div(deposit.votingPowerBaseline)
               ).toFixed(2)}
             />
           )}
