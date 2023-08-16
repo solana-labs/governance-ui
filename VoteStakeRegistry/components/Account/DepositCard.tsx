@@ -217,7 +217,7 @@ const DepositCard = ({
               label="Vote Multiplier"
               value={(deposit.votingPower.isZero() ||
               deposit.votingPowerBaseline.isZero()
-                ? 0
+                ? new BN(0)
                 : deposit.votingPower.div(deposit.votingPowerBaseline)
               ).toFixed(2)}
             />
