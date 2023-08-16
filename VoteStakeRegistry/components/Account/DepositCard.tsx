@@ -24,7 +24,6 @@ import {
   SECS_PER_DAY,
 } from '@utils/dateTools'
 import { BN } from '@coral-xyz/anchor'
-import { BigNumber } from 'bignumber.js'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
@@ -218,8 +217,8 @@ const DepositCard = ({
               label="Vote Multiplier"
               value={(deposit.votingPower.isZero() ||
               deposit.votingPowerBaseline.isZero()
-                ? new BigNumber(0)
-                : deposit.votingPower.div(deposit.votingPowerBaseline)
+                ? 0
+                : deposit.votingPower.mul(100).div(deposit.votingPowerBaseline).toNumber() / 100
               ).toFixed(2)}
             />
           )}
