@@ -1,7 +1,7 @@
 import { XCircleIcon, CheckCircleIcon } from '@heroicons/react/outline'
 import { BanIcon } from '@heroicons/react/solid'
 import useProposalVotes from '@hooks/useProposalVotes'
-import { ProposalState, VoteType } from '@solana/spl-governance'
+import { GovernanceAccountType, ProposalState, VoteType } from '@solana/spl-governance'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
 import { useVetoingPop } from './VotePanel/hooks'
 
@@ -76,7 +76,8 @@ const VoteResultStatus = () => {
       ? 'vetoed'
       : 'denied')
 
-  const isMulti = proposal?.account.voteType !== VoteType.SINGLE_CHOICE;
+  const isMulti = proposal?.account.voteType !== VoteType.SINGLE_CHOICE
+   && proposal?.account.accountType === GovernanceAccountType.ProposalV2
 
   return status === undefined ? null : status === 'approved' ? isMulti ?
   (

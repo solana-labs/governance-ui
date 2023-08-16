@@ -1,6 +1,7 @@
 import {
   getTokenOwnerRecordAddress,
   getVoteRecordAddress,
+  GovernanceAccountType,
   VoteType
 } from '@solana/spl-governance'
 import { ThumbUpIcon, ThumbDownIcon } from '@heroicons/react/solid'
@@ -57,7 +58,8 @@ const Comment = ({ chatMessage }: { chatMessage: ChatMessage }) => {
     ?.account
 
   const isMulti = proposal?.account.voteType !== VoteType.SINGLE_CHOICE
-
+    && proposal?.account.accountType === GovernanceAccountType.ProposalV2
+    
   return (
     <div className="border-b border-fgd-4 mt-4 pb-4 last:pb-0 last:border-b-0">
       <div className="flex items-center justify-between mb-4">

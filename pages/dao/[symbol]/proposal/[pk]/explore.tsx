@@ -14,7 +14,7 @@ import ProposalVoteResult from '@components/ProposalVoteResults'
 import ProposalRemainingVotingTime from '@components/ProposalRemainingVotingTime'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
-import { VoteType } from '@solana/spl-governance'
+import { GovernanceAccountType, VoteType } from '@solana/spl-governance'
 import MultiChoiceVotes from '@components/MultiChoiceVotes'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import ProposalVoterNftChart from '@components/ProposalVoterNftChart'
@@ -41,7 +41,8 @@ export default function Explore() {
     router.push(newPath)
   }
   const isMulti = proposal?.account.voteType !== VoteType.SINGLE_CHOICE
-
+    && proposal?.account.accountType === GovernanceAccountType.ProposalV2
+    
   return (
     <div className="bg-bkg-2 rounded-lg p-4 space-y-3 md:p-6">
       <button

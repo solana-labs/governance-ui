@@ -1,4 +1,4 @@
-import { Proposal, ProgramAccount, VoteType } from '@solana/spl-governance'
+import { Proposal, ProgramAccount, VoteType, GovernanceAccountType } from '@solana/spl-governance'
 import classNames from 'classnames'
 import { ThumbUpIcon, ThumbDownIcon } from '@heroicons/react/solid'
 import { isYesVote } from '@models/voteRecords'
@@ -17,7 +17,8 @@ interface Props {
 export default function ProposalMyVoteBadge(props: Props) {
   const realm = useRealmQuery().data?.result
   const wallet = useWalletOnePointOh()
-  const isMulti = props.proposal.account.voteType !== VoteType.SINGLE_CHOICE;
+  const isMulti = props.proposal.account.voteType !== VoteType.SINGLE_CHOICE
+   && props.proposal.account.accountType === GovernanceAccountType.ProposalV2
 
   const { data: tokenOwnerRecordPk } = useAddressQuery_TokenOwnerRecord(
     realm?.owner,

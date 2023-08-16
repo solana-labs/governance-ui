@@ -2,7 +2,7 @@ import styled from '@emotion/styled'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import ProposalStateBadge from './ProposalStateBadge'
 import Link from 'next/link'
-import { Proposal, ProposalState, VoteType } from '@solana/spl-governance'
+import { GovernanceAccountType, Proposal, ProposalState, VoteType } from '@solana/spl-governance'
 import { ApprovalProgress, VetoProgress } from './QuorumProgress'
 import useRealm from '../hooks/useRealm'
 import useProposalVotes from '../hooks/useProposalVotes'
@@ -33,7 +33,8 @@ const ProposalCard = ({ proposalPk, proposal }: ProposalCardProps) => {
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
   const votesData = useProposalVotes(proposal)
-  const isMulti = proposal.voteType !== VoteType.SINGLE_CHOICE;
+  const isMulti = proposal.voteType !== VoteType.SINGLE_CHOICE
+   && proposal.accountType === GovernanceAccountType.ProposalV2
 
   return (
     <div>

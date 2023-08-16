@@ -1,4 +1,4 @@
-import { VoteKind, VoteType, withFinalizeVote } from '@solana/spl-governance'
+import { GovernanceAccountType, VoteKind, VoteType, withFinalizeVote } from '@solana/spl-governance'
 import { TransactionInstruction } from '@solana/web3.js'
 import { useState } from 'react'
 import { relinquishVote } from '../../actions/relinquishVote'
@@ -143,8 +143,10 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
   }
 
   const vote = ownVoteRecord?.account.vote
-  const isMulti = proposal?.account.voteType !== VoteType.SINGLE_CHOICE;
 
+  const isMulti = proposal?.account.voteType !== VoteType.SINGLE_CHOICE
+    && proposal?.account.accountType === GovernanceAccountType.ProposalV2
+    
   return vote !== undefined ? (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-4">
       <div className="flex flex-col items-center justify-center">

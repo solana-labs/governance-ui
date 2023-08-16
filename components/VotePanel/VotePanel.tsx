@@ -1,4 +1,4 @@
-import { ProposalState, VoteType } from '@solana/spl-governance'
+import { GovernanceAccountType, ProposalState, VoteType } from '@solana/spl-governance'
 import { BanIcon } from '@heroicons/react/solid'
 
 import Tooltip from '@components/Tooltip'
@@ -30,6 +30,7 @@ const VotePanel = () => {
     !isVoteCast
 
   const isMulti = proposal?.account.voteType !== VoteType.SINGLE_CHOICE
+    && proposal?.account.accountType === GovernanceAccountType.ProposalV2
 
   return (
     <>
@@ -47,7 +48,7 @@ const VotePanel = () => {
       )}
       {/* START: Note that these components control for themselves whether they are displayed and may not be visible */}
       <YouVoted quorum="electoral" />
-      {proposal && isMulti && proposal.account.options ? (
+      {proposal && isMulti ? (
         <CastMultiVoteButtons proposal={proposal.account} />
       ) : (
         <CastVoteButtons />
