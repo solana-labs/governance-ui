@@ -2,6 +2,7 @@ import { Keypair, Transaction, TransactionInstruction } from '@solana/web3.js'
 import {
   ChatMessageBody,
   getGovernanceProgramVersion,
+  GovernanceAccountType,
   GOVERNANCE_CHAT_PROGRAM_ID,
   Proposal,
   Realm,
@@ -80,6 +81,7 @@ export async function castVote(
   )
 
   const isMulti = proposal.account.voteType !== VoteType.SINGLE_CHOICE
+   && proposal.account.accountType === GovernanceAccountType.ProposalV2
 
   // It is not clear that defining these extraneous fields, `deny` and `veto`, is actually necessary.
   // See:  https://discord.com/channels/910194960941338677/910630743510777926/1044741454175674378
