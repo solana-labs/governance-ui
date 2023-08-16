@@ -24,7 +24,7 @@ import {
   SECS_PER_DAY,
 } from '@utils/dateTools'
 import { BN } from '@coral-xyz/anchor'
-import { BigNumber } from 'bignumber.js';
+import { BigNumber } from 'bignumber.js'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
