@@ -215,6 +215,7 @@ const Grant = ({
       isValid,
       governance: form.governedTokenAccount?.governance,
       prerequisiteInstructions: prerequisiteInstructions,
+      chunkBy: 1,
     }
     return obj
   }, [
