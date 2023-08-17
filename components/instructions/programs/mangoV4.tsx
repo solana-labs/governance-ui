@@ -15,8 +15,8 @@ import EmptyWallet, {
   getOracle,
   getBestMarket,
   EditTokenArgsFormatted,
-  PROPOSED_LISTING_PRESETS,
   isPythOracle,
+  getFormattedListingPresets,
 } from '@utils/Mango/listingTools'
 import { secondsToHours } from 'date-fns'
 import WarningFilledIcon from '@carbon/icons-react/lib/WarningFilled'
@@ -232,7 +232,9 @@ const instructions = () => ({
       )
 
       const formattedProposedArgs = getFormattedListingValues(args)
-      const suggestedPreset = PROPOSED_LISTING_PRESETS[liqudityTier.tier]
+      const suggestedPreset = getFormattedListingPresets(
+        proposedOracle.type === 'Pyth'
+      )[liqudityTier.tier]
       const suggestedUntrusted = liqudityTier.tier === 'UNTRUSTED'
 
       const suggestedFormattedPreset: ListingArgsFormatted = Object.keys(
@@ -718,7 +720,9 @@ const instructions = () => ({
           const isPyth = await isPythOracle(connection, oracle)
           liqudityTier = await getSuggestedCoinTier(mint.toBase58(), !!isPyth)
 
-          const suggestedPreset = PROPOSED_LISTING_PRESETS[liqudityTier.tier!]
+          const suggestedPreset = getFormattedListingPresets(!!isPyth)[
+            liqudityTier.tier!
+          ]
           suggestedUntrusted = liqudityTier.tier === 'UNTRUSTED'
 
           const suggestedFormattedPreset:
