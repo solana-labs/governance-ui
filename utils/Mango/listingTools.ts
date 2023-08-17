@@ -6,6 +6,7 @@ import {
 import {
   LISTING_PRESETS,
   LISTING_PRESETS_KEYS,
+  LISTING_PRESETS_PYTH,
   ListingPreset,
 } from '@blockworks-foundation/mango-v4-settings/lib/helpers/listingTools'
 import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
@@ -110,12 +111,16 @@ type ProposedListingPresets = {
   [key in LISTING_PRESETS_KEYS]: PureListingArgsOrEmptyObj
 }
 
-export const PROPOSED_LISTING_PRESETS: ProposedListingPresets = Object.keys(
-  LISTING_PRESETS
-).reduce((accumulator, key) => {
-  accumulator[key] = transformPresetToProposed(LISTING_PRESETS[key])
-  return accumulator
-}, {} as ProposedListingPresets)
+export const getFormattedListingPresets = (isPythOracle: boolean) => {
+  const PRESETS = isPythOracle ? LISTING_PRESETS_PYTH : LISTING_PRESETS
+  const PROPOSED_LISTING_PRESETS: ProposedListingPresets = Object.keys(
+    PRESETS
+  ).reduce((accumulator, key) => {
+    accumulator[key] = transformPresetToProposed(PRESETS[key])
+    return accumulator
+  }, {} as ProposedListingPresets)
+  return PROPOSED_LISTING_PRESETS
+}
 
 const fetchJupiterRoutes = async (
   inputMint = 'So11111111111111111111111111111111111111112',
