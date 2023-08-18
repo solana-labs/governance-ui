@@ -6,11 +6,12 @@ import {
   showTransactionError,
   showTransactionsProcessUi,
 } from './transactionsLoader'
+
+import { invalidateInstructionAccounts } from '@hooks/queries/queryClient'
 import {
   sendSignAndConfirmTransactions,
   sendSignAndConfirmTransactionsProps,
-} from '@blockworks-foundation/mangolana/lib/transactions'
-import { invalidateInstructionAccounts } from '@hooks/queries/queryClient'
+} from './modifiedMangolana'
 
 export type WalletSigner = Pick<
   SignerWalletAdapter,
@@ -38,6 +39,7 @@ export const sendTransactionsV3 = ({
   timeoutStrategy,
   callbacks,
   config,
+  lookupTableAccounts,
 }: sendSignAndConfirmTransactionsProps) => {
   const callbacksWithUiComponent = {
     afterBatchSign: (signedTxnsCount) => {
@@ -105,6 +107,7 @@ export const sendTransactionsV3 = ({
     callbacks: callbacksWithUiComponent,
     config: cfg,
     confirmLevel: 'confirmed', //TODO base this on connection confirmation level
+    lookupTableAccounts,
   })
 }
 

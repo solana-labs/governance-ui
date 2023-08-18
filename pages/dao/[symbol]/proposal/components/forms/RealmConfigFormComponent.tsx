@@ -11,10 +11,9 @@ import {
 import { precision } from '@utils/formatting'
 import BigNumber from 'bignumber.js'
 import { AssetAccount } from '@utils/uiTypes/assets'
-import InstructionForm, {
-  InstructionInput,
-  InstructionInputType,
-} from '../instructions/FormCreator'
+import type { InstructionInput } from '../instructions/FormCreator'
+import { InstructionInputType } from '../instructions/inputInstructionType'
+import InstructionForm from '../instructions/FormCreator'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
@@ -22,19 +21,6 @@ import {
   useRealmCommunityMintInfoQuery,
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
-
-export interface RealmConfigForm {
-  governedAccount: AssetAccount | undefined
-  minCommunityTokensToCreateGovernance: number
-  communityVoterWeightAddin: string
-  removeCouncil: boolean
-  maxCommunityVoterWeightAddin: string
-  communityMintSupplyFactor: number
-  communityTokenType: typeof TOKEN_TYPE_NAME_VALUES[number] // programVersion >= v3
-  councilTokenType: typeof TOKEN_TYPE_NAME_VALUES[number] // programVersion >= v3
-  councilVoterWeightAddin: string // programVersion >= v3
-  maxCouncilVoterWeightAddin: string // programVersion >= v3
-}
 
 const TOKEN_TYPE_NAME_VALUES = [
   { name: 'Liquid', value: GoverningTokenType.Liquid },

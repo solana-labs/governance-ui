@@ -50,14 +50,18 @@ const formatNumber = (value: BN, decimals: number) => {
   return formatter.format(num.toNumber())
 }
 
-const voteTypeText = (type: VoteType) => {
+const voteTypeText = (type: VoteType, isMulti: boolean) => {
   switch (type) {
     case VoteType.No:
       return 'Nay'
     case VoteType.Undecided:
       return ''
     case VoteType.Yes:
-      return 'Yay'
+      if (isMulti) {
+        return 'Voted'
+      } else {
+        return 'Yay'
+      }
   }
 }
 
@@ -103,6 +107,7 @@ interface Props {
   className?: string
   data: VoterDisplayData[]
   endpoint: string
+  isMulti: boolean
   highlighted?: string
   onHighlight?(key?: string): void
 }
@@ -213,7 +218,7 @@ export default function ProposalTopVotersList(props: Props) {
                         'text-sm'
                       )}
                     >
-                      {voteTypeText(rowData.voteType)}
+                      {voteTypeText(rowData.voteType, props.isMulti)}
                     </div>
                     <div
                       className={classNames(
@@ -242,8 +247,10 @@ export default function ProposalTopVotersList(props: Props) {
       </div>
       <div className="flex-shink-0 text-xs px-2 mt-3 flex items-center gap-3">
         Show:
-        <Filter defaultChecked={showYays} label="Yays" onChange={setShowYays} />
-        <Filter defaultChecked={showNays} label="Nays" onChange={setShowNays} />
+        <Filter defaultChecked={showYays} label={props.isMulti ? "Voted" : "Yays"} onChange={setShowYays} />
+        {!props.isMulti &&
+          <Filter defaultChecked={showNays} label="Nays" onChange={setShowNays} />
+        }
         <Filter
           defaultChecked={showUndecideds}
           label="Undecided"

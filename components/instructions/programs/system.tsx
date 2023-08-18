@@ -65,5 +65,16 @@ export const SYSTEM_INSTRUCTIONS = {
         return <p>No Instruction data</p>
       },
     },
+    9: {
+      name: 'System Program - Allocate',
+      accounts: [],
+      getDataUI: (
+        _connection: Connection,
+        _data: Uint8Array,
+        _accounts: AccountMetaData[]
+      ) => {
+        return <p></p>
+      },
+    },
   },
 }

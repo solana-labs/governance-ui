@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { BigNumber } from 'bignumber.js'
 import useRealm from '@hooks/useRealm'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
@@ -110,11 +110,7 @@ export default function LockedCommunityNFTRecordVotingPower(props: Props) {
   return (
     <div className={`${props.className} -mt-10`}>
       <div className="mb-4 flex justify-end">
-        <Link
-          href={fmtUrlWithCluster(
-            `/dao/${symbol}/account/${tokenOwnerRecordPk}`
-          )}
-        >
+        <Link href={fmtUrlWithCluster(`/dao/${symbol}/account/me`)}>
           <a
             className={`default-transition flex items-center text-fgd-2 text-sm transition-all hover:text-fgd-3 ${
               !connected || !tokenOwnerRecordPk

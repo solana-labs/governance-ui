@@ -59,6 +59,17 @@ export default function ProposalExecutionCard(props: Props) {
 
   const { ready, notReady, executed, nextExecuteAt } = proposalTransactions
 
+  //Temp solutions for execution of small instructions in one tx until other instructions are not
+  //rewrite to handle tx separation it self
+  const isOneTx = () => {
+    if (!ready || !ready.length || ready.length !== 2) {
+      return false
+    }
+    return true
+  }
+
+  const executeAllInOneTx = isOneTx() ? true : false
+
   return (
     <div
       className={classNames(
@@ -95,7 +106,7 @@ export default function ProposalExecutionCard(props: Props) {
               setPlaying={setPlayState}
               small={false}
               proposalInstructions={ready}
-              multiTransactionMode={true}
+              multiTransactionMode={!executeAllInOneTx}
             />
           ) : (
             <Button className="w-48" disabled>

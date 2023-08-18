@@ -17,6 +17,7 @@ const useSelectedRealmPubkey = () => {
 
   // if we cant just parse the realm pk from the url, look it up.
   // this happens a lot and might be slightly expensive so i decided to use react-query
+  // but really something not async would be more appropriate.
   const { data: lookup } = useQuery({
     enabled: typeof symbol === 'string' && parsed === undefined,
     queryKey: ['Realms symbol lookup', symbol],

@@ -2,12 +2,14 @@ import { Keypair, Transaction, TransactionInstruction } from '@solana/web3.js'
 import {
   ChatMessageBody,
   getGovernanceProgramVersion,
+  GovernanceAccountType,
   GOVERNANCE_CHAT_PROGRAM_ID,
   Proposal,
   Realm,
   TokenOwnerRecord,
   VoteChoice,
   VoteKind,
+  VoteType,
   withPostChatMessage,
 } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
@@ -52,10 +54,14 @@ export async function castVote(
   voteKind: VoteKind,
   message?: ChatMessageBody | undefined,
   votingPlugin?: VotingClient,
-  runAfterConfirmation?: (() => void) | null
+  runAfterConfirmation?: (() => void) | null,
+  voteWeights?: number[]
 ) {
   const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []
+
+  const createCastNftVoteTicketIxs: TransactionInstruction[] = []
+  const createPostMessageTicketIxs: TransactionInstruction[] = []
 
   const governanceAuthority = walletPubkey
   const payer = walletPubkey
@@ -70,39 +76,56 @@ export async function castVote(
   const plugin = await votingPlugin?.withCastPluginVote(
     instructions,
     proposal,
-    tokenOwnerRecord.pubkey
+    tokenOwnerRecord.pubkey,
+    createCastNftVoteTicketIxs
   )
+
+  const isMulti =
+    proposal.account.voteType !== VoteType.SINGLE_CHOICE &&
+    proposal.account.accountType === GovernanceAccountType.ProposalV2
 
   // It is not clear that defining these extraneous fields, `deny` and `veto`, is actually necessary.
   // See:  https://discord.com/channels/910194960941338677/910630743510777926/1044741454175674378
-  const vote =
-    voteKind === VoteKind.Approve
-      ? new Vote({
-          voteType: VoteKind.Approve,
-          approveChoices: [new VoteChoice({ rank: 0, weightPercentage: 100 })],
-          deny: undefined,
-          veto: undefined,
-        })
-      : voteKind === VoteKind.Deny
-      ? new Vote({
-          voteType: VoteKind.Deny,
-          approveChoices: undefined,
-          deny: true,
-          veto: undefined,
-        })
-      : voteKind == VoteKind.Veto
-      ? new Vote({
-          voteType: VoteKind.Veto,
-          veto: true,
-          deny: undefined,
-          approveChoices: undefined,
-        })
-      : new Vote({
-          voteType: VoteKind.Abstain,
-          veto: undefined,
-          deny: undefined,
-          approveChoices: undefined,
-        })
+  const vote = isMulti
+    ? new Vote({
+        voteType: VoteKind.Approve,
+        approveChoices: proposal.account.options.map((_o, index) => {
+          if (voteWeights?.includes(index)) {
+            return new VoteChoice({ rank: 0, weightPercentage: 100 })
+          } else {
+            return new VoteChoice({ rank: 0, weightPercentage: 0 })
+          }
+        }),
+        deny: undefined,
+        veto: undefined,
+      })
+    : voteKind === VoteKind.Approve
+    ? new Vote({
+        voteType: VoteKind.Approve,
+        approveChoices: [new VoteChoice({ rank: 0, weightPercentage: 100 })],
+        deny: undefined,
+        veto: undefined,
+      })
+    : voteKind === VoteKind.Deny
+    ? new Vote({
+        voteType: VoteKind.Deny,
+        approveChoices: undefined,
+        deny: true,
+        veto: undefined,
+      })
+    : voteKind == VoteKind.Veto
+    ? new Vote({
+        voteType: VoteKind.Veto,
+        veto: true,
+        deny: undefined,
+        approveChoices: undefined,
+      })
+    : new Vote({
+        voteType: VoteKind.Abstain,
+        veto: undefined,
+        deny: undefined,
+        approveChoices: undefined,
+      })
 
   const tokenMint =
     voteKind === VoteKind.Veto
@@ -130,7 +153,8 @@ export async function castVote(
     const plugin = await votingPlugin?.withUpdateVoterWeightRecord(
       instructions,
       tokenOwnerRecord.pubkey,
-      'commentProposal'
+      'commentProposal',
+      createPostMessageTicketIxs
     )
 
     await withPostChatMessage(
@@ -218,17 +242,19 @@ export async function castVote(
       openNftVotingCountingModal,
       closeNftVotingCountingModal,
     } = useNftProposalStore.getState()
-    //update voter weight + cast vote from spl gov need to be in one transaction
-    const ixsWithOwnChunk = instructions.slice(-ixChunkCount)
-    const remainingIxsToChunk = instructions.slice(
-      0,
-      instructions.length - ixChunkCount
+
+    const createNftVoteTicketsChunks = chunks(
+      [...createCastNftVoteTicketIxs, ...createPostMessageTicketIxs],
+      1
     )
 
-    const splIxsWithAccountsChunk = chunks(ixsWithOwnChunk, 2)
-    const nftsAccountsChunks = chunks(remainingIxsToChunk, 2)
+    const splIxs = instructions.slice(-ixChunkCount)
+    const nftAccountIxs = instructions.slice(0, -ixChunkCount)
+
+    const splIxsWithAccountsChunk = chunks(splIxs, 2)
+    const nftsAccountsChunks = chunks(nftAccountIxs, 2)
     const instructionsChunks = [
-      ...nftsAccountsChunks.map((txBatch, batchIdx) => {
+      ...createNftVoteTicketsChunks.map((txBatch, batchIdx) => {
         return {
           instructionsSet: txBatchesToInstructionSetWithSigners(
             txBatch,
@@ -236,6 +262,18 @@ export async function castVote(
             batchIdx
           ),
           sequenceType: SequenceType.Parallel,
+        }
+      }),
+      ...nftsAccountsChunks.map((txBatch, batchIdx) => {
+        return {
+          instructionsSet: txBatchesToInstructionSetWithSigners(
+            txBatch,
+            [],
+            batchIdx
+          ),
+          sequenceType:
+            // this is to ensure create all the nft_action_tickets account first
+            batchIdx == 0 ? SequenceType.Sequential : SequenceType.Parallel,
         }
       }),
       ...splIxsWithAccountsChunk.map((txBatch, batchIdx) => {

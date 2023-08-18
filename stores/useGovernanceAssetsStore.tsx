@@ -8,7 +8,12 @@ import {
   ProgramAccount,
   GovernanceAccountType,
 } from '@solana/spl-governance'
-import { ParsedAccountData, PublicKey } from '@solana/web3.js'
+import {
+  LAMPORTS_PER_SOL,
+  ParsedAccountData,
+  PublicKey,
+  StakeProgram,
+} from '@solana/web3.js'
 import { AccountInfo, MintInfo } from '@solana/spl-token'
 import {
   AUXILIARY_TOKEN_ACCOUNTS,
@@ -40,34 +45,21 @@ import {
   AccountTypeToken,
   AssetAccount,
   GovernanceProgramAccountWithNativeTreasuryAddress,
+  AccountTypeStake,
+  StakeState,
 } from '@utils/uiTypes/assets'
 import group from '@utils/group'
-import { fetchParsedAccountInfoByPubkey } from '@hooks/queries/parsedAccountInfo'
+import { getFilteredProgramAccounts } from '@utils/helpers'
+import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes'
 
 const additionalPossibleMintAccounts = {
-  Mango: [new PublicKey('EGk8Gw7Z484mzAKb7GwCcqrZd4KwwsyU2Dv9woY6uDQu')],
+  Mango: [
+    new PublicKey('EGk8Gw7Z484mzAKb7GwCcqrZd4KwwsyU2Dv9woY6uDQu'),
+    new PublicKey('8gjzxiqcU87cvRc7hFiUJgxqLSV7AQnSttfWC5fD9aim'),
+  ],
 }
 const tokenAccountOwnerOffset = 32
 const programAccountOwnerOffset = 13
-
-//until indexing for devnet we don't fetch devnet programs temp solution
-const devnetHardcodedPrograms = {
-  //governance dao
-  FMEWULPSGR1BKVJK4K7xTjhG23NfYxeAn2bamYgNoUck: [
-    'vsr2nfGVNHmSY8uxoBGqq8AQbwz3JwaEaHqGbsTPXqQ',
-    'DFYh1afNSQk4bSgLWidwxaeRpyYM2zm4c4WwE6S8fzS9',
-    'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw',
-    'GTesTBiEWE32WHXXE2S4XbZvA5CrEc4xs6ZgRe895dP',
-  ],
-  GsoJzs1Pb5J31huQki69G3Ng4zBco5d1Feu28tH7CJCu: [
-    'Fs9fJums4kmSUhEc5SFTUttzJQdicEYq54wgLqZVYqeP',
-    'FUP8CyQ5UkxTkZgkkQEZbpAixb5Kwbz4RqAPitBQyW7p',
-  ],
-  //metaplex dao
-  CmfnQAJjgUWge1ACV8rCtKWS65GaQu7sVGoFd5qdJEfm: [
-    'metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s',
-  ],
-}
 
 interface SolAccInfo {
   governancePk: PublicKey
@@ -183,6 +175,14 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
       }, [] as string[])
     )
     accounts.push(...governedTokenAccounts)
+    const stakeAccounts = await loadStakeAccounts(
+      connection,
+      governedTokenAccounts.filter(
+        (x) => x.isSol && x.extensions.solAccount?.lamports
+      )
+    )
+    accounts.push(...stakeAccounts)
+
     set((s) => {
       s.loadTokenAccounts = false
       s.governedTokenAccounts = accounts
@@ -469,11 +469,7 @@ const getProgramAssetAccounts = async (
       .map((x) => x.pubkey),
   ]
 
-  //until indexing for devnet we don't fetch devnet programs
-  const programs =
-    connection.cluster !== 'devnet'
-      ? await getProgramAccountInfo(connection, possibleOwnersPk)
-      : await getHardcodedDevnetPrograms(connection, governancesArray)
+  const programs = await getProgramAccountInfo(connection, possibleOwnersPk)
 
   return programs.map(
     (program) =>
@@ -806,6 +802,7 @@ const loadGovernedTokenAccounts = async (
   realm: ProgramAccount<Realm>,
   governancesArray: GovernanceProgramAccountWithNativeTreasuryAddress[]
 ): Promise<AssetAccount[]> => {
+  console.log('loadGovernedTokenAccounts has been called')
   const auxiliaryTokenAccounts: typeof AUXILIARY_TOKEN_ACCOUNTS[keyof typeof AUXILIARY_TOKEN_ACCOUNTS] = AUXILIARY_TOKEN_ACCOUNTS[
     realm.account.name
   ]?.length
@@ -840,6 +837,77 @@ const loadGovernedTokenAccounts = async (
   return uniqueGovernedTokenAccounts(governedTokenAccounts)
 }
 
+const loadStakeAccounts = async (
+  connection: ConnectionContext,
+  solAccounts: AssetAccount[]
+) => {
+  const accountsNotYetStaked = await Promise.all(
+    solAccounts.map((x) =>
+      getFilteredProgramAccounts(connection.current, StakeProgram.programId, [
+        {
+          memcmp: {
+            offset: 0,
+            bytes: bs58.encode([1, 0, 0, 0]),
+          },
+        },
+        {
+          memcmp: {
+            offset: 44,
+            bytes: x.extensions.transferAddress,
+          },
+        },
+      ])
+    )
+  )
+  const accountsStaked = await Promise.all(
+    solAccounts.map((x) =>
+      getFilteredProgramAccounts(connection.current, StakeProgram.programId, [
+        {
+          memcmp: {
+            offset: 0,
+            bytes: bs58.encode([2, 0, 0, 0]),
+          },
+        },
+        {
+          memcmp: {
+            offset: 44,
+            bytes: x.extensions.transferAddress,
+          },
+        },
+      ])
+    )
+  )
+  const accountsNotYetStakedMapped = accountsNotYetStaked.flatMap((x, idx) =>
+    x.map((stake) => ({ ...stake, governance: solAccounts[idx].governance }))
+  )
+  const accountsStakedMapped = accountsStaked.flatMap((x, idx) =>
+    x.map((stake) => ({ ...stake, governance: solAccounts[idx].governance }))
+  )
+
+  return [
+    ...accountsNotYetStakedMapped.map(
+      (x) =>
+        new AccountTypeStake(
+          x.governance,
+          x.publicKey,
+          StakeState.Inactive,
+          null,
+          x.accountInfo.lamports / LAMPORTS_PER_SOL
+        )
+    ),
+    ...accountsStakedMapped.map(
+      (x) =>
+        new AccountTypeStake(
+          x.governance,
+          x.publicKey,
+          StakeState.Active,
+          PublicKey.decode(x.accountInfo.data.slice(124, 124 + 32)),
+          x.accountInfo.lamports / LAMPORTS_PER_SOL
+        )
+    ),
+  ]
+}
+
 const getAccountsForGovernances = async (
   connection: ConnectionContext,
   realm: ProgramAccount<Realm>,
@@ -870,7 +938,6 @@ const getAccountsForGovernances = async (
   if (additionalMintAccounts) {
     possibleMintAccountPks.push(...additionalMintAccounts)
   }
-
   // 1 - Load accounts related to program governances
   // 2 - Load token accounts behind any type of governance
   // 3 - Load accounts related to mint
@@ -1049,51 +1116,4 @@ const getProgramAccountInfo = async (
   }
 
   return result
-}
-
-//until indexing for devnet we don't fetch devnet programs temp solution
-const getHardcodedDevnetPrograms = async (
-  connection: ConnectionContext,
-  governancesArray: GovernanceProgramAccountWithNativeTreasuryAddress[]
-) => {
-  const accounts: {
-    owner: PublicKey
-    programId: PublicKey
-  }[] = []
-  const realmId = governancesArray[0]?.account.realm.toBase58()
-  if (realmId) {
-    const programIds = devnetHardcodedPrograms[realmId] || []
-    for (const id of programIds) {
-      const programAccount = (
-        await fetchParsedAccountInfoByPubkey(
-          connection.current,
-          new PublicKey(id)
-        )
-      ).result
-      const programDataPk = programAccount?.data['parsed']?.info?.programData
-      if (programDataPk) {
-        const programInfo = (
-          await fetchParsedAccountInfoByPubkey(
-            connection.current,
-            new PublicKey(programDataPk)
-          )
-        ).result
-        const info = programInfo?.data['parsed']?.info
-        const authority = info.authority
-        if (
-          governancesArray.find(
-            (x) =>
-              x.nativeTreasuryAddress.toBase58() === authority ||
-              x.pubkey.toBase58() === authority
-          )
-        ) {
-          accounts.push({
-            owner: new PublicKey(authority),
-            programId: new PublicKey(id),
-          })
-        }
-      }
-    }
-  }
-  return accounts
 }

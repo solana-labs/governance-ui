@@ -16,8 +16,14 @@ import { capitalize } from '@utils/helpers'
 import { Member } from 'utils/uiTypes/members'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useTokenOwnerRecordsForRealmQuery } from '@hooks/queries/tokenOwnerRecord'
-import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { useQuery } from '@tanstack/react-query'
+import { useConnection } from '@solana/wallet-adapter-react'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import { NFT_PLUGINS_PKS } from '@constants/plugins'
+import { useNftRegistrarCollection } from '@hooks/useNftRegistrarCollection'
+import { fetchDigitalAssetsByOwner } from '@hooks/queries/digitalAssets'
+import { getNetworkFromEndpoint } from '@utils/connection'
+import { BN } from '@coral-xyz/anchor'
 
 /**
  * @deprecated
@@ -27,9 +33,19 @@ export const useMembersQuery = () => {
   const realm = useRealmQuery().data?.result
   const { data: tors } = useTokenOwnerRecordsForRealmQuery()
 
-  const connection = useLegacyConnectionContext()
+  const connection = useConnection()
+  const config = useRealmConfigQuery().data?.result
+  const currentPluginPk = config?.account.communityTokenConfig.voterWeightAddin
+  const isNftMode =
+    currentPluginPk && NFT_PLUGINS_PKS.includes(currentPluginPk?.toBase58())
+  const usedCollectionsPks = useNftRegistrarCollection()
 
-  const enabled = tors !== undefined && realm !== undefined
+  const network = getNetworkFromEndpoint(connection.connection.rpcEndpoint)
+  if (network === 'localnet') throw new Error()
+  const enabled =
+    tors !== undefined &&
+    realm !== undefined &&
+    (!isNftMode || usedCollectionsPks !== undefined)
 
   const query = useQuery({
     enabled,
@@ -41,13 +57,41 @@ export const useMembersQuery = () => {
 
       const communityMint = realm.account.communityMint
 
-      const tokenRecordArray = tors
-        .filter((x) => x.account.governingTokenMint.equals(communityMint))
-        .map((x) => ({
-          walletAddress: x.account.governingTokenOwner.toString(),
-          community: x,
-          _kind: 'community' as const,
-        }))
+      const tokenRecordArray = isNftMode
+        ? await Promise.all(
+            tors.map(async (x) => {
+              const ownedNfts = await fetchDigitalAssetsByOwner(
+                network,
+                x.account.governingTokenOwner
+              )
+
+              const verifiedNfts = ownedNfts.filter((nft) => {
+                const collection = nft.grouping.find(
+                  (x) => x.group_key === 'collection'
+                )
+                return (
+                  collection &&
+                  usedCollectionsPks.includes(collection.group_value)
+                )
+              })
+
+              x.account.governingTokenDepositAmount = new BN( // maybe should use add?
+                verifiedNfts.length * 10 ** 6
+              )
+              return {
+                walletAddress: x.account.governingTokenOwner.toString(),
+                community: x,
+                _kind: 'community' as const,
+              }
+            })
+          )
+        : tors
+            .filter((x) => x.account.governingTokenMint.equals(communityMint))
+            .map((x) => ({
+              walletAddress: x.account.governingTokenOwner.toString(),
+              community: x,
+              _kind: 'community' as const,
+            }))
 
       const councilRecordArray =
         councilMint !== undefined
@@ -63,7 +107,7 @@ export const useMembersQuery = () => {
       const fetchCouncilMembersWithTokensOutsideRealm = async () => {
         if (realm?.account.config.councilMint) {
           const tokenAccounts = await getTokenAccountsByMint(
-            connection.current,
+            connection.connection,
             realm.account.config.councilMint.toBase58()
           )
           const tokenAccountsInfo: TokenProgramAccount<AccountInfo>[] = []
@@ -102,7 +146,7 @@ export const useMembersQuery = () => {
             ATAS.push(ata)
           }
           const ownersAtas = await getMultipleAccountInfoChunked(
-            connection.current,
+            connection.connection,
             ATAS
           )
           const ownersAtasParsed: TokenProgramAccount<AccountInfo>[] = ownersAtas
@@ -212,7 +256,6 @@ export const useMembersQuery = () => {
       console.log('useMembers is fetching')
 
       let members = [...membersWithTokensDeposited]
-
       const [councilMembers, communityMembers] = await Promise.all([
         fetchCouncilMembersWithTokensOutsideRealm(),
         fetchCommunityMembersATAS(),
@@ -224,7 +267,6 @@ export const useMembersQuery = () => {
       const activeMembers = members.filter(
         (x) => !x.councilVotes.isZero() || !x.communityVotes.isZero()
       )
-
       return activeMembers
     },
   })

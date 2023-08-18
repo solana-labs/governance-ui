@@ -1,19 +1,19 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState, useMemo } from 'react'
 import { ProgramAccount, Governance } from '@solana/spl-governance'
 import {
   UiInstruction,
   DualFinanceWithdrawForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
-import GovernedAccountSelect from '../../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import Input from '@components/inputs/Input'
 import { getWithdrawInstruction } from '@utils/instructions/Dual'
 import { getDualFinanceWithdrawSchema } from '@utils/validations'
-import Tooltip from '@components/Tooltip'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import Input from '@components/inputs/Input'
+import GovernedAccountSelect from '../../GovernedAccountSelect'
+import Tooltip from '@components/Tooltip'
 
 const DualWithdraw = ({
   index,
@@ -40,7 +40,7 @@ const DualWithdraw = ({
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-  const schema = getDualFinanceWithdrawSchema()
+  const schema = useMemo(getDualFinanceWithdrawSchema, [])
   useEffect(() => {
     function getInstruction(): Promise<UiInstruction> {
       return getWithdrawInstruction({
@@ -55,15 +55,7 @@ const DualWithdraw = ({
       { governedAccount: governedAccount, getInstruction },
       index
     )
-  }, [
-    form,
-    governedAccount,
-    handleSetInstructions,
-    index,
-    connection,
-    schema,
-    wallet,
-  ])
+  }, [form, governedAccount, handleSetInstructions, index, connection, wallet])
   useEffect(() => {
     handleSetForm({ value: undefined, propertyName: 'mintPk' })
   }, [form.baseTreasury])

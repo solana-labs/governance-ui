@@ -53,10 +53,12 @@ export const useSubmitVote = () => {
       vote,
       voterTokenRecord,
       comment,
+      voteWeights
     }: {
       vote: VoteKind
       voterTokenRecord: ProgramAccount<TokenOwnerRecord>
-      comment?: string
+      comment?: string,
+      voteWeights?: number[]
     }) => {
       const rpcContext = new RpcContext(
         proposal!.owner,
@@ -88,7 +90,8 @@ export const useSubmitVote = () => {
           vote,
           msg,
           client,
-          confirmationCallback
+          confirmationCallback,
+          voteWeights
         )
         queryClient.invalidateQueries({
           queryKey: ['Proposal'],

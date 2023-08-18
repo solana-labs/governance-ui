@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
@@ -9,10 +9,8 @@ import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
-import InstructionForm, {
-  InstructionInput,
-  InstructionInputType,
-} from '../../FormCreator'
+import InstructionForm, { InstructionInput } from '../../FormCreator'
+import { InstructionInputType } from '../../inputInstructionType'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { buildIxGate } from '@blockworks-foundation/mango-v4'
 import { IxGateParams } from '@blockworks-foundation/mango-v4/dist/types/src/clientIxParamBuilder'
@@ -99,7 +97,23 @@ const IxGateSet = ({
     AccountBuybackFeesWithMngo: true,
     TokenForceCloseBorrowsWithToken: true,
     PerpForceClosePosition: true,
-    GroupWithdrawInsuranceFund: true
+    GroupWithdrawInsuranceFund: true,
+
+    TokenConditionalSwapCreate: true,
+    TokenConditionalSwapTrigger: true,
+    TokenConditionalSwapCancel: true,
+    OpenbookV2CancelOrder: true,
+    OpenbookV2CloseOpenOrders: true,
+    OpenbookV2CreateOpenOrders: true,
+    OpenbookV2DeregisterMarket: true,
+    OpenbookV2EditMarket: true,
+    OpenbookV2LiqForceCancelOrders: true,
+    OpenbookV2PlaceOrder: true,
+    OpenbookV2PlaceTakeOrder: true,
+    OpenbookV2RegisterMarket: true,
+    OpenbookV2SettleFunds: true,
+    AdminTokenWithdrawFees: true,
+    AdminPerpWithdrawFees: true,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -492,17 +506,107 @@ const IxGateSet = ({
       name: 'TokenForceCloseBorrowsWithToken',
     },
     {
-        label: 'Perp Force Close Position',
-        initialValue: form.PerpForceClosePosition,
-        type: InstructionInputType.SWITCH,
-        name: 'PerpForceClosePosition',
-      },
-      {
-        label: 'Group Withdraw Insurance Fund',
-        initialValue: form.GroupWithdrawInsuranceFund,
-        type: InstructionInputType.SWITCH,
-        name: 'GroupWithdrawInsuranceFund',
-      },
+      label: 'Perp Force Close Position',
+      initialValue: form.PerpForceClosePosition,
+      type: InstructionInputType.SWITCH,
+      name: 'PerpForceClosePosition',
+    },
+    {
+      label: 'Group Withdraw Insurance Fund',
+      initialValue: form.GroupWithdrawInsuranceFund,
+      type: InstructionInputType.SWITCH,
+      name: 'GroupWithdrawInsuranceFund',
+    },
+    {
+      label: 'Token Conditional Swap Create',
+      initialValue: form.TokenConditionalSwapCreate,
+      type: InstructionInputType.SWITCH,
+      name: 'TokenConditionalSwapCreate',
+    },
+    {
+      label: 'Token Conditional Swap Trigger',
+      initialValue: form.TokenConditionalSwapTrigger,
+      type: InstructionInputType.SWITCH,
+      name: 'TokenConditionalSwapTrigger',
+    },
+    {
+      label: 'Token Conditional Swap Cancel',
+      initialValue: form.TokenConditionalSwapCancel,
+      type: InstructionInputType.SWITCH,
+      name: 'TokenConditionalSwapCancel',
+    },
+    {
+      label: 'Openbook V2 Cancel Order',
+      initialValue: form.OpenbookV2CancelOrder,
+      type: InstructionInputType.SWITCH,
+      name: 'OpenbookV2CancelOrder',
+    },
+    {
+      label: 'Openbook V2 Close Open Orders',
+      initialValue: form.OpenbookV2CloseOpenOrders,
+      type: InstructionInputType.SWITCH,
+      name: 'OpenbookV2CloseOpenOrders',
+    },
+    {
+      label: 'Openbook V2 Create Open Orders',
+      initialValue: form.OpenbookV2CreateOpenOrders,
+      type: InstructionInputType.SWITCH,
+      name: 'OpenbookV2CreateOpenOrders',
+    },
+    {
+      label: 'Openbook V2 Deregister Market',
+      initialValue: form.OpenbookV2DeregisterMarket,
+      type: InstructionInputType.SWITCH,
+      name: 'OpenbookV2DeregisterMarket',
+    },
+    {
+      label: 'Openbook V2 Edit Market',
+      initialValue: form.OpenbookV2EditMarket,
+      type: InstructionInputType.SWITCH,
+      name: 'OpenbookV2EditMarket',
+    },
+    {
+      label: 'Openbook V2 Liq Force Cancel Orders',
+      initialValue: form.OpenbookV2LiqForceCancelOrders,
+      type: InstructionInputType.SWITCH,
+      name: 'OpenbookV2LiqForceCancelOrders',
+    },
+    {
+      label: 'Openbook V2 Place Order',
+      initialValue: form.OpenbookV2PlaceOrder,
+      type: InstructionInputType.SWITCH,
+      name: 'OpenbookV2PlaceOrder',
+    },
+    {
+      label: 'Openbook V2 Place Take Order',
+      initialValue: form.OpenbookV2PlaceTakeOrder,
+      type: InstructionInputType.SWITCH,
+      name: 'OpenbookV2PlaceTakeOrder',
+    },
+    {
+      label: 'Openbook V2 Register Market',
+      initialValue: form.OpenbookV2RegisterMarket,
+      type: InstructionInputType.SWITCH,
+      name: 'OpenbookV2RegisterMarket',
+    },
+    {
+      label: 'Openbook V2 Settle Funds',
+      initialValue: form.OpenbookV2SettleFunds,
+      type: InstructionInputType.SWITCH,
+      name: 'OpenbookV2SettleFunds',
+    },
+    {
+      label: 'Admin Token Withdraw Fees',
+      initialValue: form.AdminTokenWithdrawFees,
+      type: InstructionInputType.SWITCH,
+      name: 'AdminTokenWithdrawFees',
+    },
+    {
+      label: 'Admin Perp Withdraw Fees',
+      initialValue: form.AdminPerpWithdrawFees,
+      type: InstructionInputType.SWITCH,
+      name: 'AdminPerpWithdrawFees',
+    },
   ]
 
   return (

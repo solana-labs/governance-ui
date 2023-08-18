@@ -1,5 +1,5 @@
 import { Connection, PublicKey } from '@solana/web3.js'
-import { utils } from '@coral-xyz/anchor'
+
 import {
   consts,
   generatedTypes,
@@ -213,7 +213,7 @@ export const FORESIGHT_INSTRUCTIONS = {
         } else {
           const marketId = Buffer.from(marketAccount.id)
           const marketListId = Buffer.from(marketAccount.marketListId)
-          const [metadataPubkey] = utils.publicKey.findProgramAddressSync(
+          const [metadataPubkey] = PublicKey.findProgramAddressSync(
             [Buffer.from('market_metadata'), marketId, marketListId],
             consts.PROGRAM_ID_PUBKEY
           )
