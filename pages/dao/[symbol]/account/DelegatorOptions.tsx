@@ -1,7 +1,7 @@
 import SelectPrimaryDelegators from '@components/SelectPrimaryDelegators'
 import DelegatorsList from './DelegatorsList'
 
-const DelegatorOptions = ({}) => {
+const DelegatorOptions = () => {
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
       <h3 className="mb-4">Delegation Options</h3>
