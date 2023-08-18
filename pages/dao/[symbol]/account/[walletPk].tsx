@@ -1,7 +1,6 @@
 import React from 'react'
 import useRealm from '@hooks/useRealm'
 import { useRouter } from 'next/router'
-import { default as Account } from '@components/Account'
 import LockTokensAccount from 'VoteStakeRegistry/components/Account/LockTokensAccount'
 import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
 import { useAsync } from 'react-async-hook'
@@ -9,6 +8,7 @@ import { fetchRealmByPubkey } from '@hooks/queries/realm'
 import { useConnection } from '@solana/wallet-adapter-react'
 import { getTokenOwnerRecordAddress } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
+import Account from './Account'
 
 /** This page is for viewing other people's accounts. only VSR uses it. */
 const OtherAccountPage: React.FC = () => {
