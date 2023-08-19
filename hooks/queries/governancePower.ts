@@ -1,5 +1,9 @@
 import { Connection, PublicKey } from '@solana/web3.js'
-import { fetchTokenOwnerRecordByPubkey } from './tokenOwnerRecord'
+import {
+  fetchTokenOwnerRecordByPubkey,
+  useUserCommunityTokenOwnerRecord,
+  useUserCouncilTokenOwnerRecord,
+} from './tokenOwnerRecord'
 import BN from 'bn.js'
 import { fetchNftRegistrar } from './plugins/nftVoter'
 import { fetchDigitalAssetsByOwner } from './digitalAssets'
@@ -23,6 +27,12 @@ import {
   useAddressQuery_CommunityTokenOwner,
   useAddressQuery_CouncilTokenOwner,
 } from './addresses/tokenOwnerRecord'
+import {
+  SimpleGatedVoterWeight,
+  VoteNftWeight,
+  VoteRegistryVoterWeight,
+  VoterWeight,
+} from '@models/voteWeights'
 
 export const getVanillaGovpower = async (
   connection: Connection,
@@ -128,8 +138,9 @@ export const useGovernancePowerAsync = (kind: 'community' | 'council') => {
     [connection, realmPk, kind]
   )
 
-  return useAsync(async () => {
-    realmPk &&
+  return useAsync(
+    async () =>
+      realmPk &&
       TOR &&
       (plugin === 'vanilla'
         ? getVanillaGovpower(connection, TOR)
@@ -141,6 +152,64 @@ export const useGovernancePowerAsync = (kind: 'community' | 'council') => {
         ? heliumVotingPower
         : plugin === 'gateway'
         ? gatewayVotingPower
-        : new BN(0))
-  }, [realmPk, TOR, plugin, connection])
+        : new BN(0)),
+    [realmPk, TOR, plugin, connection]
+  )
+}
+
+/**
+ * @deprecated
+ * use useGovernancePowerAsync
+ */
+export const useLegacyVoterWeight = () => {
+  const { connection } = useConnection()
+  const realmPk = useSelectedRealmPubkey()
+
+  const vsrVotingPower = useDepositStore((s) => s.state.votingPower)
+  const heliumVotingPower = useHeliumVsrStore((s) => s.state.votingPower)
+  const gatewayVotingPower = useGatewayPluginStore((s) => s.state.votingPower)
+
+  const communityTOR = useUserCommunityTokenOwnerRecord().data?.result
+  const councilTOR = useUserCouncilTokenOwnerRecord().data
+
+  const { result: plugin } = useAsync(
+    async () =>
+      realmPk && determineVotingPowerType(connection, realmPk, 'community'),
+    [connection, realmPk]
+  )
+
+  return useAsync(
+    async () =>
+      realmPk &&
+      communityTOR &&
+      councilTOR &&
+      (plugin === 'vanilla'
+        ? new VoterWeight(communityTOR, councilTOR?.result)
+        : plugin === 'NFT'
+        ? new VoteNftWeight(
+            communityTOR,
+            councilTOR.result,
+            await getNftGovpower(connection, realmPk, communityTOR.pubkey)
+          )
+        : plugin === 'VSR'
+        ? new VoteRegistryVoterWeight(
+            communityTOR,
+            councilTOR.result,
+            vsrVotingPower
+          )
+        : plugin === 'HeliumVSR'
+        ? new VoteRegistryVoterWeight(
+            communityTOR,
+            councilTOR.result,
+            heliumVotingPower
+          )
+        : plugin === 'gateway'
+        ? new SimpleGatedVoterWeight(
+            communityTOR,
+            councilTOR.result,
+            gatewayVotingPower
+          )
+        : undefined),
+    [realmPk, communityTOR, councilTOR, plugin, connection]
+  )
 }
