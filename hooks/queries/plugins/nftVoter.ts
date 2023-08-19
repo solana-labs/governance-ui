@@ -5,14 +5,19 @@ import { Program } from '@coral-xyz/anchor'
 import { IDL, NftVoter } from 'idls/nft_voter'
 import asFindable from '@utils/queries/asFindable'
 import queryClient from '../queryClient'
+import { fetchRealmConfigQuery } from '../realmConfig'
 
 const nftMintRegistrarQueryFn = async (
   connection: Connection,
-  programId: PublicKey, // TODO just get this from realm config
   realmPk: PublicKey
 ) => {
   const realm = (await fetchRealmByPubkey(connection, realmPk)).result
   if (!realm) throw new Error()
+
+  const config = await fetchRealmConfigQuery(connection, realmPk)
+  const programId = config.result?.account.communityTokenConfig.voterWeightAddin
+  if (programId === undefined)
+    return { found: false, result: undefined } as const
 
   const { registrar: registrarPk } = await getRegistrarPDA(
     realm.pubkey,
@@ -26,16 +31,12 @@ const nftMintRegistrarQueryFn = async (
   return asFindable(() => program.account.registrar.fetch(registrarPk))()
 }
 
-export const fetchNftRegistrar = (
-  connection: Connection,
-  programId: PublicKey, // TODO just get this from realm config
-  realmPk: PublicKey
-) =>
+export const fetchNftRegistrar = (connection: Connection, realmPk: PublicKey) =>
   queryClient.fetchQuery({
     queryKey: [
       connection.rpcEndpoint,
       'Nft Plugin Registrar',
       realmPk.toString(),
     ],
-    queryFn: () => nftMintRegistrarQueryFn(connection, programId, realmPk),
+    queryFn: () => nftMintRegistrarQueryFn(connection, realmPk),
   })
