@@ -13,6 +13,16 @@ import {
   NFT_PLUGINS_PKS,
   VSR_PLUGIN_PKS,
 } from '@constants/plugins'
+import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
+import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
+import useGatewayPluginStore from 'GatewayPlugin/store/gatewayPluginStore'
+import { useAsync } from 'react-async-hook'
+import { useConnection } from '@solana/wallet-adapter-react'
+import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
+import {
+  useAddressQuery_CommunityTokenOwner,
+  useAddressQuery_CouncilTokenOwner,
+} from './addresses/tokenOwnerRecord'
 
 export const getVanillaGovpower = async (
   connection: Connection,
@@ -99,4 +109,38 @@ export const determineVotingPowerType = async (
     : GATEWAY_PLUGINS_PKS.includes(programId.toString())
     ? 'gateway'
     : 'unknown'
+}
+
+export const useGovernancePowerAsync = (kind: 'community' | 'council') => {
+  const { connection } = useConnection()
+  const realmPk = useSelectedRealmPubkey()
+
+  const vsrVotingPower = useDepositStore((s) => s.state.votingPower)
+  const heliumVotingPower = useHeliumVsrStore((s) => s.state.votingPower)
+  const gatewayVotingPower = useGatewayPluginStore((s) => s.state.votingPower)
+
+  const communityTOR = useAddressQuery_CommunityTokenOwner()
+  const councilTOR = useAddressQuery_CouncilTokenOwner()
+  const { data: TOR } = kind === 'community' ? communityTOR : councilTOR
+
+  const { result: plugin } = useAsync(
+    async () => realmPk && determineVotingPowerType(connection, realmPk, kind),
+    [connection, realmPk, kind]
+  )
+
+  return useAsync(async () => {
+    realmPk &&
+      TOR &&
+      (plugin === 'vanilla'
+        ? getVanillaGovpower(connection, TOR)
+        : plugin === 'NFT'
+        ? getNftGovpower(connection, realmPk, TOR)
+        : plugin === 'VSR'
+        ? vsrVotingPower
+        : plugin === 'HeliumVSR'
+        ? heliumVotingPower
+        : plugin === 'gateway'
+        ? gatewayVotingPower
+        : new BN(0))
+  }, [realmPk, TOR, plugin, connection])
 }
