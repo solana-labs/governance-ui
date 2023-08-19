@@ -143,19 +143,21 @@ export const useGovernancePowerAsync = (
 
   return useAsync(
     async () =>
-      realmPk &&
-      TOR &&
-      (plugin === 'vanilla'
-        ? getVanillaGovpower(connection, TOR)
-        : plugin === 'NFT'
-        ? getNftGovpower(connection, realmPk, TOR)
-        : plugin === 'VSR'
-        ? vsrVotingPower
-        : plugin === 'HeliumVSR'
-        ? heliumVotingPower
-        : plugin === 'gateway'
-        ? gatewayVotingPower
-        : new BN(0)),
+      plugin === undefined
+        ? undefined
+        : realmPk &&
+          TOR &&
+          (plugin === 'vanilla'
+            ? getVanillaGovpower(connection, TOR)
+            : plugin === 'NFT'
+            ? getNftGovpower(connection, realmPk, TOR)
+            : plugin === 'VSR'
+            ? vsrVotingPower
+            : plugin === 'HeliumVSR'
+            ? heliumVotingPower
+            : plugin === 'gateway'
+            ? gatewayVotingPower
+            : new BN(0)),
     [realmPk, TOR, plugin, connection]
   )
 }

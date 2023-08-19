@@ -20,6 +20,7 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { useGovernancePowerAsync } from '@hooks/queries/governancePower'
 
 interface Props {
   className?: string
@@ -29,7 +30,7 @@ interface Props {
 
 export default function NftVotingPower(props: Props) {
   const nfts = useNftPluginStore((s) => s.state.votingNfts)
-  const votingPower = useNftPluginStore((s) => s.state.votingPower)
+  const { result: votingPower } = useGovernancePowerAsync('community')
   const maxWeight = useNftPluginStore((s) => s.state.maxVoteRecord)
   const isLoading = useNftPluginStore((s) => s.state.isLoadingNfts)
   const wallet = useWalletOnePointOh()
@@ -47,7 +48,7 @@ export default function NftVotingPower(props: Props) {
   const max = maxWeight
     ? new BigNumber(maxWeight.account.maxVoterWeight.toString())
     : null
-  const amount = new BigNumber(votingPower.toString())
+  const amount = new BigNumber((votingPower ?? 0).toString())
 
   const handleRegister = async () => {
     if (!realm || !wallet?.publicKey || !client.client || !realmInfo)
