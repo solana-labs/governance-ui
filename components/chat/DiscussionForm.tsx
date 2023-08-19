@@ -18,13 +18,15 @@ import { useRealmQuery } from '@hooks/queries/realm'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
 import { useVotingPop } from '@components/VotePanel/hooks'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 
 const DiscussionForm = () => {
   const [comment, setComment] = useState('')
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
   const realm = useRealmQuery().data?.result
-  const { ownVoterWeight, realmInfo } = useRealm()
+  const { result: ownVoterWeight } = useLegacyVoterWeight()
+  const { realmInfo } = useRealm()
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
@@ -83,11 +85,11 @@ const DiscussionForm = () => {
   }
 
   const postEnabled =
-    proposal && connected && ownVoterWeight.hasAnyWeight() && comment
+    proposal && connected && ownVoterWeight?.hasAnyWeight() && comment
 
   const tooltipContent = !connected
     ? 'Connect your wallet to send a comment'
-    : !ownVoterWeight.hasAnyWeight()
+    : !ownVoterWeight?.hasAnyWeight()
     ? 'You need to have deposited some tokens to submit your comment.'
     : !comment
     ? 'Write a comment to submit'

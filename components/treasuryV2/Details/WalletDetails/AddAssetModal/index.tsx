@@ -1,4 +1,3 @@
-import React from 'react'
 import cx from 'classnames'
 
 import { Wallet } from '@models/treasury/Wallet'
@@ -9,6 +8,7 @@ import WalletQRCode from '@components/WalletQRCode'
 import Address from '@components/Address'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 
 interface TokenAccount {
   iconUrl?: string
@@ -45,13 +45,15 @@ interface Props {
 
 export default function AddAssetModal(props: Props) {
   const realm = useRealmQuery().data?.result
-  const { ownVoterWeight, realmInfo } = useRealm()
+  const { result: ownVoterWeight } = useLegacyVoterWeight()
+
+  const { realmInfo } = useRealm()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
 
-  const tokenOwnerRecord = ownVoterWeight.canCreateGovernanceUsingCouncilTokens()
+  const tokenOwnerRecord = ownVoterWeight?.canCreateGovernanceUsingCouncilTokens()
     ? ownVoterWeight.councilTokenRecord
-    : realm && ownVoterWeight.canCreateGovernanceUsingCommunityTokens(realm)
+    : realm && ownVoterWeight?.canCreateGovernanceUsingCommunityTokens(realm)
     ? ownVoterWeight.communityTokenRecord
     : undefined
 

@@ -44,6 +44,7 @@ import {
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 
 const SOL_BUFFER = 0.02
 
@@ -65,7 +66,9 @@ export const Deposit: React.FC<{
   const { symbol } = router.query
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
-  const { realmInfo, ownVoterWeight } = useRealm()
+  const { result: ownVoterWeight } = useLegacyVoterWeight()
+
+  const { realmInfo } = useRealm()
   const {
     canUseTransferInstruction,
     governedTokenAccountsWithoutNfts,
@@ -210,7 +213,7 @@ export const Deposit: React.FC<{
         connection.current,
         connection.endpoint
       )
-      const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
+      const ownTokenRecord = ownVoterWeight!.getTokenRecordToCreateProposal(
         governedTokenAccount!.governance!.account.config,
         voteByCouncil
       )

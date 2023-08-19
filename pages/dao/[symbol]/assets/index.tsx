@@ -1,4 +1,3 @@
-import React from 'react'
 import AssetsList from '@components/AssetsList/AssetsList'
 import Tooltip from '@components/Tooltip'
 import useRealm from '@hooks/useRealm'
@@ -9,14 +8,15 @@ import { LinkButton } from '@components/Button'
 import { PlusCircleIcon } from '@heroicons/react/outline'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 export const NEW_PROGRAM_VIEW = `/program/new`
 
 const Assets = () => {
   const router = useRouter()
   const realm = useRealmQuery().data?.result
+  const { result: ownVoterWeight } = useLegacyVoterWeight()
   const {
     symbol,
-    ownVoterWeight,
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
@@ -27,7 +27,7 @@ const Assets = () => {
     router.push(fmtUrlWithCluster(`/dao/${symbol}${NEW_PROGRAM_VIEW}`))
   }
   const canCreateGovernance = realm
-    ? ownVoterWeight.canCreateGovernance(realm)
+    ? ownVoterWeight?.canCreateGovernance(realm)
     : null
 
   const newAssetToolTip = renderAddNewAssetTooltip(

@@ -4,7 +4,6 @@ import Input from 'components/inputs/Input'
 import PreviousRouteBtn from 'components/PreviousRouteBtn'
 import Tooltip from 'components/Tooltip'
 import useQueryContext from 'hooks/useQueryContext'
-import useRealm from 'hooks/useRealm'
 import { Keypair, PublicKey, Transaction } from '@solana/web3.js'
 import { tryParseKey } from 'tools/validators/pubkey'
 import { isFormValid } from 'utils/formValidation'
@@ -23,6 +22,7 @@ import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { usePrevious } from '@hooks/usePrevious'
+import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 interface NewProgramForm {
   programId: string
   authority: null | AssetAccount
@@ -40,7 +40,7 @@ const NewProgramForm = () => {
   const realm = useRealmQuery().data?.result
   const realmMint = useRealmCommunityMintInfoQuery().data?.result
   const { symbol } = router.query
-  const { ownVoterWeight } = useRealm()
+  const { result: ownVoterWeight } = useLegacyVoterWeight()
   const { assetAccounts } = useGovernanceAssetsStore()
 
   const wallet = useWalletOnePointOh()
@@ -52,9 +52,9 @@ const NewProgramForm = () => {
   const prevFormProgramId = usePrevious(form.programId)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
-  const tokenOwnerRecord = ownVoterWeight.canCreateGovernanceUsingCouncilTokens()
+  const tokenOwnerRecord = ownVoterWeight?.canCreateGovernanceUsingCouncilTokens()
     ? ownVoterWeight.councilTokenRecord
-    : realm && ownVoterWeight.canCreateGovernanceUsingCommunityTokens(realm)
+    : realm && ownVoterWeight?.canCreateGovernanceUsingCommunityTokens(realm)
     ? ownVoterWeight.communityTokenRecord
     : undefined
 

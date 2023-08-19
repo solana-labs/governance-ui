@@ -121,7 +121,9 @@ export const determineVotingPowerType = async (
     : 'unknown'
 }
 
-export const useGovernancePowerAsync = (kind: 'community' | 'council') => {
+export const useGovernancePowerAsync = (
+  kind: 'community' | 'council' | undefined
+) => {
   const { connection } = useConnection()
   const realmPk = useSelectedRealmPubkey()
 
@@ -131,10 +133,11 @@ export const useGovernancePowerAsync = (kind: 'community' | 'council') => {
 
   const communityTOR = useAddressQuery_CommunityTokenOwner()
   const councilTOR = useAddressQuery_CouncilTokenOwner()
-  const { data: TOR } = kind === 'community' ? communityTOR : councilTOR
+  const { data: TOR } = kind && kind === 'community' ? communityTOR : councilTOR
 
   const { result: plugin } = useAsync(
-    async () => realmPk && determineVotingPowerType(connection, realmPk, kind),
+    async () =>
+      kind && realmPk && determineVotingPowerType(connection, realmPk, kind),
     [connection, realmPk, kind]
   )
 
