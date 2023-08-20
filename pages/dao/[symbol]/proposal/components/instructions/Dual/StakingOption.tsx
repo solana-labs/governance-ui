@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState, useMemo } from 'react'
 import { ProgramAccount, Governance } from '@solana/spl-governance'
 import {
@@ -14,6 +13,15 @@ import { getDualFinanceStakingOptionSchema } from '@utils/validations'
 import Tooltip from '@components/Tooltip'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { getTreasuryAccountItemInfoV2 } from '@utils/treasuryTools'
+
+interface MintMetadata {
+  logo: string,
+  name: string,
+  symbol: string,
+  displayPrice: string,
+  decimals: number,
+}
 
 const StakingOption = ({
   index,
@@ -26,7 +34,7 @@ const StakingOption = ({
     soName: undefined,
     optionExpirationUnixSeconds: 0,
     numTokens: 0,
-    lotSize: 0,
+    lotSize: 1,
     baseTreasury: undefined,
     quoteTreasury: undefined,
     payer: undefined,
@@ -42,12 +50,16 @@ const StakingOption = ({
   >(undefined)
 
   const [formErrors, setFormErrors] = useState({})
+
+  const [baseMetadata, setBaseMetadata] = useState<MintMetadata>()
+  const [quoteMetadata, setQuoteMetadata] = useState<MintMetadata>()
+
   const { handleSetInstructions } = useContext(NewProposalContext)
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-  const schema = useMemo(getDualFinanceStakingOptionSchema, [])
+  const schema = getDualFinanceStakingOptionSchema({form});
   useEffect(() => {
     function getInstruction(): Promise<UiInstruction> {
       return getConfigInstruction({
@@ -62,6 +74,40 @@ const StakingOption = ({
       { governedAccount: governedAccount, getInstruction },
       index
     )
+    if (form.baseTreasury) {
+      const {
+        logo,
+        name,
+        symbol,
+        displayPrice,
+      } = getTreasuryAccountItemInfoV2(form.baseTreasury)
+      setBaseMetadata({
+        logo,
+        name,
+        symbol,
+        displayPrice,
+        decimals: form.baseTreasury.extensions.mint?.account.decimals!
+      })
+    } else {
+      setBaseMetadata(undefined)
+    }
+    if (form.quoteTreasury) {
+      const {
+        logo,
+        name,
+        symbol,
+        displayPrice,
+      } = getTreasuryAccountItemInfoV2(form.quoteTreasury)
+      setQuoteMetadata({
+        logo,
+        name,
+        symbol,
+        displayPrice,
+        decimals: form.quoteTreasury.extensions.mint?.account.decimals!
+      })
+    } else {
+      setQuoteMetadata(undefined)
+    }
   }, [
     form,
     governedAccount,
@@ -205,6 +251,31 @@ const StakingOption = ({
           error={formErrors['userPk']}
         />
       </Tooltip>
+      {baseMetadata && quoteMetadata && (
+        <>
+          <div className="p-3 border rounded-lg text-fgd-1 border-fgd-4 w-full">
+          {form.strike / form.lotSize * 10 ** (-quoteMetadata.decimals + baseMetadata.decimals)}
+          <img
+            className={`h-6 w-6`}
+            src={quoteMetadata.logo}
+            onError={({ currentTarget }) => {
+              currentTarget.onerror = null // prevents looping
+              currentTarget.hidden = true
+            }}
+          />
+          =
+          1
+          <img
+            className={`h-6 w-6`}
+            src={baseMetadata.logo}
+            onError={({ currentTarget }) => {
+              currentTarget.onerror = null // prevents looping
+              currentTarget.hidden = true
+            }}
+          />
+        </ div >
+        </>
+      )}
     </>
   )
 }

@@ -79,9 +79,8 @@ const DualAirdrop = ({
     setGovernedAccount(form.treasury?.governance)
   }, [form.treasury])
 
-  const merkleSchema = useMemo(getDualFinanceMerkleAirdropSchema, [])
-
-  const governanceSchema = useMemo(getDualFinanceGovernanceAirdropSchema, [])
+  const merkleSchema = getDualFinanceMerkleAirdropSchema({form});
+  const governanceSchema = getDualFinanceGovernanceAirdropSchema({form});
 
   return (
     <>
@@ -156,8 +155,9 @@ const DualAirdrop = ({
           />
         </>
       )}
+      {/* TODO: Note that this is full tokens, not atoms since expectation is that this composes with staking options */}
       <Input
-        label="Total number of tokens"
+        label="Total number of tokens."
         value={form.amount}
         type="text"
         onChange={(evt) =>
