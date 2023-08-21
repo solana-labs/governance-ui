@@ -30,6 +30,7 @@ import {
   coinTiersToNames,
 } from '@blockworks-foundation/mango-v4-settings/lib/helpers/listingTools'
 import { tryParseKey } from '@tools/validators/pubkey'
+import Loading from '@components/Loading'
 // import { snakeCase } from 'snake-case'
 // import { sha256 } from 'js-sha256'
 
@@ -1024,6 +1025,73 @@ const instructions = () => ({
       const info = await displayArgs(connection, data)
       try {
         return <div>{info}</div>
+      } catch (e) {
+        console.log(e)
+        return <div>{JSON.stringify(data)}</div>
+      }
+    },
+  },
+  73195: {
+    name: 'Withdraw all token fees',
+    accounts: [
+      { name: 'Group' },
+      { name: 'Bank' },
+      { name: 'Vault' },
+      { name: 'Destination' },
+    ],
+    getDataUI: async (
+      connection: Connection,
+      data: Uint8Array,
+      accounts: AccountMetaData[]
+    ) => {
+      const group = accounts[0].pubkey
+      const bank = accounts[1].pubkey
+      const client = await getClient(connection)
+      const mangoGroup = await client.getGroup(group)
+      const mint = [...mangoGroup.banksMapByMint.values()].find(
+        (x) => x[0]!.publicKey.equals(bank)!
+      )![0]!.mint!
+      const tokenSymbol = tokenPriceService.getTokenInfo(mint.toBase58())
+        ?.symbol
+      try {
+        return (
+          <div>
+            {tokenSymbol ? tokenSymbol : <Loading className="w-5"></Loading>}
+          </div>
+        )
+      } catch (e) {
+        console.log(e)
+        return <div>{JSON.stringify(data)}</div>
+      }
+    },
+  },
+  15219: {
+    name: 'Withdraw all perp fees',
+    accounts: [
+      { name: 'Group' },
+      { name: 'Perp market' },
+      { name: 'Bank' },
+      { name: 'Vault' },
+      { name: 'Destination' },
+    ],
+    getDataUI: async (
+      connection: Connection,
+      data: Uint8Array,
+      accounts: AccountMetaData[]
+    ) => {
+      const group = accounts[0].pubkey
+      const perpMarket = accounts[1].pubkey
+      const client = await getClient(connection)
+      const mangoGroup = await client.getGroup(group)
+      const marketName = [
+        ...mangoGroup.perpMarketsMapByName.values(),
+      ].find((x) => x.publicKey.equals(perpMarket))?.name
+      try {
+        return (
+          <div>
+            {marketName ? marketName : <Loading className="w-5"></Loading>}
+          </div>
+        )
       } catch (e) {
         console.log(e)
         return <div>{JSON.stringify(data)}</div>
