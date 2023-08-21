@@ -1,4 +1,5 @@
-import React, { useMemo, useContext, useEffect, useState } from 'react'
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+import React, { useContext, useEffect, useState } from 'react'
 import { ProgramAccount, Governance } from '@solana/spl-governance'
 import {
   UiInstruction,
