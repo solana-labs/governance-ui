@@ -662,8 +662,10 @@ export const getDualFinanceLiquidityStakingOptionSchema = ({
 
 export const getDualFinanceStakingOptionSchema = ({
   form,
+  connection,
 }: {
-  form: any
+  form: any,
+  connection: any
 }) => {
   return yup.object().shape({
     soName: yup.string().required('Staking option name is required')
@@ -672,8 +674,20 @@ export const getDualFinanceStakingOptionSchema = ({
     ),
     userPk: yup
       .string()
-      .test('is-valid-address1', 'Please enter a valid PublicKey', (value) =>
-        value ? validatePubkey(value) : true
+      .test(
+        'is-valid-address1', 'Please enter a valid PublicKey',
+        async function (userPk: string) {
+          if (!userPk || !validatePubkey(userPk)) {
+            return false;
+          }
+
+          const pubKey = getValidatedPublickKey(userPk)
+          const account = await getValidateAccount(connection.current, pubKey)
+          if (!account) {
+            return false;
+          }
+          return true;
+        }
       ),
     optionExpirationUnixSeconds: yup
       .number()

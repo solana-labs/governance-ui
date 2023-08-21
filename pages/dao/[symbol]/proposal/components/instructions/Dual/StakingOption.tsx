@@ -59,7 +59,7 @@ const StakingOption = ({
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-  const schema = getDualFinanceStakingOptionSchema({form});
+  const schema = getDualFinanceStakingOptionSchema({form, connection});
   useEffect(() => {
     function getInstruction(): Promise<UiInstruction> {
       return getConfigInstruction({
