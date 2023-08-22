@@ -41,7 +41,7 @@ export const sendTransactionsV3 = ({
   config,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   lookupTableAccounts,
-}: sendSignAndConfirmTransactionsProps & { lookupTableAccounts: any }) => {
+}: sendSignAndConfirmTransactionsProps & { lookupTableAccounts?: any }) => {
   const callbacksWithUiComponent = {
     afterBatchSign: (signedTxnsCount) => {
       if (callbacks?.afterBatchSign) {
