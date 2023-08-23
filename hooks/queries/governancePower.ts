@@ -174,8 +174,8 @@ export const useLegacyVoterWeight = () => {
   const heliumVotingPower = useHeliumVsrStore((s) => s.state.votingPower)
   const gatewayVotingPower = useGatewayPluginStore((s) => s.state.votingPower)
 
-  const communityTOR = useUserCommunityTokenOwnerRecord().data?.result
-  const councilTOR = useUserCouncilTokenOwnerRecord().data
+  const { data: communityTOR } = useUserCommunityTokenOwnerRecord()
+  const { data: councilTOR } = useUserCouncilTokenOwnerRecord()
 
   const { result: plugin } = useAsync(
     async () =>
@@ -183,34 +183,45 @@ export const useLegacyVoterWeight = () => {
     [connection, realmPk]
   )
 
+  console.log('communityTOR', communityTOR)
+  console.log('councilTOR', councilTOR)
+  console.log('wealmPk', realmPk)
+  console.log('vsrV', vsrVotingPower)
+
   return useAsync(
     async () =>
       realmPk &&
       communityTOR &&
       councilTOR &&
       (plugin === 'vanilla'
-        ? new VoterWeight(communityTOR, councilTOR?.result)
+        ? new VoterWeight(communityTOR.result, councilTOR.result)
         : plugin === 'NFT'
-        ? new VoteNftWeight(
-            communityTOR,
-            councilTOR.result,
-            await getNftGovpower(connection, realmPk, communityTOR.pubkey)
-          )
+        ? communityTOR.result?.pubkey
+          ? new VoteNftWeight(
+              communityTOR.result,
+              councilTOR.result,
+              await getNftGovpower(
+                connection,
+                realmPk,
+                communityTOR.result.pubkey
+              )
+            )
+          : undefined
         : plugin === 'VSR'
         ? new VoteRegistryVoterWeight(
-            communityTOR,
+            communityTOR.result,
             councilTOR.result,
             vsrVotingPower
           )
         : plugin === 'HeliumVSR'
         ? new VoteRegistryVoterWeight(
-            communityTOR,
+            communityTOR.result,
             councilTOR.result,
             heliumVotingPower
           )
         : plugin === 'gateway'
         ? new SimpleGatedVoterWeight(
-            communityTOR,
+            communityTOR.result,
             councilTOR.result,
             gatewayVotingPower
           )
