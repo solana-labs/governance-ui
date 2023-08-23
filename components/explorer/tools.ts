@@ -1,4 +1,5 @@
-import { PublicKey, Transaction } from '@solana/web3.js'
+import { TransactionOrVersionedTransaction } from '@solana/wallet-adapter-base'
+import { PublicKey, Transaction, TransactionVersion } from '@solana/web3.js'
 import { ConnectionContext } from '@utils/connection'
 import base58 from 'bs58'
 
@@ -30,7 +31,9 @@ export function getExplorerUrl(
 /// Returns explorer inspector URL for the given transaction
 export async function getExplorerInspectorUrl(
   connection: ConnectionContext,
-  transaction: Transaction
+  transaction: TransactionOrVersionedTransaction<
+    ReadonlySet<TransactionVersion>
+  >
 ) {
   const SIGNATURE_LENGTH = 64
 
@@ -42,12 +45,16 @@ export async function getExplorerInspectorUrl(
     base58.encode(s.signature ?? Buffer.alloc(SIGNATURE_LENGTH))
   )
   explorerUrl.searchParams.append('signatures', JSON.stringify(signatures))
-  const latestBlockhash = await connection.current.getLatestBlockhash()
-  transaction.lastValidBlockHeight = latestBlockhash.lastValidBlockHeight
-  transaction.recentBlockhash = latestBlockhash.blockhash
 
-  const message = transaction.serializeMessage()
-  explorerUrl.searchParams.append('message', message.toString('base64'))
+  const message =
+    transaction instanceof Transaction
+      ? transaction.serializeMessage().toString('base64')
+      : Buffer.from(transaction.message.serialize()).toString('base64')
+  explorerUrl.searchParams.append('message', message)
+
+  if (connection.cluster === 'devnet') {
+    explorerUrl.searchParams.append('cluster', 'devnet')
+  }
 
   return explorerUrl.toString()
 }

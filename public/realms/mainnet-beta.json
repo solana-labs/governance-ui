@@ -216,6 +216,20 @@
     "github": "https://github.com/hubbleprotocol"
   },
   {
+    "symbol": "wikicious",
+    "category": "defi",
+    "bannerImage": "https://raw.githubusercontent.com/hetwik/wikicious-assets/main/wikicious.png",
+    "displayName": "wikicious",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Bamkg8hJLRPH56p8Xvo2v3TUpLs1fnsNKw2HBSbtkJvp",
+    "ogImage": "https://raw.githubusercontent.com/hetwik/wikicious-assets/main/wikicious.png",
+    "shortDescription": "wikicious is a Decentralized Exchange platform that runs on solana blockchain",
+    "sortRank": 3,
+    "website": "https://wikicious.com/",
+    "twitter": "@Wiki_cious",
+    "github": "https://github.com/wikicious"
+  },
+  {
     "symbol": "MangoLiquidityDAO",
     "displayName": "Mango Liquidity Council",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -3201,6 +3215,5 @@
     "sortRank": 3,
     "symbol": "VIEWSDAO",
     "twitter": "@Decod3rsNFT"
-
   }
 ]

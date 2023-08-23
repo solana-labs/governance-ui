@@ -99,7 +99,7 @@ const WithdrawPerpFees = ({
             bank.mint,
             ataAddress,
             form.governedAccount.extensions.transferAddress!,
-            form.governedAccount.extensions.transferAddress!
+            wallet.publicKey
           )
         )
       }

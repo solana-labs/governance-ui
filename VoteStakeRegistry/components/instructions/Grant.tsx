@@ -160,7 +160,6 @@ const Grant = ({
         form.amount!,
         form.governedTokenAccount.extensions.mint.account.decimals
       )
-      //const currentTokenOwnerRecord = tokenRecords[form.destinationAccount]
 
       const destinationTokenOwnerRecordPk = await getTokenOwnerRecordAddress(
         realm.owner,
@@ -168,7 +167,7 @@ const Grant = ({
         realm.account.communityMint,
         destinationAccount
       )
-      const currentTokenOwnerRecord = queryClient.fetchQuery({
+      const currentTokenOwnerRecord = await queryClient.fetchQuery({
         queryKey: tokenOwnerRecordQueryKeys.byPubkey(
           connection.cluster,
           destinationTokenOwnerRecordPk
@@ -180,7 +179,7 @@ const Grant = ({
           ),
       })
 
-      if (!currentTokenOwnerRecord) {
+      if (!currentTokenOwnerRecord.found) {
         await withCreateTokenOwnerRecord(
           prerequisiteInstructions,
           realm!.owner,
@@ -215,6 +214,7 @@ const Grant = ({
       isValid,
       governance: form.governedTokenAccount?.governance,
       prerequisiteInstructions: prerequisiteInstructions,
+      chunkBy: 1,
     }
     return obj
   }, [

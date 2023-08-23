@@ -47,7 +47,7 @@ const DualGso = ({
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-  const schema = getDualFinanceGsoSchema()
+  const schema = getDualFinanceGsoSchema({form})
   useEffect(() => {
     function getInstruction(): Promise<UiInstruction> {
       return getConfigGsoInstruction({

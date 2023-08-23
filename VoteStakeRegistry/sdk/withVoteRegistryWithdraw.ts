@@ -97,7 +97,7 @@ export const withVoteRegistryWithdraw = async ({
       splProgramVersion,
       realmPk,
       walletPk,
-      mintPk,
+      communityMintPk,
       walletPk
     )
   }

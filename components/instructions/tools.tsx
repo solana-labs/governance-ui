@@ -276,6 +276,20 @@ export const ACCOUNT_NAMES = {
     'Marinade Voter Stake Registry Program Governance',
   '6egAu2HDLcSgeUYmiBvNLgp7Bd4nPk16gX9MvWuJpeX2':
     'Marinade SPL Program Governance',
+
+  // Dual DAO
+  '4yx1NJ4Vqf2zT1oVLk4SySBhhDJXmXFt88ncm4gPxtL7':
+    'Staking Options Program',
+  '2fJcpdR6qzqDP7fBqvoJQ5PGYdaRFBNyUKZkZf5t12mr':
+    'Airdrop Program',
+  '8tBcmZAMNm11DuGAS2r6PqSA3CKt72amoz8bVj14xRiT':
+    'Merkle Airdrop Verifier Program',
+  ATCsJvzSbHaJj3a9uKTRHSoD8ZmWPfeC3sYxzcJJHTM5:
+    'Governance Airdrop Verifier Program',
+  DuALd6fooWzVDkaTsQzDAxPGYCnLrnWamdNNTNxicdX8:
+    'Lockup Staking Options Program',
+  '7Z36Efbt7a4nLiV7s5bY7J2e4TJ6V9JEKGccsy2od2bE':
+    'Dual DAO wallet',
 }
 
 // TODO: Add this to on-chain metadata to Governance account
