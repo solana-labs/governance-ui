@@ -4,9 +4,10 @@ import { ProgramAccount, Proposal, ProposalState } from '@solana/spl-governance'
 import { useEffect } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useNftProposalStore from './NftProposalStore'
-import useNftPluginStore from './store/nftPluginStore'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
+import { useGovernancePowerAsync } from '@hooks/queries/governancePower'
+import { useVotingPop } from '@components/VotePanel/hooks'
 
 const NftProposalVoteState = ({
   proposal,
@@ -19,7 +20,8 @@ const NftProposalVoteState = ({
   const getCountedNfts = useNftProposalStore((s) => s.getCountedNfts)
   const countedNfts = useNftProposalStore((s) => s.countedNftsForProposal)
   const wallet = useWalletOnePointOh()
-  const votingPower = useNftPluginStore((s) => s.state.votingPower)
+  const votingPop = useVotingPop()
+  const { result: votingPower } = useGovernancePowerAsync(votingPop)
   const isNftPlugin =
     config?.account.communityTokenConfig.voterWeightAddin &&
     NFT_PLUGINS_PKS.includes(
@@ -29,6 +31,7 @@ const NftProposalVoteState = ({
   const ownVoteRecord = useProposalVoteRecordQuery('electoral').data?.result
 
   const showVoteRecords =
+    votingPower &&
     countedNfts.length > 0 &&
     countedNfts.length < votingPower.toNumber() &&
     !ownVoteRecord

@@ -1,7 +1,6 @@
 import Button from '@components/Button'
 import VoteCommentModal from '@components/VoteCommentModal'
 import { BanIcon } from '@heroicons/react/solid'
-import useRealm from '@hooks/useRealm'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { VoteKind } from '@solana/spl-governance'
 import { useState } from 'react'
@@ -14,6 +13,7 @@ import {
 import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
 import { useSubmitVote } from '@hooks/useSubmitVote'
 import { useSelectedRealmInfo } from '@hooks/selectedRealm/useSelectedRealmRegistryEntry'
+import { useGovernancePowerAsync } from '@hooks/queries/governancePower'
 
 const useIsVetoable = (): undefined | boolean => {
   const vetoingPop = useVetoingPop()
@@ -29,7 +29,8 @@ const useCanVeto = ():
   | undefined
   | { canVeto: true }
   | { canVeto: false; message: string } => {
-  const { ownVoterWeight } = useRealm()
+  const vetoPop = useVetoingPop()
+  const { result: govPower } = useGovernancePowerAsync(vetoPop)
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const isVetoable = useIsVetoable()
@@ -52,11 +53,7 @@ const useCanVeto = ():
     return { canVeto: false, message: 'You already voted' }
 
   // Do you have any voting power?
-  const hasMinAmountToVote =
-    voterTokenRecord &&
-    ownVoterWeight.hasMinAmountToVote(
-      voterTokenRecord.account.governingTokenMint
-    )
+  const hasMinAmountToVote = voterTokenRecord && govPower?.gtn(0)
   if (hasMinAmountToVote === undefined) return undefined
   if (hasMinAmountToVote === false)
     return {

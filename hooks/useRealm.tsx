@@ -1,24 +1,6 @@
-import { ProgramAccount, TokenOwnerRecord } from '@solana/spl-governance'
 import { useRouter } from 'next/router'
-import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { useMemo } from 'react'
-import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
-import {
-  SimpleGatedVoterWeight,
-  VoteNftWeight,
-  VoteRegistryVoterWeight,
-  VoterWeight,
-} from '../models/voteWeights'
-import {
-  NFT_PLUGINS_PKS,
-  VSR_PLUGIN_PKS,
-  GATEWAY_PLUGINS_PKS,
-  HELIUM_VSR_PLUGINS_PKS,
-} from '../constants/plugins'
-import useGatewayPluginStore from '../GatewayPlugin/store/gatewayPluginStore'
-import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
-import { BN } from '@coral-xyz/anchor'
-import { PublicKey } from '@solana/web3.js'
+import { NFT_PLUGINS_PKS } from '../constants/plugins'
 import { useVsrMode } from './useVsrMode'
 import { useRealmQuery } from './queries/realm'
 import {
@@ -48,10 +30,6 @@ export default function useRealm() {
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
 
-  const votingPower = useDepositStore((s) => s.state.votingPower)
-  const heliumVotingPower = useHeliumVsrStore((s) => s.state.votingPower)
-  const nftVotingPower = useNftPluginStore((s) => s.state.votingPower)
-  const gatewayVotingPower = useGatewayPluginStore((s) => s.state.votingPower)
   const currentPluginPk = config?.account?.communityTokenConfig.voterWeightAddin
 
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
@@ -97,15 +75,6 @@ export default function useRealm() {
   const vsrMode = useVsrMode()
   const isNftMode =
     currentPluginPk && NFT_PLUGINS_PKS.includes(currentPluginPk?.toBase58())
-  const ownVoterWeight = getVoterWeight(
-    currentPluginPk,
-    ownTokenRecord,
-    votingPower,
-    nftVotingPower,
-    gatewayVotingPower,
-    ownCouncilTokenRecord,
-    heliumVotingPower
-  )
 
   return useMemo(
     () => ({
@@ -127,7 +96,7 @@ export default function useRealm() {
       realmTokenAccount,
       councilTokenAccount,
       /** @deprecated just use the token owner record directly, ok? */
-      ownVoterWeight,
+      //ownVoterWeight,
       //realmDisplayName: realmInfo?.displayName ?? realm?.account?.name,
       canChooseWhoVote,
       //councilTokenOwnerRecords,
@@ -144,8 +113,6 @@ export default function useRealm() {
       councilTokenAccount,
       currentPluginPk,
       isNftMode,
-
-      ownVoterWeight,
       realmInfo,
       realmTokenAccount,
       symbol,
@@ -154,46 +121,4 @@ export default function useRealm() {
       vsrMode,
     ]
   )
-}
-
-const getVoterWeight = (
-  currentPluginPk: PublicKey | undefined,
-  ownTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,
-  votingPower: BN,
-  nftVotingPower: BN,
-  gatewayVotingPower: BN,
-  ownCouncilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,
-  heliumVotingPower: BN
-) => {
-  if (currentPluginPk) {
-    if (VSR_PLUGIN_PKS.includes(currentPluginPk.toBase58())) {
-      return new VoteRegistryVoterWeight(
-        ownTokenRecord,
-        ownCouncilTokenRecord,
-        votingPower
-      )
-    }
-    if (HELIUM_VSR_PLUGINS_PKS.includes(currentPluginPk.toBase58())) {
-      return new VoteRegistryVoterWeight(
-        ownTokenRecord,
-        ownCouncilTokenRecord,
-        heliumVotingPower
-      )
-    }
-    if (NFT_PLUGINS_PKS.includes(currentPluginPk.toBase58())) {
-      return new VoteNftWeight(
-        ownTokenRecord,
-        ownCouncilTokenRecord,
-        nftVotingPower
-      )
-    }
-    if (GATEWAY_PLUGINS_PKS.includes(currentPluginPk.toBase58())) {
-      return new SimpleGatedVoterWeight(
-        ownTokenRecord,
-        ownCouncilTokenRecord,
-        gatewayVotingPower
-      )
-    }
-  }
-  return new VoterWeight(ownTokenRecord, ownCouncilTokenRecord)
 }

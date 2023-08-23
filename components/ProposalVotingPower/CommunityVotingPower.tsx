@@ -16,6 +16,7 @@ import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
 import { useConnection } from '@solana/wallet-adapter-react'
+import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 
 interface Props {
   className?: string
@@ -25,8 +26,8 @@ export default function CommunityVotingPower(props: Props) {
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const realm = useRealmQuery().data?.result
   const mint = useRealmCommunityMintInfoQuery().data?.result
-
-  const { ownVoterWeight, realmInfo, realmTokenAccount } = useRealm()
+  const { result: ownVoterWeight } = useLegacyVoterWeight()
+  const { realmInfo, realmTokenAccount } = useRealm()
   const proposal = useRouteProposalQuery().data?.result
   const { connection } = useConnection()
   const wallet = useWalletOnePointOh()
@@ -40,7 +41,9 @@ export default function CommunityVotingPower(props: Props) {
   const tokenName =
     getMintMetadata(depositMint)?.name ?? realm?.account.name ?? ''
 
-  const amount = getNumTokens(ownVoterWeight, ownTokenRecord, mint, realmInfo)
+  const amount = ownVoterWeight
+    ? getNumTokens(ownVoterWeight, ownTokenRecord, mint, realmInfo)
+    : new BigNumber(0)
   const max =
     realm && proposal && mint
       ? new BigNumber(

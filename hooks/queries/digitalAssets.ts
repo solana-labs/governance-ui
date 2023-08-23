@@ -234,7 +234,7 @@ const dasByOwnerQueryFn = async (network: Network, owner: PublicKey) => {
     }),
   })
   const { result } = await response.json()
-  return result.items as any[]
+  return result.items as DasNftObject[]
 }
 
 export const fetchDigitalAssetsByOwner = (network: Network, owner: PublicKey) =>

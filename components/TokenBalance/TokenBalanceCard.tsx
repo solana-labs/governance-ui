@@ -54,6 +54,7 @@ import { useConnection } from '@solana/wallet-adapter-react'
 import queryClient from '@hooks/queries/queryClient'
 import { proposalQueryKeys } from '@hooks/queries/proposal'
 import asFindable from '@utils/queries/asFindable'
+import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 
 const TokenBalanceCard = ({
   proposal,
@@ -172,18 +173,18 @@ export const TokenDeposit = ({
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { result: ownVoterWeight } = useLegacyVoterWeight()
 
   const {
     realmInfo,
     realmTokenAccount,
-    ownVoterWeight,
     councilTokenAccount,
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
 
-  const amount =
-    councilMint && tokenRole === GoverningTokenRole.Council
+  const amount = ownVoterWeight
+    ? councilMint && tokenRole === GoverningTokenRole.Council
       ? getNumTokens(
           ownVoterWeight,
           ownCouncilTokenRecord,
@@ -191,6 +192,7 @@ export const TokenDeposit = ({
           realmInfo
         )
       : getNumTokens(ownVoterWeight, ownCouncilTokenRecord, mint, realmInfo)
+    : new BigNumber(0)
 
   const max: BigNumber | undefined =
     councilMint && tokenRole === GoverningTokenRole.Council

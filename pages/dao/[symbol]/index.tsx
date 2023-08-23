@@ -53,6 +53,7 @@ import {
   useRealmProposalsQuery,
 } from '@hooks/queries/proposal'
 import queryClient from '@hooks/queries/queryClient'
+import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
@@ -76,7 +77,8 @@ const REALM = () => {
   const realmQuery = useRealmQuery()
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
-  const { realmInfo, ownVoterWeight } = useRealm()
+  const { result: ownVoterWeight } = useLegacyVoterWeight()
+  const { realmInfo } = useRealm()
   const proposalsPerPage = 20
   const [filters, setFilters] = useState<Filters>(InitialFilters)
   const [sorting, setSorting] = useState<Sorting>(InitialSorting)
@@ -225,10 +227,12 @@ const REALM = () => {
     selectedProposals.length === votingProposals?.length
   const hasCommunityVoteWeight =
     ownTokenRecord &&
-    ownVoterWeight.hasMinAmountToVote(ownTokenRecord.account.governingTokenMint)
+    ownVoterWeight?.hasMinAmountToVote(
+      ownTokenRecord.account.governingTokenMint
+    )
   const hasCouncilVoteWeight =
     ownCouncilTokenRecord &&
-    ownVoterWeight.hasMinAmountToVote(
+    ownVoterWeight?.hasMinAmountToVote(
       ownCouncilTokenRecord.account.governingTokenMint
     )
 
