@@ -357,8 +357,8 @@ export default function useGovernanceAssets() {
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Dual,
     },
-    [Instructions.DualFinanceExercise]: {
-      name: 'Exercise',
+    [Instructions.DualFinanceExerciseStakingOption]: {
+      name: 'Exercise Staking Option',
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Dual,
     },
@@ -367,7 +367,7 @@ export default function useGovernanceAssets() {
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Dual,
     },
-    [Instructions.DualFinanceWithdraw]: {
+    [Instructions.DualFinanceStakingOptionWithdraw]: {
       name: 'Withdraw',
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Dual,
