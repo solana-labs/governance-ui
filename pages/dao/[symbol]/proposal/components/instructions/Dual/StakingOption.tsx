@@ -75,7 +75,7 @@ const StakingOption = ({
       { governedAccount: governedAccount, getInstruction },
       index
     )
-    if (form.baseTreasury) {
+    if (form.baseTreasury && form.baseTreasury.extensions.mint && form.baseTreasury.extensions.mint.account.decimals) {
       const {
         logo,
         name,
@@ -87,12 +87,12 @@ const StakingOption = ({
         name,
         symbol,
         displayPrice,
-        decimals: form.baseTreasury.extensions.mint?.account.decimals!
+        decimals: form.baseTreasury.extensions.mint.account.decimals
       })
     } else {
       setBaseMetadata(undefined)
     }
-    if (form.quoteTreasury) {
+    if (form.quoteTreasury && form.quoteTreasury.extensions.mint && form.quoteTreasury.extensions.mint.account.decimals) {
       const {
         logo,
         name,
@@ -104,7 +104,7 @@ const StakingOption = ({
         name,
         symbol,
         displayPrice,
-        decimals: form.quoteTreasury.extensions.mint?.account.decimals!
+        decimals: form.quoteTreasury.extensions.mint.account.decimals
       })
     } else {
       setQuoteMetadata(undefined)
