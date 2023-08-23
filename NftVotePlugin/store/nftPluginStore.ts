@@ -26,6 +26,10 @@ const defaultState = {
   isLoadingNfts: false,
 }
 
+/**
+ * @deprecated
+ * instead of using this, query directly whatever it is you wanna query. we can make a query for getting voting NFTs.
+ */
 const useNftPluginStore = create<nftPluginStore>((set, _get) => ({
   state: {
     ...defaultState,
