@@ -48,9 +48,9 @@ export async function getExplorerInspectorUrl(
 
   const message =
     transaction instanceof Transaction
-      ? transaction.serializeMessage()
-      : transaction.message.serialize()
-  explorerUrl.searchParams.append('message', message.toString('base64'))
+      ? transaction.serializeMessage().toString('base64')
+      : Buffer.from(transaction.message.serialize()).toString('base64')
+  explorerUrl.searchParams.append('message', message)
 
   if (connection.cluster === 'devnet') {
     explorerUrl.searchParams.append('cluster', 'devnet')
