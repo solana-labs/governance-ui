@@ -26,7 +26,12 @@ import {
   TimeStrategy,
   TransactionInstructionWithSigners,
 } from '@blockworks-foundation/mangolana/lib/globalTypes'
-import { WalletSigner } from '@solana/spl-governance'
+import { WalletContextState } from '@solana/wallet-adapter-react'
+
+type WalletSigner = Pick<
+  WalletContextState,
+  'publicKey' | 'signAllTransactions' | 'signTransaction'
+>
 
 interface TransactionInstructionWithType {
   instructionsSet: TransactionInstructionWithSigners[]
@@ -494,8 +499,10 @@ export const sendSignAndConfirmTransactions = async ({
   versionedTxs.forEach((tx, i) => tx.sign(signers[i]))
 
   logger.log(transactionCallOrchestrator)
+
+  if (wallet.signAllTransactions === undefined) throw new Error()
+
   const signedTxns = ((await wallet.signAllTransactions(
-    //@ts-ignore
     versionedTxs
   )) as unknown) as VersionedTransaction[]
   if (callbacks?.afterFirstBatchSign) {
