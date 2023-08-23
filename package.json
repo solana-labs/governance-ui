@@ -101,7 +101,7 @@
     "@solana/wallet-adapter-torus": "0.11.27",
     "@solana/wallet-adapter-walletconnect": "0.1.14",
     "@solana/wallet-adapter-wallets": "0.19.15",
-    "@solana/web3.js": "1.73.3",
+    "@solana/web3.js": "1.78.3",
     "@solendprotocol/solend-sdk": "0.5.5",
     "@sqds/iframe-adapter": "1.0.16",
     "@switchboard-xyz/solana.js": "2.5.4",
@@ -205,7 +205,7 @@
   },
   "resolutions": {
     "port-sdk/@saberhq/token-utils": "1.12.53",
-    "@solana/web3.js": "1.73.3",
+    "@solana/web3.js": "1.78.3",
     "react": "18.2.0",
     "@solana/spl-token-registry": "0.2.3775",
     "@solana/buffer-layout": "4.0.0",
