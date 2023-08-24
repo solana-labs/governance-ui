@@ -272,6 +272,12 @@ export const ACCOUNT_NAMES = {
     'Marinade Council Budget Wallet',
   H988v6sNu4dw911AeUo6fy5RsTkDtyfcTAMNpdq1Mo6u:
     'Marinade Council Budget MNDE Vault',
+  '7iUtTuZAh2Len8LiC1u68gUMPMsKh9kce9bcbdGwtBZY':
+    'Marinade Programs Upgrade Governance',
+  '6YAju4nd4t7kyuHV6NvVpMepMk11DgWyYjKVJUak2EEm':
+    'Marinade Programs Upgrade Wallet',
+  'indiXdKbsC4QSLQQnn6ngZvkqfywn6KgEeQbkGSpk1V':
+    'Marinade Incentives Distribution Program',
   '2w6ny74cU6yRxkD6ZACh5M1JznLQ1KB6AUsB7zo2NBHX':
     'Marinade Voter Stake Registry Program Governance',
   '6egAu2HDLcSgeUYmiBvNLgp7Bd4nPk16gX9MvWuJpeX2':
