@@ -1,7 +1,7 @@
 import {
   PublicKey,
   Keypair,
-  // Transaction,
+  Transaction,
   TransactionInstruction,
 } from '@solana/web3.js'
 import {
@@ -14,13 +14,8 @@ import { ChatMessageBody } from '@solana/spl-governance'
 import { withPostChatMessage } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
+import { sendTransaction } from '../../utils/send'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
-import { chunks } from '@utils/helpers'
-import {
-  SequenceType,
-  sendTransactionsV3,
-  txBatchesToInstructionSetWithSigners,
-} from '@utils/sendTransactions'
 
 export async function postChatMessage(
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -33,7 +28,6 @@ export async function postChatMessage(
 ) {
   const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []
-  const createNftTicketsIxs: TransactionInstruction[] = []
 
   const governanceAuthority = walletPubkey
   const payer = walletPubkey
@@ -41,8 +35,7 @@ export async function postChatMessage(
   const plugin = await client?.withUpdateVoterWeightRecord(
     instructions,
     tokeOwnerRecord,
-    'commentProposal',
-    createNftTicketsIxs
+    'commentProposal'
   )
 
   await withPostChatMessage(
@@ -61,43 +54,8 @@ export async function postChatMessage(
     plugin?.voterWeightPk
   )
 
-  // createTicketIxs is a list of instructions that create nftActionTicket only for nft-voter-v2 plugin
-  // so it will be empty for other plugins or just spl-governance
-  const nftTicketAccountsChuncks = chunks(createNftTicketsIxs, 1)
+  const transaction = new Transaction()
+  transaction.add(...instructions)
 
-  const postMessageIxsChunk = [instructions]
-
-  const instructionsChunks = [
-    ...nftTicketAccountsChuncks.map((txBatch, batchIdx) => {
-      return {
-        instructionsSet: txBatchesToInstructionSetWithSigners(
-          txBatch,
-          [],
-          batchIdx
-        ),
-        sequenceType: SequenceType.Parallel,
-      }
-    }),
-    ...postMessageIxsChunk.map((txBatch, batchIdx) => {
-      return {
-        instructionsSet: txBatchesToInstructionSetWithSigners(
-          txBatch,
-          [signers],
-          batchIdx
-        ),
-        sequenceType: SequenceType.Sequential,
-      }
-    }),
-  ]
-
-  await sendTransactionsV3({
-    connection,
-    wallet,
-    transactionInstructions: instructionsChunks,
-    callbacks: undefined,
-  })
-
-  // const transaction = new Transaction()
-  // transaction.add(...instructions)
-  // await sendTransaction({ transaction, wallet, connection, signers })
+  await sendTransaction({ transaction, wallet, connection, signers })
 }

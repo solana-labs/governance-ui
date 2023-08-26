@@ -60,9 +60,6 @@ export async function castVote(
   const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []
 
-  const createCastNftVoteTicketIxs: TransactionInstruction[] = []
-  const createPostMessageTicketIxs: TransactionInstruction[] = []
-
   const governanceAuthority = walletPubkey
   const payer = walletPubkey
   // Explicitly request the version before making RPC calls to work around race conditions in resolving
@@ -76,12 +73,12 @@ export async function castVote(
   const plugin = await votingPlugin?.withCastPluginVote(
     instructions,
     proposal,
-    tokenOwnerRecord,
-    createCastNftVoteTicketIxs
+    tokenOwnerRecord
   )
 
-  const isMulti = proposal.account.voteType !== VoteType.SINGLE_CHOICE
-   && proposal.account.accountType === GovernanceAccountType.ProposalV2
+  const isMulti =
+    proposal.account.voteType !== VoteType.SINGLE_CHOICE &&
+    proposal.account.accountType === GovernanceAccountType.ProposalV2
 
   // It is not clear that defining these extraneous fields, `deny` and `veto`, is actually necessary.
   // See:  https://discord.com/channels/910194960941338677/910630743510777926/1044741454175674378
@@ -152,8 +149,7 @@ export async function castVote(
     const plugin = await votingPlugin?.withUpdateVoterWeightRecord(
       instructions,
       tokenOwnerRecord,
-      'commentProposal',
-      createPostMessageTicketIxs
+      'commentProposal'
     )
 
     await withPostChatMessage(
@@ -241,28 +237,16 @@ export async function castVote(
       openNftVotingCountingModal,
       closeNftVotingCountingModal,
     } = useNftProposalStore.getState()
-
-    const createNftVoteTicketsChunks = chunks(
-      [...createCastNftVoteTicketIxs, ...createPostMessageTicketIxs],
-      1
+    //update voter weight + cast vote from spl gov need to be in one transaction
+    const ixsWithOwnChunk = instructions.slice(-ixChunkCount)
+    const remainingIxsToChunk = instructions.slice(
+      0,
+      instructions.length - ixChunkCount
     )
 
-    const splIxs = instructions.slice(-ixChunkCount)
-    const nftAccountIxs = instructions.slice(0, -ixChunkCount)
-
-    const splIxsWithAccountsChunk = chunks(splIxs, 2)
-    const nftsAccountsChunks = chunks(nftAccountIxs, 2)
+    const splIxsWithAccountsChunk = chunks(ixsWithOwnChunk, 2)
+    const nftsAccountsChunks = chunks(remainingIxsToChunk, 2)
     const instructionsChunks = [
-      ...createNftVoteTicketsChunks.map((txBatch, batchIdx) => {
-        return {
-          instructionsSet: txBatchesToInstructionSetWithSigners(
-            txBatch,
-            [],
-            batchIdx
-          ),
-          sequenceType: SequenceType.Parallel,
-        }
-      }),
       ...nftsAccountsChunks.map((txBatch, batchIdx) => {
         return {
           instructionsSet: txBatchesToInstructionSetWithSigners(
@@ -270,9 +254,7 @@ export async function castVote(
             [],
             batchIdx
           ),
-          sequenceType:
-            // this is to ensure create all the nft_action_tickets account first
-            batchIdx == 0 ? SequenceType.Sequential : SequenceType.Parallel,
+          sequenceType: SequenceType.Parallel,
         }
       }),
       ...splIxsWithAccountsChunk.map((txBatch, batchIdx) => {

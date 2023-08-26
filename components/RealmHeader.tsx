@@ -10,7 +10,6 @@ import { getRealmExplorerHost } from 'tools/routing'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
-import { NFT_PLUGINS_PKS } from '@constants/plugins'
 
 const RealmHeader = () => {
   const { fmtUrlWithCluster } = useQueryContext()
@@ -68,10 +67,7 @@ const RealmHeader = () => {
           <div className="w-40 h-10 rounded-md animate-pulse bg-bkg-3" />
         )}
         <div className="flex items-center space-x-4">
-          {(!config?.account.communityTokenConfig.voterWeightAddin ||
-            NFT_PLUGINS_PKS.includes(
-              config?.account.communityTokenConfig.voterWeightAddin.toBase58()
-            )) && (
+          {!config?.account.communityTokenConfig.voterWeightAddin && (
             <Link href={fmtUrlWithCluster(`/dao/${symbol}/members`)}>
               <a className="flex items-center text-sm cursor-pointer default-transition text-fgd-2 hover:text-fgd-3">
                 <UsersIcon className="flex-shrink-0 w-5 h-5 mr-1" />

@@ -24,7 +24,6 @@ const Members = () => {
   } = useRealm()
   const pagination = useRef<{ setPage: (val) => void }>(null)
   const membersPerPage = 10
-
   const { data: activeMembers } = useMembersQuery()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
@@ -193,12 +192,7 @@ const Members = () => {
           </div>
         </div>
         <div className="col-span-12 lg:col-span-8">
-          {activeMember ? (
-            <MemberOverview
-              member={activeMember}
-              activeMembers={activeMembers}
-            />
-          ) : null}
+          {activeMember ? <MemberOverview member={activeMember} /> : null}
         </div>
       </div>
       {openAddMemberModal && (

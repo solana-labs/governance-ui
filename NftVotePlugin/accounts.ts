@@ -1,6 +1,5 @@
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { PublicKey } from '@solana/web3.js'
-
 export interface NftVoteRecord {
   account: {
     governingTokenOwner: PublicKey
@@ -44,31 +43,5 @@ export const getNftVoteRecordProgramAddress = async (
   return {
     nftVoteRecord,
     nftVoteRecordBump,
-  }
-}
-
-export const getNftActionTicketProgramAddress = (
-  ticketType: string,
-  registrar: PublicKey,
-  owner: PublicKey,
-  nftMintAddress: string,
-  clientProgramId: PublicKey
-) => {
-  const [
-    nftActionTicket,
-    nftActionTicketBump,
-  ] = PublicKey.findProgramAddressSync(
-    [
-      Buffer.from(ticketType),
-      registrar.toBuffer(),
-      owner.toBuffer(),
-      new PublicKey(nftMintAddress).toBuffer(),
-    ],
-    clientProgramId
-  )
-
-  return {
-    nftActionTicket,
-    nftActionTicketBump,
   }
 }

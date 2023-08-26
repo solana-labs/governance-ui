@@ -1,16 +1,15 @@
 import { MaxVoterWeightRecord, ProgramAccount } from '@solana/spl-governance'
-import { VotingClient } from '@utils/uiTypes/VotePlugin'
-import { DasNftObject } from '@hooks/queries/digitalAssets'
+import { NFTWithMeta, VotingClient } from '@utils/uiTypes/VotePlugin'
 import create, { State } from 'zustand'
 
 interface nftPluginStore extends State {
   state: {
-    votingNfts: DasNftObject[]
+    votingNfts: NFTWithMeta[]
     maxVoteRecord: ProgramAccount<MaxVoterWeightRecord> | null
     isLoadingNfts: boolean
   }
   setVotingNfts: (
-    nfts: DasNftObject[],
+    nfts: NFTWithMeta[],
     votingClient: VotingClient,
     nftMintRegistrar: any
   ) => void

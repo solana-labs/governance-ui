@@ -14,7 +14,7 @@ import {
   InstructionData,
   withSignOffProposal,
   withAddSignatory,
-  MultiChoiceType,
+  MultiChoiceType
 } from '@solana/spl-governance'
 import {
   sendTransactionsV3,
@@ -26,7 +26,6 @@ import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
 import { trySentryLog } from '@utils/logs'
 import { deduplicateObjsFilter } from '@utils/instructionTools'
-import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 export interface InstructionDataWithHoldUpTime {
   data: InstructionData | null
   holdUpTime: number | undefined
@@ -74,7 +73,6 @@ export const createProposal = async (
   callbacks?: Parameters<typeof sendTransactionsV3>[0]['callbacks']
 ): Promise<PublicKey> => {
   const instructions: TransactionInstruction[] = []
-  const createNftTicketsIxs: TransactionInstruction[] = []
   const governanceAuthority = walletPubkey
   const signatory = walletPubkey
   const payer = walletPubkey
@@ -93,25 +91,19 @@ export const createProposal = async (
   )
 
   // V2 Approve/Deny configuration
-  const isMulti = options.length > 1
+  const isMulti = options.length > 1;
 
   const useDenyOption = !isMulti
 
-  const voteType = isMulti
-    ? VoteType.MULTI_CHOICE(
-        MultiChoiceType.FullWeight,
-        1,
-        options.length,
-        options.length
-      )
-    : VoteType.SINGLE_CHOICE
-
+  const voteType = isMulti ? VoteType.MULTI_CHOICE(
+    MultiChoiceType.FullWeight, 1, options.length, options.length
+  ) : VoteType.SINGLE_CHOICE
+  
   //will run only if plugin is connected with realm
   const plugin = await client?.withUpdateVoterWeightRecord(
     instructions,
     tokenOwnerRecord,
-    'createProposal',
-    createNftTicketsIxs
+    'createProposal'
   )
 
   const proposalAddress = await withCreateProposal(
@@ -232,72 +224,27 @@ export const createProposal = async (
     ...signerChunks,
   ]
 
-  const isNftVoter = client?.client instanceof NftVoterClient
-  if (!isNftVoter) {
-    const txes = [
-      ...prerequisiteInstructionsChunks,
-      instructions,
-      ...insertChunks,
-    ].map((txBatch, batchIdx) => {
-      return {
-        instructionsSet: txBatchesToInstructionSetWithSigners(
-          txBatch,
-          signersSet,
-          batchIdx
-        ),
-        sequenceType: SequenceType.Sequential,
-      }
-    })
+  const txes = [
+    ...prerequisiteInstructionsChunks,
+    instructions,
+    ...insertChunks,
+  ].map((txBatch, batchIdx) => {
+    return {
+      instructionsSet: txBatchesToInstructionSetWithSigners(
+        txBatch,
+        signersSet,
+        batchIdx
+      ),
+      sequenceType: SequenceType.Sequential,
+    }
+  })
 
-    await sendTransactionsV3({
-      callbacks,
-      connection,
-      wallet,
-      transactionInstructions: txes,
-    })
-  }
-
-  if (isNftVoter) {
-    // update voter weight records
-    const nftTicketAccountsChunk = chunks(createNftTicketsIxs, 1)
-    const splIxsWithAccountsChunk = [
-      ...prerequisiteInstructionsChunks,
-      instructions,
-      ...insertChunks,
-    ]
-
-    const instructionsChunks = [
-      ...nftTicketAccountsChunk.map((txBatch, batchIdx) => {
-        return {
-          instructionsSet: txBatchesToInstructionSetWithSigners(
-            txBatch,
-            [],
-            batchIdx
-          ),
-          sequenceType: SequenceType.Parallel,
-        }
-      }),
-      ...splIxsWithAccountsChunk.map((txBatch, batchIdx) => {
-        return {
-          instructionsSet: txBatchesToInstructionSetWithSigners(
-            txBatch,
-            signersSet,
-            batchIdx
-          ),
-          sequenceType: SequenceType.Sequential,
-        }
-      }),
-    ]
-
-    // should add checking user has enough sol, refer castVote
-
-    await sendTransactionsV3({
-      connection,
-      wallet,
-      transactionInstructions: instructionsChunks,
-      callbacks,
-    })
-  }
+  await sendTransactionsV3({
+    callbacks,
+    connection,
+    wallet,
+    transactionInstructions: txes,
+  })
 
   const logInfo = {
     realmId: realm.pubkey.toBase58(),
