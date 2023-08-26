@@ -204,7 +204,8 @@ const New = () => {
     governance: undefined,
     options: ['', ''], // the multichoice form starts with 2 blank options for the poll
   })
-  const [formErrors, setFormErrors] = useState({})
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_formErrors, setFormErrors] = useState({})
   const [
     governance,
     setGovernance,
