@@ -8,7 +8,6 @@ import BN from 'bn.js'
 import { fetchNftRegistrar } from './plugins/nftVoter'
 import { fetchDigitalAssetsByOwner } from './digitalAssets'
 import { getNetworkFromEndpoint } from '@utils/connection'
-import { ON_NFT_VOTER_V2 } from '@constants/flags'
 import { fetchRealmByPubkey, useRealmQuery } from './realm'
 import { fetchRealmConfigQuery } from './realmConfig'
 import {
@@ -70,7 +69,7 @@ export const getNftGovpower = async (
   if (network === 'localnet') throw new Error()
   const nfts = (await fetchDigitalAssetsByOwner(network, owner))
     // filter cnfts if not supported yet
-    .filter((nft) => ON_NFT_VOTER_V2 || !nft.compression.compressed)
+    .filter((nft) => !nft.compression.compressed)
 
   // map nfts to power and sum them
   const power = nfts
