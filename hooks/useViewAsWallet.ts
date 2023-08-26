@@ -22,6 +22,7 @@ const useViewAsWallet = () => {
     async (transaction: Transaction) => {
       const inspectUrl = await getExplorerInspectorUrl(connection, transaction)
       window.open(inspectUrl, '_blank')
+      return transaction
     },
     [connection]
   )
@@ -31,8 +32,15 @@ const useViewAsWallet = () => {
       typeof viewAs === 'string'
         ? (({
             publicKey: new PublicKey(viewAs),
-            signAllTransactions: (txs: Transaction[]) =>
-              txs.forEach(signTransaction),
+            signAllTransactions: async (txs: Transaction[]) => {
+              const results: typeof txs = []
+              for (const tx of txs) {
+                results.push(await signTransaction(tx))
+                // the browser won't let you open a billion tabs in a short amount of time, so we sleep.
+                await new Promise((r) => setTimeout(r, 5000))
+              }
+              return results
+            },
             signTransaction,
             signMessage: err,
             connected: true,
