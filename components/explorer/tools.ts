@@ -45,6 +45,11 @@ export async function getExplorerInspectorUrl(
     base58.encode(s.signature ?? Buffer.alloc(SIGNATURE_LENGTH))
   )
   explorerUrl.searchParams.append('signatures', JSON.stringify(signatures))
+  const recentBlockHash = await connection.current.getLatestBlockhash()
+  if (transaction instanceof Transaction) {
+    transaction.lastValidBlockHeight = recentBlockHash.lastValidBlockHeight
+    transaction.recentBlockhash = recentBlockHash.blockhash
+  }
 
   const message =
     transaction instanceof Transaction
