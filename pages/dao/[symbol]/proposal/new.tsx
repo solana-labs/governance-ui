@@ -8,16 +8,18 @@ import React, {
 } from 'react'
 import * as yup from 'yup'
 import { PlusCircleIcon, XCircleIcon } from '@heroicons/react/outline'
-import {TableOfContents} from '@carbon/icons-react'
+import { TableOfContents } from '@carbon/icons-react'
 import {
   getInstructionDataFromBase64,
   Governance,
   ProgramAccount,
 } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
-import Button, { LinkButton, ProposalTypeRadioButton, SecondaryButton } from '@components/Button'
-import Input from '@components/inputs/Input'
-import Textarea from '@components/inputs/Textarea'
+import Button, {
+  LinkButton,
+  ProposalTypeRadioButton,
+  SecondaryButton,
+} from '@components/Button'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import useGovernanceAssets, {
   InstructionType,
@@ -99,7 +101,7 @@ import GrantForm from './components/instructions/Serum/GrantForm'
 import JoinDAO from './components/instructions/JoinDAO'
 import UpdateConfigAuthority from './components/instructions/Serum/UpdateConfigAuthority'
 import UpdateConfigParams from './components/instructions/Serum/UpdateConfigParams'
-import { StyledLabel } from '@components/inputs/styles'
+import { StyledLabel, inputClasses } from '@components/inputs/styles'
 import SelectInstructionType from '@components/SelectInstructionType'
 import AddKeyToDID from './components/instructions/Identity/AddKeyToDID'
 import RemoveKeyFromDID from './components/instructions/Identity/RemoveKeyFromDID'
@@ -135,6 +137,9 @@ import DualGsoWithdraw from './components/instructions/Dual/DualGsoWithdraw'
 import MultiChoiceForm from '../../../../components/MultiChoiceForm'
 
 const TITLE_LENGTH_LIMIT = 130
+// the true length limit is either at the tx size level, and maybe also the total account size level (I can't remember)
+// so this is semi arbitrary
+const DESCRIPTION_LENGTH_LIMIT = 512
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -143,9 +148,8 @@ const schema = yup.object().shape({
 const multiChoiceSchema = yup.object().shape({
   governance: yup.string().required('Governance is required'),
 
-  options: yup.array().of(yup.string().required('Option cannot be empty'))
-});
-
+  options: yup.array().of(yup.string().required('Option cannot be empty')),
+})
 
 const defaultGovernanceCtx: InstructionsContext = {
   instructionsData: [],
@@ -186,7 +190,7 @@ const New = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const realm = useRealmQuery().data?.result
 
-  const { symbol, realmInfo, canChooseWhoVote} = useRealm()
+  const { symbol, realmInfo, canChooseWhoVote } = useRealm()
   const { availableInstructions } = useGovernanceAssets()
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [form, setForm] = useState({
@@ -198,7 +202,7 @@ const New = () => {
     options: string[]
   }>({
     governance: undefined,
-    options: ['', ''] // the multichoice form starts with 2 blank options for the poll
+    options: ['', ''], // the multichoice form starts with 2 blank options for the poll
   })
   const [formErrors, setFormErrors] = useState({})
   const [
@@ -296,16 +300,19 @@ const New = () => {
 
     if (isValid && instructions.every((x: UiInstruction) => x.isValid)) {
       if (isMulti) {
-        const { isValid: isMultiFormValid, validationErrors: multiValidationErrors }: formValidation = await isFormValid(
+        const {
+          isValid: isMultiFormValid,
+          validationErrors: multiValidationErrors,
+        }: formValidation = await isFormValid(
           multiChoiceSchema,
           multiChoiceForm
         )
-        
+
         if (isMultiFormValid && multiChoiceForm.governance) {
           // Create Multi-Choice Proposal
           try {
-            const options = [...multiChoiceForm.options];
-            
+            const options = [...multiChoiceForm.options]
+
             proposalAddress = await proposeMultiChoice({
               title: form.title,
               description: form.description,
@@ -313,13 +320,13 @@ const New = () => {
               instructionsData: [],
               voteByCouncil,
               options,
-              isDraft
-            });
-    
+              isDraft,
+            })
+
             const url = fmtUrlWithCluster(
               `/dao/${symbol}/proposal/${proposalAddress}`
             )
-    
+
             router.push(url)
           } catch (ex) {
             console.log(ex)
@@ -327,7 +334,7 @@ const New = () => {
           }
         } else {
           setIsMultiFormValidated(true)
-          setMultiFormErrors(multiValidationErrors);
+          setMultiFormErrors(multiValidationErrors)
         }
       } else {
         if (!governance) {
@@ -615,8 +622,6 @@ const New = () => {
     [governance?.pubkey?.toBase58()]
   )
 
-  const titleTooLong = form.title.length > TITLE_LENGTH_LIMIT
-
   return (
     <div className="grid grid-cols-12 gap-4">
       <div
@@ -637,47 +642,68 @@ const New = () => {
             </div>
           </div>
           <div className="pt-2">
-            <div className="pb-4 relative min-h-[100px]">
-              <Input
-                label="Title"
+            <div className="flex flex-col max-w-lg mb-3">
+              <div className="flex items-end justify-between">
+                <div>
+                  <StyledLabel>Title</StyledLabel>
+                </div>
+                <div
+                  className={classNames(
+                    'text-xs mb-1',
+                    form.title.length >= TITLE_LENGTH_LIMIT
+                      ? 'text-error-red'
+                      : 'text-white/50'
+                  )}
+                >
+                  {form.title.length} / {TITLE_LENGTH_LIMIT}
+                </div>
+              </div>
+              <input
                 placeholder="Title of your proposal"
                 value={form.title}
-                type="text"
-                error={formErrors['title']}
-                showErrorState={titleTooLong}
                 onChange={(evt) =>
                   handleSetForm({
                     value: evt.target.value,
                     propertyName: 'title',
                   })
                 }
+                maxLength={TITLE_LENGTH_LIMIT}
+                className={inputClasses({
+                  useDefaultStyle: true,
+                })}
               />
-              <div className="max-w-lg w-full absolute bottom-4 left-0">
+            </div>
+            <div className="flex flex-col max-w-lg mb-3">
+              <div className="flex items-end justify-between">
+                <div>
+                  <StyledLabel>Description</StyledLabel>
+                </div>
                 <div
                   className={classNames(
-                    'absolute',
-                    'bottom-0',
-                    'right-0',
-                    'text-xs',
-                    titleTooLong ? 'text-error-red' : 'text-white/50'
+                    'text-xs mb-1',
+                    form.description.length >= DESCRIPTION_LENGTH_LIMIT
+                      ? 'text-error-red'
+                      : 'text-white/50'
                   )}
                 >
-                  {form.title.length} / {TITLE_LENGTH_LIMIT}
+                  {form.description.length} / {DESCRIPTION_LENGTH_LIMIT}
                 </div>
               </div>
+              <textarea
+                placeholder="Description of your proposal or use a github gist link (optional)"
+                value={form.description}
+                onChange={(evt) =>
+                  handleSetForm({
+                    value: evt.target.value,
+                    propertyName: 'description',
+                  })
+                }
+                maxLength={DESCRIPTION_LENGTH_LIMIT}
+                className={inputClasses({
+                  useDefaultStyle: true,
+                })}
+              />
             </div>
-            <Textarea
-              className="mb-3"
-              label="Description"
-              placeholder="Description of your proposal or use a github gist link (optional)"
-              value={form.description}
-              onChange={(evt) =>
-                handleSetForm({
-                  value: evt.target.value,
-                  propertyName: 'description',
-                })
-              }
-            ></Textarea>
             {canChooseWhoVote && (
               <VoteBySwitch
                 checked={voteByCouncil}
@@ -687,19 +713,21 @@ const New = () => {
               ></VoteBySwitch>
             )}
             <div className="max-w-lg w-full mb-4 flex flex-wrap gap-2 justify-between items-end">
-              <div className='flex grow basis-0'>
+              <div className="flex grow basis-0">
                 <ProposalTypeRadioButton
                   onClick={() => setIsMulti(false)}
                   selected={!isMulti}
                   disabled={false}
-                  className='grow'
+                  className="grow"
                 >
                   Executable
                 </ProposalTypeRadioButton>
               </div>
               <div className="flex flex-col items-center justify-evenly grow basis-0">
-                <div className="bg-[#10B981] text-black flex flex-row gap-2 text-sm 
-                items-center justify-center px-2 py-1 rounded-md mb-2 w-full">
+                <div
+                  className="bg-[#10B981] text-black flex flex-row gap-2 text-sm 
+                items-center justify-center px-2 py-1 rounded-md mb-2 w-full"
+                >
                   <TableOfContents />
                   <div>New: Multiple Choice Polls</div>
                 </div>
@@ -707,88 +735,89 @@ const New = () => {
                   onClick={() => setIsMulti(true)}
                   selected={isMulti}
                   disabled={false}
-                  className='w-full'
+                  className="w-full"
                 >
                   Non-Executable <br /> (Multiple-Choice)
                 </ProposalTypeRadioButton>
               </div>
             </div>
-            {isMulti ?
-            <MultiChoiceForm 
-              multiChoiceForm={multiChoiceForm} 
-              updateMultiChoiceForm={setMultiChoiceForm}
-              isMultiFormValidated={isMultiFormValidated}
-              multiFormErrors={multiFormErrors}
-              updateMultiFormErrors={setMultiFormErrors}
-            /> :
-            <div>
-            <NewProposalContext.Provider
-              value={{
-                instructionsData,
-                handleSetInstructions,
-                governance,
-                setGovernance,
-                voteByCouncil,
-              }}
-            >
-              <h2>Transactions</h2>
-              {instructionsData.map((instruction, index) => {
-                // copy index to keep its value for onChange function
-                const idx = index
+            {isMulti ? (
+              <MultiChoiceForm
+                multiChoiceForm={multiChoiceForm}
+                updateMultiChoiceForm={setMultiChoiceForm}
+                isMultiFormValidated={isMultiFormValidated}
+                multiFormErrors={multiFormErrors}
+                updateMultiFormErrors={setMultiFormErrors}
+              />
+            ) : (
+              <div>
+                <NewProposalContext.Provider
+                  value={{
+                    instructionsData,
+                    handleSetInstructions,
+                    governance,
+                    setGovernance,
+                    voteByCouncil,
+                  }}
+                >
+                  <h2>Transactions</h2>
+                  {instructionsData.map((instruction, index) => {
+                    // copy index to keep its value for onChange function
+                    const idx = index
 
-                return (
-                  <div
-                    key={idx}
-                    className="mb-3 border border-fgd-4 p-4 md:p-6 rounded-lg"
-                  >
-                    <StyledLabel>Instruction {idx + 1}</StyledLabel>
-
-                    <SelectInstructionType
-                      instructionTypes={availableInstructions}
-                      onChange={(instructionType) =>
-                        setInstructionType({
-                          value: instructionType,
-                          idx,
-                        })
-                      }
-                      selectedInstruction={instruction.type}
-                    />
-
-                    <div className="flex items-end pt-4">
-                      <InstructionContentContainer
-                        idx={idx}
-                        instructionsData={instructionsData}
+                    return (
+                      <div
+                        key={idx}
+                        className="mb-3 border border-fgd-4 p-4 md:p-6 rounded-lg"
                       >
-                        {getCurrentInstruction({
-                          typeId: instruction.type?.id,
-                          index: idx,
-                        })}
-                      </InstructionContentContainer>
-                      {idx !== 0 && (
-                        <LinkButton
-                          className="flex font-bold items-center ml-4 text-fgd-1 text-sm"
-                          onClick={() => removeInstruction(idx)}
-                        >
-                          <XCircleIcon className="h-5 mr-1.5 text-red w-5" />
-                          Remove
-                        </LinkButton>
-                      )}
-                    </div>
-                  </div>
-                )
-              })}
-            </NewProposalContext.Provider>
-            <div className="flex justify-end mt-4 mb-8 px-6">
-              <LinkButton
-                className="flex font-bold items-center text-fgd-1 text-sm"
-                onClick={addInstruction}
-              >
-                <PlusCircleIcon className="h-5 mr-1.5 text-green w-5" />
-                Add instruction
-              </LinkButton>
-            </div>
-            </div>
-            }
+                        <StyledLabel>Instruction {idx + 1}</StyledLabel>
+
+                        <SelectInstructionType
+                          instructionTypes={availableInstructions}
+                          onChange={(instructionType) =>
+                            setInstructionType({
+                              value: instructionType,
+                              idx,
+                            })
+                          }
+                          selectedInstruction={instruction.type}
+                        />
+
+                        <div className="flex items-end pt-4">
+                          <InstructionContentContainer
+                            idx={idx}
+                            instructionsData={instructionsData}
+                          >
+                            {getCurrentInstruction({
+                              typeId: instruction.type?.id,
+                              index: idx,
+                            })}
+                          </InstructionContentContainer>
+                          {idx !== 0 && (
+                            <LinkButton
+                              className="flex font-bold items-center ml-4 text-fgd-1 text-sm"
+                              onClick={() => removeInstruction(idx)}
+                            >
+                              <XCircleIcon className="h-5 mr-1.5 text-red w-5" />
+                              Remove
+                            </LinkButton>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </NewProposalContext.Provider>
+                <div className="flex justify-end mt-4 mb-8 px-6">
+                  <LinkButton
+                    className="flex font-bold items-center text-fgd-1 text-sm"
+                    onClick={addInstruction}
+                  >
+                    <PlusCircleIcon className="h-5 mr-1.5 text-green w-5" />
+                    Add instruction
+                  </LinkButton>
+                </div>
+              </div>
+            )}
             <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
               <SecondaryButton
                 disabled={isLoading}
