@@ -32,7 +32,7 @@ const ProposalVoterNftChart = (props: Props) => {
     props.highlighted ? new PublicKey(props.highlighted) : undefined
   )
 
-  const usedCollectionsPks: string[] = useNftRegistrarCollection()
+  const usedCollectionsPks = useNftRegistrarCollection()
   const verifiedNfts = useMemo(
     () => filterVerifiedCollections(nfts, usedCollectionsPks),
     [nfts, usedCollectionsPks]

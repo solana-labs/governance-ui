@@ -27,7 +27,7 @@ interface UseVotePluginsClientStore extends State {
     heliumVsrClient: HeliumVsrClient | undefined
     nftClient: NftVoterClient | undefined
     gatewayClient: GatewayClient | undefined
-    nftMintRegistrar: any
+    nftMintRegistrar: undefined | Awaited<ReturnType<typeof tryGetNftRegistrar>>
     gatewayRegistrar: any
     currentRealmVotingClient: VotingClient
     voteStakeRegistryRegistrar: Registrar | null
