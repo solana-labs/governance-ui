@@ -255,7 +255,7 @@ const StakingOption = ({
       {baseMetadata && quoteMetadata && (
         <>
           <div className="p-3 border rounded-lg text-fgd-1 border-fgd-4 w-full">
-          {form.strike / form.lotSize * 10 ** (-quoteMetadata.decimals + baseMetadata.decimals) / form.numTokens * 10 ** baseMetadata.decimals}
+          {form.strike / form.lotSize * 10 ** (-quoteMetadata.decimals + baseMetadata.decimals) * (form.numTokens / 10 ** baseMetadata.decimals)}
           <img
             className={`h-6 w-6`}
             src={quoteMetadata.logo}
