@@ -184,10 +184,8 @@ export const useLegacyVoterWeight = () => {
     [connection, realmPk]
   )
 
-  const { result: shouldCareAboutCouncil } = useAsync(
-    async () => realm && realm.account.config.councilMint !== undefined,
-    [realm]
-  )
+  const shouldCareAboutCouncil =
+    realm && realm.account.config.councilMint !== undefined
 
   return useAsync(
     async () =>
