@@ -1,6 +1,6 @@
 import { PublicKey } from '@solana/web3.js'
 import type BN from 'bn.js'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { pipe } from 'fp-ts/lib/function'
 import cx from 'classnames'
 // import ChevronRightIcon from '@carbon/icons-react/lib/ChevronRight'
@@ -132,8 +132,8 @@ export function NFTVotePluginSettingsDisplay(props: Props) {
   const registrar = useVotePluginsClientStore((s) => s.state.nftMintRegistrar)
   const [collections, setCollections] = useState<RE.Result<Data>>(RE.pending())
 
-  const collectionConfigs: CollectionConfig[] =
-    registrar?.collectionConfigs || []
+  const collectionConfigs = (registrar?.collectionConfigs ||
+    []) as CollectionConfig[]
 
   useEffect(() => {
     setCollections(RE.pending())
