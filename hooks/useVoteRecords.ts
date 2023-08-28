@@ -202,7 +202,7 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
         walletsPks,
         realm,
         client,
-        connection,
+        connection.current,
         mintsUsedInRealm
       )
       setUndecidedDepositByVoteRecord(votingPerWallet)
