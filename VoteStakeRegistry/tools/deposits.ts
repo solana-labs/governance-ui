@@ -1,12 +1,11 @@
 import { BN, EventParser, Idl, Program } from '@coral-xyz/anchor'
 import { ProgramAccount, Realm } from '@solana/spl-governance'
-import { MintInfo } from '@solana/spl-token'
 import { PublicKey, Transaction, Connection } from '@solana/web3.js'
 import { SIMULATION_WALLET } from '@tools/constants'
 import { ConnectionContext } from '@utils/connection'
 import { DAYS_PER_MONTH } from '@utils/dateTools'
 import { chunks } from '@utils/helpers'
-import { TokenProgramAccount, tryGetMint } from '@utils/tokens'
+import { tryGetMint } from '@utils/tokens'
 import {
   getRegistrarPDA,
   getVoterPDA,
@@ -143,7 +142,7 @@ const getVotingPowersForWallets = async ({
   existingRegistrar: Registrar
   walletPks: PublicKey[]
   communityMint: PublicKey
-  mintsUsedInRealm: TokenProgramAccount<MintInfo>[]
+  mintsUsedInRealm: PublicKey[]
   latestBlockhash: Readonly<{
     blockhash: string
     lastValidBlockHeight: number
@@ -174,7 +173,7 @@ const getVotingPowersForWallets = async ({
 
   for (const i of mintCfgs) {
     if (i.mint.toBase58() !== emptyPk) {
-      const mint = mintsUsedInRealm.find((x) => x.publicKey.equals(i.mint))
+      const mint = mintsUsedInRealm.find((x) => x.equals(i.mint))
       mints[i.mint.toBase58()] = mint
     }
   }
@@ -401,7 +400,7 @@ export const getLockTokensVotingPowerPerWallet = async (
   realm: ProgramAccount<Realm>,
   client: VsrClient,
   connection: ConnectionContext,
-  mintsUsedInRealm: TokenProgramAccount<MintInfo>[]
+  mintsUsedInRealm: PublicKey[]
 ) => {
   const { registrar } = await getRegistrarPDA(
     realm.pubkey,
