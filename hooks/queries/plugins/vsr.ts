@@ -77,10 +77,12 @@ const voterPowerLogQueryFn = async (
   connection: Connection,
   program: Program<VoterStakeRegistry>,
   registrar: PublicKey,
-  voter: PublicKey
+  voter: PublicKey,
+  depositEntryBegin = 0,
+  depositEntryCount = 0
 ) => {
   const ix = await program.methods
-    .logVoterInfo(0, 0)
+    .logVoterInfo(depositEntryBegin, depositEntryCount)
     .accounts({ registrar, voter })
     .instruction()
   const transaction = new Transaction({
