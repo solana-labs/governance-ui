@@ -22,6 +22,12 @@
     }
   },
   "rules": {
+    "react-hooks/exhaustive-deps": [
+      "warn",
+      {
+        "additionalHooks": "(useAsync|useAsyncCallback|useAsyncAbortable)"
+      }
+    ],
     "react/react-in-jsx-scope": 0,
     "react/display-name": 0,
     "react/prop-types": 0,
