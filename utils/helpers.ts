@@ -1,5 +1,6 @@
 import { AccountInfo, Connection, PublicKey } from '@solana/web3.js'
 import { gistApi } from './github'
+import { arweaveDescriptionApi } from './arweave'
 
 export function capitalize(str?: string) {
   return str ? str?.charAt(0).toUpperCase() + str?.slice(1) : str
@@ -24,10 +25,19 @@ export class SanitizedObject {
 export async function resolveProposalDescription(descriptionLink: string) {
   try {
     gistApi.cancel()
+    arweaveDescriptionApi.cancel()
+    let desc = ''
     const url = new URL(descriptionLink)
-    const desc =
-      (await gistApi.fetchGistFile(url.toString())) ?? descriptionLink
-    return desc
+
+    if (url.toString().includes('gist')) {
+      desc = await gistApi.fetchGistFile(url.toString())
+    }
+
+    if (url.toString().includes('arweave')) {
+      desc = await arweaveDescriptionApi.fetchArweaveFile(url.toString())
+    }
+
+    return desc ? desc : descriptionLink
   } catch {
     return descriptionLink
   }
