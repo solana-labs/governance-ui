@@ -18,7 +18,6 @@ import {
 import { tryGetVoter, tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 import { MONTHLY } from './types'
-import { fetchVotingPowerSimulation } from '@hooks/queries/plugins/vsr'
 
 const VOTER_INFO_EVENT_NAME = 'VoterInfo'
 const DEPOSIT_EVENT_NAME = 'DepositEntryInfo'
@@ -97,13 +96,13 @@ export const getDeposits = async ({
       const depositsInfo = events.filter((x) => x.name === DEPOSIT_EVENT_NAME)
       const votingPowerEntry = events.find(
         (x) => x.name === VOTER_INFO_EVENT_NAME
-      ) as any
+      )
       deposits = deposits.map((x) => {
         const additionalInfoData = depositsInfo.find(
           (info) => info.data.depositEntryIndex === x.index
-        )?.data as any
+        ).data
 
-        x.currentlyLocked = additionalInfoData?.locking.amount || new BN(0)
+        x.currentlyLocked = additionalInfoData.locking?.amount || new BN(0)
         x.available = additionalInfoData.unlocked || new BN(0)
         x.vestingRate = additionalInfoData.locking?.vesting?.rate || new BN(0)
         x.nextVestingTimestamp =
@@ -356,21 +355,22 @@ const getDepositsAdditionalInfoEvents = async (
   //because we switch wallet in here we can't use rpc from npm module
   //anchor dont allow to switch wallets inside existing client
   //parse events response as anchor do
-  const events: Awaited<ReturnType<typeof fetchVotingPowerSimulation>> = []
+  const events: any[] = []
+  const parser = new EventParser(client.program.programId, client.program.coder)
   const maxRange = 8
   const maxIndex = Math.max(...usedDeposits.map((x) => x.index)) + 1
   const numberOfSimulations = Math.ceil(maxIndex / maxRange)
   for (let i = 0; i < numberOfSimulations; i++) {
-    const logs = await fetchVotingPowerSimulation(
-      connection,
-      client.program,
-      registrar,
-      voter,
-      maxRange * i,
-      maxRange
-    )
-
-    events.push(...logs)
+    const take = maxRange
+    const transaction = new Transaction({ feePayer: simulationWallet })
+    const logVoterInfoIx = await client.program.methods
+      .logVoterInfo(maxRange * i, take)
+      .accounts({ registrar, voter })
+      .instruction()
+    transaction.add(logVoterInfoIx)
+    const batchOfDeposits = await connection.simulateTransaction(transaction)
+    const logEvents = parser.parseLogs(batchOfDeposits.value.logs!)
+    events.push(...[...logEvents])
   }
   return events
 }
