@@ -9,6 +9,10 @@ import {
 } from 'VoteStakeRegistry/sdk/voter_stake_registry'
 import { fetchRealmConfigQuery } from '../realmConfig'
 import queryClient from '../queryClient'
+import { useConnection } from '@solana/wallet-adapter-react'
+import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
+import useUserOrDelegator from '@hooks/useUserOrDelegator'
+import { useAsync } from 'react-async-hook'
 
 const VOTER_INFO_EVENT_NAME = 'VoterInfo'
 
@@ -54,6 +58,16 @@ export const getVsrGovpower = async (
         result: votingPowerEntry.data.votingPower as BN,
       } as const)
     : ({ found: false, result: undefined } as const)
+}
+
+export const useVsrGovpower = () => {
+  const { connection } = useConnection()
+  const realmPk = useSelectedRealmPubkey()
+  const actingAsWallet = useUserOrDelegator()
+  return useAsync(async () => {
+    if (realmPk === undefined || actingAsWallet === undefined) return undefined
+    return getVsrGovpower(connection, realmPk, actingAsWallet)
+  }, [connection, realmPk, actingAsWallet])
 }
 
 /**
