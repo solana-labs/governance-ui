@@ -15,7 +15,7 @@ export const StyledSubLabel = styled.div`
 export interface InputClasses {
   className?: string
   disabled?: boolean
-  error: string
+  error?: string
   noMaxWidth?: boolean
   useDefaultStyle?: boolean
   showErrorState?: boolean
