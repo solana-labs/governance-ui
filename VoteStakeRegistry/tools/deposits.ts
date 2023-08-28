@@ -368,6 +368,7 @@ const getDepositsAdditionalInfoEvents = async (
       .accounts({ registrar, voter })
       .instruction()
     transaction.add(logVoterInfoIx)
+    // TODO cache using fetchVotingPowerSimulation
     const batchOfDeposits = await connection.simulateTransaction(transaction)
     const logEvents = parser.parseLogs(batchOfDeposits.value.logs!)
     events.push(...[...logEvents])
