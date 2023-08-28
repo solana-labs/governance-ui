@@ -79,12 +79,9 @@ export const getNftGovpower = async (
         // find collectionConfig such that the nft's `collection` grouping matches the collection id
         collectionConfigs.find(
           (x) =>
-            x.collection.equals(
-              new PublicKey(
-                nft.grouping.find((y) => y.group_key === 'collection')
-                  ?.group_value ?? 'dummy value hehehe'
-              )
-            )
+            x.collection.toString() ===
+            (nft.grouping.find((y) => y.group_key === 'collection')
+              ?.group_value ?? false)
           // take the weight for that collection, or 0 if the nft matches none of the dao's collections
         )?.weight ?? new BN(0)
     )
@@ -158,7 +155,15 @@ export const useGovernancePowerAsync = (
             : plugin === 'gateway'
             ? gatewayVotingPower
             : new BN(0)),
-    [realmPk, TOR, plugin, connection]
+    [
+      plugin,
+      realmPk,
+      TOR,
+      connection,
+      vsrVotingPower,
+      heliumVotingPower,
+      gatewayVotingPower,
+    ]
   )
 }
 
@@ -184,10 +189,8 @@ export const useLegacyVoterWeight = () => {
     [connection, realmPk]
   )
 
-  const { result: shouldCareAboutCouncil } = useAsync(
-    async () => realm && realm.account.config.councilMint !== undefined,
-    [realm]
-  )
+  const shouldCareAboutCouncil =
+    realm && realm.account.config.councilMint !== undefined
 
   return useAsync(
     async () =>
@@ -230,6 +233,17 @@ export const useLegacyVoterWeight = () => {
             gatewayVotingPower
           )
         : undefined),
-    [realmPk, communityTOR, councilTOR, plugin, connection]
+
+    [
+      communityTOR,
+      connection,
+      councilTOR,
+      gatewayVotingPower,
+      heliumVotingPower,
+      plugin,
+      realmPk,
+      shouldCareAboutCouncil,
+      vsrVotingPower,
+    ]
   )
 }
