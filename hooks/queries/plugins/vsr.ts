@@ -53,12 +53,24 @@ export const getVsrGovpower = async (
   })
 
   const votingPowerEntry = logs.find((x) => x.name === VOTER_INFO_EVENT_NAME)
-  return votingPowerEntry
+  const votingPower = votingPowerEntry
     ? ({
         found: true,
         result: votingPowerEntry.data.votingPower as BN,
       } as const)
     : ({ found: false, result: undefined } as const)
+
+  // you may be asking yourself, "what?". that is healthy
+  queryClient.setQueryData(
+    [
+      connection.rpcEndpoint,
+      'VSR: voting power',
+      registrarPk.toString(),
+      voterPk.toString(),
+    ],
+    votingPower
+  )
+  return votingPower
 }
 
 export const useVsrGovpower = () => {
@@ -115,11 +127,37 @@ const useFoo = (wallets: PublicKey[]) => {
       }),
     }
 
-    const x = getLockTokensVotingPowerPerWallet(
+    const x = await getLockTokensVotingPowerPerWallet(
       wallets,
       realm,
       client,
       connection
     )
+
+    const { registrar: registrarPk } = await getRegistrarPDA(
+      realm.pubkey,
+      realm.account.communityMint,
+      programId
+    )
+
+    for (const [key, power] of Object.entries(x)) {
+      const { voter: voterPk } = await getVoterPDA(
+        registrarPk,
+        new PublicKey(key),
+        programId
+      )
+
+      queryClient.setQueryData(
+        [
+          connection.rpcEndpoint,
+          'VSR: voting power',
+          registrarPk.toString(),
+          voterPk.toString(),
+        ],
+        power
+      )
+    }
+
+    return x
   }, [])
 }

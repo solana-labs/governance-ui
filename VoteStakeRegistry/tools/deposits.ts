@@ -398,7 +398,7 @@ export const getLockTokensVotingPowerPerWallet = async (
   })
 
   if (votingPowers) {
-    const votingPowerObj = {}
+    const votingPowerObj: Record<string, BN> = {}
     for (const record of votingPowers) {
       votingPowerObj[record.walletPk] = record.votingPower
     }
