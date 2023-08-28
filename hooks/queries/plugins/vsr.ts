@@ -2,7 +2,7 @@ import { BN, EventParser, Program } from '@coral-xyz/anchor'
 import { PublicKey, Transaction, Connection } from '@solana/web3.js'
 import { SIMULATION_WALLET } from '@tools/constants'
 import { getRegistrarPDA, getVoterPDA } from 'VoteStakeRegistry/sdk/accounts'
-import { fetchRealmByPubkey } from '../realm'
+import { fetchRealmByPubkey, useRealmQuery } from '../realm'
 import {
   VoterStakeRegistry,
   IDL,
@@ -13,6 +13,7 @@ import { useConnection } from '@solana/wallet-adapter-react'
 import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
 import useUserOrDelegator from '@hooks/useUserOrDelegator'
 import { useAsync } from 'react-async-hook'
+import { getLockTokensVotingPowerPerWallet } from 'VoteStakeRegistry/tools/deposits'
 
 const VOTER_INFO_EVENT_NAME = 'VoterInfo'
 
@@ -95,4 +96,30 @@ const voterPowerLogQueryFn = async (
     return []
   }
   return [...parser.parseLogs(sim.value.logs)]
+}
+
+const useFoo = (wallets: PublicKey[]) => {
+  const { connection } = useConnection()
+  const realm = useRealmQuery().data?.result
+
+  return useAsync(async () => {
+    if (realm === undefined) return undefined
+    const config = await fetchRealmConfigQuery(connection, realm.pubkey)
+    const programId =
+      config.result?.account.communityTokenConfig.voterWeightAddin
+    if (programId === undefined) return undefined
+
+    const client = {
+      program: new Program<VoterStakeRegistry>(IDL, programId, {
+        connection,
+      }),
+    }
+
+    const x = getLockTokensVotingPowerPerWallet(
+      wallets,
+      realm,
+      client,
+      connection
+    )
+  }, [])
 }

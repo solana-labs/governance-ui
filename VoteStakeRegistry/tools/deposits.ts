@@ -130,9 +130,7 @@ const getVotingPowersForWallets = async ({
   registrarPk,
   existingRegistrar,
   walletPks,
-  communityMint,
   connection,
-  mintsUsedInRealm,
   latestBlockhash,
 }: {
   client: VsrClient
@@ -140,8 +138,6 @@ const getVotingPowersForWallets = async ({
   registrarPk: PublicKey
   existingRegistrar: Registrar
   walletPks: PublicKey[]
-  communityMint: PublicKey
-  mintsUsedInRealm: PublicKey[]
   latestBlockhash: Readonly<{
     blockhash: string
     lastValidBlockHeight: number
@@ -154,8 +150,7 @@ const getVotingPowersForWallets = async ({
     walletPk: string
     tx: string
   }[] = []
-  const mintCfgs = existingRegistrar?.votingMints || []
-  const mints = {}
+  const mintCfgs = existingRegistrar.votingMints
   const events: {
     walletPk: string
     event: any
@@ -170,32 +165,18 @@ const getVotingPowersForWallets = async ({
   )
   voters.push(...(voterAccsResponse as (Voter | null)[]))
 
-  for (const i of mintCfgs) {
-    if (i.mint.toBase58() !== emptyPk) {
-      const mint = mintsUsedInRealm.find((x) => x.equals(i.mint))
-      mints[i.mint.toBase58()] = mint
-    }
-  }
-
   if (voters.length) {
     for (const i in voters) {
       const voter = voters[i]
       const voterPk = voterPks[i]
       if (voter) {
-        const hasDepositsWithCommunityMint = voter.deposits
-          .map(
-            (x, idx) =>
-              ({
-                ...x,
-                mint: mints[mintCfgs![x.votingMintConfigIdx].mint.toBase58()],
-                index: idx,
-              } as DepositWithMintAccount)
-          )
-          .filter(
-            (x) =>
-              x.isUsed &&
-              x.mint.publicKey.toBase58() === communityMint.toBase58()
-          ).length
+        const hasDepositsWithCommunityMint = voter.deposits.find(
+          (x) =>
+            x.isUsed &&
+            mintCfgs[x.votingMintConfigIdx].baselineVoteWeightScaledFactor.gtn(
+              0
+            )
+        )
         if (hasDepositsWithCommunityMint) {
           const simulationWallet = new PublicKey(SIMULATION_WALLET)
 
@@ -398,8 +379,7 @@ export const getLockTokensVotingPowerPerWallet = async (
   walletsPks: PublicKey[],
   realm: ProgramAccount<Realm>,
   client: VsrClient,
-  connection: Connection,
-  mintsUsedInRealm: PublicKey[]
+  connection: Connection
 ) => {
   const { registrar } = await getRegistrarPDA(
     realm.pubkey,
@@ -413,9 +393,7 @@ export const getLockTokensVotingPowerPerWallet = async (
     registrarPk: registrar,
     existingRegistrar: existingRegistrar!,
     walletPks: walletsPks,
-    communityMint: realm.account.communityMint,
     connection: connection,
-    mintsUsedInRealm,
     latestBlockhash,
   })
 
