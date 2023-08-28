@@ -8,7 +8,6 @@ import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 interface DepositStore extends State {
   state: {
     deposits: DepositWithMintAccount[]
-    votingPower: BN
     votingPowerFromDeposits: BN
     isLoading: boolean
   }
@@ -58,11 +57,7 @@ const useDepositStore = create<DepositStore>((set, _get) => ({
       s.state.isLoading = true
     })
 
-    const {
-      votingPower,
-      deposits,
-      votingPowerFromDeposits,
-    } = await getDeposits({
+    const { deposits, votingPowerFromDeposits } = await getDeposits({
       isUsed,
       realmPk,
       walletPk,
@@ -72,7 +67,6 @@ const useDepositStore = create<DepositStore>((set, _get) => ({
     })
 
     set((s) => {
-      s.state.votingPower = votingPower
       s.state.deposits = deposits
       s.state.votingPowerFromDeposits = votingPowerFromDeposits
       s.state.isLoading = false

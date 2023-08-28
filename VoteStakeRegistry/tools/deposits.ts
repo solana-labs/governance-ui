@@ -66,7 +66,6 @@ export const getDeposits = async ({
   const existingRegistrar = await tryGetRegistrar(registrar, client)
   const mintCfgs = existingRegistrar?.votingMints || []
   const mints = {}
-  let votingPower = new BN(0)
   let votingPowerFromDeposits = new BN(0)
   let deposits: DepositWithMintAccount[] = []
   for (const i of mintCfgs) {
@@ -121,13 +120,11 @@ export const getDeposits = async ({
       ) {
         votingPowerFromDeposits = votingPowerEntry.data.votingPowerBaseline
       }
-      if (votingPowerEntry && !votingPowerEntry.data.votingPower.isZero()) {
-        votingPower = votingPowerEntry.data.votingPower
-      }
-      return { votingPower, deposits, votingPowerFromDeposits }
+
+      return { deposits, votingPowerFromDeposits }
     }
   }
-  return { votingPower, deposits, votingPowerFromDeposits }
+  return { deposits, votingPowerFromDeposits }
 }
 
 const getVotingPowersForWallets = async ({
