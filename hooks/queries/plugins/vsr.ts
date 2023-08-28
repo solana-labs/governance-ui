@@ -41,16 +41,12 @@ export const getVsrGovpower = async (
   )
   const { voter: voterPk } = await getVoterPDA(registrarPk, walletPk, programId)
 
-  const logs = await queryClient.fetchQuery({
-    queryKey: [
-      connection.rpcEndpoint,
-      'VSR: get vote power log',
-      registrarPk.toString(),
-      voterPk.toString(),
-    ],
-    queryFn: () =>
-      voterPowerLogQueryFn(connection, program, registrarPk, voterPk),
-  })
+  const logs = await fetchVotingPowerSimulation(
+    connection,
+    program,
+    registrarPk,
+    voterPk
+  )
 
   const votingPowerEntry = logs.find((x) => x.name === VOTER_INFO_EVENT_NAME)
   const votingPower = votingPowerEntry
@@ -72,6 +68,32 @@ export const getVsrGovpower = async (
   )
   return votingPower
 }
+
+export const fetchVotingPowerSimulation = (
+  connection: Connection,
+  program: Program<VoterStakeRegistry>,
+  registrarPk: PublicKey,
+  voterPk: PublicKey,
+  depositEntryBegin = 0,
+  depositEntryCount = 0
+) =>
+  queryClient.fetchQuery({
+    queryKey: [
+      connection.rpcEndpoint,
+      'VSR: get vote power log',
+      registrarPk.toString(),
+      voterPk.toString(),
+    ],
+    queryFn: () =>
+      voterPowerLogQueryFn(
+        connection,
+        program,
+        registrarPk,
+        voterPk,
+        depositEntryBegin,
+        depositEntryCount
+      ),
+  })
 
 export const useVsrGovpower = () => {
   const { connection } = useConnection()
@@ -110,7 +132,7 @@ const voterPowerLogQueryFn = async (
   return [...parser.parseLogs(sim.value.logs)]
 }
 
-const useFoo = (wallets: PublicKey[]) => {
+export const useVsrGovpowerMulti = (wallets: PublicKey[]) => {
   const { connection } = useConnection()
   const realm = useRealmQuery().data?.result
 
