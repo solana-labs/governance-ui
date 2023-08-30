@@ -80,6 +80,8 @@ const getTokenOwnerRecordsForWallet = async (
     })
     .filter((x) => x !== null)
 
+  // TODO BATCH ALERT
+  // solution: kill this entire function. use react-query.
   try {
     const rawAccountData = await axios.request({
       url: connection.endpoint,

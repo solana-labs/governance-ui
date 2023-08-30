@@ -31,6 +31,7 @@ export const getProposalsTransactions = async (
     headers: {
       'Content-Type': 'application/json',
     },
+    // TODO batch alert
     data: JSON.stringify([
       ...pubkeys.map((x) => {
         return {
