@@ -165,7 +165,7 @@ export const useGovernancePowerAsync = (
       realmPk,
       TOR,
       connection,
-      vsrVotingPower,
+      actingAsWalletPk,
       heliumVotingPower,
       gatewayVotingPower,
     ]
@@ -243,6 +243,7 @@ export const useLegacyVoterWeight = () => {
         : undefined),
 
     [
+      actingAsWalletPk,
       communityTOR,
       connection,
       councilTOR,
@@ -251,7 +252,6 @@ export const useLegacyVoterWeight = () => {
       plugin,
       realmPk,
       shouldCareAboutCouncil,
-      vsrVotingPower,
     ]
   )
 }
