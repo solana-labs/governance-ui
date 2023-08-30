@@ -1,10 +1,5 @@
 import { useRouter } from 'next/router'
-import {
-  AddressImage,
-  DisplayAddress,
-  useAddressName,
-  useWalletIdentity,
-} from '@cardinal/namespaces-components'
+import { AddressImage, DisplayAddress } from '@cardinal/namespaces-components'
 import styled from '@emotion/styled'
 import { Menu } from '@headlessui/react'
 import { UserCircleIcon } from '@heroicons/react/outline'
@@ -16,7 +11,6 @@ import {
 import { abbreviateAddress } from '@utils/formatting'
 import { useCallback, useEffect, useState } from 'react'
 import Switch from './Switch'
-import { TwitterIcon } from './icons'
 import { notify } from '@utils/notifications'
 import { Profile } from '@components/Profile'
 import Loading from './Loading'
@@ -92,13 +86,6 @@ const ConnectWalletButton = (props) => {
   function handleToggleDevnet() {
     updateClusterParam(currentCluster !== 'devnet' ? 'devnet' : null)
   }
-
-  const { show } = useWalletIdentity()
-
-  const { displayName } = useAddressName(
-    connection.current,
-    publicKey ?? undefined
-  )
 
   const walletAddressFormatted = publicKey ? abbreviateAddress(publicKey) : ''
 
@@ -230,24 +217,6 @@ const ConnectWalletButton = (props) => {
                       <hr
                         className={`border border-fgd-3 opacity-50 mt-2 mb-2`}
                       ></hr>
-                      <Menu.Item key={'twitter'}>
-                        <button
-                          className="flex items-center w-full p-2 font-normal default-transition h-9 hover:bg-bkg-3 hover:cursor-pointer hover:rounded focus:outline-none"
-                          onClick={() =>
-                            show(
-                              //@ts-expect-error cardinal uses the `Wallet` class from uhh saberhq, so, the types dont line up. nice!
-                              wallet?.adapter,
-                              connection.current,
-                              connection.cluster
-                            )
-                          }
-                        >
-                          <TwitterIcon className="w-4 h-4 mr-2" />
-                          <span className="text-sm">
-                            {displayName ? 'Edit Twitter' : 'Link Twitter'}
-                          </span>
-                        </button>
-                      </Menu.Item>
                       <Menu.Item key={'disconnect'}>
                         <button
                           className="flex items-center w-full p-2 font-normal default-transition h-9 hover:bg-bkg-3 hover:cursor-pointer hover:rounded focus:outline-none"

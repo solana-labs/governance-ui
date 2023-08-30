@@ -13,13 +13,10 @@ import * as PaymentStreaming from '@mean-dao/payment-streaming'
 
 // Alphabetical order
 export enum PackageEnum {
-  Castle = 1,
   Common,
-  Everlend,
+  Dual,
   Foresight,
-  Friktion,
   GatewayPlugin,
-  GoblinGold,
   Identity,
   NftPlugin,
   MangoMarketV4,
@@ -27,10 +24,8 @@ export enum PackageEnum {
   PsyFinance,
   Serum,
   Solend,
-  Streamflow,
   Switchboard,
   VsrPlugin,
-  Dual,
 }
 
 export interface UiInstruction {
@@ -40,7 +35,7 @@ export interface UiInstruction {
   governance: ProgramAccount<Governance> | undefined
   customHoldUpTime?: number
   prerequisiteInstructions?: TransactionInstruction[]
-  prerequisiteInstructionsSigners?: Keypair[]
+  prerequisiteInstructionsSigners?: (Keypair | null)[]
   chunkBy?: number
   signers?: Keypair[]
 }
@@ -57,22 +52,6 @@ export interface DomainNameTransferForm {
   destinationAccount: string
   governedAccount: AssetAccount | undefined
   domainAddress: string | undefined
-}
-
-export interface CastleDepositForm {
-  amount: number | undefined
-  governedTokenAccount: AssetAccount | undefined
-  castleVaultId: string
-  programId: string | undefined
-  mintInfo: MintInfo | undefined
-}
-
-export interface CastleWithdrawForm {
-  amount: number | undefined
-  governedTokenAccount: AssetAccount | undefined
-  castleVaultId: string
-  programId: string | undefined
-  mintInfo: MintInfo | undefined
 }
 
 export interface MeanCreateAccount {
@@ -114,52 +93,6 @@ export interface MeanTransferStream {
   governedTokenAccount: AssetAccount | undefined
   stream: PaymentStreaming.Stream | undefined
   destination: string | undefined
-}
-
-export interface FriktionDepositForm {
-  amount: number | undefined
-  governedTokenAccount: AssetAccount | undefined
-  voltVaultId: string
-  programId: string | undefined
-  mintInfo: MintInfo | undefined
-}
-
-export interface FriktionWithdrawForm {
-  amount: number | undefined
-  governedTokenAccount: AssetAccount | undefined
-  voltVaultId: string
-  programId: string | undefined
-  mintInfo: MintInfo | undefined
-}
-
-export interface FriktionClaimPendingDepositForm {
-  governedTokenAccount: AssetAccount | undefined
-  voltVaultId: string
-  programId: string | undefined
-  mintInfo: MintInfo | undefined
-}
-
-export interface FriktionClaimPendingWithdrawForm {
-  governedTokenAccount: AssetAccount | undefined
-  voltVaultId: string
-  programId: string | undefined
-  mintInfo: MintInfo | undefined
-}
-
-export interface GoblinGoldDepositForm {
-  amount: number | undefined
-  governedTokenAccount?: AssetAccount | undefined
-  goblinGoldVaultId: string
-  mintName?: SupportedMintName | undefined
-  mintInfo: MintInfo | undefined
-}
-
-export interface GoblinGoldWithdrawForm {
-  amount: number | undefined
-  governedTokenAccount?: AssetAccount | undefined
-  goblinGoldVaultId?: string
-  mintName?: SupportedMintName
-  mintInfo: MintInfo | undefined
 }
 
 export interface GrantForm {
@@ -292,16 +225,6 @@ export interface EmptyInstructionForm {
   governedAccount: AssetAccount | undefined
 }
 
-export interface SwitchboardAdmitOracleForm {
-  oraclePubkey: PublicKey | undefined
-  queuePubkey: PublicKey | undefined
-}
-
-export interface SwitchboardRevokeOracleForm {
-  oraclePubkey: PublicKey | undefined
-  queuePubkey: PublicKey | undefined
-}
-
 export interface CreateAssociatedTokenAccountForm {
   governedAccount?: AssetAccount
   splTokenMint?: string
@@ -391,8 +314,6 @@ export interface JoinDAOForm {
 export enum Instructions {
   Base64,
   ChangeMakeDonation,
-  ClaimPendingDeposit,
-  ClaimPendingWithdraw,
   Clawback,
   CloseTokenAccount,
   ConfigureGatewayPlugin,
@@ -405,23 +326,21 @@ export enum Instructions {
   CreateTokenMetadata,
   CreateVsrRegistrar,
   DeactivateValidatorStake,
-  DepositIntoCastle,
-  DepositIntoGoblinGold,
-  DepositIntoVolt,
   DepositReserveLiquidityAndObligationCollateral,
   DifferValidatorStake,
   DualFinanceAirdrop,
-  DualFinanceExercise,
+  DualFinanceExerciseStakingOption,
   DualFinanceLiquidityStakingOption,
   DualFinanceInitStrike,
   DualFinanceStakingOption,
-  DualFinanceWithdraw,
+  DualFinanceGso,
+  DualFinanceGsoWithdraw,
+  DualFinanceStakingOptionWithdraw,
   DualFinanceDelegate,
   DualFinanceDelegateWithdraw,
   DualFinanceVoteDeposit,
   DualFinanceVote,
-  EverlendDeposit,
-  EverlendWithdraw,
+  DelegateStake,
   ForesightAddMarketListToCategory,
   ForesightInitCategory,
   ForesightInitMarket,
@@ -446,6 +365,8 @@ export enum Instructions {
   MangoV4StubOracleCreate,
   MangoV4StubOracleSet,
   MangoV4TokenAddBank,
+  MangoV4AdminWithdrawTokenFees,
+  MangoV4WithdrawPerpFees,
   MeanCreateAccount,
   MeanCreateStream,
   MeanFundAccount,
@@ -469,19 +390,14 @@ export enum Instructions {
   SerumUpdateGovConfigAuthority,
   SerumUpdateGovConfigParams,
   StakeValidator,
-  SwitchboardAdmitOracle,
-  SwitchboardRevokeOracle,
   SwitchboardFundOracle,
   WithdrawFromOracle,
   Transfer,
   TransferDomainName,
   UpdateTokenMetadata,
   VotingMintConfig,
-  WithdrawFromCastle,
-  WithdrawFromGoblinGold,
   WithdrawObligationCollateralAndRedeemReserveLiquidity,
   WithdrawValidatorStake,
-  WithdrawFromVolt,
   SplitStake,
   AddKeyToDID,
   RemoveKeyFromDID,
@@ -548,6 +464,12 @@ export interface ValidatorWithdrawStakeForm {
   amount: number
 }
 
+export interface DelegateStakeForm {
+  governedTokenAccount: AssetAccount | undefined
+  stakingAccount: StakeAccount | undefined
+  votePubkey: string
+}
+
 export interface DualFinanceAirdropForm {
   root: string
   amount: number
@@ -567,6 +489,19 @@ export interface DualFinanceStakingOptionForm {
   quoteTreasury: AssetAccount | undefined
   payer: AssetAccount | undefined
   userPk: string | undefined
+}
+
+export interface DualFinanceGsoForm {
+  strike: number
+  soName: string | undefined
+  optionExpirationUnixSeconds: number
+  numTokens: number
+  lotSize: number
+  subscriptionPeriodEnd: number
+  lockupRatio: number
+  baseTreasury: AssetAccount | undefined
+  quoteTreasury: AssetAccount | undefined
+  payer: AssetAccount | undefined
 }
 
 export interface DualFinanceLiquidityStakingOptionForm {
@@ -597,6 +532,11 @@ export interface DualFinanceWithdrawForm {
   soName: string | undefined
   baseTreasury: AssetAccount | undefined
   mintPk: string | undefined
+}
+
+export interface DualFinanceGsoWithdrawForm {
+  soName: string | undefined
+  baseTreasury: AssetAccount | undefined
 }
 
 export interface DualFinanceDelegateForm {

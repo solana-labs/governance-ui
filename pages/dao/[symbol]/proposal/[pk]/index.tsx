@@ -13,9 +13,10 @@ import ProposalTimeStatus from 'components/ProposalTimeStatus'
 import { useEffect, useState } from 'react'
 import ProposalActionsPanel from '@components/ProposalActions'
 import { getRealmExplorerHost } from 'tools/routing'
-import { ProposalState } from '@solana/spl-governance'
+import { GovernanceAccountType, ProposalState, VoteType } from '@solana/spl-governance'
 import VoteResultStatus from '@components/VoteResultStatus'
 import VoteResults from '@components/VoteResults'
+import MultiChoiceVotes from '@components/MultiChoiceVotes'
 import { resolveProposalDescription } from '@utils/helpers'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import Link from 'next/link'
@@ -36,6 +37,8 @@ const Proposal = () => {
   const governance = useProposalGovernanceQuery().data?.result
   const descriptionLink = proposal?.account.descriptionLink
   const allowDiscussion = realmInfo?.allowDiscussion ?? true
+  const isMulti = proposal?.account.voteType !== VoteType.SINGLE_CHOICE
+    && proposal?.account.accountType === GovernanceAccountType.ProposalV2
 
   const [description, setDescription] = useState('')
   const voteData = useProposalVotes(proposal?.account)
@@ -131,6 +134,7 @@ const Proposal = () => {
       </div>
 
       <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
+        <VotePanel />
         {showTokenBalance && <ProposalVotingPower />}
         {showResults ? (
           <div className="bg-bkg-2 rounded-lg">
@@ -143,7 +147,7 @@ const Proposal = () => {
               ) : (
                 <h3 className="mb-4">Results</h3>
               )}
-              {proposal?.account.state === ProposalState.Voting ? (
+              {proposal?.account.state === ProposalState.Voting && !isMulti ? (
                 <>
                   <div className="pb-3">
                     <ApprovalProgress
@@ -172,7 +176,15 @@ const Proposal = () => {
                   <VoteResultStatus />
                 </div>
               )}
-              <VoteResults proposal={proposal.account} />
+
+              {isMulti ? (
+                <MultiChoiceVotes
+                  proposal={proposal.account}
+                  limit={proposal.account.options.length}
+                />
+              ) : (
+                <VoteResults proposal={proposal.account} />
+              )}
               {proposal && (
                 <div className="flex justify-end mt-4">
                   <Link
@@ -192,7 +204,6 @@ const Proposal = () => {
           </div>
         ) : null}
         <VotingRules />
-        <VotePanel />
         <NftProposalVoteState proposal={proposal}></NftProposalVoteState>
         {proposal && currentWallet && showProposalExecution && (
           <ProposalExecutionCard />

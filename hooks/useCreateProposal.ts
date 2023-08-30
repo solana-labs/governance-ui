@@ -1,6 +1,6 @@
 import {
-  createProposal,
   InstructionDataWithHoldUpTime,
+  createProposal,
 } from 'actions/createProposal'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useRealm from './useRealm'
@@ -16,6 +16,8 @@ import {
 import useLegacyConnectionContext from './useLegacyConnectionContext'
 import queryClient from './queries/queryClient'
 import { proposalQueryKeys } from './queries/proposal'
+import { createLUTProposal } from 'actions/createLUTproposal'
+import { useLegacyVoterWeight } from './queries/governancePower'
 
 export default function useCreateProposal() {
   const client = useVotePluginsClientStore(
@@ -27,7 +29,9 @@ export default function useCreateProposal() {
   const config = useRealmConfigQuery().data?.result
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
-  const { ownVoterWeight, canChooseWhoVote } = useRealm()
+  const { result: ownVoterWeight } = useLegacyVoterWeight()
+
+  const { canChooseWhoVote } = useRealm()
   const { getRpcContext } = useRpcContext()
 
   /** @deprecated because the api is goofy, use `propose` */
@@ -38,6 +42,7 @@ export default function useCreateProposal() {
     instructionsData,
     voteByCouncil = false,
     isDraft = false,
+    utilizeLookupTable,
   }: {
     title: string
     description: string
@@ -45,6 +50,7 @@ export default function useCreateProposal() {
     instructionsData: InstructionDataWithHoldUpTime[]
     voteByCouncil?: boolean
     isDraft?: boolean
+    utilizeLookupTable?: boolean
   }) => {
     const { result: selectedGovernance } = await fetchGovernanceByPubkey(
       connection.current,
@@ -53,7 +59,85 @@ export default function useCreateProposal() {
     if (!selectedGovernance) throw new Error('governance not found')
     if (!realm) throw new Error()
 
-    const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
+    const ownTokenRecord = ownVoterWeight?.getTokenRecordToCreateProposal(
+      selectedGovernance.account.config,
+      voteByCouncil
+    ) // TODO just get the token record the normal way
+
+    const defaultProposalMint =
+      !mint?.supply.isZero() ||
+      config?.account.communityTokenConfig.voterWeightAddin
+        ? realm?.account.communityMint
+        : !councilMint?.supply.isZero()
+        ? realm?.account.config.councilMint
+        : undefined
+
+    const proposalMint =
+      canChooseWhoVote && voteByCouncil
+        ? realm?.account.config.councilMint
+        : defaultProposalMint
+
+    if (!proposalMint) {
+      throw new Error('There is no suitable governing token for the proposal')
+    }
+    const rpcContext = getRpcContext()
+    if (!rpcContext) throw new Error()
+
+    const create = utilizeLookupTable ? createLUTProposal : createProposal
+    const proposalAddress = await create(
+      rpcContext,
+      realm,
+      governance.pubkey,
+      ownTokenRecord!,
+      title,
+      description,
+      proposalMint,
+      selectedGovernance.account.proposalCount,
+      instructionsData,
+      isDraft,
+      ['Approve'],
+      client
+    )
+    queryClient.invalidateQueries({
+      queryKey: proposalQueryKeys.all(connection.endpoint),
+    })
+    return proposalAddress
+  }
+
+  const propose = (
+    params: Omit<Parameters<typeof handleCreateProposal>[0], 'governance'> & {
+      governance: PublicKey
+    }
+  ) => {
+    const { governance, ...rest } = params
+    return handleCreateProposal({ ...rest, governance: { pubkey: governance } })
+  }
+
+  const proposeMultiChoice = async ({
+    title,
+    description,
+    governance,
+    instructionsData,
+    voteByCouncil = false,
+    options,
+    isDraft = false,
+  }: {
+    title: string
+    description: string
+    governance: PublicKey
+    instructionsData: InstructionDataWithHoldUpTime[]
+    voteByCouncil?: boolean
+    options: string[]
+    isDraft?: boolean
+  }) => {
+    const { result: selectedGovernance } = await fetchGovernanceByPubkey(
+      connection.current,
+      governance
+    )
+    if (!selectedGovernance) throw new Error('governance not found')
+    if (!realm) throw new Error()
+
+    const ownTokenRecord = ownVoterWeight?.getTokenRecordToCreateProposal(
       selectedGovernance.account.config,
       voteByCouncil
     )
@@ -80,7 +164,7 @@ export default function useCreateProposal() {
     const proposalAddress = await createProposal(
       rpcContext,
       realm,
-      governance.pubkey,
+      governance,
       ownTokenRecord!,
       title,
       description,
@@ -88,6 +172,7 @@ export default function useCreateProposal() {
       selectedGovernance.account.proposalCount,
       instructionsData,
       isDraft,
+      options,
       client
     )
     queryClient.invalidateQueries({
@@ -96,14 +181,5 @@ export default function useCreateProposal() {
     return proposalAddress
   }
 
-  const propose = (
-    params: Omit<Parameters<typeof handleCreateProposal>[0], 'governance'> & {
-      governance: PublicKey
-    }
-  ) => {
-    const { governance, ...rest } = params
-    return handleCreateProposal({ ...rest, governance: { pubkey: governance } })
-  }
-
-  return { handleCreateProposal, propose }
+  return { handleCreateProposal, propose, proposeMultiChoice }
 }

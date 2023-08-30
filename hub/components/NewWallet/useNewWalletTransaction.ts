@@ -8,13 +8,18 @@ import { useCallback } from 'react';
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore';
 
 import { rules2governanceConfig } from '../EditWalletRules/createTransaction';
+import { useLegacyVoterWeight } from '@hooks/queries/governancePower';
 import { useRealmQuery } from '@hooks/queries/realm';
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext';
 import useProgramVersion from '@hooks/useProgramVersion';
-import useRealm from '@hooks/useRealm';
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh';
+import { chunks } from '@utils/helpers';
 import { trySentryLog } from '@utils/logs';
-import { SequenceType, sendTransactionsV3 } from '@utils/sendTransactions';
+import {
+  SequenceType,
+  sendTransactionsV3,
+  txBatchesToInstructionSetWithSigners,
+} from '@utils/sendTransactions';
 
 import useGovernanceDefaults from './useGovernanceDefaults';
 
@@ -28,11 +33,11 @@ const useNewWalletCallback = (
   );
   const programVersion = useProgramVersion();
   const realm = useRealmQuery().data?.result;
-  const { ownVoterWeight } = useRealm();
+  const { result: ownVoterWeight } = useLegacyVoterWeight();
 
-  const tokenOwnerRecord = ownVoterWeight.canCreateGovernanceUsingCouncilTokens()
+  const tokenOwnerRecord = ownVoterWeight?.canCreateGovernanceUsingCouncilTokens()
     ? ownVoterWeight.councilTokenRecord
-    : realm && ownVoterWeight.canCreateGovernanceUsingCommunityTokens(realm)
+    : realm && ownVoterWeight?.canCreateGovernanceUsingCommunityTokens(realm)
     ? ownVoterWeight.communityTokenRecord
     : undefined;
 
@@ -51,12 +56,14 @@ const useNewWalletCallback = (
     );
 
     const instructions: TransactionInstruction[] = [];
+    const createNftTicketsIxs: TransactionInstruction[] = [];
 
     // client is typed such that it cant be undefined, but whatever.
     const plugin = await client?.withUpdateVoterWeightRecord(
       instructions,
-      tokenOwnerRecord.pubkey,
+      tokenOwnerRecord,
       'createGovernance',
+      createNftTicketsIxs,
     );
 
     const governanceAddress = await withCreateGovernance(
@@ -79,8 +86,22 @@ const useNewWalletCallback = (
       wallet.publicKey,
     );
 
+    // createTicketIxs is a list of instructions that create nftActionTicket only for nft-voter-v2 plugin
+    // so it will be empty for other plugins
+    const nftTicketAccountsChuncks = chunks(createNftTicketsIxs, 1);
+
     await sendTransactionsV3({
       transactionInstructions: [
+        ...nftTicketAccountsChuncks.map((txBatch, batchIdx) => {
+          return {
+            instructionsSet: txBatchesToInstructionSetWithSigners(
+              txBatch,
+              [],
+              batchIdx,
+            ),
+            sequenceType: SequenceType.Parallel,
+          };
+        }),
         {
           instructionsSet: instructions.map((x) => ({
             transactionInstruction: x,

@@ -9,6 +9,7 @@ import {
   Proposal,
   ProposalState,
   Vote,
+  VoteType,
   withCastVote,
   YesNoVote,
 } from '@solana/spl-governance'
@@ -30,7 +31,6 @@ import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { notify } from '@utils/notifications'
 import { sendSignedTransaction } from '@utils/send'
 import { compareProposals, filterProposals } from '@utils/proposals'
-import { REALM_ID as PYTH_REALM_ID } from 'pyth-staking-api'
 import ProposalSorting, {
   InitialSorting,
   PROPOSAL_SORTING_LOCAL_STORAGE_KEY,
@@ -53,6 +53,7 @@ import {
   useRealmProposalsQuery,
 } from '@hooks/queries/proposal'
 import queryClient from '@hooks/queries/queryClient'
+import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
@@ -76,7 +77,8 @@ const REALM = () => {
   const realmQuery = useRealmQuery()
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
-  const { realmInfo, ownVoterWeight } = useRealm()
+  const { result: ownVoterWeight } = useLegacyVoterWeight()
+  const { realmInfo } = useRealm()
   const proposalsPerPage = 20
   const [filters, setFilters] = useState<Filters>(InitialFilters)
   const [sorting, setSorting] = useState<Sorting>(InitialSorting)
@@ -153,6 +155,7 @@ const REALM = () => {
           governancesByGovernance[v.account.governance.toBase58()]?.account
         return (
           v.account.state === ProposalState.Voting &&
+          v.account.voteType === VoteType.SINGLE_CHOICE &&
           // !getCurrentVoteRecKeyVal()[k] &&
           !v.account.hasVoteTimeEnded(governance)
         )
@@ -224,10 +227,12 @@ const REALM = () => {
     selectedProposals.length === votingProposals?.length
   const hasCommunityVoteWeight =
     ownTokenRecord &&
-    ownVoterWeight.hasMinAmountToVote(ownTokenRecord.account.governingTokenMint)
+    ownVoterWeight?.hasMinAmountToVote(
+      ownTokenRecord.account.governingTokenMint
+    )
   const hasCouncilVoteWeight =
     ownCouncilTokenRecord &&
-    ownVoterWeight.hasMinAmountToVote(
+    ownVoterWeight?.hasMinAmountToVote(
       ownCouncilTokenRecord.account.governingTokenMint
     )
 
@@ -284,7 +289,7 @@ const REALM = () => {
             pubkey: selectedProposal.proposalPk,
             owner: realm.pubkey,
           },
-          relevantTokenRecord.pubkey
+          relevantTokenRecord
         )
         if (client.client instanceof NftVoterClient === false) {
           await withCastVote(
@@ -339,9 +344,6 @@ const REALM = () => {
     setPaginatedProposals(paginateProposals(0))
     pagination?.current?.setPage(0)
   }, [paginateProposals, filteredProposals])
-
-  //Todo: move to own components with refactor to dao folder structure
-  const isPyth = realmInfo?.realmId.toBase58() === PYTH_REALM_ID.toBase58()
 
   return (
     <>
@@ -528,7 +530,7 @@ const REALM = () => {
             </div>
             <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
               <TokenBalanceCardWrapper />
-              {!isPyth && !process?.env?.DISABLE_NFTS && <NFTSCompactWrapper />}
+              {!process?.env?.DISABLE_NFTS && <NFTSCompactWrapper />}
               <AccountsCompactWrapper />
               <AssetsCompactWrapper />
             </div>

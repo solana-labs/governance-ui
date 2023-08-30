@@ -34,6 +34,9 @@ interface VoterWeightInterface {
 }
 
 /// VoterWeight encapsulates logic to determine voter weights from token records (community or council)
+/**
+ * @deprecated instead of using this, ask yourself what you are trying to do, and observe that there is no reason you'd need to use this class in order to do it.
+ */
 export class VoteRegistryVoterWeight implements VoterWeightInterface {
   //TODO implement council
   communityTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
@@ -137,86 +140,9 @@ export class VoteRegistryVoterWeight implements VoterWeightInterface {
   }
 }
 
-/// VoterWeight encapsulates logic to determine voter weights from token records (community or council)
-export class PythVoterWeight implements VoterWeightInterface {
-  //TODO implement council
-  communityTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
-  councilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
-  votingPower: BN
-
-  constructor(
-    communityTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,
-    votingPower: BN
-  ) {
-    this.communityTokenRecord = communityTokenRecord
-    this.councilTokenRecord = undefined
-    this.votingPower = votingPower
-  }
-
-  // Checks if the voter has any voting weight
-  hasAnyWeight() {
-    return !this.votingPower.isZero()
-  }
-
-  // Returns first available tokenRecord
-  getTokenRecord() {
-    if (this.communityTokenRecord) {
-      return this.communityTokenRecord.pubkey
-    }
-
-    throw new Error('Current wallet has no Token Owner Records')
-  }
-
-  hasMinCommunityWeight(minCommunityWeight: BN) {
-    return (
-      this.communityTokenRecord && this.votingPower.cmp(minCommunityWeight) >= 0
-    )
-  }
-  hasMinCouncilWeight() {
-    return false
-  }
-
-  canCreateProposal(config: GovernanceConfig) {
-    return this.hasMinCommunityWeight(config.minCommunityTokensToCreateProposal)
-  }
-  canCreateGovernanceUsingCommunityTokens(realm: ProgramAccount<Realm>) {
-    return this.hasMinCommunityWeight(
-      realm.account.config.minCommunityTokensToCreateGovernance
-    )
-  }
-  canCreateGovernanceUsingCouncilTokens() {
-    return false
-  }
-  canCreateGovernance(realm: ProgramAccount<Realm>) {
-    return (
-      this.canCreateGovernanceUsingCommunityTokens(realm) ||
-      this.canCreateGovernanceUsingCouncilTokens()
-    )
-  }
-  hasMinAmountToVote(mintPk: PublicKey) {
-    const isCommunity =
-      this.communityTokenRecord?.account.governingTokenMint.toBase58() ===
-      mintPk.toBase58()
-    const isCouncil =
-      this.councilTokenRecord?.account.governingTokenMint.toBase58() ===
-      mintPk.toBase58()
-    if (isCouncil) {
-      return false
-    }
-    if (isCommunity) {
-      return !this.votingPower.isZero()
-    }
-  }
-
-  getTokenRecordToCreateProposal(config: GovernanceConfig) {
-    // Prefer community token owner record as proposal owner
-    if (this.hasMinCommunityWeight(config.minCommunityTokensToCreateProposal)) {
-      return this.communityTokenRecord!
-    }
-    throw new Error('Not enough vote weight to create proposal')
-  }
-}
-
+/**
+ * @deprecated instead of using this, ask yourself what you are trying to do, and observe that there is no reason you'd need to use this class in order to do it.
+ */
 export class VoteNftWeight implements VoterWeightInterface {
   //TODO implement council
   communityTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
@@ -318,85 +244,9 @@ export class VoteNftWeight implements VoterWeightInterface {
   }
 }
 
-export class SwitchboardQueueVoteWeight implements VoterWeightInterface {
-  communityTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
-  votingPower: BN
-  councilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
-
-  constructor(
-    communityTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,
-    votingPower: BN
-  ) {
-    this.communityTokenRecord = communityTokenRecord
-    this.councilTokenRecord = undefined
-    this.votingPower = votingPower
-  }
-
-  // Checks if the voter has any voting weight
-  hasAnyWeight() {
-    return !this.votingPower.isZero()
-  }
-
-  // Returns first available tokenRecord
-  getTokenRecord() {
-    if (this.communityTokenRecord) {
-      return this.communityTokenRecord.pubkey
-    }
-    throw new Error('Current wallet has no Token Owner Records')
-  }
-
-  hasMinCommunityWeight(minCommunityWeight: BN) {
-    return (
-      this.communityTokenRecord && this.votingPower.cmp(minCommunityWeight) >= 0
-    )
-  }
-  hasMinCouncilWeight(_minCouncilWeight: BN) {
-    return false
-  }
-
-  canCreateProposal(_config: GovernanceConfig) {
-    return this.votingPower.gt(new BN(0))
-  }
-  canCreateGovernanceUsingCommunityTokens(realm: ProgramAccount<Realm>) {
-    return true
-    return this.hasMinCommunityWeight(
-      realm.account.config.minCommunityTokensToCreateGovernance
-    )
-  }
-  canCreateGovernanceUsingCouncilTokens() {
-    return false
-  }
-  canCreateGovernance(realm: ProgramAccount<Realm>) {
-    return true
-    return (
-      this.canCreateGovernanceUsingCommunityTokens(realm) ||
-      this.canCreateGovernanceUsingCouncilTokens()
-    )
-  }
-  hasMinAmountToVote(mintPk: PublicKey) {
-    return true
-    const isCommunity =
-      this.communityTokenRecord?.account.governingTokenMint.toBase58() ===
-      mintPk.toBase58()
-    const isCouncil =
-      this.councilTokenRecord?.account.governingTokenMint.toBase58() ===
-      mintPk.toBase58()
-    if (isCouncil) {
-      return !this.councilTokenRecord?.account.governingTokenDepositAmount.isZero()
-    }
-    if (isCommunity) {
-      return !this.votingPower.isZero()
-    }
-  }
-
-  getTokenRecordToCreateProposal(_config: GovernanceConfig) {
-    if (this.communityTokenRecord !== undefined) {
-      return this.communityTokenRecord
-    }
-    throw new Error('Not enough vote weight to create proposal')
-  }
-}
-
+/**
+ * @deprecated instead of using this, ask yourself what you are trying to do, and observe that there is no reason you'd need to use this class in order to do it.
+ */
 export class VoterWeight implements VoterWeightInterface {
   communityTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
   councilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
@@ -500,6 +350,9 @@ export class VoterWeight implements VoterWeightInterface {
 }
 
 // TODO treat this as temporary - it should delegate to the governance VoterWeight (frontend and on-chain)
+/**
+ * @deprecated instead of using this, ask yourself what you are trying to do, and observe that there is no reason you'd need to use this class in order to do it.
+ */
 export class SimpleGatedVoterWeight implements VoterWeightInterface {
   constructor(
     public communityTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,

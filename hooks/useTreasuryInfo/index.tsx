@@ -150,7 +150,7 @@ export default function useTreasuryInfo(
       icon: realmInfo.ogImage ? <img src={realmInfo.ogImage} /> : undefined,
       governedTokens: { counts, values },
       name: realmInfo.displayName || realmInfo.symbol,
-      totalValue: wallets.reduce((acc, wallet) => {
+      totalValue: [...auxWallets, ...wallets].reduce((acc, wallet) => {
         return acc.plus(wallet.totalValue)
       }, new BigNumber(0)),
     },

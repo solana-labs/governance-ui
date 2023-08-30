@@ -22,11 +22,9 @@ import { VOTE_STAKE_REGISTRY_INSTRUCTIONS } from './programs/voteStakeRegistry'
 import { MARINADE_INSTRUCTIONS } from './programs/marinade'
 import { SOLEND_PROGRAM_INSTRUCTIONS } from './programs/solend'
 import { ATA_PROGRAM_INSTRUCTIONS } from './programs/associatedTokenAccount'
-import { STREAMFLOW_INSTRUCTIONS } from './programs/streamflow'
 import { governance as foresightGov } from '@foresight-tmp/foresight-sdk'
 import { ConnectionContext } from '@utils/connection'
 import { NFT_VOTER_INSTRUCTIONS } from './programs/nftVotingClient'
-import { PROGRAM_IDS } from '@castlefinance/vault-sdk'
 import { FORESIGHT_INSTRUCTIONS } from './programs/foresight'
 import { LIDO_INSTRUCTIONS } from './programs/lido'
 import { NAME_SERVICE_INSTRUCTIONS } from './programs/nameService'
@@ -53,7 +51,16 @@ export const ACCOUNT_NAMES = {
   '9pDEi3yT9ooT1uw1PApQDYK65advJs4Nt65EJG1m59Yq':
     'Mango Developer Council Mint',
   Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z: 'Mango DAO MNGO Treasury Vault',
+  DiSDgMz4DeNKHXkpqUGoukr1YM9xxc1wH9gusZnMa1ga: 'Mango DAO Dual Realm Deposit',
+  '8gjzxiqcU87cvRc7hFiUJgxqLSV7AQnSttfWC5fD9aim':
+    'Mango DAO Treasury Council Mint',
+  A9xaHx54B9bRYBga4V6LKFrRaARpMJFYVooEXRAanru5:
+    'Mango DAO Treasury Council USDC Treasury',
   '7zGXUAeUkY9pEGfApsY26amibvqsf2dmty1cbtxHdfaQ': 'Mango DAO Wallet Governance',
+  '9so7UTo6b6LXBSqdDfh18hjVj8Ng5BmLbYXLB7UrhaaJ':
+    'Mango Treasury Council Wallet',
+  BxZ974q4zsrSThN54rZqNaA6E2CFoj77mUikqK68Lgrf:
+    'Mango Treasury Council Wallet Governance',
   FnrgYLrpftdsBj5gd4qeaFwDUQZCg2cfo7aqQ1kJmWJy:
     'Mango Dao -> Dual Dao Vote Wallet',
   EWaYDnKhcqS4tVjyhUBoJR1Yx755imqzBm5tb2vQTNtK:
@@ -156,10 +163,6 @@ export const ACCOUNT_NAMES = {
     'GSAIL VAULT 2022-2026 VESTING SCHEDULE',
   GAMpPYx4DcJdPhnr7sM84gxym4NiNpzo4G6WufpRLemP: 'GSAIL TREASURY VAULT',
 
-  // Marinade DAO
-  B7ux5n2LYxJhS2TsMAcE98eMbkY3dBHUWyrZPBnDmMT5: 'MNDE Treasury',
-  GewCM8ipoPnEraZZqEp6VgVPLZfxr8xwJREmidXVU1EH: 'mSOL Treasury',
-
   // MonkOG DAO
   CVuCjHrqj97fSTsnSKzEBVPeYzXEEv6uiRjzBLRvnouj: 'MonkOG DAO Treasury Vault',
 
@@ -225,6 +228,75 @@ export const ACCOUNT_NAMES = {
   '714JsESwkxjDZTaxD2TNe7vqMG52yxug8vaXug5VKBqd':
     'Kaiman dao council mint governance',
   '9rFYGii2nQz74qg5PTYViPj46E82PrJguEC2QvbZVuwk': 'Kaiman dao council mint',
+
+  // Marinade DAO
+  '899YG3yk4F66ZgbNWLHriZHTXSKk9e1kvsKEquW7L6Mo': 'Marinade DAO Realm',
+  MNDEFzGvMt87ueuHvVU9VcTqsAP5b3fTGPsHuuPA5ey: 'MNDE Token Mint',
+  FsrqQfLGdFVtySSSsyZJUzVBA9bvGZSKyhp7nsJCqgJe:
+    'Marinade Realm Config Governance',
+  '26Pw2qvaHgnvHPD73pWr6EUWchpTF3bEzVbEoDPLS21D':
+    'Marinade Realm Config Wallet',
+  '6MGwpuJ5YE1c8jJaF8FKurQdDJeYRf1adX76dovkXxRs': 'Marinade Council Mint',
+  CnPBhNLpwPDY5rw8Wa8bt8DCkRNJ2GoGVf9xb7VYNrRr:
+    'Marinade Admin Authorities Governance',
+  BD9XxcmnvbJHgCcX8b2QMXjmcXHQ332NskFvjq6DTByU:
+    'Marinade Admin Authorities Wallet',
+  M5Fg6GipNvPzWgXNr5wj1EDcp8GB9J53cgyE7YGYLbL:
+    'Marinade Liquid Staking Admin Authority Governance',
+  '42VJbDihcS81YJPbuhHnHgvo1ehu42j8VK9sNwrnAarR':
+    'Marinade Liquid Staking Admin Authority Wallet',
+  '8z6A4qSfL9FFvwX12zqt6HrbzaWthGUqBe4czCn9iXtq':
+    'Marinade MNDE Treasury Governance',
+  B56RWQGf9RFw7t8gxPzrRvk5VRmB5DoF94aLoJ25YtvG: 'Marinade MNDE Treasury Wallet',
+  GR1LBT4cU89cJWE74CP6BsJTf2kriQ9TX59tbDsfxgSi: 'Marinade MNDE Treasury Vault',
+  '23xVZXQrHAZ4rm4nWKAM5eTLeUFmstbs42KF21PA4Ayo':
+    'Marinade Opinion Voting Governance',
+  AyCAAAd7wsw6zy6cVhDf8gp6Mv4K46T84dUrkg7KX7fy:
+    'Marinade Opinion Voting Wallet',
+  CWRgRr4udD66JbVtS9u2Gu7LHBi5m6SM3ytvmWobThEQ:
+    'Marinade Tokadapt Program Governance',
+  AEej7Lywu8EzMznXnxhb1493yCVnmLNXaCKYfUNvQQaJ:
+    'Marinade Escrow Relocker Program Governance',
+  '3cBS14yanCZPRKgdCLnmxHWXFfGjW8bid5zxj7UPqWW5':
+    'Marinade Liquidity Gauges Program Governance',
+  CLydpgqZty5HQq1uMtbXpH1vtmN7erhdBSPbn12NGLmb:
+    'Marinade Validator Gauges Program Governance',
+  G6yWqM2RVjhepkVEayeNVqgKNtpMuwtgqDY3s2N3uzas:
+    'Marinade Referral v1 Program Governance',
+  '6XQFdWeogb5C8c1KsSCkK6rzzxLxzxsPQqoXge9oJ9xR':
+    'Marinade Referral v2 Program Governance',
+  '2aQP7NGhktKR92EsHKSoRzcw5FfcZ8oBWgyoGdB3ouww':
+    'Marinade Directed Stake Program Governance',
+  A8tioq6Joznftd2b6GLY8rrgCka6F81vVztFciWDxEAe:
+    'Marinade Council Budget Governance',
+  J5BEceL5z1EQ7JBqEFu4BfPN4PYCeQaW3GXrzXFfCzhs:
+    'Marinade Council Budget Wallet',
+  H988v6sNu4dw911AeUo6fy5RsTkDtyfcTAMNpdq1Mo6u:
+    'Marinade Council Budget MNDE Vault',
+  '7iUtTuZAh2Len8LiC1u68gUMPMsKh9kce9bcbdGwtBZY':
+    'Marinade Programs Upgrade Governance',
+  '6YAju4nd4t7kyuHV6NvVpMepMk11DgWyYjKVJUak2EEm':
+    'Marinade Programs Upgrade Wallet',
+  'indiXdKbsC4QSLQQnn6ngZvkqfywn6KgEeQbkGSpk1V':
+    'Marinade Incentives Distribution Program',
+  '2w6ny74cU6yRxkD6ZACh5M1JznLQ1KB6AUsB7zo2NBHX':
+    'Marinade Voter Stake Registry Program Governance',
+  '6egAu2HDLcSgeUYmiBvNLgp7Bd4nPk16gX9MvWuJpeX2':
+    'Marinade SPL Program Governance',
+
+  // Dual DAO
+  '4yx1NJ4Vqf2zT1oVLk4SySBhhDJXmXFt88ncm4gPxtL7':
+    'Staking Options Program',
+  '2fJcpdR6qzqDP7fBqvoJQ5PGYdaRFBNyUKZkZf5t12mr':
+    'Airdrop Program',
+  '8tBcmZAMNm11DuGAS2r6PqSA3CKt72amoz8bVj14xRiT':
+    'Merkle Airdrop Verifier Program',
+  ATCsJvzSbHaJj3a9uKTRHSoD8ZmWPfeC3sYxzcJJHTM5:
+    'Governance Airdrop Verifier Program',
+  DuALd6fooWzVDkaTsQzDAxPGYCnLrnWamdNNTNxicdX8:
+    'Lockup Staking Options Program',
+  '7Z36Efbt7a4nLiV7s5bY7J2e4TJ6V9JEKGccsy2od2bE':
+    'Dual DAO wallet',
 }
 
 // TODO: Add this to on-chain metadata to Governance account
@@ -296,6 +368,10 @@ const MNGO_AUXILIARY_TOKEN_ACCOUNTS = [
     owner: '58apybWwtWwgVfARs7uJ75Vs1csPimnCCFth7cKwTJAe',
     accounts: ['DiSDgMz4DeNKHXkpqUGoukr1YM9xxc1wH9gusZnMa1ga'],
   },
+  {
+    owner: '9so7UTo6b6LXBSqdDfh18hjVj8Ng5BmLbYXLB7UrhaaJ',
+    accounts: ['A9xaHx54B9bRYBga4V6LKFrRaARpMJFYVooEXRAanru5'],
+  },
 ]
 
 export const AUXILIARY_TOKEN_ACCOUNTS = {
@@ -303,12 +379,6 @@ export const AUXILIARY_TOKEN_ACCOUNTS = {
 }
 
 export const HIDDEN_TREASURES = [...HIDDEN_MNGO_TREASURES]
-
-export const ALL_CASTLE_PROGRAMS = [
-  PROGRAM_IDS['devnet-parity'],
-  PROGRAM_IDS['devnet-staging'],
-  PROGRAM_IDS['mainnet'],
-]
 
 interface AccountDescriptor {
   name: string
@@ -345,7 +415,6 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...SYSTEM_INSTRUCTIONS,
   ...VOTE_STAKE_REGISTRY_INSTRUCTIONS,
   ...NFT_VOTER_INSTRUCTIONS,
-  ...STREAMFLOW_INSTRUCTIONS,
   ...NAME_SERVICE_INSTRUCTIONS,
   ...TOKEN_AUCTION_INSTRUCTIONS,
   ...VALIDATORDAO_INSTRUCTIONS,

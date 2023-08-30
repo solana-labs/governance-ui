@@ -62,7 +62,7 @@ const LiquidityStakingOption = ({
   useEffect(() => {
     setGovernedAccount(form.baseTreasury?.governance)
   }, [form.baseTreasury])
-  const schema = getDualFinanceLiquidityStakingOptionSchema()
+  const schema = getDualFinanceLiquidityStakingOptionSchema({form})
 
   return (
     <>

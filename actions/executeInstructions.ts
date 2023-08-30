@@ -23,7 +23,6 @@ export const executeInstructions = async (
   proposalInstructions: ProgramAccount<ProposalTransaction>[],
   multiTransactionMode = false
 ) => {
-  console.log(multiTransactionMode)
   const instructions: TransactionInstruction[] = []
 
   await Promise.all(

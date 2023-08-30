@@ -14,6 +14,11 @@ import ProposalVoteResult from '@components/ProposalVoteResults'
 import ProposalRemainingVotingTime from '@components/ProposalRemainingVotingTime'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { GovernanceAccountType, VoteType } from '@solana/spl-governance'
+import MultiChoiceVotes from '@components/MultiChoiceVotes'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import ProposalVoterNftChart from '@components/ProposalVoterNftChart'
+import { NFT_PLUGINS_PKS } from '@constants/plugins'
 
 export default function Explore() {
   const proposal = useRouteProposalQuery().data?.result
@@ -24,7 +29,20 @@ export default function Explore() {
   const signatories = useSignatories(proposal)
   const router = useRouter()
 
+  const config = useRealmConfigQuery().data?.result
+  const currentPluginPk = config?.account.communityTokenConfig.voterWeightAddin
+  const isNftMode =
+    currentPluginPk && NFT_PLUGINS_PKS.includes(currentPluginPk?.toBase58())
+
   const endpoint = connection.endpoint
+
+  const handleExploreBackClick = () => {
+    const newPath = router.asPath.replace(/\/explore$/, '')
+    router.push(newPath)
+  }
+  const isMulti =
+    proposal?.account.voteType !== VoteType.SINGLE_CHOICE &&
+    proposal?.account.accountType === GovernanceAccountType.ProposalV2
 
   return (
     <div className="bg-bkg-2 rounded-lg p-4 space-y-3 md:p-6">
@@ -38,7 +56,7 @@ export default function Explore() {
           'transition-all',
           'hover:text-fgd-3'
         )}
-        onClick={router.back}
+        onClick={handleExploreBackClick}
       >
         <ChevronLeftIcon className="h-6 w-6 " />
         Back
@@ -49,18 +67,35 @@ export default function Explore() {
             <h1 className="mr-2">{proposal?.account.name}</h1>
             <ProposalStateBadge proposal={proposal.account} />
           </div>
-          <h3 className="mb-4 mt-16">Top Voters</h3>
+          <div className="mb-4 mt-16 flex justify-between">
+            <h3 className="">Top Voters</h3>
+          </div>
           <div
             className="grid gap-4 grid-cols-1 items-center lg:grid-cols-2"
             onMouseLeave={() => setHighlighted(undefined)}
           >
-            <ProposalTopVotersList
-              className="h-[500px]"
-              data={records}
-              endpoint={endpoint}
-              highlighted={highlighted}
-              onHighlight={setHighlighted}
-            />
+            <div className="flex flex-col gap-5 h-[500px]">
+              <ProposalTopVotersList
+                className={isNftMode ? 'h-[275px]' : 'h-[500px]'}
+                data={records}
+                endpoint={endpoint}
+                isMulti={isMulti}
+                highlighted={highlighted}
+                onHighlight={setHighlighted}
+              />
+              {/* when hovering over a top voter, ProposalVoterNftChart shows he/her NFTs when isNftMode */}
+              {isNftMode ? (
+                <ProposalVoterNftChart
+                  className="h-[205px]"
+                  highlighted={highlighted}
+                  voteType={
+                    highlighted && records
+                      ? records.find((x) => x.key === highlighted)?.voteType
+                      : undefined
+                  }
+                />
+              ) : undefined}
+            </div>
             <ProposalTopVotersBubbleChart
               className="h-[500px]"
               data={records}
@@ -75,12 +110,22 @@ export default function Explore() {
               proposal={proposal}
               signatories={signatories}
             />
-            <ProposalVoteResult
-              className="text-center"
-              data={records}
-              governance={governance}
-              proposal={proposal}
-            />
+            {isMulti ? (
+              <div className="text-center">
+                <h3 className="mb-3">Vote Result</h3>
+                <MultiChoiceVotes
+                  proposal={proposal.account}
+                  limit={proposal.account.options.length}
+                />
+              </div>
+            ) : (
+              <ProposalVoteResult
+                className="text-center"
+                data={records}
+                governance={governance}
+                proposal={proposal}
+              />
+            )}
             <ProposalRemainingVotingTime
               align="right"
               governance={governance}

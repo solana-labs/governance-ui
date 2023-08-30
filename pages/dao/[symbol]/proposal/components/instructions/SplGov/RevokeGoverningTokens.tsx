@@ -14,7 +14,7 @@ import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
 import { validateSolAddress } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { useRouter } from 'next/router'
-import React, {
+import {
   FC,
   useCallback,
   useContext,
@@ -25,6 +25,7 @@ import React, {
 import { NewProposalContext } from '../../../new'
 import useMembershipTypes from './useMembershipTypes'
 import { useRealmQuery } from '@hooks/queries/realm'
+import Tooltip from '@components/Tooltip'
 
 type Form = {
   memberKey?: string
@@ -197,17 +198,26 @@ const RevokeGoverningTokens: FC<{
 
   return (
     <>
-      <Select
-        label="Membership Type"
-        value={selectedMembershipType}
-        onChange={(x) => setForm((p) => ({ ...p, membershipPopulation: x }))}
+      <Tooltip
+        content={
+          Object.keys(membershipTypes).length === 0
+            ? 'Your DAO has no governance tokens with the Membership token type'
+            : undefined
+        }
       >
-        {Object.keys(membershipTypes).map((x) => (
-          <Select.Option key={x} value={x}>
-            {capitalizeFirstLetter(x)}
-          </Select.Option>
-        ))}
-      </Select>
+        <Select
+          label="Membership Token"
+          disabled={Object.keys(membershipTypes).length === 0}
+          value={selectedMembershipType}
+          onChange={(x) => setForm((p) => ({ ...p, membershipPopulation: x }))}
+        >
+          {Object.keys(membershipTypes).map((x) => (
+            <Select.Option key={x} value={x}>
+              {capitalizeFirstLetter(x)}
+            </Select.Option>
+          ))}
+        </Select>
+      </Tooltip>
       <Input
         label="Member Public Key"
         value={form.memberKey}

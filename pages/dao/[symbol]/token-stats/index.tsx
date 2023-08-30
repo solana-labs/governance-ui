@@ -186,10 +186,12 @@ const LockTokenStats = () => {
         depositsWithWalletsInner.push(depositWithWallet)
       }
     }
-    return depositsWithWalletsInner.sort(
-      (a, b) =>
-        b.deposit.amountDepositedNative.toNumber() -
-        a.deposit.amountDepositedNative.toNumber()
+    return depositsWithWalletsInner.sort((a, b) =>
+      a.deposit.amountDepositedNative.eq(b.deposit.amountDepositedNative)
+        ? 0
+        : a.deposit.amountDepositedNative.lt(b.deposit.amountDepositedNative)
+        ? 1
+        : -1
     )
   }, [
     realm?.account.communityMint,

@@ -42,7 +42,7 @@ export const createBase64Proposal = async (
   const governanceAuthority = walletPk
   const signatory = walletPk
   const payer = walletPk
-  console.log(wallet)
+
   // Changed this because it is misbehaving on my local validator setup.
   const programVersion = await getGovernanceProgramVersion(
     connection,

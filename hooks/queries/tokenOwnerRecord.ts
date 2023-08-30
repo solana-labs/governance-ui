@@ -1,11 +1,10 @@
-import { EndpointTypes } from '@models/types'
 import {
   TokenOwnerRecord,
   getGovernanceAccounts,
   getTokenOwnerRecord,
   pubkeyFilter,
 } from '@solana/spl-governance'
-import { PublicKey } from '@solana/web3.js'
+import { Connection, PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
 import asFindable from '@utils/queries/asFindable'
 import {
@@ -16,15 +15,16 @@ import { useRealmQuery } from './realm'
 import { useMemo } from 'react'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import queryClient from './queryClient'
 
 export const tokenOwnerRecordQueryKeys = {
-  all: (cluster: EndpointTypes) => [cluster, 'TokenOwnerRecord'],
-  byPubkey: (cluster: EndpointTypes, k: PublicKey) => [
-    ...tokenOwnerRecordQueryKeys.all(cluster),
+  all: (endpoint: string) => [endpoint, 'TokenOwnerRecord'],
+  byPubkey: (endpoint: string, k: PublicKey) => [
+    ...tokenOwnerRecordQueryKeys.all(endpoint),
     k.toString(),
   ],
-  byRealm: (cluster: EndpointTypes, realm: PublicKey) => [
-    ...tokenOwnerRecordQueryKeys.all(cluster),
+  byRealm: (endpoint: string, realm: PublicKey) => [
+    ...tokenOwnerRecordQueryKeys.all(endpoint),
     'by Realm',
     realm,
   ],
@@ -37,7 +37,10 @@ export const useTokenOwnerRecordsForRealmQuery = () => {
   const enabled = realm !== undefined
   const query = useQuery({
     queryKey: enabled
-      ? tokenOwnerRecordQueryKeys.byRealm(connection.cluster, realm.pubkey)
+      ? tokenOwnerRecordQueryKeys.byRealm(
+          connection.current.rpcEndpoint,
+          realm.pubkey
+        )
       : undefined,
     queryFn: async () => {
       if (!enabled) throw new Error()
@@ -88,6 +91,9 @@ export const useTokenOwnerRecordsDelegatedToUser = () => {
   return delagatingTors
 }
 
+const queryFn = (connection: Connection, pubkey: PublicKey) =>
+  asFindable(getTokenOwnerRecord)(connection, pubkey)
+
 export const useTokenOwnerRecordByPubkeyQuery = (
   pubkey: PublicKey | undefined
 ) => {
@@ -95,16 +101,31 @@ export const useTokenOwnerRecordByPubkeyQuery = (
   const enabled = pubkey !== undefined
   const query = useQuery({
     queryKey: enabled
-      ? tokenOwnerRecordQueryKeys.byPubkey(connection.cluster, pubkey)
+      ? tokenOwnerRecordQueryKeys.byPubkey(
+          connection.current.rpcEndpoint,
+          pubkey
+        )
       : undefined,
     queryFn: async () => {
       if (!enabled) throw new Error()
-      return asFindable(getTokenOwnerRecord)(connection.current, pubkey)
+      return queryFn(connection.current, pubkey)
     },
     enabled,
   })
   return query
 }
+
+export const fetchTokenOwnerRecordByPubkey = (
+  connection: Connection,
+  pubkey: PublicKey
+) =>
+  queryClient.fetchQuery({
+    queryKey: tokenOwnerRecordQueryKeys.byPubkey(
+      connection.rpcEndpoint,
+      pubkey
+    ),
+    queryFn: () => queryFn(connection, pubkey),
+  })
 
 export const useUserCommunityTokenOwnerRecord = () => {
   const { data: tokenOwnerRecordPubkey } = useAddressQuery_CommunityTokenOwner()

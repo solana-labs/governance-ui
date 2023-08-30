@@ -1,4 +1,4 @@
-import { Proposal, ProgramAccount } from '@solana/spl-governance'
+import { Proposal, ProgramAccount, VoteType, GovernanceAccountType } from '@solana/spl-governance'
 import classNames from 'classnames'
 import { ThumbUpIcon, ThumbDownIcon } from '@heroicons/react/solid'
 import { isYesVote } from '@models/voteRecords'
@@ -17,6 +17,8 @@ interface Props {
 export default function ProposalMyVoteBadge(props: Props) {
   const realm = useRealmQuery().data?.result
   const wallet = useWalletOnePointOh()
+  const isMulti = props.proposal.account.voteType !== VoteType.SINGLE_CHOICE
+   && props.proposal.account.accountType === GovernanceAccountType.ProposalV2
 
   const { data: tokenOwnerRecordPk } = useAddressQuery_TokenOwnerRecord(
     realm?.owner,
@@ -37,7 +39,7 @@ export default function ProposalMyVoteBadge(props: Props) {
 
   const isYes = isYesVote(ownVoteRecord?.result?.account)
   return (
-    <Tooltip content={isYes ? 'You voted "Yes"' : 'You voted "No"'}>
+    <Tooltip content={isYes ? isMulti ? 'You have already voted on this proposal' : 'You voted "Yes"' : 'You voted "No"'}>
       <div
         className={classNames(
           props.className,

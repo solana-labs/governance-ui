@@ -25,7 +25,7 @@ const getHeliusEndpoint = (network: Network) => {
 }
 
 export const digitalAssetsQueryKeys = {
-  all: (network: Network) => [network, 'DigitalAssets'], //TBH endpoint is stupid for this. it should be either 'devnet' or 'mainnet'.
+  all: (network: Network) => [network, 'DigitalAssets'], // TBH endpoint is stupid for this. it should be either 'devnet' or 'mainnet'.
   byId: (network: Network, id: PublicKey) => [
     ...digitalAssetsQueryKeys.all(network),
     'by Id',
@@ -41,6 +41,51 @@ export const digitalAssetsQueryKeys = {
     'by Realm',
     realm.toString(),
   ],
+  proofById: (network: Network, id: PublicKey) => [
+    ...digitalAssetsQueryKeys.all(network),
+    'proof By Id',
+    id.toString(),
+  ],
+}
+
+export type DasNftObject = {
+  grouping: { group_key: 'collection'; group_value: string }[]
+  compression: {
+    eligible: boolean
+    compressed: boolean
+    data_hash: string
+    creator_hash: string
+    asset_hash: string
+    tree: string
+    seq: number
+    leaf_id: number
+  }
+  ownership: {
+    frozen: boolean
+    delegated: boolean
+    delegate: null | string
+    ownership_model: string
+    owner: string
+  }
+  content: {
+    $schema: string
+    json_uri: string
+    files: any
+    metadata: {
+      description: string
+      name: string
+      symbol: string
+    }
+    links: {
+      image: string
+    }
+  }
+  creators: {
+    address: string
+    share: number
+    verified: boolean
+  }[]
+  id: string
 }
 
 /*** Here is an example item from the DAS Api, since it's not typed and the docs dont give the full schema.
@@ -144,7 +189,27 @@ export const dasByIdQueryFn = async (network: Network, id: PublicKey) => {
 
   const x = await response.json()
   if (x.error) return { found: false, result: undefined, err: x.error }
-  return { result: x.result, found: true }
+  return { result: x.result as DasNftObject, found: true }
+}
+
+export const fetchDigitalAssetById = (network: Network, id: PublicKey) =>
+  queryClient.fetchQuery({
+    queryKey: digitalAssetsQueryKeys.byOwner(network, id),
+    queryFn: () => dasByIdQueryFn(network, id),
+  })
+
+export const useDigitalAssetById = (id: PublicKey | undefined) => {
+  const { connection } = useConnection()
+  const network = getNetworkFromEndpoint(connection.rpcEndpoint) as Network
+  const enabled = id !== undefined
+  return useQuery({
+    enabled,
+    queryKey: id && digitalAssetsQueryKeys.byId(network, id),
+    queryFn: async () => {
+      if (!enabled) throw new Error()
+      return dasByIdQueryFn(network, id)
+    },
+  })
 }
 
 const dasByOwnerQueryFn = async (network: Network, owner: PublicKey) => {
@@ -169,7 +234,7 @@ const dasByOwnerQueryFn = async (network: Network, owner: PublicKey) => {
     }),
   })
   const { result } = await response.json()
-  return result.items as any[]
+  return result.items as DasNftObject[]
 }
 
 export const fetchDigitalAssetsByOwner = (network: Network, owner: PublicKey) =>
@@ -185,8 +250,10 @@ export const useDigitalAssetsByOwner = (owner: undefined | PublicKey) => {
   return useQuery({
     enabled,
     queryKey: owner && digitalAssetsQueryKeys.byOwner(network, owner),
-    queryFn: async () =>
-      enabled ? dasByOwnerQueryFn(network, owner) : new Error(),
+    queryFn: async () => {
+      if (!enabled) throw new Error()
+      return dasByOwnerQueryFn(network, owner)
+    },
   })
 }
 
@@ -222,3 +289,30 @@ export const useRealmDigitalAssetsQuery = () => {
   })
   return query
 }
+
+const dasProofByIdQueryFn = async (network: Network, id: PublicKey) => {
+  const url = getHeliusEndpoint(network)
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      id: 'Realms user',
+      method: 'getAssetProof',
+      params: {
+        id: id.toString(),
+      },
+    }),
+  })
+
+  const { result, error } = await response.json()
+  if (error) return { found: false, result: undefined, err: error } as const
+  else return { found: true, result } as const
+}
+export const fetchDasAssetProofById = (network: Network, assetId: PublicKey) =>
+  queryClient.fetchQuery({
+    queryKey: digitalAssetsQueryKeys.proofById(network, assetId),
+    queryFn: () => dasProofByIdQueryFn(network, assetId),
+  })

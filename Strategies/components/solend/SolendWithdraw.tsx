@@ -40,6 +40,7 @@ import {
 } from '@hooks/queries/mintInfo'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { useRealmProposalsQuery } from '@hooks/queries/proposal'
+import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 
 const SolendWithdraw = ({
   proposedInvestment,
@@ -64,7 +65,8 @@ const SolendWithdraw = ({
   const config = useRealmConfigQuery().data?.result
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
-  const { realmInfo, ownVoterWeight } = useRealm()
+  const { result: ownVoterWeight } = useLegacyVoterWeight()
+  const { realmInfo } = useRealm()
   const [isWithdrawing, setIsWithdrawing] = useState(false)
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [deposits, setDeposits] = useState<{
@@ -199,6 +201,7 @@ const SolendWithdraw = ({
   }
 
   const handleWithdraw = async () => {
+    if (ownVoterWeight === undefined) throw new Error()
     if (proposals === undefined) throw new Error()
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     if (!isValid) {

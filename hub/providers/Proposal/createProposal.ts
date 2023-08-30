@@ -1,8 +1,8 @@
+import { SUPPORT_CNFTS } from '@constants/flags';
 import {
   VSR_PLUGIN_PKS,
   NFT_PLUGINS_PKS,
   GATEWAY_PLUGINS_PKS,
-  PYTH_PLUGINS_PKS,
 } from '@constants/plugins';
 import { Wallet } from '@coral-xyz/anchor';
 import {
@@ -31,14 +31,18 @@ import {
 } from 'actions/createProposal';
 import { tryGetNftRegistrar } from 'VoteStakeRegistry/sdk/api';
 
+import {
+  DasNftObject,
+  fetchDigitalAssetsByOwner,
+} from '@hooks/queries/digitalAssets';
+import { getNetworkFromEndpoint } from '@utils/connection';
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts';
-import { getNfts } from '@utils/tokens';
-import { NFTWithMeta, VotingClient } from '@utils/uiTypes/VotePlugin';
+import { VotingClient } from '@utils/uiTypes/VotePlugin';
 
 import { fetchPlugins } from './fetchPlugins';
 
 interface Args {
-  callbacks?: Parameters<typeof _createProposal>[11];
+  callbacks?: Parameters<typeof _createProposal>[12];
   cluster?: string;
   connection: Connection;
   councilTokenMintPublicKey?: PublicKey;
@@ -47,6 +51,7 @@ interface Args {
   governingTokenMintPublicKey: PublicKey;
   instructions: TransactionInstruction[];
   isDraft: boolean;
+  options: string[];
   proposalDescription: string;
   proposalTitle: string;
   realmPublicKey: PublicKey;
@@ -172,7 +177,7 @@ export async function createProposal(args: Args) {
   const pluginPublicKey =
     realmConfig.account.communityTokenConfig.voterWeightAddin;
   let votingClient: VotingClient | undefined = undefined;
-  let votingNfts: NFTWithMeta[] = [];
+  let votingNfts: DasNftObject[] = [];
 
   if (pluginPublicKey) {
     const votingPlugins = await fetchPlugins(
@@ -218,19 +223,27 @@ export async function createProposal(args: Args) {
             x.collection.toBase58(),
           ) || [];
 
-        const nfts = await getNfts(args.requestingUserPublicKey, {
-          cluster: args.cluster,
-        } as any);
-
-        votingNfts = nfts.filter(
-          (nft) =>
-            nft.collection &&
-            nft.collection.mintAddress &&
-            (nft.collection.verified ||
-              typeof nft.collection.verified === 'undefined') &&
-            collections.includes(nft.collection.mintAddress) &&
-            nft.collection.creators?.filter((x) => x.verified).length > 0,
+        // const nfts = await getNfts(args.requestingUserPublicKey, {
+        //   cluster: args.cluster,
+        // } as any);
+        const network = getNetworkFromEndpoint(args.connection.rpcEndpoint);
+        if (network === 'localnet') throw new Error();
+        const nfts = await fetchDigitalAssetsByOwner(
+          network,
+          args.requestingUserPublicKey,
         );
+
+        votingNfts = nfts.filter((nft) => {
+          const collection = nft.grouping.find(
+            (x: any) => x.group_key === 'collection',
+          );
+          return (
+            (SUPPORT_CNFTS || !nft.compression.compressed) &&
+            collection &&
+            collections.includes(collection.group_value) &&
+            nft.creators?.filter((x: any) => x.verified).length > 0
+          );
+        });
       }
     }
 
@@ -239,13 +252,6 @@ export async function createProposal(args: Args) {
       votingPlugins.gatewayClient
     ) {
       client = votingPlugins.gatewayClient;
-    }
-
-    if (
-      PYTH_PLUGINS_PKS.includes(pluginPublicKeyStr) &&
-      votingPlugins.pythClient
-    ) {
-      client = votingPlugins.pythClient;
     }
 
     if (client) {
@@ -279,6 +285,7 @@ export async function createProposal(args: Args) {
     proposalIndex,
     instructionData,
     args.isDraft,
+    args.options,
     votingClient,
     args.callbacks,
   );

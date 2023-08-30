@@ -8,15 +8,7 @@ import Switch from '@components/Switch'
 import Select from '@components/inputs/Select'
 import { usePrevious } from '@hooks/usePrevious'
 import { DISABLED_VALUE } from '@tools/constants'
-
-export enum InstructionInputType {
-  GOVERNED_ACCOUNT,
-  INPUT,
-  TEXTAREA,
-  SWITCH,
-  SELECT,
-  DISABLEABLE_INPUT,
-}
+import { InstructionInputType } from './inputInstructionType'
 
 export interface InstructionInput {
   label: string

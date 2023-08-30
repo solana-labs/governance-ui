@@ -53,7 +53,7 @@ interface DepositBox {
 const unlockedTypes = ['none']
 
 const LockTokensAccount: React.FC<{
-  tokenOwnerRecordPk: string | string[] | undefined
+  tokenOwnerRecordPk: PublicKey
   children: React.ReactNode
 }> = ({ tokenOwnerRecordPk, children }) => {
   const realm = useRealmQuery().data?.result
@@ -79,10 +79,9 @@ const LockTokensAccount: React.FC<{
   )
   const [isOwnerOfDeposits, setIsOwnerOfDeposits] = useState(true)
 
-  const lol = useMemo(() => new PublicKey(tokenOwnerRecordPk as string), [
-    tokenOwnerRecordPk,
-  ])
-  const { data: tokenOwnerRecord } = useTokenOwnerRecordByPubkeyQuery(lol)
+  const { data: tokenOwnerRecord } = useTokenOwnerRecordByPubkeyQuery(
+    tokenOwnerRecordPk
+  )
   const tokenOwnerRecordWalletPk =
     tokenOwnerRecord?.result?.account.governingTokenOwner
 
@@ -208,9 +207,7 @@ const LockTokensAccount: React.FC<{
           depositMint,
           publicKey
         )
-        setIsOwnerOfDeposits(
-          tokenOwnerRecordAddress.toBase58() === tokenOwnerRecordPk
-        )
+        setIsOwnerOfDeposits(tokenOwnerRecordAddress.equals(tokenOwnerRecordPk))
       }
       getTokenOwnerRecord()
     }

@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import { ProgramAccount, Governance } from '@solana/spl-governance'
 import {
   UiInstruction,
@@ -43,7 +42,7 @@ const DualExercise = ({
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-  const schema = getDualFinanceExerciseSchema()
+  const schema = useMemo(getDualFinanceExerciseSchema, [])
   useEffect(() => {
     function getInstruction(): Promise<UiInstruction> {
       return getExerciseInstruction({

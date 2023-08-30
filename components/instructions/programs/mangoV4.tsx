@@ -5,25 +5,32 @@ import {
 } from '@blockworks-foundation/mango-v4'
 import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
 import { AnchorProvider, BN, BorshInstructionCoder } from '@coral-xyz/anchor'
-import { Wallet } from '@marinade.finance/marinade-ts-sdk'
 import { AccountMetaData } from '@solana/spl-governance'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
-import {
-  LISTING_PRESETS,
+import EmptyWallet, {
   getSuggestedCoinTier,
   compareObjectsAndGetDifferentKeys,
   ListingArgs,
   ListingArgsFormatted,
-  coinTiersToNames,
   getOracle,
   getBestMarket,
   EditTokenArgsFormatted,
-  LISTING_PRESETS_KEYS,
+  isPythOracle,
+  getFormattedListingPresets,
 } from '@utils/Mango/listingTools'
 import { secondsToHours } from 'date-fns'
 import WarningFilledIcon from '@carbon/icons-react/lib/WarningFilled'
 import { CheckCircleIcon } from '@heroicons/react/solid'
 import { Market } from '@project-serum/serum'
+import tokenPriceService, {
+  TokenInfoWithoutDecimals,
+} from '@utils/services/tokenPrice'
+import {
+  LISTING_PRESETS_KEYS,
+  coinTiersToNames,
+} from '@blockworks-foundation/mango-v4-settings/lib/helpers/listingTools'
+import { tryParseKey } from '@tools/validators/pubkey'
+import Loading from '@components/Loading'
 // import { snakeCase } from 'snake-case'
 // import { sha256 } from 'js-sha256'
 
@@ -215,15 +222,21 @@ const instructions = () => ({
       const oracle = accounts[6].pubkey
       const isMintOnCurve = PublicKey.isOnCurve(proposedMint)
 
-      const [info, proposedOracle, suggestedTier, args] = await Promise.all([
+      const [info, proposedOracle, args] = await Promise.all([
         displayArgs(connection, data),
         getOracle(connection, oracle),
-        getSuggestedCoinTier(proposedMint.toBase58()),
         getDataObjectFlattened<ListingArgs>(connection, data),
       ])
+      const liqudityTier = await getSuggestedCoinTier(
+        proposedMint.toBase58(),
+        proposedOracle.type === 'Pyth'
+      )
+
       const formattedProposedArgs = getFormattedListingValues(args)
-      const suggestedPreset = LISTING_PRESETS[suggestedTier.tier]
-      const suggestedUntrusted = suggestedTier.tier === 'UNTRUSTED'
+      const suggestedPreset = getFormattedListingPresets(
+        proposedOracle.type === 'Pyth'
+      )[liqudityTier.tier]
+      const suggestedUntrusted = liqudityTier.tier === 'UNTRUSTED'
 
       const suggestedFormattedPreset: ListingArgsFormatted = Object.keys(
         suggestedPreset
@@ -288,8 +301,8 @@ const instructions = () => ({
                   </h3>
                   <h3 className="text-orange flex">
                     Very low liquidity Price impact of{' '}
-                    {suggestedTier.priceImpact}% on $1000 swap. This token
-                    should probably be listed using the Register Trustless Token
+                    {liqudityTier.priceImpact}% on $1000 swap. This token should
+                    probably be listed using the Register Trustless Token
                     instruction check params carefully
                   </h3>
                 </>
@@ -298,14 +311,14 @@ const instructions = () => ({
                 <h3 className="text-green flex items-center">
                   <CheckCircleIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
                   Proposal params match suggested token tier -{' '}
-                  {coinTiersToNames[suggestedTier.tier]}.
+                  {coinTiersToNames[liqudityTier.tier]}.
                 </h3>
               )}
               {!suggestedUntrusted && invalidKeys.length > 0 && (
                 <h3 className="text-orange flex items-center">
                   <WarningFilledIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
                   Proposal params do not match suggested token tier -{' '}
-                  {coinTiersToNames[suggestedTier.tier]} check params carefully
+                  {coinTiersToNames[liqudityTier.tier]} check params carefully
                 </h3>
               )}
               {isMintOnCurve && (
@@ -333,14 +346,6 @@ const instructions = () => ({
                     </a>
                   </>
                 )}
-                {proposedOracle.type === 'Switchboard' &&
-                  (suggestedTier.tier === 'PREMIUM' ||
-                    suggestedTier.tier === 'MID') && (
-                    <span className="text-orange">
-                      Midwit or Bluechip tokens should be listed with pyth
-                      oracle
-                    </span>
-                  )}
               </div>
               <DisplayListingPropertyWrapped
                 label="Token index"
@@ -627,130 +632,139 @@ const instructions = () => ({
       data: Uint8Array,
       accounts: AccountMetaData[]
     ) => {
-      const mintInfo = accounts[2].pubkey
-      const group = accounts[0].pubkey
-
-      const client = await getClient(connection)
-      const [mangoGroup, info, args] = await Promise.all([
-        client.getGroup(group),
-        displayArgs(connection, data),
-        getDataObjectFlattened<any>(connection, data),
-      ])
-      const mint = [...mangoGroup.mintInfosMapByMint.values()].find((x) =>
-        x.publicKey.equals(mintInfo)
-      )?.mint
-
-      let suggestedTier: Partial<{
-        tier: LISTING_PRESETS_KEYS
-        priceImpact: string
-      }> = {}
-      let suggestedUntrusted = false
-      let invalidKeys: (keyof EditTokenArgsFormatted)[] = []
-      let invalidFields: Partial<EditTokenArgsFormatted> = {}
-
-      const parsedArgs: Partial<EditTokenArgsFormatted> = {
-        tokenIndex: args.tokenIndex,
-        tokenName: args.name,
-        oracleConfidenceFilter: args['oracleConfigOpt.confFilter']
-          ? (args['oracleConfigOpt.confFilter'] * 100)?.toFixed(2)
-          : undefined,
-        oracleMaxStalenessSlots: args['oracleConfigOpt.maxStalenessSlots'],
-        interestRateUtilizationPoint0: args['interestRateParamsOpt.util0']
-          ? (args['interestRateParamsOpt.util0'] * 100)?.toFixed(2)
-          : undefined,
-        interestRatePoint0: args['interestRateParamsOpt.rate0']
-          ? (args['interestRateParamsOpt.rate0'] * 100)?.toFixed(2)
-          : undefined,
-        interestRateUtilizationPoint1: args['interestRateParamsOpt.util1']
-          ? (args['interestRateParamsOpt.util1'] * 100)?.toFixed(2)
-          : undefined,
-        interestRatePoint1: args['interestRateParamsOpt.rate1']
-          ? (args['interestRateParamsOpt.rate1'] * 100)?.toFixed(2)
-          : undefined,
-        maxRate: args['interestRateParamsOpt.maxRate']
-          ? (args['interestRateParamsOpt.maxRate'] * 100)?.toFixed(2)
-          : undefined,
-        adjustmentFactor: args['interestRateParamsOpt.adjustmentFactor']
-          ? (args['interestRateParamsOpt.adjustmentFactor'] * 100).toFixed(2)
-          : undefined,
-        loanFeeRate: args.loanFeeRateOpt
-          ? (args.loanFeeRateOpt * 10000)?.toFixed(2)
-          : undefined,
-        loanOriginationFeeRate: args.loanOriginationFeeRateOpt
-          ? (args.loanOriginationFeeRateOpt * 10000)?.toFixed(2)
-          : undefined,
-        maintAssetWeight: args.maintAssetWeightOpt?.toFixed(2),
-        initAssetWeight: args.initAssetWeightOpt?.toFixed(2),
-        maintLiabWeight: args.maintLiabWeightOpt?.toFixed(2),
-        initLiabWeight: args.initLiabWeightOpt?.toFixed(2),
-        liquidationFee: args['liquidationFeeOpt']
-          ? (args['liquidationFeeOpt'] * 100)?.toFixed(2)
-          : undefined,
-        minVaultToDepositsRatio: args['minVaultToDepositsRatioOpt']
-          ? (args['minVaultToDepositsRatioOpt'] * 100)?.toFixed(2)
-          : undefined,
-        netBorrowLimitPerWindowQuote: args['netBorrowLimitPerWindowQuoteOpt']
-          ? toUiDecimals(args['netBorrowLimitPerWindowQuoteOpt'], 6)
-          : undefined,
-        netBorrowLimitWindowSizeTs: args.netBorrowLimitWindowSizeTsOpt
-          ? secondsToHours(args.netBorrowLimitWindowSizeTsOpt)
-          : undefined,
-        borrowWeightScaleStartQuote: args.borrowWeightScaleStartQuoteOpt
-          ? toUiDecimals(args.borrowWeightScaleStartQuoteOpt, 6)
-          : undefined,
-        depositWeightScaleStartQuote: args.depositWeightScaleStartQuoteOpt
-          ? toUiDecimals(args.depositWeightScaleStartQuoteOpt, 6)
-          : undefined,
-        groupInsuranceFund:
-          args.groupInsuranceFundOpt !== null
-            ? args.groupInsuranceFundOpt
-            : undefined,
-      }
-
-      if (mint) {
-        suggestedTier = await getSuggestedCoinTier(mint.toBase58())
-        const suggestedPreset = LISTING_PRESETS[suggestedTier.tier!]
-        suggestedUntrusted = suggestedTier.tier === 'UNTRUSTED'
-        const suggestedFormattedPreset:
-          | EditTokenArgsFormatted
-          | Record<string, never> = Object.keys(suggestedPreset).length
-          ? {
-              ...getFormattedListingValues({
-                tokenIndex: args.tokenIndex,
-                name: args.name,
-                ...suggestedPreset,
-              } as ListingArgs),
-              borrowWeightScaleStartQuote: toUiDecimals(
-                suggestedPreset.borrowWeightScale,
-                6
-              ),
-              depositWeightScaleStartQuote: toUiDecimals(
-                suggestedPreset.depositWeightScale,
-                6
-              ),
-              groupInsuranceFund: suggestedPreset.insuranceFound,
-            }
-          : {}
-
-        invalidKeys = (Object.keys(suggestedPreset).length
-          ? compareObjectsAndGetDifferentKeys<Partial<EditTokenArgsFormatted>>(
-              parsedArgs,
-              suggestedFormattedPreset
-            )
-          : []
-        ).filter((x) => parsedArgs[x] !== undefined)
-
-        invalidFields = invalidKeys.reduce((obj, key) => {
-          return {
-            ...obj,
-            [key]: suggestedFormattedPreset[key],
-          }
-        }, {})
-      }
-
       try {
+        let mintData: null | TokenInfoWithoutDecimals | undefined = null
+        const mintInfo = accounts[2].pubkey
+        const group = accounts[0].pubkey
+
+        const client = await getClient(connection)
+        const [mangoGroup, info, args] = await Promise.all([
+          client.getGroup(group),
+          displayArgs(connection, data),
+          getDataObjectFlattened<any>(connection, data),
+        ])
+        const mint = [...mangoGroup.mintInfosMapByMint.values()].find((x) =>
+          x.publicKey.equals(mintInfo)
+        )?.mint
+
+        let liqudityTier: Partial<{
+          tier: LISTING_PRESETS_KEYS
+          priceImpact: string
+        }> = {}
+        let suggestedUntrusted = false
+        let invalidKeys: (keyof EditTokenArgsFormatted)[] = []
+        let invalidFields: Partial<EditTokenArgsFormatted> = {}
+
+        const parsedArgs: Partial<EditTokenArgsFormatted> = {
+          tokenIndex: args.tokenIndex,
+          tokenName: args.name,
+          oracleConfidenceFilter: args['oracleConfigOpt.confFilter']
+            ? (args['oracleConfigOpt.confFilter'] * 100)?.toFixed(2)
+            : undefined,
+          oracleMaxStalenessSlots: args['oracleConfigOpt.maxStalenessSlots'],
+          interestRateUtilizationPoint0: args['interestRateParamsOpt.util0']
+            ? (args['interestRateParamsOpt.util0'] * 100)?.toFixed(2)
+            : undefined,
+          interestRatePoint0: args['interestRateParamsOpt.rate0']
+            ? (args['interestRateParamsOpt.rate0'] * 100)?.toFixed(2)
+            : undefined,
+          interestRateUtilizationPoint1: args['interestRateParamsOpt.util1']
+            ? (args['interestRateParamsOpt.util1'] * 100)?.toFixed(2)
+            : undefined,
+          interestRatePoint1: args['interestRateParamsOpt.rate1']
+            ? (args['interestRateParamsOpt.rate1'] * 100)?.toFixed(2)
+            : undefined,
+          maxRate: args['interestRateParamsOpt.maxRate']
+            ? (args['interestRateParamsOpt.maxRate'] * 100)?.toFixed(2)
+            : undefined,
+          adjustmentFactor: args['interestRateParamsOpt.adjustmentFactor']
+            ? (args['interestRateParamsOpt.adjustmentFactor'] * 100).toFixed(2)
+            : undefined,
+          loanFeeRate: args.loanFeeRateOpt
+            ? (args.loanFeeRateOpt * 10000)?.toFixed(2)
+            : undefined,
+          loanOriginationFeeRate: args.loanOriginationFeeRateOpt
+            ? (args.loanOriginationFeeRateOpt * 10000)?.toFixed(2)
+            : undefined,
+          maintAssetWeight: args.maintAssetWeightOpt?.toFixed(2),
+          initAssetWeight: args.initAssetWeightOpt?.toFixed(2),
+          maintLiabWeight: args.maintLiabWeightOpt?.toFixed(2),
+          initLiabWeight: args.initLiabWeightOpt?.toFixed(2),
+          liquidationFee: args['liquidationFeeOpt']
+            ? (args['liquidationFeeOpt'] * 100)?.toFixed(2)
+            : undefined,
+          minVaultToDepositsRatio: args['minVaultToDepositsRatioOpt']
+            ? (args['minVaultToDepositsRatioOpt'] * 100)?.toFixed(2)
+            : undefined,
+          netBorrowLimitPerWindowQuote: args['netBorrowLimitPerWindowQuoteOpt']
+            ? toUiDecimals(args['netBorrowLimitPerWindowQuoteOpt'], 6)
+            : undefined,
+          netBorrowLimitWindowSizeTs: args.netBorrowLimitWindowSizeTsOpt
+            ? secondsToHours(args.netBorrowLimitWindowSizeTsOpt)
+            : undefined,
+          borrowWeightScaleStartQuote: args.borrowWeightScaleStartQuoteOpt
+            ? toUiDecimals(args.borrowWeightScaleStartQuoteOpt, 6)
+            : undefined,
+          depositWeightScaleStartQuote: args.depositWeightScaleStartQuoteOpt
+            ? toUiDecimals(args.depositWeightScaleStartQuoteOpt, 6)
+            : undefined,
+          groupInsuranceFund:
+            args.groupInsuranceFundOpt !== null
+              ? args.groupInsuranceFundOpt
+              : undefined,
+        }
+
+        if (mint) {
+          mintData = tokenPriceService.getTokenInfo(mint.toBase58())
+          const oracle = mangoGroup.banksMapByMint.get(mint.toBase58())![0]!
+            .oracle
+          const isPyth = await isPythOracle(connection, oracle)
+          liqudityTier = await getSuggestedCoinTier(mint.toBase58(), !!isPyth)
+
+          const suggestedPreset = getFormattedListingPresets(!!isPyth)[
+            liqudityTier.tier!
+          ]
+          suggestedUntrusted = liqudityTier.tier === 'UNTRUSTED'
+
+          const suggestedFormattedPreset:
+            | EditTokenArgsFormatted
+            | Record<string, never> = Object.keys(suggestedPreset).length
+            ? {
+                ...getFormattedListingValues({
+                  tokenIndex: args.tokenIndex,
+                  name: args.name,
+                  ...suggestedPreset,
+                } as ListingArgs),
+                borrowWeightScaleStartQuote: toUiDecimals(
+                  suggestedPreset.borrowWeightScale,
+                  6
+                ),
+                depositWeightScaleStartQuote: toUiDecimals(
+                  suggestedPreset.depositWeightScale,
+                  6
+                ),
+                groupInsuranceFund: suggestedPreset.insuranceFound,
+              }
+            : {}
+
+          invalidKeys = (Object.keys(suggestedPreset).length
+            ? compareObjectsAndGetDifferentKeys<
+                Partial<EditTokenArgsFormatted>
+              >(parsedArgs, suggestedFormattedPreset)
+            : []
+          ).filter((x) => parsedArgs[x] !== undefined)
+
+          invalidFields = invalidKeys.reduce((obj, key) => {
+            return {
+              ...obj,
+              [key]: suggestedFormattedPreset[key],
+            }
+          }, {})
+        }
+
         return (
           <div>
+            <h3>{mintData && <div>Token: {mintData.symbol}</div>}</h3>
             {suggestedUntrusted && (
               <>
                 <h3 className="text-orange flex items-center">
@@ -758,27 +772,26 @@ const instructions = () => ({
                   Suggested token tier: UNTRUSTED.
                 </h3>
                 <h3 className="text-orange flex">
-                  Very low liquidity Price impact of{' '}
-                  {suggestedTier?.priceImpact}% on $1000 swap. Check params
-                  carefully
+                  Very low liquidity Price impact of {liqudityTier?.priceImpact}
+                  % on $1000 swap. Check params carefully
                 </h3>
               </>
             )}
-            {!suggestedUntrusted && !invalidKeys.length && suggestedTier.tier && (
+            {!suggestedUntrusted && !invalidKeys.length && liqudityTier.tier && (
               <h3 className="text-green flex items-center">
                 <CheckCircleIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
                 Proposal params match suggested token tier -{' '}
-                {coinTiersToNames[suggestedTier.tier]}.
+                {coinTiersToNames[liqudityTier.tier]}.
               </h3>
             )}
             {!suggestedUntrusted &&
               invalidKeys &&
               invalidKeys!.length > 0 &&
-              suggestedTier.tier && (
+              liqudityTier.tier && (
                 <h3 className="text-orange flex items-center">
                   <WarningFilledIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
                   Proposal params do not match suggested token tier -{' '}
-                  {coinTiersToNames[suggestedTier.tier]} check params carefully
+                  {coinTiersToNames[liqudityTier.tier]} check params carefully
                 </h3>
               )}
             <div className="border-b mb-4 pb-4 space-y-3">
@@ -985,8 +998,14 @@ const instructions = () => ({
           </div>
         )
       } catch (e) {
-        console.log(e)
-        return <div>{JSON.stringify(data)}</div>
+        const info = await displayArgs(connection, data)
+
+        try {
+          return <div>{info}</div>
+        } catch (e) {
+          console.log(e)
+          return <div>{JSON.stringify(data)}</div>
+        }
       }
     },
   },
@@ -1006,6 +1025,73 @@ const instructions = () => ({
       const info = await displayArgs(connection, data)
       try {
         return <div>{info}</div>
+      } catch (e) {
+        console.log(e)
+        return <div>{JSON.stringify(data)}</div>
+      }
+    },
+  },
+  73195: {
+    name: 'Withdraw all token fees',
+    accounts: [
+      { name: 'Group' },
+      { name: 'Bank' },
+      { name: 'Vault' },
+      { name: 'Destination' },
+    ],
+    getDataUI: async (
+      connection: Connection,
+      data: Uint8Array,
+      accounts: AccountMetaData[]
+    ) => {
+      const group = accounts[0].pubkey
+      const bank = accounts[1].pubkey
+      const client = await getClient(connection)
+      const mangoGroup = await client.getGroup(group)
+      const mint = [...mangoGroup.banksMapByMint.values()].find(
+        (x) => x[0]!.publicKey.equals(bank)!
+      )![0]!.mint!
+      const tokenSymbol = tokenPriceService.getTokenInfo(mint.toBase58())
+        ?.symbol
+      try {
+        return (
+          <div>
+            {tokenSymbol ? tokenSymbol : <Loading className="w-5"></Loading>}
+          </div>
+        )
+      } catch (e) {
+        console.log(e)
+        return <div>{JSON.stringify(data)}</div>
+      }
+    },
+  },
+  15219: {
+    name: 'Withdraw all perp fees',
+    accounts: [
+      { name: 'Group' },
+      { name: 'Perp market' },
+      { name: 'Bank' },
+      { name: 'Vault' },
+      { name: 'Destination' },
+    ],
+    getDataUI: async (
+      connection: Connection,
+      data: Uint8Array,
+      accounts: AccountMetaData[]
+    ) => {
+      const group = accounts[0].pubkey
+      const perpMarket = accounts[1].pubkey
+      const client = await getClient(connection)
+      const mangoGroup = await client.getGroup(group)
+      const marketName = [
+        ...mangoGroup.perpMarketsMapByName.values(),
+      ].find((x) => x.publicKey.equals(perpMarket))?.name
+      try {
+        return (
+          <div>
+            {marketName ? marketName : <Loading className="w-5"></Loading>}
+          </div>
+        )
       } catch (e) {
         console.log(e)
         return <div>{JSON.stringify(data)}</div>
@@ -1044,7 +1130,7 @@ const getClient = async (connection: Connection) => {
   const options = AnchorProvider.defaultOptions()
   const adminProvider = new AnchorProvider(
     connection,
-    new Wallet(Keypair.generate()),
+    new EmptyWallet(Keypair.generate()),
     options
   )
   const client = await MangoClient.connect(
@@ -1112,12 +1198,15 @@ const displayArgs = async (connection: Connection, data: Uint8Array) => {
 
           return true
         })
-        .map((key) => (
-          <div key={key} className="flex">
-            <div className="mr-3">{key}:</div>
-            <div>{`${commify(args[key])}`}</div>
-          </div>
-        ))}
+        .map((key) => {
+          const isPublicKey = tryParseKey(args[key])
+          return (
+            <div key={key} className="flex">
+              <div className="mr-3">{key}:</div>
+              <div>{`${isPublicKey ? args[key] : commify(args[key])}`}</div>
+            </div>
+          )
+        })}
     </div>
   )
 }

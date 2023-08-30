@@ -1,4 +1,3 @@
-import React from 'react'
 import cx from 'classnames'
 import { ChevronDownIcon } from '@heroicons/react/outline'
 
@@ -10,6 +9,7 @@ import { abbreviateAddress } from '@utils/formatting'
 import SelectedWalletIcon from '../../icons/SelectedWalletIcon'
 import UnselectedWalletIcon from '../../icons/UnselectedWalletIcon'
 import AssetsPreviewIconList from './AssetsPreviewIconList'
+import { useTreasurySelectState } from '@components/treasuryV2/Details/treasurySelectStore'
 
 interface Props {
   className?: string
@@ -25,6 +25,12 @@ export default function SummaryButton(props: Props) {
   const containsTokens = props.wallet.assets.some(
     (asset) => asset.type === AssetType.Token || asset.type === AssetType.Sol
   )
+
+  const [treasurySelect] = useTreasurySelectState()
+  const selected =
+    treasurySelect === undefined || treasurySelect._kind === 'Legacy'
+      ? props.selected
+      : treasurySelect.selectedGovernance === props.wallet.governanceAddress
 
   return (
     <button
@@ -78,7 +84,7 @@ export default function SummaryButton(props: Props) {
                 'top-0',
                 'left-0',
                 'transition-opacity',
-                props.selected ? 'opacity-100' : 'opacity-0'
+                selected ? 'opacity-100' : 'opacity-0'
               )}
             />
             <UnselectedWalletIcon
@@ -89,7 +95,7 @@ export default function SummaryButton(props: Props) {
                 'top-0',
                 'left-0',
                 'transition-opacity',
-                props.selected ? 'opacity-0' : 'opacity-100'
+                selected ? 'opacity-0' : 'opacity-100'
               )}
             />
           </div>

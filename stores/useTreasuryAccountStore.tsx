@@ -19,6 +19,9 @@ interface TreasuryAccountStore extends State {
   handleFetchRecentActivity: (account: AssetAccount, connection) => void
 }
 
+/**
+ * @deprecated
+ */
 const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
   currentAccount: null,
   mintAddress: '',
@@ -26,7 +29,6 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
   recentActivity: [],
   isLoadingRecentActivity: false,
   isLoadingTokenAccounts: false,
-
   setCurrentAccount: async (account, connection) => {
     if (!account) {
       set((s) => {
