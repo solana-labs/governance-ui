@@ -43,7 +43,6 @@ import {
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
 import { useConnection } from '@solana/wallet-adapter-react'
-import { useVsrGovpower } from '@hooks/queries/plugins/vsr'
 
 interface DepositBox {
   mintPk: PublicKey
@@ -74,7 +73,7 @@ const LockTokensAccount: React.FC<{
   const [reducedDeposits, setReducedDeposits] = useState<DepositBox[]>([])
   const ownDeposits = useDepositStore((s) => s.state.deposits)
   const [deposits, setDeposits] = useState<DepositWithMintAccount[]>([])
-  const votingPower = useVsrGovpower().result?.result ?? new BN(0)
+  const [votingPower, setVotingPower] = useState<BN>(new BN(0))
   const [votingPowerFromDeposits, setVotingPowerFromDeposits] = useState<BN>(
     new BN(0)
   )
@@ -111,7 +110,11 @@ const LockTokensAccount: React.FC<{
         publicKey &&
         client
       ) {
-        const { deposits, votingPowerFromDeposits } = await getDeposits({
+        const {
+          deposits,
+          votingPower,
+          votingPowerFromDeposits,
+        } = await getDeposits({
           realmPk: realm.pubkey,
           communityMintPk: realm.account.communityMint,
           walletPk: tokenOwnerRecordWalletPk
@@ -150,10 +153,12 @@ const LockTokensAccount: React.FC<{
           return curr
         }, [] as DepositBox[])
         setVotingPowerFromDeposits(votingPowerFromDeposits)
+        setVotingPower(votingPower)
         setDeposits(deposits)
         setReducedDeposits(reducedDeposits)
       } else if (!wallet?.connected) {
         setVotingPowerFromDeposits(new BN(0))
+        setVotingPower(new BN(0))
         setDeposits([])
         setReducedDeposits([])
       }

@@ -17,6 +17,7 @@ import {
   NFT_PLUGINS_PKS,
   VSR_PLUGIN_PKS,
 } from '@constants/plugins'
+import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import useGatewayPluginStore from 'GatewayPlugin/store/gatewayPluginStore'
 import { useAsync } from 'react-async-hook'
@@ -32,8 +33,6 @@ import {
   VoteRegistryVoterWeight,
   VoterWeight,
 } from '@models/voteWeights'
-import useUserOrDelegator from '@hooks/useUserOrDelegator'
-import { getVsrGovpower } from './plugins/vsr'
 
 export const getVanillaGovpower = async (
   connection: Connection,
@@ -125,8 +124,7 @@ export const useGovernancePowerAsync = (
   const { connection } = useConnection()
   const realmPk = useSelectedRealmPubkey()
 
-  const actingAsWalletPk = useUserOrDelegator()
-
+  const vsrVotingPower = useDepositStore((s) => s.state.votingPower)
   const heliumVotingPower = useHeliumVsrStore((s) => s.state.votingPower)
   const gatewayVotingPower = useGatewayPluginStore((s) => s.state.votingPower)
 
@@ -151,10 +149,7 @@ export const useGovernancePowerAsync = (
             : plugin === 'NFT'
             ? getNftGovpower(connection, realmPk, TOR)
             : plugin === 'VSR'
-            ? actingAsWalletPk
-              ? (await getVsrGovpower(connection, realmPk, actingAsWalletPk))
-                  .result ?? new BN(0)
-              : undefined
+            ? vsrVotingPower
             : plugin === 'HeliumVSR'
             ? heliumVotingPower
             : plugin === 'gateway'
@@ -181,6 +176,7 @@ export const useLegacyVoterWeight = () => {
   const realmPk = useSelectedRealmPubkey()
   const realm = useRealmQuery().data?.result
 
+  const vsrVotingPower = useDepositStore((s) => s.state.votingPower)
   const heliumVotingPower = useHeliumVsrStore((s) => s.state.votingPower)
   const gatewayVotingPower = useGatewayPluginStore((s) => s.state.votingPower)
 
@@ -192,7 +188,6 @@ export const useLegacyVoterWeight = () => {
       realmPk && determineVotingPowerType(connection, realmPk, 'community'),
     [connection, realmPk]
   )
-  const actingAsWalletPk = useUserOrDelegator()
 
   const shouldCareAboutCouncil =
     realm && realm.account.config.councilMint !== undefined
@@ -220,14 +215,11 @@ export const useLegacyVoterWeight = () => {
             )
           : undefined
         : plugin === 'VSR'
-        ? actingAsWalletPk
-          ? new VoteRegistryVoterWeight(
-              communityTOR.result,
-              councilTOR?.result,
-              (await getVsrGovpower(connection, realmPk, actingAsWalletPk))
-                .result ?? new BN(0)
-            )
-          : undefined
+        ? new VoteRegistryVoterWeight(
+            communityTOR.result,
+            councilTOR?.result,
+            vsrVotingPower
+          )
         : plugin === 'HeliumVSR'
         ? new VoteRegistryVoterWeight(
             communityTOR.result,

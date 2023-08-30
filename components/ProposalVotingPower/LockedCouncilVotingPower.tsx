@@ -1,6 +1,5 @@
 import { BigNumber } from 'bignumber.js'
 import classNames from 'classnames'
-import BN from 'bn.js'
 
 import { calculateMaxVoteScore } from '@models/proposal/calulateMaxVoteScore'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
@@ -11,7 +10,6 @@ import VotingPowerPct from './VotingPowerPct'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmCouncilMintInfoQuery } from '@hooks/queries/mintInfo'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
-import { useVsrGovpower } from '@hooks/queries/plugins/vsr'
 
 interface Props {
   className?: string
@@ -22,7 +20,7 @@ export default function LockedCouncilVotingPower(props: Props) {
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
   const proposal = useRouteProposalQuery().data?.result
   const deposits = useDepositStore((s) => s.state.deposits)
-  const votingPower = useVsrGovpower().result?.result ?? new BN(0)
+  const votingPower = useDepositStore((s) => s.state.votingPower)
   const isLoading = useDepositStore((s) => s.state.isLoading)
 
   const depositRecord = deposits.find(
