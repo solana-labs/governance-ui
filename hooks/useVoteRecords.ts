@@ -48,7 +48,7 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
   const assetAccounts = useGovernanceAssetsStore((s) => s.assetAccounts)
   const mintsUsedInRealm = assetAccounts
     .filter((x) => x.isToken)
-    .map((x) => x.extensions.mint!)
+    .map((x) => x.extensions.mint!.publicKey)
   ///
 
   const [context, setContext] = useState<RpcContext | null>(null)
@@ -202,8 +202,7 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
         walletsPks,
         realm,
         client,
-        connection,
-        mintsUsedInRealm
+        connection.current
       )
       setUndecidedDepositByVoteRecord(votingPerWallet)
     }
@@ -232,7 +231,6 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
     tokenOwnerRecords.length,
     voteRecords.length,
     vsrMode,
-    mintsUsedInRealm.length,
     undecidedDepositByVoteRecord,
     tokenOwnerRecords,
     voteRecords,
