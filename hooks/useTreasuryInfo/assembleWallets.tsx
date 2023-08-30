@@ -29,8 +29,6 @@ import { Domain } from '@models/treasury/Domain'
 import { groupDomainsByWallet } from './groupDomainsByWallet'
 import { ConnectionContext } from '@utils/connection'
 import { PublicKey } from '@solana/web3.js'
-import getTokenOwnerRecordsForWallet from './getTokenOwnerRecordsForWallet'
-import { tryParseKey } from '@tools/validators/pubkey'
 
 function isNotNull<T>(x: T | null): x is T {
   return x !== null
@@ -127,15 +125,6 @@ export const assembleWallets = async (
       if (asset) {
         walletMap[walletAddress].assets.push(asset)
       }
-    }
-
-    if (account.type === AccountType.SOL) {
-      const tokenOwnerRecords = await getTokenOwnerRecordsForWallet(
-        connection,
-        account.governance,
-        tryParseKey(walletAddress)
-      )
-      walletMap[walletAddress].assets.push(...tokenOwnerRecords)
     }
   }
 

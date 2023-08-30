@@ -1,5 +1,4 @@
 import cx from 'classnames'
-import { TokenOwnerRecordAsset } from '@models/treasury/Asset'
 import { UserGroupIcon } from '@heroicons/react/solid'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { BN } from '@coral-xyz/anchor'
@@ -25,18 +24,27 @@ import { ExternalLinkIcon } from '@heroicons/react/outline'
 import Link from 'next/link'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useTokenOwnerRecordByPubkeyQuery } from '@hooks/queries/tokenOwnerRecord'
+import { fetchRealmByPubkey, useRealmByPubkeyQuery } from '@hooks/queries/realm'
+import mainnetBetaRealms from 'public/realms/mainnet-beta.json'
+import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
+import { fetchGovernanceByPubkey } from '@hooks/queries/governance'
 
 interface Props {
-  className?: string
-  tokenOwnerRecordAsset: TokenOwnerRecordAsset
+  tokenOwnerRecord: PublicKey
+  governance: PublicKey
 }
-export default function Header(props: Props) {
+export default function Header({ tokenOwnerRecord, governance }: Props) {
   const router = useRouter()
   const { cluster } = router.query
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
 
-  const asset = props.tokenOwnerRecordAsset
+  const tokenOwnerRecordData = useTokenOwnerRecordByPubkeyQuery(
+    tokenOwnerRecord
+  ).data?.result
+  const realmPk = tokenOwnerRecordData?.account.realm
+  const realm = useRealmByPubkeyQuery(realmPk).data?.result
 
   const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
@@ -50,6 +58,15 @@ export default function Header(props: Props) {
       notify({ type: 'error', message: 'Please connect your wallet to vote.' })
       return
     }
+    if (tokenOwnerRecordData === undefined) throw new Error()
+
+    const realm = (
+      await fetchRealmByPubkey(
+        connection.current,
+        tokenOwnerRecordData.account.realm
+      )
+    ).result
+    if (realm === undefined) throw new Error()
 
     try {
       setIsLeaving(true)
@@ -58,12 +75,12 @@ export default function Header(props: Props) {
 
       const programVersion = await getGovernanceProgramVersion(
         connection.current,
-        new PublicKey(asset.programId)
+        new PublicKey(tokenOwnerRecordData.owner)
       )
 
       const ata = await getAssociatedTokenAddress(
-        asset.tokenOwnerRecordAccount.account.governingTokenMint,
-        asset.tokenOwnerRecordAccount.account.governingTokenOwner,
+        tokenOwnerRecordData.account.governingTokenMint,
+        tokenOwnerRecordData.account.governingTokenOwner,
         true
       )
 
@@ -72,20 +89,20 @@ export default function Header(props: Props) {
       } catch (e) {
         const [ix] = await createAssociatedTokenAccount(
           wallet.publicKey,
-          asset.tokenOwnerRecordAccount.account.governingTokenOwner,
-          asset.tokenOwnerRecordAccount.account.governingTokenMint
+          tokenOwnerRecordData.account.governingTokenOwner,
+          tokenOwnerRecordData.account.governingTokenMint
         )
         instructions.push(ix)
       }
 
       await withWithdrawGoverningTokens(
         instructions,
-        new PublicKey(asset.programId),
+        new PublicKey(tokenOwnerRecordData.owner),
         programVersion,
-        asset.realmAccount.pubkey,
+        tokenOwnerRecordData.account.realm,
         ata,
-        asset.tokenOwnerRecordAccount.account.governingTokenMint,
-        asset.tokenOwnerRecordAccount.account.governingTokenOwner
+        tokenOwnerRecordData.account.governingTokenMint,
+        tokenOwnerRecordData.account.governingTokenOwner
       )
 
       const tx = new Transaction({ feePayer: wallet.publicKey }).add(
@@ -104,13 +121,17 @@ export default function Header(props: Props) {
 
       const instructionsData: InstructionDataWithHoldUpTime[] = []
 
+      const governanceData = await (
+        await fetchGovernanceByPubkey(connection.current, governance)
+      ).result
+      if (governanceData === undefined) throw new Error()
+
       instructions.forEach(async (ix) => {
         const serializedIx = serializeInstructionToBase64(ix)
 
         const ixData = {
           data: getInstructionDataFromBase64(serializedIx),
-          holdUpTime:
-            asset.governanceOwner.account.config.minInstructionHoldUpTime,
+          holdUpTime: governanceData.account.config.minInstructionHoldUpTime,
           prerequisiteInstructions: [],
         }
 
@@ -119,7 +140,7 @@ export default function Header(props: Props) {
 
       const governingMintInfo = await tryGetMint(
         connection.current,
-        asset.tokenOwnerRecordAccount.account.governingTokenMint
+        tokenOwnerRecordData.account.governingTokenMint
       )
       if (!governingMintInfo) {
         notify({ type: 'error', message: 'Could not find governing mint info' })
@@ -127,15 +148,13 @@ export default function Header(props: Props) {
       }
 
       const proposalAddress = await handleCreateProposal({
-        title: `Leave ${asset.realmAccount.account.name}`,
+        title: `Leave ${realm.account.name}`,
         description: `Withdrawing ${fmtMintAmount(
           governingMintInfo.account,
-          asset.tokenOwnerRecordAccount.account.governingTokenDepositAmount
-        )} governing tokens from ${
-          props.tokenOwnerRecordAsset.realmAccount.account.name
-        }`,
+          tokenOwnerRecordData.account.governingTokenDepositAmount
+        )} governing tokens from ${realm.account.name}`,
         instructionsData,
-        governance: props.tokenOwnerRecordAsset.governanceOwner,
+        governance: { pubkey: governance },
       })
       const url = fmtUrlWithCluster(
         `/dao/${symbol}/proposal/${proposalAddress}`
@@ -149,10 +168,17 @@ export default function Header(props: Props) {
     }
   }
 
+  const realmInfo = mainnetBetaRealms.find(
+    (x) => x.realmId === tokenOwnerRecordData?.account.realm.toString()
+  )
+
+  const mint = useMintInfoByPubkeyQuery(
+    tokenOwnerRecordData?.account.governingTokenMint
+  ).data?.result
+
   return (
     <div
       className={cx(
-        props.className,
         'bg-bkg-1',
         'min-h-[128px]',
         'px-8',
@@ -164,10 +190,10 @@ export default function Header(props: Props) {
     >
       <div className="flex space-x-3 items-center">
         <div>
-          {asset.realmImage ? (
+          {realmInfo?.ogImage ? (
             <img
-              src={asset.realmImage}
-              alt={asset.realmSymbol}
+              src={realmInfo?.ogImage}
+              alt={realmInfo?.symbol}
               className="h-12 w-auto"
             />
           ) : (
@@ -176,12 +202,14 @@ export default function Header(props: Props) {
         </div>
         <div className="flex flex-col">
           <p className="text-fgd-3">
-            {asset.address.toBase58().slice(0, 10)}...
+            {tokenOwnerRecord.toBase58().slice(0, 10)}...
           </p>
           <div className="flex items-center space-x-2">
-            <p className="text-2xl font-bold text-fgd-1">{asset.displayName}</p>
+            <p className="text-2xl font-bold text-fgd-1">
+              {realmInfo?.displayName ?? realm?.account.name ?? '...'}
+            </p>
             <Link
-              href={`/dao/${asset.realmSymbol}${
+              href={`/dao/${realmInfo?.symbol ?? realmPk}${
                 cluster ? `?cluster=${cluster}` : ''
               }`}
             >
@@ -191,11 +219,12 @@ export default function Header(props: Props) {
             </Link>
           </div>
           <p className="text-fgd-3">
-            Community Votes:{' '}
+            Community Votes: {/** todo check for council */}
             {fmtMintAmount(
-              asset.communityMint.account,
+              mint,
               new BN(
-                asset.tokenOwnerRecordAccount.account.governingTokenDepositAmount.toString()
+                tokenOwnerRecordData?.account.governingTokenDepositAmount.toString() ??
+                  0
               )
             )}
           </p>

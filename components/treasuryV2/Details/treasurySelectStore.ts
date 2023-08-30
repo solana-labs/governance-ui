@@ -7,11 +7,17 @@ type NftCollectionView = {
   collectionId: PubkeyAsString | 'none' // 'none' is for showing NFTs without a collection
 }
 
+/** this is used for Token Owner Records the DAO owns, for voting (ostensibly) in another DAO */
+type TokenOwnerRecordView = {
+  _kind: 'TokenOwnerRecord'
+  pubkey: PubkeyAsString
+}
+
 /** Used whenever the view state should use the legacy, non-zustand props */
 type LegacyView = {
   _kind: 'Legacy'
 }
-type View = NftCollectionView | LegacyView
+type View = NftCollectionView | LegacyView | TokenOwnerRecordView
 
 type TreasurySelectState =
   | LegacyView

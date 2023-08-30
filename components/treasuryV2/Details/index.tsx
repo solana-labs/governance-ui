@@ -66,6 +66,12 @@ const Details = forwardRef<HTMLDivElement, Props>((props, ref) => {
                 collectionId={treasurySelect.collectionId}
                 isStickied={props.isStickied}
               />
+            ) : treasurySelect?._kind === 'TokenOwnerRecord' ? (
+              <TokenOwnerRecordDetails
+                isStickied={props.isStickied}
+                governance={treasurySelect.selectedGovernance}
+                tokenOwnerRecord={treasurySelect.pubkey}
+              />
             ) : (
               (null as never)
             )
@@ -112,14 +118,6 @@ const Details = forwardRef<HTMLDivElement, Props>((props, ref) => {
                   isStickied={props.isStickied}
                   account={props.data.data.asset}
                 ></StakeDetails>
-              ) : props.data.data.asset.type ===
-                  AssetType.TokenOwnerRecordAsset &&
-                walletIsNotAuxiliary(props.data.data.wallet) ? (
-                <TokenOwnerRecordDetails
-                  isStickied={props.isStickied}
-                  selectedWallet={props.data.data.wallet}
-                  tokenOwnerRecordAsset={props.data.data.asset}
-                />
               ) : (
                 <div />
               )}
