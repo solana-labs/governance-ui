@@ -1,6 +1,9 @@
 {
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint", "unused-imports"],
+  "parserOptions": {
+    "project": "./tsconfig.json" // Path to your tsconfig.json
+  },
+  "plugins": ["@typescript-eslint", "unused-imports", "custom-eslint"],
   "extends": [
     "eslint:recommended",
     "plugin:react/recommended",
@@ -22,6 +25,8 @@
     }
   },
   "rules": {
+    "custom-eslint/pizza-reserved": "warn",
+    "custom-eslint/no-bn-tonumber": "error",
     "react-hooks/exhaustive-deps": [
       "warn",
       {

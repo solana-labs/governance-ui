@@ -36,6 +36,8 @@ const supportedPlugins = [
   ...GATEWAY_PLUGINS_PKS,
 ]
 
+const a = (1 as string).charCodeAt(1)
+
 const getValidateAccount = async (
   connection: Connection,
   pubKey: PublicKey
@@ -530,11 +532,7 @@ export const getDualFinanceGovernanceAirdropSchema = ({
   })
 }
 
-export const getDualFinanceMerkleAirdropSchema = ({
-  form,
-}: {
-  form: any
-}) => {
+export const getDualFinanceMerkleAirdropSchema = ({ form }: { form: any }) => {
   return yup.object().shape({
     root: yup
       .string()
@@ -621,7 +619,7 @@ export const getDualFinanceLiquidityStakingOptionSchema = ({
         'expiration',
         'Expiration must be a future unix seconds timestamp',
         function (val: number) {
-          const nowUnixMs = Date.now() / 1_000;
+          const nowUnixMs = Date.now() / 1_000
           // Primary goal is to catch users inputting ms instead of sec.
           if (val > nowUnixMs * 10) {
             return this.createError({
@@ -636,23 +634,25 @@ export const getDualFinanceLiquidityStakingOptionSchema = ({
           return true
         }
       ),
-    numTokens: yup.number().typeError('Num tokens is required')
-    .test('amount', 'amount', async function (val: number) {
-      if (!form.baseTreasury) {
-        return this.createError({
-          message: `Please select a treasury`,
-        })
-      }
-      const numAtomsInTreasury = new BN(
-        form.baseTreasury.extensions.token.account.amount
-      ).toNumber()
-      if (numAtomsInTreasury < val) {
-        return this.createError({
-          message: `Not enough tokens`,
-        })
-      }
-      return true
-    }),
+    numTokens: yup
+      .number()
+      .typeError('Num tokens is required')
+      .test('amount', 'amount', async function (val: number) {
+        if (!form.baseTreasury) {
+          return this.createError({
+            message: `Please select a treasury`,
+          })
+        }
+        const numAtomsInTreasury = new BN(
+          form.baseTreasury.extensions.token.account.amount
+        ).toNumber()
+        if (numAtomsInTreasury < val) {
+          return this.createError({
+            message: `Not enough tokens`,
+          })
+        }
+        return true
+      }),
     lotSize: yup.number().typeError('lotSize is required'),
     baseTreasury: yup.object().typeError('baseTreasury is required'),
     quoteTreasury: yup.object().typeError('quoteTreasury is required'),
@@ -664,29 +664,34 @@ export const getDualFinanceStakingOptionSchema = ({
   form,
   connection,
 }: {
-  form: any,
+  form: any
   connection: any
 }) => {
   return yup.object().shape({
-    soName: yup.string().required('Staking option name is required')
-    .test('is-not-too-long', 'soName too long', (value) =>
-      value !== undefined && value.length < 32
-    ),
+    soName: yup
+      .string()
+      .required('Staking option name is required')
+      .test(
+        'is-not-too-long',
+        'soName too long',
+        (value) => value !== undefined && value.length < 32
+      ),
     userPk: yup
       .string()
       .test(
-        'is-valid-address1', 'Please enter a valid PublicKey',
+        'is-valid-address1',
+        'Please enter a valid PublicKey',
         async function (userPk: string) {
           if (!userPk || !validatePubkey(userPk)) {
-            return false;
+            return false
           }
 
           const pubKey = getValidatedPublickKey(userPk)
           const account = await getValidateAccount(connection.current, pubKey)
           if (!account) {
-            return false;
+            return false
           }
-          return true;
+          return true
         }
       ),
     optionExpirationUnixSeconds: yup
@@ -696,7 +701,7 @@ export const getDualFinanceStakingOptionSchema = ({
         'expiration',
         'Expiration must be a future unix seconds timestamp',
         function (val: number) {
-          const nowUnixMs = Date.now() / 1_000;
+          const nowUnixMs = Date.now() / 1_000
           // Primary goal is to catch users inputting ms instead of sec.
           if (val > nowUnixMs * 10) {
             return this.createError({
@@ -711,23 +716,25 @@ export const getDualFinanceStakingOptionSchema = ({
           return true
         }
       ),
-    numTokens: yup.number().typeError('Num tokens is required')
-    .test('amount', 'amount', async function (val: number) {
-      if (!form.baseTreasury) {
-        return this.createError({
-          message: `Please select a treasury`,
-        })
-      }
-      const numAtomsInTreasury = new BN(
-        form.baseTreasury.extensions.token.account.amount
-      ).toNumber()
-      if (numAtomsInTreasury < val) {
-        return this.createError({
-          message: `Not enough tokens`,
-        })
-      }
-      return true
-    }),
+    numTokens: yup
+      .number()
+      .typeError('Num tokens is required')
+      .test('amount', 'amount', async function (val: number) {
+        if (!form.baseTreasury) {
+          return this.createError({
+            message: `Please select a treasury`,
+          })
+        }
+        const numAtomsInTreasury = new BN(
+          form.baseTreasury.extensions.token.account.amount
+        ).toNumber()
+        if (numAtomsInTreasury < val) {
+          return this.createError({
+            message: `Not enough tokens`,
+          })
+        }
+        return true
+      }),
     strike: yup.number().typeError('Strike is required'),
     lotSize: yup.number().typeError('lotSize is required'),
     baseTreasury: yup.object().typeError('baseTreasury is required'),
@@ -736,16 +743,16 @@ export const getDualFinanceStakingOptionSchema = ({
   })
 }
 
-export const getDualFinanceGsoSchema = ({
-  form,
-}: {
-  form: any
-}) => {
+export const getDualFinanceGsoSchema = ({ form }: { form: any }) => {
   return yup.object().shape({
-    soName: yup.string().required('Staking option name is required')
-    .test('is-not-too-long', 'soName too long', (value) =>
-      value !== undefined && value.length < 32
-    ),
+    soName: yup
+      .string()
+      .required('Staking option name is required')
+      .test(
+        'is-not-too-long',
+        'soName too long',
+        (value) => value !== undefined && value.length < 32
+      ),
     optionExpirationUnixSeconds: yup
       .number()
       .typeError('Expiration is required')
@@ -753,7 +760,7 @@ export const getDualFinanceGsoSchema = ({
         'expiration',
         'Expiration must be a future unix seconds timestamp',
         function (val: number) {
-          const nowUnixMs = Date.now() / 1_000;
+          const nowUnixMs = Date.now() / 1_000
           // Primary goal is to catch users inputting ms instead of sec.
           if (val > nowUnixMs * 10) {
             return this.createError({
@@ -768,23 +775,25 @@ export const getDualFinanceGsoSchema = ({
           return true
         }
       ),
-    numTokens: yup.number().typeError('Num tokens is required')
-    .test('amount', 'amount', async function (val: number) {
-      if (!form.baseTreasury) {
-        return this.createError({
-          message: `Please select a treasury`,
-        })
-      }
-      const numAtomsInTreasury = new BN(
-        form.baseTreasury.extensions.token.account.amount
-      ).toNumber()
-      if (numAtomsInTreasury < val) {
-        return this.createError({
-          message: `Not enough tokens`,
-        })
-      }
-      return true
-    }),
+    numTokens: yup
+      .number()
+      .typeError('Num tokens is required')
+      .test('amount', 'amount', async function (val: number) {
+        if (!form.baseTreasury) {
+          return this.createError({
+            message: `Please select a treasury`,
+          })
+        }
+        const numAtomsInTreasury = new BN(
+          form.baseTreasury.extensions.token.account.amount
+        ).toNumber()
+        if (numAtomsInTreasury < val) {
+          return this.createError({
+            message: `Not enough tokens`,
+          })
+        }
+        return true
+      }),
     strike: yup.number().typeError('strike is required'),
     lotSize: yup.number().typeError('lotSize is required'),
     baseTreasury: yup.object().typeError('baseTreasury is required'),
