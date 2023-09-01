@@ -36,8 +36,6 @@ const supportedPlugins = [
   ...GATEWAY_PLUGINS_PKS,
 ]
 
-const a = (1 as string).charCodeAt(1)
-
 const getValidateAccount = async (
   connection: Connection,
   pubKey: PublicKey

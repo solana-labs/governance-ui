@@ -9,11 +9,7 @@ module.exports = {
     return {
       MemberExpression(node) {
         const tsNode = parserServices.esTreeNodeToTSNodeMap.get(node)
-        const fungus = parserServices.esTreeNodeToTSNodeMap.get(node.property)
         const expression = tsNode.expression
-        const type = typeChecker.typeToString(
-          typeChecker.getTypeAtLocation(tsNode)
-        )
         const etype = typeChecker.typeToString(
           typeChecker.getTypeAtLocation(expression)
         )

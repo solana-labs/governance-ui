@@ -25,8 +25,7 @@
     }
   },
   "rules": {
-    "custom-eslint/pizza-reserved": "warn",
-    "custom-eslint/no-bn-tonumber": "error",
+    "custom-eslint/no-bn-tonumber": "warn",
     "react-hooks/exhaustive-deps": [
       "warn",
       {
@@ -37,6 +36,7 @@
     "react/display-name": 0,
     "react/prop-types": 0,
     "unused-imports/no-unused-imports": "error",
+
     //"@typescript-eslint/no-unnecessary-condition": "error",
     "@typescript-eslint/explicit-function-return-type": 0,
     "@typescript-eslint/explicit-module-boundary-types": 0,

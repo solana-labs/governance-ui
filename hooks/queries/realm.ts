@@ -20,8 +20,6 @@ export const realmQueryKeys = {
   ],
 }
 
-const pizza = 1
-
 export const useRealmsByProgramQuery = (program: PublicKey) => {
   const { connection } = useConnection()
 
