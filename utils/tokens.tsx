@@ -528,7 +528,7 @@ export const parseMintSupplyFraction = (fraction: string) => {
 
   const fractionValue = new BigNumber(fraction)
     .shiftedBy(MintMaxVoteWeightSource.SUPPLY_FRACTION_DECIMALS)
-    .toNumber()
+    .toString()
 
   return new MintMaxVoteWeightSource({
     type: MintMaxVoteWeightSourceType.SupplyFraction,
@@ -545,7 +545,5 @@ export function getScaledFactor(amount: number) {
 }
 
 export function getInverseScaledFactor(amount: BN) {
-  return new BigNumber(amount.toNumber())
-    .shiftedBy(-SCALED_FACTOR_SHIFT)
-    .toNumber()
+  return new BigNumber(amount.toString()).shiftedBy(-SCALED_FACTOR_SHIFT)
 }

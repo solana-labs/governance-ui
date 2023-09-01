@@ -22,13 +22,11 @@ export const getTreasuryAccountItemInfoV2 = (account: AssetAccount) => {
               ? account.extensions.solAccount!.lamports
               : account.extensions.amount
           )
-        ).toNumber()
-      : 0
+        )
+      : new BigNumber(0)
   const price = tokenPriceService.getUSDTokenPrice(mintAddress!)
-  const totalPrice = amount * price
-  const totalPriceFormatted = amount
-    ? new BigNumber(totalPrice).toFormat(0)
-    : ''
+  const totalPrice = amount.multipliedBy(new BigNumber(price))
+  const totalPriceFormatted = totalPrice ? totalPrice.toFormat(0) : ''
   const info = tokenPriceService.getTokenInfo(mintAddress!)
 
   const symbol =

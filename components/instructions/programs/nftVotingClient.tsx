@@ -79,7 +79,7 @@ export const NFT_VOTER_INSTRUCTIONS = {
             <div className="space-y-3">
               <div>Size: {decodedInstructionData.size}</div>
               <div>
-                Weight: {weight} ({decodedInstructionData.weight.toNumber()})
+                Weight: {weight} ({decodedInstructionData.weight.toString()})
               </div>
             </div>
           )

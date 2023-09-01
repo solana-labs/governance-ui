@@ -80,7 +80,9 @@ export const filterProposals = (
               proposalB.account.draftAt ||
               new BN(0)
           )
-          .toNumber()
+          .gtn(0)
+          ? 1
+          : -1
       }
       if (sorting.completed_at === SORTING_OPTIONS.DESC) {
         return (
@@ -95,7 +97,9 @@ export const filterProposals = (
               proposalA.account.draftAt ||
               new BN(0)
           )
-          .toNumber()
+          .gtn(0)
+          ? 1
+          : -1
       }
       if (sorting.signedOffAt === SORTING_OPTIONS.ASC) {
         return (
@@ -108,7 +112,9 @@ export const filterProposals = (
               proposalB.account.draftAt ||
               new BN(0)
           )
-          .toNumber()
+          .gtn(0)
+          ? 1
+          : -1
       }
       if (sorting.signedOffAt === SORTING_OPTIONS.DESC) {
         return (
@@ -121,7 +127,9 @@ export const filterProposals = (
               proposalA.account.draftAt ||
               new BN(0)
           )
-          .toNumber()
+          .gtn(0)
+          ? 1
+          : -1
       }
       return 0
     })
