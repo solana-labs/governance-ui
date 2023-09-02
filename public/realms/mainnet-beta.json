@@ -54,6 +54,20 @@
     "github": "https://github.com/blockworks-foundation/"
   },
   {
+    "symbol": "CHP",
+    "bannerImage": "https://i.imgur.com/i1gGoIw.jpg",
+    "displayName": "CryptoHelp",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "8DY3XKWmeaJDKyfVwr4cRv2tp7j8m9pyi4QJQZNGyizq",
+    "communityMint": "EADxj4FGaoe2BmTtigPznGCqZ8Yh4LqBU51NoyCjv1Bc",
+    "ogImage": "/realms/CryptoHelp/cryptohelp.png",
+    "shortDescription": "A compassionate, blockchain-powered collective, uniting individuals to swiftly make critical decisions and allocate resources to aid those facing emergencies.",
+    "sortRank": 6,
+    "website": "https://cryptohelp.me",
+    "keywords": "CryptoHelp, Crowdfunding, help, DAO, Crypto, Solana, REALM, Governance, ERC20, SOL, SPL, Cross-Chain, Support, Fastest, Fast,",
+    "discord": "https://discord.gg/Tw7dqTJZmZ"
+  },
+  {
     "symbol": "MNGO-TC",
     "category": "defi",
     "displayName": "Mango Treasury Council",
