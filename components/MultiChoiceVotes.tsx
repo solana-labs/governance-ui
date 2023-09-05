@@ -49,7 +49,9 @@ const MultiChoiceVotes = ({
     <div className="border border-fgd-4 rounded-md">
       {proposal.options.slice(0, limit).map((option, index) => {
         const optionVotes = option.voteWeight
-        const optionWeightPct = optionVotes.muln(1000).div(totalVoteWeight)
+        const optionWeightPct = totalVoteWeight.isZero() // dont divide by zero
+          ? new BN(0)
+          : optionVotes.muln(1000).div(totalVoteWeight)
 
         return (
           <div className="border-b border-fgd-4 p-5" key={index}>
