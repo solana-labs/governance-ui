@@ -20,6 +20,7 @@ import {
 } from '@solana/spl-token'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { useConnection } from '@solana/wallet-adapter-react'
+import { WSOL_MINT } from '@components/instructions/tools'
 
 type NamePkVal = {
   name: string
@@ -66,8 +67,9 @@ const AdminTokenWithdrawTokenFees = ({
   }
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
-    let serializedInstruction = ''
+    const serializedInstruction = ''
     const prerequisiteInstructions: TransactionInstruction[] = []
+    const additionalSerializedInstructions: string[] = []
     if (
       isValid &&
       form.governedAccount?.governance?.account &&
@@ -111,11 +113,26 @@ const AdminTokenWithdrawTokenFees = ({
         })
         .instruction()
 
-      serializedInstruction = serializeInstructionToBase64(ix)
+      additionalSerializedInstructions.push(serializeInstructionToBase64(ix))
+
+      if (bank.mint.toBase58() === WSOL_MINT) {
+        additionalSerializedInstructions.push(
+          serializeInstructionToBase64(
+            Token.createCloseAccountInstruction(
+              TOKEN_PROGRAM_ID,
+              ataAddress,
+              form.governedAccount.extensions.transferAddress!,
+              form.governedAccount.extensions.transferAddress!,
+              []
+            )
+          )
+        )
+      }
     }
     const obj: UiInstruction = {
       prerequisiteInstructions,
       serializedInstruction: serializedInstruction,
+      additionalSerializedInstructions: additionalSerializedInstructions,
       isValid,
       governance: form.governedAccount?.governance,
       customHoldUpTime: form.holdupTime,

@@ -132,6 +132,7 @@ const WithdrawFromOracle = ({
       additionalSerializedInstructions: additionalSerializedInstructions,
       isValid,
       governance: form.governedAccount?.governance,
+      chunkBy: 1,
     }
     return obj
   }
