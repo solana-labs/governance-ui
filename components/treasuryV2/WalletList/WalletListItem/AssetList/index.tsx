@@ -210,7 +210,7 @@ export default function AssetList(props: Props) {
 
   return (
     <div className={cx(props.className, 'relative', 'space-y-6')}>
-      {props.assets.length === 0 && (
+      {props.assets.length === 0 && (nfts?.length ?? 0) === 0 && (
         <div className="p-4 text-center text-sm text-fgd-1">
           This wallet contains no assets
         </div>

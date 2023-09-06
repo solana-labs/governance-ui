@@ -18,7 +18,6 @@ import { RealmInfo } from '@models/registry/api'
 import { calculateTotalValue } from './calculateTotalValue'
 import { convertAccountToAsset } from './convertAccountToAsset'
 import { groupNftsByWallet } from './groupNftsByWallet'
-import { groupNftsIntoCollections } from './groupNftsIntoCollections'
 import {
   ProgramAssetAccount,
   groupProgramsByWallet,
@@ -185,24 +184,6 @@ export const assembleWallets = async (
     })
   }
 
-  for (const [walletAddress, nftList] of Object.entries(nftsGroupedByWallet)) {
-    if (!walletMap[walletAddress]) {
-      walletMap[walletAddress] = {
-        address: walletAddress,
-        assets: [],
-        rules: {},
-        stats: {},
-        totalValue: new BigNumber(0),
-      }
-    }
-
-    const collections = groupNftsIntoCollections(nftList)
-
-    for (const collection of collections) {
-      walletMap[walletAddress].assets.push(collection)
-    }
-  }
-
   const allWallets = Object.values(walletMap)
     .map((wallet) => ({
       ...wallet,
@@ -218,14 +199,10 @@ export const assembleWallets = async (
     .sort((a, b) => {
       if (a.totalValue.isZero() && b.totalValue.isZero()) {
         const aContainsSortable = a.assets.some(
-          (asset) =>
-            asset.type === AssetType.NFTCollection ||
-            asset.type === AssetType.Programs
+          (asset) => asset.type === AssetType.Programs
         )
         const bContainsSortable = b.assets.some(
-          (asset) =>
-            asset.type === AssetType.NFTCollection ||
-            asset.type === AssetType.Programs
+          (asset) => asset.type === AssetType.Programs
         )
 
         if (aContainsSortable && !bContainsSortable) {
