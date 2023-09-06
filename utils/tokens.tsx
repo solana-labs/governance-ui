@@ -25,8 +25,6 @@ import { BN } from '@coral-xyz/anchor'
 import { abbreviateAddress } from './formatting'
 import BigNumber from 'bignumber.js'
 import { AssetAccount } from '@utils/uiTypes/assets'
-import { NFTWithMeta } from './uiTypes/VotePlugin'
-import { ConnectionContext } from './connection'
 import {
   Metaplex,
   Nft,
@@ -152,41 +150,6 @@ export async function getNFTsByCollection(
             : null,
         }
       })
-    )
-  )
-
-  return nfts.map(enhanceNFT)
-}
-
-/** @deprecated -- use react-query by pubkey, avoid transitory data models */
-export async function getNFTsByOwner(owner: PublicKey, isDevnet?: boolean) {
-  const endpoint = isDevnet
-    ? process.env.NEXT_PUBLIC_HELIUS_DEVNET_RPC || process.env.DEVNET_RPC
-    : process.env.NEXT_PUBLIC_HELIUS_MAINNET_RPC || process.env.MAINNET_RPC
-
-  const connection = new Connection(endpoint || '')
-  const metaplex = new Metaplex(connection)
-
-  const rawNfts = await metaplex.nfts().findAllByOwner({
-    owner,
-  })
-
-  const nfts = await Promise.all(
-    rawNfts.map((nft) => loadNft(nft, isDevnet))
-  ).then((nfts) =>
-    Promise.all(
-      nfts.filter(exists).map(async (nft) => ({
-        ...nft,
-        owner,
-        tokenAccountAddress: await getAssociatedTokenAddress(
-          nft.mint.address,
-          owner,
-          true
-        ).catch((e) => {
-          console.error(e)
-          return null
-        }),
-      }))
     )
   )
 
@@ -511,14 +474,6 @@ export type AccountInfoGen<T> = {
   lamports: number
   data: T
   rentEpoch?: number
-}
-
-/** @deprecated just use react-query by owner pubkey */
-export const getNfts = (
-  ownerPk: PublicKey,
-  connection: ConnectionContext
-): Promise<NFTWithMeta[]> => {
-  return getNFTsByOwner(ownerPk, connection.cluster === 'devnet')
 }
 
 export const parseMintSupplyFraction = (fraction: string) => {

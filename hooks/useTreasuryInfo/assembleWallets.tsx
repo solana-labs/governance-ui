@@ -12,12 +12,10 @@ import { AssetAccount, AccountType } from '@utils/uiTypes/assets'
 import { AssetType, Token, RealmAuthority } from '@models/treasury/Asset'
 import { AuxiliaryWallet, Wallet } from '@models/treasury/Wallet'
 import { getAccountName } from '@components/instructions/tools'
-import { NFT } from '@models/treasury/NFT'
 import { RealmInfo } from '@models/registry/api'
 
 import { calculateTotalValue } from './calculateTotalValue'
 import { convertAccountToAsset } from './convertAccountToAsset'
-import { groupNftsByWallet } from './groupNftsByWallet'
 import {
   ProgramAssetAccount,
   groupProgramsByWallet,
@@ -36,7 +34,6 @@ function isNotNull<T>(x: T | null): x is T {
 export const assembleWallets = async (
   connection: ConnectionContext,
   accounts: AssetAccount[],
-  nfts: NFT[],
   domains: Domain[],
   programId: PublicKey,
   councilMintAddress?: string,
@@ -48,7 +45,6 @@ export const assembleWallets = async (
   realmInfo?: RealmInfo
 ) => {
   const walletMap: { [address: string]: Wallet } = {}
-  const nftsGroupedByWallet = groupNftsByWallet(nfts)
   const programs = accounts.filter(
     (account) => account.type === AccountType.PROGRAM
   ) as ProgramAssetAccount[]
