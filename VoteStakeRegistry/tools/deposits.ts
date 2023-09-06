@@ -209,6 +209,7 @@ const getVotingPowersForWallets = async ({
       encodedTransactionsParsedByWallets,
       100
     )
+    // TODO Batch alert
     const simulations = await Promise.all(
       chunkedEncodedTransactionsParsed.map((txChunk) =>
         fetch(connection.rpcEndpoint, {

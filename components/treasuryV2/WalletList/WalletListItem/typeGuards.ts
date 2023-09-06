@@ -9,7 +9,6 @@ import {
   Sol,
   Domains,
   Unknown,
-  TokenOwnerRecordAsset,
   Stake,
 } from '@models/treasury/Asset'
 
@@ -47,10 +46,4 @@ export function isSol(asset: Asset): asset is Sol {
 
 export function isUnknown(asset: Asset): asset is Unknown {
   return asset.type === AssetType.Unknown
-}
-
-export function isTokenOwnerRecord(
-  asset: Asset
-): asset is TokenOwnerRecordAsset {
-  return asset.type === AssetType.TokenOwnerRecordAsset
 }

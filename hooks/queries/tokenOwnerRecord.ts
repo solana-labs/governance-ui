@@ -16,6 +16,7 @@ import { useMemo } from 'react'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import queryClient from './queryClient'
+import mainnetBetaRealms from 'public/realms/mainnet-beta.json'
 
 export const tokenOwnerRecordQueryKeys = {
   all: (endpoint: string) => [endpoint, 'TokenOwnerRecord'],
@@ -28,6 +29,51 @@ export const tokenOwnerRecordQueryKeys = {
     'by Realm',
     realm,
   ],
+  byProgramXOwner: (endpoint: string, program: PublicKey, owner: PublicKey) => [
+    ...tokenOwnerRecordQueryKeys.all(endpoint),
+    'by Program',
+    program,
+    'by Owner',
+    owner,
+  ],
+}
+
+/** does NOT filter by realm */
+const fetchTokenOwnerRecordsByRealmByOwner = async (
+  connection: Connection,
+  program: PublicKey,
+  ownerPk: PublicKey
+) =>
+  queryClient.fetchQuery({
+    queryKey: tokenOwnerRecordQueryKeys.byProgramXOwner(
+      connection.rpcEndpoint,
+      program,
+      ownerPk
+    ),
+    queryFn: async () => {
+      const filter = pubkeyFilter(1 + 32 + 32, ownerPk)
+      if (!filter) throw new Error() // unclear why this would ever happen, probably it just cannot
+
+      return getGovernanceAccounts(connection, program, TokenOwnerRecord, [
+        filter,
+      ])
+    },
+  })
+
+export const fetchTokenOwnerRecordsByOwnerAnyRealm = async (
+  connection: Connection,
+  ownerPk: PublicKey
+) => {
+  const programs = [...new Set(mainnetBetaRealms.map((x) => x.programId))].map(
+    (x) => new PublicKey(x)
+  )
+  return (
+    await Promise.all(
+      programs.map((pk) =>
+        fetchTokenOwnerRecordsByRealmByOwner(connection, pk, ownerPk)
+      )
+    )
+  ).flat()
 }
 
 export const useTokenOwnerRecordsForRealmQuery = () => {

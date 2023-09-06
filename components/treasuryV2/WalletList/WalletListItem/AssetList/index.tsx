@@ -26,7 +26,6 @@ import {
   isRealmAuthority,
   isUnknown,
   isDomain,
-  isTokenOwnerRecord,
   isStake,
 } from '../typeGuards'
 
@@ -150,11 +149,6 @@ export default function AssetList(props: Props) {
     [governanceNfts, treasuryNfts]
   )
 
-  const tokenOwnerRecordsFromProps = useMemo(
-    () => props.assets.filter(isTokenOwnerRecord),
-    [props.assets]
-  )
-
   // NOTE possible source of bugs, state wont update if props do.
   const [others, setOthers] = useState<
     (Mint | Programs | Unknown | Domains | RealmAuthority | Stake)[]
@@ -250,13 +244,11 @@ export default function AssetList(props: Props) {
           itemsToHide={itemsToHide}
         />
       )}
-      {tokenOwnerRecordsFromProps.length > 0 && (
+      {props.governance !== undefined && (
         <TokenOwnerRecordsList
+          governance={props.governance}
           disableCollapse={false}
           expanded={true}
-          assets={tokenOwnerRecordsFromProps}
-          selectedAssetId={props.selectedAssetId}
-          onSelect={props.onSelectAsset}
           onToggleExpand={() => props.onToggleExpandSection?.('others')}
         />
       )}

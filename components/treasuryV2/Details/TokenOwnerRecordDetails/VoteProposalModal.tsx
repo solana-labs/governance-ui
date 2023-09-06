@@ -2,6 +2,7 @@ import Button, { SecondaryButton } from '@components/Button'
 import Loading from '@components/Loading'
 import Modal from '@components/Modal'
 import { ThumbDownIcon, ThumbUpIcon } from '@heroicons/react/solid'
+import { useGovernanceByPubkeyQuery } from '@hooks/queries/governance'
 import useCreateProposal from '@hooks/useCreateProposal'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import useQueryContext from '@hooks/useQueryContext'
@@ -10,7 +11,6 @@ import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import {
   getGovernanceProgramVersion,
   getInstructionDataFromBase64,
-  Governance,
   ProgramAccount,
   Proposal,
   Realm,
@@ -33,7 +33,7 @@ interface Props {
   proposal: ProgramAccount<Proposal>
   voterTokenRecord: ProgramAccount<TokenOwnerRecord>
   realm: ProgramAccount<Realm>
-  currentGovernance?: ProgramAccount<Governance>
+  currentGovernancePk?: PublicKey
   programId?: PublicKey | null
 }
 export default function VoteProposalModal({
@@ -43,7 +43,7 @@ export default function VoteProposalModal({
   voterTokenRecord,
   programId,
   realm,
-  currentGovernance,
+  currentGovernancePk,
   proposal,
 }: Props) {
   const router = useRouter()
@@ -57,6 +57,9 @@ export default function VoteProposalModal({
   const { wallet } = useWalletDeprecated()
 
   const { handleCreateProposal } = useCreateProposal()
+
+  const currentGovernance = useGovernanceByPubkeyQuery(currentGovernancePk).data
+    ?.result
 
   const submitVote = async (vote: YesNoVote) => {
     if (!wallet || !wallet.publicKey) {

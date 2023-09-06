@@ -993,6 +993,8 @@ const getAccountsForGovernances = async (
   return [...accounts, ...genericGovernances]
 }
 
+// TODO BATCH ALERT
+// Solution: I cant tell what this is doing. it should probably be murdered.
 const getProgramAccountInfo = async (
   { endpoint, current }: ConnectionContext,
   publicKeys: PublicKey[]

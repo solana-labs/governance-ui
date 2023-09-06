@@ -40,25 +40,27 @@ export const useRealmsByProgramQuery = (program: PublicKey) => {
   return query
 }
 
-export const useRealmQuery = () => {
+export const useRealmByPubkeyQuery = (realmPk: undefined | PublicKey) => {
   const { connection } = useConnection()
-  const pubkey = useSelectedRealmPubkey()
 
-  const enabled = pubkey !== undefined
-  const query = useQuery({
+  const enabled = realmPk !== undefined
+  return useQuery({
     queryKey: enabled
-      ? realmQueryKeys.byPubkey(connection.rpcEndpoint, pubkey)
+      ? realmQueryKeys.byPubkey(connection.rpcEndpoint, realmPk)
       : undefined,
     queryFn: async () => {
       if (!enabled) throw new Error()
-      return asFindable(getRealm)(connection, pubkey)
+      return asFindable(getRealm)(connection, realmPk)
     },
     staleTime: 3600000, // 1 hour
     cacheTime: 3600000 * 24 * 10,
     enabled,
   })
+}
 
-  return query
+export const useRealmQuery = () => {
+  const pubkey = useSelectedRealmPubkey()
+  return useRealmByPubkeyQuery(pubkey)
 }
 
 export const fetchRealmByPubkey = (
