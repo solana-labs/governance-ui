@@ -3,14 +3,9 @@ import { useMemo } from 'react'
 import Collapsible from './Collapsible'
 import NFTCollectionPreviewIcon from '../../../icons/NFTCollectionPreviewIcon'
 import NFTListItem from './NFTListItem'
-import useTreasuryAddressForGovernance from '@hooks/useTreasuryAddressForGovernance'
-import {
-  DasNftObject,
-  useDigitalAssetsByOwner,
-} from '@hooks/queries/digitalAssets'
 import { PublicKey } from '@solana/web3.js'
-import { SUPPORT_CNFTS } from '@constants/flags'
 import cx from '@hub/lib/cx'
+import useGovernanceNfts from './useGovernanceNfts'
 
 interface Props {
   className?: string
@@ -25,19 +20,7 @@ function onlyUnique(value, index, array) {
 }
 
 export default function NFTList({ governance, ...props }: Props) {
-  const { result: treasury } = useTreasuryAddressForGovernance(governance)
-  const { data: governanceNfts } = useDigitalAssetsByOwner(governance)
-  const { data: treasuryNfts } = useDigitalAssetsByOwner(treasury)
-
-  const nfts = useMemo(
-    () =>
-      governanceNfts && treasuryNfts
-        ? ([...governanceNfts, ...treasuryNfts] as DasNftObject[])
-            .flat()
-            .filter((x) => SUPPORT_CNFTS || !x.compression.compressed)
-        : undefined,
-    [governanceNfts, treasuryNfts]
-  )
+  const nfts = useGovernanceNfts(governance)
 
   const collectionIds = useMemo(
     () =>

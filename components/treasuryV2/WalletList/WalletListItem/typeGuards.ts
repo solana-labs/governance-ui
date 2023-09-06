@@ -3,7 +3,6 @@ import {
   AssetType,
   Token,
   Mint,
-  NFTCollection,
   Programs,
   RealmAuthority,
   Sol,
@@ -22,10 +21,6 @@ export function isMint(asset: Asset): asset is Mint {
 
 export function isDomain(asset: Asset): asset is Domains {
   return asset.type === AssetType.Domain
-}
-
-export function isNFTCollection(asset: Asset): asset is NFTCollection {
-  return asset.type === AssetType.NFTCollection
 }
 
 export function isPrograms(asset: Asset): asset is Programs {

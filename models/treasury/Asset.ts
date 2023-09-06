@@ -6,7 +6,6 @@ import type {
 
 import type { AssetAccount, StakeState } from '@utils/uiTypes/assets'
 
-import { NFT } from './NFT'
 import { Program } from './Program'
 import { Domain } from './Domain'
 
@@ -14,7 +13,7 @@ import { PublicKey } from '@solana/web3.js'
 
 export enum AssetType {
   Mint,
-  NFTCollection,
+  //  NFTCollection,
   Domain,
   Programs,
   RealmAuthority,
@@ -34,17 +33,6 @@ export interface Mint {
   symbol: string
   tokenRole?: 'council' | 'community'
   totalSupply?: BigNumber
-}
-
-export interface NFTCollection {
-  type: AssetType.NFTCollection
-  address?: string
-  id: string
-  count: BigNumber
-  icon: JSX.Element
-  list: NFT[]
-  name: string
-  totalCount?: BigNumber
 }
 
 export interface Programs {
@@ -122,7 +110,7 @@ export interface Domains {
 
 export type Asset =
   | Mint
-  | NFTCollection
+  //| NFTCollection
   | Domains
   | Programs
   | RealmAuthority

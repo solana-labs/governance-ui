@@ -140,6 +140,7 @@ export default function AuxiliaryWalletListItem(props: Props) {
               <AssetsPreviewIconList
                 assets={props.wallet.assets}
                 className="pl-5 mt-1"
+                governance={undefined}
               />
             </div>
             <ChevronDownIcon
