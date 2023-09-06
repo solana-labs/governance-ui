@@ -25,17 +25,6 @@ import { BN } from '@coral-xyz/anchor'
 import { abbreviateAddress } from './formatting'
 import BigNumber from 'bignumber.js'
 import { AssetAccount } from '@utils/uiTypes/assets'
-import {
-  Metaplex,
-  Nft,
-  Sft,
-  SftWithToken,
-  NftWithToken,
-  Metadata,
-  JsonMetadata,
-} from '@metaplex-foundation/js'
-import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
-import { pause } from './pause'
 
 export type TokenAccount = AccountInfo
 export type MintAccount = MintInfo
@@ -43,117 +32,6 @@ export type MintAccount = MintInfo
 export type TokenProgramAccount<T> = {
   publicKey: PublicKey
   account: T
-}
-
-type RawNft = Nft | Sft | SftWithToken | NftWithToken
-type NftWithATA = RawNft & {
-  owner: null | PublicKey
-  tokenAccountAddress: null | PublicKey
-}
-
-function exists<T>(item: T | null | undefined): item is T {
-  return !!item
-}
-
-/** @deprecated - avoid transitory data models */
-const enhanceNFT = (nft: NftWithATA) => {
-  return {
-    image: nft.json?.image || '',
-    name: nft.json?.name || '',
-    description: nft.json?.description || '',
-    properties: {
-      category: '',
-      files: [],
-    },
-    collection: {
-      mintAddress: nft.collection?.address.toBase58() || '',
-      name: nft.json?.collection?.name || '',
-      creators: nft.creators.map((creator) => ({
-        verified: creator.verified,
-        address: creator.address.toBase58(),
-      })),
-      verified: nft.collection?.verified,
-      count: nft.collectionDetails?.size,
-      image: nft.json?.image || '',
-    },
-    address: nft.metadataAddress.toBase58(),
-    mintAddress: nft.mint.address.toBase58(),
-    owner: nft.owner,
-    tokenAccountAddress: nft.tokenAccountAddress?.toBase58() || '',
-    updateAuthorityAddress: nft.updateAuthorityAddress.toBase58(),
-    getAssociatedTokenAccount: async () => {
-      return nft.tokenAccountAddress?.toBase58() || ''
-    },
-  }
-}
-
-/** @deprecated -- use react-query by pubkey */
-function loadNft(
-  nft: Metadata<JsonMetadata<string>> | Nft | Sft,
-  isDevnet?: boolean
-) {
-  const endpoint = isDevnet
-    ? process.env.NEXT_PUBLIC_HELIUS_DEVNET_RPC || process.env.DEVNET_RPC
-    : process.env.NEXT_PUBLIC_HELIUS_MAINNET_RPC || process.env.MAINNET_RPC
-
-  const connection = new Connection(endpoint || '')
-  const metaplex = new Metaplex(connection)
-
-  return Promise.race([
-    metaplex
-      .nfts()
-      // @ts-ignore
-      .load({ metadata: nft })
-      .catch((e) => {
-        console.error(e)
-        return null
-      }),
-    // sometime loading the nft metadata will timeout due to invalid or unsafe uris
-    pause(5000).then(() => null),
-  ])
-}
-
-/** @deprecated -- use react-query by pubkey, avoid transitory data models */
-export async function getNFTsByCollection(
-  collectionAddress: PublicKey,
-  isDevnet?: boolean
-) {
-  const endpoint = isDevnet
-    ? process.env.NEXT_PUBLIC_HELIUS_DEVNET_RPC || process.env.DEVNET_RPC
-    : process.env.NEXT_PUBLIC_HELIUS_MAINNET_RPC || process.env.MAINNET_RPC
-
-  const connection = new Connection(endpoint || '')
-  const metaplex = new Metaplex(connection)
-  const rawNfts = (
-    await metaplex.nfts().findAllByMintList({ mints: [collectionAddress] })
-  ).filter(exists)
-
-  const nfts = await Promise.all(
-    rawNfts.map((nft) => loadNft(nft, isDevnet))
-  ).then((nfts) =>
-    Promise.all(
-      nfts.filter(exists).map(async (nft) => {
-        const owner =
-          (await getTokenAccountsByMint(connection, nft.address.toBase58()))[0]
-            ?.account.owner || null
-
-        return {
-          ...nft,
-          owner,
-          tokenAccountAddress: owner
-            ? await getAssociatedTokenAddress(nft.mint.address, owner).catch(
-                (e) => {
-                  console.error(e)
-                  return null
-                }
-              )
-            : null,
-        }
-      })
-    )
-  )
-
-  return nfts.map(enhanceNFT)
 }
 
 export async function getOwnedTokenAccounts(
