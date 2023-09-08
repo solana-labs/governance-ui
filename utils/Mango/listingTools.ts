@@ -47,8 +47,15 @@ export type ListingArgs = {
   netBorrowLimitPerWindowQuote: number
   netBorrowLimitWindowSizeTs: number
   insuranceFound: boolean
-  borrowWeightScale: number
-  depositWeightScale: number
+  borrowWeightScaleStartQuote: number
+  depositWeightScaleStartQuote: number
+  stablePriceDelayGrowthLimit: number
+  stablePriceDelayIntervalSeconds: number
+  stablePriceGrowthLimit: number
+  tokenConditionalSwapMakerFeeRate: number
+  tokenConditionalSwapTakerFeeRate: number
+  flashLoanDepositFeeRate: number
+  reduceOnly: number
 }
 
 export type ListingArgsFormatted = {
@@ -72,11 +79,18 @@ export type ListingArgsFormatted = {
   minVaultToDepositsRatio: string
   netBorrowLimitPerWindowQuote: number
   netBorrowLimitWindowSizeTs: number
+  borrowWeightScaleStartQuote: number
+  depositWeightScaleStartQuote: number
+  stablePriceDelayGrowthLimit: string
+  stablePriceDelayIntervalSeconds: number
+  stablePriceGrowthLimit: string
+  tokenConditionalSwapMakerFeeRate: number
+  tokenConditionalSwapTakerFeeRate: number
+  flashLoanDepositFeeRate: number
+  reduceOnly: string
 }
 
 export type EditTokenArgsFormatted = ListingArgsFormatted & {
-  borrowWeightScaleStartQuote: number
-  depositWeightScaleStartQuote: number
   groupInsuranceFund: boolean
 }
 

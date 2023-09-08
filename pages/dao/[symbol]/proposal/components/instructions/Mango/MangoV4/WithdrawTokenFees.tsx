@@ -102,7 +102,7 @@ const AdminTokenWithdrawTokenFees = ({
       }
 
       const ix = await mangoClient!.program.methods
-        .admingTokenWithdrawFees()
+        .adminTokenWithdrawFees()
         .accounts({
           group: mangoGroup!.publicKey,
           admin: form.governedAccount.extensions.transferAddress,

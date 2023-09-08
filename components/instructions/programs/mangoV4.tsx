@@ -247,6 +247,7 @@ const instructions = () => ({
             ...suggestedPreset,
           } as ListingArgs)
         : ({} as ListingArgsFormatted)
+
       const invalidKeys: (keyof ListingArgsFormatted)[] = Object.keys(
         suggestedPreset
       ).length
@@ -459,6 +460,56 @@ const instructions = () => ({
                 suggestedUntrusted={suggestedUntrusted}
                 valKey="netBorrowLimitPerWindowQuote"
                 prefix="$"
+              />
+              <DisplayListingPropertyWrapped
+                label="Borrow Weight Scale Start Quote"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey="borrowWeightScaleStartQuote"
+                prefix="$"
+              />
+              <DisplayListingPropertyWrapped
+                label="Deposit Weight Scale Start Quote"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey="depositWeightScaleStartQuote"
+                prefix="$"
+              />
+              <DisplayListingPropertyWrapped
+                label="Stable Price Delay Interval"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey="stablePriceDelayIntervalSeconds"
+                suffix="H"
+              />
+              <DisplayListingPropertyWrapped
+                label="Stable Price Delay Growth Limit"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey="stablePriceDelayGrowthLimit"
+                suffix="%"
+              />
+              <DisplayListingPropertyWrapped
+                label="Stable Price Growth Limit"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey="stablePriceGrowthLimit"
+                suffix="%"
+              />
+              <DisplayListingPropertyWrapped
+                label="reduceOnly"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey="reduceOnly"
+              />
+              <DisplayListingPropertyWrapped
+                label="Token Conditional Swap Taker Fee Rate"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey="tokenConditionalSwapTakerFeeRate"
+              />
+              <DisplayListingPropertyWrapped
+                label="Token Conditional Swap Maker Fee Rate"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey="tokenConditionalSwapMakerFeeRate"
+              />
+              <DisplayListingPropertyWrapped
+                label="Flash Loan Deposit Fee Rate"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey="flashLoanDepositFeeRate"
               />
             </div>
             <AdvancedOptionsDropdown className="mt-4" title="Raw values">
@@ -712,6 +763,11 @@ const instructions = () => ({
             args.groupInsuranceFundOpt !== null
               ? args.groupInsuranceFundOpt
               : undefined,
+          tokenConditionalSwapMakerFeeRate:
+            args.tokenConditionalSwapMakerFeeRateOpt,
+          tokenConditionalSwapTakerFeeRate:
+            args.tokenConditionalSwapTakerFeeRateOpt,
+          flashLoanDepositFeeRate: args.flashLoanDepositFeeRateOpt,
         }
 
         if (mint) {
@@ -735,14 +791,6 @@ const instructions = () => ({
                   name: args.name,
                   ...suggestedPreset,
                 } as ListingArgs),
-                borrowWeightScaleStartQuote: toUiDecimals(
-                  suggestedPreset.borrowWeightScale,
-                  6
-                ),
-                depositWeightScaleStartQuote: toUiDecimals(
-                  suggestedPreset.depositWeightScale,
-                  6
-                ),
                 groupInsuranceFund: suggestedPreset.insuranceFound,
               }
             : {}
@@ -991,6 +1039,25 @@ const instructions = () => ({
                 label="Group Insurance Fund"
                 value={parsedArgs.groupInsuranceFund?.toString()}
                 suggestedVal={invalidFields.groupInsuranceFund?.toString()}
+              />
+              <DisplayNullishProperty
+                label="Oracle"
+                value={args.oracleOpt?.toBase58()}
+              />
+              <DisplayNullishProperty
+                label="Token Conditional Swap Maker Fee Rate"
+                value={parsedArgs.tokenConditionalSwapMakerFeeRate}
+                suggestedVal={invalidFields.tokenConditionalSwapMakerFeeRate}
+              />
+              <DisplayNullishProperty
+                label="Token Conditional Swap Taker Fee Rate"
+                value={parsedArgs.tokenConditionalSwapTakerFeeRate}
+                suggestedVal={invalidFields.tokenConditionalSwapTakerFeeRate}
+              />
+              <DisplayNullishProperty
+                label="Flash Loan Deposit Fee Rate"
+                value={parsedArgs.flashLoanDepositFeeRate}
+                suggestedVal={invalidFields.flashLoanDepositFeeRate}
               />
             </div>
             <h3>Raw values</h3>
@@ -1314,9 +1381,34 @@ const getFormattedListingValues = (args: ListingArgs) => {
       6
     ),
     netBorrowLimitWindowSizeTs: secondsToHours(args.netBorrowLimitWindowSizeTs),
+    borrowWeightScaleStartQuote: toUiDecimals(
+      args.borrowWeightScaleStartQuote,
+      6
+    ),
+    depositWeightScaleStartQuote: toUiDecimals(
+      args.depositWeightScaleStartQuote,
+      6
+    ),
+    stablePriceDelayGrowthLimit: (
+      args.stablePriceDelayGrowthLimit * 100
+    ).toFixed(2),
+    stablePriceDelayIntervalSeconds: secondsToHours(
+      args.stablePriceDelayIntervalSeconds
+    ),
+    stablePriceGrowthLimit: (args.stablePriceGrowthLimit * 100).toFixed(2),
+    tokenConditionalSwapMakerFeeRate: args.tokenConditionalSwapMakerFeeRate,
+    tokenConditionalSwapTakerFeeRate: args.tokenConditionalSwapTakerFeeRate,
+    flashLoanDepositFeeRate: args.flashLoanDepositFeeRate,
+    reduceOnly: REDUCE_ONLY_OPTIONS[args.reduceOnly].name,
   }
   return formattedArgs
 }
+
+const REDUCE_ONLY_OPTIONS = [
+  { value: 0, name: 'Disabled' },
+  { value: 1, name: 'No borrows and no deposits' },
+  { value: 2, name: 'No borrows' },
+]
 
 //need yarn add js-sha256 snakeCase
 // function sighash(nameSpace: string, ixName: string): Buffer {

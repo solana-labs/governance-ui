@@ -17,6 +17,11 @@ import { toNative } from '@blockworks-foundation/mango-v4'
 import { BN } from '@coral-xyz/anchor'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
+const REDUCE_ONLY_OPTIONS = [
+  { value: 0, name: 'Disabled' },
+  { value: 1, name: 'No borrows and no deposits' },
+  { value: 2, name: 'No borrows' },
+]
 interface TokenRegisterForm {
   governedAccount: AssetAccount | null
   mintPk: string
@@ -42,6 +47,15 @@ interface TokenRegisterForm {
   netBorrowLimitPerWindowQuote: number
   tokenIndex: number
   holdupTime: number
+  stablePriceDelayIntervalSeconds: number
+  stablePriceGrowthLimit: number
+  stablePriceDelayGrowthLimit: number
+  tokenConditionalSwapTakerFeeRate: number
+  tokenConditionalSwapMakerFeeRate: number
+  flashLoanDepositFeeRate: number
+  reduceOnly: { name: string; value: number }
+  borrowWeightScaleStartQuote: number
+  depositWeightScaleStartQuote: number
 }
 
 const TokenRegister = ({
@@ -86,6 +100,15 @@ const TokenRegister = ({
     netBorrowLimitPerWindowQuote: toNative(1000000, 6).toNumber(),
     tokenIndex: 0,
     holdupTime: 0,
+    stablePriceDelayIntervalSeconds: 60 * 60,
+    stablePriceGrowthLimit: 0.0003,
+    stablePriceDelayGrowthLimit: 0.06,
+    tokenConditionalSwapTakerFeeRate: 0,
+    tokenConditionalSwapMakerFeeRate: 0,
+    flashLoanDepositFeeRate: 0,
+    reduceOnly: REDUCE_ONLY_OPTIONS[0],
+    borrowWeightScaleStartQuote: toNative(10000, 6).toNumber(),
+    depositWeightScaleStartQuote: toNative(10000, 6).toNumber(),
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -129,9 +152,18 @@ const TokenRegister = ({
           Number(form.maintLiabWeight),
           Number(form.initLiabWeight),
           Number(form.liquidationFee),
+          Number(form.stablePriceDelayIntervalSeconds),
+          Number(form.stablePriceDelayGrowthLimit),
+          Number(form.stablePriceGrowthLimit),
           Number(form.minVaultToDepositsRatio),
           new BN(form.netBorrowLimitWindowSizeTs),
-          new BN(form.netBorrowLimitPerWindowQuote)
+          new BN(form.netBorrowLimitPerWindowQuote),
+          Number(form.borrowWeightScaleStartQuote),
+          Number(form.depositWeightScaleStartQuote),
+          Number(form.reduceOnly),
+          Number(form.tokenConditionalSwapTakerFeeRate),
+          Number(form.tokenConditionalSwapMakerFeeRate),
+          Number(form.flashLoanDepositFeeRate)
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -378,6 +410,78 @@ const TokenRegister = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'netBorrowLimitPerWindowQuote',
+    },
+    {
+      label: 'Reduce only',
+      subtitle: getAdditionalLabelInfo('reduceOnly'),
+      initialValue: form.reduceOnly,
+      type: InstructionInputType.SELECT,
+      options: REDUCE_ONLY_OPTIONS,
+      name: 'reduceOnly',
+    },
+    {
+      label: `Stable Price Delay Interval Seconds`,
+      subtitle: getAdditionalLabelInfo('stablePriceDelayIntervalSeconds'),
+      initialValue: form.stablePriceDelayIntervalSeconds,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'stablePriceDelayIntervalSeconds',
+    },
+    {
+      label: `Stable Price Growth Limit`,
+      subtitle: getAdditionalLabelInfo('stablePriceGrowthLimit'),
+      initialValue: form.stablePriceGrowthLimit,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'stablePriceGrowthLimit',
+    },
+    {
+      label: `Stable Price Delay Growth Limit`,
+      subtitle: getAdditionalLabelInfo('stablePriceDelayGrowthLimit'),
+      initialValue: form.stablePriceDelayGrowthLimit,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'stablePriceDelayGrowthLimit',
+    },
+    {
+      label: `Token Conditional Swap Taker Fee Rate`,
+      subtitle: getAdditionalLabelInfo('tokenConditionalSwapTakerFeeRate'),
+      initialValue: form.tokenConditionalSwapTakerFeeRate,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'tokenConditionalSwapTakerFeeRate',
+    },
+    {
+      label: `Token Conditional Swap Maker Fee Rate`,
+      subtitle: getAdditionalLabelInfo('tokenConditionalSwapMakerFeeRate'),
+      initialValue: form.tokenConditionalSwapMakerFeeRate,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'tokenConditionalSwapMakerFeeRate',
+    },
+    {
+      label: `Flash Loan Deposit Fee Rate`,
+      subtitle: getAdditionalLabelInfo('flashLoanDepositFeeRate'),
+      initialValue: form.flashLoanDepositFeeRate,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'flashLoanDepositFeeRate',
+    },
+    {
+      label: `Borrow Weight Scale Start Quote`,
+      subtitle: getAdditionalLabelInfo('borrowWeightScaleStartQuote'),
+      initialValue: form.borrowWeightScaleStartQuote,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'borrowWeightScaleStartQuote',
+    },
+    {
+      label: `Deposit Weight Scale Start Quote`,
+      subtitle: getAdditionalLabelInfo('depositWeightScaleStartQuote'),
+      initialValue: form.depositWeightScaleStartQuote,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'depositWeightScaleStartQuote',
     },
   ]
 
