@@ -57,6 +57,9 @@ const keyToLabel = {
   resetNetBorrowLimit: 'Reset Net Borrow Limit',
   reduceOnly: 'Reduce Only',
   forceClose: 'Force Close',
+  tokenConditionalSwapTakerFeeRate: 'Token Conditional Swap Taker Fee Rate',
+  tokenConditionalSwapMakerFeeRate: 'Token Conditional Swap Maker Fee Rate',
+  flashLoanDepositFeeRate: 'Flash Loan Deposit Fee Rate',
 }
 
 type NamePkVal = {
@@ -99,6 +102,9 @@ interface EditTokenForm {
   reduceOnly: { name: string; value: number }
   holdupTime: number
   forceClose: boolean
+  tokenConditionalSwapTakerFeeRate: number
+  tokenConditionalSwapMakerFeeRate: number
+  flashLoanDepositFeeRate: number
 }
 
 const defaultFormValues: EditTokenForm = {
@@ -136,6 +142,9 @@ const defaultFormValues: EditTokenForm = {
   reduceOnly: REDUCE_ONLY_OPTIONS[0],
   forceClose: false,
   holdupTime: 0,
+  tokenConditionalSwapTakerFeeRate: 0,
+  tokenConditionalSwapMakerFeeRate: 0,
+  flashLoanDepositFeeRate: 0,
 }
 
 const EditToken = ({
@@ -270,7 +279,18 @@ const EditToken = ({
           values.resetNetBorrowLimit!,
           getNullOrTransform(values.reduceOnly, null, Number),
           getNullOrTransform(values.name, null, String),
-          values.forceClose!
+          values.forceClose!,
+          getNullOrTransform(
+            values.tokenConditionalSwapTakerFeeRate,
+            null,
+            Number
+          ),
+          getNullOrTransform(
+            values.tokenConditionalSwapMakerFeeRate,
+            null,
+            Number
+          ),
+          getNullOrTransform(values.flashLoanDepositFeeRate, null, Number)
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -363,6 +383,11 @@ const EditToken = ({
           (x) => x.value === currentToken.reduceOnly
         )!,
         forceClose: currentToken.forceClose,
+        tokenConditionalSwapTakerFeeRate:
+          currentToken.tokenConditionalSwapTakerFeeRate,
+        tokenConditionalSwapMakerFeeRate:
+          currentToken.tokenConditionalSwapMakerFeeRate,
+        flashLoanDepositFeeRate: currentToken.flashLoanDepositFeeRate,
       }
       setForm((prevForm) => ({
         ...prevForm,
@@ -653,6 +678,30 @@ const EditToken = ({
       initialValue: form.forceClose,
       type: InstructionInputType.SWITCH,
       name: 'forceClose',
+    },
+    {
+      label: keyToLabel['tokenConditionalSwapMakerFeeRate'],
+      subtitle: getAdditionalLabelInfo('tokenConditionalSwapMakerFeeRate'),
+      initialValue: form.tokenConditionalSwapMakerFeeRate,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'tokenConditionalSwapMakerFeeRate',
+    },
+    {
+      label: keyToLabel['tokenConditionalSwapTakerFeeRate'],
+      subtitle: getAdditionalLabelInfo('tokenConditionalSwapTakerFeeRate'),
+      initialValue: form.tokenConditionalSwapTakerFeeRate,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'tokenConditionalSwapTakerFeeRate',
+    },
+    {
+      label: keyToLabel['flashLoanDepositFeeRate'],
+      subtitle: getAdditionalLabelInfo('flashLoanDepositFeeRate'),
+      initialValue: form.flashLoanDepositFeeRate,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'flashLoanDepositFeeRate',
     },
   ]
 
