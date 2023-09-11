@@ -768,6 +768,7 @@ const instructions = () => ({
           tokenConditionalSwapTakerFeeRate:
             args.tokenConditionalSwapTakerFeeRateOpt,
           flashLoanDepositFeeRate: args.flashLoanDepositFeeRateOpt,
+          reduceOnly: args.reduceOnlyOpt,
         }
 
         if (mint) {
@@ -1059,6 +1060,12 @@ const instructions = () => ({
                 value={parsedArgs.flashLoanDepositFeeRate}
                 suggestedVal={invalidFields.flashLoanDepositFeeRate}
               />
+              {typeof parsedArgs.reduceOnly === 'number' && (
+                <DisplayNullishProperty
+                  label="Reduce only"
+                  value={REDUCE_ONLY_OPTIONS[parsedArgs.reduceOnly].name}
+                />
+              )}
             </div>
             <h3>Raw values</h3>
             <div>{info}</div>
