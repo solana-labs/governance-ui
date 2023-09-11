@@ -25,6 +25,7 @@ import {
   useRealmCommunityMintInfoQuery,
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
+import { useVsrGovpower } from '@hooks/queries/plugins/vsr'
 
 const LockPluginTokenBalanceCard = ({
   proposal,
@@ -165,7 +166,7 @@ const TokenDepositLock = ({
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const deposits = useDepositStore((s) => s.state.deposits)
-  const votingPower = useDepositStore((s) => s.state.votingPower)
+  const votingPower = useVsrGovpower().result?.result ?? new BN(0)
   const votingPowerFromDeposits = useDepositStore(
     (s) => s.state.votingPowerFromDeposits
   )
@@ -217,7 +218,7 @@ const TokenDepositLock = ({
     if (availableTokens != '0' || hasTokensDeposited || hasTokensInWallet) {
       setHasGovPower(true)
     }
-  }, [availableTokens, hasTokensDeposited, hasTokensInWallet])
+  }, [availableTokens, hasTokensDeposited, hasTokensInWallet, setHasGovPower])
 
   const canShowAvailableTokensMessage = hasTokensInWallet && connected
   const tokensToShow =

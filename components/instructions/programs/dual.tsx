@@ -3,6 +3,7 @@ import {
   StakingOptions,
   STAKING_OPTIONS_PK,
 } from '@dual-finance/staking-options'
+import { AIRDROP_PK } from '@dual-finance/airdrop'
 import { BN, BorshInstructionCoder, Idl } from '@coral-xyz/anchor'
 import { AccountMetaData } from '@solana/spl-governance'
 import { tryGetMint } from '@utils/tokens'
@@ -63,7 +64,31 @@ interface exerciseReversibleInstruction {
   strike: BN
 }
 
-const INSTRUCTIONS = {
+// TODO: merkle airdrop
+const AIRDROP_INSTRUCTIONS = {
+  245: {
+    name: 'Airdrop Configure',
+    accounts: [
+      { name: 'payer' },
+      { name: 'state' },
+      { name: 'vault' },
+      { name: 'mint' },
+      { name: 'verifierSignature' },
+      { name: 'tokenProgram' },
+      { name: 'systemProgram' },
+      { name: 'rent' },
+    ],
+    getDataUI: async (_connection: Connection, data: Uint8Array) => {
+      return (
+        <div className="space-y-3">
+          <div>State seed: {data.toString()}</div>
+        </div>
+      )
+    },
+  },
+};
+
+const SO_INSTRUCTIONS = {
   45: {
     name: 'Staking Option ConfigV3',
     accounts: [
@@ -473,6 +498,7 @@ const GSO_INSTRUCTIONS = {
 }
 
 export const DUAL_INSTRUCTIONS = {
-  [STAKING_OPTIONS_PK.toBase58()]: INSTRUCTIONS,
+  [AIRDROP_PK.toBase58()]: AIRDROP_INSTRUCTIONS,
+  [STAKING_OPTIONS_PK.toBase58()]: SO_INSTRUCTIONS,
   [GSO_PK.toBase58()]: GSO_INSTRUCTIONS,
 }

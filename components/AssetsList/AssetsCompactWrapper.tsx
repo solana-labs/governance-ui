@@ -1,4 +1,3 @@
-import React from 'react'
 import AssetsList from './AssetsList'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import useRealm from '@hooks/useRealm'
@@ -17,21 +16,23 @@ import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import Loading from '@components/Loading'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 
 const AssetsCompactWrapper = () => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
   const realm = useRealmQuery().data?.result
+  const { result: ownVoterWeight } = useLegacyVoterWeight()
   const {
     symbol,
-    ownVoterWeight,
+
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const canCreateGovernance = realm
-    ? ownVoterWeight.canCreateGovernance(realm)
+    ? ownVoterWeight?.canCreateGovernance(realm)
     : null
 
   const newAssetToolTip = renderAddNewAssetTooltip(

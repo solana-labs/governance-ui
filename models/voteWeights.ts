@@ -34,6 +34,9 @@ interface VoterWeightInterface {
 }
 
 /// VoterWeight encapsulates logic to determine voter weights from token records (community or council)
+/**
+ * @deprecated instead of using this, ask yourself what you are trying to do, and observe that there is no reason you'd need to use this class in order to do it.
+ */
 export class VoteRegistryVoterWeight implements VoterWeightInterface {
   //TODO implement council
   communityTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
@@ -137,6 +140,9 @@ export class VoteRegistryVoterWeight implements VoterWeightInterface {
   }
 }
 
+/**
+ * @deprecated instead of using this, ask yourself what you are trying to do, and observe that there is no reason you'd need to use this class in order to do it.
+ */
 export class VoteNftWeight implements VoterWeightInterface {
   //TODO implement council
   communityTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
@@ -238,6 +244,9 @@ export class VoteNftWeight implements VoterWeightInterface {
   }
 }
 
+/**
+ * @deprecated instead of using this, ask yourself what you are trying to do, and observe that there is no reason you'd need to use this class in order to do it.
+ */
 export class VoterWeight implements VoterWeightInterface {
   communityTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
   councilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
@@ -341,6 +350,9 @@ export class VoterWeight implements VoterWeightInterface {
 }
 
 // TODO treat this as temporary - it should delegate to the governance VoterWeight (frontend and on-chain)
+/**
+ * @deprecated instead of using this, ask yourself what you are trying to do, and observe that there is no reason you'd need to use this class in order to do it.
+ */
 export class SimpleGatedVoterWeight implements VoterWeightInterface {
   constructor(
     public communityTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,

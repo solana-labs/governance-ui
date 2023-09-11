@@ -10,12 +10,10 @@ import {
 } from '@heroicons/react/outline'
 import { VoteThresholdType, VoteTipping } from '@solana/spl-governance'
 import cx from 'classnames'
-import React from 'react'
 import { useRouter } from 'next/router'
 
 import { ntext } from '@utils/ntext'
 import { Wallet } from '@models/treasury/Wallet'
-import useRealm from '@hooks/useRealm'
 import Tooltip from '@components/Tooltip'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import Address from '@components/Address'
@@ -30,6 +28,7 @@ import {
   useRealmCommunityMintInfoQuery,
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
+import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 
 const UNIX_SECOND = 1
 const UNIX_MINUTE = UNIX_SECOND * 60
@@ -90,7 +89,7 @@ interface Props {
 export default function Rules(props: Props) {
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
-  const { ownVoterWeight } = useRealm()
+  const { result: ownVoterWeight } = useLegacyVoterWeight()
   const router = useRouter()
   const { symbol } = router.query
   const { fmtUrlWithCluster } = useQueryContext()

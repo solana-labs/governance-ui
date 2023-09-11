@@ -30,6 +30,7 @@ import {
   coinTiersToNames,
 } from '@blockworks-foundation/mango-v4-settings/lib/helpers/listingTools'
 import { tryParseKey } from '@tools/validators/pubkey'
+import Loading from '@components/Loading'
 // import { snakeCase } from 'snake-case'
 // import { sha256 } from 'js-sha256'
 
@@ -246,6 +247,7 @@ const instructions = () => ({
             ...suggestedPreset,
           } as ListingArgs)
         : ({} as ListingArgsFormatted)
+
       const invalidKeys: (keyof ListingArgsFormatted)[] = Object.keys(
         suggestedPreset
       ).length
@@ -458,6 +460,56 @@ const instructions = () => ({
                 suggestedUntrusted={suggestedUntrusted}
                 valKey="netBorrowLimitPerWindowQuote"
                 prefix="$"
+              />
+              <DisplayListingPropertyWrapped
+                label="Borrow Weight Scale Start Quote"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey="borrowWeightScaleStartQuote"
+                prefix="$"
+              />
+              <DisplayListingPropertyWrapped
+                label="Deposit Weight Scale Start Quote"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey="depositWeightScaleStartQuote"
+                prefix="$"
+              />
+              <DisplayListingPropertyWrapped
+                label="Stable Price Delay Interval"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey="stablePriceDelayIntervalSeconds"
+                suffix="H"
+              />
+              <DisplayListingPropertyWrapped
+                label="Stable Price Delay Growth Limit"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey="stablePriceDelayGrowthLimit"
+                suffix="%"
+              />
+              <DisplayListingPropertyWrapped
+                label="Stable Price Growth Limit"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey="stablePriceGrowthLimit"
+                suffix="%"
+              />
+              <DisplayListingPropertyWrapped
+                label="reduceOnly"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey="reduceOnly"
+              />
+              <DisplayListingPropertyWrapped
+                label="Token Conditional Swap Taker Fee Rate"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey="tokenConditionalSwapTakerFeeRate"
+              />
+              <DisplayListingPropertyWrapped
+                label="Token Conditional Swap Maker Fee Rate"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey="tokenConditionalSwapMakerFeeRate"
+              />
+              <DisplayListingPropertyWrapped
+                label="Flash Loan Deposit Fee Rate"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey="flashLoanDepositFeeRate"
               />
             </div>
             <AdvancedOptionsDropdown className="mt-4" title="Raw values">
@@ -711,6 +763,12 @@ const instructions = () => ({
             args.groupInsuranceFundOpt !== null
               ? args.groupInsuranceFundOpt
               : undefined,
+          tokenConditionalSwapMakerFeeRate:
+            args.tokenConditionalSwapMakerFeeRateOpt,
+          tokenConditionalSwapTakerFeeRate:
+            args.tokenConditionalSwapTakerFeeRateOpt,
+          flashLoanDepositFeeRate: args.flashLoanDepositFeeRateOpt,
+          reduceOnly: args.reduceOnlyOpt,
         }
 
         if (mint) {
@@ -734,14 +792,6 @@ const instructions = () => ({
                   name: args.name,
                   ...suggestedPreset,
                 } as ListingArgs),
-                borrowWeightScaleStartQuote: toUiDecimals(
-                  suggestedPreset.borrowWeightScale,
-                  6
-                ),
-                depositWeightScaleStartQuote: toUiDecimals(
-                  suggestedPreset.depositWeightScale,
-                  6
-                ),
                 groupInsuranceFund: suggestedPreset.insuranceFound,
               }
             : {}
@@ -991,6 +1041,31 @@ const instructions = () => ({
                 value={parsedArgs.groupInsuranceFund?.toString()}
                 suggestedVal={invalidFields.groupInsuranceFund?.toString()}
               />
+              <DisplayNullishProperty
+                label="Oracle"
+                value={args.oracleOpt?.toBase58()}
+              />
+              <DisplayNullishProperty
+                label="Token Conditional Swap Maker Fee Rate"
+                value={parsedArgs.tokenConditionalSwapMakerFeeRate}
+                suggestedVal={invalidFields.tokenConditionalSwapMakerFeeRate}
+              />
+              <DisplayNullishProperty
+                label="Token Conditional Swap Taker Fee Rate"
+                value={parsedArgs.tokenConditionalSwapTakerFeeRate}
+                suggestedVal={invalidFields.tokenConditionalSwapTakerFeeRate}
+              />
+              <DisplayNullishProperty
+                label="Flash Loan Deposit Fee Rate"
+                value={parsedArgs.flashLoanDepositFeeRate}
+                suggestedVal={invalidFields.flashLoanDepositFeeRate}
+              />
+              {typeof parsedArgs.reduceOnly === 'number' && (
+                <DisplayNullishProperty
+                  label="Reduce only"
+                  value={REDUCE_ONLY_OPTIONS[parsedArgs.reduceOnly].name}
+                />
+              )}
             </div>
             <h3>Raw values</h3>
             <div>{info}</div>
@@ -1024,6 +1099,73 @@ const instructions = () => ({
       const info = await displayArgs(connection, data)
       try {
         return <div>{info}</div>
+      } catch (e) {
+        console.log(e)
+        return <div>{JSON.stringify(data)}</div>
+      }
+    },
+  },
+  73195: {
+    name: 'Withdraw all token fees',
+    accounts: [
+      { name: 'Group' },
+      { name: 'Bank' },
+      { name: 'Vault' },
+      { name: 'Destination' },
+    ],
+    getDataUI: async (
+      connection: Connection,
+      data: Uint8Array,
+      accounts: AccountMetaData[]
+    ) => {
+      const group = accounts[0].pubkey
+      const bank = accounts[1].pubkey
+      const client = await getClient(connection)
+      const mangoGroup = await client.getGroup(group)
+      const mint = [...mangoGroup.banksMapByMint.values()].find(
+        (x) => x[0]!.publicKey.equals(bank)!
+      )![0]!.mint!
+      const tokenSymbol = tokenPriceService.getTokenInfo(mint.toBase58())
+        ?.symbol
+      try {
+        return (
+          <div>
+            {tokenSymbol ? tokenSymbol : <Loading className="w-5"></Loading>}
+          </div>
+        )
+      } catch (e) {
+        console.log(e)
+        return <div>{JSON.stringify(data)}</div>
+      }
+    },
+  },
+  15219: {
+    name: 'Withdraw all perp fees',
+    accounts: [
+      { name: 'Group' },
+      { name: 'Perp market' },
+      { name: 'Bank' },
+      { name: 'Vault' },
+      { name: 'Destination' },
+    ],
+    getDataUI: async (
+      connection: Connection,
+      data: Uint8Array,
+      accounts: AccountMetaData[]
+    ) => {
+      const group = accounts[0].pubkey
+      const perpMarket = accounts[1].pubkey
+      const client = await getClient(connection)
+      const mangoGroup = await client.getGroup(group)
+      const marketName = [
+        ...mangoGroup.perpMarketsMapByName.values(),
+      ].find((x) => x.publicKey.equals(perpMarket))?.name
+      try {
+        return (
+          <div>
+            {marketName ? marketName : <Loading className="w-5"></Loading>}
+          </div>
+        )
       } catch (e) {
         console.log(e)
         return <div>{JSON.stringify(data)}</div>
@@ -1246,9 +1388,34 @@ const getFormattedListingValues = (args: ListingArgs) => {
       6
     ),
     netBorrowLimitWindowSizeTs: secondsToHours(args.netBorrowLimitWindowSizeTs),
+    borrowWeightScaleStartQuote: toUiDecimals(
+      args.borrowWeightScaleStartQuote,
+      6
+    ),
+    depositWeightScaleStartQuote: toUiDecimals(
+      args.depositWeightScaleStartQuote,
+      6
+    ),
+    stablePriceDelayGrowthLimit: (
+      args.stablePriceDelayGrowthLimit * 100
+    ).toFixed(2),
+    stablePriceDelayIntervalSeconds: secondsToHours(
+      args.stablePriceDelayIntervalSeconds
+    ),
+    stablePriceGrowthLimit: (args.stablePriceGrowthLimit * 100).toFixed(2),
+    tokenConditionalSwapMakerFeeRate: args.tokenConditionalSwapMakerFeeRate,
+    tokenConditionalSwapTakerFeeRate: args.tokenConditionalSwapTakerFeeRate,
+    flashLoanDepositFeeRate: args.flashLoanDepositFeeRate,
+    reduceOnly: REDUCE_ONLY_OPTIONS[args.reduceOnly].name,
   }
   return formattedArgs
 }
+
+const REDUCE_ONLY_OPTIONS = [
+  { value: 0, name: 'Disabled' },
+  { value: 1, name: 'No borrows and no deposits' },
+  { value: 2, name: 'No borrows' },
+]
 
 //need yarn add js-sha256 snakeCase
 // function sighash(nameSpace: string, ixName: string): Buffer {

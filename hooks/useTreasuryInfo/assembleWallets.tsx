@@ -12,13 +12,10 @@ import { AssetAccount, AccountType } from '@utils/uiTypes/assets'
 import { AssetType, Token, RealmAuthority } from '@models/treasury/Asset'
 import { AuxiliaryWallet, Wallet } from '@models/treasury/Wallet'
 import { getAccountName } from '@components/instructions/tools'
-import { NFT } from '@models/treasury/NFT'
 import { RealmInfo } from '@models/registry/api'
 
 import { calculateTotalValue } from './calculateTotalValue'
 import { convertAccountToAsset } from './convertAccountToAsset'
-import { groupNftsByWallet } from './groupNftsByWallet'
-import { groupNftsIntoCollections } from './groupNftsIntoCollections'
 import {
   ProgramAssetAccount,
   groupProgramsByWallet,
@@ -29,8 +26,6 @@ import { Domain } from '@models/treasury/Domain'
 import { groupDomainsByWallet } from './groupDomainsByWallet'
 import { ConnectionContext } from '@utils/connection'
 import { PublicKey } from '@solana/web3.js'
-import getTokenOwnerRecordsForWallet from './getTokenOwnerRecordsForWallet'
-import { tryParseKey } from '@tools/validators/pubkey'
 
 function isNotNull<T>(x: T | null): x is T {
   return x !== null
@@ -39,7 +34,6 @@ function isNotNull<T>(x: T | null): x is T {
 export const assembleWallets = async (
   connection: ConnectionContext,
   accounts: AssetAccount[],
-  nfts: NFT[],
   domains: Domain[],
   programId: PublicKey,
   councilMintAddress?: string,
@@ -51,7 +45,6 @@ export const assembleWallets = async (
   realmInfo?: RealmInfo
 ) => {
   const walletMap: { [address: string]: Wallet } = {}
-  const nftsGroupedByWallet = groupNftsByWallet(nfts)
   const programs = accounts.filter(
     (account) => account.type === AccountType.PROGRAM
   ) as ProgramAssetAccount[]
@@ -128,15 +121,6 @@ export const assembleWallets = async (
         walletMap[walletAddress].assets.push(asset)
       }
     }
-
-    if (account.type === AccountType.SOL) {
-      const tokenOwnerRecords = await getTokenOwnerRecordsForWallet(
-        connection,
-        account.governance,
-        tryParseKey(walletAddress)
-      )
-      walletMap[walletAddress].assets.push(...tokenOwnerRecords)
-    }
   }
 
   for (const [walletAddress, programList] of Object.entries(
@@ -196,24 +180,6 @@ export const assembleWallets = async (
     })
   }
 
-  for (const [walletAddress, nftList] of Object.entries(nftsGroupedByWallet)) {
-    if (!walletMap[walletAddress]) {
-      walletMap[walletAddress] = {
-        address: walletAddress,
-        assets: [],
-        rules: {},
-        stats: {},
-        totalValue: new BigNumber(0),
-      }
-    }
-
-    const collections = groupNftsIntoCollections(nftList)
-
-    for (const collection of collections) {
-      walletMap[walletAddress].assets.push(collection)
-    }
-  }
-
   const allWallets = Object.values(walletMap)
     .map((wallet) => ({
       ...wallet,
@@ -229,14 +195,10 @@ export const assembleWallets = async (
     .sort((a, b) => {
       if (a.totalValue.isZero() && b.totalValue.isZero()) {
         const aContainsSortable = a.assets.some(
-          (asset) =>
-            asset.type === AssetType.NFTCollection ||
-            asset.type === AssetType.Programs
+          (asset) => asset.type === AssetType.Programs
         )
         const bContainsSortable = b.assets.some(
-          (asset) =>
-            asset.type === AssetType.NFTCollection ||
-            asset.type === AssetType.Programs
+          (asset) => asset.type === AssetType.Programs
         )
 
         if (aContainsSortable && !bContainsSortable) {

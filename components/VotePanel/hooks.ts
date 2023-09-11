@@ -89,11 +89,14 @@ export const useVetoingPop = () => {
     return tokenRole === 'community'
       ? governance?.account.config.councilVetoVoteThreshold.type !==
           VoteThresholdType.Disabled &&
-          // if there is no council then there's not actually a vetoing population, in my opinion
-          realm?.account.config.councilMint !== undefined &&
-          'council'
+        // if there is no council then there's not actually a vetoing population, in my opinion
+        realm?.account.config.councilMint !== undefined
+        ? 'council'
+        : undefined
       : governance?.account.config.communityVetoVoteThreshold.type !==
-          VoteThresholdType.Disabled && 'community'
+        VoteThresholdType.Disabled
+      ? 'community'
+      : undefined
   }, [governance, tokenRole, realm?.account.config.councilMint])
 
   return vetoingPop

@@ -14,6 +14,7 @@ import * as PaymentStreaming from '@mean-dao/payment-streaming'
 // Alphabetical order
 export enum PackageEnum {
   Common,
+  Dual,
   Foresight,
   GatewayPlugin,
   Identity,
@@ -25,7 +26,6 @@ export enum PackageEnum {
   Solend,
   Switchboard,
   VsrPlugin,
-  Dual,
 }
 
 export interface UiInstruction {
@@ -329,13 +329,13 @@ export enum Instructions {
   DepositReserveLiquidityAndObligationCollateral,
   DifferValidatorStake,
   DualFinanceAirdrop,
-  DualFinanceExercise,
+  DualFinanceExerciseStakingOption,
   DualFinanceLiquidityStakingOption,
   DualFinanceInitStrike,
   DualFinanceStakingOption,
   DualFinanceGso,
   DualFinanceGsoWithdraw,
-  DualFinanceWithdraw,
+  DualFinanceStakingOptionWithdraw,
   DualFinanceDelegate,
   DualFinanceDelegateWithdraw,
   DualFinanceVoteDeposit,

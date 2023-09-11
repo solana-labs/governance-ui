@@ -9,19 +9,20 @@ import {
   useVoterTokenRecord,
   useVotingPop,
 } from './hooks'
-import useRealm from '@hooks/useRealm'
 import { VotingClientType } from '@utils/uiTypes/VotePlugin'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
 import { useSubmitVote } from '@hooks/useSubmitVote'
 import { useSelectedRealmInfo } from '@hooks/selectedRealm/useSelectedRealmRegistryEntry'
+import { useGovernancePowerAsync } from '@hooks/queries/governancePower'
 
 export const useCanVote = () => {
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
-  const { ownVoterWeight } = useRealm()
+  const votingPop = useVotingPop()
+  const { result: govPower } = useGovernancePowerAsync(votingPop)
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
 
@@ -30,11 +31,7 @@ export const useCanVote = () => {
 
   const isVoteCast = !!ownVoteRecord?.found
 
-  const hasMinAmountToVote =
-    voterTokenRecord &&
-    ownVoterWeight.hasMinAmountToVote(
-      voterTokenRecord.account.governingTokenMint
-    )
+  const hasMinAmountToVote = voterTokenRecord && govPower?.gtn(0)
 
   const canVote =
     connected &&

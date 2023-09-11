@@ -452,30 +452,31 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@blockworks-foundation/mango-v4-settings@0.2.6":
-  version "0.2.6"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4-settings/-/mango-v4-settings-0.2.6.tgz#725a8cf669e164cd7694d97989472f7852afad68"
-  integrity sha512-RK8O8lbflIN9IgNE1uUkjrtlv/7f0BjIqTwcuLNFos6/e/Q2/AnlXRlD5Y9WnO6xS7mXNsw9kr05xCxeYZzM1Q==
+"@blockworks-foundation/mango-v4-settings@0.2.10":
+  version "0.2.10"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4-settings/-/mango-v4-settings-0.2.10.tgz#d09a74b743b1eb44bcad46b09680035fb8ec5a85"
+  integrity sha512-pQ7TfAxBdoF0fNVQ7PsT4TW5cpGibTjZadXcYlbyfetxQbTQS9mgghfGaq/TDFz/rHa6FS2FJ0xCJBoy7FNDbg==
   dependencies:
     bn.js "^5.2.1"
     eslint-config-prettier "^9.0.0"
 
-"@blockworks-foundation/mango-v4@0.18.17":
-  version "0.18.17"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4/-/mango-v4-0.18.17.tgz#e6ed1895df7c5ebdcae2ded04fd219f2964323a7"
-  integrity sha512-LT2rgFumxESRjHXZ7bke9A/6OK5Y8yMZLEH8z2kF8nzAtQP7RPB42pVTY2l5vjHKYAz+Wo73WwdrpoLqjeXL/w==
+"@blockworks-foundation/mango-v4@0.19.27":
+  version "0.19.27"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4/-/mango-v4-0.19.27.tgz#73203fecd7cca5ceea658ede8788b72974778d48"
+  integrity sha512-UEGTcxWLe0wga+RSTdBzoUUev2oCXV2az0s3RCcU7BlQ2UPnQDWSfbO/rmxPmveKYFSBGW+RsiSzLlXAmm9hPQ==
   dependencies:
     "@coral-xyz/anchor" "^0.27.0"
     "@project-serum/serum" "0.13.65"
     "@pythnetwork/client" "~2.14.0"
     "@solana/spl-token" "0.3.7"
-    "@solana/web3.js" "^1.73.2"
+    "@solana/web3.js" "^1.78.2"
     "@switchboard-xyz/sbv2-lite" "^0.1.6"
     big.js "^6.1.1"
     binance-api-node "^0.12.0"
     bs58 "^5.0.0"
     cross-fetch "^3.1.5"
     dotenv "^16.0.3"
+    lodash "^4.17.21"
     node-kraken-api "^2.2.2"
 
 "@blockworks-foundation/mangolana@0.0.1-beta.15":
@@ -4712,7 +4713,7 @@
     "@wallet-standard/app" "^1.0.1"
     "@wallet-standard/base" "^1.0.1"
 
-"@solana/web3.js@1.56.0", "@solana/web3.js@1.73.3", "@solana/web3.js@^1.17.0", "@solana/web3.js@^1.21.0", "@solana/web3.js@^1.22.0", "@solana/web3.js@^1.30.2", "@solana/web3.js@^1.31.0", "@solana/web3.js@^1.32.0", "@solana/web3.js@^1.35.1", "@solana/web3.js@^1.36.0", "@solana/web3.js@^1.37.1", "@solana/web3.js@^1.43.4", "@solana/web3.js@^1.44.3", "@solana/web3.js@^1.48.0", "@solana/web3.js@^1.50.1", "@solana/web3.js@^1.56.2", "@solana/web3.js@^1.59.1", "@solana/web3.js@^1.63.0", "@solana/web3.js@^1.63.1", "@solana/web3.js@^1.66.2", "@solana/web3.js@^1.68.0", "@solana/web3.js@^1.73.0", "@solana/web3.js@^1.73.2", "@solana/web3.js@^1.78.3":
+"@solana/web3.js@1.56.0", "@solana/web3.js@1.73.3", "@solana/web3.js@^1.17.0", "@solana/web3.js@^1.21.0", "@solana/web3.js@^1.22.0", "@solana/web3.js@^1.30.2", "@solana/web3.js@^1.31.0", "@solana/web3.js@^1.32.0", "@solana/web3.js@^1.35.1", "@solana/web3.js@^1.36.0", "@solana/web3.js@^1.37.1", "@solana/web3.js@^1.43.4", "@solana/web3.js@^1.44.3", "@solana/web3.js@^1.48.0", "@solana/web3.js@^1.50.1", "@solana/web3.js@^1.56.2", "@solana/web3.js@^1.59.1", "@solana/web3.js@^1.63.0", "@solana/web3.js@^1.63.1", "@solana/web3.js@^1.66.2", "@solana/web3.js@^1.68.0", "@solana/web3.js@^1.73.0", "@solana/web3.js@^1.73.2", "@solana/web3.js@^1.78.2", "@solana/web3.js@^1.78.3":
   version "1.73.3"
   resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.73.3.tgz#60e6bd68f6f364d4be360b1e0a03a0a68468a029"
   integrity sha512-vHRMo589XEIpoujpE2sZZ1aMZvfA1ImKfNxobzEFyMb+H5j6mRRUXfdgWD0qJ0sm11e5BcBC7HPeRXJB+7f3Lg==

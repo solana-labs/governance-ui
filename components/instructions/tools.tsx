@@ -81,6 +81,7 @@ export const ACCOUNT_NAMES = {
   '4PdEyhrV3gaUj4ffwjKGXBLo42jF2CQCCBoXenwCRWXf':
     'Mango DAO USDC Treasury Vault',
   '6h29sTzK4XsL4Gjo8uXLWXgKLNSXvnnax45RJ4NSCziP': 'Mango DAO USDC Treasury',
+  '4j7rsyag8nFYw4SXk1qQijyaeX8vVbuN28XyjYjSayFZ': 'Mango DAO CHAI Treasury',
   '4WQSYg21RrJNYhF4251XFpoy1uYbMHcMfZNLMXA3x5Mp':
     'Mango DAO Voter Stake Registry Registrar',
   DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE: 'Mango DAO Governance Realm',
@@ -272,10 +273,27 @@ export const ACCOUNT_NAMES = {
     'Marinade Council Budget Wallet',
   H988v6sNu4dw911AeUo6fy5RsTkDtyfcTAMNpdq1Mo6u:
     'Marinade Council Budget MNDE Vault',
+  '7iUtTuZAh2Len8LiC1u68gUMPMsKh9kce9bcbdGwtBZY':
+    'Marinade Programs Upgrade Governance',
+  '6YAju4nd4t7kyuHV6NvVpMepMk11DgWyYjKVJUak2EEm':
+    'Marinade Programs Upgrade Wallet',
+  indiXdKbsC4QSLQQnn6ngZvkqfywn6KgEeQbkGSpk1V:
+    'Marinade Incentives Distribution Program',
   '2w6ny74cU6yRxkD6ZACh5M1JznLQ1KB6AUsB7zo2NBHX':
     'Marinade Voter Stake Registry Program Governance',
   '6egAu2HDLcSgeUYmiBvNLgp7Bd4nPk16gX9MvWuJpeX2':
     'Marinade SPL Program Governance',
+
+  // Dual DAO
+  '4yx1NJ4Vqf2zT1oVLk4SySBhhDJXmXFt88ncm4gPxtL7': 'Staking Options Program',
+  '2fJcpdR6qzqDP7fBqvoJQ5PGYdaRFBNyUKZkZf5t12mr': 'Airdrop Program',
+  '8tBcmZAMNm11DuGAS2r6PqSA3CKt72amoz8bVj14xRiT':
+    'Merkle Airdrop Verifier Program',
+  ATCsJvzSbHaJj3a9uKTRHSoD8ZmWPfeC3sYxzcJJHTM5:
+    'Governance Airdrop Verifier Program',
+  DuALd6fooWzVDkaTsQzDAxPGYCnLrnWamdNNTNxicdX8:
+    'Lockup Staking Options Program',
+  '7Z36Efbt7a4nLiV7s5bY7J2e4TJ6V9JEKGccsy2od2bE': 'Dual DAO wallet',
 }
 
 // TODO: Add this to on-chain metadata to Governance account

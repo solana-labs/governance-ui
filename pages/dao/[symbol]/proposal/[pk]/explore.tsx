@@ -40,9 +40,10 @@ export default function Explore() {
     const newPath = router.asPath.replace(/\/explore$/, '')
     router.push(newPath)
   }
-  const isMulti = proposal?.account.voteType !== VoteType.SINGLE_CHOICE
-    && proposal?.account.accountType === GovernanceAccountType.ProposalV2
-    
+  const isMulti =
+    proposal?.account.voteType !== VoteType.SINGLE_CHOICE &&
+    proposal?.account.accountType === GovernanceAccountType.ProposalV2
+
   return (
     <div className="bg-bkg-2 rounded-lg p-4 space-y-3 md:p-6">
       <button
@@ -83,15 +84,17 @@ export default function Explore() {
                 onHighlight={setHighlighted}
               />
               {/* when hovering over a top voter, ProposalVoterNftChart shows he/her NFTs when isNftMode */}
-              <ProposalVoterNftChart
-                className="h-[205px]"
-                highlighted={highlighted}
-                voteType={
-                  highlighted && records
-                    ? records.find((x) => x.key === highlighted)?.voteType
-                    : undefined
-                }
-              />
+              {isNftMode ? (
+                <ProposalVoterNftChart
+                  className="h-[205px]"
+                  highlighted={highlighted}
+                  voteType={
+                    highlighted && records
+                      ? records.find((x) => x.key === highlighted)?.voteType
+                      : undefined
+                  }
+                />
+              ) : undefined}
             </div>
             <ProposalTopVotersBubbleChart
               className="h-[500px]"

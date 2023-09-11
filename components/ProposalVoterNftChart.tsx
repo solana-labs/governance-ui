@@ -1,6 +1,4 @@
-import { NFT_PLUGINS_PKS } from '@constants/plugins'
 import { useDigitalAssetsByOwner } from '@hooks/queries/digitalAssets'
-import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import { useNftRegistrarCollection } from '@hooks/useNftRegistrarCollection'
 import { PublicKey } from '@solana/web3.js'
 import { useMemo } from 'react'
@@ -23,22 +21,15 @@ function filterVerifiedCollections(nfts, usedCollectionsPks) {
 }
 
 const ProposalVoterNftChart = (props: Props) => {
-  const config = useRealmConfigQuery().data?.result
-  const currentPluginPk = config?.account.communityTokenConfig.voterWeightAddin
-  const isNftMode =
-    currentPluginPk && NFT_PLUGINS_PKS.includes(currentPluginPk?.toBase58())
-
   const { data: nfts, isLoading } = useDigitalAssetsByOwner(
     props.highlighted ? new PublicKey(props.highlighted) : undefined
   )
 
-  const usedCollectionsPks: string[] = useNftRegistrarCollection()
+  const usedCollectionsPks = useNftRegistrarCollection()
   const verifiedNfts = useMemo(
     () => filterVerifiedCollections(nfts, usedCollectionsPks),
     [nfts, usedCollectionsPks]
   )
-
-  if (!isNftMode) return <></>
 
   return (
     <div className="w-full">

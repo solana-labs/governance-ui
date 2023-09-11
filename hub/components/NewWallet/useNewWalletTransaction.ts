@@ -8,10 +8,10 @@ import { useCallback } from 'react';
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore';
 
 import { rules2governanceConfig } from '../EditWalletRules/createTransaction';
+import { useLegacyVoterWeight } from '@hooks/queries/governancePower';
 import { useRealmQuery } from '@hooks/queries/realm';
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext';
 import useProgramVersion from '@hooks/useProgramVersion';
-import useRealm from '@hooks/useRealm';
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh';
 import { chunks } from '@utils/helpers';
 import { trySentryLog } from '@utils/logs';
@@ -33,11 +33,11 @@ const useNewWalletCallback = (
   );
   const programVersion = useProgramVersion();
   const realm = useRealmQuery().data?.result;
-  const { ownVoterWeight } = useRealm();
+  const { result: ownVoterWeight } = useLegacyVoterWeight();
 
-  const tokenOwnerRecord = ownVoterWeight.canCreateGovernanceUsingCouncilTokens()
+  const tokenOwnerRecord = ownVoterWeight?.canCreateGovernanceUsingCouncilTokens()
     ? ownVoterWeight.councilTokenRecord
-    : realm && ownVoterWeight.canCreateGovernanceUsingCommunityTokens(realm)
+    : realm && ownVoterWeight?.canCreateGovernanceUsingCommunityTokens(realm)
     ? ownVoterWeight.communityTokenRecord
     : undefined;
 

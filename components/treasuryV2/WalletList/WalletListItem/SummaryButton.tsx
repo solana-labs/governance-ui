@@ -10,6 +10,8 @@ import SelectedWalletIcon from '../../icons/SelectedWalletIcon'
 import UnselectedWalletIcon from '../../icons/UnselectedWalletIcon'
 import AssetsPreviewIconList from './AssetsPreviewIconList'
 import { useTreasurySelectState } from '@components/treasuryV2/Details/treasurySelectStore'
+import { PublicKey } from '@solana/web3.js'
+import { useMemo } from 'react'
 
 interface Props {
   className?: string
@@ -31,6 +33,14 @@ export default function SummaryButton(props: Props) {
     treasurySelect === undefined || treasurySelect._kind === 'Legacy'
       ? props.selected
       : treasurySelect.selectedGovernance === props.wallet.governanceAddress
+
+  const governance = useMemo(
+    () =>
+      props.wallet.governanceAddress
+        ? new PublicKey(props.wallet.governanceAddress)
+        : undefined,
+    [props.wallet.governanceAddress]
+  )
 
   return (
     <button
@@ -116,6 +126,7 @@ export default function SummaryButton(props: Props) {
             showRealmAuthority
             assets={props.wallet.assets}
             className="mt-1"
+            governance={governance}
           />
         </div>
         <ChevronDownIcon

@@ -3,13 +3,11 @@ import {
   AssetType,
   Token,
   Mint,
-  NFTCollection,
   Programs,
   RealmAuthority,
   Sol,
   Domains,
   Unknown,
-  TokenOwnerRecordAsset,
   Stake,
 } from '@models/treasury/Asset'
 
@@ -23,10 +21,6 @@ export function isMint(asset: Asset): asset is Mint {
 
 export function isDomain(asset: Asset): asset is Domains {
   return asset.type === AssetType.Domain
-}
-
-export function isNFTCollection(asset: Asset): asset is NFTCollection {
-  return asset.type === AssetType.NFTCollection
 }
 
 export function isPrograms(asset: Asset): asset is Programs {
@@ -47,10 +41,4 @@ export function isSol(asset: Asset): asset is Sol {
 
 export function isUnknown(asset: Asset): asset is Unknown {
   return asset.type === AssetType.Unknown
-}
-
-export function isTokenOwnerRecord(
-  asset: Asset
-): asset is TokenOwnerRecordAsset {
-  return asset.type === AssetType.TokenOwnerRecordAsset
 }

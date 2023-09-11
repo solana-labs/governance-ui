@@ -17,6 +17,7 @@ import useLegacyConnectionContext from './useLegacyConnectionContext'
 import queryClient from './queries/queryClient'
 import { proposalQueryKeys } from './queries/proposal'
 import { createLUTProposal } from 'actions/createLUTproposal'
+import { useLegacyVoterWeight } from './queries/governancePower'
 
 export default function useCreateProposal() {
   const client = useVotePluginsClientStore(
@@ -28,7 +29,9 @@ export default function useCreateProposal() {
   const config = useRealmConfigQuery().data?.result
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
-  const { ownVoterWeight, canChooseWhoVote } = useRealm()
+  const { result: ownVoterWeight } = useLegacyVoterWeight()
+
+  const { canChooseWhoVote } = useRealm()
   const { getRpcContext } = useRpcContext()
 
   /** @deprecated because the api is goofy, use `propose` */
@@ -56,10 +59,10 @@ export default function useCreateProposal() {
     if (!selectedGovernance) throw new Error('governance not found')
     if (!realm) throw new Error()
 
-    const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
+    const ownTokenRecord = ownVoterWeight?.getTokenRecordToCreateProposal(
       selectedGovernance.account.config,
       voteByCouncil
-    )
+    ) // TODO just get the token record the normal way
 
     const defaultProposalMint =
       !mint?.supply.isZero() ||
@@ -92,7 +95,7 @@ export default function useCreateProposal() {
       selectedGovernance.account.proposalCount,
       instructionsData,
       isDraft,
-      ["Approve"],
+      ['Approve'],
       client
     )
     queryClient.invalidateQueries({
@@ -110,25 +113,23 @@ export default function useCreateProposal() {
     return handleCreateProposal({ ...rest, governance: { pubkey: governance } })
   }
 
-  const proposeMultiChoice = async(
-    {
-      title,
-      description,
-      governance,
-      instructionsData,
-      voteByCouncil = false,
-      options,
-      isDraft = false,
-    }: {
-      title: string
-      description: string
-      governance: PublicKey
-      instructionsData: InstructionDataWithHoldUpTime[]
-      voteByCouncil?: boolean
-      options: string[]
-      isDraft?: boolean
-    }
-  ) => {
+  const proposeMultiChoice = async ({
+    title,
+    description,
+    governance,
+    instructionsData,
+    voteByCouncil = false,
+    options,
+    isDraft = false,
+  }: {
+    title: string
+    description: string
+    governance: PublicKey
+    instructionsData: InstructionDataWithHoldUpTime[]
+    voteByCouncil?: boolean
+    options: string[]
+    isDraft?: boolean
+  }) => {
     const { result: selectedGovernance } = await fetchGovernanceByPubkey(
       connection.current,
       governance
@@ -136,7 +137,7 @@ export default function useCreateProposal() {
     if (!selectedGovernance) throw new Error('governance not found')
     if (!realm) throw new Error()
 
-    const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
+    const ownTokenRecord = ownVoterWeight?.getTokenRecordToCreateProposal(
       selectedGovernance.account.config,
       voteByCouncil
     )

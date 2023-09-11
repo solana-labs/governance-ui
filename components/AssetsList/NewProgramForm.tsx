@@ -4,7 +4,6 @@ import Input from 'components/inputs/Input'
 import PreviousRouteBtn from 'components/PreviousRouteBtn'
 import Tooltip from 'components/Tooltip'
 import useQueryContext from 'hooks/useQueryContext'
-import useRealm from 'hooks/useRealm'
 import { Keypair, PublicKey, Transaction } from '@solana/web3.js'
 import { tryParseKey } from 'tools/validators/pubkey'
 import { isFormValid } from 'utils/formValidation'
@@ -40,7 +39,6 @@ const NewProgramForm = () => {
   const realm = useRealmQuery().data?.result
   const realmMint = useRealmCommunityMintInfoQuery().data?.result
   const { symbol } = router.query
-  const { ownVoterWeight } = useRealm()
   const { assetAccounts } = useGovernanceAssetsStore()
 
   const wallet = useWalletOnePointOh()
@@ -52,11 +50,6 @@ const NewProgramForm = () => {
   const prevFormProgramId = usePrevious(form.programId)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
-  const tokenOwnerRecord = ownVoterWeight.canCreateGovernanceUsingCouncilTokens()
-    ? ownVoterWeight.councilTokenRecord
-    : realm && ownVoterWeight.canCreateGovernanceUsingCommunityTokens(realm)
-    ? ownVoterWeight.communityTokenRecord
-    : undefined
 
   const handleSetForm = useCallback(({ propertyName, value }) => {
     setFormErrors({})
@@ -70,9 +63,7 @@ const NewProgramForm = () => {
       if (!connected) {
         throw 'Please connect your wallet'
       }
-      if (!tokenOwnerRecord) {
-        throw "You don't have enough governance power to create a new program governance"
-      }
+
       const { isValid, validationErrors } = await isFormValid(schema, form)
       setFormErrors(validationErrors)
       if (isValid && realmMint) {

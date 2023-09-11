@@ -1,4 +1,3 @@
-import useRealm from '@hooks/useRealm'
 import { fmtMintAmount, getHoursFromTimestamp } from '@tools/sdk/units'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import { getFormattedStringFromDays, SECS_PER_DAY } from '@utils/dateTools'
@@ -14,12 +13,13 @@ import {
   useRealmCommunityMintInfoQuery,
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
+import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 
 const ParamsView = ({ activeGovernance }) => {
   const realm = useRealmQuery().data?.result
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
-  const { ownVoterWeight } = useRealm()
+  const { result: ownVoterWeight } = useLegacyVoterWeight()
   const programVersion = useProgramVersion()
   const realmAccount = realm?.account
   const communityMint = realmAccount?.communityMint.toBase58()
@@ -141,6 +141,7 @@ const ParamsView = ({ activeGovernance }) => {
           <div className="flex">
             <Button
               disabled={
+                ownVoterWeight === undefined ||
                 !ownVoterWeight.canCreateProposal(
                   activeGovernance.account.config
                 )
@@ -150,7 +151,7 @@ const ParamsView = ({ activeGovernance }) => {
               }
               onClick={() => {
                 if (
-                  ownVoterWeight.canCreateProposal(
+                  ownVoterWeight?.canCreateProposal(
                     activeGovernance.account.config
                   )
                 ) {

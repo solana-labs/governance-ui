@@ -15,6 +15,7 @@ import { Domain as DomainModel } from '@models/treasury/Domain'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmGovernancesQuery } from '@hooks/queries/governance'
+import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 
 interface Props {
   domain: DomainModel
@@ -26,9 +27,10 @@ const Domain: React.FC<Props> = (props) => {
   const connected = !!wallet?.connected
   const realm = useRealmQuery().data?.result
   const governanceItems = useRealmGovernancesQuery().data
+  const { result: ownVoterWeight } = useLegacyVoterWeight()
+
   const {
     symbol,
-    ownVoterWeight,
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
@@ -36,7 +38,7 @@ const Domain: React.FC<Props> = (props) => {
   const canCreateProposal =
     realm &&
     governanceItems?.some((g) =>
-      ownVoterWeight.canCreateProposal(g.account.config)
+      ownVoterWeight?.canCreateProposal(g.account.config)
     ) &&
     !toManyCommunityOutstandingProposalsForUser &&
     !toManyCouncilOutstandingProposalsForUse
@@ -46,7 +48,7 @@ const Domain: React.FC<Props> = (props) => {
     : governanceItems?.length === 0
     ? 'There is no governance configuration to create a new proposal'
     : !governanceItems?.some((g) =>
-        ownVoterWeight.canCreateProposal(g.account.config)
+        ownVoterWeight?.canCreateProposal(g.account.config)
       )
     ? "You don't have enough governance power to create a new proposal"
     : toManyCommunityOutstandingProposalsForUser

@@ -16,6 +16,7 @@ export const nftQueryKeys = {
   ],
 }
 
+/** @deprecated use digitalAssets queries */
 export const useNFTbyMintQuery = (pubkey: PublicKey | undefined) => {
   const connection = useLegacyConnectionContext()
 
@@ -41,6 +42,7 @@ export const useNFTbyMintQuery = (pubkey: PublicKey | undefined) => {
   return query
 }
 
+/** @deprecated use digitalAssets queries */
 export const fetchNFTbyMint = (connection: Connection, pubkey: PublicKey) => {
   const cluster = getNetworkFromEndpoint(connection.rpcEndpoint)
   return queryClient.fetchQuery({

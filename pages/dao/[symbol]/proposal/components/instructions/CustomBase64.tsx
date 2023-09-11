@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import * as yup from 'yup'
 import {
   getInstructionDataFromBase64,
@@ -15,9 +15,9 @@ import {
 
 import { NewProposalContext } from '../../new'
 import GovernedAccountSelect from '../GovernedAccountSelect'
-import useRealm from '@hooks/useRealm'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 
 const CustomBase64 = ({
   index,
@@ -26,7 +26,7 @@ const CustomBase64 = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { ownVoterWeight } = useRealm()
+  const { result: ownVoterWeight } = useLegacyVoterWeight()
   const wallet = useWalletOnePointOh()
   const { assetAccounts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)
@@ -111,7 +111,7 @@ const CustomBase64 = ({
       <GovernedAccountSelect
         label="Governance"
         governedAccounts={assetAccounts.filter((x) =>
-          ownVoterWeight.canCreateProposal(x.governance.account.config)
+          ownVoterWeight?.canCreateProposal(x.governance.account.config)
         )}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedAccount' })

@@ -21,6 +21,8 @@ import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecor
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
 import { useConnection } from '@solana/wallet-adapter-react'
+import BN from 'bn.js'
+import { useVsrGovpower } from '@hooks/queries/plugins/vsr'
 
 interface Props {
   className?: string
@@ -39,7 +41,7 @@ export default function LockedCommunityVotingPower(props: Props) {
   const endpoint = connection.rpcEndpoint
 
   const getOwnedDeposits = useDepositStore((s) => s.getOwnedDeposits)
-  const votingPower = useDepositStore((s) => s.state.votingPower)
+  const votingPower = useVsrGovpower().result?.result ?? new BN(0)
   const votingPowerFromDeposits = useDepositStore(
     (s) => s.state.votingPowerFromDeposits
   )

@@ -1,4 +1,5 @@
-import React, { useMemo, useContext, useEffect, useState } from 'react'
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+import React, { useContext, useEffect, useState } from 'react'
 import { ProgramAccount, Governance } from '@solana/spl-governance'
 import {
   UiInstruction,
@@ -79,9 +80,8 @@ const DualAirdrop = ({
     setGovernedAccount(form.treasury?.governance)
   }, [form.treasury])
 
-  const merkleSchema = useMemo(getDualFinanceMerkleAirdropSchema, [])
-
-  const governanceSchema = useMemo(getDualFinanceGovernanceAirdropSchema, [])
+  const merkleSchema = getDualFinanceMerkleAirdropSchema({form});
+  const governanceSchema = getDualFinanceGovernanceAirdropSchema({form});
 
   return (
     <>
@@ -156,8 +156,9 @@ const DualAirdrop = ({
           />
         </>
       )}
+      {/* TODO: Note that this is full tokens, not atoms since expectation is that this composes with staking options */}
       <Input
-        label="Total number of tokens"
+        label="Total number of tokens."
         value={form.amount}
         type="text"
         onChange={(evt) =>
