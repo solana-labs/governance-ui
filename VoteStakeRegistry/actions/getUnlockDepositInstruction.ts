@@ -1,45 +1,44 @@
 import { PublicKey } from '@solana/web3.js'
 
-import { getRegistrarPDA, getVoterPDA } from 'VoteStakeRegistry/sdk/accounts'
+import {
+  Registrar,
+  getRegistrarPDA,
+  getVoterPDA,
+} from 'VoteStakeRegistry/sdk/accounts'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 
 export const getUnlockDepositInstruction = async ({
-  grantAuthorityPk,
+  communityMintPk,
   voterAuthorityPk,
   realmPk,
-  communityMintPk,
   depositEntryIndex,
   client,
+  voteStakeRegistryRegistrar,
 }: {
-  depositEntryIndex: number
-  realmMint: PublicKey
   communityMintPk: PublicKey
+  depositEntryIndex: number
   voterAuthorityPk: PublicKey
   realmPk: PublicKey
-  grantAuthorityPk: PublicKey
   client?: VsrClient
+  voteStakeRegistryRegistrar: Registrar
 }) => {
   const clientProgramId = client!.program.programId
 
-  const { registrar } = await getRegistrarPDA(
+  const { registrar } = getRegistrarPDA(
     realmPk,
     communityMintPk,
     clientProgramId
   )
-  const { voter } = await getVoterPDA(
-    registrar,
-    voterAuthorityPk,
-    clientProgramId
-  )
+  const { voter } = getVoterPDA(registrar, voterAuthorityPk, clientProgramId)
 
-  const grantIx = await client?.program.methods
+  const unlockDepositIx = await client?.program.methods
     .unlockDeposit(depositEntryIndex)
     .accounts({
       registrar,
       voter,
       voterAuthority: voterAuthorityPk,
-      grantAuthority: grantAuthorityPk,
+      grantAuthority: voteStakeRegistryRegistrar.realmAuthority,
     })
     .instruction()
-  return grantIx
+  return unlockDepositIx
 }

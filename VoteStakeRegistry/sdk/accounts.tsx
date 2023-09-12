@@ -63,12 +63,12 @@ export interface DepositWithMintAccount extends Deposit {
 
 export const emptyPk = '11111111111111111111111111111111'
 
-export const getRegistrarPDA = async (
+export const getRegistrarPDA = (
   realmPk: PublicKey,
   mint: PublicKey,
   clientProgramId: PublicKey
 ) => {
-  const [registrar, registrarBump] = await PublicKey.findProgramAddress(
+  const [registrar, registrarBump] = PublicKey.findProgramAddressSync(
     [realmPk.toBuffer(), Buffer.from('registrar'), mint.toBuffer()],
     clientProgramId
   )
@@ -78,12 +78,12 @@ export const getRegistrarPDA = async (
   }
 }
 
-export const getVoterPDA = async (
+export const getVoterPDA = (
   registrar: PublicKey,
   walletPk: PublicKey,
   clientProgramId: PublicKey
 ) => {
-  const [voter, voterBump] = await PublicKey.findProgramAddress(
+  const [voter, voterBump] = PublicKey.findProgramAddressSync(
     [registrar.toBuffer(), Buffer.from('voter'), walletPk.toBuffer()],
     clientProgramId
   )

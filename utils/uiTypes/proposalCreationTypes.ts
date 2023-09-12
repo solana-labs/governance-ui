@@ -106,6 +106,11 @@ export interface GrantForm {
   allowClawback: boolean
 }
 
+export interface UnlockDepositForm {
+  depositEntryIndex: number
+  voterAuthorityPk: string
+}
+
 export interface ClawbackForm {
   governedTokenAccount: AssetAccount | undefined
   voter: Voter | null
