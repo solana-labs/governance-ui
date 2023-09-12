@@ -271,6 +271,14 @@ export default function useGovernanceAssets() {
         VSR_PLUGIN_PKS.includes(currentPluginPk.toBase58()),
       packageId: PackageEnum.Common,
     },
+    [Instructions.UnlockDeposit]: {
+      name: 'Unlock Deposit',
+      isVisible:
+        canUseTokenTransferInstruction &&
+        currentPluginPk &&
+        VSR_PLUGIN_PKS.includes(currentPluginPk.toBase58()),
+      packageId: PackageEnum.VsrPlugin,
+    },
     [Instructions.JoinDAO]: {
       name: 'Join a DAO',
       packageId: PackageEnum.Common,

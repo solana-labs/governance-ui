@@ -29,7 +29,7 @@ import { useRealmQuery } from '@hooks/queries/realm'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { getUnlockDepositInstruction } from 'VoteStakeRegistry/actions/getUnlockDepositInstruction'
 import { NewProposalContext } from 'pages/dao/[symbol]/proposal/new'
-import { Voter } from 'VoteStakeRegistry/sdk/accounts'
+import { Voter, getVoterPDA } from 'VoteStakeRegistry/sdk/accounts'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 import { tryGetVoter } from 'VoteStakeRegistry/sdk/api'
 import Select from '@components/inputs/Select'
@@ -42,12 +42,15 @@ const UnlockDeposit = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { client, voteStakeRegistryRegistrar } = useVotePluginsClientStore(
-    (s) => ({
-      client: s.state.vsrClient,
-      voteStakeRegistryRegistrar: s.state.voteStakeRegistryRegistrar,
-    })
-  )
+  const {
+    client,
+    voteStakeRegistryRegistrar,
+    voteStakeRegistryRegistrarPk,
+  } = useVotePluginsClientStore((s) => ({
+    client: s.state.vsrClient,
+    voteStakeRegistryRegistrar: s.state.voteStakeRegistryRegistrar,
+    voteStakeRegistryRegistrarPk: s.state.voteStakeRegistryRegistrarPk,
+  }))
   const connection = useLegacyConnectionContext()
   const realm = useRealmQuery().data?.result
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -143,17 +146,19 @@ const UnlockDeposit = ({
   }, [form, governedAccount, handleSetInstructions, index, getInstruction])
 
   useEffect(() => {
-    const loadVoter = async (client: VsrClient) => {
-      const _voter = await tryGetVoter(
+    const loadVoter = async (client: VsrClient, registrarPk: PublicKey) => {
+      const { voter: voterPda } = getVoterPDA(
+        registrarPk,
         new PublicKey(form.voterAuthorityPk),
-        client
+        client.program.programId
       )
+      const _voter = await tryGetVoter(voterPda, client)
       setVoter(_voter)
     }
-    if (form.voterAuthorityPk && client) {
-      loadVoter(client)
+    if (form.voterAuthorityPk && client && voteStakeRegistryRegistrarPk) {
+      loadVoter(client, voteStakeRegistryRegistrarPk)
     }
-  }, [client, form.voterAuthorityPk])
+  }, [client, form.voterAuthorityPk, voteStakeRegistryRegistrarPk])
 
   return (
     <>
@@ -181,15 +186,18 @@ const UnlockDeposit = ({
           {voter.deposits.map((deposit, idx) => {
             const unixLockupEnd = deposit.lockup.endTs.toNumber() * 1000
             const finalUnlockDate = dayjs(unixLockupEnd)
+            const lockupType = getDepositType(deposit)
+            if (lockupType == 'none') return null
             return (
               <Select.Option key={idx} value={idx}>
-                <div>Lockup Type: {getDepositType(deposit)}</div>
+                <div>Lockup Type: {lockupType}</div>
                 <div>
                   <div>
                     Lockup end date: {finalUnlockDate.format('YYYY-MM-DD')}
                   </div>
                   {/* TODO: Translate to human readable value */}
-                  Amount still locked: {deposit.amountDepositedNative}
+                  Amount still locked:{' '}
+                  {deposit.amountDepositedNative.toString()}
                 </div>
               </Select.Option>
             )

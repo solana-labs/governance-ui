@@ -399,6 +399,7 @@ export enum Instructions {
   WithdrawFromOracle,
   Transfer,
   TransferDomainName,
+  UnlockDeposit,
   UpdateTokenMetadata,
   VotingMintConfig,
   WithdrawObligationCollateralAndRedeemReserveLiquidity,
