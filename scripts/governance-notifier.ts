@@ -96,15 +96,30 @@ async function runNotifier() {
             votingTokenDecimals
           )
 
-          const msg = `“${
-            proposal.account.name
-          }” proposal ended with votes YES - ${formatNumber(
-            yesVotes,
-            undefined,
-            { minimumFractionDigits: 0 }
-          )} NO - ${formatNumber(noVotes, undefined, {
+          const minVotesNeeded = 100000000
+          const quorumReached = yesVotes >= minVotesNeeded
+          const isSuccess = yesVotes > noVotes && quorumReached
+
+          const msg = `
+          Proposal Ended: ${proposal.account.name}
+          
+          Status: ${
+            isSuccess
+              ? 'Success'
+              : !quorumReached
+              ? 'Defeated - Quorum Not Reached'
+              : 'Defeated'
+          }
+          
+          🗳️ Voting Breakdown:
+          - Yes Votes: ${formatNumber(yesVotes, undefined, {
             minimumFractionDigits: 0,
-          })} | https://realms.today/dao/${escape(
+          })}
+          - No Votes: ${formatNumber(noVotes, undefined, {
+            minimumFractionDigits: 0,
+          })}
+          
+          🔗 https://realms.today/dao/${escape(
             REALM
           )}/proposal/${proposal.pubkey.toBase58()}`
 
