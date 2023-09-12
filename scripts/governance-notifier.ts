@@ -11,6 +11,7 @@ import {
 import { getCertifiedRealmInfo } from '@models/registry/api'
 import { accountsToPubkeyMap } from '@tools/sdk/accounts'
 import { fmtTokenAmount } from '@utils/formatting'
+import { formatNumber } from '@utils/formatNumber'
 
 const fiveMinutesSeconds = 5 * 60
 const toleranceSeconds = 30
@@ -94,9 +95,16 @@ async function runNotifier() {
             proposal.account.getNoVoteCount(),
             votingTokenDecimals
           )
+
           const msg = `“${
             proposal.account.name
-          }” proposal ended with results: YES votes - ${yesVotes} NO votes - ${noVotes} | https://realms.today/dao/${escape(
+          }” proposal ended with votes YES - ${formatNumber(
+            yesVotes,
+            undefined,
+            { minimumFractionDigits: 0 }
+          )} NO - ${formatNumber(noVotes, undefined, {
+            minimumFractionDigits: 0,
+          })} | https://realms.today/dao/${escape(
             REALM
           )}/proposal/${proposal.pubkey.toBase58()}`
 
