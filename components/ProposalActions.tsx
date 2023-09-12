@@ -143,7 +143,7 @@ const ProposalActionsPanel = () => {
     : ''
   const handleFinalizeVote = async () => {
     try {
-      if (proposal && realmInfo && governance) {
+      if (proposal && realmInfo && governance && proposalOwner) {
         const rpcContext = new RpcContext(
           proposal.owner,
           getProgramVersionForRealm(realmInfo),
@@ -156,7 +156,8 @@ const ProposalActionsPanel = () => {
           rpcContext,
           governance?.account.realm,
           proposal,
-          maxVoterWeight
+          maxVoterWeight,
+          proposalOwner.account.governingTokenOwner
         )
       }
       queryClient.invalidateQueries({
@@ -208,7 +209,7 @@ const ProposalActionsPanel = () => {
     proposal: ProgramAccount<Proposal> | undefined
   ) => {
     try {
-      if (proposal && realmInfo) {
+      if (proposal && realmInfo && proposalOwner) {
         const rpcContext = new RpcContext(
           proposal.owner,
           getProgramVersionForRealm(realmInfo),
@@ -217,7 +218,12 @@ const ProposalActionsPanel = () => {
           connection.endpoint
         )
 
-        await cancelProposal(rpcContext, realmInfo.realmId, proposal)
+        await cancelProposal(
+          rpcContext,
+          realmInfo.realmId,
+          proposal,
+          proposalOwner.account.governingTokenOwner
+        )
       }
       queryClient.invalidateQueries({
         queryKey: proposalQueryKeys.all(connection.endpoint),
