@@ -10,6 +10,7 @@ import {
 } from '@solana/spl-governance'
 import { getCertifiedRealmInfo } from '@models/registry/api'
 import { accountsToPubkeyMap } from '@tools/sdk/accounts'
+import { fmtTokenAmount } from '@utils/formatting'
 
 const fiveMinutesSeconds = 5 * 60
 const toleranceSeconds = 30
@@ -80,6 +81,30 @@ async function runNotifier() {
         // voting is closed
         proposal.account.votingCompletedAt
       ) {
+        if (
+          nowInSeconds - proposal.account.votingCompletedAt.toNumber() <=
+          fiveMinutesSeconds + toleranceSeconds
+        ) {
+          const votingTokenDecimals = 6
+          const yesVotes = fmtTokenAmount(
+            proposal.account.getYesVoteCount(),
+            votingTokenDecimals
+          )
+          const noVotes = fmtTokenAmount(
+            proposal.account.getNoVoteCount(),
+            votingTokenDecimals
+          )
+          const msg = `“${
+            proposal.account.name
+          }” proposal ended with results: YES votes - ${yesVotes} NO votes - ${noVotes} | https://realms.today/dao/${escape(
+            REALM
+          )}/proposal/${proposal.pubkey.toBase58()}`
+
+          console.log(msg)
+          if (process.env.WEBHOOK_URL) {
+            axios.post(process.env.WEBHOOK_URL, { content: msg })
+          }
+        }
         countClosed++
         continue
       }
