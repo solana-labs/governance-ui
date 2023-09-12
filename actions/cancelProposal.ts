@@ -5,16 +5,22 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js'
 
-import { getGovernanceProgramVersion, RpcContext } from '@solana/spl-governance'
+import {
+  getGovernanceProgramVersion,
+  RpcContext,
+  withRefundProposalDeposit,
+} from '@solana/spl-governance'
 import { Proposal } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { sendTransaction } from 'utils/send'
 import { withCancelProposal } from '@solana/spl-governance'
+import { getProposalDepositPk } from '@utils/helpers'
 
 export const cancelProposal = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
   realmPk: PublicKey,
-  proposal: ProgramAccount<Proposal> | undefined
+  proposal: ProgramAccount<Proposal> | undefined,
+  proposalOwnerWallet: PublicKey
 ) => {
   const instructions: TransactionInstruction[] = []
   const signers: Keypair[] = []
@@ -37,6 +43,25 @@ export const cancelProposal = async (
     proposal!.account.tokenOwnerRecord,
     governanceAuthority
   )
+
+  const proposalDepositPk = getProposalDepositPk(
+    proposal!.pubkey,
+    proposalOwnerWallet,
+    programId
+  )
+
+  //Release sol if deposit exempt setting threshold hit
+  const isDepositActive = await connection.getBalance(proposalDepositPk)
+
+  if (isDepositActive) {
+    await withRefundProposalDeposit(
+      instructions,
+      programId!,
+      programVersion,
+      proposal!.pubkey,
+      proposalOwnerWallet
+    )
+  }
 
   const transaction = new Transaction({ feePayer: walletPubkey })
 

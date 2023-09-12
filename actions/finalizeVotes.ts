@@ -1,6 +1,7 @@
 import {
   getGovernanceProgramVersion,
   ProgramAccount,
+  withRefundProposalDeposit,
 } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import {
@@ -12,12 +13,14 @@ import {
 import { sendTransaction } from '@utils/send'
 import { Proposal } from '@solana/spl-governance'
 import { withFinalizeVote } from '@solana/spl-governance'
+import { getProposalDepositPk } from '@utils/helpers'
 
 export const finalizeVote = async (
   { connection, wallet, programId }: RpcContext,
   realm: PublicKey,
   proposal: ProgramAccount<Proposal>,
-  maxVoterWeightPk: PublicKey | undefined
+  maxVoterWeightPk: PublicKey | undefined,
+  proposalOwnerWallet: PublicKey
 ) => {
   const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []
@@ -40,6 +43,25 @@ export const finalizeVote = async (
     proposal.account.governingTokenMint,
     maxVoterWeightPk
   )
+
+  const proposalDepositPk = getProposalDepositPk(
+    proposal.pubkey,
+    proposalOwnerWallet,
+    programId
+  )
+
+  //Release sol if deposit exempt setting threshold hit
+  const isDepositActive = await connection.getBalance(proposalDepositPk)
+
+  if (isDepositActive) {
+    await withRefundProposalDeposit(
+      instructions,
+      programId!,
+      programVersion,
+      proposal.pubkey,
+      proposalOwnerWallet
+    )
+  }
 
   const transaction = new Transaction()
 
