@@ -43,9 +43,9 @@ const InstructionForm = ({
   setFormErrors: React.Dispatch<React.SetStateAction<any>>
   formErrors
   setForm: React.Dispatch<React.SetStateAction<any>>
-  outerForm: { [key: string]: any }
+  outerForm: { [key: string]: any } | undefined
 }) => {
-  const [form, setInnerForm] = useState({ ...outerForm })
+  const [form, setInnerForm] = useState(outerForm ? { ...outerForm } : {})
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setInnerForm({ ...outerForm, [propertyName]: value })
