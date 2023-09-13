@@ -17,13 +17,17 @@ import {
   secsToDays,
   SECS_PER_DAY,
 } from '@utils/dateTools'
-import { calcMultiplier } from 'VoteStakeRegistry/tools/deposits'
+import {
+  calcMultiplier,
+  getDepositType,
+} from 'VoteStakeRegistry/tools/deposits'
 import { VoterStakeRegistry as HeliumVSR } from '@helium/idls/lib/types/voter_stake_registry'
 import { PROGRAM_ID as HELIUM_VSR_PROGRAM_ID } from '@helium/voter-stake-registry-sdk'
 import { fetchTokenAccountByPubkey } from '@hooks/queries/tokenAccount'
 import { fetchMintInfoByPubkey } from '@hooks/queries/mintInfo'
 import { toUiDecimals } from '@blockworks-foundation/mango-v4'
 import EmptyWallet from '@utils/Mango/listingTools'
+import dayjs from 'dayjs'
 
 interface ClawbackInstruction {
   depositEntryIndex: number
@@ -49,6 +53,10 @@ export interface GrantInstruction {
   amount: BN
   startTs: BN
   allowClawback: boolean
+}
+
+export interface UnlockDepositInstruction {
+  depositEntryIndex: number
 }
 
 const clawbackIx = (programId: PublicKey) => ({
@@ -351,6 +359,72 @@ const grantIx = (programId: PublicKey) => ({
   },
 })
 
+const unlockDepositIx = (programId: PublicKey) => ({
+  235: {
+    name: 'UnlockDeposit',
+    accounts: [
+      { name: 'Registrar' },
+      { name: 'Voter' },
+      { name: 'Voter Authority' },
+      { name: 'Grant Authority' },
+    ],
+    getDataUI: async (
+      connection: Connection,
+      data: Uint8Array,
+      accounts: AccountMetaData[]
+    ) => {
+      try {
+        const options = AnchorProvider.defaultOptions()
+        const provider = new AnchorProvider(
+          connection,
+          new EmptyWallet(Keypair.generate()),
+          options
+        )
+        const vsrClient = await VsrClient.connect(provider, programId)
+        const decodedInstructionData = new BorshInstructionCoder(
+          vsrClient.program.idl
+        ).decode(Buffer.from(data))?.data as UnlockDepositInstruction | null
+        const voterPk = accounts[1].pubkey
+        const [voter, registrar] = await Promise.all([
+          tryGetVoter(voterPk, vsrClient),
+          tryGetRegistrar(accounts[0].pubkey, vsrClient),
+        ])
+        if (!decodedInstructionData || !voter || !registrar) return
+
+        const deposit = voter.deposits[decodedInstructionData.depositEntryIndex]
+        const lockupKind = getDepositType(deposit)
+        const mintPk = registrar.votingMints[deposit.votingMintConfigIdx].mint
+        const mint = await tryGetMint(connection, mintPk!)
+        const unixLockupEnd = deposit.lockup.endTs.toNumber() * 1000
+        const endDate = dayjs(unixLockupEnd)
+        return (
+          <>
+            {decodedInstructionData ? (
+              <div className="space-y-3">
+                <div>Grant owner: {accounts[2].pubkey.toBase58()}</div>
+                <div>Lock type: {lockupKind}</div>
+                <div>
+                  Amount:{' '}
+                  {fmtMintAmount(mint!.account, deposit.amountDepositedNative)}
+                </div>
+                {endDate && (
+                  <div>Original end date: {endDate.format('YYYY-MM-DD')}</div>
+                )}
+                <div>Only grant owner can execute instruction</div>
+              </div>
+            ) : (
+              <div>{JSON.stringify(data)}</div>
+            )}
+          </>
+        )
+      } catch (e) {
+        console.log(e)
+        return <div>{JSON.stringify(data)}</div>
+      }
+    },
+  },
+})
+
 const heliumInitializeRegistrarIx = (_programId: PublicKey) => ({
   120: {
     name: 'Initialize registrar',
@@ -456,6 +530,7 @@ const common_instructions = (programId: PublicKey) =>
     grantIx,
     deposit,
     UpdateVoterWeight,
+    unlockDepositIx,
   ].reduce(
     (acc, ix) => ({
       ...acc,
