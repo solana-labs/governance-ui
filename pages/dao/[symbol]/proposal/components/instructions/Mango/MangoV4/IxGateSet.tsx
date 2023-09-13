@@ -148,7 +148,6 @@ const IxGateSet = ({
     }
     return obj
   }
-  console.log(form)
 
   useEffect(() => {
     handleSetInstructions(
