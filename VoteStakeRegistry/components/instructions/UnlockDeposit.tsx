@@ -178,10 +178,10 @@ const UnlockDeposit = ({
         <Select
           label={'Deposit Entry'}
           onChange={(value) => {
-            handleSetForm({ value, propertyName: 'lockupKind' })
+            handleSetForm({ value, propertyName: 'depositEntryIndex' })
           }}
           placeholder="Please select..."
-          value={form.depositEntryIndex}
+          value={`Entry # ${form.depositEntryIndex}`}
         >
           {voter.deposits.map((deposit, idx) => {
             const unixLockupEnd = deposit.lockup.endTs.toNumber() * 1000
