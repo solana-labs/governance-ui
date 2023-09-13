@@ -27,7 +27,7 @@ import { useRealmQuery } from '@hooks/queries/realm'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface CloseTokenAccountForm {
-  governedAccount: AssetAccount | undefined
+  governedAccount: AssetAccount | undefined | null
   fundsDestinationAccount: string
   solRentDestination: string
 }
@@ -44,7 +44,11 @@ const CloseTokenAccount = ({
   const connection = useLegacyConnectionContext()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
-  const [form, setForm] = useState<CloseTokenAccountForm>()
+  const [form, setForm] = useState<CloseTokenAccountForm>({
+    governedAccount: null,
+    fundsDestinationAccount: '',
+    solRentDestination: '',
+  })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
   const schema = yup.object().shape({
