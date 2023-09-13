@@ -40,6 +40,19 @@ const ParamsView = ({ activeGovernance }) => {
         )
     : 'calculating...'
 
+  const minCouncilTokensToCreateProposal = activeGovernance?.account?.config
+    ?.minCouncilTokensToCreateProposal
+    ? mint &&
+      DISABLED_VOTER_WEIGHT.eq(
+        activeGovernance.account.config.minCouncilTokensToCreateProposal
+      )
+      ? 'Disabled'
+      : fmtMintAmount(
+          mint,
+          activeGovernance?.account?.config?.minCouncilTokensToCreateProposal
+        )
+    : 'calculating...'
+
   return (
     <>
       {activeGovernance && (
@@ -66,10 +79,7 @@ const ParamsView = ({ activeGovernance }) => {
             <AddressField
               label="Min council tokens to create a proposal"
               padding
-              val={fmtMintAmount(
-                councilMint,
-                activeGovernance.account.config.minCouncilTokensToCreateProposal
-              )}
+              val={minCouncilTokensToCreateProposal}
             />
           )}
           <NumberField
