@@ -107,7 +107,7 @@ export interface GrantForm {
 }
 
 export interface UnlockDepositForm {
-  depositEntryIndex: number
+  depositEntryIndex: number | undefined
   voterAuthorityPk: string
 }
 

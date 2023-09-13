@@ -12,10 +12,7 @@ import {
   UiInstruction,
   UnlockDepositForm,
 } from '@utils/uiTypes/proposalCreationTypes'
-import {
-  getTokenTransferSchema,
-  getValidatedPublickKey,
-} from '@utils/validations'
+import { getValidatedPublickKey } from '@utils/validations'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import {
   Governance,
@@ -26,7 +23,6 @@ import { validateInstruction } from '@utils/instructionTools'
 import * as yup from 'yup'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { useRealmQuery } from '@hooks/queries/realm'
-import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { getUnlockDepositInstruction } from 'VoteStakeRegistry/actions/getUnlockDepositInstruction'
 import { NewProposalContext } from 'pages/dao/[symbol]/proposal/new'
 import { Voter, getVoterPDA } from 'VoteStakeRegistry/sdk/accounts'
@@ -51,43 +47,42 @@ const UnlockDeposit = ({
     voteStakeRegistryRegistrar: s.state.voteStakeRegistryRegistrar,
     voteStakeRegistryRegistrarPk: s.state.voteStakeRegistryRegistrarPk,
   }))
-  const connection = useLegacyConnectionContext()
   const realm = useRealmQuery().data?.result
   const { handleSetInstructions } = useContext(NewProposalContext)
 
   const { governancesArray } = useGovernanceAssets()
   const [form, setForm] = useState<UnlockDepositForm>({
-    depositEntryIndex: 0,
+    depositEntryIndex: undefined,
     voterAuthorityPk: '',
   })
   const schema = useMemo(
     () =>
-      getTokenTransferSchema({ form, connection }).concat(
-        yup.object().shape({
-          voterAuthorityPk: yup
-            .string()
-            .required('voterAuthority required')
-            .test(
-              'voterAuthorityPk',
-              'voterAuthorityPk must be valid PublicKey',
-              function (voterAuthorityPk: string) {
-                try {
-                  getValidatedPublickKey(voterAuthorityPk)
-                } catch (err) {
-                  return false
-                }
-                return true
+      yup.object().shape({
+        voterAuthorityPk: yup
+          .string()
+          .required('voterAuthority required')
+          .test(
+            'voterAuthorityPk',
+            'voterAuthorityPk must be valid PublicKey',
+            function (voterAuthorityPk: string) {
+              try {
+                getValidatedPublickKey(voterAuthorityPk)
+              } catch (err) {
+                return false
               }
-            ),
-        })
-      ),
-    [form, connection]
+              return true
+            }
+          ),
+        depositEntryIndex: yup.number().required('depositEntryIndex required'),
+      }),
+    []
   )
 
   const [voter, setVoter] = useState<Voter | null>(null)
-  const [governedAccount] = useState<ProgramAccount<Governance> | undefined>(
-    undefined
-  )
+
+  const [governedAccount, setGovernedAccount] = useState<
+    ProgramAccount<Governance> | undefined
+  >(undefined)
   const [formErrors, setFormErrors] = useState({})
 
   const handleSetForm = ({ propertyName, value }) => {
@@ -100,6 +95,7 @@ const UnlockDeposit = ({
     if (!voteStakeRegistryRegistrar)
       throw new Error('No voteStakeRegistryRegistrar')
 
+    console.log('form', form)
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     let serializedInstruction = ''
     const prerequisiteInstructions: TransactionInstruction[] = []
@@ -117,32 +113,31 @@ const UnlockDeposit = ({
       serializedInstruction = serializeInstructionToBase64(unlockDepositIx!)
     }
 
-    const governance = governancesArray.find((governance) =>
-      governance.pubkey.equals(voteStakeRegistryRegistrar.realmAuthority)
-    )
-
     const obj: UiInstruction = {
       serializedInstruction,
       isValid,
-      governance,
+      governance: governedAccount,
       prerequisiteInstructions: prerequisiteInstructions,
       chunkBy: 1,
     }
     return obj
-  }, [
-    client,
-    form,
-    governancesArray,
-    realm,
-    schema,
-    voteStakeRegistryRegistrar,
-  ])
+  }, [client, form, governedAccount, realm, schema, voteStakeRegistryRegistrar])
+
+  useEffect(() => {
+    if (!voteStakeRegistryRegistrar) return
+
+    const governance = governancesArray.find((governance) =>
+      governance.pubkey.equals(voteStakeRegistryRegistrar.realmAuthority)
+    )
+    setGovernedAccount(governance)
+  }, [governancesArray, voteStakeRegistryRegistrar])
 
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: governedAccount, getInstruction },
       index
     )
+    console.log('Set instruction')
   }, [form, governedAccount, handleSetInstructions, index, getInstruction])
 
   useEffect(() => {
@@ -181,7 +176,12 @@ const UnlockDeposit = ({
             handleSetForm({ value, propertyName: 'depositEntryIndex' })
           }}
           placeholder="Please select..."
-          value={`Entry # ${form.depositEntryIndex}`}
+          value={
+            form.depositEntryIndex
+              ? `Entry # ${form.depositEntryIndex}`
+              : undefined
+          }
+          error={formErrors['depositEntryIndex']}
         >
           {voter.deposits.map((deposit, idx) => {
             const unixLockupEnd = deposit.lockup.endTs.toNumber() * 1000
