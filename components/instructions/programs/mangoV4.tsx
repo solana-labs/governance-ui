@@ -773,8 +773,9 @@ const instructions = () => ({
 
         if (mint) {
           mintData = tokenPriceService.getTokenInfo(mint.toBase58())
-          const oracle = mangoGroup.banksMapByMint.get(mint.toBase58())![0]!
-            .oracle
+          const oracle =
+            args.oracleOpt ||
+            mangoGroup.banksMapByMint.get(mint.toBase58())![0]!.oracle
           const isPyth = await isPythOracle(connection, oracle)
           liqudityTier = await getSuggestedCoinTier(mint.toBase58(), !!isPyth)
 
