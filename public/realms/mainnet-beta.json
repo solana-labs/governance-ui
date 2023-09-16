@@ -3228,5 +3228,22 @@
     "sortRank": 3,
     "symbol": "VIEWSDAO",
     "twitter": "@Decod3rsNFT"
+  },
+  {
+    "symbol": "ALL",
+    "category": "web3",
+    "displayName": "AllDomains",
+    
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "ELEXG9cTEJ2pgxFbEVAwushyoPvE7rrEHBgNKfv8uxzi",
+    "communityMint": "BaoawH9p2J8yUK9r5YXQs3hQwmUJgscACjmTkh8rMwYL",
+    "ogImage": "/realms/ALL/img/logo.png",
+    "bannerImage": "https://i.imgur.com/tbaZ0qN.png",
+    "shortDescription": "AllDomains is a Solana Protocol that allows users to create human-readable domain names that can be used in place of a Public Key.",
+    "sortRank": 7,
+    "website": "https://alldomains.id",
+    "keywords": "Web3 Identity, REALM, Goverenance, Web3 domains, DAO",
+    "twitter": "@AllDomains_",
+    "github": "https://github.com/onsol-labs/"
   }
 ]
