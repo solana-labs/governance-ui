@@ -34,7 +34,6 @@ import { useEffect, useState } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { VSR_PLUGIN_PKS } from '@constants/plugins'
 import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
-import SerumGovernanceTokenWrapper from './SerumGovernanceTokenWrapper'
 import getNumTokens from '@components/ProposalVotingPower/getNumTokens'
 import VotingPowerPct from '@components/ProposalVotingPower/VotingPowerPct'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
@@ -136,11 +135,6 @@ const TokenBalanceCard = ({
           <div className="h-10 rounded-lg animate-pulse bg-bkg-3" />
         </>
       )}
-      {/* TODO: Restrict to Serum DAO */}
-      {realmProgramId?.toBase58() ===
-      'G41fmJzd29v7Qmdi8ZyTBBYa98ghh3cwHBTexqCG1PQJ' ? (
-        <SerumGovernanceTokenWrapper />
-      ) : null}
       {children}
     </>
   )

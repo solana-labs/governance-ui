@@ -6,7 +6,6 @@ import { Wallet } from '@models/treasury/Wallet'
 
 import AssetList, { Section } from './AssetList'
 import SummaryButton from './SummaryButton'
-import SerumGovWallet from './SerumGovWallet'
 import { PublicKey } from '@metaplex-foundation/js'
 
 interface Props {
@@ -93,7 +92,6 @@ export default function WalletListItem(props: Props) {
               })
             }
           />
-          <SerumGovWallet wallet={props.wallet} />
         </div>
       )}
     </div>
