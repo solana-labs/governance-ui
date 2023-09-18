@@ -1,6 +1,7 @@
 import {
   getGovernanceProgramVersion,
   ProgramAccount,
+  TokenOwnerRecord,
   withRefundProposalDeposit,
 } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
@@ -20,7 +21,7 @@ export const finalizeVote = async (
   realm: PublicKey,
   proposal: ProgramAccount<Proposal>,
   maxVoterWeightPk: PublicKey | undefined,
-  proposalOwnerWallet: PublicKey
+  proposalOwner: ProgramAccount<TokenOwnerRecord>
 ) => {
   const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []
@@ -44,22 +45,42 @@ export const finalizeVote = async (
     maxVoterWeightPk
   )
 
-  const proposalDepositPk = getProposalDepositPk(
-    proposal.pubkey,
-    proposalOwnerWallet,
-    programId
-  )
+  //its possible that delegate payed for deposit created with someone else token owner record.
+  //there is need of check both deposits.
+  const [possibleDelegateDeposit, possibleTorDeposit] = [
+    proposalOwner.account.governanceDelegate
+      ? getProposalDepositPk(
+          proposal.pubkey,
+          proposalOwner.account.governanceDelegate,
+          programId
+        )
+      : null,
+    getProposalDepositPk(
+      proposal.pubkey,
+      proposalOwner.account.governingTokenOwner,
+      programId
+    ),
+  ]
 
   //Release sol if deposit exempt setting threshold hit
-  const isDepositActive = await connection.getBalance(proposalDepositPk)
+  const [delegateDeposit, torDeposit] = await Promise.all([
+    possibleDelegateDeposit
+      ? connection.getBalance(possibleDelegateDeposit)
+      : null,
+    connection.getBalance(possibleTorDeposit),
+  ])
 
-  if (isDepositActive) {
+  const activeDeposit = delegateDeposit ? delegateDeposit : torDeposit
+
+  if (activeDeposit) {
     await withRefundProposalDeposit(
       instructions,
       programId!,
       programVersion,
       proposal.pubkey,
-      proposalOwnerWallet
+      possibleDelegateDeposit && delegateDeposit
+        ? possibleDelegateDeposit
+        : possibleTorDeposit
     )
   }
 
