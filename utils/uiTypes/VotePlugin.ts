@@ -155,10 +155,10 @@ export class VotingClient {
     type: UpdateVoterWeightRecordTypes,
     createNftActionTicketIxs?: TransactionInstruction[]
   ): Promise<ProgramAddresses | undefined> => {
+    if (this.noClient) return
+
     const realm = this.realm!
-    console.log(this.client)
     if (
-      this.noClient ||
       !realm.account.communityMint.equals(
         tokenOwnerRecord.account.governingTokenMint
       )
