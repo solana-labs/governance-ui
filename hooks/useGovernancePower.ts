@@ -6,6 +6,7 @@ import {
 } from './queries/tokenOwnerRecord'
 import { BN } from 'bn.js'
 import { useRealmQuery } from './queries/realm'
+import { useAsync } from 'react-async-hook'
 
 const useGovernancePower = () => {
   const councilTor = useUserCouncilTokenOwnerRecord()
@@ -33,6 +34,17 @@ const useGovernancePower = () => {
           .map((x) => x.account.governingTokenDepositAmount)
           .reduce((x, acc) => x.add(acc), new BN(0))
   }, [councilMintAddr, torsDelegatedToUser])
+
+  const commpd = useAsync(async () => {
+    if (realm === undefined || torsDelegatedToUser === undefined)
+      return undefined
+
+    const communityTors = torsDelegatedToUser.filter((x) =>
+      x.account.governingTokenMint.equals(realm.account.communityMint)
+    )
+
+    const powers = await Promise.all([])
+  }, [])
 }
 
 export const useCouncilPowerFromDelegators = () => {
