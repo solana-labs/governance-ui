@@ -294,6 +294,22 @@ export const ACCOUNT_NAMES = {
   DuALd6fooWzVDkaTsQzDAxPGYCnLrnWamdNNTNxicdX8:
     'Lockup Staking Options Program',
   '7Z36Efbt7a4nLiV7s5bY7J2e4TJ6V9JEKGccsy2od2bE': 'Dual DAO wallet',
+
+  // AllDomains DAO
+  fP1PNg489M64sRHou3unkCVhj7nU7pYwseDyCPtpqpQ: 'AllDomains DAO Wallet',
+  H53NZSkb8VSiajHdM1yXPYsWwS2ZRZn9K5X6WeomXZ9: 'AllDomains Treasury',
+  '6T7RnoweVwuLEp86gwxpQg3z4xW8eSJdMjzKi9Ei48Mh': 'AllDomains Foundation 1',
+  '5vz3XNcMhPGZeEFwkKqjWA5s3aPLgr2HJh7UvrUeaDaB': 'AllDomains Foundation 2',
+  BaoawH9p2J8yUK9r5YXQs3hQwmUJgscACjmTkh8rMwYL: 'AllDomains (ALL) Token',
+  '8XU6iRnVGp1DSWsbXWQVG3BofKncULJPEcU6YV6VRXDv': 'AllDomains Council Mint',
+  Hq1ffpMA4368gerKRAdVy7KFrUUMo2NwGwVwcXoFy1Th: 'AllDomains Community Rewards',
+  rP3eHs6uEDhQLqJHPLAwaNVENRezAgSnZK6opUtjhhT: 'AllDomains Grants',
+  '27Ma5zSVb8Sv9fuSZcXH2ZghTzdDXuWtzST4NJjXKKVo': 'AllDomains Rewards Governance',
+  '82s94bsTpcXfYbP7vTSwFfoi4cJEkoeQTfMif1h9s1AU': 'AllDomains Community Governance',
+  'CnixsSAVZqvaJEdkFHXXRQmot7RCSJFRHYMJvupbPoiE': 'AllDomains Foundation Governance 1',
+  '95vv4h7GWeBG7DbnzMwB15ZinFKBUiPeg6ea7ZqdGjZx': 'AllDomains Foundation Governance 2',
+  '6gwjRFcW1Y9iuJwXPdz1zZUa3Hcu855dH6APA5LjD8qK': 'AllDomains Treasury Governance',
+  AWVUWfRnHCTgo123mRXB9BRWaxt6JdZXXKhFMQ5mryKJ: 'AllDomains DAO Governance',
 }
 
 // TODO: Add this to on-chain metadata to Governance account
@@ -442,11 +458,11 @@ export async function getInstructionDescriptor(
   const descriptor = !instruction.data.length
     ? descriptors
     : descriptors && descriptors[instruction.data[0]]
-    ? descriptors[instruction.data[0]]
-    : //backup if first number is same for couple of instructions inside same idl
-    descriptors && descriptors[`${instruction.data[0]}${instruction.data[1]}`]
-    ? descriptors[`${instruction.data[0]}${instruction.data[1]}`]
-    : descriptors
+      ? descriptors[instruction.data[0]]
+      : //backup if first number is same for couple of instructions inside same idl
+      descriptors && descriptors[`${instruction.data[0]}${instruction.data[1]}`]
+        ? descriptors[`${instruction.data[0]}${instruction.data[1]}`]
+        : descriptors
 
   const dataUI = (descriptor?.getDataUI &&
     (await descriptor?.getDataUI(
