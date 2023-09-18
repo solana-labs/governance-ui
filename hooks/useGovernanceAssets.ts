@@ -1,7 +1,11 @@
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import { Instructions, PackageEnum } from '@utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
-import { HELIUM_VSR_PLUGINS_PKS, VSR_PLUGIN_PKS } from '../constants/plugins'
+import {
+  HELIUM_VSR_PLUGINS_PKS,
+  VSR_0_2_5_PLUGIN_PKS,
+  VSR_PLUGIN_PKS,
+} from '../constants/plugins'
 import { useRealmQuery } from './queries/realm'
 import { useRealmConfigQuery } from './queries/realmConfig'
 import { useRouter } from 'next/router'
@@ -276,7 +280,7 @@ export default function useGovernanceAssets() {
       isVisible:
         canUseTokenTransferInstruction &&
         currentPluginPk &&
-        VSR_PLUGIN_PKS.includes(currentPluginPk.toBase58()),
+        VSR_0_2_5_PLUGIN_PKS.includes(currentPluginPk.toBase58()),
       packageId: PackageEnum.VsrPlugin,
     },
     [Instructions.JoinDAO]: {
