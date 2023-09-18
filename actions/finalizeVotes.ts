@@ -79,8 +79,8 @@ export const finalizeVote = async (
       programVersion,
       proposal.pubkey,
       possibleDelegateDeposit && delegateDeposit
-        ? possibleDelegateDeposit
-        : possibleTorDeposit
+        ? proposalOwner.account.governanceDelegate!
+        : proposalOwner.account.governingTokenOwner!
     )
   }
 
