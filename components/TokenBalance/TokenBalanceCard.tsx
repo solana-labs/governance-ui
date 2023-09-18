@@ -35,7 +35,6 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { VSR_PLUGIN_PKS } from '@constants/plugins'
 import SerumGovernanceTokenWrapper from './SerumGovernanceTokenWrapper'
 import getNumTokens from '@components/ProposalVotingPower/getNumTokens'
-import VotingPowerPct from '@components/ProposalVotingPower/VotingPowerPct'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import {
@@ -54,6 +53,8 @@ import queryClient from '@hooks/queries/queryClient'
 import { proposalQueryKeys } from '@hooks/queries/proposal'
 import asFindable from '@utils/queries/asFindable'
 import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
+import CommunityVotingPower from '@components/ProposalVotingPower/CommunityVotingPower'
+import CouncilVotingPower from '@components/ProposalVotingPower/CouncilVotingPower'
 
 const TokenBalanceCard = ({
   proposal,
@@ -472,20 +473,11 @@ export const TokenDeposit = ({
 
       {(availableTokens != '0' || inAccountDetails) && (
         <div className="flex items-center mt-4 space-x-4">
-          <div className="w-full px-4 py-2 rounded-md bg-bkg-1 flex flex-row items-center justify-between">
-            <div>
-              <p className="text-xs text-fgd-3">{depositTokenName} Votes</p>
-              <div className="flex items-center w-full justify-between mt-1">
-                <p className="mb-0 text-xl font-bold text-fgd-1 hero-text">
-                  {availableTokens}
-                </p>
-              </div>
-            </div>
-            {amount > new BigNumber(0)
-              ? max &&
-                !max.isZero() && <VotingPowerPct amount={amount} total={max} />
-              : null}
-          </div>
+          {tokenRole === GoverningTokenRole.Community ? (
+            <CommunityVotingPower className="w-full" />
+          ) : (
+            <CouncilVotingPower className="w-full" />
+          )}
         </div>
       )}
 

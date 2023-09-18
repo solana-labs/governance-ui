@@ -27,7 +27,7 @@ export default function VotingPowerPct(props: Props) {
       className={classNames(
         props.className,
         'leading-[15px]',
-        'text-[11px]',
+        'text-xs',
         'text-right',
         'text-white/70'
       )}

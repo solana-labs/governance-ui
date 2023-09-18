@@ -147,11 +147,15 @@ export default function CommunityVotingPower(props: Props) {
         <div className={'p-3 rounded-md bg-bkg-1'}>
           <div className="text-white/50 text-xs">{tokenName} Votes</div>
           <div className="flex items-center justify-between mt-1">
-            {delegatorsAmount?.gtn(0) ? (
-              <div className="text-white font-bold text-2xl">
-                {formattedTotal} ({formattedDelegatorsAmount}) from delegators
+            <div className=" flex flex-row gap-x-2">
+              <div className="text-xl font-bold text-fgd-1 hero-text">
+                {formattedTotal}
               </div>
-            ) : undefined}
+              <div className="text-xs text-white/50">
+                ({formattedDelegatorsAmount} from delegators)
+              </div>
+            </div>
+
             {mintInfo && (
               <VotingPowerPct
                 amount={new BigNumber(totalAmount.toString())}
