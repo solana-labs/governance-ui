@@ -10,13 +10,14 @@ import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import EmptyWallet, {
   getSuggestedCoinTier,
   compareObjectsAndGetDifferentKeys,
-  ListingArgs,
+  FlatListingArgs,
   ListingArgsFormatted,
   getOracle,
   getBestMarket,
   EditTokenArgsFormatted,
   isPythOracle,
   getFormattedListingPresets,
+  FlatEditArgs,
 } from '@utils/Mango/listingTools'
 import { secondsToHours } from 'date-fns'
 import WarningFilledIcon from '@carbon/icons-react/lib/WarningFilled'
@@ -225,7 +226,7 @@ const instructions = () => ({
       const [info, proposedOracle, args] = await Promise.all([
         displayArgs(connection, data),
         getOracle(connection, oracle),
-        getDataObjectFlattened<ListingArgs>(connection, data),
+        getDataObjectFlattened<FlatListingArgs>(connection, data),
       ])
       const liqudityTier = await getSuggestedCoinTier(
         proposedMint.toBase58(),
@@ -244,8 +245,9 @@ const instructions = () => ({
         ? getFormattedListingValues({
             tokenIndex: args.tokenIndex,
             name: args.name,
+            oracle: args.oracle,
             ...suggestedPreset,
-          } as ListingArgs)
+          })
         : ({} as ListingArgsFormatted)
 
       const invalidKeys: (keyof ListingArgsFormatted)[] = Object.keys(
@@ -692,7 +694,7 @@ const instructions = () => ({
         const [mangoGroup, info, args] = await Promise.all([
           client.getGroup(group),
           displayArgs(connection, data),
-          getDataObjectFlattened<any>(connection, data),
+          getDataObjectFlattened<FlatEditArgs>(connection, data),
         ])
         const mint = [...mangoGroup.mintInfosMapByMint.values()].find((x) =>
           x.publicKey.equals(mintInfo)
@@ -708,7 +710,7 @@ const instructions = () => ({
 
         const parsedArgs: Partial<EditTokenArgsFormatted> = {
           tokenIndex: args.tokenIndex,
-          tokenName: args.name,
+          tokenName: args.nameOpt,
           oracleConfidenceFilter:
             args['oracleConfigOpt.confFilter'] !== undefined
               ? (args['oracleConfigOpt.confFilter'] * 100)?.toFixed(2)
@@ -785,7 +787,10 @@ const instructions = () => ({
           tokenConditionalSwapTakerFeeRate:
             args.tokenConditionalSwapTakerFeeRateOpt,
           flashLoanDepositFeeRate: args.flashLoanDepositFeeRateOpt,
-          reduceOnly: args.reduceOnlyOpt,
+          reduceOnly:
+            args.reduceOnlyOpt !== undefined
+              ? REDUCE_ONLY_OPTIONS[args.reduceOnlyOpt].name
+              : undefined,
         }
 
         if (mint) {
@@ -807,9 +812,10 @@ const instructions = () => ({
             ? {
                 ...getFormattedListingValues({
                   tokenIndex: args.tokenIndex,
-                  name: args.name,
+                  name: args.nameOpt,
+                  oracle: args.oracleOpt,
                   ...suggestedPreset,
-                } as ListingArgs),
+                }),
                 groupInsuranceFund: suggestedPreset.insuranceFound,
               }
             : {}
@@ -1078,18 +1084,17 @@ const instructions = () => ({
                 value={parsedArgs.flashLoanDepositFeeRate}
                 suggestedVal={invalidFields.flashLoanDepositFeeRate}
               />
-              {typeof parsedArgs.reduceOnly === 'number' && (
-                <DisplayNullishProperty
-                  label="Reduce only"
-                  value={REDUCE_ONLY_OPTIONS[parsedArgs.reduceOnly].name}
-                />
-              )}
+              <DisplayNullishProperty
+                label="Reduce only"
+                value={parsedArgs.reduceOnly}
+              />
             </div>
             <h3>Raw values</h3>
             <div>{info}</div>
           </div>
         )
       } catch (e) {
+        console.log(e)
         const info = await displayArgs(connection, data)
 
         try {
@@ -1375,10 +1380,11 @@ const DisplayListingProperty = ({
   </div>
 )
 
-const getFormattedListingValues = (args: ListingArgs) => {
+const getFormattedListingValues = (args: FlatListingArgs) => {
   const formattedArgs: ListingArgsFormatted = {
     tokenIndex: args.tokenIndex,
     tokenName: args.name,
+    oracle: args.oracle?.toBase58(),
     oracleConfidenceFilter: (args['oracleConfig.confFilter'] * 100).toFixed(2),
     oracleMaxStalenessSlots: args['oracleConfig.maxStalenessSlots'],
     interestRateUtilizationPoint0: (
