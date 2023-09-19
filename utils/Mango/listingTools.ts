@@ -25,7 +25,7 @@ const MAINNET_PYTH_PROGRAM = new PublicKey(
   'FsJ3A3u2vn5cTVofAjvy6y5kwABJAqYWpe4975bi2epH'
 )
 
-export type ListingArgs = {
+export type FlatListingArgs = {
   name: string
   tokenIndex: number
   'oracleConfig.confFilter': number
@@ -56,6 +56,42 @@ export type ListingArgs = {
   tokenConditionalSwapTakerFeeRate: number
   flashLoanDepositFeeRate: number
   reduceOnly: number
+  groupInsuranceFund: boolean
+  oracle: PublicKey
+}
+
+export type FlatEditArgs = {
+  nameOpt: string
+  tokenIndex: number
+  'oracleConfigOpt.confFilter': number
+  'oracleConfigOpt.maxStalenessSlots': number
+  'interestRateParamsOpt.util0': number
+  'interestRateParamsOpt.rate0': number
+  'interestRateParamsOpt.util1': number
+  'interestRateParamsOpt.rate1': number
+  'interestRateParamsOpt.maxRate': number
+  'interestRateParamsOpt.adjustmentFactor': number
+  loanFeeRateOpt: number
+  loanOriginationFeeRateOpt: number
+  maintAssetWeightOpt: number
+  initAssetWeightOpt: number
+  maintLiabWeightOpt: number
+  initLiabWeightOpt: number
+  liquidationFeeOpt: number
+  minVaultToDepositsRatioOpt: number
+  netBorrowLimitPerWindowQuoteOpt: number
+  netBorrowLimitWindowSizeTsOpt: number
+  borrowWeightScaleStartQuoteOpt: number
+  depositWeightScaleStartQuoteOpt: number
+  stablePriceDelayGrowthLimitOpt: number
+  stablePriceDelayIntervalSecondsOpt: number
+  stablePriceGrowthLimitOpt: number
+  tokenConditionalSwapMakerFeeRateOpt: number
+  tokenConditionalSwapTakerFeeRateOpt: number
+  flashLoanDepositFeeRateOpt: number
+  reduceOnlyOpt: number
+  groupInsuranceFundOpt: boolean
+  oracleOpt: PublicKey
 }
 
 export type ListingArgsFormatted = {
@@ -88,41 +124,37 @@ export type ListingArgsFormatted = {
   tokenConditionalSwapTakerFeeRate: number
   flashLoanDepositFeeRate: number
   reduceOnly: string
+  oracle: string
 }
 
 export type EditTokenArgsFormatted = ListingArgsFormatted & {
   groupInsuranceFund: boolean
 }
 
-const transformPresetToProposed = (
-  listingPreset: ListingPreset | Record<string, never>
-) => {
-  const proposedPreset: PureListingArgsOrEmptyObj =
-    Object.keys(listingPreset).length !== 0
-      ? {
-          ...(listingPreset as ListingPreset),
-          'oracleConfig.maxStalenessSlots': listingPreset.maxStalenessSlots!,
-          'oracleConfig.confFilter': listingPreset.oracleConfFilter,
-          'interestRateParams.adjustmentFactor': listingPreset.adjustmentFactor,
-          'interestRateParams.util0': listingPreset.util0,
-          'interestRateParams.rate0': listingPreset.rate0,
-          'interestRateParams.util1': listingPreset.util1,
-          'interestRateParams.rate1': listingPreset.rate1,
-          'interestRateParams.maxRate': listingPreset.maxRate,
-        }
-      : {}
+const transformPresetToProposed = (listingPreset: ListingPreset) => {
+  const proposedPreset: FormattedListingPreset = {
+    ...listingPreset,
+    'oracleConfig.maxStalenessSlots': listingPreset.maxStalenessSlots!,
+    'oracleConfig.confFilter': listingPreset.oracleConfFilter,
+    'interestRateParams.adjustmentFactor': listingPreset.adjustmentFactor,
+    'interestRateParams.util0': listingPreset.util0,
+    'interestRateParams.rate0': listingPreset.rate0,
+    'interestRateParams.util1': listingPreset.util1,
+    'interestRateParams.rate1': listingPreset.rate1,
+    'interestRateParams.maxRate': listingPreset.maxRate,
+    groupInsuranceFund: listingPreset.insuranceFound,
+  }
 
   return proposedPreset
 }
 
-type PureListingArgsOrEmptyObj =
-  | Record<string, never>
-  | (Omit<ListingArgs, 'name' | 'tokenIndex'> & {
-      preset_name: string
-    })
+type FormattedListingPreset = Omit<
+  FlatListingArgs,
+  'name' | 'tokenIndex' | 'oracle'
+>
 
 type ProposedListingPresets = {
-  [key in LISTING_PRESETS_KEYS]: PureListingArgsOrEmptyObj
+  [key in LISTING_PRESETS_KEYS]: FormattedListingPreset
 }
 
 export const getFormattedListingPresets = (isPythOracle: boolean) => {
