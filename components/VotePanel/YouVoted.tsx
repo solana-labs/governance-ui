@@ -207,6 +207,7 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
           assertUnreachable(vote.voteType as never)
         )}
       </div>
+
       {(isVoting || isInCoolOffTime) && (
         <div className="items-center justify-center flex w-full gap-5">
           <div className="flex flex-col gap-6 items-center">
