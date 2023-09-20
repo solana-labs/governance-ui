@@ -1,4 +1,9 @@
-import { GovernanceAccountType, VoteKind, VoteType, withFinalizeVote } from '@solana/spl-governance'
+import {
+  GovernanceAccountType,
+  VoteKind,
+  VoteType,
+  withFinalizeVote,
+} from '@solana/spl-governance'
 import { TransactionInstruction } from '@solana/web3.js'
 import { useState } from 'react'
 import { relinquishVote } from '../../actions/relinquishVote'
@@ -144,38 +149,42 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
 
   const vote = ownVoteRecord?.account.vote
 
-  const isMulti = proposal?.account.voteType !== VoteType.SINGLE_CHOICE
-    && proposal?.account.accountType === GovernanceAccountType.ProposalV2
-    
+  const isMulti =
+    proposal?.account.voteType !== VoteType.SINGLE_CHOICE &&
+    proposal?.account.accountType === GovernanceAccountType.ProposalV2
+
   return vote !== undefined ? (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-4">
       <div className="flex flex-col items-center justify-center">
         <h3 className="text-center">
           {quorum === 'electoral' ? 'Your vote' : 'You voted to veto'}
         </h3>
-        {vote.voteType === VoteKind.Approve ? 
-          isMulti ? 
-            vote.approveChoices?.map((choice, index) => (
-              choice.weightPercentage ?
-              <div className="p-1 w-full" key={index}>
-                <Button
-                  className='w-full border border-primary-light text-primary-light bg-transparent'
-                  disabled={true}
-                >
-                  <div className="flex flex-row gap-2 justify-center">
-                    <div><CheckmarkFilled /></div>
-                    <div>{proposal?.account.options[index].label}</div>
-                  </div>
-                </Button>
+        {vote.voteType === VoteKind.Approve ? (
+          isMulti ? (
+            vote.approveChoices?.map((choice, index) =>
+              choice.weightPercentage ? (
+                <div className="p-1 w-full" key={index}>
+                  <Button
+                    className="w-full border border-primary-light text-primary-light bg-transparent"
+                    disabled={true}
+                  >
+                    <div className="flex flex-row gap-2 justify-center">
+                      <div>
+                        <CheckmarkFilled />
+                      </div>
+                      <div>{proposal?.account.options[index].label}</div>
+                    </div>
+                  </Button>
+                </div>
+              ) : null
+            )
+          ) : (
+            <Tooltip content={`You voted "Yes"`}>
+              <div className="flex flex-row items-center justify-center rounded-full border border-[#8EFFDD] p-2 mt-2">
+                <ThumbUpIcon className="h-4 w-4 fill-[#8EFFDD]" />
               </div>
-              : null
-            )) 
-          : (
-          <Tooltip content={`You voted "Yes"`}>
-            <div className="flex flex-row items-center justify-center rounded-full border border-[#8EFFDD] p-2 mt-2">
-              <ThumbUpIcon className="h-4 w-4 fill-[#8EFFDD]" />
-            </div>
-          </Tooltip>
+            </Tooltip>
+          )
         ) : vote.voteType === VoteKind.Deny ? (
           <Tooltip content={`You voted "No"`}>
             <div className="flex flex-row items-center justify-center rounded-full border border-[#FF7C7C] p-2 mt-2">
@@ -209,6 +218,29 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
               disabled={!isWithdrawEnabled || isLoading}
             >
               Withdraw Vote
+            </Button>
+
+            {isInCoolOffTime && (
+              <div className="text-xs">
+                Warning: If you withdraw your vote now you can only deny the
+                proposal its not possible to vote yes during cool off time
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {!isVoting && !isInCoolOffTime && !ownVoteRecord?.account.isRelinquished && (
+        <div className="items-center justify-center flex w-full gap-5">
+          <div className="flex flex-col gap-6 items-center">
+            <Button
+              className="min-w-[200px]"
+              isLoading={isLoading}
+              tooltipMessage={withdrawTooltipContent}
+              onClick={() => submitRelinquishVote()}
+              disabled={!isWithdrawEnabled || isLoading}
+            >
+              Relinquish Vote
             </Button>
 
             {isInCoolOffTime && (
