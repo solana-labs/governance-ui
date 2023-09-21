@@ -45,7 +45,7 @@ export const Deposit = ({ role }: { role: 'community' | 'council' }) => {
     return { mint, userAta, mintInfo } as const
   }, [connection, realm, role, walletPk])
 
-  const depositAmount = result?.userAta
+  const depositAmount = result?.userAta?.amount
     ? new BigNumber(result.userAta.amount.toString())
     : new BigNumber(0)
 

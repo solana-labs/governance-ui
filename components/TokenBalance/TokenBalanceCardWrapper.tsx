@@ -14,6 +14,8 @@ import {
 } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import ClaimUnreleasedPositions from 'HeliumVotePlugin/components/ClaimUnreleasedPositions'
+import VanillaAccountDetails from './VanillaAccountDetails'
+import GovernancePowerCard from '@components/GovernancePower/GovernancePowerCard'
 
 const LockPluginTokenBalanceCard = dynamic(
   () =>
@@ -29,14 +31,11 @@ const HeliumVotingPowerCard = dynamic(() =>
   })
 )
 
-const VanillaTokenBalanceCard = dynamic(
-  () => import('./VanillaTokenBalanceCard')
-)
 const NftVotingPower = dynamic(
   () => import('../ProposalVotingPower/NftVotingPower')
 )
 
-const GovernancePowerTitle = () => {
+export const GovernancePowerTitle = () => {
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
   const wallet = useWalletOnePointOh()
@@ -114,7 +113,11 @@ const TokenBalanceCardInner = ({
           <>
             {!inAccountDetails && <GovernancePowerTitle />}
             <NftVotingPower inAccountDetails={inAccountDetails} />
-            <VanillaTokenBalanceCard inAccountDetails={inAccountDetails} />
+            {inAccountDetails ? (
+              <VanillaAccountDetails />
+            ) : (
+              <GovernancePowerCard />
+            )}
             <ClaimUnreleasedNFTs inAccountDetails={inAccountDetails} />
           </>
         ) : (
@@ -131,11 +134,9 @@ const TokenBalanceCardInner = ({
   //Default
   return (
     <>
-      {!inAccountDetails && <GovernancePowerTitle />}
-      <VanillaTokenBalanceCard inAccountDetails={inAccountDetails}>
-        {/*Add the gateway card if this is a gated DAO*/}
-        {isGatewayMode && <GatewayCard></GatewayCard>}
-      </VanillaTokenBalanceCard>
+      {inAccountDetails ? <VanillaAccountDetails /> : <GovernancePowerCard />}
+
+      {isGatewayMode && <GatewayCard />}
     </>
   )
 }
