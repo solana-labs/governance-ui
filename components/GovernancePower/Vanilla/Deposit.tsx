@@ -1,6 +1,5 @@
 import { BigNumber } from 'bignumber.js'
 import { SecondaryButton } from '@components/Button'
-import { getMintMetadata } from '../instructions/programs/splToken'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useConnection } from '@solana/wallet-adapter-react'
@@ -14,6 +13,7 @@ import BN from 'bn.js'
 import { fetchMintInfoByPubkey } from '@hooks/queries/mintInfo'
 import { fetchTokenAccountByPubkey } from '@hooks/queries/tokenAccount'
 import { useDepositCallback } from './useDepositCallback'
+import { getMintMetadata } from '@components/instructions/programs/splToken'
 
 export const Deposit = ({ role }: { role: 'community' | 'council' }) => {
   const realm = useRealmQuery().data?.result

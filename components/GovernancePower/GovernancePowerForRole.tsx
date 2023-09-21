@@ -5,10 +5,10 @@ import { useAsync } from 'react-async-hook'
 import { determineVotingPowerType } from '@hooks/queries/governancePower'
 import { useConnection } from '@solana/wallet-adapter-react'
 import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
-import VanillaVotingPower from '@components/ProposalVotingPower/VanillaVotingPower'
 import LockedCommunityVotingPower from '@components/ProposalVotingPower/LockedCommunityVotingPower'
 import NftVotingPower from '@components/ProposalVotingPower/NftVotingPower'
 import LockedCommunityNFTRecordVotingPower from '@components/ProposalVotingPower/LockedCommunityNFTRecordVotingPower'
+import VanillaVotingPower from './Vanilla/VanillaVotingPower'
 
 export default function GovernancePowerForRole({
   role,

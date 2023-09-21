@@ -4,8 +4,6 @@ import classNames from 'classnames'
 
 import useRealm from '@hooks/useRealm'
 
-import { getMintMetadata } from '../instructions/programs/splToken'
-import VotingPowerPct from './VotingPowerPct'
 import { useTokenOwnerRecordsDelegatedToUser } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
@@ -18,6 +16,8 @@ import {
 import { useAsync } from 'react-async-hook'
 import BN from 'bn.js'
 import { Deposit } from './Deposit'
+import { getMintMetadata } from '@components/instructions/programs/splToken'
+import VotingPowerPct from '@components/ProposalVotingPower/VotingPowerPct'
 
 interface Props {
   className?: string

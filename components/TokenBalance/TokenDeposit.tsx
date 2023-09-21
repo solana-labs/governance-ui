@@ -37,8 +37,8 @@ import { useConnection } from '@solana/wallet-adapter-react'
 import queryClient from '@hooks/queries/queryClient'
 import { proposalQueryKeys } from '@hooks/queries/proposal'
 import asFindable from '@utils/queries/asFindable'
-import VanillaVotingPower from '@components/ProposalVotingPower/VanillaVotingPower'
-import { useDepositCallback } from '@components/ProposalVotingPower/useDepositCallback'
+import { useDepositCallback } from '@components/GovernancePower/Vanilla/useDepositCallback'
+import VanillaVotingPower from '@components/GovernancePower/Vanilla/VanillaVotingPower'
 
 export const TokenDeposit = ({
   mint,
