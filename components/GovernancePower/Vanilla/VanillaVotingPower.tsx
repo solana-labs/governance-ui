@@ -18,6 +18,8 @@ import BN from 'bn.js'
 import { Deposit } from './Deposit'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import VotingPowerPct from '@components/ProposalVotingPower/VotingPowerPct'
+import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
+import { abbreviateAddress } from '@utils/formatting'
 
 interface Props {
   className?: string
@@ -46,11 +48,18 @@ export default function VanillaVotingPower({ role, ...props }: Props) {
     [connection, relevantTOR]
   )
 
+  // If the user is using a delegator, we want to show that and not count the other delegators
+  const selectedDelegator = useSelectedDelegatorStore((s) =>
+    role === 'community' ? s.communityDelegator : s.councilDelegator
+  )
+
   const torsDelegatedToUser = useTokenOwnerRecordsDelegatedToUser()
 
   const { result: delegatorsAmount } = useAsync(
     async () =>
-      torsDelegatedToUser === undefined || relevantMint === undefined
+      selectedDelegator !== undefined
+        ? new BN(0)
+        : torsDelegatedToUser === undefined || relevantMint === undefined
         ? undefined
         : (
             await Promise.all(
@@ -61,7 +70,7 @@ export default function VanillaVotingPower({ role, ...props }: Props) {
                 .map((x) => getVanillaGovpower(connection, x.pubkey))
             )
           ).reduce((partialSum, a) => partialSum.add(a), new BN(0)),
-    [connection, relevantMint, torsDelegatedToUser]
+    [connection, relevantMint, selectedDelegator, torsDelegatedToUser]
   )
 
   const totalAmount = (delegatorsAmount ?? new BN(0)).add(
@@ -114,7 +123,13 @@ export default function VanillaVotingPower({ role, ...props }: Props) {
                 {formattedTotal}
               </div>
               <div className="text-xs text-fgd-3">
-                ({formattedDelegatorsAmount} from delegators)
+                {selectedDelegator !== undefined ? (
+                  // if we're acting as a specific delegator, show that instead of the delegator aggregation
+                  <>(as {abbreviateAddress(selectedDelegator)})</>
+                ) : formattedDelegatorsAmount !== undefined &&
+                  formattedDelegatorsAmount !== '0' ? (
+                  <>({formattedDelegatorsAmount} from delegators)</>
+                ) : null}
               </div>
             </div>
 
