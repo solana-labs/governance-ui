@@ -14,7 +14,6 @@ import { useIsVoting } from './hooks'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
 import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
-import DelegateCard from '@components/DelegateCard'
 import DelegateBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
 
 const VotePanel = () => {

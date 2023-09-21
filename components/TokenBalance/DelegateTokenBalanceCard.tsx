@@ -96,6 +96,10 @@ const DelegateBalanceCard = () => {
             return acc
           }
 
+          if (!accountInfo.owner.equals(UXD_STAKING_PROGRAM)) {
+            return acc
+          }
+
           const govTokenOwner = communityTorsDelegatedToUser[
             index
           ].account.governingTokenOwner.toBase58()
