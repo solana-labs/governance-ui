@@ -6,6 +6,7 @@ import { WSOL_MINT } from '@components/instructions/tools'
 import overrides from 'public/realms/token-overrides.json'
 import { MAINNET_USDC_MINT } from '@foresight-tmp/foresight-sdk/dist/consts'
 import { Price, TokenInfo } from './types'
+import { chunks } from '@utils/helpers'
 
 //this service provide prices it is not recommended to get anything more from here besides token name or price.
 //decimals from metadata can be different from the realm on chain one
@@ -49,37 +50,40 @@ class TokenPriceService {
   }
   async fetchTokenPrices(mintAddresses: string[]) {
     if (mintAddresses.length) {
-      const mintAddressesWithSol = [...mintAddresses, WSOL_MINT]
-      const symbols = mintAddressesWithSol.join(',')
-      try {
-        const USDC_MINT = MAINNET_USDC_MINT.toBase58()
-        const response = await axios.get(`${priceEndpoint}?ids=${symbols}`)
-        const priceToUsd: Price[] = response?.data?.data
-          ? Object.values(response.data.data)
-          : []
-        const keyValue = Object.fromEntries(
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          Object.entries(priceToUsd).map(([key, val]) => [val.id, val])
-        )
+      //can query only 100 at once
+      const mintAddressesWithSol = chunks([...mintAddresses, WSOL_MINT], 100)
+      for (const mintChunk of mintAddressesWithSol) {
+        const symbols = mintChunk.join(',')
+        try {
+          const response = await axios.get(`${priceEndpoint}?ids=${symbols}`)
+          const priceToUsd: Price[] = response?.data?.data
+            ? Object.values(response.data.data)
+            : []
+          const keyValue = Object.fromEntries(
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            Object.entries(priceToUsd).map(([key, val]) => [val.id, val])
+          )
 
-        this._tokenPriceToUSDlist = {
-          ...this._tokenPriceToUSDlist,
-          ...keyValue,
-        }
-        if (!this._tokenPriceToUSDlist[USDC_MINT]) {
-          this._tokenPriceToUSDlist[USDC_MINT] = {
-            id: USDC_MINT,
-            mintSymbol: 'USDC',
-            price: 1,
-            vsToken: USDC_MINT,
-            vsTokenSymbol: 'USDC',
+          this._tokenPriceToUSDlist = {
+            ...this._tokenPriceToUSDlist,
+            ...keyValue,
           }
+        } catch (e) {
+          notify({
+            type: 'error',
+            message: 'unable to fetch token prices',
+          })
         }
-      } catch (e) {
-        notify({
-          type: 'error',
-          message: 'unable to fetch token prices',
-        })
+      }
+      const USDC_MINT = MAINNET_USDC_MINT.toBase58()
+      if (!this._tokenPriceToUSDlist[USDC_MINT]) {
+        this._tokenPriceToUSDlist[USDC_MINT] = {
+          id: USDC_MINT,
+          mintSymbol: 'USDC',
+          price: 1,
+          vsToken: USDC_MINT,
+          vsTokenSymbol: 'USDC',
+        }
       }
     }
   }

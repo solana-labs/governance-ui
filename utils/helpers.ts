@@ -90,3 +90,19 @@ export async function getFilteredProgramAccounts(
     })
   )
 }
+
+export const getProposalDepositPk = (
+  proposal: PublicKey,
+  proposalOwnerWallet: PublicKey,
+  programId: PublicKey
+) => {
+  const [proposalDeposit] = PublicKey.findProgramAddressSync(
+    [
+      Buffer.from('proposal-deposit'),
+      proposal.toBuffer(),
+      proposalOwnerWallet.toBuffer(),
+    ],
+    programId
+  )
+  return proposalDeposit
+}

@@ -155,6 +155,8 @@ export class VotingClient {
     type: UpdateVoterWeightRecordTypes,
     createNftActionTicketIxs?: TransactionInstruction[]
   ): Promise<ProgramAddresses | undefined> => {
+    if (this.noClient) return
+
     const realm = this.realm!
     const torAccount = await fetchTokenOwnerRecordByPubkey(
       this.client!.program.provider.connection,
@@ -163,7 +165,6 @@ export class VotingClient {
     console.log(this.client)
     if (!torAccount.result) return
     if (
-      this.noClient ||
       !realm.account.communityMint.equals(
         torAccount.result.account.governingTokenMint
       )

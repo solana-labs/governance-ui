@@ -22,6 +22,7 @@ const MINT_METADATA = {
   MyHd6a7HWKTMeJMHBkrbMq4hZwZxwn9x7dxXcopQ4Wd: { name: 'OMH' },
   UXPhBoR3qG4UCiGNJfV7MqhHyFqKN68g45GoYvAeL2M: { name: 'UXP' },
   H7uqouPsJkeEiLpCEoC1qYVVquDrZan6ZfdPK2gS44zm: { name: 'FORE' },
+  BaoawH9p2J8yUK9r5YXQs3hQwmUJgscACjmTkh8rMwYL: { name: 'ALL' },
 }
 
 export function getMintMetadata(

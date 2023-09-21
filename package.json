@@ -27,7 +27,7 @@
     ]
   },
   "dependencies": {
-    "@blockworks-foundation/mango-v4": "0.19.27",
+    "@blockworks-foundation/mango-v4": "0.19.29",
     "@blockworks-foundation/mango-v4-settings": "0.2.10",
     "@blockworks-foundation/mangolana": "0.0.1-beta.15",
     "@bonfida/spl-name-service": "0.1.47",
