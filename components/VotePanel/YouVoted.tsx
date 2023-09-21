@@ -66,6 +66,9 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
   const voterTokenRecord =
     quorum === 'electoral' ? electoralVoterTokenRecord : vetoVotertokenRecord
 
+  const isRelinquished = ownVoteRecord?.account.isRelinquished === true
+  const isVoteCast = !!ownVoteRecord
+
   const isWithdrawEnabled =
     connected &&
     ownVoteRecord &&
@@ -206,6 +209,29 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
         ) : (
           assertUnreachable(vote.voteType as never)
         )}
+
+        {isVoteCast && quorum === 'electoral' ? (
+          <>
+            <h3 className="text-center mt-6">Vote Relinquish</h3>
+            <div className="text-center mt-2 italic text-xs mb-2">
+              Required to withdraw governance tokens
+            </div>
+
+            {isRelinquished ? (
+              <Tooltip content="Vote has been relinquished">
+                <div className="flex flex-row items-center justify-center rounded-full border border-[#8EFFDD] p-2 mt-2">
+                  <ThumbUpIcon className="h-4 w-4 fill-[#8EFFDD]" />
+                </div>
+              </Tooltip>
+            ) : (
+              <Tooltip content="Vote has not been relinquished">
+                <div className="flex flex-row items-center justify-center rounded-full border border-[#FF7C7C] p-2 mt-2">
+                  <ThumbDownIcon className="h-4 w-4 fill-[#FF7C7C]" />
+                </div>
+              </Tooltip>
+            )}
+          </>
+        ) : null}
       </div>
 
       {(isVoting || isInCoolOffTime) && (

@@ -27,10 +27,6 @@ const VotePanel = () => {
   const isVoteCast = ownVoteRecord?.result !== undefined
   const isVoting = useIsVoting()
 
-  console.log('isVoteCast', isVoteCast)
-  console.log('ownVoteRecord', JSON.stringify(ownVoteRecord, null, 5))
-  console.log('wallet pubkey', wallet?.publicKey?.toBase58())
-
   const didNotVote =
     connected &&
     !!proposal &&
