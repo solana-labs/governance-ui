@@ -80,8 +80,13 @@ const Account = ({
     return (
       <>
         <AccountInner withHeader={withHeader} displayPanel={displayPanel} />
-        <div className="md:w-col-span-6 md:max-w- col-span-12">
-          <DelegateCard />
+        <div className="col-span-12 grid grid-cols-2 gap-4">
+          <div className="col-span-2 md:col-span-1">
+            <DelegateCard />
+          </div>
+          <div className="col-span-2 md:col-span-1">
+            <DelegatorOptions />
+          </div>
         </div>
       </>
     )
