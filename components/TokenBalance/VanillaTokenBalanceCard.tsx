@@ -12,7 +12,7 @@ import {
 } from '@hooks/queries/mintInfo'
 import { TokenDeposit } from './TokenDeposit'
 
-const TokenBalanceCard = ({
+const VanillaTokenBalanceCard = ({
   proposal,
   inAccountDetails = false,
   children,
@@ -96,4 +96,4 @@ const TokenBalanceCard = ({
   )
 }
 
-export default TokenBalanceCard
+export default VanillaTokenBalanceCard

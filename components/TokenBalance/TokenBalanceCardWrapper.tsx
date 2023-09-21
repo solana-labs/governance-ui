@@ -1,5 +1,3 @@
-import { Proposal } from '@solana/spl-governance'
-import { Option } from 'tools/core/option'
 import useRealm from '@hooks/useRealm'
 import dynamic from 'next/dynamic'
 import { ChevronRightIcon } from '@heroicons/react/solid'
@@ -31,7 +29,9 @@ const HeliumVotingPowerCard = dynamic(() =>
   })
 )
 
-const TokenBalanceCard = dynamic(() => import('./TokenBalanceCard'))
+const VanillaTokenBalanceCard = dynamic(
+  () => import('./VanillaTokenBalanceCard')
+)
 const NftVotingPower = dynamic(
   () => import('../ProposalVotingPower/NftVotingPower')
 )
@@ -63,10 +63,8 @@ const GovernancePowerTitle = () => {
 }
 
 const TokenBalanceCardInner = ({
-  proposal,
   inAccountDetails,
 }: {
-  proposal?: Option<Proposal>
   inAccountDetails?: boolean
 }) => {
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
@@ -116,10 +114,7 @@ const TokenBalanceCardInner = ({
           <>
             {!inAccountDetails && <GovernancePowerTitle />}
             <NftVotingPower inAccountDetails={inAccountDetails} />
-            <TokenBalanceCard
-              proposal={proposal}
-              inAccountDetails={inAccountDetails}
-            />
+            <VanillaTokenBalanceCard inAccountDetails={inAccountDetails} />
             <ClaimUnreleasedNFTs inAccountDetails={inAccountDetails} />
           </>
         ) : (
@@ -137,29 +132,24 @@ const TokenBalanceCardInner = ({
   return (
     <>
       {!inAccountDetails && <GovernancePowerTitle />}
-      <TokenBalanceCard proposal={proposal} inAccountDetails={inAccountDetails}>
+      <VanillaTokenBalanceCard inAccountDetails={inAccountDetails}>
         {/*Add the gateway card if this is a gated DAO*/}
         {isGatewayMode && <GatewayCard></GatewayCard>}
-      </TokenBalanceCard>
+      </VanillaTokenBalanceCard>
     </>
   )
 }
 
 const TokenBalanceCardWrapper = ({
-  proposal,
   inAccountDetails,
 }: {
-  proposal?: Option<Proposal>
   inAccountDetails?: boolean
 }) => {
   return (
     <div
       className={`rounded-lg bg-bkg-2 ${inAccountDetails ? `` : `p-4 md:p-6`}`}
     >
-      <TokenBalanceCardInner
-        proposal={proposal}
-        inAccountDetails={inAccountDetails}
-      />
+      <TokenBalanceCardInner inAccountDetails={inAccountDetails} />
     </div>
   )
 }
