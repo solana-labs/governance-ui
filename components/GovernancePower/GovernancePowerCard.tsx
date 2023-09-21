@@ -1,7 +1,32 @@
-import { GovernancePowerTitle } from '@components/TokenBalance/TokenBalanceCardWrapper'
+import { ChevronRightIcon } from '@heroicons/react/solid'
 import { useGovernancePowerAsync } from '@hooks/queries/governancePower'
+import useQueryContext from '@hooks/useQueryContext'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import GovernancePowerForRole from './GovernancePowerForRole'
+
+const GovernancePowerTitle = () => {
+  const { symbol } = useRouter().query
+  const { fmtUrlWithCluster } = useQueryContext()
+  const connected = useWalletOnePointOh()?.connected ?? undefined
+
+  return (
+    <div className="flex items-center justify-between mb-4">
+      <h3 className="mb-0">My governance power</h3>
+      <Link href={fmtUrlWithCluster(`/dao/${symbol}/account/me`)}>
+        <a
+          className={`default-transition flex items-center text-fgd-2 text-sm transition-all hover:text-fgd-3 ${
+            !connected ? 'opacity-50 pointer-events-none' : ''
+          }`}
+        >
+          View
+          <ChevronRightIcon className="flex-shrink-0 w-6 h-6" />
+        </a>
+      </Link>
+    </div>
+  )
+}
 
 const GovernancePowerCard = () => {
   const connected = useWalletOnePointOh()?.connected ?? false
