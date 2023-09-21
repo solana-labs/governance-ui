@@ -63,7 +63,13 @@ const VotePanel = () => {
       <YouVoted quorum="veto" />
       {!isMulti && <VetoButtons />}
 
-      <DelegateBalanceCard />
+      {connected ? (
+        <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-4">
+          <div className="flex flex-col p-4">
+            <DelegateBalanceCard />
+          </div>
+        </div>
+      ) : null}
       {/* END */}
     </>
   )
