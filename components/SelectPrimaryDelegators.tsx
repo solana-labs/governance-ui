@@ -67,16 +67,6 @@ const SelectPrimaryDelegators = () => {
   return (
     <>
       {walletId &&
-        councilTorsDelegatedToUser &&
-        councilTorsDelegatedToUser.length > 0 && (
-          <PrimaryDelegatorSelect
-            selectedDelegator={councilDelegator}
-            handleSelect={handleCouncilSelect}
-            kind={'council'}
-            tors={councilTorsDelegatedToUser}
-          />
-        )}
-      {walletId &&
         communityTorsDelegatedToUser &&
         communityTorsDelegatedToUser.length > 0 && (
           <PrimaryDelegatorSelect
@@ -84,6 +74,16 @@ const SelectPrimaryDelegators = () => {
             handleSelect={handleCommunitySelect}
             kind={'community'}
             tors={communityTorsDelegatedToUser}
+          />
+        )}
+      {walletId &&
+        councilTorsDelegatedToUser &&
+        councilTorsDelegatedToUser.length > 0 && (
+          <PrimaryDelegatorSelect
+            selectedDelegator={councilDelegator}
+            handleSelect={handleCouncilSelect}
+            kind={'council'}
+            tors={councilTorsDelegatedToUser}
           />
         )}
     </>
