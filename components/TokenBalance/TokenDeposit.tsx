@@ -48,8 +48,7 @@ import queryClient from '@hooks/queries/queryClient'
 import { proposalQueryKeys } from '@hooks/queries/proposal'
 import asFindable from '@utils/queries/asFindable'
 import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
-import CommunityVotingPower from '@components/ProposalVotingPower/CommunityVotingPower'
-import CouncilVotingPower from '@components/ProposalVotingPower/CouncilVotingPower'
+import VanillaVotingPower from '@components/ProposalVotingPower/VanillaVotingPower'
 
 export const TokenDeposit = ({
   mint,
@@ -380,9 +379,9 @@ export const TokenDeposit = ({
       {(availableTokens != '0' || inAccountDetails) && (
         <div className="flex items-center mt-4 space-x-4">
           {tokenRole === GoverningTokenRole.Community ? (
-            <CommunityVotingPower className="w-full" />
+            <VanillaVotingPower className="w-full" role="community" />
           ) : (
-            <CouncilVotingPower className="w-full" />
+            <VanillaVotingPower className="w-full" role="council" />
           )}
         </div>
       )}

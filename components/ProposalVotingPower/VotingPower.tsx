@@ -1,7 +1,6 @@
 import classNames from 'classnames'
 
-import CommunityVotingPower from './CommunityVotingPower'
-import CouncilVotingPower from './CouncilVotingPower'
+import VanillaVotingPower from './VanillaVotingPower'
 import LockedCommunityVotingPower from './LockedCommunityVotingPower'
 import NftVotingPower from './NftVotingPower'
 import LockedCommunityNFTRecordVotingPower from './LockedCommunityNFTRecordVotingPower'
@@ -41,7 +40,7 @@ export default function VotingPower(props: Props) {
     <div className={classNames(props.className, 'space-y-2')}>
       {votePop === 'community' ? (
         kind === 'vanilla' ? (
-          <CommunityVotingPower />
+          <VanillaVotingPower role="community" />
         ) : kind === 'VSR' ? (
           <LockedCommunityVotingPower />
         ) : kind === 'NFT' ? (
@@ -50,7 +49,7 @@ export default function VotingPower(props: Props) {
           <LockedCommunityNFTRecordVotingPower />
         ) : null
       ) : kind === 'vanilla' ? (
-        <CouncilVotingPower />
+        <VanillaVotingPower role="council" />
       ) : null}
     </div>
   )

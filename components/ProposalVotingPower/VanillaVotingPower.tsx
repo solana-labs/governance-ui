@@ -11,15 +11,22 @@ import VotingPowerPct from './VotingPowerPct'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useTokenOwnerRecordsDelegatedToUser } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
-import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
+import {
+  useMintInfoByPubkeyQuery,
+  useRealmCommunityMintInfoQuery,
+} from '@hooks/queries/mintInfo'
 import { useConnection } from '@solana/wallet-adapter-react'
 import { getVanillaGovpower } from '@hooks/queries/governancePower'
-import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
+import {
+  useAddressQuery_CommunityTokenOwner,
+  useAddressQuery_CouncilTokenOwner,
+} from '@hooks/queries/addresses/tokenOwnerRecord'
 import { useAsync } from 'react-async-hook'
 import BN from 'bn.js'
 
 interface Props {
   className?: string
+  role: 'community' | 'council'
 }
 
 const Deposit = () => {
@@ -68,37 +75,44 @@ const Deposit = () => {
   )
 }
 
-export default function CommunityVotingPower(props: Props) {
+export default function VanillaVotingPower({ role, ...props }: Props) {
   const realm = useRealmQuery().data?.result
-  const mintInfo = useRealmCommunityMintInfoQuery().data?.result
   const { realmInfo } = useRealm()
 
   const { data: communityTOR } = useAddressQuery_CommunityTokenOwner()
+  const { data: councilTOR } = useAddressQuery_CouncilTokenOwner()
+
   const { connection } = useConnection()
 
+  const relevantTOR = role === 'community' ? communityTOR : councilTOR
+  const relevantMint =
+    role === 'community'
+      ? realm?.account.communityMint
+      : realm?.account.config.councilMint
+
+  const mintInfo = useMintInfoByPubkeyQuery(relevantMint).data?.result
+
   const { result: personalAmount } = useAsync(
-    async () => communityTOR && getVanillaGovpower(connection, communityTOR),
-    [communityTOR, connection]
+    async () => relevantTOR && getVanillaGovpower(connection, relevantTOR),
+    [connection, relevantTOR]
   )
 
   const torsDelegatedToUser = useTokenOwnerRecordsDelegatedToUser()
 
   const { result: delegatorsAmount } = useAsync(
     async () =>
-      torsDelegatedToUser === undefined || realm === undefined
+      torsDelegatedToUser === undefined || relevantMint === undefined
         ? undefined
         : (
             await Promise.all(
               torsDelegatedToUser
                 .filter((x) =>
-                  x.account.governingTokenMint.equals(
-                    realm.account.communityMint
-                  )
+                  x.account.governingTokenMint.equals(relevantMint)
                 )
                 .map((x) => getVanillaGovpower(connection, x.pubkey))
             )
           ).reduce((partialSum, a) => partialSum.add(a), new BN(0)),
-    [connection, realm, torsDelegatedToUser]
+    [connection, relevantMint, torsDelegatedToUser]
   )
 
   const totalAmount = (delegatorsAmount ?? new BN(0)).add(
@@ -125,9 +139,8 @@ export default function CommunityVotingPower(props: Props) {
     [delegatorsAmount, mintInfo]
   )
 
-  const depositMint = realm?.account.communityMint
   const tokenName =
-    getMintMetadata(depositMint)?.name ?? realm?.account.name ?? ''
+    getMintMetadata(relevantMint)?.name ?? realm?.account.name ?? ''
 
   if (!(realm && realmInfo)) {
     return (
