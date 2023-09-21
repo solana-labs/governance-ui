@@ -1,20 +1,14 @@
 import { BigNumber } from 'bignumber.js'
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 import classNames from 'classnames'
 
 import useRealm from '@hooks/useRealm'
-import { SecondaryButton } from '@components/Button'
 
 import { getMintMetadata } from '../instructions/programs/splToken'
-import depositTokens from './depositTokens'
 import VotingPowerPct from './VotingPowerPct'
-import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useTokenOwnerRecordsDelegatedToUser } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
-import {
-  useMintInfoByPubkeyQuery,
-  useRealmCommunityMintInfoQuery,
-} from '@hooks/queries/mintInfo'
+import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
 import { useConnection } from '@solana/wallet-adapter-react'
 import { getVanillaGovpower } from '@hooks/queries/governancePower'
 import {
@@ -23,56 +17,11 @@ import {
 } from '@hooks/queries/addresses/tokenOwnerRecord'
 import { useAsync } from 'react-async-hook'
 import BN from 'bn.js'
+import { Deposit } from './Deposit'
 
 interface Props {
   className?: string
   role: 'community' | 'council'
-}
-
-const Deposit = () => {
-  const realm = useRealmQuery().data?.result
-  const mint = useRealmCommunityMintInfoQuery().data?.result
-  const { realmInfo, realmTokenAccount } = useRealm()
-  const { connection } = useConnection()
-  const wallet = useWalletOnePointOh()
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  const depositAmount = realmTokenAccount
-    ? new BigNumber(realmTokenAccount.account.amount.toString())
-    : new BigNumber(0)
-
-  const depositMint = realm?.account.communityMint
-  const tokenName =
-    getMintMetadata(depositMint)?.name ?? realm?.account.name ?? ''
-
-  const deposit = useCallback(async () => {
-    if (depositAmount && realmTokenAccount && realmInfo && realm && wallet) {
-      await depositTokens({
-        connection,
-        realmInfo,
-        realm,
-        wallet,
-        amount: depositAmount,
-        depositTokenAccount: realmTokenAccount,
-      })
-    }
-  }, [depositAmount, connection, realmTokenAccount, realmInfo, realm, wallet])
-
-  return !depositAmount.isGreaterThan(0) ? null : (
-    <>
-      <div className="mt-3 text-xs text-white/50">
-        You have{' '}
-        {mint
-          ? depositAmount.shiftedBy(-mint.decimals).toFormat()
-          : depositAmount.toFormat()}{' '}
-        more {tokenName} votes in your wallet. Do you want to deposit them to
-        increase your voting power in this Dao?
-      </div>
-      <SecondaryButton className="mt-4 w-48" onClick={deposit}>
-        Deposit
-      </SecondaryButton>
-    </>
-  )
 }
 
 export default function VanillaVotingPower({ role, ...props }: Props) {
@@ -178,7 +127,7 @@ export default function VanillaVotingPower({ role, ...props }: Props) {
           </div>
         </div>
       )}
-      <Deposit />
+      <Deposit role={role} />
     </div>
   )
 }

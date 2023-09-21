@@ -1,28 +1,20 @@
-import { BigNumber } from 'bignumber.js'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   MintInfo,
   Token,
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
-import {
-  Keypair,
-  PublicKey,
-  Transaction,
-  TransactionInstruction,
-} from '@solana/web3.js'
+import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 import BN from 'bn.js'
 import useRealm from '@hooks/useRealm'
 import { getProposal, ProposalState } from '@solana/spl-governance'
 import { getUnrelinquishedVoteRecords } from '@models/api'
-import { withDepositGoverningTokens } from '@solana/spl-governance'
 import { withRelinquishVote } from '@solana/spl-governance'
 import { withWithdrawGoverningTokens } from '@solana/spl-governance'
 import { sendTransaction } from '@utils/send'
-import { approveTokenTransfer } from '@utils/tokens'
 import Button, { SecondaryButton } from '../Button'
 import { GoverningTokenRole } from '@solana/spl-governance'
-import { fmtMintAmount, getMintDecimalAmount } from '@tools/sdk/units'
+import { fmtMintAmount } from '@tools/sdk/units'
 import { getMintMetadata } from '../instructions/programs/splToken'
 import { withFinalizeVote } from '@solana/spl-governance'
 import { chunks } from '@utils/helpers'
@@ -32,7 +24,6 @@ import { ExclamationIcon } from '@heroicons/react/outline'
 import { useEffect } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { VSR_PLUGIN_PKS } from '@constants/plugins'
-import getNumTokens from '@components/ProposalVotingPower/getNumTokens'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import {
@@ -41,14 +32,13 @@ import {
 } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
-import { useRealmCouncilMintInfoQuery } from '@hooks/queries/mintInfo'
 import { fetchGovernanceByPubkey } from '@hooks/queries/governance'
 import { useConnection } from '@solana/wallet-adapter-react'
 import queryClient from '@hooks/queries/queryClient'
 import { proposalQueryKeys } from '@hooks/queries/proposal'
 import asFindable from '@utils/queries/asFindable'
-import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 import VanillaVotingPower from '@components/ProposalVotingPower/VanillaVotingPower'
+import { useDepositCallback } from '@components/ProposalVotingPower/useDepositCallback'
 
 export const TokenDeposit = ({
   mint,
@@ -76,8 +66,6 @@ export const TokenDeposit = ({
   const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
-  const councilMint = useRealmCouncilMintInfoQuery().data?.result
-  const { result: ownVoterWeight } = useLegacyVoterWeight()
 
   const {
     realmInfo,
@@ -86,24 +74,6 @@ export const TokenDeposit = ({
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
-
-  const amount = ownVoterWeight
-    ? councilMint && tokenRole === GoverningTokenRole.Council
-      ? getNumTokens(
-          ownVoterWeight,
-          ownCouncilTokenRecord,
-          councilMint,
-          realmInfo
-        )
-      : getNumTokens(ownVoterWeight, ownCouncilTokenRecord, mint, realmInfo)
-    : new BigNumber(0)
-
-  const max: BigNumber | undefined =
-    councilMint && tokenRole === GoverningTokenRole.Council
-      ? getMintDecimalAmount(councilMint, councilMint.supply)
-      : mint
-      ? getMintDecimalAmount(mint, mint.supply)
-      : undefined
 
   const depositTokenRecord =
     tokenRole === GoverningTokenRole.Community
@@ -126,45 +96,9 @@ export const TokenDeposit = ({
     tokenRole === GoverningTokenRole.Community ? '' : 'Council'
   }`
 
-  const depositTokens = async function (amount: BN) {
-    const instructions: TransactionInstruction[] = []
-    const signers: Keypair[] = []
-
-    const transferAuthority = approveTokenTransfer(
-      instructions,
-      [],
-      depositTokenAccount!.publicKey,
-      wallet!.publicKey!,
-      amount
-    )
-
-    signers.push(transferAuthority)
-
-    await withDepositGoverningTokens(
-      instructions,
-      realmInfo!.programId,
-      getProgramVersionForRealm(realmInfo!),
-      realm!.pubkey,
-      depositTokenAccount!.publicKey,
-      depositTokenAccount!.account.mint,
-      wallet!.publicKey!,
-      transferAuthority.publicKey,
-      wallet!.publicKey!,
-      amount
-    )
-
-    const transaction = new Transaction()
-    transaction.add(...instructions)
-
-    await sendTransaction({
-      connection,
-      wallet: wallet!,
-      transaction,
-      signers,
-      sendingMessage: 'Depositing tokens',
-      successMessage: 'Tokens have been deposited',
-    })
-  }
+  const depositTokens = useDepositCallback(
+    tokenRole === GoverningTokenRole.Community ? 'community' : 'council'
+  )
 
   const depositAllTokens = async () =>
     await depositTokens(depositTokenAccount!.account.amount)
