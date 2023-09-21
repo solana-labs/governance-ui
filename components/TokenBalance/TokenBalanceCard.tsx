@@ -4,7 +4,6 @@ import { Proposal } from '@solana/spl-governance'
 import { Option } from '@tools/core/option'
 import { GoverningTokenRole } from '@solana/spl-governance'
 import { useState } from 'react'
-import SerumGovernanceTokenWrapper from './SerumGovernanceTokenWrapper'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import {
@@ -24,7 +23,6 @@ const TokenBalanceCard = ({
 }) => {
   const [hasGovPower, setHasGovPower] = useState<boolean>(false)
   const realm = useRealmQuery().data?.result
-  const realmProgramId = realm?.owner
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
   const wallet = useWalletOnePointOh()
@@ -92,11 +90,7 @@ const TokenBalanceCard = ({
           <div className="h-10 rounded-lg animate-pulse bg-bkg-3" />
         </>
       )}
-      {/* TODO: Restrict to Serum DAO */}
-      {realmProgramId?.toBase58() ===
-      'G41fmJzd29v7Qmdi8ZyTBBYa98ghh3cwHBTexqCG1PQJ' ? (
-        <SerumGovernanceTokenWrapper />
-      ) : null}
+
       {children}
     </>
   )
