@@ -10,6 +10,7 @@ import useRealm from '@hooks/useRealm'
 import {
   getProposal,
   GoverningTokenType,
+  Proposal,
   ProposalState,
 } from '@solana/spl-governance'
 import { getUnrelinquishedVoteRecords } from '@models/api'
@@ -25,9 +26,14 @@ import { chunks } from '@utils/helpers'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { notify } from '@utils/notifications'
 import { ExclamationIcon } from '@heroicons/react/outline'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { VSR_PLUGIN_PKS } from '@constants/plugins'
+import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
+import RelinquishVoteCount from '@components/TokenBalance/RelinquishVoteCount'
+import SerumGovernanceTokenWrapper from './SerumGovernanceTokenWrapper'
+import getNumTokens from '@components/ProposalVotingPower/getNumTokens'
+import VotingPowerPct from '@components/ProposalVotingPower/VotingPowerPct'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import {
@@ -44,6 +50,102 @@ import asFindable from '@utils/queries/asFindable'
 import VanillaVotingPower from '@components/GovernancePower/Vanilla/VanillaVotingPower'
 import { fetchTokenAccountByPubkey } from '@hooks/queries/tokenAccount'
 import { DepositTokensButton } from '@components/DepositTokensButton'
+import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
+
+const TokenBalanceCard = ({
+  proposal,
+  inAccountDetails = false,
+  children,
+}: {
+  proposal?: Option<Proposal>
+  inAccountDetails?: boolean
+  children?: React.ReactNode
+}) => {
+  const [hasGovPower, setHasGovPower] = useState<boolean>(false)
+  const realm = useRealmQuery().data?.result
+  const realmProgramId = realm?.owner
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
+  const isDepositVisible = (
+    depositMint: MintInfo | undefined,
+    realmMint: PublicKey | undefined
+  ) =>
+    depositMint &&
+    (!proposal ||
+      (proposal.isSome() &&
+        proposal.value.governingTokenMint.toBase58() === realmMint?.toBase58()))
+
+  const communityDepositVisible =
+    // If there is no council then community deposit is the only option to show
+    !realm?.account.config.councilMint ||
+    isDepositVisible(mint, realm?.account.communityMint)
+
+  const councilDepositVisible = isDepositVisible(
+    councilMint,
+    realm?.account.config.councilMint
+  )
+  const hasLoaded = mint || councilMint
+
+  return (
+    <>
+      {hasLoaded ? (
+        <div
+          className={`${
+            inAccountDetails ? `flex w-full gap-8 md:gap-12` : `space-y-4`
+          }`}
+        >
+          {!hasGovPower && !inAccountDetails && connected && (
+            <div className={'text-xs text-white/50 mt-8'}>
+              You do not have any governance power in this dao
+            </div>
+          )}
+          {!connected && (
+            <div className={'text-xs text-white/50 mt-8'}>
+              Connect your wallet to see governance power
+            </div>
+          )}
+          {communityDepositVisible && (
+            <TokenDeposit
+              mint={mint}
+              tokenRole={GoverningTokenRole.Community}
+              councilVote={false}
+              inAccountDetails={inAccountDetails}
+              setHasGovPower={setHasGovPower}
+            />
+          )}
+          {councilDepositVisible && (
+            <TokenDeposit
+              mint={councilMint}
+              tokenRole={GoverningTokenRole.Council}
+              councilVote={true}
+              inAccountDetails={inAccountDetails}
+              setHasGovPower={setHasGovPower}
+            />
+          )}
+          <DelegateTokenBalanceCard />
+          <RelinquishVoteCount />
+        </div>
+      ) : (
+        <>
+          <div className="h-12 mb-4 rounded-lg animate-pulse bg-bkg-3" />
+          <div className="h-10 rounded-lg animate-pulse bg-bkg-3" />
+        </>
+      )}
+      {/* TODO: Restrict to Serum DAO */}
+      {realmProgramId?.toBase58() ===
+      'G41fmJzd29v7Qmdi8ZyTBBYa98ghh3cwHBTexqCG1PQJ' ? (
+        <SerumGovernanceTokenWrapper />
+      ) : null}
+      {children}
+    </>
+  )
+}
 
 export const TokenDeposit = ({
   mint,
