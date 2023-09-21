@@ -102,18 +102,18 @@ export default function VanillaVotingPower({ role, ...props }: Props) {
   return (
     <div className={props.className}>
       {totalAmount === undefined || totalAmount.isZero() ? (
-        <div className={'text-xs text-white/50'}>
+        <div className={'text-xs text-fgd-3'}>
           You do not have any voting power in this dao.
         </div>
       ) : (
         <div className={'p-3 rounded-md bg-bkg-1'}>
-          <div className="text-white/50 text-xs">{tokenName} Votes</div>
+          <div className="text-fgd-3 text-xs">{tokenName} Votes</div>
           <div className="flex items-center justify-between mt-1">
             <div className=" flex flex-row gap-x-2">
               <div className="text-xl font-bold text-fgd-1 hero-text">
                 {formattedTotal}
               </div>
-              <div className="text-xs text-white/50">
+              <div className="text-xs text-fgd-3">
                 ({formattedDelegatorsAmount} from delegators)
               </div>
             </div>
