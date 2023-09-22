@@ -16,6 +16,7 @@ import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import ClaimUnreleasedPositions from 'HeliumVotePlugin/components/ClaimUnreleasedPositions'
 import VanillaAccountDetails from './VanillaAccountDetails'
 import GovernancePowerCard from '@components/GovernancePower/GovernancePowerCard'
+import SelectPrimaryDelegators from '@components/SelectPrimaryDelegators'
 
 const LockPluginTokenBalanceCard = dynamic(
   () =>
@@ -151,6 +152,7 @@ const TokenBalanceCardWrapper = ({
       className={`rounded-lg bg-bkg-2 ${inAccountDetails ? `` : `p-4 md:p-6`}`}
     >
       <TokenBalanceCardInner inAccountDetails={inAccountDetails} />
+      <SelectPrimaryDelegators />
     </div>
   )
 }
