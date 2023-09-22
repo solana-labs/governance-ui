@@ -3206,6 +3206,15 @@
     "ogImage": "/realms/ComradeDAO/img/comradedaologo.png"
   },
   {
+    "symbol": "RESON",
+    "displayName": "ResonanceDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "BsAFgmFSFAqMz9zPFA6Q2s7rkgE6pi6WTYHgygtNkN5z",
+    "website": "https://playresonance.com",
+    "twitter": "@resonancesolana",
+    "ogImage": "/realms/ResonanceDAO/img/resonancedaologo.png"
+  },
+  {
     "symbol": "PPWT",
     "displayName": "Poodle Paws DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
