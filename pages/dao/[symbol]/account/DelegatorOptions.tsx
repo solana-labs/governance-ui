@@ -6,8 +6,7 @@ import DelegatorsList from './DelegatorsList'
 const DelegatorOptions = () => {
   const delegatesArray = useTokenOwnerRecordsDelegatedToUser()
 
-  return delegatesArray === undefined ||
-    delegatesArray.length < 1 ? undefined : (
+  return delegatesArray === undefined || delegatesArray.length < 1 ? null : (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
       <h3 className="mb-4">Delegation Options</h3>
       <SelectPrimaryDelegators />
