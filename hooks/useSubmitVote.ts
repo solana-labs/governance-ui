@@ -29,6 +29,7 @@ import { NFT_PLUGINS_PKS } from '@constants/plugins'
 import { TransactionInstruction } from '@solana/web3.js'
 import useProgramVersion from './useProgramVersion'
 import useVotingTokenOwnerRecords from './useVotingTokenOwnerRecords'
+import { useMemo } from 'react'
 
 export const useSubmitVote = () => {
   const wallet = useWalletOnePointOh()
@@ -124,7 +125,7 @@ type VoteArgs = {
   comment?: string
 }
 
-export const useSubmitVoteAwesome = () => {
+export const useCreateVoteIxs = () => {
   // get info
   const programVersion = useProgramVersion()
   const realm = useRealmQuery().data?.result
@@ -137,54 +138,64 @@ export const useSubmitVoteAwesome = () => {
   // get delegates
 
   // api
-  // should this be memoized?
   const walletPk = wallet?.publicKey ?? undefined
-  const submitVote =
-    realm !== undefined &&
-    programVersion !== undefined &&
-    walletPk !== undefined
-      ? // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        async ({ voteKind, governingBody, proposal, comment }: VoteArgs) => {
-          //const signers: Keypair[] = []
-          const instructions: TransactionInstruction[] = []
+  const submitVote = useMemo(
+    () =>
+      realm !== undefined &&
+      programVersion !== undefined &&
+      walletPk !== undefined
+        ? // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          async ({ voteKind, governingBody, proposal, comment }: VoteArgs) => {
+            //const signers: Keypair[] = []
+            const instructions: TransactionInstruction[] = []
 
-          const governingTokenMint =
-            governingBody === 'community'
-              ? realm.account.communityMint
-              : realm.account.config.councilMint
-          if (governingTokenMint === undefined)
-            throw new Error(`no mint for ${governingBody} governing body`)
+            const governingTokenMint =
+              governingBody === 'community'
+                ? realm.account.communityMint
+                : realm.account.config.councilMint
+            if (governingTokenMint === undefined)
+              throw new Error(`no mint for ${governingBody} governing body`)
 
-          const vote = formatVote(voteKind)
+            const vote = formatVote(voteKind)
 
-          const votingTors = await getVotingTokenOwnerRecords(governingBody)
-          for (const torPk of votingTors) {
-            //will run only if any plugin is connected with realm
-            const votingPluginHelpers = await votingPluginClient?.withCastPluginVote(
-              instructions,
-              proposal,
-              torPk
-            )
+            const votingTors = await getVotingTokenOwnerRecords(governingBody)
+            for (const torPk of votingTors) {
+              //will run only if any plugin is connected with realm
+              const votingPluginHelpers = await votingPluginClient?.withCastPluginVote(
+                instructions,
+                proposal,
+                torPk
+              )
 
-            await withCastVote(
-              instructions,
-              realm.owner,
-              programVersion,
-              realm.pubkey,
-              proposal.account.governance,
-              proposal.pubkey,
-              proposal.account.tokenOwnerRecord,
-              torPk,
-              walletPk,
-              governingTokenMint,
-              vote,
-              walletPk,
-              votingPluginHelpers?.voterWeightPk,
-              votingPluginHelpers?.maxVoterWeightRecord
-            )
+              await withCastVote(
+                instructions,
+                realm.owner,
+                programVersion,
+                realm.pubkey,
+                proposal.account.governance,
+                proposal.pubkey,
+                proposal.account.tokenOwnerRecord,
+                torPk,
+                walletPk,
+                governingTokenMint,
+                vote,
+                walletPk,
+                votingPluginHelpers?.voterWeightPk,
+                votingPluginHelpers?.maxVoterWeightRecord
+              )
+
+              return instructions
+            }
           }
-        }
-      : undefined
+        : undefined,
+    [
+      getVotingTokenOwnerRecords,
+      programVersion,
+      realm,
+      votingPluginClient,
+      walletPk,
+    ]
+  )
 
   return submitVote
 }
