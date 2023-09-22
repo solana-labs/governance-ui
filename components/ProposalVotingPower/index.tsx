@@ -1,12 +1,6 @@
 import classNames from 'classnames'
 
-import { GATEWAY_PLUGINS_PKS } from '@constants/plugins'
-import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
-import { option } from '@tools/core/option'
-
 import VotingPower from './VotingPower'
-import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
-import { useRouteProposalQuery } from '@hooks/queries/proposal'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface Props {
@@ -15,16 +9,13 @@ interface Props {
 
 export default function ProposalVotingPower(props: Props) {
   const connected = useWalletOnePointOh()?.connected
-  const config = useRealmConfigQuery().data?.result
-  const proposal = useRouteProposalQuery().data?.result
-  const currentPluginPk = config?.account?.communityTokenConfig.voterWeightAddin
-
+  /* 
   const isUsingGatewayPlugin =
     currentPluginPk && GATEWAY_PLUGINS_PKS.includes(currentPluginPk.toBase58())
 
   if (isUsingGatewayPlugin) {
     return <TokenBalanceCardWrapper proposal={option(proposal?.account)} />
-  }
+  } */
 
   return (
     <div

@@ -40,7 +40,7 @@ export async function postChatMessage(
   //will run only if plugin is connected with realm
   const plugin = await client?.withUpdateVoterWeightRecord(
     instructions,
-    tokeOwnerRecord,
+    tokeOwnerRecord.pubkey,
     'commentProposal',
     createNftTicketsIxs
   )

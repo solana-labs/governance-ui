@@ -5,7 +5,6 @@ import {
   Realm,
   SYSTEM_PROGRAM_ID,
   Proposal,
-  TokenOwnerRecord,
 } from '@solana/spl-governance'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { chunks } from '@utils/helpers'
@@ -53,6 +52,7 @@ import {
 import { NftVoter } from 'idls/nft_voter'
 import { NftVoterV2 } from 'idls/nft_voter_v2'
 import { Program } from '@project-serum/anchor'
+import { fetchTokenOwnerRecordByPubkey } from '@hooks/queries/tokenOwnerRecord'
 
 export type UpdateVoterWeightRecordTypes =
   | 'castVote'
@@ -151,16 +151,22 @@ export class VotingClient {
   }
   withUpdateVoterWeightRecord = async (
     instructions: TransactionInstruction[],
-    tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>,
+    tokenOwnerRecord: PublicKey,
     type: UpdateVoterWeightRecordTypes,
     createNftActionTicketIxs?: TransactionInstruction[]
   ): Promise<ProgramAddresses | undefined> => {
     if (this.noClient) return
 
     const realm = this.realm!
+    const torAccount = await fetchTokenOwnerRecordByPubkey(
+      this.client!.program.provider.connection,
+      tokenOwnerRecord
+    )
+    console.log(this.client)
+    if (!torAccount.result) return
     if (
       !realm.account.communityMint.equals(
-        tokenOwnerRecord.account.governingTokenMint
+        torAccount.result.account.governingTokenMint
       )
     ) {
       return
@@ -232,7 +238,7 @@ export class VotingClient {
           .accounts({
             registrar,
             voterWeightRecord: voterWeightPk,
-            voterTokenOwnerRecord: tokenOwnerRecord.pubkey,
+            voterTokenOwnerRecord: tokenOwnerRecord,
           })
           .remainingAccounts(remainingAccounts.slice(0, 10))
           .instruction()
@@ -314,7 +320,7 @@ export class VotingClient {
   withCastPluginVote = async (
     instructions: TransactionInstruction[],
     proposal: ProgramAccount<Proposal>,
-    tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>,
+    tokenOwnerRecord: PublicKey,
     createNftActionTicketIxs?: TransactionInstruction[]
   ): Promise<ProgramAddresses | undefined> => {
     if (this.noClient) {
@@ -415,7 +421,7 @@ export class VotingClient {
             })
             .accounts({
               registrar,
-              voterTokenOwnerRecord: tokenOwnerRecord.pubkey,
+              voterTokenOwnerRecord: tokenOwnerRecord,
             })
             .remainingAccounts(chunk)
             .instruction()
@@ -455,7 +461,7 @@ export class VotingClient {
           walletPk,
           registrar,
           proposal.pubkey,
-          tokenOwnerRecord.pubkey,
+          tokenOwnerRecord,
           voterWeightPk,
           this.votingNfts,
           nftVoteRecordsFiltered
@@ -470,7 +476,7 @@ export class VotingClient {
           walletPk,
           registrar,
           proposal.pubkey,
-          tokenOwnerRecord.pubkey,
+          tokenOwnerRecord,
           voterWeightPk,
           this.votingNfts,
           nftVoteRecordsFiltered
