@@ -53,11 +53,11 @@ export const useSubmitVote = () => {
       vote,
       voterTokenRecord,
       comment,
-      voteWeights
+      voteWeights,
     }: {
       vote: VoteKind
       voterTokenRecord: ProgramAccount<TokenOwnerRecord>
-      comment?: string,
+      comment?: string
       voteWeights?: number[]
     }) => {
       const rpcContext = new RpcContext(
@@ -143,7 +143,8 @@ export const useSubmitVoteAwesome = () => {
     realm !== undefined &&
     programVersion !== undefined &&
     walletPk !== undefined
-      ? async ({ voteKind, governingBody, proposal, comment }: VoteArgs) => {
+      ? // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        async ({ voteKind, governingBody, proposal, comment }: VoteArgs) => {
           //const signers: Keypair[] = []
           const instructions: TransactionInstruction[] = []
 
@@ -184,6 +185,8 @@ export const useSubmitVoteAwesome = () => {
           }
         }
       : undefined
+
+  return submitVote
 }
 
 const formatVote = (voteKind: VoteKind) =>
