@@ -1,4 +1,5 @@
 const lineClamp = require('@tailwindcss/line-clamp')
+const forms = require('@tailwindcss/forms')
 
 module.exports = {
   darkMode: 'class',
@@ -200,5 +201,5 @@ module.exports = {
       },
     },
   },
-  plugins: [lineClamp],
+  plugins: [lineClamp, forms],
 }

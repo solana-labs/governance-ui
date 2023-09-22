@@ -1,9 +1,9 @@
 import React from 'react'
 import useRealm from '@hooks/useRealm'
-import { default as Account } from '@components/Account'
 import LockTokensAccount from 'VoteStakeRegistry/components/Account/LockTokensAccount'
 import { LockTokensAccount as HeliumLockTokensAccount } from 'HeliumVotePlugin/components/LockTokensAccount'
 import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
+import Account from './Account'
 
 const AccountPage: React.FC = () => {
   const { vsrMode } = useRealm()

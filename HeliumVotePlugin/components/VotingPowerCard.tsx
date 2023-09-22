@@ -5,8 +5,7 @@ import useRealm from '@hooks/useRealm'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import InlineNotification from '@components/InlineNotification'
-import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
-import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
+import { TokenDeposit } from '@components/TokenBalance/TokenDeposit'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import { MintInfo } from '@solana/spl-token'
 import { VotingPowerBox } from './VotingPowerBox'
@@ -69,7 +68,6 @@ export const VotingPowerCard: React.FC<{
               />
             </div>
           )}
-          <DelegateTokenBalanceCard />
         </>
       ) : (
         <>

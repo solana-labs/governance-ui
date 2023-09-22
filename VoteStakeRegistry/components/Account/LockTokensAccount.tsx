@@ -33,7 +33,7 @@ import {
 } from '@heroicons/react/outline'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import { abbreviateAddress } from '@utils/formatting'
-import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
+import { TokenDeposit } from '@components/TokenBalance/TokenDeposit'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useTokenOwnerRecordByPubkeyQuery } from '@hooks/queries/tokenOwnerRecord'

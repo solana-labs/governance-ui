@@ -16,8 +16,7 @@ import { useEffect, useState } from 'react'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import InlineNotification from '@components/InlineNotification'
 import Link from 'next/link'
-import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
-import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
+import { TokenDeposit } from '@components/TokenBalance/TokenDeposit'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRouter } from 'next/router'
@@ -138,7 +137,6 @@ const LockPluginTokenBalanceCard = ({
               />
             </div>
           )}
-          <DelegateTokenBalanceCard />
         </>
       ) : (
         <>

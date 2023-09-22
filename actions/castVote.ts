@@ -76,12 +76,13 @@ export async function castVote(
   const plugin = await votingPlugin?.withCastPluginVote(
     instructions,
     proposal,
-    tokenOwnerRecord,
+    tokenOwnerRecord.pubkey,
     createCastNftVoteTicketIxs
   )
 
-  const isMulti = proposal.account.voteType !== VoteType.SINGLE_CHOICE
-   && proposal.account.accountType === GovernanceAccountType.ProposalV2
+  const isMulti =
+    proposal.account.voteType !== VoteType.SINGLE_CHOICE &&
+    proposal.account.accountType === GovernanceAccountType.ProposalV2
 
   // It is not clear that defining these extraneous fields, `deny` and `veto`, is actually necessary.
   // See:  https://discord.com/channels/910194960941338677/910630743510777926/1044741454175674378
@@ -151,7 +152,7 @@ export async function castVote(
   if (message) {
     const plugin = await votingPlugin?.withUpdateVoterWeightRecord(
       instructions,
-      tokenOwnerRecord,
+      tokenOwnerRecord.pubkey,
       'commentProposal',
       createPostMessageTicketIxs
     )
