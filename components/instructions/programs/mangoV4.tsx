@@ -1,6 +1,7 @@
 import {
   MANGO_V4_ID,
   MangoClient,
+  USDC_MINT,
   toUiDecimals,
 } from '@blockworks-foundation/mango-v4'
 import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
@@ -799,7 +800,12 @@ const instructions = () => ({
             args.oracleOpt ||
             mangoGroup.banksMapByMint.get(mint.toBase58())![0]!.oracle
           const isPyth = await isPythOracle(connection, oracle)
-          liqudityTier = await getSuggestedCoinTier(mint.toBase58(), !!isPyth)
+          liqudityTier = !mint.equals(USDC_MINT)
+            ? await getSuggestedCoinTier(mint.toBase58(), !!isPyth)
+            : {
+                tier: 'PREMIUM',
+                priceImpact: '0',
+              }
 
           const suggestedPreset = getFormattedListingPresets(!!isPyth)[
             liqudityTier.tier!
@@ -867,6 +873,15 @@ const instructions = () => ({
                   {coinTiersToNames[liqudityTier.tier]} check params carefully
                 </h3>
               )}
+            <div className="py-4">
+              <div className="flex mb-2">
+                <div className="w-3 h-3 bg-orange mr-2"></div> - Proposed values
+              </div>
+              <div className="flex">
+                <div className="w-3 h-3 bg-green mr-2"></div> - Suggested by
+                liqudity
+              </div>
+            </div>
             <div className="border-b mb-4 pb-4 space-y-3">
               <DisplayNullishProperty
                 label="Token index"
