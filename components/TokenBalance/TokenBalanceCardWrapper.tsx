@@ -8,10 +8,7 @@ import ClaimUnreleasedNFTs from './ClaimUnreleasedNFTs'
 import Link from 'next/link'
 import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import {
-  useUserCommunityTokenOwnerRecord,
-  useUserCouncilTokenOwnerRecord,
-} from '@hooks/queries/tokenOwnerRecord'
+import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import ClaimUnreleasedPositions from 'HeliumVotePlugin/components/ClaimUnreleasedPositions'
 import VanillaAccountDetails from './VanillaAccountDetails'
@@ -68,10 +65,9 @@ const TokenBalanceCardInner = ({
   inAccountDetails?: boolean
 }) => {
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
-  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
   const config = useRealmConfigQuery().data?.result
 
-  const { councilTokenAccount, vsrMode } = useRealm()
+  const { vsrMode } = useRealm()
   const currentPluginPk = config?.account?.communityTokenConfig.voterWeightAddin
   const isNftMode =
     currentPluginPk && NFT_PLUGINS_PKS.includes(currentPluginPk?.toBase58())
@@ -100,35 +96,15 @@ const TokenBalanceCardInner = ({
     )
   }
 
-  if (
-    isNftMode &&
-    (!ownTokenRecord ||
-      ownTokenRecord.account.governingTokenDepositAmount.isZero())
-  ) {
+  if (isNftMode && inAccountDetails) {
     return (
-      <>
-        {(ownCouncilTokenRecord &&
-          !ownCouncilTokenRecord?.account.governingTokenDepositAmount.isZero()) ||
-        (councilTokenAccount &&
-          !councilTokenAccount?.account.amount.isZero()) ? (
-          <>
-            {!inAccountDetails && <GovernancePowerTitle />}
-            <NftVotingPower inAccountDetails={inAccountDetails} />
-            {inAccountDetails ? (
-              <VanillaAccountDetails />
-            ) : (
-              <GovernancePowerCard />
-            )}
-            <ClaimUnreleasedNFTs inAccountDetails={inAccountDetails} />
-          </>
-        ) : (
-          <>
-            {!inAccountDetails && <GovernancePowerTitle />}
-            <NftVotingPower inAccountDetails={inAccountDetails} />
-            <ClaimUnreleasedNFTs inAccountDetails={inAccountDetails} />
-          </>
-        )}
-      </>
+      <div className="grid grid-cols-2 gap-x-2 w-full">
+        <div>
+          <NftVotingPower inAccountDetails={inAccountDetails} />
+          <ClaimUnreleasedNFTs inAccountDetails={inAccountDetails} />
+        </div>
+        <VanillaAccountDetails />
+      </div>
     )
   }
 
