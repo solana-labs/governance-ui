@@ -205,38 +205,27 @@ export async function castVote(
 
   // we need to chunk instructions
   if (isHeliumVoter) {
-    // update voter weight + cast vote from spl gov need to be in one transaction
+    // @asktree: I'm aware of no rationale for chunking in this particular manner
+    const chunkerz = chunks(
+      [
+        ...pluginCastVoteIxs,
+        ...castVoteIxs,
+        ...pluginPostMessageIxs,
+        ...postMessageIxs,
+      ],
+      2
+    )
 
-    const splIxsWithAccountsChunk = chunks(
-      [...castVoteIxs, ...postMessageIxs],
-      2
-    )
-    const positionsAccountsChunks = chunks(
-      [...pluginCastVoteIxs, ...pluginPostMessageIxs],
-      2
-    )
-    const ixsChunks = [
-      ...positionsAccountsChunks.map((txBatch, batchIdx) => {
-        return {
-          instructionsSet: txBatchesToInstructionSetWithSigners(
-            txBatch,
-            [],
-            batchIdx
-          ),
-          sequenceType: SequenceType.Parallel,
-        }
-      }),
-      ...splIxsWithAccountsChunk.map((txBatch, batchIdx) => {
-        return {
-          instructionsSet: txBatchesToInstructionSetWithSigners(
-            txBatch,
-            message ? [[], signers] : [],
-            batchIdx
-          ),
-          sequenceType: SequenceType.Sequential,
-        }
-      }),
-    ]
+    const ixsChunks = chunkerz.map((txBatch, batchIdx) => {
+      return {
+        instructionsSet: txBatchesToInstructionSetWithSigners(
+          txBatch,
+          message ? [[], signers] : [],
+          batchIdx
+        ),
+        sequenceType: SequenceType.Sequential,
+      }
+    })
 
     await sendTransactionsV3({
       connection,
