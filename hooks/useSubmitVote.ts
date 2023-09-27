@@ -139,7 +139,7 @@ export const useCreateVoteIxs = () => {
 
   // api
   const walletPk = wallet?.publicKey ?? undefined
-  const submitVote = useMemo(
+  return useMemo(
     () =>
       realm !== undefined &&
       programVersion !== undefined &&
@@ -196,8 +196,6 @@ export const useCreateVoteIxs = () => {
       walletPk,
     ]
   )
-
-  return submitVote
 }
 
 const formatVote = (voteKind: VoteKind) =>
