@@ -23,7 +23,7 @@ import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { notify } from '@utils/notifications'
 import { useRealmQuery } from './queries/realm'
 import { useRealmConfigQuery } from './queries/realmConfig'
-import { useRouteProposalQuery } from './queries/proposal'
+import { proposalQueryKeys, useRouteProposalQuery } from './queries/proposal'
 import useLegacyConnectionContext from './useLegacyConnectionContext'
 import { NFT_PLUGINS_PKS } from '@constants/plugins'
 import { TransactionInstruction } from '@solana/web3.js'
@@ -87,7 +87,7 @@ export const useSubmitVote = () => {
           rpcContext,
           realm!,
           proposal!,
-          voterTokenRecord,
+          voterTokenRecord.pubkey,
           vote,
           msg,
           client,
@@ -95,8 +95,12 @@ export const useSubmitVote = () => {
           voteWeights
         )
         queryClient.invalidateQueries({
-          queryKey: ['Proposal'],
+          queryKey: proposalQueryKeys.all(connection.current.rpcEndpoint),
         })
+        msg &&
+          queryClient.invalidateQueries({
+            queryKey: [connection.cluster, 'ChatMessages'],
+          })
       } catch (e) {
         notify({ type: 'error', message: e.message })
       } finally {
