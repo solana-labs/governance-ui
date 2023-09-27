@@ -1,8 +1,6 @@
 import { BigNumber } from 'bignumber.js'
 import { useMemo } from 'react'
 
-import useRealm from '@hooks/useRealm'
-
 import { useTokenOwnerRecordsDelegatedToUser } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
@@ -35,7 +33,6 @@ export default function VanillaVotingPower({
   ...props
 }: Props) {
   const realm = useRealmQuery().data?.result
-  const { realmInfo } = useRealm()
   const realmConfig = useRealmConfigQuery().data?.result
 
   const { data: communityTOR } = useAddressQuery_CommunityTokenOwner()
