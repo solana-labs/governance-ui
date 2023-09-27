@@ -60,7 +60,7 @@ export async function castVote(
   votingPlugin?: VotingClient,
   runAfterConfirmation?: (() => void) | null,
   voteWeights?: number[],
-  additionalTokenOwnerRecords?: []
+  _additionalTokenOwnerRecords?: []
 ) {
   const signers: Keypair[] = []
 
