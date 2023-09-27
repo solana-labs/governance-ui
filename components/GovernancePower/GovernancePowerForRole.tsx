@@ -1,5 +1,3 @@
-import classNames from 'classnames'
-
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useAsync } from 'react-async-hook'
 import { determineVotingPowerType } from '@hooks/queries/governancePower'
@@ -15,6 +13,7 @@ export default function GovernancePowerForRole({
   ...props
 }: {
   role: 'community' | 'council'
+  hideIfZero?: boolean
   className?: string
 }) {
   const { connection } = useConnection()
@@ -30,17 +29,17 @@ export default function GovernancePowerForRole({
     return determineVotingPowerType(connection, realmPk, role)
   }, [connection, realmPk, role])
 
-  if (connected && kind === undefined) {
+  if (connected && kind === undefined && !props.hideIfZero) {
     return (
       <div className="animate-pulse bg-bkg-1 col-span-1 h-[76px] rounded-lg" />
     )
   }
 
   return (
-    <div className={classNames(props.className)}>
+    <>
       {role === 'community' ? (
         kind === 'vanilla' ? (
-          <VanillaVotingPower role="community" />
+          <VanillaVotingPower role="community" {...props} />
         ) : kind === 'VSR' ? (
           <LockedCommunityVotingPower />
         ) : kind === 'NFT' ? (
@@ -49,8 +48,8 @@ export default function GovernancePowerForRole({
           <LockedCommunityNFTRecordVotingPower />
         ) : null
       ) : kind === 'vanilla' ? (
-        <VanillaVotingPower role="council" />
+        <VanillaVotingPower role="council" {...props} />
       ) : null}
-    </div>
+    </>
   )
 }

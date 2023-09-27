@@ -1,7 +1,9 @@
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import { useGovernancePowerAsync } from '@hooks/queries/governancePower'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import useQueryContext from '@hooks/useQueryContext'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { GoverningTokenType } from '@solana/spl-governance'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import GovernancePowerForRole from './GovernancePowerForRole'
@@ -42,6 +44,8 @@ const GovernancePowerCard = () => {
     communityPower.result.isZero() &&
     councilPower.result.isZero()
 
+  const realmConfig = useRealmConfigQuery().data?.result
+
   return (
     <div>
       <GovernancePowerTitle />
@@ -60,8 +64,20 @@ const GovernancePowerCard = () => {
         </div>
       ) : (
         <div className="flex flex-col gap-2">
-          <GovernancePowerForRole role="community" />
-          <GovernancePowerForRole role="council" />
+          {realmConfig?.account.communityTokenConfig.tokenType ===
+          GoverningTokenType.Dormant ? null : (
+            <GovernancePowerForRole role="community" />
+          )}
+          {realmConfig?.account.councilTokenConfig.tokenType ===
+          GoverningTokenType.Dormant ? null : (
+            <GovernancePowerForRole
+              role="council"
+              hideIfZero={
+                realmConfig?.account.communityTokenConfig.tokenType !==
+                GoverningTokenType.Dormant
+              }
+            />
+          )}
         </div>
       )}
     </div>

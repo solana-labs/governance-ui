@@ -1,6 +1,5 @@
 import { BigNumber } from 'bignumber.js'
 import { useMemo } from 'react'
-import classNames from 'classnames'
 
 import useRealm from '@hooks/useRealm'
 
@@ -20,15 +19,24 @@ import { getMintMetadata } from '@components/instructions/programs/splToken'
 import VotingPowerPct from '@components/ProposalVotingPower/VotingPowerPct'
 import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
 import { abbreviateAddress } from '@utils/formatting'
+import clsx from 'clsx'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import { GoverningTokenType } from '@solana/spl-governance'
 
 interface Props {
   className?: string
   role: 'community' | 'council'
+  hideIfZero?: boolean
 }
 
-export default function VanillaVotingPower({ role, ...props }: Props) {
+export default function VanillaVotingPower({
+  role,
+  hideIfZero,
+  ...props
+}: Props) {
   const realm = useRealmQuery().data?.result
   const { realmInfo } = useRealm()
+  const realmConfig = useRealmConfigQuery().data?.result
 
   const { data: communityTOR } = useAddressQuery_CommunityTokenOwner()
   const { data: councilTOR } = useAddressQuery_CouncilTokenOwner()
@@ -100,27 +108,31 @@ export default function VanillaVotingPower({ role, ...props }: Props) {
   const tokenName =
     getMintMetadata(relevantMint)?.name ?? realm?.account.name ?? ''
 
-  if (!(realm && realmInfo)) {
-    return (
-      <div
-        className={classNames(props.className, 'rounded-md bg-bkg-1 h-[76px]')}
-      />
-    )
-  }
+  const disabled =
+    role === 'community'
+      ? realmConfig?.account.communityTokenConfig.tokenType ===
+        GoverningTokenType.Dormant
+      : realmConfig?.account.councilTokenConfig.tokenType ===
+        GoverningTokenType.Dormant
 
   return (
-    <div className={props.className}>
-      {totalAmount === undefined || totalAmount.isZero() ? (
-        <div className={'text-xs text-fgd-3'}>
-          You do not have any voting power in this dao.
-        </div>
-      ) : (
+    <div
+      className={clsx(
+        props.className,
+        hideIfZero && totalAmount.isZero() && 'hidden',
+        disabled && 'hidden'
+      )}
+    >
+      {
         <div className={'p-3 rounded-md bg-bkg-1'}>
-          <div className="text-fgd-3 text-xs">{tokenName} Votes</div>
+          <div className="text-fgd-3 text-xs">
+            {tokenName}
+            {role === 'council' ? ' Council' : ''} Votes
+          </div>
           <div className="flex items-center justify-between mt-1">
             <div className=" flex flex-row gap-x-2">
               <div className="text-xl font-bold text-fgd-1 hero-text">
-                {formattedTotal}
+                {formattedTotal ?? 0}
               </div>
               <div className="text-xs text-fgd-3">
                 {selectedDelegator !== undefined ? (
@@ -141,7 +153,7 @@ export default function VanillaVotingPower({ role, ...props }: Props) {
             )}
           </div>
         </div>
-      )}
+      }
       <Deposit role={role} />
     </div>
   )
