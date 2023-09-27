@@ -129,6 +129,9 @@ type VoteArgs = {
   comment?: string
 }
 
+/** This is WIP and shouldn't be used
+ * @deprecated
+ */
 export const useCreateVoteIxs = () => {
   // get info
   const programVersion = useProgramVersion()

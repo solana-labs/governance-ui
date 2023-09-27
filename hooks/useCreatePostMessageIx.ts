@@ -13,6 +13,9 @@ import { useRouteProposalQuery } from '@hooks/queries/proposal'
 import { Keypair, TransactionInstruction } from '@solana/web3.js'
 import useUserOrDelegator from './useUserOrDelegator'
 
+/** This is WIP and shouldn't be used
+ * @deprecated
+ */
 const useCreatePostMessageIx = () => {
   // get info
   const realm = useRealmQuery().data?.result
