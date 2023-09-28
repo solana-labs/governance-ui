@@ -299,9 +299,7 @@ export const getSuggestedCoinTier = async (
     indexForTierFromSwaps > -1 ? TIERS[indexForTierFromSwaps] : 'UNTRUSTED'
 
   const tierLowerThenCurrent =
-    tier === 'ULTRA_PREMIUM'
-      ? 'PREMIUM'
-      : tier === 'PREMIUM'
+    tier === 'ULTRA_PREMIUM' || tier === 'PREMIUM'
       ? 'MID'
       : tier === 'MID'
       ? 'MEME'
