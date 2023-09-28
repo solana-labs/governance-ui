@@ -803,7 +803,7 @@ const instructions = () => ({
           liqudityTier = !mint.equals(USDC_MINT)
             ? await getSuggestedCoinTier(mint.toBase58(), !!isPyth)
             : {
-                tier: 'PREMIUM',
+                tier: 'ULTRA_PREMIUM',
                 priceImpact: '0',
               }
 

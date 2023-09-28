@@ -204,8 +204,20 @@ export const getSuggestedCoinTier = async (
   outputMint: string,
   hasPythOracle: boolean
 ) => {
-  const TIERS: LISTING_PRESETS_KEYS[] = ['PREMIUM', 'MID', 'MEME', 'SHIT']
+  const TIERS: LISTING_PRESETS_KEYS[] = [
+    'ULTRA_PREMIUM',
+    'PREMIUM',
+    'MID',
+    'MEME',
+    'SHIT',
+  ]
+
   const swaps = await Promise.all([
+    fetchJupiterRoutes(
+      MAINNET_USDC_MINT.toBase58(),
+      outputMint,
+      toNative(250000, 6).toNumber()
+    ),
     fetchJupiterRoutes(
       MAINNET_USDC_MINT.toBase58(),
       outputMint,
@@ -225,6 +237,12 @@ export const getSuggestedCoinTier = async (
       MAINNET_USDC_MINT.toBase58(),
       outputMint,
       toNative(1000, 6).toNumber()
+    ),
+    fetchJupiterRoutes(
+      MAINNET_USDC_MINT.toBase58(),
+      outputMint,
+      toNative(250000, 6).toNumber(),
+      'ExactOut'
     ),
     fetchJupiterRoutes(
       MAINNET_USDC_MINT.toBase58(),
@@ -281,10 +299,15 @@ export const getSuggestedCoinTier = async (
     indexForTierFromSwaps > -1 ? TIERS[indexForTierFromSwaps] : 'UNTRUSTED'
 
   const tierLowerThenCurrent =
-    tier === 'PREMIUM' ? 'MID' : tier === 'MID' ? 'MEME' : tier
-  const isMidOrPremium = tier === 'MID' || tier === 'PREMIUM'
+    tier === 'ULTRA_PREMIUM' || tier === 'PREMIUM'
+      ? 'MID'
+      : tier === 'MID'
+      ? 'MEME'
+      : tier
+  const isPythRecommendedTier =
+    tier === 'MID' || tier === 'PREMIUM' || tier === 'ULTRA_PREMIUM'
   const listingTier =
-    isMidOrPremium && !hasPythOracle ? tierLowerThenCurrent : tier
+    isPythRecommendedTier && !hasPythOracle ? tierLowerThenCurrent : tier
 
   return {
     tier: listingTier,
