@@ -198,6 +198,10 @@ export default function useGovernanceAssets() {
       name: 'Switchboard',
       image: '/img/switchboard.png',
     },
+    [PackageEnum.UXDProtocol]: {
+      name: 'UXD Protocol',
+      image: '/img/uxd.png',
+    },
     [PackageEnum.VsrPlugin]: {
       name: 'Vsr Plugin',
       isVisible:
@@ -768,6 +772,65 @@ export default function useGovernanceAssets() {
     [Instructions.WithdrawFromOracle]: {
       name: 'Withdraw from Oracle',
       packageId: PackageEnum.Switchboard,
+    },
+
+    /*
+      ____ _______  ___________    ____________________ ___________________________  _________  ________  .____     
+      |    |   \   \/  /\______ \   \______   \______   \\_____  \__    ___/\_____  \ \_   ___ \ \_____  \ |    |    
+      |    |   /\     /  |    |  \   |     ___/|       _/ /   |   \|    |    /   |   \/    \  \/  /   |   \|    |    
+      |    |  / /     \  |    `   \  |    |    |    |   \/    |    \    |   /    |    \     \____/    |    \    |___ 
+      |______/ /___/\  \/_______  /  |____|    |____|_  /\_______  /____|   \_______  /\______  /\_______  /_______ \
+                    \_/        \/                    \/         \/                 \/        \/         \/        \/
+   */
+    [Instructions.UXDInitializeController]: {
+      name: 'Initialize Controller',
+      isVisible: symbol === 'UXP',
+      packageId: PackageEnum.UXDProtocol,
+    },
+    [Instructions.UXDEditController]: {
+      name: 'Edit Controller',
+      isVisible: symbol === 'UXP',
+      packageId: PackageEnum.UXDProtocol,
+    },
+    [Instructions.UXDInitializeIdentityDepository]: {
+      name: 'Initialize Identity Depository',
+      isVisible: symbol === 'UXP',
+      packageId: PackageEnum.UXDProtocol,
+    },
+    [Instructions.UXDEditIdentityDepository]: {
+      name: 'Edit Identity Depository',
+      isVisible: symbol === 'UXP',
+      packageId: PackageEnum.UXDProtocol,
+    },
+    [Instructions.UXDMintWithIdentityDepository]: {
+      name: 'Mint with Identity Depository',
+      isVisible: symbol === 'UXP',
+      packageId: PackageEnum.UXDProtocol,
+    },
+    [Instructions.UXDRedeemWithIdentityDepository]: {
+      name: 'Redeem with Identity Depository',
+      isVisible: symbol === 'UXP',
+      packageId: PackageEnum.UXDProtocol,
+    },
+    [Instructions.UXDRegisterDepository]: {
+      name: 'Register a Depository',
+      isVisible: symbol === 'UXP',
+      packageId: PackageEnum.UXDProtocol,
+    },
+    [Instructions.UXDEditDepository]: {
+      name: 'Edit a Depository',
+      isVisible: symbol === 'UXP',
+      packageId: PackageEnum.UXDProtocol,
+    },
+    [Instructions.UXDMint]: {
+      name: 'Mint',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.UXDProtocol,
+    },
+    [Instructions.UXDRedeem]: {
+      name: 'Redeem',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.UXDProtocol,
     },
 
     /*

@@ -3,7 +3,12 @@ import {
   Token,
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
-import { Connection, PublicKey, Transaction } from '@solana/web3.js'
+import {
+  Connection,
+  PublicKey,
+  Transaction,
+  TransactionInstruction,
+} from '@solana/web3.js'
 import type { ConnectionContext } from 'utils/connection'
 import { sendTransaction } from './send'
 import { tryGetAta, isExistingTokenAccount } from './validations'
@@ -99,4 +104,28 @@ export function findATAAddrSync(
     mintAddress.toBuffer(),
   ]
   return PublicKey.findProgramAddressSync(seeds, ASSOCIATED_TOKEN_PROGRAM_ID)
+}
+
+export async function checkInitTokenAccount(
+  account: PublicKey,
+  instructions: TransactionInstruction[],
+  connection: ConnectionContext,
+  mint: PublicKey,
+  owner: PublicKey,
+  feePayer: PublicKey
+) {
+  const accountInfo = await connection.current.getAccountInfo(account)
+  if (accountInfo && accountInfo.lamports > 0) {
+    return
+  }
+  instructions.push(
+    Token.createAssociatedTokenAccountInstruction(
+      ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+      TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+      mint, // mint
+      account, // ata
+      owner, // owner of token account
+      feePayer
+    )
+  )
 }

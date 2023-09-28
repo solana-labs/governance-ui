@@ -26,6 +26,7 @@ export enum PackageEnum {
   Serum,
   Solend,
   Switchboard,
+  UXDProtocol,
   VsrPlugin,
   Distribution,
 }
@@ -314,6 +315,72 @@ export interface JoinDAOForm {
   amount?: number
 }
 
+export interface UXDInitializeControllerForm {
+  governedAccount?: AssetAccount
+  mintDecimals: number
+}
+
+export interface UXDEditControllerForm {
+  governedAccount?: AssetAccount
+  redeemableGlobalSupplyCap?: number
+}
+
+export interface UXDInitializeIdentityDepositoryForm {
+  governedAccount?: AssetAccount
+}
+
+export interface UXDEditIdentityDepositoryForm {
+  governedAccount?: AssetAccount
+  redeemableAmountUnderManagementCap: number
+  mintingDisabled: boolean
+}
+
+export interface UXDMintWithIdentityDepositoryForm {
+  governedAccount?: AssetAccount
+  uxdProgram: string
+  collateralAmount: number
+}
+
+export interface UXDRedeemWithIdentityDepositoryForm {
+  governedAccount?: AssetAccount
+  uxdProgram: string
+  redeemableAmount: number
+}
+
+export interface UXDRegisterDepositoryForm {
+  governedAccount?: AssetAccount
+  depositoryType: string
+  collateralName?: string
+  redeemableDepositorySupplyCap: number
+  mintingFeeInBps: number
+  redeemingFeeInBps: number
+}
+
+export interface UXDEditDepositoryForm {
+  governedAccount?: AssetAccount
+  depositoryType: string
+  collateralName?: string
+  redeemableAmountUnderManagementCap: number
+  mintingFeeInBps: number
+  redeemingFeeInBps: number
+}
+
+export interface UXDMintForm {
+  governedAccount?: AssetAccount
+  depositoryType: string
+  uxdProgram: string
+  collateralName?: string
+  collateralAmount: number
+}
+
+export interface UXDRedeemForm {
+  governedAccount?: AssetAccount
+  depositoryType: string
+  uxdProgram: string
+  collateralName?: string
+  redeemableAmount: number
+}
+
 export enum Instructions {
   Base64,
   ChangeMakeDonation,
@@ -416,6 +483,16 @@ export enum Instructions {
   RemoveServiceFromDID,
   RevokeGoverningTokens,
   SetMintAuthority,
+  UXDInitializeController,
+  UXDEditController,
+  UXDInitializeIdentityDepository,
+  UXDEditIdentityDepository,
+  UXDMintWithIdentityDepository,
+  UXDRedeemWithIdentityDepository,
+  UXDRegisterDepository,
+  UXDEditDepository,
+  UXDMint,
+  UXDRedeem,
 }
 
 export interface ComponentInstructionData {

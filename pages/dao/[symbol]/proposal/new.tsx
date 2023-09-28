@@ -140,6 +140,16 @@ import { usePrevious } from '@hooks/usePrevious'
 import DualVote from './components/instructions/Dual/DualVote'
 import DualGso from './components/instructions/Dual/DualGso'
 import DualGsoWithdraw from './components/instructions/Dual/DualGsoWithdraw'
+import UXDInitializeController from './components/instructions/UXDProtocol/InitializeController'
+import UXDEditController from './components/instructions/UXDProtocol/EditController'
+import UXDInitializeIdentityDepository from './components/instructions/UXDProtocol/InitializeIdentityDepository'
+import UXDEditIdentityDepository from './components/instructions/UXDProtocol/EditIdentityDepository'
+import UXDMintWithIdentityDepository from './components/instructions/UXDProtocol/MintWithIdentityDepository'
+import UXDRedeemWithIdentityDepository from './components/instructions/UXDProtocol/RedeemWithIdentityDepository'
+import UXDRegisterDepository from './components/instructions/UXDProtocol/RegisterDepository'
+import UXDEditDepository from './components/instructions/UXDProtocol/EditDepository'
+import UXDMint from './components/instructions/UXDProtocol/Mint'
+import UXDRedeem from './components/instructions/UXDProtocol/Redeem'
 import MultiChoiceForm from '../../../../components/MultiChoiceForm'
 import CloseVaults from './components/instructions/DistrubtionProgram/CloseVaults'
 import FillVaults from './components/instructions/DistrubtionProgram/FillVaults'
@@ -600,6 +610,16 @@ const New = () => {
       [Instructions.RemoveServiceFromDID]: RemoveServiceFromDID,
       [Instructions.RevokeGoverningTokens]: RevokeGoverningTokens,
       [Instructions.SetMintAuthority]: SetMintAuthority,
+      [Instructions.UXDInitializeController]: UXDInitializeController,
+      [Instructions.UXDEditController]: UXDEditController,
+      [Instructions.UXDInitializeIdentityDepository]: UXDInitializeIdentityDepository,
+      [Instructions.UXDEditIdentityDepository]: UXDEditIdentityDepository,
+      [Instructions.UXDRedeemWithIdentityDepository]: UXDRedeemWithIdentityDepository,
+      [Instructions.UXDMintWithIdentityDepository]: UXDMintWithIdentityDepository,
+      [Instructions.UXDRegisterDepository]: UXDRegisterDepository,
+      [Instructions.UXDEditDepository]: UXDEditDepository,
+      [Instructions.UXDMint]: UXDMint,
+      [Instructions.UXDRedeem]: UXDRedeem,
     }),
     [governance?.pubkey?.toBase58()]
   )
