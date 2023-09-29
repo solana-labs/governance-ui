@@ -8,7 +8,7 @@ import {
   ScaleIcon,
   UserGroupIcon,
 } from '@heroicons/react/outline'
-import { VoteThresholdType, VoteTipping } from '@solana/spl-governance'
+import { GoverningTokenType, VoteTipping } from '@solana/spl-governance'
 import cx from 'classnames'
 import { useRouter } from 'next/router'
 
@@ -29,6 +29,7 @@ import {
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
 import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 
 const UNIX_SECOND = 1
 const UNIX_MINUTE = UNIX_SECOND * 60
@@ -93,17 +94,18 @@ export default function Rules(props: Props) {
   const router = useRouter()
   const { symbol } = router.query
   const { fmtUrlWithCluster } = useQueryContext()
+  const realmConfig = useRealmConfigQuery().data?.result
 
   const programVersion = useProgramVersion()
 
   const governanceConfig = props.wallet.governanceAccount?.account.config
 
   const communityEnabled =
-    governanceConfig &&
-    governanceConfig.communityVoteThreshold.type !== VoteThresholdType.Disabled
+    realmConfig?.account.communityTokenConfig.tokenType !==
+    GoverningTokenType.Dormant
   const councilEnabled =
-    governanceConfig &&
-    governanceConfig.councilVoteThreshold.type !== VoteThresholdType.Disabled
+    realmConfig?.account.councilTokenConfig.tokenType !==
+    GoverningTokenType.Dormant
 
   const canEditRules =
     ownVoterWeight &&
