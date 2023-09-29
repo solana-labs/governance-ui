@@ -11,7 +11,7 @@
     "twitter": "@cyborgapes_nft",
     "discord": "https://discord.gg/9ue6ktyu",
     "shortDescription": "Cyborg Apes Society Mission DAO",
-    "sortRank": 3
+    "sortRank": -1000
   },
   {
     "symbol": "Dean's List Network State",
@@ -21,7 +21,7 @@
     "bannerImage": "/realms/Deans_List_Network_State/banner-deanslist.png",
     "website": "https://www.deanslist.services/",
     "twitter": "@deanslistDAO",
-    "discord": "https://discord.gg/deanslist",
+    "discord": "https://discord.gg/deanfslist",
     "ogImage": "/realms/Deans_List_Network_State/avatar-deanslist.png",
     "github": "https://github.com/Deans-List/",
     "shortDescription": "A Service DAO turned Network State, consisting of Web3 power users providing feedback sessions. Join us in changing the future of work!"
@@ -34,7 +34,7 @@
     "bannerImage": "/realms/Ukraine/img/Flag_of_Ukraine.svg",
     "ogImage": "/realms/Ukraine/img/Ukraine_Logo.png",
     "sharedWalletId": "66pJhhESDjdeBBDdkKmxYYd7q6GUggYPWjxpMKNX39KV",
-    "sortRank": 3
+    "sortRank": 2
   },
   {
     "symbol": "MNGO",
@@ -46,7 +46,7 @@
     "communityMint": "MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac",
     "ogImage": "https://i.imgur.com/448n6bC.jpg",
     "shortDescription": "Every market, all the power, none of the fuss. Simplifying decentralized finance through easy-to-use products and developer tools.",
-    "sortRank": 3,
+    "sortRank": 99,
     "website": "https://mango.markets",
     "keywords": "Mango Markets, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
     "twitter": "@mangomarkets",
@@ -61,7 +61,7 @@
     "communityMint": "EADxj4FGaoe2BmTtigPznGCqZ8Yh4LqBU51NoyCjv1Bc",
     "ogImage": "/realms/CryptoHelp/cryptohelp.png",
     "shortDescription": "A compassionate, blockchain-powered collective, uniting individuals to swiftly make critical decisions and allocate resources to aid those facing emergencies.",
-    "sortRank": 6,
+    "sortRank": -1000,
     "website": "https://cryptohelp.me",
     "keywords": "CryptoHelp, Crowdfunding, help, DAO, Crypto, Solana, REALM, Governance, ERC20, SOL, SPL, Cross-Chain, Support, Fastest, Fast,",
     "discord": "https://discord.gg/Tw7dqTJZmZ"
@@ -136,7 +136,6 @@
     "realmId": "3MMDxjv1SzEFQDKryT7csAvaydYtrgMAc3L9xL9CVLCg",
     "ogImage": "https://i.ibb.co/0j2TR8T/serum.jpg",
     "shortDescription": "Faster, Cheaper and more Powerful DeFi",
-    "sortRank": 3,
     "website": "https://projectserum.com",
     "twitter": "@ProjectSerum",
     "discord": "https://discord.gg/KGZS5HRAfF",
@@ -168,8 +167,7 @@
     "realmId": "6Fiy6ZrCKBfcMieNq3S6qSzfpgRTYKn5zPW78VL9FwjL",
     "ogImage": "/realms/MDLH/img/MDLH.png",
     "bannerImage": "/realms/MDLH/img/banner.jpeg",
-    "sharedWalletId": "7ifeCFVFsxoQNfqiSBF9qFfHcNSQAyoQU63GV2RmJoUi",
-    "sortRank": 3
+    "sharedWalletId": "7ifeCFVFsxoQNfqiSBF9qFfHcNSQAyoQU63GV2RmJoUi"
   },
   {
     "symbol": "Duck Punkz",
@@ -179,7 +177,6 @@
     "realmId": "6Yj8shsZrjqYQuPkEzcvkmdFq5Nn7RSVQ4EsNqLx7DJQ",
     "ogImage": "https://pbs.twimg.com/profile_images/1563167507476713473/ZDruLZv7_400x400.jpg",
     "shortDescription": "Crypto Duck Punkz: The Great Quekening ",
-    "sortRank": 3,
     "twitter": "@cryptoduckpunkz",
     "discord": "http://discord.gg/EYh3j6VQ6J"
   },
@@ -237,7 +234,6 @@
     "realmId": "8iAceAv7XyRXUsvS2LXjkSy9QAc99csdQpSCNvFGgnk8",
     "ogImage": "https://raw.githubusercontent.com/hetwik/wikicious-assets/main/wikicious.png",
     "shortDescription": "wikicious is a decentralized crypto exchange and trading platform that runs on solana blockchain",
-    "sortRank": 3,
     "website": "https://wikicious.com/",
     "twitter": "@wikiciousmarkets",
     "github": "https://github.com/wikicious"
@@ -293,7 +289,6 @@
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "3QF8K3jK8Kpn7Ls9Wn3FcFWquKGcJHUfnD25bTufWeLL",
     "bannerImage": "/realms/WezeshaDAO/img/WezeshaBanner.png",
-    "sortRank": 3,
     "shortDescription": "Wezesha means 'to enable' in Swahili. We want to enable tech progress and web3 in the ascending world.",
     "website": "https://wezesha.co",
     "keywords": "Wezesha DAO, Wezesha, Wezesha Coin, The Big Five NFTs Club, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, SPL-TOKEN, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
@@ -563,7 +558,7 @@
     "realmId": "899YG3yk4F66ZgbNWLHriZHTXSKk9e1kvsKEquW7L6Mo",
     "ogImage": "/realms/MNDE/img/mnde_logo.png",
     "shortDescription": "Secure Solana and earn rewards without your funds locked in.",
-    "sortRank": 3,
+    "sortRank": 98,
     "website": "https://marinade.finance/",
     "twitter": "@marinadefinance",
     "discord": "https://discord.com/invite/6EtUf4Euu6",
@@ -665,7 +660,7 @@
     "realmId": "6NzVDMfEBJvkFDnjPx53K7mLGW3yQdSjLhsamS8go4cn",
     "ogImage": "https://i.imgur.com/34Ss9kj.png",
     "shortDescription": "Bonfida has a simple, yet realistic goal of providing products and services that will enhance the Solana blockchain experience.",
-    "sortRank": 3,
+    "sortRank": 2,
     "website": "https://bonfida.org/",
     "twitter": "@bonfida",
     "keywords": "Bonfida, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
@@ -754,7 +749,7 @@
     "realmId": "8HZ4V94dtojrTpdUpWrfstr7bEhRnZZHn8jotfns9L9x",
     "ogImage": "/realms/RatioFinance/img/ratiologo.png",
     "shortDescription": "Our mission at Ratio Finance is to De-Risk DeFi for all.",
-    "sortRank": 3,
+    
     "website": "https://ratio.finance/",
     "twitter": "@RatioFinance",
     "discord": "https://discord.com/invite/5v8AYva8nU"
@@ -900,7 +895,7 @@
     "realmId": "9PmmctkHPN5Br8V4gmjNuUdccrD7TtzfJ7U8mcpoBGXd",
     "ogImage": "https://pbs.twimg.com/profile_images/1493280200288735234/C8zpit6a_400x400.jpg",
     "shortDescription": "A fantasy-punk shared world that’s shaped and owned by community.",
-    "sortRank": 3,
+    
     "website": "http://neofairies.com/",
     "twitter": "@neofairies",
     "discord": "https://discord.gg/neofairies",
@@ -1201,7 +1196,7 @@
     "realmId": "DCdCsuUjg6MnULfEmBUmvg1heggnLrKSFdp5uTRSKuwR",
     "ogImage": "/realms/Epics/EpicsLogoSquareInvert.svg",
     "shortDescription": "Buidl to Earn. Epics is a decentralized crowdsourcing platform for incentivizing open source software development.",
-    "sortRank": 3,
+    
     "website": "https://epics.dev",
     "twitter": "@EpicsDAO2",
     "discord": "https://discord.gg/GmHYfyRamx",
@@ -1286,26 +1281,10 @@
     "realmId": "G43QB1csngJDWBhrBCba5tbVcxcPHhGNtGkqfntfP6fg",
     "ogImage": "https://worldtop.mypinata.cloud/ipfs/QmXbMPq3Js6iJx6guEZsB8PaAPX6vB1Fr5wMRQnLavoUQk",
     "shortDescription": "BlockLive is fast, easy, transparent way to buy and sell live event tickets that you can hold onto for a lifetime.",
-    "sortRank": 3,
     "website": "https://blocklive.io/",
     "twitter": "@blocklive_",
     "discord": "https://discord.gg/pNdYQzwZ",
     "github": "https://github.com/BlockLive"
-  },
-  {
-    "symbol": "Friktion",
-    "category": "defi",
-    "bannerImage": "https://i.imgur.com/phXF3sh.png",
-    "displayName": "Friktion",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "CXGN5H84vXjoQg7jkAKdAbMtEv3S2K4t8kptwzPzfQLQ",
-    "ogImage": "https://i.imgur.com/Tt8n8qE.png",
-    "shortDescription": "Smarter returns on your crypto",
-    "sortRank": 3,
-    "website": "https://friktion.fi/",
-    "twitter": "@friktion_labs",
-    "discord": "https://discord.gg/friktion",
-    "github": "https://github.com/Friktion-Labs"
   },
   {
     "symbol": "Squads",
@@ -1331,7 +1310,6 @@
     "realmId": "BZE9AiJrMxUXXjwy9iBPzj34Wh5Zf1wLEFAM4oSSMRLi",
     "ogImage": "/realms/Allie-Coin-DAO/Allie-Coin-Logo.png",
     "shortDescription": "Allie Coin unlocks a new world of gaming.",
-    "sortRank": 3,
     "website": "https://alliecoin.io/",
     "twitter": "@allie_coin",
     "discord": "https://discord.gg/wAzwpQCNF2"
@@ -1345,7 +1323,6 @@
     "realmId": "5NNv1oJ4PFhE2416kTNDzrR9axoHjBTw2CNABqcYpXXL",
     "ogImage": "https://superteam.fun/_next/image?url=https%3A%2F%2Fsuper-static-assets.s3.amazonaws.com%2F75e99297-73de-4946-ba6b-0ac603638793%2Fimages%2F259d92ba-12da-42d7-be75-4c9b8b0796dd.png&w=3840&q=80",
     "shortDescription": "Superteam is a community dedicated to helping Solana projects launch and grow. ",
-    "sortRank": 3,
     "website": "https://superteam.fun/",
     "twitter": "@SuperteamDAO",
     "discord": "https://discord.com/invite/Mq3ReaekgG ",
@@ -1533,7 +1510,6 @@
     "realmId": "aoBhePkPBCvrSZrK1ioEz6duUY211jfeBPzMzeGAqT8",
     "ogImage": "https://uploads-ssl.webflow.com/62836ced977bb370cdeeecd7/62839a8ffa3bf57b0f3dc040_avatars.gif",
     "shortDescription": "Panzerdogs is a Solana NFT gaming project where players can own all of their in-game assets and use them for P2E and P2P battles.",
-    "sortRank": 3,
     "website": "https://www.panzerdogs.io/",
     "twitter": "@panzerdogs",
     "discord": "https://discord.gg/panzerdogs"
@@ -1707,7 +1683,6 @@
     "realmId": "4Mgn32BDz48BNRTJLk7fKg3e5Rtgfvf4WvCisR58fsiw",
     "ogImage": "https://i.imgur.com/hU072BV.png",
     "shortDescription": "Dynamically growing, genetically unique plants with customizable traits that remove CO2 from the atmosphere as they grow!",
-    "sortRank": 3,
     "website": "https://www.plantoids.io",
     "twitter": "@PlantoidsNFT",
     "discord": "https://discord.gg/twGScVXwty"
@@ -1721,7 +1696,6 @@
     "realmId": "JDAa2nFhyaRsESqYqWoZp6aw8egtcSV2UvKRDgfvgNLY",
     "ogImage": "https://i.imgur.com/5ISruUM.png",
     "shortDescription": "Mini Royale: Nations is a community-owned skill-based shooter set on top of an ever-evolving social strategy game.",
-    "sortRank": 3,
     "website": "https://miniroyale.io/",
     "twitter": "@MiniNations",
     "discord": "https://discord.gg/miniroyale"
@@ -1733,7 +1707,6 @@
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "6Ffasv4dQ8ZeRbZXZx2tiHcgJh5Y5VELmxnA7Qh1RWRg",
     "shortDescription": "Web3’s Global Home ",
-    "sortRank": 3,
     "website": "https://empiredao.xyz/",
     "twitter": "@empiredao"
   },
@@ -1757,7 +1730,6 @@
     "displayName": "Angelic ",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "HsU14rpiBDC33hBsDPFQdZWaeykmKr67x3D2hA5RJRJD",
-    "sortRank": 3,
     "website": "https://angelicthegame.com/",
     "twitter": "@angelicthegame",
     "discord": "https://dsc.gg/angelicthegame"
@@ -1771,7 +1743,6 @@
     "realmId": "AvpoeRXmbfrtkF9NQvWkcN4LbWmQHy3ntWnYudEUdU3N",
     "ogImage": "https://i.imgur.com/MGcybjN.jpg",
     "shortDescription": "Licensed athlete token, NFT & social platform.",
-    "sortRank": 3,
     "website": "https://www.blocksset.co/",
     "twitter": "@blockassetco",
     "discord": "https://www.discord.gg/blockasset"
@@ -1785,7 +1756,6 @@
     "realmId": "FxccMsauuC2KSsWMvrTytm2eP18oRr1HC1VLCaWEysAR",
     "ogImage": "https://3376093563-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2Fyc0V2H6VuzSAxmtjN5ka%2Fuploads%2F9AgFRI7sWh4xTBRiu2z9%2FLogo%20Icon%20Original%20(2).png?alt=media&token=76b3a796-9225-4ff9-9602-f43027a170d4",
     "shortDescription": "A Solana native eCommerce platform!",
-    "sortRank": 3,
     "website": "https://aten.app/",
     "twitter": "@AtenSolana",
     "discord": "https://discord.gg/pUn8uTj8Kv"
@@ -1799,7 +1769,6 @@
     "realmId": "4pAWUQBEvSo5sAeKt2bT8htJXy55J4inJDQhzwDcHWv3",
     "ogImage": "https://i.imgur.com/VZ9Jo9z.jpg",
     "shortDescription": "Own and manage a virtual basketball team. Build your roster of players and compete to win cash rewards in live basketball games.",
-    "sortRank": 3,
     "website": "https://www.vbagame.com/",
     "twitter": "@vbagame",
     "discord": "https://discord.gg/vbagame"
@@ -1813,7 +1782,7 @@
     "realmId": "GL54h53j3KAJZ8AqihMo4H48DgRR8nmSwXxSz1ALTGXg",
     "ogImage": "https://uploads-ssl.webflow.com/6265f670acb30e9728ef1297/635b16d3cf67fdd8839a93cb_22_10_27%20Logo%20Orange%20just%20O.png",
     "shortDescription": "A decentralized synthetic asset protocol bringing commodity markets on-chain.",
-    "sortRank": 3,
+    
     "website": "https://www.ostium.io",
     "twitter": "@ostium_fi",
     "discord": "https://discord.gg/ny3HCfNt",
@@ -1826,7 +1795,7 @@
     "displayName": "01 Exchange",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "EVsSaLkZbnekEnVeMsYEKtj2gYxcuaVYjGLUhVXzKTA9",
-    "sortRank": 3,
+    
     "website": "https://01.xyz/",
     "twitter": "@01_exchange"
   },
@@ -1839,7 +1808,7 @@
     "realmId": "EAyrTrS4fEkCCXtbn3qFEtv4LzocYMqeVGYKW7syPt6Y",
     "ogImage": "https://i.imgur.com/s5dyeqS.jpg",
     "shortDescription": "Bridging fashion and Web3 through a collection of vibey creatures",
-    "sortRank": 3,
+    
     "website": "https://www.drippies.space/",
     "twitter": "@drippieverse",
     "discord": "https://discord.gg/drippieverse"
@@ -1853,7 +1822,7 @@
     "realmId": "8PaQWLgqMyF6oxhteahuhvKag2RcbedsRuy2jMFJoLzU",
     "ogImage": "https://i.imgur.com/KDi5P9l.png",
     "shortDescription": "Degen Legends is esports & investment gaming organization, born in the heart of the web3 gaming revolution. ",
-    "sortRank": 3,
+    
     "website": "https://www.degenlegends.io/",
     "twitter": "@DegenLegends",
     "discord": "discord.gg/degenlegends",
@@ -1868,7 +1837,7 @@
     "realmId": "GMpWmXc3sKejmAcAFpcQ4NgCL9Fx3gFR2FeepNUtK5Mh",
     "ogImage": "https://raw.githubusercontent.com/Francium-DeFi/materials/main/francium_logo_white_background_with_ring.png.png",
     "shortDescription": "Francium is a DeFi yield strategy Platform on Solana. Granted by Solana & Serum.",
-    "sortRank": 3,
+    
     "website": "https://francium.io/",
     "twitter": "@Francium_Defi",
     "discord": "https://discord.com/invite/francium",
@@ -1883,7 +1852,7 @@
     "realmId": "9dvvWxLNRv2HWRkc1FJdgpXuF9fDRZMsCbw6vTdHbp5",
     "ogImage": "https://i.imgur.com/dwuDf3u.jpg",
     "shortDescription": "The Search Engine for Blockchains",
-    "sortRank": 3,
+    
     "website": "https://ora.so",
     "twitter": "@oralabs_"
   },
@@ -1896,7 +1865,7 @@
     "realmId": "DdNEw88N8VTeYfvxdLBwQ9aR4trejTUapGZRGdaMqyNY",
     "ogImage": "https://i.imgur.com/pWJFEOj.png",
     "shortDescription": "Connect your Solana wallet to join a gated-access group chat with other, verified NFT collection holders.",
-    "sortRank": 3,
+    
     "website": "https://Contribute.xyz",
     "twitter": "@Contribute_xyz",
     "github": "https://github.com/ContributeDAO/"
@@ -1910,7 +1879,7 @@
     "realmId": "2XsZGq4GJoaQ7dC91yWuneq4U9VK3wE6XJ185a4D7fwe",
     "ogImage": "https://artivive.com/assets/uploads/2022/10/artivive_avatar_1.jpg",
     "shortDescription": "Artivive is the AR art platform onboarding 200.000 artists to WEB3",
-    "sortRank": 3,
+    
     "website": "https://artivive.com/",
     "twitter": "@ArtiviveApp",
     "discord": "https://discord.com/invite/BBTpqxyGW2"
@@ -1923,7 +1892,7 @@
     "realmId": "AH4qTqRFcoNqmYEi7p8heAGVSPHfJrNUPa8DvjDnBsf3",
     "ogImage": "https://storage.googleapis.com/carpool-public-media/carpool-icon.png",
     "shortDescription": "Backend as a Service for Solana Developers",
-    "sortRank": 3,
+    
     "website": "https://www.carpool.dev/",
     "twitter": "@CarpoolDev",
     "discord": "https://discord.gg/h5BphJByAN"
@@ -1937,7 +1906,7 @@
     "realmId": "58axqgJSAEK3adKL5hx5dYoRqkYMEiEXQZqk9FFFpa7f",
     "ogImage": "https://i.imgur.com/PSk30Rp.jpg",
     "shortDescription": "Experience the World of Solana. IRL.",
-    "sortRank": 3,
+    
     "website": "https://solanaspaces.com",
     "twitter": "@solanaspaces"
   },
@@ -1948,7 +1917,7 @@
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "54owXqUwmzR18h4NY6VEp45SNp6qtJUfByDeQuHenhgK",
     "shortDescription": "Build your space in the Metaverse",
-    "sortRank": 3,
+    
     "website": "https://theportal.to/",
     "twitter": "@_portals_",
     "discord": "https://discord.gg/portals"
@@ -1962,7 +1931,7 @@
     "realmId": "2pJND9oPC1F4yWrBsxTDpmMcg6BbFSwvcu1kExBkbVDU",
     "ogImage": "https://pbs.twimg.com/profile_images/1576678407366213632/dNd2-caG_400x400.jpg",
     "shortDescription": "Bridgesplit is tokenization infrastructure for complex on & off-chain assets, powering indexes, tranching, lending and more.",
-    "sortRank": 3,
+    
     "website": "https://bridgesplit.com",
     "twitter": "@bridgesplit",
     "discord": "https://discord.gg/bridgesplit",
@@ -1977,7 +1946,7 @@
     "realmId": "H3A8YM1ggR7GggD9qX4CEWkvPmkQUXuhGq2AGpbgqM6J",
     "ogImage": "https://i.imgur.com/fBOx8Qe.png",
     "shortDescription": "The blockchain mobile game that cleans up the planet",
-    "sortRank": 3,
+    
     "website": "https://garbles.fun/",
     "twitter": "@garblesfun",
     "discord": "https://discord.gg/zQ3CPA7TVu",
@@ -2036,7 +2005,7 @@
     "realmId": "EhDvEUsxDSzU49jnyQ9iTheqQTPtG43gFvwbbrgye8t7",
     "ogImage": "https://pbs.twimg.com/profile_images/1580267930666749952/xRSHqD0N_400x400.jpg",
     "shortDescription": "Zebec is a continuous settlement protocol on Solana. We are revolutionizing payroll by introducing streaming finance technology.",
-    "sortRank": 3,
+    
     "twitter": "@Zebec_HQ",
     "discord": "https://t.co/kwC1Plza41",
     "github": "https://github.com/Zebec-protocol/"
@@ -2049,7 +2018,7 @@
     "realmId": "GZyALQBvdBswSpMLabKEBVgKykkZMgnYcJgFk5dGU4aV",
     "ogImage": "https://snowflake.so/assets/snowflake.png",
     "shortDescription": "The most trusted multisig platform on Solana with native automation & a rich app store built for every team's needs.",
-    "sortRank": 3,
+    
     "website": "https://snowflake.so",
     "twitter": "@snowflake_sol",
     "discord": "https://discord.gg/9qWK2BNaMD",
@@ -2064,7 +2033,7 @@
     "realmId": "H2wGwADHWze2yZRurayzutPnDeKxpvf6WhVJpzixM121",
     "ogImage": "https://i.imgur.com/uCHPIk5.png",
     "shortDescription": "Low-cost leverage of your crypto assets by minting USH, a decentralized overcollateralized stablecoin that is fully composable. ",
-    "sortRank": 3,
+    
     "website": "https://hedge.so",
     "twitter": "@HedgeLabs",
     "discord": "https://discord.gg/hedge",
@@ -2079,7 +2048,7 @@
     "realmId": "DVDoxbAiYv8oyScU1TUL7ZSsVMpU7zARaFTqwqdw5p5R",
     "ogImage": "https://pbs.twimg.com/profile_images/1441071172452425742/1_N9szP0_400x400.jpg",
     "shortDescription": "web3 social network",
-    "sortRank": 3,
+    
     "website": "https://solcial.io/",
     "twitter": "@solcialofficial",
     "discord": "https://discord.gg/solcial",
@@ -2093,7 +2062,7 @@
     "realmId": "8V5BthCyL5LFDsWDKhfmAHqEgudSw1pXMC2PmWKAAr3D",
     "ogImage": "https://crossmint.notion.site/image/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2F0bbd2497-149e-4c09-899f-db712b7903ec%2Fcrossmint-logo-gradient.svg?table=block&id=35587462-6b8b-47fc-9d2d-785820faa16f&spaceId=d0f95547-f516-4746-9a98-cfb9535377c4&userId=&cache=v2",
     "shortDescription": "Crossmint builds infrastructure to make NFTs accessible to everyone: minting APIs, fiat on-ramp, wallets, and more",
-    "sortRank": 3,
+    
     "website": "http://crossmint.com",
     "twitter": "@crossmint",
     "discord": "https://discord.gg/crossmint"
@@ -2107,7 +2076,7 @@
     "realmId": "FiKdbhsKRMTzSfyTDRqBY3cy5GjAqCSXYJYRe2wQQ8Ly",
     "ogImage": "https://i.imgur.com/6RCUXM3.jpg",
     "shortDescription": "Financial Products & Services for NFT Owners. Initially launching with a fully customizable NFT-collateralized loans platform.",
-    "sortRank": 3,
+    
     "website": "https://unloc.xyz",
     "twitter": "@UnlocNFT",
     "discord": "https://twitter.com/UnlocNFT",
@@ -2121,7 +2090,7 @@
     "realmId": "2m2HfiYwMdbwVQ2BsSdqzQihdK2c2JymVy7aREDa9Lzu",
     "ogImage": "https://i.imgur.com/avceXLB.png",
     "shortDescription": "Credit investing made global ",
-    "sortRank": 3,
+    
     "website": "https://credix.finance",
     "twitter": "@Credix_finance",
     "github": "https://github.com/credix-finance"
@@ -2135,7 +2104,7 @@
     "realmId": "6iMVHPfcBebctV5bvSY23d2nuDuKvzTLP9HNCwWV2gGe",
     "ogImage": "https://i.imgur.com/XDe5JAy.png",
     "shortDescription": "4,444 Ancestors to guide you on your Journey into Web3",
-    "sortRank": 3,
+    
     "website": "https://www.ourdiaspora.xyz/",
     "twitter": "@OurDiaspora",
     "github": "https://github.com/diaspora-labs"
@@ -2149,7 +2118,7 @@
     "realmId": "DXezSkchMaYZTa3WM5xVU1SDQhMsFspMLuyyMuWk2YK9",
     "ogImage": "https://i.ibb.co/nwc9YkH/1.png",
     "shortDescription": "The First AAA-Quality Free-to-Play NFT MMO Shooter on Solana!",
-    "sortRank": 3,
+    
     "website": "https://rageeffect.io",
     "twitter": "@RageEffect_",
     "discord": "https://discord.gg/rCCpKpUxb4"
@@ -2163,7 +2132,7 @@
     "realmId": "3DLKv41oFs8DiHBkUEdm3MwiyJ9Sp4E6sb8QCAqynnbA",
     "ogImage": "https://i.imgur.com/4T6fjCz.png",
     "shortDescription": "A fully decentralized peer-to-peer communications platform",
-    "sortRank": 3,
+    
     "website": "https://www.satellite.im/",
     "twitter": "@Satellite_im"
   },
@@ -2176,7 +2145,7 @@
     "realmId": "7Ad1wQdytLHSFxnUyEHVPUYrNKMect4Qs5pQtYgFCrr3",
     "ogImage": "https://i.imgur.com/iwthT5U.png",
     "shortDescription": "SkateX is a free-to-play extreme sports video game that uses blockchain technology so players can truly own their digital gear.",
-    "sortRank": 3,
+    
     "website": "https://www.skatex.io/",
     "twitter": "@PlaySkateX",
     "discord": "https://discord.gg/skatex"
@@ -2190,7 +2159,7 @@
     "realmId": "7KsnMMyrF8wsxsLZNBZ8hRkGe13MdjAT9ko1qDEvkEWQ",
     "ogImage": "https://pbs.twimg.com/profile_images/1571859763121758208/32YgNnii_400x400.png",
     "shortDescription": "The easiest way to add checkout and shopping data to any app",
-    "sortRank": 3,
+    
     "website": "https://www.rye.com",
     "twitter": "@rye",
     "discord": "https://discord.gg/HQuXqsGc",
@@ -2205,7 +2174,7 @@
     "realmId": "HJ4YUJFSa1xX5wfbrPQKMTcTTnyT2eMxBk2eyBFGVmR7",
     "ogImage": "https://i.imgur.com/iajmud9.png",
     "shortDescription": "APIs & SDKs for video game developers to easily implement smart contracts into games with no blockchain knowledge required.",
-    "sortRank": 3,
+    
     "website": "https://ludex.gg/",
     "twitter": "@ludexgg",
     "discord": "https://discord.com/invite/ludex",
@@ -2220,7 +2189,7 @@
     "realmId": "DntR8BU5tYVhQUNfARFG5VxKrpdRaKY2qKC3v8cYJirm",
     "ogImage": "https://i.imgur.com/eKF74mG.png",
     "shortDescription": "Okay Bears has the highest trade volume of any NFT collection on Solana and is an emerging global icon of clean, positive cool.",
-    "sortRank": 3,
+    
     "website": "https://okaybears.com",
     "twitter": "@okaybears",
     "discord": "https://discord.com/invite/okaybears"
@@ -2234,7 +2203,7 @@
     "realmId": "wij7YqAPCYtPk4isjY5TpoMpbYC7xupwuKVzpbnZHp7",
     "ogImage": "https://i.imgur.com/RQ9Ys7o.png",
     "shortDescription": "HEIR - the best sports culture community for athletes and fans with exclusive content, experience, merchandise, and digital assets",
-    "sortRank": 3,
+    
     "website": "https://www.heir.app/",
     "twitter": "@Heir_Company",
     "discord": "https://discord.com/channels/943655968183578674/943655968674283608"
@@ -2299,7 +2268,7 @@
     "realmId": "HWYGhNLKUrrE8RmVkitDZrgsb68Ye8sp5P2pVLb2FyNf",
     "ogImage": "https://i.imgur.com/PbV3nRm.png",
     "shortDescription": "Community-driven Social Web3 Gaming - Building Everlasting IPs Togehter with Our Fans! ",
-    "sortRank": 3,
+    
     "website": "https://gangbusters.io/",
     "twitter": "@gangbusters_io",
     "discord": "https://discord.gg/battletabs"
@@ -2313,7 +2282,7 @@
     "realmId": "8msNFq5VBectsGAv66zYx5QRve1p3m6ZEz49xaWX3tbd",
     "ogImage": "https://uploads-ssl.webflow.com/6320eecd0f98b4666b218021/635bd4c7c5a75162302a70a4_ms6lYn6g_400x400.jpg",
     "shortDescription": "Parcl is an investment protocol that allows users to trade the price movements of real estate markets around the world. ",
-    "sortRank": 3,
+    
     "website": "https://parcl.co",
     "twitter": "@parcl",
     "discord": "http://discord.gg/parcl",
@@ -2328,7 +2297,7 @@
     "realmId": "5jHwG4CWkZhJD75M9kiZybGtzr4GC32NwvEq6dmSKefm",
     "ogImage": "https://ev.io/sites/default/files/wallet_image/OracleTiny.png",
     "shortDescription": "Ev.io is a competitive first person shooter on Solana in which you can earn SOL for getting kills. ",
-    "sortRank": 3,
+    
     "website": "https://ev.io",
     "twitter": "@play_evio",
     "discord": "http://discord.gg/evio"
@@ -2341,7 +2310,7 @@
     "realmId": "27tbVohNkTpWiKtz1oGJQPhb3gPSGJfc4e2MtqFcuSuW",
     "ogImage": "https://glassimg.imgix.net/new-icon.png?w=108&h=108&fm=webp",
     "shortDescription": "Glass is the first video NFT marketplace for video creators, collectors, and traders built on the solana blockchain. ",
-    "sortRank": 3,
+    
     "website": "https://glass.xyz/",
     "twitter": "@glassprotocol",
     "discord": "https://discord.gg/xn79hkqRFD"
@@ -2355,7 +2324,7 @@
     "realmId": "99vU7SHYJ4tSEqRNjY352Fx7gMSYfgcqxmjBMDyx3q8j",
     "ogImage": "https://pbs.twimg.com/profile_images/1470433908185513994/x7Gyha1M_400x400.jpg",
     "shortDescription": "A DeFi primitive to create, trade, and settle, on-chain derivatives",
-    "sortRank": 3,
+    
     "website": "https://www.vyperprotocol.io/",
     "twitter": "@VyperProtocol",
     "discord": "https://discord.com/invite/DuXVSgjmuW",
@@ -2385,7 +2354,7 @@
     "realmId": "HivVP77n6hsrgsaJUoHkYRMzgjjfmgWdcRrdrYSm6LLg",
     "ogImage": "https://ipfs.io/ipfs/bafkreieiumjwp6dt6xckxvineeqowt6m565c3i25fn2b3hz4wodeirfn5q",
     "shortDescription": "Helping brands, influencers, and their fans thrive in the new tokenized economy.",
-    "sortRank": 3,
+    
     "website": "https://campus.io/",
     "twitter": "@campusunlocks"
   },
@@ -2441,7 +2410,7 @@
     "realmId": "5KvezmjkfTshcWZ56jt6xj88Nu5Lbgy4gigHenhH8HPb",
     "ogImage": "https://i.imgur.com/29MQYJy.png",
     "shortDescription": "Chillchat is the collaborative platform to build virtual worlds.",
-    "sortRank": 3,
+    
     "website": "https://chillchat.me/",
     "twitter": "@chillchatme",
     "discord": "http://discord.gg/chillchat"
@@ -2455,7 +2424,7 @@
     "realmId": "2hzSGHCfkAaGWedSc3Bh9CrmxGaQNCu8wjZPUfvbkYm7",
     "ogImage": "https://i.ibb.co/1vB3PVV/grim-copy.png",
     "shortDescription": "Global storytelling brand anchored in lore, gaming, and unique NFT experiences.",
-    "sortRank": 3,
+    
     "website": "https://grimsyndicate.com/",
     "twitter": "@Grim__Syndicate",
     "discord": "https://discord.com/invite/grimsyndicate",
@@ -2483,7 +2452,7 @@
     "realmId": "5Mt6EghNJHaPbNtHxH7tbbrMdwSP3sXcPRCqwPCbTVN4",
     "ogImage": "https://i.imgur.com/6O8aTQB.png",
     "shortDescription": "Audius is a fully decentralized music platform. Own the masters & the platform.",
-    "sortRank": 3,
+    
     "website": "https://audius.co/",
     "twitter": "@AudiusProject",
     "discord": "https://discord.gg/audius",
@@ -2498,7 +2467,7 @@
     "realmId": "23DjgMdE4vCCNckzy8F4NvRFMxH6X2LVU6DrC75btVR8",
     "ogImage": "https://pbs.twimg.com/profile_images/1539994043706253312/ukuwuvkD_400x400.jpg",
     "shortDescription": "Cega is the #1 options protocol on Solana building exotic options structured products offering the best risk-adjusted yield.",
-    "sortRank": 3,
+    
     "website": "https://app.cega.fi/",
     "twitter": "@cega_fi",
     "discord": "http://discord.gg/cega"
@@ -2512,7 +2481,7 @@
     "realmId": "4vXAFpUSfRzxbtriRe7tH6u2Uwbm2SmBsD8EKnWow5qh",
     "ogImage": "https://ipfs.io/ipfs/QmQ6VgRFiVTdKbiebxGvhW3Wa3Lkhpe6SkWBPjGnPkTttS/7978.png",
     "shortDescription": "Your crypto, paycheck, and debit card – all in one sleek app.",
-    "sortRank": 3,
+    
     "website": "getcogni.com",
     "twitter": "@getcogni",
     "discord": "https://twitter.com/getcogni"
@@ -2599,7 +2568,7 @@
     "realmId": "9pLvqBe2CxC4HXQD5UQ7YLpQUqC5A9SqU4kNqw9inbNQ",
     "ogImage": "https://i.imgur.com/tSTSdAh.png",
     "shortDescription": "Eternal Dragons is a Web3 gaming series brought to you by Trailblazer Games, telling the story of the long-lost Eternal Dragons.",
-    "sortRank": 3,
+    
     "website": "https://eternaldragons.com/",
     "twitter": "@EternalDragons_",
     "discord": "https://discord.com/invite/eternaldragons",
@@ -2614,7 +2583,7 @@
     "realmId": "413KSeuFUBSWDzfjU9BBqBAWYKmoR8mncrhV84WcGNAk",
     "ogImage": "https://tulipprotocol.notion.site/image/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2F7fb0fb44-825e-46f3-aae1-b76cc9684547%2Fnew-logo.png?table=block&id=e0916de3-eca0-429b-ab04-6b9df820f4f1&spaceId=b22e9cdb-d148-4721-823e-c7a372f168da&width=1200&userId=&cache=v2",
     "shortDescription": "Solana's Yield Aggregation Homestead",
-    "sortRank": 3,
+    
     "website": "https://tulip.garden/",
     "twitter": "@TulipProtocol",
     "discord": "https://discord.com/invite/tulip",
@@ -2629,7 +2598,7 @@
     "realmId": "3HC3mCQkpAAHQZa3aJjQJFpFNwoLp3ZWnkCYuWzoymo9",
     "ogImage": "https://pbs.twimg.com/profile_images/1587347395507113984/_Y2HV3ye_400x400.jpg",
     "shortDescription": "Simple, Reliable Cover For Everyone in Web3.Maximum protection and yield, fully protected through Protocol Controlled Reserves",
-    "sortRank": 3,
+    
     "website": "https://amulet.org/",
     "twitter": "@AmuletProtocol",
     "discord": "https://discord.com/invite/AmuletProtocol",
@@ -2644,7 +2613,7 @@
     "realmId": "4X8PMiLabGjdAHdrKL9SLu1HAMMp9xNcn3DY2mAciT8N",
     "ogImage": "https://i.imgur.com/Bn9n7sF.png",
     "shortDescription": "Faraway makes fun and social games with player-driven economies",
-    "sortRank": 3,
+    
     "website": "https://faraway.gg/",
     "twitter": "@farawaygg"
   },
@@ -2657,7 +2626,7 @@
     "realmId": "A3WX4QKcioruP71f4yweusv9jqU9R4LtGfJEHtZhs3Rx",
     "ogImage": "https://i.imgur.com/PHo3WRt.jpg",
     "shortDescription": "Remix the world! A new card strategy racing game from a team that worked on HALO, FIFA, Battlefield & PokerStars. Mask Up!",
-    "sortRank": 3,
+    
     "website": "https://www.mixmob.io/",
     "twitter": "@MixMobOrigin",
     "discord": "discord.gg/mixmob",
@@ -2672,7 +2641,7 @@
     "realmId": "53pMaU2DXieGxwXZLMN1rgDECwFrxuYw5u9QgEFCx4Rd",
     "ogImage": "https://pbs.twimg.com/profile_images/1563154884718985216/MPPps3IA_400x400.jpg",
     "shortDescription": "Kamino is an active liquidity management layer that fully automates concentrated liquidity DEX positions across Solana.",
-    "sortRank": 3,
+    
     "website": "https://bit.ly/Kamino-Site",
     "twitter": "@kamino_finance",
     "discord": "https://discord.gg/kaminofinance",
@@ -2687,7 +2656,7 @@
     "realmId": "DKDkC6km37NcExxgBFW1nToSiybPvbu5RwhSSnRWwXYo",
     "ogImage": "https://cdn.discordapp.com/attachments/953968357579837441/1034573854338715688/Frame_327.jpg",
     "shortDescription": "Find and reward the SUPERSTARS in your Discord with Moonlit.",
-    "sortRank": 3,
+    
     "website": "https://www.moonlit.team/",
     "twitter": "@moonlit_team",
     "discord": "https://discord.gg/ESXqmPy6wV"
@@ -2701,7 +2670,7 @@
     "realmId": "4pzwicnneaxCL4XVms2gJApfj7jpiFvDMzCWEHYw2rMV",
     "ogImage": "https://i.imgur.com/cF4oQK7.png",
     "shortDescription": "Your Crypto Everything App.",
-    "sortRank": 3,
+    
     "website": "https://coin98.com/",
     "twitter": "@coin98_wallet",
     "discord": "https://c98.link/discord",
@@ -2716,7 +2685,7 @@
     "realmId": "8gqpog28H6UvefDu7wMbwaRQX7a7rbVtw7z3yX9xjJQa",
     "ogImage": "https://i.imgur.com/mEUafGW.png",
     "shortDescription": "The Free-to-Play, Move-to-Earn NFT mobile game. Steps you take every day fuel your journey in the Genoverse. Move. Play. Create.",
-    "sortRank": 3,
+    
     "website": "https://www.genopets.me/",
     "twitter": "@genopets",
     "discord": "https://discord.gg/genopets"
@@ -2729,7 +2698,7 @@
     "realmId": "5K4VVEeYpANxL79r7rM3heyXqYZkzu2KkD4kFkt1gGpG",
     "ogImage": "https://i.imgur.com/2d1aeHo.png",
     "shortDescription": "Earth From Another Sun is an open-world MMO sandbox FPS game where you can command massive armies to fight & conquer the Galaxy.",
-    "sortRank": 3,
+    
     "website": "https://efas.io/",
     "twitter": "@PlayEFAS/",
     "discord": "https://discord.gg/EFAS"
@@ -2743,7 +2712,7 @@
     "realmId": "2AgaUrJeZYxQgipGa8s5opQBPRqJBjKwWqv3hwinnefJ",
     "ogImage": "https://i.imgur.com/4mcImE9.png",
     "shortDescription": "The Web3 payments API",
-    "sortRank": 3,
+    
     "website": "https://www.hel.io/",
     "twitter": "@helio_pay",
     "discord": "https://discord.gg/helio",
@@ -2758,7 +2727,7 @@
     "realmId": "E5yobpBits2Wm8LbtGSPS6KhKzU3oZRTcbx2XTM6Q1fF",
     "ogImage": "https://kaizen.nyc3.cdn.digitaloceanspaces.com/assets/kc-logo-square.png",
     "shortDescription": "Creators of the strategy game: Domination, which drives our gaming/metaverse infrastructure and ecosystem development for Solana.",
-    "sortRank": 3,
+    
     "website": "https://domination.gg",
     "twitter": "@KaizenCorpsNFT",
     "discord": "https://discord.gg/dominationgg",
@@ -2773,7 +2742,7 @@
     "realmId": "4xXbWdJbTdvmNNb2ZE1MEk7wtYWj3MJm8SqQ8u3TErvh",
     "ogImage": "https://i.imgur.com/Sm74WKk.jpg",
     "shortDescription": "The first subDAO of YGG, with the mission of creating the biggest and most sustainable virtual economy in Southeast Asia!",
-    "sortRank": 3,
+    
     "website": "https://yggsea.io/",
     "twitter": "@yggsea",
     "discord": "https://discord.gg/yggsea",
@@ -2788,7 +2757,7 @@
     "realmId": "DReG8cfj6XA73u82AGFnytxGm3XZ3saetGwapRrRkoty",
     "ogImage": "https://res.cloudinary.com/dnfor6ngq/image/upload/v1659720459/2_cdaoyi.png",
     "shortDescription": "Powering seamless, mobile native NFT and Payments experiences on Solana",
-    "sortRank": 3,
+    
     "website": "https://candypay.fun",
     "twitter": "@candypayfun",
     "discord": "https://discord.gg/VGjPXWUHGT",
@@ -2803,7 +2772,7 @@
     "realmId": "GHVYhVLqSfqsuNXkKrALXDEX8xq76WGMAtJka5zr3jqw",
     "ogImage": "https://i.imgur.com/j9HOqJ5.png",
     "shortDescription": "Payments Infrastructure for web3",
-    "sortRank": 3,
+    
     "website": "https://sphere.engineer",
     "twitter": "@sphere_labs",
     "discord": "https://discord.gg/spherelabs",
@@ -2818,7 +2787,7 @@
     "realmId": "9jebQmDLbYRa4vo8rCQpPJu9VxRxWMp1cNTU1nzmrNLY",
     "ogImage": "https://i.imgur.com/6Os7NYz.jpg",
     "shortDescription": "Decentralized, censorship resistant, on-chain forums protocol. Reddit for Solana.",
-    "sortRank": 3,
+    
     "website": "https://www.dispatch.forum",
     "twitter": "@usedispatch",
     "github": "https://github.com/usedispatch"
@@ -2832,7 +2801,7 @@
     "realmId": "4iUTtxTm6aJRLKJBqQrn36kg84i33xeGmruyQDd2pqbr",
     "ogImage": "https://app.sunrisestake.com/logo.png",
     "shortDescription": "Carbon-neutral Staking on Solana",
-    "sortRank": 3,
+    
     "website": "https://sunrisestake.com",
     "twitter": "@sunrisestake"
   },
@@ -2845,7 +2814,7 @@
     "realmId": "87piQaXhHJffNHLkjixEViCoNWFTpXDPnqNTfzj523aD",
     "ogImage": "https://uploads-ssl.webflow.com/5c49faca5b4d2378c457f3c3/635af638a86f57d500e39e64_icon_neoland_square.png",
     "shortDescription": "Transform the world into a giant game board",
-    "sortRank": 3,
+    
     "website": "neopolis.io",
     "twitter": "@neolandgame",
     "discord": "https://discord.gg/neoland"
@@ -2859,7 +2828,7 @@
     "realmId": "6LjHttTUQfps53BjCFibfZx3BnGvCnGeYRaVjLuXv64L",
     "ogImage": "https://hkxww66li2siqwldmomgiqghcsmgfwsmexcucvy74y7tgeymkc5q.arweave.net/Oq9re8tGpIhZY2OYZEDHFJhi2kwlxUFXH-Y_MxMMULs",
     "shortDescription": "Redefine web3 game and app development experience with RACE protocol",
-    "sortRank": 3,
+    
     "website": "https://racepoker.app/",
     "twitter": "@RaceGameTeam",
     "discord": "https://discord.racepoker.app/",
@@ -2888,7 +2857,7 @@
     "realmId": "EYNTFC5dB6ofU6AgbQgDsRsJ6oXBU783drDYQbdm9kba",
     "ogImage": "https://i.imgur.com/sWbDYnS.png",
     "shortDescription": "No-code Web3 ecommerce platform built for everyone. Together we build.",
-    "sortRank": 3,
+    
     "website": "https://coinablepay.com",
     "twitter": "@coinablepay",
     "discord": "https://discord.com/invite/RgU669RNRk",
@@ -2902,7 +2871,7 @@
     "realmId": "HvSw2w9Ctfr8ejS8Gm1SvXpNxiQ7Fdgz8W6HmBvqVpC6",
     "ogImage": "https://yt3.ggpht.com/yti/AJo0G0n517FVbMu4X145K2--tc-UvT1WtPsnpqsDjkTFyA=s88-c-k-c0x00ffffff-no-rj-mo",
     "shortDescription": "The leading Web3 and Crypto Independent Media Sourse",
-    "sortRank": 3,
+    
     "website": "https://www.paulbarronnetwork.com",
     "twitter": "@paulbarrontv"
   },
@@ -2915,7 +2884,7 @@
     "realmId": "DoFABWkP3qRV2yggE3Tm1MpemKDviwnDaQAVB3gRiPwc",
     "ogImage": "https://res.cloudinary.com/dpjpqasje/image/upload/v1668060649/Group_48096200_hhatl0.png",
     "shortDescription": "BizFirst helps merchants accept USDC payments and run NFT-based loyalty programs on their Store/Website.",
-    "sortRank": 3,
+    
     "website": "https://www.bizfirst.xyz/",
     "twitter": "@MyBizFirst"
   },
@@ -2928,7 +2897,7 @@
     "realmId": "H5Me9k9Vk42d1eEfmfWX9z8hnFJvzCDN33z3hp6BwexH",
     "ogImage": "https://res.cloudinary.com/dpjpqasje/image/upload/v1668059808/Group_5342_mgjdnv.png",
     "shortDescription": "ACF is the simplest play-and-earn game.",
-    "sortRank": 3,
+    
     "website": "https://alienchickenfarm.com",
     "twitter": "@playacf"
   },
@@ -2941,7 +2910,7 @@
     "realmId": "bxPumP2w94Pz9QYYCCTYERgZSnTBWMh8xHwUCBU9N7W",
     "ogImage": "https://res.cloudinary.com/dpjpqasje/image/upload/v1668060746/appicon_2_zcpynu.png",
     "shortDescription": "The Crypto Wallet You Deserve.",
-    "sortRank": 3,
+    
     "website": "https://www.getsky.app/",
     "twitter": "@GetSkyApp",
     "discord": "https://twitter.com/GetSkyApp"
@@ -2955,7 +2924,7 @@
     "realmId": "9AmuU93FiiMCY6LA6HK1wBocT4y1C55hbNDC8jWA3qEi",
     "ogImage": "https://retrotrades.com/static/cropped-retrotoken-192x192.png",
     "shortDescription": "RetroTrades Community Hub",
-    "sortRank": 3,
+    
     "website": "https://retrotrades.com",
     "twitter": "@retrotradesnft",
     "discord": "https://discord.gg/retrotrades"
@@ -2969,7 +2938,7 @@
     "realmId": "HtQ6TCLsLnR4iw78J8d5qR9Sac2ZfQkqpFqTnj8zgXEx",
     "ogImage": "https://i.imgur.com/ksEqZYk.png",
     "shortDescription": "The Water DAO is a decentralized platform for certifying water sources and issuing water credits. ",
-    "sortRank": 3,
+    
     "website": "https://www.waterdao.app/",
     "discord": "https://discord.gg/SnmXY6whY9"
   },
@@ -2982,7 +2951,7 @@
     "realmId": "Gz9Zoht1gb6RW9hn9ejCup3uMDRqMSnppBWiQr9dHCaK",
     "ogImage": "https://i.imgur.com/Mzze5aD.jpeg",
     "shortDescription": "Home of the Infinite. A world is unfolding, compounding. First collect & merge to unlock animated artwork on chain. ",
-    "sortRank": 3,
+    
     "website": "https://infinitylabsnft.com/",
     "twitter": "@InfinityLabsNFT",
     "discord": "https://discord.gg/d6y3aprk7v"
@@ -2996,7 +2965,7 @@
     "realmId": "3rQGVXuERbo9jakn5QXYBDFPR3uPXrNhPFQSmTeMNC2X",
     "ogImage": "https://i.postimg.cc/mZmBGRKf/339a-cyberpunk-1.png",
     "shortDescription": "We are Cyber Feminists - an online group of intellectual women at the forefront of technology for human evolution. ",
-    "sortRank": 3,
+    
     "website": "https://cyberfeminismindex.com/",
     "twitter": "@valeriespina",
     "discord": "https://discord.gg/xT7k8vNWCM"
@@ -3010,7 +2979,7 @@
     "realmId": "DhuExYnEG55GzCrEWsUjTF6jDjoXuvWj8Y2x3eb6SZqb",
     "ogImage": "https://i.imgur.com/EVb5ZGi.jpeg",
     "shortDescription": "Hxro is an open primitive powering on-chain derivatives for market-based applications.",
-    "sortRank": 3,
+    
     "website": "https://hxro.com",
     "twitter": "@HxroNetwork?s=20&t=_zzB0Frms7pHMI4GvotWgg",
     "discord": "https://discord.gg/hxrolabs"
@@ -3024,7 +2993,7 @@
     "realmId": "Huv6gAgfyjqj24WAypHthD85SGDc9N3WvhwFAxm7eDgn",
     "ogImage": "https://pbs.twimg.com/profile_images/1430306224713740292/q4termyJ_400x400.jpg",
     "shortDescription": "Solana's first open NFT marketplace.",
-    "sortRank": 3,
+    
     "website": "https://www.digitaleyes.market/",
     "twitter": "@DigitalEyesNFT",
     "discord": "https://discord.com/invite/hhbgab4bsD"
@@ -3039,7 +3008,7 @@
     "communityMint": "7bzmxz5TmbyVQLULo6hLRwi52rKwn4d2RWDces4uvZc4",
     "ogImage": "https://raw.githubusercontent.com/third-markets/Logo/main/third_logo_500.png",
     "shortDescription": "Trade selected tokens directly from your wallet with lightning speed and near-zero fees",
-    "sortRank": 3,
+    
     "website": "https://third.markets",
     "keywords": "Third Markets, Third, REALM, Governance, Swap, Jupiter, jup-ag, Jupiter Aggregator, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, BTC, USD, Tokens, SPL Tokens",
     "twitter": "@ThirdMarkets",
@@ -3054,7 +3023,7 @@
     "communityMint": "xLPFiPmWve5rUnAYcHZSZWjwgyqEdcV6dDzoBJRtNw9",
     "ogImage": "/realms/xLPFi/xLPFi-min.png",
     "shortDescription": "LP Finance is a synthetic asset issuance protocol on Solana",
-    "sortRank": 3,
+    
     "website": "https://lp.finance/",
     "twitter": "@LPFinance_",
     "linkedin": "https://www.linkedin.com/company/lpfinance/",
@@ -3234,7 +3203,7 @@
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "9mJUsn6pwUytW2TdytEDRajKDHBjqXsbXyKFP28fzaZ6",
     "shortDescription": "$VIEWS DAO - Building the Watch-to-Earn meta",
-    "sortRank": 3,
+    
     "symbol": "VIEWSDAO",
     "twitter": "@Decod3rsNFT"
   },
@@ -3249,7 +3218,7 @@
     "ogImage": "/realms/ALL/img/logo.png",
     "bannerImage": "https://i.imgur.com/tbaZ0qN.png",
     "shortDescription": "AllDomains is a Solana Protocol that allows users to create human-readable domain names that can be used in place of a Public Key.",
-    "sortRank": 7,
+    "sortRank": -1000,
     "website": "https://alldomains.id",
     "keywords": "Web3 Identity, REALM, Goverenance, Web3 domains, DAO",
     "twitter": "@AllDomains_",
