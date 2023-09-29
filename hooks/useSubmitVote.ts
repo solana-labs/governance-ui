@@ -30,6 +30,7 @@ import { TransactionInstruction } from '@solana/web3.js'
 import useProgramVersion from './useProgramVersion'
 import useVotingTokenOwnerRecords from './useVotingTokenOwnerRecords'
 import { useMemo } from 'react'
+import { useTokenOwnerRecordsDelegatedToUser } from './queries/tokenOwnerRecord'
 
 export const useSubmitVote = () => {
   const wallet = useWalletOnePointOh()
@@ -48,6 +49,8 @@ export const useSubmitVote = () => {
     NFT_PLUGINS_PKS.includes(
       config?.account.communityTokenConfig.voterWeightAddin?.toBase58()
     )
+
+  const delegators = useTokenOwnerRecordsDelegatedToUser()
 
   const { error, loading, execute } = useAsyncCallback(
     async ({
@@ -81,6 +84,11 @@ export const useSubmitVote = () => {
           voteRecordQueryKeys.all(connection.cluster)
         )
       }
+      const relevantDelegators = delegators?.filter((x) =>
+        x.account.governingTokenMint.equals(
+          voterTokenRecord.account.governingTokenMint
+        )
+      )
 
       try {
         await castVote(
@@ -92,7 +100,8 @@ export const useSubmitVote = () => {
           msg,
           client,
           confirmationCallback,
-          voteWeights
+          voteWeights,
+          relevantDelegators
         )
         queryClient.invalidateQueries({
           queryKey: proposalQueryKeys.all(connection.current.rpcEndpoint),
