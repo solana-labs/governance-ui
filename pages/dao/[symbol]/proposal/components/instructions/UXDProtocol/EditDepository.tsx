@@ -5,6 +5,7 @@ import {
   ProgramAccount,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
+import { PublicKey } from '@solana/web3.js'
 import Input from '@components/inputs/Input'
 import Select from '@components/inputs/Select'
 import Switch from '@components/Switch'
@@ -43,6 +44,9 @@ const schema = yup.object().shape({
   redeemableAmountUnderManagementCap: yup
     .number()
     .min(0, 'Redeemable amount under management cap should be min 0'),
+  profitsBeneficiaryCollateralChange: yup
+    .string()
+    .required('Profits Beneficiary is required'),
 })
 
 const EditDepository = ({
@@ -66,6 +70,11 @@ const EditDepository = ({
     setRedeemableAmountUnderManagementCapChange,
   ] = useState<boolean>(false)
 
+  const [
+    profitsBeneficiaryCollateralChange,
+    setProfitsBeneficiaryCollateralChange,
+  ] = useState<boolean>(false)
+
   const connection = useLegacyConnectionContext()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [formErrors, setFormErrors] = useState({})
@@ -78,6 +87,7 @@ const EditDepository = ({
     redeemableAmountUnderManagementCap: 0,
     mintingFeeInBps: 0,
     redeemingFeeInBps: 0,
+    profitsBeneficiaryCollateralChange: '',
   })
 
   const handleSetForm = ({ propertyName, value }) => {
@@ -123,6 +133,10 @@ const EditDepository = ({
       ? form.redeemableAmountUnderManagementCap
       : undefined
 
+    const profitsBeneficiaryCollateral = profitsBeneficiaryCollateralChange
+      ? new PublicKey(form.profitsBeneficiaryCollateralChange)
+      : undefined
+
     const ix = await editUXDDepositoryIx(
       connection,
       uxdProgramId,
@@ -133,6 +147,7 @@ const EditDepository = ({
         mintingFeeInBps,
         redeemingFeeInBps,
         redeemableAmountUnderManagementCap,
+        profitsBeneficiaryCollateral,
       }
     )
 
@@ -258,6 +273,27 @@ const EditDepository = ({
             })
           }
           error={formErrors['redeemableAmountUnderManagementCap']}
+        />
+      ) : null}
+
+      <h5>Profits Beneficiary Collateral</h5>
+
+      <Switch
+        checked={profitsBeneficiaryCollateralChange}
+        onChange={(checked) => setProfitsBeneficiaryCollateralChange(checked)}
+      />
+
+      {profitsBeneficiaryCollateralChange ? (
+        <Input
+          type="string"
+          value={form.profitsBeneficiaryCollateralChange}
+          onChange={(value) =>
+            handleSetForm({
+              value,
+              propertyName: 'profitsBeneficiaryCollateral',
+            })
+          }
+          error={formErrors['profitsBeneficiaryCollateral']}
         />
       ) : null}
     </>

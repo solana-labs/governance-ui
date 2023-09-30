@@ -339,12 +339,14 @@ export interface UXDMintWithIdentityDepositoryForm {
   governedAccount?: AssetAccount
   uxdProgram: string
   collateralAmount: number
+  user: string
 }
 
 export interface UXDRedeemWithIdentityDepositoryForm {
   governedAccount?: AssetAccount
   uxdProgram: string
   redeemableAmount: number
+  user: string
 }
 
 export interface UXDRegisterDepositoryForm {
@@ -363,6 +365,7 @@ export interface UXDEditDepositoryForm {
   redeemableAmountUnderManagementCap: number
   mintingFeeInBps: number
   redeemingFeeInBps: number
+  profitsBeneficiaryCollateralChange: string
 }
 
 export interface UXDMintForm {
@@ -371,6 +374,7 @@ export interface UXDMintForm {
   uxdProgram: string
   collateralName?: string
   collateralAmount: number
+  user: string
 }
 
 export interface UXDRedeemForm {
@@ -379,6 +383,7 @@ export interface UXDRedeemForm {
   uxdProgram: string
   collateralName?: string
   redeemableAmount: number
+  user: string
 }
 
 export enum Instructions {

@@ -62,6 +62,7 @@ const schema = yup.object().shape({
     .nullable()
     .required('Governance account is required'),
   uxdProgram: yup.string().required('UXD Program address is required'),
+  user: yup.string().required('user is required'),
   collateralAmount: yup
     .number()
     .moreThan(0, 'Collateral amount should be more than 0')
@@ -86,6 +87,7 @@ const MintWithIdentityDepository = ({
     governedAccount: undefined,
     collateralAmount: 0,
     uxdProgram: 'UXD8m9cvwk4RcSxnX2HZ9VudQCEeDH6fRnB4CAP57Dr',
+    user: '',
   })
 
   const handleSetForm = ({ propertyName, value }) => {
@@ -127,6 +129,7 @@ const MintWithIdentityDepository = ({
       new Controller('UXD', UXD_DECIMALS, uxdProgramId),
       identityDepository,
       new PublicKey(form.uxdProgram),
+      new PublicKey(form.user),
       form.collateralAmount,
       { preflightCommitment: 'processed', commitment: 'processed' },
       wallet.publicKey
@@ -186,6 +189,19 @@ const MintWithIdentityDepository = ({
           })
         }
         error={formErrors['uxdProgram']}
+      />
+
+      <Input
+        label="User"
+        value={form.user}
+        type="string"
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: 'user',
+          })
+        }
+        error={formErrors['user']}
       />
 
       <Input

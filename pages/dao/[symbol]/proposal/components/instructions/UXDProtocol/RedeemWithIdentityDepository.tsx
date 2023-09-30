@@ -64,6 +64,7 @@ const schema = yup.object().shape({
     .nullable()
     .required('Governance account is required'),
   uxdProgram: yup.string().required('UXD Program address is required'),
+  user: yup.string().required('user is required'),
   redeemableAmount: yup
     .number()
     .moreThan(0, 'Redeemable amount should be more than 0')
@@ -88,6 +89,7 @@ const RedeemWithIdentityDepository = ({
     governedAccount: undefined,
     redeemableAmount: 0,
     uxdProgram: 'UXD8m9cvwk4RcSxnX2HZ9VudQCEeDH6fRnB4CAP57Dr',
+    user: '',
   })
 
   const handleSetForm = ({ propertyName, value }) => {
@@ -129,6 +131,7 @@ const RedeemWithIdentityDepository = ({
     const ix = client.createRedeemFromIdentityDepositoryInstruction(
       new Controller('UXD', UXD_DECIMALS, uxdProgramId),
       identityDepository,
+      new PublicKey(form.user),
       new PublicKey(form.uxdProgram),
       form.redeemableAmount,
       { preflightCommitment: 'processed', commitment: 'processed' },
@@ -189,6 +192,19 @@ const RedeemWithIdentityDepository = ({
           })
         }
         error={formErrors['uxdProgram']}
+      />
+
+      <Input
+        label="User"
+        value={form.user}
+        type="string"
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: 'user',
+          })
+        }
+        error={formErrors['user']}
       />
 
       <Input

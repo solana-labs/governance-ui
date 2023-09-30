@@ -784,42 +784,42 @@ export default function useGovernanceAssets() {
    */
     [Instructions.UXDInitializeController]: {
       name: 'Initialize Controller',
-      isVisible: symbol === 'UXP',
+      isVisible: symbol === 'uxp',
       packageId: PackageEnum.UXDProtocol,
     },
     [Instructions.UXDEditController]: {
       name: 'Edit Controller',
-      isVisible: symbol === 'UXP',
+      isVisible: symbol === 'uxp',
       packageId: PackageEnum.UXDProtocol,
     },
     [Instructions.UXDInitializeIdentityDepository]: {
       name: 'Initialize Identity Depository',
-      isVisible: symbol === 'UXP',
+      isVisible: symbol === 'uxp',
       packageId: PackageEnum.UXDProtocol,
     },
     [Instructions.UXDEditIdentityDepository]: {
       name: 'Edit Identity Depository',
-      isVisible: symbol === 'UXP',
+      isVisible: symbol === 'uxp',
       packageId: PackageEnum.UXDProtocol,
     },
     [Instructions.UXDMintWithIdentityDepository]: {
       name: 'Mint with Identity Depository',
-      isVisible: symbol === 'UXP',
+      isVisible: symbol === 'uxp',
       packageId: PackageEnum.UXDProtocol,
     },
     [Instructions.UXDRedeemWithIdentityDepository]: {
       name: 'Redeem with Identity Depository',
-      isVisible: symbol === 'UXP',
+      isVisible: symbol === 'uxp',
       packageId: PackageEnum.UXDProtocol,
     },
     [Instructions.UXDRegisterDepository]: {
       name: 'Register a Depository',
-      isVisible: symbol === 'UXP',
+      isVisible: symbol === 'uxp',
       packageId: PackageEnum.UXDProtocol,
     },
     [Instructions.UXDEditDepository]: {
       name: 'Edit a Depository',
-      isVisible: symbol === 'UXP',
+      isVisible: symbol === 'uxp',
       packageId: PackageEnum.UXDProtocol,
     },
     [Instructions.UXDMint]: {

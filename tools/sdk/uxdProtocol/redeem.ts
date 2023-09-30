@@ -18,6 +18,7 @@ export type UXDRedeemParams = {
   payer: PublicKey
   collateralName: string
   redeemableAmount: number
+  user: PublicKey
 }
 
 const redeemWithMercurialIx = async ({
@@ -53,6 +54,7 @@ const redeemWithMercurialIx = async ({
     controller,
     depository,
     params.authority,
+    params.user,
     params.redeemableAmount,
     { preflightCommitment: 'processed', commitment: 'processed' },
     params.payer

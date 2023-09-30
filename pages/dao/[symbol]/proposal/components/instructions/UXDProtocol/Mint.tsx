@@ -36,6 +36,7 @@ const schema = yup.object().shape({
     .required('Governance account is required'),
   depositoryType: yup.string().required('Valid Depository type is required'),
   uxdProgram: yup.string().required('UXD Program address is required'),
+  user: yup.string().required('user is required'),
   collateralName: yup.string().required('Collateral Name address is required'),
   collateralAmount: yup
     .number()
@@ -62,6 +63,7 @@ const Mint = ({
     depositoryType: 'Credix',
     collateralAmount: 0,
     uxdProgram: 'UXD8m9cvwk4RcSxnX2HZ9VudQCEeDH6fRnB4CAP57Dr',
+    user: '',
   })
 
   const handleSetForm = ({ propertyName, value }) => {
@@ -103,6 +105,7 @@ const Mint = ({
         payer: wallet.publicKey,
         collateralName: form.collateralName,
         collateralAmount: form.collateralAmount,
+        user: new PublicKey(form.user),
       }
     )
 
@@ -172,6 +175,19 @@ const Mint = ({
           })
         }
         error={formErrors['uxdProgram']}
+      />
+
+      <Input
+        label="User"
+        value={form.user}
+        type="string"
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: 'user',
+          })
+        }
+        error={formErrors['user']}
       />
 
       <Select

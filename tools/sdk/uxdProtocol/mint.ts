@@ -18,6 +18,7 @@ export type UXDMintParams = {
   payer: PublicKey
   collateralName: string
   collateralAmount: number
+  user: PublicKey
 }
 
 const mintWithMercurialIx = async ({
@@ -53,6 +54,7 @@ const mintWithMercurialIx = async ({
     controller,
     depository,
     params.authority,
+    params.user,
     params.collateralAmount,
     { preflightCommitment: 'processed', commitment: 'processed' },
     params.payer
@@ -82,6 +84,7 @@ const mintWithCredixIx = async ({
     controller,
     depository,
     params.authority,
+    params.user,
     params.collateralAmount,
     { preflightCommitment: 'processed', commitment: 'processed' },
     params.payer
