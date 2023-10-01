@@ -7,7 +7,7 @@ const ENDPOINTS: EndpointInfo[] = [
     name: 'mainnet',
     url:
       process.env.MAINNET_RPC ||
-      'https://dawn-misty-county.solana-mainnet.quiknode.pro/0fd828935b41cc93a6f6438ec1e85282db8e0704/',
+      'https://rpc.helius.xyz/?api-key=4b483911-5163-4078-aeeb-02bcba97f85a',
   },
   {
     name: 'devnet',
