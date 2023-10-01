@@ -180,3 +180,12 @@ export function getMintSupplyFractionAsDecimalPercentage(
     .dividedBy(new BigNumber(mint.supply.toString()))
     .toNumber()
 }
+
+export function nativeAmountToFormattedUiAmount(
+  nativeAmount: BN,
+  decimals: number
+): string {
+  return Number(
+    new BigNumber(nativeAmount.toString()).shiftedBy(-decimals).toString()
+  ).toLocaleString()
+}

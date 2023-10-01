@@ -1,7 +1,7 @@
+import { u8 } from 'buffer-layout'
 import { AccountInfo, Connection, PublicKey } from '@solana/web3.js'
 import { gistApi } from './github'
 import { arweaveDescriptionApi } from './arweave'
-import { u8 } from 'buffer-layout'
 import { BN } from '@coral-xyz/anchor'
 
 export function capitalize(str?: string) {
@@ -110,6 +110,6 @@ export const getProposalDepositPk = (
 }
 
 // Anchor instruction adds a 7 byte discriminator prefix on instruction data
-export const ANCHOR_DISCRIMINATOR_LAYOUT = Array.from(new Array(7)).map(u8);
+export const ANCHOR_DISCRIMINATOR_LAYOUT = Array.from(new Array(7)).map(u8)
 
-export const BN_ZERO = new BN(0);
+export const BN_ZERO = new BN(0)

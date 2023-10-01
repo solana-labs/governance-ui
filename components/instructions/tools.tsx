@@ -38,6 +38,7 @@ import { STAKE_INSTRUCTIONS } from './programs/stake'
 import { MAPLE_FINANCE_PROGRAM_INSTRUCTIONS } from './programs/mapleFinance'
 import dayjs from 'dayjs'
 import { JUPITER_REF } from './programs/jupiterRef'
+import { UXD_PROGRAM_INSTRUCTIONS } from './programs/uxdProtocol'
 
 /**
  * Default governance program id instance
@@ -456,6 +457,7 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...STAKE_INSTRUCTIONS,
   ...MAPLE_FINANCE_PROGRAM_INSTRUCTIONS,
   ...JUPITER_REF,
+  ...UXD_PROGRAM_INSTRUCTIONS,
 }
 
 export async function getInstructionDescriptor(
@@ -496,7 +498,6 @@ export async function getInstructionDescriptor(
   // and for the one with multiple instructions
   const descriptor = !instructionToDecode.data.length
     ? descriptors
-
     : descriptors && descriptors[instructionToDecode.data[0]]
     ? descriptors[instructionToDecode.data[0]]
     : //backup if first number is same for couple of instructions inside same idl
