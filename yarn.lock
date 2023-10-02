@@ -452,10 +452,10 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@blockworks-foundation/mango-v4-settings@0.2.11":
-  version "0.2.11"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4-settings/-/mango-v4-settings-0.2.11.tgz#f573cf3c61c6b31d9097940160f18897219cac80"
-  integrity sha512-F4cR8gOTcstdrMtbtEDgXb40Jm+7j6HE1PNiu+9UgJ04hsoQFbxbtSIWRh4ZpmiW3Kd4LIOZLNSjzRnAJU8zcg==
+"@blockworks-foundation/mango-v4-settings@0.2.13":
+  version "0.2.13"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4-settings/-/mango-v4-settings-0.2.13.tgz#c75c1ea2e8e4c7888e45e979d75d18a2342142bf"
+  integrity sha512-C5djeBkeM1u2IuFTu9qu9B78iCdq2Fu/M2VEXUlZWDBmU3eMUMtQ60qc+nBL+HedrBriApM4WaRSu/RwBs3IBQ==
   dependencies:
     bn.js "^5.2.1"
     eslint-config-prettier "^9.0.0"

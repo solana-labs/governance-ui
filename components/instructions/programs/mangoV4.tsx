@@ -17,8 +17,8 @@ import EmptyWallet, {
   getBestMarket,
   EditTokenArgsFormatted,
   isPythOracle,
-  getFormattedListingPresets,
   FlatEditArgs,
+  getFormattedListingPresets,
 } from '@utils/Mango/listingTools'
 import { secondsToHours } from 'date-fns'
 import WarningFilledIcon from '@carbon/icons-react/lib/WarningFilled'
@@ -795,6 +795,7 @@ const instructions = () => ({
         }
 
         if (mint) {
+          const bank = mangoGroup.getFirstBankByMint(mint)
           mintData = tokenPriceService.getTokenInfo(mint.toBase58())
           const oracle =
             args.oracleOpt ||
@@ -807,11 +808,12 @@ const instructions = () => ({
                 priceImpact: '0',
               }
 
-          const suggestedPreset = getFormattedListingPresets(!!isPyth)[
-            liqudityTier.tier!
-          ]
+          const suggestedPreset = getFormattedListingPresets(
+            !!isPyth,
+            bank.nativeDeposits().mul(bank.price).toNumber()
+          )[liqudityTier.tier!]
           suggestedUntrusted = liqudityTier.tier === 'UNTRUSTED'
-
+          console.log(suggestedPreset)
           const suggestedFormattedPreset:
             | EditTokenArgsFormatted
             | Record<string, never> = Object.keys(suggestedPreset).length

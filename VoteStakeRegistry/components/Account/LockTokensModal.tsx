@@ -37,7 +37,6 @@ import {
   Period,
   VestingPeriod,
   vestingPeriods,
-  DAILY,
 } from 'VoteStakeRegistry/tools/types'
 import BigNumber from 'bignumber.js'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
@@ -376,16 +375,10 @@ const LockTokensModal = ({
                     onChange={(type) =>
                       setLockupType(
                         //@ts-ignore
-                        lockupTypes
-                          .filter(
-                            (x) => x.value !== MONTHLY && x.value !== DAILY
-                          )
-                          .find((t) => t.displayName === type)
+                        lockupTypes.find((t) => t.displayName === type)
                       )
                     }
-                    values={lockupTypes
-                      .filter((x) => x.value !== MONTHLY && x.value !== DAILY)
-                      .map((type) => type.displayName)}
+                    values={lockupTypes.map((type) => type.displayName)}
                   />
                 </div>
               </>
