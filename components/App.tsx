@@ -37,6 +37,7 @@ import {
 } from '@sqds/iframe-adapter'
 import { WALLET_PROVIDERS } from '@utils/wallet-adapters'
 import { tryParsePublicKey } from '@tools/core/pubkey'
+import { useAsync } from 'react-async-hook'
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
@@ -131,6 +132,17 @@ export function AppContents(props: Props) {
       symbol as string
     )}/favicon.ico?v=${Date.now()}`
 
+  // check if a file actually exists at faviconUrl
+  const { result: faviconExists } = useAsync(
+    async () =>
+      faviconUrl
+        ? fetch(faviconUrl)
+            .then((response) => response.status === 200)
+            .catch(() => false)
+        : false,
+    [faviconUrl]
+  )
+
   useEffect(() => {
     if (
       realm &&
@@ -178,7 +190,7 @@ export function AppContents(props: Props) {
             background-color: #17161c;
           }
         `}</style>
-        {faviconUrl ? (
+        {faviconUrl && faviconExists ? (
           <>
             <link rel="icon" href={faviconUrl} />
           </>
