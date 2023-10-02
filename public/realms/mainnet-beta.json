@@ -3218,7 +3218,7 @@
     "ogImage": "/realms/ALL/img/logo.png",
     "bannerImage": "https://i.imgur.com/tbaZ0qN.png",
     "shortDescription": "AllDomains is a Solana Protocol that allows users to create human-readable domain names that can be used in place of a Public Key.",
-    "sortRank": -1000,
+    "sortRank": 100,
     "website": "https://alldomains.id",
     "keywords": "Web3 Identity, REALM, Goverenance, Web3 domains, DAO",
     "twitter": "@AllDomains_",
