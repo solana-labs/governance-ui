@@ -10,6 +10,14 @@ interface Props {
   pubkey: PublicKey
   governance: PublicKey
 }
+
+/**
+ * CURRENTLY NOT USED
+ * This was from work by Serum for intra-dao voting. As of Sep 29, 2023, it has no known users.
+ * In my (Agrippa's) opinion, a treasury-based flow for intra-dao voting is inferior to a generic
+ * wallet extension for the browser for building proposals using the same UI that normal users use to interact.
+ * (In the vein of Cordelia or Fuze wallet, or whatever the Squads thing is called)
+ */
 export default function TokenOwnerRecordListItem({
   pubkey,
   governance,
