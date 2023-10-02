@@ -37,7 +37,6 @@ import {
   Period,
   VestingPeriod,
   vestingPeriods,
-  DAILY,
 } from 'VoteStakeRegistry/tools/types'
 import BigNumber from 'bignumber.js'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
