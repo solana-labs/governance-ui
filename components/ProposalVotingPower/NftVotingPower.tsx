@@ -104,57 +104,43 @@ export default function NftVotingPower(props: Props) {
 
   if (nfts.length === 0) {
     return (
-      <Wrapper inAccountDetails={props.inAccountDetails}>
-        <div
-          className={classNames(props.className, 'text-xs', 'text-white/50')}
-        >
-          You do not have any voting power in this dao.
-        </div>
-      </Wrapper>
+      <div className={classNames(props.className, 'text-xs', 'text-white/50')}>
+        You do not have any voting power in this dao.
+      </div>
     )
   }
 
   return (
-    <Wrapper inAccountDetails={props.inAccountDetails}>
-      <div className={props.className}>
-        <div className={classNames('p-3', 'rounded-md', 'bg-bkg-1')}>
-          <div className="text-white/50 text-xs">My NFT Votes</div>
-          <div className="flex items-center justify-between mt-1">
-            <div className="text-white flex items-center gap-1">
-              {displayNfts.slice(0, 3).map((nft, index) => (
-                <div
-                  className="h-12 w-12 rounded-sm bg-bkg-2 bg-cover"
-                  key={nft.content.metadata.name + index}
-                  style={{
-                    backgroundImage: `url("${nft.content.links.image}")`,
-                  }}
-                />
-              ))}
-              {!!remainingCount && (
-                <div className="text-sm text-white ml-2">
-                  +{remainingCount} more
-                </div>
-              )}
-            </div>
-            {max && !max.isZero() && (
-              <VotingPowerPct amount={amount} total={max} />
+    <div className={props.className}>
+      <div className={classNames('p-3', 'rounded-md', 'bg-bkg-1')}>
+        <div className="text-white/50 text-xs">My NFT Votes</div>
+        <div className="flex items-center justify-between mt-1">
+          <div className="text-white flex items-center gap-1">
+            {displayNfts.slice(0, 3).map((nft, index) => (
+              <div
+                className="h-12 w-12 rounded-sm bg-bkg-2 bg-cover"
+                key={nft.content.metadata.name + index}
+                style={{
+                  backgroundImage: `url("${nft.content.links.image}")`,
+                }}
+              />
+            ))}
+            {!!remainingCount && (
+              <div className="text-sm text-white ml-2">
+                +{remainingCount} more
+              </div>
             )}
           </div>
+          {max && !max.isZero() && (
+            <VotingPowerPct amount={amount} total={max} />
+          )}
         </div>
-        {connected && !ownTokenRecord && (
-          <Button className="w-full mt-3" onClick={handleRegister}>
-            Join
-          </Button>
-        )}
       </div>
-    </Wrapper>
+      {connected && !ownTokenRecord && (
+        <Button className="w-full mt-3" onClick={handleRegister}>
+          Join
+        </Button>
+      )}
+    </div>
   )
-}
-
-const Wrapper = (props: Props) => {
-  if (props.inAccountDetails) {
-    return <div className="my-4 space-y-4 w-1/2">{props.children}</div>
-  } else {
-    return <>{props.children}</>
-  }
 }

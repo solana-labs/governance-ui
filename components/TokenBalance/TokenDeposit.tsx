@@ -303,15 +303,9 @@ export const TokenDeposit = ({
   }
 
   return (
-    <TokenDepositWrapper inAccountDetails={inAccountDetails}>
-      {inAccountDetails && (
-        <h4>
-          {tokenRole === GoverningTokenRole.Community ? `Community` : `Council`}
-        </h4>
-      )}
-
+    <div className="w-full">
       {(availableTokens != '0' || inAccountDetails) && (
-        <div className="flex items-center mt-4 space-x-4">
+        <div className="flex items-center space-x-4">
           {tokenRole === GoverningTokenRole.Community ? (
             <VanillaVotingPower className="w-full" role="community" />
           ) : (
@@ -378,19 +372,6 @@ export const TokenDeposit = ({
           Please withdraw your tokens and deposit again to get governance power
         </small>
       )}
-    </TokenDepositWrapper>
+    </div>
   )
-}
-const TokenDepositWrapper = ({
-  children,
-  inAccountDetails,
-}: {
-  inAccountDetails?: boolean
-  children: React.ReactNode
-}) => {
-  if (inAccountDetails) {
-    return <div className="space-y-4 w-1/2">{children}</div>
-  } else {
-    return <div>{children}</div>
-  }
 }
