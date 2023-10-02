@@ -125,12 +125,15 @@ export function AppContents(props: Props) {
   // Note: ?v==${Date.now()} is added to the url to force favicon refresh.
   // Without it browsers would cache the last used and won't change it for different realms
   // https://stackoverflow.com/questions/2208933/how-do-i-force-a-favicon-refresh
-  const faviconUrl =
-    symbol &&
-    tryParsePublicKey(symbol as string) === undefined && // don't try to use a custom favicon if this is a pubkey-based url
-    `/realms/${getResourcePathPart(
-      symbol as string
-    )}/favicon.ico?v=${Date.now()}`
+  const faviconUrl = useMemo(
+    () =>
+      symbol &&
+      tryParsePublicKey(symbol as string) === undefined && // don't try to use a custom favicon if this is a pubkey-based url
+      `/realms/${getResourcePathPart(
+        symbol as string
+      )}/favicon.ico?v=${Date.now()}`,
+    [symbol]
+  )
 
   // check if a file actually exists at faviconUrl
   const { result: faviconExists } = useAsync(
