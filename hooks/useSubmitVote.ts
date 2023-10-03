@@ -84,11 +84,13 @@ export const useSubmitVote = () => {
           voteRecordQueryKeys.all(connection.cluster)
         )
       }
-      const relevantDelegators = delegators?.filter((x) =>
-        x.account.governingTokenMint.equals(
-          voterTokenRecord.account.governingTokenMint
+      const relevantDelegators = delegators
+        ?.filter((x) =>
+          x.account.governingTokenMint.equals(
+            voterTokenRecord.account.governingTokenMint
+          )
         )
-      )
+        .map((x) => x.pubkey)
 
       try {
         await castVote(
