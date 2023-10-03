@@ -36,6 +36,7 @@ import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { fetchRealmByPubkey } from '@hooks/queries/realm'
 import { fetchProposalByPubkeyQuery } from '@hooks/queries/proposal'
 import { findPluginName } from '@hooks/queries/governancePower'
+import { DELEGATOR_BATCH_VOTE_SUPPORT_BY_PLUGIN } from '@constants/flags'
 
 const getVetoTokenMint = (
   proposal: ProgramAccount<Proposal>,
@@ -50,18 +51,6 @@ const getVetoTokenMint = (
   if (vetoTokenMint === undefined)
     throw new Error('There is no token that can veto this proposal')
   return vetoTokenMint
-}
-
-const DELEGATOR_BATCH_VOTE_SUPPORT_BY_PLUGIN: Record<
-  ReturnType<typeof findPluginName>,
-  boolean
-> = {
-  vanilla: true,
-  VSR: false,
-  HeliumVSR: false,
-  gateway: false,
-  NFT: false,
-  unknown: false,
 }
 
 const createDelegatorVote = async ({
