@@ -24,6 +24,7 @@ import { fetchTokenAccountByPubkey } from '@hooks/queries/tokenAccount'
 import { fetchMintInfoByPubkey } from '@hooks/queries/mintInfo'
 import { toUiDecimals } from '@blockworks-foundation/mango-v4'
 import EmptyWallet from '@utils/Mango/listingTools'
+import BigNumber from 'bignumber.js'
 
 interface ClawbackInstruction {
   depositEntryIndex: number
@@ -410,21 +411,28 @@ const heliumConfigVotingMintIx = (programId: PublicKey) => ({
             <div>Index: {decodedInstructionData?.args.idx}</div>
             <div>Digit shifts: {decodedInstructionData?.args.digitShift}</div>
             <div>
-              Unlocked factor: {baselineVoteWeightScaledFactor.toNumber() / 1e9}{' '}
-              ({baselineVoteWeightScaledFactor.toNumber()})
+              Unlocked factor:{' '}
+              {new BigNumber(
+                baselineVoteWeightScaledFactor.toString()
+              ).dividedBy(new BigNumber(1e9))}{' '}
+              ({baselineVoteWeightScaledFactor.toString()})
             </div>
             <div>
               Max lockup time:{' '}
               {decodedInstructionData &&
                 getFormattedStringFromDays(
+                  // eslint-disable-next-line custom-eslint/no-bn-tonumber
                   secsToDays(lockupSaturationSecs.toNumber())
                 )}{' '}
-              (secs: {lockupSaturationSecs.toNumber()})
+              (secs: {lockupSaturationSecs.toString()})
             </div>
             <div>
               Max multiplier:{' '}
-              {getInverseScaledFactor(baselineVoteWeightScaledFactor) +
-                getInverseScaledFactor(maxExtraLockupVoteWeightScaledFactor)}
+              {getInverseScaledFactor(baselineVoteWeightScaledFactor)
+                .plus(
+                  getInverseScaledFactor(maxExtraLockupVoteWeightScaledFactor)
+                )
+                .toString()}
             </div>
             {/* Additional Genesis Multiplier not configurable through UI */}
             {/* <div>

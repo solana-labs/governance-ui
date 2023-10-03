@@ -1,6 +1,9 @@
 {
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint", "unused-imports"],
+  "parserOptions": {
+    "project": "./tsconfig.json" // Path to your tsconfig.json
+  },
+  "plugins": ["@typescript-eslint", "unused-imports", "custom-eslint"],
   "extends": [
     "eslint:recommended",
     "plugin:react/recommended",
@@ -22,6 +25,7 @@
     }
   },
   "rules": {
+    "custom-eslint/no-bn-tonumber": "warn",
     "react-hooks/exhaustive-deps": [
       "warn",
       {
@@ -32,6 +36,7 @@
     "react/display-name": 0,
     "react/prop-types": 0,
     "unused-imports/no-unused-imports": "error",
+
     //"@typescript-eslint/no-unnecessary-condition": "error",
     "@typescript-eslint/explicit-function-return-type": 0,
     "@typescript-eslint/explicit-module-boundary-types": 0,
