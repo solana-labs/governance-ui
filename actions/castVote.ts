@@ -110,7 +110,7 @@ export async function castVote(
   votingPlugin?: VotingClient,
   runAfterConfirmation?: (() => void) | null,
   voteWeights?: number[],
-  additionalTokenOwnerRecords?: []
+  additionalTokenOwnerRecords?: PublicKey[]
 ) {
   const chatMessageSigners: Keypair[] = []
 
