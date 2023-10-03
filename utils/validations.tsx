@@ -191,6 +191,7 @@ export const validateBuffer = async (
       let buffer: ProgramBufferAccount
 
       try {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         buffer = create(info.data.parsed, ProgramBufferAccount)
       } catch {
         throw 'Invalid program buffer account'
