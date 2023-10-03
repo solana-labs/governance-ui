@@ -29,7 +29,7 @@ async function fetchArweaveFile(url: string) {
       const apiResponse = await axios.get(apiUrl, {
         signal: controller.signal,
       })
-      if (apiResponse.status === 200) {
+      if (apiResponse?.data?.description) {
         return apiResponse.data.description
       } else {
         console.warn('could not arweave file', {
