@@ -1,19 +1,15 @@
 import { Proposal, VoteKind } from '@solana/spl-governance'
-import { CheckCircleIcon } from "@heroicons/react/solid";
+import { CheckCircleIcon } from '@heroicons/react/solid'
 import { useState } from 'react'
 import Button, { SecondaryButton } from '../Button'
 import VoteCommentModal from '../VoteCommentModal'
-import {
-  useIsVoting,
-  useVoterTokenRecord,
-  useVotingPop,
-} from './hooks'
+import { useIsVoting, useVoterTokenRecord, useVotingPop } from './hooks'
 import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
 import { useSubmitVote } from '@hooks/useSubmitVote'
 import { useSelectedRealmInfo } from '@hooks/selectedRealm/useSelectedRealmRegistryEntry'
-import { useCanVote } from './CastVoteButtons'
+import { useCanVote } from './useCanVote'
 
-export const CastMultiVoteButtons = ({proposal} : {proposal: Proposal}) => {
+export const CastMultiVoteButtons = ({ proposal }: { proposal: Proposal }) => {
   const [showVoteModal, setShowVoteModal] = useState(false)
   const [vote, setVote] = useState<'yes' | 'no' | null>(null)
   const realmInfo = useSelectedRealmInfo()
@@ -23,13 +19,15 @@ export const CastMultiVoteButtons = ({proposal} : {proposal: Proposal}) => {
   const voterTokenRecord = useVoterTokenRecord()
   const [canVote, tooltipContent] = useCanVote()
   const { data: ownVoteRecord } = useProposalVoteRecordQuery('electoral')
-  const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
-  const [optionStatus, setOptionStatus] = useState<boolean[]>(new Array(proposal.options.length).fill(false));
+  const [selectedOptions, setSelectedOptions] = useState<number[]>([])
+  const [optionStatus, setOptionStatus] = useState<boolean[]>(
+    new Array(proposal.options.length).fill(false)
+  )
   const isVoteCast = !!ownVoteRecord?.found
   const isVoting = useIsVoting()
 
-  const nota = "$$_NOTA_$$";
-  const last = proposal.options.length - 1;
+  const nota = '$$_NOTA_$$'
+  const last = proposal.options.length - 1
 
   const handleVote = async (vote: 'yes' | 'no') => {
     setVote(vote)
@@ -40,50 +38,50 @@ export const CastMultiVoteButtons = ({proposal} : {proposal: Proposal}) => {
       await submitVote({
         vote: vote === 'yes' ? VoteKind.Approve : VoteKind.Deny,
         voterTokenRecord: voterTokenRecord!,
-        voteWeights: selectedOptions
+        voteWeights: selectedOptions,
       })
     }
   }
 
   const handleOption = (index: number) => {
-    let options = [...selectedOptions];
-    let status = [...optionStatus];
-    const isNota = proposal.options[last].label === nota;
+    let options = [...selectedOptions]
+    let status = [...optionStatus]
+    const isNota = proposal.options[last].label === nota
 
-    const selected = status[index];
+    const selected = status[index]
 
     if (selected) {
-      options = options.filter(option => option !== index);
+      options = options.filter((option) => option !== index)
       status[index] = false
     } else {
       if (isNota) {
         if (index === last) {
           // if nota is clicked, unselect all other options
-          status = status.map(() => false);
-          status[index] = true;
-          options = [index];
+          status = status.map(() => false)
+          status[index] = true
+          options = [index]
         } else {
           // remove nota from the selected if any other option is clicked
-          status[last] = false;
-          options = options.filter(option => option !== last);
+          status[last] = false
+          options = options.filter((option) => option !== last)
           if (!options.includes(index)) {
             options.push(index)
           }
-          status[index] = true;
+          status[index] = true
         }
       } else {
         if (!options.includes(index)) {
           options.push(index)
         }
-        status[index] = true;
+        status[index] = true
       }
     }
 
-    setSelectedOptions(options);
-    setOptionStatus(status);
+    setSelectedOptions(options)
+    setOptionStatus(status)
   }
 
-  return (isVoting && !isVoteCast) ? (
+  return isVoting && !isVoteCast ? (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-4">
       <div className="flex flex-col items-center justify-center">
         <h3 className="text-center">Cast your {votingPop} vote</h3>
@@ -99,29 +97,35 @@ export const CastMultiVoteButtons = ({proposal} : {proposal: Proposal}) => {
                 <SecondaryButton
                   tooltipMessage={tooltipContent}
                   className={`
-                    ${optionStatus[index] ? 
-                      'bg-primary-light text-bkg-2 hover:text-bkg-2 hover:border-primary-light' : 
-                      'bg-transparent'}
+                    ${
+                      optionStatus[index]
+                        ? 'bg-primary-light text-bkg-2 hover:text-bkg-2 hover:border-primary-light'
+                        : 'bg-transparent'
+                    }
                     rounded-lg w-full
                   `}
                   onClick={() => handleOption(index)}
                   disabled={!canVote || submitting}
                   isLoading={submitting}
                 >
-                  {optionStatus[index] && <CheckCircleIcon  className="inline w-4 mr-1"/>}
-                  {option.label === nota && index === last ? "None of the Above" : option.label}
+                  {optionStatus[index] && (
+                    <CheckCircleIcon className="inline w-4 mr-1" />
+                  )}
+                  {option.label === nota && index === last
+                    ? 'None of the Above'
+                    : option.label}
                 </SecondaryButton>
               </div>
-            )}
-          )}
+            )
+          })}
           <div className="text-xs">
             Note: You can select one or more options
           </div>
           <Button
             tooltipMessage={
-              tooltipContent === "" && !selectedOptions.length ? 
-              `Select at least one option to vote` 
-              : tooltipContent
+              tooltipContent === '' && !selectedOptions.length
+                ? `Select at least one option to vote`
+                : tooltipContent
             }
             className="w-full"
             onClick={() => handleVote('yes')}
