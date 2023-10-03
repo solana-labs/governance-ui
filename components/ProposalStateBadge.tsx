@@ -1,4 +1,8 @@
-import { Proposal, ProposalState } from '@solana/spl-governance'
+import {
+  Proposal,
+  ProposalState,
+  getNativeTreasuryAddress,
+} from '@solana/spl-governance'
 import classNames from 'classnames'
 
 import assertUnreachable from '@utils/typescript/assertUnreachable'
@@ -8,6 +12,8 @@ import {
   useUserCouncilTokenOwnerRecord,
 } from '@hooks/queries/tokenOwnerRecord'
 import { useGovernanceByPubkeyQuery } from '@hooks/queries/governance'
+import { useSelectedProposalTransactions } from '@hooks/queries/proposalTransaction'
+import { useAsync } from 'react-async-hook'
 
 export const hasInstructions = (proposal: Proposal) => {
   if (proposal.instructionsCount) {
@@ -172,6 +178,25 @@ export default function ProposalStateBadge(props: Props) {
 
   const coolOff = isInCoolOffTime(props.proposal, governance?.account)
 
+  const { data: allTransactions } = useSelectedProposalTransactions()
+  const treasuryAddress = useAsync(
+    async () =>
+      governance !== undefined
+        ? getNativeTreasuryAddress(governance.owner, governance.pubkey)
+        : undefined,
+    [governance]
+  )
+  const walletsPassedToInstructions = allTransactions?.flatMap((tx) =>
+    tx.account.instructions.flatMap((ins) =>
+      ins.accounts.map((acc) => acc.pubkey)
+    )
+  )
+  const possibleWrongGovernance =
+    allTransactions?.length &&
+    !walletsPassedToInstructions?.find(
+      (x) => treasuryAddress.result && x.equals(treasuryAddress.result)
+    )
+
   const otherState = {
     isCreator,
     isSignatory,
@@ -181,23 +206,45 @@ export default function ProposalStateBadge(props: Props) {
   }
 
   return (
-    <div
-      className={classNames(
-        props.className,
-        'border',
-        'inline-flex',
-        'min-w-max',
-        'items-center',
-        'px-2',
-        'py-1',
-        'rounded-full',
-        'text-xs',
-        getBorderColor(props.proposal.state, otherState),
-        getOpacity(props.proposal.state, otherState),
-        getTextColor(props.proposal.state, otherState)
+    <div>
+      {possibleWrongGovernance && (
+        <div
+          className={classNames(
+            props.className,
+            'border',
+            'inline-flex',
+            'min-w-max',
+            'items-center',
+            'px-2',
+            'py-1',
+            'rounded-full',
+            'text-xs',
+            'border-[#F5A458]',
+            'text-[#F5A458]',
+            'mr-2'
+          )}
+        >
+          Possible wrong governance
+        </div>
       )}
-    >
-      {getLabel(props.proposal.state, otherState)}
+      <div
+        className={classNames(
+          props.className,
+          'border',
+          'inline-flex',
+          'min-w-max',
+          'items-center',
+          'px-2',
+          'py-1',
+          'rounded-full',
+          'text-xs',
+          getBorderColor(props.proposal.state, otherState),
+          getOpacity(props.proposal.state, otherState),
+          getTextColor(props.proposal.state, otherState)
+        )}
+      >
+        {getLabel(props.proposal.state, otherState)}
+      </div>
     </div>
   )
 }
