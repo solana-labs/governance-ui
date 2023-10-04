@@ -15,6 +15,7 @@ import {
   VoteKind,
   VoteType,
   withPostChatMessage,
+  withCreateTokenOwnerRecord,
 } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
@@ -37,6 +38,8 @@ import { fetchRealmByPubkey } from '@hooks/queries/realm'
 import { fetchProposalByPubkeyQuery } from '@hooks/queries/proposal'
 import { findPluginName } from '@hooks/queries/governancePower'
 import { DELEGATOR_BATCH_VOTE_SUPPORT_BY_PLUGIN } from '@constants/flags'
+import { fetchTokenOwnerRecordByPubkey } from '@hooks/queries/tokenOwnerRecord'
+import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
 
 const getVetoTokenMint = (
   proposal: ProgramAccount<Proposal>,
@@ -98,6 +101,42 @@ const createDelegatorVote = async ({
     //plugin?.maxVoterWeightRecord
   )
   return castVoteIxs
+}
+
+const createTokenOwnerRecordIfNeeded = async ({
+  connection,
+  realmPk,
+  tokenOwnerRecordPk,
+  payer,
+  governingTokenMint,
+}: {
+  connection: Connection
+  realmPk: PublicKey
+  tokenOwnerRecordPk: PublicKey
+  payer: PublicKey
+  governingTokenMint: PublicKey
+}) => {
+  const realm = await fetchRealmByPubkey(connection, realmPk)
+  if (!realm.result) throw new Error()
+  const version = await fetchProgramVersion(connection, realm.result.owner)
+
+  const tokenOwnerRecord = await fetchTokenOwnerRecordByPubkey(
+    connection,
+    tokenOwnerRecordPk
+  )
+  if (tokenOwnerRecord.result) return []
+  // create token owner record
+  const ixs: TransactionInstruction[] = []
+  await withCreateTokenOwnerRecord(
+    ixs,
+    realm.result.owner,
+    version,
+    realmPk,
+    payer,
+    governingTokenMint,
+    payer
+  )
+  return ixs
 }
 
 export async function castVote(
@@ -253,9 +292,17 @@ export async function castVote(
 
   const isNftVoter = votingPlugin?.client instanceof NftVoterClient
   const isHeliumVoter = votingPlugin?.client instanceof HeliumVsrClient
+  const tokenOwnerRecordIxs = await createTokenOwnerRecordIfNeeded({
+    connection,
+    realmPk: realm.pubkey,
+    tokenOwnerRecordPk: tokenOwnerRecord,
+    payer,
+    governingTokenMint: tokenMint,
+  })
 
   if (!isNftVoter && !isHeliumVoter) {
     const batch1 = [
+      ...tokenOwnerRecordIxs,
       ...pluginCastVoteIxs,
       ...castVoteIxs,
       ...pluginPostMessageIxs,
