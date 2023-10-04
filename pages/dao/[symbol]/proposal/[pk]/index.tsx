@@ -125,7 +125,9 @@ const Proposal = () => {
                 </ReactMarkdown>
               </div>
             )}
-            <ProposalWarnings proposal={proposal.account} />
+            {proposal.account && (
+              <ProposalWarnings proposal={proposal.account} />
+            )}
             <TransactionPanel />
             {isTwoCol && allowDiscussion && <DiscussionPanel />}
           </>
