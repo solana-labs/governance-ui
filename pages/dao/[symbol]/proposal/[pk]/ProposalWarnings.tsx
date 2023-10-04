@@ -129,12 +129,13 @@ const useProposalSafetyCheck = (proposal: Proposal) => {
       config === undefined ||
       transactions === undefined
     )
-      return undefined
+      return []
 
     const ixs = transactions.flatMap((pix) => pix.account.getAllInstructions())
 
     const possibleWrongGovernance =
-      transactions?.length &&
+      treasuryAddress.result &&
+      !!transactions?.length &&
       !walletsPassedToInstructions?.find(
         (x) => governance?.pubkey.equals(x) || treasuryAddress.result?.equals(x)
       )
@@ -174,7 +175,14 @@ const useProposalSafetyCheck = (proposal: Proposal) => {
     }
 
     return realmConfigWarnings
-  }, [config, transactions, realmInfo])
+  }, [
+    realmInfo,
+    config,
+    transactions,
+    walletsPassedToInstructions,
+    governance?.pubkey,
+    treasuryAddress.result,
+  ])
 
   return realmConfigWarnings
 }
