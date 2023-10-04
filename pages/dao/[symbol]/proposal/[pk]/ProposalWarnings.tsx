@@ -107,7 +107,7 @@ const useProposalSafetyCheck = (proposal: Proposal) => {
 
   const { realmInfo } = useRealm()
   const { data: transactions } = useSelectedProposalTransactions()
-  const governance = useGovernanceByPubkeyQuery(proposal.governance).data
+  const governance = useGovernanceByPubkeyQuery(proposal?.governance).data
     ?.result
 
   const treasuryAddress = useAsync(
