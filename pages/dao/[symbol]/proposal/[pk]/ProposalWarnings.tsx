@@ -183,7 +183,7 @@ const useProposalSafetyCheck = (proposal: Proposal) => {
     governance?.pubkey,
     treasuryAddress.result,
   ])
-  console.log(realmConfigWarnings)
+
   return realmConfigWarnings
 }
 
