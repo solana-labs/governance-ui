@@ -813,7 +813,7 @@ const instructions = () => ({
             bank.nativeDeposits().mul(bank.price).toNumber()
           )[liqudityTier.tier!]
           suggestedUntrusted = liqudityTier.tier === 'UNTRUSTED'
-          console.log(suggestedPreset)
+
           const suggestedFormattedPreset:
             | EditTokenArgsFormatted
             | Record<string, never> = Object.keys(suggestedPreset).length
