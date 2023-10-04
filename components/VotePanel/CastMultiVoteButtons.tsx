@@ -3,7 +3,7 @@ import { CheckCircleIcon } from '@heroicons/react/solid'
 import { useState } from 'react'
 import Button, { SecondaryButton } from '../Button'
 import VoteCommentModal from '../VoteCommentModal'
-import { useIsVoting, useVoterTokenRecord, useVotingPop } from './hooks'
+import { useIsVoting, useVotingPop } from './hooks'
 import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
 import { useSubmitVote } from '@hooks/useSubmitVote'
 import { useSelectedRealmInfo } from '@hooks/selectedRealm/useSelectedRealmRegistryEntry'
@@ -16,7 +16,6 @@ export const CastMultiVoteButtons = ({ proposal }: { proposal: Proposal }) => {
   const allowDiscussion = realmInfo?.allowDiscussion ?? true
   const { submitting, submitVote } = useSubmitVote()
   const votingPop = useVotingPop()
-  const voterTokenRecord = useVoterTokenRecord()
   const [canVote, tooltipContent] = useCanVote()
   const { data: ownVoteRecord } = useProposalVoteRecordQuery('electoral')
   const [selectedOptions, setSelectedOptions] = useState<number[]>([])
@@ -37,7 +36,6 @@ export const CastMultiVoteButtons = ({ proposal }: { proposal: Proposal }) => {
     } else {
       await submitVote({
         vote: vote === 'yes' ? VoteKind.Approve : VoteKind.Deny,
-        voterTokenRecord: voterTokenRecord!,
         voteWeights: selectedOptions,
       })
     }
@@ -144,7 +142,6 @@ export const CastMultiVoteButtons = ({ proposal }: { proposal: Proposal }) => {
           isOpen={showVoteModal}
           onClose={() => setShowVoteModal(false)}
           vote={VoteKind.Approve}
-          voterTokenRecord={voterTokenRecord!}
           isMulti={selectedOptions}
         />
       ) : null}

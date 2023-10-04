@@ -3,12 +3,7 @@ import { useState } from 'react'
 import { ThumbUpIcon, ThumbDownIcon } from '@heroicons/react/solid'
 import Button from '../Button'
 import VoteCommentModal from '../VoteCommentModal'
-import {
-  useIsInCoolOffTime,
-  useIsVoting,
-  useVoterTokenRecord,
-  useVotingPop,
-} from './hooks'
+import { useIsInCoolOffTime, useIsVoting, useVotingPop } from './hooks'
 import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
 import { useSubmitVote } from '@hooks/useSubmitVote'
 import { useSelectedRealmInfo } from '@hooks/selectedRealm/useSelectedRealmRegistryEntry'
@@ -21,7 +16,6 @@ export const CastVoteButtons = () => {
   const allowDiscussion = realmInfo?.allowDiscussion ?? true
   const { submitting, submitVote } = useSubmitVote()
   const votingPop = useVotingPop()
-  const voterTokenRecord = useVoterTokenRecord()
   const [canVote, tooltipContent] = useCanVote()
   const { data: ownVoteRecord } = useProposalVoteRecordQuery('electoral')
 
@@ -37,7 +31,6 @@ export const CastVoteButtons = () => {
     } else {
       await submitVote({
         vote: vote === 'yes' ? VoteKind.Approve : VoteKind.Deny,
-        voterTokenRecord: voterTokenRecord!,
       })
     }
   }
@@ -89,7 +82,6 @@ export const CastVoteButtons = () => {
           isOpen={showVoteModal}
           onClose={() => setShowVoteModal(false)}
           vote={vote === 'yes' ? VoteKind.Approve : VoteKind.Deny}
-          voterTokenRecord={voterTokenRecord!}
         />
       ) : null}
     </div>
