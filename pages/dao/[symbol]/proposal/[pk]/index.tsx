@@ -13,7 +13,11 @@ import ProposalTimeStatus from 'components/ProposalTimeStatus'
 import { useEffect, useState } from 'react'
 import ProposalActionsPanel from '@components/ProposalActions'
 import { getRealmExplorerHost } from 'tools/routing'
-import { GovernanceAccountType, ProposalState, VoteType } from '@solana/spl-governance'
+import {
+  GovernanceAccountType,
+  ProposalState,
+  VoteType,
+} from '@solana/spl-governance'
 import VoteResultStatus from '@components/VoteResultStatus'
 import VoteResults from '@components/VoteResults'
 import MultiChoiceVotes from '@components/MultiChoiceVotes'
@@ -37,8 +41,9 @@ const Proposal = () => {
   const governance = useProposalGovernanceQuery().data?.result
   const descriptionLink = proposal?.account.descriptionLink
   const allowDiscussion = realmInfo?.allowDiscussion ?? true
-  const isMulti = proposal?.account.voteType !== VoteType.SINGLE_CHOICE
-    && proposal?.account.accountType === GovernanceAccountType.ProposalV2
+  const isMulti =
+    proposal?.account.voteType !== VoteType.SINGLE_CHOICE &&
+    proposal?.account.accountType === GovernanceAccountType.ProposalV2
 
   const [description, setDescription] = useState('')
   const voteData = useProposalVotes(proposal?.account)
@@ -120,7 +125,7 @@ const Proposal = () => {
                 </ReactMarkdown>
               </div>
             )}
-            <ProposalWarnings />
+            <ProposalWarnings proposal={proposal.account} />
             <TransactionPanel />
             {isTwoCol && allowDiscussion && <DiscussionPanel />}
           </>
