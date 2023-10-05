@@ -216,7 +216,7 @@ export function QuorumPercent(props: Props) {
     >
       <div className="grid grid-cols-[100px,1fr] gap-x-2 items-center">
         <SliderValue
-          min={1}
+          min={0.5}
           max={100}
           value={props.rules.quorumPercent}
           units="%"
@@ -228,7 +228,7 @@ export function QuorumPercent(props: Props) {
           }}
         />
         <Slider
-          min={1}
+          min={0.5}
           max={100}
           trackColor="bg-sky-400"
           value={props.rules.quorumPercent}
