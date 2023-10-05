@@ -34,7 +34,10 @@ export function SliderValue(props: Props) {
           );
           const parsed = parseFloat(text);
           const value = Number.isNaN(parsed) ? props.min : parsed;
-          props.onChange?.(Math.max(props.min, value));
+          const newValue = Math.max(props.min, value);
+          setValue(String(props.value)); // this is to force the input to update to the correct value
+          // even if the user enters an invalid value that doesnt actually change props.value
+          props.onChange?.(newValue);
         }}
       />
       <div
