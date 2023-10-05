@@ -1,11 +1,9 @@
 import { BigNumber } from 'bignumber.js'
-import { SecondaryButton } from '@components/Button'
 import { useRealmQuery } from '@hooks/queries/realm'
-import BN from 'bn.js'
 import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
-import { useDepositCallback } from './useDepositCallback'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import useUserGovTokenAccountQuery from '@hooks/useUserGovTokenAccount'
+import { DepositTokensButton } from '@components/DepositTokensButton'
 
 /** Contextual deposit, shows only if relevant */
 export const Deposit = ({ role }: { role: 'community' | 'council' }) => {
@@ -24,8 +22,6 @@ export const Deposit = ({ role }: { role: 'community' | 'council' }) => {
 
   const tokenName = getMintMetadata(mint)?.name ?? realm?.account.name ?? ''
 
-  const deposit = useDepositCallback(role)
-
   return !depositAmount.isGreaterThan(0) ? null : (
     <>
       <div className="mt-3 text-xs text-white/50">
@@ -36,12 +32,7 @@ export const Deposit = ({ role }: { role: 'community' | 'council' }) => {
         more {tokenName} votes in your wallet. Do you want to deposit them to
         increase your voting power in this Dao?
       </div>
-      <SecondaryButton
-        className="mt-4 w-48"
-        onClick={() => deposit(new BN(depositAmount.toString()))}
-      >
-        Deposit
-      </SecondaryButton>
+      <DepositTokensButton className="mt-4 w-48" role={role} as="secondary" />
     </>
   )
 }
