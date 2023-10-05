@@ -35,7 +35,7 @@ export const useTokenAccountsByOwnerQuery = (pubkey: PublicKey | undefined) => {
       results.forEach((x) => {
         queryClient.setQueryData(
           tokenAccountQueryKeys.byPubkey(connection.rpcEndpoint, x.publicKey),
-          { found: true, result: x }
+          { found: true, result: x.account }
         )
       })
 
