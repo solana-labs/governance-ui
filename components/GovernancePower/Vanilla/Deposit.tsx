@@ -15,6 +15,7 @@ import { fetchTokenAccountByPubkey } from '@hooks/queries/tokenAccount'
 import { useDepositCallback } from './useDepositCallback'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 
+/** Contextual deposit, shows only if relevant */
 export const Deposit = ({ role }: { role: 'community' | 'council' }) => {
   const realm = useRealmQuery().data?.result
   const wallet = useWalletOnePointOh()
