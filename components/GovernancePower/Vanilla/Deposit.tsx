@@ -1,42 +1,22 @@
 import { BigNumber } from 'bignumber.js'
 import { SecondaryButton } from '@components/Button'
-import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
-import { useAsync } from 'react-async-hook'
-import {
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  Token,
-  TOKEN_PROGRAM_ID,
-} from '@solana/spl-token'
 import BN from 'bn.js'
 import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
-import { useTokenAccountByPubkeyQuery } from '@hooks/queries/tokenAccount'
 import { useDepositCallback } from './useDepositCallback'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
+import useUserGovTokenAccountQuery from '@hooks/useUserGovTokenAccount'
 
 /** Contextual deposit, shows only if relevant */
 export const Deposit = ({ role }: { role: 'community' | 'council' }) => {
   const realm = useRealmQuery().data?.result
-  const wallet = useWalletOnePointOh()
-  const walletPk = wallet?.publicKey ?? undefined
   const mint =
     role === 'community'
       ? realm?.account.communityMint
       : realm?.account.config.councilMint
-  const { result: userAtaPk } = useAsync(
-    async () =>
-      walletPk &&
-      mint &&
-      Token.getAssociatedTokenAddress(
-        ASSOCIATED_TOKEN_PROGRAM_ID,
-        TOKEN_PROGRAM_ID,
-        mint,
-        walletPk
-      ),
-    [mint, walletPk]
-  )
+
   const mintInfo = useMintInfoByPubkeyQuery(mint).data?.result
-  const userAta = useTokenAccountByPubkeyQuery(userAtaPk).data?.result
+  const userAta = useUserGovTokenAccountQuery(role).data?.result
 
   const depositAmount = userAta?.amount
     ? new BigNumber(userAta.amount.toString())
