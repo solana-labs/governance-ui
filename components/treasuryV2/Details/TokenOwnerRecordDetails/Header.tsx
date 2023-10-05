@@ -7,7 +7,6 @@ import { useState } from 'react'
 import { notify } from '@utils/notifications'
 import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 import {
-  getGovernanceProgramVersion,
   getInstructionDataFromBase64,
   serializeInstructionToBase64,
   withWithdrawGoverningTokens,
@@ -29,6 +28,7 @@ import { fetchRealmByPubkey, useRealmByPubkeyQuery } from '@hooks/queries/realm'
 import mainnetBetaRealms from 'public/realms/mainnet-beta.json'
 import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
 import { fetchGovernanceByPubkey } from '@hooks/queries/governance'
+import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
 
 interface Props {
   tokenOwnerRecord: PublicKey
@@ -73,7 +73,7 @@ export default function Header({ tokenOwnerRecord, governance }: Props) {
 
       const instructions: TransactionInstruction[] = []
 
-      const programVersion = await getGovernanceProgramVersion(
+      const programVersion = await fetchProgramVersion(
         connection.current,
         new PublicKey(tokenOwnerRecordData.owner)
       )

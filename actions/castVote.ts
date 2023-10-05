@@ -6,7 +6,6 @@ import {
 } from '@solana/web3.js'
 import {
   ChatMessageBody,
-  getGovernanceProgramVersion,
   GovernanceAccountType,
   GOVERNANCE_CHAT_PROGRAM_ID,
   Proposal,
@@ -34,6 +33,7 @@ import { calcCostOfNftVote, checkHasEnoughSolToVote } from '@tools/nftVoteCalc'
 import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
+import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
 
 const getVetoTokenMint = (
   proposal: ProgramAccount<Proposal>,
@@ -71,10 +71,7 @@ export async function castVote(
   const payer = walletPubkey
   // Explicitly request the version before making RPC calls to work around race conditions in resolving
   // the version for RealmInfo
-  const programVersion = await getGovernanceProgramVersion(
-    connection,
-    programId
-  )
+  const programVersion = await fetchProgramVersion(connection, programId)
 
   const pluginCastVoteIxs: TransactionInstruction[] = []
   //will run only if any plugin is connected with realm

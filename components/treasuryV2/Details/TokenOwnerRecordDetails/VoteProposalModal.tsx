@@ -3,13 +3,13 @@ import Loading from '@components/Loading'
 import Modal from '@components/Modal'
 import { ThumbDownIcon, ThumbUpIcon } from '@heroicons/react/solid'
 import { useGovernanceByPubkeyQuery } from '@hooks/queries/governance'
+import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
 import useCreateProposal from '@hooks/useCreateProposal'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import {
-  getGovernanceProgramVersion,
   getInstructionDataFromBase64,
   ProgramAccount,
   Proposal,
@@ -79,7 +79,7 @@ export default function VoteProposalModal({
 
       const governanceAuthority = voterTokenRecord.account.governingTokenOwner
 
-      const programVersion = await getGovernanceProgramVersion(
+      const programVersion = await fetchProgramVersion(
         connection.current,
         programId
       )
