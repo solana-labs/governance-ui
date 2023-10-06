@@ -4,6 +4,11 @@ import BN from 'bn.js'
 import useUserGovTokenAccountQuery from '@hooks/useUserGovTokenAccount'
 import { useDepositCallback } from './GovernancePower/Vanilla/useDepositCallback'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import Modal from './Modal'
+import { useState } from 'react'
+import useGoverningTokenMint from '@hooks/selectedRealm/useGoverningTokenMint'
+import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
+import Input from './inputs/Input'
 
 export const DepositTokensButton = ({
   role,
@@ -29,16 +34,54 @@ export const DepositTokensButton = ({
     : undefined
 
   const ButtonToUse = as === 'primary' ? Button : SecondaryButton
+  const [openModal, setOpenModal] = useState(false)
+  const [amount, setAmount] = useState('')
+  const mint = useGoverningTokenMint(role)
+  const mintInfo = useMintInfoByPubkeyQuery(mint).data?.result
+
+  const humanReadableMax =
+    mintInfo === undefined
+      ? undefined
+      : depositAmount.shiftedBy(-mintInfo.decimals).toNumber()
 
   const deposit = useDepositCallback(role)
   return (
-    <ButtonToUse
-      {...props}
-      onClick={() => deposit(new BN(depositAmount.toString()))}
-      tooltipMessage={depositTooltipContent}
-      disabled={!connected || !hasTokensInWallet || props.disabled}
-    >
-      Deposit
-    </ButtonToUse>
+    <>
+      <ButtonToUse
+        {...props}
+        onClick={() => setOpenModal(true)}
+        tooltipMessage={depositTooltipContent}
+        disabled={!connected || !hasTokensInWallet || props.disabled}
+      >
+        Deposit
+      </ButtonToUse>
+      {openModal && (
+        <Modal isOpen={openModal} onClose={() => setOpenModal(false)}>
+          <div className="flex flex-col gap-y-4">
+            <h2>Deposit tokens</h2>
+            <Input
+              placeholder={humanReadableMax?.toString() + ' (max)'}
+              type="number"
+              label="Amount to deposit"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              max={humanReadableMax}
+            />
+            <Button
+              onClick={async () => {
+                if (mintInfo === undefined) throw new Error()
+                const nativeAmount = new BN(
+                  new BigNumber(amount).shiftedBy(mintInfo.decimals).toString()
+                )
+                await deposit(nativeAmount)
+                setOpenModal(false)
+              }}
+            >
+              Confirm
+            </Button>
+          </div>
+        </Modal>
+      )}
+    </>
   )
 }
