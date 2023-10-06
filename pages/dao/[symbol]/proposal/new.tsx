@@ -135,6 +135,7 @@ import DualVote from './components/instructions/Dual/DualVote'
 import DualGso from './components/instructions/Dual/DualGso'
 import DualGsoWithdraw from './components/instructions/Dual/DualGsoWithdraw'
 import MultiChoiceForm from '../../../../components/MultiChoiceForm'
+import CloseVaults from './components/instructions/DistrubtionProgram/CloseVaults'
 
 const TITLE_LENGTH_LIMIT = 130
 // the true length limit is either at the tx size level, and maybe also the total account size level (I can't remember)
@@ -492,6 +493,7 @@ const New = () => {
       [Instructions.DualFinanceDelegateWithdraw]: DualVoteDepositWithdraw,
       [Instructions.DualFinanceVoteDeposit]: DualVoteDeposit,
       [Instructions.DualFinanceVote]: DualVote,
+      [Instructions.DistributionCloseVaults]: CloseVaults,
       [Instructions.MeanCreateAccount]: MeanCreateAccount,
       [Instructions.MeanFundAccount]: MeanFundAccount,
       [Instructions.MeanWithdrawFromAccount]: MeanWithdrawFromAccount,
