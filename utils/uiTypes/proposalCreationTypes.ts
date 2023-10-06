@@ -10,6 +10,10 @@ import { consts as foresightConsts } from '@foresight-tmp/foresight-sdk'
 import { AssetAccount, StakeAccount } from '@utils/uiTypes/assets'
 import { RealmInfo } from '@models/registry/api'
 import * as PaymentStreaming from '@mean-dao/payment-streaming'
+import {
+  DepositoriesRoutingWeightBps,
+  RouterDepositories,
+} from '@tools/sdk/uxdProtocol'
 
 // Alphabetical order
 export enum PackageEnum {
@@ -323,6 +327,8 @@ export interface UXDInitializeControllerForm {
 export interface UXDEditControllerForm {
   governedAccount?: AssetAccount
   redeemableGlobalSupplyCap?: number
+  depositoriesRoutingWeightBps?: DepositoriesRoutingWeightBps
+  routerDepositories?: RouterDepositories
 }
 
 export interface UXDInitializeIdentityDepositoryForm {

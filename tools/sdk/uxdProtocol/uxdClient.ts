@@ -61,6 +61,18 @@ export const GOVERNANCE_MINTS = {
   },
 }
 
+export type DepositoriesRoutingWeightBps = {
+  identityDepositoryWeightBps: number
+  mercurialVaultDepositoryWeightBps: number
+  credixLpDepositoryWeightBps: number
+}
+
+export type RouterDepositories = {
+  identityDepository: PublicKey
+  mercurialVaultDepository: PublicKey
+  credixLpDepository: PublicKey
+}
+
 export enum DEPOSITORY_TYPES {
   IDENTITY = 'Identity',
   MERCURIAL = 'Mercurial',

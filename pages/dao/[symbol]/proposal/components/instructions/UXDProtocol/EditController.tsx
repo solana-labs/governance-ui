@@ -18,6 +18,7 @@ import {
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { useConnection } from '@solana/wallet-adapter-react'
+import { PublicKey } from '@solana/web3.js'
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -27,6 +28,28 @@ const schema = yup.object().shape({
   redeemableGlobalSupplyCap: yup
     .number()
     .min(0, 'Redeemable global supply cap should be min 0'),
+  depositoriesRoutingWeightBps: yup.object().shape({
+    identityDepositoryWeightBps: yup
+      .number()
+      .required('identity depository weight is required'),
+    mercurialVaultDepositoryWeightBps: yup
+      .number()
+      .required('mercurial depository weight is required'),
+    credixLpDepositoryWeightBps: yup
+      .number()
+      .required('credix depository weight is required'),
+  }),
+  routerDepositories: yup.object().shape({
+    identityDepository: yup
+      .string()
+      .required('identity depository address is required'),
+    mercurialVaultDepository: yup
+      .string()
+      .required('mercurial depository address is required'),
+    credixLpDepository: yup
+      .string()
+      .required('credix depository address is required'),
+  }),
 })
 
 const EditController = ({
@@ -46,6 +69,15 @@ const EditController = ({
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
   const { assetAccounts } = useGovernanceAssets()
+
+  const [
+    depositoriesRoutingWeightBpsChange,
+    setDepositoriesRoutingWeightBpsChange,
+  ] = useState<boolean>(false)
+  const [
+    routerDepositoriesChange,
+    setRouterDepositoriesChange,
+  ] = useState<boolean>(false)
 
   const [form, setForm] = useState<UXDEditControllerForm>({
     governedAccount: undefined,
@@ -81,11 +113,38 @@ const EditController = ({
       form.governedAccount?.governance?.account.governedAccount
     const client = uxdClient(uxdProgramId)
     const authority = form.governedAccount.governance.pubkey
+    const depositoriesRoutingWeightBps =
+      depositoriesRoutingWeightBpsChange &&
+      form.depositoriesRoutingWeightBps?.credixLpDepositoryWeightBps &&
+      form.depositoriesRoutingWeightBps.identityDepositoryWeightBps &&
+      form.depositoriesRoutingWeightBps.mercurialVaultDepositoryWeightBps
+        ? form.depositoriesRoutingWeightBps
+        : undefined
+
+    const routerDepositories =
+      routerDepositoriesChange &&
+      form.routerDepositories?.credixLpDepository &&
+      form.routerDepositories.identityDepository &&
+      form.routerDepositories.mercurialVaultDepository
+        ? {
+            credixLpDepository: new PublicKey(
+              form.routerDepositories.credixLpDepository
+            ),
+            identityDepository: new PublicKey(
+              form.routerDepositories.identityDepository
+            ),
+            mercurialVaultDepository: new PublicKey(
+              form.routerDepositories.mercurialVaultDepository
+            ),
+          }
+        : undefined
     const ix = client.createEditControllerInstruction(
       new Controller('UXD', UXD_DECIMALS, uxdProgramId),
       authority,
       {
         redeemableGlobalSupplyCap: form.redeemableGlobalSupplyCap,
+        depositoriesRoutingWeightBps,
+        routerDepositories,
       },
       { preflightCommitment: 'processed', commitment: 'processed' }
     )
@@ -141,6 +200,131 @@ const EditController = ({
           }
           error={formErrors['redeemableGlobalSupplyCap']}
         />
+      ) : null}
+
+      <h5>Depositories Routing Weight in Bps</h5>
+
+      <Switch
+        checked={depositoriesRoutingWeightBpsChange}
+        onChange={(checked) => setDepositoriesRoutingWeightBpsChange(checked)}
+      />
+      {depositoriesRoutingWeightBpsChange ? (
+        <>
+          <Input
+            label="Identity Depository Routing Weight in Bps"
+            value={
+              form.depositoriesRoutingWeightBps?.identityDepositoryWeightBps
+            }
+            type="number"
+            min={0}
+            max={10 ** 12}
+            onChange={(evt) =>
+              handleSetForm({
+                value: {
+                  ...form.depositoriesRoutingWeightBps,
+                  identityDepositoryWeightBps: evt.target.value,
+                },
+                propertyName: 'depositoriesRoutingWeightBps',
+              })
+            }
+            error={formErrors['depositoriesRoutingWeightBps']}
+          />
+          <Input
+            label="Mercurial Vault Depository Routing Weight in Bps"
+            value={
+              form.depositoriesRoutingWeightBps
+                ?.mercurialVaultDepositoryWeightBps
+            }
+            type="number"
+            min={0}
+            max={10 ** 12}
+            onChange={(evt) =>
+              handleSetForm({
+                value: {
+                  ...form.depositoriesRoutingWeightBps,
+                  mercurialVaultDepositoryWeightBps: evt.target.value,
+                },
+                propertyName: 'depositoriesRoutingWeightBps',
+              })
+            }
+            error={formErrors['depositoriesRoutingWeightBps']}
+          />
+          <Input
+            label="Credix LP Depository Routing Weight in Bps"
+            value={
+              form.depositoriesRoutingWeightBps?.credixLpDepositoryWeightBps
+            }
+            type="number"
+            min={0}
+            max={10 ** 12}
+            onChange={(evt) =>
+              handleSetForm({
+                value: {
+                  ...form.depositoriesRoutingWeightBps,
+                  credixLpDepositoryWeightBps: evt.target.value,
+                },
+                propertyName: 'depositoriesRoutingWeightBps',
+              })
+            }
+            error={formErrors['depositoriesRoutingWeightBps']}
+          />
+        </>
+      ) : null}
+
+      <h5>Router Depositories</h5>
+
+      <Switch
+        checked={routerDepositoriesChange}
+        onChange={(checked) => setRouterDepositoriesChange(checked)}
+      />
+      {routerDepositoriesChange ? (
+        <>
+          <Input
+            label="Identity Depository"
+            value={form.routerDepositories?.identityDepository}
+            type="string"
+            onChange={(evt) =>
+              handleSetForm({
+                value: {
+                  ...form.routerDepositories,
+                  identityDepository: evt.target.value,
+                },
+                propertyName: 'routerDepositories',
+              })
+            }
+            error={formErrors['routerDepositories']}
+          />
+          <Input
+            label="Mercurial Vault Depository"
+            value={form.routerDepositories?.mercurialVaultDepository}
+            type="string"
+            onChange={(evt) =>
+              handleSetForm({
+                value: {
+                  ...form.routerDepositories,
+                  mercurialVaultDepository: evt.target.value,
+                },
+                propertyName: 'routerDepositories',
+              })
+            }
+            error={formErrors['routerDepositories']}
+          />
+          <Input
+            label="Credix LP Depository"
+            value={form.routerDepositories?.credixLpDepository}
+            type="string"
+            onChange={(evt) =>
+              handleSetForm({
+                value: {
+                  ...form.routerDepositories,
+                  credixLpDepository: evt.target.value,
+                },
+                propertyName: 'routerDepositories',
+              })
+            }
+            error={formErrors['routerDepositories']}
+          />
+        </>
       ) : null}
     </>
   )
