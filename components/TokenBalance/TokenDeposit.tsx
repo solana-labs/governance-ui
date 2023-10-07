@@ -12,7 +12,7 @@ import { getUnrelinquishedVoteRecords } from '@models/api'
 import { withRelinquishVote } from '@solana/spl-governance'
 import { withWithdrawGoverningTokens } from '@solana/spl-governance'
 import { sendTransaction } from '@utils/send'
-import Button, { SecondaryButton } from '../Button'
+import { SecondaryButton } from '../Button'
 import { GoverningTokenRole } from '@solana/spl-governance'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { getMintMetadata } from '../instructions/programs/splToken'
@@ -37,8 +37,8 @@ import { useConnection } from '@solana/wallet-adapter-react'
 import queryClient from '@hooks/queries/queryClient'
 import { proposalQueryKeys } from '@hooks/queries/proposal'
 import asFindable from '@utils/queries/asFindable'
-import { useDepositCallback } from '@components/GovernancePower/Vanilla/useDepositCallback'
 import VanillaVotingPower from '@components/GovernancePower/Vanilla/VanillaVotingPower'
+import { DepositTokensButton } from '@components/DepositTokensButton'
 
 export const TokenDeposit = ({
   mint,
@@ -95,13 +95,6 @@ export const TokenDeposit = ({
   const depositTokenName = `${tokenName} ${
     tokenRole === GoverningTokenRole.Community ? '' : 'Council'
   }`
-
-  const depositTokens = useDepositCallback(
-    tokenRole === GoverningTokenRole.Community ? 'community' : 'council'
-  )
-
-  const depositAllTokens = async () =>
-    await depositTokens(depositTokenAccount!.account.amount)
 
   const withdrawAllTokens = async function () {
     const instructions: TransactionInstruction[] = []
@@ -254,11 +247,6 @@ export const TokenDeposit = ({
     depositTokenRecord &&
     depositTokenRecord.account.governingTokenDepositAmount.gt(new BN(0))
 
-  const depositTooltipContent = !connected
-    ? 'Connect your wallet to deposit'
-    : !hasTokensInWallet
-    ? "You don't have any governance tokens in your wallet to deposit."
-    : ''
   const withdrawTooltipContent = !connected
     ? 'Connect your wallet to withdraw'
     : !hasTokensDeposited
@@ -326,24 +314,16 @@ export const TokenDeposit = ({
           </div>
 
           <div className="flex flex-col mt-6 space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
-            {hasTokensInWallet && !inAccountDetails ? (
-              <SecondaryButton
-                tooltipMessage={depositTooltipContent}
+            {hasTokensInWallet || inAccountDetails ? (
+              <DepositTokensButton
                 className="sm:w-1/2 max-w-[200px]"
-                disabled={!connected || !hasTokensInWallet}
-                onClick={depositAllTokens}
-              >
-                Deposit
-              </SecondaryButton>
-            ) : inAccountDetails ? (
-              <Button
-                tooltipMessage={depositTooltipContent}
-                className="sm:w-1/2 max-w-[200px]"
-                disabled={!connected || !hasTokensInWallet}
-                onClick={depositAllTokens}
-              >
-                Deposit
-              </Button>
+                role={
+                  tokenRole === GoverningTokenRole.Community
+                    ? 'community'
+                    : 'council'
+                }
+                as={inAccountDetails ? 'primary' : 'secondary'}
+              />
             ) : null}
             {(inAccountDetails || isVsr) && (
               <SecondaryButton

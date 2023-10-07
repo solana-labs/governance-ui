@@ -25,6 +25,7 @@ import { NewProposalContext } from '../../new'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
+/** This is an instruction component to deposit tokens in another DAO */
 const JoinDAO = ({
   index,
   governance,

@@ -17,6 +17,23 @@ import { getLockTokensVotingPowerPerWallet } from 'VoteStakeRegistry/tools/depos
 
 const VOTER_INFO_EVENT_NAME = 'VoterInfo'
 
+export const vsrQueryKeys = {
+  all: (connection: Connection) => [connection.rpcEndpoint, 'VSR'],
+  allVotingPower: (connection: Connection) => [
+    ...vsrQueryKeys.all(connection),
+    'voting power',
+  ],
+  votingPower: (
+    connection: Connection,
+    registrarPk: PublicKey,
+    voterPk: PublicKey
+  ) => [
+    ...vsrQueryKeys.allVotingPower(connection),
+    registrarPk.toString(),
+    voterPk.toString(),
+  ],
+}
+
 export const getVsrGovpower = async (
   connection: Connection,
   realmPk: PublicKey,
@@ -58,12 +75,7 @@ export const getVsrGovpower = async (
 
   // you may be asking yourself, "what?". that is healthy
   queryClient.setQueryData(
-    [
-      connection.rpcEndpoint,
-      'VSR: voting power',
-      registrarPk.toString(),
-      voterPk.toString(),
-    ],
+    vsrQueryKeys.votingPower(connection, registrarPk, voterPk),
     votingPower
   )
   return votingPower
@@ -95,6 +107,10 @@ export const fetchVotingPowerSimulation = (
       ),
   })
 
+// TODO break apart getVsrGovpower into one function that gets the accounts you need,
+// and then a query function that actually gets the account and is used by useQuery.
+// so that you can invalidate.
+// this will trigger an extra rerender i think, which is kind of annoying, but i do not really see an alternative.
 export const useVsrGovpower = () => {
   const { connection } = useConnection()
   const realmPk = useSelectedRealmPubkey()
@@ -170,16 +186,11 @@ export const useVsrGovpowerMulti = (wallets: PublicKey[]) => {
       )
 
       queryClient.setQueryData(
-        [
-          connection.rpcEndpoint,
-          'VSR: voting power',
-          registrarPk.toString(),
-          voterPk.toString(),
-        ],
+        vsrQueryKeys.votingPower(connection, registrarPk, voterPk),
         power
       )
     }
 
     return x
-  }, [])
+  }, [connection, realm, wallets])
 }

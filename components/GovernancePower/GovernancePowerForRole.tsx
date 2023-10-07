@@ -7,6 +7,7 @@ import LockedCommunityVotingPower from '@components/ProposalVotingPower/LockedCo
 import NftVotingPower from '@components/ProposalVotingPower/NftVotingPower'
 import LockedCommunityNFTRecordVotingPower from '@components/ProposalVotingPower/LockedCommunityNFTRecordVotingPower'
 import VanillaVotingPower from './Vanilla/VanillaVotingPower'
+import { Deposit } from './Vanilla/Deposit'
 
 export default function GovernancePowerForRole({
   role,
@@ -39,7 +40,9 @@ export default function GovernancePowerForRole({
     <>
       {role === 'community' ? (
         kind === 'vanilla' ? (
-          <VanillaVotingPower role="community" {...props} />
+          <VanillaVotingPower role="community" {...props}>
+            <Deposit role="community" />
+          </VanillaVotingPower>
         ) : kind === 'VSR' ? (
           <LockedCommunityVotingPower />
         ) : kind === 'NFT' ? (
@@ -48,7 +51,9 @@ export default function GovernancePowerForRole({
           <LockedCommunityNFTRecordVotingPower />
         ) : null
       ) : kind === 'vanilla' ? (
-        <VanillaVotingPower role="council" {...props} />
+        <VanillaVotingPower role="council" {...props}>
+          <Deposit role="council" />
+        </VanillaVotingPower>
       ) : null}
     </>
   )
