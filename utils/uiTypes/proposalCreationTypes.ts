@@ -329,6 +329,9 @@ export interface UXDEditControllerForm {
   redeemableGlobalSupplyCap?: number
   depositoriesRoutingWeightBps?: DepositoriesRoutingWeightBps
   routerDepositories?: RouterDepositories
+  outflowLimitPerEpochAmount?: number
+  outflowLimitPerEpochBps?: number
+  slotsPerEpoch?: number
 }
 
 export interface UXDInitializeIdentityDepositoryForm {
@@ -368,6 +371,7 @@ export interface UXDEditDepositoryForm {
   governedAccount?: AssetAccount
   depositoryType: string
   collateralName?: string
+  mintingDisabled: boolean
   redeemableAmountUnderManagementCap: number
   mintingFeeInBps: number
   redeemingFeeInBps: number

@@ -31,25 +31,26 @@ const schema = yup.object().shape({
   depositoriesRoutingWeightBps: yup.object().shape({
     identityDepositoryWeightBps: yup
       .number()
-      .required('identity depository weight is required'),
+      .min(0, 'weight bps should be min 0'),
     mercurialVaultDepositoryWeightBps: yup
       .number()
-      .required('mercurial depository weight is required'),
+      .min(0, 'weight bps should be min 0'),
     credixLpDepositoryWeightBps: yup
       .number()
-      .required('credix depository weight is required'),
+      .min(0, 'weight bps should be min 0'),
   }),
   routerDepositories: yup.object().shape({
-    identityDepository: yup
-      .string()
-      .required('identity depository address is required'),
-    mercurialVaultDepository: yup
-      .string()
-      .required('mercurial depository address is required'),
-    credixLpDepository: yup
-      .string()
-      .required('credix depository address is required'),
+    identityDepository: yup.string(),
+    mercurialVaultDepository: yup.string(),
+    credixLpDepository: yup.string(),
   }),
+  outflowLimitPerEpochAmount: yup
+    .number()
+    .min(0, 'outflow limit per epoch amount should be min 0'),
+  outflowLimitPerEpochBps: yup
+    .number()
+    .min(0, 'outflow limit per epoch bps should be min 0'),
+  slotsPerEpoch: yup.number().min(0, 'slots per epoch should be min 0'),
 })
 
 const EditController = ({
@@ -59,17 +60,15 @@ const EditController = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const [
-    redeemableGlobalSupplyCapChange,
-    setRedeemableGlobalSupplyCapChange,
-  ] = useState<boolean>(false)
-
   const connection = useConnection()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
   const { assetAccounts } = useGovernanceAssets()
-
+  const [
+    redeemableGlobalSupplyCapChange,
+    setRedeemableGlobalSupplyCapChange,
+  ] = useState<boolean>(false)
   const [
     depositoriesRoutingWeightBpsChange,
     setDepositoriesRoutingWeightBpsChange,
@@ -79,9 +78,18 @@ const EditController = ({
     setRouterDepositoriesChange,
   ] = useState<boolean>(false)
 
+  const [
+    outflowLimitPerEpochAmountChange,
+    setOutflowLimitPerEpochAmountChange,
+  ] = useState<boolean>(false)
+  const [
+    outflowLimitPerEpochBpsChange,
+    setOutflowLimitPerEpochBpsChange,
+  ] = useState<boolean>(false)
+  const [slotsPerEpochChange, setSlotsPerEpochChange] = useState<boolean>(false)
+
   const [form, setForm] = useState<UXDEditControllerForm>({
     governedAccount: undefined,
-    redeemableGlobalSupplyCap: 0,
   })
 
   const handleSetForm = ({ propertyName, value }) => {
@@ -113,6 +121,16 @@ const EditController = ({
       form.governedAccount?.governance?.account.governedAccount
     const client = uxdClient(uxdProgramId)
     const authority = form.governedAccount.governance.pubkey
+    const redeemableGlobalSupplyCap = redeemableGlobalSupplyCapChange
+      ? form.redeemableGlobalSupplyCap
+      : undefined
+    const outflowLimitPerEpochAmount = outflowLimitPerEpochAmountChange
+      ? form.outflowLimitPerEpochAmount
+      : undefined
+    const outflowLimitPerEpochBps = outflowLimitPerEpochBpsChange
+      ? form.outflowLimitPerEpochBps
+      : undefined
+    const slotsPerEpoch = slotsPerEpochChange ? form.slotsPerEpoch : undefined
     const depositoriesRoutingWeightBps =
       depositoriesRoutingWeightBpsChange &&
       form.depositoriesRoutingWeightBps?.credixLpDepositoryWeightBps &&
@@ -138,13 +156,25 @@ const EditController = ({
             ),
           }
         : undefined
+
+    console.debug({
+      redeemableGlobalSupplyCap,
+      depositoriesRoutingWeightBps,
+      routerDepositories,
+      outflowLimitPerEpochAmount,
+      outflowLimitPerEpochBps,
+      slotsPerEpoch,
+    })
     const ix = client.createEditControllerInstruction(
       new Controller('UXD', UXD_DECIMALS, uxdProgramId),
       authority,
       {
-        redeemableGlobalSupplyCap: form.redeemableGlobalSupplyCap,
+        redeemableGlobalSupplyCap,
         depositoriesRoutingWeightBps,
         routerDepositories,
+        outflowLimitPerEpochAmount,
+        outflowLimitPerEpochBps,
+        slotsPerEpoch,
       },
       { preflightCommitment: 'processed', commitment: 'processed' }
     )
@@ -325,6 +355,72 @@ const EditController = ({
             error={formErrors['routerDepositories']}
           />
         </>
+      ) : null}
+
+      <h5>Outflow Limit Per Epoch Amount</h5>
+      <Switch
+        checked={outflowLimitPerEpochAmountChange}
+        onChange={(checked) => setOutflowLimitPerEpochAmountChange(checked)}
+      />
+      {outflowLimitPerEpochAmountChange ? (
+        <Input
+          label="Outflow Limit Per Epoch Amount"
+          value={form.outflowLimitPerEpochAmount}
+          type="number"
+          min={0}
+          max={10 ** 12}
+          onChange={(evt) =>
+            handleSetForm({
+              value: evt.target.value,
+              propertyName: 'outflowLimitPerEpochAmount',
+            })
+          }
+          error={formErrors['outflowLimitPerEpochAmount']}
+        />
+      ) : null}
+
+      <h5>Outflow Limit Per Epoch Bps</h5>
+      <Switch
+        checked={outflowLimitPerEpochBpsChange}
+        onChange={(checked) => setOutflowLimitPerEpochBpsChange(checked)}
+      />
+      {outflowLimitPerEpochBpsChange ? (
+        <Input
+          label="Outflow Limit Per Epoch Bps"
+          value={form.outflowLimitPerEpochBps}
+          type="number"
+          min={0}
+          max={10 ** 12}
+          onChange={(evt) =>
+            handleSetForm({
+              value: evt.target.value,
+              propertyName: 'outflowLimitPerEpochBps',
+            })
+          }
+          error={formErrors['outflowLimitPerEpochBps']}
+        />
+      ) : null}
+
+      <h5>Slots per Epoch</h5>
+      <Switch
+        checked={slotsPerEpochChange}
+        onChange={(checked) => setSlotsPerEpochChange(checked)}
+      />
+      {slotsPerEpochChange ? (
+        <Input
+          label="Slots per Epoch"
+          value={form.slotsPerEpoch}
+          type="number"
+          min={0}
+          max={10 ** 12}
+          onChange={(evt) =>
+            handleSetForm({
+              value: evt.target.value,
+              propertyName: 'slotsPerEpoch',
+            })
+          }
+          error={formErrors['slotsPerEpoch']}
+        />
       ) : null}
     </>
   )

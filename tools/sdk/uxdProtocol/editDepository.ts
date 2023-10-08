@@ -20,6 +20,7 @@ export type UXDEditDepositoryParams = {
   redeemableAmountUnderManagementCap?: number
   profitsBeneficiaryCollateral?: PublicKey
   depositoryMintName: string
+  mintingDisabled: boolean
 }
 
 const editMercurialDepositoryIx = async ({
@@ -60,6 +61,7 @@ const editMercurialDepositoryIx = async ({
       mintingFeeInBps: params.mintingFeeInBps,
       redeemingFeeInBps: params.redeemingFeeInBps,
       profitsBeneficiaryCollateral: params.profitsBeneficiaryCollateral,
+      mintingDisabled: params.mintingDisabled,
     },
     { preflightCommitment: 'processed', commitment: 'processed' }
   )
@@ -94,6 +96,7 @@ const editCredixDepository = async ({
       mintingFeeInBps: params.mintingFeeInBps,
       redeemingFeeInBps: params.redeemingFeeInBps,
       profitsBeneficiaryCollateral: params.profitsBeneficiaryCollateral,
+      mintingDisabled: params.mintingDisabled,
     },
     { preflightCommitment: 'processed', commitment: 'processed' }
   )

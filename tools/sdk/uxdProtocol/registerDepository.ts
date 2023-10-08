@@ -112,7 +112,6 @@ export const registerUXDDepositoryIx = async (
         params,
       })
     case DEPOSITORY_TYPES.CREDIX:
-    default:
       return registerNewCredixDepositoryIx({
         connection,
         uxdProgramId,
@@ -120,5 +119,7 @@ export const registerUXDDepositoryIx = async (
         controller,
         params,
       })
+    default:
+      throw new Error('Depository type not handled')
   }
 }

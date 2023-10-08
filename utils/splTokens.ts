@@ -91,6 +91,7 @@ export const SPL_TOKENS: {
     mint: new PublicKey('iouQcQBAiEXe6cKLS85zmZxUqaCqBdeHFpqKoSz615u'),
     decimals: 6,
   },
+
   'Lifinity UXD-USDC LP': {
     name: 'Lifinity UXD-USDC LP',
     mint: new PublicKey('DM2Grhnear76DwNiRUSfeiFMt6jSj2op9GWinQDc7Yqh'),

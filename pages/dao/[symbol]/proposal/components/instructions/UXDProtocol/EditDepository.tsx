@@ -33,6 +33,9 @@ const schema = yup.object().shape({
     .required('Governance account is required'),
   depositoryType: yup.string().required('Valid Depository type is required'),
   collateralName: yup.string().required('Valid Collateral name is required'),
+  mintingDisabled: yup
+    .bool()
+    .required('Disabling minting must be true or false'),
   mintingFeeInBps: yup
     .number()
     .min(0, 'Minting fee in bps should be min 0')
@@ -44,9 +47,7 @@ const schema = yup.object().shape({
   redeemableAmountUnderManagementCap: yup
     .number()
     .min(0, 'Redeemable amount under management cap should be min 0'),
-  profitsBeneficiaryCollateralChange: yup
-    .string()
-    .required('Profits Beneficiary is required'),
+  profitsBeneficiaryCollateralChange: yup.string(),
 })
 
 const EditDepository = ({
@@ -88,6 +89,7 @@ const EditDepository = ({
     mintingFeeInBps: 0,
     redeemingFeeInBps: 0,
     profitsBeneficiaryCollateralChange: '',
+    mintingDisabled: false,
   })
 
   const handleSetForm = ({ propertyName, value }) => {
@@ -148,6 +150,7 @@ const EditDepository = ({
         redeemingFeeInBps,
         redeemableAmountUnderManagementCap,
         profitsBeneficiaryCollateral,
+        mintingDisabled: form.mintingDisabled,
       }
     )
 
@@ -296,6 +299,18 @@ const EditDepository = ({
           error={formErrors['profitsBeneficiaryCollateral']}
         />
       ) : null}
+
+      <h5>Disable Minting</h5>
+
+      <Switch
+        checked={form.mintingDisabled}
+        onChange={(value) =>
+          handleSetForm({
+            value,
+            propertyName: 'mintingDisabled',
+          })
+        }
+      />
     </>
   )
 }
