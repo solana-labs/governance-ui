@@ -342,6 +342,7 @@ export enum Instructions {
   DualFinanceVoteDeposit,
   DualFinanceVote,
   DistributionCloseVaults,
+  DistributionFillVaults,
   DelegateStake,
   ForesightAddMarketListToCategory,
   ForesightInitCategory,
