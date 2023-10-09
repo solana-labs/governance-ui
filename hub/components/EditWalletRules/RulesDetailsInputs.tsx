@@ -239,6 +239,7 @@ export function QuorumPercent(props: Props) {
             props.onRulesChange?.(newRules);
           }}
           onRenderValue={(val) => `${val}%`}
+          step={1}
         />
       </div>
     </ValueBlock>
