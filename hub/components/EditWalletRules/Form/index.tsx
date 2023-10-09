@@ -29,7 +29,6 @@ interface Props
 }
 
 function Form(props: Props & { title: string; description: string }) {
-  console.log('form props', props);
   const [showCouncilOptions, setShowCouncilOptions] = useState(
     props.initialCouncilRules?.canVote || false,
   );
