@@ -1,5 +1,4 @@
 import {
-  getGovernanceProgramVersion,
   ProgramAccount,
   TokenOwnerRecord,
   withRefundProposalDeposit,
@@ -15,6 +14,7 @@ import { sendTransaction } from '@utils/send'
 import { Proposal } from '@solana/spl-governance'
 import { withFinalizeVote } from '@solana/spl-governance'
 import { getProposalDepositPk } from '@utils/helpers'
+import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
 
 export const finalizeVote = async (
   { connection, wallet, programId }: RpcContext,
@@ -28,10 +28,7 @@ export const finalizeVote = async (
 
   // Explicitly request the version before making RPC calls to work around race conditions in resolving
   // the version for RealmInfo
-  const programVersion = await getGovernanceProgramVersion(
-    connection,
-    programId
-  )
+  const programVersion = await fetchProgramVersion(connection, programId)
 
   await withFinalizeVote(
     instructions,

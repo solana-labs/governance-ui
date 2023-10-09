@@ -6,7 +6,6 @@ import {
 } from '@solana/web3.js'
 
 import {
-  getGovernanceProgramVersion,
   RpcContext,
   TokenOwnerRecord,
   withRefundProposalDeposit,
@@ -16,6 +15,7 @@ import { ProgramAccount } from '@solana/spl-governance'
 import { sendTransaction } from 'utils/send'
 import { withCancelProposal } from '@solana/spl-governance'
 import { getProposalDepositPk } from '@utils/helpers'
+import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
 
 export const cancelProposal = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -29,10 +29,7 @@ export const cancelProposal = async (
 
   // Explicitly request the version before making RPC calls to work around race conditions in resolving
   // the version for RealmInfo
-  const programVersion = await getGovernanceProgramVersion(
-    connection,
-    programId
-  )
+  const programVersion = await fetchProgramVersion(connection, programId)
 
   withCancelProposal(
     instructions,

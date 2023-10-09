@@ -5,12 +5,13 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js'
 
-import { getGovernanceProgramVersion, Proposal } from '@solana/spl-governance'
+import { Proposal } from '@solana/spl-governance'
 
 import { withFlagTransactionError } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { sendTransaction } from '@utils/send'
+import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
 
 export const flagInstructionError = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -24,10 +25,7 @@ export const flagInstructionError = async (
 
   // Explicitly request the version before making RPC calls to work around race conditions in resolving
   // the version for RealmInfo
-  const programVersion = await getGovernanceProgramVersion(
-    connection,
-    programId
-  )
+  const programVersion = await fetchProgramVersion(connection, programId)
 
   withFlagTransactionError(
     instructions,
