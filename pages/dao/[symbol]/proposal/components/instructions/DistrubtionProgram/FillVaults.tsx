@@ -6,7 +6,6 @@ import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import {
   Governance,
-  SYSTEM_PROGRAM_ID,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
@@ -25,12 +24,9 @@ import EmptyWallet from '@utils/Mango/listingTools'
 import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { tryGetTokenAccount } from '@utils/tokens'
 import Button from '@components/Button'
-import {
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  TOKEN_PROGRAM_ID,
-  Token,
-} from '@solana/spl-token'
+import { TOKEN_PROGRAM_ID, Token, u64 } from '@solana/spl-token'
 import Input from '@components/inputs/Input'
+import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
 
 interface FillVaultsForm {
   governedAccount: AssetAccount | null
@@ -82,7 +78,6 @@ const FillVaults = ({
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
-    const mintsOfCurrentlyPushedAtaInstructions: string[] = []
     const additionalSerializedInstructions: string[] = []
     const prerequisiteInstructions: TransactionInstruction[] = []
     if (
@@ -91,51 +86,22 @@ const FillVaults = ({
       wallet?.publicKey &&
       vaults
     ) {
-      for (const v of Object.values(vaults)) {
-        const ataAddress = await Token.getAssociatedTokenAddress(
-          ASSOCIATED_TOKEN_PROGRAM_ID,
+      for (const t of transfers) {
+        const mintAmount = parseMintNaturalAmountFromDecimal(
+          t.amount,
+          t.decimals
+        )
+        const transferIx = Token.createTransferInstruction(
           TOKEN_PROGRAM_ID,
-          v.mint,
+          t.from,
+          t.to,
           form.governedAccount.extensions.transferAddress!,
-          true
+          [],
+          new u64(mintAmount.toString())
         )
-
-        const depositAccountInfo = await connection.current.getAccountInfo(
-          ataAddress
+        additionalSerializedInstructions.push(
+          serializeInstructionToBase64(transferIx!)
         )
-        if (
-          !depositAccountInfo &&
-          !mintsOfCurrentlyPushedAtaInstructions.find(
-            (x) => x !== v.mint.toBase58()
-          )
-        ) {
-          // generate the instruction for creating the ATA
-          prerequisiteInstructions.push(
-            Token.createAssociatedTokenAccountInstruction(
-              ASSOCIATED_TOKEN_PROGRAM_ID,
-              TOKEN_PROGRAM_ID,
-              v.mint,
-              ataAddress,
-              form.governedAccount.extensions.transferAddress!,
-              wallet.publicKey
-            )
-          )
-          mintsOfCurrentlyPushedAtaInstructions.push(v.mint.toBase58())
-        }
-
-        const ix = await client?.program.methods
-          .vaultClose()
-          .accounts({
-            distribution: distribution?.publicKey,
-            vault: v.publicKey,
-            mint: v.mint,
-            destination: ataAddress,
-            authority: form.governedAccount.extensions.transferAddress,
-            systemProgram: SYSTEM_PROGRAM_ID,
-            tokenProgram: TOKEN_PROGRAM_ID,
-          })
-          .instruction()
-        additionalSerializedInstructions.push(serializeInstructionToBase64(ix!))
       }
       serializedInstruction = ''
     }
