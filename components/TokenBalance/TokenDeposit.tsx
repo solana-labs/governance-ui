@@ -7,7 +7,11 @@ import {
 import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 import BN from 'bn.js'
 import useRealm from '@hooks/useRealm'
-import { getProposal, ProposalState } from '@solana/spl-governance'
+import {
+  getProposal,
+  GoverningTokenType,
+  ProposalState,
+} from '@solana/spl-governance'
 import { getUnrelinquishedVoteRecords } from '@models/api'
 import { withRelinquishVote } from '@solana/spl-governance'
 import { withWithdrawGoverningTokens } from '@solana/spl-governance'
@@ -66,6 +70,13 @@ export const TokenDeposit = ({
   const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
+
+  const relevantTokenConfig =
+    tokenRole === GoverningTokenRole.Community
+      ? config?.account.communityTokenConfig
+      : config?.account.councilTokenConfig
+  const isMembership =
+    relevantTokenConfig?.tokenType === GoverningTokenType.Membership
 
   const {
     realmInfo,
@@ -325,24 +336,25 @@ export const TokenDeposit = ({
                 as={inAccountDetails ? 'primary' : 'secondary'}
               />
             ) : null}
-            {(inAccountDetails || isVsr) && (
-              <SecondaryButton
-                tooltipMessage={withdrawTooltipContent}
-                className="sm:w-1/2 max-w-[200px]"
-                disabled={
-                  !connected ||
-                  !hasTokensDeposited ||
-                  (!councilVote &&
-                    toManyCommunityOutstandingProposalsForUser) ||
-                  toManyCouncilOutstandingProposalsForUse ||
-                  wallet?.publicKey?.toBase58() !==
-                    depositTokenRecord.account.governingTokenOwner.toBase58()
-                }
-                onClick={withdrawAllTokens}
-              >
-                Withdraw
-              </SecondaryButton>
-            )}
+            {!isMembership && // Membership tokens can't be withdrawn (that is their whole point, actually)
+              (inAccountDetails || isVsr) && (
+                <SecondaryButton
+                  tooltipMessage={withdrawTooltipContent}
+                  className="sm:w-1/2 max-w-[200px]"
+                  disabled={
+                    !connected ||
+                    !hasTokensDeposited ||
+                    (!councilVote &&
+                      toManyCommunityOutstandingProposalsForUser) ||
+                    toManyCouncilOutstandingProposalsForUse ||
+                    wallet?.publicKey?.toBase58() !==
+                      depositTokenRecord.account.governingTokenOwner.toBase58()
+                  }
+                  onClick={withdrawAllTokens}
+                >
+                  Withdraw
+                </SecondaryButton>
+              )}
           </div>
         </>
       }
