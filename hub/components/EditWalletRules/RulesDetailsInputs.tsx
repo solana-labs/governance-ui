@@ -226,6 +226,7 @@ export function QuorumPercent(props: Props) {
             });
             props.onRulesChange?.(newRules);
           }}
+          integer
         />
         <Slider
           min={1}

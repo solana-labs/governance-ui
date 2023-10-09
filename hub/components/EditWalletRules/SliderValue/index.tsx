@@ -10,6 +10,7 @@ interface Props {
   value: number;
   units: React.ReactNode;
   onChange?(value: number): void;
+  integer?: boolean;
 }
 
 export function SliderValue(props: Props) {
@@ -32,7 +33,9 @@ export function SliderValue(props: Props) {
             /.*?(([0-9]*\.)?[0-9]+).*/g,
             '$1',
           );
-          const parsed = Math.floor(parseFloat(text));
+          const parsed = props.integer
+            ? Math.floor(parseFloat(text))
+            : parseFloat(text);
           const value = Number.isNaN(parsed) ? props.min : parsed;
           const newValue = Math.max(props.min, value);
           setValue(String(props.value)); // this is to force the input to update to the correct value
