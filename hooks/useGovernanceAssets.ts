@@ -755,6 +755,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseAuthorityInstruction,
       packageId: PackageEnum.Distribution,
     },
+    [Instructions.DistributionFillVaults]: {
+      name: 'Fill vaults',
+      isVisible: canUseAuthorityInstruction,
+      packageId: PackageEnum.Distribution,
+    },
   }
 
   const availablePackages: PackageType[] = Object.entries(packages)
