@@ -3223,5 +3223,15 @@
     "keywords": "Web3 Identity, REALM, Goverenance, Web3 domains, DAO",
     "twitter": "@AllDomains_",
     "github": "https://github.com/onsol-labs/"
+  },
+  {
+    "symbol": "PHNX",
+    "displayName": "PhoenixDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "FHe1HUmcyhJQDiDTi1Dkt3Jtu25Eo8QzT6kdAVDCiNUB",
+    "website": "https://phnx.one/",
+    "twitter": "@Phnxsol",
+    "discord": "https://discord.gg/cmxR5SRpFU",
+    "ogImage": "/realms/Phoenix_DAO/PhoenixDAO.png"
   }
 ]
