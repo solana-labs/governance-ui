@@ -821,16 +821,14 @@ const instructions = () => ({
               },
               {}
             )
-          console.log(tokenToPriceImpact)
+
           const priceImpact = tokenToPriceImpact[getApiTokenName(bank.name)]
 
-          const suggestedTier = priceImpact
-            ? getProposedTier(
-                PRESETS,
-                priceImpact.target_amount,
-                bank.oracleProvider === OracleProvider.Pyth
-              )
-            : 'SHIT'
+          const suggestedTier = getProposedTier(
+            PRESETS,
+            priceImpact?.target_amount,
+            bank.oracleProvider === OracleProvider.Pyth
+          )
 
           liqudityTier = !mint.equals(USDC_MINT)
             ? {
