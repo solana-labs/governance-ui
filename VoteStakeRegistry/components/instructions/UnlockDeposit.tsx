@@ -99,7 +99,7 @@ const UnlockDeposit = ({
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     let serializedInstruction = ''
     const prerequisiteInstructions: TransactionInstruction[] = []
-    if (isValid && form.depositEntryIndex) {
+    if (isValid && typeof form.depositEntryIndex === 'number') {
       const voterAuthorityPk = new PublicKey(form.voterAuthorityPk)
 
       const unlockDepositIx = await getUnlockDepositInstruction({
