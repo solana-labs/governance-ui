@@ -30,7 +30,6 @@ import {
 } from '../typeGuards'
 
 import { PublicKey } from '@solana/web3.js'
-import TokenOwnerRecordsList from './TokenOwnerRecordsList'
 import { GoverningTokenType } from '@solana/spl-governance'
 import TokenIcon from '@components/treasuryV2/icons/TokenIcon'
 import { useTokensMetadata } from '@hooks/queries/tokenMetadata'
@@ -242,14 +241,6 @@ export default function AssetList(props: Props) {
           onSelect={props.onSelectAsset}
           onToggleExpand={() => props.onToggleExpandSection?.('others')}
           itemsToHide={itemsToHide}
-        />
-      )}
-      {props.governance !== undefined && (
-        <TokenOwnerRecordsList
-          governance={props.governance}
-          disableCollapse={false}
-          expanded={true}
-          onToggleExpand={() => props.onToggleExpandSection?.('others')}
         />
       )}
     </div>

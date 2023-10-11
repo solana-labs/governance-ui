@@ -1,42 +1,33 @@
-import { BigNumber } from 'bignumber.js'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   MintInfo,
   Token,
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
-import {
-  Keypair,
-  PublicKey,
-  Transaction,
-  TransactionInstruction,
-} from '@solana/web3.js'
+import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 import BN from 'bn.js'
 import useRealm from '@hooks/useRealm'
-import { getProposal, Proposal, ProposalState } from '@solana/spl-governance'
+import {
+  getProposal,
+  GoverningTokenType,
+  ProposalState,
+} from '@solana/spl-governance'
 import { getUnrelinquishedVoteRecords } from '@models/api'
-import { withDepositGoverningTokens } from '@solana/spl-governance'
 import { withRelinquishVote } from '@solana/spl-governance'
 import { withWithdrawGoverningTokens } from '@solana/spl-governance'
 import { sendTransaction } from '@utils/send'
-import { approveTokenTransfer } from '@utils/tokens'
-import Button, { SecondaryButton } from '../Button'
-import { Option } from '@tools/core/option'
+import { SecondaryButton } from '../Button'
 import { GoverningTokenRole } from '@solana/spl-governance'
-import { fmtMintAmount, getMintDecimalAmount } from '@tools/sdk/units'
+import { fmtMintAmount } from '@tools/sdk/units'
 import { getMintMetadata } from '../instructions/programs/splToken'
 import { withFinalizeVote } from '@solana/spl-governance'
 import { chunks } from '@utils/helpers'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { notify } from '@utils/notifications'
 import { ExclamationIcon } from '@heroicons/react/outline'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { VSR_PLUGIN_PKS } from '@constants/plugins'
-import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
-import SerumGovernanceTokenWrapper from './SerumGovernanceTokenWrapper'
-import getNumTokens from '@components/ProposalVotingPower/getNumTokens'
-import VotingPowerPct from '@components/ProposalVotingPower/VotingPowerPct'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import {
@@ -45,106 +36,13 @@ import {
 } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
-import {
-  useRealmCommunityMintInfoQuery,
-  useRealmCouncilMintInfoQuery,
-} from '@hooks/queries/mintInfo'
 import { fetchGovernanceByPubkey } from '@hooks/queries/governance'
 import { useConnection } from '@solana/wallet-adapter-react'
 import queryClient from '@hooks/queries/queryClient'
 import { proposalQueryKeys } from '@hooks/queries/proposal'
 import asFindable from '@utils/queries/asFindable'
-import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
-
-const TokenBalanceCard = ({
-  proposal,
-  inAccountDetails = false,
-  children,
-}: {
-  proposal?: Option<Proposal>
-  inAccountDetails?: boolean
-  children?: React.ReactNode
-}) => {
-  const [hasGovPower, setHasGovPower] = useState<boolean>(false)
-  const realm = useRealmQuery().data?.result
-  const realmProgramId = realm?.owner
-  const mint = useRealmCommunityMintInfoQuery().data?.result
-  const councilMint = useRealmCouncilMintInfoQuery().data?.result
-  const wallet = useWalletOnePointOh()
-  const connected = !!wallet?.connected
-  const isDepositVisible = (
-    depositMint: MintInfo | undefined,
-    realmMint: PublicKey | undefined
-  ) =>
-    depositMint &&
-    (!proposal ||
-      (proposal.isSome() &&
-        proposal.value.governingTokenMint.toBase58() === realmMint?.toBase58()))
-
-  const communityDepositVisible =
-    // If there is no council then community deposit is the only option to show
-    !realm?.account.config.councilMint ||
-    isDepositVisible(mint, realm?.account.communityMint)
-
-  const councilDepositVisible = isDepositVisible(
-    councilMint,
-    realm?.account.config.councilMint
-  )
-  const hasLoaded = mint || councilMint
-
-  return (
-    <>
-      {hasLoaded ? (
-        <div
-          className={`${
-            inAccountDetails ? `flex w-full gap-8 md:gap-12` : `space-y-4`
-          }`}
-        >
-          {!hasGovPower && !inAccountDetails && connected && (
-            <div className={'text-xs text-white/50 mt-8'}>
-              You do not have any governance power in this dao
-            </div>
-          )}
-          {!connected && (
-            <div className={'text-xs text-white/50 mt-8'}>
-              Connect your wallet to see governance power
-            </div>
-          )}
-          {communityDepositVisible && (
-            <TokenDeposit
-              mint={mint}
-              tokenRole={GoverningTokenRole.Community}
-              councilVote={false}
-              inAccountDetails={inAccountDetails}
-              setHasGovPower={setHasGovPower}
-            />
-          )}
-          {councilDepositVisible && (
-            <TokenDeposit
-              mint={councilMint}
-              tokenRole={GoverningTokenRole.Council}
-              councilVote={true}
-              inAccountDetails={inAccountDetails}
-              setHasGovPower={setHasGovPower}
-            />
-          )}
-          <DelegateTokenBalanceCard />
-        </div>
-      ) : (
-        <>
-          <div className="h-12 mb-4 rounded-lg animate-pulse bg-bkg-3" />
-          <div className="h-10 rounded-lg animate-pulse bg-bkg-3" />
-        </>
-      )}
-      {/* TODO: Restrict to Serum DAO */}
-      {realmProgramId?.toBase58() ===
-      'G41fmJzd29v7Qmdi8ZyTBBYa98ghh3cwHBTexqCG1PQJ' ? (
-        <SerumGovernanceTokenWrapper />
-      ) : null}
-      {children}
-    </>
-  )
-}
+import VanillaVotingPower from '@components/GovernancePower/Vanilla/VanillaVotingPower'
+import { DepositTokensButton } from '@components/DepositTokensButton'
 
 export const TokenDeposit = ({
   mint,
@@ -172,8 +70,13 @@ export const TokenDeposit = ({
   const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
-  const councilMint = useRealmCouncilMintInfoQuery().data?.result
-  const { result: ownVoterWeight } = useLegacyVoterWeight()
+
+  const relevantTokenConfig =
+    tokenRole === GoverningTokenRole.Community
+      ? config?.account.communityTokenConfig
+      : config?.account.councilTokenConfig
+  const isMembership =
+    relevantTokenConfig?.tokenType === GoverningTokenType.Membership
 
   const {
     realmInfo,
@@ -182,24 +85,6 @@ export const TokenDeposit = ({
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
-
-  const amount = ownVoterWeight
-    ? councilMint && tokenRole === GoverningTokenRole.Council
-      ? getNumTokens(
-          ownVoterWeight,
-          ownCouncilTokenRecord,
-          councilMint,
-          realmInfo
-        )
-      : getNumTokens(ownVoterWeight, ownCouncilTokenRecord, mint, realmInfo)
-    : new BigNumber(0)
-
-  const max: BigNumber | undefined =
-    councilMint && tokenRole === GoverningTokenRole.Council
-      ? getMintDecimalAmount(councilMint, councilMint.supply)
-      : mint
-      ? getMintDecimalAmount(mint, mint.supply)
-      : undefined
 
   const depositTokenRecord =
     tokenRole === GoverningTokenRole.Community
@@ -221,49 +106,6 @@ export const TokenDeposit = ({
   const depositTokenName = `${tokenName} ${
     tokenRole === GoverningTokenRole.Community ? '' : 'Council'
   }`
-
-  const depositTokens = async function (amount: BN) {
-    const instructions: TransactionInstruction[] = []
-    const signers: Keypair[] = []
-
-    const transferAuthority = approveTokenTransfer(
-      instructions,
-      [],
-      depositTokenAccount!.publicKey,
-      wallet!.publicKey!,
-      amount
-    )
-
-    signers.push(transferAuthority)
-
-    await withDepositGoverningTokens(
-      instructions,
-      realmInfo!.programId,
-      getProgramVersionForRealm(realmInfo!),
-      realm!.pubkey,
-      depositTokenAccount!.publicKey,
-      depositTokenAccount!.account.mint,
-      wallet!.publicKey!,
-      transferAuthority.publicKey,
-      wallet!.publicKey!,
-      amount
-    )
-
-    const transaction = new Transaction()
-    transaction.add(...instructions)
-
-    await sendTransaction({
-      connection,
-      wallet: wallet!,
-      transaction,
-      signers,
-      sendingMessage: 'Depositing tokens',
-      successMessage: 'Tokens have been deposited',
-    })
-  }
-
-  const depositAllTokens = async () =>
-    await depositTokens(depositTokenAccount!.account.amount)
 
   const withdrawAllTokens = async function () {
     const instructions: TransactionInstruction[] = []
@@ -353,18 +195,18 @@ export const TokenDeposit = ({
     let ata: PublicKey | null = null
     if (!depositTokenAccount) {
       ata = await Token.getAssociatedTokenAddress(
-        ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-        TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-        depositMint!, // mint
-        wallet!.publicKey!, // owner
+        ASSOCIATED_TOKEN_PROGRAM_ID,
+        TOKEN_PROGRAM_ID,
+        depositMint!,
+        wallet!.publicKey!,
         true
       )
       const ataIx = Token.createAssociatedTokenAccountInstruction(
-        ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-        TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-        depositMint!, // mint
-        ata, // ata
-        wallet!.publicKey!, // owner of token account
+        ASSOCIATED_TOKEN_PROGRAM_ID,
+        TOKEN_PROGRAM_ID,
+        depositMint!,
+        ata,
+        wallet!.publicKey!,
         wallet!.publicKey! // fee payer
       )
       instructions.push(ataIx)
@@ -416,11 +258,6 @@ export const TokenDeposit = ({
     depositTokenRecord &&
     depositTokenRecord.account.governingTokenDepositAmount.gt(new BN(0))
 
-  const depositTooltipContent = !connected
-    ? 'Connect your wallet to deposit'
-    : !hasTokensInWallet
-    ? "You don't have any governance tokens in your wallet to deposit."
-    : ''
   const withdrawTooltipContent = !connected
     ? 'Connect your wallet to withdraw'
     : !hasTokensDeposited
@@ -465,29 +302,14 @@ export const TokenDeposit = ({
   }
 
   return (
-    <TokenDepositWrapper inAccountDetails={inAccountDetails}>
-      {inAccountDetails && (
-        <h4>
-          {tokenRole === GoverningTokenRole.Community ? `Community` : `Council`}
-        </h4>
-      )}
-
+    <div className="w-full">
       {(availableTokens != '0' || inAccountDetails) && (
-        <div className="flex items-center mt-4 space-x-4">
-          <div className="w-full px-4 py-2 rounded-md bg-bkg-1 flex flex-row items-center justify-between">
-            <div>
-              <p className="text-xs text-fgd-3">{depositTokenName} Votes</p>
-              <div className="flex items-center w-full justify-between mt-1">
-                <p className="mb-0 text-xl font-bold text-fgd-1 hero-text">
-                  {availableTokens}
-                </p>
-              </div>
-            </div>
-            {amount > new BigNumber(0)
-              ? max &&
-                !max.isZero() && <VotingPowerPct amount={amount} total={max} />
-              : null}
-          </div>
+        <div className="flex items-center space-x-4">
+          {tokenRole === GoverningTokenRole.Community ? (
+            <VanillaVotingPower className="w-full" role="community" />
+          ) : (
+            <VanillaVotingPower className="w-full" role="council" />
+          )}
         </div>
       )}
 
@@ -503,43 +325,36 @@ export const TokenDeposit = ({
           </div>
 
           <div className="flex flex-col mt-6 space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
-            {hasTokensInWallet && !inAccountDetails ? (
-              <SecondaryButton
-                tooltipMessage={depositTooltipContent}
+            {hasTokensInWallet || inAccountDetails ? (
+              <DepositTokensButton
                 className="sm:w-1/2 max-w-[200px]"
-                disabled={!connected || !hasTokensInWallet}
-                onClick={depositAllTokens}
-              >
-                Deposit
-              </SecondaryButton>
-            ) : inAccountDetails ? (
-              <Button
-                tooltipMessage={depositTooltipContent}
-                className="sm:w-1/2 max-w-[200px]"
-                disabled={!connected || !hasTokensInWallet}
-                onClick={depositAllTokens}
-              >
-                Deposit
-              </Button>
-            ) : null}
-            {(inAccountDetails || isVsr) && (
-              <SecondaryButton
-                tooltipMessage={withdrawTooltipContent}
-                className="sm:w-1/2 max-w-[200px]"
-                disabled={
-                  !connected ||
-                  !hasTokensDeposited ||
-                  (!councilVote &&
-                    toManyCommunityOutstandingProposalsForUser) ||
-                  toManyCouncilOutstandingProposalsForUse ||
-                  wallet?.publicKey?.toBase58() !==
-                    depositTokenRecord.account.governingTokenOwner.toBase58()
+                role={
+                  tokenRole === GoverningTokenRole.Community
+                    ? 'community'
+                    : 'council'
                 }
-                onClick={withdrawAllTokens}
-              >
-                Withdraw
-              </SecondaryButton>
-            )}
+                as={inAccountDetails ? 'primary' : 'secondary'}
+              />
+            ) : null}
+            {!isMembership && // Membership tokens can't be withdrawn (that is their whole point, actually)
+              (inAccountDetails || isVsr) && (
+                <SecondaryButton
+                  tooltipMessage={withdrawTooltipContent}
+                  className="sm:w-1/2 max-w-[200px]"
+                  disabled={
+                    !connected ||
+                    !hasTokensDeposited ||
+                    (!councilVote &&
+                      toManyCommunityOutstandingProposalsForUser) ||
+                    toManyCouncilOutstandingProposalsForUse ||
+                    wallet?.publicKey?.toBase58() !==
+                      depositTokenRecord.account.governingTokenOwner.toBase58()
+                  }
+                  onClick={withdrawAllTokens}
+                >
+                  Withdraw
+                </SecondaryButton>
+              )}
           </div>
         </>
       }
@@ -549,22 +364,6 @@ export const TokenDeposit = ({
           Please withdraw your tokens and deposit again to get governance power
         </small>
       )}
-    </TokenDepositWrapper>
+    </div>
   )
 }
-
-const TokenDepositWrapper = ({
-  children,
-  inAccountDetails,
-}: {
-  inAccountDetails?: boolean
-  children: React.ReactNode
-}) => {
-  if (inAccountDetails) {
-    return <div className="space-y-4 w-1/2">{children}</div>
-  } else {
-    return <div>{children}</div>
-  }
-}
-
-export default TokenBalanceCard

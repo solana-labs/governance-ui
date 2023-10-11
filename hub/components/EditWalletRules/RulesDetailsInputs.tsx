@@ -226,6 +226,7 @@ export function QuorumPercent(props: Props) {
             });
             props.onRulesChange?.(newRules);
           }}
+          integer
         />
         <Slider
           min={1}
@@ -239,6 +240,7 @@ export function QuorumPercent(props: Props) {
             props.onRulesChange?.(newRules);
           }}
           onRenderValue={(val) => `${val}%`}
+          step={1}
         />
       </div>
     </ValueBlock>

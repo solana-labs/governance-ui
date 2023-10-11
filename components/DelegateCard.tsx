@@ -6,10 +6,7 @@ import {
   PublicKey,
 } from '@solana/web3.js'
 import Input from './inputs/Input'
-import {
-  withSetGovernanceDelegate,
-  getGovernanceProgramVersion,
-} from '@solana/spl-governance'
+import { withSetGovernanceDelegate } from '@solana/spl-governance'
 import { sendTransaction } from 'utils/send'
 import { CashIcon, CreditCardIcon } from '@heroicons/react/solid'
 import Button from './Button'
@@ -26,6 +23,7 @@ import {
 } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useConnection } from '@solana/wallet-adapter-react'
+import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
 
 const DelegateCard = () => {
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
@@ -50,7 +48,7 @@ const DelegateCard = () => {
 
     try {
       setLoading(true)
-      const programVersion = await getGovernanceProgramVersion(
+      const programVersion = await fetchProgramVersion(
         connection,
         realm.owner // governance program public key
       )
@@ -109,7 +107,7 @@ const DelegateCard = () => {
     }
 
     try {
-      const programVersion = await getGovernanceProgramVersion(
+      const programVersion = await fetchProgramVersion(
         connection,
         realm.owner // governance program public key
       )

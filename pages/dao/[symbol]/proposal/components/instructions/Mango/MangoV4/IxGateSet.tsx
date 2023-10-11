@@ -98,7 +98,6 @@ const IxGateSet = ({
     TokenForceCloseBorrowsWithToken: true,
     PerpForceClosePosition: true,
     GroupWithdrawInsuranceFund: true,
-
     TokenConditionalSwapCreate: true,
     TokenConditionalSwapTrigger: true,
     TokenConditionalSwapCancel: true,
@@ -131,15 +130,8 @@ const IxGateSet = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const builderTypedIxGate: any = Object.fromEntries(
-        Object.entries(form).map(([k, v]) => [
-          k.charAt(0).toUpperCase() + k.slice(1),
-          v,
-        ])
-      )
-
       const ix = await mangoClient!.program.methods
-        .ixGateSet(buildIxGate(builderTypedIxGate))
+        .ixGateSet(buildIxGate(form))
         .accounts({
           group: mangoGroup!.publicKey,
           admin: form.governedAccount.extensions.transferAddress,

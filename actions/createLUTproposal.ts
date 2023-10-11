@@ -5,7 +5,6 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js'
 import {
-  getGovernanceProgramVersion,
   ProgramAccount,
   Realm,
   TokenOwnerRecord,
@@ -28,6 +27,7 @@ import { trySentryLog } from '@utils/logs'
 import { deduplicateObjsFilter } from '@utils/instructionTools'
 import { sendSignAndConfirmTransactions } from '@utils/modifiedMangolana'
 import { InstructionDataWithHoldUpTime } from './createProposal'
+import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
 
 /** This is a modified version of createProposal that makes a lookup table, which is useful for especially large instructions */
 // TODO make a more generic, less redundant solution
@@ -63,10 +63,7 @@ export const createLUTProposal = async (
   // the version for RealmInfo
 
   // Changed this because it is misbehaving on my local validator setup.
-  const programVersion = await getGovernanceProgramVersion(
-    connection,
-    programId
-  )
+  const programVersion = await fetchProgramVersion(connection, programId)
 
   // V2 Approve/Deny configuration
   const voteType = VoteType.SINGLE_CHOICE
@@ -75,7 +72,7 @@ export const createLUTProposal = async (
   //will run only if plugin is connected with realm
   const plugin = await client?.withUpdateVoterWeightRecord(
     instructions,
-    tokenOwnerRecord,
+    tokenOwnerRecord.pubkey,
     'createProposal'
   )
 

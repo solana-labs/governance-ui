@@ -8,6 +8,7 @@ import {
   LISTING_PRESETS_KEYS,
   LISTING_PRESETS_PYTH,
   ListingPreset,
+  getTierWithAdjustedNetBorrows,
 } from '@blockworks-foundation/mango-v4-settings/lib/helpers/listingTools'
 import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
 import { MAINNET_USDC_MINT } from '@foresight-tmp/foresight-sdk/dist/consts'
@@ -25,7 +26,7 @@ const MAINNET_PYTH_PROGRAM = new PublicKey(
   'FsJ3A3u2vn5cTVofAjvy6y5kwABJAqYWpe4975bi2epH'
 )
 
-export type ListingArgs = {
+export type FlatListingArgs = {
   name: string
   tokenIndex: number
   'oracleConfig.confFilter': number
@@ -56,6 +57,42 @@ export type ListingArgs = {
   tokenConditionalSwapTakerFeeRate: number
   flashLoanDepositFeeRate: number
   reduceOnly: number
+  groupInsuranceFund: boolean
+  oracle: PublicKey
+}
+
+export type FlatEditArgs = {
+  nameOpt: string
+  tokenIndex: number
+  'oracleConfigOpt.confFilter': number
+  'oracleConfigOpt.maxStalenessSlots': number
+  'interestRateParamsOpt.util0': number
+  'interestRateParamsOpt.rate0': number
+  'interestRateParamsOpt.util1': number
+  'interestRateParamsOpt.rate1': number
+  'interestRateParamsOpt.maxRate': number
+  'interestRateParamsOpt.adjustmentFactor': number
+  loanFeeRateOpt: number
+  loanOriginationFeeRateOpt: number
+  maintAssetWeightOpt: number
+  initAssetWeightOpt: number
+  maintLiabWeightOpt: number
+  initLiabWeightOpt: number
+  liquidationFeeOpt: number
+  minVaultToDepositsRatioOpt: number
+  netBorrowLimitPerWindowQuoteOpt: number
+  netBorrowLimitWindowSizeTsOpt: number
+  borrowWeightScaleStartQuoteOpt: number
+  depositWeightScaleStartQuoteOpt: number
+  stablePriceDelayGrowthLimitOpt: number
+  stablePriceDelayIntervalSecondsOpt: number
+  stablePriceGrowthLimitOpt: number
+  tokenConditionalSwapMakerFeeRateOpt: number
+  tokenConditionalSwapTakerFeeRateOpt: number
+  flashLoanDepositFeeRateOpt: number
+  reduceOnlyOpt: number
+  groupInsuranceFundOpt: boolean
+  oracleOpt: PublicKey
 }
 
 export type ListingArgsFormatted = {
@@ -88,49 +125,56 @@ export type ListingArgsFormatted = {
   tokenConditionalSwapTakerFeeRate: number
   flashLoanDepositFeeRate: number
   reduceOnly: string
+  oracle: string
 }
 
 export type EditTokenArgsFormatted = ListingArgsFormatted & {
   groupInsuranceFund: boolean
 }
 
-const transformPresetToProposed = (
-  listingPreset: ListingPreset | Record<string, never>
-) => {
-  const proposedPreset: PureListingArgsOrEmptyObj =
-    Object.keys(listingPreset).length !== 0
-      ? {
-          ...(listingPreset as ListingPreset),
-          'oracleConfig.maxStalenessSlots': listingPreset.maxStalenessSlots!,
-          'oracleConfig.confFilter': listingPreset.oracleConfFilter,
-          'interestRateParams.adjustmentFactor': listingPreset.adjustmentFactor,
-          'interestRateParams.util0': listingPreset.util0,
-          'interestRateParams.rate0': listingPreset.rate0,
-          'interestRateParams.util1': listingPreset.util1,
-          'interestRateParams.rate1': listingPreset.rate1,
-          'interestRateParams.maxRate': listingPreset.maxRate,
-        }
-      : {}
+const transformPresetToProposed = (listingPreset: ListingPreset) => {
+  const proposedPreset: FormattedListingPreset = {
+    ...listingPreset,
+    'oracleConfig.maxStalenessSlots': listingPreset.maxStalenessSlots!,
+    'oracleConfig.confFilter': listingPreset.oracleConfFilter,
+    'interestRateParams.adjustmentFactor': listingPreset.adjustmentFactor,
+    'interestRateParams.util0': listingPreset.util0,
+    'interestRateParams.rate0': listingPreset.rate0,
+    'interestRateParams.util1': listingPreset.util1,
+    'interestRateParams.rate1': listingPreset.rate1,
+    'interestRateParams.maxRate': listingPreset.maxRate,
+    groupInsuranceFund: listingPreset.insuranceFound,
+  }
 
   return proposedPreset
 }
 
-type PureListingArgsOrEmptyObj =
-  | Record<string, never>
-  | (Omit<ListingArgs, 'name' | 'tokenIndex'> & {
-      preset_name: string
-    })
+type FormattedListingPreset = Omit<
+  FlatListingArgs,
+  'name' | 'tokenIndex' | 'oracle'
+>
 
 type ProposedListingPresets = {
-  [key in LISTING_PRESETS_KEYS]: PureListingArgsOrEmptyObj
+  [key in LISTING_PRESETS_KEYS]: FormattedListingPreset
 }
 
-export const getFormattedListingPresets = (isPythOracle: boolean) => {
+export const getFormattedListingPresets = (
+  isPythOracle: boolean,
+  currentTotalDepositsInUsdc?: number
+) => {
   const PRESETS = isPythOracle ? LISTING_PRESETS_PYTH : LISTING_PRESETS
+
   const PROPOSED_LISTING_PRESETS: ProposedListingPresets = Object.keys(
     PRESETS
   ).reduce((accumulator, key) => {
-    accumulator[key] = transformPresetToProposed(PRESETS[key])
+    accumulator[key] = transformPresetToProposed(
+      !currentTotalDepositsInUsdc
+        ? PRESETS[key]
+        : getTierWithAdjustedNetBorrows(
+            PRESETS[key],
+            currentTotalDepositsInUsdc
+          )
+    )
     return accumulator
   }, {} as ProposedListingPresets)
   return PROPOSED_LISTING_PRESETS
@@ -172,8 +216,20 @@ export const getSuggestedCoinTier = async (
   outputMint: string,
   hasPythOracle: boolean
 ) => {
-  const TIERS: LISTING_PRESETS_KEYS[] = ['PREMIUM', 'MID', 'MEME', 'SHIT']
+  const TIERS: LISTING_PRESETS_KEYS[] = [
+    'ULTRA_PREMIUM',
+    'PREMIUM',
+    'MID',
+    'MEME',
+    'SHIT',
+  ]
+
   const swaps = await Promise.all([
+    fetchJupiterRoutes(
+      MAINNET_USDC_MINT.toBase58(),
+      outputMint,
+      toNative(250000, 6).toNumber()
+    ),
     fetchJupiterRoutes(
       MAINNET_USDC_MINT.toBase58(),
       outputMint,
@@ -193,6 +249,12 @@ export const getSuggestedCoinTier = async (
       MAINNET_USDC_MINT.toBase58(),
       outputMint,
       toNative(1000, 6).toNumber()
+    ),
+    fetchJupiterRoutes(
+      MAINNET_USDC_MINT.toBase58(),
+      outputMint,
+      toNative(250000, 6).toNumber(),
+      'ExactOut'
     ),
     fetchJupiterRoutes(
       MAINNET_USDC_MINT.toBase58(),
@@ -249,10 +311,15 @@ export const getSuggestedCoinTier = async (
     indexForTierFromSwaps > -1 ? TIERS[indexForTierFromSwaps] : 'UNTRUSTED'
 
   const tierLowerThenCurrent =
-    tier === 'PREMIUM' ? 'MID' : tier === 'MID' ? 'MEME' : tier
-  const isMidOrPremium = tier === 'MID' || tier === 'PREMIUM'
+    tier === 'ULTRA_PREMIUM' || tier === 'PREMIUM'
+      ? 'MID'
+      : tier === 'MID'
+      ? 'MEME'
+      : tier
+  const isPythRecommendedTier =
+    tier === 'MID' || tier === 'PREMIUM' || tier === 'ULTRA_PREMIUM'
   const listingTier =
-    isMidOrPremium && !hasPythOracle ? tierLowerThenCurrent : tier
+    isPythRecommendedTier && !hasPythOracle ? tierLowerThenCurrent : tier
 
   return {
     tier: listingTier,

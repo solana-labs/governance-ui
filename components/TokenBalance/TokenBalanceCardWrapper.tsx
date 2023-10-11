@@ -1,5 +1,3 @@
-import { Proposal } from '@solana/spl-governance'
-import { Option } from 'tools/core/option'
 import useRealm from '@hooks/useRealm'
 import dynamic from 'next/dynamic'
 import { ChevronRightIcon } from '@heroicons/react/solid'
@@ -10,12 +8,12 @@ import ClaimUnreleasedNFTs from './ClaimUnreleasedNFTs'
 import Link from 'next/link'
 import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import {
-  useUserCommunityTokenOwnerRecord,
-  useUserCouncilTokenOwnerRecord,
-} from '@hooks/queries/tokenOwnerRecord'
+import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import ClaimUnreleasedPositions from 'HeliumVotePlugin/components/ClaimUnreleasedPositions'
+import VanillaAccountDetails from './VanillaAccountDetails'
+import GovernancePowerCard from '@components/GovernancePower/GovernancePowerCard'
+import SelectPrimaryDelegators from '@components/SelectPrimaryDelegators'
 
 const LockPluginTokenBalanceCard = dynamic(
   () =>
@@ -31,12 +29,11 @@ const HeliumVotingPowerCard = dynamic(() =>
   })
 )
 
-const TokenBalanceCard = dynamic(() => import('./TokenBalanceCard'))
 const NftVotingPower = dynamic(
   () => import('../ProposalVotingPower/NftVotingPower')
 )
 
-const GovernancePowerTitle = () => {
+export const GovernancePowerTitle = () => {
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
   const wallet = useWalletOnePointOh()
@@ -63,17 +60,14 @@ const GovernancePowerTitle = () => {
 }
 
 const TokenBalanceCardInner = ({
-  proposal,
   inAccountDetails,
 }: {
-  proposal?: Option<Proposal>
   inAccountDetails?: boolean
 }) => {
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
-  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
   const config = useRealmConfigQuery().data?.result
 
-  const { councilTokenAccount, vsrMode } = useRealm()
+  const { vsrMode } = useRealm()
   const currentPluginPk = config?.account?.communityTokenConfig.voterWeightAddin
   const isNftMode =
     currentPluginPk && NFT_PLUGINS_PKS.includes(currentPluginPk?.toBase58())
@@ -102,64 +96,39 @@ const TokenBalanceCardInner = ({
     )
   }
 
-  if (
-    isNftMode &&
-    (!ownTokenRecord ||
-      ownTokenRecord.account.governingTokenDepositAmount.isZero())
-  ) {
+  if (isNftMode && inAccountDetails) {
     return (
-      <>
-        {(ownCouncilTokenRecord &&
-          !ownCouncilTokenRecord?.account.governingTokenDepositAmount.isZero()) ||
-        (councilTokenAccount &&
-          !councilTokenAccount?.account.amount.isZero()) ? (
-          <>
-            {!inAccountDetails && <GovernancePowerTitle />}
-            <NftVotingPower inAccountDetails={inAccountDetails} />
-            <TokenBalanceCard
-              proposal={proposal}
-              inAccountDetails={inAccountDetails}
-            />
-            <ClaimUnreleasedNFTs inAccountDetails={inAccountDetails} />
-          </>
-        ) : (
-          <>
-            {!inAccountDetails && <GovernancePowerTitle />}
-            <NftVotingPower inAccountDetails={inAccountDetails} />
-            <ClaimUnreleasedNFTs inAccountDetails={inAccountDetails} />
-          </>
-        )}
-      </>
+      <div className="grid grid-cols-2 gap-x-2 w-full">
+        <div>
+          <NftVotingPower inAccountDetails={inAccountDetails} />
+          <ClaimUnreleasedNFTs inAccountDetails={inAccountDetails} />
+        </div>
+        <VanillaAccountDetails />
+      </div>
     )
   }
 
   //Default
   return (
     <>
-      {!inAccountDetails && <GovernancePowerTitle />}
-      <TokenBalanceCard proposal={proposal} inAccountDetails={inAccountDetails}>
-        {/*Add the gateway card if this is a gated DAO*/}
-        {isGatewayMode && <GatewayCard></GatewayCard>}
-      </TokenBalanceCard>
+      {inAccountDetails ? <VanillaAccountDetails /> : <GovernancePowerCard />}
+
+      {isGatewayMode && <GatewayCard />}
     </>
   )
 }
 
 const TokenBalanceCardWrapper = ({
-  proposal,
   inAccountDetails,
 }: {
-  proposal?: Option<Proposal>
   inAccountDetails?: boolean
 }) => {
   return (
     <div
       className={`rounded-lg bg-bkg-2 ${inAccountDetails ? `` : `p-4 md:p-6`}`}
     >
-      <TokenBalanceCardInner
-        proposal={proposal}
-        inAccountDetails={inAccountDetails}
-      />
+      <TokenBalanceCardInner inAccountDetails={inAccountDetails} />
+      <SelectPrimaryDelegators />
     </div>
   )
 }

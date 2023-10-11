@@ -9,7 +9,6 @@ import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import useRealmProposalVotes from '@hooks/useRealmProposalVotes'
 import {
-  getGovernanceProgramVersion,
   getInstructionDataFromBase64,
   getVoteRecordAddress,
   ProgramAccount,
@@ -41,6 +40,7 @@ import {
 } from '@hooks/queries/governance'
 import { fetchVoteRecordByPubkey } from '@hooks/queries/voteRecord'
 import { useAsync } from 'react-async-hook'
+import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
 
 interface Props {
   proposal: ProgramAccount<Proposal>
@@ -137,7 +137,7 @@ export default function ProposalDetails({
 
       const instructions: TransactionInstruction[] = []
 
-      const programVersion = await getGovernanceProgramVersion(
+      const programVersion = await fetchProgramVersion(
         connection,
         tokenOwnerRecord.owner
       )

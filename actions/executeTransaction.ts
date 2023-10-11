@@ -15,10 +15,10 @@ import {
   RpcContext,
   Proposal,
   ProposalTransaction,
-  getGovernanceProgramVersion,
   withExecuteTransaction,
   ProgramAccount,
 } from '@solana/spl-governance'
+import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
 
 /**
  * Executes a proposal transaction
@@ -40,10 +40,7 @@ export const executeTransaction = async (
 
   // Explicitly request the version before making RPC calls to work around race conditions in resolving
   // the version for RealmInfo
-  const programVersion = await getGovernanceProgramVersion(
-    connection,
-    programId
-  )
+  const programVersion = await fetchProgramVersion(connection, programId)
 
   await withExecuteTransaction(
     instructions,

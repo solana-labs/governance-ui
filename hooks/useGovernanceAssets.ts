@@ -151,6 +151,9 @@ export default function useGovernanceAssets() {
       name: 'Dual Finance',
       image: '/img/dual-logo.png',
     },
+    [PackageEnum.Distribution]: {
+      name: 'Distribution Program',
+    },
     [PackageEnum.Foresight]: {
       name: 'Foresight',
       isVisible: symbol === 'FORE',
@@ -757,6 +760,17 @@ export default function useGovernanceAssets() {
       name: 'Vote Escrowed Tokens: Configure Voting Mint',
       isVisible: canUseAuthorityInstruction,
       packageId: PackageEnum.VsrPlugin,
+    },
+
+    [Instructions.DistributionCloseVaults]: {
+      name: 'Close vaults',
+      isVisible: canUseAuthorityInstruction,
+      packageId: PackageEnum.Distribution,
+    },
+    [Instructions.DistributionFillVaults]: {
+      name: 'Fill vaults',
+      isVisible: canUseAuthorityInstruction,
+      packageId: PackageEnum.Distribution,
     },
   }
 

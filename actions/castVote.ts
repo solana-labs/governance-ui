@@ -1,12 +1,15 @@
-import { Keypair, Transaction, TransactionInstruction } from '@solana/web3.js'
+import {
+  Keypair,
+  PublicKey,
+  Transaction,
+  TransactionInstruction,
+} from '@solana/web3.js'
 import {
   ChatMessageBody,
-  getGovernanceProgramVersion,
   GovernanceAccountType,
   GOVERNANCE_CHAT_PROGRAM_ID,
   Proposal,
   Realm,
-  TokenOwnerRecord,
   VoteChoice,
   VoteKind,
   VoteType,
@@ -30,6 +33,7 @@ import { calcCostOfNftVote, checkHasEnoughSolToVote } from '@tools/nftVoteCalc'
 import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
+import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
 
 const getVetoTokenMint = (
   proposal: ProgramAccount<Proposal>,
@@ -50,15 +54,15 @@ export async function castVote(
   { connection, wallet, programId, walletPubkey }: RpcContext,
   realm: ProgramAccount<Realm>,
   proposal: ProgramAccount<Proposal>,
-  tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>,
+  tokenOwnerRecord: PublicKey,
   voteKind: VoteKind,
   message?: ChatMessageBody | undefined,
   votingPlugin?: VotingClient,
   runAfterConfirmation?: (() => void) | null,
-  voteWeights?: number[]
+  voteWeights?: number[],
+  _additionalTokenOwnerRecords?: []
 ) {
   const signers: Keypair[] = []
-  const instructions: TransactionInstruction[] = []
 
   const createCastNftVoteTicketIxs: TransactionInstruction[] = []
   const createPostMessageTicketIxs: TransactionInstruction[] = []
@@ -67,21 +71,21 @@ export async function castVote(
   const payer = walletPubkey
   // Explicitly request the version before making RPC calls to work around race conditions in resolving
   // the version for RealmInfo
-  const programVersion = await getGovernanceProgramVersion(
-    connection,
-    programId
-  )
+  const programVersion = await fetchProgramVersion(connection, programId)
 
+  const pluginCastVoteIxs: TransactionInstruction[] = []
   //will run only if any plugin is connected with realm
   const plugin = await votingPlugin?.withCastPluginVote(
-    instructions,
+    pluginCastVoteIxs,
     proposal,
     tokenOwnerRecord,
     createCastNftVoteTicketIxs
   )
+  console.log('PLUGIN IXS', pluginCastVoteIxs)
 
-  const isMulti = proposal.account.voteType !== VoteType.SINGLE_CHOICE
-   && proposal.account.accountType === GovernanceAccountType.ProposalV2
+  const isMulti =
+    proposal.account.voteType !== VoteType.SINGLE_CHOICE &&
+    proposal.account.accountType === GovernanceAccountType.ProposalV2
 
   // It is not clear that defining these extraneous fields, `deny` and `veto`, is actually necessary.
   // See:  https://discord.com/channels/910194960941338677/910630743510777926/1044741454175674378
@@ -131,15 +135,16 @@ export async function castVote(
       ? getVetoTokenMint(proposal, realm)
       : proposal.account.governingTokenMint
 
+  const castVoteIxs: TransactionInstruction[] = []
   await withCastVote(
-    instructions,
+    castVoteIxs,
     programId,
     programVersion,
     realm.pubkey,
     proposal.account.governance,
     proposal.pubkey,
     proposal.account.tokenOwnerRecord,
-    tokenOwnerRecord.pubkey,
+    tokenOwnerRecord,
     governanceAuthority,
     tokenMint,
     vote,
@@ -148,23 +153,25 @@ export async function castVote(
     plugin?.maxVoterWeightRecord
   )
 
+  const pluginPostMessageIxs: TransactionInstruction[] = []
+  const postMessageIxs: TransactionInstruction[] = []
   if (message) {
     const plugin = await votingPlugin?.withUpdateVoterWeightRecord(
-      instructions,
+      pluginPostMessageIxs,
       tokenOwnerRecord,
       'commentProposal',
       createPostMessageTicketIxs
     )
 
     await withPostChatMessage(
-      instructions,
+      postMessageIxs,
       signers,
       GOVERNANCE_CHAT_PROGRAM_ID,
       programId,
       realm.pubkey,
       proposal.account.governance,
       proposal.pubkey,
-      tokenOwnerRecord.pubkey,
+      tokenOwnerRecord,
       governanceAuthority,
       payer,
       undefined,
@@ -173,13 +180,19 @@ export async function castVote(
     )
   }
 
-  const ixChunkCount = message ? 4 : 2
   const isNftVoter = votingPlugin?.client instanceof NftVoterClient
   const isHeliumVoter = votingPlugin?.client instanceof HeliumVsrClient
 
   if (!isNftVoter && !isHeliumVoter) {
     const transaction = new Transaction()
-    transaction.add(...instructions)
+    transaction.add(
+      ...[
+        ...pluginCastVoteIxs,
+        ...castVoteIxs,
+        ...pluginPostMessageIxs,
+        ...postMessageIxs,
+      ]
+    )
 
     await sendTransaction({ transaction, wallet, connection, signers })
     if (runAfterConfirmation) {
@@ -189,37 +202,27 @@ export async function castVote(
 
   // we need to chunk instructions
   if (isHeliumVoter) {
-    // update voter weight + cast vote from spl gov need to be in one transaction
-    const ixsWithOwnChunk = instructions.slice(-ixChunkCount)
-    const remainingIxsToChunk = instructions.slice(
-      0,
-      instructions.length - ixChunkCount
+    // @asktree: I'm aware of no rationale for chunking in this particular manner
+    const chunkerz = chunks(
+      [
+        ...pluginCastVoteIxs,
+        ...castVoteIxs,
+        ...pluginPostMessageIxs,
+        ...postMessageIxs,
+      ],
+      2
     )
 
-    const splIxsWithAccountsChunk = chunks(ixsWithOwnChunk, 2)
-    const positionsAccountsChunks = chunks(remainingIxsToChunk, 2)
-    const ixsChunks = [
-      ...positionsAccountsChunks.map((txBatch, batchIdx) => {
-        return {
-          instructionsSet: txBatchesToInstructionSetWithSigners(
-            txBatch,
-            [],
-            batchIdx
-          ),
-          sequenceType: SequenceType.Parallel,
-        }
-      }),
-      ...splIxsWithAccountsChunk.map((txBatch, batchIdx) => {
-        return {
-          instructionsSet: txBatchesToInstructionSetWithSigners(
-            txBatch,
-            message ? [[], signers] : [],
-            batchIdx
-          ),
-          sequenceType: SequenceType.Sequential,
-        }
-      }),
-    ]
+    const ixsChunks = chunkerz.map((txBatch, batchIdx) => {
+      return {
+        instructionsSet: txBatchesToInstructionSetWithSigners(
+          txBatch,
+          message ? [[], signers] : [],
+          batchIdx
+        ),
+        sequenceType: SequenceType.Sequential,
+      }
+    })
 
     await sendTransactionsV3({
       connection,
@@ -246,12 +249,16 @@ export async function castVote(
       [...createCastNftVoteTicketIxs, ...createPostMessageTicketIxs],
       1
     )
+    const otherChunks = chunks(
+      [
+        ...pluginCastVoteIxs,
+        ...castVoteIxs,
+        ...pluginPostMessageIxs,
+        ...postMessageIxs,
+      ],
+      2
+    )
 
-    const splIxs = instructions.slice(-ixChunkCount)
-    const nftAccountIxs = instructions.slice(0, -ixChunkCount)
-
-    const splIxsWithAccountsChunk = chunks(splIxs, 2)
-    const nftsAccountsChunks = chunks(nftAccountIxs, 2)
     const instructionsChunks = [
       ...createNftVoteTicketsChunks.map((txBatch, batchIdx) => {
         return {
@@ -263,19 +270,7 @@ export async function castVote(
           sequenceType: SequenceType.Parallel,
         }
       }),
-      ...nftsAccountsChunks.map((txBatch, batchIdx) => {
-        return {
-          instructionsSet: txBatchesToInstructionSetWithSigners(
-            txBatch,
-            [],
-            batchIdx
-          ),
-          sequenceType:
-            // this is to ensure create all the nft_action_tickets account first
-            batchIdx == 0 ? SequenceType.Sequential : SequenceType.Parallel,
-        }
-      }),
-      ...splIxsWithAccountsChunk.map((txBatch, batchIdx) => {
+      ...otherChunks.map((txBatch, batchIdx) => {
         return {
           instructionsSet: txBatchesToInstructionSetWithSigners(
             txBatch,

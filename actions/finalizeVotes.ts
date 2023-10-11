@@ -1,6 +1,6 @@
 import {
-  getGovernanceProgramVersion,
   ProgramAccount,
+  TokenOwnerRecord,
   withRefundProposalDeposit,
 } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
@@ -14,23 +14,21 @@ import { sendTransaction } from '@utils/send'
 import { Proposal } from '@solana/spl-governance'
 import { withFinalizeVote } from '@solana/spl-governance'
 import { getProposalDepositPk } from '@utils/helpers'
+import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
 
 export const finalizeVote = async (
   { connection, wallet, programId }: RpcContext,
   realm: PublicKey,
   proposal: ProgramAccount<Proposal>,
   maxVoterWeightPk: PublicKey | undefined,
-  proposalOwnerWallet: PublicKey
+  proposalOwner: ProgramAccount<TokenOwnerRecord>
 ) => {
   const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []
 
   // Explicitly request the version before making RPC calls to work around race conditions in resolving
   // the version for RealmInfo
-  const programVersion = await getGovernanceProgramVersion(
-    connection,
-    programId
-  )
+  const programVersion = await fetchProgramVersion(connection, programId)
 
   await withFinalizeVote(
     instructions,
@@ -44,22 +42,42 @@ export const finalizeVote = async (
     maxVoterWeightPk
   )
 
-  const proposalDepositPk = getProposalDepositPk(
-    proposal.pubkey,
-    proposalOwnerWallet,
-    programId
-  )
+  //its possible that delegate payed for deposit created with someone else token owner record.
+  //there is need of check both deposits.
+  const [possibleDelegateDeposit, possibleTorDeposit] = [
+    proposalOwner.account.governanceDelegate
+      ? getProposalDepositPk(
+          proposal.pubkey,
+          proposalOwner.account.governanceDelegate,
+          programId
+        )
+      : null,
+    getProposalDepositPk(
+      proposal.pubkey,
+      proposalOwner.account.governingTokenOwner,
+      programId
+    ),
+  ]
 
   //Release sol if deposit exempt setting threshold hit
-  const isDepositActive = await connection.getBalance(proposalDepositPk)
+  const [delegateDeposit, torDeposit] = await Promise.all([
+    possibleDelegateDeposit
+      ? connection.getBalance(possibleDelegateDeposit)
+      : null,
+    connection.getBalance(possibleTorDeposit),
+  ])
 
-  if (isDepositActive) {
+  const activeDeposit = delegateDeposit ? delegateDeposit : torDeposit
+
+  if (activeDeposit) {
     await withRefundProposalDeposit(
       instructions,
       programId!,
       programVersion,
       proposal.pubkey,
-      proposalOwnerWallet
+      possibleDelegateDeposit && delegateDeposit
+        ? proposalOwner.account.governanceDelegate!
+        : proposalOwner.account.governingTokenOwner!
     )
   }
 

@@ -26,6 +26,7 @@ export enum PackageEnum {
   Solend,
   Switchboard,
   VsrPlugin,
+  Distribution,
 }
 
 export interface UiInstruction {
@@ -345,6 +346,8 @@ export enum Instructions {
   DualFinanceDelegateWithdraw,
   DualFinanceVoteDeposit,
   DualFinanceVote,
+  DistributionCloseVaults,
+  DistributionFillVaults,
   DelegateStake,
   ForesightAddMarketListToCategory,
   ForesightInitCategory,

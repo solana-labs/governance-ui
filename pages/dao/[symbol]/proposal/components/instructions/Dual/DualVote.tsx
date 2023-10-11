@@ -1,15 +1,8 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import {
   ProgramAccount,
   Governance,
-  getGovernanceProgramVersion,
   SYSTEM_PROGRAM_ID,
   VoteKind,
   VoteChoice,
@@ -40,6 +33,7 @@ import {
 } from 'VoteStakeRegistry/sdk/accounts'
 import { AnchorProvider } from '@coral-xyz/anchor'
 import EmptyWallet from '@utils/Mango/listingTools'
+import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
 
 type DualFinanceVoteForm = {
   realm: string
@@ -132,7 +126,7 @@ const DualVote = ({
         const vsrClient = await VsrClient.connect(provider, DEFAULT_VSR_ID)
         // Explicitly request the version before making RPC calls to work around race conditions in resolving
         // the version for RealmInfo
-        const programVersion = await getGovernanceProgramVersion(
+        const programVersion = await fetchProgramVersion(
           connection.current,
           programId
         )

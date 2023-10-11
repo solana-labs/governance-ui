@@ -93,7 +93,9 @@ export default function useRealm() {
       /** @deprecated use useRealmProposalsQuery */
       //proposals,
       //tokenRecords,
+      /** @deprecated use useUserGovTokenAccount */
       realmTokenAccount,
+      /** @deprecated use useUserGovTokenAccount */
       councilTokenAccount,
       /** @deprecated just use the token owner record directly, ok? */
       //ownVoterWeight,

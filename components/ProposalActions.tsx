@@ -157,7 +157,7 @@ const ProposalActionsPanel = () => {
           governance?.account.realm,
           proposal,
           maxVoterWeight,
-          proposalOwner.account.governingTokenOwner
+          proposalOwner
         )
       }
       queryClient.invalidateQueries({
@@ -222,7 +222,7 @@ const ProposalActionsPanel = () => {
           rpcContext,
           realmInfo.realmId,
           proposal,
-          proposalOwner.account.governingTokenOwner
+          proposalOwner
         )
       }
       queryClient.invalidateQueries({

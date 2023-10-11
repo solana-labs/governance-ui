@@ -14,7 +14,7 @@ import {
   getMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
-import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
+import { TokenDeposit } from '@components/TokenBalance/TokenDeposit'
 import { GoverningTokenRole } from '@solana/spl-governance'
 import InlineNotification from '@components/InlineNotification'
 import tokenPriceService from '@utils/services/tokenPrice'

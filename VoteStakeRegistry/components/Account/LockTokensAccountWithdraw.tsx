@@ -27,9 +27,9 @@ import {
   LockClosedIcon,
 } from '@heroicons/react/outline'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
-import Account from '../../../components/Account'
+import Account from '../../../pages/dao/[symbol]/account/Account'
 import { abbreviateAddress } from '@utils/formatting'
-import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
+import { TokenDeposit } from '@components/TokenBalance/TokenDeposit'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'

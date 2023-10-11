@@ -5,15 +5,12 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js'
 
-import {
-  getGovernanceProgramVersion,
-  Proposal,
-  RpcContext,
-} from '@solana/spl-governance'
+import { Proposal, RpcContext } from '@solana/spl-governance'
 import { SignatoryRecord } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { sendTransaction } from 'utils/send'
 import { withSignOffProposal } from '@solana/spl-governance'
+import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
 
 export const signOffProposal = async (
   { connection, wallet, programId }: RpcContext,
@@ -26,10 +23,7 @@ export const signOffProposal = async (
 
   // Explicitly request the version before making RPC calls to work around race conditions in resolving
   // the version for RealmInfo
-  const programVersion = await getGovernanceProgramVersion(
-    connection,
-    programId
-  )
+  const programVersion = await fetchProgramVersion(connection, programId)
 
   withSignOffProposal(
     instructions,
