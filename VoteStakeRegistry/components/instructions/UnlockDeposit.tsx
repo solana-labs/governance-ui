@@ -177,7 +177,7 @@ const UnlockDeposit = ({
           }}
           placeholder="Please select..."
           value={
-            form.depositEntryIndex
+            typeof form.depositEntryIndex === 'number'
               ? `Entry # ${form.depositEntryIndex}`
               : undefined
           }
