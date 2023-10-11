@@ -463,10 +463,10 @@
     keccak256 "^1.0.6"
     merkletreejs "^0.3.10"
 
-"@blockworks-foundation/mango-v4-settings@0.2.13":
-  version "0.2.13"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4-settings/-/mango-v4-settings-0.2.13.tgz#c75c1ea2e8e4c7888e45e979d75d18a2342142bf"
-  integrity sha512-C5djeBkeM1u2IuFTu9qu9B78iCdq2Fu/M2VEXUlZWDBmU3eMUMtQ60qc+nBL+HedrBriApM4WaRSu/RwBs3IBQ==
+"@blockworks-foundation/mango-v4-settings@0.2.15":
+  version "0.2.15"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4-settings/-/mango-v4-settings-0.2.15.tgz#05ba6f6c73cf783ae67fb590e4c5971a106353ee"
+  integrity sha512-zjkCddUsDfEP3EzwgcOc0/Yw6OV8EXh2lfh0KGtcIPtExkV/zVtvwoR29rirabMEVw//HXeupkTY6Bo4KpyfWQ==
   dependencies:
     bn.js "^5.2.1"
     eslint-config-prettier "^9.0.0"

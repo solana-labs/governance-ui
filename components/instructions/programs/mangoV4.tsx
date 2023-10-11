@@ -1,6 +1,7 @@
 import {
   MANGO_V4_ID,
   MangoClient,
+  OracleProvider,
   USDC_MINT,
   toUiDecimals,
 } from '@blockworks-foundation/mango-v4'
@@ -16,7 +17,6 @@ import EmptyWallet, {
   getOracle,
   getBestMarket,
   EditTokenArgsFormatted,
-  isPythOracle,
   FlatEditArgs,
   getFormattedListingPresets,
 } from '@utils/Mango/listingTools'
@@ -28,8 +28,13 @@ import tokenPriceService, {
   TokenInfoWithoutDecimals,
 } from '@utils/services/tokenPrice'
 import {
+  LISTING_PRESETS,
   LISTING_PRESETS_KEYS,
+  LISTING_PRESETS_PYTH,
+  MidPriceImpact,
   coinTiersToNames,
+  getMidPriceImpacts,
+  getProposedTier,
 } from '@blockworks-foundation/mango-v4-settings/lib/helpers/listingTools'
 import { tryParseKey } from '@tools/validators/pubkey'
 import Loading from '@components/Loading'
@@ -797,12 +802,43 @@ const instructions = () => ({
         if (mint) {
           const bank = mangoGroup.getFirstBankByMint(mint)
           mintData = tokenPriceService.getTokenInfo(mint.toBase58())
-          const oracle =
-            args.oracleOpt ||
-            mangoGroup.banksMapByMint.get(mint.toBase58())![0]!.oracle
-          const isPyth = await isPythOracle(connection, oracle)
+          const isPyth = bank?.oracleProvider === OracleProvider.Pyth
+          const midPriceImpacts = getMidPriceImpacts(mangoGroup.pis)
+
+          const PRESETS = isPyth ? LISTING_PRESETS_PYTH : LISTING_PRESETS
+
+          const tokenToPriceImpact = midPriceImpacts
+            .filter((x) => x.avg_price_impact_percent < 1)
+            .reduce(
+              (acc: { [key: string]: MidPriceImpact }, val: MidPriceImpact) => {
+                if (
+                  !acc[val.symbol] ||
+                  val.target_amount > acc[val.symbol].target_amount
+                ) {
+                  acc[val.symbol] = val
+                }
+                return acc
+              },
+              {}
+            )
+          console.log(tokenToPriceImpact)
+          const priceImpact = tokenToPriceImpact[getApiTokenName(bank.name)]
+
+          const suggestedTier = priceImpact
+            ? getProposedTier(
+                PRESETS,
+                priceImpact.target_amount,
+                bank.oracleProvider === OracleProvider.Pyth
+              )
+            : 'SHIT'
+
           liqudityTier = !mint.equals(USDC_MINT)
-            ? await getSuggestedCoinTier(mint.toBase58(), !!isPyth)
+            ? {
+                tier: suggestedTier,
+                priceImpact: priceImpact
+                  ? priceImpact.avg_price_impact_percent.toString()
+                  : '',
+              }
             : {
                 tier: 'ULTRA_PREMIUM',
                 priceImpact: '0',
@@ -1464,3 +1500,10 @@ const REDUCE_ONLY_OPTIONS = [
 //   const preimage = `${nameSpace}:${name}`
 //   return Buffer.from(sha256.digest(preimage)).slice(0, 8)
 // }
+
+const getApiTokenName = (bankName: string) => {
+  if (bankName === 'ETH (Portal)') {
+    return 'ETH'
+  }
+  return bankName
+}
