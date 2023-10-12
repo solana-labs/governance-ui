@@ -29,7 +29,7 @@
   "dependencies": {
     "@blockworks-foundation/mango-mints-redemption": "0.0.8",
     "@blockworks-foundation/mango-v4": "0.19.29",
-    "@blockworks-foundation/mango-v4-settings": "0.2.13",
+    "@blockworks-foundation/mango-v4-settings": "0.2.16",
     "@blockworks-foundation/mangolana": "0.0.1-beta.15",
     "@bonfida/spl-name-service": "0.1.47",
     "@bundlr-network/client": "0.7.15",
