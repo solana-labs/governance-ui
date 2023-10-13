@@ -3184,6 +3184,15 @@
     "ogImage": "/realms/ResonanceDAO/resonancedaologo.png"
   },
   {
+    "symbol": "VILLAGE",
+    "displayName": "VillagesDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Cv526yBpKfyEERuaSBPUHk1bF6vsNVLcSVi8xevJgT8S",
+    "website": "https://heliumdenver.com",
+    "twitter": "@hntdenver",
+    "ogImage": "/realms/VillagesDAO/villagesdaologo.png"
+  },
+  {
     "symbol": "PPWT",
     "displayName": "Poodle Paws DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
