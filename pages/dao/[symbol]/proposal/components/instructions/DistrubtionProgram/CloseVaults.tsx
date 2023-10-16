@@ -96,7 +96,7 @@ const CloseVaults = ({
         if (
           !depositAccountInfo &&
           !mintsOfCurrentlyPushedAtaInstructions.find(
-            (x) => x !== v.mint.toBase58()
+            (x) => x === v.mint.toBase58()
           )
         ) {
           // generate the instruction for creating the ATA

@@ -94,7 +94,7 @@ const CloseMultipleTokenAccounts = ({
         if (
           needToCreateAta &&
           !mintsOfCurrentlyPushedAtaInstructions.find(
-            (x) => x !== mintPK.toBase58()
+            (x) => x === mintPK.toBase58()
           )
         ) {
           const createAtaInstruction = Token.createAssociatedTokenAccountInstruction(
