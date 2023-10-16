@@ -30,12 +30,11 @@ export const DepositTokensButton = ({
   const depositTooltipContent = !connected
     ? 'Connect your wallet to deposit'
     : !hasTokensInWallet
-    ? "You don't have any governance tokens in your wallet to deposit."
-    : undefined
+      ? "You don't have any governance tokens in your wallet to deposit."
+      : undefined
 
   const ButtonToUse = as === 'primary' ? Button : SecondaryButton
   const [openModal, setOpenModal] = useState(false)
-  const [amount, setAmount] = useState('')
   const mint = useGoverningTokenMint(role)
   const mintInfo = useMintInfoByPubkeyQuery(mint).data?.result
 
@@ -43,6 +42,8 @@ export const DepositTokensButton = ({
     mintInfo === undefined
       ? undefined
       : depositAmount.shiftedBy(-mintInfo.decimals).toNumber()
+
+  const [amount, setAmount] = useState(humanReadableMax)
 
   const deposit = useDepositCallback(role)
   return (
