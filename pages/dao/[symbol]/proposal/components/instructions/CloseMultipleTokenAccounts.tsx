@@ -18,18 +18,14 @@ import {
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
 import * as yup from 'yup'
-import { PublicKey } from '@solana/web3.js'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { getATA } from '@utils/ataTools'
-import { sendTransactionsV3, SequenceType } from '@utils/sendTransactions'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import Checkbox from '@components/inputs/Checkbox'
 import tokenPriceService from '@utils/services/tokenPrice'
-import {
-  fmtMintAmount,
-  formatMintNaturalAmountAsDecimal,
-} from '@tools/sdk/units'
+import { fmtMintAmount } from '@tools/sdk/units'
 
 interface CloseMultiTokenAccountForm {
   wallet: AssetAccount | undefined | null
@@ -66,20 +62,22 @@ const CloseMultipleTokenAccounts = ({
   })
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
-    let serializedInstructionClose = ''
+
     const additionalSerializedInstructions: string[] = []
+    const prerequisiteInstructions: TransactionInstruction[] = []
+    const mintsOfCurrentlyPushedAtaInstructions: string[] = []
     if (
       isValid &&
       form!.wallet?.governance?.account &&
       wallet?.publicKey &&
       realm
     ) {
-      if (!form!.wallet.extensions.token!.account.amount?.isZero()) {
-        const sourceAccount = form!.wallet.extensions.token?.publicKey
+      for (const tokenAccount of form.tokenAccounts) {
+        const sourceAccount = tokenAccount.pubkey
         //this is the original owner
         const destinationAccount = new PublicKey(form!.fundsDestinationAccount)
-        const mintPK = form!.wallet.extensions.mint!.publicKey
-        const amount = form!.wallet.extensions.token!.account.amount
+        const mintPK = tokenAccount.extensions.mint!.publicKey
+        const amount = tokenAccount.extensions.token!.account.amount
 
         //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
         const {
@@ -93,7 +91,12 @@ const CloseMultipleTokenAccounts = ({
         })
         //we push this createATA instruction to transactions to create right before creating proposal
         //we don't want to create ata only when instruction is serialized
-        if (needToCreateAta) {
+        if (
+          needToCreateAta &&
+          !mintsOfCurrentlyPushedAtaInstructions.find(
+            (x) => x !== mintPK.toBase58()
+          )
+        ) {
           const createAtaInstruction = Token.createAssociatedTokenAccountInstruction(
             ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
             TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
@@ -102,53 +105,41 @@ const CloseMultipleTokenAccounts = ({
             destinationAccount, // owner of token account
             wallet!.publicKey! // fee payer
           )
-          //ata needs to be created before otherwise simulations will throw errors.
-          //createCloseAccountInstruction has check if ata is existing its not like in transfer where we can run
-          //simulation without created ata and we create it on the fly before proposal
-          await sendTransactionsV3({
-            connection: connection.current,
-            wallet: wallet,
-            transactionInstructions: [
-              {
-                instructionsSet: [
-                  {
-                    transactionInstruction: createAtaInstruction,
-                  },
-                ],
-                sequenceType: SequenceType.Parallel,
-              },
-            ],
-          })
+          mintsOfCurrentlyPushedAtaInstructions.push(mintPK.toBase58())
+          prerequisiteInstructions.push(createAtaInstruction)
         }
-        const transferIx = Token.createTransferInstruction(
+
+        if (!amount.isZero()) {
+          const transferIx = Token.createTransferInstruction(
+            TOKEN_PROGRAM_ID,
+            sourceAccount!,
+            receiverAddress,
+            tokenAccount.extensions.token!.account.owner,
+            [],
+            amount
+          )
+          additionalSerializedInstructions.push(
+            serializeInstructionToBase64(transferIx)
+          )
+        }
+
+        const closeInstruction = Token.createCloseAccountInstruction(
           TOKEN_PROGRAM_ID,
-          sourceAccount!,
-          receiverAddress,
-          form!.wallet!.extensions!.token!.account.owner,
-          [],
-          amount
+          tokenAccount.pubkey,
+          new PublicKey(form!.solRentDestination),
+          tokenAccount.extensions.token!.account.owner,
+          []
         )
         additionalSerializedInstructions.push(
-          serializeInstructionToBase64(transferIx)
+          serializeInstructionToBase64(closeInstruction)
         )
       }
-
-      const closeInstruction = Token.createCloseAccountInstruction(
-        TOKEN_PROGRAM_ID,
-        form!.wallet.extensions.token!.publicKey!,
-        new PublicKey(form!.solRentDestination),
-        form!.wallet.extensions.token!.account.owner!,
-        []
-      )
-      serializedInstructionClose = serializeInstructionToBase64(
-        closeInstruction
-      )
-      additionalSerializedInstructions.push(serializedInstructionClose)
     }
     const obj: UiInstruction = {
-      prerequisiteInstructions: [],
+      prerequisiteInstructions: prerequisiteInstructions,
       serializedInstruction: '',
       additionalSerializedInstructions: additionalSerializedInstructions,
+      chunkBy: 3,
       isValid,
       governance: form!.wallet?.governance,
     }
@@ -162,6 +153,7 @@ const CloseMultipleTokenAccounts = ({
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
+
   const inputs: InstructionInput[] = [
     {
       label: 'Wallet',
@@ -200,19 +192,39 @@ const CloseMultipleTokenAccounts = ({
               const info = tokenPriceService.getTokenInfo(
                 x.extensions.mint!.publicKey.toBase58()
               )
-              const imgUrl = info?.logoURI ? info.logoURI : ''
               const pubkey = x.pubkey.toBase58()
               const tokenName = info?.name ? info.name : ''
               const amount = fmtMintAmount(
                 x.extensions.mint!.account,
                 x!.extensions.token!.account.amount
               )
-              console.log()
               return (
                 <div className="mb-4" key={x.pubkey.toBase58()}>
                   <Checkbox
                     label={`${pubkey} ${amount} ${tokenName}`}
-                    checked={false}
+                    checked={
+                      !!form.tokenAccounts?.find(
+                        (toAcc) =>
+                          toAcc.pubkey.toBase58() === x.pubkey.toBase58()
+                      )
+                    }
+                    onChange={(e) => {
+                      let newTokenAccounts = form.tokenAccounts
+                        ? [...form.tokenAccounts]
+                        : []
+                      if (e.target.checked) {
+                        newTokenAccounts = [...newTokenAccounts, x]
+                      } else {
+                        newTokenAccounts = newTokenAccounts.filter(
+                          (toAcc) =>
+                            toAcc.pubkey.toBase58() !== x.pubkey.toBase58()
+                        )
+                      }
+                      setForm({
+                        ...form,
+                        tokenAccounts: newTokenAccounts,
+                      })
+                    }}
                   ></Checkbox>
                 </div>
               )
