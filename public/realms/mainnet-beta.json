@@ -14,6 +14,15 @@
     "sortRank": -1000
   },
   {
+    "symbol": "CollabX",
+    "displayName": "CollabX",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "BVfB1PfxCdcKozoQQ5kvC9waUY527bZuwJVyT7Qvf8N2",
+    "ogImage": "https://shdw-drive.genesysgo.net/5nwi4maAZ3v3EwTJtcg9oFfenQUX7pb9ry4KuhyUSawK/logo_collabx.png",
+    "github": "https://github.com/Grape-Labs",
+    "shortDescription": "A small but mighty developer DAO! 🚀 We're like the little engines that could, tirelessly building, testing, and occasionally chewing glass to create a better ecosystem"
+  },
+  {
     "symbol": "Dean's List Network State",
     "displayName": "Dean's List Network State",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
