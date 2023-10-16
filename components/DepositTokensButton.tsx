@@ -63,7 +63,7 @@ export const DepositTokensButton = ({
             <Input
               placeholder={humanReadableMax?.toString() + ' (max)'}
               type="number"
-              label="Amount to deposit"
+              label={<>Amount to deposit - <a href="#" onClick={(e) => { setAmount(humanReadableMax?.toString()) }}>Max</a></>}
               value={amount}
               onChange={(e) => { setAmount(e.target.value) }}
               max={humanReadableMax}
