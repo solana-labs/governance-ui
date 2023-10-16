@@ -70,7 +70,7 @@ export const DepositTokensButton = ({
               Amount to deposit
               <span>
                 &nbsp;-&nbsp;<a href="#" onClick={() => { setAmount(humanReadableMax ? humanReadableMax.toString() : '') }}>Max</a>
-              </span>)
+              </span>
             </label>
             <Input
               placeholder={humanReadableMax?.toString() + ' (max)'}
@@ -88,7 +88,7 @@ export const DepositTokensButton = ({
                 await deposit(nativeAmount)
                 setOpenModal(false)
               }}
-              disabled={humanReadableMax !== undefined && parseInt(amount) > humanReadableMax}
+              disabled={humanReadableMax !== undefined && parseInt(amount) > humanReadableMax && parseInt(amount) > 0}
             >
               Confirm
             </Button>
