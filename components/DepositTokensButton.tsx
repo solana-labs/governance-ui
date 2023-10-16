@@ -67,7 +67,11 @@ export const DepositTokensButton = ({
           <div className="flex flex-col gap-y-4">
             <h2>Deposit tokens</h2>
             <label>
-              Amount to deposit - <a href="#" onClick={() => { setAmount(humanReadableMax ? humanReadableMax.toString() : '') }}>Max</a>
+              Amount to deposit
+              {(!amount || amount.length < 0 || parseInt(amount) < humanReadableMax) &&
+                <>
+                  &nbsp;-&nbsp;<a href="#" onClick={() => { setAmount(humanReadableMax ? humanReadableMax.toString() : '') }}>Max</a>
+                </>}
             </label>
             <Input
               placeholder={humanReadableMax?.toString() + ' (max)'}
@@ -85,6 +89,7 @@ export const DepositTokensButton = ({
                 await deposit(nativeAmount)
                 setOpenModal(false)
               }}
+              disabled={parseInt(amount) > humanReadableMax}
             >
               Confirm
             </Button>
