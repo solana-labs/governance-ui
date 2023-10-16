@@ -65,10 +65,7 @@ export const DepositTokensButton = ({
               type="number"
               label="Amount to deposit"
               value={amount}
-              onChange={(e) => {
-                const inputValue = e.target.value;
-                setAmount(inputValue);
-              }}
+              onChange={(e) => { setAmount(e.target.value) }}
               max={humanReadableMax}
             />
             <Button
