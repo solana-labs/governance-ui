@@ -206,6 +206,7 @@
     }
   },
   "resolutions": {
+    "@babel/traverse": ">=7.23.2",
     "port-sdk/@saberhq/token-utils": "1.12.53",
     "@solana/web3.js": "1.73.3",
     "react": "18.2.0",
