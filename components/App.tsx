@@ -37,6 +37,7 @@ import {
 } from '@sqds/iframe-adapter'
 import { WALLET_PROVIDERS } from '@utils/wallet-adapters'
 import { tryParsePublicKey } from '@tools/core/pubkey'
+import { useAsync } from 'react-async-hook'
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
@@ -124,12 +125,26 @@ export function AppContents(props: Props) {
   // Note: ?v==${Date.now()} is added to the url to force favicon refresh.
   // Without it browsers would cache the last used and won't change it for different realms
   // https://stackoverflow.com/questions/2208933/how-do-i-force-a-favicon-refresh
-  const faviconUrl =
-    symbol &&
-    tryParsePublicKey(symbol as string) === undefined && // don't try to use a custom favicon if this is a pubkey-based url
-    `/realms/${getResourcePathPart(
-      symbol as string
-    )}/favicon.ico?v=${Date.now()}`
+  const faviconUrl = useMemo(
+    () =>
+      symbol &&
+      tryParsePublicKey(symbol as string) === undefined && // don't try to use a custom favicon if this is a pubkey-based url
+      `/realms/${getResourcePathPart(
+        symbol as string
+      )}/favicon.ico?v=${Date.now()}`,
+    [symbol]
+  )
+
+  // check if a file actually exists at faviconUrl
+  const { result: faviconExists } = useAsync(
+    async () =>
+      faviconUrl
+        ? fetch(faviconUrl)
+            .then((response) => response.status === 200)
+            .catch(() => false)
+        : false,
+    [faviconUrl]
+  )
 
   useEffect(() => {
     if (
@@ -178,7 +193,7 @@ export function AppContents(props: Props) {
             background-color: #17161c;
           }
         `}</style>
-        {faviconUrl ? (
+        {faviconUrl && faviconExists ? (
           <>
             <link rel="icon" href={faviconUrl} />
           </>
