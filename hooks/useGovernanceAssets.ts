@@ -243,6 +243,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Common,
     },
+    [Instructions.CloseMultipleTokenAccounts]: {
+      name: 'Close multiple token accounts',
+      isVisible: canUseTransferInstruction,
+      packageId: PackageEnum.Common,
+    },
     [Instructions.CreateAssociatedTokenAccount]: {
       name: 'Create Associated Token Account',
       packageId: PackageEnum.Common,
