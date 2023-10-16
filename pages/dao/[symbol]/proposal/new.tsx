@@ -70,6 +70,7 @@ import MakeAddMarketListToCategoryParams from './components/instructions/Foresig
 import RealmConfig from './components/instructions/RealmConfig'
 import MakeSetMarketMetadataParams from './components/instructions/Foresight/MakeSetMarketMetadataParams'
 import CloseTokenAccount from './components/instructions/CloseTokenAccount'
+import CloseMultipleTokenAccounts from './components/instructions/CloseMultipleTokenAccounts'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import StakingOption from './components/instructions/Dual/StakingOption'
 import MeanCreateAccount from './components/instructions/Mean/MeanCreateAccount'
@@ -524,6 +525,7 @@ const New = () => {
       [Instructions.CreateNftPluginMaxVoterWeight]: CreateNftPluginMaxVoterWeightRecord,
       [Instructions.ConfigureNftPluginCollection]: ConfigureNftPluginCollection,
       [Instructions.CloseTokenAccount]: CloseTokenAccount,
+      [Instructions.CloseMultipleTokenAccounts]: CloseMultipleTokenAccounts,
       [Instructions.VotingMintConfig]: VotingMintConfig,
       [Instructions.CreateVsrRegistrar]: CreateVsrRegistrar,
       [Instructions.CreateGatewayPluginRegistrar]: CreateGatewayPluginRegistrar,

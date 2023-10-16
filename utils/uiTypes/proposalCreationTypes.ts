@@ -317,6 +317,7 @@ export enum Instructions {
   ChangeMakeDonation,
   Clawback,
   CloseTokenAccount,
+  CloseMultipleTokenAccounts,
   ConfigureGatewayPlugin,
   ConfigureNftPluginCollection,
   CreateAssociatedTokenAccount,
