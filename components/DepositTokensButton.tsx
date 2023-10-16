@@ -5,7 +5,7 @@ import useUserGovTokenAccountQuery from '@hooks/useUserGovTokenAccount'
 import { useDepositCallback } from './GovernancePower/Vanilla/useDepositCallback'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import Modal from './Modal'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import useGoverningTokenMint from '@hooks/selectedRealm/useGoverningTokenMint'
 import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
 import Input from './inputs/Input'
@@ -43,7 +43,12 @@ export const DepositTokensButton = ({
       ? undefined
       : depositAmount.shiftedBy(-mintInfo.decimals).toNumber()
 
-  const [amount, setAmount] = useState(humanReadableMax ? humanReadableMax?.toString() : '')
+  const [amount, setAmount] = useState('')
+
+  useEffect(() => {
+    if (humanReadableMax && humanReadableMax > 0)
+      setAmount(humanReadableMax ? humanReadableMax.toString() : '')
+  }, [humanReadableMax])
 
   const deposit = useDepositCallback(role)
 
