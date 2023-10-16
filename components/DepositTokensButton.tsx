@@ -5,7 +5,7 @@ import useUserGovTokenAccountQuery from '@hooks/useUserGovTokenAccount'
 import { useDepositCallback } from './GovernancePower/Vanilla/useDepositCallback'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import Modal from './Modal'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import useGoverningTokenMint from '@hooks/selectedRealm/useGoverningTokenMint'
 import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
 import Input from './inputs/Input'
@@ -35,7 +35,6 @@ export const DepositTokensButton = ({
 
   const ButtonToUse = as === 'primary' ? Button : SecondaryButton
   const [openModal, setOpenModal] = useState(false)
-  const [amount, setAmount] = useState('')
   const mint = useGoverningTokenMint(role)
   const mintInfo = useMintInfoByPubkeyQuery(mint).data?.result
 
@@ -44,7 +43,15 @@ export const DepositTokensButton = ({
       ? undefined
       : depositAmount.shiftedBy(-mintInfo.decimals).toNumber()
 
+  const [amount, setAmount] = useState('')
+
+  useEffect(() => {
+    if (humanReadableMax && humanReadableMax > 0)
+      setAmount(humanReadableMax ? humanReadableMax.toString() : '')
+  }, [humanReadableMax])
+
   const deposit = useDepositCallback(role)
+
   return (
     <>
       <ButtonToUse
@@ -59,12 +66,17 @@ export const DepositTokensButton = ({
         <Modal isOpen={openModal} onClose={() => setOpenModal(false)}>
           <div className="flex flex-col gap-y-4">
             <h2>Deposit tokens</h2>
+            <label>
+              Amount to deposit
+              <span>
+                &nbsp;-&nbsp;<a href="#" onClick={() => { setAmount(humanReadableMax ? humanReadableMax.toString() : '') }}>Max</a>
+              </span>
+            </label>
             <Input
               placeholder={humanReadableMax?.toString() + ' (max)'}
               type="number"
-              label="Amount to deposit"
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              onChange={(e) => { setAmount(e.target.value) }}
               max={humanReadableMax}
             />
             <Button
@@ -76,6 +88,7 @@ export const DepositTokensButton = ({
                 await deposit(nativeAmount)
                 setOpenModal(false)
               }}
+              disabled={humanReadableMax !== undefined && (parseInt(amount) > humanReadableMax || parseInt(amount)<= 0)}
             >
               Confirm
             </Button>
