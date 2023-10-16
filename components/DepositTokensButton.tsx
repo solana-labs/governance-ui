@@ -60,10 +60,12 @@ export const DepositTokensButton = ({
         <Modal isOpen={openModal} onClose={() => setOpenModal(false)}>
           <div className="flex flex-col gap-y-4">
             <h2>Deposit tokens</h2>
+            <label>
+              Amount to deposit - <a href="#" onClick={() => { setAmount(humanReadableMax ? humanReadableMax.toString() : '') }}>Max</a>
+            </label>
             <Input
               placeholder={humanReadableMax?.toString() + ' (max)'}
               type="number"
-              label={<>Amount to deposit - <a href="#" onClick={() => { setAmount(humanReadableMax ? humanReadableMax.toString() : '') }}>Max</a></>}
               value={amount}
               onChange={(e) => { setAmount(e.target.value) }}
               max={humanReadableMax}
