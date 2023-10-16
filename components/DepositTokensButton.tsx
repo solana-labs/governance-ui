@@ -89,7 +89,7 @@ export const DepositTokensButton = ({
                 await deposit(nativeAmount)
                 setOpenModal(false)
               }}
-              disabled={parseInt(amount) > humanReadableMax}
+              disabled={(humanReadableMax && parseInt(amount) > humanReadableMax)}
             >
               Confirm
             </Button>
