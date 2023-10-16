@@ -70,9 +70,15 @@ export const DepositTokensButton = ({
             <Button
               onClick={async () => {
                 if (mintInfo === undefined) throw new Error()
-                const nativeAmount = new BN(
-                  new BigNumber(amount).shiftedBy(mintInfo.decimals).toString()
-                )
+                // max is the placeholder, so deposit the maximum amount if no value is input
+                const nativeAmount =
+                  amount === ''
+                    ? new BN(depositAmount.toString())
+                    : new BN(
+                        new BigNumber(amount)
+                          .shiftedBy(mintInfo.decimals)
+                          .toString()
+                      )
                 await deposit(nativeAmount)
                 setOpenModal(false)
               }}
