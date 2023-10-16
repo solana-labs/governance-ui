@@ -43,7 +43,7 @@ export const DepositTokensButton = ({
       ? undefined
       : depositAmount.shiftedBy(-mintInfo.decimals).toNumber()
 
-  const [amount, setAmount] = useState((humanReadableMax?.toString() && humanReadableMax > 0) ? humanReadableMax.toString() : '')
+  const [amount, setAmount] = useState((humanReadableMax && humanReadableMax?.toString() && parseInt(humanReadableMax) > 0) ? humanReadableMax.toString() : '')
 
   const deposit = useDepositCallback(role)
   return (
@@ -63,7 +63,7 @@ export const DepositTokensButton = ({
             <Input
               placeholder={humanReadableMax?.toString() + ' (max)'}
               type="number"
-              label={<>Amount to deposit - <a href="#" onClick={() => { setAmount(humanReadableMax?.toString()) }}>Max</a></>}
+              label={<>Amount to deposit - <a href="#" onClick={() => { setAmount(humanReadableMax ? humanReadableMax.toString() || '') }}>Max</a></>}
               value={amount}
               onChange={(e) => { setAmount(e.target.value) }}
               max={humanReadableMax}
