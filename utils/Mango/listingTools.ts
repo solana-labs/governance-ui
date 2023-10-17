@@ -2,6 +2,7 @@ import {
   OPENBOOK_PROGRAM_ID,
   RouteInfo,
   toNative,
+  toNativeI80F48,
 } from '@blockworks-foundation/mango-v4'
 import {
   LISTING_PRESETS,
@@ -10,17 +11,21 @@ import {
   ListingPreset,
   getTierWithAdjustedNetBorrows,
 } from '@blockworks-foundation/mango-v4-settings/lib/helpers/listingTools'
-import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
+import { AnchorProvider, BN, Program, Wallet } from '@coral-xyz/anchor'
 import { MAINNET_USDC_MINT } from '@foresight-tmp/foresight-sdk/dist/consts'
 import { Market } from '@project-serum/serum'
-import { PythHttpClient } from '@pythnetwork/client'
+import { PythHttpClient, parsePriceData } from '@pythnetwork/client'
 import {
+  AccountInfo,
   Connection,
   Keypair,
   PublicKey,
   Transaction,
   VersionedTransaction,
 } from '@solana/web3.js'
+import SwitchboardProgram from '@switchboard-xyz/sbv2-lite'
+import { fmtTokenAmount } from '@utils/formatting'
+import Big from 'big.js'
 
 const MAINNET_PYTH_PROGRAM = new PublicKey(
   'FsJ3A3u2vn5cTVofAjvy6y5kwABJAqYWpe4975bi2epH'
@@ -345,10 +350,8 @@ export const compareObjectsAndGetDifferentKeys = <T extends object>(
   return diffKeys as (keyof T)[]
 }
 
-const isSwitchboardOracle = async (
-  connection: Connection,
-  feedPk: PublicKey
-) => {
+const isSwitchboardOracle = async (connection: Connection) => {
+  const feedPk = new PublicKey('Ag7RdWj5t3U9avU4XKAY7rBbGDCNz456ckNmcpW1aHoE')
   const SWITCHBOARD_PROGRAM_ID = 'SW1TCH7qEPTdLsDHRgPuMQjbQxKdH2aBStViMFnt64f'
 
   const options = AnchorProvider.defaultOptions()
@@ -368,6 +371,14 @@ const isSwitchboardOracle = async (
   )
   const feeds = await switchboardProgram.account.aggregatorAccountData.all()
   const feed = feeds.find((x) => x.publicKey.equals(feedPk))
+  const ai = await connection.getAccountInfo(feedPk)
+  const elo = await decodePriceFromOracleAi(
+    feedPk,
+    ai!,
+    connection,
+    'switchboard'
+  )
+  console.log(elo)
   return feed
     ? `https://app.switchboard.xyz/solana/mainnet-beta/feed/${feedPk.toBase58()}`
     : ''
@@ -481,4 +492,57 @@ export const getBestMarket = async ({
   } catch (e) {
     return null
   }
+}
+
+export const decodePriceFromOracleAi = async (
+  oracle: PublicKey,
+  ai: AccountInfo<Buffer>,
+  connection: Connection,
+  type: string
+): Promise<{
+  uiPrice: number
+  lastUpdatedSlot: number
+  deviation: number
+}> => {
+  let uiPrice, lastUpdatedSlot, deviation
+  if (type === 'pyth') {
+    const priceData = parsePriceData(ai.data)
+    uiPrice = priceData.previousPrice
+    lastUpdatedSlot = parseInt(priceData.lastSlot.toString())
+    deviation =
+      priceData.previousConfidence !== undefined
+        ? priceData.previousConfidence
+        : undefined
+  } else if (type === 'switchboard') {
+    const program = await SwitchboardProgram.loadMainnet(connection)
+    uiPrice = program.decodeLatestAggregatorValue(ai)!.toNumber()
+    lastUpdatedSlot = program
+      .decodeAggregator(ai)
+      .latestConfirmedRound!.roundOpenSlot!.toNumber()
+    deviation = (
+      (switchboardDecimalToBig(
+        program.decodeAggregator(ai).latestConfirmedRound.stdDeviation
+      ).toNumber() /
+        uiPrice) *
+      100
+    ).toFixed(2)
+  } else {
+    throw new Error(
+      `Unknown oracle provider (parsing not implemented) for oracle ${oracle}, with owner ${ai.owner}!`
+    )
+  }
+  return { uiPrice, lastUpdatedSlot, deviation }
+}
+
+export function switchboardDecimalToBig(sbDecimal: {
+  mantissa: BN
+  scale: number
+}): Big {
+  const mantissa = new Big(sbDecimal.mantissa.toString())
+  const scale = sbDecimal.scale
+  const oldDp = Big.DP
+  Big.DP = 20
+  const result: Big = mantissa.div(new Big(10).pow(scale))
+  Big.DP = oldDp
+  return result
 }

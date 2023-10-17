@@ -447,7 +447,7 @@
     keccak256 "^1.0.6"
     merkletreejs "^0.3.10"
 
-"@blockworks-foundation/mango-v4-settings@0.2.16":
+"@blockworks-foundation/mango-v4-settings@0.2.16", "@blockworks-foundation/mango-v4-settings@^0.2.15":
   version "0.2.16"
   resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4-settings/-/mango-v4-settings-0.2.16.tgz#63f03c13d1677461ea42d3b1e9171042830c6cdc"
   integrity sha512-9GCRZkVqTQsEUkqx/488pmSWM8I74Ght5AEzMPsuS5XlRGWIDjytWoBE0Y9wFVPrnRw2THTj0ZQft+vDwCYDCA==
@@ -455,12 +455,13 @@
     bn.js "^5.2.1"
     eslint-config-prettier "^9.0.0"
 
-"@blockworks-foundation/mango-v4@0.19.29":
-  version "0.19.29"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4/-/mango-v4-0.19.29.tgz#83789fe54a6a5c51c37524f23e664e6d7a31376f"
-  integrity sha512-ocdaRsq7o5Q6cvqk6CAPYJ1jJttWXEHdGnDMKHNVck8VSWA660poXDoJhzXaKUm5v22ZhaUFqjYsjiLO9gbp1g==
+"@blockworks-foundation/mango-v4@0.19.34":
+  version "0.19.34"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4/-/mango-v4-0.19.34.tgz#ddeec24f4caa9343de08354790eab6ba50a0d613"
+  integrity sha512-QMM3e4pyfwh13S0dn7nYZp8fs4pRI00CtUiN/9Q/DvLqEF97JuBFllGDuxRM5Y3SZSiBOwsFaWOJwYnDyNJOAA==
   dependencies:
-    "@coral-xyz/anchor" "^0.27.0"
+    "@blockworks-foundation/mango-v4-settings" "^0.2.15"
+    "@coral-xyz/anchor" "^0.28.1-beta.2"
     "@project-serum/serum" "0.13.65"
     "@pythnetwork/client" "~2.14.0"
     "@solana/spl-token" "0.3.7"
@@ -801,7 +802,7 @@
     superstruct "^0.15.4"
     toml "^3.0.0"
 
-"@coral-xyz/anchor@0.27.0", "@coral-xyz/anchor@^0.27.0":
+"@coral-xyz/anchor@0.27.0":
   version "0.27.0"
   resolved "https://registry.yarnpkg.com/@coral-xyz/anchor/-/anchor-0.27.0.tgz#621e5ef123d05811b97e49973b4ed7ede27c705c"
   integrity sha512-+P/vPdORawvg3A9Wj02iquxb4T0C5m4P6aZBVYysKl4Amk+r6aMPZkUhilBkD6E4Nuxnoajv3CFykUfkGE0n5g==
@@ -838,6 +839,27 @@
     crypto-hash "^1.3.0"
     eventemitter3 "^4.0.7"
     js-sha256 "^0.9.0"
+    pako "^2.0.3"
+    snake-case "^3.0.4"
+    superstruct "^0.15.4"
+    toml "^3.0.0"
+
+"@coral-xyz/anchor@^0.28.1-beta.2":
+  version "0.28.1-beta.2"
+  resolved "https://registry.yarnpkg.com/@coral-xyz/anchor/-/anchor-0.28.1-beta.2.tgz#4ddd4b2b66af04407be47cf9524147793ec514a0"
+  integrity sha512-xreUcOFF8+IQKWOBUrDKJbIw2ftpRVybFlEPVrbSlOBCbreCWrQ5754Gt9cHIcuBDAzearCDiBqzsGQdNgPJiw==
+  dependencies:
+    "@coral-xyz/borsh" "^0.28.0"
+    "@noble/hashes" "^1.3.1"
+    "@solana/web3.js" "^1.68.0"
+    base64-js "^1.5.1"
+    bn.js "^5.1.2"
+    bs58 "^4.0.1"
+    buffer-layout "^1.2.2"
+    camelcase "^6.3.0"
+    cross-fetch "^3.1.5"
+    crypto-hash "^1.3.0"
+    eventemitter3 "^4.0.7"
     pako "^2.0.3"
     snake-case "^3.0.4"
     superstruct "^0.15.4"
@@ -2647,6 +2669,11 @@
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.3.1.tgz#8831ef002114670c603c458ab8b11328406953a9"
   integrity sha512-EbqwksQwz9xDRGfDST86whPBgM65E0OH/pCgqW0GBVzO22bNE+NuIbeTb714+IfSjU3aRk47EUvXIb5bTsenKA==
+
+"@noble/hashes@^1.3.1":
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.3.2.tgz#6f26dbc8fbc7205873ce3cee2f690eba0d421b39"
+  integrity sha512-MVC8EAQp7MvEcm30KWENFjgR+Mkmf+D189XJTkFIlwohU5hcBbn1ZkKq7KVTi2Hme3PMGF390DaL52beVrIihQ==
 
 "@noble/secp256k1@^1.6.3":
   version "1.7.1"
@@ -4967,6 +4994,14 @@
     lodash "^4.17.21"
     protobufjs "^7.2.4"
     yaml "^2.2.1"
+
+"@switchboard-xyz/sbv2-lite@0.2.4":
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/@switchboard-xyz/sbv2-lite/-/sbv2-lite-0.2.4.tgz#fb8e189124d89fbffa5060a8009f8e0886cc7368"
+  integrity sha512-rJNwMalZ26D4bxtrxneZ6gBIwwtQ0KiSy8jY4c81KPEad/USMyl0iGPyhKKOr6dNRDKy5BgOslnU8xnZF+rnuQ==
+  dependencies:
+    "@coral-xyz/anchor" "^0.28.0"
+    big.js "^6.1.1"
 
 "@switchboard-xyz/sbv2-lite@^0.1.6":
   version "0.1.6"
