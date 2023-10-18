@@ -1,14 +1,13 @@
-import { DisplayAddress } from '@cardinal/namespaces-components'
 import Select from '@components/inputs/Select'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useTokenOwnerRecordsDelegatedToUser } from '@hooks/queries/tokenOwnerRecord'
 import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
 import { PublicKey } from '@solana/web3.js'
-import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useMemo } from 'react'
 import { ProgramAccount, TokenOwnerRecord } from '@solana/spl-governance'
 import { capitalize } from '@utils/helpers'
+import { abbreviateAddress } from '@utils/formatting'
 
 const YOUR_WALLET_VALUE = 'Your wallet'
 
@@ -104,7 +103,6 @@ function PrimaryDelegatorSelect({
   kind: 'community' | 'council'
   tors: ProgramAccount<TokenOwnerRecord>[]
 }) {
-  const connection = useLegacyConnectionContext()
   return (
     <div className="flex space-x-4 items-center mt-4">
       <div className="bg-bkg-1 px-4 py-2 justify-between rounded-md w-full">
@@ -118,13 +116,7 @@ function PrimaryDelegatorSelect({
           componentLabel={
             selectedDelegator ? (
               <div className="relative">
-                <DisplayAddress
-                  connection={connection.current}
-                  address={selectedDelegator}
-                  height="12px"
-                  width="100px"
-                  dark={true}
-                />
+                {abbreviateAddress(selectedDelegator)}
                 <div className="absolute bg-bkg-1 bottom-0 left-0 w-full h-full opacity-0	" />
               </div>
             ) : (
@@ -141,13 +133,7 @@ function PrimaryDelegatorSelect({
               value={delegatedTor.account.governingTokenOwner.toBase58()}
             >
               <div className="relative">
-                <DisplayAddress
-                  connection={connection.current}
-                  address={delegatedTor.account.governingTokenOwner}
-                  height="12px"
-                  width="100px"
-                  dark={true}
-                />
+                {abbreviateAddress(delegatedTor.account.governingTokenOwner)}
                 <div className="absolute bg-bkg-1 bottom-0 left-0 w-full h-full opacity-0	" />
               </div>
             </Select.Option>
