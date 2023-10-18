@@ -5,10 +5,7 @@ import { useConnection } from '@solana/wallet-adapter-react'
 import { Keypair, Transaction, TransactionInstruction } from '@solana/web3.js'
 import { approveTokenTransfer } from '@utils/tokens'
 import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
-import {
-  getGovernanceProgramVersion,
-  withDepositGoverningTokens,
-} from '@solana/spl-governance'
+import { withDepositGoverningTokens } from '@solana/spl-governance'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
@@ -16,6 +13,7 @@ import {
 } from '@solana/spl-token'
 import BN from 'bn.js'
 import { sendTransaction } from '@utils/send'
+import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
 
 export const useDepositCallback = (
   role: 'community' | 'council' | 'undefined'
@@ -56,10 +54,7 @@ export const useDepositCallback = (
 
       signers.push(transferAuthority)
 
-      const programVersion = await getGovernanceProgramVersion(
-        connection,
-        realm.owner
-      )
+      const programVersion = await fetchProgramVersion(connection, realm.owner)
 
       await withDepositGoverningTokens(
         instructions,

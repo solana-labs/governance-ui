@@ -1,5 +1,4 @@
 import {
-  getGovernanceProgramVersion,
   getTokenOwnerRecord,
   getTokenOwnerRecordAddress,
   serializeInstructionToBase64,
@@ -40,6 +39,7 @@ import {
 } from '@solana/spl-token'
 import { getMintCfgIdx, tryGetVoter } from 'VoteStakeRegistry/sdk/api'
 import { getPeriod } from 'VoteStakeRegistry/tools/deposits'
+import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
 
 const govProgramId = new PublicKey(
   'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'
@@ -88,7 +88,7 @@ export async function getDelegateInstruction({
     form.delegateToken &&
     form.delegateToken.extensions.mint?.publicKey
   ) {
-    const programVersion = await getGovernanceProgramVersion(
+    const programVersion = await fetchProgramVersion(
       connection.current,
       form.delegateToken?.governance.owner // governance program public key
     )
@@ -146,7 +146,7 @@ export async function getVoteDepositInstruction({
       form.delegateToken.extensions.mint.account.decimals
     )
 
-    const programVersion = await getGovernanceProgramVersion(
+    const programVersion = await fetchProgramVersion(
       connection.current,
       govProgramId // governance program public key
     )
@@ -341,7 +341,7 @@ export async function getDelegateWithdrawInstruction({
     form.delegateToken &&
     form.delegateToken.extensions.mint?.publicKey
   ) {
-    const programVersion = await getGovernanceProgramVersion(
+    const programVersion = await fetchProgramVersion(
       connection.current,
       govProgramId // governance program public key
     )

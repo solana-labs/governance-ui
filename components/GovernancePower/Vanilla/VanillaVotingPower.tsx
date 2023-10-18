@@ -12,7 +12,6 @@ import {
 } from '@hooks/queries/addresses/tokenOwnerRecord'
 import { useAsync } from 'react-async-hook'
 import BN from 'bn.js'
-import { Deposit } from './Deposit'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import VotingPowerPct from '@components/ProposalVotingPower/VotingPowerPct'
 import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
@@ -25,11 +24,13 @@ interface Props {
   className?: string
   role: 'community' | 'council'
   hideIfZero?: boolean
+  children?: React.ReactNode
 }
 
 export default function VanillaVotingPower({
   role,
   hideIfZero,
+  children,
   ...props
 }: Props) {
   const realm = useRealmQuery().data?.result
@@ -120,38 +121,36 @@ export default function VanillaVotingPower({
         disabled && 'hidden'
       )}
     >
-      {
-        <div className={'p-3 rounded-md bg-bkg-1'}>
-          <div className="text-fgd-3 text-xs">
-            {tokenName}
-            {role === 'council' ? ' Council' : ''} Votes
-          </div>
-          <div className="flex items-center justify-between mt-1">
-            <div className=" flex flex-row gap-x-2">
-              <div className="text-xl font-bold text-fgd-1 hero-text">
-                {formattedTotal ?? 0}
-              </div>
-              <div className="text-xs text-fgd-3">
-                {selectedDelegator !== undefined ? (
-                  // if we're acting as a specific delegator, show that instead of the delegator aggregation
-                  <>(as {abbreviateAddress(selectedDelegator)})</>
-                ) : formattedDelegatorsAmount !== undefined &&
-                  formattedDelegatorsAmount !== '0' ? (
-                  <>({formattedDelegatorsAmount} from delegators)</>
-                ) : null}
-              </div>
-            </div>
-
-            {mintInfo && (
-              <VotingPowerPct
-                amount={new BigNumber(totalAmount.toString())}
-                total={new BigNumber(mintInfo.supply.toString())}
-              />
-            )}
-          </div>
+      <div className={'p-3 rounded-md bg-bkg-1'}>
+        <div className="text-fgd-3 text-xs">
+          {tokenName}
+          {role === 'council' ? ' Council' : ''} Votes
         </div>
-      }
-      <Deposit role={role} />
+        <div className="flex items-center justify-between mt-1">
+          <div className=" flex flex-row gap-x-2">
+            <div className="text-xl font-bold text-fgd-1 hero-text">
+              {formattedTotal ?? 0}
+            </div>
+            <div className="text-xs text-fgd-3">
+              {selectedDelegator !== undefined ? (
+                // if we're acting as a specific delegator, show that instead of the delegator aggregation
+                <>(as {abbreviateAddress(selectedDelegator)})</>
+              ) : formattedDelegatorsAmount !== undefined &&
+                formattedDelegatorsAmount !== '0' ? (
+                <>({formattedDelegatorsAmount} from delegators)</>
+              ) : null}
+            </div>
+          </div>
+
+          {mintInfo && (
+            <VotingPowerPct
+              amount={new BigNumber(totalAmount.toString())}
+              total={new BigNumber(mintInfo.supply.toString())}
+            />
+          )}
+        </div>
+      </div>
+      {children}
     </div>
   )
 }

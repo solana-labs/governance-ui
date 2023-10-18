@@ -70,6 +70,7 @@ import MakeAddMarketListToCategoryParams from './components/instructions/Foresig
 import RealmConfig from './components/instructions/RealmConfig'
 import MakeSetMarketMetadataParams from './components/instructions/Foresight/MakeSetMarketMetadataParams'
 import CloseTokenAccount from './components/instructions/CloseTokenAccount'
+import CloseMultipleTokenAccounts from './components/instructions/CloseMultipleTokenAccounts'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import StakingOption from './components/instructions/Dual/StakingOption'
 import MeanCreateAccount from './components/instructions/Mean/MeanCreateAccount'
@@ -135,6 +136,8 @@ import DualVote from './components/instructions/Dual/DualVote'
 import DualGso from './components/instructions/Dual/DualGso'
 import DualGsoWithdraw from './components/instructions/Dual/DualGsoWithdraw'
 import MultiChoiceForm from '../../../../components/MultiChoiceForm'
+import CloseVaults from './components/instructions/DistrubtionProgram/CloseVaults'
+import FillVaults from './components/instructions/DistrubtionProgram/FillVaults'
 
 const TITLE_LENGTH_LIMIT = 130
 // the true length limit is either at the tx size level, and maybe also the total account size level (I can't remember)
@@ -492,6 +495,8 @@ const New = () => {
       [Instructions.DualFinanceDelegateWithdraw]: DualVoteDepositWithdraw,
       [Instructions.DualFinanceVoteDeposit]: DualVoteDeposit,
       [Instructions.DualFinanceVote]: DualVote,
+      [Instructions.DistributionCloseVaults]: CloseVaults,
+      [Instructions.DistributionFillVaults]: FillVaults,
       [Instructions.MeanCreateAccount]: MeanCreateAccount,
       [Instructions.MeanFundAccount]: MeanFundAccount,
       [Instructions.MeanWithdrawFromAccount]: MeanWithdrawFromAccount,
@@ -520,6 +525,7 @@ const New = () => {
       [Instructions.CreateNftPluginMaxVoterWeight]: CreateNftPluginMaxVoterWeightRecord,
       [Instructions.ConfigureNftPluginCollection]: ConfigureNftPluginCollection,
       [Instructions.CloseTokenAccount]: CloseTokenAccount,
+      [Instructions.CloseMultipleTokenAccounts]: CloseMultipleTokenAccounts,
       [Instructions.VotingMintConfig]: VotingMintConfig,
       [Instructions.CreateVsrRegistrar]: CreateVsrRegistrar,
       [Instructions.CreateGatewayPluginRegistrar]: CreateGatewayPluginRegistrar,

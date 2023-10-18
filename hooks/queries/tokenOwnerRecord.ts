@@ -60,6 +60,9 @@ const fetchTokenOwnerRecordsByRealmByOwner = async (
     },
   })
 
+/**
+ * CURRENTLY USED ONLY BY DISABLED COMPONENTS
+ */
 export const fetchTokenOwnerRecordsByOwnerAnyRealm = async (
   connection: Connection,
   ownerPk: PublicKey

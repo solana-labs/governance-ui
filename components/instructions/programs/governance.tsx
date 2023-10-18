@@ -7,7 +7,6 @@ import {
   deserializeBorsh,
   getGovernance,
   getGovernanceInstructionSchema,
-  getGovernanceProgramVersion,
   getRealm,
   GovernanceAccountParser,
   InstructionData,
@@ -35,6 +34,7 @@ import {
 } from '@tools/sdk/units'
 import { dryRunInstruction } from 'actions/dryRunInstruction'
 import { tryGetMint } from '../../../utils/tokens'
+import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
 
 const TOKEN_TYPES = { 0: 'Liquid', 1: 'Membership', 2: 'Disabled' }
 const governanceProgramId = 'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'
@@ -77,7 +77,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
         accounts: AccountMetaData[]
       ) => {
         const realm = await getRealm(connection, accounts[0].pubkey)
-        const programVersion = await getGovernanceProgramVersion(
+        const programVersion = await fetchProgramVersion(
           connection,
           realm.owner
         )
@@ -122,7 +122,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
         const governance = await getGovernance(connection, accounts[0].pubkey)
         const realm = await getRealm(connection, governance.account.realm)
 
-        const programVersion = await getGovernanceProgramVersion(
+        const programVersion = await fetchProgramVersion(
           connection,
           realm.owner
         )
@@ -453,7 +453,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
         accounts: AccountMetaData[]
       ) => {
         const realm = await getRealm(connection, accounts[0].pubkey)
-        const programVersion = await getGovernanceProgramVersion(
+        const programVersion = await fetchProgramVersion(
           connection,
           realm.owner
         )
@@ -483,7 +483,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
         accounts: AccountMetaData[]
       ) => {
         const realm = await getRealm(connection, accounts[0].pubkey)
-        const programVersion = await getGovernanceProgramVersion(
+        const programVersion = await fetchProgramVersion(
           connection,
           realm.owner
         )
@@ -537,7 +537,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
           currentRealmConfig,
           simulationResults,
         ] = await Promise.all([
-          getGovernanceProgramVersion(connection, realm.owner),
+          fetchProgramVersion(connection, realm.owner),
           tryGetMint(connection, realm.account.communityMint),
           tryGetRealmConfig(connection, realm.owner, realm.pubkey),
           dryRunInstruction(connection, walletMoq, instructionMoq),
@@ -813,7 +813,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
         accounts: AccountMetaData[]
       ) => {
         const realm = await getRealm(connection, accounts[0].pubkey)
-        const programVersion = await getGovernanceProgramVersion(
+        const programVersion = await fetchProgramVersion(
           connection,
           realm.owner
         )

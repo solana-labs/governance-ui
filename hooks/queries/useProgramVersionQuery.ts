@@ -27,6 +27,8 @@ export function useProgramVersionByIdQuery(
     enabled: realmsProgramId !== undefined,
     // Staletime is zero by default, so queries get refetched often. Since program version is immutable it should never go stale.
     staleTime: Number.MAX_SAFE_INTEGER,
+    // cacheTime is 10 days.
+    cacheTime: 1000 * 60 * 60 * 24 * 10,
   })
 
   return query

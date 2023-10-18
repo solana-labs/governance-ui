@@ -8,6 +8,7 @@ import {
   LISTING_PRESETS_KEYS,
   LISTING_PRESETS_PYTH,
   ListingPreset,
+  getTierWithAdjustedNetBorrows,
 } from '@blockworks-foundation/mango-v4-settings/lib/helpers/listingTools'
 import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
 import { MAINNET_USDC_MINT } from '@foresight-tmp/foresight-sdk/dist/consts'
@@ -157,12 +158,23 @@ type ProposedListingPresets = {
   [key in LISTING_PRESETS_KEYS]: FormattedListingPreset
 }
 
-export const getFormattedListingPresets = (isPythOracle: boolean) => {
+export const getFormattedListingPresets = (
+  isPythOracle: boolean,
+  currentTotalDepositsInUsdc?: number
+) => {
   const PRESETS = isPythOracle ? LISTING_PRESETS_PYTH : LISTING_PRESETS
+
   const PROPOSED_LISTING_PRESETS: ProposedListingPresets = Object.keys(
     PRESETS
   ).reduce((accumulator, key) => {
-    accumulator[key] = transformPresetToProposed(PRESETS[key])
+    accumulator[key] = transformPresetToProposed(
+      !currentTotalDepositsInUsdc
+        ? PRESETS[key]
+        : getTierWithAdjustedNetBorrows(
+            PRESETS[key],
+            currentTotalDepositsInUsdc
+          )
+    )
     return accumulator
   }, {} as ProposedListingPresets)
   return PROPOSED_LISTING_PRESETS

@@ -1,8 +1,11 @@
 import { ExclamationCircleIcon } from '@heroicons/react/solid'
+import { useGovernanceByPubkeyQuery } from '@hooks/queries/governance'
 import { useSelectedProposalTransactions } from '@hooks/queries/proposalTransaction'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import useRealm from '@hooks/useRealm'
+import { Proposal, getNativeTreasuryAddress } from '@solana/spl-governance'
 import { useMemo } from 'react'
+import { useAsync } from 'react-async-hook'
 
 const SetRealmConfigWarning = () => (
   <div className="rounded-md bg-yellow-50 p-4">
@@ -81,11 +84,44 @@ const SetGovernanceConfig = () => (
   </div>
 )
 
-const useProposalSafetyCheck = () => {
+const PossibleWrongGovernance = () => (
+  <div className="rounded-md bg-yellow-50 p-4">
+    <div className="flex">
+      <div className="flex-shrink-0">
+        <ExclamationCircleIcon
+          className="h-5 w-5 text-yellow-400"
+          aria-hidden="true"
+        />
+      </div>
+      <div className="ml-3">
+        <h3 className="text-sm font-medium text-yellow-800">
+          Possible wrong governance pass, check accounts.
+        </h3>
+      </div>
+    </div>
+  </div>
+)
+
+const useProposalSafetyCheck = (proposal: Proposal) => {
   const config = useRealmConfigQuery().data?.result
 
   const { realmInfo } = useRealm()
   const { data: transactions } = useSelectedProposalTransactions()
+  const governance = useGovernanceByPubkeyQuery(proposal?.governance).data
+    ?.result
+
+  const treasuryAddress = useAsync(
+    async () =>
+      governance !== undefined
+        ? getNativeTreasuryAddress(governance.owner, governance.pubkey)
+        : undefined,
+    [governance]
+  )
+  const walletsPassedToInstructions = transactions?.flatMap((tx) =>
+    tx.account.instructions.flatMap((ins) =>
+      ins.accounts.map((acc) => acc.pubkey)
+    )
+  )
 
   const realmConfigWarnings = useMemo(() => {
     if (
@@ -93,44 +129,75 @@ const useProposalSafetyCheck = () => {
       config === undefined ||
       transactions === undefined
     )
-      return undefined
+      return []
 
     const ixs = transactions.flatMap((pix) => pix.account.getAllInstructions())
 
-    const realmConfigWarnings = ixs.map((ix) => {
-      if (ix.programId.equals(realmInfo.programId) && ix.data[0] === 19) {
-        return 'setGovernanceConfig'
-      }
-      if (ix.programId.equals(realmInfo.programId) && ix.data[0] === 22) {
-        return 'setRealmConfig'
-      }
-      if (
-        ix.accounts.find(
-          (a) => a.isWritable && a.pubkey.equals(config.pubkey)
-        ) !== undefined
-      ) {
-        if (ix.programId.equals(realmInfo.programId)) {
-          return 'setRealmConfig'
-        } else {
-          return 'ThirdPartyInstructionWritesConfig'
+    const possibleWrongGovernance =
+      treasuryAddress.result &&
+      !!transactions?.length &&
+      !walletsPassedToInstructions?.find(
+        (x) => governance?.pubkey.equals(x) || treasuryAddress.result?.equals(x)
+      )
+
+    const realmConfigWarnings: (
+      | 'setGovernanceConfig'
+      | 'setRealmConfig'
+      | 'thirdPartyInstructionWritesConfig'
+      | 'possibleWrongGovernance'
+      | undefined
+    )[] = []
+
+    realmConfigWarnings.push(
+      ...ixs.map((ix) => {
+        if (ix.programId.equals(realmInfo.programId) && ix.data[0] === 19) {
+          return 'setGovernanceConfig'
         }
-      }
-    })
+        if (ix.programId.equals(realmInfo.programId) && ix.data[0] === 22) {
+          return 'setRealmConfig'
+        }
+        if (
+          ix.accounts.find(
+            (a) => a.isWritable && a.pubkey.equals(config.pubkey)
+          ) !== undefined
+        ) {
+          if (ix.programId.equals(realmInfo.programId)) {
+            return 'setRealmConfig'
+          } else {
+            return 'thirdPartyInstructionWritesConfig'
+          }
+        }
+      })
+    )
+
+    if (possibleWrongGovernance) {
+      realmConfigWarnings.push('possibleWrongGovernance')
+    }
 
     return realmConfigWarnings
-  }, [config, transactions, realmInfo])
+  }, [
+    realmInfo,
+    config,
+    transactions,
+    walletsPassedToInstructions,
+    governance?.pubkey,
+    treasuryAddress.result,
+  ])
 
   return realmConfigWarnings
 }
 
-const ProposalWarnings = () => {
-  const warnings = useProposalSafetyCheck()
+const ProposalWarnings = ({ proposal }: { proposal: Proposal }) => {
+  const warnings = useProposalSafetyCheck(proposal)
   return (
     <>
       {warnings?.includes('setGovernanceConfig') && <SetGovernanceConfig />}
       {warnings?.includes('setRealmConfig') && <SetRealmConfigWarning />}
-      {warnings?.includes('ThirdPartyInstructionWritesConfig') && (
+      {warnings?.includes('thirdPartyInstructionWritesConfig') && (
         <ThirdPartyInstructionWritesConfigWarning />
+      )}
+      {warnings?.includes('possibleWrongGovernance') && (
+        <PossibleWrongGovernance></PossibleWrongGovernance>
       )}
     </>
   )

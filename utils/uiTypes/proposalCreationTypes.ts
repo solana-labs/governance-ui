@@ -26,6 +26,7 @@ export enum PackageEnum {
   Solend,
   Switchboard,
   VsrPlugin,
+  Distribution,
 }
 
 export interface UiInstruction {
@@ -316,6 +317,7 @@ export enum Instructions {
   ChangeMakeDonation,
   Clawback,
   CloseTokenAccount,
+  CloseMultipleTokenAccounts,
   ConfigureGatewayPlugin,
   ConfigureNftPluginCollection,
   CreateAssociatedTokenAccount,
@@ -340,6 +342,8 @@ export enum Instructions {
   DualFinanceDelegateWithdraw,
   DualFinanceVoteDeposit,
   DualFinanceVote,
+  DistributionCloseVaults,
+  DistributionFillVaults,
   DelegateStake,
   ForesightAddMarketListToCategory,
   ForesightInitCategory,

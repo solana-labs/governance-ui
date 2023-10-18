@@ -1,6 +1,7 @@
 import { Connection, PublicKey } from '@solana/web3.js'
 import {
   fetchTokenOwnerRecordByPubkey,
+  useTokenOwnerRecordByPubkeyQuery,
   useUserCommunityTokenOwnerRecord,
   useUserCouncilTokenOwnerRecord,
 } from './tokenOwnerRecord'
@@ -44,6 +45,15 @@ export const getVanillaGovpower = async (
     tokenOwnerRecord
   )
   return torAccount.result
+    ? torAccount.result.account.governingTokenDepositAmount
+    : new BN(0)
+}
+
+export const useVanillaGovpower = (tokenOwnerRecordPk: PublicKey) => {
+  const { data: torAccount } = useTokenOwnerRecordByPubkeyQuery(
+    tokenOwnerRecordPk
+  )
+  return torAccount?.result
     ? torAccount.result.account.governingTokenDepositAmount
     : new BN(0)
 }
