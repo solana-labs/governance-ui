@@ -77,10 +77,7 @@ const createDelegatorVote = async ({
     .result
   if (!proposal) throw new Error()
 
-  const programVersion = await getGovernanceProgramVersion(
-    connection,
-    realm.owner
-  )
+  const programVersion = await fetchProgramVersion(connection, realm.owner)
 
   const castVoteIxs: TransactionInstruction[] = []
   await withCastVote(
