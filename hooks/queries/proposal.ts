@@ -1,4 +1,4 @@
-import { Connection, PublicKey } from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
 import asFindable from '@utils/queries/asFindable'
 import {
@@ -27,15 +27,6 @@ export const proposalQueryKeys = {
   ],
 }
 
-export const fetchProposalByPubkeyQuery = (
-  connection: Connection,
-  pubkey: PublicKey
-) =>
-  queryClient.fetchQuery({
-    queryKey: proposalQueryKeys.byPubkey(connection.rpcEndpoint, pubkey),
-    queryFn: () => asFindable(getProposal)(connection, pubkey),
-  })
-
 export const useProposalByPubkeyQuery = (pubkey: PublicKey | undefined) => {
   const connection = useLegacyConnectionContext()
 
@@ -50,6 +41,7 @@ export const useProposalByPubkeyQuery = (pubkey: PublicKey | undefined) => {
     },
     enabled,
   })
+
   return query
 }
 

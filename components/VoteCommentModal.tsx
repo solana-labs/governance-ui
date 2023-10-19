@@ -7,12 +7,15 @@ import Loading from './Loading'
 import Modal from './Modal'
 import Input from './inputs/Input'
 import Tooltip from './Tooltip'
+import { TokenOwnerRecord } from '@solana/spl-governance'
+import { ProgramAccount } from '@solana/spl-governance'
 import { useSubmitVote } from '@hooks/useSubmitVote'
 
 interface VoteCommentModalProps {
   onClose: () => void
   isOpen: boolean
   vote: VoteKind
+  voterTokenRecord: ProgramAccount<TokenOwnerRecord>
   isMulti?: number[]
 }
 
@@ -27,6 +30,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   onClose,
   isOpen,
   vote,
+  voterTokenRecord,
   isMulti,
 }) => {
   const [comment, setComment] = useState('')
@@ -37,8 +41,9 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   const handleSubmit = async () => {
     await submitVote({
       vote,
+      voterTokenRecord,
       comment,
-      voteWeights: isMulti,
+      voteWeights: isMulti
     })
 
     onClose()
@@ -73,20 +78,16 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
           onClick={handleSubmit}
         >
           <div className="flex items-center">
-            {!submitting && isMulti ? (
-              ''
-            ) : vote === VoteKind.Approve ? (
-              <ThumbUpIcon className="h-4 w-4 fill-black mr-2" />
-            ) : vote === VoteKind.Deny ? (
-              <ThumbDownIcon className="h-4 w-4 fill-black mr-2" />
-            ) : (
-              <BanIcon className="h-4 w-4 fill-black mr-2" />
-            )}
-            {submitting ? (
-              <Loading />
-            ) : (
-              <span>Vote {isMulti ? '' : voteString}</span>
-            )}
+            {!submitting &&
+              isMulti ? "" :
+              (vote === VoteKind.Approve ? (
+                <ThumbUpIcon className="h-4 w-4 fill-black mr-2" />
+              ) : vote === VoteKind.Deny ? (
+                <ThumbDownIcon className="h-4 w-4 fill-black mr-2" />
+              ) : (
+                <BanIcon className="h-4 w-4 fill-black mr-2" />
+              ))}
+            {submitting ? <Loading /> : <span>Vote {isMulti ? "" : voteString}</span>}
           </div>
         </Button>
       </div>

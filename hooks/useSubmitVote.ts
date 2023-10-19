@@ -9,10 +9,10 @@ import {
   ProgramAccount,
   Proposal,
   RpcContext,
+  TokenOwnerRecord,
   Vote,
   VoteChoice,
   VoteKind,
-  getTokenOwnerRecordAddress,
   withCastVote,
 } from '@solana/spl-governance'
 import { getProgramVersionForRealm } from '@models/registry/api'
@@ -30,8 +30,6 @@ import { TransactionInstruction } from '@solana/web3.js'
 import useProgramVersion from './useProgramVersion'
 import useVotingTokenOwnerRecords from './useVotingTokenOwnerRecords'
 import { useMemo } from 'react'
-import { useTokenOwnerRecordsDelegatedToUser } from './queries/tokenOwnerRecord'
-import useUserOrDelegator from './useUserOrDelegator'
 
 export const useSubmitVote = () => {
   const wallet = useWalletOnePointOh()
@@ -51,25 +49,20 @@ export const useSubmitVote = () => {
       config?.account.communityTokenConfig.voterWeightAddin?.toBase58()
     )
 
-  const actingAsWalletPk = useUserOrDelegator()
-  const delegators = useTokenOwnerRecordsDelegatedToUser()
-
   const { error, loading, execute } = useAsyncCallback(
     async ({
       vote,
+      voterTokenRecord,
       comment,
       voteWeights,
     }: {
       vote: VoteKind
+      voterTokenRecord: ProgramAccount<TokenOwnerRecord>
       comment?: string
       voteWeights?: number[]
     }) => {
-      if (!proposal) throw new Error()
-      if (!realm) throw new Error()
-      if (!actingAsWalletPk) throw new Error()
-
       const rpcContext = new RpcContext(
-        proposal.owner,
+        proposal!.owner,
         getProgramVersionForRealm(realmInfo!),
         wallet!,
         connection.current,
@@ -89,41 +82,17 @@ export const useSubmitVote = () => {
         )
       }
 
-      const relevantMint =
-        vote !== VoteKind.Veto
-          ? // if its not a veto, business as usual
-            proposal.account.governingTokenMint
-          : // if it is a veto, the vetoing mint is the opposite of the governing mint
-          realm.account.communityMint.equals(
-              proposal.account.governingTokenMint
-            )
-          ? realm.account.config.councilMint
-          : realm.account.communityMint
-      if (relevantMint === undefined) throw new Error()
-
-      const tokenOwnerRecordPk = await getTokenOwnerRecordAddress(
-        realm.owner,
-        realm.pubkey,
-        relevantMint,
-        actingAsWalletPk
-      )
-
-      const relevantDelegators = delegators
-        ?.filter((x) => x.account.governingTokenMint.equals(relevantMint))
-        .map((x) => x.pubkey)
-
       try {
         await castVote(
           rpcContext,
-          realm,
-          proposal,
-          tokenOwnerRecordPk,
+          realm!,
+          proposal!,
+          voterTokenRecord.pubkey,
           vote,
           msg,
           client,
           confirmationCallback,
-          voteWeights,
-          relevantDelegators
+          voteWeights
         )
         queryClient.invalidateQueries({
           queryKey: proposalQueryKeys.all(connection.current.rpcEndpoint),

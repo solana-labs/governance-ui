@@ -102,19 +102,6 @@ export const getNftGovpower = async (
   return power
 }
 
-export const findPluginName = (programId: PublicKey | undefined) =>
-  programId === undefined
-    ? ('vanilla' as const)
-    : VSR_PLUGIN_PKS.includes(programId.toString())
-    ? ('VSR' as const)
-    : HELIUM_VSR_PLUGINS_PKS.includes(programId.toString())
-    ? 'HeliumVSR'
-    : NFT_PLUGINS_PKS.includes(programId.toString())
-    ? 'NFT'
-    : GATEWAY_PLUGINS_PKS.includes(programId.toString())
-    ? 'gateway'
-    : 'unknown'
-
 export const determineVotingPowerType = async (
   connection: Connection,
   realmPk: PublicKey,
@@ -129,7 +116,17 @@ export const determineVotingPowerType = async (
       ? config.result?.account.communityTokenConfig.voterWeightAddin
       : config.result?.account.councilTokenConfig.voterWeightAddin
 
-  return findPluginName(programId)
+  return programId === undefined
+    ? ('vanilla' as const)
+    : VSR_PLUGIN_PKS.includes(programId.toString())
+    ? ('VSR' as const)
+    : HELIUM_VSR_PLUGINS_PKS.includes(programId.toString())
+    ? 'HeliumVSR'
+    : NFT_PLUGINS_PKS.includes(programId.toString())
+    ? 'NFT'
+    : GATEWAY_PLUGINS_PKS.includes(programId.toString())
+    ? 'gateway'
+    : 'unknown'
 }
 
 export const useGovernancePowerAsync = (
