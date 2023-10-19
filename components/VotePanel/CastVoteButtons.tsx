@@ -3,11 +3,58 @@ import { useState } from 'react'
 import { ThumbUpIcon, ThumbDownIcon } from '@heroicons/react/solid'
 import Button from '../Button'
 import VoteCommentModal from '../VoteCommentModal'
-import { useIsInCoolOffTime, useIsVoting, useVotingPop } from './hooks'
+import {
+  useIsInCoolOffTime,
+  useIsVoting,
+  useVoterTokenRecord,
+  useVotingPop,
+} from './hooks'
+import { VotingClientType } from '@utils/uiTypes/VotePlugin'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
 import { useSubmitVote } from '@hooks/useSubmitVote'
 import { useSelectedRealmInfo } from '@hooks/selectedRealm/useSelectedRealmRegistryEntry'
-import { useCanVote } from './useCanVote'
+import { useGovernancePowerAsync } from '@hooks/queries/governancePower'
+
+export const useCanVote = () => {
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
+  const votingPop = useVotingPop()
+  const { result: govPower } = useGovernancePowerAsync(votingPop)
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
+
+  const { data: ownVoteRecord } = useProposalVoteRecordQuery('electoral')
+  const voterTokenRecord = useVoterTokenRecord()
+
+  const isVoteCast = !!ownVoteRecord?.found
+
+  const hasMinAmountToVote = voterTokenRecord && govPower?.gtn(0)
+
+  const canVote =
+    connected &&
+    !(
+      client.clientType === VotingClientType.NftVoterClient && !voterTokenRecord
+    ) &&
+    !(
+      client.clientType === VotingClientType.HeliumVsrClient &&
+      !voterTokenRecord
+    ) &&
+    !isVoteCast &&
+    hasMinAmountToVote
+
+  const voteTooltipContent = !connected
+    ? 'You need to connect your wallet to be able to vote'
+    : client.clientType === VotingClientType.NftVoterClient && !voterTokenRecord
+    ? 'You must join the Realm to be able to vote'
+    : !hasMinAmountToVote
+    ? 'You don’t have governance power to vote in this dao'
+    : ''
+
+  return [canVote, voteTooltipContent] as const
+}
 
 export const CastVoteButtons = () => {
   const [showVoteModal, setShowVoteModal] = useState(false)
@@ -16,6 +63,7 @@ export const CastVoteButtons = () => {
   const allowDiscussion = realmInfo?.allowDiscussion ?? true
   const { submitting, submitVote } = useSubmitVote()
   const votingPop = useVotingPop()
+  const voterTokenRecord = useVoterTokenRecord()
   const [canVote, tooltipContent] = useCanVote()
   const { data: ownVoteRecord } = useProposalVoteRecordQuery('electoral')
 
@@ -31,6 +79,7 @@ export const CastVoteButtons = () => {
     } else {
       await submitVote({
         vote: vote === 'yes' ? VoteKind.Approve : VoteKind.Deny,
+        voterTokenRecord: voterTokenRecord!,
       })
     }
   }
@@ -82,6 +131,7 @@ export const CastVoteButtons = () => {
           isOpen={showVoteModal}
           onClose={() => setShowVoteModal(false)}
           vote={vote === 'yes' ? VoteKind.Approve : VoteKind.Deny}
+          voterTokenRecord={voterTokenRecord!}
         />
       ) : null}
     </div>
