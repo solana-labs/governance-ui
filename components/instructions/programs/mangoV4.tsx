@@ -19,6 +19,7 @@ import EmptyWallet, {
   EditTokenArgsFormatted,
   FlatEditArgs,
   getFormattedListingPresets,
+  decodePriceFromOracleAi,
 } from '@utils/Mango/listingTools'
 import { secondsToHours } from 'date-fns'
 import WarningFilledIcon from '@carbon/icons-react/lib/WarningFilled'
@@ -229,11 +230,20 @@ const instructions = () => ({
       const oracle = accounts[6].pubkey
       const isMintOnCurve = PublicKey.isOnCurve(proposedMint)
 
-      const [info, proposedOracle, args] = await Promise.all([
+      const [info, proposedOracle, args, oracleAi] = await Promise.all([
         displayArgs(connection, data),
         getOracle(connection, oracle),
         getDataObjectFlattened<FlatListingArgs>(connection, data),
+        connection.getAccountInfo(oracle),
       ])
+
+      const oracleData = await decodePriceFromOracleAi(
+        oracle,
+        oracleAi!,
+        connection,
+        proposedOracle.type
+      )
+
       const liqudityTier = await getSuggestedCoinTier(
         proposedMint.toBase58(),
         proposedOracle.type === 'Pyth'
@@ -336,7 +346,7 @@ const instructions = () => ({
                 </div>
               )}
               <div
-                className={`py-4 ${
+                className={`py-2 ${
                   proposedOracle.type === 'Unknown' ? 'text-red' : ''
                 }`}
               >
@@ -356,6 +366,16 @@ const instructions = () => ({
                   </>
                 )}
               </div>
+              {oracleData.uiPrice ? (
+                <div className="py-4 space-y-2">
+                  <div>Oracle Price: ${oracleData.uiPrice}</div>
+                  <div>
+                    Oracle Last known confidence: {oracleData.deviation}%
+                  </div>
+                </div>
+              ) : (
+                <div className="py-4">No Oracle Data</div>
+              )}
               <DisplayListingPropertyWrapped
                 label="Token index"
                 suggestedUntrusted={false}
