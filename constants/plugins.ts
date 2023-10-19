@@ -8,6 +8,7 @@ export const VSR_PLUGIN_PKS: string[] = [
   'VotEn9AWwTFtJPJSMV5F9jsMY6QwWM5qn3XP9PATGW7',
   'VoteWPk9yyGmkX4U77nEWRJWpcc8kUfrPoghxENpstL',
   'VoteMBhDCqGLRgYpp9o7DGyq81KNmwjXQRAHStjtJsS',
+  '5sWzuuYkeWLBdAv3ULrBfqA51zF7Y4rnVzereboNDCPn',
 ]
 
 export const HELIUM_VSR_PLUGINS_PKS: string[] = [
