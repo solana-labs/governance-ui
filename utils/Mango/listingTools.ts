@@ -2,7 +2,6 @@ import {
   OPENBOOK_PROGRAM_ID,
   RouteInfo,
   toNative,
-  toNativeI80F48,
 } from '@blockworks-foundation/mango-v4'
 import {
   LISTING_PRESETS,
@@ -24,7 +23,6 @@ import {
   VersionedTransaction,
 } from '@solana/web3.js'
 import SwitchboardProgram from '@switchboard-xyz/sbv2-lite'
-import { fmtTokenAmount } from '@utils/formatting'
 import Big from 'big.js'
 
 const MAINNET_PYTH_PROGRAM = new PublicKey(
@@ -350,8 +348,10 @@ export const compareObjectsAndGetDifferentKeys = <T extends object>(
   return diffKeys as (keyof T)[]
 }
 
-const isSwitchboardOracle = async (connection: Connection) => {
-  const feedPk = new PublicKey('Ag7RdWj5t3U9avU4XKAY7rBbGDCNz456ckNmcpW1aHoE')
+const isSwitchboardOracle = async (
+  connection: Connection,
+  feedPk: PublicKey
+) => {
   const SWITCHBOARD_PROGRAM_ID = 'SW1TCH7qEPTdLsDHRgPuMQjbQxKdH2aBStViMFnt64f'
 
   const options = AnchorProvider.defaultOptions()
@@ -371,14 +371,7 @@ const isSwitchboardOracle = async (connection: Connection) => {
   )
   const feeds = await switchboardProgram.account.aggregatorAccountData.all()
   const feed = feeds.find((x) => x.publicKey.equals(feedPk))
-  const ai = await connection.getAccountInfo(feedPk)
-  const elo = await decodePriceFromOracleAi(
-    feedPk,
-    ai!,
-    connection,
-    'switchboard'
-  )
-  console.log(elo)
+
   return feed
     ? `https://app.switchboard.xyz/solana/mainnet-beta/feed/${feedPk.toBase58()}`
     : ''
@@ -502,36 +495,36 @@ export const decodePriceFromOracleAi = async (
 ): Promise<{
   uiPrice: number
   lastUpdatedSlot: number
-  deviation: number
+  deviation: string
 }> => {
   let uiPrice, lastUpdatedSlot, deviation
-  if (type === 'pyth') {
-    const priceData = parsePriceData(ai.data)
-    uiPrice = priceData.previousPrice
-    lastUpdatedSlot = parseInt(priceData.lastSlot.toString())
-    deviation =
-      priceData.previousConfidence !== undefined
-        ? priceData.previousConfidence
-        : undefined
-  } else if (type === 'switchboard') {
-    const program = await SwitchboardProgram.loadMainnet(connection)
-    uiPrice = program.decodeLatestAggregatorValue(ai)!.toNumber()
-    lastUpdatedSlot = program
-      .decodeAggregator(ai)
-      .latestConfirmedRound!.roundOpenSlot!.toNumber()
-    deviation = (
-      (switchboardDecimalToBig(
-        program.decodeAggregator(ai).latestConfirmedRound.stdDeviation
-      ).toNumber() /
-        uiPrice) *
-      100
-    ).toFixed(2)
-  } else {
-    throw new Error(
-      `Unknown oracle provider (parsing not implemented) for oracle ${oracle}, with owner ${ai.owner}!`
-    )
+  try {
+    if (type === 'Pyth') {
+      const priceData = parsePriceData(ai.data)
+      uiPrice = priceData.previousPrice
+      lastUpdatedSlot = parseInt(priceData.lastSlot.toString())
+      deviation =
+        priceData.previousConfidence !== undefined
+          ? ((priceData.previousConfidence / uiPrice) * 100).toFixed(2)
+          : undefined
+    } else if (type === 'Switchboard') {
+      const program = await SwitchboardProgram.loadMainnet(connection)
+      uiPrice = program.decodeLatestAggregatorValue(ai)!.toNumber()
+      lastUpdatedSlot = program
+        .decodeAggregator(ai)
+        .latestConfirmedRound!.roundOpenSlot!.toNumber()
+      deviation = (
+        (switchboardDecimalToBig(
+          program.decodeAggregator(ai).latestConfirmedRound.stdDeviation
+        ).toNumber() /
+          uiPrice) *
+        100
+      ).toFixed(2)
+    }
+    return { uiPrice, lastUpdatedSlot, deviation }
+  } catch (e) {
+    return { uiPrice, lastUpdatedSlot, deviation }
   }
-  return { uiPrice, lastUpdatedSlot, deviation }
 }
 
 export function switchboardDecimalToBig(sbDecimal: {
