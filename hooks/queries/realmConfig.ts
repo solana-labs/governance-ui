@@ -25,7 +25,6 @@ export const realmConfigQueryKeys = {
 export const useRealmConfigQuery = () => {
   const { connection } = useConnection()
   const realm = useRealmQuery().data?.result
-
   const enabled = realm !== undefined
   const query = useQuery({
     queryKey: enabled
@@ -38,6 +37,7 @@ export const useRealmConfigQuery = () => {
         realm.owner,
         realm.pubkey
       )
+
       return asFindable(getRealmConfig)(connection, realmConfigPk)
     },
     staleTime: 3600000, // 1 hour
