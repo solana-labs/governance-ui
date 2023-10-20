@@ -3,7 +3,11 @@ import { useGovernanceByPubkeyQuery } from '@hooks/queries/governance'
 import { useSelectedProposalTransactions } from '@hooks/queries/proposalTransaction'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import useRealm from '@hooks/useRealm'
-import { Proposal, getNativeTreasuryAddress } from '@solana/spl-governance'
+import {
+  BPF_UPGRADE_LOADER_ID,
+  Proposal,
+  getNativeTreasuryAddress,
+} from '@solana/spl-governance'
 import { useMemo } from 'react'
 import { useAsync } from 'react-async-hook'
 
@@ -102,9 +106,31 @@ const PossibleWrongGovernance = () => (
   </div>
 )
 
+const ProgramUpgrade = () => (
+  <div className="rounded-md bg-yellow-50 p-4">
+    <div className="flex">
+      <div className="flex-shrink-0">
+        <ExclamationCircleIcon
+          className="h-5 w-5 text-yellow-400"
+          aria-hidden="true"
+        />
+      </div>
+      <div className="ml-3">
+        <h3 className="text-sm font-medium text-yellow-800">
+          Instructions like this one are dangerous
+        </h3>
+        <div className="mt-2">
+          <p className="text-sm text-yellow-700">
+            This proposal upgrade program check params carefully
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+)
+
 const useProposalSafetyCheck = (proposal: Proposal) => {
   const config = useRealmConfigQuery().data?.result
-
   const { realmInfo } = useRealm()
   const { data: transactions } = useSelectedProposalTransactions()
   const governance = useGovernanceByPubkeyQuery(proposal?.governance).data
@@ -123,13 +149,8 @@ const useProposalSafetyCheck = (proposal: Proposal) => {
     )
   )
 
-  const realmConfigWarnings = useMemo(() => {
-    if (
-      realmInfo === undefined ||
-      config === undefined ||
-      transactions === undefined
-    )
-      return []
+  const proposalWarnings = useMemo(() => {
+    if (realmInfo === undefined || transactions === undefined) return []
 
     const ixs = transactions.flatMap((pix) => pix.account.getAllInstructions())
 
@@ -140,15 +161,16 @@ const useProposalSafetyCheck = (proposal: Proposal) => {
         (x) => governance?.pubkey.equals(x) || treasuryAddress.result?.equals(x)
       )
 
-    const realmConfigWarnings: (
+    const proposalWarnings: (
       | 'setGovernanceConfig'
       | 'setRealmConfig'
       | 'thirdPartyInstructionWritesConfig'
       | 'possibleWrongGovernance'
+      | 'programUpgrade'
       | undefined
     )[] = []
 
-    realmConfigWarnings.push(
+    proposalWarnings.push(
       ...ixs.map((ix) => {
         if (ix.programId.equals(realmInfo.programId) && ix.data[0] === 19) {
           return 'setGovernanceConfig'
@@ -156,9 +178,12 @@ const useProposalSafetyCheck = (proposal: Proposal) => {
         if (ix.programId.equals(realmInfo.programId) && ix.data[0] === 22) {
           return 'setRealmConfig'
         }
+        if (ix.programId.equals(BPF_UPGRADE_LOADER_ID)) {
+          return 'programUpgrade'
+        }
         if (
           ix.accounts.find(
-            (a) => a.isWritable && a.pubkey.equals(config.pubkey)
+            (a) => a.isWritable && config && a.pubkey.equals(config.pubkey)
           ) !== undefined
         ) {
           if (ix.programId.equals(realmInfo.programId)) {
@@ -171,10 +196,10 @@ const useProposalSafetyCheck = (proposal: Proposal) => {
     )
 
     if (possibleWrongGovernance) {
-      realmConfigWarnings.push('possibleWrongGovernance')
+      proposalWarnings.push('possibleWrongGovernance')
     }
 
-    return realmConfigWarnings
+    return proposalWarnings
   }, [
     realmInfo,
     config,
@@ -184,7 +209,7 @@ const useProposalSafetyCheck = (proposal: Proposal) => {
     treasuryAddress.result,
   ])
 
-  return realmConfigWarnings
+  return proposalWarnings
 }
 
 const ProposalWarnings = ({ proposal }: { proposal: Proposal }) => {
@@ -198,6 +223,9 @@ const ProposalWarnings = ({ proposal }: { proposal: Proposal }) => {
       )}
       {warnings?.includes('possibleWrongGovernance') && (
         <PossibleWrongGovernance></PossibleWrongGovernance>
+      )}
+      {warnings?.includes('programUpgrade') && (
+        <ProgramUpgrade></ProgramUpgrade>
       )}
     </>
   )
