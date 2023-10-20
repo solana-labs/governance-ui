@@ -15,7 +15,6 @@ import Loading from './Loading'
 import { WalletName, WalletReadyState } from '@solana/wallet-adapter-base'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
-import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { DEFAULT_PROVIDER } from '../utils/wallet-adapters'
 import useViewAsWallet from '@hooks/useViewAsWallet'
 import { ProfileName } from "@components/Profile/ProfileName";
@@ -39,7 +38,6 @@ const ConnectWalletButton = (props) => {
     publicKey: realPublicKey,
     connected,
   } = useWallet()
-  const connection = useLegacyConnectionContext()
 
   const publicKey = debugAdapter?.publicKey ?? realPublicKey
 

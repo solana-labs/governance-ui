@@ -1,5 +1,5 @@
 import { FunctionComponent, useMemo } from 'react'
-import { LogoutIcon, UserCircleIcon } from '@heroicons/react/outline'
+import { LogoutIcon } from '@heroicons/react/outline'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { PublicKey } from '@solana/web3.js'
@@ -10,7 +10,6 @@ import {
   useRealmCommunityMintInfoQuery,
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
-import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import { NFT_PLUGINS_PKS } from '@constants/plugins'
 import {ProfileName} from "@components/Profile/ProfileName";
@@ -110,7 +109,6 @@ const MemberItems = ({
     councilVotes && !councilVotes.isZero()
       ? fmtMintAmount(councilMint, councilVotes)
       : null
-  const connection = useLegacyConnectionContext()
 
   const renderAddressName = useMemo(() => {
     return (

@@ -141,7 +141,6 @@ const LockTokenStats = () => {
   const voteStakeRegistryRegistrar = useVotePluginsClientStore(
     (s) => s.state.voteStakeRegistryRegistrar
   )
-  const connection = useLegacyConnectionContext()
   const governedTokenAccounts = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
   )

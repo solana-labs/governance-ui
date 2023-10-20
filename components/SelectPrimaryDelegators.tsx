@@ -3,7 +3,6 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useTokenOwnerRecordsDelegatedToUser } from '@hooks/queries/tokenOwnerRecord'
 import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
 import { PublicKey } from '@solana/web3.js'
-import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useMemo } from 'react'
 import { ProgramAccount, TokenOwnerRecord } from '@solana/spl-governance'
@@ -104,7 +103,6 @@ function PrimaryDelegatorSelect({
   kind: 'community' | 'council'
   tors: ProgramAccount<TokenOwnerRecord>[]
 }) {
-  const connection = useLegacyConnectionContext()
   return (
     <div className="flex space-x-4 items-center mt-4">
       <div className="bg-bkg-1 px-4 py-2 justify-between rounded-md w-full">
