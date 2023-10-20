@@ -238,7 +238,6 @@ const instructions = () => ({
       ])
 
       const oracleData = await decodePriceFromOracleAi(
-        oracle,
         oracleAi!,
         connection,
         proposedOracle.type
@@ -668,12 +667,36 @@ const instructions = () => ({
     ],
     getDataUI: async (
       connection: Connection,
-      data: Uint8Array
-      //accounts: AccountMetaData[]
+      data: Uint8Array,
+      accounts: AccountMetaData[]
     ) => {
-      const info = await displayArgs(connection, data)
+      const oracle = accounts[6].pubkey
+
+      const [info, proposedOracle, oracleAi] = await Promise.all([
+        displayArgs(connection, data),
+        getOracle(connection, oracle),
+        connection.getAccountInfo(oracle),
+      ])
+
+      const oracleData = await decodePriceFromOracleAi(
+        oracleAi!,
+        connection,
+        proposedOracle.type
+      )
       try {
-        return <div>{info}</div>
+        return (
+          <div>
+            {oracleData.uiPrice ? (
+              <div className="py-4 space-y-2">
+                <div>Oracle Price: ${oracleData.uiPrice}</div>
+                <div>Oracle Last known confidence: {oracleData.deviation}%</div>
+              </div>
+            ) : (
+              <div className="py-4">No Oracle Data</div>
+            )}
+            <div>{info}</div>
+          </div>
+        )
       } catch (e) {
         console.log(e)
         return <div>{JSON.stringify(data)}</div>
