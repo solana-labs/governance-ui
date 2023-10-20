@@ -2,7 +2,7 @@ import Input from '@components/inputs/Input'
 import { GrantInstruction } from '@components/instructions/programs/voteStakeRegistry'
 import { MANGO_DAO_TREASURY } from '@components/instructions/tools'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
-import { SearchIcon, UserCircleIcon } from '@heroicons/react/outline'
+import { SearchIcon } from '@heroicons/react/outline'
 import useRealm from '@hooks/useRealm'
 import { BN, BorshInstructionCoder } from '@coral-xyz/anchor'
 import {
@@ -22,7 +22,6 @@ import {
   getTimeLeftFromNowFmt,
 } from '@utils/dateTools'
 import InfoBox from 'VoteStakeRegistry/components/LockTokenStats/InfoBox'
-import { AddressImage, DisplayAddress } from '@cardinal/namespaces-components'
 import { LockupType } from 'VoteStakeRegistry/sdk/accounts'
 import {
   DepositWithWallet,
@@ -47,6 +46,7 @@ import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { useRealmProposalsQuery } from '@hooks/queries/proposal'
 import { useQuery } from '@tanstack/react-query'
 import { IDL } from 'VoteStakeRegistry/sdk/voter_stake_registry'
+import {ProfileImage, ProfileName} from "@components/Profile";
 
 const VestingVsTime = dynamic(
   () => import('VoteStakeRegistry/components/LockTokenStats/VestingVsTime'),
@@ -437,9 +437,8 @@ const LockTokenStats = () => {
       : symbol
   const renderAddressName = (wallet) => {
     return (
-      <DisplayAddress
-        connection={connection.current}
-        address={new PublicKey(wallet)}
+      <ProfileName
+        publicKey={new PublicKey(wallet)}
         height="25px"
         width="100px"
         dark={true}
@@ -447,14 +446,7 @@ const LockTokenStats = () => {
     )
   }
   const renderAddressImage = (wallet) => (
-    <AddressImage
-      dark={true}
-      connection={connection.current}
-      address={new PublicKey(wallet)}
-      height="25px"
-      width="25px"
-      placeholder={<UserCircleIcon className="h-6 text-fgd-3 w-6" />}
-    />
+    <ProfileImage publicKey={new PublicKey(wallet)} expanded={false} className="h-6 text-fgd-3 w-6" />
   )
 
   return (

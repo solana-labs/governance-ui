@@ -3,7 +3,6 @@ import { LogoutIcon, UserCircleIcon } from '@heroicons/react/outline'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { PublicKey } from '@solana/web3.js'
-import { AddressImage, DisplayAddress } from '@cardinal/namespaces-components'
 import { Member } from '@utils/uiTypes/members'
 import { MintInfo } from '@solana/spl-token'
 import { useRealmQuery } from '@hooks/queries/realm'
@@ -14,6 +13,8 @@ import {
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import { NFT_PLUGINS_PKS } from '@constants/plugins'
+import {ProfileName} from "@components/Profile/ProfileName";
+import {ProfileImage} from "@components/Profile";
 
 interface MembersTabsProps {
   activeTab: Member
@@ -113,9 +114,8 @@ const MemberItems = ({
 
   const renderAddressName = useMemo(() => {
     return (
-      <DisplayAddress
-        connection={connection.current}
-        address={new PublicKey(walletAddress)}
+      <ProfileName
+        publicKey={new PublicKey(walletAddress)}
         height="12px"
         width="100px"
         dark={true}
@@ -125,14 +125,7 @@ const MemberItems = ({
   }, [walletAddress])
   const renderAddressImage = useMemo(
     () => (
-      <AddressImage
-        dark={true}
-        connection={connection.current}
-        address={new PublicKey(walletAddress)}
-        height="32px"
-        width="32px"
-        placeholder={<UserCircleIcon className="w-6 h-6 text-fgd-3" />}
-      />
+        <ProfileImage publicKey={new PublicKey(walletAddress)} expanded={false} className="w-6 h-6 text-fgd-3" />
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     [walletAddress]

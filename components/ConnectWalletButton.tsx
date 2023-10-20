@@ -1,8 +1,6 @@
 import { useRouter } from 'next/router'
-import { AddressImage, DisplayAddress } from '@cardinal/namespaces-components'
 import styled from '@emotion/styled'
 import { Menu } from '@headlessui/react'
-import { UserCircleIcon } from '@heroicons/react/outline'
 import {
   BackspaceIcon,
   CheckCircleIcon,
@@ -12,7 +10,7 @@ import { abbreviateAddress } from '@utils/formatting'
 import { useCallback, useEffect, useState } from 'react'
 import Switch from './Switch'
 import { notify } from '@utils/notifications'
-import { Profile } from '@components/Profile'
+import {Profile, ProfileImage} from '@components/Profile'
 import Loading from './Loading'
 import { WalletName, WalletReadyState } from '@solana/wallet-adapter-base'
 import { useWallet } from '@solana/wallet-adapter-react'
@@ -20,6 +18,7 @@ import { ExternalLinkIcon } from '@heroicons/react/outline'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { DEFAULT_PROVIDER } from '../utils/wallet-adapters'
 import useViewAsWallet from '@hooks/useViewAsWallet'
+import { ProfileName } from "@components/Profile/ProfileName";
 
 const StyledWalletProviderLabel = styled.p`
   font-size: 0.65rem;
@@ -112,18 +111,7 @@ const ConnectWalletButton = (props) => {
           ) : null}
           {connected && publicKey ? (
             <div className="hidden w-12 pr-2 sm:block">
-              <AddressImage
-                dark={true}
-                connection={connection.current}
-                address={publicKey}
-                height="40px"
-                width="40px"
-                placeholder={
-                  <div className="flex items-center justify-center flex-shrink-0 w-10 h-10 mr-2 rounded-full bg-bkg-4">
-                    <UserCircleIcon className="h-9 text-fgd-3 w-9" />
-                  </div>
-                }
-              />{' '}
+              <ProfileImage publicKey={publicKey} expanded={false} className="h-9 text-fgd-3 w-9" />
             </div>
           ) : (
             <div className="hidden pl-2 pr-2 sm:block">
@@ -134,13 +122,12 @@ const ConnectWalletButton = (props) => {
             {connected && publicKey ? (
               <>
                 {connected && publicKey ? (
-                  <DisplayAddress
-                    connection={connection.current}
-                    address={publicKey!}
-                    width="100px"
-                    height="20px"
-                    dark={true}
-                  />
+                    <ProfileName
+                        publicKey={publicKey}
+                        width="100px"
+                        height="20px"
+                        dark={true}
+                    />
                 ) : null}
                 <StyledWalletProviderLabel className="font-normal text-fgd-3">
                   {walletAddressFormatted}

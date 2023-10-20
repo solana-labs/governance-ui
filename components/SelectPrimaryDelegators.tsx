@@ -1,4 +1,3 @@
-import { DisplayAddress } from '@cardinal/namespaces-components'
 import Select from '@components/inputs/Select'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useTokenOwnerRecordsDelegatedToUser } from '@hooks/queries/tokenOwnerRecord'
@@ -9,6 +8,7 @@ import { useRealmQuery } from '@hooks/queries/realm'
 import { useMemo } from 'react'
 import { ProgramAccount, TokenOwnerRecord } from '@solana/spl-governance'
 import { capitalize } from '@utils/helpers'
+import { ProfileName } from './Profile/ProfileName'
 
 const YOUR_WALLET_VALUE = 'Your wallet'
 
@@ -118,9 +118,8 @@ function PrimaryDelegatorSelect({
           componentLabel={
             selectedDelegator ? (
               <div className="relative">
-                <DisplayAddress
-                  connection={connection.current}
-                  address={selectedDelegator}
+                <ProfileName
+                  publicKey={selectedDelegator}
                   height="12px"
                   width="100px"
                   dark={true}
@@ -141,9 +140,8 @@ function PrimaryDelegatorSelect({
               value={delegatedTor.account.governingTokenOwner.toBase58()}
             >
               <div className="relative">
-                <DisplayAddress
-                  connection={connection.current}
-                  address={delegatedTor.account.governingTokenOwner}
+                <ProfileName
+                  publicKey={delegatedTor.account.governingTokenOwner}
                   height="12px"
                   width="100px"
                   dark={true}
