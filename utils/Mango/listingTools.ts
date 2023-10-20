@@ -488,7 +488,6 @@ export const getBestMarket = async ({
 }
 
 export const decodePriceFromOracleAi = async (
-  oracle: PublicKey,
   ai: AccountInfo<Buffer>,
   connection: Connection,
   type: string
