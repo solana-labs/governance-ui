@@ -284,7 +284,7 @@ const grantIx = (programId: PublicKey) => ({
           <>
             {decodedInstructionData ? (
               <div className="space-y-3">
-                <div>Grant to: {accounts[8].pubkey.toBase58()}</div>
+                <div>Grant to: {accounts[3].pubkey.toBase58()}</div>
                 <div>Lock type: {lockupKind}</div>
                 <div>
                   Amount:{' '}
