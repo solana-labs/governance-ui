@@ -99,16 +99,8 @@ const PossibleWrongGovernance = () => (
       </div>
       <div className="ml-3">
         <h3 className="text-sm font-medium text-yellow-800">
-          Instructions like this one are dangerous
+          Possible wrong governance pass, check accounts.
         </h3>
-        <div className="mt-2">
-          <p className="text-sm text-yellow-700">
-            This proposal writes to your governance configuration, this could
-            affect how votes are counted. Both the instruction data AND accounts
-            list contain parameters. Do not pass this proposal if there are any
-            accounts you do not recognize.
-          </p>
-        </div>
       </div>
     </div>
   </div>
