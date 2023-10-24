@@ -7,7 +7,7 @@ import { SupportedMintName } from '@tools/sdk/solend/configuration'
 import { DepositWithMintAccount, Voter } from 'VoteStakeRegistry/sdk/accounts'
 import { LockupKind } from 'VoteStakeRegistry/tools/types'
 import { consts as foresightConsts } from '@foresight-tmp/foresight-sdk'
-import { AssetAccount, StakeAccount } from '@utils/uiTypes/assets'
+import { AssetAccount, GovernanceProgramAccountWithNativeTreasuryAddress, StakeAccount } from '@utils/uiTypes/assets'
 import { RealmInfo } from '@models/registry/api'
 import * as PaymentStreaming from '@mean-dao/payment-streaming'
 
@@ -20,6 +20,7 @@ export enum PackageEnum {
   Identity,
   NftPlugin,
   MangoMarketV4,
+  MapleFinance,
   MeanFinance,
   PsyFinance,
   Serum,
@@ -205,7 +206,7 @@ export interface ForesightHasCategoryId extends ForesightHasGovernedAccount {
 
 export interface ForesightMakeAddMarketListToCategoryParams
   extends ForesightHasCategoryId,
-    ForesightHasMarketListId {}
+  ForesightHasMarketListId { }
 
 export interface ForesightMakeResolveMarketParams extends ForesightHasMarketId {
   winner: number
@@ -371,6 +372,7 @@ export enum Instructions {
   MangoV4TokenAddBank,
   MangoV4AdminWithdrawTokenFees,
   MangoV4WithdrawPerpFees,
+  MapleFinanceLendingDeposit,
   MeanCreateAccount,
   MeanCreateStream,
   MeanFundAccount,

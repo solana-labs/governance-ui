@@ -171,6 +171,10 @@ export default function useGovernanceAssets() {
       name: 'Mango Market v4',
       image: '/img/mango.png',
     },
+    [PackageEnum.MapleFinance]: {
+      name: 'Maple Finance',
+      image: '/img/maplefinance.png',
+    },
     [PackageEnum.MeanFinance]: {
       name: 'Mean Finance',
       image: '/img/meanfinance.png',
@@ -595,6 +599,19 @@ export default function useGovernanceAssets() {
       packageId: PackageEnum.MangoMarketV4,
       isVisible: canUseAnyInstruction,
     },
+    /*
+      ███    ███  █████  ██████  ██      ███████     ███████ ██ ███    ██  █████  ███    ██  ██████ ███████ 
+      ████  ████ ██   ██ ██   ██ ██      ██          ██      ██ ████   ██ ██   ██ ████   ██ ██      ██      
+      ██ ████ ██ ███████ ██████  ██      █████       █████   ██ ██ ██  ██ ███████ ██ ██  ██ ██      █████   
+      ██  ██  ██ ██   ██ ██      ██      ██          ██      ██ ██  ██ ██ ██   ██ ██  ██ ██ ██      ██      
+      ██      ██ ██   ██ ██      ███████ ███████     ██      ██ ██   ████ ██   ██ ██   ████  ██████ ███████ 
+    */
+
+    [Instructions.MapleFinanceLendingDeposit]: {
+      name: 'Lending Deposit',
+      packageId: PackageEnum.MapleFinance,
+    },
+
     /*
       ███    ███ ███████  █████  ███    ██     ███████ ██ ███    ██  █████  ███    ██  ██████ ███████
       ████  ████ ██      ██   ██ ████   ██     ██      ██ ████   ██ ██   ██ ████   ██ ██      ██
