@@ -28,7 +28,7 @@ import {
   SolanaAugmentedProvider,
   SignerWallet,
 } from '@saberhq/solana-contrib'
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { TransactionInstruction } from '@solana/web3.js'
 import { findATAAddrSync } from '@utils/ataTools'
 import { USDC_MINT } from '@blockworks-foundation/mango-v4'
 import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'

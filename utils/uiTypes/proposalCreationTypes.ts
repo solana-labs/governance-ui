@@ -7,7 +7,7 @@ import { SupportedMintName } from '@tools/sdk/solend/configuration'
 import { DepositWithMintAccount, Voter } from 'VoteStakeRegistry/sdk/accounts'
 import { LockupKind } from 'VoteStakeRegistry/tools/types'
 import { consts as foresightConsts } from '@foresight-tmp/foresight-sdk'
-import { AssetAccount, GovernanceProgramAccountWithNativeTreasuryAddress, StakeAccount } from '@utils/uiTypes/assets'
+import { AssetAccount, StakeAccount } from '@utils/uiTypes/assets'
 import { RealmInfo } from '@models/registry/api'
 import * as PaymentStreaming from '@mean-dao/payment-streaming'
 
