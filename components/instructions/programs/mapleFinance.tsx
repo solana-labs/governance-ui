@@ -26,7 +26,7 @@ export const MAPLE_FINANCE_PROGRAM_INSTRUCTIONS = {
       getDataUI: async (
         _connection: Connection,
         data: Uint8Array,
-        accounts: AccountMetaData[]
+        _accounts: AccountMetaData[]
       ) => {
         const dataLayout = struct([
           u8('instruction'),
