@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { useContext, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import * as yup from 'yup'
-import { isFormValid } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import {
@@ -30,6 +28,7 @@ import {
   TOKEN_PROGRAM_ID,
   Token,
 } from '@solana/spl-token'
+import { validateInstruction } from '@utils/instructionTools'
 
 interface CloseVaultsForm {
   governedAccount: AssetAccount | null
@@ -64,13 +63,18 @@ const CloseVaults = ({
   const [vaults, setVaults] = useState<{ [pubkey: string]: Vault }>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
-  const validateInstruction = async (): Promise<boolean> => {
-    const { isValid, validationErrors } = await isFormValid(schema, form)
-    setFormErrors(validationErrors)
-    return isValid
-  }
-  async function getInstruction(): Promise<UiInstruction> {
-    const isValid = await validateInstruction()
+  const schema = useMemo(
+    () =>
+      yup.object().shape({
+        governedAccount: yup
+          .object()
+          .nullable()
+          .required('Program governed account is required'),
+      }),
+    []
+  )
+  const getInstruction = useCallback(async () => {
+    const isValid = await validateInstruction({ schema, form, setFormErrors })
     let serializedInstruction = ''
     const mintsOfCurrentlyPushedAtaInstructions: string[] = []
     const additionalSerializedInstructions: string[] = []
@@ -135,10 +139,17 @@ const CloseVaults = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
-      customHoldUpTime: form.distributionNumber,
     }
     return obj
-  }
+  }, [
+    client?.program.methods,
+    connection,
+    distribution?.publicKey,
+    form,
+    schema,
+    vaults,
+    wallet?.publicKey,
+  ])
   const handleSelectDistribution = async (number: number) => {
     const distribution = await client?.loadDistribution(number)
     setDistribution(distribution)
@@ -189,14 +200,8 @@ const CloseVaults = ({
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form])
-  const schema = yup.object().shape({
-    governedAccount: yup
-      .object()
-      .nullable()
-      .required('Program governed account is required'),
-  })
+  }, [form, getInstruction, handleSetInstructions, index, vaults])
+
   const inputs: InstructionInput[] = [
     {
       label: 'Governance',
