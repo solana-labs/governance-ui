@@ -492,4 +492,7 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
   VoteMBhDCqGLRgYpp9o7DGyq81KNmwjXQRAHStjtJsS: common_instructions(
     new PublicKey('VoteMBhDCqGLRgYpp9o7DGyq81KNmwjXQRAHStjtJsS')
   ),
+  '5sWzuuYkeWLBdAv3ULrBfqA51zF7Y4rnVzereboNDCPn': common_instructions(
+    new PublicKey('5sWzuuYkeWLBdAv3ULrBfqA51zF7Y4rnVzereboNDCPn')
+  ),
 }
