@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { useContext, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import * as yup from 'yup'
-import { isFormValid } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import {
@@ -27,6 +25,7 @@ import Button from '@components/Button'
 import { TOKEN_PROGRAM_ID, Token, u64 } from '@solana/spl-token'
 import Input from '@components/inputs/Input'
 import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
+import { validateInstruction } from '@utils/instructionTools'
 
 interface FillVaultsForm {
   governedAccount: AssetAccount | null
@@ -70,16 +69,24 @@ const FillVaults = ({
   const [vaults, setVaults] = useState<{ [pubkey: string]: Vault }>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
-  const validateInstruction = async (): Promise<boolean> => {
-    const { isValid, validationErrors } = await isFormValid(schema, form)
-    setFormErrors(validationErrors)
-    return isValid
-  }
-  async function getInstruction(): Promise<UiInstruction> {
-    const isValid = await validateInstruction()
+
+  const schema = useMemo(
+    () =>
+      yup.object().shape({
+        governedAccount: yup
+          .object()
+          .nullable()
+          .required('Program governed account is required'),
+      }),
+    []
+  )
+
+  const getInstruction = useCallback(async () => {
+    const isValid = await validateInstruction({ schema, form, setFormErrors })
     let serializedInstruction = ''
     const additionalSerializedInstructions: string[] = []
     const prerequisiteInstructions: TransactionInstruction[] = []
+
     if (
       isValid &&
       form.governedAccount?.governance?.account &&
@@ -111,10 +118,10 @@ const FillVaults = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
-      customHoldUpTime: form.distributionNumber,
     }
+
     return obj
-  }
+  }, [form, schema, transfers, vaults, wallet?.publicKey])
   const handleSelectDistribution = async (number: number) => {
     const distribution = await client?.loadDistribution(number)
     setDistribution(distribution)
@@ -193,14 +200,8 @@ const FillVaults = ({
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form])
-  const schema = yup.object().shape({
-    governedAccount: yup
-      .object()
-      .nullable()
-      .required('Program governed account is required'),
-  })
+  }, [form, getInstruction, handleSetInstructions, index, vaults])
+
   const inputs: InstructionInput[] = [
     {
       label: 'Governance',
