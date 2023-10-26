@@ -63,6 +63,15 @@
     "github": "https://github.com/blockworks-foundation/"
   },
   {
+    "symbol": "XAND",
+    "category": "defi",
+    "displayName": "Xandeum DAO",
+    "programId": "DcG2PZTnj8s4Pnmp7xJswniCskckU5E6XsrKuyD7NYFK",
+    "realmId": "CFprdZRYitjPYEDUQKDQZwao1jcRcU1z1GsFspMpN8Ci",
+    "communityMint": "2j437Lt84XvysJiYbXTSJfAMy26Et9HiVGFvGFp8nYWH",
+    "ogImage": "https://xandeum.com/wp-content/uploads/2023/05/Xandeum-Logo-Standard.png"
+  },
+  {
     "symbol": "HPC",
     "displayName": "CryptoHelp",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
