@@ -187,7 +187,8 @@ const LockTokensAccount: React.FC<{
 
   const depositMint =
     !mint?.supply.isZero() ||
-    config?.account.communityTokenConfig.maxVoterWeightAddin
+    config?.account.communityTokenConfig.maxVoterWeightAddin ||
+    realm?.account.communityMint
       ? realm?.account.communityMint
       : !councilMint?.supply.isZero()
       ? realm?.account.config.councilMint
