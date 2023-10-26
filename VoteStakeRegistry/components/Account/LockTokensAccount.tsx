@@ -185,13 +185,7 @@ const LockTokensAccount: React.FC<{
     ownDeposits, //side effect
   ])
 
-  const depositMint =
-    !mint?.supply.isZero() ||
-    config?.account.communityTokenConfig.maxVoterWeightAddin
-      ? realm?.account.communityMint
-      : !councilMint?.supply.isZero()
-      ? realm?.account.config.councilMint
-      : undefined
+  const depositMint = realm?.account.communityMint
 
   useEffect(() => {
     if (realm?.owner && realm.pubkey && publicKey !== null && depositMint) {
