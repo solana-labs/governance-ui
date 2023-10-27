@@ -131,6 +131,7 @@ const FillVaults = ({
     const v: any = {}
     for (let i = 0; i < distribution.metadata!.mints.length; i++) {
       const mint = distribution.metadata!.mints[i]
+      const type = mint.properties.type
       const vaultAddress = distribution.findVaultAddress(
         new PublicKey(mint.address)
       )
@@ -144,7 +145,7 @@ const FillVaults = ({
           publicKey: vaultAddress,
           amount: tokenAccount?.account.amount,
           mint: tokenAccount?.account.mint,
-          mintIndex: i,
+          mintIndex: type,
         }
       } catch {
         v[vaultAddress.toString()] = { amount: -1, mintIndex: i }

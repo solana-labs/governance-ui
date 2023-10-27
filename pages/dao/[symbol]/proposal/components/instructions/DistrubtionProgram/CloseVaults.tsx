@@ -40,6 +40,7 @@ type Vault = {
   amount: bigint
   mintIndex: number
   mint: PublicKey
+  type: string
 }
 
 const CloseVaults = ({
@@ -159,6 +160,7 @@ const CloseVaults = ({
     const v: any = {}
     for (let i = 0; i < distribution.metadata!.mints.length; i++) {
       const mint = distribution.metadata!.mints[i]
+      const type = mint.properties.type
       const vaultAddress = distribution.findVaultAddress(
         new PublicKey(mint.address)
       )
@@ -173,6 +175,7 @@ const CloseVaults = ({
           amount: tokenAccount?.account.amount,
           mint: tokenAccount?.account.mint,
           mintIndex: i,
+          type: type,
         }
       } catch {
         v[vaultAddress.toString()] = { amount: -1, mintIndex: i }
