@@ -304,11 +304,16 @@ export const ACCOUNT_NAMES = {
   '8XU6iRnVGp1DSWsbXWQVG3BofKncULJPEcU6YV6VRXDv': 'AllDomains Council Mint',
   Hq1ffpMA4368gerKRAdVy7KFrUUMo2NwGwVwcXoFy1Th: 'AllDomains Community Rewards',
   rP3eHs6uEDhQLqJHPLAwaNVENRezAgSnZK6opUtjhhT: 'AllDomains Grants',
-  '27Ma5zSVb8Sv9fuSZcXH2ZghTzdDXuWtzST4NJjXKKVo': 'AllDomains Rewards Governance',
-  '82s94bsTpcXfYbP7vTSwFfoi4cJEkoeQTfMif1h9s1AU': 'AllDomains Community Governance',
-  'CnixsSAVZqvaJEdkFHXXRQmot7RCSJFRHYMJvupbPoiE': 'AllDomains Foundation Governance 1',
-  '95vv4h7GWeBG7DbnzMwB15ZinFKBUiPeg6ea7ZqdGjZx': 'AllDomains Foundation Governance 2',
-  '6gwjRFcW1Y9iuJwXPdz1zZUa3Hcu855dH6APA5LjD8qK': 'AllDomains Treasury Governance',
+  '27Ma5zSVb8Sv9fuSZcXH2ZghTzdDXuWtzST4NJjXKKVo':
+    'AllDomains Rewards Governance',
+  '82s94bsTpcXfYbP7vTSwFfoi4cJEkoeQTfMif1h9s1AU':
+    'AllDomains Community Governance',
+  CnixsSAVZqvaJEdkFHXXRQmot7RCSJFRHYMJvupbPoiE:
+    'AllDomains Foundation Governance 1',
+  '95vv4h7GWeBG7DbnzMwB15ZinFKBUiPeg6ea7ZqdGjZx':
+    'AllDomains Foundation Governance 2',
+  '6gwjRFcW1Y9iuJwXPdz1zZUa3Hcu855dH6APA5LjD8qK':
+    'AllDomains Treasury Governance',
   AWVUWfRnHCTgo123mRXB9BRWaxt6JdZXXKhFMQ5mryKJ: 'AllDomains DAO Governance',
 }
 
@@ -344,6 +349,7 @@ export const HIDDEN_PROPOSALS = new Map<string, string>([
   ['7P3dtUTSvcQcjtJpZHZKEzrGvvHQdQGJrtKFLNAYHvpv', ''],
   ['H5TnbSBNFKJJwKea8tUj7ETcmhRHXQ1N9XCXBSD6Q9P1', ''],
   ['GeMQWvFTasBoui11RqRzMtDPQ9b2BkMK8NzepWzvuXw3', ''],
+  ['CRmUPr8CbfPQ4MAoo2yxSf5qL2nPsddL69kowMfp1JYP', ''],
 ])
 
 export const DEFAULT_NATIVE_SOL_MINT =
@@ -458,11 +464,11 @@ export async function getInstructionDescriptor(
   const descriptor = !instruction.data.length
     ? descriptors
     : descriptors && descriptors[instruction.data[0]]
-      ? descriptors[instruction.data[0]]
-      : //backup if first number is same for couple of instructions inside same idl
-      descriptors && descriptors[`${instruction.data[0]}${instruction.data[1]}`]
-        ? descriptors[`${instruction.data[0]}${instruction.data[1]}`]
-        : descriptors
+    ? descriptors[instruction.data[0]]
+    : //backup if first number is same for couple of instructions inside same idl
+    descriptors && descriptors[`${instruction.data[0]}${instruction.data[1]}`]
+    ? descriptors[`${instruction.data[0]}${instruction.data[1]}`]
+    : descriptors
 
   const dataUI = (descriptor?.getDataUI &&
     (await descriptor?.getDataUI(

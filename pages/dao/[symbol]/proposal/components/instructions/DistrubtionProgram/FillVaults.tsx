@@ -139,8 +139,7 @@ const FillVaults = ({
     const v: any = {}
     for (let i = 0; i < distribution.metadata!.mints.length; i++) {
       const mint = distribution.metadata!.mints[i]
-      const type = distribution.metadata!.mints[i].properties.type
-
+      const type = mint.properties.type
       const vaultAddress = distribution.findVaultAddress(
         new PublicKey(mint.address)
       )
