@@ -22,10 +22,16 @@ import EmptyWallet from '@utils/Mango/listingTools'
 import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { tryGetTokenAccount } from '@utils/tokens'
 import Button from '@components/Button'
-import { TOKEN_PROGRAM_ID, Token, u64 } from '@solana/spl-token'
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  TOKEN_PROGRAM_ID,
+  Token,
+  u64,
+} from '@solana/spl-token'
 import Input from '@components/inputs/Input'
 import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
 import { validateInstruction } from '@utils/instructionTools'
+import useGovernanceNfts from '@components/treasuryV2/WalletList/WalletListItem/AssetList/useGovernanceNfts'
 
 interface FillVaultsForm {
   governedAccount: AssetAccount | null
@@ -37,6 +43,7 @@ type Vault = {
   amount: bigint
   mintIndex: number
   mint: PublicKey
+  type: string
 }
 
 type Transfer = {
@@ -69,6 +76,7 @@ const FillVaults = ({
   const [vaults, setVaults] = useState<{ [pubkey: string]: Vault }>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
+  const nfts = useGovernanceNfts(form.governedAccount?.governance.pubkey)
 
   const schema = useMemo(
     () =>
@@ -145,7 +153,8 @@ const FillVaults = ({
           publicKey: vaultAddress,
           amount: tokenAccount?.account.amount,
           mint: tokenAccount?.account.mint,
-          mintIndex: type,
+          mintIndex: i,
+          type: type,
         }
       } catch {
         v[vaultAddress.toString()] = { amount: -1, mintIndex: i }
@@ -153,6 +162,7 @@ const FillVaults = ({
     }
     setVaults(v)
   }
+
   useEffect(() => {
     if (distribution) {
       fetchVaults()
@@ -171,7 +181,8 @@ const FillVaults = ({
   useEffect(() => {
     if (vaults && form.governedAccount) {
       const trans = Object.values(vaults).map((v) => {
-        const from = assetAccounts.find(
+        const isToken = v.type.toLowerCase() === 'token'
+        const fromToken = assetAccounts.find(
           (assetAccount) =>
             assetAccount.isToken &&
             assetAccount.extensions.mint?.publicKey.equals(v.mint) &&
@@ -179,14 +190,26 @@ const FillVaults = ({
               form.governedAccount!.extensions.transferAddress!
             )
         )
-        if (!from) {
+        const fromNft = nfts?.find((x) => x.id === v.mint.toBase58())
+
+        if (!fromToken && !fromNft) {
           return undefined
         }
+
         return {
-          from: from!.pubkey,
+          from: isToken
+            ? fromToken!.pubkey
+            : PublicKey.findProgramAddressSync(
+                [
+                  new PublicKey(fromNft!.ownership.owner).toBuffer(),
+                  TOKEN_PROGRAM_ID.toBuffer(),
+                  new PublicKey(fromNft!.id).toBuffer(),
+                ],
+                ASSOCIATED_TOKEN_PROGRAM_ID
+              )[0],
           to: v.publicKey,
           amount: '',
-          decimals: from!.extensions.mint!.account.decimals,
+          decimals: isToken ? fromToken!.extensions.mint!.account.decimals : 0,
           mintIndex: v.mintIndex,
         }
       })
