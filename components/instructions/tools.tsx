@@ -51,9 +51,12 @@ export const ACCOUNT_NAMES = {
   '9pDEi3yT9ooT1uw1PApQDYK65advJs4Nt65EJG1m59Yq':
     'Mango Developer Council Mint',
   Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z: 'Mango DAO MNGO Treasury Vault',
+  HvBKrep6TbUpLVB4Lyd5T56LohhpPf3ZdNt7wpTiKqn3: 'Mango DAO Game Master Wallet',
   DiSDgMz4DeNKHXkpqUGoukr1YM9xxc1wH9gusZnMa1ga: 'Mango DAO Dual Realm Deposit',
   '8gjzxiqcU87cvRc7hFiUJgxqLSV7AQnSttfWC5fD9aim':
     'Mango DAO Treasury Council Mint',
+  G1Yc5696GcfL28uAWG6iCaKJwZd8sQzwPJTc2UacsjHN:
+    'Mango DAO Game master Council Mint',
   A9xaHx54B9bRYBga4V6LKFrRaARpMJFYVooEXRAanru5:
     'Mango DAO Treasury Council USDC Treasury',
   '7zGXUAeUkY9pEGfApsY26amibvqsf2dmty1cbtxHdfaQ': 'Mango DAO Wallet Governance',
