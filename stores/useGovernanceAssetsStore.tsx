@@ -56,6 +56,7 @@ const additionalPossibleMintAccounts = {
   Mango: [
     new PublicKey('EGk8Gw7Z484mzAKb7GwCcqrZd4KwwsyU2Dv9woY6uDQu'),
     new PublicKey('8gjzxiqcU87cvRc7hFiUJgxqLSV7AQnSttfWC5fD9aim'),
+    new PublicKey('G1Yc5696GcfL28uAWG6iCaKJwZd8sQzwPJTc2UacsjHN'),
   ],
 }
 const tokenAccountOwnerOffset = 32
