@@ -101,7 +101,7 @@ const FillVaults = ({
       wallet?.publicKey &&
       vaults
     ) {
-      for (const t of transfers) {
+      for (const t of transfers.filter((x) => x.amount)) {
         const mintAmount = parseMintNaturalAmountFromDecimal(
           t.amount,
           t.decimals
