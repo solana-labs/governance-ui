@@ -27,7 +27,7 @@
     ]
   },
   "dependencies": {
-    "@blockworks-foundation/mango-mints-redemption": "0.0.8",
+    "@blockworks-foundation/mango-mints-redemption": "0.0.10",
     "@blockworks-foundation/mango-v4": "0.19.34",
     "@blockworks-foundation/mango-v4-settings": "0.2.16",
     "@blockworks-foundation/mangolana": "0.0.1-beta.15",

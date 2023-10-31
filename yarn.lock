@@ -436,16 +436,16 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@blockworks-foundation/mango-mints-redemption@0.0.8":
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-mints-redemption/-/mango-mints-redemption-0.0.8.tgz#6b02f3e81c9be14fa95ba8da5f156167ac1b971b"
-  integrity sha512-P0F+e6I/TcCGunqZlTaKvH5YbTbqBxx6EyMV4Av2h6VFlwFmJBF2RoUwF27JCpD3F1VzY8nMKGILrLhiTqyWPQ==
+"@blockworks-foundation/mango-mints-redemption@0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-mints-redemption/-/mango-mints-redemption-0.0.10.tgz#51a9a3f8b9278e9686da96747b05b019087e3d37"
+  integrity sha512-8HR1xUzI1pOvbYqVV3afRm9YcSysI/9j/Rk6snw7IU1jTrIEpGgDJGGqwUjotFgKf4Nql2dGwAUrF/dO04W7bQ==
   dependencies:
     "@coral-xyz/anchor" "^0.28.0"
     "@solana/spl-token" "^0.3.8"
     axios "^1.4.0"
     keccak256 "^1.0.6"
-    merkletreejs "^0.3.10"
+    merkletreejs "^0.3.11"
 
 "@blockworks-foundation/mango-v4-settings@0.2.16", "@blockworks-foundation/mango-v4-settings@^0.2.15":
   version "0.2.16"
@@ -6313,12 +6313,12 @@ ansi-escapes@^4.2.1:
   dependencies:
     type-fest "^0.21.3"
 
-ansi-regex@3.0.1, ansi-regex@^2.0.0:
+ansi-regex@3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-3.0.1.tgz#123d6479e92ad45ad897d4054e3c7ca7db4944e1"
   integrity sha512-+O9Jct8wf++lXxxFc4hc8LsjaSq0HFzzL7cVsw8pRDIPdjKD2mT4ytDZlLuSBZ4cLKZFXIrMGO7DbQCtMJJMKw==
 
-"ansi-regex@>=3.0.1 <=5.0.1", ansi-regex@^3.0.0, ansi-regex@^4.1.0, ansi-regex@^5.0.0, ansi-regex@^5.0.1:
+"ansi-regex@>=3.0.1 <=5.0.1", ansi-regex@^2.0.0, ansi-regex@^3.0.0, ansi-regex@^4.1.0, ansi-regex@^5.0.0, ansi-regex@^5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-5.0.1.tgz#082cb2c89c9fe8659a311a53bd6a4dc5301db304"
   integrity sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==
@@ -7779,6 +7779,11 @@ crypto-js@^4.1.1:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-4.1.1.tgz#9e485bcf03521041bd85844786b83fb7619736cf"
   integrity sha512-o2JlM7ydqd3Qk9CA0L4NL6mTzU2sdx96a+oOfPu8Mkl/PK51vSyoi8/rQ8NknZtk44vq15lmhAj9CIAGwgeWKw==
+
+crypto-js@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-4.2.0.tgz#4d931639ecdfd12ff80e8186dba6af2c2e856631"
+  integrity sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==
 
 css-blank-pseudo@^0.1.4:
   version "0.1.4"
@@ -11668,14 +11673,14 @@ merkletreejs@^0.2.32:
     treeify "^1.1.0"
     web3-utils "^1.3.4"
 
-merkletreejs@^0.3.10:
-  version "0.3.10"
-  resolved "https://registry.yarnpkg.com/merkletreejs/-/merkletreejs-0.3.10.tgz#b9abdfc5e3aadaf9eb8b0a35c4b87aea33f5d4b7"
-  integrity sha512-lin42tKfRdkW+6iE5pjtQ9BnH+1Hk3sJ5Fn9hUUSjcXRcJbSISHgPCfYvMNEXiNqZPhz/TyRPEV30qgnujsQ7A==
+merkletreejs@^0.3.11:
+  version "0.3.11"
+  resolved "https://registry.yarnpkg.com/merkletreejs/-/merkletreejs-0.3.11.tgz#e0de05c3ca1fd368de05a12cb8efb954ef6fc04f"
+  integrity sha512-LJKTl4iVNTndhL+3Uz/tfkjD0klIWsHlUzgtuNnNrsf7bAlXR30m+xYB7lHr5Z/l6e/yAIsr26Dabx6Buo4VGQ==
   dependencies:
     bignumber.js "^9.0.1"
     buffer-reverse "^1.0.1"
-    crypto-js "^3.1.9-1"
+    crypto-js "^4.2.0"
     treeify "^1.1.0"
     web3-utils "^1.3.4"
 
