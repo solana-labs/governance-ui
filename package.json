@@ -27,7 +27,7 @@
     ]
   },
   "dependencies": {
-    "@blockworks-foundation/mango-mints-redemption": "0.0.8",
+    "@blockworks-foundation/mango-mints-redemption": "0.0.10",
     "@blockworks-foundation/mango-v4": "0.19.34",
     "@blockworks-foundation/mango-v4-settings": "0.2.16",
     "@blockworks-foundation/mangolana": "0.0.1-beta.15",
@@ -231,7 +231,8 @@
     "@bonfida/spl-name-service": "0.1.47",
     "@bundlr-network/client": "0.7.15",
     "@carbon/icons-react": "11.7.0",
-    "@cardinal/namespaces-components": "2.5.5"
+    "@cardinal/namespaces-components": "2.5.5",
+    "crypto-js": ">=4.1.1"
   },
   "browser": {
     "child_process": false
