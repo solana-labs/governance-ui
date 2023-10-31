@@ -4,6 +4,7 @@ import useRealm from '../hooks/useRealm'
 import {
   getSignatoryRecordAddress,
   ProposalState,
+  serializeInstructionToBase64,
   SignatoryRecord,
 } from '@solana/spl-governance'
 import Button, { SecondaryButton } from './Button'
@@ -31,15 +32,25 @@ import { useAsync } from 'react-async-hook'
 import { useGovernanceAccountByPubkeyQuery } from '@hooks/queries/governanceAccount'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import queryClient from '@hooks/queries/queryClient'
+import useCreateProposal from '@hooks/useCreateProposal'
+import { useSelectedProposalTransactions } from '@hooks/queries/proposalTransaction'
+import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
+import { TransactionInstruction } from '@solana/web3.js'
+import useQueryContext from '@hooks/useQueryContext'
+import { useRouter } from 'next/router'
 
 const ProposalActionsPanel = () => {
+  const { propose } = useCreateProposal()
+  const { fmtUrlWithCluster } = useQueryContext()
+  const router = useRouter()
+  const { realmInfo } = useRealm()
   const proposal = useRouteProposalQuery().data?.result
+  const { data: transactions } = useSelectedProposalTransactions()
   const governance = useProposalGovernanceQuery().data?.result
   const proposalOwner = useTokenOwnerRecordByPubkeyQuery(
     proposal?.account.tokenOwnerRecord
   ).data?.result
 
-  const { realmInfo } = useRealm()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
@@ -108,6 +119,13 @@ const ProposalActionsPanel = () => {
       proposalOwner.account,
       wallet.publicKey
     )
+
+  const canRepropose =
+    proposal &&
+    governance &&
+    proposalOwner &&
+    wallet?.publicKey &&
+    ProposalState.Defeated === proposal?.account.state
 
   const signOffTooltipContent = !connected
     ? 'Connect your wallet to sign off this proposal'
@@ -238,14 +256,73 @@ const ProposalActionsPanel = () => {
       console.error('error cancelling proposal', error)
     }
   }
+
+  const handleRepropose = async () => {
+    try {
+      if (proposal && realmInfo && signatoryRecord) {
+        const proposalAddress = await propose({
+          title: proposal.account.name,
+          description: proposal.account.descriptionLink,
+          voteByCouncil:
+            proposal.account.governingTokenMint !== realmInfo.communityMint,
+          instructionsData: transactions
+            ? [
+                ...transactions.flatMap((tx) =>
+                  tx.account.getAllInstructions().map(
+                    (inst) =>
+                      new InstructionDataWithHoldUpTime({
+                        instruction: {
+                          serializedInstruction: serializeInstructionToBase64(
+                            new TransactionInstruction({
+                              keys: inst.accounts,
+                              programId: inst.programId,
+                              data: Buffer.from(inst.data),
+                            })
+                          ),
+                          isValid: true,
+                          governance: undefined,
+                          customHoldUpTime: tx.account.holdUpTime,
+                        },
+                      })
+                  )
+                ),
+              ]
+            : [],
+          governance: proposal.account.governance,
+        })
+        const url = fmtUrlWithCluster(
+          `/dao/${router.query.symbol}/proposal/${proposalAddress}`
+        )
+        router.push(url)
+      }
+      queryClient.invalidateQueries({
+        queryKey: proposalQueryKeys.all(connection.endpoint),
+      })
+    } catch (error) {
+      notify({
+        type: 'error',
+        message: `Error: Could not sign off proposal.`,
+        description: `${error}`,
+      })
+
+      console.error('error sign off', error)
+    }
+  }
   return (
     <>
       {ProposalState.Cancelled === proposal?.account.state ||
       ProposalState.Succeeded === proposal?.account.state ||
-      ProposalState.Defeated === proposal?.account.state ||
-      (!canCancelProposal && !canSignOff && !canFinalizeVote) ? null : (
+      (!canCancelProposal &&
+        !canSignOff &&
+        !canFinalizeVote &&
+        !canRepropose) ? null : (
         <div>
           <div className="bg-bkg-2 rounded-lg p-6 space-y-6 flex justify-center items-center text-center flex-col w-full mt-4">
+            {canRepropose && (
+              <Button className="w-1/2" onClick={handleRepropose}>
+                Repropose
+              </Button>
+            )}
             {canSignOff && (
               <Button
                 tooltipMessage={signOffTooltipContent}
