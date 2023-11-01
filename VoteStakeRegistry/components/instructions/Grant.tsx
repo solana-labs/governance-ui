@@ -77,7 +77,7 @@ const Grant = ({
   })
   const schema = useMemo(
     () =>
-      getTokenTransferSchema({ form, connection, ignoreAmount }).concat(
+      getTokenTransferSchema({ form, connection, ignoreAmount: true }).concat(
         yup.object().shape({
           startDateUnixSeconds: yup
             .number()
