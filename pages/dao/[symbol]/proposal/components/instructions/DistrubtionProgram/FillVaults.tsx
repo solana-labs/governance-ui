@@ -33,9 +33,11 @@ import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
 import { validateInstruction } from '@utils/instructionTools'
 import useGovernanceNfts from '@components/treasuryV2/WalletList/WalletListItem/AssetList/useGovernanceNfts'
 
+export const SEASON_PREFIX = 112
+
 interface FillVaultsForm {
   governedAccount: AssetAccount | null
-  distributionNumber: number
+  season: number
 }
 
 type Vault = {
@@ -68,7 +70,7 @@ const FillVaults = ({
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<FillVaultsForm>({
     governedAccount: null,
-    distributionNumber: 0,
+    season: 1,
   })
   const [transfers, setTransfers] = useState<Transfer[]>([])
   const [client, setClient] = useState<MangoMintsRedemptionClient>()
@@ -131,7 +133,9 @@ const FillVaults = ({
     return obj
   }, [form, schema, transfers, vaults, wallet?.publicKey])
   const handleSelectDistribution = async (number: number) => {
-    const distribution = await client?.loadDistribution(number)
+    const distribution = await client?.loadDistribution(
+      Number(`${SEASON_PREFIX}${number}`)
+    )
     setDistribution(distribution)
   }
   const fetchVaults = async () => {
@@ -180,39 +184,43 @@ const FillVaults = ({
   }, [])
   useEffect(() => {
     if (vaults && form.governedAccount) {
-      const trans = Object.values(vaults).map((v) => {
-        const isToken = v.type.toLowerCase() === 'token'
-        const fromToken = assetAccounts.find(
-          (assetAccount) =>
-            assetAccount.isToken &&
-            assetAccount.extensions.mint?.publicKey.equals(v.mint) &&
-            assetAccount.extensions.token?.account.owner.equals(
-              form.governedAccount!.extensions.transferAddress!
-            )
-        )
-        const fromNft = nfts?.find((x) => x.id === v.mint.toBase58())
+      const trans = Object.values(vaults)
+        .filter((x) => x.mint)
+        .map((v) => {
+          const isToken = v.type.toLowerCase() === 'token'
+          const fromToken = assetAccounts.find(
+            (assetAccount) =>
+              assetAccount.isToken &&
+              assetAccount.extensions.mint?.publicKey.equals(v.mint) &&
+              assetAccount.extensions.token?.account.owner.equals(
+                form.governedAccount!.extensions.transferAddress!
+              )
+          )
+          const fromNft = nfts?.find((x) => x.id === v.mint.toBase58())
 
-        if (!fromToken && !fromNft) {
-          return undefined
-        }
+          if (!fromToken && !fromNft) {
+            return undefined
+          }
 
-        return {
-          from: isToken
-            ? fromToken!.pubkey
-            : PublicKey.findProgramAddressSync(
-                [
-                  new PublicKey(fromNft!.ownership.owner).toBuffer(),
-                  TOKEN_PROGRAM_ID.toBuffer(),
-                  new PublicKey(fromNft!.id).toBuffer(),
-                ],
-                ASSOCIATED_TOKEN_PROGRAM_ID
-              )[0],
-          to: v.publicKey,
-          amount: '',
-          decimals: isToken ? fromToken!.extensions.mint!.account.decimals : 0,
-          mintIndex: v.mintIndex,
-        }
-      })
+          return {
+            from: isToken
+              ? fromToken!.pubkey
+              : PublicKey.findProgramAddressSync(
+                  [
+                    new PublicKey(fromNft!.ownership.owner).toBuffer(),
+                    TOKEN_PROGRAM_ID.toBuffer(),
+                    new PublicKey(fromNft!.id).toBuffer(),
+                  ],
+                  ASSOCIATED_TOKEN_PROGRAM_ID
+                )[0],
+            to: v.publicKey,
+            amount: '',
+            decimals: isToken
+              ? fromToken!.extensions.mint!.account.decimals
+              : 0,
+            mintIndex: v.mintIndex,
+          }
+        })
       setTransfers(trans.filter((x) => x) as Transfer[])
     } else {
       setTransfers([])
@@ -237,20 +245,18 @@ const FillVaults = ({
       options: solAccounts,
     },
     {
-      label: 'Distribution Number',
-      initialValue: form.distributionNumber,
+      label: 'Season',
+      initialValue: form.season,
       type: InstructionInputType.INPUT,
       additionalComponent: (
         <div>
-          <Button
-            onClick={() => handleSelectDistribution(form.distributionNumber)}
-          >
+          <Button onClick={() => handleSelectDistribution(form.season)}>
             Load
           </Button>
         </div>
       ),
       inputType: 'number',
-      name: 'distributionNumber',
+      name: 'season',
     },
   ]
 

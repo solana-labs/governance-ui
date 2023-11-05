@@ -29,10 +29,11 @@ import {
   Token,
 } from '@solana/spl-token'
 import { validateInstruction } from '@utils/instructionTools'
+import { SEASON_PREFIX } from './FillVaults'
 
 interface CloseVaultsForm {
   governedAccount: AssetAccount | null
-  distributionNumber: number
+  season: number
 }
 
 type Vault = {
@@ -57,7 +58,7 @@ const CloseVaults = ({
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<CloseVaultsForm>({
     governedAccount: null,
-    distributionNumber: 0,
+    season: 0,
   })
   const [client, setClient] = useState<MangoMintsRedemptionClient>()
   const [distribution, setDistribution] = useState<Distribution>()
@@ -152,7 +153,9 @@ const CloseVaults = ({
     wallet?.publicKey,
   ])
   const handleSelectDistribution = async (number: number) => {
-    const distribution = await client?.loadDistribution(number)
+    const distribution = await client?.loadDistribution(
+      Number(`${SEASON_PREFIX}${number}`)
+    )
     setDistribution(distribution)
   }
   const fetchVaults = async () => {
@@ -217,19 +220,17 @@ const CloseVaults = ({
     },
     {
       label: 'Distribution Number',
-      initialValue: form.distributionNumber,
+      initialValue: form.season,
       type: InstructionInputType.INPUT,
       additionalComponent: (
         <div>
-          <Button
-            onClick={() => handleSelectDistribution(form.distributionNumber)}
-          >
+          <Button onClick={() => handleSelectDistribution(form.season)}>
             Load
           </Button>
         </div>
       ),
       inputType: 'number',
-      name: 'distributionNumber',
+      name: 'season',
     },
   ]
 
