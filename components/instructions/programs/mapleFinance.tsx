@@ -52,6 +52,27 @@ export const MAPLE_FINANCE_PROGRAM_INSTRUCTIONS = {
         )
       },
     },
+
+    [23]: {
+      name: 'Maple Finance - Lender Unlock Deposit',
+      accounts: [
+        { name: 'Lender' },
+        { name: 'Lender User' },
+        { name: 'Pool' },
+        { name: 'Globals' },
+        { name: 'Locked Shares' },
+        { name: 'Lender Shares' },
+        { name: 'Token Program' },
+      ],
+      getDataUI: async (
+        _connection: Connection,
+        _data: Uint8Array,
+        _accounts: AccountMetaData[]
+      ) => {
+        return <></>
+      },
+    },
+
     [121]: {
       name: 'Maple Finance - Withdrawal Request Initialize',
       accounts: [

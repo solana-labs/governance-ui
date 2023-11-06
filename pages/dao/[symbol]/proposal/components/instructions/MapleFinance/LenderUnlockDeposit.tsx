@@ -15,9 +15,9 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import {
   getPoolPubkeyFromName,
   governanceInstructionInput,
-  withdrawRequestExecuteInstructionInputs,
+  lendingUnlockDepositInstructionInputs,
   PoolName,
-  WithdrawRequestExecuteSchemaComponents,
+  LendingUnlockDepositSchemaComponents,
 } from '@utils/instructions/MapleFinance/util'
 import { useRealmQuery } from '@hooks/queries/realm'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
@@ -28,15 +28,15 @@ import {
   SolanaAugmentedProvider,
   SignerWallet,
 } from '@saberhq/solana-contrib'
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { TransactionInstruction } from '@solana/web3.js'
+import { findLenderAddress } from '@maplelabs/syrup-sdk'
 
-interface WithdrawalRequestExecuteForm {
+interface LendingUnlockDepositForm {
   governedAccount: AssetAccount | undefined
   poolName: { name: PoolName; value: number }
-  withdrawalRequest: string
 }
 
-const WithdrawalRequestExecute = ({
+const LendingUnlockDeposit = ({
   index,
   governance,
 }: {
@@ -47,7 +47,7 @@ const WithdrawalRequestExecute = ({
   const { assetAccounts } = useGovernanceAssets()
   const connection = useLegacyConnectionContext()
   const shouldBeGoverned = index !== 0 && governance
-  const [form, setForm] = useState<WithdrawalRequestExecuteForm>()
+  const [form, setForm] = useState<LendingUnlockDepositForm>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
   const { wallet } = useWalletDeprecated()
@@ -63,7 +63,7 @@ const WithdrawalRequestExecute = ({
       form!.governedAccount?.governance?.pubkey &&
       connection?.current
     ) {
-      const withdrawalRequestIxs: TransactionInstruction[] = []
+      const lenderUnlockDepositIxs: TransactionInstruction[] = []
 
       const client = mapleFinance.SyrupClient.load({
         provider: new SolanaAugmentedProvider(
@@ -75,26 +75,28 @@ const WithdrawalRequestExecute = ({
       })
 
       const poolAddress = getPoolPubkeyFromName(form!.poolName.name)
+      const lenderUser = form!.governedAccount?.pubkey
+
+      console.log('lenderUser', lenderUser.toBase58())
 
       const pool = await mapleFinance.WrappedPool.load(client, poolAddress)
 
-      const withdrawalRequestAddress = new PublicKey(form!.withdrawalRequest)
+      const [lenderAddress] = await findLenderAddress(poolAddress, lenderUser)
 
-      const withdrawalRequest = await mapleFinance.WrappedWithdrawalRequest.load(
-        client,
-        withdrawalRequestAddress
-      )
+      const [lender, globals] = await Promise.all([
+        mapleFinance.WrappedLender.load(client, lenderAddress),
+        mapleFinance.WrappedGlobals.load(client, pool.data.globals),
+      ])
 
-      const txEnveloppe = await client
-        .lenderActions()
-        .executeWithdrawalRequest({
-          pool,
-          withdrawalRequest,
-        })
+      const txEnveloppe = await client.lenderActions().unlockShares({
+        lender,
+        lenderUser,
+        globals,
+      })
 
-      withdrawalRequestIxs.push(...txEnveloppe.instructions)
+      lenderUnlockDepositIxs.push(...txEnveloppe.instructions)
 
-      serializedInstructions = withdrawalRequestIxs.map(
+      serializedInstructions = lenderUnlockDepositIxs.map(
         serializeInstructionToBase64
       )
     }
@@ -119,7 +121,7 @@ const WithdrawalRequestExecute = ({
       index
     )
   }, [form])
-  const schema = yup.object().shape(WithdrawRequestExecuteSchemaComponents)
+  const schema = yup.object().shape(LendingUnlockDepositSchemaComponents)
   const inputs: InstructionInput[] = [
     governanceInstructionInput(
       realm,
@@ -127,8 +129,7 @@ const WithdrawalRequestExecute = ({
       assetAccounts,
       shouldBeGoverned
     ),
-    withdrawRequestExecuteInstructionInputs.poolName,
-    withdrawRequestExecuteInstructionInputs.withdrawalRequest,
+    lendingUnlockDepositInstructionInputs.poolName,
   ]
 
   return (
@@ -144,4 +145,4 @@ const WithdrawalRequestExecute = ({
   )
 }
 
-export default WithdrawalRequestExecute
+export default LendingUnlockDeposit

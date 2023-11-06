@@ -373,6 +373,7 @@ export enum Instructions {
   MangoV4AdminWithdrawTokenFees,
   MangoV4WithdrawPerpFees,
   MapleFinanceLendingDeposit,
+  MapleFinanceLendingUnlockDeposit,
   MapleFinanceWithdrawalRequestInitialize,
   MapleFinanceWithdrawalRequestExecute,
   MeanCreateAccount,

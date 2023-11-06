@@ -129,3 +129,27 @@ export const withdrawRequestExecuteInstructionInputs: Record<
     type: InstructionInputType.INPUT,
   },
 }
+
+export const LendingUnlockDepositSchemaComponents = {
+  governedAccount: yup
+    .object()
+    .nullable()
+    .required('Governed account is required'),
+  poolName: yup.object().shape({
+    name: yup.string().required('Pool name is required'),
+    value: yup.string().required('Pool name is required'),
+  }),
+}
+
+export const lendingUnlockDepositInstructionInputs: Record<
+  string,
+  InstructionInput
+> = {
+  poolName: {
+    label: 'Pool Name',
+    name: 'poolName',
+    type: InstructionInputType.SELECT,
+    initialValue: 'CASH MANAGEMENT POOL',
+    options: [{ value: 0, name: 'CASH MANAGEMENT POOL' }],
+  },
+}

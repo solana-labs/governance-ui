@@ -105,6 +105,7 @@ import UpdateConfigParams from './components/instructions/Serum/UpdateConfigPara
 import { StyledLabel, inputClasses } from '@components/inputs/styles'
 import SelectInstructionType from '@components/SelectInstructionType'
 import MapleFinanceLenderDeposit from './components/instructions/MapleFinance/LenderDeposit'
+import MapleFinanceLendingUnlockDeposit from './components/instructions/MapleFinance/LenderUnlockDeposit'
 import MapleFinanceWithdrawalRequestInitialize from './components/instructions/MapleFinance/WithdrawalRequestInitialize'
 import MapleFinanceWithdrawalRequestExecute from './components/instructions/MapleFinance/WithdrawalRequestExecute'
 import AddKeyToDID from './components/instructions/Identity/AddKeyToDID'
@@ -501,6 +502,7 @@ const New = () => {
       [Instructions.DistributionCloseVaults]: CloseVaults,
       [Instructions.DistributionFillVaults]: FillVaults,
       [Instructions.MapleFinanceLendingDeposit]: MapleFinanceLenderDeposit,
+      [Instructions.MapleFinanceLendingUnlockDeposit]: MapleFinanceLendingUnlockDeposit,
       [Instructions.MapleFinanceWithdrawalRequestInitialize]: MapleFinanceWithdrawalRequestInitialize,
       [Instructions.MapleFinanceWithdrawalRequestExecute]: MapleFinanceWithdrawalRequestExecute,
       [Instructions.MeanCreateAccount]: MeanCreateAccount,

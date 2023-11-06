@@ -161,6 +161,7 @@ const WithdrawalRequestInitialize = ({
       assetAccounts,
       shouldBeGoverned
     ),
+    withdrawRequestInitializeInstructionInputs.poolName,
     {
       ...withdrawRequestInitializeInstructionInputs.sharesAmount,
       additionalComponent: (
@@ -170,7 +171,6 @@ const WithdrawalRequestInitialize = ({
         </div>
       ),
     },
-    withdrawRequestInitializeInstructionInputs.poolName,
   ]
 
   useEffect(() => {
