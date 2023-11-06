@@ -33,7 +33,7 @@ import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
 import { validateInstruction } from '@utils/instructionTools'
 import useGovernanceNfts from '@components/treasuryV2/WalletList/WalletListItem/AssetList/useGovernanceNfts'
 
-export const SEASON_PREFIX = 114
+export const SEASON_PREFIX = 115
 
 interface FillVaultsForm {
   governedAccount: AssetAccount | null
