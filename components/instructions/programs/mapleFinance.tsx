@@ -52,5 +52,53 @@ export const MAPLE_FINANCE_PROGRAM_INSTRUCTIONS = {
         )
       },
     },
+    [121]: {
+      name: 'Maple Finance - Withdrawal Request Initialize',
+      accounts: [
+        { name: 'Lender' },
+        { name: 'Lender Owner' },
+        { name: 'Pool' },
+        { name: 'Globals' },
+        { name: 'Shares Mint' },
+        { name: 'Lender Share Account' },
+        { name: 'Withdrawal Request' },
+        { name: 'Withdrawal Request Locker' },
+        { name: 'System Program' },
+        { name: 'Token Program' },
+        { name: 'Rent' },
+      ],
+      getDataUI: async (
+        _connection: Connection,
+        _data: Uint8Array,
+        _accounts: AccountMetaData[]
+      ) => {
+        return <></>
+      },
+    },
+
+    [90]: {
+      name: 'Maple Finance - Withdrawal Request Execute',
+      accounts: [
+        { name: 'Withdrawal Request' },
+        { name: 'Lender Owner' },
+        { name: 'Lender' },
+        { name: 'Pool' },
+        { name: 'Globals' },
+        { name: 'Base Mint' },
+        { name: 'Pool Locker' },
+        { name: 'Shares Mint' },
+        { name: 'Withdrawal Request Locker' },
+        { name: 'Lender Locker' },
+        { name: 'System Program' },
+        { name: 'Token Program' },
+      ],
+      getDataUI: async (
+        _connection: Connection,
+        _data: Uint8Array,
+        _accounts: AccountMetaData[]
+      ) => {
+        return <></>
+      },
+    },
   },
 }

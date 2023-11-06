@@ -15,9 +15,9 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import {
   getPoolPubkeyFromName,
   governanceInstructionInput,
-  lendingDepositInstructionInputs,
+  withdrawRequestExecuteInstructionInputs,
   PoolName,
-  LendingDepositSchemaComponents,
+  WithdrawRequestExecuteSchemaComponents,
 } from '@utils/instructions/MapleFinance/util'
 import { useRealmQuery } from '@hooks/queries/realm'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
@@ -28,18 +28,15 @@ import {
   SolanaAugmentedProvider,
   SignerWallet,
 } from '@saberhq/solana-contrib'
-import { TransactionInstruction } from '@solana/web3.js'
-import { findATAAddrSync } from '@utils/ataTools'
-import { USDC_MINT } from '@blockworks-foundation/mango-v4'
-import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 
-interface LendingDepositForm {
+interface WithdrawalRequestExecuteForm {
   governedAccount: AssetAccount | undefined
-  depositAmount: number
   poolName: { name: PoolName; value: number }
+  withdrawalRequest: string
 }
 
-const LendingDeposit = ({
+const WithdrawalRequestExecute = ({
   index,
   governance,
 }: {
@@ -50,7 +47,7 @@ const LendingDeposit = ({
   const { assetAccounts } = useGovernanceAssets()
   const connection = useLegacyConnectionContext()
   const shouldBeGoverned = index !== 0 && governance
-  const [form, setForm] = useState<LendingDepositForm>()
+  const [form, setForm] = useState<WithdrawalRequestExecuteForm>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
   const { wallet } = useWalletDeprecated()
@@ -66,7 +63,7 @@ const LendingDeposit = ({
       form!.governedAccount?.governance?.pubkey &&
       connection?.current
     ) {
-      const lenderDepositIxs: TransactionInstruction[] = []
+      const withdrawalRequestIxs: TransactionInstruction[] = []
 
       const client = mapleFinance.SyrupClient.load({
         provider: new SolanaAugmentedProvider(
@@ -78,27 +75,26 @@ const LendingDeposit = ({
       })
 
       const poolAddress = getPoolPubkeyFromName(form!.poolName.name)
-      const lenderUser = form!.governedAccount?.pubkey
-
-      const [usdcATA] = findATAAddrSync(lenderUser, USDC_MINT)
 
       const pool = await mapleFinance.WrappedPool.load(client, poolAddress)
 
-      const uiAmount = form!.depositAmount
+      const withdrawalRequestAddress = new PublicKey(form!.withdrawalRequest)
 
-      // USDC is 6 decimals
-      const nativeAmount = parseMintNaturalAmountFromDecimal(uiAmount, 6)
+      const withdrawalRequest = await mapleFinance.WrappedWithdrawalRequest.load(
+        client,
+        withdrawalRequestAddress
+      )
 
-      const txEnveloppe = await client.lenderActions().deposit({
-        amount: nativeAmount,
-        pool,
-        lenderUser,
-        lenderLocker: usdcATA,
-      })
+      const txEnveloppe = await client
+        .lenderActions()
+        .executeWithdrawalRequest({
+          pool,
+          withdrawalRequest,
+        })
 
-      lenderDepositIxs.push(...txEnveloppe.instructions)
+      withdrawalRequestIxs.push(...txEnveloppe.instructions)
 
-      serializedInstructions = lenderDepositIxs.map(
+      serializedInstructions = withdrawalRequestIxs.map(
         serializeInstructionToBase64
       )
     }
@@ -123,7 +119,7 @@ const LendingDeposit = ({
       index
     )
   }, [form])
-  const schema = yup.object().shape(LendingDepositSchemaComponents)
+  const schema = yup.object().shape(WithdrawRequestExecuteSchemaComponents)
   const inputs: InstructionInput[] = [
     governanceInstructionInput(
       realm,
@@ -131,8 +127,9 @@ const LendingDeposit = ({
       assetAccounts,
       shouldBeGoverned
     ),
-    lendingDepositInstructionInputs.depositAmount,
-    lendingDepositInstructionInputs.poolName,
+    withdrawRequestExecuteInstructionInputs.sharesAmount,
+    withdrawRequestExecuteInstructionInputs.poolName,
+    withdrawRequestExecuteInstructionInputs.withdrawalRequest,
   ]
 
   return (
@@ -148,4 +145,4 @@ const LendingDeposit = ({
   )
 }
 
-export default LendingDeposit
+export default WithdrawalRequestExecute

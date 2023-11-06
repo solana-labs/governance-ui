@@ -611,6 +611,14 @@ export default function useGovernanceAssets() {
       name: 'Lending Deposit',
       packageId: PackageEnum.MapleFinance,
     },
+    [Instructions.MapleFinanceWithdrawalRequestInitialize]: {
+      name: 'Withdrawal Request Initialize',
+      packageId: PackageEnum.MapleFinance,
+    },
+    [Instructions.MapleFinanceWithdrawalRequestExecute]: {
+      name: 'Withdrawal Request Execute',
+      packageId: PackageEnum.MapleFinance,
+    },
 
     /*
       ███    ███ ███████  █████  ███    ██     ███████ ██ ███    ██  █████  ███    ██  ██████ ███████
