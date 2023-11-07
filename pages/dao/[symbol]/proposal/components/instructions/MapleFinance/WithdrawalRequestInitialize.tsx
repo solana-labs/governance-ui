@@ -117,15 +117,6 @@ const WithdrawalRequestInitialize = ({
           lenderUser,
         })
 
-      console.info(
-        'withdrawal request',
-        txEnveloppe.withdrawalRequest.toBase58()
-      )
-      console.info(
-        'withdrawal request locker',
-        txEnveloppe.withdrawalRequestLocker.toBase58()
-      )
-
       withdrawalRequestIxs.push(...txEnveloppe.tx.instructions)
 
       serializedInstructions = withdrawalRequestIxs.map(

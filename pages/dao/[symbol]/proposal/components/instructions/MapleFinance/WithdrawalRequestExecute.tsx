@@ -85,14 +85,21 @@ const WithdrawalRequestExecute = ({
         withdrawalRequestAddress
       )
 
+      const lenderUser = form!.governedAccount?.pubkey
+
       const txEnveloppe = await client
         .lenderActions()
         .executeWithdrawalRequest({
           pool,
           withdrawalRequest,
+          lenderUser,
         })
 
-      withdrawalRequestIxs.push(...txEnveloppe.instructions)
+      // remove the last instruction which is the close account instruction
+      // otherwise the transaction will fail due to Transaction too large: 1256 > 1232
+      const ixs = txEnveloppe.instructions.slice(0, -1)
+
+      withdrawalRequestIxs.push(...ixs)
 
       serializedInstructions = withdrawalRequestIxs.map(
         serializeInstructionToBase64
