@@ -153,3 +153,35 @@ export const lendingUnlockDepositInstructionInputs: Record<
     options: [{ value: 0, name: 'CASH MANAGEMENT POOL' }],
   },
 }
+
+export const WithdrawRequestCloseSchemaComponents = {
+  governedAccount: yup
+    .object()
+    .nullable()
+    .required('Governed account is required'),
+  poolName: yup.object().shape({
+    name: yup.string().required('Pool name is required'),
+    value: yup.string().required('Pool name is required'),
+  }),
+  withdrawalRequest: yup.string().required('withdrawalRequest is required'),
+}
+
+export const withdrawRequestCloseInstructionInputs: Record<
+  string,
+  InstructionInput
+> = {
+  poolName: {
+    label: 'Pool Name',
+    name: 'poolName',
+    type: InstructionInputType.SELECT,
+    initialValue: 'CASH MANAGEMENT POOL',
+    options: [{ value: 0, name: 'CASH MANAGEMENT POOL' }],
+  },
+  withdrawalRequest: {
+    label: 'Withdrawal Request (Pubkey)',
+    initialValue: '',
+    inputType: 'string',
+    name: 'withdrawalRequest',
+    type: InstructionInputType.INPUT,
+  },
+}

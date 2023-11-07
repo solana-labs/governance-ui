@@ -108,6 +108,7 @@ import MapleFinanceLenderDeposit from './components/instructions/MapleFinance/Le
 import MapleFinanceLendingUnlockDeposit from './components/instructions/MapleFinance/LenderUnlockDeposit'
 import MapleFinanceWithdrawalRequestInitialize from './components/instructions/MapleFinance/WithdrawalRequestInitialize'
 import MapleFinanceWithdrawalRequestExecute from './components/instructions/MapleFinance/WithdrawalRequestExecute'
+import MapleFinanceWithdrawalRequestClose from './components/instructions/MapleFinance/WithdrawalRequestClose'
 import AddKeyToDID from './components/instructions/Identity/AddKeyToDID'
 import RemoveKeyFromDID from './components/instructions/Identity/RemoveKeyFromDID'
 import AddServiceToDID from './components/instructions/Identity/AddServiceToDID'
@@ -505,6 +506,7 @@ const New = () => {
       [Instructions.MapleFinanceLendingUnlockDeposit]: MapleFinanceLendingUnlockDeposit,
       [Instructions.MapleFinanceWithdrawalRequestInitialize]: MapleFinanceWithdrawalRequestInitialize,
       [Instructions.MapleFinanceWithdrawalRequestExecute]: MapleFinanceWithdrawalRequestExecute,
+      [Instructions.MapleFinanceWithdrawalRequestClose]: MapleFinanceWithdrawalRequestClose,
       [Instructions.MeanCreateAccount]: MeanCreateAccount,
       [Instructions.MeanFundAccount]: MeanFundAccount,
       [Instructions.MeanWithdrawFromAccount]: MeanWithdrawFromAccount,

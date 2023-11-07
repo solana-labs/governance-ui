@@ -599,6 +599,7 @@ export default function useGovernanceAssets() {
       packageId: PackageEnum.MangoMarketV4,
       isVisible: canUseAnyInstruction,
     },
+
     /*
       ███    ███  █████  ██████  ██      ███████     ███████ ██ ███    ██  █████  ███    ██  ██████ ███████ 
       ████  ████ ██   ██ ██   ██ ██      ██          ██      ██ ████   ██ ██   ██ ████   ██ ██      ██      
@@ -621,6 +622,10 @@ export default function useGovernanceAssets() {
     },
     [Instructions.MapleFinanceWithdrawalRequestExecute]: {
       name: 'Withdrawal Request Execute',
+      packageId: PackageEnum.MapleFinance,
+    },
+    [Instructions.MapleFinanceWithdrawalRequestClose]: {
+      name: 'Withdrawal Request Close',
       packageId: PackageEnum.MapleFinance,
     },
 

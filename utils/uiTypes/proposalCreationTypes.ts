@@ -376,6 +376,7 @@ export enum Instructions {
   MapleFinanceLendingUnlockDeposit,
   MapleFinanceWithdrawalRequestInitialize,
   MapleFinanceWithdrawalRequestExecute,
+  MapleFinanceWithdrawalRequestClose,
   MeanCreateAccount,
   MeanCreateStream,
   MeanFundAccount,
