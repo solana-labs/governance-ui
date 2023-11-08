@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { useContext, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import * as yup from 'yup'
-import { isFormValid } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import {
@@ -30,10 +28,12 @@ import {
   TOKEN_PROGRAM_ID,
   Token,
 } from '@solana/spl-token'
+import { validateInstruction } from '@utils/instructionTools'
+import { SEASON_PREFIX } from './FillVaults'
 
 interface CloseVaultsForm {
   governedAccount: AssetAccount | null
-  distributionNumber: number
+  season: number
 }
 
 type Vault = {
@@ -41,6 +41,7 @@ type Vault = {
   amount: bigint
   mintIndex: number
   mint: PublicKey
+  type: string
 }
 
 const CloseVaults = ({
@@ -57,20 +58,25 @@ const CloseVaults = ({
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<CloseVaultsForm>({
     governedAccount: null,
-    distributionNumber: 0,
+    season: 0,
   })
   const [client, setClient] = useState<MangoMintsRedemptionClient>()
   const [distribution, setDistribution] = useState<Distribution>()
   const [vaults, setVaults] = useState<{ [pubkey: string]: Vault }>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
-  const validateInstruction = async (): Promise<boolean> => {
-    const { isValid, validationErrors } = await isFormValid(schema, form)
-    setFormErrors(validationErrors)
-    return isValid
-  }
-  async function getInstruction(): Promise<UiInstruction> {
-    const isValid = await validateInstruction()
+  const schema = useMemo(
+    () =>
+      yup.object().shape({
+        governedAccount: yup
+          .object()
+          .nullable()
+          .required('Program governed account is required'),
+      }),
+    []
+  )
+  const getInstruction = useCallback(async () => {
+    const isValid = await validateInstruction({ schema, form, setFormErrors })
     let serializedInstruction = ''
     const mintsOfCurrentlyPushedAtaInstructions: string[] = []
     const additionalSerializedInstructions: string[] = []
@@ -135,12 +141,21 @@ const CloseVaults = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
-      customHoldUpTime: form.distributionNumber,
     }
     return obj
-  }
+  }, [
+    client?.program.methods,
+    connection,
+    distribution?.publicKey,
+    form,
+    schema,
+    vaults,
+    wallet?.publicKey,
+  ])
   const handleSelectDistribution = async (number: number) => {
-    const distribution = await client?.loadDistribution(number)
+    const distribution = await client?.loadDistribution(
+      Number(`${SEASON_PREFIX}${number}`)
+    )
     setDistribution(distribution)
   }
   const fetchVaults = async () => {
@@ -148,6 +163,7 @@ const CloseVaults = ({
     const v: any = {}
     for (let i = 0; i < distribution.metadata!.mints.length; i++) {
       const mint = distribution.metadata!.mints[i]
+      const type = mint.properties.type
       const vaultAddress = distribution.findVaultAddress(
         new PublicKey(mint.address)
       )
@@ -162,6 +178,7 @@ const CloseVaults = ({
           amount: tokenAccount?.account.amount,
           mint: tokenAccount?.account.mint,
           mintIndex: i,
+          type: type,
         }
       } catch {
         v[vaultAddress.toString()] = { amount: -1, mintIndex: i }
@@ -189,14 +206,8 @@ const CloseVaults = ({
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form])
-  const schema = yup.object().shape({
-    governedAccount: yup
-      .object()
-      .nullable()
-      .required('Program governed account is required'),
-  })
+  }, [form, getInstruction, handleSetInstructions, index, vaults])
+
   const inputs: InstructionInput[] = [
     {
       label: 'Governance',
@@ -209,19 +220,17 @@ const CloseVaults = ({
     },
     {
       label: 'Distribution Number',
-      initialValue: form.distributionNumber,
+      initialValue: form.season,
       type: InstructionInputType.INPUT,
       additionalComponent: (
         <div>
-          <Button
-            onClick={() => handleSelectDistribution(form.distributionNumber)}
-          >
+          <Button onClick={() => handleSelectDistribution(form.season)}>
             Load
           </Button>
         </div>
       ),
       inputType: 'number',
-      name: 'distributionNumber',
+      name: 'season',
     },
   ]
 

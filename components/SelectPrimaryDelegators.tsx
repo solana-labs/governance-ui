@@ -7,7 +7,7 @@ import { useRealmQuery } from '@hooks/queries/realm'
 import { useMemo } from 'react'
 import { ProgramAccount, TokenOwnerRecord } from '@solana/spl-governance'
 import { capitalize } from '@utils/helpers'
-import { abbreviateAddress } from '@utils/formatting'
+import { ProfileName } from './Profile/ProfileName'
 
 const YOUR_WALLET_VALUE = 'Your wallet'
 
@@ -116,7 +116,12 @@ function PrimaryDelegatorSelect({
           componentLabel={
             selectedDelegator ? (
               <div className="relative">
-                {abbreviateAddress(selectedDelegator)}
+                <ProfileName
+                  publicKey={selectedDelegator}
+                  height="12px"
+                  width="100px"
+                  dark={true}
+                />
                 <div className="absolute bg-bkg-1 bottom-0 left-0 w-full h-full opacity-0	" />
               </div>
             ) : (
@@ -133,7 +138,12 @@ function PrimaryDelegatorSelect({
               value={delegatedTor.account.governingTokenOwner.toBase58()}
             >
               <div className="relative">
-                {abbreviateAddress(delegatedTor.account.governingTokenOwner)}
+                <ProfileName
+                  publicKey={delegatedTor.account.governingTokenOwner}
+                  height="12px"
+                  width="100px"
+                  dark={true}
+                />
                 <div className="absolute bg-bkg-1 bottom-0 left-0 w-full h-full opacity-0	" />
               </div>
             </Select.Option>

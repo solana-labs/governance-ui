@@ -10,17 +10,20 @@ import {
   ListingPreset,
   getTierWithAdjustedNetBorrows,
 } from '@blockworks-foundation/mango-v4-settings/lib/helpers/listingTools'
-import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
+import { AnchorProvider, BN, Program, Wallet } from '@coral-xyz/anchor'
 import { MAINNET_USDC_MINT } from '@foresight-tmp/foresight-sdk/dist/consts'
 import { Market } from '@project-serum/serum'
-import { PythHttpClient } from '@pythnetwork/client'
+import { PythHttpClient, parsePriceData } from '@pythnetwork/client'
 import {
+  AccountInfo,
   Connection,
   Keypair,
   PublicKey,
   Transaction,
   VersionedTransaction,
 } from '@solana/web3.js'
+import SwitchboardProgram from '@switchboard-xyz/sbv2-lite'
+import Big from 'big.js'
 
 const MAINNET_PYTH_PROGRAM = new PublicKey(
   'FsJ3A3u2vn5cTVofAjvy6y5kwABJAqYWpe4975bi2epH'
@@ -368,6 +371,7 @@ const isSwitchboardOracle = async (
   )
   const feeds = await switchboardProgram.account.aggregatorAccountData.all()
   const feed = feeds.find((x) => x.publicKey.equals(feedPk))
+
   return feed
     ? `https://app.switchboard.xyz/solana/mainnet-beta/feed/${feedPk.toBase58()}`
     : ''
@@ -481,4 +485,56 @@ export const getBestMarket = async ({
   } catch (e) {
     return null
   }
+}
+
+export const decodePriceFromOracleAi = async (
+  ai: AccountInfo<Buffer>,
+  connection: Connection,
+  type: string
+): Promise<{
+  uiPrice: number
+  lastUpdatedSlot: number
+  deviation: string
+}> => {
+  let uiPrice, lastUpdatedSlot, deviation
+  try {
+    if (type === 'Pyth') {
+      const priceData = parsePriceData(ai.data)
+      uiPrice = priceData.previousPrice
+      lastUpdatedSlot = parseInt(priceData.lastSlot.toString())
+      deviation =
+        priceData.previousConfidence !== undefined
+          ? ((priceData.previousConfidence / uiPrice) * 100).toFixed(2)
+          : undefined
+    } else if (type === 'Switchboard') {
+      const program = await SwitchboardProgram.loadMainnet(connection)
+      uiPrice = program.decodeLatestAggregatorValue(ai)!.toNumber()
+      lastUpdatedSlot = program
+        .decodeAggregator(ai)
+        .latestConfirmedRound!.roundOpenSlot!.toNumber()
+      deviation = (
+        (switchboardDecimalToBig(
+          program.decodeAggregator(ai).latestConfirmedRound.stdDeviation
+        ).toNumber() /
+          uiPrice) *
+        100
+      ).toFixed(2)
+    }
+    return { uiPrice, lastUpdatedSlot, deviation }
+  } catch (e) {
+    return { uiPrice, lastUpdatedSlot, deviation }
+  }
+}
+
+export function switchboardDecimalToBig(sbDecimal: {
+  mantissa: BN
+  scale: number
+}): Big {
+  const mantissa = new Big(sbDecimal.mantissa.toString())
+  const scale = sbDecimal.scale
+  const oldDp = Big.DP
+  Big.DP = 20
+  const result: Big = mantissa.div(new Big(10).pow(scale))
+  Big.DP = oldDp
+  return result
 }

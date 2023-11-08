@@ -14,12 +14,25 @@
     "sortRank": -1000
   },
   {
+    "symbol": "GrapeUX",
+    "displayName": "Grape UX",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "jtncbMzs2k3wypGiLBtM55ou3mFERpeZniH7V1Bq4zg",
+    "ogImage": "https://gizd7klcchftk5lmjgketydzoblxqeb2x4uacdle4q6ayhdety4q.arweave.net/MjI_qWIRyzV1bEmUSeB5cFd4EDq_KAENZOQ8DBxknjk?ext=png",
+    "github": "https://github.com/Grape-Labs",
+    "website": "https://governance.so/dao/jtncbMzs2k3wypGiLBtM55ou3mFERpeZniH7V1Bq4zg",
+    "twitter": "@grapeprotocol",
+    "discord": "@grapedao",
+    "shortDescription": "Grape UX DAO has early access to Grape Gvoernance and contributors provide feedback to quickly iterate and improve UX"
+  },
+  {
     "symbol": "CollabX",
     "displayName": "CollabX",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "BVfB1PfxCdcKozoQQ5kvC9waUY527bZuwJVyT7Qvf8N2",
     "ogImage": "https://shdw-drive.genesysgo.net/5nwi4maAZ3v3EwTJtcg9oFfenQUX7pb9ry4KuhyUSawK/logo_collabx.png",
     "github": "https://github.com/Grape-Labs",
+    "website": "https://governance.so/dao/BVfB1PfxCdcKozoQQ5kvC9waUY527bZuwJVyT7Qvf8N2",
     "shortDescription": "A small but mighty developer DAO! 🚀 We're like the little engines that could, tirelessly building, testing, and occasionally chewing glass to create a better ecosystem"
   },
   {
@@ -63,6 +76,15 @@
     "github": "https://github.com/blockworks-foundation/"
   },
   {
+    "symbol": "XAND",
+    "category": "defi",
+    "displayName": "Xandeum DAO",
+    "programId": "DcG2PZTnj8s4Pnmp7xJswniCskckU5E6XsrKuyD7NYFK",
+    "realmId": "CFprdZRYitjPYEDUQKDQZwao1jcRcU1z1GsFspMpN8Ci",
+    "communityMint": "2j437Lt84XvysJiYbXTSJfAMy26Et9HiVGFvGFp8nYWH",
+    "ogImage": "https://xandeum.com/wp-content/uploads/2023/05/Xandeum-Logo-Standard.png"
+  },
+  {
     "symbol": "HPC",
     "displayName": "CryptoHelp",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -82,6 +104,20 @@
     "programId": "GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J",
     "realmId": "7CWXhWsMXbfx8caHcpCbSQKDpsaLNu65YoBLoGfogzk6",
     "communityMint": "DYg9LHzbhk9pg7h3Zhda2CW1berCp7NZQYxUEW6Eex35",
+    "ogImage": "https://i.imgur.com/448n6bC.jpg",
+    "shortDescription": "Every market, all the power, none of the fuss. Simplifying decentralized finance through easy-to-use products and developer tools.",
+    "website": "https://mango.markets",
+    "keywords": "Mango Markets, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
+    "twitter": "@mangomarkets",
+    "discord": "https://discord.com/invite/2uwjsBc5yw",
+    "github": "https://github.com/blockworks-foundation/"
+  },
+  {
+    "symbol": "MNGO-GM",
+    "category": "defi",
+    "displayName": "Mango Game Master",
+    "programId": "GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J",
+    "realmId": "6JFaFouiN4ssPc38ey1hXKSxyFWZzZy9w5Xt5xLzeozm",
     "ogImage": "https://i.imgur.com/448n6bC.jpg",
     "shortDescription": "Every market, all the power, none of the fuss. Simplifying decentralized finance through easy-to-use products and developer tools.",
     "website": "https://mango.markets",
@@ -3267,5 +3303,15 @@
     "website": "https://phnx.one/",
     "twitter": "@Phnxsol",
     "ogImage": "/realms/PHNXDAO/phnxLogo.png"
+  },
+  {
+    "symbol": "OPDA",
+    "displayName": "OPANZ DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Ccix1WKGTwCbdChjUSrVVgq4xPzMGzTutqpW1R4hCRGd",
+    "bannerImage": "/realms/OPANZ/OPANZ_Banner.png",
+    "ogImage": "/realms/OPANZ/OPANZ_Logo.png",
+    "website": "https://auturoa.nz/",
+    "twitter": "@opanzch"
   }
 ]

@@ -1,5 +1,5 @@
 import React, { FC } from 'react'
-import { useProfile } from '@components/Profile'
+import { useProfile } from '@components/Profile/useProfile'
 import ImgWithLoader from '@components/ImgWithLoader'
 import { PublicKey } from '@solana/web3.js'
 import { LoadingDots } from '@components/Loading'
@@ -25,14 +25,30 @@ export const ProfileImage: FC<Props> = ({ publicKey, expanded, className }) => {
   if (!profile && loading) return <LoadingDots />
 
   // No civic profile - show placeholder
-  if (!profile || !profile.image) return <UserCircleIcon className={classes} />
+  if (!profile || !profile.image) {
+    return<a
+        className="underline"
+        target="_blank"
+        href={'https://civic.me/' + publicKey?.toString()}
+        rel="noreferrer"
+    >
+      <UserCircleIcon className={classes}/>
+    </a>
+  }
 
   // Show civic profile image with loader as image loads
   return (
-    <ImgWithLoader
-      src={profile.image.url}
-      className={classes}
-      alt="Profile pic"
-    />
+      <a
+          className="underline"
+          target="_blank"
+          href={'https://civic.me/' + publicKey?.toString()}
+          rel="noreferrer"
+      >
+        <ImgWithLoader
+            src={profile.image.url}
+            className={classes}
+            alt="Profile pic"
+        />
+      </a>
   )
 }

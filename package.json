@@ -27,14 +27,13 @@
     ]
   },
   "dependencies": {
-    "@blockworks-foundation/mango-mints-redemption": "0.0.8",
-    "@blockworks-foundation/mango-v4": "0.19.29",
+    "@blockworks-foundation/mango-mints-redemption": "0.0.10",
+    "@blockworks-foundation/mango-v4": "0.19.34",
     "@blockworks-foundation/mango-v4-settings": "0.2.16",
     "@blockworks-foundation/mangolana": "0.0.1-beta.15",
     "@bonfida/spl-name-service": "0.1.47",
     "@bundlr-network/client": "0.7.15",
     "@carbon/icons-react": "11.7.0",
-    "@cardinal/namespaces-components": "2.5.5",
     "@civic/profile": "0.1.2",
     "@civic/solana-gateway-react": "0.15.0",
     "@coral-xyz/anchor": "0.27.0",
@@ -105,6 +104,7 @@
     "@solana/web3.js": "1.73.3",
     "@solendprotocol/solend-sdk": "0.5.5",
     "@sqds/iframe-adapter": "1.0.16",
+    "@switchboard-xyz/sbv2-lite": "0.2.4",
     "@switchboard-xyz/solana.js": "2.5.4",
     "@tailwindcss/forms": "0.5.3",
     "@tailwindcss/line-clamp": "0.4.2",
@@ -145,11 +145,13 @@
     "rc-slider": "9.7.5",
     "react": "18.2.0",
     "react-async-hook": "4.0.0",
+    "react-content-loader": "6.2.1",
     "react-dom": "18.0.0",
     "react-dropzone": "14.2.2",
     "react-easy-sort": "1.5.0",
     "react-headless-pagination": "0.1.0",
     "react-hook-form": "7.31.3",
+    "react-icons": "4.11.0",
     "react-markdown": "7.0.0",
     "react-portal": "4.2.2",
     "react-responsive": "9.0.0-beta.10",
@@ -230,7 +232,8 @@
     "@bonfida/spl-name-service": "0.1.47",
     "@bundlr-network/client": "0.7.15",
     "@carbon/icons-react": "11.7.0",
-    "@cardinal/namespaces-components": "2.5.5"
+    "@cardinal/namespaces-components": "2.5.5",
+    "crypto-js": ">=4.1.1"
   },
   "browser": {
     "child_process": false

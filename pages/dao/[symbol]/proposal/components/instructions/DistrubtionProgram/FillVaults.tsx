@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { useContext, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import * as yup from 'yup'
-import { isFormValid } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import {
@@ -24,13 +22,22 @@ import EmptyWallet from '@utils/Mango/listingTools'
 import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { tryGetTokenAccount } from '@utils/tokens'
 import Button from '@components/Button'
-import { TOKEN_PROGRAM_ID, Token, u64 } from '@solana/spl-token'
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  TOKEN_PROGRAM_ID,
+  Token,
+  u64,
+} from '@solana/spl-token'
 import Input from '@components/inputs/Input'
 import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
+import { validateInstruction } from '@utils/instructionTools'
+import useGovernanceNfts from '@components/treasuryV2/WalletList/WalletListItem/AssetList/useGovernanceNfts'
+
+export const SEASON_PREFIX = 115
 
 interface FillVaultsForm {
   governedAccount: AssetAccount | null
-  distributionNumber: number
+  season: number
 }
 
 type Vault = {
@@ -38,6 +45,7 @@ type Vault = {
   amount: bigint
   mintIndex: number
   mint: PublicKey
+  type: string
 }
 
 type Transfer = {
@@ -62,7 +70,7 @@ const FillVaults = ({
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<FillVaultsForm>({
     governedAccount: null,
-    distributionNumber: 0,
+    season: 1,
   })
   const [transfers, setTransfers] = useState<Transfer[]>([])
   const [client, setClient] = useState<MangoMintsRedemptionClient>()
@@ -70,23 +78,32 @@ const FillVaults = ({
   const [vaults, setVaults] = useState<{ [pubkey: string]: Vault }>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
-  const validateInstruction = async (): Promise<boolean> => {
-    const { isValid, validationErrors } = await isFormValid(schema, form)
-    setFormErrors(validationErrors)
-    return isValid
-  }
-  async function getInstruction(): Promise<UiInstruction> {
-    const isValid = await validateInstruction()
+  const nfts = useGovernanceNfts(form.governedAccount?.governance.pubkey)
+
+  const schema = useMemo(
+    () =>
+      yup.object().shape({
+        governedAccount: yup
+          .object()
+          .nullable()
+          .required('Program governed account is required'),
+      }),
+    []
+  )
+
+  const getInstruction = useCallback(async () => {
+    const isValid = await validateInstruction({ schema, form, setFormErrors })
     let serializedInstruction = ''
     const additionalSerializedInstructions: string[] = []
     const prerequisiteInstructions: TransactionInstruction[] = []
+
     if (
       isValid &&
       form.governedAccount?.governance?.account &&
       wallet?.publicKey &&
       vaults
     ) {
-      for (const t of transfers) {
+      for (const t of transfers.filter((x) => x.amount)) {
         const mintAmount = parseMintNaturalAmountFromDecimal(
           t.amount,
           t.decimals
@@ -111,12 +128,14 @@ const FillVaults = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
-      customHoldUpTime: form.distributionNumber,
     }
+
     return obj
-  }
+  }, [form, schema, transfers, vaults, wallet?.publicKey])
   const handleSelectDistribution = async (number: number) => {
-    const distribution = await client?.loadDistribution(number)
+    const distribution = await client?.loadDistribution(
+      Number(`${SEASON_PREFIX}${number}`)
+    )
     setDistribution(distribution)
   }
   const fetchVaults = async () => {
@@ -124,6 +143,7 @@ const FillVaults = ({
     const v: any = {}
     for (let i = 0; i < distribution.metadata!.mints.length; i++) {
       const mint = distribution.metadata!.mints[i]
+      const type = mint.properties.type
       const vaultAddress = distribution.findVaultAddress(
         new PublicKey(mint.address)
       )
@@ -138,6 +158,7 @@ const FillVaults = ({
           amount: tokenAccount?.account.amount,
           mint: tokenAccount?.account.mint,
           mintIndex: i,
+          type: type,
         }
       } catch {
         v[vaultAddress.toString()] = { amount: -1, mintIndex: i }
@@ -145,6 +166,7 @@ const FillVaults = ({
     }
     setVaults(v)
   }
+
   useEffect(() => {
     if (distribution) {
       fetchVaults()
@@ -162,26 +184,43 @@ const FillVaults = ({
   }, [])
   useEffect(() => {
     if (vaults && form.governedAccount) {
-      const trans = Object.values(vaults).map((v) => {
-        const from = assetAccounts.find(
-          (assetAccount) =>
-            assetAccount.isToken &&
-            assetAccount.extensions.mint?.publicKey.equals(v.mint) &&
-            assetAccount.extensions.token?.account.owner.equals(
-              form.governedAccount!.extensions.transferAddress!
-            )
-        )
-        if (!from) {
-          return undefined
-        }
-        return {
-          from: from!.pubkey,
-          to: v.publicKey,
-          amount: '',
-          decimals: from!.extensions.mint!.account.decimals,
-          mintIndex: v.mintIndex,
-        }
-      })
+      const trans = Object.values(vaults)
+        .filter((x) => x.mint)
+        .map((v) => {
+          const isToken = v.type.toLowerCase() === 'token'
+          const fromToken = assetAccounts.find(
+            (assetAccount) =>
+              assetAccount.isToken &&
+              assetAccount.extensions.mint?.publicKey.equals(v.mint) &&
+              assetAccount.extensions.token?.account.owner.equals(
+                form.governedAccount!.extensions.transferAddress!
+              )
+          )
+          const fromNft = nfts?.find((x) => x.id === v.mint.toBase58())
+
+          if (!fromToken && !fromNft) {
+            return undefined
+          }
+
+          return {
+            from: isToken
+              ? fromToken!.pubkey
+              : PublicKey.findProgramAddressSync(
+                  [
+                    new PublicKey(fromNft!.ownership.owner).toBuffer(),
+                    TOKEN_PROGRAM_ID.toBuffer(),
+                    new PublicKey(fromNft!.id).toBuffer(),
+                  ],
+                  ASSOCIATED_TOKEN_PROGRAM_ID
+                )[0],
+            to: v.publicKey,
+            amount: '',
+            decimals: isToken
+              ? fromToken!.extensions.mint!.account.decimals
+              : 0,
+            mintIndex: v.mintIndex,
+          }
+        })
       setTransfers(trans.filter((x) => x) as Transfer[])
     } else {
       setTransfers([])
@@ -193,14 +232,8 @@ const FillVaults = ({
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form])
-  const schema = yup.object().shape({
-    governedAccount: yup
-      .object()
-      .nullable()
-      .required('Program governed account is required'),
-  })
+  }, [form, getInstruction, handleSetInstructions, index, vaults])
+
   const inputs: InstructionInput[] = [
     {
       label: 'Governance',
@@ -212,20 +245,18 @@ const FillVaults = ({
       options: solAccounts,
     },
     {
-      label: 'Distribution Number',
-      initialValue: form.distributionNumber,
+      label: 'Season',
+      initialValue: form.season,
       type: InstructionInputType.INPUT,
       additionalComponent: (
         <div>
-          <Button
-            onClick={() => handleSelectDistribution(form.distributionNumber)}
-          >
+          <Button onClick={() => handleSelectDistribution(form.season)}>
             Load
           </Button>
         </div>
       ),
       inputType: 'number',
-      name: 'distributionNumber',
+      name: 'season',
     },
   ]
 

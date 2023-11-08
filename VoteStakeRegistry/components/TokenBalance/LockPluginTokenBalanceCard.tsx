@@ -255,6 +255,7 @@ const TokenDepositLock = ({
           ></VotingPowerBox>
         </div>
       )}
+
       {(availableTokens != '0' || lockTokensFmt != '0') && (
         <div className="pt-4 px-4">
           {availableTokens != '0' && (

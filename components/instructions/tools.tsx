@@ -51,9 +51,12 @@ export const ACCOUNT_NAMES = {
   '9pDEi3yT9ooT1uw1PApQDYK65advJs4Nt65EJG1m59Yq':
     'Mango Developer Council Mint',
   Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z: 'Mango DAO MNGO Treasury Vault',
+  HvBKrep6TbUpLVB4Lyd5T56LohhpPf3ZdNt7wpTiKqn3: 'Mango DAO Game Master Wallet',
   DiSDgMz4DeNKHXkpqUGoukr1YM9xxc1wH9gusZnMa1ga: 'Mango DAO Dual Realm Deposit',
   '8gjzxiqcU87cvRc7hFiUJgxqLSV7AQnSttfWC5fD9aim':
     'Mango DAO Treasury Council Mint',
+  G1Yc5696GcfL28uAWG6iCaKJwZd8sQzwPJTc2UacsjHN:
+    'Mango DAO Game master Council Mint',
   A9xaHx54B9bRYBga4V6LKFrRaARpMJFYVooEXRAanru5:
     'Mango DAO Treasury Council USDC Treasury',
   '7zGXUAeUkY9pEGfApsY26amibvqsf2dmty1cbtxHdfaQ': 'Mango DAO Wallet Governance',
@@ -61,10 +64,9 @@ export const ACCOUNT_NAMES = {
     'Mango Treasury Council Wallet',
   BxZ974q4zsrSThN54rZqNaA6E2CFoj77mUikqK68Lgrf:
     'Mango Treasury Council Wallet Governance',
-  FnrgYLrpftdsBj5gd4qeaFwDUQZCg2cfo7aqQ1kJmWJy:
-    'Mango Dao -> Dual Dao Vote Wallet',
+  FnrgYLrpftdsBj5gd4qeaFwDUQZCg2cfo7aqQ1kJmWJy: 'Mango DAO -> DAO Vote Wallet',
   EWaYDnKhcqS4tVjyhUBoJR1Yx755imqzBm5tb2vQTNtK:
-    'Mango Dao -> Dual Dao Vote Wallet Governance',
+    'Mango DAO -> DAO Vote Wallet Governance',
   '7D6tGmaMyC8i73Q8X2Fec2S1Zb5rkyai6pctdMqHpHWT':
     'Mango DAO Fast Listing Governance',
   Fmt4596j4uBvYutwQ2ZBw7RGw9EngR8yNijdqemnpiaB: 'Mango DAO Fast Listing Wallet',
@@ -304,11 +306,16 @@ export const ACCOUNT_NAMES = {
   '8XU6iRnVGp1DSWsbXWQVG3BofKncULJPEcU6YV6VRXDv': 'AllDomains Council Mint',
   Hq1ffpMA4368gerKRAdVy7KFrUUMo2NwGwVwcXoFy1Th: 'AllDomains Community Rewards',
   rP3eHs6uEDhQLqJHPLAwaNVENRezAgSnZK6opUtjhhT: 'AllDomains Grants',
-  '27Ma5zSVb8Sv9fuSZcXH2ZghTzdDXuWtzST4NJjXKKVo': 'AllDomains Rewards Governance',
-  '82s94bsTpcXfYbP7vTSwFfoi4cJEkoeQTfMif1h9s1AU': 'AllDomains Community Governance',
-  'CnixsSAVZqvaJEdkFHXXRQmot7RCSJFRHYMJvupbPoiE': 'AllDomains Foundation Governance 1',
-  '95vv4h7GWeBG7DbnzMwB15ZinFKBUiPeg6ea7ZqdGjZx': 'AllDomains Foundation Governance 2',
-  '6gwjRFcW1Y9iuJwXPdz1zZUa3Hcu855dH6APA5LjD8qK': 'AllDomains Treasury Governance',
+  '27Ma5zSVb8Sv9fuSZcXH2ZghTzdDXuWtzST4NJjXKKVo':
+    'AllDomains Rewards Governance',
+  '82s94bsTpcXfYbP7vTSwFfoi4cJEkoeQTfMif1h9s1AU':
+    'AllDomains Community Governance',
+  CnixsSAVZqvaJEdkFHXXRQmot7RCSJFRHYMJvupbPoiE:
+    'AllDomains Foundation Governance 1',
+  '95vv4h7GWeBG7DbnzMwB15ZinFKBUiPeg6ea7ZqdGjZx':
+    'AllDomains Foundation Governance 2',
+  '6gwjRFcW1Y9iuJwXPdz1zZUa3Hcu855dH6APA5LjD8qK':
+    'AllDomains Treasury Governance',
   AWVUWfRnHCTgo123mRXB9BRWaxt6JdZXXKhFMQ5mryKJ: 'AllDomains DAO Governance',
 }
 
@@ -344,6 +351,7 @@ export const HIDDEN_PROPOSALS = new Map<string, string>([
   ['7P3dtUTSvcQcjtJpZHZKEzrGvvHQdQGJrtKFLNAYHvpv', ''],
   ['H5TnbSBNFKJJwKea8tUj7ETcmhRHXQ1N9XCXBSD6Q9P1', ''],
   ['GeMQWvFTasBoui11RqRzMtDPQ9b2BkMK8NzepWzvuXw3', ''],
+  ['CRmUPr8CbfPQ4MAoo2yxSf5qL2nPsddL69kowMfp1JYP', ''],
 ])
 
 export const DEFAULT_NATIVE_SOL_MINT =
@@ -458,11 +466,11 @@ export async function getInstructionDescriptor(
   const descriptor = !instruction.data.length
     ? descriptors
     : descriptors && descriptors[instruction.data[0]]
-      ? descriptors[instruction.data[0]]
-      : //backup if first number is same for couple of instructions inside same idl
-      descriptors && descriptors[`${instruction.data[0]}${instruction.data[1]}`]
-        ? descriptors[`${instruction.data[0]}${instruction.data[1]}`]
-        : descriptors
+    ? descriptors[instruction.data[0]]
+    : //backup if first number is same for couple of instructions inside same idl
+    descriptors && descriptors[`${instruction.data[0]}${instruction.data[1]}`]
+    ? descriptors[`${instruction.data[0]}${instruction.data[1]}`]
+    : descriptors
 
   const dataUI = (descriptor?.getDataUI &&
     (await descriptor?.getDataUI(

@@ -15,13 +15,13 @@ import { VoteTipping, getNativeTreasuryAddress } from '@solana/spl-governance'
 import { secondsInDay } from 'date-fns'
 import clsx from 'clsx'
 import { TimerBar } from './ProposalTimer'
-import { formatShortAddress } from '@cardinal/namespaces-components'
 import { useAsync } from 'react-async-hook'
 import useRealm from '@hooks/useRealm'
 import { ACCOUNT_NAMES } from './instructions/tools'
 import { ExploreButton } from './treasuryV2/Details/ExploreLink'
 import Tooltip from './Tooltip'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
+import {ShortAddress} from "@components/Profile/ShortAddress";
 
 const formatOneDecimal = (x: number) => x.toFixed(1).replace(/[.,]0$/, '')
 
@@ -125,7 +125,7 @@ const VotingRules = () => {
                 <div>
                   {ACCOUNT_NAMES[treasuryAddress.result.toString()]
                     ? ACCOUNT_NAMES[treasuryAddress.result.toString()]
-                    : formatShortAddress(treasuryAddress.result)}
+                    : <ShortAddress address={treasuryAddress.result} />}
                 </div>
                 <ExploreButton address={treasuryAddress.result.toString()} />
               </div>

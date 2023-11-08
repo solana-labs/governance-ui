@@ -284,7 +284,7 @@ const grantIx = (programId: PublicKey) => ({
           <>
             {decodedInstructionData ? (
               <div className="space-y-3">
-                <div>Grant to: {accounts[8].pubkey.toBase58()}</div>
+                <div>Grant to: {accounts[3].pubkey.toBase58()}</div>
                 <div>Lock type: {lockupKind}</div>
                 <div>
                   Amount:{' '}
@@ -491,5 +491,8 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
   ),
   VoteMBhDCqGLRgYpp9o7DGyq81KNmwjXQRAHStjtJsS: common_instructions(
     new PublicKey('VoteMBhDCqGLRgYpp9o7DGyq81KNmwjXQRAHStjtJsS')
+  ),
+  '5sWzuuYkeWLBdAv3ULrBfqA51zF7Y4rnVzereboNDCPn': common_instructions(
+    new PublicKey('5sWzuuYkeWLBdAv3ULrBfqA51zF7Y4rnVzereboNDCPn')
   ),
 }

@@ -86,16 +86,21 @@ export default function LockedCommunityVotingPower(props: Props) {
         )
       : new BigNumber('0')
 
-  const lockedTokensAmount = deposits
-    .filter(
-      (x) =>
-        typeof x.lockup.kind['none'] === 'undefined' &&
-        x.mint.publicKey.toBase58() === realm?.account.communityMint.toBase58()
-    )
-    .reduce(
-      (curr, next) => curr.plus(new BigNumber(next.currentlyLocked.toString())),
-      new BigNumber(0)
-    )
+  const lockedTokensAmount = mint
+    ? deposits
+        .filter(
+          (x) =>
+            typeof x.lockup.kind['none'] === 'undefined' &&
+            x.mint.publicKey.toBase58() ===
+              realm?.account.communityMint.toBase58()
+        )
+        .reduce(
+          (curr, next) =>
+            curr.plus(new BigNumber(next.currentlyLocked.toString())),
+          new BigNumber(0)
+        )
+        .shiftedBy(-mint.decimals)
+    : new BigNumber('0')
 
   const max =
     realm && proposal && mint
