@@ -128,7 +128,7 @@ const MintWithIdentityDepository = ({
     const ix = client.createMintWithIdentityDepositoryInstruction(
       new Controller('UXD', UXD_DECIMALS, uxdProgramId),
       identityDepository,
-      new PublicKey(form.uxdProgram),
+      authority,
       new PublicKey(form.user),
       form.collateralAmount,
       { preflightCommitment: 'processed', commitment: 'processed' },
