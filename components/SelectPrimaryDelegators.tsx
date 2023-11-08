@@ -9,7 +9,8 @@ import { ProgramAccount, TokenOwnerRecord } from '@solana/spl-governance'
 import { capitalize } from '@utils/helpers'
 import { ProfileName } from './Profile/ProfileName'
 
-const YOUR_WALLET_VALUE = 'Your wallet'
+const YOUR_WALLET_VALUE = 'Yourself + all delegators'
+const JUST_YOUR_WALLET = 'Yourself only'
 
 const SelectPrimaryDelegators = () => {
   const wallet = useWalletOnePointOh()
@@ -49,42 +50,42 @@ const SelectPrimaryDelegators = () => {
     setCouncilDelegator,
   } = useSelectedDelegatorStore()
 
-  const handleCouncilSelect = (councilTokenRecord: string | undefined) => {
+  const handleCouncilSelect = (councilWalletPk: string | undefined) => {
     setCouncilDelegator(
-      councilTokenRecord !== undefined
-        ? new PublicKey(councilTokenRecord)
-        : undefined
+      councilWalletPk !== undefined ? new PublicKey(councilWalletPk) : undefined
     )
   }
 
-  const handleCommunitySelect = (communityPubKey?: string) => {
+  const handleCommunitySelect = (communityWalletPk: string | undefined) => {
     setCommunityDelegator(
-      communityPubKey ? new PublicKey(communityPubKey) : undefined
+      communityWalletPk ? new PublicKey(communityWalletPk) : undefined
     )
   }
 
   return (
     <>
-      {walletId &&
+      {((walletId &&
         communityTorsDelegatedToUser &&
-        communityTorsDelegatedToUser.length > 0 && (
-          <PrimaryDelegatorSelect
-            selectedDelegator={communityDelegator}
-            handleSelect={handleCommunitySelect}
-            kind={'community'}
-            tors={communityTorsDelegatedToUser}
-          />
-        )}
-      {walletId &&
+        communityTorsDelegatedToUser.length > 0) ||
+        communityDelegator) && (
+        <PrimaryDelegatorSelect
+          selectedDelegator={communityDelegator}
+          handleSelect={handleCommunitySelect}
+          kind={'community'}
+          tors={communityTorsDelegatedToUser ?? []}
+        />
+      )}
+      {((walletId &&
         councilTorsDelegatedToUser &&
-        councilTorsDelegatedToUser.length > 0 && (
-          <PrimaryDelegatorSelect
-            selectedDelegator={councilDelegator}
-            handleSelect={handleCouncilSelect}
-            kind={'council'}
-            tors={councilTorsDelegatedToUser}
-          />
-        )}
+        councilTorsDelegatedToUser.length > 0) ||
+        councilDelegator) && (
+        <PrimaryDelegatorSelect
+          selectedDelegator={councilDelegator}
+          handleSelect={handleCouncilSelect}
+          kind={'council'}
+          tors={councilTorsDelegatedToUser ?? []}
+        />
+      )}
     </>
   )
 }
@@ -103,6 +104,8 @@ function PrimaryDelegatorSelect({
   kind: 'community' | 'council'
   tors: ProgramAccount<TokenOwnerRecord>[]
 }) {
+  const wallet = useWalletOnePointOh()
+  const walletPk = wallet?.publicKey ?? undefined
   return (
     <div className="flex space-x-4 items-center mt-4">
       <div className="bg-bkg-1 px-4 py-2 justify-between rounded-md w-full">
@@ -115,15 +118,19 @@ function PrimaryDelegatorSelect({
           onChange={handleSelect}
           componentLabel={
             selectedDelegator ? (
-              <div className="relative">
-                <ProfileName
-                  publicKey={selectedDelegator}
-                  height="12px"
-                  width="100px"
-                  dark={true}
-                />
-                <div className="absolute bg-bkg-1 bottom-0 left-0 w-full h-full opacity-0	" />
-              </div>
+              walletPk && selectedDelegator.equals(walletPk) ? (
+                JUST_YOUR_WALLET
+              ) : (
+                <div className="relative">
+                  <ProfileName
+                    publicKey={selectedDelegator}
+                    height="12px"
+                    width="100px"
+                    dark={true}
+                  />
+                  <div className="absolute bg-bkg-1 bottom-0 left-0 w-full h-full opacity-0	" />
+                </div>
+              )
             ) : (
               YOUR_WALLET_VALUE
             )
@@ -132,6 +139,16 @@ function PrimaryDelegatorSelect({
           <Select.Option key={'reset'} value={undefined}>
             {YOUR_WALLET_VALUE}
           </Select.Option>
+          {walletPk ? (
+            <Select.Option
+              key={walletPk.toBase58()}
+              value={walletPk.toBase58()}
+            >
+              {JUST_YOUR_WALLET}
+            </Select.Option>
+          ) : (
+            <></>
+          )}
           {tors.map((delegatedTor) => (
             <Select.Option
               key={delegatedTor.account.governingTokenOwner.toBase58()}
