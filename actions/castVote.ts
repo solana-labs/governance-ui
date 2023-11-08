@@ -249,15 +249,17 @@ export async function castVote(
       [...createCastNftVoteTicketIxs, ...createPostMessageTicketIxs],
       1
     )
-    const otherChunks = chunks(
-      [
-        ...pluginCastVoteIxs,
-        ...castVoteIxs,
-        ...pluginPostMessageIxs,
-        ...postMessageIxs,
-      ],
-      2
+
+    // last element of pluginCastVoteIxs
+    const last = pluginCastVoteIxs[pluginCastVoteIxs.length - 1]
+    // everything except last element of pluginCastVoteIxs
+    const nftCountingChunks = pluginCastVoteIxs.slice(0, -1)
+    const voteChunk = [last, ...castVoteIxs] // the final nft-voter.CastNftVote instruction has to in same tx as the vote
+    const chunkedIxs = [...chunks(nftCountingChunks, 2), voteChunk].filter(
+      (x) => x.length > 0
     )
+
+    // note that we are not chunking postMessageIxs, not yet supported (somehow)
 
     const instructionsChunks = [
       ...createNftVoteTicketsChunks.map((txBatch, batchIdx) => {
@@ -270,7 +272,7 @@ export async function castVote(
           sequenceType: SequenceType.Parallel,
         }
       }),
-      ...otherChunks.map((txBatch, batchIdx) => {
+      ...chunkedIxs.map((txBatch, batchIdx) => {
         return {
           instructionsSet: txBatchesToInstructionSetWithSigners(
             txBatch,
