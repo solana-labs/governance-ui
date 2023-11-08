@@ -31,7 +31,7 @@ import useProgramVersion from './useProgramVersion'
 import useVotingTokenOwnerRecords from './useVotingTokenOwnerRecords'
 import { useMemo } from 'react'
 import { useTokenOwnerRecordsDelegatedToUser } from './queries/tokenOwnerRecord'
-import useUserOrDelegator from './useUserOrDelegator'
+import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
 
 export const useSubmitVote = () => {
   const wallet = useWalletOnePointOh()
@@ -51,7 +51,12 @@ export const useSubmitVote = () => {
       config?.account.communityTokenConfig.voterWeightAddin?.toBase58()
     )
 
-  const actingAsWalletPk = useUserOrDelegator()
+  const selectedCommunityDelegator = useSelectedDelegatorStore(
+    (s) => s.communityDelegator
+  )
+  const selectedCouncilDelegator = useSelectedDelegatorStore(
+    (s) => s.councilDelegator
+  )
   const delegators = useTokenOwnerRecordsDelegatedToUser()
 
   const { error, loading, execute } = useAsyncCallback(
@@ -66,7 +71,6 @@ export const useSubmitVote = () => {
     }) => {
       if (!proposal) throw new Error()
       if (!realm) throw new Error()
-      if (!actingAsWalletPk) throw new Error()
 
       const rpcContext = new RpcContext(
         proposal.owner,
@@ -101,6 +105,19 @@ export const useSubmitVote = () => {
           : realm.account.communityMint
       if (relevantMint === undefined) throw new Error()
 
+      const role = relevantMint.equals(realm.account.communityMint)
+        ? 'community'
+        : 'council'
+
+      const relevantSelectedDelegator =
+        role === 'community'
+          ? selectedCommunityDelegator
+          : selectedCouncilDelegator
+
+      const actingAsWalletPk =
+        relevantSelectedDelegator ?? wallet?.publicKey ?? undefined
+      if (!actingAsWalletPk) throw new Error()
+
       const tokenOwnerRecordPk = await getTokenOwnerRecordAddress(
         realm.owner,
         realm.pubkey,
@@ -108,9 +125,14 @@ export const useSubmitVote = () => {
         actingAsWalletPk
       )
 
-      const relevantDelegators = delegators
-        ?.filter((x) => x.account.governingTokenMint.equals(relevantMint))
-        .map((x) => x.pubkey)
+      const relevantDelegators =
+        // if the user is manually selecting a delegator, don't auto-vote for the rest of the delegators
+        // ("delegator" is a slight misnomer here since you can select yourself, so that you dont vote with your other delegators)
+        relevantSelectedDelegator !== undefined
+          ? []
+          : delegators
+              ?.filter((x) => x.account.governingTokenMint.equals(relevantMint))
+              .map((x) => x.pubkey)
 
       try {
         await castVote(
