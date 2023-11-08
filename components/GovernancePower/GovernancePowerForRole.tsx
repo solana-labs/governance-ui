@@ -26,7 +26,6 @@ export default function GovernancePowerForRole({
 
   const { result: kind } = useAsync(async () => {
     if (realmPk === undefined) return undefined
-
     return determineVotingPowerType(connection, realmPk, role)
   }, [connection, realmPk, role])
 
@@ -40,9 +39,10 @@ export default function GovernancePowerForRole({
     <>
       {role === 'community' ? (
         kind === 'vanilla' ? (
-          <VanillaVotingPower role="community" {...props}>
+          <div>
+            <VanillaVotingPower role="community" {...props} />
             <Deposit role="community" />
-          </VanillaVotingPower>
+          </div>
         ) : kind === 'VSR' ? (
           <LockedCommunityVotingPower />
         ) : kind === 'NFT' ? (
@@ -51,9 +51,10 @@ export default function GovernancePowerForRole({
           <LockedCommunityNFTRecordVotingPower />
         ) : null
       ) : kind === 'vanilla' ? (
-        <VanillaVotingPower role="council" {...props}>
+        <div>
+          <VanillaVotingPower role="council" {...props} />
           <Deposit role="council" />
-        </VanillaVotingPower>
+        </div>
       ) : null}
     </>
   )
