@@ -1,19 +1,12 @@
 import { ChevronRightIcon } from '@heroicons/react/solid'
-import {
-  determineVotingPowerType,
-  useGovernancePowerAsync,
-} from '@hooks/queries/governancePower'
+import { useGovernancePowerAsync } from '@hooks/queries/governancePower'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
-import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
 import useQueryContext from '@hooks/useQueryContext'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { GoverningTokenType } from '@solana/spl-governance'
-import { useConnection } from '@solana/wallet-adapter-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useAsync } from 'react-async-hook'
 import GovernancePowerForRole from './GovernancePowerForRole'
-import { Deposit } from './Vanilla/Deposit'
 
 const GovernancePowerTitle = () => {
   const { symbol } = useRouter().query
@@ -36,7 +29,7 @@ const GovernancePowerTitle = () => {
     </div>
   )
 }
-
+/* 
 // TODO: refactor deposit components to their own generic DepositForRole component
 const VanillaDeposit = ({ role }: { role: 'community' | 'council' }) => {
   const { connection } = useConnection()
@@ -49,7 +42,7 @@ const VanillaDeposit = ({ role }: { role: 'community' | 'council' }) => {
   }, [connection, realmPk, role])
 
   return kind === 'vanilla' ? <Deposit role={role} /> : <></>
-}
+} */
 
 const GovernancePowerCard = () => {
   const connected = useWalletOnePointOh()?.connected ?? false
