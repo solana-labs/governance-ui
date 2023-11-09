@@ -71,7 +71,6 @@ const VetoButtons = () => {
   const vetoingPop = useVetoingPop()
   const canVeto = useCanVeto()
   const [openModal, setOpenModal] = useState(false)
-  const voterTokenRecord = useUserVetoTokenRecord()
   const { data: userVetoRecord } = useProposalVoteRecordQuery('veto')
   const { submitting, submitVote } = useSubmitVote()
 
@@ -81,15 +80,11 @@ const VetoButtons = () => {
     } else {
       submitVote({
         vote: VoteKind.Veto,
-        voterTokenRecord: voterTokenRecord!,
       })
     }
   }
 
-  return vetoable &&
-    vetoingPop &&
-    voterTokenRecord &&
-    !userVetoRecord?.found ? (
+  return vetoable && vetoingPop && !userVetoRecord?.found ? (
     <>
       <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-4">
         <div className="flex flex-col items-center justify-center">
@@ -116,7 +111,6 @@ const VetoButtons = () => {
         <VoteCommentModal
           onClose={() => setOpenModal(false)}
           isOpen={openModal}
-          voterTokenRecord={voterTokenRecord}
           vote={VoteKind.Veto}
         />
       ) : null}
