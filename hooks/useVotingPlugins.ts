@@ -19,6 +19,7 @@ import {
   HELIUM_VSR_PLUGINS_PKS,
   VSR_PLUGIN_PKS,
   GATEWAY_PLUGINS_PKS,
+  PYTH_PLUGIN_PK,
 } from '../constants/plugins'
 import useUserOrDelegator from './useUserOrDelegator'
 import { getNetworkFromEndpoint } from '@utils/connection'
@@ -41,6 +42,7 @@ export function useVotingPlugins() {
     handleSetNftRegistrar,
     handleSetGatewayRegistrar,
     handleSetCurrentRealmVotingClient,
+    handleSetPythClient
   } = useVotePluginsClientStore()
 
   const [
@@ -67,6 +69,7 @@ export function useVotingPlugins() {
     nftClient,
     nftMintRegistrar,
     heliumVsrClient,
+    pythClient
   ] = useVotePluginsClientStore((s) => [
     s.state.currentRealmVotingClient,
     s.state.vsrClient,
@@ -74,7 +77,7 @@ export function useVotingPlugins() {
     s.state.nftClient,
     s.state.nftMintRegistrar,
     s.state.heliumVsrClient,
-    s.state.heliumVsrRegistrar,
+    s.state.pythClient,
   ])
 
   const usedCollectionsPks: string[] = useMemo(
@@ -137,6 +140,9 @@ export function useVotingPlugins() {
         if (HELIUM_VSR_PLUGINS_PKS.includes(currentPluginPk.toBase58())) {
           handleSetHeliumVsrClient(wallet, connection, currentPluginPk)
         }
+        if (PYTH_PLUGIN_PK.includes(currentPluginPk.toBase58())) {
+          handleSetPythClient(wallet, connection)
+        }
       }
       handleSetNftClient(wallet, connection)
       handleSetGatewayClient(wallet, connection)
@@ -148,6 +154,7 @@ export function useVotingPlugins() {
     handleSetHeliumVsrClient,
     handleSetNftClient,
     handleSetVsrClient,
+    handleSetPythClient,
     wallet,
   ])
 
@@ -203,6 +210,22 @@ export function useVotingPlugins() {
       }
     }
 
+    const handlePythPlugin = () => {
+      if (
+        pythClient &&
+        currentPluginPk &&
+        PYTH_PLUGIN_PK.includes(currentPluginPk.toBase58())
+      ) {
+        if (voterPk) {
+          handleSetCurrentRealmVotingClient({
+            client: pythClient,
+            realm,
+            walletPk: voterPk,
+          })
+        }
+      }
+    }
+
     // If the current realm uses Civic Pass
     // register the gatekeeper network (the "type" of Civic)
     // in the Civic GatewayProvider.
@@ -239,6 +262,7 @@ export function useVotingPlugins() {
       handleGatewayPlugin()
       handleVsrPlugin()
       handleHeliumVsrPlugin()
+      handlePythPlugin()
     }
   }, [
     currentClient,
