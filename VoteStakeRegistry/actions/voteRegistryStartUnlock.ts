@@ -42,7 +42,7 @@ export const voteRegistryStartUnlock = async ({
   //adding one day to lockupPeriod when unlocking to avoid difference in front/backend calculation of period
   //period have to be same or higher then deposit has that we unlock
   const period = lockUpPeriodInDays + 1
-  const lockupKind = 'cliff'
+  const lockupKind = 'constant'
   const signers: Keypair[] = []
   const { wallet, connection } = rpcContext
   if (!client) {
