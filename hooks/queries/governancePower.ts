@@ -1,40 +1,39 @@
-import { Connection, PublicKey } from '@solana/web3.js'
-import {
-  fetchTokenOwnerRecordByPubkey,
-  useTokenOwnerRecordByPubkeyQuery,
-  useUserCommunityTokenOwnerRecord,
-  useUserCouncilTokenOwnerRecord,
-} from './tokenOwnerRecord'
-import BN from 'bn.js'
-import { fetchNftRegistrar } from './plugins/nftVoter'
-import { fetchDigitalAssetsByOwner } from './digitalAssets'
-import { getNetworkFromEndpoint } from '@utils/connection'
 import { ON_NFT_VOTER_V2 } from '@constants/flags'
-import { fetchRealmByPubkey, useRealmQuery } from './realm'
-import { fetchRealmConfigQuery } from './realmConfig'
 import {
   GATEWAY_PLUGINS_PKS,
   HELIUM_VSR_PLUGINS_PKS,
   NFT_PLUGINS_PKS,
   VSR_PLUGIN_PKS,
 } from '@constants/plugins'
-import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
-import useGatewayPluginStore from 'GatewayPlugin/store/gatewayPluginStore'
-import { useAsync } from 'react-async-hook'
-import { useConnection } from '@solana/wallet-adapter-react'
 import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
-import {
-  useAddressQuery_CommunityTokenOwner,
-  useAddressQuery_CouncilTokenOwner,
-} from './addresses/tokenOwnerRecord'
+import useUserOrDelegator from '@hooks/useUserOrDelegator'
 import {
   SimpleGatedVoterWeight,
   VoteNftWeight,
   VoteRegistryVoterWeight,
-  VoterWeight,
 } from '@models/voteWeights'
-import useUserOrDelegator from '@hooks/useUserOrDelegator'
+import { useConnection } from '@solana/wallet-adapter-react'
+import { Connection, PublicKey } from '@solana/web3.js'
+import { getNetworkFromEndpoint } from '@utils/connection'
+import useGatewayPluginStore from 'GatewayPlugin/store/gatewayPluginStore'
+import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
+import BN from 'bn.js'
+import { useAsync } from 'react-async-hook'
+import {
+  useAddressQuery_CommunityTokenOwner,
+  useAddressQuery_CouncilTokenOwner,
+} from './addresses/tokenOwnerRecord'
+import { fetchDigitalAssetsByOwner } from './digitalAssets'
+import { fetchNftRegistrar } from './plugins/nftVoter'
 import { getVsrGovpower } from './plugins/vsr'
+import { fetchRealmByPubkey, useRealmQuery } from './realm'
+import { fetchRealmConfigQuery } from './realmConfig'
+import {
+  fetchTokenOwnerRecordByPubkey,
+  useTokenOwnerRecordByPubkeyQuery,
+  useUserCommunityTokenOwnerRecord,
+  useUserCouncilTokenOwnerRecord,
+} from './tokenOwnerRecord'
 
 export const getVanillaGovpower = async (
   connection: Connection,
@@ -129,7 +128,17 @@ export const determineVotingPowerType = async (
       ? config.result?.account.communityTokenConfig.voterWeightAddin
       : config.result?.account.councilTokenConfig.voterWeightAddin
 
-  return findPluginName(programId)
+  return programId === undefined
+    ? ('vanilla' as const)
+    : VSR_PLUGIN_PKS.includes(programId.toString())
+    ? ('VSR' as const)
+    : HELIUM_VSR_PLUGINS_PKS.includes(programId.toString())
+    ? 'HeliumVSR'
+    : NFT_PLUGINS_PKS.includes(programId.toString())
+    ? 'NFT'
+    : GATEWAY_PLUGINS_PKS.includes(programId.toString())
+    ? 'gateway'
+    : 'pyth'
 }
 
 export const useGovernancePowerAsync = (
@@ -218,8 +227,12 @@ export const useLegacyVoterWeight = () => {
         ? undefined
         : shouldCareAboutCouncil === true && councilTOR === undefined
         ? undefined
-        : plugin === 'vanilla'
-        ? new VoterWeight(communityTOR.result, councilTOR?.result)
+        : plugin === 'pyth'
+        ? new VoteRegistryVoterWeight(
+            communityTOR.result,
+            councilTOR?.result,
+            new BN(1000000000000000)
+          )
         : plugin === 'NFT'
         ? communityTOR.result?.pubkey
           ? new VoteNftWeight(
