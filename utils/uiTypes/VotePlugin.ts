@@ -53,6 +53,7 @@ import { NftVoter } from 'idls/nft_voter'
 import { NftVoterV2 } from 'idls/nft_voter_v2'
 import { Program } from '@project-serum/anchor'
 import { fetchTokenOwnerRecordByPubkey } from '@hooks/queries/tokenOwnerRecord'
+import { PythClient } from "@pythnetwork/staking"
 
 export type UpdateVoterWeightRecordTypes =
   | 'castVote'
@@ -104,6 +105,7 @@ export type Client =
   | HeliumVsrClient
   | NftVoterClient
   | GatewayClient
+  | PythClient
 
 //Abstract for common functions that plugins will implement
 export class VotingClient {

@@ -19,6 +19,7 @@ import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import { Registrar as HeliumVsrRegistrar } from 'HeliumVotePlugin/sdk/types'
 import * as heliumVsrSdk from '@helium/voter-stake-registry-sdk'
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
+import { PythClient } from "@pythnetwork/staking"
 
 interface UseVotePluginsClientStore extends State {
   state: {
@@ -27,6 +28,7 @@ interface UseVotePluginsClientStore extends State {
     heliumVsrClient: HeliumVsrClient | undefined
     nftClient: NftVoterClient | undefined
     gatewayClient: GatewayClient | undefined
+    pythClient: PythClient | undefined
     nftMintRegistrar: any
     gatewayRegistrar: any
     currentRealmVotingClient: VotingClient
@@ -74,6 +76,10 @@ interface UseVotePluginsClientStore extends State {
     realm,
     walletPk,
   }: VotingClientProps) => void
+  handleSetPythClient: (
+    wallet: SignerWalletAdapter | undefined,
+    connection: ConnectionContext
+  ) => void
 }
 
 const defaultState = {
@@ -81,6 +87,7 @@ const defaultState = {
   heliumVsrClient: undefined,
   nftClient: undefined,
   gatewayClient: undefined,
+  pythClient: undefined,
   voteStakeRegistryRegistrar: null,
   heliumVsrRegistrar: null,
   voteStakeRegistryRegistrarPk: null,
@@ -233,6 +240,18 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
         s.state.gatewayClient = gatewayClient
       })
     },
+    handleSetPythClient: async (wallet, connection) => {
+      const options = AnchorProvider.defaultOptions()
+      const provider = new AnchorProvider(
+        connection.current,
+        (wallet as unknown) as Wallet,
+        options
+      )
+      const pythClient = await PythClient.connect(provider, "devnet")
+      set((s) => {
+        s.state.pythClient = pythClient
+      })
+    }
   })
 )
 
