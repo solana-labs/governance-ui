@@ -24,3 +24,7 @@ export const GATEWAY_PLUGINS_PKS: string[] = [
   'Ggatr3wgDLySEwA2qEjt1oiw4BUzp5yMLJyz21919dq6',
   'GgathUhdrCWRHowoRKACjgWhYHfxCEdBi5ViqYN6HVxk', // v2, supporting composition
 ]
+
+export const PYTH_PLUGIN_PK: string[] = [
+  "pytS9TjG1qyAZypk7n8rw8gfW9sUaqqYyMhJQ4E7JCQ"
+]
