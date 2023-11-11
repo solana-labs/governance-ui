@@ -1,4 +1,5 @@
 import {
+  Bank,
   MANGO_V4_ID,
   MangoClient,
   OracleProvider,
@@ -20,6 +21,7 @@ import EmptyWallet, {
   FlatEditArgs,
   getFormattedListingPresets,
   decodePriceFromOracleAi,
+  getFormattedBankValues,
 } from '@utils/Mango/listingTools'
 import { secondsToHours } from 'date-fns'
 import WarningFilledIcon from '@carbon/icons-react/lib/WarningFilled'
@@ -756,6 +758,10 @@ const instructions = () => ({
         let suggestedUntrusted = false
         let invalidKeys: (keyof EditTokenArgsFormatted)[] = []
         let invalidFields: Partial<EditTokenArgsFormatted> = {}
+        let bank: null | Bank = null
+        let bankFormattedValues: null | ReturnType<
+          typeof getFormattedBankValues
+        > = null
 
         const parsedArgs: Partial<EditTokenArgsFormatted> = {
           tokenIndex: args.tokenIndex,
@@ -843,7 +849,8 @@ const instructions = () => ({
         }
 
         if (mint) {
-          const bank = mangoGroup.getFirstBankByMint(mint)
+          bank = mangoGroup.getFirstBankByMint(mint)
+          bankFormattedValues = getFormattedBankValues(mangoGroup, bank)
           mintData = tokenPriceService.getTokenInfo(mint.toBase58())
           const isPyth = bank?.oracleProvider === OracleProvider.Pyth
           const midPriceImpacts = getMidPriceImpacts(mangoGroup.pis)
@@ -954,6 +961,9 @@ const instructions = () => ({
               )}
             <div className="py-4">
               <div className="flex mb-2">
+                <div className="w-3 h-3 bg-white mr-2"></div> - Current values
+              </div>
+              <div className="flex mb-2">
                 <div className="w-3 h-3 bg-orange mr-2"></div> - Proposed values
               </div>
               <div className="flex">
@@ -972,6 +982,10 @@ const instructions = () => ({
               />
               <DisplayNullishProperty
                 label="Oracle Confidence Filter"
+                currentValue={
+                  bankFormattedValues?.oracleConfFilter &&
+                  `${bankFormattedValues.oracleConfFilter}%`
+                }
                 value={
                   parsedArgs.oracleConfidenceFilter &&
                   `${parsedArgs.oracleConfidenceFilter}%`
@@ -983,11 +997,16 @@ const instructions = () => ({
               />
               <DisplayNullishProperty
                 label="Oracle Max Staleness Slots"
+                currentValue={bankFormattedValues?.maxStalenessSlots}
                 value={parsedArgs.oracleMaxStalenessSlots}
                 suggestedVal={invalidFields.oracleMaxStalenessSlots}
               />
               <DisplayNullishProperty
                 label="Interest rate adjustment factor"
+                currentValue={
+                  bankFormattedValues?.adjustmentFactor &&
+                  `${bankFormattedValues.adjustmentFactor}%`
+                }
                 value={
                   parsedArgs.adjustmentFactor &&
                   `${parsedArgs.adjustmentFactor}%`
@@ -1003,6 +1022,9 @@ const instructions = () => ({
                   parsedArgs.interestRateUtilizationPoint0 &&
                   `${parsedArgs.interestRateUtilizationPoint0}%`
                 }
+                currentValue={
+                  bankFormattedValues?.util0 && `${bankFormattedValues.util0}%`
+                }
                 suggestedVal={
                   invalidFields.interestRateUtilizationPoint0 &&
                   `${invalidFields.interestRateUtilizationPoint0}%`
@@ -1013,6 +1035,9 @@ const instructions = () => ({
                 value={
                   parsedArgs.interestRatePoint0 &&
                   `${parsedArgs.interestRatePoint0}%`
+                }
+                currentValue={
+                  bankFormattedValues?.rate0 && `${bankFormattedValues.rate0}%`
                 }
                 suggestedVal={
                   invalidFields.interestRatePoint0 &&
@@ -1025,6 +1050,9 @@ const instructions = () => ({
                   parsedArgs.interestRateUtilizationPoint1 &&
                   `${parsedArgs.interestRateUtilizationPoint1}%`
                 }
+                currentValue={
+                  bankFormattedValues?.util1 && `${bankFormattedValues?.util1}%`
+                }
                 suggestedVal={
                   invalidFields.interestRateUtilizationPoint1 &&
                   `${invalidFields.interestRateUtilizationPoint1}%`
@@ -1036,6 +1064,9 @@ const instructions = () => ({
                   parsedArgs.interestRatePoint1 &&
                   `${parsedArgs.interestRatePoint1}%`
                 }
+                currentValue={
+                  bankFormattedValues?.rate1 && `${bankFormattedValues.rate1}%`
+                }
                 suggestedVal={
                   invalidFields.interestRatePoint1 &&
                   `${invalidFields.interestRatePoint1}%`
@@ -1044,6 +1075,10 @@ const instructions = () => ({
               <DisplayNullishProperty
                 label="Interest rate max rate"
                 value={parsedArgs.maxRate && `${parsedArgs.maxRate}%`}
+                currentValue={
+                  bankFormattedValues?.maxRate &&
+                  `${bankFormattedValues.maxRate}%`
+                }
                 suggestedVal={
                   invalidFields.maxRate && `${invalidFields.maxRate}%`
                 }
@@ -1052,6 +1087,10 @@ const instructions = () => ({
                 label="Loan Fee Rate"
                 value={
                   parsedArgs.loanFeeRate && `${parsedArgs.loanFeeRate} bps`
+                }
+                currentValue={
+                  bankFormattedValues?.loanFeeRate &&
+                  `${bankFormattedValues.loanFeeRate} bps`
                 }
                 suggestedVal={
                   invalidFields.loanFeeRate &&
@@ -1064,6 +1103,10 @@ const instructions = () => ({
                   parsedArgs.loanOriginationFeeRate &&
                   `${parsedArgs.loanOriginationFeeRate} bps`
                 }
+                currentValue={
+                  bankFormattedValues?.loanOriginationFeeRate &&
+                  `${bankFormattedValues.loanOriginationFeeRate} bps`
+                }
                 suggestedVal={
                   invalidFields.loanOriginationFeeRate &&
                   `${invalidFields.loanOriginationFeeRate} bps`
@@ -1072,27 +1115,35 @@ const instructions = () => ({
               <DisplayNullishProperty
                 label="Maintenance Asset Weight"
                 value={parsedArgs.maintAssetWeight}
+                currentValue={bankFormattedValues?.maintAssetWeight}
                 suggestedVal={invalidFields.maintAssetWeight}
               />
               <DisplayNullishProperty
                 label="Init Asset Weight"
                 value={parsedArgs.initAssetWeight}
+                currentValue={bankFormattedValues?.initAssetWeight}
                 suggestedVal={invalidFields.initAssetWeight}
               />
               <DisplayNullishProperty
                 label="Maintenance Liab Weight"
                 value={parsedArgs.maintLiabWeight}
+                currentValue={bankFormattedValues?.maintLiabWeight}
                 suggestedVal={invalidFields.maintLiabWeight}
               />
               <DisplayNullishProperty
                 label="Init Liab Weight"
                 value={parsedArgs.initLiabWeight}
+                currentValue={bankFormattedValues?.initLiabWeight}
                 suggestedVal={invalidFields.initLiabWeight}
               />
               <DisplayNullishProperty
                 label="Liquidation Fee"
                 value={
                   parsedArgs.liquidationFee && `${parsedArgs.liquidationFee}%`
+                }
+                currentValue={
+                  bankFormattedValues?.liquidationFee &&
+                  `${bankFormattedValues.liquidationFee}%`
                 }
                 suggestedVal={
                   invalidFields.liquidationFee &&
@@ -1105,6 +1156,10 @@ const instructions = () => ({
                   parsedArgs.minVaultToDepositsRatio &&
                   `${parsedArgs.minVaultToDepositsRatio}%`
                 }
+                currentValue={
+                  bankFormattedValues?.minVaultToDepositsRatio &&
+                  `${bankFormattedValues.minVaultToDepositsRatio}%`
+                }
                 suggestedVal={
                   invalidFields.minVaultToDepositsRatio &&
                   `${invalidFields.minVaultToDepositsRatio}%`
@@ -1115,6 +1170,10 @@ const instructions = () => ({
                 value={
                   parsedArgs.netBorrowLimitWindowSizeTs &&
                   `${parsedArgs.netBorrowLimitWindowSizeTs}H`
+                }
+                currentValue={
+                  bankFormattedValues?.netBorrowLimitWindowSizeTs &&
+                  `${bankFormattedValues.netBorrowLimitWindowSizeTs}H`
                 }
                 suggestedVal={
                   invalidFields.netBorrowLimitWindowSizeTs &&
@@ -1127,6 +1186,10 @@ const instructions = () => ({
                   parsedArgs.netBorrowLimitPerWindowQuote &&
                   `$${parsedArgs.netBorrowLimitPerWindowQuote}`
                 }
+                currentValue={
+                  bankFormattedValues?.netBorrowLimitPerWindowQuote &&
+                  `$${bankFormattedValues.netBorrowLimitPerWindowQuote}`
+                }
                 suggestedVal={
                   invalidFields.netBorrowLimitPerWindowQuote &&
                   `$${invalidFields.netBorrowLimitPerWindowQuote}`
@@ -1137,6 +1200,10 @@ const instructions = () => ({
                 value={
                   parsedArgs.borrowWeightScaleStartQuote &&
                   `$${parsedArgs.borrowWeightScaleStartQuote}`
+                }
+                currentValue={
+                  bankFormattedValues?.borrowWeightScaleStartQuote &&
+                  `$${bankFormattedValues.borrowWeightScaleStartQuote}`
                 }
                 suggestedVal={
                   invalidFields.borrowWeightScaleStartQuote &&
@@ -1149,6 +1216,10 @@ const instructions = () => ({
                   parsedArgs.depositWeightScaleStartQuote &&
                   `$${parsedArgs.depositWeightScaleStartQuote}`
                 }
+                currentValue={
+                  bankFormattedValues?.depositWeightScaleStartQuote &&
+                  `$${bankFormattedValues.depositWeightScaleStartQuote}`
+                }
                 suggestedVal={
                   invalidFields.depositWeightScaleStartQuote &&
                   `$${invalidFields.depositWeightScaleStartQuote}`
@@ -1157,30 +1228,46 @@ const instructions = () => ({
               <DisplayNullishProperty
                 label="Group Insurance Fund"
                 value={parsedArgs.groupInsuranceFund?.toString()}
+                currentValue={
+                  mint
+                    ? mangoGroup.mintInfosMapByMint
+                        .get(mint.toBase58())
+                        ?.groupInsuranceFund.toString()
+                    : undefined
+                }
                 suggestedVal={invalidFields.groupInsuranceFund?.toString()}
               />
               <DisplayNullishProperty
                 label="Oracle"
                 value={args.oracleOpt?.toBase58()}
+                currentValue={bankFormattedValues?.oracle}
               />
               <DisplayNullishProperty
                 label="Token Conditional Swap Maker Fee Rate"
                 value={parsedArgs.tokenConditionalSwapMakerFeeRate}
+                currentValue={
+                  bankFormattedValues?.tokenConditionalSwapMakerFeeRate
+                }
                 suggestedVal={invalidFields.tokenConditionalSwapMakerFeeRate}
               />
               <DisplayNullishProperty
                 label="Token Conditional Swap Taker Fee Rate"
                 value={parsedArgs.tokenConditionalSwapTakerFeeRate}
+                currentValue={
+                  bankFormattedValues?.tokenConditionalSwapTakerFeeRate
+                }
                 suggestedVal={invalidFields.tokenConditionalSwapTakerFeeRate}
               />
               <DisplayNullishProperty
                 label="Flash Loan Deposit Fee Rate"
                 value={parsedArgs.flashLoanDepositFeeRate}
+                currentValue={bankFormattedValues?.flashLoanDepositFeeRate}
                 suggestedVal={invalidFields.flashLoanDepositFeeRate}
               />
               <DisplayNullishProperty
                 label="Reduce only"
                 value={parsedArgs.reduceOnly}
+                currentValue={bankFormattedValues?.reduceOnly}
               />
             </div>
             <h3>Raw values</h3>
@@ -1420,8 +1507,10 @@ const DisplayNullishProperty = ({
   label,
   value,
   suggestedVal,
+  currentValue,
 }: {
   label: string
+  currentValue?: string | null | undefined | number
   value: string | null | undefined | number
   suggestedVal?: string | null | undefined | number
 }) =>
@@ -1429,7 +1518,13 @@ const DisplayNullishProperty = ({
     <div className="flex space-x-3">
       <div>{label}:</div>
       <div className="flex">
-        <div className={`${suggestedVal ? 'text-orange' : ''}`}>{value}</div>
+        <div className={`${currentValue ? 'text-grey' : ''}`}>
+          {currentValue}
+        </div>
+      </div>
+      {<div className="mx-1">/</div>}
+      <div className="flex">
+        <div className="text-orange">{value}</div>
       </div>
       {suggestedVal && <div className="mx-1">/</div>}
       {suggestedVal && <div className="text-green">{suggestedVal}</div>}
