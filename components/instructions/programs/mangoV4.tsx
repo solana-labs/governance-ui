@@ -1311,6 +1311,50 @@ const instructions = () => ({
       }
     },
   },
+  117255: {
+    name: 'Token Deposit',
+    accounts: [
+      { name: 'Group' },
+      { name: 'Account' },
+      { name: 'Owner' },
+      { name: 'Payer' },
+    ],
+    getDataUI: async (
+      connection: Connection,
+      data: Uint8Array
+      //accounts: AccountMetaData[]
+    ) => {
+      const info = await displayArgs(connection, data)
+      try {
+        return <div>{info}</div>
+      } catch (e) {
+        console.log(e)
+        return <div>{JSON.stringify(data)}</div>
+      }
+    },
+  },
+  186211: {
+    name: 'Edit Mango Account',
+    accounts: [
+      { name: 'Group' },
+      { name: 'Account' },
+      { name: 'Owner' },
+      { name: 'Payer' },
+    ],
+    getDataUI: async (
+      connection: Connection,
+      data: Uint8Array
+      //accounts: AccountMetaData[]
+    ) => {
+      const info = await displayArgs(connection, data)
+      try {
+        return <div>{info}</div>
+      } catch (e) {
+        console.log(e)
+        return <div>{JSON.stringify(data)}</div>
+      }
+    },
+  },
 })
 
 export const MANGO_V4_INSTRUCTIONS = {
