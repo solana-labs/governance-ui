@@ -185,6 +185,8 @@ export const useGovernancePowerAsync = (
             ? heliumVotingPower
             : plugin === 'gateway'
             ? gatewayVotingPower
+            : plugin === 'pyth'
+            ? new BN(1000000000000000)
             : new BN(0)),
     [
       plugin,
