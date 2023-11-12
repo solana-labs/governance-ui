@@ -3,6 +3,7 @@ import {
   GATEWAY_PLUGINS_PKS,
   HELIUM_VSR_PLUGINS_PKS,
   NFT_PLUGINS_PKS,
+  PYTH_PLUGIN_PK,
   VSR_PLUGIN_PKS,
 } from '@constants/plugins'
 import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
@@ -11,6 +12,7 @@ import {
   SimpleGatedVoterWeight,
   VoteNftWeight,
   VoteRegistryVoterWeight,
+  VoterWeight,
 } from '@models/voteWeights'
 import { useConnection } from '@solana/wallet-adapter-react'
 import { Connection, PublicKey } from '@solana/web3.js'
@@ -138,7 +140,9 @@ export const determineVotingPowerType = async (
     ? 'NFT'
     : GATEWAY_PLUGINS_PKS.includes(programId.toString())
     ? 'gateway'
-    : 'pyth'
+    : PYTH_PLUGIN_PK.includes(programId.toString())
+    ? 'pyth'
+    : 'unknown'
 }
 
 export const useGovernancePowerAsync = (
@@ -227,6 +231,8 @@ export const useLegacyVoterWeight = () => {
         ? undefined
         : shouldCareAboutCouncil === true && councilTOR === undefined
         ? undefined
+        : plugin === 'vanilla'
+        ? new VoterWeight(communityTOR.result, councilTOR?.result)
         : plugin === 'pyth'
         ? new VoteRegistryVoterWeight(
             communityTOR.result,

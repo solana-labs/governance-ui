@@ -19,7 +19,7 @@ import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import { Registrar as HeliumVsrRegistrar } from 'HeliumVotePlugin/sdk/types'
 import * as heliumVsrSdk from '@helium/voter-stake-registry-sdk'
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
-import { PythClient } from "@pythnetwork/staking"
+import { PythClient } from '@pythnetwork/staking'
 
 interface UseVotePluginsClientStore extends State {
   state: {
@@ -247,11 +247,11 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
         (wallet as unknown) as Wallet,
         options
       )
-      const pythClient = await PythClient.connect(provider, "devnet")
+      const pythClient = await PythClient.connect(provider, 'devnet')
       set((s) => {
         s.state.pythClient = pythClient
       })
-    }
+    },
   })
 )
 
