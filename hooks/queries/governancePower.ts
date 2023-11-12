@@ -16,6 +16,7 @@ import {
   GATEWAY_PLUGINS_PKS,
   HELIUM_VSR_PLUGINS_PKS,
   NFT_PLUGINS_PKS,
+  PYTH_PLUGIN_PK,
   VSR_PLUGIN_PKS,
 } from '@constants/plugins'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
@@ -126,7 +127,8 @@ export const determineVotingPowerType = async (
           ? 'NFT'
           : GATEWAY_PLUGINS_PKS.includes(programId.toString())
             ? 'gateway'
-            : 'pyth'
+            : PYTH_PLUGIN_PK.includes(programId.toString()) ? "pyth"
+              : "unknown"
 }
 
 export const useGovernancePowerAsync = (
@@ -216,7 +218,11 @@ export const useLegacyVoterWeight = () => {
         : shouldCareAboutCouncil === true && councilTOR === undefined
           ? undefined
           : plugin === 'pyth'
-            ? new VoteRegistryVoterWeight(communityTOR.result, councilTOR?.result, new BN(1000000000000000))
+            ? new VoteRegistryVoterWeight(
+              communityTOR.result,
+              councilTOR?.result,
+              new BN(1000000000000000)
+            )
             : plugin === 'NFT'
               ? communityTOR.result?.pubkey
                 ? new VoteNftWeight(

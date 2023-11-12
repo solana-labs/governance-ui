@@ -3598,17 +3598,22 @@
     "@coral-xyz/anchor" "^0.26.0"
     "buffer" "^6.0.1"
 
-"@pythnetwork/staking@^1.3.2":
-  "integrity" "sha512-N6I+IfvbcE7b/8LjgdRfYZykXFGbg3OlkyJ/z3gnlfG96UIPljLGlQtjex64o3/VFP5U0WL2KgKcF7fGg0x1DA=="
-  "resolved" "https://registry.npmjs.org/@pythnetwork/staking/-/staking-1.3.2.tgz"
-  "version" "1.3.2"
+"@pythnetwork/staking-wasm@*":
+  "integrity" "sha512-0ZdaWmueVO5hucdVH4UDfHyBuxtW6UDcrpEFtD/3pq4naQjcgu1u6rK8iL2pgKi8W2UlsB4vwJqay2Sf1sA4mw=="
+  "resolved" "https://registry.npmjs.org/@pythnetwork/staking-wasm/-/staking-wasm-0.3.4.tgz"
+  "version" "0.3.4"
+
+"@pythnetwork/staking@^1.3.5":
+  "integrity" "sha512-g9mZ1H72RjpuWgSzK+7/R6LB5PddCr770XOOajpU0nQxHBdim+777PKH7aZ4aYbMyU+vKQ8dWgYmyxgjRttIHw=="
+  "resolved" "https://registry.npmjs.org/@pythnetwork/staking/-/staking-1.3.5.tgz"
+  "version" "1.3.5"
   dependencies:
     "@project-serum/anchor" "0.24.2"
+    "@pythnetwork/staking-wasm" "*"
     "@solana/spl-governance" "0.3.26"
     "@solana/spl-token" "^0.1.8"
     "@solana/web3.js" "^1.36.0"
     "encoding" "^0.1.13"
-    "pyth-staking-wasm" "*"
     "ts-node" "^10.7.0"
     "typescript" "^4.3.5"
 
@@ -15501,11 +15506,6 @@
     "glob" "^7.1.7"
     "postcss" "^8.3.5"
     "postcss-selector-parser" "^6.0.6"
-
-"pyth-staking-wasm@*":
-  "integrity" "sha512-cRjsQFsUngazwbRZyZBs0y2gcu9OHfnQFEmUW0cq9fjZWla7a3zMXGDayQbBDs4gzCPP3Fuk584SJZQpGHQrfA=="
-  "resolved" "https://registry.npmjs.org/pyth-staking-wasm/-/pyth-staking-wasm-0.4.0.tgz"
-  "version" "0.4.0"
 
 "qr-code-styling@1.6.0-rc.1":
   "integrity" "sha512-ModRIiW6oUnsP18QzrRYZSc/CFKFKIdj7pUs57AEVH20ajlglRpN3HukjHk0UbNMTlKGuaYl7Gt6/O5Gg2NU2Q=="

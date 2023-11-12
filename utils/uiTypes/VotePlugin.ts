@@ -53,7 +53,7 @@ import { NftVoter } from 'idls/nft_voter'
 import { NftVoterV2 } from 'idls/nft_voter_v2'
 import { Program } from '@project-serum/anchor'
 import { fetchTokenOwnerRecordByPubkey } from '@hooks/queries/tokenOwnerRecord'
-import { PythClient } from "@pythnetwork/staking"
+import { PythClient } from '@pythnetwork/staking'
 
 export type UpdateVoterWeightRecordTypes =
   | 'castVote'
@@ -78,6 +78,7 @@ export enum VotingClientType {
   HeliumVsrClient,
   NftVoterClient,
   GatewayClient,
+  PythClient,
 }
 
 export class AccountData {
@@ -150,21 +151,26 @@ export class VotingClient {
       this.clientType = VotingClientType.GatewayClient
       this.noClient = false
     }
+    if (this.client instanceof PythClient) {
+      this.clientType = VotingClientType.PythClient
+      this.noClient = false
+    }
   }
   withUpdateVoterWeightRecord = async (
     instructions: TransactionInstruction[],
     tokenOwnerRecord: PublicKey,
     type: UpdateVoterWeightRecordTypes,
-    createNftActionTicketIxs?: TransactionInstruction[]
+    createNftActionTicketIxs?: TransactionInstruction[],
+    voterWeightTarget?: PublicKey
   ): Promise<ProgramAddresses | undefined> => {
     if (this.noClient) return
-
     const realm = this.realm!
     const torAccount = await fetchTokenOwnerRecordByPubkey(
-      this.client!.program.provider.connection,
+      this.client!.stakeConnection.program.provider.connection, // FIX ME
       tokenOwnerRecord
     )
     console.log(this.client)
+
     if (!torAccount.result) return
     if (
       !realm.account.communityMint.equals(
@@ -318,6 +324,26 @@ export class VotingClient {
       instructions.push(updateVoterWeightRecordIx)
       return { voterWeightPk, maxVoterWeightRecord: undefined }
     }
+    if (this.client instanceof PythClient) {
+      const stakeAccount = await this.client!.stakeConnection.getMainAccount(
+        walletPk
+      )
+
+      const {
+        voterWeightAccount,
+        maxVoterWeightRecord,
+      } = await this.client.stakeConnection.withUpdateVoterWeight(
+        instructions,
+        stakeAccount!,
+        { [type]: {} },
+        voterWeightTarget
+      )
+
+      return {
+        voterWeightPk: voterWeightAccount,
+        maxVoterWeightRecord,
+      }
+    }
   }
   withCastPluginVote = async (
     instructions: TransactionInstruction[],
@@ -433,6 +459,27 @@ export class VotingClient {
       return {
         voterWeightPk,
         maxVoterWeightRecord: maxVoterWeightPk,
+      }
+    }
+
+    if (this.client instanceof PythClient) {
+      const stakeAccount = await this.client!.stakeConnection.getMainAccount(
+        walletPk
+      )
+
+      const {
+        voterWeightAccount,
+        maxVoterWeightRecord,
+      } = await this.client.stakeConnection.withUpdateVoterWeight(
+        instructions,
+        stakeAccount!,
+        { ['castVote']: {} },
+        proposal.pubkey
+      )
+
+      return {
+        voterWeightPk: voterWeightAccount,
+        maxVoterWeightRecord,
       }
     }
 
