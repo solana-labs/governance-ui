@@ -221,7 +221,7 @@ export const useLegacyVoterWeight = () => {
             ? new VoteRegistryVoterWeight(
               communityTOR.result,
               councilTOR?.result,
-              new BN(1000000000000000)
+              new BN(1000000000000000) // FIX ME
             )
             : plugin === 'NFT'
               ? communityTOR.result?.pubkey
