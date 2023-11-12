@@ -170,8 +170,9 @@ export const useGovernancePowerAsync = (
               : plugin === 'HeliumVSR'
                 ? heliumVotingPower
                 : plugin === 'gateway'
-                  ? gatewayVotingPower
-                  : new BN(0)),
+                  ? gatewayVotingPower : plugin === "pyth" ?
+                    new BN(1000000000000000)
+                    : new BN(0)),
     [
       plugin,
       realmPk,
