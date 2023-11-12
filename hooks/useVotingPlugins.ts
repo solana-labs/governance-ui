@@ -77,8 +77,8 @@ export function useVotingPlugins() {
     s.state.nftClient,
     s.state.nftMintRegistrar,
     s.state.heliumVsrClient,
-    s.state.heliumVsrRegistrar,
     s.state.pythClient,
+    s.state.heliumVsrRegistrar,
   ])
 
   const usedCollectionsPks: string[] = useMemo(
