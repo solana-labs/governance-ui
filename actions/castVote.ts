@@ -62,6 +62,7 @@ const createDelegatorVote = async ({
   tokenOwnerRecordPk,
   userPk,
   vote,
+  votingPlugin,
 }: {
   connection: Connection
   realmPk: PublicKey
@@ -69,6 +70,7 @@ const createDelegatorVote = async ({
   tokenOwnerRecordPk: PublicKey
   userPk: PublicKey
   vote: Vote
+  votingPlugin?: VotingClient
 }) => {
   //
   const realm = (await fetchRealmByPubkey(connection, realmPk)).result
@@ -77,9 +79,24 @@ const createDelegatorVote = async ({
     .result
   if (!proposal) throw new Error()
 
+  if (
+    !DELEGATOR_BATCH_VOTE_SUPPORT_BY_PLUGIN[
+      findPluginName(votingPlugin?.client?.program.programId)
+    ]
+  )
+    throw new Error()
+
   const programVersion = await fetchProgramVersion(connection, realm.owner)
 
   const castVoteIxs: TransactionInstruction[] = []
+
+  await votingPlugin?.withCastPluginVote(
+    castVoteIxs,
+    proposal,
+    tokenOwnerRecordPk
+    //createCastNftVoteTicketIxs
+  )
+
   await withCastVote(
     castVoteIxs,
     realm.owner,

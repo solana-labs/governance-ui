@@ -8,6 +8,11 @@ import { useMemo } from 'react'
 import { ProgramAccount, TokenOwnerRecord } from '@solana/spl-governance'
 import { capitalize } from '@utils/helpers'
 import { ProfileName } from './Profile/ProfileName'
+import { useAsync } from 'react-async-hook'
+import { determineVotingPowerType } from '@hooks/queries/governancePower'
+import { useConnection } from '@solana/wallet-adapter-react'
+import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
+import { DELEGATOR_BATCH_VOTE_SUPPORT_BY_PLUGIN } from '@constants/flags'
 
 const YOUR_WALLET_VALUE = 'Yourself + all delegators'
 const JUST_YOUR_WALLET = 'Yourself only'
@@ -92,6 +97,16 @@ const SelectPrimaryDelegators = () => {
 
 export default SelectPrimaryDelegators
 
+const usePluginNameAsync = (kind: 'community' | 'council') => {
+  const { connection } = useConnection()
+  const realmPk = useSelectedRealmPubkey()
+  return useAsync(
+    async () =>
+      kind && realmPk && determineVotingPowerType(connection, realmPk, kind),
+    [connection, realmPk, kind]
+  )
+}
+
 function PrimaryDelegatorSelect({
   selectedDelegator,
   handleSelect,
@@ -106,6 +121,11 @@ function PrimaryDelegatorSelect({
 }) {
   const wallet = useWalletOnePointOh()
   const walletPk = wallet?.publicKey ?? undefined
+
+  const { result: plugin } = usePluginNameAsync(kind)
+  const batchDelegatorUxSupported =
+    DELEGATOR_BATCH_VOTE_SUPPORT_BY_PLUGIN[plugin]
+
   return (
     <div className="flex space-x-4 items-center mt-4">
       <div className="bg-bkg-1 px-4 py-2 justify-between rounded-md w-full">
