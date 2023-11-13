@@ -58,6 +58,7 @@ function stepName(step: Step): string {
 interface Props {
   className?: string;
   governanceAddress: PublicKey;
+  realmPk: PublicKey;
 }
 
 export function EditWalletRules(props: Props) {
@@ -71,7 +72,7 @@ export function EditWalletRules(props: Props) {
   const [result] = useQuery(gql.getGovernanceRulesResp, {
     query: gql.getGovernanceRules,
     variables: {
-      realmUrlId: symbol,
+      realmUrlId: realmPk,
       governancePublicKey: props.governanceAddress.toBase58(),
     },
   });
