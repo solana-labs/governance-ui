@@ -15,6 +15,7 @@ import {
   VoteType,
   withPostChatMessage,
   withCreateTokenOwnerRecord,
+  getVoteRecordAddress,
 } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
@@ -39,6 +40,7 @@ import { findPluginName } from '@hooks/queries/governancePower'
 import { DELEGATOR_BATCH_VOTE_SUPPORT_BY_PLUGIN } from '@constants/flags'
 import { fetchTokenOwnerRecordByPubkey } from '@hooks/queries/tokenOwnerRecord'
 import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
+import { fetchVoteRecordByPubkey } from '@hooks/queries/voteRecord'
 
 const getVetoTokenMint = (
   proposal: ProgramAccount<Proposal>,
@@ -242,18 +244,32 @@ export async function castVote(
     DELEGATOR_BATCH_VOTE_SUPPORT_BY_PLUGIN[
       findPluginName(votingPlugin?.client?.program.programId)
     ]
-      ? await Promise.all(
-          additionalTokenOwnerRecords.map((tokenOwnerRecordPk) =>
-            createDelegatorVote({
-              connection,
-              realmPk: realm.pubkey,
-              proposalPk: proposal.pubkey,
-              tokenOwnerRecordPk,
-              userPk: walletPubkey,
-              vote,
+      ? (
+          await Promise.all(
+            additionalTokenOwnerRecords.map(async (tokenOwnerRecordPk) => {
+              // Skip vote if already voted
+              const voteRecordPk = await getVoteRecordAddress(
+                realm.owner,
+                proposal.pubkey,
+                tokenOwnerRecordPk
+              )
+              const voteRecord = await fetchVoteRecordByPubkey(
+                connection,
+                voteRecordPk
+              )
+              if (voteRecord.found) return undefined
+
+              return createDelegatorVote({
+                connection,
+                realmPk: realm.pubkey,
+                proposalPk: proposal.pubkey,
+                tokenOwnerRecordPk,
+                userPk: walletPubkey,
+                vote,
+              })
             })
           )
-        )
+        ).filter((x): x is NonNullable<typeof x> => x !== undefined)
       : []
 
   const pluginPostMessageIxs: TransactionInstruction[] = []
