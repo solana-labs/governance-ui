@@ -46,6 +46,7 @@ export const useDepositCallback = (
       const signers: Keypair[] = []
 
       let transferAuthority;
+      console.log(wallet?.name)
       if (wallet?.name == "SquadsX") {
       transferAuthority = approveTokenTransfer(
         instructions,
