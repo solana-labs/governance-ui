@@ -337,7 +337,15 @@
     keccak256 "^1.0.6"
     merkletreejs "^0.3.11"
 
-"@blockworks-foundation/mango-v4-settings@0.2.16", "@blockworks-foundation/mango-v4-settings@^0.2.15":
+"@blockworks-foundation/mango-v4-settings@0.2.17":
+  version "0.2.17"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4-settings/-/mango-v4-settings-0.2.17.tgz#ebc64eb037137bdd16df93cdb63badc7f178542b"
+  integrity sha512-k4Hi0Rjq3XbWnN4Hvdd2aDrm24Ob+8+WDCz7hzR+XKCQ0HcYQXVrZn2Yz7e9IA4M3zQEP9n5HHnQopLQb8UgMw==
+  dependencies:
+    bn.js "^5.2.1"
+    eslint-config-prettier "^9.0.0"
+
+"@blockworks-foundation/mango-v4-settings@^0.2.15":
   version "0.2.16"
   resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4-settings/-/mango-v4-settings-0.2.16.tgz#63f03c13d1677461ea42d3b1e9171042830c6cdc"
   integrity sha512-9GCRZkVqTQsEUkqx/488pmSWM8I74Ght5AEzMPsuS5XlRGWIDjytWoBE0Y9wFVPrnRw2THTj0ZQft+vDwCYDCA==
@@ -6178,12 +6186,12 @@ ansi-escapes@^4.2.1:
   dependencies:
     type-fest "^0.21.3"
 
-ansi-regex@3.0.1:
+ansi-regex@3.0.1, ansi-regex@^2.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-3.0.1.tgz#123d6479e92ad45ad897d4054e3c7ca7db4944e1"
   integrity sha512-+O9Jct8wf++lXxxFc4hc8LsjaSq0HFzzL7cVsw8pRDIPdjKD2mT4ytDZlLuSBZ4cLKZFXIrMGO7DbQCtMJJMKw==
 
-"ansi-regex@>=3.0.1 <=5.0.1", ansi-regex@^2.0.0, ansi-regex@^3.0.0, ansi-regex@^4.1.0, ansi-regex@^5.0.0, ansi-regex@^5.0.1:
+"ansi-regex@>=3.0.1 <=5.0.1", ansi-regex@^3.0.0, ansi-regex@^4.1.0, ansi-regex@^5.0.0, ansi-regex@^5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-5.0.1.tgz#082cb2c89c9fe8659a311a53bd6a4dc5301db304"
   integrity sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==
