@@ -49,6 +49,7 @@ export const useDepositCallback = (
 
       // Checks if the connected wallet is the Squads Multisig extension. This wallet needs custom logic as ephemeral Keypair signatures can not be used after the transaction blockhash has expired.
       if (wallet?.name == "SquadsX") {
+        /*
         transferAuthority = approveTokenTransfer(
           instructions,
           [],
@@ -59,6 +60,7 @@ export const useDepositCallback = (
           // Delegate set to PDA wallet.
           wallet.publicKey!
         )
+        */
       } else {
         transferAuthority = approveTokenTransfer(
           instructions,
