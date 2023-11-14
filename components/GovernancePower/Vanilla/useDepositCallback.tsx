@@ -69,10 +69,22 @@ export const useDepositCallback = (
       signers.push(transferAuthority)
       }
 
-      
-
       const programVersion = await fetchProgramVersion(connection, realm.owner)
 
+      if (wallet?.name == "SquadsX") {
+        await withDepositGoverningTokens(
+          instructions,
+          realm.owner,
+          programVersion,
+          realm.pubkey,
+          userAtaPk,
+          mint,
+          walletPk,
+          wallet.publicKey!,
+          walletPk,
+          amount,
+        )
+      } else {
       await withDepositGoverningTokens(
         instructions,
         realm.owner,
@@ -83,8 +95,9 @@ export const useDepositCallback = (
         walletPk,
         transferAuthority.publicKey,
         walletPk,
-        amount
+        amount,
       )
+      }
 
       const transaction = new Transaction()
       transaction.add(...instructions)
