@@ -175,7 +175,8 @@ export const initializeOptionInstruction = async (
       ASSOCIATED_TOKEN_PROGRAM_ID,
       TOKEN_PROGRAM_ID,
       underlyingMint,
-      FEE_OWNER_KEY
+      FEE_OWNER_KEY,
+      true
     )
     remainingAccounts.push({
       pubkey: mintFeeKey,
@@ -199,7 +200,8 @@ export const initializeOptionInstruction = async (
       ASSOCIATED_TOKEN_PROGRAM_ID,
       TOKEN_PROGRAM_ID,
       quoteMint,
-      FEE_OWNER_KEY
+      FEE_OWNER_KEY,
+      true
     )
     remainingAccounts.push({
       pubkey: exerciseFeeKey,

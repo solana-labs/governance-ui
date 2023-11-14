@@ -38,7 +38,8 @@ export const useDepositCallback = (
         ASSOCIATED_TOKEN_PROGRAM_ID,
         TOKEN_PROGRAM_ID,
         mint,
-        walletPk // owner
+        walletPk, // owner
+        true
       )
 
       const instructions: TransactionInstruction[] = []
