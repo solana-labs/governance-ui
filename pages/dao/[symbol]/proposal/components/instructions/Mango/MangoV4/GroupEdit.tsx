@@ -46,6 +46,7 @@ type GroupEditForm = {
   feesMngoTokenIndex: number | null
   feesExpiryInterval: number | null
   holdupTime: number
+  allowedFastListingsPerInterval: number | null
 }
 
 const defaultFormValues: GroupEditForm = {
@@ -62,6 +63,7 @@ const defaultFormValues: GroupEditForm = {
   feesMngoTokenIndex: 0,
   feesExpiryInterval: 0,
   holdupTime: 0,
+  allowedFastListingsPerInterval: 0,
 }
 
 const GroupEdit = ({
@@ -122,7 +124,12 @@ const GroupEdit = ({
           getNullOrTransform(values.feesMngoBonusRate, null, Number),
           getNullOrTransform(values.feesSwapMangoAccount, PublicKey),
           getNullOrTransform(values.feesMngoTokenIndex, null, Number),
-          getNullOrTransform(values.feesExpiryInterval, BN)
+          getNullOrTransform(values.feesExpiryInterval, BN),
+          getNullOrTransform(
+            values.allowedFastListingsPerInterval,
+            null,
+            Number
+          )
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -195,6 +202,8 @@ const GroupEdit = ({
         feesSwapMangoAccount: mangoGroup!.buybackFeesSwapMangoAccount?.toBase58(),
         feesMngoTokenIndex: mangoGroup!.mngoTokenIndex,
         feesExpiryInterval: mangoGroup!.buybackFeesExpiryInterval?.toNumber(),
+        allowedFastListingsPerInterval: mangoGroup!
+          .allowedFastListingsPerInterval,
       }
       setForm((prevForm) => ({
         ...prevForm,
@@ -306,6 +315,14 @@ const GroupEdit = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'feesExpiryInterval',
+    },
+    {
+      label: keyToLabel['allowedFastListingsPerInterval'],
+      subtitle: getAdditionalLabelInfo('allowedFastListingsPerInterval'),
+      initialValue: form.allowedFastListingsPerInterval,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'allowedFastListingsPerInterval',
     },
   ]
 
