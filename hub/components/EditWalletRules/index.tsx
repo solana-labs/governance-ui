@@ -72,7 +72,7 @@ export function EditWalletRules(props: Props) {
   const [result] = useQuery(gql.getGovernanceRulesResp, {
     query: gql.getGovernanceRules,
     variables: {
-      realmUrlId: realmPk,
+      realmUrlId: props.realmPk,
       governancePublicKey: props.governanceAddress.toBase58(),
     },
   });
