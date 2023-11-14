@@ -124,7 +124,7 @@ function PrimaryDelegatorSelect({
 
   const { result: plugin } = usePluginNameAsync(kind)
   const batchDelegatorUxSupported =
-    DELEGATOR_BATCH_VOTE_SUPPORT_BY_PLUGIN[plugin]
+    plugin && DELEGATOR_BATCH_VOTE_SUPPORT_BY_PLUGIN[plugin]
 
   return (
     <div className="flex space-x-4 items-center mt-4">
@@ -152,12 +152,12 @@ function PrimaryDelegatorSelect({
                 </div>
               )
             ) : (
-              YOUR_WALLET_VALUE
+              batchDelegatorUxSupported ? YOUR_WALLET_VALUE : JUST_YOUR_WALLET
             )
           }
         >
           <Select.Option key={'reset'} value={undefined}>
-            {YOUR_WALLET_VALUE}
+            {batchDelegatorUxSupported ? YOUR_WALLET_VALUE : JUST_YOUR_WALLET}
           </Select.Option>
           {walletPk ? (
             <Select.Option
@@ -169,6 +169,91 @@ function PrimaryDelegatorSelect({
           ) : (
             <></>
           )}
+          {tors.map((delegatedTor) => (
+            <Select.Option
+              key={delegatedTor.account.governingTokenOwner.toBase58()}
+              value={delegatedTor.account.governingTokenOwner.toBase58()}
+            >
+              <div className="relative">
+                <ProfileName
+                  publicKey={delegatedTor.account.governingTokenOwner}
+                  height="12px"
+                  width="100px"
+                  dark={true}
+                />
+                <div className="absolute bg-bkg-1 bottom-0 left-0 w-full h-full opacity-0	" />
+              </div>
+            </Select.Option>
+          ))}
+        </Select>
+      </div>
+    </div>
+  )
+}
+
+
+// its a conditional, make it use the old or new component depending on support. thanks.
+const a = ({kind}: {  kind: 'community' | 'council'
+}) => {
+
+  const { result: plugin } = usePluginNameAsync(kind)
+  const batchDelegatorUxSupported =
+    plugin && DELEGATOR_BATCH_VOTE_SUPPORT_BY_PLUGIN[plugin]
+  return batchDelegatorUxSupported ? PrimaryDelegatorSelect
+}
+
+function PrimaryDelegatorSelectOld({
+  selectedDelegator,
+  handleSelect,
+
+  kind,
+  tors,
+}: {
+  selectedDelegator: PublicKey | undefined
+  handleSelect: (tokenRecordPk: string) => void
+  kind: 'community' | 'council'
+  tors: ProgramAccount<TokenOwnerRecord>[]
+}) {
+  const wallet = useWalletOnePointOh()
+  const walletPk = wallet?.publicKey ?? undefined
+
+  const { result: plugin } = usePluginNameAsync(kind)
+  const batchDelegatorUxSupported =
+    plugin && DELEGATOR_BATCH_VOTE_SUPPORT_BY_PLUGIN[plugin]
+
+  return (
+    <div className="flex space-x-4 items-center mt-4">
+      <div className="bg-bkg-1 px-4 py-2 justify-between rounded-md w-full">
+        <p className="text-fgd-3 text-xs mb-1">
+          Perform {capitalize(kind)} actions as:
+        </p>
+        <Select
+          value={selectedDelegator}
+          placeholder="Delegate to use for council votes"
+          onChange={handleSelect}
+          componentLabel={
+            selectedDelegator ? (
+              walletPk && selectedDelegator.equals(walletPk) ? (
+                JUST_YOUR_WALLET
+              ) : (
+                <div className="relative">
+                  <ProfileName
+                    publicKey={selectedDelegator}
+                    height="12px"
+                    width="100px"
+                    dark={true}
+                  />
+                  <div className="absolute bg-bkg-1 bottom-0 left-0 w-full h-full opacity-0	" />
+                </div>
+              )
+            ) : (
+              JUST_YOUR_WALLET
+            )
+          }
+        >
+          <Select.Option key={'reset'} value={undefined}>
+            {JUST_YOUR_WALLET}
+          </Select.Option>
           {tors.map((delegatedTor) => (
             <Select.Option
               key={delegatedTor.account.governingTokenOwner.toBase58()}
