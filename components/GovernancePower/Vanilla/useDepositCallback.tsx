@@ -45,15 +45,30 @@ export const useDepositCallback = (
       const instructions: TransactionInstruction[] = []
       const signers: Keypair[] = []
 
-      const transferAuthority = approveTokenTransfer(
+      let transferAuthority;
+      if (wallet?.name == "SquadsX") {
+      transferAuthority = approveTokenTransfer(
         instructions,
         [],
         userAtaPk,
         wallet!.publicKey!,
-        amount
-      )
+        amount,
+        true,
+        wallet.publicKey!
+      ) 
+      } else {
+      transferAuthority = approveTokenTransfer(
+          instructions,
+          [],
+          userAtaPk,
+          wallet!.publicKey!,
+          amount
+        ) 
 
       signers.push(transferAuthority)
+      }
+
+      
 
       const programVersion = await fetchProgramVersion(connection, realm.owner)
 
