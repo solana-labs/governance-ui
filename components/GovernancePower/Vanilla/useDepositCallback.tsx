@@ -46,31 +46,34 @@ export const useDepositCallback = (
       const signers: Keypair[] = []
 
       let transferAuthority;
-      console.log(wallet?.name)
+
+      // Checks if the connected wallet is the Squads Multisig extension. This wallet needs custom logic as ephemeral Keypair signatures can not be used after the transaction blockhash has expired.
       if (wallet?.name == "SquadsX") {
-      transferAuthority = approveTokenTransfer(
-        instructions,
-        [],
-        userAtaPk,
-        wallet!.publicKey!,
-        amount,
-        true,
-        wallet.publicKey!
-      ) 
+        transferAuthority = approveTokenTransfer(
+          instructions,
+          [],
+          userAtaPk,
+          wallet!.publicKey!,
+          amount,
+          true,
+          // Delegate set to PDA wallet.
+          wallet.publicKey!
+        )
       } else {
-      transferAuthority = approveTokenTransfer(
+        transferAuthority = approveTokenTransfer(
           instructions,
           [],
           userAtaPk,
           wallet!.publicKey!,
           amount
-        ) 
+        )
 
-      signers.push(transferAuthority)
+        signers.push(transferAuthority)
       }
 
       const programVersion = await fetchProgramVersion(connection, realm.owner)
 
+      // Same custom logic applied to PDA wallet as before.
       if (wallet?.name == "SquadsX") {
         await withDepositGoverningTokens(
           instructions,
@@ -80,23 +83,24 @@ export const useDepositCallback = (
           userAtaPk,
           mint,
           walletPk,
+          // PDA wallet public key instead of transferAuthority public key.
           wallet.publicKey!,
           walletPk,
           amount,
         )
       } else {
-      await withDepositGoverningTokens(
-        instructions,
-        realm.owner,
-        programVersion,
-        realm.pubkey,
-        userAtaPk,
-        mint,
-        walletPk,
-        transferAuthority.publicKey,
-        walletPk,
-        amount,
-      )
+        await withDepositGoverningTokens(
+          instructions,
+          realm.owner,
+          programVersion,
+          realm.pubkey,
+          userAtaPk,
+          mint,
+          walletPk,
+          transferAuthority.publicKey,
+          walletPk,
+          amount,
+        )
       }
 
       const transaction = new Transaction()
