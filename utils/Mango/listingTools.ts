@@ -63,7 +63,7 @@ export type FlatListingArgs = {
   stablePriceGrowthLimit: number
   tokenConditionalSwapMakerFeeRate: number
   tokenConditionalSwapTakerFeeRate: number
-  flashLoanDepositFeeRate: number
+  flashLoanSwapFeeRate: number
   reduceOnly: number
   groupInsuranceFund: boolean
   oracle: PublicKey
@@ -97,7 +97,7 @@ export type FlatEditArgs = {
   stablePriceGrowthLimitOpt: number
   tokenConditionalSwapMakerFeeRateOpt: number
   tokenConditionalSwapTakerFeeRateOpt: number
-  flashLoanDepositFeeRateOpt: number
+  flashLoanSwapFeeRateOpt: number
   reduceOnlyOpt: number
   groupInsuranceFundOpt: boolean
   oracleOpt: PublicKey
@@ -131,7 +131,7 @@ export type ListingArgsFormatted = {
   stablePriceGrowthLimit: string
   tokenConditionalSwapMakerFeeRate: number
   tokenConditionalSwapTakerFeeRate: number
-  flashLoanDepositFeeRate: number
+  flashLoanSwapFeeRate: number
   reduceOnly: string
   oracle: string
 }

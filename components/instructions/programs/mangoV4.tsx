@@ -538,7 +538,7 @@ const instructions = () => ({
               <DisplayListingPropertyWrapped
                 label="Flash Loan Deposit Fee Rate"
                 suggestedUntrusted={suggestedUntrusted}
-                valKey="flashLoanDepositFeeRate"
+                valKey="flashLoanSwapFeeRate"
               />
             </div>
             <AdvancedOptionsDropdown className="mt-4" title="Raw values">
@@ -841,7 +841,7 @@ const instructions = () => ({
             args.tokenConditionalSwapMakerFeeRateOpt,
           tokenConditionalSwapTakerFeeRate:
             args.tokenConditionalSwapTakerFeeRateOpt,
-          flashLoanDepositFeeRate: args.flashLoanDepositFeeRateOpt,
+          flashLoanSwapFeeRate: args.flashLoanSwapFeeRateOpt,
           reduceOnly:
             args.reduceOnlyOpt !== undefined
               ? REDUCE_ONLY_OPTIONS[args.reduceOnlyOpt].name
@@ -1259,10 +1259,10 @@ const instructions = () => ({
                 suggestedVal={invalidFields.tokenConditionalSwapTakerFeeRate}
               />
               <DisplayNullishProperty
-                label="Flash Loan Deposit Fee Rate"
-                value={parsedArgs.flashLoanDepositFeeRate}
-                currentValue={bankFormattedValues?.flashLoanDepositFeeRate}
-                suggestedVal={invalidFields.flashLoanDepositFeeRate}
+                label="Flash Loan Swap Fee Rate"
+                value={parsedArgs.flashLoanSwapFeeRate}
+                currentValue={bankFormattedValues?.flashLoanSwapFeeRate}
+                suggestedVal={invalidFields.flashLoanSwapFeeRate}
               />
               <DisplayNullishProperty
                 label="Reduce only"
@@ -1662,7 +1662,7 @@ const getFormattedListingValues = (args: FlatListingArgs) => {
     stablePriceGrowthLimit: (args.stablePriceGrowthLimit * 100).toFixed(2),
     tokenConditionalSwapMakerFeeRate: args.tokenConditionalSwapMakerFeeRate,
     tokenConditionalSwapTakerFeeRate: args.tokenConditionalSwapTakerFeeRate,
-    flashLoanDepositFeeRate: args.flashLoanDepositFeeRate,
+    flashLoanSwapFeeRate: args.flashLoanSwapFeeRate,
     reduceOnly: REDUCE_ONLY_OPTIONS[args.reduceOnly].name,
   }
   return formattedArgs
