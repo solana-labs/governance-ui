@@ -45,65 +45,35 @@ export const useDepositCallback = (
       const instructions: TransactionInstruction[] = []
       const signers: Keypair[] = []
 
-      let transferAuthority;
+      // Checks if the connected wallet is the Squads Multisig extension (or any PDA wallet for future reference). If it is the case, it will not use an ephemeral signer.
+      const transferAuthority = wallet?.name == "SquadsX"
+        ? undefined
+        : approveTokenTransfer(instructions, [], userAtaPk, wallet!.publicKey!, amount);
 
-      // Checks if the connected wallet is the Squads Multisig extension. This wallet needs custom logic as ephemeral Keypair signatures can not be used after the transaction blockhash has expired.
-      if (wallet?.name == "SquadsX") {
-        /*
-        transferAuthority = approveTokenTransfer(
-          instructions,
-          [],
-          userAtaPk,
-          wallet!.publicKey!,
-          amount,
-          true,
-          // Delegate set to PDA wallet.
-          wallet.publicKey!
-        )
-        */
-      } else {
-        transferAuthority = approveTokenTransfer(
-          instructions,
-          [],
-          userAtaPk,
-          wallet!.publicKey!,
-          amount
-        )
-
-        signers.push(transferAuthority)
+      if (transferAuthority) {
+        signers.push(transferAuthority);
       }
 
       const programVersion = await fetchProgramVersion(connection, realm.owner)
 
-      // Same custom logic applied to PDA wallet as before.
-      if (wallet?.name == "SquadsX") {
-        await withDepositGoverningTokens(
-          instructions,
-          realm.owner,
-          programVersion,
-          realm.pubkey,
-          userAtaPk,
-          mint,
-          walletPk,
-          // PDA wallet public key instead of transferAuthority public key.
-          wallet.publicKey!,
-          walletPk,
-          amount,
-        )
-      } else {
-        await withDepositGoverningTokens(
-          instructions,
-          realm.owner,
-          programVersion,
-          realm.pubkey,
-          userAtaPk,
-          mint,
-          walletPk,
-          transferAuthority.publicKey,
-          walletPk,
-          amount,
-        )
+      const publicKeyToUse = transferAuthority != undefined && wallet?.publicKey != null ? transferAuthority.publicKey : wallet?.publicKey;
+
+      if (!publicKeyToUse) {
+        throw new Error()
       }
+
+      await withDepositGoverningTokens(
+        instructions,
+        realm.owner,
+        programVersion,
+        realm.pubkey,
+        userAtaPk,
+        mint,
+        walletPk,
+        publicKeyToUse,
+        walletPk,
+        amount,
+      )
 
       const transaction = new Transaction()
       transaction.add(...instructions)
