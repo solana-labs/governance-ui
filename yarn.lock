@@ -337,20 +337,28 @@
     keccak256 "^1.0.6"
     merkletreejs "^0.3.11"
 
-"@blockworks-foundation/mango-v4-settings@0.2.16", "@blockworks-foundation/mango-v4-settings@^0.2.15":
-  version "0.2.16"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4-settings/-/mango-v4-settings-0.2.16.tgz#63f03c13d1677461ea42d3b1e9171042830c6cdc"
-  integrity sha512-9GCRZkVqTQsEUkqx/488pmSWM8I74Ght5AEzMPsuS5XlRGWIDjytWoBE0Y9wFVPrnRw2THTj0ZQft+vDwCYDCA==
+"@blockworks-foundation/mango-v4-settings@0.2.18":
+  version "0.2.18"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4-settings/-/mango-v4-settings-0.2.18.tgz#d984617fd44d7ba0d56b7f4a751f8b3b4d95cc35"
+  integrity sha512-hdU75eED5YzUWg4EJcUIJZsEvfeLVwUj3yfEykyj/OMVR/H83cbX5KuTnfh6ri0Iwd+K8cqNNFdParLKigoUxQ==
   dependencies:
     bn.js "^5.2.1"
     eslint-config-prettier "^9.0.0"
 
-"@blockworks-foundation/mango-v4@0.19.34":
-  version "0.19.34"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4/-/mango-v4-0.19.34.tgz#ddeec24f4caa9343de08354790eab6ba50a0d613"
-  integrity sha512-QMM3e4pyfwh13S0dn7nYZp8fs4pRI00CtUiN/9Q/DvLqEF97JuBFllGDuxRM5Y3SZSiBOwsFaWOJwYnDyNJOAA==
+"@blockworks-foundation/mango-v4-settings@^0.2.16":
+  version "0.2.17"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4-settings/-/mango-v4-settings-0.2.17.tgz#ebc64eb037137bdd16df93cdb63badc7f178542b"
+  integrity sha512-k4Hi0Rjq3XbWnN4Hvdd2aDrm24Ob+8+WDCz7hzR+XKCQ0HcYQXVrZn2Yz7e9IA4M3zQEP9n5HHnQopLQb8UgMw==
   dependencies:
-    "@blockworks-foundation/mango-v4-settings" "^0.2.15"
+    bn.js "^5.2.1"
+    eslint-config-prettier "^9.0.0"
+
+"@blockworks-foundation/mango-v4@0.20.2":
+  version "0.20.2"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4/-/mango-v4-0.20.2.tgz#1e8d041155288cd3ca56cb19c935ca12da306c39"
+  integrity sha512-PrTFd1ZraRF3mjtCuJvqDqepwlo5xKIMxgJmrRRuC2Am8VqcIiXglrbPoYDKNVrEZ5OEraJFhccgRDHamkq2Vg==
+  dependencies:
+    "@blockworks-foundation/mango-v4-settings" "^0.2.16"
     "@coral-xyz/anchor" "^0.28.1-beta.2"
     "@project-serum/serum" "0.13.65"
     "@pythnetwork/client" "~2.14.0"

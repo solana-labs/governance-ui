@@ -52,7 +52,7 @@ interface TokenRegisterForm {
   stablePriceDelayGrowthLimit: number
   tokenConditionalSwapTakerFeeRate: number
   tokenConditionalSwapMakerFeeRate: number
-  flashLoanDepositFeeRate: number
+  flashLoanSwapFeeRate: number
   reduceOnly: { name: string; value: number }
   borrowWeightScaleStartQuote: number
   depositWeightScaleStartQuote: number
@@ -105,7 +105,7 @@ const TokenRegister = ({
     stablePriceDelayGrowthLimit: 0.06,
     tokenConditionalSwapTakerFeeRate: 0,
     tokenConditionalSwapMakerFeeRate: 0,
-    flashLoanDepositFeeRate: 0,
+    flashLoanSwapFeeRate: 0,
     reduceOnly: REDUCE_ONLY_OPTIONS[0],
     borrowWeightScaleStartQuote: toNative(10000, 6).toNumber(),
     depositWeightScaleStartQuote: toNative(10000, 6).toNumber(),
@@ -163,7 +163,7 @@ const TokenRegister = ({
           Number(form.reduceOnly),
           Number(form.tokenConditionalSwapTakerFeeRate),
           Number(form.tokenConditionalSwapMakerFeeRate),
-          Number(form.flashLoanDepositFeeRate)
+          Number(form.flashLoanSwapFeeRate)
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -461,11 +461,11 @@ const TokenRegister = ({
     },
     {
       label: `Flash Loan Deposit Fee Rate`,
-      subtitle: getAdditionalLabelInfo('flashLoanDepositFeeRate'),
-      initialValue: form.flashLoanDepositFeeRate,
+      subtitle: getAdditionalLabelInfo('flashLoanSwapFeeRate'),
+      initialValue: form.flashLoanSwapFeeRate,
       type: InstructionInputType.INPUT,
       inputType: 'number',
-      name: 'flashLoanDepositFeeRate',
+      name: 'flashLoanSwapFeeRate',
     },
     {
       label: `Borrow Weight Scale Start Quote`,
