@@ -72,7 +72,7 @@ export const useDepositCallback = (
         walletPk,
         publicKeyToUse,
         walletPk,
-        amount,
+        amount
       )
 
       const transaction = new Transaction()
