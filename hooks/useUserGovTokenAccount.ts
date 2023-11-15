@@ -24,7 +24,8 @@ const useUserGovTokenAccountQuery = (role: 'community' | 'council') => {
         ASSOCIATED_TOKEN_PROGRAM_ID,
         TOKEN_PROGRAM_ID,
         mint,
-        walletPk
+        walletPk,
+        true
       ),
     [mint, walletPk]
   )

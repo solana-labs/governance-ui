@@ -207,7 +207,7 @@ export class VotingClient {
       )
 
       for (const pos of this.heliumVsrVotingPositions) {
-        const tokenAccount = await getAssociatedTokenAddress(pos.mint, walletPk)
+        const tokenAccount = await getAssociatedTokenAddress(pos.mint, walletPk, true)
 
         remainingAccounts.push(
           new AccountData(tokenAccount),
@@ -396,7 +396,7 @@ export class VotingClient {
 
       for (let i = 0; i < unusedPositions.length; i++) {
         const pos = unusedPositions[i]
-        const tokenAccount = await getAssociatedTokenAddress(pos.mint, walletPk)
+        const tokenAccount = await getAssociatedTokenAddress(pos.mint, walletPk, true)
         const [nftVoteRecord] = nftVoteRecordKey(
           proposal.pubkey,
           pos.mint,
