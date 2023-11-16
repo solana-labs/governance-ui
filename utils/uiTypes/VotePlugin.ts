@@ -165,10 +165,16 @@ export class VotingClient {
   ): Promise<ProgramAddresses | undefined> => {
     if (this.noClient) return
     const realm = this.realm!
-    const torAccount = await fetchTokenOwnerRecordByPubkey(
-      this.client!.stakeConnection.program.provider.connection, // FIX ME
-      tokenOwnerRecord
-    )
+    const torAccount =
+      this.client instanceof PythClient
+        ? await fetchTokenOwnerRecordByPubkey(
+            this.client.stakeConnection.program.provider.connection,
+            tokenOwnerRecord
+          )
+        : await fetchTokenOwnerRecordByPubkey(
+            this.client!.program.provider.connection,
+            tokenOwnerRecord
+          )
     console.log(this.client)
 
     if (!torAccount.result) return
