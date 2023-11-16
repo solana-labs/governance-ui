@@ -171,14 +171,14 @@ export const useGovernancePowerAsync = (
       plugin === undefined
         ? undefined
         : realmPk &&
-        TOR &&
-        (plugin === 'vanilla'
-          ? getVanillaGovpower(connection, TOR)
-          : plugin === 'NFT'
+          TOR &&
+          (plugin === 'vanilla'
+            ? getVanillaGovpower(connection, TOR)
+            : plugin === 'NFT'
             ? getNftGovpower(connection, realmPk, TOR)
             : plugin === 'VSR'
-              ? actingAsWalletPk
-                ? (await getVsrGovpower(connection, realmPk, actingAsWalletPk))
+            ? actingAsWalletPk
+              ? (await getVsrGovpower(connection, realmPk, actingAsWalletPk))
                   .result ?? new BN(0)
               : undefined
             : plugin === 'HeliumVSR'
@@ -258,42 +258,23 @@ export const useLegacyVoterWeight = () => {
           ? new VoteRegistryVoterWeight(
               communityTOR.result,
               councilTOR?.result,
-              new BN(1000000000000000) // FIX ME
+              (await getVsrGovpower(connection, realmPk, actingAsWalletPk))
+                .result ?? new BN(0)
             )
-            : plugin === 'NFT'
-              ? communityTOR.result?.pubkey
-                ? new VoteNftWeight(
-                  communityTOR.result,
-                  councilTOR?.result,
-                  await getNftGovpower(
-                    connection,
-                    realmPk,
-                    communityTOR.result.pubkey
-                  )
-                )
-                : undefined
-              : plugin === 'VSR'
-                ? actingAsWalletPk
-                  ? new VoteRegistryVoterWeight(
-                    communityTOR.result,
-                    councilTOR?.result,
-                    (await getVsrGovpower(connection, realmPk, actingAsWalletPk))
-                      .result ?? new BN(0)
-                  )
-                  : undefined
-                : plugin === 'HeliumVSR'
-                  ? new VoteRegistryVoterWeight(
-                    communityTOR.result,
-                    councilTOR?.result,
-                    heliumVotingPower
-                  )
-                  : plugin === 'gateway'
-                    ? new SimpleGatedVoterWeight(
-                      communityTOR.result,
-                      councilTOR?.result,
-                      gatewayVotingPower
-                    )
-                    : undefined),
+          : undefined
+        : plugin === 'HeliumVSR'
+        ? new VoteRegistryVoterWeight(
+            communityTOR.result,
+            councilTOR?.result,
+            heliumVotingPower
+          )
+        : plugin === 'gateway'
+        ? new SimpleGatedVoterWeight(
+            communityTOR.result,
+            councilTOR?.result,
+            gatewayVotingPower
+          )
+        : undefined),
 
     [
       actingAsWalletPk,
