@@ -2935,10 +2935,10 @@
   resolved "https://registry.yarnpkg.com/@pythnetwork/staking-wasm/-/staking-wasm-0.3.4.tgz#29c0f47467249a4c66814a8aab9eadf2cc008add"
   integrity sha512-0ZdaWmueVO5hucdVH4UDfHyBuxtW6UDcrpEFtD/3pq4naQjcgu1u6rK8iL2pgKi8W2UlsB4vwJqay2Sf1sA4mw==
 
-"@pythnetwork/staking@^1.3.5":
-  version "1.3.5"
-  resolved "https://registry.yarnpkg.com/@pythnetwork/staking/-/staking-1.3.5.tgz#62131bfde650765ddc832dfb72ac3bf01440cc40"
-  integrity sha512-g9mZ1H72RjpuWgSzK+7/R6LB5PddCr770XOOajpU0nQxHBdim+777PKH7aZ4aYbMyU+vKQ8dWgYmyxgjRttIHw==
+"@pythnetwork/staking@^1.3.6":
+  version "1.3.6"
+  resolved "https://registry.yarnpkg.com/@pythnetwork/staking/-/staking-1.3.6.tgz#861f38a88f6744f953ac2ef96fb758d6db01b755"
+  integrity sha512-M5bigpcM97AHHLFYl0Y9HLWP3KRPcymW20Fg/tcukvs6ivFAcw1SLWDRlR6qMYQ9QFaMa5mmy7SIOMQrdcLJJg==
   dependencies:
     "@project-serum/anchor" "0.24.2"
     "@pythnetwork/staking-wasm" "*"
@@ -6218,12 +6218,12 @@ ansi-escapes@^4.2.1:
   dependencies:
     type-fest "^0.21.3"
 
-ansi-regex@3.0.1:
+ansi-regex@3.0.1, ansi-regex@^2.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-3.0.1.tgz#123d6479e92ad45ad897d4054e3c7ca7db4944e1"
   integrity sha512-+O9Jct8wf++lXxxFc4hc8LsjaSq0HFzzL7cVsw8pRDIPdjKD2mT4ytDZlLuSBZ4cLKZFXIrMGO7DbQCtMJJMKw==
 
-"ansi-regex@>=3.0.1 <=5.0.1", ansi-regex@^2.0.0, ansi-regex@^3.0.0, ansi-regex@^4.1.0, ansi-regex@^5.0.0, ansi-regex@^5.0.1:
+"ansi-regex@>=3.0.1 <=5.0.1", ansi-regex@^3.0.0, ansi-regex@^4.1.0, ansi-regex@^5.0.0, ansi-regex@^5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-5.0.1.tgz#082cb2c89c9fe8659a311a53bd6a4dc5301db304"
   integrity sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==

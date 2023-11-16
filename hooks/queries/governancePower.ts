@@ -15,7 +15,7 @@ import {
   VoterWeight,
 } from '@models/voteWeights'
 import { useConnection } from '@solana/wallet-adapter-react'
-import { Connection, PublicKey } from '@solana/web3.js'
+import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import { getNetworkFromEndpoint } from '@utils/connection'
 import useGatewayPluginStore from 'GatewayPlugin/store/gatewayPluginStore'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
@@ -36,6 +36,9 @@ import {
   useUserCommunityTokenOwnerRecord,
   useUserCouncilTokenOwnerRecord,
 } from './tokenOwnerRecord'
+import { PythClient } from '@pythnetwork/staking'
+import { AnchorProvider } from '@coral-xyz/anchor'
+import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet'
 
 export const getVanillaGovpower = async (
   connection: Connection,
@@ -101,6 +104,20 @@ export const getNftGovpower = async (
     .reduce((partialSum, a) => partialSum.add(a), new BN(0))
 
   return power
+}
+
+export const getPythGovPower = async (connection: Connection, user : PublicKey | undefined) : Promise<BN> => {
+  if (!user) return new BN(0)
+
+  const pythClient = await PythClient.connect(new AnchorProvider(connection, new NodeWallet(new Keypair()), {}), "mainnet-beta")
+  const stakeAccount = await pythClient.stakeConnection.getMainAccount(user)
+  
+  if (stakeAccount){
+    return stakeAccount.getVoterWeight(await pythClient.stakeConnection.getTime()).toBN()
+  }
+  else {
+    return new BN(0)
+  }
 }
 
 export const findPluginName = (programId: PublicKey | undefined) =>
@@ -186,7 +203,7 @@ export const useGovernancePowerAsync = (
             : plugin === 'gateway'
             ? gatewayVotingPower
             : plugin === 'pyth'
-            ? new BN(1000000000000000)
+            ? getPythGovPower(connection, actingAsWalletPk)
             : new BN(0)),
     [
       plugin,
@@ -239,7 +256,7 @@ export const useLegacyVoterWeight = () => {
         ? new VoteRegistryVoterWeight(
             communityTOR.result,
             councilTOR?.result,
-            new BN(1000000000000000)
+            await getPythGovPower(connection, actingAsWalletPk)
           )
         : plugin === 'NFT'
         ? communityTOR.result?.pubkey
