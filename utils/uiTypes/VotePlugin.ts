@@ -164,6 +164,7 @@ export class VotingClient {
     voterWeightTarget?: PublicKey
   ): Promise<ProgramAddresses | undefined> => {
     if (this.noClient) return
+    
     const realm = this.realm!
     const torAccount = await fetchTokenOwnerRecordByPubkey(
       this.client!.program.provider.connection,
