@@ -53,7 +53,7 @@ import { NftVoter } from 'idls/nft_voter'
 import { NftVoterV2 } from 'idls/nft_voter_v2'
 import { Program } from '@project-serum/anchor'
 import { fetchTokenOwnerRecordByPubkey } from '@hooks/queries/tokenOwnerRecord'
-import { PythClient } from '@pythnetwork/staking'
+import { StakeConnection as PythClient } from '@pythnetwork/staking'
 
 export type UpdateVoterWeightRecordTypes =
   | 'castVote'
@@ -164,7 +164,7 @@ export class VotingClient {
     voterWeightTarget?: PublicKey
   ): Promise<ProgramAddresses | undefined> => {
     if (this.noClient) return
-    
+
     const realm = this.realm!
     const torAccount = await fetchTokenOwnerRecordByPubkey(
       this.client!.program.provider.connection,

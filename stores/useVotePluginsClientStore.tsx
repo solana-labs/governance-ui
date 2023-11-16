@@ -19,7 +19,7 @@ import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import { Registrar as HeliumVsrRegistrar } from 'HeliumVotePlugin/sdk/types'
 import * as heliumVsrSdk from '@helium/voter-stake-registry-sdk'
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
-import { PythClient } from '@pythnetwork/staking'
+import { StakeConnection as PythClient } from '@pythnetwork/staking'
 
 interface UseVotePluginsClientStore extends State {
   state: {
@@ -28,7 +28,7 @@ interface UseVotePluginsClientStore extends State {
     heliumVsrClient: HeliumVsrClient | undefined
     nftClient: NftVoterClient | undefined
     gatewayClient: GatewayClient | undefined
-    pythClient: typeof PythClient | undefined
+    pythClient: PythClient | undefined
     nftMintRegistrar: any
     gatewayRegistrar: any
     currentRealmVotingClient: VotingClient
