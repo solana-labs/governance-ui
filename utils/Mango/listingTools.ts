@@ -224,117 +224,124 @@ export const getSuggestedCoinTier = async (
   outputMint: string,
   hasPythOracle: boolean
 ) => {
-  const TIERS: LISTING_PRESETS_KEYS[] = [
-    'ULTRA_PREMIUM',
-    'PREMIUM',
-    'MID',
-    'MEME',
-    'SHIT',
-  ]
+  try {
+    const TIERS: LISTING_PRESETS_KEYS[] = [
+      'ULTRA_PREMIUM',
+      'PREMIUM',
+      'MID',
+      'MEME',
+      'SHIT',
+    ]
 
-  const swaps = await Promise.all([
-    fetchJupiterRoutes(
-      MAINNET_USDC_MINT.toBase58(),
-      outputMint,
-      toNative(250000, 6).toNumber()
-    ),
-    fetchJupiterRoutes(
-      MAINNET_USDC_MINT.toBase58(),
-      outputMint,
-      toNative(100000, 6).toNumber()
-    ),
-    fetchJupiterRoutes(
-      MAINNET_USDC_MINT.toBase58(),
-      outputMint,
-      toNative(20000, 6).toNumber()
-    ),
-    fetchJupiterRoutes(
-      MAINNET_USDC_MINT.toBase58(),
-      outputMint,
-      toNative(5000, 6).toNumber()
-    ),
-    fetchJupiterRoutes(
-      MAINNET_USDC_MINT.toBase58(),
-      outputMint,
-      toNative(1000, 6).toNumber()
-    ),
-    fetchJupiterRoutes(
-      MAINNET_USDC_MINT.toBase58(),
-      outputMint,
-      toNative(250000, 6).toNumber(),
-      'ExactOut'
-    ),
-    fetchJupiterRoutes(
-      MAINNET_USDC_MINT.toBase58(),
-      outputMint,
-      toNative(100000, 6).toNumber(),
-      'ExactOut'
-    ),
-    fetchJupiterRoutes(
-      MAINNET_USDC_MINT.toBase58(),
-      outputMint,
-      toNative(20000, 6).toNumber(),
-      'ExactOut'
-    ),
-    fetchJupiterRoutes(
-      MAINNET_USDC_MINT.toBase58(),
-      outputMint,
-      toNative(5000, 6).toNumber(),
-      'ExactOut'
-    ),
-    fetchJupiterRoutes(
-      MAINNET_USDC_MINT.toBase58(),
-      outputMint,
-      toNative(1000, 6).toNumber(),
-      'ExactOut'
-    ),
-  ])
-  const bestRoutesSwaps = swaps
-    .filter((x) => x.bestRoute)
-    .map((x) => x.bestRoute!)
+    const swaps = await Promise.all([
+      fetchJupiterRoutes(
+        MAINNET_USDC_MINT.toBase58(),
+        outputMint,
+        toNative(250000, 6).toNumber()
+      ),
+      fetchJupiterRoutes(
+        MAINNET_USDC_MINT.toBase58(),
+        outputMint,
+        toNative(100000, 6).toNumber()
+      ),
+      fetchJupiterRoutes(
+        MAINNET_USDC_MINT.toBase58(),
+        outputMint,
+        toNative(20000, 6).toNumber()
+      ),
+      fetchJupiterRoutes(
+        MAINNET_USDC_MINT.toBase58(),
+        outputMint,
+        toNative(5000, 6).toNumber()
+      ),
+      fetchJupiterRoutes(
+        MAINNET_USDC_MINT.toBase58(),
+        outputMint,
+        toNative(1000, 6).toNumber()
+      ),
+      fetchJupiterRoutes(
+        MAINNET_USDC_MINT.toBase58(),
+        outputMint,
+        toNative(250000, 6).toNumber(),
+        'ExactOut'
+      ),
+      fetchJupiterRoutes(
+        MAINNET_USDC_MINT.toBase58(),
+        outputMint,
+        toNative(100000, 6).toNumber(),
+        'ExactOut'
+      ),
+      fetchJupiterRoutes(
+        MAINNET_USDC_MINT.toBase58(),
+        outputMint,
+        toNative(20000, 6).toNumber(),
+        'ExactOut'
+      ),
+      fetchJupiterRoutes(
+        MAINNET_USDC_MINT.toBase58(),
+        outputMint,
+        toNative(5000, 6).toNumber(),
+        'ExactOut'
+      ),
+      fetchJupiterRoutes(
+        MAINNET_USDC_MINT.toBase58(),
+        outputMint,
+        toNative(1000, 6).toNumber(),
+        'ExactOut'
+      ),
+    ])
+    const bestRoutesSwaps = swaps
+      .filter((x) => x.bestRoute)
+      .map((x) => x.bestRoute!)
 
-  const averageSwaps = bestRoutesSwaps.reduce(
-    (acc: { amount: string; priceImpactPct: number }[], val) => {
-      if (val.swapMode === 'ExactIn') {
-        const exactOutRoute = bestRoutesSwaps.find(
-          (x) => x.amount === val.amount && x.swapMode === 'ExactOut'
-        )
-        acc.push({
-          amount: val.amount.toString(),
-          priceImpactPct: exactOutRoute?.priceImpactPct
-            ? (val.priceImpactPct + exactOutRoute.priceImpactPct) / 2
-            : val.priceImpactPct,
-        })
-      }
-      return acc
-    },
-    []
-  )
+    const averageSwaps = bestRoutesSwaps.reduce(
+      (acc: { amount: string; priceImpactPct: number }[], val) => {
+        if (val.swapMode === 'ExactIn') {
+          const exactOutRoute = bestRoutesSwaps.find(
+            (x) => x.amount === val.amount && x.swapMode === 'ExactOut'
+          )
+          acc.push({
+            amount: val.amount.toString(),
+            priceImpactPct: exactOutRoute?.priceImpactPct
+              ? (val.priceImpactPct + exactOutRoute.priceImpactPct) / 2
+              : val.priceImpactPct,
+          })
+        }
+        return acc
+      },
+      []
+    )
 
-  const indexForTierFromSwaps = averageSwaps.findIndex(
-    (x) => x?.priceImpactPct && x?.priceImpactPct * 100 < 1
-  )
+    const indexForTierFromSwaps = averageSwaps.findIndex(
+      (x) => x?.priceImpactPct && x?.priceImpactPct * 100 < 1
+    )
 
-  const tier =
-    indexForTierFromSwaps > -1 ? TIERS[indexForTierFromSwaps] : 'UNTRUSTED'
+    const tier =
+      indexForTierFromSwaps > -1 ? TIERS[indexForTierFromSwaps] : 'UNTRUSTED'
 
-  const tierLowerThenCurrent =
-    tier === 'ULTRA_PREMIUM' || tier === 'PREMIUM'
-      ? 'MID'
-      : tier === 'MID'
-      ? 'MEME'
-      : tier
-  const isPythRecommendedTier =
-    tier === 'MID' || tier === 'PREMIUM' || tier === 'ULTRA_PREMIUM'
-  const listingTier =
-    isPythRecommendedTier && !hasPythOracle ? tierLowerThenCurrent : tier
+    const tierLowerThenCurrent =
+      tier === 'ULTRA_PREMIUM' || tier === 'PREMIUM'
+        ? 'MID'
+        : tier === 'MID'
+        ? 'MEME'
+        : tier
+    const isPythRecommendedTier =
+      tier === 'MID' || tier === 'PREMIUM' || tier === 'ULTRA_PREMIUM'
+    const listingTier =
+      isPythRecommendedTier && !hasPythOracle ? tierLowerThenCurrent : tier
 
-  return {
-    tier: listingTier,
-    priceImpact: (indexForTierFromSwaps > -1
-      ? averageSwaps[indexForTierFromSwaps]!.priceImpactPct
-      : 100
-    ).toFixed(2),
+    return {
+      tier: listingTier,
+      priceImpact: (indexForTierFromSwaps > -1
+        ? averageSwaps[indexForTierFromSwaps]!.priceImpactPct
+        : 100
+      ).toFixed(2),
+    }
+  } catch (e) {
+    return {
+      tier: 'UNTRUSTED',
+      priceImpact: 100,
+    }
   }
 }
 
