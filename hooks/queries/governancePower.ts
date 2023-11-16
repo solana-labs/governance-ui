@@ -130,7 +130,9 @@ export const findPluginName = (programId: PublicKey | undefined) =>
     : NFT_PLUGINS_PKS.includes(programId.toString())
     ? 'NFT'
     : GATEWAY_PLUGINS_PKS.includes(programId.toString())
-    ? 'gateway'
+    ? 'gateway' 
+    : PYTH_PLUGIN_PK.includes(programId.toString())
+    ? 'pyth'
     : 'unknown'
 
 export const determineVotingPowerType = async (
@@ -147,19 +149,7 @@ export const determineVotingPowerType = async (
       ? config.result?.account.communityTokenConfig.voterWeightAddin
       : config.result?.account.councilTokenConfig.voterWeightAddin
 
-  return programId === undefined
-    ? ('vanilla' as const)
-    : VSR_PLUGIN_PKS.includes(programId.toString())
-    ? ('VSR' as const)
-    : HELIUM_VSR_PLUGINS_PKS.includes(programId.toString())
-    ? 'HeliumVSR'
-    : NFT_PLUGINS_PKS.includes(programId.toString())
-    ? 'NFT'
-    : GATEWAY_PLUGINS_PKS.includes(programId.toString())
-    ? 'gateway'
-    : PYTH_PLUGIN_PK.includes(programId.toString())
-    ? 'pyth'
-    : 'unknown'
+  return findPluginName(programId)
 }
 
 export const useGovernancePowerAsync = (
