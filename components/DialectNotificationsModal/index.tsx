@@ -33,6 +33,9 @@ const themeVariables: IncomingThemeVariables = {
       bg: 'bg-bkg-1',
       toggleBackgroundActive: 'bg-primary-light',
     },
+    textStyles: {
+      input: 'text-black',
+    },
     outlinedInput: `${defaultVariables.dark.outlinedInput} focus-within:border-primary-light`,
     disabledButton: `${defaultVariables.dark.disabledButton} border-primary-light font-bold rounded-full border-fgd-3 text-fgd-3 cursor-not-allowed`,
     modal: `${defaultVariables.dark.modal} bg-bkg-1 sm:border sm:border-fgd-4 shadow-md sm:rounded-md`,
