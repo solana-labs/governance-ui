@@ -1,4 +1,17 @@
+import { Connection, Keypair, PublicKey } from '@solana/web3.js'
+import {
+  fetchTokenOwnerRecordByPubkey,
+  useTokenOwnerRecordByPubkeyQuery,
+  useUserCommunityTokenOwnerRecord,
+  useUserCouncilTokenOwnerRecord,
+} from './tokenOwnerRecord'
+import BN from 'bn.js'
+import { fetchNftRegistrar } from './plugins/nftVoter'
+import { fetchDigitalAssetsByOwner } from './digitalAssets'
+import { getNetworkFromEndpoint } from '@utils/connection'
 import { ON_NFT_VOTER_V2 } from '@constants/flags'
+import { fetchRealmByPubkey, useRealmQuery } from './realm'
+import { fetchRealmConfigQuery } from './realmConfig'
 import {
   GATEWAY_PLUGINS_PKS,
   HELIUM_VSR_PLUGINS_PKS,
@@ -6,36 +19,23 @@ import {
   PYTH_PLUGIN_PK,
   VSR_PLUGIN_PKS,
 } from '@constants/plugins'
+import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
+import useGatewayPluginStore from 'GatewayPlugin/store/gatewayPluginStore'
+import { useAsync } from 'react-async-hook'
+import { useConnection } from '@solana/wallet-adapter-react'
 import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
-import useUserOrDelegator from '@hooks/useUserOrDelegator'
+import {
+  useAddressQuery_CommunityTokenOwner,
+  useAddressQuery_CouncilTokenOwner,
+} from './addresses/tokenOwnerRecord'
 import {
   SimpleGatedVoterWeight,
   VoteNftWeight,
   VoteRegistryVoterWeight,
   VoterWeight,
 } from '@models/voteWeights'
-import { useConnection } from '@solana/wallet-adapter-react'
-import { Connection, Keypair, PublicKey } from '@solana/web3.js'
-import { getNetworkFromEndpoint } from '@utils/connection'
-import useGatewayPluginStore from 'GatewayPlugin/store/gatewayPluginStore'
-import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
-import BN from 'bn.js'
-import { useAsync } from 'react-async-hook'
-import {
-  useAddressQuery_CommunityTokenOwner,
-  useAddressQuery_CouncilTokenOwner,
-} from './addresses/tokenOwnerRecord'
-import { fetchDigitalAssetsByOwner } from './digitalAssets'
-import { fetchNftRegistrar } from './plugins/nftVoter'
+import useUserOrDelegator from '@hooks/useUserOrDelegator'
 import { getVsrGovpower } from './plugins/vsr'
-import { fetchRealmByPubkey, useRealmQuery } from './realm'
-import { fetchRealmConfigQuery } from './realmConfig'
-import {
-  fetchTokenOwnerRecordByPubkey,
-  useTokenOwnerRecordByPubkeyQuery,
-  useUserCommunityTokenOwnerRecord,
-  useUserCouncilTokenOwnerRecord,
-} from './tokenOwnerRecord'
 import { PythClient } from '@pythnetwork/staking'
 import { AnchorProvider } from '@coral-xyz/anchor'
 import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet'
