@@ -376,6 +376,16 @@ const instructions = () => ({
               ) : (
                 <div className="py-4">No Oracle Data</div>
               )}
+              <div className="py-4">
+                <div className="flex mb-2">
+                  <div className="w-3 h-3 bg-orange mr-2"></div> - Proposed
+                  values
+                </div>
+                <div className="flex">
+                  <div className="w-3 h-3 bg-green mr-2"></div> - Suggested by
+                  liqudity
+                </div>
+              </div>
               <DisplayListingPropertyWrapped
                 label="Token index"
                 suggestedUntrusted={false}
