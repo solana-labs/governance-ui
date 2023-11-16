@@ -37,7 +37,6 @@ import {
 import useUserOrDelegator from '@hooks/useUserOrDelegator'
 import { getVsrGovpower } from './plugins/vsr'
 import { PythClient } from '@pythnetwork/staking'
-import { AnchorProvider } from '@coral-xyz/anchor'
 import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet'
 
 export const getVanillaGovpower = async (
