@@ -1,6 +1,7 @@
 import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
 import useWalletOnePointOh from './useWalletOnePointOh'
 
+/** @deprecated it's very suspicious this only cares about community delegator and shud prob not be used / shud take role as input */
 export default function () {
   const wallet = useWalletOnePointOh()
   const selectedCommunityDelegator = useSelectedDelegatorStore(

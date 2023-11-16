@@ -53,6 +53,8 @@ export const ACCOUNT_NAMES = {
   Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z: 'Mango DAO MNGO Treasury Vault',
   HvBKrep6TbUpLVB4Lyd5T56LohhpPf3ZdNt7wpTiKqn3: 'Mango DAO Game Master Wallet',
   DiSDgMz4DeNKHXkpqUGoukr1YM9xxc1wH9gusZnMa1ga: 'Mango DAO Dual Realm Deposit',
+  '2gDu12CM56g18Ukc9R1EdmEbToXqGTrnBEqR3zKfVKgt':
+    'Mango DAO BLAZE Realm Deposit',
   '8gjzxiqcU87cvRc7hFiUJgxqLSV7AQnSttfWC5fD9aim':
     'Mango DAO Treasury Council Mint',
   G1Yc5696GcfL28uAWG6iCaKJwZd8sQzwPJTc2UacsjHN:
@@ -388,6 +390,10 @@ const MNGO_AUXILIARY_TOKEN_ACCOUNTS = [
   {
     owner: '58apybWwtWwgVfARs7uJ75Vs1csPimnCCFth7cKwTJAe',
     accounts: ['DiSDgMz4DeNKHXkpqUGoukr1YM9xxc1wH9gusZnMa1ga'],
+  },
+  {
+    owner: '7hqfhmXK6uXQKmNjUVEJo5acDMLcnyN9p9bZ5Dmnifde',
+    accounts: ['2gDu12CM56g18Ukc9R1EdmEbToXqGTrnBEqR3zKfVKgt'],
   },
   {
     owner: '9so7UTo6b6LXBSqdDfh18hjVj8Ng5BmLbYXLB7UrhaaJ',

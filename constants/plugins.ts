@@ -1,4 +1,5 @@
-import * as heliumVsrSdk from '@helium/voter-stake-registry-sdk'
+import { PROGRAM_ID as HELIUM_VSR_PROGRAM_ID } from '@helium/voter-stake-registry-sdk'
+import { PublicKey } from '@solana/web3.js'
 import { DEFAULT_NFT_VOTER_PLUGIN } from '@tools/constants'
 
 export const VSR_PLUGIN_PKS: string[] = [
@@ -11,7 +12,7 @@ export const VSR_PLUGIN_PKS: string[] = [
 ]
 
 export const HELIUM_VSR_PLUGINS_PKS: string[] = [
-  heliumVsrSdk.PROGRAM_ID.toBase58(),
+  HELIUM_VSR_PROGRAM_ID.toBase58(),
 ]
 
 export const NFT_PLUGINS_PKS: string[] = [
@@ -26,5 +27,20 @@ export const GATEWAY_PLUGINS_PKS: string[] = [
 ]
 
 export const PYTH_PLUGIN_PK: string[] = [
-  "pytS9TjG1qyAZypk7n8rw8gfW9sUaqqYyMhJQ4E7JCQ"
+  'pytS9TjG1qyAZypk7n8rw8gfW9sUaqqYyMhJQ4E7JCQ',
 ]
+
+export const findPluginName = (programId: PublicKey | undefined) =>
+  programId === undefined
+    ? ('vanilla' as const)
+    : VSR_PLUGIN_PKS.includes(programId.toString())
+    ? ('VSR' as const)
+    : HELIUM_VSR_PLUGINS_PKS.includes(programId.toString())
+    ? 'HeliumVSR'
+    : NFT_PLUGINS_PKS.includes(programId.toString())
+    ? 'NFT'
+    : GATEWAY_PLUGINS_PKS.includes(programId.toString())
+    ? 'gateway'
+    : PYTH_PLUGIN_PK.includes(programId.toString())
+    ? 'pyth'
+    : 'unknown'

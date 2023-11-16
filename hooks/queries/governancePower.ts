@@ -1,17 +1,4 @@
-import { Connection, PublicKey } from '@solana/web3.js'
-import {
-  fetchTokenOwnerRecordByPubkey,
-  useTokenOwnerRecordByPubkeyQuery,
-  useUserCommunityTokenOwnerRecord,
-  useUserCouncilTokenOwnerRecord,
-} from './tokenOwnerRecord'
-import BN from 'bn.js'
-import { fetchNftRegistrar } from './plugins/nftVoter'
-import { fetchDigitalAssetsByOwner } from './digitalAssets'
-import { getNetworkFromEndpoint } from '@utils/connection'
 import { ON_NFT_VOTER_V2 } from '@constants/flags'
-import { fetchRealmByPubkey, useRealmQuery } from './realm'
-import { fetchRealmConfigQuery } from './realmConfig'
 import {
   GATEWAY_PLUGINS_PKS,
   HELIUM_VSR_PLUGINS_PKS,
@@ -19,23 +6,36 @@ import {
   PYTH_PLUGIN_PK,
   VSR_PLUGIN_PKS,
 } from '@constants/plugins'
-import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
-import useGatewayPluginStore from 'GatewayPlugin/store/gatewayPluginStore'
-import { useAsync } from 'react-async-hook'
-import { useConnection } from '@solana/wallet-adapter-react'
 import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
-import {
-  useAddressQuery_CommunityTokenOwner,
-  useAddressQuery_CouncilTokenOwner,
-} from './addresses/tokenOwnerRecord'
+import useUserOrDelegator from '@hooks/useUserOrDelegator'
 import {
   SimpleGatedVoterWeight,
   VoteNftWeight,
   VoteRegistryVoterWeight,
   VoterWeight,
 } from '@models/voteWeights'
-import useUserOrDelegator from '@hooks/useUserOrDelegator'
+import { useConnection } from '@solana/wallet-adapter-react'
+import { Connection, PublicKey } from '@solana/web3.js'
+import { getNetworkFromEndpoint } from '@utils/connection'
+import useGatewayPluginStore from 'GatewayPlugin/store/gatewayPluginStore'
+import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
+import BN from 'bn.js'
+import { useAsync } from 'react-async-hook'
+import {
+  useAddressQuery_CommunityTokenOwner,
+  useAddressQuery_CouncilTokenOwner,
+} from './addresses/tokenOwnerRecord'
+import { fetchDigitalAssetsByOwner } from './digitalAssets'
+import { fetchNftRegistrar } from './plugins/nftVoter'
 import { getVsrGovpower } from './plugins/vsr'
+import { fetchRealmByPubkey, useRealmQuery } from './realm'
+import { fetchRealmConfigQuery } from './realmConfig'
+import {
+  fetchTokenOwnerRecordByPubkey,
+  useTokenOwnerRecordByPubkeyQuery,
+  useUserCommunityTokenOwnerRecord,
+  useUserCouncilTokenOwnerRecord,
+} from './tokenOwnerRecord'
 
 export const getVanillaGovpower = async (
   connection: Connection,
@@ -103,6 +103,19 @@ export const getNftGovpower = async (
   return power
 }
 
+export const findPluginName = (programId: PublicKey | undefined) =>
+  programId === undefined
+    ? ('vanilla' as const)
+    : VSR_PLUGIN_PKS.includes(programId.toString())
+    ? ('VSR' as const)
+    : HELIUM_VSR_PLUGINS_PKS.includes(programId.toString())
+    ? 'HeliumVSR'
+    : NFT_PLUGINS_PKS.includes(programId.toString())
+    ? 'NFT'
+    : GATEWAY_PLUGINS_PKS.includes(programId.toString())
+    ? 'gateway'
+    : 'unknown'
+
 export const determineVotingPowerType = async (
   connection: Connection,
   realmPk: PublicKey,
@@ -120,15 +133,16 @@ export const determineVotingPowerType = async (
   return programId === undefined
     ? ('vanilla' as const)
     : VSR_PLUGIN_PKS.includes(programId.toString())
-      ? ('VSR' as const)
-      : HELIUM_VSR_PLUGINS_PKS.includes(programId.toString())
-        ? 'HeliumVSR'
-        : NFT_PLUGINS_PKS.includes(programId.toString())
-          ? 'NFT'
-          : GATEWAY_PLUGINS_PKS.includes(programId.toString())
-            ? 'gateway'
-            : PYTH_PLUGIN_PK.includes(programId.toString()) ? "pyth"
-              : "unknown"
+    ? ('VSR' as const)
+    : HELIUM_VSR_PLUGINS_PKS.includes(programId.toString())
+    ? 'HeliumVSR'
+    : NFT_PLUGINS_PKS.includes(programId.toString())
+    ? 'NFT'
+    : GATEWAY_PLUGINS_PKS.includes(programId.toString())
+    ? 'gateway'
+    : PYTH_PLUGIN_PK.includes(programId.toString())
+    ? 'pyth'
+    : 'unknown'
 }
 
 export const useGovernancePowerAsync = (
@@ -157,22 +171,23 @@ export const useGovernancePowerAsync = (
       plugin === undefined
         ? undefined
         : realmPk &&
-        TOR &&
-        (plugin === 'vanilla'
-          ? getVanillaGovpower(connection, TOR)
-          : plugin === 'NFT'
+          TOR &&
+          (plugin === 'vanilla'
+            ? getVanillaGovpower(connection, TOR)
+            : plugin === 'NFT'
             ? getNftGovpower(connection, realmPk, TOR)
             : plugin === 'VSR'
-              ? actingAsWalletPk
-                ? (await getVsrGovpower(connection, realmPk, actingAsWalletPk))
+            ? actingAsWalletPk
+              ? (await getVsrGovpower(connection, realmPk, actingAsWalletPk))
                   .result ?? new BN(0)
-                : undefined
-              : plugin === 'HeliumVSR'
-                ? heliumVotingPower
-                : plugin === 'gateway'
-                  ? gatewayVotingPower : plugin === "pyth" ?
-                    new BN(1000000000000000)
-                    : new BN(0)),
+              : undefined
+            : plugin === 'HeliumVSR'
+            ? heliumVotingPower
+            : plugin === 'gateway'
+            ? gatewayVotingPower
+            : plugin === 'pyth'
+            ? new BN(1000000000000000)
+            : new BN(0)),
     [
       plugin,
       realmPk,
@@ -217,47 +232,49 @@ export const useLegacyVoterWeight = () => {
       (shouldCareAboutCouncil === undefined
         ? undefined
         : shouldCareAboutCouncil === true && councilTOR === undefined
-          ? undefined
-          : plugin === 'pyth'
-            ? new VoteRegistryVoterWeight(
+        ? undefined
+        : plugin === 'vanilla'
+        ? new VoterWeight(communityTOR.result, councilTOR?.result)
+        : plugin === 'pyth'
+        ? new VoteRegistryVoterWeight(
+            communityTOR.result,
+            councilTOR?.result,
+            new BN(1000000000000000)
+          )
+        : plugin === 'NFT'
+        ? communityTOR.result?.pubkey
+          ? new VoteNftWeight(
               communityTOR.result,
               councilTOR?.result,
-              new BN(1000000000000000) // FIX ME
+              await getNftGovpower(
+                connection,
+                realmPk,
+                communityTOR.result.pubkey
+              )
             )
-            : plugin === 'NFT'
-              ? communityTOR.result?.pubkey
-                ? new VoteNftWeight(
-                  communityTOR.result,
-                  councilTOR?.result,
-                  await getNftGovpower(
-                    connection,
-                    realmPk,
-                    communityTOR.result.pubkey
-                  )
-                )
-                : undefined
-              : plugin === 'VSR'
-                ? actingAsWalletPk
-                  ? new VoteRegistryVoterWeight(
-                    communityTOR.result,
-                    councilTOR?.result,
-                    (await getVsrGovpower(connection, realmPk, actingAsWalletPk))
-                      .result ?? new BN(0)
-                  )
-                  : undefined
-                : plugin === 'HeliumVSR'
-                  ? new VoteRegistryVoterWeight(
-                    communityTOR.result,
-                    councilTOR?.result,
-                    heliumVotingPower
-                  )
-                  : plugin === 'gateway'
-                    ? new SimpleGatedVoterWeight(
-                      communityTOR.result,
-                      councilTOR?.result,
-                      gatewayVotingPower
-                    )
-                    : undefined),
+          : undefined
+        : plugin === 'VSR'
+        ? actingAsWalletPk
+          ? new VoteRegistryVoterWeight(
+              communityTOR.result,
+              councilTOR?.result,
+              (await getVsrGovpower(connection, realmPk, actingAsWalletPk))
+                .result ?? new BN(0)
+            )
+          : undefined
+        : plugin === 'HeliumVSR'
+        ? new VoteRegistryVoterWeight(
+            communityTOR.result,
+            councilTOR?.result,
+            heliumVotingPower
+          )
+        : plugin === 'gateway'
+        ? new SimpleGatedVoterWeight(
+            communityTOR.result,
+            councilTOR?.result,
+            gatewayVotingPower
+          )
+        : undefined),
 
     [
       actingAsWalletPk,

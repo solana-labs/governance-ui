@@ -80,7 +80,21 @@ export const getCastNftVoteInstruction = async (
         .instruction()
     )
   }
-  return castNftVoteIxs
+
+  // this is required in the case where all nfts are counted already
+  const emptyCastNftVote = await program.methods
+    .castNftVote(proposal)
+    .accounts({
+      registrar,
+      voterWeightRecord: voterWeightPk,
+      voterTokenOwnerRecord: tokenOwnerRecord,
+      voterAuthority: walletPk,
+      payer: walletPk,
+      systemProgram: SYSTEM_PROGRAM_ID,
+    })
+    .instruction()
+
+  return castNftVoteIxs.length ? castNftVoteIxs : [emptyCastNftVote]
 }
 
 export const getCastNftVoteInstructionV2 = async (
