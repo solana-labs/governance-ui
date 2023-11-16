@@ -2935,10 +2935,10 @@
   resolved "https://registry.yarnpkg.com/@pythnetwork/staking-wasm/-/staking-wasm-0.3.4.tgz#29c0f47467249a4c66814a8aab9eadf2cc008add"
   integrity sha512-0ZdaWmueVO5hucdVH4UDfHyBuxtW6UDcrpEFtD/3pq4naQjcgu1u6rK8iL2pgKi8W2UlsB4vwJqay2Sf1sA4mw==
 
-"@pythnetwork/staking@^1.3.6":
-  version "1.3.6"
-  resolved "https://registry.yarnpkg.com/@pythnetwork/staking/-/staking-1.3.6.tgz#861f38a88f6744f953ac2ef96fb758d6db01b755"
-  integrity sha512-M5bigpcM97AHHLFYl0Y9HLWP3KRPcymW20Fg/tcukvs6ivFAcw1SLWDRlR6qMYQ9QFaMa5mmy7SIOMQrdcLJJg==
+"@pythnetwork/staking@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@pythnetwork/staking/-/staking-2.0.0.tgz#41edcb000a3c2d1db938a3017dae46f54aac061e"
+  integrity sha512-7RPcsYfEJxGZ12P+OyQ1lfXxgcoe69N0Zftj525GaxUDMBvCXtNSQM+FuskF8y/GKHifZ+CDI8eP3w26gv0ZzQ==
   dependencies:
     "@project-serum/anchor" "0.24.2"
     "@pythnetwork/staking-wasm" "*"

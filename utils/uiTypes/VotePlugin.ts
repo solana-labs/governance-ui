@@ -165,16 +165,11 @@ export class VotingClient {
   ): Promise<ProgramAddresses | undefined> => {
     if (this.noClient) return
     const realm = this.realm!
-    const torAccount =
-      this.client instanceof PythClient
-        ? await fetchTokenOwnerRecordByPubkey(
-            this.client.stakeConnection.program.provider.connection,
-            tokenOwnerRecord
-          )
-        : await fetchTokenOwnerRecordByPubkey(
+    const torAccount = await fetchTokenOwnerRecordByPubkey(
             this.client!.program.provider.connection,
             tokenOwnerRecord
           )
+
     console.log(this.client)
 
     if (!torAccount.result) return
@@ -331,14 +326,14 @@ export class VotingClient {
       return { voterWeightPk, maxVoterWeightRecord: undefined }
     }
     if (this.client instanceof PythClient) {
-      const stakeAccount = await this.client!.stakeConnection.getMainAccount(
+      const stakeAccount = await this.client!.getMainAccount(
         walletPk
       )
 
       const {
         voterWeightAccount,
         maxVoterWeightRecord,
-      } = await this.client.stakeConnection.withUpdateVoterWeight(
+      } = await this.client.withUpdateVoterWeight(
         instructions,
         stakeAccount!,
         { [type]: {} },
@@ -469,14 +464,14 @@ export class VotingClient {
     }
 
     if (this.client instanceof PythClient) {
-      const stakeAccount = await this.client!.stakeConnection.getMainAccount(
+      const stakeAccount = await this.client!.getMainAccount(
         walletPk
       )
 
       const {
         voterWeightAccount,
         maxVoterWeightRecord,
-      } = await this.client.stakeConnection.withUpdateVoterWeight(
+      } = await this.client.withUpdateVoterWeight(
         instructions,
         stakeAccount!,
         { ['castVote']: {} },

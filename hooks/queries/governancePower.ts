@@ -109,11 +109,11 @@ export const getNftGovpower = async (
 export const getPythGovPower = async (connection: Connection, user : PublicKey | undefined) : Promise<BN> => {
   if (!user) return new BN(0)
 
-  const pythClient = await PythClient.connect(new AnchorProvider(connection, new NodeWallet(new Keypair()), {}), "mainnet-beta")
-  const stakeAccount = await pythClient.stakeConnection.getMainAccount(user)
+  const pythClient = await PythClient.connect(connection, new NodeWallet(new Keypair()))
+  const stakeAccount = await pythClient.getMainAccount(user)
   
   if (stakeAccount){
-    return stakeAccount.getVoterWeight(await pythClient.stakeConnection.getTime()).toBN()
+    return stakeAccount.getVoterWeight(await pythClient.getTime()).toBN()
   }
   else {
     return new BN(0)

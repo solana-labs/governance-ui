@@ -241,16 +241,12 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
       })
     },
     handleSetPythClient: async (wallet, connection) => {
-      const options = AnchorProvider.defaultOptions()
-      const provider = new AnchorProvider(
-        connection.current,
-        (wallet as unknown) as Wallet,
-        options
-      )
-      const pythClient = await PythClient.connect(provider, 'devnet')
+      if (wallet) {
+      const pythClient = await PythClient.connect(connection.current, wallet as unknown as Wallet)
       set((s) => {
         s.state.pythClient = pythClient
       })
+      }
     },
   })
 )
