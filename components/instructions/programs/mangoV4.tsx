@@ -256,16 +256,15 @@ const instructions = () => ({
       )[liqudityTier.tier]
       const suggestedUntrusted = liqudityTier.tier === 'UNTRUSTED'
 
-      const suggestedFormattedPreset: ListingArgsFormatted = Object.keys(
-        suggestedPreset
-      ).length
-        ? getFormattedListingValues({
-            tokenIndex: args.tokenIndex,
-            name: args.name,
-            oracle: args.oracle,
-            ...suggestedPreset,
-          })
-        : ({} as ListingArgsFormatted)
+      const suggestedFormattedPreset: ListingArgsFormatted =
+        Object.keys(suggestedPreset).length && !suggestedUntrusted
+          ? getFormattedListingValues({
+              tokenIndex: args.tokenIndex,
+              name: args.name,
+              oracle: args.oracle,
+              ...suggestedPreset,
+            })
+          : ({} as ListingArgsFormatted)
 
       const invalidKeys: (keyof ListingArgsFormatted)[] = Object.keys(
         suggestedPreset
@@ -1566,7 +1565,7 @@ const DisplayNullishProperty = ({
           {currentValue}
         </div>
       </div>
-      {<div className="mx-1">/</div>}
+      {currentValue && <div className="mx-1">/</div>}
       <div className="flex">
         <div className="text-orange">{value}</div>
       </div>
