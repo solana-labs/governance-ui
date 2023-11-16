@@ -937,7 +937,8 @@ const instructions = () => ({
                 </h3>
                 <h3 className="text-orange flex">
                   Very low liquidity Price impact of {liqudityTier?.priceImpact}
-                  % on $1000 swap. Check params carefully
+                  % on $1000 swap. Check params carefully token should be listed
+                  with untrusted instruction
                 </h3>
               </>
             )}
