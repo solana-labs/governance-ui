@@ -41,6 +41,7 @@ import {
 } from '@blockworks-foundation/mango-v4-settings/lib/helpers/listingTools'
 import { tryParseKey } from '@tools/validators/pubkey'
 import Loading from '@components/Loading'
+import queryClient from '@hooks/queries/queryClient'
 // import { snakeCase } from 'snake-case'
 // import { sha256 } from 'js-sha256'
 
@@ -749,10 +750,9 @@ const instructions = () => ({
         let mintData: null | TokenInfoWithoutDecimals | undefined = null
         const mintInfo = accounts[2].pubkey
         const group = accounts[0].pubkey
-
         const client = await getClient(connection)
         const [mangoGroup, info, args] = await Promise.all([
-          client.getGroup(group),
+          getGroupForClient(client, group),
           displayArgs(connection, data),
           getDataObjectFlattened<FlatEditArgs>(connection, data),
         ])
@@ -1335,7 +1335,7 @@ const instructions = () => ({
       const group = accounts[0].pubkey
       const bank = accounts[1].pubkey
       const client = await getClient(connection)
-      const mangoGroup = await client.getGroup(group)
+      const mangoGroup = await getGroupForClient(client, group)
       const mint = [...mangoGroup.banksMapByMint.values()].find(
         (x) => x[0]!.publicKey.equals(bank)!
       )![0]!.mint!
@@ -1370,7 +1370,7 @@ const instructions = () => ({
       const group = accounts[0].pubkey
       const perpMarket = accounts[1].pubkey
       const client = await getClient(connection)
-      const mangoGroup = await client.getGroup(group)
+      const mangoGroup = await getGroupForClient(client, group)
       const marketName = [
         ...mangoGroup.perpMarketsMapByName.values(),
       ].find((x) => x.publicKey.equals(perpMarket))?.name
@@ -1459,19 +1459,35 @@ export const MANGO_V4_INSTRUCTIONS = {
 }
 
 const getClient = async (connection: Connection) => {
-  const options = AnchorProvider.defaultOptions()
-  const adminProvider = new AnchorProvider(
-    connection,
-    new EmptyWallet(Keypair.generate()),
-    options
-  )
-  const client = await MangoClient.connect(
-    adminProvider,
-    'mainnet-beta',
-    MANGO_V4_ID['mainnet-beta']
-  )
+  const client = await queryClient.fetchQuery({
+    queryKey: ['mangoClient', connection.rpcEndpoint],
+    queryFn: async () => {
+      const options = AnchorProvider.defaultOptions()
+      const adminProvider = new AnchorProvider(
+        connection,
+        new EmptyWallet(Keypair.generate()),
+        options
+      )
+      const client = await MangoClient.connect(
+        adminProvider,
+        'mainnet-beta',
+        MANGO_V4_ID['mainnet-beta']
+      )
 
+      return client
+    },
+  })
   return client
+}
+const getGroupForClient = async (client: MangoClient, groupPk: PublicKey) => {
+  const group = await queryClient.fetchQuery({
+    queryKey: ['mangoGroup', groupPk.toBase58(), client.connection.rpcEndpoint],
+    queryFn: async () => {
+      const response = await client.getGroup(groupPk)
+      return response
+    },
+  })
+  return group
 }
 
 async function getDataObjectFlattened<T>(
