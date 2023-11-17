@@ -29,6 +29,7 @@ import {
 } from '@solana/web3.js'
 import SwitchboardProgram from '@switchboard-xyz/sbv2-lite'
 import Big from 'big.js'
+import { secondsToHours } from 'date-fns'
 
 const MAINNET_PYTH_PROGRAM = new PublicKey(
   'FsJ3A3u2vn5cTVofAjvy6y5kwABJAqYWpe4975bi2epH'
@@ -643,5 +644,8 @@ export const getFormattedBankValues = (group: Group, bank: Bank) => {
       6
     ),
     liquidationFee: (bank.liquidationFee.toNumber() * 100).toFixed(2),
+    netBorrowLimitWindowSizeTs: secondsToHours(
+      bank.netBorrowLimitWindowSizeTs.toNumber()
+    ),
   }
 }
