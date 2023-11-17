@@ -34,7 +34,7 @@ const themeVariables: IncomingThemeVariables = {
       toggleBackgroundActive: 'bg-primary-light',
     },
     textStyles: {
-      input: 'text-black',
+      input: 'text-primary-1 bg-bkg-1 border-none hover:border-none',
     },
     outlinedInput: `${defaultVariables.dark.outlinedInput} focus-within:border-primary-light`,
     disabledButton: `${defaultVariables.dark.disabledButton} border-primary-light font-bold rounded-full border-fgd-3 text-fgd-3 cursor-not-allowed`,
