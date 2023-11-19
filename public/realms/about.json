@@ -390,7 +390,7 @@
       {
         "heading": "Generalised Options Infrastructure for Solana",
         "content": [
-          "In addition to the Zeta DEX, our expertise in options and financial technology have enabled us to build a range of exotic tokenised option structures on chain, used by some of the biggest brands in DeFi including Ribbon Finance for on chain structured products. Our tools and infrastructure make it easy for developers to build on chain agreements between counter-parties, allowing them to create defi products that are enforced entirely on chain."
+          "In addition to the Zeta DEX, our expertise in options and financial technology has enabled us to build a range of exotic tokenised option structures on chain, used by some of the biggest brands in DeFi including Ribbon Finance for on chain structured products. Our tools and infrastructure make it easy for developers to build on chain agreements between counter-parties, allowing them to create defi products that are enforced entirely on chain."
         ]
       }
     ],
@@ -506,7 +506,7 @@
       {
         "title": "MechaFightClub: Irreverent Labs is Using Humor & Advanced AI to Evolve NFT Fighting Games",
         "content": [
-          "Irreverant Labs’ first game, MechaFightClub, is Mortal Kombat meets Gundam Wing with a dash of South Park humor, all on the Solana blockchain."
+          "Irreverent Labs’ first game, MechaFightClub, is Mortal Kombat meets Gundam Wing with a dash of South Park humor, all on the Solana blockchain."
         ],
         "url": "https://esports.gg/news/fgc/mechafightclub-irreverent-labs-solana-blockchain/"
       }
@@ -1060,7 +1060,7 @@
       {
         "heading": "Introduction",
         "content": [
-          "On Gilder you can view and keep up to date with any SPL-governance dao. You'll be able to get notifications directly as they are created, vote and create proposals all from your Android or IOS device. Gilder recently merged with the Bastion team, the winners of the DAO category in the Solana Summer Camp Hackathon 2022 and built on top of Realms; Bastion provides a comprehensive DAO tool that helps DAOs on Solana to truly access DeFi and help it's voters become more involved. With the new team consisting of the Bastion and Gilder team, DAOs will become first class citizens on Solana."
+          "On Gilder you can view and keep up to date with any SPL-governance dao. You'll be able to get notifications directly as they are created, vote and create proposals all from your Android or IOS device. Gilder recently merged with the Bastion team, the winners of the DAO category in the Solana Summer Camp Hackathon 2022 and built on top of Realms; Bastion provides a comprehensive DAO tool that helps DAOs on Solana to truly access DeFi and help its voters become more involved. With the new team consisting of the Bastion and Gilder team, DAOs will become first class citizens on Solana."
         ]
       }
     ]
@@ -1346,8 +1346,8 @@
         "answer": [
           "1. Peg Stability Module\nThe Peg Stability Module is Hubble's primary pegging mechanism, allowing zero-slippage swaps between USDH and USDC to allow frictionless arbitrage.",
           "2. Stability Fees\nHubble has a Stability Fee, acting as an interest rate, that can be increased if USDH falls below peg. The Stability Fee incentivizes users to repay their loans, which can help reduce USDH supply on the market when necessary.",
-          "3. Hubble Native Yield\nUSDH Vault stakers earn a an adjustable % yield referred to as the Hubble Native Yield (HNY). The HNY can be manually adjusted to increase or decrease rewards, thus increasing or decreasing USDH demand.",
-          "4. Liquidity\nBy establishing USDH as a ubiquitous stablecoin across Solana, pairing USDH with numerous tokens across multiple DEXes and attracting liquidity, USDH becames more and more settled at a 1:1 ratio with the USD. The more USDH liquidity grows, the stronger the USDH peg becomes."
+          "3. Hubble Native Yield\nUSDH Vault stakers earn an adjustable % yield referred to as the Hubble Native Yield (HNY). The HNY can be manually adjusted to increase or decrease rewards, thus increasing or decreasing USDH demand.",
+          "4. Liquidity\nBy establishing USDH as a ubiquitous stablecoin across Solana, pairing USDH with numerous tokens across multiple DEXes and attracting liquidity, USDH became more and more settled at a 1:1 ratio with the USD. The more USDH liquidity grows, the stronger the USDH peg becomes."
         ]
       },
       {
@@ -1377,9 +1377,9 @@
           "Socean Stake Pool is an algorithmic stake pool. A stake pool helps stake SOL on the user’s behalf. We issue depositors a token (scnSOL) that can be redeemed for SOL anytime. scnSOL can be used in DeFi to earn extra yield by lending, borrowing, providing liquidity and purchasing structured products.",
           "Why should I stake with Socean Stake?: We are the top performing stake pool by APR over the past year. Over the past year, we outperformed every single stake pool, delivering the best APR for stakers.  Our strong delegation strategy and low fees allow us to offer high returns for stakers.",
           "Our delegation strategy not only maximises APY for stakers, but also promotes network health. Unlike other stake pools, we don't make backroom deals, or have a preferred set of validators: any validator can and will be selected by our delegation algorithm as long as it demonstrates good performance.",
-          "The Socean Team actively contribute to core development in the Solana runtime and participate in a variety of Solana ecosystem projects. We've worked with the Solana Foundation for many months, helping to develop the Foundation's stake pool program. We've also received multiple grants from the Foundation to develop the stake pool ecosystem.",
+          "The Socean Team actively contributes to core development in the Solana runtime and participate in a variety of Solana ecosystem projects. We've worked with the Solana Foundation for many months, helping to develop the Foundation's stake pool program. We've also received multiple grants from the Foundation to develop the stake pool ecosystem.",
           "Unlike some stake pools which run their own code, we use the Solana Foundation's open-source reference implementation. This ensures that our stake pool has been audited for safety, and receives timely fixes and updates. The program can be built from source and verified against the on-chain version.",
-          "Socean  have partnered with most of the best DeFi Protocols on Solana like Orca, Raydium and Solend, so that you can maximise your yield with scnSOL."
+          "Socean has partnered with most of the best DeFi Protocols on Solana like Orca, Raydium and Solend, so that you can maximise your yield with scnSOL."
         ]
       }
     ],
@@ -1426,7 +1426,7 @@
       {
         "heading": "Introduction",
         "content": [
-          "Allie Coin is a Web3 gaming community founded by Twitch streamer Alliestrasza. Allie has been producing gaming content for more than six years, primarily on Twitch and YouTube, where she has amassed a following of over 200,000 fans. In 2017, she decided to create Allie Coin to combine her loves for gaming and content creation within the emerging Web3 universe. The Allie Coin gaming community is designed to unlock fun and competitive gaming experiences for a global community."
+          "Allie Coin is a Web3 gaming community founded by Twitch streamer Alliestrasza. Allie has been producing gaming content for more than six years, primarily on Twitch and YouTube, where she has amassed a following of over 200,000 fans. In 2017, she decided to create Allie Coin to combine her love for gaming and content creation within the emerging Web3 universe. The Allie Coin gaming community is designed to unlock fun and competitive gaming experiences for a global community."
         ]
       },
       {
@@ -2068,7 +2068,7 @@
           "Our mission at Degen Legends is our movement. We’re building a brand that proudly represents the crypto community & web2 gamers to the gaming world.",
           "Our community is a group of gamers, poker players, traders & builders in the gaming ecosystem, which powers our content, esports & investment brand, linked to our project with our NFT & Token ecosystem.",
           "Our front facing brand is a content & esports organization focused on building out web3 gaming.",
-          "Our backend is powered by our  venture capital arm, which we invest into games at highly discounted prices (seed round), and build out games exposure through our community, content & esports. We then provide the assets to our community through our token, which can be earned by staking your NFT or completing missions for us through our gamified mission ecosystem."
+          "Our backend is powered by our venture capital arm, which we invest into games at highly discounted prices (seed round), and build out games exposure through our community, content & esports. We then provide the assets to our community through our token, which can be earned by staking your NFT or completing missions for us through our gamified mission ecosystem."
         ]
       }
     ],
@@ -2340,13 +2340,13 @@
       {
         "question": "Is Orbis available on Solana?",
         "answer": [
-          "Yes. A user’s decentralized identity can be created using wallets from Solana as well as other blockchains such any EVM chain (Ethereum Mainnet, Polygon, Optimism, Arbitrum) or Tezos (coming soon)."
+          "Yes. A user’s decentralized identity can be created using wallets from Solana as well as other blockchains such as any EVM chain (Ethereum Mainnet, Polygon, Optimism, Arbitrum) or Tezos (coming soon)."
         ]
       },
       {
         "question": "Can I take my data from one application to another one?",
         "answer": [
-          "Yes if the experience is built on the Orbis Protocol. Applications share a common social graph and userbase. This enables a seamless social experience for users, who can take their exisiting data to new applications."
+          "Yes if the experience is built on the Orbis Protocol. Applications share a common social graph and userbase. This enables a seamless social experience for users, who can take their existing data to new applications."
         ]
       },
       {
@@ -2369,7 +2369,7 @@
       },
       {
         "content": [
-          "This infrastructure is a network of engines that enabling assets to be pooled, tranched, and fractionalized to create liquidity and composability for otherwise difficult to financialize assets. The network also includes plug-and-play financial products, like money-market lending and derivatives that leverage the global settlement layer of these tokenized assets."
+          "This infrastructure is a network of engines that enables assets to be pooled, tranched, and fractionalized to create liquidity and composability for otherwise difficult to financialize assets. The network also includes plug-and-play financial products, like money-market lending and derivatives that leverage the global settlement layer of these tokenized assets."
         ]
       },
       {
@@ -2642,7 +2642,7 @@
   },
   "H2wGwADHWze2yZRurayzutPnDeKxpvf6WhVJpzixM121": {
     "symbol": "Hedge",
-    "heading": "Low-cost leverage of your crypto assets by minting USH, a decentralized overcollateralized stablecoin that is fully composable. ",
+    "heading": "Low-cost leverage of your crypto assets by minting USH, a decentralized overcollateralized stablecoin that is fully composable.",
     "about": [
       {
         "heading": "Introduction",
@@ -2674,7 +2674,7 @@
         "heading": "Introduction",
         "content": [
           "Solcial is a permissionless social network allowing users to be rewarded fairly for their work, and promoting freedom of speech by allowing users to interact without fearing ban or censorship.",
-          "Solcial is a mobile app (iOS and Android), a desktop app, and a website. On Solcial each user has their own token, allowing you to invest directly in them. You get minted 1 millions coins when you signup, that supply is fixed and the same for everyone. To begin with every user will have their token price set to $1 with 10,000 of their tokens put in a liquidity pool. This helps insure that tokens are tradeable and users can compare token prices knowing they began at the same price. Otherwise, these coins are yours, you can keep them or sell them (or send them to friends).",
+          "Solcial is a mobile app (iOS and Android), a desktop app, and a website. On Solcial each user has their own token, allowing you to invest directly in them. You get minted 1 million coins when you signup, that supply is fixed and the same for everyone. To begin with every user will have their token price set to $1 with 10,000 of their tokens put in a liquidity pool. This helps insure that tokens are tradeable and users can compare token prices knowing they began at the same price. Otherwise, these coins are yours, you can keep them or sell them (or send them to friends).",
           "To follow people on Solcial we have 3 subscription levels: you can follow someone for free (Tier 1) to access their public content (similar to Twitter or Instagram), and to access their private content (what we call Tier 2 and 3 subscriptions) you need to own their token, to be an investor in them. That’s what we called the “invest-for-subscription” model.",
           "You can also display your NFTs on your user profile, either just to show-off, or to buy & sell your NFTs with your friends.",
           "All user content is stored on IPFS and accessed through a P2P layer that we developed. Therefore Solcial doesn't rely on censorable servers or gateways. And the token related operations (minting, trading etc) are all on the Solana blockchain."
@@ -3154,7 +3154,7 @@
   },
   "HWYGhNLKUrrE8RmVkitDZrgsb68Ye8sp5P2pVLb2FyNf": {
     "symbol": "Gangbusters Ltd",
-    "heading": "Community-driven Social Web3 Gaming - Building Everlasting IPs Togehter with Our Fans! ",
+    "heading": "Community-driven Social Web3 Gaming - Building Everlasting IPs Together with Our Fans! ",
     "about": [
       {
         "heading": "Introduction",
@@ -3501,7 +3501,7 @@
       {
         "heading": "Introduction",
         "content": [
-          "The Grim Syndicate is  collection of 10,000 unique, generative reaper agent NFTs minted on the Solana Blockchain. These Grims are both a pass into the community, as well as, a transportive ticket into a new infinitum of experiences.",
+          "The Grim Syndicate is a collection of 10,000 unique, generative reaper agent NFTs minted on the Solana Blockchain. These Grims are both a pass into the community, as well as, a transportive ticket into a new infinitum of experiences.",
           "The Lore: Whether you call us logistic supervisors or ferrymen for the non-corporeal, transporting Souls to the Ethereal Plane is quite literally our job at the Ethereal Transit Authority. We take pride in our work; shepherding Souls of each and every world, universe, and planar dimension to their next great adventure!",
           "But while most newly untethered  Souls easily make their way quickly and easily to our Phantom Phreights (patent pending), some Souls need a little extra ...encouragement!",
           "That’s where the Agents of the Grim Syndicate come in – an elite collective responsible for ferrying some of those fickle Souls from across the dimensional spectrum (even those hard-to-reach pocket universes) to arrive at their final destination. At the Ethereal Transit Authority death doesn't have to mean a dead-end.",
@@ -5280,7 +5280,7 @@
       {
         "heading": "Introduction",
         "content": [
-          "DigitalEyes is the the ultimate one-stop shop for NFTs on Solana.",
+          "DigitalEyes is the ultimate one-stop shop for NFTs on Solana.",
           "- Marketplace aggregator for secondary trading",
           "- Launchpad for primary NFT drops",
           "- Mint Calendar for all upcoming NFT drops",
