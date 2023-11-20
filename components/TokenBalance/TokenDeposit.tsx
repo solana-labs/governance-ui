@@ -42,7 +42,6 @@ import queryClient from '@hooks/queries/queryClient'
 import { proposalQueryKeys } from '@hooks/queries/proposal'
 import asFindable from '@utils/queries/asFindable'
 import VanillaVotingPower from '@components/GovernancePower/Vanilla/VanillaVotingPower'
-import { DepositTokensButton } from '@components/DepositTokensButton'
 
 export const TokenDeposit = ({
   mint,
@@ -316,7 +315,7 @@ export const TokenDeposit = ({
           </div>
 
           <div className="flex flex-col mt-6 space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
-            {hasTokensInWallet || inAccountDetails ? (
+            {/* {hasTokensInWallet || inAccountDetails ? (
               <DepositTokensButton
                 className="sm:w-1/2 max-w-[200px]"
                 role={
@@ -326,7 +325,7 @@ export const TokenDeposit = ({
                 }
                 as={inAccountDetails ? 'primary' : 'secondary'}
               />
-            ) : null}
+            ) : null} */}
             {!isMembership && // Membership tokens can't be withdrawn (that is their whole point, actually)
               (inAccountDetails || isVsr) && (
                 <SecondaryButton
