@@ -209,7 +209,6 @@ export const TokenDeposit = ({
         wallet!.publicKey!,
         wallet!.publicKey! // fee payer
       )
-      instructions.push(ataIx)
     }
 
     await withWithdrawGoverningTokens(
