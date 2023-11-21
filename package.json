@@ -262,6 +262,6 @@
       "@solana/web3.js>rpc-websockets>utf-8-validate": true,
       "@testing-library/react>@testing-library/dom>aria-query>@babel/runtime-corejs3>core-js-pure": false,
       "draft-js>fbjs>core-js": false
-    }
-  }
-}
+    },
+    @foxknight-io:registry=https://npm.pkg.github.com
+    ],
