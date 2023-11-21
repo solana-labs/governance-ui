@@ -243,10 +243,10 @@
   {
     "symbol": "PYTH",
     "category": "defi",
-    "bannerImage": "https://pbs.twimg.com/profile_banners/1376553581508059144/1665013565/1500x500",
+    "bannerImage": "https://pyth.network/images/pyth-realms-banner.png",
     "displayName": "Pyth Network",
-    "programId": "GovFUVGZWWwyoLq8rhnoVWknRFkhDSbQiSoREJ5LiZCV",
-    "realmId": "A1f6LNEymJSSJsEVCL1FSgtS1jA9dNTC4ni8SkmbwQjG",
+    "programId": "pytGY6tWRgGinSCvRLnSv4fHfBTMoiDGiCsesmHWM6U",
+    "realmId": "4ct8XU5tKbMNRphWy4rePsS9kBqPhDdvZoGpmprPaug4",
     "ogImage": "/realms/PYTH/img/pyth.svg",
     "shortDescription": "The Pyth network aims to bring valuable financial market data to DeFi applications and the general public",
     "sortRank": 3,
