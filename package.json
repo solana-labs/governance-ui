@@ -29,6 +29,7 @@
   "dependencies": {
     "@blockworks-foundation/mango-mints-redemption": "0.0.10",
     "@blockworks-foundation/mango-v4": "0.20.3",
+    "@jup-ag/referral-sdk": "0.1.5",
     "@blockworks-foundation/mango-v4-settings": "0.2.18",
     "@blockworks-foundation/mangolana": "0.0.1-beta.15",
     "@bonfida/spl-name-service": "0.1.47",
