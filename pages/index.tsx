@@ -5,6 +5,7 @@ const Index = () => {
   const router = useRouter()
   const REALM = process?.env?.REALM
 
+  // JITO here todo
   useEffect(() => {
     const mainUrl = REALM ? `/dao/${REALM}` : '/realms'
     if (!router.asPath.includes(mainUrl)) {
