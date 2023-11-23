@@ -290,9 +290,9 @@ export const TokenDeposit = ({
       ? availableTokens
       : 0
   const isVsr =
-    config?.account.communityTokenConfig.voterWeightAddin &&
+    config?.account?.communityTokenConfig?.voterWeightAddin &&
     VSR_PLUGIN_PKS.includes(
-      config?.account.communityTokenConfig.voterWeightAddin.toBase58()
+      config?.account?.communityTokenConfig?.voterWeightAddin?.toBase58()
     ) &&
     tokenRole === GoverningTokenRole.Community
 
