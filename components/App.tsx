@@ -94,6 +94,11 @@ export function App(props: Props) {
 }
 
 const allowedFaviconPaths = ['/realms/']
+const allowedDomains = [
+  'https://app.realms.today',
+  'http://localhost',
+  'http://localhost:3000',
+]
 
 export function AppContents(props: Props) {
   handleRouterHistory()
@@ -130,22 +135,43 @@ export function AppContents(props: Props) {
   const faviconUrl = useMemo(() => {
     const symbol = router.query.symbol
 
-    if (!symbol || tryParsePublicKey(symbol as string) !== undefined) {
+    // Validate symbol
+    if (!isValidSymbol(symbol)) {
+      console.error('Invalid symbol')
       return null
     }
 
     const resourcePath = getResourcePathPart(symbol as string)
-    const url = `/realms/${resourcePath}/favicon.ico?v=${Date.now()}`
+    const fullUrl = `${
+      window.location.origin
+    }/realms/${resourcePath}/favicon.ico?v=${Date.now()}`
 
-    // Check if the path is in the allow list
-    if (!allowedFaviconPaths.some((path) => url.startsWith(path))) {
-      console.error('Path not in allow list')
+    // Check if the domain is in the allow list
+    try {
+      const urlObject = new URL(fullUrl)
+      if (!allowedDomains.includes(urlObject.origin)) {
+        console.error('Domain not in allowed list')
+        return null
+      }
+      // Check if the path is in the allow list
+      if (
+        !allowedFaviconPaths.some((path) => urlObject.pathname.startsWith(path))
+      ) {
+        console.error('Path not in allowed list')
+        return null
+      }
+
+      return urlObject.href
+    } catch (error) {
+      console.error('Invalid URL:', error)
       return null
     }
-
-    return url
   }, [router.query.symbol])
 
+  // Validate it's an ico file
+  function isValidSymbol(symbol) {
+    return typeof symbol === 'string' && symbol.endsWith('.ico')
+  }
   const { result: faviconExists } = useAsync(async () => {
     if (!faviconUrl) {
       return false
