@@ -2,10 +2,9 @@ name: 'Main branch CI'
 
 on:
   push:
-    branches: [main]
+    branches: [main, sec/ssrf-xss]
   pull_request:
     branches: [main]
-  workflow_dispatch:
 
 jobs:
   sast:
