@@ -4,15 +4,21 @@ import * as AspectRatio from '@radix-ui/react-aspect-ratio';
 import cx from '@hub/lib/cx';
 
 export function getYoutubeEmbedUrl(url: string) {
-  const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-  const match = url.match(regExp);
-  const id = match && match[7].length == 11 ? match[7] : null;
-
-  if (id) {
-    return `https://www.youtube.com/embed/${id}`;
+  if (!url.includes('youtube.com') && !url.includes('youtu.be')) {
+    return null;
   }
 
-  return url;
+  const regExp = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+  const match = url.match(regExp);
+
+  const id = match && /^[a-zA-Z0-9_-]{11}$/.test(match[1]) ? match[1] : null;
+
+  if (id) {
+    const safeId = encodeURIComponent(id);
+    return `https://www.youtube.com/embed/${safeId}`;
+  }
+
+  return null;
 }
 
 interface Props {
@@ -57,65 +63,68 @@ export function Gallery(props: Props) {
             width: props.items[0].width / 2,
           }}
         />
-        {props.items.map((item, i) => (
-          <div
-            className={cx(
-              'flex',
-              'flex-col',
-              'items-center',
-              'shrink-0',
-              'snap-start',
-              'md:snap-center',
-              'pl-4',
-              'md:pl-0',
-            )}
-            key={i}
-          >
-            {item.url.includes('www.youtube.com') ? (
-              <div
-                className="rounded overflow-hidden shrink-0 max-w-[85vw]"
-                style={{ width: item.width }}
-              >
-                <AspectRatio.Root ratio={item.width / item.height}>
-                  <iframe
-                    allowFullScreen
-                    allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
-                    frameBorder="0"
-                    height="100%"
-                    src={getYoutubeEmbedUrl(item.url)}
-                    width="100%"
-                  />
-                </AspectRatio.Root>
-              </div>
-            ) : item.url.endsWith('.mp4') ? (
-              <div
-                className="rounded max-w-[85vw] md:max-w-xl overflow-hidden"
-                style={{ width: item.width }}
-              >
-                <AspectRatio.Root ratio={item.width / item.height}>
-                  <video controls>
-                    <source src={item.url} type="video/mp4" />
-                  </video>
-                </AspectRatio.Root>
-              </div>
-            ) : (
-              <div
-                className="rounded max-w-[85vw] md:max-w-xl overflow-hidden"
-                style={{ width: item.width }}
-              >
-                <AspectRatio.Root ratio={item.width / item.height}>
-                  <img className="h-full w-full" src={item.url} />
-                </AspectRatio.Root>
-              </div>
-            )}
-            {item.caption && (
-              <div className="max-w-[60%] md:max-w-[95%] h-0 text-xs text-center text-neutral-700">
-                <div className="h-2 w-full" />
-                {item.caption}
-              </div>
-            )}
-          </div>
-        ))}
+        {props.items.map((item, i) => {
+          const youtubeEmbedUrl = getYoutubeEmbedUrl(item.url);
+          return (
+            <div
+              className={cx(
+                'flex',
+                'flex-col',
+                'items-center',
+                'shrink-0',
+                'snap-start',
+                'md:snap-center',
+                'pl-4',
+                'md:pl-0',
+              )}
+              key={i}
+            >
+              {youtubeEmbedUrl ? (
+                <div
+                  className="rounded overflow-hidden shrink-0 max-w-[85vw]"
+                  style={{ width: item.width }}
+                >
+                  <AspectRatio.Root ratio={item.width / item.height}>
+                    <iframe
+                      allowFullScreen
+                      allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
+                      frameBorder="0"
+                      height="100%"
+                      src={youtubeEmbedUrl}
+                      width="100%"
+                    />
+                  </AspectRatio.Root>
+                </div>
+              ) : item.url.endsWith('.mp4') ? (
+                <div
+                  className="rounded max-w-[85vw] md:max-w-xl overflow-hidden"
+                  style={{ width: item.width }}
+                >
+                  <AspectRatio.Root ratio={item.width / item.height}>
+                    <video controls>
+                      <source src={item.url} type="video/mp4" />
+                    </video>
+                  </AspectRatio.Root>
+                </div>
+              ) : (
+                <div
+                  className="rounded max-w-[85vw] md:max-w-xl overflow-hidden"
+                  style={{ width: item.width }}
+                >
+                  <AspectRatio.Root ratio={item.width / item.height}>
+                    <img className="h-full w-full" src={item.url} />
+                  </AspectRatio.Root>
+                </div>
+              )}
+              {item.caption && (
+                <div className="max-w-[60%] md:max-w-[95%] h-0 text-xs text-center text-neutral-700">
+                  <div className="h-2 w-full" />
+                  {item.caption}
+                </div>
+              )}
+            </div>
+          );
+        })}
         <div
           className="shrink-0 h-2"
           style={{
