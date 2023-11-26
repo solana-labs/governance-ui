@@ -93,6 +93,13 @@ export function App(props: Props) {
   )
 }
 
+const allowedFaviconPaths = ['/realms/']
+const allowedDomains = [
+  'https://app.realms.today',
+  'http://localhost',
+  'http://localhost:3000',
+]
+
 export function AppContents(props: Props) {
   handleRouterHistory()
   useVotingPlugins()
@@ -113,7 +120,7 @@ export function AppContents(props: Props) {
   const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
 
   const router = useRouter()
-  const { cluster, symbol } = router.query
+  const { cluster } = router.query
   const updateSerumGovAccounts = useSerumGovStore(
     (s) => s.actions.updateSerumGovAccounts
   )
@@ -124,26 +131,54 @@ export function AppContents(props: Props) {
   // Note: ?v==${Date.now()} is added to the url to force favicon refresh.
   // Without it browsers would cache the last used and won't change it for different realms
   // https://stackoverflow.com/questions/2208933/how-do-i-force-a-favicon-refresh
-  const faviconUrl = useMemo(
-    () =>
-      symbol &&
-      tryParsePublicKey(symbol as string) === undefined && // don't try to use a custom favicon if this is a pubkey-based url
-      `/realms/${getResourcePathPart(
-        symbol as string
-      )}/favicon.ico?v=${Date.now()}`,
-    [symbol]
-  )
 
-  // check if a file actually exists at faviconUrl
-  const { result: faviconExists } = useAsync(
-    async () =>
-      faviconUrl
-        ? fetch(faviconUrl)
-            .then((response) => response.status === 200)
-            .catch(() => false)
-        : false,
-    [faviconUrl]
-  )
+  const faviconUrl = useMemo(() => {
+    const symbol = router.query.symbol
+
+    if (!symbol || tryParsePublicKey(symbol as string) !== undefined) {
+      return null
+    }
+
+    const resourcePath = getResourcePathPart(symbol as string)
+    const fullUrl = `${
+      window.location.origin
+    }/realms/${resourcePath}/favicon.ico?v=${Date.now()}`
+
+    // Check if the domain is in the allow list
+    try {
+      const urlObject = new URL(fullUrl)
+      if (!allowedDomains.includes(urlObject.origin)) {
+        console.error('Domain not in allowed list')
+        return null
+      }
+      // Check if the path is in the allow list
+      if (
+        !allowedFaviconPaths.some((path) => urlObject.pathname.startsWith(path))
+      ) {
+        console.error('Path not in allowed list')
+        return null
+      }
+
+      return urlObject.href
+    } catch (error) {
+      console.error('Invalid URL:', error)
+      return null
+    }
+  }, [router.query.symbol])
+
+  const { result: faviconExists } = useAsync(async () => {
+    if (!faviconUrl) {
+      return false
+    }
+
+    try {
+      const response = await fetch(faviconUrl)
+      return response.status === 200
+    } catch (error) {
+      console.error('Error fetching favicon:', error)
+      return false
+    }
+  }, [faviconUrl])
 
   useEffect(() => {
     if (
