@@ -135,7 +135,9 @@ export function AppContents(props: Props) {
   const faviconUrl = useMemo(() => {
     const symbol = router.query.symbol
 
-    // Validate symbol
+    if (!symbol || tryParsePublicKey(symbol as string) !== undefined) {
+      return null
+    }
     if (!isValidSymbol(symbol)) {
       console.error('Invalid symbol')
       return null
@@ -170,7 +172,7 @@ export function AppContents(props: Props) {
 
   // Validate it's an ico file
   function isValidSymbol(symbol) {
-    return typeof symbol === 'string' && symbol.endsWith('.ico')
+    return typeof symbol === 'string' && symbol.trim() !== '' && /^[a-zA-Z0-9-_]+$/.test(symbol);
   }
   const { result: faviconExists } = useAsync(async () => {
     if (!faviconUrl) {
