@@ -81,7 +81,7 @@ jobs:
             key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
         - name: Install dependencies
-          run: yarn install --frozen-lockfile
+          run: yarn ci
 
         - name: Run tests
           run: yarn test-all
