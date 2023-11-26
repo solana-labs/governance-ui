@@ -142,7 +142,7 @@ export const useSubmitVote = () => {
           tokenOwnerRecordPk,
           vote,
           msg,
-          client,
+          role === 'community' ? client : undefined, // NOTE: currently FE doesn't support council plugins fully
           confirmationCallback,
           voteWeights,
           relevantDelegators
