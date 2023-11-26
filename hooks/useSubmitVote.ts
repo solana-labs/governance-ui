@@ -155,6 +155,7 @@ export const useSubmitVote = () => {
             queryKey: [connection.cluster, 'ChatMessages'],
           })
       } catch (e) {
+        console.error(e)
         notify({ type: 'error', message: e.message })
       } finally {
         if (isNftPlugin) {
