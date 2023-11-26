@@ -38,6 +38,7 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { useRealmQuery } from '@hooks/queries/realm'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import Input from '@components/inputs/Input'
 
 const Clawback = ({
   index,
@@ -54,13 +55,13 @@ const Clawback = ({
     governedTokenAccountsWithoutNfts,
     governancesArray,
   } = useGovernanceAssets()
-  const shouldBeGoverned = !!(index !== 0 && governance)
   const [voters, setVoters] = useState<Voter[]>([])
   const [deposits, setDeposits] = useState<DepositWithMintAccount[]>([])
   const [form, setForm] = useState<ClawbackForm>({
     governedTokenAccount: undefined,
     voter: null,
     deposit: null,
+    holdupTime: 0,
   })
   const formDeposits = form.deposit
   const schema = useMemo(
@@ -74,6 +75,7 @@ const Clawback = ({
       }),
     []
   )
+  console.log(realm?.account.authority?.toBase58())
   const realmAuthorityGov = governancesArray.find(
     (x) => x.pubkey.toBase58() === realm?.account.authority?.toBase58()
   )
@@ -119,6 +121,7 @@ const Clawback = ({
       isValid,
       governance: realmAuthorityGov,
       prerequisiteInstructions: prerequisiteInstructions,
+      customHoldUpTime: form.holdupTime,
     }
     return obj
   }, [client, form, realmAuthorityGov, realm, schema])
@@ -265,6 +268,7 @@ const Clawback = ({
           })}
       </Select>
       <GovernedAccountSelect
+        type={'token'}
         label="Clawback destination"
         governedAccounts={
           governedTokenAccountsWithoutNfts.filter(
@@ -278,9 +282,19 @@ const Clawback = ({
         }}
         value={form.governedTokenAccount}
         error={formErrors['governedTokenAccount']}
-        shouldBeGoverned={shouldBeGoverned}
         governance={governance}
       ></GovernedAccountSelect>
+      <Input
+        label="Instruction hold up time (days)"
+        type="number"
+        value={form.holdupTime}
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: 'holdupTime',
+          })
+        }
+      ></Input>
     </>
   )
 }
