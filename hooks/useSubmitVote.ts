@@ -142,7 +142,7 @@ export const useSubmitVote = () => {
           tokenOwnerRecordPk,
           vote,
           msg,
-          client,
+          role === 'community' ? client : undefined, // NOTE: currently FE doesn't support council plugins fully
           confirmationCallback,
           voteWeights,
           relevantDelegators
@@ -155,6 +155,7 @@ export const useSubmitVote = () => {
             queryKey: [connection.cluster, 'ChatMessages'],
           })
       } catch (e) {
+        console.error(e)
         notify({ type: 'error', message: e.message })
       } finally {
         if (isNftPlugin) {
