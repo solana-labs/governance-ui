@@ -75,7 +75,7 @@ const Clawback = ({
       }),
     []
   )
-  console.log(realm?.account.authority?.toBase58())
+
   const realmAuthorityGov = governancesArray.find(
     (x) => x.pubkey.toBase58() === realm?.account.authority?.toBase58()
   )
