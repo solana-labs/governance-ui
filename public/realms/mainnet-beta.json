@@ -3313,5 +3313,14 @@
     "ogImage": "/realms/OPANZ/OPANZ_Logo.png",
     "website": "https://auturoa.nz/",
     "twitter": "@opanzch"
+ },
+ {
+    "symbol": "BETS",
+    "displayName": "SPORT BET DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "communityMint": "2tJFfPM4Yarffve3rrmuZWctorXWJ1th4g59NcdpP2Fd",
+    "realmId": "BoKHKtKubHYrmZtdCDdHuVp1C5SoXBRPWVGWNhBRMvgF",
+    "bannerImage": "/realms/SBDlogo/OriginalonWhite.png",
+    "ogImage": "/realms/SBDlogo/SBDlogo.png"
   }
 ]
