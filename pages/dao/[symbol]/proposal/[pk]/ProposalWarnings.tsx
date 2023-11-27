@@ -144,7 +144,7 @@ const useProposalSafetyCheck = (proposal: Proposal) => {
     [governance]
   )
   const walletsPassedToInstructions = transactions?.flatMap((tx) =>
-    tx.account.instructions.flatMap((ins) =>
+    tx.account.instructions?.flatMap((ins) =>
       ins.accounts.map((acc) => acc.pubkey)
     )
   )
@@ -158,7 +158,9 @@ const useProposalSafetyCheck = (proposal: Proposal) => {
       treasuryAddress.result &&
       !!transactions?.length &&
       !walletsPassedToInstructions?.find(
-        (x) => governance?.pubkey.equals(x) || treasuryAddress.result?.equals(x)
+        (x) =>
+          x &&
+          (governance?.pubkey?.equals(x) || treasuryAddress.result?.equals(x))
       )
 
     const proposalWarnings: (
