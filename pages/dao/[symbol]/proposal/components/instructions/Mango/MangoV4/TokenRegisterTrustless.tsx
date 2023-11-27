@@ -14,6 +14,9 @@ import InstructionForm, { InstructionInput } from '../../FormCreator'
 import { InstructionInputType } from '../../inputInstructionType'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { ReferralProvider } from '@jup-ag/referral-sdk'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { JUPITER_REFERRAL_PK } from '@tools/constants'
 
 interface TokenRegisterTrustlessForm {
   governedAccount: AssetAccount | null
@@ -42,6 +45,7 @@ const TokenRegisterTrustless = ({
         (mangoGroup?.admin &&
           x.extensions.transferAddress?.equals(mangoGroup?.admin)))
   )
+  const connection = useLegacyConnectionContext()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<TokenRegisterTrustlessForm>({
     governedAccount: null,
@@ -62,6 +66,7 @@ const TokenRegisterTrustless = ({
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
+    const additionalSerializedInstructions: string[] = []
     if (
       isValid &&
       form.governedAccount?.governance?.account &&
@@ -80,10 +85,27 @@ const TokenRegisterTrustless = ({
         })
         .instruction()
 
+      const rp = new ReferralProvider(connection.current)
+
+      const tx = await rp.initializeReferralTokenAccount({
+        payerPubKey: form.governedAccount.extensions.transferAddress!,
+        referralAccountPubKey: JUPITER_REFERRAL_PK,
+        mint: new PublicKey(form.mintPk),
+      })
+      const isExistingAccount =
+        (await connection.current.getBalance(tx.referralTokenAccountPubKey)) > 1
+
+      if (!isExistingAccount) {
+        additionalSerializedInstructions.push(
+          ...tx.tx.instructions.map((x) => serializeInstructionToBase64(x))
+        )
+      }
+
       serializedInstruction = serializeInstructionToBase64(ix)
     }
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
+      additionalSerializedInstructions,
       isValid,
       governance: form.governedAccount?.governance,
       customHoldUpTime: form.holdupTime,

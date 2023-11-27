@@ -29,6 +29,7 @@
   "dependencies": {
     "@blockworks-foundation/mango-mints-redemption": "0.0.10",
     "@blockworks-foundation/mango-v4": "0.20.3",
+    "@jup-ag/referral-sdk": "0.1.5",
     "@blockworks-foundation/mango-v4-settings": "0.2.18",
     "@blockworks-foundation/mangolana": "0.0.1-beta.15",
     "@bonfida/spl-name-service": "0.1.47",
@@ -84,7 +85,7 @@
     "@radix-ui/react-toast": "1.0.0",
     "@radix-ui/react-toolbar": "1.0.0",
     "@radix-ui/react-tooltip": "1.0.0",
-    "@sentry/nextjs": "6.19.7",
+    "@sentry/nextjs": "7.81.1",
     "@solana-mobile/wallet-adapter-mobile": "2.0.0",
     "@solana/buffer-layout": "4.0.0",
     "@solana/governance-program-library": "npm:@civic/governance-program-library@0.16.9-beta.2",
