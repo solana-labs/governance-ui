@@ -2,7 +2,7 @@ name: 'Main branch CI'
 
 on:
   push:
-    branches: [main, sec/ssrf-xss]
+    branches: [main]
   pull_request:
     branches: [main]
 
