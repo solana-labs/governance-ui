@@ -35,6 +35,7 @@ import { MANGO_V4_INSTRUCTIONS } from './programs/mangoV4'
 import { DUAL_INSTRUCTIONS } from './programs/dual'
 import { SWITCHBOARD_INSTRUCTIONS } from './programs/switchboard'
 import { STAKE_INSTRUCTIONS } from './programs/stake'
+import { JUPITER_REF } from './programs/jupiterRef'
 
 /**
  * Default governance program id instance
@@ -449,6 +450,7 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...MANGO_V4_INSTRUCTIONS,
   ...DUAL_INSTRUCTIONS,
   ...STAKE_INSTRUCTIONS,
+  ...JUPITER_REF,
 }
 
 export async function getInstructionDescriptor(
