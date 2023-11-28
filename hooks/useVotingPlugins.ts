@@ -42,7 +42,7 @@ export function useVotingPlugins() {
     handleSetNftRegistrar,
     handleSetGatewayRegistrar,
     handleSetCurrentRealmVotingClient,
-    handleSetPythClient
+    handleSetPythClient,
   } = useVotePluginsClientStore()
 
   const [
@@ -69,7 +69,7 @@ export function useVotingPlugins() {
     nftClient,
     nftMintRegistrar,
     heliumVsrClient,
-    pythClient
+    pythClient,
   ] = useVotePluginsClientStore((s) => [
     s.state.currentRealmVotingClient,
     s.state.vsrClient,
@@ -132,6 +132,18 @@ export function useVotingPlugins() {
     [usedCollectionsPks]
   )
 
+  // initialise pyth plugin
+  useEffect(() => {
+    if (
+      wallet &&
+      connection &&
+      currentPluginPk &&
+      PYTH_PLUGIN_PK.includes(currentPluginPk.toBase58())
+    ) {
+      handleSetPythClient(wallet, connection)
+    }
+  }, [connection, currentPluginPk, handleSetPythClient, wallet])
+
   useEffect(() => {
     if (wallet && connection) {
       if (currentPluginPk) {
@@ -140,9 +152,6 @@ export function useVotingPlugins() {
         }
         if (HELIUM_VSR_PLUGINS_PKS.includes(currentPluginPk.toBase58())) {
           handleSetHeliumVsrClient(wallet, connection, currentPluginPk)
-        }
-        if (PYTH_PLUGIN_PK.includes(currentPluginPk.toBase58())) {
-          handleSetPythClient(wallet, connection)
         }
       }
       handleSetNftClient(wallet, connection)
@@ -155,7 +164,6 @@ export function useVotingPlugins() {
     handleSetHeliumVsrClient,
     handleSetNftClient,
     handleSetVsrClient,
-    handleSetPythClient,
     wallet,
   ])
 
@@ -280,6 +288,7 @@ export function useVotingPlugins() {
     voterPk,
     realm,
     vsrClient,
+    pythClient,
   ])
 
   const handleMaxVoterWeight = useCallback(async () => {
