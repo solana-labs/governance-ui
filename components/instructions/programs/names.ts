@@ -27,6 +27,7 @@ const GOVERNANCE_PROGRAM_NAMES = {
   MGovW65tDhMMcpEmsegpsdgvzb6zUwGsNjhXFxRAnjd: 'MEAN DAO Governance Program',
   GovMaiHfpVPw8BAM1mbdzgmSZYDw2tdP32J2fapoQoYs: 'Marinade Governance Program',
   hgovkRU6Ghe1Qoyb54HdSLdqN7VtxaifBzRmh9jtd3S: 'Helium Governance Program',
+  jtogvBNH3WBSWDYD5FJfQP2ZxNTuf82zL8GkEhPeaJx: 'Jito Governance Program',
 }
 
 // Well known program names displayed on the instruction card

@@ -3,9 +3,9 @@ import { useRouter } from 'next/router'
 
 const Index = () => {
   const router = useRouter()
-  const REALM = process?.env?.REALM
+  // process env acting funny
+  const REALM = 'Jito'
 
-  // JITO here todo
   useEffect(() => {
     const mainUrl = REALM ? `/dao/${REALM}` : '/realms'
     if (!router.asPath.includes(mainUrl)) {
