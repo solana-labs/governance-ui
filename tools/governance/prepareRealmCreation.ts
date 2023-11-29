@@ -141,41 +141,11 @@ export async function prepareRealmCreation({
   const existingCommunityMint = existingCommunityMintPk
     ? (await fetchMintInfoByPubkey(connection, existingCommunityMintPk)).result
     : undefined
-  const communityEnabledInConfig = communityTokenConfig
-    ? communityTokenConfig.tokenType !== GoverningTokenType.Dormant
-    : false
-
-  // community can govern if...
-  const communityCanGovern =
-    // its enabled
-    communityEnabledInConfig &&
-    // ...and has a vote threshold
-    communityVoteThreshold.type !== VoteThresholdType.Disabled &&
-    (communityVoteThreshold.value ?? 0 > 0) &&
-    // ... and has supply
-    (existingCommunityMint?.supply.gtn(0) ?? false)
 
   const existingCouncilMint = existingCouncilMintPk
     ? (await fetchMintInfoByPubkey(connection, existingCouncilMintPk)).result
     : undefined
-  const incomingCouncilMembers = councilWalletPks.length
-  const councilEnabledInConfig =
-    params._programVersion === 3
-      ? params.councilTokenConfig.tokenType !== GoverningTokenType.Dormant
-      : communityTokenConfig
-      ? communityTokenConfig.tokenType !== GoverningTokenType.Dormant
-      : false
-  // council can govern if...
-  const councilCanGovern =
-    // its enabled...
-    councilEnabledInConfig &&
-    // ...and has a vote threshold
-    councilVoteThreshold.type !== VoteThresholdType.Disabled &&
-    (councilVoteThreshold.value ?? 0 > 0) &&
-    // and either the council mint has supply... OR
-    ((existingCouncilMint?.supply.gtn(0) ?? false) ||
-      // there are incoming council members
-      incomingCouncilMembers > 0)
+
   const communityMintDecimals = existingCommunityMint?.decimals || 6
 
   const communityMaxVoteWeightSource = parseMintMaxVoteWeight(
@@ -214,10 +184,6 @@ export async function prepareRealmCreation({
   // Create council mint
   let councilMintPk
 
-  if (!communityCanGovern && nftCollectionCount === 0 && !councilCanGovern) {
-    throw new Error('no tokens exist that could govern this DAO')
-  }
-
   if (!existingCouncilMintPk && createCouncil) {
     councilMintPk = await withCreateMint(
       connection,
@@ -231,6 +197,51 @@ export async function prepareRealmCreation({
   } else {
     councilMintPk = existingCouncilMintPk
   }
+
+  // START check if realm is governable ----------------
+  const communityEnabledInConfig = communityTokenConfig
+    ? communityTokenConfig.tokenType !== GoverningTokenType.Dormant
+    : false
+  // community can govern if...
+  const communityCanGovern =
+    // its enabled
+    communityEnabledInConfig &&
+    // ...and has a vote threshold
+    communityVoteThreshold.type !== VoteThresholdType.Disabled &&
+    (communityVoteThreshold.value ?? 0 > 0) &&
+    // ... and has supply
+    (existingCommunityMint?.supply.gtn(0) ?? false)
+
+  const incomingCouncilMembers = councilWalletPks.length
+  const councilEnabledInConfig =
+    params._programVersion !== 2
+      ? params.councilTokenConfig.tokenType !== GoverningTokenType.Dormant
+      : communityTokenConfig
+      ? // if version 2, council just uses community config
+        communityTokenConfig.tokenType !== GoverningTokenType.Dormant
+      : false
+  // council can govern if...
+  const councilCanGovern =
+    // it has a mint...
+    councilMintPk &&
+    // its enabled...
+    councilEnabledInConfig && // NOTE: technically it can be enabled, but undefined.
+    // ...and has a vote threshold
+    councilVoteThreshold.type !== VoteThresholdType.Disabled &&
+    (councilVoteThreshold.value ?? 0 > 0) &&
+    // and either the council mint has supply... OR
+    ((existingCouncilMint?.supply.gtn(0) ?? false) ||
+      // there are incoming council members
+      incomingCouncilMembers > 0)
+
+  if (
+    !communityCanGovern &&
+    nftCollectionCount === 0 && // note this is not the most thorough check possible for nft realms
+    !councilCanGovern
+  ) {
+    throw new Error('no tokens exist that could govern this DAO')
+  }
+  // END ---------------------------------------------
 
   // Convert to mint natural amount
   const minCommunityTokensToCreateAsMintValue =
