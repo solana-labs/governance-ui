@@ -219,7 +219,7 @@ export async function prepareRealmCreation({
       : communityTokenConfig
       ? // if version 2, council just uses community config
         communityTokenConfig.tokenType !== GoverningTokenType.Dormant
-      : false
+      : false // just assume if no community config is supplied for some reason, we can't count on anything.
   // council can govern if...
   const councilCanGovern =
     // it has a mint...
