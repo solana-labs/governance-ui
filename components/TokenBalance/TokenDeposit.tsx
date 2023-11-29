@@ -42,6 +42,7 @@ import queryClient from '@hooks/queries/queryClient'
 import { proposalQueryKeys } from '@hooks/queries/proposal'
 import asFindable from '@utils/queries/asFindable'
 import VanillaVotingPower from '@components/GovernancePower/Vanilla/VanillaVotingPower'
+import { fetchTokenAccountByPubkey } from '@hooks/queries/tokenAccount'
 
 export const TokenDeposit = ({
   mint,
@@ -191,15 +192,26 @@ export const TokenDeposit = ({
         )
       }
     }
-    let ata: PublicKey | null = null
-    if (!depositTokenAccount) {
-      ata = await Token.getAssociatedTokenAddress(
+
+    const ataPk = await Token.getAssociatedTokenAddress(
+      ASSOCIATED_TOKEN_PROGRAM_ID,
+      TOKEN_PROGRAM_ID,
+      depositMint!,
+      wallet!.publicKey!,
+      true
+    )
+    const ata = await fetchTokenAccountByPubkey(connection, ataPk)
+
+    if (!ata.found) {
+      const ataIx = Token.createAssociatedTokenAccountInstruction(
         ASSOCIATED_TOKEN_PROGRAM_ID,
         TOKEN_PROGRAM_ID,
         depositMint!,
+        ataPk,
         wallet!.publicKey!,
-        true
+        wallet!.publicKey! // fee payer
       )
+      instructions.push(ataIx)
     }
 
     await withWithdrawGoverningTokens(
@@ -209,7 +221,7 @@ export const TokenDeposit = ({
       realm!.pubkey,
       depositTokenAccount?.publicKey
         ? depositTokenAccount!.publicKey
-        : new PublicKey(ata!),
+        : new PublicKey(ataPk),
       depositTokenRecord!.account.governingTokenMint,
       wallet!.publicKey!
     )
