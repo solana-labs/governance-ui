@@ -215,7 +215,7 @@ export async function prepareRealmCreation({
   const incomingCouncilMembers = councilWalletPks.length
   const councilEnabledInConfig =
     params._programVersion !== 2
-      ? params.councilTokenConfig.tokenType !== GoverningTokenType.Dormant
+      ? params.councilTokenConfig.tokenType === GoverningTokenType.Membership
       : communityTokenConfig
       ? // if version 2, council just uses community config
         communityTokenConfig.tokenType !== GoverningTokenType.Dormant
