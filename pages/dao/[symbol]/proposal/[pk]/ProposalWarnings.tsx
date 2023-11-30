@@ -1,3 +1,4 @@
+import { MANGO_INSTRUCTION_FORWARDER } from '@components/instructions/tools'
 import { ExclamationCircleIcon } from '@heroicons/react/solid'
 import { useGovernanceByPubkeyQuery } from '@hooks/queries/governance'
 import { useSelectedProposalTransactions } from '@hooks/queries/proposalTransaction'
@@ -129,12 +130,44 @@ const ProgramUpgrade = () => (
   </div>
 )
 
+const ForwardWarning = () => (
+  <div className="rounded-md bg-yellow-50 p-4">
+    <div className="flex">
+      <div className="flex-shrink-0">
+        <ExclamationCircleIcon
+          className="h-5 w-5 text-yellow-400"
+          aria-hidden="true"
+        />
+      </div>
+      <div className="ml-3">
+        <h3 className="text-sm font-medium text-yellow-800">
+          Instruction use instruction forward program:{' '}
+          {MANGO_INSTRUCTION_FORWARDER}
+        </h3>
+        <div className="mt-2">
+          <p className="text-sm text-yellow-700">
+            This means one of instruction is executable only by given wallet
+            until time set in proposal, check time and wallet in instruction
+            panel
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+)
+
 const useProposalSafetyCheck = (proposal: Proposal) => {
   const config = useRealmConfigQuery().data?.result
   const { realmInfo } = useRealm()
   const { data: transactions } = useSelectedProposalTransactions()
   const governance = useGovernanceByPubkeyQuery(proposal?.governance).data
     ?.result
+
+  const isUsingForwardProgram = transactions
+    ?.flatMap((tx) =>
+      tx.account.instructions.flatMap((ins) => ins.programId.toBase58())
+    )
+    .filter((x) => x === MANGO_INSTRUCTION_FORWARDER).length
 
   const treasuryAddress = useAsync(
     async () =>
@@ -169,6 +202,7 @@ const useProposalSafetyCheck = (proposal: Proposal) => {
       | 'thirdPartyInstructionWritesConfig'
       | 'possibleWrongGovernance'
       | 'programUpgrade'
+      | 'usingMangoInstructionForwarder'
       | undefined
     )[] = []
 
@@ -193,6 +227,9 @@ const useProposalSafetyCheck = (proposal: Proposal) => {
           } else {
             return 'thirdPartyInstructionWritesConfig'
           }
+        }
+        if (isUsingForwardProgram) {
+          return 'usingMangoInstructionForwarder'
         }
       })
     )
@@ -228,6 +265,9 @@ const ProposalWarnings = ({ proposal }: { proposal: Proposal }) => {
       )}
       {warnings?.includes('programUpgrade') && (
         <ProgramUpgrade></ProgramUpgrade>
+      )}
+      {warnings?.includes('usingMangoInstructionForwarder') && (
+        <ForwardWarning></ForwardWarning>
       )}
     </>
   )

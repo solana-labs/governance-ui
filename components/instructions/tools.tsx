@@ -35,6 +35,7 @@ import { MANGO_V4_INSTRUCTIONS } from './programs/mangoV4'
 import { DUAL_INSTRUCTIONS } from './programs/dual'
 import { SWITCHBOARD_INSTRUCTIONS } from './programs/switchboard'
 import { STAKE_INSTRUCTIONS } from './programs/stake'
+import dayjs from 'dayjs'
 import { JUPITER_REF } from './programs/jupiterRef'
 
 /**
@@ -45,6 +46,8 @@ export const DEFAULT_GOVERNANCE_PROGRAM_ID =
 export const DEFAULT_GOVERNANCE_PROGRAM_VERSION = 3
 
 export const MANGO_DAO_TREASURY = '9RGoboEjmaAjSCXsKi6p6zJucnwF3Eg5NUN9jPS6ziL3'
+export const MANGO_INSTRUCTION_FORWARDER =
+  'ixFPGCPYEp5GzhoahhHFVL8VVzkq1kc2eeFZh3qpYca'
 
 // Well known account names displayed on the instruction card
 export const ACCOUNT_NAMES = {
@@ -459,38 +462,97 @@ export async function getInstructionDescriptor(
   realm?: ProgramAccount<Realm> | undefined
 ) {
   let descriptors: any
+  let instructionToDecode = { ...instruction }
+  const isUsingForwardProgram =
+    instructionToDecode.programId.toBase58() === MANGO_INSTRUCTION_FORWARDER
   if (
-    (realm && instruction.programId.equals(realm.owner)) ||
-    instruction.programId.equals(new PublicKey(DEFAULT_GOVERNANCE_PROGRAM_ID))
+    (realm && instructionToDecode.programId.equals(realm.owner)) ||
+    instructionToDecode.programId.equals(
+      new PublicKey(DEFAULT_GOVERNANCE_PROGRAM_ID)
+    )
   ) {
     descriptors =
       GOVERNANCE_INSTRUCTIONS['GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw']
+  } else if (isUsingForwardProgram) {
+    instructionToDecode = {
+      accounts: instructionToDecode.accounts.slice(
+        1,
+        instructionToDecode.accounts.length
+      ),
+      data: instructionToDecode.data.slice(8, instructionToDecode.data.length),
+      programId: instructionToDecode.accounts[1].pubkey,
+    }
+    descriptors =
+      INSTRUCTION_DESCRIPTORS[instructionToDecode.programId.toBase58()]
   } else {
-    descriptors = INSTRUCTION_DESCRIPTORS[instruction.programId.toBase58()]
+    descriptors =
+      INSTRUCTION_DESCRIPTORS[instructionToDecode.programId.toBase58()]
   }
 
   // Make it work for program with one instruction like ATA program
   // and for the one with multiple instructions
-  const descriptor = !instruction.data.length
+  const descriptor = !instructionToDecode.data.length
     ? descriptors
-    : descriptors && descriptors[instruction.data[0]]
-    ? descriptors[instruction.data[0]]
+    : descriptors && descriptors[instructionToDecode.data[0]]
+    ? descriptors[instructionToDecode.data[0]]
     : //backup if first number is same for couple of instructions inside same idl
-    descriptors && descriptors[`${instruction.data[0]}${instruction.data[1]}`]
-    ? descriptors[`${instruction.data[0]}${instruction.data[1]}`]
+    descriptors &&
+      descriptors[
+        `${instructionToDecode.data[0]}${instructionToDecode.data[1]}`
+      ]
+    ? descriptors[
+        `${instructionToDecode.data[0]}${instructionToDecode.data[1]}`
+      ]
     : descriptors
 
   const dataUI = (descriptor?.getDataUI &&
     (await descriptor?.getDataUI(
       connection.current,
-      instruction.data,
-      instruction.accounts,
-      instruction.programId,
+      instructionToDecode.data,
+      instructionToDecode.accounts,
+      instructionToDecode.programId,
       connection.cluster
-    ))) ?? <>{JSON.stringify(instruction.data)}</>
+    ))) ?? <>{JSON.stringify(instructionToDecode.data)}</>
+
+  const dataUiWithAdditionalInfo = (
+    <>
+      {isUsingForwardProgram && (
+        <ForwarderProgramDecode
+          instruction={instruction}
+        ></ForwarderProgramDecode>
+      )}
+      {dataUI}
+    </>
+  )
   return {
     name: descriptor?.name,
     accounts: descriptor?.accounts,
-    dataUI,
+    dataUI: dataUiWithAdditionalInfo,
   }
+}
+
+const ForwarderProgramDecode = ({
+  instruction,
+}: {
+  instruction: InstructionData
+}) => {
+  const timestampBytes = instruction.data.slice(0, 8)
+  const view = new DataView(Buffer.from(timestampBytes).buffer)
+  const timestamp = view.getUint32(0, true) // true for little-endian
+
+  const date = dayjs(timestamp * 1000) // Convert to milliseconds
+
+  return (
+    <div className="py-2 pb-4">
+      <div>
+        Instruction use forwarder program: {MANGO_INSTRUCTION_FORWARDER}
+      </div>
+      <div>
+        Only wallet: {instruction.accounts[0].pubkey.toBase58()} can execute
+      </div>
+      <div>
+        Proposal is executable only until: {date.format('DD-MM-YYYY HH:mm')}
+      </div>
+    </div>
+  )
 }

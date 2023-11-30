@@ -19,6 +19,9 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { ReferralProvider } from '@jup-ag/referral-sdk'
 import { JUPITER_REFERRAL_PK } from '@tools/constants'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import ForwarderProgram, {
+  useForwarderProgramHelpers,
+} from '@components/ForwarderProgram/ForwarderProgram'
 
 const REDUCE_ONLY_OPTIONS = [
   { value: 0, name: 'Disabled' },
@@ -72,6 +75,7 @@ const TokenRegister = ({
   const { mangoClient, mangoGroup, getAdditionalLabelInfo } = UseMangoV4()
   const { assetAccounts } = useGovernanceAssets()
   const connection = useLegacyConnectionContext()
+  const forwarderProgramHelpers = useForwarderProgramHelpers()
 
   const solAccounts = assetAccounts.filter(
     (x) =>
@@ -193,11 +197,17 @@ const TokenRegister = ({
 
       if (!isExistingAccount) {
         additionalSerializedInstructions.push(
-          ...tx.tx.instructions.map((x) => serializeInstructionToBase64(x))
+          ...tx.tx.instructions.map((x) =>
+            serializeInstructionToBase64(
+              forwarderProgramHelpers.withForwarderWrapper(x)
+            )
+          )
         )
       }
 
-      serializedInstruction = serializeInstructionToBase64(ix)
+      serializedInstruction = serializeInstructionToBase64(
+        forwarderProgramHelpers.withForwarderWrapper(ix)
+      )
     }
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
@@ -215,7 +225,11 @@ const TokenRegister = ({
       index
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form])
+  }, [
+    form,
+    forwarderProgramHelpers.form,
+    forwarderProgramHelpers.withForwarderWrapper,
+  ])
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
@@ -518,6 +532,7 @@ const TokenRegister = ({
           formErrors={formErrors}
         ></InstructionForm>
       )}
+      <ForwarderProgram {...forwarderProgramHelpers}></ForwarderProgram>
     </>
   )
 }

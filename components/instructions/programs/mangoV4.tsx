@@ -204,6 +204,7 @@ const instructions = () => ({
       //accounts: AccountMetaData[]
     ) => {
       const info = await displayArgs(connection, data)
+      console.log(info, '@@@@')
       try {
         return <div>{info}</div>
       } catch (e) {
@@ -1549,6 +1550,10 @@ const displayArgs = async (connection: Connection, data: Uint8Array) => {
         })
         .map((key) => {
           const isPublicKey = tryParseKey(args[key])
+          const isBN = args[key] instanceof BN
+          if (isBN) {
+            console.log(args[key].toNumber())
+          }
           return (
             <div key={key} className="flex">
               <div className="mr-3">{key}:</div>
