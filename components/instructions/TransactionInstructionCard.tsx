@@ -5,6 +5,7 @@ import InstructionProgram from './InstructionProgram'
 import { useCallback, useEffect, useState } from 'react'
 import {
   InstructionDescriptor,
+  MANGO_INSTRUCTION_FORWARDER,
   WSOL_MINT,
   getInstructionDescriptor,
 } from './tools'
@@ -30,6 +31,15 @@ const TransactionInstructionCard = ({
   const connection = useLegacyConnectionContext()
   const realm = useRealmQuery().data?.result
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
+  const instructionUseInstructionForwarder =
+    instructionData.programId.toBase58() === MANGO_INSTRUCTION_FORWARDER
+  const instructionAccounts = instructionUseInstructionForwarder
+    ? [...instructionData.accounts.slice(2, instructionData.accounts.length)]
+    : instructionData.accounts
+
+  const programId = instructionUseInstructionForwarder
+    ? instructionData.accounts[1].pubkey
+    : instructionData.programId
 
   const [descriptor, setDescriptor] = useState<InstructionDescriptor>()
   const [nftImgUrl, setNftImgUrl] = useState('')
@@ -106,17 +116,17 @@ const TransactionInstructionCard = ({
       </div>
       <InstructionProgram
         connection={connection}
-        programId={instructionData.programId}
+        programId={programId}
       ></InstructionProgram>
       <div className="border-b border-bkg-4 mb-6">
-        {instructionData.accounts.map((am, idx) => (
+        {instructionAccounts.map((am, idx) => (
           <InstructionAccount
             endpoint={connection.endpoint}
             key={idx}
             index={idx}
             accountMeta={am}
             descriptor={descriptor}
-            programId={instructionData.programId}
+            programId={programId}
           />
         ))}
       </div>

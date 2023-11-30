@@ -8,11 +8,12 @@ import useCreateProposal from '@hooks/useCreateProposal'
 import UseMangoV4 from '@hooks/useMangoV4'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import {
   getInstructionDataFromBase64,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
-import { AccountMeta, PublicKey } from '@solana/web3.js'
+import { AccountMeta, PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -26,6 +27,7 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
   const [mangoAccount, setSelectedMangoAccount] = useState<MangoAccount | null>(
     null
   )
+  const wallet = useWalletOnePointOh()
   const [mangoAccounts, setMangoAccounts] = useState<MangoAccount[]>([])
   const [mangoAccName, setMangoAccName] = useState('')
   const [isProposing, setIsProposing] = useState(false)
@@ -120,7 +122,13 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
 
       const createAccInstData = {
         data: getInstructionDataFromBase64(
-          serializeInstructionToBase64(createAccIx!)
+          serializeInstructionToBase64(
+            wrapWithForwarder(
+              createAccIx!,
+              wallet!.publicKey!,
+              new BN(1701345105)
+            )
+          )
         ),
         holdUpTime:
           account?.governance.account?.config.minInstructionHoldUpTime,
@@ -259,3 +267,27 @@ const getNextAccountNumber = (accounts: MangoAccount[]): number => {
 }
 
 export default MangoModal
+
+function wrapWithForwarder(
+  ix: TransactionInstruction,
+  signer: PublicKey,
+  timeout: BN
+): TransactionInstruction {
+  return new TransactionInstruction({
+    keys: [
+      {
+        pubkey: signer,
+        isSigner: true,
+        isWritable: false,
+      },
+      {
+        pubkey: ix.programId,
+        isSigner: false,
+        isWritable: false,
+      },
+      ...ix.keys,
+    ],
+    programId: new PublicKey('ixFPGCPYEp5GzhoahhHFVL8VVzkq1kc2eeFZh3qpYca'),
+    data: Buffer.concat([timeout.toArrayLike(Buffer, 'le', 8), ix.data]),
+  })
+}
