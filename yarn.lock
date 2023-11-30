@@ -2732,6 +2732,26 @@
     snake-case "^3.0.4"
     toml "^3.0.0"
 
+"@project-serum/anchor@0.24.2", "@project-serum/anchor@^0.24.2":
+  version "0.24.2"
+  resolved "https://registry.yarnpkg.com/@project-serum/anchor/-/anchor-0.24.2.tgz#a3c52a99605c80735f446ca9b3a4885034731004"
+  integrity sha512-0/718g8/DnEuwAidUwh5wLYphUYXhUbiClkuRNhvNoa+1Y8a4g2tJyxoae+emV+PG/Gikd/QUBNMkIcimiIRTA==
+  dependencies:
+    "@project-serum/borsh" "^0.2.5"
+    "@solana/web3.js" "^1.36.0"
+    base64-js "^1.5.1"
+    bn.js "^5.1.2"
+    bs58 "^4.0.1"
+    buffer-layout "^1.2.2"
+    camelcase "^5.3.1"
+    cross-fetch "^3.1.5"
+    crypto-hash "^1.3.0"
+    eventemitter3 "^4.0.7"
+    js-sha256 "^0.9.0"
+    pako "^2.0.3"
+    snake-case "^3.0.4"
+    toml "^3.0.0"
+
 "@project-serum/anchor@0.25.0", "@project-serum/anchor@^0.25.0":
   version "0.25.0"
   resolved "https://registry.yarnpkg.com/@project-serum/anchor/-/anchor-0.25.0.tgz#88ee4843336005cf5a64c80636ce626f0996f503"
@@ -2809,26 +2829,6 @@
     crypto-hash "^1.3.0"
     eventemitter3 "^4.0.7"
     find "^0.3.0"
-    js-sha256 "^0.9.0"
-    pako "^2.0.3"
-    snake-case "^3.0.4"
-    toml "^3.0.0"
-
-"@project-serum/anchor@^0.24.2":
-  version "0.24.2"
-  resolved "https://registry.yarnpkg.com/@project-serum/anchor/-/anchor-0.24.2.tgz#a3c52a99605c80735f446ca9b3a4885034731004"
-  integrity sha512-0/718g8/DnEuwAidUwh5wLYphUYXhUbiClkuRNhvNoa+1Y8a4g2tJyxoae+emV+PG/Gikd/QUBNMkIcimiIRTA==
-  dependencies:
-    "@project-serum/borsh" "^0.2.5"
-    "@solana/web3.js" "^1.36.0"
-    base64-js "^1.5.1"
-    bn.js "^5.1.2"
-    bs58 "^4.0.1"
-    buffer-layout "^1.2.2"
-    camelcase "^5.3.1"
-    cross-fetch "^3.1.5"
-    crypto-hash "^1.3.0"
-    eventemitter3 "^4.0.7"
     js-sha256 "^0.9.0"
     pako "^2.0.3"
     snake-case "^3.0.4"
@@ -2944,6 +2944,25 @@
   dependencies:
     "@coral-xyz/anchor" "^0.26.0"
     buffer "^6.0.1"
+
+"@pythnetwork/staking-wasm@*":
+  version "0.3.4"
+  resolved "https://registry.yarnpkg.com/@pythnetwork/staking-wasm/-/staking-wasm-0.3.4.tgz#29c0f47467249a4c66814a8aab9eadf2cc008add"
+  integrity sha512-0ZdaWmueVO5hucdVH4UDfHyBuxtW6UDcrpEFtD/3pq4naQjcgu1u6rK8iL2pgKi8W2UlsB4vwJqay2Sf1sA4mw==
+
+"@pythnetwork/staking@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@pythnetwork/staking/-/staking-2.0.0.tgz#41edcb000a3c2d1db938a3017dae46f54aac061e"
+  integrity sha512-7RPcsYfEJxGZ12P+OyQ1lfXxgcoe69N0Zftj525GaxUDMBvCXtNSQM+FuskF8y/GKHifZ+CDI8eP3w26gv0ZzQ==
+  dependencies:
+    "@project-serum/anchor" "0.24.2"
+    "@pythnetwork/staking-wasm" "*"
+    "@solana/spl-governance" "0.3.26"
+    "@solana/spl-token" "^0.1.8"
+    "@solana/web3.js" "^1.36.0"
+    encoding "^0.1.13"
+    ts-node "^10.7.0"
+    typescript "^4.3.5"
 
 "@radix-ui/number@1.0.0":
   version "1.0.0"
@@ -4130,6 +4149,19 @@
     borsh "^0.7.0"
     js-sha3 "^0.8.0"
     typescript-collections "^1.3.3"
+
+"@solana/spl-governance@0.3.26":
+  version "0.3.26"
+  resolved "https://registry.yarnpkg.com/@solana/spl-governance/-/spl-governance-0.3.26.tgz#1a6c56037063654d243cc3ee9503b5b3140bbd6f"
+  integrity sha512-L84AWKcAmEMIWhh5gcfasfDesOMT+IU4i+s0ELgKCN0O9MC/hVrSjTkn68vBhDfCElnJyJTFMAN7NqSbrweD9A==
+  dependencies:
+    "@solana/web3.js" "^1.22.0"
+    axios "^1.1.3"
+    bignumber.js "^9.0.1"
+    bn.js "^5.1.3"
+    borsh "^0.3.1"
+    bs58 "^4.0.1"
+    superstruct "^0.15.2"
 
 "@solana/spl-governance@0.3.28":
   version "0.3.28"
@@ -6223,12 +6255,12 @@ ansi-escapes@^4.2.1:
   dependencies:
     type-fest "^0.21.3"
 
-ansi-regex@3.0.1:
+ansi-regex@3.0.1, ansi-regex@^2.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-3.0.1.tgz#123d6479e92ad45ad897d4054e3c7ca7db4944e1"
   integrity sha512-+O9Jct8wf++lXxxFc4hc8LsjaSq0HFzzL7cVsw8pRDIPdjKD2mT4ytDZlLuSBZ4cLKZFXIrMGO7DbQCtMJJMKw==
 
-"ansi-regex@>=3.0.1 <=5.0.1", ansi-regex@^2.0.0, ansi-regex@^3.0.0, ansi-regex@^4.1.0, ansi-regex@^5.0.0, ansi-regex@^5.0.1:
+"ansi-regex@>=3.0.1 <=5.0.1", ansi-regex@^3.0.0, ansi-regex@^4.1.0, ansi-regex@^5.0.0, ansi-regex@^5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-5.0.1.tgz#082cb2c89c9fe8659a311a53bd6a4dc5301db304"
   integrity sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==
@@ -15119,7 +15151,7 @@ ts-mocha@^9.0.2:
   optionalDependencies:
     tsconfig-paths "^3.5.0"
 
-ts-node@10.9.1, ts-node@^10.9.1:
+ts-node@10.9.1, ts-node@^10.7.0, ts-node@^10.9.1:
   version "10.9.1"
   resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-10.9.1.tgz#e73de9102958af9e1f0b168a6ff320e25adcff4b"
   integrity sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==
@@ -15291,7 +15323,7 @@ typescript-collections@^1.3.3:
   resolved "https://registry.yarnpkg.com/typescript-collections/-/typescript-collections-1.3.3.tgz#62d50d93c018c094d425eabee649f00ec5cc0fea"
   integrity sha512-7sI4e/bZijOzyURng88oOFZCISQPTHozfE2sUu5AviFYk5QV7fYGb6YiDl+vKjF/pICA354JImBImL9XJWUvdQ==
 
-typescript@4.9.5, typescript@^4.1.2, typescript@^4.5.5, typescript@^4.6.2:
+typescript@4.9.5, typescript@^4.1.2, typescript@^4.3.5, typescript@^4.5.5, typescript@^4.6.2:
   version "4.9.5"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.9.5.tgz#095979f9bcc0d09da324d58d03ce8f8374cbe65a"
   integrity sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==

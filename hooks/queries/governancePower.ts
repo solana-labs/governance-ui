@@ -1,4 +1,4 @@
-import { Connection, PublicKey } from '@solana/web3.js'
+import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import {
   fetchTokenOwnerRecordByPubkey,
   useTokenOwnerRecordByPubkeyQuery,
@@ -16,6 +16,7 @@ import {
   GATEWAY_PLUGINS_PKS,
   HELIUM_VSR_PLUGINS_PKS,
   NFT_PLUGINS_PKS,
+  PYTH_PLUGIN_PK,
   VSR_PLUGIN_PKS,
 } from '@constants/plugins'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
@@ -35,6 +36,8 @@ import {
 } from '@models/voteWeights'
 import useUserOrDelegator from '@hooks/useUserOrDelegator'
 import { getVsrGovpower } from './plugins/vsr'
+import { PythClient } from '@pythnetwork/staking'
+import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet'
 
 export const getVanillaGovpower = async (
   connection: Connection,
@@ -102,6 +105,20 @@ export const getNftGovpower = async (
   return power
 }
 
+export const getPythGovPower = async (connection: Connection, user : PublicKey | undefined) : Promise<BN> => {
+  if (!user) return new BN(0)
+
+  const pythClient = await PythClient.connect(connection, new NodeWallet(new Keypair()))
+  const stakeAccount = await pythClient.getMainAccount(user)
+  
+  if (stakeAccount){
+    return stakeAccount.getVoterWeight(await pythClient.getTime()).toBN()
+  }
+  else {
+    return new BN(0)
+  }
+}
+
 export const findPluginName = (programId: PublicKey | undefined) =>
   programId === undefined
     ? ('vanilla' as const)
@@ -112,7 +129,9 @@ export const findPluginName = (programId: PublicKey | undefined) =>
     : NFT_PLUGINS_PKS.includes(programId.toString())
     ? 'NFT'
     : GATEWAY_PLUGINS_PKS.includes(programId.toString())
-    ? 'gateway'
+    ? 'gateway' 
+    : PYTH_PLUGIN_PK.includes(programId.toString())
+    ? 'pyth'
     : 'unknown'
 
 export const determineVotingPowerType = async (
@@ -172,6 +191,8 @@ export const useGovernancePowerAsync = (
             ? heliumVotingPower
             : plugin === 'gateway'
             ? gatewayVotingPower
+            : plugin === 'pyth'
+            ? getPythGovPower(connection, actingAsWalletPk)
             : new BN(0)),
     [
       plugin,
@@ -220,6 +241,12 @@ export const useLegacyVoterWeight = () => {
         ? undefined
         : plugin === 'vanilla'
         ? new VoterWeight(communityTOR.result, councilTOR?.result)
+        : plugin === 'pyth'
+        ? new VoteRegistryVoterWeight(
+            communityTOR.result,
+            councilTOR?.result,
+            await getPythGovPower(connection, actingAsWalletPk)
+          )
         : plugin === 'NFT'
         ? communityTOR.result?.pubkey
           ? new VoteNftWeight(
