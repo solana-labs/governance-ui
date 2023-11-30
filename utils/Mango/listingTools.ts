@@ -318,7 +318,7 @@ export const getSuggestedCoinTier = async (
     )
 
     const tier =
-      indexForTierFromSwaps > -1 ? TIERS[indexForTierFromSwaps] : 'UNTRUSTED'
+      indexForTierFromSwaps > -1 ? TIERS[indexForTierFromSwaps] : 'SHIT'
 
     const tierLowerThenCurrent =
       tier === 'ULTRA_PREMIUM' || tier === 'PREMIUM'
@@ -340,7 +340,7 @@ export const getSuggestedCoinTier = async (
     }
   } catch (e) {
     return {
-      tier: 'UNTRUSTED',
+      tier: 'SHIT',
       priceImpact: 100,
     }
   }
@@ -632,9 +632,10 @@ export const getFormattedBankValues = (group: Group, bank: Bank) => {
     lastRatesUpdate: new Date(
       1000 * bank.bankRateLastUpdated.toNumber()
     ).toUTCString(),
-    oracleConfFilter: (100 * bank.oracleConfig.confFilter.toNumber()).toFixed(
-      2
-    ),
+    oracleConfFilter:
+      bank.oracleConfig.confFilter.toNumber() === Number.MAX_SAFE_INTEGER
+        ? ''
+        : (100 * bank.oracleConfig.confFilter.toNumber()).toFixed(2),
     minVaultToDepositsRatio: bank.minVaultToDepositsRatio * 100,
     netBorrowsInWindow: toUiDecimalsForQuote(
       I80F48.fromI64(bank.netBorrowsInWindow).mul(bank.price)

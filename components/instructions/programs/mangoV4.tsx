@@ -253,6 +253,7 @@ const instructions = () => ({
       )
 
       const formattedProposedArgs = getFormattedListingValues(args)
+
       const suggestedPreset = getFormattedListingPresets(
         proposedOracle.type === 'Pyth'
       )[liqudityTier.tier]
@@ -304,7 +305,7 @@ const instructions = () => ({
             suggestedUntrusted={suggestedUntrusted}
             val={formattedProposedArgs[valKey]}
             suggestedVal={invalidFields[valKey]}
-            suffix={suffix}
+            suffix={formattedProposedArgs[valKey] && suffix}
             prefix={perfix}
           />
         )
@@ -1649,7 +1650,10 @@ const getFormattedListingValues = (args: FlatListingArgs) => {
     tokenIndex: args.tokenIndex,
     tokenName: args.name,
     oracle: args.oracle?.toBase58(),
-    oracleConfidenceFilter: (args['oracleConfig.confFilter'] * 100).toFixed(2),
+    oracleConfidenceFilter:
+      args['oracleConfig.confFilter'] >= Number.MAX_SAFE_INTEGER
+        ? ''
+        : (args['oracleConfig.confFilter'] * 100).toFixed(2),
     oracleMaxStalenessSlots: args['oracleConfig.maxStalenessSlots'],
     interestRateUtilizationPoint0: (
       args['interestRateParams.util0'] * 100
