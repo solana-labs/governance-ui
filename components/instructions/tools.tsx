@@ -35,7 +35,6 @@ import { MANGO_V4_INSTRUCTIONS } from './programs/mangoV4'
 import { DUAL_INSTRUCTIONS } from './programs/dual'
 import { SWITCHBOARD_INSTRUCTIONS } from './programs/switchboard'
 import { STAKE_INSTRUCTIONS } from './programs/stake'
-import { INSTRUCTION_FORWARDER } from './programs/instructionForwarder'
 import dayjs from 'dayjs'
 
 /**
@@ -453,7 +452,6 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...MANGO_V4_INSTRUCTIONS,
   ...DUAL_INSTRUCTIONS,
   ...STAKE_INSTRUCTIONS,
-  ...INSTRUCTION_FORWARDER,
 }
 
 export async function getInstructionDescriptor(
@@ -541,6 +539,7 @@ const ForwarderProgramDecode = ({
   const timestamp = view.getUint32(0, true) // true for little-endian
 
   const date = dayjs(timestamp * 1000) // Convert to milliseconds
+
   return (
     <div className="py-2 pb-4">
       <div>
@@ -550,7 +549,7 @@ const ForwarderProgramDecode = ({
         Only wallet: {instruction.accounts[0].pubkey.toBase58()} can execute
       </div>
       <div>
-        Proposal is executable only until: {date.format('DD-MM-YYYY HH:MM')}
+        Proposal is executable only until: {date.format('DD-MM-YYYY HH:mm')}
       </div>
     </div>
   )

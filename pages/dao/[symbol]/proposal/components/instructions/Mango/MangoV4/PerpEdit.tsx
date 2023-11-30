@@ -19,6 +19,9 @@ import { BN } from '@coral-xyz/anchor'
 import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
 import Switch from '@components/Switch'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import ForwarderProgram, {
+  useForwarderProgramHelpers,
+} from '@components/ForwarderProgram/ForwarderProgram'
 
 const keyToLabel = {
   oraclePk: 'Oracle',
@@ -145,6 +148,7 @@ const PerpEdit = ({
   const { assetAccounts } = useGovernanceAssets()
   const [perps, setPerps] = useState<NameMarketIndexVal[]>([])
   const [forcedValues, setForcedValues] = useState<string[]>([])
+  const forwarderProgramHelpers = useForwarderProgramHelpers()
   const solAccounts = assetAccounts.filter(
     (x) =>
       x.type === AccountType.SOL &&
@@ -247,7 +251,9 @@ const PerpEdit = ({
         })
         .instruction()
 
-      serializedInstruction = serializeInstructionToBase64(ix)
+      serializedInstruction = serializeInstructionToBase64(
+        forwarderProgramHelpers.withForwarderWrapper(ix)
+      )
     }
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
@@ -265,7 +271,12 @@ const PerpEdit = ({
       index
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form, forcedValues])
+  }, [
+    form,
+    forcedValues,
+    forwarderProgramHelpers.form,
+    forwarderProgramHelpers.withForwarderWrapper,
+  ])
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
@@ -646,6 +657,7 @@ const PerpEdit = ({
                 ))}
             </div>
           </AdvancedOptionsDropdown>
+          <ForwarderProgram {...forwarderProgramHelpers}></ForwarderProgram>
         </>
       )}
     </>
