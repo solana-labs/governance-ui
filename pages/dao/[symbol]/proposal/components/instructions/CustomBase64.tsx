@@ -4,6 +4,7 @@ import {
   getInstructionDataFromBase64,
   Governance,
   ProgramAccount,
+  serializeInstructionToBase64,
 } from '@solana/spl-governance'
 import Input from '@components/inputs/Input'
 import Textarea from '@components/inputs/Textarea'
@@ -18,6 +19,10 @@ import GovernedAccountSelect from '../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
+import ForwarderProgram, {
+  useForwarderProgramHelpers,
+} from '@components/ForwarderProgram/ForwarderProgram'
+import { TransactionInstruction } from '@solana/web3.js'
 
 const CustomBase64 = ({
   index,
@@ -29,6 +34,7 @@ const CustomBase64 = ({
   const { result: ownVoterWeight } = useLegacyVoterWeight()
   const wallet = useWalletOnePointOh()
   const { assetAccounts } = useGovernanceAssets()
+  const forwarderProgramHelpers = useForwarderProgramHelpers()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<Base64InstructionForm>({
     governedAccount: undefined,
@@ -49,7 +55,19 @@ const CustomBase64 = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      serializedInstruction = form.base64
+      if (forwarderProgramHelpers.form.useExecutableBy) {
+        const ix = getInstructionDataFromBase64(form.base64)
+        const tx = new TransactionInstruction({
+          keys: ix.accounts,
+          data: Buffer.from(ix.data),
+          programId: ix.programId,
+        })
+        serializedInstruction = serializeInstructionToBase64(
+          forwarderProgramHelpers.withForwarderWrapper(tx)
+        )
+      } else {
+        serializedInstruction = form.base64
+      }
     }
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
@@ -65,7 +83,11 @@ const CustomBase64 = ({
       index
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form])
+  }, [
+    form,
+    forwarderProgramHelpers.form,
+    forwarderProgramHelpers.withForwarderWrapper,
+  ])
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
@@ -149,6 +171,7 @@ const CustomBase64 = ({
         }
         error={formErrors['base64']}
       ></Textarea>
+      <ForwarderProgram {...forwarderProgramHelpers}></ForwarderProgram>
     </>
   )
 }
