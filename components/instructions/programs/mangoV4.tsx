@@ -750,6 +750,7 @@ const instructions = () => ({
     ) => {
       try {
         let mintData: null | TokenInfoWithoutDecimals | undefined = null
+
         const mintInfo = accounts[2].pubkey
         const group = accounts[0].pubkey
         const client = await getClient(connection)
