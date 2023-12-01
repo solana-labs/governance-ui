@@ -96,8 +96,9 @@ const TokenRegisterTrustless = ({
         referralAccountPubKey: JUPITER_REFERRAL_PK,
         mint: new PublicKey(form.mintPk),
       })
-      const isExistingAccount =
-        (await connection.current.getBalance(tx.referralTokenAccountPubKey)) > 1
+      const isExistingAccount = await connection.current.getAccountInfo(
+        tx.referralTokenAccountPubKey
+      )
 
       if (!isExistingAccount) {
         additionalSerializedInstructions.push(
