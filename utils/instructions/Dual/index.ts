@@ -479,6 +479,17 @@ export async function getExerciseInstruction({
       additionalSerializedInstructions.push(serializeInstructionToBase64(ataIx))
     }
 
+    // Possibly init the base token account that is receiving tokens from exercise.
+    const walletBaseAta = await findAssociatedTokenAddress(wallet.publicKey, baseMint);
+    if ((await connection.current.getAccountInfo(walletBaseAta)) === null) {
+      const [ataIx] = await createAssociatedTokenAccount(
+        wallet.publicKey,
+        wallet.publicKey,
+        baseMint
+      )
+      additionalSerializedInstructions.push(serializeInstructionToBase64(ataIx))
+    }
+
     const prerequisiteInstructions: TransactionInstruction[] = []
     const space = 165
     const rent = await connection.current.getMinimumBalanceForRentExemption(
