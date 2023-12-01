@@ -465,6 +465,7 @@ export async function getInstructionDescriptor(
   let instructionToDecode = { ...instruction }
   const isUsingForwardProgram =
     instructionToDecode.programId.toBase58() === MANGO_INSTRUCTION_FORWARDER
+
   if (
     (realm && instructionToDecode.programId.equals(realm.owner)) ||
     instructionToDecode.programId.equals(
@@ -476,7 +477,7 @@ export async function getInstructionDescriptor(
   } else if (isUsingForwardProgram) {
     instructionToDecode = {
       accounts: instructionToDecode.accounts.slice(
-        1,
+        2,
         instructionToDecode.accounts.length
       ),
       data: instructionToDecode.data.slice(8, instructionToDecode.data.length),
