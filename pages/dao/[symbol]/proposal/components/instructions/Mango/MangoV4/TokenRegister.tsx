@@ -170,7 +170,7 @@ const TokenRegister = ({
           new BN(form.netBorrowLimitPerWindowQuote),
           Number(form.borrowWeightScaleStartQuote),
           Number(form.depositWeightScaleStartQuote),
-          Number(form.reduceOnly),
+          Number(form.reduceOnly.value),
           Number(form.tokenConditionalSwapTakerFeeRate),
           Number(form.tokenConditionalSwapMakerFeeRate),
           Number(form.flashLoanSwapFeeRate)
@@ -192,8 +192,9 @@ const TokenRegister = ({
         referralAccountPubKey: JUPITER_REFERRAL_PK,
         mint: new PublicKey(form.mintPk),
       })
-      const isExistingAccount =
-        (await connection.current.getBalance(tx.referralTokenAccountPubKey)) > 1
+      const isExistingAccount = await connection.current.getAccountInfo(
+        tx.referralTokenAccountPubKey
+      )
 
       if (!isExistingAccount) {
         additionalSerializedInstructions.push(
