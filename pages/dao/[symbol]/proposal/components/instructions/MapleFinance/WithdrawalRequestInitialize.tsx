@@ -36,6 +36,7 @@ import {
 import { tryGetMint } from '@utils/tokens'
 import { findLenderAddress } from '@maplelabs/syrup-sdk'
 import { tryGetAta } from '@utils/validations'
+import { BN } from '@coral-xyz/anchor'
 
 interface WithdrawalRequestInitializeForm {
   governedAccount: AssetAccount | undefined
@@ -174,6 +175,7 @@ const WithdrawalRequestInitialize = ({
 
         const poolAddress = getPoolPubkeyFromName(form!.poolName.name)
         const lenderUser = form!.governedAccount?.pubkey
+        const [lenderAddress] = await findLenderAddress(poolAddress, lenderUser)
 
         const client = mapleFinance.SyrupClient.load({
           provider: new SolanaAugmentedProvider(
@@ -209,6 +211,38 @@ const WithdrawalRequestInitialize = ({
         )
 
         setSharesAmountAvailable(sharesAmount)
+
+        const lender = await mapleFinance.WrappedLender.load(
+          client,
+          lenderAddress
+        )
+
+        const totalShares = await lender.getTotalShares()
+
+        console.log('totalShares', totalShares.toString())
+
+        console.log('pool', pool.data)
+        console.log('sharesOutstanding', pool.data.sharesOutstanding.toString())
+        console.log('totalValue', pool.data.totalValue.toString())
+
+        console.log(
+          'value per share',
+          pool.data.totalValue.toNumber() /
+            pool.data.sharesOutstanding.toNumber()
+        )
+
+        const valuePerShare =
+          pool.data.totalValue.toNumber() /
+          pool.data.sharesOutstanding.toNumber()
+
+        const totalWorth = totalShares.toNumber() * valuePerShare
+
+        const totalWorthUsd = fmtBnMintDecimals(
+          new BN(Math.floor(totalWorth)),
+          6
+        )
+
+        console.log('totalWorthUsd', totalWorthUsd)
       } catch {
         // ignore errors
       }

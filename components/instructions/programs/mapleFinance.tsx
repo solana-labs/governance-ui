@@ -121,5 +121,27 @@ export const MAPLE_FINANCE_PROGRAM_INSTRUCTIONS = {
         return <></>
       },
     },
+
+    [204]: {
+      name: 'Maple Finance - Withdrawal Request Close',
+      accounts: [
+        { name: 'Globals' },
+        { name: 'Withdrawal Request' },
+        { name: 'Lender Owner' },
+        { name: 'Pool' },
+        { name: 'Lender' },
+        { name: 'Lender Share Account' },
+        { name: 'Lender Locker' },
+        { name: 'System Program' },
+        { name: 'Token Program' },
+      ],
+      getDataUI: async (
+        _connection: Connection,
+        _data: Uint8Array,
+        _accounts: AccountMetaData[]
+      ) => {
+        return <></>
+      },
+    },
   },
 }
