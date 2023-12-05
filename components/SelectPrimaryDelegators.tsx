@@ -107,7 +107,7 @@ const usePluginNameAsync = (kind: 'community' | 'council') => {
   )
 }
 
-function PrimaryDelegatorSelect({
+function PrimaryDelegatorSelectBatchSupported({
   selectedDelegator,
   handleSelect,
 
@@ -151,8 +151,10 @@ function PrimaryDelegatorSelect({
                   <div className="absolute bg-bkg-1 bottom-0 left-0 w-full h-full opacity-0	" />
                 </div>
               )
+            ) : batchDelegatorUxSupported ? (
+              YOUR_WALLET_VALUE
             ) : (
-              batchDelegatorUxSupported ? YOUR_WALLET_VALUE : JUST_YOUR_WALLET
+              JUST_YOUR_WALLET
             )
           }
         >
@@ -191,17 +193,21 @@ function PrimaryDelegatorSelect({
   )
 }
 
-
 // its a conditional, make it use the old or new component depending on support. thanks.
-const a = ({kind}: {  kind: 'community' | 'council'
-}) => {
-
-  const { result: plugin } = usePluginNameAsync(kind)
+const PrimaryDelegatorSelect = (
+  props: Parameters<typeof PrimaryDelegatorSelectBatchSupported>[0]
+) => {
+  const { result: plugin } = usePluginNameAsync(props.kind)
   const batchDelegatorUxSupported =
     plugin && DELEGATOR_BATCH_VOTE_SUPPORT_BY_PLUGIN[plugin]
-  return batchDelegatorUxSupported ? PrimaryDelegatorSelect
+  return batchDelegatorUxSupported ? (
+    <PrimaryDelegatorSelectBatchSupported {...props} />
+  ) : (
+    <PrimaryDelegatorSelectOld {...props} />
+  )
 }
 
+/** Used when batched delegator voting is not supported */
 function PrimaryDelegatorSelectOld({
   selectedDelegator,
   handleSelect,
@@ -217,10 +223,6 @@ function PrimaryDelegatorSelectOld({
   const wallet = useWalletOnePointOh()
   const walletPk = wallet?.publicKey ?? undefined
 
-  const { result: plugin } = usePluginNameAsync(kind)
-  const batchDelegatorUxSupported =
-    plugin && DELEGATOR_BATCH_VOTE_SUPPORT_BY_PLUGIN[plugin]
-
   return (
     <div className="flex space-x-4 items-center mt-4">
       <div className="bg-bkg-1 px-4 py-2 justify-between rounded-md w-full">
@@ -234,7 +236,7 @@ function PrimaryDelegatorSelectOld({
           componentLabel={
             selectedDelegator ? (
               walletPk && selectedDelegator.equals(walletPk) ? (
-                JUST_YOUR_WALLET
+                'Your wallet'
               ) : (
                 <div className="relative">
                   <ProfileName
@@ -247,12 +249,12 @@ function PrimaryDelegatorSelectOld({
                 </div>
               )
             ) : (
-              JUST_YOUR_WALLET
+              'Your wallet'
             )
           }
         >
           <Select.Option key={'reset'} value={undefined}>
-            {JUST_YOUR_WALLET}
+            {'Your wallet'}
           </Select.Option>
           {tors.map((delegatedTor) => (
             <Select.Option
