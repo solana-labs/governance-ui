@@ -35,7 +35,7 @@ const Footer = () => {
         'lg:pb-24',
         'gap-y-8',
         'md:gap-y-0',
-        'z-10'
+        'z-[1]'
       )}
     >
       <div
