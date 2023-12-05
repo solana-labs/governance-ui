@@ -14,16 +14,28 @@
     "sortRank": -1000
   },
   {
+    "symbol": "Frictionless",
+    "displayName": "Frictionless DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Hr6PtVoKHTZETmJtjiYu9YeAFCMNUkDTv4qQV2kdDF2C",
+    "ogImage": "https://shdw-drive.genesysgo.net/5nwi4maAZ3v3EwTJtcg9oFfenQUX7pb9ry4KuhyUSawK/frictionless_logo.png",
+    "github": "https://github.com/Grape-Labs",
+    "website": "https://governance.so/frictionless",
+    "twitter": "@grapeprotocol",
+    "discord": "@grapedao",
+    "shortDescription": "Frictionless is revolutionizing governance participation, bridging the gap between web2 and web3"
+  },
+  {
     "symbol": "GrapeUX",
     "displayName": "Grape UX",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "jtncbMzs2k3wypGiLBtM55ou3mFERpeZniH7V1Bq4zg",
-    "ogImage": "https://gizd7klcchftk5lmjgketydzoblxqeb2x4uacdle4q6ayhdety4q.arweave.net/MjI_qWIRyzV1bEmUSeB5cFd4EDq_KAENZOQ8DBxknjk?ext=png",
+    "ogImage": "https://shdw-drive.genesysgo.net/5nwi4maAZ3v3EwTJtcg9oFfenQUX7pb9ry4KuhyUSawK/UX_logo.png",
     "github": "https://github.com/Grape-Labs",
     "website": "https://governance.so/dao/jtncbMzs2k3wypGiLBtM55ou3mFERpeZniH7V1Bq4zg",
     "twitter": "@grapeprotocol",
     "discord": "@grapedao",
-    "shortDescription": "Grape UX DAO has early access to Grape Gvoernance and contributors provide feedback to quickly iterate and improve UX"
+    "shortDescription": "Grape UX DAO has early access to Grape Governance and contributors provide feedback to quickly iterate and improve UX"
   },
   {
     "symbol": "CollabX",
