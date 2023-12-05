@@ -110,7 +110,6 @@ const usePluginNameAsync = (kind: 'community' | 'council') => {
 function PrimaryDelegatorSelectBatchSupported({
   selectedDelegator,
   handleSelect,
-
   kind,
   tors,
 }: {
