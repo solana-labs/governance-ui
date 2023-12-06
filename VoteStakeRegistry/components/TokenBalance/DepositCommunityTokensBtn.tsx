@@ -17,7 +17,7 @@ import { useConnection } from '@solana/wallet-adapter-react'
 import queryClient from '@hooks/queries/queryClient'
 import { tokenAccountQueryKeys } from '@hooks/queries/tokenAccount'
 
-const DepositCommunityTokensBtn = ({ className = '' }) => {
+const DepositCommunityTokensBtn = ({ className = '', inAccountDetails }) => {
   const { getOwnedDeposits } = useDepositStore()
   const realm = useRealmQuery().data?.result
 
@@ -89,7 +89,7 @@ const DepositCommunityTokensBtn = ({ className = '' }) => {
     ? "You don't have any governance tokens in your wallet to deposit."
     : ''
 
-  return hasTokensInWallet ? (
+  return hasTokensInWallet || inAccountDetails ? (
     <SecondaryButton
       tooltipMessage={depositTooltipContent}
       className={`sm:w-1/2 ${className}`}

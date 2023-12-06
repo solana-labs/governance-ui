@@ -254,7 +254,10 @@ const LockTokensAccount: React.FC<{
           </h1>
 
           <div className="ml-auto flex flex-row">
-            <DepositCommunityTokensBtn className="mr-3" />
+            <DepositCommunityTokensBtn
+              inAccountDetails={true}
+              className="mr-3"
+            />
             <WithDrawCommunityTokens />
           </div>
         </div>
