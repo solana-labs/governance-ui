@@ -90,12 +90,13 @@ export default function VSRCommunityVotingPower(props: Props) {
       (sum, curr) => sum.add(curr),
       new BN(0)
     )
-
   const formattedDelegatorPower =
     totalDelegatorPower &&
     new BigNumber(totalDelegatorPower.toString()).shiftedBy(-mint.decimals)
 
-  if (isLoading || !(votingPower && mint)) {
+  const totalPower = votingPower.add(totalDelegatorPower ?? new BN(0))
+
+  if (isLoading || !(totalPower && mint)) {
     return (
       <div
         className={classNames(props.className, 'rounded-md bg-bkg-1 h-[76px]')}
@@ -126,7 +127,7 @@ export default function VSRCommunityVotingPower(props: Props) {
         </p>
         {formattedDelegatorPower?.gt(new BigNumber(0)) && (
           <p className="flex text-xs">
-            <span>Power from delegators</span>
+            <span>Votes from delegators</span>
             <span className="font-bold ml-auto text-fgd-1">
               {formattedDelegatorPower.isNaN()
                 ? '0'
