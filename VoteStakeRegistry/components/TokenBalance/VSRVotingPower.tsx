@@ -7,9 +7,12 @@ import { getMintDecimalAmount } from '@tools/sdk/units'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 import BN from 'bn.js'
-import { useVsrGovpower } from '@hooks/queries/plugins/vsr'
+import { useVsrGovpower, useVsrGovpowerMulti } from '@hooks/queries/plugins/vsr'
 import VotingPowerBox from 'VoteStakeRegistry/components/TokenBalance/VotingPowerBox'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
+import { useTokenOwnerRecordsDelegatedToUser } from '@hooks/queries/tokenOwnerRecord'
+import { useMemo } from 'react'
+import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
 
 interface Props {
   className?: string
@@ -61,6 +64,37 @@ export default function VSRCommunityVotingPower(props: Props) {
         .shiftedBy(-mint.decimals)
     : new BigNumber('0')
 
+  const delegatedTors = useTokenOwnerRecordsDelegatedToUser()
+  const selectedDelegator = useSelectedDelegatorStore(
+    (s) => s.communityDelegator
+  )
+  // memoize useAsync inputs to prevent constant refetch
+  const relevantDelegators = useMemo(
+    () =>
+      selectedDelegator !== undefined // ignore delegators if any delegator is selected
+        ? []
+        : delegatedTors
+            ?.filter(
+              (x) =>
+                x.account.governingTokenMint.toString() ===
+                realm?.account.communityMint.toString()
+            )
+            .map((x) => x.account.governingTokenOwner),
+    [delegatedTors, realm?.account.communityMint, selectedDelegator]
+  )
+  const { result: delegatorPowers } = useVsrGovpowerMulti(relevantDelegators)
+  const totalDelegatorPower =
+    delegatorPowers &&
+    mint &&
+    Object.values(delegatorPowers).reduce(
+      (sum, curr) => sum.add(curr),
+      new BN(0)
+    )
+
+  const formattedDelegatorPower =
+    totalDelegatorPower &&
+    new BigNumber(totalDelegatorPower.toString()).shiftedBy(-mint.decimals)
+
   if (isLoading || !(votingPower && mint)) {
     return (
       <div
@@ -77,8 +111,8 @@ export default function VSRCommunityVotingPower(props: Props) {
         votingPowerFromDeposits={votingPowerFromDeposits}
         className="p-3"
       />
-      <div className="pt-4 px-4">
-        <p className="flex mb-1.5 text-xs">
+      <div className="flex flex-col pt-4 px-4 gap-1.5">
+        <p className="flex text-xs">
           <span>{tokenName} Deposited</span>
           <span className="font-bold ml-auto text-fgd-1">
             {tokenAmount.isNaN() ? '0' : tokenAmount.toFormat()}
@@ -90,6 +124,16 @@ export default function VSRCommunityVotingPower(props: Props) {
             {lockedTokensAmount.isNaN() ? '0' : lockedTokensAmount.toFormat()}
           </span>
         </p>
+        {formattedDelegatorPower?.gt(new BigNumber(0)) && (
+          <p className="flex text-xs">
+            <span>Power from delegators</span>
+            <span className="font-bold ml-auto text-fgd-1">
+              {formattedDelegatorPower.isNaN()
+                ? '0'
+                : formattedDelegatorPower.toFormat()}
+            </span>
+          </p>
+        )}
       </div>
     </div>
   )

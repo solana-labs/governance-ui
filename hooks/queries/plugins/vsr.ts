@@ -148,12 +148,15 @@ const voterPowerLogQueryFn = async (
   return [...parser.parseLogs(sim.value.logs)]
 }
 
-export const useVsrGovpowerMulti = (wallets: PublicKey[]) => {
+export const useVsrGovpowerMulti = (wallets: PublicKey[] | undefined) => {
   const { connection } = useConnection()
   const realm = useRealmQuery().data?.result
 
   return useAsync(async () => {
+    console.log('vsr multi govpower CALLED')
     if (realm === undefined) return undefined
+    if (wallets === undefined) return undefined
+    if (wallets.length === 0) return {}
     const config = await fetchRealmConfigQuery(connection, realm.pubkey)
     const programId =
       config.result?.account.communityTokenConfig.voterWeightAddin
