@@ -74,6 +74,12 @@ export const getVsrGovpower = async (
     : ({ found: false, result: undefined } as const)
 
   // you may be asking yourself, "what?". that is healthy
+  // the reason i did things this way is because every component of this is cached
+  // but something should probably still be re-thought.
+  // TODO because this query data is never read anywhere, so this makes no actual sense to do.
+  // but yeah i suppose reading this from cache would be problematic because it won't invalidate properly by default
+  // the problem is that things are complicated by the batched query lower in this file.
+  // react-query as a paradigm just doesnt work super well for this kind of thing, i think.
   queryClient.setQueryData(
     vsrQueryKeys.votingPower(connection, registrarPk, voterPk),
     votingPower
