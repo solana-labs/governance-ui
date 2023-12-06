@@ -114,13 +114,8 @@ export default function LockedCommunityVotingPower(props: Props) {
 
   return (
     <div className={props.className}>
-      {amount.isZero() ? (
-        <div className={'text-xs text-white/50'}>
-          You do not have any voting power in this dao.
-        </div>
-      ) : (
-        <VSRCommunityVotingPower />
-      )}
+      <VSRCommunityVotingPower />
+
       {depositAmount.isGreaterThan(0) && (
         <>
           <div className="mt-3 text-xs text-white/50">

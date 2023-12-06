@@ -70,7 +70,7 @@ const createDelegatorVote = async ({
   tokenOwnerRecordPk: PublicKey
   userPk: PublicKey
   vote: Vote
-  votingPlugin?: VotingClient
+  votingPlugin: VotingClient | undefined
 }) => {
   //
   const realm = (await fetchRealmByPubkey(connection, realmPk)).result
@@ -90,13 +90,12 @@ const createDelegatorVote = async ({
 
   const castVoteIxs: TransactionInstruction[] = []
 
-  await votingPlugin?.withCastPluginVote(
+  const pluginAddresses = await votingPlugin?.withCastPluginVote(
     castVoteIxs,
     proposal,
     tokenOwnerRecordPk
     //createCastNftVoteTicketIxs
   )
-
   await withCastVote(
     castVoteIxs,
     realm.owner,
@@ -109,10 +108,11 @@ const createDelegatorVote = async ({
     userPk,
     proposal.account.governingTokenMint,
     vote,
-    userPk
-    //plugin?.voterWeightPk,
-    //plugin?.maxVoterWeightRecord
+    userPk,
+    pluginAddresses?.voterWeightPk,
+    pluginAddresses?.maxVoterWeightRecord
   )
+
   return castVoteIxs
 }
 
@@ -268,6 +268,7 @@ export async function castVote(
               tokenOwnerRecordPk,
               userPk: walletPubkey,
               vote,
+              votingPlugin: votingPlugin,
             })
           )
         )
