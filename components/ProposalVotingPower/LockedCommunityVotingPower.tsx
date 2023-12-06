@@ -15,7 +15,6 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
-import { useRouteProposalQuery } from '@hooks/queries/proposal'
 import { useConnection } from '@solana/wallet-adapter-react'
 import BN from 'bn.js'
 import { useVsrGovpower } from '@hooks/queries/plugins/vsr'
@@ -30,7 +29,6 @@ export default function LockedCommunityVotingPower(props: Props) {
   const mint = useRealmCommunityMintInfoQuery().data?.result
 
   const { realmInfo, realmTokenAccount } = useRealm()
-  const proposal = useRouteProposalQuery().data?.result
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const { connection } = useConnection()
   const deposits = useDepositStore((s) => s.state.deposits)
