@@ -1,20 +1,16 @@
 import useRealm from '@hooks/useRealm'
 import { BigNumber } from 'bignumber.js'
-import { LightningBoltIcon } from '@heroicons/react/solid'
 import { useCallback } from 'react'
 import classNames from 'classnames'
 
-import { calculateMaxVoteScore } from '@models/proposal/calulateMaxVoteScore'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { getMintDecimalAmount } from '@tools/sdk/units'
-import Tooltip from '@components/Tooltip'
 import { SecondaryButton } from '@components/Button'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { notify } from '@utils/notifications'
 
 import { getMintMetadata } from '../instructions/programs/splToken'
 import depositTokensVSR from './depositTokensVSR'
-import VotingPowerPct from './VotingPowerPct'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
@@ -23,6 +19,7 @@ import { useRouteProposalQuery } from '@hooks/queries/proposal'
 import { useConnection } from '@solana/wallet-adapter-react'
 import BN from 'bn.js'
 import { useVsrGovpower } from '@hooks/queries/plugins/vsr'
+import VotingPowerBox from 'VoteStakeRegistry/components/TokenBalance/VotingPowerBox'
 
 interface Props {
   className?: string
@@ -74,11 +71,6 @@ export default function LockedCommunityVotingPower(props: Props) {
       ? getMintDecimalAmount(mint, votingPower)
       : new BigNumber('0')
 
-  const multiplier =
-    !votingPower.isZero() && !votingPowerFromDeposits.isZero()
-      ? votingPower.div(votingPowerFromDeposits).toNumber().toFixed(2) + 'x'
-      : null
-
   const tokenAmount =
     depositRecord && mint
       ? new BigNumber(
@@ -101,13 +93,6 @@ export default function LockedCommunityVotingPower(props: Props) {
         )
         .shiftedBy(-mint.decimals)
     : new BigNumber('0')
-
-  const max =
-    realm && proposal && mint
-      ? new BigNumber(
-          calculateMaxVoteScore(realm, proposal, mint).toString()
-        ).shiftedBy(-mint.decimals)
-      : null
 
   const deposit = useCallback(async () => {
     if (
@@ -170,25 +155,12 @@ export default function LockedCommunityVotingPower(props: Props) {
         </div>
       ) : (
         <>
-          <div className={'p-3 rounded-md bg-bkg-1'}>
-            <div className="text-white/50 text-xs">{tokenName} Votes</div>
-            <div className="flex items-center justify-between mt-1">
-              <div className="text-white font-bold text-2xl flex items-center">
-                {amount.toFormat(2)}{' '}
-                {multiplier && (
-                  <Tooltip content="Vote Weight Multiplier – Increase your vote weight by locking tokens">
-                    <div className="cursor-help flex font-normal items-center ml-3 text-xs rounded-full bg-bkg-3 px-2 py-1">
-                      <LightningBoltIcon className="h-3 mr-1 text-primary-light w-3" />
-                      {multiplier}
-                    </div>
-                  </Tooltip>
-                )}
-              </div>
-              {max && !max.isZero() && (
-                <VotingPowerPct amount={amount} total={max} />
-              )}
-            </div>
-          </div>
+          <VotingPowerBox
+            votingPower={votingPower}
+            mint={mint}
+            votingPowerFromDeposits={votingPowerFromDeposits}
+            className="p-3"
+          />
           <div className="pt-4 px-4">
             <p className="flex mb-1.5 text-xs">
               <span>{tokenName} Deposited</span>

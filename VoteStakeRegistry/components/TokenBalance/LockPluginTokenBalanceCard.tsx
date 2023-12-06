@@ -27,6 +27,7 @@ import {
 } from '@hooks/queries/mintInfo'
 import { useVsrGovpower } from '@hooks/queries/plugins/vsr'
 
+/** UNUSED */
 const LockPluginTokenBalanceCard = ({
   proposal,
   inAccountDetails,

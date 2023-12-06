@@ -33,7 +33,6 @@ const VotingPowerBox = ({
 
   return (
     <>
-      {' '}
       <div
         className={`bg-bkg-1 flex justify-between items-center rounded-md ${className}`}
         style={style}
