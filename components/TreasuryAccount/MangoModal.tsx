@@ -120,7 +120,7 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
 
       const createAccInstData = {
         data: getInstructionDataFromBase64(
-          serializeInstructionToBase64(createAccIx!)
+          serializeInstructionToBase64(createAccIx)
         ),
         holdUpTime:
           account?.governance.account?.config.minInstructionHoldUpTime,

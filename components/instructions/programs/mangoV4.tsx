@@ -749,6 +749,7 @@ const instructions = () => ({
     ) => {
       try {
         let mintData: null | TokenInfoWithoutDecimals | undefined = null
+
         const mintInfo = accounts[2].pubkey
         const group = accounts[0].pubkey
         const client = await getClient(connection)
@@ -1549,6 +1550,10 @@ const displayArgs = async (connection: Connection, data: Uint8Array) => {
         })
         .map((key) => {
           const isPublicKey = tryParseKey(args[key])
+          const isBN = args[key] instanceof BN
+          if (isBN && key === 'price.val') {
+            return args[key] / Math.pow(2, 48)
+          }
           return (
             <div key={key} className="flex">
               <div className="mr-3">{key}:</div>

@@ -18,6 +18,9 @@ import { BN } from '@coral-xyz/anchor'
 import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
 import Switch from '@components/Switch'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import ForwarderProgram, {
+  useForwarderProgramHelpers,
+} from '@components/ForwarderProgram/ForwarderProgram'
 
 const REDUCE_ONLY_OPTIONS = [
   { value: 0, name: 'Disabled' },
@@ -158,6 +161,7 @@ const EditToken = ({
   const { getAdditionalLabelInfo, mangoClient, mangoGroup } = UseMangoV4()
   const { assetAccounts } = useGovernanceAssets()
   const [forcedValues, setForcedValues] = useState<string[]>([])
+  const forwarderProgramHelpers = useForwarderProgramHelpers()
   const solAccounts = assetAccounts.filter(
     (x) =>
       x.type === AccountType.SOL &&
@@ -307,7 +311,9 @@ const EditToken = ({
         ])
         .instruction()
 
-      serializedInstruction = serializeInstructionToBase64(ix)
+      serializedInstruction = serializeInstructionToBase64(
+        forwarderProgramHelpers.withForwarderWrapper(ix)
+      )
     }
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
@@ -325,7 +331,12 @@ const EditToken = ({
       index
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form, forcedValues])
+  }, [
+    form,
+    forcedValues,
+    forwarderProgramHelpers.form,
+    forwarderProgramHelpers.withForwarderWrapper,
+  ])
 
   useEffect(() => {
     const getTokens = async () => {
@@ -716,6 +727,7 @@ const EditToken = ({
             setFormErrors={setFormErrors}
             formErrors={formErrors}
           ></InstructionForm>
+          <ForwarderProgram {...forwarderProgramHelpers}></ForwarderProgram>
           <AdvancedOptionsDropdown title="More">
             <h3>Force values</h3>
             <div>
