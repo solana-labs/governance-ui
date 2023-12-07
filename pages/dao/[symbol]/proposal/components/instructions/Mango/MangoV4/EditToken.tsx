@@ -217,7 +217,8 @@ const EditToken = ({
           ? null
           : form.oracleConfFilter
       const maxStalenessSlots =
-        (form.maxStalenessSlots as number | string) === ''
+        (form.maxStalenessSlots as number | string) === '' ||
+        form.maxStalenessSlots === -1
           ? null
           : form.maxStalenessSlots
 

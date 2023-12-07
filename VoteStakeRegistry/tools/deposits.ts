@@ -2,7 +2,7 @@ import { BN, EventParser, Idl, Program } from '@coral-xyz/anchor'
 import { ProgramAccount, Realm } from '@solana/spl-governance'
 import { PublicKey, Transaction, Connection } from '@solana/web3.js'
 import { SIMULATION_WALLET } from '@tools/constants'
-import { DAYS_PER_MONTH } from '@utils/dateTools'
+import { DAYS_PER_MONTH, SECS_PER_DAY } from '@utils/dateTools'
 import { chunks } from '@utils/helpers'
 import { tryGetMint } from '@utils/tokens'
 import {
@@ -259,31 +259,33 @@ export const calcMultiplier = ({
   maxExtraLockupVoteWeightScaledFactor,
   lockupSecs,
   lockupSaturationSecs,
+  isVested = false,
 }: {
   depositScaledFactor: number
   maxExtraLockupVoteWeightScaledFactor: number
   lockupSecs: number
   lockupSaturationSecs: number
+  isVested?: boolean
 }) => {
-  //   if (isVested) {
-  //     const onMonthSecs = SECS_PER_DAY * DAYS_PER_MONTH
-  //     const n_periods_before_saturation = lockupSaturationSecs / onMonthSecs
-  //     const n_periods = lockupSecs / onMonthSecs
-  //     const n_unsaturated_periods = Math.min(
-  //       n_periods,
-  //       n_periods_before_saturation
-  //     )
-  //     const n_saturated_periods = Math.max(0, n_periods - n_unsaturated_periods)
-  //     const calc =
-  //       (depositScaledFactor +
-  //         (maxExtraLockupVoteWeightScaledFactor / n_periods) *
-  //           (n_saturated_periods +
-  //             ((n_unsaturated_periods + 1) * n_unsaturated_periods) /
-  //               2 /
-  //               n_periods_before_saturation)) /
-  //       depositScaledFactor
-  //     return depositScaledFactor !== 0 ? calc : 0
-  //   }
+  if (isVested) {
+    const onMonthSecs = SECS_PER_DAY * DAYS_PER_MONTH
+    const n_periods_before_saturation = lockupSaturationSecs / onMonthSecs
+    const n_periods = lockupSecs / onMonthSecs
+    const n_unsaturated_periods = Math.min(
+      n_periods,
+      n_periods_before_saturation
+    )
+    const n_saturated_periods = Math.max(0, n_periods - n_unsaturated_periods)
+    const calc =
+      (depositScaledFactor +
+        (maxExtraLockupVoteWeightScaledFactor / n_periods) *
+          (n_saturated_periods +
+            ((n_unsaturated_periods + 1) * n_unsaturated_periods) /
+              2 /
+              n_periods_before_saturation)) /
+      depositScaledFactor
+    return depositScaledFactor !== 0 ? calc : 0
+  }
   const calc =
     (depositScaledFactor +
       (maxExtraLockupVoteWeightScaledFactor *
@@ -318,7 +320,8 @@ export const getPeriod = (
 export const calcMintMultiplier = (
   lockupSecs: number,
   registrar: Registrar | null,
-  realm: ProgramAccount<Realm> | undefined
+  realm: ProgramAccount<Realm> | undefined,
+  isVested?: boolean
 ) => {
   const mintCfgs = registrar?.votingMints
   const mintCfg = mintCfgs?.find(
@@ -339,6 +342,7 @@ export const calcMintMultiplier = (
       maxExtraLockupVoteWeightScaledFactor: maxExtraLockupVoteWeightScaledFactorNum,
       lockupSaturationSecs: lockupSaturationSecsNum,
       lockupSecs,
+      isVested,
     })
 
     return parseFloat(calced.toFixed(2))
