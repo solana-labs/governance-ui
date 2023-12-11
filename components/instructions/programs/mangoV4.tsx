@@ -1651,8 +1651,8 @@ const getFormattedListingValues = (args: FlatListingArgs) => {
     tokenName: args.name,
     oracle: args.oracle?.toBase58(),
     oracleConfidenceFilter:
-      args['oracleConfig.confFilter'] >= Number.MAX_SAFE_INTEGER
-        ? ''
+      args['oracleConfig.confFilter'] >= 100
+        ? args['oracleConfig.confFilter'].toString()
         : (args['oracleConfig.confFilter'] * 100).toFixed(2),
     oracleMaxStalenessSlots: args['oracleConfig.maxStalenessSlots'],
     interestRateUtilizationPoint0: (
