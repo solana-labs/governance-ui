@@ -70,7 +70,7 @@ const AddKeyToDID = ({
         .addVerificationMethod({
           flags: [BitwiseVerificationMethodFlag.CapabilityInvocation],
           fragment: form!.alias,
-          keyData: new PublicKey(form!.key).toBytes(),
+          keyData: new PublicKey(form!.key).toBuffer(),
           // TODO support eth keys too
           methodType: VerificationMethodType.Ed25519VerificationKey2018,
         })
