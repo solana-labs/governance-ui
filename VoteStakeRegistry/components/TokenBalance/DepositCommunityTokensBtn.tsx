@@ -89,16 +89,7 @@ const DepositCommunityTokensBtn = ({ className = '', inAccountDetails }) => {
     ? "You don't have any governance tokens in your wallet to deposit."
     : ''
 
-  return hasTokensInWallet && !inAccountDetails ? (
-    <SecondaryButton
-      tooltipMessage={depositTooltipContent}
-      className={`sm:w-1/2 ${className}`}
-      disabled={!connected || !hasTokensInWallet || isLoading}
-      onClick={depositAllTokens}
-    >
-      {isLoading ? <Loading></Loading> : 'Deposit'}
-    </SecondaryButton>
-  ) : inAccountDetails ? (
+  return hasTokensInWallet || inAccountDetails ? (
     <SecondaryButton
       tooltipMessage={depositTooltipContent}
       className={`sm:w-1/2 ${className}`}

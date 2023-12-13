@@ -180,7 +180,7 @@ export class VotingClient {
       return
     }
     const clientProgramId = this.client!.program.programId
-    const walletPk = this.walletPk!
+    const walletPk = torAccount.result.account.governingTokenOwner
 
     if (this.client instanceof VsrClient) {
       const { registrar } = await getRegistrarPDA(
