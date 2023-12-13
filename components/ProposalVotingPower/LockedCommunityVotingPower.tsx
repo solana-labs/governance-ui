@@ -1,6 +1,6 @@
 import useRealm from '@hooks/useRealm'
 import { BigNumber } from 'bignumber.js'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import classNames from 'classnames'
 
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
@@ -13,12 +13,16 @@ import { getMintMetadata } from '../instructions/programs/splToken'
 import depositTokensVSR from './depositTokensVSR'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
-import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
+import {
+  useTokenOwnerRecordsDelegatedToUser,
+  useUserCommunityTokenOwnerRecord,
+} from '@hooks/queries/tokenOwnerRecord'
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 import { useConnection } from '@solana/wallet-adapter-react'
 import BN from 'bn.js'
 import { useVsrGovpower } from '@hooks/queries/plugins/vsr'
 import VSRCommunityVotingPower from 'VoteStakeRegistry/components/TokenBalance/VSRVotingPower'
+import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
 
 interface Props {
   className?: string
@@ -104,6 +108,25 @@ export default function LockedCommunityVotingPower(props: Props) {
     wallet,
   ])
 
+  const delegatedTors = useTokenOwnerRecordsDelegatedToUser()
+  const selectedDelegator = useSelectedDelegatorStore(
+    (s) => s.communityDelegator
+  )
+  // memoize useAsync inputs to prevent constant refetch
+  const relevantDelegators = useMemo(
+    () =>
+      selectedDelegator !== undefined // ignore delegators if any delegator is selected
+        ? []
+        : delegatedTors
+            ?.filter(
+              (x) =>
+                x.account.governingTokenMint.toString() ===
+                realm?.account.communityMint.toString()
+            )
+            .map((x) => x.account.governingTokenOwner),
+    [delegatedTors, realm?.account.communityMint, selectedDelegator]
+  )
+
   if (isLoading || !(votingPower && mint)) {
     return (
       <div
@@ -114,7 +137,13 @@ export default function LockedCommunityVotingPower(props: Props) {
 
   return (
     <div className={props.className}>
-      <VSRCommunityVotingPower />
+      {amount.isZero() && (relevantDelegators?.length ?? 0) < 1 ? (
+        <div className={'text-xs text-white/50'}>
+          You do not have any voting power in this dao.
+        </div>
+      ) : (
+        <VSRCommunityVotingPower />
+      )}
 
       {depositAmount.isGreaterThan(0) && (
         <>

@@ -98,7 +98,7 @@ export default function VSRCommunityVotingPower(props: Props) {
     totalDelegatorPower &&
     new BigNumber(totalDelegatorPower.toString()).shiftedBy(-mint.decimals)
 
-  const totalPower = votingPower.add(totalDelegatorPower ?? new BN(0))
+  //const totalPower = votingPower.add(totalDelegatorPower ?? new BN(0))
 
   if (isLoading || mint === undefined || votingPowerLoading) {
     return (
