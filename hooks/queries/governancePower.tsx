@@ -35,7 +35,6 @@ import {
 } from '@models/voteWeights'
 import useUserOrDelegator from '@hooks/useUserOrDelegator'
 import { getVsrGovpower, useVsrGovpower } from './plugins/vsr'
-import React from 'react'
 
 export const getVanillaGovpower = async (
   connection: Connection,
@@ -133,6 +132,9 @@ export const determineVotingPowerType = async (
   return findPluginName(programId)
 }
 
+// TODO use HOC to provide voting power to components that need voting power without knowing plugin
+// this is an efficiency thing to save on queries, since we can't have conditional useQuery hooks.
+/* 
 export const WithCommunityGovernancePower = <
   P extends { communityGovernancePower: BN | undefined }
 >(
@@ -167,7 +169,7 @@ export const WithVsrGovernancePower = <
         communityGovernancePower={communityGovernancePower}
       />
     )
-  }
+  } */
 
 export const useGovernancePowerAsync = (
   kind: 'community' | 'council' | undefined
