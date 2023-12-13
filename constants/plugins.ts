@@ -26,6 +26,10 @@ export const GATEWAY_PLUGINS_PKS: string[] = [
   'GgathUhdrCWRHowoRKACjgWhYHfxCEdBi5ViqYN6HVxk', // v2, supporting composition
 ]
 
+export const PYTH_PLUGIN_PK: string[] = [
+  'pytS9TjG1qyAZypk7n8rw8gfW9sUaqqYyMhJQ4E7JCQ',
+]
+
 export const findPluginName = (programId: PublicKey | undefined) =>
   programId === undefined
     ? ('vanilla' as const)
@@ -37,4 +41,6 @@ export const findPluginName = (programId: PublicKey | undefined) =>
     ? 'NFT'
     : GATEWAY_PLUGINS_PKS.includes(programId.toString())
     ? 'gateway'
+    : PYTH_PLUGIN_PK.includes(programId.toString())
+    ? 'pyth'
     : 'unknown'

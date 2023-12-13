@@ -16,11 +16,10 @@ const getProfile = async (
 ): Promise<BaseProfile> => {
     const cached = profiles.get(publicKey.toBase58());
     if (cached) return cached;
-    const promise = CivicProfile.get(publicKey.toBase58(), {
-        solana: {
-            connection,
-        },
-    });
+
+    const options = connection ? { solana: { connection } } : undefined;
+
+    const promise = CivicProfile.get(publicKey.toBase58(), options);
 
     profiles.set(publicKey.toBase58(), promise)
 

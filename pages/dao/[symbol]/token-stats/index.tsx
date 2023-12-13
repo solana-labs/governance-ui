@@ -46,7 +46,7 @@ import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { useRealmProposalsQuery } from '@hooks/queries/proposal'
 import { useQuery } from '@tanstack/react-query'
 import { IDL } from 'VoteStakeRegistry/sdk/voter_stake_registry'
-import {ProfileImage, ProfileName} from "@components/Profile";
+import { ProfileImage, ProfileName } from '@components/Profile'
 
 const VestingVsTime = dynamic(
   () => import('VoteStakeRegistry/components/LockTokenStats/VestingVsTime'),
@@ -445,7 +445,11 @@ const LockTokenStats = () => {
     )
   }
   const renderAddressImage = (wallet) => (
-    <ProfileImage publicKey={new PublicKey(wallet)} expanded={false} className="h-6 text-fgd-3 w-6" />
+    <ProfileImage
+      publicKey={new PublicKey(wallet)}
+      expanded={false}
+      className="h-6 text-fgd-3 w-6"
+    />
   )
 
   return (
@@ -539,7 +543,7 @@ const LockTokenStats = () => {
                         .reduce((acc, curr) => {
                           return acc.add(curr.vestingAmount)
                         }, new BN(0))
-                        .toNumber(),
+                        .toString(),
                     }
                   }),
                 ]}

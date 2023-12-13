@@ -18,6 +18,9 @@ import { BN } from '@coral-xyz/anchor'
 import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
 import Switch from '@components/Switch'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import ForwarderProgram, {
+  useForwarderProgramHelpers,
+} from '@components/ForwarderProgram/ForwarderProgram'
 
 const REDUCE_ONLY_OPTIONS = [
   { value: 0, name: 'Disabled' },
@@ -59,7 +62,7 @@ const keyToLabel = {
   forceClose: 'Force Close',
   tokenConditionalSwapTakerFeeRate: 'Token Conditional Swap Taker Fee Rate',
   tokenConditionalSwapMakerFeeRate: 'Token Conditional Swap Maker Fee Rate',
-  flashLoanDepositFeeRate: 'Flash Loan Deposit Fee Rate',
+  flashLoanSwapFeeRate: 'Flash Loan Deposit Fee Rate',
 }
 
 type NamePkVal = {
@@ -104,7 +107,7 @@ interface EditTokenForm {
   forceClose: boolean
   tokenConditionalSwapTakerFeeRate: number
   tokenConditionalSwapMakerFeeRate: number
-  flashLoanDepositFeeRate: number
+  flashLoanSwapFeeRate: number
 }
 
 const defaultFormValues: EditTokenForm = {
@@ -144,7 +147,7 @@ const defaultFormValues: EditTokenForm = {
   holdupTime: 0,
   tokenConditionalSwapTakerFeeRate: 0,
   tokenConditionalSwapMakerFeeRate: 0,
-  flashLoanDepositFeeRate: 0,
+  flashLoanSwapFeeRate: 0,
 }
 
 const EditToken = ({
@@ -158,6 +161,7 @@ const EditToken = ({
   const { getAdditionalLabelInfo, mangoClient, mangoGroup } = UseMangoV4()
   const { assetAccounts } = useGovernanceAssets()
   const [forcedValues, setForcedValues] = useState<string[]>([])
+  const forwarderProgramHelpers = useForwarderProgramHelpers()
   const solAccounts = assetAccounts.filter(
     (x) =>
       x.type === AccountType.SOL &&
@@ -213,7 +217,8 @@ const EditToken = ({
           ? null
           : form.oracleConfFilter
       const maxStalenessSlots =
-        (form.maxStalenessSlots as number | string) === ''
+        (form.maxStalenessSlots as number | string) === '' ||
+        form.maxStalenessSlots === -1
           ? null
           : form.maxStalenessSlots
 
@@ -290,7 +295,7 @@ const EditToken = ({
             null,
             Number
           ),
-          getNullOrTransform(values.flashLoanDepositFeeRate, null, Number)
+          getNullOrTransform(values.flashLoanSwapFeeRate, null, Number)
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -307,7 +312,9 @@ const EditToken = ({
         ])
         .instruction()
 
-      serializedInstruction = serializeInstructionToBase64(ix)
+      serializedInstruction = serializeInstructionToBase64(
+        forwarderProgramHelpers.withForwarderWrapper(ix)
+      )
     }
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
@@ -325,7 +332,12 @@ const EditToken = ({
       index
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form, forcedValues])
+  }, [
+    form,
+    forcedValues,
+    forwarderProgramHelpers.form,
+    forwarderProgramHelpers.withForwarderWrapper,
+  ])
 
   useEffect(() => {
     const getTokens = async () => {
@@ -387,7 +399,7 @@ const EditToken = ({
           currentToken.tokenConditionalSwapTakerFeeRate,
         tokenConditionalSwapMakerFeeRate:
           currentToken.tokenConditionalSwapMakerFeeRate,
-        flashLoanDepositFeeRate: currentToken.flashLoanDepositFeeRate,
+        flashLoanSwapFeeRate: currentToken.flashLoanSwapFeeRate,
       }
       setForm((prevForm) => ({
         ...prevForm,
@@ -696,12 +708,12 @@ const EditToken = ({
       name: 'tokenConditionalSwapTakerFeeRate',
     },
     {
-      label: keyToLabel['flashLoanDepositFeeRate'],
-      subtitle: getAdditionalLabelInfo('flashLoanDepositFeeRate'),
-      initialValue: form.flashLoanDepositFeeRate,
+      label: keyToLabel['flashLoanSwapFeeRate'],
+      subtitle: getAdditionalLabelInfo('flashLoanSwapFeeRate'),
+      initialValue: form.flashLoanSwapFeeRate,
       type: InstructionInputType.INPUT,
       inputType: 'number',
-      name: 'flashLoanDepositFeeRate',
+      name: 'flashLoanSwapFeeRate',
     },
   ]
 
@@ -716,6 +728,7 @@ const EditToken = ({
             setFormErrors={setFormErrors}
             formErrors={formErrors}
           ></InstructionForm>
+          <ForwarderProgram {...forwarderProgramHelpers}></ForwarderProgram>
           <AdvancedOptionsDropdown title="More">
             <h3>Force values</h3>
             <div>

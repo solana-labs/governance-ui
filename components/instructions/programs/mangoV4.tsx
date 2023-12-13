@@ -41,6 +41,7 @@ import {
 } from '@blockworks-foundation/mango-v4-settings/lib/helpers/listingTools'
 import { tryParseKey } from '@tools/validators/pubkey'
 import Loading from '@components/Loading'
+import queryClient from '@hooks/queries/queryClient'
 // import { snakeCase } from 'snake-case'
 // import { sha256 } from 'js-sha256'
 
@@ -251,21 +252,21 @@ const instructions = () => ({
       )
 
       const formattedProposedArgs = getFormattedListingValues(args)
+
       const suggestedPreset = getFormattedListingPresets(
         proposedOracle.type === 'Pyth'
       )[liqudityTier.tier]
       const suggestedUntrusted = liqudityTier.tier === 'UNTRUSTED'
 
-      const suggestedFormattedPreset: ListingArgsFormatted = Object.keys(
-        suggestedPreset
-      ).length
-        ? getFormattedListingValues({
-            tokenIndex: args.tokenIndex,
-            name: args.name,
-            oracle: args.oracle,
-            ...suggestedPreset,
-          })
-        : ({} as ListingArgsFormatted)
+      const suggestedFormattedPreset: ListingArgsFormatted =
+        Object.keys(suggestedPreset).length && !suggestedUntrusted
+          ? getFormattedListingValues({
+              tokenIndex: args.tokenIndex,
+              name: args.name,
+              oracle: args.oracle,
+              ...suggestedPreset,
+            })
+          : ({} as ListingArgsFormatted)
 
       const invalidKeys: (keyof ListingArgsFormatted)[] = Object.keys(
         suggestedPreset
@@ -303,7 +304,7 @@ const instructions = () => ({
             suggestedUntrusted={suggestedUntrusted}
             val={formattedProposedArgs[valKey]}
             suggestedVal={invalidFields[valKey]}
-            suffix={suffix}
+            suffix={formattedProposedArgs[valKey] && suffix}
             prefix={perfix}
           />
         )
@@ -377,6 +378,16 @@ const instructions = () => ({
               ) : (
                 <div className="py-4">No Oracle Data</div>
               )}
+              <div className="py-4">
+                <div className="flex mb-2">
+                  <div className="w-3 h-3 bg-orange mr-2"></div> - Proposed
+                  values
+                </div>
+                <div className="flex">
+                  <div className="w-3 h-3 bg-green mr-2"></div> - Suggested by
+                  liqudity
+                </div>
+              </div>
               <DisplayListingPropertyWrapped
                 label="Token index"
                 suggestedUntrusted={false}
@@ -538,7 +549,7 @@ const instructions = () => ({
               <DisplayListingPropertyWrapped
                 label="Flash Loan Deposit Fee Rate"
                 suggestedUntrusted={suggestedUntrusted}
-                valKey="flashLoanDepositFeeRate"
+                valKey="flashLoanSwapFeeRate"
               />
             </div>
             <AdvancedOptionsDropdown className="mt-4" title="Raw values">
@@ -738,12 +749,12 @@ const instructions = () => ({
     ) => {
       try {
         let mintData: null | TokenInfoWithoutDecimals | undefined = null
+
         const mintInfo = accounts[2].pubkey
         const group = accounts[0].pubkey
-
         const client = await getClient(connection)
         const [mangoGroup, info, args] = await Promise.all([
-          client.getGroup(group),
+          getGroupForClient(client, group),
           displayArgs(connection, data),
           getDataObjectFlattened<FlatEditArgs>(connection, data),
         ])
@@ -841,7 +852,7 @@ const instructions = () => ({
             args.tokenConditionalSwapMakerFeeRateOpt,
           tokenConditionalSwapTakerFeeRate:
             args.tokenConditionalSwapTakerFeeRateOpt,
-          flashLoanDepositFeeRate: args.flashLoanDepositFeeRateOpt,
+          flashLoanSwapFeeRate: args.flashLoanSwapFeeRateOpt,
           reduceOnly:
             args.reduceOnlyOpt !== undefined
               ? REDUCE_ONLY_OPTIONS[args.reduceOnlyOpt].name
@@ -938,7 +949,8 @@ const instructions = () => ({
                 </h3>
                 <h3 className="text-orange flex">
                   Very low liquidity Price impact of {liqudityTier?.priceImpact}
-                  % on $1000 swap. Check params carefully
+                  % on $1000 swap. Check params carefully token should be listed
+                  with untrusted instruction
                 </h3>
               </>
             )}
@@ -1259,10 +1271,10 @@ const instructions = () => ({
                 suggestedVal={invalidFields.tokenConditionalSwapTakerFeeRate}
               />
               <DisplayNullishProperty
-                label="Flash Loan Deposit Fee Rate"
-                value={parsedArgs.flashLoanDepositFeeRate}
-                currentValue={bankFormattedValues?.flashLoanDepositFeeRate}
-                suggestedVal={invalidFields.flashLoanDepositFeeRate}
+                label="Flash Loan Swap Fee Rate"
+                value={parsedArgs.flashLoanSwapFeeRate}
+                currentValue={bankFormattedValues?.flashLoanSwapFeeRate}
+                suggestedVal={invalidFields.flashLoanSwapFeeRate}
               />
               <DisplayNullishProperty
                 label="Reduce only"
@@ -1325,7 +1337,7 @@ const instructions = () => ({
       const group = accounts[0].pubkey
       const bank = accounts[1].pubkey
       const client = await getClient(connection)
-      const mangoGroup = await client.getGroup(group)
+      const mangoGroup = await getGroupForClient(client, group)
       const mint = [...mangoGroup.banksMapByMint.values()].find(
         (x) => x[0]!.publicKey.equals(bank)!
       )![0]!.mint!
@@ -1360,7 +1372,7 @@ const instructions = () => ({
       const group = accounts[0].pubkey
       const perpMarket = accounts[1].pubkey
       const client = await getClient(connection)
-      const mangoGroup = await client.getGroup(group)
+      const mangoGroup = await getGroupForClient(client, group)
       const marketName = [
         ...mangoGroup.perpMarketsMapByName.values(),
       ].find((x) => x.publicKey.equals(perpMarket))?.name
@@ -1449,19 +1461,35 @@ export const MANGO_V4_INSTRUCTIONS = {
 }
 
 const getClient = async (connection: Connection) => {
-  const options = AnchorProvider.defaultOptions()
-  const adminProvider = new AnchorProvider(
-    connection,
-    new EmptyWallet(Keypair.generate()),
-    options
-  )
-  const client = await MangoClient.connect(
-    adminProvider,
-    'mainnet-beta',
-    MANGO_V4_ID['mainnet-beta']
-  )
+  const client = await queryClient.fetchQuery({
+    queryKey: ['mangoClient', connection.rpcEndpoint],
+    queryFn: async () => {
+      const options = AnchorProvider.defaultOptions()
+      const adminProvider = new AnchorProvider(
+        connection,
+        new EmptyWallet(Keypair.generate()),
+        options
+      )
+      const client = await MangoClient.connect(
+        adminProvider,
+        'mainnet-beta',
+        MANGO_V4_ID['mainnet-beta']
+      )
 
+      return client
+    },
+  })
   return client
+}
+const getGroupForClient = async (client: MangoClient, groupPk: PublicKey) => {
+  const group = await queryClient.fetchQuery({
+    queryKey: ['mangoGroup', groupPk.toBase58(), client.connection.rpcEndpoint],
+    queryFn: async () => {
+      const response = await client.getGroup(groupPk)
+      return response
+    },
+  })
+  return group
 }
 
 async function getDataObjectFlattened<T>(
@@ -1522,6 +1550,10 @@ const displayArgs = async (connection: Connection, data: Uint8Array) => {
         })
         .map((key) => {
           const isPublicKey = tryParseKey(args[key])
+          const isBN = args[key] instanceof BN
+          if (isBN && key === 'price.val') {
+            return args[key] / Math.pow(2, 48)
+          }
           return (
             <div key={key} className="flex">
               <div className="mr-3">{key}:</div>
@@ -1566,7 +1598,7 @@ const DisplayNullishProperty = ({
           {currentValue}
         </div>
       </div>
-      {<div className="mx-1">/</div>}
+      {currentValue && <div className="mx-1">/</div>}
       <div className="flex">
         <div className="text-orange">{value}</div>
       </div>
@@ -1618,7 +1650,10 @@ const getFormattedListingValues = (args: FlatListingArgs) => {
     tokenIndex: args.tokenIndex,
     tokenName: args.name,
     oracle: args.oracle?.toBase58(),
-    oracleConfidenceFilter: (args['oracleConfig.confFilter'] * 100).toFixed(2),
+    oracleConfidenceFilter:
+      args['oracleConfig.confFilter'] >= 100
+        ? args['oracleConfig.confFilter'].toString()
+        : (args['oracleConfig.confFilter'] * 100).toFixed(2),
     oracleMaxStalenessSlots: args['oracleConfig.maxStalenessSlots'],
     interestRateUtilizationPoint0: (
       args['interestRateParams.util0'] * 100
@@ -1662,7 +1697,7 @@ const getFormattedListingValues = (args: FlatListingArgs) => {
     stablePriceGrowthLimit: (args.stablePriceGrowthLimit * 100).toFixed(2),
     tokenConditionalSwapMakerFeeRate: args.tokenConditionalSwapMakerFeeRate,
     tokenConditionalSwapTakerFeeRate: args.tokenConditionalSwapTakerFeeRate,
-    flashLoanDepositFeeRate: args.flashLoanDepositFeeRate,
+    flashLoanSwapFeeRate: args.flashLoanSwapFeeRate,
     reduceOnly: REDUCE_ONLY_OPTIONS[args.reduceOnly].name,
   }
   return formattedArgs

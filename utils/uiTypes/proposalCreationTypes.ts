@@ -111,6 +111,7 @@ export interface ClawbackForm {
   governedTokenAccount: AssetAccount | undefined
   voter: Voter | null
   deposit: DepositWithMintAccount | null
+  holdupTime: number
 }
 
 export interface SendTokenCompactViewForm extends SplTokenTransferForm {

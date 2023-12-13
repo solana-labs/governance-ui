@@ -208,7 +208,8 @@ const LockTokensModal = ({
   const currentMultiplier = calcMintMultiplier(
     lockupPeriodDays * SECS_PER_DAY,
     voteStakeRegistryRegistrar,
-    realm
+    realm,
+    lockupType.value !== 'constant'
   )
   const currentPercentOfMaxMultiplier =
     (100 * currentMultiplier) / maxMultiplier

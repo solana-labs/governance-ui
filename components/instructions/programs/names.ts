@@ -10,6 +10,8 @@ import { NAME_PROGRAM_ID } from '@bonfida/spl-name-service'
 const GOVERNANCE_PROGRAM_NAMES = {
   GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J: 'Mango Governance Program',
   FP4PxqHTVzeG2c6eZd7974F9WvKUSdBeduUK3rjYyvBw: 'Mango v4 Program Governance ',
+  '89VDjvzxfNLN7EgkvkNZ4VWpskBuiuZtHkLpYJd3ynEY':
+    'Mango v4 Program Governance Wallet',
   AVoAYTs36yB5izAaBkxRG67wL1AMwG3vo41hKtUSb8is:
     'Serum Governance Program (Old)',
   G41fmJzd29v7Qmdi8ZyTBBYa98ghh3cwHBTexqCG1PQJ:

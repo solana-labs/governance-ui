@@ -38,23 +38,29 @@ export const useDepositCallback = (
         ASSOCIATED_TOKEN_PROGRAM_ID,
         TOKEN_PROGRAM_ID,
         mint,
-        walletPk // owner
+        walletPk, // owner
+        true
       )
 
       const instructions: TransactionInstruction[] = []
       const signers: Keypair[] = []
 
-      const transferAuthority = approveTokenTransfer(
-        instructions,
-        [],
-        userAtaPk,
-        wallet!.publicKey!,
-        amount
-      )
+      // Checks if the connected wallet is the Squads Multisig extension (or any PDA wallet for future reference). If it is the case, it will not use an ephemeral signer.
+      const transferAuthority = wallet?.name == "SquadsX"
+        ? undefined
+        : approveTokenTransfer(instructions, [], userAtaPk, wallet!.publicKey!, amount);
 
-      signers.push(transferAuthority)
+      if (transferAuthority) {
+        signers.push(transferAuthority);
+      }
 
       const programVersion = await fetchProgramVersion(connection, realm.owner)
+
+      const publicKeyToUse = transferAuthority != undefined && wallet?.publicKey != null ? transferAuthority.publicKey : wallet?.publicKey;
+
+      if (!publicKeyToUse) {
+        throw new Error()
+      }
 
       await withDepositGoverningTokens(
         instructions,
@@ -64,7 +70,7 @@ export const useDepositCallback = (
         userAtaPk,
         mint,
         walletPk,
-        transferAuthority.publicKey,
+        publicKeyToUse,
         walletPk,
         amount
       )
