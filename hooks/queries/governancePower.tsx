@@ -158,6 +158,7 @@ export const determineVotingPowerType = async (
 
 // TODO use HOC to provide voting power to components that need voting power without knowing plugin
 // this is an efficiency thing to save on queries, since we can't have conditional useQuery hooks.
+// i guess you can just use the enabled flag..
 /* 
 export const WithCommunityGovernancePower = <
   P extends { communityGovernancePower: BN | undefined }
