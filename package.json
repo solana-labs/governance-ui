@@ -16,8 +16,10 @@
     "test": "jest",
     "test-all": "yarn lint && yarn type-check && yarn test",
     "notifier": "ts-node scripts/governance-notifier.ts",
-    "setup": "yarn install && yarn allow-scripts",
+    "setup": "yarn install && yarn allow-scripts && yarn bigint-fix",
+    "ci": "yarn install --frozen-lockfile --network-concurrency 1 --color=always && yarn allow-scripts && yarn bigint-fix",
     "deduplicate": "npx yarn-deduplicate",
+    "bigint-fix": "cd node_modules/bigint-buffer && yarn rebuild && cd ../../",
     "postinstall": "echo '\\033[35mIf you just added a package, consider running `\\033[1m\\033[36;1myarn deduplicate` \\033[0m\\033[35mto check for duplicates!\\033[00m\n \\033[35malso make sure scripts run by new packages are reviewed and added in the allowScripts section. Then run `\\033[1m\\033[36;1myarn allow-scripts\\033[0m\\033[35m`!\\033[00m'",
     "create-proposal": "ts-node cli/createProposalScript.ts"
   },
@@ -35,7 +37,7 @@
     "@bonfida/spl-name-service": "0.1.47",
     "@bundlr-network/client": "0.7.15",
     "@carbon/icons-react": "11.7.0",
-    "@civic/profile": "0.1.2",
+    "@civic/profile": "^0.5.0-beta.1",
     "@civic/solana-gateway-react": "0.15.0",
     "@coral-xyz/anchor": "0.27.0",
     "@coral-xyz/borsh": "0.27.0",
@@ -54,7 +56,7 @@
     "@helium/voter-stake-registry-sdk": "0.0.44",
     "@heroicons/react": "1.0.6",
     "@hookform/resolvers": "2.8.10",
-    "@identity.com/sol-did-client": "3.1.4",
+    "@identity.com/sol-did-client": "3.3.0",
     "@marinade.finance/marinade-ts-sdk": "2.0.9",
     "@mean-dao/payment-streaming": "4.0.3",
     "@metaplex-foundation/js": "0.19.4",
@@ -263,7 +265,8 @@
       "@solana/web3.js>rpc-websockets>bufferutil": true,
       "@solana/web3.js>rpc-websockets>utf-8-validate": true,
       "@testing-library/react>@testing-library/dom>aria-query>@babel/runtime-corejs3>core-js-pure": false,
-      "draft-js>fbjs>core-js": false
+      "draft-js>fbjs>core-js": false,
+      "@switchboard-xyz/solana.js>@switchboard-xyz/common>protobufjs": false
     }
   }
 }

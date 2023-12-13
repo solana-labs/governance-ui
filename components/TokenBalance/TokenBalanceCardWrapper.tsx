@@ -74,12 +74,8 @@ const TokenBalanceCardInner = ({
   const isGatewayMode =
     currentPluginPk && GATEWAY_PLUGINS_PKS.includes(currentPluginPk?.toBase58())
 
-  if (
-    vsrMode === 'default' &&
-    (!ownTokenRecord ||
-      ownTokenRecord.account.governingTokenDepositAmount.isZero())
-  ) {
-    return <LockPluginTokenBalanceCard inAccountDetails={inAccountDetails} />
+  if (vsrMode === 'default' && inAccountDetails) {
+    return <LockPluginTokenBalanceCard inAccountDetails={inAccountDetails} /> // does this ever actually occur in the component hierarchy?
   }
 
   if (

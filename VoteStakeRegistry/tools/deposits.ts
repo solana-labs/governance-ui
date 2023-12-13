@@ -1,6 +1,11 @@
 import { BN, EventParser, Idl, Program } from '@coral-xyz/anchor'
 import { ProgramAccount, Realm } from '@solana/spl-governance'
-import { PublicKey, Transaction, Connection } from '@solana/web3.js'
+import {
+  PublicKey,
+  Transaction,
+  Connection,
+  ComputeBudgetProgram,
+} from '@solana/web3.js'
 import { SIMULATION_WALLET } from '@tools/constants'
 import { DAYS_PER_MONTH, SECS_PER_DAY } from '@utils/dateTools'
 import { chunks } from '@utils/helpers'
@@ -372,8 +377,12 @@ const getDepositsAdditionalInfoEvents = async (
       .logVoterInfo(maxRange * i, take)
       .accounts({ registrar, voter })
       .instruction()
+    transaction.add(
+      ComputeBudgetProgram.setComputeUnitLimit({ units: 1_000_000 })
+    )
     transaction.add(logVoterInfoIx)
     // TODO cache using fetchVotingPowerSimulation
+
     const batchOfDeposits = await connection.simulateTransaction(transaction)
     const logEvents = parser.parseLogs(batchOfDeposits.value.logs!)
     events.push(...[...logEvents])
