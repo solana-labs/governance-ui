@@ -215,6 +215,7 @@ export const useGovernancePowerAsync = (
       kind && realmPk && determineVotingPowerType(connection, realmPk, kind),
     [connection, realmPk, kind]
   )
+  const actingAsWalletPk = useUserOrDelegator()
 
   return useAsync(
     async () =>
@@ -243,6 +244,7 @@ export const useGovernancePowerAsync = (
       vsrVotingPower,
       heliumVotingPower,
       gatewayVotingPower,
+      actingAsWalletPk,
     ]
   )
 }
