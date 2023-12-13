@@ -32,7 +32,6 @@ export default function VSRCommunityVotingPower(props: Props) {
   const votingPowerFromDeposits = useDepositStore(
     (s) => s.state.votingPowerFromDeposits
   )
-  const isLoading = useDepositStore((s) => s.state.isLoading)
 
   const depositRecord = deposits.find(
     (deposit) =>
@@ -100,7 +99,7 @@ export default function VSRCommunityVotingPower(props: Props) {
 
   //const totalPower = votingPower.add(totalDelegatorPower ?? new BN(0))
 
-  if (isLoading || mint === undefined || votingPowerLoading) {
+  if (mint === undefined || votingPowerLoading) {
     return (
       <div
         className={classNames(props.className, 'rounded-md bg-bkg-1 h-[76px]')}

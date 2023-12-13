@@ -41,7 +41,6 @@ export default function LockedCommunityVotingPower(props: Props) {
   const votingPower = useVsrGovpower().data?.result ?? new BN(0)
 
   const wallet = useWalletOnePointOh()
-  const isLoading = useDepositStore((s) => s.state.isLoading)
 
   const currentTokenOwnerRecord = useUserCommunityTokenOwnerRecord().data
     ?.result
@@ -127,10 +126,14 @@ export default function LockedCommunityVotingPower(props: Props) {
     [delegatedTors, realm?.account.communityMint, selectedDelegator]
   )
 
-  if (isLoading || !(votingPower && mint)) {
+  console.log('bfbfb', votingPower, mint, votingPower && mint)
+  if (!(votingPower && mint)) {
     return (
       <div
-        className={classNames(props.className, 'rounded-md bg-bkg-1 h-[76px]')}
+        className={classNames(
+          props.className,
+          'rounded-md bg-bkg-1 animate-pulse h-[76px]'
+        )}
       />
     )
   }
