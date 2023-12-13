@@ -34,7 +34,7 @@ export default function LockedCommunityVotingPower(props: Props) {
   const endpoint = connection.rpcEndpoint
 
   const getOwnedDeposits = useDepositStore((s) => s.getOwnedDeposits)
-  const votingPower = useVsrGovpower().result?.result ?? new BN(0)
+  const votingPower = useVsrGovpower().data?.result ?? new BN(0)
 
   const wallet = useWalletOnePointOh()
   const isLoading = useDepositStore((s) => s.state.isLoading)

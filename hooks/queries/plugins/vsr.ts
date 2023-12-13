@@ -7,28 +7,30 @@ import {
   VoterStakeRegistry,
   IDL,
 } from 'VoteStakeRegistry/sdk/voter_stake_registry'
-import { fetchRealmConfigQuery } from '../realmConfig'
+import { fetchRealmConfigQuery, useRealmConfigQuery } from '../realmConfig'
 import queryClient from '../queryClient'
 import { useConnection } from '@solana/wallet-adapter-react'
-import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
 import useUserOrDelegator from '@hooks/useUserOrDelegator'
 import { useAsync } from 'react-async-hook'
 import { getLockTokensVotingPowerPerWallet } from 'VoteStakeRegistry/tools/deposits'
+import { useQuery } from '@tanstack/react-query'
 
 const VOTER_INFO_EVENT_NAME = 'VoterInfo'
 
 export const vsrQueryKeys = {
   all: (connection: Connection) => [connection.rpcEndpoint, 'VSR'],
-  allVotingPower: (connection: Connection) => [
+  allVotingPower: (connection: Connection, pluginId: PublicKey) => [
     ...vsrQueryKeys.all(connection),
+    pluginId.toString(),
     'voting power',
   ],
   votingPower: (
     connection: Connection,
+    pluginId: PublicKey,
     registrarPk: PublicKey,
     voterPk: PublicKey
   ) => [
-    ...vsrQueryKeys.allVotingPower(connection),
+    ...vsrQueryKeys.allVotingPower(connection, pluginId),
     registrarPk.toString(),
     voterPk.toString(),
   ],
@@ -47,24 +49,24 @@ export const getVsrGovpower = async (
   if (programId === undefined)
     return { found: false, result: undefined } as const
 
-  const program = new Program<VoterStakeRegistry>(IDL, programId, {
-    connection,
-  })
-
   const { registrar: registrarPk } = await getRegistrarPDA(
     realmPk,
     communityMintPk,
     programId
   )
   const { voter: voterPk } = await getVoterPDA(registrarPk, walletPk, programId)
-
-  const logs = await fetchVotingPowerSimulation(
+  const votingPower = await fetchVotingPower(
     connection,
-    program,
+    programId,
     registrarPk,
     voterPk
   )
+  return votingPower
+}
 
+const extractVotingPowerFromSimulation = (
+  logs: Awaited<ReturnType<typeof voterPowerLogQueryFn>>
+) => {
   const votingPowerEntry = logs.find((x) => x.name === VOTER_INFO_EVENT_NAME)
   const votingPower = votingPowerEntry
     ? ({
@@ -72,20 +74,44 @@ export const getVsrGovpower = async (
         result: votingPowerEntry.data.votingPower as BN,
       } as const)
     : ({ found: false, result: undefined } as const)
-
-  // you may be asking yourself, "what?". that is healthy
-  // the reason i did things this way is because every component of this is cached
-  // but something should probably still be re-thought.
-  // TODO because this query data is never read anywhere, so this makes no actual sense to do.
-  // but yeah i suppose reading this from cache would be problematic because it won't invalidate properly by default
-  // the problem is that things are complicated by the batched query lower in this file.
-  // react-query as a paradigm just doesnt work super well for this kind of thing, i think.
-  queryClient.setQueryData(
-    vsrQueryKeys.votingPower(connection, registrarPk, voterPk),
-    votingPower
-  )
   return votingPower
 }
+
+const votingPowerQueryFn = async (
+  connection: Connection,
+  pluginId: PublicKey,
+  registrarPk: PublicKey,
+  voterPk: PublicKey
+) => {
+  const program = new Program<VoterStakeRegistry>(IDL, pluginId, {
+    connection,
+  })
+  const logs = await fetchVotingPowerSimulation(
+    connection,
+    program,
+    registrarPk,
+    voterPk
+  )
+  const votingPower = extractVotingPowerFromSimulation(logs)
+  return votingPower
+}
+
+export const fetchVotingPower = (
+  connection: Connection,
+  pluginId: PublicKey,
+  registrarPk: PublicKey,
+  voterPk: PublicKey
+) =>
+  queryClient.fetchQuery({
+    queryKey: vsrQueryKeys.votingPower(
+      connection,
+      pluginId,
+      registrarPk,
+      voterPk
+    ),
+    queryFn: () =>
+      votingPowerQueryFn(connection, pluginId, registrarPk, voterPk),
+  })
 
 export const fetchVotingPowerSimulation = (
   connection: Connection,
@@ -98,9 +124,13 @@ export const fetchVotingPowerSimulation = (
   queryClient.fetchQuery({
     queryKey: [
       connection.rpcEndpoint,
-      'VSR: get vote power log',
+      'VSR',
+      'voting power',
+      'simulation',
       registrarPk.toString(),
       voterPk.toString(),
+      depositEntryBegin,
+      depositEntryCount,
     ],
     queryFn: () =>
       voterPowerLogQueryFn(
@@ -113,18 +143,58 @@ export const fetchVotingPowerSimulation = (
       ),
   })
 
-// TODO break apart getVsrGovpower into one function that gets the accounts you need,
-// and then a query function that actually gets the account and is used by useQuery.
-// so that you can invalidate.
-// this will trigger an extra rerender i think, which is kind of annoying, but i do not really see an alternative.
+export const useRegistrarPk = () => {
+  const realm = useRealmQuery().data?.result
+  const communityMintPk = realm?.account.communityMint
+  const config = useRealmConfigQuery().data?.result
+  const programId = config?.account.communityTokenConfig.voterWeightAddin
+  return useAsync(
+    async () =>
+      realm &&
+      communityMintPk &&
+      programId &&
+      getRegistrarPDA(realm.pubkey, communityMintPk, programId),
+    [communityMintPk, programId, realm]
+  )
+}
+
+export const useVoterPk = (walletPk: PublicKey | undefined) => {
+  const registrar = useRegistrarPk().result
+  const config = useRealmConfigQuery().data?.result
+  const programId = config?.account.communityTokenConfig.voterWeightAddin
+  return useAsync(
+    async () =>
+      registrar &&
+      walletPk &&
+      programId &&
+      getVoterPDA(registrar.registrar, walletPk, programId),
+    [programId, registrar, walletPk]
+  )
+}
+
 export const useVsrGovpower = () => {
   const { connection } = useConnection()
-  const realmPk = useSelectedRealmPubkey()
   const actingAsWallet = useUserOrDelegator()
-  return useAsync(async () => {
-    if (realmPk === undefined || actingAsWallet === undefined) return undefined
-    return getVsrGovpower(connection, realmPk, actingAsWallet)
-  }, [connection, realmPk, actingAsWallet])
+  const config = useRealmConfigQuery().data?.result
+  const pluginId = config?.account.communityTokenConfig.voterWeightAddin
+  const voterPk = useVoterPk(actingAsWallet).result?.voter
+  const registrarPk = useRegistrarPk().result?.registrar
+
+  const enabled = !(
+    pluginId === undefined ||
+    registrarPk === undefined ||
+    voterPk === undefined
+  )
+  return useQuery({
+    enabled,
+    queryKey: enabled
+      ? vsrQueryKeys.votingPower(connection, pluginId, registrarPk, voterPk)
+      : undefined,
+    queryFn: () => {
+      if (!enabled) throw new Error()
+      return votingPowerQueryFn(connection, pluginId, registrarPk, voterPk)
+    },
+  })
 }
 
 /**
@@ -195,7 +265,7 @@ export const useVsrGovpowerMulti = (wallets: PublicKey[] | undefined) => {
       )
 
       queryClient.setQueryData(
-        vsrQueryKeys.votingPower(connection, registrarPk, voterPk),
+        vsrQueryKeys.votingPower(connection, programId, registrarPk, voterPk),
         power
       )
     }

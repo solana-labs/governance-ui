@@ -34,7 +34,8 @@ import {
   VoterWeight,
 } from '@models/voteWeights'
 import useUserOrDelegator from '@hooks/useUserOrDelegator'
-import { getVsrGovpower } from './plugins/vsr'
+import { getVsrGovpower, useVsrGovpower } from './plugins/vsr'
+import React from 'react'
 
 export const getVanillaGovpower = async (
   connection: Connection,
@@ -132,16 +133,51 @@ export const determineVotingPowerType = async (
   return findPluginName(programId)
 }
 
+export const WithCommunityGovernancePower = <
+  P extends { communityGovernancePower: BN | undefined }
+>(
+  Component: React.ComponentType<P>
+): React.FC<Omit<P, 'communityGovernancePower'>> =>
+  function Enhanced(props) {
+    const { connection } = useConnection()
+    const kind = 'community'
+    const realmPk = useSelectedRealmPubkey()
+
+    const { result: plugin } = useAsync(
+      async () =>
+        kind && realmPk && determineVotingPowerType(connection, realmPk, kind),
+      [connection, realmPk, kind]
+    )
+    // this `props as P` thing is annoying!! ts should know better -@asktree
+    return <Component {...(props as P)} />
+  }
+
+export const WithVsrGovernancePower = <
+  P extends { communityGovernancePower: BN | undefined }
+>(
+  Component: React.ComponentType<P>
+): React.FC<Omit<P, 'communityGovernancePower'>> =>
+  function Enhanced(props) {
+    const communityGovernancePower = useVsrGovpower().data?.result
+
+    // this `props as P` thing is annoying!! ts should know better -@asktree
+    return (
+      <Component
+        {...(props as P)}
+        communityGovernancePower={communityGovernancePower}
+      />
+    )
+  }
+
 export const useGovernancePowerAsync = (
   kind: 'community' | 'council' | undefined
 ) => {
   const { connection } = useConnection()
   const realmPk = useSelectedRealmPubkey()
 
-  const actingAsWalletPk = useUserOrDelegator()
-
   const heliumVotingPower = useHeliumVsrStore((s) => s.state.votingPower)
   const gatewayVotingPower = useGatewayPluginStore((s) => s.state.votingPower)
+  const vsrVotingPower = useVsrGovpower().data?.result
 
   const communityTOR = useAddressQuery_CommunityTokenOwner()
   const councilTOR = useAddressQuery_CouncilTokenOwner()
@@ -164,10 +200,7 @@ export const useGovernancePowerAsync = (
             : plugin === 'NFT'
             ? getNftGovpower(connection, realmPk, TOR)
             : plugin === 'VSR'
-            ? actingAsWalletPk
-              ? (await getVsrGovpower(connection, realmPk, actingAsWalletPk))
-                  .result ?? new BN(0)
-              : undefined
+            ? vsrVotingPower ?? new BN(0)
             : plugin === 'HeliumVSR'
             ? heliumVotingPower
             : plugin === 'gateway'
@@ -178,7 +211,7 @@ export const useGovernancePowerAsync = (
       realmPk,
       TOR,
       connection,
-      actingAsWalletPk,
+      vsrVotingPower,
       heliumVotingPower,
       gatewayVotingPower,
     ]

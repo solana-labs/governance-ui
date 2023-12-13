@@ -167,7 +167,7 @@ const TokenDepositLock = ({
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const deposits = useDepositStore((s) => s.state.deposits)
-  const votingPower = useVsrGovpower().result?.result ?? new BN(0)
+  const votingPower = useVsrGovpower().data?.result ?? new BN(0)
   const votingPowerFromDeposits = useDepositStore(
     (s) => s.state.votingPowerFromDeposits
   )

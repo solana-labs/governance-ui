@@ -25,8 +25,8 @@ export default function VSRCommunityVotingPower(props: Props) {
   const deposits = useDepositStore((s) => s.state.deposits)
 
   const {
-    result: votingPowerResult,
-    loading: votingPowerLoading,
+    data: votingPowerResult,
+    isLoading: votingPowerLoading,
   } = useVsrGovpower()
   const votingPower = votingPowerResult?.result ?? new BN(0)
   const votingPowerFromDeposits = useDepositStore(

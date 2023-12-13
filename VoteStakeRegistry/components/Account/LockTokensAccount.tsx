@@ -74,7 +74,7 @@ const LockTokensAccount: React.FC<{
   const [reducedDeposits, setReducedDeposits] = useState<DepositBox[]>([])
   const ownDeposits = useDepositStore((s) => s.state.deposits)
   const [deposits, setDeposits] = useState<DepositWithMintAccount[]>([])
-  const votingPower = useVsrGovpower().result?.result ?? new BN(0)
+  const votingPower = useVsrGovpower().data?.result ?? new BN(0)
   const [votingPowerFromDeposits, setVotingPowerFromDeposits] = useState<BN>(
     new BN(0)
   )
