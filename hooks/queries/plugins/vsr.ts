@@ -224,52 +224,64 @@ const voterPowerLogQueryFn = async (
   return [...parser.parseLogs(sim.value.logs)]
 }
 
+// TODO, use batshit to batch this, i guess.
 export const useVsrGovpowerMulti = (wallets: PublicKey[] | undefined) => {
   const { connection } = useConnection()
   const realm = useRealmQuery().data?.result
 
-  return useAsync(async () => {
-    console.log('vsr multi govpower CALLED')
-    if (realm === undefined) return undefined
-    if (wallets === undefined) return undefined
-    if (wallets.length === 0) return {}
-    const config = await fetchRealmConfigQuery(connection, realm.pubkey)
-    const programId =
-      config.result?.account.communityTokenConfig.voterWeightAddin
-    if (programId === undefined) return undefined
+  return useQuery({
+    enabled: wallets !== undefined && wallets.length > 0,
+    queryKey: [
+      vsrQueryKeys.all(connection),
+      'VSR',
+      'voting power',
+      'simulation',
+      'multi',
+      wallets?.map((x) => x.toString()).toString(),
+    ],
+    queryFn: async () => {
+      console.log('vsr multi govpower CALLED')
+      if (realm === undefined) return undefined
+      if (wallets === undefined) return undefined
+      if (wallets.length === 0) return {}
+      const config = await fetchRealmConfigQuery(connection, realm.pubkey)
+      const programId =
+        config.result?.account.communityTokenConfig.voterWeightAddin
+      if (programId === undefined) return undefined
 
-    const client = {
-      program: new Program<VoterStakeRegistry>(IDL, programId, {
-        connection,
-      }),
-    }
+      const client = {
+        program: new Program<VoterStakeRegistry>(IDL, programId, {
+          connection,
+        }),
+      }
 
-    const x = await getLockTokensVotingPowerPerWallet(
-      wallets,
-      realm,
-      client,
-      connection
-    )
+      const x = await getLockTokensVotingPowerPerWallet(
+        wallets,
+        realm,
+        client,
+        connection
+      )
 
-    const { registrar: registrarPk } = await getRegistrarPDA(
-      realm.pubkey,
-      realm.account.communityMint,
-      programId
-    )
-
-    for (const [key, power] of Object.entries(x)) {
-      const { voter: voterPk } = await getVoterPDA(
-        registrarPk,
-        new PublicKey(key),
+      const { registrar: registrarPk } = await getRegistrarPDA(
+        realm.pubkey,
+        realm.account.communityMint,
         programId
       )
 
-      queryClient.setQueryData(
-        vsrQueryKeys.votingPower(connection, programId, registrarPk, voterPk),
-        power
-      )
-    }
+      for (const [key, power] of Object.entries(x)) {
+        const { voter: voterPk } = await getVoterPDA(
+          registrarPk,
+          new PublicKey(key),
+          programId
+        )
 
-    return x
-  }, [connection, realm, wallets])
+        queryClient.setQueryData(
+          vsrQueryKeys.votingPower(connection, programId, registrarPk, voterPk),
+          power
+        )
+      }
+
+      return x
+    },
+  })
 }

@@ -86,7 +86,7 @@ export default function VSRCommunityVotingPower(props: Props) {
             .map((x) => x.account.governingTokenOwner),
     [delegatedTors, realm?.account.communityMint, selectedDelegator]
   )
-  const { result: delegatorPowers } = useVsrGovpowerMulti(relevantDelegators)
+  const { data: delegatorPowers } = useVsrGovpowerMulti(relevantDelegators)
   const totalDelegatorPower =
     delegatorPowers &&
     mint &&
