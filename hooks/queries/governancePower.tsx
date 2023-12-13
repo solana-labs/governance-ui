@@ -171,6 +171,7 @@ export const WithVsrGovernancePower = <
     )
   } */
 
+/** where possible avoid using this and use a plugin-specific hook instead */
 export const useGovernancePowerAsync = (
   kind: 'community' | 'council' | undefined
 ) => {
