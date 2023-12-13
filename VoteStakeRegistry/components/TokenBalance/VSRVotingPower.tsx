@@ -102,7 +102,10 @@ export default function VSRCommunityVotingPower(props: Props) {
   if (mint === undefined || votingPowerLoading) {
     return (
       <div
-        className={classNames(props.className, 'rounded-md bg-bkg-1 h-[76px]')}
+        className={classNames(
+          props.className,
+          'rounded-md bg-bkg-1 h-[76px] animate-pulse'
+        )}
       />
     )
   }
