@@ -29,6 +29,7 @@ interface OpenBookEditMarketForm {
   name: string
   reduceOnly: boolean
   forceClose: boolean
+  oraclePriceBand: number
   holdupTime: number
 }
 
@@ -56,6 +57,7 @@ const OpenBookEditMarket = ({
     forceClose: false,
     market: null,
     holdupTime: 0,
+    oraclePriceBand: 0,
     name: '',
   })
   const [currentMarkets, setCurrentMarkets] = useState<NameMarketIndexVal[]>([])
@@ -80,7 +82,12 @@ const OpenBookEditMarket = ({
       )
 
       const ix = await mangoClient!.program.methods
-        .serum3EditMarket(form.reduceOnly, form.forceClose, form.name)
+        .serum3EditMarket(
+          form.reduceOnly,
+          form.forceClose,
+          form.name,
+          form.oraclePriceBand
+        )
         .accounts({
           group: mangoGroup!.publicKey,
           admin: form.governedAccount.extensions.transferAddress,
@@ -135,6 +142,7 @@ const OpenBookEditMarket = ({
       )
       setForm((prevForm) => ({
         ...prevForm,
+        oraclePriceBand: 0,
         reduceOnly: market?.reduceOnly || false,
         forceClose: market?.forceClose || false,
         name: market?.name || '',

@@ -551,6 +551,26 @@ const instructions = () => ({
                 suggestedUntrusted={suggestedUntrusted}
                 valKey="flashLoanSwapFeeRate"
               />
+              <DisplayListingPropertyWrapped
+                label="Deposit Limit"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey="depositLimit"
+              />
+              <DisplayListingPropertyWrapped
+                label="Interest Target Utilization"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey="interestTargetUtilization"
+              />
+              <DisplayListingPropertyWrapped
+                label="Interest Curve Scaling"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey="interestCurveScaling"
+              />
+              <DisplayListingPropertyWrapped
+                label="Group Insurance Fund"
+                suggestedUntrusted={suggestedUntrusted}
+                valKey="groupInsuranceFund"
+              />
             </div>
             <AdvancedOptionsDropdown className="mt-4" title="Raw values">
               <div>{info}</div>
@@ -857,6 +877,13 @@ const instructions = () => ({
             args.reduceOnlyOpt !== undefined
               ? REDUCE_ONLY_OPTIONS[args.reduceOnlyOpt].name
               : undefined,
+          interestCurveScaling: args.interestCurveScalingOpt,
+          interestTargetUtilization: args.interestTargetUtilizationOpt,
+          maintWeightShiftStart: args.maintWeightShiftStartOpt,
+          maintWeightShiftEnd: args.maintWeightShiftEndOpt,
+          maintWeightShiftAssetTarget: args.maintWeightShiftAssetTargetOpt,
+          maintWeightShiftLiabTarget: args.maintWeightShiftLiabTargetOpt,
+          depositLimit: args.depositLimitOpt,
         }
 
         if (mint) {
@@ -920,6 +947,11 @@ const instructions = () => ({
                   ...suggestedPreset,
                 }),
                 groupInsuranceFund: suggestedPreset.insuranceFound,
+                maintWeightShiftStart: args.maintWeightShiftStartOpt,
+                maintWeightShiftEnd: args.maintWeightShiftEndOpt,
+                maintWeightShiftAssetTarget:
+                  args.maintWeightShiftAssetTargetOpt,
+                maintWeightShiftLiabTarget: args.maintWeightShiftLiabTargetOpt,
               }
             : {}
 
@@ -1699,6 +1731,10 @@ const getFormattedListingValues = (args: FlatListingArgs) => {
     tokenConditionalSwapTakerFeeRate: args.tokenConditionalSwapTakerFeeRate,
     flashLoanSwapFeeRate: args.flashLoanSwapFeeRate,
     reduceOnly: REDUCE_ONLY_OPTIONS[args.reduceOnly].name,
+    depositLimit: args.depositLimit,
+    interestTargetUtilization: args.interestTargetUtilization,
+    interestCurveScaling: args.interestCurveScaling,
+    groupInsuranceFund: args.groupInsuranceFund,
   }
   return formattedArgs
 }

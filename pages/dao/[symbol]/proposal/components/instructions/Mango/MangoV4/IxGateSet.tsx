@@ -117,6 +117,7 @@ const IxGateSet = ({
     TokenConditionalSwapStart: true,
     TokenConditionalSwapCreatePremiumAuction: true,
     TokenConditionalSwapCreateLinearAuction: true,
+    Serum3PlaceOrderV2: true,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -626,6 +627,12 @@ const IxGateSet = ({
       initialValue: form.TokenConditionalSwapCreateLinearAuction,
       type: InstructionInputType.SWITCH,
       name: 'TokenConditionalSwapCreateLinearAuction',
+    },
+    {
+      label: 'Serum 3 Place Order V2',
+      initialValue: form.Serum3PlaceOrderV2,
+      type: InstructionInputType.SWITCH,
+      name: 'Serum3PlaceOrderV2',
     },
   ]
 

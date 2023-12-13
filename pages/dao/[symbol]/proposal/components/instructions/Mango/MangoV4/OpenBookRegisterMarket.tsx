@@ -29,6 +29,7 @@ interface OpenBookRegisterMarketForm {
   marketIndex: number
   name: string
   holdupTime: number
+  oraclePriceBand: number
 }
 
 const OpenBookRegisterMarket = ({
@@ -61,6 +62,7 @@ const OpenBookRegisterMarket = ({
     ].toBase58(),
     name: '',
     holdupTime: 0,
+    oraclePriceBand: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -79,7 +81,11 @@ const OpenBookRegisterMarket = ({
       wallet?.publicKey
     ) {
       const ix = await mangoClient!.program.methods
-        .serum3RegisterMarket(Number(form.marketIndex), form.name)
+        .serum3RegisterMarket(
+          Number(form.marketIndex),
+          form.name,
+          form.oraclePriceBand
+        )
         .accounts({
           group: mangoGroup!.publicKey,
           admin: form.governedAccount.extensions.transferAddress,
@@ -213,6 +219,13 @@ const OpenBookRegisterMarket = ({
       initialValue: form.openBookProgram,
       type: InstructionInputType.INPUT,
       name: 'openBookProgram',
+    },
+    {
+      label: `Oracle Price Band`,
+      initialValue: form.oraclePriceBand,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'oraclePriceBand',
     },
   ]
 

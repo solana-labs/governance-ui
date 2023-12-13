@@ -68,6 +68,9 @@ export type FlatListingArgs = {
   reduceOnly: number
   groupInsuranceFund: boolean
   oracle: PublicKey
+  depositLimit: number
+  interestTargetUtilization: number
+  interestCurveScaling: number
 }
 
 export type FlatEditArgs = {
@@ -102,6 +105,15 @@ export type FlatEditArgs = {
   reduceOnlyOpt: number
   groupInsuranceFundOpt: boolean
   oracleOpt: PublicKey
+  interestCurveScalingOpt: number
+  interestTargetUtilizationOpt: number
+  maintWeightShiftStartOpt: number
+  maintWeightShiftEndOpt: number
+  maintWeightShiftAssetTargetOpt: number
+  maintWeightShiftLiabTargetOpt: number
+  maintWeightShiftAbortOpt: boolean
+  setFallbackOracleOpt: boolean
+  depositLimitOpt: number
 }
 
 export type ListingArgsFormatted = {
@@ -135,10 +147,17 @@ export type ListingArgsFormatted = {
   flashLoanSwapFeeRate: number
   reduceOnly: string
   oracle: string
+  depositLimit: number
+  interestTargetUtilization: number
+  interestCurveScaling: number
+  groupInsuranceFund: boolean
 }
 
 export type EditTokenArgsFormatted = ListingArgsFormatted & {
-  groupInsuranceFund: boolean
+  maintWeightShiftStart: number
+  maintWeightShiftEnd: number
+  maintWeightShiftAssetTarget: number
+  maintWeightShiftLiabTarget: number
 }
 
 const transformPresetToProposed = (listingPreset: ListingPreset) => {
@@ -648,5 +667,8 @@ export const getFormattedBankValues = (group: Group, bank: Bank) => {
     netBorrowLimitWindowSizeTs: secondsToHours(
       bank.netBorrowLimitWindowSizeTs.toNumber()
     ),
+    depositLimit: bank.depositLimit.toNumber(),
+    interestTargetUtilization: bank.interestTargetUtilization,
+    interestCurveScaling: bank.interestCurveScaling,
   }
 }
