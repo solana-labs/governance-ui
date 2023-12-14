@@ -277,7 +277,7 @@ export const useVsrGovpowerMulti = (wallets: PublicKey[] | undefined) => {
 
         queryClient.setQueryData(
           vsrQueryKeys.votingPower(connection, programId, registrarPk, voterPk),
-          power
+          { found: true, result: power }
         )
       }
 
