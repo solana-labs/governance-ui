@@ -883,7 +883,7 @@ const instructions = () => ({
           maintWeightShiftEnd: args.maintWeightShiftEndOpt,
           maintWeightShiftAssetTarget: args.maintWeightShiftAssetTargetOpt,
           maintWeightShiftLiabTarget: args.maintWeightShiftLiabTargetOpt,
-          depositLimit: args.depositLimitOpt,
+          depositLimit: args.depositLimitOpt.toString(),
         }
 
         if (mint) {
@@ -946,7 +946,7 @@ const instructions = () => ({
                   oracle: args.oracleOpt,
                   ...suggestedPreset,
                 }),
-                groupInsuranceFund: suggestedPreset.insuranceFound,
+                groupInsuranceFund: suggestedPreset.groupInsuranceFund,
                 maintWeightShiftStart: args.maintWeightShiftStartOpt,
                 maintWeightShiftEnd: args.maintWeightShiftEndOpt,
                 maintWeightShiftAssetTarget:
@@ -1661,7 +1661,7 @@ const DisplayListingProperty = ({
         className={`${suggestedUntrusted || suggestedVal ? 'text-orange' : ''}`}
       >
         {prefix}
-        {val}
+        {`${val}`}
         {suffix}
       </div>
       {suggestedVal && <div className="mx-1">/</div>}
@@ -1678,6 +1678,7 @@ const DisplayListingProperty = ({
 )
 
 const getFormattedListingValues = (args: FlatListingArgs) => {
+  console.log(args)
   const formattedArgs: ListingArgsFormatted = {
     tokenIndex: args.tokenIndex,
     tokenName: args.name,
@@ -1731,7 +1732,7 @@ const getFormattedListingValues = (args: FlatListingArgs) => {
     tokenConditionalSwapTakerFeeRate: args.tokenConditionalSwapTakerFeeRate,
     flashLoanSwapFeeRate: args.flashLoanSwapFeeRate,
     reduceOnly: REDUCE_ONLY_OPTIONS[args.reduceOnly].name,
-    depositLimit: args.depositLimit,
+    depositLimit: args.depositLimit.toString(),
     interestTargetUtilization: args.interestTargetUtilization,
     interestCurveScaling: args.interestCurveScaling,
     groupInsuranceFund: args.groupInsuranceFund,

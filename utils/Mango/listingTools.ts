@@ -56,7 +56,6 @@ export type FlatListingArgs = {
   minVaultToDepositsRatio: number
   netBorrowLimitPerWindowQuote: number
   netBorrowLimitWindowSizeTs: number
-  insuranceFound: boolean
   borrowWeightScaleStartQuote: number
   depositWeightScaleStartQuote: number
   stablePriceDelayGrowthLimit: number
@@ -147,7 +146,7 @@ export type ListingArgsFormatted = {
   flashLoanSwapFeeRate: number
   reduceOnly: string
   oracle: string
-  depositLimit: number
+  depositLimit: string
   interestTargetUtilization: number
   interestCurveScaling: number
   groupInsuranceFund: boolean
@@ -171,7 +170,7 @@ const transformPresetToProposed = (listingPreset: ListingPreset) => {
     'interestRateParams.util1': listingPreset.util1,
     'interestRateParams.rate1': listingPreset.rate1,
     'interestRateParams.maxRate': listingPreset.maxRate,
-    groupInsuranceFund: listingPreset.insuranceFound,
+    groupInsuranceFund: listingPreset.groupInsuranceFund,
   }
 
   return proposedPreset
