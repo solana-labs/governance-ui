@@ -31,6 +31,12 @@ import SwitchboardProgram from '@switchboard-xyz/sbv2-lite'
 import Big from 'big.js'
 import { secondsToHours } from 'date-fns'
 
+export const REDUCE_ONLY_OPTIONS = [
+  { value: 0, name: 'Disabled' },
+  { value: 1, name: 'No borrows and no deposits' },
+  { value: 2, name: 'No borrows' },
+]
+
 const MAINNET_PYTH_PROGRAM = new PublicKey(
   'FsJ3A3u2vn5cTVofAjvy6y5kwABJAqYWpe4975bi2epH'
 )
@@ -70,6 +76,8 @@ export type FlatListingArgs = {
   depositLimit: number
   interestTargetUtilization: number
   interestCurveScaling: number
+  setFallbackOracle: boolean
+  maintWeightShiftAbort: boolean
 }
 
 export type FlatEditArgs = {
@@ -110,8 +118,8 @@ export type FlatEditArgs = {
   maintWeightShiftEndOpt: number
   maintWeightShiftAssetTargetOpt: number
   maintWeightShiftLiabTargetOpt: number
-  maintWeightShiftAbortOpt: boolean
-  setFallbackOracleOpt: boolean
+  maintWeightShiftAbort: boolean
+  setFallbackOracle: boolean
   depositLimitOpt: number
 }
 
@@ -157,6 +165,8 @@ export type EditTokenArgsFormatted = ListingArgsFormatted & {
   maintWeightShiftEnd: number
   maintWeightShiftAssetTarget: number
   maintWeightShiftLiabTarget: number
+  maintWeightShiftAbort: boolean
+  setFallbackOracle: boolean
 }
 
 const transformPresetToProposed = (listingPreset: ListingPreset) => {
@@ -171,6 +181,8 @@ const transformPresetToProposed = (listingPreset: ListingPreset) => {
     'interestRateParams.rate1': listingPreset.rate1,
     'interestRateParams.maxRate': listingPreset.maxRate,
     groupInsuranceFund: listingPreset.groupInsuranceFund,
+    maintWeightShiftAbort: false,
+    setFallbackOracle: false,
   }
 
   return proposedPreset
@@ -669,5 +681,6 @@ export const getFormattedBankValues = (group: Group, bank: Bank) => {
     depositLimit: bank.depositLimit.toNumber(),
     interestTargetUtilization: bank.interestTargetUtilization,
     interestCurveScaling: bank.interestCurveScaling,
+    reduceOnly: REDUCE_ONLY_OPTIONS[bank.reduceOnly].name,
   }
 }

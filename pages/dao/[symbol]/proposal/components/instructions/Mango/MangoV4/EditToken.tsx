@@ -21,12 +21,7 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import ForwarderProgram, {
   useForwarderProgramHelpers,
 } from '@components/ForwarderProgram/ForwarderProgram'
-
-const REDUCE_ONLY_OPTIONS = [
-  { value: 0, name: 'Disabled' },
-  { value: 1, name: 'No borrows and no deposits' },
-  { value: 2, name: 'No borrows' },
-]
+import { REDUCE_ONLY_OPTIONS } from '@utils/Mango/listingTools'
 
 const keyToLabel = {
   oraclePk: 'Oracle',

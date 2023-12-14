@@ -22,6 +22,7 @@ import EmptyWallet, {
   getFormattedListingPresets,
   decodePriceFromOracleAi,
   getFormattedBankValues,
+  REDUCE_ONLY_OPTIONS,
 } from '@utils/Mango/listingTools'
 import { secondsToHours } from 'date-fns'
 import WarningFilledIcon from '@carbon/icons-react/lib/WarningFilled'
@@ -883,7 +884,9 @@ const instructions = () => ({
           maintWeightShiftEnd: args.maintWeightShiftEndOpt,
           maintWeightShiftAssetTarget: args.maintWeightShiftAssetTargetOpt,
           maintWeightShiftLiabTarget: args.maintWeightShiftLiabTargetOpt,
-          depositLimit: args.depositLimitOpt.toString(),
+          depositLimit: args.depositLimitOpt?.toString(),
+          setFallbackOracle: args.setFallbackOracle,
+          maintWeightShiftAbort: args.maintWeightShiftAbort,
         }
 
         if (mint) {
@@ -952,6 +955,8 @@ const instructions = () => ({
                 maintWeightShiftAssetTarget:
                   args.maintWeightShiftAssetTargetOpt,
                 maintWeightShiftLiabTarget: args.maintWeightShiftLiabTargetOpt,
+                maintWeightShiftAbort: args.maintWeightShiftAbort,
+                setFallbackOracle: args.setFallbackOracle,
               }
             : {}
 
@@ -1313,6 +1318,60 @@ const instructions = () => ({
                 value={parsedArgs.reduceOnly}
                 currentValue={bankFormattedValues?.reduceOnly}
               />
+              <DisplayNullishProperty
+                label="Interest Curve Scaling"
+                value={parsedArgs.interestCurveScaling}
+                currentValue={bankFormattedValues?.interestCurveScaling}
+                suggestedVal={invalidFields.interestCurveScaling}
+              />
+              <DisplayNullishProperty
+                label="Interest Target Utilization"
+                value={parsedArgs.interestTargetUtilization}
+                currentValue={bankFormattedValues?.interestTargetUtilization}
+                suggestedVal={invalidFields.interestTargetUtilization}
+              />
+              <DisplayNullishProperty
+                label="Maint Weight Shift Start"
+                value={parsedArgs.maintWeightShiftStart}
+                currentValue={bankFormattedValues?.maintWeightShiftStart.toNumber()}
+                suggestedVal={invalidFields.maintWeightShiftStart}
+              />
+              <DisplayNullishProperty
+                label="Maint Weight Shift End"
+                value={parsedArgs.maintWeightShiftEnd}
+                currentValue={bankFormattedValues?.maintWeightShiftEnd.toNumber()}
+                suggestedVal={invalidFields.maintWeightShiftEnd}
+              />
+              <DisplayNullishProperty
+                label="Maint Weight Shift Asset Target"
+                value={parsedArgs.maintWeightShiftAssetTarget}
+                currentValue={bankFormattedValues?.maintWeightShiftAssetTarget.toNumber()}
+                suggestedVal={invalidFields.maintWeightShiftAssetTarget}
+              />
+              <DisplayNullishProperty
+                label="Maint Weight Shift Liab Target"
+                value={parsedArgs.maintWeightShiftLiabTarget}
+                currentValue={bankFormattedValues?.maintWeightShiftLiabTarget.toNumber()}
+                suggestedVal={invalidFields.maintWeightShiftLiabTarget}
+              />
+              <DisplayNullishProperty
+                label="Deposit Limit"
+                value={parsedArgs.depositLimit}
+                currentValue={bankFormattedValues?.depositLimit}
+                suggestedVal={invalidFields.depositLimit}
+              />
+              <DisplayNullishProperty
+                label="Maint Weight Shift Abort"
+                value={`${parsedArgs.maintWeightShiftAbort}`}
+                currentValue={null}
+                suggestedVal={null}
+              />
+              <DisplayNullishProperty
+                label="SetFallbackOracle"
+                value={`${parsedArgs.setFallbackOracle}`}
+                currentValue={null}
+                suggestedVal={null}
+              />
             </div>
             <h3>Raw values</h3>
             <div>{info}</div>
@@ -1577,6 +1636,12 @@ const displayArgs = async (connection: Connection, data: Uint8Array) => {
           if (key === 'resetNetBorrowLimit' && args[key] === false) {
             return false
           }
+          if (key === 'maintWeightShiftAbort' && args[key] === false) {
+            return false
+          }
+          if (key === 'setFallbackOracle' && args[key] === false) {
+            return false
+          }
 
           return true
         })
@@ -1678,7 +1743,6 @@ const DisplayListingProperty = ({
 )
 
 const getFormattedListingValues = (args: FlatListingArgs) => {
-  console.log(args)
   const formattedArgs: ListingArgsFormatted = {
     tokenIndex: args.tokenIndex,
     tokenName: args.name,
@@ -1739,12 +1803,6 @@ const getFormattedListingValues = (args: FlatListingArgs) => {
   }
   return formattedArgs
 }
-
-const REDUCE_ONLY_OPTIONS = [
-  { value: 0, name: 'Disabled' },
-  { value: 1, name: 'No borrows and no deposits' },
-  { value: 2, name: 'No borrows' },
-]
 
 //need yarn add js-sha256 snakeCase
 // function sighash(nameSpace: string, ixName: string): Buffer {
