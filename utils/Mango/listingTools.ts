@@ -114,8 +114,8 @@ export type FlatEditArgs = {
   oracleOpt: PublicKey
   interestCurveScalingOpt: number
   interestTargetUtilizationOpt: number
-  maintWeightShiftStartOpt: number
-  maintWeightShiftEndOpt: number
+  maintWeightShiftStartOpt: BN
+  maintWeightShiftEndOpt: BN
   maintWeightShiftAssetTargetOpt: number
   maintWeightShiftLiabTargetOpt: number
   maintWeightShiftAbort: boolean
@@ -682,5 +682,9 @@ export const getFormattedBankValues = (group: Group, bank: Bank) => {
     interestTargetUtilization: bank.interestTargetUtilization,
     interestCurveScaling: bank.interestCurveScaling,
     reduceOnly: REDUCE_ONLY_OPTIONS[bank.reduceOnly].name,
+    maintWeightShiftStart: bank.maintWeightShiftStart.toNumber(),
+    maintWeightShiftEnd: bank.maintWeightShiftEnd.toNumber(),
+    maintWeightShiftAssetTarget: bank.maintWeightShiftAssetTarget.toNumber(),
+    maintWeightShiftLiabTarget: bank.maintWeightShiftLiabTarget.toNumber(),
   }
 }

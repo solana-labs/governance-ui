@@ -880,8 +880,8 @@ const instructions = () => ({
               : undefined,
           interestCurveScaling: args.interestCurveScalingOpt,
           interestTargetUtilization: args.interestTargetUtilizationOpt,
-          maintWeightShiftStart: args.maintWeightShiftStartOpt,
-          maintWeightShiftEnd: args.maintWeightShiftEndOpt,
+          maintWeightShiftStart: args.maintWeightShiftStartOpt.toNumber(),
+          maintWeightShiftEnd: args.maintWeightShiftEndOpt.toNumber(),
           maintWeightShiftAssetTarget: args.maintWeightShiftAssetTargetOpt,
           maintWeightShiftLiabTarget: args.maintWeightShiftLiabTargetOpt,
           depositLimit: args.depositLimitOpt?.toString(),
@@ -950,8 +950,8 @@ const instructions = () => ({
                   ...suggestedPreset,
                 }),
                 groupInsuranceFund: suggestedPreset.groupInsuranceFund,
-                maintWeightShiftStart: args.maintWeightShiftStartOpt,
-                maintWeightShiftEnd: args.maintWeightShiftEndOpt,
+                maintWeightShiftStart: args.maintWeightShiftStartOpt.toNumber(),
+                maintWeightShiftEnd: args.maintWeightShiftEndOpt.toNumber(),
                 maintWeightShiftAssetTarget:
                   args.maintWeightShiftAssetTargetOpt,
                 maintWeightShiftLiabTarget: args.maintWeightShiftLiabTargetOpt,
@@ -1333,25 +1333,25 @@ const instructions = () => ({
               <DisplayNullishProperty
                 label="Maint Weight Shift Start"
                 value={parsedArgs.maintWeightShiftStart}
-                currentValue={bankFormattedValues?.maintWeightShiftStart.toNumber()}
+                currentValue={bankFormattedValues?.maintWeightShiftStart}
                 suggestedVal={invalidFields.maintWeightShiftStart}
               />
               <DisplayNullishProperty
                 label="Maint Weight Shift End"
                 value={parsedArgs.maintWeightShiftEnd}
-                currentValue={bankFormattedValues?.maintWeightShiftEnd.toNumber()}
+                currentValue={bankFormattedValues?.maintWeightShiftEnd}
                 suggestedVal={invalidFields.maintWeightShiftEnd}
               />
               <DisplayNullishProperty
                 label="Maint Weight Shift Asset Target"
                 value={parsedArgs.maintWeightShiftAssetTarget}
-                currentValue={bankFormattedValues?.maintWeightShiftAssetTarget.toNumber()}
+                currentValue={bankFormattedValues?.maintWeightShiftAssetTarget}
                 suggestedVal={invalidFields.maintWeightShiftAssetTarget}
               />
               <DisplayNullishProperty
                 label="Maint Weight Shift Liab Target"
                 value={parsedArgs.maintWeightShiftLiabTarget}
-                currentValue={bankFormattedValues?.maintWeightShiftLiabTarget.toNumber()}
+                currentValue={bankFormattedValues?.maintWeightShiftLiabTarget}
                 suggestedVal={invalidFields.maintWeightShiftLiabTarget}
               />
               <DisplayNullishProperty
