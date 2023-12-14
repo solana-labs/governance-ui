@@ -21,12 +21,7 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import ForwarderProgram, {
   useForwarderProgramHelpers,
 } from '@components/ForwarderProgram/ForwarderProgram'
-
-const REDUCE_ONLY_OPTIONS = [
-  { value: 0, name: 'Disabled' },
-  { value: 1, name: 'No borrows and no deposits' },
-  { value: 2, name: 'No borrows' },
-]
+import { REDUCE_ONLY_OPTIONS } from '@utils/Mango/listingTools'
 
 const keyToLabel = {
   oraclePk: 'Oracle',
@@ -63,6 +58,15 @@ const keyToLabel = {
   tokenConditionalSwapTakerFeeRate: 'Token Conditional Swap Taker Fee Rate',
   tokenConditionalSwapMakerFeeRate: 'Token Conditional Swap Maker Fee Rate',
   flashLoanSwapFeeRate: 'Flash Loan Deposit Fee Rate',
+  interestCurveScaling: 'Interest Curve Scaling',
+  interestTargetUtilization: 'interestTargetUtilization',
+  maintWeightShiftStart: 'Maint Weight Shift Start',
+  maintWeightShiftEnd: 'Maint Weight Shift End',
+  maintWeightShiftAssetTarget: 'Maint Weight Shift Asset Target',
+  maintWeightShiftLiabTarget: 'Maint Weight Shift Liab Target',
+  maintWeightShiftAbort: 'Maint Weight Shift Abort',
+  setFallbackOracle: 'Set Fallback Oracle',
+  depositLimit: 'Deposit Limit',
 }
 
 type NamePkVal = {
@@ -108,6 +112,15 @@ interface EditTokenForm {
   tokenConditionalSwapTakerFeeRate: number
   tokenConditionalSwapMakerFeeRate: number
   flashLoanSwapFeeRate: number
+  interestCurveScaling: number
+  interestTargetUtilization: number
+  maintWeightShiftStart: number
+  maintWeightShiftEnd: number
+  maintWeightShiftAssetTarget: number
+  maintWeightShiftLiabTarget: number
+  maintWeightShiftAbort: boolean
+  setFallbackOracle: boolean
+  depositLimit: number
 }
 
 const defaultFormValues: EditTokenForm = {
@@ -148,6 +161,15 @@ const defaultFormValues: EditTokenForm = {
   tokenConditionalSwapTakerFeeRate: 0,
   tokenConditionalSwapMakerFeeRate: 0,
   flashLoanSwapFeeRate: 0,
+  interestCurveScaling: 0,
+  interestTargetUtilization: 0,
+  maintWeightShiftStart: 0,
+  maintWeightShiftEnd: 0,
+  maintWeightShiftAssetTarget: 0,
+  maintWeightShiftLiabTarget: 0,
+  maintWeightShiftAbort: false,
+  setFallbackOracle: false,
+  depositLimit: 0,
 }
 
 const EditToken = ({
@@ -295,7 +317,16 @@ const EditToken = ({
             null,
             Number
           ),
-          getNullOrTransform(values.flashLoanSwapFeeRate, null, Number)
+          getNullOrTransform(values.flashLoanSwapFeeRate, null, Number),
+          getNullOrTransform(values.interestCurveScaling, null, Number),
+          getNullOrTransform(values.interestTargetUtilization, null, Number),
+          getNullOrTransform(values.maintWeightShiftStart, BN),
+          getNullOrTransform(values.maintWeightShiftEnd, BN),
+          getNullOrTransform(values.maintWeightShiftAssetTarget, null, Number),
+          getNullOrTransform(values.maintWeightShiftLiabTarget, null, Number),
+          values.maintWeightShiftAbort!,
+          values.setFallbackOracle!,
+          getNullOrTransform(values.depositLimit, BN)
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -400,6 +431,13 @@ const EditToken = ({
         tokenConditionalSwapMakerFeeRate:
           currentToken.tokenConditionalSwapMakerFeeRate,
         flashLoanSwapFeeRate: currentToken.flashLoanSwapFeeRate,
+        interestCurveScaling: currentToken.interestCurveScaling,
+        interestTargetUtilization: currentToken.interestTargetUtilization,
+        maintWeightShiftStart: currentToken.maintWeightShiftStart.toNumber(),
+        maintWeightShiftEnd: currentToken.maintWeightShiftEnd.toNumber(),
+        maintWeightShiftAssetTarget: currentToken.maintWeightShiftAssetTarget.toNumber(),
+        maintWeightShiftLiabTarget: currentToken.maintWeightShiftLiabTarget.toNumber(),
+        depositLimit: currentToken.depositLimit.toNumber(),
       }
       setForm((prevForm) => ({
         ...prevForm,
@@ -714,6 +752,76 @@ const EditToken = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'flashLoanSwapFeeRate',
+    },
+    {
+      label: keyToLabel['interestCurveScaling'],
+      subtitle: getAdditionalLabelInfo('interestCurveScaling'),
+      initialValue: form.interestCurveScaling,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'interestCurveScaling',
+    },
+    {
+      label: keyToLabel['interestTargetUtilization'],
+      subtitle: getAdditionalLabelInfo('interestTargetUtilization'),
+      initialValue: form.interestTargetUtilization,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'interestTargetUtilization',
+    },
+    {
+      label: keyToLabel['maintWeightShiftStart'],
+      subtitle: getAdditionalLabelInfo('maintWeightShiftStart'),
+      initialValue: form.maintWeightShiftStart,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'maintWeightShiftStart',
+    },
+    {
+      label: keyToLabel['maintWeightShiftEnd'],
+      subtitle: getAdditionalLabelInfo('maintWeightShiftEnd'),
+      initialValue: form.maintWeightShiftEnd,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'maintWeightShiftEnd',
+    },
+    {
+      label: keyToLabel['maintWeightShiftAssetTarget'],
+      subtitle: getAdditionalLabelInfo('maintWeightShiftAssetTarget'),
+      initialValue: form.maintWeightShiftAssetTarget,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'maintWeightShiftAssetTarget',
+    },
+    {
+      label: keyToLabel['maintWeightShiftLiabTarget'],
+      subtitle: getAdditionalLabelInfo('maintWeightShiftLiabTarget'),
+      initialValue: form.maintWeightShiftLiabTarget,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'maintWeightShiftLiabTarget',
+    },
+    {
+      label: keyToLabel['maintWeightShiftAbort'],
+      subtitle: getAdditionalLabelInfo('maintWeightShiftAbort'),
+      initialValue: form.maintWeightShiftAbort,
+      type: InstructionInputType.SWITCH,
+      name: 'maintWeightShiftAbort',
+    },
+    {
+      label: keyToLabel['setFallbackOracle'],
+      subtitle: getAdditionalLabelInfo('setFallbackOracle'),
+      initialValue: form.setFallbackOracle,
+      type: InstructionInputType.SWITCH,
+      name: 'setFallbackOracle',
+    },
+    {
+      label: keyToLabel['depositLimit'],
+      subtitle: getAdditionalLabelInfo('depositLimit'),
+      initialValue: form.depositLimit,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'depositLimit',
     },
   ]
 

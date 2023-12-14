@@ -31,6 +31,12 @@ import SwitchboardProgram from '@switchboard-xyz/sbv2-lite'
 import Big from 'big.js'
 import { secondsToHours } from 'date-fns'
 
+export const REDUCE_ONLY_OPTIONS = [
+  { value: 0, name: 'Disabled' },
+  { value: 1, name: 'No borrows and no deposits' },
+  { value: 2, name: 'No borrows' },
+]
+
 const MAINNET_PYTH_PROGRAM = new PublicKey(
   'FsJ3A3u2vn5cTVofAjvy6y5kwABJAqYWpe4975bi2epH'
 )
@@ -56,7 +62,6 @@ export type FlatListingArgs = {
   minVaultToDepositsRatio: number
   netBorrowLimitPerWindowQuote: number
   netBorrowLimitWindowSizeTs: number
-  insuranceFound: boolean
   borrowWeightScaleStartQuote: number
   depositWeightScaleStartQuote: number
   stablePriceDelayGrowthLimit: number
@@ -68,6 +73,11 @@ export type FlatListingArgs = {
   reduceOnly: number
   groupInsuranceFund: boolean
   oracle: PublicKey
+  depositLimit: number
+  interestTargetUtilization: number
+  interestCurveScaling: number
+  setFallbackOracle: boolean
+  maintWeightShiftAbort: boolean
 }
 
 export type FlatEditArgs = {
@@ -102,6 +112,15 @@ export type FlatEditArgs = {
   reduceOnlyOpt: number
   groupInsuranceFundOpt: boolean
   oracleOpt: PublicKey
+  interestCurveScalingOpt: number
+  interestTargetUtilizationOpt: number
+  maintWeightShiftStartOpt: BN
+  maintWeightShiftEndOpt: BN
+  maintWeightShiftAssetTargetOpt: number
+  maintWeightShiftLiabTargetOpt: number
+  maintWeightShiftAbort: boolean
+  setFallbackOracle: boolean
+  depositLimitOpt: number
 }
 
 export type ListingArgsFormatted = {
@@ -135,10 +154,19 @@ export type ListingArgsFormatted = {
   flashLoanSwapFeeRate: number
   reduceOnly: string
   oracle: string
+  depositLimit: string
+  interestTargetUtilization: number
+  interestCurveScaling: number
+  groupInsuranceFund: boolean
 }
 
 export type EditTokenArgsFormatted = ListingArgsFormatted & {
-  groupInsuranceFund: boolean
+  maintWeightShiftStart: number
+  maintWeightShiftEnd: number
+  maintWeightShiftAssetTarget: number
+  maintWeightShiftLiabTarget: number
+  maintWeightShiftAbort: boolean
+  setFallbackOracle: boolean
 }
 
 const transformPresetToProposed = (listingPreset: ListingPreset) => {
@@ -152,7 +180,9 @@ const transformPresetToProposed = (listingPreset: ListingPreset) => {
     'interestRateParams.util1': listingPreset.util1,
     'interestRateParams.rate1': listingPreset.rate1,
     'interestRateParams.maxRate': listingPreset.maxRate,
-    groupInsuranceFund: listingPreset.insuranceFound,
+    groupInsuranceFund: listingPreset.groupInsuranceFund,
+    maintWeightShiftAbort: false,
+    setFallbackOracle: false,
   }
 
   return proposedPreset
@@ -648,5 +678,13 @@ export const getFormattedBankValues = (group: Group, bank: Bank) => {
     netBorrowLimitWindowSizeTs: secondsToHours(
       bank.netBorrowLimitWindowSizeTs.toNumber()
     ),
+    depositLimit: bank.depositLimit.toNumber(),
+    interestTargetUtilization: bank.interestTargetUtilization,
+    interestCurveScaling: bank.interestCurveScaling,
+    reduceOnly: REDUCE_ONLY_OPTIONS[bank.reduceOnly].name,
+    maintWeightShiftStart: bank.maintWeightShiftStart.toNumber(),
+    maintWeightShiftEnd: bank.maintWeightShiftEnd.toNumber(),
+    maintWeightShiftAssetTarget: bank.maintWeightShiftAssetTarget.toNumber(),
+    maintWeightShiftLiabTarget: bank.maintWeightShiftLiabTarget.toNumber(),
   }
 }

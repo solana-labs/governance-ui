@@ -22,12 +22,8 @@ import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import ForwarderProgram, {
   useForwarderProgramHelpers,
 } from '@components/ForwarderProgram/ForwarderProgram'
+import { REDUCE_ONLY_OPTIONS } from '@utils/Mango/listingTools'
 
-const REDUCE_ONLY_OPTIONS = [
-  { value: 0, name: 'Disabled' },
-  { value: 1, name: 'No borrows and no deposits' },
-  { value: 2, name: 'No borrows' },
-]
 interface TokenRegisterForm {
   governedAccount: AssetAccount | null
   mintPk: string
@@ -62,6 +58,10 @@ interface TokenRegisterForm {
   reduceOnly: { name: string; value: number }
   borrowWeightScaleStartQuote: number
   depositWeightScaleStartQuote: number
+  interestCurveScaling: number
+  interestTargetUtilization: number
+  depositLimit: number
+  insuranceFound: boolean
 }
 
 const TokenRegister = ({
@@ -118,6 +118,10 @@ const TokenRegister = ({
     reduceOnly: REDUCE_ONLY_OPTIONS[0],
     borrowWeightScaleStartQuote: toNative(10000, 6).toNumber(),
     depositWeightScaleStartQuote: toNative(10000, 6).toNumber(),
+    depositLimit: 0,
+    interestTargetUtilization: 0.5,
+    interestCurveScaling: 4,
+    insuranceFound: false,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -173,7 +177,11 @@ const TokenRegister = ({
           Number(form.reduceOnly.value),
           Number(form.tokenConditionalSwapTakerFeeRate),
           Number(form.tokenConditionalSwapMakerFeeRate),
-          Number(form.flashLoanSwapFeeRate)
+          Number(form.flashLoanSwapFeeRate),
+          Number(form.interestCurveScaling),
+          Number(form.interestTargetUtilization),
+          form.insuranceFound,
+          new BN(form.depositLimit)
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -519,6 +527,37 @@ const TokenRegister = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'depositWeightScaleStartQuote',
+    },
+    {
+      label: `Interest Curve Scaling`,
+      subtitle: getAdditionalLabelInfo('interestCurveScaling'),
+      initialValue: form.interestCurveScaling,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'interestCurveScaling',
+    },
+    {
+      label: `Interest Target Utilization`,
+      subtitle: getAdditionalLabelInfo('interestTargetUtilization'),
+      initialValue: form.interestTargetUtilization,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'interestTargetUtilization',
+    },
+    {
+      label: `Deposit Limit`,
+      subtitle: getAdditionalLabelInfo('depositLimit'),
+      initialValue: form.depositLimit,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'depositLimit',
+    },
+    {
+      label: `Insurance Found`,
+      subtitle: getAdditionalLabelInfo('insuranceFound'),
+      initialValue: form.insuranceFound,
+      type: InstructionInputType.SWITCH,
+      name: 'insuranceFound',
     },
   ]
 
