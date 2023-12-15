@@ -12,13 +12,6 @@ import { getNetworkFromEndpoint } from '@utils/connection'
 import { ON_NFT_VOTER_V2 } from '@constants/flags'
 import { fetchRealmByPubkey, useRealmQuery } from './realm'
 import { fetchRealmConfigQuery } from './realmConfig'
-import {
-  GATEWAY_PLUGINS_PKS,
-  HELIUM_VSR_PLUGINS_PKS,
-  NFT_PLUGINS_PKS,
-  PYTH_PLUGIN_PK,
-  VSR_PLUGIN_PKS,
-} from '@constants/plugins'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import useGatewayPluginStore from 'GatewayPlugin/store/gatewayPluginStore'
 import { useAsync } from 'react-async-hook'
@@ -38,6 +31,7 @@ import useUserOrDelegator from '@hooks/useUserOrDelegator'
 import { getVsrGovpower, useVsrGovpower } from './plugins/vsr'
 import { PythClient } from '@pythnetwork/staking'
 import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet'
+import { findPluginName } from '@constants/plugins'
 
 export const getVanillaGovpower = async (
   connection: Connection,
@@ -123,21 +117,6 @@ export const getPythGovPower = async (
     return new BN(0)
   }
 }
-
-export const findPluginName = (programId: PublicKey | undefined) =>
-  programId === undefined
-    ? ('vanilla' as const)
-    : VSR_PLUGIN_PKS.includes(programId.toString())
-    ? ('VSR' as const)
-    : HELIUM_VSR_PLUGINS_PKS.includes(programId.toString())
-    ? 'HeliumVSR'
-    : NFT_PLUGINS_PKS.includes(programId.toString())
-    ? 'NFT'
-    : GATEWAY_PLUGINS_PKS.includes(programId.toString())
-    ? 'gateway'
-    : PYTH_PLUGIN_PK.includes(programId.toString())
-    ? 'pyth'
-    : 'unknown'
 
 export const determineVotingPowerType = async (
   connection: Connection,

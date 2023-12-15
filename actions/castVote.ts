@@ -36,11 +36,11 @@ import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { fetchRealmByPubkey } from '@hooks/queries/realm'
 import { fetchProposalByPubkeyQuery } from '@hooks/queries/proposal'
-import { findPluginName } from '@hooks/queries/governancePower'
 import { DELEGATOR_BATCH_VOTE_SUPPORT_BY_PLUGIN } from '@constants/flags'
 import { fetchTokenOwnerRecordByPubkey } from '@hooks/queries/tokenOwnerRecord'
 import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
 import { fetchVoteRecordByPubkey } from '@hooks/queries/voteRecord'
+import { findPluginName } from '@constants/plugins'
 
 const getVetoTokenMint = (
   proposal: ProgramAccount<Proposal>,
