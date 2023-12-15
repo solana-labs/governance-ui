@@ -99,6 +99,8 @@ export const getNftGovpower = async (
   return power
 }
 
+export const useNftDelegators = async () => {}
+
 export const getPythGovPower = async (
   connection: Connection,
   user: PublicKey | undefined
