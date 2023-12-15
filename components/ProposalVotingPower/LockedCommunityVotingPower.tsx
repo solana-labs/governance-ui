@@ -44,7 +44,10 @@ export default function LockedCommunityVotingPower(props: Props) {
   if (isLoading || votingPowerLoading || !(votingPower && mint)) {
     return (
       <div
-        className={classNames(props.className, 'rounded-md bg-bkg-1 h-[76px]')}
+        className={classNames(
+          props.className,
+          'rounded-md bg-bkg-1 h-[76px] animate-pulse'
+        )}
       />
     )
   }
