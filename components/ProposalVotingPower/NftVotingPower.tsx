@@ -127,7 +127,7 @@ export default function NftVotingPower(props: Props) {
     )
   }
 
-  if (votingPower?.isZero()) {
+  if (nfts.length === 0) {
     return (
       <div className={classNames(props.className, 'text-xs', 'text-white/50')}>
         You do not have any voting power in this dao.
