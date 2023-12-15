@@ -15,7 +15,7 @@ import { useCallback, useMemo } from 'react'
 import { ON_NFT_VOTER_V2 } from '@constants/flags'
 import { NFT_PLUGINS_PKS } from '@constants/plugins'
 
-export const useVotingNfts = (ownerPk: PublicKey) => {
+export const useVotingNfts = (ownerPk: PublicKey | undefined) => {
   const { connection } = useConnection()
   const realmPk = useSelectedRealmPubkey()
   const { data: nfts } = useDigitalAssetsByOwner(ownerPk)
