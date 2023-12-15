@@ -1,9 +1,8 @@
-import { useVotingNfts } from '@hooks/queries/plugins/nftVoter'
 import { usePrevious } from '@hooks/usePrevious'
-import useUserOrDelegator from '@hooks/useUserOrDelegator'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
+import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { useEffect, useState } from 'react'
 import useTransactionsStore from 'stores/useTransactionStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
@@ -26,11 +25,10 @@ const NftVotingComponent = () => {
     (s) => s.state.currentRealmVotingClient
   )
   const wallet = useWalletOnePointOh()
-  const userPk = useUserOrDelegator()
-  const votingNfts = useVotingNfts(userPk) ?? []
+  const { votingNfts } = useNftPluginStore((s) => s.state)
   const votingInProgress = useNftProposalStore((s) => s.votingInProgress)
   const usedNfts = countedNftsForProposal.length
-  const totalVotingPower = votingNfts.length //  TODO this is sometimes incorrect, power per nft is determined by config
+  const totalVotingPower = votingNfts.length
   const remainingNftsToCount = totalVotingPower - usedNfts
   //in last tx there is max of 5 nfts
   const lastTransactionNftsCount = 5
