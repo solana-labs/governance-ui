@@ -7,7 +7,6 @@ import { notify } from '@utils/notifications'
 
 import useGatewayPluginStore from '../GatewayPlugin/store/gatewayPluginStore'
 import { getGatekeeperNetwork } from '../GatewayPlugin/sdk/accounts'
-import { DasNftObject } from '@hooks/queries/digitalAssets'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import * as heliumVsrSdk from '@helium/voter-stake-registry-sdk'
 import useWalletOnePointOh from './useWalletOnePointOh'
@@ -22,7 +21,6 @@ import {
   PYTH_PLUGIN_PK,
 } from '../constants/plugins'
 import useUserOrDelegator from './useUserOrDelegator'
-import { SUPPORT_CNFTS } from '@constants/flags'
 
 export function useVotingPlugins() {
   const realm = useRealmQuery().data?.result
@@ -108,19 +106,6 @@ export function useVotingPlugins() {
     //gatewayStore,
     realm,
   ])
-
-  const getIsFromCollection = useCallback(
-    (nft: DasNftObject) => {
-      const collection = nft.grouping.find((x) => x.group_key === 'collection')
-      return (
-        (SUPPORT_CNFTS || !nft.compression.compressed) &&
-        collection &&
-        usedCollectionsPks.includes(collection.group_value) &&
-        nft.creators?.filter((x) => x.verified).length > 0
-      )
-    },
-    [usedCollectionsPks]
-  )
 
   // initialise pyth plugin
   useEffect(() => {
