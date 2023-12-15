@@ -4,52 +4,79 @@ import { getRegistrarPDA } from '@utils/plugin/accounts'
 import { Program } from '@coral-xyz/anchor'
 import { IDL, NftVoter } from 'idls/nft_voter'
 import asFindable from '@utils/queries/asFindable'
-import { fetchRealmConfigQuery, useRealmConfigQuery } from '../realmConfig'
+import { fetchRealmConfigQuery } from '../realmConfig'
 import { useBatchedVoteDelegators } from '@components/VotePanel/useDelegators'
 import { useConnection } from '@solana/wallet-adapter-react'
 import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
 import { getNftGovpower } from '../governancePower'
 import { useQueries, useQuery } from '@tanstack/react-query'
-import { DasNftObject, useDigitalAssetsByOwner } from '../digitalAssets'
-import { useCallback, useMemo } from 'react'
+import {
+  fetchDigitalAssetsByOwner,
+  useDigitalAssetsByOwner,
+} from '../digitalAssets'
+import { useMemo } from 'react'
 import { ON_NFT_VOTER_V2 } from '@constants/flags'
+import queryClient from '../queryClient'
 import { NFT_PLUGINS_PKS } from '@constants/plugins'
+import { getNetworkFromEndpoint } from '@utils/connection'
 
 export const useVotingNfts = (ownerPk: PublicKey | undefined) => {
   const { connection } = useConnection()
   const realmPk = useSelectedRealmPubkey()
   const { data: nfts } = useDigitalAssetsByOwner(ownerPk)
-  const config = useRealmConfigQuery().data?.result
-  const currentPluginPk = config?.account.communityTokenConfig.voterWeightAddin
 
   const registrar = useQuery(nftRegistrarQuery(connection, realmPk)).data
     ?.result
 
   const usedCollectionsPks = useMemo(
-    () =>
-      currentPluginPk === undefined ||
-      !NFT_PLUGINS_PKS.includes(currentPluginPk.toBase58())
-        ? undefined
-        : registrar?.collectionConfigs.map((x) => x.collection.toBase58()),
-    [currentPluginPk, registrar?.collectionConfigs]
+    () => registrar?.collectionConfigs.map((x) => x.collection.toBase58()),
+    [registrar?.collectionConfigs]
   )
 
-  const getIsFromCollection = useCallback(
-    (nft: DasNftObject) => {
-      const collection = nft.grouping.find((x) => x.group_key === 'collection')
-      return (
-        (ON_NFT_VOTER_V2 || !nft.compression.compressed) &&
-        collection &&
-        usedCollectionsPks?.includes(collection.group_value) &&
-        nft.creators?.filter((x) => x.verified).length > 0
-      )
-    },
-    [usedCollectionsPks]
-  )
-  const votingNfts = nfts
-    ?.filter(getIsFromCollection)
-    .filter((x) => ON_NFT_VOTER_V2 || !x.compression.compressed)
+  const votingNfts = nfts?.filter((nft) => {
+    const collection = nft.grouping.find((x) => x.group_key === 'collection')
+    return (
+      (ON_NFT_VOTER_V2 || !nft.compression.compressed) &&
+      collection &&
+      usedCollectionsPks?.includes(collection.group_value) &&
+      nft.creators?.filter((x) => x.verified).length > 0
+    )
+  })
 
+  return votingNfts
+}
+
+export const getVotingNfts = async (
+  connection: Connection,
+  realmPk: PublicKey,
+  ownerPk: PublicKey
+) => {
+  const realm = fetchRealmByPubkey(connection, realmPk)
+  if (realm === undefined) throw new Error()
+  const config = await fetchRealmConfigQuery(connection, realmPk)
+  if (config.result === undefined) throw new Error()
+  const currentPluginPk =
+    config.result.account.communityTokenConfig.voterWeightAddin
+  if (currentPluginPk === undefined) throw new Error()
+  const { result: registrar } = await queryClient.fetchQuery(
+    nftRegistrarQuery(connection, realmPk)
+  )
+  if (registrar === undefined) throw new Error()
+  const usedCollectionsPks = registrar.collectionConfigs.map((x) =>
+    x.collection.toBase58()
+  )
+  const network = getNetworkFromEndpoint(connection.rpcEndpoint) as any
+  const nfts = await fetchDigitalAssetsByOwner(network, ownerPk)
+
+  const votingNfts = nfts?.filter((nft) => {
+    const collection = nft.grouping.find((x) => x.group_key === 'collection')
+    return (
+      (ON_NFT_VOTER_V2 || !nft.compression.compressed) &&
+      collection &&
+      usedCollectionsPks?.includes(collection.group_value) &&
+      nft.creators?.filter((x) => x.verified).length > 0
+    )
+  })
   return votingNfts
 }
 
@@ -99,7 +126,10 @@ export const nftRegistrarQuery = (
     const config = await fetchRealmConfigQuery(connection, realmPk)
     const programId =
       config.result?.account.communityTokenConfig.voterWeightAddin
-    if (programId === undefined)
+    if (
+      programId === undefined ||
+      !NFT_PLUGINS_PKS.includes(programId.toString())
+    )
       return { found: false, result: undefined } as const
 
     const { registrar: registrarPk } = await getRegistrarPDA(
