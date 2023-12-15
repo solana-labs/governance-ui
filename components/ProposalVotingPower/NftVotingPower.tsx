@@ -108,7 +108,6 @@ export default function NftVotingPower(props: Props) {
     loading: votingPowerLoading,
   } = useGovernancePowerAsync('community')
   const maxWeight = useNftPluginStore((s) => s.state.maxVoteRecord)
-  const isLoading = useNftPluginStore((s) => s.state.isLoadingNfts)
 
   const displayNfts = (nfts ?? []).slice(0, 3)
   const remainingCount = Math.max((nfts ?? []).length - 3, 0)
@@ -117,7 +116,7 @@ export default function NftVotingPower(props: Props) {
     : null
   const amount = new BigNumber((votingPower ?? 0).toString())
 
-  if (isLoading || votingPowerLoading) {
+  if (votingPowerLoading || nfts === undefined) {
     return (
       <div
         className={classNames(

@@ -43,10 +43,7 @@ export function useVotingPlugins() {
     handleSetPythClient,
   } = useVotePluginsClientStore()
 
-  const [setIsLoadingNfts, setNftMaxVoterWeight] = useNftPluginStore((s) => [
-    s.setIsLoadingNfts,
-    s.setMaxVoterWeight,
-  ])
+  const [setNftMaxVoterWeight] = useNftPluginStore((s) => [s.setMaxVoterWeight])
 
   // @asktree: you should select what you need from stores, not use entire thing
   const heliumStore = useHeliumVsrStore()

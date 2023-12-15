@@ -4,17 +4,14 @@ import create, { State } from 'zustand'
 interface nftPluginStore extends State {
   state: {
     maxVoteRecord: ProgramAccount<MaxVoterWeightRecord> | null
-    isLoadingNfts: boolean
   }
   setMaxVoterWeight: (
     maxVoterRecord: ProgramAccount<MaxVoterWeightRecord> | null
   ) => void
-  setIsLoadingNfts: (val: boolean) => void
 }
 
 const defaultState = {
   maxVoteRecord: null,
-  isLoadingNfts: false,
 }
 
 /**
@@ -25,12 +22,6 @@ const useNftPluginStore = create<nftPluginStore>((set, _get) => ({
   state: {
     ...defaultState,
   },
-  setIsLoadingNfts: (val) => {
-    set((s) => {
-      s.state.isLoadingNfts = val
-    })
-  },
-
   setMaxVoterWeight: (maxVoterRecord) => {
     set((s) => {
       s.state.maxVoteRecord = maxVoterRecord
