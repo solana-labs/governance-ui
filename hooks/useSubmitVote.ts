@@ -30,8 +30,8 @@ import { TransactionInstruction } from '@solana/web3.js'
 import useProgramVersion from './useProgramVersion'
 import useVotingTokenOwnerRecords from './useVotingTokenOwnerRecords'
 import { useMemo } from 'react'
+import { useTokenOwnerRecordsDelegatedToUser } from './queries/tokenOwnerRecord'
 import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
-import { useBatchedVoteDelegators } from '@components/VotePanel/useDelegators'
 
 export const useSubmitVote = () => {
   const wallet = useWalletOnePointOh()
@@ -57,8 +57,7 @@ export const useSubmitVote = () => {
   const selectedCouncilDelegator = useSelectedDelegatorStore(
     (s) => s.councilDelegator
   )
-  const communityDelegators = useBatchedVoteDelegators('community')
-  const councilDelegators = useBatchedVoteDelegators('council')
+  const delegators = useTokenOwnerRecordsDelegatedToUser()
 
   const { error, loading, execute } = useAsyncCallback(
     async ({
@@ -126,10 +125,14 @@ export const useSubmitVote = () => {
         actingAsWalletPk
       )
 
-      const relevantDelegators = (role === 'community'
-        ? communityDelegators
-        : councilDelegators
-      )?.map((x) => x.pubkey)
+      const relevantDelegators =
+        // if the user is manually selecting a delegator, don't auto-vote for the rest of the delegators
+        // ("delegator" is a slight misnomer here since you can select yourself, so that you dont vote with your other delegators)
+        relevantSelectedDelegator !== undefined
+          ? []
+          : delegators
+              ?.filter((x) => x.account.governingTokenMint.equals(relevantMint))
+              .map((x) => x.pubkey)
 
       try {
         await castVote(
