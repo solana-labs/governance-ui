@@ -3334,5 +3334,14 @@
     "ogImage": "/realms/SolshureDAO/img/solshure_dao.png",
     "website": "https://solshure.com/",
     "twitter": "@Solshure"
+  },
+  {
+    "symbol": "TBET",
+    "displayName": "TrustBet",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "9gSewHByQG9YbqpkVWp9qucLoqvQRZ4YKn5b6E5w6okt",
+    "bannerImage": "/realms/TrustBet/Bannerontransparent.png",
+    "ogImage": "realms/TrustBet/LRlogo.png",
+    "communityMint": "xpFbKJa92Ee1NSYEhc3b3BVk4im8YStXRaVW6EoW33w"
   }
 ]
