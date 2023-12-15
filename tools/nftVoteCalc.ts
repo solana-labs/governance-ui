@@ -7,6 +7,7 @@ import {
   getNftVoteRecordProgramAddress,
   getUsedNftsForProposal,
 } from 'NftVotePlugin/accounts'
+import { getVotingNfts } from '@hooks/queries/plugins/nftVoter'
 
 //lamports costs hardcoded for now.
 //TODO figure out better cost handling
@@ -17,20 +18,23 @@ const commentAvgCharacterCost = 6960
 const singleTransactionCosts = 5000
 
 export const calcCostOfNftVote = async (
+  connection: Connection,
   comment: ChatMessageBody | undefined,
   numberOfTransactions: number,
   proposalPk: PublicKey,
-  votingPlugin: VotingClient
+  votingPlugin: VotingClient,
+  realmPk: PublicKey,
+  userPk: PublicKey
 ) => {
   let nftToVoteCount = 0
-  const voterNfts = votingPlugin.votingNfts
+  const votingNfts = await getVotingNfts(connection, realmPk, userPk)
 
   const nftsAlreadyUsedToVote = await getUsedNftsForProposal(
     votingPlugin.client as NftVoterClient,
     proposalPk
   )
   if (nftsAlreadyUsedToVote.length > 0) {
-    for (const nft of voterNfts) {
+    for (const nft of votingNfts) {
       const { nftVoteRecord } = await getNftVoteRecordProgramAddress(
         proposalPk,
         nft.id,
@@ -45,7 +49,7 @@ export const calcCostOfNftVote = async (
       }
     }
   } else {
-    nftToVoteCount = voterNfts.length
+    nftToVoteCount = votingNfts.length
   }
 
   let baseCost = castVoteIxAndUpdateVoterWeightIxCost

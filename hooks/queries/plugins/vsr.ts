@@ -14,6 +14,7 @@ import useUserOrDelegator from '@hooks/useUserOrDelegator'
 import { useAsync } from 'react-async-hook'
 import { getLockTokensVotingPowerPerWallet } from 'VoteStakeRegistry/tools/deposits'
 import { useQuery } from '@tanstack/react-query'
+import { findPluginName } from '@constants/plugins'
 
 const VOTER_INFO_EVENT_NAME = 'VoterInfo'
 
@@ -179,12 +180,15 @@ export const useVsrGovpower = () => {
   const pluginId = config?.account.communityTokenConfig.voterWeightAddin
   const voterPk = useVoterPk(actingAsWallet).result?.voter
   const registrarPk = useRegistrarPk().result?.registrar
+  const pluginName = findPluginName(pluginId)
 
-  const enabled = !(
-    pluginId === undefined ||
-    registrarPk === undefined ||
-    voterPk === undefined
-  )
+  const enabled =
+    pluginName === 'VSR' &&
+    !(
+      pluginId === undefined ||
+      registrarPk === undefined ||
+      voterPk === undefined
+    )
   return useQuery({
     enabled,
     queryKey: enabled

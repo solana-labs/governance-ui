@@ -1,18 +1,16 @@
 import useRealm from '@hooks/useRealm'
 import { BigNumber } from 'bignumber.js'
-import { useMemo } from 'react'
 import classNames from 'classnames'
 
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 
 import { getMintMetadata } from '../instructions/programs/splToken'
 import { useRealmQuery } from '@hooks/queries/realm'
-import { useTokenOwnerRecordsDelegatedToUser } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 import { useVsrGovpower } from '@hooks/queries/plugins/vsr'
 import VSRCommunityVotingPower from 'VoteStakeRegistry/components/TokenBalance/VSRVotingPower'
-import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
 import DepositCommunityTokensBtn from 'VoteStakeRegistry/components/TokenBalance/DepositCommunityTokensBtn'
+import useDelegators from '@components/VotePanel/useDelegators'
 
 interface Props {
   className?: string
@@ -40,24 +38,8 @@ export default function LockedCommunityVotingPower(props: Props) {
   const tokenName =
     getMintMetadata(depositMint)?.name ?? realm?.account.name ?? ''
 
-  const delegatedTors = useTokenOwnerRecordsDelegatedToUser()
-  const selectedDelegator = useSelectedDelegatorStore(
-    (s) => s.communityDelegator
-  )
   // memoize useAsync inputs to prevent constant refetch
-  const relevantDelegators = useMemo(
-    () =>
-      selectedDelegator !== undefined // ignore delegators if any delegator is selected
-        ? []
-        : delegatedTors
-            ?.filter(
-              (x) =>
-                x.account.governingTokenMint.toString() ===
-                realm?.account.communityMint.toString()
-            )
-            .map((x) => x.account.governingTokenOwner),
-    [delegatedTors, realm?.account.communityMint, selectedDelegator]
-  )
+  const relevantDelegators = useDelegators('community')
 
   if (isLoading || votingPowerLoading || !(votingPower && mint)) {
     return (
