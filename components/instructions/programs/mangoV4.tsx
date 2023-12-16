@@ -880,8 +880,8 @@ const instructions = () => ({
               : undefined,
           interestCurveScaling: args.interestCurveScalingOpt,
           interestTargetUtilization: args.interestTargetUtilizationOpt,
-          maintWeightShiftStart: args.maintWeightShiftStartOpt.toNumber(),
-          maintWeightShiftEnd: args.maintWeightShiftEndOpt.toNumber(),
+          maintWeightShiftStart: args.maintWeightShiftStartOpt?.toNumber(),
+          maintWeightShiftEnd: args.maintWeightShiftEndOpt?.toNumber(),
           maintWeightShiftAssetTarget: args.maintWeightShiftAssetTargetOpt,
           maintWeightShiftLiabTarget: args.maintWeightShiftLiabTargetOpt,
           depositLimit: args.depositLimitOpt?.toString(),
@@ -950,8 +950,8 @@ const instructions = () => ({
                   ...suggestedPreset,
                 }),
                 groupInsuranceFund: suggestedPreset.groupInsuranceFund,
-                maintWeightShiftStart: args.maintWeightShiftStartOpt.toNumber(),
-                maintWeightShiftEnd: args.maintWeightShiftEndOpt.toNumber(),
+                maintWeightShiftStart: args.maintWeightShiftStartOpt?.toNumber(),
+                maintWeightShiftEnd: args.maintWeightShiftEndOpt?.toNumber(),
                 maintWeightShiftAssetTarget:
                   args.maintWeightShiftAssetTargetOpt,
                 maintWeightShiftLiabTarget: args.maintWeightShiftLiabTargetOpt,
@@ -1360,18 +1360,22 @@ const instructions = () => ({
                 currentValue={bankFormattedValues?.depositLimit}
                 suggestedVal={invalidFields.depositLimit}
               />
-              <DisplayNullishProperty
-                label="Maint Weight Shift Abort"
-                value={`${parsedArgs.maintWeightShiftAbort}`}
-                currentValue={null}
-                suggestedVal={null}
-              />
-              <DisplayNullishProperty
-                label="SetFallbackOracle"
-                value={`${parsedArgs.setFallbackOracle}`}
-                currentValue={null}
-                suggestedVal={null}
-              />
+              {parsedArgs?.maintWeightShiftAbort && (
+                <DisplayNullishProperty
+                  label="Maint Weight Shift Abort"
+                  value={`${parsedArgs.maintWeightShiftAbort}`}
+                  currentValue={null}
+                  suggestedVal={null}
+                />
+              )}
+              {parsedArgs?.setFallbackOracle && (
+                <DisplayNullishProperty
+                  label="Set fall back oracle"
+                  value={`${parsedArgs.setFallbackOracle}`}
+                  currentValue={null}
+                  suggestedVal={null}
+                />
+              )}
             </div>
             <h3>Raw values</h3>
             <div>{info}</div>
