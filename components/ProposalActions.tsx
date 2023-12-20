@@ -282,6 +282,7 @@ const ProposalActionsPanel = () => {
                           isValid: true,
                           governance: undefined,
                           customHoldUpTime: tx.account.holdUpTime,
+                          chunkBy: 2,
                         },
                       })
                   )

@@ -1591,41 +1591,45 @@ async function getDataObjectFlattened<T>(
   connection: Connection,
   data: Uint8Array
 ) {
-  const client = await getClient(connection)
-  const decodedInstructionData = new BorshInstructionCoder(
-    client.program.idl
-  ).decode(Buffer.from(data))?.data as any
+  try {
+    const client = await getClient(connection)
+    const decodedInstructionData = new BorshInstructionCoder(
+      client.program.idl
+    ).decode(Buffer.from(data))?.data as any
 
-  //   console.log(
-  //     client.program.idl.instructions.map((ix) => {
-  //       const sh = sighash('global', ix.name)
-  //       return {
-  //         name: ix.name,
-  //         sh: `${sh[0]}${sh[1]}`,
-  //       }
-  //     })
-  //   )
+    //   console.log(
+    //     client.program.idl.instructions.map((ix) => {
+    //       const sh = sighash('global', ix.name)
+    //       return {
+    //         name: ix.name,
+    //         sh: `${sh[0]}${sh[1]}`,
+    //       }
+    //     })
+    //   )
 
-  const args = {}
-  for (const key of Object.keys(decodedInstructionData)) {
-    const val = decodedInstructionData[key]
-    if (val !== null) {
-      if (
-        typeof val === 'object' &&
-        !Array.isArray(val) &&
-        !(val instanceof BN) &&
-        !(val instanceof PublicKey)
-      ) {
-        for (const innerKey of Object.keys(val)) {
-          const innerVal = val[innerKey]
-          args[`${key}.${innerKey}`] = innerVal
+    const args = {}
+    for (const key of Object.keys(decodedInstructionData)) {
+      const val = decodedInstructionData[key]
+      if (val !== null) {
+        if (
+          typeof val === 'object' &&
+          !Array.isArray(val) &&
+          !(val instanceof BN) &&
+          !(val instanceof PublicKey)
+        ) {
+          for (const innerKey of Object.keys(val)) {
+            const innerVal = val[innerKey]
+            args[`${key}.${innerKey}`] = innerVal
+          }
+        } else {
+          args[key] = val
         }
-      } else {
-        args[key] = val
       }
     }
+    return args as T
+  } catch (e) {
+    return {} as T
   }
-  return args as T
 }
 
 const displayArgs = async (connection: Connection, data: Uint8Array) => {

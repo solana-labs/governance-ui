@@ -348,7 +348,7 @@ export const getSuggestedCoinTier = async (
     )
 
     const tier =
-      indexForTierFromSwaps > -1 ? TIERS[indexForTierFromSwaps] : 'SHIT'
+      indexForTierFromSwaps > -1 ? TIERS[indexForTierFromSwaps] : 'UNTRUSTED'
 
     const tierLowerThenCurrent =
       tier === 'ULTRA_PREMIUM' || tier === 'PREMIUM'
@@ -370,7 +370,7 @@ export const getSuggestedCoinTier = async (
     }
   } catch (e) {
     return {
-      tier: 'SHIT',
+      tier: 'UNTRUSTED',
       priceImpact: 100,
     }
   }
