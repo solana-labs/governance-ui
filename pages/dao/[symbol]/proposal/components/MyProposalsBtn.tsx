@@ -34,11 +34,15 @@ import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
 import {
+  tokenOwnerRecordQueryKeys,
   useUserCommunityTokenOwnerRecord,
   useUserCouncilTokenOwnerRecord,
 } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
-import { useVoteRecordsByOwnerQuery } from '@hooks/queries/voteRecord'
+import {
+  useVoteRecordsByOwnerQuery,
+  voteRecordQueryKeys,
+} from '@hooks/queries/voteRecord'
 import useProgramVersion from '@hooks/useProgramVersion'
 import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
 import { useConnection } from '@solana/wallet-adapter-react'
@@ -164,18 +168,19 @@ const MyProposalsBn = () => {
       } = await connection.getLatestBlockhash()
 
       const transactions: Transaction[] = []
+      const instructions: TransactionInstruction[] = []
       for (let i = 0; i < proposalsArray.length; i++) {
         const proposal = proposalsArray[i]
 
-        const instructions: TransactionInstruction[] = []
-
         await withInstruction(instructions, proposal)
-
+      }
+      const instructionChunks = chunks(instructions, 8)
+      for (const chunk of instructionChunks) {
         const transaction = new Transaction({
           recentBlockhash,
           feePayer: wallet.publicKey!,
         })
-        transaction.add(...instructions)
+        transaction.add(...chunk)
         transaction.recentBlockhash = recentBlockhash
         transaction.setSigners(
           // fee payed by the wallet owner
@@ -191,6 +196,14 @@ const MyProposalsBn = () => {
       )
       queryClient.invalidateQueries({
         queryKey: proposalQueryKeys.all(connection.rpcEndpoint),
+      })
+      queryClient.invalidateQueries({
+        queryKey: tokenOwnerRecordQueryKeys.all(connection.rpcEndpoint),
+      })
+      queryClient.invalidateQueries({
+        queryKey: voteRecordQueryKeys.all(
+          connection.rpcEndpoint.includes('devnet') ? 'devnet' : 'mainnet'
+        ),
       })
     } catch (e) {
       console.log(e)

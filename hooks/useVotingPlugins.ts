@@ -7,7 +7,6 @@ import { notify } from '@utils/notifications'
 
 import useGatewayPluginStore from '../GatewayPlugin/store/gatewayPluginStore'
 import { getGatekeeperNetwork } from '../GatewayPlugin/sdk/accounts'
-import { DasNftObject } from '@hooks/queries/digitalAssets'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import * as heliumVsrSdk from '@helium/voter-stake-registry-sdk'
 import useWalletOnePointOh from './useWalletOnePointOh'
@@ -22,9 +21,6 @@ import {
   PYTH_PLUGIN_PK,
 } from '../constants/plugins'
 import useUserOrDelegator from './useUserOrDelegator'
-import { getNetworkFromEndpoint } from '@utils/connection'
-import { fetchDigitalAssetsByOwner } from './queries/digitalAssets'
-import { ON_NFT_VOTER_V2, SUPPORT_CNFTS } from '@constants/flags'
 
 export function useVotingPlugins() {
   const realm = useRealmQuery().data?.result
@@ -45,15 +41,7 @@ export function useVotingPlugins() {
     handleSetPythClient,
   } = useVotePluginsClientStore()
 
-  const [
-    setIsLoadingNfts,
-    setNftMaxVoterWeight,
-    setVotingNfts,
-  ] = useNftPluginStore((s) => [
-    s.setIsLoadingNfts,
-    s.setMaxVoterWeight,
-    s.setVotingNfts,
-  ])
+  const [setNftMaxVoterWeight] = useNftPluginStore((s) => [s.setMaxVoterWeight])
 
   // @asktree: you should select what you need from stores, not use entire thing
   const heliumStore = useHeliumVsrStore()
@@ -118,19 +106,6 @@ export function useVotingPlugins() {
     //gatewayStore,
     realm,
   ])
-
-  const getIsFromCollection = useCallback(
-    (nft: DasNftObject) => {
-      const collection = nft.grouping.find((x) => x.group_key === 'collection')
-      return (
-        (SUPPORT_CNFTS || !nft.compression.compressed) &&
-        collection &&
-        usedCollectionsPks.includes(collection.group_value) &&
-        nft.creators?.filter((x) => x.verified).length > 0
-      )
-    },
-    [usedCollectionsPks]
-  )
 
   // initialise pyth plugin
   useEffect(() => {
@@ -358,47 +333,12 @@ export function useVotingPlugins() {
     realm,
   ])
 
-  const handleGetNfts = useCallback(async () => {
-    setIsLoadingNfts(true)
-    if (!wallet?.publicKey) return
-    try {
-      // const nfts = await getNfts(wallet.publicKey, connection)
-      const network = getNetworkFromEndpoint(connection.endpoint)
-      if (network === 'localnet') throw new Error()
-      const nfts = await fetchDigitalAssetsByOwner(network, wallet.publicKey)
-      const votingNfts = nfts
-        .filter(getIsFromCollection)
-        .filter((x) => ON_NFT_VOTER_V2 || !x.compression.compressed)
-      const nftsWithMeta = votingNfts
-      setVotingNfts(nftsWithMeta, currentClient, nftMintRegistrar)
-    } catch (e) {
-      console.log(e)
-      notify({
-        message: `Something went wrong can't fetch nfts: ${e}`,
-        type: 'error',
-      })
-    }
-    setIsLoadingNfts(false)
-  }, [
-    connection,
-    currentClient,
-    getIsFromCollection,
-    nftMintRegistrar,
-    setIsLoadingNfts,
-    setVotingNfts,
-    wallet?.publicKey,
-  ])
-
   useEffect(() => {
     if (usedCollectionsPks.length && realm) {
-      if (connected && currentClient.walletPk?.toBase58()) {
-        handleGetNfts()
-      }
       handleMaxVoterWeight()
     } else if (realm) {
       handleGetHeliumVsrVoting()
     } else {
-      setVotingNfts([], currentClient, nftMintRegistrar)
       setNftMaxVoterWeight(null)
     }
   }, [
@@ -406,12 +346,10 @@ export function useVotingPlugins() {
     currentClient,
     currentPluginPk,
     handleGetHeliumVsrVoting,
-    handleGetNfts,
     handleMaxVoterWeight,
     nftMintRegistrar,
     realm,
     setNftMaxVoterWeight,
-    setVotingNfts,
     usedCollectionsPks.length,
   ])
 }
