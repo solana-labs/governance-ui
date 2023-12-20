@@ -50,7 +50,7 @@ export function FlagInstructionErrorButton({
   ) {
     return null
   }
-  console.log(proposal.account.tokenOwnerRecord.toBase58())
+
   const onFlagError = async () => {
     try {
       const rpcContext = new RpcContext(
