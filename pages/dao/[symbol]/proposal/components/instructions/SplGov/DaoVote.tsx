@@ -43,7 +43,7 @@ type DualFinanceVoteForm = {
   voteOption: 'Yes' | 'No'
 }
 
-const DualVote = ({
+const DaoVote = ({
   index,
   governance,
 }: {
@@ -283,4 +283,4 @@ const DualVote = ({
   )
 }
 
-export default DualVote
+export default DaoVote
