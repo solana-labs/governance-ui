@@ -4,12 +4,10 @@ import {
   Governance,
   ProgramAccount,
   serializeInstructionToBase64,
-  SYSTEM_PROGRAM_ID,
 } from '@solana/spl-governance'
 import { validateInstruction } from '@utils/instructionTools'
 import { NameValue, UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
-import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NewProposalContext } from '../../../new'
 import InstructionForm, { InstructionInput } from '../FormCreator'
@@ -19,9 +17,10 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { PublicKey } from '@solana/web3.js'
 import { InformationCircleIcon } from '@heroicons/react/outline'
 import Tooltip from '@components/Tooltip'
-import { getRegistrarPDA } from '@utils/plugin/accounts'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import {availablePasses} from "../../../../../../../GatewayPlugin/config";
+import {createCivicRegistrarIx} from "@utils/plugin/gateway";
 
 interface CreateGatewayRegistrarForm {
   governedAccount: AssetAccount | undefined
@@ -38,7 +37,6 @@ const CreateGatewayPluginRegistrar = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const realm = useRealmQuery().data?.result
-  const { realmInfo } = useRealm()
   const gatewayClient = useVotePluginsClientStore((s) => s.state.gatewayClient)
   const { assetAccounts } = useGovernanceAssets()
   const wallet = useWalletOnePointOh()
@@ -63,30 +61,12 @@ const CreateGatewayPluginRegistrar = ({
       form!.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const { registrar } = await getRegistrarPDA(
-        realm!.pubkey,
-        realm!.account.communityMint,
-        gatewayClient!.program.programId
+      const createRegistrarIx = await createCivicRegistrarIx(
+        realm!,
+          wallet.publicKey!,
+          gatewayClient!,
+          chosenGatekeeperNetwork!,
       )
-
-      const remainingAccounts = form!.predecessor
-        ? [{ pubkey: form!.predecessor, isSigner: false, isWritable: false }]
-        : []
-
-      const createRegistrarIx = await gatewayClient!.program.methods
-        .createRegistrar(false)
-        .accounts({
-          registrar,
-          realm: realm!.pubkey,
-          governanceProgramId: realmInfo!.programId,
-          realmAuthority: realm!.account.authority!,
-          governingTokenMint: realm!.account.communityMint!,
-          gatekeeperNetwork: chosenGatekeeperNetwork,
-          payer: wallet.publicKey!,
-          systemProgram: SYSTEM_PROGRAM_ID,
-        })
-        .remainingAccounts(remainingAccounts)
-        .instruction()
       serializedInstruction = serializeInstructionToBase64(createRegistrarIx)
     }
     return {
@@ -146,28 +126,7 @@ const CreateGatewayPluginRegistrar = ({
           </span>
         </Tooltip>
       ),
-      options: [
-        {
-          name: 'Bot Resistance',
-          value: 'ignREusXmGrscGNUesoU9mxfds9AiYTezUKex2PsZV6',
-        },
-        {
-          name: 'Uniqueness',
-          value: 'uniqobk8oGh4XBLMqM68K8M2zNu3CdYX7q5go7whQiv',
-        },
-        {
-          name: 'ID Verification',
-          value: 'bni1ewus6aMxTxBi5SAfzEmmXLf8KcVFRmTfproJuKw',
-        },
-        {
-          name: 'ID Verification for DeFi',
-          value: 'gatbGF9DvLAw3kWyn1EmH5Nh1Sqp8sTukF7yaQpSc71',
-        },
-        {
-          name: 'Other',
-          value: '',
-        },
-      ],
+      options: availablePasses as any,
     },
     {
       label: 'Other Pass',
