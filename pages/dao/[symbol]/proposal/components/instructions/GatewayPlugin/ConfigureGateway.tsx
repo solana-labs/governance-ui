@@ -15,10 +15,10 @@ import { InstructionInputType } from '../inputInstructionType'
 import { PublicKey } from '@solana/web3.js'
 import { getValidatedPublickKey } from '@utils/validations'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { getRegistrarPDA } from '@utils/plugin/accounts'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import {configureCivicRegistrarIx} from "@utils/plugin/gateway";
 
 interface ConfigureGatewayForm {
   governedAccount: AssetAccount | undefined
@@ -55,24 +55,11 @@ const ConfigureGatewayPlugin = ({
       form!.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const remainingAccounts = form!.predecessor
-        ? [{ pubkey: form!.predecessor, isSigner: false, isWritable: false }]
-        : []
-      const { registrar } = await getRegistrarPDA(
-        realm!.pubkey,
-        realm!.account.communityMint,
-        gatewayClient!.program.programId
+      const configureRegistrarTx = await configureCivicRegistrarIx(
+          realm!,
+          gatewayClient!,
+          chosenGatekeeperNetwork!,
       )
-      const configureRegistrarTx = await gatewayClient!.program.methods
-        .configureRegistrar(false)
-        .accounts({
-          registrar,
-          realm: realm!.pubkey,
-          realmAuthority: realm!.account.authority!,
-          gatekeeperNetwork: chosenGatekeeperNetwork,
-        })
-        .remainingAccounts(remainingAccounts)
-        .instruction()
       serializedInstruction = serializeInstructionToBase64(configureRegistrarTx)
     }
     return {

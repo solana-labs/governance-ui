@@ -1,6 +1,7 @@
-import { NFT_PLUGINS_PKS } from '@constants/plugins';
+import { GATEWAY_PLUGINS_PKS, NFT_PLUGINS_PKS } from '@constants/plugins';
 import { AnchorProvider, Wallet } from '@project-serum/anchor';
 
+import { GatewayClient } from '@solana/governance-program-library';
 import {
   RealmConfig,
   RealmConfigAccount,
@@ -18,6 +19,7 @@ import { tryGetNftRegistrar } from 'VoteStakeRegistry/sdk/api';
 
 import { getNetworkFromEndpoint } from '@utils/connection';
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts';
+import { tryGetRegistar as tryGetGatewayRegistrar } from '@utils/plugin/gateway';
 import { parseMintAccountData, MintAccount } from '@utils/tokens';
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient';
 
@@ -32,6 +34,7 @@ export interface Config {
   nftCollectionSize: number;
   nftCollectionWeight: BN;
   realmAuthority?: PublicKey;
+  civicPassType?: PublicKey;
 }
 
 export async function fetchConfig(
@@ -82,11 +85,13 @@ export async function fetchConfig(
   let nftCollection: PublicKey | undefined = undefined;
   let nftCollectionSize = 0;
   let nftCollectionWeight = new BN(0);
+  let civicPassType: PublicKey | undefined = undefined;
   const defaultOptions = AnchorProvider.defaultOptions();
   const anchorProvider = new AnchorProvider(connection, wallet, defaultOptions);
 
   const isDevnet = getNetworkFromEndpoint(connection.rpcEndpoint) === 'devnet';
   const nftClient = await NftVoterClient.connect(anchorProvider, isDevnet);
+  const gatewayClient = await GatewayClient.connect(anchorProvider, isDevnet);
   const pluginPublicKey =
     configProgramAccount.account.communityTokenConfig.voterWeightAddin;
 
@@ -110,6 +115,16 @@ export async function fetchConfig(
         nftCollectionSize = collections[0].size;
         nftCollectionWeight = collections[0].weight;
       }
+    }
+  }
+
+  if (
+    pluginPublicKey &&
+    GATEWAY_PLUGINS_PKS.includes(pluginPublicKey.toBase58())
+  ) {
+    if (gatewayClient && realm.account.communityMint) {
+      const registrar = await tryGetGatewayRegistrar(realm, gatewayClient);
+      civicPassType = registrar?.gatekeeperNetwork;
     }
   }
 
@@ -161,6 +176,7 @@ export async function fetchConfig(
     nftCollection,
     nftCollectionSize,
     nftCollectionWeight,
+    civicPassType,
     config: realmConfig,
     configAccount: configProgramAccount.account,
     realmAuthority: realm.account.authority,

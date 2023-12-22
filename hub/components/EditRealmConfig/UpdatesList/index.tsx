@@ -10,6 +10,7 @@ import { PublicKey } from '@solana/web3.js';
 import { BigNumber } from 'bignumber.js';
 import BN from 'bn.js';
 
+import { availablePasses } from '../../../../GatewayPlugin/config';
 import { Config } from '../fetchConfig';
 import { getLabel } from '../TokenTypeSelector';
 import {
@@ -45,6 +46,7 @@ export function buildUpdates(config: Config) {
     nftCollection: config.nftCollection,
     nftCollectionSize: config.nftCollectionSize,
     nftCollectionWeight: config.nftCollectionWeight,
+    civicPassType: config.civicPassType,
   };
 }
 
@@ -80,6 +82,16 @@ export function diff<T extends { [key: string]: unknown }>(
 
   return diffs;
 }
+
+const civicPassTypeLabel = (civicPassType: PublicKey | undefined): string => {
+  if (!civicPassType) return 'None';
+  const foundPass = availablePasses.find(
+    (pass) => pass.value === civicPassType?.toBase58(),
+  );
+
+  if (!foundPass) return 'Other (' + abbreviateAddress(civicPassType) + ')';
+  return foundPass.name;
+};
 
 function votingStructureText(
   votingPluginDiff: [PublicKey | undefined, PublicKey | undefined],
@@ -156,7 +168,8 @@ export function UpdatesList(props: Props) {
     'communityMaxVotingPlugin' in updates ||
     'nftCollection' in updates ||
     'nftCollectionSize' in updates ||
-    'nftCollectionWeight' in updates;
+    'nftCollectionWeight' in updates ||
+    'civicPassType' in updates;
 
   const hasCouncilUpdates =
     'councilTokenType' in updates ||
@@ -415,6 +428,19 @@ export function UpdatesList(props: Props) {
                       {new BigNumber(updates.nftCollectionWeight[0].toString())
                         .shiftedBy(-props.config.communityMint.account.decimals)
                         .toFormat()}
+                    </div>
+                  </div>
+                }
+              />
+            )}
+            {'civicPassType' in updates && (
+              <SummaryItem
+                label="Civic Pass Type"
+                value={
+                  <div className="flex items-baseline">
+                    <div>{civicPassTypeLabel(updates.civicPassType[1])}</div>
+                    <div className="ml-3 text-base text-neutral-500 line-through">
+                      {civicPassTypeLabel(updates.civicPassType[0])}
                     </div>
                   </div>
                 }
