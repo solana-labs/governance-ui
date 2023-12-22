@@ -54,6 +54,8 @@ import {
 } from '@hooks/queries/proposal'
 import queryClient from '@hooks/queries/queryClient'
 import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
+import { getFeeEstimate } from '@tools/feeEstimate'
+import { createComputeBudgetIx } from '@blockworks-foundation/mango-v4'
 
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
@@ -263,9 +265,10 @@ const REALM = () => {
 
     try {
       setIsMultiVoting(true)
-      const {
-        blockhash: recentBlockhash,
-      } = await connection.getLatestBlockhash()
+      const [{ blockhash: recentBlockhash }, fee] = await Promise.all([
+        connection.getLatestBlockhash(),
+        getFeeEstimate(connection),
+      ])
 
       const transactions: Transaction[] = []
       for (let i = 0; i < selectedProposals.length; i++) {
@@ -311,8 +314,9 @@ const REALM = () => {
         }
 
         const transaction = new Transaction()
-        transaction.add(...instructions)
+        transaction.add(...[createComputeBudgetIx(fee), ...instructions])
         transaction.recentBlockhash = recentBlockhash
+        transaction.feePayer = wallet.publicKey!
         transaction.setSigners(
           // fee payed by the wallet owner
           wallet.publicKey!

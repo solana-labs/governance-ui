@@ -1,16 +1,14 @@
 import {
   Bank,
-  MANGO_V4_ID,
-  MangoClient,
   OracleProvider,
   USDC_MINT,
   toUiDecimals,
 } from '@blockworks-foundation/mango-v4'
 import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
-import { AnchorProvider, BN, BorshInstructionCoder } from '@coral-xyz/anchor'
+import { BN, BorshInstructionCoder } from '@coral-xyz/anchor'
 import { AccountMetaData } from '@solana/spl-governance'
-import { Connection, Keypair, PublicKey } from '@solana/web3.js'
-import EmptyWallet, {
+import { Connection, PublicKey } from '@solana/web3.js'
+import {
   getSuggestedCoinTier,
   compareObjectsAndGetDifferentKeys,
   FlatListingArgs,
@@ -42,7 +40,7 @@ import {
 } from '@blockworks-foundation/mango-v4-settings/lib/helpers/listingTools'
 import { tryParseKey } from '@tools/validators/pubkey'
 import Loading from '@components/Loading'
-import queryClient from '@hooks/queries/queryClient'
+import { getClient, getGroupForClient } from '@utils/mangoV4Tools'
 // import { snakeCase } from 'snake-case'
 // import { sha256 } from 'js-sha256'
 
@@ -610,7 +608,7 @@ const instructions = () => ({
 
       const info = await displayArgs(connection, data)
       const client = await getClient(connection)
-      const mangoGroup = await client.getGroup(group)
+      const mangoGroup = await getGroupForClient(client, group)
       const banks = [...mangoGroup.banksMapByMint.values()].map((x) => x[0])
       let baseMint = banks.find((x) => x.publicKey.equals(baseBank))?.mint
       let quoteMint = banks.find((x) => x.publicKey.equals(quoteBank))?.mint
@@ -1553,38 +1551,6 @@ const instructions = () => ({
 
 export const MANGO_V4_INSTRUCTIONS = {
   '4MangoMjqJ2firMokCjjGgoK8d4MXcrgL7XJaL3w6fVg': instructions(),
-}
-
-const getClient = async (connection: Connection) => {
-  const client = await queryClient.fetchQuery({
-    queryKey: ['mangoClient', connection.rpcEndpoint],
-    queryFn: async () => {
-      const options = AnchorProvider.defaultOptions()
-      const adminProvider = new AnchorProvider(
-        connection,
-        new EmptyWallet(Keypair.generate()),
-        options
-      )
-      const client = await MangoClient.connect(
-        adminProvider,
-        'mainnet-beta',
-        MANGO_V4_ID['mainnet-beta']
-      )
-
-      return client
-    },
-  })
-  return client
-}
-const getGroupForClient = async (client: MangoClient, groupPk: PublicKey) => {
-  const group = await queryClient.fetchQuery({
-    queryKey: ['mangoGroup', groupPk.toBase58(), client.connection.rpcEndpoint],
-    queryFn: async () => {
-      const response = await client.getGroup(groupPk)
-      return response
-    },
-  })
-  return group
 }
 
 async function getDataObjectFlattened<T>(
