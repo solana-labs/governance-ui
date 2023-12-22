@@ -8,15 +8,23 @@ type Profile = BaseProfile & {
   exists: boolean
 }
 
+const profiles = new Map<string, Promise<BaseProfile>>()
+
 const getProfile = async (
   publicKey: PublicKey,
   connection?: Connection
-): Promise<BaseProfile> =>
-  CivicProfile.get(publicKey.toBase58(), {
-    solana: {
-      connection,
-    },
-  })
+): Promise<BaseProfile> => {
+    const cached = profiles.get(publicKey.toBase58());
+    if (cached) return cached;
+
+    const options = connection ? { solana: { connection } } : undefined;
+
+    const promise = CivicProfile.get(publicKey.toBase58(), options);
+
+    profiles.set(publicKey.toBase58(), promise)
+
+    return promise;
+}
 
 const profileIsSet = (profile: BaseProfile): boolean =>
   !!profile.name || !!profile.image || !!profile.headline

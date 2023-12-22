@@ -1,4 +1,3 @@
-import { DisplayAddress } from '@cardinal/namespaces-components'
 import { getExplorerUrl } from '@components/explorer/tools'
 import {
   ChatAltIcon,
@@ -54,6 +53,7 @@ import {
 } from '@hooks/queries/digitalAssets'
 import { useNftRegistrarCollection } from '@hooks/useNftRegistrarCollection'
 import { NFT_PLUGINS_PKS } from '@constants/plugins'
+import {ProfileName} from "@components/Profile/ProfileName";
 
 const RevokeMembership: FC<{ member: PublicKey; mint: PublicKey }> = ({
   member,
@@ -401,9 +401,8 @@ const MemberOverview = ({
     <>
       <div className="flex items-center justify-between mb-2 py-2">
         <h2 className="mb-0">
-          <DisplayAddress
-            connection={connection.current}
-            address={walletPublicKey}
+          <ProfileName
+            publicKey={walletPublicKey}
             height="12px"
             width="100px"
             dark={true}

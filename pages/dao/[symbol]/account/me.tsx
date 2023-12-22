@@ -4,13 +4,18 @@ import LockTokensAccount from 'VoteStakeRegistry/components/Account/LockTokensAc
 import { LockTokensAccount as HeliumLockTokensAccount } from 'HeliumVotePlugin/components/LockTokensAccount'
 import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
 import Account from './Account'
+import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 
 const AccountPage: React.FC = () => {
   const { vsrMode } = useRealm()
-
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const { data: tokenOwnerRecordPk } = useAddressQuery_CommunityTokenOwner()
 
-  if (vsrMode) {
+  if (
+    vsrMode &&
+    (!ownTokenRecord ||
+      ownTokenRecord.account.governingTokenDepositAmount.isZero())
+  ) {
     if (vsrMode === 'helium') {
       return (
         <HeliumLockTokensAccount /* tokenOwnerRecordPk={tokenOwnerRecordPk} */>

@@ -240,7 +240,7 @@ export default function useGovernanceAssets() {
         canUseTokenTransferInstruction &&
         currentPluginPk &&
         VSR_PLUGIN_PKS.includes(currentPluginPk.toBase58()),
-      packageId: PackageEnum.Common,
+      packageId: PackageEnum.VsrPlugin,
     },
     [Instructions.CloseTokenAccount]: {
       name: 'Close token account',
@@ -281,7 +281,7 @@ export default function useGovernanceAssets() {
         canUseTokenTransferInstruction &&
         currentPluginPk &&
         VSR_PLUGIN_PKS.includes(currentPluginPk.toBase58()),
-      packageId: PackageEnum.Common,
+      packageId: PackageEnum.VsrPlugin,
     },
     [Instructions.JoinDAO]: {
       name: 'Join a DAO',

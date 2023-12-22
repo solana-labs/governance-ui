@@ -76,10 +76,7 @@ const SwitchboardFundOracle = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const program = await SwitchboardProgram.load(
-        connection.cluster === 'devnet' ? 'devnet' : 'mainnet-beta',
-        connection.current
-      )
+      const program = await SwitchboardProgram.load(connection.current)
       const [oracle, oracleAccountData] = await AggregatorAccount.load(
         program,
         form.oraclePublicKey

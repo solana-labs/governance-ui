@@ -36,6 +36,8 @@ import { DUAL_INSTRUCTIONS } from './programs/dual'
 import { SWITCHBOARD_INSTRUCTIONS } from './programs/switchboard'
 import { STAKE_INSTRUCTIONS } from './programs/stake'
 import { MAPLE_FINANCE_PROGRAM_INSTRUCTIONS } from './programs/mapleFinance'
+import dayjs from 'dayjs'
+import { JUPITER_REF } from './programs/jupiterRef'
 
 /**
  * Default governance program id instance
@@ -45,6 +47,8 @@ export const DEFAULT_GOVERNANCE_PROGRAM_ID =
 export const DEFAULT_GOVERNANCE_PROGRAM_VERSION = 3
 
 export const MANGO_DAO_TREASURY = '9RGoboEjmaAjSCXsKi6p6zJucnwF3Eg5NUN9jPS6ziL3'
+export const MANGO_INSTRUCTION_FORWARDER =
+  'ixFPGCPYEp5GzhoahhHFVL8VVzkq1kc2eeFZh3qpYca'
 
 // Well known account names displayed on the instruction card
 export const ACCOUNT_NAMES = {
@@ -52,9 +56,14 @@ export const ACCOUNT_NAMES = {
   '9pDEi3yT9ooT1uw1PApQDYK65advJs4Nt65EJG1m59Yq':
     'Mango Developer Council Mint',
   Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z: 'Mango DAO MNGO Treasury Vault',
+  HvBKrep6TbUpLVB4Lyd5T56LohhpPf3ZdNt7wpTiKqn3: 'Mango DAO Game Master Wallet',
   DiSDgMz4DeNKHXkpqUGoukr1YM9xxc1wH9gusZnMa1ga: 'Mango DAO Dual Realm Deposit',
+  '2gDu12CM56g18Ukc9R1EdmEbToXqGTrnBEqR3zKfVKgt':
+    'Mango DAO BLAZE Realm Deposit',
   '8gjzxiqcU87cvRc7hFiUJgxqLSV7AQnSttfWC5fD9aim':
     'Mango DAO Treasury Council Mint',
+  G1Yc5696GcfL28uAWG6iCaKJwZd8sQzwPJTc2UacsjHN:
+    'Mango DAO Game master Council Mint',
   A9xaHx54B9bRYBga4V6LKFrRaARpMJFYVooEXRAanru5:
     'Mango DAO Treasury Council USDC Treasury',
   '7zGXUAeUkY9pEGfApsY26amibvqsf2dmty1cbtxHdfaQ': 'Mango DAO Wallet Governance',
@@ -62,10 +71,9 @@ export const ACCOUNT_NAMES = {
     'Mango Treasury Council Wallet',
   BxZ974q4zsrSThN54rZqNaA6E2CFoj77mUikqK68Lgrf:
     'Mango Treasury Council Wallet Governance',
-  FnrgYLrpftdsBj5gd4qeaFwDUQZCg2cfo7aqQ1kJmWJy:
-    'Mango Dao -> Dual Dao Vote Wallet',
+  FnrgYLrpftdsBj5gd4qeaFwDUQZCg2cfo7aqQ1kJmWJy: 'Mango DAO -> DAO Vote Wallet',
   EWaYDnKhcqS4tVjyhUBoJR1Yx755imqzBm5tb2vQTNtK:
-    'Mango Dao -> Dual Dao Vote Wallet Governance',
+    'Mango DAO -> DAO Vote Wallet Governance',
   '7D6tGmaMyC8i73Q8X2Fec2S1Zb5rkyai6pctdMqHpHWT':
     'Mango DAO Fast Listing Governance',
   Fmt4596j4uBvYutwQ2ZBw7RGw9EngR8yNijdqemnpiaB: 'Mango DAO Fast Listing Wallet',
@@ -350,6 +358,7 @@ export const HIDDEN_PROPOSALS = new Map<string, string>([
   ['7P3dtUTSvcQcjtJpZHZKEzrGvvHQdQGJrtKFLNAYHvpv', ''],
   ['H5TnbSBNFKJJwKea8tUj7ETcmhRHXQ1N9XCXBSD6Q9P1', ''],
   ['GeMQWvFTasBoui11RqRzMtDPQ9b2BkMK8NzepWzvuXw3', ''],
+  ['CRmUPr8CbfPQ4MAoo2yxSf5qL2nPsddL69kowMfp1JYP', ''],
 ])
 
 export const DEFAULT_NATIVE_SOL_MINT =
@@ -386,6 +395,10 @@ const MNGO_AUXILIARY_TOKEN_ACCOUNTS = [
   {
     owner: '58apybWwtWwgVfARs7uJ75Vs1csPimnCCFth7cKwTJAe',
     accounts: ['DiSDgMz4DeNKHXkpqUGoukr1YM9xxc1wH9gusZnMa1ga'],
+  },
+  {
+    owner: '7hqfhmXK6uXQKmNjUVEJo5acDMLcnyN9p9bZ5Dmnifde',
+    accounts: ['2gDu12CM56g18Ukc9R1EdmEbToXqGTrnBEqR3zKfVKgt'],
   },
   {
     owner: '9so7UTo6b6LXBSqdDfh18hjVj8Ng5BmLbYXLB7UrhaaJ',
@@ -442,6 +455,7 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...DUAL_INSTRUCTIONS,
   ...STAKE_INSTRUCTIONS,
   ...MAPLE_FINANCE_PROGRAM_INSTRUCTIONS,
+  ...JUPITER_REF,
 }
 
 export async function getInstructionDescriptor(
@@ -450,38 +464,99 @@ export async function getInstructionDescriptor(
   realm?: ProgramAccount<Realm> | undefined
 ) {
   let descriptors: any
+  let instructionToDecode = { ...instruction }
+  const isUsingForwardProgram =
+    instructionToDecode.programId.toBase58() === MANGO_INSTRUCTION_FORWARDER
+
   if (
-    (realm && instruction.programId.equals(realm.owner)) ||
-    instruction.programId.equals(new PublicKey(DEFAULT_GOVERNANCE_PROGRAM_ID))
+    (realm && instructionToDecode.programId.equals(realm.owner)) ||
+    instructionToDecode.programId.equals(
+      new PublicKey(DEFAULT_GOVERNANCE_PROGRAM_ID)
+    )
   ) {
     descriptors =
       GOVERNANCE_INSTRUCTIONS['GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw']
+  } else if (isUsingForwardProgram) {
+    instructionToDecode = {
+      accounts: instructionToDecode.accounts.slice(
+        2,
+        instructionToDecode.accounts.length
+      ),
+      data: instructionToDecode.data.slice(8, instructionToDecode.data.length),
+      programId: instructionToDecode.accounts[1].pubkey,
+    }
+    descriptors =
+      INSTRUCTION_DESCRIPTORS[instructionToDecode.programId.toBase58()]
   } else {
-    descriptors = INSTRUCTION_DESCRIPTORS[instruction.programId.toBase58()]
+    descriptors =
+      INSTRUCTION_DESCRIPTORS[instructionToDecode.programId.toBase58()]
   }
 
   // Make it work for program with one instruction like ATA program
   // and for the one with multiple instructions
-  const descriptor = !instruction.data.length
+  const descriptor = !instructionToDecode.data.length
     ? descriptors
-    : descriptors && descriptors[instruction.data[0]]
-    ? descriptors[instruction.data[0]]
+
+    : descriptors && descriptors[instructionToDecode.data[0]]
+    ? descriptors[instructionToDecode.data[0]]
     : //backup if first number is same for couple of instructions inside same idl
-    descriptors && descriptors[`${instruction.data[0]}${instruction.data[1]}`]
-    ? descriptors[`${instruction.data[0]}${instruction.data[1]}`]
+    descriptors &&
+      descriptors[
+        `${instructionToDecode.data[0]}${instructionToDecode.data[1]}`
+      ]
+    ? descriptors[
+        `${instructionToDecode.data[0]}${instructionToDecode.data[1]}`
+      ]
     : descriptors
 
   const dataUI = (descriptor?.getDataUI &&
     (await descriptor?.getDataUI(
       connection.current,
-      instruction.data,
-      instruction.accounts,
-      instruction.programId,
+      instructionToDecode.data,
+      instructionToDecode.accounts,
+      instructionToDecode.programId,
       connection.cluster
-    ))) ?? <>{JSON.stringify(instruction.data)}</>
+    ))) ?? <>{JSON.stringify(instructionToDecode.data)}</>
+
+  const dataUiWithAdditionalInfo = (
+    <>
+      {isUsingForwardProgram && (
+        <ForwarderProgramDecode
+          instruction={instruction}
+        ></ForwarderProgramDecode>
+      )}
+      {dataUI}
+    </>
+  )
   return {
     name: descriptor?.name,
     accounts: descriptor?.accounts,
-    dataUI,
+    dataUI: dataUiWithAdditionalInfo,
   }
+}
+
+const ForwarderProgramDecode = ({
+  instruction,
+}: {
+  instruction: InstructionData
+}) => {
+  const timestampBytes = instruction.data.slice(0, 8)
+  const view = new DataView(Buffer.from(timestampBytes).buffer)
+  const timestamp = view.getUint32(0, true) // true for little-endian
+
+  const date = dayjs(timestamp * 1000) // Convert to milliseconds
+
+  return (
+    <div className="py-2 pb-4">
+      <div>
+        Instruction use forwarder program: {MANGO_INSTRUCTION_FORWARDER}
+      </div>
+      <div>
+        Only wallet: {instruction.accounts[0].pubkey.toBase58()} can execute
+      </div>
+      <div>
+        Proposal is executable only until: {date.format('DD-MM-YYYY HH:mm')}
+      </div>
+    </div>
+  )
 }

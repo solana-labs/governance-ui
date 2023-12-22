@@ -96,7 +96,11 @@ async function runNotifier() {
             votingTokenDecimals
           )
 
-          const minVotesNeeded = 100000000
+          const minVotesNeeded =
+            proposal.account.governance.toBase58() ===
+            '7D6tGmaMyC8i73Q8X2Fec2S1Zb5rkyai6pctdMqHpHWT'
+              ? 50000000
+              : 100000000
           const quorumReached = yesVotes >= minVotesNeeded
           const isSuccess = yesVotes > noVotes && quorumReached
 

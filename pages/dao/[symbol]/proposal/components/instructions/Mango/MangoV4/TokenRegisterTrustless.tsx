@@ -14,6 +14,12 @@ import InstructionForm, { InstructionInput } from '../../FormCreator'
 import { InstructionInputType } from '../../inputInstructionType'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { ReferralProvider } from '@jup-ag/referral-sdk'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { JUPITER_REFERRAL_PK } from '@tools/constants'
+import ForwarderProgram, {
+  useForwarderProgramHelpers,
+} from '@components/ForwarderProgram/ForwarderProgram'
 
 interface TokenRegisterTrustlessForm {
   governedAccount: AssetAccount | null
@@ -42,6 +48,8 @@ const TokenRegisterTrustless = ({
         (mangoGroup?.admin &&
           x.extensions.transferAddress?.equals(mangoGroup?.admin)))
   )
+  const forwarderProgramHelpers = useForwarderProgramHelpers()
+  const connection = useLegacyConnectionContext()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<TokenRegisterTrustlessForm>({
     governedAccount: null,
@@ -62,6 +70,7 @@ const TokenRegisterTrustless = ({
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
+    const additionalSerializedInstructions: string[] = []
     if (
       isValid &&
       form.governedAccount?.governance?.account &&
@@ -80,10 +89,34 @@ const TokenRegisterTrustless = ({
         })
         .instruction()
 
-      serializedInstruction = serializeInstructionToBase64(ix)
+      const rp = new ReferralProvider(connection.current)
+
+      const tx = await rp.initializeReferralTokenAccount({
+        payerPubKey: form.governedAccount.extensions.transferAddress!,
+        referralAccountPubKey: JUPITER_REFERRAL_PK,
+        mint: new PublicKey(form.mintPk),
+      })
+      const isExistingAccount = await connection.current.getAccountInfo(
+        tx.referralTokenAccountPubKey
+      )
+
+      if (!isExistingAccount) {
+        additionalSerializedInstructions.push(
+          ...tx.tx.instructions.map((x) =>
+            serializeInstructionToBase64(
+              forwarderProgramHelpers.withForwarderWrapper(x)
+            )
+          )
+        )
+      }
+
+      serializedInstruction = serializeInstructionToBase64(
+        forwarderProgramHelpers.withForwarderWrapper(ix)
+      )
     }
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
+      additionalSerializedInstructions,
       isValid,
       governance: form.governedAccount?.governance,
       customHoldUpTime: form.holdupTime,
@@ -97,7 +130,11 @@ const TokenRegisterTrustless = ({
       index
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form])
+  }, [
+    form,
+    forwarderProgramHelpers.form,
+    forwarderProgramHelpers.withForwarderWrapper,
+  ])
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
@@ -185,6 +222,7 @@ const TokenRegisterTrustless = ({
           formErrors={formErrors}
         ></InstructionForm>
       )}
+      <ForwarderProgram {...forwarderProgramHelpers}></ForwarderProgram>
     </>
   )
 }

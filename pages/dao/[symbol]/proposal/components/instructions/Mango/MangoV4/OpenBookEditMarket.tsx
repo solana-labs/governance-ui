@@ -14,6 +14,9 @@ import { InstructionInputType } from '../../inputInstructionType'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { MarketIndex } from '@blockworks-foundation/mango-v4/dist/types/src/accounts/serum3'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import ForwarderProgram, {
+  useForwarderProgramHelpers,
+} from '@components/ForwarderProgram/ForwarderProgram'
 
 type NameMarketIndexVal = {
   name: string
@@ -26,6 +29,7 @@ interface OpenBookEditMarketForm {
   name: string
   reduceOnly: boolean
   forceClose: boolean
+  oraclePriceBand: number
   holdupTime: number
 }
 
@@ -39,6 +43,7 @@ const OpenBookEditMarket = ({
   const wallet = useWalletOnePointOh()
   const { mangoClient, mangoGroup } = UseMangoV4()
   const { assetAccounts } = useGovernanceAssets()
+  const forwarderProgramHelpers = useForwarderProgramHelpers()
   const solAccounts = assetAccounts.filter(
     (x) =>
       x.type === AccountType.SOL &&
@@ -52,6 +57,7 @@ const OpenBookEditMarket = ({
     forceClose: false,
     market: null,
     holdupTime: 0,
+    oraclePriceBand: 0,
     name: '',
   })
   const [currentMarkets, setCurrentMarkets] = useState<NameMarketIndexVal[]>([])
@@ -76,7 +82,12 @@ const OpenBookEditMarket = ({
       )
 
       const ix = await mangoClient!.program.methods
-        .serum3EditMarket(form.reduceOnly, form.forceClose, form.name)
+        .serum3EditMarket(
+          form.reduceOnly,
+          form.forceClose,
+          form.name,
+          form.oraclePriceBand
+        )
         .accounts({
           group: mangoGroup!.publicKey,
           admin: form.governedAccount.extensions.transferAddress,
@@ -84,7 +95,9 @@ const OpenBookEditMarket = ({
         })
         .instruction()
 
-      serializedInstruction = serializeInstructionToBase64(ix)
+      serializedInstruction = serializeInstructionToBase64(
+        forwarderProgramHelpers.withForwarderWrapper(ix)
+      )
     }
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
@@ -102,7 +115,11 @@ const OpenBookEditMarket = ({
       index
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form])
+  }, [
+    form,
+    forwarderProgramHelpers.form,
+    forwarderProgramHelpers.withForwarderWrapper,
+  ])
   useEffect(() => {
     const getMarkets = async () => {
       const markets = [...mangoGroup!.serum3MarketsMapByExternal.values()].map(
@@ -125,6 +142,7 @@ const OpenBookEditMarket = ({
       )
       setForm((prevForm) => ({
         ...prevForm,
+        oraclePriceBand: 0,
         reduceOnly: market?.reduceOnly || false,
         forceClose: market?.forceClose || false,
         name: market?.name || '',
@@ -197,6 +215,7 @@ const OpenBookEditMarket = ({
           formErrors={formErrors}
         ></InstructionForm>
       )}
+      <ForwarderProgram {...forwarderProgramHelpers}></ForwarderProgram>
     </>
   )
 }

@@ -35,7 +35,6 @@ const AssetsCompactWrapper = () => {
       <div className="overflow-y-auto" style={{ maxHeight: '350px' }}>
         <AssetsList panelView />
       </div>
-      )
     </div>
   )
 }

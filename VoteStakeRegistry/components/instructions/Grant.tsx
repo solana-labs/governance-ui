@@ -1,11 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import Input from '@components/inputs/Input'
 import useRealm from '@hooks/useRealm'
 import { AccountInfo } from '@solana/spl-token'
@@ -83,7 +77,7 @@ const Grant = ({
   })
   const schema = useMemo(
     () =>
-      getTokenTransferSchema({ form, connection }).concat(
+      getTokenTransferSchema({ form, connection, ignoreAmount: true }).concat(
         yup.object().shape({
           startDateUnixSeconds: yup
             .number()

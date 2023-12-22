@@ -1,4 +1,4 @@
-import { Connection, PublicKey } from '@solana/web3.js'
+import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import {
   fetchTokenOwnerRecordByPubkey,
   useTokenOwnerRecordByPubkeyQuery,
@@ -6,18 +6,11 @@ import {
   useUserCouncilTokenOwnerRecord,
 } from './tokenOwnerRecord'
 import BN from 'bn.js'
-import { fetchNftRegistrar } from './plugins/nftVoter'
 import { fetchDigitalAssetsByOwner } from './digitalAssets'
 import { getNetworkFromEndpoint } from '@utils/connection'
 import { ON_NFT_VOTER_V2 } from '@constants/flags'
 import { fetchRealmByPubkey, useRealmQuery } from './realm'
 import { fetchRealmConfigQuery } from './realmConfig'
-import {
-  GATEWAY_PLUGINS_PKS,
-  HELIUM_VSR_PLUGINS_PKS,
-  NFT_PLUGINS_PKS,
-  VSR_PLUGIN_PKS,
-} from '@constants/plugins'
 import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import useGatewayPluginStore from 'GatewayPlugin/store/gatewayPluginStore'
 import { useAsync } from 'react-async-hook'
@@ -34,7 +27,12 @@ import {
   VoterWeight,
 } from '@models/voteWeights'
 import useUserOrDelegator from '@hooks/useUserOrDelegator'
-import { getVsrGovpower } from './plugins/vsr'
+import { getVsrGovpower, useVsrGovpower } from './plugins/vsr'
+import { PythClient } from '@pythnetwork/staking'
+import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet'
+import { findPluginName } from '@constants/plugins'
+import { nftRegistrarQuery } from './plugins/nftVoter'
+import queryClient from './queryClient'
 
 export const getVanillaGovpower = async (
   connection: Connection,
@@ -64,7 +62,9 @@ export const getNftGovpower = async (
   tokenOwnerRecordPk: PublicKey
 ) => {
   // figure out what collections are used
-  const { result: registrar } = await fetchNftRegistrar(connection, realmPk)
+  const { result: registrar } = await queryClient.fetchQuery(
+    nftRegistrarQuery(connection, realmPk)
+  )
   if (registrar === undefined) throw new Error()
   const { collectionConfigs } = registrar
 
@@ -102,6 +102,25 @@ export const getNftGovpower = async (
   return power
 }
 
+export const getPythGovPower = async (
+  connection: Connection,
+  user: PublicKey | undefined
+): Promise<BN> => {
+  if (!user) return new BN(0)
+
+  const pythClient = await PythClient.connect(
+    connection,
+    new NodeWallet(new Keypair())
+  )
+  const stakeAccount = await pythClient.getMainAccount(user)
+
+  if (stakeAccount) {
+    return stakeAccount.getVoterWeight(await pythClient.getTime()).toBN()
+  } else {
+    return new BN(0)
+  }
+}
+
 export const determineVotingPowerType = async (
   connection: Connection,
   realmPk: PublicKey,
@@ -116,29 +135,59 @@ export const determineVotingPowerType = async (
       ? config.result?.account.communityTokenConfig.voterWeightAddin
       : config.result?.account.councilTokenConfig.voterWeightAddin
 
-  return programId === undefined
-    ? ('vanilla' as const)
-    : VSR_PLUGIN_PKS.includes(programId.toString())
-    ? ('VSR' as const)
-    : HELIUM_VSR_PLUGINS_PKS.includes(programId.toString())
-    ? 'HeliumVSR'
-    : NFT_PLUGINS_PKS.includes(programId.toString())
-    ? 'NFT'
-    : GATEWAY_PLUGINS_PKS.includes(programId.toString())
-    ? 'gateway'
-    : 'unknown'
+  return findPluginName(programId)
 }
 
+// TODO use HOC to provide voting power to components that need voting power without knowing plugin
+// this is an efficiency thing to save on queries, since we can't have conditional useQuery hooks.
+// i guess you can just use the enabled flag..
+/* 
+export const WithCommunityGovernancePower = <
+  P extends { communityGovernancePower: BN | undefined }
+>(
+  Component: React.ComponentType<P>
+): React.FC<Omit<P, 'communityGovernancePower'>> =>
+  function Enhanced(props) {
+    const { connection } = useConnection()
+    const kind = 'community'
+    const realmPk = useSelectedRealmPubkey()
+
+    const { result: plugin } = useAsync(
+      async () =>
+        kind && realmPk && determineVotingPowerType(connection, realmPk, kind),
+      [connection, realmPk, kind]
+    )
+    // this `props as P` thing is annoying!! ts should know better -@asktree
+    return <Component {...(props as P)} />
+  }
+
+export const WithVsrGovernancePower = <
+  P extends { communityGovernancePower: BN | undefined }
+>(
+  Component: React.ComponentType<P>
+): React.FC<Omit<P, 'communityGovernancePower'>> =>
+  function Enhanced(props) {
+    const communityGovernancePower = useVsrGovpower().data?.result
+
+    // this `props as P` thing is annoying!! ts should know better -@asktree
+    return (
+      <Component
+        {...(props as P)}
+        communityGovernancePower={communityGovernancePower}
+      />
+    )
+  } */
+
+/** where possible avoid using this and use a plugin-specific hook instead */
 export const useGovernancePowerAsync = (
   kind: 'community' | 'council' | undefined
 ) => {
   const { connection } = useConnection()
   const realmPk = useSelectedRealmPubkey()
 
-  const actingAsWalletPk = useUserOrDelegator()
-
   const heliumVotingPower = useHeliumVsrStore((s) => s.state.votingPower)
   const gatewayVotingPower = useGatewayPluginStore((s) => s.state.votingPower)
+  const vsrVotingPower = useVsrGovpower().data?.result
 
   const communityTOR = useAddressQuery_CommunityTokenOwner()
   const councilTOR = useAddressQuery_CouncilTokenOwner()
@@ -149,6 +198,7 @@ export const useGovernancePowerAsync = (
       kind && realmPk && determineVotingPowerType(connection, realmPk, kind),
     [connection, realmPk, kind]
   )
+  const actingAsWalletPk = useUserOrDelegator()
 
   return useAsync(
     async () =>
@@ -161,23 +211,23 @@ export const useGovernancePowerAsync = (
             : plugin === 'NFT'
             ? getNftGovpower(connection, realmPk, TOR)
             : plugin === 'VSR'
-            ? actingAsWalletPk
-              ? (await getVsrGovpower(connection, realmPk, actingAsWalletPk))
-                  .result ?? new BN(0)
-              : undefined
+            ? vsrVotingPower ?? new BN(0)
             : plugin === 'HeliumVSR'
             ? heliumVotingPower
             : plugin === 'gateway'
             ? gatewayVotingPower
+            : plugin === 'pyth'
+            ? getPythGovPower(connection, actingAsWalletPk)
             : new BN(0)),
     [
       plugin,
       realmPk,
       TOR,
       connection,
-      actingAsWalletPk,
+      vsrVotingPower,
       heliumVotingPower,
       gatewayVotingPower,
+      actingAsWalletPk,
     ]
   )
 }
@@ -217,6 +267,12 @@ export const useLegacyVoterWeight = () => {
         ? undefined
         : plugin === 'vanilla'
         ? new VoterWeight(communityTOR.result, councilTOR?.result)
+        : plugin === 'pyth'
+        ? new VoteRegistryVoterWeight(
+            communityTOR.result,
+            councilTOR?.result,
+            await getPythGovPower(connection, actingAsWalletPk)
+          )
         : plugin === 'NFT'
         ? communityTOR.result?.pubkey
           ? new VoteNftWeight(

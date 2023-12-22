@@ -1,4 +1,4 @@
-import { PublicKey } from '@solana/web3.js'
+import { Connection, PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
 import asFindable from '@utils/queries/asFindable'
 import {
@@ -13,6 +13,7 @@ import { useMemo } from 'react'
 import { useRealmGovernancesQuery } from './governance'
 import queryClient from './queryClient'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { HIDDEN_PROPOSALS } from '@components/instructions/tools'
 
 export const proposalQueryKeys = {
   all: (endpoint: string) => [endpoint, 'Proposal'],
@@ -26,6 +27,15 @@ export const proposalQueryKeys = {
     realm,
   ],
 }
+
+export const fetchProposalByPubkeyQuery = (
+  connection: Connection,
+  pubkey: PublicKey
+) =>
+  queryClient.fetchQuery({
+    queryKey: proposalQueryKeys.byPubkey(connection.rpcEndpoint, pubkey),
+    queryFn: () => asFindable(getProposal)(connection, pubkey),
+  })
 
 export const useProposalByPubkeyQuery = (pubkey: PublicKey | undefined) => {
   const connection = useLegacyConnectionContext()
@@ -41,7 +51,6 @@ export const useProposalByPubkeyQuery = (pubkey: PublicKey | undefined) => {
     },
     enabled,
   })
-
   return query
 }
 
@@ -80,7 +89,11 @@ export const useRealmProposalsQuery = () => {
             getProposalsByGovernance(connection.current, realm.owner, x.pubkey)
           )
         )
-      ).flat()
+      )
+        .flat()
+        // Blacklisted proposals which should not be displayed in the UI
+        // hidden legacy accounts to declutter UI
+        .filter((x) => HIDDEN_PROPOSALS.get(x.pubkey.toBase58()) === undefined)
 
       // TODO instead of using setQueryData, prefetch queries on mouseover ?
       results.forEach((x) => {

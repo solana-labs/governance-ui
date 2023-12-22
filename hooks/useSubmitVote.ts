@@ -9,10 +9,10 @@ import {
   ProgramAccount,
   Proposal,
   RpcContext,
-  TokenOwnerRecord,
   Vote,
   VoteChoice,
   VoteKind,
+  getTokenOwnerRecordAddress,
   withCastVote,
 } from '@solana/spl-governance'
 import { getProgramVersionForRealm } from '@models/registry/api'
@@ -30,6 +30,8 @@ import { TransactionInstruction } from '@solana/web3.js'
 import useProgramVersion from './useProgramVersion'
 import useVotingTokenOwnerRecords from './useVotingTokenOwnerRecords'
 import { useMemo } from 'react'
+import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
+import { useBatchedVoteDelegators } from '@components/VotePanel/useDelegators'
 
 export const useSubmitVote = () => {
   const wallet = useWalletOnePointOh()
@@ -49,20 +51,30 @@ export const useSubmitVote = () => {
       config?.account.communityTokenConfig.voterWeightAddin?.toBase58()
     )
 
+  const selectedCommunityDelegator = useSelectedDelegatorStore(
+    (s) => s.communityDelegator
+  )
+  const selectedCouncilDelegator = useSelectedDelegatorStore(
+    (s) => s.councilDelegator
+  )
+  const communityDelegators = useBatchedVoteDelegators('community')
+  const councilDelegators = useBatchedVoteDelegators('council')
+
   const { error, loading, execute } = useAsyncCallback(
     async ({
       vote,
-      voterTokenRecord,
       comment,
       voteWeights,
     }: {
       vote: VoteKind
-      voterTokenRecord: ProgramAccount<TokenOwnerRecord>
       comment?: string
       voteWeights?: number[]
     }) => {
+      if (!proposal) throw new Error()
+      if (!realm) throw new Error()
+
       const rpcContext = new RpcContext(
-        proposal!.owner,
+        proposal.owner,
         getProgramVersionForRealm(realmInfo!),
         wallet!,
         connection.current,
@@ -82,17 +94,55 @@ export const useSubmitVote = () => {
         )
       }
 
+      const relevantMint =
+        vote !== VoteKind.Veto
+          ? // if its not a veto, business as usual
+            proposal.account.governingTokenMint
+          : // if it is a veto, the vetoing mint is the opposite of the governing mint
+          realm.account.communityMint.equals(
+              proposal.account.governingTokenMint
+            )
+          ? realm.account.config.councilMint
+          : realm.account.communityMint
+      if (relevantMint === undefined) throw new Error()
+
+      const role = relevantMint.equals(realm.account.communityMint)
+        ? 'community'
+        : 'council'
+
+      const relevantSelectedDelegator =
+        role === 'community'
+          ? selectedCommunityDelegator
+          : selectedCouncilDelegator
+
+      const actingAsWalletPk =
+        relevantSelectedDelegator ?? wallet?.publicKey ?? undefined
+      if (!actingAsWalletPk) throw new Error()
+
+      const tokenOwnerRecordPk = await getTokenOwnerRecordAddress(
+        realm.owner,
+        realm.pubkey,
+        relevantMint,
+        actingAsWalletPk
+      )
+
+      const relevantDelegators = (role === 'community'
+        ? communityDelegators
+        : councilDelegators
+      )?.map((x) => x.pubkey)
+
       try {
         await castVote(
           rpcContext,
-          realm!,
-          proposal!,
-          voterTokenRecord.pubkey,
+          realm,
+          proposal,
+          tokenOwnerRecordPk,
           vote,
           msg,
-          client,
+          role === 'community' ? client : undefined, // NOTE: currently FE doesn't support council plugins fully
           confirmationCallback,
-          voteWeights
+          voteWeights,
+          relevantDelegators
         )
         queryClient.invalidateQueries({
           queryKey: proposalQueryKeys.all(connection.current.rpcEndpoint),
@@ -102,6 +152,7 @@ export const useSubmitVote = () => {
             queryKey: [connection.cluster, 'ChatMessages'],
           })
       } catch (e) {
+        console.error(e)
         notify({ type: 'error', message: e.message })
       } finally {
         if (isNftPlugin) {

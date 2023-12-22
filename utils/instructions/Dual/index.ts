@@ -479,6 +479,17 @@ export async function getExerciseInstruction({
       additionalSerializedInstructions.push(serializeInstructionToBase64(ataIx))
     }
 
+    // Possibly init the base token account that is receiving tokens from exercise.
+    const walletBaseAta = await findAssociatedTokenAddress(wallet.publicKey, baseMint);
+    if ((await connection.current.getAccountInfo(walletBaseAta)) === null) {
+      const [ataIx] = await createAssociatedTokenAccount(
+        wallet.publicKey,
+        wallet.publicKey,
+        baseMint
+      )
+      additionalSerializedInstructions.push(serializeInstructionToBase64(ataIx))
+    }
+
     const prerequisiteInstructions: TransactionInstruction[] = []
     const space = 165
     const rent = await connection.current.getMinimumBalanceForRentExemption(
@@ -731,7 +742,7 @@ export async function getGsoWithdrawInstruction({
 
   const serializedInstruction = ''
   const additionalSerializedInstructions: string[] = []
-  if (isValid && form.soName && form.baseTreasury && !!form.baseTreasury.isSol && wallet?.publicKey) {
+  if (isValid && form.soName && form.baseTreasury && wallet?.publicKey) {
     const gso = getGsoApi(connection)
     const authority = form.baseTreasury.extensions.token!.account.owner!
     const baseMint = form.baseTreasury.extensions.mint?.publicKey

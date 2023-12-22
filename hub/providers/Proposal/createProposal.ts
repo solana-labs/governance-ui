@@ -260,8 +260,6 @@ export async function createProposal(args: Args) {
         client,
         walletPk: args.requestingUserPublicKey,
       });
-
-      votingClient._setCurrentVoterNfts(votingNfts);
     }
   }
 

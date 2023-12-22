@@ -113,6 +113,11 @@ const IxGateSet = ({
     OpenbookV2SettleFunds: true,
     AdminTokenWithdrawFees: true,
     AdminPerpWithdrawFees: true,
+    AccountSizeMigration: true,
+    TokenConditionalSwapStart: true,
+    TokenConditionalSwapCreatePremiumAuction: true,
+    TokenConditionalSwapCreateLinearAuction: true,
+    Serum3PlaceOrderV2: true,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -598,6 +603,36 @@ const IxGateSet = ({
       initialValue: form.AdminPerpWithdrawFees,
       type: InstructionInputType.SWITCH,
       name: 'AdminPerpWithdrawFees',
+    },
+    {
+      label: 'Account Size Migration',
+      initialValue: form.AccountSizeMigration,
+      type: InstructionInputType.SWITCH,
+      name: 'AccountSizeMigration',
+    },
+    {
+      label: 'Token Conditional Swap Start',
+      initialValue: form.TokenConditionalSwapStart,
+      type: InstructionInputType.SWITCH,
+      name: 'TokenConditionalSwapStart',
+    },
+    {
+      label: 'Token Conditional Swap Create Premium Auction',
+      initialValue: form.TokenConditionalSwapCreatePremiumAuction,
+      type: InstructionInputType.SWITCH,
+      name: 'TokenConditionalSwapCreatePremiumAuction',
+    },
+    {
+      label: 'Token Conditional Swap Create Linear Auction',
+      initialValue: form.TokenConditionalSwapCreateLinearAuction,
+      type: InstructionInputType.SWITCH,
+      name: 'TokenConditionalSwapCreateLinearAuction',
+    },
+    {
+      label: 'Serum 3 Place Order V2',
+      initialValue: form.Serum3PlaceOrderV2,
+      type: InstructionInputType.SWITCH,
+      name: 'Serum3PlaceOrderV2',
     },
   ]
 

@@ -14,12 +14,37 @@
     "sortRank": -1000
   },
   {
+    "symbol": "Frictionless",
+    "displayName": "Frictionless DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Hr6PtVoKHTZETmJtjiYu9YeAFCMNUkDTv4qQV2kdDF2C",
+    "ogImage": "https://shdw-drive.genesysgo.net/5nwi4maAZ3v3EwTJtcg9oFfenQUX7pb9ry4KuhyUSawK/frictionless_logo.png",
+    "github": "https://github.com/Grape-Labs",
+    "website": "https://governance.so/frictionless",
+    "twitter": "@grapeprotocol",
+    "discord": "@grapedao",
+    "shortDescription": "Frictionless is revolutionizing governance participation, bridging the gap between web2 and web3"
+  },
+  {
+    "symbol": "GrapeUX",
+    "displayName": "Grape UX",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "jtncbMzs2k3wypGiLBtM55ou3mFERpeZniH7V1Bq4zg",
+    "ogImage": "https://shdw-drive.genesysgo.net/5nwi4maAZ3v3EwTJtcg9oFfenQUX7pb9ry4KuhyUSawK/UX_logo.png",
+    "github": "https://github.com/Grape-Labs",
+    "website": "https://governance.so/dao/jtncbMzs2k3wypGiLBtM55ou3mFERpeZniH7V1Bq4zg",
+    "twitter": "@grapeprotocol",
+    "discord": "@grapedao",
+    "shortDescription": "Grape UX DAO has early access to Grape Governance and contributors provide feedback to quickly iterate and improve UX"
+  },
+  {
     "symbol": "CollabX",
     "displayName": "CollabX",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "BVfB1PfxCdcKozoQQ5kvC9waUY527bZuwJVyT7Qvf8N2",
     "ogImage": "https://shdw-drive.genesysgo.net/5nwi4maAZ3v3EwTJtcg9oFfenQUX7pb9ry4KuhyUSawK/logo_collabx.png",
     "github": "https://github.com/Grape-Labs",
+    "website": "https://governance.so/dao/BVfB1PfxCdcKozoQQ5kvC9waUY527bZuwJVyT7Qvf8N2",
     "shortDescription": "A small but mighty developer DAO! 🚀 We're like the little engines that could, tirelessly building, testing, and occasionally chewing glass to create a better ecosystem"
   },
   {
@@ -34,6 +59,16 @@
     "ogImage": "/realms/Deans_List_Network_State/avatar-deanslist.png",
     "github": "https://github.com/Deans-List/",
     "shortDescription": "A Service DAO turned Network State, consisting of Web3 power users providing feedback sessions. Join us in changing the future of work!"
+  },
+  {
+    "symbol": "Dean's List Solarplex State",
+    "displayName": "Dean's List Solarplex State",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "4U5tep3h2wFrLskrCJAemvFVyLwGvQ8Xbuc8dBEC6smF",
+    "twitter": "@deanslistDAO",
+    "ogImage": "/realms/Deans-List-Solarplex-State/deans_list_solarplex_state.png",
+    "github": "https://github.com/Deans-List/",
+    "shortDescription": "Dean's List Solarplex State oversees feedback incentives on Solarplex."
   },
   {
     "symbol": "Ukraine",
@@ -63,6 +98,15 @@
     "github": "https://github.com/blockworks-foundation/"
   },
   {
+    "symbol": "XAND",
+    "category": "defi",
+    "displayName": "Xandeum DAO",
+    "programId": "DcG2PZTnj8s4Pnmp7xJswniCskckU5E6XsrKuyD7NYFK",
+    "realmId": "CFprdZRYitjPYEDUQKDQZwao1jcRcU1z1GsFspMpN8Ci",
+    "communityMint": "2j437Lt84XvysJiYbXTSJfAMy26Et9HiVGFvGFp8nYWH",
+    "ogImage": "https://xandeum.com/wp-content/uploads/2023/05/Xandeum-Logo-Standard.png"
+  },
+  {
     "symbol": "HPC",
     "displayName": "CryptoHelp",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -82,6 +126,20 @@
     "programId": "GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J",
     "realmId": "7CWXhWsMXbfx8caHcpCbSQKDpsaLNu65YoBLoGfogzk6",
     "communityMint": "DYg9LHzbhk9pg7h3Zhda2CW1berCp7NZQYxUEW6Eex35",
+    "ogImage": "https://i.imgur.com/448n6bC.jpg",
+    "shortDescription": "Every market, all the power, none of the fuss. Simplifying decentralized finance through easy-to-use products and developer tools.",
+    "website": "https://mango.markets",
+    "keywords": "Mango Markets, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
+    "twitter": "@mangomarkets",
+    "discord": "https://discord.com/invite/2uwjsBc5yw",
+    "github": "https://github.com/blockworks-foundation/"
+  },
+  {
+    "symbol": "MNGO-GM",
+    "category": "defi",
+    "displayName": "Mango Game Master",
+    "programId": "GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J",
+    "realmId": "6JFaFouiN4ssPc38ey1hXKSxyFWZzZy9w5Xt5xLzeozm",
     "ogImage": "https://i.imgur.com/448n6bC.jpg",
     "shortDescription": "Every market, all the power, none of the fuss. Simplifying decentralized finance through easy-to-use products and developer tools.",
     "website": "https://mango.markets",
@@ -207,10 +265,10 @@
   {
     "symbol": "PYTH",
     "category": "defi",
-    "bannerImage": "https://pbs.twimg.com/profile_banners/1376553581508059144/1665013565/1500x500",
+    "bannerImage": "https://pyth.network/images/pyth-realms-banner.png",
     "displayName": "Pyth Network",
-    "programId": "GovFUVGZWWwyoLq8rhnoVWknRFkhDSbQiSoREJ5LiZCV",
-    "realmId": "A1f6LNEymJSSJsEVCL1FSgtS1jA9dNTC4ni8SkmbwQjG",
+    "programId": "pytGY6tWRgGinSCvRLnSv4fHfBTMoiDGiCsesmHWM6U",
+    "realmId": "4ct8XU5tKbMNRphWy4rePsS9kBqPhDdvZoGpmprPaug4",
     "ogImage": "/realms/PYTH/img/pyth.svg",
     "shortDescription": "The Pyth network aims to bring valuable financial market data to DeFi applications and the general public",
     "sortRank": 3,
@@ -3267,5 +3325,33 @@
     "website": "https://phnx.one/",
     "twitter": "@Phnxsol",
     "ogImage": "/realms/PHNXDAO/phnxLogo.png"
+  },
+  {
+    "symbol": "OPDA",
+    "displayName": "OPANZ DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Ccix1WKGTwCbdChjUSrVVgq4xPzMGzTutqpW1R4hCRGd",
+    "bannerImage": "/realms/OPANZ/OPANZ_Banner.png",
+    "ogImage": "/realms/OPANZ/OPANZ_Logo.png",
+    "website": "https://auturoa.nz/",
+    "twitter": "@opanzch"
+  },
+  {
+    "symbol": "SHURA",
+    "displayName": "Solshure DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "BbLADqNQtWtPVrrxJESwmHRS4MHS1NyqpPDwndtYcZDB",
+    "ogImage": "/realms/SolshureDAO/img/solshure_dao.png",
+    "website": "https://solshure.com/",
+    "twitter": "@Solshure"
+  },
+  {
+    "symbol": "TBET",
+    "displayName": "TrustBet",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "9gSewHByQG9YbqpkVWp9qucLoqvQRZ4YKn5b6E5w6okt",
+    "bannerImage": "/realms/TrustBet/Bannerontransparent.png",
+    "ogImage": "realms/TrustBet/LRlogo.png",
+    "communityMint": "xpFbKJa92Ee1NSYEhc3b3BVk4im8YStXRaVW6EoW33w"
   }
 ]

@@ -166,17 +166,18 @@ const SendTokens = () => {
   }
 
   const IsAmountNotHigherThenBalance = () => {
-    const mintValue = getMintNaturalAmountFromDecimalAsBN(
-      form.amount!,
-      form.governedTokenAccount!.extensions.mint!.account.decimals
-    )
-    let gte: boolean | undefined = false
     try {
+      const mintValue = getMintNaturalAmountFromDecimalAsBN(
+        form.amount!,
+        form.governedTokenAccount!.extensions.mint!.account.decimals
+      )
+      let gte: boolean | undefined = false
       gte = form.governedTokenAccount!.extensions.amount?.gte(mintValue)
+      return gte
     } catch (e) {
       //silent fail
+      return true
     }
-    return gte
   }
   useEffect(() => {
     if (currentAccount) {

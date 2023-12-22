@@ -1,13 +1,12 @@
 import Head from 'next/head'
-import { useRouter } from 'next/router'
 
 import { GraphQLProvider } from '@hub/providers/GraphQL'
 import { JWTProvider } from '@hub/providers/JWT'
 import { EditRealmConfig } from '@hub/components/EditRealmConfig'
+import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
 
 export default function EditConfigPage() {
-  const router = useRouter()
-  const { symbol } = router.query
+  const realmPk = useSelectedRealmPubkey()
 
   return (
     <>
@@ -19,10 +18,12 @@ export default function EditConfigPage() {
             <meta property="og:title" content="Edit Org Config" key="title" />
           </Head>
           <div className="dark">
-            <EditRealmConfig
-              className="min-h-screen"
-              realmUrlId={symbol as string}
-            />
+            {realmPk && (
+              <EditRealmConfig
+                className="min-h-screen"
+                realmUrlId={realmPk.toString()}
+              />
+            )}
           </div>
         </GraphQLProvider>
       </JWTProvider>
