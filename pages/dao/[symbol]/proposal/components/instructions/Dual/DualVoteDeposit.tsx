@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useContext, useEffect, useMemo, useState } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
 import { ProgramAccount, Governance } from '@solana/spl-governance'
 import {
   UiInstruction,
@@ -14,6 +14,7 @@ import { getDualFinanceVoteDepositSchema } from '@utils/validations'
 import Tooltip from '@components/Tooltip'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { useRealmPubkeyByPkOrSymbol } from '@hooks/selectedRealm/useSelectedRealmPubkey'
 
 const DualVoteDeposit = ({
   index,
@@ -24,7 +25,7 @@ const DualVoteDeposit = ({
 }) => {
   const [form, setForm] = useState<DualFinanceVoteDepositForm>({
     numTokens: 0,
-    realm: 'EGYbpow8V9gt8JFmadFYai4sjfwc7Vc9gazU735hE6u7',
+    realm: '',
     delegateToken: undefined,
   })
   const connection = useLegacyConnectionContext()
@@ -40,6 +41,9 @@ const DualVoteDeposit = ({
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
+
+  const { realmInputParsed } = useRealmPubkeyByPkOrSymbol(form.realm)
+
   function getInstruction(): Promise<UiInstruction> {
     return getVoteDepositInstruction({
       connection,
