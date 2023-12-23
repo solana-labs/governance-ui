@@ -137,17 +137,17 @@ export const txBatchesToInstructionSetWithSigners = (
   txBatch: TransactionInstruction[],
   signerBatches: Keypair[][],
   batchIdx?: number
-) => {
+): { transactionInstruction: TransactionInstruction; signers: Keypair[] }[] => {
   return txBatch.map((tx, txIdx) => {
+    let signers: Keypair[] = [];
+
+    if (typeof batchIdx !== 'undefined' && signerBatches?.length && signerBatches?.[batchIdx]?.[txIdx]) {
+      signers = [signerBatches[batchIdx][txIdx]];
+    }
+
     return {
       transactionInstruction: tx,
-      signers:
-        typeof batchIdx !== 'undefined' &&
-        signerBatches.length &&
-        signerBatches[batchIdx] &&
-        signerBatches[batchIdx][txIdx]
-          ? [signerBatches[batchIdx][txIdx]]
-          : [],
-    }
-  })
-}
+      signers,
+    };
+  });
+};
