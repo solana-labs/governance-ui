@@ -44,29 +44,25 @@ export default async function createTokenizedRealm({
     )
     console.log('CREATE GOV TOKEN REALM: sending transactions')
 
+    const signers = [
+      mintsSetupSigners,
+      ...councilMembersSignersChunks,
+      realmSigners,
+    ]
     const txes = [
-      {
+      mintsSetupInstructions,
+      ...councilMembersChunks,
+      realmInstructions,
+    ].map((txBatch, batchIdx) => {
+      return {
         instructionsSet: txBatchesToInstructionSetWithSigners(
-          mintsSetupInstructions,
-          mintsSetupSigners
+          txBatch,
+          signers,
+          batchIdx
         ),
         sequenceType: SequenceType.Sequential,
-      },
-      ...councilMembersChunks.map((chunk, idx) => ({
-        instructionsSet: txBatchesToInstructionSetWithSigners(
-          chunk,
-          councilMembersSignersChunks[idx]
-        ),
-        sequenceType: SequenceType.Sequential,
-      })),
-      {
-        instructionsSet: txBatchesToInstructionSetWithSigners(
-          realmInstructions,
-          realmSigners
-        ),
-        sequenceType: SequenceType.Sequential,
-      },
-    ];
+      }
+    })
 
     const tx = await sendTransactionsV3({
       connection,
