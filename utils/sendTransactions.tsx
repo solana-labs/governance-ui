@@ -142,7 +142,7 @@ export const txBatchesToInstructionSetWithSigners = (
     let signers: Keypair[] = [];
 
     if (typeof batchIdx !== 'undefined' && batchIdx < signerBatches.length && txIdx < signerBatches[batchIdx].length) {
-      signers = signerBatches[batchIdx][txIdx];
+      signers = [signerBatches[batchIdx][txIdx]];
     }
 
     return {
