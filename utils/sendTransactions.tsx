@@ -141,7 +141,7 @@ export const txBatchesToInstructionSetWithSigners = (
   return txBatch.map((tx, txIdx) => {
     let signers: Keypair[] = [];
 
-    if (typeof batchIdx !== 'undefined' && signerBatches?.length && signerBatches?.[batchIdx]?.[txIdx]) {
+    if (typeof batchIdx !== 'undefined' && batchIdx < signerBatches.length && txIdx < signerBatches[batchIdx].length) {
       signers = signerBatches[batchIdx][txIdx];
     }
 
