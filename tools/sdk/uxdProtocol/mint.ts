@@ -3,13 +3,12 @@ import {
   UXD_DECIMALS,
   Controller,
   UXDClient,
-  MercurialVaultDepository,
 } from '@uxd-protocol/uxd-client'
 import { ConnectionContext } from '@utils/connection'
 import {
   DEPOSITORY_TYPES,
   getCredixLpDepository,
-  getDepositoryMintInfo,
+  getMercurialVaultDepository,
   uxdClient,
 } from './uxdClient'
 
@@ -21,7 +20,7 @@ export type UXDMintParams = {
   user: PublicKey
 }
 
-const mintWithMercurialIx = async ({
+const mintWithMercurialVaultDepositoryIx = async ({
   connection,
   uxdProgramId,
   client,
@@ -34,21 +33,11 @@ const mintWithMercurialIx = async ({
   controller: Controller
   params: UXDMintParams
 }) => {
-  const {
-    address: collateralMint,
-    decimals: collateralDecimals,
-  } = getDepositoryMintInfo(connection.cluster, params.collateralName)
-
-  const depository = await MercurialVaultDepository.initialize({
-    connection: connection.current,
-    collateralMint: {
-      mint: collateralMint,
-      name: params.collateralName,
-      decimals: collateralDecimals,
-      symbol: params.collateralName,
-    },
+  const depository = await getMercurialVaultDepository(
+    connection,
     uxdProgramId,
-  })
+    params.collateralName
+  )
 
   return client.createMintWithMercurialVaultDepositoryInstruction(
     controller,
@@ -61,7 +50,7 @@ const mintWithMercurialIx = async ({
   )
 }
 
-const mintWithCredixIx = async ({
+const mintWithCredixLpDepositoryIx = async ({
   connection,
   uxdProgramId,
   client,
@@ -101,22 +90,23 @@ export const mintUXDIx = async (
   const controller = new Controller('UXD', UXD_DECIMALS, uxdProgramId)
 
   switch (depositoryType) {
-    case DEPOSITORY_TYPES.MERCURIAL:
-      return mintWithMercurialIx({
+    case DEPOSITORY_TYPES.MERCURIAL_VAULT:
+      return mintWithMercurialVaultDepositoryIx({
         connection,
         uxdProgramId,
         client,
         controller,
         params,
       })
-    case DEPOSITORY_TYPES.CREDIX:
+    case DEPOSITORY_TYPES.CREDIX_LP:
+      return mintWithCredixLpDepositoryIx({
+        connection,
+        uxdProgramId,
+        client,
+        controller,
+        params,
+      })
     default:
-      return mintWithCredixIx({
-        connection,
-        uxdProgramId,
-        client,
-        controller,
-        params,
-      })
+      throw new Error("Invalid mint depository type: " + depositoryType)
   }
 }

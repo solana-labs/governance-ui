@@ -1,16 +1,16 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import {
   UXDClient,
-  MercurialVaultDepository,
   UXD_DECIMALS,
   Controller,
 } from '@uxd-protocol/uxd-client'
 import { ConnectionContext } from '@utils/connection'
 import {
   getCredixLpDepository,
-  getDepositoryMintInfo,
   DEPOSITORY_TYPES,
   uxdClient,
+  getMercurialVaultDepository,
+  getAlloyxVaultDepository,
 } from './uxdClient'
 
 export type UXDRegisterDepositoryParams = {
@@ -21,8 +21,38 @@ export type UXDRegisterDepositoryParams = {
   redeemingFeeInBps: number
   redeemableDepositorySupplyCap: number
 }
+const registerMercurialVaultDepositoryIx = async ({
+  connection,
+  uxdProgramId,
+  client,
+  controller,
+  params,
+}: {
+  connection: ConnectionContext
+  uxdProgramId: PublicKey
+  client: UXDClient
+  controller: Controller
+  params: UXDRegisterDepositoryParams
+}): Promise<TransactionInstruction> => {
+  const depository = await getMercurialVaultDepository(
+    connection,
+    uxdProgramId,
+    params.depositoryMintName
+  )
 
-const registerNewCredixDepositoryIx = async ({
+  return client.createRegisterMercurialVaultDepositoryInstruction(
+    controller,
+    depository,
+    params.authority,
+    params.mintingFeeInBps,
+    params.redeemingFeeInBps,
+    params.redeemableDepositorySupplyCap,
+    { preflightCommitment: 'processed', commitment: 'processed' },
+    params.payer
+  )
+}
+
+const registerCredixLpDepositoryIx = async ({
   connection,
   uxdProgramId,
   client,
@@ -53,7 +83,7 @@ const registerNewCredixDepositoryIx = async ({
   )
 }
 
-const registerNewMercurialDepositoryIx = async ({
+const registerAlloyxVaultDepositoryIx = async ({
   connection,
   uxdProgramId,
   client,
@@ -65,23 +95,14 @@ const registerNewMercurialDepositoryIx = async ({
   client: UXDClient
   controller: Controller
   params: UXDRegisterDepositoryParams
-}): Promise<TransactionInstruction> => {
-  const {
-    address: collateralMint,
-    decimals: collateralDecimals,
-  } = getDepositoryMintInfo(connection.cluster, params.depositoryMintName)
-  const depository = await MercurialVaultDepository.initialize({
-    connection: connection.current,
-    collateralMint: {
-      mint: collateralMint,
-      name: params.depositoryMintName,
-      symbol: params.depositoryMintName,
-      decimals: collateralDecimals,
-    },
+}) => {
+  const depository = await getAlloyxVaultDepository(
+    connection,
     uxdProgramId,
-  })
+    params.depositoryMintName
+  )
 
-  return client.createRegisterMercurialVaultDepositoryInstruction(
+  return client.createRegisterAlloyxVaultDepositoryInstruction(
     controller,
     depository,
     params.authority,
@@ -93,6 +114,7 @@ const registerNewMercurialDepositoryIx = async ({
   )
 }
 
+
 export const registerUXDDepositoryIx = async (
   connection: ConnectionContext,
   uxdProgramId: PublicKey,
@@ -103,16 +125,24 @@ export const registerUXDDepositoryIx = async (
   const controller = new Controller('UXD', UXD_DECIMALS, uxdProgramId)
 
   switch (depositoryType) {
-    case DEPOSITORY_TYPES.MERCURIAL:
-      return registerNewMercurialDepositoryIx({
+    case DEPOSITORY_TYPES.MERCURIAL_VAULT:
+      return registerMercurialVaultDepositoryIx({
         connection,
         uxdProgramId,
         client,
         controller,
         params,
       })
-    case DEPOSITORY_TYPES.CREDIX:
-      return registerNewCredixDepositoryIx({
+    case DEPOSITORY_TYPES.CREDIX_LP:
+      return registerCredixLpDepositoryIx({
+        connection,
+        uxdProgramId,
+        client,
+        controller,
+        params,
+      })
+    case DEPOSITORY_TYPES.ALLOYX_VAULT:
+      return registerAlloyxVaultDepositoryIx({
         connection,
         uxdProgramId,
         client,

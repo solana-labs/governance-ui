@@ -64,7 +64,7 @@ const RegisterDepository = ({
 
   const [form, setForm] = useState<UXDRegisterDepositoryForm>({
     governedAccount: undefined,
-    depositoryType: DEPOSITORY_TYPES.CREDIX,
+    depositoryType: DEPOSITORY_TYPES.ALLOYX_VAULT,
     redeemableDepositorySupplyCap: 0,
     mintingFeeInBps: 0,
     redeemingFeeInBps: 0,

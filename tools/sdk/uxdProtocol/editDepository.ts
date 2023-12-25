@@ -1,7 +1,6 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import {
   UXDClient,
-  MercurialVaultDepository,
   Controller,
   UXD_DECIMALS,
 } from '@uxd-protocol/uxd-client'
@@ -9,7 +8,8 @@ import { ConnectionContext } from '@utils/connection'
 import {
   DEPOSITORY_TYPES,
   getCredixLpDepository,
-  getDepositoryMintInfo,
+  getMercurialVaultDepository,
+  getAlloyxVaultDepository,
   uxdClient,
 } from './uxdClient'
 
@@ -23,7 +23,7 @@ export type UXDEditDepositoryParams = {
   mintingDisabled: boolean
 }
 
-const editMercurialDepositoryIx = async ({
+const editMercurialVaultDepositoryIx = async ({
   connection,
   uxdProgramId,
   client,
@@ -36,20 +36,11 @@ const editMercurialDepositoryIx = async ({
   controller: Controller
   params: UXDEditDepositoryParams
 }): Promise<TransactionInstruction> => {
-  const {
-    address: collateralMint,
-    decimals: collateralDecimals,
-  } = getDepositoryMintInfo(connection.cluster, params.depositoryMintName)
-  const depository = await MercurialVaultDepository.initialize({
-    connection: connection.current,
-    collateralMint: {
-      mint: collateralMint,
-      name: params.depositoryMintName,
-      symbol: params.depositoryMintName,
-      decimals: collateralDecimals,
-    },
+  const depository = await getMercurialVaultDepository(
+    connection,
     uxdProgramId,
-  })
+    params.depositoryMintName
+  )
 
   return client.createEditMercurialVaultDepositoryInstruction(
     controller,
@@ -67,7 +58,7 @@ const editMercurialDepositoryIx = async ({
   )
 }
 
-const editCredixDepository = async ({
+const editCredixLpDepository = async ({
   connection,
   uxdProgramId,
   client,
@@ -102,6 +93,41 @@ const editCredixDepository = async ({
   )
 }
 
+const editAlloyxVaultDepository = async ({
+  connection,
+  uxdProgramId,
+  client,
+  controller,
+  params,
+}: {
+  connection: ConnectionContext
+  uxdProgramId: PublicKey
+  client: UXDClient
+  controller: Controller
+  params: UXDEditDepositoryParams
+}): Promise<TransactionInstruction> => {
+  const depository = await getAlloyxVaultDepository(
+    connection,
+    uxdProgramId,
+    params.depositoryMintName
+  )
+
+  return client.createEditAlloyxVaultDepositoryInstruction(
+    controller,
+    depository,
+    params.authority,
+    {
+      redeemableAmountUnderManagementCap:
+        params.redeemableAmountUnderManagementCap,
+      mintingFeeInBps: params.mintingFeeInBps,
+      redeemingFeeInBps: params.redeemingFeeInBps,
+      profitsBeneficiaryCollateral: params.profitsBeneficiaryCollateral,
+      mintingDisabled: params.mintingDisabled,
+    },
+    { preflightCommitment: 'processed', commitment: 'processed' }
+  )
+}
+
 export const editUXDDepositoryIx = async (
   connection: ConnectionContext,
   uxdProgramId: PublicKey,
@@ -111,22 +137,31 @@ export const editUXDDepositoryIx = async (
   const client = uxdClient(uxdProgramId)
   const controller = new Controller('UXD', UXD_DECIMALS, uxdProgramId)
   switch (depositoryType) {
-    case DEPOSITORY_TYPES.MERCURIAL:
-      return editMercurialDepositoryIx({
+    case DEPOSITORY_TYPES.MERCURIAL_VAULT:
+      return editMercurialVaultDepositoryIx({
         connection,
         uxdProgramId,
         client,
         controller,
         params,
       })
-    case DEPOSITORY_TYPES.CREDIX:
+    case DEPOSITORY_TYPES.CREDIX_LP:
+      return editCredixLpDepository({
+        connection,
+        uxdProgramId,
+        client,
+        controller,
+        params,
+      })
+    case DEPOSITORY_TYPES.ALLOYX_VAULT:
+      return editAlloyxVaultDepository({
+        connection,
+        uxdProgramId,
+        client,
+        controller,
+        params,
+      })
     default:
-      return editCredixDepository({
-        connection,
-        uxdProgramId,
-        client,
-        controller,
-        params,
-      })
+      throw new Error("Unsupported edit depository type:" + depositoryType)
   }
 }

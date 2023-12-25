@@ -2,15 +2,13 @@ import { EndpointTypes } from '@models/types'
 import { PublicKey } from '@solana/web3.js'
 import { ConnectionContext } from '@utils/connection'
 import { UXDClient } from '@uxd-protocol/uxd-client'
+import { MercurialVaultDepository } from '@uxd-protocol/uxd-client'
 import { CredixLpDepository } from '@uxd-protocol/uxd-client'
+import { AlloyxVaultDepository } from '@uxd-protocol/uxd-client'
 
 export const DEPOSITORY_MINTS = {
   devnet: {
-    MERCURIAL_USDC: {
-      address: new PublicKey('6L9fgyYtbz34JvwvYyL6YzJDAywz9PKGttuZuWyuoqje'),
-      decimals: 6,
-    },
-    CREDIX_USDC: {
+    USDC: {
       address: new PublicKey('Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr'),
       decimals: 6,
     },
@@ -27,34 +25,41 @@ export type DepositoriesRoutingWeightBps = {
   identityDepositoryWeightBps: number
   mercurialVaultDepositoryWeightBps: number
   credixLpDepositoryWeightBps: number
+  alloyxVaultDepositoryWeightBps: number
 }
 
 export type RouterDepositories = {
   identityDepository: PublicKey
   mercurialVaultDepository: PublicKey
   credixLpDepository: PublicKey
+  alloyxVaultDepository: PublicKey
 }
 
 export enum DEPOSITORY_TYPES {
   IDENTITY = 'Identity',
-  MERCURIAL = 'Mercurial',
-  CREDIX = 'Credix',
+  MERCURIAL_VAULT = 'MercurialVault',
+  CREDIX_LP = 'CredixLp',
+  ALLOYX_VAULT = "AlloyxVault"
 }
 
 export const getDepositoryTypes = (
   includeIdentityType: boolean
 ): DEPOSITORY_TYPES[] => {
-  const types = [DEPOSITORY_TYPES.CREDIX, DEPOSITORY_TYPES.MERCURIAL]
+  const types = [
+    DEPOSITORY_TYPES.MERCURIAL_VAULT,
+    DEPOSITORY_TYPES.CREDIX_LP,
+    DEPOSITORY_TYPES.ALLOYX_VAULT,
+  ]
   if (includeIdentityType) {
     types.push(DEPOSITORY_TYPES.IDENTITY)
   }
-
   return types
 }
 
 export const getDepositoryMintSymbols = (cluster: EndpointTypes): string[] => [
   ...Object.keys(DEPOSITORY_MINTS[cluster]),
 ]
+
 export const getDepositoryMintInfo = (
   cluster: EndpointTypes,
   symbol: string
@@ -65,6 +70,23 @@ export const getDepositoryMintInfo = (
 
 export const uxdClient = (programId: PublicKey): UXDClient => {
   return new UXDClient(programId)
+}
+
+export const getMercurialVaultDepository = (
+  connection: ConnectionContext,
+  uxdProgramId: PublicKey,
+  depositoryMintName: string
+) => {
+  const collateralMintAddress = getDepositoryMintInfo(
+    connection.cluster,
+    depositoryMintName
+  ).address
+  return MercurialVaultDepository.initialize({
+    connection: connection.current,
+    collateralMint: collateralMintAddress,
+    collateralSymbol: depositoryMintName,
+    uxdProgramId,
+  })
 }
 
 export const getCredixLpDepository = (
@@ -86,5 +108,22 @@ export const getCredixLpDepository = (
     collateralSymbol: depositoryMintName,
     uxdProgramId,
     credixProgramId: credixProgramId,
+  })
+}
+
+export const getAlloyxVaultDepository = (
+  connection: ConnectionContext,
+  uxdProgramId: PublicKey,
+  depositoryMintName: string
+) => {
+  const collateralMintAddress = getDepositoryMintInfo(
+    connection.cluster,
+    depositoryMintName
+  ).address
+  return AlloyxVaultDepository.initialize({
+    connection: connection.current,
+    collateralMint: collateralMintAddress,
+    collateralSymbol: depositoryMintName,
+    uxdProgramId,
   })
 }
