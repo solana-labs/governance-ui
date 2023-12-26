@@ -1,7 +1,7 @@
 export const MAINNET_RPC =
   process.env.NEXT_PUBLIC_MAINNET_RPC ||
   process.env.MAINNET_RPC ||
-  'http://realms-realms-c335.mainnet.rpcpool.com/258d3727-bb96-409d-abea-0b1b4c48af29/'
+  'https://wild-empty-sunset.solana-mainnet.quiknode.pro/58b024b787bbbe155d39de4ae5e789ac63ed1982/'
 
 export const DEVNET_RPC =
   process.env.NEXT_PUBLIC_DEVNET_RPC ||
