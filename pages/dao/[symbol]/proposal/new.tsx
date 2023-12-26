@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, {
   createContext,
@@ -35,20 +36,22 @@ import {
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { notify } from 'utils/notifications'
-import Clawback from 'VoteStakeRegistry/components/instructions/Clawback'
-import Grant from 'VoteStakeRegistry/components/instructions/Grant'
+// import Clawback from 'VoteStakeRegistry/components/instructions/Clawback'
+// import Grant from 'VoteStakeRegistry/components/instructions/Grant'
 import InstructionContentContainer from './components/InstructionContentContainer'
 import ProgramUpgrade from './components/instructions/bpfUpgradeableLoader/ProgramUpgrade'
 import CreateAssociatedTokenAccount from './components/instructions/CreateAssociatedTokenAccount'
 import CustomBase64 from './components/instructions/CustomBase64'
 import Empty from './components/instructions/Empty'
+// import MakeChangeMaxAccounts from './components/instructions/Mango/MakeChangeMaxAccounts'
+// import MakeChangeReferralFeeParams from './components/instructions/Mango/MakeChangeReferralFeeParams'
 import Mint from './components/instructions/Mint'
-import CreateObligationAccount from './components/instructions/Solend/CreateObligationAccount'
-import DepositReserveLiquidityAndObligationCollateral from './components/instructions/Solend/DepositReserveLiquidityAndObligationCollateral'
-import InitObligationAccount from './components/instructions/Solend/InitObligationAccount'
-import RefreshObligation from './components/instructions/Solend/RefreshObligation'
-import RefreshReserve from './components/instructions/Solend/RefreshReserve'
-import WithdrawObligationCollateralAndRedeemReserveLiquidity from './components/instructions/Solend/WithdrawObligationCollateralAndRedeemReserveLiquidity'
+// import CreateObligationAccount from './components/instructions/Solend/CreateObligationAccount'
+// import DepositReserveLiquidityAndObligationCollateral from './components/instructions/Solend/DepositReserveLiquidityAndObligationCollateral'
+// import InitObligationAccount from './components/instructions/Solend/InitObligationAccount'
+// import RefreshObligation from './components/instructions/Solend/RefreshObligation'
+// import RefreshReserve from './components/instructions/Solend/RefreshReserve'
+// import WithdrawObligationCollateralAndRedeemReserveLiquidity from './components/instructions/Solend/WithdrawObligationCollateralAndRedeemReserveLiquidity'
 import SplTokenTransfer from './components/instructions/SplTokenTransfer'
 import VoteBySwitch from './components/VoteBySwitch'
 import CreateNftPluginRegistrar from './components/instructions/NftVotingPlugin/CreateRegistrar'
@@ -68,7 +71,7 @@ import MakeInitCategoryParams from './components/instructions/Foresight/MakeInit
 import MakeResolveMarketParams from './components/instructions/Foresight/MakeResolveMarketParams'
 import MakeAddMarketListToCategoryParams from './components/instructions/Foresight/MakeAddMarketListToCategoryParams'
 import RealmConfig from './components/instructions/RealmConfig'
-import MakeSetMarketMetadataParams from './components/instructions/Foresight/MakeSetMarketMetadataParams'
+// import MakeSetMarketMetadataParams from './components/instructions/Foresight/MakeSetMarketMetadataParams'
 import CloseTokenAccount from './components/instructions/CloseTokenAccount'
 import CloseMultipleTokenAccounts from './components/instructions/CloseMultipleTokenAccounts'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
@@ -445,17 +448,17 @@ const New = () => {
   // if a component needs specials attributes, use componentBuilderFunction object
   const instructionMap: {
     [key in Instructions]:
-      | ((props: {
-          index: number
-          governance: ProgramAccount<Governance> | null
-        }) => JSX.Element | null)
-      | {
-          componentBuilderFunction: (props: {
-            index: number
-            governance: ProgramAccount<Governance> | null
-          }) => JSX.Element | null
-        }
-      | null
+    | ((props: {
+      index: number
+      governance: ProgramAccount<Governance> | null
+    }) => JSX.Element | null)
+    | {
+      componentBuilderFunction: (props: {
+        index: number
+        governance: ProgramAccount<Governance> | null
+      }) => JSX.Element | null
+    }
+    | null
   } = useMemo(
     () => ({
       [Instructions.Transfer]: SplTokenTransfer,
@@ -521,9 +524,9 @@ const New = () => {
       [Instructions.ForesightAddMarketListToCategory]: MakeAddMarketListToCategoryParams,
       [Instructions.ForesightSetMarketMetadata]: MakeSetMarketMetadataParams,
       [Instructions.RealmConfig]: RealmConfig,
-      [Instructions.CreateNftPluginRegistrar]: CreateNftPluginRegistrar,
-      [Instructions.CreateNftPluginMaxVoterWeight]: CreateNftPluginMaxVoterWeightRecord,
-      [Instructions.ConfigureNftPluginCollection]: ConfigureNftPluginCollection,
+      // [Instructions.CreateNftPluginRegistrar]: CreateNftPluginRegistrar,
+      // [Instructions.CreateNftPluginMaxVoterWeight]: CreateNftPluginMaxVoterWeightRecord,
+      // [Instructions.ConfigureNftPluginCollection]: ConfigureNftPluginCollection,
       [Instructions.CloseTokenAccount]: CloseTokenAccount,
       [Instructions.CloseMultipleTokenAccounts]: CloseMultipleTokenAccounts,
       [Instructions.VotingMintConfig]: VotingMintConfig,
@@ -589,7 +592,65 @@ const New = () => {
       [Instructions.AddServiceToDID]: AddServiceToDID,
       [Instructions.RemoveServiceFromDID]: RemoveServiceFromDID,
       [Instructions.RevokeGoverningTokens]: RevokeGoverningTokens,
-      [Instructions.SetMintAuthority]: SetMintAuthority,
+      // [Instructions.SagaPreOrder]: SagaPreOrder,
+      // [Instructions.DepositToMangoAccount]: MakeDepositToMangoAccount,
+      // [Instructions.DepositToMangoAccountCsv]: MakeDepositToMangoAccountCsv,
+      // [Instructions.StakeValidator]: StakeValidator,
+      // [Instructions.DeactivateValidatorStake]: DeactivateValidatorStake,
+      // [Instructions.WithdrawValidatorStake]: WithdrawValidatorStake,
+      // [Instructions.DifferValidatorStake]: null,
+      // [Instructions.TransferDomainName]: TransferDomainName,
+      // [Instructions.EverlendDeposit]: DepositForm,
+      // [Instructions.EverlendWithdraw]: WithdrawForm,
+      // [Instructions.SerumInitUser]: InitUser,
+      // [Instructions.SerumGrantLockedSRM]: {
+      //   componentBuilderFunction: ({ index, governance }) => (
+      //     <GrantForm
+      //       index={index}
+      //       governance={governance}
+      //       isLocked={true}
+      //       isMsrm={false}
+      //     />
+      //   ),
+      // },
+      // [Instructions.SerumGrantLockedMSRM]: {
+      //   componentBuilderFunction: ({ index, governance }) => (
+      //     <GrantForm
+      //       index={index}
+      //       governance={governance}
+      //       isLocked={true}
+      //       isMsrm={true}
+      //     />
+      //   ),
+      // },
+      // [Instructions.SerumGrantVestSRM]: {
+      //   componentBuilderFunction: ({ index, governance }) => (
+      //     <GrantForm
+      //       index={index}
+      //       governance={governance}
+      //       isLocked={false}
+      //       isMsrm={false}
+      //     />
+      //   ),
+      // },
+      // [Instructions.SerumGrantVestMSRM]: {
+      //   componentBuilderFunction: ({ index, governance }) => (
+      //     <GrantForm
+      //       index={index}
+      //       governance={governance}
+      //       isLocked={false}
+      //       isMsrm={true}
+      //     />
+      //   ),
+      // },
+      // [Instructions.SerumUpdateGovConfigParams]: UpdateConfigParams,
+      // [Instructions.SerumUpdateGovConfigAuthority]: UpdateConfigAuthority,
+      // [Instructions.JoinDAO]: JoinDAO,
+      // [Instructions.ClaimMangoTokens]: ClaimMangoTokens,
+      // [Instructions.AddKeyToDID]: AddKeyToDID,
+      // [Instructions.RemoveKeyFromDID]: RemoveKeyFromDID,
+      // [Instructions.AddServiceToDID]: AddServiceToDID,
+      // [Instructions.RemoveServiceFromDID]: RemoveServiceFromDID,
     }),
     [governance?.pubkey?.toBase58()]
   )
@@ -632,12 +693,16 @@ const New = () => {
   return (
     <div className="grid grid-cols-12 gap-4">
       <div
-        className={`bg-bkg-2 col-span-12 md:col-span-7 md:order-first lg:col-span-8 order-last p-4 md:p-6 rounded-lg space-y-3 ${
-          isLoading ? 'pointer-events-none' : ''
-        }`}
+        className={`bg-bkg-2 col-span-12 md:col-span-7 md:order-first lg:col-span-8 order-last p-4 md:p-6 rounded-lg space-y-3 ${isLoading ? 'pointer-events-none' : ''
+          }`}
       >
         <>
-          <PreviousRouteBtn></PreviousRouteBtn>
+          <Link href={fmtUrlWithCluster(`/dao/${symbol}/`)}>
+            <a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">
+              <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
+              Back
+            </a>
+          </Link>
           <div className="border-b border-fgd-4 pb-4 pt-2">
             <div className="flex items-center justify-between">
               <h1>

@@ -12,9 +12,10 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { getAllSplGovernanceProgramIds } from './tools/realms'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (!process.env.BACKEND_MAINNET_RPC)
-    return res.status(500).json('BACKEND_MAINNET_RPC not provided in env')
-  const conn = new Connection(process.env.BACKEND_MAINNET_RPC, 'recent')
+  const conn = new Connection(
+    'https://wild-empty-sunset.solana-mainnet.quiknode.pro/58b024b787bbbe155d39de4ae5e789ac63ed1982/',
+    'recent'
+  )
 
   console.log('fetching spl-gov instances...')
   // Get all realms

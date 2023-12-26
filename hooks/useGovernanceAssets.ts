@@ -62,7 +62,7 @@ export default function useGovernanceAssets() {
     governancesQuery.data,
   ])
 
-  function canUseGovernanceForInstruction(types: AccountType[]) {
+  function canUseGovernanceForInstruction(types: GovernanceAccountType[]) {
     return (
       realm &&
       assetAccounts
@@ -72,11 +72,16 @@ export default function useGovernanceAssets() {
         )
     )
   }
-
   const canMintRealmCouncilToken = () => {
-    return !!assetAccounts.find(
+    const governances = getGovernancesByAccountTypes([
+      GovernanceAccountType.MintGovernanceV1,
+      GovernanceAccountType.MintGovernanceV2,
+    ])
+
+    return !!governances.find(
       (x) =>
-        x.pubkey.toBase58() == realm?.account.config.councilMint?.toBase58()
+        x.account.governedAccount.toBase58() ==
+        realm?.account.config.councilMint?.toBase58()
     )
   }
   const canUseTransferInstruction = governedTokenAccounts.some((acc) => {
@@ -90,11 +95,13 @@ export default function useGovernanceAssets() {
   })
 
   const canUseProgramUpgradeInstruction = canUseGovernanceForInstruction([
-    AccountType.PROGRAM,
+    GovernanceAccountType.ProgramGovernanceV1,
+    GovernanceAccountType.ProgramGovernanceV2,
   ])
 
   const canUseMintInstruction = canUseGovernanceForInstruction([
-    AccountType.MINT,
+    GovernanceAccountType.MintGovernanceV1,
+    GovernanceAccountType.MintGovernanceV2,
   ])
 
   const canUseAnyInstruction =
@@ -307,19 +314,24 @@ export default function useGovernanceAssets() {
       isVisible: canUseAuthorityInstruction,
       packageId: PackageEnum.Common,
     },
-    [Instructions.StakeValidator]: {
-      name: 'Stake A Validator',
-      packageId: PackageEnum.Common,
-    },
+    // [Instructions.SagaPreOrder]: {
+    //   name: 'Pre-order Saga Phone',
+    //   isVisible: canUseTokenTransferInstruction,
+    //   packageId: PackageEnum.Common,
+    // },
+    // [Instructions.StakeValidator]: {
+    //   name: 'Stake A Validator',
+    //   packageId: PackageEnum.Common,
+    // },
     [Instructions.Transfer]: {
       name: 'Transfer Tokens',
       isVisible: canUseTokenTransferInstruction,
       packageId: PackageEnum.Common,
     },
-    [Instructions.TransferDomainName]: {
-      name: 'SNS Transfer Out Domain Name',
-      packageId: PackageEnum.Common,
-    },
+    // [Instructions.TransferDomainName]: {
+    //   name: 'SNS Transfer Out Domain Name',
+    //   packageId: PackageEnum.Common,
+    // },
     [Instructions.UpdateTokenMetadata]: {
       name: 'Update Token Metadata',
       isVisible: canUseAuthorityInstruction,
@@ -447,36 +459,36 @@ export default function useGovernanceAssets() {
       ██ ██████  ███████ ██   ████    ██    ██    ██       ██
     */
 
-    [Instructions.ConfigureGatewayPlugin]: {
-      name: 'Configure',
-      isVisible: canUseAuthorityInstruction,
-      packageId: PackageEnum.GatewayPlugin,
-    },
-    [Instructions.CreateGatewayPluginRegistrar]: {
-      name: 'Create registrar',
-      isVisible: canUseAuthorityInstruction,
-      packageId: PackageEnum.GatewayPlugin,
-    },
-    [Instructions.AddKeyToDID]: {
-      name: 'Add Key to DID',
-      isVisible: canUseAnyInstruction,
-      packageId: PackageEnum.Identity,
-    },
-    [Instructions.RemoveKeyFromDID]: {
-      name: 'Remove Key from DID',
-      isVisible: canUseAnyInstruction,
-      packageId: PackageEnum.Identity,
-    },
-    [Instructions.AddServiceToDID]: {
-      name: 'Add Service to DID',
-      isVisible: canUseAnyInstruction,
-      packageId: PackageEnum.Identity,
-    },
-    [Instructions.RemoveServiceFromDID]: {
-      name: 'Remove Service from DID',
-      isVisible: canUseAnyInstruction,
-      packageId: PackageEnum.Identity,
-    },
+    // [Instructions.ConfigureGatewayPlugin]: {
+    //   name: 'Configure',
+    //   isVisible: canUseAuthorityInstruction,
+    //   packageId: PackageEnum.GatewayPlugin,
+    // },
+    // [Instructions.CreateGatewayPluginRegistrar]: {
+    //   name: 'Create registrar',
+    //   isVisible: canUseAuthorityInstruction,
+    //   packageId: PackageEnum.GatewayPlugin,
+    // },
+    // [Instructions.AddKeyToDID]: {
+    //   name: 'Add Key to DID',
+    //   isVisible: canUseAnyInstruction,
+    //   packageId: PackageEnum.Identity,
+    // },
+    // [Instructions.RemoveKeyFromDID]: {
+    //   name: 'Remove Key from DID',
+    //   isVisible: canUseAnyInstruction,
+    //   packageId: PackageEnum.Identity,
+    // },
+    // [Instructions.AddServiceToDID]: {
+    //   name: 'Add Service to DID',
+    //   isVisible: canUseAnyInstruction,
+    //   packageId: PackageEnum.Identity,
+    // },
+    // [Instructions.RemoveServiceFromDID]: {
+    //   name: 'Remove Service from DID',
+    //   isVisible: canUseAnyInstruction,
+    //   packageId: PackageEnum.Identity,
+    // },
 
     /*
       ███    ██ ███████ ████████     ██████  ██      ██    ██  ██████  ██ ███    ██
@@ -486,21 +498,115 @@ export default function useGovernanceAssets() {
       ██   ████ ██         ██        ██      ███████  ██████   ██████  ██ ██   ████
     */
 
-    [Instructions.ConfigureNftPluginCollection]: {
-      name: 'Configure collection',
-      isVisible: canUseAuthorityInstruction,
-      packageId: PackageEnum.NftPlugin,
-    },
-    [Instructions.CreateNftPluginMaxVoterWeight]: {
-      name: 'Create max voter weight',
-      isVisible: canUseAuthorityInstruction,
-      packageId: PackageEnum.NftPlugin,
-    },
-    [Instructions.CreateNftPluginRegistrar]: {
-      name: 'Create registrar',
-      isVisible: canUseAuthorityInstruction,
-      packageId: PackageEnum.NftPlugin,
-    },
+    // [Instructions.ConfigureNftPluginCollection]: {
+    //   name: 'Configure collection',
+    //   isVisible: canUseAuthorityInstruction,
+    //   packageId: PackageEnum.NftPlugin,
+    // },
+    // [Instructions.CreateNftPluginMaxVoterWeight]: {
+    //   name: 'Create max voter weight',
+    //   isVisible: canUseAuthorityInstruction,
+    //   packageId: PackageEnum.NftPlugin,
+    // },
+    // [Instructions.CreateNftPluginRegistrar]: {
+    //   name: 'Create registrar',
+    //   isVisible: canUseAuthorityInstruction,
+    //   packageId: PackageEnum.NftPlugin,
+    // },
+
+    /*
+      ███    ███  █████  ███    ██  ██████   ██████      ██    ██ ██████
+      ████  ████ ██   ██ ████   ██ ██       ██    ██     ██    ██      ██
+      ██ ████ ██ ███████ ██ ██  ██ ██   ███ ██    ██     ██    ██  █████
+      ██  ██  ██ ██   ██ ██  ██ ██ ██    ██ ██    ██      ██  ██       ██
+      ██      ██ ██   ██ ██   ████  ██████   ██████        ████   ██████
+    */
+
+    // [Instructions.ClaimMangoTokens]: {
+    //   name: 'Claim Tokens',
+    //   isVisible: canUseTokenTransferInstruction,
+    //   packageId: PackageEnum.MangoMarketV3,
+    // },
+    // [Instructions.DepositToMangoAccount]: {
+    //   name: 'Deposit to mango account',
+    //   isVisible: canUseTokenTransferInstruction,
+    //   packageId: PackageEnum.MangoMarketV3,
+    // },
+    // [Instructions.DepositToMangoAccountCsv]: {
+    //   name: 'Deposit to mango account with CSV',
+    //   isVisible: canUseTokenTransferInstruction,
+    //   packageId: PackageEnum.MangoMarketV3,
+    // },
+    // [Instructions.MangoAddOracle]: {
+    //   name: 'Add Oracle',
+    //   isVisible: canUseProgramUpgradeInstruction,
+    //   packageId: PackageEnum.MangoMarketV3,
+    // },
+    // [Instructions.MangoAddSpotMarket]: {
+    //   name: 'Add Spot Market',
+    //   isVisible: canUseProgramUpgradeInstruction,
+    //   packageId: PackageEnum.MangoMarketV3,
+    // },
+    // [Instructions.MangoChangeMaxAccounts]: {
+    //   name: 'Change Max Accounts',
+    //   isVisible: canUseProgramUpgradeInstruction,
+    //   packageId: PackageEnum.MangoMarketV3,
+    // },
+    // [Instructions.MangoChangePerpMarket]: {
+    //   name: 'Change Perp Market',
+    //   isVisible: canUseProgramUpgradeInstruction,
+    //   packageId: PackageEnum.MangoMarketV3,
+    // },
+    // [Instructions.MangoChangeQuoteParams]: {
+    //   name: 'Change Quote Params',
+    //   isVisible: canUseProgramUpgradeInstruction,
+    //   packageId: PackageEnum.MangoMarketV3,
+    // },
+    // [Instructions.MangoChangeReferralFeeParams]: {
+    //   name: 'Change Referral Fee Params',
+    //   isVisible: canUseProgramUpgradeInstruction,
+    //   packageId: PackageEnum.MangoMarketV3,
+    // },
+    // [Instructions.MangoChangeReferralFeeParams2]: {
+    //   name: 'Change Referral Fee Params V2',
+    //   isVisible: canUseProgramUpgradeInstruction,
+    //   packageId: PackageEnum.MangoMarketV3,
+    // },
+    // [Instructions.MangoChangeSpotMarket]: {
+    //   name: 'Change Spot Market',
+    //   isVisible: canUseProgramUpgradeInstruction,
+    //   packageId: PackageEnum.MangoMarketV3,
+    // },
+    // [Instructions.MangoCreatePerpMarket]: {
+    //   name: 'Create Perp Market',
+    //   isVisible: canUseProgramUpgradeInstruction,
+    //   packageId: PackageEnum.MangoMarketV3,
+    // },
+    // [Instructions.MangoRemoveOracle]: {
+    //   name: 'Remove Oracle',
+    //   isVisible: canUseProgramUpgradeInstruction,
+    //   packageId: PackageEnum.MangoMarketV3,
+    // },
+    // [Instructions.MangoRemovePerpMarket]: {
+    //   name: 'Remove Perp Market',
+    //   isVisible: canUseProgramUpgradeInstruction,
+    //   packageId: PackageEnum.MangoMarketV3,
+    // },
+    // [Instructions.MangoRemoveSpotMarket]: {
+    //   name: 'Remove Spot Market',
+    //   isVisible: canUseProgramUpgradeInstruction,
+    //   packageId: PackageEnum.MangoMarketV3,
+    // },
+    // [Instructions.MangoSetMarketMode]: {
+    //   name: 'Set Market Mode',
+    //   isVisible: canUseProgramUpgradeInstruction,
+    //   packageId: PackageEnum.MangoMarketV3,
+    // },
+    // [Instructions.MangoSwapSpotMarket]: {
+    //   name: 'Swap Spot Market',
+    //   isVisible: canUseProgramUpgradeInstruction,
+    //   packageId: PackageEnum.MangoMarketV3,
+    // },
 
     /*
       ███    ███  █████  ███    ██  ██████   ██████      ██    ██ ██   ██
@@ -603,26 +709,26 @@ export default function useGovernanceAssets() {
       ██      ██ ███████ ██   ██ ██   ████     ██      ██ ██   ████ ██   ██ ██   ████  ██████ ███████
     */
 
-    [Instructions.MeanCreateAccount]: {
-      name: 'Payment Stream: New account',
-      packageId: PackageEnum.MeanFinance,
-    },
-    [Instructions.MeanFundAccount]: {
-      name: 'Payment Stream: Fund account',
-      packageId: PackageEnum.MeanFinance,
-    },
-    [Instructions.MeanWithdrawFromAccount]: {
-      name: 'Payment Stream: Withdraw funds',
-      packageId: PackageEnum.MeanFinance,
-    },
-    [Instructions.MeanCreateStream]: {
-      name: 'Payment Stream: New stream',
-      packageId: PackageEnum.MeanFinance,
-    },
-    [Instructions.MeanTransferStream]: {
-      name: 'Payment Stream: Transfer stream',
-      packageId: PackageEnum.MeanFinance,
-    },
+    // [Instructions.MeanCreateAccount]: {
+    //   name: 'Payment Stream: New account',
+    //   packageId: PackageEnum.MeanFinance,
+    // },
+    // [Instructions.MeanFundAccount]: {
+    //   name: 'Payment Stream: Fund account',
+    //   packageId: PackageEnum.MeanFinance,
+    // },
+    // [Instructions.MeanWithdrawFromAccount]: {
+    //   name: 'Payment Stream: Withdraw funds',
+    //   packageId: PackageEnum.MeanFinance,
+    // },
+    // [Instructions.MeanCreateStream]: {
+    //   name: 'Payment Stream: New stream',
+    //   packageId: PackageEnum.MeanFinance,
+    // },
+    // [Instructions.MeanTransferStream]: {
+    //   name: 'Payment Stream: Transfer stream',
+    //   packageId: PackageEnum.MeanFinance,
+    // },
 
     /*
       ██████  ███████ ██    ██  ███████ ██ ███    ██  █████  ███    ██  ██████ ███████
@@ -632,22 +738,22 @@ export default function useGovernanceAssets() {
       ██      ███████    ██     ██      ██ ██   ████ ██   ██ ██   ████  ██████ ███████ 
     */
 
-    [Instructions.PsyFinanceMintAmericanOptions]: {
-      name: ' Mint American Options',
-      packageId: PackageEnum.PsyFinance,
-    },
-    [Instructions.PsyFinanceBurnWriterForQuote]: {
-      name: 'Claim Quote with Writer Token',
-      packageId: PackageEnum.PsyFinance,
-    },
-    [Instructions.PsyFinanceClaimUnderlyingPostExpiration]: {
-      name: 'Claim Underlying (post expiration)',
-      packageId: PackageEnum.PsyFinance,
-    },
-    [Instructions.PsyFinanceExerciseOption]: {
-      name: 'Exercise Option',
-      packageId: PackageEnum.PsyFinance,
-    },
+    // [Instructions.PsyFinanceMintAmericanOptions]: {
+    //   name: ' Mint American Options',
+    //   packageId: PackageEnum.PsyFinance,
+    // },
+    // [Instructions.PsyFinanceBurnWriterForQuote]: {
+    //   name: 'Claim Quote with Writer Token',
+    //   packageId: PackageEnum.PsyFinance,
+    // },
+    // [Instructions.PsyFinanceClaimUnderlyingPostExpiration]: {
+    //   name: 'Claim Underlying (post expiration)',
+    //   packageId: PackageEnum.PsyFinance,
+    // },
+    // [Instructions.PsyFinanceExerciseOption]: {
+    //   name: 'Exercise Option',
+    //   packageId: PackageEnum.PsyFinance,
+    // },
 
     /*
       ███████ ███████ ██████  ██    ██ ███    ███
@@ -657,34 +763,34 @@ export default function useGovernanceAssets() {
       ███████ ███████ ██   ██  ██████  ██      ██
     */
 
-    [Instructions.SerumGrantLockedMSRM]: {
-      name: 'Grant Locked MSRM',
-      packageId: PackageEnum.Serum,
-    },
-    [Instructions.SerumGrantLockedSRM]: {
-      name: 'Grant Locked SRM',
-      packageId: PackageEnum.Serum,
-    },
-    [Instructions.SerumGrantVestMSRM]: {
-      name: 'Grant Vested MSRM',
-      packageId: PackageEnum.Serum,
-    },
-    [Instructions.SerumGrantVestSRM]: {
-      name: 'Grant Vested SRM',
-      packageId: PackageEnum.Serum,
-    },
-    [Instructions.SerumInitUser]: {
-      name: 'Init User Account',
-      packageId: PackageEnum.Serum,
-    },
-    [Instructions.SerumUpdateGovConfigAuthority]: {
-      name: 'Update Governance Config Authority',
-      packageId: PackageEnum.Serum,
-    },
-    [Instructions.SerumUpdateGovConfigParams]: {
-      name: 'Update Governance Config Params',
-      packageId: PackageEnum.Serum,
-    },
+    // [Instructions.SerumGrantLockedMSRM]: {
+    //   name: 'Grant Locked MSRM',
+    //   packageId: PackageEnum.Serum,
+    // },
+    // [Instructions.SerumGrantLockedSRM]: {
+    //   name: 'Grant Locked SRM',
+    //   packageId: PackageEnum.Serum,
+    // },
+    // [Instructions.SerumGrantVestMSRM]: {
+    //   name: 'Grant Vested MSRM',
+    //   packageId: PackageEnum.Serum,
+    // },
+    // [Instructions.SerumGrantVestSRM]: {
+    //   name: 'Grant Vested SRM',
+    //   packageId: PackageEnum.Serum,
+    // },
+    // [Instructions.SerumInitUser]: {
+    //   name: 'Init User Account',
+    //   packageId: PackageEnum.Serum,
+    // },
+    // [Instructions.SerumUpdateGovConfigAuthority]: {
+    //   name: 'Update Governance Config Authority',
+    //   packageId: PackageEnum.Serum,
+    // },
+    // [Instructions.SerumUpdateGovConfigParams]: {
+    //   name: 'Update Governance Config Params',
+    //   packageId: PackageEnum.Serum,
+    // },
 
     /*
       ███████  ██████  ██      ███████ ███    ██ ██████
@@ -802,6 +908,7 @@ export default function useGovernanceAssets() {
     auxiliaryTokenAccounts,
     availableInstructions,
     availablePackages,
+    canMintRealmCommunityToken,
     canMintRealmCouncilToken,
     canUseAuthorityInstruction,
     canUseMintInstruction,

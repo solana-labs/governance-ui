@@ -20,6 +20,7 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import NftVotingCountingModal from '@components/NftVotingCountingModal'
 import { getResourcePathPart } from '@tools/core/resources'
 import useSerumGovStore from 'stores/useSerumGovStore'
+import Footer from './Footer'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
@@ -219,7 +220,20 @@ export function AppContents(props: Props) {
     resetDepositState,
     vsrClient,
     wallet?.connected,
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+    vsrClient?.program.programId.toBase58(),
   ])
+
+  useEffect(() => {
+    if (
+      prevStringifyPossibleNftsAccounts !==
+      JSON.stringify(possibleNftsAccounts) &&
+      realm?.pubkey
+    ) {
+      getNfts(possibleNftsAccounts, connection)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
+  }, [JSON.stringify(possibleNftsAccounts), realm?.pubkey.toBase58()])
 
   useEffect(() => {
     updateSerumGovAccounts(cluster as string | undefined)
@@ -315,16 +329,21 @@ export function AppContents(props: Props) {
       </Head>
       <GoogleTag />
       <ErrorBoundary>
-        <ThemeProvider defaultTheme="Dark">
-          <GatewayProvider>
-            <NavBar />
-            <Notifications />
-            <TransactionLoader></TransactionLoader>
-            <NftVotingCountingModal />
-            <PageBodyContainer>{props.children}</PageBodyContainer>
-          </GatewayProvider>
-        </ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider defaultTheme="Dark">
+            <WalletIdentityProvider appName={'Realms'}>
+              <GatewayProvider>
+                <NavBar />
+                <Notifications />
+                <TransactionLoader></TransactionLoader>
+                <NftVotingCountingModal />
+                <PageBodyContainer>{props.children}</PageBodyContainer>
+              </GatewayProvider>
+            </WalletIdentityProvider>
+          </ThemeProvider>
+        </QueryClientProvider>
       </ErrorBoundary>
+      <Footer />
     </div>
   )
 }

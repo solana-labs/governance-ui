@@ -237,13 +237,13 @@ export const getMeanCreateAccountSchema = ({ form }) => {
               governedTokenAccount?.extensions.mint.account.decimals
             )
             return !!(governedTokenAccount?.extensions.token?.publicKey &&
-            !governedTokenAccount.isSol
+              !governedTokenAccount.isSol
               ? governedTokenAccount.extensions.token.account.amount.gte(
-                  mintValue
-                )
+                mintValue
+              )
               : new BN(
-                  governedTokenAccount.extensions.solAccount!.lamports
-                ).gte(mintValue))
+                governedTokenAccount.extensions.solAccount!.lamports
+              ).gte(mintValue))
           }
           return this.createError({
             message: `Amount is required`,
@@ -285,13 +285,13 @@ export const getMeanFundAccountSchema = ({ form }) => {
               governedTokenAccount?.extensions.mint.account.decimals
             )
             return !!(governedTokenAccount?.extensions.token?.publicKey &&
-            !governedTokenAccount.isSol
+              !governedTokenAccount.isSol
               ? governedTokenAccount.extensions.token.account.amount.gte(
-                  mintValue
-                )
+                mintValue
+              )
               : new BN(
-                  governedTokenAccount.extensions.solAccount!.lamports
-                ).gte(mintValue))
+                governedTokenAccount.extensions.solAccount!.lamports
+              ).gte(mintValue))
           }
           return this.createError({
             message: `Amount is required`,
@@ -932,13 +932,13 @@ export const getTokenTransferSchema = ({
               return tokenAmount.gte(mintValue)
             }
             return !!(governedTokenAccount?.extensions.token?.publicKey &&
-            !governedTokenAccount.isSol
+              !governedTokenAccount.isSol
               ? governedTokenAccount.extensions.token.account.amount.gte(
-                  mintValue
-                )
+                mintValue
+              )
               : new BN(
-                  governedTokenAccount.extensions.solAccount!.lamports
-                ).gte(mintValue))
+                governedTokenAccount.extensions.solAccount!.lamports
+              ).gte(mintValue))
           }
           return this.createError({
             message: `Amount is required`,
@@ -1072,7 +1072,7 @@ export const getStakeSchema = ({ form }) => {
           return !!(
             form.governedTokenAccount.extensions.solAccount.owner &&
             form.governedTokenAccount.extensions.solAccount.lamports >=
-              new BN(mintValue)
+            new BN(mintValue)
           )
         }
         return this.createError({ message: 'Amount is required' })

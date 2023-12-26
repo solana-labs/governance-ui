@@ -206,7 +206,7 @@ export interface ForesightHasCategoryId extends ForesightHasGovernedAccount {
 
 export interface ForesightMakeAddMarketListToCategoryParams
   extends ForesightHasCategoryId,
-    ForesightHasMarketListId {}
+  ForesightHasMarketListId { }
 
 export interface ForesightMakeResolveMarketParams extends ForesightHasMarketId {
   winner: number
@@ -322,10 +322,10 @@ export enum Instructions {
   ConfigureGatewayPlugin,
   ConfigureNftPluginCollection,
   CreateAssociatedTokenAccount,
-  CreateGatewayPluginRegistrar,
-  CreateNftPluginMaxVoterWeight,
-  CreateNftPluginRegistrar,
-  CreateSolendObligationAccount,
+  // CreateGatewayPluginRegistrar,
+  // CreateNftPluginMaxVoterWeight,
+  // CreateNftPluginRegistrar,
+  // CreateSolendObligationAccount,
   CreateTokenMetadata,
   CreateVsrRegistrar,
   DeactivateValidatorStake,
@@ -380,10 +380,10 @@ export enum Instructions {
   Mint,
   None,
   ProgramUpgrade,
-  PsyFinanceBurnWriterForQuote,
-  PsyFinanceClaimUnderlyingPostExpiration,
-  PsyFinanceExerciseOption,
-  PsyFinanceMintAmericanOptions,
+  // PsyFinanceBurnWriterForQuote,
+  // PsyFinanceClaimUnderlyingPostExpiration,
+  // PsyFinanceExerciseOption,
+  // PsyFinanceMintAmericanOptions,
   RealmConfig,
   RefreshSolendObligation,
   RefreshSolendReserve,
@@ -398,7 +398,7 @@ export enum Instructions {
   SwitchboardFundOracle,
   WithdrawFromOracle,
   Transfer,
-  TransferDomainName,
+  // TransferDomainName,
   UpdateTokenMetadata,
   VotingMintConfig,
   WithdrawObligationCollateralAndRedeemReserveLiquidity,
@@ -409,7 +409,7 @@ export enum Instructions {
   AddServiceToDID,
   RemoveServiceFromDID,
   RevokeGoverningTokens,
-  SetMintAuthority,
+  //SetMintAuthority,
 }
 
 export interface ComponentInstructionData {

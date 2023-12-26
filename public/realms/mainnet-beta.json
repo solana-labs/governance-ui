@@ -1189,8 +1189,8 @@
     "website": "https://services.grapes.network/",
     "twitter": "@grapeprotocol",
     "ogImage": "/realms/GrapeCCSubDAO/GrapeCCSubDAO.png"
-  },
-  {
+   },
+   {
     "symbol": "AthensDAO",
     "displayName": "AthensDAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1199,8 +1199,8 @@
     "website": "https://athensdao.net/",
     "twitter": "@GrapeAthensDAO",
     "ogImage": "/realms/AthensDAO/AthensDAO_Logo.jpg"
-  },
-  {
+   },
+   {
     "symbol": "Wen DAO",
     "displayName": "Wen DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1208,8 +1208,8 @@
     "website": "https://services.grapes.network/",
     "twitter": "@grapeprotocol",
     "ogImage": "/realms/Wen DAO/Wen DAO.png"
-  },
-  {
+   }, 
+   { 
     "symbol": "BOOT",
     "displayName": "Bootstrap DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -1254,7 +1254,7 @@
     "ogImage": "/realms/bacDao/logo_bulls.png",
     "website": "https://bullsarmyclub.com/"
   },
-  {
+ {
     "symbol": "EPCT",
     "category": "web3",
     "bannerImage": "https://bafybeih52um4tvyggeja36kmbyg5b4pfod547qxdite4krwoe4nwtareji.ipfs.w3s.link/EpicsBetaTwitterHeaderLogo.png",
@@ -1776,20 +1776,6 @@
     "shortDescription": "Web3’s Global Home ",
     "website": "https://empiredao.xyz/",
     "twitter": "@empiredao"
-  },
-  {
-    "symbol": "Holaplex",
-    "category": "web3",
-    "bannerImage": "https://i.imgur.com/uW2laRX.png",
-    "displayName": "Holaplex",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "4H282CCFjstxBd651gdhAydnXcjGk956Dk7p25MqxmfN",
-    "ogImage": "https://i.imgur.com/v9GE74q.png",
-    "shortDescription": "Holaplex provides a suite of web3 and NFT commerce solutions for businesses.",
-    "sortRank": 3,
-    "website": "https://www.holaplex.com/",
-    "twitter": "@holaplex",
-    "github": "https://github.com/holaplex"
   },
   {
     "symbol": "Angelic",
@@ -3142,10 +3128,11 @@
     "discord": "https://discord.gg/XcWVHM2Z",
     "github": "https://github.com/brdot",
     "website": "https://brdot.com.br"
+    
   },
   {
     "symbol": "SAO",
-    "category": "nft",
+    "category":"nft",
     "displayName": "Sator DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "7yAiT2bUg5MwBzT3K9BvhcZdtHr5z8AnCGWa2iPJjB3T",
@@ -3154,11 +3141,11 @@
     "shortDescription": "Sator brings traditional TV and movies into Web3 through NFT-VOD and token-gated staking.",
     "website": "https://sator.io",
     "discord": "https://discord.gg/qftzCFrHNQ",
-    "twitter": "https://twitter.com/SatorSAO"
+    "twitter": "https://twitter.com/SatorSAO" 
   },
-  {
+  { 
     "symbol": "Safecows",
-    "category": "web3",
+    "category":"web3",
     "displayName": "Safecows",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "6RQAna7aWHLVwfYRFGyM8kpnBXNGkMNCGfvuwYuuvpFU",
@@ -3170,7 +3157,7 @@
   },
   {
     "symbol": "BlueChickDAO",
-    "category": "gaming",
+    "category":"gaming",
     "displayName": "The Blue Chick NFTs DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "99c96qFUwLiGcbudDeTLVxYTbtQ4CkDsstvHHmGPGGWj",
@@ -3180,7 +3167,8 @@
     "website": "https://bluechicknfts.wtf",
     "discord": "https://discord.gg/SHVcwHKUNG",
     "twitter": "@blueChickNFTs"
-  },
+  },  
+  
   {
     "symbol": "HNT",
     "voteSymbol": "veHNT",
@@ -3213,145 +3201,5 @@
     "website": "https://helium.com",
     "twitter": "@Helium",
     "ogImage": "/realms/Helium/img/mobilelogo.png"
-  },
-  {
-    "symbol": "CRYSTAL",
-    "displayName": "Polar Dao",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "6xdMASp69Q42BudN7L2u2i92GfEruzCiZBqYaT3hwhZ4",
-    "website": "https://thepolariansnft.com",
-    "twitter": "@polariansnft",
-    "ogImage": "/realms/PolarDao.png"
-  },
-  {
-    "symbol": "LAVA",
-    "displayName": "LavaDAO",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "shortDescription": "LavaDAO manages the HeliumDenver event space ecosystem and hackathon.",
-    "discord": "https://discord.gg/B7DWEgeRum",
-    "bannerImage": "https://cdn.discordapp.com/attachments/1051281685234327613/1162371467795775498/lavabanner.png?ex=653bb1c9&is=65293cc9&hm=a1560670cb9a170b3cae38bf244e8983c844858361027cd5b817adb8ecea88e0&",
-    "category": "DePIN",
-    "sortRank": 3, 
-    "realmId": "HPhQwEU6GEYd82vkXDQ59pjavVJ7vrEsbnj1fwU9USRA",
-    "website": "https://heliumdenver.com",
-    "twitter": "@hntdenver",
-    "ogImage": "/realms/LavaDAO/img/lavalogo.png"
-  },
-  {
-    "symbol": "COMRADE",
-    "displayName": "ComradeDAO",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "2KY6Ka8KNxLEPvD19J5GArVReVWm2VSinNmqvZJMYzRP",
-    "shortDescription": "ComradeDAO manages the NudieMagazine creator space ecosystem.",
-    "bannerImage": "https://cdn.discordapp.com/attachments/1051281685234327613/1162374152653639731/comradebanner.png?ex=653bb449&is=65293f49&hm=a39dea9cbcc471e4252883d5706b0521acb62fbc4f0ae6181e4a7ee3b3d3fb8b&",
-    "category": "Web3",
-    "sortRank": 3, 
-    "website": "https://thenudiemagazine.com",
-    "twitter": "@nudie_mag",
-    "ogImage": "/realms/ComradeDAO/img/comradedaologo.png"
-  },
-  {
-    "symbol": "RESON",
-    "displayName": "ResonanceDAO",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "BsAFgmFSFAqMz9zPFA6Q2s7rkgE6pi6WTYHgygtNkN5z",
-    "shortDescription": "ResonanceDAO manages the Resonance Gaming Ecosystem.",
-    "bannerImage": "https://cdn.discordapp.com/attachments/1051281685234327613/1162371467795775498/lavabanner.png?ex=653bb1c9&is=65293cc9&hm=a1560670cb9a170b3cae38bf244e8983c844858361027cd5b817adb8ecea88e0&",
-    "category": "Web3",
-    "sortRank": 3, 
-    "website": "https://playresonance.com",
-    "twitter": "@resonancesolana",
-    "ogImage": "/realms/ResonanceDAO/resonancedaologo.png"
-  },
-  {
-    "symbol": "VILLAGE",
-    "displayName": "VillagesDAO",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "Cv526yBpKfyEERuaSBPUHk1bF6vsNVLcSVi8xevJgT8S",
-    "shortDescription": "VillagesDAO manages the global Villages Fresh Water Project collab with LavaDAO, CryptoChicks NFT, and Aerial IoT.",
-    "bannerImage": "https://cdn.discordapp.com/attachments/1051281685234327613/1162371468257153076/villagesbanner.png?ex=653bb1c9&is=65293cc9&hm=4098e1484db8e46aee0d026d16d8bb75e333f90f563cbf98c0dc2cdfab6bc086&",
-    "category": "Web3",
-    "sortRank": 3, 
-    "website": "https://heliumdenver.com",
-    "twitter": "@hntdenver",
-    "ogImage": "/realms/VillagesDAO/villagesdaologo.png"
-  },
-  {
-    "symbol": "PPWT",
-    "displayName": "Poodle Paws DAO",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "ABh3GrrTQqnYofrcbhajSbuvDB1si7PHzxL2s4RZ4Ef",
-    "website": "https://poodlepaws.vercel.app/",
-    "twitter": "@PoodlePawsWT",
-    "bannerImage": "https://i.imgur.com/bVHqAmp.png",
-    "shortDescription": "Poodle Paws DAO envisions becoming the preeminent pet brand in the realm of Web3 and beyond.",
-    "ogImage": "/realms/PoodlePawsDAO/PoodlePawsDAO.png"
-  },
-  {
-    "category": "nft",
-    "discord": "https://discord.gg/Decod3rsNFT",
-    "displayName": "$VIEWS DAO",
-    "bannerImage": "/realms/VIEWSDAO/img/views_banner.jpg",
-    "ogImage": "/realms/VIEWSDAO/img/views_logo.png",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "9mJUsn6pwUytW2TdytEDRajKDHBjqXsbXyKFP28fzaZ6",
-    "shortDescription": "$VIEWS DAO - Building the Watch-to-Earn meta",
-    
-    "symbol": "VIEWSDAO",
-    "twitter": "@Decod3rsNFT"
-  },
-  {
-    "symbol": "ALL",
-    "category": "web3",
-    "displayName": "AllDomains",
-    
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "ELEXG9cTEJ2pgxFbEVAwushyoPvE7rrEHBgNKfv8uxzi",
-    "communityMint": "BaoawH9p2J8yUK9r5YXQs3hQwmUJgscACjmTkh8rMwYL",
-    "ogImage": "/realms/ALL/img/logo.png",
-    "bannerImage": "https://i.imgur.com/tbaZ0qN.png",
-    "shortDescription": "AllDomains is a Solana Protocol that allows users to create human-readable domain names that can be used in place of a Public Key.",
-    "sortRank": 3,
-    "website": "https://alldomains.id",
-    "keywords": "Web3 Identity, REALM, Goverenance, Web3 domains, DAO",
-    "twitter": "@AllDomains_",
-    "github": "https://github.com/onsol-labs/"
-  },
-  {
-    "symbol": "PHNX",
-    "displayName": "PhoenixDAO",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "FHe1HUmcyhJQDiDTi1Dkt3Jtu25Eo8QzT6kdAVDCiNUB",
-    "website": "https://phnx.one/",
-    "twitter": "@Phnxsol",
-    "ogImage": "/realms/PHNXDAO/phnxLogo.png"
-  },
-  {
-    "symbol": "OPDA",
-    "displayName": "OPANZ DAO",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "Ccix1WKGTwCbdChjUSrVVgq4xPzMGzTutqpW1R4hCRGd",
-    "bannerImage": "/realms/OPANZ/OPANZ_Banner.png",
-    "ogImage": "/realms/OPANZ/OPANZ_Logo.png",
-    "website": "https://auturoa.nz/",
-    "twitter": "@opanzch"
-  },
-  {
-    "symbol": "SHURA",
-    "displayName": "Solshure DAO",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "BbLADqNQtWtPVrrxJESwmHRS4MHS1NyqpPDwndtYcZDB",
-    "ogImage": "/realms/SolshureDAO/img/solshure_dao.png",
-    "website": "https://solshure.com/",
-    "twitter": "@Solshure"
-  },
-  {
-    "symbol": "TBET",
-    "displayName": "TrustBet",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "9gSewHByQG9YbqpkVWp9qucLoqvQRZ4YKn5b6E5w6okt",
-    "bannerImage": "/realms/TrustBet/Bannerontransparent.png",
-    "ogImage": "realms/TrustBet/LRlogo.png",
-    "communityMint": "xpFbKJa92Ee1NSYEhc3b3BVk4im8YStXRaVW6EoW33w"
   }
 ]
