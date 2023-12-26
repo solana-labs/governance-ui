@@ -7,6 +7,7 @@ import useQueryContext from 'hooks/useQueryContext'
 
 import useMembersStore from 'stores/useMembersStore'
 import { tryParsePublicKey } from '@tools/core/pubkey'
+import { NFT_PLUGINS_PKS } from '@constants/plugins'
 
 const RealmHeader = () => {
   const { fmtUrlWithCluster } = useQueryContext()
@@ -20,16 +21,11 @@ const RealmHeader = () => {
   } = useRealm()
   const { REALM } = process.env
   const activeMembers = useMembersStore((s) => s.compact.activeMembers)
-  const isBackNavVisible = realmInfo?.symbol !== REALM // hide backnav for the default realm
+  const isBackNavVisible = realmInfo?.symbol !== 'ORCA' // hide backnav for the default realm
 
-  const explorerHost = getRealmExplorerHost(realmInfo)
-  // const realmUrl = `https://${explorerHost}/#/realm/${realmInfo?.realmId.toBase58()}?programId=${realmInfo?.programId.toBase58()}`
+  // const explorerHost = getRealmExplorerHost(realmInfo)
 
-  const [isBackNavVisible, setIsBackNavVisible] = useState(true)
-
-  useEffect(() => {
-    setIsBackNavVisible(realmInfo?.symbol !== REALM)
-  }, [realmInfo?.symbol, REALM])
+  const forumUrl = `https://forums.orca.so/`
 
   return (
     <div className="px-4 pt-4 pb-4 rounded-t-lg bg-bkg-2 md:px-6 md:pt-6">
