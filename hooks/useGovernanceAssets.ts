@@ -62,7 +62,7 @@ export default function useGovernanceAssets() {
     governancesQuery.data,
   ])
 
-  function canUseGovernanceForInstruction(types: GovernanceAccountType[]) {
+  function canUseGovernanceForInstruction(types: AccountType[]) {
     return (
       realm &&
       assetAccounts
@@ -72,16 +72,11 @@ export default function useGovernanceAssets() {
         )
     )
   }
-  const canMintRealmCouncilToken = () => {
-    const governances = getGovernancesByAccountTypes([
-      GovernanceAccountType.MintGovernanceV1,
-      GovernanceAccountType.MintGovernanceV2,
-    ])
 
-    return !!governances.find(
+  const canMintRealmCouncilToken = () => {
+    return !!assetAccounts.find(
       (x) =>
-        x.account.governedAccount.toBase58() ==
-        realm?.account.config.councilMint?.toBase58()
+        x.pubkey.toBase58() == realm?.account.config.councilMint?.toBase58()
     )
   }
   const canUseTransferInstruction = governedTokenAccounts.some((acc) => {
@@ -95,13 +90,11 @@ export default function useGovernanceAssets() {
   })
 
   const canUseProgramUpgradeInstruction = canUseGovernanceForInstruction([
-    GovernanceAccountType.ProgramGovernanceV1,
-    GovernanceAccountType.ProgramGovernanceV2,
+    AccountType.PROGRAM,
   ])
 
   const canUseMintInstruction = canUseGovernanceForInstruction([
-    GovernanceAccountType.MintGovernanceV1,
-    GovernanceAccountType.MintGovernanceV2,
+    AccountType.MINT,
   ])
 
   const canUseAnyInstruction =
@@ -314,15 +307,10 @@ export default function useGovernanceAssets() {
       isVisible: canUseAuthorityInstruction,
       packageId: PackageEnum.Common,
     },
-    // [Instructions.SagaPreOrder]: {
-    //   name: 'Pre-order Saga Phone',
-    //   isVisible: canUseTokenTransferInstruction,
-    //   packageId: PackageEnum.Common,
-    // },
-    // [Instructions.StakeValidator]: {
-    //   name: 'Stake A Validator',
-    //   packageId: PackageEnum.Common,
-    // },
+    [Instructions.StakeValidator]: {
+      name: 'Stake A Validator',
+      packageId: PackageEnum.Common,
+    },
     [Instructions.Transfer]: {
       name: 'Transfer Tokens',
       isVisible: canUseTokenTransferInstruction,
@@ -345,10 +333,10 @@ export default function useGovernanceAssets() {
       name: 'Set Mint Authority',
       packageId: PackageEnum.Common,
     },
-    [Instructions.SplitStake]: {
-      name: 'Split Stake Validator',
-      packageId: PackageEnum.Common,
-    },
+    // [Instructions.SplitStake]: {
+    //   name: 'Split Stake Validator',
+    //   packageId: PackageEnum.Common,
+    // },
     /*
       ██████  ██    ██  █████  ██          ███████ ██ ███    ██  █████  ███    ██  ██████ ███████
       ██   ██ ██    ██ ██   ██ ██          ██      ██ ████   ██ ██   ██ ████   ██ ██      ██
@@ -357,66 +345,66 @@ export default function useGovernanceAssets() {
       ██████   ██████  ██   ██ ███████     ██      ██ ██   ████ ██   ██ ██   ████  ██████ ███████
     */
 
-    [Instructions.DualFinanceStakingOption]: {
-      name: 'Staking Option',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Dual,
-    },
-    [Instructions.DualFinanceGso]: {
-      name: 'Lockup Staking Option',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Dual,
-    },
-    [Instructions.DualFinanceLiquidityStakingOption]: {
-      name: 'Liquidity Staking Option',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Dual,
-    },
-    [Instructions.DualFinanceInitStrike]: {
-      name: 'Init Staking Option Strike',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Dual,
-    },
-    [Instructions.DualFinanceExerciseStakingOption]: {
-      name: 'Exercise Staking Option',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Dual,
-    },
-    [Instructions.DualFinanceGsoWithdraw]: {
-      name: 'Lockup Staking Option Withdraw',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Dual,
-    },
-    [Instructions.DualFinanceStakingOptionWithdraw]: {
-      name: 'Withdraw',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Dual,
-    },
-    [Instructions.DualFinanceAirdrop]: {
-      name: 'Airdrop',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Dual,
-    },
-    [Instructions.DualFinanceDelegate]: {
-      name: 'Delegate',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Dual,
-    },
-    [Instructions.DualFinanceDelegateWithdraw]: {
-      name: 'Withdraw Vote Deposit',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Dual,
-    },
-    [Instructions.DualFinanceVoteDeposit]: {
-      name: 'Vote Deposit',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Dual,
-    },
-    [Instructions.DualFinanceVote]: {
-      name: 'Vote',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Dual,
-    },
+    // [Instructions.DualFinanceStakingOption]: {
+    //   name: 'Staking Option',
+    //   isVisible: canUseTransferInstruction,
+    //   packageId: PackageEnum.Dual,
+    // },
+    // [Instructions.DualFinanceGso]: {
+    //   name: 'Lockup Staking Option',
+    //   isVisible: canUseTransferInstruction,
+    //   packageId: PackageEnum.Dual,
+    // },
+    // [Instructions.DualFinanceLiquidityStakingOption]: {
+    //   name: 'Liquidity Staking Option',
+    //   isVisible: canUseTransferInstruction,
+    //   packageId: PackageEnum.Dual,
+    // },
+    // [Instructions.DualFinanceInitStrike]: {
+    //   name: 'Init Staking Option Strike',
+    //   isVisible: canUseTransferInstruction,
+    //   packageId: PackageEnum.Dual,
+    // },
+    // [Instructions.DualFinanceExerciseStakingOption]: {
+    //   name: 'Exercise Staking Option',
+    //   isVisible: canUseTransferInstruction,
+    //   packageId: PackageEnum.Dual,
+    // },
+    // [Instructions.DualFinanceGsoWithdraw]: {
+    //   name: 'Lockup Staking Option Withdraw',
+    //   isVisible: canUseTransferInstruction,
+    //   packageId: PackageEnum.Dual,
+    // },
+    // [Instructions.DualFinanceStakingOptionWithdraw]: {
+    //   name: 'Withdraw',
+    //   isVisible: canUseTransferInstruction,
+    //   packageId: PackageEnum.Dual,
+    // },
+    // [Instructions.DualFinanceAirdrop]: {
+    //   name: 'Airdrop',
+    //   isVisible: canUseTransferInstruction,
+    //   packageId: PackageEnum.Dual,
+    // },
+    // [Instructions.DualFinanceDelegate]: {
+    //   name: 'Delegate',
+    //   isVisible: canUseTransferInstruction,
+    //   packageId: PackageEnum.Dual,
+    // },
+    // [Instructions.DualFinanceDelegateWithdraw]: {
+    //   name: 'Withdraw Vote Deposit',
+    //   isVisible: canUseTransferInstruction,
+    //   packageId: PackageEnum.Dual,
+    // },
+    // [Instructions.DualFinanceVoteDeposit]: {
+    //   name: 'Vote Deposit',
+    //   isVisible: canUseTransferInstruction,
+    //   packageId: PackageEnum.Dual,
+    // },
+    // [Instructions.DualFinanceVote]: {
+    //   name: 'Vote',
+    //   isVisible: canUseTransferInstruction,
+    //   packageId: PackageEnum.Dual,
+    // },
 
     /*
       ███████  ██████  ██████  ███████ ███████ ██  ██████  ██   ██ ████████
@@ -426,30 +414,30 @@ export default function useGovernanceAssets() {
       ██       ██████  ██   ██ ███████ ███████ ██  ██████  ██   ██    ██
     */
 
-    [Instructions.ForesightAddMarketListToCategory]: {
-      name: 'Add Market List To Category',
-      packageId: PackageEnum.Foresight,
-    },
-    [Instructions.ForesightInitCategory]: {
-      name: 'Init Category',
-      packageId: PackageEnum.Foresight,
-    },
-    [Instructions.ForesightInitMarket]: {
-      name: 'Init Market',
-      packageId: PackageEnum.Foresight,
-    },
-    [Instructions.ForesightInitMarketList]: {
-      name: 'Init Market List',
-      packageId: PackageEnum.Foresight,
-    },
-    [Instructions.ForesightResolveMarket]: {
-      name: 'Resolve Market',
-      packageId: PackageEnum.Foresight,
-    },
-    [Instructions.ForesightSetMarketMetadata]: {
-      name: 'Set Market Metadata',
-      packageId: PackageEnum.Foresight,
-    },
+    // [Instructions.ForesightAddMarketListToCategory]: {
+    //   name: 'Add Market List To Category',
+    //   packageId: PackageEnum.Foresight,
+    // },
+    // [Instructions.ForesightInitCategory]: {
+    //   name: 'Init Category',
+    //   packageId: PackageEnum.Foresight,
+    // },
+    // [Instructions.ForesightInitMarket]: {
+    //   name: 'Init Market',
+    //   packageId: PackageEnum.Foresight,
+    // },
+    // [Instructions.ForesightInitMarketList]: {
+    //   name: 'Init Market List',
+    //   packageId: PackageEnum.Foresight,
+    // },
+    // [Instructions.ForesightResolveMarket]: {
+    //   name: 'Resolve Market',
+    //   packageId: PackageEnum.Foresight,
+    // },
+    // [Instructions.ForesightSetMarketMetadata]: {
+    //   name: 'Set Market Metadata',
+    //   packageId: PackageEnum.Foresight,
+    // },
 
     /*
       ██ ██████  ███████ ███    ██ ████████ ██ ████████ ██    ██
@@ -515,100 +503,6 @@ export default function useGovernanceAssets() {
     // },
 
     /*
-      ███    ███  █████  ███    ██  ██████   ██████      ██    ██ ██████
-      ████  ████ ██   ██ ████   ██ ██       ██    ██     ██    ██      ██
-      ██ ████ ██ ███████ ██ ██  ██ ██   ███ ██    ██     ██    ██  █████
-      ██  ██  ██ ██   ██ ██  ██ ██ ██    ██ ██    ██      ██  ██       ██
-      ██      ██ ██   ██ ██   ████  ██████   ██████        ████   ██████
-    */
-
-    // [Instructions.ClaimMangoTokens]: {
-    //   name: 'Claim Tokens',
-    //   isVisible: canUseTokenTransferInstruction,
-    //   packageId: PackageEnum.MangoMarketV3,
-    // },
-    // [Instructions.DepositToMangoAccount]: {
-    //   name: 'Deposit to mango account',
-    //   isVisible: canUseTokenTransferInstruction,
-    //   packageId: PackageEnum.MangoMarketV3,
-    // },
-    // [Instructions.DepositToMangoAccountCsv]: {
-    //   name: 'Deposit to mango account with CSV',
-    //   isVisible: canUseTokenTransferInstruction,
-    //   packageId: PackageEnum.MangoMarketV3,
-    // },
-    // [Instructions.MangoAddOracle]: {
-    //   name: 'Add Oracle',
-    //   isVisible: canUseProgramUpgradeInstruction,
-    //   packageId: PackageEnum.MangoMarketV3,
-    // },
-    // [Instructions.MangoAddSpotMarket]: {
-    //   name: 'Add Spot Market',
-    //   isVisible: canUseProgramUpgradeInstruction,
-    //   packageId: PackageEnum.MangoMarketV3,
-    // },
-    // [Instructions.MangoChangeMaxAccounts]: {
-    //   name: 'Change Max Accounts',
-    //   isVisible: canUseProgramUpgradeInstruction,
-    //   packageId: PackageEnum.MangoMarketV3,
-    // },
-    // [Instructions.MangoChangePerpMarket]: {
-    //   name: 'Change Perp Market',
-    //   isVisible: canUseProgramUpgradeInstruction,
-    //   packageId: PackageEnum.MangoMarketV3,
-    // },
-    // [Instructions.MangoChangeQuoteParams]: {
-    //   name: 'Change Quote Params',
-    //   isVisible: canUseProgramUpgradeInstruction,
-    //   packageId: PackageEnum.MangoMarketV3,
-    // },
-    // [Instructions.MangoChangeReferralFeeParams]: {
-    //   name: 'Change Referral Fee Params',
-    //   isVisible: canUseProgramUpgradeInstruction,
-    //   packageId: PackageEnum.MangoMarketV3,
-    // },
-    // [Instructions.MangoChangeReferralFeeParams2]: {
-    //   name: 'Change Referral Fee Params V2',
-    //   isVisible: canUseProgramUpgradeInstruction,
-    //   packageId: PackageEnum.MangoMarketV3,
-    // },
-    // [Instructions.MangoChangeSpotMarket]: {
-    //   name: 'Change Spot Market',
-    //   isVisible: canUseProgramUpgradeInstruction,
-    //   packageId: PackageEnum.MangoMarketV3,
-    // },
-    // [Instructions.MangoCreatePerpMarket]: {
-    //   name: 'Create Perp Market',
-    //   isVisible: canUseProgramUpgradeInstruction,
-    //   packageId: PackageEnum.MangoMarketV3,
-    // },
-    // [Instructions.MangoRemoveOracle]: {
-    //   name: 'Remove Oracle',
-    //   isVisible: canUseProgramUpgradeInstruction,
-    //   packageId: PackageEnum.MangoMarketV3,
-    // },
-    // [Instructions.MangoRemovePerpMarket]: {
-    //   name: 'Remove Perp Market',
-    //   isVisible: canUseProgramUpgradeInstruction,
-    //   packageId: PackageEnum.MangoMarketV3,
-    // },
-    // [Instructions.MangoRemoveSpotMarket]: {
-    //   name: 'Remove Spot Market',
-    //   isVisible: canUseProgramUpgradeInstruction,
-    //   packageId: PackageEnum.MangoMarketV3,
-    // },
-    // [Instructions.MangoSetMarketMode]: {
-    //   name: 'Set Market Mode',
-    //   isVisible: canUseProgramUpgradeInstruction,
-    //   packageId: PackageEnum.MangoMarketV3,
-    // },
-    // [Instructions.MangoSwapSpotMarket]: {
-    //   name: 'Swap Spot Market',
-    //   isVisible: canUseProgramUpgradeInstruction,
-    //   packageId: PackageEnum.MangoMarketV3,
-    // },
-
-    /*
       ███    ███  █████  ███    ██  ██████   ██████      ██    ██ ██   ██
       ████  ████ ██   ██ ████   ██ ██       ██    ██     ██    ██ ██   ██
       ██ ████ ██ ███████ ██ ██  ██ ██   ███ ██    ██     ██    ██ ███████
@@ -616,91 +510,91 @@ export default function useGovernanceAssets() {
       ██      ██ ██   ██ ██   ████  ██████   ██████        ████        ██
     */
 
-    [Instructions.MangoV4PerpCreate]: {
-      name: 'Create Perp',
-      packageId: PackageEnum.MangoMarketV4,
-      isVisible: canUseAnyInstruction,
-    },
-    [Instructions.MangoV4PerpEdit]: {
-      name: 'Edit Perp',
-      packageId: PackageEnum.MangoMarketV4,
-      isVisible: canUseAnyInstruction,
-    },
-    [Instructions.MangoV4OpenBookRegisterMarket]: {
-      name: 'Register Openbook Market',
-      packageId: PackageEnum.MangoMarketV4,
-      isVisible: canUseAnyInstruction,
-    },
-    [Instructions.MangoV4TokenEdit]: {
-      name: 'Edit Token',
-      packageId: PackageEnum.MangoMarketV4,
-      isVisible: canUseAnyInstruction,
-    },
-    [Instructions.MangoV4TokenRegister]: {
-      name: 'Register Token',
-      packageId: PackageEnum.MangoMarketV4,
-      isVisible: canUseAnyInstruction,
-    },
-    [Instructions.MangoV4TokenRegisterTrustless]: {
-      name: 'Register Trustless Token',
-      packageId: PackageEnum.MangoMarketV4,
-      isVisible: canUseAnyInstruction,
-    },
-    [Instructions.MangoV4GroupEdit]: {
-      name: 'Edit Group',
-      packageId: PackageEnum.MangoMarketV4,
-      isVisible: canUseAnyInstruction,
-    },
-    [Instructions.MangoV4AdminWithdrawTokenFees]: {
-      name: 'Withdraw Token Fees',
-      packageId: PackageEnum.MangoMarketV4,
-      isVisible: canUseAnyInstruction,
-    },
-    [Instructions.MangoV4WithdrawPerpFees]: {
-      name: 'Withdraw Perp Fees',
-      packageId: PackageEnum.MangoMarketV4,
-      isVisible: canUseAnyInstruction,
-    },
-    [Instructions.MangoV4OpenBookEditMarket]: {
-      name: 'Edit Openbook Market',
-      packageId: PackageEnum.MangoMarketV4,
-      isVisible: canUseAnyInstruction,
-    },
-    [Instructions.MangoV4IxGateSet]: {
-      name: 'Enable/Disable individual instructions in Group',
-      packageId: PackageEnum.MangoMarketV4,
-      isVisible: canUseAnyInstruction,
-    },
-    [Instructions.MangoV4StubOracleCreate]: {
-      name: 'Create Stub Oracle',
-      packageId: PackageEnum.MangoMarketV4,
-      isVisible: canUseAnyInstruction,
-    },
-    [Instructions.MangoV4StubOracleSet]: {
-      name: 'Set Stub Oracle Value',
-      packageId: PackageEnum.MangoMarketV4,
-      isVisible: canUseAnyInstruction,
-    },
-    [Instructions.MangoV4AltSet]: {
-      name: 'Set Address Lookup Table for Group',
-      packageId: PackageEnum.MangoMarketV4,
-      isVisible: canUseAnyInstruction,
-    },
-    [Instructions.MangoV4AltExtend]: {
-      name: 'Extend Address Lookup Table',
-      packageId: PackageEnum.MangoMarketV4,
-      isVisible: canUseAnyInstruction,
-    },
-    [Instructions.MangoV4TokenAddBank]: {
-      name: 'Add additional Bank to an existing Token',
-      packageId: PackageEnum.MangoMarketV4,
-      isVisible: canUseAnyInstruction,
-    },
-    [Instructions.IdlSetBuffer]: {
-      name: 'Idl Set Buffer',
-      packageId: PackageEnum.MangoMarketV4,
-      isVisible: canUseAnyInstruction,
-    },
+    // [Instructions.MangoV4PerpCreate]: {
+    //   name: 'Create Perp',
+    //   packageId: PackageEnum.MangoMarketV4,
+    //   isVisible: canUseAnyInstruction,
+    // },
+    // [Instructions.MangoV4PerpEdit]: {
+    //   name: 'Edit Perp',
+    //   packageId: PackageEnum.MangoMarketV4,
+    //   isVisible: canUseAnyInstruction,
+    // },
+    // [Instructions.MangoV4OpenBookRegisterMarket]: {
+    //   name: 'Register Openbook Market',
+    //   packageId: PackageEnum.MangoMarketV4,
+    //   isVisible: canUseAnyInstruction,
+    // },
+    // [Instructions.MangoV4TokenEdit]: {
+    //   name: 'Edit Token',
+    //   packageId: PackageEnum.MangoMarketV4,
+    //   isVisible: canUseAnyInstruction,
+    // },
+    // [Instructions.MangoV4TokenRegister]: {
+    //   name: 'Register Token',
+    //   packageId: PackageEnum.MangoMarketV4,
+    //   isVisible: canUseAnyInstruction,
+    // },
+    // [Instructions.MangoV4TokenRegisterTrustless]: {
+    //   name: 'Register Trustless Token',
+    //   packageId: PackageEnum.MangoMarketV4,
+    //   isVisible: canUseAnyInstruction,
+    // },
+    // [Instructions.MangoV4GroupEdit]: {
+    //   name: 'Edit Group',
+    //   packageId: PackageEnum.MangoMarketV4,
+    //   isVisible: canUseAnyInstruction,
+    // },
+    // [Instructions.MangoV4AdminWithdrawTokenFees]: {
+    //   name: 'Withdraw Token Fees',
+    //   packageId: PackageEnum.MangoMarketV4,
+    //   isVisible: canUseAnyInstruction,
+    // },
+    // [Instructions.MangoV4WithdrawPerpFees]: {
+    //   name: 'Withdraw Perp Fees',
+    //   packageId: PackageEnum.MangoMarketV4,
+    //   isVisible: canUseAnyInstruction,
+    // },
+    // [Instructions.MangoV4OpenBookEditMarket]: {
+    //   name: 'Edit Openbook Market',
+    //   packageId: PackageEnum.MangoMarketV4,
+    //   isVisible: canUseAnyInstruction,
+    // },
+    // [Instructions.MangoV4IxGateSet]: {
+    //   name: 'Enable/Disable individual instructions in Group',
+    //   packageId: PackageEnum.MangoMarketV4,
+    //   isVisible: canUseAnyInstruction,
+    // },
+    // [Instructions.MangoV4StubOracleCreate]: {
+    //   name: 'Create Stub Oracle',
+    //   packageId: PackageEnum.MangoMarketV4,
+    //   isVisible: canUseAnyInstruction,
+    // },
+    // [Instructions.MangoV4StubOracleSet]: {
+    //   name: 'Set Stub Oracle Value',
+    //   packageId: PackageEnum.MangoMarketV4,
+    //   isVisible: canUseAnyInstruction,
+    // },
+    // [Instructions.MangoV4AltSet]: {
+    //   name: 'Set Address Lookup Table for Group',
+    //   packageId: PackageEnum.MangoMarketV4,
+    //   isVisible: canUseAnyInstruction,
+    // },
+    // [Instructions.MangoV4AltExtend]: {
+    //   name: 'Extend Address Lookup Table',
+    //   packageId: PackageEnum.MangoMarketV4,
+    //   isVisible: canUseAnyInstruction,
+    // },
+    // [Instructions.MangoV4TokenAddBank]: {
+    //   name: 'Add additional Bank to an existing Token',
+    //   packageId: PackageEnum.MangoMarketV4,
+    //   isVisible: canUseAnyInstruction,
+    // },
+    // [Instructions.IdlSetBuffer]: {
+    //   name: 'Idl Set Buffer',
+    //   packageId: PackageEnum.MangoMarketV4,
+    //   isVisible: canUseAnyInstruction,
+    // },
     /*
       ███    ███ ███████  █████  ███    ██     ███████ ██ ███    ██  █████  ███    ██  ██████ ███████
       ████  ████ ██      ██   ██ ████   ██     ██      ██ ████   ██ ██   ██ ████   ██ ██      ██
@@ -798,32 +692,32 @@ export default function useGovernanceAssets() {
       ███████ ██    ██ ██      █████   ██ ██  ██ ██   ██
            ██ ██    ██ ██      ██      ██  ██ ██ ██   ██
       ███████  ██████  ███████ ███████ ██   ████ ██████
-    */
+    // */
 
-    [Instructions.CreateSolendObligationAccount]: {
-      name: 'Create Obligation Account',
-      packageId: PackageEnum.Solend,
-    },
-    [Instructions.DepositReserveLiquidityAndObligationCollateral]: {
-      name: 'Deposit Funds',
-      packageId: PackageEnum.Solend,
-    },
-    [Instructions.InitSolendObligationAccount]: {
-      name: 'Init Obligation Account',
-      packageId: PackageEnum.Solend,
-    },
-    [Instructions.RefreshSolendObligation]: {
-      name: 'Refresh Obligation',
-      packageId: PackageEnum.Solend,
-    },
-    [Instructions.RefreshSolendReserve]: {
-      name: 'Refresh Reserve',
-      packageId: PackageEnum.Solend,
-    },
-    [Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity]: {
-      name: 'Withdraw Funds',
-      packageId: PackageEnum.Solend,
-    },
+    // [Instructions.CreateSolendObligationAccount]: {
+    //   name: 'Create Obligation Account',
+    //   packageId: PackageEnum.Solend,
+    // },
+    // [Instructions.DepositReserveLiquidityAndObligationCollateral]: {
+    //   name: 'Deposit Funds',
+    //   packageId: PackageEnum.Solend,
+    // },
+    // [Instructions.InitSolendObligationAccount]: {
+    //   name: 'Init Obligation Account',
+    //   packageId: PackageEnum.Solend,
+    // },
+    // [Instructions.RefreshSolendObligation]: {
+    //   name: 'Refresh Obligation',
+    //   packageId: PackageEnum.Solend,
+    // },
+    // [Instructions.RefreshSolendReserve]: {
+    //   name: 'Refresh Reserve',
+    //   packageId: PackageEnum.Solend,
+    // },
+    // [Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity]: {
+    //   name: 'Withdraw Funds',
+    //   packageId: PackageEnum.Solend,
+    // },
 
     /*
       ███████ ██     ██ ██ ████████  ██████ ██   ██ ██████   ██████   █████  ██████  ██████
@@ -833,14 +727,14 @@ export default function useGovernanceAssets() {
       ███████  ███ ███  ██    ██     ██████ ██   ██ ██████   ██████  ██   ██ ██   ██ ██████
     */
 
-    [Instructions.SwitchboardFundOracle]: {
-      name: 'Fund Oracle',
-      packageId: PackageEnum.Switchboard,
-    },
-    [Instructions.WithdrawFromOracle]: {
-      name: 'Withdraw from Oracle',
-      packageId: PackageEnum.Switchboard,
-    },
+    // [Instructions.SwitchboardFundOracle]: {
+    //   name: 'Fund Oracle',
+    //   packageId: PackageEnum.Switchboard,
+    // },
+    // [Instructions.WithdrawFromOracle]: {
+    //   name: 'Withdraw from Oracle',
+    //   packageId: PackageEnum.Switchboard,
+    // },
 
     /*
       ██    ██ ███████ ██████      ██████  ██      ██    ██  ██████  ██ ███    ██
@@ -850,27 +744,27 @@ export default function useGovernanceAssets() {
         ████   ███████ ██   ██     ██      ███████  ██████   ██████  ██ ██   ████
     */
 
-    [Instructions.CreateVsrRegistrar]: {
-      name: 'Vote Escrowed Tokens: Create Registrar',
-      isVisible: canUseAuthorityInstruction,
-      packageId: PackageEnum.VsrPlugin,
-    },
-    [Instructions.VotingMintConfig]: {
-      name: 'Vote Escrowed Tokens: Configure Voting Mint',
-      isVisible: canUseAuthorityInstruction,
-      packageId: PackageEnum.VsrPlugin,
-    },
+    // [Instructions.CreateVsrRegistrar]: {
+    //   name: 'Vote Escrowed Tokens: Create Registrar',
+    //   isVisible: canUseAuthorityInstruction,
+    //   packageId: PackageEnum.VsrPlugin,
+    // },
+    // [Instructions.VotingMintConfig]: {
+    //   name: 'Vote Escrowed Tokens: Configure Voting Mint',
+    //   isVisible: canUseAuthorityInstruction,
+    //   packageId: PackageEnum.VsrPlugin,
+    // },
 
-    [Instructions.DistributionCloseVaults]: {
-      name: 'Close vaults',
-      isVisible: canUseAuthorityInstruction,
-      packageId: PackageEnum.Distribution,
-    },
-    [Instructions.DistributionFillVaults]: {
-      name: 'Fill vaults',
-      isVisible: canUseAuthorityInstruction,
-      packageId: PackageEnum.Distribution,
-    },
+    // [Instructions.DistributionCloseVaults]: {
+    //   name: 'Close vaults',
+    //   isVisible: canUseAuthorityInstruction,
+    //   packageId: PackageEnum.Distribution,
+    // },
+    // [Instructions.DistributionFillVaults]: {
+    //   name: 'Fill vaults',
+    //   isVisible: canUseAuthorityInstruction,
+    //   packageId: PackageEnum.Distribution,
+    // },
   }
 
   const availablePackages: PackageType[] = Object.entries(packages)
@@ -908,7 +802,6 @@ export default function useGovernanceAssets() {
     auxiliaryTokenAccounts,
     availableInstructions,
     availablePackages,
-    canMintRealmCommunityToken,
     canMintRealmCouncilToken,
     canUseAuthorityInstruction,
     canUseMintInstruction,

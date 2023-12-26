@@ -58,49 +58,49 @@ import VoteBySwitch from './components/VoteBySwitch'
 // import CreateNftPluginRegistrar from './components/instructions/NftVotingPlugin/CreateRegistrar'
 // import CreateNftPluginMaxVoterWeightRecord from './components/instructions/NftVotingPlugin/CreateMaxVoterWeightRecord'
 // import ConfigureNftPluginCollection from './components/instructions/NftVotingPlugin/ConfigureCollection'
-import SwitchboardFundOracle from './components/instructions/Switchboard/FundOracle'
-import WithdrawFromOracle from './components/instructions/Switchboard/WithdrawFromOracle'
+// import SwitchboardFundOracle from './components/instructions/Switchboard/FundOracle'
+// import WithdrawFromOracle from './components/instructions/Switchboard/WithdrawFromOracle'
 import StakeValidator from './components/instructions/Validators/StakeValidator'
 import DeactivateValidatorStake from './components/instructions/Validators/DeactivateStake'
 import WithdrawValidatorStake from './components/instructions/Validators/WithdrawStake'
 import DelegateStake from './components/instructions/Validators/DelegateStake'
-import SplitStake from './components/instructions/Validators/SplitStake'
+// import SplitStake from './components/instructions/Validators/SplitStake'
 import useCreateProposal from '@hooks/useCreateProposal'
-import MakeInitMarketParams from './components/instructions/Foresight/MakeInitMarketParams'
-import MakeInitMarketListParams from './components/instructions/Foresight/MakeInitMarketListParams'
-import MakeInitCategoryParams from './components/instructions/Foresight/MakeInitCategoryParams'
-import MakeResolveMarketParams from './components/instructions/Foresight/MakeResolveMarketParams'
-import MakeAddMarketListToCategoryParams from './components/instructions/Foresight/MakeAddMarketListToCategoryParams'
+// import MakeInitMarketParams from './components/instructions/Foresight/MakeInitMarketParams'
+// import MakeInitMarketListParams from './components/instructions/Foresight/MakeInitMarketListParams'
+// import MakeInitCategoryParams from './components/instructions/Foresight/MakeInitCategoryParams'
+// import MakeResolveMarketParams from './components/instructions/Foresight/MakeResolveMarketParams'
+// import MakeAddMarketListToCategoryParams from './components/instructions/Foresight/MakeAddMarketListToCategoryParams'
 import RealmConfig from './components/instructions/RealmConfig'
 // import MakeSetMarketMetadataParams from './components/instructions/Foresight/MakeSetMarketMetadataParams'
 import CloseTokenAccount from './components/instructions/CloseTokenAccount'
 import CloseMultipleTokenAccounts from './components/instructions/CloseMultipleTokenAccounts'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
-import StakingOption from './components/instructions/Dual/StakingOption'
-import MeanCreateAccount from './components/instructions/Mean/MeanCreateAccount'
-import MeanFundAccount from './components/instructions/Mean/MeanFundAccount'
-import MeanWithdrawFromAccount from './components/instructions/Mean/MeanWithdrawFromAccount'
-import MeanCreateStream from './components/instructions/Mean/MeanCreateStream'
-import MeanTransferStream from './components/instructions/Mean/MeanTransferStream'
+// import StakingOption from './components/instructions/Dual/StakingOption'
+// import MeanCreateAccount from './components/instructions/Mean/MeanCreateAccount'
+// import MeanFundAccount from './components/instructions/Mean/MeanFundAccount'
+// import MeanWithdrawFromAccount from './components/instructions/Mean/MeanWithdrawFromAccount'
+// import MeanCreateStream from './components/instructions/Mean/MeanCreateStream'
+// import MeanTransferStream from './components/instructions/Mean/MeanTransferStream'
 import ChangeDonation from './components/instructions/Change/ChangeDonation'
-import VotingMintConfig from './components/instructions/Vsr/VotingMintConfig'
-import CreateVsrRegistrar from './components/instructions/Vsr/CreateRegistrar'
-import CreateGatewayPluginRegistrar from './components/instructions/GatewayPlugin/CreateRegistrar'
-import ConfigureGatewayPlugin from './components/instructions/GatewayPlugin/ConfigureGateway'
+// import VotingMintConfig from './components/instructions/Vsr/VotingMintConfig'
+// import CreateVsrRegistrar from './components/instructions/Vsr/CreateRegistrar'
+// import CreateGatewayPluginRegistrar from './components/instructions/GatewayPlugin/CreateRegistrar'
+// import ConfigureGatewayPlugin from './components/instructions/GatewayPlugin/ConfigureGateway'
 import CreateTokenMetadata from './components/instructions/CreateTokenMetadata'
 import UpdateTokenMetadata from './components/instructions/UpdateTokenMetadata'
 import classNames from 'classnames'
-import TokenRegister from './components/instructions/Mango/MangoV4/TokenRegister'
-import EditToken from './components/instructions/Mango/MangoV4/EditToken'
-import PerpEdit from './components/instructions/Mango/MangoV4/PerpEdit'
-import GroupEdit from './components/instructions/Mango/MangoV4/GroupEdit'
-import AdminTokenWithdrawFees from './components/instructions/Mango/MangoV4/WithdrawTokenFees'
-import WithdrawPerpFees from './components/instructions/Mango/MangoV4/WithdrawPerpFees'
-import OpenBookRegisterMarket from './components/instructions/Mango/MangoV4/OpenBookRegisterMarket'
-import OpenBookEditMarket from './components/instructions/Mango/MangoV4/OpenBookEditMarket'
-import PerpCreate from './components/instructions/Mango/MangoV4/PerpCreate'
-import TokenRegisterTrustless from './components/instructions/Mango/MangoV4/TokenRegisterTrustless'
-import TransferDomainName from './components/instructions/TransferDomainName'
+// import TokenRegister from './components/instructions/Mango/MangoV4/TokenRegister'
+// import EditToken from './components/instructions/Mango/MangoV4/EditToken'
+// import PerpEdit from './components/instructions/Mango/MangoV4/PerpEdit'
+// import GroupEdit from './components/instructions/Mango/MangoV4/GroupEdit'
+// import AdminTokenWithdrawFees from './components/instructions/Mango/MangoV4/WithdrawTokenFees'
+// import WithdrawPerpFees from './components/instructions/Mango/MangoV4/WithdrawPerpFees'
+// import OpenBookRegisterMarket from './components/instructions/Mango/MangoV4/OpenBookRegisterMarket'
+// import OpenBookEditMarket from './components/instructions/Mango/MangoV4/OpenBookEditMarket'
+// import PerpCreate from './components/instructions/Mango/MangoV4/PerpCreate'
+// import TokenRegisterTrustless from './components/instructions/Mango/MangoV4/TokenRegisterTrustless'
+// import TransferDomainName from './components/instructions/TransferDomainName'
 import InitUser from './components/instructions/Serum/InitUser'
 import GrantForm from './components/instructions/Serum/GrantForm'
 import JoinDAO from './components/instructions/JoinDAO'
@@ -108,29 +108,29 @@ import UpdateConfigAuthority from './components/instructions/Serum/UpdateConfigA
 import UpdateConfigParams from './components/instructions/Serum/UpdateConfigParams'
 import { StyledLabel, inputClasses } from '@components/inputs/styles'
 import SelectInstructionType from '@components/SelectInstructionType'
-import AddKeyToDID from './components/instructions/Identity/AddKeyToDID'
-import RemoveKeyFromDID from './components/instructions/Identity/RemoveKeyFromDID'
-import AddServiceToDID from './components/instructions/Identity/AddServiceToDID'
-import RemoveServiceFromDID from './components/instructions/Identity/RemoveServiceFromDID'
-import DualAirdrop from './components/instructions/Dual/DualAirdrop'
-import DualWithdraw from './components/instructions/Dual/DualWithdraw'
-import DualExercise from './components/instructions/Dual/DualExercise'
-import DualDelegate from './components/instructions/Dual/DualDelegate'
-import DualVoteDepositWithdraw from './components/instructions/Dual/DualVoteDepositWithdraw'
-import DualVoteDeposit from './components/instructions/Dual/DualVoteDeposit'
-import PsyFinanceMintAmericanOptions from './components/instructions/PsyFinance/MintAmericanOptions'
+// import AddKeyToDID from './components/instructions/Identity/AddKeyToDID'
+// import RemoveKeyFromDID from './components/instructions/Identity/RemoveKeyFromDID'
+// import AddServiceToDID from './components/instructions/Identity/AddServiceToDID'
+// import RemoveServiceFromDID from './components/instructions/Identity/RemoveServiceFromDID'
+// import DualAirdrop from './components/instructions/Dual/DualAirdrop'
+// import DualWithdraw from './components/instructions/Dual/DualWithdraw'
+// import DualExercise from './components/instructions/Dual/DualExercise'
+// import DualDelegate from './components/instructions/Dual/DualDelegate'
+// import DualVoteDepositWithdraw from './components/instructions/Dual/DualVoteDepositWithdraw'
+// import DualVoteDeposit from './components/instructions/Dual/DualVoteDeposit'
+// import PsyFinanceMintAmericanOptions from './components/instructions/PsyFinance/MintAmericanOptions'
 import IxGateSet from './components/instructions/Mango/MangoV4/IxGateSet'
 import StubOracleCreate from './components/instructions/Mango/MangoV4/StubOracleCreate'
 import StubOracleSet from './components/instructions/Mango/MangoV4/StubOracleSet'
 import AltSet from './components/instructions/Mango/MangoV4/AltSet'
 import AltExtend from './components/instructions/Mango/MangoV4/AltExtend'
 import TokenAddBank from './components/instructions/Mango/MangoV4/TokenAddBank'
-import PsyFinanceBurnWriterTokenForQuote from './components/instructions/PsyFinance/BurnWriterTokenForQuote'
-import PsyFinanceClaimUnderlyingPostExpiration from './components/instructions/PsyFinance/ClaimUnderlyingPostExpiration'
-import PsyFinanceExerciseOption from './components/instructions/PsyFinance/ExerciseOption'
+// import PsyFinanceBurnWriterTokenForQuote from './components/instructions/PsyFinance/BurnWriterTokenForQuote'
+// import PsyFinanceClaimUnderlyingPostExpiration from './components/instructions/PsyFinance/ClaimUnderlyingPostExpiration'
+// import PsyFinanceExerciseOption from './components/instructions/PsyFinance/ExerciseOption'
 import RevokeGoverningTokens from './components/instructions/SplGov/RevokeGoverningTokens'
 // import PreviousRouteBtn from '@components/PreviousRouteBtn'
-// import SetMintAuthority from './components/instructions/SetMintAuthroity'
+import SetMintAuthority from './components/instructions/SetMintAuthroity'
 import LiquidityStakingOption from './components/instructions/Dual/LiquidityStakingOption'
 import InitStrike from './components/instructions/Dual/InitStrike'
 import IdlSetBuffer from './components/instructions/Mango/MangoV4/IdlSetBuffer'
@@ -467,73 +467,73 @@ const New = () => {
       [Instructions.Mint]: Mint,
       [Instructions.Base64]: CustomBase64,
       [Instructions.None]: Empty,
-      [Instructions.MangoV4TokenRegister]: TokenRegister,
-      [Instructions.MangoV4TokenEdit]: EditToken,
-      [Instructions.MangoV4GroupEdit]: GroupEdit,
-      [Instructions.MangoV4AdminWithdrawTokenFees]: AdminTokenWithdrawFees,
-      [Instructions.MangoV4WithdrawPerpFees]: WithdrawPerpFees,
-      [Instructions.IdlSetBuffer]: IdlSetBuffer,
-      [Instructions.MangoV4OpenBookEditMarket]: OpenBookEditMarket,
-      [Instructions.MangoV4IxGateSet]: IxGateSet,
-      [Instructions.MangoV4AltExtend]: AltExtend,
-      [Instructions.MangoV4AltSet]: AltSet,
-      [Instructions.MangoV4StubOracleCreate]: StubOracleCreate,
-      [Instructions.MangoV4StubOracleSet]: StubOracleSet,
-      [Instructions.MangoV4PerpEdit]: PerpEdit,
-      [Instructions.MangoV4OpenBookRegisterMarket]: OpenBookRegisterMarket,
-      [Instructions.MangoV4PerpCreate]: PerpCreate,
-      [Instructions.MangoV4TokenRegisterTrustless]: TokenRegisterTrustless,
-      [Instructions.MangoV4TokenAddBank]: TokenAddBank,
+      // [Instructions.MangoV4TokenRegister]: TokenRegister,
+      // [Instructions.MangoV4TokenEdit]: EditToken,
+      // [Instructions.MangoV4GroupEdit]: GroupEdit,
+      // [Instructions.MangoV4AdminWithdrawTokenFees]: AdminTokenWithdrawFees,
+      // [Instructions.MangoV4WithdrawPerpFees]: WithdrawPerpFees,
+      // [Instructions.IdlSetBuffer]: IdlSetBuffer,
+      // [Instructions.MangoV4OpenBookEditMarket]: OpenBookEditMarket,
+      // [Instructions.MangoV4IxGateSet]: IxGateSet,
+      // [Instructions.MangoV4AltExtend]: AltExtend,
+      // [Instructions.MangoV4AltSet]: AltSet,
+      // [Instructions.MangoV4StubOracleCreate]: StubOracleCreate,
+      // [Instructions.MangoV4StubOracleSet]: StubOracleSet,
+      // [Instructions.MangoV4PerpEdit]: PerpEdit,
+      // [Instructions.MangoV4OpenBookRegisterMarket]: OpenBookRegisterMarket,
+      // [Instructions.MangoV4PerpCreate]: PerpCreate,
+      // [Instructions.MangoV4TokenRegisterTrustless]: TokenRegisterTrustless,
+      // [Instructions.MangoV4TokenAddBank]: TokenAddBank,
       [Instructions.Grant]: Grant,
       [Instructions.Clawback]: Clawback,
       [Instructions.CreateAssociatedTokenAccount]: CreateAssociatedTokenAccount,
-      [Instructions.DualFinanceAirdrop]: DualAirdrop,
-      [Instructions.DualFinanceStakingOption]: StakingOption,
-      [Instructions.DualFinanceGso]: DualGso,
-      [Instructions.DualFinanceGsoWithdraw]: DualGsoWithdraw,
-      [Instructions.DualFinanceInitStrike]: InitStrike,
-      [Instructions.DualFinanceLiquidityStakingOption]: LiquidityStakingOption,
-      [Instructions.DualFinanceStakingOptionWithdraw]: DualWithdraw,
-      [Instructions.DualFinanceExerciseStakingOption]: DualExercise,
-      [Instructions.DualFinanceDelegate]: DualDelegate,
-      [Instructions.DualFinanceDelegateWithdraw]: DualVoteDepositWithdraw,
-      [Instructions.DualFinanceVoteDeposit]: DualVoteDeposit,
-      [Instructions.DualFinanceVote]: DualVote,
-      [Instructions.DistributionCloseVaults]: CloseVaults,
-      [Instructions.DistributionFillVaults]: FillVaults,
-      [Instructions.MeanCreateAccount]: MeanCreateAccount,
-      [Instructions.MeanFundAccount]: MeanFundAccount,
-      [Instructions.MeanWithdrawFromAccount]: MeanWithdrawFromAccount,
-      [Instructions.MeanCreateStream]: MeanCreateStream,
-      [Instructions.MeanTransferStream]: MeanTransferStream,
-      [Instructions.CreateSolendObligationAccount]: CreateObligationAccount,
-      [Instructions.InitSolendObligationAccount]: InitObligationAccount,
-      [Instructions.DepositReserveLiquidityAndObligationCollateral]: DepositReserveLiquidityAndObligationCollateral,
-      [Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity]: WithdrawObligationCollateralAndRedeemReserveLiquidity,
-      [Instructions.PsyFinanceMintAmericanOptions]: PsyFinanceMintAmericanOptions,
-      [Instructions.PsyFinanceBurnWriterForQuote]: PsyFinanceBurnWriterTokenForQuote,
-      [Instructions.PsyFinanceClaimUnderlyingPostExpiration]: PsyFinanceClaimUnderlyingPostExpiration,
-      [Instructions.PsyFinanceExerciseOption]: PsyFinanceExerciseOption,
-      [Instructions.SwitchboardFundOracle]: SwitchboardFundOracle,
-      [Instructions.WithdrawFromOracle]: WithdrawFromOracle,
-      [Instructions.RefreshSolendObligation]: RefreshObligation,
-      [Instructions.RefreshSolendReserve]: RefreshReserve,
-      [Instructions.ForesightInitMarket]: MakeInitMarketParams,
-      [Instructions.ForesightInitMarketList]: MakeInitMarketListParams,
-      [Instructions.ForesightInitCategory]: MakeInitCategoryParams,
-      [Instructions.ForesightResolveMarket]: MakeResolveMarketParams,
-      [Instructions.ForesightAddMarketListToCategory]: MakeAddMarketListToCategoryParams,
-      [Instructions.ForesightSetMarketMetadata]: MakeSetMarketMetadataParams,
+      // [Instructions.DualFinanceAirdrop]: DualAirdrop,
+      // [Instructions.DualFinanceStakingOption]: StakingOption,
+      // [Instructions.DualFinanceGso]: DualGso,
+      // [Instructions.DualFinanceGsoWithdraw]: DualGsoWithdraw,
+      // [Instructions.DualFinanceInitStrike]: InitStrike,
+      // [Instructions.DualFinanceLiquidityStakingOption]: LiquidityStakingOption,
+      // [Instructions.DualFinanceStakingOptionWithdraw]: DualWithdraw,
+      // [Instructions.DualFinanceExerciseStakingOption]: DualExercise,
+      // [Instructions.DualFinanceDelegate]: DualDelegate,
+      // [Instructions.DualFinanceDelegateWithdraw]: DualVoteDepositWithdraw,
+      // [Instructions.DualFinanceVoteDeposit]: DualVoteDeposit,
+      // [Instructions.DualFinanceVote]: DualVote,
+      // [Instructions.DistributionCloseVaults]: CloseVaults,
+      // [Instructions.DistributionFillVaults]: FillVaults,
+      // [Instructions.MeanCreateAccount]: MeanCreateAccount,
+      // [Instructions.MeanFundAccount]: MeanFundAccount,
+      // [Instructions.MeanWithdrawFromAccount]: MeanWithdrawFromAccount,
+      // [Instructions.MeanCreateStream]: MeanCreateStream,
+      // [Instructions.MeanTransferStream]: MeanTransferStream,
+      // [Instructions.CreateSolendObligationAccount]: CreateObligationAccount,
+      // [Instructions.InitSolendObligationAccount]: InitObligationAccount,
+      // [Instructions.DepositReserveLiquidityAndObligationCollateral]: DepositReserveLiquidityAndObligationCollateral,
+      // [Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity]: WithdrawObligationCollateralAndRedeemReserveLiquidity,
+      // [Instructions.PsyFinanceMintAmericanOptions]: PsyFinanceMintAmericanOptions,
+      // [Instructions.PsyFinanceBurnWriterForQuote]: PsyFinanceBurnWriterTokenForQuote,
+      // [Instructions.PsyFinanceClaimUnderlyingPostExpiration]: PsyFinanceClaimUnderlyingPostExpiration,
+      // [Instructions.PsyFinanceExerciseOption]: PsyFinanceExerciseOption,
+      // [Instructions.SwitchboardFundOracle]: SwitchboardFundOracle,
+      // [Instructions.WithdrawFromOracle]: WithdrawFromOracle,
+      // [Instructions.RefreshSolendObligation]: RefreshObligation,
+      // [Instructions.RefreshSolendReserve]: RefreshReserve,
+      // [Instructions.ForesightInitMarket]: MakeInitMarketParams,
+      // [Instructions.ForesightInitMarketList]: MakeInitMarketListParams,
+      // [Instructions.ForesightInitCategory]: MakeInitCategoryParams,
+      // [Instructions.ForesightResolveMarket]: MakeResolveMarketParams,
+      // [Instructions.ForesightAddMarketListToCategory]: MakeAddMarketListToCategoryParams,
+      // [Instructions.ForesightSetMarketMetadata]: MakeSetMarketMetadataParams,
       [Instructions.RealmConfig]: RealmConfig,
       // [Instructions.CreateNftPluginRegistrar]: CreateNftPluginRegistrar,
       // [Instructions.CreateNftPluginMaxVoterWeight]: CreateNftPluginMaxVoterWeightRecord,
       // [Instructions.ConfigureNftPluginCollection]: ConfigureNftPluginCollection,
       [Instructions.CloseTokenAccount]: CloseTokenAccount,
       [Instructions.CloseMultipleTokenAccounts]: CloseMultipleTokenAccounts,
-      [Instructions.VotingMintConfig]: VotingMintConfig,
-      [Instructions.CreateVsrRegistrar]: CreateVsrRegistrar,
-      [Instructions.CreateGatewayPluginRegistrar]: CreateGatewayPluginRegistrar,
-      [Instructions.ConfigureGatewayPlugin]: ConfigureGatewayPlugin,
+      // [Instructions.VotingMintConfig]: VotingMintConfig,
+      // [Instructions.CreateVsrRegistrar]: CreateVsrRegistrar,
+      // [Instructions.CreateGatewayPluginRegistrar]: CreateGatewayPluginRegistrar,
+      // [Instructions.ConfigureGatewayPlugin]: ConfigureGatewayPlugin,
       [Instructions.ChangeMakeDonation]: ChangeDonation,
       [Instructions.CreateTokenMetadata]: CreateTokenMetadata,
       [Instructions.UpdateTokenMetadata]: UpdateTokenMetadata,
@@ -541,57 +541,57 @@ const New = () => {
       [Instructions.DeactivateValidatorStake]: DeactivateValidatorStake,
       [Instructions.WithdrawValidatorStake]: WithdrawValidatorStake,
       [Instructions.DelegateStake]: DelegateStake,
-      [Instructions.SplitStake]: SplitStake,
+      // [Instructions.SplitStake]: SplitStake,
       [Instructions.DifferValidatorStake]: null,
-      [Instructions.TransferDomainName]: TransferDomainName,
-      [Instructions.SerumInitUser]: InitUser,
-      [Instructions.SerumGrantLockedSRM]: {
-        componentBuilderFunction: ({ index, governance }) => (
-          <GrantForm
-            index={index}
-            governance={governance}
-            isLocked={true}
-            isMsrm={false}
-          />
-        ),
-      },
-      [Instructions.SerumGrantLockedMSRM]: {
-        componentBuilderFunction: ({ index, governance }) => (
-          <GrantForm
-            index={index}
-            governance={governance}
-            isLocked={true}
-            isMsrm={true}
-          />
-        ),
-      },
-      [Instructions.SerumGrantVestSRM]: {
-        componentBuilderFunction: ({ index, governance }) => (
-          <GrantForm
-            index={index}
-            governance={governance}
-            isLocked={false}
-            isMsrm={false}
-          />
-        ),
-      },
-      [Instructions.SerumGrantVestMSRM]: {
-        componentBuilderFunction: ({ index, governance }) => (
-          <GrantForm
-            index={index}
-            governance={governance}
-            isLocked={false}
-            isMsrm={true}
-          />
-        ),
-      },
-      [Instructions.SerumUpdateGovConfigParams]: UpdateConfigParams,
-      [Instructions.SerumUpdateGovConfigAuthority]: UpdateConfigAuthority,
+      // [Instructions.TransferDomainName]: TransferDomainName,
+      // [Instructions.SerumInitUser]: InitUser,
+      // [Instructions.SerumGrantLockedSRM]: {
+      //   componentBuilderFunction: ({ index, governance }) => (
+      //     <GrantForm
+      //       index={index}
+      //       governance={governance}
+      //       isLocked={true}
+      //       isMsrm={false}
+      //     />
+      //   ),
+      // },
+      // [Instructions.SerumGrantLockedMSRM]: {
+      //   componentBuilderFunction: ({ index, governance }) => (
+      //     <GrantForm
+      //       index={index}
+      //       governance={governance}
+      //       isLocked={true}
+      //       isMsrm={true}
+      //     />
+      //   ),
+      // },
+      // [Instructions.SerumGrantVestSRM]: {
+      //   componentBuilderFunction: ({ index, governance }) => (
+      //     <GrantForm
+      //       index={index}
+      //       governance={governance}
+      //       isLocked={false}
+      //       isMsrm={false}
+      //     />
+      //   ),
+      // },
+      // [Instructions.SerumGrantVestMSRM]: {
+      //   componentBuilderFunction: ({ index, governance }) => (
+      //     <GrantForm
+      //       index={index}
+      //       governance={governance}
+      //       isLocked={false}
+      //       isMsrm={true}
+      //     />
+      //   ),
+      // },
+      // [Instructions.SerumUpdateGovConfigParams]: UpdateConfigParams,
+      // [Instructions.SerumUpdateGovConfigAuthority]: UpdateConfigAuthority,
       [Instructions.JoinDAO]: JoinDAO,
-      [Instructions.AddKeyToDID]: AddKeyToDID,
-      [Instructions.RemoveKeyFromDID]: RemoveKeyFromDID,
-      [Instructions.AddServiceToDID]: AddServiceToDID,
-      [Instructions.RemoveServiceFromDID]: RemoveServiceFromDID,
+      // [Instructions.AddKeyToDID]: AddKeyToDID,
+      // [Instructions.RemoveKeyFromDID]: RemoveKeyFromDID,
+      // [Instructions.AddServiceToDID]: AddServiceToDID,
+      // [Instructions.RemoveServiceFromDID]: RemoveServiceFromDID,
       [Instructions.RevokeGoverningTokens]: RevokeGoverningTokens,
       // [Instructions.SagaPreOrder]: SagaPreOrder,
       // [Instructions.DepositToMangoAccount]: MakeDepositToMangoAccount,
