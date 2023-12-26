@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid, validatePubkey } from '@utils/formValidation'
@@ -10,10 +10,8 @@ import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
-import InstructionForm, {
-  InstructionInput,
-  InstructionInputType,
-} from '../../FormCreator'
+import InstructionForm, { InstructionInput } from '../../FormCreator'
+import { InstructionInputType } from '../../inputInstructionType'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { PerpMarketIndex } from '@blockworks-foundation/mango-v4'
 import { getChangedValues, getNullOrTransform } from '@utils/mangoV4Tools'
@@ -21,6 +19,9 @@ import { BN } from '@coral-xyz/anchor'
 import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
 import Switch from '@components/Switch'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import ForwarderProgram, {
+  useForwarderProgramHelpers,
+} from '@components/ForwarderProgram/ForwarderProgram'
 
 const keyToLabel = {
   oraclePk: 'Oracle',
@@ -54,6 +55,7 @@ const keyToLabel = {
   reduceOnly: 'Reduce Only',
   resetStablePrice: 'Reset Stable Price',
   positivePnlLiquidationFee: 'Positive Pnl Liquidation Fee',
+  forceClose: 'Force Close',
 }
 
 type NameMarketIndexVal = {
@@ -94,6 +96,7 @@ interface PerpEditForm {
   resetStablePrice: boolean
   positivePnlLiquidationFee: number
   holdupTime: number
+  forceClose: boolean
 }
 
 const defaultFormValues = {
@@ -130,6 +133,7 @@ const defaultFormValues = {
   resetStablePrice: false,
   positivePnlLiquidationFee: 0,
   holdupTime: 0,
+  forceClose: false,
 }
 
 const PerpEdit = ({
@@ -144,6 +148,7 @@ const PerpEdit = ({
   const { assetAccounts } = useGovernanceAssets()
   const [perps, setPerps] = useState<NameMarketIndexVal[]>([])
   const [forcedValues, setForcedValues] = useState<string[]>([])
+  const forwarderProgramHelpers = useForwarderProgramHelpers()
   const solAccounts = assetAccounts.filter(
     (x) =>
       x.type === AccountType.SOL &&
@@ -217,7 +222,7 @@ const PerpEdit = ({
           getNullOrTransform(values.minFunding, null, Number),
           getNullOrTransform(values.maxFunding, null, Number),
           getNullOrTransform(values.impactQuantity, BN),
-          values.groupInsuranceFund,
+          values.groupInsuranceFund!,
           getNullOrTransform(values.feePenalty, null, Number),
           getNullOrTransform(values.settleFeeFlat, null, Number),
           getNullOrTransform(values.settleFeeAmountThreshold, null, Number),
@@ -231,10 +236,11 @@ const PerpEdit = ({
           getNullOrTransform(values.stablePriceGrowthLimit, null, Number),
           getNullOrTransform(values.settlePnlLimitFactor, null, Number),
           getNullOrTransform(values.settlePnlLimitWindowSize, BN),
-          values.reduceOnly,
-          values.resetStablePrice,
+          values.reduceOnly!,
+          values.resetStablePrice!,
           getNullOrTransform(values.positivePnlLiquidationFee, null, Number),
-          getNullOrTransform(values.name, null, String)
+          getNullOrTransform(values.name, null, String),
+          values.forceClose!
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -245,11 +251,14 @@ const PerpEdit = ({
         })
         .instruction()
 
-      serializedInstruction = serializeInstructionToBase64(ix)
+      serializedInstruction = serializeInstructionToBase64(
+        forwarderProgramHelpers.withForwarderWrapper(ix)
+      )
     }
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
       isValid,
+      chunkBy: 1,
       governance: form.governedAccount?.governance,
       customHoldUpTime: form.holdupTime,
     }
@@ -262,7 +271,12 @@ const PerpEdit = ({
       index
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form, forcedValues])
+  }, [
+    form,
+    forcedValues,
+    forwarderProgramHelpers.form,
+    forwarderProgramHelpers.withForwarderWrapper,
+  ])
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
@@ -288,7 +302,7 @@ const PerpEdit = ({
     if (mangoGroup) {
       getTokens()
     }
-  }, [mangoGroup?.publicKey.toBase58()])
+  }, [mangoGroup])
 
   useEffect(() => {
     if (form.perp && mangoGroup) {
@@ -296,7 +310,6 @@ const PerpEdit = ({
         form.perp.value
       )!
       const vals = {
-        ...form,
         oraclePk: currentPerp.oracle.toBase58(),
         name: currentPerp.name,
         oracleConfFilter: currentPerp.oracleConfig.confFilter.toNumber(),
@@ -328,14 +341,17 @@ const PerpEdit = ({
         settlePnlLimitWindowSize: currentPerp.settlePnlLimitWindowSizeTs.toNumber(),
         reduceOnly: currentPerp.reduceOnly,
         resetStablePrice: false,
+        forceClose: currentPerp.forceClose,
         positivePnlLiquidationFee: currentPerp.positivePnlLiquidationFee.toNumber(),
       }
-      setForm({
+      setForm((prevForm) => ({
+        ...prevForm,
         ...vals,
-      })
-      setOriginalFormValues({ ...vals })
+      }))
+      setOriginalFormValues((prevForm) => ({ ...prevForm, ...vals }))
     }
-  }, [form.perp?.value])
+  }, [form.perp, mangoGroup])
+
   const inputs: InstructionInput[] = [
     {
       label: 'Governance',
@@ -492,27 +508,6 @@ const PerpEdit = ({
       name: 'feePenalty',
     },
     {
-      label: keyToLabel['groupInsuranceFund'],
-      subtitle: getAdditionalLabelInfo('groupInsuranceFund'),
-      initialValue: form.groupInsuranceFund,
-      type: InstructionInputType.SWITCH,
-      name: 'groupInsuranceFund',
-    },
-    {
-      label: keyToLabel['reduceOnly'],
-      subtitle: getAdditionalLabelInfo('reduceOnly'),
-      initialValue: form.reduceOnly,
-      type: InstructionInputType.SWITCH,
-      name: 'reduceOnly',
-    },
-    {
-      label: keyToLabel['resetStablePrice'],
-      subtitle: getAdditionalLabelInfo('resetStablePrice'),
-      initialValue: form.resetStablePrice,
-      type: InstructionInputType.SWITCH,
-      name: 'resetStablePrice',
-    },
-    {
       label: keyToLabel['settleFeeFlat'],
       subtitle: getAdditionalLabelInfo('settleFeeFlat'),
       initialValue: form.settleFeeFlat,
@@ -592,6 +587,34 @@ const PerpEdit = ({
       inputType: 'number',
       name: 'positivePnlLiquidationFee',
     },
+    {
+      label: keyToLabel['groupInsuranceFund'],
+      subtitle: getAdditionalLabelInfo('groupInsuranceFund'),
+      initialValue: form.groupInsuranceFund,
+      type: InstructionInputType.SWITCH,
+      name: 'groupInsuranceFund',
+    },
+    {
+      label: keyToLabel['reduceOnly'],
+      subtitle: getAdditionalLabelInfo('reduceOnly'),
+      initialValue: form.reduceOnly,
+      type: InstructionInputType.SWITCH,
+      name: 'reduceOnly',
+    },
+    {
+      label: keyToLabel['resetStablePrice'],
+      subtitle: getAdditionalLabelInfo('resetStablePrice'),
+      initialValue: form.resetStablePrice,
+      type: InstructionInputType.SWITCH,
+      name: 'resetStablePrice',
+    },
+    {
+      label: keyToLabel['forceClose'],
+      subtitle: getAdditionalLabelInfo('forceClose'),
+      initialValue: form.forceClose,
+      type: InstructionInputType.SWITCH,
+      name: 'forceClose',
+    },
   ]
   return (
     <>
@@ -634,6 +657,7 @@ const PerpEdit = ({
                 ))}
             </div>
           </AdvancedOptionsDropdown>
+          <ForwarderProgram {...forwarderProgramHelpers}></ForwarderProgram>
         </>
       )}
     </>

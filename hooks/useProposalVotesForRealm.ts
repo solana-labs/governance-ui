@@ -6,10 +6,10 @@ import {
   Realm,
 } from '@solana/spl-governance'
 import { MintInfo } from '@solana/spl-token'
+import { useConnection } from '@solana/wallet-adapter-react'
 import { calculatePct, fmtTokenAmount } from '@utils/formatting'
 import { tryGetMint } from '@utils/tokens'
 import { useEffect, useMemo, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 
 type ProposalVotesInfoType = {
   voteThresholdPct: number
@@ -40,7 +40,7 @@ export default function useProposalVotesForRealm(
   proposal: Proposal,
   governance?: ProgramAccount<Governance>
 ) {
-  const connection = useWalletStore((s) => s.connection.current)
+  const { connection } = useConnection()
 
   const [proposalVotes, setProposalVotes] = useState<ProposalVotesInfoType>(
     defaultProposalVotes

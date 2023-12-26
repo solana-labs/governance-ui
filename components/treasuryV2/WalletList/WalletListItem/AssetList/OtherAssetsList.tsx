@@ -8,6 +8,7 @@ import {
   Programs,
   RealmAuthority,
   Unknown,
+  Stake,
 } from '@models/treasury/Asset'
 
 import Collapsible from './Collapsible'
@@ -16,15 +17,19 @@ import DomainListItem from './DomainListItem'
 import ProgramsListItem from './ProgramsListItem'
 import UnknownAssetListItem from './UnknownAssetListItem'
 import RealmAuthorityListItem from './RealmAuthorityListItem'
+import StakeListItem from './StakeListItem'
+import { abbreviateAddress } from '@utils/formatting'
 
 interface Props {
   className?: string
   disableCollapse?: boolean
   expanded?: boolean
-  assets: (Mint | Domains | Programs | RealmAuthority | Unknown)[]
+  assets: (Mint | Domains | Programs | RealmAuthority | Unknown | Stake)[]
   selectedAssetId?: string | null
   itemsToHide: string[]
-  onSelect?(asset: Mint | Domains | Programs | RealmAuthority | Unknown): void
+  onSelect?(
+    asset: Mint | Domains | Programs | RealmAuthority | Unknown | Stake
+  ): void
   onToggleExpand?(): void
 }
 
@@ -88,6 +93,18 @@ export default function OtherAssetsList(props: Props) {
                   thumbnail={asset.icon}
                   onSelect={() => props.onSelect?.(asset)}
                 />
+              )
+            case AssetType.Stake:
+              return (
+                <StakeListItem
+                  key={i}
+                  amount={asset.amount}
+                  publicKey={
+                    asset.raw.extensions.stake?.stakeAccount &&
+                    abbreviateAddress(asset.raw.extensions.stake.stakeAccount!)
+                  }
+                  onSelect={() => props.onSelect?.(asset)}
+                ></StakeListItem>
               )
             case AssetType.Unknown:
               return (

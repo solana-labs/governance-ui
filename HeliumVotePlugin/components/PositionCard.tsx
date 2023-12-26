@@ -1,11 +1,9 @@
 import React, { useCallback, useState, useMemo } from 'react'
-import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import useWalletStore from 'stores/useWalletStore'
-import { fmtMintAmount } from '@tools/sdk/units'
+import { fmtMintAmount, getMintDecimalAmount } from '@tools/sdk/units'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { abbreviateAddress } from '@utils/formatting'
-import { useUnixNow } from '@hooks/useUnixNow'
+import { useSolanaUnixNow } from '@hooks/useSolanaUnixNow'
 import { BN } from '@coral-xyz/anchor'
 import Button from '@components/Button'
 import { HNT_MINT } from '@helium/spl-utils'
@@ -24,29 +22,44 @@ import {
 } from '../components/LockTokensModal'
 import { TransferTokensModal } from './TransferTokensModal'
 import { calcLockupMultiplier } from '../utils/calcLockupMultiplier'
-import { useUnlockPosition } from '../hooks/useUnlockPosition'
+import { useFlipPositionLockupKind } from '../hooks/useFlipPositionLockupKind'
 import { useExtendPosition } from '../hooks/useExtendPosition'
+import { useSplitPosition } from '../hooks/useSplitPosition'
 import { useTransferPosition } from '../hooks/useTransferPosition'
 import { useClosePosition } from '../hooks/useClosePosition'
 import { DelegateTokensModal } from './DelegateTokensModal'
 import { useDelegatePosition } from '../hooks/useDelegatePosition'
 import { useUndelegatePosition } from '../hooks/useUndelegatePosition'
+import { useClaimDelegatedPositionRewards } from '../hooks/useClaimDelegatedPositionRewards'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { PublicKey } from '@solana/web3.js'
+import { PromptModal } from './PromptModal'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
+import queryClient from '@hooks/queries/queryClient'
+import { tokenAccountQueryKeys } from '@hooks/queries/tokenAccount'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
-export interface PositionCardProps {
+interface PositionCardProps {
+  subDaos?: SubDaoWithMeta[]
   position: PositionWithMeta
+  tokenOwnerRecordPk: PublicKey | null
   isOwner: boolean
 }
 
 export const PositionCard: React.FC<PositionCardProps> = ({
+  subDaos,
   position,
+  tokenOwnerRecordPk,
   isOwner,
 }) => {
-  const { unixNow = 0 } = useUnixNow()
+  const { unixNow = 0 } = useSolanaUnixNow()
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
   const [isExtendModalOpen, setIsExtendModalOpen] = useState(false)
+  const [isSplitModalOpen, setIsSplitModalOpen] = useState(false)
   const [isDelegateModalOpen, setIsDelegateModalOpen] = useState(false)
-  const { realm, realmInfo } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
   const [isLoading, positions, getPositions] = useHeliumVsrStore((s) => [
     s.state.isLoading,
     s.state.positions,
@@ -85,7 +98,11 @@ export const PositionCard: React.FC<PositionCardProps> = ({
       )
 
       return (
-        !pos.hasGenesisMultiplier &&
+        (unixNow >= pos.genesisEnd.toNumber() ||
+          unixNow <=
+            position.votingMint.genesisVotePowerMultiplierExpirationTs.toNumber() ||
+          !pos.hasGenesisMultiplier) &&
+        !pos.isDelegated &&
         !position.pubkey.equals(pos.pubkey) &&
         lockupPeriodInDays >= positionLockupPeriodInDays
       )
@@ -99,10 +116,16 @@ export const PositionCard: React.FC<PositionCardProps> = ({
   } = useExtendPosition()
 
   const {
-    loading: isUnlocking,
-    error: unlockingError,
-    unlockPosition,
-  } = useUnlockPosition()
+    loading: isSpliting,
+    error: splitingError,
+    splitPosition,
+  } = useSplitPosition()
+
+  const {
+    loading: isFlipping,
+    error: flippingError,
+    flipPositionLockupKind,
+  } = useFlipPositionLockupKind()
 
   const {
     loading: isTransfering,
@@ -128,27 +151,33 @@ export const PositionCard: React.FC<PositionCardProps> = ({
     undelegatePosition,
   } = useUndelegatePosition()
 
-  const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
-    (s) => s.actions
-  )
-  const connection = useWalletStore((s) => s.connection)
+  const {
+    loading: isClaimingRewards,
+    error: claimingRewardsError,
+    claimDelegatedPositionRewards,
+  } = useClaimDelegatedPositionRewards()
+
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
 
   const { lockup, hasGenesisMultiplier, votingMint } = position
   const lockupKind = Object.keys(lockup.kind)[0] as string
+  const isConstant = lockupKind === 'constant'
   const lockupExpired =
-    lockupKind !== 'constant' && lockup.endTs.sub(new BN(unixNow)).lt(new BN(0))
+    !isConstant && lockup.endTs.sub(new BN(unixNow)).lt(new BN(0))
 
   const lockedTokens = fmtMintAmount(
     position.votingMint.mint.account,
     position.amountDepositedNative
   )
 
-  const isConstant = lockupKind === 'constant'
   const isRealmCommunityMint =
     realm?.account.communityMint &&
     realm.account.communityMint.equals(position.votingMint.mint.publicKey)
 
+  const maxActionableAmount = mint
+    ? getMintDecimalAmount(mint, position.amountDepositedNative).toNumber()
+    : 0
   const canDelegate =
     isRealmCommunityMint && realm.account.communityMint.equals(HNT_MINT)
 
@@ -167,8 +196,9 @@ export const PositionCard: React.FC<PositionCardProps> = ({
   )
 
   const refetchState = async () => {
-    fetchWalletTokenAccounts()
-    fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+    queryClient.invalidateQueries({
+      queryKey: tokenAccountQueryKeys.all(connection.endpoint),
+    })
     await getPositions({
       votingClient: currentClient,
       realmPk: realm!.pubkey,
@@ -179,17 +209,20 @@ export const PositionCard: React.FC<PositionCardProps> = ({
     })
   }
 
-  const handleUnlock = async () => {
+  const handleFlipPositionLockupKind = async () => {
     try {
-      await unlockPosition({ position })
+      await flipPositionLockupKind({ position, tokenOwnerRecordPk })
 
-      if (!unlockingError) {
+      if (!flippingError) {
         await refetchState()
       }
     } catch (e) {
       notify({
         type: 'error',
-        message: e.message || 'Unable to unlock tokens',
+        message:
+          e.message || isConstant
+            ? 'Unable to unlock position'
+            : 'Unable to pause unlock',
       })
     }
   }
@@ -198,6 +231,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
     await extendPosition({
       position,
       lockupPeriodsInDays: values.lockupPeriodInDays,
+      tokenOwnerRecordPk,
     })
 
     if (!extendingError) {
@@ -205,9 +239,27 @@ export const PositionCard: React.FC<PositionCardProps> = ({
     }
   }
 
-  const handleTransferTokens = async (targetPosition: PositionWithMeta) => {
+  const handleSplitTokens = async (values: LockTokensModalFormValues) => {
+    await splitPosition({
+      sourcePosition: position,
+      amount: values.amount,
+      lockupKind: values.lockupKind.value,
+      lockupPeriodsInDays: values.lockupPeriodInDays,
+      tokenOwnerRecordPk: tokenOwnerRecordPk,
+    })
+
+    if (!splitingError) {
+      await refetchState()
+    }
+  }
+
+  const handleTransferTokens = async (
+    targetPosition: PositionWithMeta,
+    amount: number
+  ) => {
     await transferPosition({
       sourcePosition: position,
+      amount,
       targetPosition,
     })
 
@@ -220,6 +272,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
     await delegatePosition({
       position,
       subDao,
+      tokenOwnerRecordPk,
     })
 
     if (!delegatingError) {
@@ -229,7 +282,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
 
   const handleUndelegateTokens = async () => {
     try {
-      await undelegatePosition({ position })
+      await undelegatePosition({ position, tokenOwnerRecordPk })
 
       if (!undelegatingError) {
         await refetchState()
@@ -242,10 +295,26 @@ export const PositionCard: React.FC<PositionCardProps> = ({
     }
   }
 
+  const handleClaimRewards = async () => {
+    try {
+      await claimDelegatedPositionRewards({ position, tokenOwnerRecordPk })
+
+      if (!claimingRewardsError) {
+        await refetchState()
+      }
+    } catch (e) {
+      notify({
+        type: 'error',
+        message: e.message || 'Unable to claim rewards',
+      })
+    }
+  }
+
   const handleClose = async () => {
     try {
       await closePosition({
         position,
+        tokenOwnerRecordPk,
       })
 
       if (!closingError) {
@@ -268,14 +337,23 @@ export const PositionCard: React.FC<PositionCardProps> = ({
     )
   }
 
+  const delegatedSubDaoMetadata = position.delegatedSubDao
+    ? subDaos?.find((sd) => sd.pubkey.equals(position.delegatedSubDao!))
+        ?.dntMetadata
+    : null
+
   const isSubmitting =
     isExtending ||
+    isSpliting ||
     isClosing ||
     isTransfering ||
-    isUnlocking ||
+    isFlipping ||
     isDelegating ||
-    isUndelegating
+    isUndelegating ||
+    isClaimingRewards
 
+  const lockupKindDisplay = isConstant ? 'Constant' : 'Decaying'
+  const hasActiveVotes = position.numActiveVotes > 0
   return (
     <div className="relative border overflow-hidden border-fgd-4 rounded-lg flex flex-col">
       {hasGenesisMultiplier && (
@@ -309,21 +387,19 @@ export const PositionCard: React.FC<PositionCardProps> = ({
           </div>
           <div
             className="p-4 rounded-lg flex flex-col h-full w-full"
-            style={{ minHeight: '290px' }}
+            style={{ minHeight: '260px' }}
           >
             <div className="flex flex-wrap mb-4">
-              <CardLabel
-                label="Lockup Type"
-                value={lockupKind.charAt(0).toUpperCase() + lockupKind.slice(1)}
-              />
+              <CardLabel label="Lockup Type" value={lockupKindDisplay} />
               {isRealmCommunityMint && (
                 <CardLabel
                   label="Vote Multiplier"
                   value={(
                     (position.votingPower.isZero()
                       ? 0
-                      : position.votingPower.toNumber() /
-                        position.amountDepositedNative.toNumber()) /
+                      : position.votingPower
+                          .div(position.amountDepositedNative)
+                          .toNumber()) /
                     (position.genesisEnd.gt(new BN(unixNow))
                       ? votingMint.genesisVotePowerMultiplier
                       : 1)
@@ -331,7 +407,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
                 />
               )}
               <CardLabel
-                label={isConstant ? 'Min. Duration' : 'Time left'}
+                label={isConstant ? 'Min Duration' : 'Time left'}
                 value={
                   isConstant
                     ? getMinDurationFmt(
@@ -353,14 +429,36 @@ export const PositionCard: React.FC<PositionCardProps> = ({
             {isOwner && (
               <div style={{ marginTop: 'auto' }}>
                 {position.isDelegated ? (
-                  <Button
-                    className="w-full"
-                    onClick={handleUndelegateTokens}
-                    disabled={isSubmitting}
-                    isLoading={isUndelegating}
-                  >
-                    UnDelegate
-                  </Button>
+                  <div className="flex flex-col gap-2 items-center">
+                    {delegatedSubDaoMetadata ? (
+                      <span
+                        className="text-fgd-2 flex-row gap-2"
+                        style={{ fontSize: '9px' }}
+                      >
+                        <img
+                          className="w-4 h-4"
+                          src={delegatedSubDaoMetadata.json?.image || ''}
+                        />
+                        {delegatedSubDaoMetadata.name}
+                      </span>
+                    ) : null}
+                    <Button
+                      className="w-full"
+                      onClick={handleClaimRewards}
+                      disabled={isSubmitting || !position.hasRewards}
+                      isLoading={isClaimingRewards}
+                    >
+                      Claim Rewards
+                    </Button>
+                    <Button
+                      className="w-full"
+                      onClick={handleUndelegateTokens}
+                      disabled={isSubmitting || position.hasRewards}
+                      isLoading={isUndelegating}
+                    >
+                      UnDelegate
+                    </Button>
+                  </div>
                 ) : (
                   <>
                     {lockupExpired ? (
@@ -377,33 +475,44 @@ export const PositionCard: React.FC<PositionCardProps> = ({
                         <div className="flex flex-row gap-2 justify-center">
                           <Button
                             className="w-full"
-                            onClick={() => setIsExtendModalOpen(true)}
+                            onClick={() => setIsSplitModalOpen(true)}
                             disabled={isSubmitting}
-                            isLoading={isExtending}
+                            isLoading={isSpliting}
                           >
-                            Extend
+                            Split
                           </Button>
-                          {!hasGenesisMultiplier && (
-                            <Button
-                              className="w-full"
-                              onClick={() => setIsTransferModalOpen(true)}
-                              disabled={
-                                transferablePositions.length == 0 ||
-                                isSubmitting
-                              }
-                              isLoading={isTransfering}
-                            >
-                              Transfer
-                            </Button>
-                          )}
-                        </div>
-                        {isConstant && (
                           <Button
-                            onClick={handleUnlock}
+                            className="w-full"
+                            onClick={() => setIsTransferModalOpen(true)}
                             disabled={isSubmitting}
-                            isLoading={isUnlocking}
+                            isLoading={isTransfering}
                           >
-                            Unlock
+                            Transfer
+                          </Button>
+                        </div>
+                        <Button
+                          className="w-full"
+                          onClick={() => setIsExtendModalOpen(true)}
+                          disabled={isSubmitting}
+                          isLoading={isExtending}
+                        >
+                          Extend
+                        </Button>
+                        {isConstant ? (
+                          <Button
+                            onClick={handleFlipPositionLockupKind}
+                            disabled={isSubmitting}
+                            isLoading={isFlipping}
+                          >
+                            Start Unlock
+                          </Button>
+                        ) : (
+                          <Button
+                            onClick={handleFlipPositionLockupKind}
+                            disabled={isSubmitting}
+                            isLoading={isFlipping}
+                          >
+                            Pause Unlock
                           </Button>
                         )}
                         {canDelegate && (
@@ -429,23 +538,85 @@ export const PositionCard: React.FC<PositionCardProps> = ({
         <LockTokensModal
           mode="extend"
           isOpen={isExtendModalOpen}
-          minLockupTimeInDays={Math.ceil(
-            secsToDays(position.lockup.endTs.sub(new BN(unixNow)).toNumber())
+          minLockupTimeInDays={
+            isConstant
+              ? Math.ceil(
+                  secsToDays(
+                    position.lockup.endTs
+                      .sub(position.lockup.startTs)
+                      .toNumber()
+                  )
+                )
+              : Math.ceil(
+                  secsToDays(
+                    position.lockup.endTs.sub(new BN(unixNow)).toNumber()
+                  )
+                )
+          }
+          maxLockupTimeInDays={secsToDays(
+            votingMint.lockupSaturationSecs.toNumber()
           )}
-          maxLockupAmount={position.amountDepositedNative.toNumber()}
+          maxLockupAmount={maxActionableAmount}
           calcMultiplierFn={handleCalcLockupMultiplier}
           onClose={() => setIsExtendModalOpen(false)}
           onSubmit={handleExtendTokens}
         />
       )}
-      {isTransferModalOpen && (
-        <TransferTokensModal
-          isOpen={isTransferModalOpen}
-          positions={transferablePositions}
-          onClose={() => setIsTransferModalOpen(false)}
-          onSubmit={handleTransferTokens}
-        />
-      )}
+      {isSplitModalOpen &&
+        (!hasActiveVotes ? (
+          <LockTokensModal
+            mode="split"
+            isOpen={isSplitModalOpen}
+            minLockupTimeInDays={
+              isConstant
+                ? Math.ceil(
+                    secsToDays(
+                      position.lockup.endTs
+                        .sub(position.lockup.startTs)
+                        .toNumber()
+                    )
+                  )
+                : Math.ceil(
+                    secsToDays(
+                      position.lockup.endTs.sub(new BN(unixNow)).toNumber()
+                    )
+                  )
+            }
+            maxLockupTimeInDays={secsToDays(
+              votingMint.lockupSaturationSecs.toNumber()
+            )}
+            maxLockupAmount={maxActionableAmount}
+            calcMultiplierFn={handleCalcLockupMultiplier}
+            onClose={() => setIsSplitModalOpen(false)}
+            onSubmit={handleSplitTokens}
+          />
+        ) : (
+          <PromptModal
+            isOpen={isSplitModalOpen}
+            type="error"
+            title="Unable to split"
+            message="Position is partaking in an active vote!"
+            onClose={() => setIsSplitModalOpen(false)}
+          />
+        ))}
+      {isTransferModalOpen &&
+        (!hasActiveVotes ? (
+          <TransferTokensModal
+            isOpen={isTransferModalOpen}
+            positions={transferablePositions}
+            maxTransferAmount={maxActionableAmount}
+            onClose={() => setIsTransferModalOpen(false)}
+            onSubmit={handleTransferTokens}
+          />
+        ) : (
+          <PromptModal
+            isOpen={isTransferModalOpen}
+            type="error"
+            title="Unable to transfer"
+            message="Position is partaking in an active vote!"
+            onClose={() => setIsTransferModalOpen(false)}
+          />
+        ))}
       {canDelegate && isDelegateModalOpen && (
         <DelegateTokensModal
           isOpen={isDelegateModalOpen}

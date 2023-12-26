@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
 import { ProgramAccount, Governance } from '@solana/spl-governance'
 import {
@@ -12,7 +13,6 @@ import {
   getGovernanceAirdropInstruction,
   getMerkleAirdropInstruction,
 } from '@utils/instructions/Dual/airdrop'
-import useWalletStore from 'stores/useWalletStore'
 import {
   getDualFinanceGovernanceAirdropSchema,
   getDualFinanceMerkleAirdropSchema,
@@ -20,6 +20,7 @@ import {
 import Tooltip from '@components/Tooltip'
 import Select from '@components/inputs/Select'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const DualAirdrop = ({
   index,
@@ -36,7 +37,7 @@ const DualAirdrop = ({
     amount: 0,
     treasury: undefined,
   })
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const { assetAccounts } = useGovernanceAssets()
@@ -79,8 +80,8 @@ const DualAirdrop = ({
     setGovernedAccount(form.treasury?.governance)
   }, [form.treasury])
 
-  const merkleSchema = getDualFinanceMerkleAirdropSchema()
-  const governanceSchema = getDualFinanceGovernanceAirdropSchema()
+  const merkleSchema = getDualFinanceMerkleAirdropSchema({form});
+  const governanceSchema = getDualFinanceGovernanceAirdropSchema({form});
 
   return (
     <>
@@ -155,8 +156,9 @@ const DualAirdrop = ({
           />
         </>
       )}
+      {/* TODO: Note that this is full tokens, not atoms since expectation is that this composes with staking options */}
       <Input
-        label="Total number of tokens"
+        label="Total number of tokens."
         value={form.amount}
         type="text"
         onChange={(evt) =>

@@ -15,8 +15,8 @@ import ConvertToMsol from '@components/TreasuryAccount/ConvertToMsol'
 import ConvertToStSol from '@components/TreasuryAccount/ConvertToStSol'
 import Trade from '@components/TreasuryAccount/Trade'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import useWalletStore from 'stores/useWalletStore'
 import MangoModal from '@components/TreasuryAccount/MangoModal'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface Props {
   className?: string
@@ -27,7 +27,7 @@ interface Props {
 
 export default function Investments(props: Props) {
   const { currentAccount, setCurrentAccount } = useTreasuryAccountStore()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const [showAvailableInvestments, setShowAvailableInvestments] = useState(
     false
   )

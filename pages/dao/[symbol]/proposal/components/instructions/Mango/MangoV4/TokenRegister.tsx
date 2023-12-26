@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { PublicKey, SYSVAR_RENT_PUBKEY } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid, validatePubkey } from '@utils/formValidation'
@@ -10,14 +10,19 @@ import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
-import InstructionForm, {
-  InstructionInput,
-  InstructionInputType,
-} from '../../FormCreator'
+import InstructionForm, { InstructionInput } from '../../FormCreator'
+import { InstructionInputType } from '../../inputInstructionType'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { toNative } from '@blockworks-foundation/mango-v4'
 import { BN } from '@coral-xyz/anchor'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { ReferralProvider } from '@jup-ag/referral-sdk'
+import { JUPITER_REFERRAL_PK } from '@tools/constants'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import ForwarderProgram, {
+  useForwarderProgramHelpers,
+} from '@components/ForwarderProgram/ForwarderProgram'
+import { REDUCE_ONLY_OPTIONS } from '@utils/Mango/listingTools'
 
 interface TokenRegisterForm {
   governedAccount: AssetAccount | null
@@ -44,6 +49,19 @@ interface TokenRegisterForm {
   netBorrowLimitPerWindowQuote: number
   tokenIndex: number
   holdupTime: number
+  stablePriceDelayIntervalSeconds: number
+  stablePriceGrowthLimit: number
+  stablePriceDelayGrowthLimit: number
+  tokenConditionalSwapTakerFeeRate: number
+  tokenConditionalSwapMakerFeeRate: number
+  flashLoanSwapFeeRate: number
+  reduceOnly: { name: string; value: number }
+  borrowWeightScaleStartQuote: number
+  depositWeightScaleStartQuote: number
+  interestCurveScaling: number
+  interestTargetUtilization: number
+  depositLimit: number
+  insuranceFound: boolean
 }
 
 const TokenRegister = ({
@@ -56,6 +74,9 @@ const TokenRegister = ({
   const wallet = useWalletOnePointOh()
   const { mangoClient, mangoGroup, getAdditionalLabelInfo } = UseMangoV4()
   const { assetAccounts } = useGovernanceAssets()
+  const connection = useLegacyConnectionContext()
+  const forwarderProgramHelpers = useForwarderProgramHelpers()
+
   const solAccounts = assetAccounts.filter(
     (x) =>
       x.type === AccountType.SOL &&
@@ -88,6 +109,19 @@ const TokenRegister = ({
     netBorrowLimitPerWindowQuote: toNative(1000000, 6).toNumber(),
     tokenIndex: 0,
     holdupTime: 0,
+    stablePriceDelayIntervalSeconds: 60 * 60,
+    stablePriceGrowthLimit: 0.0003,
+    stablePriceDelayGrowthLimit: 0.06,
+    tokenConditionalSwapTakerFeeRate: 0,
+    tokenConditionalSwapMakerFeeRate: 0,
+    flashLoanSwapFeeRate: 0,
+    reduceOnly: REDUCE_ONLY_OPTIONS[0],
+    borrowWeightScaleStartQuote: toNative(10000, 6).toNumber(),
+    depositWeightScaleStartQuote: toNative(10000, 6).toNumber(),
+    depositLimit: 0,
+    interestTargetUtilization: 0.5,
+    interestCurveScaling: 4,
+    insuranceFound: false,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -100,6 +134,7 @@ const TokenRegister = ({
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
+    const additionalSerializedInstructions: string[] = []
     if (
       isValid &&
       form.governedAccount?.governance?.account &&
@@ -131,9 +166,22 @@ const TokenRegister = ({
           Number(form.maintLiabWeight),
           Number(form.initLiabWeight),
           Number(form.liquidationFee),
+          Number(form.stablePriceDelayIntervalSeconds),
+          Number(form.stablePriceDelayGrowthLimit),
+          Number(form.stablePriceGrowthLimit),
           Number(form.minVaultToDepositsRatio),
           new BN(form.netBorrowLimitWindowSizeTs),
-          new BN(form.netBorrowLimitPerWindowQuote)
+          new BN(form.netBorrowLimitPerWindowQuote),
+          Number(form.borrowWeightScaleStartQuote),
+          Number(form.depositWeightScaleStartQuote),
+          Number(form.reduceOnly.value),
+          Number(form.tokenConditionalSwapTakerFeeRate),
+          Number(form.tokenConditionalSwapMakerFeeRate),
+          Number(form.flashLoanSwapFeeRate),
+          Number(form.interestCurveScaling),
+          Number(form.interestTargetUtilization),
+          form.insuranceFound,
+          new BN(form.depositLimit)
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -145,11 +193,35 @@ const TokenRegister = ({
         })
         .instruction()
 
-      serializedInstruction = serializeInstructionToBase64(ix)
+      const rp = new ReferralProvider(connection.current)
+
+      const tx = await rp.initializeReferralTokenAccount({
+        payerPubKey: form.governedAccount.extensions.transferAddress!,
+        referralAccountPubKey: JUPITER_REFERRAL_PK,
+        mint: new PublicKey(form.mintPk),
+      })
+      const isExistingAccount = await connection.current.getAccountInfo(
+        tx.referralTokenAccountPubKey
+      )
+
+      if (!isExistingAccount) {
+        additionalSerializedInstructions.push(
+          ...tx.tx.instructions.map((x) =>
+            serializeInstructionToBase64(
+              forwarderProgramHelpers.withForwarderWrapper(x)
+            )
+          )
+        )
+      }
+
+      serializedInstruction = serializeInstructionToBase64(
+        forwarderProgramHelpers.withForwarderWrapper(ix)
+      )
     }
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
       isValid,
+      chunkBy: 1,
       governance: form.governedAccount?.governance,
       customHoldUpTime: form.holdupTime,
     }
@@ -162,7 +234,11 @@ const TokenRegister = ({
       index
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form])
+  }, [
+    form,
+    forwarderProgramHelpers.form,
+    forwarderProgramHelpers.withForwarderWrapper,
+  ])
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
@@ -380,6 +456,109 @@ const TokenRegister = ({
       inputType: 'number',
       name: 'netBorrowLimitPerWindowQuote',
     },
+    {
+      label: 'Reduce only',
+      subtitle: getAdditionalLabelInfo('reduceOnly'),
+      initialValue: form.reduceOnly,
+      type: InstructionInputType.SELECT,
+      options: REDUCE_ONLY_OPTIONS,
+      name: 'reduceOnly',
+    },
+    {
+      label: `Stable Price Delay Interval Seconds`,
+      subtitle: getAdditionalLabelInfo('stablePriceDelayIntervalSeconds'),
+      initialValue: form.stablePriceDelayIntervalSeconds,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'stablePriceDelayIntervalSeconds',
+    },
+    {
+      label: `Stable Price Growth Limit`,
+      subtitle: getAdditionalLabelInfo('stablePriceGrowthLimit'),
+      initialValue: form.stablePriceGrowthLimit,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'stablePriceGrowthLimit',
+    },
+    {
+      label: `Stable Price Delay Growth Limit`,
+      subtitle: getAdditionalLabelInfo('stablePriceDelayGrowthLimit'),
+      initialValue: form.stablePriceDelayGrowthLimit,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'stablePriceDelayGrowthLimit',
+    },
+    {
+      label: `Token Conditional Swap Taker Fee Rate`,
+      subtitle: getAdditionalLabelInfo('tokenConditionalSwapTakerFeeRate'),
+      initialValue: form.tokenConditionalSwapTakerFeeRate,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'tokenConditionalSwapTakerFeeRate',
+    },
+    {
+      label: `Token Conditional Swap Maker Fee Rate`,
+      subtitle: getAdditionalLabelInfo('tokenConditionalSwapMakerFeeRate'),
+      initialValue: form.tokenConditionalSwapMakerFeeRate,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'tokenConditionalSwapMakerFeeRate',
+    },
+    {
+      label: `Flash Loan Deposit Fee Rate`,
+      subtitle: getAdditionalLabelInfo('flashLoanSwapFeeRate'),
+      initialValue: form.flashLoanSwapFeeRate,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'flashLoanSwapFeeRate',
+    },
+    {
+      label: `Borrow Weight Scale Start Quote`,
+      subtitle: getAdditionalLabelInfo('borrowWeightScaleStartQuote'),
+      initialValue: form.borrowWeightScaleStartQuote,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'borrowWeightScaleStartQuote',
+    },
+    {
+      label: `Deposit Weight Scale Start Quote`,
+      subtitle: getAdditionalLabelInfo('depositWeightScaleStartQuote'),
+      initialValue: form.depositWeightScaleStartQuote,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'depositWeightScaleStartQuote',
+    },
+    {
+      label: `Interest Curve Scaling`,
+      subtitle: getAdditionalLabelInfo('interestCurveScaling'),
+      initialValue: form.interestCurveScaling,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'interestCurveScaling',
+    },
+    {
+      label: `Interest Target Utilization`,
+      subtitle: getAdditionalLabelInfo('interestTargetUtilization'),
+      initialValue: form.interestTargetUtilization,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'interestTargetUtilization',
+    },
+    {
+      label: `Deposit Limit`,
+      subtitle: getAdditionalLabelInfo('depositLimit'),
+      initialValue: form.depositLimit,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'depositLimit',
+    },
+    {
+      label: `Insurance Found`,
+      subtitle: getAdditionalLabelInfo('insuranceFound'),
+      initialValue: form.insuranceFound,
+      type: InstructionInputType.SWITCH,
+      name: 'insuranceFound',
+    },
   ]
 
   return (
@@ -393,6 +572,7 @@ const TokenRegister = ({
           formErrors={formErrors}
         ></InstructionForm>
       )}
+      <ForwarderProgram {...forwarderProgramHelpers}></ForwarderProgram>
     </>
   )
 }

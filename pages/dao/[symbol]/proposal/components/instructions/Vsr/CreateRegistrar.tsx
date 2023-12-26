@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import * as yup from 'yup'
 import {
   Governance,
@@ -11,7 +11,8 @@ import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
 import useRealm from '@hooks/useRealm'
 import { NewProposalContext } from '../../../new'
-import InstructionForm, { InstructionInputType } from '../FormCreator'
+import InstructionForm from '../FormCreator'
+import { InstructionInputType } from '../inputInstructionType'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { PublicKey, SYSVAR_RENT_PUBKEY } from '@solana/web3.js'
@@ -19,8 +20,9 @@ import { getRegistrarPDA } from 'VoteStakeRegistry/sdk/accounts'
 import { DEFAULT_VSR_ID, VsrClient } from 'VoteStakeRegistry/sdk/client'
 import { web3 } from '@coral-xyz/anchor'
 import useWalletDeprecated from '@hooks/useWalletDeprecated'
-import { heliumVsrPluginsPks, vsrPluginsPks } from '@hooks/useVotingPlugins'
+import { HELIUM_VSR_PLUGINS_PKS, VSR_PLUGIN_PKS } from '@constants/plugins'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 interface CreateVsrRegistrarForm {
   governedAccount: AssetAccount | undefined
@@ -53,7 +55,9 @@ const CreateVsrRegistrar = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { realm, realmInfo } = useRealm()
+  const realm = useRealmQuery().data?.result
+
+  const { realmInfo } = useRealm()
   const { assetAccounts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<CreateVsrRegistrarForm>()
@@ -85,14 +89,14 @@ const CreateVsrRegistrar = ({
     let instruction: web3.TransactionInstruction
     let vsrClient: VsrClient | HeliumVsrClient | undefined
 
-    if (vsrPluginsPks.includes(form.programId)) {
+    if (VSR_PLUGIN_PKS.includes(form.programId)) {
       vsrClient = await VsrClient.connect(
         anchorProvider,
         new PublicKey(form.programId)
       )
     }
 
-    if (heliumVsrPluginsPks.includes(form.programId)) {
+    if (HELIUM_VSR_PLUGINS_PKS.includes(form.programId)) {
       vsrClient = await HeliumVsrClient.connect(
         anchorProvider,
         new PublicKey(form.programId)

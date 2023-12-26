@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import Input from '@components/inputs/Input'
-import { TokenInfo } from '@solana/spl-token-registry'
 import tokenPriceService from '@utils/services/tokenPrice'
 import Select from './Select'
 import { StyledLabel } from './styles'
+import { TokenInfo } from '@utils/services/types'
 
 const TokenSelect: React.FC<{
   label: string

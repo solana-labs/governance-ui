@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid, validatePubkey } from '@utils/formValidation'
@@ -9,10 +9,8 @@ import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
-import InstructionForm, {
-  InstructionInput,
-  InstructionInputType,
-} from '../../FormCreator'
+import InstructionForm, { InstructionInput } from '../../FormCreator'
+import { InstructionInputType } from '../../inputInstructionType'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { BN } from '@coral-xyz/anchor'
 import { getChangedValues, getNullOrTransform } from '@utils/mangoV4Tools'
@@ -48,6 +46,7 @@ type GroupEditForm = {
   feesMngoTokenIndex: number | null
   feesExpiryInterval: number | null
   holdupTime: number
+  allowedFastListingsPerInterval: number | null
 }
 
 const defaultFormValues: GroupEditForm = {
@@ -64,6 +63,7 @@ const defaultFormValues: GroupEditForm = {
   feesMngoTokenIndex: 0,
   feesExpiryInterval: 0,
   holdupTime: 0,
+  allowedFastListingsPerInterval: 0,
 }
 
 const GroupEdit = ({
@@ -124,7 +124,12 @@ const GroupEdit = ({
           getNullOrTransform(values.feesMngoBonusRate, null, Number),
           getNullOrTransform(values.feesSwapMangoAccount, PublicKey),
           getNullOrTransform(values.feesMngoTokenIndex, null, Number),
-          getNullOrTransform(values.feesExpiryInterval, BN)
+          getNullOrTransform(values.feesExpiryInterval, BN),
+          getNullOrTransform(
+            values.allowedFastListingsPerInterval,
+            null,
+            Number
+          )
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -187,7 +192,6 @@ const GroupEdit = ({
   useEffect(() => {
     const getGroupParams = async () => {
       const vals = {
-        ...form,
         admin: mangoGroup!.admin.toBase58(),
         fastListingAdmin: mangoGroup!.fastListingAdmin.toBase58(),
         securityAdmin: mangoGroup!.securityAdmin.toBase58(),
@@ -198,16 +202,19 @@ const GroupEdit = ({
         feesSwapMangoAccount: mangoGroup!.buybackFeesSwapMangoAccount?.toBase58(),
         feesMngoTokenIndex: mangoGroup!.mngoTokenIndex,
         feesExpiryInterval: mangoGroup!.buybackFeesExpiryInterval?.toNumber(),
+        allowedFastListingsPerInterval: mangoGroup!
+          .allowedFastListingsPerInterval,
       }
-      setForm({
+      setForm((prevForm) => ({
+        ...prevForm,
         ...vals,
-      })
-      setOriginalFormValues({ ...vals })
+      }))
+      setOriginalFormValues((prevForm) => ({ ...prevForm, ...vals }))
     }
     if (mangoGroup) {
       getGroupParams()
     }
-  }, [mangoGroup?.publicKey.toBase58()])
+  }, [mangoGroup])
 
   const inputs: InstructionInput[] = [
     {
@@ -308,6 +315,14 @@ const GroupEdit = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'feesExpiryInterval',
+    },
+    {
+      label: keyToLabel['allowedFastListingsPerInterval'],
+      subtitle: getAdditionalLabelInfo('allowedFastListingsPerInterval'),
+      initialValue: form.allowedFastListingsPerInterval,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'allowedFastListingsPerInterval',
     },
   ]
 

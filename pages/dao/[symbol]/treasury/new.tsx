@@ -1,11 +1,11 @@
-import NewAccountForm from '@components/TreasuryAccount/NewTreasuryAccountForm'
+import { NewWallet } from '@hub/components/NewWallet/NewWallet'
 import React from 'react'
 
 const New = () => {
   return (
-    <div className="grid grid-cols-12">
-      <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12 md:col-span-12 lg:col-span-8 space-y-3">
-        <NewAccountForm></NewAccountForm>
+    <div className="dark w-full max-w-3xl mx-auto">
+      <div className="dark:bg-neutral-900 rounded px-4 lg:px-8">
+        <NewWallet />
       </div>
     </div>
   )

@@ -3,7 +3,8 @@ import Loading, { LoadingDots } from './Loading'
 import Tooltip from './Tooltip'
 import Header from './Header'
 import GradientCheckmarkCircle from './NewRealmWizard/components/GradientCheckmarkCircle'
-interface ButtonProps {
+import SimpleCheckmarkCircle from './NewRealmWizard/components/SimpleCheckmarkCircle'
+export interface ButtonProps {
   className?: string
   isLoading?: boolean
   onClick?: () => void
@@ -122,7 +123,7 @@ export const NewButton: FunctionComponent<NewButtonProps> = ({
       'py-3 px-2 h-[64px] min-w-[208px] text-fgd-1 border border-fgd-3 focus:border-fgd-1 hover:bg-fgd-1 hover:text-bkg-1 active:bg-fgd-2 active:text-bkg-1 active:border-none disabled:bg-fgd-4 disabled:text-bkg-1 disabled:border-none '
   } else {
     // this is a primary button
-    // TODO: make sure this using the typogrpahic class for CTAs
+    // TODO: make sure this using the typographic class for CTAs
     classNames +=
       'py-4 px-2 h-[64px] min-w-[208px] text-bkg-1 bg-fgd-1 hover:bg-fgd-2 active:bg-fgd-3 active:border-none focus:border-2 focus:border-[#00E4FF] disabled:bg-fgd-4'
   }
@@ -168,6 +169,46 @@ export const RadioButton: FunctionComponent<NewButtonProps> = ({
       <div className="flex items-center pl-4 space-x-3 md:pl-0 md:justify-center">
         <GradientCheckmarkCircle selected={selected} />
         <Header as="cta">{children}</Header>
+      </div>
+    </button>
+  )
+}
+
+export const ProposalTypeRadioButton: FunctionComponent<NewButtonProps> = ({
+  className = '',
+  selected = false,
+  disabled = false,
+  children,
+  ...props
+}) => {
+  let classNames =
+    'group default-transition px-2 py-1 min-h-[72px] min-w-[186px] rounded-lg border disabled:cursor-not-allowed'
+
+  if (selected) {
+    classNames += ' bg-fgd-1 border-fgd-1 focus:border-blue'
+  } else {
+    classNames += ' focus:bg-fgd-3 focus:border-none'
+  }
+
+  if (!disabled) {
+    classNames +=
+      'hover:bg-bkg-4 hover:border-fgd-1 hover:bg-white/30 hover:text-black border-fgd-3'
+  } else {
+    classNames += ' bg-none text-fgd-4 border-bkg-4'
+  }
+
+  classNames += ` ${className}`
+  return (
+    <button className={classNames} type="button" disabled={disabled} {...props}>
+      <div className="flex items-center pl-4 space-x-3 md:pl-0 justify-center">
+        <SimpleCheckmarkCircle selected={selected} />
+        <div
+          className={`inline ml-2 text-sm ${
+            selected ? 'text-bkg-1' : 'text-fgd-3'
+          }`}
+        >
+          {children}
+        </div>
       </div>
     </button>
   )

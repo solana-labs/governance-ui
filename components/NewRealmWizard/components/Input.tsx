@@ -106,7 +106,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
 export default Input
 
-export function FieldMessage({
+function FieldMessage({
   error = '',
   warning = '',
   success = '',

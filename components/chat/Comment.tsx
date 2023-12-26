@@ -1,36 +1,65 @@
-import React from 'react'
-import { VoteRecord } from '@solana/spl-governance'
+import {
+  getTokenOwnerRecordAddress,
+  getVoteRecordAddress,
+  GovernanceAccountType,
+  VoteType
+} from '@solana/spl-governance'
 import { ThumbUpIcon, ThumbDownIcon } from '@heroicons/react/solid'
 import { ExternalLinkIcon } from '@heroicons/react/solid'
 import { ChatMessage } from '@solana/spl-governance'
 import { abbreviateAddress, fmtTokenAmount } from '../../utils/formatting'
 import useRealm from '../../hooks/useRealm'
-import { MintInfo } from '@solana/spl-token'
 import { isPublicKey } from '@tools/core/pubkey'
 import { getVoteWeight, isYesVote } from '@models/voteRecords'
 import dayjs from 'dayjs'
 import { ProfilePopup, ProfileImage, useProfile } from '@components/Profile'
+import { useRouteProposalQuery } from '@hooks/queries/proposal'
+import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
+import { useAsync } from 'react-async-hook'
+import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
+import { useVoteRecordByPubkeyQuery } from '@hooks/queries/voteRecord'
+
 const relativeTime = require('dayjs/plugin/relativeTime')
-const Comment = ({
-  chatMessage,
-  voteRecord,
-  proposalMint,
-}: {
-  chatMessage: ChatMessage
-  voteRecord: VoteRecord | undefined
-  proposalMint: MintInfo | undefined
-}) => {
+const Comment = ({ chatMessage }: { chatMessage: ChatMessage }) => {
   dayjs.extend(relativeTime)
   const { author, postedAt, body } = chatMessage
   const { realmInfo } = useRealm()
   const { profile } = useProfile(author)
   const voteSymbol = !realmInfo
     ? ''
+    : realmInfo.voteSymbol
+    ? realmInfo.voteSymbol
     : isPublicKey(realmInfo.symbol)
     ? realmInfo.displayName
     : realmInfo.symbol
+
   //@ts-ignore
   const fromNow = dayjs(postedAt.toNumber() * 1000).fromNow()
+
+  const proposal = useRouteProposalQuery().data?.result
+  const proposalMint = useMintInfoByPubkeyQuery(
+    proposal?.account.governingTokenMint
+  ).data?.result
+
+  const realmPk = useSelectedRealmPubkey()
+
+  const { result: voteRecordPk } = useAsync(async () => {
+    if (!proposal || !realmPk) return undefined
+    const tokenPk = proposal.account.governingTokenMint
+    const torPk = await getTokenOwnerRecordAddress(
+      proposal.owner,
+      realmPk,
+      tokenPk,
+      author
+    )
+    return getVoteRecordAddress(proposal.owner, proposal.pubkey, torPk)
+  }, [proposal, realmPk, author])
+  const voteRecord = useVoteRecordByPubkeyQuery(voteRecordPk).data?.result
+    ?.account
+
+  const isMulti = proposal?.account.voteType !== VoteType.SINGLE_CHOICE
+    && proposal?.account.accountType === GovernanceAccountType.ProposalV2
+    
   return (
     <div className="border-b border-fgd-4 mt-4 pb-4 last:pb-0 last:border-b-0">
       <div className="flex items-center justify-between mb-4">
@@ -70,7 +99,7 @@ const Comment = ({
               ) : (
                 <ThumbDownIcon className="h-4 mr-2 fill-[#FF7C7C] w-4" />
               )}
-              {isYesVote(voteRecord) ? 'Yes' : 'No'}
+              {isYesVote(voteRecord) ? isMulti ? 'Voted' : 'Yes' : 'No'}
             </div>
             <span className="text-fgd-4">|</span>
             <span className="pl-2 text-xs">

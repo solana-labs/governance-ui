@@ -17,7 +17,6 @@ import tokenPriceService from '@utils/services/tokenPrice'
 import BigNumber from 'bignumber.js'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import { SolendStrategy } from 'Strategies/types/types'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import AdditionalProposalOptions from '@components/AdditionalProposalOptions'
@@ -33,6 +32,15 @@ import {
 } from 'Strategies/protocols/solend'
 import { PublicKey } from '@solana/web3.js'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { useRealmProposalsQuery } from '@hooks/queries/proposal'
+import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 
 const SolendWithdraw = ({
   proposedInvestment,
@@ -52,16 +60,13 @@ const SolendWithdraw = ({
   } = useGovernanceAssets()
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
-  const {
-    proposals,
-    realmInfo,
-    realm,
-    ownVoterWeight,
-    mint,
-    councilMint,
-    symbol,
-    config,
-  } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { symbol } = router.query
+  const config = useRealmConfigQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { result: ownVoterWeight } = useLegacyVoterWeight()
+  const { realmInfo } = useRealm()
   const [isWithdrawing, setIsWithdrawing] = useState(false)
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [deposits, setDeposits] = useState<{
@@ -70,7 +75,8 @@ const SolendWithdraw = ({
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
-  const connection = useWalletStore((s) => s.connection)
+  const proposals = useRealmProposalsQuery().data
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const tokenInfo = tokenPriceService.getTokenInfo(handledMint)
   const mintInfo = governedTokenAccount.extensions?.mint?.account
@@ -195,6 +201,8 @@ const SolendWithdraw = ({
   }
 
   const handleWithdraw = async () => {
+    if (ownVoterWeight === undefined) throw new Error()
+    if (proposals === undefined) throw new Error()
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     if (!isValid) {
       return
@@ -241,7 +249,7 @@ const SolendWithdraw = ({
           amountFmt: (
             (form.amount as number) / cTokenExchangeRate(reserveStat[0])
           ).toFixed(4),
-          proposalCount: Object.keys(proposals).length,
+          proposalCount: proposals.length,
           action: 'Withdraw',
         },
         realm!,

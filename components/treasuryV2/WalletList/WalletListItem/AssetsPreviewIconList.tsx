@@ -10,7 +10,6 @@ import {
   Programs,
   RealmAuthority,
   Token,
-  NFTCollection,
   Sol,
 } from '@models/treasury/Asset'
 import Tooltip from '@components/Tooltip'
@@ -18,6 +17,10 @@ import CommunityMintIcon from '@components/treasuryV2/icons/CommunityMintIcon'
 import CouncilMintIcon from '@components/treasuryV2/icons/CouncilMintIcon'
 import PlainRealmLogo from '@components/treasuryV2/icons/PlainRealmLogo'
 import { ntext } from '@utils/ntext'
+import useGovernanceNfts from './AssetList/useGovernanceNfts'
+import { PublicKey } from '@solana/web3.js'
+import NFTCollectionPreviewIcon from '@components/treasuryV2/icons/NFTCollectionPreviewIcon'
+import { useDigitalAssetById } from '@hooks/queries/digitalAssets'
 
 function isDomains(asset: Asset): asset is Domains {
   return asset.type === AssetType.Domain
@@ -25,10 +28,6 @@ function isDomains(asset: Asset): asset is Domains {
 
 function isToken(asset: Asset): asset is Token {
   return asset.type === AssetType.Token
-}
-
-function isNFTCollection(asset: Asset): asset is NFTCollection {
-  return asset.type === AssetType.NFTCollection
 }
 
 function isPrograms(asset: Asset): asset is Programs {
@@ -51,11 +50,33 @@ function isRealmAuthority(asset: Asset): asset is RealmAuthority {
   return asset.type === AssetType.RealmAuthority
 }
 
+const NftPreviewIcon = ({
+  collectionId,
+}: {
+  collectionId: PublicKey | undefined
+}) => {
+  const { data: collectionNft } = useDigitalAssetById(collectionId)
+  const imageUri =
+    collectionNft?.result?.content.files[0]?.cdn_uri ??
+    collectionNft?.result?.content.files[0]?.uri
+
+  return (
+    <>
+      {imageUri !== undefined ? (
+        <img src={imageUri} className="rounded w-4 h-4" />
+      ) : (
+        <NFTCollectionPreviewIcon className="stroke-fgd-1 rounded w-4 h-4" />
+      )}
+    </>
+  )
+}
+
 interface Props {
   className?: string
   assets: Asset[]
   showRealmAuthority?: boolean
   showMints?: boolean
+  governance: PublicKey | undefined
 }
 
 /**
@@ -71,10 +92,10 @@ interface Props {
  * 5. If the wallet contains more than 3 assets, show a count after the icons
  */
 export default function AssetsPreviewIconList(props: Props) {
+  const nfts = useGovernanceNfts(props.governance) ?? []
   const tokens = props.assets
     .filter(isToken)
     .sort((a, b) => b.value.comparedTo(a.value))
-  const nfts = props.assets.filter(isNFTCollection)
   const sol = props.assets.filter(isSol)
   const councilMint: Mint | undefined = props.assets.filter(isCouncilMint)[0]
   const communityMint: Mint | undefined = props.assets.filter(
@@ -102,7 +123,7 @@ export default function AssetsPreviewIconList(props: Props) {
   const previewList: JSX.Element[] = []
   const summary: string[] = []
 
-  let remainingCount = assetCount
+  let remainingCount = assetCount + nfts.length
 
   // Handle special cases first
   if (props.showRealmAuthority && realmAuthority) {
@@ -190,15 +211,10 @@ export default function AssetsPreviewIconList(props: Props) {
 
   // Display any NFTs
   if (nfts.length) {
-    const icon = nfts[0].icon
-    previewList.push(
-      React.cloneElement(icon, {
-        className: cx(icon.props.className, 'rounded'),
-      })
-    )
+    // enhancement: show an nft collection icon using some non-arbitrary logic
+    previewList.push(<NftPreviewIcon collectionId={undefined} />)
     remainingCount -= nfts.length
     summary.push('NFTs')
-    unaccounted = unaccounted.filter((item) => !isNFTCollection(item))
   }
 
   // If we have space, show an icon for remaining assets

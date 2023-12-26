@@ -10,7 +10,7 @@ export interface Voter {
   //there are more fields but no use for them on ui yet
 }
 
-export interface VotingMint {
+interface VotingMint {
   baselineVoteWeightScaledFactor: BN
   digitShift: number
   grantAuthority: PublicKey
@@ -36,7 +36,7 @@ interface LockupKind {
   constant: object
 }
 
-export interface Lockup {
+interface Lockup {
   endTs: BN
   kind: LockupKind
   startTs: BN

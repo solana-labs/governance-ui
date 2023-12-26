@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import {
   createSetRealmConfig,
   Governance,
@@ -23,8 +23,11 @@ import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import { isDisabledVoterWeight } from '@tools/governance/units'
 import useProgramVersion from '@hooks/useProgramVersion'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
+import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 
-export interface RealmConfigForm {
+interface RealmConfigForm {
   governedAccount: AssetAccount | undefined
   minCommunityTokensToCreateGovernance: number
   communityVoterWeightAddin: string
@@ -33,6 +36,9 @@ export interface RealmConfigForm {
   communityMintSupplyFactor: number
 }
 
+/** @deprecated
+ *  This is the less maintained way to do the same thing in the wallet and assets view. rather than editing it, just kill it probably
+ * */
 const RealmConfig = ({
   index,
   governance,
@@ -40,7 +46,9 @@ const RealmConfig = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { realm, mint, realmInfo } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const { realmInfo } = useRealm()
   const wallet = useWalletOnePointOh()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const { assetAccounts } = useGovernanceAssets()
@@ -52,7 +60,10 @@ const RealmConfig = ({
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
   const programVersion = useProgramVersion()
-  const schema = getRealmCfgSchema({ programVersion, form })
+  const schema = getRealmCfgSchema({
+    programVersion: programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION,
+    form,
+  })
 
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })

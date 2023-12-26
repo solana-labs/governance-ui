@@ -21,22 +21,22 @@ interface Props
     proposalVoteType: 'council' | 'community';
   }> {
   className?: string;
-  currentCommunityRules: CommunityRules;
-  currentCouncilRules: CouncilRules;
-  currentBaseVoteDays: number;
-  currentCoolOffHours: number;
-  currentMinInstructionHoldupDays: number;
+  initialCommunityRules: CommunityRules;
+  initialCouncilRules: CouncilRules;
+  initialBaseVoteDays: number;
+  initialCoolOffHours: number;
+  initialMinInstructionHoldupDays: number;
 }
 
 export function ProposalVoteType(props: Props) {
   const [showRules, setShowRules] = useState(false);
 
   const rules =
-    props.proposalVoteType === 'council' && props.currentCouncilRules
-      ? props.currentCouncilRules
-      : props.currentCommunityRules;
+    props.proposalVoteType === 'council' && props.initialCouncilRules
+      ? props.initialCouncilRules
+      : props.initialCommunityRules;
 
-  const unrestrictedVotingHours = 24 * props.currentBaseVoteDays;
+  const unrestrictedVotingHours = 24 * props.initialBaseVoteDays;
   const unrestrictedVotingDays = Math.floor(unrestrictedVotingHours / 24);
   const unrestrictedVotingRemainingHours =
     unrestrictedVotingHours - unrestrictedVotingDays * 24;
@@ -48,21 +48,21 @@ export function ProposalVoteType(props: Props) {
         icon={<WalletIcon />}
         text="Membership Voting"
       />
-      {!!props.currentCouncilRules &&
-      props.currentCouncilRules.canVote &&
-      props.currentCommunityRules.canVote ? (
+      {!!props.initialCouncilRules &&
+      props.initialCouncilRules.canVote &&
+      props.initialCommunityRules.canVote ? (
         <ValueBlock
           title="Who should vote on this proposal?"
           description="Community or council?"
         >
           <ButtonToggle
-            disableValueTrue={!props.currentCommunityRules.canVote}
-            disableValueFalse={!props.currentCouncilRules}
+            disableValueTrue={!props.initialCommunityRules.canVote}
+            disableValueFalse={!props.initialCouncilRules}
             value={props.proposalVoteType === 'community'}
             valueTrueText="Community"
             valueFalseText="Council"
             onChange={(value) => {
-              if (value === false && !!props.currentCouncilRules) {
+              if (value === false && !!props.initialCouncilRules) {
                 props.onProposalVoteTypeChange?.('council');
               } else {
                 props.onProposalVoteTypeChange?.('community');
@@ -111,15 +111,15 @@ export function ProposalVoteType(props: Props) {
             />
             <SummaryItem
               label="Voting Cool-off Hours"
-              value={`${props.currentCoolOffHours} ${ntext(
-                props.currentCoolOffHours,
+              value={`${props.initialCoolOffHours} ${ntext(
+                props.initialCoolOffHours,
                 'hour',
               )}`}
             />
             <SummaryItem
               label="Min Instruction Holdup Time"
-              value={`${props.currentMinInstructionHoldupDays} ${ntext(
-                props.currentMinInstructionHoldupDays,
+              value={`${props.initialMinInstructionHoldupDays} ${ntext(
+                props.initialMinInstructionHoldupDays,
                 'day',
               )}`}
             />
@@ -132,18 +132,18 @@ export function ProposalVoteType(props: Props) {
               value={getLabel(rules.voteTipping)}
             />
             {props.proposalVoteType === 'council' &&
-              props.currentCommunityRules.canVeto && (
+              props.initialCommunityRules.canVeto && (
                 <SummaryItem
                   label="Community Veto Quorum"
-                  value={`${props.currentCommunityRules.vetoQuorumPercent}%`}
+                  value={`${props.initialCommunityRules.vetoQuorumPercent}%`}
                 />
               )}
             {props.proposalVoteType === 'community' &&
-              props.currentCouncilRules &&
-              props.currentCouncilRules.canVeto && (
+              props.initialCouncilRules &&
+              props.initialCouncilRules.canVeto && (
                 <SummaryItem
                   label="Council Veto Quorum"
-                  value={`${props.currentCommunityRules.vetoQuorumPercent}%`}
+                  value={`${props.initialCommunityRules.vetoQuorumPercent}%`}
                 />
               )}
           </div>

@@ -88,7 +88,7 @@ export const withCreateNewDeposit = async ({
       programVersion,
       realmPk,
       walletPk,
-      mintPk,
+      communityMintPk,
       walletPk
     )
   }

@@ -20,9 +20,7 @@ const AccountsCompactWrapper = () => {
   ]
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
-  const isLoadingAccounts = useGovernanceAssetsStore(
-    (s) => s.loadGovernedAccounts
-  )
+  const isLoadingAccounts = useGovernanceAssetsStore((s) => s.loadTokenAccounts)
 
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg transition-all">

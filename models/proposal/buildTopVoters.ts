@@ -2,16 +2,12 @@ import {
   ProgramAccount,
   VoteRecord,
   TokenOwnerRecord,
-  Realm,
-  Proposal,
   VoteKind,
 } from '@solana/spl-governance'
 import { MintInfo } from '@solana/spl-token'
 import BN from 'bn.js'
 import { PublicKey } from '@solana/web3.js'
 import { BigNumber } from 'bignumber.js'
-
-import { calculateMaxVoteScore } from '@models/proposal/calulateMaxVoteScore'
 
 export enum VoteType {
   No,
@@ -51,13 +47,10 @@ const ZERO = new BN(0)
 export function buildTopVoters(
   voteRecords: ProgramAccount<VoteRecord>[],
   tokenOwnerRecords: ProgramAccount<TokenOwnerRecord>[],
-  realm: ProgramAccount<Realm>,
-  proposal: ProgramAccount<Proposal>,
   governingTokenMint: MintInfo,
-  undecidedVoterWeightByWallets: { [walletPk: string]: BN }
+  undecidedVoterWeightByWallets: { [walletPk: string]: BN },
+  maxVote: BN
 ): VoterDisplayData[] {
-  const maxVote = calculateMaxVoteScore(realm, proposal, governingTokenMint)
-
   const electoralVotes = voteRecords.filter(
     (x) => x.account.vote?.voteType !== VoteKind.Veto
   )

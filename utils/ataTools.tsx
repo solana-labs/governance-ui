@@ -1,4 +1,3 @@
-import { utils } from '@coral-xyz/anchor'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
@@ -99,8 +98,5 @@ export function findATAAddrSync(
     TOKEN_PROGRAM_ID.toBuffer(),
     mintAddress.toBuffer(),
   ]
-  return utils.publicKey.findProgramAddressSync(
-    seeds,
-    ASSOCIATED_TOKEN_PROGRAM_ID
-  )
+  return PublicKey.findProgramAddressSync(seeds, ASSOCIATED_TOKEN_PROGRAM_ID)
 }

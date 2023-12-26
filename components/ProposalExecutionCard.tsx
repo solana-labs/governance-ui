@@ -7,26 +7,25 @@ import {
   ExecuteAllInstructionButton,
   PlayState,
 } from '@components/instructions/ExecuteAllInstructionButton'
-import useProposal from '@hooks/useProposal'
 import { ntext } from '@utils/ntext'
 import Button from '@components/Button'
 import { diffTime } from '@components/ProposalRemainingVotingTime'
 import useProposalTransactions from '@hooks/useProposalTransactions'
+import { useRouteProposalQuery } from '@hooks/queries/proposal'
+import { useSelectedProposalTransactions } from '@hooks/queries/proposalTransaction'
 
 interface Props {
   className?: string
 }
 
 export default function ProposalExecutionCard(props: Props) {
-  const { instructions, proposal } = useProposal()
+  const proposal = useRouteProposalQuery().data?.result
+  const { data: allTransactions } = useSelectedProposalTransactions()
   const [playState, setPlayState] = useState(PlayState.Unplayed)
   const [timeLeft, setTimeLeft] = useState<
     undefined | ReturnType<typeof diffTime>
   >()
   const timer = useRef<undefined | number>()
-
-  const allTransactions = Object.values(instructions)
-
   const proposalTransactions = useProposalTransactions(
     allTransactions,
     proposal
@@ -49,6 +48,7 @@ export default function ProposalExecutionCard(props: Props) {
   }, [proposalTransactions?.nextExecuteAt])
 
   if (
+    allTransactions === undefined ||
     allTransactions.length === 0 ||
     !proposal ||
     !proposalTransactions ||
@@ -58,6 +58,17 @@ export default function ProposalExecutionCard(props: Props) {
   }
 
   const { ready, notReady, executed, nextExecuteAt } = proposalTransactions
+
+  //Temp solutions for execution of small instructions in one tx until other instructions are not
+  //rewrite to handle tx separation it self
+  const isOneTx = () => {
+    if (!ready || !ready.length || ready.length !== 2) {
+      return false
+    }
+    return true
+  }
+
+  const executeAllInOneTx = isOneTx() ? true : false
 
   return (
     <div
@@ -95,7 +106,7 @@ export default function ProposalExecutionCard(props: Props) {
               setPlaying={setPlayState}
               small={false}
               proposalInstructions={ready}
-              multiTransactionMode={true}
+              multiTransactionMode={!executeAllInOneTx}
             />
           ) : (
             <Button className="w-48" disabled>

@@ -1,6 +1,6 @@
-import { validateSolAddress } from '@utils/formValidation'
+import { validatePubkey } from '@utils/formValidation'
 
-export interface Addresses {
+interface Addresses {
   valid: string[]
   invalid: string[]
 }
@@ -10,7 +10,7 @@ export const textToAddressList = (textBlock: string): Addresses => {
   const invalid: string[] = []
 
   textBlock.split(/[\s|,]/).forEach((address) => {
-    if (validateSolAddress(address)) {
+    if (validatePubkey(address)) {
       valid.push(address)
     } else if (address.trim() /* ignore empty strings */) {
       invalid.push(address.trim())

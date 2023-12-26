@@ -1,4 +1,4 @@
-export type ImageTextElement<T> = {
+type ImageTextElement<T> = {
   id: T
   name: string
   image?: string

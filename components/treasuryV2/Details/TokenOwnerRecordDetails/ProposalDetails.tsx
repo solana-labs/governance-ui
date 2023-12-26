@@ -9,16 +9,12 @@ import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import useRealmProposalVotes from '@hooks/useRealmProposalVotes'
 import {
-  getGovernanceProgramVersion,
   getInstructionDataFromBase64,
-  Governance,
+  getVoteRecordAddress,
   ProgramAccount,
   Proposal,
   ProposalState,
-  Realm,
   serializeInstructionToBase64,
-  TokenOwnerRecord,
-  VoteRecord,
   withRelinquishVote,
   YesNoVote,
 } from '@solana/spl-governance'
@@ -28,36 +24,42 @@ import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useCallback, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import VoteProposalModal from './VoteProposalModal'
 import ProposalStateBadge from '@components/ProposalStateBadge'
+import { useConnection } from '@solana/wallet-adapter-react'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import mainnetBetaRealms from 'public/realms/mainnet-beta.json'
+import {
+  fetchTokenOwnerRecordByPubkey,
+  useTokenOwnerRecordByPubkeyQuery,
+} from '@hooks/queries/tokenOwnerRecord'
+import { useRealmByPubkeyQuery } from '@hooks/queries/realm'
+import {
+  fetchGovernanceByPubkey,
+  useGovernanceByPubkeyQuery,
+} from '@hooks/queries/governance'
+import { fetchVoteRecordByPubkey } from '@hooks/queries/voteRecord'
+import { useAsync } from 'react-async-hook'
+import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
 
 interface Props {
-  voteRecord?: ProgramAccount<VoteRecord>
   proposal: ProgramAccount<Proposal>
-  proposalGovernance?: ProgramAccount<Governance>
-  currentGovernance?: ProgramAccount<Governance>
-  realm: ProgramAccount<Realm>
-  tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>
-  programId?: PublicKey | null
-  realmSymbol: string
+  realmPk: PublicKey
+  owningGovernancePk: PublicKey
+  tokenOwnerRecordPk: PublicKey
 }
 export default function ProposalDetails({
-  voteRecord,
   proposal,
-  proposalGovernance,
-  currentGovernance,
-  realm,
-  tokenOwnerRecord,
-  programId,
-  realmSymbol,
+  tokenOwnerRecordPk,
+  owningGovernancePk,
+  realmPk,
 }: Props) {
   const router = useRouter()
   const { cluster } = router.query
 
   const { symbol } = useRealm()
-  const { current: wallet } = useWalletStore()
-  const connection = useWalletStore((s) => s.connection.current)
+  const wallet = useWalletOnePointOh()
+  const { connection } = useConnection()
   const { fmtUrlWithCluster } = useQueryContext()
 
   const [showVoteModal, setShowVoteModal] = useState(false)
@@ -66,9 +68,31 @@ export default function ProposalDetails({
 
   const { handleCreateProposal } = useCreateProposal()
 
+  const voteRecord = useAsync(async () => {
+    const pda = await getVoteRecordAddress(
+      proposal.owner,
+      proposal.pubkey,
+      tokenOwnerRecordPk
+    )
+    return fetchVoteRecordByPubkey(connection, pda)
+  }, [connection, proposal.owner, proposal.pubkey, tokenOwnerRecordPk]).result
+    ?.result
+
+  const tokenOwnerRecord = useTokenOwnerRecordByPubkeyQuery(tokenOwnerRecordPk)
+    .data?.result
+  const realmInfo = mainnetBetaRealms.find(
+    (x) => x.realmId === tokenOwnerRecord?.account.realm.toString()
+  )
+  const realmSymbol = realmInfo?.symbol ?? 'Unknown Realm'
+
+  const otherRealm = useRealmByPubkeyQuery(realmPk).data?.result
+  const proposalGovernance = useGovernanceByPubkeyQuery(
+    proposal.account.governance
+  ).data?.result
+
   const voteData = useRealmProposalVotes(
     proposal.account,
-    realm.account,
+    otherRealm?.account,
     proposalGovernance?.account
   )
 
@@ -92,34 +116,40 @@ export default function ProposalDetails({
       return
     }
 
-    if (!programId || !currentGovernance) {
-      notify({ type: 'error', message: 'Governance program not found.' })
-      return
-    }
-
     if (!voteRecord) {
       notify({ type: 'error', message: 'No vote record found.' })
       return
     }
+    if (!otherRealm) throw new Error()
+
+    const tokenOwnerRecord = (
+      await fetchTokenOwnerRecordByPubkey(connection, tokenOwnerRecordPk)
+    ).result
+    if (!tokenOwnerRecord) throw new Error()
+
+    const owningGovernance = (
+      await fetchGovernanceByPubkey(connection, owningGovernancePk)
+    ).result
+    if (!owningGovernance) throw new Error()
 
     try {
       setIsWithdrawing(true)
 
       const instructions: TransactionInstruction[] = []
 
-      const programVersion = await getGovernanceProgramVersion(
+      const programVersion = await fetchProgramVersion(
         connection,
-        programId
+        tokenOwnerRecord.owner
       )
 
       await withRelinquishVote(
         instructions,
-        programId,
+        tokenOwnerRecord.owner,
         programVersion,
-        realm.pubkey,
+        realmPk,
         proposal.account.governance,
         proposal.pubkey,
-        tokenOwnerRecord.pubkey,
+        tokenOwnerRecordPk,
         tokenOwnerRecord.account.governingTokenMint,
         voteRecord.pubkey,
         tokenOwnerRecord.account.governingTokenOwner,
@@ -147,9 +177,8 @@ export default function ProposalDetails({
 
         const ixData = {
           data: getInstructionDataFromBase64(serializedIx),
-          holdUpTime: currentGovernance.account.config.minInstructionHoldUpTime,
+          holdUpTime: owningGovernance.account.config.minInstructionHoldUpTime,
           prerequisiteInstructions: [],
-          shouldSplitIntoSeparateTxs: false,
         }
 
         instructionsData.push(ixData)
@@ -158,10 +187,10 @@ export default function ProposalDetails({
       const proposalAddress = await handleCreateProposal({
         title: `Relinquishing vote for "${proposal.account.name}"`,
         description: `Relinquishing vote for proposal ${proposal.pubkey.toString()} in ${
-          realm.account.name
+          otherRealm.account.name
         }`,
         instructionsData,
-        governance: currentGovernance,
+        governance: owningGovernance,
       })
       const url = fmtUrlWithCluster(
         `/dao/${symbol}/proposal/${proposalAddress}`
@@ -175,7 +204,7 @@ export default function ProposalDetails({
     }
   }
 
-  return (
+  return tokenOwnerRecord === undefined || otherRealm === undefined ? null : (
     <div className="rounded-md bg-bkg-2 p-4 flex flex-col space-y-4">
       <div className="flex justify-between border-b border-fgd-4 pb-3">
         <div className="flex flex-col">
@@ -201,7 +230,7 @@ export default function ProposalDetails({
           <VoteResultsForRealmProposal
             isListView
             proposal={proposal.account}
-            realm={realm}
+            realm={otherRealm}
             governance={proposalGovernance}
           />
         </div>
@@ -266,9 +295,9 @@ export default function ProposalDetails({
               vote={vote!}
               proposal={proposal}
               voterTokenRecord={tokenOwnerRecord}
-              realm={realm}
-              programId={programId}
-              currentGovernance={currentGovernance}
+              realm={otherRealm}
+              programId={tokenOwnerRecord.owner}
+              currentGovernancePk={owningGovernancePk}
             />
           ) : null}
         </>

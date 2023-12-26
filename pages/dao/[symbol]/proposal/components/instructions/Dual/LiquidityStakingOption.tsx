@@ -10,10 +10,10 @@ import GovernedAccountSelect from '../../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Input from '@components/inputs/Input'
 import { getConfigLsoInstruction } from '@utils/instructions/Dual'
-import useWalletStore from 'stores/useWalletStore'
 import { getDualFinanceLiquidityStakingOptionSchema } from '@utils/validations'
 import Tooltip from '@components/Tooltip'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const LiquidityStakingOption = ({
   index,
@@ -30,7 +30,7 @@ const LiquidityStakingOption = ({
     quoteTreasury: undefined,
     payer: undefined,
   })
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const { assetAccounts } = useGovernanceAssets()
@@ -62,7 +62,7 @@ const LiquidityStakingOption = ({
   useEffect(() => {
     setGovernedAccount(form.baseTreasury?.governance)
   }, [form.baseTreasury])
-  const schema = getDualFinanceLiquidityStakingOptionSchema()
+  const schema = getDualFinanceLiquidityStakingOptionSchema({form})
 
   return (
     <>

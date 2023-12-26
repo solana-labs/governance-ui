@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { useEffect, useState } from 'react'
 import { useHasVoteTimeExpired } from '../hooks/useHasVoteTimeExpired'
 import useRealm from '../hooks/useRealm'
 import {
   getSignatoryRecordAddress,
   ProposalState,
+  serializeInstructionToBase64,
+  SignatoryRecord,
 } from '@solana/spl-governance'
-import useWalletStore from '../stores/useWalletStore'
 import Button, { SecondaryButton } from './Button'
 
 import { RpcContext } from '@solana/spl-governance'
@@ -22,19 +22,40 @@ import dayjs from 'dayjs'
 import { diffTime } from './ProposalRemainingVotingTime'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import {
+  proposalQueryKeys,
+  useRouteProposalQuery,
+} from '@hooks/queries/proposal'
+import { useProposalGovernanceQuery } from '@hooks/useProposal'
+import { useTokenOwnerRecordByPubkeyQuery } from '@hooks/queries/tokenOwnerRecord'
+import { useAsync } from 'react-async-hook'
+import { useGovernanceAccountByPubkeyQuery } from '@hooks/queries/governanceAccount'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import queryClient from '@hooks/queries/queryClient'
+import useCreateProposal from '@hooks/useCreateProposal'
+import { useSelectedProposalTransactions } from '@hooks/queries/proposalTransaction'
+import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
+import { TransactionInstruction } from '@solana/web3.js'
+import useQueryContext from '@hooks/useQueryContext'
+import { useRouter } from 'next/router'
 
 const ProposalActionsPanel = () => {
-  const { governance, proposal, proposalOwner } = useWalletStore(
-    (s) => s.selectedProposal
-  )
+  const { propose } = useCreateProposal()
+  const { fmtUrlWithCluster } = useQueryContext()
+  const router = useRouter()
   const { realmInfo } = useRealm()
+  const proposal = useRouteProposalQuery().data?.result
+  const { data: transactions } = useSelectedProposalTransactions()
+  const governance = useProposalGovernanceQuery().data?.result
+  const proposalOwner = useTokenOwnerRecordByPubkeyQuery(
+    proposal?.account.tokenOwnerRecord
+  ).data?.result
+
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
-  const signatories = useWalletStore((s) => s.selectedProposal.signatories)
-  const connection = useWalletStore((s) => s.connection)
-  const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
-  const [signatoryRecord, setSignatoryRecord] = useState<any>(undefined)
+  const connection = useLegacyConnectionContext()
+
   const maxVoteRecordPk = useMaxVoteRecord()?.pubkey
   const votePluginsClientMaxVoterWeight = useVotePluginsClientStore(
     (s) => s.state.maxVoterWeight
@@ -61,24 +82,27 @@ const ProposalActionsPanel = () => {
     : undefined
 
   const walletPk = wallet?.publicKey
-  useEffect(() => {
-    const setup = async () => {
-      if (proposal && realmInfo && walletPk) {
-        const signatoryRecordPk = await getSignatoryRecordAddress(
-          realmInfo.programId,
-          proposal.pubkey,
-          walletPk
-        )
 
-        if (signatoryRecordPk && signatories) {
-          setSignatoryRecord(signatories[signatoryRecordPk.toBase58()])
-        }
-      }
-    }
+  const { result: signatoryRecordPk } = useAsync(
+    async () =>
+      realmInfo === undefined ||
+      proposal === undefined ||
+      walletPk === undefined ||
+      walletPk === null
+        ? undefined
+        : getSignatoryRecordAddress(
+            realmInfo.programId,
+            proposal.pubkey,
+            walletPk
+          ),
+    [realmInfo, proposal, walletPk]
+  )
 
-    setup()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [proposal?.pubkey.toBase58(), realmInfo?.symbol, walletPk?.toBase58()])
+  const signatoryRecord = useGovernanceAccountByPubkeyQuery(
+    SignatoryRecord,
+    'SignatoryRecord',
+    signatoryRecordPk
+  ).data?.result
 
   const canSignOff =
     signatoryRecord &&
@@ -95,6 +119,13 @@ const ProposalActionsPanel = () => {
       proposalOwner.account,
       wallet.publicKey
     )
+
+  const canRepropose =
+    proposal &&
+    governance &&
+    proposalOwner &&
+    wallet?.publicKey &&
+    ProposalState.Defeated === proposal?.account.state
 
   const signOffTooltipContent = !connected
     ? 'Connect your wallet to sign off this proposal'
@@ -130,7 +161,7 @@ const ProposalActionsPanel = () => {
     : ''
   const handleFinalizeVote = async () => {
     try {
-      if (proposal && realmInfo && governance) {
+      if (proposal && realmInfo && governance && proposalOwner) {
         const rpcContext = new RpcContext(
           proposal.owner,
           getProgramVersionForRealm(realmInfo),
@@ -143,10 +174,13 @@ const ProposalActionsPanel = () => {
           rpcContext,
           governance?.account.realm,
           proposal,
-          maxVoterWeight
+          maxVoterWeight,
+          proposalOwner
         )
-        await refetchProposals()
       }
+      queryClient.invalidateQueries({
+        queryKey: proposalQueryKeys.all(connection.endpoint),
+      })
     } catch (error) {
       notify({
         type: 'error',
@@ -160,7 +194,7 @@ const ProposalActionsPanel = () => {
 
   const handleSignOffProposal = async () => {
     try {
-      if (proposal && realmInfo) {
+      if (proposal && realmInfo && signatoryRecord) {
         const rpcContext = new RpcContext(
           proposal.owner,
           getProgramVersionForRealm(realmInfo),
@@ -175,9 +209,10 @@ const ProposalActionsPanel = () => {
           proposal,
           signatoryRecord
         )
-
-        await refetchProposals()
       }
+      queryClient.invalidateQueries({
+        queryKey: proposalQueryKeys.all(connection.endpoint),
+      })
     } catch (error) {
       notify({
         type: 'error',
@@ -192,7 +227,7 @@ const ProposalActionsPanel = () => {
     proposal: ProgramAccount<Proposal> | undefined
   ) => {
     try {
-      if (proposal && realmInfo) {
+      if (proposal && realmInfo && proposalOwner) {
         const rpcContext = new RpcContext(
           proposal.owner,
           getProgramVersionForRealm(realmInfo),
@@ -201,10 +236,16 @@ const ProposalActionsPanel = () => {
           connection.endpoint
         )
 
-        await cancelProposal(rpcContext, realmInfo.realmId, proposal)
-
-        await refetchProposals()
+        await cancelProposal(
+          rpcContext,
+          realmInfo.realmId,
+          proposal,
+          proposalOwner
+        )
       }
+      queryClient.invalidateQueries({
+        queryKey: proposalQueryKeys.all(connection.endpoint),
+      })
     } catch (error) {
       notify({
         type: 'error',
@@ -215,14 +256,74 @@ const ProposalActionsPanel = () => {
       console.error('error cancelling proposal', error)
     }
   }
+
+  const handleRepropose = async () => {
+    try {
+      if (proposal && realmInfo && signatoryRecord) {
+        const proposalAddress = await propose({
+          title: proposal.account.name,
+          description: proposal.account.descriptionLink,
+          voteByCouncil:
+            proposal.account.governingTokenMint !== realmInfo.communityMint,
+          instructionsData: transactions
+            ? [
+                ...transactions.flatMap((tx) =>
+                  tx.account.getAllInstructions().map(
+                    (inst) =>
+                      new InstructionDataWithHoldUpTime({
+                        instruction: {
+                          serializedInstruction: serializeInstructionToBase64(
+                            new TransactionInstruction({
+                              keys: inst.accounts,
+                              programId: inst.programId,
+                              data: Buffer.from(inst.data),
+                            })
+                          ),
+                          isValid: true,
+                          governance: undefined,
+                          customHoldUpTime: tx.account.holdUpTime,
+                          chunkBy: 2,
+                        },
+                      })
+                  )
+                ),
+              ]
+            : [],
+          governance: proposal.account.governance,
+        })
+        const url = fmtUrlWithCluster(
+          `/dao/${router.query.symbol}/proposal/${proposalAddress}`
+        )
+        router.push(url)
+      }
+      queryClient.invalidateQueries({
+        queryKey: proposalQueryKeys.all(connection.endpoint),
+      })
+    } catch (error) {
+      notify({
+        type: 'error',
+        message: `Error: Could not sign off proposal.`,
+        description: `${error}`,
+      })
+
+      console.error('error sign off', error)
+    }
+  }
   return (
     <>
       {ProposalState.Cancelled === proposal?.account.state ||
       ProposalState.Succeeded === proposal?.account.state ||
-      ProposalState.Defeated === proposal?.account.state ||
-      (!canCancelProposal && !canSignOff && !canFinalizeVote) ? null : (
+      (!canCancelProposal &&
+        !canSignOff &&
+        !canFinalizeVote &&
+        !canRepropose) ? null : (
         <div>
           <div className="bg-bkg-2 rounded-lg p-6 space-y-6 flex justify-center items-center text-center flex-col w-full mt-4">
+            {canRepropose && (
+              <Button className="w-1/2" onClick={handleRepropose}>
+                Repropose
+              </Button>
+            )}
             {canSignOff && (
               <Button
                 tooltipMessage={signOffTooltipContent}

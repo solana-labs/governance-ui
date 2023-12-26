@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { AccountMeta, PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid, validatePubkey } from '@utils/formValidation'
@@ -10,16 +10,18 @@ import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
-import InstructionForm, {
-  InstructionInput,
-  InstructionInputType,
-} from '../../FormCreator'
+import InstructionForm, { InstructionInput } from '../../FormCreator'
+import { InstructionInputType } from '../../inputInstructionType'
 import UseMangoV4 from '@hooks/useMangoV4'
 import { getChangedValues, getNullOrTransform } from '@utils/mangoV4Tools'
 import { BN } from '@coral-xyz/anchor'
 import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
 import Switch from '@components/Switch'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import ForwarderProgram, {
+  useForwarderProgramHelpers,
+} from '@components/ForwarderProgram/ForwarderProgram'
+import { REDUCE_ONLY_OPTIONS } from '@utils/Mango/listingTools'
 
 const keyToLabel = {
   oraclePk: 'Oracle',
@@ -52,6 +54,19 @@ const keyToLabel = {
   resetStablePrice: 'Reset Stable Price',
   resetNetBorrowLimit: 'Reset Net Borrow Limit',
   reduceOnly: 'Reduce Only',
+  forceClose: 'Force Close',
+  tokenConditionalSwapTakerFeeRate: 'Token Conditional Swap Taker Fee Rate',
+  tokenConditionalSwapMakerFeeRate: 'Token Conditional Swap Maker Fee Rate',
+  flashLoanSwapFeeRate: 'Flash Loan Deposit Fee Rate',
+  interestCurveScaling: 'Interest Curve Scaling',
+  interestTargetUtilization: 'interestTargetUtilization',
+  maintWeightShiftStart: 'Maint Weight Shift Start',
+  maintWeightShiftEnd: 'Maint Weight Shift End',
+  maintWeightShiftAssetTarget: 'Maint Weight Shift Asset Target',
+  maintWeightShiftLiabTarget: 'Maint Weight Shift Liab Target',
+  maintWeightShiftAbort: 'Maint Weight Shift Abort',
+  setFallbackOracle: 'Set Fallback Oracle',
+  depositLimit: 'Deposit Limit',
 }
 
 type NamePkVal = {
@@ -91,8 +106,21 @@ interface EditTokenForm {
   depositWeightScaleStartQuote: number
   resetStablePrice: boolean
   resetNetBorrowLimit: boolean
-  reduceOnly: boolean
+  reduceOnly: { name: string; value: number }
   holdupTime: number
+  forceClose: boolean
+  tokenConditionalSwapTakerFeeRate: number
+  tokenConditionalSwapMakerFeeRate: number
+  flashLoanSwapFeeRate: number
+  interestCurveScaling: number
+  interestTargetUtilization: number
+  maintWeightShiftStart: number
+  maintWeightShiftEnd: number
+  maintWeightShiftAssetTarget: number
+  maintWeightShiftLiabTarget: number
+  maintWeightShiftAbort: boolean
+  setFallbackOracle: boolean
+  depositLimit: number
 }
 
 const defaultFormValues: EditTokenForm = {
@@ -127,8 +155,21 @@ const defaultFormValues: EditTokenForm = {
   groupInsuranceFund: false,
   resetStablePrice: false,
   resetNetBorrowLimit: false,
-  reduceOnly: false,
+  reduceOnly: REDUCE_ONLY_OPTIONS[0],
+  forceClose: false,
   holdupTime: 0,
+  tokenConditionalSwapTakerFeeRate: 0,
+  tokenConditionalSwapMakerFeeRate: 0,
+  flashLoanSwapFeeRate: 0,
+  interestCurveScaling: 0,
+  interestTargetUtilization: 0,
+  maintWeightShiftStart: 0,
+  maintWeightShiftEnd: 0,
+  maintWeightShiftAssetTarget: 0,
+  maintWeightShiftLiabTarget: 0,
+  maintWeightShiftAbort: false,
+  setFallbackOracle: false,
+  depositLimit: 0,
 }
 
 const EditToken = ({
@@ -142,6 +183,7 @@ const EditToken = ({
   const { getAdditionalLabelInfo, mangoClient, mangoGroup } = UseMangoV4()
   const { assetAccounts } = useGovernanceAssets()
   const [forcedValues, setForcedValues] = useState<string[]>([])
+  const forwarderProgramHelpers = useForwarderProgramHelpers()
   const solAccounts = assetAccounts.filter(
     (x) =>
       x.type === AccountType.SOL &&
@@ -178,9 +220,17 @@ const EditToken = ({
       const mintInfo = mangoGroup!.mintInfosMapByTokenIndex.get(
         bank.tokenIndex
       )!
-      const values = getChangedValues<EditTokenForm>(
-        originalFormValues,
-        form,
+      const values = getChangedValues<
+        Omit<EditTokenForm, 'reduceOnly'> & { reduceOnly: number }
+      >(
+        {
+          ...originalFormValues,
+          reduceOnly: originalFormValues.reduceOnly.value,
+        },
+        {
+          ...form,
+          reduceOnly: form.reduceOnly.value,
+        },
         forcedValues
       )
 
@@ -189,7 +239,8 @@ const EditToken = ({
           ? null
           : form.oracleConfFilter
       const maxStalenessSlots =
-        (form.maxStalenessSlots as number | string) === ''
+        (form.maxStalenessSlots as number | string) === '' ||
+        form.maxStalenessSlots === -1
           ? null
           : form.maxStalenessSlots
 
@@ -221,7 +272,7 @@ const EditToken = ({
                 maxStalenessSlots: maxStalenessSlots,
               }
             : null,
-          values.groupInsuranceFund,
+          values.groupInsuranceFund!,
           isThereNeedOfSendingRateConfigs
             ? {
                 adjustmentFactor: Number(form.adjustmentFactor),
@@ -251,10 +302,31 @@ const EditToken = ({
           getNullOrTransform(values.netBorrowLimitWindowSizeTs, BN),
           getNullOrTransform(values.borrowWeightScaleStartQuote, null, Number),
           getNullOrTransform(values.depositWeightScaleStartQuote, null, Number),
-          values.resetStablePrice,
-          values.resetNetBorrowLimit,
-          values.reduceOnly,
-          getNullOrTransform(values.name, null, String)
+          values.resetStablePrice!,
+          values.resetNetBorrowLimit!,
+          getNullOrTransform(values.reduceOnly, null, Number),
+          getNullOrTransform(values.name, null, String),
+          values.forceClose!,
+          getNullOrTransform(
+            values.tokenConditionalSwapTakerFeeRate,
+            null,
+            Number
+          ),
+          getNullOrTransform(
+            values.tokenConditionalSwapMakerFeeRate,
+            null,
+            Number
+          ),
+          getNullOrTransform(values.flashLoanSwapFeeRate, null, Number),
+          getNullOrTransform(values.interestCurveScaling, null, Number),
+          getNullOrTransform(values.interestTargetUtilization, null, Number),
+          getNullOrTransform(values.maintWeightShiftStart, BN),
+          getNullOrTransform(values.maintWeightShiftEnd, BN),
+          getNullOrTransform(values.maintWeightShiftAssetTarget, null, Number),
+          getNullOrTransform(values.maintWeightShiftLiabTarget, null, Number),
+          values.maintWeightShiftAbort!,
+          values.setFallbackOracle!,
+          getNullOrTransform(values.depositLimit, BN)
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -271,11 +343,14 @@ const EditToken = ({
         ])
         .instruction()
 
-      serializedInstruction = serializeInstructionToBase64(ix)
+      serializedInstruction = serializeInstructionToBase64(
+        forwarderProgramHelpers.withForwarderWrapper(ix)
+      )
     }
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
       isValid,
+      chunkBy: 1,
       governance: form.governedAccount?.governance,
       customHoldUpTime: form.holdupTime,
     }
@@ -288,7 +363,13 @@ const EditToken = ({
       index
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form, forcedValues])
+  }, [
+    form,
+    forcedValues,
+    forwarderProgramHelpers.form,
+    forwarderProgramHelpers.withForwarderWrapper,
+  ])
+
   useEffect(() => {
     const getTokens = async () => {
       const currentTokens = [...mangoGroup!.banksMapByMint.values()].map(
@@ -302,17 +383,16 @@ const EditToken = ({
     if (wallet?.publicKey && mangoGroup) {
       getTokens()
     }
-  }, [mangoGroup?.publicKey.toBase58()])
+  }, [mangoGroup, wallet?.publicKey])
+
+  const formTokenPk = form.token?.value.toBase58()
   useEffect(() => {
-    if (form.token && mangoGroup) {
-      const currentToken = mangoGroup!.banksMapByMint.get(
-        form.token.value.toBase58()
-      )![0]
-      const groupInsuranceFund = mangoGroup.mintInfosMapByMint.get(
-        form.token.value.toBase58()
-      )?.groupInsuranceFund
+    if (formTokenPk && mangoGroup) {
+      const currentToken = mangoGroup!.banksMapByMint.get(formTokenPk)![0]
+      const groupInsuranceFund = mangoGroup.mintInfosMapByMint.get(formTokenPk)
+        ?.groupInsuranceFund
+
       const vals = {
-        ...form,
         oraclePk: currentToken.oracle.toBase58(),
         oracleConfFilter: currentToken.oracleConfig.confFilter.toNumber(),
         maxStalenessSlots: currentToken.oracleConfig.maxStalenessSlots.toNumber(),
@@ -342,14 +422,31 @@ const EditToken = ({
         borrowWeightScaleStartQuote: currentToken.borrowWeightScaleStartQuote,
         depositWeightScaleStartQuote: currentToken.depositWeightScaleStartQuote,
         groupInsuranceFund: !!groupInsuranceFund,
-        reduceOnly: currentToken.reduceOnly,
+        reduceOnly: REDUCE_ONLY_OPTIONS.find(
+          (x) => x.value === currentToken.reduceOnly
+        )!,
+        forceClose: currentToken.forceClose,
+        tokenConditionalSwapTakerFeeRate:
+          currentToken.tokenConditionalSwapTakerFeeRate,
+        tokenConditionalSwapMakerFeeRate:
+          currentToken.tokenConditionalSwapMakerFeeRate,
+        flashLoanSwapFeeRate: currentToken.flashLoanSwapFeeRate,
+        interestCurveScaling: currentToken.interestCurveScaling,
+        interestTargetUtilization: currentToken.interestTargetUtilization,
+        maintWeightShiftStart: currentToken.maintWeightShiftStart.toNumber(),
+        maintWeightShiftEnd: currentToken.maintWeightShiftEnd.toNumber(),
+        maintWeightShiftAssetTarget: currentToken.maintWeightShiftAssetTarget.toNumber(),
+        maintWeightShiftLiabTarget: currentToken.maintWeightShiftLiabTarget.toNumber(),
+        depositLimit: currentToken.depositLimit.toNumber(),
       }
-      setForm({
+      setForm((prevForm) => ({
+        ...prevForm,
         ...vals,
-      })
-      setOriginalFormValues({ ...vals })
+      }))
+      setOriginalFormValues((prevForm) => ({ ...prevForm, ...vals }))
     }
-  }, [form.token?.value.toBase58()])
+  }, [formTokenPk, mangoGroup])
+
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
@@ -369,6 +466,7 @@ const EditToken = ({
       ),
     name: yup.string().required(),
   })
+
   const inputs: InstructionInput[] = [
     {
       label: 'Governance',
@@ -620,8 +718,110 @@ const EditToken = ({
       label: keyToLabel['reduceOnly'],
       subtitle: getAdditionalLabelInfo('reduceOnly'),
       initialValue: form.reduceOnly,
-      type: InstructionInputType.SWITCH,
+      type: InstructionInputType.SELECT,
+      options: REDUCE_ONLY_OPTIONS,
       name: 'reduceOnly',
+    },
+    {
+      label: keyToLabel['forceClose'],
+      subtitle: getAdditionalLabelInfo('forceClose'),
+      initialValue: form.forceClose,
+      type: InstructionInputType.SWITCH,
+      name: 'forceClose',
+    },
+    {
+      label: keyToLabel['tokenConditionalSwapMakerFeeRate'],
+      subtitle: getAdditionalLabelInfo('tokenConditionalSwapMakerFeeRate'),
+      initialValue: form.tokenConditionalSwapMakerFeeRate,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'tokenConditionalSwapMakerFeeRate',
+    },
+    {
+      label: keyToLabel['tokenConditionalSwapTakerFeeRate'],
+      subtitle: getAdditionalLabelInfo('tokenConditionalSwapTakerFeeRate'),
+      initialValue: form.tokenConditionalSwapTakerFeeRate,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'tokenConditionalSwapTakerFeeRate',
+    },
+    {
+      label: keyToLabel['flashLoanSwapFeeRate'],
+      subtitle: getAdditionalLabelInfo('flashLoanSwapFeeRate'),
+      initialValue: form.flashLoanSwapFeeRate,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'flashLoanSwapFeeRate',
+    },
+    {
+      label: keyToLabel['interestCurveScaling'],
+      subtitle: getAdditionalLabelInfo('interestCurveScaling'),
+      initialValue: form.interestCurveScaling,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'interestCurveScaling',
+    },
+    {
+      label: keyToLabel['interestTargetUtilization'],
+      subtitle: getAdditionalLabelInfo('interestTargetUtilization'),
+      initialValue: form.interestTargetUtilization,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'interestTargetUtilization',
+    },
+    {
+      label: keyToLabel['maintWeightShiftStart'],
+      subtitle: getAdditionalLabelInfo('maintWeightShiftStart'),
+      initialValue: form.maintWeightShiftStart,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'maintWeightShiftStart',
+    },
+    {
+      label: keyToLabel['maintWeightShiftEnd'],
+      subtitle: getAdditionalLabelInfo('maintWeightShiftEnd'),
+      initialValue: form.maintWeightShiftEnd,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'maintWeightShiftEnd',
+    },
+    {
+      label: keyToLabel['maintWeightShiftAssetTarget'],
+      subtitle: getAdditionalLabelInfo('maintWeightShiftAssetTarget'),
+      initialValue: form.maintWeightShiftAssetTarget,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'maintWeightShiftAssetTarget',
+    },
+    {
+      label: keyToLabel['maintWeightShiftLiabTarget'],
+      subtitle: getAdditionalLabelInfo('maintWeightShiftLiabTarget'),
+      initialValue: form.maintWeightShiftLiabTarget,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'maintWeightShiftLiabTarget',
+    },
+    {
+      label: keyToLabel['maintWeightShiftAbort'],
+      subtitle: getAdditionalLabelInfo('maintWeightShiftAbort'),
+      initialValue: form.maintWeightShiftAbort,
+      type: InstructionInputType.SWITCH,
+      name: 'maintWeightShiftAbort',
+    },
+    {
+      label: keyToLabel['setFallbackOracle'],
+      subtitle: getAdditionalLabelInfo('setFallbackOracle'),
+      initialValue: form.setFallbackOracle,
+      type: InstructionInputType.SWITCH,
+      name: 'setFallbackOracle',
+    },
+    {
+      label: keyToLabel['depositLimit'],
+      subtitle: getAdditionalLabelInfo('depositLimit'),
+      initialValue: form.depositLimit,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'depositLimit',
     },
   ]
 
@@ -636,6 +836,7 @@ const EditToken = ({
             setFormErrors={setFormErrors}
             formErrors={formErrors}
           ></InstructionForm>
+          <ForwarderProgram {...forwarderProgramHelpers}></ForwarderProgram>
           <AdvancedOptionsDropdown title="More">
             <h3>Force values</h3>
             <div>

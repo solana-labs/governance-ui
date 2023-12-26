@@ -119,7 +119,6 @@ export const deposit = async (
         governance: treasuryAssetAccount.governance,
         serializedInstruction: serializeInstructionToBase64(initReceiptIx),
         prerequisiteInstructions: [],
-        chunkSplitByDefault: true,
         isValid: true,
         customHoldUpTime:
           treasuryAssetAccount.governance.account.config
@@ -168,7 +167,6 @@ export const deposit = async (
     additionalSerializedInstructions:
       serializedTransferToReceiptIxs.slice(1) || [],
     prerequisiteInstructions,
-    chunkSplitByDefault: true,
     isValid: true,
     customHoldUpTime:
       treasuryAssetAccount.governance.account.config.minInstructionHoldUpTime,

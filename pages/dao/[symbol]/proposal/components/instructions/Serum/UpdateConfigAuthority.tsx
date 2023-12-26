@@ -11,8 +11,8 @@ import { tryParseKey } from '@tools/validators/pubkey'
 import { SerumUpdateConfigAuthority } from '@utils/uiTypes/proposalCreationTypes'
 import { useContext, useEffect, useState } from 'react'
 import useSerumGovStore, { ConfigAccountType } from 'stores/useSerumGovStore'
-import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../../new'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 const UpdateConfigAuthority = ({
   index,
@@ -22,7 +22,7 @@ const UpdateConfigAuthority = ({
 }) => {
   const programId = useSerumGovStore((s) => s.programId)
   const actions = useSerumGovStore((s) => s.actions)
-  const connection = useWalletStore((s) => s.connection.current)
+  const { connection } = useConnection()
   const wallet = useWalletOnePointOh()
   const { anchorProvider } = useWalletDeprecated()
 

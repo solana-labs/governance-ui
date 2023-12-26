@@ -7,7 +7,7 @@ import { SubDaoWithMeta } from 'HeliumVotePlugin/sdk/types'
 import { useSubDaos } from 'HeliumVotePlugin/hooks/useSubDaos'
 import { LoadingDots } from '@components/Loading'
 
-export interface DelegateTokensModalProps {
+interface DelegateTokensModalProps {
   isOpen: boolean
   onClose: () => void
   onSubmit: (subDao: SubDaoWithMeta) => Promise<void>
@@ -63,11 +63,11 @@ export const DelegateTokensModal: React.FC<DelegateTokensModalProps> = ({
         </>
       ) : (
         <div className="bg-bkg-3 rounded-md w-full p-4 mb-4 font-normal text-xs">
-          <div>Select an exisitng subdao to delegate too</div>
+          <div>Select an existing subdao to delegate to</div>
           <br />
           <div>
-            Once delegated, you cant perform any actions on this position until
-            you undelegate
+            Once delegated, you can&apos;t perform any actions on this position
+            until you undelegate
           </div>
           <div className="w-full flex flex-col gap-2 pt-4">
             {subDaos?.map((subDao) => {
@@ -83,7 +83,7 @@ export const DelegateTokensModal: React.FC<DelegateTokensModalProps> = ({
                 >
                   <img
                     className="w-5 h-5"
-                    src={subDao.dntMetadata.json?.image}
+                    src={subDao.dntMetadata.json?.image || ''}
                   />
                   {subDao.dntMetadata.name}
                 </div>

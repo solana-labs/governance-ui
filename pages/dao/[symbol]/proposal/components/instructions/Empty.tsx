@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import * as yup from 'yup'
 import { Governance, ProgramAccount } from '@solana/spl-governance'
 import { validateInstruction } from '@utils/instructionTools'
@@ -8,8 +8,8 @@ import {
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../new'
 import GovernedAccountSelect from '../GovernedAccountSelect'
-import useRealm from '@hooks/useRealm'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 const Empty = ({
   index,
   governance,
@@ -20,7 +20,7 @@ const Empty = ({
   const [form, setForm] = useState<EmptyInstructionForm>({
     governedAccount: undefined,
   })
-  const { ownVoterWeight } = useRealm()
+  const { result: ownVoterWeight } = useLegacyVoterWeight()
   const { assetAccounts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [formErrors, setFormErrors] = useState({})
@@ -56,7 +56,7 @@ const Empty = ({
     <GovernedAccountSelect
       label="Wallet"
       governedAccounts={assetAccounts.filter((x) =>
-        ownVoterWeight.canCreateProposal(x.governance.account.config)
+        ownVoterWeight?.canCreateProposal(x.governance.account.config)
       )}
       onChange={(value) => {
         handleSetForm({ value, propertyName: 'governedAccount' })

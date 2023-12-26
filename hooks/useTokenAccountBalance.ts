@@ -1,6 +1,6 @@
 import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
+import { useConnection } from '@solana/wallet-adapter-react'
 import { Connection, PublicKey } from '@solana/web3.js'
-import useWalletStore from 'stores/useWalletStore'
 import useSWR from 'swr'
 
 const fetchTokenAccountBalance = async (
@@ -18,7 +18,7 @@ export default function useTokenAccountBalance(
   owner?: PublicKey | null,
   mint?: PublicKey
 ) {
-  const connection = useWalletStore((s) => s.connection.current)
+  const { connection } = useConnection()
 
   const { data, mutate, error, isValidating } = useSWR(
     () =>
@@ -50,7 +50,7 @@ export default function useTokenAccountBalance(
 //   owner?: PublicKey | null,
 //   mint?: PublicKey
 // ) {
-//   const connection = useWalletStore((s) => s.connection)
+//   const connection = useLegacyConnectionContext()
 
 //   const [isLoading, setIsLoading] = useState(true)
 //   const [balance, setBalance] = useState<TokenAmount | null>(null)

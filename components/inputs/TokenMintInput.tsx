@@ -6,11 +6,11 @@ import tokenPriceService, {
 } from '@utils/services/tokenPrice'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { TokenProgramAccount, tryGetMint } from '@utils/tokens'
-import useWalletStore from 'stores/useWalletStore'
 import { PublicKey } from '@solana/web3.js'
 import { MintInfo } from '@solana/spl-token'
 import { debounce } from '@utils/debounce'
 import { InformationCircleIcon } from '@heroicons/react/outline'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const TokenMintInput = ({
   noMaxWidth = true,
@@ -28,7 +28,7 @@ const TokenMintInput = ({
     foundByNameToken: TokenInfoWithoutDecimals | undefined
   ) => void
 }) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const [isTyping, setIsTyping] = useState(false)
   const [query, setQuery] = useState<string>('')
   const [mintInfo, setMintInfo] = useState<

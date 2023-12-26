@@ -1,5 +1,9 @@
-import { Wallet } from '@marinade.finance/marinade-ts-sdk'
-import { AnchorProvider, BN, BorshInstructionCoder, IdlTypes } from '@coral-xyz/anchor'
+import {
+  AnchorProvider,
+  BN,
+  BorshInstructionCoder,
+  IdlTypes,
+} from '@coral-xyz/anchor'
 import { AccountMetaData } from '@solana/spl-governance'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import { fmtMintAmount } from '@tools/sdk/units'
@@ -16,6 +20,10 @@ import {
 import { calcMultiplier } from 'VoteStakeRegistry/tools/deposits'
 import { VoterStakeRegistry as HeliumVSR } from '@helium/idls/lib/types/voter_stake_registry'
 import { PROGRAM_ID as HELIUM_VSR_PROGRAM_ID } from '@helium/voter-stake-registry-sdk'
+import { fetchTokenAccountByPubkey } from '@hooks/queries/tokenAccount'
+import { fetchMintInfoByPubkey } from '@hooks/queries/mintInfo'
+import { toUiDecimals } from '@blockworks-foundation/mango-v4'
+import EmptyWallet from '@utils/Mango/listingTools'
 
 interface ClawbackInstruction {
   depositEntryIndex: number
@@ -62,7 +70,7 @@ const clawbackIx = (programId: PublicKey) => ({
         const options = AnchorProvider.defaultOptions()
         const provider = new AnchorProvider(
           connection,
-          new Wallet(Keypair.generate()),
+          new EmptyWallet(Keypair.generate()),
           options
         )
         const vsrClient = await VsrClient.connect(provider, programId)
@@ -115,6 +123,54 @@ const createRegistrarIx = (_programId: PublicKey) => ({
   },
 })
 
+const UpdateVoterWeight = (_programId: PublicKey) => ({
+  45: {
+    name: 'Vote Stake Registry Update Voter Weight',
+    accounts: [],
+    getDataUI: async () => {
+      return <div></div>
+    },
+  },
+})
+
+const deposit = (programId: PublicKey) => ({
+  242: {
+    name: 'Vote stake registry deposit',
+    accounts: [
+      { name: 'Registrar' },
+      { name: 'Voter' },
+      { name: 'Vault' },
+      { name: 'Deposit Token' },
+      { name: 'Deposit Authority' },
+    ],
+    getDataUI: async (
+      connection: Connection,
+      data: Uint8Array,
+      accounts: AccountMetaData[]
+    ) => {
+      const tokenAccountPk = accounts[3].pubkey
+      const tokenAccount = (
+        await fetchTokenAccountByPubkey(connection, tokenAccountPk)
+      ).result
+      const mint = (await fetchMintInfoByPubkey(connection, tokenAccount!.mint))
+        .result
+      const options = AnchorProvider.defaultOptions()
+      const provider = new AnchorProvider(
+        connection,
+        new EmptyWallet(Keypair.generate()),
+        options
+      )
+      const vsrClient = await VsrClient.connect(provider, programId)
+
+      const decodedInstructionData = new BorshInstructionCoder(
+        vsrClient.program.idl
+      ).decode(Buffer.from(data))?.data as any
+      const amount = toUiDecimals(decodedInstructionData.amount, mint!.decimals)
+      return <div>Amount: {amount}</div>
+    },
+  },
+})
+
 const configVotingMintIx = (programId: PublicKey) => ({
   113: {
     name: 'Configure voting mint',
@@ -128,7 +184,7 @@ const configVotingMintIx = (programId: PublicKey) => ({
         const options = AnchorProvider.defaultOptions()
         const provider = new AnchorProvider(
           connection,
-          new Wallet(Keypair.generate()),
+          new EmptyWallet(Keypair.generate()),
           options
         )
         const vsrClient = await VsrClient.connect(provider, programId)
@@ -209,7 +265,7 @@ const grantIx = (programId: PublicKey) => ({
         const options = AnchorProvider.defaultOptions()
         const provider = new AnchorProvider(
           connection,
-          new Wallet(Keypair.generate()),
+          new EmptyWallet(Keypair.generate()),
           options
         )
         const vsrClient = await VsrClient.connect(provider, programId)
@@ -228,7 +284,7 @@ const grantIx = (programId: PublicKey) => ({
           <>
             {decodedInstructionData ? (
               <div className="space-y-3">
-                <div>Grant to: {accounts[8].pubkey.toBase58()}</div>
+                <div>Grant to: {accounts[2].pubkey.toBase58()}</div>
                 <div>Lock type: {lockupKind}</div>
                 <div>
                   Amount:{' '}
@@ -330,7 +386,7 @@ const heliumConfigVotingMintIx = (programId: PublicKey) => ({
         const options = AnchorProvider.defaultOptions()
         const provider = new AnchorProvider(
           connection,
-          new Wallet(Keypair.generate()),
+          new EmptyWallet(Keypair.generate()),
           options
         )
         const vsrClient = await VsrClient.connect(provider, programId)
@@ -368,9 +424,7 @@ const heliumConfigVotingMintIx = (programId: PublicKey) => ({
             <div>
               Max multiplier:{' '}
               {getInverseScaledFactor(baselineVoteWeightScaledFactor) +
-                getInverseScaledFactor(
-                  maxExtraLockupVoteWeightScaledFactor
-                )}
+                getInverseScaledFactor(maxExtraLockupVoteWeightScaledFactor)}
             </div>
             {/* Additional Genesis Multiplier not configurable through UI */}
             {/* <div>
@@ -395,7 +449,14 @@ const heliumConfigVotingMintIx = (programId: PublicKey) => ({
 })
 
 const common_instructions = (programId: PublicKey) =>
-  [clawbackIx, createRegistrarIx, configVotingMintIx, grantIx].reduce(
+  [
+    clawbackIx,
+    createRegistrarIx,
+    configVotingMintIx,
+    grantIx,
+    deposit,
+    UpdateVoterWeight,
+  ].reduce(
     (acc, ix) => ({
       ...acc,
       ...ix(programId),
@@ -427,5 +488,11 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
   ),
   VoteWPk9yyGmkX4U77nEWRJWpcc8kUfrPoghxENpstL: common_instructions(
     new PublicKey('VoteWPk9yyGmkX4U77nEWRJWpcc8kUfrPoghxENpstL')
+  ),
+  VoteMBhDCqGLRgYpp9o7DGyq81KNmwjXQRAHStjtJsS: common_instructions(
+    new PublicKey('VoteMBhDCqGLRgYpp9o7DGyq81KNmwjXQRAHStjtJsS')
+  ),
+  '5sWzuuYkeWLBdAv3ULrBfqA51zF7Y4rnVzereboNDCPn': common_instructions(
+    new PublicKey('5sWzuuYkeWLBdAv3ULrBfqA51zF7Y4rnVzereboNDCPn')
   ),
 }

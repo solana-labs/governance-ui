@@ -25,11 +25,13 @@ interface Props
     nftCollection?: PublicKey;
     nftCollectionSize: number;
     nftCollectionWeight: BN;
+    civicPassType: Config['civicPassType'];
   }> {
   currentConfigAccount: Config['configAccount'];
   currentNftCollection?: PublicKey;
   currentNftCollectionSize: number;
   currentNftCollectionWeight: BN;
+  currentCivicPassType: Config['civicPassType'];
   communityMint: Config['communityMint'];
   className?: string;
 }
@@ -43,6 +45,7 @@ export function CommunityStructure(props: Props) {
     nftCollection: props.currentNftCollection,
     nftCollectionSize: props.currentNftCollectionSize,
     nftCollectionWeight: props.currentNftCollectionWeight,
+    civicPassType: props.currentCivicPassType,
   };
 
   const votingStructure = {
@@ -52,6 +55,7 @@ export function CommunityStructure(props: Props) {
     nftCollection: props.nftCollection,
     nftCollectionSize: props.nftCollectionSize,
     nftCollectionWeight: props.nftCollectionWeight,
+    civicPassType: props.civicPassType,
   };
 
   const minTokensToManage = new BigNumber(
@@ -211,6 +215,7 @@ export function CommunityStructure(props: Props) {
                 nftCollection,
                 nftCollectionSize,
                 nftCollectionWeight,
+                civicPassType,
               }) => {
                 const newConfig = produce(
                   { ...props.configAccount },
@@ -245,6 +250,13 @@ export function CommunityStructure(props: Props) {
                     !props.nftCollectionWeight.eq(nftCollectionWeight)
                   ) {
                     props.onNftCollectionWeightChange?.(nftCollectionWeight);
+                  }
+
+                  if (
+                    typeof civicPassType !== 'undefined' &&
+                    !props.civicPassType?.equals(civicPassType)
+                  ) {
+                    props.onCivicPassTypeChange?.(civicPassType);
                   }
                 }, 0);
               }}

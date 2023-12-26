@@ -1,15 +1,15 @@
-import useRealm from '@hooks/useRealm'
 import { getVoteRecordAddress } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
+import { useRealmQuery } from '../realm'
 
 export const useAddressQuery_SelectedProposalVoteRecord = (
   tokenOwnerRecordAddress?: PublicKey
 ) => {
   const router = useRouter()
   const { pk } = router.query
-  const { realm } = useRealm()
+  const realm = useRealmQuery().data?.result
 
   const programId = realm?.owner // TODO make me cached plz
   const proposalAddress = typeof pk === 'string' ? new PublicKey(pk) : undefined

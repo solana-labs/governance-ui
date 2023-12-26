@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Asset } from '@models/treasury/Asset'
 import { Result, Status } from '@utils/uiTypes/Result'
@@ -15,8 +15,8 @@ interface Props {
     auxiliaryWallets: AuxiliaryWallet[]
     wallets: Wallet[]
   }>
-  selectedAsset?: Asset | null
-  selectedWallet?: AuxiliaryWallet | Wallet | null
+  selectedAsset?: Asset | null | 'USE NON-LEGACY STATE'
+  selectedWallet?: AuxiliaryWallet | Wallet | null | 'USE NON-LEGACY STATE'
   onSelectAsset?(asset: Asset, wallet: AuxiliaryWallet | Wallet): void
   onSelectWallet?(wallet: AuxiliaryWallet | Wallet): void
 }
@@ -47,33 +47,12 @@ export default function WalletList(props: Props) {
 
   switch (props.data._tag) {
     case Status.Failed:
-      return (
-        <div className={cx(props.className, 'h-full')}>
-          <div className="flex-shrink-0 flex items-center justify-between pb-5">
-            <div className="w-40 bg-bkg-1 rounded-sm text-lg opacity-50">
-              &nbsp;
-            </div>
-            <div className="w-40 bg-bkg-1 rounded-sm text-lg opacity-50">
-              &nbsp;
-            </div>
-          </div>
-          <div className="overflow-y-auto flex-grow space-y-4">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div className="h-24 rounded bg-bkg-1 opacity-50" key={i} />
-            ))}
-          </div>
-        </div>
-      )
     case Status.Pending:
       return (
         <div className={cx(props.className, 'h-full')}>
           <div className="flex-shrink-0 flex items-center justify-between pb-5">
-            <div className="w-40 bg-bkg-1 rounded-sm text-lg animate-pulse">
-              &nbsp;
-            </div>
-            <div className="w-40 bg-bkg-1 rounded-sm text-lg animate-pulse">
-              &nbsp;
-            </div>
+            <div className="font-bold text-base">DAO Wallets</div>
+            <NewWalletButton />
           </div>
           <div className="overflow-y-auto flex-grow space-y-4">
             {Array.from({ length: 3 }).map((_, i) => (
@@ -113,10 +92,15 @@ export default function WalletList(props: Props) {
                 expanded={expanded.includes(wallet.address)}
                 selected={
                   (props.selectedWallet &&
+                    props.selectedWallet !== 'USE NON-LEGACY STATE' &&
                     'address' in props.selectedWallet &&
                     props.selectedWallet.address) === wallet.address
                 }
-                selectedAsset={props.selectedAsset}
+                selectedAsset={
+                  props.selectedAsset !== 'USE NON-LEGACY STATE'
+                    ? props.selectedAsset
+                    : null
+                }
                 wallet={wallet}
                 onExpand={() => {
                   setExpanded((list) => {
@@ -133,29 +117,31 @@ export default function WalletList(props: Props) {
                   props.onSelectAsset?.(asset, wallet)
                 }}
                 onSelectWallet={() => {
-                  const current = props.selectedWallet
                   props.onSelectWallet?.(wallet)
-                  setExpanded((list) => {
-                    const curKey = current
-                      ? 'address' in current
-                        ? current.address
-                        : current.name
-                      : null
 
-                    if (
-                      wallet.address === curKey &&
-                      list.includes(wallet.address) &&
-                      !props.selectedAsset
-                    ) {
-                      return list.filter((str) => str !== wallet.address)
-                    } else if (!list.includes(wallet.address)) {
-                      return list
-                        .filter((str) => str !== curKey)
-                        .concat(wallet.address)
-                    } else {
-                      return list
-                    }
-                  })
+                  const current = props.selectedWallet
+                  if (current !== 'USE NON-LEGACY STATE')
+                    setExpanded((list) => {
+                      const curKey = current
+                        ? 'address' in current
+                          ? current.address
+                          : current.name
+                        : null
+
+                      if (
+                        wallet.address === curKey &&
+                        list.includes(wallet.address) &&
+                        !props.selectedAsset
+                      ) {
+                        return list.filter((str) => str !== wallet.address)
+                      } else if (!list.includes(wallet.address)) {
+                        return list
+                          .filter((str) => str !== curKey)
+                          .concat(wallet.address)
+                      } else {
+                        return list
+                      }
+                    })
                 }}
               />
             ))}
@@ -164,11 +150,18 @@ export default function WalletList(props: Props) {
                 key={wallet.name}
                 expanded={expanded.includes(wallet.name)}
                 selected={
-                  props.selectedWallet && 'address' in props.selectedWallet
+                  props.selectedWallet &&
+                  props.selectedWallet !== 'USE NON-LEGACY STATE' &&
+                  'address' in props.selectedWallet
                     ? false
-                    : props.selectedWallet?.name === wallet.name
+                    : // @ts-ignore
+                      props.selectedWallet?.name === wallet.name
                 }
-                selectedAsset={props.selectedAsset}
+                selectedAsset={
+                  props.selectedAsset !== 'USE NON-LEGACY STATE'
+                    ? props.selectedAsset
+                    : null
+                }
                 wallet={wallet}
                 onExpand={() => {
                   setExpanded((list) => {
@@ -183,29 +176,30 @@ export default function WalletList(props: Props) {
                   props.onSelectAsset?.(asset, wallet)
                 }}
                 onSelectWallet={() => {
-                  const current = props.selectedWallet
                   props.onSelectWallet?.(wallet)
-                  setExpanded((list) => {
-                    const curKey = current
-                      ? 'address' in current
-                        ? current.address
-                        : current.name
-                      : null
+                  const current = props.selectedWallet
+                  if (current !== 'USE NON-LEGACY STATE')
+                    setExpanded((list) => {
+                      const curKey = current
+                        ? 'address' in current
+                          ? current.address
+                          : current.name
+                        : null
 
-                    if (
-                      wallet.name === curKey &&
-                      list.includes(wallet.name) &&
-                      !props.selectedAsset
-                    ) {
-                      return list.filter((str) => str !== wallet.name)
-                    } else if (!list.includes(wallet.name)) {
-                      return list
-                        .filter((str) => str !== curKey)
-                        .concat(wallet.name)
-                    } else {
-                      return list
-                    }
-                  })
+                      if (
+                        wallet.name === curKey &&
+                        list.includes(wallet.name) &&
+                        !props.selectedAsset
+                      ) {
+                        return list.filter((str) => str !== wallet.name)
+                      } else if (!list.includes(wallet.name)) {
+                        return list
+                          .filter((str) => str !== curKey)
+                          .concat(wallet.name)
+                      } else {
+                        return list
+                      }
+                    })
                 }}
               />
             ))}

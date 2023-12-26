@@ -25,20 +25,6 @@ import { BN } from '@coral-xyz/anchor'
 import { abbreviateAddress } from './formatting'
 import BigNumber from 'bignumber.js'
 import { AssetAccount } from '@utils/uiTypes/assets'
-import { NFTWithMeta } from './uiTypes/VotePlugin'
-import { ConnectionContext } from './connection'
-import { I80F48 } from '@blockworks-foundation/mango-v4'
-import {
-  Metaplex,
-  Nft,
-  Sft,
-  SftWithToken,
-  NftWithToken,
-  Metadata,
-  JsonMetadata,
-} from '@metaplex-foundation/js'
-import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
-import { pause } from './pause'
 
 export type TokenAccount = AccountInfo
 export type MintAccount = MintInfo
@@ -46,148 +32,6 @@ export type MintAccount = MintInfo
 export type TokenProgramAccount<T> = {
   publicKey: PublicKey
   account: T
-}
-
-type RawNft = Nft | Sft | SftWithToken | NftWithToken
-type NftWithATA = RawNft & {
-  owner: null | PublicKey
-  tokenAccountAddress: null | PublicKey
-}
-
-function exists<T>(item: T | null | undefined): item is T {
-  return !!item
-}
-
-const enhanceNFT = (nft: NftWithATA) => {
-  return {
-    image: nft.json?.image || '',
-    name: nft.json?.name || '',
-    description: nft.json?.description || '',
-    properties: {
-      category: '',
-      files: [],
-    },
-    collection: {
-      mintAddress: nft.collection?.address.toBase58() || '',
-      name: nft.json?.collection?.name || '',
-      creators: nft.creators.map((creator) => ({
-        verified: creator.verified,
-        address: creator.address.toBase58(),
-      })),
-      verified: nft.collection?.verified,
-      count: nft.collectionDetails?.size,
-      image: nft.json?.image || '',
-    },
-    address: nft.metadataAddress.toBase58(),
-    mintAddress: nft.mint.address.toBase58(),
-    owner: nft.owner,
-    tokenAccountAddress: nft.tokenAccountAddress?.toBase58() || '',
-    updateAuthorityAddress: nft.updateAuthorityAddress.toBase58(),
-    getAssociatedTokenAccount: async () => {
-      return nft.tokenAccountAddress?.toBase58() || ''
-    },
-  }
-}
-
-function loadNft(
-  nft: Metadata<JsonMetadata<string>> | Nft | Sft,
-  isDevnet?: boolean
-) {
-  const endpoint = isDevnet
-    ? process.env.NEXT_PUBLIC_HELIUS_DEVNET_RPC || process.env.DEVNET_RPC
-    : process.env.NEXT_PUBLIC_HELIUS_MAINNET_RPC || process.env.MAINNET_RPC
-
-  const connection = new Connection(endpoint || '')
-  const metaplex = new Metaplex(connection)
-
-  return Promise.race([
-    metaplex
-      .nfts()
-      // @ts-ignore
-      .load({ metadata: nft })
-      .catch((e) => {
-        console.error(e)
-        return null
-      }),
-    // sometime loading the nft metadata will timeout due to invalid or unsafe uris
-    pause(5000).then(() => null),
-  ])
-}
-
-export async function getNFTsByCollection(
-  collectionAddress: PublicKey,
-  isDevnet?: boolean
-) {
-  const endpoint = isDevnet
-    ? process.env.NEXT_PUBLIC_HELIUS_DEVNET_RPC || process.env.DEVNET_RPC
-    : process.env.NEXT_PUBLIC_HELIUS_MAINNET_RPC || process.env.MAINNET_RPC
-
-  const connection = new Connection(endpoint || '')
-  const metaplex = new Metaplex(connection)
-  const rawNfts = (
-    await metaplex.nfts().findAllByMintList({ mints: [collectionAddress] })
-  ).filter(exists)
-
-  const nfts = await Promise.all(
-    rawNfts.map((nft) => loadNft(nft, isDevnet))
-  ).then((nfts) =>
-    Promise.all(
-      nfts.filter(exists).map(async (nft) => {
-        const owner =
-          (await getTokenAccountsByMint(connection, nft.address.toBase58()))[0]
-            ?.account.owner || null
-
-        return {
-          ...nft,
-          owner,
-          tokenAccountAddress: owner
-            ? await getAssociatedTokenAddress(nft.mint.address, owner).catch(
-                (e) => {
-                  console.error(e)
-                  return null
-                }
-              )
-            : null,
-        }
-      })
-    )
-  )
-
-  return nfts.map(enhanceNFT)
-}
-
-export async function getNFTsByOwner(owner: PublicKey, isDevnet?: boolean) {
-  const endpoint = isDevnet
-    ? process.env.NEXT_PUBLIC_HELIUS_DEVNET_RPC || process.env.DEVNET_RPC
-    : process.env.NEXT_PUBLIC_HELIUS_MAINNET_RPC || process.env.MAINNET_RPC
-
-  const connection = new Connection(endpoint || '')
-  const metaplex = new Metaplex(connection)
-
-  const rawNfts = await metaplex.nfts().findAllByOwner({
-    owner,
-  })
-
-  const nfts = await Promise.all(
-    rawNfts.map((nft) => loadNft(nft, isDevnet))
-  ).then((nfts) =>
-    Promise.all(
-      nfts.filter(exists).map(async (nft) => ({
-        ...nft,
-        owner,
-        tokenAccountAddress: await getAssociatedTokenAddress(
-          nft.mint.address,
-          owner,
-          true
-        ).catch((e) => {
-          console.error(e)
-          return null
-        }),
-      }))
-    )
-  )
-
-  return nfts.map(enhanceNFT)
 }
 
 export async function getOwnedTokenAccounts(
@@ -206,6 +50,7 @@ export async function getOwnedTokenAccounts(
   })
 }
 
+/** @deprecated -- use react-query by pubkey */
 export const getTokenAccountsByMint = async (
   connection: Connection,
   mint: string
@@ -231,6 +76,7 @@ export const getTokenAccountsByMint = async (
   })
 }
 
+/** @deprecated, probably */
 export async function tryGetMint(
   connection: Connection,
   publicKey: PublicKey
@@ -252,10 +98,7 @@ export async function tryGetMint(
   }
 }
 
-export const I80F48OptionalFromNumber = (val: number | undefined) => {
-  return val || val === 0 ? I80F48.fromNumber(val) : undefined
-}
-
+/** @deprecated -- use react-query by pubkey */
 export async function tryGetTokenAccount(
   connection: Connection,
   publicKey: PublicKey
@@ -279,6 +122,7 @@ export async function tryGetTokenAccount(
   }
 }
 
+/** @deprecated -- use react-query by pubkey */
 export async function tryGetTokenMint(
   connection: Connection,
   publicKey: PublicKey
@@ -288,12 +132,15 @@ export async function tryGetTokenMint(
 }
 
 // copied from @solana/spl-token
+/** @deprecated -- why? just import from spl-token? */
 export const TOKEN_PROGRAM_ID = new PublicKey(
   'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'
 )
 export const BPF_UPGRADE_LOADER_ID = new PublicKey(
   'BPFLoaderUpgradeab1e11111111111111111111111'
 )
+
+/** @asktree its very unclear why this must exist, like... why doesn't spl-token do this? */
 export function parseTokenAccountData(
   account: PublicKey,
   data: Buffer
@@ -332,6 +179,7 @@ export function parseTokenAccountData(
   return accountInfo
 }
 
+/** @deprecated -- why not just use the normal mint layout? */
 export function parseMintAccountData(data: Buffer): MintAccount {
   const mintInfo = MintLayout.decode(data)
   if (mintInfo.mintAuthorityOption === 0) {
@@ -407,6 +255,7 @@ export async function getMultipleAccountInfoChunked(
 }
 
 //TODO refactor both methods (getMintAccountLabelInfo, getTokenAccountLabelInfo) make it more common
+/** @deprecated */
 export function getTokenAccountLabelInfo(acc: AssetAccount | undefined) {
   let tokenAccount = ''
   let tokenName = ''
@@ -438,6 +287,7 @@ export function getTokenAccountLabelInfo(acc: AssetAccount | undefined) {
   }
 }
 
+/** @deprecated because i dont think i like the AssetAccount abstraction */
 export function getSolAccountLabel(acc: AssetAccount | undefined) {
   let tokenAccount = ''
   let tokenName = ''
@@ -468,6 +318,7 @@ export function getSolAccountLabel(acc: AssetAccount | undefined) {
   }
 }
 
+/** @deprecated because i dont think i like the AssetAccount abstraction */
 export function getMintAccountLabelInfo(acc: AssetAccount | undefined) {
   let account = ''
   let tokenName = ''
@@ -494,44 +345,13 @@ export function getMintAccountLabelInfo(acc: AssetAccount | undefined) {
   }
 }
 
+/** @deprecated why? */
 export type AccountInfoGen<T> = {
   executable: boolean
   owner: PublicKey
   lamports: number
   data: T
   rentEpoch?: number
-}
-
-export const deserializeMint = (data: Buffer) => {
-  if (data.length !== MintLayout.span) {
-    throw new Error('Not a valid Mint')
-  }
-
-  const mintInfo = MintLayout.decode(data)
-
-  if (mintInfo.mintAuthorityOption === 0) {
-    mintInfo.mintAuthority = null
-  } else {
-    mintInfo.mintAuthority = new PublicKey(mintInfo.mintAuthority)
-  }
-
-  mintInfo.supply = u64.fromBuffer(mintInfo.supply)
-  mintInfo.isInitialized = mintInfo.isInitialized !== 0
-
-  if (mintInfo.freezeAuthorityOption === 0) {
-    mintInfo.freezeAuthority = null
-  } else {
-    mintInfo.freezeAuthority = new PublicKey(mintInfo.freezeAuthority)
-  }
-
-  return mintInfo as MintInfo
-}
-
-export const getNfts = (
-  ownerPk: PublicKey,
-  connection: ConnectionContext
-): Promise<NFTWithMeta[]> => {
-  return getNFTsByOwner(ownerPk, connection.cluster === 'devnet')
 }
 
 export const parseMintSupplyFraction = (fraction: string) => {
@@ -549,7 +369,7 @@ export const parseMintSupplyFraction = (fraction: string) => {
   })
 }
 
-export const SCALED_FACTOR_SHIFT = 9
+const SCALED_FACTOR_SHIFT = 9
 
 export function getScaledFactor(amount: number) {
   return new BN(

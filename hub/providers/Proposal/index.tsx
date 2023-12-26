@@ -35,12 +35,13 @@ export const DEFAULT: Value = {
   progress: { state: CreationProgressState.Ready },
 };
 
+/** @deprecated */
 export const context = createContext(DEFAULT);
 
 interface Props {
   children?: React.ReactNode;
 }
-
+/** @deprecated */
 export function ProposalProvider(props: Props) {
   const [cluster] = useCluster();
   const { connect, signTransaction, signAllTransactions } = useWallet();

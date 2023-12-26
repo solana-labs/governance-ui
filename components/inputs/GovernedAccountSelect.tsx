@@ -44,9 +44,12 @@ const GovernedAccountSelect = ({
           case AccountType.MINT:
             return getMintAccountLabelComponent(getMintAccountLabelInfo(value))
           case AccountType.PROGRAM:
-            return getProgramAccountLabel(value.governance)
+            return getProgramAccountLabel(value)
           default:
-            return value.governance.account.governedAccount.toBase58()
+            return (
+              value.extensions.transferAddress?.toBase58() ||
+              value.pubkey.toBase58()
+            )
         }
       }
     } else {
@@ -101,12 +104,12 @@ const GovernedAccountSelect = ({
       </div>
     )
   }
-  function getProgramAccountLabel(val: ProgramAccount<Governance>) {
-    const name = val ? getProgramName(val.account.governedAccount) : ''
+  function getProgramAccountLabel(val: AssetAccount) {
+    const name = val ? getProgramName(val.pubkey) : ''
     return (
       <div className="flex flex-col">
         {name && <div>{name}</div>}
-        <div>{val?.account?.governedAccount?.toBase58()}</div>
+        <div>{val?.pubkey?.toBase58()}</div>
       </div>
     )
   }

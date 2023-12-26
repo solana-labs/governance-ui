@@ -8,16 +8,15 @@ import { useEffect, useRef, useState } from 'react';
 import { Config } from '../fetchConfig';
 import cx from '@hub/lib/cx';
 
+import { DEFAULT_NFT_VOTER_PLUGIN } from '@tools/constants';
+
+import { CivicConfigurator } from './CivicConfigurator';
 import { Custom } from './Custom';
 import { NFT } from './NFT';
 
 export const DEFAULT_NFT_CONFIG = {
-  votingProgramId: new PublicKey(
-    'GnftV5kLjd67tvHpNGyodwWveEKivz3ZWvvE3Z4xi2iw',
-  ),
-  maxVotingProgramId: new PublicKey(
-    'GnftV5kLjd67tvHpNGyodwWveEKivz3ZWvvE3Z4xi2iw',
-  ),
+  votingProgramId: new PublicKey(DEFAULT_NFT_VOTER_PLUGIN),
+  maxVotingProgramId: new PublicKey(DEFAULT_NFT_VOTER_PLUGIN),
 };
 
 export const DEFAULT_VSR_CONFIG = {
@@ -53,33 +52,24 @@ const labelStyles = cx('font-700', 'dark:text-neutral-50');
 const descriptionStyles = cx('dark:text-neutral-400');
 const iconStyles = cx('fill-neutral-500', 'h-5', 'transition-transform', 'w-4');
 
+type VotingStructure = {
+  votingProgramId?: PublicKey;
+  maxVotingProgramId?: PublicKey;
+  nftCollection?: PublicKey;
+  nftCollectionSize?: number;
+  nftCollectionWeight?: BN;
+  civicPassType?: PublicKey;
+};
+
 interface Props {
   allowNFT?: boolean;
   allowCivic?: boolean;
   allowVSR?: boolean;
   className?: string;
   communityMint: Config['communityMint'];
-  currentStructure: {
-    votingProgramId?: PublicKey;
-    maxVotingProgramId?: PublicKey;
-    nftCollection?: PublicKey;
-    nftCollectionSize?: number;
-    nftCollectionWeight?: BN;
-  };
-  structure: {
-    votingProgramId?: PublicKey;
-    maxVotingProgramId?: PublicKey;
-    nftCollection?: PublicKey;
-    nftCollectionSize?: number;
-    nftCollectionWeight?: BN;
-  };
-  onChange?(value: {
-    votingProgramId?: PublicKey;
-    maxVotingProgramId?: PublicKey;
-    nftCollection?: PublicKey;
-    nftCollectionSize?: number;
-    nftCollectionWeight?: BN;
-  }): void;
+  currentStructure: VotingStructure;
+  structure: VotingStructure;
+  onChange?(value: VotingStructure): void;
 }
 
 function areConfigsEqual(a: Props['structure'], b: Props['structure']) {
@@ -260,9 +250,22 @@ export function VotingStructureSelector(props: Props) {
             }}
           />
         )}
+        {isCivicConfig(props.structure) && (
+          <CivicConfigurator
+            className="mt-2"
+            currentPassType={props.currentStructure.civicPassType}
+            onPassTypeChange={(value) => {
+              const newConfig = produce({ ...props.structure }, (data) => {
+                data.civicPassType = value ?? undefined;
+              });
+              props.onChange?.(newConfig);
+            }}
+          />
+        )}
         <DropdownMenu.Portal>
           <DropdownMenu.Content
-            className="space-y-0.5 bg-white dark:bg-black"
+            // weo weo z-index crap
+            className="dark space-y-0.5 z-20"
             sideOffset={2}
             style={{ width }}
           >

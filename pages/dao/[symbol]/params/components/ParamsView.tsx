@@ -1,4 +1,3 @@
-import useRealm from '@hooks/useRealm'
 import { fmtMintAmount, getHoursFromTimestamp } from '@tools/sdk/units'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import { getFormattedStringFromDays, SECS_PER_DAY } from '@utils/dateTools'
@@ -8,13 +7,24 @@ import { AddressField, NumberField } from '../index'
 import useProgramVersion from '@hooks/useProgramVersion'
 import { useRouter } from 'next/router'
 import useQueryContext from '@hooks/useQueryContext'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
+import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 
 const ParamsView = ({ activeGovernance }) => {
-  const { realm, mint, councilMint, ownVoterWeight, symbol } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const { result: ownVoterWeight } = useLegacyVoterWeight()
   const programVersion = useProgramVersion()
   const realmAccount = realm?.account
   const communityMint = realmAccount?.communityMint.toBase58()
   const router = useRouter()
+  const { symbol } = router.query
   const { fmtUrlWithCluster } = useQueryContext()
 
   const minCommunityTokensToCreateProposal = activeGovernance?.account?.config
@@ -27,6 +37,19 @@ const ParamsView = ({ activeGovernance }) => {
       : fmtMintAmount(
           mint,
           activeGovernance?.account?.config?.minCommunityTokensToCreateProposal
+        )
+    : 'calculating...'
+
+  const minCouncilTokensToCreateProposal = activeGovernance?.account?.config
+    ?.minCouncilTokensToCreateProposal
+    ? mint &&
+      DISABLED_VOTER_WEIGHT.eq(
+        activeGovernance.account.config.minCouncilTokensToCreateProposal
+      )
+      ? 'Disabled'
+      : fmtMintAmount(
+          mint,
+          activeGovernance?.account?.config?.minCouncilTokensToCreateProposal
         )
     : 'calculating...'
 
@@ -56,10 +79,7 @@ const ParamsView = ({ activeGovernance }) => {
             <AddressField
               label="Min council tokens to create a proposal"
               padding
-              val={fmtMintAmount(
-                councilMint,
-                activeGovernance.account.config.minCouncilTokensToCreateProposal
-              )}
+              val={minCouncilTokensToCreateProposal}
             />
           )}
           <NumberField
@@ -67,7 +87,7 @@ const ParamsView = ({ activeGovernance }) => {
             padding
             val={activeGovernance.account.config.minInstructionHoldUpTime}
           />
-          {programVersion >= 3 && (
+          {(programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) >= 3 && (
             <>
               <AddressField
                 label="Proposal Cool-off Time"
@@ -97,7 +117,7 @@ const ParamsView = ({ activeGovernance }) => {
               val={`${activeGovernance.account.config.councilVoteThreshold.value}%`}
             />
           )}
-          {programVersion >= 3 ? (
+          {(programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) >= 3 ? (
             <>
               <AddressField
                 label="Community Vote Tipping"
@@ -131,6 +151,7 @@ const ParamsView = ({ activeGovernance }) => {
           <div className="flex">
             <Button
               disabled={
+                ownVoterWeight === undefined ||
                 !ownVoterWeight.canCreateProposal(
                   activeGovernance.account.config
                 )
@@ -140,13 +161,13 @@ const ParamsView = ({ activeGovernance }) => {
               }
               onClick={() => {
                 if (
-                  ownVoterWeight.canCreateProposal(
+                  ownVoterWeight?.canCreateProposal(
                     activeGovernance.account.config
                   )
                 ) {
                   router.push(
                     fmtUrlWithCluster(
-                      `/realm/${symbol}/governance/${activeGovernance.pubkey.toBase58()}/edit`
+                      `/dao/${symbol}/treasury/governance/${activeGovernance.pubkey.toString()}/edit`
                     )
                   )
                 }

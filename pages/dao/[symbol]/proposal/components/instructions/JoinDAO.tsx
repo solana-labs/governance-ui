@@ -4,7 +4,6 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useRealmAccount from '@hooks/useRealmAccount'
 import { getCertifiedRealmInfos, RealmInfo } from '@models/registry/api'
 import {
-  getGovernanceProgramVersion,
   Governance,
   ProgramAccount,
   serializeInstructionToBase64,
@@ -19,11 +18,14 @@ import { precision } from '@utils/formatting'
 import { JoinDAOForm } from '@utils/uiTypes/proposalCreationTypes'
 import { useRouter } from 'next/router'
 import { useContext, useEffect, useMemo, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { notify } from '@utils/notifications'
 import { NewProposalContext } from '../../new'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
 
+/** This is an instruction component to deposit tokens in another DAO */
 const JoinDAO = ({
   index,
   governance,
@@ -36,8 +38,8 @@ const JoinDAO = ({
   //Small hack to prevent race conditions with cluster change until we remove connection from store and move it to global dep.
   const routeHasClusterInPath = router.asPath.includes('cluster')
 
-  const { current: wallet } = useWalletStore()
-  const connection = useWalletStore((s) => s.connection)
+  const wallet = useWalletOnePointOh()
+  const connection = useLegacyConnectionContext()
 
   const { governedSPLTokenAccounts } = useGovernanceAssets()
 
@@ -124,7 +126,7 @@ const JoinDAO = ({
       form.mintInfo.decimals
     )
 
-    const programVersion = await getGovernanceProgramVersion(
+    const programVersion = await fetchProgramVersion(
       connection.current,
       form.realm.programId
     )
