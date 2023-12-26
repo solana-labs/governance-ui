@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+// import { useEffect, useState } from 'react'
 import useRealm from 'hooks/useRealm'
 import { ChartPieIcon, ChatAlt2Icon, CogIcon, UsersIcon } from '@heroicons/react/outline'
 import { ChevronLeftIcon } from '@heroicons/react/solid'
@@ -19,7 +19,7 @@ const RealmHeader = () => {
     config,
     vsrMode,
   } = useRealm()
-  const { REALM } = process.env
+  // const { REALM } = process.env
   const activeMembers = useMembersStore((s) => s.compact.activeMembers)
   const isBackNavVisible = realmInfo?.symbol !== 'ORCA' // hide backnav for the default realm
 
