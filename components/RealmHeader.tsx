@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import useRealm from 'hooks/useRealm'
-import { ChatAlt2Icon, CogIcon, UsersIcon } from '@heroicons/react/outline'
+import { ChartPieIcon, ChatAlt2Icon, CogIcon, UsersIcon } from '@heroicons/react/outline'
 import { ChevronLeftIcon } from '@heroicons/react/solid'
 import Link from 'next/link'
 import useQueryContext from 'hooks/useQueryContext'
@@ -23,7 +23,7 @@ const RealmHeader = () => {
   const isBackNavVisible = realmInfo?.symbol !== REALM // hide backnav for the default realm
 
   const explorerHost = getRealmExplorerHost(realmInfo)
-  const realmUrl = `https://${explorerHost}/#/realm/${realmInfo?.realmId.toBase58()}?programId=${realmInfo?.programId.toBase58()}`
+  // const realmUrl = `https://${explorerHost}/#/realm/${realmInfo?.realmId.toBase58()}?programId=${realmInfo?.programId.toBase58()}`
 
   const [isBackNavVisible, setIsBackNavVisible] = useState(true)
 
