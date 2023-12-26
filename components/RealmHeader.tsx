@@ -4,8 +4,6 @@ import { ChartPieIcon, ChatAlt2Icon, CogIcon, UsersIcon } from '@heroicons/react
 import { ChevronLeftIcon } from '@heroicons/react/solid'
 import Link from 'next/link'
 import useQueryContext from 'hooks/useQueryContext'
-
-import useMembersStore from 'stores/useMembersStore'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { NFT_PLUGINS_PKS } from '@constants/plugins'
 
@@ -20,7 +18,6 @@ const RealmHeader = () => {
     vsrMode,
   } = useRealm()
   // const { REALM } = process.env
-  const activeMembers = useMembersStore((s) => s.compact.activeMembers)
   const isBackNavVisible = realmInfo?.symbol !== 'ORCA' // hide backnav for the default realm
 
   // const explorerHost = getRealmExplorerHost(realmInfo)
@@ -72,7 +69,7 @@ const RealmHeader = () => {
             <Link href={fmtUrlWithCluster(`/dao/${symbol}/members`)}>
               <a className="flex items-center text-sm cursor-pointer default-transition text-fgd-2 hover:text-fgd-3">
                 <UsersIcon className="flex-shrink-0 w-5 h-5 mr-1" />
-                Members ({activeMembers.length})
+                Members
               </a>
             </Link>
           )}
