@@ -3353,5 +3353,20 @@
     "bannerImage": "/realms/TrustBet/Bannerontransparent.png",
     "ogImage": "realms/TrustBet/LRlogo.png",
     "communityMint": "xpFbKJa92Ee1NSYEhc3b3BVk4im8YStXRaVW6EoW33w"
+  },
+  {
+    "symbol": "BLR",
+    "displayName": "Blockride",
+    "category": "web3",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "A6ZS5ZdkyAbncb55fKjaUhBcQcovp8XcYT5AEQayv96y",
+    "bannerImage": "/realms/Blockride/banner.png",
+    "ogImage": "/realms/Blockride/logo.png",
+    "twitter": "@blockridenft",
+    "website": "https://blockride.xyz/",
+    "sortRank": 3,
+    "shortDescription": "BLOCKRIDE DAO - Building a modern approach to vehicle financing",
+    "keywords": "Web3, REALM, Governance, vehicle financing, DAO, Africans, Nigeria, RWA, Solana",
+    "github": "https://github.com/BlockrideNFT-org"
   }
 ]
