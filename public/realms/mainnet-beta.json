@@ -65,8 +65,9 @@
     "displayName": "Dean's List Solarplex State",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "4U5tep3h2wFrLskrCJAemvFVyLwGvQ8Xbuc8dBEC6smF",
+    "bannerImage": "/realms/Deans-List-Solarplex-State/img/banner-deanslist-solarplex.png",
     "twitter": "@deanslistDAO",
-    "ogImage": "/realms/Deans-List-Solarplex-State/deans_list_solarplex_state.png",
+    "ogImage": "/realms/Deans-List-Solarplex-State/img/deans_list_solarplex_state.png",
     "github": "https://github.com/Deans-List/",
     "shortDescription": "Dean's List Solarplex State oversees feedback incentives on Solarplex."
   },
