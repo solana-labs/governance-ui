@@ -945,16 +945,18 @@ const instructions = () => ({
         return (
           <div>
             <h3>{mintData && <div>Token: {mintData.symbol}</div>}</h3>
-            <>
-              <h3 className="text-orange flex items-center">
-                <WarningFilledIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
-                Suggested token tier: UNTRUSTED.
-              </h3>
-              <h3 className="text-orange flex">
-                Very low liquidity Price impact of {liqudityTier?.priceImpact}%
-                on $1000 swap. Check params carefully
-              </h3>
-            </>
+            {liqudityTier.presetKey === 'UNTRUSTED' && (
+              <>
+                <h3 className="text-orange flex items-center">
+                  <WarningFilledIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
+                  Suggested token tier: UNTRUSTED.
+                </h3>
+                <h3 className="text-orange flex">
+                  Very low liquidity Price impact of {liqudityTier?.priceImpact}
+                  % on $1000 swap. Check params carefully
+                </h3>
+              </>
+            )}
             {!invalidKeys.length && liqudityTier.presetKey && (
               <h3 className="text-green flex items-center">
                 <CheckCircleIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
