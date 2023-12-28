@@ -3369,5 +3369,15 @@
     "shortDescription": "BLOCKRIDE DAO - Building a modern approach to vehicle financing",
     "keywords": "Web3, REALM, Governance, vehicle financing, DAO, Africans, Nigeria, RWA, Solana",
     "github": "https://github.com/BlockrideNFT-org"
+  },
+  {
+    "symbol": "RAAAWR",
+    "displayName": "Solsaur DAO",
+    "bannerImage": "/realms/Solsaur/solsaur-realms-banner.png",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "ANqmLV2hQNwFm3jyfqLEBa6KTksosr6uKzcdfg9X6ReR",
+    "ogImage": "/realms/Solsaur/solsaur.png",
+    "website": "https://www.solsaur.com",
+    "twitter": "@solsauras"
   }
 ]
