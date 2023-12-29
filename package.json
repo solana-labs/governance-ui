@@ -239,7 +239,7 @@
     "@carbon/icons-react": "11.7.0",
     "@cardinal/namespaces-components": "2.5.5",
     "crypto-js": ">=4.1.1",
-    "@solana/web3.js": ">=1.78.2"
+    "@solana/web3.js": "1.78.2"
   },
   "browser": {
     "child_process": false
