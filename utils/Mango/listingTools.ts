@@ -9,11 +9,13 @@ import {
   toUiDecimalsForQuote,
 } from '@blockworks-foundation/mango-v4'
 import {
+  LISTING_PRESET,
   LISTING_PRESETS,
-  LISTING_PRESETS_KEYS,
-  LISTING_PRESETS_PYTH,
-  ListingPreset,
-  getTierWithAdjustedNetBorrows,
+  LISTING_PRESETS_KEY,
+  getPresetWithAdjustedNetBorrows,
+  getPresetWithAdjustedDepositLimit,
+  getPythPresets,
+  getSwitchBoardPresets,
 } from '@blockworks-foundation/mango-v4-settings/lib/helpers/listingTools'
 import { AnchorProvider, BN, Program, Wallet } from '@coral-xyz/anchor'
 import { MAINNET_USDC_MINT } from '@foresight-tmp/foresight-sdk/dist/consts'
@@ -169,7 +171,7 @@ export type EditTokenArgsFormatted = ListingArgsFormatted & {
   setFallbackOracle: boolean
 }
 
-const transformPresetToProposed = (listingPreset: ListingPreset) => {
+const transformPresetToProposed = (listingPreset: LISTING_PRESET) => {
   const proposedPreset: FormattedListingPreset = {
     ...listingPreset,
     'oracleConfig.maxStalenessSlots': listingPreset.maxStalenessSlots!,
@@ -194,26 +196,38 @@ type FormattedListingPreset = Omit<
 >
 
 type ProposedListingPresets = {
-  [key in LISTING_PRESETS_KEYS]: FormattedListingPreset
+  [key in LISTING_PRESETS_KEY]: FormattedListingPreset
 }
 
 export const getFormattedListingPresets = (
   isPythOracle: boolean,
-  currentTotalDepositsInUsdc?: number
+  currentTotalDepositsInUsdc?: number,
+  decimals?: number,
+  tokenPrice?: number
 ) => {
-  const PRESETS = isPythOracle ? LISTING_PRESETS_PYTH : LISTING_PRESETS
+  const PRESETS = !isPythOracle
+    ? getSwitchBoardPresets(LISTING_PRESETS)
+    : getPythPresets(LISTING_PRESETS)
 
   const PROPOSED_LISTING_PRESETS: ProposedListingPresets = Object.keys(
     PRESETS
   ).reduce((accumulator, key) => {
-    accumulator[key] = transformPresetToProposed(
-      !currentTotalDepositsInUsdc
-        ? PRESETS[key]
-        : getTierWithAdjustedNetBorrows(
-            PRESETS[key],
-            currentTotalDepositsInUsdc
-          )
-    )
+    let adjustedPreset = PRESETS[key]
+    if (currentTotalDepositsInUsdc) {
+      adjustedPreset = getPresetWithAdjustedNetBorrows(
+        PRESETS[key],
+        currentTotalDepositsInUsdc
+      )
+    }
+
+    if (decimals && tokenPrice) {
+      adjustedPreset = getPresetWithAdjustedDepositLimit(
+        adjustedPreset,
+        tokenPrice,
+        decimals
+      )
+    }
+    accumulator[key] = transformPresetToProposed(adjustedPreset)
     return accumulator
   }, {} as ProposedListingPresets)
   return PROPOSED_LISTING_PRESETS
@@ -251,17 +265,18 @@ const fetchJupiterRoutes = async (
   }
 }
 
-export const getSuggestedCoinTier = async (
+export const getSuggestedCoinPresetInfo = async (
   outputMint: string,
   hasPythOracle: boolean
 ) => {
   try {
-    const TIERS: LISTING_PRESETS_KEYS[] = [
-      'ULTRA_PREMIUM',
-      'PREMIUM',
-      'MID',
-      'MEME',
-      'SHIT',
+    const PRESETS = !hasPythOracle
+      ? getSwitchBoardPresets(LISTING_PRESETS)
+      : getPythPresets(LISTING_PRESETS)
+    const targetAmounts = [
+      ...new Set([
+        ...Object.values(PRESETS).map((x) => x.preset_target_amount),
+      ]),
     ]
 
     const swaps = await Promise.all([
@@ -279,6 +294,11 @@ export const getSuggestedCoinTier = async (
         MAINNET_USDC_MINT.toBase58(),
         outputMint,
         toNative(20000, 6).toNumber()
+      ),
+      fetchJupiterRoutes(
+        MAINNET_USDC_MINT.toBase58(),
+        outputMint,
+        toNative(10000, 6).toNumber()
       ),
       fetchJupiterRoutes(
         MAINNET_USDC_MINT.toBase58(),
@@ -311,6 +331,12 @@ export const getSuggestedCoinTier = async (
       fetchJupiterRoutes(
         MAINNET_USDC_MINT.toBase58(),
         outputMint,
+        toNative(20000, 6).toNumber(),
+        'ExactOut'
+      ),
+      fetchJupiterRoutes(
+        MAINNET_USDC_MINT.toBase58(),
+        outputMint,
         toNative(5000, 6).toNumber(),
         'ExactOut'
       ),
@@ -329,10 +355,10 @@ export const getSuggestedCoinTier = async (
       (acc: { amount: string; priceImpactPct: number }[], val) => {
         if (val.swapMode === 'ExactIn') {
           const exactOutRoute = bestRoutesSwaps.find(
-            (x) => x.amount === val.amount && x.swapMode === 'ExactOut'
+            (x) => x.outAmount === val.outAmount && x.swapMode === 'ExactOut'
           )
           acc.push({
-            amount: val.amount.toString(),
+            amount: val.outAmount.toString(),
             priceImpactPct: exactOutRoute?.priceImpactPct
               ? (val.priceImpactPct + exactOutRoute.priceImpactPct) / 2
               : val.priceImpactPct,
@@ -343,34 +369,27 @@ export const getSuggestedCoinTier = async (
       []
     )
 
-    const indexForTierFromSwaps = averageSwaps.findIndex(
+    const indexForTargetAmount = averageSwaps.findIndex(
       (x) => x?.priceImpactPct && x?.priceImpactPct * 100 < 1
     )
+    const targetAmount =
+      indexForTargetAmount > -1 ? targetAmounts[indexForTargetAmount] : 0
 
-    const tier =
-      indexForTierFromSwaps > -1 ? TIERS[indexForTierFromSwaps] : 'UNTRUSTED'
-
-    const tierLowerThenCurrent =
-      tier === 'ULTRA_PREMIUM' || tier === 'PREMIUM'
-        ? 'MID'
-        : tier === 'MID'
-        ? 'MEME'
-        : tier
-    const isPythRecommendedTier =
-      tier === 'MID' || tier === 'PREMIUM' || tier === 'ULTRA_PREMIUM'
-    const listingTier =
-      isPythRecommendedTier && !hasPythOracle ? tierLowerThenCurrent : tier
+    const preset: LISTING_PRESET =
+      Object.values(PRESETS).find(
+        (x) => x.preset_target_amount === targetAmount
+      ) || PRESETS.UNTRUSTED
 
     return {
-      tier: listingTier,
-      priceImpact: (indexForTierFromSwaps > -1
-        ? averageSwaps[indexForTierFromSwaps]!.priceImpactPct
+      presetKey: preset.preset_key,
+      priceImpact: (indexForTargetAmount > -1
+        ? averageSwaps[indexForTargetAmount]!.priceImpactPct
         : 100
       ).toFixed(2),
     }
   } catch (e) {
     return {
-      tier: 'UNTRUSTED',
+      presetKey: 'UNTRUSTED',
       priceImpact: 100,
     }
   }
@@ -678,7 +697,7 @@ export const getFormattedBankValues = (group: Group, bank: Bank) => {
     netBorrowLimitWindowSizeTs: secondsToHours(
       bank.netBorrowLimitWindowSizeTs.toNumber()
     ),
-    depositLimit: bank.depositLimit.toNumber(),
+    depositLimit: bank.depositLimit.toString(),
     interestTargetUtilization: bank.interestTargetUtilization,
     interestCurveScaling: bank.interestCurveScaling,
     reduceOnly: REDUCE_ONLY_OPTIONS[bank.reduceOnly].name,
