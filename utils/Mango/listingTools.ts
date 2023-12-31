@@ -277,11 +277,6 @@ export const getSuggestedCoinPresetInfo = async (
     const PRESETS = !hasPythOracle
       ? getSwitchBoardPresets(LISTING_PRESETS)
       : getPythPresets(LISTING_PRESETS)
-    const targetAmounts = [
-      ...new Set([
-        ...Object.values(PRESETS).map((x) => x.preset_target_amount),
-      ]),
-    ]
 
     const swaps = await Promise.all([
       fetchJupiterRoutes(
@@ -359,8 +354,9 @@ export const getSuggestedCoinPresetInfo = async (
       (acc: { amount: string; priceImpactPct: number }[], val) => {
         if (val.swapMode === 'ExactIn') {
           const exactOutRoute = bestRoutesSwaps.find(
-            (x) => x.outAmount === val.outAmount && x.swapMode === 'ExactOut'
+            (x) => x.outAmount === val.inAmount && x.swapMode === 'ExactOut'
           )
+
           acc.push({
             amount: val.inAmount.toString(),
             priceImpactPct: exactOutRoute?.priceImpactPct
@@ -380,7 +376,10 @@ export const getSuggestedCoinPresetInfo = async (
     )
 
     const targetAmount =
-      indexForTargetAmount > -1 ? targetAmounts[indexForTargetAmount] : 0
+      indexForTargetAmount > -1
+        ? toUiDecimals(new BN(averageSwaps[indexForTargetAmount].amount), 6)
+        : 0
+
     const preset: LISTING_PRESET =
       Object.values(PRESETS).find(
         (x) => x.preset_target_amount === targetAmount

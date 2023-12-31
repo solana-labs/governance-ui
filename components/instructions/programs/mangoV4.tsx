@@ -555,9 +555,10 @@ const instructions = () => ({
                 label="Interest Curve Scaling"
                 valKey="interestCurveScaling"
               />
-              <DisplayListingPropertyWrapped
+              <DisplayNullishProperty
                 label="Group Insurance Fund"
-                valKey="groupInsuranceFund"
+                value={formattedProposedArgs.groupInsuranceFund.toString()}
+                suggestedVal={invalidFields.groupInsuranceFund?.toString()}
               />
             </div>
             <AdvancedOptionsDropdown className="mt-4" title="Raw values">
