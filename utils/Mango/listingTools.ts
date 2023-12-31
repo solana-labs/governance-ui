@@ -242,25 +242,29 @@ const fetchJupiterRoutes = async (
   feeBps = 0
 ) => {
   {
-    const paramsString = new URLSearchParams({
-      inputMint: inputMint.toString(),
-      outputMint: outputMint.toString(),
-      amount: amount.toString(),
-      slippageBps: Math.ceil(slippage * 100).toString(),
-      feeBps: feeBps.toString(),
-      swapMode,
-    }).toString()
+    try {
+      const paramsString = new URLSearchParams({
+        inputMint: inputMint.toString(),
+        outputMint: outputMint.toString(),
+        amount: amount.toString(),
+        slippageBps: Math.ceil(slippage * 100).toString(),
+        feeBps: feeBps.toString(),
+        swapMode,
+      }).toString()
 
-    const response = await fetch(
-      `https://quote-api.jup.ag/v4/quote?${paramsString}`
-    )
+      const response = await fetch(
+        `https://quote-api.jup.ag/v6/quote?${paramsString}`
+      )
 
-    const res = await response.json()
-    const data = res.data
-
-    return {
-      routes: res.data as RouteInfo[],
-      bestRoute: (data.length ? data[0] : null) as RouteInfo | null,
+      const res = await response.json()
+      return {
+        bestRoute: (res ? res : null) as RouteInfo | null,
+      }
+    } catch (e) {
+      console.log(e)
+      return {
+        bestRoute: null,
+      }
     }
   }
 }
@@ -273,11 +277,6 @@ export const getSuggestedCoinPresetInfo = async (
     const PRESETS = !hasPythOracle
       ? getSwitchBoardPresets(LISTING_PRESETS)
       : getPythPresets(LISTING_PRESETS)
-    const targetAmounts = [
-      ...new Set([
-        ...Object.values(PRESETS).map((x) => x.preset_target_amount),
-      ]),
-    ]
 
     const swaps = await Promise.all([
       fetchJupiterRoutes(
@@ -355,13 +354,16 @@ export const getSuggestedCoinPresetInfo = async (
       (acc: { amount: string; priceImpactPct: number }[], val) => {
         if (val.swapMode === 'ExactIn') {
           const exactOutRoute = bestRoutesSwaps.find(
-            (x) => x.outAmount === val.outAmount && x.swapMode === 'ExactOut'
+            (x) => x.outAmount === val.inAmount && x.swapMode === 'ExactOut'
           )
+
           acc.push({
-            amount: val.outAmount.toString(),
+            amount: val.inAmount.toString(),
             priceImpactPct: exactOutRoute?.priceImpactPct
-              ? (val.priceImpactPct + exactOutRoute.priceImpactPct) / 2
-              : val.priceImpactPct,
+              ? (Number(val.priceImpactPct) +
+                  Number(exactOutRoute.priceImpactPct)) /
+                2
+              : Number(val.priceImpactPct),
           })
         }
         return acc
@@ -372,8 +374,11 @@ export const getSuggestedCoinPresetInfo = async (
     const indexForTargetAmount = averageSwaps.findIndex(
       (x) => x?.priceImpactPct && x?.priceImpactPct * 100 < 1
     )
+
     const targetAmount =
-      indexForTargetAmount > -1 ? targetAmounts[indexForTargetAmount] : 0
+      indexForTargetAmount > -1
+        ? toUiDecimals(new BN(averageSwaps[indexForTargetAmount].amount), 6)
+        : 0
 
     const preset: LISTING_PRESET =
       Object.values(PRESETS).find(
@@ -388,6 +393,7 @@ export const getSuggestedCoinPresetInfo = async (
       ).toFixed(2),
     }
   } catch (e) {
+    console.log(e)
     return {
       presetKey: 'UNTRUSTED',
       priceImpact: 100,

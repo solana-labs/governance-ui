@@ -319,17 +319,20 @@ const instructions = () => ({
         return (
           <div>
             <div className="pb-4 space-y-3">
-              <>
-                <h3 className="text-orange flex items-center">
-                  <WarningFilledIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
-                  Suggested token tier: UNTRUSTED.
-                </h3>
-                <h3 className="text-orange flex">
-                  Very low liquidity Price impact of {presetInfo.priceImpact}%
-                  on $1000 swap. This token should probably be listed using the
-                  Register Trustless Token instruction check params carefully
-                </h3>
-              </>
+              {presetInfo.presetKey === 'UNTRUSTED' && (
+                <>
+                  <h3 className="text-orange flex items-center">
+                    <WarningFilledIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
+                    Suggested token tier: UNTRUSTED.
+                  </h3>
+                  <h3 className="text-orange flex">
+                    Very low liquidity Price impact of {presetInfo.priceImpact}%
+                    on $1000 swap. This token should probably be listed using
+                    the Register Trustless Token instruction check params
+                    carefully
+                  </h3>
+                </>
+              )}
               {!invalidKeys.length && (
                 <h3 className="text-green flex items-center">
                   <CheckCircleIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
@@ -525,9 +528,24 @@ const instructions = () => ({
                 label="Flash Loan Deposit Fee Rate"
                 valKey="flashLoanSwapFeeRate"
               />
-              <DisplayListingPropertyWrapped
+              <DisplayNullishProperty
                 label="Deposit Limit"
-                valKey="depositLimit"
+                value={
+                  mintInfo
+                    ? toUiDecimals(
+                        new BN(formattedProposedArgs.depositLimit.toString()),
+                        mintInfo.account.decimals
+                      )
+                    : formattedProposedArgs.depositLimit
+                }
+                suggestedVal={
+                  mintInfo && invalidFields?.depositLimit
+                    ? toUiDecimals(
+                        new BN(invalidFields.depositLimit.toString()),
+                        mintInfo.account.decimals
+                      )
+                    : invalidFields.depositLimit
+                }
               />
               <DisplayListingPropertyWrapped
                 label="Interest Target Utilization"
@@ -537,9 +555,10 @@ const instructions = () => ({
                 label="Interest Curve Scaling"
                 valKey="interestCurveScaling"
               />
-              <DisplayListingPropertyWrapped
+              <DisplayNullishProperty
                 label="Group Insurance Fund"
-                valKey="groupInsuranceFund"
+                value={formattedProposedArgs.groupInsuranceFund.toString()}
+                suggestedVal={invalidFields.groupInsuranceFund?.toString()}
               />
             </div>
             <AdvancedOptionsDropdown className="mt-4" title="Raw values">
