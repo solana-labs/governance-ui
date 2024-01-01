@@ -70,7 +70,7 @@ const GovernancePowerCard = () => {
         <div className="flex flex-col gap-2">
           {realmConfig?.account.communityTokenConfig.tokenType ===
           GoverningTokenType.Dormant ? null : (
-            <GovernancePowerForRole role="community" />
+            <GovernancePowerForRole role="community" votingPower={communityPower.result} />
           )}
           {realmConfig?.account.councilTokenConfig.tokenType ===
           GoverningTokenType.Dormant ? null : (

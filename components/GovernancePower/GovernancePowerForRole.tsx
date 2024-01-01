@@ -12,12 +12,15 @@ import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecor
 import { ExclamationIcon } from '@heroicons/react/solid'
 import { VSR_PLUGIN_PKS } from '@constants/plugins'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import { BN } from '@coral-xyz/anchor'
+import SimpleVotingPower from '@components/ProposalVotingPower/SimpleVotingPower'
 
 export default function GovernancePowerForRole({
   role,
   ...props
 }: {
-  role: 'community' | 'council'
+  role: 'community' | 'council',
+  votingPower? : BN,
   hideIfZero?: boolean
   className?: string
 }) {
@@ -74,7 +77,11 @@ export default function GovernancePowerForRole({
           <NftVotingPower />
         ) : kind === 'HeliumVSR' ? (
           <LockedCommunityNFTRecordVotingPower />
-        ) : null
+        )
+         : kind == 'pyth' && props.votingPower ? (
+          <SimpleVotingPower role = 'community' {...props} /> 
+         )
+        : null
       ) : kind === 'vanilla' ? (
         <div>
           <VanillaVotingPower role="council" {...props} />
