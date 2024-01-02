@@ -3379,5 +3379,19 @@
     "ogImage": "/realms/Solsaur/solsaur.png",
     "website": "https://www.solsaur.com",
     "twitter": "@solsauras"
+  },
+  {
+    "symbol": "Conk",
+    "displayName": "Conk Dao",
+    "category": "web3",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "A3jzUmuVqbyzqLgHtmMA2igUeACScRiSk71Hy27ehieo",
+    "bannerImage": "/realms/ConkDao/conk_banner.png",
+    "ogImage": "/realms/ConkDao/conk.png",
+    "twitter": "@Conk_Coin",
+    "website": "https://conkcoin.club",
+    "sortRank": 3,
+    "shortDescription": "Conk DAO - The People's Cat Coin",
+    "keywords": "Web3, REALM, Governance, Meme, DAO, Solana"
   }
 ]
