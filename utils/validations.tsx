@@ -510,9 +510,9 @@ export const getDualFinanceGovernanceAirdropSchema = ({
       ),
     treasury: yup.object().typeError('Treasury is required'),
     amount: yup
-      .number()
+      .string()
       .typeError('Amount is required')
-      .test('amount', 'amount', async function (val: number) {
+      .test('amount', 'amount', async function (val: string) {
         if (!form.treasury) {
           return this.createError({
             message: `Please select a treasury`,
@@ -584,9 +584,9 @@ export const getDualFinanceMerkleAirdropSchema = ({ form }: { form: any }) => {
       ),
     treasury: yup.object().typeError('Treasury is required'),
     amount: yup
-      .number()
+      .string()
       .typeError('Amount is required')
-      .test('amount', 'amount', async function (val: number) {
+      .test('amount', 'amount', async function (val: string) {
         if (!form.treasury) {
           return this.createError({
             message: `Please select a treasury`,
@@ -634,9 +634,9 @@ export const getDualFinanceLiquidityStakingOptionSchema = ({
         }
       ),
     numTokens: yup
-      .number()
+      .string()
       .typeError('Num tokens is required')
-      .test('amount', 'amount', async function (val: number) {
+      .test('amount', 'amount', async function (val: string) {
         if (!form.baseTreasury) {
           return this.createError({
             message: `Please select a treasury`,
@@ -716,9 +716,9 @@ export const getDualFinanceStakingOptionSchema = ({
         }
       ),
     numTokens: yup
-      .number()
+      .string()
       .typeError('Num tokens is required')
-      .test('amount', 'amount', async function (val: number) {
+      .test('amount', 'amount', async function (val: string) {
         if (!form.baseTreasury) {
           return this.createError({
             message: `Please select a treasury`,
@@ -775,9 +775,9 @@ export const getDualFinanceGsoSchema = ({ form }: { form: any }) => {
         }
       ),
     numTokens: yup
-      .number()
+      .string()
       .typeError('Num tokens is required')
-      .test('amount', 'amount', async function (val: number) {
+      .test('amount', 'amount', async function (val: string) {
         if (!form.baseTreasury) {
           return this.createError({
             message: `Please select a treasury`,
