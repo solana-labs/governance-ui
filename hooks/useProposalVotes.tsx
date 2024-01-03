@@ -10,15 +10,18 @@ import {
   useRealmCouncilMintInfoQuery,
 } from './queries/mintInfo'
 import { useGovernanceByPubkeyQuery } from './queries/governance'
+import useScalingFactor from './PythNetwork/useScalingFactor'
 
 // TODO support council plugins
 export default function useProposalVotes(proposal?: Proposal) {
+  const scalingFactor = useScalingFactor();
   const realm = useRealmQuery().data?.result
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
   const maxVoteRecord = useMaxVoteRecord()
   const governance = useGovernanceByPubkeyQuery(proposal?.governance).data
     ?.result?.account
+
 
   const programVersion = useProgramVersion()
 
@@ -28,7 +31,7 @@ export default function useProposalVotes(proposal?: Proposal) {
       ? mint
       : councilMint
   // TODO: optimize using memo
-  if (!realm || !proposal || !governance || !proposalMint || !programVersion || proposal.voteType != VoteType.SINGLE_CHOICE)
+  if (!realm || !proposal || !governance || !proposalMint || !programVersion || proposal.voteType != VoteType.SINGLE_CHOICE || !scalingFactor)
     return {
       _programVersion: undefined,
       voteThresholdPct: undefined,
@@ -100,12 +103,12 @@ export default function useProposalVotes(proposal?: Proposal) {
     voteThresholdPct,
     yesVotePct,
     yesVoteProgress,
-    yesVoteCount,
-    noVoteCount,
+    yesVoteCount : Math.floor(yesVoteCount * scalingFactor),
+    noVoteCount : Math.floor(noVoteCount * scalingFactor),
     relativeYesVotes,
     relativeNoVotes,
     minimumYesVotes,
-    yesVotesRequired,
+    yesVotesRequired : yesVotesRequired * scalingFactor,
   }
 
   // @asktree: you may be asking yourself, "is this different from the more succinct way to write this?"
