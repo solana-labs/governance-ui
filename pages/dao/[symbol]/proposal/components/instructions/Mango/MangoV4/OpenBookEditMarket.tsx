@@ -142,7 +142,7 @@ const OpenBookEditMarket = ({
       )
       setForm((prevForm) => ({
         ...prevForm,
-        oraclePriceBand: 0,
+        oraclePriceBand: Number(market?.oraclePriceBand) || 0,
         reduceOnly: market?.reduceOnly || false,
         forceClose: market?.forceClose || false,
         name: market?.name || '',
@@ -175,6 +175,13 @@ const OpenBookEditMarket = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'holdupTime',
+    },
+    {
+      label: 'Price band',
+      initialValue: form.oraclePriceBand,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'oraclePriceBand',
     },
     {
       label: 'Market',
