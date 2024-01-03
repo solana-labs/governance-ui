@@ -520,8 +520,8 @@ export const getDualFinanceGovernanceAirdropSchema = ({
         }
         const numAtomsInTreasury = new BN(
           form.treasury.extensions.token.account.amount
-          )
-          if (numAtomsInTreasury.lt(new BN(val))) {
+        )
+        if (numAtomsInTreasury.lt(new BN(val))) {
           return this.createError({
             message: `Not enough tokens`,
           })
@@ -594,8 +594,8 @@ export const getDualFinanceMerkleAirdropSchema = ({ form }: { form: any }) => {
         }
         const numAtomsInTreasury = new BN(
           form.treasury.extensions.token.account.amount
-          )
-          if (numAtomsInTreasury.lt(new BN(val))) {
+        )
+        if (numAtomsInTreasury.lt(new BN(val))) {
           return this.createError({
             message: `Not enough tokens`,
           })
@@ -644,8 +644,8 @@ export const getDualFinanceLiquidityStakingOptionSchema = ({
         }
         const numAtomsInTreasury = new BN(
           form.baseTreasury.extensions.token.account.amount
-          )
-          if (numAtomsInTreasury.lt(new BN(val))) {
+        )
+        if (numAtomsInTreasury.lt(new BN(val))) {
           return this.createError({
             message: `Not enough tokens`,
           })
@@ -785,8 +785,8 @@ export const getDualFinanceGsoSchema = ({ form }: { form: any }) => {
         }
         const numAtomsInTreasury = new BN(
           form.baseTreasury.extensions.token.account.amount
-          )
-          if (numAtomsInTreasury.lt(new BN(val))) {
+        )
+        if (numAtomsInTreasury.lt(new BN(val))) {
           return this.createError({
             message: `Not enough tokens`,
           })
