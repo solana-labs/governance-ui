@@ -30,6 +30,7 @@ import {
   VersionedTransaction,
 } from '@solana/web3.js'
 import SwitchboardProgram from '@switchboard-xyz/sbv2-lite'
+import { notify } from '@utils/notifications'
 import Big from 'big.js'
 import { secondsToHours } from 'date-fns'
 
@@ -535,9 +536,6 @@ export const getBestMarket = async ({
     if (!markets.length) {
       return undefined
     }
-    if (markets.length === 1) {
-      return markets[0].publicKey
-    }
     const marketsDataJsons = await Promise.all([
       ...markets.map((x) =>
         fetch(`/openSerumApi/market/${x.publicKey.toBase58()}`)
@@ -546,12 +544,26 @@ export const getBestMarket = async ({
     const marketsData = await Promise.all([
       ...marketsDataJsons.map((x) => x.json()),
     ])
-    const bestMarket = marketsData.sort((a, b) => b.volume24h - a.volume24h)
-    return bestMarket.length
-      ? new PublicKey(bestMarket[0].id)
-      : markets[0].publicKey
+    let error = ''
+    let sortedMarkets = marketsData.sort((a, b) => b.volume24h - a.volume24h)
+    let firstBestMarket = sortedMarkets[0]
+
+    if (firstBestMarket.volume24h === 0) {
+      error = 'Openbook market had 0 volume in last 24h check it carefully'
+    }
+    sortedMarkets = sortedMarkets.sort(
+      (a, b) => b.quoteDepositsTotal - a.quoteDepositsTotal
+    )
+    firstBestMarket = sortedMarkets[0]
+
+    return sortedMarkets.length
+      ? { pubKey: new PublicKey(firstBestMarket.id), error: error }
+      : undefined
   } catch (e) {
-    return null
+    notify({
+      message: 'Openbook market not found',
+      type: 'error',
+    })
   }
 }
 
