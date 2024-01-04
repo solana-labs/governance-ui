@@ -623,7 +623,7 @@ const instructions = () => ({
       try {
         return (
           <div>
-            {bestMarket && openbookMarketPk.equals(bestMarket) && (
+            {bestMarket && openbookMarketPk.equals(bestMarket.pubKey) && (
               <div className="text-green flex items-center">
                 <CheckCircleIcon className="w-5 mr-2"></CheckCircleIcon>
                 Proposed market match the best market according to listing
@@ -636,7 +636,13 @@ const instructions = () => ({
                 Best market not found check market carefully
               </div>
             )}
-            {bestMarket && !openbookMarketPk.equals(bestMarket) && (
+            {bestMarket?.error && (
+              <div className="text-orange flex items-center pb-4">
+                <WarningFilledIcon className="w-5 mr-2"></WarningFilledIcon>
+                {bestMarket?.error}
+              </div>
+            )}
+            {bestMarket && !openbookMarketPk.equals(bestMarket.pubKey) && (
               <div className="flex flex-row text-orange ">
                 <div className="flex items-center">
                   <WarningFilledIcon className="w-5 mr-2"></WarningFilledIcon>
@@ -646,7 +652,7 @@ const instructions = () => ({
                     <a
                       className="underline"
                       target="_blank"
-                      href={`https://openserum.io/${bestMarket.toBase58()}`}
+                      href={`https://openserum.io/${bestMarket.pubKey.toBase58()}`}
                       rel="noreferrer"
                     >
                       Suggested Openbook market link
