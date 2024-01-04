@@ -380,10 +380,10 @@
     lodash "^4.17.21"
     node-kraken-api "^2.2.2"
 
-"@blockworks-foundation/mangolana@0.0.1-beta.15":
-  version "0.0.1-beta.15"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mangolana/-/mangolana-0.0.1-beta.15.tgz#5442044ecb54c2f57128155665c0b1d9ecbdda39"
-  integrity sha512-VDSRGHhrtR4nyjGEqQGLBLWbQLFn1Kh1SoaqwwV3De0Ls0WDhe8C5aTDQ8k028XKrlHRC5O1QkJrwWskqKvqNw==
+"@blockworks-foundation/mangolana@0.0.1-beta.16":
+  version "0.0.1-beta.16"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mangolana/-/mangolana-0.0.1-beta.16.tgz#37e27ca076a4961f0e23f9664c0d7fbd667c7e22"
+  integrity sha512-zdCaVfno129OmPuABzkcPjNhXNc6PLk56u6DH3bjBebG31CY2udMXfP3zlV2TN9l9Y54zM7oJS3WItbzRPKMfQ==
   dependencies:
     "@solana/web3.js" "^1.63.1"
     bs58 "^5.0.0"
