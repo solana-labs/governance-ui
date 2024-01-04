@@ -169,22 +169,20 @@ export const createProposal = async (
           ...instruction.prerequisiteInstructionsSigners
         )
       }
-      for (let i = 0; i < 10; i++) {
-        await withInsertTransaction(
-          insertInstructions,
-          programId,
-          programVersion,
-          governance,
-          proposalAddress,
-          tokenOwnerRecord.pubkey,
-          governanceAuthority,
-          index,
-          0,
-          instruction.holdUpTime || 0,
-          [instruction.data],
-          payer
-        )
-      }
+      await withInsertTransaction(
+        insertInstructions,
+        programId,
+        programVersion,
+        governance,
+        proposalAddress,
+        tokenOwnerRecord.pubkey,
+        governanceAuthority,
+        index,
+        0,
+        instruction.holdUpTime || 0,
+        [instruction.data],
+        payer
+      )
     }
   }
 
