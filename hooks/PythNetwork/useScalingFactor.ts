@@ -6,7 +6,9 @@ import { useConnection } from "@solana/wallet-adapter-react";
 import { useAsync } from "react-async-hook";
 import { useQuery } from "@tanstack/react-query";
 
-
+/**
+ * Returns 1 for everything except the Pyth DAO
+ */
 export default function useScalingFactor(): number {
     const realm = useSelectedRealmPubkey()
     const { connection } = useConnection()
