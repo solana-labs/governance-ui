@@ -1,33 +1,31 @@
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
 import { determineVotingPowerType } from "@hooks/queries/governancePower";
-import { useRealmQuery } from "@hooks/queries/realm";
+import useSelectedRealmPubkey from "@hooks/selectedRealm/useSelectedRealmPubkey";
 import { PythClient } from "@pythnetwork/staking";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { useAsync } from "react-async-hook";
+import { useQuery } from "@tanstack/react-query";
 
 
-export default function useScalingFactor() : number | undefined {
-    const realm = useRealmQuery().data?.result
-    const {connection} = useConnection()
+export default function useScalingFactor(): number {
+    const realm = useSelectedRealmPubkey()
+    const { connection } = useConnection()
     const { result: plugin } = useAsync(
         async () =>
-        realm && determineVotingPowerType(connection, realm.pubkey, 'community'),
+            realm && determineVotingPowerType(connection, realm, 'community'),
         [connection, realm]
-      )
+    )
 
-    const {result : scalingFactorResult } = useAsync(
-        async () => {
-        if (plugin !== 'pyth') {
-            return 1
-        }
-        else if (plugin === 'pyth') {
+    const { data: scalingFactor } = useQuery(["pyth-scaling-factor"],
+        async (): Promise<number> => {
             const pythClient = await PythClient.connect(connection, {} as NodeWallet)
             return pythClient.getScalingFactor()
-        }
-    },
-        [connection, plugin]
-      )
-      return scalingFactorResult 
-    
+        }, { enabled: plugin == "pyth" })
+
+    if (plugin == "pyth") {
+        return scalingFactor || 1
+    } else {
+        return 1
     }
-    
+}
+
