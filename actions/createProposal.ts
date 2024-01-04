@@ -96,11 +96,11 @@ export const createProposal = async (
 
   const voteType = isMulti
     ? VoteType.MULTI_CHOICE(
-      MultiChoiceType.FullWeight,
-      1,
-      options.length,
-      options.length
-    )
+        MultiChoiceType.FullWeight,
+        1,
+        options.length,
+        options.length
+      )
     : VoteType.SINGLE_CHOICE
 
   //will run only if plugin is connected with realm
