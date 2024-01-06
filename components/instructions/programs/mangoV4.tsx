@@ -602,13 +602,13 @@ const instructions = () => ({
       const banks = [...mangoGroup.banksMapByMint.values()].map((x) => x[0])
       let baseMint = banks.find((x) => x.publicKey.equals(baseBank))?.mint
       let quoteMint = banks.find((x) => x.publicKey.equals(quoteBank))?.mint
+      const currentMarket = await Market.load(
+        connection,
+        openbookMarketPk,
+        undefined,
+        openBookProgram
+      )
       if (!baseMint || !quoteMint) {
-        const currentMarket = await Market.load(
-          connection,
-          openbookMarketPk,
-          undefined,
-          openBookProgram
-        )
         baseMint = currentMarket.baseMintAddress
         quoteMint = currentMarket.quoteMintAddress
       }
@@ -671,6 +671,21 @@ const instructions = () => ({
               >
                 Proposed Openbook market link
               </a>
+            </div>
+            {console.log(currentMarket)}
+            <div className="my-4">
+              <div>Tick Size: {currentMarket.tickSize}</div>
+              <div>
+                Base Lot Size: {currentMarket.decoded?.baseLotSize?.toNumber()}
+              </div>
+              <div>
+                Quote Lot Size:{' '}
+                {currentMarket.decoded?.quoteLotSize?.toNumber()}
+              </div>
+              <div>
+                Quote decimals: {currentMarket['_quoteSplTokenDecimals']}
+              </div>
+              <div>Base decimals: {currentMarket['_baseSplTokenDecimals']}</div>
             </div>
             {info}
           </div>
