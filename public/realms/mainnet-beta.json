@@ -3393,5 +3393,17 @@
     "sortRank": 3,
     "shortDescription": "Conk DAO - The People's Cat Coin",
     "keywords": "Web3, REALM, Governance, Meme, DAO, Solana"
+  },
+  {
+    "symbol": "MEMES",
+    "category": "defi",
+    "bannerImage": "https://twitter.com/MemeCoinDAOai/photo",
+    "displayName": "MemeCoinDAOai",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Ecar1VyamYnR2UzJzJbQMKR9Zq1U5p1xuUUsnzceDiaH",
+    "ogImage": "/realms/MemeCoinDAOai",
+    "shortDescription": "Meme Life",
+    "website": "https://www.memecoindao.ai",
+    "twitter": "@MemeCoinDAOai"
   }
 ]
