@@ -1,16 +1,4 @@
-[ {
-    "symbol": "MEMES",
-    "category": "defi",
-    "bannerImage": "https://twitter.com/MemeCoinDAOai/photo",
-    "displayName": "MemeCoinDAOai",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "Ecar1VyamYnR2UzJzJbQMKR9Zq1U5p1xuUUsnzceDiaH",
-    "ogImage": "https://www.memecoindao.ai/wp-content/uploads/2023/12/22.svg",
-    "shortDescription": "Meme Life",
-    "website": "https://www.memecoindao.ai",
-    "twitter": "@MemeCoinDAOai",  
-      }
-  {
+ {
     "symbol": "CAS",
     "displayName": "Cyborg Ape Society",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
