@@ -23,5 +23,6 @@ jobs:
       - name: Run the governance notifier script
         run: npx ts-node scripts/governance-notifier.ts
         env:
+          MAINNET_RPC: https://api.metaplex.solana.com/
           CLUSTER_URL: https://api.metaplex.solana.com/
           WEBHOOK_URL: https://webhook.site/b48b863e-d364-433a-b55b-bbc86db7d1ed
