@@ -29,6 +29,7 @@ export function errorWrapper() {
 
 export async function runNotifier() {
   const REALM = 'Jito'
+  console.log("starting governance notifier")
   const connectionContext = getConnectionContext('mainnet')
   const realmInfo = await getCertifiedRealmInfo(REALM, connectionContext)
 
@@ -203,3 +204,5 @@ export async function runNotifier() {
     `-- countOpenForVotingSinceSomeTime: ${countOpenForVotingSinceSomeTime}, countJustOpenedForVoting: ${countJustOpenedForVoting}, countVotingNotStartedYet: ${countVotingNotStartedYet}, countClosed: ${countClosed}, countCancelled: ${countCancelled}`
   )
 }
+
+errorWrapper()
