@@ -1,7 +1,7 @@
 {
   "crons": [
     {
-      "path": "/api/governance-notifier",
+      "path": "/api/gov-notifier",
       "schedule": "*/10 * * * *"
     }
   ]

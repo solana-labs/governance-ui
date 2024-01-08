@@ -206,6 +206,7 @@ export async function runNotifier() {
   }
 
   if (!webhookTriggered && process.env.WEBHOOK_URL) {
+    console.log("Nothing to Report")
     axios.post(process.env.WEBHOOK_URL, { content: 'Nothing to Report' })
   }
 
