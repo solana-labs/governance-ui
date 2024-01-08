@@ -29,7 +29,7 @@ export function errorWrapper() {
 
 export async function runNotifier() {
   const REALM = 'Jito'
-  console.log("starting governance notifier")
+  console.log('Starting governance notifier')
   const connectionContext = getConnectionContext('mainnet')
   const realmInfo = await getCertifiedRealmInfo(REALM, connectionContext)
 
@@ -43,6 +43,7 @@ export async function runNotifier() {
   )
 
   const governancesMap = accountsToPubkeyMap(governances)
+  let webhookTriggered = false
 
   console.log(`- getting all proposals for all governances`)
   const proposalsByGovernance = await Promise.all(
@@ -125,6 +126,7 @@ export async function runNotifier() {
           console.log(msg)
           if (process.env.WEBHOOK_URL) {
             axios.post(process.env.WEBHOOK_URL, { content: msg })
+            webhookTriggered = true
           }
         }
         countClosed++
@@ -159,6 +161,7 @@ export async function runNotifier() {
         console.log(msg)
         if (process.env.WEBHOOK_URL) {
           axios.post(process.env.WEBHOOK_URL, { content: msg })
+          webhookTriggered = true
         }
       }
       // note that these could also include those in finalizing state, but this is just for logging
@@ -196,10 +199,16 @@ export async function runNotifier() {
         console.log(msg)
         if (process.env.WEBHOOK_URL) {
           axios.post(process.env.WEBHOOK_URL, { content: msg })
+          webhookTriggered = true
         }
       }
     }
   }
+
+  if (!webhookTriggered && process.env.WEBHOOK_URL) {
+    axios.post(process.env.WEBHOOK_URL, { content: 'Nothing to Report' })
+  }
+
   console.log(
     `-- countOpenForVotingSinceSomeTime: ${countOpenForVotingSinceSomeTime}, countJustOpenedForVoting: ${countJustOpenedForVoting}, countVotingNotStartedYet: ${countVotingNotStartedYet}, countClosed: ${countClosed}, countCancelled: ${countCancelled}`
   )
