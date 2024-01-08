@@ -242,14 +242,14 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
     },
     handleSetPythClient: async (wallet, connection) => {
       if (wallet) {
-      const pythClient = await PythClient.connect(connection.current, wallet as unknown as Wallet)
-      const maxVoterWeight = (await pythClient.program.methods.updateMaxVoterWeight().pubkeys()).maxVoterRecord
-      set((s) => {
-        s.state.pythClient = pythClient
-        s.state.maxVoterWeight = maxVoterWeight
-      })
+        const pythClient = await PythClient.connect(connection.current, wallet as unknown as Wallet)
+        const maxVoterWeight = (await pythClient.program.methods.updateMaxVoterWeight().pubkeys()).maxVoterRecord
+        set((s) => {
+          s.state.pythClient = pythClient
+          s.state.maxVoterWeight = maxVoterWeight
+        })
+      }
     }
-  }
   })
 )
 
