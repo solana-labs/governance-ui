@@ -31,6 +31,13 @@ export const DEFAULT_CIVIC_CONFIG = {
   maxVotingProgramId: undefined,
 };
 
+export const DEFAULT_QV_CONFIG = {
+  votingProgramId: new PublicKey('quadCSapU8nTdLg73KHDnmdxKnJQsh7GUbu5tZfnRRr'),
+  maxVotingProgramId: new PublicKey(
+    'quadCSapU8nTdLg73KHDnmdxKnJQsh7GUbu5tZfnRRr',
+  ),
+};
+
 const itemStyles = cx(
   'border',
   'cursor-pointer',
@@ -65,6 +72,7 @@ interface Props {
   allowNFT?: boolean;
   allowCivic?: boolean;
   allowVSR?: boolean;
+  allowQV?: boolean;
   className?: string;
   communityMint: Config['communityMint'];
   currentStructure: VotingStructure;
@@ -118,6 +126,10 @@ function isCivicConfig(config: Props['structure']) {
   return areConfigsEqual(config, DEFAULT_CIVIC_CONFIG);
 }
 
+function isQVConfig(config: Props['structure']) {
+  return areConfigsEqual(config, DEFAULT_QV_CONFIG);
+}
+
 function isCustomConfig(config: Props['structure']) {
   return !isNFTConfig(config) && !isVSRConfig(config) && !isCivicConfig(config);
 }
@@ -135,6 +147,10 @@ export function getLabel(value: Props['structure']): string {
     return 'Civic';
   }
 
+  if (isQVConfig(value)) {
+    return 'QV';
+  }
+
   return 'Custom';
 }
 
@@ -149,6 +165,10 @@ function getDescription(value: Props['structure']): string {
 
   if (isCivicConfig(value)) {
     return 'Governance based on Civic verification';
+  }
+
+  if (isQVConfig(value)) {
+    return 'Quadratic voting';
   }
 
   return 'Add a custom program ID for governance structure';
@@ -273,6 +293,7 @@ export function VotingStructureSelector(props: Props) {
               ...(props.allowCivic ? [DEFAULT_CIVIC_CONFIG] : []),
               ...(props.allowNFT ? [DEFAULT_NFT_CONFIG] : []),
               ...(props.allowVSR ? [DEFAULT_VSR_CONFIG] : []),
+              ...(props.allowQV ? [DEFAULT_QV_CONFIG] : []),
               ...(isCustomConfig(props.currentStructure)
                 ? [props.currentStructure]
                 : [{}]),

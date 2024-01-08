@@ -20,14 +20,11 @@ import {
   getMaxVoterWeightRecord,
   getRegistrarPDA,
 } from '@utils/plugin/accounts';
-import {
-  configureCivicRegistrarIx,
-  createCivicRegistrarIx,
-} from '@utils/plugin/gateway';
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient';
 
 import { Config } from './fetchConfig';
 import { buildUpdates, diff } from './UpdatesList';
+import {configureCivicRegistrarIx, createCivicRegistrarIx} from "../../../GatewayPlugin/sdk/api";
 
 function shouldAddConfigInstruction(config: Config, currentConfig: Config) {
   const updates = diff(buildUpdates(currentConfig), buildUpdates(config));

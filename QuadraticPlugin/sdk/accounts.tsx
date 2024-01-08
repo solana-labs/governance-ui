@@ -4,30 +4,34 @@ import {
   ProgramAccount,
   Realm,
 } from '@solana/spl-governance'
-import { GatewayClient } from '@solana/governance-program-library'
+import { QuadraticClient } from '@solana/governance-program-library'
 import { getRegistrarPDA, getVoterWeightRecord } from '@utils/plugin/accounts'
-import { notify } from '@utils/notifications'
+import {Coefficients} from "./api";
 
-export const getGatekeeperNetwork = async (
-  client: GatewayClient,
+export const getCoefficients = async (
+  client: QuadraticClient,
   realm: ProgramAccount<Realm>
-): Promise<PublicKey> => {
+): Promise<Coefficients> => {
   // Get the registrar for the realm
   const { registrar } = await getRegistrarPDA(
     realm.pubkey,
     realm.account.communityMint,
     client.program.programId
   )
-  const registrarObject = await client.program.account.registrar.fetch(
+  const registrarObject = await client.program.account.Registrar.fetch(
     registrar
   )
 
   // Find the gatekeeper network from the registrar
-  return registrarObject.gatekeeperNetwork
+  return [
+      registrarObject.quadraticCoefficients.a,
+        registrarObject.quadraticCoefficients.b,
+        registrarObject.quadraticCoefficients.c,
+      ]
 }
 
 const getPredecessorProgramId = async (
-  client: GatewayClient,
+  client: QuadraticClient,
   realm: ProgramAccount<Realm>
 ): Promise<PublicKey | null> => {
   // Get the registrar for the realm
@@ -36,7 +40,7 @@ const getPredecessorProgramId = async (
     realm.account.communityMint,
     client.program.programId
   )
-  const registrarObject = await client.program.account.registrar.fetch(
+  const registrarObject = await client.program.account.Registrar.fetch(
     registrar
   )
 
@@ -45,7 +49,7 @@ const getPredecessorProgramId = async (
 }
 
 export const getPreviousVotingWeightRecord = async (
-  client: GatewayClient,
+  client: QuadraticClient,
   realm: ProgramAccount<Realm>,
   walletPk: PublicKey
 ): Promise<PublicKey> => {
@@ -74,20 +78,10 @@ export const getPreviousVotingWeightRecord = async (
 }
 
 export const getVoteInstruction = async (
-  client: GatewayClient,
-  gatewayToken: PublicKey,
+  client: QuadraticClient,
   realm: ProgramAccount<Realm>,
   walletPk: PublicKey
 ) => {
-  // Throw if the user has no gateway token (TODO handle this later)
-  if (!gatewayToken) {
-    const error = new Error(
-      `Unable to execute transaction: No Civic Pass found`
-    )
-    notify({ type: 'error', message: `${error}` })
-    throw error
-  }
-
   // get the user's voter weight account address
   const { voterWeightPk } = await getVoterWeightRecord(
     realm.pubkey,
@@ -118,7 +112,6 @@ export const getVoteInstruction = async (
       registrar,
       voterWeightRecord: voterWeightPk,
       inputVoterWeight,
-      gatewayToken,
     })
     .instruction()
 }

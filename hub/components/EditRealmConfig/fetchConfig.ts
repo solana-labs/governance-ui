@@ -19,9 +19,9 @@ import { tryGetNftRegistrar } from 'VoteStakeRegistry/sdk/api';
 
 import { getNetworkFromEndpoint } from '@utils/connection';
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts';
-import { tryGetRegistar as tryGetGatewayRegistrar } from '@utils/plugin/gateway';
 import { parseMintAccountData, MintAccount } from '@utils/tokens';
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient';
+import { tryGetGatewayRegistrar } from "../../../GatewayPlugin/sdk/api";
 
 export interface Config {
   config: RealmConfig;
@@ -123,7 +123,7 @@ export async function fetchConfig(
     GATEWAY_PLUGINS_PKS.includes(pluginPublicKey.toBase58())
   ) {
     if (gatewayClient && realm.account.communityMint) {
-      const registrar = await tryGetGatewayRegistrar(realm, gatewayClient);
+      const registrar = await tryGetGatewayRegistrar(realm.pubkey, gatewayClient);
       civicPassType = registrar?.gatekeeperNetwork;
     }
   }
