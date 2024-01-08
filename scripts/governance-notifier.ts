@@ -16,25 +16,23 @@ import { formatNumber } from '@utils/formatNumber'
 const fiveMinutesSeconds = 5 * 60
 const toleranceSeconds = 30
 
-if (!process.env.CLUSTER_URL) {
-  console.error('Please set CLUSTER_URL to a rpc node of choice!')
+if (!process.env.MAINNET_RPC) {
+  console.error('Please set MAINNET_RPC to a rpc node of choice!')
   process.exit(1)
 }
 
-function errorWrapper() {
+export function errorWrapper() {
   runNotifier().catch((error) => {
     console.error(error)
   })
 }
 
-// run every 5 mins, checks if a governance proposal just opened in the last 5 mins
-// and notifies on WEBHOOK_URL
-async function runNotifier() {
-  const REALM = process.env.REALM || 'MNGO'
+export async function runNotifier() {
+  const REALM = 'Jito'
   const connectionContext = getConnectionContext('mainnet')
   const realmInfo = await getCertifiedRealmInfo(REALM, connectionContext)
 
-  const connection = new Connection(process.env.CLUSTER_URL!)
+  const connection = new Connection(process.env.MAINNET_RPC!)
   console.log(`- getting all governance accounts for ${REALM}`)
   const governances = await getGovernanceAccounts(
     connection,
@@ -205,8 +203,3 @@ async function runNotifier() {
     `-- countOpenForVotingSinceSomeTime: ${countOpenForVotingSinceSomeTime}, countJustOpenedForVoting: ${countJustOpenedForVoting}, countVotingNotStartedYet: ${countVotingNotStartedYet}, countClosed: ${countClosed}, countCancelled: ${countCancelled}`
   )
 }
-
-// start notifier immediately
-errorWrapper()
-
-setInterval(errorWrapper, fiveMinutesSeconds * 1000)
