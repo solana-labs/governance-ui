@@ -205,14 +205,19 @@ export async function runNotifier() {
     }
   }
 
+  const summary = `countOpenForVotingSinceSomeTime: ${countOpenForVotingSinceSomeTime}, countJustOpenedForVoting: ${countJustOpenedForVoting}, countVotingNotStartedYet: ${countVotingNotStartedYet}, countClosed: ${countClosed}, countCancelled: ${countCancelled}`
   if (!webhookTriggered && process.env.WEBHOOK_URL) {
-    console.log("Nothing to Report")
-    axios.post(process.env.WEBHOOK_URL, { content: 'Nothing to Report' })
+    console.log('Nothing urgent to Report')
+    axios
+      .post(process.env.WEBHOOK_URL, {
+        content: 'Nothing urgent to Report: ' + summary,
+      })
+      .then(() => {
+        console.log('Nothing Webhook Triggered')
+      })
   }
 
-  console.log(
-    `-- countOpenForVotingSinceSomeTime: ${countOpenForVotingSinceSomeTime}, countJustOpenedForVoting: ${countJustOpenedForVoting}, countVotingNotStartedYet: ${countVotingNotStartedYet}, countClosed: ${countClosed}, countCancelled: ${countCancelled}`
-  )
+  console.log(summary)
 }
 
 errorWrapper()
