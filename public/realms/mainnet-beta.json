@@ -61,6 +61,17 @@
     "shortDescription": "A Service DAO turned Network State, consisting of Web3 power users providing feedback sessions. Join us in changing the future of work!"
   },
   {
+    "symbol": "Dean's List Solarplex State",
+    "displayName": "Dean's List Solarplex State",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "4U5tep3h2wFrLskrCJAemvFVyLwGvQ8Xbuc8dBEC6smF",
+    "bannerImage": "/realms/Deans-List-Solarplex-State/img/banner-deanslist-solarplex.png",
+    "twitter": "@deanslistDAO",
+    "ogImage": "/realms/Deans-List-Solarplex-State/img/deans_list_solarplex_state.png",
+    "github": "https://github.com/Deans-List/",
+    "shortDescription": "Dean's List Solarplex State oversees feedback incentives on Solarplex."
+  },
+  {
     "symbol": "Ukraine",
     "displayName": "Ukraine.SOL",
     "programId": "gUAedF544JeE6NYbQakQvribHykUNgaPJqcgf3UQVnY",
@@ -3343,5 +3354,44 @@
     "bannerImage": "/realms/TrustBet/Bannerontransparent.png",
     "ogImage": "realms/TrustBet/LRlogo.png",
     "communityMint": "xpFbKJa92Ee1NSYEhc3b3BVk4im8YStXRaVW6EoW33w"
+  },
+  {
+    "symbol": "BLR",
+    "displayName": "Blockride",
+    "category": "web3",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "A6ZS5ZdkyAbncb55fKjaUhBcQcovp8XcYT5AEQayv96y",
+    "bannerImage": "/realms/Blockride/banner.png",
+    "ogImage": "/realms/Blockride/logo.png",
+    "twitter": "@blockridenft",
+    "website": "https://blockride.xyz/",
+    "sortRank": 3,
+    "shortDescription": "BLOCKRIDE DAO - Building a modern approach to vehicle financing",
+    "keywords": "Web3, REALM, Governance, vehicle financing, DAO, Africans, Nigeria, RWA, Solana",
+    "github": "https://github.com/BlockrideNFT-org"
+  },
+  {
+    "symbol": "RAAAWR",
+    "displayName": "Solsaur DAO",
+    "bannerImage": "/realms/Solsaur/solsaur-realms-banner.png",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "ANqmLV2hQNwFm3jyfqLEBa6KTksosr6uKzcdfg9X6ReR",
+    "ogImage": "/realms/Solsaur/solsaur.png",
+    "website": "https://www.solsaur.com",
+    "twitter": "@solsauras"
+  },
+  {
+    "symbol": "Conk",
+    "displayName": "Conk Dao",
+    "category": "web3",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "A3jzUmuVqbyzqLgHtmMA2igUeACScRiSk71Hy27ehieo",
+    "bannerImage": "/realms/ConkDao/conk_banner.png",
+    "ogImage": "/realms/ConkDao/conk.png",
+    "twitter": "@Conk_Coin",
+    "website": "https://conkcoin.club",
+    "sortRank": 3,
+    "shortDescription": "Conk DAO - The People's Cat Coin",
+    "keywords": "Web3, REALM, Governance, Meme, DAO, Solana"
   }
 ]

@@ -1,5 +1,5 @@
 import create, { State } from 'zustand'
-import { GatewayClient } from '@solana/governance-program-library'
+import {GatewayClient, QuadraticClient} from '@solana/governance-program-library'
 import { getRegistrarPDA, Registrar } from 'VoteStakeRegistry/sdk/accounts'
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts'
 import { AnchorProvider, Wallet } from '@coral-xyz/anchor'
@@ -20,6 +20,7 @@ import { Registrar as HeliumVsrRegistrar } from 'HeliumVotePlugin/sdk/types'
 import * as heliumVsrSdk from '@helium/voter-stake-registry-sdk'
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { StakeConnection as PythClient } from '@pythnetwork/staking'
+import {tryGetQuadraticRegistrar} from "../QuadraticPlugin/sdk/api";
 
 interface UseVotePluginsClientStore extends State {
   state: {
@@ -28,9 +29,11 @@ interface UseVotePluginsClientStore extends State {
     heliumVsrClient: HeliumVsrClient | undefined
     nftClient: NftVoterClient | undefined
     gatewayClient: GatewayClient | undefined
+    quadraticClient: QuadraticClient | undefined
     pythClient: PythClient | undefined
     nftMintRegistrar: any
     gatewayRegistrar: any
+    quadraticRegistrar: any
     currentRealmVotingClient: VotingClient
     voteStakeRegistryRegistrar: Registrar | null
     voteStakeRegistryRegistrarPk: PublicKey | null
@@ -87,12 +90,14 @@ const defaultState = {
   heliumVsrClient: undefined,
   nftClient: undefined,
   gatewayClient: undefined,
+  quadraticClient: undefined,
   pythClient: undefined,
   voteStakeRegistryRegistrar: null,
   heliumVsrRegistrar: null,
   voteStakeRegistryRegistrarPk: null,
   nftMintRegistrar: null,
   gatewayRegistrar: null,
+  quadraticRegistrar: null,
   currentRealmVotingClient: new VotingClient({
     client: undefined,
     realm: undefined,
@@ -216,6 +221,20 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
         s.state.gatewayRegistrar = existingRegistrar
       })
     },
+    handleSetQuadraticRegistrar: async (client, realm) => {
+      if (realm === undefined) return
+
+      const clientProgramId = client.program.programId
+      const { registrar } = await getPluginRegistrarPDA(
+          realm.pubkey,
+          realm.account.communityMint,
+          clientProgramId
+      )
+      const existingRegistrar = await tryGetQuadraticRegistrar(registrar, client)
+      set((s) => {
+        s.state.quadraticRegistrar = existingRegistrar
+      })
+    },
     handleSetCurrentRealmVotingClient: ({ client, realm, walletPk }) => {
       set((s) => {
         s.state.currentRealmVotingClient = new VotingClient({
@@ -238,6 +257,21 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
       )
       set((s) => {
         s.state.gatewayClient = gatewayClient
+      })
+    },
+    handleSetQuadraticClient: async (wallet, connection) => {
+      const options = AnchorProvider.defaultOptions()
+      const provider = new AnchorProvider(
+          connection.current,
+          (wallet as unknown) as Wallet,
+          options
+      )
+      const quadraticClient = await QuadraticClient.connect(
+          provider,
+          connection.cluster === 'devnet'
+      )
+      set((s) => {
+        s.state.quadraticClient = quadraticClient
       })
     },
     handleSetPythClient: async (wallet, connection) => {

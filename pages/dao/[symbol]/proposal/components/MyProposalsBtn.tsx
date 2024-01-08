@@ -51,6 +51,8 @@ import {
   useRealmProposalsQuery,
 } from '@hooks/queries/proposal'
 import queryClient from '@hooks/queries/queryClient'
+import { getFeeEstimate } from '@tools/feeEstimate'
+import { createComputeBudgetIx } from '@blockworks-foundation/mango-v4'
 
 const MyProposalsBn = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
@@ -163,9 +165,10 @@ const MyProposalsBn = () => {
     if (!wallet || !programId || !realm) return
     setIsLoading(true)
     try {
-      const {
-        blockhash: recentBlockhash,
-      } = await connection.getLatestBlockhash()
+      const [{ blockhash: recentBlockhash }, fee] = await Promise.all([
+        connection.getLatestBlockhash(),
+        getFeeEstimate(connection),
+      ])
 
       const transactions: Transaction[] = []
       const instructions: TransactionInstruction[] = []
@@ -180,7 +183,7 @@ const MyProposalsBn = () => {
           recentBlockhash,
           feePayer: wallet.publicKey!,
         })
-        transaction.add(...chunk)
+        transaction.add(...[createComputeBudgetIx(fee), ...chunk])
         transaction.recentBlockhash = recentBlockhash
         transaction.setSigners(
           // fee payed by the wallet owner
