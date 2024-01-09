@@ -14,7 +14,7 @@ import usePythScalingFactor from './PythNetwork/useScalingFactor'
 
 // TODO support council plugins
 export default function useProposalVotes(proposal?: Proposal) {
-  
+
   const realm = useRealmQuery().data?.result
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
@@ -22,13 +22,13 @@ export default function useProposalVotes(proposal?: Proposal) {
   const governance = useGovernanceByPubkeyQuery(proposal?.governance).data
     ?.result?.account
   // This is always undefined except for Pyth
-  const pythScalingFactor : number | undefined = usePythScalingFactor();
+  const pythScalingFactor: number | undefined = usePythScalingFactor();
 
   const programVersion = useProgramVersion()
 
   const proposalMint =
     proposal?.governingTokenMint.toBase58() ===
-    realm?.account.communityMint.toBase58()
+      realm?.account.communityMint.toBase58()
       ? mint
       : councilMint
   // TODO: optimize using memo
@@ -56,8 +56,8 @@ export default function useProposalVotes(proposal?: Proposal) {
       ? governance.config.communityVoteThreshold.value
       : 0
     : programVersion > 2
-    ? governance.config.councilVoteThreshold.value || 0
-    : governance.config.communityVoteThreshold.value || 0
+      ? governance.config.councilVoteThreshold.value || 0
+      : governance.config.communityVoteThreshold.value || 0
 
   if (voteThresholdPct === undefined)
     throw new Error(
@@ -104,12 +104,12 @@ export default function useProposalVotes(proposal?: Proposal) {
     voteThresholdPct,
     yesVotePct,
     yesVoteProgress,
-    yesVoteCount : Math.floor(yesVoteCount * (pythScalingFactor || 1)),
-    noVoteCount : Math.floor(noVoteCount * (pythScalingFactor || 1)),
+    yesVoteCount: Math.floor(yesVoteCount * (pythScalingFactor || 1)),
+    noVoteCount: Math.floor(noVoteCount * (pythScalingFactor || 1)),
     relativeYesVotes,
     relativeNoVotes,
     minimumYesVotes,
-    yesVotesRequired : yesVotesRequired * (pythScalingFactor || 1),
+    yesVotesRequired: yesVotesRequired * (pythScalingFactor || 1),
   }
 
   // @asktree: you may be asking yourself, "is this different from the more succinct way to write this?"
@@ -170,11 +170,11 @@ export default function useProposalVotes(proposal?: Proposal) {
   const vetoMaxVoteWeight = isPluginCommunityVeto
     ? maxVoteRecord.account.maxVoterWeight
     : getProposalMaxVoteWeight(
-        realm.account,
-        proposal,
-        vetoMintInfo,
-        vetoMintPk
-      )
+      realm.account,
+      proposal,
+      vetoMintInfo,
+      vetoMintPk
+    )
 
   const vetoVoteProgress = calculatePct(
     proposal.vetoVoteWeight,
