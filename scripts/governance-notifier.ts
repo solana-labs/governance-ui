@@ -16,6 +16,25 @@ import { formatNumber } from '@utils/formatNumber'
 const fiveMinutesSeconds = 5 * 60
 const toleranceSeconds = 30
 
+const maxRetries = 3
+const retryDelay = 5000
+
+async function sendWebhook(webhookUrl, data, retries = maxRetries) {
+  try {
+    await axios.post(webhookUrl, data)
+    console.log('Webhook Triggered Successfully')
+  } catch (error) {
+    console.error('Webhook Trigger Failed:', error.message)
+    if (retries > 0) {
+      console.log(`Retrying... Attempts left: ${retries}`)
+      await new Promise((resolve) => setTimeout(resolve, retryDelay))
+      await sendWebhook(webhookUrl, data, retries - 1)
+    } else {
+      console.error('All retries failed')
+    }
+  }
+}
+
 if (!process.env.MAINNET_RPC) {
   console.error('Please set MAINNET_RPC to a rpc node of choice!')
   process.exit(1)
@@ -125,7 +144,9 @@ export async function runNotifier() {
 
           console.log(msg)
           if (process.env.WEBHOOK_URL) {
-            axios.post(process.env.WEBHOOK_URL, { content: msg })
+            sendWebhook(process.env.WEBHOOK_URL, {
+              content: msg,
+            })
             webhookTriggered = true
           }
         }
@@ -160,7 +181,9 @@ export async function runNotifier() {
 
         console.log(msg)
         if (process.env.WEBHOOK_URL) {
-          axios.post(process.env.WEBHOOK_URL, { content: msg })
+          sendWebhook(process.env.WEBHOOK_URL, {
+            content: msg,
+          })
           webhookTriggered = true
         }
       }
@@ -198,7 +221,9 @@ export async function runNotifier() {
 
         console.log(msg)
         if (process.env.WEBHOOK_URL) {
-          axios.post(process.env.WEBHOOK_URL, { content: msg })
+          sendWebhook(process.env.WEBHOOK_URL, {
+            content: msg,
+          })
           webhookTriggered = true
         }
       }
@@ -206,15 +231,12 @@ export async function runNotifier() {
   }
 
   const summary = `countOpenForVotingSinceSomeTime: ${countOpenForVotingSinceSomeTime}, countJustOpenedForVoting: ${countJustOpenedForVoting}, countVotingNotStartedYet: ${countVotingNotStartedYet}, countClosed: ${countClosed}, countCancelled: ${countCancelled}`
+
   if (!webhookTriggered && process.env.WEBHOOK_URL) {
     console.log('Nothing urgent to Report')
-    axios
-      .post(process.env.WEBHOOK_URL, {
-        content: 'Nothing urgent to Report: ' + summary,
-      })
-      .then(() => {
-        console.log('Nothing Webhook Triggered')
-      })
+    sendWebhook(process.env.WEBHOOK_URL, {
+      content: 'Nothing urgent to Report: ' + summary,
+    })
   }
 
   console.log(summary)
