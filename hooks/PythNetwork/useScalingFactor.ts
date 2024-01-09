@@ -25,7 +25,7 @@ export default function usePythScalingFactor(): number | undefined {
         }, { enabled: plugin == "pyth" })
 
     if (plugin == "pyth") {
-        return scalingFactor || undefined
+        return scalingFactor
     } else {
         return undefined
     }
