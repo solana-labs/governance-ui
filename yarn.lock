@@ -4155,13 +4155,12 @@
   dependencies:
     buffer "~6.0.3"
 
-"@solana/governance-program-library@npm:@civic/governance-program-library@0.18.2-beta.1":
-  version "0.18.2-beta.1"
-  resolved "https://registry.yarnpkg.com/@civic/governance-program-library/-/governance-program-library-0.18.2-beta.1.tgz#7a7ef2329af013e6860119b7a55cee003aae2465"
-  integrity sha512-XiKsAJ5NconXEz4F9RaBDHUlr1nRS0eqk81N8VwSJR8wvgulfZpvOuehZNsTJNfoZrhrdvGKw0rwIJaObHMd9g==
+"@solana/governance-program-library@npm:@civic/governance-program-library@0.18.2-beta.4":
+  version "0.18.2-beta.4"
+  resolved "https://registry.yarnpkg.com/@civic/governance-program-library/-/governance-program-library-0.18.2-beta.4.tgz#00918e96dd87b47925072cc3390ab81b02370571"
+  integrity sha512-GdtTKIPMdIhhnort6OQJlrMq8ROpH6GxEkSBN4B6QDd4SYSk/FfqjrsGto6joagDCOY63yCiPkJoju3F/qplug==
   dependencies:
-    "@project-serum/anchor" "^0.25.0"
-    "@project-serum/serum" "^0.13.61"
+    "@coral-xyz/anchor" "^0.28.0"
 
 "@solana/spl-account-compression@^0.1.4", "@solana/spl-account-compression@^0.1.8":
   version "0.1.9"
