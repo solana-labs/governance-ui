@@ -2,7 +2,15 @@
   "crons": [
     {
       "path": "/api/gov-notifier-summary",
-      "schedule": "59 19 * * *"
+      "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/gov-notifier-summary",
+      "schedule": "0 22 * * *"
+    },
+    {
+      "path": "/api/gov-notifier-summary",
+      "schedule": "0 23 * * *"
     },
     {
       "path": "/api/gov-notifier",

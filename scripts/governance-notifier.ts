@@ -41,12 +41,14 @@ if (!process.env.MAINNET_RPC) {
 }
 
 export function errorWrapper() {
+  console.log("Running in errorWrapper")
   runNotifier().catch((error) => {
     console.error(error)
   })
 }
 
-const REALM = 'jeet'
+const REALM = 'Jito'
+const MIN_VOTES_NEEDED = 30_000_000
 
 export async function runNotifier(summaryOnly = false) {
   console.log('Starting governance notifier')
@@ -115,8 +117,7 @@ export async function runNotifier(summaryOnly = false) {
             votingTokenDecimals
           )
 
-          const minVotesNeeded = 100000000
-          const quorumReached = yesVotes >= minVotesNeeded
+          const quorumReached = yesVotes >= MIN_VOTES_NEEDED
           const isSuccess = yesVotes > noVotes && quorumReached
 
           const msg = `
