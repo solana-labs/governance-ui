@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { useContext, useEffect, useMemo, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { ProgramAccount, Governance } from '@solana/spl-governance'
 import {
   UiInstruction,
@@ -32,9 +32,7 @@ const DualVoteDeposit = ({
   const wallet = useWalletOnePointOh()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const { assetAccounts } = useGovernanceAssets()
-  const [governedAccount, setGovernedAccount] = useState<
-    ProgramAccount<Governance> | undefined
-  >(undefined)
+
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
   const handleSetForm = ({ propertyName, value }) => {
@@ -42,30 +40,25 @@ const DualVoteDeposit = ({
     setForm({ ...form, [propertyName]: value })
   }
 
-  const { realmInputParsed } = useRealmPubkeyByPkOrSymbol(form.realm)
+  const realmInputParsed = useRealmPubkeyByPkOrSymbol(form.realm)
 
-  function getInstruction(): Promise<UiInstruction> {
-    return getVoteDepositInstruction({
-      connection,
-      form,
-      schema,
-      setFormErrors,
-      wallet,
-    })
-  }
-  const schema = useMemo(getDualFinanceVoteDepositSchema, [])
   useEffect(() => {
+    const schema = getDualFinanceVoteDepositSchema()
+    function getInstruction(): Promise<UiInstruction> {
+      return getVoteDepositInstruction({
+        connection,
+        form,
+        schema,
+        setFormErrors,
+        wallet,
+        realmPk: realmInputParsed,
+      })
+    }
     handleSetInstructions(
-      { governedAccount: governedAccount, getInstruction },
+      { governedAccount: form.delegateToken?.governance, getInstruction },
       index
     )
-  }, [form, governedAccount, handleSetInstructions, index, connection, wallet])
-  useEffect(() => {
-    handleSetForm({ value: undefined, propertyName: 'mintPk' })
-  }, [form.delegateToken])
-  useEffect(() => {
-    setGovernedAccount(form.delegateToken?.governance)
-  }, [form.delegateToken])
+  }, [form, handleSetInstructions, index, connection, wallet, realmInputParsed])
 
   // TODO: Include this in the config instruction which can optionally be done
   // if the project doesnt need to change where the tokens get returned to.
