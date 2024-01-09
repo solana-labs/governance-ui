@@ -13,10 +13,10 @@ import { accountsToPubkeyMap } from '@tools/sdk/accounts'
 import { fmtTokenAmount } from '@utils/formatting'
 import { formatNumber } from '@utils/formatNumber'
 
-const fiveMinutesSeconds = 5 * 60
+const thirtyMinutesSeconds = 30 * 60
 const toleranceSeconds = 30
 
-const maxRetries = 3
+const maxRetries = 4
 const retryDelay = 5000
 
 async function sendWebhook(webhookUrl, data, retries = maxRetries) {
@@ -46,8 +46,9 @@ export function errorWrapper() {
   })
 }
 
-export async function runNotifier() {
-  const REALM = 'Jito'
+const REALM = 'jeet'
+
+export async function runNotifier(summaryOnly = false) {
   console.log('Starting governance notifier')
   const connectionContext = getConnectionContext('mainnet')
   const realmInfo = await getCertifiedRealmInfo(REALM, connectionContext)
@@ -62,7 +63,6 @@ export async function runNotifier() {
   )
 
   const governancesMap = accountsToPubkeyMap(governances)
-  let webhookTriggered = false
 
   console.log(`- getting all proposals for all governances`)
   const proposalsByGovernance = await Promise.all(
@@ -103,7 +103,7 @@ export async function runNotifier() {
       ) {
         if (
           nowInSeconds - proposal.account.votingCompletedAt.toNumber() <=
-          fiveMinutesSeconds + toleranceSeconds
+          thirtyMinutesSeconds + toleranceSeconds
         ) {
           const votingTokenDecimals = 6
           const yesVotes = fmtTokenAmount(
@@ -143,11 +143,10 @@ export async function runNotifier() {
           )}/proposal/${proposal.pubkey.toBase58()}`
 
           console.log(msg)
-          if (process.env.WEBHOOK_URL) {
-            sendWebhook(process.env.WEBHOOK_URL, {
+          if (!summaryOnly && process.env.WEBHOOK_URL) {
+            await sendWebhook(process.env.WEBHOOK_URL, {
               content: msg,
             })
-            webhookTriggered = true
           }
         }
         countClosed++
@@ -165,7 +164,7 @@ export async function runNotifier() {
       if (
         // proposal opened in last 5 mins
         nowInSeconds - proposal.account.votingAt.toNumber() <=
-        fiveMinutesSeconds + toleranceSeconds
+        thirtyMinutesSeconds + toleranceSeconds
         // proposal opened in last 24 hrs - useful to notify when bot recently stopped working
         // and missed the 5 min window
         // (nowInSeconds - proposal.info.votingAt.toNumber())/(60 * 60) <=
@@ -180,11 +179,10 @@ export async function runNotifier() {
         )}/proposal/${proposal.pubkey.toBase58()}`
 
         console.log(msg)
-        if (process.env.WEBHOOK_URL) {
-          sendWebhook(process.env.WEBHOOK_URL, {
+        if (!summaryOnly && process.env.WEBHOOK_URL) {
+          await sendWebhook(process.env.WEBHOOK_URL, {
             content: msg,
           })
-          webhookTriggered = true
         }
       }
       // note that these could also include those in finalizing state, but this is just for logging
@@ -211,7 +209,7 @@ export async function runNotifier() {
         nowInSeconds
       if (
         remainingInSeconds > 86400 &&
-        remainingInSeconds < 86400 + fiveMinutesSeconds + toleranceSeconds
+        remainingInSeconds < 86400 + thirtyMinutesSeconds + toleranceSeconds
       ) {
         const msg = `“${
           proposal.account.name
@@ -220,11 +218,10 @@ export async function runNotifier() {
         )}/proposal/${proposal.pubkey.toBase58()} in 24 hrs`
 
         console.log(msg)
-        if (process.env.WEBHOOK_URL) {
-          sendWebhook(process.env.WEBHOOK_URL, {
+        if (!summaryOnly && process.env.WEBHOOK_URL) {
+          await sendWebhook(process.env.WEBHOOK_URL, {
             content: msg,
           })
-          webhookTriggered = true
         }
       }
     }
@@ -232,9 +229,9 @@ export async function runNotifier() {
 
   const summary = `countOpenForVotingSinceSomeTime: ${countOpenForVotingSinceSomeTime}, countJustOpenedForVoting: ${countJustOpenedForVoting}, countVotingNotStartedYet: ${countVotingNotStartedYet}, countClosed: ${countClosed}, countCancelled: ${countCancelled}`
 
-  if (!webhookTriggered && process.env.WEBHOOK_URL) {
+  if (summaryOnly && process.env.WEBHOOK_URL) {
     console.log('Nothing urgent to Report')
-    sendWebhook(process.env.WEBHOOK_URL, {
+    await sendWebhook(process.env.WEBHOOK_URL, {
       content: 'Nothing urgent to Report: ' + summary,
     })
   }
