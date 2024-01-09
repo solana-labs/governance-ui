@@ -33,15 +33,11 @@ import {
 import { AnchorProvider } from '@coral-xyz/anchor'
 import EmptyWallet from '@utils/Mango/listingTools'
 import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
-import {
-  fetchProposalByPubkeyQuery,
-  useProposalByPubkeyQuery,
-} from '@hooks/queries/proposal'
+import { fetchProposalByPubkeyQuery } from '@hooks/queries/proposal'
 import { fetchGovernanceByPubkey } from '@hooks/queries/governance'
 import { fetchRealmByPubkey } from '@hooks/queries/realm'
 import { fetchRealmConfigQuery } from '@hooks/queries/realmConfig'
 import { findPluginName } from '@constants/plugins'
-import { tryParsePublicKey } from '@tools/core/pubkey'
 
 type DaoVoteForm = {
   delegateToken: AssetAccount | undefined
@@ -103,12 +99,13 @@ const DaoVote = ({
     return isValid
   }, [form, schema])
 
+  /* 
   const parsedProposalPk = tryParsePublicKey(form.proposal)
   const {
     data: proposalData,
     isLoading: proposalLoading,
   } = useProposalByPubkeyQuery(parsedProposalPk)
-
+*/
   // TODO preview proposal title!
 
   useEffect(() => {
