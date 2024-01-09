@@ -1,5 +1,5 @@
 import { GATEWAY_PLUGINS_PKS, NFT_PLUGINS_PKS } from '@constants/plugins';
-import { AnchorProvider, Wallet } from '@project-serum/anchor';
+import { AnchorProvider, Wallet } from '@coral-xyz/anchor';
 
 import { GatewayClient } from '@solana/governance-program-library';
 import {

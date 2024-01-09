@@ -972,7 +972,18 @@ const instructions = () => ({
                 Partial<EditTokenArgsFormatted>
               >(parsedArgs, suggestedFormattedPreset)
             : []
-          ).filter((x) => parsedArgs[x] !== undefined)
+          )
+            .filter((x) => parsedArgs[x] !== undefined)
+            .filter((x) => {
+              //soft invalid keys - some of the keys can be off by some small maring
+              if (x === 'depositLimit') {
+                return !isDifferenceWithin5Percent(
+                  Number(parsedArgs['depositLimit'] || 0),
+                  Number(suggestedFormattedPreset['depositLimit'])
+                )
+              }
+              return true
+            })
 
           invalidFields = invalidKeys.reduce((obj, key) => {
             return {
@@ -1792,4 +1803,18 @@ const getApiTokenName = (bankName: string) => {
     return 'ETH'
   }
   return bankName
+}
+
+function isDifferenceWithin5Percent(a: number, b: number): boolean {
+  // Calculate the absolute difference
+  const difference = Math.abs(a - b)
+
+  // Calculate the average of the two numbers
+  const average = (a + b) / 2
+
+  // Calculate the percentage difference
+  const percentageDifference = (difference / average) * 100
+
+  // Check if the difference is within 5%
+  return percentageDifference <= 5
 }
