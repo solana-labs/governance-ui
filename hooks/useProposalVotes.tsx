@@ -10,18 +10,19 @@ import {
   useRealmCouncilMintInfoQuery,
 } from './queries/mintInfo'
 import { useGovernanceByPubkeyQuery } from './queries/governance'
-import useScalingFactor from './PythNetwork/useScalingFactor'
+import usePythScalingFactor from './PythNetwork/useScalingFactor'
 
 // TODO support council plugins
 export default function useProposalVotes(proposal?: Proposal) {
-  const scalingFactor = useScalingFactor();
+  
   const realm = useRealmQuery().data?.result
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
   const maxVoteRecord = useMaxVoteRecord()
   const governance = useGovernanceByPubkeyQuery(proposal?.governance).data
     ?.result?.account
-
+  // This is always undefined except for Pyth
+  const pythScalingFactor : number | undefined = usePythScalingFactor();
 
   const programVersion = useProgramVersion()
 
@@ -103,12 +104,12 @@ export default function useProposalVotes(proposal?: Proposal) {
     voteThresholdPct,
     yesVotePct,
     yesVoteProgress,
-    yesVoteCount : Math.floor(yesVoteCount * scalingFactor),
-    noVoteCount : Math.floor(noVoteCount * scalingFactor),
+    yesVoteCount : Math.floor(yesVoteCount * (pythScalingFactor || 1)),
+    noVoteCount : Math.floor(noVoteCount * (pythScalingFactor || 1)),
     relativeYesVotes,
     relativeNoVotes,
     minimumYesVotes,
-    yesVotesRequired : yesVotesRequired * scalingFactor,
+    yesVotesRequired : yesVotesRequired * (pythScalingFactor || 1),
   }
 
   // @asktree: you may be asking yourself, "is this different from the more succinct way to write this?"

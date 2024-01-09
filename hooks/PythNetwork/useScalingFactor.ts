@@ -7,9 +7,9 @@ import { useAsync } from "react-async-hook";
 import { useQuery } from "@tanstack/react-query";
 
 /**
- * Returns 1 for everything except the Pyth DAO
+ * Returns undefined for everything except the Pyth DAO
  */
-export default function useScalingFactor(): number {
+export default function usePythScalingFactor(): number | undefined {
     const realm = useSelectedRealmPubkey()
     const { connection } = useConnection()
     const { result: plugin } = useAsync(
@@ -25,9 +25,9 @@ export default function useScalingFactor(): number {
         }, { enabled: plugin == "pyth" })
 
     if (plugin == "pyth") {
-        return scalingFactor || 1
+        return scalingFactor || undefined
     } else {
-        return 1
+        return undefined
     }
 }
 
