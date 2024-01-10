@@ -341,12 +341,13 @@ export default function useGovernanceAssets() {
       name: 'Vote in another DAO',
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Common,
-    }, // not implemented
-    /* [Instructions.DualFinanceDelegateWithdraw]: {
+    },
+    [Instructions.DualFinanceDelegateWithdraw]: {
       name: 'Withdraw Vote Deposit',
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Common,
-    }, */ [Instructions.DualFinanceVoteDeposit]: {
+    },
+    [Instructions.DualFinanceVoteDeposit]: {
       name: 'Join a VSR DAO',
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Common,
