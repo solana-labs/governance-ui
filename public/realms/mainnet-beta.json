@@ -3402,5 +3402,14 @@
     "ogImage": "/realms/MemeCoinDAOai",
     "website": "https://www.memecoindao.ai",
     "twitter": "@MemeCoinDAOa"
-  }
+  },
+  {
+    "symbol": "$GARI",
+    "displayName": "GARI Network DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "HvDndGYjZNMVQDsrdAJJR7DtnQSB5rXM9BJBdwuxiXDg",
+    "ogImage": "public/realms/GARI Network DAO/Coin.png",
+    "website": "https://gari.network/",
+    "twitter": "@TheGariNetwork" 
+}
 ]
