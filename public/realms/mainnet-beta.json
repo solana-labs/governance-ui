@@ -192,7 +192,7 @@
     "sortRank": 3,
     "website": "https://grapes.network/",
     "twitter": "@grapeprotocol",
-    "discord": "https://discord.com/invite/greatape",
+    "discord": "https://discord.com/invite/grapedao",
     "github": "https://github.com/Grape-Labs"
   },
   {
@@ -3393,5 +3393,14 @@
     "sortRank": 3,
     "shortDescription": "Conk DAO - The People's Cat Coin",
     "keywords": "Web3, REALM, Governance, Meme, DAO, Solana"
+  },
+  {
+    "symbol": "MEMES",
+    "displayName": "MemeCoinDAOai",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Ecar1VyamYnR2UzJzJbQMKR9Zq1U5p1xuUUsnzceDiaH",
+    "ogImage": "/realms/MemeCoinDAOai",
+    "website": "https://www.memecoindao.ai",
+    "twitter": "@MemeCoinDAOa"
   }
 ]

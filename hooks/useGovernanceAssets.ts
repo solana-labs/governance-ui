@@ -337,6 +337,21 @@ export default function useGovernanceAssets() {
       name: 'Split Stake Validator',
       packageId: PackageEnum.Common,
     },
+    [Instructions.DaoVote]: {
+      name: 'Vote in another DAO',
+      isVisible: canUseTransferInstruction,
+      packageId: PackageEnum.Common,
+    },
+    [Instructions.DualFinanceDelegateWithdraw]: {
+      name: 'Withdraw Vote Deposit',
+      isVisible: canUseTransferInstruction,
+      packageId: PackageEnum.Common,
+    },
+    [Instructions.DualFinanceVoteDeposit]: {
+      name: 'Join a VSR DAO',
+      isVisible: canUseTransferInstruction,
+      packageId: PackageEnum.Common,
+    },
     /*
       ██████  ██    ██  █████  ██          ███████ ██ ███    ██  █████  ███    ██  ██████ ███████
       ██   ██ ██    ██ ██   ██ ██          ██      ██ ████   ██ ██   ██ ████   ██ ██      ██
@@ -387,21 +402,6 @@ export default function useGovernanceAssets() {
     },
     [Instructions.DualFinanceDelegate]: {
       name: 'Delegate',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Dual,
-    },
-    [Instructions.DualFinanceDelegateWithdraw]: {
-      name: 'Withdraw Vote Deposit',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Dual,
-    },
-    [Instructions.DualFinanceVoteDeposit]: {
-      name: 'Vote Deposit',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Dual,
-    },
-    [Instructions.DualFinanceVote]: {
-      name: 'Vote',
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Dual,
     },

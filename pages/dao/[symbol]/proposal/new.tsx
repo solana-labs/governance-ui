@@ -132,7 +132,7 @@ import InitStrike from './components/instructions/Dual/InitStrike'
 import IdlSetBuffer from './components/instructions/Mango/MangoV4/IdlSetBuffer'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { usePrevious } from '@hooks/usePrevious'
-import DualVote from './components/instructions/Dual/DualVote'
+import DaoVote from './components/instructions/SplGov/DaoVote'
 import DualGso from './components/instructions/Dual/DualGso'
 import DualGsoWithdraw from './components/instructions/Dual/DualGsoWithdraw'
 import MultiChoiceForm from '../../../../components/MultiChoiceForm'
@@ -494,7 +494,7 @@ const New = () => {
       [Instructions.DualFinanceDelegate]: DualDelegate,
       [Instructions.DualFinanceDelegateWithdraw]: DualVoteDepositWithdraw,
       [Instructions.DualFinanceVoteDeposit]: DualVoteDeposit,
-      [Instructions.DualFinanceVote]: DualVote,
+      [Instructions.DaoVote]: DaoVote,
       [Instructions.DistributionCloseVaults]: CloseVaults,
       [Instructions.DistributionFillVaults]: FillVaults,
       [Instructions.MeanCreateAccount]: MeanCreateAccount,
