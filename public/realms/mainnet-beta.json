@@ -3408,8 +3408,10 @@
     "displayName": "GARI Network DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "HvDndGYjZNMVQDsrdAJJR7DtnQSB5rXM9BJBdwuxiXDg",
-    "ogImage": "public/realms/GARI Network DAO/gari.png",
+    "bannerImage": "public/realms/GARI Network DAO/garicover.gif",
+    "ogImage": "https://gari.network/wp-content/uploads/2023/12/Gari-Logo.png",
     "website": "https://gari.network/",
-    "twitter": "@TheGariNetwork" 
+    "twitter": "@TheGariNetwork".
+    "category": "web3"
 }
 ]
