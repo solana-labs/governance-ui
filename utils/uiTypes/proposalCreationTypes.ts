@@ -342,7 +342,7 @@ export enum Instructions {
   DualFinanceDelegate,
   DualFinanceDelegateWithdraw,
   DualFinanceVoteDeposit,
-  DualFinanceVote,
+  DaoVote,
   DistributionCloseVaults,
   DistributionFillVaults,
   DelegateStake,
