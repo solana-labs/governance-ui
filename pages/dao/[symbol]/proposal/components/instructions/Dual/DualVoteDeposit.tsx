@@ -82,7 +82,6 @@ const DualVoteDeposit = ({
         label="Realm"
         value={form.realm}
         type="text"
-        disabled={true}
         onChange={(evt) =>
           handleSetForm({
             value: evt.target.value,
