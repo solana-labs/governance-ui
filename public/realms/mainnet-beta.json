@@ -1454,6 +1454,20 @@
     "github": "https://uniquevc.gitbook.io/unique-venture-clubs-docs/"
   },
   {
+    "symbol": "GARI Network",
+    "category": "web3",
+    "bannerImage": "https://i.imgur.com/VfFjhk5.jpeg",
+    "displayName": "GARI Network D.A.O",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "uWg5gaTsBnXc5qiVMB8XxBUPYqLAb5bzzgkkpxi6UAY",
+    "ogImage": "https://i.imgur.com/t5hzoBV.jpg",
+    "shortDescription": "GARI Network enables everyone to monetize their social media time and activities by leveraging web3 technologies.",
+    "sortRank": 3,
+    "website": "https://gari.network/",
+    "twitter": "@GariToken",
+    "discord": "https://discord.gg/garitoken"
+  },
+  {
     "symbol": "Dual DAO",
     "category": "defi",
     "bannerImage": "https://pbs.twimg.com/profile_banners/1488237042068819971/1652495773/1500x500",
@@ -3388,5 +3402,16 @@
     "ogImage": "/realms/MemeCoinDAOai",
     "website": "https://www.memecoindao.ai",
     "twitter": "@MemeCoinDAOa"
-  }
+  },
+  {
+    "symbol": "$GARI",
+    "displayName": "GARI Network DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "HvDndGYjZNMVQDsrdAJJR7DtnQSB5rXM9BJBdwuxiXDg",
+    "bannerImage": "https://media1.tenor.com/m/uKCFs6UJgCwAAAAC/gari-gari-token.gif",
+    "ogImage": "https://gari.network/wp-content/uploads/2023/12/gari-coin-1.png",
+    "website": "https://gari.network/",
+    "twitter": "@TheGariNetwork",
+    "category": "web3"
+}
 ]

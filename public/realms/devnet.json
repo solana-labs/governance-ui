@@ -254,5 +254,14 @@
     "website": "https://helium.com",
     "twitter": "@Helium",
     "ogImage": "/realms/Helium/img/mobilelogo.png"
+  },
+  {
+    "symbol": "$GARI",
+    "displayName": "GARI Network DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "HvDndGYjZNMVQDsrdAJJR7DtnQSB5rXM9BJBdwuxiXDg",
+    "ogImage": "/realms/GARI Network DAO/Coin.png",
+    "website": "https://gari.network/",
+    "twitter": "@TheGariNetwork"
   }
 ]
