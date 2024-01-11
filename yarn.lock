@@ -344,10 +344,10 @@
     keccak256 "^1.0.6"
     merkletreejs "^0.3.11"
 
-"@blockworks-foundation/mango-v4-settings@0.4.6":
-  version "0.4.6"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4-settings/-/mango-v4-settings-0.4.6.tgz#ae040b1a258dd1a1d086ad2aa9d9b844bb2446f5"
-  integrity sha512-13D37bxuuJ9sLch3UvXYL8JyHje57hVmweDnplGFuBZY++V4IcC7dNiPOkeKg6FbYdi1yu/0zUg/kT+gn5TkIQ==
+"@blockworks-foundation/mango-v4-settings@0.4.7":
+  version "0.4.7"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4-settings/-/mango-v4-settings-0.4.7.tgz#f71f87c7ff05cd80620c640fdc340aff842579ec"
+  integrity sha512-+R0kIsqfbFw2F0aHcuq1Ux/WXHKs7h2UmyE1Ew7oA/yA1JtS7G1T7RsckxOW1XZJ8+xnhnn8hcICZkhoagZUBA==
   dependencies:
     bn.js "^5.2.1"
     eslint-config-prettier "^9.0.0"
@@ -360,10 +360,10 @@
     bn.js "^5.2.1"
     eslint-config-prettier "^9.0.0"
 
-"@blockworks-foundation/mango-v4@0.21.5":
-  version "0.21.5"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4/-/mango-v4-0.21.5.tgz#5e3b3257de0a0efc98c1f9057982e434c1665120"
-  integrity sha512-tCBFb+eBltsJbFkcBPBgfk5Wzmwa+9MfNU7FTWX8vMycl+ck4svE8K05HEO25dWRSJmZbwx8osGxaqCsricAbQ==
+"@blockworks-foundation/mango-v4@0.21.13":
+  version "0.21.13"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4/-/mango-v4-0.21.13.tgz#297b21f26810f59b29b3a05e0609fe6f493ac98c"
+  integrity sha512-mpU6CnhJHOuIkXQj2VOqznDBETmg8GSV5K6UBII61K9skh3g8avwvtOMSxJ7V6bZaTf1IMlh0t5Fe7WnWtoTlQ==
   dependencies:
     "@blockworks-foundation/mango-v4-settings" "^0.2.16"
     "@coral-xyz/anchor" "^0.28.1-beta.2"
