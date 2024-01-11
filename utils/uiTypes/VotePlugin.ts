@@ -355,7 +355,7 @@ export class VotingClient {
       } = await this.client.withUpdateVoterWeight(
         instructions,
         stakeAccount!,
-        { [type]: {} },
+        { [type]: {} } as any,
         pythVoterWeightTarget
       )
 

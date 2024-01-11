@@ -192,7 +192,7 @@
     "sortRank": 3,
     "website": "https://grapes.network/",
     "twitter": "@grapeprotocol",
-    "discord": "https://discord.com/invite/greatape",
+    "discord": "https://discord.com/invite/grapedao",
     "github": "https://github.com/Grape-Labs"
   },
   {
@@ -1457,7 +1457,7 @@
     "symbol": "GARI Network",
     "category": "web3",
     "bannerImage": "https://i.imgur.com/VfFjhk5.jpeg",
-    "displayName": "GARI Network",
+    "displayName": "GARI Network D.A.O",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "uWg5gaTsBnXc5qiVMB8XxBUPYqLAb5bzzgkkpxi6UAY",
     "ogImage": "https://i.imgur.com/t5hzoBV.jpg",
@@ -3402,5 +3402,16 @@
     "ogImage": "/realms/MemeCoinDAOai",
     "website": "https://www.memecoindao.ai",
     "twitter": "@MemeCoinDAOa"
-  }
+  },
+  {
+    "symbol": "$GARI",
+    "displayName": "GARI Network DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "HvDndGYjZNMVQDsrdAJJR7DtnQSB5rXM9BJBdwuxiXDg",
+    "bannerImage": "https://media1.tenor.com/m/uKCFs6UJgCwAAAAC/gari-gari-token.gif",
+    "ogImage": "https://gari.network/wp-content/uploads/2023/12/gari-coin-1.png",
+    "website": "https://gari.network/",
+    "twitter": "@TheGariNetwork",
+    "category": "web3"
+}
 ]

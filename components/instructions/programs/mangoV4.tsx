@@ -323,7 +323,7 @@ const instructions = () => ({
                 <>
                   <h3 className="text-orange flex items-center">
                     <WarningFilledIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
-                    Suggested token tier: UNTRUSTED.
+                    Suggested token tier: C
                   </h3>
                   <h3 className="text-orange flex">
                     Very low liquidity Price impact of {presetInfo.priceImpact}%
@@ -807,10 +807,11 @@ const instructions = () => ({
         const parsedArgs: Partial<EditTokenArgsFormatted> = {
           tokenIndex: args.tokenIndex,
           tokenName: args.nameOpt,
-          oracleConfidenceFilter:
-            args['oracleConfigOpt.confFilter'] !== undefined
-              ? (args['oracleConfigOpt.confFilter'] * 100)?.toFixed(2)
-              : undefined,
+          oracleConfidenceFilter: args['oracleConfigOpt.confFilter']
+            ? args['oracleConfigOpt.confFilter'] >= 100
+              ? args['oracleConfigOpt.confFilter'].toString()
+              : (args['oracleConfigOpt.confFilter'] * 100).toFixed(2)
+            : undefined,
           oracleMaxStalenessSlots: args['oracleConfigOpt.maxStalenessSlots'],
           interestRateUtilizationPoint0:
             args['interestRateParamsOpt.util0'] !== undefined
@@ -906,7 +907,9 @@ const instructions = () => ({
           const midPriceImpacts = getMidPriceImpacts(mangoGroup.pis)
 
           const tokenToPriceImpact = midPriceImpacts
-            .filter((x) => x.avg_price_impact_percent < 1)
+            .filter(
+              (x) => x.avg_price_impact_percent < 1 || x.target_amount <= 1000
+            )
             .reduce(
               (acc: { [key: string]: MidPriceImpact }, val: MidPriceImpact) => {
                 if (
@@ -923,7 +926,9 @@ const instructions = () => ({
           const priceImpact = tokenToPriceImpact[getApiTokenName(bank.name)]
 
           const suggestedPresetKey = getProposedKey(
-            priceImpact?.target_amount,
+            priceImpact.avg_price_impact_percent < 1
+              ? priceImpact?.target_amount
+              : undefined,
             bank.oracleProvider === OracleProvider.Pyth
           )
 
@@ -1000,12 +1005,15 @@ const instructions = () => ({
               <>
                 <h3 className="text-orange flex items-center">
                   <WarningFilledIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
-                  Suggested token tier: UNTRUSTED.
+                  Suggested token tier: C
                 </h3>
-                <h3 className="text-orange flex">
-                  Very low liquidity Price impact of {liqudityTier?.priceImpact}
-                  % on $1000 swap. Check params carefully
-                </h3>
+                {liqudityTier.priceImpact && (
+                  <h3 className="text-orange flex">
+                    Very low liquidity Price impact of{' '}
+                    {Number(liqudityTier.priceImpact).toFixed(2)}% on $1000
+                    swap. Check params carefully
+                  </h3>
+                )}
               </>
             )}
             {!invalidKeys.length && liqudityTier.presetKey && (
