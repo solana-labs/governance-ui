@@ -874,11 +874,7 @@ export const getDualFinanceDelegateWithdrawSchema = () => {
 export const getDualFinanceVoteDepositSchema = () => {
   return yup.object().shape({
     numTokens: yup.number().typeError('Num tokens is required'),
-    realm: yup
-      .string()
-      .test('is-valid-address1', 'Please enter a valid PublicKey', (value) =>
-        value ? validatePubkey(value) : true
-      ),
+    realm: yup.string(),
     token: yup.object().typeError('Delegate Token is required'),
   })
 }

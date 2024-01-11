@@ -128,7 +128,12 @@ export async function getVoteDepositInstruction({
   setFormErrors,
   realmPk,
 }: VoteDepositArgs): Promise<UiInstruction> {
-  const isValid = await validateInstruction({ schema, form, setFormErrors })
+  const isValid =
+    (await validateInstruction({ schema, form, setFormErrors })) &&
+    realmPk !== undefined
+  if (!realmPk) {
+    setFormErrors({ realm: 'Realm not found' })
+  }
 
   const serializedInstruction = ''
   const additionalSerializedInstructions: string[] = []
