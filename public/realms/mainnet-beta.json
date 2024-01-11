@@ -3413,5 +3413,13 @@
     "website": "https://gari.network/",
     "twitter": "@TheGariNetwork",
     "category": "web3"
-}
-]
+},
+  {
+  "symbol": "BOHDAO",
+"displayName": "Brigade of Honor Dao",
+"programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+"realmId": "FSh5XBFUYFMEWP99y4j7W6zERtEnqFVuwfuHgHgJJYWq",
+"ogImage": "https://www.brigadeofhonor.com/BOHlogo.png",
+"website": "https://www.brigadeofhonor.com",
+"twitter": "@BoHgamingguild"
+},
