@@ -18,7 +18,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
-import {configureCivicRegistrarIx} from "@utils/plugin/gateway";
+import {configureCivicRegistrarIx} from "../../../../../../../GatewayPlugin/sdk/api";
 
 interface ConfigureGatewayForm {
   governedAccount: AssetAccount | undefined

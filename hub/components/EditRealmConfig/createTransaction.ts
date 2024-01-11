@@ -24,8 +24,8 @@ import {
   createCivicRegistrarIx,
 } from '../../../GatewayPlugin/sdk/api';
 import {
-    configureQuadraticRegistrarIx,
-    createQuadraticRegistrarIx, DEFAULT_COEFFICIENTS,
+  createQuadraticRegistrarIx,
+  DEFAULT_COEFFICIENTS,
 } from '../../../QuadraticPlugin/sdk/api';
 import { DEFAULT_QV_CONFIG } from '@hub/components/EditRealmConfig/VotingStructureSelector';
 import {

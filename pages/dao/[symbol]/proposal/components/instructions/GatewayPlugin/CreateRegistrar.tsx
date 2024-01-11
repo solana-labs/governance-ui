@@ -20,7 +20,7 @@ import Tooltip from '@components/Tooltip'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import {availablePasses} from "../../../../../../../GatewayPlugin/config";
-import {createCivicRegistrarIx} from "@utils/plugin/gateway";
+import {createCivicRegistrarIx} from "../../../../../../../GatewayPlugin/sdk/api";
 
 interface CreateGatewayRegistrarForm {
   governedAccount: AssetAccount | undefined
