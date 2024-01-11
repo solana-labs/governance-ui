@@ -205,6 +205,10 @@ export function CommunityStructure(props: Props) {
                 props.configAccount.communityTokenConfig.tokenType !==
                 GoverningTokenType.Membership
               }
+              allowQV={
+                props.configAccount.communityTokenConfig.tokenType !==
+                GoverningTokenType.Membership
+              }
               className="w-full"
               communityMint={props.communityMint}
               currentStructure={currentVotingStructure}

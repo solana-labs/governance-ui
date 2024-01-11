@@ -1,6 +1,9 @@
 import { AnchorProvider, Wallet } from '@coral-xyz/anchor';
 
-import { GatewayClient } from '@solana/governance-program-library';
+import {
+  GatewayClient,
+  QuadraticClient,
+} from '@solana/governance-program-library';
 import {
   createSetRealmConfig,
   GoverningTokenType,
@@ -17,13 +20,18 @@ import type {
 } from '@solana/web3.js';
 
 import {
+  configureCivicRegistrarIx,
+  createCivicRegistrarIx,
+} from '../../../GatewayPlugin/sdk/api';
+import {
+    configureQuadraticRegistrarIx,
+    createQuadraticRegistrarIx, DEFAULT_COEFFICIENTS,
+} from '../../../QuadraticPlugin/sdk/api';
+import { DEFAULT_QV_CONFIG } from '@hub/components/EditRealmConfig/VotingStructureSelector';
+import {
   getMaxVoterWeightRecord,
   getRegistrarPDA,
 } from '@utils/plugin/accounts';
-import {
-  configureCivicRegistrarIx,
-  createCivicRegistrarIx,
-} from '@utils/plugin/gateway';
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient';
 
 import { Config } from './fetchConfig';
@@ -48,6 +56,9 @@ function shouldAddConfigInstruction(config: Config, currentConfig: Config) {
 
   return false;
 }
+
+const configUsesVoterWeightPlugin = (config: Config, plugin: PublicKey) =>
+  config.configAccount.communityTokenConfig.voterWeightAddin?.equals(plugin);
 
 export async function createTransaction(
   realmPublicKey: PublicKey,
@@ -166,6 +177,37 @@ export async function createTransaction(
             gatewayClient,
             config.civicPassType,
           );
+
+      instructions.push(instruction);
+    } else if (
+      configUsesVoterWeightPlugin(config, DEFAULT_QV_CONFIG.votingProgramId) &&
+      !configUsesVoterWeightPlugin(
+        currentConfig,
+        DEFAULT_QV_CONFIG.votingProgramId,
+      )
+    ) {
+      // Configure the registrar for the quadratic voting plugin for the DAO
+      // Since QV needs to be paired up with some other plugin that protects against sybil attacks,
+      // it will typically have a predecessor plugin (e.g. the Civic Gateway plugin)
+      // In an upcoming release, there will be a way to configure this via the UI.
+      // In the meantime, we use the heuristic that the existing plugin should be used as the predecessor.
+      // If this is not desired, for any reason, then the workaround is to move back to "default" first.
+      const predecessorPlugin =
+        currentConfig.configAccount.communityTokenConfig.voterWeightAddin;
+
+      const quadraticClient = await QuadraticClient.connect(
+        anchorProvider,
+        isDevnet,
+      );
+
+      // Only registrar creation is possible at present, using default coefficients (no configuration of an existing registrar)
+      const instruction = await createQuadraticRegistrarIx(
+        realmAccount,
+        wallet.publicKey,
+        quadraticClient,
+        DEFAULT_COEFFICIENTS,
+        predecessorPlugin,
+      );
 
       instructions.push(instruction);
     }

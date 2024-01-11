@@ -131,7 +131,12 @@ function isQVConfig(config: Props['structure']) {
 }
 
 function isCustomConfig(config: Props['structure']) {
-  return !isNFTConfig(config) && !isVSRConfig(config) && !isCivicConfig(config);
+  return (
+    !isNFTConfig(config) &&
+    !isVSRConfig(config) &&
+    !isCivicConfig(config) &&
+    !isQVConfig(config)
+  );
 }
 
 export function getLabel(value: Props['structure']): string {

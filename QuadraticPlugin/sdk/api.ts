@@ -5,6 +5,17 @@ import {getRegistrarPDA} from "@utils/plugin/accounts";
 
 export type Coefficients = [ a: number, b: number, c: number ];
 
+// By default, the quadratic plugin will use a function ax-2 + bx - c
+// resulting in a vote weight that is the square root of the token balance
+// Future work will allow this to be configured in the UI if needed
+export const DEFAULT_COEFFICIENTS: Coefficients = [ 1, 0, 0 ];
+
+const toAnchorType = (coefficients: Coefficients) => ({
+    a: coefficients[0],
+    b: coefficients[1],
+    c: coefficients[2],
+    });
+
 // Get the registrar account for a given realm
 export const tryGetQuadraticRegistrar = async (
   registrarPk: PublicKey,
@@ -38,7 +49,7 @@ export const createQuadraticRegistrarIx = async (
         : []
 
     return quadraticClient!.program.methods
-        .createRegistrar(false)
+        .createRegistrar(toAnchorType(coefficients || DEFAULT_COEFFICIENTS), !!predecessor)
         .accounts({
             registrar,
             realm: realm.pubkey,
@@ -52,10 +63,10 @@ export const createQuadraticRegistrarIx = async (
         .instruction()
 }
 // Create an instruction to configure a registrar account for a given realm
-export const configureCivicRegistrarIx = async (
+export const configureQuadraticRegistrarIx = async (
     realm: ProgramAccount<Realm>,
     quadraticClient: QuadraticClient,
-    gatekeeperNetwork: PublicKey,
+    coefficients?:  Coefficients,
     predecessor?: PublicKey
 ) => {
   const {registrar} = await getRegistrarPDA(
@@ -67,12 +78,11 @@ export const configureCivicRegistrarIx = async (
       ? [{pubkey: predecessor, isSigner: false, isWritable: false}]
       : []
   return quadraticClient.program.methods
-      .configureRegistrar(false)
+      .configureRegistrar(toAnchorType(coefficients || DEFAULT_COEFFICIENTS), !!predecessor)
       .accounts({
         registrar,
         realm: realm.pubkey,
         realmAuthority: realm.account.authority!,
-        gatekeeperNetwork: gatekeeperNetwork,
       })
       .remainingAccounts(remainingAccounts)
       .instruction()

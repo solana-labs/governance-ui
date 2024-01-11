@@ -1,4 +1,4 @@
-import { GatewayClient } from '@solana/governance-program-library'
+import {GatewayClient, QuadraticClient} from '@solana/governance-program-library'
 
 import {
   ProgramAccount,
@@ -14,10 +14,8 @@ import {
   getVoterWeightPDA,
 } from 'VoteStakeRegistry/sdk/accounts'
 import { NFTWithMint } from './nfts'
-import {
-  getPreviousVotingWeightRecord,
-  getVoteInstruction,
-} from '../../GatewayPlugin/sdk/accounts'
+import * as GatewayPluginAccounts from '../../GatewayPlugin/sdk/accounts'
+import * as QuadraticPluginAccounts from '../../QuadraticPlugin/sdk/accounts'
 import {
   getVoterWeightRecord as getPluginVoterWeightRecord,
   getRegistrarPDA as getPluginRegistrarPDA,
@@ -106,6 +104,7 @@ export type Client =
   | HeliumVsrClient
   | NftVoterClient
   | GatewayClient
+  | QuadraticClient
   | PythClient
 
 //Abstract for common functions that plugins will implement
@@ -323,7 +322,7 @@ export class VotingClient {
       if (!this.gatewayToken)
         throw new Error(`Unable to execute transaction: No Civic Pass found`)
 
-      const updateVoterWeightRecordIx = await getVoteInstruction(
+      const updateVoterWeightRecordIx = await GatewayPluginAccounts.getVoteInstruction(
         this.client,
         this.gatewayToken,
         realm,
@@ -331,6 +330,21 @@ export class VotingClient {
       )
       instructions.push(updateVoterWeightRecordIx)
       return { voterWeightPk, maxVoterWeightRecord: undefined }
+    }
+    if (this.client instanceof QuadraticClient) {
+      const { voterWeightPk, maxVoterWeightPk } = await this._withHandleQuadraticVoterWeight(
+          realm,
+          walletPk,
+          clientProgramId,
+          instructions
+      )
+      const updateVoterWeightRecordIxes = await QuadraticPluginAccounts.getVoteInstructions(
+          this.client,
+          realm,
+          walletPk
+      )
+      instructions.push(...updateVoterWeightRecordIxes)
+      return { voterWeightPk, maxVoterWeightRecord: maxVoterWeightPk }
     }
     if (this.client instanceof PythClient) {
       const stakeAccount = await this.client!.getMainAccount(walletPk)
@@ -381,7 +395,7 @@ export class VotingClient {
 
     if (this.client instanceof GatewayClient) {
       // get the gateway plugin vote instruction
-      const instruction = await getVoteInstruction(
+      const instruction = await GatewayPluginAccounts.getVoteInstruction(
         this.client,
         this.gatewayToken,
         realm,
@@ -759,7 +773,7 @@ export class VotingClient {
       clientProgramId
     )
 
-    const previousVoterWeightPk = await getPreviousVotingWeightRecord(
+    const previousVoterWeightPk = await GatewayPluginAccounts.getPreviousVotingWeightRecord(
       this.client,
       realm,
       walletPk
@@ -769,6 +783,53 @@ export class VotingClient {
       previousVoterWeightPk,
       voterWeightPk,
       voterWeightRecordBump,
+    }
+  }
+
+  // TODO This will be simplified with milestone 2 of the QV work,
+  // which defines a general-purpose mechanism for plugins in the UI.
+  // We will no longer need separate functions like this for each plugin
+  _withHandleQuadraticVoterWeight = async (
+      realm: ProgramAccount<Realm>,
+      walletPk: PublicKey,
+      clientProgramId: PublicKey,
+      _instructions
+  ) => {
+    if (!(this.client instanceof QuadraticClient)) {
+      throw 'Method only allowed for quadratic client'
+    }
+    const {
+      voterWeightPk,
+      voterWeightRecordBump,
+    } = await getPluginVoterWeightRecord(
+        realm.pubkey,
+        realm.account.communityMint,
+        walletPk,
+        clientProgramId
+    )
+
+    const {
+      maxVoterWeightRecord,
+      maxVoterWeightRecordBump,
+    } = await getPluginMaxVoterWeightRecord(
+        realm.pubkey,
+        walletPk,
+        clientProgramId
+    )
+
+    const { voterWeightPk: previousVoterWeightPk, maxVoterWeightPk: previousMaxVoterWeightPk } = await QuadraticPluginAccounts.getPreviousVotingWeightRecords(
+        this.client,
+        realm,
+        walletPk
+    )
+
+    return {
+      previousVoterWeightPk,
+      previousMaxVoterWeightPk,
+      voterWeightPk,
+      voterWeightRecordBump,
+      maxVoterWeightPk: maxVoterWeightRecord,
+      maxVoterWeightRecordBump
     }
   }
   _setCurrentHeliumVsrPositions = (positions: PositionWithMeta[]) => {

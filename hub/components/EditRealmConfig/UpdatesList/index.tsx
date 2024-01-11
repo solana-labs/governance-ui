@@ -17,6 +17,7 @@ import {
   DEFAULT_NFT_CONFIG,
   DEFAULT_VSR_CONFIG,
   DEFAULT_CIVIC_CONFIG,
+  DEFAULT_QV_CONFIG,
 } from '../VotingStructureSelector';
 import { SectionBlock } from '@hub/components/EditWalletRules/SectionBlock';
 import { SectionHeader } from '@hub/components/EditWalletRules/SectionHeader';
@@ -134,6 +135,11 @@ function votingStructureText(
     typeof maxVotingPluginDiff[1] === 'undefined'
   ) {
     newText = 'Civic';
+  } else if (
+    votingPluginDiff[1]?.equals(DEFAULT_QV_CONFIG.votingProgramId) &&
+    maxVotingPluginDiff[1]?.equals(DEFAULT_QV_CONFIG.maxVotingProgramId)
+  ) {
+    newText = 'QV';
   } else if (votingPluginDiff[1] || maxVotingPluginDiff[1]) {
     newText = 'Custom';
   }
