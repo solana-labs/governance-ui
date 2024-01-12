@@ -397,7 +397,7 @@ export const getSuggestedCoinPresetInfo = async (
     console.log(e)
     return {
       presetKey: 'UNTRUSTED',
-      priceImpact: 100,
+      priceImpact: '100',
     }
   }
 }
