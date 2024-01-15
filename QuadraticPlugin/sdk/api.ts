@@ -7,8 +7,12 @@ export type Coefficients = [ a: number, b: number, c: number ];
 
 // By default, the quadratic plugin will use a function ax-2 + bx - c
 // resulting in a vote weight that is the square root of the token balance
-// Future work will allow this to be configured in the UI if needed
-export const DEFAULT_COEFFICIENTS: Coefficients = [ 1, 0, 0 ];
+// The `a` coefficient is set to 1000, which, assuming the governance token has 6 decimals,
+// will result in a vote weight that is the square root of the token balance in major denomination.
+// For example,  if the token balance is 100, then the vote weight will be:
+// sqrt(100 * 10^6) = 10,000 * 10^3 = 10,000,000 = 10 votes
+// This should be handled dynamically by the UI in the future.
+export const DEFAULT_COEFFICIENTS: Coefficients = [ 1000, 0, 0 ];
 
 const toAnchorType = (coefficients: Coefficients) => ({
     a: coefficients[0],

@@ -12,6 +12,7 @@ import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecor
 import { ExclamationIcon } from '@heroicons/react/solid'
 import { VSR_PLUGIN_PKS } from '@constants/plugins'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import QVVotingPower from '@components/ProposalVotingPower/QVVotingPower'
 
 export default function GovernancePowerForRole({
   role,
@@ -42,9 +43,7 @@ export default function GovernancePowerForRole({
 
   const { result: kind } = useAsync(async () => {
     if (realmPk === undefined) return undefined
-    return didWithdrawFromVanillaSetup
-      ? determineVotingPowerType(connection, realmPk, role)
-      : 'vanilla'
+    return determineVotingPowerType(connection, realmPk, role);
   }, [connection, realmPk, role, didWithdrawFromVanillaSetup])
 
   if (connected && kind === undefined && !props.hideIfZero) {
@@ -74,7 +73,9 @@ export default function GovernancePowerForRole({
           <NftVotingPower />
         ) : kind === 'HeliumVSR' ? (
           <LockedCommunityNFTRecordVotingPower />
-        ) : null
+        ) : kind === 'QV' ? (
+          <QVVotingPower />
+        ): null
       ) : kind === 'vanilla' ? (
         <div>
           <VanillaVotingPower role="council" {...props} />

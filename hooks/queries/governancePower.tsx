@@ -33,6 +33,8 @@ import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet'
 import { findPluginName } from '@constants/plugins'
 import { nftRegistrarQuery } from './plugins/nftVoter'
 import queryClient from './queryClient'
+import useQuadraticPluginStore from "../../QuadraticPlugin/store/quadraticPluginStore";
+import {useEffect} from "react";
 
 export const getVanillaGovpower = async (
   connection: Connection,
@@ -187,6 +189,8 @@ export const useGovernancePowerAsync = (
 
   const heliumVotingPower = useHeliumVsrStore((s) => s.state.votingPower)
   const gatewayVotingPower = useGatewayPluginStore((s) => s.state.votingPower)
+  const quadraticVotingPower = useQuadraticPluginStore((s) => s.state.votingPower)
+  const setQuadraticVotingPower = useQuadraticPluginStore((s) => s.setVotingPower)
   const vsrVotingPower = useVsrGovpower().data?.result
 
   const communityTOR = useAddressQuery_CommunityTokenOwner()
@@ -200,25 +204,35 @@ export const useGovernancePowerAsync = (
   )
   const actingAsWalletPk = useUserOrDelegator()
 
+  // TODO this should be encapsulated into a QV client
+  useEffect(() => {
+      if (plugin === 'QV' && TOR) {
+          getVanillaGovpower(connection, TOR).then(setQuadraticVotingPower);
+      }
+  }, [connection, TOR, plugin]);
+
   return useAsync(
-    async () =>
-      plugin === undefined
-        ? undefined
-        : realmPk &&
-          TOR &&
-          (plugin === 'vanilla'
-            ? getVanillaGovpower(connection, TOR)
-            : plugin === 'NFT'
-            ? getNftGovpower(connection, realmPk, TOR)
-            : plugin === 'VSR'
-            ? vsrVotingPower ?? new BN(0)
-            : plugin === 'HeliumVSR'
-            ? heliumVotingPower
-            : plugin === 'gateway'
-            ? gatewayVotingPower
-            : plugin === 'pyth'
-            ? getPythGovPower(connection, actingAsWalletPk)
-            : new BN(0)),
+    async () => {
+        return plugin === undefined
+            ? undefined
+            : realmPk &&
+            TOR &&
+            (plugin === 'vanilla'
+                ? getVanillaGovpower(connection, TOR)
+                : plugin === 'NFT'
+                    ? getNftGovpower(connection, realmPk, TOR)
+                    : plugin === 'VSR'
+                        ? vsrVotingPower ?? new BN(0)
+                        : plugin === 'HeliumVSR'
+                            ? heliumVotingPower
+                            : plugin === 'gateway'
+                                ? gatewayVotingPower
+                                : plugin === 'QV'
+                                    ? quadraticVotingPower
+                                    : plugin === 'pyth'
+                                        ? getPythGovPower(connection, actingAsWalletPk)
+                                        : new BN(0));
+    },
     [
       plugin,
       realmPk,
@@ -305,6 +319,11 @@ export const useLegacyVoterWeight = () => {
             communityTOR.result,
             councilTOR?.result,
             gatewayVotingPower
+          )
+        : plugin === 'QV'
+        ? new VoterWeight(
+            communityTOR.result,
+            councilTOR?.result,
           )
         : undefined),
 

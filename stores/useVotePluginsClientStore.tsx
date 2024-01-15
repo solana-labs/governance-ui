@@ -58,6 +58,10 @@ interface UseVotePluginsClientStore extends State {
     wallet: SignerWalletAdapter | undefined,
     connection: ConnectionContext
   ) => void
+  handleSetQuadraticClient: (
+      wallet: SignerWalletAdapter | undefined,
+      connection: ConnectionContext
+  ) => void
   handleSetVsrRegistrar: (
     client: VsrClient,
     realm: ProgramAccount<Realm> | undefined
@@ -73,6 +77,10 @@ interface UseVotePluginsClientStore extends State {
   handleSetGatewayRegistrar: (
     client: GatewayClient,
     realm: ProgramAccount<Realm> | undefined
+  ) => void
+  handleSetQuadraticRegistrar: (
+      client: QuadraticClient,
+      realm: ProgramAccount<Realm> | undefined
   ) => void
   handleSetCurrentRealmVotingClient: ({
     client,
@@ -231,8 +239,10 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
           clientProgramId
       )
       const existingRegistrar = await tryGetQuadraticRegistrar(registrar, client)
+      const {maxVoterWeightPk} = client.getMaxVoterWeightRecordPDA(realm.pubkey, realm.account.communityMint);
       set((s) => {
         s.state.quadraticRegistrar = existingRegistrar
+        s.state.maxVoterWeight = maxVoterWeightPk
       })
     },
     handleSetCurrentRealmVotingClient: ({ client, realm, walletPk }) => {

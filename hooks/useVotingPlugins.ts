@@ -19,6 +19,7 @@ import {
   VSR_PLUGIN_PKS,
   GATEWAY_PLUGINS_PKS,
   PYTH_PLUGIN_PK,
+  QV_PLUGINS_PKS,
 } from '../constants/plugins'
 import useUserOrDelegator from './useUserOrDelegator'
 
@@ -37,6 +38,8 @@ export function useVotingPlugins() {
     handleSetGatewayClient,
     handleSetNftRegistrar,
     handleSetGatewayRegistrar,
+    handleSetQuadraticClient,
+    handleSetQuadraticRegistrar,
     handleSetCurrentRealmVotingClient,
     handleSetPythClient,
   } = useVotePluginsClientStore()
@@ -54,6 +57,7 @@ export function useVotingPlugins() {
     currentClient,
     vsrClient,
     gatewayClient,
+    quadraticClient,
     nftClient,
     nftMintRegistrar,
     heliumVsrClient,
@@ -62,6 +66,7 @@ export function useVotingPlugins() {
     s.state.currentRealmVotingClient,
     s.state.vsrClient,
     s.state.gatewayClient,
+    s.state.quadraticClient,
     s.state.nftClient,
     s.state.nftMintRegistrar,
     s.state.heliumVsrClient,
@@ -131,11 +136,13 @@ export function useVotingPlugins() {
       }
       handleSetNftClient(wallet, connection)
       handleSetGatewayClient(wallet, connection)
+      handleSetQuadraticClient(wallet, connection)
     }
   }, [
     connection,
     currentPluginPk,
     handleSetGatewayClient,
+    handleSetQuadraticClient,
     handleSetHeliumVsrClient,
     handleSetNftClient,
     handleSetVsrClient,
@@ -233,6 +240,26 @@ export function useVotingPlugins() {
       }
     }
 
+    // If the current realm uses the Quadratic Voting plugin
+    // load the registrar to get the quadratic voting parameters
+    // and pass the current token weight to the client
+    const handleQVPlugin = () => {
+      if (
+          quadraticClient &&
+          currentPluginPk &&
+          QV_PLUGINS_PKS.includes(currentPluginPk.toBase58())
+      ) {
+        handleSetQuadraticRegistrar(quadraticClient, realm)
+        if (voterPk) {
+          handleSetCurrentRealmVotingClient({
+            client: quadraticClient,
+            realm,
+            walletPk: voterPk,
+          })
+        }
+      }
+    }
+
     if (
       realm &&
       (!currentClient ||
@@ -247,6 +274,7 @@ export function useVotingPlugins() {
       handleVsrPlugin()
       handleHeliumVsrPlugin()
       handlePythPlugin()
+      handleQVPlugin()
     }
   }, [
     currentClient,

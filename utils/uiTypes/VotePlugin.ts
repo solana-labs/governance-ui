@@ -77,6 +77,7 @@ export enum VotingClientType {
   NftVoterClient,
   GatewayClient,
   PythClient,
+  QuadraticClient,
 }
 
 export class AccountData {
@@ -144,8 +145,8 @@ export class VotingClient {
       this.clientType = VotingClientType.GatewayClient
       this.noClient = false
     }
-    if (this.client instanceof GatewayClient) {
-      this.clientType = VotingClientType.GatewayClient
+    if (this.client instanceof QuadraticClient) {
+      this.clientType = VotingClientType.QuadraticClient
       this.noClient = false
     }
     if (this.client instanceof PythClient) {
@@ -335,7 +336,6 @@ export class VotingClient {
       const { voterWeightPk, maxVoterWeightPk } = await this._withHandleQuadraticVoterWeight(
           realm,
           walletPk,
-          clientProgramId,
           instructions
       )
       const updateVoterWeightRecordIxes = await QuadraticPluginAccounts.getVoteInstructions(
@@ -412,6 +412,25 @@ export class VotingClient {
       )
 
       return { voterWeightPk, maxVoterWeightRecord: undefined }
+    }
+
+    if (this.client instanceof QuadraticClient) {
+      // get the quadratic plugin vote instruction
+      const quadraticInstructions = await QuadraticPluginAccounts.getVoteInstructions(
+          this.client,
+          realm,
+          walletPk
+      )
+
+      instructions.push(...quadraticInstructions)
+
+      const { voterWeightPk, maxVoterWeightPk } = await this._withHandleQuadraticVoterWeight(
+          realm,
+          walletPk,
+          instructions
+      )
+
+      return { voterWeightPk, maxVoterWeightRecord: maxVoterWeightPk }
     }
 
     if (this.client instanceof HeliumVsrClient) {
@@ -792,30 +811,22 @@ export class VotingClient {
   _withHandleQuadraticVoterWeight = async (
       realm: ProgramAccount<Realm>,
       walletPk: PublicKey,
-      clientProgramId: PublicKey,
       _instructions
   ) => {
     if (!(this.client instanceof QuadraticClient)) {
       throw 'Method only allowed for quadratic client'
     }
+
+    const mint = realm.account.communityMint;
     const {
       voterWeightPk,
       voterWeightRecordBump,
-    } = await getPluginVoterWeightRecord(
-        realm.pubkey,
-        realm.account.communityMint,
-        walletPk,
-        clientProgramId
-    )
+    } = this.client.getVoterWeightRecordPDA(realm.pubkey, mint, walletPk);
 
     const {
-      maxVoterWeightRecord,
+      maxVoterWeightPk,
       maxVoterWeightRecordBump,
-    } = await getPluginMaxVoterWeightRecord(
-        realm.pubkey,
-        walletPk,
-        clientProgramId
-    )
+    } = this.client.getMaxVoterWeightRecordPDA(realm.pubkey, mint);
 
     const { voterWeightPk: previousVoterWeightPk, maxVoterWeightPk: previousMaxVoterWeightPk } = await QuadraticPluginAccounts.getPreviousVotingWeightRecords(
         this.client,
@@ -828,7 +839,7 @@ export class VotingClient {
       previousMaxVoterWeightPk,
       voterWeightPk,
       voterWeightRecordBump,
-      maxVoterWeightPk: maxVoterWeightRecord,
+      maxVoterWeightPk,
       maxVoterWeightRecordBump
     }
   }

@@ -68,13 +68,19 @@ export const getPreviousVotingWeightRecords = async (
         predecessorProgramId
     )
 
+    // it may or may not have a max voter weight record - check first
     const { maxVoterWeightRecord } = await getMaxVoterWeightRecord(
         realm.pubkey,
         realm.account.communityMint,
         predecessorProgramId
     )
 
-    return { voterWeightPk, maxVoterWeightPk: maxVoterWeightRecord }
+    // Check if that predecessor max voter weight actually exists
+    // voter weight plugins may not use a max voter weight record
+    const hasPredecessorMaxVoterWeightRecord = !!await client.program.provider.connection.getAccountInfo(maxVoterWeightRecord);
+
+    // only return maxVoterWeightRecord if it exists
+    return { voterWeightPk, maxVoterWeightPk: hasPredecessorMaxVoterWeightRecord ? maxVoterWeightRecord : undefined }
   }
 
   // this plugin registrar has no predecessor plugin.
@@ -91,64 +97,24 @@ export const getPreviousVotingWeightRecords = async (
   }
 }
 
+/**
+ * Add updateVoteWeightRecord and updateMaxVoteWeightRecord instructions
+ * to the transaction before voting, to ensure that the vote weight is up to date.
+ */
 export const getVoteInstructions = async (
     client: QuadraticClient,
     realm: ProgramAccount<Realm>,
     walletPk: PublicKey
 ) => {
-  // get the user's voter weight account address
-  const { voterWeightPk } = await getVoterWeightRecord(
-      realm.pubkey,
-      realm.account.communityMint,
-      walletPk,
-      client.program.programId
-  )
-
-  const { maxVoterWeightRecord: maxVoterWeightPk } = await getMaxVoterWeightRecord(
-      realm.pubkey,
-      realm.account.communityMint,
-      client.program.programId
-  )
-
-  // Get the registrar for the realm
-  const { registrar } = await getRegistrarPDA(
-      realm.pubkey,
-      realm.account.communityMint,
-      client.program.programId
-  )
-
-  // the previous voting weight record in the chain of plugins,
-  // or the token owner record if this is the first plugin in the chain
-  const { voterWeightPk: inputVoterWeight, maxVoterWeightPk: inputMaxVoterWeight} = await getPreviousVotingWeightRecords(
-      client,
-      realm,
-      walletPk
-  )
+  const mint = realm.account.communityMint;
 
   const instructions: TransactionInstruction[] = [];
 
-  // call updateVotingWeightRecord on the plugin
-  const updateVoterWeightIx = await client.program.methods
-      .updateVoterWeightRecord()
-      .accounts({
-        registrar,
-        voterWeightRecord: voterWeightPk,
-        inputVoterWeight,
-      })
-      .instruction()
+  const updateVoterWeightIx = await client.updateVoterWeightRecord(walletPk, realm.pubkey, mint);
   instructions.push(updateVoterWeightIx);
 
-  if (inputMaxVoterWeight) {
-    const updateMaxVoterWeightIx = await client.program.methods
-        .updateMaxVoterWeightRecord()
-        .accounts({
-          registrar,
-          maxVoterWeightRecord: maxVoterWeightPk,
-          inputMaxVoterWeight,
-        })
-        .instruction()
-    instructions.push(updateMaxVoterWeightIx);
-  }
+  const updateMaxVoterWeightIx = await client.updateMaxVoterWeightRecord(realm.pubkey, mint);
+  instructions.push(updateMaxVoterWeightIx);
 
   return instructions;
 }
