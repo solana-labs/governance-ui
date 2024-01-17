@@ -3225,6 +3225,19 @@
     "ogImage": "/realms/LavaDAO/img/lavalogo.png"
   },
   {
+    "symbol": "PAWN",
+    "displayName": "Pawn DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "shortDescription": "A Pawn in someone's experiment.",
+    "discord": "https://discord.gg/Td7QFn2ePz",
+    "bannerImage": "/realms/PAWN/img/pawns-banner.png",
+    "category": "Memecoin",
+    "sortRank": 3, 
+    "realmId": "7rvjS4CgRYUZkSLJAXitmeQCybvfZcYcMjpVRhJ9mFHK",
+    "twitter": "@pawnspl24",
+    "ogImage": "/realms/PAWN/img/pawn.png"
+  },
+  {
     "symbol": "COMRADE",
     "displayName": "ComradeDAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
