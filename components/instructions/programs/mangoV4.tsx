@@ -1273,6 +1273,7 @@ const instructions = () => ({
                   `${invalidFields.netBorrowLimitWindowSizeTs}H`
                 }
               />
+
               <DisplayNullishProperty
                 label="Net Borrow Limit Per Window Quote"
                 value={
@@ -1809,10 +1810,7 @@ const getFormattedListingValues = (args: FlatListingArgs) => {
     initLiabWeight: args.initLiabWeight.toFixed(2),
     liquidationFee: (args['liquidationFee'] * 100).toFixed(2),
     minVaultToDepositsRatio: (args['minVaultToDepositsRatio'] * 100).toFixed(2),
-    netBorrowLimitPerWindowQuote: toUiDecimals(
-      args['netBorrowLimitPerWindowQuote'],
-      6
-    ),
+    netBorrowLimitPerWindowQuote: args['netBorrowLimitPerWindowQuote'],
     netBorrowLimitWindowSizeTs: secondsToHours(args.netBorrowLimitWindowSizeTs),
     borrowWeightScaleStartQuote: toUiDecimals(
       args.borrowWeightScaleStartQuote,
