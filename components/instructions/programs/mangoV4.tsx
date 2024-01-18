@@ -284,15 +284,25 @@ const instructions = () => ({
             suggestedFormattedPreset
           )
         : []
-      const invalidFields: Partial<ListingArgsFormatted> = invalidKeys.reduce(
-        (obj, key) => {
+
+      const invalidFields: Partial<ListingArgsFormatted> = invalidKeys
+        .filter((x) => {
+          //soft invalid keys - some of the keys can be off by some small maring
+          if (x === 'depositLimit') {
+            return !isDifferenceWithin5Percent(
+              Number(formattedProposedArgs['depositLimit'] || 0),
+              Number(suggestedFormattedPreset['depositLimit'])
+            )
+          }
+          return true
+        })
+        .reduce((obj, key) => {
           return {
             ...obj,
             [key]: suggestedFormattedPreset[key],
           }
-        },
-        {}
-      )
+        }, {})
+
       const DisplayListingPropertyWrapped = ({
         label,
         valKey,
@@ -326,10 +336,7 @@ const instructions = () => ({
                     Suggested token tier: C
                   </h3>
                   <h3 className="text-orange flex">
-                    Very low liquidity Price impact of {presetInfo.priceImpact}%
-                    on $1000 swap. This token should probably be listed using
-                    the Register Trustless Token instruction check params
-                    carefully
+                    Very low liquidity check params carefully
                   </h3>
                 </>
               )}
@@ -530,22 +537,40 @@ const instructions = () => ({
               />
               <DisplayNullishProperty
                 label="Deposit Limit"
-                value={
+                value={`${
                   mintInfo
                     ? toUiDecimals(
                         new BN(formattedProposedArgs.depositLimit.toString()),
                         mintInfo.account.decimals
                       )
                     : formattedProposedArgs.depositLimit
-                }
-                suggestedVal={
+                } ${args.name} ($${
+                  mintInfo
+                    ? (
+                        toUiDecimals(
+                          new BN(formattedProposedArgs.depositLimit.toString()),
+                          mintInfo.account.decimals
+                        ) * oracleData.uiPrice
+                      ).toFixed(0)
+                    : 0
+                })`}
+                suggestedVal={`${
                   mintInfo && invalidFields?.depositLimit
                     ? toUiDecimals(
                         new BN(invalidFields.depositLimit.toString()),
                         mintInfo.account.decimals
                       )
                     : invalidFields.depositLimit
-                }
+                } ${args.name} ($${
+                  mintInfo && invalidFields.depositLimit
+                    ? (
+                        toUiDecimals(
+                          new BN(invalidFields.depositLimit.toString()),
+                          mintInfo.account.decimals
+                        ) * oracleData.uiPrice
+                      ).toFixed(0)
+                    : 0
+                })`}
               />
               <DisplayListingPropertyWrapped
                 label="Interest Target Utilization"
@@ -946,7 +971,7 @@ const instructions = () => ({
 
           const suggestedPreset = getFormattedListingPresets(
             !!isPyth,
-            bank.nativeDeposits().mul(bank.price).toNumber(),
+            bank.uiDeposits(),
             bank.mintDecimals,
             bank.uiPrice
           )[liqudityTier.presetKey!]
@@ -1007,13 +1032,9 @@ const instructions = () => ({
                   <WarningFilledIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
                   Suggested token tier: C
                 </h3>
-                {liqudityTier.priceImpact && (
-                  <h3 className="text-orange flex">
-                    Very low liquidity Price impact of{' '}
-                    {Number(liqudityTier.priceImpact).toFixed(2)}% on $1000
-                    swap. Check params carefully
-                  </h3>
-                )}
+                <h3 className="text-orange flex">
+                  Very low liquidity check params carefully
+                </h3>
               </>
             )}
             {!invalidKeys.length && liqudityTier.presetKey && (
@@ -1379,9 +1400,30 @@ const instructions = () => ({
               />
               <DisplayNullishProperty
                 label="Deposit Limit"
-                value={parsedArgs.depositLimit}
-                currentValue={bankFormattedValues?.depositLimit}
-                suggestedVal={invalidFields.depositLimit}
+                value={`${
+                  bank && parsedArgs.depositLimit
+                    ? toUiDecimals(
+                        new BN(parsedArgs.depositLimit),
+                        bank.mintDecimals
+                      )
+                    : parsedArgs.depositLimit
+                } ${bank?.name}`}
+                currentValue={`${
+                  bank && bankFormattedValues?.depositLimit
+                    ? toUiDecimals(
+                        new BN(bankFormattedValues.depositLimit),
+                        bank.mintDecimals
+                      )
+                    : bankFormattedValues?.depositLimit
+                } ${bank?.name}`}
+                suggestedVal={`${
+                  bank && invalidFields?.depositLimit
+                    ? toUiDecimals(
+                        new BN(invalidFields.depositLimit),
+                        bank.mintDecimals
+                      )
+                    : invalidFields?.depositLimit
+                } ${bank?.name}`}
               />
               {parsedArgs?.maintWeightShiftAbort && (
                 <DisplayNullishProperty
