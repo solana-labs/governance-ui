@@ -1810,7 +1810,10 @@ const getFormattedListingValues = (args: FlatListingArgs) => {
     initLiabWeight: args.initLiabWeight.toFixed(2),
     liquidationFee: (args['liquidationFee'] * 100).toFixed(2),
     minVaultToDepositsRatio: (args['minVaultToDepositsRatio'] * 100).toFixed(2),
-    netBorrowLimitPerWindowQuote: args['netBorrowLimitPerWindowQuote'],
+    netBorrowLimitPerWindowQuote: toUiDecimals(
+      args['netBorrowLimitPerWindowQuote'],
+      6
+    ),
     netBorrowLimitWindowSizeTs: secondsToHours(args.netBorrowLimitWindowSizeTs),
     borrowWeightScaleStartQuote: toUiDecimals(
       args.borrowWeightScaleStartQuote,
