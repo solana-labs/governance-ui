@@ -946,7 +946,7 @@ const instructions = () => ({
 
           const suggestedPreset = getFormattedListingPresets(
             !!isPyth,
-            bank.nativeDeposits().mul(bank.price).toNumber(),
+            bank.uiDeposits(),
             bank.mintDecimals,
             bank.uiPrice
           )[liqudityTier.presetKey!]
