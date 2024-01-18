@@ -537,22 +537,40 @@ const instructions = () => ({
               />
               <DisplayNullishProperty
                 label="Deposit Limit"
-                value={
+                value={`${
                   mintInfo
                     ? toUiDecimals(
                         new BN(formattedProposedArgs.depositLimit.toString()),
                         mintInfo.account.decimals
                       )
                     : formattedProposedArgs.depositLimit
-                }
-                suggestedVal={
+                } ${args.name} ($${
+                  mintInfo
+                    ? (
+                        toUiDecimals(
+                          new BN(formattedProposedArgs.depositLimit.toString()),
+                          mintInfo.account.decimals
+                        ) * oracleData.uiPrice
+                      ).toFixed(0)
+                    : 0
+                })`}
+                suggestedVal={`${
                   mintInfo && invalidFields?.depositLimit
                     ? toUiDecimals(
                         new BN(invalidFields.depositLimit.toString()),
                         mintInfo.account.decimals
                       )
                     : invalidFields.depositLimit
-                }
+                } ${args.name} ($${
+                  mintInfo && invalidFields.depositLimit
+                    ? (
+                        toUiDecimals(
+                          new BN(invalidFields.depositLimit.toString()),
+                          mintInfo.account.decimals
+                        ) * oracleData.uiPrice
+                      ).toFixed(0)
+                    : 0
+                })`}
               />
               <DisplayListingPropertyWrapped
                 label="Interest Target Utilization"
@@ -953,7 +971,7 @@ const instructions = () => ({
 
           const suggestedPreset = getFormattedListingPresets(
             !!isPyth,
-            bank.nativeDeposits().mul(bank.price).toNumber(),
+            bank.uiDeposits(),
             bank.mintDecimals,
             bank.uiPrice
           )[liqudityTier.presetKey!]
@@ -1382,9 +1400,30 @@ const instructions = () => ({
               />
               <DisplayNullishProperty
                 label="Deposit Limit"
-                value={parsedArgs.depositLimit}
-                currentValue={bankFormattedValues?.depositLimit}
-                suggestedVal={invalidFields.depositLimit}
+                value={`${
+                  bank && parsedArgs.depositLimit
+                    ? toUiDecimals(
+                        new BN(parsedArgs.depositLimit),
+                        bank.mintDecimals
+                      )
+                    : parsedArgs.depositLimit
+                } ${bank?.name}`}
+                currentValue={`${
+                  bank && bankFormattedValues?.depositLimit
+                    ? toUiDecimals(
+                        new BN(bankFormattedValues.depositLimit),
+                        bank.mintDecimals
+                      )
+                    : bankFormattedValues?.depositLimit
+                } ${bank?.name}`}
+                suggestedVal={`${
+                  bank && invalidFields?.depositLimit
+                    ? toUiDecimals(
+                        new BN(invalidFields.depositLimit),
+                        bank.mintDecimals
+                      )
+                    : invalidFields?.depositLimit
+                } ${bank?.name}`}
               />
               {parsedArgs?.maintWeightShiftAbort && (
                 <DisplayNullishProperty
