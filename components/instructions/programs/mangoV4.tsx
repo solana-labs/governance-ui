@@ -1401,30 +1401,40 @@ const instructions = () => ({
               />
               <DisplayNullishProperty
                 label="Deposit Limit"
-                value={`${
-                  bank && parsedArgs.depositLimit
-                    ? toUiDecimals(
-                        new BN(parsedArgs.depositLimit),
-                        bank.mintDecimals
-                      )
-                    : parsedArgs.depositLimit
-                } ${bank?.name}`}
-                currentValue={`${
-                  bank && bankFormattedValues?.depositLimit
-                    ? toUiDecimals(
-                        new BN(bankFormattedValues.depositLimit),
-                        bank.mintDecimals
-                      )
-                    : bankFormattedValues?.depositLimit
-                } ${bank?.name}`}
-                suggestedVal={`${
-                  bank && invalidFields?.depositLimit
-                    ? toUiDecimals(
-                        new BN(invalidFields.depositLimit),
-                        bank.mintDecimals
-                      )
-                    : invalidFields?.depositLimit
-                } ${bank?.name}`}
+                value={
+                  bank &&
+                  parsedArgs.depositLimit &&
+                  `${
+                    bank && parsedArgs.depositLimit
+                      ? toUiDecimals(
+                          new BN(parsedArgs.depositLimit),
+                          bank.mintDecimals
+                        )
+                      : parsedArgs.depositLimit
+                  } ${bank?.name}`
+                }
+                currentValue={
+                  bankFormattedValues?.depositLimit &&
+                  `${
+                    bank && bankFormattedValues?.depositLimit
+                      ? toUiDecimals(
+                          new BN(bankFormattedValues.depositLimit),
+                          bank.mintDecimals
+                        )
+                      : bankFormattedValues?.depositLimit
+                  } ${bank?.name}`
+                }
+                suggestedVal={
+                  invalidFields?.depositLimit &&
+                  `${
+                    bank && invalidFields?.depositLimit
+                      ? toUiDecimals(
+                          new BN(invalidFields.depositLimit),
+                          bank.mintDecimals
+                        )
+                      : invalidFields?.depositLimit
+                  } ${bank?.name}`
+                }
               />
               {parsedArgs?.maintWeightShiftAbort && (
                 <DisplayNullishProperty
