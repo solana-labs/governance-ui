@@ -113,8 +113,5 @@ export const getVoteInstructions = async (
   const updateVoterWeightIx = await client.updateVoterWeightRecord(walletPk, realm.pubkey, mint);
   instructions.push(updateVoterWeightIx);
 
-  const updateMaxVoterWeightIx = await client.updateMaxVoterWeightRecord(realm.pubkey, mint);
-  instructions.push(updateMaxVoterWeightIx);
-
   return instructions;
 }
