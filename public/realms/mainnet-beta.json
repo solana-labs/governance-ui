@@ -3420,5 +3420,16 @@
     "website": "https://gari.network/",
     "twitter": "@TheGariNetwork",
     "category": "web3"
+},
+  {
+    "symbol": "$DATBOI",
+    "displayName": "DATBOI DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "6w49FPScLfV6iw94bxCE8kh49pz2FvteMvSE1YTKb1sC",
+    "bannerImage": "/realms/DatBoiDAO/DatboiTwitterBanner.png",
+    "ogImage": "/realms/DatBoiDAO/CALogo.png",
+    "website": "https://datboi.rocks/",
+    "twitter": "@datboisolana"
 }
+  
 ]
