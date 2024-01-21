@@ -837,7 +837,10 @@ const instructions = () => ({
               ? args['oracleConfigOpt.confFilter'].toString()
               : (args['oracleConfigOpt.confFilter'] * 100).toFixed(2)
             : undefined,
-          oracleMaxStalenessSlots: args['oracleConfigOpt.maxStalenessSlots'],
+          oracleMaxStalenessSlots:
+            args['oracleConfigOpt.maxStalenessSlots'] === null
+              ? -1
+              : args['oracleConfigOpt.maxStalenessSlots'],
           interestRateUtilizationPoint0:
             args['interestRateParamsOpt.util0'] !== undefined
               ? (args['interestRateParamsOpt.util0'] * 100)?.toFixed(2)
@@ -1091,7 +1094,11 @@ const instructions = () => ({
               <DisplayNullishProperty
                 label="Oracle Max Staleness Slots"
                 currentValue={bankFormattedValues?.maxStalenessSlots}
-                value={parsedArgs.oracleMaxStalenessSlots}
+                value={
+                  parsedArgs.oracleMaxStalenessSlots === null
+                    ? -1
+                    : parsedArgs.oracleMaxStalenessSlots
+                }
                 suggestedVal={invalidFields.oracleMaxStalenessSlots}
               />
               <DisplayNullishProperty
