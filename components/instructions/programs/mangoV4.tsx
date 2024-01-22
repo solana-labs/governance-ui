@@ -40,6 +40,7 @@ import { tryParseKey } from '@tools/validators/pubkey'
 import Loading from '@components/Loading'
 import { getClient, getGroupForClient } from '@utils/mangoV4Tools'
 import { tryGetMint } from '@utils/tokens'
+import { formatNumber } from '@utils/formatNumber'
 // import { snakeCase } from 'snake-case'
 // import { sha256 } from 'js-sha256'
 
@@ -1598,12 +1599,35 @@ const instructions = () => ({
     ],
     getDataUI: async (
       connection: Connection,
-      data: Uint8Array
-      //accounts: AccountMetaData[]
+      data: Uint8Array,
+      accounts: AccountMetaData[]
     ) => {
-      const info = await displayArgs(connection, data)
+      const args = await getDataObjectFlattened<any>(connection, data)
+      const accountInfo = await connection.getParsedAccountInfo(
+        accounts[6].pubkey
+      )
+      const mint = await tryGetMint(
+        connection,
+        new PublicKey(accountInfo.value?.data['parsed'].info.mint)
+      )
+      const tokenInfo = tokenPriceService.getTokenInfo(
+        accountInfo.value?.data['parsed'].info.mint
+      )
       try {
-        return <div>{info}</div>
+        return (
+          <div>
+            <div>
+              amount:{' '}
+              {mint?.account.decimals
+                ? formatNumber(
+                    toUiDecimals(args.amount, mint?.account.decimals)
+                  )
+                : args.amount}{' '}
+              {tokenInfo?.symbol}
+            </div>
+            <div>reduce only: {args.reduceOnly.toString()}</div>
+          </div>
+        )
       } catch (e) {
         console.log(e)
         return <div>{JSON.stringify(data)}</div>
