@@ -3422,12 +3422,21 @@
     "category": "web3"
 },
 {
-  "symbol": "BOHDAO",
-"displayName": "Brigade of Honor Dao",
-"programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-"realmId": "FSh5XBFUYFMEWP99y4j7W6zERtEnqFVuwfuHgHgJJYWq",
-"ogImage": "https://www.brigadeofhonor.com/BOHlogo.png",
-"website": "https://www.brigadeofhonor.com",
-"twitter": "@BoHgamingguild"
-}
+   "symbol": "BOHDAO",
+   "displayName": "Brigade of Honor Dao",
+   "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+   "realmId": "FSh5XBFUYFMEWP99y4j7W6zERtEnqFVuwfuHgHgJJYWq",
+   "ogImage": "https://www.brigadeofhonor.com/BOHlogo.png",
+   "website": "https://www.brigadeofhonor.com",
+   "twitter": "@BoHgamingguild"
+},
+{ 
+   "symbol": "TOKE",
+   "displayName": "McToken DAO",
+   "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+   "realmId": "BEmzTQaiwyj69uvxmdL9fSEuETg9vsVrRDAkmDE1HWTD",
+   "ogImage": "/realms/mctoken/mctoken.png",
+   "website": "https://myceliumnetworks.com",
+   "twitter": "@MyceliumX"
+},
 ]
