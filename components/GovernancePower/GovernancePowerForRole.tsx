@@ -57,7 +57,7 @@ export default function GovernancePowerForRole({
           didWithdrawFromVanillaSetup ? (
             <LockedCommunityVotingPower />
           ) : (
-            //TODO move me to body of LockedCommunityVotingPower
+            //TODO make a better generic little prompt for when a plugin is used but there are still tokens in vanilla
             <>
               <VanillaVotingPower role="community" {...props} />
               <div className="flex flex-col gap-2">
