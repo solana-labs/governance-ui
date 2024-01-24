@@ -11,6 +11,10 @@ import { tryParsePublicKey } from '@tools/core/pubkey'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import { GoverningTokenType } from '@solana/spl-governance'
+import { determineVotingPowerType } from '@hooks/queries/governancePower'
+import { useAsync } from 'react-async-hook'
+import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 const RealmHeader = () => {
   const { fmtUrlWithCluster } = useQueryContext()
@@ -25,6 +29,14 @@ const RealmHeader = () => {
 
   const [isBackNavVisible, setIsBackNavVisible] = useState(true)
 
+  const { connection } = useConnection()
+  const realmPk = useSelectedRealmPubkey()
+
+  const { result: kind } = useAsync(async () => {
+    if (realmPk === undefined) return undefined
+    return determineVotingPowerType(connection, realmPk, 'community')
+  }, [connection, realmPk])
+  const membersTabIsCouncilOnly = !(kind === 'vanilla' || kind === 'NFT')
   const councilExists =
     realm?.account.config.councilMint !== undefined &&
     config?.account.councilTokenConfig?.tokenType !== GoverningTokenType.Dormant
@@ -83,11 +95,11 @@ const RealmHeader = () => {
               </a>
             </Link>
           )}
-          {councilExists && (
+          {(!membersTabIsCouncilOnly || councilExists) && (
             <Link href={fmtUrlWithCluster(`/dao/${symbol}/members`)}>
               <a className="flex items-center text-sm cursor-pointer default-transition text-fgd-2 hover:text-fgd-3">
                 <UsersIcon className="flex-shrink-0 w-5 h-5 mr-1" />
-                Members
+                {membersTabIsCouncilOnly ? 'Council' : 'Members'}
               </a>
             </Link>
           )}
