@@ -217,24 +217,35 @@ const dasByOwnerQueryFn = async (network: Network, owner: PublicKey) => {
 
   // https://docs.helius.xyz/solana-compression/digital-asset-standard-das-api/get-assets-by-owner
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      jsonrpc: '2.0',
-      id: 'Realms user',
-      method: 'getAssetsByOwner',
-      params: {
-        ownerAddress: owner.toString(),
-        page: 1, // Starts at 1
-        limit: 1000, // TODO support having >1k nfts
+  const PAGE_LIMIT = 1000
+  const items: DasNftObject[] = []
+  let moreNftsRemaining = true
+  let page = 1
+
+  while (moreNftsRemaining) {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-    }),
-  })
-  const { result } = await response.json()
-  return result.items as DasNftObject[]
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 'Realms user',
+        method: 'getAssetsByOwner',
+        params: {
+          ownerAddress: owner.toString(),
+          page, // Starts at 1
+          limit: PAGE_LIMIT,
+        },
+      }),
+    })
+    const { result } = await response.json()
+    const pageItems = result.items as DasNftObject[]
+    items.push(...pageItems)
+    page++
+    if (pageItems.length < PAGE_LIMIT) moreNftsRemaining = false
+  }
+  return items
 }
 
 export const fetchDigitalAssetsByOwner = (network: Network, owner: PublicKey) =>
