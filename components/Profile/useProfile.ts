@@ -32,8 +32,6 @@ export const useProfile = (
         ...data,
         exists: profileIsSet(data),
       }),
-      retry: true,
-      // If a user gets rate limited, otherwise it will continually keep retrying for each profile
     }
   )
 
