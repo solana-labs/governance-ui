@@ -3430,13 +3430,13 @@
 "website": "https://www.brigadeofhonor.com",
 "twitter": "@BoHgamingguild"
 }, 
-{ "symbol": "HOTTUB",
-
+{ 
+"symbol": "HOTTUB",
 "displayName": "Hot Tub Time Machine",
 "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
 "realmId": "EiVEGHgTQypzb3toRPjJiYeSnpoWPF8GoS71QM2hNFSd",
 "bannerImage": "/realms/HotTub/1246127.png",
 "ogImage": "/realms/HotTub/HOTTUB.jpg",
 "website": "https://hottubdao.xyz",
-"twitter": "@HotTubSol" },
+"twitter": "@HotTubSol" }
 ]
