@@ -27,11 +27,13 @@ export const useProfile = (
     // @ts-ignore we won't run this if there is no profileWalletPublicKey
     () => CivicProfile.get(profileWalletPublicKey?.toBase58(), options),
     {
-      enabled: !!profileWalletPublicKey, // Only serun query if profileWalletPublicKey is available
+      enabled: !!profileWalletPublicKey, // Only run query if profileWalletPublicKey is available
       select: (data) => ({
         ...data,
         exists: profileIsSet(data),
       }),
+      retry: true,
+      // If a user gets rate limited, otherwise it will continually keep retrying for each profile
     }
   )
 
