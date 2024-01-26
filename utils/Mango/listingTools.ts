@@ -202,7 +202,7 @@ type ProposedListingPresets = {
 
 export const getFormattedListingPresets = (
   isPythOracle: boolean,
-  currentTotalDepositsInUsdc?: number,
+  uiDeposits?: number,
   decimals?: number,
   tokenPrice?: number
 ) => {
@@ -214,10 +214,11 @@ export const getFormattedListingPresets = (
     PRESETS
   ).reduce((accumulator, key) => {
     let adjustedPreset = PRESETS[key]
-    if (currentTotalDepositsInUsdc) {
+    if (uiDeposits && tokenPrice) {
       adjustedPreset = getPresetWithAdjustedNetBorrows(
         PRESETS[key],
-        currentTotalDepositsInUsdc
+        uiDeposits,
+        tokenPrice
       )
     }
 
@@ -397,7 +398,7 @@ export const getSuggestedCoinPresetInfo = async (
     console.log(e)
     return {
       presetKey: 'UNTRUSTED',
-      priceImpact: 100,
+      priceImpact: '100',
     }
   }
 }

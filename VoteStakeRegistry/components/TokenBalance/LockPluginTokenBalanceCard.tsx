@@ -133,7 +133,6 @@ const LockPluginTokenBalanceCard = ({
               <TokenDeposit
                 mint={councilMint}
                 tokenRole={GoverningTokenRole.Council}
-                councilVote={true}
                 setHasGovPower={setHasGovPower}
               />
             </div>

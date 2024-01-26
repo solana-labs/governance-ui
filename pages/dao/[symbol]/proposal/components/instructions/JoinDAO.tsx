@@ -201,7 +201,11 @@ const JoinDAO = ({
         error={formErrors['realm']}
       >
         {certifiedRealms.map((r) => (
-          <Select.Option className="border-red" key="haha" value={r}>
+          <Select.Option
+            className="border-red"
+            key={r.realmId.toString()}
+            value={r}
+          >
             {r.displayName}
           </Select.Option>
         ))}

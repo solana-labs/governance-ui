@@ -40,6 +40,7 @@ import { tryParseKey } from '@tools/validators/pubkey'
 import Loading from '@components/Loading'
 import { getClient, getGroupForClient } from '@utils/mangoV4Tools'
 import { tryGetMint } from '@utils/tokens'
+import { formatNumber } from '@utils/formatNumber'
 // import { snakeCase } from 'snake-case'
 // import { sha256 } from 'js-sha256'
 
@@ -284,15 +285,25 @@ const instructions = () => ({
             suggestedFormattedPreset
           )
         : []
-      const invalidFields: Partial<ListingArgsFormatted> = invalidKeys.reduce(
-        (obj, key) => {
+
+      const invalidFields: Partial<ListingArgsFormatted> = invalidKeys
+        .filter((x) => {
+          //soft invalid keys - some of the keys can be off by some small maring
+          if (x === 'depositLimit') {
+            return !isDifferenceWithin5Percent(
+              Number(formattedProposedArgs['depositLimit'] || 0),
+              Number(suggestedFormattedPreset['depositLimit'])
+            )
+          }
+          return true
+        })
+        .reduce((obj, key) => {
           return {
             ...obj,
             [key]: suggestedFormattedPreset[key],
           }
-        },
-        {}
-      )
+        }, {})
+
       const DisplayListingPropertyWrapped = ({
         label,
         valKey,
@@ -326,10 +337,7 @@ const instructions = () => ({
                     Suggested token tier: C
                   </h3>
                   <h3 className="text-orange flex">
-                    Very low liquidity Price impact of {presetInfo.priceImpact}%
-                    on $1000 swap. This token should probably be listed using
-                    the Register Trustless Token instruction check params
-                    carefully
+                    Very low liquidity check params carefully
                   </h3>
                 </>
               )}
@@ -530,22 +538,40 @@ const instructions = () => ({
               />
               <DisplayNullishProperty
                 label="Deposit Limit"
-                value={
+                value={`${
                   mintInfo
                     ? toUiDecimals(
                         new BN(formattedProposedArgs.depositLimit.toString()),
                         mintInfo.account.decimals
                       )
                     : formattedProposedArgs.depositLimit
-                }
-                suggestedVal={
+                } ${args.name} ($${
+                  mintInfo
+                    ? (
+                        toUiDecimals(
+                          new BN(formattedProposedArgs.depositLimit.toString()),
+                          mintInfo.account.decimals
+                        ) * oracleData.uiPrice
+                      ).toFixed(0)
+                    : 0
+                })`}
+                suggestedVal={`${
                   mintInfo && invalidFields?.depositLimit
                     ? toUiDecimals(
                         new BN(invalidFields.depositLimit.toString()),
                         mintInfo.account.decimals
                       )
                     : invalidFields.depositLimit
-                }
+                } ${args.name} ($${
+                  mintInfo && invalidFields.depositLimit
+                    ? (
+                        toUiDecimals(
+                          new BN(invalidFields.depositLimit.toString()),
+                          mintInfo.account.decimals
+                        ) * oracleData.uiPrice
+                      ).toFixed(0)
+                    : 0
+                })`}
               />
               <DisplayListingPropertyWrapped
                 label="Interest Target Utilization"
@@ -812,7 +838,10 @@ const instructions = () => ({
               ? args['oracleConfigOpt.confFilter'].toString()
               : (args['oracleConfigOpt.confFilter'] * 100).toFixed(2)
             : undefined,
-          oracleMaxStalenessSlots: args['oracleConfigOpt.maxStalenessSlots'],
+          oracleMaxStalenessSlots:
+            args['oracleConfigOpt.maxStalenessSlots'] === null
+              ? -1
+              : args['oracleConfigOpt.maxStalenessSlots'],
           interestRateUtilizationPoint0:
             args['interestRateParamsOpt.util0'] !== undefined
               ? (args['interestRateParamsOpt.util0'] * 100)?.toFixed(2)
@@ -946,7 +975,7 @@ const instructions = () => ({
 
           const suggestedPreset = getFormattedListingPresets(
             !!isPyth,
-            bank.nativeDeposits().mul(bank.price).toNumber(),
+            bank.uiDeposits(),
             bank.mintDecimals,
             bank.uiPrice
           )[liqudityTier.presetKey!]
@@ -1007,13 +1036,9 @@ const instructions = () => ({
                   <WarningFilledIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
                   Suggested token tier: C
                 </h3>
-                {liqudityTier.priceImpact && (
-                  <h3 className="text-orange flex">
-                    Very low liquidity Price impact of{' '}
-                    {Number(liqudityTier.priceImpact).toFixed(2)}% on $1000
-                    swap. Check params carefully
-                  </h3>
-                )}
+                <h3 className="text-orange flex">
+                  Very low liquidity check params carefully
+                </h3>
               </>
             )}
             {!invalidKeys.length && liqudityTier.presetKey && (
@@ -1070,7 +1095,11 @@ const instructions = () => ({
               <DisplayNullishProperty
                 label="Oracle Max Staleness Slots"
                 currentValue={bankFormattedValues?.maxStalenessSlots}
-                value={parsedArgs.oracleMaxStalenessSlots}
+                value={
+                  parsedArgs.oracleMaxStalenessSlots === null
+                    ? -1
+                    : parsedArgs.oracleMaxStalenessSlots
+                }
                 suggestedVal={invalidFields.oracleMaxStalenessSlots}
               />
               <DisplayNullishProperty
@@ -1252,6 +1281,7 @@ const instructions = () => ({
                   `${invalidFields.netBorrowLimitWindowSizeTs}H`
                 }
               />
+
               <DisplayNullishProperty
                 label="Net Borrow Limit Per Window Quote"
                 value={
@@ -1379,9 +1409,40 @@ const instructions = () => ({
               />
               <DisplayNullishProperty
                 label="Deposit Limit"
-                value={parsedArgs.depositLimit}
-                currentValue={bankFormattedValues?.depositLimit}
-                suggestedVal={invalidFields.depositLimit}
+                value={
+                  bank &&
+                  parsedArgs.depositLimit &&
+                  `${
+                    bank && parsedArgs.depositLimit
+                      ? toUiDecimals(
+                          new BN(parsedArgs.depositLimit),
+                          bank.mintDecimals
+                        )
+                      : parsedArgs.depositLimit
+                  } ${bank?.name}`
+                }
+                currentValue={
+                  bankFormattedValues?.depositLimit &&
+                  `${
+                    bank && bankFormattedValues?.depositLimit
+                      ? toUiDecimals(
+                          new BN(bankFormattedValues.depositLimit),
+                          bank.mintDecimals
+                        )
+                      : bankFormattedValues?.depositLimit
+                  } ${bank?.name}`
+                }
+                suggestedVal={
+                  invalidFields?.depositLimit &&
+                  `${
+                    bank && invalidFields?.depositLimit
+                      ? toUiDecimals(
+                          new BN(invalidFields.depositLimit),
+                          bank.mintDecimals
+                        )
+                      : invalidFields?.depositLimit
+                  } ${bank?.name}`
+                }
               />
               {parsedArgs?.maintWeightShiftAbort && (
                 <DisplayNullishProperty
@@ -1538,12 +1599,35 @@ const instructions = () => ({
     ],
     getDataUI: async (
       connection: Connection,
-      data: Uint8Array
-      //accounts: AccountMetaData[]
+      data: Uint8Array,
+      accounts: AccountMetaData[]
     ) => {
-      const info = await displayArgs(connection, data)
+      const args = await getDataObjectFlattened<any>(connection, data)
+      const accountInfo = await connection.getParsedAccountInfo(
+        accounts[6].pubkey
+      )
+      const mint = await tryGetMint(
+        connection,
+        new PublicKey(accountInfo.value?.data['parsed'].info.mint)
+      )
+      const tokenInfo = tokenPriceService.getTokenInfo(
+        accountInfo.value?.data['parsed'].info.mint
+      )
       try {
-        return <div>{info}</div>
+        return (
+          <div>
+            <div>
+              amount:{' '}
+              {mint?.account.decimals
+                ? formatNumber(
+                    toUiDecimals(args.amount, mint?.account.decimals)
+                  )
+                : args.amount}{' '}
+              {tokenInfo?.symbol}
+            </div>
+            <div>reduce only: {args.reduceOnly.toString()}</div>
+          </div>
+        )
       } catch (e) {
         console.log(e)
         return <div>{JSON.stringify(data)}</div>

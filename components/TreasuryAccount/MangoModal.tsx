@@ -81,7 +81,7 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
       )
 
       const depositIx = await mangoClient!.program.methods
-        .tokenDeposit(new BN(100000000000), false)
+        .tokenDeposit(new BN(1000000000000), false)
         .accounts({
           group: mangoGroup!.publicKey,
           account: mangoAccount,
@@ -107,7 +107,7 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
       const delegateIx = await mangoClient!.program.methods
         .accountEdit(
           null,
-          new PublicKey('EsWMqyaEDoAqMgiWG9McSmpetBiYjL4VkHPkfevxKu4D'),
+          new PublicKey('CwkzPDCBMzYZuvNa88sgToYyyqtEdKTJneWTsg7n3mTE'),
           null,
           null
         )
