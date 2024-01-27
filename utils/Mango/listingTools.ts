@@ -48,7 +48,7 @@ export type FlatListingArgs = {
   name: string
   tokenIndex: number
   'oracleConfig.confFilter': number
-  'oracleConfig.maxStalenessSlots': number
+  'oracleConfig.maxStalenessSlots': number | null
   'interestRateParams.util0': number
   'interestRateParams.rate0': number
   'interestRateParams.util1': number
@@ -130,7 +130,7 @@ export type ListingArgsFormatted = {
   tokenIndex: number
   tokenName: string
   oracleConfidenceFilter: string
-  oracleMaxStalenessSlots: number
+  oracleMaxStalenessSlots: number | null
   interestRateUtilizationPoint1: string
   interestRateUtilizationPoint0: string
   interestRatePoint0: string
@@ -175,7 +175,10 @@ export type EditTokenArgsFormatted = ListingArgsFormatted & {
 const transformPresetToProposed = (listingPreset: LISTING_PRESET) => {
   const proposedPreset: FormattedListingPreset = {
     ...listingPreset,
-    'oracleConfig.maxStalenessSlots': listingPreset.maxStalenessSlots!,
+    'oracleConfig.maxStalenessSlots':
+      listingPreset.maxStalenessSlots === -1
+        ? null
+        : listingPreset.maxStalenessSlots!,
     'oracleConfig.confFilter': listingPreset.oracleConfFilter,
     'interestRateParams.adjustmentFactor': listingPreset.adjustmentFactor,
     'interestRateParams.util0': listingPreset.util0,
