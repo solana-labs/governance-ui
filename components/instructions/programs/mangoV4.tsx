@@ -277,8 +277,15 @@ const instructions = () => ({
         })
 
         return (
-          JSON.stringify(formattedProposedArgs) ===
-          JSON.stringify(formattedPreset)
+          JSON.stringify({
+            //deposit limit depends on current price so can be different a bit in proposal
+            ...formattedProposedArgs,
+            depositLimit: 0,
+          }) ===
+          JSON.stringify({
+            ...formattedPreset,
+            depositLimit: 0,
+          })
         )
       })
 
