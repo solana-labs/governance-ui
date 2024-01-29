@@ -726,7 +726,7 @@ const instructions = () => ({
                 Proposed Openbook market link
               </a>
             </div>
-            {console.log(currentMarket)}
+
             <div className="my-4">
               <div>Tick Size: {currentMarket.tickSize}</div>
               <div>
