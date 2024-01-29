@@ -259,12 +259,37 @@ const instructions = () => ({
 
       const formattedProposedArgs = getFormattedListingValues(args)
 
-      const suggestedPreset = getFormattedListingPresets(
+      const formattedSuggestedPresets = getFormattedListingPresets(
         proposedOracle.type === 'Pyth',
         0,
         mintInfo?.account.decimals || 0,
         oracleData.uiPrice
-      )[presetInfo.presetKey]
+      )
+
+      const currentListingArgsMatchedTier = Object.values(
+        formattedSuggestedPresets
+      ).find((preset) => {
+        const formattedPreset = getFormattedListingValues({
+          tokenIndex: args.tokenIndex,
+          name: args.name,
+          oracle: args.oracle,
+          ...preset,
+        })
+
+        return (
+          JSON.stringify({
+            //deposit limit depends on current price so can be different a bit in proposal
+            ...formattedProposedArgs,
+            depositLimit: 0,
+          }) ===
+          JSON.stringify({
+            ...formattedPreset,
+            depositLimit: 0,
+          })
+        )
+      })
+
+      const suggestedPreset = formattedSuggestedPresets[presetInfo.presetKey]
 
       const suggestedFormattedPreset: ListingArgsFormatted = Object.keys(
         suggestedPreset
@@ -292,7 +317,7 @@ const instructions = () => ({
           if (x === 'depositLimit') {
             return !isDifferenceWithin5Percent(
               Number(formattedProposedArgs['depositLimit'] || 0),
-              Number(suggestedFormattedPreset['depositLimit'])
+              Number(suggestedFormattedPreset['depositLimit'] || 0)
             )
           }
           return true
@@ -354,6 +379,13 @@ const instructions = () => ({
                   Proposal params do not match suggested token tier -{' '}
                   {coinTiersToNames[presetInfo.presetKey]} check params
                   carefully
+                </h3>
+              )}
+              {currentListingArgsMatchedTier && (
+                <h3 className="text-green flex items-center">
+                  <CheckCircleIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
+                  Full match found with tier {/* @ts-ignore */}
+                  {currentListingArgsMatchedTier.preset_name}
                 </h3>
               )}
               {isMintOnCurve && (
@@ -536,17 +568,17 @@ const instructions = () => ({
                 label="Flash Loan Deposit Fee Rate"
                 valKey="flashLoanSwapFeeRate"
               />
-              <DisplayNullishProperty
+              <DisplayListingProperty
                 label="Deposit Limit"
-                value={`${
-                  mintInfo
+                val={`${
+                  mintInfo && formattedProposedArgs.depositLimit
                     ? toUiDecimals(
                         new BN(formattedProposedArgs.depositLimit.toString()),
                         mintInfo.account.decimals
                       )
                     : formattedProposedArgs.depositLimit
                 } ${args.name} ($${
-                  mintInfo
+                  mintInfo && formattedProposedArgs.depositLimit
                     ? (
                         toUiDecimals(
                           new BN(formattedProposedArgs.depositLimit.toString()),
@@ -555,23 +587,19 @@ const instructions = () => ({
                       ).toFixed(0)
                     : 0
                 })`}
-                suggestedVal={`${
+                suggestedVal={
                   mintInfo && invalidFields?.depositLimit
-                    ? toUiDecimals(
+                    ? `${toUiDecimals(
                         new BN(invalidFields.depositLimit.toString()),
                         mintInfo.account.decimals
-                      )
-                    : invalidFields.depositLimit
-                } ${args.name} ($${
-                  mintInfo && invalidFields.depositLimit
-                    ? (
+                      )} ${args.name} ($${(
                         toUiDecimals(
                           new BN(invalidFields.depositLimit.toString()),
                           mintInfo.account.decimals
                         ) * oracleData.uiPrice
-                      ).toFixed(0)
-                    : 0
-                })`}
+                      ).toFixed(0)})`
+                    : undefined
+                }
               />
               <DisplayListingPropertyWrapped
                 label="Interest Target Utilization"
@@ -581,9 +609,9 @@ const instructions = () => ({
                 label="Interest Curve Scaling"
                 valKey="interestCurveScaling"
               />
-              <DisplayNullishProperty
+              <DisplayListingProperty
                 label="Group Insurance Fund"
-                value={formattedProposedArgs.groupInsuranceFund.toString()}
+                val={formattedProposedArgs.groupInsuranceFund?.toString()}
                 suggestedVal={invalidFields.groupInsuranceFund?.toString()}
               />
             </div>
@@ -1013,7 +1041,7 @@ const instructions = () => ({
               if (x === 'depositLimit') {
                 return !isDifferenceWithin5Percent(
                   Number(parsedArgs['depositLimit'] || 0),
-                  Number(suggestedFormattedPreset['depositLimit'])
+                  Number(suggestedFormattedPreset['depositLimit'] || 0)
                 )
               }
               return true
