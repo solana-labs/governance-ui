@@ -1,0 +1,1 @@
+export { updateVoterWeightRecord } from './updateVoterWeightRecord'
