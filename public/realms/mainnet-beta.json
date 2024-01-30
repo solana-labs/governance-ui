@@ -3420,14 +3420,32 @@
     "website": "https://gari.network/",
     "twitter": "@TheGariNetwork",
     "category": "web3"
-},
-{
-  "symbol": "BOHDAO",
-"displayName": "Brigade of Honor Dao",
-"programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-"realmId": "FSh5XBFUYFMEWP99y4j7W6zERtEnqFVuwfuHgHgJJYWq",
-"ogImage": "https://www.brigadeofhonor.com/BOHlogo.png",
-"website": "https://www.brigadeofhonor.com",
-"twitter": "@BoHgamingguild"
-}
+  },
+  {
+    "symbol": "BOHDAO",
+    "displayName": "Brigade of Honor Dao",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "FSh5XBFUYFMEWP99y4j7W6zERtEnqFVuwfuHgHgJJYWq",
+    "ogImage": "https://www.brigadeofhonor.com/BOHlogo.png",
+    "website": "https://www.brigadeofhonor.com/",
+    "twitter": "@BoHgamingguild"
+  },
+  {
+    "symbol": "MF",
+    "displayName": "MOUTAI FUND",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "3JZmKT5xWKESXdC9aVpcv4so2DngpDHqzCm1pzwPU8Jc",
+    "ogImage": "/realms/MOUTAI/MF.png",
+    "website": "https://moutaifund.club/",
+    "twitter": "@MoutaiFund"
+  },
+  {
+    "symbol": "MOUTAI",
+    "displayName": "MOUTAI DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "DgsXUhQbGuHxRNcSZJJdVXJcFCeMEFyDNeBYUDS9pHmC",
+    "ogImage": "/realms/MOUTAI/mdao.jpg",
+    "website": "https://www.moutaicoin.co/",
+    "twitter": "@Moutai_Sol"
+  }
 ]
