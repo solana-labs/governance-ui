@@ -12,8 +12,6 @@ import { getCertifiedRealmInfo } from '@models/registry/api'
 import { accountsToPubkeyMap } from '@tools/sdk/accounts'
 import { fmtTokenAmount } from '@utils/formatting'
 import { formatNumber } from '@utils/formatNumber'
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
 
 const fiveMinutesSeconds = 5 * 60
 const toleranceSeconds = 30
@@ -106,23 +104,28 @@ async function runNotifier() {
           const quorumReached = yesVotes >= minVotesNeeded
           const isSuccess = yesVotes > noVotes && quorumReached
 
-          const msg = `Proposal Ended: ${proposal.account.name} Status: ${
+          const msg = `
+          Proposal Ended: ${proposal.account.name}
+          
+          Status: ${
             isSuccess
               ? 'Success'
               : !quorumReached
               ? 'Defeated - Quorum Not Reached'
               : 'Defeated'
-          } 🗳️ Voting Breakdown: - Yes Votes: ${formatNumber(
-            yesVotes,
-            undefined,
-            {
-              minimumFractionDigits: 0,
-            }
-          )} - No Votes: ${formatNumber(noVotes, undefined, {
+          }
+          
+          🗳️ Voting Breakdown:
+          - Yes Votes: ${formatNumber(yesVotes, undefined, {
             minimumFractionDigits: 0,
-          })} 🔗 [Proposal link](<https://realms.today/dao/${escape(
+          })}
+          - No Votes: ${formatNumber(noVotes, undefined, {
+            minimumFractionDigits: 0,
+          })}
+          
+          🔗 https://realms.today/dao/${escape(
             REALM
-          )}/proposal/${proposal.pubkey.toBase58()}>)`
+          )}/proposal/${proposal.pubkey.toBase58()}`
 
           console.log(msg)
           if (process.env.WEBHOOK_URL) {
@@ -151,20 +154,12 @@ async function runNotifier() {
         // 24
       ) {
         countJustOpenedForVoting++
-        dayjs.extend(utc)
-        const nowUtc = dayjs().utc()
-        const remainingInSeconds =
-          governancesMap[proposal.account.governance.toBase58()].account.config
-            .baseVotingTime +
-          proposal.account.votingAt.toNumber() -
-          nowInSeconds
 
-        const msg = `“List JUP on Mango-v4” proposal just opened for voting 🗳 [Proposal link](<https://realms.today/dao/${escape(
+        const msg = `“${
+          proposal.account.name
+        }” proposal just opened for voting 🗳 https://realms.today/dao/${escape(
           REALM
-        )}/proposal/${proposal.pubkey.toBase58()}>) Voting time ends: ${nowUtc
-          .add(remainingInSeconds, 'second')
-          .format('DD-MM-YYYY HH:mm')}
-        ) UTC}`
+        )}/proposal/${proposal.pubkey.toBase58()}`
 
         console.log(msg)
         if (process.env.WEBHOOK_URL) {
@@ -199,9 +194,9 @@ async function runNotifier() {
       ) {
         const msg = `“${
           proposal.account.name
-        }” proposal will close for voting 🗳 [Proposal link](<https://realms.today/dao/${escape(
+        }” proposal will close for voting 🗳 https://realms.today/dao/${escape(
           REALM
-        )}/proposal/${proposal.pubkey.toBase58()}>) in 24 hrs`
+        )}/proposal/${proposal.pubkey.toBase58()} in 24 hrs`
 
         console.log(msg)
         if (process.env.WEBHOOK_URL) {
