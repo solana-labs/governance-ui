@@ -389,6 +389,12 @@ const HIDDEN_MNGO_TREASURES = [
   'PuXf9LNrmtVDhBTxteNTWS8D2SpzbhYvidkSatjRArt',
 ]
 
+//badly created realms
+export const HIDDEN_REALMS = [
+  'BWnVbUDohApiiaWBNNGcLH2KXRKEoTBJ7schsKQWYAtj',
+  'FsoDEiZ9BoGTAaCLzXkyQWEqNKa5PW2iokzmuD7YsRdL',
+]
+
 //owner and desired accounts we want to show
 const MNGO_AUXILIARY_TOKEN_ACCOUNTS = [
   {
