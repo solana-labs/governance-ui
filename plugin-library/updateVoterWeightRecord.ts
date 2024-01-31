@@ -44,7 +44,6 @@ export const updateVoterWeightRecord = async ({
   for (const pluginName of pluginNames) {
     const client = await loadClient(pluginName as PluginName, provider)
 
-    // check if the voter weight record exists already. If not, create it.
     const voterWeightRecord = await client.getVoterWeightRecord(
       realmPublicKey,
       governanceMintPublicKey,
