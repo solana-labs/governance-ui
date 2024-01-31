@@ -31,9 +31,9 @@ export const getPredecessorProgramId = async (
 
 export const getPlugins = async (
   realmPublicKey: PublicKey,
-  governanceMintPublicKey: PublicKey, // TODO, if this is the council mint, get plugins for the council governance instead of community
+  governanceMintPublicKey: PublicKey,
   connection: Connection
-): Promise<string[]> => {
+): Promise<PluginName[]> => {
   const config = await fetchRealmConfigQuery(connection, realmPublicKey)
   const plugins: PluginName[] = []
 
@@ -44,7 +44,8 @@ export const getPlugins = async (
     options
   )
 
-  let programId = config.result?.account?.communityTokenConfig?.voterWeightAddin
+  let programId =
+    config.result?.account?.communityTokenConfig?.voterWeightAddin ?? null
 
   let pluginName = ''
 
@@ -58,7 +59,6 @@ export const getPlugins = async (
       }
 
       const client = await loadClient(pluginName as PluginName, provider)
-      // @ts-ignore TODO fix type
       programId = await getPredecessorProgramId(
         client,
         realmPublicKey,
