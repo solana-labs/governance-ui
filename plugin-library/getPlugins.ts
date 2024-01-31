@@ -58,7 +58,7 @@ export const getPlugins = async (
       }
 
       const client = await loadClient(pluginName as PluginName, provider)
-      // @ts-ignore
+      // @ts-ignore TODO fix type
       programId = await getPredecessorProgramId(
         client,
         realmPublicKey,
