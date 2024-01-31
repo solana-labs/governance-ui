@@ -34,7 +34,17 @@ export const PYTH_PLUGIN_PK: string[] = [
   'pytS9TjG1qyAZypk7n8rw8gfW9sUaqqYyMhJQ4E7JCQ',
 ]
 
-export const findPluginName = (programId: PublicKey | undefined) =>
+export type PluginName =
+  | 'gateway'
+  | 'QV'
+  | 'vanilla'
+  | 'VSR'
+  | 'HeliumVSR'
+  | 'NFT'
+  | 'pyth'
+  | 'unknown'
+
+export const findPluginName = (programId: PublicKey | undefined): PluginName =>
   programId === undefined
     ? ('vanilla' as const)
     : VSR_PLUGIN_PKS.includes(programId.toString())
