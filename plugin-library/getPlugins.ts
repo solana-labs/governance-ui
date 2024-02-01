@@ -29,11 +29,15 @@ export const getPredecessorProgramId = async (
   return registrarObject.previousVoterWeightPluginProgramId
 }
 
-export const getPlugins = async (
-  realmPublicKey: PublicKey,
-  governanceMintPublicKey: PublicKey,
+export const getPlugins = async ({
+  realmPublicKey,
+  governanceMintPublicKey,
+  connection,
+}: {
+  realmPublicKey: PublicKey
+  governanceMintPublicKey: PublicKey
   connection: Connection
-): Promise<PluginName[]> => {
+}): Promise<PluginName[]> => {
   const config = await fetchRealmConfigQuery(connection, realmPublicKey)
   const plugins: PluginName[] = []
 
