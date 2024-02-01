@@ -76,12 +76,12 @@ export default function GovernancePowerForRole({
             </>
           )
         ) : kind === 'NFT' ? (
-          <NftVotingPower /> )
+          <NftVotingPower />)
           : kind === 'pyth' ? (
             <PythVotingPower role='community' />
-        ) : kind === 'HeliumVSR' ? (
-          <LockedCommunityNFTRecordVotingPower />
-        ) : null
+          ) : kind === 'HeliumVSR' ? (
+            <LockedCommunityNFTRecordVotingPower />
+          ) : null
       ) : kind === 'vanilla' ? (
         <div>
           <VanillaVotingPower role="council" {...props} />
