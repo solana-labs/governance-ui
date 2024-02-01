@@ -116,7 +116,7 @@ export const TokenDeposit = ({
         <div className="flex items-center space-x-4">
           {tokenRole === GoverningTokenRole.Community ? (
             plugin === 'pyth' ? (
-              <PythVotingPower className="w-full" role={'community'} />
+              <PythVotingPower className="w-full" role='community' />
             ):
             <VanillaVotingPower className="w-full" role="community" />
           ) : (

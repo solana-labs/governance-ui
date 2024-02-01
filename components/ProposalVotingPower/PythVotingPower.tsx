@@ -4,10 +4,6 @@ import { useRealmQuery } from '@hooks/queries/realm'
 import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
 import { useConnection } from '@solana/wallet-adapter-react'
 import { getPythGovPower } from '@hooks/queries/governancePower'
-import {
-  useAddressQuery_CommunityTokenOwner,
-  useAddressQuery_CouncilTokenOwner,
-} from '@hooks/queries/addresses/tokenOwnerRecord'
 import { useAsync } from 'react-async-hook'
 import BN from 'bn.js'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
