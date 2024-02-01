@@ -16,9 +16,6 @@ import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import VanillaVotingPower from '@components/GovernancePower/Vanilla/VanillaVotingPower'
 import { DepositTokensButton } from '@components/DepositTokensButton'
 import VanillaWithdrawTokensButton from './VanillaWithdrawTokensButton'
-import { useAsync } from 'react-async-hook'
-import { determineVotingPowerType } from '@hooks/queries/governancePower'
-import { useConnection } from '@solana/wallet-adapter-react'
 import { findPluginName } from '@constants/plugins'
 import PythVotingPower from '@components/ProposalVotingPower/PythVotingPower'
 
@@ -36,8 +33,6 @@ export const TokenDeposit = ({
 }) => {
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
-
-  const { connection } = useConnection();
 
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
