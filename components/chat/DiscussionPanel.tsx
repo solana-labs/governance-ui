@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
 import DiscussionForm from './DiscussionForm'
-import Comment from './Comment'
 import { useQuery } from '@tanstack/react-query'
 import {
   GOVERNANCE_CHAT_PROGRAM_ID,
@@ -8,6 +7,7 @@ import {
 } from '@solana/spl-governance'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { useSelectedProposalPk } from '@hooks/queries/proposal'
+import LazyLoadComment from './LazyLoadComment'
 
 export const useChatMessagesQuery = () => {
   const connection = useLegacyConnectionContext()
@@ -57,7 +57,7 @@ const DiscussionPanel = () => {
       </div>
 
       {sortedMessages?.map((cm) => (
-        <Comment key={cm.pubkey.toBase58()} chatMessage={cm.account} />
+        <LazyLoadComment key={cm.pubkey.toBase58()} chatMessage={cm.account} />
       ))}
     </div>
   )

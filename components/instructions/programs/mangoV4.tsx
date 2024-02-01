@@ -40,6 +40,7 @@ import { tryParseKey } from '@tools/validators/pubkey'
 import Loading from '@components/Loading'
 import { getClient, getGroupForClient } from '@utils/mangoV4Tools'
 import { tryGetMint } from '@utils/tokens'
+import { formatNumber } from '@utils/formatNumber'
 // import { snakeCase } from 'snake-case'
 // import { sha256 } from 'js-sha256'
 
@@ -258,12 +259,37 @@ const instructions = () => ({
 
       const formattedProposedArgs = getFormattedListingValues(args)
 
-      const suggestedPreset = getFormattedListingPresets(
+      const formattedSuggestedPresets = getFormattedListingPresets(
         proposedOracle.type === 'Pyth',
         0,
         mintInfo?.account.decimals || 0,
         oracleData.uiPrice
-      )[presetInfo.presetKey]
+      )
+
+      const currentListingArgsMatchedTier = Object.values(
+        formattedSuggestedPresets
+      ).find((preset) => {
+        const formattedPreset = getFormattedListingValues({
+          tokenIndex: args.tokenIndex,
+          name: args.name,
+          oracle: args.oracle,
+          ...preset,
+        })
+
+        return (
+          JSON.stringify({
+            //deposit limit depends on current price so can be different a bit in proposal
+            ...formattedProposedArgs,
+            depositLimit: 0,
+          }) ===
+          JSON.stringify({
+            ...formattedPreset,
+            depositLimit: 0,
+          })
+        )
+      })
+
+      const suggestedPreset = formattedSuggestedPresets[presetInfo.presetKey]
 
       const suggestedFormattedPreset: ListingArgsFormatted = Object.keys(
         suggestedPreset
@@ -291,7 +317,7 @@ const instructions = () => ({
           if (x === 'depositLimit') {
             return !isDifferenceWithin5Percent(
               Number(formattedProposedArgs['depositLimit'] || 0),
-              Number(suggestedFormattedPreset['depositLimit'])
+              Number(suggestedFormattedPreset['depositLimit'] || 0)
             )
           }
           return true
@@ -353,6 +379,13 @@ const instructions = () => ({
                   Proposal params do not match suggested token tier -{' '}
                   {coinTiersToNames[presetInfo.presetKey]} check params
                   carefully
+                </h3>
+              )}
+              {currentListingArgsMatchedTier && (
+                <h3 className="text-green flex items-center">
+                  <CheckCircleIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
+                  Full match found with tier {/* @ts-ignore */}
+                  {currentListingArgsMatchedTier.preset_name}
                 </h3>
               )}
               {isMintOnCurve && (
@@ -535,23 +568,37 @@ const instructions = () => ({
                 label="Flash Loan Deposit Fee Rate"
                 valKey="flashLoanSwapFeeRate"
               />
-              <DisplayNullishProperty
+              <DisplayListingProperty
                 label="Deposit Limit"
-                value={
-                  mintInfo
+                val={`${
+                  mintInfo && formattedProposedArgs.depositLimit
                     ? toUiDecimals(
                         new BN(formattedProposedArgs.depositLimit.toString()),
                         mintInfo.account.decimals
                       )
                     : formattedProposedArgs.depositLimit
-                }
+                } ${args.name} ($${
+                  mintInfo && formattedProposedArgs.depositLimit
+                    ? (
+                        toUiDecimals(
+                          new BN(formattedProposedArgs.depositLimit.toString()),
+                          mintInfo.account.decimals
+                        ) * oracleData.uiPrice
+                      ).toFixed(0)
+                    : 0
+                })`}
                 suggestedVal={
                   mintInfo && invalidFields?.depositLimit
-                    ? toUiDecimals(
+                    ? `${toUiDecimals(
                         new BN(invalidFields.depositLimit.toString()),
                         mintInfo.account.decimals
-                      )
-                    : invalidFields.depositLimit
+                      )} ${args.name} ($${(
+                        toUiDecimals(
+                          new BN(invalidFields.depositLimit.toString()),
+                          mintInfo.account.decimals
+                        ) * oracleData.uiPrice
+                      ).toFixed(0)})`
+                    : undefined
                 }
               />
               <DisplayListingPropertyWrapped
@@ -562,9 +609,9 @@ const instructions = () => ({
                 label="Interest Curve Scaling"
                 valKey="interestCurveScaling"
               />
-              <DisplayNullishProperty
+              <DisplayListingProperty
                 label="Group Insurance Fund"
-                value={formattedProposedArgs.groupInsuranceFund.toString()}
+                val={formattedProposedArgs.groupInsuranceFund?.toString()}
                 suggestedVal={invalidFields.groupInsuranceFund?.toString()}
               />
             </div>
@@ -679,7 +726,7 @@ const instructions = () => ({
                 Proposed Openbook market link
               </a>
             </div>
-            {console.log(currentMarket)}
+
             <div className="my-4">
               <div>Tick Size: {currentMarket.tickSize}</div>
               <div>
@@ -795,6 +842,7 @@ const instructions = () => ({
           displayArgs(connection, data),
           getDataObjectFlattened<FlatEditArgs>(connection, data),
         ])
+        let priceImpact: MidPriceImpact | undefined
         const mint = [...mangoGroup.mintInfosMapByMint.values()].find((x) =>
           x.publicKey.equals(mintInfo)
         )?.mint
@@ -819,7 +867,10 @@ const instructions = () => ({
               ? args['oracleConfigOpt.confFilter'].toString()
               : (args['oracleConfigOpt.confFilter'] * 100).toFixed(2)
             : undefined,
-          oracleMaxStalenessSlots: args['oracleConfigOpt.maxStalenessSlots'],
+          oracleMaxStalenessSlots:
+            args['oracleConfigOpt.maxStalenessSlots'] === null
+              ? -1
+              : args['oracleConfigOpt.maxStalenessSlots'],
           interestRateUtilizationPoint0:
             args['interestRateParamsOpt.util0'] !== undefined
               ? (args['interestRateParamsOpt.util0'] * 100)?.toFixed(2)
@@ -911,6 +962,7 @@ const instructions = () => ({
           bankFormattedValues = getFormattedBankValues(mangoGroup, bank)
           mintData = tokenPriceService.getTokenInfo(mint.toBase58())
           const isPyth = bank?.oracleProvider === OracleProvider.Pyth
+
           const midPriceImpacts = getMidPriceImpacts(mangoGroup.pis)
 
           const tokenToPriceImpact = midPriceImpacts
@@ -930,14 +982,16 @@ const instructions = () => ({
               {}
             )
 
-          const priceImpact = tokenToPriceImpact[getApiTokenName(bank.name)]
+          priceImpact = tokenToPriceImpact[getApiTokenName(bank.name)]
 
-          const suggestedPresetKey = getProposedKey(
-            priceImpact.avg_price_impact_percent < 1
-              ? priceImpact?.target_amount
-              : undefined,
-            bank.oracleProvider === OracleProvider.Pyth
-          )
+          const suggestedPresetKey = priceImpact
+            ? getProposedKey(
+                priceImpact.avg_price_impact_percent < 1
+                  ? priceImpact?.target_amount
+                  : undefined,
+                bank.oracleProvider === OracleProvider.Pyth
+              )
+            : 'UNTRUSTED'
 
           liqudityTier = !mint.equals(USDC_MINT)
             ? {
@@ -953,7 +1007,7 @@ const instructions = () => ({
 
           const suggestedPreset = getFormattedListingPresets(
             !!isPyth,
-            bank.nativeDeposits().mul(bank.price).toNumber(),
+            bank.uiDeposits(),
             bank.mintDecimals,
             bank.uiPrice
           )[liqudityTier.presetKey!]
@@ -991,7 +1045,7 @@ const instructions = () => ({
               if (x === 'depositLimit') {
                 return !isDifferenceWithin5Percent(
                   Number(parsedArgs['depositLimit'] || 0),
-                  Number(suggestedFormattedPreset['depositLimit'])
+                  Number(suggestedFormattedPreset['depositLimit'] || 0)
                 )
               }
               return true
@@ -1008,6 +1062,12 @@ const instructions = () => ({
         return (
           <div>
             <h3>{mintData && <div>Token: {mintData.symbol}</div>}</h3>
+            {!priceImpact && (
+              <h3 className="text-orange flex items-center">
+                <WarningFilledIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
+                No price impact data in group
+              </h3>
+            )}
             {liqudityTier.presetKey === 'UNTRUSTED' && (
               <>
                 <h3 className="text-orange flex items-center">
@@ -1073,7 +1133,11 @@ const instructions = () => ({
               <DisplayNullishProperty
                 label="Oracle Max Staleness Slots"
                 currentValue={bankFormattedValues?.maxStalenessSlots}
-                value={parsedArgs.oracleMaxStalenessSlots}
+                value={
+                  parsedArgs.oracleMaxStalenessSlots === null
+                    ? -1
+                    : parsedArgs.oracleMaxStalenessSlots
+                }
                 suggestedVal={invalidFields.oracleMaxStalenessSlots}
               />
               <DisplayNullishProperty
@@ -1255,6 +1319,7 @@ const instructions = () => ({
                   `${invalidFields.netBorrowLimitWindowSizeTs}H`
                 }
               />
+
               <DisplayNullishProperty
                 label="Net Borrow Limit Per Window Quote"
                 value={
@@ -1382,9 +1447,40 @@ const instructions = () => ({
               />
               <DisplayNullishProperty
                 label="Deposit Limit"
-                value={parsedArgs.depositLimit}
-                currentValue={bankFormattedValues?.depositLimit}
-                suggestedVal={invalidFields.depositLimit}
+                value={
+                  bank &&
+                  parsedArgs.depositLimit &&
+                  `${
+                    bank && parsedArgs.depositLimit
+                      ? toUiDecimals(
+                          new BN(parsedArgs.depositLimit),
+                          bank.mintDecimals
+                        )
+                      : parsedArgs.depositLimit
+                  } ${bank?.name}`
+                }
+                currentValue={
+                  bankFormattedValues?.depositLimit &&
+                  `${
+                    bank && bankFormattedValues?.depositLimit
+                      ? toUiDecimals(
+                          new BN(bankFormattedValues.depositLimit),
+                          bank.mintDecimals
+                        )
+                      : bankFormattedValues?.depositLimit
+                  } ${bank?.name}`
+                }
+                suggestedVal={
+                  invalidFields?.depositLimit &&
+                  `${
+                    bank && invalidFields?.depositLimit
+                      ? toUiDecimals(
+                          new BN(invalidFields.depositLimit),
+                          bank.mintDecimals
+                        )
+                      : invalidFields?.depositLimit
+                  } ${bank?.name}`
+                }
               />
               {parsedArgs?.maintWeightShiftAbort && (
                 <DisplayNullishProperty
@@ -1541,12 +1637,35 @@ const instructions = () => ({
     ],
     getDataUI: async (
       connection: Connection,
-      data: Uint8Array
-      //accounts: AccountMetaData[]
+      data: Uint8Array,
+      accounts: AccountMetaData[]
     ) => {
-      const info = await displayArgs(connection, data)
+      const args = await getDataObjectFlattened<any>(connection, data)
+      const accountInfo = await connection.getParsedAccountInfo(
+        accounts[6].pubkey
+      )
+      const mint = await tryGetMint(
+        connection,
+        new PublicKey(accountInfo.value?.data['parsed'].info.mint)
+      )
+      const tokenInfo = tokenPriceService.getTokenInfo(
+        accountInfo.value?.data['parsed'].info.mint
+      )
       try {
-        return <div>{info}</div>
+        return (
+          <div>
+            <div>
+              amount:{' '}
+              {mint?.account.decimals
+                ? formatNumber(
+                    toUiDecimals(args.amount, mint?.account.decimals)
+                  )
+                : args.amount}{' '}
+              {tokenInfo?.symbol}
+            </div>
+            <div>reduce only: {args.reduceOnly.toString()}</div>
+          </div>
+        )
       } catch (e) {
         console.log(e)
         return <div>{JSON.stringify(data)}</div>

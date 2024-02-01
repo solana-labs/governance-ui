@@ -1,5 +1,5 @@
 import useRealm from '@hooks/useRealm'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import MemberOverview from '@components/Members/MemberOverview'
 import { PlusCircleIcon, SearchIcon, UsersIcon } from '@heroicons/react/outline'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -15,6 +15,10 @@ import { Member } from '@utils/uiTypes/members'
 import PaginationComponent from '@components/Pagination'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useMembersQuery } from '@components/Members/useMembers'
+import { useConnection } from '@solana/wallet-adapter-react'
+import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
+import { determineVotingPowerType } from '@hooks/queries/governancePower'
+import { useAsync } from 'react-async-hook'
 
 const Members = () => {
   const {
@@ -25,7 +29,6 @@ const Members = () => {
   const pagination = useRef<{ setPage: (val) => void }>(null)
   const membersPerPage = 10
 
-  const { data: activeMembers } = useMembersQuery()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const {
@@ -37,6 +40,25 @@ const Members = () => {
   const [openAddMemberModal, setOpenAddMemberModal] = useState(false)
   const [searchString, setSearchString] = useState('')
   const [filteredMembers, setFilteredMembers] = useState<Member[]>([])
+
+  const { connection } = useConnection()
+  const realmPk = useSelectedRealmPubkey()
+  const { data: activeMembersData } = useMembersQuery()
+
+  const { result: kind } = useAsync(async () => {
+    if (realmPk === undefined) return undefined
+    return determineVotingPowerType(connection, realmPk, 'community')
+  }, [connection, realmPk])
+
+  // if this is not vanilla or NFT, this view is used only to show council. filter accordingly.
+  const councilOnly = !(kind === 'vanilla' || kind === 'NFT')
+  const activeMembers = useMemo(
+    () =>
+      councilOnly
+        ? activeMembersData?.filter((x) => x.councilVotes.gtn(0))
+        : activeMembersData,
+    [activeMembersData, councilOnly]
+  )
 
   const filterMembers = (v) => {
     if (activeMembers !== undefined) {
@@ -98,7 +120,7 @@ const Members = () => {
               ) : null}
               <div>
                 <p>{realmInfo?.displayName}</p>
-                <h1 className="mb-0">Members</h1>
+                <h1 className="mb-0">{councilOnly ? 'Council ' : ''}Members</h1>
               </div>
             </div>
             <div className="flex space-x-3">
