@@ -11,6 +11,7 @@ import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecor
 import { ExclamationIcon } from '@heroicons/react/solid'
 import VanillaWithdrawTokensButton from '@components/TokenBalance/VanillaWithdrawTokensButton'
 import LockedCommunityVotingPower from '@components/ProposalVotingPower/LockedCommunityVotingPower'
+import PythVotingPower from '@components/ProposalVotingPower/PythVotingPower'
 
 export default function GovernancePowerForRole({
   role,
@@ -75,7 +76,9 @@ export default function GovernancePowerForRole({
             </>
           )
         ) : kind === 'NFT' ? (
-          <NftVotingPower />
+          <NftVotingPower /> )
+          : kind === 'pyth' ? (
+            <PythVotingPower role={'community'} />
         ) : kind === 'HeliumVSR' ? (
           <LockedCommunityNFTRecordVotingPower />
         ) : null
