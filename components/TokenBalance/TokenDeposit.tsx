@@ -117,8 +117,8 @@ export const TokenDeposit = ({
           {tokenRole === GoverningTokenRole.Community ? (
             plugin === 'pyth' ? (
               <PythVotingPower className="w-full" role='community' />
-            ):
-            <VanillaVotingPower className="w-full" role="community" />
+            ) :
+              <VanillaVotingPower className="w-full" role="community" />
           ) : (
             <VanillaVotingPower className="w-full" role="council" />
           )}
@@ -126,20 +126,18 @@ export const TokenDeposit = ({
       )}
 
       <div
-        className={`my-4 opacity-70 text-xs  ${
-          canShowAvailableTokensMessage ? 'block' : 'hidden'
-        }`}
+        className={`my-4 opacity-70 text-xs  ${canShowAvailableTokensMessage ? 'block' : 'hidden'
+          }`}
       >
         You have {tokensToShow} {hasTokensDeposited ? `more ` : ``}
         {depositTokenName} tokens available to deposit. {plugin === 'pyth' ? 'You can deposit them at https://staking.pyth.network/ . ' : ""}
       </div>
-      
+
       <div
-        className={`my-4 opacity-70 text-xs  ${
-          (plugin === 'pyth') ? 'block' : 'hidden'
-        }`}
+        className={`my-4 opacity-70 text-xs  ${(plugin === 'pyth') ? 'block' : 'hidden'
+          }`}
       >
-         If you previously deposited tokens on this page, use the button below to withdraw them immediately. Those tokens have no voting power.
+        If you previously deposited tokens on this page, use the button below to withdraw them immediately. Those tokens have no voting power.
       </div>
 
       <div className="flex flex-col mt-6 space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
