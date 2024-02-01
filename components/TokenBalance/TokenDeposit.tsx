@@ -16,8 +16,6 @@ import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import VanillaVotingPower from '@components/GovernancePower/Vanilla/VanillaVotingPower'
 import { DepositTokensButton } from '@components/DepositTokensButton'
 import VanillaWithdrawTokensButton from './VanillaWithdrawTokensButton'
-import { findPluginName } from '@constants/plugins'
-import PythVotingPower, { PYTH_INSTRUCTIONS } from '@components/ProposalVotingPower/PythVotingPower'
 
 /** deposit + withdraw for vanilla govtokens, used only in account view. plugin views still use this for council. */
 export const TokenDeposit = ({
@@ -103,22 +101,12 @@ export const TokenDeposit = ({
     return null
   }
 
-  const voterWeightAddin  =
-    tokenRole === GoverningTokenRole.Community
-      ? config?.account.communityTokenConfig.voterWeightAddin
-      : config?.account.councilTokenConfig.voterWeightAddin
-
-  const plugin = findPluginName(voterWeightAddin);
-
   return (
     <div className="w-full">
       {(availableTokens != '0' || inAccountDetails) && (
         <div className="flex items-center space-x-4">
           {tokenRole === GoverningTokenRole.Community ? (
-            plugin === 'pyth' ? (
-              <PythVotingPower className="w-full" role='community' />
-            ) :
-              <VanillaVotingPower className="w-full" role="community" />
+            <VanillaVotingPower className="w-full" role="community" />
           ) : (
             <VanillaVotingPower className="w-full" role="council" />
           )}
@@ -126,22 +114,16 @@ export const TokenDeposit = ({
       )}
 
       <div
-        className={`my-4 opacity-70 text-xs  ${canShowAvailableTokensMessage ? 'block' : 'hidden'
-          }`}
+        className={`my-4 opacity-70 text-xs  ${
+          canShowAvailableTokensMessage ? 'block' : 'hidden'
+        }`}
       >
         You have {tokensToShow} {hasTokensDeposited ? `more ` : ``}
         {depositTokenName} tokens available to deposit.
       </div>
 
-      <div
-        className={`my-4 opacity-70 text-xs  ${(plugin === 'pyth') ? 'block' : 'hidden'
-          }`}
-      >
-        {PYTH_INSTRUCTIONS}
-      </div>
-
       <div className="flex flex-col mt-6 space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
-        {(hasTokensInWallet || inAccountDetails) && plugin !== "pyth" ? (
+        {hasTokensInWallet || inAccountDetails ? (
           <DepositTokensButton
             className="sm:w-1/2 max-w-[200px]"
             role={

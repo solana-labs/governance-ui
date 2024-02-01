@@ -11,7 +11,7 @@ import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecor
 import { ExclamationIcon } from '@heroicons/react/solid'
 import VanillaWithdrawTokensButton from '@components/TokenBalance/VanillaWithdrawTokensButton'
 import LockedCommunityVotingPower from '@components/ProposalVotingPower/LockedCommunityVotingPower'
-import PythVotingPower from '@components/ProposalVotingPower/PythVotingPower'
+import PythVotingPower from 'PythVotePlugin/components/PythVotingPower'
 
 export default function GovernancePowerForRole({
   role,
