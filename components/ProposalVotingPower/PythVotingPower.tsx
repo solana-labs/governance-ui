@@ -56,10 +56,10 @@ export default function PythVotingPower({
     () =>
       mintInfo && totalAmount !== undefined
         ? new BigNumber(totalAmount.toString())
-            .multipliedBy(pythScalingFactor?? 1)
-            .shiftedBy(-mintInfo.decimals)
-            .integerValue()
-            .toString()
+          .multipliedBy(pythScalingFactor ?? 1)
+          .shiftedBy(-mintInfo.decimals)
+          .integerValue()
+          .toString()
         : undefined,
     [totalAmount, mintInfo]
   )
@@ -70,9 +70,9 @@ export default function PythVotingPower({
   const disabled =
     role === 'community'
       ? realmConfig?.account.communityTokenConfig.tokenType ===
-        GoverningTokenType.Dormant
+      GoverningTokenType.Dormant
       : realmConfig?.account.councilTokenConfig.tokenType ===
-        GoverningTokenType.Dormant
+      GoverningTokenType.Dormant
 
   return (
     <div
