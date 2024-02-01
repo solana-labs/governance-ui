@@ -17,7 +17,7 @@ import VanillaVotingPower from '@components/GovernancePower/Vanilla/VanillaVotin
 import { DepositTokensButton } from '@components/DepositTokensButton'
 import VanillaWithdrawTokensButton from './VanillaWithdrawTokensButton'
 import { findPluginName } from '@constants/plugins'
-import PythVotingPower from '@components/ProposalVotingPower/PythVotingPower'
+import PythVotingPower, { PYTH_DEPOSIT_MESSAGE, PYTH_WITHDRAW_MESSAGE } from '@components/ProposalVotingPower/PythVotingPower'
 
 /** deposit + withdraw for vanilla govtokens, used only in account view. plugin views still use this for council. */
 export const TokenDeposit = ({
@@ -130,14 +130,14 @@ export const TokenDeposit = ({
           }`}
       >
         You have {tokensToShow} {hasTokensDeposited ? `more ` : ``}
-        {depositTokenName} tokens available to deposit. {plugin === 'pyth' ? 'You can deposit them at https://staking.pyth.network/ . ' : ""}
+        {depositTokenName} tokens available to deposit. {plugin === 'pyth' ? PYTH_DEPOSIT_MESSAGE : ""}
       </div>
 
       <div
         className={`my-4 opacity-70 text-xs  ${(plugin === 'pyth') ? 'block' : 'hidden'
           }`}
       >
-        If you previously deposited tokens on this page, use the button below to withdraw them immediately. Those tokens have no voting power.
+        {PYTH_WITHDRAW_MESSAGE}
       </div>
 
       <div className="flex flex-col mt-6 space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">

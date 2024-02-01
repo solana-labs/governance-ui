@@ -14,6 +14,9 @@ import { GoverningTokenType } from '@solana/spl-governance'
 import usePythScalingFactor from '@hooks/PythNetwork/useScalingFactor'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
+export const PYTH_DEPOSIT_MESSAGE = "You can deposit them at https://staking.pyth.network/."
+export const PYTH_WITHDRAW_MESSAGE = "If you previously deposited tokens on this page, use the button below to withdraw them immediately. Those tokens have no voting power."
+
 interface Props {
   className?: string
   role: 'community' | 'council'
