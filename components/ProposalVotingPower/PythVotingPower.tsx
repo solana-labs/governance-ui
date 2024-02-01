@@ -51,7 +51,6 @@ export default function PythVotingPower({
 
   const pythScalingFactor: number | undefined = usePythScalingFactor();
 
-  // If the user is using a delegator, we want to show that and not count the other delegators
   const totalAmount = personalAmount ?? new BN(0)
 
   const formattedTotal = useMemo(
