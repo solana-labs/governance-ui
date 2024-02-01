@@ -31,14 +31,12 @@ export const updateVoterWeightRecord = async ({
     new EmptyWallet(Keypair.generate()),
     options
   )
-  console.log('provider', provider)
 
-  const pluginNames = await getPlugins(
+  const pluginNames = await getPlugins({
     realmPublicKey,
     governanceMintPublicKey,
-    connection
-  )
-  console.log('PLUGIN NAMES', pluginNames)
+    connection,
+  })
   const ixes: TransactionInstruction[] = []
 
   for (const pluginName of pluginNames) {
@@ -83,8 +81,6 @@ export const updateVoterWeightRecord = async ({
       governanceMintPublicKey
     )
     if (updateMaxVoterWeightRecordIx) ixes.push(updateMaxVoterWeightRecordIx)
-
-    console.log('Instructions', ixes)
   }
   return ixes
 }
