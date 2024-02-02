@@ -7,6 +7,7 @@ import { getPlugins } from './getPlugins'
 export const usePlugins = () => {
   const { connection } = useConnection()
 
+  // TODO: return plugin info object
   const fetchPlugins = ({
     realmPublicKey,
     governanceMintPublicKey,
@@ -24,6 +25,15 @@ export const usePlugins = () => {
         }),
     })
   }
+
+  const createVoterWeightRecord = () => {}
+
+  const getMaxVoteWeightRecord = () => {}
+
+  const getVoterWeightRecord = () => {}
+
+  // TODO: make sure to handle no plugin case
+  // default voteWeight is defaultTokenOwnerRecord
 
   const updateVoterWeight = ({
     realmPublicKey,
@@ -51,5 +61,11 @@ export const usePlugins = () => {
     })
   }
 
-  return { updateVoterWeight, fetchPlugins }
+  return {
+    updateVoterWeight,
+    fetchPlugins,
+    getVoterWeightRecord,
+    getMaxVoteWeightRecord,
+    createVoterWeightRecord,
+  }
 }
