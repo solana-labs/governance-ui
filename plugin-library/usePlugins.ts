@@ -15,7 +15,7 @@ export const usePlugins = () => {
     governanceMintPublicKey: PublicKey
   }) => {
     return queryClient.fetchQuery({
-      queryKey: ['fetchPlugins'],
+      queryKey: ['fetchPlugins', realmPublicKey, governanceMintPublicKey],
       queryFn: () =>
         getPlugins({
           realmPublicKey,
@@ -35,7 +35,12 @@ export const usePlugins = () => {
     governanceMintPublicKey: PublicKey
   }) => {
     return queryClient.fetchQuery({
-      queryKey: ['updateVoteWeight'],
+      queryKey: [
+        'updateVoteWeight',
+        realmPublicKey,
+        walletPublicKey,
+        governanceMintPublicKey,
+      ],
       queryFn: () =>
         updateVoterWeightRecord({
           walletPublicKey,
