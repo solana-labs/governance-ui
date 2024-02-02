@@ -7,9 +7,9 @@ import { useState, useEffect } from 'react'
 import { BN } from '@coral-xyz/anchor'
 
 export interface usePluginsArgs {
-  realmPublicKey: PublicKey
-  governanceMintPublicKey: PublicKey
-  walletPublicKey: PublicKey
+  realmPublicKey: PublicKey | undefined
+  governanceMintPublicKey: PublicKey | undefined
+  walletPublicKey: PublicKey | undefined
 }
 
 export interface usePluginsReturnType {
@@ -41,6 +41,10 @@ export const usePlugins = ({
   }, [realmPublicKey, governanceMintPublicKey, walletPublicKey])
 
   const fetchPlugins = () => {
+    if (!realmPublicKey || !governanceMintPublicKey || !walletPublicKey) {
+      return Promise.resolve([])
+    }
+
     return queryClient.fetchQuery({
       queryKey: ['fetchPlugins', realmPublicKey, governanceMintPublicKey],
       queryFn: () =>
@@ -62,6 +66,10 @@ export const usePlugins = ({
   // default voteWeight is defaultTokenOwnerRecord
 
   const updateVoterWeight = (): Promise<TransactionInstruction[]> => {
+    if (!realmPublicKey || !governanceMintPublicKey || !walletPublicKey) {
+      return Promise.resolve([])
+    }
+
     return queryClient.fetchQuery({
       queryKey: [
         'updateVoteWeight',
