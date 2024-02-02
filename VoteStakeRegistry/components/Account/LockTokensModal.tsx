@@ -110,7 +110,14 @@ const LockTokensModal = ({
         display: '5y',
       },
       {
-        defaultValue: 1,
+        defaultValue: depositToUnlock
+          ? Math.ceil(
+              secsToDays(
+                depositToUnlock?.lockup.endTs.toNumber() -
+                  depositToUnlock.lockup.startTs.toNumber()
+              )
+            )
+          : 1,
         display: 'Custom',
       },
     ]
@@ -142,6 +149,7 @@ const LockTokensModal = ({
       x.lockup.kind.none
   )
   const [lockupPeriodDays, setLockupPeriodDays] = useState<number>(0)
+
   const allowClawback = false
   const [lockupPeriod, setLockupPeriod] = useState<Period>(lockupPeriods[0])
   const [amount, setAmount] = useState<number | undefined>()
@@ -169,6 +177,7 @@ const LockTokensModal = ({
         depositToUnlock?.amountInitiallyLockedNative
       )
     : 0
+
   const maxAmountToLock =
     depositRecord && mint
       ? wantToLockMoreThenDeposited
@@ -431,7 +440,7 @@ const LockTokensModal = ({
                   values={lockupPeriods.map((p) => p.display)}
                 />
               </div>
-              {lockupPeriod.defaultValue === 1 && (
+              {lockupPeriod.display === 'Custom' && (
                 <>
                   <div className={`${labelClasses} flex justify-between`}>
                     Number of days
