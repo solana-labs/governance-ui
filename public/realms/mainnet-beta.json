@@ -1282,10 +1282,10 @@
     "displayName": "OPANZ",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "Gp34fkwEyMhyK1Bjhr4iCdf4CdieUULvDqSrKxyRDu5e",
-    "bannerImage": "/realms/OPANZ/OPANZ_Banner.png",
-    "ogImage": "/realms/OPANZ/OPANZ_Logo.png",
-    "website": "https://auturoa.nz/",
-    "twitter": "@OPANZ999"
+    "bannerImage": "",
+    "ogImage": "",
+    "website": "",
+    "twitter": ""
   },
   {
     "symbol": "MEAN",
@@ -1316,10 +1316,10 @@
     "displayName": "OPANZ COMMUNITY DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "D2dphGE7euTcC576skADhqQ8rwZ9dPMq6pmoDhdbdsYX",
-    "bannerImage": "/realms/ODCO/OCDC.png",
-    "ogImage": "/realms/ODCO/OCDLO.png",
-    "website": "https://auturoa.nz/",
-    "twitter": "@OPANZ999"
+    "bannerImage": "",
+    "ogImage": "",
+    "website": "",
+    "twitter": ""
   },
   {
     "symbol": "eleusance",
@@ -3338,7 +3338,7 @@
     "displayName": "OPANZ DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "Ccix1WKGTwCbdChjUSrVVgq4xPzMGzTutqpW1R4hCRGd",
-    "bannerImage": "",
+    "bannerImage": "realms/OPANZ/OPCover.png",
     "ogImage": "/realms/OPANZ/OPANZ_Logo.png",
     "website": "https://auturoa.nz/",
     "twitter": "@opanzch"
