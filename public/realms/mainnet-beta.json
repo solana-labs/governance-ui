@@ -3447,5 +3447,16 @@
     "ogImage": "/realms/MOUTAI/mdao.jpg",
     "website": "https://www.moutaicoin.co/",
     "twitter": "@Moutai_Sol"
+  },
+  {
+    "symbol": "OPDA",
+    "displayName": "OPDA TREASURY",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "7yrQJzHrUqxVbPKsZWz75zFWrXFizXatpUGRKnmTzLjP",
+    "bannerImage": "realms/OPANZ/OPDA_Treasury_Cover.png",
+    "ogImage": "realms/OPANZ/OPDA_Treasury.png",
+    "website": "https://opanz.nz",
+    "twitter": "@OPANZ_OPDA",
   }
+  
 ]
