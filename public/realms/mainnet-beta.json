@@ -1282,11 +1282,7 @@
     "displayName": "OPANZ",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "Gp34fkwEyMhyK1Bjhr4iCdf4CdieUULvDqSrKxyRDu5e",
-    "bannerImage": "",
-    "ogImage": "",
-    "website": "",
-    "twitter": ""
-  },
+    },
   {
     "symbol": "MEAN",
     "category": "daotools",
@@ -1316,11 +1312,7 @@
     "displayName": "OPANZ COMMUNITY DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "D2dphGE7euTcC576skADhqQ8rwZ9dPMq6pmoDhdbdsYX",
-    "bannerImage": "",
-    "ogImage": "",
-    "website": "",
-    "twitter": ""
-  },
+   },
   {
     "symbol": "eleusance",
     "displayName": "eleusance DAO",
