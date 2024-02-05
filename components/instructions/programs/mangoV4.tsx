@@ -963,7 +963,9 @@ const instructions = () => ({
           mintData = tokenPriceService.getTokenInfo(mint.toBase58())
           const isPyth = bank?.oracleProvider === OracleProvider.Pyth
 
-          const midPriceImpacts = getMidPriceImpacts(mangoGroup.pis)
+          const midPriceImpacts = getMidPriceImpacts(
+            mangoGroup.pis.length ? mangoGroup.pis : []
+          )
 
           const tokenToPriceImpact = midPriceImpacts
             .filter(
