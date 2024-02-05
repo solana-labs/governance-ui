@@ -271,5 +271,8 @@
       "draft-js>fbjs>core-js": false,
       "@switchboard-xyz/solana.js>@switchboard-xyz/common>protobufjs": false
     }
+  },
+  "volta": {
+    "node": "18.19.0"
   }
 }
