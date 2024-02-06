@@ -1,10 +1,10 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import queryClient from '@hooks/queries/queryClient'
 import { useConnection } from '@solana/wallet-adapter-react'
 import { updateVoterWeightRecord } from './updateVoterWeightRecord'
 import { PluginData, getPlugins } from './getPlugins'
 import { useState, useEffect, useCallback } from 'react'
-import { BN } from '@coral-xyz/anchor'
 
 export interface usePluginsArgs {
   realmPublicKey: PublicKey | undefined
@@ -56,8 +56,12 @@ export const usePlugins = ({
     }
 
     fetchAndSetPlugins()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [realmPublicKey, governanceMintPublicKey, walletPublicKey])
+    // convert to strings to prevent unecessary re-runs when the same publickey but different object is passed to hook
+  }, [
+    realmPublicKey?.toBase58(),
+    governanceMintPublicKey?.toBase58(),
+    walletPublicKey?.toBase58(),
+  ])
 
   const createVoterWeightRecords = () => {
     return
