@@ -13,8 +13,6 @@ export interface usePluginsArgs {
 }
 
 export interface usePluginsReturnType {
-  voterWeight: BN | undefined
-  maxVoterWeight: BN | undefined
   plugins: Array<any>
   updateVoterWeight: () => Promise<TransactionInstruction[]>
   createVoterWeightRecords: () => void
@@ -26,8 +24,6 @@ export const usePlugins = ({
   walletPublicKey,
 }: usePluginsArgs): usePluginsReturnType => {
   const { connection } = useConnection()
-  const [maxVoterWeight, setMaxVoterWeight] = useState<BN | undefined>()
-  const [voterWeight, setVoterWeight] = useState<BN | undefined>()
   const [plugins, setPlugins] = useState<Array<PluginData>>([])
 
   const fetchPlugins = useCallback(() => {
@@ -41,6 +37,7 @@ export const usePlugins = ({
         getPlugins({
           realmPublicKey,
           governanceMintPublicKey,
+          walletPublicKey,
           connection,
         }),
     })
@@ -62,8 +59,6 @@ export const usePlugins = ({
     fetchAndSetPlugins()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [realmPublicKey, governanceMintPublicKey, walletPublicKey])
-
-  const getVoteWeight = () => {}
 
   const createVoterWeightRecords = () => {
     return
@@ -95,7 +90,5 @@ export const usePlugins = ({
     updateVoterWeight,
     plugins,
     createVoterWeightRecords,
-    voterWeight,
-    maxVoterWeight,
   }
 }

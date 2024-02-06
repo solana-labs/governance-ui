@@ -41,10 +41,12 @@ export const getPredecessorProgramId = async (
 export const getPlugins = async ({
   realmPublicKey,
   governanceMintPublicKey,
+  walletPublicKey,
   connection,
 }: {
   realmPublicKey: PublicKey
   governanceMintPublicKey: PublicKey
+  walletPublicKey: PublicKey
   connection: Connection
 }): Promise<PluginData[]> => {
   const config = await fetchRealmConfigQuery(connection, realmPublicKey)
@@ -68,21 +70,30 @@ export const getPlugins = async ({
     do {
       pluginName = findPluginName(programId)
       if (pluginName) {
+        const client = await loadClient(pluginName as PluginName, provider)
+
+        const voterWeight = await client.getVoterWeightRecord(
+          realmPublicKey,
+          governanceMintPublicKey,
+          walletPublicKey
+        )
+
+        // TODO: get any plugin specific params
+
         plugins.push({
           programId: programId,
           name: pluginName as PluginName,
-          voterWeight: new BN(0),
-          maxVoterWeight: new BN(0),
+          voterWeight: voterWeight?.voterWeight,
+          maxVoterWeight: undefined, // TODO, fetch this for other clients
           params: {},
         })
-      }
 
-      const client = await loadClient(pluginName as PluginName, provider)
-      programId = await getPredecessorProgramId(
-        client,
-        realmPublicKey,
-        governanceMintPublicKey
-      )
+        programId = await getPredecessorProgramId(
+          client,
+          realmPublicKey,
+          governanceMintPublicKey
+        )
+      }
     } while (pluginName !== null && programId !== null)
   }
 
