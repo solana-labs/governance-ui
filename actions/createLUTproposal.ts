@@ -13,7 +13,6 @@ import {
   getSignatoryRecordAddress,
   withInsertTransaction,
   withSignOffProposal,
-  withAddSignatory,
   RpcContext,
 } from '@solana/spl-governance'
 import {
@@ -93,17 +92,6 @@ export const createLUTProposal = async (
     useDenyOption,
     payer,
     plugin?.voterWeightPk
-  )
-
-  await withAddSignatory(
-    instructions,
-    programId,
-    programVersion,
-    proposalAddress,
-    tokenOwnerRecord.pubkey,
-    governanceAuthority,
-    signatory,
-    payer
   )
 
   // TODO: Return signatoryRecordAddress from the SDK call

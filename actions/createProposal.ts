@@ -12,7 +12,6 @@ import {
   withInsertTransaction,
   InstructionData,
   withSignOffProposal,
-  withAddSignatory,
   MultiChoiceType,
 } from '@solana/spl-governance'
 import {
@@ -129,17 +128,6 @@ export const createProposal = async (
     useDenyOption,
     payer,
     plugin?.voterWeightPk
-  )
-
-  await withAddSignatory(
-    instructions,
-    programId,
-    programVersion,
-    proposalAddress,
-    tokenOwnerRecord.pubkey,
-    governanceAuthority,
-    signatory,
-    payer
   )
 
   // TODO: Return signatoryRecordAddress from the SDK call

@@ -7,7 +7,6 @@ import {
   TokenOwnerRecord,
   VoteType,
   WalletSigner,
-  withAddSignatory,
   withCreateProposal,
   withInsertTransaction,
   withSignOffProposal,
@@ -100,17 +99,6 @@ export const createBase64Proposal = async (
     useDenyOption,
     payer,
     voterWeightPluginPk
-  )
-
-  await withAddSignatory(
-    instructions,
-    governanceProgram,
-    programVersion,
-    proposalAddress,
-    tokenOwnerRecord.pubkey,
-    governanceAuthority,
-    signatory,
-    payer
   )
 
   const signatoryRecordAddress = await getSignatoryRecordAddress(
