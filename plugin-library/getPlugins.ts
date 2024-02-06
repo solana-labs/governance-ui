@@ -10,6 +10,7 @@ import {
 import { loadClient } from './loadClient'
 import { AnchorProvider } from '@coral-xyz/anchor'
 import EmptyWallet from '@utils/Mango/listingTools'
+import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts'
 
 export interface PluginData {
   programId: PublicKey
@@ -78,14 +79,24 @@ export const getPlugins = async ({
           walletPublicKey
         )
 
-        // TODO: get any plugin specific params
+        const { registrar } = await getPluginRegistrarPDA(
+          realmPublicKey,
+          governanceMintPublicKey,
+          programId
+        )
+
+        const registrarData = await client.program.account.registrar.fetch(
+          registrar
+        )
 
         plugins.push({
           programId: programId,
           name: pluginName as PluginName,
           voterWeight: voterWeight?.voterWeight,
           maxVoterWeight: undefined, // TODO, fetch this for other clients
-          params: {},
+          params: {
+            ...registrarData,
+          },
         })
 
         programId = await getPredecessorProgramId(
