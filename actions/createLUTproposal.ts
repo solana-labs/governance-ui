@@ -10,7 +10,6 @@ import {
   TokenOwnerRecord,
   VoteType,
   withCreateProposal,
-  getSignatoryRecordAddress,
   withInsertTransaction,
   withSignOffProposal,
   RpcContext,
@@ -93,13 +92,12 @@ export const createLUTProposal = async (
     payer,
     plugin?.voterWeightPk
   )
-
-  // TODO: Return signatoryRecordAddress from the SDK call
+  /* 
   const signatoryRecordAddress = await getSignatoryRecordAddress(
     programId,
     proposalAddress,
     signatory
-  )
+  ) */
 
   const insertInstructions: TransactionInstruction[] = []
 
@@ -147,8 +145,8 @@ export const createLUTProposal = async (
       governance,
       proposalAddress,
       signatory,
-      signatoryRecordAddress,
-      undefined
+      undefined, //signatoryRecordAddress,
+      tokenOwnerRecord.pubkey
     )
   }
 

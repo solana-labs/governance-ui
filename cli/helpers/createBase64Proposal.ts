@@ -1,7 +1,6 @@
 import {
   getGovernanceProgramVersion,
   getInstructionDataFromBase64,
-  getSignatoryRecordAddress,
   ProgramAccount,
   SYSTEM_PROGRAM_ID,
   TokenOwnerRecord,
@@ -100,12 +99,12 @@ export const createBase64Proposal = async (
     payer,
     voterWeightPluginPk
   )
-
+  /* 
   const signatoryRecordAddress = await getSignatoryRecordAddress(
     governanceProgram,
     proposalAddress,
     signatory
-  )
+  ) */
   const insertInstructions: TransactionInstruction[] = []
   for (const i in base64Instructions) {
     const instruction = getInstructionDataFromBase64(base64Instructions[i])
@@ -132,8 +131,8 @@ export const createBase64Proposal = async (
     governance,
     proposalAddress,
     signatory,
-    signatoryRecordAddress,
-    undefined
+    undefined, //signatoryRecordAddress,
+    tokenOwnerRecord.pubkey
   )
 
   const txChunks = chunk([...instructions, ...insertInstructions], 2)
