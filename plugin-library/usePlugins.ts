@@ -52,7 +52,6 @@ export const usePlugins = ({
         return
       }
       const newPlugins = await fetchPlugins()
-      console.log('plugins in fetch and set', newPlugins)
       setPlugins(newPlugins)
     }
 
