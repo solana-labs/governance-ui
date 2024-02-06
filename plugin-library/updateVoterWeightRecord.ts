@@ -35,6 +35,7 @@ export const updateVoterWeightRecord = async ({
   const plugins = await getPlugins({
     realmPublicKey,
     governanceMintPublicKey,
+    walletPublicKey,
     connection,
   })
   const ixes: TransactionInstruction[] = []
