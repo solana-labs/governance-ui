@@ -32,15 +32,15 @@ export const updateVoterWeightRecord = async ({
     options
   )
 
-  const pluginNames = await getPlugins({
+  const plugins = await getPlugins({
     realmPublicKey,
     governanceMintPublicKey,
     connection,
   })
   const ixes: TransactionInstruction[] = []
 
-  for (const pluginName of pluginNames) {
-    const client = await loadClient(pluginName as PluginName, provider)
+  for (const plugin of plugins) {
+    const client = await loadClient(plugin.name as PluginName, provider)
 
     const voterWeightRecord = await client.getVoterWeightRecord(
       realmPublicKey,

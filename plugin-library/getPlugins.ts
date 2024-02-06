@@ -12,15 +12,15 @@ import { AnchorProvider } from '@coral-xyz/anchor'
 import EmptyWallet from '@utils/Mango/listingTools'
 
 export interface PluginData {
-  pluginProgramId: PublicKey
-  name: string | undefined // you may need undefined here to allow "unknown" plugins
+  programId: PublicKey
+  name: PluginName | undefined // you may need undefined here to allow "unknown" plugins
   params: any // the most challenging one- probably a typed data structure of some kind, that is related to the plugin, e.g. QV plugin has params: { coefficients: number[] }, Gateway plugin has params: { gatekeeperNetwork: Plugin } - these would come from the registrar
   voterWeight: BN // the weight after applying this plugin (taken from the voter's voterWeightRecord account)
   maxVoterWeight: BN | undefined // see above - can be undefined if the plugin does not set a max vw
 }
 
 export const getPredecessorProgramId = async (
-  client: GatewayClient | QuadraticClient,
+  client: GatewayClient | QuadraticClient, // TODO: Add other clients once we support them
   realmPublicKey: PublicKey,
   governanceMintPublicKey: PublicKey
 ): Promise<PublicKey | null> => {
@@ -46,9 +46,9 @@ export const getPlugins = async ({
   realmPublicKey: PublicKey
   governanceMintPublicKey: PublicKey
   connection: Connection
-}): Promise<PluginName[]> => {
+}): Promise<PluginData[]> => {
   const config = await fetchRealmConfigQuery(connection, realmPublicKey)
-  const plugins: PluginName[] = []
+  const plugins: PluginData[] = []
 
   const options = AnchorProvider.defaultOptions()
   const provider = new AnchorProvider(
@@ -68,7 +68,13 @@ export const getPlugins = async ({
     do {
       pluginName = findPluginName(programId)
       if (pluginName) {
-        plugins.push(pluginName as PluginName)
+        plugins.push({
+          programId: programId,
+          name: pluginName as PluginName,
+          voterWeight: new BN(0),
+          maxVoterWeight: new BN(0),
+          params: {},
+        })
       }
 
       const client = await loadClient(pluginName as PluginName, provider)
