@@ -57,7 +57,7 @@ const keyToLabel = {
   forceClose: 'Force Close',
   tokenConditionalSwapTakerFeeRate: 'Token Conditional Swap Taker Fee Rate',
   tokenConditionalSwapMakerFeeRate: 'Token Conditional Swap Maker Fee Rate',
-  flashLoanSwapFeeRate: 'Flash Loan Deposit Fee Rate',
+  flashLoanSwapFeeRate: 'Flash Loan Swap Fee Rate',
   interestCurveScaling: 'Interest Curve Scaling',
   interestTargetUtilization: 'interestTargetUtilization',
   maintWeightShiftStart: 'Maint Weight Shift Start',
