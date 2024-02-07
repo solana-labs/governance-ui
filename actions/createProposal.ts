@@ -7,12 +7,10 @@ import {
   TokenOwnerRecord,
   VoteType,
   withCreateProposal,
-  getSignatoryRecordAddress,
   RpcContext,
   withInsertTransaction,
   InstructionData,
   withSignOffProposal,
-  withAddSignatory,
   MultiChoiceType,
 } from '@solana/spl-governance'
 import {
@@ -76,7 +74,6 @@ export const createProposal = async (
   const instructions: TransactionInstruction[] = []
   const createNftTicketsIxs: TransactionInstruction[] = []
   const governanceAuthority = walletPubkey
-  const signatory = walletPubkey
   const payer = walletPubkey
   const prerequisiteInstructions: TransactionInstruction[] = []
   const prerequisiteInstructionsSigners: (Keypair | null)[] = []
@@ -131,24 +128,6 @@ export const createProposal = async (
     plugin?.voterWeightPk
   )
 
-  await withAddSignatory(
-    instructions,
-    programId,
-    programVersion,
-    proposalAddress,
-    tokenOwnerRecord.pubkey,
-    governanceAuthority,
-    signatory,
-    payer
-  )
-
-  // TODO: Return signatoryRecordAddress from the SDK call
-  const signatoryRecordAddress = await getSignatoryRecordAddress(
-    programId,
-    proposalAddress,
-    signatory
-  )
-
   const insertInstructions: TransactionInstruction[] = []
 
   const chunkBys = instructionsData
@@ -194,9 +173,9 @@ export const createProposal = async (
       realm.pubkey,
       governance,
       proposalAddress,
-      signatory,
-      signatoryRecordAddress,
-      undefined
+      walletPubkey,
+      undefined,
+      tokenOwnerRecord.pubkey
     )
   }
 
