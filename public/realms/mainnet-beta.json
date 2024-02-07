@@ -3453,8 +3453,8 @@
     "displayName": "OPDA TREASURY",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "7yrQJzHrUqxVbPKsZWz75zFWrXFizXatpUGRKnmTzLjP",
-    "bannerImage": "/realms/OPANZ/OPDA Treasury Cover 250-250.png",
-    "ogImage": "/realms/OPANZ/OPDA Treasury 64 -64.png",
+    "bannerImage": "public/realms/OPANZ/OPDA_Treasury_Cover_250.png",
+    "ogImage": "/realms/OPANZ/OPDA_Treasury_64.png",
     "website": "https://opanz.nz",
     "twitter": "@OPANZ_OPDA"
   },
@@ -3462,8 +3462,8 @@
     "displayName": "WHANAU OPANZ",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "CRy7DaqT5CT49tiT7F52v1irgEmxT5zSMXYZYCN182rm",
-    "bannerImage": "/realms/OPANZ/Whanau OPANZ 250-250.png",
-    "ogImage": "/realms/OPANZ/Whanau OPANZ 64.png",
+    "bannerImage": "public/realms/OPANZ/Whanau_OPANZ_250.png",
+    "ogImage": "/realms/OPANZ/Whanau_OPANZ_64.png",
     "website": "https://auturoa.nz",
     "twitter": "@OPANZ999"
   }
