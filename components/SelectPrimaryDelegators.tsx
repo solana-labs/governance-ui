@@ -22,7 +22,7 @@ const SelectPrimaryDelegators = () => {
   const walletId = wallet?.publicKey?.toBase58()
   const realm = useRealmQuery().data?.result
 
-  const delegatesArray = useTokenOwnerRecordsDelegatedToUser()
+  const { data: delegatesArray } = useTokenOwnerRecordsDelegatedToUser()
 
   // returns array of community tokenOwnerRecords that connected wallet has been delegated
   const communityTorsDelegatedToUser = useMemo(
