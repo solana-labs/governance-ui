@@ -897,10 +897,10 @@
     "@solana/web3.js" "^1.73.2"
     js-sha3 "^0.8.0"
 
-"@dual-finance/gso@0.0.14":
-  version "0.0.14"
-  resolved "https://registry.yarnpkg.com/@dual-finance/gso/-/gso-0.0.14.tgz#48990ae01295453d4428f6dbea2b83e73d0d9232"
-  integrity sha512-DjnP/VkT64oNaiyyHrtzwuCe4jEiFkt+9XTfJeLs88TmyUPULel/xmt4PQP2gzjCFrKcj160C+Sb7Q3SjaQB4w==
+"@dual-finance/gso@0.0.16":
+  version "0.0.16"
+  resolved "https://registry.yarnpkg.com/@dual-finance/gso/-/gso-0.0.16.tgz#98cb760af1f77671c61dd9901503531a1eaf42e7"
+  integrity sha512-v0mUqpU3F5LxLnSbJ9M5sOI9BIWS1MizxEnZN69CcFhrmCno6Et9O+whed4ukmWTqeQq5ULwUTVk9CUuxutQEw==
   dependencies:
     "@dual-finance/staking-options" "^0.0.17"
     "@project-serum/anchor" "^0.25.0"
@@ -1885,16 +1885,6 @@
     "@types/node" "*"
     "@types/yargs" "^17.0.8"
     chalk "^4.0.0"
-
-"@jnwng/walletconnect-solana@^0.1.5":
-  version "0.1.5"
-  resolved "https://registry.yarnpkg.com/@jnwng/walletconnect-solana/-/walletconnect-solana-0.1.5.tgz#54d71c0667fe317376490c337c36d0d19da95e5a"
-  integrity sha512-n8YLfF6NIVOqn+YeJEFRaZbbeNTGXL+VPBl+hqMpxLH+Fp+qgdm4CYH+ULH/OSszL2DBO1j+hB/XFDPiswCNeA==
-  dependencies:
-    "@walletconnect/qrcode-modal" "^1.8.0"
-    "@walletconnect/sign-client" "^2.4.5"
-    "@walletconnect/utils" "^2.4.5"
-    bs58 "^5.0.0"
 
 "@jnwng/walletconnect-solana@^0.2.0":
   version "0.2.0"
@@ -6188,7 +6178,7 @@
   dependencies:
     tslib "1.14.1"
 
-"@walletconnect/sign-client@^2.4.5", "@walletconnect/sign-client@^2.7.2":
+"@walletconnect/sign-client@^2.7.2":
   version "2.11.0"
   resolved "https://registry.yarnpkg.com/@walletconnect/sign-client/-/sign-client-2.11.0.tgz#de10f976cc1b8ab04b7f7c27f6a298e4e083ab25"
   integrity sha512-H2ukscibBS+6WrzQWh+WyVBqO5z4F5et12JcwobdwgHnJSlqIoZxqnUYYWNCI5rUR5UKsKWaUyto4AE9N5dw4Q==
