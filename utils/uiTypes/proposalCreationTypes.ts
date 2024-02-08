@@ -504,6 +504,7 @@ export interface DualFinanceGsoForm {
   lotSize: number
   subscriptionPeriodEnd: number
   lockupRatio: number
+  lockupMint: string
   baseTreasury: AssetAccount | undefined
   quoteTreasury: AssetAccount | undefined
   payer: AssetAccount | undefined
