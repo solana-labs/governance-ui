@@ -3447,5 +3447,13 @@
     "ogImage": "/realms/MOUTAI/mdao.jpg",
     "website": "https://www.moutaicoin.co/",
     "twitter": "@Moutai_Sol"
+  },
+  {
+    "symbol": "GARBAGE",
+    "displayName": "GARBAGE DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "GgF6fHb3iM3Um5DtvwbZvpGpYTzYnr1RmZr4NkwHveGp",
+    "website": "",
+    "twitter": ""
   }
 ]
