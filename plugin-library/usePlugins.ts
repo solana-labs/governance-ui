@@ -5,6 +5,8 @@ import { useConnection } from '@solana/wallet-adapter-react'
 import { updateVoterWeightRecord } from './updateVoterWeightRecord'
 import { PluginData, getPlugins } from './getPlugins'
 import { useState, useEffect, useCallback } from 'react'
+import { BN } from '@coral-xyz/anchor'
+import { calculateVoteWeight } from './calculateVoteWeight'
 
 export interface usePluginsArgs {
   realmPublicKey: PublicKey | undefined
@@ -16,6 +18,7 @@ export interface usePluginsReturnType {
   plugins: Array<any>
   updateVoterWeight: () => Promise<TransactionInstruction[]>
   createVoterWeightRecords: () => void
+  voteWeight: BN | null
 }
 
 export const usePlugins = ({
@@ -25,6 +28,7 @@ export const usePlugins = ({
 }: usePluginsArgs): usePluginsReturnType => {
   const { connection } = useConnection()
   const [plugins, setPlugins] = useState<Array<PluginData>>([])
+  const [voteWeight, setVoteWeight] = useState<BN | null>(null)
 
   const fetchPlugins = useCallback(() => {
     if (!realmPublicKey || !governanceMintPublicKey || !walletPublicKey) {
@@ -63,6 +67,18 @@ export const usePlugins = ({
     walletPublicKey?.toBase58(),
   ])
 
+  useEffect(() => {
+    // get calculated vote weight
+    const fetchAndSetWeight = async () => {
+      const weight = await calculateVoteWeight(plugins)
+      setVoteWeight(weight)
+    }
+
+    if (plugins.length) {
+      fetchAndSetWeight()
+    }
+  }, [plugins])
+
   const createVoterWeightRecords = () => {
     return
   }
@@ -93,5 +109,6 @@ export const usePlugins = ({
     updateVoterWeight,
     plugins,
     createVoterWeightRecords,
+    voteWeight,
   }
 }

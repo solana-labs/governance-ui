@@ -18,6 +18,8 @@ export interface PluginData {
   params: any // the most challenging one- probably a typed data structure of some kind, that is related to the plugin, e.g. QV plugin has params: { coefficients: number[] }, Gateway plugin has params: { gatekeeperNetwork: Plugin } - these would come from the registrar
   voterWeight: BN // the weight after applying this plugin (taken from the voter's voterWeightRecord account)
   maxVoterWeight: BN | undefined // see above - can be undefined if the plugin does not set a max vw
+  registrarPublicKey: PublicKey
+  client: QuadraticClient | QuadraticClient
 }
 
 export const getPredecessorProgramId = async (
@@ -90,10 +92,13 @@ export const getPlugins = async ({
         )
 
         plugins.push({
+          // @ts-ignore issue with client types
+          client: client,
           programId: programId,
           name: pluginName as PluginName,
           voterWeight: voterWeight?.voterWeight,
           maxVoterWeight: undefined, // TODO, fetch this for other clients
+          registrarPublicKey: registrar,
           params: {
             ...registrarData,
           },
