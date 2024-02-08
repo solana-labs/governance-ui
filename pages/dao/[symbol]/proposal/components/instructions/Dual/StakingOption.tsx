@@ -34,7 +34,7 @@ const StakingOption = ({
   const [form, setForm] = useState<DualFinanceStakingOptionForm>({
     soName: undefined,
     optionExpirationUnixSeconds: 0,
-    numTokens: 0,
+    numTokens: '0',
     lotSize: 1,
     baseTreasury: undefined,
     quoteTreasury: undefined,
