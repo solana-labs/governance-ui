@@ -897,10 +897,10 @@
     "@solana/web3.js" "^1.73.2"
     js-sha3 "^0.8.0"
 
-"@dual-finance/gso@0.0.16":
-  version "0.0.16"
-  resolved "https://registry.yarnpkg.com/@dual-finance/gso/-/gso-0.0.16.tgz#98cb760af1f77671c61dd9901503531a1eaf42e7"
-  integrity sha512-v0mUqpU3F5LxLnSbJ9M5sOI9BIWS1MizxEnZN69CcFhrmCno6Et9O+whed4ukmWTqeQq5ULwUTVk9CUuxutQEw==
+"@dual-finance/gso@0.0.17":
+  version "0.0.17"
+  resolved "https://registry.yarnpkg.com/@dual-finance/gso/-/gso-0.0.17.tgz#b547bc722c7e924be20dd424acb048739ccb3bdb"
+  integrity sha512-SatlyKfQq185FVWfzOu62IDorCiS/5+JMbnNybgZuI9f2/Sz/WU7ybY4Z7MZz4u8fK6ZWkLQEU3Mfmki/opBzA==
   dependencies:
     "@dual-finance/staking-options" "^0.0.17"
     "@project-serum/anchor" "^0.25.0"
