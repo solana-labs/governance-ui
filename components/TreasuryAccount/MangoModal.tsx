@@ -430,7 +430,7 @@ const MangoAccountItem = ({
     <div>
       <div>Name: {account.name}</div>
       <div>{account.publicKey.toBase58()}</div>
-      <div>Pnl: ${account.getPnl(group).toString()}</div>
+      <div>Account Value: ${account.getAssetsValue(group).toString()}</div>
     </div>
   ) : (
     <div>Create new account</div>
