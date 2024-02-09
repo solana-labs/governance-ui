@@ -141,7 +141,8 @@ export async function getConfigInstruction({
           //owner is sol wallet or governance same as baseTokenAccount
           form.baseTreasury.extensions!.token!.account.owner,
           [],
-          form.numTokens
+          // @ts-ignore
+          form.numTokens as unknown as bigint
         )
       )
     )
@@ -332,7 +333,8 @@ export async function getConfigGsoInstruction({
           //owner is sol wallet or governance same as baseTreasury
           form.baseTreasury.extensions!.token!.account.owner,
           [],
-          form.numTokens
+          // @ts-ignore
+          form.numTokens as unknown as bigint
         )
       )
     )
