@@ -24,6 +24,7 @@ import { precision } from '@utils/formatting'
 import * as yup from 'yup'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { validateInstruction } from '@utils/instructionTools'
+import Switch from '@components/Switch'
 
 const MangoModal = ({ account }: { account: AssetAccount }) => {
   const { canUseTransferInstruction } = useGovernanceAssets()
@@ -42,6 +43,8 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
     amount: number
     title: string
     description: string
+    delegate: boolean
+    delegateWallet: string
   }>({
     accountName: '',
     title: `Deposit ${
@@ -51,7 +54,9 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
     } to the Mango`,
     description: '',
     amount: 0,
-    mangoAccount: undefined
+    mangoAccount: undefined,
+    delegate: false,
+    delegateWallet: '',
   });
   const [formErrors, setFormErrors] = useState({})
 
@@ -91,6 +96,12 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
       .required('Amount is required')
       .min(mintMinAmount)
       .max(maxAmount.toNumber()),
+    delegate: yup.boolean().required('Delegate is required'),
+    delegateWallet: yup.string().nullable().when('delegate', {
+      is: true,
+      then: yup.string().required('Delegate Wallet is required'),
+      otherwise: yup.string().notRequired()
+    }),
   })
 
   useEffect(() => {
@@ -179,28 +190,6 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
         )
         .instruction()
 
-      const delegateIx = await mangoClient!.program.methods
-        .accountEdit(
-          null,
-          new PublicKey('CwkzPDCBMzYZuvNa88sgToYyyqtEdKTJneWTsg7n3mTE'),
-          null,
-          null
-        )
-        .accounts({
-          group: mangoGroup!.publicKey,
-          account: mangoAccount,
-          owner: account.extensions.token!.account.owner!,
-        })
-        .instruction()
-
-      const createAccInstData = {
-        data: getInstructionDataFromBase64(
-          serializeInstructionToBase64(createAccIx)
-        ),
-        holdUpTime:
-        account?.governance.account?.config.minInstructionHoldUpTime,
-        prerequisiteInstructions: [],
-      }
       const depositAccInstData = {
         data: getInstructionDataFromBase64(
           serializeInstructionToBase64(depositIx!)
@@ -209,23 +198,55 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
         account?.governance.account?.config.minInstructionHoldUpTime,
         prerequisiteInstructions: [],
       }
-      const delegateAccInstData = {
-        data: getInstructionDataFromBase64(
-          serializeInstructionToBase64(delegateIx!)
-        ),
-        holdUpTime:
-        account?.governance.account?.config.minInstructionHoldUpTime,
-        prerequisiteInstructions: [],
+
+      const instructions = [depositAccInstData];
+
+      if(form.delegate) {
+        const delegateIx = await mangoClient!.program.methods
+          .accountEdit(
+            null,
+            new PublicKey(form.delegateWallet),
+            null,
+            null
+          )
+          .accounts({
+            group: mangoGroup!.publicKey,
+            account: mangoAccount,
+            owner: account.extensions.token!.account.owner!,
+          })
+          .instruction()
+
+        const delegateAccInstData = {
+          data: getInstructionDataFromBase64(
+            serializeInstructionToBase64(delegateIx!)
+          ),
+          holdUpTime:
+          account?.governance.account?.config.minInstructionHoldUpTime,
+          prerequisiteInstructions: [],
+        }
+
+        instructions.push(delegateAccInstData)
       }
+
+
+      if(form.mangoAccount === null) {
+        const createAccInstData = {
+          data: getInstructionDataFromBase64(
+            serializeInstructionToBase64(createAccIx)
+          ),
+          holdUpTime:
+          account?.governance.account?.config.minInstructionHoldUpTime,
+          prerequisiteInstructions: [],
+        }
+
+        instructions.push(createAccInstData)
+      }
+
       const proposalAddress = await handleCreateProposal({
         title: form.title,
         description: form.description,
         voteByCouncil,
-        instructionsData: [
-          createAccInstData,
-          depositAccInstData,
-          delegateAccInstData,
-        ],
+        instructionsData: instructions,
         governance: account.governance!,
       })
       const url = fmtUrlWithCluster(
@@ -331,6 +352,30 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
             })
           }}
         />
+        <div className="flex justify-end mb-1.5 text-sm">
+          <p>
+            Delegate
+          </p>
+          <Switch
+            checked={form.delegate}
+            onChange={() => handleSetForm({
+              propertyName: 'delegate',
+              value: !form.delegate
+            })}
+          />
+        </div>
+        {form.delegate && (
+          <Input
+            error={formErrors['delegateWallet']}
+            label="Delegate Wallet"
+            type="text"
+            value={form.delegateWallet}
+            onChange={(e) => handleSetForm({
+              propertyName: 'delegateWallet',
+              value: e.target.value
+            })}
+          />
+        )}
         <AdditionalProposalOptions
           title={form.title}
           description={form.description}
@@ -368,8 +413,6 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
               <div>Propose</div>
             </Tooltip>
           </Button>
-
-
         </div>
       </div>
     </div>
