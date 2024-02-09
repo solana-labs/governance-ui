@@ -3,6 +3,7 @@ import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import queryClient from '@hooks/queries/queryClient'
 import { useConnection } from '@solana/wallet-adapter-react'
 import { updateVoterWeightRecord } from './updateVoterWeightRecord'
+import { createVoterWeightRecord } from './createVoterWeightRecord'
 import { PluginData, getPlugins } from './getPlugins'
 import { useState, useEffect, useCallback } from 'react'
 import { BN } from '@coral-xyz/anchor'
@@ -17,7 +18,7 @@ export interface usePluginsArgs {
 export interface usePluginsReturnType {
   plugins: Array<any>
   updateVoterWeight: () => Promise<TransactionInstruction[]>
-  createVoterWeightRecords: () => void
+  createVoterWeight: () => Promise<TransactionInstruction[]>
   voteWeight: BN | null
 }
 
@@ -79,8 +80,26 @@ export const usePlugins = ({
     }
   }, [plugins])
 
-  const createVoterWeightRecords = () => {
-    return
+  const createVoterWeight = (): Promise<TransactionInstruction[]> => {
+    if (!realmPublicKey || !governanceMintPublicKey || !walletPublicKey) {
+      return Promise.resolve([])
+    }
+
+    return queryClient.fetchQuery({
+      queryKey: [
+        'createVoteWeight',
+        realmPublicKey,
+        walletPublicKey,
+        governanceMintPublicKey,
+      ],
+      queryFn: () =>
+        createVoterWeightRecord({
+          walletPublicKey,
+          realmPublicKey,
+          governanceMintPublicKey,
+          connection,
+        }),
+    })
   }
 
   const updateVoterWeight = (): Promise<TransactionInstruction[]> => {
@@ -107,8 +126,8 @@ export const usePlugins = ({
 
   return {
     updateVoterWeight,
+    createVoterWeight,
     plugins,
-    createVoterWeightRecords,
     voteWeight,
   }
 }
