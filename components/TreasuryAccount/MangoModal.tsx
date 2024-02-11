@@ -1,4 +1,4 @@
-import { Group, MangoAccount } from '@blockworks-foundation/mango-v4'
+import { Group, MangoAccount, toUiDecimals } from '@blockworks-foundation/mango-v4'
 import AdditionalProposalOptions from '@components/AdditionalProposalOptions'
 import Button, { LinkButton } from '@components/Button'
 import Input from '@components/inputs/Input'
@@ -430,7 +430,7 @@ const MangoAccountItem = ({
     <div>
       <div>Name: {account.name}</div>
       <div>{account.publicKey.toBase58()}</div>
-      <div>Account Value: ${account.getAssetsValue(group).toString()}</div>
+      <div>Account Value: ${toUiDecimals(account.getAssetsValue(group), 6)}</div>
     </div>
   ) : (
     <div>Create new account</div>
