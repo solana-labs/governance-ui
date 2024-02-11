@@ -137,6 +137,12 @@ export const ACCOUNT_NAMES = {
   FAFDfoUkaxoMqiNur9F1iigdBNrXFf4uNmS5XrhMewvf:
     'Friends and Family Community Mint',
 
+  // Dean's List DAO
+  '7A6CrNWAFFBpQTBRo5fULibqqB3MouNLgbVBf8D3MJAx': 'Deans List DAO Treasury',
+  'FThth1Uwkw1JJKMkKohpgiEshYKZojMpfhGHMf2rLZNR': 'DAO: (DEAN) Strategic Reserve',
+  'DY9NzNSbbDJk4NYXN2TBMkF8oBbZaq7UYSy3VzKcviNS': 'DAO: (DEAN) Community Reserve',
+  'EZ3V9DRoUpewNyNTyG3ya7TiPwe27XGDCgFHgfXNprJX': 'DAO: (DEAN) Liquidity Reserve',
+
   // Physis DAO
   '29epeLvAMyRXtpA1HaoKB1hGcAnrc1NvMCbaZ8AVRwEi': 'Physis DAO Treasury',
   '4i2Yjk5bUiLeVNwqBpkRdFSECSCvMgKoeCSdRSx1TPcz': 'DAO: Rewards (PHY)',
