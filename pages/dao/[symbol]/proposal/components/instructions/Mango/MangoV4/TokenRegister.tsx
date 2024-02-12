@@ -16,9 +16,6 @@ import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { toNative } from '@blockworks-foundation/mango-v4'
 import { BN } from '@coral-xyz/anchor'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { ReferralProvider } from '@jup-ag/referral-sdk'
-import { JUPITER_REFERRAL_PK } from '@tools/constants'
-import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import ForwarderProgram, {
   useForwarderProgramHelpers,
 } from '@components/ForwarderProgram/ForwarderProgram'
@@ -74,7 +71,6 @@ const TokenRegister = ({
   const wallet = useWalletOnePointOh()
   const { mangoClient, mangoGroup, getAdditionalLabelInfo } = UseMangoV4()
   const { assetAccounts } = useGovernanceAssets()
-  const connection = useLegacyConnectionContext()
   const forwarderProgramHelpers = useForwarderProgramHelpers()
 
   const solAccounts = assetAccounts.filter(
@@ -134,7 +130,6 @@ const TokenRegister = ({
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
-    const additionalSerializedInstructions: string[] = []
     if (
       isValid &&
       form.governedAccount?.governance?.account &&
@@ -192,27 +187,6 @@ const TokenRegister = ({
           rent: SYSVAR_RENT_PUBKEY,
         })
         .instruction()
-
-      const rp = new ReferralProvider(connection.current)
-
-      const tx = await rp.initializeReferralTokenAccount({
-        payerPubKey: form.governedAccount.extensions.transferAddress!,
-        referralAccountPubKey: JUPITER_REFERRAL_PK,
-        mint: new PublicKey(form.mintPk),
-      })
-      const isExistingAccount = await connection.current.getAccountInfo(
-        tx.referralTokenAccountPubKey
-      )
-
-      if (!isExistingAccount) {
-        additionalSerializedInstructions.push(
-          ...tx.tx.instructions.map((x) =>
-            serializeInstructionToBase64(
-              forwarderProgramHelpers.withForwarderWrapper(x)
-            )
-          )
-        )
-      }
 
       serializedInstruction = serializeInstructionToBase64(
         forwarderProgramHelpers.withForwarderWrapper(ix)
