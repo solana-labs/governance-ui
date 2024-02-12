@@ -54,7 +54,7 @@ export default function UseMangoV4() {
       setMangoClient(client)
       setMangoGroup(group)
     }
-    if (wallet?.publicKey && connection) {
+    if (wallet && connection) {
       console.log('SET NEW CLIENT')
       handleSetClient()
     }
