@@ -10,8 +10,10 @@ import {
   TokenOwnerRecord,
   VoteType,
   withCreateProposal,
+  getSignatoryRecordAddress,
   withInsertTransaction,
   withSignOffProposal,
+  withAddSignatory,
   RpcContext,
 } from '@solana/spl-governance'
 import {
@@ -92,12 +94,24 @@ export const createLUTProposal = async (
     payer,
     plugin?.voterWeightPk
   )
-  /* 
+
+  await withAddSignatory(
+    instructions,
+    programId,
+    programVersion,
+    proposalAddress,
+    tokenOwnerRecord.pubkey,
+    governanceAuthority,
+    signatory,
+    payer
+  )
+
+  // TODO: Return signatoryRecordAddress from the SDK call
   const signatoryRecordAddress = await getSignatoryRecordAddress(
     programId,
     proposalAddress,
     signatory
-  ) */
+  )
 
   const insertInstructions: TransactionInstruction[] = []
 
@@ -145,8 +159,8 @@ export const createLUTProposal = async (
       governance,
       proposalAddress,
       signatory,
-      undefined, //signatoryRecordAddress,
-      tokenOwnerRecord.pubkey
+      signatoryRecordAddress,
+      undefined
     )
   }
 
