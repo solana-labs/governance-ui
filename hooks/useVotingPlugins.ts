@@ -23,6 +23,7 @@ import {
 } from '../constants/plugins'
 import useUserOrDelegator from './useUserOrDelegator'
 
+// TODO QV-2: This hooks seems to initialize the stores. Remove the plugins already migrated to the new hook
 export function useVotingPlugins() {
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
@@ -245,9 +246,9 @@ export function useVotingPlugins() {
     // and pass the current token weight to the client
     const handleQVPlugin = () => {
       if (
-          quadraticClient &&
-          currentPluginPk &&
-          QV_PLUGINS_PKS.includes(currentPluginPk.toBase58())
+        quadraticClient &&
+        currentPluginPk &&
+        QV_PLUGINS_PKS.includes(currentPluginPk.toBase58())
       ) {
         handleSetQuadraticRegistrar(quadraticClient, realm)
         if (voterPk) {

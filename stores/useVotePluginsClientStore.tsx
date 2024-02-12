@@ -1,5 +1,8 @@
 import create, { State } from 'zustand'
-import {GatewayClient, QuadraticClient} from '@solana/governance-program-library'
+import {
+  GatewayClient,
+  QuadraticClient,
+} from '@solana/governance-program-library'
 import { getRegistrarPDA, Registrar } from 'VoteStakeRegistry/sdk/accounts'
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts'
 import { AnchorProvider, Wallet } from '@coral-xyz/anchor'
@@ -20,8 +23,9 @@ import { Registrar as HeliumVsrRegistrar } from 'HeliumVotePlugin/sdk/types'
 import * as heliumVsrSdk from '@helium/voter-stake-registry-sdk'
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { StakeConnection as PythClient } from '@pythnetwork/staking'
-import {tryGetQuadraticRegistrar} from "../QuadraticPlugin/sdk/api";
+import { tryGetQuadraticRegistrar } from '../QuadraticPlugin/sdk/api'
 
+// TODO QV-2: Remove teh quadratic and gateway clients from the store
 interface UseVotePluginsClientStore extends State {
   state: {
     //diffrent plugins to choose because we will still have functions related only to one plugin
@@ -59,8 +63,8 @@ interface UseVotePluginsClientStore extends State {
     connection: ConnectionContext
   ) => void
   handleSetQuadraticClient: (
-      wallet: SignerWalletAdapter | undefined,
-      connection: ConnectionContext
+    wallet: SignerWalletAdapter | undefined,
+    connection: ConnectionContext
   ) => void
   handleSetVsrRegistrar: (
     client: VsrClient,
@@ -79,8 +83,8 @@ interface UseVotePluginsClientStore extends State {
     realm: ProgramAccount<Realm> | undefined
   ) => void
   handleSetQuadraticRegistrar: (
-      client: QuadraticClient,
-      realm: ProgramAccount<Realm> | undefined
+    client: QuadraticClient,
+    realm: ProgramAccount<Realm> | undefined
   ) => void
   handleSetCurrentRealmVotingClient: ({
     client,
@@ -234,12 +238,18 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
 
       const clientProgramId = client.program.programId
       const { registrar } = await getPluginRegistrarPDA(
-          realm.pubkey,
-          realm.account.communityMint,
-          clientProgramId
+        realm.pubkey,
+        realm.account.communityMint,
+        clientProgramId
       )
-      const existingRegistrar = await tryGetQuadraticRegistrar(registrar, client)
-      const {maxVoterWeightPk} = client.getMaxVoterWeightRecordPDA(realm.pubkey, realm.account.communityMint);
+      const existingRegistrar = await tryGetQuadraticRegistrar(
+        registrar,
+        client
+      )
+      const { maxVoterWeightPk } = client.getMaxVoterWeightRecordPDA(
+        realm.pubkey,
+        realm.account.communityMint
+      )
       set((s) => {
         s.state.quadraticRegistrar = existingRegistrar
         s.state.maxVoterWeight = maxVoterWeightPk
@@ -272,13 +282,13 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
     handleSetQuadraticClient: async (wallet, connection) => {
       const options = AnchorProvider.defaultOptions()
       const provider = new AnchorProvider(
-          connection.current,
-          (wallet as unknown) as Wallet,
-          options
+        connection.current,
+        (wallet as unknown) as Wallet,
+        options
       )
       const quadraticClient = await QuadraticClient.connect(
-          provider,
-          connection.cluster === 'devnet'
+        provider,
+        connection.cluster === 'devnet'
       )
       set((s) => {
         s.state.quadraticClient = quadraticClient
@@ -286,14 +296,19 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
     },
     handleSetPythClient: async (wallet, connection) => {
       if (wallet) {
-        const pythClient = await PythClient.connect(connection.current, wallet as unknown as Wallet)
-        const maxVoterWeight = (await pythClient.program.methods.updateMaxVoterWeight().pubkeys()).maxVoterRecord
+        const pythClient = await PythClient.connect(
+          connection.current,
+          (wallet as unknown) as Wallet
+        )
+        const maxVoterWeight = (
+          await pythClient.program.methods.updateMaxVoterWeight().pubkeys()
+        ).maxVoterRecord
         set((s) => {
           s.state.pythClient = pythClient
           s.state.maxVoterWeight = maxVoterWeight
         })
       }
-    }
+    },
   })
 )
 

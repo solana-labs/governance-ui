@@ -6,6 +6,7 @@ import { VsrClient } from 'VoteStakeRegistry/sdk/client';
 
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient';
 
+// TODO QV-2: replace calls to this method to use the new getPlugins hook
 /** @deprecated */
 export async function fetchPlugins(
   connection: Connection,

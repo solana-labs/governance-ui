@@ -1,4 +1,7 @@
-import {GatewayClient, QuadraticClient} from '@solana/governance-program-library'
+import {
+  GatewayClient,
+  QuadraticClient,
+} from '@solana/governance-program-library'
 
 import {
   ProgramAccount,
@@ -108,6 +111,7 @@ export type Client =
   | QuadraticClient
   | PythClient
 
+// TODO QV-2
 //Abstract for common functions that plugins will implement
 export class VotingClient {
   client: Client | undefined
@@ -333,15 +337,18 @@ export class VotingClient {
       return { voterWeightPk, maxVoterWeightRecord: undefined }
     }
     if (this.client instanceof QuadraticClient) {
-      const { voterWeightPk, maxVoterWeightPk } = await this._withHandleQuadraticVoterWeight(
-          realm,
-          walletPk,
-          instructions
+      const {
+        voterWeightPk,
+        maxVoterWeightPk,
+      } = await this._withHandleQuadraticVoterWeight(
+        realm,
+        walletPk,
+        instructions
       )
       const updateVoterWeightRecordIxes = await QuadraticPluginAccounts.getVoteInstructions(
-          this.client,
-          realm,
-          walletPk
+        this.client,
+        realm,
+        walletPk
       )
       instructions.push(...updateVoterWeightRecordIxes)
       return { voterWeightPk, maxVoterWeightRecord: maxVoterWeightPk }
@@ -417,17 +424,20 @@ export class VotingClient {
     if (this.client instanceof QuadraticClient) {
       // get the quadratic plugin vote instruction
       const quadraticInstructions = await QuadraticPluginAccounts.getVoteInstructions(
-          this.client,
-          realm,
-          walletPk
+        this.client,
+        realm,
+        walletPk
       )
 
       instructions.push(...quadraticInstructions)
 
-      const { voterWeightPk, maxVoterWeightPk } = await this._withHandleQuadraticVoterWeight(
-          realm,
-          walletPk,
-          instructions
+      const {
+        voterWeightPk,
+        maxVoterWeightPk,
+      } = await this._withHandleQuadraticVoterWeight(
+        realm,
+        walletPk,
+        instructions
       )
 
       return { voterWeightPk, maxVoterWeightRecord: maxVoterWeightPk }
@@ -809,29 +819,32 @@ export class VotingClient {
   // which defines a general-purpose mechanism for plugins in the UI.
   // We will no longer need separate functions like this for each plugin
   _withHandleQuadraticVoterWeight = async (
-      realm: ProgramAccount<Realm>,
-      walletPk: PublicKey,
-      _instructions
+    realm: ProgramAccount<Realm>,
+    walletPk: PublicKey,
+    _instructions
   ) => {
     if (!(this.client instanceof QuadraticClient)) {
       throw 'Method only allowed for quadratic client'
     }
 
-    const mint = realm.account.communityMint;
+    const mint = realm.account.communityMint
     const {
       voterWeightPk,
       voterWeightRecordBump,
-    } = this.client.getVoterWeightRecordPDA(realm.pubkey, mint, walletPk);
+    } = this.client.getVoterWeightRecordPDA(realm.pubkey, mint, walletPk)
 
     const {
       maxVoterWeightPk,
       maxVoterWeightRecordBump,
-    } = this.client.getMaxVoterWeightRecordPDA(realm.pubkey, mint);
+    } = this.client.getMaxVoterWeightRecordPDA(realm.pubkey, mint)
 
-    const { voterWeightPk: previousVoterWeightPk, maxVoterWeightPk: previousMaxVoterWeightPk } = await QuadraticPluginAccounts.getPreviousVotingWeightRecords(
-        this.client,
-        realm,
-        walletPk
+    const {
+      voterWeightPk: previousVoterWeightPk,
+      maxVoterWeightPk: previousMaxVoterWeightPk,
+    } = await QuadraticPluginAccounts.getPreviousVotingWeightRecords(
+      this.client,
+      realm,
+      walletPk
     )
 
     return {
@@ -840,7 +853,7 @@ export class VotingClient {
       voterWeightPk,
       voterWeightRecordBump,
       maxVoterWeightPk,
-      maxVoterWeightRecordBump
+      maxVoterWeightRecordBump,
     }
   }
   _setCurrentHeliumVsrPositions = (positions: PositionWithMeta[]) => {

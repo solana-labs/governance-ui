@@ -33,8 +33,9 @@ import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet'
 import { findPluginName } from '@constants/plugins'
 import { nftRegistrarQuery } from './plugins/nftVoter'
 import queryClient from './queryClient'
-import useQuadraticPluginStore from "../../QuadraticPlugin/store/quadraticPluginStore";
-import {useEffect} from "react";
+import { useEffect } from 'react'
+import { usePlugins } from 'plugin-library'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 export const getVanillaGovpower = async (
   connection: Connection,
@@ -180,6 +181,24 @@ export const WithVsrGovernancePower = <
     )
   } */
 
+// TODO QV-2 Check if there is no plugin and get the vanilla value (or should the usePlugins hook have the vanilla value?)
+export const useGovernancePower = (
+  kind: 'community' | 'council' | undefined
+) => {
+  const wallet = useWalletOnePointOh()
+  const realm = useRealmQuery().data?.result
+  const { voteWeight } = usePlugins({
+    realmPublicKey: realm?.pubkey,
+    governanceMintPublicKey:
+      kind === 'community'
+        ? realm?.account.communityMint
+        : realm?.account.config.councilMint,
+    walletPublicKey: wallet?.publicKey || undefined,
+  })
+
+  return voteWeight
+}
+
 /** where possible avoid using this and use a plugin-specific hook instead */
 export const useGovernancePowerAsync = (
   kind: 'community' | 'council' | undefined
@@ -189,8 +208,12 @@ export const useGovernancePowerAsync = (
 
   const heliumVotingPower = useHeliumVsrStore((s) => s.state.votingPower)
   const gatewayVotingPower = useGatewayPluginStore((s) => s.state.votingPower)
-  const quadraticVotingPower = useQuadraticPluginStore((s) => s.state.votingPower)
-  const setQuadraticVotingPower = useQuadraticPluginStore((s) => s.setVotingPower)
+  const quadraticVotingPower = useQuadraticPluginStore(
+    (s) => s.state.votingPower
+  )
+  const setQuadraticVotingPower = useQuadraticPluginStore(
+    (s) => s.setVotingPower
+  )
   const vsrVotingPower = useVsrGovpower().data?.result
 
   const communityTOR = useAddressQuery_CommunityTokenOwner()
@@ -206,44 +229,41 @@ export const useGovernancePowerAsync = (
 
   // TODO this should be encapsulated into a QV client
   useEffect(() => {
-      if (plugin === 'QV' && TOR) {
-          getVanillaGovpower(connection, TOR).then(setQuadraticVotingPower);
-      }
-  }, [connection, TOR, plugin]);
+    if (plugin === 'QV' && TOR) {
+      getVanillaGovpower(connection, TOR).then(setQuadraticVotingPower)
+    }
+  }, [connection, TOR, plugin])
 
-  return useAsync(
-    async () => {
-        return plugin === undefined
-            ? undefined
-            : realmPk &&
-            TOR &&
-            (plugin === 'vanilla'
-                ? getVanillaGovpower(connection, TOR)
-                : plugin === 'NFT'
-                    ? getNftGovpower(connection, realmPk, TOR)
-                    : plugin === 'VSR'
-                        ? vsrVotingPower ?? new BN(0)
-                        : plugin === 'HeliumVSR'
-                            ? heliumVotingPower
-                            : plugin === 'gateway'
-                                ? gatewayVotingPower
-                                : plugin === 'QV'
-                                    ? quadraticVotingPower
-                                    : plugin === 'pyth'
-                                        ? getPythGovPower(connection, actingAsWalletPk)
-                                        : new BN(0));
-    },
-    [
-      plugin,
-      realmPk,
-      TOR,
-      connection,
-      vsrVotingPower,
-      heliumVotingPower,
-      gatewayVotingPower,
-      actingAsWalletPk,
-    ]
-  )
+  return useAsync(async () => {
+    return plugin === undefined
+      ? undefined
+      : realmPk &&
+          TOR &&
+          (plugin === 'vanilla'
+            ? getVanillaGovpower(connection, TOR)
+            : plugin === 'NFT'
+            ? getNftGovpower(connection, realmPk, TOR)
+            : plugin === 'VSR'
+            ? vsrVotingPower ?? new BN(0)
+            : plugin === 'HeliumVSR'
+            ? heliumVotingPower
+            : plugin === 'gateway'
+            ? gatewayVotingPower
+            : plugin === 'QV'
+            ? quadraticVotingPower
+            : plugin === 'pyth'
+            ? getPythGovPower(connection, actingAsWalletPk)
+            : new BN(0))
+  }, [
+    plugin,
+    realmPk,
+    TOR,
+    connection,
+    vsrVotingPower,
+    heliumVotingPower,
+    gatewayVotingPower,
+    actingAsWalletPk,
+  ])
 }
 
 /**
@@ -321,10 +341,7 @@ export const useLegacyVoterWeight = () => {
             gatewayVotingPower
           )
         : plugin === 'QV'
-        ? new VoterWeight(
-            communityTOR.result,
-            councilTOR?.result,
-          )
+        ? new VoterWeight(communityTOR.result, councilTOR?.result)
         : undefined),
 
     [
