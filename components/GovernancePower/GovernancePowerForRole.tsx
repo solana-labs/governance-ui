@@ -12,8 +12,6 @@ import { ExclamationIcon } from '@heroicons/react/solid'
 import VanillaWithdrawTokensButton from '@components/TokenBalance/VanillaWithdrawTokensButton'
 import LockedCommunityVotingPower from '@components/ProposalVotingPower/LockedCommunityVotingPower'
 import PythVotingPower from 'PythVotePlugin/components/PythVotingPower'
-import { usePlugins } from 'plugin-library'
-import { useRealmQuery } from '@hooks/queries/realm'
 import PluginVotingPower from '@components/ProposalVotingPower/PluginVotingPower'
 
 export default function GovernancePowerForRole({
@@ -37,17 +35,6 @@ export default function GovernancePowerForRole({
 
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
-
-  // TODO QV-2 Create a new hook to encapsulate this logic?
-  const realm = useRealmQuery().data?.result
-  const { voteWeight } = usePlugins({
-    realmPublicKey: realm?.pubkey,
-    governanceMintPublicKey:
-      role === 'community'
-        ? realm?.account.communityMint
-        : realm?.account.config.councilMint,
-    walletPublicKey: wallet?.publicKey || undefined,
-  })
 
   const { result: kind } = useAsync(async () => {
     if (realmPk === undefined) return undefined
