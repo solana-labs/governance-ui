@@ -5,11 +5,9 @@ import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { TokenDeposit } from '@components/TokenBalance/TokenDeposit'
 import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
 import { useRealmQuery } from '@hooks/queries/realm'
-import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { GoverningTokenRole } from '@solana/spl-governance'
 import { BigNumber } from 'bignumber.js'
 import clsx from 'clsx'
-import { useVoterWeightPlugins } from 'VoterWeightPlugins'
 import { useMemo } from 'react'
 import {useRealmVoterWeightPlugins} from "@hooks/useRealmVoterWeightPlugins";
 
