@@ -34,8 +34,7 @@ import { findPluginName } from '@constants/plugins'
 import { nftRegistrarQuery } from './plugins/nftVoter'
 import queryClient from './queryClient'
 import { useEffect } from 'react'
-import { usePlugins } from 'plugin-library'
-import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import {useRealmVoterWeightPlugins} from "@hooks/useRealmVoterWeightPlugins";
 
 export const getVanillaGovpower = async (
   connection: Connection,
@@ -185,18 +184,8 @@ export const WithVsrGovernancePower = <
 export const useGovernancePower = (
   kind: 'community' | 'council' | undefined
 ) => {
-  const wallet = useWalletOnePointOh()
-  const realm = useRealmQuery().data?.result
-  const { voteWeight } = usePlugins({
-    realmPublicKey: realm?.pubkey,
-    governanceMintPublicKey:
-      kind === 'community'
-        ? realm?.account.communityMint
-        : realm?.account.config.councilMint,
-    walletPublicKey: wallet?.publicKey || undefined,
-  })
-
-  return voteWeight
+  const { voterWeight } = useRealmVoterWeightPlugins(kind)
+  return voterWeight
 }
 
 /** where possible avoid using this and use a plugin-specific hook instead */
