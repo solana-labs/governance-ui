@@ -3455,5 +3455,15 @@
     "realmId": "GgF6fHb3iM3Um5DtvwbZvpGpYTzYnr1RmZr4NkwHveGp",
     "website": "",
     "twitter": ""
+  },
+  {
+    "symbol": "INFUSION",
+    "displayName": "Infusion DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Fsh13s8jCE9CfUSz6UwrDc4qPCqsuokyhvVVKrMZMMvQ",
+    "ogImage": "/realms/infusionlogo.png",
+    "website": "https://infusion-labs.com",
+    "twitter": "@infusion_labs",
+    "shortDescription": "Infusion is creating the world's first fair and decentralized investment firm and hedge fund"
   }
 ]
