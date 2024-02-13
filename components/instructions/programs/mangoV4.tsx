@@ -842,6 +842,7 @@ const instructions = () => ({
           displayArgs(connection, data),
           getDataObjectFlattened<FlatEditArgs>(connection, data),
         ])
+        let priceImpact: MidPriceImpact | undefined
         const mint = [...mangoGroup.mintInfosMapByMint.values()].find((x) =>
           x.publicKey.equals(mintInfo)
         )?.mint
@@ -961,6 +962,7 @@ const instructions = () => ({
           bankFormattedValues = getFormattedBankValues(mangoGroup, bank)
           mintData = tokenPriceService.getTokenInfo(mint.toBase58())
           const isPyth = bank?.oracleProvider === OracleProvider.Pyth
+
           const midPriceImpacts = getMidPriceImpacts(mangoGroup.pis)
 
           const tokenToPriceImpact = midPriceImpacts
@@ -980,14 +982,16 @@ const instructions = () => ({
               {}
             )
 
-          const priceImpact = tokenToPriceImpact[getApiTokenName(bank.name)]
+          priceImpact = tokenToPriceImpact[getApiTokenName(bank.name)]
 
-          const suggestedPresetKey = getProposedKey(
-            priceImpact.avg_price_impact_percent < 1
-              ? priceImpact?.target_amount
-              : undefined,
-            bank.oracleProvider === OracleProvider.Pyth
-          )
+          const suggestedPresetKey = priceImpact
+            ? getProposedKey(
+                priceImpact.avg_price_impact_percent < 1
+                  ? priceImpact?.target_amount
+                  : undefined,
+                bank.oracleProvider === OracleProvider.Pyth
+              )
+            : 'UNTRUSTED'
 
           liqudityTier = !mint.equals(USDC_MINT)
             ? {
@@ -1058,6 +1062,12 @@ const instructions = () => ({
         return (
           <div>
             <h3>{mintData && <div>Token: {mintData.symbol}</div>}</h3>
+            {!priceImpact && (
+              <h3 className="text-orange flex items-center">
+                <WarningFilledIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
+                No price impact data in group
+              </h3>
+            )}
             {liqudityTier.presetKey === 'UNTRUSTED' && (
               <>
                 <h3 className="text-orange flex items-center">
