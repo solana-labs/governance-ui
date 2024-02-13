@@ -11,16 +11,7 @@ import { loadClient } from './loadClient'
 import { AnchorProvider } from '@coral-xyz/anchor'
 import EmptyWallet from '@utils/Mango/listingTools'
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts'
-
-export interface PluginData {
-  programId: PublicKey
-  name: PluginName | undefined // you may need undefined here to allow "unknown" plugins
-  params: any // the most challenging one- probably a typed data structure of some kind, that is related to the plugin, e.g. QV plugin has params: { coefficients: number[] }, Gateway plugin has params: { gatekeeperNetwork: Plugin } - these would come from the registrar
-  voterWeight: BN // the weight after applying this plugin (taken from the voter's voterWeightRecord account)
-  maxVoterWeight: BN | undefined // see above - can be undefined if the plugin does not set a max vw
-  registrarPublicKey: PublicKey
-  client: QuadraticClient | QuadraticClient
-}
+import {VoterWeightPluginInfo} from "./types";
 
 export const getPredecessorProgramId = async (
   client: GatewayClient | QuadraticClient, // TODO: Add other clients once we support them
@@ -51,9 +42,9 @@ export const getPlugins = async ({
   governanceMintPublicKey: PublicKey
   walletPublicKey: PublicKey
   connection: Connection
-}): Promise<PluginData[]> => {
+}): Promise<VoterWeightPluginInfo[]> => {
   const config = await fetchRealmConfigQuery(connection, realmPublicKey)
-  const plugins: PluginData[] = []
+  const plugins: VoterWeightPluginInfo[] = []
 
   const options = AnchorProvider.defaultOptions()
   const provider = new AnchorProvider(
