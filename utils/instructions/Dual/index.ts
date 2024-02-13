@@ -141,7 +141,8 @@ export async function getConfigInstruction({
           //owner is sol wallet or governance same as baseTokenAccount
           form.baseTreasury.extensions!.token!.account.owner,
           [],
-          form.numTokens
+          // @ts-ignore
+          form.numTokens as unknown as bigint
         )
       )
     )
@@ -332,7 +333,8 @@ export async function getConfigGsoInstruction({
           //owner is sol wallet or governance same as baseTreasury
           form.baseTreasury.extensions!.token!.account.owner,
           [],
-          form.numTokens
+          // @ts-ignore
+          form.numTokens as unknown as bigint
         )
       )
     )
@@ -362,6 +364,7 @@ export async function getConfigGsoInstruction({
     // Set all GSOs to have the same expiration and lockup period. This means
     // that users will be able to unstake at the same time as option expiration.
     const lockupPeriodEnd = form.optionExpirationUnixSeconds
+    const lockupMint = new PublicKey(form.lockupMint);
     const configInstruction = await gso.createConfigInstruction(
       optionsPerMillion,
       lockupPeriodEnd,
@@ -371,6 +374,7 @@ export async function getConfigGsoInstruction({
       form.soName,
       strikeAtomsPerLot,
       form.payer.extensions.transferAddress!,
+      lockupMint,
       baseMint,
       quoteMint,
       baseAccount,

@@ -259,7 +259,7 @@ const ProposalActionsPanel = () => {
 
   const handleRepropose = async () => {
     try {
-      if (proposal && realmInfo && signatoryRecord) {
+      if (proposal && realmInfo) {
         const proposalAddress = await propose({
           title: proposal.account.name,
           description: proposal.account.descriptionLink,

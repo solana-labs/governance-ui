@@ -488,7 +488,7 @@ export interface DualFinanceStakingOptionForm {
   strike: number
   soName: string | undefined
   optionExpirationUnixSeconds: number
-  numTokens: number
+  numTokens: string
   lotSize: number
   baseTreasury: AssetAccount | undefined
   quoteTreasury: AssetAccount | undefined
@@ -504,6 +504,7 @@ export interface DualFinanceGsoForm {
   lotSize: number
   subscriptionPeriodEnd: number
   lockupRatio: number
+  lockupMint: string
   baseTreasury: AssetAccount | undefined
   quoteTreasury: AssetAccount | undefined
   payer: AssetAccount | undefined

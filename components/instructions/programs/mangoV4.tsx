@@ -523,7 +523,7 @@ const instructions = () => ({
                 suffix="H"
               />
               <DisplayListingPropertyWrapped
-                label="Net Borrow Limit Per Window Quote"
+                label="Net Borrow Limit Per Window Quote (compared with 5% margin)"
                 valKey="netBorrowLimitPerWindowQuote"
                 prefix="$"
               />
@@ -569,7 +569,7 @@ const instructions = () => ({
                 valKey="flashLoanSwapFeeRate"
               />
               <DisplayListingProperty
-                label="Deposit Limit"
+                label="Deposit Limit (compared with 5% margin)"
                 val={`${
                   mintInfo && formattedProposedArgs.depositLimit
                     ? toUiDecimals(
@@ -963,7 +963,9 @@ const instructions = () => ({
           mintData = tokenPriceService.getTokenInfo(mint.toBase58())
           const isPyth = bank?.oracleProvider === OracleProvider.Pyth
 
-          const midPriceImpacts = getMidPriceImpacts(mangoGroup.pis)
+          const midPriceImpacts = getMidPriceImpacts(
+            mangoGroup.pis.length ? mangoGroup.pis : []
+          )
 
           const tokenToPriceImpact = midPriceImpacts
             .filter(
@@ -1046,6 +1048,15 @@ const instructions = () => ({
                 return !isDifferenceWithin5Percent(
                   Number(parsedArgs['depositLimit'] || 0),
                   Number(suggestedFormattedPreset['depositLimit'] || 0)
+                )
+              }
+              if (x === 'netBorrowLimitPerWindowQuote') {
+                return !isDifferenceWithin5Percent(
+                  Number(parsedArgs['netBorrowLimitPerWindowQuote'] || 0),
+                  Number(
+                    suggestedFormattedPreset['netBorrowLimitPerWindowQuote'] ||
+                      0
+                  )
                 )
               }
               return true
@@ -1321,7 +1332,7 @@ const instructions = () => ({
               />
 
               <DisplayNullishProperty
-                label="Net Borrow Limit Per Window Quote"
+                label="Net Borrow Limit Per Window Quote (compared with 5% margin)"
                 value={
                   parsedArgs.netBorrowLimitPerWindowQuote &&
                   `$${parsedArgs.netBorrowLimitPerWindowQuote}`
@@ -1446,7 +1457,7 @@ const instructions = () => ({
                 suggestedVal={invalidFields.maintWeightShiftLiabTarget}
               />
               <DisplayNullishProperty
-                label="Deposit Limit"
+                label="Deposit Limit (compared with 5% margin)"
                 value={
                   bank &&
                   parsedArgs.depositLimit &&
@@ -1457,9 +1468,15 @@ const instructions = () => ({
                           bank.mintDecimals
                         )
                       : parsedArgs.depositLimit
-                  } ${bank?.name}`
+                  } ${bank?.name} ($${(
+                    toUiDecimals(
+                      new BN(parsedArgs.depositLimit.toString()),
+                      bank.mintDecimals
+                    ) * bank.uiPrice
+                  ).toFixed(0)})`
                 }
                 currentValue={
+                  bank &&
                   bankFormattedValues?.depositLimit &&
                   `${
                     bank && bankFormattedValues?.depositLimit
@@ -1468,9 +1485,15 @@ const instructions = () => ({
                           bank.mintDecimals
                         )
                       : bankFormattedValues?.depositLimit
-                  } ${bank?.name}`
+                  } ${bank?.name} ($${(
+                    toUiDecimals(
+                      new BN(bankFormattedValues.depositLimit.toString()),
+                      bank.mintDecimals
+                    ) * bank.uiPrice
+                  ).toFixed(0)})`
                 }
                 suggestedVal={
+                  bank &&
                   invalidFields?.depositLimit &&
                   `${
                     bank && invalidFields?.depositLimit
@@ -1479,7 +1502,12 @@ const instructions = () => ({
                           bank.mintDecimals
                         )
                       : invalidFields?.depositLimit
-                  } ${bank?.name}`
+                  } ${bank?.name}  ($${(
+                    toUiDecimals(
+                      new BN(invalidFields.depositLimit.toString()),
+                      bank.mintDecimals
+                    ) * bank.uiPrice
+                  ).toFixed(0)})`
                 }
               />
               {parsedArgs?.maintWeightShiftAbort && (

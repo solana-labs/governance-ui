@@ -11,6 +11,10 @@ const AccountPage: React.FC = () => {
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const { data: tokenOwnerRecordPk } = useAddressQuery_CommunityTokenOwner()
 
+  if (vsrMode === 'pyth') {
+    return <Account />
+  }
+
   if (
     vsrMode &&
     (!ownTokenRecord ||
@@ -23,7 +27,6 @@ const AccountPage: React.FC = () => {
         </HeliumLockTokensAccount>
       )
     }
-
     return tokenOwnerRecordPk ? (
       <LockTokensAccount tokenOwnerRecordPk={tokenOwnerRecordPk}>
         <Account withHeader={false} displayPanel={false} />
