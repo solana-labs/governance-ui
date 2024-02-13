@@ -10,19 +10,19 @@ import { getPlugins } from './getPlugins'
 import { PluginName } from '@constants/plugins'
 import { loadClient } from './loadClient'
 
-interface CreateVoterWeightRecordArgs {
+interface CreateMaxVoterWeightRecordArgs {
   walletPublicKey: PublicKey
   realmPublicKey: PublicKey
   governanceMintPublicKey: PublicKey
   connection: Connection
 }
 
-export const createVoterWeightRecord = async ({
+export const createMaxVoterWeight = async ({
   walletPublicKey,
   realmPublicKey,
   governanceMintPublicKey, // this will be the community mint for most use cases.
   connection,
-}: CreateVoterWeightRecordArgs): Promise<TransactionInstruction[]> => {
+}: CreateMaxVoterWeightRecordArgs): Promise<TransactionInstruction[]> => {
   const options = AnchorProvider.defaultOptions()
   const provider = new AnchorProvider(
     connection,
@@ -30,6 +30,7 @@ export const createVoterWeightRecord = async ({
     options
   )
 
+  // TODO pass in
   const plugins = await getPlugins({
     realmPublicKey,
     governanceMintPublicKey,
@@ -41,19 +42,17 @@ export const createVoterWeightRecord = async ({
   for (const plugin of plugins) {
     const client = await loadClient(plugin.name as PluginName, provider)
 
-    const voterWeightRecord = await client.getVoterWeightRecord(
+    const voterWeightRecord = await client.getMaxVoterWeightRecord(
       realmPublicKey,
       governanceMintPublicKey,
-      walletPublicKey
     )
 
     if (!voterWeightRecord) {
-      const ix = await client.createVoterWeightRecord(
-        walletPublicKey,
+      const ix = await client.createMaxVoterWeightRecord(
         realmPublicKey,
         governanceMintPublicKey
       )
-      ixes.push(ix)
+      if (ix) ixes.push(ix)
     }
 
     const maxVoterWeightRecord = await client.getMaxVoterWeightRecord(

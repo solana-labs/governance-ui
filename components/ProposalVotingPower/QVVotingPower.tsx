@@ -94,7 +94,6 @@ export default function QVVotingPower(props: Props) {
                 <TokenDeposit
                     mint={mintInfo}
                     tokenRole={GoverningTokenRole.Community}
-                    councilVote={false}
                     inAccountDetails={true}
                 />
               </div>
