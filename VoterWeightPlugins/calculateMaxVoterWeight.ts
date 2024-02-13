@@ -1,19 +1,33 @@
 import { BN } from '@coral-xyz/anchor'
 import {VoterWeightPluginInfo} from "./types";
+import {reduceAsync} from "./utils";
+import {PublicKey} from "@solana/web3.js";
 
-export const calculateMaxVoterWeight = (
-  plugins: VoterWeightPluginInfo[]
-): BN | undefined => {
-  // let voteWeight
-  // // plugins are sorted in newest plugin > oldest, but we want to operate on the oldest first
-  // const reversedPlugins = plugins.reverse()
-  //
-  //
-  // reversedPlugins.forEach((plugin) => {
-  //   voteWeight = plugin.voterWeight
-  // })
+type CalculateMaxVoterWeightParams = {
+  realm: PublicKey,
+  mint: PublicKey
+  plugins: VoterWeightPluginInfo[],
+  tokenSupply: BN,
+  useOnChainWeight?: boolean
+}
 
-// Currently we are just showing the latest values in the voter weight records - TODO calculate the latest value
-  // Also, this may return undefined, when it should return the max voter weight of the last plugin with a value (or the default voter weight)
-  return plugins[plugins.length - 1].maxVoterWeight
+export const calculateMaxVoterWeight = async ({
+  realm,
+  mint,
+  plugins,
+  tokenSupply,
+  useOnChainWeight = false
+ }: CalculateMaxVoterWeightParams): Promise<BN | null> => {
+  // if useOnChainWeight is true, we just return the currently stored voter weight on chain (which may be out of date)
+  if (useOnChainWeight) {
+    return plugins[plugins.length - 1].maxVoterWeight ?? null
+  }
+
+  const reducer = async (inputVoterWeight: BN | null, nextPlugin: VoterWeightPluginInfo) => {
+    // short-circuit if any of the plugins return null
+    if (inputVoterWeight === null) return null;
+    return nextPlugin.client.calculateMaxVoterWeight(realm, mint, inputVoterWeight);
+  };
+
+  return reduceAsync<VoterWeightPluginInfo, BN | null>(plugins, reducer, tokenSupply);
 }
