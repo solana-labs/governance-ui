@@ -103,5 +103,5 @@ export const getPlugins = async ({
     } while (pluginName !== null && programId !== null)
   }
 
-  return plugins
+  return plugins.reverse();
 }

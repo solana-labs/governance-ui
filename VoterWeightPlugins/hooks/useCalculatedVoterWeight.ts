@@ -1,11 +1,11 @@
 import { ProgramAccount, TokenOwnerRecord } from "@solana/spl-governance";
-import {UsePluginsArgs, VoterWeightPluginInfo} from "../types";
+import {UseVoterWeightPluginsArgs, VoterWeightPluginInfo} from "../types";
 import {calculateVoterWeight} from "../calculateVoterWeight";
 import {useState} from "react";
 import BN from "bn.js";
 import queryClient from "@hooks/queries/queryClient";
 
-type Args = UsePluginsArgs & {
+type Args = UseVoterWeightPluginsArgs & {
     plugins?: VoterWeightPluginInfo[],
     tokenOwnerRecord?: ProgramAccount<TokenOwnerRecord>
 }
@@ -21,9 +21,9 @@ export const useCalculatedVoterWeight = (args: Args): BN | null => {
         queryClient.fetchQuery({
             queryKey: [
                 'calculateVoterWeight',
-                args.realmPublicKey,
-                args.governanceMintPublicKey,
-                args.walletPublicKey,
+                args.realmPublicKey.toString(),
+                args.governanceMintPublicKey.toString(),
+                args.walletPublicKey.toString(),
             ],
             queryFn: () => calculateVoterWeight(args),
         }).then(setWeight);
