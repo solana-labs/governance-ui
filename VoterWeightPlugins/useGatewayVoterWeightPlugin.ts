@@ -1,15 +1,10 @@
-import {GATEWAY_PLUGINS_PKS} from "@constants/plugins";
-import {useRealmVoterWeightPlugins} from "@hooks/useRealmVoterWeightPlugins";
+import { GATEWAY_PLUGINS_PKS } from '@constants/plugins'
+import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
+import { useVoterWeightPluginReadinessReturnType } from './useVoterWeightPlugins'
 
 export interface useGatewayVoterWeightPluginReturnType
   extends useVoterWeightPluginReadinessReturnType {
   gatekeeperNetwork: string
-}
-
-// TODO: move to getVotingPlugins when ready
-export interface useVoterWeightPluginReadinessReturnType {
-  isReady: boolean //defines if the plugin is loading
-  isEnabled: boolean //defines if the plugin is enabled in the realm
 }
 
 type GatewayPluginParams = {
@@ -17,20 +12,20 @@ type GatewayPluginParams = {
 }
 
 export const useGatewayVoterWeightPlugin = (): useGatewayVoterWeightPluginReturnType => {
-  const {
-    voterWeight,
-    plugins,
-  } = useRealmVoterWeightPlugins()
+  const { isReady, plugins } = useRealmVoterWeightPlugins()
 
-  const gatewayPlugin = plugins.find((plugin) => GATEWAY_PLUGINS_PKS.includes(plugin.programId.toString()));
+  const gatewayPlugin = plugins?.find((plugin) =>
+    GATEWAY_PLUGINS_PKS.includes(plugin.programId.toString())
+  )
 
-  const isEnabled = gatewayPlugin !== undefined;
-  const isReady = voterWeight !== undefined;
-  const gatekeeperNetwork = (gatewayPlugin?.params as GatewayPluginParams || undefined)?.gatekeeperNetwork;
+  const isEnabled = gatewayPlugin !== undefined
+  const gatekeeperNetwork = (
+    (gatewayPlugin?.params as GatewayPluginParams) || undefined
+  )?.gatekeeperNetwork
 
   return {
     isReady,
     gatekeeperNetwork,
-    isEnabled
+    isEnabled,
   }
 }
