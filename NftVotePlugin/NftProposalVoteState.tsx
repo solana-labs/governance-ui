@@ -6,8 +6,8 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useNftProposalStore from './NftProposalStore'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
-import { useGovernancePowerAsync } from '@hooks/queries/governancePower'
 import { useVotingPop } from '@components/VotePanel/hooks'
+import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
 
 const NftProposalVoteState = ({
   proposal,
@@ -21,7 +21,7 @@ const NftProposalVoteState = ({
   const countedNfts = useNftProposalStore((s) => s.countedNftsForProposal)
   const wallet = useWalletOnePointOh()
   const votingPop = useVotingPop()
-  const { result: votingPower } = useGovernancePowerAsync(votingPop)
+  const { voterWeight, isReady } = useRealmVoterWeightPlugins(votingPop)
   const isNftPlugin =
     config?.account.communityTokenConfig.voterWeightAddin &&
     NFT_PLUGINS_PKS.includes(
@@ -31,9 +31,10 @@ const NftProposalVoteState = ({
   const ownVoteRecord = useProposalVoteRecordQuery('electoral').data?.result
 
   const showVoteRecords =
-    votingPower &&
+    isReady &&
+    voterWeight &&
     countedNfts.length > 0 &&
-    countedNfts.length < votingPower.toNumber() &&
+    countedNfts.length < voterWeight.toNumber() &&
     !ownVoteRecord
 
   const useComponent =

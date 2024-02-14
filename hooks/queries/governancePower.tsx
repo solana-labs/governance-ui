@@ -34,7 +34,8 @@ import { findPluginName } from '@constants/plugins'
 import { nftRegistrarQuery } from './plugins/nftVoter'
 import queryClient from './queryClient'
 import { useEffect } from 'react'
-import {useRealmVoterWeightPlugins} from "@hooks/useRealmVoterWeightPlugins";
+import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
+import useQuadraticPluginStore from 'QuadraticPlugin/store/quadraticPluginStore'
 
 export const getVanillaGovpower = async (
   connection: Connection,
@@ -187,7 +188,7 @@ export const useGovernancePower = (
   const { voterWeight } = useRealmVoterWeightPlugins(kind)
   return voterWeight
 }
-
+/** deprecated: this should not be used anymored. Use useRealmVoterWeightPlugins hook */
 /** where possible avoid using this and use a plugin-specific hook instead */
 export const useGovernancePowerAsync = (
   kind: 'community' | 'council' | undefined
