@@ -3,10 +3,10 @@ import {BN, Idl} from "@coral-xyz/anchor";
 import {PluginName} from "@constants/plugins";
 import {Client} from "@solana/governance-program-library";
 
-export type usePluginsArgs = {
-    realmPublicKey: PublicKey | undefined
-    governanceMintPublicKey: PublicKey | undefined
-    walletPublicKey: PublicKey | undefined
+export type UsePluginsArgs = {
+    realmPublicKey?: PublicKey
+    governanceMintPublicKey?: PublicKey
+    walletPublicKey?: PublicKey
 }
 
 export type VoterWeightPluginInfo<TParams = unknown, TClient extends Idl = Idl> = {

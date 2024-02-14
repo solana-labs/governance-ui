@@ -2,7 +2,6 @@ import { PublicKey, Connection, Keypair } from '@solana/web3.js'
 import { fetchRealmConfigQuery } from '@hooks/queries/realmConfig'
 import { findPluginName, PluginName } from '@constants/plugins'
 import { getRegistrarPDA } from '@utils/plugin/accounts'
-import { BN } from '@coral-xyz/anchor'
 import {
   GatewayClient,
   QuadraticClient,
