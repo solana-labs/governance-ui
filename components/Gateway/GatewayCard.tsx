@@ -166,11 +166,11 @@ const GatewayCard = () => {
       <p className="text-fgd-3 mt-2">
         Verify your personhood with Civic Pass to vote.
       </p>
-      {/* {connected && showJoinButton && (
-        <Button className="w-full" onClick={handleRegister}>
+      {connected && showJoinButton && (
+        <Button className="w-full mt-4" onClick={handleRegister}>
           Join
         </Button>
-      )} */}
+      )}
       {showGatewayModal && (
         <Modal
           sizeClassName="sm:max-w-3xl"

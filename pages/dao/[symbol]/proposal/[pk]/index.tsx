@@ -34,9 +34,13 @@ import ProposalWarnings from './ProposalWarnings'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import VotingRules from '@components/VotingRules'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
+import GatewayCard from '@components/Gateway/GatewayCard'
+// TODO: replace this with absolute route
+import { useGatewayVoterWeightPlugin } from 'VoterWeightPlugins/useGatewayVoterWeightPlugin'
 
 const Proposal = () => {
   const { realmInfo, symbol } = useRealm()
+  const { isEnabled } = useGatewayVoterWeightPlugin()
   const proposal = useRouteProposalQuery().data?.result
   const governance = useProposalGovernanceQuery().data?.result
   const descriptionLink = proposal?.account.descriptionLink
@@ -210,6 +214,11 @@ const Proposal = () => {
             </div>
           </div>
         ) : null}
+        {isEnabled && (
+          <div className="bg-bkg-2 rounded-lg px-6 pb-6">
+            <GatewayCard />
+          </div>
+        )}
         <VotingRules />
         <NftProposalVoteState proposal={proposal}></NftProposalVoteState>
         {proposal && currentWallet && showProposalExecution && (
