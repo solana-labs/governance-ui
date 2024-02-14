@@ -13,7 +13,7 @@ import {
 import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
 import { useSubmitVote } from '@hooks/useSubmitVote'
 import { useSelectedRealmInfo } from '@hooks/selectedRealm/useSelectedRealmRegistryEntry'
-import { useGovernancePowerAsync } from '@hooks/queries/governancePower'
+import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
 
 const useIsVetoable = (): undefined | boolean => {
   const vetoingPop = useVetoingPop()
@@ -30,7 +30,7 @@ const useCanVeto = ():
   | { canVeto: true }
   | { canVeto: false; message: string } => {
   const vetoPop = useVetoingPop()
-  const { result: govPower } = useGovernancePowerAsync(vetoPop)
+  const { voterWeight, isReady } = useRealmVoterWeightPlugins(vetoPop)
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const isVetoable = useIsVetoable()
@@ -53,7 +53,7 @@ const useCanVeto = ():
     return { canVeto: false, message: 'You already voted' }
 
   // Do you have any voting power?
-  const hasMinAmountToVote = voterTokenRecord && govPower?.gtn(0)
+  const hasMinAmountToVote = voterTokenRecord && isReady && voterWeight?.gtn(0)
   if (hasMinAmountToVote === undefined) return undefined
   if (hasMinAmountToVote === false)
     return {

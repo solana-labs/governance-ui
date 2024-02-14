@@ -18,11 +18,11 @@ import VotingPowerPct from './VotingPowerPct'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
-import { useGovernancePowerAsync } from '@hooks/queries/governancePower'
 import useUserOrDelegator from '@hooks/useUserOrDelegator'
 import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
 import { useConnection } from '@solana/wallet-adapter-react'
 import { useVotingNfts } from '@hooks/queries/plugins/nftVoter'
+import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
 
 interface Props {
   className?: string
@@ -103,10 +103,10 @@ const Join = () => {
 export default function NftVotingPower(props: Props) {
   const userPk = useUserOrDelegator()
   const nfts = useVotingNfts(userPk)
-  const {
-    result: votingPower,
-    loading: votingPowerLoading,
-  } = useGovernancePowerAsync('community')
+
+  const { isReady, voterWeight } = useRealmVoterWeightPlugins('community')
+
+  // TODO QV-2 use the new hook
   const maxWeight = useNftPluginStore((s) => s.state.maxVoteRecord)
 
   const displayNfts = (nfts ?? []).slice(0, 3)
@@ -114,9 +114,9 @@ export default function NftVotingPower(props: Props) {
   const max = maxWeight
     ? new BigNumber(maxWeight.account.maxVoterWeight.toString())
     : null
-  const amount = new BigNumber((votingPower ?? 0).toString())
+  const amount = new BigNumber((voterWeight ?? 0).toString())
 
-  if (votingPowerLoading || nfts === undefined) {
+  if (isReady || nfts === undefined) {
     return (
       <div
         className={classNames(

@@ -3,12 +3,12 @@ import { VotingClientType } from '@utils/uiTypes/VotePlugin'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
-import { useGovernancePowerAsync } from '@hooks/queries/governancePower'
 
 import { useBatchedVoteDelegators } from './useDelegators'
+import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
 
 const useHasAnyVotingPower = (role: 'community' | 'council' | undefined) => {
-  const { result: personalAmount } = useGovernancePowerAsync(role)
+  const { voterWeight, isReady } = useRealmVoterWeightPlugins(role)
   const relevantDelegators = useBatchedVoteDelegators(role)
 
   // notably, this is ignoring whether the delegators actually have voting power, but it's not a big deal
@@ -16,7 +16,7 @@ const useHasAnyVotingPower = (role: 'community' | 'council' | undefined) => {
 
   // technically, if you have a TOR you can vote even if there's no power. But that doesnt seem user friendly.
   const canPersonallyVote =
-    personalAmount === undefined ? undefined : personalAmount.isZero() === false
+    !isReady || !voterWeight ? undefined : voterWeight.isZero() === false
 
   const canVote = canBatchVote || canPersonallyVote
 

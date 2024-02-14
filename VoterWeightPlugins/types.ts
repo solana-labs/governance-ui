@@ -3,10 +3,10 @@ import {BN, Idl} from "@coral-xyz/anchor";
 import {PluginName} from "@constants/plugins";
 import {Client} from "@solana/governance-program-library";
 
-export type usePluginsArgs = {
-    realmPublicKey: PublicKey | undefined
-    governanceMintPublicKey: PublicKey | undefined
-    walletPublicKey: PublicKey | undefined
+export type UseVoterWeightPluginsArgs = {
+    realmPublicKey?: PublicKey
+    governanceMintPublicKey?: PublicKey
+    walletPublicKey?: PublicKey
 }
 
 export type VoterWeightPluginInfo<TParams = unknown, TClient extends Idl = Idl> = {
@@ -17,4 +17,9 @@ export type VoterWeightPluginInfo<TParams = unknown, TClient extends Idl = Idl> 
     maxVoterWeight: BN | undefined // see above - can be undefined if the plugin does not set a max voter weight
     registrarPublicKey: PublicKey
     client: Client<TClient>
+}
+
+export interface useVoterWeightPluginReadinessReturnType {
+    isReady: boolean //defines if the plugin is loading
+    isEnabled: boolean //defines if the plugin is enabled in the realm
 }
