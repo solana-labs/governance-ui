@@ -37,7 +37,6 @@ import {
 import { WALLET_PROVIDERS } from '@utils/wallet-adapters'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { useAsync } from 'react-async-hook'
-import {PluginDebug} from "../VoterWeightPlugins/PluginDebug";
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,

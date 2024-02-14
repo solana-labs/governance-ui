@@ -1,6 +1,7 @@
 import { GATEWAY_PLUGINS_PKS } from '@constants/plugins'
 import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
-import { useVoterWeightPluginReadinessReturnType } from './useVoterWeightPlugins'
+
+import {useVoterWeightPluginReadinessReturnType} from "./types";
 
 export interface useGatewayVoterWeightPluginReturnType
   extends useVoterWeightPluginReadinessReturnType {
