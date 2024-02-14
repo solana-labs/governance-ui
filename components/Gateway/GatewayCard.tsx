@@ -139,7 +139,8 @@ const GatewayCard = () => {
   }, [realm?.pubkey.toBase58(), wallet?.connected])
 
   return (
-    <div className="bg-bkg-2 pt-4 md:pt-6 rounded-lg">
+    <div className="bg-bkg-2 md:pt-6 rounded-lg">
+      <h3 className="mb-1">Verify to Vote</h3>
       <div className="space-y-4">
         {!connected && (
           <div className="text-xs bg-bkg-3 p-3">Please connect your wallet</div>
@@ -151,11 +152,14 @@ const GatewayCard = () => {
           wallet.publicKey &&
           gatekeeperNetwork && <GatewayButton />}
       </div>
-      {connected && showJoinButton && (
+      <p className="text-fgd-3 mt-2">
+        Verify your personhood with Civic Pass to vote.
+      </p>
+      {/* {connected && showJoinButton && (
         <Button className="w-full" onClick={handleRegister}>
           Join
         </Button>
-      )}
+      )} */}
     </div>
   )
 }
