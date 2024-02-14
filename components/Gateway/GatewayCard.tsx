@@ -23,6 +23,8 @@ import {
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import Modal from '@components/Modal'
+import { InformationCircleIcon } from '@heroicons/react/outline'
 
 // TODO lots of overlap with NftBalanceCard here - we need to separate the logic for creating the Token Owner Record
 // from the rest of this logic
@@ -35,6 +37,7 @@ const GatewayCard = () => {
   const gatekeeperNetwork = useGatewayPluginStore(
     (s) => s.state.gatekeeperNetwork
   )
+  const [showGatewayModal, setShowGatewayModal] = useState(false)
   const isLoading = useGatewayPluginStore((s) => s.state.isLoadingGatewayToken)
   const connection = useLegacyConnectionContext()
   const [, setTokenOwneRecordPk] = useState('') //@asktree: ?????????????????????????????????????????
@@ -140,7 +143,15 @@ const GatewayCard = () => {
 
   return (
     <div className="bg-bkg-2 md:pt-6 rounded-lg">
-      <h3 className="mb-1">Verify to Vote</h3>
+      <div className="flex items-center">
+        <h3 className="mb-1">Verify to Vote</h3>
+        <span>
+          <InformationCircleIcon
+            className="w-5 h-5 ml-1 mb-1 cursor-pointer"
+            onClick={() => setShowGatewayModal(true)}
+          />
+        </span>
+      </div>
       <div className="space-y-4">
         {!connected && (
           <div className="text-xs bg-bkg-3 p-3">Please connect your wallet</div>
@@ -160,6 +171,52 @@ const GatewayCard = () => {
           Join
         </Button>
       )} */}
+      {showGatewayModal && (
+        <Modal
+          sizeClassName="sm:max-w-3xl"
+          onClose={() => setShowGatewayModal(false)}
+          isOpen={showGatewayModal}
+        >
+          <div className="p-4">
+            <h1 className="text-center mb-8"> Verify to Vote</h1>
+            <div className="flex justify-start items-start mb-6">
+              <div className="min-w-[32px] min-h-[32px] border-solid border-[1px] border-gray-400 mr-3 rounded-full flex items-center justify-center">
+                <span>1</span>
+              </div>
+              <div>
+                <h2>Connect Governance Wallet</h2>
+                <div>
+                  Connect the wallet with your governance token(s). Consolidate
+                  multiple tokens into one wallet before voting.
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-start items-start mb-6">
+              <div className="min-w-[32px] min-h-[32px] border-solid border-[1px] border-gray-400 mr-3 rounded-full flex items-center justify-center">
+                <span>2</span>
+              </div>
+              <div>
+                <h2>Verify Identity</h2>
+                <div>
+                  Verify yourself using Civic Pass to prevent voting abuse.
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-start items-start mb-6">
+              <div className="min-w-[32px] min-h-[32px] border-solid border-[1px] border-gray-400 mr-3 rounded-full flex items-center justify-center">
+                <span>3</span>
+              </div>
+              <div>
+                <h3>Vote</h3>
+                <div>
+                  Connect the wallet with your governance token(s). Consolidate
+                  multiple tokens into one wallet before voting.
+                </div>
+              </div>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   )
 }
