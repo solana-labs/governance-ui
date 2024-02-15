@@ -6,11 +6,12 @@ import {
   GatewayClient,
   QuadraticClient,
 } from '@solana/governance-program-library'
-import { loadClient } from './loadClient'
+import { loadClient } from './clients/'
 import { AnchorProvider } from '@coral-xyz/anchor'
 import EmptyWallet from '@utils/Mango/listingTools'
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts'
 import {VoterWeightPluginInfo} from "./types";
+import BN from "bn.js";
 
 export const getPredecessorProgramId = async (
   client: GatewayClient | QuadraticClient, // TODO: Add other clients once we support them
@@ -53,7 +54,7 @@ export const getPlugins = async ({
   )
 
   let programId =
-    config.result?.account?.communityTokenConfig?.voterWeightAddin ?? null
+    config.result?.account?.communityTokenConfig?.voterWeightAddin
 
   let pluginName = ''
 
@@ -62,14 +63,18 @@ export const getPlugins = async ({
 
     do {
       pluginName = findPluginName(programId)
-      if (pluginName) {
-        const client = await loadClient(pluginName as PluginName, provider)
+      if (pluginName && programId) {
+        const client = await loadClient(pluginName as PluginName, programId, provider)
 
-        const voterWeight = await client.getVoterWeightRecord(
+        const voterWeightRecord = await client.getVoterWeightRecord(
           realmPublicKey,
           governanceMintPublicKey,
           walletPublicKey
-        )
+        ) as {voterWeight: BN} | null // TODO fix up typing on these clients
+        const maxVoterWeightRecord = await client.getMaxVoterWeightRecord(
+            realmPublicKey,
+            governanceMintPublicKey,
+        ) as {maxVoterWeight: BN} | null // TODO fix up typing on these clients
 
         const { registrar } = await getPluginRegistrarPDA(
           realmPublicKey,
@@ -77,30 +82,22 @@ export const getPlugins = async ({
           programId
         )
 
-        const registrarData = await client.program.account.registrar.fetch(
-          registrar
-        )
+        const registrarData = await client.getRegistrarAccount(realmPublicKey,
+            governanceMintPublicKey);
 
         plugins.push({
-          // @ts-ignore issue with client types
-          client: client,
-          programId: programId,
+          client,
+          programId,
           name: pluginName as PluginName,
-          voterWeight: voterWeight?.voterWeight,
-          maxVoterWeight: undefined, // TODO, fetch this for other clients
+          voterWeight: voterWeightRecord?.voterWeight,
+          maxVoterWeight: maxVoterWeightRecord?.maxVoterWeight,
           registrarPublicKey: registrar,
-          params: {
-            ...registrarData,
-          },
+          params: registrarData,
         })
 
-        programId = await getPredecessorProgramId(
-          client,
-          realmPublicKey,
-          governanceMintPublicKey
-        )
+        programId = await client.getPredecessorProgramId(realmPublicKey, governanceMintPublicKey);
       }
-    } while (pluginName !== null && programId !== null)
+    } while (pluginName && programId)
   }
 
   return plugins.reverse();

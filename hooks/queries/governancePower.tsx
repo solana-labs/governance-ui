@@ -105,6 +105,7 @@ export const getNftGovpower = async (
   return power
 }
 
+// TODO [CT] replaced with PythVoterWeightPluginClient
 export const getPythGovPower = async (
   connection: Connection,
   user: PublicKey | undefined

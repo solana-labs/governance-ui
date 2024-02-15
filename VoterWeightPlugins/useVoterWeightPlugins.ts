@@ -1,20 +1,20 @@
 import {TransactionInstruction} from '@solana/web3.js'
 import queryClient from '@hooks/queries/queryClient'
 import {useConnection} from '@solana/wallet-adapter-react'
-import {updateVoterWeight} from './updateVoterWeight'
-import {createVoterWeight} from './createVoterWeight'
+import {updateVoterWeight} from './lib/updateVoterWeight'
+import {createVoterWeight} from './lib/createVoterWeight'
 import {BN} from '@coral-xyz/anchor'
-import {UseVoterWeightPluginsArgs, VoterWeightPluginInfo} from './types'
-import {createMaxVoterWeight} from './createMaxVoterWeight'
-import {updateMaxVoterWeight} from './updateMaxVoterWeight'
+import {UseVoterWeightPluginsArgs, VoterWeightPluginInfo} from './lib/types'
+import {createMaxVoterWeight} from './lib/createMaxVoterWeight'
+import {updateMaxVoterWeight} from './lib/updateMaxVoterWeight'
 import {useUserCommunityTokenOwnerRecord} from '@hooks/queries/tokenOwnerRecord'
 import {useRealmCommunityMintInfoQuery} from '@hooks/queries/mintInfo'
 import {useCalculatedVoterWeight} from "./hooks/useCalculatedVoterWeight";
 import {useCalculatedMaxVoterWeight} from "./hooks/useCalculatedMaxVoterWeight";
 import {usePlugins} from "./hooks/usePlugins";
-import {queryKeys} from "./utils";
+import {queryKeys} from "./lib/utils";
 
-export interface usePluginsReturnType {
+export interface UsePluginsReturnType {
   isReady: boolean
   plugins: VoterWeightPluginInfo[] | undefined // undefined means we are still loading
   updateVoterWeightRecords: () => Promise<TransactionInstruction[]>
@@ -25,7 +25,7 @@ export interface usePluginsReturnType {
   maxVoterWeight: BN | null // null means "something went wrong", if we are not still loading
 }
 
-export const useVoterWeightPlugins = (args: UseVoterWeightPluginsArgs): usePluginsReturnType => {
+export const useVoterWeightPlugins = (args: UseVoterWeightPluginsArgs): UsePluginsReturnType => {
   const { realmPublicKey, governanceMintPublicKey, walletPublicKey } = args
   const { connection } = useConnection()
   const tokenOwnerRecord = useUserCommunityTokenOwnerRecord().data?.result
