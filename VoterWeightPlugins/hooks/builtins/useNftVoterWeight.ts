@@ -1,5 +1,5 @@
 import {UsePluginsReturnType} from "../../useVoterWeightPlugins";
-import {UseVoterWeightPluginsArgs} from "../../types";
+import {UseVoterWeightPluginsArgs} from "../../lib/types";
 
 export const useNftVoterWeight = (args: UseVoterWeightPluginsArgs): UsePluginsReturnType | undefined => {
     // TODO dummy

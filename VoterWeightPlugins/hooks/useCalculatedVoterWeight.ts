@@ -1,6 +1,6 @@
 import { ProgramAccount, TokenOwnerRecord } from "@solana/spl-governance";
-import {UseVoterWeightPluginsArgs, VoterWeightPluginInfo} from "../types";
-import {calculateVoterWeight} from "../calculateVoterWeight";
+import {UseVoterWeightPluginsArgs, VoterWeightPluginInfo} from "../lib/types";
+import {calculateVoterWeight} from "../lib/calculateVoterWeight";
 import {useState} from "react";
 import BN from "bn.js";
 import queryClient from "@hooks/queries/queryClient";

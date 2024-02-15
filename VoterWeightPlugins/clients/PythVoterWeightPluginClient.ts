@@ -53,10 +53,10 @@ export class PythVoterWeightPluginClient extends Client<any> {
     }
 
     static async connect(provider: Provider, devnet = false): Promise<PythVoterWeightPluginClient> {
-    const pythClient = await PythClient.connect(
-        provider.connection,
-        new NodeWallet(new Keypair())
-    )
+        const pythClient = await PythClient.connect(
+            provider.connection,
+            new NodeWallet(new Keypair())
+        )
         return new PythVoterWeightPluginClient(pythClient.program, pythClient, devnet);
     }
 }

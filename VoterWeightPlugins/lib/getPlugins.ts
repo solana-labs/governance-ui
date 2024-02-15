@@ -64,7 +64,7 @@ export const getPlugins = async ({
     do {
       pluginName = findPluginName(programId)
       if (pluginName && programId) {
-        const client = await loadClient(pluginName as PluginName, provider)
+        const client = await loadClient(pluginName as PluginName, programId, provider)
 
         const voterWeightRecord = await client.getVoterWeightRecord(
           realmPublicKey,

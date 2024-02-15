@@ -1,7 +1,7 @@
-import {UseVoterWeightPluginsArgs, VoterWeightPluginInfo} from "../types";
+import {UseVoterWeightPluginsArgs, VoterWeightPluginInfo} from "../lib/types";
 import {useState} from "react";
 import BN from "bn.js";
-import {calculateMaxVoterWeight} from "../calculateMaxVoterWeight";
+import {calculateMaxVoterWeight} from "../lib/calculateMaxVoterWeight";
 import {MintInfo} from "@solana/spl-token";
 import queryClient from "@hooks/queries/queryClient";
 

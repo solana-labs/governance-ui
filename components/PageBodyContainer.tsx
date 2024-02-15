@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import Footer from '@components/Footer'
-import {PluginDebug} from "../VoterWeightPlugins/PluginDebug";
+import {PluginDebug} from "../VoterWeightPlugins/lib/PluginDebug";
 import React from "react";
 
 const PageBodyContainer = ({ children }) => {
