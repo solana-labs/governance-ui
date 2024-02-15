@@ -2,6 +2,7 @@ import {Client} from "@solana/governance-program-library";
 import {PublicKey, TransactionInstruction} from "@solana/web3.js";
 import BN from "bn.js";
 import {Program, Provider} from "@coral-xyz/anchor";
+import {VoterStakeRegistry, IDL} from "@helium/idls/lib/types/voter_stake_registry";
 
 export class VsrPluginClient extends Client<any> {
 
@@ -23,12 +24,8 @@ export class VsrPluginClient extends Client<any> {
         return null;
     }
     async calculateVoterWeight(voter: PublicKey, realm: PublicKey): Promise<BN | null> {
-        const govPower = await getVsrGovpower(
-            this.program.provider.connection,
-            realm,
-            voter);
-
-        return govPower.found ? govPower.result : null;
+        // TODO
+        return null
     }
     constructor(program: Program<VoterStakeRegistry>, devnet:boolean) {
         super(program, devnet);
