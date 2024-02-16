@@ -184,6 +184,7 @@ export class VotingClient {
     const clientProgramId = this.client!.program.programId
     const walletPk = torAccount.result.account.governingTokenOwner
 
+    // TODO [CT] This can all be replaced with the new hook
     if (this.client instanceof VsrClient) {
       const { registrar } = await getRegistrarPDA(
         realm.pubkey,
