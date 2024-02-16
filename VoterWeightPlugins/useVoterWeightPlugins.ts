@@ -1,18 +1,18 @@
-import {TransactionInstruction} from '@solana/web3.js'
+import { TransactionInstruction } from '@solana/web3.js'
 import queryClient from '@hooks/queries/queryClient'
-import {useConnection} from '@solana/wallet-adapter-react'
-import {updateVoterWeight} from './lib/updateVoterWeight'
-import {createVoterWeight} from './lib/createVoterWeight'
-import {BN} from '@coral-xyz/anchor'
-import {UseVoterWeightPluginsArgs, VoterWeightPluginInfo} from './lib/types'
-import {createMaxVoterWeight} from './lib/createMaxVoterWeight'
-import {updateMaxVoterWeight} from './lib/updateMaxVoterWeight'
-import {useUserCommunityTokenOwnerRecord} from '@hooks/queries/tokenOwnerRecord'
-import {useRealmCommunityMintInfoQuery} from '@hooks/queries/mintInfo'
-import {useCalculatedVoterWeight} from "./hooks/useCalculatedVoterWeight";
-import {useCalculatedMaxVoterWeight} from "./hooks/useCalculatedMaxVoterWeight";
-import {usePlugins} from "./hooks/usePlugins";
-import {queryKeys} from "./lib/utils";
+import { useConnection } from '@solana/wallet-adapter-react'
+import { updateVoterWeight } from './lib/updateVoterWeight'
+import { createVoterWeight } from './lib/createVoterWeight'
+import { BN } from '@coral-xyz/anchor'
+import { UseVoterWeightPluginsArgs, VoterWeightPluginInfo } from './lib/types'
+import { createMaxVoterWeight } from './lib/createMaxVoterWeight'
+import { updateMaxVoterWeight } from './lib/updateMaxVoterWeight'
+import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
+import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
+import { useCalculatedVoterWeight } from './hooks/useCalculatedVoterWeight'
+import { useCalculatedMaxVoterWeight } from './hooks/useCalculatedMaxVoterWeight'
+import { usePlugins } from './hooks/usePlugins'
+import { queryKeys } from './lib/utils'
 
 export interface UsePluginsReturnType {
   isReady: boolean
@@ -25,22 +25,24 @@ export interface UsePluginsReturnType {
   maxVoterWeight: BN | null // null means "something went wrong", if we are not still loading
 }
 
-export const useVoterWeightPlugins = (args: UseVoterWeightPluginsArgs): UsePluginsReturnType => {
+export const useVoterWeightPlugins = (
+  args: UseVoterWeightPluginsArgs
+): UsePluginsReturnType => {
   const { realmPublicKey, governanceMintPublicKey, walletPublicKey } = args
   const { connection } = useConnection()
   const tokenOwnerRecord = useUserCommunityTokenOwnerRecord().data?.result
   const mintInfo = useRealmCommunityMintInfoQuery().data?.result
-  const plugins = usePlugins(args);
+  const plugins = usePlugins(args)
   const voterWeight = useCalculatedVoterWeight({
     ...args,
     plugins,
-    tokenOwnerRecord
-  });
+    tokenOwnerRecord,
+  })
   const maxVoterWeight = useCalculatedMaxVoterWeight({
     ...args,
     plugins,
-    mintInfo
-  });
+    mintInfo,
+  })
 
   const createVoterWeightRecords = (): Promise<TransactionInstruction[]> => {
     if (!realmPublicKey || !governanceMintPublicKey || !walletPublicKey) {
@@ -109,6 +111,8 @@ export const useVoterWeightPlugins = (args: UseVoterWeightPluginsArgs): UsePlugi
         }),
     })
   }
+
+  console.log(333, plugins)
 
   return {
     isReady: plugins !== undefined,

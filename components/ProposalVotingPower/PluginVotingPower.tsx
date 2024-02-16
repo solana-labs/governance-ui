@@ -9,20 +9,22 @@ import { GoverningTokenRole } from '@solana/spl-governance'
 import { BigNumber } from 'bignumber.js'
 import clsx from 'clsx'
 import { useMemo } from 'react'
-import {useRealmVoterWeightPlugins} from "@hooks/useRealmVoterWeightPlugins";
+import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
 
 interface Props {
   className?: string
+  role: 'community' | 'council'
 }
 
-export default function PluginVotingPower(props: Props) {
+export default function PluginVotingPower({ role, className }: Props) {
   const realm = useRealmQuery().data?.result
 
   const mintInfo = useMintInfoByPubkeyQuery(realm?.account.communityMint).data
     ?.result
 
   const isLoading = useDepositStore((s) => s.state.isLoading)
-  const { voterWeight } = useRealmVoterWeightPlugins()
+
+  const { voterWeight, isReady } = useRealmVoterWeightPlugins(role)
 
   const formattedTotal = useMemo(
     () =>
@@ -34,12 +36,11 @@ export default function PluginVotingPower(props: Props) {
     [mintInfo, voterWeight]
   )
 
-  // TODO QV-2: isLoading should also use the usePlugins loading state
-  if (isLoading || !voterWeight) {
+  if (isLoading || !isReady) {
     return (
       <div
         className={classNames(
-          props.className,
+          className,
           'rounded-md bg-bkg-1 h-[76px] animate-pulse'
         )}
       />
@@ -47,12 +48,15 @@ export default function PluginVotingPower(props: Props) {
   }
 
   return (
-    <div className={clsx(props.className)}>
+    <div className={clsx(className)}>
       <div className={'p-3 rounded-md bg-bkg-1'}>
         <div className="flex items-center justify-between mt-1">
           <div className=" flex flex-col gap-x-2">
             <div
-              className={clsx(props.className, voterWeight.isZero() && 'hidden')}
+              className={clsx(
+                className,
+                !voterWeight || (voterWeight.isZero() && 'hidden')
+              )}
             >
               <div className={'p-3 rounded-md bg-bkg-1'}>
                 <div className="text-fgd-3 text-xs">QV Votes</div>
