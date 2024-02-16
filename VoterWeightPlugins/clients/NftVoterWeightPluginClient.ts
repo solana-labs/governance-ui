@@ -12,6 +12,8 @@ import {IDL, NftVoter} from "../../idls/nft_voter";
 import {NftVoterV2} from "../../idls/nft_voter_v2";
 import {VoterWeightAction} from "@solana/spl-governance";
 import {UpdateVoterWeightRecordTypes} from "@utils/uiTypes/VotePlugin";
+import {getNftGovpower} from "@hooks/queries/governancePower";
+import {getTokenOwnerRecordAddressSync} from "../lib/utils";
 
 function convertVoterWeightActionToType(action: VoterWeightAction): UpdateVoterWeightRecordTypes {
     switch (action) {
@@ -36,14 +38,9 @@ export class NftVoterWeightPluginClient extends Client<any> {
         return null;
     }
 
-    async updateVoterWeightRecord(voter: PublicKey, realm: PublicKey, mint: PublicKey, action: VoterWeightAction): Promise<TransactionInstruction> {
-        const { registrar } = this.getRegistrarPDA(realm, mint);
-        const { voterWeightPk} = this.getVoterWeightRecordPDA(
-            realm,
-            mint,
-            voter
-        )
-
+    async updateVoterWeightRecord(voter: PublicKey, realm: PublicKey, mint: PublicKey, action: VoterWeightAction) {
+        const {registrar} = this.getRegistrarPDA(realm, mint);
+        const { voterWeightPk } = this.getVoterWeightRecordPDA(realm, mint, voter);
         const votingNfts = await getVotingNfts(
             this.program.provider.connection,
             realm,
@@ -52,7 +49,7 @@ export class NftVoterWeightPluginClient extends Client<any> {
 
         if (!ON_NFT_VOTER_V2) {
             console.log('on nft voter v1')
-            return getUpdateVoterWeightRecordInstruction(
+            const ix = await getUpdateVoterWeightRecordInstruction(
                 this.program as Program<NftVoter>,
                 voter,
                 registrar,
@@ -60,9 +57,11 @@ export class NftVoterWeightPluginClient extends Client<any> {
                 votingNfts,
                 convertVoterWeightActionToType(action)
             )
+            return { pre: [ix] }
         } else {
             console.log('on nft voter v2')
             const {
+                createNftTicketIxs,
                 updateVoterWeightRecordIx,
             } = await getUpdateVoterWeightRecordInstructionV2(
                 this.program as Program<NftVoterV2>,
@@ -72,7 +71,7 @@ export class NftVoterWeightPluginClient extends Client<any> {
                 votingNfts,
                 convertVoterWeightActionToType(action)
             )
-            return updateVoterWeightRecordIx;
+            return { pre: [updateVoterWeightRecordIx] , post: createNftTicketIxs }
         }
     }
     // NO-OP
@@ -80,6 +79,8 @@ export class NftVoterWeightPluginClient extends Client<any> {
         return null;
     }
     async calculateVoterWeight(voter: PublicKey, realm: PublicKey, mint: PublicKey): Promise<BN | null> {
+        const [TOR] = getTokenOwnerRecordAddressSync(realm, mint, voter)
+        return getNftGovpower(this.program.provider.connection, realm, TOR);
     }
 
     constructor(program: Program<NftVoter>, devnet:boolean) {

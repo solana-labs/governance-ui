@@ -15,16 +15,17 @@ interface UpdateVoterWeightRecordArgs {
 export const updateVoterWeight = async ({
   walletPublicKey,
   realmPublicKey,
-  governanceMintPublicKey, // this will be the community mint for most use cases.
+  governanceMintPublicKey,
   connection,
-}: UpdateVoterWeightRecordArgs): Promise<TransactionInstruction[]> => {
+}: UpdateVoterWeightRecordArgs): Promise<{ pre: TransactionInstruction[], post: TransactionInstruction[]}> => {
   const plugins = await getPlugins({
     realmPublicKey,
     governanceMintPublicKey,
     walletPublicKey,
     connection,
   })
-  const ixes: TransactionInstruction[] = []
+  const preIxes: TransactionInstruction[] = []
+  const postIxes: TransactionInstruction[] = []
 
   for (const plugin of plugins) {
     const updateVoterWeightRecordIx = await plugin.client.updateVoterWeightRecord(
@@ -32,7 +33,8 @@ export const updateVoterWeight = async ({
       realmPublicKey,
       governanceMintPublicKey
     )
-    ixes.push(updateVoterWeightRecordIx)
+    preIxes.push(...updateVoterWeightRecordIx.pre)
+    postIxes.push(...updateVoterWeightRecordIx.post || [])
   }
-  return ixes
+  return { pre: preIxes, post: postIxes }
 }

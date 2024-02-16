@@ -17,7 +17,7 @@ import {useVoterWeightPks} from "./hooks/useVoterWeightPks";
 export interface UsePluginsReturnType {
   isReady: boolean
   plugins: VoterWeightPluginInfo[] | undefined // undefined means we are still loading
-  updateVoterWeightRecords: () => Promise<TransactionInstruction[]>
+  updateVoterWeightRecords: () => Promise<{ pre: TransactionInstruction[], post: TransactionInstruction[]}>
   createVoterWeightRecords: () => Promise<TransactionInstruction[]>
   updateMaxVoterWeightRecords: () => Promise<TransactionInstruction[]>
   createMaxVoterWeightRecords: () => Promise<TransactionInstruction[]>
@@ -65,9 +65,9 @@ export const useVoterWeightPlugins = (args: UseVoterWeightPluginsArgs): UsePlugi
     })
   }
 
-  const updateVoterWeightRecords = (): Promise<TransactionInstruction[]> => {
+  const updateVoterWeightRecords = (): Promise<{ pre: TransactionInstruction[], post: TransactionInstruction[] }> => {
     if (!realmPublicKey || !governanceMintPublicKey || !walletPublicKey) {
-      return Promise.resolve([])
+      return Promise.resolve({ pre: [], post: [] })
     }
 
     return queryClient.fetchQuery({

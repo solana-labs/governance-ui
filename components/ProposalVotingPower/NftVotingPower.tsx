@@ -104,7 +104,7 @@ export default function NftVotingPower(props: Props) {
   const userPk = useUserOrDelegator()
   const nfts = useVotingNfts(userPk)
 
-  const { isReady, voterWeight } = useRealmVoterWeightPlugins('community')
+  const { isReady, calculatedVoterWeight } = useRealmVoterWeightPlugins('community')
 
   // TODO QV-2 use the new hook
   const maxWeight = useNftPluginStore((s) => s.state.maxVoteRecord)
@@ -114,7 +114,7 @@ export default function NftVotingPower(props: Props) {
   const max = maxWeight
     ? new BigNumber(maxWeight.account.maxVoterWeight.toString())
     : null
-  const amount = new BigNumber((voterWeight ?? 0).toString())
+  const amount = new BigNumber((calculatedVoterWeight?.value ?? 0).toString())
 
   if (isReady || nfts === undefined) {
     return (

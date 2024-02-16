@@ -23,7 +23,7 @@ export class HeliumVsrPluginClient extends Client<any> {
         return null;
     }
 
-    async updateVoterWeightRecord(voter: PublicKey, realm: PublicKey, mint: PublicKey, action: VoterWeightAction): Promise<TransactionInstruction> {
+    async updateVoterWeightRecord(voter: PublicKey, realm: PublicKey, mint: PublicKey, action: VoterWeightAction) {
         const { positions } = await this.getPositions(voter, realm, mint);
         const tokenOwnerRecord = await getTokenOwnerRecordAddress(this.governanceProgramId, realm, mint, voter);
 
@@ -53,7 +53,7 @@ export class HeliumVsrPluginClient extends Client<any> {
             this.program.programId
         )
 
-        return this.program.methods
+        const ix = await this.program.methods
                 .updateVoterWeightRecordV0({
                     owner: voter,
                     voterWeightAction: {
@@ -67,6 +67,8 @@ export class HeliumVsrPluginClient extends Client<any> {
                 })
                 .remainingAccounts(remainingAccounts.slice(0, 10))
                 .instruction();
+
+        return { pre: [ix] }
     }
     // NO-OP
     async updateMaxVoterWeightRecord(): Promise<TransactionInstruction | null> {

@@ -20,7 +20,7 @@ export class VsrPluginClient extends Client<any> {
         return null;
     }
 
-    async updateVoterWeightRecord(voter: PublicKey, realm: PublicKey, mint: PublicKey): Promise<TransactionInstruction> {
+    async updateVoterWeightRecord(voter: PublicKey, realm: PublicKey, mint: PublicKey) {
         const pluginProgramId = this.program.programId;
         const { registrar } = await getRegistrarPDA(
             realm,
@@ -33,7 +33,7 @@ export class VsrPluginClient extends Client<any> {
             voterPDA,
             pluginProgramId
         )
-        return this.program.methods.updateVoterWeightRecord()
+        const ix = await this.program.methods.updateVoterWeightRecord()
             .accounts({
                 registrar,
                 voterPDA,
@@ -41,6 +41,8 @@ export class VsrPluginClient extends Client<any> {
                 systemProgram: SYSTEM_PROGRAM_ID,
             })
             .instruction()
+
+        return { pre: [ix] }
     }
     // NO-OP
     async updateMaxVoterWeightRecord(): Promise<TransactionInstruction | null> {
