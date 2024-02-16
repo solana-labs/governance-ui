@@ -92,7 +92,7 @@ export const getPlugins = async ({
           voterWeight: voterWeightRecord?.voterWeight,
           maxVoterWeight: maxVoterWeightRecord?.maxVoterWeight,
           registrarPublicKey: registrar,
-          params: registrarData,
+          params: registrarData ?? {},
         })
 
         programId = await client.getPredecessorProgramId(realmPublicKey, governanceMintPublicKey);
