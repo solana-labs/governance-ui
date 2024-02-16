@@ -19,6 +19,15 @@ export type VoterWeightPluginInfo<TParams = unknown, TClient extends Idl = Idl> 
     client: Client<TClient>
 }
 
+export type CalculatedWeight = {
+    voterWeight: BN | null  // null means "something went wrong", if we are not still loading
+    details: {
+        pluginName: PluginName
+        pluginWeight: BN | null
+        error: Error | null
+    }[]
+}
+
 export interface useVoterWeightPluginReadinessReturnType {
     isReady: boolean //defines if the plugin is loading
     isEnabled: boolean //defines if the plugin is enabled in the realm

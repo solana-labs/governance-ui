@@ -1,10 +1,10 @@
-import {TransactionInstruction} from '@solana/web3.js'
+import {PublicKey, TransactionInstruction} from '@solana/web3.js'
 import queryClient from '@hooks/queries/queryClient'
 import {useConnection} from '@solana/wallet-adapter-react'
 import {updateVoterWeight} from './lib/updateVoterWeight'
 import {createVoterWeight} from './lib/createVoterWeight'
 import {BN} from '@coral-xyz/anchor'
-import {UseVoterWeightPluginsArgs, VoterWeightPluginInfo} from './lib/types'
+import {CalculatedWeight, UseVoterWeightPluginsArgs, VoterWeightPluginInfo} from './lib/types'
 import {createMaxVoterWeight} from './lib/createMaxVoterWeight'
 import {updateMaxVoterWeight} from './lib/updateMaxVoterWeight'
 import {useUserCommunityTokenOwnerRecord} from '@hooks/queries/tokenOwnerRecord'
@@ -21,8 +21,10 @@ export interface UsePluginsReturnType {
   createVoterWeightRecords: () => Promise<TransactionInstruction[]>
   updateMaxVoterWeightRecords: () => Promise<TransactionInstruction[]>
   createMaxVoterWeightRecords: () => Promise<TransactionInstruction[]>
-  voterWeight: BN | null // null means "something went wrong", if we are not still loading
-  maxVoterWeight: BN | null // null means "something went wrong", if we are not still loading
+  calcualtedVoterWeight: CalculatedWeight | undefined, // undefined means we are still loading
+  calculatedMaxVoterWeight: CalculatedWeight | undefined, // undefined means we are still loading
+  voterWeightPk: PublicKey // the voter weight pubkey to be used in the governance instruction itself
+  maxVoterWeightPk: PublicKey // the max voter weight pubkey to be used in the governance instruction itself
 }
 
 export const useVoterWeightPlugins = (args: UseVoterWeightPluginsArgs): UsePluginsReturnType => {

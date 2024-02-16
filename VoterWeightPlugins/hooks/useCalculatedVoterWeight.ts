@@ -1,5 +1,5 @@
 import { ProgramAccount, TokenOwnerRecord } from "@solana/spl-governance";
-import {UseVoterWeightPluginsArgs, VoterWeightPluginInfo} from "../lib/types";
+import {CalculatedWeight, UseVoterWeightPluginsArgs, VoterWeightPluginInfo} from "../lib/types";
 import {calculateVoterWeight} from "../lib/calculateVoterWeight";
 import {useState} from "react";
 import BN from "bn.js";
@@ -14,7 +14,7 @@ const argsAreSet = (args: Args): args is Required<Args> =>
     args.realmPublicKey !== undefined && args.governanceMintPublicKey !== undefined && args.walletPublicKey !== undefined &&
     args.plugins !== undefined && args.tokenOwnerRecord !== undefined
 
-export const useCalculatedVoterWeight = (args: Args): BN | null => {
+export const useCalculatedVoterWeight = (args: Args): CalculatedWeight => {
     const [weight, setWeight] = useState<BN | null>(null)
 
     if (argsAreSet(args)) {
