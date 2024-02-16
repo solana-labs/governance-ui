@@ -1,10 +1,9 @@
-import {TransactionInstruction} from '@solana/web3.js'
+import {PublicKey, TransactionInstruction} from '@solana/web3.js'
 import queryClient from '@hooks/queries/queryClient'
 import {useConnection} from '@solana/wallet-adapter-react'
 import {updateVoterWeight} from './lib/updateVoterWeight'
 import {createVoterWeight} from './lib/createVoterWeight'
-import {BN} from '@coral-xyz/anchor'
-import {UseVoterWeightPluginsArgs, VoterWeightPluginInfo} from './lib/types'
+import {CalculatedWeight, UseVoterWeightPluginsArgs, VoterWeightPluginInfo} from './lib/types'
 import {createMaxVoterWeight} from './lib/createMaxVoterWeight'
 import {updateMaxVoterWeight} from './lib/updateMaxVoterWeight'
 import {useUserCommunityTokenOwnerRecord} from '@hooks/queries/tokenOwnerRecord'
@@ -13,6 +12,7 @@ import {useCalculatedVoterWeight} from "./hooks/useCalculatedVoterWeight";
 import {useCalculatedMaxVoterWeight} from "./hooks/useCalculatedMaxVoterWeight";
 import {usePlugins} from "./hooks/usePlugins";
 import {queryKeys} from "./lib/utils";
+import {useVoterWeightPks} from "./hooks/useVoterWeightPks";
 
 export interface UsePluginsReturnType {
   isReady: boolean
@@ -21,8 +21,10 @@ export interface UsePluginsReturnType {
   createVoterWeightRecords: () => Promise<TransactionInstruction[]>
   updateMaxVoterWeightRecords: () => Promise<TransactionInstruction[]>
   createMaxVoterWeightRecords: () => Promise<TransactionInstruction[]>
-  voterWeight: BN | null // null means "something went wrong", if we are not still loading
-  maxVoterWeight: BN | null // null means "something went wrong", if we are not still loading
+  calculatedVoterWeight: CalculatedWeight | undefined, // undefined means we are still loading
+  calculatedMaxVoterWeight: CalculatedWeight | undefined, // undefined means we are still loading
+  voterWeightPk: PublicKey | undefined // the voter weight pubkey to be used in the governance instruction itself
+  maxVoterWeightPk: PublicKey | undefined // the max voter weight pubkey to be used in the governance instruction itself
 }
 
 export const useVoterWeightPlugins = (args: UseVoterWeightPluginsArgs): UsePluginsReturnType => {
@@ -31,15 +33,19 @@ export const useVoterWeightPlugins = (args: UseVoterWeightPluginsArgs): UsePlugi
   const tokenOwnerRecord = useUserCommunityTokenOwnerRecord().data?.result
   const mintInfo = useRealmCommunityMintInfoQuery().data?.result
   const plugins = usePlugins(args);
-  const voterWeight = useCalculatedVoterWeight({
+  const calculatedVoterWeight = useCalculatedVoterWeight({
     ...args,
     plugins,
     tokenOwnerRecord
   });
-  const maxVoterWeight = useCalculatedMaxVoterWeight({
+  const calculatedMaxVoterWeight = useCalculatedMaxVoterWeight({
     ...args,
     plugins,
     mintInfo
+  });
+  const pks = useVoterWeightPks({
+    ...args,
+    plugins
   });
 
   const createVoterWeightRecords = (): Promise<TransactionInstruction[]> => {
@@ -117,7 +123,8 @@ export const useVoterWeightPlugins = (args: UseVoterWeightPluginsArgs): UsePlugi
     updateMaxVoterWeightRecords,
     createMaxVoterWeightRecords,
     plugins,
-    voterWeight,
-    maxVoterWeight,
+    calculatedVoterWeight,
+    calculatedMaxVoterWeight,
+    ...pks
   }
 }
