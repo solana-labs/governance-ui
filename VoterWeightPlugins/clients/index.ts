@@ -9,6 +9,7 @@ import {Provider} from '@coral-xyz/anchor'
 import {PythVoterWeightPluginClient} from "./PythVoterWeightPluginClient";
 import {VsrPluginClient} from "./VsrPluginClient";
 import {PublicKey} from "@solana/web3.js";
+import {HeliumVsrPluginClient} from "./HeliumVsrPluginClient";
 
 // | 'gateway'
 // | 'QV'
@@ -36,6 +37,8 @@ export const loadClient = (plugin: PluginName, programId: PublicKey, provider: P
       return PythVoterWeightPluginClient.connect(provider)
     case 'VSR':
       return VsrPluginClient.connect(provider, programId)
+    case 'HeliumVSR':
+      return HeliumVsrPluginClient.connect(provider, programId)
     // TODO: return all clients
     default:
       throw new Error(`Unsupported plugin ${plugin}`)

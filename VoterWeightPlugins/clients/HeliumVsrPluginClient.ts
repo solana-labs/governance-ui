@@ -10,7 +10,8 @@ import {AccountData} from "@utils/uiTypes/VotePlugin";
 import {getTokenOwnerRecordAddress, VoterWeightAction} from "@solana/spl-governance";
 import {getPositions, GetPositionsReturn} from "../../HeliumVotePlugin/utils/getPositions";
 
-export class VsrPluginClient extends Client<any> {
+export class HeliumVsrPluginClient extends Client<any> {
+    readonly requiresInputVoterWeight = false;
 
     // NO-OP TODO: Double-check
     async createVoterWeightRecord(): Promise<TransactionInstruction | null> {
@@ -89,11 +90,11 @@ export class VsrPluginClient extends Client<any> {
         })
     }
 
-    static async connect(provider: Provider, pluginId: PublicKey, devnet = false, governanceProgramId = DEFAULT_GOVERNANCE_PROGRAM_ID): Promise<VsrPluginClient> {
+    static async connect(provider: Provider, pluginId: PublicKey, devnet = false, governanceProgramId = DEFAULT_GOVERNANCE_PROGRAM_ID): Promise<HeliumVsrPluginClient> {
         // used purely to get the current user's vsr positions
         const internalClient = await HeliumVsrClient.connect(provider, pluginId, devnet)
 
-        return new VsrPluginClient(
+        return new HeliumVsrPluginClient(
             new Program<VoterStakeRegistry>(IDL, pluginId, provider),
             internalClient,
             devnet,

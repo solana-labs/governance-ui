@@ -8,6 +8,7 @@ import {IDL, VoterStakeRegistry,} from 'VoteStakeRegistry/sdk/voter_stake_regist
 import {getRegistrarPDA, getVoterPDA, getVoterWeightPDA} from "../../VoteStakeRegistry/sdk/accounts";
 
 export class VsrPluginClient extends Client<any> {
+    readonly requiresInputVoterWeight = false;
 
     // NO-OP TODO: How are Vsr voter weight records created?
     async createVoterWeightRecord(): Promise<TransactionInstruction | null> {

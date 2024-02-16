@@ -7,6 +7,7 @@ import {Provider} from "@coral-xyz/anchor";
 import {VoterWeightAction} from "@solana/spl-governance";
 
 export class PythVoterWeightPluginClient extends Client<any> {
+    readonly requiresInputVoterWeight = false;
     // The pyth plugin does not have a registrar account
     async getRegistrarAccount(): Promise<null> {
         return null;

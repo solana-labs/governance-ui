@@ -4271,10 +4271,10 @@
   dependencies:
     buffer "~6.0.3"
 
-"@solana/governance-program-library@npm:@civic/governance-program-library@0.18.2-beta.14":
-  version "0.18.2-beta.14"
-  resolved "https://registry.yarnpkg.com/@civic/governance-program-library/-/governance-program-library-0.18.2-beta.14.tgz#bf298c43cf934f9768ae37e7df6fa7234270d4f5"
-  integrity sha512-5aoHY5abWcEnvLGE6FBW6MpFWxl6cdboZrDJ2okv8gBU5U4epTi51kYplCt+mAIs5VfemtmpuspbeFUkVYjBvQ==
+"@solana/governance-program-library@npm:@civic/governance-program-library@0.18.2-beta.15":
+  version "0.18.2-beta.15"
+  resolved "https://registry.yarnpkg.com/@civic/governance-program-library/-/governance-program-library-0.18.2-beta.15.tgz#a8e3aa6b8d1a3f30e60b3fcb6baf205165923a48"
+  integrity sha512-P53gQcjR4p+s+4t6RSnMsn+C8YmMj6f4giB8310Q8JyWfkiK3XDpdAbLmqnMvJJHtDHbIKlJb5In9sYA/E8XTw==
   dependencies:
     "@coral-xyz/anchor" "^0.29.0"
     "@identity.com/solana-gateway-ts" "^0.12.0"

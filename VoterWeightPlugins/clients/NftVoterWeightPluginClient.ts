@@ -24,6 +24,7 @@ function convertVoterWeightActionToType(action: VoterWeightAction): UpdateVoterW
 }
 
 export class NftVoterWeightPluginClient extends Client<any> {
+    readonly requiresInputVoterWeight = false;
 
     // NO-OP TODO: Double-check
     async createVoterWeightRecord(): Promise<TransactionInstruction | null> {
