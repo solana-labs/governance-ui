@@ -11,12 +11,25 @@ export type UseVoterWeightPluginsArgs = {
 
 export type VoterWeightPluginInfo<TParams = unknown, TClient extends Idl = Idl> = {
     programId: PublicKey
-    name: PluginName | undefined // you need undefined here to allow "unknown" plugins
+    name: PluginName
     params: TParams
-    voterWeight: BN // the weight after applying this plugin (taken from the voter's voterWeightRecord account)
+    voterWeight: BN | undefined // the weight after applying this plugin (taken from the voter's voterWeightRecord account)
     maxVoterWeight: BN | undefined // see above - can be undefined if the plugin does not set a max voter weight
     registrarPublicKey: PublicKey
     client: Client<TClient>
+}
+
+export type CalculatedWeight = {
+    value: BN | null  // null means "something went wrong", if we are not still loading
+    details: ({
+        pluginName: PluginName
+    } & ({
+        pluginWeight: null
+        error: Error
+    }|{
+        pluginWeight: BN
+        error:  null
+    }))[]
 }
 
 export interface useVoterWeightPluginReadinessReturnType {

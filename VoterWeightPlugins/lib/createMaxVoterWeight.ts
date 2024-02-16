@@ -1,14 +1,9 @@
 import {
   PublicKey,
   TransactionInstruction,
-  Keypair,
   Connection,
 } from '@solana/web3.js'
-import { AnchorProvider } from '@coral-xyz/anchor'
-import EmptyWallet from '@utils/Mango/listingTools'
 import { getPlugins } from './getPlugins'
-import { PluginName } from '@constants/plugins'
-import { loadClient } from './loadClient'
 
 interface CreateMaxVoterWeightRecordArgs {
   walletPublicKey: PublicKey
@@ -23,13 +18,6 @@ export const createMaxVoterWeight = async ({
   governanceMintPublicKey, // this will be the community mint for most use cases.
   connection,
 }: CreateMaxVoterWeightRecordArgs): Promise<TransactionInstruction[]> => {
-  const options = AnchorProvider.defaultOptions()
-  const provider = new AnchorProvider(
-    connection,
-    new EmptyWallet(Keypair.generate()),
-    options
-  )
-
   // TODO pass in
   const plugins = await getPlugins({
     realmPublicKey,
@@ -40,7 +28,7 @@ export const createMaxVoterWeight = async ({
   const ixes: TransactionInstruction[] = []
 
   for (const plugin of plugins) {
-    const client = await loadClient(plugin.name as PluginName, provider)
+    const client = plugin.client
 
     const voterWeightRecord = await client.getMaxVoterWeightRecord(
       realmPublicKey,

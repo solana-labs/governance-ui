@@ -21,7 +21,9 @@ const NftProposalVoteState = ({
   const countedNfts = useNftProposalStore((s) => s.countedNftsForProposal)
   const wallet = useWalletOnePointOh()
   const votingPop = useVotingPop()
-  const { voterWeight, isReady } = useRealmVoterWeightPlugins(votingPop)
+  const { calculatedVoterWeight, isReady } = useRealmVoterWeightPlugins(
+    votingPop
+  )
   const isNftPlugin =
     config?.account.communityTokenConfig.voterWeightAddin &&
     NFT_PLUGINS_PKS.includes(
@@ -32,9 +34,9 @@ const NftProposalVoteState = ({
 
   const showVoteRecords =
     isReady &&
-    voterWeight &&
+    calculatedVoterWeight?.value &&
     countedNfts.length > 0 &&
-    countedNfts.length < voterWeight.toNumber() &&
+    countedNfts.length < calculatedVoterWeight.value.toNumber() &&
     !ownVoteRecord
 
   const useComponent =

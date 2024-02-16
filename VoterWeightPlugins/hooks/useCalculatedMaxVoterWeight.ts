@@ -1,7 +1,6 @@
-import {UseVoterWeightPluginsArgs, VoterWeightPluginInfo} from "../types";
+import {CalculatedWeight, UseVoterWeightPluginsArgs, VoterWeightPluginInfo} from "../lib/types";
 import {useState} from "react";
-import BN from "bn.js";
-import {calculateMaxVoterWeight} from "../calculateMaxVoterWeight";
+import { calculateMaxVoterWeight } from "../lib/calculateVoterWeights";
 import {MintInfo} from "@solana/spl-token";
 import queryClient from "@hooks/queries/queryClient";
 
@@ -14,8 +13,8 @@ const argsAreSet = (args: Args): args is Required<Args> =>
     args.realmPublicKey !== undefined && args.governanceMintPublicKey !== undefined &&
     args.plugins !== undefined && args.mintInfo !== undefined
 
-export const useCalculatedMaxVoterWeight = (args: Args): BN | null => {
-    const [weight, setWeight] = useState<BN | null>(null)
+export const useCalculatedMaxVoterWeight = (args: Args): CalculatedWeight | undefined => {
+    const [weight, setWeight] = useState<CalculatedWeight>()
 
     if (argsAreSet(args)) {
         queryClient.fetchQuery({

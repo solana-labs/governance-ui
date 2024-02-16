@@ -1,9 +1,9 @@
-import {UseVoterWeightPluginsArgs, VoterWeightPluginInfo} from "../types";
+import {UseVoterWeightPluginsArgs, VoterWeightPluginInfo} from "../lib/types";
 import {useState} from "react";
 import queryClient from "@hooks/queries/queryClient";
-import {getPlugins} from "../getPlugins";
+import {getPlugins} from "../lib/getPlugins";
 import {useConnection} from "@solana/wallet-adapter-react";
-import {queryKeys} from "../utils";
+import {queryKeys} from "../lib/utils";
 
 const argsAreSet = (args: UseVoterWeightPluginsArgs): args is Required<UseVoterWeightPluginsArgs> =>
     args.realmPublicKey !== undefined && args.governanceMintPublicKey !== undefined && args.walletPublicKey !== undefined;
