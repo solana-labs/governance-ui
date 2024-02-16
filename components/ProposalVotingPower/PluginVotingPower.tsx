@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-
+import { useState } from 'react'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 
 import { TokenDeposit } from '@components/TokenBalance/TokenDeposit'
@@ -8,8 +8,9 @@ import { useRealmQuery } from '@hooks/queries/realm'
 import { GoverningTokenRole } from '@solana/spl-governance'
 import { BigNumber } from 'bignumber.js'
 import clsx from 'clsx'
-import { useMemo } from 'react'
 import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
+import Modal from '@components/Modal'
+import QuadraticVotingInfoModal from './QuadraticVotingInfoModal'
 
 interface Props {
   className?: string
@@ -23,18 +24,14 @@ export default function PluginVotingPower({ role, className }: Props) {
     ?.result
 
   const isLoading = useDepositStore((s) => s.state.isLoading)
-
   const { calculatedVoterWeight, isReady } = useRealmVoterWeightPlugins(role)
 
-  const formattedTotal = useMemo(
-    () =>
-      mintInfo && calculatedVoterWeight?.value
-        ? new BigNumber(calculatedVoterWeight?.value.toString())
-            .shiftedBy(-mintInfo.decimals)
-            .toString()
-        : undefined,
-    [mintInfo, calculatedVoterWeight?.value]
-  )
+  const formattedTotal =
+    mintInfo && calculatedVoterWeight?.value
+      ? new BigNumber(calculatedVoterWeight?.value.toString())
+          .shiftedBy(-mintInfo.decimals)
+          .toString()
+      : undefined
 
   if (isLoading || !isReady) {
     return (
@@ -49,6 +46,10 @@ export default function PluginVotingPower({ role, className }: Props) {
 
   return (
     <div className={clsx(className)}>
+      <div className="flex items-center">
+        <p className="mb-2">Quadratic Voting</p>
+        <QuadraticVotingInfoModal />
+      </div>
       <div className={'p-3 rounded-md bg-bkg-1'}>
         <div className="flex items-center justify-between mt-1">
           <div className=" flex flex-col gap-x-2">
@@ -60,7 +61,7 @@ export default function PluginVotingPower({ role, className }: Props) {
               )}
             >
               <div className={'p-3 rounded-md bg-bkg-1'}>
-                <div className="text-fgd-3 text-xs">QV Votes</div>
+                <div className="text-fgd-3 text-xs">QV Votes </div>
                 <div className="flex items-center justify-between mt-1">
                   <div className=" flex flex-row gap-x-2">
                     <div className="text-xl font-bold text-fgd-1 hero-text">
