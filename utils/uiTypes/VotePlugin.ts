@@ -747,6 +747,7 @@ export class VotingClient {
     }
   }
 
+  // TODO [CT] moved to NftVoterWeightPluginClient
   _withHandleNftVoterWeight = async (
     realm: ProgramAccount<Realm>,
     walletPk: PublicKey,
@@ -783,7 +784,7 @@ export class VotingClient {
     }
   }
 
-  // TODO: this can probably be merged with the nft voter plugin implementation
+  // TODO: [CT] can now be replaced with the new hook
   _withHandleGatewayVoterWeight = async (
     realm: ProgramAccount<Realm>,
     walletPk: PublicKey,
@@ -816,9 +817,7 @@ export class VotingClient {
     }
   }
 
-  // TODO This will be simplified with milestone 2 of the QV work,
-  // which defines a general-purpose mechanism for plugins in the UI.
-  // We will no longer need separate functions like this for each plugin
+  // TODO [CT] Let's remove this now
   _withHandleQuadraticVoterWeight = async (
     realm: ProgramAccount<Realm>,
     walletPk: PublicKey,
