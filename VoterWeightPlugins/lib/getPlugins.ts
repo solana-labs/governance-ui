@@ -10,8 +10,8 @@ import { loadClient } from '../clients/'
 import { AnchorProvider } from '@coral-xyz/anchor'
 import EmptyWallet from '@utils/Mango/listingTools'
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts'
-import {VoterWeightPluginInfo} from "./types";
-import BN from "bn.js";
+import { VoterWeightPluginInfo } from './types'
+import BN from 'bn.js'
 
 export const getPredecessorProgramId = async (
   client: GatewayClient | QuadraticClient, // TODO: Add other clients once we support them
@@ -53,8 +53,7 @@ export const getPlugins = async ({
     options
   )
 
-  let programId =
-    config.result?.account?.communityTokenConfig?.voterWeightAddin
+  let programId = config.result?.account?.communityTokenConfig?.voterWeightAddin
 
   let pluginName = ''
 
@@ -64,17 +63,21 @@ export const getPlugins = async ({
     do {
       pluginName = findPluginName(programId)
       if (pluginName && programId) {
-        const client = await loadClient(pluginName as PluginName, programId, provider)
+        const client = await loadClient(
+          pluginName as PluginName,
+          programId,
+          provider
+        )
 
-        const voterWeightRecord = await client.getVoterWeightRecord(
+        const voterWeightRecord = (await client.getVoterWeightRecord(
           realmPublicKey,
           governanceMintPublicKey,
           walletPublicKey
-        ) as {voterWeight: BN} | null // TODO fix up typing on these clients
-        const maxVoterWeightRecord = await client.getMaxVoterWeightRecord(
-            realmPublicKey,
-            governanceMintPublicKey,
-        ) as {maxVoterWeight: BN} | null // TODO fix up typing on these clients
+        )) as { voterWeight: BN } | null // TODO fix up typing on these clients
+        const maxVoterWeightRecord = (await client.getMaxVoterWeightRecord(
+          realmPublicKey,
+          governanceMintPublicKey
+        )) as { maxVoterWeight: BN } | null // TODO fix up typing on these clients
 
         const { registrar } = await getPluginRegistrarPDA(
           realmPublicKey,
@@ -82,8 +85,10 @@ export const getPlugins = async ({
           programId
         )
 
-        const registrarData = await client.getRegistrarAccount(realmPublicKey,
-            governanceMintPublicKey);
+        const registrarData = await client.getRegistrarAccount(
+          realmPublicKey,
+          governanceMintPublicKey
+        )
 
         plugins.push({
           client,
@@ -95,10 +100,13 @@ export const getPlugins = async ({
           params: registrarData ?? {},
         })
 
-        programId = await client.getPredecessorProgramId(realmPublicKey, governanceMintPublicKey);
+        programId = await client.getPredecessorProgramId(
+          realmPublicKey,
+          governanceMintPublicKey
+        )
       }
     } while (pluginName && programId)
   }
 
-  return plugins.reverse();
+  return plugins.reverse()
 }

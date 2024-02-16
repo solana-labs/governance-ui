@@ -8,7 +8,7 @@ import { useBatchedVoteDelegators } from './useDelegators'
 import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
 
 const useHasAnyVotingPower = (role: 'community' | 'council' | undefined) => {
-  const { voterWeight, isReady } = useRealmVoterWeightPlugins(role)
+  const { calculatedMaxVoterWeight, isReady } = useRealmVoterWeightPlugins(role)
   const relevantDelegators = useBatchedVoteDelegators(role)
 
   // notably, this is ignoring whether the delegators actually have voting power, but it's not a big deal
@@ -16,7 +16,9 @@ const useHasAnyVotingPower = (role: 'community' | 'council' | undefined) => {
 
   // technically, if you have a TOR you can vote even if there's no power. But that doesnt seem user friendly.
   const canPersonallyVote =
-    !isReady || !voterWeight ? undefined : voterWeight.isZero() === false
+    !isReady || !calculatedMaxVoterWeight?.value
+      ? undefined
+      : calculatedMaxVoterWeight.value.isZero() === false
 
   const canVote = canBatchVote || canPersonallyVote
 

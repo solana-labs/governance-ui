@@ -61,7 +61,7 @@ const GovernancePowerCard = () => {
         <div className={'text-xs text-white/50 mt-8'}>
           Connect your wallet to see governance power
         </div>
-      ) : isReady ? (
+      ) : !isReady ? (
         <>
           <div className="h-12 mb-4 rounded-lg animate-pulse bg-bkg-3" />
           <div className="h-10 rounded-lg animate-pulse bg-bkg-3" />
