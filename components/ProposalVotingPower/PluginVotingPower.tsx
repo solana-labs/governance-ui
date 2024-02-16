@@ -24,16 +24,16 @@ export default function PluginVotingPower({ role, className }: Props) {
 
   const isLoading = useDepositStore((s) => s.state.isLoading)
 
-  const { voterWeight, isReady } = useRealmVoterWeightPlugins(role)
+  const { calculatedVoterWeight, isReady } = useRealmVoterWeightPlugins(role)
 
   const formattedTotal = useMemo(
     () =>
-      mintInfo && voterWeight
-        ? new BigNumber(voterWeight.toString())
+      mintInfo && calculatedVoterWeight?.value
+        ? new BigNumber(calculatedVoterWeight?.value.toString())
             .shiftedBy(-mintInfo.decimals)
             .toString()
         : undefined,
-    [mintInfo, voterWeight]
+    [mintInfo, calculatedVoterWeight?.value]
   )
 
   if (isLoading || !isReady) {
@@ -55,7 +55,8 @@ export default function PluginVotingPower({ role, className }: Props) {
             <div
               className={clsx(
                 className,
-                !voterWeight || (voterWeight.isZero() && 'hidden')
+                !calculatedVoterWeight?.value ||
+                  (calculatedVoterWeight.value.isZero() && 'hidden')
               )}
             >
               <div className={'p-3 rounded-md bg-bkg-1'}>

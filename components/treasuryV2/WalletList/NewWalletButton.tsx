@@ -17,13 +17,16 @@ export default function NewWalletButton() {
 
   const {
     isReady: communityIsReady,
-    voterWeight: communityGovPower,
+    calculatedVoterWeight: communityCalculatedVoterWeight,
   } = useRealmVoterWeightPlugins('community')
   const {
     isReady: councilIsReady,
-    voterWeight: councilGovPower,
+    calculatedVoterWeight: councilCalculatedVoterWeight,
   } = useRealmVoterWeightPlugins('council')
   const isReady = communityIsReady && councilIsReady
+
+  const communityGovPower = communityCalculatedVoterWeight?.value
+  const councilGovPower = councilCalculatedVoterWeight?.value
 
   const {
     symbol,

@@ -186,8 +186,8 @@ export const WithVsrGovernancePower = <
 export const useGovernancePower = (
   kind: 'community' | 'council' | undefined
 ) => {
-  const { voterWeight } = useRealmVoterWeightPlugins(kind)
-  return voterWeight
+  const { calculatedMaxVoterWeight } = useRealmVoterWeightPlugins(kind)
+  return calculatedMaxVoterWeight?.value
 }
 /** deprecated: this should not be used anymored. Use useRealmVoterWeightPlugins hook */
 /** where possible avoid using this and use a plugin-specific hook instead */
