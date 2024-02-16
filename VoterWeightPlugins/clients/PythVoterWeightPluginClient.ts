@@ -7,7 +7,10 @@ import {Provider} from "@coral-xyz/anchor";
 import {VoterWeightAction} from "@solana/spl-governance";
 
 export class PythVoterWeightPluginClient extends Client<any> {
-    private client: StakeConnection;
+    // The pyth plugin does not have a registrar account
+    async getRegistrarAccount(): Promise<null> {
+        return null;
+    }
 
     // NO-OP Pyth records are created through the Pyth dApp. TODO: Double-check
     async createVoterWeightRecord(): Promise<TransactionInstruction | null> {
@@ -48,7 +51,7 @@ export class PythVoterWeightPluginClient extends Client<any> {
             return new BN(0)
         }
     }
-    constructor(program: typeof PythClient.prototype.program, client: StakeConnection, devnet:boolean) {
+    constructor(program: typeof PythClient.prototype.program, private client: StakeConnection, devnet:boolean) {
         super(program, devnet);
     }
 

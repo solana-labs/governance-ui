@@ -6,7 +6,7 @@ import {
   GatewayClient,
   QuadraticClient,
 } from '@solana/governance-program-library'
-import { loadClient } from './clients/'
+import { loadClient } from '../clients/'
 import { AnchorProvider } from '@coral-xyz/anchor'
 import EmptyWallet from '@utils/Mango/listingTools'
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts'
@@ -92,7 +92,7 @@ export const getPlugins = async ({
           voterWeight: voterWeightRecord?.voterWeight,
           maxVoterWeight: maxVoterWeightRecord?.maxVoterWeight,
           registrarPublicKey: registrar,
-          params: registrarData,
+          params: registrarData ?? {},
         })
 
         programId = await client.getPredecessorProgramId(realmPublicKey, governanceMintPublicKey);
