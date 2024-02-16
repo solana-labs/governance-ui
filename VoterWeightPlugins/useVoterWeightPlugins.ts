@@ -122,8 +122,6 @@ export const useVoterWeightPlugins = (
     })
   }
 
-  console.log(333, plugins)
-
   return {
     isReady: plugins !== undefined,
     updateVoterWeightRecords,
