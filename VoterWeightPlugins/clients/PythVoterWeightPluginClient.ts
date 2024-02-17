@@ -7,6 +7,7 @@ import {Provider} from "@coral-xyz/anchor";
 import {VoterWeightAction} from "@solana/spl-governance";
 
 export class PythVoterWeightPluginClient extends Client<any> {
+    readonly requiresInputVoterWeight = false;
     // The pyth plugin does not have a registrar account
     async getRegistrarAccount(): Promise<null> {
         return null;
@@ -22,7 +23,7 @@ export class PythVoterWeightPluginClient extends Client<any> {
         return null;
     }
 
-    async updateVoterWeightRecord(voter: PublicKey, realm: PublicKey, mint: PublicKey, action: VoterWeightAction): Promise<TransactionInstruction> {
+    async updateVoterWeightRecord(voter: PublicKey, realm: PublicKey, mint: PublicKey, action: VoterWeightAction) {
         const stakeAccount = await this.client.getMainAccount(voter)
 
         if (!stakeAccount) throw new Error("Stake account not found for voter");
@@ -36,7 +37,7 @@ export class PythVoterWeightPluginClient extends Client<any> {
             mint
         )
 
-        return instructions[0];
+        return { pre: instructions };
     }
     // NO-OP
     async updateMaxVoterWeightRecord(): Promise<TransactionInstruction | null> {
