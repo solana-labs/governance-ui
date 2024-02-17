@@ -47,8 +47,6 @@ export default function PluginVotingPower({ role, className }: Props) {
     )
   }
 
-  console.log(222, calculatedVoterWeight)
-
   if (!calculatedVoterWeight?.value || calculatedVoterWeight.value.isZero()) {
     return null
   }
