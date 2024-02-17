@@ -189,77 +189,17 @@ export const useGovernancePower = (
   const { calculatedMaxVoterWeight } = useRealmVoterWeightPlugins(kind)
   return calculatedMaxVoterWeight?.value
 }
-/** deprecated: this should not be used anymored. Use useRealmVoterWeightPlugins hook */
-/** where possible avoid using this and use a plugin-specific hook instead */
+/** deprecated: this should not be used any more. Use useRealmVoterWeightPlugins hook */
 export const useGovernancePowerAsync = (
   kind: 'community' | 'council' | undefined
 ) => {
-  const { connection } = useConnection()
-  const realmPk = useSelectedRealmPubkey()
-
-  const heliumVotingPower = useHeliumVsrStore((s) => s.state.votingPower)
-  const gatewayVotingPower = useGatewayPluginStore((s) => s.state.votingPower)
-  const quadraticVotingPower = useQuadraticPluginStore(
-    (s) => s.state.votingPower
-  )
-  const setQuadraticVotingPower = useQuadraticPluginStore(
-    (s) => s.setVotingPower
-  )
-  const vsrVotingPower = useVsrGovpower().data?.result
-
-  const communityTOR = useAddressQuery_CommunityTokenOwner()
-  const councilTOR = useAddressQuery_CouncilTokenOwner()
-  const { data: TOR } = kind && kind === 'community' ? communityTOR : councilTOR
-
-  const { result: plugin } = useAsync(
-    async () =>
-      kind && realmPk && determineVotingPowerType(connection, realmPk, kind),
-    [connection, realmPk, kind]
-  )
-  const actingAsWalletPk = useUserOrDelegator()
-
-  // TODO this should be encapsulated into a QV client
-  useEffect(() => {
-    if (plugin === 'QV' && TOR) {
-      getVanillaGovpower(connection, TOR).then(setQuadraticVotingPower)
-    }
-  }, [connection, TOR, plugin])
-
-  return useAsync(async () => {
-    return plugin === undefined
-      ? undefined
-      : realmPk &&
-          TOR &&
-          (plugin === 'vanilla'
-            ? getVanillaGovpower(connection, TOR)
-            : plugin === 'NFT'
-            ? getNftGovpower(connection, realmPk, TOR)
-            : plugin === 'VSR'
-            ? vsrVotingPower ?? new BN(0)
-            : plugin === 'HeliumVSR'
-            ? heliumVotingPower
-            : plugin === 'gateway'
-            ? gatewayVotingPower
-            : plugin === 'QV'
-            ? quadraticVotingPower
-            : plugin === 'pyth'
-            ? getPythGovPower(connection, actingAsWalletPk)
-            : new BN(0))
-  }, [
-    plugin,
-    realmPk,
-    TOR,
-    connection,
-    vsrVotingPower,
-    heliumVotingPower,
-    gatewayVotingPower,
-    actingAsWalletPk,
-  ])
+  const { calculatedVoterWeight } = useRealmVoterWeightPlugins(kind)
+  return calculatedVoterWeight?.value;
 }
 
 /**
  * @deprecated
- * use useGovernancePowerAsync
+ * use useRealmVoterWeightPlugins instead
  */
 export const useLegacyVoterWeight = () => {
   const { connection } = useConnection()
