@@ -22,8 +22,9 @@ type PublicKeyMap = {
  * @param args
  */
 export const queryKeys = (args: PublicKeyMap) =>
-    Object.values(args).map((value) => (value ?? "").toString())
-
+    Object.values(args)
+        .filter((value): value is PublicKey => value !== undefined)
+        .map((value) => value.toString())
 
 // A synchronous version of the getTokenOwnerRecordAddress function in @solana/spl-governance
 // More convenient to use in hooks

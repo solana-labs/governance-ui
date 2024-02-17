@@ -38,13 +38,13 @@ export const useVoterWeightPlugins = (
   const { connection } = useConnection()
   const tokenOwnerRecord = useUserCommunityTokenOwnerRecord().data?.result
   const mintInfo = useRealmCommunityMintInfoQuery().data?.result
-  const plugins = usePlugins(args)
-  const calculatedVoterWeight = useCalculatedVoterWeight({
+  const { data: plugins } = usePlugins(args)
+  const { data: calculatedVoterWeight} = useCalculatedVoterWeight({
     ...args,
     plugins,
     tokenOwnerRecord,
   })
-  const calculatedMaxVoterWeight = useCalculatedMaxVoterWeight({
+  const { data: calculatedMaxVoterWeight} = useCalculatedMaxVoterWeight({
     ...args,
     plugins,
     mintInfo,

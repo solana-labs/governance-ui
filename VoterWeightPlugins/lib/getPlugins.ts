@@ -1,35 +1,25 @@
 import { PublicKey, Connection, Keypair } from '@solana/web3.js'
 import { fetchRealmConfigQuery } from '@hooks/queries/realmConfig'
 import { findPluginName, PluginName } from '@constants/plugins'
-import { getRegistrarPDA } from '@utils/plugin/accounts'
-import {
-  GatewayClient,
-  QuadraticClient,
-} from '@solana/governance-program-library'
 import { loadClient } from '../clients/'
 import { AnchorProvider } from '@coral-xyz/anchor'
 import EmptyWallet from '@utils/Mango/listingTools'
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts'
 import { VoterWeightPluginInfo } from './types'
 import BN from 'bn.js'
+import {fetchRealmByPubkey} from "@hooks/queries/realm";
 
-export const getPredecessorProgramId = async (
-  client: GatewayClient | QuadraticClient, // TODO: Add other clients once we support them
-  realmPublicKey: PublicKey,
-  governanceMintPublicKey: PublicKey
-): Promise<PublicKey | null> => {
-  // Get the registrar for the realm
-  const { registrar } = await getRegistrarPDA(
-    realmPublicKey,
-    governanceMintPublicKey,
-    client.program.programId
-  )
-  const registrarObject = await client.program.account.registrar.fetch(
-    registrar
-  )
-
-  // Find the gatekeeper network from the registrar
-  return registrarObject.previousVoterWeightPluginProgramId
+const getInitialPluginProgramId = async (
+    realmPublicKey: PublicKey,
+    governanceMintPublicKey: PublicKey,
+    connection: Connection
+):Promise<PublicKey | undefined> => {
+  const config = await fetchRealmConfigQuery(connection, realmPublicKey)
+  const realm = await fetchRealmByPubkey(connection, realmPublicKey)
+  const kind = realm.result?.account.communityMint.equals(governanceMintPublicKey) ? "community" : "council"
+  return config.result?.account?.[
+      kind === 'community' ? 'communityTokenConfig' : 'councilTokenConfig']
+      ?.voterWeightAddin
 }
 
 export const getPlugins = async ({
@@ -43,7 +33,6 @@ export const getPlugins = async ({
   walletPublicKey: PublicKey
   connection: Connection
 }): Promise<VoterWeightPluginInfo[]> => {
-  const config = await fetchRealmConfigQuery(connection, realmPublicKey)
   const plugins: VoterWeightPluginInfo[] = []
 
   const options = AnchorProvider.defaultOptions()
@@ -53,7 +42,7 @@ export const getPlugins = async ({
     options
   )
 
-  let programId = config.result?.account?.communityTokenConfig?.voterWeightAddin
+  let programId = await getInitialPluginProgramId(realmPublicKey, governanceMintPublicKey, connection)
 
   let pluginName = ''
 
