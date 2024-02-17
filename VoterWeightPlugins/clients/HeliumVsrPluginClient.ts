@@ -77,7 +77,7 @@ export class HeliumVsrPluginClient extends Client<any> {
         const positionDetails = await this.getPositions(voter, realm, mint);
         return positionDetails.votingPower
     }
-    constructor(private internalClient: HeliumVsrClient, devnet:boolean, readonly governanceProgramId ) {
+    constructor(readonly internalClient: HeliumVsrClient, devnet:boolean, readonly governanceProgramId ) {
         super(internalClient.program, devnet);
     }
 

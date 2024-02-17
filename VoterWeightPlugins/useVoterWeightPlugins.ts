@@ -18,7 +18,7 @@ import { usePlugins } from './hooks/usePlugins'
 import { queryKeys } from './lib/utils'
 import { useVoterWeightPks } from './hooks/useVoterWeightPks'
 
-export interface UsePluginsReturnType {
+export interface UseVoterWeightPluginsReturnType {
   isReady: boolean
   plugins: VoterWeightPluginInfo[] | undefined // undefined means we are still loading
   updateVoterWeightRecords: () => Promise<{ pre: TransactionInstruction[], post: TransactionInstruction[]}>
@@ -33,7 +33,7 @@ export interface UsePluginsReturnType {
 
 export const useVoterWeightPlugins = (
   args: UseVoterWeightPluginsArgs
-): UsePluginsReturnType => {
+): UseVoterWeightPluginsReturnType => {
   const { realmPublicKey, governanceMintPublicKey, walletPublicKey } = args
   const { connection } = useConnection()
   const tokenOwnerRecord = useUserCommunityTokenOwnerRecord().data?.result

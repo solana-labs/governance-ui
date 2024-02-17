@@ -24,6 +24,10 @@ import * as heliumVsrSdk from '@helium/voter-stake-registry-sdk'
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { StakeConnection as PythClient } from '@pythnetwork/staking'
 import { tryGetQuadraticRegistrar } from '../QuadraticPlugin/sdk/api'
+import {useRealmVoterWeightPlugins} from "@hooks/useRealmVoterWeightPlugins";
+import {useQuery} from "@tanstack/react-query";
+import {useRealmQuery} from "@hooks/queries/realm";
+import useWalletOnePointOh from "@hooks/useWalletOnePointOh";
 
 // TODO QV-2: Remove teh quadratic and gateway clients from the store
 interface UseVotePluginsClientStore extends State {
@@ -116,6 +120,32 @@ const defaultState = {
     walletPk: undefined,
   }),
   maxVoterWeight: undefined,
+}
+
+const useVotingClient = (kind : 'community' | 'council' = 'community' ) => {
+  const { , plugins } = useRealmVoterWeightPlugins();
+  const realm = useRealmQuery().data?.result
+  const wallet = useWalletOnePointOh()
+  const governanceMintPublicKey =
+      kind === 'community'
+          ? realm?.account.communityMint
+          : realm?.account.config.councilMint
+
+  // messy logic to get the "legacy" client out of the plugins.
+  // if there's more than one, use the last one.
+  // this only works if the legacy plugins don't support chaining anyway.
+  // if they did, then we would have to call relinquish on whichever plugin supported it
+  const client = plugins?.length ? plugins[plugins.length - 1].client : undefined
+
+  // TODO react-query?
+
+  return new VotingClient({
+    client: client,
+    realm: undefined,
+    walletPk: undefined,
+    updateVoterWeightRecords,
+    calculatedVoterWeight
+  });
 }
 
 const useVotePluginsClientStore = create<UseVotePluginsClientStore>(

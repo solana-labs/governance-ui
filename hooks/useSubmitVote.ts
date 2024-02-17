@@ -32,6 +32,7 @@ import useVotingTokenOwnerRecords from './useVotingTokenOwnerRecords'
 import { useMemo } from 'react'
 import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
 import { useBatchedVoteDelegators } from '@components/VotePanel/useDelegators'
+import {useRealmVoterWeightPlugins} from "@hooks/useRealmVoterWeightPlugins";
 
 export const useSubmitVote = () => {
   const wallet = useWalletOnePointOh()
@@ -59,6 +60,9 @@ export const useSubmitVote = () => {
   )
   const communityDelegators = useBatchedVoteDelegators('community')
   const councilDelegators = useBatchedVoteDelegators('council')
+    const {
+      updateVoterWeightRecords
+    } = useRealmVoterWeightPlugins('community' /* TODO */)
 
   const { error, loading, execute } = useAsyncCallback(
     async ({
