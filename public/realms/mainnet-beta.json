@@ -3455,5 +3455,15 @@
     "realmId": "GgF6fHb3iM3Um5DtvwbZvpGpYTzYnr1RmZr4NkwHveGp",
     "website": "",
     "twitter": ""
+  },
+  {
+"symbol": "OPDAT",
+    "displayName": "OPDA TREASURY",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "7yrQJzHrUqxVbPKsZWz75zFWrXFizXatpUGRKnmTzLjP",
+    "bannerImage": "public/realms/OPANZ/OPANZTreasury.png",
+    "ogImage": "public/realms/OPANZ/OPDATreasury.png",
+    "website": "https://opanz.nz",
+    "twitter": "@OPANZ_OPDA"
   }
 ]
