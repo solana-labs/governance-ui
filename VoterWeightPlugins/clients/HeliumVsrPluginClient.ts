@@ -1,8 +1,7 @@
 import {Client, DEFAULT_GOVERNANCE_PROGRAM_ID} from "@solana/governance-program-library";
 import {PublicKey, TransactionInstruction} from "@solana/web3.js";
 import BN from "bn.js";
-import {Program, Provider} from "@coral-xyz/anchor";
-import {VoterStakeRegistry, IDL} from "@helium/idls/lib/types/voter_stake_registry";
+import {Provider} from "@coral-xyz/anchor";
 import {registrarKey, voterWeightRecordKey} from "@helium/voter-stake-registry-sdk";
 import {getAssociatedTokenAddress} from "@blockworks-foundation/mango-v4";
 import {HeliumVsrClient} from "../../HeliumVotePlugin/sdk/client";
@@ -78,8 +77,8 @@ export class HeliumVsrPluginClient extends Client<any> {
         const positionDetails = await this.getPositions(voter, realm, mint);
         return positionDetails.votingPower
     }
-    constructor(program: Program<VoterStakeRegistry>, private internalClient: HeliumVsrClient, devnet:boolean, readonly governanceProgramId ) {
-        super(program, devnet);
+    constructor(private internalClient: HeliumVsrClient, devnet:boolean, readonly governanceProgramId ) {
+        super(internalClient.program, devnet);
     }
 
     private async getPositions(voter: PublicKey, realm: PublicKey, mint: PublicKey): Promise<GetPositionsReturn> {
@@ -97,7 +96,6 @@ export class HeliumVsrPluginClient extends Client<any> {
         const internalClient = await HeliumVsrClient.connect(provider, pluginId, devnet)
 
         return new HeliumVsrPluginClient(
-            new Program<VoterStakeRegistry>(IDL, pluginId, provider),
             internalClient,
             devnet,
             governanceProgramId
