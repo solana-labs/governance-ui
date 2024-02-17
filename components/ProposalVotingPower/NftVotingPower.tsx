@@ -104,7 +104,9 @@ export default function NftVotingPower(props: Props) {
   const userPk = useUserOrDelegator()
   const nfts = useVotingNfts(userPk)
 
-  const { isReady, calculatedVoterWeight } = useRealmVoterWeightPlugins('community')
+  const { isReady, calculatedVoterWeight } = useRealmVoterWeightPlugins(
+    'community'
+  )
 
   // TODO QV-2 use the new hook
   const maxWeight = useNftPluginStore((s) => s.state.maxVoteRecord)

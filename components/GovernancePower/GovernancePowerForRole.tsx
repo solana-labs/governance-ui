@@ -3,15 +3,12 @@ import { useAsync } from 'react-async-hook'
 import { determineVotingPowerType } from '@hooks/queries/governancePower'
 import { useConnection } from '@solana/wallet-adapter-react'
 import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
-import NftVotingPower from '@components/ProposalVotingPower/NftVotingPower'
-import LockedCommunityNFTRecordVotingPower from '@components/ProposalVotingPower/LockedCommunityNFTRecordVotingPower'
 import VanillaVotingPower from './Vanilla/VanillaVotingPower'
 import { Deposit } from './Vanilla/Deposit'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { ExclamationIcon } from '@heroicons/react/solid'
 import VanillaWithdrawTokensButton from '@components/TokenBalance/VanillaWithdrawTokensButton'
 import LockedCommunityVotingPower from '@components/ProposalVotingPower/LockedCommunityVotingPower'
-import PythVotingPower from 'PythVotePlugin/components/PythVotingPower'
 import PluginVotingPower from '@components/ProposalVotingPower/PluginVotingPower'
 
 export default function GovernancePowerForRole({
@@ -76,15 +73,9 @@ export default function GovernancePowerForRole({
               </div>
             </>
           )
-        ) : kind === 'NFT' ? (
-          <NftVotingPower />)
-          : kind === 'pyth' ? (
-            <PythVotingPower role='community' />
-          ) : kind === 'HeliumVSR' ? (
-            <LockedCommunityNFTRecordVotingPower />
-          ) : kind === 'QV' ? (
-          <PluginVotingPower />
-        ) : null
+        ) : (
+          <PluginVotingPower role={role} />
+        )
       ) : kind === 'vanilla' ? (
         <div>
           <VanillaVotingPower role="council" {...props} />

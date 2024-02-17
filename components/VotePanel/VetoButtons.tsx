@@ -30,7 +30,9 @@ const useCanVeto = ():
   | { canVeto: true }
   | { canVeto: false; message: string } => {
   const vetoPop = useVetoingPop()
-  const { voterWeight, isReady } = useRealmVoterWeightPlugins(vetoPop)
+  const { calculatedMaxVoterWeight, isReady } = useRealmVoterWeightPlugins(
+    vetoPop
+  )
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const isVetoable = useIsVetoable()
@@ -53,7 +55,8 @@ const useCanVeto = ():
     return { canVeto: false, message: 'You already voted' }
 
   // Do you have any voting power?
-  const hasMinAmountToVote = voterTokenRecord && isReady && voterWeight?.gtn(0)
+  const hasMinAmountToVote =
+    voterTokenRecord && isReady && calculatedMaxVoterWeight?.value?.gtn(0)
   if (hasMinAmountToVote === undefined) return undefined
   if (hasMinAmountToVote === false)
     return {
