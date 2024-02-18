@@ -12,6 +12,7 @@ export const useRealmVoterWeightPlugins = (kind : 'community' | 'council' = 'com
         kind === 'community'
             ? realm?.account.communityMint
             : realm?.account.config.councilMint
+
     return useVoterWeightPlugins({
         realmPublicKey: realm?.pubkey,
         governanceMintPublicKey,

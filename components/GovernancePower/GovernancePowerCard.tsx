@@ -47,7 +47,6 @@ const VanillaDeposit = ({ role }: { role: 'community' | 'council' }) => {
 const GovernancePowerCard = () => {
   const connected = useWalletOnePointOh()?.connected ?? false
 
-  // TODO this logic exists just to make sure the data is loaded. It should be refactored
   const { isReady: communityIsReady } = useRealmVoterWeightPlugins('community')
   const { isReady: councilIsReady } = useRealmVoterWeightPlugins('council')
   const isReady = communityIsReady && councilIsReady
