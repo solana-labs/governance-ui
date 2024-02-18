@@ -2,7 +2,6 @@ import {
   InstructionDataWithHoldUpTime,
   createProposal,
 } from 'actions/createProposal'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useRealm from './useRealm'
 import useRpcContext from './useRpcContext'
 import { fetchGovernanceByPubkey } from './queries/governance'
@@ -18,12 +17,9 @@ import queryClient from './queries/queryClient'
 import { proposalQueryKeys } from './queries/proposal'
 import { createLUTProposal } from 'actions/createLUTproposal'
 import { useLegacyVoterWeight } from './queries/governancePower'
+import {useVotingClient} from "@hooks/useVotingClient";
 
 export default function useCreateProposal() {
-  const client = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
-  )
-
   const connection = useLegacyConnectionContext()
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
@@ -33,6 +29,7 @@ export default function useCreateProposal() {
 
   const { canChooseWhoVote } = useRealm()
   const { getRpcContext } = useRpcContext()
+  const votingClient = useVotingClient();
 
   /** @deprecated because the api is goofy, use `propose` */
   const handleCreateProposal = async ({
@@ -96,7 +93,7 @@ export default function useCreateProposal() {
       instructionsData,
       isDraft,
       ['Approve'],
-      client
+      votingClient
     )
     queryClient.invalidateQueries({
       queryKey: proposalQueryKeys.all(connection.endpoint),
@@ -173,7 +170,7 @@ export default function useCreateProposal() {
       instructionsData,
       isDraft,
       options,
-      client
+      votingClient
     )
     queryClient.invalidateQueries({
       queryKey: proposalQueryKeys.all(connection.endpoint),

@@ -15,6 +15,7 @@ import { useAsync } from 'react-async-hook'
 import { getLockTokensVotingPowerPerWallet } from 'VoteStakeRegistry/tools/deposits'
 import { useQuery } from '@tanstack/react-query'
 import { findPluginName } from '@constants/plugins'
+import {useVsrClient} from "../../../VoterWeightPlugins/useVsrClient";
 
 const VOTER_INFO_EVENT_NAME = 'VoterInfo'
 
@@ -232,6 +233,7 @@ const voterPowerLogQueryFn = async (
 export const useVsrGovpowerMulti = (wallets: PublicKey[] | undefined) => {
   const { connection } = useConnection()
   const realm = useRealmQuery().data?.result
+  const { vsrClient } = useVsrClient();
 
   return useQuery({
     enabled: wallets !== undefined && wallets.length > 0,
@@ -251,18 +253,12 @@ export const useVsrGovpowerMulti = (wallets: PublicKey[] | undefined) => {
       const config = await fetchRealmConfigQuery(connection, realm.pubkey)
       const programId =
         config.result?.account.communityTokenConfig.voterWeightAddin
-      if (programId === undefined) return undefined
-
-      const client = {
-        program: new Program<VoterStakeRegistry>(IDL, programId, {
-          connection,
-        }),
-      }
+      if (!vsrClient || programId === undefined) return undefined
 
       const x = await getLockTokensVotingPowerPerWallet(
         wallets,
         realm,
-        client,
+          vsrClient,
         connection
       )
 

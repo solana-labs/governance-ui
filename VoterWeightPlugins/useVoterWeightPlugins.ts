@@ -17,11 +17,16 @@ import { useCalculatedMaxVoterWeight } from './hooks/useCalculatedMaxVoterWeight
 import { usePlugins } from './hooks/usePlugins'
 import { queryKeys } from './lib/utils'
 import { useVoterWeightPks } from './hooks/useVoterWeightPks'
+import { PluginName } from '@constants/plugins'
+import {VoterWeightAction} from "@solana/spl-governance";
 
-export interface UsePluginsReturnType {
+export interface UseVoterWeightPluginsReturnType {
   isReady: boolean
   plugins: VoterWeightPluginInfo[] | undefined // undefined means we are still loading
-  updateVoterWeightRecords: () => Promise<{ pre: TransactionInstruction[], post: TransactionInstruction[]}>
+  updateVoterWeightRecords: (action?: VoterWeightAction) => Promise<{
+    pre: TransactionInstruction[]
+    post: TransactionInstruction[]
+  }>
   createVoterWeightRecords: () => Promise<TransactionInstruction[]>
   updateMaxVoterWeightRecords: () => Promise<TransactionInstruction[]>
   createMaxVoterWeightRecords: () => Promise<TransactionInstruction[]>
@@ -29,11 +34,14 @@ export interface UsePluginsReturnType {
   calculatedMaxVoterWeight: CalculatedWeight | undefined // undefined means we are still loading
   voterWeightPk: PublicKey | undefined // the voter weight pubkey to be used in the governance instruction itself
   maxVoterWeightPk: PublicKey | undefined // the max voter weight pubkey to be used in the governance instruction itself
+
+  //auxiliary functions to the ui
+  includesPlugin: (name: PluginName) => boolean
 }
 
 export const useVoterWeightPlugins = (
   args: UseVoterWeightPluginsArgs
-): UsePluginsReturnType => {
+): UseVoterWeightPluginsReturnType => {
   const { realmPublicKey, governanceMintPublicKey, walletPublicKey } = args
   const { connection } = useConnection()
   const tokenOwnerRecord = useUserCommunityTokenOwnerRecord().data?.result
@@ -71,19 +79,23 @@ export const useVoterWeightPlugins = (
     })
   }
 
-  const updateVoterWeightRecords = (): Promise<{ pre: TransactionInstruction[], post: TransactionInstruction[] }> => {
+  const updateVoterWeightRecords = (action?: VoterWeightAction): Promise<{
+    pre: TransactionInstruction[]
+    post: TransactionInstruction[]
+  }> => {
     if (!realmPublicKey || !governanceMintPublicKey || !walletPublicKey) {
       return Promise.resolve({ pre: [], post: [] })
     }
 
     return queryClient.fetchQuery({
-      queryKey: ['updateVoterWeightRecords', ...queryKeys(args)],
+      queryKey: ['updateVoterWeightRecords', ...queryKeys(args), action],
       queryFn: () =>
         updateVoterWeight({
           walletPublicKey,
           realmPublicKey,
           governanceMintPublicKey,
           connection,
+          action
         }),
     })
   }
@@ -122,6 +134,9 @@ export const useVoterWeightPlugins = (
     })
   }
 
+  const includesPlugin = (pluginName: PluginName) =>
+    plugins?.some((plugin) => plugin.name === pluginName) || false
+
   return {
     isReady: plugins !== undefined,
     updateVoterWeightRecords,
@@ -132,5 +147,6 @@ export const useVoterWeightPlugins = (
     calculatedVoterWeight,
     calculatedMaxVoterWeight,
     ...pks,
+    includesPlugin,
   }
 }

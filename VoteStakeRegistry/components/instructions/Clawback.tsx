@@ -22,7 +22,6 @@ import { NewProposalContext } from 'pages/dao/[symbol]/proposal/new'
 import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/GovernedAccountSelect'
 import * as yup from 'yup'
 import {
-  Deposit,
   DepositWithMintAccount,
   getRegistrarPDA,
   emptyPk,
@@ -34,11 +33,11 @@ import { fmtMintAmount } from '@tools/sdk/units'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { getClawbackInstruction } from 'VoteStakeRegistry/actions/getClawbackInstruction'
 import { abbreviateAddress } from '@utils/formatting'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { useRealmQuery } from '@hooks/queries/realm'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import Input from '@components/inputs/Input'
+import {useVsrClient} from "VoterWeightPlugins/useVsrClient";
 
 const Clawback = ({
   index,
@@ -47,7 +46,7 @@ const Clawback = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
+  const { vsrClient } = useVsrClient();
   const connection = useLegacyConnectionContext()
   const realm = useRealmQuery().data?.result
 
@@ -111,7 +110,7 @@ const Clawback = ({
         voterDepositIndex: form.deposit.index,
         grantMintPk: form.deposit.mint.publicKey,
         realmCommunityMintPk: realm!.account.communityMint,
-        client,
+        client: vsrClient,
       })
       serializedInstruction = serializeInstructionToBase64(clawbackIx!)
     }
@@ -124,7 +123,7 @@ const Clawback = ({
       customHoldUpTime: form.holdupTime,
     }
     return obj
-  }, [client, form, realmAuthorityGov, realm, schema])
+  }, [vsrClient, form, realmAuthorityGov, realm, schema])
 
   useEffect(() => {
     handleSetInstructions(
@@ -145,9 +144,9 @@ const Clawback = ({
       const { registrar } = await getRegistrarPDA(
         realm!.pubkey,
         realm!.account.communityMint,
-        client!.program.programId
+          vsrClient!.program.programId
       )
-      const resp = await client?.program.account.voter.all([
+      const resp = await vsrClient?.program.account.voter.all([
         {
           memcmp: {
             offset: 40,
@@ -159,26 +158,27 @@ const Clawback = ({
         resp
           ?.filter(
             (x) =>
-              (x.account.deposits as Deposit[]).filter(
+              (x.account.deposits).filter(
                 (depo) => depo.allowClawback
               ).length
           )
-          .map((x) => x.account as Voter) || []
+            // The cast works around an anchor issue with interpreting enums
+          .map((x) => x.account as unknown as Voter) || []
 
       setVoters([...voters])
     }
-    if (client) {
+    if (vsrClient) {
       getVoters()
     }
-  }, [client, realm])
+  }, [vsrClient, realm])
   useEffect(() => {
     const getOwnedDepositsInfo = async () => {
       const { registrar } = await getRegistrarPDA(
         realm!.pubkey,
         realm!.account.communityMint,
-        client!.program.programId
+        vsrClient!.program.programId
       )
-      const existingRegistrar = await tryGetRegistrar(registrar, client!)
+      const existingRegistrar = await tryGetRegistrar(registrar, vsrClient!)
       const mintCfgs = existingRegistrar?.votingMints
       const mints = {}
       if (mintCfgs) {
@@ -211,7 +211,7 @@ const Clawback = ({
       deposit: null,
       governedTokenAccount: undefined,
     }))
-  }, [client, connection, form.voter, realm])
+  }, [vsrClient, connection, form.voter, realm])
 
   useEffect(() => {
     setForm((prevForm) => ({ ...prevForm, governedTokenAccount: undefined }))

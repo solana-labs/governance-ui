@@ -4,12 +4,14 @@ import {
   Connection,
 } from '@solana/web3.js'
 import { getPlugins } from './getPlugins'
+import {VoterWeightAction} from "@solana/spl-governance";
 
 interface UpdateVoterWeightRecordArgs {
   walletPublicKey: PublicKey
   realmPublicKey: PublicKey
   governanceMintPublicKey: PublicKey
   connection: Connection
+  action?: VoterWeightAction
 }
 
 export const updateVoterWeight = async ({
@@ -17,6 +19,7 @@ export const updateVoterWeight = async ({
   realmPublicKey,
   governanceMintPublicKey,
   connection,
+  action
 }: UpdateVoterWeightRecordArgs): Promise<{ pre: TransactionInstruction[], post: TransactionInstruction[]}> => {
   const plugins = await getPlugins({
     realmPublicKey,
@@ -31,7 +34,8 @@ export const updateVoterWeight = async ({
     const updateVoterWeightRecordIx = await plugin.client.updateVoterWeightRecord(
       walletPublicKey,
       realmPublicKey,
-      governanceMintPublicKey
+      governanceMintPublicKey,
+      action
     )
     preIxes.push(...updateVoterWeightRecordIx.pre)
     postIxes.push(...updateVoterWeightRecordIx.post || [])

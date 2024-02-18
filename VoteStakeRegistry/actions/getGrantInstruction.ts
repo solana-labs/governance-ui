@@ -73,7 +73,7 @@ export const getGrantInstruction = async ({
     .grant(
       voterBump,
       voterWeightBump,
-      { [lockupKind]: {} },
+      { [lockupKind]: {} } as any, // The cast to any works around an anchor issue with interpreting enums
       new BN(startTime),
       lockupPeriod,
       allowClawback,

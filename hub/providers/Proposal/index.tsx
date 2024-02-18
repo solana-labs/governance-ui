@@ -10,6 +10,7 @@ import { useToast, ToastType } from '@hub/hooks/useToast';
 import { useWallet } from '@hub/hooks/useWallet';
 
 import { createProposal } from './createProposal';
+import {useVotingClient} from "@hooks/useVotingClient";
 
 type CreateProposalsArgs = Omit<
   Parameters<typeof createProposal>[0],
@@ -47,6 +48,7 @@ export function ProposalProvider(props: Props) {
   const { connect, signTransaction, signAllTransactions } = useWallet();
   const { publish } = useToast();
   const { callbacks, progress } = useProposalCreationProgress();
+  const votingClient = useVotingClient();
 
   return (
     <context.Provider
@@ -73,6 +75,7 @@ export function ProposalProvider(props: Props) {
               requestingUserPublicKey: publicKey,
               signAllTransactions,
               signTransaction,
+              votingClient,
             });
           } catch (e) {
             const message =

@@ -9,33 +9,19 @@ import BN from 'bn.js'
 import { fetchDigitalAssetsByOwner } from './digitalAssets'
 import { getNetworkFromEndpoint } from '@utils/connection'
 import { ON_NFT_VOTER_V2 } from '@constants/flags'
-import { fetchRealmByPubkey, useRealmQuery } from './realm'
+import { fetchRealmByPubkey } from './realm'
 import { fetchRealmConfigQuery } from './realmConfig'
-import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
-import useGatewayPluginStore from 'GatewayPlugin/store/gatewayPluginStore'
-import { useAsync } from 'react-async-hook'
-import { useConnection } from '@solana/wallet-adapter-react'
-import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
+
+
 import {
-  useAddressQuery_CommunityTokenOwner,
-  useAddressQuery_CouncilTokenOwner,
-} from './addresses/tokenOwnerRecord'
-import {
-  SimpleGatedVoterWeight,
-  VoteNftWeight,
-  VoteRegistryVoterWeight,
-  VoterWeight,
+  LegacyVoterWeightAdapter,
 } from '@models/voteWeights'
-import useUserOrDelegator from '@hooks/useUserOrDelegator'
-import { getVsrGovpower, useVsrGovpower } from './plugins/vsr'
 import { PythClient } from '@pythnetwork/staking'
 import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet'
 import { findPluginName } from '@constants/plugins'
 import { nftRegistrarQuery } from './plugins/nftVoter'
 import queryClient from './queryClient'
-import { useEffect } from 'react'
 import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
-import useQuadraticPluginStore from 'QuadraticPlugin/store/quadraticPluginStore'
 
 export const getVanillaGovpower = async (
   connection: Connection,
@@ -202,89 +188,21 @@ export const useGovernancePowerAsync = (
  * use useRealmVoterWeightPlugins instead
  */
 export const useLegacyVoterWeight = () => {
-  const { connection } = useConnection()
-  const realmPk = useSelectedRealmPubkey()
-  const realm = useRealmQuery().data?.result
-
-  const heliumVotingPower = useHeliumVsrStore((s) => s.state.votingPower)
-  const gatewayVotingPower = useGatewayPluginStore((s) => s.state.votingPower)
-
+  const communityPluginDetails = useRealmVoterWeightPlugins('community');
+  const councilPluginDetails = useRealmVoterWeightPlugins('council');
+  const ownVoterWeights = {
+    community: communityPluginDetails.calculatedVoterWeight?.value ?? undefined,
+    council: councilPluginDetails.calculatedVoterWeight?.value ?? undefined,
+  }
   const { data: communityTOR } = useUserCommunityTokenOwnerRecord()
   const { data: councilTOR } = useUserCouncilTokenOwnerRecord()
 
-  const { result: plugin } = useAsync(
-    async () =>
-      realmPk && determineVotingPowerType(connection, realmPk, 'community'),
-    [connection, realmPk]
-  )
-  const actingAsWalletPk = useUserOrDelegator()
+  const voterWeight = new LegacyVoterWeightAdapter(ownVoterWeights, {
+    community: communityTOR?.result,
+    council: councilTOR?.result,
+  });
+  const ready = communityPluginDetails.isReady && councilPluginDetails.isReady;
 
-  const shouldCareAboutCouncil =
-    realm && realm.account.config.councilMint !== undefined
-
-  return useAsync(
-    async () =>
-      realmPk &&
-      communityTOR &&
-      (shouldCareAboutCouncil === undefined
-        ? undefined
-        : shouldCareAboutCouncil === true && councilTOR === undefined
-        ? undefined
-        : plugin === 'vanilla'
-        ? new VoterWeight(communityTOR.result, councilTOR?.result)
-        : plugin === 'pyth'
-        ? new VoteRegistryVoterWeight(
-            communityTOR.result,
-            councilTOR?.result,
-            await getPythGovPower(connection, actingAsWalletPk)
-          )
-        : plugin === 'NFT'
-        ? communityTOR.result?.pubkey
-          ? new VoteNftWeight(
-              communityTOR.result,
-              councilTOR?.result,
-              await getNftGovpower(
-                connection,
-                realmPk,
-                communityTOR.result.pubkey
-              )
-            )
-          : undefined
-        : plugin === 'VSR'
-        ? actingAsWalletPk
-          ? new VoteRegistryVoterWeight(
-              communityTOR.result,
-              councilTOR?.result,
-              (await getVsrGovpower(connection, realmPk, actingAsWalletPk))
-                .result ?? new BN(0)
-            )
-          : undefined
-        : plugin === 'HeliumVSR'
-        ? new VoteRegistryVoterWeight(
-            communityTOR.result,
-            councilTOR?.result,
-            heliumVotingPower
-          )
-        : plugin === 'gateway'
-        ? new SimpleGatedVoterWeight(
-            communityTOR.result,
-            councilTOR?.result,
-            gatewayVotingPower
-          )
-        : plugin === 'QV'
-        ? new VoterWeight(communityTOR.result, councilTOR?.result)
-        : undefined),
-
-    [
-      actingAsWalletPk,
-      communityTOR,
-      connection,
-      councilTOR,
-      gatewayVotingPower,
-      heliumVotingPower,
-      plugin,
-      realmPk,
-      shouldCareAboutCouncil,
-    ]
-  )
+  // only expose the vote weight once everything is loaded
+  return { result: ready ? voterWeight : undefined, ready };
 }

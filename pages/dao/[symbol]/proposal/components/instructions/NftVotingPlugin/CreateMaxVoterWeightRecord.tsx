@@ -10,7 +10,6 @@ import { validateInstruction } from '@utils/instructionTools'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
 import useRealm from '@hooks/useRealm'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NewProposalContext } from '../../../new'
 import InstructionForm, { InstructionInput } from '../FormCreator'
 import { InstructionInputType } from '../inputInstructionType'
@@ -19,6 +18,7 @@ import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import {useNftClient} from "../../../../../../../VoterWeightPlugins/useNftClient";
 
 interface CreateNftMaxVoterWeightRecord {
   governedAccount: AssetAccount | undefined
@@ -34,7 +34,7 @@ const CreateNftPluginMaxVoterWeightRecord = ({
   const realm = useRealmQuery().data?.result
 
   const { realmInfo } = useRealm()
-  const nftClient = useVotePluginsClientStore((s) => s.state.nftClient)
+  const {nftClient} = useNftClient()
   const { assetAccounts } = useGovernanceAssets()
   const wallet = useWalletOnePointOh()
   const shouldBeGoverned = !!(index !== 0 && governance)
