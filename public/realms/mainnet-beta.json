@@ -3461,8 +3461,8 @@
     "displayName": "OPDA TREASURY",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "7yrQJzHrUqxVbPKsZWz75zFWrXFizXatpUGRKnmTzLjP",
-    "bannerImage": "public/realms/opdatdao/OPANZTreasury.png",
-    "ogImage": "public/realms/opdatdao/OPDATreasurylogo.png",
+    "bannerImage": "/realms/opdatdao/OPANZTreasury.png",
+    "ogImage": "/realms/opdatdao/OPDATreasurylogo.png",
     "website": "https://opanz.nz",
     "twitter": "@OPANZ_OPDA"
   },
@@ -3471,8 +3471,8 @@
     "displayName": "Whanau OPANZ",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "CRy7DaqT5CT49tiT7F52v1irgEmxT5zSMXYZYCN182rm",
-    "bannerImage": "public/realms/whaopdao/WhanauOPANZ.png",
-    "ogImage": "public/realms/whaopdao/OPANZWhanau.png",
+    "bannerImage": "/realms/whaopdao/WhanauOPANZ.png",
+    "ogImage": "/realms/whaopdao/OPANZWhanau.png",
     "website": "https://opanz.nz",
     "twitter": "@OPANZ_OPDA"
   }
