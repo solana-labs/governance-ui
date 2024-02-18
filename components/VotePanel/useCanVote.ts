@@ -1,6 +1,4 @@
 import { useVoterTokenRecord, useVotingPop } from './hooks'
-import { VotingClientType } from '@utils/uiTypes/VotePlugin'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
 
@@ -26,9 +24,7 @@ const useHasAnyVotingPower = (role: 'community' | 'council' | undefined) => {
 }
 
 export const useCanVote = () => {
-  const client = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
-  )
+  const { isReady, includesPlugin } = useRealmVoterWeightPlugins()
   const votingPop = useVotingPop()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
@@ -42,19 +38,14 @@ export const useCanVote = () => {
 
   const canVote =
     connected &&
-    !(
-      client.clientType === VotingClientType.NftVoterClient && !voterTokenRecord
-    ) &&
-    !(
-      client.clientType === VotingClientType.HeliumVsrClient &&
-      !voterTokenRecord
-    ) &&
+    !(isReady && includesPlugin('NFT') && !voterTokenRecord) &&
+    !(isReady && includesPlugin('HeliumVSR') && !voterTokenRecord) &&
     !isVoteCast &&
     hasMinAmountToVote
 
   const voteTooltipContent = !connected
     ? 'You need to connect your wallet to be able to vote'
-    : client.clientType === VotingClientType.NftVoterClient && !voterTokenRecord
+    : isReady && includesPlugin('NFT') && !voterTokenRecord
     ? 'You must join the Realm to be able to vote'
     : !hasMinAmountToVote
     ? 'You don’t have governance power to vote in this dao'

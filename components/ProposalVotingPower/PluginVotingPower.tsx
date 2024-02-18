@@ -47,20 +47,18 @@ export default function PluginVotingPower({ role, className }: Props) {
     )
   }
 
+  if (!calculatedVoterWeight?.value || calculatedVoterWeight.value.isZero()) {
+    return null
+  }
+
   return (
     <div className={clsx(className)}>
       <div className={'p-3 rounded-md bg-bkg-1'}>
         <div className="flex items-center justify-between mt-1">
           <div className=" flex flex-col gap-x-2">
-            <div
-              className={clsx(
-                className,
-                !calculatedVoterWeight?.value ||
-                  (calculatedVoterWeight.value.isZero() && 'hidden')
-              )}
-            >
+            <div className={clsx(className)}>
               <div className={'p-3 rounded-md bg-bkg-1'}>
-                <div className="text-fgd-3 text-xs">QV Votes</div>
+                <div className="text-fgd-3 text-xs">Votes</div>
                 <div className="flex items-center justify-between mt-1">
                   <div className=" flex flex-row gap-x-2">
                     <div className="text-xl font-bold text-fgd-1 hero-text">
