@@ -349,6 +349,49 @@ export class VoterWeight implements VoterWeightInterface {
   }
 }
 
+// Deprecated: used to adapt the useLegacyVoterWeight hook to use the voter weight plugins,
+// without having to reference each plugin individually, and to support chaining.
+// Note - instead of this, you should probably be using the useRealmVoterWeightPlugins hook
+export class LegacyVoterWeightAdapter extends VoterWeight {
+  constructor(
+      readonly voterWeights: {
+    community: BN | undefined
+    council: BN | undefined
+  },
+      tokenOwnerRecords: {
+    community: ProgramAccount<TokenOwnerRecord> | undefined
+    council: ProgramAccount<TokenOwnerRecord> | undefined
+      }
+      ) {
+    super(tokenOwnerRecords.community, tokenOwnerRecords.council)
+  }
+
+  hasAnyWeight() {
+    return (!!this.voterWeights.community && !this.voterWeights.community.isZero())
+        || (!!this.voterWeights.council && !this.voterWeights.council.isZero());
+  }
+
+  hasMinCommunityWeight(minCommunityWeight: BN) {
+    return this.voterWeights.community?.gte(minCommunityWeight);
+  }
+  hasMinCouncilWeight(minCouncilWeight: BN) {
+    return this.voterWeights.council?.gte(minCouncilWeight);
+  }
+
+  hasMinAmountToVote(mintPk: PublicKey) {
+    const isCommunity =
+        this.communityTokenRecord?.account.governingTokenMint.toBase58() ===
+        mintPk.toBase58()
+    const isCouncil =
+        this.councilTokenRecord?.account.governingTokenMint.toBase58() ===
+        mintPk.toBase58()
+
+    if (isCouncil) return this.hasMinCouncilWeight(new BN(0));
+    if (isCommunity) return this.hasMinCommunityWeight(new BN(0));
+    return false;
+  }
+}
+
 // TODO treat this as temporary - it should delegate to the governance VoterWeight (frontend and on-chain)
 /**
  * @deprecated instead of using this, ask yourself what you are trying to do, and observe that there is no reason you'd need to use this class in order to do it.
