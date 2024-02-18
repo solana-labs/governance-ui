@@ -14,7 +14,6 @@ import useRpcContext from '@hooks/useRpcContext'
 import { getVoteRecords, getTokenOwnerRecords } from '@models/proposal'
 import useRealm from '@hooks/useRealm'
 import { buildTopVoters } from '@models/proposal'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { getLockTokensVotingPowerPerWallet } from 'VoteStakeRegistry/tools/deposits'
 import { BN } from '@coral-xyz/anchor'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
@@ -27,6 +26,7 @@ import { getNetworkFromEndpoint } from '@utils/connection'
 import { fetchDigitalAssetsByOwner } from './queries/digitalAssets'
 import { useNftRegistrarCollection } from './useNftRegistrarCollection'
 import { useAsync } from 'react-async-hook'
+import {useVsrClient} from "../VoterWeightPlugins/useVsrClient";
 
 export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
   const { getRpcContext } = useRpcContext()
@@ -52,7 +52,7 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
   ///
 
   const [context, setContext] = useState<RpcContext | null>(null)
-  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
+  const { vsrClient } = useVsrClient();
   const connection = useLegacyConnectionContext()
   const governingTokenMintPk = proposal?.account.governingTokenMint
 
@@ -196,12 +196,12 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
   useEffect(() => {
     //VSR only
     const handleGetVsrVotingPowers = async (walletsPks: PublicKey[]) => {
-      if (!realm || !client) throw new Error()
+      if (!realm || !vsrClient) throw new Error()
 
       const votingPerWallet = await getLockTokensVotingPowerPerWallet(
         walletsPks,
         realm,
-        client,
+        vsrClient,
         connection.current
       )
       setUndecidedDepositByVoteRecord(votingPerWallet)
@@ -221,7 +221,7 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
                 tokenOwnerRecord.account.governingTokenOwner.toBase58()
             )
       )
-      if (undecidedData.length && mintsUsedInRealm.length && realm && client) {
+      if (undecidedData.length && mintsUsedInRealm.length && realm && vsrClient) {
         handleGetVsrVotingPowers(
           undecidedData.map((x) => x.account.governingTokenOwner)
         )
@@ -235,7 +235,7 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
     tokenOwnerRecords,
     voteRecords,
     realm,
-    client,
+    vsrClient,
     connection,
     mintsUsedInRealm,
   ])

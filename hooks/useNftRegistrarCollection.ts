@@ -1,4 +1,3 @@
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { useRealmConfigQuery } from './queries/realmConfig'
 import { useMemo } from 'react'
 import { NFT_PLUGINS_PKS } from '@constants/plugins'
@@ -6,6 +5,7 @@ import { NFT_PLUGINS_PKS } from '@constants/plugins'
 export const useNftRegistrarCollection = () => {
   const config = useRealmConfigQuery().data?.result
   const currentPluginPk = config?.account.communityTokenConfig.voterWeightAddin
+  const
   const [nftMintRegistrar] = useVotePluginsClientStore((s) => [
     s.state.nftMintRegistrar,
   ])

@@ -5,13 +5,14 @@ import {
 import { TransactionInstruction } from '@solana/web3.js';
 
 import { useCallback } from 'react';
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore';
 
+import { convertTypeToVoterWeightAction } from '../../../VoterWeightPlugins';
 import { rules2governanceConfig } from '../EditWalletRules/createTransaction';
 import { useLegacyVoterWeight } from '@hooks/queries/governancePower';
 import { useRealmQuery } from '@hooks/queries/realm';
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext';
 import useProgramVersion from '@hooks/useProgramVersion';
+import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins';
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh';
 import { chunks } from '@utils/helpers';
 import { trySentryLog } from '@utils/logs';
@@ -28,9 +29,10 @@ const useNewWalletCallback = (
 ) => {
   const wallet = useWalletOnePointOh();
   const connection = useLegacyConnectionContext();
-  const client = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient,
-  );
+  const {
+    voterWeightPk,
+    updateVoterWeightRecords,
+  } = useRealmVoterWeightPlugins();
   const programVersion = useProgramVersion();
   const realm = useRealmQuery().data?.result;
   const { result: ownVoterWeight } = useLegacyVoterWeight();
@@ -58,12 +60,11 @@ const useNewWalletCallback = (
     const instructions: TransactionInstruction[] = [];
     const createNftTicketsIxs: TransactionInstruction[] = [];
 
-    // client is typed such that it cant be undefined, but whatever.
-    const plugin = await client?.withUpdateVoterWeightRecord(
-      instructions,
-      'createGovernance',
-      createNftTicketsIxs,
+    const { pre: preIx, post: postIx } = await updateVoterWeightRecords(
+      convertTypeToVoterWeightAction('createGovernance'),
     );
+    instructions.push(...preIx);
+    createNftTicketsIxs.push(...postIx);
 
     const governanceAddress = await withCreateGovernance(
       instructions,
@@ -75,7 +76,7 @@ const useNewWalletCallback = (
       tokenOwnerRecord.pubkey,
       wallet.publicKey,
       wallet.publicKey,
-      plugin?.voterWeightPk,
+      voterWeightPk,
     );
     await withCreateNativeTreasury(
       instructions,

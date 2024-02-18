@@ -30,7 +30,6 @@ import {
   getReserveData,
   SolendSubStrategy,
 } from 'Strategies/protocols/solend'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { PublicKey } from '@solana/web3.js'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
@@ -42,6 +41,7 @@ import {
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { useRealmProposalsQuery } from '@hooks/queries/proposal'
 import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
+import {useVotingClient} from "@hooks/useVotingClient";
 
 const SOL_BUFFER = 0.02
 
@@ -71,9 +71,7 @@ const SolendDeposit = ({
     [reserveAddress: string]: number
   }>({})
   const [voteByCouncil, setVoteByCouncil] = useState(false)
-  const client = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
-  )
+  const votingClient = useVotingClient();
   const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const tokenInfo = tokenPriceService.getTokenInfo(handledMint)
@@ -249,7 +247,7 @@ const SolendDeposit = ({
         governedTokenAccount!.governance!.account!.proposalCount,
         false,
         connection,
-        client
+        votingClient
       )
       const url = fmtUrlWithCluster(
         `/dao/${symbol}/proposal/${proposalAddress}`

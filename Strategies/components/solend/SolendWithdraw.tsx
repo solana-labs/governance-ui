@@ -18,7 +18,6 @@ import BigNumber from 'bignumber.js'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { SolendStrategy } from 'Strategies/types/types'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import AdditionalProposalOptions from '@components/AdditionalProposalOptions'
 import { validateInstruction } from '@utils/instructionTools'
 import * as yup from 'yup'
@@ -41,6 +40,7 @@ import {
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { useRealmProposalsQuery } from '@hooks/queries/proposal'
 import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
+import {useVotingClient} from "@hooks/useVotingClient";
 
 const SolendWithdraw = ({
   proposedInvestment,
@@ -72,9 +72,7 @@ const SolendWithdraw = ({
   const [deposits, setDeposits] = useState<{
     [reserveAddress: string]: { amount: number; amountExact: number }
   }>({})
-  const client = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
-  )
+  const votingClient = useVotingClient();
   const proposals = useRealmProposalsQuery().data
   const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
@@ -259,7 +257,7 @@ const SolendWithdraw = ({
         governedTokenAccount!.governance!.account!.proposalCount,
         false,
         connection,
-        client
+        votingClient
       )
       const url = fmtUrlWithCluster(
         `/dao/${symbol}/proposal/${proposalAddress}`
