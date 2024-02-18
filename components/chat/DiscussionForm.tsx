@@ -8,7 +8,6 @@ import { postChatMessage } from '../../actions/chat/postMessage'
 import Loading from '../Loading'
 import Tooltip from '@components/Tooltip'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import {
   useUserCommunityTokenOwnerRecord,
@@ -19,6 +18,7 @@ import { useRouteProposalQuery } from '@hooks/queries/proposal'
 import { useVotingPop } from '@components/VotePanel/hooks'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
+import {useVotingClient} from "@hooks/useVotingClient";
 
 const DiscussionForm = () => {
   const [comment, setComment] = useState('')
@@ -27,9 +27,7 @@ const DiscussionForm = () => {
   const realm = useRealmQuery().data?.result
   const { result: ownVoterWeight } = useLegacyVoterWeight()
   const { realmInfo } = useRealm()
-  const client = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
-  )
+  const votingClient = useVotingClient();
   const [submitting, setSubmitting] = useState(false)
 
   const wallet = useWalletOnePointOh()
@@ -72,7 +70,7 @@ const DiscussionForm = () => {
         commenterVoterTokenRecord,
         msg,
         undefined,
-        client
+        votingClient
       )
 
       setComment('')

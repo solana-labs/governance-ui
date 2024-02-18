@@ -216,7 +216,7 @@ export const LockTokensAccount: React.FC<{
         registrar: vsrRegistrar.result ?? null,
         realm,
       }),
-    [realm, vsrRegistrar]
+    [realm, vsrRegistrar.result]
   )
 
   const handleLockTokens = async (values: LockTokensModalFormValues) => {

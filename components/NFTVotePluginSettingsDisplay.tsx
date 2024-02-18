@@ -2,7 +2,6 @@ import { PublicKey } from '@solana/web3.js'
 import type BN from 'bn.js'
 import cx from 'classnames'
 
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import NFTIcon from '@components/treasuryV2/icons/NFTCollectionPreviewIcon'
 import { useConnection } from '@solana/wallet-adapter-react'
 import { useAsync } from 'react-async-hook'
