@@ -8,7 +8,7 @@ import {
 } from '@tools/constants'
 import { ON_NFT_VOTER_V2 } from '@constants/flags'
 import {Client} from "@solana/governance-program-library";
-import {VoterWeightAction} from "@solana/spl-governance";
+import {VoterWeightAction, withCreateTokenOwnerRecord} from "@solana/spl-governance";
 import {getVotingNfts} from "@hooks/queries/plugins/nftVoter";
 import {
   getUpdateVoterWeightRecordInstruction,
@@ -17,6 +17,7 @@ import {
 import {convertVoterWeightActionToType, getTokenOwnerRecordAddressSync} from "../../VoterWeightPlugins/lib/utils";
 import BN from "bn.js";
 import {getNftGovpower} from "@hooks/queries/governancePower";
+import {fetchProgramVersion} from "@hooks/queries/useProgramVersionQuery";
 
 // const programVersion = (ON_NFT_VOTER_V2 ? Program<NftVoterV2> : Program<NftVoter>)
 // const idl = ON_NFT_VOTER_V2 ? IDLV2 : IDL
@@ -25,11 +26,22 @@ const DEFAULT_NFT_VOTER_PLUGIN_VERSION = ON_NFT_VOTER_V2
     : DEFAULT_NFT_VOTER_PLUGIN
 
 export abstract class NftVoterClient extends Client<any> {
-  readonly requiresInputVoterWeight = false;
+  readonly requiresInputVoterWeight = true;
 
-  // NO-OP TODO: Double-check
-  async createVoterWeightRecord(): Promise<TransactionInstruction | null> {
-    return null;
+  async createVoterWeightRecord(voter: PublicKey, realm: PublicKey, mint: PublicKey): Promise<TransactionInstruction | null> {
+    const instructions: TransactionInstruction[] = [];
+    const programVersion = await fetchProgramVersion(this.program.provider.connection, this.governanceProgramId)
+    await withCreateTokenOwnerRecord(
+        instructions,
+        this.governanceProgramId,
+        programVersion,
+        realm,
+        voter,
+        mint,
+        voter
+    )
+
+    return instructions[0]
   }
 
   // NO-OP
