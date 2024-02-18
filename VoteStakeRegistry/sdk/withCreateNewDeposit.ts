@@ -139,7 +139,7 @@ export const withCreateNewDeposit = async ({
     const createDepositEntryInstruction = await client?.program.methods
       .createDepositEntry(
         firstFreeIdx,
-        { [lockupKind]: {} },
+        { [lockupKind]: {} } as any, // The cast to any works around an anchor issue with interpreting enums
         //lockup starts now
         null,
         period,

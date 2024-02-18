@@ -10,7 +10,8 @@ export const tryGetVoter = async (
 ) => {
   try {
     const voter = await client?.program.account.voter.fetch(voterPk)
-    return voter as Voter
+    // The cast to any works around an anchor issue with interpreting enums
+    return voter as unknown as Voter
   } catch (e) {
     return null
   }

@@ -22,7 +22,6 @@ import { NewProposalContext } from 'pages/dao/[symbol]/proposal/new'
 import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/GovernedAccountSelect'
 import * as yup from 'yup'
 import {
-  Deposit,
   DepositWithMintAccount,
   getRegistrarPDA,
   emptyPk,
@@ -159,11 +158,12 @@ const Clawback = ({
         resp
           ?.filter(
             (x) =>
-              (x.account.deposits as Deposit[]).filter( // TODO [CT] check these type issues - Vsr program IDL doesn't seem to match
+              (x.account.deposits).filter(
                 (depo) => depo.allowClawback
               ).length
           )
-          .map((x) => x.account as Voter) || []
+            // The cast works around an anchor issue with interpreting enums
+          .map((x) => x.account as unknown as Voter) || []
 
       setVoters([...voters])
     }

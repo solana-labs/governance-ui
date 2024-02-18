@@ -7,7 +7,7 @@ import {
   DEFAULT_NFT_VOTER_PLUGIN_V2,
 } from '@tools/constants'
 import { ON_NFT_VOTER_V2 } from '@constants/flags'
-import {Client} from "@solana/governance-program-library";
+import {Client, DEFAULT_GOVERNANCE_PROGRAM_ID} from "@solana/governance-program-library";
 import {VoterWeightAction, withCreateTokenOwnerRecord} from "@solana/spl-governance";
 import {getVotingNfts} from "@hooks/queries/plugins/nftVoter";
 import {
@@ -60,7 +60,8 @@ export abstract class NftVoterClient extends Client<any> {
 
   constructor(
       public program: Program<NftVoterV2> | Program<NftVoter>,
-      public devnet?: boolean
+      public devnet: boolean,
+      readonly governanceProgramId: PublicKey
   ) {
     super(program, devnet)
   }
@@ -68,27 +69,30 @@ export abstract class NftVoterClient extends Client<any> {
   static async connect(
       provider: Provider,
       programId = new PublicKey(DEFAULT_NFT_VOTER_PLUGIN_VERSION),
-      devnet?: boolean
+      devnet = false,
+      governanceProgramId = DEFAULT_GOVERNANCE_PROGRAM_ID
   ): Promise<NftVoterClient> {
     if (ON_NFT_VOTER_V2) {
       return NftVoterClientV2.connect(
           provider,
           programId,
           devnet,
+          governanceProgramId
       )
     } else {
       return NftVoterClientV1.connect(
           provider,
           programId,
           devnet,
+          governanceProgramId
       )
     }
   }
 }
 
 export class NftVoterClientV1 extends NftVoterClient {
-  constructor(public program: Program<NftVoter>, public devnet?: boolean) {
-    super(program, devnet)
+  constructor(public program: Program<NftVoter>, public devnet: boolean, readonly governanceProgramId) {
+    super(program, devnet, governanceProgramId)
   }
 
   async updateVoterWeightRecord(voter: PublicKey, realm: PublicKey, mint: PublicKey, action: VoterWeightAction) {
@@ -115,18 +119,20 @@ export class NftVoterClientV1 extends NftVoterClient {
   static async connect(
       provider: Provider,
       programId = new PublicKey(DEFAULT_NFT_VOTER_PLUGIN_VERSION),
-      devnet?: boolean,
+      devnet = false,
+      governanceProgramId = DEFAULT_GOVERNANCE_PROGRAM_ID
   ): Promise<NftVoterClientV1> {
     return new NftVoterClientV1(
         new Program<NftVoter>(IDL, programId, provider),
-        devnet
+        devnet,
+        governanceProgramId
     )
   }
 }
 
 export class NftVoterClientV2 extends NftVoterClient {
-  constructor(public program: Program<NftVoterV2>, public devnet?: boolean) {
-    super(program, devnet)
+  constructor(public program: Program<NftVoterV2>, public devnet: boolean, readonly governanceProgramId) {
+    super(program, devnet, governanceProgramId)
   }
 
   async updateVoterWeightRecord(voter: PublicKey, realm: PublicKey, mint: PublicKey, action: VoterWeightAction) {
@@ -156,12 +162,14 @@ export class NftVoterClientV2 extends NftVoterClient {
   static async connect(
       provider: Provider,
       programId = new PublicKey(DEFAULT_NFT_VOTER_PLUGIN_VERSION),
-      devnet?: boolean
+      devnet = false,
+      governanceProgramId = DEFAULT_GOVERNANCE_PROGRAM_ID
   ): Promise<NftVoterClientV2> {
     console.log(programId.toBase58())
     return new NftVoterClientV2(
         new Program<NftVoterV2>(IDLV2, programId, provider),
-        devnet
+        devnet,
+        governanceProgramId
     )
   }
 }
