@@ -1,6 +1,5 @@
 import useWalletOnePointOh from './useWalletOnePointOh'
 import useRealm from './useRealm'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
 import { useAsyncCallback } from 'react-async-hook'
 import {
@@ -22,35 +21,28 @@ import { castVote } from 'actions/castVote'
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { notify } from '@utils/notifications'
 import { useRealmQuery } from './queries/realm'
-import { useRealmConfigQuery } from './queries/realmConfig'
 import { proposalQueryKeys, useRouteProposalQuery } from './queries/proposal'
 import useLegacyConnectionContext from './useLegacyConnectionContext'
-import { NFT_PLUGINS_PKS } from '@constants/plugins'
 import { TransactionInstruction } from '@solana/web3.js'
 import useProgramVersion from './useProgramVersion'
 import useVotingTokenOwnerRecords from './useVotingTokenOwnerRecords'
 import { useMemo } from 'react'
 import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
 import { useBatchedVoteDelegators } from '@components/VotePanel/useDelegators'
-import {useRealmVoterWeightPlugins} from "@hooks/useRealmVoterWeightPlugins";
+import {useVotingClient} from "@hooks/useVotingClient";
+import {useNftClient} from "../VoterWeightPlugins/useNftClient";
 
 export const useSubmitVote = () => {
   const wallet = useWalletOnePointOh()
   const connection = useLegacyConnectionContext()
   const realm = useRealmQuery().data?.result
-  const config = useRealmConfigQuery().data?.result
   const proposal = useRouteProposalQuery().data?.result
   const { realmInfo } = useRealm()
   const { closeNftVotingCountingModal } = useNftProposalStore.getState()
-  const client = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
-  )
+  const votingClient = useVotingClient('community'); // TODO this should be passed the role
+  const {nftClient} = useNftClient();
 
-  const isNftPlugin =
-    config?.account.communityTokenConfig.voterWeightAddin &&
-    NFT_PLUGINS_PKS.includes(
-      config?.account.communityTokenConfig.voterWeightAddin?.toBase58()
-    )
+  const isNftPlugin = !!nftClient;
 
   const selectedCommunityDelegator = useSelectedDelegatorStore(
     (s) => s.communityDelegator
@@ -60,9 +52,6 @@ export const useSubmitVote = () => {
   )
   const communityDelegators = useBatchedVoteDelegators('community')
   const councilDelegators = useBatchedVoteDelegators('council')
-    const {
-      updateVoterWeightRecords
-    } = useRealmVoterWeightPlugins('community' /* TODO */)
 
   const { error, loading, execute } = useAsyncCallback(
     async ({
@@ -143,7 +132,7 @@ export const useSubmitVote = () => {
           tokenOwnerRecordPk,
           vote,
           msg,
-          role === 'community' ? client : undefined, // NOTE: currently FE doesn't support council plugins fully
+          role === 'community' ? votingClient : undefined, // NOTE: currently FE doesn't support council plugins fully
           confirmationCallback,
           voteWeights,
           relevantDelegators
@@ -161,7 +150,7 @@ export const useSubmitVote = () => {
       } finally {
         if (isNftPlugin) {
           closeNftVotingCountingModal(
-            client.client as NftVoterClient,
+              votingClient.client as NftVoterClient,
             proposal!,
             wallet!.publicKey!
           )
@@ -192,10 +181,8 @@ export const useCreateVoteIxs = () => {
   const programVersion = useProgramVersion()
   const realm = useRealmQuery().data?.result
   const wallet = useWalletOnePointOh()
-  const votingPluginClient = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
-  )
   const getVotingTokenOwnerRecords = useVotingTokenOwnerRecords()
+  const votingClient = useVotingClient('community') // TODO this should be passed the role
 
   // get delegates
 
@@ -223,7 +210,7 @@ export const useCreateVoteIxs = () => {
             const votingTors = await getVotingTokenOwnerRecords(governingBody)
             for (const torPk of votingTors) {
               //will run only if any plugin is connected with realm
-              const votingPluginHelpers = await votingPluginClient?.withCastPluginVote(
+              const votingPluginHelpers = await votingClient.withCastPluginVote(
                 instructions,
                 proposal,
                 torPk
@@ -254,7 +241,7 @@ export const useCreateVoteIxs = () => {
       getVotingTokenOwnerRecords,
       programVersion,
       realm,
-      votingPluginClient,
+      votingClient,
       walletPk,
     ]
   )

@@ -3,7 +3,7 @@ import {useRealmQuery} from "@hooks/queries/realm";
 import useWalletOnePointOh from "@hooks/useWalletOnePointOh";
 import {VotingClient} from "@utils/uiTypes/VotePlugin";
 
-const useVotingClient = (kind: 'community' | 'council' = 'community') => {
+export const useVotingClient = (kind: 'community' | 'council' = 'community') => {
     const voterWeightPluginDetails = useRealmVoterWeightPlugins(kind);
     const realm = useRealmQuery().data?.result
     const wallet = useWalletOnePointOh()

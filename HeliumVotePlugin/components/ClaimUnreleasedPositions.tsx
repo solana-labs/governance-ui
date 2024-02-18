@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { TransactionInstruction } from '@solana/web3.js'
 import { SecondaryButton } from '@components/Button'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import { chunks } from '@utils/helpers'
 import {

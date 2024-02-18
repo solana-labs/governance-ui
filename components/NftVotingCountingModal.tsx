@@ -6,7 +6,6 @@ import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
 import { useEffect, useState } from 'react'
 import useTransactionsStore from 'stores/useTransactionStore'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import Modal from './Modal'
 
 const NftVotingCountingModal = () => {
@@ -22,9 +21,6 @@ const NftVotingComponent = () => {
     countedNftsForProposal,
     proposal,
   } = useNftProposalStore()
-  const client = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
-  )
   const wallet = useWalletOnePointOh()
   const userPk = useUserOrDelegator()
   const votingNfts = useVotingNfts(userPk) ?? []

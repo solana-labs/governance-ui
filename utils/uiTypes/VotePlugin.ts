@@ -1,7 +1,6 @@
 import {ProgramAccount, Proposal, Realm, VoterWeightAction,} from '@solana/spl-governance'
 import {PublicKey, TransactionInstruction} from '@solana/web3.js'
 import {chunks} from '@utils/helpers'
-import {NFTWithMint} from './nfts'
 import {
   getRegistrarPDA as getPluginRegistrarPDA,
 } from '@utils/plugin/accounts'
@@ -17,11 +16,10 @@ import {getAssociatedTokenAddress} from '@blockworks-foundation/mango-v4'
 import queryClient from '@hooks/queries/queryClient'
 import asFindable from '@utils/queries/asFindable'
 import {UseVoterWeightPluginsReturnType} from "../../VoterWeightPlugins/useVoterWeightPlugins";
-import {HeliumVsrPluginClient} from "../../VoterWeightPlugins/clients/HeliumVsrPluginClient";
-import {NftVoterWeightPluginClient} from "../../VoterWeightPlugins/clients/NftVoterWeightPluginClient";
 import {convertTypeToVoterWeightAction} from "../../VoterWeightPlugins";
-import { Idl } from '@coral-xyz/anchor'
 import {Client} from "@solana/governance-program-library";
+import {NftVoterClient} from "@utils/uiTypes/NftVoterClient";
+import {HeliumVsrClient} from "../../HeliumVotePlugin/sdk/client";
 
 export type UpdateVoterWeightRecordTypes =
   | 'castVote'
@@ -31,14 +29,10 @@ export type UpdateVoterWeightRecordTypes =
   | 'signOffProposal'
 
 export interface VotingClientProps {
-  client: Client<Idl> | undefined
+  client: Client<any> | undefined
   realm: ProgramAccount<Realm> | undefined
   walletPk: PublicKey | null | undefined
   voterWeightPluginDetails: UseVoterWeightPluginsReturnType
-}
-
-export interface NFTWithMeta extends NFTWithMint {
-  getAssociatedTokenAccount(): Promise<string>
 }
 
 export enum VotingClientType {
@@ -68,14 +62,12 @@ interface ProgramAddresses {
   maxVoterWeightRecord: PublicKey | undefined
 }
 
-// TODO QV-2
 //Abstract for common functions that plugins will implement
 export class VotingClient {
-  client: Client<Idl> | undefined
+  client: Client<any> | undefined
   realm: ProgramAccount<Realm> | undefined
   walletPk: PublicKey | null | undefined
   heliumVsrVotingPositions: PositionWithMeta[]
-  gatewayToken: PublicKey
   oracles: PublicKey[]
   instructions: TransactionInstruction[]
   clientType: VotingClientType
@@ -91,11 +83,11 @@ export class VotingClient {
     this.noClient = true
     this.clientType = VotingClientType.NoClient
     this.voterWeightPluginDetails = voterWeightPluginDetails
-    if (this.client instanceof HeliumVsrPluginClient) {
+    if (this.client instanceof HeliumVsrClient) {
       this.clientType = VotingClientType.HeliumVsrClient
       this.noClient = false
     }
-    if (this.client instanceof NftVoterWeightPluginClient) {
+    if (this.client instanceof NftVoterClient) {
       this.clientType = VotingClientType.NftVoterClient
       this.noClient = false
     }
@@ -136,7 +128,7 @@ export class VotingClient {
     }
 
     // the helium client needs to add some additional accounts to the transaction
-    if (clientProgramId && this.client instanceof HeliumVsrPluginClient) {
+    if (clientProgramId && this.client instanceof HeliumVsrClient) {
       const remainingAccounts: AccountData[] = []
 
       const [registrar] = registrarKey(
@@ -197,7 +189,7 @@ export class VotingClient {
     }
   }
   withRelinquishVote = async (
-    instructions,
+    instructions: TransactionInstruction[],
     proposal: ProgramAccount<Proposal>,
     voteRecordPk: PublicKey,
     tokenOwnerRecord: PublicKey
@@ -222,7 +214,7 @@ export class VotingClient {
       return
     }
 
-    if (this.client instanceof HeliumVsrPluginClient) {
+    if (this.client instanceof HeliumVsrClient) {
       const remainingAccounts: AccountData[] = []
       const [registrar] = registrarKey(
         realm.pubkey,
@@ -281,7 +273,7 @@ export class VotingClient {
       }
     }
 
-    if (this.client instanceof NftVoterWeightPluginClient) {
+    if (this.client instanceof NftVoterClient) {
       const remainingAccounts: AccountData[] = []
       const { registrar } = await getPluginRegistrarPDA(
         realm.pubkey,

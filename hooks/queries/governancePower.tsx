@@ -16,10 +16,8 @@ import useGatewayPluginStore from 'GatewayPlugin/store/gatewayPluginStore'
 import { useAsync } from 'react-async-hook'
 import { useConnection } from '@solana/wallet-adapter-react'
 import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
-import {
-  useAddressQuery_CommunityTokenOwner,
-  useAddressQuery_CouncilTokenOwner,
-} from './addresses/tokenOwnerRecord'
+
+
 import {
   SimpleGatedVoterWeight,
   VoteNftWeight,
@@ -27,15 +25,13 @@ import {
   VoterWeight,
 } from '@models/voteWeights'
 import useUserOrDelegator from '@hooks/useUserOrDelegator'
-import { getVsrGovpower, useVsrGovpower } from './plugins/vsr'
+import { getVsrGovpower } from './plugins/vsr'
 import { PythClient } from '@pythnetwork/staking'
 import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet'
 import { findPluginName } from '@constants/plugins'
 import { nftRegistrarQuery } from './plugins/nftVoter'
 import queryClient from './queryClient'
-import { useEffect } from 'react'
 import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
-import useQuadraticPluginStore from 'QuadraticPlugin/store/quadraticPluginStore'
 
 export const getVanillaGovpower = async (
   connection: Connection,
