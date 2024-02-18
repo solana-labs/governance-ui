@@ -50,7 +50,6 @@ const useCreatePostMessageIx = () => {
 
       const plugin = await votingPluginClient?.withUpdateVoterWeightRecord(
         instructions,
-        userTorPk,
         'commentProposal',
         createNftTicketsIxs
       )

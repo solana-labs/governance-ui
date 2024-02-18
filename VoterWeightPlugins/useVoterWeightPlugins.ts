@@ -18,11 +18,12 @@ import { usePlugins } from './hooks/usePlugins'
 import { queryKeys } from './lib/utils'
 import { useVoterWeightPks } from './hooks/useVoterWeightPks'
 import { PluginName } from '@constants/plugins'
+import {VoterWeightAction} from "@solana/spl-governance";
 
 export interface UseVoterWeightPluginsReturnType {
   isReady: boolean
   plugins: VoterWeightPluginInfo[] | undefined // undefined means we are still loading
-  updateVoterWeightRecords: () => Promise<{
+  updateVoterWeightRecords: (action?: VoterWeightAction) => Promise<{
     pre: TransactionInstruction[]
     post: TransactionInstruction[]
   }>
@@ -78,7 +79,7 @@ export const useVoterWeightPlugins = (
     })
   }
 
-  const updateVoterWeightRecords = (): Promise<{
+  const updateVoterWeightRecords = (action?: VoterWeightAction): Promise<{
     pre: TransactionInstruction[]
     post: TransactionInstruction[]
   }> => {
@@ -87,13 +88,14 @@ export const useVoterWeightPlugins = (
     }
 
     return queryClient.fetchQuery({
-      queryKey: ['updateVoterWeightRecords', ...queryKeys(args)],
+      queryKey: ['updateVoterWeightRecords', ...queryKeys(args), action],
       queryFn: () =>
         updateVoterWeight({
           walletPublicKey,
           realmPublicKey,
           governanceMintPublicKey,
           connection,
+          action
         }),
     })
   }

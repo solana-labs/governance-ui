@@ -13,17 +13,7 @@ import {NftVoterV2} from "../../idls/nft_voter_v2";
 import {VoterWeightAction} from "@solana/spl-governance";
 import {UpdateVoterWeightRecordTypes} from "@utils/uiTypes/VotePlugin";
 import {getNftGovpower} from "@hooks/queries/governancePower";
-import {getTokenOwnerRecordAddressSync} from "../lib/utils";
-
-function convertVoterWeightActionToType(action: VoterWeightAction): UpdateVoterWeightRecordTypes {
-    switch (action) {
-        case VoterWeightAction.CastVote: return "castVote";
-        case VoterWeightAction.CommentProposal: return "commentProposal";
-        case VoterWeightAction.CreateGovernance: return "createGovernance";
-        case VoterWeightAction.CreateProposal: return "createProposal";
-        case VoterWeightAction.SignOffProposal: return "signOffProposal";
-    }
-}
+import {convertVoterWeightActionToType, getTokenOwnerRecordAddressSync} from "../lib/utils";
 
 export class NftVoterWeightPluginClient extends Client<any> {
     readonly requiresInputVoterWeight = false;
