@@ -10,6 +10,9 @@ import { ExclamationIcon } from '@heroicons/react/solid'
 import VanillaWithdrawTokensButton from '@components/TokenBalance/VanillaWithdrawTokensButton'
 import LockedCommunityVotingPower from '@components/ProposalVotingPower/LockedCommunityVotingPower'
 import PluginVotingPower from '@components/ProposalVotingPower/PluginVotingPower'
+import NftVotingPower from '@components/ProposalVotingPower/NftVotingPower'
+import PythVotingPower from "../../PythVotePlugin/components/PythVotingPower";
+import LockedCommunityNFTRecordVotingPower from "@components/ProposalVotingPower/LockedCommunityNFTRecordVotingPower";
 
 export default function GovernancePowerForRole({
   role,
@@ -73,9 +76,13 @@ export default function GovernancePowerForRole({
               </div>
             </>
           )
-        ) : (
-          <PluginVotingPower role={role} />
-        )
+        ) : kind === 'NFT' ? (
+                <NftVotingPower />)
+            : kind === 'pyth' ? (
+                <PythVotingPower role='community' />
+            ) : kind === 'HeliumVSR' ? (
+                <LockedCommunityNFTRecordVotingPower />
+            ) : <PluginVotingPower role='community'/>
       ) : kind === 'vanilla' ? (
         <div>
           <VanillaVotingPower role="council" {...props} />
