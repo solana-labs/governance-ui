@@ -11,7 +11,7 @@ export const usePlugins = (args: UseVoterWeightPluginsArgs): UseQueryResult<Vote
     const { connection } = useConnection()
 
     return useQuery(
-        ['fetchPlugins', queryKeys(args)],
+        ['getPlugins', queryKeys(args)],
         () => getPlugins({
             ...(args as Required<UseVoterWeightPluginsArgs>),
             connection,
