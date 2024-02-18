@@ -27,6 +27,7 @@ import { fetchDigitalAssetsByOwner } from './queries/digitalAssets'
 import { useNftRegistrarCollection } from './useNftRegistrarCollection'
 import { useAsync } from 'react-async-hook'
 import {useVsrClient} from "../VoterWeightPlugins/useVsrClient";
+import {useNftRegistrar} from "@hooks/useNftRegistrar";
 
 export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
   const { getRpcContext } = useRpcContext()
@@ -61,9 +62,7 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
   // In buildTopVoters.ts, it checks whether the token_owner_record is in the vote_record.
   // If not, the function use record.account.governingTokenDepositAmount as the undecided vote weight, where nft-voter should be 0.
   // Thus, pre-calculating the undecided weight for each nft voter is necessary.
-  const [nftMintRegistrar] = useVotePluginsClientStore((s) => [
-    s.state.nftMintRegistrar,
-  ])
+  const nftMintRegistrar = useNftRegistrar();
   const usedCollectionsPks: string[] = useNftRegistrarCollection()
 
   const { result: undecidedNftsByVoteRecord } = useAsync(async () => {

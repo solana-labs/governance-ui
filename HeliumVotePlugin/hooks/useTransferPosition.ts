@@ -4,7 +4,6 @@ import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { useAsyncCallback } from 'react-async-hook'
 import { PositionWithMeta } from '../sdk/types'
 import { PROGRAM_ID, init, daoKey } from '@helium/helium-sub-daos-sdk'
-import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
 import { notify } from '@utils/notifications'
 import {

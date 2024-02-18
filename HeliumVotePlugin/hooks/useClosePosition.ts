@@ -4,7 +4,6 @@ import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { useAsyncCallback } from 'react-async-hook'
 import { PositionWithMeta } from '../sdk/types'
 import useRealm from '@hooks/useRealm'
-import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import { useSolanaUnixNow } from '@hooks/useSolanaUnixNow'
 import { SequenceType } from '@blockworks-foundation/mangolana/lib/globalTypes'
 import { notify } from '@utils/notifications'
@@ -14,7 +13,6 @@ import {
 } from '@utils/sendTransactions'
 import { withCreateTokenOwnerRecord } from '@solana/spl-governance'
 import { useRealmQuery } from '@hooks/queries/realm'
-import {useVotingClient} from "@hooks/useVotingClient";
 import {useHeliumClient} from "../../VoterWeightPlugins/useHeliumClient";
 
 export const useClosePosition = () => {
