@@ -44,6 +44,7 @@ import {
 } from '@hooks/queries/mintInfo'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
+import {useVotingClient} from "@hooks/useVotingClient";
 
 const SOL_BUFFER = 0.02
 
