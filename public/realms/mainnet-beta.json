@@ -3471,9 +3471,10 @@
     "displayName": "Whanau OPANZ",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "CRy7DaqT5CT49tiT7F52v1irgEmxT5zSMXYZYCN182rm",
-    "bannerImage": "/realms/whaopdao/WhanauOPANZ.png",
+    "bannerImage": "/realms/whaopdao/WhanauOPANZrs.png",
     "ogImage": "/realms/whaopdao/OPANZWhanau.png",
     "website": "https://opanz.nz",
-    "twitter": "@OPANZ_OPDA"
+    "twitter": "@OPANZ_OPDA",
+    "shortDescription": "Official Whanau OPANZ Governance DAO"
   }
 ]
