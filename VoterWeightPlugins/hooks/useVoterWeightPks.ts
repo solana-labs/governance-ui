@@ -33,7 +33,7 @@ export const useVoterWeightPks = (args: Args): {
 
     const lastPlugin = plugins[plugins.length - 1];
     const { voterWeightPk} = lastPlugin.client.getVoterWeightRecordPDA(realmPublicKey, governanceMintPublicKey, walletPublicKey);
-    const { maxVoterWeightPk} = lastPlugin.client.getMaxVoterWeightRecordPDA(realmPublicKey, governanceMintPublicKey);
+    const { maxVoterWeightPk} = lastPlugin.client.getMaxVoterWeightRecordPDA(realmPublicKey, governanceMintPublicKey) || {};
 
     return {
         voterWeightPk,

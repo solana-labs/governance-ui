@@ -111,8 +111,9 @@ export class VotingClient {
     createNftActionTicketIxs?: TransactionInstruction[]
   ): Promise<ProgramAddresses | undefined> => {
     const updateVoterWeightRecordIxes = await this.voterWeightPluginDetails.updateVoterWeightRecords(VoterWeightAction.CastVote);
+    const updateMaxVoterWeightRecordIxes = await this.voterWeightPluginDetails.updateMaxVoterWeightRecords();
     const { voterWeightPk, maxVoterWeightPk } = this.voterWeightPluginDetails;
-    instructions.push(...updateVoterWeightRecordIxes.pre);
+    instructions.push(...updateMaxVoterWeightRecordIxes, ...updateVoterWeightRecordIxes.pre);
     createNftActionTicketIxs?.push(...updateVoterWeightRecordIxes.post || []);
 
     const clientProgramId = this.client?.program.programId

@@ -33,9 +33,7 @@ export const DEFAULT_CIVIC_CONFIG = {
 
 export const DEFAULT_QV_CONFIG = {
   votingProgramId: new PublicKey('quadCSapU8nTdLg73KHDnmdxKnJQsh7GUbu5tZfnRRr'),
-  maxVotingProgramId: new PublicKey(
-    'quadCSapU8nTdLg73KHDnmdxKnJQsh7GUbu5tZfnRRr',
-  ),
+  maxVotingProgramId: undefined, // the QV plugin does not use a max voting weight record.
 };
 
 const itemStyles = cx(

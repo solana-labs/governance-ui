@@ -137,7 +137,7 @@ function votingStructureText(
     newText = 'Civic';
   } else if (
     votingPluginDiff[1]?.equals(DEFAULT_QV_CONFIG.votingProgramId) &&
-    maxVotingPluginDiff[1]?.equals(DEFAULT_QV_CONFIG.maxVotingProgramId)
+    typeof maxVotingPluginDiff[1] === 'undefined'
   ) {
     newText = 'QV';
   } else if (votingPluginDiff[1] || maxVotingPluginDiff[1]) {
