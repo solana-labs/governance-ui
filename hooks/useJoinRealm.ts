@@ -37,9 +37,11 @@ export const useJoinRealm = (): UseJoinRealmReturnType => {
                 realm.account.communityMint,
                 wallet.publicKey)
         }
+        console.log('onboardUserIxes', onboardUserIxes)
+        console.log('createVoterWeightRecords', createVoterWeightRecords)
 
         const createVoterWeightRecordIxes = await createVoterWeightRecords();
-        return [...onboardUserIxes, ...createVoterWeightRecordIxes]
+        return [...createVoterWeightRecordIxes, ...onboardUserIxes]
     }, [realm?.pubkey.toBase58(), wallet?.publicKey?.toBase58(), programVersion, userNeedsTokenOwnerRecord])
 
     return {
