@@ -137,8 +137,13 @@ export const useVoterWeightPlugins = (
   const includesPlugin = (pluginName: PluginName) =>
     plugins?.some((plugin) => plugin.name === pluginName) || false
 
+  // if we have the plugins, we are ready
+  // otherwise, if the realm exists, and the governance mint does not, we have nothing to load
+  // an example of this is a realm with no council token.
+  const isReady = plugins !== undefined || (!!realmPublicKey && !governanceMintPublicKey)
+
   return {
-    isReady: plugins !== undefined,
+    isReady,
     updateVoterWeightRecords,
     createVoterWeightRecords,
     updateMaxVoterWeightRecords,

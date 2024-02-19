@@ -79,6 +79,14 @@ const TokenBalanceCardInner = ({
     return <LockPluginTokenBalanceCard inAccountDetails={inAccountDetails} /> // does this ever actually occur in the component hierarchy?
   }
 
+  console.log('TokenBalanceCardWrapper', {
+    vsrMode,
+    ownTokenRecord,
+    isNftMode,
+    isGatewayMode,
+    inAccountDetails
+  })
+
   if (
     vsrMode === 'helium' &&
     (!ownTokenRecord ||
