@@ -14,9 +14,9 @@ import {
   getUpdateVoterWeightRecordInstruction,
   getUpdateVoterWeightRecordInstructionV2
 } from "@utils/instructions/NftVoter/updateVoterWeight";
-import {convertVoterWeightActionToType, getTokenOwnerRecordAddressSync} from "../../VoterWeightPlugins/lib/utils";
+import {convertVoterWeightActionToType} from "../../VoterWeightPlugins/lib/utils";
 import BN from "bn.js";
-import {getNftGovpower} from "@hooks/queries/governancePower";
+import {getNftGovpowerForOwner} from "@hooks/queries/governancePower";
 import {fetchProgramVersion} from "@hooks/queries/useProgramVersionQuery";
 
 // const programVersion = (ON_NFT_VOTER_V2 ? Program<NftVoterV2> : Program<NftVoter>)
@@ -53,9 +53,8 @@ export abstract class NftVoterClient extends Client<any> {
   async updateMaxVoterWeightRecord(): Promise<TransactionInstruction | null> {
     return null;
   }
-  async calculateVoterWeight(voter: PublicKey, realm: PublicKey, mint: PublicKey): Promise<BN | null> {
-    const [TOR] = getTokenOwnerRecordAddressSync(realm, mint, voter)
-    return getNftGovpower(this.program.provider.connection, realm, TOR);
+  async calculateVoterWeight(voter: PublicKey, realm: PublicKey): Promise<BN | null> {
+    return getNftGovpowerForOwner(this.program.provider.connection, realm, voter);
   }
 
   constructor(

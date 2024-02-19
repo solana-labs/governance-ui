@@ -10,7 +10,7 @@ type CalculateVoterWeightParams = {
     realmPublicKey: PublicKey,
     governanceMintPublicKey: PublicKey
     plugins: VoterWeightPluginInfo[],
-    tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>,
+    tokenOwnerRecord?: ProgramAccount<TokenOwnerRecord>,
     useOnChainWeight?: boolean
 }
 
@@ -70,7 +70,7 @@ export const calculateVoterWeight = async ({
   plugins,
   tokenOwnerRecord
 }: CalculateVoterWeightParams): Promise<CalculatedWeight> => {
-    const tokenOwnerRecordPower = tokenOwnerRecord?.account.governingTokenDepositAmount;
+    const tokenOwnerRecordPower = tokenOwnerRecord?.account.governingTokenDepositAmount ?? new BN(0)
 
     const startingWeight: CalculatedWeight = {
         value: tokenOwnerRecordPower,
