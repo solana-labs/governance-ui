@@ -11,8 +11,9 @@ import VanillaWithdrawTokensButton from '@components/TokenBalance/VanillaWithdra
 import LockedCommunityVotingPower from '@components/ProposalVotingPower/LockedCommunityVotingPower'
 import PluginVotingPower from '@components/ProposalVotingPower/PluginVotingPower'
 import NftVotingPower from '@components/ProposalVotingPower/NftVotingPower'
-import PythVotingPower from "../../PythVotePlugin/components/PythVotingPower";
-import LockedCommunityNFTRecordVotingPower from "@components/ProposalVotingPower/LockedCommunityNFTRecordVotingPower";
+import PythVotingPower from '../../PythVotePlugin/components/PythVotingPower'
+import LockedCommunityNFTRecordVotingPower from '@components/ProposalVotingPower/LockedCommunityNFTRecordVotingPower'
+import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
 
 export default function GovernancePowerForRole({
   role,
@@ -36,6 +37,8 @@ export default function GovernancePowerForRole({
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
 
+  const { plugins, isReady } = useRealmVoterWeightPlugins(role)
+
   const { result: kind } = useAsync(async () => {
     if (realmPk === undefined) return undefined
     return determineVotingPowerType(connection, realmPk, role)
@@ -50,7 +53,7 @@ export default function GovernancePowerForRole({
   return (
     <>
       {role === 'community' ? (
-        kind === 'vanilla' ? (
+        kind === 'vanilla' || (isReady && plugins?.length === 0) ? (
           <div>
             <VanillaVotingPower role="community" {...props} />
             <Deposit role="community" />
@@ -77,13 +80,15 @@ export default function GovernancePowerForRole({
             </>
           )
         ) : kind === 'NFT' ? (
-                <NftVotingPower />)
-            : kind === 'pyth' ? (
-                <PythVotingPower role='community' />
-            ) : kind === 'HeliumVSR' ? (
-                <LockedCommunityNFTRecordVotingPower />
-            ) : <PluginVotingPower role='community'/>
-      ) : kind === 'vanilla' ? (
+          <NftVotingPower />
+        ) : kind === 'pyth' ? (
+          <PythVotingPower role="community" />
+        ) : kind === 'HeliumVSR' ? (
+          <LockedCommunityNFTRecordVotingPower />
+        ) : isReady && plugins?.length > 0 ? (
+          <PluginVotingPower role="community" />
+        ) : null
+      ) : kind === 'vanilla' || (isReady && plugins?.length === 0) ? (
         <div>
           <VanillaVotingPower role="council" {...props} />
           <Deposit role="council" />
