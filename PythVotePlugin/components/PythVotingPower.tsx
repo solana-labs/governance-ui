@@ -75,17 +75,6 @@ export default function PythVotingPower({
       : realmConfig?.account.councilTokenConfig.tokenType ===
       GoverningTokenType.Dormant
 
-  console.log("pythVotingPower", {
-    role,
-    realmConfig,
-    disabled,
-    realm,
-    mintInfo,
-    totalAmount,
-    formattedTotal,
-    tokenName,
-  })
-
   return (
     <div
       className={clsx(
