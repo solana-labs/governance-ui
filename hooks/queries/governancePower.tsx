@@ -45,50 +45,53 @@ export const useVanillaGovpower = (tokenOwnerRecordPk: PublicKey) => {
     : new BN(0)
 }
 
-export const getNftGovpower = async (
-  connection: Connection,
-  realmPk: PublicKey,
-  tokenOwnerRecordPk: PublicKey
-) => {
+export const getNftGovpowerForOwner = async (connection: Connection, realmPk: PublicKey, owner: PublicKey) => {
   // figure out what collections are used
-  const { result: registrar } = await queryClient.fetchQuery(
-    nftRegistrarQuery(connection, realmPk)
+  const {result: registrar} = await queryClient.fetchQuery(
+      nftRegistrarQuery(connection, realmPk)
   )
   if (registrar === undefined) throw new Error()
-  const { collectionConfigs } = registrar
-
-  // grab the owner of the TOR
-  const { result: TOR } = await fetchTokenOwnerRecordByPubkey(
-    connection,
-    tokenOwnerRecordPk
-  )
-  if (TOR === undefined) throw new Error()
-  const owner = TOR.account.governingTokenOwner
+  const {collectionConfigs} = registrar
 
   // grab the user nfts
   const network = getNetworkFromEndpoint(connection.rpcEndpoint)
   if (network === 'localnet') throw new Error()
   const nfts = (await fetchDigitalAssetsByOwner(network, owner))
-    // filter cnfts if not supported yet
-    .filter((nft) => ON_NFT_VOTER_V2 || !nft.compression.compressed)
+      // filter cnfts if not supported yet
+      .filter((nft) => ON_NFT_VOTER_V2 || !nft.compression.compressed)
 
   // map nfts to power and sum them
   const power = nfts
-    .map(
-      (nft) =>
-        // find collectionConfig such that the nft's `collection` grouping matches the collection id
-        collectionConfigs.find(
-          (x) =>
-            x.collection.toString() ===
-            (nft.grouping.find((y) => y.group_key === 'collection')
-              ?.group_value ?? false)
-          // take the weight for that collection, or 0 if the nft matches none of the dao's collections
-        )?.weight ?? new BN(0)
-    )
-    // sum
-    .reduce((partialSum, a) => partialSum.add(a), new BN(0))
+      .map(
+          (nft) =>
+              // find collectionConfig such that the nft's `collection` grouping matches the collection id
+              collectionConfigs.find(
+                  (x) =>
+                      x.collection.toString() ===
+                      (nft.grouping.find((y) => y.group_key === 'collection')
+                          ?.group_value ?? false)
+                  // take the weight for that collection, or 0 if the nft matches none of the dao's collections
+              )?.weight ?? new BN(0)
+      )
+      // sum
+      .reduce((partialSum, a) => partialSum.add(a), new BN(0))
 
   return power
+}
+
+export const getNftGovpower = async (
+  connection: Connection,
+  realmPk: PublicKey,
+  tokenOwnerRecordPk: PublicKey
+) => {
+  // grab the owner of the TOR
+  const { result: TOR } = await fetchTokenOwnerRecordByPubkey(
+      connection,
+      tokenOwnerRecordPk
+  )
+  if (TOR === undefined) throw new Error()
+  const owner = TOR.account.governingTokenOwner
+  return getNftGovpowerForOwner(connection, realmPk, owner);
 }
 
 // TODO [CT] replaced with PythVoterWeightPluginClient

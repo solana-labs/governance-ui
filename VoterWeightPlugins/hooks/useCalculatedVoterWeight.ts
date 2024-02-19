@@ -8,9 +8,15 @@ type Args = UseVoterWeightPluginsArgs & {
     tokenOwnerRecord?: ProgramAccount<TokenOwnerRecord>
 }
 
-const argsAreSet = (args: Args): args is Required<Args> =>
+// args, where all the necessary properties are marked as required - we can calculate once they are all set
+type RequiredArgs = Required<UseVoterWeightPluginsArgs> & {
+    plugins: VoterWeightPluginInfo[],
+    tokenOwnerRecord?: ProgramAccount<TokenOwnerRecord>
+};
+
+const argsAreSet = (args: Args): args is RequiredArgs =>
     args.realmPublicKey !== undefined && args.governanceMintPublicKey !== undefined && args.walletPublicKey !== undefined &&
-    args.plugins !== undefined && args.tokenOwnerRecord !== undefined
+    args.plugins !== undefined
 
 export const useCalculatedVoterWeight = (args: Args): UseQueryResult<CalculatedWeight> =>
     useQuery(
@@ -19,8 +25,9 @@ export const useCalculatedVoterWeight = (args: Args): UseQueryResult<CalculatedW
             args.realmPublicKey?.toString(),
             args.governanceMintPublicKey?.toString(),
             args.walletPublicKey?.toString(),
+            args.tokenOwnerRecord?.pubkey.toString()
         ],
-        () => calculateVoterWeight(args as Required<Args>),
+        () => calculateVoterWeight(args as RequiredArgs),
         {
             enabled: argsAreSet(args),
         }
