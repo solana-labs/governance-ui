@@ -53,6 +53,9 @@ const GovernancePowerCard = () => {
 
   const realmConfig = useRealmConfigQuery().data?.result
 
+  console.log("community token type", realmConfig?.account.communityTokenConfig.tokenType)
+    console.log("council token type", realmConfig?.account.councilTokenConfig.tokenType)
+
   return (
     <div>
       <GovernancePowerTitle />

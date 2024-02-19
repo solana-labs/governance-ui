@@ -1,5 +1,6 @@
 import { createContext } from 'react';
 
+import { useVotingClient } from '@hooks/useVotingClient';
 import { ClusterType, useCluster } from '@hub/hooks/useCluster';
 import {
   useProposalCreationProgress,
@@ -10,7 +11,6 @@ import { useToast, ToastType } from '@hub/hooks/useToast';
 import { useWallet } from '@hub/hooks/useWallet';
 
 import { createProposal } from './createProposal';
-import {useVotingClient} from "@hooks/useVotingClient";
 
 type CreateProposalsArgs = Omit<
   Parameters<typeof createProposal>[0],

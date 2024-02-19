@@ -114,14 +114,14 @@ export const getPythGovPower = async (
 export const determineVotingPowerType = async (
   connection: Connection,
   realmPk: PublicKey,
-  kind: 'council' | 'community'
+  role: 'council' | 'community'
 ) => {
   const realm = (await fetchRealmByPubkey(connection, realmPk)).result
   if (!realm) throw new Error()
 
   const config = await fetchRealmConfigQuery(connection, realmPk)
   const programId =
-    kind === 'community'
+    role === 'community'
       ? config.result?.account.communityTokenConfig.voterWeightAddin
       : config.result?.account.councilTokenConfig.voterWeightAddin
 

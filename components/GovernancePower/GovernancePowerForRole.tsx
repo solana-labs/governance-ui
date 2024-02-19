@@ -14,6 +14,9 @@ import NftVotingPower from '@components/ProposalVotingPower/NftVotingPower'
 import PythVotingPower from '../../PythVotePlugin/components/PythVotingPower'
 import LockedCommunityNFTRecordVotingPower from '@components/ProposalVotingPower/LockedCommunityNFTRecordVotingPower'
 import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
+import {PluginName} from "@constants/plugins";
+
+type VotingPowerDisplayType = PluginName | 'composite';
 
 export default function GovernancePowerForRole({
   role,
@@ -37,10 +40,12 @@ export default function GovernancePowerForRole({
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
 
-  const { plugins, isReady } = useRealmVoterWeightPlugins(role)
+  const { plugins } = useRealmVoterWeightPlugins(role)
 
-  const { result: kind } = useAsync(async () => {
+  const { result: kind } = useAsync<VotingPowerDisplayType | undefined>(async () => {
     if (realmPk === undefined) return undefined
+    // if there are multiple plugins, show the generic plugin voting power
+    if ((plugins?.length ?? 0) > 1) return 'composite';
     return determineVotingPowerType(connection, realmPk, role)
   }, [connection, realmPk, role])
 
@@ -49,11 +54,10 @@ export default function GovernancePowerForRole({
       <div className="animate-pulse bg-bkg-1 col-span-1 h-[76px] rounded-lg" />
     )
   }
-
   return (
     <>
       {role === 'community' ? (
-        kind === 'vanilla' || (isReady && plugins?.length === 0) ? (
+        kind === 'vanilla' ? (
           <div>
             <VanillaVotingPower role="community" {...props} />
             <Deposit role="community" />
@@ -85,10 +89,10 @@ export default function GovernancePowerForRole({
           <PythVotingPower role="community" />
         ) : kind === 'HeliumVSR' ? (
           <LockedCommunityNFTRecordVotingPower />
-        ) : isReady && plugins?.length && plugins?.length > 0 ? (
+        ) : kind === 'composite' ? (
           <PluginVotingPower role="community" />
         ) : null
-      ) : kind === 'vanilla' || (isReady && plugins?.length === 0) ? (
+      ) : kind === 'vanilla' ? (
         <div>
           <VanillaVotingPower role="council" {...props} />
           <Deposit role="council" />
