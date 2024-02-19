@@ -85,7 +85,7 @@ export default function GovernancePowerForRole({
           <PythVotingPower role="community" />
         ) : kind === 'HeliumVSR' ? (
           <LockedCommunityNFTRecordVotingPower />
-        ) : isReady && plugins?.length > 0 ? (
+        ) : isReady && plugins?.length && plugins?.length > 0 ? (
           <PluginVotingPower role="community" />
         ) : null
       ) : kind === 'vanilla' || (isReady && plugins?.length === 0) ? (
