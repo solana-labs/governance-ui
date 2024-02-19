@@ -1,4 +1,4 @@
-import { Program, Provider, web3 } from '@coral-xyz/anchor'
+import { Program, Provider, web3} from '@coral-xyz/anchor'
 import { IDL, VoterStakeRegistry } from './voter_stake_registry'
 import {Client} from "@solana/governance-program-library";
 import {PublicKey, TransactionInstruction} from "@solana/web3.js";
@@ -13,6 +13,39 @@ export const DEFAULT_VSR_ID = new web3.PublicKey(
 
 export class VsrClient extends Client<typeof IDL> {
   readonly requiresInputVoterWeight = false;
+
+  getRegistrarPDA(realm: PublicKey, mint: PublicKey) {
+    const [registrar, registrarBump] = PublicKey.findProgramAddressSync(
+        [realm.toBuffer(), Buffer.from('registrar'), mint.toBuffer()],
+        this.program.programId
+    )
+    return {
+      registrar,
+      registrarBump,
+    }
+  }
+
+  getVoterWeightRecordPDA(realm: PublicKey, mint: PublicKey, walletPk: PublicKey) {
+    const {registrar} = this.getRegistrarPDA(realm, mint);
+
+    const [voterWeightPk, voterWeightRecordBump] = PublicKey.findProgramAddressSync(
+        [
+          registrar.toBuffer(),
+          Buffer.from('voter-weight-record'),
+          walletPk.toBuffer(),
+        ],
+        this.program.programId
+    )
+
+    return {
+      voterWeightPk,
+      voterWeightRecordBump,
+    }
+  }
+
+  async getVoterWeightRecord() {
+    return null;
+  }
 
   // NO-OP TODO: How are Vsr voter weight records created?
   async createVoterWeightRecord(): Promise<TransactionInstruction | null> {
@@ -45,6 +78,7 @@ export class VsrClient extends Client<typeof IDL> {
     return null;
   }
   async calculateVoterWeight(voter: PublicKey, realm: PublicKey): Promise<BN | null> {
+    // TODO should use vsr govpower multi? see useVsrGovpowerMulti
     const govPower = await getVsrGovpower(
         this.program.provider.connection,
         realm,
