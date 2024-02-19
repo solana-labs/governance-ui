@@ -1579,7 +1579,7 @@ const instructions = () => ({
       }
     },
   },
-  73195: {
+  11366: {
     name: 'Withdraw all token fees',
     accounts: [
       { name: 'Group' },

@@ -23,7 +23,7 @@ export const useProfile = (
     : undefined
 
   const { data: profile, isLoading } = useQuery(
-    ['profile', profileWalletPublicKey],
+    ['Civic Profile', profileWalletPublicKey?.toBase58() + 'Civic'],
     // @ts-ignore we won't run this if there is no profileWalletPublicKey
     () => CivicProfile.get(profileWalletPublicKey?.toBase58(), options),
     {
