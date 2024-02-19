@@ -68,7 +68,6 @@ export default function NftVotingPower(props: Props) {
     'community'
   )
 
-  // TODO QV-2 use the new hook
   const maxWeight = useNftPluginStore((s) => s.state.maxVoteRecord)
 
   const displayNfts = (nfts ?? []).slice(0, 3)
@@ -78,7 +77,7 @@ export default function NftVotingPower(props: Props) {
     : null
   const amount = new BigNumber((calculatedVoterWeight?.value ?? 0).toString())
 
-  if (isReady || nfts === undefined) {
+  if (!isReady || nfts === undefined) {
     return (
       <div
         className={classNames(
