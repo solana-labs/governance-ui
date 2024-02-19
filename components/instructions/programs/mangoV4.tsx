@@ -567,6 +567,7 @@ const instructions = () => ({
               <DisplayListingPropertyWrapped
                 label="Flash Loan Deposit Fee Rate"
                 valKey="flashLoanSwapFeeRate"
+                suffix=" bps"
               />
               <DisplayListingProperty
                 label="Deposit Limit (compared with 5% margin)"
@@ -941,7 +942,10 @@ const instructions = () => ({
             args.tokenConditionalSwapMakerFeeRateOpt,
           tokenConditionalSwapTakerFeeRate:
             args.tokenConditionalSwapTakerFeeRateOpt,
-          flashLoanSwapFeeRate: args.flashLoanSwapFeeRateOpt,
+          flashLoanSwapFeeRate:
+            args.flashLoanSwapFeeRateOpt !== undefined
+              ? (args.loanOriginationFeeRateOpt * 10000)?.toFixed(2)
+              : undefined,
           reduceOnly:
             args.reduceOnlyOpt !== undefined
               ? REDUCE_ONLY_OPTIONS[args.reduceOnlyOpt].name
@@ -1411,9 +1415,18 @@ const instructions = () => ({
               />
               <DisplayNullishProperty
                 label="Flash Loan Swap Fee Rate"
-                value={parsedArgs.flashLoanSwapFeeRate}
-                currentValue={bankFormattedValues?.flashLoanSwapFeeRate}
-                suggestedVal={invalidFields.flashLoanSwapFeeRate}
+                value={
+                  parsedArgs.flashLoanSwapFeeRate &&
+                  `${parsedArgs.flashLoanSwapFeeRate} bps`
+                }
+                currentValue={
+                  bankFormattedValues?.flashLoanSwapFeeRate &&
+                  `${bankFormattedValues.flashLoanSwapFeeRate} bps`
+                }
+                suggestedVal={
+                  invalidFields.flashLoanSwapFeeRate &&
+                  `${invalidFields.flashLoanSwapFeeRate} bps`
+                }
               />
               <DisplayNullishProperty
                 label="Reduce only"
@@ -1939,7 +1952,7 @@ const getFormattedListingValues = (args: FlatListingArgs) => {
     stablePriceGrowthLimit: (args.stablePriceGrowthLimit * 100).toFixed(2),
     tokenConditionalSwapMakerFeeRate: args.tokenConditionalSwapMakerFeeRate,
     tokenConditionalSwapTakerFeeRate: args.tokenConditionalSwapTakerFeeRate,
-    flashLoanSwapFeeRate: args.flashLoanSwapFeeRate,
+    flashLoanSwapFeeRate: (args.flashLoanSwapFeeRate * 10000).toFixed(2),
     reduceOnly: REDUCE_ONLY_OPTIONS[args.reduceOnly].name,
     depositLimit: args.depositLimit.toString(),
     interestTargetUtilization: args.interestTargetUtilization,
