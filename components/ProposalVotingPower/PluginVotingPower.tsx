@@ -1,5 +1,4 @@
 import classNames from 'classnames'
-import { useState } from 'react'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 
 import { TokenDeposit } from '@components/TokenBalance/TokenDeposit'
@@ -9,7 +8,6 @@ import { GoverningTokenRole } from '@solana/spl-governance'
 import { BigNumber } from 'bignumber.js'
 import clsx from 'clsx'
 import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
-import Modal from '@components/Modal'
 import QuadraticVotingInfoModal from './QuadraticVotingInfoModal'
 
 interface Props {
@@ -24,7 +22,13 @@ export default function PluginVotingPower({ role, className }: Props) {
     ?.result
 
   const isLoading = useDepositStore((s) => s.state.isLoading)
-  const { calculatedVoterWeight, isReady } = useRealmVoterWeightPlugins(role)
+  const {
+    calculatedVoterWeight,
+    isReady,
+    plugins,
+  } = useRealmVoterWeightPlugins(role)
+  const isQuadratic =
+    plugins?.findIndex((plugin) => plugin.name === 'QV') !== -1
 
   const formattedTotal =
     mintInfo && calculatedVoterWeight?.value
@@ -46,41 +50,45 @@ export default function PluginVotingPower({ role, className }: Props) {
 
   return (
     <div className={clsx(className)}>
-      <div className="flex items-center">
-        <p className="mb-2">Quadratic Voting</p>
-        <QuadraticVotingInfoModal />
-      </div>
-      <div className={'p-3 rounded-md bg-bkg-1'}>
-        <div className="flex items-center justify-between mt-1">
-          <div className=" flex flex-col gap-x-2">
-            <div
-              className={clsx(
-                className,
-                !calculatedVoterWeight?.value ||
-                  (calculatedVoterWeight.value.isZero() && 'hidden')
-              )}
-            >
-              <div className={'p-3 rounded-md bg-bkg-1'}>
-                <div className="text-fgd-3 text-xs">QV Votes </div>
-                <div className="flex items-center justify-between mt-1">
-                  <div className=" flex flex-row gap-x-2">
-                    <div className="text-xl font-bold text-fgd-1 hero-text">
-                      {formattedTotal ?? 0}
+      {isQuadratic ? (
+        <div className="flex items-center">
+          <p className="mb-2">Quadratic Voting</p>
+          <QuadraticVotingInfoModal />
+          {/* TODO Display quadratic voting card here */}
+        </div>
+      ) : (
+        <div className={'p-3 rounded-md bg-bkg-1'}>
+          <div className="flex items-center justify-between mt-1">
+            <div className=" flex flex-col gap-x-2">
+              <div
+                className={clsx(
+                  className,
+                  !calculatedVoterWeight?.value ||
+                    (calculatedVoterWeight.value.isZero() && 'hidden')
+                )}
+              >
+                <div className={'p-3 rounded-md bg-bkg-1'}>
+                  <div className="text-fgd-3 text-xs">QV Votes</div>
+                  <div className="flex items-center justify-between mt-1">
+                    <div className=" flex flex-row gap-x-2">
+                      <div className="text-xl font-bold text-fgd-1 hero-text">
+                        {formattedTotal ?? 0}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="text-xl font-bold text-fgd-1 hero-text">
-              <TokenDeposit
-                mint={mintInfo}
-                tokenRole={GoverningTokenRole.Community}
-                inAccountDetails={true}
-              />
+              <div className="text-xl font-bold text-fgd-1 hero-text">
+                <TokenDeposit
+                  mint={mintInfo}
+                  tokenRole={GoverningTokenRole.Community}
+                  inAccountDetails={true}
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }
