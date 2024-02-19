@@ -29,12 +29,13 @@ const Join = () => {
   const realm = useRealmQuery().data?.result
   const { userNeedsTokenOwnerRecord, handleRegister } = useJoinRealm();
 
-  // TODO [CT] as per GatewayCard, we might want a separate join button thatis not specific to the nft plugin
+  // TODO [CT] as per GatewayCard, we might want a separate join button that is not specific to the nft plugin
   // this is no longer any way related to the nft plugin
   const join = async () => {
     if (!realm || !wallet?.publicKey) throw new Error()
 
     const instructions = await handleRegister();
+    console.log('join instructions', instructions)
     const transaction = new Transaction()
     transaction.add(...instructions)
 

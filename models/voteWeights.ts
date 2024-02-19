@@ -299,6 +299,10 @@ export class VoterWeight implements VoterWeightInterface {
   }
 
   canCreateProposal(config: GovernanceConfig) {
+    console.log("canCreateProposal", (
+        this.hasMinCommunityWeight(config.minCommunityTokensToCreateProposal) ||
+        this.hasMinCouncilWeight(config.minCouncilTokensToCreateProposal)
+    ));
     return (
         this.hasMinCommunityWeight(config.minCommunityTokensToCreateProposal) ||
         this.hasMinCouncilWeight(config.minCouncilTokensToCreateProposal)
@@ -337,6 +341,9 @@ export class VoterWeight implements VoterWeightInterface {
   }
 
   getTokenRecordToCreateProposal(config: GovernanceConfig, voteByCouncil: boolean) {
+    console.log('voteByCouncil', voteByCouncil)
+    console.log('this.councilTokenRecord', this.councilTokenRecord)
+    console.log('this.communityTokenRecord', this.communityTokenRecord)
     if (voteByCouncil) {
       return this.councilTokenRecord!
     }
@@ -367,10 +374,10 @@ export class LegacyVoterWeightAdapter extends VoterWeight {
   }
 
   hasMinCommunityWeight(minCommunityWeight: BN) {
-    return this.voterWeights.community?.gte(minCommunityWeight);
+    return !!this.communityTokenRecord && this.voterWeights.community?.gte(minCommunityWeight);
   }
   hasMinCouncilWeight(minCouncilWeight: BN) {
-    return this.voterWeights.council?.gte(minCouncilWeight);
+    return !!this.councilTokenRecord && this.voterWeights.council?.gte(minCouncilWeight);
   }
 
   hasMinAmountToVote(mintPk: PublicKey) {
