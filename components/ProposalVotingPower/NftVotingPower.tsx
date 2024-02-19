@@ -35,7 +35,6 @@ const Join = () => {
     if (!realm || !wallet?.publicKey) throw new Error()
 
     const instructions = await handleRegister();
-    console.log('join instructions', instructions)
     const transaction = new Transaction()
     transaction.add(...instructions)
 

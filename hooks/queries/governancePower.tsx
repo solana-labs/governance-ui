@@ -204,10 +204,6 @@ export const useLegacyVoterWeight = () => {
     community: communityTOR?.result,
     council: councilTOR?.result,
   });
-  console.log("useLegacyVoterWeight", {
-    community: communityTOR?.result,
-    council: councilTOR?.result,
-  });
   const ready = communityPluginDetails.isReady && councilPluginDetails.isReady;
 
   // only expose the vote weight once everything is loaded
