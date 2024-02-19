@@ -24,6 +24,27 @@ const DEFAULT_NFT_VOTER_PLUGIN_VERSION = ON_NFT_VOTER_V2
 export abstract class NftVoterClient extends Client<any> {
   readonly requiresInputVoterWeight = true;
 
+  getMaxVoterWeightRecordPDA(realm: PublicKey, mint: PublicKey): {
+    maxVoterWeightPk: PublicKey;
+    maxVoterWeightRecordBump: number
+  } | null {
+    const [
+      maxVoterWeightPk,
+      maxVoterWeightRecordBump,
+    ] = PublicKey.findProgramAddressSync(
+        [
+          Buffer.from('max-voter-weight-record'),
+          realm.toBuffer(),
+          mint.toBuffer(),
+        ],
+        this.program.programId
+    )
+    return {
+      maxVoterWeightPk,
+      maxVoterWeightRecordBump,
+    }
+  }
+
   async createVoterWeightRecord(voter: PublicKey, realm: PublicKey, mint: PublicKey): Promise<TransactionInstruction | null> {
     const { voterWeightPk } = this.getVoterWeightRecordPDA(realm, mint, voter)
     return this.program.methods
@@ -90,6 +111,12 @@ export class NftVoterClientV1 extends NftVoterClient {
   }
 
   async updateVoterWeightRecord(voter: PublicKey, realm: PublicKey, mint: PublicKey, action: VoterWeightAction) {
+    // Not clear why, but it seems like updateVoterWeightRecord is not called during cast vote
+    // for the nft plugin
+    if (action === VoterWeightAction.CastVote) {
+      return {pre: []}
+    }
+
     const {registrar} = this.getRegistrarPDA(realm, mint);
     const {voterWeightPk} = this.getVoterWeightRecordPDA(realm, mint, voter);
     const votingNfts = await getVotingNfts(
@@ -130,6 +157,12 @@ export class NftVoterClientV2 extends NftVoterClient {
   }
 
   async updateVoterWeightRecord(voter: PublicKey, realm: PublicKey, mint: PublicKey, action: VoterWeightAction) {
+    // Not clear why, but it seems like updateVoterWeightRecord is not called during cast vote
+    // for the nft plugin
+    if (action === VoterWeightAction.CastVote) {
+      return {pre: []}
+    }
+
     const {registrar} = this.getRegistrarPDA(realm, mint);
     const { voterWeightPk } = this.getVoterWeightRecordPDA(realm, mint, voter);
     const votingNfts = await getVotingNfts(
