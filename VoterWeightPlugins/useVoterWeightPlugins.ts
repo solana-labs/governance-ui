@@ -10,7 +10,6 @@ import {
 } from './lib/types'
 import { createMaxVoterWeight } from './lib/createMaxVoterWeight'
 import { updateMaxVoterWeight } from './lib/updateMaxVoterWeight'
-import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 import { useCalculatedVoterWeight } from './hooks/useCalculatedVoterWeight'
 import { useCalculatedMaxVoterWeight } from './hooks/useCalculatedMaxVoterWeight'
@@ -19,6 +18,7 @@ import { queryKeys } from './lib/utils'
 import { useVoterWeightPks } from './hooks/useVoterWeightPks'
 import { PluginName } from '@constants/plugins'
 import {VoterWeightAction} from "@solana/spl-governance";
+import {useTokenOwnerRecord} from "./hooks/useTokenOwnerRecord";
 
 export interface UseVoterWeightPluginsReturnType {
   isReady: boolean
@@ -44,8 +44,8 @@ export const useVoterWeightPlugins = (
 ): UseVoterWeightPluginsReturnType => {
   const { realmPublicKey, governanceMintPublicKey, walletPublicKey } = args
   const { connection } = useConnection()
-  const tokenOwnerRecord = useUserCommunityTokenOwnerRecord().data?.result
   const mintInfo = useRealmCommunityMintInfoQuery().data?.result
+  const tokenOwnerRecord = useTokenOwnerRecord(args);
   const { data: plugins } = usePlugins(args)
   const { data: calculatedVoterWeight} = useCalculatedVoterWeight({
     ...args,
