@@ -10,7 +10,7 @@ import {
 } from './lib/types'
 import { createMaxVoterWeight } from './lib/createMaxVoterWeight'
 import { updateMaxVoterWeight } from './lib/updateMaxVoterWeight'
-import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
+import {useMintInfoByPubkeyQuery} from '@hooks/queries/mintInfo'
 import { useCalculatedVoterWeight } from './hooks/useCalculatedVoterWeight'
 import { useCalculatedMaxVoterWeight } from './hooks/useCalculatedMaxVoterWeight'
 import { usePlugins } from './hooks/usePlugins'
@@ -44,8 +44,8 @@ export const useVoterWeightPlugins = (
 ): UseVoterWeightPluginsReturnType => {
   const { realmPublicKey, governanceMintPublicKey, walletPublicKey } = args
   const { connection } = useConnection()
-  const mintInfo = useRealmCommunityMintInfoQuery().data?.result
-  const tokenOwnerRecord = useTokenOwnerRecord(args);
+  const mintInfo = useMintInfoByPubkeyQuery(args.governanceMintPublicKey).data?.result;
+  const tokenOwnerRecord = useTokenOwnerRecord(args.governanceMintPublicKey);
   const { data: plugins } = usePlugins(args)
   const { data: calculatedVoterWeight} = useCalculatedVoterWeight({
     ...args,

@@ -8,12 +8,11 @@ import {
   useUserCouncilTokenOwnerRecord,
 } from './queries/tokenOwnerRecord'
 import { useRealmConfigQuery } from './queries/realmConfig'
-import {
-  useRealmCommunityMintInfoQuery,
-  useRealmCouncilMintInfoQuery,
-} from './queries/mintInfo'
 import { useSelectedRealmInfo } from './selectedRealm/useSelectedRealmRegistryEntry'
 import { useUserTokenAccountsQuery } from './queries/tokenAccount'
+import {useRealmVoterWeights} from "@hooks/useRealmVoterWeightPlugins";
+import BN from "bn.js";
+import {GovernanceRole} from "../@types/types";
 
 /**
  * @deprecated This hook has been broken up into many smaller hooks, use those instead, DO NOT use this
@@ -26,10 +25,14 @@ export default function useRealm() {
   const realm = useRealmQuery().data?.result
   const realmInfo = useSelectedRealmInfo()
 
-  const config = useRealmConfigQuery().data?.result
-  const mint = useRealmCommunityMintInfoQuery().data?.result
-  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  // if the realm has community and council tokens, both with non-zero weights, the proposer can choose which should be used to vote
+  const { communityMaxWeight, councilMaxWeight } = useRealmVoterWeights()
+  const availableVoteGovernanceOptions = [
+      communityMaxWeight?.value?.gt(new BN(0)) ? 'community' : undefined,
+        councilMaxWeight?.value?.gt(new BN(0)) ? 'council' : undefined
+  ].filter(Boolean) as GovernanceRole[]; // filter out undefined
 
+  const config = useRealmConfigQuery().data?.result
   const currentPluginPk = config?.account?.communityTokenConfig.voterWeightAddin
 
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
@@ -54,13 +57,6 @@ export default function useRealm() {
       ),
     [realm, tokenAccounts]
   )
-
-  const canChooseWhoVote =
-    realm?.account.communityMint &&
-    (!mint?.supply.isZero() ||
-      config?.account.communityTokenConfig.voterWeightAddin) &&
-    realm.account.config.councilMint &&
-    !councilMint?.supply.isZero()
 
   //TODO take from realm config when available
   const realmCfgMaxOutstandingProposalCount = 10
@@ -100,7 +96,7 @@ export default function useRealm() {
       /** @deprecated just use the token owner record directly, ok? */
       //ownVoterWeight,
       //realmDisplayName: realmInfo?.displayName ?? realm?.account?.name,
-      canChooseWhoVote,
+      availableVoteGovernanceOptions,
       //councilTokenOwnerRecords,
       toManyCouncilOutstandingProposalsForUse,
       toManyCommunityOutstandingProposalsForUser,
@@ -111,7 +107,7 @@ export default function useRealm() {
       isNftMode,
     }),
     [
-      canChooseWhoVote,
+      availableVoteGovernanceOptions,
       councilTokenAccount,
       currentPluginPk,
       isNftMode,

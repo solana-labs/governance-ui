@@ -2,7 +2,6 @@ import {
   InstructionDataWithHoldUpTime,
   createProposal,
 } from 'actions/createProposal'
-import useRealm from './useRealm'
 import useRpcContext from './useRpcContext'
 import { fetchGovernanceByPubkey } from './queries/governance'
 import { PublicKey } from '@solana/web3.js'
@@ -27,7 +26,6 @@ export default function useCreateProposal() {
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
   const { result: ownVoterWeight } = useLegacyVoterWeight()
 
-  const { canChooseWhoVote } = useRealm()
   const { getRpcContext } = useRpcContext()
   const votingClient = useVotingClient();
 
@@ -70,7 +68,7 @@ export default function useCreateProposal() {
         : undefined
 
     const proposalMint =
-      canChooseWhoVote && voteByCouncil
+      voteByCouncil
         ? realm?.account.config.councilMint
         : defaultProposalMint
 
@@ -148,7 +146,7 @@ export default function useCreateProposal() {
         : undefined
 
     const proposalMint =
-      canChooseWhoVote && voteByCouncil
+      voteByCouncil
         ? realm?.account.config.councilMint
         : defaultProposalMint
 

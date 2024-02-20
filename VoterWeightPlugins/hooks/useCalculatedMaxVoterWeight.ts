@@ -18,6 +18,7 @@ export const useCalculatedMaxVoterWeight = (args: Args): UseQueryResult<Calculat
             'calculateMaxVoterWeight',
             args.realmPublicKey?.toString(),
             args.governanceMintPublicKey?.toString(),
+            args.mintInfo
         ],
         () => calculateMaxVoterWeight(args as Required<Args>),
         {
