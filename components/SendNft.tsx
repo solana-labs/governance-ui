@@ -60,7 +60,7 @@ const SendNft = ({
 }) => {
   const { connection } = useConnection()
   const realm = useRealmQuery().data?.result
-  const { canChooseWhoVote } = useRealm()
+  const { availableVoteGovernanceOptions } = useRealm()
   const { propose } = useCreateProposal()
   const { canUseTransferInstruction } = useGovernanceAssets()
   const { fmtUrlWithCluster } = useQueryContext()
@@ -283,7 +283,7 @@ const SendNft = ({
               value={description}
               onChange={(evt) => setDescription(evt.target.value)}
             ></Textarea>
-            {canChooseWhoVote && (
+            {availableVoteGovernanceOptions.length > 1 && (
               <VoteBySwitch
                 checked={voteByCouncil}
                 onChange={() => {

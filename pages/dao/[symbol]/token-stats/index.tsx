@@ -15,7 +15,6 @@ import dayjs from 'dayjs'
 import dynamic from 'next/dynamic'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import {
   DAYS_PER_MONTH,
   getMinDurationFmt,
@@ -47,6 +46,8 @@ import { useRealmProposalsQuery } from '@hooks/queries/proposal'
 import { useQuery } from '@tanstack/react-query'
 import { IDL } from 'VoteStakeRegistry/sdk/voter_stake_registry'
 import { ProfileImage, ProfileName } from '@components/Profile'
+import {useVsrClient} from "../../../../VoterWeightPlugins/useVsrClient";
+import {useAsync} from "react-async-hook";
 
 const VestingVsTime = dynamic(
   () => import('VoteStakeRegistry/components/LockTokenStats/VestingVsTime'),
@@ -134,13 +135,19 @@ const LockTokenStats = () => {
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const { symbol } = useRouter().query
   const { realmInfo } = useRealm()
-  const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
-  const voteStakeRegistryRegistrarPk = useVotePluginsClientStore(
-    (s) => s.state.voteStakeRegistryRegistrarPk
+  const { vsrClient } = useVsrClient();
+  const voteStakeRegistryRegistrarPk =
+    realm && vsrClient &&
+        vsrClient.getRegistrarPDA(realm.pubkey, realm.account.communityMint).registrar;
+  const { result:voteStakeRegistryRegistrar } = useAsync(
+    async () => {
+      if (vsrClient && realm) {
+        return vsrClient.getRegistrarAccount(realm.pubkey, realm.account.communityMint);
+      }
+    },
+    [vsrClient, realm]
   )
-  const voteStakeRegistryRegistrar = useVotePluginsClientStore(
-    (s) => s.state.voteStakeRegistryRegistrar
-  )
+
   const governedTokenAccounts = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
   )

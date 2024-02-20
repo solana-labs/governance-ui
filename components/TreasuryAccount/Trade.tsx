@@ -173,7 +173,7 @@ const Trade: React.FC<TradeProps> = ({ tokenAccount }) => {
   const { wallet, anchorProvider } = useWalletDeprecated()
   const { handleCreateProposal } = useCreateProposal()
   const { canUseTransferInstruction } = useGovernanceAssets()
-  const { canChooseWhoVote, symbol } = useRealm()
+  const { availableVoteGovernanceOptions, symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
   const [form, setForm] = useState<TradeForm>({
     amount: 0,
@@ -438,7 +438,7 @@ const Trade: React.FC<TradeProps> = ({ tokenAccount }) => {
           <ProposalOptions
             handleSetForm={handleSetForm}
             form={form}
-            canChooseWhoVote={canChooseWhoVote}
+            canChooseWhoVote={availableVoteGovernanceOptions.length > 1}
             voteByCouncil={voteByCouncil}
             setVoteByCouncil={setVoteByCouncil}
           />

@@ -138,6 +138,7 @@ import DualGsoWithdraw from './components/instructions/Dual/DualGsoWithdraw'
 import MultiChoiceForm from '../../../../components/MultiChoiceForm'
 import CloseVaults from './components/instructions/DistrubtionProgram/CloseVaults'
 import FillVaults from './components/instructions/DistrubtionProgram/FillVaults'
+import {GovernanceRole} from "../../../../@types/types";
 
 const TITLE_LENGTH_LIMIT = 130
 // the true length limit is either at the tx size level, and maybe also the total account size level (I can't remember)
@@ -187,19 +188,25 @@ const getDefaultInstructionProps = (
   chunkBy: x.chunkBy || 2,
 })
 
+const onlyGovernanceAvailable = (availableVoteGovernanceOptions: GovernanceRole[], role: GovernanceRole) =>
+    availableVoteGovernanceOptions.length === 1 && availableVoteGovernanceOptions[0] === role;
+
 const New = () => {
   const router = useRouter()
   const { handleCreateProposal, proposeMultiChoice } = useCreateProposal()
   const { fmtUrlWithCluster } = useQueryContext()
   const realm = useRealmQuery().data?.result
-
-  const { symbol, realmInfo, canChooseWhoVote } = useRealm()
+  const { symbol, realmInfo, availableVoteGovernanceOptions } = useRealm()
   const { availableInstructions } = useGovernanceAssets()
-  const [voteByCouncil, setVoteByCouncil] = useState(false)
+  const [voteByCouncilToggle, setVoteByCouncilToggle] = useState(availableVoteGovernanceOptions.includes('community'))
   const [form, setForm] = useState({
     title: typeof router.query['t'] === 'string' ? router.query['t'] : '',
     description: '',
   })
+    // the proposal will use the council if:
+    // - that is the only option
+    // - the proposer chooses it
+    const voteByCouncil = voteByCouncilToggle || onlyGovernanceAvailable(availableVoteGovernanceOptions, 'council');
   const [multiChoiceForm, setMultiChoiceForm] = useState<{
     governance: PublicKey | undefined
     options: string[]
@@ -711,11 +718,11 @@ const New = () => {
                 })}
               />
             </div>
-            {canChooseWhoVote && (
+            {availableVoteGovernanceOptions.length > 1 && (
               <VoteBySwitch
-                checked={voteByCouncil}
+                checked={voteByCouncilToggle}
                 onChange={() => {
-                  setVoteByCouncil(!voteByCouncil)
+                  setVoteByCouncilToggle(!voteByCouncilToggle)
                 }}
               ></VoteBySwitch>
             )}

@@ -45,7 +45,7 @@ const CloseBuffers = ({ program }: { program: AssetAccount }) => {
   const { fmtUrlWithCluster } = useQueryContext()
   const { symbol } = router.query
   const realm = useRealmQuery().data?.result
-  const { realmInfo, canChooseWhoVote } = useRealm()
+  const { realmInfo, availableVoteGovernanceOptions } = useRealm()
   const [isBuffersLoading, setIsBuffersLoading] = useState(false)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [buffers, setBuffers] = useState<
@@ -299,7 +299,7 @@ const CloseBuffers = ({ program }: { program: AssetAccount }) => {
                 })
               }
             />
-            {canChooseWhoVote && (
+            {availableVoteGovernanceOptions.length > 1 && (
               <VoteBySwitch
                 checked={voteByCouncil}
                 onChange={() => {

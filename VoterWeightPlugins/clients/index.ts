@@ -7,17 +7,10 @@ import {
 
 import {Provider} from '@coral-xyz/anchor'
 import {PythVoterWeightPluginClient} from "./PythVoterWeightPluginClient";
-import {VsrPluginClient} from "./VsrPluginClient";
 import {PublicKey} from "@solana/web3.js";
-
-// | 'gateway'
-// | 'QV'
-// | 'vanilla'
-// | 'VSR'
-// | 'HeliumVSR'
-// | 'NFT'
-// | 'pyth'
-// | 'unknown'
+import {VsrClient} from "../../VoteStakeRegistry/sdk/client";
+import {NftVoterClient} from "@utils/uiTypes/NftVoterClient";
+import {HeliumVsrClient} from "../../HeliumVotePlugin/sdk/client";
 
 /**
  * Given a plugin name and program ID, load the appropriate client
@@ -35,8 +28,11 @@ export const loadClient = (plugin: PluginName, programId: PublicKey, provider: P
     case 'pyth':
       return PythVoterWeightPluginClient.connect(provider)
     case 'VSR':
-      return VsrPluginClient.connect(provider, programId)
-    // TODO: return all clients
+      return VsrClient.connect(provider, programId)
+    case 'HeliumVSR':
+      return HeliumVsrClient.connect(provider, programId)
+    case 'NFT':
+      return NftVoterClient.connect(provider, programId)
     default:
       throw new Error(`Unsupported plugin ${plugin}`)
   }

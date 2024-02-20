@@ -1,29 +1,20 @@
 import {
   PublicKey,
   TransactionInstruction,
-  Connection,
 } from '@solana/web3.js'
-import { getPlugins } from './getPlugins'
+import {VoterWeightPluginInfo} from "./types";
 
 interface UpdateMaxVoterWeightRecordArgs {
-  walletPublicKey: PublicKey
   realmPublicKey: PublicKey
   governanceMintPublicKey: PublicKey
-  connection: Connection
+  plugins?: VoterWeightPluginInfo[]
 }
 
 export const updateMaxVoterWeight = async ({
-  walletPublicKey,
   realmPublicKey,
-  governanceMintPublicKey, // this will be the community mint for most use cases.
-  connection,
+  governanceMintPublicKey,
+  plugins = [],
 }: UpdateMaxVoterWeightRecordArgs): Promise<TransactionInstruction[]> => {
-  const plugins = await getPlugins({
-    realmPublicKey,
-    governanceMintPublicKey,
-    walletPublicKey,
-    connection,
-  })
   const ixes: TransactionInstruction[] = []
 
   for (const plugin of plugins) {

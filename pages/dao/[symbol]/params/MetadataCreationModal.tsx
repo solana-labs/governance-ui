@@ -51,7 +51,7 @@ const MetadataCreationModal = ({
 }) => {
   const router = useRouter()
   const realm = useRealmQuery().data?.result
-  const { canChooseWhoVote, symbol, realmInfo } = useRealm()
+  const { availableVoteGovernanceOptions, symbol, realmInfo } = useRealm()
   const programId: PublicKey | undefined = realmInfo?.programId
 
   const { assetAccounts } = useGovernanceAssets()
@@ -400,7 +400,7 @@ const MetadataCreationModal = ({
           }
         ></Textarea>
 
-        {canChooseWhoVote && (
+        {availableVoteGovernanceOptions.length > 1 && (
           <VoteBySwitch
             checked={voteByCouncil}
             onChange={() => {

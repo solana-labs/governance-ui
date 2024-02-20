@@ -56,7 +56,7 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
   const { symbol } = router.query
 
   const realm = useRealmQuery().data?.result
-  const { realmInfo, canChooseWhoVote } = useRealm()
+  const { realmInfo, availableVoteGovernanceOptions } = useRealm()
   const { data: mintInfo } = useMintInfoByPubkeyQuery(mintAccount.pubkey)
 
   const programId: PublicKey | undefined = realmInfo?.programId
@@ -343,7 +343,7 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
             onBlur={validateAmountOnBlur}
           />
 
-          {canChooseWhoVote && (
+          {availableVoteGovernanceOptions.length > 1 && (
             <VoteBySwitch
               checked={voteByCouncil}
               onChange={() => {

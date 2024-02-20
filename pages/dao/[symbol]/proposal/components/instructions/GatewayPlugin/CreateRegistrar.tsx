@@ -8,7 +8,6 @@ import {
 import { validateInstruction } from '@utils/instructionTools'
 import { NameValue, UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NewProposalContext } from '../../../new'
 import InstructionForm, { InstructionInput } from '../FormCreator'
 import { InstructionInputType } from '../inputInstructionType'
@@ -21,6 +20,7 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import {availablePasses} from "../../../../../../../GatewayPlugin/config";
 import {createCivicRegistrarIx} from "../../../../../../../GatewayPlugin/sdk/api";
+import {useGatewayVoterWeightPlugin} from "../../../../../../../VoterWeightPlugins";
 
 interface CreateGatewayRegistrarForm {
   governedAccount: AssetAccount | undefined
@@ -37,7 +37,7 @@ const CreateGatewayPluginRegistrar = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const realm = useRealmQuery().data?.result
-  const gatewayClient = useVotePluginsClientStore((s) => s.state.gatewayClient)
+  const { gatewayClient } = useGatewayVoterWeightPlugin();
   const { assetAccounts } = useGovernanceAssets()
   const wallet = useWalletOnePointOh()
   const shouldBeGoverned = !!(index !== 0 && governance)
@@ -59,12 +59,12 @@ const CreateGatewayPluginRegistrar = ({
     if (
       isValid &&
       form!.governedAccount?.governance?.account &&
-      wallet?.publicKey
+      wallet?.publicKey && realm && gatewayClient
     ) {
       const createRegistrarIx = await createCivicRegistrarIx(
-        realm!,
-          wallet.publicKey!,
-          gatewayClient!,
+        realm,
+          wallet.publicKey,
+          gatewayClient,
           chosenGatekeeperNetwork!,
       )
       serializedInstruction = serializeInstructionToBase64(createRegistrarIx)

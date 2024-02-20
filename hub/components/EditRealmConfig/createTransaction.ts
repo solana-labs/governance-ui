@@ -98,7 +98,11 @@ export async function createTransaction(
         currentConfig.nftCollectionSize !== config.nftCollectionSize ||
         !currentConfig.nftCollectionWeight.eq(config.nftCollectionWeight))
     ) {
-      const nftClient = await NftVoterClient.connect(anchorProvider, isDevnet);
+      const nftClient = await NftVoterClient.connect(
+        anchorProvider,
+        undefined,
+        isDevnet,
+      );
       const { registrar } = await getRegistrarPDA(
         realmPublicKey,
         config.communityMint.publicKey,

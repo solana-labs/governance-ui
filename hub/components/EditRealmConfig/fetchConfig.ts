@@ -90,7 +90,11 @@ export async function fetchConfig(
   const anchorProvider = new AnchorProvider(connection, wallet, defaultOptions);
 
   const isDevnet = getNetworkFromEndpoint(connection.rpcEndpoint) === 'devnet';
-  const nftClient = await NftVoterClient.connect(anchorProvider, isDevnet);
+  const nftClient = await NftVoterClient.connect(
+    anchorProvider,
+    undefined,
+    isDevnet,
+  );
   const gatewayClient = await GatewayClient.connect(anchorProvider, isDevnet);
   const pluginPublicKey =
     configProgramAccount.account.communityTokenConfig.voterWeightAddin;

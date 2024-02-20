@@ -3,36 +3,36 @@ import {
   TransactionInstruction,
   Connection,
 } from '@solana/web3.js'
-import { getPlugins } from './getPlugins'
+import {VoterWeightAction} from "@solana/spl-governance";
+import {VoterWeightPluginInfo} from "./types";
 
 interface UpdateVoterWeightRecordArgs {
   walletPublicKey: PublicKey
   realmPublicKey: PublicKey
   governanceMintPublicKey: PublicKey
-  connection: Connection
+  plugins?: VoterWeightPluginInfo[]
+  action?: VoterWeightAction
 }
 
 export const updateVoterWeight = async ({
   walletPublicKey,
   realmPublicKey,
-  governanceMintPublicKey, // this will be the community mint for most use cases.
-  connection,
-}: UpdateVoterWeightRecordArgs): Promise<TransactionInstruction[]> => {
-  const plugins = await getPlugins({
-    realmPublicKey,
-    governanceMintPublicKey,
-    walletPublicKey,
-    connection,
-  })
-  const ixes: TransactionInstruction[] = []
+  governanceMintPublicKey,
+  plugins = [],
+  action
+}: UpdateVoterWeightRecordArgs): Promise<{ pre: TransactionInstruction[], post: TransactionInstruction[]}> => {
+  const preIxes: TransactionInstruction[] = []
+  const postIxes: TransactionInstruction[] = []
 
   for (const plugin of plugins) {
     const updateVoterWeightRecordIx = await plugin.client.updateVoterWeightRecord(
       walletPublicKey,
       realmPublicKey,
-      governanceMintPublicKey
+      governanceMintPublicKey,
+      action
     )
-    ixes.push(updateVoterWeightRecordIx)
+    preIxes.push(...updateVoterWeightRecordIx.pre)
+    postIxes.push(...updateVoterWeightRecordIx.post || [])
   }
-  return ixes
+  return { pre: preIxes, post: postIxes }
 }

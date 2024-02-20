@@ -1,27 +1,40 @@
-import {UseVoterWeightPluginsArgs, VoterWeightPluginInfo} from "../lib/types";
-import {useState} from "react";
-import queryClient from "@hooks/queries/queryClient";
+import {VoterWeightPluginInfo} from "../lib/types";
 import {getPlugins} from "../lib/getPlugins";
 import {useConnection} from "@solana/wallet-adapter-react";
 import {queryKeys} from "../lib/utils";
+import {useQuery, UseQueryResult} from "@tanstack/react-query";
+import useWalletOnePointOh from "@hooks/useWalletOnePointOh";
+import {AnchorProvider, Wallet} from "@coral-xyz/anchor";
+import {PublicKey} from "@solana/web3.js";
 
-const argsAreSet = (args: UseVoterWeightPluginsArgs): args is Required<UseVoterWeightPluginsArgs> =>
-    args.realmPublicKey !== undefined && args.governanceMintPublicKey !== undefined && args.walletPublicKey !== undefined;
+type Args = {
+    realmPublicKey?: PublicKey
+    governanceMintPublicKey?: PublicKey
+}
 
-export const usePlugins = (args: UseVoterWeightPluginsArgs): VoterWeightPluginInfo[] | undefined => {
+const argsAreSet = (args: Args): args is Required<Args> =>
+    args.realmPublicKey !== undefined && args.governanceMintPublicKey !== undefined;
+
+export const usePlugins = (args: Args): UseQueryResult<VoterWeightPluginInfo[], unknown> => {
     const { connection } = useConnection()
-    const [plugins, setPlugins] = useState<VoterWeightPluginInfo[]>()
+    const wallet = useWalletOnePointOh()
+    const provider = wallet && new AnchorProvider(
+        connection,
+        wallet as unknown as Wallet,
+        AnchorProvider.defaultOptions()
+    )
 
-    if (argsAreSet(args)) {
-        queryClient.fetchQuery({
-            queryKey: ['fetchPlugins', queryKeys(args)],
-            queryFn: () =>
-                getPlugins({
-                    ...args,
-                    connection,
-                }),
-        }).then(setPlugins);
-    }
-
-    return plugins;
+    return useQuery(
+        ['getPlugins', ...queryKeys(args), wallet?.publicKey?.toString()],
+        () => {
+            if (!provider) return [];
+            return getPlugins({
+                ...(args as Required<Args>),
+                provider,
+            });
+        },
+        {
+            enabled: argsAreSet(args) && !!provider,
+        }
+    )
 }
