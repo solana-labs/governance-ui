@@ -2,19 +2,19 @@ import useRealm from '@hooks/useRealm'
 import dynamic from 'next/dynamic'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import useQueryContext from '@hooks/useQueryContext'
-import { GATEWAY_PLUGINS_PKS, NFT_PLUGINS_PKS } from '@constants/plugins'
 import GatewayCard from '@components/Gateway/GatewayCard'
 import ClaimUnreleasedNFTs from './ClaimUnreleasedNFTs'
 import Link from 'next/link'
 import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
-import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import ClaimUnreleasedPositions from 'HeliumVotePlugin/components/ClaimUnreleasedPositions'
 import VanillaAccountDetails from './VanillaAccountDetails'
 import GovernancePowerCard from '@components/GovernancePower/GovernancePowerCard'
 import SelectPrimaryDelegators from '@components/SelectPrimaryDelegators'
 import PythAccountDetails from 'PythVotePlugin/components/PythAccountDetails'
+import {useRealmVoterWeightPlugins} from "@hooks/useRealmVoterWeightPlugins";
+import {ReactNode} from "react";
 
 const LockPluginTokenBalanceCard = dynamic(
   () =>
@@ -66,25 +66,36 @@ const TokenBalanceCardInner = ({
   inAccountDetails?: boolean
 }) => {
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
-  const config = useRealmConfigQuery().data?.result
+  const { plugins }= useRealmVoterWeightPlugins('community');
+  const requiredCards = plugins?.map((plugin) => plugin.name);
 
-  const { vsrMode } = useRealm()
-  const currentPluginPk = config?.account?.communityTokenConfig.voterWeightAddin
-  const isNftMode =
-    currentPluginPk && NFT_PLUGINS_PKS.includes(currentPluginPk?.toBase58())
-  const isGatewayMode =
-    currentPluginPk && GATEWAY_PLUGINS_PKS.includes(currentPluginPk?.toBase58())
+  const showHeliumCard = requiredCards?.includes('HeliumVSR');
+  const showDefaultVSRCard = requiredCards?.includes('VSR');
+    const showPythCard = requiredCards?.includes('pyth');
+    const showNftCard = requiredCards?.includes('NFT');
+    const showGatewayCard = requiredCards?.includes('gateway');
 
-  if (vsrMode === 'default' && inAccountDetails) {
+  console.log("requiredCards", {
+    requiredCards,
+    showHeliumCard,
+    showDefaultVSRCard,
+    showPythCard,
+    showNftCard,
+    showGatewayCard
+  })
+
+  if (showDefaultVSRCard && inAccountDetails) {
     return <LockPluginTokenBalanceCard inAccountDetails={inAccountDetails} /> // does this ever actually occur in the component hierarchy?
   }
 
+  const cards: ReactNode[] = [];
+
   if (
-    vsrMode === 'helium' &&
+      showHeliumCard &&
     (!ownTokenRecord ||
       ownTokenRecord.account.governingTokenDepositAmount.isZero())
   ) {
-    return (
+    cards.push(
       <>
         {!inAccountDetails && <GovernancePowerTitle />}
         <HeliumVotingPowerCard inAccountDetails={inAccountDetails} />
@@ -93,8 +104,8 @@ const TokenBalanceCardInner = ({
     )
   }
 
-  if (isNftMode && inAccountDetails) {
-    return (
+  if (showNftCard && inAccountDetails) {
+    cards.push(
       <div className="grid grid-cols-2 gap-x-2 w-full">
         <div>
           <NftVotingPower inAccountDetails={inAccountDetails} />
@@ -105,22 +116,33 @@ const TokenBalanceCardInner = ({
     )
   }
 
-  if (vsrMode === 'pyth'){
-    return (
+  if (showPythCard){
+    cards.push(
       <>
       {inAccountDetails ? <PythAccountDetails /> : <GovernancePowerCard />}
       </>
     )
   }
 
+  if (showGatewayCard){
+    cards.push(
+        <>
+          {inAccountDetails ?  <GatewayCard /> : <GovernancePowerCard />}
+        </>
+    )
+  }
+
   //Default
-  return (
+  if (cards.length === 0){
+  cards.push(
     <>
       {inAccountDetails ? <VanillaAccountDetails /> : <GovernancePowerCard />}
-
-      {isGatewayMode && <GatewayCard />}
     </>
   )
+  }
+  console.log("cards", cards)
+
+  return <>{cards}</>
 }
 
 const TokenBalanceCardWrapper = ({

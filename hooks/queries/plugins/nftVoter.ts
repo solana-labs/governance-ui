@@ -1,7 +1,7 @@
-import { Connection, PublicKey } from '@solana/web3.js'
-import { fetchRealmByPubkey } from '../realm'
+import {Connection, PublicKey} from '@solana/web3.js'
+import {fetchRealmByPubkey} from '../realm'
 import { getRegistrarPDA } from '@utils/plugin/accounts'
-import { Program } from '@coral-xyz/anchor'
+import { Program} from '@coral-xyz/anchor'
 import { IDL, NftVoter } from 'idls/nft_voter'
 import asFindable from '@utils/queries/asFindable'
 import { fetchRealmConfigQuery } from '../realmConfig'
@@ -9,25 +9,22 @@ import { useBatchedVoteDelegators } from '@components/VotePanel/useDelegators'
 import { useConnection } from '@solana/wallet-adapter-react'
 import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
 import { getNftGovpower } from '../governancePower'
-import { useQueries, useQuery } from '@tanstack/react-query'
+import { useQueries } from '@tanstack/react-query'
 import {
   fetchDigitalAssetsByOwner,
   useDigitalAssetsByOwner,
 } from '../digitalAssets'
 import { useMemo } from 'react'
 import { ON_NFT_VOTER_V2 } from '@constants/flags'
-import queryClient from '../queryClient'
 import { NFT_PLUGINS_PKS } from '@constants/plugins'
 import { getNetworkFromEndpoint } from '@utils/connection'
+import {useNftRegistrar} from "@hooks/useNftRegistrar";
+import {fetchPluginRegistrar} from "@hooks/queries/pluginRegistrar";
 
 export const useVotingNfts = (ownerPk: PublicKey | undefined) => {
-  const { connection } = useConnection()
-  const realmPk = useSelectedRealmPubkey()
+  const registrar = useNftRegistrar();
   const { data: nfts } = useDigitalAssetsByOwner(ownerPk)
   console.log('nfts', nfts)
-
-  const registrar = useQuery(nftRegistrarQuery(connection, realmPk)).data
-    ?.result
 
   const usedCollectionsPks = useMemo(
     () => registrar?.collectionConfigs.map((x) => x.collection.toBase58()),
@@ -56,12 +53,7 @@ export const getVotingNfts = async (
   if (realm === undefined) throw new Error()
   const config = await fetchRealmConfigQuery(connection, realmPk)
   if (config.result === undefined) throw new Error()
-  const currentPluginPk =
-    config.result.account.communityTokenConfig.voterWeightAddin
-  if (currentPluginPk === undefined) throw new Error()
-  const { result: registrar } = await queryClient.fetchQuery(
-    nftRegistrarQuery(connection, realmPk)
-  )
+  const registrar = await fetchPluginRegistrar<NftVoter>(realmPk, connection, 'NFT');
   if (registrar === undefined) throw new Error()
   const usedCollectionsPks = registrar.collectionConfigs.map((x) =>
     x.collection.toBase58()
@@ -109,6 +101,8 @@ export const useNftBatchedVotePower = async (
   return total
 }
 
+// @deprecated - Use useNftClient().plugin.registrar instead to support chaining.
+// Outside of react, use fetchPluginRegistrar instead.
 export const nftRegistrarQuery = (
   connection: Connection,
   realmPk: PublicKey | undefined

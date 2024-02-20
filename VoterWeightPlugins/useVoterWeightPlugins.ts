@@ -1,6 +1,5 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import queryClient from '@hooks/queries/queryClient'
-import { useConnection } from '@solana/wallet-adapter-react'
 import { updateVoterWeight } from './lib/updateVoterWeight'
 import { createVoterWeight } from './lib/createVoterWeight'
 import {

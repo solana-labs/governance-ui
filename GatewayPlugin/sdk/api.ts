@@ -3,19 +3,6 @@ import {GatewayClient} from '@solana/governance-program-library'
 import {ProgramAccount, Realm, SYSTEM_PROGRAM_ID} from "@solana/spl-governance";
 import {getRegistrarPDA} from "@utils/plugin/accounts";
 
-// Get the registrar account for a given realm
-export const tryGetGatewayRegistrar = async (
-  registrarPk: PublicKey,
-  gatewayClient: GatewayClient
-) => {
-  try {
-    return await gatewayClient.program.account.registrar.fetch(
-      registrarPk
-    )
-  } catch (e) {
-    return null
-  }
-}
 
 // Create an instruction to create a registrar account for a given realm
 export const createCivicRegistrarIx = async (
@@ -36,7 +23,7 @@ export const createCivicRegistrarIx = async (
       : []
 
   return gatewayClient!.program.methods
-      .createRegistrar(false)
+      .createRegistrar(!!predecessor)
       .accounts({
         registrar,
         realm: realm.pubkey,

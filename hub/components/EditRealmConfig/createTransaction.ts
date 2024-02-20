@@ -169,6 +169,10 @@ export async function createTransaction(
         isDevnet,
       );
 
+      const predecessorPlugin = config.chainingEnabled
+        ? currentConfig.configAccount.communityTokenConfig.voterWeightAddin
+        : undefined;
+
       const instruction = currentConfig.civicPassType
         ? await configureCivicRegistrarIx(
             realmAccount,
@@ -180,6 +184,7 @@ export async function createTransaction(
             wallet.publicKey,
             gatewayClient,
             config.civicPassType,
+            predecessorPlugin,
           );
 
       instructions.push(instruction);
@@ -193,11 +198,9 @@ export async function createTransaction(
       // Configure the registrar for the quadratic voting plugin for the DAO
       // Since QV needs to be paired up with some other plugin that protects against sybil attacks,
       // it will typically have a predecessor plugin (e.g. the Civic Gateway plugin)
-      // In an upcoming release, there will be a way to configure this via the UI.
-      // In the meantime, we use the heuristic that the existing plugin should be used as the predecessor.
-      // If this is not desired, for any reason, then the workaround is to move back to "default" first.
-      const predecessorPlugin =
-        currentConfig.configAccount.communityTokenConfig.voterWeightAddin;
+      const predecessorPlugin = currentConfig.chainingEnabled
+        ? currentConfig.configAccount.communityTokenConfig.voterWeightAddin
+        : undefined;
 
       const quadraticClient = await QuadraticClient.connect(
         anchorProvider,

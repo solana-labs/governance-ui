@@ -164,7 +164,7 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
       const nftVoterPluginTotalWeight = nftMintRegistrar?.collectionConfigs.reduce(
         (prev, curr) => {
           const size = curr.size
-          const weight = curr.weight
+          const weight = curr.weight.toNumber()
           if (typeof size === 'undefined' || typeof weight === 'undefined')
             return prev
           return prev + size * weight
@@ -176,7 +176,7 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
         tokenOwnerRecords,
         mint,
         undecidedNftsByVoteRecord ?? {},
-        new BN(nftVoterPluginTotalWeight)
+        new BN(nftVoterPluginTotalWeight ?? 0)
       )
     }
     return []

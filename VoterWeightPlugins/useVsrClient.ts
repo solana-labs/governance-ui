@@ -1,26 +1,28 @@
 import { VSR_PLUGIN_PKS} from '@constants/plugins'
 import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
 
-import { useVoterWeightPluginReadinessReturnType } from './lib/types'
+import {useVoterWeightPluginReadinessReturnType, VoterWeightPluginInfo} from './lib/types'
 import {VsrClient} from "../VoteStakeRegistry/sdk/client";
 
 export interface useVsrClientReturnType
   extends useVoterWeightPluginReadinessReturnType {
   vsrClient: VsrClient | undefined
+  plugin: VoterWeightPluginInfo | undefined
 }
 
 export const useVsrClient = (): useVsrClientReturnType => {
   const { isReady, plugins } = useRealmVoterWeightPlugins()
 
-  const vsrPlugin = plugins?.find((plugin) =>
+  const plugin = plugins?.find((plugin) =>
       VSR_PLUGIN_PKS.includes(plugin.programId.toString())
   )
 
-  const isEnabled = vsrPlugin !== undefined
+  const isEnabled = plugin !== undefined
 
   return {
     isReady,
-    vsrClient: vsrPlugin?.client as VsrClient,
+    vsrClient: plugin?.client as VsrClient,
+    plugin,
     isEnabled,
   }
 }

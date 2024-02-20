@@ -1,5 +1,6 @@
 // A list of "passes" offered by Civic to verify or gate access to a DAO.
 export const availablePasses = [
+    // Default
     {
         name: 'Uniqueness',
         value: 'uniqobk8oGh4XBLMqM68K8M2zNu3CdYX7q5go7whQiv',
@@ -21,3 +22,11 @@ export const availablePasses = [
         description: 'Set up your own custom verification (contact Civic.com for options)'
     },
 ] as const;
+
+// Infer the types from the available passes, giving type safety on the `other` and `default` pass types
+type ArrayElement<
+    ArrayType extends readonly unknown[]
+> = ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
+export type CivicPass = ArrayElement<typeof availablePasses>;
+
+export const defaultPass: CivicPass = availablePasses[0]

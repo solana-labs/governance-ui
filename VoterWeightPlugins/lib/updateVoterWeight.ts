@@ -1,7 +1,6 @@
 import {
   PublicKey,
   TransactionInstruction,
-  Connection,
 } from '@solana/web3.js'
 import {VoterWeightAction} from "@solana/spl-governance";
 import {VoterWeightPluginInfo} from "./types";

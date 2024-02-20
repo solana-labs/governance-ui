@@ -27,14 +27,14 @@ export const usePlugins = (args: Args): UseQueryResult<VoterWeightPluginInfo[], 
     return useQuery(
         ['getPlugins', ...queryKeys(args), wallet?.publicKey?.toString()],
         () => {
-            if (!provider) return [];
+            if (!provider || !provider.publicKey) return [];
             return getPlugins({
                 ...(args as Required<Args>),
                 provider,
             });
         },
         {
-            enabled: argsAreSet(args) && !!provider,
+            enabled: argsAreSet(args) && !!provider?.publicKey,
         }
     )
 }

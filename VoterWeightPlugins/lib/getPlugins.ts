@@ -16,6 +16,7 @@ const getInitialPluginProgramId = async (
   const config = await fetchRealmConfigQuery(connection, realmPublicKey)
   const realm = await fetchRealmByPubkey(connection, realmPublicKey)
   const kind = realm.result?.account.communityMint.equals(governanceMintPublicKey) ? "community" : "council"
+
   return config.result?.account?.[
       kind === 'community' ? 'communityTokenConfig' : 'councilTokenConfig']
       ?.voterWeightAddin
@@ -39,7 +40,7 @@ export const getPlugins = async ({
     // build plugin list till we get null, which means we are at the end of the plugin chain
     do {
       pluginName = findPluginName(programId)
-      if (pluginName && programId) {
+      if (pluginName) {
         const client = await loadClient(
           pluginName as PluginName,
           programId,
@@ -56,7 +57,7 @@ export const getPlugins = async ({
           governanceMintPublicKey
         )) as { maxVoterWeight: BN } | null // TODO fix up typing on these clients
 
-        const { registrar } = await getPluginRegistrarPDA(
+        const { registrar: registrarPublicKey } = await getPluginRegistrarPDA(
           realmPublicKey,
           governanceMintPublicKey,
           programId
@@ -66,6 +67,7 @@ export const getPlugins = async ({
           realmPublicKey,
           governanceMintPublicKey
         )
+        console.log("registrar data", registrarData);
 
         plugins.push({
           client,
@@ -73,16 +75,15 @@ export const getPlugins = async ({
           name: pluginName as PluginName,
           voterWeight: voterWeightRecord?.voterWeight,
           maxVoterWeight: maxVoterWeightRecord?.maxVoterWeight,
-          registrarPublicKey: registrar,
+          registrarPublicKey,
           params: registrarData ?? {},
         })
 
-        programId = await client.getPredecessorProgramId(
-          realmPublicKey,
-          governanceMintPublicKey
-        )
+        console.log("registrar predecessor", registrarData?.previousVoterWeightPluginProgramId?.toBase58())
+
+        programId = registrarData?.previousVoterWeightPluginProgramId;
       }
-    } while (pluginName && programId)
+    } while (programId)
   }
 
   return plugins.reverse()
