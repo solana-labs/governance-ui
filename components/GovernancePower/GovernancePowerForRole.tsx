@@ -16,6 +16,7 @@ import LockedCommunityNFTRecordVotingPower from '@components/ProposalVotingPower
 import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
 import {PluginName} from "@constants/plugins";
 import {VoterWeightPluginInfo} from "../../VoterWeightPlugins/lib/types";
+import GatewayCard from "@components/Gateway/GatewayCard";
 
 type VotingPowerDisplayType = PluginName | 'composite';
 
@@ -40,11 +41,11 @@ export default function GovernancePowerForRole({
   const usesPlugin = usesPluginFn(plugins)
   const usesNFT = usesPlugin('NFT');
   const usesPyth = usesPlugin('pyth');
-    const usesHeliumVSR = usesPlugin('HeliumVSR');
-    const usesVSR = usesPlugin('VSR');
-    const usesGateway = usesPlugin('gateway');
-    const usesQV = usesPlugin('QV');
-    const isVanilla = !usesNFT && !usesPyth && !usesHeliumVSR && !usesVSR && !usesGateway && !usesQV;
+  const usesHeliumVSR = usesPlugin('HeliumVSR');
+  const usesVSR = usesPlugin('VSR');
+  const usesGateway = usesPlugin('gateway');
+  const usesQV = usesPlugin('QV');
+  const isVanilla = !usesNFT && !usesPyth && !usesHeliumVSR && !usesVSR && !usesGateway && !usesQV;
 
   console.log("uses:", {
     hideIfZero: props.hideIfZero,
@@ -114,6 +115,7 @@ export default function GovernancePowerForRole({
             {usesNFT && <NftVotingPower />}
             {usesPyth && <PythVotingPower role="community" />}
             {usesHeliumVSR && <LockedCommunityNFTRecordVotingPower />}
+            {usesGateway && <GatewayCard />}
             {usesQV && <PluginVotingPower role="community" />}
           </>
           // council
