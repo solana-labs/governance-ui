@@ -48,6 +48,7 @@ export function buildUpdates(config: Config) {
     nftCollectionSize: config.nftCollectionSize,
     nftCollectionWeight: config.nftCollectionWeight,
     civicPassType: config.civicPassType,
+    chainingEnabled: config.chainingEnabled,
   };
 }
 
@@ -321,14 +322,25 @@ export function UpdatesList(props: Props) {
                           )[1]
                         }
                       </div>
-                      <div className="ml-3 text-base text-neutral-500 line-through">
-                        {
-                          votingStructureText(
-                            updates.communityVotingPlugin || [],
-                            updates.communityMaxVotingPlugin || [],
-                          )[0]
-                        }
-                      </div>
+                      {updates.chainingEnabled ? (
+                        <div className="ml-3 text-base text-neutral-500">
+                          {'⬅ ' +
+                            votingStructureText(
+                              updates.communityVotingPlugin || [],
+                              updates.communityMaxVotingPlugin || [],
+                            )[0] +
+                            ' (Chaining)'}
+                        </div>
+                      ) : (
+                        <div className="ml-3 text-base text-neutral-500 line-through">
+                          {
+                            votingStructureText(
+                              updates.communityVotingPlugin || [],
+                              updates.communityMaxVotingPlugin || [],
+                            )[0]
+                          }
+                        </div>
+                      )}
                     </div>
                   }
                 />
