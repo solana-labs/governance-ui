@@ -13,13 +13,13 @@ const GatewayCard = () => {
     const connected = !!wallet?.connected
     const {connection} = useConnection();
     const { gatekeeperNetwork, isReady, isEnabled } = useGatewayVoterWeightPlugin();
-    const { userNeedsTokenOwnerRecord, handleRegister } = useJoinRealm();
+    const { userNeedsTokenOwnerRecord, userNeedsVoterWeightRecords, handleRegister } = useJoinRealm();
 
     // TODO [CT] join button should no longer be related to the gateway plugin
     // this,a nd handle register can both be removed from here.
     // the generic join button should call handleRegister from useJoinRealm, which will
     // call the relevant instructions for all plugins
-    const showJoinButton = userNeedsTokenOwnerRecord;
+    const showJoinButton = userNeedsTokenOwnerRecord || userNeedsVoterWeightRecords;
 
     const join = async () => {
         const instructions = await handleRegister();
