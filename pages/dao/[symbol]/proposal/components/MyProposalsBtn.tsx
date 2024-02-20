@@ -50,7 +50,7 @@ import {
 import queryClient from '@hooks/queries/queryClient'
 import { getFeeEstimate } from '@tools/feeEstimate'
 import { createComputeBudgetIx } from '@blockworks-foundation/mango-v4'
-import {useVotingClient} from "@hooks/useVotingClient";
+import {useVotingClients} from "@hooks/useVotingClients";
 import {useNftClient} from "../../../../../VoterWeightPlugins/useNftClient";
 
 const MyProposalsBn = () => {
@@ -84,7 +84,7 @@ const MyProposalsBn = () => {
   const programVersion =
     useProgramVersion() ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION
 
-  const votingClient = useVotingClient();
+  const votingClients = useVotingClients();
   const { nftClient } = useNftClient();
 
   const [
@@ -241,6 +241,10 @@ const MyProposalsBn = () => {
         realm?.account.communityMint.toBase58()
           ? ownTokenRecord
           : ownCouncilTokenRecord
+      const role = proposal.account.governingTokenMint.toBase58() ===
+        realm?.account.communityMint.toBase58()
+        ? 'community'
+        : 'council'
       const governanceAuthority = wallet!.publicKey!
       const beneficiary = wallet!.publicKey!
 
@@ -263,7 +267,7 @@ const MyProposalsBn = () => {
         governanceAuthority,
         beneficiary
       )
-      await votingClient.withRelinquishVote(
+      await votingClients(role).withRelinquishVote(
         instructions,
         proposal,
         voteRecordPk,

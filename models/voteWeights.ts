@@ -299,10 +299,6 @@ export class VoterWeight implements VoterWeightInterface {
   }
 
   canCreateProposal(config: GovernanceConfig) {
-    console.log("canCreateProposal", (
-        this.hasMinCommunityWeight(config.minCommunityTokensToCreateProposal) ||
-        this.hasMinCouncilWeight(config.minCouncilTokensToCreateProposal)
-    ));
     return (
         this.hasMinCommunityWeight(config.minCommunityTokensToCreateProposal) ||
         this.hasMinCouncilWeight(config.minCouncilTokensToCreateProposal)

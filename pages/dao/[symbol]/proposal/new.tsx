@@ -718,7 +718,7 @@ const New = () => {
                 })}
               />
             </div>
-            {availableVoteGovernanceOptions.length && (
+            {availableVoteGovernanceOptions.length > 1 && (
               <VoteBySwitch
                 checked={voteByCouncilToggle}
                 onChange={() => {

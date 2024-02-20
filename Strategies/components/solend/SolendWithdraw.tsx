@@ -40,7 +40,7 @@ import {
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { useRealmProposalsQuery } from '@hooks/queries/proposal'
 import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
-import {useVotingClient} from "@hooks/useVotingClient";
+import {useVotingClients} from "@hooks/useVotingClients";
 
 const SolendWithdraw = ({
   proposedInvestment,
@@ -72,7 +72,7 @@ const SolendWithdraw = ({
   const [deposits, setDeposits] = useState<{
     [reserveAddress: string]: { amount: number; amountExact: number }
   }>({})
-  const votingClient = useVotingClient();
+  const votingClients = useVotingClients();
   const proposals = useRealmProposalsQuery().data
   const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
@@ -257,7 +257,7 @@ const SolendWithdraw = ({
         governedTokenAccount!.governance!.account!.proposalCount,
         false,
         connection,
-        votingClient
+        votingClients(voteByCouncil? 'council' : 'community'),
       )
       const url = fmtUrlWithCluster(
         `/dao/${symbol}/proposal/${proposalAddress}`

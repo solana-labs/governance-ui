@@ -55,7 +55,7 @@ import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 import { getFeeEstimate } from '@tools/feeEstimate'
 import { createComputeBudgetIx } from '@blockworks-foundation/mango-v4'
 import {useNftClient} from "../../../VoterWeightPlugins/useNftClient";
-import {useVotingClient} from "@hooks/useVotingClient";
+import {useVotingClients} from "@hooks/useVotingClients";
 
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
@@ -96,7 +96,7 @@ const REALM = () => {
     SelectedProposal[]
   >([])
 
-  const votingClient = useVotingClient();
+  const votingClients = useVotingClients();
   const { nftClient } = useNftClient();
   const wallet = useWalletOnePointOh()
   const { connection } = useConnection()
@@ -277,6 +277,10 @@ const REALM = () => {
           realm.account.communityMint.toBase58()
             ? ownTokenRecord
             : ownCouncilTokenRecord
+        const role = selectedProposal.proposal.governingTokenMint.toBase58() ===
+            realm.account.communityMint.toBase58()
+            ? 'community'
+            : 'council'
 
         if (relevantTokenRecord === undefined)
           throw new Error('token owner record not found or not yet loaded')
@@ -284,7 +288,7 @@ const REALM = () => {
         const instructions: TransactionInstruction[] = []
 
         //will run only if plugin is connected with realm
-        const plugin = await votingClient?.withCastPluginVote(
+        const plugin = await votingClients(role)?.withCastPluginVote(
           instructions,
           {
             account: selectedProposal.proposal,

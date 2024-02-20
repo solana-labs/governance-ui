@@ -45,8 +45,8 @@ import {
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { fetchJupiterPrice } from '@hooks/queries/jupiterPrice'
 import {useHeliumClient} from "../../VoterWeightPlugins/useHeliumClient";
-import {useVotingClient} from "@hooks/useVotingClient";
 import {Registrar} from "../sdk/types";
+import {useVotingClients} from "@hooks/useVotingClients";
 
 export const LockTokensAccount: React.FC<{
   // tokenOwnerRecordPk: string | string[] | undefined // @asktree: this was unused
@@ -77,7 +77,7 @@ export const LockTokensAccount: React.FC<{
         wallet?.publicKey ?? undefined
 
   const { heliumClient: vsrClient } = useHeliumClient();
-  const currentClient = useVotingClient('community'); // TODO support council
+  const votingClients = useVotingClients();
   
   const vsrRegistrar = useAsync<Registrar | undefined>(
     async () => {
@@ -141,7 +141,7 @@ export const LockTokensAccount: React.FC<{
         vsrClient
       ) {
         await getPositions({
-          votingClient: currentClient,
+          votingClient: votingClients('community'),  // community mint is hardcoded for getPositions
           realmPk: realm.pubkey,
           communityMintPk: realm.account.communityMint,
           walletPk: tokenOwnerRecordWalletPk
@@ -234,7 +234,7 @@ export const LockTokensAccount: React.FC<{
 
     if (!error) {
       await getPositions({
-        votingClient: currentClient,
+        votingClient: votingClients('community'),  // community mint is hardcoded for getPositions
         realmPk: realm!.pubkey,
         communityMintPk: realm!.account.communityMint,
         walletPk: wallet!.publicKey!,

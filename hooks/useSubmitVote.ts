@@ -29,7 +29,7 @@ import useVotingTokenOwnerRecords from './useVotingTokenOwnerRecords'
 import { useMemo } from 'react'
 import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
 import { useBatchedVoteDelegators } from '@components/VotePanel/useDelegators'
-import {useVotingClient} from "@hooks/useVotingClient";
+import {useVotingClients} from "@hooks/useVotingClients";
 import {useNftClient} from "../VoterWeightPlugins/useNftClient";
 
 export const useSubmitVote = () => {
@@ -39,7 +39,7 @@ export const useSubmitVote = () => {
   const proposal = useRouteProposalQuery().data?.result
   const { realmInfo } = useRealm()
   const { closeNftVotingCountingModal } = useNftProposalStore.getState()
-  const votingClient = useVotingClient('community'); // TODO this should be passed the role
+  const votingClients = useVotingClients(); // TODO this should be passed the role
   const {nftClient} = useNftClient();
 
   const isNftPlugin = !!nftClient;
@@ -124,6 +124,7 @@ export const useSubmitVote = () => {
         : councilDelegators
       )?.map((x) => x.pubkey)
 
+        const votingClient = votingClients(role);
       try {
         await castVote(
           rpcContext,
@@ -132,7 +133,7 @@ export const useSubmitVote = () => {
           tokenOwnerRecordPk,
           vote,
           msg,
-          role === 'community' ? votingClient : undefined, // NOTE: currently FE doesn't support council plugins fully
+          votingClient,
           confirmationCallback,
           voteWeights,
           relevantDelegators
@@ -182,7 +183,7 @@ export const useCreateVoteIxs = () => {
   const realm = useRealmQuery().data?.result
   const wallet = useWalletOnePointOh()
   const getVotingTokenOwnerRecords = useVotingTokenOwnerRecords()
-  const votingClient = useVotingClient('community') // TODO this should be passed the role
+  const votingClients = useVotingClients();
 
   // get delegates
 
@@ -195,7 +196,6 @@ export const useCreateVoteIxs = () => {
       walletPk !== undefined
         ? // eslint-disable-next-line @typescript-eslint/no-unused-vars
           async ({ voteKind, governingBody, proposal, comment }: VoteArgs) => {
-            //const signers: Keypair[] = []
             const instructions: TransactionInstruction[] = []
 
             const governingTokenMint =
@@ -205,7 +205,8 @@ export const useCreateVoteIxs = () => {
             if (governingTokenMint === undefined)
               throw new Error(`no mint for ${governingBody} governing body`)
 
-            const vote = formatVote(voteKind)
+              const votingClient = votingClients(governingBody);
+              const vote = formatVote(voteKind)
 
             const votingTors = await getVotingTokenOwnerRecords(governingBody)
             for (const torPk of votingTors) {
@@ -241,7 +242,7 @@ export const useCreateVoteIxs = () => {
       getVotingTokenOwnerRecords,
       programVersion,
       realm,
-      votingClient,
+      votingClients,
       walletPk,
     ]
   )

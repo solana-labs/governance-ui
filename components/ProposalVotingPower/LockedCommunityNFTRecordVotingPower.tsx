@@ -15,7 +15,7 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
-import {useVotingClient} from "@hooks/useVotingClient";
+import {useVotingClients} from "@hooks/useVotingClients";
 
 interface Props {
   className?: string
@@ -32,7 +32,8 @@ export default function LockedCommunityNFTRecordVotingPower(props: Props) {
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const { data: tokenOwnerRecordPk } = useAddressQuery_CommunityTokenOwner()
-  const votingClient = useVotingClient()
+  // this is only available for the community role as long as the rest of the hooks are hard-coding it
+  const votingClient = useVotingClients()('community')
   const [
     loadingPositions,
     votingPower,

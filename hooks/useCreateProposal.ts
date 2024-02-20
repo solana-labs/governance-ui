@@ -16,7 +16,7 @@ import queryClient from './queries/queryClient'
 import { proposalQueryKeys } from './queries/proposal'
 import { createLUTProposal } from 'actions/createLUTproposal'
 import { useLegacyVoterWeight } from './queries/governancePower'
-import {useVotingClient} from "@hooks/useVotingClient";
+import {useVotingClients} from "@hooks/useVotingClients";
 
 export default function useCreateProposal() {
   const connection = useLegacyConnectionContext()
@@ -27,7 +27,7 @@ export default function useCreateProposal() {
   const { result: ownVoterWeight } = useLegacyVoterWeight()
 
   const { getRpcContext } = useRpcContext()
-  const votingClient = useVotingClient();
+  const votingClients = useVotingClients();
 
   /** @deprecated because the api is goofy, use `propose` */
   const handleCreateProposal = async ({
@@ -77,6 +77,9 @@ export default function useCreateProposal() {
     }
     const rpcContext = getRpcContext()
     if (!rpcContext) throw new Error()
+
+    // only here can we identify whether we are using the community or council voting client
+    const votingClient = votingClients(voteByCouncil ? 'council' : 'community');
 
     const create = utilizeLookupTable ? createLUTProposal : createProposal
     const proposalAddress = await create(
@@ -156,6 +159,8 @@ export default function useCreateProposal() {
     const rpcContext = getRpcContext()
     if (!rpcContext) throw new Error()
 
+    // only here can we identify whether we are using the community or council voting client
+    const votingClient = votingClients(voteByCouncil ? 'council' : 'community');
     const proposalAddress = await createProposal(
       rpcContext,
       realm,

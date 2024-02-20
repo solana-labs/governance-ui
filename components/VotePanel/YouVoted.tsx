@@ -34,10 +34,9 @@ import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import queryClient from '@hooks/queries/queryClient'
 import { CheckmarkFilled } from '@carbon/icons-react'
-import {useVotingClient} from "@hooks/useVotingClient";
+import {useVotingClientForGoverningTokenMint} from "@hooks/useVotingClients";
 
 export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
-  const votingClient = useVotingClient();
   const proposal = useRouteProposalQuery().data?.result
   const realm = useRealmQuery().data?.result
   const { realmInfo } = useRealm()
@@ -58,6 +57,7 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
   const vetoVotertokenRecord = useUserVetoTokenRecord()
   const voterTokenRecord =
     quorum === 'electoral' ? electoralVoterTokenRecord : vetoVotertokenRecord
+  const votingClient = useVotingClientForGoverningTokenMint(proposal?.account.governingTokenMint)
 
   const isWithdrawEnabled =
     connected &&

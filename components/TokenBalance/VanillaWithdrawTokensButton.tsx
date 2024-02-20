@@ -34,7 +34,7 @@ import queryClient from '@hooks/queries/queryClient'
 import { proposalQueryKeys } from '@hooks/queries/proposal'
 import asFindable from '@utils/queries/asFindable'
 import { fetchTokenAccountByPubkey } from '@hooks/queries/tokenAccount'
-import {useVotingClient} from "@hooks/useVotingClient";
+import {useVotingClients} from "@hooks/useVotingClients";
 
 // TODO make this have reasonable props
 // TODO, also just refactor it
@@ -51,7 +51,7 @@ const VanillaWithdrawTokensButton = ({
   const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
-  const votingClient = useVotingClient(role);
+  const votingClient = useVotingClients()(role);
 
   const relevantTokenConfig =
     role === 'community'

@@ -44,7 +44,7 @@ import {
 } from '@hooks/queries/mintInfo'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
-import {useVotingClient} from "@hooks/useVotingClient";
+import {useVotingClients} from "@hooks/useVotingClients";
 
 const SOL_BUFFER = 0.02
 
@@ -73,7 +73,7 @@ export const Deposit: React.FC<{
     canUseTransferInstruction,
     governedTokenAccountsWithoutNfts,
   } = useGovernanceAssets()
-  const votingClient = useVotingClient();
+  const votingClients = useVotingClients();
   const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const [ownedStrategyTokenAccount, setOwnedStrategyTokenAccount] = useState<
@@ -252,7 +252,7 @@ export const Deposit: React.FC<{
         governedTokenAccount!.governance!.account!.proposalCount,
         false,
         connection,
-        votingClient
+        votingClients(voteByCouncil? 'council' : 'community')
       )
       const url = fmtUrlWithCluster(
         `/dao/${symbol}/proposal/${proposalAddress}`
@@ -266,7 +266,7 @@ export const Deposit: React.FC<{
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
-    votingClient,
+    votingClients,
     config,
     connection,
     councilMint,

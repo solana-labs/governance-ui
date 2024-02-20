@@ -18,7 +18,7 @@ import { useRouteProposalQuery } from '@hooks/queries/proposal'
 import { useVotingPop } from '@components/VotePanel/hooks'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
-import {useVotingClient} from "@hooks/useVotingClient";
+import {useVotingClients} from "@hooks/useVotingClients";
 
 const DiscussionForm = () => {
   const [comment, setComment] = useState('')
@@ -27,7 +27,7 @@ const DiscussionForm = () => {
   const realm = useRealmQuery().data?.result
   const { result: ownVoterWeight } = useLegacyVoterWeight()
   const { realmInfo } = useRealm()
-  const votingClient = useVotingClient();
+  const votingClients = useVotingClients();
   const [submitting, setSubmitting] = useState(false)
 
   const wallet = useWalletOnePointOh()
@@ -38,6 +38,7 @@ const DiscussionForm = () => {
   const commenterVoterTokenRecord =
     tokenRole === 'community' ? ownTokenRecord : ownCouncilTokenRecord
 
+  const votingClient = votingClients(tokenRole ?? 'community');// default to community if no role is provided
   const submitComment = async () => {
     setSubmitting(true)
     if (

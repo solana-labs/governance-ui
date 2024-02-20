@@ -39,7 +39,7 @@ import queryClient from '@hooks/queries/queryClient'
 import { tokenAccountQueryKeys } from '@hooks/queries/tokenAccount'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import {useHeliumClient} from "../../VoterWeightPlugins/useHeliumClient";
-import {useVotingClient} from "@hooks/useVotingClient";
+import {useVotingClients} from "@hooks/useVotingClients";
 import {useAsync} from "react-async-hook";
 
 interface PositionCardProps {
@@ -68,7 +68,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
     s.getPositions,
   ])
   const { heliumClient: vsrClient } = useHeliumClient();
-  const currentClient = useVotingClient('community'); // TODO support council
+  const votingClients = useVotingClients();
 
   const vsrRegistrar = useAsync<Registrar | undefined>(
       async () => {
@@ -204,7 +204,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
       queryKey: tokenAccountQueryKeys.all(connection.endpoint),
     })
     await getPositions({
-      votingClient: currentClient,
+      votingClient: votingClients('community'),  // community mint is hardcoded for getPositions
       realmPk: realm!.pubkey,
       communityMintPk: realm!.account.communityMint,
       walletPk: wallet!.publicKey!,
