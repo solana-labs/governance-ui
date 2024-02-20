@@ -10,19 +10,23 @@ const getAccountDomains = async (
   account: AssetAccount,
   connection: Connection
 ): Promise<Domain[]> => {
-  const domains = await getAllDomains(connection, account.pubkey)
+  try {
+    const domains = await getAllDomains(connection, account.pubkey)
 
-  if (!domains.length) {
+    if (!domains.length) {
+      return []
+    }
+
+    const reverse = await performReverseLookupBatch(connection, domains)
+
+    return domains.map((domain, index) => ({
+      name: reverse[index],
+      address: domain.toBase58(),
+      owner: account.pubkey.toBase58(),
+    }))
+  } catch (e) {
     return []
   }
-
-  const reverse = await performReverseLookupBatch(connection, domains)
-
-  return domains.map((domain, index) => ({
-    name: reverse[index],
-    address: domain.toBase58(),
-    owner: account.pubkey.toBase58(),
-  }))
 }
 
 export const getDomains = async (
