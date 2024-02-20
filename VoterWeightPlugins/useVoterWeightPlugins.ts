@@ -43,7 +43,6 @@ export const useVoterWeightPlugins = (
   args: UseVoterWeightPluginsArgs
 ): UseVoterWeightPluginsReturnType => {
   const { realmPublicKey, governanceMintPublicKey, walletPublicKey } = args
-  const { connection } = useConnection()
   const mintInfo = useMintInfoByPubkeyQuery(args.governanceMintPublicKey).data?.result;
   const tokenOwnerRecord = useTokenOwnerRecord(args.governanceMintPublicKey);
   const { data: plugins } = usePlugins(args)

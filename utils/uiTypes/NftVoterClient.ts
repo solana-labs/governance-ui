@@ -1,4 +1,4 @@
-import {Program, Provider} from '@coral-xyz/anchor'
+import {IdlAccounts, Program, Provider} from '@coral-xyz/anchor'
 import {PublicKey, TransactionInstruction} from '@solana/web3.js'
 import {IDL, NftVoter} from '../../idls/nft_voter'
 import {IDLV2, NftVoterV2} from '../../idls/nft_voter_v2'
@@ -71,6 +71,22 @@ export abstract class NftVoterClient extends Client<any> {
   }
   async calculateVoterWeight(voter: PublicKey, realm: PublicKey): Promise<BN | null> {
     return getNftGovpowerForOwner(this.program.provider.connection, realm, voter);
+  }
+
+  async calculateMaxVoterWeight(realm: PublicKey, mint: PublicKey): Promise<BN | null> {
+    const registrar = (await this.getRegistrarAccount(realm, mint)) as unknown as IdlAccounts<typeof this.program.idl>['registrar'] | undefined;
+    const nftVoterPluginTotalWeight = registrar?.collectionConfigs.reduce(
+        (prev, curr) => {
+          const size = curr.size
+          const weight = curr.weight.toNumber()
+          if (typeof size === 'undefined' || typeof weight === 'undefined')
+            return prev
+          return prev + size * weight
+        },
+        0
+    )
+
+    return nftVoterPluginTotalWeight !== undefined ? new BN(nftVoterPluginTotalWeight) : null;
   }
 
   constructor(
