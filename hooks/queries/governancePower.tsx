@@ -19,9 +19,10 @@ import {
 import { PythClient } from '@pythnetwork/staking'
 import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet'
 import { findPluginName } from '@constants/plugins'
-import { nftRegistrarQuery } from './plugins/nftVoter'
-import queryClient from './queryClient'
 import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
+import {IdlAccounts} from "@coral-xyz/anchor";
+import {NftVoter} from "../../idls/nft_voter";
+import {fetchPluginRegistrar} from "@hooks/queries/pluginRegistrar";
 
 export const getVanillaGovpower = async (
   connection: Connection,
@@ -45,11 +46,7 @@ export const useVanillaGovpower = (tokenOwnerRecordPk: PublicKey) => {
     : new BN(0)
 }
 
-export const getNftGovpowerForOwner = async (connection: Connection, realmPk: PublicKey, owner: PublicKey) => {
-  // figure out what collections are used
-  const {result: registrar} = await queryClient.fetchQuery(
-      nftRegistrarQuery(connection, realmPk)
-  )
+export const getNftGovpowerForOwnerAndRegistrar = async(connection: Connection, owner: PublicKey, registrar: IdlAccounts<NftVoter>['registrar'] | undefined) => {
   if (registrar === undefined) throw new Error()
   const {collectionConfigs} = registrar
 
@@ -77,6 +74,11 @@ export const getNftGovpowerForOwner = async (connection: Connection, realmPk: Pu
       .reduce((partialSum, a) => partialSum.add(a), new BN(0))
 
   return power
+}
+
+export const getNftGovpowerForOwner = async (connection: Connection, realmPk: PublicKey, owner: PublicKey) => {
+  const registrar = await fetchPluginRegistrar<NftVoter>(realmPk, connection, 'NFT');
+  return getNftGovpowerForOwnerAndRegistrar(connection, owner, registrar);
 }
 
 export const getNftGovpower = async (
