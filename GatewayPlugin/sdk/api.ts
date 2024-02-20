@@ -23,7 +23,7 @@ export const createCivicRegistrarIx = async (
       : []
 
   return gatewayClient!.program.methods
-      .createRegistrar(false)
+      .createRegistrar(!!predecessor)
       .accounts({
         registrar,
         realm: realm.pubkey,

@@ -14,6 +14,7 @@ import GovernancePowerCard from '@components/GovernancePower/GovernancePowerCard
 import SelectPrimaryDelegators from '@components/SelectPrimaryDelegators'
 import PythAccountDetails from 'PythVotePlugin/components/PythAccountDetails'
 import {useRealmVoterWeightPlugins} from "@hooks/useRealmVoterWeightPlugins";
+import {ReactNode} from "react";
 
 const LockPluginTokenBalanceCard = dynamic(
   () =>
@@ -74,16 +75,27 @@ const TokenBalanceCardInner = ({
     const showNftCard = requiredCards?.includes('NFT');
     const showGatewayCard = requiredCards?.includes('gateway');
 
+  console.log("requiredCards", {
+    requiredCards,
+    showHeliumCard,
+    showDefaultVSRCard,
+    showPythCard,
+    showNftCard,
+    showGatewayCard
+  })
+
   if (showDefaultVSRCard && inAccountDetails) {
     return <LockPluginTokenBalanceCard inAccountDetails={inAccountDetails} /> // does this ever actually occur in the component hierarchy?
   }
+
+  const cards: ReactNode[] = [];
 
   if (
       showHeliumCard &&
     (!ownTokenRecord ||
       ownTokenRecord.account.governingTokenDepositAmount.isZero())
   ) {
-    return (
+    cards.push(
       <>
         {!inAccountDetails && <GovernancePowerTitle />}
         <HeliumVotingPowerCard inAccountDetails={inAccountDetails} />
@@ -93,7 +105,7 @@ const TokenBalanceCardInner = ({
   }
 
   if (showNftCard && inAccountDetails) {
-    return (
+    cards.push(
       <div className="grid grid-cols-2 gap-x-2 w-full">
         <div>
           <NftVotingPower inAccountDetails={inAccountDetails} />
@@ -105,7 +117,7 @@ const TokenBalanceCardInner = ({
   }
 
   if (showPythCard){
-    return (
+    cards.push(
       <>
       {inAccountDetails ? <PythAccountDetails /> : <GovernancePowerCard />}
       </>
@@ -113,7 +125,7 @@ const TokenBalanceCardInner = ({
   }
 
   if (showGatewayCard){
-    return (
+    cards.push(
         <>
           {inAccountDetails ?  <GatewayCard /> : <GovernancePowerCard />}
         </>
@@ -121,11 +133,16 @@ const TokenBalanceCardInner = ({
   }
 
   //Default
-  return (
+  if (cards.length === 0){
+  cards.push(
     <>
       {inAccountDetails ? <VanillaAccountDetails /> : <GovernancePowerCard />}
     </>
   )
+  }
+  console.log("cards", cards)
+
+  return <>{cards}</>
 }
 
 const TokenBalanceCardWrapper = ({

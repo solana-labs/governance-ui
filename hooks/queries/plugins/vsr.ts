@@ -16,6 +16,7 @@ import { getLockTokensVotingPowerPerWallet } from 'VoteStakeRegistry/tools/depos
 import { useQuery } from '@tanstack/react-query'
 import { findPluginName } from '@constants/plugins'
 import {useVsrClient} from "../../../VoterWeightPlugins/useVsrClient";
+import {fetchPlugin} from "@hooks/queries/pluginRegistrar";
 
 const VOTER_INFO_EVENT_NAME = 'VoterInfo'
 
@@ -45,17 +46,14 @@ export const getVsrGovpower = async (
 ) => {
   const { result: realm } = await fetchRealmByPubkey(connection, realmPk)
   if (realm === undefined) throw new Error()
-  const communityMintPk = realm.account.communityMint
   const config = await fetchRealmConfigQuery(connection, realmPk)
+  const plugin = await fetchPlugin(realmPk, connection, 'VSR');
+  const registrarPk = plugin?.registrarPublicKey;
   const programId = config.result?.account.communityTokenConfig.voterWeightAddin
-  if (programId === undefined)
-    return { found: false, result: undefined } as const
+  if (registrarPk === undefined || programId === undefined) {
+    return {found: false, result: undefined} as const
+  }
 
-  const { registrar: registrarPk } = await getRegistrarPDA(
-    realmPk,
-    communityMintPk,
-    programId
-  )
   const { voter: voterPk } = await getVoterPDA(registrarPk, walletPk, programId)
   const votingPower = await fetchVotingPower(
     connection,

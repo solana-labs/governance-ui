@@ -23,7 +23,7 @@ interface Props {
 
 export function NFTVotePluginSettingsDisplay(props: Props) {
   const { connection } = useConnection()
-    const registrar = useNftRegistrar();
+  const registrar = useNftRegistrar();
 
   const { result: configsWithNames } = useAsync(async () => {
     const collectionConfigs = (registrar?.collectionConfigs ||
