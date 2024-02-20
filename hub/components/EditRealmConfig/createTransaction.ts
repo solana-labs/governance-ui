@@ -169,7 +169,7 @@ export async function createTransaction(
         isDevnet,
       );
 
-      const predecessorPlugin = currentConfig.chainingEnabled
+      const predecessorPlugin = config.chainingEnabled
         ? currentConfig.configAccount.communityTokenConfig.voterWeightAddin
         : undefined;
 

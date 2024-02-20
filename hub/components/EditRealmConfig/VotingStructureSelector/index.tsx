@@ -5,6 +5,7 @@ import BN from 'bn.js';
 import { produce } from 'immer';
 import { useEffect, useRef, useState } from 'react';
 
+import { defaultPass } from '../../../../GatewayPlugin/config';
 import { Config } from '../fetchConfig';
 import { ChainToggleConfigurator } from '@hub/components/EditRealmConfig/VotingStructureSelector/ChainToggle';
 import cx from '@hub/lib/cx';
@@ -170,6 +171,19 @@ export function getLabel(value: Props['structure']): string {
 
   return 'Custom';
 }
+
+const getDefaults = (value: Props['structure']): Partial<Config> => {
+  let result: Partial<Config> = {};
+
+  if (isCivicConfig(value)) {
+    result = {
+      ...result,
+      civicPassType: new PublicKey(defaultPass.value),
+    };
+  }
+
+  return result;
+};
 
 function getDescription(value: Props['structure']): string {
   if (isNFTConfig(value)) {
@@ -353,7 +367,11 @@ export function VotingStructureSelector(props: Props) {
                       props.onChange?.({});
                       setIsDefault(true);
                     } else {
-                      props.onChange?.(config);
+                      const changes = {
+                        ...getDefaults(config), // add any default values (e.g. chainingEnabled)
+                        ...config,
+                      };
+                      props.onChange?.(changes);
                       setIsDefault(false);
                     }
                   }}

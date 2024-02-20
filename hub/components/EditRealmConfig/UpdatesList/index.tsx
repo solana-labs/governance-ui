@@ -201,6 +201,8 @@ export function UpdatesList(props: Props) {
     );
   }
 
+  console.log('updates', updates);
+
   return (
     <SectionBlock className={cx('space-y-16', props.className)}>
       {'minCommunityTokensToCreateGovernance' in updates && (
