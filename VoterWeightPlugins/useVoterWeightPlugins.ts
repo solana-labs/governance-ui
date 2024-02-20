@@ -74,7 +74,7 @@ export const useVoterWeightPlugins = (
           walletPublicKey,
           realmPublicKey,
           governanceMintPublicKey,
-          connection,
+          plugins,
         }),
     })
   }
@@ -94,7 +94,7 @@ export const useVoterWeightPlugins = (
           walletPublicKey,
           realmPublicKey,
           governanceMintPublicKey,
-          connection,
+          plugins,
           action
         }),
     })
@@ -109,10 +109,9 @@ export const useVoterWeightPlugins = (
       queryKey: ['createMaxVoterWeightRecords', ...queryKeys(args)],
       queryFn: () =>
         createMaxVoterWeight({
-          walletPublicKey,
           realmPublicKey,
           governanceMintPublicKey,
-          connection,
+          plugins,
         }),
     })
   }
@@ -126,10 +125,9 @@ export const useVoterWeightPlugins = (
       queryKey: ['updateMaxVoterWeightRecords', ...queryKeys(args)],
       queryFn: () =>
         updateMaxVoterWeight({
-          walletPublicKey,
           realmPublicKey,
           governanceMintPublicKey,
-          connection,
+          plugins,
         }),
     })
   }
