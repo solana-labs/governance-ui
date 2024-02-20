@@ -55,7 +55,7 @@ const STSOL_MINT_DEVNET = '5nnLCgZn1EQaLj1ub8vYbQgBhkWi97x4JC5ARVPhci4V'
 
 const ConvertToStSol = () => {
   const realm = useRealmQuery().data?.result
-  const { canChooseWhoVote, symbol } = useRealm()
+  const { availableVoteGovernanceOptions, symbol } = useRealm()
   const { canUseTransferInstruction } = useGovernanceAssets()
   const { governedTokenAccounts } = useGovernanceAssets()
   const { fmtUrlWithCluster } = useQueryContext()
@@ -260,7 +260,7 @@ const ConvertToStSol = () => {
                 })
               }
             />
-            {canChooseWhoVote && (
+            {availableVoteGovernanceOptions.length > 1 && (
               <VoteBySwitch
                 checked={voteByCouncil}
                 onChange={() => {

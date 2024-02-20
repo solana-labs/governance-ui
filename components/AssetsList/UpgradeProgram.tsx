@@ -44,7 +44,7 @@ const UpgradeProgram = ({ program }: { program: AssetAccount }) => {
   const { fmtUrlWithCluster } = useQueryContext()
   const { symbol } = router.query
   const realm = useRealmQuery().data?.result
-  const { realmInfo, canChooseWhoVote } = useRealm()
+  const { realmInfo, availableVoteGovernanceOptions } = useRealm()
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<UpgradeProgramCompactForm>({
     governedAccount: program,
@@ -252,7 +252,7 @@ const UpgradeProgram = ({ program }: { program: AssetAccount }) => {
                 })
               }
             />
-            {canChooseWhoVote && (
+            {availableVoteGovernanceOptions && (
               <VoteBySwitch
                 checked={voteByCouncil}
                 onChange={() => {

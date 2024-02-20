@@ -30,7 +30,7 @@ import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const ConvertToMsol = () => {
   const realm = useRealmQuery().data?.result
-  const { canChooseWhoVote, symbol } = useRealm()
+  const { availableVoteGovernanceOptions, symbol } = useRealm()
   const { canUseTransferInstruction } = useGovernanceAssets()
   const { governedTokenAccounts } = useGovernanceAssets()
   const { fmtUrlWithCluster } = useQueryContext()
@@ -223,7 +223,7 @@ const ConvertToMsol = () => {
                 })
               }
             ></Textarea>
-            {canChooseWhoVote && (
+            {availableVoteGovernanceOptions.length > 1 && (
               <VoteBySwitch
                 checked={voteByCouncil}
                 onChange={() => {

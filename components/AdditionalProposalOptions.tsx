@@ -26,7 +26,7 @@ const AdditionalProposalOptions: React.FC<{
   setVoteByCouncil,
 }) => {
   const [showOptions, setShowOptions] = useState(false)
-  const { canChooseWhoVote } = useRealm()
+  const { availableVoteGovernanceOptions } = useRealm()
   return (
     <>
       <LinkButton
@@ -61,7 +61,7 @@ const AdditionalProposalOptions: React.FC<{
             value={description}
             onChange={setDescription}
           />
-          {canChooseWhoVote && (
+          {availableVoteGovernanceOptions.length > 1 && (
             <VoteBySwitch
               checked={voteByCouncil}
               onChange={() => {

@@ -52,7 +52,7 @@ const SendTokens = () => {
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const connection = useLegacyConnectionContext()
   const realm = useRealmQuery().data?.result
-  const { realmInfo, symbol, canChooseWhoVote } = useRealm()
+  const { realmInfo, symbol, availableVoteGovernanceOptions } = useRealm()
   const { handleCreateProposal } = useCreateProposal()
   const { canUseTransferInstruction } = useGovernanceAssets()
   const tokenInfo = useTreasuryAccountStore((s) => s.tokenInfo)
@@ -345,7 +345,7 @@ const SendTokens = () => {
                 })
               }
             ></Textarea>
-            {canChooseWhoVote && (
+            {availableVoteGovernanceOptions.length > 1 && (
               <VoteBySwitch
                 checked={voteByCouncil}
                 onChange={() => {
