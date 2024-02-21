@@ -1739,6 +1739,7 @@ const instructions = () => ({
 
 export const MANGO_V4_INSTRUCTIONS = {
   '4MangoMjqJ2firMokCjjGgoK8d4MXcrgL7XJaL3w6fVg': instructions(),
+  zF2vSz6V9g1YHGmfrzsY497NJzbRr84QUrPry4bLQ25: instructions(),
 }
 
 async function getDataObjectFlattened<T>(
