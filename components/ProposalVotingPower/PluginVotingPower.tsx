@@ -2,14 +2,18 @@ import classNames from 'classnames'
 
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 
-import { TokenDeposit } from '@components/TokenBalance/TokenDeposit'
 import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
 import { useRealmQuery } from '@hooks/queries/realm'
-import { GoverningTokenRole } from '@solana/spl-governance'
 import { BigNumber } from 'bignumber.js'
 import clsx from 'clsx'
 import { useMemo } from 'react'
 import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
+import {useJoinRealm} from "@hooks/useJoinRealm";
+import {Transaction} from "@solana/web3.js";
+import useWalletOnePointOh from "@hooks/useWalletOnePointOh";
+import {useConnection} from "@solana/wallet-adapter-react";
+import Button from "@components/Button";
+import {sendTransaction} from "@utils/send";
 
 interface Props {
   className?: string
@@ -17,8 +21,11 @@ interface Props {
 }
 
 export default function PluginVotingPower({ role, className }: Props) {
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
+  const {connection} = useConnection();
   const realm = useRealmQuery().data?.result
-
+  const { userNeedsTokenOwnerRecord, userNeedsVoterWeightRecords, handleRegister } = useJoinRealm();
   const mintInfo = useMintInfoByPubkeyQuery(realm?.account.communityMint).data
     ?.result
 
@@ -35,6 +42,32 @@ export default function PluginVotingPower({ role, className }: Props) {
         : undefined,
     [mintInfo, calculatedVoterWeight?.value]
   )
+  const showJoinButton = userNeedsTokenOwnerRecord || userNeedsVoterWeightRecords;
+
+  const join = async () => {
+    const instructions = await handleRegister();
+    const transaction = new Transaction()
+    transaction.add(...instructions)
+
+    await sendTransaction({
+      transaction: transaction,
+      wallet: wallet!,
+      connection,
+      signers: [],
+      sendingMessage: `Registering`,
+      successMessage: `Registered`,
+    })
+  }
+
+  console.log("PluginVotingPower", {
+    role,
+    realm,
+    mintInfo,
+    isLoading,
+    calculatedVoterWeight: calculatedVoterWeight?.value?.toString(),
+    isReady,
+    formattedTotal,
+  })
 
   if (isLoading || !isReady) {
     return (
@@ -45,10 +78,6 @@ export default function PluginVotingPower({ role, className }: Props) {
         )}
       />
     )
-  }
-
-  if (!calculatedVoterWeight?.value || calculatedVoterWeight.value.isZero()) {
-    return null
   }
 
   return (
@@ -69,11 +98,11 @@ export default function PluginVotingPower({ role, className }: Props) {
               </div>
             </div>
             <div className="text-xl font-bold text-fgd-1 hero-text">
-              <TokenDeposit
-                mint={mintInfo}
-                tokenRole={GoverningTokenRole.Community}
-                inAccountDetails={true}
-              />
+              {connected && showJoinButton && (
+                  <Button className="w-full" onClick={join}>
+                    Join
+                  </Button>
+              )}
             </div>
           </div>
         </div>

@@ -46,6 +46,9 @@ export default function GovernancePowerForRole({
   const usesGateway = usesPlugin('gateway');
   const usesQV = usesPlugin('QV');
   const isVanilla = !usesNFT && !usesPyth && !usesHeliumVSR && !usesVSR && !usesGateway && !usesQV;
+  // if the realm uses a plugin that doesn't have its own dedicated vote power UI, then use the default one.
+  // Note - when the work for Quadratic Voting milestone 3 comes in, the QV plugin will have its own UI component.
+  const usesDefaultPluginBasedVotingPower = usesGateway || usesQV;
 
   //VSR if dao transited to use plugin and some users have still deposited tokens they should withdraw before
   //depositing to plugin
@@ -62,6 +65,19 @@ export default function GovernancePowerForRole({
     if ((plugins?.length ?? 0) > 1) return 'composite';
     return determineVotingPowerType(connection, realmPk, role)
   }, [connection, realmPk, role])
+
+  console.log("gov power for role", {
+    role,
+    usesNFT,
+    usesPyth,
+    usesHeliumVSR,
+    usesVSR,
+    usesGateway,
+    usesQV,
+    isVanilla,
+    didWithdrawFromVanillaSetup,
+    connected,
+  })
 
   if (connected && kind === undefined && !props.hideIfZero) {
     return (
@@ -103,7 +119,7 @@ export default function GovernancePowerForRole({
             {usesPyth && <PythVotingPower role="community" />}
             {usesHeliumVSR && <LockedCommunityNFTRecordVotingPower />}
             {usesGateway && <GatewayCard />}
-            {usesQV && <PluginVotingPower role="community" />}
+            {usesDefaultPluginBasedVotingPower && <PluginVotingPower role="community" />}
           </>
           // council
           : kind === 'vanilla' ? (

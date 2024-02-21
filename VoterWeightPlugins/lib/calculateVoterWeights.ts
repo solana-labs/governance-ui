@@ -70,6 +70,7 @@ export const calculateVoterWeight = async ({
   plugins,
   tokenOwnerRecord
 }: CalculateVoterWeightParams): Promise<CalculatedWeight> => {
+    console.log("CVW: CALCULATING VOTER WEIGHT");
     const tokenOwnerRecordPower = tokenOwnerRecord?.account.governingTokenDepositAmount ?? new BN(0)
 
     const startingWeight: CalculatedWeight = {
@@ -77,11 +78,14 @@ export const calculateVoterWeight = async ({
         details: []
     };
 
+    console.log("CVW: STARTING WEIGHT", startingWeight?.value?.toString());
+
     const reducer = async (inputVoterWeight: CalculatedWeight, nextPlugin: VoterWeightPluginInfo): Promise<CalculatedWeight> => {
         if (inputVoterWeight.value === null) return inputVoterWeight;
 
         try {
             const nextWeight = await nextPlugin.client.calculateVoterWeight(walletPublicKey, realmPublicKey, governanceMintPublicKey, inputVoterWeight.value);
+            console.log("CVW: NEXT WEIGHT", nextWeight?.toString());
             return handlePluginSuccess(inputVoterWeight, nextPlugin, nextWeight);
         } catch (error) {
             return handlePluginError(inputVoterWeight, nextPlugin, error);
