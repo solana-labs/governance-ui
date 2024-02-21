@@ -4236,10 +4236,10 @@
     "@solana/codecs-core" "2.0.0-experimental.8618508"
     "@solana/codecs-numbers" "2.0.0-experimental.8618508"
 
-"@solana/governance-program-library@npm:@civic/governance-program-library@0.18.2-beta.19":
-  version "0.18.2-beta.19"
-  resolved "https://registry.yarnpkg.com/@civic/governance-program-library/-/governance-program-library-0.18.2-beta.19.tgz#22adeb8fdfd666c8a014d1900f7a05c5485756f9"
-  integrity sha512-HmVEPobvWCKTJDZ6EWZ3ec8OxCi6vX5Y/24Hpey6sIiKM9dgAbh6mtgaAYwlGybrB44HZcSSZg2TsPr/mlLoRA==
+"@solana/governance-program-library@npm:@civic/governance-program-library@0.18.2-beta.20":
+  version "0.18.2-beta.20"
+  resolved "https://registry.yarnpkg.com/@civic/governance-program-library/-/governance-program-library-0.18.2-beta.20.tgz#c69c7814dcd007851aa4f91038ba9932718e9c09"
+  integrity sha512-XvqXjaSAEOsXuPjl8T8aW2bK7Q2bWpXEb8UUyx5XsPsDovFDjXUiosEEhuaOXiAM4p+QdvmYo08zSzc43hs33w==
   dependencies:
     "@coral-xyz/anchor" "^0.29.0"
     "@identity.com/solana-gateway-ts" "^0.12.0"
