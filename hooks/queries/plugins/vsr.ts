@@ -39,6 +39,8 @@ export const vsrQueryKeys = {
   ],
 }
 
+// @deprecated - use the vsr voting client instead (useVsrClient), or preferably just obtain the weight generically for all plugins using
+// useRealmVoterWeightPlugins().calculatedVoterWeight
 export const getVsrGovpower = async (
   connection: Connection,
   realmPk: PublicKey,
@@ -46,22 +48,19 @@ export const getVsrGovpower = async (
 ) => {
   const { result: realm } = await fetchRealmByPubkey(connection, realmPk)
   if (realm === undefined) throw new Error()
-  const config = await fetchRealmConfigQuery(connection, realmPk)
   const plugin = await fetchPlugin(realmPk, connection, 'VSR');
-  const registrarPk = plugin?.registrarPublicKey;
-  const programId = config.result?.account.communityTokenConfig.voterWeightAddin
-  if (registrarPk === undefined || programId === undefined) {
+  const votingPower =await plugin?.client?.calculateVoterWeight(
+    walletPk,
+    realmPk,
+    realm.account.communityMint,
+    new BN(0) // technically incorrect. Should obtain the voter weight from the input TOR
+  );
+
+  if (!votingPower) {
     return {found: false, result: undefined} as const
   }
 
-  const { voter: voterPk } = await getVoterPDA(registrarPk, walletPk, programId)
-  const votingPower = await fetchVotingPower(
-    connection,
-    programId,
-    registrarPk,
-    voterPk
-  )
-  return votingPower
+  return { found: true, result: votingPower }
 }
 
 const extractVotingPowerFromSimulation = (
