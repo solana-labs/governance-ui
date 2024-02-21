@@ -92,7 +92,6 @@ export async function fetchConfig(
     (plugin) => plugin.name === 'gateway',
   )?.client as GatewayClient | undefined;
 
-
   if (nftClient && realm.account.communityMint) {
     const programId = nftClient.program.programId;
     const registrarPDA = (
