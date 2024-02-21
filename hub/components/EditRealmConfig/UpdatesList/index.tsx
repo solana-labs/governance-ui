@@ -117,6 +117,11 @@ function votingStructureText(
     typeof maxVotingPluginDiff[0] === 'undefined'
   ) {
     existingText = 'Civic';
+  } else if (
+    votingPluginDiff[0]?.equals(DEFAULT_QV_CONFIG.votingProgramId) &&
+    typeof maxVotingPluginDiff[0] === 'undefined'
+  ) {
+    existingText = 'QV';
   } else if (votingPluginDiff[0] || maxVotingPluginDiff[0]) {
     existingText = 'Custom';
   }
