@@ -47,19 +47,6 @@ export default function GovernancePowerForRole({
   const usesQV = usesPlugin('QV');
   const isVanilla = !usesNFT && !usesPyth && !usesHeliumVSR && !usesVSR && !usesGateway && !usesQV;
 
-  console.log("uses:", {
-    hideIfZero: props.hideIfZero,
-    role,
-    plugins,
-    usesNFT,
-    usesPyth,
-    usesHeliumVSR,
-    usesVSR,
-    usesGateway,
-    usesQV,
-    isVanilla
-  });
-
   //VSR if dao transited to use plugin and some users have still deposited tokens they should withdraw before
   //depositing to plugin
   const didWithdrawFromVanillaSetup =

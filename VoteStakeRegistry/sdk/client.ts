@@ -5,7 +5,7 @@ import {PublicKey, TransactionInstruction} from "@solana/web3.js";
 import {getVoterPDA} from "./accounts";
 import {SYSTEM_PROGRAM_ID} from "@solana/spl-governance";
 import BN from "bn.js";
-import {getVsrGovpower} from "@hooks/queries/plugins/vsr";
+import {fetchVotingPower} from "@hooks/queries/plugins/vsr";
 
 export const DEFAULT_VSR_ID = new web3.PublicKey(
   'vsr2nfGVNHmSY8uxoBGqq8AQbwz3JwaEaHqGbsTPXqQ'
@@ -77,14 +77,23 @@ export class VsrClient extends Client<typeof IDL> {
   async updateMaxVoterWeightRecord(): Promise<TransactionInstruction | null> {
     return null;
   }
-  async calculateVoterWeight(voter: PublicKey, realm: PublicKey): Promise<BN | null> {
+  async calculateVoterWeight(voter: PublicKey, realm: PublicKey, mint: PublicKey): Promise<BN | null> {
     // TODO should use vsr govpower multi? see useVsrGovpowerMulti
-    const govPower = await getVsrGovpower(
-        this.program.provider.connection,
-        realm,
-        voter);
+    const { registrar: registrarPk} = this.getRegistrarPDA(realm, mint)
+    const programId = this.program.programId;
+    if (registrarPk === undefined || programId === undefined) {
+      return null
+    }
 
-    return govPower.found ? govPower.result : null;
+    const { voter: voterPk } = await getVoterPDA(registrarPk, voter, programId)
+    const votingPower = await fetchVotingPower(
+        this.program.provider.connection,
+        programId,
+        registrarPk,
+        voterPk
+    )
+
+    return votingPower.result ?? null;
   }
   constructor(program: Program<VoterStakeRegistry>, devnet:boolean) {
     super(program, devnet);
