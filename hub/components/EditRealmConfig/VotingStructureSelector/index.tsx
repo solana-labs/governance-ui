@@ -223,12 +223,6 @@ export function VotingStructureSelector(props: Props) {
     props.structure.votingProgramId?.toBase58() !==
       props.currentStructure.votingProgramId?.toBase58();
 
-  console.log('shouldShowChainToggle', {
-    shouldShowChainToggle,
-    current: props.currentStructure.votingProgramId?.toBase58(),
-    new: props.structure.votingProgramId?.toBase58(),
-  });
-
   useEffect(() => {
     if (trigger.current) {
       setWidth(trigger.current.clientWidth);
