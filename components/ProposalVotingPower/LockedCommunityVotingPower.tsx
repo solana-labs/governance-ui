@@ -7,10 +7,10 @@ import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { getMintMetadata } from '../instructions/programs/splToken'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
-import { useVsrGovpower } from '@hooks/queries/plugins/vsr'
 import VSRCommunityVotingPower from 'VoteStakeRegistry/components/TokenBalance/VSRVotingPower'
 import DepositCommunityTokensBtn from 'VoteStakeRegistry/components/TokenBalance/DepositCommunityTokensBtn'
 import useDelegators from '@components/VotePanel/useDelegators'
+import {useRealmVoterWeightPlugins} from "@hooks/useRealmVoterWeightPlugins";
 
 interface Props {
   className?: string
@@ -25,12 +25,8 @@ export default function LockedCommunityVotingPower(props: Props) {
   const mint = mintData?.result
 
   const { realmTokenAccount } = useRealm()
-
-  const {
-    data: votingPowerResult,
-    isLoading: votingPowerLoading,
-  } = useVsrGovpower()
-  const votingPower = votingPowerResult?.result
+  const { calculatedVoterWeight, isReady: votingPowerReady } = useRealmVoterWeightPlugins('community');
+  const votingPower = calculatedVoterWeight?.value ?? undefined;
 
   const isLoading = useDepositStore((s) => s.state.isLoading)
 
@@ -45,7 +41,7 @@ export default function LockedCommunityVotingPower(props: Props) {
   // memoize useAsync inputs to prevent constant refetch
   const relevantDelegators = useDelegators('community')
 
-  if (isLoading || votingPowerLoading || mintLoading) {
+  if (isLoading || !votingPowerReady || mintLoading) {
     return (
       <div
         className={classNames(
@@ -64,7 +60,7 @@ export default function LockedCommunityVotingPower(props: Props) {
           You do not have any voting power in this dao.
         </div>
       ) : (
-        <VSRCommunityVotingPower />
+        <VSRCommunityVotingPower votingPower={votingPower} votingPowerLoading={!votingPowerReady}/>
       )}
 
       {depositAmount.isGreaterThan(0) && (
