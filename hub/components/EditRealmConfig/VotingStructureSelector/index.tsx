@@ -214,6 +214,21 @@ export function VotingStructureSelector(props: Props) {
   );
   const trigger = useRef<HTMLButtonElement>(null);
 
+  // only show the chain toggle if the plugin supports chaining
+  // and there is a previous plugin to chain with
+  // and the current plugin is not the same as the previous plugin
+  const shouldShowChainToggle =
+    isChainablePlugin(props.structure) &&
+    !!props.currentStructure.votingProgramId &&
+    props.structure.votingProgramId?.toBase58() !==
+      props.currentStructure.votingProgramId?.toBase58();
+
+  console.log('shouldShowChainToggle', {
+    shouldShowChainToggle,
+    current: props.currentStructure.votingProgramId?.toBase58(),
+    new: props.structure.votingProgramId?.toBase58(),
+  });
+
   useEffect(() => {
     if (trigger.current) {
       setWidth(trigger.current.clientWidth);
@@ -314,21 +329,20 @@ export function VotingStructureSelector(props: Props) {
             }}
           />
         )}
-        {isChainablePlugin(props.structure) && // only show the chain toggle if the plugin supports chaining
-          !!props.currentStructure.votingProgramId && ( // and there is a previous plugin to chain with
-            <ChainToggleConfigurator
-              chainingEnabled={props.structure.chainingEnabled ?? false}
-              previousPlugin={
-                props.currentStructure.votingProgramId?.toBase58() || ''
-              }
-              onChange={(value) => {
-                const newConfig = produce({ ...props.structure }, (data) => {
-                  data.chainingEnabled = value;
-                });
-                props.onChange?.(newConfig);
-              }}
-            />
-          )}
+        {shouldShowChainToggle && (
+          <ChainToggleConfigurator
+            chainingEnabled={props.structure.chainingEnabled ?? false}
+            previousPlugin={
+              props.currentStructure.votingProgramId?.toBase58() || ''
+            }
+            onChange={(value) => {
+              const newConfig = produce({ ...props.structure }, (data) => {
+                data.chainingEnabled = value;
+              });
+              props.onChange?.(newConfig);
+            }}
+          />
+        )}
         <DropdownMenu.Portal>
           <DropdownMenu.Content
             // weo weo z-index crap
