@@ -21,7 +21,7 @@ import {
   getTimeLeftFromNowFmt,
 } from '@utils/dateTools'
 import InfoBox from 'VoteStakeRegistry/components/LockTokenStats/InfoBox'
-import { LockupType } from 'VoteStakeRegistry/sdk/accounts'
+import { LockupType, Registrar } from 'VoteStakeRegistry/sdk/accounts'
 import {
   DepositWithWallet,
   getProposalsTransactions,
@@ -47,7 +47,6 @@ import { useQuery } from '@tanstack/react-query'
 import { IDL } from 'VoteStakeRegistry/sdk/voter_stake_registry'
 import { ProfileImage, ProfileName } from '@components/Profile'
 import {useVsrClient} from "../../../../VoterWeightPlugins/useVsrClient";
-import {useAsync} from "react-async-hook";
 
 const VestingVsTime = dynamic(
   () => import('VoteStakeRegistry/components/LockTokenStats/VestingVsTime'),
@@ -135,18 +134,9 @@ const LockTokenStats = () => {
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const { symbol } = useRouter().query
   const { realmInfo } = useRealm()
-  const { vsrClient } = useVsrClient();
-  const voteStakeRegistryRegistrarPk =
-    realm && vsrClient &&
-        vsrClient.getRegistrarPDA(realm.pubkey, realm.account.communityMint).registrar;
-  const { result:voteStakeRegistryRegistrar } = useAsync(
-    async () => {
-      if (vsrClient && realm) {
-        return vsrClient.getRegistrarAccount(realm.pubkey, realm.account.communityMint);
-      }
-    },
-    [vsrClient, realm]
-  )
+  const { vsrClient, plugin } = useVsrClient();
+  const voteStakeRegistryRegistrar = plugin?.params as Registrar | undefined;
+  const voteStakeRegistryRegistrarPk = plugin?.registrarPublicKey;
 
   const governedTokenAccounts = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
