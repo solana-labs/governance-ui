@@ -1,4 +1,8 @@
-import { Group, MangoAccount, toUiDecimals } from '@blockworks-foundation/mango-v4'
+import {
+  Group,
+  MangoAccount,
+  toUiDecimals,
+} from '@blockworks-foundation/mango-v4'
 import AdditionalProposalOptions from '@components/AdditionalProposalOptions'
 import Button, { LinkButton } from '@components/Button'
 import Input from '@components/inputs/Input'
@@ -18,13 +22,18 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Tooltip from '@components/Tooltip'
-import { getMintDecimalAmount, getMintMinAmountAsDecimal, getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
+import {
+  getMintDecimalAmount,
+  getMintMinAmountAsDecimal,
+  getMintNaturalAmountFromDecimalAsBN,
+} from '@tools/sdk/units'
 import BigNumber from 'bignumber.js'
 import { precision } from '@utils/formatting'
 import * as yup from 'yup'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { validateInstruction } from '@utils/instructionTools'
 import Switch from '@components/Switch'
+import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 
 const MangoModal = ({ account }: { account: AssetAccount }) => {
   const { canUseTransferInstruction } = useGovernanceAssets()
@@ -35,10 +44,12 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
   const { symbol } = useRealm()
   const [isProposing, setIsProposing] = useState(false)
   const [voteByCouncil, setVoteByCouncil] = useState(false)
-  const [isLoadingMangoAccount, setIsLoadingMangoAccount] = useState<boolean>(true)
+  const [isLoadingMangoAccount, setIsLoadingMangoAccount] = useState<boolean>(
+    true
+  )
   const [mangoAccounts, setMangoAccounts] = useState<MangoAccount[]>([])
   const [form, setForm] = useState<{
-    mangoAccount: MangoAccount | null | undefined,
+    mangoAccount: MangoAccount | null | undefined
     accountName: string
     amount: number
     title: string
@@ -57,7 +68,7 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
     mangoAccount: undefined,
     delegate: false,
     delegateWallet: '',
-  });
+  })
   const [formErrors, setFormErrors] = useState({})
 
   const handleSetForm = ({ propertyName, value }) => {
@@ -84,11 +95,18 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
   const currentPrecision = precision(mintMinAmount)
 
   const schema = yup.object().shape({
-    mangoAccount: yup.object().nullable(true).test('is-not-undefined', 'Please select an Account', value => value !== undefined),
+    mangoAccount: yup
+      .object()
+      .nullable(true)
+      .test(
+        'is-not-undefined',
+        'Please select an Account',
+        (value) => value !== undefined
+      ),
     accountName: yup.string().when('mangoAccount', {
       is: null,
       then: yup.string().required('Account name is required'),
-      otherwise: yup.string().notRequired()
+      otherwise: yup.string().notRequired(),
     }),
     title: yup.string().required('Title is required'),
     amount: yup
@@ -97,11 +115,14 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
       .min(mintMinAmount)
       .max(maxAmount.toNumber()),
     delegate: yup.boolean().required('Delegate is required'),
-    delegateWallet: yup.string().nullable().when('delegate', {
-      is: true,
-      then: yup.string().required('Delegate Wallet is required'),
-      otherwise: yup.string().notRequired()
-    }),
+    delegateWallet: yup
+      .string()
+      .nullable()
+      .when('delegate', {
+        is: true,
+        then: yup.string().required('Delegate Wallet is required'),
+        otherwise: yup.string().notRequired(),
+      }),
   })
 
   useEffect(() => {
@@ -116,61 +137,76 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
       }
     }
 
-    setIsLoadingMangoAccount(true);
+    setIsLoadingMangoAccount(true)
     getMangoAccounts().then(() => setIsLoadingMangoAccount(false))
   }, [mangoClient !== null && mangoGroup !== null])
 
-
-
   const handleCreateAccount = async () => {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
-    if(!isValid) return;
+    if (!isValid) return
 
     try {
       setIsProposing(true)
-      const newAccountNum = getNextAccountNumber(mangoAccounts)
+      const instructions: InstructionDataWithHoldUpTime[] = []
+      let mangoAccountPk = form.mangoAccount?.publicKey
       const bank = mangoGroup!.getFirstBankByMint(
         account.extensions.mint!.publicKey!
       )
-      const createAccIx = await mangoClient!.program.methods
-        .accountCreate(
-          newAccountNum,
-          8,
-          4,
-          4,
-          32,
-          form.accountName || `Account ${newAccountNum + 1}`
+
+      if (form.mangoAccount === null) {
+        const newAccountNum = getNextAccountNumber(mangoAccounts)
+        const createAccIx = await mangoClient!.program.methods
+          .accountCreate(
+            newAccountNum,
+            8,
+            4,
+            4,
+            32,
+            form.accountName || `Account ${newAccountNum + 1}`
+          )
+          .accounts({
+            group: mangoGroup!.publicKey,
+            owner: account.extensions.token!.account.owner!,
+            payer: account.extensions.token!.account.owner!,
+          })
+          .instruction()
+
+        const createAccInstData = {
+          data: getInstructionDataFromBase64(
+            serializeInstructionToBase64(createAccIx)
+          ),
+          holdUpTime:
+            account?.governance.account?.config.minInstructionHoldUpTime,
+          prerequisiteInstructions: [],
+        }
+
+        instructions.push(createAccInstData)
+
+        const acctNumBuffer = Buffer.alloc(4)
+        acctNumBuffer.writeUInt32LE(newAccountNum)
+
+        const [mangoAccount] = PublicKey.findProgramAddressSync(
+          [
+            Buffer.from('MangoAccount'),
+            mangoGroup!.publicKey.toBuffer(),
+            account.extensions.token!.account.owner!.toBuffer(),
+            acctNumBuffer,
+          ],
+          mangoClient!.programId
         )
-        .accounts({
-          group: mangoGroup!.publicKey,
-          owner: account.extensions.token!.account.owner!,
-          payer: account.extensions.token!.account.owner!,
-        })
-        .instruction()
-
-      const acctNumBuffer = Buffer.alloc(4)
-      acctNumBuffer.writeUInt32LE(newAccountNum)
-
-      const [mangoAccount] = PublicKey.findProgramAddressSync(
-        [
-          Buffer.from('MangoAccount'),
-          mangoGroup!.publicKey.toBuffer(),
-          account.extensions.token!.account.owner!.toBuffer(),
-          acctNumBuffer,
-        ],
-        mangoClient!.programId
-      )
+        mangoAccountPk = mangoAccount
+      }
 
       const tokens = getMintNaturalAmountFromDecimalAsBN(
         form.amount,
-        account.extensions.mint!.account!.decimals,
+        account.extensions.mint!.account!.decimals
       )
 
       const depositIx = await mangoClient!.program.methods
         .tokenDeposit(tokens, false)
         .accounts({
           group: mangoGroup!.publicKey,
-          account: mangoAccount,
+          account: mangoAccountPk,
           owner: account.extensions.token!.account.owner!,
           bank: bank.publicKey,
           vault: bank.vault,
@@ -195,23 +231,18 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
           serializeInstructionToBase64(depositIx!)
         ),
         holdUpTime:
-        account?.governance.account?.config.minInstructionHoldUpTime,
+          account?.governance.account?.config.minInstructionHoldUpTime,
         prerequisiteInstructions: [],
       }
 
-      const instructions = [depositAccInstData];
+      instructions.push(depositAccInstData)
 
-      if(form.delegate) {
+      if (form.delegate) {
         const delegateIx = await mangoClient!.program.methods
-          .accountEdit(
-            null,
-            new PublicKey(form.delegateWallet),
-            null,
-            null
-          )
+          .accountEdit(null, new PublicKey(form.delegateWallet), null, null)
           .accounts({
             group: mangoGroup!.publicKey,
-            account: mangoAccount,
+            account: mangoAccountPk,
             owner: account.extensions.token!.account.owner!,
           })
           .instruction()
@@ -221,25 +252,11 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
             serializeInstructionToBase64(delegateIx!)
           ),
           holdUpTime:
-          account?.governance.account?.config.minInstructionHoldUpTime,
+            account?.governance.account?.config.minInstructionHoldUpTime,
           prerequisiteInstructions: [],
         }
 
         instructions.push(delegateAccInstData)
-      }
-
-
-      if(form.mangoAccount === null) {
-        const createAccInstData = {
-          data: getInstructionDataFromBase64(
-            serializeInstructionToBase64(createAccIx)
-          ),
-          holdUpTime:
-          account?.governance.account?.config.minInstructionHoldUpTime,
-          prerequisiteInstructions: [],
-        }
-
-        instructions.push(createAccInstData)
       }
 
       const proposalAddress = await handleCreateProposal({
@@ -262,7 +279,10 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
   return (
     <div className="w-full inline-block ">
       <div className="border-b border-fgd-4 flex items-center pb-2">
-        <img src="https://mango.markets/logos/logo-mark.svg" className="w-10 h-10 mr-3" />
+        <img
+          src="https://mango.markets/logos/logo-mark.svg"
+          className="w-10 h-10 mr-3"
+        />
         <div className="flex justify-center items-center">
           <h3>Mango</h3>
         </div>
@@ -277,15 +297,21 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
               group={mangoGroup}
             ></MangoAccountItem>
           }
-          placeholder={form.mangoAccount === undefined ? 'Please select...' : form.mangoAccount?.name || 'Create new account'}
-          onChange={(value) => handleSetForm({
-            propertyName: 'mangoAccount',
-            value
-          })}
+          placeholder={
+            form.mangoAccount === undefined
+              ? 'Please select...'
+              : form.mangoAccount?.name || 'Create new account'
+          }
+          onChange={(value) =>
+            handleSetForm({
+              propertyName: 'mangoAccount',
+              value,
+            })
+          }
         >
-          {isLoadingMangoAccount && !mangoAccounts.length ?
+          {isLoadingMangoAccount && !mangoAccounts.length ? (
             <div className="text-center py-4">Loading accounts...</div>
-            :
+          ) : (
             mangoAccounts.map((x) => (
               <Select.Option key={x.publicKey.toBase58()} value={x}>
                 <MangoAccountItem
@@ -294,7 +320,7 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
                 ></MangoAccountItem>
               </Select.Option>
             ))
-          }
+          )}
 
           <Select.Option key={null} value={null}>
             <div>Create new account</div>
@@ -306,10 +332,12 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
             label="Account name"
             type="text"
             value={form.accountName}
-            onChange={(e) => handleSetForm({
-              propertyName: 'accountName',
-              value: e.target.value
-            })}
+            onChange={(e) =>
+              handleSetForm({
+                propertyName: 'accountName',
+                value: e.target.value,
+              })
+            }
           />
         )}
         <div className="flex mb-1.5 text-sm">
@@ -336,10 +364,12 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
           type="number"
           step={mintMinAmount}
           value={form.amount}
-          onChange={(e) => handleSetForm({
-            propertyName: 'amount',
-            value: e.target.value
-          })}
+          onChange={(e) =>
+            handleSetForm({
+              propertyName: 'amount',
+              value: e.target.value,
+            })
+          }
           onBlur={() => {
             handleSetForm({
               propertyName: 'amount',
@@ -353,15 +383,15 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
           }}
         />
         <div className="flex justify-end mb-1.5 text-sm">
-          <p>
-            Delegate
-          </p>
+          <p>Delegate</p>
           <Switch
             checked={form.delegate}
-            onChange={() => handleSetForm({
-              propertyName: 'delegate',
-              value: !form.delegate
-            })}
+            onChange={() =>
+              handleSetForm({
+                propertyName: 'delegate',
+                value: !form.delegate,
+              })
+            }
           />
         </div>
         {form.delegate && (
@@ -370,10 +400,12 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
             label="Delegate Wallet"
             type="text"
             value={form.delegateWallet}
-            onChange={(e) => handleSetForm({
-              propertyName: 'delegateWallet',
-              value: e.target.value
-            })}
+            onChange={(e) =>
+              handleSetForm({
+                propertyName: 'delegateWallet',
+                value: e.target.value,
+              })
+            }
           />
         )}
         <AdditionalProposalOptions
@@ -384,13 +416,13 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
           setTitle={(evt) => {
             handleSetForm({
               propertyName: 'title',
-              value: evt.target.value
+              value: evt.target.value,
             })
           }}
           setDescription={(evt) => {
             handleSetForm({
               propertyName: 'description',
-              value: evt.target.value
+              value: evt.target.value,
             })
           }}
           voteByCouncil={voteByCouncil}
@@ -430,7 +462,9 @@ const MangoAccountItem = ({
     <div>
       <div>Name: {account.name}</div>
       <div>{account.publicKey.toBase58()}</div>
-      <div>Account Value: ${toUiDecimals(account.getAssetsValue(group), 6)}</div>
+      <div>
+        Account Value: ${toUiDecimals(account.getAssetsValue(group), 6)}
+      </div>
     </div>
   ) : (
     <div>Create new account</div>
