@@ -14,6 +14,8 @@ import useWalletOnePointOh from "@hooks/useWalletOnePointOh";
 import {useConnection} from "@solana/wallet-adapter-react";
 import Button from "@components/Button";
 import {sendTransaction} from "@utils/send";
+import {TokenDeposit} from "@components/TokenBalance/TokenDeposit";
+import {GoverningTokenRole} from "@solana/spl-governance";
 
 interface Props {
   className?: string
@@ -103,6 +105,11 @@ export default function PluginVotingPower({ role, className }: Props) {
                     Join
                   </Button>
               )}
+              <TokenDeposit
+                  mint={mintInfo}
+                  tokenRole={GoverningTokenRole.Community}
+                  inAccountDetails={true}
+              />
             </div>
           </div>
         </div>
