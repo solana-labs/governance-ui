@@ -66,19 +66,6 @@ export default function GovernancePowerForRole({
     return determineVotingPowerType(connection, realmPk, role)
   }, [connection, realmPk, role])
 
-  console.log("gov power for role", {
-    role,
-    usesNFT,
-    usesPyth,
-    usesHeliumVSR,
-    usesVSR,
-    usesGateway,
-    usesQV,
-    isVanilla,
-    didWithdrawFromVanillaSetup,
-    connected,
-  })
-
   if (connected && kind === undefined && !props.hideIfZero) {
     return (
       <div className="animate-pulse bg-bkg-1 col-span-1 h-[76px] rounded-lg" />

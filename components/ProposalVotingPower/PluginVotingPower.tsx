@@ -61,16 +61,6 @@ export default function PluginVotingPower({ role, className }: Props) {
     })
   }
 
-  console.log("PluginVotingPower", {
-    role,
-    realm,
-    mintInfo,
-    isLoading,
-    calculatedVoterWeight: calculatedVoterWeight?.value?.toString(),
-    isReady,
-    formattedTotal,
-  })
-
   if (isLoading || !isReady) {
     return (
       <div

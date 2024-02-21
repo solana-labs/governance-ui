@@ -59,12 +59,6 @@ export default function useCreateProposal() {
       voteByCouncil
     ) // TODO just get the token record the normal way
 
-    console.log('ownTokenRecord', {
-      ownTokenRecord,
-        selectedGovernanceConfig: selectedGovernance.account.config,
-        voteByCouncil,
-    })
-
     const defaultProposalMint =
       !mint?.supply.isZero() ||
       config?.account.communityTokenConfig.voterWeightAddin
