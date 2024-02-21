@@ -5070,6 +5070,14 @@
     protobufjs "^7.2.4"
     yaml "^2.2.1"
 
+"@switchboard-xyz/sbv2-lite@0.2.4":
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/@switchboard-xyz/sbv2-lite/-/sbv2-lite-0.2.4.tgz#fb8e189124d89fbffa5060a8009f8e0886cc7368"
+  integrity sha512-rJNwMalZ26D4bxtrxneZ6gBIwwtQ0KiSy8jY4c81KPEad/USMyl0iGPyhKKOr6dNRDKy5BgOslnU8xnZF+rnuQ==
+  dependencies:
+    "@coral-xyz/anchor" "^0.28.0"
+    big.js "^6.1.1"
+
 "@switchboard-xyz/sbv2-lite@^0.1.6":
   version "0.1.6"
   resolved "https://registry.yarnpkg.com/@switchboard-xyz/sbv2-lite/-/sbv2-lite-0.1.6.tgz#dc3fbb5b3b028dbd3c688b991bcc48a670131ddb"
@@ -5078,15 +5086,7 @@
     "@project-serum/anchor" "^0.24.2"
     big.js "^6.1.1"
 
-"@switchboard-xyz/sbv2-lite@^0.2.4":
-  version "0.2.4"
-  resolved "https://registry.yarnpkg.com/@switchboard-xyz/sbv2-lite/-/sbv2-lite-0.2.4.tgz#fb8e189124d89fbffa5060a8009f8e0886cc7368"
-  integrity sha512-rJNwMalZ26D4bxtrxneZ6gBIwwtQ0KiSy8jY4c81KPEad/USMyl0iGPyhKKOr6dNRDKy5BgOslnU8xnZF+rnuQ==
-  dependencies:
-    "@coral-xyz/anchor" "^0.28.0"
-    big.js "^6.1.1"
-
-"@switchboard-xyz/solana.js@^3.2.5":
+"@switchboard-xyz/solana.js@3.2.5":
   version "3.2.5"
   resolved "https://registry.yarnpkg.com/@switchboard-xyz/solana.js/-/solana.js-3.2.5.tgz#c4bd3218d0b3b6bfae19215990a21cc0d5a97efa"
   integrity sha512-gCovHDTHCr+JPSwB5+JXqoKPwLs4GKM0sqUEEcQHJZXLpIAzE3Q0RDQOS76rgnpNR0sDYzv8a9aneab8GTG4Ag==
