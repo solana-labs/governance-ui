@@ -10,9 +10,6 @@ import {
 import { useRealmConfigQuery } from './queries/realmConfig'
 import { useSelectedRealmInfo } from './selectedRealm/useSelectedRealmRegistryEntry'
 import { useUserTokenAccountsQuery } from './queries/tokenAccount'
-import {useRealmVoterWeights} from "@hooks/useRealmVoterWeightPlugins";
-import BN from "bn.js";
-import {GovernanceRole} from "../@types/types";
 
 /**
  * @deprecated This hook has been broken up into many smaller hooks, use those instead, DO NOT use this
@@ -24,13 +21,6 @@ export default function useRealm() {
   const { data: tokenAccounts } = useUserTokenAccountsQuery()
   const realm = useRealmQuery().data?.result
   const realmInfo = useSelectedRealmInfo()
-
-  // if the realm has community and council tokens, both with non-zero weights, the proposer can choose which should be used to vote
-  const { communityMaxWeight, councilMaxWeight } = useRealmVoterWeights()
-  const availableVoteGovernanceOptions = [
-      communityMaxWeight?.value?.gt(new BN(0)) ? 'community' : undefined,
-        councilMaxWeight?.value?.gt(new BN(0)) ? 'council' : undefined
-  ].filter(Boolean) as GovernanceRole[]; // filter out undefined
 
   const config = useRealmConfigQuery().data?.result
   const currentPluginPk = config?.account?.communityTokenConfig.voterWeightAddin
@@ -96,7 +86,6 @@ export default function useRealm() {
       /** @deprecated just use the token owner record directly, ok? */
       //ownVoterWeight,
       //realmDisplayName: realmInfo?.displayName ?? realm?.account?.name,
-      availableVoteGovernanceOptions,
       //councilTokenOwnerRecords,
       toManyCouncilOutstandingProposalsForUse,
       toManyCommunityOutstandingProposalsForUser,
@@ -107,7 +96,6 @@ export default function useRealm() {
       isNftMode,
     }),
     [
-      availableVoteGovernanceOptions,
       councilTokenAccount,
       currentPluginPk,
       isNftMode,

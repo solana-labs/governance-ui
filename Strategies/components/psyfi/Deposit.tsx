@@ -45,6 +45,7 @@ import {
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 import {useVotingClients} from "@hooks/useVotingClients";
+import {useVoteByCouncilToggle} from "@hooks/useVoteByCouncilToggle";
 
 const SOL_BUFFER = 0.02
 
@@ -87,7 +88,7 @@ export const Deposit: React.FC<{
   >()
   const [depositReceiptPubkey, setDepositReceiptPubkey] = useState<PublicKey>()
   const [isDepositing, setIsDepositing] = useState(false)
-  const [voteByCouncil, setVoteByCouncil] = useState(false)
+  const { voteByCouncil, setVoteByCouncil } = useVoteByCouncilToggle();
   const [form, setForm] = useState<PsyFiStrategyForm>({
     strategy: proposedInvestment,
     title: '',
