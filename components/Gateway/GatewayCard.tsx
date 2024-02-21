@@ -56,7 +56,7 @@ const GatewayCard = () => {
   }
 
   return (
-    <div className="bg-bkg-2 pt-3 md:pt-3 rounded-lg">
+    <div className="bg-bkg-2 py-3 rounded-lg">
       <div className="space-y-1">
         {!connected && (
           <div className="text-xs bg-bkg-3 p-3">Please connect your wallet</div>

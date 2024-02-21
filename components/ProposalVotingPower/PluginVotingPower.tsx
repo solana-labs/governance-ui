@@ -4,12 +4,13 @@ import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { TokenDeposit } from '@components/TokenBalance/TokenDeposit'
 import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
 import { useRealmQuery } from '@hooks/queries/realm'
-import { GoverningTokenRole } from '@solana/spl-governance'
+import { useMemo } from 'react'
 import { BigNumber } from 'bignumber.js'
 import clsx from 'clsx'
 import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
 import QuadraticVotingInfoModal from './QuadraticVotingInfoModal'
 import { useQuadraticVoterWeightPlugin } from '../../VoterWeightPlugins/useQuadraticVoterWeightPlugin'
+import { useMembersQuery } from '@components/Members/useMembers'
 
 interface Props {
   className?: string
@@ -18,18 +19,33 @@ interface Props {
 
 export default function PluginVotingPower({ role, className }: Props) {
   const realm = useRealmQuery().data?.result
-
+  const { data: activeMembersData } = useMembersQuery()
   const mintInfo = useMintInfoByPubkeyQuery(realm?.account.communityMint).data
     ?.result
 
+  const activeMembers = useMemo(() => activeMembersData, [activeMembersData])
+
   const isLoading = useDepositStore((s) => s.state.isLoading)
-  const { calculatedVoterWeight, isReady } = useRealmVoterWeightPlugins(role)
+  const {
+    calculatedVoterWeight,
+    isReady,
+    calculatedMaxVoterWeight,
+    plugins,
+  } = useRealmVoterWeightPlugins(role)
 
   const { coefficients } = useQuadraticVoterWeightPlugin()
 
+  console.log('plugins', plugins)
   const formattedTotal =
     mintInfo && calculatedVoterWeight?.value
       ? new BigNumber(calculatedVoterWeight?.value.toString())
+          .shiftedBy(-mintInfo.decimals)
+          .toString()
+      : undefined
+
+  const formattedMax =
+    mintInfo && calculatedMaxVoterWeight?.value
+      ? new BigNumber(calculatedMaxVoterWeight?.value.toString())
           .shiftedBy(-mintInfo.decimals)
           .toString()
       : undefined
@@ -56,8 +72,9 @@ export default function PluginVotingPower({ role, className }: Props) {
         <p className="mb-1">Quadratic Voting</p>
         <QuadraticVotingInfoModal
           voteWeight={formattedTotal ?? '0'}
-          totalVoteWeight={100}
+          totalVoteWeight={formattedMax ?? '0'}
           coefficients={coefficients}
+          totalMembers={activeMembers?.length ?? 0}
         />
       </div>
       <div className={'p-3 rounded-md bg-bkg-1'}>
@@ -66,9 +83,9 @@ export default function PluginVotingPower({ role, className }: Props) {
             <div className="flex">
               <div className="flex flex-col">
                 <p className="font-bold">
-                  {100} tokens | {formattedTotal} votes
+                  {formattedMax} tokens | {formattedTotal} votes
                 </p>
-                <p className="text-fgd-3">0.6% of possible votes</p>
+                <p className="text-fgd-3">10% of possible votes</p>
               </div>
             </div>
 

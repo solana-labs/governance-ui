@@ -11,7 +11,7 @@ export interface useQuadraticVoterWeightPluginReturnType
 export type Coefficients = [a: number, b: number, c: number]
 
 type QuadraticPluginParams = {
-  coefficients: Coefficients
+  quadraticCoefficients: Coefficients
 }
 
 export const useQuadraticVoterWeightPlugin = (): useQuadraticVoterWeightPluginReturnType => {
@@ -24,10 +24,7 @@ export const useQuadraticVoterWeightPlugin = (): useQuadraticVoterWeightPluginRe
   const isEnabled = quadraticPlugin !== undefined
   const coefficients = (
     (quadraticPlugin?.params as QuadraticPluginParams) || undefined
-  )?.coefficients
-
-  // client.calculateVoterWeight, comes from the hook.
-  //
+  )?.quadraticCoefficients
 
   return {
     isReady,

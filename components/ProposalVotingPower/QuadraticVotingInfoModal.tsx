@@ -7,13 +7,15 @@ import { Coefficients } from '../../VoterWeightPlugins/useQuadraticVoterWeightPl
 interface QuadraticVotingInfoModalProps {
   voteWeight: string
   coefficients: Coefficients
-  totalVoteWeight: number
+  totalVoteWeight: string
+  totalMembers: number
 }
 
 export default function QuadraticVotingInfoModal({
   voteWeight,
   coefficients,
   totalVoteWeight,
+  totalMembers,
 }: QuadraticVotingInfoModalProps) {
   const [showQuadraticModal, setShowQuadraticModal] = useState(false)
 
@@ -38,12 +40,12 @@ export default function QuadraticVotingInfoModal({
                 <p className="font-bold">
                   {totalVoteWeight} tokens | {voteWeight} votes
                 </p>
-                <p className="text-fgd-3">0.6% of possible votes</p>
+                <p className="text-fgd-3">10% of possible votes</p>
               </div>
               <UserGroupIcon className="w-12 h-12" />
               <div className="flex flex-col">
-                <p className="text-fgd-3">100 DAO members</p>
-                <p className="text-fgd-3">holding 2000 tokens</p>
+                <p className="text-fgd-3">{totalMembers} DAO members</p>
+                <p className="text-fgd-3">holding {totalVoteWeight} tokens</p>
               </div>
             </div>
             <div className="flex justify-start items-start mb-6">
