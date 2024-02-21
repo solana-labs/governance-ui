@@ -85,7 +85,6 @@ export async function fetchConfig(
   let nftCollectionSize = 0;
   let nftCollectionWeight = new BN(0);
   let civicPassType: PublicKey | undefined = undefined;
-  let chainingEnabled = false;
 
   const nftClient = currentPlugins.find((plugin) => plugin.name === 'NFT')
     ?.client as NftVoterClient | undefined;
@@ -93,10 +92,6 @@ export async function fetchConfig(
     (plugin) => plugin.name === 'gateway',
   )?.client as GatewayClient | undefined;
 
-  chainingEnabled = currentPlugins.length > 1;
-
-  const pluginPublicKey =
-    configProgramAccount.account.communityTokenConfig.voterWeightAddin;
 
   if (nftClient && realm.account.communityMint) {
     const programId = nftClient.program.programId;
@@ -179,6 +174,6 @@ export async function fetchConfig(
     config: realmConfig,
     configAccount: configProgramAccount.account,
     realmAuthority: realm.account.authority,
-    chainingEnabled,
+    chainingEnabled: false,
   };
 }
