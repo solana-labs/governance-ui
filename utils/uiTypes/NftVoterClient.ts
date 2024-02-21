@@ -209,7 +209,6 @@ export class NftVoterClientV2 extends NftVoterClient {
       devnet = false,
       governanceProgramId = DEFAULT_GOVERNANCE_PROGRAM_ID
   ): Promise<NftVoterClientV2> {
-    console.log(programId.toBase58())
     return new NftVoterClientV2(
         new Program<NftVoterV2>(IDLV2, programId, provider),
         devnet,

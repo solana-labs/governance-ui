@@ -2,6 +2,15 @@ import {useRealmVoterWeightPlugins} from "@hooks/useRealmVoterWeightPlugins";
 import {VoterWeightPluginInfo} from "./types";
 import {useState} from "react";
 
+/**
+ * A useful debug dashboard for plugins, allowing you to see the voter weights and plugin config, without having to infer it
+ * through the UI.
+ *
+ * Access it using the query param ?debug on any DAO
+ *
+ * Should be removed before QV-2 is merged.
+ */
+
 const Params = ({ plugin } : { plugin: VoterWeightPluginInfo }) => {
     const trimmedParams = Object.entries(plugin.params as any).filter(([key]) => key !== 'reserved');
     return <div>

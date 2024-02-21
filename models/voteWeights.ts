@@ -337,9 +337,6 @@ export class VoterWeight implements VoterWeightInterface {
   }
 
   getTokenRecordToCreateProposal(config: GovernanceConfig, voteByCouncil: boolean) {
-    console.log('voteByCouncil', voteByCouncil)
-    console.log('this.councilTokenRecord', this.councilTokenRecord)
-    console.log('this.communityTokenRecord', this.communityTokenRecord)
     if (voteByCouncil) {
       return this.councilTokenRecord!
     }

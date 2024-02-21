@@ -1,7 +1,6 @@
 import classNames from 'classnames'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 
-import { TokenDeposit } from '@components/TokenBalance/TokenDeposit'
 import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useMemo } from 'react'
@@ -11,6 +10,14 @@ import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
 import QuadraticVotingInfoModal from './QuadraticVotingInfoModal'
 import { useQuadraticVoterWeightPlugin } from '../../VoterWeightPlugins/useQuadraticVoterWeightPlugin'
 import { useMembersQuery } from '@components/Members/useMembers'
+import { useJoinRealm } from '@hooks/useJoinRealm'
+import { Transaction } from '@solana/web3.js'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useConnection } from '@solana/wallet-adapter-react'
+import Button from '@components/Button'
+import { sendTransaction } from '@utils/send'
+import { TokenDeposit } from '@components/TokenBalance/TokenDeposit'
+import { GoverningTokenRole } from '@solana/spl-governance'
 
 interface Props {
   className?: string
@@ -18,8 +25,16 @@ interface Props {
 }
 
 export default function PluginVotingPower({ role, className }: Props) {
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
+  const { connection } = useConnection()
   const realm = useRealmQuery().data?.result
   const { data: activeMembersData } = useMembersQuery()
+  const {
+    userNeedsTokenOwnerRecord,
+    userNeedsVoterWeightRecords,
+    handleRegister,
+  } = useJoinRealm()
   const mintInfo = useMintInfoByPubkeyQuery(realm?.account.communityMint).data
     ?.result
 
@@ -30,18 +45,9 @@ export default function PluginVotingPower({ role, className }: Props) {
     calculatedVoterWeight,
     isReady,
     calculatedMaxVoterWeight,
-    plugins,
   } = useRealmVoterWeightPlugins(role)
 
   const { coefficients } = useQuadraticVoterWeightPlugin()
-
-  console.log('plugins', plugins)
-  const formattedTotal =
-    mintInfo && calculatedVoterWeight?.value
-      ? new BigNumber(calculatedVoterWeight?.value.toString())
-          .shiftedBy(-mintInfo.decimals)
-          .toString()
-      : undefined
 
   const formattedMax =
     mintInfo && calculatedMaxVoterWeight?.value
@@ -49,6 +55,33 @@ export default function PluginVotingPower({ role, className }: Props) {
           .shiftedBy(-mintInfo.decimals)
           .toString()
       : undefined
+
+  const formattedTotal = useMemo(
+    () =>
+      mintInfo && calculatedVoterWeight?.value
+        ? new BigNumber(calculatedVoterWeight?.value.toString())
+            .shiftedBy(-mintInfo.decimals)
+            .toString()
+        : undefined,
+    [mintInfo, calculatedVoterWeight?.value]
+  )
+  const showJoinButton =
+    userNeedsTokenOwnerRecord || userNeedsVoterWeightRecords
+
+  const join = async () => {
+    const instructions = await handleRegister()
+    const transaction = new Transaction()
+    transaction.add(...instructions)
+
+    await sendTransaction({
+      transaction: transaction,
+      wallet: wallet!,
+      connection,
+      signers: [],
+      sendingMessage: `Registering`,
+      successMessage: `Registered`,
+    })
+  }
 
   if (isLoading || !isReady) {
     return (
@@ -59,10 +92,6 @@ export default function PluginVotingPower({ role, className }: Props) {
         )}
       />
     )
-  }
-
-  if (!calculatedVoterWeight?.value || calculatedVoterWeight.value.isZero()) {
-    return null
   }
 
   return (
@@ -88,14 +117,18 @@ export default function PluginVotingPower({ role, className }: Props) {
                 <p className="text-fgd-3">10% of possible votes</p>
               </div>
             </div>
-
-            {/* <div className="text-xl font-bold text-fgd-1 hero-text">
+            <div className="text-xl font-bold text-fgd-1 hero-text">
+              {connected && showJoinButton && (
+                <Button className="w-full" onClick={join}>
+                  Join
+                </Button>
+              )}
               <TokenDeposit
                 mint={mintInfo}
                 tokenRole={GoverningTokenRole.Community}
                 inAccountDetails={true}
               />
-            </div> */}
+            </div>
           </div>
         </div>
       </div>

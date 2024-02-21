@@ -198,6 +198,11 @@ const VanillaWithdrawTokensButton = ({
       wallet!.publicKey!
     )
 
+    // Force the UI to recalculate voter weight
+    queryClient.invalidateQueries({
+      queryKey: ['calculateVoterWeight'],
+    })
+
     try {
       // use chunks of 8 here since we added finalize,
       // because previously 9 withdraws used to fit into one tx

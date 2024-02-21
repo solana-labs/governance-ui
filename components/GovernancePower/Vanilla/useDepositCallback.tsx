@@ -14,6 +14,7 @@ import {
 import BN from 'bn.js'
 import { sendTransaction } from '@utils/send'
 import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
+import queryClient from "@hooks/queries/queryClient";
 
 export const useDepositCallback = (
   role: 'community' | 'council' | 'undefined'
@@ -86,6 +87,11 @@ export const useDepositCallback = (
         sendingMessage: 'Depositing tokens',
         successMessage: 'Tokens have been deposited',
       })
+
+        // Force the UI to recalculate voter weight
+        queryClient.invalidateQueries({
+            queryKey: ['calculateVoterWeight'],
+        })
     },
     [connection, realmPk, role, wallet, walletPk]
   )

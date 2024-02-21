@@ -67,7 +67,6 @@ export const getPlugins = async ({
           realmPublicKey,
           governanceMintPublicKey
         )
-        console.log("registrar data", registrarData);
 
         plugins.push({
           client,
@@ -78,8 +77,6 @@ export const getPlugins = async ({
           registrarPublicKey,
           params: registrarData ?? {},
         })
-
-        console.log("registrar predecessor", registrarData?.previousVoterWeightPluginProgramId?.toBase58())
 
         programId = registrarData?.previousVoterWeightPluginProgramId;
       }

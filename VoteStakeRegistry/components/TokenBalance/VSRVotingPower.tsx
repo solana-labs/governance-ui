@@ -7,7 +7,7 @@ import { getMintDecimalAmount } from '@tools/sdk/units'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 import BN from 'bn.js'
-import { useVsrGovpower, useVsrGovpowerMulti } from '@hooks/queries/plugins/vsr'
+import { useVsrGovpowerMulti } from '@hooks/queries/plugins/vsr'
 import VotingPowerBox from 'VoteStakeRegistry/components/TokenBalance/VotingPowerBox'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import { useTokenOwnerRecordsDelegatedToUser } from '@hooks/queries/tokenOwnerRecord'
@@ -15,20 +15,17 @@ import { useMemo } from 'react'
 import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
 
 interface Props {
-  className?: string
+  className?: string,
+  votingPower: BN | undefined,
+  votingPowerLoading: boolean
 }
 
-export default function VSRCommunityVotingPower(props: Props) {
+export default function VSRCommunityVotingPower({ className, votingPower, votingPowerLoading }: Props) {
   const realm = useRealmQuery().data?.result
   const mint = useRealmCommunityMintInfoQuery().data?.result
 
   const deposits = useDepositStore((s) => s.state.deposits)
 
-  const {
-    data: votingPowerResult,
-    isLoading: votingPowerLoading,
-  } = useVsrGovpower()
-  const votingPower = votingPowerResult?.result ?? new BN(0)
   const votingPowerFromDeposits = useDepositStore(
     (s) => s.state.votingPowerFromDeposits
   )
@@ -104,7 +101,7 @@ export default function VSRCommunityVotingPower(props: Props) {
     return (
       <div
         className={classNames(
-          props.className,
+          className,
           'rounded-md bg-bkg-1 h-[76px] animate-pulse'
         )}
       />
@@ -112,9 +109,9 @@ export default function VSRCommunityVotingPower(props: Props) {
   }
 
   return (
-    <div className={props.className}>
+    <div className={className}>
       <VotingPowerBox
-        votingPower={votingPower}
+        votingPower={votingPower ?? new BN(0)}
         mint={mint}
         votingPowerFromDeposits={votingPowerFromDeposits}
         className="p-3"

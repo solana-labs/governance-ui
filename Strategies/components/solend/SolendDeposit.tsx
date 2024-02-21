@@ -42,6 +42,7 @@ import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { useRealmProposalsQuery } from '@hooks/queries/proposal'
 import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 import {useVotingClients} from "@hooks/useVotingClients";
+import {useVoteByCouncilToggle} from "@hooks/useVoteByCouncilToggle";
 
 const SOL_BUFFER = 0.02
 
@@ -70,7 +71,7 @@ const SolendDeposit = ({
   const [deposits, setDeposits] = useState<{
     [reserveAddress: string]: number
   }>({})
-  const [voteByCouncil, setVoteByCouncil] = useState(false)
+  const { voteByCouncil, setVoteByCouncil } = useVoteByCouncilToggle();
   const votingClients = useVotingClients();
   const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()

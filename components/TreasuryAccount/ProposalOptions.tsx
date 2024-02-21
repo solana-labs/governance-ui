@@ -6,13 +6,13 @@ import React from 'react'
 const ProposalOptions: React.FC<{
   handleSetForm: (obj: { propertyName: string; value: any }) => void
   form: any
-  canChooseWhoVote?: boolean
+  shouldShowVoteByCouncilToggle?: boolean
   voteByCouncil: boolean
   setVoteByCouncil: React.Dispatch<React.SetStateAction<boolean>>
 }> = ({
   handleSetForm,
   form,
-  canChooseWhoVote,
+  shouldShowVoteByCouncilToggle,
   voteByCouncil,
   setVoteByCouncil,
 }) => {
@@ -46,14 +46,14 @@ const ProposalOptions: React.FC<{
           })
         }
       ></Textarea>
-      {canChooseWhoVote && (
-        <VoteBySwitch
-          checked={voteByCouncil}
-          onChange={() => {
-            setVoteByCouncil(!voteByCouncil)
-          }}
-        ></VoteBySwitch>
-      )}
+        {shouldShowVoteByCouncilToggle && (
+            <VoteBySwitch
+                checked={voteByCouncil}
+                onChange={() => {
+                    setVoteByCouncil(!voteByCouncil)
+                }}
+            ></VoteBySwitch>
+        )}
     </>
   )
 }

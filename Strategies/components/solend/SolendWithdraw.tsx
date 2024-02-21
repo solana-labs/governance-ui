@@ -41,6 +41,7 @@ import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { useRealmProposalsQuery } from '@hooks/queries/proposal'
 import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 import {useVotingClients} from "@hooks/useVotingClients";
+import {useVoteByCouncilToggle} from "@hooks/useVoteByCouncilToggle";
 
 const SolendWithdraw = ({
   proposedInvestment,
@@ -68,7 +69,7 @@ const SolendWithdraw = ({
   const { result: ownVoterWeight } = useLegacyVoterWeight()
   const { realmInfo } = useRealm()
   const [isWithdrawing, setIsWithdrawing] = useState(false)
-  const [voteByCouncil, setVoteByCouncil] = useState(false)
+  const { voteByCouncil, setVoteByCouncil } = useVoteByCouncilToggle();
   const [deposits, setDeposits] = useState<{
     [reserveAddress: string]: { amount: number; amountExact: number }
   }>({})

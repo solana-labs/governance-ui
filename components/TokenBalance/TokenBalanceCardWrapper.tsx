@@ -71,18 +71,9 @@ const TokenBalanceCardInner = ({
 
   const showHeliumCard = requiredCards?.includes('HeliumVSR');
   const showDefaultVSRCard = requiredCards?.includes('VSR');
-    const showPythCard = requiredCards?.includes('pyth');
-    const showNftCard = requiredCards?.includes('NFT');
-    const showGatewayCard = requiredCards?.includes('gateway');
-
-  console.log("requiredCards", {
-    requiredCards,
-    showHeliumCard,
-    showDefaultVSRCard,
-    showPythCard,
-    showNftCard,
-    showGatewayCard
-  })
+  const showPythCard = requiredCards?.includes('pyth');
+  const showNftCard = requiredCards?.includes('NFT');
+  const showGatewayCard = requiredCards?.includes('gateway');
 
   if (showDefaultVSRCard && inAccountDetails) {
     return <LockPluginTokenBalanceCard inAccountDetails={inAccountDetails} /> // does this ever actually occur in the component hierarchy?
@@ -140,7 +131,6 @@ const TokenBalanceCardInner = ({
     </>
   )
   }
-  console.log("cards", cards)
 
   return <>{cards}</>
 }

@@ -1,14 +1,7 @@
-import Button from '@components/Button'
 import Loading from '@components/Loading'
 import { GatewayButton } from '@components/Gateway/GatewayButton'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useState } from 'react'
-import { useRealmQuery } from '@hooks/queries/realm'
-import {
-  useRealmCommunityMintInfoQuery,
-  useRealmCouncilMintInfoQuery,
-} from '@hooks/queries/mintInfo'
-import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import Modal from '@components/Modal'
 import { InformationCircleIcon } from '@heroicons/react/solid'
 import { useGatewayVoterWeightPlugin } from '../../VoterWeightPlugins'

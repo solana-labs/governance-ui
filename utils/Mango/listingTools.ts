@@ -154,7 +154,7 @@ export type ListingArgsFormatted = {
   stablePriceGrowthLimit: string
   tokenConditionalSwapMakerFeeRate: number
   tokenConditionalSwapTakerFeeRate: number
-  flashLoanSwapFeeRate: number
+  flashLoanSwapFeeRate: string
   reduceOnly: string
   oracle: string
   depositLimit: string
@@ -221,7 +221,8 @@ export const getFormattedListingPresets = (
       adjustedPreset = getPresetWithAdjustedNetBorrows(
         PRESETS[key],
         uiDeposits,
-        tokenPrice
+        tokenPrice,
+        PRESETS[key].netBorrowLimitPerWindowQuote
       )
     }
 
