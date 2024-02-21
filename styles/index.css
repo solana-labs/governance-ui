@@ -388,6 +388,7 @@ https://developer.mozilla.org/en-US/docs/Web/CSS/word-break#values */
 .gatewayButton > svg {
   filter: brightness(0) invert(0);
   min-width: 24px;
+  padding-top: 4px;
 }
 
 .react-grid-item.react-grid-placeholder {

@@ -1,13 +1,22 @@
 import { useState } from 'react'
 
 import { InformationCircleIcon, UserGroupIcon } from '@heroicons/react/solid'
-
 import Modal from '@components/Modal'
+import { Coefficients } from '../../VoterWeightPlugins/useQuadraticVoterWeightPlugin'
 
-export default function QuadraticVotingInfoModal() {
+interface QuadraticVotingInfoModalProps {
+  voteWeight: string
+  coefficients: Coefficients
+  totalVoteWeight: number
+}
+
+export default function QuadraticVotingInfoModal({
+  voteWeight,
+  coefficients,
+  totalVoteWeight,
+}: QuadraticVotingInfoModalProps) {
   const [showQuadraticModal, setShowQuadraticModal] = useState(false)
 
-  console.log('IN IN MODAL')
   return (
     <div>
       <span>
@@ -26,7 +35,9 @@ export default function QuadraticVotingInfoModal() {
           <div className="p-4">
             <div className="bg-bkg-1 p-4 rounded-lg mb-8 flex flex-row justify-evenly">
               <div className="flex flex-col items-end">
-                <p>64 tokens | 7 votes</p>
+                <p className="font-bold">
+                  {totalVoteWeight} tokens | {voteWeight} votes
+                </p>
                 <p className="text-fgd-3">0.6% of possible votes</p>
               </div>
               <UserGroupIcon className="w-12 h-12" />

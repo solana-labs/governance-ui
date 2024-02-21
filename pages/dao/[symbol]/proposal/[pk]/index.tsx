@@ -37,6 +37,8 @@ import { useRouteProposalQuery } from '@hooks/queries/proposal'
 import GatewayCard from '@components/Gateway/GatewayCard'
 // TODO: replace this with absolute route
 import { useGatewayVoterWeightPlugin } from 'VoterWeightPlugins/useGatewayVoterWeightPlugin'
+import { useQuadraticVoterWeightPlugin } from 'VoterWeightPlugins/useQuadraticVoterWeightPlugin'
+import PluginVotingPower from '@components/ProposalVotingPower/PluginVotingPower'
 
 const Proposal = () => {
   const { realmInfo, symbol } = useRealm()
@@ -48,6 +50,7 @@ const Proposal = () => {
   const isMulti =
     proposal?.account.voteType !== VoteType.SINGLE_CHOICE &&
     proposal?.account.accountType === GovernanceAccountType.ProposalV2
+  const isQuadratic = useQuadraticVoterWeightPlugin().isEnabled
 
   const [description, setDescription] = useState('')
   const voteData = useProposalVotes(proposal?.account)
@@ -147,6 +150,11 @@ const Proposal = () => {
       <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
         <VotePanel />
         {showTokenBalance && <ProposalVotingPower />}
+        {isQuadratic && (
+          <div className="bg-bkg-2 rounded-lg p-4 md:p-6">
+            <PluginVotingPower role="community" />
+          </div>
+        )}
         {showResults ? (
           <div className="bg-bkg-2 rounded-lg">
             <div className="p-4 md:p-6">
