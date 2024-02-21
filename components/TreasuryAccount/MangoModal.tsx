@@ -25,6 +25,7 @@ import * as yup from 'yup'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { validateInstruction } from '@utils/instructionTools'
 import Switch from '@components/Switch'
+import {useVoteByCouncilToggle} from "@hooks/useVoteByCouncilToggle";
 
 const MangoModal = ({ account }: { account: AssetAccount }) => {
   const { canUseTransferInstruction } = useGovernanceAssets()
@@ -34,7 +35,7 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
   const router = useRouter()
   const { symbol } = useRealm()
   const [isProposing, setIsProposing] = useState(false)
-  const [voteByCouncil, setVoteByCouncil] = useState(false)
+  const { voteByCouncil, setVoteByCouncil } = useVoteByCouncilToggle();
   const [isLoadingMangoAccount, setIsLoadingMangoAccount] = useState<boolean>(true)
   const [mangoAccounts, setMangoAccounts] = useState<MangoAccount[]>([])
   const [form, setForm] = useState<{
