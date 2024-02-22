@@ -337,6 +337,28 @@
     keccak256 "^1.0.6"
     merkletreejs "^0.3.11"
 
+"@blockworks-foundation/mango-v4-rc@npm:@blockworks-foundation/mango-v4@0.23.0-rc1":
+  version "0.23.0-rc1"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4/-/mango-v4-0.23.0-rc1.tgz#a4eed291c7ac1e6d02bbad228d917e34ad2149c0"
+  integrity sha512-U+F1SAr35TVsKz48W5iYanEIFxttfEVYV0uwDUhXz9HWbHctKYuZH0RyUb9y7xyI6vDBn/z/87FmFiV8meVlyQ==
+  dependencies:
+    "@blockworks-foundation/mango-v4-settings" "0.14.15"
+    "@blockworks-foundation/mangolana" "0.0.14"
+    "@coral-xyz/anchor" "^0.28.1-beta.2"
+    "@project-serum/serum" "0.13.65"
+    "@pythnetwork/client" "~2.14.0"
+    "@solana/spl-token" "0.3.7"
+    "@solana/web3.js" "^1.78.2"
+    "@switchboard-xyz/sbv2-lite" "^0.1.6"
+    big.js "^6.1.1"
+    binance-api-node "^0.12.0"
+    bs58 "^5.0.0"
+    cross-fetch "^3.1.5"
+    dotenv "^16.0.3"
+    fast-copy "^3.0.1"
+    lodash "^4.17.21"
+    node-kraken-api "^2.2.2"
+
 "@blockworks-foundation/mango-v4-settings@0.14.15":
   version "0.14.15"
   resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4-settings/-/mango-v4-settings-0.14.15.tgz#0ac04f2cffbd27a4129bc2086ec1418e29393880"

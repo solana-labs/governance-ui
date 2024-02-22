@@ -22,6 +22,8 @@ import ForwarderProgram, {
   useForwarderProgramHelpers,
 } from '@components/ForwarderProgram/ForwarderProgram'
 import { REDUCE_ONLY_OPTIONS } from '@utils/Mango/listingTools'
+import useProgramSelector from '../components/useProgramSelector'
+import ProgramSelector from '../components/ProgramSelector'
 
 const keyToLabel = {
   oraclePk: 'Oracle',
@@ -180,7 +182,12 @@ const EditToken = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletOnePointOh()
-  const { getAdditionalLabelInfo, mangoClient, mangoGroup } = UseMangoV4()
+  const programSelectorHook = useProgramSelector()
+
+  const { getAdditionalLabelInfo, mangoClient, mangoGroup } = UseMangoV4(
+    programSelectorHook.program?.val,
+    programSelectorHook.program?.group
+  )
   const { assetAccounts } = useGovernanceAssets()
   const [forcedValues, setForcedValues] = useState<string[]>([])
   const forwarderProgramHelpers = useForwarderProgramHelpers()
@@ -827,6 +834,9 @@ const EditToken = ({
 
   return (
     <>
+      <ProgramSelector
+        programSelectorHook={programSelectorHook}
+      ></ProgramSelector>
       {form && (
         <>
           <InstructionForm
