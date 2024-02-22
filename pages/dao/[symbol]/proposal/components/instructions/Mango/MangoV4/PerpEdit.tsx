@@ -22,8 +22,8 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import ForwarderProgram, {
   useForwarderProgramHelpers,
 } from '@components/ForwarderProgram/ForwarderProgram'
-import ProgramSelector from '../components/ProgramSelector'
-import useProgramSelector from '../components/useProgramSelector'
+import ProgramSelector from '@components/Mango/ProgramSelector'
+import useProgramSelector from '@components/Mango/useProgramSelector'
 
 const keyToLabel = {
   oraclePk: 'Oracle',

@@ -21,8 +21,8 @@ import ForwarderProgram, {
   useForwarderProgramHelpers,
 } from '@components/ForwarderProgram/ForwarderProgram'
 import { REDUCE_ONLY_OPTIONS } from '@utils/Mango/listingTools'
-import useProgramSelector from '../components/useProgramSelector'
-import ProgramSelector from '../components/ProgramSelector'
+import ProgramSelector from '@components/Mango/ProgramSelector'
+import useProgramSelector from '@components/Mango/useProgramSelector'
 import UseMangoV4 from '@hooks/useMangoV4V23'
 
 const keyToLabel = {

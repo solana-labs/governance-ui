@@ -21,8 +21,8 @@ import {
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { useConnection } from '@solana/wallet-adapter-react'
 import { WSOL_MINT } from '@components/instructions/tools'
-import ProgramSelector from '../components/ProgramSelector'
-import useProgramSelector from '../components/useProgramSelector'
+import ProgramSelector from '@components/Mango/ProgramSelector'
+import useProgramSelector from '@components/Mango/useProgramSelector'
 
 type NamePkVal = {
   name: string

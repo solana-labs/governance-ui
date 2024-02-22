@@ -14,9 +14,8 @@ import InstructionForm, { InstructionInput } from '../../FormCreator'
 import { InstructionInputType } from '../../inputInstructionType'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import useProgramSelector from '../components/useProgramSelector'
-import ProgramSelector from '../components/ProgramSelector'
-
+import ProgramSelector from '@components/Mango/ProgramSelector'
+import useProgramSelector from '@components/Mango/useProgramSelector'
 interface AltSetForm {
   governedAccount: AssetAccount | null
   index: number

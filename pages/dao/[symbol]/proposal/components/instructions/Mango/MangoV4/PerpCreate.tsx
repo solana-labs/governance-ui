@@ -24,8 +24,8 @@ import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import ForwarderProgram, {
   useForwarderProgramHelpers,
 } from '@components/ForwarderProgram/ForwarderProgram'
-import ProgramSelector from '../components/ProgramSelector'
-import useProgramSelector from '../components/useProgramSelector'
+import ProgramSelector from '@components/Mango/ProgramSelector'
+import useProgramSelector from '@components/Mango/useProgramSelector'
 
 interface PerpCreateForm {
   governedAccount: AssetAccount | null

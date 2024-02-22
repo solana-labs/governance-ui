@@ -15,8 +15,8 @@ import { InstructionInputType } from '../../inputInstructionType'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import ProgramSelector from '../components/ProgramSelector'
-import useProgramSelector from '../components/useProgramSelector'
+import ProgramSelector from '@components/Mango/ProgramSelector'
+import useProgramSelector from '@components/Mango/useProgramSelector'
 
 type NamePkVal = {
   name: string

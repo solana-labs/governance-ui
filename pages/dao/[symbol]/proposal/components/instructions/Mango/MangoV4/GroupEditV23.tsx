@@ -17,8 +17,8 @@ import { getChangedValues, getNullOrTransform } from '@utils/mangoV4Tools'
 import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
 import Switch from '@components/Switch'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import ProgramSelector from '../components/ProgramSelector'
-import useProgramSelector from '../components/useProgramSelector'
+import ProgramSelector from '@components/Mango/ProgramSelector'
+import useProgramSelector from '@components/Mango/useProgramSelector'
 
 const keyToLabel = {
   admin: 'Admin',

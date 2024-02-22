@@ -20,8 +20,8 @@ import ForwarderProgram, {
   useForwarderProgramHelpers,
 } from '@components/ForwarderProgram/ForwarderProgram'
 import { REDUCE_ONLY_OPTIONS } from '@utils/Mango/listingTools'
-import ProgramSelector from '../components/ProgramSelector'
-import useProgramSelector from '../components/useProgramSelector'
+import ProgramSelector from '@components/Mango/ProgramSelector'
+import useProgramSelector from '@components/Mango/useProgramSelector'
 
 interface TokenRegisterForm {
   governedAccount: AssetAccount | null

@@ -1,4 +1,3 @@
-import InstructionForm, { InstructionInput } from '../../FormCreator'
 import { useEffect, useState } from 'react'
 import {
   BOOST_MAINNET_GROUP,
@@ -6,11 +5,14 @@ import {
   MANGO_V4_MAINNET_GROUP,
 } from '@hooks/useMangoV4'
 import { MANGO_V4_ID } from '@blockworks-foundation/mango-v4'
-import { InstructionInputType } from '../../inputInstructionType'
 import { PublicKey } from '@metaplex-foundation/js'
 import useProgramSelector from './useProgramSelector'
+import { InstructionInputType } from 'pages/dao/[symbol]/proposal/components/instructions/inputInstructionType'
+import InstructionForm, {
+  InstructionInput,
+} from 'pages/dao/[symbol]/proposal/components/instructions/FormCreator'
 
-export type Program = { name: string; val: PublicKey; group: PublicKey }
+type Program = { name: string; val: PublicKey; group: PublicKey }
 
 interface ProgramSelectorForm {
   program: Program
