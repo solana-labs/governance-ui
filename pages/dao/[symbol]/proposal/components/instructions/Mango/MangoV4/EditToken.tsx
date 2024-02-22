@@ -394,7 +394,11 @@ const EditToken = ({
 
   const formTokenPk = form.token?.value.toBase58()
   useEffect(() => {
-    if (formTokenPk && mangoGroup) {
+    if (
+      formTokenPk &&
+      mangoGroup &&
+      mangoGroup!.banksMapByMint.get(formTokenPk)
+    ) {
       const currentToken = mangoGroup!.banksMapByMint.get(formTokenPk)![0]
       const groupInsuranceFund = mangoGroup.mintInfosMapByMint.get(formTokenPk)
         ?.groupInsuranceFund

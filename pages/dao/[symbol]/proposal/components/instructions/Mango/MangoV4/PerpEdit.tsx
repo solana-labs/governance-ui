@@ -311,7 +311,11 @@ const PerpEdit = ({
   }, [mangoGroup])
 
   useEffect(() => {
-    if (form.perp && mangoGroup) {
+    if (
+      form.perp &&
+      mangoGroup &&
+      mangoGroup!.perpMarketsMapByMarketIndex.get(form.perp.value)
+    ) {
       const currentPerp = mangoGroup!.perpMarketsMapByMarketIndex.get(
         form.perp.value
       )!
