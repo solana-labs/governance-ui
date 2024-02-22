@@ -15,8 +15,8 @@ import { InstructionInputType } from '../../inputInstructionType'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { I80F48 } from '@blockworks-foundation/mango-v4'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import ProgramSelector from '../components/ProgramSelector'
-import useProgramSelector from '../components/useProgramSelector'
+import ProgramSelector from '@components/Mango/ProgramSelector'
+import useProgramSelector from '@components/Mango/useProgramSelector'
 
 interface StubOracleCreateForm {
   governedAccount: AssetAccount | null

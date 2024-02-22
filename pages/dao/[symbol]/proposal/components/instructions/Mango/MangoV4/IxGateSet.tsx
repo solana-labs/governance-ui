@@ -15,8 +15,8 @@ import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { buildIxGate } from '@blockworks-foundation/mango-v4'
 import { IxGateParams } from '@blockworks-foundation/mango-v4/dist/types/src/clientIxParamBuilder'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import ProgramSelector from '../components/ProgramSelector'
-import useProgramSelector from '../components/useProgramSelector'
+import ProgramSelector from '@components/Mango/ProgramSelector'
+import useProgramSelector from '@components/Mango/useProgramSelector'
 
 type IxGateSetForm = IxGateParams & {
   governedAccount: AssetAccount | null

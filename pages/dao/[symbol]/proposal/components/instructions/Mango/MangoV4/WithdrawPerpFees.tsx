@@ -21,8 +21,8 @@ import {
 import { TransactionInstruction } from '@solana/web3.js'
 import { useConnection } from '@solana/wallet-adapter-react'
 import { PerpMarketIndex } from '@blockworks-foundation/mango-v4'
-import ProgramSelector from '../components/ProgramSelector'
-import useProgramSelector from '../components/useProgramSelector'
+import ProgramSelector from '@components/Mango/ProgramSelector'
+import useProgramSelector from '@components/Mango/useProgramSelector'
 
 type NameMarketIndexVal = {
   name: string
