@@ -3455,5 +3455,14 @@
     "realmId": "GgF6fHb3iM3Um5DtvwbZvpGpYTzYnr1RmZr4NkwHveGp",
     "website": "",
     "twitter": ""
-  }
+  },  
+  {
+    "symbol": "SOLC",
+    "displayName": "Solana Council",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "ARFAbZLw5GexHYMh7aBNLo8ywpy6GAgWnniV3w5gDKqt",
+    "ogImage": "/realms/SolanaCouncil/SolanaCouncil_logo.png",
+    "bannerImage": "/realms/SolanaCouncil/SolanaCouncil_banner.png",
+    "twitter": "@SolanaCouncil"
+  },
 ]
