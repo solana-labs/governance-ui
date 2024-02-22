@@ -21,6 +21,8 @@ import {
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { useConnection } from '@solana/wallet-adapter-react'
 import { WSOL_MINT } from '@components/instructions/tools'
+import ProgramSelector from '../components/ProgramSelector'
+import useProgramSelector from '../components/useProgramSelector'
 
 type NamePkVal = {
   name: string
@@ -42,7 +44,11 @@ const AdminTokenWithdrawTokenFees = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletOnePointOh()
-  const { mangoClient, mangoGroup } = UseMangoV4()
+  const programSelectorHook = useProgramSelector()
+  const { mangoClient, mangoGroup } = UseMangoV4(
+    programSelectorHook.program?.val,
+    programSelectorHook.program?.group
+  )
   const { assetAccounts } = useGovernanceAssets()
   const { connection } = useConnection()
   const solAccounts = assetAccounts.filter(
@@ -209,6 +215,9 @@ const AdminTokenWithdrawTokenFees = ({
 
   return (
     <>
+      <ProgramSelector
+        programSelectorHook={programSelectorHook}
+      ></ProgramSelector>
       {form && (
         <InstructionForm
           outerForm={form}

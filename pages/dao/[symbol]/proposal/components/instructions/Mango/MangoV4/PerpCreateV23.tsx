@@ -17,7 +17,7 @@ import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, { InstructionInput } from '../../FormCreator'
 import { InstructionInputType } from '../../inputInstructionType'
-import UseMangoV4 from '@hooks/useMangoV4'
+import UseMangoV4 from '@hooks/useMangoV4V23'
 import { BN } from '@coral-xyz/anchor'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
@@ -59,6 +59,7 @@ interface PerpCreateForm {
   positivePnlLiquidationFee: number
   perpMarketIndex: number
   holdupTime: number
+  platformLiquidationFee: number
 }
 
 const PerpCreate = ({
@@ -115,6 +116,7 @@ const PerpCreate = ({
     settlePnlLimitWindowSize: 60 * 60,
     positivePnlLiquidationFee: 0,
     holdupTime: 0,
+    platformLiquidationFee: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -209,7 +211,8 @@ const PerpCreate = ({
           Number(form.settleTokenIndex),
           Number(form.settlePnlLimitFactor),
           new BN(form.settlePnlLimitWindowSize),
-          Number(form.positivePnlLiquidationFee)
+          Number(form.positivePnlLiquidationFee),
+          Number(form.platformLiquidationFee)
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -518,6 +521,14 @@ const PerpCreate = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'positivePnlLiquidationFee',
+    },
+    {
+      label: `Platform Liquidation Fee`,
+      subtitle: getAdditionalLabelInfo('platformLiquidationFee'),
+      initialValue: form.platformLiquidationFee,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'platformLiquidationFee',
     },
   ]
   return (

@@ -31,6 +31,7 @@
   "dependencies": {
     "@blockworks-foundation/mango-mints-redemption": "0.0.10",
     "@blockworks-foundation/mango-v4": "0.21.22",
+    "@blockworks-foundation/mango-v4-rc": "npm:@blockworks-foundation/mango-v4@0.23.0-rc1",
     "@blockworks-foundation/mango-v4-settings": "0.14.15",
     "@blockworks-foundation/mangolana": "0.0.14",
     "@bonfida/spl-name-service": "0.1.47",

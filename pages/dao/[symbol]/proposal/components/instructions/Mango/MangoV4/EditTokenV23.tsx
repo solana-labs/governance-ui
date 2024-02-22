@@ -12,7 +12,6 @@ import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, { InstructionInput } from '../../FormCreator'
 import { InstructionInputType } from '../../inputInstructionType'
-import UseMangoV4 from '@hooks/useMangoV4'
 import { getChangedValues, getNullOrTransform } from '@utils/mangoV4Tools'
 import { BN } from '@coral-xyz/anchor'
 import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
@@ -24,6 +23,7 @@ import ForwarderProgram, {
 import { REDUCE_ONLY_OPTIONS } from '@utils/Mango/listingTools'
 import useProgramSelector from '../components/useProgramSelector'
 import ProgramSelector from '../components/ProgramSelector'
+import UseMangoV4 from '@hooks/useMangoV4V23'
 
 const keyToLabel = {
   oraclePk: 'Oracle',
@@ -69,6 +69,11 @@ const keyToLabel = {
   maintWeightShiftAbort: 'Maint Weight Shift Abort',
   setFallbackOracle: 'Set Fallback Oracle',
   depositLimit: 'Deposit Limit',
+  zeroUtilRate: 'Zero Util Rate',
+  platformLiquidationFee: 'Platform Liquidation Fee',
+  disableAssetLiquidation: 'Disable Asset Liquidation',
+  collateralFeePerDay: 'Collateral Fee Per Day',
+  forceWithdraw: 'Force Withdraw',
 }
 
 type NamePkVal = {
@@ -123,6 +128,11 @@ interface EditTokenForm {
   maintWeightShiftAbort: boolean
   setFallbackOracle: boolean
   depositLimit: number
+  zeroUtilRate: number
+  platformLiquidationFee: number
+  disableAssetLiquidation: boolean
+  collateralFeePerDay: number
+  forceWithdraw: boolean
 }
 
 const defaultFormValues: EditTokenForm = {
@@ -172,6 +182,11 @@ const defaultFormValues: EditTokenForm = {
   maintWeightShiftAbort: false,
   setFallbackOracle: false,
   depositLimit: 0,
+  zeroUtilRate: 0,
+  platformLiquidationFee: 0,
+  disableAssetLiquidation: false,
+  collateralFeePerDay: 0,
+  forceWithdraw: false,
 }
 
 const EditToken = ({
@@ -333,7 +348,12 @@ const EditToken = ({
           getNullOrTransform(values.maintWeightShiftLiabTarget, null, Number),
           values.maintWeightShiftAbort!,
           values.setFallbackOracle!,
-          getNullOrTransform(values.depositLimit, BN)
+          getNullOrTransform(values.depositLimit, BN),
+          getNullOrTransform(values.zeroUtilRate, null, Number),
+          getNullOrTransform(values.platformLiquidationFee, null, Number),
+          values.disableAssetLiquidation!,
+          getNullOrTransform(values.collateralFeePerDay, null, Number),
+          values.forceWithdraw!
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -449,6 +469,9 @@ const EditToken = ({
         maintWeightShiftAssetTarget: currentToken.maintWeightShiftAssetTarget.toNumber(),
         maintWeightShiftLiabTarget: currentToken.maintWeightShiftLiabTarget.toNumber(),
         depositLimit: currentToken.depositLimit.toNumber(),
+        zeroUtilRate: currentToken.zeroUtilRate.toNumber(),
+        platformLiquidationFeeOpt: currentToken.platformLiquidationFee.toNumber(),
+        collateralFeePerDayOpt: currentToken.collateralFeePerDay,
       }
       setForm((prevForm) => ({
         ...prevForm,
@@ -833,6 +856,44 @@ const EditToken = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'depositLimit',
+    },
+    {
+      label: keyToLabel['zeroUtilRate'],
+      subtitle: getAdditionalLabelInfo('zeroUtilRate'),
+      initialValue: form.zeroUtilRate,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'zeroUtilRate',
+    },
+    {
+      label: keyToLabel['platformLiquidationFee'],
+      subtitle: getAdditionalLabelInfo('platformLiquidationFee'),
+      initialValue: form.platformLiquidationFee,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'platformLiquidationFee',
+    },
+    {
+      label: keyToLabel['disableAssetLiquidation'],
+      subtitle: getAdditionalLabelInfo('disableAssetLiquidation'),
+      initialValue: form.disableAssetLiquidation,
+      type: InstructionInputType.SWITCH,
+      name: 'disableAssetLiquidation',
+    },
+    {
+      label: keyToLabel['collateralFeePerDay'],
+      subtitle: getAdditionalLabelInfo('collateralFeePerDay'),
+      initialValue: form.collateralFeePerDay,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'collateralFeePerDay',
+    },
+    {
+      label: keyToLabel['forceWithdraw'],
+      subtitle: getAdditionalLabelInfo('forceWithdraw'),
+      initialValue: form.forceWithdraw,
+      type: InstructionInputType.SWITCH,
+      name: 'forceWithdraw',
     },
   ]
 

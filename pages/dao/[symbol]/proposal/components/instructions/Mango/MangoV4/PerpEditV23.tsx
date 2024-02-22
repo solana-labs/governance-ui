@@ -12,7 +12,7 @@ import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, { InstructionInput } from '../../FormCreator'
 import { InstructionInputType } from '../../inputInstructionType'
-import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
+import UseMangoV4 from '../../../../../../../../hooks/useMangoV4V23'
 import { PerpMarketIndex } from '@blockworks-foundation/mango-v4'
 import { getChangedValues, getNullOrTransform } from '@utils/mangoV4Tools'
 import { BN } from '@coral-xyz/anchor'
@@ -57,6 +57,7 @@ const keyToLabel = {
   reduceOnly: 'Reduce Only',
   resetStablePrice: 'Reset Stable Price',
   positivePnlLiquidationFee: 'Positive Pnl Liquidation Fee',
+  platformLiquidationFee: 'Platform Liquidation Fee',
   forceClose: 'Force Close',
 }
 
@@ -99,6 +100,7 @@ interface PerpEditForm {
   positivePnlLiquidationFee: number
   holdupTime: number
   forceClose: boolean
+  platformLiquidationFee: number
 }
 
 const defaultFormValues = {
@@ -136,6 +138,7 @@ const defaultFormValues = {
   positivePnlLiquidationFee: 0,
   holdupTime: 0,
   forceClose: false,
+  platformLiquidationFee: 0,
 }
 
 const PerpEdit = ({
@@ -246,7 +249,8 @@ const PerpEdit = ({
           values.resetStablePrice!,
           getNullOrTransform(values.positivePnlLiquidationFee, null, Number),
           getNullOrTransform(values.name, null, String),
-          values.forceClose!
+          values.forceClose!,
+          getNullOrTransform(values.platformLiquidationFee, null, Number)
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -596,6 +600,14 @@ const PerpEdit = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'positivePnlLiquidationFee',
+    },
+    {
+      label: keyToLabel['platformLiquidationFee'],
+      subtitle: getAdditionalLabelInfo('platformLiquidationFee'),
+      initialValue: form.platformLiquidationFee,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'platformLiquidationFee',
     },
     {
       label: keyToLabel['groupInsuranceFund'],

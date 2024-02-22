@@ -6,12 +6,15 @@ import {
   Group,
   MangoClient,
   MANGO_V4_ID,
-} from '@blockworks-foundation/mango-v4'
+} from '@blockworks-foundation/mango-v4-rc'
 import { useEffect, useState } from 'react'
 import useWalletOnePointOh from './useWalletOnePointOh'
 import useLegacyConnectionContext from './useLegacyConnectionContext'
 
-export default function UseMangoV4(programId?: PublicKey, group?: PublicKey) {
+export default function UseMangoV4V23(
+  programId?: PublicKey,
+  group?: PublicKey
+) {
   const connection = useLegacyConnectionContext()
   const cluster = connection.cluster
   const wallet = useWalletOnePointOh()
