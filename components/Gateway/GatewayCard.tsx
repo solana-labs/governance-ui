@@ -9,6 +9,7 @@ import { useJoinRealm } from '@hooks/useJoinRealm'
 import { useConnection } from '@solana/wallet-adapter-react'
 import { Transaction } from '@solana/web3.js'
 import { sendTransaction } from '@utils/send'
+import Button from '@components/Button'
 
 const GatewayCard = () => {
   const [showGatewayModal, setShowGatewayModal] = useState(false)

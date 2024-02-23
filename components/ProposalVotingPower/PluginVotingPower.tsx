@@ -114,7 +114,7 @@ export default function PluginVotingPower({ role, className }: Props) {
                 <p className="font-bold">
                   {formattedMax} tokens | {formattedTotal} votes
                 </p>
-                <p className="text-fgd-3">10% of possible votes</p>
+                <p className="text-fgd-3 mb-2">10% of possible votes</p>
               </div>
             </div>
             <div className="text-xl font-bold text-fgd-1 hero-text">
@@ -127,6 +127,7 @@ export default function PluginVotingPower({ role, className }: Props) {
                 mint={mintInfo}
                 tokenRole={GoverningTokenRole.Community}
                 inAccountDetails={true}
+                hideVotes={true}
               />
             </div>
           </div>

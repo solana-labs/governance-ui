@@ -9,6 +9,7 @@ import { produce } from 'immer';
 import { Config } from '../fetchConfig';
 import { TokenTypeSelector } from '../TokenTypeSelector';
 import { VotingStructureSelector } from '../VotingStructureSelector';
+import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins';
 import { ButtonToggle } from '@hub/components/controls/ButtonToggle';
 import { Input } from '@hub/components/controls/Input';
 import { MAX_NUM } from '@hub/components/EditWalletRules/constants';
@@ -38,6 +39,9 @@ interface Props
 }
 
 export function CommunityStructure(props: Props) {
+  const { plugins } = useRealmVoterWeightPlugins();
+  const inOrderPlugins = plugins?.reverse();
+
   const currentVotingStructure = {
     votingProgramId:
       props.currentConfigAccount.communityTokenConfig.voterWeightAddin,
@@ -189,6 +193,7 @@ export function CommunityStructure(props: Props) {
           )}
         </>
       )}
+
       {props.configAccount.communityTokenConfig.tokenType !==
         GoverningTokenType.Dormant && (
         <ValueBlock
@@ -196,6 +201,21 @@ export function CommunityStructure(props: Props) {
           title="What type of governance structure do you want your DAO’s community to use?"
           description=""
         >
+          {inOrderPlugins &&
+            inOrderPlugins?.length > 1 &&
+            inOrderPlugins.slice(0, -1).map((plugin) => {
+              return (
+                <>
+                  <button
+                    disabled={true}
+                    className="border mb-2 gap-x-4 grid-cols-[100px,1fr,20px] grid h-14 items-center px-4 rounded-md text-left transition-colors dark:bg-neutral-800 dark:border-neutral-700 w-full"
+                  >
+                    {plugin.name}{' '}
+                  </button>
+                  <div className="min-h-[40px] w-0 border-l dark:border-neutral-700 ml-2 mb-2" />
+                </>
+              );
+            })}
           <div>
             <VotingStructureSelector
               allowNFT

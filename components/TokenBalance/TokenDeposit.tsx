@@ -23,11 +23,13 @@ export const TokenDeposit = ({
   tokenRole,
   inAccountDetails,
   setHasGovPower,
+  hideVotes,
 }: {
   mint: MintInfo | undefined
   tokenRole: GoverningTokenRole
   inAccountDetails?: boolean
   setHasGovPower?: (hasGovPower: boolean) => void
+  hideVotes?: boolean
 }) => {
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
@@ -103,7 +105,7 @@ export const TokenDeposit = ({
 
   return (
     <div className="w-full">
-      {(availableTokens != '0' || inAccountDetails) && (
+      {(availableTokens != '0' || inAccountDetails) && !hideVotes && (
         <div className="flex items-center space-x-4">
           {tokenRole === GoverningTokenRole.Community ? (
             <VanillaVotingPower className="w-full" role="community" />
