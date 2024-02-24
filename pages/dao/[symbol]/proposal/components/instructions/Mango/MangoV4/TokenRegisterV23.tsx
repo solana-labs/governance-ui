@@ -27,6 +27,7 @@ interface TokenRegisterForm {
   governedAccount: AssetAccount | null
   mintPk: string
   oraclePk: string
+  fallbackOracle: string
   oracleConfFilter: number
   maxStalenessSlots: string
   name: string
@@ -95,6 +96,7 @@ const TokenRegister = ({
     mintPk: '',
     maxStalenessSlots: '',
     oraclePk: '',
+    fallbackOracle: '',
     oracleConfFilter: 0.1,
     name: '',
     adjustmentFactor: 0.004, // rate parameters are chosen to be the same for all high asset weight tokens,
@@ -203,6 +205,7 @@ const TokenRegister = ({
           oracle: new PublicKey(form.oraclePk),
           payer: form.governedAccount.extensions.transferAddress,
           rent: SYSVAR_RENT_PUBKEY,
+          fallbackOracle: new PublicKey(form.fallbackOracle),
         })
         .instruction()
 
@@ -290,6 +293,12 @@ const TokenRegister = ({
       initialValue: form.oraclePk,
       type: InstructionInputType.INPUT,
       name: 'oraclePk',
+    },
+    {
+      label: `Fallback oracle`,
+      initialValue: form.fallbackOracle,
+      type: InstructionInputType.INPUT,
+      name: 'fallbackOracle',
     },
     {
       label: `Oracle Confidence Filter`,

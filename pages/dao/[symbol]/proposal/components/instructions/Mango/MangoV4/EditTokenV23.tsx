@@ -27,6 +27,7 @@ import UseMangoV4 from '@hooks/useMangoV4V23'
 
 const keyToLabel = {
   oraclePk: 'Oracle',
+  fallbackOracle: 'Fallback Oracle',
   oracleConfFilter: 'Oracle Confidence Filter',
   maxStalenessSlots: 'Max Staleness Slots',
   mintPk: 'Mint',
@@ -85,6 +86,7 @@ interface EditTokenForm {
   governedAccount: AssetAccount | null
   token: null | NamePkVal
   oraclePk: string
+  fallbackOracle: string
   oracleConfFilter: number
   maxStalenessSlots: number
   mintPk: string
@@ -139,6 +141,7 @@ const defaultFormValues: EditTokenForm = {
   governedAccount: null,
   token: null,
   oraclePk: '',
+  fallbackOracle: '',
   oracleConfFilter: 0,
   maxStalenessSlots: 0,
   mintPk: '',
@@ -360,6 +363,9 @@ const EditToken = ({
           oracle: form.oraclePk ? new PublicKey(form.oraclePk) : bank.oracle,
           admin: form.governedAccount.extensions.transferAddress,
           mintInfo: mintInfo.publicKey,
+          fallbackOracle: form.fallbackOracle
+            ? new PublicKey(form.fallbackOracle)
+            : bank.fallbackOracle,
         })
         .remainingAccounts([
           {
@@ -425,6 +431,7 @@ const EditToken = ({
 
       const vals = {
         oraclePk: currentToken.oracle.toBase58(),
+        fallbackOracle: currentToken.fallbackOracle.toBase58(),
         oracleConfFilter: currentToken.oracleConfig.confFilter.toNumber(),
         maxStalenessSlots: currentToken.oracleConfig.maxStalenessSlots.toNumber(),
         mintPk: currentToken.mint.toBase58(),
@@ -536,6 +543,12 @@ const EditToken = ({
       initialValue: form.oraclePk,
       type: InstructionInputType.INPUT,
       name: 'oraclePk',
+    },
+    {
+      label: keyToLabel['fallbackOracle'],
+      initialValue: form.fallbackOracle,
+      type: InstructionInputType.INPUT,
+      name: 'fallbackOracle',
     },
     {
       label: keyToLabel['oracleConfFilter'],
