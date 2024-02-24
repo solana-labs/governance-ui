@@ -1,6 +1,7 @@
 import {
   Group,
   MangoAccount,
+  USDC_MINT,
   toUiDecimals,
 } from '@blockworks-foundation/mango-v4'
 import AdditionalProposalOptions from '@components/AdditionalProposalOptions'
@@ -34,10 +35,16 @@ import tokenPriceService from '@utils/services/tokenPrice'
 import { validateInstruction } from '@utils/instructionTools'
 import Switch from '@components/Switch'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
+import ProgramSelector from '@components/Mango/ProgramSelector'
+import useProgramSelector from '@components/Mango/useProgramSelector'
 
 const MangoModal = ({ account }: { account: AssetAccount }) => {
   const { canUseTransferInstruction } = useGovernanceAssets()
-  const { mangoClient, mangoGroup } = UseMangoV4()
+  const programSelectorHook = useProgramSelector()
+  const { mangoClient, mangoGroup } = UseMangoV4(
+    programSelectorHook.program?.val,
+    programSelectorHook.program?.group
+  )
   const { fmtUrlWithCluster } = useQueryContext()
   const { handleCreateProposal } = useCreateProposal()
   const router = useRouter()
@@ -76,6 +83,9 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
     setFormErrors({})
   }
 
+  useEffect(() => {
+    setForm({ ...form, mangoAccount: undefined })
+  }, [programSelectorHook.program?.val.toBase58()])
   const SOL_BUFFER = 0.02
 
   const treasuryAmount = new BN(
@@ -126,6 +136,9 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
   })
 
   useEffect(() => {
+    setMangoAccounts([])
+  }, [programSelectorHook.program?.val])
+  useEffect(() => {
     const getMangoAccounts = async () => {
       const accounts = await mangoClient?.getMangoAccountsForOwner(
         mangoGroup!,
@@ -136,10 +149,12 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
         setMangoAccounts(accounts)
       }
     }
-
-    setIsLoadingMangoAccount(true)
-    getMangoAccounts().then(() => setIsLoadingMangoAccount(false))
-  }, [mangoClient !== null && mangoGroup !== null])
+    if (mangoClient && mangoGroup) {
+      setMangoAccounts([])
+      setIsLoadingMangoAccount(true)
+      getMangoAccounts().then(() => setIsLoadingMangoAccount(false))
+    }
+  }, [account.extensions.token, mangoClient, mangoGroup])
 
   const handleCreateAccount = async () => {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
@@ -288,6 +303,13 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
         </div>
       </div>
       <div className="pt-2 space-y-4 w-full">
+        {account.extensions.mint?.publicKey.toBase58() ===
+          USDC_MINT.toBase58() && (
+          <ProgramSelector
+            programSelectorHook={programSelectorHook}
+          ></ProgramSelector>
+        )}
+
         <Select
           error={formErrors['mangoAccount']}
           label="Mango account"
