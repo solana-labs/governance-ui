@@ -59,7 +59,7 @@ export default function VanillaVotingPower({
     role === 'community' ? s.communityDelegator : s.councilDelegator
   )
 
-  const torsDelegatedToUser = useTokenOwnerRecordsDelegatedToUser()
+  const { data: torsDelegatedToUser } = useTokenOwnerRecordsDelegatedToUser()
 
   const { result: delegatorsAmount } = useAsync(
     async () =>

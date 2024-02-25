@@ -22,6 +22,8 @@ import ForwarderProgram, {
   useForwarderProgramHelpers,
 } from '@components/ForwarderProgram/ForwarderProgram'
 import { REDUCE_ONLY_OPTIONS } from '@utils/Mango/listingTools'
+import ProgramSelector from '@components/Mango/ProgramSelector'
+import useProgramSelector from '@components/Mango/useProgramSelector'
 
 const keyToLabel = {
   oraclePk: 'Oracle',
@@ -57,7 +59,7 @@ const keyToLabel = {
   forceClose: 'Force Close',
   tokenConditionalSwapTakerFeeRate: 'Token Conditional Swap Taker Fee Rate',
   tokenConditionalSwapMakerFeeRate: 'Token Conditional Swap Maker Fee Rate',
-  flashLoanSwapFeeRate: 'Flash Loan Deposit Fee Rate',
+  flashLoanSwapFeeRate: 'Flash Loan Swap Fee Rate',
   interestCurveScaling: 'Interest Curve Scaling',
   interestTargetUtilization: 'interestTargetUtilization',
   maintWeightShiftStart: 'Maint Weight Shift Start',
@@ -180,7 +182,12 @@ const EditToken = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletOnePointOh()
-  const { getAdditionalLabelInfo, mangoClient, mangoGroup } = UseMangoV4()
+  const programSelectorHook = useProgramSelector()
+
+  const { getAdditionalLabelInfo, mangoClient, mangoGroup } = UseMangoV4(
+    programSelectorHook.program?.val,
+    programSelectorHook.program?.group
+  )
   const { assetAccounts } = useGovernanceAssets()
   const [forcedValues, setForcedValues] = useState<string[]>([])
   const forwarderProgramHelpers = useForwarderProgramHelpers()
@@ -387,7 +394,11 @@ const EditToken = ({
 
   const formTokenPk = form.token?.value.toBase58()
   useEffect(() => {
-    if (formTokenPk && mangoGroup) {
+    if (
+      formTokenPk &&
+      mangoGroup &&
+      mangoGroup!.banksMapByMint.get(formTokenPk)
+    ) {
       const currentToken = mangoGroup!.banksMapByMint.get(formTokenPk)![0]
       const groupInsuranceFund = mangoGroup.mintInfosMapByMint.get(formTokenPk)
         ?.groupInsuranceFund
@@ -827,6 +838,9 @@ const EditToken = ({
 
   return (
     <>
+      <ProgramSelector
+        programSelectorHook={programSelectorHook}
+      ></ProgramSelector>
       {form && (
         <>
           <InstructionForm

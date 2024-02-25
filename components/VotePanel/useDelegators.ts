@@ -14,7 +14,7 @@ const useDelegators = (role: 'community' | 'council' | undefined) => {
       ? realm?.account.communityMint
       : realm?.account.config.councilMint
 
-  const torsDelegatedToUser = useTokenOwnerRecordsDelegatedToUser()
+  const { data: torsDelegatedToUser } = useTokenOwnerRecordsDelegatedToUser()
   const relevantDelegators =
     relevantMint &&
     torsDelegatedToUser?.filter((x) =>

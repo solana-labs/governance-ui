@@ -22,6 +22,8 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import ForwarderProgram, {
   useForwarderProgramHelpers,
 } from '@components/ForwarderProgram/ForwarderProgram'
+import ProgramSelector from '@components/Mango/ProgramSelector'
+import useProgramSelector from '@components/Mango/useProgramSelector'
 
 const keyToLabel = {
   oraclePk: 'Oracle',
@@ -144,7 +146,11 @@ const PerpEdit = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletOnePointOh()
-  const { mangoClient, mangoGroup, getAdditionalLabelInfo } = UseMangoV4()
+  const programSelectorHook = useProgramSelector()
+  const { mangoClient, mangoGroup, getAdditionalLabelInfo } = UseMangoV4(
+    programSelectorHook.program?.val,
+    programSelectorHook.program?.group
+  )
   const { assetAccounts } = useGovernanceAssets()
   const [perps, setPerps] = useState<NameMarketIndexVal[]>([])
   const [forcedValues, setForcedValues] = useState<string[]>([])
@@ -305,7 +311,11 @@ const PerpEdit = ({
   }, [mangoGroup])
 
   useEffect(() => {
-    if (form.perp && mangoGroup) {
+    if (
+      form.perp &&
+      mangoGroup &&
+      mangoGroup!.perpMarketsMapByMarketIndex.get(form.perp.value)
+    ) {
       const currentPerp = mangoGroup!.perpMarketsMapByMarketIndex.get(
         form.perp.value
       )!
@@ -618,6 +628,9 @@ const PerpEdit = ({
   ]
   return (
     <>
+      <ProgramSelector
+        programSelectorHook={programSelectorHook}
+      ></ProgramSelector>
       {form && (
         <>
           <InstructionForm

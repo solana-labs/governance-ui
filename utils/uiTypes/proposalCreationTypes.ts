@@ -342,7 +342,7 @@ export enum Instructions {
   DualFinanceDelegate,
   DualFinanceDelegateWithdraw,
   DualFinanceVoteDeposit,
-  DualFinanceVote,
+  DaoVote,
   DistributionCloseVaults,
   DistributionFillVaults,
   DelegateStake,
@@ -356,15 +356,21 @@ export enum Instructions {
   InitSolendObligationAccount,
   JoinDAO,
   MangoV4PerpCreate,
+  MangoV4PerpCreateV23,
   MangoV4PerpEdit,
+  MangoV4PerpEditV23,
   MangoV4OpenBookRegisterMarket,
   MangoV4OpenBookEditMarket,
   MangoV4TokenEdit,
+  MangoV4TokenEditV23,
   MangoV4TokenRegister,
+  MangoV4TokenRegisterV23,
   MangoV4TokenRegisterTrustless,
   MangoV4GroupEdit,
+  MangoV4GroupEditV23,
   IdlSetBuffer,
   MangoV4IxGateSet,
+  MangoV4IxGateSetV23,
   MangoV4AltSet,
   MangoV4AltExtend,
   MangoV4StubOracleCreate,
@@ -488,7 +494,7 @@ export interface DualFinanceStakingOptionForm {
   strike: number
   soName: string | undefined
   optionExpirationUnixSeconds: number
-  numTokens: number
+  numTokens: string
   lotSize: number
   baseTreasury: AssetAccount | undefined
   quoteTreasury: AssetAccount | undefined
@@ -504,6 +510,7 @@ export interface DualFinanceGsoForm {
   lotSize: number
   subscriptionPeriodEnd: number
   lockupRatio: number
+  lockupMint: string
   baseTreasury: AssetAccount | undefined
   quoteTreasury: AssetAccount | undefined
   payer: AssetAccount | undefined

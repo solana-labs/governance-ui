@@ -85,6 +85,17 @@ class TokenPriceService {
           vsTokenSymbol: 'USDC',
         }
       }
+
+      //override chai price if its broken
+      const chaiMint = '3jsFX1tx2Z8ewmamiwSU851GzyzM2DJMq7KWW5DM8Py3'
+      const chaiData = this._tokenPriceToUSDlist[chaiMint]
+
+      if (chaiData?.price && (chaiData.price > 1.3 || chaiData.price < 0.9)) {
+        this._tokenPriceToUSDlist[chaiMint] = {
+          ...chaiData,
+          price: 1,
+        }
+      }
     }
   }
   /**

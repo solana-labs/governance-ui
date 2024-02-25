@@ -365,6 +365,7 @@ const getDepositsAdditionalInfoEvents = async (
   //because we switch wallet in here we can't use rpc from npm module
   //anchor dont allow to switch wallets inside existing client
   //parse events response as anchor do
+  const latestBlockhash = await connection.getLatestBlockhash()
   const events: any[] = []
   const parser = new EventParser(client.program.programId, client.program.coder)
   const maxRange = 8
@@ -373,6 +374,8 @@ const getDepositsAdditionalInfoEvents = async (
   for (let i = 0; i < numberOfSimulations; i++) {
     const take = maxRange
     const transaction = new Transaction({ feePayer: simulationWallet })
+    transaction.lastValidBlockHeight = latestBlockhash.lastValidBlockHeight
+    transaction.recentBlockhash = latestBlockhash.blockhash
     const logVoterInfoIx = await client.program.methods
       .logVoterInfo(maxRange * i, take)
       .accounts({ registrar, voter })

@@ -37,7 +37,7 @@ const DelegatorCheckbox = ({
 const DelegatorsList = () => {
   const realm = useRealmQuery().data?.result
 
-  const delegatesArray = useTokenOwnerRecordsDelegatedToUser()
+  const { data: delegatesArray } = useTokenOwnerRecordsDelegatedToUser()
 
   // returns array of community tokenOwnerRecords that connected wallet has been delegated
   const communityTorsDelegatedToUser = useMemo(

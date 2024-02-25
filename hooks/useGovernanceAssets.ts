@@ -337,6 +337,21 @@ export default function useGovernanceAssets() {
       name: 'Split Stake Validator',
       packageId: PackageEnum.Common,
     },
+    [Instructions.DaoVote]: {
+      name: 'Vote in another DAO',
+      isVisible: canUseTransferInstruction,
+      packageId: PackageEnum.Common,
+    },
+    [Instructions.DualFinanceDelegateWithdraw]: {
+      name: 'Withdraw Vote Deposit',
+      isVisible: canUseTransferInstruction,
+      packageId: PackageEnum.Common,
+    },
+    [Instructions.DualFinanceVoteDeposit]: {
+      name: 'Join a VSR DAO',
+      isVisible: canUseTransferInstruction,
+      packageId: PackageEnum.Common,
+    },
     /*
       ██████  ██    ██  █████  ██          ███████ ██ ███    ██  █████  ███    ██  ██████ ███████
       ██   ██ ██    ██ ██   ██ ██          ██      ██ ████   ██ ██   ██ ████   ██ ██      ██
@@ -387,21 +402,6 @@ export default function useGovernanceAssets() {
     },
     [Instructions.DualFinanceDelegate]: {
       name: 'Delegate',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Dual,
-    },
-    [Instructions.DualFinanceDelegateWithdraw]: {
-      name: 'Withdraw Vote Deposit',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Dual,
-    },
-    [Instructions.DualFinanceVoteDeposit]: {
-      name: 'Vote Deposit',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Dual,
-    },
-    [Instructions.DualFinanceVote]: {
-      name: 'Vote',
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Dual,
     },
@@ -515,8 +515,18 @@ export default function useGovernanceAssets() {
       packageId: PackageEnum.MangoMarketV4,
       isVisible: canUseAnyInstruction,
     },
+    [Instructions.MangoV4PerpCreateV23]: {
+      name: 'Create Perp v23',
+      packageId: PackageEnum.MangoMarketV4,
+      isVisible: canUseAnyInstruction,
+    },
     [Instructions.MangoV4PerpEdit]: {
       name: 'Edit Perp',
+      packageId: PackageEnum.MangoMarketV4,
+      isVisible: canUseAnyInstruction,
+    },
+    [Instructions.MangoV4PerpEditV23]: {
+      name: 'Edit Perp v23',
       packageId: PackageEnum.MangoMarketV4,
       isVisible: canUseAnyInstruction,
     },
@@ -530,8 +540,18 @@ export default function useGovernanceAssets() {
       packageId: PackageEnum.MangoMarketV4,
       isVisible: canUseAnyInstruction,
     },
+    [Instructions.MangoV4TokenEditV23]: {
+      name: 'Edit Token v23',
+      packageId: PackageEnum.MangoMarketV4,
+      isVisible: canUseAnyInstruction,
+    },
     [Instructions.MangoV4TokenRegister]: {
       name: 'Register Token',
+      packageId: PackageEnum.MangoMarketV4,
+      isVisible: canUseAnyInstruction,
+    },
+    [Instructions.MangoV4TokenRegisterV23]: {
+      name: 'Register Token v23',
       packageId: PackageEnum.MangoMarketV4,
       isVisible: canUseAnyInstruction,
     },
@@ -542,6 +562,11 @@ export default function useGovernanceAssets() {
     },
     [Instructions.MangoV4GroupEdit]: {
       name: 'Edit Group',
+      packageId: PackageEnum.MangoMarketV4,
+      isVisible: canUseAnyInstruction,
+    },
+    [Instructions.MangoV4GroupEditV23]: {
+      name: 'Edit Group v23',
       packageId: PackageEnum.MangoMarketV4,
       isVisible: canUseAnyInstruction,
     },
@@ -562,6 +587,11 @@ export default function useGovernanceAssets() {
     },
     [Instructions.MangoV4IxGateSet]: {
       name: 'Enable/Disable individual instructions in Group',
+      packageId: PackageEnum.MangoMarketV4,
+      isVisible: canUseAnyInstruction,
+    },
+    [Instructions.MangoV4IxGateSetV23]: {
+      name: 'Enable/Disable individual instructions in Group v23',
       packageId: PackageEnum.MangoMarketV4,
       isVisible: canUseAnyInstruction,
     },

@@ -3,15 +3,15 @@ import { useAsync } from 'react-async-hook'
 import { determineVotingPowerType } from '@hooks/queries/governancePower'
 import { useConnection } from '@solana/wallet-adapter-react'
 import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
-import LockedCommunityVotingPower from '@components/ProposalVotingPower/LockedCommunityVotingPower'
 import NftVotingPower from '@components/ProposalVotingPower/NftVotingPower'
 import LockedCommunityNFTRecordVotingPower from '@components/ProposalVotingPower/LockedCommunityNFTRecordVotingPower'
 import VanillaVotingPower from './Vanilla/VanillaVotingPower'
 import { Deposit } from './Vanilla/Deposit'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { ExclamationIcon } from '@heroicons/react/solid'
-import { VSR_PLUGIN_PKS } from '@constants/plugins'
-import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import VanillaWithdrawTokensButton from '@components/TokenBalance/VanillaWithdrawTokensButton'
+import LockedCommunityVotingPower from '@components/ProposalVotingPower/LockedCommunityVotingPower'
+import PythVotingPower from 'PythVotePlugin/components/PythVotingPower'
 
 export default function GovernancePowerForRole({
   role,
@@ -23,16 +23,11 @@ export default function GovernancePowerForRole({
 }) {
   const { connection } = useConnection()
   const realmPk = useSelectedRealmPubkey()
-  const config = useRealmConfigQuery().data?.result
 
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
-  //if dao transited to use plugin and some users have still deposited tokens they should withdraw before
+
+  //VSR if dao transited to use plugin and some users have still deposited tokens they should withdraw before
   //depositing to plugin
-  const isVsr =
-    config?.account?.communityTokenConfig?.voterWeightAddin &&
-    VSR_PLUGIN_PKS.includes(
-      config?.account?.communityTokenConfig?.voterWeightAddin?.toBase58()
-    )
   const didWithdrawFromVanillaSetup =
     !ownTokenRecord ||
     ownTokenRecord.account.governingTokenDepositAmount.isZero()
@@ -42,10 +37,8 @@ export default function GovernancePowerForRole({
 
   const { result: kind } = useAsync(async () => {
     if (realmPk === undefined) return undefined
-    return didWithdrawFromVanillaSetup
-      ? determineVotingPowerType(connection, realmPk, role)
-      : 'vanilla'
-  }, [connection, realmPk, role, didWithdrawFromVanillaSetup])
+    return determineVotingPowerType(connection, realmPk, role)
+  }, [connection, realmPk, role])
 
   if (connected && kind === undefined && !props.hideIfZero) {
     return (
@@ -60,21 +53,35 @@ export default function GovernancePowerForRole({
           <div>
             <VanillaVotingPower role="community" {...props} />
             <Deposit role="community" />
-            {isVsr && !didWithdrawFromVanillaSetup && (
-              <small className="flex items-center mt-3 text-xs">
-                <ExclamationIcon className="w-5 h-5 mr-2"></ExclamationIcon>
-                Please withdraw your tokens and deposit again to get governance
-                power
-              </small>
-            )}
           </div>
         ) : kind === 'VSR' ? (
-          <LockedCommunityVotingPower />
+          didWithdrawFromVanillaSetup ? (
+            <LockedCommunityVotingPower />
+          ) : (
+            //TODO make a better generic little prompt for when a plugin is used but there are still tokens in vanilla
+            <>
+              <VanillaVotingPower role="community" {...props} />
+              <div className="flex flex-col gap-2">
+                <div>
+                  <small className="flex items-center mt-3 text-xs">
+                    <ExclamationIcon className="w-5 h-5 mr-2"></ExclamationIcon>
+                    Please withdraw your tokens and deposit again to get
+                    governance power
+                  </small>
+                </div>
+                <div>
+                  <VanillaWithdrawTokensButton role={role} />
+                </div>
+              </div>
+            </>
+          )
         ) : kind === 'NFT' ? (
-          <NftVotingPower />
-        ) : kind === 'HeliumVSR' ? (
-          <LockedCommunityNFTRecordVotingPower />
-        ) : null
+          <NftVotingPower />)
+          : kind === 'pyth' ? (
+            <PythVotingPower role='community' />
+          ) : kind === 'HeliumVSR' ? (
+            <LockedCommunityNFTRecordVotingPower />
+          ) : null
       ) : kind === 'vanilla' ? (
         <div>
           <VanillaVotingPower role="council" {...props} />

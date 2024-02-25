@@ -67,21 +67,24 @@ export const finalizeVote = async (
     connection.getBalance(possibleTorDeposit),
   ])
 
-  const activeDeposit = delegateDeposit ? delegateDeposit : torDeposit
+  let refundAddress;
+  if (delegateDeposit && delegateDeposit > 0 && possibleDelegateDeposit) {
+    refundAddress = proposalOwner.account.governanceDelegate;
+  } else if (torDeposit && torDeposit > 0) {
+    refundAddress = proposalOwner.account.governingTokenOwner;
+  }
 
-  if (activeDeposit) {
+  if (refundAddress) {
     await withRefundProposalDeposit(
       instructions,
       programId!,
       programVersion,
       proposal.pubkey,
-      possibleDelegateDeposit && delegateDeposit
-        ? proposalOwner.account.governanceDelegate!
-        : proposalOwner.account.governingTokenOwner!
+      refundAddress
     )
   }
 
-  const transaction = new Transaction()
+  const transaction = new Transaction({ feePayer: wallet.publicKey });
 
   transaction.add(...instructions)
 

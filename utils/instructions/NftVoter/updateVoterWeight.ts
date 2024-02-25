@@ -8,7 +8,7 @@ import { PROGRAM_ID as ACCOUNT_COMPACTION_PROGRAM_ID } from '@solana/spl-account
 import { SYSTEM_PROGRAM_ID } from '@solana/spl-governance'
 import { NftVoter } from 'idls/nft_voter'
 import { NftVoterV2 } from 'idls/nft_voter_v2'
-import { Program } from '@project-serum/anchor'
+import { Program } from '@coral-xyz/anchor'
 import {
   AccountData,
   UpdateVoterWeightRecordTypes,
@@ -130,8 +130,16 @@ export const getUpdateVoterWeightRecordInstructionV2 = async (
       program.provider.connection,
       cnft
     )
+
+    // CreateCnftActionTicket requires a non-null collection,
+    // but getCnftParamAndProof returns a nullable one
+    if (!param.collection.key) throw new Error("Collection key not found");
+    // Typescript doesn't infer this in its current version, but this is basically
+    // casting the collection key to non-null.
+    const typesafeParams = [param as typeof param & { collection: typeof param.collection & { key : PublicKey }}]
+
     const instruction = await program.methods
-      .createCnftActionTicket({ [type]: {} }, [param])
+      .createCnftActionTicket({ [type]: {} }, typesafeParams)
       .accounts({
         registrar,
         voterWeightRecord: voterWeightPk,

@@ -26,6 +26,13 @@
     "shortDescription": "Frictionless is revolutionizing governance participation, bridging the gap between web2 and web3"
   },
   {
+    "symbol": "DED",
+    "displayName": "DED DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "735Kg6893iFH2KuGy6uJrVXYKwBi6ky3KLLNPmJ4TMCD",
+    "ogImage": "https://arweave.net/LzLM9GSor6FYeeFv5hv2a5oQuwcoyH3WFGbEq6_xGZk"
+  },
+  {
     "symbol": "GrapeUX",
     "displayName": "Grape UX",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -59,6 +66,17 @@
     "ogImage": "/realms/Deans_List_Network_State/avatar-deanslist.png",
     "github": "https://github.com/Deans-List/",
     "shortDescription": "A Service DAO turned Network State, consisting of Web3 power users providing feedback sessions. Join us in changing the future of work!"
+  },
+  {
+    "symbol": "Dean's List Solarplex State",
+    "displayName": "Dean's List Solarplex State",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "4U5tep3h2wFrLskrCJAemvFVyLwGvQ8Xbuc8dBEC6smF",
+    "bannerImage": "/realms/Deans-List-Solarplex-State/img/banner-deanslist-solarplex.png",
+    "twitter": "@deanslistDAO",
+    "ogImage": "/realms/Deans-List-Solarplex-State/img/deans_list_solarplex_state.png",
+    "github": "https://github.com/Deans-List/",
+    "shortDescription": "Dean's List Solarplex State oversees feedback incentives on Solarplex."
   },
   {
     "symbol": "Ukraine",
@@ -181,7 +199,7 @@
     "sortRank": 3,
     "website": "https://grapes.network/",
     "twitter": "@grapeprotocol",
-    "discord": "https://discord.com/invite/greatape",
+    "discord": "https://discord.com/invite/grapedao",
     "github": "https://github.com/Grape-Labs"
   },
   {
@@ -1441,20 +1459,6 @@
     "twitter": "@uniquevcs",
     "discord": "https://discord.gg/uniquevcs",
     "github": "https://uniquevc.gitbook.io/unique-venture-clubs-docs/"
-  },
-  {
-    "symbol": "GARI Network",
-    "category": "web3",
-    "bannerImage": "https://i.imgur.com/VfFjhk5.jpeg",
-    "displayName": "GARI Network",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "uWg5gaTsBnXc5qiVMB8XxBUPYqLAb5bzzgkkpxi6UAY",
-    "ogImage": "https://i.imgur.com/t5hzoBV.jpg",
-    "shortDescription": "GARI Network enables everyone to monetize their social media time and activities by leveraging web3 technologies.",
-    "sortRank": 3,
-    "website": "https://gari.network/",
-    "twitter": "@GariToken",
-    "discord": "https://discord.gg/garitoken"
   },
   {
     "symbol": "Dual DAO",
@@ -3228,6 +3232,19 @@
     "ogImage": "/realms/LavaDAO/img/lavalogo.png"
   },
   {
+    "symbol": "PAWN",
+    "displayName": "Pawn DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "shortDescription": "A Pawn in someone's experiment.",
+    "discord": "https://discord.gg/Td7QFn2ePz",
+    "bannerImage": "/realms/PAWN/img/pawns-banner.png",
+    "category": "Memecoin",
+    "sortRank": 3, 
+    "realmId": "7rvjS4CgRYUZkSLJAXitmeQCybvfZcYcMjpVRhJ9mFHK",
+    "twitter": "@pawnspl24",
+    "ogImage": "/realms/PAWN/img/pawn.png"
+  },
+  {
     "symbol": "COMRADE",
     "displayName": "ComradeDAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -3343,5 +3360,100 @@
     "bannerImage": "/realms/TrustBet/Bannerontransparent.png",
     "ogImage": "realms/TrustBet/tickerlogo.svg",
     "communityMint": "xpFbKJa92Ee1NSYEhc3b3BVk4im8YStXRaVW6EoW33w"
+  },
+  {
+    "symbol": "BLR",
+    "displayName": "Blockride",
+    "category": "web3",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "A6ZS5ZdkyAbncb55fKjaUhBcQcovp8XcYT5AEQayv96y",
+    "bannerImage": "/realms/Blockride/banner.png",
+    "ogImage": "/realms/Blockride/logo.png",
+    "twitter": "@blockridenft",
+    "website": "https://blockride.xyz/",
+    "sortRank": 3,
+    "shortDescription": "BLOCKRIDE DAO - Building a modern approach to vehicle financing",
+    "keywords": "Web3, REALM, Governance, vehicle financing, DAO, Africans, Nigeria, RWA, Solana",
+    "github": "https://github.com/BlockrideNFT-org"
+  },
+  {
+    "symbol": "RAAAWR",
+    "displayName": "Solsaur DAO",
+    "bannerImage": "/realms/Solsaur/solsaur-realms-banner.png",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "ANqmLV2hQNwFm3jyfqLEBa6KTksosr6uKzcdfg9X6ReR",
+    "ogImage": "/realms/Solsaur/solsaur.png",
+    "website": "https://www.solsaur.com",
+    "twitter": "@solsauras"
+  },
+  {
+    "symbol": "Conk",
+    "displayName": "Conk Dao",
+    "category": "web3",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "A3jzUmuVqbyzqLgHtmMA2igUeACScRiSk71Hy27ehieo",
+    "bannerImage": "/realms/ConkDao/conk_banner.png",
+    "ogImage": "/realms/ConkDao/conk.png",
+    "twitter": "@Conk_Coin",
+    "website": "https://conkcoin.club",
+    "sortRank": 3,
+    "shortDescription": "Conk DAO - The People's Cat Coin",
+    "keywords": "Web3, REALM, Governance, Meme, DAO, Solana"
+  },
+  {
+    "symbol": "MEMES",
+    "displayName": "MemeCoinDAOai",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Ecar1VyamYnR2UzJzJbQMKR9Zq1U5p1xuUUsnzceDiaH",
+    "bannerImage": "/realms/MemeCoinDAOai/MemeCoinDAOBanner1_15.png",
+    "ogImage": "/realms/MemeCoinDAOai/MemeCoinDAOFinalLogo.png",
+    "website": "https://www.memecoindao.ai",
+    "twitter": "@MemeCoinDAOai"
+  },
+  {
+    "symbol": "$GARI",
+    "displayName": "GARI Network DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "HvDndGYjZNMVQDsrdAJJR7DtnQSB5rXM9BJBdwuxiXDg",
+    "bannerImage": "https://media1.tenor.com/m/uKCFs6UJgCwAAAAC/gari-gari-token.gif",
+    "ogImage": "https://gari.network/wp-content/uploads/2023/12/gari-coin-1.png",
+    "website": "https://gari.network/",
+    "twitter": "@TheGariNetwork",
+    "category": "web3"
+  },
+  {
+    "symbol": "BOHDAO",
+    "displayName": "Brigade of Honor Dao",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "FSh5XBFUYFMEWP99y4j7W6zERtEnqFVuwfuHgHgJJYWq",
+    "ogImage": "https://www.brigadeofhonor.com/BOHlogo.png",
+    "website": "https://www.brigadeofhonor.com/",
+    "twitter": "@BoHgamingguild"
+  },
+  {
+    "symbol": "MF",
+    "displayName": "MOUTAI FUND",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "3JZmKT5xWKESXdC9aVpcv4so2DngpDHqzCm1pzwPU8Jc",
+    "ogImage": "/realms/MOUTAI/MF.png",
+    "website": "https://moutaifund.club/",
+    "twitter": "@MoutaiFund"
+  },
+  {
+    "symbol": "MOUTAI",
+    "displayName": "MOUTAI DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "DgsXUhQbGuHxRNcSZJJdVXJcFCeMEFyDNeBYUDS9pHmC",
+    "ogImage": "/realms/MOUTAI/mdao.jpg",
+    "website": "https://www.moutaicoin.co/",
+    "twitter": "@Moutai_Sol"
+  },
+  {
+    "symbol": "GARBAGE",
+    "displayName": "GARBAGE DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "GgF6fHb3iM3Um5DtvwbZvpGpYTzYnr1RmZr4NkwHveGp",
+    "website": "",
+    "twitter": ""
   }
 ]

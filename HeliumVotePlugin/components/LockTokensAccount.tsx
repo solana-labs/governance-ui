@@ -401,7 +401,6 @@ export const LockTokensAccount: React.FC<{
           <TokenDeposit
             mint={councilMint}
             tokenRole={GoverningTokenRole.Council}
-            councilVote={true}
             inAccountDetails={true}
           />
         </div>

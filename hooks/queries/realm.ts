@@ -6,6 +6,7 @@ import { getNetworkFromEndpoint } from '@utils/connection'
 import asFindable from '@utils/queries/asFindable'
 import queryClient from './queryClient'
 import { useConnection } from '@solana/wallet-adapter-react'
+import { HIDDEN_REALMS } from '@components/instructions/tools'
 
 export const realmQueryKeys = {
   all: (endpoint: string) => [endpoint, 'Realm'],
@@ -30,7 +31,10 @@ export const useRealmsByProgramQuery = (program: PublicKey) => {
       : undefined,
     queryFn: async () => {
       if (!enabled) throw new Error()
-      return getRealms(connection, program)
+      const realms = (await getRealms(connection, program)).filter(
+        (x) => !HIDDEN_REALMS.includes(x.pubkey.toBase58())
+      )
+      return realms
     },
     staleTime: 3600000, // 1 hour
     cacheTime: 3600000 * 24 * 10,
