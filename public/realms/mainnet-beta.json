@@ -3455,5 +3455,14 @@
     "realmId": "GgF6fHb3iM3Um5DtvwbZvpGpYTzYnr1RmZr4NkwHveGp",
     "website": "",
     "twitter": ""
+  },
+  {
+    "symbol": "NFTM",
+    "displayName": "NFTMarketsHub",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "GUn3aDwE8PNVDTJk4uQx4cSbqZksiHj7YpsTJE8Fn9yX",
+    "bannerImage": "/realms/NFTMarketsHub/NFTMarketsHublogo.jpg",
+    "ogImage": "realms/realms/NFTMarketsHub/NFTMarketsHublogo.jpg",
+    "communityMint": "E1Wytf41Spys5sXYZYN3NN87SagVZ12ZHdaf9Lidjocr"
   }
 ]
