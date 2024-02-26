@@ -678,7 +678,7 @@
     did-resolver "^3.2.0"
     ramda "^0.29.0"
 
-"@civic/solana-gateway-react@0.16.10":
+"@civic/solana-gateway-react@^0.16.10":
   version "0.16.10"
   resolved "https://registry.yarnpkg.com/@civic/solana-gateway-react/-/solana-gateway-react-0.16.10.tgz#cf79f264ba5d4aabd42d75c7ed0667e56641f388"
   integrity sha512-JIs+XPuNG3q2qSWDqUPtcSsNugipehfj7dmrwOj3xkbLMVLu8mrHTPfU5kAlTx1s9xcFtdSCJkzhEHX4lu3xJg==

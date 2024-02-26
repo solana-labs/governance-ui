@@ -198,7 +198,7 @@ export async function createTransaction(
       // Configure the registrar for the quadratic voting plugin for the DAO
       // Since QV needs to be paired up with some other plugin that protects against sybil attacks,
       // it will typically have a predecessor plugin (e.g. the Civic Gateway plugin)
-      const predecessorPlugin = currentConfig.chainingEnabled
+      const predecessorPlugin = config.chainingEnabled
         ? currentConfig.configAccount.communityTokenConfig.voterWeightAddin
         : undefined;
 
