@@ -5,19 +5,24 @@ import {useVoterWeightPlugins} from "../VoterWeightPlugins";
 import {useRealmQuery} from "@hooks/queries/realm";
 import useWalletOnePointOh from "@hooks/useWalletOnePointOh";
 import {GovernanceRole} from "../@types/types";
+import {useSelectedDelegatorStore} from "../stores/useSelectedDelegatorStore";
 
-export const useRealmVoterWeightPlugins = (kind : GovernanceRole = 'community') => {
+export const useRealmVoterWeightPlugins = (role : GovernanceRole = 'community') => {
     const realm = useRealmQuery().data?.result
     const wallet = useWalletOnePointOh()
     const governanceMintPublicKey =
-        kind === 'community'
+        role === 'community'
             ? realm?.account.communityMint
             : realm?.account.config.councilMint
+    const selectedDelegator = useSelectedDelegatorStore((s) =>
+        role === 'community' ? s.communityDelegator : s.councilDelegator
+    )
 
+    // if a delegator is selected, use it, otherwise use the currently connected wallet
     return useVoterWeightPlugins({
         realmPublicKey: realm?.pubkey,
         governanceMintPublicKey,
-        walletPublicKey: wallet?.publicKey ?? undefined
+        walletPublicKey: selectedDelegator ?? wallet?.publicKey ?? undefined
     })
 }
 
