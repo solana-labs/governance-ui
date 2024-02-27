@@ -34,15 +34,9 @@ import ProposalWarnings from './ProposalWarnings'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import VotingRules from '@components/VotingRules'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
-import GatewayCard from '@components/Gateway/GatewayCard'
-// TODO: replace this with absolute route
-import { useGatewayVoterWeightPlugin } from 'VoterWeightPlugins/useGatewayVoterWeightPlugin'
-import { useQuadraticVoterWeightPlugin } from 'VoterWeightPlugins/useQuadraticVoterWeightPlugin'
-import PluginVotingPower from '@components/ProposalVotingPower/PluginVotingPower'
 
 const Proposal = () => {
   const { realmInfo, symbol } = useRealm()
-  const { isEnabled } = useGatewayVoterWeightPlugin()
   const proposal = useRouteProposalQuery().data?.result
   const governance = useProposalGovernanceQuery().data?.result
   const descriptionLink = proposal?.account.descriptionLink
@@ -50,7 +44,6 @@ const Proposal = () => {
   const isMulti =
     proposal?.account.voteType !== VoteType.SINGLE_CHOICE &&
     proposal?.account.accountType === GovernanceAccountType.ProposalV2
-  const isQuadratic = useQuadraticVoterWeightPlugin().isEnabled
 
   const [description, setDescription] = useState('')
   const voteData = useProposalVotes(proposal?.account)
