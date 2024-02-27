@@ -38,11 +38,13 @@ export default function QuadraticVotingInfoModal({
                 <p className="font-bold">
                   {tokenAmount} tokens | {voteWeight} votes
                 </p>
-                <p className="text-fgd-3">
+
+                <p className="text-fgd-3 mb-2">
                   {(
-                    (Number(voteWeight) / Number(totalVoteWeight)) *
+                    (Number(voteWeight ?? '0') /
+                      Number(totalVoteWeight ?? '0')) *
                     100
-                  ).toFixed(2)}
+                  ).toFixed(2) ?? 0}
                   % of possible votes
                 </p>
               </div>

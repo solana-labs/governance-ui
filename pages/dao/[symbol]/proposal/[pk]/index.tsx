@@ -150,11 +150,6 @@ const Proposal = () => {
       <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
         <VotePanel />
         {showTokenBalance && <ProposalVotingPower />}
-        {isQuadratic && (
-          <div className="bg-bkg-2 rounded-lg p-4 md:p-6">
-            <PluginVotingPower role="community" />
-          </div>
-        )}
         {showResults ? (
           <div className="bg-bkg-2 rounded-lg">
             <div className="p-4 md:p-6">
@@ -222,11 +217,6 @@ const Proposal = () => {
             </div>
           </div>
         ) : null}
-        {isEnabled && (
-          <div className="bg-bkg-2 rounded-lg px-6 pb-6">
-            <GatewayCard />
-          </div>
-        )}
         <VotingRules />
         <NftProposalVoteState proposal={proposal}></NftProposalVoteState>
         {proposal && currentWallet && showProposalExecution && (

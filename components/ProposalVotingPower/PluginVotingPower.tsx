@@ -48,12 +48,6 @@ export default function PluginVotingPower({ role, className }: Props) {
   } = useRealmVoterWeightPlugins(role)
   const { result: ownVoterWeight } = useLegacyVoterWeight()
 
-  console.log('ownerVoterWeight', ownVoterWeight)
-  console.log(
-    'ownVoterWeight',
-    ownVoterWeight?.communityTokenRecord?.account?.governingTokenDepositAmount.toNumber()
-  )
-
   const formattedTokenAmount = useMemo(
     () =>
       mintInfo && ownVoterWeight?.communityTokenRecord
@@ -115,7 +109,6 @@ export default function PluginVotingPower({ role, className }: Props) {
 
   return (
     <div>
-      <h3>My Voting Power</h3>
       <div className="flex items-center mb-2">
         <p className="mb-1">Quadratic Voting</p>
         <QuadraticVotingInfoModal
@@ -131,13 +124,15 @@ export default function PluginVotingPower({ role, className }: Props) {
             <div className="flex">
               <div className="flex flex-col">
                 <p className="font-bold">
-                  {formattedTokenAmount} tokens | {formattedTotal} votes
+                  {formattedTokenAmount ?? '0'} tokens | {formattedTotal ?? '0'}{' '}
+                  votes
                 </p>
                 <p className="text-fgd-3 mb-2">
                   {(
-                    (Number(formattedTotal) / Number(formattedMax)) *
+                    (Number(formattedTotal ?? '0') /
+                      Number(formattedMax ?? '0')) *
                     100
-                  ).toFixed(2)}
+                  ).toFixed(2) ?? 0}
                   % of possible votes
                 </p>
               </div>
