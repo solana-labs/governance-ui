@@ -12,7 +12,9 @@ type UseJoinRealmReturnType = {
     userNeedsTokenOwnerRecord: boolean,
     userNeedsVoterWeightRecords: boolean,
     // returns an array of instructions that should be added to a transaction when the join button is clicked.
-    handleRegister: () => Promise<TransactionInstruction[]>
+    // will create the Token Owner Record if needed unless includeTokenOwnerRecord is false
+    // (this allows it to be chained with deposit instructions)
+    handleRegister: (includeTokenOwnerRecord?: boolean) => Promise<TransactionInstruction[]>
 }
 
 export const useJoinRealm = (): UseJoinRealmReturnType => {
@@ -32,9 +34,9 @@ export const useJoinRealm = (): UseJoinRealmReturnType => {
             .then((ixes) => setUserNeedsVoterWeightRecords(ixes.length > 0));
     }, [createVoterWeightRecords])
 
-    const handleRegister = useCallback(async () => {
+    const handleRegister = useCallback(async (includeTokenOwnerRecord = true) => {
         const onboardUserIxes = []
-        if (userNeedsTokenOwnerRecord && realm && wallet?.publicKey && programVersion) {
+        if (includeTokenOwnerRecord && userNeedsTokenOwnerRecord && realm && wallet?.publicKey && programVersion) {
             await withCreateTokenOwnerRecord(onboardUserIxes,
                 realm.owner,
                 programVersion,
