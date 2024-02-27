@@ -102,7 +102,7 @@ export default function PluginVotingPower({ role, className }: Props) {
         <QuadraticVotingInfoModal
           voteWeight={formattedTotal ?? '0'}
           totalVoteWeight={formattedMax ?? '0'}
-          coefficients={coefficients}
+          // coefficients={coefficients}
           totalMembers={activeMembers?.length ?? 0}
         />
       </div>
