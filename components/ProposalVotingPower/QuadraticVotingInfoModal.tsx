@@ -2,18 +2,15 @@ import { useState } from 'react'
 
 import { InformationCircleIcon, UserGroupIcon } from '@heroicons/react/solid'
 import Modal from '@components/Modal'
-import { Coefficients } from '../../VoterWeightPlugins/useQuadraticVoterWeightPlugin'
 
 interface QuadraticVotingInfoModalProps {
   voteWeight: string
-  coefficients: Coefficients
   totalVoteWeight: string
   totalMembers: number
 }
 
 export default function QuadraticVotingInfoModal({
   voteWeight,
-  coefficients,
   totalVoteWeight,
   totalMembers,
 }: QuadraticVotingInfoModalProps) {
