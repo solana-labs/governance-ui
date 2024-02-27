@@ -6,8 +6,9 @@ import {useRealmQuery} from "@hooks/queries/realm";
 import useWalletOnePointOh from "@hooks/useWalletOnePointOh";
 import {GovernanceRole} from "../@types/types";
 import {useSelectedDelegatorStore} from "../stores/useSelectedDelegatorStore";
+import {UseVoterWeightPluginsReturnType} from "../VoterWeightPlugins/useVoterWeightPlugins";
 
-export const useRealmVoterWeightPlugins = (role : GovernanceRole = 'community') => {
+export const useRealmVoterWeightPlugins = (role : GovernanceRole = 'community'): UseVoterWeightPluginsReturnType  => {
     const realm = useRealmQuery().data?.result
     const wallet = useWalletOnePointOh()
     const governanceMintPublicKey =

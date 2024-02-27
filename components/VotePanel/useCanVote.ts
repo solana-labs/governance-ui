@@ -31,7 +31,10 @@ export const useCanVote = () => {
 
   const { data: ownVoteRecord } = useProposalVoteRecordQuery('electoral')
   const voterTokenRecord = useVoterTokenRecord()
+  const { plugins } = useRealmVoterWeightPlugins(votingPop);
 
+
+  const hasAllVoterWeightRecords = (plugins ?? []).every((plugin) => plugin.voterWeight !== undefined)
   const isVoteCast = !!ownVoteRecord?.found
 
   const hasMinAmountToVote = useHasAnyVotingPower(votingPop)
@@ -40,6 +43,7 @@ export const useCanVote = () => {
     connected &&
     !(isReady && includesPlugin('NFT') && !voterTokenRecord) &&
     !(isReady && includesPlugin('HeliumVSR') && !voterTokenRecord) &&
+    hasAllVoterWeightRecords &&
     !isVoteCast &&
     hasMinAmountToVote
 

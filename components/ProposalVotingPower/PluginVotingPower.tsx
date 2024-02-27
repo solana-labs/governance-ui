@@ -44,7 +44,13 @@ export default function PluginVotingPower({ role, className }: Props) {
         : undefined,
     [mintInfo, calculatedVoterWeight?.value]
   )
-  const showJoinButton = userNeedsTokenOwnerRecord || userNeedsVoterWeightRecords;
+  // There are two buttons available on this UI:
+  // The Deposit button - available if you have tokens to deposit
+  // The Join button - available if you have already deposited tokens (you have a Token Owner Record)
+  // but you may not have all your Voter Weight Records yet.
+  // This latter case may occur if the DAO changes its configuration and new Voter Weight Records are required.
+  // For example if a new plugin is added.
+  const showJoinButton = !userNeedsTokenOwnerRecord && userNeedsVoterWeightRecords;
 
   const join = async () => {
     const instructions = await handleRegister();
