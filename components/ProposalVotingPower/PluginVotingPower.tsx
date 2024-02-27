@@ -8,7 +8,7 @@ import { BigNumber } from 'bignumber.js'
 import clsx from 'clsx'
 import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
 import QuadraticVotingInfoModal from './QuadraticVotingInfoModal'
-import { useQuadraticVoterWeightPlugin } from '../../VoterWeightPlugins/useQuadraticVoterWeightPlugin'
+// import { useQuadraticVoterWeightPlugin } from '../../VoterWeightPlugins/useQuadraticVoterWeightPlugin'
 import { useMembersQuery } from '@components/Members/useMembers'
 import { useJoinRealm } from '@hooks/useJoinRealm'
 import { Transaction } from '@solana/web3.js'
@@ -47,7 +47,7 @@ export default function PluginVotingPower({ role, className }: Props) {
     calculatedMaxVoterWeight,
   } = useRealmVoterWeightPlugins(role)
 
-  const { coefficients } = useQuadraticVoterWeightPlugin()
+  // const { coefficients } = useQuadraticVoterWeightPlugin()
 
   const formattedMax =
     mintInfo && calculatedMaxVoterWeight?.value
