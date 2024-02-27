@@ -8,7 +8,6 @@ import { BigNumber } from 'bignumber.js'
 import clsx from 'clsx'
 import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
 import QuadraticVotingInfoModal from './QuadraticVotingInfoModal'
-// import { useQuadraticVoterWeightPlugin } from '../../VoterWeightPlugins/useQuadraticVoterWeightPlugin'
 import { useMembersQuery } from '@components/Members/useMembers'
 import { useJoinRealm } from '@hooks/useJoinRealm'
 import { Transaction } from '@solana/web3.js'
@@ -18,6 +17,7 @@ import Button from '@components/Button'
 import { sendTransaction } from '@utils/send'
 import { TokenDeposit } from '@components/TokenBalance/TokenDeposit'
 import { GoverningTokenRole } from '@solana/spl-governance'
+import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 
 interface Props {
   className?: string
@@ -46,8 +46,26 @@ export default function PluginVotingPower({ role, className }: Props) {
     isReady,
     calculatedMaxVoterWeight,
   } = useRealmVoterWeightPlugins(role)
+  const { result: ownVoterWeight } = useLegacyVoterWeight()
 
-  // const { coefficients } = useQuadraticVoterWeightPlugin()
+  console.log('ownerVoterWeight', ownVoterWeight)
+  console.log(
+    'ownVoterWeight',
+    ownVoterWeight?.communityTokenRecord?.account?.governingTokenDepositAmount.toNumber()
+  )
+
+  const formattedTokenAmount = useMemo(
+    () =>
+      mintInfo && ownVoterWeight?.communityTokenRecord
+        ? new BigNumber(
+            ownVoterWeight?.communityTokenRecord?.account?.governingTokenDepositAmount?.toString()
+          )
+            .shiftedBy(-mintInfo.decimals)
+            .toFixed(2)
+            .toString()
+        : undefined,
+    [mintInfo, ownVoterWeight?.communityTokenRecord]
+  )
 
   const formattedMax =
     mintInfo && calculatedMaxVoterWeight?.value
@@ -61,6 +79,7 @@ export default function PluginVotingPower({ role, className }: Props) {
       mintInfo && calculatedVoterWeight?.value
         ? new BigNumber(calculatedVoterWeight?.value.toString())
             .shiftedBy(-mintInfo.decimals)
+            .toFixed(2)
             .toString()
         : undefined,
     [mintInfo, calculatedVoterWeight?.value]
@@ -101,8 +120,8 @@ export default function PluginVotingPower({ role, className }: Props) {
         <p className="mb-1">Quadratic Voting</p>
         <QuadraticVotingInfoModal
           voteWeight={formattedTotal ?? '0'}
+          tokenAmount={formattedTokenAmount ?? '0'}
           totalVoteWeight={formattedMax ?? '0'}
-          // coefficients={coefficients}
           totalMembers={activeMembers?.length ?? 0}
         />
       </div>
@@ -112,9 +131,15 @@ export default function PluginVotingPower({ role, className }: Props) {
             <div className="flex">
               <div className="flex flex-col">
                 <p className="font-bold">
-                  {formattedMax} tokens | {formattedTotal} votes
+                  {formattedTokenAmount} tokens | {formattedTotal} votes
                 </p>
-                <p className="text-fgd-3 mb-2">10% of possible votes</p>
+                <p className="text-fgd-3 mb-2">
+                  {(
+                    (Number(formattedTotal) / Number(formattedMax)) *
+                    100
+                  ).toFixed(2)}
+                  % of possible votes
+                </p>
               </div>
             </div>
             <div className="text-xl font-bold text-fgd-1 hero-text">

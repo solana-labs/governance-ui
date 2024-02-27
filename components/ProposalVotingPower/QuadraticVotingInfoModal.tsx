@@ -7,12 +7,14 @@ interface QuadraticVotingInfoModalProps {
   voteWeight: string
   totalVoteWeight: string
   totalMembers: number
+  tokenAmount: string
 }
 
 export default function QuadraticVotingInfoModal({
   voteWeight,
   totalVoteWeight,
   totalMembers,
+  tokenAmount,
 }: QuadraticVotingInfoModalProps) {
   const [showQuadraticModal, setShowQuadraticModal] = useState(false)
 
@@ -30,14 +32,19 @@ export default function QuadraticVotingInfoModal({
           onClose={() => setShowQuadraticModal(false)}
           isOpen={showQuadraticModal}
         >
-          {/* TODO add quadratic values */}
           <div className="p-4">
             <div className="bg-bkg-1 p-4 rounded-lg mb-8 flex flex-row justify-evenly">
               <div className="flex flex-col items-end">
                 <p className="font-bold">
-                  {totalVoteWeight} tokens | {voteWeight} votes
+                  {tokenAmount} tokens | {voteWeight} votes
                 </p>
-                <p className="text-fgd-3">10% of possible votes</p>
+                <p className="text-fgd-3">
+                  {(
+                    (Number(voteWeight) / Number(totalVoteWeight)) *
+                    100
+                  ).toFixed(2)}
+                  % of possible votes
+                </p>
               </div>
               <UserGroupIcon className="w-12 h-12" />
               <div className="flex flex-col">

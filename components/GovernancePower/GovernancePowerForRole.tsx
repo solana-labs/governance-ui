@@ -39,8 +39,6 @@ export default function GovernancePowerForRole({
   const { plugins } = useRealmVoterWeightPlugins(role)
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
 
-  console.log('plugins', plugins)
-
   const usesPlugin = usesPluginFn(plugins)
   const usesNFT = usesPlugin('NFT')
   const usesPyth = usesPlugin('pyth')
