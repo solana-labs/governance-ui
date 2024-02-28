@@ -9,15 +9,10 @@ import clsx from 'clsx'
 import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
 import QuadraticVotingInfoModal from './QuadraticVotingInfoModal'
 import { useMembersQuery } from '@components/Members/useMembers'
-import { useJoinRealm } from '@hooks/useJoinRealm'
-import { Transaction } from '@solana/web3.js'
-import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useConnection } from '@solana/wallet-adapter-react'
-import Button from '@components/Button'
-import { sendTransaction } from '@utils/send'
 import { TokenDeposit } from '@components/TokenBalance/TokenDeposit'
 import { GoverningTokenRole } from '@solana/spl-governance'
 import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
+import { getMintMetadata } from '@components/instructions/programs/splToken'
 
 interface Props {
   className?: string
@@ -25,16 +20,9 @@ interface Props {
 }
 
 export default function PluginVotingPower({ role, className }: Props) {
-  const wallet = useWalletOnePointOh()
-  const connected = !!wallet?.connected
-  const { connection } = useConnection()
   const realm = useRealmQuery().data?.result
   const { data: activeMembersData } = useMembersQuery()
-  const {
-    userNeedsTokenOwnerRecord,
-    userNeedsVoterWeightRecords,
-    handleRegister,
-  } = useJoinRealm()
+
   const mintInfo = useMintInfoByPubkeyQuery(realm?.account.communityMint).data
     ?.result
 
@@ -61,6 +49,14 @@ export default function PluginVotingPower({ role, className }: Props) {
     [mintInfo, ownVoterWeight?.communityTokenRecord]
   )
 
+  const relevantMint =
+    role === 'community'
+      ? realm?.account.communityMint
+      : realm?.account.config.councilMint
+
+  const tokenName =
+    getMintMetadata(relevantMint)?.name ?? realm?.account.name ?? ''
+
   const formattedMax =
     mintInfo && calculatedMaxVoterWeight?.value
       ? new BigNumber(calculatedMaxVoterWeight?.value.toString())
@@ -78,29 +74,6 @@ export default function PluginVotingPower({ role, className }: Props) {
         : undefined,
     [mintInfo, calculatedVoterWeight?.value]
   )
-  // There are two buttons available on this UI:
-  // The Deposit button - available if you have tokens to deposit
-  // The Join button - available if you have already deposited tokens (you have a Token Owner Record)
-  // but you may not have all your Voter Weight Records yet.
-  // This latter case may occur if the DAO changes its configuration and new Voter Weight Records are required.
-  // For example if a new plugin is added.
-  const showJoinButton =
-    !userNeedsTokenOwnerRecord && userNeedsVoterWeightRecords
-
-  const join = async () => {
-    const instructions = await handleRegister()
-    const transaction = new Transaction()
-    transaction.add(...instructions)
-
-    await sendTransaction({
-      transaction: transaction,
-      wallet: wallet!,
-      connection,
-      signers: [],
-      sendingMessage: `Registering`,
-      successMessage: `Registered`,
-    })
-  }
 
   if (isLoading || !isReady) {
     return (
@@ -127,28 +100,23 @@ export default function PluginVotingPower({ role, className }: Props) {
       <div className={'p-3 rounded-md bg-bkg-1'}>
         <div className="flex items-center justify-between mt-1">
           <div className={clsx(className)}>
-            <div className="flex">
-              <div className="flex flex-col">
-                <p className="font-bold">
-                  {formattedTokenAmount ?? '0'} tokens | {formattedTotal ?? '0'}{' '}
-                  votes
+            <div className="flex flex-col">
+              <div className="text-fgd-3 text-xs">
+                {tokenName}
+                {role === 'council' ? ' Council' : ''} Votes
+              </div>
+              <div className="flex items-center">
+                <p className="font-bold mr-2 text-xl">
+                  {formattedTotal ?? '0'}
                 </p>
-                <p className="text-fgd-3 mb-2">
-                  {(
-                    (Number(formattedTotal ?? '0') /
-                      Number(formattedMax ?? '0')) *
-                    100
-                  ).toFixed(2) ?? 0}
-                  % of possible votes
+                <p className="text-fgd-3 text-xs justify-self">
+                  ({formattedTokenAmount ?? '0'} tokens)
                 </p>
               </div>
             </div>
             <div className="text-xl font-bold text-fgd-1 hero-text">
-              {connected && showJoinButton && (
-                <Button className="w-full" onClick={join}>
-                  Join
-                </Button>
-              )}
+              {/* Replace "Deposit" button with Join/Update button when a user needs to update */}
+              {/* Add copy explaining that user needds to update to vote */}
               <TokenDeposit
                 mint={mintInfo}
                 tokenRole={GoverningTokenRole.Community}
