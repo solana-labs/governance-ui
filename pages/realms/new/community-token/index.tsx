@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 
 import { PublicKey } from '@solana/web3.js'
 import createTokenizedRealm from 'actions/createTokenizedRealm'
+import createQVRealm from 'actions/createQVRealm'
 import useQueryContext from '@hooks/useQueryContext'
 
 import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
@@ -161,11 +162,22 @@ export default function CommunityTokenWizard() {
         throw new Error('No valid wallet connected')
       }
 
-      const results = await createTokenizedRealm({
-        wallet,
-        connection: connection.current,
-        ...transformFormData2RealmCreation(formData),
-      })
+      let results
+
+      if (!formData.isQuadratic) {
+        results = await createTokenizedRealm({
+          wallet,
+          connection: connection.current,
+          ...transformFormData2RealmCreation(formData),
+        })
+      } else {
+        console.log('CREATING QUADRATIC ')
+        results = await createQVRealm({
+          wallet,
+          connection: connection.current,
+          ...transformFormData2RealmCreation(formData),
+        })
+      }
 
       if (results) {
         push(

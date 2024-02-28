@@ -11,6 +11,7 @@ import FormField from '@components/NewRealmWizard/components/FormField'
 import FormFooter from '@components/NewRealmWizard/components/FormFooter'
 import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
 import Input, { RadioGroup } from '@components/NewRealmWizard/components/Input'
+
 import { GenericTokenIcon } from '@components/NewRealmWizard/components/TokenInfoTable'
 import TokenInput, { TokenWithMintInfo, COMMUNITY_TOKEN } from '../TokenInput'
 
@@ -73,6 +74,7 @@ export interface CommunityToken {
   transferCommunityMintAuthority?: boolean
   minimumNumberOfCommunityTokensToGovern?: number
   communityMintSupplyFactor?: number
+  isQuadratic?: boolean
   useSupplyFactor: boolean
   communityAbsoluteMaxVoteWeight?: number
 }
@@ -96,6 +98,7 @@ export default function CommunityTokenForm({
     // @asktree: I set default values here in order to eliminate a bug where a value was only being set as a side effect of opening advanced options
     defaultValues: {
       useSupplyFactor: true,
+      isQuadratic: false,
     },
     mode: 'all',
     resolver: yupResolver(schema),
@@ -321,6 +324,29 @@ export default function CommunityTokenForm({
             )}
           />
         )}
+
+        <Controller
+          name="isQuadratic"
+          control={control}
+          defaultValue={true}
+          render={({ field: { ref: _, ...field } }) => (
+            <div className="pt-3">
+              <FormField
+                title="Create a quadratic dao?"
+                description="This will change how votes are calculated based on distribution and amount of tokens held."
+                advancedOption
+              >
+                <RadioGroup
+                  {...field}
+                  options={[
+                    { label: 'Default', value: false },
+                    { label: 'Quadratic', value: true },
+                  ]}
+                />
+              </FormField>
+            </div>
+          )}
+        />
       </AdvancedOptionsDropdown>
 
       <FormFooter
