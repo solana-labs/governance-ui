@@ -24,6 +24,7 @@ import {
   createCivicRegistrarIx,
 } from '../../../GatewayPlugin/sdk/api';
 import {
+  configureQuadraticRegistrarIx,
   createQuadraticRegistrarIx,
   DEFAULT_COEFFICIENTS,
 } from '../../../QuadraticPlugin/sdk/api';
@@ -173,7 +174,12 @@ export async function createTransaction(
         ? currentConfig.configAccount.communityTokenConfig.voterWeightAddin
         : undefined;
 
-      const instruction = currentConfig.civicPassType
+      const existingRegistrarAccount = await gatewayClient.getRegistrarAccount(
+        realmPublicKey,
+        config.communityMint.publicKey,
+      );
+
+      const instruction = existingRegistrarAccount
         ? await configureCivicRegistrarIx(
             realmAccount,
             gatewayClient,
@@ -207,14 +213,25 @@ export async function createTransaction(
         isDevnet,
       );
 
-      // Only registrar creation is possible at present, using default coefficients (no configuration of an existing registrar)
-      const instruction = await createQuadraticRegistrarIx(
-        realmAccount,
-        wallet.publicKey,
-        quadraticClient,
-        DEFAULT_COEFFICIENTS,
-        predecessorPlugin,
+      const existingRegistrarAccount = await quadraticClient.getRegistrarAccount(
+        realmPublicKey,
+        config.communityMint.publicKey,
       );
+
+      const instruction = existingRegistrarAccount
+        ? await configureQuadraticRegistrarIx(
+            realmAccount,
+            quadraticClient,
+            DEFAULT_COEFFICIENTS,
+            predecessorPlugin,
+          )
+        : await createQuadraticRegistrarIx(
+            realmAccount,
+            wallet.publicKey,
+            quadraticClient,
+            DEFAULT_COEFFICIENTS,
+            predecessorPlugin,
+          );
 
       instructions.push(instruction);
     }
