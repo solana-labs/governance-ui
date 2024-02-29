@@ -342,14 +342,14 @@ export class VoterWeight implements VoterWeightInterface {
   ) {
     // if the vote is by council, prefer council token
     if (voteByCouncil) {
-      if (this.councilTokenRecord) {
+      if (this.councilTokenRecord && this.hasMinCouncilWeight(config.minCouncilTokensToCreateProposal)) {
         return this.councilTokenRecord
       }
       if (this.communityTokenRecord) {
         return this.communityTokenRecord
       }
     }
-    // otherwise prefer community token owner record as proposal owner
+    //  prefer community token owner record as proposal owner
     if (this.hasMinCommunityWeight(config.minCommunityTokensToCreateProposal)) {
       return this.communityTokenRecord!
     }
