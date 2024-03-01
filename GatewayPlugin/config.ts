@@ -29,4 +29,8 @@ type ArrayElement<
 > = ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
 export type CivicPass = ArrayElement<typeof availablePasses>;
 
-export const defaultPass: CivicPass = availablePasses[0]
+// Use this when populating a dropdown
+export const defaultPass: CivicPass = availablePasses[0];
+// Use this in cases where you are implicitly adding sybil resistance to a DAO (e.g. QV DAO creation), rather than
+// offering a choice - this allows defaultPass to be something *other than* sybil resistance without breaking things.
+export const defaultSybilResistancePass = availablePasses[0];

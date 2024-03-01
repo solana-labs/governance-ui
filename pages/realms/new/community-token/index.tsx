@@ -56,6 +56,12 @@ const transformFormData2RealmCreation = (formData: CommunityTokenForm) => {
 
   const programIdAddress = formData?.programId || DEFAULT_GOVERNANCE_PROGRAM_ID
 
+  // If plugins are being added to the realm, we want to delay setting the realm authority
+  // until after they are added, so that the plugins can be added by the current wallet, without going through
+  // a proposal.
+  // If more plugins are included in the Community token flow, then we should generalise this
+  const shouldSkipSettingRealmAuthority = formData.isQuadratic ?? false;
+
   const params = {
     ...{
       programIdAddress,
@@ -85,6 +91,7 @@ const transformFormData2RealmCreation = (formData: CommunityTokenForm) => {
         formData.transferCouncilMintAuthority ?? true,
       councilWalletPks:
         formData?.memberAddresses?.map((w) => new PublicKey(w)) || [],
+      skipRealmAuthority: shouldSkipSettingRealmAuthority,
     },
     ...(formData._programVersion === 3
       ? ({
@@ -162,6 +169,9 @@ export default function CommunityTokenWizard() {
         throw new Error('No valid wallet connected')
       }
 
+      // A Quadratic Voting DAO includes two plugins:
+      // - Gateway Plugin: sybil resistance protection (by default provided by civic.com)
+      // - QV Plugin: adapt the vote weight according to the quadratic formula: ax^1/2 + bx + c
       const pluginList: PluginName[] = formData.isQuadratic
         ? ['gateway', 'QV']
         : []
