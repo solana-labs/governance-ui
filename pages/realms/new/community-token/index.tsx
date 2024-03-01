@@ -1,43 +1,43 @@
-import { useState } from 'react'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
 
+import useQueryContext from '@hooks/useQueryContext'
 import { PublicKey } from '@solana/web3.js'
 import createTokenizedRealm from 'actions/createTokenizedRealm'
-import createQVRealm from 'actions/createQVRealm'
-import useQueryContext from '@hooks/useQueryContext'
 
 import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
 
 import { notify } from '@utils/notifications'
 
 import FormPage from '@components/NewRealmWizard/PageTemplate'
+import AddCouncilForm, {
+  AddCouncil,
+  AddCouncilSchema,
+} from '@components/NewRealmWizard/components/steps/AddCouncilForm'
 import BasicDetailsForm, {
-  BasicDetailsSchema,
   BasicDetails,
+  BasicDetailsSchema,
 } from '@components/NewRealmWizard/components/steps/BasicDetailsForm'
 import CommunityTokenDetailsForm, {
-  CommunityTokenSchema,
   CommunityToken,
+  CommunityTokenSchema,
 } from '@components/NewRealmWizard/components/steps/CommunityTokenDetailsForm'
+import InviteMembersForm, {
+  InviteMembers,
+  InviteMembersSchema,
+} from '@components/NewRealmWizard/components/steps/InviteMembersForm'
 import YesVotePercentageForm, {
-  CommunityYesVotePercentageSchema,
   CommunityYesVotePercentage,
+  CommunityYesVotePercentageSchema,
   CouncilYesVotePercentageSchema,
 } from '@components/NewRealmWizard/components/steps/YesVotePercentageThresholdForm'
-import AddCouncilForm, {
-  AddCouncilSchema,
-  AddCouncil,
-} from '@components/NewRealmWizard/components/steps/AddCouncilForm'
-import InviteMembersForm, {
-  InviteMembersSchema,
-  InviteMembers,
-} from '@components/NewRealmWizard/components/steps/InviteMembersForm'
+import { PluginName } from '@constants/plugins'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import {
   GoverningTokenConfigAccountArgs,
   GoverningTokenType,
 } from '@solana/spl-governance'
-import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export const FORM_NAME = 'tokenized'
 
@@ -162,22 +162,16 @@ export default function CommunityTokenWizard() {
         throw new Error('No valid wallet connected')
       }
 
-      let results
+      const pluginList: PluginName[] = formData.isQuadratic
+        ? ['gateway', 'QV']
+        : []
 
-      if (!formData.isQuadratic) {
-        results = await createTokenizedRealm({
-          wallet,
-          connection: connection.current,
-          ...transformFormData2RealmCreation(formData),
-        })
-      } else {
-        console.log('CREATING QUADRATIC ')
-        results = await createQVRealm({
-          wallet,
-          connection: connection.current,
-          ...transformFormData2RealmCreation(formData),
-        })
-      }
+      const results = await createTokenizedRealm({
+        wallet,
+        connection: connection.current,
+        ...transformFormData2RealmCreation(formData),
+        pluginList,
+      })
 
       if (results) {
         push(

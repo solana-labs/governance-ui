@@ -11,12 +11,23 @@ import {
   Web3Context,
 } from '@tools/governance/prepareRealmCreation'
 import { trySentryLog } from '@utils/logs'
+import {
+  DEFAULT_COEFFICIENTS,
+  QuadraticClient,
+} from '@solana/governance-program-library'
+import { AnchorProvider, Wallet } from '@coral-xyz/anchor'
+import { toAnchorType } from 'QuadraticPlugin/sdk/api'
+import { SYSTEM_PROGRAM_ID } from '@solana/spl-governance'
+import { PluginName } from '@constants/plugins'
+import { getRegistrarPDA } from '@utils/plugin/accounts'
 
-type TokenizedRealm = Web3Context & RealmCreation
+type CreateWithPlugin = { pluginList: PluginName[] }
+type TokenizedRealm = Web3Context & RealmCreation & CreateWithPlugin
 
 export default async function createTokenizedRealm({
   connection,
   wallet,
+  pluginList,
 
   ...params
 }: TokenizedRealm) {
@@ -29,6 +40,9 @@ export default async function createTokenizedRealm({
     mintsSetupInstructions,
     mintsSetupSigners,
     councilMembersInstructions,
+    walletPk,
+    programIdPk,
+    mainGovernancePk,
   } = await prepareRealmCreation({
     connection,
     wallet,
@@ -44,15 +58,49 @@ export default async function createTokenizedRealm({
     )
     console.log('CREATE GOV TOKEN REALM: sending transactions')
 
+    let pluginSigners
+    let pluginTxes
+    if (pluginList.includes('QV')) {
+      const options = AnchorProvider.defaultOptions()
+      const provider = new AnchorProvider(connection, wallet as Wallet, options)
+      const isDevnet = connection.rpcEndpoint.includes('devnet')
+      const quadraticClient = await QuadraticClient.connect(provider, isDevnet)
+
+      const { registrar } = await getRegistrarPDA(
+        realmPk,
+        communityMintPk,
+        quadraticClient!.program.programId
+      )
+
+      const qvInstruction = await quadraticClient!.program.methods
+        .createRegistrar(toAnchorType(DEFAULT_COEFFICIENTS), false)
+        .accounts({
+          registrar,
+          realm: realmPk,
+          governanceProgramId: programIdPk,
+          realmAuthority: mainGovernancePk,
+          governingTokenMint: communityMintPk,
+          payer: walletPk,
+          systemProgram: SYSTEM_PROGRAM_ID,
+        })
+        .instruction()
+
+      pluginSigners = []
+      pluginTxes = [qvInstruction]
+    }
+
     const signers = [
       mintsSetupSigners,
       ...councilMembersSignersChunks,
       realmSigners,
+      ...(pluginSigners ? [pluginSigners] : []),
     ]
+
     const txes = [
       mintsSetupInstructions,
       ...councilMembersChunks,
       realmInstructions,
+      ...(pluginTxes ? [pluginTxes] : []),
     ].map((txBatch, batchIdx) => {
       return {
         instructionsSet: txBatchesToInstructionSetWithSigners(
@@ -69,6 +117,38 @@ export default async function createTokenizedRealm({
       wallet,
       transactionInstructions: txes,
     })
+
+    // if (pluginList.includes('QV')) {
+    //   const realm = await getRealm(connection, realmPk)
+
+    //   const options = AnchorProvider.defaultOptions()
+    //   const provider = new AnchorProvider(connection, wallet as Wallet, options)
+    //   const isDevnet = connection.rpcEndpoint.includes('devnet')
+    //   const quadraticClient = await QuadraticClient.connect(provider, isDevnet)
+
+    //   const quadraticRegistrar = await createQuadraticRegistrarIx(
+    //     realm,
+    //     walletPk,
+    //     quadraticClient
+    //   )
+
+    //   const qvTxes = [
+    //     {
+    //       instructionsSet: txBatchesToInstructionSetWithSigners(
+    //         [quadraticRegistrar],
+    //         [],
+    //         0
+    //       ),
+    //       sequenceType: SequenceType.Sequential,
+    //     },
+    //   ]
+
+    //   const qvTx = await sendTransactionsV3({
+    //     connection,
+    //     wallet,
+    //     transactionInstructions: qvTxes,
+    //   })
+    // }
 
     const logInfo = {
       realmId: realmPk,
