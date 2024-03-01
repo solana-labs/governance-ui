@@ -63,15 +63,15 @@ export default function QuadraticVotingInfoModal({
               <div>
                 <h2>How is it calculated?</h2>
                 <div>
-                  Quadratic voting is calculated by finding the square root of
-                  the amount of tokens held by a member. The result is the
-                  number of <i>actual</i> votes.
+                  Quadratic voting is based on the square root of the amount of
+                  tokens held by a member. The result is the number of{' '}
+                  <i>actual</i> votes.
                 </div>
               </div>
             </div>
             <div className="flex justify-start items-start ">
               <div>
-                <div className="mb-2">Example Caclulation: </div>
+                <div className="mb-2">Example Calculation: </div>
 
                 <div>
                   1 votes = 1 token

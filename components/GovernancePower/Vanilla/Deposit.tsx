@@ -29,7 +29,7 @@ export const Deposit = ({ role }: { role: 'community' | 'council' }) => {
         {mintInfo
           ? depositAmount.shiftedBy(-mintInfo.decimals).toFormat()
           : depositAmount.toFormat()}{' '}
-        more {tokenName} votes in your wallet. Do you want to deposit them to
+        more {tokenName} tokens in your wallet. Do you want to deposit them to
         increase your voting power in this Dao?
       </div>
       <DepositTokensButton className="mt-4 w-48" role={role} as="secondary" />
