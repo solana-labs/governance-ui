@@ -35,7 +35,7 @@ import {
 import { WALLET_PROVIDERS } from '@utils/wallet-adapters'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { useAsync } from 'react-async-hook'
-import {useVsrClient} from "../VoterWeightPlugins/useVsrClient";
+import { useVsrClient } from '../VoterWeightPlugins/useVsrClient'
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
@@ -121,7 +121,7 @@ export function AppContents(props: Props) {
   const updateSerumGovAccounts = useSerumGovStore(
     (s) => s.actions.updateSerumGovAccounts
   )
-  const {vsrClient} = useVsrClient();
+  const { vsrClient } = useVsrClient()
 
   const realmName = realmInfo?.displayName ?? realm?.account?.name
   const title = realmName ? `${realmName}` : 'Realms'
@@ -170,7 +170,11 @@ export function AppContents(props: Props) {
 
   // Validate it's an ico file
   function isValidSymbol(symbol) {
-    return typeof symbol === 'string' && symbol.trim() !== '' && /^[a-zA-Z0-9-_]+$/.test(symbol);
+    return (
+      typeof symbol === 'string' &&
+      symbol.trim() !== '' &&
+      /^[a-zA-Z0-9-_]+$/.test(symbol)
+    )
   }
   const { result: faviconExists } = useAsync(async () => {
     if (!faviconUrl) {
