@@ -97,7 +97,7 @@ const DryRunInstructionBtn = ({
       <SecondaryButton
         className={btnClassNames}
         onClick={handleDryRun}
-        disabled={isPending || !wallet?.connected}
+        disabled={isPending}
         small
       >
         {isPending ? <Loading></Loading> : 'Preview transaction'}

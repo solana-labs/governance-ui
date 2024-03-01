@@ -28,6 +28,7 @@ export async function dryRunInstruction(
   if (prerequisiteInstructionsToRun) {
     prerequisiteInstructionsToRun.map((x) => transaction.add(x))
   }
+  console.log("additionalInstructions", additionalInstructions)
   if (additionalInstructions) {
     for (const i of additionalInstructions) {
       transaction.add({
@@ -38,6 +39,7 @@ export async function dryRunInstruction(
     }
   }
 
+  console.log("instructionData", instructionData)
   if (instructionData) {
     transaction.add({
       keys: instructionData.accounts,

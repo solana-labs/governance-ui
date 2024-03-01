@@ -7,7 +7,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
-import {  AssetAccount } from '@utils/uiTypes/assets'
+import { MESH_PROGRAM_ID, MeshEditMemberForm } from './common'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import InstructionForm, { InstructionInput } from '../FormCreator'
 import { InstructionInputType } from '../inputInstructionType'
@@ -18,12 +18,6 @@ import {
   PublicKey,
 } from '@solana/web3.js'
 import { Wallet } from '@coral-xyz/anchor'
-
-interface MeshRemoveMemberForm {
-  governedAccount: AssetAccount | null
-  vault: string
-  member: string
-}
 
 const MeshRemoveMember = ({
   index,
@@ -36,7 +30,7 @@ const MeshRemoveMember = ({
   const connection = useLegacyConnectionContext()
   const { assetAccounts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const [form, setForm] = useState<MeshRemoveMemberForm>({
+  const [form, setForm] = useState<MeshEditMemberForm>({
     governedAccount: null,
     vault: "",
     member: "",
@@ -57,7 +51,7 @@ const MeshRemoveMember = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-        const squads = new Squads({connection: connection.current, wallet : {} as Wallet , multisigProgramId: new PublicKey(form.vault)});
+        const squads = new Squads({connection: connection.current, wallet : {} as Wallet , multisigProgramId: MESH_PROGRAM_ID});
         const instruction  = await squads.buildRemoveMember(new PublicKey(form.vault) , form.governedAccount.governance.pubkey, new PublicKey(form.member))
         return {
         serializedInstruction: serializeInstructionToBase64(instruction),
@@ -91,7 +85,7 @@ const MeshRemoveMember = ({
     vault: yup.string().required('Vault is required').test('is-vault-valid', 'Invalid Vault Account', function (val: string) {
         return val ? validatePubkey(val) : true
       }),
-      member: yup.string().required('Vault is required').test('is-member-valid', 'Invalid Member Account', function (val: string) {
+      member: yup.string().required('Member is required').test('is-member-valid', 'Invalid Member Account', function (val: string) {
         return val ? validatePubkey(val) : true
       }),
   })
