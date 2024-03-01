@@ -144,6 +144,7 @@ import DualGsoWithdraw from './components/instructions/Dual/DualGsoWithdraw'
 import MultiChoiceForm from '../../../../components/MultiChoiceForm'
 import CloseVaults from './components/instructions/DistrubtionProgram/CloseVaults'
 import FillVaults from './components/instructions/DistrubtionProgram/FillVaults'
+import MeshRemoveMember from './components/instructions/Squads/MeshRemoveMember'
 
 const TITLE_LENGTH_LIMIT = 130
 // the true length limit is either at the tx size level, and maybe also the total account size level (I can't remember)
@@ -514,6 +515,7 @@ const New = () => {
       [Instructions.MeanWithdrawFromAccount]: MeanWithdrawFromAccount,
       [Instructions.MeanCreateStream]: MeanCreateStream,
       [Instructions.MeanTransferStream]: MeanTransferStream,
+      [Instructions.MeshRemoveMember]: MeshRemoveMember,
       [Instructions.CreateSolendObligationAccount]: CreateObligationAccount,
       [Instructions.InitSolendObligationAccount]: InitObligationAccount,
       [Instructions.DepositReserveLiquidityAndObligationCollateral]: DepositReserveLiquidityAndObligationCollateral,

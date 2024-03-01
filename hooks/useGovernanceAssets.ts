@@ -190,6 +190,10 @@ export default function useGovernanceAssets() {
       name: 'Solend',
       image: '/img/solend.png',
     },
+    [PackageEnum.Squads]: {
+      name : "Squads",
+      image : '/img/squads.png',
+    },
     [PackageEnum.Switchboard]: {
       name: 'Switchboard',
       image: '/img/switchboard.png',
@@ -748,11 +752,20 @@ export default function useGovernanceAssets() {
       name: 'Withdraw Funds',
       packageId: PackageEnum.Solend,
     },
-
+    /*
+    ███████  ██████  ██    ██  █████  ██████  ███████ 
+    ██      ██    ██ ██    ██ ██   ██ ██   ██ ██      
+    ███████ ██    ██ ██    ██ ███████ ██   ██ ███████ 
+         ██ ██ ▄▄ ██ ██    ██ ██   ██ ██   ██      ██ 
+    ███████  ██████   ██████  ██   ██ ██████  ███████ 
+    */
+   [Instructions.MeshRemoveMember]: {
+      name: "Mesh Remove Member",
+      packageId: PackageEnum.Squads
+   },
     /*
       ███████ ██     ██ ██ ████████  ██████ ██   ██ ██████   ██████   █████  ██████  ██████
-      ██      ██     ██ ██    ██    ██      ██   ██ ██   ██ ██    ██ ██   ██ ██   ██ ██   ██
-      ███████ ██  █  ██ ██    ██    ██      ███████ ██████  ██    ██ ███████ ██████  ██   ██
+z      ███████ ██  █  ██ ██    ██    ██      ███████ ██████  ██    ██ ███████ ██████  ██   ██
            ██ ██ ███ ██ ██    ██    ██      ██   ██ ██   ██ ██    ██ ██   ██ ██   ██ ██   ██
       ███████  ███ ███  ██    ██     ██████ ██   ██ ██████   ██████  ██   ██ ██   ██ ██████
     */

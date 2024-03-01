@@ -15,6 +15,7 @@ export async function dryRunInstruction(
   prerequisiteInstructionsToRun?: TransactionInstruction[] | undefined,
   additionalInstructions?: InstructionData[]
 ) {
+  console.log("DRY RUN")
   const recentBlockHash = await connection.getLatestBlockhash()
   const transaction = new Transaction({ feePayer: wallet.publicKey })
   transaction.lastValidBlockHeight = recentBlockHash.lastValidBlockHeight
@@ -45,11 +46,15 @@ export async function dryRunInstruction(
     })
   }
 
+
+  console.log("HERE")
+
   const result = await connection.simulateTransaction(
     transaction,
     undefined,
     true
   )
+  console.log(result)
 
   return { response: result.value, transaction }
 }
