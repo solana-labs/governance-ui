@@ -62,12 +62,6 @@ export default async function createTokenizedRealm({
       []
     )
     console.log('CREATE GOV TOKEN REALM: sending transactions')
-    console.log("Current instructions", {
-        realmInstructions,
-        mintsSetupInstructions,
-        councilMembersInstructions,
-    });
-    console.log("plugins", pluginList);
 
     const pluginSigners: Keypair[] = []
     const pluginIxes: TransactionInstruction[] = []
