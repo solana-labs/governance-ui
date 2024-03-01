@@ -7,23 +7,21 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
-import { MESH_PROGRAM_ID, MeshEditMemberForm } from './common'
+import { MESH_PROGRAM_ID } from './common'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import InstructionForm, { InstructionInput } from '../FormCreator'
 import { InstructionInputType } from '../inputInstructionType'
 import { NewProposalContext } from '../../../new'
-import Squads from "@sqds/mesh";
+import Squads from '@sqds/mesh'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
-import {
-  PublicKey,
-} from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js'
 import { Wallet } from '@coral-xyz/anchor'
 import { AssetAccount } from '@utils/uiTypes/assets'
 
 export interface MeshChangeThresholdMemberForm {
-    governedAccount: AssetAccount | null
-    vault: string
-    newThreshold: number
+  governedAccount: AssetAccount | null
+  vault: string
+  newThreshold: number
 }
 
 const MeshChangeThresholdMember = ({
@@ -39,7 +37,7 @@ const MeshChangeThresholdMember = ({
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<MeshChangeThresholdMemberForm>({
     governedAccount: null,
-    vault: "",
+    vault: '',
     newThreshold: 0,
   })
   const [formErrors, setFormErrors] = useState({})
@@ -58,23 +56,31 @@ const MeshChangeThresholdMember = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-        const squads = new Squads({connection: connection.current, wallet : {} as Wallet , multisigProgramId: MESH_PROGRAM_ID});
-        const instruction  = await squads.buildChangeThresholdMember(new PublicKey(form.vault) , form.governedAccount.governance.pubkey, form.newThreshold)
-        return {
+      const squads = new Squads({
+        connection: connection.current,
+        wallet: {} as Wallet,
+        multisigProgramId: MESH_PROGRAM_ID,
+      })
+      const instruction = await squads.buildChangeThresholdMember(
+        new PublicKey(form.vault),
+        form.governedAccount.governance.pubkey,
+        form.newThreshold
+      )
+      return {
         serializedInstruction: serializeInstructionToBase64(instruction),
         isValid,
         governance: form.governedAccount?.governance,
         chunkBy: 1,
-        }
-        } else {
-            return {
-                serializedInstruction: "",
-                isValid,
-                governance: form.governedAccount?.governance,
-                chunkBy: 1,
-                }
-        }
-}
+      }
+    } else {
+      return {
+        serializedInstruction: '',
+        isValid,
+        governance: form.governedAccount?.governance,
+        chunkBy: 1,
+      }
+    }
+  }
 
   useEffect(() => {
     handleSetInstructions(
@@ -89,12 +95,22 @@ const MeshChangeThresholdMember = ({
       .object()
       .nullable()
       .required('Program governed account is required'),
-    vault: yup.string().required('Vault is required').test('is-vault-valid', 'Invalid Vault Account', function (val: string) {
+    vault: yup
+      .string()
+      .required('Vault is required')
+      .test('is-vault-valid', 'Invalid Vault Account', function (val: string) {
         return val ? validatePubkey(val) : true
       }),
-      newThreshold: yup.number().required('New threshold is required').test('is-member-valid', "New threshold can't be 0", function (val: number) {
-        return val > 0
-      }),
+    newThreshold: yup
+      .number()
+      .required('New threshold is required')
+      .test(
+        'is-threshold-valid',
+        "New threshold can't be 0",
+        function (val: number) {
+          return val > 0
+        }
+      ),
   })
   const inputs: InstructionInput[] = [
     {

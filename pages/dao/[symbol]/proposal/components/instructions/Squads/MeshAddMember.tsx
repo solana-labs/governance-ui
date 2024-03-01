@@ -12,11 +12,9 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import InstructionForm, { InstructionInput } from '../FormCreator'
 import { InstructionInputType } from '../inputInstructionType'
 import { NewProposalContext } from '../../../new'
-import Squads from "@sqds/mesh";
+import Squads from '@sqds/mesh'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
-import {
-  PublicKey,
-} from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js'
 import { Wallet } from '@coral-xyz/anchor'
 
 const MeshAddMember = ({
@@ -32,8 +30,8 @@ const MeshAddMember = ({
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<MeshEditMemberForm>({
     governedAccount: null,
-    vault: "",
-    member: "",
+    vault: '',
+    member: '',
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -51,23 +49,31 @@ const MeshAddMember = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-        const squads = new Squads({connection: connection.current, wallet : {} as Wallet , multisigProgramId: MESH_PROGRAM_ID});
-        const instruction  = await squads.buildAddMember(new PublicKey(form.vault) , form.governedAccount.governance.pubkey, new PublicKey(form.member))
-        return {
+      const squads = new Squads({
+        connection: connection.current,
+        wallet: {} as Wallet,
+        multisigProgramId: MESH_PROGRAM_ID,
+      })
+      const instruction = await squads.buildAddMember(
+        new PublicKey(form.vault),
+        form.governedAccount.governance.pubkey,
+        new PublicKey(form.member)
+      )
+      return {
         serializedInstruction: serializeInstructionToBase64(instruction),
         isValid,
         governance: form.governedAccount?.governance,
         chunkBy: 1,
-        }
-        } else {
-            return {
-                serializedInstruction: "",
-                isValid,
-                governance: form.governedAccount?.governance,
-                chunkBy: 1,
-                }
-        }
-}
+      }
+    } else {
+      return {
+        serializedInstruction: '',
+        isValid,
+        governance: form.governedAccount?.governance,
+        chunkBy: 1,
+      }
+    }
+  }
 
   useEffect(() => {
     handleSetInstructions(
@@ -82,12 +88,22 @@ const MeshAddMember = ({
       .object()
       .nullable()
       .required('Program governed account is required'),
-    vault: yup.string().required('Vault is required').test('is-vault-valid', 'Invalid Vault Account', function (val: string) {
+    vault: yup
+      .string()
+      .required('Vault is required')
+      .test('is-vault-valid', 'Invalid Vault Account', function (val: string) {
         return val ? validatePubkey(val) : true
       }),
-      member: yup.string().required('Member is required').test('is-member-valid', 'Invalid Member Account', function (val: string) {
-        return val ? validatePubkey(val) : true
-      }),
+    member: yup
+      .string()
+      .required('Member is required')
+      .test(
+        'is-member-valid',
+        'Invalid Member Account',
+        function (val: string) {
+          return val ? validatePubkey(val) : true
+        }
+      ),
   })
   const inputs: InstructionInput[] = [
     {
