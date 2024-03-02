@@ -6,13 +6,17 @@ import { useRealmQuery } from '@hooks/queries/realm'
 import { useMemo } from 'react'
 import { BigNumber } from 'bignumber.js'
 import clsx from 'clsx'
-import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
+import {
+  useRealmVoterWeightPlugins,
+  useRealmVoterWeights,
+} from '@hooks/useRealmVoterWeightPlugins'
 import QuadraticVotingInfoModal from './QuadraticVotingInfoModal'
 import { useMembersQuery } from '@components/Members/useMembers'
 import { TokenDeposit } from '@components/TokenBalance/TokenDeposit'
 import { GoverningTokenRole } from '@solana/spl-governance'
 import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
+import { BN } from '@coral-xyz/anchor'
 
 interface Props {
   className?: string
@@ -75,6 +79,11 @@ export default function PluginVotingPower({ role, className }: Props) {
     [mintInfo, calculatedVoterWeight?.value]
   )
 
+  const { communityWeight, councilWeight } = useRealmVoterWeights()
+
+  const hasAnyVotingPower =
+    councilWeight?.value?.gt(new BN(0)) && communityWeight?.value?.gt(new BN(0))
+
   if (isLoading || !isReady) {
     return (
       <div
@@ -88,15 +97,17 @@ export default function PluginVotingPower({ role, className }: Props) {
 
   return (
     <div>
-      <div className="flex items-center mb-2">
-        <p className="mb-1">Quadratic Voting</p>
-        <QuadraticVotingInfoModal
-          voteWeight={formattedTotal ?? '0'}
-          tokenAmount={formattedTokenAmount ?? '0'}
-          totalVoteWeight={formattedMax ?? '0'}
-          totalMembers={activeMembers?.length ?? 0}
-        />
-      </div>
+      {hasAnyVotingPower && (
+        <div className="flex items-center mb-2">
+          <p className="mb-1">Quadratic Voting</p>
+          <QuadraticVotingInfoModal
+            voteWeight={formattedTotal ?? '0'}
+            tokenAmount={formattedTokenAmount ?? '0'}
+            totalVoteWeight={formattedMax ?? '0'}
+            totalMembers={activeMembers?.length ?? 0}
+          />
+        </div>
+      )}
       <div className={'p-3 rounded-md bg-bkg-1'}>
         <div className="flex items-center justify-between mt-1">
           <div className={clsx(className)}>
