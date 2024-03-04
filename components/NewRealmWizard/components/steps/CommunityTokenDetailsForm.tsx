@@ -333,7 +333,7 @@ export default function CommunityTokenForm({
             <div className="pt-3">
               <FormField
                 title="Create a quadratic dao?"
-                description="This will change how votes are calculated based on distribution and amount of tokens held."
+                description="This will change how votes are calculated based on distribution and amount of tokens held. Additionally, the Civic Pass plugin will be included, requiring all users to verify their identity and ensuring sybil resistance by mitigating the risk of fake or duplicate accounts."
                 advancedOption
               >
                 <RadioGroup
