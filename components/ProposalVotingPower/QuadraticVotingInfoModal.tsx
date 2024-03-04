@@ -54,8 +54,9 @@ export default function QuadraticVotingInfoModal({
               <div>
                 <h2>What is Quadratic Voting?</h2>
                 <div>
-                  Quadratic voting empowers individual voter groups, surpassing
-                  the influence of token-rich whales.
+                  Quadratic voting empowers individual voter groups, lessening
+                  the influence of token-rich whales and giving more of a
+                  proportional vote to smaller token holders.
                 </div>
               </div>
             </div>
