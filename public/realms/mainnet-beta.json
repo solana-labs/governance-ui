@@ -48,6 +48,15 @@
     "ogImage": "/realms/RAIN/img/rain_logo.png"
   },
   {
+    "symbol": "FABS",
+    "displayName": "Founders Wif Abs",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "2iWqzA6j5jDVsbVjBJHM2DFX4qJX7AAohArAR8VLDVV6",
+    "ogImage": "/realms/FABS/img/fabio.png",
+    "bannerImage": "/realms/FABS/img/fabs-banner.jpeg",
+    "twitter": "@fabsonsol"
+  },
+  {
     "symbol": "UkraineUnchained",
     "displayName": "#Unchain_Ukraine",
     "programId": "gUAedF544JeE6NYbQakQvribHykUNgaPJqcgf3UQVnY",
