@@ -12,7 +12,6 @@ import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, { InstructionInput } from '../../FormCreator'
 import { InstructionInputType } from '../../inputInstructionType'
-import UseMangoV4 from '@hooks/useMangoV4'
 import { getChangedValues, getNullOrTransform } from '@utils/mangoV4Tools'
 import { BN } from '@coral-xyz/anchor'
 import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
@@ -24,9 +23,11 @@ import ForwarderProgram, {
 import { REDUCE_ONLY_OPTIONS } from '@utils/Mango/listingTools'
 import ProgramSelector from '@components/Mango/ProgramSelector'
 import useProgramSelector from '@components/Mango/useProgramSelector'
+import UseMangoV4 from '@hooks/useMangoV4'
 
 const keyToLabel = {
   oraclePk: 'Oracle',
+  fallbackOracle: 'Fallback Oracle',
   oracleConfFilter: 'Oracle Confidence Filter',
   maxStalenessSlots: 'Max Staleness Slots',
   mintPk: 'Mint',
@@ -69,6 +70,11 @@ const keyToLabel = {
   maintWeightShiftAbort: 'Maint Weight Shift Abort',
   setFallbackOracle: 'Set Fallback Oracle',
   depositLimit: 'Deposit Limit',
+  zeroUtilRate: 'Zero Util Rate',
+  platformLiquidationFee: 'Platform Liquidation Fee',
+  disableAssetLiquidation: 'Disable Asset Liquidation',
+  collateralFeePerDay: 'Collateral Fee Per Day',
+  forceWithdraw: 'Force Withdraw',
 }
 
 type NamePkVal = {
@@ -80,6 +86,7 @@ interface EditTokenForm {
   governedAccount: AssetAccount | null
   token: null | NamePkVal
   oraclePk: string
+  fallbackOracle: string
   oracleConfFilter: number
   maxStalenessSlots: number
   mintPk: string
@@ -123,12 +130,15 @@ interface EditTokenForm {
   maintWeightShiftAbort: boolean
   setFallbackOracle: boolean
   depositLimit: number
+  zeroUtilRate: number
+  platformLiquidationFee: number
 }
 
 const defaultFormValues: EditTokenForm = {
   governedAccount: null,
   token: null,
   oraclePk: '',
+  fallbackOracle: '',
   oracleConfFilter: 0,
   maxStalenessSlots: 0,
   mintPk: '',
@@ -172,6 +182,8 @@ const defaultFormValues: EditTokenForm = {
   maintWeightShiftAbort: false,
   setFallbackOracle: false,
   depositLimit: 0,
+  zeroUtilRate: 0,
+  platformLiquidationFee: 0,
 }
 
 const EditToken = ({
@@ -333,13 +345,18 @@ const EditToken = ({
           getNullOrTransform(values.maintWeightShiftLiabTarget, null, Number),
           values.maintWeightShiftAbort!,
           values.setFallbackOracle!,
-          getNullOrTransform(values.depositLimit, BN)
+          getNullOrTransform(values.depositLimit, BN),
+          getNullOrTransform(values.zeroUtilRate, null, Number),
+          getNullOrTransform(values.platformLiquidationFee, null, Number)
         )
         .accounts({
           group: mangoGroup!.publicKey,
           oracle: form.oraclePk ? new PublicKey(form.oraclePk) : bank.oracle,
           admin: form.governedAccount.extensions.transferAddress,
           mintInfo: mintInfo.publicKey,
+          fallbackOracle: form.fallbackOracle
+            ? new PublicKey(form.fallbackOracle)
+            : bank.fallbackOracle,
         })
         .remainingAccounts([
           {
@@ -405,6 +422,7 @@ const EditToken = ({
 
       const vals = {
         oraclePk: currentToken.oracle.toBase58(),
+        fallbackOracle: currentToken.fallbackOracle.toBase58(),
         oracleConfFilter: currentToken.oracleConfig.confFilter.toNumber(),
         maxStalenessSlots: currentToken.oracleConfig.maxStalenessSlots.toNumber(),
         mintPk: currentToken.mint.toBase58(),
@@ -449,6 +467,8 @@ const EditToken = ({
         maintWeightShiftAssetTarget: currentToken.maintWeightShiftAssetTarget.toNumber(),
         maintWeightShiftLiabTarget: currentToken.maintWeightShiftLiabTarget.toNumber(),
         depositLimit: currentToken.depositLimit.toNumber(),
+        zeroUtilRate: currentToken.zeroUtilRate.toNumber(),
+        platformLiquidationFeeOpt: currentToken.platformLiquidationFee.toNumber(),
       }
       setForm((prevForm) => ({
         ...prevForm,
@@ -513,6 +533,12 @@ const EditToken = ({
       initialValue: form.oraclePk,
       type: InstructionInputType.INPUT,
       name: 'oraclePk',
+    },
+    {
+      label: keyToLabel['fallbackOracle'],
+      initialValue: form.fallbackOracle,
+      type: InstructionInputType.INPUT,
+      name: 'fallbackOracle',
     },
     {
       label: keyToLabel['oracleConfFilter'],
@@ -833,6 +859,22 @@ const EditToken = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'depositLimit',
+    },
+    {
+      label: keyToLabel['zeroUtilRate'],
+      subtitle: getAdditionalLabelInfo('zeroUtilRate'),
+      initialValue: form.zeroUtilRate,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'zeroUtilRate',
+    },
+    {
+      label: keyToLabel['platformLiquidationFee'],
+      subtitle: getAdditionalLabelInfo('platformLiquidationFee'),
+      initialValue: form.platformLiquidationFee,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'platformLiquidationFee',
     },
   ]
 
