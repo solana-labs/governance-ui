@@ -37,6 +37,7 @@ export default function PluginVotingPower({ role, className }: Props) {
     calculatedVoterWeight,
     isReady,
     calculatedMaxVoterWeight,
+    plugins,
   } = useRealmVoterWeightPlugins(role)
   const { result: ownVoterWeight } = useLegacyVoterWeight()
 
@@ -97,7 +98,7 @@ export default function PluginVotingPower({ role, className }: Props) {
 
   return (
     <div>
-      {hasAnyVotingPower && (
+      {hasAnyVotingPower && plugins?.some((p) => p.name === 'QV') && (
         <div className="flex items-center mb-2">
           <p className="mb-1">Quadratic Voting</p>
           <QuadraticVotingInfoModal
@@ -114,7 +115,7 @@ export default function PluginVotingPower({ role, className }: Props) {
             <div className="flex flex-col">
               <div className="text-fgd-3 text-xs">
                 {tokenName}
-                {role === 'council' ? ' Council' : ''} Votes
+                {role === 'council' ? ' Council' : ''} votes
               </div>
               <div className="flex items-center">
                 <p className="font-bold mr-2 text-xl">
