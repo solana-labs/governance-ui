@@ -27,7 +27,6 @@ import Tooltip from '@components/Tooltip'
 import {
   getMintDecimalAmount,
   getMintMinAmountAsDecimal,
-  getMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
 import BigNumber from 'bignumber.js'
 import { precision } from '@utils/formatting'
