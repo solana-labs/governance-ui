@@ -94,6 +94,7 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
   }, [programSelectorHook.program?.val.toBase58()])
 
   useEffect(() => {
+    setFormErrors({})
     setForm({
       ...form,
       accountName: '',
@@ -144,7 +145,7 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
       .number()
       .required('Amount is required')
       .min(mintMinAmount)
-      .max(maxAmount.toNumber()),
+      .max(proposalType === ProposalType.DEPOSIT ? maxAmount.toNumber() : maxWithdrawBalance),
     delegate: yup.boolean().required('Delegate is required'),
     delegateWallet: yup
       .string()
