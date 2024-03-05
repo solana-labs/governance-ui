@@ -18,8 +18,11 @@ const GatewayCard = () => {
   } = useGatewayVoterWeightPlugin()
   const { communityWeight, councilWeight } = useRealmVoterWeights()
 
-  const hasAnyVotingPower =
-    councilWeight?.value?.gt(new BN(0)) && communityWeight?.value?.gt(new BN(0))
+  const hasTokens =
+    (councilWeight?.details && councilWeight?.details.length > 0) ||
+    (communityWeight?.details && communityWeight?.details.length > 0) ||
+    councilWeight?.value?.gt(new BN(0)) ||
+    communityWeight?.value?.gt(new BN(0))
 
   if (!connected) {
     return (
@@ -30,12 +33,12 @@ const GatewayCard = () => {
       </div>
     )
   }
-  if (hasAnyVotingPower) {
+  if (hasTokens) {
     return (
       <div className="bg-bkg-2 py-3 rounded-lg">
         <div className="space-y-1">
           <div className="flex items-center">
-            <h3>Verify to Vote</h3>
+            <h3>Verify to vote</h3>
             <span>
               <InformationCircleIcon
                 className="w-5 h-5 ml-1 mb-1 cursor-pointer"
@@ -45,17 +48,14 @@ const GatewayCard = () => {
           </div>
           {isEnabled &&
             isReady &&
-            connected &&
             wallet &&
             wallet.publicKey &&
             gatekeeperNetwork &&
-            hasAnyVotingPower && <GatewayButton />}
+            hasTokens && <GatewayButton />}
         </div>
-
         <p className="text-fgd-3 mt-2">
           Verify your personhood with Civic Pass to vote.
         </p>
-
         {showGatewayModal && (
           <Modal
             sizeClassName="sm:max-w-3xl"
@@ -63,7 +63,7 @@ const GatewayCard = () => {
             isOpen={showGatewayModal}
           >
             <div className="p-4">
-              <h1 className="text-center mb-8">Verify to Vote</h1>
+              <h1 className="text-center mb-8">Verify to vote</h1>
               <div className="flex justify-start items-start mb-6">
                 <div className="min-w-[32px] min-h-[32px] border-solid border-[1px] border-gray-400 mr-3 rounded-full flex items-center justify-center">
                   <span>1</span>
