@@ -39,8 +39,10 @@ import ProgramSelector from '@components/Mango/ProgramSelector'
 import useProgramSelector from '@components/Mango/useProgramSelector'
 import ButtonGroup from '@components/ButtonGroup'
 
-const DEPOSIT = 'Deposit'
-const WITHDRAW = 'Withdraw'
+enum ProposalType {
+  DEPOSIT = 'Deposit',
+  WITHDRAW = 'Withdraw',
+}
 
 const MangoModal = ({ account }: { account: AssetAccount }) => {
   const { canUseTransferInstruction } = useGovernanceAssets()
@@ -59,8 +61,8 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
     true
   )
   const [mangoAccounts, setMangoAccounts] = useState<MangoAccount[]>([])
-  const tabs = [DEPOSIT, WITHDRAW]
-  const [proposalType, setProposalType] = useState('Deposit')
+  const tabs = [ProposalType.DEPOSIT, ProposalType.WITHDRAW]
+  const [proposalType, setProposalType] = useState(ProposalType.DEPOSIT)
   const [form, setForm] = useState<{
     mangoAccount: MangoAccount | null | undefined
     accountName: string
@@ -174,12 +176,11 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
   }, [account.extensions.token, mangoClient, mangoGroup])
 
   useEffect(() => {
-    if (proposalType === 'Deposit') return
+    if (proposalType === ProposalType.DEPOSIT) return
     if (!mangoGroup || !form.mangoAccount) return
     const bank = mangoGroup!.getFirstBankByMint(
       account.extensions.mint!.publicKey!
     )
-    
     const maxWithdrawForBank = getMaxWithdrawForBank(mangoGroup, bank, form.mangoAccount)
     setMaxWithdrawBalance(maxWithdrawForBank.toNumber())
   }, [proposalType, mangoGroup, form])
@@ -245,40 +246,60 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
         account.extensions.mint!.account!.decimals
       )
 
-      const methodByProposal = proposalType === 'Deposit' ? mangoClient!.program.methods.tokenDeposit : mangoClient!.program.methods.tokenWithdraw
-      const methodByProposalInstruction = await methodByProposal(tokens, false)
-        .accounts({
-          group: mangoGroup!.publicKey,
-          account: mangoAccountPk,
-          owner: account.extensions.token!.account.owner!,
-          bank: bank.publicKey,
-          vault: bank.vault,
-          oracle: bank.oracle,
-          tokenAccount: account.pubkey,
-          ...(proposalType === 'Deposit' && { tokenAuthority: account.extensions.token!.account.owner!, })
-        })
-        .remainingAccounts(
-          [bank.publicKey, bank.oracle].map(
-            (pk) =>
-              ({
-                pubkey: pk,
-                isWritable: false,
-                isSigner: false,
-              } as AccountMeta)
+      if (proposalType === ProposalType.DEPOSIT) {
+        const methodByProposal = mangoClient!.program.methods.tokenDeposit;
+        const methodByProposalInstruction = await methodByProposal(tokens, false)
+          .accounts({
+            group: mangoGroup!.publicKey,
+            account: mangoAccountPk,
+            owner: account.extensions.token!.account.owner!,
+            bank: bank.publicKey,
+            vault: bank.vault,
+            oracle: bank.oracle,
+            tokenAccount: account.pubkey,
+            tokenAuthority: account.extensions.token!.account.owner!
+          })
+          .remainingAccounts(
+            [bank.publicKey, bank.oracle].map(
+              (pk) =>
+                ({
+                  pubkey: pk,
+                  isWritable: false,
+                  isSigner: false,
+                } as AccountMeta)
+            )
           )
-        )
-        .instruction()
-
-      const depositAccInstData = {
-        data: getInstructionDataFromBase64(
-          serializeInstructionToBase64(methodByProposalInstruction!)
-        ),
-        holdUpTime:
-          account?.governance.account?.config.minInstructionHoldUpTime,
-        prerequisiteInstructions: [],
+          .instruction()
+  
+        const depositAccInstData = {
+          data: getInstructionDataFromBase64(
+            serializeInstructionToBase64(methodByProposalInstruction!)
+          ),
+          holdUpTime:
+            account?.governance.account?.config.minInstructionHoldUpTime,
+          prerequisiteInstructions: [],
+        }
+  
+        instructions.push(depositAccInstData)
       }
+      
+      if (proposalType === ProposalType.WITHDRAW) {
+        const withdrawTxs = await mangoClient!.tokenWithdrawNativeIx(mangoGroup!, form.mangoAccount!, account.extensions.mint!.publicKey!, tokens, false)
 
-      instructions.push(depositAccInstData)
+        for (const withdrawTx of withdrawTxs) {
+          const withdrawAccInsData = {
+            data: getInstructionDataFromBase64(
+              serializeInstructionToBase64(withdrawTx)
+            ),
+            holdUpTime:
+            account?.governance.account?.config.minInstructionHoldUpTime,
+            prerequisiteInstructions: [],
+          }
+
+          instructions.push(withdrawAccInsData)
+        }
+      }
+      
 
       if (form.delegate) {
         const delegateIx = await mangoClient!.program.methods
@@ -339,7 +360,7 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
             values={tabs}
           />
         </div>
-        {proposalType === WITHDRAW && (
+        {proposalType === ProposalType.WITHDRAW && (
           <div className="pt-2 space-y-4 w-full">
             {account.extensions.mint?.publicKey.toBase58() ===
               USDC_MINT.toBase58() && (
@@ -409,7 +430,7 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
                   onClick={() => {
                     handleSetForm({
                       propertyName: 'amount',
-                      value: maxAmount.toNumber(),
+                      value: maxWithdrawBalance,
                     })
                   }}
                 >
@@ -420,7 +441,7 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
             <Input
               error={formErrors['amount']}
               min={mintMinAmount}
-              max={maxAmount.toNumber()}
+              max={maxWithdrawBalance}
               type="number"
               step={mintMinAmount}
               value={form.amount}
@@ -511,7 +532,7 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
             </div>
           </div>
         )}
-        {proposalType === DEPOSIT && (
+        {proposalType === ProposalType.DEPOSIT && (
           <div className="pt-2 space-y-4 w-full">
             {account.extensions.mint?.publicKey.toBase58() ===
               USDC_MINT.toBase58() && (
