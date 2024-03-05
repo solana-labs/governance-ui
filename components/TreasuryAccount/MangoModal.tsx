@@ -188,14 +188,6 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
     setMaxWithdrawBalance(maxWithdrawForBank.toNumber())
   }, [proposalType, mangoGroup, form])
 
-  function teste() {
-    const tokens = getMintNaturalAmountFromDecimalAsBN(
-      form.amount,
-      account.extensions.mint!.account!.decimals
-    )
-    console.log(tokens);
-  }
-
   const handleCreateAccount = async () => {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     if (!isValid) return
@@ -204,10 +196,9 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
       setIsProposing(true)
       const instructions: InstructionDataWithHoldUpTime[] = []
       let mangoAccountPk = form.mangoAccount?.publicKey
-      // const bank = mangoGroup!.getFirstBankByMint(
-      //   account.extensions.mint!.publicKey!
-      // )
-      
+      const bank = mangoGroup!.getFirstBankByMint(
+        account.extensions.mint!.publicKey!
+      )
 
       if (form.mangoAccount === null) {
         const newAccountNum = getNextAccountNumber(mangoAccounts)
