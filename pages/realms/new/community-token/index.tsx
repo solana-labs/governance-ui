@@ -60,7 +60,7 @@ const transformFormData2RealmCreation = (formData: CommunityTokenForm) => {
   // until after they are added, so that the plugins can be added by the current wallet, without going through
   // a proposal.
   // If more plugins are included in the Community token flow, then we should generalise this
-  const shouldSkipSettingRealmAuthority = formData.isQuadratic ?? false;
+  const shouldSkipSettingRealmAuthority = formData.isQuadratic ?? false
 
   const params = {
     ...{
@@ -92,6 +92,9 @@ const transformFormData2RealmCreation = (formData: CommunityTokenForm) => {
       councilWalletPks:
         formData?.memberAddresses?.map((w) => new PublicKey(w)) || [],
       skipRealmAuthority: shouldSkipSettingRealmAuthority,
+      coefficientA: formData.coefficientA,
+      coefficientB: formData.coefficientB,
+      coefficientC: formData.coefficientC,
     },
     ...(formData._programVersion === 3
       ? ({
