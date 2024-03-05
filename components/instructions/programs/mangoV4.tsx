@@ -1619,7 +1619,11 @@ const instructions = () => ({
       { name: 'Group' },
       { name: 'Account' },
       { name: 'Owner' },
-      { name: 'Payer' },
+      { name: 'Bank' },
+      { name: 'Vault' },
+      { name: 'Oracle' },
+      { name: 'TokenAccount' },
+      { name: 'TokenProgram' },
     ],
     getDataUI: async (
       connection: Connection,
@@ -1637,6 +1641,7 @@ const instructions = () => ({
       const tokenInfo = tokenPriceService.getTokenInfo(
         accountInfo.value?.data['parsed'].info.mint
       )
+
       try {
         return (
           <div>
@@ -1649,7 +1654,7 @@ const instructions = () => ({
                 : args.amount}{' '}
               {tokenInfo?.symbol}
             </div>
-            <div>reduce only: {args.reduceOnly.toString()}</div>
+            <div>allowBorrow: {args.allowBorrow.toString()}</div>
           </div>
         )
       } catch (e) {
