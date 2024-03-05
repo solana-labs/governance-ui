@@ -2,7 +2,8 @@ import {
   Group,
   MangoAccount,
   USDC_MINT,
-  toUiDecimals
+  toUiDecimals,
+  toNative
 } from '@blockworks-foundation/mango-v4'
 import AdditionalProposalOptions from '@components/AdditionalProposalOptions'
 import Button, { LinkButton } from '@components/Button'
@@ -245,10 +246,7 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
         mangoAccountPk = mangoAccount
       }
 
-      const tokens = getMintNaturalAmountFromDecimalAsBN(
-        form.amount,
-        account.extensions.mint!.account!.decimals
-      )
+      const tokens = toNative(form.amount, account.extensions.mint!.account!.decimals)
 
       if (proposalType === ProposalType.DEPOSIT) {
         const methodByProposal = mangoClient!.program.methods.tokenDeposit;
