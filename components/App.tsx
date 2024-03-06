@@ -36,6 +36,7 @@ import { WALLET_PROVIDERS } from '@utils/wallet-adapters'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { useAsync } from 'react-async-hook'
 import { useVsrClient } from '../VoterWeightPlugins/useVsrClient'
+import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
@@ -108,7 +109,12 @@ export function AppContents(props: Props) {
 
   const { getOwnedDeposits, resetDepositState } = useDepositStore()
 
+  const { plugins } = useRealmVoterWeightPlugins('community')
+  const usesVsr = plugins?.find((plugin) =>
+    VSR_PLUGIN_PKS.includes(plugin.programId.toString())
+  )
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
 
@@ -193,10 +199,7 @@ export function AppContents(props: Props) {
   useEffect(() => {
     if (
       realm &&
-      config?.account.communityTokenConfig.voterWeightAddin &&
-      VSR_PLUGIN_PKS.includes(
-        config.account.communityTokenConfig.voterWeightAddin.toBase58()
-      ) &&
+      usesVsr &&
       realm.pubkey &&
       wallet?.connected &&
       ownTokenRecord &&
