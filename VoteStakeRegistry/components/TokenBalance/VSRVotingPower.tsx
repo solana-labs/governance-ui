@@ -18,9 +18,10 @@ interface Props {
   className?: string,
   votingPower: BN | undefined,
   votingPowerLoading: boolean
+  isLastPlugin: boolean
 }
 
-export default function VSRCommunityVotingPower({ className, votingPower, votingPowerLoading }: Props) {
+export default function VSRCommunityVotingPower({ className, votingPower, votingPowerLoading, isLastPlugin }: Props) {
   const realm = useRealmQuery().data?.result
   const mint = useRealmCommunityMintInfoQuery().data?.result
 
@@ -114,6 +115,7 @@ export default function VSRCommunityVotingPower({ className, votingPower, voting
         votingPower={votingPower ?? new BN(0)}
         mint={mint}
         votingPowerFromDeposits={votingPowerFromDeposits}
+        isLastPlugin={isLastPlugin}
         className="p-3"
       />
       <div className="flex flex-col pt-4 px-4 gap-1.5">

@@ -93,7 +93,7 @@ export class VsrClient extends Client<typeof IDL> {
         voterPk
     )
 
-    return votingPower.result ?? null;
+    return votingPower.result ?? new BN(0);
   }
   constructor(program: Program<VoterStakeRegistry>, devnet:boolean) {
     super(program, devnet);

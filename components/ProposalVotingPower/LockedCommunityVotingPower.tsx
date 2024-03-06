@@ -11,10 +11,15 @@ import VSRCommunityVotingPower from 'VoteStakeRegistry/components/TokenBalance/V
 import DepositCommunityTokensBtn from 'VoteStakeRegistry/components/TokenBalance/DepositCommunityTokensBtn'
 import useDelegators from '@components/VotePanel/useDelegators'
 import {useRealmVoterWeightPlugins} from "@hooks/useRealmVoterWeightPlugins";
+import {CalculatedWeight} from "../../VoterWeightPlugins/lib/types";
+import { BN } from '@coral-xyz/anchor'
 
 interface Props {
   className?: string
 }
+
+const findVSRVoterWeight = (calculatedVoterWeight: CalculatedWeight | undefined): BN|undefined =>
+    calculatedVoterWeight?.details.find((detail) => detail.pluginName === 'VSR')?.pluginWeight ?? undefined;
 
 export default function LockedCommunityVotingPower(props: Props) {
   const realm = useRealmQuery().data?.result
@@ -25,8 +30,13 @@ export default function LockedCommunityVotingPower(props: Props) {
   const mint = mintData?.result
 
   const { realmTokenAccount } = useRealm()
-  const { calculatedVoterWeight, isReady: votingPowerReady } = useRealmVoterWeightPlugins('community');
-  const votingPower = calculatedVoterWeight?.value ?? undefined;
+  const { calculatedVoterWeight, isReady: votingPowerReady, plugins } = useRealmVoterWeightPlugins('community');
+
+  // in case the VSR plugin is the last plugin, this is the final calculated voter weight.
+  // however, if it is one in a chain, we are just showing an intermediate calculation here.
+  // This affects how it appears in the UI
+  const votingPower = findVSRVoterWeight(calculatedVoterWeight)
+  const isLastVoterWeightPlugin = plugins?.[plugins.length - 1].name === 'VSR';
 
   const isLoading = useDepositStore((s) => s.state.isLoading)
 
@@ -60,7 +70,7 @@ export default function LockedCommunityVotingPower(props: Props) {
           You do not have any voting power in this dao.
         </div>
       ) : (
-        <VSRCommunityVotingPower votingPower={votingPower} votingPowerLoading={!votingPowerReady}/>
+        <VSRCommunityVotingPower votingPower={votingPower} votingPowerLoading={!votingPowerReady} isLastPlugin={isLastVoterWeightPlugin}/>
       )}
 
       {depositAmount.isGreaterThan(0) && (
