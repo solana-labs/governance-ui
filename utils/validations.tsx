@@ -99,6 +99,10 @@ const validateDestinationAccAddress = async (
   val: any,
   governedAccount?: PublicKey
 ) => {
+  if (!validatePubkey(String(val))) {
+    throw new Error('Invalid destination account address');
+  }
+
   const currentConnection = connection.current
   const pubKey = getValidatedPublickKey(val)
   const account = await getValidateAccount(currentConnection, pubKey)
@@ -127,6 +131,10 @@ const validateDestinationAccAddressWithMint = async (
   val: any,
   mintPubKey: PublicKey
 ) => {
+  if (!validatePubkey(String(val))) {
+    throw new Error('Invalid destination account address');
+  }
+
   const currentConnection = connection.current
   const pubKey = getValidatedPublickKey(val)
   const account = await getValidateAccount(currentConnection, pubKey)
