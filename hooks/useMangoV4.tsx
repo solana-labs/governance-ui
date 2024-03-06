@@ -2,10 +2,13 @@ import { AnchorProvider } from '@coral-xyz/anchor'
 import { PublicKey } from '@solana/web3.js'
 import { ConnectionContext } from '@utils/connection'
 import { WalletSigner } from '@solana/spl-governance'
+import Decimal from 'decimal.js'
 import {
   Group,
   MangoClient,
   MANGO_V4_ID,
+  Bank,
+  MangoAccount,
 } from '@blockworks-foundation/mango-v4'
 import { useEffect, useState } from 'react'
 import useWalletOnePointOh from './useWalletOnePointOh'
@@ -87,6 +90,40 @@ export default function UseMangoV4(programId?: PublicKey, group?: PublicKey) {
     }
   }
 
+  const getMaxBorrowForBank = (
+    group: Group,
+    bank: Bank,
+    mangoAccount: MangoAccount,
+  ) => {
+    try {
+      const maxBorrow = new Decimal(
+        mangoAccount.getMaxWithdrawWithBorrowForTokenUi(group, bank.mint),
+      )
+      return maxBorrow
+    } catch (e) {
+      console.log(`failed to get max borrow for ${bank.name}`, e)
+      return new Decimal(0)
+    }
+  }
+
+  const getMaxWithdrawForBank = (
+    group: Group,
+    bank: Bank,
+    mangoAccount: MangoAccount,
+    allowBorrow = false,
+  ): Decimal => {
+    const accountBalance = new Decimal(mangoAccount.getTokenBalanceUi(bank))
+    const vaultBalance = group.getTokenVaultBalanceByMintUi(bank.mint)
+    const maxBorrow = getMaxBorrowForBank(group, bank, mangoAccount)
+    const maxWithdraw = allowBorrow
+      ? Decimal.min(vaultBalance, maxBorrow)
+      : bank.initAssetWeight.toNumber() === 0
+      ? Decimal.min(accountBalance, vaultBalance)
+      : Decimal.min(accountBalance, vaultBalance, maxBorrow)
+  
+    return Decimal.max(0, maxWithdraw)
+  }
+
   return {
     ADMIN_PK,
     GROUP_NUM,
@@ -95,6 +132,7 @@ export default function UseMangoV4(programId?: PublicKey, group?: PublicKey) {
     mangoClient,
     mangoGroup,
     getAdditionalLabelInfo,
+    getMaxWithdrawForBank,
   }
 }
 
