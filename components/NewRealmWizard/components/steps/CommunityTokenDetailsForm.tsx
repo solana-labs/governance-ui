@@ -11,9 +11,13 @@ import FormField from '@components/NewRealmWizard/components/FormField'
 import FormFooter from '@components/NewRealmWizard/components/FormFooter'
 import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
 import Input, { RadioGroup } from '@components/NewRealmWizard/components/Input'
+import { CogIcon, ExternalLinkIcon } from '@heroicons/react/outline'
 
 import { GenericTokenIcon } from '@components/NewRealmWizard/components/TokenInfoTable'
 import TokenInput, { TokenWithMintInfo, COMMUNITY_TOKEN } from '../TokenInput'
+import { getCoefficients } from '../../../../actions/addPlugins/addQVPlugin'
+import { useConnection } from '@solana/wallet-adapter-react'
+import { PublicKey } from '@solana/web3.js'
 
 export const CommunityTokenSchema = {
   useExistingCommunityToken: yup
@@ -75,6 +79,9 @@ export interface CommunityToken {
   minimumNumberOfCommunityTokensToGovern?: number
   communityMintSupplyFactor?: number
   isQuadratic?: boolean
+  coefficientA: number
+  coefficientB: number
+  coefficientC: number
   useSupplyFactor: boolean
   communityAbsoluteMaxVoteWeight?: number
 }
@@ -88,6 +95,8 @@ export default function CommunityTokenForm({
   onPrevClick,
 }) {
   const schema = yup.object(CommunityTokenSchema).required()
+  const { connection } = useConnection()
+
   const {
     watch,
     control,
@@ -99,15 +108,41 @@ export default function CommunityTokenForm({
     defaultValues: {
       useSupplyFactor: true,
       isQuadratic: false,
+      coefficientA: 1000,
+      coefficientB: 0,
+      coefficientC: 0,
     },
     mode: 'all',
     resolver: yupResolver(schema),
   })
   const useExistingCommunityToken = watch('useExistingCommunityToken')
+  const communityTokenMintAddress = watch('communityTokenMintAddress')
   const useSupplyFactor = watch('useSupplyFactor')
+  const isQuadratic = watch('isQuadratic')
+  const coefficientA = watch('coefficientA')
+  const coefficientB = watch('coefficientB')
+  const coefficientC = watch('coefficientC')
   const [communityTokenInfo, setCommunityTokenInfo] = useState<
     TokenWithMintInfo | undefined
   >()
+
+  useEffect(() => {
+    const fetchCoefficients = async () => {
+      const coefficients = await getCoefficients(
+        undefined,
+        new PublicKey(communityTokenMintAddress),
+        connection
+      )
+      setValue('coefficientA', coefficients[0])
+      setValue('coefficientB', coefficients[1])
+      setValue('coefficientC', coefficients[2])
+    }
+
+    // If the user wants to use a pre-existing token, we need to adjust the coefficients ot match the decimals of that token
+    if (communityTokenMintAddress) {
+      fetchCoefficients()
+    }
+  }, [connection, communityTokenMintAddress, setValue])
 
   useEffect(() => {
     updateUserInput(formData, CommunityTokenSchema, setValue)
@@ -330,7 +365,7 @@ export default function CommunityTokenForm({
           control={control}
           defaultValue={true}
           render={({ field: { ref: _, ...field } }) => (
-            <div className="pt-3">
+            <div className="pt-3 mb-6">
               <FormField
                 title="Create a quadratic dao?"
                 description="This will change how votes are calculated based on distribution and amount of tokens held. Additionally, the Civic Pass plugin will be included, requiring all users to verify their identity and ensuring sybil resistance by mitigating the risk of fake or duplicate accounts."
@@ -347,6 +382,113 @@ export default function CommunityTokenForm({
             </div>
           )}
         />
+
+        {isQuadratic && (
+          <div className="pt-3">
+            <div className="flex mb-6 items-center">
+              <CogIcon
+                width={24}
+                height={24}
+                color="#5DC9EB"
+                className="mr-2"
+              />
+              <p className="body-base mr-1">Quadratic Configuration</p>
+              <p className="pl-1 border-l-2 border-gray-500 body-small">
+                Changes advised for <i>advanced users only</i>
+              </p>
+            </div>
+
+            <FormField
+              title="Quadratic Coefficients"
+              description="Configures the quadratic voting formulate influencing coefficients, which change the weight of votes."
+            >
+              <div className="mb-4 flex mt-[-16px]">
+                <p className="mr-1">See Docs</p>
+                <a
+                  href="https://docs.realms.today/"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <ExternalLinkIcon className="w-6 h-6 ml-1" color="#5DC9EB" />
+                </a>
+              </div>
+            </FormField>
+            <div className="flex space-x-4">
+              <Controller
+                name="coefficientA"
+                control={control}
+                defaultValue={''}
+                render={({ field, fieldState: { error } }) => (
+                  <FormField
+                    title="Coefficient A"
+                    description=""
+                    // advancedOption
+                  >
+                    <Input
+                      type="tel"
+                      placeholder="1000"
+                      error={error?.message || ''}
+                      defaultValue={coefficientA}
+                      {...field}
+                      onChange={(ev) => {
+                        preventNegativeNumberInput(ev)
+                        field.onChange(ev)
+                      }}
+                    />
+                  </FormField>
+                )}
+              />
+              <Controller
+                name="coefficientB"
+                control={control}
+                defaultValue={''}
+                render={({ field, fieldState: { error } }) => (
+                  <FormField
+                    title="Coefficient B"
+                    description=""
+                    // advancedOption
+                  >
+                    <Input
+                      type="tel"
+                      placeholder="0"
+                      error={error?.message || ''}
+                      defaultValue={coefficientB}
+                      {...field}
+                      onChange={(ev) => {
+                        preventNegativeNumberInput(ev)
+                        field.onChange(ev)
+                      }}
+                    />
+                  </FormField>
+                )}
+              />
+              <Controller
+                name="coefficientC"
+                control={control}
+                defaultValue={''}
+                render={({ field, fieldState: { error } }) => (
+                  <FormField
+                    title="Coefficient C"
+                    description=""
+                    // advancedOption
+                  >
+                    <Input
+                      type="tel"
+                      placeholder="0"
+                      error={error?.message || ''}
+                      defaultValue={coefficientC}
+                      {...field}
+                      onChange={(ev) => {
+                        preventNegativeNumberInput(ev)
+                        field.onChange(ev)
+                      }}
+                    />
+                  </FormField>
+                )}
+              />
+            </div>
+          </div>
+        )}
       </AdvancedOptionsDropdown>
 
       <FormFooter
