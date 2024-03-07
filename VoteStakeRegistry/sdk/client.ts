@@ -1,7 +1,7 @@
 import { Program, Provider, web3} from '@coral-xyz/anchor'
 import { IDL, VoterStakeRegistry } from './voter_stake_registry'
 import {Client} from "@solana/governance-program-library";
-import {PublicKey, TransactionInstruction} from "@solana/web3.js";
+import {PublicKey, SYSVAR_INSTRUCTIONS_PUBKEY, SYSVAR_RENT_PUBKEY, TransactionInstruction} from "@solana/web3.js";
 import {getVoterPDA} from "./accounts";
 import {SYSTEM_PROGRAM_ID} from "@solana/spl-governance";
 import BN from "bn.js";
@@ -60,7 +60,7 @@ export class VsrClient extends Client<typeof IDL> {
   async updateVoterWeightRecord(voter: PublicKey, realm: PublicKey, mint: PublicKey) {
     const pluginProgramId = this.program.programId;
     const { registrar } = this.getRegistrarPDA(realm, mint)
-    const { voter: voterPDA } = await getVoterPDA(registrar, voter, pluginProgramId)
+    const { voter: voterPDA } = getVoterPDA(registrar, voter, pluginProgramId)
     const { voterWeightPk } = this.getVoterWeightRecordPDA(realm, mint, voter);
     const ix = await this.program.methods.updateVoterWeightRecord()
         .accounts({
@@ -85,7 +85,7 @@ export class VsrClient extends Client<typeof IDL> {
       return null
     }
 
-    const { voter: voterPk } = await getVoterPDA(registrarPk, voter, programId)
+    const { voter: voterPk } = getVoterPDA(registrarPk, voter, programId)
     const votingPower = await fetchVotingPower(
         this.program.provider.connection,
         programId,

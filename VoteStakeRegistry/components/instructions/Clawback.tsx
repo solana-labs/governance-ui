@@ -141,9 +141,9 @@ const Clawback = ({
   }, [form.governedTokenAccount, governancesArray, realm?.account.authority])
   useEffect(() => {
     const getVoters = async () => {
-      const { registrar } = await getRegistrarPDA(
-        realm!.pubkey,
-        realm!.account.communityMint,
+      const { registrar } = getRegistrarPDA(
+          realm!.pubkey,
+          realm!.account.communityMint,
           vsrClient!.program.programId
       )
       const resp = await vsrClient?.program.account.voter.all([
@@ -173,10 +173,10 @@ const Clawback = ({
   }, [vsrClient, realm])
   useEffect(() => {
     const getOwnedDepositsInfo = async () => {
-      const { registrar } = await getRegistrarPDA(
-        realm!.pubkey,
-        realm!.account.communityMint,
-        vsrClient!.program.programId
+      const { registrar } = getRegistrarPDA(
+          realm!.pubkey,
+          realm!.account.communityMint,
+          vsrClient!.program.programId
       )
       const existingRegistrar = await tryGetRegistrar(registrar, vsrClient!)
       const mintCfgs = existingRegistrar?.votingMints

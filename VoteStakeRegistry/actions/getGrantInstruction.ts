@@ -46,17 +46,17 @@ export const getGrantInstruction = async ({
   const systemProgram = SystemProgram.programId
   const clientProgramId = client!.program.programId
 
-  const { registrar } = await getRegistrarPDA(
+  const { registrar } = getRegistrarPDA(
     realmPk,
     communityMintPk,
     clientProgramId
   )
-  const { voter, voterBump } = await getVoterPDA(
+  const { voter, voterBump } = getVoterPDA(
     registrar,
     toPk,
     clientProgramId
   )
-  const { voterWeightPk, voterWeightBump } = await getVoterWeightPDA(
+  const { voterWeightPk, voterWeightBump } = getVoterWeightPDA(
     registrar,
     toPk,
     clientProgramId

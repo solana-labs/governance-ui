@@ -12,7 +12,7 @@ export const createCivicRegistrarIx = async (
     gatekeeperNetwork: PublicKey,
     predecessor?: PublicKey
 ) => {
-  const {registrar} = await getRegistrarPDA(
+  const {registrar} = getRegistrarPDA(
       realm.pubkey,
       realm.account.communityMint,
       gatewayClient.program.programId
@@ -44,7 +44,7 @@ export const configureCivicRegistrarIx = async (
     gatekeeperNetwork: PublicKey,
     predecessor?: PublicKey
 ) => {
-  const {registrar} = await getRegistrarPDA(
+  const {registrar} = getRegistrarPDA(
       realm.pubkey,
       realm.account.communityMint,
       gatewayClient.program.programId

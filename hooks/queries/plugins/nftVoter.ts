@@ -127,10 +127,10 @@ export const nftRegistrarQuery = (
     )
       return { found: false, result: undefined } as const
 
-    const { registrar: registrarPk } = await getRegistrarPDA(
-      realm.pubkey,
-      realm.account.communityMint,
-      programId
+    const { registrar: registrarPk } = getRegistrarPDA(
+        realm.pubkey,
+        realm.account.communityMint,
+        programId
     )
 
     // use anchor to fetch registrar :-)

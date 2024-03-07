@@ -29,12 +29,12 @@ export const getClawbackInstruction = async ({
 }) => {
   const clientProgramId = client!.program.programId
 
-  const { registrar } = await getRegistrarPDA(
+  const { registrar } = getRegistrarPDA(
     realmPk,
     realmCommunityMintPk,
     clientProgramId
   )
-  const { voter } = await getVoterPDA(
+  const { voter } = getVoterPDA(
     registrar,
     voterWalletAddress,
     clientProgramId
