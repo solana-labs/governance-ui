@@ -11,7 +11,7 @@ import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, { InstructionInput } from '../../FormCreator'
 import { InstructionInputType } from '../../inputInstructionType'
-import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
+import UseMangoV4 from '../../../../../../../../hooks/useMangoV4V23'
 import { BN } from '@coral-xyz/anchor'
 import { getChangedValues, getNullOrTransform } from '@utils/mangoV4Tools'
 import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
@@ -32,6 +32,7 @@ const keyToLabel = {
   feesSwapMangoAccount: 'Fees Swap Mango Account',
   feesMngoTokenIndex: 'Fees MNGO Token Index',
   feesExpiryInterval: 'Fees Expiry Interval',
+  collateralFeeInterval: 'Collateral Fee Interval',
 }
 
 type GroupEditForm = {
@@ -49,6 +50,7 @@ type GroupEditForm = {
   feesExpiryInterval: number | null
   holdupTime: number
   allowedFastListingsPerInterval: number | null
+  collateralFeeInterval: number | null
 }
 
 const defaultFormValues: GroupEditForm = {
@@ -66,6 +68,7 @@ const defaultFormValues: GroupEditForm = {
   feesExpiryInterval: 0,
   holdupTime: 0,
   allowedFastListingsPerInterval: 0,
+  collateralFeeInterval: 0,
 }
 
 const GroupEdit = ({
@@ -135,7 +138,8 @@ const GroupEdit = ({
             values.allowedFastListingsPerInterval,
             null,
             Number
-          )
+          ),
+          getNullOrTransform(values.collateralFeeInterval, BN)
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -210,6 +214,7 @@ const GroupEdit = ({
         feesExpiryInterval: mangoGroup!.buybackFeesExpiryInterval?.toNumber(),
         allowedFastListingsPerInterval: mangoGroup!
           .allowedFastListingsPerInterval,
+        collateralFeeInterval: mangoGroup!.collateralFeeInterval.toNumber(),
       }
       setForm((prevForm) => ({
         ...prevForm,
@@ -329,6 +334,14 @@ const GroupEdit = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'allowedFastListingsPerInterval',
+    },
+    {
+      label: keyToLabel['collateralFeeInterval'],
+      subtitle: getAdditionalLabelInfo('collateralFeeInterval'),
+      initialValue: form.collateralFeeInterval,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'collateralFeeInterval',
     },
   ]
 

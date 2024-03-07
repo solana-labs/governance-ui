@@ -23,7 +23,7 @@ import ForwarderProgram, {
 import { REDUCE_ONLY_OPTIONS } from '@utils/Mango/listingTools'
 import ProgramSelector from '@components/Mango/ProgramSelector'
 import useProgramSelector from '@components/Mango/useProgramSelector'
-import UseMangoV4 from '@hooks/useMangoV4'
+import UseMangoV4 from '@hooks/useMangoV4V23'
 
 const keyToLabel = {
   oraclePk: 'Oracle',
@@ -132,6 +132,9 @@ interface EditTokenForm {
   depositLimit: number
   zeroUtilRate: number
   platformLiquidationFee: number
+  disableAssetLiquidation: boolean
+  collateralFeePerDay: number
+  forceWithdraw: boolean
 }
 
 const defaultFormValues: EditTokenForm = {
@@ -184,6 +187,9 @@ const defaultFormValues: EditTokenForm = {
   depositLimit: 0,
   zeroUtilRate: 0,
   platformLiquidationFee: 0,
+  disableAssetLiquidation: false,
+  collateralFeePerDay: 0,
+  forceWithdraw: false,
 }
 
 const EditToken = ({
@@ -347,7 +353,10 @@ const EditToken = ({
           values.setFallbackOracle!,
           getNullOrTransform(values.depositLimit, BN),
           getNullOrTransform(values.zeroUtilRate, null, Number),
-          getNullOrTransform(values.platformLiquidationFee, null, Number)
+          getNullOrTransform(values.platformLiquidationFee, null, Number),
+          values.disableAssetLiquidation!,
+          getNullOrTransform(values.collateralFeePerDay, null, Number),
+          values.forceWithdraw!
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -469,6 +478,7 @@ const EditToken = ({
         depositLimit: currentToken.depositLimit.toNumber(),
         zeroUtilRate: currentToken.zeroUtilRate.toNumber(),
         platformLiquidationFeeOpt: currentToken.platformLiquidationFee.toNumber(),
+        collateralFeePerDayOpt: currentToken.collateralFeePerDay,
       }
       setForm((prevForm) => ({
         ...prevForm,
@@ -875,6 +885,28 @@ const EditToken = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'platformLiquidationFee',
+    },
+    {
+      label: keyToLabel['disableAssetLiquidation'],
+      subtitle: getAdditionalLabelInfo('disableAssetLiquidation'),
+      initialValue: form.disableAssetLiquidation,
+      type: InstructionInputType.SWITCH,
+      name: 'disableAssetLiquidation',
+    },
+    {
+      label: keyToLabel['collateralFeePerDay'],
+      subtitle: getAdditionalLabelInfo('collateralFeePerDay'),
+      initialValue: form.collateralFeePerDay,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'collateralFeePerDay',
+    },
+    {
+      label: keyToLabel['forceWithdraw'],
+      subtitle: getAdditionalLabelInfo('forceWithdraw'),
+      initialValue: form.forceWithdraw,
+      type: InstructionInputType.SWITCH,
+      name: 'forceWithdraw',
     },
   ]
 
