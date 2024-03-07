@@ -3464,5 +3464,14 @@
     "realmId": "GgF6fHb3iM3Um5DtvwbZvpGpYTzYnr1RmZr4NkwHveGp",
     "website": "",
     "twitter": ""
+  },
+  {
+    "symbol": "Solestia",
+    "displayName": "Solestia DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "2puq4zSSUfsMhKNx4vQg1K3YBm6aG7Fm2VNPAPqpaF6q",
+    "ogImage": "/realms/SolestiaDAO/photo_2023-11-20_07-48-57.jpg",
+    "twitter": "@SolestiaDAO",
+    "shortDescription": "Whimsical times in the markets with Solestia."
   }
 ]
