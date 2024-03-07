@@ -5,7 +5,7 @@ import { useTokenOwnerRecordsDelegatedToUser } from '@hooks/queries/tokenOwnerRe
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
 import { useConnection } from '@solana/wallet-adapter-react'
-import { getVanillaGovpower } from '@hooks/queries/governancePower'
+import { getVanillaGovpower, useVanillaGovpower } from '@hooks/queries/governancePower'
 import {
   useAddressQuery_CommunityTokenOwner,
   useAddressQuery_CouncilTokenOwner,
