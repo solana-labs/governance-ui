@@ -49,10 +49,7 @@ export default function VanillaVotingPower({
 
   const mintInfo = useMintInfoByPubkeyQuery(relevantMint).data?.result
 
-  const { result: personalAmount } = useAsync(
-    async () => relevantTOR && getVanillaGovpower(connection, relevantTOR),
-    [connection, relevantTOR]
-  )
+  const personalAmount = relevantTOR ? useVanillaGovpower(relevantTOR) : new BN(0);
 
   // If the user is using a delegator, we want to show that and not count the other delegators
   const selectedDelegator = useSelectedDelegatorStore((s) =>
