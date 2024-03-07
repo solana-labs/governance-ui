@@ -3464,5 +3464,14 @@
     "realmId": "GgF6fHb3iM3Um5DtvwbZvpGpYTzYnr1RmZr4NkwHveGp",
     "website": "",
     "twitter": ""
+  },
+  {
+    "symbol": "sinDAO",
+    "displayName": "sinDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "7boMaQ9LG3eHXEsiWWWs7RDP2Z8ASJ3wJevTmuTh1qhL",
+    "ogImage": "/realms/sinDAO/sindao.png",
+    "website": "https://sindao.org",
+    "twitter": "@thesinDAO"
   }
 ]
