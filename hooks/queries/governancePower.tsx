@@ -22,7 +22,7 @@ import { findPluginName } from '@constants/plugins'
 import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
 import {IdlAccounts} from "@coral-xyz/anchor";
 import {NftVoter} from "../../idls/nft_voter";
-import {fetchPluginRegistrar} from "@hooks/queries/pluginRegistrar";
+import {getPluginRegistrarCientCached} from "@hooks/queries/pluginRegistrar";
 
 export const getVanillaGovpower = async (
   connection: Connection,
@@ -77,7 +77,7 @@ export const getNftGovpowerForOwnerAndRegistrar = async(connection: Connection, 
 }
 
 export const getNftGovpowerForOwner = async (connection: Connection, realmPk: PublicKey, owner: PublicKey) => {
-  const registrar = await fetchPluginRegistrar<NftVoter>(realmPk, connection, 'NFT');
+  const registrar = await getPluginRegistrarCientCached<NftVoter>(realmPk, connection, 'NFT');
   return getNftGovpowerForOwnerAndRegistrar(connection, owner, registrar);
 }
 

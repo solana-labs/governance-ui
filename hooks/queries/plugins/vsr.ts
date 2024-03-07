@@ -15,7 +15,7 @@ import { getLockTokensVotingPowerPerWallet } from 'VoteStakeRegistry/tools/depos
 import { useQuery } from '@tanstack/react-query'
 import { findPluginName } from '@constants/plugins'
 import {useVsrClient} from "../../../VoterWeightPlugins/useVsrClient";
-import {fetchPlugin} from "@hooks/queries/pluginRegistrar";
+import {getPluginClientCached} from "@hooks/queries/pluginRegistrar";
 
 const VOTER_INFO_EVENT_NAME = 'VoterInfo'
 
@@ -47,7 +47,7 @@ export const getVsrGovpower = async (
 ) => {
   const { result: realm } = await fetchRealmByPubkey(connection, realmPk)
   if (realm === undefined) throw new Error()
-  const plugin = await fetchPlugin(realmPk, connection, 'VSR');
+  const plugin = await getPluginClientCached(realmPk, connection, 'VSR');
   const votingPower =await plugin?.client?.calculateVoterWeight(
     walletPk,
     realmPk,
