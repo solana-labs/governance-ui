@@ -664,10 +664,10 @@
   dependencies:
     caip "~1.1.0"
 
-"@civic/profile@^0.5.0-beta.1":
-  version "0.5.0-beta.1"
-  resolved "https://registry.yarnpkg.com/@civic/profile/-/profile-0.5.0-beta.1.tgz#8caf4e575a682c4dcc47237310642ee8896463ea"
-  integrity sha512-NdWUcxu0/ecdVJoHVbVP2sSY+1nqV4uuEAYyfrIFfp9x6EiJZoXnxl73cNa22NKThCumSURTkAoiW3cs2q7bMg==
+"@civic/profile@0.5.1":
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/@civic/profile/-/profile-0.5.1.tgz#90242b4c64c24bbd2d5d4bebc38dfa6fe396b520"
+  integrity sha512-820RnslrLRDRJHmW+4m4v0u7v6XERWm+Rc+Qch0R7HnZardhFoyosqu+utnUUE0hkbmO0u+t1SndjLlpbk3bAQ==
   dependencies:
     "@bonfida/spl-name-service" "^1.0.6"
     "@civic/did-registry" "0.0.6-alpha.2"
