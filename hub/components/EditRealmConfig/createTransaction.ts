@@ -104,7 +104,7 @@ export async function createTransaction(
         undefined,
         isDevnet,
       );
-      const { registrar } = await getRegistrarPDA(
+      const { registrar } = getRegistrarPDA(
         realmPublicKey,
         config.communityMint.publicKey,
         nftClient.program.programId,

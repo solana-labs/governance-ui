@@ -44,7 +44,7 @@ export const createQuadraticRegistrarIx = async (
   coefficients?: Coefficients,
   predecessor?: PublicKey
 ) => {
-  const { registrar } = await getRegistrarPDA(
+  const { registrar } = getRegistrarPDA(
     realm.pubkey,
     realm.account.communityMint,
     quadraticClient.program.programId
@@ -78,7 +78,7 @@ export const configureQuadraticRegistrarIx = async (
   coefficients?: Coefficients,
   predecessor?: PublicKey
 ) => {
-  const { registrar } = await getRegistrarPDA(
+  const { registrar } = getRegistrarPDA(
     realm.pubkey,
     realm.account.communityMint,
     quadraticClient.program.programId

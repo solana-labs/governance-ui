@@ -7,7 +7,7 @@ import {fetchRealmByPubkey} from "@hooks/queries/realm";
 import {PluginName} from "@constants/plugins";
 import {VoterWeightPluginInfo} from "../../VoterWeightPlugins/lib/types";
 
-export const fetchPlugin = async (realmPk: PublicKey, connection: Connection, pluginName: PluginName): Promise<VoterWeightPluginInfo | undefined> => {
+export const getPluginClientCached = async (realmPk: PublicKey, connection: Connection, pluginName: PluginName): Promise<VoterWeightPluginInfo | undefined> => {
     const realm = fetchRealmByPubkey(connection, realmPk)
     const plugins = await queryClient.fetchQuery({
         queryKey: ['getCommunityPluginsWithoutWallet', realmPk.toString()],
@@ -25,7 +25,7 @@ export const fetchPlugin = async (realmPk: PublicKey, connection: Connection, pl
     return plugins.find((x) => x.name === pluginName);
 }
 
-export const fetchPluginRegistrar = async <T extends Idl>(realmPk: PublicKey, connection: Connection, pluginName: PluginName): Promise<IdlAccounts<T>['registrar'] | undefined> => {
-    const plugin = await fetchPlugin(realmPk, connection, pluginName);
+export const getPluginRegistrarCientCached = async <T extends Idl>(realmPk: PublicKey, connection: Connection, pluginName: PluginName): Promise<IdlAccounts<T>['registrar'] | undefined> => {
+    const plugin = await getPluginClientCached(realmPk, connection, pluginName);
     return plugin?.params as IdlAccounts<T>['registrar'] | undefined;
 }

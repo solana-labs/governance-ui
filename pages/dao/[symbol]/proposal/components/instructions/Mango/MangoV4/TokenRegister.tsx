@@ -20,11 +20,14 @@ import ForwarderProgram, {
   useForwarderProgramHelpers,
 } from '@components/ForwarderProgram/ForwarderProgram'
 import { REDUCE_ONLY_OPTIONS } from '@utils/Mango/listingTools'
+import ProgramSelector from '@components/Mango/ProgramSelector'
+import useProgramSelector from '@components/Mango/useProgramSelector'
 
 interface TokenRegisterForm {
   governedAccount: AssetAccount | null
   mintPk: string
   oraclePk: string
+  fallbackOracle: string
   oracleConfFilter: number
   maxStalenessSlots: string
   name: string
@@ -59,6 +62,8 @@ interface TokenRegisterForm {
   interestTargetUtilization: number
   depositLimit: number
   insuranceFound: boolean
+  zeroUtilRate: number
+  platformLiquidationFee: number
 }
 
 const TokenRegister = ({
@@ -69,7 +74,11 @@ const TokenRegister = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletOnePointOh()
-  const { mangoClient, mangoGroup, getAdditionalLabelInfo } = UseMangoV4()
+  const programSelectorHook = useProgramSelector()
+  const { mangoClient, mangoGroup, getAdditionalLabelInfo } = UseMangoV4(
+    programSelectorHook.program?.val,
+    programSelectorHook.program?.group
+  )
   const { assetAccounts } = useGovernanceAssets()
   const forwarderProgramHelpers = useForwarderProgramHelpers()
 
@@ -85,6 +94,7 @@ const TokenRegister = ({
     mintPk: '',
     maxStalenessSlots: '',
     oraclePk: '',
+    fallbackOracle: '',
     oracleConfFilter: 0.1,
     name: '',
     adjustmentFactor: 0.004, // rate parameters are chosen to be the same for all high asset weight tokens,
@@ -118,6 +128,8 @@ const TokenRegister = ({
     interestTargetUtilization: 0.5,
     interestCurveScaling: 4,
     insuranceFound: false,
+    zeroUtilRate: 0,
+    platformLiquidationFee: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -176,7 +188,9 @@ const TokenRegister = ({
           Number(form.interestCurveScaling),
           Number(form.interestTargetUtilization),
           form.insuranceFound,
-          new BN(form.depositLimit)
+          new BN(form.depositLimit),
+          Number(form.zeroUtilRate),
+          Number(form.platformLiquidationFee)
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -185,6 +199,7 @@ const TokenRegister = ({
           oracle: new PublicKey(form.oraclePk),
           payer: form.governedAccount.extensions.transferAddress,
           rent: SYSVAR_RENT_PUBKEY,
+          fallbackOracle: new PublicKey(form.fallbackOracle),
         })
         .instruction()
 
@@ -272,6 +287,12 @@ const TokenRegister = ({
       initialValue: form.oraclePk,
       type: InstructionInputType.INPUT,
       name: 'oraclePk',
+    },
+    {
+      label: `Fallback oracle`,
+      initialValue: form.fallbackOracle,
+      type: InstructionInputType.INPUT,
+      name: 'fallbackOracle',
     },
     {
       label: `Oracle Confidence Filter`,
@@ -533,10 +554,29 @@ const TokenRegister = ({
       type: InstructionInputType.SWITCH,
       name: 'insuranceFound',
     },
+    {
+      label: 'Zero Util Rate',
+      subtitle: getAdditionalLabelInfo('zeroUtilRate'),
+      initialValue: form.zeroUtilRate,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'zeroUtilRate',
+    },
+    {
+      label: 'Platform Liquidation Fee',
+      subtitle: getAdditionalLabelInfo('platformLiquidationFee'),
+      initialValue: form.platformLiquidationFee,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'platformLiquidationFee',
+    },
   ]
 
   return (
     <>
+      <ProgramSelector
+        programSelectorHook={programSelectorHook}
+      ></ProgramSelector>
       {form && (
         <InstructionForm
           outerForm={form}

@@ -288,10 +288,10 @@ const Grant = ({
   useEffect(() => {
     const getGrantMints = async () => {
       const clientProgramId = vsrClient!.program.programId
-      const { registrar } = await getRegistrarPDA(
-        realm!.pubkey,
-        realm!.account.communityMint,
-        clientProgramId
+      const { registrar } = getRegistrarPDA(
+          realm!.pubkey,
+          realm!.account.communityMint,
+          clientProgramId
       )
       const existingRegistrar = await tryGetRegistrar(registrar, vsrClient!)
       if (existingRegistrar) {
