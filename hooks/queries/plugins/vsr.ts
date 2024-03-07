@@ -11,12 +11,11 @@ import { fetchRealmConfigQuery, useRealmConfigQuery } from '../realmConfig'
 import queryClient from '../queryClient'
 import { useConnection } from '@solana/wallet-adapter-react'
 import useUserOrDelegator from '@hooks/useUserOrDelegator'
-import { useAsync } from 'react-async-hook'
 import { getLockTokensVotingPowerPerWallet } from 'VoteStakeRegistry/tools/deposits'
 import { useQuery } from '@tanstack/react-query'
 import { findPluginName } from '@constants/plugins'
 import {useVsrClient} from "../../../VoterWeightPlugins/useVsrClient";
-import {fetchPlugin} from "@hooks/queries/pluginRegistrar";
+import {getPluginClientCached} from "@hooks/queries/pluginRegistrar";
 
 const VOTER_INFO_EVENT_NAME = 'VoterInfo'
 
@@ -48,7 +47,7 @@ export const getVsrGovpower = async (
 ) => {
   const { result: realm } = await fetchRealmByPubkey(connection, realmPk)
   if (realm === undefined) throw new Error()
-  const plugin = await fetchPlugin(realmPk, connection, 'VSR');
+  const plugin = await getPluginClientCached(realmPk, connection, 'VSR');
   const votingPower =await plugin?.client?.calculateVoterWeight(
     walletPk,
     realmPk,
@@ -147,28 +146,21 @@ export const useRegistrarPk = () => {
   const communityMintPk = realm?.account.communityMint
   const config = useRealmConfigQuery().data?.result
   const programId = config?.account.communityTokenConfig.voterWeightAddin
-  return useAsync(
-    async () =>
-      realm &&
+  return realm &&
       communityMintPk &&
       programId &&
-      getRegistrarPDA(realm.pubkey, communityMintPk, programId),
-    [communityMintPk, programId, realm]
-  )
+      getRegistrarPDA(realm.pubkey, communityMintPk, programId)
 }
 
 export const useVoterPk = (walletPk: PublicKey | undefined) => {
-  const registrar = useRegistrarPk().result
+  const registrar = useRegistrarPk()
   const config = useRealmConfigQuery().data?.result
   const programId = config?.account.communityTokenConfig.voterWeightAddin
-  return useAsync(
-    async () =>
-      registrar &&
+
+  return registrar &&
       walletPk &&
       programId &&
-      getVoterPDA(registrar.registrar, walletPk, programId),
-    [programId, registrar, walletPk]
-  )
+      getVoterPDA(registrar.registrar, walletPk, programId);
 }
 
 export const useVsrGovpower = () => {
@@ -176,8 +168,8 @@ export const useVsrGovpower = () => {
   const actingAsWallet = useUserOrDelegator()
   const config = useRealmConfigQuery().data?.result
   const pluginId = config?.account.communityTokenConfig.voterWeightAddin
-  const voterPk = useVoterPk(actingAsWallet).result?.voter
-  const registrarPk = useRegistrarPk().result?.registrar
+  const voterPk = useVoterPk(actingAsWallet)?.voter
+  const registrarPk = useRegistrarPk()?.registrar
   const pluginName = findPluginName(pluginId)
 
   const enabled =
@@ -259,14 +251,14 @@ export const useVsrGovpowerMulti = (wallets: PublicKey[] | undefined) => {
         connection
       )
 
-      const { registrar: registrarPk } = await getRegistrarPDA(
-        realm.pubkey,
-        realm.account.communityMint,
-        programId
+      const { registrar: registrarPk } = getRegistrarPDA(
+          realm.pubkey,
+          realm.account.communityMint,
+          programId
       )
 
       for (const [key, power] of Object.entries(x)) {
-        const { voter: voterPk } = await getVoterPDA(
+        const { voter: voterPk } = getVoterPDA(
           registrarPk,
           new PublicKey(key),
           programId

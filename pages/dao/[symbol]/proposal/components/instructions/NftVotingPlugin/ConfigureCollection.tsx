@@ -60,10 +60,10 @@ const ConfigureNftPluginCollection = ({
         form!.weight,
         mint!.decimals
       )
-      const { registrar } = await getRegistrarPDA(
-        realm!.pubkey,
-        realm!.account.communityMint,
-        nftClient!.program.programId
+      const { registrar } = getRegistrarPDA(
+          realm!.pubkey,
+          realm!.account.communityMint,
+          nftClient!.program.programId
       )
       const { maxVoterWeightRecord } = await getMaxVoterWeightRecord(
         realm!.pubkey,

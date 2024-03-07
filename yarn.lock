@@ -337,29 +337,13 @@
     keccak256 "^1.0.6"
     merkletreejs "^0.3.11"
 
-"@blockworks-foundation/mango-v4-settings@0.14.15":
-  version "0.14.15"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4-settings/-/mango-v4-settings-0.14.15.tgz#0ac04f2cffbd27a4129bc2086ec1418e29393880"
-  integrity sha512-GBo43KCosdaohbtS3Rtz8e2zsLsiN3JqTfLKVtStRYO3f2tQLzeo/D2Khz07psw2egq6TCNZJH7+v32iGrPq0w==
+"@blockworks-foundation/mango-v4-rc@npm:@blockworks-foundation/mango-v4@0.23.0-rc1":
+  version "0.23.0-rc1"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4/-/mango-v4-0.23.0-rc1.tgz#a4eed291c7ac1e6d02bbad228d917e34ad2149c0"
+  integrity sha512-U+F1SAr35TVsKz48W5iYanEIFxttfEVYV0uwDUhXz9HWbHctKYuZH0RyUb9y7xyI6vDBn/z/87FmFiV8meVlyQ==
   dependencies:
-    bn.js "^5.2.1"
-    eslint-config-prettier "^9.0.0"
-
-"@blockworks-foundation/mango-v4-settings@^0.2.16":
-  version "0.2.17"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4-settings/-/mango-v4-settings-0.2.17.tgz#ebc64eb037137bdd16df93cdb63badc7f178542b"
-  integrity sha512-k4Hi0Rjq3XbWnN4Hvdd2aDrm24Ob+8+WDCz7hzR+XKCQ0HcYQXVrZn2Yz7e9IA4M3zQEP9n5HHnQopLQb8UgMw==
-  dependencies:
-    bn.js "^5.2.1"
-    eslint-config-prettier "^9.0.0"
-
-"@blockworks-foundation/mango-v4@0.21.22":
-  version "0.21.22"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4/-/mango-v4-0.21.22.tgz#cf399225b995f3d82edc523f5af03c004c9369ec"
-  integrity sha512-n+aSuqlmv6lofmpkLCs4mNF5E7jBGD4UTKE3XfJNUVeV0Vh6E3dihraT26ZkrHCW+woNPWa+26vmd3X3bk4t+w==
-  dependencies:
-    "@blockworks-foundation/mango-v4-settings" "^0.2.16"
-    "@blockworks-foundation/mangolana" "0.0.13"
+    "@blockworks-foundation/mango-v4-settings" "0.14.15"
+    "@blockworks-foundation/mangolana" "0.0.14"
     "@coral-xyz/anchor" "^0.28.1-beta.2"
     "@project-serum/serum" "0.13.65"
     "@pythnetwork/client" "~2.14.0"
@@ -375,16 +359,35 @@
     lodash "^4.17.21"
     node-kraken-api "^2.2.2"
 
-"@blockworks-foundation/mangolana@0.0.13":
-  version "0.0.13"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mangolana/-/mangolana-0.0.13.tgz#82a9b0846e69068de6216d20fcdcd60375d14e1e"
-  integrity sha512-/QPMHjtPpAYaDPbQVLolp5Lq4cCd77b8gBumws97L3J0DfvsKpZVYeAA0fNmSX6qq+pKqCgCywDjJeYhJ01PsQ==
+"@blockworks-foundation/mango-v4-settings@0.14.15":
+  version "0.14.15"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4-settings/-/mango-v4-settings-0.14.15.tgz#0ac04f2cffbd27a4129bc2086ec1418e29393880"
+  integrity sha512-GBo43KCosdaohbtS3Rtz8e2zsLsiN3JqTfLKVtStRYO3f2tQLzeo/D2Khz07psw2egq6TCNZJH7+v32iGrPq0w==
   dependencies:
-    "@solana/web3.js" "^1.88.0"
+    bn.js "^5.2.1"
+    eslint-config-prettier "^9.0.0"
+
+"@blockworks-foundation/mango-v4@0.22.4":
+  version "0.22.4"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4/-/mango-v4-0.22.4.tgz#fe9ff7fd0ab42a0b922d471f561a05954f7a857f"
+  integrity sha512-lutP7Tpr6pbXo12+MIGQLei+TMe4Y3SBJhwUjeh3lgGcXgdW2hG2GQzDy8uiBBEk8vKwdLLgffOZEWbxCtOliw==
+  dependencies:
+    "@blockworks-foundation/mango-v4-settings" "0.14.15"
+    "@blockworks-foundation/mangolana" "0.0.14"
+    "@coral-xyz/anchor" "^0.28.1-beta.2"
+    "@project-serum/serum" "0.13.65"
+    "@pythnetwork/client" "~2.14.0"
+    "@solana/spl-token" "0.3.7"
+    "@solana/web3.js" "^1.78.2"
+    "@switchboard-xyz/sbv2-lite" "^0.1.6"
+    big.js "^6.1.1"
+    binance-api-node "^0.12.0"
     bs58 "^5.0.0"
-    isomorphic-ws "^5.0.0"
-    node-fetch "2.6.11"
-    ws "^8.16.0"
+    cross-fetch "^3.1.5"
+    dotenv "^16.0.3"
+    fast-copy "^3.0.1"
+    lodash "^4.17.21"
+    node-kraken-api "^2.2.2"
 
 "@blockworks-foundation/mangolana@0.0.14":
   version "0.0.14"
@@ -4827,7 +4830,7 @@
     "@wallet-standard/app" "^1.0.1"
     "@wallet-standard/base" "^1.0.1"
 
-"@solana/web3.js@1.56.0", "@solana/web3.js@1.78.2", "@solana/web3.js@^1.17.0", "@solana/web3.js@^1.21.0", "@solana/web3.js@^1.22.0", "@solana/web3.js@^1.30.2", "@solana/web3.js@^1.31.0", "@solana/web3.js@^1.32.0", "@solana/web3.js@^1.35.1", "@solana/web3.js@^1.36.0", "@solana/web3.js@^1.37.1", "@solana/web3.js@^1.43.4", "@solana/web3.js@^1.44.3", "@solana/web3.js@^1.50.1", "@solana/web3.js@^1.56.2", "@solana/web3.js@^1.59.1", "@solana/web3.js@^1.63.0", "@solana/web3.js@^1.63.1", "@solana/web3.js@^1.66.2", "@solana/web3.js@^1.68.0", "@solana/web3.js@^1.73.0", "@solana/web3.js@^1.73.2", "@solana/web3.js@^1.77.3", "@solana/web3.js@^1.78.2", "@solana/web3.js@^1.87.5", "@solana/web3.js@^1.87.6", "@solana/web3.js@^1.88.0", "@solana/web3.js@^1.89.1":
+"@solana/web3.js@1.56.0", "@solana/web3.js@1.78.2", "@solana/web3.js@^1.17.0", "@solana/web3.js@^1.21.0", "@solana/web3.js@^1.22.0", "@solana/web3.js@^1.30.2", "@solana/web3.js@^1.31.0", "@solana/web3.js@^1.32.0", "@solana/web3.js@^1.35.1", "@solana/web3.js@^1.36.0", "@solana/web3.js@^1.37.1", "@solana/web3.js@^1.43.4", "@solana/web3.js@^1.44.3", "@solana/web3.js@^1.50.1", "@solana/web3.js@^1.53.0", "@solana/web3.js@^1.56.2", "@solana/web3.js@^1.59.1", "@solana/web3.js@^1.63.0", "@solana/web3.js@^1.63.1", "@solana/web3.js@^1.66.2", "@solana/web3.js@^1.68.0", "@solana/web3.js@^1.73.0", "@solana/web3.js@^1.73.2", "@solana/web3.js@^1.77.3", "@solana/web3.js@^1.78.2", "@solana/web3.js@^1.87.5", "@solana/web3.js@^1.87.6", "@solana/web3.js@^1.88.0", "@solana/web3.js@^1.89.1":
   version "1.78.2"
   resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.78.2.tgz#ae976ce2f793077aa104ab455f9f75be86a3e2a4"
   integrity sha512-oF+TmBZCt3eAEl4Meu3GO2p6G8wdyoKgXgTKzQpIUIhpMGA/dVQzyMFpKjCgoTU1Kx+/UF3gXUdsZOxQukGbvQ==
@@ -4883,6 +4886,15 @@
     "@solana/web3.js" "^1.73.2"
     bs58 "^5.0.0"
     encoding "^0.1.13"
+
+"@sqds/mesh@1.0.6":
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@sqds/mesh/-/mesh-1.0.6.tgz#b3538a04b3232645d61db3ac7377511b5e742e63"
+  integrity sha512-z+x1GjixJm8K3uPwaDebTsssU3B71zJzRCkywmtz2ZZoMvoz9w/C4nY+v7v6Wg/9OTbfSDgcX/Hoo/FlphkWvg==
+  dependencies:
+    "@project-serum/anchor" "^0.25.0"
+    "@solana/web3.js" "^1.53.0"
+    bn.js "^5.2.1"
 
 "@stablelib/aead@^1.0.1":
   version "1.0.1"
@@ -8367,7 +8379,7 @@ decimal.js-light@^2.4.1, decimal.js-light@^2.5.1:
   resolved "https://registry.yarnpkg.com/decimal.js-light/-/decimal.js-light-2.5.1.tgz#134fd32508f19e208f4fb2f8dac0d2626a867934"
   integrity sha512-qIMFpTMZmny+MMIitAB6D7iVPEorVw6YQRWkvarTkT4tBeSLLiHzcwj6q0MmYSFCiVpiqPJTJEYIrpcPzVEIvg==
 
-decimal.js@^10.4.2, decimal.js@^10.4.3:
+decimal.js@10.4.3, decimal.js@^10.4.2, decimal.js@^10.4.3:
   version "10.4.3"
   resolved "https://registry.yarnpkg.com/decimal.js/-/decimal.js-10.4.3.tgz#1044092884d245d1b7f65725fa4ad4c6f781cc23"
   integrity sha512-VBBaLc1MgL5XpzgIP7ny5Z6Nx3UrRkIViUkPUdtl9aya5amy3De1gsUUSB1g3+3sExYNjCAsAznmukyxCb1GRA==

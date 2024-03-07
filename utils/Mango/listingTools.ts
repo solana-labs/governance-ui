@@ -222,7 +222,7 @@ export const getFormattedListingPresets = (
         PRESETS[key],
         uiDeposits,
         tokenPrice,
-        PRESETS[key].netBorrowLimitPerWindowQuote
+        toUiDecimals(PRESETS[key].netBorrowLimitPerWindowQuote, 6)
       )
     }
 

@@ -2,7 +2,7 @@ import { PublicKey, Connection } from '@solana/web3.js'
 import { fetchRealmConfigQuery } from '@hooks/queries/realmConfig'
 import { findPluginName, PluginName } from '@constants/plugins'
 import { loadClient } from '../clients/'
-import { AnchorProvider } from '@coral-xyz/anchor'
+import {Provider} from '@coral-xyz/anchor'
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts'
 import { VoterWeightPluginInfo } from './types'
 import BN from 'bn.js'
@@ -29,7 +29,7 @@ export const getPlugins = async ({
 }: {
   realmPublicKey: PublicKey
   governanceMintPublicKey: PublicKey
-  provider: AnchorProvider
+  provider: Provider
 }): Promise<VoterWeightPluginInfo[]> => {
   const plugins: VoterWeightPluginInfo[] = []
   let programId = await getInitialPluginProgramId(realmPublicKey, governanceMintPublicKey, provider.connection)

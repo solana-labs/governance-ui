@@ -202,6 +202,10 @@ export default function useGovernanceAssets() {
       name: 'Solend',
       image: '/img/solend.png',
     },
+    [PackageEnum.Squads]: {
+      name: 'Squads',
+      image: '/img/squads.png',
+    },
     [PackageEnum.Switchboard]: {
       name: 'Switchboard',
       image: '/img/switchboard.png',
@@ -527,8 +531,18 @@ export default function useGovernanceAssets() {
       packageId: PackageEnum.MangoMarketV4,
       isVisible: canUseAnyInstruction,
     },
+    [Instructions.MangoV4PerpCreateV23]: {
+      name: 'Create Perp v23',
+      packageId: PackageEnum.MangoMarketV4,
+      isVisible: canUseAnyInstruction,
+    },
     [Instructions.MangoV4PerpEdit]: {
       name: 'Edit Perp',
+      packageId: PackageEnum.MangoMarketV4,
+      isVisible: canUseAnyInstruction,
+    },
+    [Instructions.MangoV4PerpEditV23]: {
+      name: 'Edit Perp v23',
       packageId: PackageEnum.MangoMarketV4,
       isVisible: canUseAnyInstruction,
     },
@@ -542,8 +556,18 @@ export default function useGovernanceAssets() {
       packageId: PackageEnum.MangoMarketV4,
       isVisible: canUseAnyInstruction,
     },
+    [Instructions.MangoV4TokenEditV23]: {
+      name: 'Edit Token v23',
+      packageId: PackageEnum.MangoMarketV4,
+      isVisible: canUseAnyInstruction,
+    },
     [Instructions.MangoV4TokenRegister]: {
       name: 'Register Token',
+      packageId: PackageEnum.MangoMarketV4,
+      isVisible: canUseAnyInstruction,
+    },
+    [Instructions.MangoV4TokenRegisterV23]: {
+      name: 'Register Token v23',
       packageId: PackageEnum.MangoMarketV4,
       isVisible: canUseAnyInstruction,
     },
@@ -554,6 +578,11 @@ export default function useGovernanceAssets() {
     },
     [Instructions.MangoV4GroupEdit]: {
       name: 'Edit Group',
+      packageId: PackageEnum.MangoMarketV4,
+      isVisible: canUseAnyInstruction,
+    },
+    [Instructions.MangoV4GroupEditV23]: {
+      name: 'Edit Group v23',
       packageId: PackageEnum.MangoMarketV4,
       isVisible: canUseAnyInstruction,
     },
@@ -574,6 +603,11 @@ export default function useGovernanceAssets() {
     },
     [Instructions.MangoV4IxGateSet]: {
       name: 'Enable/Disable individual instructions in Group',
+      packageId: PackageEnum.MangoMarketV4,
+      isVisible: canUseAnyInstruction,
+    },
+    [Instructions.MangoV4IxGateSetV23]: {
+      name: 'Enable/Disable individual instructions in Group v23',
       packageId: PackageEnum.MangoMarketV4,
       isVisible: canUseAnyInstruction,
     },
@@ -730,7 +764,28 @@ export default function useGovernanceAssets() {
       name: 'Withdraw Funds',
       packageId: PackageEnum.Solend,
     },
-
+    /*
+    ███████  ██████  ██    ██  █████  ██████  ███████ 
+    ██      ██    ██ ██    ██ ██   ██ ██   ██ ██      
+    ███████ ██    ██ ██    ██ ███████ ██   ██ ███████ 
+         ██ ██ ▄▄ ██ ██    ██ ██   ██ ██   ██      ██ 
+    ███████  ██████   ██████  ██   ██ ██████  ███████ 
+    */
+    [Instructions.SquadsMeshAddMember]: {
+      name: 'Mesh Add Member',
+      packageId: PackageEnum.Squads,
+      isVisible: true,
+    },
+    [Instructions.SquadsMeshChangeThresholdMember]: {
+      name: 'Mesh Change Threshold',
+      packageId: PackageEnum.Squads,
+      isVisible: true,
+    },
+    [Instructions.SquadsMeshRemoveMember]: {
+      name: 'Mesh Remove Member',
+      packageId: PackageEnum.Squads,
+      isVisible: true,
+    },
     /*
       ███████ ██     ██ ██ ████████  ██████ ██   ██ ██████   ██████   █████  ██████  ██████
       ██      ██     ██ ██    ██    ██      ██   ██ ██   ██ ██    ██ ██   ██ ██   ██ ██   ██

@@ -50,7 +50,7 @@ const CreateNftPluginRegistrar = ({
       form!.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const { registrar } = await getRegistrarPDA(
+      const { registrar } = getRegistrarPDA(
         realm!.pubkey,
         realm!.account.communityMint,
         nftClient!.program.programId

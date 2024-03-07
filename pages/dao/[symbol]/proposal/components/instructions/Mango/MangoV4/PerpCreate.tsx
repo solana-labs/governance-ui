@@ -24,6 +24,8 @@ import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import ForwarderProgram, {
   useForwarderProgramHelpers,
 } from '@components/ForwarderProgram/ForwarderProgram'
+import ProgramSelector from '@components/Mango/ProgramSelector'
+import useProgramSelector from '@components/Mango/useProgramSelector'
 
 interface PerpCreateForm {
   governedAccount: AssetAccount | null
@@ -57,6 +59,7 @@ interface PerpCreateForm {
   positivePnlLiquidationFee: number
   perpMarketIndex: number
   holdupTime: number
+  platformLiquidationFee: number
 }
 
 const PerpCreate = ({
@@ -67,7 +70,11 @@ const PerpCreate = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletOnePointOh()
-  const { mangoClient, mangoGroup, getAdditionalLabelInfo } = UseMangoV4()
+  const programSelectorHook = useProgramSelector()
+  const { mangoClient, mangoGroup, getAdditionalLabelInfo } = UseMangoV4(
+    programSelectorHook.program?.val,
+    programSelectorHook.program?.group
+  )
   const { assetAccounts } = useGovernanceAssets()
   const solAccounts = assetAccounts.filter(
     (x) =>
@@ -109,6 +116,7 @@ const PerpCreate = ({
     settlePnlLimitWindowSize: 60 * 60,
     positivePnlLiquidationFee: 0,
     holdupTime: 0,
+    platformLiquidationFee: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -203,7 +211,8 @@ const PerpCreate = ({
           Number(form.settleTokenIndex),
           Number(form.settlePnlLimitFactor),
           new BN(form.settlePnlLimitWindowSize),
-          Number(form.positivePnlLiquidationFee)
+          Number(form.positivePnlLiquidationFee),
+          Number(form.platformLiquidationFee)
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -513,9 +522,20 @@ const PerpCreate = ({
       inputType: 'number',
       name: 'positivePnlLiquidationFee',
     },
+    {
+      label: `Platform Liquidation Fee`,
+      subtitle: getAdditionalLabelInfo('platformLiquidationFee'),
+      initialValue: form.platformLiquidationFee,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'platformLiquidationFee',
+    },
   ]
   return (
     <>
+      <ProgramSelector
+        programSelectorHook={programSelectorHook}
+      ></ProgramSelector>
       {form && (
         <InstructionForm
           outerForm={form}
