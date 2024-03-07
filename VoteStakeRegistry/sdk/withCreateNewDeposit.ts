@@ -60,12 +60,12 @@ export const withCreateNewDeposit = async ({
     communityMintPk,
     clientProgramId
   )
-  const { voter, voterBump } = getVoterPDA(
+  const { voter } = getVoterPDA(
     registrar,
     walletPk,
     clientProgramId
   )
-  const { voterWeightPk, voterWeightBump } = getVoterWeightPDA(
+  const { voterWeightPk } = getVoterWeightPDA(
     registrar,
     walletPk,
     clientProgramId
@@ -94,19 +94,7 @@ export const withCreateNewDeposit = async ({
   }
 
   if (!existingVoter) {
-    const createVoterIx = await client?.program.methods
-      .createVoter(voterBump, voterWeightBump)
-      .accounts({
-        registrar: registrar,
-        voter: voter,
-        voterAuthority: walletPk,
-        voterWeightRecord: voterWeightPk,
-        payer: walletPk,
-        systemProgram: systemProgram,
-        rent: SYSVAR_RENT_PUBKEY,
-        instructions: SYSVAR_INSTRUCTIONS_PUBKEY,
-      })
-      .instruction()
+    const createVoterIx = await client?.createVoterWeightRecord(voter, realmPk, communityMintPk)
     instructions.push(createVoterIx)
   }
   const mintCfgIdx = await getMintCfgIdx(registrar, mintPk, client)

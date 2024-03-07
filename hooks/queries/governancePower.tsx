@@ -96,7 +96,6 @@ export const getNftGovpower = async (
   return getNftGovpowerForOwner(connection, realmPk, owner);
 }
 
-// TODO [CT] replaced with PythVoterWeightPluginClient
 export const getPythGovPower = async (
   connection: Connection,
   user: PublicKey | undefined

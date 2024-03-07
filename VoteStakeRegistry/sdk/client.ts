@@ -43,13 +43,40 @@ export class VsrClient extends Client<typeof IDL> {
     }
   }
 
-  async getVoterWeightRecord() {
-    return null;
-  }
 
-  // NO-OP TODO: How are Vsr voter weight records created?
-  async createVoterWeightRecord(): Promise<TransactionInstruction | null> {
-    return null;
+    /**
+     * Creates a voter weight record account and voter account for this VSR realm and user.
+     * Although the program creates both, this function keeps the 'createVoterWeightRecord' name to align with
+     * other plugins. The client code should not need to know the difference.
+     * @param voter
+     * @param realm
+     * @param mint
+     */
+  async createVoterWeightRecord(voter: PublicKey, realm: PublicKey, mint: PublicKey): Promise<TransactionInstruction> {
+    const {registrar} = this.getRegistrarPDA(realm, mint);
+    const { voter: voterPDA, voterBump } = getVoterPDA(
+        registrar,
+        voter,
+        this.program.programId
+    )
+    const { voterWeightPk, voterWeightRecordBump } = this.getVoterWeightRecordPDA(
+        realm,
+        mint,
+        voter
+    )
+    return this.program.methods
+        .createVoter(voterBump, voterWeightRecordBump)
+        .accounts({
+          registrar: registrar,
+          voter: voterPDA,
+          voterAuthority: voter,
+          voterWeightRecord: voterWeightPk,
+          payer: voter,
+          systemProgram: SYSTEM_PROGRAM_ID,
+          rent: SYSVAR_RENT_PUBKEY,
+          instructions: SYSVAR_INSTRUCTIONS_PUBKEY,
+        })
+        .instruction()
   }
 
   // NO-OP
