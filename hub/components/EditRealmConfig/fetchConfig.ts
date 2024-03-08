@@ -1,6 +1,9 @@
 import { Wallet } from '@coral-xyz/anchor';
 
-import { GatewayClient } from '@solana/governance-program-library';
+import {
+  Coefficients,
+  GatewayClient,
+} from '@solana/governance-program-library';
 import {
   RealmConfig,
   RealmConfigAccount,
@@ -34,6 +37,7 @@ export interface Config {
   realmAuthority?: PublicKey;
   civicPassType?: PublicKey;
   chainingEnabled: boolean;
+  qvCoefficients?: Coefficients;
 }
 
 export async function fetchConfig(

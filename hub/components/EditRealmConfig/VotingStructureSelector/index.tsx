@@ -1,9 +1,11 @@
 import ChevronDownIcon from '@carbon/icons-react/lib/ChevronDown';
 import { GATEWAY_PLUGINS_PKS, QV_PLUGINS_PKS } from '@constants/plugins';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import { Coefficients } from '@solana/governance-program-library';
 import { PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
 import { produce } from 'immer';
+
 import { useEffect, useRef, useState } from 'react';
 
 import { defaultPass } from '../../../../GatewayPlugin/config';
@@ -16,6 +18,7 @@ import { DEFAULT_NFT_VOTER_PLUGIN } from '@tools/constants';
 import { CivicConfigurator } from './CivicConfigurator';
 import { Custom } from './Custom';
 import { NFT } from './NFT';
+import { QVConfigurator } from './QVConfigurator';
 
 export const DEFAULT_NFT_CONFIG = {
   votingProgramId: new PublicKey(DEFAULT_NFT_VOTER_PLUGIN),
@@ -73,6 +76,7 @@ type VotingStructure = {
   nftCollectionWeight?: BN;
   civicPassType?: PublicKey;
   chainingEnabled?: boolean;
+  qvCoefficients?: Coefficients;
 };
 
 interface Props {
@@ -306,6 +310,17 @@ export function VotingStructureSelector(props: Props) {
                 data.nftCollectionWeight = value;
               });
 
+              props.onChange?.(newConfig);
+            }}
+          />
+        )}
+        {isQVConfig(props.structure) && (
+          <QVConfigurator
+            className="mt-2"
+            onCoefficientsChange={(value) => {
+              const newConfig = produce({ ...props.structure }, (data) => {
+                data.qvCoefficients = value ?? undefined;
+              });
               props.onChange?.(newConfig);
             }}
           />
