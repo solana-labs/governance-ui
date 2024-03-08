@@ -33,7 +33,6 @@ const descriptionStyles = cx('dark:text-neutral-400 text-sm')
 
 export default function CivicPassSelector({
   className,
-  selectedPass,
   onPassSelected,
 }: Props) {
   const [open, setOpen] = useState(false)
@@ -44,48 +43,58 @@ export default function CivicPassSelector({
   }, [onPassSelected, selectedPassState.value])
 
   return (
-    <DropdownMenu.Root open={open} onOpenChange={setOpen}>
-      <div>
-        <DropdownMenu.Trigger
-          className={cx(
-            itemStyles,
-            className,
-            open && 'border dark:border-white/40'
-          )}
-        >
-          <div className={labelStyles}>
-            {selectedPassState?.name || 'Select a Civic Pass'}
-          </div>
-          <div className={descriptionStyles}>
-            {selectedPassState?.description || ''}
-          </div>
-          <ChevronDownIcon className={cx(iconStyles, open && '-rotate-180')} />
-        </DropdownMenu.Trigger>
-        <DropdownMenu.Portal>
-          <DropdownMenu.Content
-            className="dark space-y-0.5 z-20 w-5/6 mx-auto lg:max-w-[920px]"
-            sideOffset={2}
+    <div>
+      <DropdownMenu.Root open={open} onOpenChange={setOpen}>
+        <div>
+          <DropdownMenu.Trigger
+            className={cx(
+              itemStyles,
+              className,
+              open && 'border dark:border-white/40'
+            )}
           >
-            {availablePasses.slice(0, -1).map((config, i) => (
-              <DropdownMenu.Item
-                className={cx(
-                  itemStyles,
-                  'w-full',
-                  'focus:outline-none',
-                  'dark:focus:bg-neutral-700'
-                )}
-                key={i}
-                onClick={() => {
-                  setSelectedPass(config)
-                }}
-              >
-                <div className={labelStyles}>{config.name}</div>
-                <div className={descriptionStyles}>{config.description}</div>
-              </DropdownMenu.Item>
-            ))}
-          </DropdownMenu.Content>
-        </DropdownMenu.Portal>
-      </div>
-    </DropdownMenu.Root>
+            <div className={labelStyles}>
+              {selectedPassState?.name || 'Select a Civic Pass'}
+            </div>
+            <div className={descriptionStyles}>
+              {selectedPassState?.description || ''}
+            </div>
+            <ChevronDownIcon
+              className={cx(iconStyles, open && '-rotate-180')}
+            />
+          </DropdownMenu.Trigger>
+          <DropdownMenu.Portal>
+            <DropdownMenu.Content
+              className="dark space-y-0.5 z-20 w-5/6 mx-auto lg:max-w-[920px]"
+              sideOffset={2}
+            >
+              {availablePasses.slice(0, -1).map((config, i) => (
+                <DropdownMenu.Item
+                  className={cx(
+                    itemStyles,
+                    'w-full',
+                    'focus:outline-none',
+                    'dark:focus:bg-neutral-700'
+                  )}
+                  key={i}
+                  onClick={() => {
+                    setSelectedPass(config)
+                  }}
+                >
+                  <div className={labelStyles}>{config.name}</div>
+                  <div className={descriptionStyles}>{config.description}</div>
+                </DropdownMenu.Item>
+              ))}
+            </DropdownMenu.Content>
+          </DropdownMenu.Portal>
+        </div>
+      </DropdownMenu.Root>
+      {!selectedPassState.isSybilResistance && (
+        <div className="body-sm mt-2">
+          <span className="text-[#5DC9EB]">Warning:</span> This pass type does
+          not provide sybil resistance.
+        </div>
+      )}
+    </div>
   )
 }
