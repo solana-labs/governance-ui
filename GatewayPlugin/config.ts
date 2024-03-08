@@ -33,7 +33,7 @@ export const availablePasses: {
       'Set up your own custom verification (contact Civic.com for options)',
     isSybilResistance: false,
   },
-] as const
+]
 
 // Infer the types from the available passes, giving type safety on the `other` and `default` pass types
 type ArrayElement<
