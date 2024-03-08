@@ -66,7 +66,7 @@ export const useVoterWeightPlugins = (
   const mintInfo = useMintInfoByPubkeyQuery(args.governanceMintPublicKey).data?.result;
   const tokenOwnerRecord = useTokenOwnerRecord(args.governanceMintPublicKey);
   const { data: plugins } = usePlugins(args)
-  const { data: calculatedVoterWeight} = useCalculatedVoterWeight({
+  const { result: calculatedVoterWeight} = useCalculatedVoterWeight({
     ...args,
     plugins,
     tokenOwnerRecord,
@@ -158,6 +158,8 @@ export const useVoterWeightPlugins = (
   // otherwise, if the realm exists, and the governance mint does not, we have nothing to load
   // an example of this is a realm with no council token.
   const isReady = plugins !== undefined || (!!realmPublicKey && !governanceMintPublicKey)
+
+  console.log("useVoterWeightPlugins calculatedVoterWeight", calculatedVoterWeight)
 
   return {
     isReady,
