@@ -28,6 +28,7 @@ type CreateWithPlugin = {
   coefficientA: number
   coefficientB: number
   coefficientC: number
+  civicPass: string
 }
 type TokenizedRealm = Web3Context & RealmCreation & CreateWithPlugin
 
@@ -88,7 +89,9 @@ export default async function createTokenizedRealm({
 
     if (pluginList.includes('gateway')) {
       // By default, use Civic's uniqueness pass. TODO allow this to be overridden in advanced mode.
-      const passType = new PublicKey(defaultSybilResistancePass.value)
+      const passType = new PublicKey(
+        params.civicPass || defaultSybilResistancePass.value
+      )
 
       const { pluginProgramId, instructions } = await addGatewayPlugin(
         connection,

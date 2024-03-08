@@ -95,6 +95,7 @@ const transformFormData2RealmCreation = (formData: CommunityTokenForm) => {
       coefficientA: formData.coefficientA,
       coefficientB: formData.coefficientB,
       coefficientC: formData.coefficientC,
+      civicPass: formData.civicPass,
     },
     ...(formData._programVersion === 3
       ? ({

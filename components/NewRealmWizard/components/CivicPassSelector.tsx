@@ -1,7 +1,9 @@
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 interface Props {
   className?: string
+  selectedPass: string
+  onPassSelected: (string) => void
 }
 import cx from '@hub/lib/cx'
 import { availablePasses } from 'GatewayPlugin/config'
@@ -15,7 +17,8 @@ const itemStyles = cx(
   'grid',
   'h-14',
   'items-center',
-  'pl-4',
+  'px-4',
+  'w-full',
   'rounded-md',
   'text-left',
   'transition-colors',
@@ -26,10 +29,21 @@ const itemStyles = cx(
 
 const labelStyles = cx('font-700', 'dark:text-neutral-50', 'w-full')
 const iconStyles = cx('fill-neutral-500', 'h-5', 'transition-transform', 'w-4')
+const descriptionStyles = cx('dark:text-neutral-400 text-sm')
 
-export default function CivicPassSelector({ className }: Props) {
+export default function CivicPassSelector({
+  className,
+  selectedPass,
+  onPassSelected,
+}: Props) {
   const [open, setOpen] = useState(false)
-  const [selectedPass, setSelectedPass] = useState(availablePasses[0])
+  const [selectedPassState, setSelectedPass] = useState(availablePasses[0])
+
+  useEffect(() => {
+    onPassSelected(selectedPassState.value)
+    console.log(111, 'setting pass', selectedPassState.value)
+  }, [onPassSelected, selectedPassState.value])
+
   return (
     <DropdownMenu.Root open={open} onOpenChange={setOpen}>
       <div>
@@ -41,13 +55,16 @@ export default function CivicPassSelector({ className }: Props) {
           )}
         >
           <div className={labelStyles}>
-            {selectedPass?.name || 'Select a Civic Pass'}
+            {selectedPassState?.name || 'Select a Civic Pass'}
+          </div>
+          <div className={descriptionStyles}>
+            {selectedPassState?.description || ''}
           </div>
           <ChevronDownIcon className={cx(iconStyles, open && '-rotate-180')} />
         </DropdownMenu.Trigger>
         <DropdownMenu.Portal>
           <DropdownMenu.Content
-            className="dark space-y-0.5 z-20"
+            className="dark space-y-0.5 z-20 w-5/6 mx-auto lg:max-w-[920px]"
             sideOffset={2}
           >
             {availablePasses.slice(0, -1).map((config, i) => (
@@ -60,13 +77,11 @@ export default function CivicPassSelector({ className }: Props) {
                 )}
                 key={i}
                 onClick={() => {
-                  // setSelectedPass(config)
-                  // onPassTypeChange(
-                  //   config?.value ? new PublicKey(config.value) : undefined
-                  // )
+                  setSelectedPass(config)
                 }}
               >
                 <div className={labelStyles}>{config.name}</div>
+                <div className={descriptionStyles}>{config.description}</div>
               </DropdownMenu.Item>
             ))}
           </DropdownMenu.Content>

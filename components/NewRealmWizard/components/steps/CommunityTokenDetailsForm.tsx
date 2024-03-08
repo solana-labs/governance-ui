@@ -83,6 +83,7 @@ export interface CommunityToken {
   coefficientA: number
   coefficientB: number
   coefficientC: number
+  civicPass: string
   useSupplyFactor: boolean
   communityAbsoluteMaxVoteWeight?: number
 }
@@ -401,12 +402,21 @@ export default function CommunityTokenForm({
                 <i>Changes advised for advanced users only</i>
               </p>
             </div>
-            <FormField
-              title="Civic Pass verification"
-              description="Configures the type of pass it will be used."
-            >
-              <CivicPassSelector />
-            </FormField>
+            <Controller
+              name="civicPass"
+              control={control}
+              defaultValue={''}
+              render={({ field }) => (
+                <FormField title="Civic Pass verification">
+                  <div className="mt-2 mb-6">
+                    <CivicPassSelector
+                      selectedPass={field.value}
+                      onPassSelected={field.onChange}
+                    />
+                  </div>
+                </FormField>
+              )}
+            />
 
             <FormField
               title="Quadratic Coefficients"
