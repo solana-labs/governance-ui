@@ -22,7 +22,7 @@ const DEFAULT_NFT_VOTER_PLUGIN_VERSION = ON_NFT_VOTER_V2
     : DEFAULT_NFT_VOTER_PLUGIN
 
 export abstract class NftVoterClient extends Client<any> {
-  readonly requiresInputVoterWeight = true;
+  readonly requiresInputVoterWeight = false;
 
   getMaxVoterWeightRecordPDA(realm: PublicKey, mint: PublicKey): {
     maxVoterWeightPk: PublicKey;
