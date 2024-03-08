@@ -41,7 +41,6 @@ export default function CivicPassSelector({
 
   useEffect(() => {
     onPassSelected(selectedPassState.value)
-    console.log(111, 'setting pass', selectedPassState.value)
   }, [onPassSelected, selectedPassState.value])
 
   return (
