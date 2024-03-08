@@ -1,4 +1,5 @@
 import ChevronDownIcon from '@carbon/icons-react/lib/ChevronDown';
+import { GATEWAY_PLUGINS_PKS, QV_PLUGINS_PKS } from '@constants/plugins';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
@@ -27,14 +28,12 @@ export const DEFAULT_VSR_CONFIG = {
 };
 
 export const DEFAULT_CIVIC_CONFIG = {
-  votingProgramId: new PublicKey(
-    'GgathUhdrCWRHowoRKACjgWhYHfxCEdBi5ViqYN6HVxk',
-  ),
+  votingProgramId: new PublicKey(GATEWAY_PLUGINS_PKS[0]),
   maxVotingProgramId: undefined,
 };
 
 export const DEFAULT_QV_CONFIG = {
-  votingProgramId: new PublicKey('quadCSapU8nTdLg73KHDnmdxKnJQsh7GUbu5tZfnRRr'),
+  votingProgramId: new PublicKey(QV_PLUGINS_PKS[0]),
   maxVotingProgramId: undefined, // the QV plugin does not use a max voting weight record.
 };
 
