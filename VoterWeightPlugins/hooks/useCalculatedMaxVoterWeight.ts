@@ -21,6 +21,7 @@ export const useCalculatedMaxVoterWeight = (args: Args): UseAsyncReturn<Calculat
         [
             args.realmPublicKey?.toString(),
             args.governanceMintPublicKey?.toString(),
-            args.mintInfo
+            args.mintInfo,
+            args.plugins?.length
         ],
     )
