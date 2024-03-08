@@ -384,17 +384,20 @@ export default function CommunityTokenForm({
         />
 
         {isQuadratic && (
-          <div className="pt-3">
-            <div className="flex mb-6 items-center">
+          <AdvancedOptionsDropdown
+            title="Quadratic Configuration"
+            icon={
               <CogIcon
                 width={24}
                 height={24}
                 color="#5DC9EB"
                 className="mr-2"
               />
-              <p className="body-base mr-1">Quadratic Configuration</p>
-              <p className="pl-1 border-l-2 border-gray-500 body-small">
-                Changes advised for <i>advanced users only</i>
+            }
+          >
+            <div className="flex mb-4 items-center">
+              <p className="pl-1 border-gray-500 body-small mb-4">
+                <i>Changes advised for advanced users only</i>
               </p>
             </div>
 
@@ -487,7 +490,7 @@ export default function CommunityTokenForm({
                 )}
               />
             </div>
-          </div>
+          </AdvancedOptionsDropdown>
         )}
       </AdvancedOptionsDropdown>
 
