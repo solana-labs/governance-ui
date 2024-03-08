@@ -17,6 +17,7 @@ import { GoverningTokenRole } from '@solana/spl-governance'
 import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import { BN } from '@coral-xyz/anchor'
+import { GatewayStatus, useGateway } from '@civic/solana-gateway-react'
 
 interface Props {
   className?: string
@@ -81,6 +82,9 @@ export default function PluginVotingPower({ role, className }: Props) {
   )
 
   const { communityWeight, councilWeight } = useRealmVoterWeights()
+  const { gatewayStatus } = useGateway()
+  const isQVEnabled = plugins?.some((p) => p.name === 'QV')
+  const isGatewayEnabled = plugins?.some((p) => p.name === 'gateway')
 
   const hasAnyVotingPower =
     councilWeight?.value?.gt(new BN(0)) && communityWeight?.value?.gt(new BN(0))
@@ -98,7 +102,7 @@ export default function PluginVotingPower({ role, className }: Props) {
 
   return (
     <div>
-      {hasAnyVotingPower && plugins?.some((p) => p.name === 'QV') && (
+      {hasAnyVotingPower && isQVEnabled && (
         <div className="flex items-center mb-2">
           <p className="mb-1">Quadratic Voting</p>
           <QuadraticVotingInfoModal
@@ -110,8 +114,8 @@ export default function PluginVotingPower({ role, className }: Props) {
         </div>
       )}
       <div className={'p-3 rounded-md bg-bkg-1'}>
-        <div className="flex items-center justify-between mt-1">
-          <div className={clsx(className)}>
+        <div className="flex items-center justify-between mt-1 w-full">
+          <div className={`${clsx(className)} w-full`}>
             <div className="flex flex-col">
               <div className="text-fgd-3 text-xs">
                 {tokenName}
@@ -126,16 +130,19 @@ export default function PluginVotingPower({ role, className }: Props) {
                 </p>
               </div>
             </div>
-            <div className="text-xl font-bold text-fgd-1 hero-text">
-              {/* Replace "Deposit" button with Join/Update button when a user needs to update */}
-              {/* Add copy explaining that user needds to update to vote */}
-              <TokenDeposit
-                mint={mintInfo}
-                tokenRole={GoverningTokenRole.Community}
-                inAccountDetails={true}
-                hideVotes={true}
-              />
-            </div>
+            {!isGatewayEnabled ||
+              (gatewayStatus === GatewayStatus.ACTIVE && (
+                <div className="text-xl font-bold text-fgd-1 hero-text">
+                  {/* Replace "Deposit" button with Join/Update button when a user needs to update */}
+                  {/* Add copy explaining that user needds to update to vote */}
+                  <TokenDeposit
+                    mint={mintInfo}
+                    tokenRole={GoverningTokenRole.Community}
+                    inAccountDetails={true}
+                    hideVotes={true}
+                  />
+                </div>
+              ))}
           </div>
         </div>
       </div>

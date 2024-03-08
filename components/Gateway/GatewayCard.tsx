@@ -6,11 +6,14 @@ import { useState } from 'react'
 import { useGatewayVoterWeightPlugin } from '../../VoterWeightPlugins'
 import { useRealmVoterWeights } from '@hooks/useRealmVoterWeightPlugins'
 import { BN } from '@coral-xyz/anchor'
+import { GatewayStatus, useGateway } from '@civic/solana-gateway-react'
 
 const GatewayCard = () => {
   const [showGatewayModal, setShowGatewayModal] = useState(false)
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
+  const { gatewayStatus } = useGateway()
+
   const {
     gatekeeperNetwork,
     isReady,
@@ -54,7 +57,9 @@ const GatewayCard = () => {
             hasTokens && <GatewayButton />}
         </div>
         <p className="text-fgd-3 mt-2">
-          Verify your personhood with Civic Pass to vote.
+          {gatewayStatus === GatewayStatus.ACTIVE
+            ? 'You are approved to vote'
+            : 'Verify your personhood with Civic Pass to vote.'}
         </p>
         {showGatewayModal && (
           <Modal
