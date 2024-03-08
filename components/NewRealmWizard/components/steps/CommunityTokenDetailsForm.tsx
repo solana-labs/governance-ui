@@ -133,7 +133,7 @@ export default function CommunityTokenForm({
         new PublicKey(communityTokenMintAddress),
         connection
       )
-      setValue('coefficientA', coefficients[0])
+      setValue('coefficientA', coefficients[0].toFixed(2))
       setValue('coefficientB', coefficients[1])
       setValue('coefficientC', coefficients[2])
     }
