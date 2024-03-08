@@ -243,7 +243,7 @@ export default function WizardSummary({
         {formData?.isQuadratic && (
           <SummaryModule title="Voting plugins">
             <Text level="0" className="input-base">
-              Civic Plugin using Identity Verification
+              Civic Plugin
             </Text>
             <Text level="0" className="input-base">
               Quadractic Voting Plugin
