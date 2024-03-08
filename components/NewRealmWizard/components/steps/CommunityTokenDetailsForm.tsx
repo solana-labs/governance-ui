@@ -18,6 +18,7 @@ import TokenInput, { TokenWithMintInfo, COMMUNITY_TOKEN } from '../TokenInput'
 import { getCoefficients } from '../../../../actions/addPlugins/addQVPlugin'
 import { useConnection } from '@solana/wallet-adapter-react'
 import { PublicKey } from '@solana/web3.js'
+import CivicPassSelector from '../CivicPassSelector'
 
 export const CommunityTokenSchema = {
   useExistingCommunityToken: yup
@@ -400,6 +401,12 @@ export default function CommunityTokenForm({
                 <i>Changes advised for advanced users only</i>
               </p>
             </div>
+            <FormField
+              title="Civic Pass verification"
+              description="Configures the type of pass it will be used."
+            >
+              <CivicPassSelector />
+            </FormField>
 
             <FormField
               title="Quadratic Coefficients"
