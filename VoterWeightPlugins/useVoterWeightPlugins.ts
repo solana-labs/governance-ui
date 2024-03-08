@@ -159,8 +159,6 @@ export const useVoterWeightPlugins = (
   // an example of this is a realm with no council token.
   const isReady = plugins !== undefined || (!!realmPublicKey && !governanceMintPublicKey)
 
-  console.log("useVoterWeightPlugins calculatedVoterWeight", calculatedVoterWeight)
-
   return {
     isReady,
     updateVoterWeightRecords,
