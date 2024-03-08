@@ -5,12 +5,13 @@ import {
   QuadraticClient,
 } from '@solana/governance-program-library'
 
-import {Provider} from '@coral-xyz/anchor'
-import {PythVoterWeightPluginClient} from "./PythVoterWeightPluginClient";
-import {PublicKey} from "@solana/web3.js";
-import {VsrClient} from "../../VoteStakeRegistry/sdk/client";
-import {NftVoterClient} from "@utils/uiTypes/NftVoterClient";
-import {HeliumVsrClient} from "../../HeliumVotePlugin/sdk/client";
+import { Provider } from '@coral-xyz/anchor'
+import { PythVoterWeightPluginClient } from './PythVoterWeightPluginClient'
+import { PublicKey } from '@solana/web3.js'
+import { VsrClient } from '../../VoteStakeRegistry/sdk/client'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
+import { HeliumVsrClient } from '../../HeliumVotePlugin/sdk/client'
+import { DriftVoterClient } from 'DriftStakeVoterPlugin/DriftVoterClient'
 
 /**
  * Given a plugin name and program ID, load the appropriate client
@@ -19,7 +20,11 @@ import {HeliumVsrClient} from "../../HeliumVotePlugin/sdk/client";
  * @param programId
  * @param provider
  */
-export const loadClient = (plugin: PluginName, programId: PublicKey, provider: Provider): Promise<Client<any>> => {
+export const loadClient = (
+  plugin: PluginName,
+  programId: PublicKey,
+  provider: Provider
+): Promise<Client<any>> => {
   switch (plugin) {
     case 'QV':
       return QuadraticClient.connect(provider)
@@ -33,6 +38,8 @@ export const loadClient = (plugin: PluginName, programId: PublicKey, provider: P
       return HeliumVsrClient.connect(provider, programId)
     case 'NFT':
       return NftVoterClient.connect(provider, programId)
+    case 'drift':
+      return DriftVoterClient.connect(provider, programId)
     default:
       throw new Error(`Unsupported plugin ${plugin}`)
   }

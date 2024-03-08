@@ -1,6 +1,7 @@
 import { PROGRAM_ID as HELIUM_VSR_PROGRAM_ID } from '@helium/voter-stake-registry-sdk'
 import { PublicKey } from '@solana/web3.js'
 import { DEFAULT_NFT_VOTER_PLUGIN } from '@tools/constants'
+import { DRIFT_STAKE_VOTER_PLUGIN } from 'DriftStakeVoterPlugin/constants'
 
 export const VSR_PLUGIN_PKS: string[] = [
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo',
@@ -34,6 +35,8 @@ export const PYTH_PLUGIN_PK: string[] = [
   'pytS9TjG1qyAZypk7n8rw8gfW9sUaqqYyMhJQ4E7JCQ',
 ]
 
+export const DRIFT_PLUGIN_PK = [DRIFT_STAKE_VOTER_PLUGIN]
+
 export type PluginName =
   | 'gateway'
   | 'QV'
@@ -42,6 +45,7 @@ export type PluginName =
   | 'HeliumVSR'
   | 'NFT'
   | 'pyth'
+  | 'drift'
   | 'unknown'
 
 export const findPluginName = (programId: PublicKey | undefined): PluginName =>
@@ -59,4 +63,6 @@ export const findPluginName = (programId: PublicKey | undefined): PluginName =>
     ? 'QV'
     : PYTH_PLUGIN_PK.includes(programId.toString())
     ? 'pyth'
+    : DRIFT_PLUGIN_PK.includes(programId.toString())
+    ? 'drift'
     : 'unknown'
