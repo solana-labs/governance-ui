@@ -7,6 +7,8 @@ import { useGatewayVoterWeightPlugin } from '../../VoterWeightPlugins'
 import { useRealmVoterWeights } from '@hooks/useRealmVoterWeightPlugins'
 import { BN } from '@coral-xyz/anchor'
 import { GatewayStatus, useGateway } from '@civic/solana-gateway-react'
+import useUserGovTokenAccountQuery from '@hooks/useUserGovTokenAccount'
+import BigNumber from 'bignumber.js'
 
 const GatewayCard = () => {
   const [showGatewayModal, setShowGatewayModal] = useState(false)
@@ -21,9 +23,13 @@ const GatewayCard = () => {
   } = useGatewayVoterWeightPlugin()
   const { communityWeight, councilWeight } = useRealmVoterWeights()
 
+  const userAta = useUserGovTokenAccountQuery('community').data?.result
+  const depositAmount = userAta?.amount
+    ? new BigNumber(userAta.amount.toString())
+    : new BigNumber(0)
+
   const hasTokens =
-    (councilWeight?.details && councilWeight?.details.length > 0) ||
-    (communityWeight?.details && communityWeight?.details.length > 0) ||
+    depositAmount.isGreaterThan(0) ||
     councilWeight?.value?.gt(new BN(0)) ||
     communityWeight?.value?.gt(new BN(0))
 
