@@ -94,7 +94,8 @@ const GatewayCard = () => {
                 <div>
                   <h2>Verify Identity</h2>
                   <div>
-                    Verify yourself using Civic Pass to prevent voting abuse.
+                    Verify your identity using Civic Pass to prevent voting
+                    abuse, such as Sybil attacks.
                   </div>
                 </div>
               </div>
@@ -104,10 +105,7 @@ const GatewayCard = () => {
                 </div>
                 <div>
                   <h3>Vote</h3>
-                  <div>
-                    Connect the wallet with your governance token(s).
-                    Consolidate multiple tokens into one wallet before voting.
-                  </div>
+                  <div>Vote with confidence in a fair system.</div>
                 </div>
               </div>
             </div>

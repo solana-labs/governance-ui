@@ -403,7 +403,7 @@ export default function CommunityTokenForm({
 
             <FormField
               title="Quadratic Coefficients"
-              description="Configures the quadratic voting formulate influencing coefficients, which change the weight of votes."
+              description="Configures the quadratic voting formulae influencing coefficients, which change the weight of votes."
             >
               <div className="mb-4 flex mt-[-16px]">
                 <p className="mr-1">See Docs</p>
