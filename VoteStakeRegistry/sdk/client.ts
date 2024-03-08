@@ -79,6 +79,21 @@ export class VsrClient extends Client<typeof IDL> {
         .instruction()
   }
 
+  async getVoterWeightRecord(realm: PublicKey, mint: PublicKey, voter: PublicKey) {
+      const {registrar} = this.getRegistrarPDA(realm, mint);
+      // This is a workaround for the fact that the VSR program IDL does not include the voterWeightRecord account
+      const votingPower = await fetchVotingPower(
+          this.program.provider.connection,
+          this.program.programId,
+          registrar,
+          voter
+      )
+
+      const power = votingPower.result ?? new BN(0);
+
+      return { voterWeight: power };
+  }
+
   // NO-OP
   async createMaxVoterWeightRecord(): Promise<TransactionInstruction | null> {
     return null;

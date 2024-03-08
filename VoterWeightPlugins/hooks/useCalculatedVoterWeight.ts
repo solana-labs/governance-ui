@@ -28,6 +28,7 @@ export const useCalculatedVoterWeight = (args: Args) : UseAsyncReturn<Calculated
             args.realmPublicKey?.toString(),
             args.governanceMintPublicKey?.toString(),
             args.walletPublicKey?.toString(),
-            args.tokenOwnerRecord?.pubkey.toString()
+            args.tokenOwnerRecord?.pubkey.toString(),
+            args.plugins?.length
         ]
     )
