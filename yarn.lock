@@ -649,10 +649,10 @@
     "@identity.com/sol-did-client" "^3.1.4"
     "@project-serum/anchor" "^0.25.0"
 
-"@civic/identity-store-client@*":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@civic/identity-store-client/-/identity-store-client-0.1.1.tgz#7d42e170c45e18fa6188f6ddb3940a6417c64e13"
-  integrity sha512-2F3v4/BYngAZmAW06QjPyFFk5eM4Nr0rcF+3h6ODCLgM3WileeHZqdGNkqjOoA97zeO6nDHOaClgYHSVg3xxgA==
+"@civic/identity-store-client@0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@civic/identity-store-client/-/identity-store-client-0.1.2.tgz#a9c836a0ea2044b63735b8474f125ad5a9aec111"
+  integrity sha512-GQU6Ge72aue7fXIkfEiYcUe9XZ35OJHq4Pj6ZWa60EwZMXnB+295pu8Xqjke2tEPPhl895zBUJ793BRNs6RCQA==
   dependencies:
     isomorphic-fetch "^3.0.0"
     querystring "^0.2.1"
@@ -664,14 +664,14 @@
   dependencies:
     caip "~1.1.0"
 
-"@civic/profile@0.5.1":
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/@civic/profile/-/profile-0.5.1.tgz#90242b4c64c24bbd2d5d4bebc38dfa6fe396b520"
-  integrity sha512-820RnslrLRDRJHmW+4m4v0u7v6XERWm+Rc+Qch0R7HnZardhFoyosqu+utnUUE0hkbmO0u+t1SndjLlpbk3bAQ==
+"@civic/profile@0.5.2":
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/@civic/profile/-/profile-0.5.2.tgz#2a8663b4d2f358b71f7a21f4b2970250eca2b3d2"
+  integrity sha512-F6Nrq7/4t5yaRR8Y3q+f17DW0+/enZXH0sl/r/5MmJJ3LeWB1zHC37TkehtK6HKjKxUxvtPrpoNWiiu39BQsPQ==
   dependencies:
     "@bonfida/spl-name-service" "^1.0.6"
     "@civic/did-registry" "0.0.6-alpha.2"
-    "@civic/identity-store-client" "*"
+    "@civic/identity-store-client" "0.1.2"
     "@civic/pkh-did-resolver" "^1.2.0"
     "@civic/storage-adapter" "*"
     "@ethersproject/address" "^5.7.0"

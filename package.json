@@ -37,7 +37,7 @@
     "@bonfida/spl-name-service": "0.1.47",
     "@bundlr-network/client": "0.7.15",
     "@carbon/icons-react": "11.7.0",
-    "@civic/profile": "0.5.1",
+    "@civic/profile": "0.5.2",
     "@civic/solana-gateway-react": "0.15.0",
     "@coral-xyz/anchor": "0.27.0",
     "@coral-xyz/borsh": "0.27.0",
