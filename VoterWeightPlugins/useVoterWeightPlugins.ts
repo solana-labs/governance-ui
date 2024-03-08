@@ -71,7 +71,7 @@ export const useVoterWeightPlugins = (
     plugins,
     tokenOwnerRecord,
   })
-  const { data: calculatedMaxVoterWeight} = useCalculatedMaxVoterWeight({
+  const { result: calculatedMaxVoterWeight} = useCalculatedMaxVoterWeight({
     ...args,
     plugins,
     mintInfo,
