@@ -118,9 +118,9 @@ export function QVConfigurator({ className, onCoefficientsChange }: Props) {
           </div>
           <div className="mt-2 mb-4 text-sm dark:text-neutral-500">
             Advanced Option: Defaults have been set to an appropriate curve
-            based on the community token. Please take a look at the realms
-            documentation to understand how changing the quadratic forumla will
-            effect voting.
+            based on the community token. Please take a look at the Realms
+            documentation to understand how changing the quadratic formula will
+            affect voting.
           </div>
         </div>
       </div>
