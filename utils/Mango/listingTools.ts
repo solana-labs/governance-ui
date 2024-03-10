@@ -62,6 +62,7 @@ export type FlatListingArgs = {
   maintLiabWeight: number
   initLiabWeight: number
   liquidationFee: number
+  platformLiquidationFee: number
   minVaultToDepositsRatio: number
   netBorrowLimitPerWindowQuote: number
   netBorrowLimitWindowSizeTs: number
@@ -101,6 +102,7 @@ export type FlatEditArgs = {
   maintLiabWeightOpt: number
   initLiabWeightOpt: number
   liquidationFeeOpt: number
+  platformLiquidationFeeOpt: number
   minVaultToDepositsRatioOpt: number
   netBorrowLimitPerWindowQuoteOpt: number
   netBorrowLimitWindowSizeTsOpt: number
@@ -144,6 +146,7 @@ export type ListingArgsFormatted = {
   maintLiabWeight: string
   initLiabWeight: string
   liquidationFee: string
+  platformLiquidationFee: string
   minVaultToDepositsRatio: string
   netBorrowLimitPerWindowQuote: number
   netBorrowLimitWindowSizeTs: number
@@ -717,6 +720,9 @@ export const getFormattedBankValues = (group: Group, bank: Bank) => {
       6
     ),
     liquidationFee: (bank.liquidationFee.toNumber() * 100).toFixed(2),
+    platformLiquidationFee: (
+      bank.platformLiquidationFee.toNumber() * 100
+    ).toFixed(2),
     netBorrowLimitWindowSizeTs: secondsToHours(
       bank.netBorrowLimitWindowSizeTs.toNumber()
     ),
