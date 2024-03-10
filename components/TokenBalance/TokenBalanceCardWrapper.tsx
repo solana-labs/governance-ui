@@ -69,7 +69,7 @@ const TokenBalanceCardInner = ({
 }) => {
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const { plugins } = useRealmVoterWeightPlugins('community')
-  const requiredCards = plugins?.map((plugin) => plugin.name)
+  const requiredCards = plugins?.voterWeight.map((plugin) => plugin.name)
 
   const showHeliumCard = requiredCards?.includes('HeliumVSR')
   const showDefaultVSRCard = requiredCards?.includes('VSR')

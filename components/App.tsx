@@ -110,7 +110,7 @@ export function AppContents(props: Props) {
   const { getOwnedDeposits, resetDepositState } = useDepositStore()
 
   const { plugins } = useRealmVoterWeightPlugins('community')
-  const usesVsr = plugins?.find((plugin) =>
+  const usesVsr = plugins?.voterWeight.find((plugin) =>
     VSR_PLUGIN_PKS.includes(plugin.programId.toString())
   )
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result

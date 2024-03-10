@@ -47,7 +47,7 @@ export const getVsrGovpower = async (
 ) => {
   const { result: realm } = await fetchRealmByPubkey(connection, realmPk)
   if (realm === undefined) throw new Error()
-  const plugin = await getPluginClientCached(realmPk, connection, 'VSR');
+  const plugin = await getPluginClientCached(realmPk, connection, 'VSR', 'voterWeight');
   const votingPower =await plugin?.client?.calculateVoterWeight(
     walletPk,
     realmPk,

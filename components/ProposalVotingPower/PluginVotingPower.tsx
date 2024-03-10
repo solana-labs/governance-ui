@@ -83,8 +83,8 @@ export default function PluginVotingPower({ role, className }: Props) {
 
   const { communityWeight, councilWeight } = useRealmVoterWeights()
   const { gatewayStatus } = useGateway()
-  const isQVEnabled = plugins?.some((p) => p.name === 'QV')
-  const isGatewayEnabled = plugins?.some((p) => p.name === 'gateway')
+  const isQVEnabled = plugins?.voterWeight.some((p) => p.name === 'QV')
+  const isGatewayEnabled = plugins?.voterWeight.some((p) => p.name === 'gateway')
 
   const hasAnyVotingPower =
     councilWeight?.value?.gt(new BN(0)) && communityWeight?.value?.gt(new BN(0))

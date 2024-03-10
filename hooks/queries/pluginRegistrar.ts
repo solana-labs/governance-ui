@@ -5,9 +5,9 @@ import EmptyWallet from "@utils/Mango/listingTools";
 import {Connection, Keypair, PublicKey} from "@solana/web3.js";
 import {fetchRealmByPubkey} from "@hooks/queries/realm";
 import {PluginName} from "@constants/plugins";
-import {VoterWeightPluginInfo} from "../../VoterWeightPlugins/lib/types";
+import {PluginType, VoterWeightPluginInfo} from "../../VoterWeightPlugins/lib/types";
 
-export const getPluginClientCached = async (realmPk: PublicKey, connection: Connection, pluginName: PluginName): Promise<VoterWeightPluginInfo | undefined> => {
+export const getPluginClientCached = async (realmPk: PublicKey, connection: Connection, pluginName: PluginName, type: PluginType): Promise<VoterWeightPluginInfo | undefined> => {
     const realm = fetchRealmByPubkey(connection, realmPk)
     const plugins = await queryClient.fetchQuery({
         queryKey: ['getCommunityPluginsWithoutWallet', realmPk.toString()],
@@ -18,6 +18,7 @@ export const getPluginClientCached = async (realmPk: PublicKey, connection: Conn
                 realmPublicKey: realmPk,
                 governanceMintPublicKey: result.account.communityMint,
                 provider: new AnchorProvider(connection, new EmptyWallet(Keypair.generate()), AnchorProvider.defaultOptions()),
+                type,
             })
         }
     });
@@ -25,7 +26,7 @@ export const getPluginClientCached = async (realmPk: PublicKey, connection: Conn
     return plugins.find((x) => x.name === pluginName);
 }
 
-export const getPluginRegistrarCientCached = async <T extends Idl>(realmPk: PublicKey, connection: Connection, pluginName: PluginName): Promise<IdlAccounts<T>['registrar'] | undefined> => {
-    const plugin = await getPluginClientCached(realmPk, connection, pluginName);
+export const getPluginRegistrarCientCached = async <T extends Idl>(realmPk: PublicKey, connection: Connection, pluginName: PluginName, type: PluginType = 'voterWeight'): Promise<IdlAccounts<T>['registrar'] | undefined> => {
+    const plugin = await getPluginClientCached(realmPk, connection, pluginName, type);
     return plugin?.params as IdlAccounts<T>['registrar'] | undefined;
 }

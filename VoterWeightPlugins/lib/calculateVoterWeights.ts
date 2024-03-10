@@ -107,8 +107,12 @@ export const calculateMaxVoterWeight = async ({
     const reducer = async (inputVoterWeight: CalculatedWeight, nextPlugin: VoterWeightPluginInfo): Promise<CalculatedWeight> => {
         if (inputVoterWeight.value === null) return inputVoterWeight;
 
+        console.log("Input max weight", inputVoterWeight.value.toString());
+
         try {
             const nextWeight = await nextPlugin.client.calculateMaxVoterWeight(realmPublicKey, governanceMintPublicKey, inputVoterWeight.value);
+            console.log("After plugin", nextPlugin.name, "max weight is", nextWeight?.toString());
+
             return handlePluginSuccess(inputVoterWeight, nextPlugin, nextWeight);
         } catch (error) {
             return handlePluginError(inputVoterWeight, nextPlugin, error);
