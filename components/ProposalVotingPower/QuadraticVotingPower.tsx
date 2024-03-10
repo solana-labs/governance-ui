@@ -24,7 +24,7 @@ interface Props {
   role: 'community' | 'council'
 }
 
-export default function PluginVotingPower({ role, className }: Props) {
+export default function QuadraticVotingPower({ role, className }: Props) {
   const realm = useRealmQuery().data?.result
   const { data: activeMembersData } = useMembersQuery()
 

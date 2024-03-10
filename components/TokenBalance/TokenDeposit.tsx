@@ -13,7 +13,7 @@ import {
 } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
-import VanillaVotingPower from '@components/GovernancePower/Vanilla/VanillaVotingPower'
+import VanillaVotingPower from '@components/GovernancePower/Power/Vanilla/VanillaVotingPower'
 import { DepositTokensButton } from '@components/DepositTokensButton'
 import VanillaWithdrawTokensButton from './VanillaWithdrawTokensButton'
 import Button from '@components/Button'

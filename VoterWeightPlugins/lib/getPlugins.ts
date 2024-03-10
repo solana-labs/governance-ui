@@ -24,11 +24,11 @@ const getInitialPluginProgramId = async (
 }
 
 export const getPlugins = async ({
-  realmPublicKey,
-  governanceMintPublicKey,
-  provider,
-  type
-}: {
+                                   realmPublicKey,
+                                   governanceMintPublicKey,
+                                   provider,
+                                   type
+                                 }: {
   realmPublicKey: PublicKey
   governanceMintPublicKey: PublicKey
   provider: Provider
@@ -37,60 +37,55 @@ export const getPlugins = async ({
   const plugins: VoterWeightPluginInfo[] = []
   let programId = await getInitialPluginProgramId(realmPublicKey, governanceMintPublicKey, provider.connection, type)
 
-  let pluginName = ''
-
   if (programId) {
     // build plugin list till we get null, which means we are at the end of the plugin chain
     do {
-      pluginName = findPluginName(programId)
-      if (pluginName) {
-        const client = await loadClient(
-            pluginName as PluginName,
-            programId,
-            provider
-        )
+      const pluginName = findPluginName(programId)
+      const client = await loadClient(
+          pluginName as PluginName,
+          programId,
+          provider
+      )
 
-        let weight: BN | undefined;
-        if (type === 'voterWeight') {
-
-
-          const voterWeightRecord = (await client.getVoterWeightRecord(
-              realmPublicKey,
-              governanceMintPublicKey,
-              provider.publicKey
-          )) as { voterWeight: BN } | null
-          weight = voterWeightRecord?.voterWeight
-        } else {
-          const maxVoterWeightRecord = (await client.getMaxVoterWeightRecord(
-              realmPublicKey,
-              governanceMintPublicKey
-          )) as { maxVoterWeight: BN } | null // TODO fix up typing on these clients
-          weight = maxVoterWeightRecord?.maxVoterWeight
-        }
-
-        const { registrar: registrarPublicKey } = await getPluginRegistrarPDA(
+      // obtain the currently stored on-chain voter weight or max voter weight depending on the passed-in type
+      let weight: BN | undefined;
+      if (type === 'voterWeight') {
+        const voterWeightRecord = (await client.getVoterWeightRecord(
             realmPublicKey,
             governanceMintPublicKey,
-            programId
-        )
-
-        const registrarData = await client.getRegistrarAccount(
+            provider.publicKey
+        )) as { voterWeight: BN } | null
+        weight = voterWeightRecord?.voterWeight
+      } else {
+        const maxVoterWeightRecord = (await client.getMaxVoterWeightRecord(
             realmPublicKey,
             governanceMintPublicKey
-        )
-
-        plugins.push({
-          client,
-          programId,
-          name: pluginName as PluginName,
-          type,
-          weight,
-          registrarPublicKey,
-          params: registrarData ?? {},
-        })
-
-        programId = registrarData?.previousVoterWeightPluginProgramId;
+        )) as { maxVoterWeight: BN } | null
+        weight = maxVoterWeightRecord?.maxVoterWeight
       }
+
+      const { registrar: registrarPublicKey } = getPluginRegistrarPDA(
+          realmPublicKey,
+          governanceMintPublicKey,
+          programId
+      )
+
+      const registrarData = await client.getRegistrarAccount(
+          realmPublicKey,
+          governanceMintPublicKey
+      )
+
+      plugins.push({
+        client,
+        programId,
+        name: pluginName as PluginName,
+        type,
+        weight,
+        registrarPublicKey,
+        params: registrarData ?? {},
+      })
+
+      programId = registrarData?.previousVoterWeightPluginProgramId;
     } while (programId)
   }
 

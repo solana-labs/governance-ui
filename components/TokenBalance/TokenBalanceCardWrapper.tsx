@@ -15,8 +15,8 @@ import SelectPrimaryDelegators from '@components/SelectPrimaryDelegators'
 import PythAccountDetails from 'PythVotePlugin/components/PythAccountDetails'
 import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
 import { ReactNode } from 'react'
-import PluginVotingPower from '@components/ProposalVotingPower/PluginVotingPower'
-import VanillaVotingPower from '@components/GovernancePower/Vanilla/VanillaVotingPower'
+import QuadraticVotingPower from '@components/ProposalVotingPower/QuadraticVotingPower'
+import VanillaVotingPower from '@components/GovernancePower/Power/Vanilla/VanillaVotingPower'
 
 const LockPluginTokenBalanceCard = dynamic(
   () =>
@@ -127,7 +127,7 @@ const TokenBalanceCardInner = ({
       <>
         {inAccountDetails && (
           <>
-            <PluginVotingPower role="community" />
+            <QuadraticVotingPower role="community" />
             <VanillaVotingPower role="council" hideIfZero />
           </>
         )}
