@@ -142,7 +142,7 @@ const BufferAuthorityMismatch = () => (
       </div>
       <div className="ml-3">
         <h3 className="text-sm font-medium text-red-800">
-          Danger alert: The current buffer authority doesn't match the DAO wallet
+          Danger alert: The current buffer authority does not match the DAO wallet
         </h3>
         <div className="mt-2">
           <p className="text-sm text-red-700">
