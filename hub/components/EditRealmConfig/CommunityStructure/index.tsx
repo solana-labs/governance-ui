@@ -42,7 +42,7 @@ interface Props
 
 export function CommunityStructure(props: Props) {
   const { plugins } = useRealmVoterWeightPlugins();
-  const inOrderPlugins = plugins?.reverse();
+  const inOrderPlugins = plugins?.voterWeight.reverse();
 
   const currentVotingStructure = {
     votingProgramId:

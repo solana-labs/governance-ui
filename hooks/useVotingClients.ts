@@ -25,7 +25,7 @@ export const useVotingClients = () => {
         // this only works if the legacy plugins don't support chaining anyway.
         // if they did, then we would have to call relinquish on whichever plugin supported it
         const voterWeightPluginDetails = kind === 'community' ? voterWeightPluginDetailsForCommunity : voterWeightPluginDetailsForCouncil;
-        const client = voterWeightPluginDetails.plugins?.length ? voterWeightPluginDetails.plugins[0].client : undefined;
+        const client = voterWeightPluginDetails.plugins?.voterWeight.length ? voterWeightPluginDetails.plugins.voterWeight[0].client : undefined;
 
         return new VotingClient({
             client: client,

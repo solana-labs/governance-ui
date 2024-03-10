@@ -11,7 +11,7 @@ import VSRCommunityVotingPower from 'VoteStakeRegistry/components/TokenBalance/V
 import DepositCommunityTokensBtn from 'VoteStakeRegistry/components/TokenBalance/DepositCommunityTokensBtn'
 import useDelegators from '@components/VotePanel/useDelegators'
 import {useRealmVoterWeightPlugins} from "@hooks/useRealmVoterWeightPlugins";
-import {CalculatedWeight} from "../../VoterWeightPlugins/lib/types";
+import {CalculatedWeight, VoterWeightPlugins} from "../../VoterWeightPlugins/lib/types";
 import { BN } from '@coral-xyz/anchor'
 
 interface Props {
@@ -20,6 +20,8 @@ interface Props {
 
 const findVSRVoterWeight = (calculatedVoterWeight: CalculatedWeight | undefined): BN|undefined =>
     calculatedVoterWeight?.details.find((detail) => detail.pluginName === 'VSR')?.pluginWeight ?? undefined;
+
+const isVSRLastVoterWeightPlugin = (plugins: VoterWeightPlugins | undefined) => plugins?.voterWeight[plugins.voterWeight.length - 1].name === 'VSR';
 
 export default function LockedCommunityVotingPower(props: Props) {
   const realm = useRealmQuery().data?.result
@@ -36,7 +38,7 @@ export default function LockedCommunityVotingPower(props: Props) {
   // however, if it is one in a chain, we are just showing an intermediate calculation here.
   // This affects how it appears in the UI
   const votingPower = findVSRVoterWeight(calculatedVoterWeight)
-  const isLastVoterWeightPlugin = plugins?.[plugins.length - 1].name === 'VSR';
+  const isLastVoterWeightPlugin = isVSRLastVoterWeightPlugin(plugins);
 
   const isLoading = useDepositStore((s) => s.state.isLoading)
 

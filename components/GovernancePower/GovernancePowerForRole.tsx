@@ -15,15 +15,15 @@ import PythVotingPower from '../../PythVotePlugin/components/PythVotingPower'
 import LockedCommunityNFTRecordVotingPower from '@components/ProposalVotingPower/LockedCommunityNFTRecordVotingPower'
 import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
 import { PluginName } from '@constants/plugins'
-import { VoterWeightPluginInfo } from '../../VoterWeightPlugins/lib/types'
+import {PluginType, VoterWeightPlugins} from '../../VoterWeightPlugins/lib/types'
 import GatewayCard from '@components/Gateway/GatewayCard'
 
 type VotingPowerDisplayType = PluginName | 'composite'
 
-const usesPluginFn = (plugins: VoterWeightPluginInfo[] | undefined) => (
+const usesPluginFn = (plugins: VoterWeightPlugins | undefined, type: PluginType = 'voterWeight') => (
   plugin: PluginName
 ) => {
-  return plugins?.some((p) => p.name === plugin)
+  return plugins?.[type].some((p) => p.name === plugin)
 }
 
 export default function GovernancePowerForRole({
@@ -71,7 +71,7 @@ export default function GovernancePowerForRole({
   >(async () => {
     if (realmPk === undefined) return undefined
     // if there are multiple plugins, show the generic plugin voting power
-    if ((plugins?.length ?? 0) > 1) return 'composite'
+    if ((plugins?.voterWeight.length ?? 0) > 1) return 'composite'
     return determineVotingPowerType(connection, realmPk, role)
   }, [connection, realmPk, role])
 
