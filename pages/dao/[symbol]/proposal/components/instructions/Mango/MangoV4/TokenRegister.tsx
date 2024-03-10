@@ -64,6 +64,8 @@ interface TokenRegisterForm {
   insuranceFound: boolean
   zeroUtilRate: number
   platformLiquidationFee: number
+  disableAssetLiquidation: boolean
+  collateralFeePerDay: number
 }
 
 const TokenRegister = ({
@@ -130,6 +132,8 @@ const TokenRegister = ({
     insuranceFound: false,
     zeroUtilRate: 0,
     platformLiquidationFee: 0,
+    disableAssetLiquidation: false,
+    collateralFeePerDay: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -190,7 +194,9 @@ const TokenRegister = ({
           form.insuranceFound,
           new BN(form.depositLimit),
           Number(form.zeroUtilRate),
-          Number(form.platformLiquidationFee)
+          Number(form.platformLiquidationFee),
+          form.disableAssetLiquidation,
+          Number(form.collateralFeePerDay)
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -569,6 +575,21 @@ const TokenRegister = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'platformLiquidationFee',
+    },
+    {
+      label: 'Disable Asset Liquidation',
+      subtitle: getAdditionalLabelInfo('disableAssetLiquidation'),
+      initialValue: form.disableAssetLiquidation,
+      type: InstructionInputType.SWITCH,
+      name: 'disableAssetLiquidation',
+    },
+    {
+      label: 'Collateral Fee Per Day',
+      subtitle: getAdditionalLabelInfo('collateralFeePerDay'),
+      initialValue: form.collateralFeePerDay,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'collateralFeePerDay',
     },
   ]
 
