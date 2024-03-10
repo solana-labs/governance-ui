@@ -36,7 +36,7 @@ export class UnrecognisedVoterWeightPluginClient extends Client<any> {
         const dummyProgram = new Program(
             {
                 version: "",
-                name: 'dummy',
+                name: 'unrecognised',
                 accounts: [],
                 instructions: []
             }, programId, provider);
