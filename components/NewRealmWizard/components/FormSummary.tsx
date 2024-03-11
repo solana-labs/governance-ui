@@ -246,7 +246,7 @@ export default function WizardSummary({
               Civic Plugin
             </Text>
             <Text level="0" className="input-base">
-              Quadractic Voting Plugin
+              Quadratic Voting Plugin
             </Text>
           </SummaryModule>
         )}
