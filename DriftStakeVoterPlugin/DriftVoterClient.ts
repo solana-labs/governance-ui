@@ -43,8 +43,11 @@ export class DriftVoterClient extends Client<DriftStakeVoter> {
     voter: PublicKey,
     realm: PublicKey,
     mint: PublicKey
+    //action?: VoterWeightAction | undefined,
   ): Promise<BN | null> {
     console.log('drift voter clint', 1)
+
+    // TODO get vanilla weight
 
     const { registrar: registrarPk } = this.getRegistrarPDA(realm, mint)
     const registrar = await this.program.account.registrar.fetch(registrarPk)
