@@ -16,7 +16,7 @@ export const getFeeEstimate = async (connection: Connection) => {
     const MAX_PRIORITY_FEE_KEYS = 128
     const client = await getClient(connection)
     const group = await getGroupForClient(client, MAINNET_MANGO_GROUP)
-    const feeMultiplier = 1.2
+    const feeMultiplier = 1.1
     const altResponse = await connection.getAddressLookupTable(
       group.addressLookupTables[0]
     )
