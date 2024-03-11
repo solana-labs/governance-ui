@@ -26,8 +26,8 @@ const argsAreSet = (args: Args): args is RequiredArgs =>
 
 export const useCalculatedVoterWeight = (
   args: Args
-): UseAsyncReturn<CalculatedWeight | undefined> => {
-  return useAsync(async () => {
+): UseAsyncReturn<CalculatedWeight | undefined> =>
+  useAsync(async () => {
     if (!argsAreSet(args)) return undefined
     return calculateVoterWeight(args as RequiredArgs)
   }, [
@@ -37,4 +37,3 @@ export const useCalculatedVoterWeight = (
     args.tokenOwnerRecord?.pubkey,
     args.plugins,
   ])
-}
