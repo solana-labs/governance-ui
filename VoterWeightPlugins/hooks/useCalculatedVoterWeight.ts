@@ -31,9 +31,9 @@ export const useCalculatedVoterWeight = (
     if (!argsAreSet(args)) return undefined
     return calculateVoterWeight(args as RequiredArgs)
   }, [
-    args.realmPublicKey,
-    args.governanceMintPublicKey,
-    args.walletPublicKey,
-    args.tokenOwnerRecord?.pubkey,
-    args.plugins,
+    args.realmPublicKey?.toString(),
+    args.governanceMintPublicKey?.toString(),
+    args.walletPublicKey?.toString(),
+    args.tokenOwnerRecord?.account.governingTokenDepositAmount,
+    args.plugins?.length,
   ])
