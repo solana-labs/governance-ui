@@ -1,4 +1,4 @@
-import {VoterWeightPluginInfo} from "../lib/types";
+import {VoterWeightPlugins} from "../lib/types";
 import {getPlugins} from "../lib/getPlugins";
 import {useConnection} from "@solana/wallet-adapter-react";
 import {queryKeys} from "../lib/utils";
@@ -15,7 +15,7 @@ type Args = {
 const argsAreSet = (args: Args): args is Required<Args> =>
     args.realmPublicKey !== undefined && args.governanceMintPublicKey !== undefined;
 
-export const usePlugins = (args: Args): UseQueryResult<VoterWeightPluginInfo[], unknown> => {
+export const usePlugins = (args: Args): UseQueryResult<VoterWeightPlugins, unknown> => {
     const { connection } = useConnection()
     const wallet = useWalletOnePointOh()
     const provider = wallet && new AnchorProvider(
@@ -24,14 +24,36 @@ export const usePlugins = (args: Args): UseQueryResult<VoterWeightPluginInfo[], 
         AnchorProvider.defaultOptions()
     )
 
-    return useQuery(
+    // Cache plugin loading with react-query
+    return useQuery<VoterWeightPlugins>(
         ['getPlugins', ...queryKeys(args), wallet?.publicKey?.toString()],
-        () => {
-            if (!provider || !provider.publicKey) return [];
-            return getPlugins({
+        async () => {
+            if (!provider || !provider.publicKey) return {
+                voterWeight: [],
+                maxVoterWeight: []
+            };
+            // Load the voter weight plugins associated with the realm and governance
+            const voterWeightPluginsPromise = getPlugins({
                 ...(args as Required<Args>),
                 provider,
+                type: 'voterWeight'
             });
+            // Load the max voter weight plugins associated with the realm and governance
+            const maxVoterWeightPluginsPromise = getPlugins({
+                ...(args as Required<Args>),
+                provider,
+                type: 'maxVoterWeight'
+            });
+
+            const [voterWeightPlugins, maxVoterWeightPlugins] = await Promise.all([
+                voterWeightPluginsPromise,
+                maxVoterWeightPluginsPromise
+            ]);
+
+            return {
+                voterWeight: voterWeightPlugins,
+                maxVoterWeight: maxVoterWeightPlugins
+            };
         },
         {
             enabled: argsAreSet(args) && !!provider?.publicKey,

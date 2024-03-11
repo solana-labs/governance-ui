@@ -18,7 +18,7 @@ type GatewayPluginParams = {
 export const useGatewayVoterWeightPlugin = (): useGatewayVoterWeightPluginReturnType => {
   const { isReady, plugins } = useRealmVoterWeightPlugins()
 
-  const gatewayPlugin = plugins?.find((plugin) =>
+  const gatewayPlugin = plugins?.voterWeight.find((plugin) =>
     GATEWAY_PLUGINS_PKS.includes(plugin.programId.toString())
   )
 

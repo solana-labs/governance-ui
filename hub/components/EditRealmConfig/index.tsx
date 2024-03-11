@@ -117,7 +117,7 @@ export function EditRealmConfig(props: Props) {
       fetchConfig(
         connection.current,
         result.data.realmByUrlId.publicKey,
-        plugins ?? [],
+        plugins?.voterWeight ?? [],
       )
         .then((config) => {
           setConfig({ ...config });

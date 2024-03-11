@@ -13,7 +13,7 @@ export interface useVsrClientReturnType
 export const useVsrClient = (): useVsrClientReturnType => {
   const { isReady, plugins } = useRealmVoterWeightPlugins()
 
-  const plugin = plugins?.find((plugin) =>
+  const plugin = plugins?.voterWeight.find((plugin) =>
       VSR_PLUGIN_PKS.includes(plugin.programId.toString())
   )
 

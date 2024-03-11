@@ -12,7 +12,7 @@ export interface useHeliumClientReturnType
 export const useHeliumClient = (): useHeliumClientReturnType => {
   const { isReady, plugins } = useRealmVoterWeightPlugins()
 
-  const heliumPlugin = plugins?.find((plugin) =>
+  const heliumPlugin = plugins?.voterWeight.find((plugin) =>
       HELIUM_VSR_PLUGINS_PKS.includes(plugin.programId.toString())
   )
 

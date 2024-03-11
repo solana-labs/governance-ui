@@ -4,35 +4,38 @@ import { findPluginName, PluginName } from '@constants/plugins'
 import { loadClient } from '../clients/'
 import {Provider} from '@coral-xyz/anchor'
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts'
-import { VoterWeightPluginInfo } from './types'
+import {PluginType, VoterWeightPluginInfo} from './types'
 import BN from 'bn.js'
 import {fetchRealmByPubkey} from "@hooks/queries/realm";
 
 const getInitialPluginProgramId = async (
     realmPublicKey: PublicKey,
     governanceMintPublicKey: PublicKey,
-    connection: Connection
+    connection: Connection,
+    type: PluginType
 ):Promise<PublicKey | undefined> => {
   const config = await fetchRealmConfigQuery(connection, realmPublicKey)
   const realm = await fetchRealmByPubkey(connection, realmPublicKey)
   const kind = realm.result?.account.communityMint.equals(governanceMintPublicKey) ? "community" : "council"
 
-  return config.result?.account?.[
-      kind === 'community' ? 'communityTokenConfig' : 'councilTokenConfig']
-      ?.voterWeightAddin
+  const governanceConfig = config.result?.account?.[
+      kind === 'community' ? 'communityTokenConfig' : 'councilTokenConfig'];
+  return type === 'voterWeight' ? governanceConfig?.voterWeightAddin : governanceConfig?.maxVoterWeightAddin;
 }
 
 export const getPlugins = async ({
   realmPublicKey,
   governanceMintPublicKey,
-  provider
+  provider,
+  type
 }: {
   realmPublicKey: PublicKey
   governanceMintPublicKey: PublicKey
   provider: Provider
+  type: PluginType
 }): Promise<VoterWeightPluginInfo[]> => {
   const plugins: VoterWeightPluginInfo[] = []
-  let programId = await getInitialPluginProgramId(realmPublicKey, governanceMintPublicKey, provider.connection)
+  let programId = await getInitialPluginProgramId(realmPublicKey, governanceMintPublicKey, provider.connection, type)
 
   let pluginName = ''
 
@@ -42,38 +45,46 @@ export const getPlugins = async ({
       pluginName = findPluginName(programId)
       if (pluginName) {
         const client = await loadClient(
-          pluginName as PluginName,
-          programId,
-          provider
+            pluginName as PluginName,
+            programId,
+            provider
         )
 
-        const voterWeightRecord = (await client.getVoterWeightRecord(
-          realmPublicKey,
-          governanceMintPublicKey,
-          provider.publicKey
-        )) as { voterWeight: BN } | null // TODO fix up typing on these clients
-        const maxVoterWeightRecord = (await client.getMaxVoterWeightRecord(
-          realmPublicKey,
-          governanceMintPublicKey
-        )) as { maxVoterWeight: BN } | null // TODO fix up typing on these clients
+        let weight: BN | undefined;
+        if (type === 'voterWeight') {
+
+
+          const voterWeightRecord = (await client.getVoterWeightRecord(
+              realmPublicKey,
+              governanceMintPublicKey,
+              provider.publicKey
+          )) as { voterWeight: BN } | null
+          weight = voterWeightRecord?.voterWeight
+        } else {
+          const maxVoterWeightRecord = (await client.getMaxVoterWeightRecord(
+              realmPublicKey,
+              governanceMintPublicKey
+          )) as { maxVoterWeight: BN } | null // TODO fix up typing on these clients
+          weight = maxVoterWeightRecord?.maxVoterWeight
+        }
 
         const { registrar: registrarPublicKey } = await getPluginRegistrarPDA(
-          realmPublicKey,
-          governanceMintPublicKey,
-          programId
+            realmPublicKey,
+            governanceMintPublicKey,
+            programId
         )
 
         const registrarData = await client.getRegistrarAccount(
-          realmPublicKey,
-          governanceMintPublicKey
+            realmPublicKey,
+            governanceMintPublicKey
         )
 
         plugins.push({
           client,
           programId,
           name: pluginName as PluginName,
-          voterWeight: voterWeightRecord?.voterWeight,
-          maxVoterWeight: maxVoterWeightRecord?.maxVoterWeight,
+          type,
+          weight,
           registrarPublicKey,
           params: registrarData ?? {},
         })

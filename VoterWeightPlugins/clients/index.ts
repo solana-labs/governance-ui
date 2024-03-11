@@ -11,6 +11,7 @@ import {PublicKey} from "@solana/web3.js";
 import {VsrClient} from "../../VoteStakeRegistry/sdk/client";
 import {NftVoterClient} from "@utils/uiTypes/NftVoterClient";
 import {HeliumVsrClient} from "../../HeliumVotePlugin/sdk/client";
+import {UnrecognisedVoterWeightPluginClient} from "./UnrecognisedVoterWeightPluginClient";
 
 /**
  * Given a plugin name and program ID, load the appropriate client
@@ -34,6 +35,6 @@ export const loadClient = (plugin: PluginName, programId: PublicKey, provider: P
     case 'NFT':
       return NftVoterClient.connect(provider, programId)
     default:
-      throw new Error(`Unsupported plugin ${plugin}`)
+      return UnrecognisedVoterWeightPluginClient.connect(provider, programId)
   }
 }

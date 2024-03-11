@@ -49,17 +49,30 @@ export const PluginDebug = () => {
         <div>Voter Weight: {calculatedVoterWeight?.value?.toString()}</div>
         <div>Max Voter Weight: {calculatedMaxVoterWeight?.value?.toString()}</div>
         <div>Is Ready: {isReady.toString()}</div>
-        <div>Plugins:
+        <div>Voter Weight Plugins:
             <ul>
-                {isReady && (plugins || []).map((plugin, i) =>
+                {isReady && (plugins?.voterWeight || []).map((plugin, i) =>
                     <li key={i}>
                         <div>Plugin Name: {plugin.name}</div>
-                        <div>Voter Weight (on-chain): {plugin.voterWeight?.toString()}</div>
-                        <div>Max Voter Weight (on-chain): {plugin.maxVoterWeight?.toString()}</div>
+                        <div>Voter Weight (on-chain): {plugin.weight?.toString()}</div>
                         <div>Voter Weight
                             (calculated): {calculatedVoterWeight?.details[i].pluginWeight?.toString()}</div>
                         <div>Voter Weight
                             (error): {calculatedVoterWeight?.details[i].error?.stack}</div>
+                        <div>Params: <Params plugin={plugin}/></div>
+                    </li>)}
+            </ul>
+        </div>
+        <div>Max Voter Weight Plugins:
+            <ul>
+                {isReady && (plugins?.maxVoterWeight || []).map((plugin, i) =>
+                    <li key={i}>
+                        <div>Plugin Name: {plugin.name}</div>
+                        <div>Max Voter Weight (on-chain): {plugin.weight?.toString()}</div>
+                        <div>Max Voter Weight
+                            (calculated): {calculatedMaxVoterWeight?.details[i].pluginWeight?.toString()}</div>
+                        <div>Max Voter Weight
+                            (error): {calculatedMaxVoterWeight?.details[i].error?.stack}</div>
                         <div>Params: <Params plugin={plugin}/></div>
                     </li>)}
             </ul>
