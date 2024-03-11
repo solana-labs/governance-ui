@@ -261,7 +261,7 @@ export default function CommunityTokenForm({
             render={({ field, fieldState: { error } }) => (
               <FormField
                 title="What is the minimum number of community tokens needed to manage this DAO?"
-                description="A user will need at least this many community token to edit the DAO"
+                description="A user will need at least this many community tokens to edit the DAO"
                 // advancedOption
               >
                 <Input
@@ -345,6 +345,17 @@ export default function CommunityTokenForm({
                 advancedOption
                 className="mt-6"
               >
+                {isQuadratic && <div className="body-sm mb-2 text-fgd-2">
+                  <div>
+                    <span className="text-[#5DC9EB]">Note:&nbsp;</span>
+                    Quadratic Voting DAOs typically have a lower circulating supply factor
+                    than non-quadratic DAOs. This is because the quadratic formula
+                    reduces the weight of votes overall.
+                  </div>
+                  <div>
+                    Consider optionally setting a value &lt; 1 here to increase the accuracy of approval thresholds.
+                  </div>
+                </div>}
                 <Input
                   type="tel"
                   placeholder={`1`}
@@ -363,14 +374,14 @@ export default function CommunityTokenForm({
         )}
 
         <Controller
-          name="isQuadratic"
-          control={control}
-          defaultValue={true}
+            name="isQuadratic"
+            control={control}
+            defaultValue={true}
           render={({ field: { ref: _, ...field } }) => (
             <div className="pt-3 mb-6">
               <FormField
                 title="Create a quadratic dao?"
-                description="This will change how votes are calculated based on distribution and amount of tokens held. Additionally, the Civic Pass plugin will be included, requiring all users to verify their identity and ensuring sybil resistance by mitigating the risk of fake or duplicate accounts."
+                description="This gives more proportional power to smaller token holders, encouraging community participation. Additionally, the Civic Pass plugin will be included, requiring all users to verify their identity and ensuring sybil resistance by mitigating the risk of fake or duplicate accounts."
                 advancedOption
               >
                 <RadioGroup

@@ -133,8 +133,6 @@ export default function QuadraticVotingPower({ role, className }: Props) {
             {!isGatewayEnabled ||
               (gatewayStatus === GatewayStatus.ACTIVE && (
                 <div className="text-xl font-bold text-fgd-1 hero-text">
-                  {/* Replace "Deposit" button with Join/Update button when a user needs to update */}
-                  {/* Add copy explaining that user needds to update to vote */}
                   <TokenDeposit
                     mint={mintInfo}
                     tokenRole={GoverningTokenRole.Community}
