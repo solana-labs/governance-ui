@@ -37,7 +37,7 @@ export const getVanillaGovpower = async (
     : new BN(0)
 }
 
-export const useVanillaGovpower = (tokenOwnerRecordPk: PublicKey) => {
+export const useVanillaGovpower = (tokenOwnerRecordPk: PublicKey | undefined) => {
   const { data: torAccount } = useTokenOwnerRecordByPubkeyQuery(
     tokenOwnerRecordPk
   )

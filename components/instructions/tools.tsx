@@ -139,9 +139,9 @@ export const ACCOUNT_NAMES = {
 
   // Dean's List DAO
   '6Vjsy1KabnHtSuHZcXuuCQFWoBML9JscSy3L4NGjqmhM': 'Deans List DAO Treasury',
-  'CLgzSdeNcf9CYHiAdmXaPaCw2vYBeiqEeZcgguqirVM9': 'DAO: (DEAN) Strategic Reserve',
-  'bDgqY2Qt4y2jSsRNvD7FETkRJJNiYZT1Q3UnAYYzUCo': 'DAO: (DEAN) Community Reserve',
-  'BtJaNZrZZmagHGzCU2VazSJWzBS9KY7tG41enBrT2NtU': 'DAO: (DEAN) Liquidity Reserve',
+  CLgzSdeNcf9CYHiAdmXaPaCw2vYBeiqEeZcgguqirVM9: 'DAO: (DEAN) Strategic Reserve',
+  bDgqY2Qt4y2jSsRNvD7FETkRJJNiYZT1Q3UnAYYzUCo: 'DAO: (DEAN) Community Reserve',
+  BtJaNZrZZmagHGzCU2VazSJWzBS9KY7tG41enBrT2NtU: 'DAO: (DEAN) Liquidity Reserve',
 
   // Physis DAO
   '29epeLvAMyRXtpA1HaoKB1hGcAnrc1NvMCbaZ8AVRwEi': 'Physis DAO Treasury',
@@ -399,6 +399,7 @@ const HIDDEN_MNGO_TREASURES = [
 export const HIDDEN_REALMS = [
   'BWnVbUDohApiiaWBNNGcLH2KXRKEoTBJ7schsKQWYAtj',
   'FsoDEiZ9BoGTAaCLzXkyQWEqNKa5PW2iokzmuD7YsRdL',
+  '9nUyxzVL2FUMuWUiVZG66gwK15CJiM3PoLkfrnGfkvt6', // old Drift dao
 ]
 
 //owner and desired accounts we want to show
