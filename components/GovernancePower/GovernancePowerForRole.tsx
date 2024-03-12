@@ -6,8 +6,8 @@ import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
 import VanillaVotingPower from './Power/Vanilla/VanillaVotingPower'
 import { Deposit } from './Power/Vanilla/Deposit'
 import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
-import {PluginName} from "@constants/plugins";
-import {VotingPowerCards} from "@components/GovernancePower/Power/VotingPowerCards";
+import { PluginName } from '@constants/plugins'
+import { VotingPowerCards } from '@components/GovernancePower/Power/VotingPowerCards'
 
 type VotingPowerDisplayType = PluginName | 'composite'
 
@@ -41,14 +41,15 @@ export default function GovernancePowerForRole({
   }
   return (
     <>
-      {role === 'community' ? <VotingPowerCards role={role} {...props} />
-          // council
-          : kind === 'vanilla' ? (
-              <div>
-                <VanillaVotingPower role="council" {...props} />
-                <Deposit role="council" />
-              </div>
-          ) : null}
+      {role === 'community' ? (
+        <VotingPowerCards role={role} {...props} />
+      ) : // council
+      kind === 'vanilla' ? (
+        <div>
+          <VanillaVotingPower role="council" {...props} />
+          <Deposit role="council" />
+        </div>
+      ) : null}
     </>
   )
 }
