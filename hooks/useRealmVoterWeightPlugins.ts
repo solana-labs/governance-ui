@@ -30,11 +30,20 @@ export const useRealmVoterWeightPlugins = (role : GovernanceRole = 'community'):
         realmPublicKey: realm?.pubkey,
         governanceMintPublicKey,
         // TODO CK Pass all the delegated wallets here
+        // This will be the list of delegators that comes from the useDelegators hook (this is a set of TORs, so you should get the wallet public keys from them)
+        // but we might need special logic in case a single selected delegator is set
+        // i.e. if selectedDelegator is set, just pass that, otherwise pass everything.
         walletPublicKeys: [selectedDelegator ?? wallet?.publicKey ?? undefined].filter(Boolean) as PublicKey[]
     })
 
     const totalCalculatedVoterWeight = nonAggregatedResult.calculatedVoterWeights?.reduce((acc, weight) => {
+        if (!acc) return weight;
+
         // TODO CK combine them
+
+        return {
+
+        }
     });
 
     return {
