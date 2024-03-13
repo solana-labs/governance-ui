@@ -7,8 +7,14 @@ import useWalletOnePointOh from "@hooks/useWalletOnePointOh";
 import {GovernanceRole} from "../@types/types";
 import {useSelectedDelegatorStore} from "../stores/useSelectedDelegatorStore";
 import {UseVoterWeightPluginsReturnType} from "../VoterWeightPlugins/useVoterWeightPlugins";
+import {PublicKey} from "@solana/web3.js";
+import {CalculatedWeight} from "../VoterWeightPlugins/lib/types";
 
-export const useRealmVoterWeightPlugins = (role : GovernanceRole = 'community'): UseVoterWeightPluginsReturnType  => {
+type UseRealmVoterWeightPluginsReturnType = UseVoterWeightPluginsReturnType & {
+    totalCalculatedVoterWeight: CalculatedWeight | undefined
+}
+
+export const useRealmVoterWeightPlugins = (role : GovernanceRole = 'community'): UseRealmVoterWeightPluginsReturnType  => {
     const realm = useRealmQuery().data?.result
     const wallet = useWalletOnePointOh()
     const governanceMintPublicKey =
@@ -20,18 +26,28 @@ export const useRealmVoterWeightPlugins = (role : GovernanceRole = 'community'):
     )
 
     // if a delegator is selected, use it, otherwise use the currently connected wallet
-    return useVoterWeightPlugins({
+    const nonAggregatedResult = useVoterWeightPlugins({
         realmPublicKey: realm?.pubkey,
         governanceMintPublicKey,
-        walletPublicKey: selectedDelegator ?? wallet?.publicKey ?? undefined
+        // TODO CK Pass all the delegated wallets here
+        walletPublicKeys: [selectedDelegator ?? wallet?.publicKey ?? undefined].filter(Boolean) as PublicKey[]
     })
+
+    const totalCalculatedVoterWeight = nonAggregatedResult.calculatedVoterWeights?.reduce((acc, weight) => {
+        // TODO CK combine them
+    });
+
+    return {
+        ...nonAggregatedResult,
+        totalCalculatedVoterWeight
+    }
 }
 
 // Get the current weights for the community and council governances - should be used in cases where the realm is known but the choice of governance is not,
 // e.g. when creating a proposal
 export const useRealmVoterWeights = () => {
-    const { calculatedMaxVoterWeight: communityMaxWeight, calculatedVoterWeight: communityWeight } = useRealmVoterWeightPlugins('community')
-    const { calculatedMaxVoterWeight: councilMaxWeight, calculatedVoterWeight: councilWeight } = useRealmVoterWeightPlugins('council')
+    const { calculatedMaxVoterWeight: communityMaxWeight, totalCalculatedVoterWeight: communityWeight } = useRealmVoterWeightPlugins('community')
+    const { calculatedMaxVoterWeight: councilMaxWeight, totalCalculatedVoterWeight: councilWeight } = useRealmVoterWeightPlugins('council')
 
     return {
         communityMaxWeight,
