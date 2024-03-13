@@ -27,6 +27,7 @@ const handlePluginSuccess = (inputVoterWeight: CalculatedWeight, nextPlugin: Vot
         // Plugin failed to calculate voter weight, but did not throw an error, so we just assign a generic error
         return {
             value: null,
+            initialValue: inputVoterWeight.initialValue,
             details: [
                 ...inputVoterWeight.details,
                 {
@@ -40,6 +41,7 @@ const handlePluginSuccess = (inputVoterWeight: CalculatedWeight, nextPlugin: Vot
 
     return {
         value: nextWeight,
+        initialValue: inputVoterWeight.initialValue,
         details: [
             ...inputVoterWeight.details,
             {
@@ -53,6 +55,7 @@ const handlePluginSuccess = (inputVoterWeight: CalculatedWeight, nextPlugin: Vot
 
 const handlePluginError = (inputVoterWeight: CalculatedWeight, nextPlugin: VoterWeightPluginInfo, error: Error): CalculatedWeight => ({
     value: null,
+    initialValue: inputVoterWeight.initialValue,
     details: [
         ...inputVoterWeight.details,
         {
@@ -74,6 +77,7 @@ export const calculateVoterWeight = async ({
 
     const startingWeight: CalculatedWeight = {
         value: tokenOwnerRecordPower,
+        initialValue: tokenOwnerRecordPower,
         details: []
     };
 
@@ -101,17 +105,15 @@ export const calculateMaxVoterWeight = async ({
 
     const startingWeight: CalculatedWeight = {
         value: tokenSupply,
+        initialValue: tokenSupply,
         details: []
     };
 
     const reducer = async (inputVoterWeight: CalculatedWeight, nextPlugin: VoterWeightPluginInfo): Promise<CalculatedWeight> => {
         if (inputVoterWeight.value === null) return inputVoterWeight;
 
-        console.log("Input max weight", inputVoterWeight.value.toString());
-
         try {
             const nextWeight = await nextPlugin.client.calculateMaxVoterWeight(realmPublicKey, governanceMintPublicKey, inputVoterWeight.value);
-            console.log("After plugin", nextPlugin.name, "max weight is", nextWeight?.toString());
 
             return handlePluginSuccess(inputVoterWeight, nextPlugin, nextWeight);
         } catch (error) {
