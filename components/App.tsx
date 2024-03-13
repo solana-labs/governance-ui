@@ -37,6 +37,7 @@ import {
 import { WALLET_PROVIDERS } from '@utils/wallet-adapters'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { useAsync } from 'react-async-hook'
+import { HeliumOverlay } from 'HeliumVotePlugin/components/HeliumOverlay'
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
@@ -320,6 +321,7 @@ export function AppContents(props: Props) {
       <GoogleTag />
       <ErrorBoundary>
         <ThemeProvider defaultTheme="Dark">
+          <HeliumOverlay symbol={router.query.symbol as string} />
           <GatewayProvider>
             <NavBar />
             <Notifications />
