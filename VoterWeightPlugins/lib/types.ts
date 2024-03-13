@@ -25,6 +25,7 @@ export type VoterWeightPlugins = Record<PluginType, VoterWeightPluginInfo[]>
 
 export type CalculatedWeight = {
     value: BN | null  // null means "something went wrong", if we are not still loading
+    initialValue: BN | null // The initial voter weight, before any plugins were applied
     details: ({
         pluginName: PluginName
     } & ({
