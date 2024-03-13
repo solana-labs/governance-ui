@@ -513,6 +513,11 @@ const instructions = () => ({
                 suffix="%"
               />
               <DisplayListingPropertyWrapped
+                label="Platform Liquidation Fee"
+                valKey="PlatformLiquidationFee"
+                suffix="%"
+              />
+              <DisplayListingPropertyWrapped
                 label="Min Vault To Deposits Ratio"
                 valKey="minVaultToDepositsRatio"
                 suffix="%"
@@ -914,6 +919,10 @@ const instructions = () => ({
             args['liquidationFeeOpt'] !== undefined
               ? (args['liquidationFeeOpt'] * 100)?.toFixed(2)
               : undefined,
+          platformLiquidationFee:
+            args['platformLiquidationFeeOpt'] !== undefined
+              ? (args['platformLiquidationFeeOpt'] * 100)?.toFixed(2)
+              : undefined,
           minVaultToDepositsRatio:
             args['minVaultToDepositsRatioOpt'] !== undefined
               ? (args['minVaultToDepositsRatioOpt'] * 100)?.toFixed(2)
@@ -1302,6 +1311,21 @@ const instructions = () => ({
                 suggestedVal={
                   invalidFields.liquidationFee &&
                   `${invalidFields.liquidationFee}%`
+                }
+              />
+              <DisplayNullishProperty
+                label="Platform Liquidation Fee"
+                value={
+                  parsedArgs.platformLiquidationFee &&
+                  `${parsedArgs.platformLiquidationFee}%`
+                }
+                currentValue={
+                  bankFormattedValues?.platformLiquidationFee &&
+                  `${bankFormattedValues.platformLiquidationFee}%`
+                }
+                suggestedVal={
+                  invalidFields.platformLiquidationFee &&
+                  `${invalidFields.platformLiquidationFee}%`
                 }
               />
               <DisplayNullishProperty
@@ -1980,6 +2004,7 @@ const getFormattedListingValues = (args: FlatListingArgs) => {
     maintLiabWeight: args.maintLiabWeight.toFixed(2),
     initLiabWeight: args.initLiabWeight.toFixed(2),
     liquidationFee: (args['liquidationFee'] * 100).toFixed(2),
+    platformLiquidationFee: (args['platformLiquidationFee'] * 100).toFixed(2),
     minVaultToDepositsRatio: (args['minVaultToDepositsRatio'] * 100).toFixed(2),
     netBorrowLimitPerWindowQuote: toUiDecimals(
       args['netBorrowLimitPerWindowQuote'],

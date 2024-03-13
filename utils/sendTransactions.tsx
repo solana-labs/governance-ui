@@ -51,7 +51,7 @@ export const sendTransactionsV3 = async ({
   for (const tx of transactionInstructions) {
     const txObjWithFee = {
       ...tx,
-      instructionSet: [
+      instructionsSet: [
         new TransactionInstructionWithSigners(createComputeBudgetIx(fee)),
         ...tx.instructionsSet,
       ],
