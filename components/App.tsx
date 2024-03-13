@@ -172,7 +172,11 @@ export function AppContents(props: Props) {
 
   // Validate it's an ico file
   function isValidSymbol(symbol) {
-    return typeof symbol === 'string' && symbol.trim() !== '' && /^[a-zA-Z0-9-_]+$/.test(symbol);
+    return (
+      typeof symbol === 'string' &&
+      symbol.trim() !== '' &&
+      /^[a-zA-Z0-9-_]+$/.test(symbol)
+    )
   }
   const { result: faviconExists } = useAsync(async () => {
     if (!faviconUrl) {
