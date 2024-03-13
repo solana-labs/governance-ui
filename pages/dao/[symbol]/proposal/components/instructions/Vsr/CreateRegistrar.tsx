@@ -20,8 +20,7 @@ import { getRegistrarPDA } from 'VoteStakeRegistry/sdk/accounts'
 import { DEFAULT_VSR_ID, VsrClient } from 'VoteStakeRegistry/sdk/client'
 import { web3 } from '@coral-xyz/anchor'
 import useWalletDeprecated from '@hooks/useWalletDeprecated'
-import { HELIUM_VSR_PLUGINS_PKS, VSR_PLUGIN_PKS } from '@constants/plugins'
-import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
+import { VSR_PLUGIN_PKS } from '@constants/plugins'
 import { useRealmQuery } from '@hooks/queries/realm'
 
 interface CreateVsrRegistrarForm {
@@ -86,18 +85,10 @@ const CreateVsrRegistrar = ({
       return returnInvalid()
     }
 
-    let instruction: web3.TransactionInstruction
-    let vsrClient: VsrClient | HeliumVsrClient | undefined
+    let vsrClient: VsrClient | undefined
 
     if (VSR_PLUGIN_PKS.includes(form.programId)) {
       vsrClient = await VsrClient.connect(
-        anchorProvider,
-        new PublicKey(form.programId)
-      )
-    }
-
-    if (HELIUM_VSR_PLUGINS_PKS.includes(form.programId)) {
-      vsrClient = await HeliumVsrClient.connect(
         anchorProvider,
         new PublicKey(form.programId)
       )
@@ -113,36 +104,19 @@ const CreateVsrRegistrar = ({
       vsrClient.program.programId
     )
 
-    if (vsrClient instanceof HeliumVsrClient) {
-      instruction = await vsrClient.program.methods
-        .initializeRegistrarV0({
-          positionUpdateAuthority: null,
-        })
-        .accounts({
-          registrar,
-          realm: realm.pubkey,
-          governanceProgramId: realmInfo.programId,
-          realmAuthority: realm.account.authority!,
-          realmGoverningTokenMint: realm.account.communityMint!,
-          payer: wallet.publicKey!,
-          systemProgram: SYSTEM_PROGRAM_ID,
-        })
-        .instruction()
-    } else {
-      instruction = await vsrClient.program.methods
-        .createRegistrar(registrarBump)
-        .accounts({
-          registrar,
-          realm: realm.pubkey,
-          governanceProgramId: realmInfo.programId,
-          realmAuthority: realm.account.authority!,
-          realmGoverningTokenMint: realm.account.communityMint!,
-          payer: wallet.publicKey!,
-          systemProgram: SYSTEM_PROGRAM_ID,
-          rent: SYSVAR_RENT_PUBKEY,
-        })
-        .instruction()
-    }
+    const instruction = await vsrClient.program.methods
+      .createRegistrar(registrarBump)
+      .accounts({
+        registrar,
+        realm: realm.pubkey,
+        governanceProgramId: realmInfo.programId,
+        realmAuthority: realm.account.authority!,
+        realmGoverningTokenMint: realm.account.communityMint!,
+        payer: wallet.publicKey!,
+        systemProgram: SYSTEM_PROGRAM_ID,
+        rent: SYSVAR_RENT_PUBKEY,
+      })
+      .instruction()
 
     return {
       serializedInstruction: serializeInstructionToBase64(instruction),

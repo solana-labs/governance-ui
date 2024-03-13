@@ -351,6 +351,11 @@ const REALM = () => {
 
   return (
     <>
+      {['HNT', 'IOT', 'MOBILE'].includes(realmInfo?.symbol || '') && (
+        <div className="fixed flex flex-col justify-center items-center backdrop-blur-md inset-0 z-20 overscroll-contain">
+          <div className="p-6 bg-black/80 rounded-md">HERP DREP</div>
+        </div>
+      )}
       <div
         className={`bottom-0 bg-bkg-3 flex flex-col justify-center fixed h-24 px-4 md:px-6 lg:px-8 transform transition-all duration-300 ease-in-out w-full left-1/2 -translate-x-1/2 z-10 ${
           multiVoteMode ? 'translate-y-0' : 'translate-y-full'

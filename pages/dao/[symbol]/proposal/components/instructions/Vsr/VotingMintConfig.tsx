@@ -24,9 +24,8 @@ import {
   Registrar,
 } from 'VoteStakeRegistry/sdk/accounts'
 import { DEFAULT_VSR_ID, VsrClient } from 'VoteStakeRegistry/sdk/client'
-import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import useWalletDeprecated from '@hooks/useWalletDeprecated'
-import { HELIUM_VSR_PLUGINS_PKS, VSR_PLUGIN_PKS } from '@constants/plugins'
+import { VSR_PLUGIN_PKS } from '@constants/plugins'
 import { useRealmQuery } from '@hooks/queries/realm'
 
 interface ConfigureVotingMintForm {
@@ -65,10 +64,7 @@ const VotingMintConfig = ({
   })
   const { handleSetInstructions } = useContext(NewProposalContext)
   const { wallet, anchorProvider } = useWalletDeprecated()
-  const showGrantAuth = useMemo(
-    () => form?.programId && !HELIUM_VSR_PLUGINS_PKS.includes(form.programId),
-    [form?.programId]
-  )
+  const showGrantAuth = useMemo(() => form?.programId, [form?.programId])
 
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
@@ -90,18 +86,10 @@ const VotingMintConfig = ({
       return returnInvalid()
     }
 
-    let instruction: web3.TransactionInstruction
-    let vsrClient: VsrClient | HeliumVsrClient | undefined
+    let vsrClient: VsrClient | undefined
 
     if (VSR_PLUGIN_PKS.includes(form.programId)) {
       vsrClient = await VsrClient.connect(
-        anchorProvider,
-        new PublicKey(form.programId)
-      )
-    }
-
-    if (HELIUM_VSR_PLUGINS_PKS.includes(form.programId)) {
-      vsrClient = await HeliumVsrClient.connect(
         anchorProvider,
         new PublicKey(form.programId)
       )
@@ -165,42 +153,22 @@ const VotingMintConfig = ({
       console.info("Can't fetch registrar", ex)
     }
 
-    if (vsrClient instanceof HeliumVsrClient) {
-      instruction = await vsrClient!.program.methods
-        .configureVotingMintV0({
-          idx: mintIndex,
-          digitShift: mintDigitShift,
-          baselineVoteWeightScaledFactor: baselineScaledFactor,
-          maxExtraLockupVoteWeightScaledFactor: maxLockupScaledFactor,
-          genesisVotePowerMultiplier: 1,
-          genesisVotePowerMultiplierExpirationTs: new BN(0),
-          lockupSaturationSecs,
-        })
-        .accounts({
-          registrar,
-          realmAuthority: realm!.account.authority,
-          mint,
-        })
-        .remainingAccounts(remainingAccounts)
-        .instruction()
-    } else {
-      instruction = await vsrClient!.program.methods
-        .configureVotingMint(
-          mintIndex, // mint index
-          mintDigitShift, // digit_shift
-          baselineScaledFactor, // unlocked_scaled_factor
-          maxLockupScaledFactor, // lockup_scaled_factor
-          lockupSaturationSecs, // lockup_saturation_secs
-          grantAuthority!.governance.pubkey // grant_authority)
-        )
-        .accounts({
-          registrar,
-          realmAuthority: realm!.account.authority,
-          mint,
-        })
-        .remainingAccounts(remainingAccounts)
-        .instruction()
-    }
+    const instruction = await vsrClient!.program.methods
+      .configureVotingMint(
+        mintIndex, // mint index
+        mintDigitShift, // digit_shift
+        baselineScaledFactor, // unlocked_scaled_factor
+        maxLockupScaledFactor, // lockup_scaled_factor
+        lockupSaturationSecs, // lockup_saturation_secs
+        grantAuthority!.governance.pubkey // grant_authority)
+      )
+      .accounts({
+        registrar,
+        realmAuthority: realm!.account.authority,
+        mint,
+      })
+      .remainingAccounts(remainingAccounts)
+      .instruction()
 
     return {
       serializedInstruction: serializeInstructionToBase64(instruction),

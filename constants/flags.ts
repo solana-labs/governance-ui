@@ -10,7 +10,6 @@ export const DELEGATOR_BATCH_VOTE_SUPPORT_BY_PLUGIN: Record<
 > = {
   vanilla: true,
   VSR: true,
-  HeliumVSR: false,
   gateway: false,
   NFT: false,
   pyth: false,

@@ -8,9 +8,7 @@ import ClaimUnreleasedNFTs from './ClaimUnreleasedNFTs'
 import Link from 'next/link'
 import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
-import ClaimUnreleasedPositions from 'HeliumVotePlugin/components/ClaimUnreleasedPositions'
 import VanillaAccountDetails from './VanillaAccountDetails'
 import GovernancePowerCard from '@components/GovernancePower/GovernancePowerCard'
 import SelectPrimaryDelegators from '@components/SelectPrimaryDelegators'
@@ -21,13 +19,6 @@ const LockPluginTokenBalanceCard = dynamic(
     import(
       'VoteStakeRegistry/components/TokenBalance/LockPluginTokenBalanceCard'
     )
-)
-
-const HeliumVotingPowerCard = dynamic(() =>
-  import('HeliumVotePlugin/components/VotingPowerCard').then((module) => {
-    const { VotingPowerCard } = module
-    return VotingPowerCard
-  })
 )
 
 const NftVotingPower = dynamic(
@@ -65,7 +56,6 @@ const TokenBalanceCardInner = ({
 }: {
   inAccountDetails?: boolean
 }) => {
-  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const config = useRealmConfigQuery().data?.result
 
   const { vsrMode } = useRealm()
@@ -77,20 +67,6 @@ const TokenBalanceCardInner = ({
 
   if (vsrMode === 'default' && inAccountDetails) {
     return <LockPluginTokenBalanceCard inAccountDetails={inAccountDetails} /> // does this ever actually occur in the component hierarchy?
-  }
-
-  if (
-    vsrMode === 'helium' &&
-    (!ownTokenRecord ||
-      ownTokenRecord.account.governingTokenDepositAmount.isZero())
-  ) {
-    return (
-      <>
-        {!inAccountDetails && <GovernancePowerTitle />}
-        <HeliumVotingPowerCard inAccountDetails={inAccountDetails} />
-        <ClaimUnreleasedPositions inAccountDetails={inAccountDetails} />
-      </>
-    )
   }
 
   if (isNftMode && inAccountDetails) {
@@ -105,11 +81,9 @@ const TokenBalanceCardInner = ({
     )
   }
 
-  if (vsrMode === 'pyth'){
+  if (vsrMode === 'pyth') {
     return (
-      <>
-      {inAccountDetails ? <PythAccountDetails /> : <GovernancePowerCard />}
-      </>
+      <>{inAccountDetails ? <PythAccountDetails /> : <GovernancePowerCard />}</>
     )
   }
 

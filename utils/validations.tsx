@@ -22,7 +22,6 @@ import { BN } from '@coral-xyz/anchor'
 import {
   NFT_PLUGINS_PKS,
   VSR_PLUGIN_PKS,
-  HELIUM_VSR_PLUGINS_PKS,
   GATEWAY_PLUGINS_PKS,
 } from '@constants/plugins'
 import { AssetAccount } from '@utils/uiTypes/assets'
@@ -32,7 +31,6 @@ import { validatePubkey } from './formValidation'
 const supportedPlugins = [
   ...NFT_PLUGINS_PKS,
   ...VSR_PLUGIN_PKS,
-  ...HELIUM_VSR_PLUGINS_PKS,
   ...GATEWAY_PLUGINS_PKS,
 ]
 
@@ -196,9 +194,9 @@ export const validateBuffer = async (
       } catch {
         throw 'Invalid program buffer account'
       }
-      /* 
+      /*
       if (buffer.info.authority?.toBase58() !== governedAccount.toBase58()) {
-        throw `Buffer authority must be set to governance account 
+        throw `Buffer authority must be set to governance account
               ${governedAccount.toBase58()}`
       } */
     })
@@ -1141,11 +1139,7 @@ export const getRealmCfgSchema = ({
               if (val) {
                 try {
                   getValidatedPublickKey(val)
-                  if (
-                    [...NFT_PLUGINS_PKS, ...HELIUM_VSR_PLUGINS_PKS].includes(
-                      val
-                    )
-                  ) {
+                  if ([...NFT_PLUGINS_PKS].includes(val)) {
                     return true
                   } else {
                     return this.createError({
@@ -1282,11 +1276,7 @@ export const getRealmCfgSchema = ({
               if (val) {
                 try {
                   getValidatedPublickKey(val)
-                  if (
-                    [...NFT_PLUGINS_PKS, ...HELIUM_VSR_PLUGINS_PKS].includes(
-                      val
-                    )
-                  ) {
+                  if ([...NFT_PLUGINS_PKS].includes(val)) {
                     return true
                   } else {
                     return this.createError({

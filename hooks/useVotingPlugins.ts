@@ -7,15 +7,12 @@ import { notify } from '@utils/notifications'
 
 import useGatewayPluginStore from '../GatewayPlugin/store/gatewayPluginStore'
 import { getGatekeeperNetwork } from '../GatewayPlugin/sdk/accounts'
-import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
-import * as heliumVsrSdk from '@helium/voter-stake-registry-sdk'
 import useWalletOnePointOh from './useWalletOnePointOh'
 import { useRealmQuery } from './queries/realm'
 import { useRealmConfigQuery } from './queries/realmConfig'
 import useLegacyConnectionContext from './useLegacyConnectionContext'
 import {
   NFT_PLUGINS_PKS,
-  HELIUM_VSR_PLUGINS_PKS,
   VSR_PLUGIN_PKS,
   GATEWAY_PLUGINS_PKS,
   PYTH_PLUGIN_PK,
@@ -31,8 +28,6 @@ export function useVotingPlugins() {
   const {
     handleSetVsrRegistrar,
     handleSetVsrClient,
-    handleSetHeliumVsrRegistrar,
-    handleSetHeliumVsrClient,
     handleSetNftClient,
     handleSetGatewayClient,
     handleSetNftRegistrar,
@@ -44,7 +39,6 @@ export function useVotingPlugins() {
   const [setNftMaxVoterWeight] = useNftPluginStore((s) => [s.setMaxVoterWeight])
 
   // @asktree: you should select what you need from stores, not use entire thing
-  const heliumStore = useHeliumVsrStore()
   const gatewayStore = useGatewayPluginStore()
   const wallet = useWalletOnePointOh()
   const connection = useLegacyConnectionContext()
@@ -56,7 +50,6 @@ export function useVotingPlugins() {
     gatewayClient,
     nftClient,
     nftMintRegistrar,
-    heliumVsrClient,
     pythClient,
   ] = useVotePluginsClientStore((s) => [
     s.state.currentRealmVotingClient,
@@ -64,9 +57,7 @@ export function useVotingPlugins() {
     s.state.gatewayClient,
     s.state.nftClient,
     s.state.nftMintRegistrar,
-    s.state.heliumVsrClient,
     s.state.pythClient,
-    s.state.heliumVsrRegistrar,
   ])
 
   const usedCollectionsPks: string[] = useMemo(
@@ -125,9 +116,6 @@ export function useVotingPlugins() {
         if (VSR_PLUGIN_PKS.includes(currentPluginPk.toBase58())) {
           handleSetVsrClient(wallet, connection, currentPluginPk)
         }
-        if (HELIUM_VSR_PLUGINS_PKS.includes(currentPluginPk.toBase58())) {
-          handleSetHeliumVsrClient(wallet, connection, currentPluginPk)
-        }
       }
       handleSetNftClient(wallet, connection)
       handleSetGatewayClient(wallet, connection)
@@ -136,7 +124,6 @@ export function useVotingPlugins() {
     connection,
     currentPluginPk,
     handleSetGatewayClient,
-    handleSetHeliumVsrClient,
     handleSetNftClient,
     handleSetVsrClient,
     wallet,
@@ -153,23 +140,6 @@ export function useVotingPlugins() {
         if (voterPk) {
           handleSetCurrentRealmVotingClient({
             client: vsrClient,
-            realm,
-            walletPk: voterPk,
-          })
-        }
-      }
-    }
-
-    const handleHeliumVsrPlugin = () => {
-      if (
-        heliumVsrClient &&
-        currentPluginPk &&
-        HELIUM_VSR_PLUGINS_PKS.includes(currentPluginPk.toBase58())
-      ) {
-        handleSetHeliumVsrRegistrar(heliumVsrClient, realm)
-        if (voterPk) {
-          handleSetCurrentRealmVotingClient({
-            client: heliumVsrClient,
             realm,
             walletPk: voterPk,
           })
@@ -245,7 +215,6 @@ export function useVotingPlugins() {
       handleNftplugin()
       handleGatewayPlugin()
       handleVsrPlugin()
-      handleHeliumVsrPlugin()
       handlePythPlugin()
     }
   }, [
@@ -255,10 +224,8 @@ export function useVotingPlugins() {
     handleRegisterGatekeeperNetwork,
     handleSetCurrentRealmVotingClient,
     handleSetGatewayRegistrar,
-    handleSetHeliumVsrRegistrar,
     handleSetNftRegistrar,
     handleSetVsrRegistrar,
-    heliumVsrClient,
     nftClient,
     voterPk,
     realm,
@@ -286,58 +253,9 @@ export function useVotingPlugins() {
     }
   }, [connection, nftClient, setNftMaxVoterWeight, realm])
 
-  const handleGetHeliumVsrVoting = useCallback(async () => {
-    if (
-      realm &&
-      currentPluginPk &&
-      HELIUM_VSR_PLUGINS_PKS.includes(currentPluginPk.toBase58())
-    ) {
-      const [maxVoterRecord] = heliumVsrSdk.maxVoterWeightRecordKey(
-        realm.pubkey,
-        realm.account.communityMint,
-        currentPluginPk
-      )
-      try {
-        const mvwr = await getMaxVoterWeightRecord(
-          connection.current,
-          maxVoterRecord
-        )
-        heliumStore.setMaxVoterWeight(mvwr)
-      } catch (_e) {
-        console.log("Couldn't get max voter weight record. Setting to null.")
-        heliumStore.setMaxVoterWeight(null)
-      }
-
-      if (currentClient.walletPk && heliumVsrClient) {
-        try {
-          await heliumStore.getPositions({
-            realmPk: realm.pubkey,
-            communityMintPk: realm.account.communityMint,
-            walletPk: currentClient.walletPk,
-            connection: connection.current,
-            client: heliumVsrClient,
-            votingClient: currentClient,
-          })
-        } catch (e) {
-          console.log(e)
-        }
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    connection,
-    currentClient,
-    currentPluginPk,
-    //heliumStore,
-    heliumVsrClient,
-    realm,
-  ])
-
   useEffect(() => {
     if (usedCollectionsPks.length && realm) {
       handleMaxVoterWeight()
-    } else if (realm) {
-      handleGetHeliumVsrVoting()
     } else {
       setNftMaxVoterWeight(null)
     }
@@ -345,7 +263,6 @@ export function useVotingPlugins() {
     connected,
     currentClient,
     currentPluginPk,
-    handleGetHeliumVsrVoting,
     handleMaxVoterWeight,
     nftMintRegistrar,
     realm,
