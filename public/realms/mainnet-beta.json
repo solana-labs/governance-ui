@@ -3450,5 +3450,14 @@
     "realmId": "GgF6fHb3iM3Um5DtvwbZvpGpYTzYnr1RmZr4NkwHveGp",
     "website": "",
     "twitter": ""
+  },
+  {
+    "symbol": "RUG",
+    "displayName": "Rugoshi's DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "DDaPoEqtrNZbHD5kTPHrt9HfARCWuMtMfdSfsGywLTnJ",
+    "ogImage": "/realms/Rugoshi/RUG logo - 2048x2048.png",
+    "website": "https://rugoshi.com",
+    "twitter": "@RugoshiPull"
   }
 ]
