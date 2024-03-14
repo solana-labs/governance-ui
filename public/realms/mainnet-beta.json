@@ -3450,5 +3450,14 @@
     "realmId": "GgF6fHb3iM3Um5DtvwbZvpGpYTzYnr1RmZr4NkwHveGp",
     "website": "",
     "twitter": ""
+  },
+  {
+    "symbol": "SOLA",
+    "displayName": "SOLAMURAI DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "ALcWZDnnEJXF9woYprU7fi7ZBFHRwSEcHFFYjG8qmWpV",
+    "ogImage": "/realms/SOLA/sola.png",
+    "website": "https://twitter.com/solamuraicoin",
+    "twitter": "https://www.solamurai.com/"
   }
 ]
