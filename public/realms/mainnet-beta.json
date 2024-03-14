@@ -3450,5 +3450,15 @@
     "realmId": "GgF6fHb3iM3Um5DtvwbZvpGpYTzYnr1RmZr4NkwHveGp",
     "website": "",
     "twitter": ""
+  },
+  {
+    "symbol": "TRIAL",
+    "displayName": "Trial Foundation",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "H95uAZjwq3nw76xZved3M8kWwU3mGhRnGGGBLW5f2UL6",
+    "website": "https://www.trialexperiment.com",
+    "twitter": "@TheReTrial",
+    "ogImage": "/realms/TrialFoundation/dot.png",
+    "shortDescription": "$TRIAL is the Community. For the community. Full transparency."
   }
 ]
