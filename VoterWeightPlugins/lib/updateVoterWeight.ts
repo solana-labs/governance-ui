@@ -28,7 +28,7 @@ export const updateVoterWeight = async ({
   // so that it knows what the previous voter weight record was.
   // Most VWRs are derived the same way, but some (e.g. VSR) use a different derivation
   // function, so this decouples the plugins in this regard.
-  let getVoterWeightRecordCallback: (() => Promise<PublicKey>) | undefined;
+  let getVoterWeightRecordCallback: (() => Promise<PublicKey>) | undefined = undefined;
 
   for (const plugin of plugins) {
     const updateVoterWeightRecordIx = await plugin.client.updateVoterWeightRecord(
