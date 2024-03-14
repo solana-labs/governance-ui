@@ -831,6 +831,7 @@ const instructions = () => ({
       { name: 'Admin' },
       { name: 'Mint Info' },
       { name: 'Oracle' },
+      { name: 'Fallback oracle' },
     ],
     getDataUI: async (
       connection: Connection,
@@ -968,6 +969,11 @@ const instructions = () => ({
           depositLimit: args.depositLimitOpt?.toString(),
           setFallbackOracle: args.setFallbackOracle,
           maintWeightShiftAbort: args.maintWeightShiftAbort,
+          zeroUtilRate: args.zeroUtilRateOpt,
+          disableAssetLiquidation: args.disableAssetLiquidationOpt,
+          collateralFeePerDay: args.collateralFeePerDayOpt,
+          forceWithdraw: args.forceWithdrawOpt,
+          forceClose: args.forceCloseOpt,
         }
 
         if (mint) {
@@ -1045,6 +1051,8 @@ const instructions = () => ({
                 maintWeightShiftLiabTarget: args.maintWeightShiftLiabTargetOpt,
                 maintWeightShiftAbort: args.maintWeightShiftAbort,
                 setFallbackOracle: args.setFallbackOracle,
+                forceWithdraw: args.forceWithdrawOpt,
+                forceClose: args.forceCloseOpt,
               }
             : {}
 
@@ -1421,6 +1429,16 @@ const instructions = () => ({
                 value={args.oracleOpt?.toBase58()}
                 currentValue={bankFormattedValues?.oracle}
               />
+              {accounts.length &&
+                accounts[4] &&
+                accounts[4].pubkey.toBase58() !==
+                  bankFormattedValues?.fallbackOracle && (
+                  <DisplayNullishProperty
+                    label="Fallback Oracle"
+                    value={accounts[4].pubkey.toBase58()}
+                    currentValue={bankFormattedValues?.fallbackOracle}
+                  />
+                )}
               <DisplayNullishProperty
                 label="Token Conditional Swap Maker Fee Rate"
                 value={parsedArgs.tokenConditionalSwapMakerFeeRate}
@@ -1547,10 +1565,34 @@ const instructions = () => ({
                   ).toFixed(0)})`
                 }
               />
+              {parsedArgs?.disableAssetLiquidation && (
+                <DisplayNullishProperty
+                  label="Disable Asset Liquidation"
+                  value={`${parsedArgs.disableAssetLiquidation}`}
+                  currentValue={null}
+                  suggestedVal={null}
+                />
+              )}
               {parsedArgs?.maintWeightShiftAbort && (
                 <DisplayNullishProperty
                   label="Maint Weight Shift Abort"
                   value={`${parsedArgs.maintWeightShiftAbort}`}
+                  currentValue={null}
+                  suggestedVal={null}
+                />
+              )}
+              {parsedArgs?.forceClose && (
+                <DisplayNullishProperty
+                  label="Force close"
+                  value={`${parsedArgs.forceClose}`}
+                  currentValue={null}
+                  suggestedVal={null}
+                />
+              )}
+              {parsedArgs?.forceWithdraw && (
+                <DisplayNullishProperty
+                  label="Force withdraw"
+                  value={`${parsedArgs.forceWithdraw}`}
                   currentValue={null}
                   suggestedVal={null}
                 />
@@ -2034,6 +2076,9 @@ const getFormattedListingValues = (args: FlatListingArgs) => {
     interestTargetUtilization: args.interestTargetUtilization,
     interestCurveScaling: args.interestCurveScaling,
     groupInsuranceFund: args.groupInsuranceFund,
+    collateralFeePerDay: args.collateralFeePerDay,
+    zeroUtilRate: args.zeroUtilRate,
+    disableAssetLiquidation: args.disableAssetLiquidation,
   }
   return formattedArgs
 }

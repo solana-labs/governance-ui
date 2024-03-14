@@ -551,6 +551,13 @@ const EditToken = ({
       name: 'fallbackOracle',
     },
     {
+      label: keyToLabel['setFallbackOracle'],
+      subtitle: getAdditionalLabelInfo('setFallbackOracle'),
+      initialValue: form.setFallbackOracle,
+      type: InstructionInputType.SWITCH,
+      name: 'setFallbackOracle',
+    },
+    {
       label: keyToLabel['oracleConfFilter'],
       subtitle: getAdditionalLabelInfo('oracleConfFilter'),
       initialValue: form.oracleConfFilter,
@@ -854,13 +861,6 @@ const EditToken = ({
       initialValue: form.maintWeightShiftAbort,
       type: InstructionInputType.SWITCH,
       name: 'maintWeightShiftAbort',
-    },
-    {
-      label: keyToLabel['setFallbackOracle'],
-      subtitle: getAdditionalLabelInfo('setFallbackOracle'),
-      initialValue: form.setFallbackOracle,
-      type: InstructionInputType.SWITCH,
-      name: 'setFallbackOracle',
     },
     {
       label: keyToLabel['depositLimit'],

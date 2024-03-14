@@ -82,6 +82,9 @@ export type FlatListingArgs = {
   interestCurveScaling: number
   setFallbackOracle: boolean
   maintWeightShiftAbort: boolean
+  zeroUtilRate: number
+  disableAssetLiquidation: boolean
+  collateralFeePerDay: number
 }
 
 export type FlatEditArgs = {
@@ -126,6 +129,11 @@ export type FlatEditArgs = {
   maintWeightShiftAbort: boolean
   setFallbackOracle: boolean
   depositLimitOpt: number
+  zeroUtilRateOpt: number
+  disableAssetLiquidationOpt: boolean
+  collateralFeePerDayOpt: number
+  forceWithdrawOpt: boolean
+  forceCloseOpt: boolean
 }
 
 export type ListingArgsFormatted = {
@@ -164,6 +172,9 @@ export type ListingArgsFormatted = {
   interestTargetUtilization: number
   interestCurveScaling: number
   groupInsuranceFund: boolean
+  zeroUtilRate: number
+  disableAssetLiquidation: boolean
+  collateralFeePerDay: number
 }
 
 export type EditTokenArgsFormatted = ListingArgsFormatted & {
@@ -173,6 +184,8 @@ export type EditTokenArgsFormatted = ListingArgsFormatted & {
   maintWeightShiftLiabTarget: number
   maintWeightShiftAbort: boolean
   setFallbackOracle: boolean
+  forceWithdraw: boolean
+  forceClose: boolean
 }
 
 const transformPresetToProposed = (listingPreset: LISTING_PRESET) => {
@@ -261,7 +274,9 @@ const fetchJupiterRoutes = async (
         swapMode,
       }).toString()
 
-      const jupiterSwapBaseUrl = process.env.NEXT_PUBLIC_JUPTER_SWAP_API_ENDPOINT || 'https://public.jupiterapi.com'
+      const jupiterSwapBaseUrl =
+        process.env.NEXT_PUBLIC_JUPTER_SWAP_API_ENDPOINT ||
+        'https://public.jupiterapi.com'
       const response = await fetch(
         `${jupiterSwapBaseUrl}/quote?${paramsString}`
       )
@@ -634,6 +649,7 @@ export const getFormattedBankValues = (group: Group, bank: Bank) => {
     publicKey: bank.publicKey.toBase58(),
     vault: bank.vault.toBase58(),
     oracle: bank.oracle.toBase58(),
+    fallbackOracle: bank.fallbackOracle.toBase58(),
     stablePrice: group.toUiPrice(
       I80F48.fromNumber(bank.stablePriceModel.stablePrice),
       bank.mintDecimals
