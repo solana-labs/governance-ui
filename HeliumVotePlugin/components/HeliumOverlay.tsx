@@ -3,7 +3,7 @@ import Link from 'next/link'
 import React from 'react'
 
 export const HeliumOverlay = ({ symbol }: { symbol: string }) => {
-  if (!symbol || !['hnt', 'iot', 'mobile'].includes(symbol)) {
+  if (!symbol || !['hnt', 'iot', 'mobile'].includes(symbol.toLowerCase())) {
     return null
   }
 
