@@ -3,13 +3,13 @@ import Link from 'next/link'
 import React from 'react'
 
 export const HeliumOverlay = ({ symbol }: { symbol: string }) => {
-  if (!symbol || !['HNT', 'IOT', 'MOBILE'].includes(symbol)) {
+  if (!symbol || !['hnt', 'iot', 'mobile'].includes(symbol)) {
     return null
   }
 
   return (
-    <div className="flex flex-col h-full w-full justify-center items-center backdrop-blur-md fixed inset-0 z-50 overflow-none">
-      <div className="flex flex-col p-6 rounded-md gap-8 max-w-xl bg-black/40 max-md:bg-transparent">
+    <div className="flex flex-col h-full w-full justify-center items-center backdrop-blur-lg fixed inset-0 z-50 overflow-none">
+      <div className="flex flex-col p-6 rounded-md gap-8 max-w-xl bg-black/40">
         <div className="flex flex-col flex-1">
           <h1>Helium Vote Has Moved</h1>
           <p className="text-lg">Important Update for the Helium Community</p>
