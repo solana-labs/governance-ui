@@ -8,7 +8,7 @@ export type PluginType = 'voterWeight' | 'maxVoterWeight'
 export type UseVoterWeightPluginsArgs = {
     realmPublicKey?: PublicKey
     governanceMintPublicKey?: PublicKey
-    walletPublicKey?: PublicKey
+    walletPublicKeys?: PublicKey[]
 }
 
 export type VoterWeightPluginInfo<TParams = unknown, TClient extends Idl = Idl> = {
@@ -16,7 +16,7 @@ export type VoterWeightPluginInfo<TParams = unknown, TClient extends Idl = Idl> 
     name: PluginName
     params: TParams
     type: PluginType
-    weight: BN | undefined // the weight after applying this plugin
+    weights: (BN | undefined)[] | undefined // the weight after applying this plugin
     registrarPublicKey: PublicKey
     client: Client<TClient>
 }
@@ -25,6 +25,7 @@ export type VoterWeightPlugins = Record<PluginType, VoterWeightPluginInfo[]>
 
 export type CalculatedWeight = {
     value: BN | null  // null means "something went wrong", if we are not still loading
+    initialValue: BN | null // The initial voter weight, before any plugins were applied
     details: ({
         pluginName: PluginName
     } & ({

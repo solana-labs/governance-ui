@@ -21,19 +21,24 @@ type RequiredArgs = Required<UseVoterWeightPluginsArgs> & {
 const argsAreSet = (args: Args): args is RequiredArgs =>
   args.realmPublicKey !== undefined &&
   args.governanceMintPublicKey !== undefined &&
-  args.walletPublicKey !== undefined &&
+  args.walletPublicKeys !== undefined &&
   args.plugins !== undefined
 
-export const useCalculatedVoterWeight = (
-  args: Args
-): UseAsyncReturn<CalculatedWeight | undefined> =>
-  useAsync(async () => {
-    if (!argsAreSet(args)) return undefined
-    return calculateVoterWeight(args as RequiredArgs)
-  }, [
-    args.realmPublicKey?.toString(),
-    args.governanceMintPublicKey?.toString(),
-    args.walletPublicKey?.toString(),
-    args.tokenOwnerRecord?.account.governingTokenDepositAmount,
-    args.plugins?.length,
-  ])
+export const useCalculatedVoterWeights = (args: Args) : UseAsyncReturn<CalculatedWeight[] | undefined> =>
+    useAsync(
+        async () => {
+            if (!argsAreSet(args)) return undefined;
+            const voterWeights = args.walletPublicKeys?.map(wallet => calculateVoterWeight({
+                ...args as RequiredArgs,
+                walletPublicKey: wallet
+            }));
+            return Promise.all(voterWeights);
+        },
+        [
+            args.realmPublicKey?.toString(),
+            args.governanceMintPublicKey?.toString(),
+            args.walletPublicKeys?.map(pubkey => pubkey.toString()).join(","),
+            args.tokenOwnerRecord?.account.governingTokenDepositAmount,
+            args.plugins?.length
+        ]
+    )

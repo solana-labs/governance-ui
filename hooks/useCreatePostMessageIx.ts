@@ -22,7 +22,8 @@ const useCreatePostMessageIx = () => {
   const realm = useRealmQuery().data?.result
   const walletPk = useWalletOnePointOh()?.publicKey ?? undefined
   const actingWalletPk = useUserOrDelegator()
-    const { updateVoterWeightRecords, voterWeightPk } = useRealmVoterWeightPlugins();
+  const { updateVoterWeightRecords, voterWeightPks, voterWeightPkForWallet } = useRealmVoterWeightPlugins();
+  const voterWeightPk = actingWalletPk ? voterWeightPkForWallet(actingWalletPk) : undefined;
   const proposal = useRouteProposalQuery().data?.result
 
   return useCallback(
@@ -46,7 +47,7 @@ const useCreatePostMessageIx = () => {
         proposal.account.governingTokenMint,
         actingWalletPk
       )
-        const updateVWRInstructions = await updateVoterWeightRecords(convertTypeToVoterWeightAction('commentProposal'));
+        const updateVWRInstructions = await updateVoterWeightRecords(actingWalletPk, convertTypeToVoterWeightAction('commentProposal'));
 
       instructions.push(...updateVWRInstructions.pre);
       createNftTicketsIxs.push(...updateVWRInstructions.post);
@@ -72,7 +73,7 @@ const useCreatePostMessageIx = () => {
         voterWeightPk
       )
     },
-    [actingWalletPk, proposal, realm, voterWeightPk, walletPk]
+    [actingWalletPk, proposal, realm, voterWeightPks, walletPk]
   )
 }
 

@@ -32,12 +32,12 @@ export default function LockedCommunityVotingPower(props: Props) {
   const mint = mintData?.result
 
   const { realmTokenAccount } = useRealm()
-  const { calculatedVoterWeight, isReady: votingPowerReady, plugins } = useRealmVoterWeightPlugins('community');
+  const {  totalCalculatedVoterWeight, isReady: votingPowerReady, plugins } = useRealmVoterWeightPlugins('community');
 
   // in case the VSR plugin is the last plugin, this is the final calculated voter weight.
   // however, if it is one in a chain, we are just showing an intermediate calculation here.
   // This affects how it appears in the UI
-  const votingPower = findVSRVoterWeight(calculatedVoterWeight)
+  const votingPower = findVSRVoterWeight(totalCalculatedVoterWeight)
   const isLastVoterWeightPlugin = isVSRLastVoterWeightPlugin(plugins);
 
   const isLoading = useDepositStore((s) => s.state.isLoading)

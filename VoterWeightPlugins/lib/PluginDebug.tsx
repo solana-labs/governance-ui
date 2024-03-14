@@ -41,12 +41,12 @@ const KindToggle = ({ kind, toggle } : { kind: 'community' | 'council', toggle: 
 
 export const PluginDebug = () => {
     const {kind, toggle} = useKindToggle();
-    const {plugins, calculatedVoterWeight, calculatedMaxVoterWeight, isReady} = useRealmVoterWeightPlugins(kind)
+    const {plugins, totalCalculatedVoterWeight, calculatedMaxVoterWeight, isReady} = useRealmVoterWeightPlugins(kind)
 
     return <div>
         <div><h1>Hello! This is a voter weight plugin debug dashboard</h1></div>
         <KindToggle kind={kind} toggle={toggle}/>
-        <div>Voter Weight: {calculatedVoterWeight?.value?.toString()}</div>
+        <div>Voter Weight: {totalCalculatedVoterWeight?.value?.toString()}</div>
         <div>Max Voter Weight: {calculatedMaxVoterWeight?.value?.toString()}</div>
         <div>Is Ready: {isReady.toString()}</div>
         <div>Voter Weight Plugins:
@@ -54,11 +54,11 @@ export const PluginDebug = () => {
                 {isReady && (plugins?.voterWeight || []).map((plugin, i) =>
                     <li key={i}>
                         <div>Plugin Name: {plugin.name}</div>
-                        <div>Voter Weight (on-chain): {plugin.weight?.toString()}</div>
+                        <div>Voter Weight (on-chain): {plugin.weights?.map(w => w?.toString()).join(",")}</div>
                         <div>Voter Weight
-                            (calculated): {calculatedVoterWeight?.details[i].pluginWeight?.toString()}</div>
+                            (calculated): {totalCalculatedVoterWeight?.details[i].pluginWeight?.toString()}</div>
                         <div>Voter Weight
-                            (error): {calculatedVoterWeight?.details[i].error?.stack}</div>
+                            (error): {totalCalculatedVoterWeight?.details[i].error?.stack}</div>
                         <div>Params: <Params plugin={plugin}/></div>
                     </li>)}
             </ul>
@@ -68,7 +68,7 @@ export const PluginDebug = () => {
                 {isReady && (plugins?.maxVoterWeight || []).map((plugin, i) =>
                     <li key={i}>
                         <div>Plugin Name: {plugin.name}</div>
-                        <div>Max Voter Weight (on-chain): {plugin.weight?.toString()}</div>
+                        <div>Max Voter Weight (on-chain): {plugin.weights?.map(w => w?.toString()).join(",")}</div>
                         <div>Max Voter Weight
                             (calculated): {calculatedMaxVoterWeight?.details[i].pluginWeight?.toString()}</div>
                         <div>Max Voter Weight
