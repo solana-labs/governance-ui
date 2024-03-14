@@ -35,7 +35,7 @@ export default function QuadraticVotingPower({ role, className }: Props) {
 
   const isLoading = useDepositStore((s) => s.state.isLoading)
   const {
-    calculatedVoterWeight,
+    totalCalculatedVoterWeight,
     isReady,
     calculatedMaxVoterWeight,
     plugins,
@@ -72,13 +72,13 @@ export default function QuadraticVotingPower({ role, className }: Props) {
 
   const formattedTotal = useMemo(
     () =>
-      mintInfo && calculatedVoterWeight?.value
-        ? new BigNumber(calculatedVoterWeight?.value.toString())
+      mintInfo && totalCalculatedVoterWeight?.value
+        ? new BigNumber(totalCalculatedVoterWeight?.value.toString())
             .shiftedBy(-mintInfo.decimals)
             .toFixed(2)
             .toString()
         : undefined,
-    [mintInfo, calculatedVoterWeight?.value]
+    [mintInfo, totalCalculatedVoterWeight?.value]
   )
 
   const { communityWeight, councilWeight } = useRealmVoterWeights()
