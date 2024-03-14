@@ -1,14 +1,9 @@
-import {
-  AnchorProvider,
-  BN,
-  BorshInstructionCoder,
-  IdlTypes,
-} from '@coral-xyz/anchor'
+import { AnchorProvider, BN, BorshInstructionCoder } from '@coral-xyz/anchor'
 import { AccountMetaData } from '@solana/spl-governance'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import { fmtMintAmount } from '@tools/sdk/units'
 import tokenPriceService from '@utils/services/tokenPrice'
-import { tryGetMint, getInverseScaledFactor } from '@utils/tokens'
+import { tryGetMint } from '@utils/tokens'
 import { tryGetRegistrar, tryGetVoter } from 'VoteStakeRegistry/sdk/api'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 import {
@@ -18,8 +13,6 @@ import {
   SECS_PER_DAY,
 } from '@utils/dateTools'
 import { calcMultiplier } from 'VoteStakeRegistry/tools/deposits'
-import { VoterStakeRegistry as HeliumVSR } from '@helium/idls/lib/types/voter_stake_registry'
-import { PROGRAM_ID as HELIUM_VSR_PROGRAM_ID } from '@helium/voter-stake-registry-sdk'
 import { fetchTokenAccountByPubkey } from '@hooks/queries/tokenAccount'
 import { fetchMintInfoByPubkey } from '@hooks/queries/mintInfo'
 import { toUiDecimals } from '@blockworks-foundation/mango-v4'
@@ -36,11 +29,6 @@ interface VotingMintCfgInstruction {
   maxExtraLockupVoteWeightScaledFactor: BN
   lockupSaturationSecs: BN
   grantAuthority: PublicKey
-}
-
-type HeliumVotingMintCfgArgs = IdlTypes<HeliumVSR>['ConfigureVotingMintArgsV0']
-interface HeliumVotingMintCfgInstruction {
-  args: HeliumVotingMintCfgArgs
 }
 
 export interface GrantInstruction {
@@ -351,103 +339,6 @@ const grantIx = (programId: PublicKey) => ({
   },
 })
 
-const heliumInitializeRegistrarIx = (_programId: PublicKey) => ({
-  120: {
-    name: 'Initialize registrar',
-    accounts: [
-      { name: 'Registrar' },
-      { name: 'Collection' },
-      { name: 'Collection Metadata' },
-      { name: 'Master Edition' },
-      { name: 'Token Account' },
-      { name: 'Realm' },
-      { name: 'Governance program id' },
-      { name: 'Realm governing token mint' },
-      { name: 'Realm authority' },
-      { name: 'Payer' },
-    ],
-    getDataUI: async () => {
-      return <div></div>
-    },
-  },
-})
-
-const heliumConfigVotingMintIx = (programId: PublicKey) => ({
-  46: {
-    name: 'Configure voting mint',
-    accounts: [
-      { name: 'Registrar' },
-      { name: 'Realm authority' },
-      { name: 'Mint' },
-      { name: 'Payer' },
-    ],
-    getDataUI: async (connection: Connection, data: Uint8Array) => {
-      try {
-        const options = AnchorProvider.defaultOptions()
-        const provider = new AnchorProvider(
-          connection,
-          new EmptyWallet(Keypair.generate()),
-          options
-        )
-        const vsrClient = await VsrClient.connect(provider, programId)
-
-        const decodedInstructionData = new BorshInstructionCoder(
-          vsrClient.program.idl
-        ).decode(Buffer.from(data))?.data as HeliumVotingMintCfgInstruction
-
-        const {
-          args: {
-            baselineVoteWeightScaledFactor,
-            lockupSaturationSecs,
-            maxExtraLockupVoteWeightScaledFactor,
-            // genesisVotePowerMultiplier,
-            // genesisVotePowerMultiplierExpirationTs,
-          },
-        } = decodedInstructionData
-
-        return (
-          <div className="space-y-3">
-            <div>Index: {decodedInstructionData?.args.idx}</div>
-            <div>Digit shifts: {decodedInstructionData?.args.digitShift}</div>
-            <div>
-              Unlocked factor: {baselineVoteWeightScaledFactor.toNumber() / 1e9}{' '}
-              ({baselineVoteWeightScaledFactor.toNumber()})
-            </div>
-            <div>
-              Max lockup time:{' '}
-              {decodedInstructionData &&
-                getFormattedStringFromDays(
-                  secsToDays(lockupSaturationSecs.toNumber())
-                )}{' '}
-              (secs: {lockupSaturationSecs.toNumber()})
-            </div>
-            <div>
-              Max multiplier:{' '}
-              {getInverseScaledFactor(baselineVoteWeightScaledFactor) +
-                getInverseScaledFactor(maxExtraLockupVoteWeightScaledFactor)}
-            </div>
-            {/* Additional Genesis Multiplier not configurable through UI */}
-            {/* <div>
-              Additional Genesis Multiplier: {genesisVotePowerMultiplier}
-            </div>
-            <div>
-              Additional Genesis Duration:
-              {decodedInstructionData &&
-                getFormattedStringFromDays(
-                  secsToDays(genesisVotePowerMultiplierExpirationTs.toNumber())
-                )}{' '}
-              (secs: {genesisVotePowerMultiplierExpirationTs.toNumber()})
-            </div> */}
-          </div>
-        )
-      } catch (e) {
-        console.log(e)
-        return <div>{JSON.stringify(data)}</div>
-      }
-    },
-  },
-})
-
 const common_instructions = (programId: PublicKey) =>
   [
     clawbackIx,
@@ -473,18 +364,6 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
   ),
   VotEn9AWwTFtJPJSMV5F9jsMY6QwWM5qn3XP9PATGW7: common_instructions(
     new PublicKey('VotEn9AWwTFtJPJSMV5F9jsMY6QwWM5qn3XP9PATGW7')
-  ),
-  // Helium vsr has no concept of clawback or grants
-  // and has slightly different accounts for voting mint config
-  [HELIUM_VSR_PROGRAM_ID.toBase58()]: [
-    heliumInitializeRegistrarIx,
-    heliumConfigVotingMintIx,
-  ].reduce(
-    (acc, ix) => ({
-      ...acc,
-      ...ix(HELIUM_VSR_PROGRAM_ID),
-    }),
-    {}
   ),
   VoteWPk9yyGmkX4U77nEWRJWpcc8kUfrPoghxENpstL: common_instructions(
     new PublicKey('VoteWPk9yyGmkX4U77nEWRJWpcc8kUfrPoghxENpstL')

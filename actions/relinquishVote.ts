@@ -18,7 +18,6 @@ import {
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
-import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 
 export const relinquishVote = async (
   { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
@@ -54,9 +53,7 @@ export const relinquishVote = async (
     tokenOwnerRecord
   )
 
-  const shouldChunk =
-    plugin?.client instanceof NftVoterClient ||
-    plugin?.client instanceof HeliumVsrClient
+  const shouldChunk = plugin?.client instanceof NftVoterClient
 
   if (shouldChunk) {
     const insertChunks = chunks(instructions, 2)

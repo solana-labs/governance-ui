@@ -32,7 +32,6 @@ import {
 } from '@utils/sendTransactions'
 import { calcCostOfNftVote, checkHasEnoughSolToVote } from '@tools/nftVoteCalc'
 import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
-import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { fetchRealmByPubkey } from '@hooks/queries/realm'
 import { fetchProposalByPubkeyQuery } from '@hooks/queries/proposal'
@@ -318,7 +317,6 @@ export async function castVote(
   }
 
   const isNftVoter = votingPlugin?.client instanceof NftVoterClient
-  const isHeliumVoter = votingPlugin?.client instanceof HeliumVsrClient
   const tokenOwnerRecordIxs = await createTokenOwnerRecordIfNeeded({
     connection,
     realmPk: realm.pubkey,
@@ -327,7 +325,7 @@ export async function castVote(
     governingTokenMint: tokenMint,
   })
 
-  if (!isNftVoter && !isHeliumVoter) {
+  if (!isNftVoter) {
     const batch1 = [
       ...tokenOwnerRecordIxs,
       ...pluginCastVoteIxs,
@@ -353,44 +351,6 @@ export async function castVote(
       connection,
       wallet,
       transactionInstructions: actions,
-      callbacks: {
-        afterAllTxConfirmed: () => {
-          if (runAfterConfirmation) {
-            runAfterConfirmation()
-          }
-        },
-      },
-    })
-  }
-
-  // we need to chunk instructions
-  if (isHeliumVoter) {
-    // @asktree: I'm aware of no rationale for chunking in this particular manner
-    const chunkerz = chunks(
-      [
-        ...pluginCastVoteIxs,
-        ...castVoteIxs,
-        ...pluginPostMessageIxs,
-        ...postMessageIxs,
-      ],
-      2
-    )
-
-    const ixsChunks = chunkerz.map((txBatch, batchIdx) => {
-      return {
-        instructionsSet: txBatchesToInstructionSetWithSigners(
-          txBatch,
-          message ? [[], chatMessageSigners] : [], // seeing signer related bugs when posting chat? This is likely culprit
-          batchIdx
-        ),
-        sequenceType: SequenceType.Sequential,
-      }
-    })
-
-    await sendTransactionsV3({
-      connection,
-      wallet,
-      transactionInstructions: ixsChunks,
       callbacks: {
         afterAllTxConfirmed: () => {
           if (runAfterConfirmation) {

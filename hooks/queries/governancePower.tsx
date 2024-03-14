@@ -11,7 +11,6 @@ import { getNetworkFromEndpoint } from '@utils/connection'
 import { ON_NFT_VOTER_V2 } from '@constants/flags'
 import { fetchRealmByPubkey, useRealmQuery } from './realm'
 import { fetchRealmConfigQuery } from './realmConfig'
-import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
 import useGatewayPluginStore from 'GatewayPlugin/store/gatewayPluginStore'
 import { useAsync } from 'react-async-hook'
 import { useConnection } from '@solana/wallet-adapter-react'
@@ -47,7 +46,9 @@ export const getVanillaGovpower = async (
     : new BN(0)
 }
 
-export const useVanillaGovpower = (tokenOwnerRecordPk: PublicKey | undefined) => {
+export const useVanillaGovpower = (
+  tokenOwnerRecordPk: PublicKey | undefined
+) => {
   const { data: torAccount } = useTokenOwnerRecordByPubkeyQuery(
     tokenOwnerRecordPk
   )
@@ -141,7 +142,7 @@ export const determineVotingPowerType = async (
 // TODO use HOC to provide voting power to components that need voting power without knowing plugin
 // this is an efficiency thing to save on queries, since we can't have conditional useQuery hooks.
 // i guess you can just use the enabled flag..
-/* 
+/*
 export const WithCommunityGovernancePower = <
   P extends { communityGovernancePower: BN | undefined }
 >(
@@ -185,7 +186,6 @@ export const useGovernancePowerAsync = (
   const { connection } = useConnection()
   const realmPk = useSelectedRealmPubkey()
 
-  const heliumVotingPower = useHeliumVsrStore((s) => s.state.votingPower)
   const gatewayVotingPower = useGatewayPluginStore((s) => s.state.votingPower)
   const vsrVotingPower = useVsrGovpower().data?.result
 
@@ -212,8 +212,6 @@ export const useGovernancePowerAsync = (
             ? getNftGovpower(connection, realmPk, TOR)
             : plugin === 'VSR'
             ? vsrVotingPower ?? new BN(0)
-            : plugin === 'HeliumVSR'
-            ? heliumVotingPower
             : plugin === 'gateway'
             ? gatewayVotingPower
             : plugin === 'pyth'
@@ -225,7 +223,6 @@ export const useGovernancePowerAsync = (
       TOR,
       connection,
       vsrVotingPower,
-      heliumVotingPower,
       gatewayVotingPower,
       actingAsWalletPk,
     ]
@@ -241,7 +238,6 @@ export const useLegacyVoterWeight = () => {
   const realmPk = useSelectedRealmPubkey()
   const realm = useRealmQuery().data?.result
 
-  const heliumVotingPower = useHeliumVsrStore((s) => s.state.votingPower)
   const gatewayVotingPower = useGatewayPluginStore((s) => s.state.votingPower)
 
   const { data: communityTOR } = useUserCommunityTokenOwnerRecord()
@@ -294,12 +290,6 @@ export const useLegacyVoterWeight = () => {
                 .result ?? new BN(0)
             )
           : undefined
-        : plugin === 'HeliumVSR'
-        ? new VoteRegistryVoterWeight(
-            communityTOR.result,
-            councilTOR?.result,
-            heliumVotingPower
-          )
         : plugin === 'gateway'
         ? new SimpleGatedVoterWeight(
             communityTOR.result,
@@ -314,7 +304,6 @@ export const useLegacyVoterWeight = () => {
       connection,
       councilTOR,
       gatewayVotingPower,
-      heliumVotingPower,
       plugin,
       realmPk,
       shouldCareAboutCouncil,

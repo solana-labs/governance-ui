@@ -43,10 +43,6 @@ export const useCanVote = () => {
     !(
       client.clientType === VotingClientType.NftVoterClient && !voterTokenRecord
     ) &&
-    !(
-      client.clientType === VotingClientType.HeliumVsrClient &&
-      !voterTokenRecord
-    ) &&
     !isVoteCast &&
     hasMinAmountToVote
 
