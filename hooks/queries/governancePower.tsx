@@ -22,7 +22,7 @@ import { findPluginName } from '@constants/plugins'
 import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
 import {IdlAccounts} from "@coral-xyz/anchor";
 import {NftVoter} from "../../idls/nft_voter";
-import {getPluginRegistrarCientCached} from "@hooks/queries/pluginRegistrar";
+import {getPluginRegistrarClientCached} from "@hooks/queries/pluginRegistrar";
 
 export const getVanillaGovpower = async (
   connection: Connection,
@@ -77,7 +77,7 @@ export const getNftGovpowerForOwnerAndRegistrar = async(connection: Connection, 
 }
 
 export const getNftGovpowerForOwner = async (connection: Connection, realmPk: PublicKey, owner: PublicKey) => {
-  const registrar = await getPluginRegistrarCientCached<NftVoter>(realmPk, connection, 'NFT');
+  const registrar = await getPluginRegistrarClientCached<NftVoter>(realmPk, connection, owner, 'NFT');
   return getNftGovpowerForOwnerAndRegistrar(connection, owner, registrar);
 }
 
@@ -183,8 +183,8 @@ export const useGovernancePower = (
 export const useGovernancePowerAsync = (
   kind: 'community' | 'council' | undefined
 ) => {
-  const { calculatedVoterWeight } = useRealmVoterWeightPlugins(kind)
-  return calculatedVoterWeight?.value;
+  const { totalCalculatedVoterWeight } = useRealmVoterWeightPlugins(kind)
+  return totalCalculatedVoterWeight?.value;
 }
 
 /**
@@ -195,8 +195,8 @@ export const useLegacyVoterWeight = () => {
   const communityPluginDetails = useRealmVoterWeightPlugins('community');
   const councilPluginDetails = useRealmVoterWeightPlugins('council');
   const ownVoterWeights = {
-    community: communityPluginDetails.calculatedVoterWeight?.value ?? undefined,
-    council: councilPluginDetails.calculatedVoterWeight?.value ?? undefined,
+    community: communityPluginDetails.totalCalculatedVoterWeight?.value ?? undefined,
+    council: councilPluginDetails.totalCalculatedVoterWeight?.value ?? undefined,
   }
   const { data: communityTOR } = useUserCommunityTokenOwnerRecord()
   const { data: councilTOR } = useUserCouncilTokenOwnerRecord()

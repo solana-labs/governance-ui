@@ -30,9 +30,11 @@ const useNewWalletCallback = (
   const wallet = useWalletOnePointOh();
   const connection = useLegacyConnectionContext();
   const {
-    voterWeightPk,
+    voterWeightPkForWallet,
     updateVoterWeightRecords,
   } = useRealmVoterWeightPlugins();
+  const voterWeightPk =
+    wallet?.publicKey && voterWeightPkForWallet(wallet.publicKey);
   const programVersion = useProgramVersion();
   const realm = useRealmQuery().data?.result;
   const { result: ownVoterWeight } = useLegacyVoterWeight();
@@ -50,6 +52,8 @@ const useNewWalletCallback = (
     if (!wallet?.publicKey) throw new Error('not signed in');
     if (tokenOwnerRecord === undefined)
       throw new Error('insufficient voting power');
+    if (!voterWeightPk)
+      throw new Error('voterWeightPk not found for current wallet');
 
     const config = await rules2governanceConfig(
       connection.current,
@@ -61,6 +65,7 @@ const useNewWalletCallback = (
     const createNftTicketsIxs: TransactionInstruction[] = [];
 
     const { pre: preIx, post: postIx } = await updateVoterWeightRecords(
+      wallet.publicKey,
       convertTypeToVoterWeightAction('createGovernance'),
     );
     instructions.push(...preIx);

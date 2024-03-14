@@ -23,16 +23,44 @@ const getInitialPluginProgramId = async (
   return type === 'voterWeight' ? governanceConfig?.voterWeightAddin : governanceConfig?.maxVoterWeightAddin;
 }
 
+const weightForWallet = async (
+    client: any,
+    realmPublicKey: PublicKey,
+    governanceMintPublicKey: PublicKey,
+    wallet: PublicKey,
+    type: PluginType
+): Promise<BN | undefined> => {
+  if (type === 'voterWeight') {
+    const voterWeightRecord = (await client.getVoterWeightRecord(
+        realmPublicKey,
+        governanceMintPublicKey,
+        wallet
+    )) as { voterWeight: BN } | null
+    return voterWeightRecord?.voterWeight
+  } else {
+    // this is slightly inefficient, since this section does not depend on the input wallet
+    // For wallets with a large amount of delegators, it might be noticeable if caching is not happening correctly.
+    // If so, it should be optimised.
+    const maxVoterWeightRecord = (await client.getMaxVoterWeightRecord(
+        realmPublicKey,
+        governanceMintPublicKey
+    )) as { maxVoterWeight: BN } | null
+    return maxVoterWeightRecord?.maxVoterWeight
+  }
+}
+
 export const getPlugins = async ({
-                                   realmPublicKey,
-                                   governanceMintPublicKey,
-                                   provider,
-                                   type
-                                 }: {
+  realmPublicKey,
+  governanceMintPublicKey,
+  provider,
+  type, 
+  wallets
+}: {
   realmPublicKey: PublicKey
   governanceMintPublicKey: PublicKey
   provider: Provider
   type: PluginType
+  wallets: PublicKey[]
 }): Promise<VoterWeightPluginInfo[]> => {
   const plugins: VoterWeightPluginInfo[] = []
   let programId = await getInitialPluginProgramId(realmPublicKey, governanceMintPublicKey, provider.connection, type)
@@ -48,21 +76,9 @@ export const getPlugins = async ({
       )
 
       // obtain the currently stored on-chain voter weight or max voter weight depending on the passed-in type
-      let weight: BN | undefined;
-      if (type === 'voterWeight') {
-        const voterWeightRecord = (await client.getVoterWeightRecord(
-            realmPublicKey,
-            governanceMintPublicKey,
-            provider.publicKey
-        )) as { voterWeight: BN } | null
-        weight = voterWeightRecord?.voterWeight
-      } else {
-        const maxVoterWeightRecord = (await client.getMaxVoterWeightRecord(
-            realmPublicKey,
-            governanceMintPublicKey
-        )) as { maxVoterWeight: BN } | null
-        weight = maxVoterWeightRecord?.maxVoterWeight
-      }
+      const weights: (BN | undefined)[] = await Promise.all(
+          wallets.map((wallet) => weightForWallet(client, realmPublicKey, governanceMintPublicKey, wallet, type))
+      )
 
       const { registrar: registrarPublicKey } = getPluginRegistrarPDA(
           realmPublicKey,
@@ -80,7 +96,7 @@ export const getPlugins = async ({
         programId,
         name: pluginName as PluginName,
         type,
-        weight,
+        weights,
         registrarPublicKey,
         params: registrarData ?? {},
       })

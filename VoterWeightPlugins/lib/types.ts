@@ -16,7 +16,7 @@ export type VoterWeightPluginInfo<TParams = unknown, TClient extends Idl = Idl> 
     name: PluginName
     params: TParams
     type: PluginType
-    weights: BN[] | undefined // the weight after applying this plugin
+    weights: (BN | undefined)[] | undefined // the weight after applying this plugin
     registrarPublicKey: PublicKey
     client: Client<TClient>
 }

@@ -33,16 +33,16 @@ export default function PluginVotingPower({ role, className }: Props) {
 
   const isLoading = useDepositStore((s) => s.state.isLoading)
 
-  const { calculatedVoterWeight, isReady } = useRealmVoterWeightPlugins(role)
+  const { totalCalculatedVoterWeight, isReady } = useRealmVoterWeightPlugins(role)
 
   const formattedTotal = useMemo(
     () =>
-      mintInfo && calculatedVoterWeight?.value
-        ? new BigNumber(calculatedVoterWeight?.value.toString())
+      mintInfo && totalCalculatedVoterWeight?.value
+        ? new BigNumber(totalCalculatedVoterWeight?.value.toString())
             .shiftedBy(-mintInfo.decimals)
             .toString()
         : undefined,
-    [mintInfo, calculatedVoterWeight?.value]
+    [mintInfo, totalCalculatedVoterWeight?.value]
   )
   // There are two buttons available on this UI:
   // The Deposit button - available if you have tokens to deposit

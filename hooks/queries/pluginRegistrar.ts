@@ -7,7 +7,7 @@ import {fetchRealmByPubkey} from "@hooks/queries/realm";
 import {PluginName} from "@constants/plugins";
 import {PluginType, VoterWeightPluginInfo} from "../../VoterWeightPlugins/lib/types";
 
-export const getPluginClientCached = async (realmPk: PublicKey, connection: Connection, pluginName: PluginName, type: PluginType): Promise<VoterWeightPluginInfo | undefined> => {
+export const getPluginClientCached = async (realmPk: PublicKey, connection: Connection, owner: PublicKey, pluginName: PluginName, type: PluginType): Promise<VoterWeightPluginInfo | undefined> => {
     const realm = fetchRealmByPubkey(connection, realmPk)
     const plugins = await queryClient.fetchQuery({
         queryKey: ['getCommunityPluginsWithoutWallet', realmPk.toString()],
@@ -19,6 +19,7 @@ export const getPluginClientCached = async (realmPk: PublicKey, connection: Conn
                 governanceMintPublicKey: result.account.communityMint,
                 provider: new AnchorProvider(connection, new EmptyWallet(Keypair.generate()), AnchorProvider.defaultOptions()),
                 type,
+                wallets: [owner]
             })
         }
     });
@@ -26,7 +27,7 @@ export const getPluginClientCached = async (realmPk: PublicKey, connection: Conn
     return plugins.find((x) => x.name === pluginName);
 }
 
-export const getPluginRegistrarCientCached = async <T extends Idl>(realmPk: PublicKey, connection: Connection, pluginName: PluginName, type: PluginType = 'voterWeight'): Promise<IdlAccounts<T>['registrar'] | undefined> => {
-    const plugin = await getPluginClientCached(realmPk, connection, pluginName, type);
+export const getPluginRegistrarClientCached = async <T extends Idl>(realmPk: PublicKey, connection: Connection, owner: PublicKey, pluginName: PluginName, type: PluginType = 'voterWeight'): Promise<IdlAccounts<T>['registrar'] | undefined> => {
+    const plugin = await getPluginClientCached(realmPk, connection, owner, pluginName, type);
     return plugin?.params as IdlAccounts<T>['registrar'] | undefined;
 }

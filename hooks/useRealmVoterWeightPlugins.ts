@@ -10,9 +10,46 @@ import { UseVoterWeightPluginsReturnType } from '../VoterWeightPlugins/useVoterW
 import { PublicKey } from '@solana/web3.js'
 import { CalculatedWeight } from '../VoterWeightPlugins/lib/types'
 import useDelegators from '@components/VotePanel/useDelegators'
+import {BN_ZERO} from "@solana/spl-governance";
+import {TokenOwnerRecord} from "@solana/spl-governance/lib/governance/accounts";
+import {SignerWalletAdapter} from "@solana/wallet-adapter-base";
 
-type UseRealmVoterWeightPluginsReturnType = UseVoterWeightPluginsReturnType & {
-  totalCalculatedVoterWeight: CalculatedWeight | undefined
+export type UseRealmVoterWeightPluginsReturnType = UseVoterWeightPluginsReturnType & {
+  totalCalculatedVoterWeight: CalculatedWeight | undefined,
+  voterWeightForWallet: (walletPublicKey: PublicKey) => CalculatedWeight | undefined
+  voterWeightPkForWallet: (walletPublicKey: PublicKey) => PublicKey | undefined
+}
+
+/**
+ * Select the wallets to determine the voter weights for as follows:
+ * - If a delegator is selected, use it only
+ * - If delegators are available, use them and the connected wallet (in first position)
+ * - If no delegators are available, use the connected wallet only
+ * @param selectedDelegator
+ * @param delegators
+ * @param wallet
+ */
+const getWalletList = (
+    selectedDelegator: PublicKey | undefined,
+    delegators: TokenOwnerRecord[] | undefined,
+    wallet: SignerWalletAdapter | undefined
+): PublicKey[] => {
+  if (!wallet?.publicKey) return [];
+
+  if (selectedDelegator) {
+    return [selectedDelegator]
+  }
+
+  if (delegators) {
+    const delegatorOwners = delegators.map((d) => d.governingTokenOwner)
+
+    return [
+        wallet.publicKey,
+        ...delegatorOwners
+    ]
+  }
+
+  return [wallet.publicKey];
 }
 
 export const useRealmVoterWeightPlugins = (
@@ -28,43 +65,56 @@ export const useRealmVoterWeightPlugins = (
     role === 'community' ? s.communityDelegator : s.councilDelegator
   )
   const delegators = useDelegators(role)
+  const walletPublicKeys =  getWalletList(
+      selectedDelegator,
+      delegators?.map(programAccount => programAccount.account),
+      wallet
+  );
 
   // if a delegator is selected, use it, otherwise use the currently connected wallet
   const nonAggregatedResult = useVoterWeightPlugins({
     realmPublicKey: realm?.pubkey,
     governanceMintPublicKey,
-    // TODO CK Pass all the delegated wallets here
-
-    // This will be the list of delegators that comes from the useDelegators hook (this is a set of TORs, so you should get the wallet public keys from them)
-    // but we might need special logic in case a single selected delegator is set
-    // i.e. if selectedDelegator is set, just pass that, otherwise pass everything.
-    walletPublicKeys: [
-      selectedDelegator
-        ? selectedDelegator
-        : delegators?.map((d) => d.account.governingTokenOwner) ??
-          wallet?.publicKey ??
-          undefined,
-    ].filter(Boolean) as PublicKey[],
+    walletPublicKeys,
   })
 
-  const totalCalculatedVoterWeight = nonAggregatedResult.calculatedVoterWeights?.reduce(
+  const totalCalculatedVoterWeight = nonAggregatedResult.calculatedVoterWeights?.length ? nonAggregatedResult.calculatedVoterWeights?.reduce(
     (acc, weight) => {
-      if (!acc || !delegators) return weight
+      if (!acc) return weight;
 
-      // TODO CK combine them
+      const initialValue = weight.initialValue === null ? (acc.initialValue === null ? null : acc.initialValue) : weight.initialValue.add(acc.initialValue ?? BN_ZERO);
+      const value = weight.value === null ? (acc.value === null ? null : acc.value) : weight.value.add(acc.value ?? BN_ZERO);
+      // Note - voter-specific details (e.g. plugin weights) are not aggregated and just use the first one
+      const details = acc.details
+
       return {
-        ...weight,
-        value: delegators.reduce(
-          (acc, d) => acc?.add(d.account.governingTokenDepositAmount),
-          weight.value
-        ),
+        details,
+        initialValue,
+        value,
       }
     }
-  )
+  ) : undefined;
+
+  // This requires that the index of the wallet in the list of wallets remains consistent with the output voter weights,
+  // while not ideal, this is simpler than the alternative, which would be to return a map of wallet public keys to voter weights
+  // or something similar.
+  const voterWeightForWallet = (walletPublicKey: PublicKey): CalculatedWeight | undefined => {
+    const walletIndex = walletPublicKeys.findIndex((pk) => pk.equals(walletPublicKey))
+    if (walletIndex === -1) return undefined; // the wallet is not one of the ones passed in
+    return nonAggregatedResult.calculatedVoterWeights?.[walletIndex]
+  }
+
+  const voterWeightPkForWallet = (walletPublicKey: PublicKey): PublicKey | undefined => {
+    const walletIndex = walletPublicKeys.findIndex((pk) => pk.equals(walletPublicKey))
+    if (walletIndex === -1) return undefined; // the wallet is not one of the ones passed in
+    return nonAggregatedResult.voterWeightPks?.[walletIndex]
+  }
 
   return {
     ...nonAggregatedResult,
     totalCalculatedVoterWeight,
+    voterWeightForWallet,
+    voterWeightPkForWallet,
   }
 }
 

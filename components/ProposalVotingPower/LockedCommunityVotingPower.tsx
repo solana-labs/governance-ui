@@ -10,7 +10,7 @@ import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 import VSRCommunityVotingPower from 'VoteStakeRegistry/components/TokenBalance/VSRVotingPower'
 import DepositCommunityTokensBtn from 'VoteStakeRegistry/components/TokenBalance/DepositCommunityTokensBtn'
 import useDelegators from '@components/VotePanel/useDelegators'
-import {useRealmVoterWeightPlugins, useRealmVoterWeights} from "@hooks/useRealmVoterWeightPlugins";
+import {useRealmVoterWeightPlugins} from "@hooks/useRealmVoterWeightPlugins";
 import {CalculatedWeight, VoterWeightPlugins} from "../../VoterWeightPlugins/lib/types";
 import { BN } from '@coral-xyz/anchor'
 
