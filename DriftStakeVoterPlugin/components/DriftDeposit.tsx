@@ -31,7 +31,7 @@ export const DriftDeposit = ({ role }: { role: 'community' | 'council' }) => {
         more {DRIFT_GOVERNANCE_TICKER} in your wallet. You can deposit into
         Realms or stake with Drift to increase your voting power.
       </div>
-      <div className="mt-4 flex flex-row justify-start flex-wrap gap-2 max-w-full">
+      <div className="mt-3 flex flex-row justify-start flex-wrap gap-2 max-w-full">
         <Button
           onClick={
             // navigate to https://app.drift.trade/earn/stake in new tab
