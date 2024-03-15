@@ -4,3 +4,5 @@ export const DRIFT_STAKE_VOTER_PLUGIN =
 export const DRIFT_PROGRAM_ID = 'dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH'
 
 export const DRIFT_GOVERNANCE_PROGRAM_ID = ''
+
+export const DRIFT_GOVERNANCE_TICKER = 'DRFT'
