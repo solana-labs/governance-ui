@@ -14,8 +14,7 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useConnection } from '@solana/wallet-adapter-react'
 import Button from '@components/Button'
 import { sendTransaction } from '@utils/send'
-import { TokenDeposit } from '@components/TokenBalance/TokenDeposit'
-import { GoverningTokenRole } from '@solana/spl-governance'
+import { DriftDeposit } from './DriftDeposit'
 
 interface Props {
   className?: string
@@ -87,7 +86,7 @@ export default function PluginVotingPower({ role, className }: Props) {
 
   return (
     <div className={clsx(className)}>
-      <div className={'p-3 rounded-md bg-bkg-1'}>
+      <div>
         <div className="flex items-center justify-between mt-1">
           <div className=" flex flex-col gap-x-2">
             <div className={clsx(className)}>
@@ -108,11 +107,7 @@ export default function PluginVotingPower({ role, className }: Props) {
                   Join
                 </Button>
               )}
-              <TokenDeposit
-                mint={mintInfo}
-                tokenRole={GoverningTokenRole.Community}
-                inAccountDetails={true}
-              />
+              <DriftDeposit role={role} />
             </div>
           </div>
         </div>
