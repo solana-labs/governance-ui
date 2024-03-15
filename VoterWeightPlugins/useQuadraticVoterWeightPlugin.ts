@@ -17,7 +17,7 @@ type QuadraticPluginParams = {
 export const useQuadraticVoterWeightPlugin = (): useQuadraticVoterWeightPluginReturnType => {
   const { isReady, plugins } = useRealmVoterWeightPlugins()
 
-  const quadraticPlugin = plugins?.find((plugin) =>
+  const quadraticPlugin = plugins?.voterWeight.find((plugin) =>
     QV_PLUGINS_PKS.includes(plugin.programId.toString())
   )
 

@@ -15,9 +15,9 @@ import queryClient from '@hooks/queries/queryClient'
 import { updateVoterWeight } from './lib/updateVoterWeight'
 import { createVoterWeight } from './lib/createVoterWeight'
 import {
-  CalculatedWeight,
+  CalculatedWeight, PluginType,
   UseVoterWeightPluginsArgs,
-  VoterWeightPluginInfo,
+  VoterWeightPlugins,
 } from './lib/types'
 import { createMaxVoterWeight } from './lib/createMaxVoterWeight'
 import { updateMaxVoterWeight } from './lib/updateMaxVoterWeight'
@@ -36,7 +36,7 @@ import {useTokenOwnerRecord} from "./hooks/useTokenOwnerRecord";
  */
 export interface UseVoterWeightPluginsReturnType {
   isReady: boolean
-  plugins: VoterWeightPluginInfo[] | undefined // undefined means we are still loading
+  plugins: VoterWeightPlugins | undefined // undefined means we are still loading
   updateVoterWeightRecords: (action?: VoterWeightAction) => Promise<{
     pre: TransactionInstruction[]
     post: TransactionInstruction[]
@@ -66,19 +66,19 @@ export const useVoterWeightPlugins = (
   const mintInfo = useMintInfoByPubkeyQuery(args.governanceMintPublicKey).data?.result;
   const tokenOwnerRecord = useTokenOwnerRecord(args.governanceMintPublicKey);
   const { data: plugins } = usePlugins(args)
-  const { data: calculatedVoterWeight} = useCalculatedVoterWeight({
+  const { result: calculatedVoterWeight} = useCalculatedVoterWeight({
     ...args,
-    plugins,
+    plugins: plugins?.voterWeight,
     tokenOwnerRecord,
   })
-  const { data: calculatedMaxVoterWeight} = useCalculatedMaxVoterWeight({
+  const { result: calculatedMaxVoterWeight} = useCalculatedMaxVoterWeight({
     ...args,
-    plugins,
+    plugins: plugins?.maxVoterWeight,
     mintInfo,
   })
   const pks = useVoterWeightPks({
     ...args,
-    plugins,
+    plugins: plugins?.voterWeight,
   })
 
   const createVoterWeightRecords = (): Promise<TransactionInstruction[]> => {
@@ -93,7 +93,7 @@ export const useVoterWeightPlugins = (
           walletPublicKey,
           realmPublicKey,
           governanceMintPublicKey,
-          plugins,
+          plugins: plugins?.voterWeight,
         }),
     })
   }
@@ -113,7 +113,7 @@ export const useVoterWeightPlugins = (
           walletPublicKey,
           realmPublicKey,
           governanceMintPublicKey,
-          plugins,
+          plugins: plugins?.voterWeight,
           action
         }),
     })
@@ -130,7 +130,7 @@ export const useVoterWeightPlugins = (
         createMaxVoterWeight({
           realmPublicKey,
           governanceMintPublicKey,
-          plugins,
+          plugins: plugins?.maxVoterWeight,
         }),
     })
   }
@@ -146,13 +146,13 @@ export const useVoterWeightPlugins = (
         updateMaxVoterWeight({
           realmPublicKey,
           governanceMintPublicKey,
-          plugins,
+          plugins: plugins?.maxVoterWeight,
         }),
     })
   }
 
-  const includesPlugin = (pluginName: PluginName) =>
-    plugins?.some((plugin) => plugin.name === pluginName) || false
+  const includesPlugin = (pluginName: PluginName, type: PluginType = 'voterWeight') =>
+    plugins?.[type]?.some((plugin) => plugin.name === pluginName) || false
 
   // if we have the plugins, we are ready
   // otherwise, if the realm exists, and the governance mint does not, we have nothing to load

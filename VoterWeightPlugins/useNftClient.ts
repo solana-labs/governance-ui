@@ -13,7 +13,7 @@ export interface useNftClientReturnType
 export const useNftClient = (): useNftClientReturnType => {
   const { isReady, plugins } = useRealmVoterWeightPlugins()
 
-  const plugin = plugins?.find((plugin) =>
+  const plugin = plugins?.voterWeight.find((plugin) =>
       NFT_PLUGINS_PKS.includes(plugin.programId.toString())
   )
 

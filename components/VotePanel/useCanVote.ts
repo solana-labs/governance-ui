@@ -34,7 +34,7 @@ export const useCanVote = () => {
   const { plugins } = useRealmVoterWeightPlugins(votingPop);
 
 
-  const hasAllVoterWeightRecords = (plugins ?? []).every((plugin) => plugin.voterWeight !== undefined)
+  const hasAllVoterWeightRecords = (plugins?.voterWeight ?? []).every((plugin) => plugin.weight !== undefined)
   const isVoteCast = !!ownVoteRecord?.found
 
   const hasMinAmountToVote = useHasAnyVotingPower(votingPop)

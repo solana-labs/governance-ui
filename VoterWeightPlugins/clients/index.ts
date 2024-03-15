@@ -11,6 +11,7 @@ import { PublicKey } from '@solana/web3.js'
 import { VsrClient } from '../../VoteStakeRegistry/sdk/client'
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { HeliumVsrClient } from '../../HeliumVotePlugin/sdk/client'
+import { UnrecognisedVoterWeightPluginClient } from './UnrecognisedVoterWeightPluginClient'
 import { DriftVoterClient } from 'DriftStakeVoterPlugin/DriftVoterClient'
 
 /**
@@ -41,6 +42,6 @@ export const loadClient = (
     case 'drift':
       return DriftVoterClient.connect(provider, programId)
     default:
-      throw new Error(`Unsupported plugin ${plugin}`)
+      return UnrecognisedVoterWeightPluginClient.connect(provider, programId)
   }
 }

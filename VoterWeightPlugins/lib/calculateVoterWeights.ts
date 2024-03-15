@@ -27,6 +27,7 @@ const handlePluginSuccess = (inputVoterWeight: CalculatedWeight, nextPlugin: Vot
         // Plugin failed to calculate voter weight, but did not throw an error, so we just assign a generic error
         return {
             value: null,
+            initialValue: inputVoterWeight.initialValue,
             details: [
                 ...inputVoterWeight.details,
                 {
@@ -40,6 +41,7 @@ const handlePluginSuccess = (inputVoterWeight: CalculatedWeight, nextPlugin: Vot
 
     return {
         value: nextWeight,
+        initialValue: inputVoterWeight.initialValue,
         details: [
             ...inputVoterWeight.details,
             {
@@ -53,6 +55,7 @@ const handlePluginSuccess = (inputVoterWeight: CalculatedWeight, nextPlugin: Vot
 
 const handlePluginError = (inputVoterWeight: CalculatedWeight, nextPlugin: VoterWeightPluginInfo, error: Error): CalculatedWeight => ({
     value: null,
+    initialValue: inputVoterWeight.initialValue,
     details: [
         ...inputVoterWeight.details,
         {
@@ -74,6 +77,7 @@ export const calculateVoterWeight = async ({
 
     const startingWeight: CalculatedWeight = {
         value: tokenOwnerRecordPower,
+        initialValue: tokenOwnerRecordPower,
         details: []
     };
 
@@ -101,6 +105,7 @@ export const calculateMaxVoterWeight = async ({
 
     const startingWeight: CalculatedWeight = {
         value: tokenSupply,
+        initialValue: tokenSupply,
         details: []
     };
 
@@ -109,6 +114,7 @@ export const calculateMaxVoterWeight = async ({
 
         try {
             const nextWeight = await nextPlugin.client.calculateMaxVoterWeight(realmPublicKey, governanceMintPublicKey, inputVoterWeight.value);
+
             return handlePluginSuccess(inputVoterWeight, nextPlugin, nextWeight);
         } catch (error) {
             return handlePluginError(inputVoterWeight, nextPlugin, error);

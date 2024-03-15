@@ -3,29 +3,13 @@ import { useAsync } from 'react-async-hook'
 import { determineVotingPowerType } from '@hooks/queries/governancePower'
 import { useConnection } from '@solana/wallet-adapter-react'
 import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
-import VanillaVotingPower from './Vanilla/VanillaVotingPower'
-import { Deposit } from './Vanilla/Deposit'
-import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
-import { ExclamationIcon } from '@heroicons/react/solid'
-import VanillaWithdrawTokensButton from '@components/TokenBalance/VanillaWithdrawTokensButton'
-import LockedCommunityVotingPower from '@components/ProposalVotingPower/LockedCommunityVotingPower'
-import PluginVotingPower from '@components/ProposalVotingPower/PluginVotingPower'
-import NftVotingPower from '@components/ProposalVotingPower/NftVotingPower'
-import PythVotingPower from '../../PythVotePlugin/components/PythVotingPower'
-import LockedCommunityNFTRecordVotingPower from '@components/ProposalVotingPower/LockedCommunityNFTRecordVotingPower'
+import VanillaVotingPower from './Power/Vanilla/VanillaVotingPower'
+import { Deposit } from './Power/Vanilla/Deposit'
 import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
 import { PluginName } from '@constants/plugins'
-import { VoterWeightPluginInfo } from '../../VoterWeightPlugins/lib/types'
-import GatewayCard from '@components/Gateway/GatewayCard'
-import DriftVotingPower from 'DriftStakeVoterPlugin/components/DriftVotingPower'
+import { VotingPowerCards } from '@components/GovernancePower/Power/VotingPowerCards'
 
 type VotingPowerDisplayType = PluginName | 'composite'
-
-const usesPluginFn = (plugins: VoterWeightPluginInfo[] | undefined) => (
-  plugin: PluginName
-) => {
-  return plugins?.some((p) => p.name === plugin)
-}
 
 export default function GovernancePowerForRole({
   role,
@@ -38,34 +22,6 @@ export default function GovernancePowerForRole({
   const { connection } = useConnection()
   const realmPk = useSelectedRealmPubkey()
   const { plugins } = useRealmVoterWeightPlugins(role)
-  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
-
-  const usesPlugin = usesPluginFn(plugins)
-  const usesNFT = usesPlugin('NFT')
-  const usesPyth = usesPlugin('pyth')
-  const usesHeliumVSR = usesPlugin('HeliumVSR')
-  const usesVSR = usesPlugin('VSR')
-  const usesGateway = usesPlugin('gateway')
-  const usesQV = usesPlugin('QV')
-  const usesDrift = usesPlugin('drift')
-  const isVanilla =
-    !usesNFT &&
-    !usesPyth &&
-    !usesHeliumVSR &&
-    !usesVSR &&
-    !usesGateway &&
-    !usesQV &&
-    !usesDrift
-  // if the realm uses a plugin that doesn't have its own dedicated vote power UI, then use the default one.
-  // Note - when the work for Quadratic Voting milestone 3 comes in, the QV plugin will have its own UI component.
-  const usesDefaultPluginBasedVotingPower = usesGateway || usesQV
-
-  //VSR if dao transited to use plugin and some users have still deposited tokens they should withdraw before
-  //depositing to plugin
-  const didWithdrawFromVanillaSetup =
-    !ownTokenRecord ||
-    ownTokenRecord.account.governingTokenDepositAmount.isZero()
-
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
 
@@ -74,9 +30,9 @@ export default function GovernancePowerForRole({
   >(async () => {
     if (realmPk === undefined) return undefined
     // if there are multiple plugins, show the generic plugin voting power
-    if ((plugins?.length ?? 0) > 1) return 'composite'
+    if ((plugins?.voterWeight.length ?? 0) > 1) return 'composite'
     return determineVotingPowerType(connection, realmPk, role)
-  }, [connection, plugins?.length, realmPk, role])
+  }, [connection, plugins, realmPk, role])
 
   if (connected && kind === undefined && !props.hideIfZero) {
     return (
@@ -86,43 +42,7 @@ export default function GovernancePowerForRole({
   return (
     <>
       {role === 'community' ? (
-        <>
-          {isVanilla && (
-            <div>
-              <VanillaVotingPower role="community" {...props} />
-              <Deposit role="community" />
-            </div>
-          )}
-          {usesVSR &&
-            (didWithdrawFromVanillaSetup ? (
-              <LockedCommunityVotingPower />
-            ) : (
-              //TODO make a better generic little prompt for when a plugin is used but there are still tokens in vanilla
-              <>
-                <VanillaVotingPower role="community" {...props} />
-                <div className="flex flex-col gap-2">
-                  <div>
-                    <small className="flex items-center mt-3 text-xs">
-                      <ExclamationIcon className="w-5 h-5 mr-2"></ExclamationIcon>
-                      Please withdraw your tokens and deposit again to get
-                      governance power
-                    </small>
-                  </div>
-                  <div>
-                    <VanillaWithdrawTokensButton role={role} />
-                  </div>
-                </div>
-              </>
-            ))}
-          {usesNFT && <NftVotingPower />}
-          {usesPyth && <PythVotingPower role="community" />}
-          {usesHeliumVSR && <LockedCommunityNFTRecordVotingPower />}
-          {usesGateway && <GatewayCard />}
-          {usesDrift && <DriftVotingPower role="community" />}
-          {usesDefaultPluginBasedVotingPower && (
-            <PluginVotingPower role="community" />
-          )}
-        </>
+        <VotingPowerCards role={role} {...props} />
       ) : // council
       kind === 'vanilla' ? (
         <div>
