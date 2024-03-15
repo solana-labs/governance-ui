@@ -151,12 +151,17 @@ export type DriftStakeVoter = {
           isSigner: false
         },
         {
-          name: 'spotMarket'
+          name: 'tokenOwnerRecord'
           isMut: false
           isSigner: false
           docs: [
             'TokenOwnerRecord for any of the configured spl-governance instances'
           ]
+        },
+        {
+          name: 'spotMarket'
+          isMut: false
+          isSigner: false
         },
         {
           name: 'insuranceFundVault'
@@ -602,12 +607,17 @@ export const IDL: DriftStakeVoter = {
           isSigner: false,
         },
         {
-          name: 'spotMarket',
+          name: 'tokenOwnerRecord',
           isMut: false,
           isSigner: false,
           docs: [
             'TokenOwnerRecord for any of the configured spl-governance instances',
           ],
+        },
+        {
+          name: 'spotMarket',
+          isMut: false,
+          isSigner: false,
         },
         {
           name: 'insuranceFundVault',

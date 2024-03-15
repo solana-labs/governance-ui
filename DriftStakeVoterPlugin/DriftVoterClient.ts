@@ -1,6 +1,9 @@
 import { BN, Program, Provider } from '@coral-xyz/anchor'
 import { Client } from '@solana/governance-program-library'
-import { SYSTEM_PROGRAM_ID } from '@solana/spl-governance'
+import {
+  getTokenOwnerRecordAddress,
+  SYSTEM_PROGRAM_ID,
+} from '@solana/spl-governance'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { DriftStakeVoter, IDL } from './idl/driftStakeVoter'
 import { IDL as DriftIDL } from './idl/drift'
@@ -15,7 +18,7 @@ import { DRIFT_STAKE_VOTER_PLUGIN } from './constants'
 import { fetchRealmByPubkey } from '@hooks/queries/realm'
 
 export class DriftVoterClient extends Client<DriftStakeVoter> {
-  readonly requiresInputVoterWeight = false
+  readonly requiresInputVoterWeight = true
 
   constructor(
     public program: Program<DriftStakeVoter>,
@@ -42,8 +45,8 @@ export class DriftVoterClient extends Client<DriftStakeVoter> {
   async calculateVoterWeight(
     voter: PublicKey,
     realm: PublicKey,
-    mint: PublicKey
-    //action?: VoterWeightAction | undefined,
+    mint: PublicKey,
+    inputVoterWeight: BN
   ): Promise<BN | null> {
     console.log('drift voter clint', 1)
 
@@ -108,7 +111,7 @@ export class DriftVoterClient extends Client<DriftStakeVoter> {
     console.log('drift voter clint', 3)
     console.log('drift voter clint amount', amount.toString())
 
-    return amount
+    return amount.add(inputVoterWeight)
   }
 
   async updateVoterWeightRecord(
@@ -121,6 +124,15 @@ export class DriftVoterClient extends Client<DriftStakeVoter> {
     pre: TransactionInstruction[]
     post?: TransactionInstruction[] | undefined
   }> {
+    const connection = this.program.provider.connection
+    const { result: realmAccount } = await fetchRealmByPubkey(connection, realm)
+    if (!realmAccount) throw new Error('Realm not found')
+    const tokenOwnerRecordPk = await getTokenOwnerRecordAddress(
+      realmAccount?.owner,
+      realm,
+      mint,
+      voter
+    )
     const { voterWeightPk } = this.getVoterWeightRecordPDA(realm, mint, voter)
     const { registrar: registrarPk } = this.getRegistrarPDA(realm, mint)
     const registrar = await this.program.account.registrar.fetch(registrarPk)
@@ -143,13 +155,14 @@ export class DriftVoterClient extends Client<DriftStakeVoter> {
 
     const ix = await this.program.methods
       .updateVoterWeightRecord()
-      .accounts({
+      .accountsStrict({
         voterWeightRecord: voterWeightPk,
         registrar: registrarPk,
         driftProgram: driftProgramId,
         spotMarket: spotMarketPk,
         insuranceFundStake: insuranceFundStakePk,
         insuranceFundVault: insuranceFundVaultPk,
+        tokenOwnerRecord: tokenOwnerRecordPk,
       })
       .instruction()
 

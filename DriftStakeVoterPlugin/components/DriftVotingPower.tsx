@@ -39,6 +39,8 @@ export default function PluginVotingPower({ role, className }: Props) {
 
   const { calculatedVoterWeight, isReady } = useRealmVoterWeightPlugins(role)
 
+  const vanillaValue = calculatedVoterWeight?.initialValue
+
   const formattedTotal = useMemo(
     () =>
       mintInfo && calculatedVoterWeight?.value
