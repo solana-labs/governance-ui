@@ -28,8 +28,8 @@ export const DriftDeposit = ({ role }: { role: 'community' | 'council' }) => {
         {mintInfo
           ? depositAmount.shiftedBy(-mintInfo.decimals).toFormat()
           : depositAmount.toFormat()}{' '}
-        more {DRIFT_GOVERNANCE_TICKER} in your wallet. You can deposit into
-        Realms or stake with Drift to increase your voting power.
+        more {DRIFT_GOVERNANCE_TICKER} in your wallet. You can stake with Drift
+        or deposit into Realms to increase your voting power.
       </div>
       <div className="mt-3 flex flex-row justify-start flex-wrap gap-2 max-w-full">
         <Button
