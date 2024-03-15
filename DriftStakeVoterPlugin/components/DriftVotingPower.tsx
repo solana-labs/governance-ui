@@ -1,7 +1,5 @@
 import classNames from 'classnames'
 
-import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
-
 import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { BigNumber } from 'bignumber.js'
@@ -34,8 +32,6 @@ export default function PluginVotingPower({ role, className }: Props) {
   } = useJoinRealm()
   const mintInfo = useMintInfoByPubkeyQuery(realm?.account.communityMint).data
     ?.result
-
-  const isLoading = useDepositStore((s) => s.state.isLoading)
 
   const { calculatedVoterWeight, isReady } = useRealmVoterWeightPlugins(role)
 
@@ -98,7 +94,7 @@ export default function PluginVotingPower({ role, className }: Props) {
     })
   }
 
-  if (isLoading || !isReady) {
+  if (!isReady || formattedTotal === undefined) {
     return (
       <div
         className={classNames(
