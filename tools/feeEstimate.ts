@@ -1,5 +1,6 @@
 import {
   Connection,
+  LAMPORTS_PER_SOL,
   PublicKey,
   RecentPrioritizationFees,
 } from '@solana/web3.js'
@@ -48,7 +49,8 @@ export const getFeeEstimate = async (connection: Connection) => {
             recentFees[mid].prioritizationFee) /
           2
     const feeEstimate = Math.ceil(medianFee * feeMultiplier)
-    return feeEstimate
+
+    return Math.min(feeEstimate, LAMPORTS_PER_SOL * 0.001)
   } catch (e) {
     return defaultFee
   }
