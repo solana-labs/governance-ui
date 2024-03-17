@@ -62,6 +62,7 @@ export type FlatListingArgs = {
   maintLiabWeight: number
   initLiabWeight: number
   liquidationFee: number
+  platformLiquidationFee: number
   minVaultToDepositsRatio: number
   netBorrowLimitPerWindowQuote: number
   netBorrowLimitWindowSizeTs: number
@@ -81,6 +82,9 @@ export type FlatListingArgs = {
   interestCurveScaling: number
   setFallbackOracle: boolean
   maintWeightShiftAbort: boolean
+  zeroUtilRate: number
+  disableAssetLiquidation: boolean
+  collateralFeePerDay: number
 }
 
 export type FlatEditArgs = {
@@ -101,6 +105,7 @@ export type FlatEditArgs = {
   maintLiabWeightOpt: number
   initLiabWeightOpt: number
   liquidationFeeOpt: number
+  platformLiquidationFeeOpt: number
   minVaultToDepositsRatioOpt: number
   netBorrowLimitPerWindowQuoteOpt: number
   netBorrowLimitWindowSizeTsOpt: number
@@ -124,6 +129,11 @@ export type FlatEditArgs = {
   maintWeightShiftAbort: boolean
   setFallbackOracle: boolean
   depositLimitOpt: number
+  zeroUtilRateOpt: number
+  disableAssetLiquidationOpt: boolean
+  collateralFeePerDayOpt: number
+  forceWithdrawOpt: boolean
+  forceCloseOpt: boolean
 }
 
 export type ListingArgsFormatted = {
@@ -144,6 +154,7 @@ export type ListingArgsFormatted = {
   maintLiabWeight: string
   initLiabWeight: string
   liquidationFee: string
+  platformLiquidationFee: string
   minVaultToDepositsRatio: string
   netBorrowLimitPerWindowQuote: number
   netBorrowLimitWindowSizeTs: number
@@ -161,6 +172,9 @@ export type ListingArgsFormatted = {
   interestTargetUtilization: number
   interestCurveScaling: number
   groupInsuranceFund: boolean
+  zeroUtilRate: number
+  disableAssetLiquidation: boolean
+  collateralFeePerDay: number
 }
 
 export type EditTokenArgsFormatted = ListingArgsFormatted & {
@@ -170,6 +184,8 @@ export type EditTokenArgsFormatted = ListingArgsFormatted & {
   maintWeightShiftLiabTarget: number
   maintWeightShiftAbort: boolean
   setFallbackOracle: boolean
+  forceWithdraw: boolean
+  forceClose: boolean
 }
 
 const transformPresetToProposed = (listingPreset: LISTING_PRESET) => {
@@ -258,8 +274,11 @@ const fetchJupiterRoutes = async (
         swapMode,
       }).toString()
 
+      const jupiterSwapBaseUrl =
+        process.env.NEXT_PUBLIC_JUPTER_SWAP_API_ENDPOINT ||
+        'https://public.jupiterapi.com'
       const response = await fetch(
-        `https://quote-api.jup.ag/v6/quote?${paramsString}`
+        `${jupiterSwapBaseUrl}/quote?${paramsString}`
       )
 
       const res = await response.json()
@@ -630,6 +649,7 @@ export const getFormattedBankValues = (group: Group, bank: Bank) => {
     publicKey: bank.publicKey.toBase58(),
     vault: bank.vault.toBase58(),
     oracle: bank.oracle.toBase58(),
+    fallbackOracle: bank.fallbackOracle.toBase58(),
     stablePrice: group.toUiPrice(
       I80F48.fromNumber(bank.stablePriceModel.stablePrice),
       bank.mintDecimals
@@ -717,6 +737,9 @@ export const getFormattedBankValues = (group: Group, bank: Bank) => {
       6
     ),
     liquidationFee: (bank.liquidationFee.toNumber() * 100).toFixed(2),
+    platformLiquidationFee: (
+      bank.platformLiquidationFee.toNumber() * 100
+    ).toFixed(2),
     netBorrowLimitWindowSizeTs: secondsToHours(
       bank.netBorrowLimitWindowSizeTs.toNumber()
     ),

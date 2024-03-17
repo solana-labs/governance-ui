@@ -367,21 +367,21 @@
     bn.js "^5.2.1"
     eslint-config-prettier "^9.0.0"
 
-"@blockworks-foundation/mango-v4-settings@^0.2.16":
-  version "0.2.17"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4-settings/-/mango-v4-settings-0.2.17.tgz#ebc64eb037137bdd16df93cdb63badc7f178542b"
-  integrity sha512-k4Hi0Rjq3XbWnN4Hvdd2aDrm24Ob+8+WDCz7hzR+XKCQ0HcYQXVrZn2Yz7e9IA4M3zQEP9n5HHnQopLQb8UgMw==
+"@blockworks-foundation/mango-v4-settings@0.14.19":
+  version "0.14.19"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4-settings/-/mango-v4-settings-0.14.19.tgz#5f712a04cb34a7f12cbc742002cef1c5c3efb887"
+  integrity sha512-F01JfWnRHczrTidgHRyUwOacH1arC6pcLD9KGEvghdEE5YgetRBbrbAiFfrPQ4axym2ovX6HByVb1zAouDnoow==
   dependencies:
     bn.js "^5.2.1"
     eslint-config-prettier "^9.0.0"
 
-"@blockworks-foundation/mango-v4@0.21.22":
-  version "0.21.22"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4/-/mango-v4-0.21.22.tgz#cf399225b995f3d82edc523f5af03c004c9369ec"
-  integrity sha512-n+aSuqlmv6lofmpkLCs4mNF5E7jBGD4UTKE3XfJNUVeV0Vh6E3dihraT26ZkrHCW+woNPWa+26vmd3X3bk4t+w==
+"@blockworks-foundation/mango-v4@0.23.1":
+  version "0.23.1"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4/-/mango-v4-0.23.1.tgz#16fc6ec30b341168973a432302d261f93ccd15a4"
+  integrity sha512-moJwwZMBlddX8opbdoV0pzmukflOPJ35HwMF0UQvS3Nk3FphxfbU/3H0HP8vYPIvRkb0WW2QspvwmfXMGaQzZg==
   dependencies:
-    "@blockworks-foundation/mango-v4-settings" "^0.2.16"
-    "@blockworks-foundation/mangolana" "0.0.13"
+    "@blockworks-foundation/mango-v4-settings" "0.14.15"
+    "@blockworks-foundation/mangolana" "0.0.14"
     "@coral-xyz/anchor" "^0.28.1-beta.2"
     "@project-serum/serum" "0.13.65"
     "@pythnetwork/client" "~2.14.0"
@@ -396,17 +396,6 @@
     fast-copy "^3.0.1"
     lodash "^4.17.21"
     node-kraken-api "^2.2.2"
-
-"@blockworks-foundation/mangolana@0.0.13":
-  version "0.0.13"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mangolana/-/mangolana-0.0.13.tgz#82a9b0846e69068de6216d20fcdcd60375d14e1e"
-  integrity sha512-/QPMHjtPpAYaDPbQVLolp5Lq4cCd77b8gBumws97L3J0DfvsKpZVYeAA0fNmSX6qq+pKqCgCywDjJeYhJ01PsQ==
-  dependencies:
-    "@solana/web3.js" "^1.88.0"
-    bs58 "^5.0.0"
-    isomorphic-ws "^5.0.0"
-    node-fetch "2.6.11"
-    ws "^8.16.0"
 
 "@blockworks-foundation/mangolana@0.0.14":
   version "0.0.14"
