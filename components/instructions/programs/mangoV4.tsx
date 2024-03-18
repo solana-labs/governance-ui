@@ -9,7 +9,6 @@ import { BN, BorshInstructionCoder } from '@coral-xyz/anchor'
 import { AccountMetaData } from '@solana/spl-governance'
 import { Connection, PublicKey } from '@solana/web3.js'
 import {
-  getSuggestedCoinTier,
   compareObjectsAndGetDifferentKeys,
   FlatListingArgs,
   ListingArgsFormatted,
@@ -21,6 +20,7 @@ import {
   decodePriceFromOracleAi,
   getFormattedBankValues,
   REDUCE_ONLY_OPTIONS,
+  getSuggestedCoinPresetInfo,
 } from '@utils/Mango/listingTools'
 import { secondsToHours } from 'date-fns'
 import WarningFilledIcon from '@carbon/icons-react/lib/WarningFilled'
@@ -30,17 +30,17 @@ import tokenPriceService, {
   TokenInfoWithoutDecimals,
 } from '@utils/services/tokenPrice'
 import {
-  LISTING_PRESETS,
-  LISTING_PRESETS_KEYS,
-  LISTING_PRESETS_PYTH,
+  LISTING_PRESETS_KEY,
   MidPriceImpact,
   coinTiersToNames,
   getMidPriceImpacts,
-  getProposedTier,
+  getProposedKey,
 } from '@blockworks-foundation/mango-v4-settings/lib/helpers/listingTools'
 import { tryParseKey } from '@tools/validators/pubkey'
 import Loading from '@components/Loading'
 import { getClient, getGroupForClient } from '@utils/mangoV4Tools'
+import { tryGetMint } from '@utils/tokens'
+import { formatNumber } from '@utils/formatNumber'
 // import { snakeCase } from 'snake-case'
 // import { sha256 } from 'js-sha256'
 
@@ -232,11 +232,18 @@ const instructions = () => ({
       const oracle = accounts[6].pubkey
       const isMintOnCurve = PublicKey.isOnCurve(proposedMint)
 
-      const [info, proposedOracle, args, oracleAi] = await Promise.all([
+      const [
+        info,
+        proposedOracle,
+        args,
+        oracleAi,
+        mintInfo,
+      ] = await Promise.all([
         displayArgs(connection, data),
         getOracle(connection, oracle),
         getDataObjectFlattened<FlatListingArgs>(connection, data),
         connection.getAccountInfo(oracle),
+        tryGetMint(connection, proposedMint),
       ])
 
       const oracleData = await decodePriceFromOracleAi(
@@ -245,27 +252,55 @@ const instructions = () => ({
         proposedOracle.type
       )
 
-      const liqudityTier = await getSuggestedCoinTier(
+      const presetInfo = await getSuggestedCoinPresetInfo(
         proposedMint.toBase58(),
         proposedOracle.type === 'Pyth'
       )
 
       const formattedProposedArgs = getFormattedListingValues(args)
 
-      const suggestedPreset = getFormattedListingPresets(
-        proposedOracle.type === 'Pyth'
-      )[liqudityTier.tier]
-      const suggestedUntrusted = liqudityTier.tier === 'UNTRUSTED'
+      const formattedSuggestedPresets = getFormattedListingPresets(
+        proposedOracle.type === 'Pyth',
+        0,
+        mintInfo?.account.decimals || 0,
+        oracleData.uiPrice
+      )
 
-      const suggestedFormattedPreset: ListingArgsFormatted =
-        Object.keys(suggestedPreset).length && !suggestedUntrusted
-          ? getFormattedListingValues({
-              tokenIndex: args.tokenIndex,
-              name: args.name,
-              oracle: args.oracle,
-              ...suggestedPreset,
-            })
-          : ({} as ListingArgsFormatted)
+      const currentListingArgsMatchedTier = Object.values(
+        formattedSuggestedPresets
+      ).find((preset) => {
+        const formattedPreset = getFormattedListingValues({
+          tokenIndex: args.tokenIndex,
+          name: args.name,
+          oracle: args.oracle,
+          ...preset,
+        })
+
+        return (
+          JSON.stringify({
+            //deposit limit depends on current price so can be different a bit in proposal
+            ...formattedProposedArgs,
+            depositLimit: 0,
+          }) ===
+          JSON.stringify({
+            ...formattedPreset,
+            depositLimit: 0,
+          })
+        )
+      })
+
+      const suggestedPreset = formattedSuggestedPresets[presetInfo.presetKey]
+
+      const suggestedFormattedPreset: ListingArgsFormatted = Object.keys(
+        suggestedPreset
+      ).length
+        ? getFormattedListingValues({
+            tokenIndex: args.tokenIndex,
+            name: args.name,
+            oracle: args.oracle,
+            ...suggestedPreset,
+          })
+        : ({} as ListingArgsFormatted)
 
       const invalidKeys: (keyof ListingArgsFormatted)[] = Object.keys(
         suggestedPreset
@@ -275,24 +310,32 @@ const instructions = () => ({
             suggestedFormattedPreset
           )
         : []
-      const invalidFields: Partial<ListingArgsFormatted> = invalidKeys.reduce(
-        (obj, key) => {
+
+      const invalidFields: Partial<ListingArgsFormatted> = invalidKeys
+        .filter((x) => {
+          //soft invalid keys - some of the keys can be off by some small maring
+          if (x === 'depositLimit') {
+            return !isDifferenceWithin5Percent(
+              Number(formattedProposedArgs['depositLimit'] || 0),
+              Number(suggestedFormattedPreset['depositLimit'] || 0)
+            )
+          }
+          return true
+        })
+        .reduce((obj, key) => {
           return {
             ...obj,
             [key]: suggestedFormattedPreset[key],
           }
-        },
-        {}
-      )
+        }, {})
+
       const DisplayListingPropertyWrapped = ({
         label,
-        suggestedUntrusted,
         valKey,
         suffix,
         prefix: perfix,
       }: {
         label: string
-        suggestedUntrusted: boolean
         valKey: string
         suffix?: string
         prefix?: string
@@ -300,7 +343,6 @@ const instructions = () => ({
         return (
           <DisplayListingProperty
             label={label}
-            suggestedUntrusted={suggestedUntrusted}
             val={formattedProposedArgs[valKey]}
             suggestedVal={invalidFields[valKey]}
             suffix={formattedProposedArgs[valKey] && suffix}
@@ -313,32 +355,37 @@ const instructions = () => ({
         return (
           <div>
             <div className="pb-4 space-y-3">
-              {suggestedUntrusted && (
+              {presetInfo.presetKey === 'UNTRUSTED' && (
                 <>
                   <h3 className="text-orange flex items-center">
                     <WarningFilledIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
-                    Suggested token tier: UNTRUSTED.
+                    Suggested token tier: C
                   </h3>
                   <h3 className="text-orange flex">
-                    Very low liquidity Price impact of{' '}
-                    {liqudityTier.priceImpact}% on $1000 swap. This token should
-                    probably be listed using the Register Trustless Token
-                    instruction check params carefully
+                    Very low liquidity check params carefully
                   </h3>
                 </>
               )}
-              {!suggestedUntrusted && !invalidKeys.length && (
+              {!invalidKeys.length && (
                 <h3 className="text-green flex items-center">
                   <CheckCircleIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
                   Proposal params match suggested token tier -{' '}
-                  {coinTiersToNames[liqudityTier.tier]}.
+                  {coinTiersToNames[presetInfo.presetKey]}.
                 </h3>
               )}
-              {!suggestedUntrusted && invalidKeys.length > 0 && (
+              {invalidKeys.length > 0 && (
                 <h3 className="text-orange flex items-center">
                   <WarningFilledIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
                   Proposal params do not match suggested token tier -{' '}
-                  {coinTiersToNames[liqudityTier.tier]} check params carefully
+                  {coinTiersToNames[presetInfo.presetKey]} check params
+                  carefully
+                </h3>
+              )}
+              {currentListingArgsMatchedTier && (
+                <h3 className="text-green flex items-center">
+                  <CheckCircleIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
+                  Full match found with tier {/* @ts-ignore */}
+                  {currentListingArgsMatchedTier.preset_name}
                 </h3>
               )}
               {isMintOnCurve && (
@@ -389,186 +436,189 @@ const instructions = () => ({
               </div>
               <DisplayListingPropertyWrapped
                 label="Token index"
-                suggestedUntrusted={false}
                 valKey={`tokenIndex`}
               />
               <DisplayListingPropertyWrapped
                 label="Token name"
-                suggestedUntrusted={false}
                 valKey={`tokenName`}
               />
               <DisplayListingPropertyWrapped
                 label="Oracle Confidence Filter"
-                suggestedUntrusted={suggestedUntrusted}
                 valKey={'oracleConfidenceFilter'}
                 suffix="%"
               />
               <DisplayListingPropertyWrapped
                 label="Oracle Max Staleness Slots"
-                suggestedUntrusted={suggestedUntrusted}
                 valKey={'oracleMaxStalenessSlots'}
               />
               <DisplayListingPropertyWrapped
                 label="Interest rate adjustment factor"
-                suggestedUntrusted={suggestedUntrusted}
                 valKey={'adjustmentFactor'}
                 suffix="%"
               />
               <DisplayListingPropertyWrapped
                 label="Interest rate utilization point 0"
-                suggestedUntrusted={suggestedUntrusted}
                 valKey={'interestRateUtilizationPoint0'}
                 suffix="%"
               />
               <DisplayListingPropertyWrapped
                 label="Interest rate point 0"
-                suggestedUntrusted={suggestedUntrusted}
                 valKey={'interestRatePoint0'}
                 suffix="%"
               />
               <DisplayListingPropertyWrapped
                 label="Interest rate utilization point 1"
-                suggestedUntrusted={suggestedUntrusted}
                 valKey={'interestRateUtilizationPoint1'}
                 suffix="%"
               />
               <DisplayListingPropertyWrapped
                 label="Interest rate point 1"
-                suggestedUntrusted={suggestedUntrusted}
                 valKey={'interestRatePoint1'}
                 suffix="%"
               />
               <DisplayListingPropertyWrapped
                 label="Interest rate max rate"
-                suggestedUntrusted={suggestedUntrusted}
                 valKey={'maxRate'}
                 suffix="%"
               />
               <DisplayListingPropertyWrapped
                 label="Loan Fee Rate"
-                suggestedUntrusted={suggestedUntrusted}
                 valKey={'loanFeeRate'}
                 suffix=" bps"
               />
               <DisplayListingPropertyWrapped
                 label="Loan Origination Fee Rate"
-                suggestedUntrusted={suggestedUntrusted}
                 valKey={'loanOriginationFeeRate'}
                 suffix=" bps"
               />
               <DisplayListingPropertyWrapped
                 label="Maintenance Asset Weight"
-                suggestedUntrusted={suggestedUntrusted}
                 valKey={'maintAssetWeight'}
               />
               <DisplayListingPropertyWrapped
                 label="Init Asset Weight"
-                suggestedUntrusted={suggestedUntrusted}
                 valKey={'initAssetWeight'}
               />
               <DisplayListingPropertyWrapped
                 label="Maintenance Liab Weight"
-                suggestedUntrusted={suggestedUntrusted}
                 valKey={'maintLiabWeight'}
               />
               <DisplayListingPropertyWrapped
                 label="Init Liab Weight"
-                suggestedUntrusted={suggestedUntrusted}
                 valKey={'initLiabWeight'}
               />
               <DisplayListingPropertyWrapped
                 label="Liquidation Fee"
-                suggestedUntrusted={suggestedUntrusted}
                 valKey="liquidationFee"
                 suffix="%"
               />
               <DisplayListingPropertyWrapped
+                label="Platform Liquidation Fee"
+                valKey="PlatformLiquidationFee"
+                suffix="%"
+              />
+              <DisplayListingPropertyWrapped
                 label="Min Vault To Deposits Ratio"
-                suggestedUntrusted={suggestedUntrusted}
                 valKey="minVaultToDepositsRatio"
                 suffix="%"
               />
               <DisplayListingPropertyWrapped
                 label="Net Borrow Limit Window Size"
-                suggestedUntrusted={suggestedUntrusted}
                 valKey="netBorrowLimitWindowSizeTs"
                 suffix="H"
               />
               <DisplayListingPropertyWrapped
-                label="Net Borrow Limit Per Window Quote"
-                suggestedUntrusted={suggestedUntrusted}
+                label="Net Borrow Limit Per Window Quote (compared with 5% margin)"
                 valKey="netBorrowLimitPerWindowQuote"
                 prefix="$"
               />
               <DisplayListingPropertyWrapped
                 label="Borrow Weight Scale Start Quote"
-                suggestedUntrusted={suggestedUntrusted}
                 valKey="borrowWeightScaleStartQuote"
                 prefix="$"
               />
               <DisplayListingPropertyWrapped
                 label="Deposit Weight Scale Start Quote"
-                suggestedUntrusted={suggestedUntrusted}
                 valKey="depositWeightScaleStartQuote"
                 prefix="$"
               />
               <DisplayListingPropertyWrapped
                 label="Stable Price Delay Interval"
-                suggestedUntrusted={suggestedUntrusted}
                 valKey="stablePriceDelayIntervalSeconds"
                 suffix="H"
               />
               <DisplayListingPropertyWrapped
                 label="Stable Price Delay Growth Limit"
-                suggestedUntrusted={suggestedUntrusted}
                 valKey="stablePriceDelayGrowthLimit"
                 suffix="%"
               />
               <DisplayListingPropertyWrapped
                 label="Stable Price Growth Limit"
-                suggestedUntrusted={suggestedUntrusted}
                 valKey="stablePriceGrowthLimit"
                 suffix="%"
               />
               <DisplayListingPropertyWrapped
                 label="reduceOnly"
-                suggestedUntrusted={suggestedUntrusted}
                 valKey="reduceOnly"
               />
               <DisplayListingPropertyWrapped
                 label="Token Conditional Swap Taker Fee Rate"
-                suggestedUntrusted={suggestedUntrusted}
                 valKey="tokenConditionalSwapTakerFeeRate"
               />
               <DisplayListingPropertyWrapped
                 label="Token Conditional Swap Maker Fee Rate"
-                suggestedUntrusted={suggestedUntrusted}
                 valKey="tokenConditionalSwapMakerFeeRate"
               />
               <DisplayListingPropertyWrapped
                 label="Flash Loan Deposit Fee Rate"
-                suggestedUntrusted={suggestedUntrusted}
                 valKey="flashLoanSwapFeeRate"
+                suffix=" bps"
               />
-              <DisplayListingPropertyWrapped
-                label="Deposit Limit"
-                suggestedUntrusted={suggestedUntrusted}
-                valKey="depositLimit"
+              <DisplayListingProperty
+                label="Deposit Limit (compared with 5% margin)"
+                val={`${
+                  mintInfo && formattedProposedArgs.depositLimit
+                    ? toUiDecimals(
+                        new BN(formattedProposedArgs.depositLimit.toString()),
+                        mintInfo.account.decimals
+                      )
+                    : formattedProposedArgs.depositLimit
+                } ${args.name} ($${
+                  mintInfo && formattedProposedArgs.depositLimit
+                    ? (
+                        toUiDecimals(
+                          new BN(formattedProposedArgs.depositLimit.toString()),
+                          mintInfo.account.decimals
+                        ) * oracleData.uiPrice
+                      ).toFixed(0)
+                    : 0
+                })`}
+                suggestedVal={
+                  mintInfo && invalidFields?.depositLimit
+                    ? `${toUiDecimals(
+                        new BN(invalidFields.depositLimit.toString()),
+                        mintInfo.account.decimals
+                      )} ${args.name} ($${(
+                        toUiDecimals(
+                          new BN(invalidFields.depositLimit.toString()),
+                          mintInfo.account.decimals
+                        ) * oracleData.uiPrice
+                      ).toFixed(0)})`
+                    : undefined
+                }
               />
               <DisplayListingPropertyWrapped
                 label="Interest Target Utilization"
-                suggestedUntrusted={suggestedUntrusted}
                 valKey="interestTargetUtilization"
               />
               <DisplayListingPropertyWrapped
                 label="Interest Curve Scaling"
-                suggestedUntrusted={suggestedUntrusted}
                 valKey="interestCurveScaling"
               />
-              <DisplayListingPropertyWrapped
+              <DisplayListingProperty
                 label="Group Insurance Fund"
-                suggestedUntrusted={suggestedUntrusted}
-                valKey="groupInsuranceFund"
+                val={formattedProposedArgs.groupInsuranceFund?.toString()}
+                suggestedVal={invalidFields.groupInsuranceFund?.toString()}
               />
             </div>
             <AdvancedOptionsDropdown className="mt-4" title="Raw values">
@@ -612,13 +662,13 @@ const instructions = () => ({
       const banks = [...mangoGroup.banksMapByMint.values()].map((x) => x[0])
       let baseMint = banks.find((x) => x.publicKey.equals(baseBank))?.mint
       let quoteMint = banks.find((x) => x.publicKey.equals(quoteBank))?.mint
+      const currentMarket = await Market.load(
+        connection,
+        openbookMarketPk,
+        undefined,
+        openBookProgram
+      )
       if (!baseMint || !quoteMint) {
-        const currentMarket = await Market.load(
-          connection,
-          openbookMarketPk,
-          undefined,
-          openBookProgram
-        )
         baseMint = currentMarket.baseMintAddress
         quoteMint = currentMarket.quoteMintAddress
       }
@@ -633,7 +683,7 @@ const instructions = () => ({
       try {
         return (
           <div>
-            {bestMarket && openbookMarketPk.equals(bestMarket) && (
+            {bestMarket && openbookMarketPk.equals(bestMarket.pubKey) && (
               <div className="text-green flex items-center">
                 <CheckCircleIcon className="w-5 mr-2"></CheckCircleIcon>
                 Proposed market match the best market according to listing
@@ -646,7 +696,13 @@ const instructions = () => ({
                 Best market not found check market carefully
               </div>
             )}
-            {bestMarket && !openbookMarketPk.equals(bestMarket) && (
+            {bestMarket?.error && (
+              <div className="text-orange flex items-center pb-4">
+                <WarningFilledIcon className="w-5 mr-2"></WarningFilledIcon>
+                {bestMarket?.error}
+              </div>
+            )}
+            {bestMarket && !openbookMarketPk.equals(bestMarket.pubKey) && (
               <div className="flex flex-row text-orange ">
                 <div className="flex items-center">
                   <WarningFilledIcon className="w-5 mr-2"></WarningFilledIcon>
@@ -656,7 +712,7 @@ const instructions = () => ({
                     <a
                       className="underline"
                       target="_blank"
-                      href={`https://openserum.io/${bestMarket.toBase58()}`}
+                      href={`https://openserum.io/${bestMarket.pubKey.toBase58()}`}
                       rel="noreferrer"
                     >
                       Suggested Openbook market link
@@ -675,6 +731,21 @@ const instructions = () => ({
               >
                 Proposed Openbook market link
               </a>
+            </div>
+
+            <div className="my-4">
+              <div>Tick Size: {currentMarket.tickSize}</div>
+              <div>
+                Base Lot Size: {currentMarket.decoded?.baseLotSize?.toNumber()}
+              </div>
+              <div>
+                Quote Lot Size:{' '}
+                {currentMarket.decoded?.quoteLotSize?.toNumber()}
+              </div>
+              <div>
+                Quote decimals: {currentMarket['_quoteSplTokenDecimals']}
+              </div>
+              <div>Base decimals: {currentMarket['_baseSplTokenDecimals']}</div>
             </div>
             {info}
           </div>
@@ -760,6 +831,7 @@ const instructions = () => ({
       { name: 'Admin' },
       { name: 'Mint Info' },
       { name: 'Oracle' },
+      { name: 'Fallback oracle' },
     ],
     getDataUI: async (
       connection: Connection,
@@ -777,15 +849,16 @@ const instructions = () => ({
           displayArgs(connection, data),
           getDataObjectFlattened<FlatEditArgs>(connection, data),
         ])
+        let priceImpact: MidPriceImpact | undefined
         const mint = [...mangoGroup.mintInfosMapByMint.values()].find((x) =>
           x.publicKey.equals(mintInfo)
         )?.mint
 
         let liqudityTier: Partial<{
-          tier: LISTING_PRESETS_KEYS
+          presetKey: LISTING_PRESETS_KEY
           priceImpact: string
         }> = {}
-        let suggestedUntrusted = false
+
         let invalidKeys: (keyof EditTokenArgsFormatted)[] = []
         let invalidFields: Partial<EditTokenArgsFormatted> = {}
         let bank: null | Bank = null
@@ -796,11 +869,15 @@ const instructions = () => ({
         const parsedArgs: Partial<EditTokenArgsFormatted> = {
           tokenIndex: args.tokenIndex,
           tokenName: args.nameOpt,
-          oracleConfidenceFilter:
-            args['oracleConfigOpt.confFilter'] !== undefined
-              ? (args['oracleConfigOpt.confFilter'] * 100)?.toFixed(2)
-              : undefined,
-          oracleMaxStalenessSlots: args['oracleConfigOpt.maxStalenessSlots'],
+          oracleConfidenceFilter: args['oracleConfigOpt.confFilter']
+            ? args['oracleConfigOpt.confFilter'] >= 100
+              ? args['oracleConfigOpt.confFilter'].toString()
+              : (args['oracleConfigOpt.confFilter'] * 100).toFixed(2)
+            : undefined,
+          oracleMaxStalenessSlots:
+            args['oracleConfigOpt.maxStalenessSlots'] === null
+              ? -1
+              : args['oracleConfigOpt.maxStalenessSlots'],
           interestRateUtilizationPoint0:
             args['interestRateParamsOpt.util0'] !== undefined
               ? (args['interestRateParamsOpt.util0'] * 100)?.toFixed(2)
@@ -843,6 +920,10 @@ const instructions = () => ({
             args['liquidationFeeOpt'] !== undefined
               ? (args['liquidationFeeOpt'] * 100)?.toFixed(2)
               : undefined,
+          platformLiquidationFee:
+            args['platformLiquidationFeeOpt'] !== undefined
+              ? (args['platformLiquidationFeeOpt'] * 100)?.toFixed(2)
+              : undefined,
           minVaultToDepositsRatio:
             args['minVaultToDepositsRatioOpt'] !== undefined
               ? (args['minVaultToDepositsRatioOpt'] * 100)?.toFixed(2)
@@ -871,7 +952,10 @@ const instructions = () => ({
             args.tokenConditionalSwapMakerFeeRateOpt,
           tokenConditionalSwapTakerFeeRate:
             args.tokenConditionalSwapTakerFeeRateOpt,
-          flashLoanSwapFeeRate: args.flashLoanSwapFeeRateOpt,
+          flashLoanSwapFeeRate:
+            args.flashLoanSwapFeeRateOpt !== undefined
+              ? (args.loanOriginationFeeRateOpt * 10000)?.toFixed(2)
+              : undefined,
           reduceOnly:
             args.reduceOnlyOpt !== undefined
               ? REDUCE_ONLY_OPTIONS[args.reduceOnlyOpt].name
@@ -885,6 +969,11 @@ const instructions = () => ({
           depositLimit: args.depositLimitOpt?.toString(),
           setFallbackOracle: args.setFallbackOracle,
           maintWeightShiftAbort: args.maintWeightShiftAbort,
+          zeroUtilRate: args.zeroUtilRateOpt,
+          disableAssetLiquidation: args.disableAssetLiquidationOpt,
+          collateralFeePerDay: args.collateralFeePerDayOpt,
+          forceWithdraw: args.forceWithdrawOpt,
+          forceClose: args.forceCloseOpt,
         }
 
         if (mint) {
@@ -892,12 +981,15 @@ const instructions = () => ({
           bankFormattedValues = getFormattedBankValues(mangoGroup, bank)
           mintData = tokenPriceService.getTokenInfo(mint.toBase58())
           const isPyth = bank?.oracleProvider === OracleProvider.Pyth
-          const midPriceImpacts = getMidPriceImpacts(mangoGroup.pis)
 
-          const PRESETS = isPyth ? LISTING_PRESETS_PYTH : LISTING_PRESETS
+          const midPriceImpacts = getMidPriceImpacts(
+            mangoGroup.pis.length ? mangoGroup.pis : []
+          )
 
           const tokenToPriceImpact = midPriceImpacts
-            .filter((x) => x.avg_price_impact_percent < 1)
+            .filter(
+              (x) => x.avg_price_impact_percent < 1 || x.target_amount <= 1000
+            )
             .reduce(
               (acc: { [key: string]: MidPriceImpact }, val: MidPriceImpact) => {
                 if (
@@ -911,31 +1003,35 @@ const instructions = () => ({
               {}
             )
 
-          const priceImpact = tokenToPriceImpact[getApiTokenName(bank.name)]
+          priceImpact = tokenToPriceImpact[getApiTokenName(bank.name)]
 
-          const suggestedTier = getProposedTier(
-            PRESETS,
-            priceImpact?.target_amount,
-            bank.oracleProvider === OracleProvider.Pyth
-          )
+          const suggestedPresetKey = priceImpact
+            ? getProposedKey(
+                priceImpact.avg_price_impact_percent < 1
+                  ? priceImpact?.target_amount
+                  : undefined,
+                bank.oracleProvider === OracleProvider.Pyth
+              )
+            : 'UNTRUSTED'
 
           liqudityTier = !mint.equals(USDC_MINT)
             ? {
-                tier: suggestedTier,
+                presetKey: suggestedPresetKey,
                 priceImpact: priceImpact
                   ? priceImpact.avg_price_impact_percent.toString()
                   : '',
               }
             : {
-                tier: 'ULTRA_PREMIUM',
+                presetKey: 'asset_250p',
                 priceImpact: '0',
               }
 
           const suggestedPreset = getFormattedListingPresets(
             !!isPyth,
-            bank.nativeDeposits().mul(bank.price).toNumber()
-          )[liqudityTier.tier!]
-          suggestedUntrusted = liqudityTier.tier === 'UNTRUSTED'
+            bank.uiDeposits(),
+            bank.mintDecimals,
+            bank.uiPrice
+          )[liqudityTier.presetKey!]
 
           const suggestedFormattedPreset:
             | EditTokenArgsFormatted
@@ -955,6 +1051,8 @@ const instructions = () => ({
                 maintWeightShiftLiabTarget: args.maintWeightShiftLiabTargetOpt,
                 maintWeightShiftAbort: args.maintWeightShiftAbort,
                 setFallbackOracle: args.setFallbackOracle,
+                forceWithdraw: args.forceWithdrawOpt,
+                forceClose: args.forceCloseOpt,
               }
             : {}
 
@@ -963,7 +1061,27 @@ const instructions = () => ({
                 Partial<EditTokenArgsFormatted>
               >(parsedArgs, suggestedFormattedPreset)
             : []
-          ).filter((x) => parsedArgs[x] !== undefined)
+          )
+            .filter((x) => parsedArgs[x] !== undefined)
+            .filter((x) => {
+              //soft invalid keys - some of the keys can be off by some small maring
+              if (x === 'depositLimit') {
+                return !isDifferenceWithin5Percent(
+                  Number(parsedArgs['depositLimit'] || 0),
+                  Number(suggestedFormattedPreset['depositLimit'] || 0)
+                )
+              }
+              if (x === 'netBorrowLimitPerWindowQuote') {
+                return !isDifferenceWithin5Percent(
+                  Number(parsedArgs['netBorrowLimitPerWindowQuote'] || 0),
+                  Number(
+                    suggestedFormattedPreset['netBorrowLimitPerWindowQuote'] ||
+                      0
+                  )
+                )
+              }
+              return true
+            })
 
           invalidFields = invalidKeys.reduce((obj, key) => {
             return {
@@ -976,36 +1094,38 @@ const instructions = () => ({
         return (
           <div>
             <h3>{mintData && <div>Token: {mintData.symbol}</div>}</h3>
-            {suggestedUntrusted && (
+            {!priceImpact && (
+              <h3 className="text-orange flex items-center">
+                <WarningFilledIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
+                No price impact data in group
+              </h3>
+            )}
+            {liqudityTier.presetKey === 'UNTRUSTED' && (
               <>
                 <h3 className="text-orange flex items-center">
                   <WarningFilledIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
-                  Suggested token tier: UNTRUSTED.
+                  Suggested token tier: C
                 </h3>
                 <h3 className="text-orange flex">
-                  Very low liquidity Price impact of {liqudityTier?.priceImpact}
-                  % on $1000 swap. Check params carefully token should be listed
-                  with untrusted instruction
+                  Very low liquidity check params carefully
                 </h3>
               </>
             )}
-            {!suggestedUntrusted && !invalidKeys.length && liqudityTier.tier && (
+            {!invalidKeys.length && liqudityTier.presetKey && (
               <h3 className="text-green flex items-center">
                 <CheckCircleIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
                 Proposal params match suggested token tier -{' '}
-                {coinTiersToNames[liqudityTier.tier]}.
+                {coinTiersToNames[liqudityTier.presetKey]}.
               </h3>
             )}
-            {!suggestedUntrusted &&
-              invalidKeys &&
-              invalidKeys!.length > 0 &&
-              liqudityTier.tier && (
-                <h3 className="text-orange flex items-center">
-                  <WarningFilledIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
-                  Proposal params do not match suggested token tier -{' '}
-                  {coinTiersToNames[liqudityTier.tier]} check params carefully
-                </h3>
-              )}
+            {invalidKeys && invalidKeys!.length > 0 && liqudityTier.presetKey && (
+              <h3 className="text-orange flex items-center">
+                <WarningFilledIcon className="h-4 w-4 fill-current mr-2 flex-shrink-0" />
+                Proposal params do not match suggested token tier -{' '}
+                {coinTiersToNames[liqudityTier.presetKey]} check params
+                carefully
+              </h3>
+            )}
             <div className="py-4">
               <div className="flex mb-2">
                 <div className="w-3 h-3 bg-white mr-2"></div> - Current values
@@ -1045,7 +1165,11 @@ const instructions = () => ({
               <DisplayNullishProperty
                 label="Oracle Max Staleness Slots"
                 currentValue={bankFormattedValues?.maxStalenessSlots}
-                value={parsedArgs.oracleMaxStalenessSlots}
+                value={
+                  parsedArgs.oracleMaxStalenessSlots === null
+                    ? -1
+                    : parsedArgs.oracleMaxStalenessSlots
+                }
                 suggestedVal={invalidFields.oracleMaxStalenessSlots}
               />
               <DisplayNullishProperty
@@ -1198,6 +1322,21 @@ const instructions = () => ({
                 }
               />
               <DisplayNullishProperty
+                label="Platform Liquidation Fee"
+                value={
+                  parsedArgs.platformLiquidationFee &&
+                  `${parsedArgs.platformLiquidationFee}%`
+                }
+                currentValue={
+                  bankFormattedValues?.platformLiquidationFee &&
+                  `${bankFormattedValues.platformLiquidationFee}%`
+                }
+                suggestedVal={
+                  invalidFields.platformLiquidationFee &&
+                  `${invalidFields.platformLiquidationFee}%`
+                }
+              />
+              <DisplayNullishProperty
                 label="Min Vault To Deposits Ratio"
                 value={
                   parsedArgs.minVaultToDepositsRatio &&
@@ -1227,8 +1366,9 @@ const instructions = () => ({
                   `${invalidFields.netBorrowLimitWindowSizeTs}H`
                 }
               />
+
               <DisplayNullishProperty
-                label="Net Borrow Limit Per Window Quote"
+                label="Net Borrow Limit Per Window Quote (compared with 5% margin)"
                 value={
                   parsedArgs.netBorrowLimitPerWindowQuote &&
                   `$${parsedArgs.netBorrowLimitPerWindowQuote}`
@@ -1289,6 +1429,16 @@ const instructions = () => ({
                 value={args.oracleOpt?.toBase58()}
                 currentValue={bankFormattedValues?.oracle}
               />
+              {accounts.length &&
+                accounts[4] &&
+                accounts[4].pubkey.toBase58() !==
+                  bankFormattedValues?.fallbackOracle && (
+                  <DisplayNullishProperty
+                    label="Fallback Oracle"
+                    value={accounts[4].pubkey.toBase58()}
+                    currentValue={bankFormattedValues?.fallbackOracle}
+                  />
+                )}
               <DisplayNullishProperty
                 label="Token Conditional Swap Maker Fee Rate"
                 value={parsedArgs.tokenConditionalSwapMakerFeeRate}
@@ -1307,9 +1457,18 @@ const instructions = () => ({
               />
               <DisplayNullishProperty
                 label="Flash Loan Swap Fee Rate"
-                value={parsedArgs.flashLoanSwapFeeRate}
-                currentValue={bankFormattedValues?.flashLoanSwapFeeRate}
-                suggestedVal={invalidFields.flashLoanSwapFeeRate}
+                value={
+                  parsedArgs.flashLoanSwapFeeRate &&
+                  `${parsedArgs.flashLoanSwapFeeRate} bps`
+                }
+                currentValue={
+                  bankFormattedValues?.flashLoanSwapFeeRate &&
+                  `${bankFormattedValues.flashLoanSwapFeeRate} bps`
+                }
+                suggestedVal={
+                  invalidFields.flashLoanSwapFeeRate &&
+                  `${invalidFields.flashLoanSwapFeeRate} bps`
+                }
               />
               <DisplayNullishProperty
                 label="Reduce only"
@@ -1353,15 +1512,87 @@ const instructions = () => ({
                 suggestedVal={invalidFields.maintWeightShiftLiabTarget}
               />
               <DisplayNullishProperty
-                label="Deposit Limit"
-                value={parsedArgs.depositLimit}
-                currentValue={bankFormattedValues?.depositLimit}
-                suggestedVal={invalidFields.depositLimit}
+                label="Deposit Limit (compared with 5% margin)"
+                value={
+                  bank &&
+                  parsedArgs.depositLimit &&
+                  `${
+                    bank && parsedArgs.depositLimit
+                      ? toUiDecimals(
+                          new BN(parsedArgs.depositLimit),
+                          bank.mintDecimals
+                        )
+                      : parsedArgs.depositLimit
+                  } ${bank?.name} ($${(
+                    toUiDecimals(
+                      new BN(parsedArgs.depositLimit.toString()),
+                      bank.mintDecimals
+                    ) * bank.uiPrice
+                  ).toFixed(0)})`
+                }
+                currentValue={
+                  bank &&
+                  bankFormattedValues?.depositLimit &&
+                  `${
+                    bank && bankFormattedValues?.depositLimit
+                      ? toUiDecimals(
+                          new BN(bankFormattedValues.depositLimit),
+                          bank.mintDecimals
+                        )
+                      : bankFormattedValues?.depositLimit
+                  } ${bank?.name} ($${(
+                    toUiDecimals(
+                      new BN(bankFormattedValues.depositLimit.toString()),
+                      bank.mintDecimals
+                    ) * bank.uiPrice
+                  ).toFixed(0)})`
+                }
+                suggestedVal={
+                  bank &&
+                  invalidFields?.depositLimit &&
+                  `${
+                    bank && invalidFields?.depositLimit
+                      ? toUiDecimals(
+                          new BN(invalidFields.depositLimit),
+                          bank.mintDecimals
+                        )
+                      : invalidFields?.depositLimit
+                  } ${bank?.name}  ($${(
+                    toUiDecimals(
+                      new BN(invalidFields.depositLimit.toString()),
+                      bank.mintDecimals
+                    ) * bank.uiPrice
+                  ).toFixed(0)})`
+                }
               />
+              {parsedArgs?.disableAssetLiquidation && (
+                <DisplayNullishProperty
+                  label="Disable Asset Liquidation"
+                  value={`${parsedArgs.disableAssetLiquidation}`}
+                  currentValue={null}
+                  suggestedVal={null}
+                />
+              )}
               {parsedArgs?.maintWeightShiftAbort && (
                 <DisplayNullishProperty
                   label="Maint Weight Shift Abort"
                   value={`${parsedArgs.maintWeightShiftAbort}`}
+                  currentValue={null}
+                  suggestedVal={null}
+                />
+              )}
+              {parsedArgs?.forceClose && (
+                <DisplayNullishProperty
+                  label="Force close"
+                  value={`${parsedArgs.forceClose}`}
+                  currentValue={null}
+                  suggestedVal={null}
+                />
+              )}
+              {parsedArgs?.forceWithdraw && (
+                <DisplayNullishProperty
+                  label="Force withdraw"
+                  value={`${parsedArgs.forceWithdraw}`}
                   currentValue={null}
                   suggestedVal={null}
                 />
@@ -1414,7 +1645,7 @@ const instructions = () => ({
       }
     },
   },
-  73195: {
+  11366: {
     name: 'Withdraw all token fees',
     accounts: [
       { name: 'Group' },
@@ -1440,6 +1671,56 @@ const instructions = () => ({
         return (
           <div>
             {tokenSymbol ? tokenSymbol : <Loading className="w-5"></Loading>}
+          </div>
+        )
+      } catch (e) {
+        console.log(e)
+        return <div>{JSON.stringify(data)}</div>
+      }
+    },
+  },
+  63223: {
+    name: 'Token Withdraw',
+    accounts: [
+      { name: 'Group' },
+      { name: 'Account' },
+      { name: 'Owner' },
+      { name: 'Bank' },
+      { name: 'Vault' },
+      { name: 'Oracle' },
+      { name: 'TokenAccount' },
+      { name: 'TokenProgram' },
+    ],
+    getDataUI: async (
+      connection: Connection,
+      data: Uint8Array,
+      accounts: AccountMetaData[]
+    ) => {
+      const args = await getDataObjectFlattened<any>(connection, data)
+      const accountInfo = await connection.getParsedAccountInfo(
+        accounts[6].pubkey
+      )
+      const mint = await tryGetMint(
+        connection,
+        new PublicKey(accountInfo.value?.data['parsed'].info.mint)
+      )
+      const tokenInfo = tokenPriceService.getTokenInfo(
+        accountInfo.value?.data['parsed'].info.mint
+      )
+
+      try {
+        return (
+          <div>
+            <div>
+              amount:{' '}
+              {mint?.account.decimals
+                ? formatNumber(
+                    toUiDecimals(args.amount, mint?.account.decimals)
+                  )
+                : args.amount}{' '}
+              {tokenInfo?.symbol}
+            </div>
+            <div>allowBorrow: {args.allowBorrow.toString()}</div>
           </div>
         )
       } catch (e) {
@@ -1513,12 +1794,35 @@ const instructions = () => ({
     ],
     getDataUI: async (
       connection: Connection,
-      data: Uint8Array
-      //accounts: AccountMetaData[]
+      data: Uint8Array,
+      accounts: AccountMetaData[]
     ) => {
-      const info = await displayArgs(connection, data)
+      const args = await getDataObjectFlattened<any>(connection, data)
+      const accountInfo = await connection.getParsedAccountInfo(
+        accounts[6].pubkey
+      )
+      const mint = await tryGetMint(
+        connection,
+        new PublicKey(accountInfo.value?.data['parsed'].info.mint)
+      )
+      const tokenInfo = tokenPriceService.getTokenInfo(
+        accountInfo.value?.data['parsed'].info.mint
+      )
       try {
-        return <div>{info}</div>
+        return (
+          <div>
+            <div>
+              amount:{' '}
+              {mint?.account.decimals
+                ? formatNumber(
+                    toUiDecimals(args.amount, mint?.account.decimals)
+                  )
+                : args.amount}{' '}
+              {tokenInfo?.symbol}
+            </div>
+            <div>reduce only: {args.reduceOnly.toString()}</div>
+          </div>
+        )
       } catch (e) {
         console.log(e)
         return <div>{JSON.stringify(data)}</div>
@@ -1551,6 +1855,7 @@ const instructions = () => ({
 
 export const MANGO_V4_INSTRUCTIONS = {
   '4MangoMjqJ2firMokCjjGgoK8d4MXcrgL7XJaL3w6fVg': instructions(),
+  zF2vSz6V9g1YHGmfrzsY497NJzbRr84QUrPry4bLQ25: instructions(),
 }
 
 async function getDataObjectFlattened<T>(
@@ -1680,14 +1985,12 @@ const DisplayNullishProperty = ({
 
 const DisplayListingProperty = ({
   label,
-  suggestedUntrusted,
   val,
   suggestedVal,
   suffix,
   prefix,
 }: {
   label: string
-  suggestedUntrusted: boolean
   val: any
   suggestedVal?: any
   suffix?: string
@@ -1696,9 +1999,7 @@ const DisplayListingProperty = ({
   <div className="flex space-x-3">
     <div>{label}:</div>
     <div className="flex">
-      <div
-        className={`${suggestedUntrusted || suggestedVal ? 'text-orange' : ''}`}
-      >
+      <div className={`${suggestedVal ? 'text-orange' : ''}`}>
         {prefix}
         {`${val}`}
         {suffix}
@@ -1720,7 +2021,7 @@ const getFormattedListingValues = (args: FlatListingArgs) => {
   const formattedArgs: ListingArgsFormatted = {
     tokenIndex: args.tokenIndex,
     tokenName: args.name,
-    oracle: args.oracle?.toBase58(),
+    oracle: args.oracle?.toBase58 && args.oracle?.toBase58(),
     oracleConfidenceFilter:
       args['oracleConfig.confFilter'] >= 100
         ? args['oracleConfig.confFilter'].toString()
@@ -1745,6 +2046,7 @@ const getFormattedListingValues = (args: FlatListingArgs) => {
     maintLiabWeight: args.maintLiabWeight.toFixed(2),
     initLiabWeight: args.initLiabWeight.toFixed(2),
     liquidationFee: (args['liquidationFee'] * 100).toFixed(2),
+    platformLiquidationFee: (args['platformLiquidationFee'] * 100).toFixed(2),
     minVaultToDepositsRatio: (args['minVaultToDepositsRatio'] * 100).toFixed(2),
     netBorrowLimitPerWindowQuote: toUiDecimals(
       args['netBorrowLimitPerWindowQuote'],
@@ -1768,12 +2070,15 @@ const getFormattedListingValues = (args: FlatListingArgs) => {
     stablePriceGrowthLimit: (args.stablePriceGrowthLimit * 100).toFixed(2),
     tokenConditionalSwapMakerFeeRate: args.tokenConditionalSwapMakerFeeRate,
     tokenConditionalSwapTakerFeeRate: args.tokenConditionalSwapTakerFeeRate,
-    flashLoanSwapFeeRate: args.flashLoanSwapFeeRate,
+    flashLoanSwapFeeRate: (args.flashLoanSwapFeeRate * 10000).toFixed(2),
     reduceOnly: REDUCE_ONLY_OPTIONS[args.reduceOnly].name,
     depositLimit: args.depositLimit.toString(),
     interestTargetUtilization: args.interestTargetUtilization,
     interestCurveScaling: args.interestCurveScaling,
     groupInsuranceFund: args.groupInsuranceFund,
+    collateralFeePerDay: args.collateralFeePerDay,
+    zeroUtilRate: args.zeroUtilRate,
+    disableAssetLiquidation: args.disableAssetLiquidation,
   }
   return formattedArgs
 }
@@ -1790,4 +2095,18 @@ const getApiTokenName = (bankName: string) => {
     return 'ETH'
   }
   return bankName
+}
+
+function isDifferenceWithin5Percent(a: number, b: number): boolean {
+  // Calculate the absolute difference
+  const difference = Math.abs(a - b)
+
+  // Calculate the average of the two numbers
+  const average = (a + b) / 2
+
+  // Calculate the percentage difference
+  const percentageDifference = (difference / average) * 100
+
+  // Check if the difference is within 5%
+  return percentageDifference <= 5
 }

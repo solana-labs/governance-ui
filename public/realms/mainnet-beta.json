@@ -26,6 +26,13 @@
     "shortDescription": "Frictionless is revolutionizing governance participation, bridging the gap between web2 and web3"
   },
   {
+    "symbol": "DED",
+    "displayName": "DED DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "735Kg6893iFH2KuGy6uJrVXYKwBi6ky3KLLNPmJ4TMCD",
+    "ogImage": "https://arweave.net/LzLM9GSor6FYeeFv5hv2a5oQuwcoyH3WFGbEq6_xGZk"
+  },
+  {
     "symbol": "GrapeUX",
     "displayName": "Grape UX",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -65,8 +72,9 @@
     "displayName": "Dean's List Solarplex State",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "4U5tep3h2wFrLskrCJAemvFVyLwGvQ8Xbuc8dBEC6smF",
+    "bannerImage": "/realms/Deans-List-Solarplex-State/img/banner-deanslist-solarplex.png",
     "twitter": "@deanslistDAO",
-    "ogImage": "/realms/Deans-List-Solarplex-State/deans_list_solarplex_state.png",
+    "ogImage": "/realms/Deans-List-Solarplex-State/img/deans_list_solarplex_state.png",
     "github": "https://github.com/Deans-List/",
     "shortDescription": "Dean's List Solarplex State oversees feedback incentives on Solarplex."
   },
@@ -191,7 +199,7 @@
     "sortRank": 3,
     "website": "https://grapes.network/",
     "twitter": "@grapeprotocol",
-    "discord": "https://discord.com/invite/greatape",
+    "discord": "https://discord.com/invite/grapedao",
     "github": "https://github.com/Grape-Labs"
   },
   {
@@ -337,6 +345,15 @@
     "website": "https://raindrops.xyz",
     "twitter": "@only_raindrops",
     "github": "https://github.com/raindrops-protocol/raindrops"
+  },
+  {
+    "symbol": "FABS",
+    "displayName": "Founders Wif Abs",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "2iWqzA6j5jDVsbVjBJHM2DFX4qJX7AAohArAR8VLDVV6",
+    "ogImage": "/realms/FABS/img/fabio.png",
+    "bannerImage": "/realms/FABS/img/fabs-banner.jpeg",
+    "twitter": "@fabsonsol"
   },
   {
     "symbol": "UkraineUnchained",
@@ -1453,20 +1470,6 @@
     "github": "https://uniquevc.gitbook.io/unique-venture-clubs-docs/"
   },
   {
-    "symbol": "GARI Network",
-    "category": "web3",
-    "bannerImage": "https://i.imgur.com/VfFjhk5.jpeg",
-    "displayName": "GARI Network",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "uWg5gaTsBnXc5qiVMB8XxBUPYqLAb5bzzgkkpxi6UAY",
-    "ogImage": "https://i.imgur.com/t5hzoBV.jpg",
-    "shortDescription": "GARI Network enables everyone to monetize their social media time and activities by leveraging web3 technologies.",
-    "sortRank": 3,
-    "website": "https://gari.network/",
-    "twitter": "@GariToken",
-    "discord": "https://discord.gg/garitoken"
-  },
-  {
     "symbol": "Dual DAO",
     "category": "defi",
     "bannerImage": "https://pbs.twimg.com/profile_banners/1488237042068819971/1652495773/1500x500",
@@ -1495,20 +1498,6 @@
     "twitter": "@lighthouse_dao",
     "discord": "https://discord.gg/Bv8JhaPF",
     "github": "https://github.com/sher9n/Lighthouse"
-  },
-  {
-    "symbol": "Drift Protocol",
-    "bannerImage": "https://i.imgur.com/b9pPf3S.png",
-    "displayName": "Drift Protocol",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "9nUyxzVL2FUMuWUiVZG66gwK15CJiM3PoLkfrnGfkvt6",
-    "ogImage": "https://i.imgur.com/HnF1Zzy.png",
-    "shortDescription": "A lightning-fast and scalable perpetual futures DEX.",
-    "sortRank": 3,
-    "website": "https://www.drift.trade/",
-    "twitter": "@DriftProtocol",
-    "discord": "http://discord.com/invite/drifting",
-    "github": "https://github.com/drift-labs/protocol-v2"
   },
   {
     "symbol": "Zeta Markets",

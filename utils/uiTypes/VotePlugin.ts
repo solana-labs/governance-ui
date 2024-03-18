@@ -50,7 +50,7 @@ import {
 } from '@utils/instructions/NftVoter/castNftVote'
 import { NftVoter } from 'idls/nft_voter'
 import { NftVoterV2 } from 'idls/nft_voter_v2'
-import { Program } from '@project-serum/anchor'
+import { Program } from '@coral-xyz/anchor'
 import { fetchTokenOwnerRecordByPubkey } from '@hooks/queries/tokenOwnerRecord'
 import { StakeConnection as PythClient } from '@pythnetwork/staking'
 import { getVotingNfts } from '@hooks/queries/plugins/nftVoter'
@@ -341,7 +341,7 @@ export class VotingClient {
       } = await this.client.withUpdateVoterWeight(
         instructions,
         stakeAccount!,
-        { [type]: {} },
+        { [type]: {} } as any,
         pythVoterWeightTarget
       )
 

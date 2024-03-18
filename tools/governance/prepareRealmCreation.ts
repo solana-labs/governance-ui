@@ -68,7 +68,7 @@ interface RealmCreationV2 {
   transferCouncilMintAuthority: boolean
   councilWalletPks: PublicKey[]
 
-  communityTokenConfig?: GoverningTokenConfigAccountArgs
+  communityTokenConfig: GoverningTokenConfigAccountArgs
   skipRealmAuthority?: boolean
 }
 type RealmCreationV3 = {
@@ -234,6 +234,7 @@ export async function prepareRealmCreation({
       // there are incoming council members
       incomingCouncilMembers > 0)
 
+  console.log('Prepare realm - can community govern?', communityCanGovern)
   if (
     !communityCanGovern &&
     nftCollectionCount === 0 && // note this is not the most thorough check possible for nft realms

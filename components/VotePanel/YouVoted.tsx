@@ -146,7 +146,9 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
 
   const isMulti = proposal?.account.voteType !== VoteType.SINGLE_CHOICE
     && proposal?.account.accountType === GovernanceAccountType.ProposalV2
-    
+  
+  const nota = '$$_NOTA_$$'
+
   return vote !== undefined ? (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-4">
       <div className="flex flex-col items-center justify-center">
@@ -164,7 +166,11 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
                 >
                   <div className="flex flex-row gap-2 justify-center">
                     <div><CheckmarkFilled /></div>
-                    <div>{proposal?.account.options[index].label}</div>
+                    <div>{
+                      proposal?.account.options[index].label === nota ?
+                        "None of the Above" :
+                        proposal?.account.options[index].label
+                    }</div>
                   </div>
                 </Button>
               </div>
