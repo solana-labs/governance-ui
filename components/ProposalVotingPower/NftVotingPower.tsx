@@ -89,7 +89,7 @@ const Join = () => {
   }
 
   return (
-    (actingAsWalletPk?.toString === wallet?.publicKey?.toString() &&
+    (actingAsWalletPk?.toString() === wallet?.publicKey?.toString() &&
       connected &&
       !ownTokenRecord && (
         <Button className="w-full mt-3" onClick={handleRegister}>

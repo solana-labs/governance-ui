@@ -14,6 +14,7 @@ import ClaimUnreleasedPositions from 'HeliumVotePlugin/components/ClaimUnrelease
 import VanillaAccountDetails from './VanillaAccountDetails'
 import GovernancePowerCard from '@components/GovernancePower/GovernancePowerCard'
 import SelectPrimaryDelegators from '@components/SelectPrimaryDelegators'
+import PythAccountDetails from 'PythVotePlugin/components/PythAccountDetails'
 
 const LockPluginTokenBalanceCard = dynamic(
   () =>
@@ -101,6 +102,14 @@ const TokenBalanceCardInner = ({
         </div>
         <VanillaAccountDetails />
       </div>
+    )
+  }
+
+  if (vsrMode === 'pyth'){
+    return (
+      <>
+      {inAccountDetails ? <PythAccountDetails /> : <GovernancePowerCard />}
+      </>
     )
   }
 

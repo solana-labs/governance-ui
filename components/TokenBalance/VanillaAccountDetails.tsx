@@ -34,7 +34,6 @@ const VanillaAccountDetails = () => {
             <TokenDeposit
               mint={mint}
               tokenRole={GoverningTokenRole.Community}
-              councilVote={false}
               inAccountDetails={true}
             />
           )}
@@ -42,7 +41,6 @@ const VanillaAccountDetails = () => {
             <TokenDeposit
               mint={councilMint}
               tokenRole={GoverningTokenRole.Council}
-              councilVote={true}
               inAccountDetails={true}
             />
           )}

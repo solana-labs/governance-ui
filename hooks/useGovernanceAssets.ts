@@ -190,6 +190,10 @@ export default function useGovernanceAssets() {
       name: 'Solend',
       image: '/img/solend.png',
     },
+    [PackageEnum.Squads]: {
+      name: 'Squads',
+      image: '/img/squads.png',
+    },
     [PackageEnum.Switchboard]: {
       name: 'Switchboard',
       image: '/img/switchboard.png',

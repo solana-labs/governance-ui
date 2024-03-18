@@ -26,6 +26,7 @@ const DualGso = ({
     optionExpirationUnixSeconds: 0,
     numTokens: 0,
     lotSize: 0,
+    lockupMint: '',
     baseTreasury: undefined,
     quoteTreasury: undefined,
     payer: undefined,
@@ -91,6 +92,18 @@ const DualGso = ({
           error={formErrors['soName']}
         />
       </Tooltip>
+      <Input
+          label="Lockup Mint"
+          value={form.lockupMint}
+          type="text"
+          onChange={(evt) =>
+            handleSetForm({
+              value: evt.target.value,
+              propertyName: 'lockupMint',
+            })
+          }
+          error={formErrors['lockupMint']}
+        />
       <Tooltip content="Treasury owned account providing the assets for the option. When the recipient exercises, these are the tokens they receive.">
         <GovernedAccountSelect
           label="Base Treasury"

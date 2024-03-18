@@ -510,9 +510,9 @@ export const getDualFinanceGovernanceAirdropSchema = ({
       ),
     treasury: yup.object().typeError('Treasury is required'),
     amount: yup
-      .number()
+      .string()
       .typeError('Amount is required')
-      .test('amount', 'amount', async function (val: number) {
+      .test('amount', 'amount', async function (val: string) {
         if (!form.treasury) {
           return this.createError({
             message: `Please select a treasury`,
@@ -520,8 +520,8 @@ export const getDualFinanceGovernanceAirdropSchema = ({
         }
         const numAtomsInTreasury = new BN(
           form.treasury.extensions.token.account.amount
-        ).toNumber()
-        if (numAtomsInTreasury < val) {
+        )
+        if (numAtomsInTreasury.lt(new BN(val))) {
           return this.createError({
             message: `Not enough tokens`,
           })
@@ -584,9 +584,9 @@ export const getDualFinanceMerkleAirdropSchema = ({ form }: { form: any }) => {
       ),
     treasury: yup.object().typeError('Treasury is required'),
     amount: yup
-      .number()
+      .string()
       .typeError('Amount is required')
-      .test('amount', 'amount', async function (val: number) {
+      .test('amount', 'amount', async function (val: string) {
         if (!form.treasury) {
           return this.createError({
             message: `Please select a treasury`,
@@ -594,8 +594,8 @@ export const getDualFinanceMerkleAirdropSchema = ({ form }: { form: any }) => {
         }
         const numAtomsInTreasury = new BN(
           form.treasury.extensions.token.account.amount
-        ).toNumber()
-        if (numAtomsInTreasury < val) {
+        )
+        if (numAtomsInTreasury.lt(new BN(val))) {
           return this.createError({
             message: `Not enough tokens`,
           })
@@ -634,9 +634,9 @@ export const getDualFinanceLiquidityStakingOptionSchema = ({
         }
       ),
     numTokens: yup
-      .number()
+      .string()
       .typeError('Num tokens is required')
-      .test('amount', 'amount', async function (val: number) {
+      .test('amount', 'amount', async function (val: string) {
         if (!form.baseTreasury) {
           return this.createError({
             message: `Please select a treasury`,
@@ -644,8 +644,8 @@ export const getDualFinanceLiquidityStakingOptionSchema = ({
         }
         const numAtomsInTreasury = new BN(
           form.baseTreasury.extensions.token.account.amount
-        ).toNumber()
-        if (numAtomsInTreasury < val) {
+        )
+        if (numAtomsInTreasury.lt(new BN(val))) {
           return this.createError({
             message: `Not enough tokens`,
           })
@@ -716,9 +716,9 @@ export const getDualFinanceStakingOptionSchema = ({
         }
       ),
     numTokens: yup
-      .number()
+      .string()
       .typeError('Num tokens is required')
-      .test('amount', 'amount', async function (val: number) {
+      .test('amount', 'amount', async function (val: string) {
         if (!form.baseTreasury) {
           return this.createError({
             message: `Please select a treasury`,
@@ -726,8 +726,8 @@ export const getDualFinanceStakingOptionSchema = ({
         }
         const numAtomsInTreasury = new BN(
           form.baseTreasury.extensions.token.account.amount
-        ).toNumber()
-        if (numAtomsInTreasury < val) {
+        )
+        if (numAtomsInTreasury.lt(new BN(val))) {
           return this.createError({
             message: `Not enough tokens`,
           })
@@ -775,9 +775,9 @@ export const getDualFinanceGsoSchema = ({ form }: { form: any }) => {
         }
       ),
     numTokens: yup
-      .number()
+      .string()
       .typeError('Num tokens is required')
-      .test('amount', 'amount', async function (val: number) {
+      .test('amount', 'amount', async function (val: string) {
         if (!form.baseTreasury) {
           return this.createError({
             message: `Please select a treasury`,
@@ -785,8 +785,8 @@ export const getDualFinanceGsoSchema = ({ form }: { form: any }) => {
         }
         const numAtomsInTreasury = new BN(
           form.baseTreasury.extensions.token.account.amount
-        ).toNumber()
-        if (numAtomsInTreasury < val) {
+        )
+        if (numAtomsInTreasury.lt(new BN(val))) {
           return this.createError({
             message: `Not enough tokens`,
           })
@@ -874,11 +874,7 @@ export const getDualFinanceDelegateWithdrawSchema = () => {
 export const getDualFinanceVoteDepositSchema = () => {
   return yup.object().shape({
     numTokens: yup.number().typeError('Num tokens is required'),
-    realm: yup
-      .string()
-      .test('is-valid-address1', 'Please enter a valid PublicKey', (value) =>
-        value ? validatePubkey(value) : true
-      ),
+    realm: yup.string(),
     token: yup.object().typeError('Delegate Token is required'),
   })
 }

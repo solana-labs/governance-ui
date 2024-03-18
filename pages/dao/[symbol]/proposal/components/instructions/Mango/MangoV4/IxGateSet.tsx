@@ -12,9 +12,11 @@ import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, { InstructionInput } from '../../FormCreator'
 import { InstructionInputType } from '../../inputInstructionType'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
-import { buildIxGate } from '@blockworks-foundation/mango-v4'
-import { IxGateParams } from '@blockworks-foundation/mango-v4/dist/types/src/clientIxParamBuilder'
+import { buildIxGate } from '@blockworks-foundation/mango-v4-rc'
+import { IxGateParams } from '@blockworks-foundation/mango-v4-rc/dist/types/src/clientIxParamBuilder'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useProgramSelector from '@components/Mango/useProgramSelector'
+import ProgramSelector from '@components/Mango/ProgramSelector'
 
 type IxGateSetForm = IxGateParams & {
   governedAccount: AssetAccount | null
@@ -29,7 +31,11 @@ const IxGateSet = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletOnePointOh()
-  const { mangoClient, mangoGroup } = UseMangoV4()
+  const programSelectorHook = useProgramSelector()
+  const { mangoClient, mangoGroup } = UseMangoV4(
+    programSelectorHook.program?.val,
+    programSelectorHook.program?.group
+  )
   const { assetAccounts } = useGovernanceAssets()
   const solAccounts = assetAccounts.filter(
     (x) =>
@@ -118,6 +124,7 @@ const IxGateSet = ({
     TokenConditionalSwapCreatePremiumAuction: true,
     TokenConditionalSwapCreateLinearAuction: true,
     Serum3PlaceOrderV2: true,
+    TokenForceWithdraw: true,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -634,10 +641,19 @@ const IxGateSet = ({
       type: InstructionInputType.SWITCH,
       name: 'Serum3PlaceOrderV2',
     },
+    {
+      label: 'Token Force withdraw',
+      initialValue: form.TokenForceWithdraw,
+      type: InstructionInputType.SWITCH,
+      name: 'TokenForceWithdraw',
+    },
   ]
 
   return (
     <>
+      <ProgramSelector
+        programSelectorHook={programSelectorHook}
+      ></ProgramSelector>
       {form && (
         <InstructionForm
           outerForm={form}

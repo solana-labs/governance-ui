@@ -22,7 +22,7 @@ import { validateInstruction } from 'utils/instructionTools'
 import * as yup from 'yup'
 import { createUpgradeInstruction } from '@tools/sdk/bpfUpgradeableLoader/createUpgradeInstruction'
 import { debounce } from '@utils/debounce'
-import { isFormValid } from '@utils/formValidation'
+import { isFormValid, validatePubkey } from '@utils/formValidation'
 import ProgramUpgradeInfo from 'pages/dao/[symbol]/proposal/components/instructions/bpfUpgradeableLoader/ProgramUpgradeInfo'
 import { getProgramName } from '@components/instructions/programs/names'
 import useCreateProposal from '@hooks/useCreateProposal'
@@ -49,6 +49,7 @@ const UpgradeProgram = ({ program }: { program: AssetAccount }) => {
   const [form, setForm] = useState<UpgradeProgramCompactForm>({
     governedAccount: program,
     programId: programId?.toString(),
+    bufferSpillAddress: wallet?.publicKey ? wallet.publicKey.toBase58() : '',
     bufferAddress: '',
     description: '',
     title: '',
@@ -87,6 +88,12 @@ const UpgradeProgram = ({ program }: { program: AssetAccount }) => {
           })
         }
       }),
+    bufferSpillAddress: yup
+      .string()
+      .required("Spill account is required")
+      .test('is-spill-account-valid', 'Invalid Spill Account', function (val: string) {
+        return val ? validatePubkey(val) : true
+      }),
     governedAccount: yup
       .object()
       .nullable()
@@ -105,7 +112,7 @@ const UpgradeProgram = ({ program }: { program: AssetAccount }) => {
         form.governedAccount.pubkey,
         new PublicKey(form.bufferAddress),
         form.governedAccount.extensions.program!.authority,
-        wallet!.publicKey
+        new PublicKey(form.bufferSpillAddress!)
       )
       serializedInstruction = serializeInstructionToBase64(upgradeIx)
     }
@@ -187,6 +194,19 @@ const UpgradeProgram = ({ program }: { program: AssetAccount }) => {
           }
           noMaxWidth={true}
           error={formErrors['bufferAddress']}
+        />
+        <Input
+          label="Spill account"
+          value={form.bufferSpillAddress}
+          type="text"
+          onChange={(evt) =>
+            handleSetForm({
+              value: evt.target.value,
+              propertyName: 'bufferSpillAddress',
+            })
+          }
+          noMaxWidth={true}
+          error={formErrors['bufferSpillAddress']}
         />
         <ProgramUpgradeInfo
           authority={form.governedAccount?.extensions.program?.authority}
