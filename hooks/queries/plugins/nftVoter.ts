@@ -19,7 +19,7 @@ import { ON_NFT_VOTER_V2 } from '@constants/flags'
 import { NFT_PLUGINS_PKS } from '@constants/plugins'
 import { getNetworkFromEndpoint } from '@utils/connection'
 import {useNftRegistrar} from "@hooks/useNftRegistrar";
-import {getPluginRegistrarCientCached} from "@hooks/queries/pluginRegistrar";
+import {getPluginRegistrarClientCached} from "@hooks/queries/pluginRegistrar";
 
 export const useVotingNfts = (ownerPk: PublicKey | undefined) => {
   const registrar = useNftRegistrar();
@@ -53,7 +53,7 @@ export const getVotingNfts = async (
   if (realm === undefined) throw new Error()
   const config = await fetchRealmConfigQuery(connection, realmPk)
   if (config.result === undefined) throw new Error()
-  const registrar = await getPluginRegistrarCientCached<NftVoter>(realmPk, connection, 'NFT');
+  const registrar = await getPluginRegistrarClientCached<NftVoter>(realmPk, connection, ownerPk, 'NFT');
   if (registrar === undefined) throw new Error()
   const usedCollectionsPks = registrar.collectionConfigs.map((x) =>
     x.collection.toBase58()

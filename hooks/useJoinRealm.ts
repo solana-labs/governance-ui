@@ -30,13 +30,16 @@ export const useJoinRealm = (): UseJoinRealmReturnType => {
     // the first plugin in the chain requires an input voter weight
     const userNeedsTokenOwnerRecord = !tokenOwnerRecord && (plugins?.voterWeight.length === 0 || !!plugins?.voterWeight[0].client.requiresInputVoterWeight);
     useEffect(() => {
-        createVoterWeightRecords()
+        if (!wallet?.publicKey) return;
+        createVoterWeightRecords(wallet.publicKey)
             .then((ixes) => setUserNeedsVoterWeightRecords(ixes.length > 0));
     }, [createVoterWeightRecords])
 
     const handleRegister = useCallback(async (includeTokenOwnerRecord = true) => {
+        if (!wallet?.publicKey) return [];
+
         const onboardUserIxes = []
-        if (includeTokenOwnerRecord && userNeedsTokenOwnerRecord && realm && wallet?.publicKey && programVersion) {
+        if (includeTokenOwnerRecord && userNeedsTokenOwnerRecord && realm && programVersion) {
             await withCreateTokenOwnerRecord(onboardUserIxes,
                 realm.owner,
                 programVersion,
@@ -46,7 +49,7 @@ export const useJoinRealm = (): UseJoinRealmReturnType => {
                 wallet.publicKey)
         }
 
-        const createVoterWeightRecordIxes = await createVoterWeightRecords();
+        const createVoterWeightRecordIxes = await createVoterWeightRecords(wallet.publicKey);
         return [...createVoterWeightRecordIxes, ...onboardUserIxes]
     }, [realm?.pubkey.toBase58(), wallet?.publicKey?.toBase58(), programVersion, userNeedsTokenOwnerRecord])
 

@@ -15,7 +15,6 @@ import {getUsedPositionsForProposal} from 'HeliumVotePlugin/utils/getUsedPositio
 import {getAssociatedTokenAddress} from '@blockworks-foundation/mango-v4'
 import queryClient from '@hooks/queries/queryClient'
 import asFindable from '@utils/queries/asFindable'
-import {UseVoterWeightPluginsReturnType} from "../../VoterWeightPlugins/useVoterWeightPlugins";
 import {convertTypeToVoterWeightAction} from "../../VoterWeightPlugins";
 import {Client} from "@solana/governance-program-library";
 import {NftVoterClient} from "@utils/uiTypes/NftVoterClient";
@@ -26,6 +25,7 @@ import {getCastNftVoteInstruction, getCastNftVoteInstructionV2} from "@utils/ins
 import {Program} from "@coral-xyz/anchor";
 import {NftVoter} from "../../idls/nft_voter";
 import {NftVoterV2} from "../../idls/nft_voter_v2";
+import {UseRealmVoterWeightPluginsReturnType} from "@hooks/useRealmVoterWeightPlugins";
 
 export type UpdateVoterWeightRecordTypes =
   | 'castVote'
@@ -38,7 +38,7 @@ export interface VotingClientProps {
   client: Client<any> | undefined
   realm: ProgramAccount<Realm> | undefined
   walletPk: PublicKey | null | undefined
-  voterWeightPluginDetails: UseVoterWeightPluginsReturnType
+  voterWeightPluginDetails: UseRealmVoterWeightPluginsReturnType
 }
 
 export enum VotingClientType {
@@ -78,7 +78,7 @@ export class VotingClient {
   instructions: TransactionInstruction[]
   clientType: VotingClientType
   noClient: boolean
-  voterWeightPluginDetails: UseVoterWeightPluginsReturnType
+  voterWeightPluginDetails: UseRealmVoterWeightPluginsReturnType
   constructor({ client, realm, walletPk, voterWeightPluginDetails }: VotingClientProps) {
     this.client = client
     this.realm = realm
@@ -98,16 +98,27 @@ export class VotingClient {
       this.noClient = false
     }
   }
+
+  private get voterWeightPk() {
+    return this.walletPk ? this.voterWeightPluginDetails.voterWeightPkForWallet(this.walletPk) : undefined
+  }
+
+  private get maxVoterWeightPk() {
+    return this.voterWeightPluginDetails.maxVoterWeightPk
+  }
+
   withUpdateVoterWeightRecord = async (
     instructions: TransactionInstruction[],
     type: UpdateVoterWeightRecordTypes,
     createNftActionTicketIxs?: TransactionInstruction[],
   ): Promise<ProgramAddresses | undefined> => {
-    const {pre: preIxes, post: postIxes} = await this.voterWeightPluginDetails.updateVoterWeightRecords(convertTypeToVoterWeightAction(type))
+    if (!this.walletPk) return undefined;
+
+    const {pre: preIxes, post: postIxes} = await this.voterWeightPluginDetails.updateVoterWeightRecords(this.walletPk, convertTypeToVoterWeightAction(type))
     instructions.push(...preIxes);
     createNftActionTicketIxs?.push(...postIxes);
 
-    return { voterWeightPk: this.voterWeightPluginDetails.voterWeightPk, maxVoterWeightRecord: this.voterWeightPluginDetails.maxVoterWeightPk }
+    return { voterWeightPk: this.voterWeightPk, maxVoterWeightRecord: this.maxVoterWeightPk }
   }
 
   withCastPluginVote = async (
@@ -116,12 +127,6 @@ export class VotingClient {
     tokenOwnerRecord: PublicKey,
     createNftActionTicketIxs?: TransactionInstruction[]
   ): Promise<ProgramAddresses | undefined> => {
-    const updateVoterWeightRecordIxes = await this.voterWeightPluginDetails.updateVoterWeightRecords(VoterWeightAction.CastVote);
-    const updateMaxVoterWeightRecordIxes = await this.voterWeightPluginDetails.updateMaxVoterWeightRecords();
-    const { voterWeightPk, maxVoterWeightPk } = this.voterWeightPluginDetails;
-    instructions.push(...updateMaxVoterWeightRecordIxes, ...updateVoterWeightRecordIxes.pre);
-    createNftActionTicketIxs?.push(...updateVoterWeightRecordIxes.post || []);
-
     const clientProgramId = this.client?.program.programId
     const realm = this.realm
     const walletPk = this.walletPk
@@ -133,6 +138,11 @@ export class VotingClient {
     ) {
       return
     }
+
+    const updateVoterWeightRecordIxes = await this.voterWeightPluginDetails.updateVoterWeightRecords(walletPk, VoterWeightAction.CastVote);
+    const updateMaxVoterWeightRecordIxes = await this.voterWeightPluginDetails.updateMaxVoterWeightRecords();
+    instructions.push(...updateMaxVoterWeightRecordIxes, ...updateVoterWeightRecordIxes.pre);
+    createNftActionTicketIxs?.push(...updateVoterWeightRecordIxes.post || []);
 
     // the helium client needs to add some additional accounts to the transaction
     if (this.client instanceof HeliumVsrClient) {
@@ -190,7 +200,7 @@ export class VotingClient {
       }
     }
 
-    if (this.client instanceof NftVoterClient && voterWeightPk) {
+    if (this.client instanceof NftVoterClient && this.voterWeightPk) {
       const {registrar} = await getPluginRegistrarPDA(
           realm.pubkey,
           realm.account.communityMint,
@@ -215,7 +225,7 @@ export class VotingClient {
             registrar,
             proposal.pubkey,
             tokenOwnerRecord,
-            voterWeightPk,
+            this.voterWeightPk,
             votingNfts,
             nftVoteRecordsFiltered
         )
@@ -230,7 +240,7 @@ export class VotingClient {
             registrar,
             proposal.pubkey,
             tokenOwnerRecord,
-            voterWeightPk,
+            this.voterWeightPk,
             votingNfts,
             nftVoteRecordsFiltered
         )
@@ -240,8 +250,8 @@ export class VotingClient {
     }
 
     return {
-      voterWeightPk,
-      maxVoterWeightRecord: maxVoterWeightPk,
+      voterWeightPk: this.voterWeightPk,
+      maxVoterWeightRecord: this.maxVoterWeightPk,
     }
   }
   withRelinquishVote = async (
@@ -257,13 +267,8 @@ export class VotingClient {
     const realm = this.realm
     const walletPk = this.walletPk
 
-    const {
-      voterWeightPk,
-      maxVoterWeightPk: maxVoterWeightRecord,
-    } = this.voterWeightPluginDetails;
-
     if (
-        !realm || !walletPk || !voterWeightPk || !clientProgramId ||
+        !realm || !walletPk || !this.voterWeightPk || !clientProgramId ||
       realm.account.communityMint.toBase58() !==
       proposal.account.governingTokenMint.toBase58()
     ) {
@@ -314,7 +319,7 @@ export class VotingClient {
               voterTokenOwnerRecord: tokenOwnerRecord,
               proposal: proposal.pubkey,
               governance: proposal.account.governance,
-              voterWeightRecord: voterWeightPk,
+              voterWeightRecord: this.voterWeightPk,
               voteRecord: voteRecordPk,
               beneficiary: walletPk,
             })
@@ -324,14 +329,14 @@ export class VotingClient {
       }
 
       return {
-        voterWeightPk,
-        maxVoterWeightRecord,
+        voterWeightPk: this.voterWeightPk,
+        maxVoterWeightRecord: this.maxVoterWeightPk,
       }
     }
 
     if (this.client instanceof NftVoterClient) {
       const remainingAccounts: AccountData[] = []
-      const { registrar } = await getPluginRegistrarPDA(
+      const { registrar } = getPluginRegistrarPDA(
         realm.pubkey,
         realm.account.communityMint,
         this.client.program.programId
@@ -352,9 +357,11 @@ export class VotingClient {
       // if this was good code, this would appear outside of this fn.
       // But we're not writing good code, there's no good place for it, I'm not bothering.
       const voterWeightRecord = await queryClient.fetchQuery({
-        queryKey: [voterWeightPk],
-        queryFn: () =>
-          asFindable(connection.getAccountInfo, connection)(voterWeightPk),
+        queryKey: [this.voterWeightPk],
+        queryFn: () => {
+          if (!this.voterWeightPk) throw new Error("No voter weight pk for the current wallet")
+          return asFindable(connection.getAccountInfo, connection)(this.voterWeightPk);
+        },
       })
 
       if (voterWeightRecord.result) {
@@ -370,7 +377,7 @@ export class VotingClient {
               .relinquishNftVote()
               .accounts({
                 registrar,
-                voterWeightRecord: voterWeightPk,
+                voterWeightRecord: this.voterWeightPk,
                 governance: proposal.account.governance,
                 proposal: proposal.pubkey,
                 voterTokenOwnerRecord: tokenOwnerRecord,
@@ -384,7 +391,10 @@ export class VotingClient {
         }
       }
 
-      return { voterWeightPk, maxVoterWeightRecord }
+      return {
+        voterWeightPk: this.voterWeightPk,
+        maxVoterWeightRecord: this.maxVoterWeightPk
+      }
     }
   }
 

@@ -22,13 +22,14 @@ import {
 import { createMaxVoterWeight } from './lib/createMaxVoterWeight'
 import { updateMaxVoterWeight } from './lib/updateMaxVoterWeight'
 import {useMintInfoByPubkeyQuery} from '@hooks/queries/mintInfo'
-import { useCalculatedVoterWeight } from './hooks/useCalculatedVoterWeight'
+import { useCalculatedVoterWeights } from './hooks/useCalculatedVoterWeights'
 import { useCalculatedMaxVoterWeight } from './hooks/useCalculatedMaxVoterWeight'
 import { usePlugins } from './hooks/usePlugins'
 import { queryKeys } from './lib/utils'
 import { useVoterWeightPks } from './hooks/useVoterWeightPks'
 import { PluginName } from '@constants/plugins'
-import {VoterWeightAction} from "@solana/spl-governance";
+import {ProgramAccount, TokenOwnerRecord, VoterWeightAction} from "@solana/spl-governance";
+import {useTokenOwnerRecordsDelegatedToUser} from "@hooks/queries/tokenOwnerRecord";
 import {useTokenOwnerRecord} from "./hooks/useTokenOwnerRecord";
 
 /**
@@ -37,16 +38,16 @@ import {useTokenOwnerRecord} from "./hooks/useTokenOwnerRecord";
 export interface UseVoterWeightPluginsReturnType {
   isReady: boolean
   plugins: VoterWeightPlugins | undefined // undefined means we are still loading
-  updateVoterWeightRecords: (action?: VoterWeightAction) => Promise<{
+  updateVoterWeightRecords: (walletPk: PublicKey, action?: VoterWeightAction) => Promise<{
     pre: TransactionInstruction[]
     post: TransactionInstruction[]
   }>
-  createVoterWeightRecords: () => Promise<TransactionInstruction[]>
+  createVoterWeightRecords: (walletPk: PublicKey) => Promise<TransactionInstruction[]>
   updateMaxVoterWeightRecords: () => Promise<TransactionInstruction[]>
   createMaxVoterWeightRecords: () => Promise<TransactionInstruction[]>
-  calculatedVoterWeight: CalculatedWeight | undefined // undefined means we are still loading
+  calculatedVoterWeights: CalculatedWeight[] | undefined // undefined means we are still loading
   calculatedMaxVoterWeight: CalculatedWeight | undefined // undefined means we are still loading
-  voterWeightPk: PublicKey | undefined // the voter weight pubkey to be used in the governance instruction itself
+  voterWeightPks: PublicKey[] | undefined // the voter weight pubkeys to be used in the governance instruction itself
   maxVoterWeightPk: PublicKey | undefined // the max voter weight pubkey to be used in the governance instruction itself
 
   //auxiliary functions to the ui
@@ -56,20 +57,21 @@ export interface UseVoterWeightPluginsReturnType {
 /**
  * Retrieves voter weight plugin information, calculated voter weights and provides functions to create/update voter weight records.
  *
- * @param {UseVoterWeightPluginsArgs}
  * @returns {UseVoterWeightPluginsReturnType}
+ * @param args
  */
 export const useVoterWeightPlugins = (
   args: UseVoterWeightPluginsArgs
 ): UseVoterWeightPluginsReturnType => {
-  const { realmPublicKey, governanceMintPublicKey, walletPublicKey } = args
+  const { realmPublicKey, governanceMintPublicKey, walletPublicKeys } = args
   const mintInfo = useMintInfoByPubkeyQuery(args.governanceMintPublicKey).data?.result;
-  const tokenOwnerRecord = useTokenOwnerRecord(args.governanceMintPublicKey);
+  const walletTokenOwnerRecord = useTokenOwnerRecord(args.governanceMintPublicKey);
+  const delegatedTokenOwnerRecords = useTokenOwnerRecordsDelegatedToUser().data;
   const { data: plugins } = usePlugins(args)
-  const { result: calculatedVoterWeight} = useCalculatedVoterWeight({
+  const { result: calculatedVoterWeights} = useCalculatedVoterWeights({
     ...args,
     plugins: plugins?.voterWeight,
-    tokenOwnerRecord,
+    tokenOwnerRecords: [walletTokenOwnerRecord, ...(delegatedTokenOwnerRecords || [])].filter(Boolean) as ProgramAccount<TokenOwnerRecord>[],
   })
   const { result: calculatedMaxVoterWeight} = useCalculatedMaxVoterWeight({
     ...args,
@@ -81,13 +83,19 @@ export const useVoterWeightPlugins = (
     plugins: plugins?.voterWeight,
   })
 
-  const createVoterWeightRecords = (): Promise<TransactionInstruction[]> => {
-    if (!realmPublicKey || !governanceMintPublicKey || !walletPublicKey) {
+  const createVoterWeightRecords = (walletPublicKey: PublicKey): Promise<TransactionInstruction[]> => {
+    if (!realmPublicKey || !governanceMintPublicKey) {
       return Promise.resolve([])
     }
 
+    const queryArgs = {
+        realmPublicKey,
+        governanceMintPublicKey,
+        walletPublicKey,
+    }
+
     return queryClient.fetchQuery({
-      queryKey: ['createVoterWeightRecords', ...queryKeys(args)],
+      queryKey: ['createVoterWeightRecords', ...queryKeys(queryArgs)],
       queryFn: () =>
         createVoterWeight({
           walletPublicKey,
@@ -98,16 +106,22 @@ export const useVoterWeightPlugins = (
     })
   }
 
-  const updateVoterWeightRecords = (action?: VoterWeightAction): Promise<{
+  const updateVoterWeightRecords = (walletPublicKey: PublicKey, action?: VoterWeightAction): Promise<{
     pre: TransactionInstruction[]
     post: TransactionInstruction[]
   }> => {
-    if (!realmPublicKey || !governanceMintPublicKey || !walletPublicKey) {
+    if (!realmPublicKey || !governanceMintPublicKey) {
       return Promise.resolve({ pre: [], post: [] })
     }
 
+    const queryArgs = {
+      realmPublicKey,
+      governanceMintPublicKey,
+      walletPublicKey,
+    }
+
     return queryClient.fetchQuery({
-      queryKey: ['updateVoterWeightRecords', ...queryKeys(args), action],
+      queryKey: ['updateVoterWeightRecords', ...queryKeys(queryArgs), action],
       queryFn: () =>
         updateVoterWeight({
           walletPublicKey,
@@ -120,12 +134,17 @@ export const useVoterWeightPlugins = (
   }
 
   const createMaxVoterWeightRecords = (): Promise<TransactionInstruction[]> => {
-    if (!realmPublicKey || !governanceMintPublicKey || !walletPublicKey) {
+    if (!realmPublicKey || !governanceMintPublicKey || !walletPublicKeys) {
       return Promise.resolve([])
     }
 
+    const queryArgs = {
+      realmPublicKey,
+      governanceMintPublicKey,
+    }
+
     return queryClient.fetchQuery({
-      queryKey: ['createMaxVoterWeightRecords', ...queryKeys(args)],
+      queryKey: ['createMaxVoterWeightRecords', ...queryKeys(queryArgs)],
       queryFn: () =>
         createMaxVoterWeight({
           realmPublicKey,
@@ -136,12 +155,17 @@ export const useVoterWeightPlugins = (
   }
 
   const updateMaxVoterWeightRecords = (): Promise<TransactionInstruction[]> => {
-    if (!realmPublicKey || !governanceMintPublicKey || !walletPublicKey) {
+    if (!realmPublicKey || !governanceMintPublicKey || !walletPublicKeys) {
       return Promise.resolve([])
     }
 
+    const queryArgs = {
+      realmPublicKey,
+      governanceMintPublicKey,
+    }
+
     return queryClient.fetchQuery({
-      queryKey: ['updateMaxVoterWeightRecords', ...queryKeys(args)],
+      queryKey: ['updateMaxVoterWeightRecords', ...queryKeys(queryArgs)],
       queryFn: () =>
         updateMaxVoterWeight({
           realmPublicKey,
@@ -166,7 +190,7 @@ export const useVoterWeightPlugins = (
     updateMaxVoterWeightRecords,
     createMaxVoterWeightRecords,
     plugins,
-    calculatedVoterWeight,
+    calculatedVoterWeights,
     calculatedMaxVoterWeight,
     ...pks,
     includesPlugin,

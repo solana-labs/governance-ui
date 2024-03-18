@@ -1,7 +1,6 @@
 import {VoterWeightPlugins} from "../lib/types";
 import {getPlugins} from "../lib/getPlugins";
 import {useConnection} from "@solana/wallet-adapter-react";
-import {queryKeys} from "../lib/utils";
 import {useQuery, UseQueryResult} from "@tanstack/react-query";
 import useWalletOnePointOh from "@hooks/useWalletOnePointOh";
 import {AnchorProvider, Wallet} from "@coral-xyz/anchor";
@@ -10,10 +9,11 @@ import {PublicKey} from "@solana/web3.js";
 type Args = {
     realmPublicKey?: PublicKey
     governanceMintPublicKey?: PublicKey
+    walletPublicKeys?: PublicKey[]
 }
 
 const argsAreSet = (args: Args): args is Required<Args> =>
-    args.realmPublicKey !== undefined && args.governanceMintPublicKey !== undefined;
+    args.realmPublicKey !== undefined && args.governanceMintPublicKey !== undefined && args.walletPublicKeys !== undefined
 
 export const usePlugins = (args: Args): UseQueryResult<VoterWeightPlugins, unknown> => {
     const { connection } = useConnection()
@@ -24,11 +24,18 @@ export const usePlugins = (args: Args): UseQueryResult<VoterWeightPlugins, unkno
         AnchorProvider.defaultOptions()
     )
 
+    const queryKeys = [
+        'getPlugins',
+        args.realmPublicKey?.toString(),
+        args.governanceMintPublicKey?.toString(),
+        args.walletPublicKeys?.map(pubkey => pubkey.toString()).join(",")
+    ]
+
     // Cache plugin loading with react-query
     return useQuery<VoterWeightPlugins>(
-        ['getPlugins', ...queryKeys(args), wallet?.publicKey?.toString()],
+        queryKeys,
         async () => {
-            if (!provider || !provider.publicKey) return {
+            if (!args.walletPublicKeys || !provider) return {
                 voterWeight: [],
                 maxVoterWeight: []
             };
@@ -36,13 +43,15 @@ export const usePlugins = (args: Args): UseQueryResult<VoterWeightPlugins, unkno
             const voterWeightPluginsPromise = getPlugins({
                 ...(args as Required<Args>),
                 provider,
-                type: 'voterWeight'
+                type: 'voterWeight',
+                wallets: args.walletPublicKeys
             });
             // Load the max voter weight plugins associated with the realm and governance
             const maxVoterWeightPluginsPromise = getPlugins({
                 ...(args as Required<Args>),
                 provider,
-                type: 'maxVoterWeight'
+                type: 'maxVoterWeight',
+                wallets: args.walletPublicKeys
             });
 
             const [voterWeightPlugins, maxVoterWeightPlugins] = await Promise.all([
@@ -56,7 +65,7 @@ export const usePlugins = (args: Args): UseQueryResult<VoterWeightPlugins, unkno
             };
         },
         {
-            enabled: argsAreSet(args) && !!provider?.publicKey,
+            enabled: argsAreSet(args),
         }
     )
 }
