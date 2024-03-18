@@ -28,7 +28,8 @@ import { usePlugins } from './hooks/usePlugins'
 import { queryKeys } from './lib/utils'
 import { useVoterWeightPks } from './hooks/useVoterWeightPks'
 import { PluginName } from '@constants/plugins'
-import {VoterWeightAction} from "@solana/spl-governance";
+import {ProgramAccount, TokenOwnerRecord, VoterWeightAction} from "@solana/spl-governance";
+import {useTokenOwnerRecordsDelegatedToUser} from "@hooks/queries/tokenOwnerRecord";
 import {useTokenOwnerRecord} from "./hooks/useTokenOwnerRecord";
 
 /**
@@ -64,12 +65,13 @@ export const useVoterWeightPlugins = (
 ): UseVoterWeightPluginsReturnType => {
   const { realmPublicKey, governanceMintPublicKey, walletPublicKeys } = args
   const mintInfo = useMintInfoByPubkeyQuery(args.governanceMintPublicKey).data?.result;
-  const tokenOwnerRecord = useTokenOwnerRecord(args.governanceMintPublicKey);
+  const walletTokenOwnerRecord = useTokenOwnerRecord(args.governanceMintPublicKey);
+  const delegatedTokenOwnerRecords = useTokenOwnerRecordsDelegatedToUser().data;
   const { data: plugins } = usePlugins(args)
   const { result: calculatedVoterWeights} = useCalculatedVoterWeights({
     ...args,
     plugins: plugins?.voterWeight,
-    tokenOwnerRecord,
+    tokenOwnerRecords: [walletTokenOwnerRecord, ...(delegatedTokenOwnerRecords || [])].filter(Boolean) as ProgramAccount<TokenOwnerRecord>[],
   })
   const { result: calculatedMaxVoterWeight} = useCalculatedMaxVoterWeight({
     ...args,

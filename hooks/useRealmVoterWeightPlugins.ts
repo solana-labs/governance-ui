@@ -36,6 +36,7 @@ const getWalletList = (
 ): PublicKey[] => {
   if (!wallet?.publicKey) return [];
 
+  // if selectedDelegator is not set, this means "yourself + all delegators"
   if (selectedDelegator) {
     return [selectedDelegator]
   }
