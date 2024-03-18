@@ -4,6 +4,7 @@ import useWalletOnePointOh from "@hooks/useWalletOnePointOh";
 import {VotingClient} from "@utils/uiTypes/VotePlugin";
 import {GovernanceRole} from "../@types/types";
 import {PublicKey} from "@solana/web3.js";
+import {useSelectedDelegatorStore} from "../stores/useSelectedDelegatorStore";
 
 /**
  * The Voting Client encapsulates plugin-specific voting logic not currently encapsulated in the individual plugins, and exposed by the
@@ -17,6 +18,16 @@ export const useVotingClients = () => {
     const realm = useRealmQuery().data?.result
     const wallet = useWalletOnePointOh()
 
+    const selectedCouncilDelegator = useSelectedDelegatorStore(
+        (s) => s.councilDelegator
+    )
+    const selectedCommunityDelegator = useSelectedDelegatorStore(
+        (s) => s.communityDelegator
+    )
+    const councilWallet = selectedCouncilDelegator ?? wallet?.publicKey;
+    const communityWallet = selectedCommunityDelegator ?? wallet?.publicKey;
+
+
     // This is not cached at present, but should be efficient, as the contents (plugins) are cached.
     // If this becomes a performance issue, we should add react-query here.
     return (kind: GovernanceRole) => {
@@ -26,11 +37,12 @@ export const useVotingClients = () => {
         // if they did, then we would have to call relinquish on whichever plugin supported it
         const voterWeightPluginDetails = kind === 'community' ? voterWeightPluginDetailsForCommunity : voterWeightPluginDetailsForCouncil;
         const client = voterWeightPluginDetails.plugins?.voterWeight.length ? voterWeightPluginDetails.plugins.voterWeight[0].client : undefined;
+        const wallet = kind === 'community' ? communityWallet : councilWallet;
 
         return new VotingClient({
             client: client,
             realm: realm,
-            walletPk: wallet?.publicKey,
+            walletPk: wallet,
             voterWeightPluginDetails
         });
     };

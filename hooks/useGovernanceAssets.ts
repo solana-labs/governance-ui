@@ -7,7 +7,7 @@ import { useRealmConfigQuery } from './queries/realmConfig'
 import { useRouter } from 'next/router'
 import { useRealmGovernancesQuery } from './queries/governance'
 import { useMemo } from 'react'
-import {useRealmVoterWeightPlugins} from "@hooks/useRealmVoterWeightPlugins";
+import { useRealmVoterWeights} from "@hooks/useRealmVoterWeightPlugins";
 import {GovernanceConfig} from "@solana/spl-governance";
 
 type Package = {
@@ -45,11 +45,10 @@ export default function useGovernanceAssets() {
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
   const { symbol } = useRouter().query
-  const communityPluginDetails = useRealmVoterWeightPlugins('community');
-  const councilPluginDetails = useRealmVoterWeightPlugins('council');
+  const {communityWeight, councilWeight} = useRealmVoterWeights();
   const ownVoterWeights = {
-    community: communityPluginDetails.calculatedVoterWeight?.value,
-    council: councilPluginDetails.calculatedVoterWeight?.value,
+    community: communityWeight?.value,
+    council: councilWeight?.value,
   }
 
   const canCreateProposal = (config: GovernanceConfig) => {
