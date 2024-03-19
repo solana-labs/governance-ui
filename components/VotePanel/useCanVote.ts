@@ -1,26 +1,13 @@
-import { useVoterTokenRecord, useVotingPop } from './hooks'
+import {useVoterTokenRecord, useVotingPop} from './hooks'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
-
-import { useBatchedVoteDelegators } from './useDelegators'
-import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
+import {useProposalVoteRecordQuery} from '@hooks/queries/voteRecord'
+import {useRealmVoterWeightPlugins} from '@hooks/useRealmVoterWeightPlugins'
+import {useDelegatorAwareVoterWeight} from "@hooks/useDelegatorAwareVoterWeight";
 
 const useHasAnyVotingPower = (role: 'community' | 'council' | undefined) => {
-  const { totalCalculatedVoterWeight, isReady } = useRealmVoterWeightPlugins(role)
-  const relevantDelegators = useBatchedVoteDelegators(role)
-
-  // notably, this is ignoring whether the delegators actually have voting power, but it's not a big deal
-  const canBatchVote = relevantDelegators && relevantDelegators?.length !== 0
-
-  // technically, if you have a TOR you can vote even if there's no power. But that doesnt seem user friendly.
-  const canPersonallyVote =
-    !isReady || !totalCalculatedVoterWeight?.value
-      ? undefined
-      : totalCalculatedVoterWeight.value.isZero() === false
-
-  const canVote = canBatchVote || canPersonallyVote
-
-  return canVote
+  const voterWeight = useDelegatorAwareVoterWeight(role ?? 'community');
+  const {isReady } = useRealmVoterWeightPlugins(role)
+  return isReady && !!voterWeight?.value && voterWeight.value?.isZero() === false
 }
 
 export const useCanVote = () => {
@@ -32,7 +19,6 @@ export const useCanVote = () => {
   const { data: ownVoteRecord } = useProposalVoteRecordQuery('electoral')
   const voterTokenRecord = useVoterTokenRecord()
   const { plugins } = useRealmVoterWeightPlugins(votingPop);
-
 
   const hasAllVoterWeightRecords = (plugins?.voterWeight ?? []).every((plugin) => plugin.weights !== undefined)
   const isVoteCast = !!ownVoteRecord?.found

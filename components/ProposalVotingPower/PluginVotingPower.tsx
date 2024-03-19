@@ -2,12 +2,12 @@ import classNames from 'classnames'
 
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 
-import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
-import { useRealmQuery } from '@hooks/queries/realm'
-import { BigNumber } from 'bignumber.js'
+import {useMintInfoByPubkeyQuery} from '@hooks/queries/mintInfo'
+import {useRealmQuery} from '@hooks/queries/realm'
+import {BigNumber} from 'bignumber.js'
 import clsx from 'clsx'
-import { useMemo } from 'react'
-import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
+import {useMemo} from 'react'
+import {useRealmVoterWeightPlugins} from '@hooks/useRealmVoterWeightPlugins'
 import {useJoinRealm} from "@hooks/useJoinRealm";
 import {Transaction} from "@solana/web3.js";
 import useWalletOnePointOh from "@hooks/useWalletOnePointOh";
@@ -16,10 +16,12 @@ import Button from "@components/Button";
 import {sendTransaction} from "@utils/send";
 import {TokenDeposit} from "@components/TokenBalance/TokenDeposit";
 import {GoverningTokenRole} from "@solana/spl-governance";
+import {GovernanceRole} from "../../@types/types";
+import {useDelegatorAwareVoterWeight} from "@hooks/useDelegatorAwareVoterWeight";
 
 interface Props {
   className?: string
-  role: 'community' | 'council'
+  role: GovernanceRole
 }
 
 export default function PluginVotingPower({ role, className }: Props) {
@@ -30,19 +32,20 @@ export default function PluginVotingPower({ role, className }: Props) {
   const { userNeedsTokenOwnerRecord, userNeedsVoterWeightRecords, handleRegister } = useJoinRealm();
   const mintInfo = useMintInfoByPubkeyQuery(realm?.account.communityMint).data
     ?.result
-
   const isLoading = useDepositStore((s) => s.state.isLoading)
+  const voterWeight = useDelegatorAwareVoterWeight(role);
 
-  const { totalCalculatedVoterWeight, isReady } = useRealmVoterWeightPlugins(role)
+  const { isReady } = useRealmVoterWeightPlugins(role)
 
   const formattedTotal = useMemo(
-    () =>
-      mintInfo && totalCalculatedVoterWeight?.value
-        ? new BigNumber(totalCalculatedVoterWeight?.value.toString())
-            .shiftedBy(-mintInfo.decimals)
-            .toString()
-        : undefined,
-    [mintInfo, totalCalculatedVoterWeight?.value]
+    () => {
+      return mintInfo && voterWeight?.value
+          ? new BigNumber(voterWeight?.value.toString())
+              .shiftedBy(-mintInfo.decimals)
+              .toString()
+          : undefined;
+    },
+    [mintInfo, voterWeight?.value]
   )
   // There are two buttons available on this UI:
   // The Deposit button - available if you have tokens to deposit
