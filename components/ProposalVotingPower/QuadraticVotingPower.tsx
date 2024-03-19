@@ -18,6 +18,7 @@ import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import { BN } from '@coral-xyz/anchor'
 import { GatewayStatus, useGateway } from '@civic/solana-gateway-react'
+import {useDelegatorAwareVoterWeight} from "@hooks/useDelegatorAwareVoterWeight";
 
 interface Props {
   className?: string
@@ -27,6 +28,7 @@ interface Props {
 export default function QuadraticVotingPower({ role, className }: Props) {
   const realm = useRealmQuery().data?.result
   const { data: activeMembersData } = useMembersQuery()
+  const voterWeight = useDelegatorAwareVoterWeight(role)
 
   const mintInfo = useMintInfoByPubkeyQuery(realm?.account.communityMint).data
     ?.result
@@ -35,7 +37,6 @@ export default function QuadraticVotingPower({ role, className }: Props) {
 
   const isLoading = useDepositStore((s) => s.state.isLoading)
   const {
-    totalCalculatedVoterWeight,
     isReady,
     calculatedMaxVoterWeight,
     plugins,
@@ -72,13 +73,13 @@ export default function QuadraticVotingPower({ role, className }: Props) {
 
   const formattedTotal = useMemo(
     () =>
-      mintInfo && totalCalculatedVoterWeight?.value
-        ? new BigNumber(totalCalculatedVoterWeight?.value.toString())
+      mintInfo && voterWeight?.value
+        ? new BigNumber(voterWeight?.value.toString())
             .shiftedBy(-mintInfo.decimals)
             .toFixed(2)
             .toString()
         : undefined,
-    [mintInfo, totalCalculatedVoterWeight?.value]
+    [mintInfo, voterWeight?.value]
   )
 
   const { communityWeight, councilWeight } = useRealmVoterWeights()
