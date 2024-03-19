@@ -53,18 +53,20 @@ export const sendTransactionsV3 = async ({
   const transactionInstructionsWithFee: TransactionInstructionWithType[] = []
   const fee = await getFeeEstimate(connection)
   for (const tx of transactionInstructions) {
-    const txObjWithFee = {
-      ...tx,
-      instructionsSet: autoFee
-        ? [
-            new TransactionInstructionWithSigners(createComputeBudgetIx(fee)),
-            ...tx.instructionsSet,
-          ]
-        : [...tx.instructionsSet],
+    if (tx.instructionsSet.length) {
+      const txObjWithFee = {
+        ...tx,
+        instructionsSet: autoFee
+          ? [
+              new TransactionInstructionWithSigners(createComputeBudgetIx(fee)),
+              ...tx.instructionsSet,
+            ]
+          : [...tx.instructionsSet],
+      }
+      transactionInstructionsWithFee.push(txObjWithFee)
     }
-    transactionInstructionsWithFee.push(txObjWithFee)
   }
-
+  
   const callbacksWithUiComponent = {
     afterBatchSign: (signedTxnsCount) => {
       if (callbacks?.afterBatchSign) {
