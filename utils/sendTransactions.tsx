@@ -45,20 +45,28 @@ export const sendTransactionsV3 = async ({
   config,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   lookupTableAccounts,
-}: sendSignAndConfirmTransactionsProps & { lookupTableAccounts?: any }) => {
+  autoFee = true,
+}: sendSignAndConfirmTransactionsProps & {
+  lookupTableAccounts?: any
+  autoFee?: boolean
+}) => {
   const transactionInstructionsWithFee: TransactionInstructionWithType[] = []
   const fee = await getFeeEstimate(connection)
   for (const tx of transactionInstructions) {
-    const txObjWithFee = {
-      ...tx,
-      instructionsSet: [
-        new TransactionInstructionWithSigners(createComputeBudgetIx(fee)),
-        ...tx.instructionsSet,
-      ],
+    if (tx.instructionsSet.length) {
+      const txObjWithFee = {
+        ...tx,
+        instructionsSet: autoFee
+          ? [
+              new TransactionInstructionWithSigners(createComputeBudgetIx(fee)),
+              ...tx.instructionsSet,
+            ]
+          : [...tx.instructionsSet],
+      }
+      transactionInstructionsWithFee.push(txObjWithFee)
     }
-    transactionInstructionsWithFee.push(txObjWithFee)
   }
-
+  
   const callbacksWithUiComponent = {
     afterBatchSign: (signedTxnsCount) => {
       if (callbacks?.afterBatchSign) {
@@ -92,6 +100,7 @@ export const sendTransactionsV3 = async ({
           sendTransactionsV3({
             ...originalProps,
             transactionInstructions: notProcessedTransactions,
+            autoFee: false,
           }),
         getErrorMsg(e),
         e.txid
