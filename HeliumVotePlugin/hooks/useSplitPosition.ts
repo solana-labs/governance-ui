@@ -183,7 +183,7 @@ export const useSplitPosition = () => {
           sequenceType: SequenceType.Sequential,
         }))
 
-        notify({ message: 'Spliting Position' })
+        notify({ message: 'Splitting Position' })
         await sendTransactionsV3({
           transactionInstructions: txsChunks,
           wallet,

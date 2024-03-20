@@ -1,5 +1,6 @@
 import {
   Connection,
+  LAMPORTS_PER_SOL,
   PublicKey,
   RecentPrioritizationFees,
 } from '@solana/web3.js'
@@ -7,7 +8,7 @@ import { getClient, getGroupForClient } from '@utils/mangoV4Tools'
 import { groupBy, mapValues, maxBy, sampleSize } from 'lodash'
 
 export const getFeeEstimate = async (connection: Connection) => {
-  const defaultFee = 5000
+  const defaultFee = 50000
   try {
     //Use mango client to find good fee
     const MAINNET_MANGO_GROUP = new PublicKey(
@@ -16,7 +17,7 @@ export const getFeeEstimate = async (connection: Connection) => {
     const MAX_PRIORITY_FEE_KEYS = 128
     const client = await getClient(connection)
     const group = await getGroupForClient(client, MAINNET_MANGO_GROUP)
-    const feeMultiplier = 1.1
+    const feeMultiplier = 2
     const altResponse = await connection.getAddressLookupTable(
       group.addressLookupTables[0]
     )
@@ -48,7 +49,8 @@ export const getFeeEstimate = async (connection: Connection) => {
             recentFees[mid].prioritizationFee) /
           2
     const feeEstimate = Math.ceil(medianFee * feeMultiplier)
-    return feeEstimate
+
+    return Math.min(feeEstimate, LAMPORTS_PER_SOL * 0.001)
   } catch (e) {
     return defaultFee
   }
