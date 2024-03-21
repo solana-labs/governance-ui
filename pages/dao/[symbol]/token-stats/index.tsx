@@ -15,13 +15,14 @@ import dayjs from 'dayjs'
 import dynamic from 'next/dynamic'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import {
   DAYS_PER_MONTH,
   getMinDurationFmt,
   getTimeLeftFromNowFmt,
 } from '@utils/dateTools'
 import InfoBox from 'VoteStakeRegistry/components/LockTokenStats/InfoBox'
-import { LockupType, Registrar } from 'VoteStakeRegistry/sdk/accounts'
+import { LockupType } from 'VoteStakeRegistry/sdk/accounts'
 import {
   DepositWithWallet,
   getProposalsTransactions,
@@ -46,7 +47,6 @@ import { useRealmProposalsQuery } from '@hooks/queries/proposal'
 import { useQuery } from '@tanstack/react-query'
 import { IDL } from 'VoteStakeRegistry/sdk/voter_stake_registry'
 import { ProfileImage, ProfileName } from '@components/Profile'
-import {useVsrClient} from "../../../../VoterWeightPlugins/useVsrClient";
 
 const VestingVsTime = dynamic(
   () => import('VoteStakeRegistry/components/LockTokenStats/VestingVsTime'),
@@ -134,10 +134,13 @@ const LockTokenStats = () => {
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const { symbol } = useRouter().query
   const { realmInfo } = useRealm()
-  const { vsrClient, plugin } = useVsrClient();
-  const voteStakeRegistryRegistrar = plugin?.params as Registrar | undefined;
-  const voteStakeRegistryRegistrarPk = plugin?.registrarPublicKey;
-
+  const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
+  const voteStakeRegistryRegistrarPk = useVotePluginsClientStore(
+    (s) => s.state.voteStakeRegistryRegistrarPk
+  )
+  const voteStakeRegistryRegistrar = useVotePluginsClientStore(
+    (s) => s.state.voteStakeRegistryRegistrar
+  )
   const governedTokenAccounts = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
   )

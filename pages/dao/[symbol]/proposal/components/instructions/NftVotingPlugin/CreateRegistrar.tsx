@@ -10,6 +10,7 @@ import { validateInstruction } from '@utils/instructionTools'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
 import useRealm from '@hooks/useRealm'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NewProposalContext } from '../../../new'
 import InstructionForm from '../FormCreator'
 import { InstructionInputType } from '../inputInstructionType'
@@ -18,7 +19,6 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getRegistrarPDA } from '@utils/plugin/accounts'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
-import {useNftClient} from "../../../../../../../VoterWeightPlugins/useNftClient";
 
 interface CreateNftRegistrarForm {
   governedAccount: AssetAccount | undefined
@@ -35,7 +35,7 @@ const CreateNftPluginRegistrar = ({
   const realm = useRealmQuery().data?.result
 
   const { realmInfo } = useRealm()
-  const {nftClient} = useNftClient()
+  const nftClient = useVotePluginsClientStore((s) => s.state.nftClient)
   const { assetAccounts } = useGovernanceAssets()
   const wallet = useWalletOnePointOh()
   const shouldBeGoverned = !!(index !== 0 && governance)
@@ -50,7 +50,7 @@ const CreateNftPluginRegistrar = ({
       form!.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const { registrar } = getRegistrarPDA(
+      const { registrar } = await getRegistrarPDA(
         realm!.pubkey,
         realm!.account.communityMint,
         nftClient!.program.programId

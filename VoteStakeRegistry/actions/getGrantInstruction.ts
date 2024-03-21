@@ -46,17 +46,17 @@ export const getGrantInstruction = async ({
   const systemProgram = SystemProgram.programId
   const clientProgramId = client!.program.programId
 
-  const { registrar } = getRegistrarPDA(
+  const { registrar } = await getRegistrarPDA(
     realmPk,
     communityMintPk,
     clientProgramId
   )
-  const { voter, voterBump } = getVoterPDA(
+  const { voter, voterBump } = await getVoterPDA(
     registrar,
     toPk,
     clientProgramId
   )
-  const { voterWeightPk, voterWeightBump } = getVoterWeightPDA(
+  const { voterWeightPk, voterWeightBump } = await getVoterWeightPDA(
     registrar,
     toPk,
     clientProgramId
@@ -73,7 +73,7 @@ export const getGrantInstruction = async ({
     .grant(
       voterBump,
       voterWeightBump,
-      { [lockupKind]: {} } as any, // The cast to any works around an anchor issue with interpreting enums
+      { [lockupKind]: {} },
       new BN(startTime),
       lockupPeriod,
       allowClawback,

@@ -4,6 +4,8 @@ import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { useAsyncCallback } from 'react-async-hook'
 import { PositionWithMeta } from '../sdk/types'
 import { PROGRAM_ID, init, daoKey } from '@helium/helium-sub-daos-sdk'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
 import { notify } from '@utils/notifications'
 import {
@@ -13,13 +15,15 @@ import {
 } from '@utils/sendTransactions'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
-import {useHeliumClient} from "../../VoterWeightPlugins/useHeliumClient";
 
 export const useTransferPosition = () => {
   const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
   const realm = useRealmQuery().data?.result
   const mint = useRealmCommunityMintInfoQuery().data?.result
-  const {heliumClient} = useHeliumClient();
+  const [{ client }] = useVotePluginsClientStore((s) => [
+    s.state.currentRealmVotingClient,
+    s.state.voteStakeRegistryRegistrarPk,
+  ])
   const { error, loading, execute } = useAsyncCallback(
     async ({
       sourcePosition,
@@ -39,7 +43,8 @@ export const useTransferPosition = () => {
         !realm ||
         !mint ||
         !wallet ||
-        !heliumClient ||
+        !client ||
+        !(client instanceof HeliumVsrClient) ||
         sourcePosition.numActiveVotes > 0 ||
         targetPosition.numActiveVotes > 0
 
@@ -75,7 +80,7 @@ export const useTransferPosition = () => {
           )
         } else {
           instructions.push(
-            await heliumClient.program.methods
+            await client.program.methods
               .transferV0({
                 amount: amountToTransfer,
               })
@@ -90,7 +95,7 @@ export const useTransferPosition = () => {
 
         if (amountToTransfer.eq(sourcePosition.amountDepositedNative)) {
           instructions.push(
-            await heliumClient.program.methods
+            await client.program.methods
               .closePositionV0()
               .accounts({
                 position: sourcePosition.pubkey,

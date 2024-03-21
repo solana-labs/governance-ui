@@ -9,19 +9,20 @@ import { notify } from '@utils/notifications'
 import { useState } from 'react'
 import { voteRegistryDepositWithoutLockup } from 'VoteStakeRegistry/actions/voteRegistryDepositWithoutLockup'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useConnection } from '@solana/wallet-adapter-react'
 import queryClient from '@hooks/queries/queryClient'
 import { tokenAccountQueryKeys } from '@hooks/queries/tokenAccount'
-import {useVsrClient} from "../../../VoterWeightPlugins/useVsrClient";
 
 const DepositCommunityTokensBtn = ({ className = '', inAccountDetails }) => {
   const { getOwnedDeposits } = useDepositStore()
   const realm = useRealmQuery().data?.result
 
   const { realmInfo, realmTokenAccount } = useRealm()
+  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const [isLoading, setIsLoading] = useState(false)
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
@@ -29,7 +30,6 @@ const DepositCommunityTokensBtn = ({ className = '', inAccountDetails }) => {
   const endpoint = connection.rpcEndpoint
   const currentTokenOwnerRecord = useUserCommunityTokenOwnerRecord().data
     ?.result
-  const {vsrClient} = useVsrClient();
 
   const depositAllTokens = async function () {
     if (!realm) {
@@ -57,14 +57,14 @@ const DepositCommunityTokensBtn = ({ className = '', inAccountDetails }) => {
         programVersion: realmInfo?.programVersion!,
         amount: realmTokenAccount!.account.amount,
         tokenOwnerRecordPk,
-        client: vsrClient,
+        client: client,
         communityMintPk: realm.account.communityMint,
       })
       await getOwnedDeposits({
         realmPk: realm!.pubkey,
         communityMintPk: realm!.account.communityMint,
         walletPk: wallet!.publicKey!,
-        client: vsrClient!,
+        client: client!,
         connection,
       })
       queryClient.invalidateQueries(

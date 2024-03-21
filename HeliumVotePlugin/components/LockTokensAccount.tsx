@@ -22,6 +22,7 @@ import { getMintMetadata } from '@components/instructions/programs/splToken'
 import { abbreviateAddress } from '@utils/formatting'
 import Button from '@components/Button'
 import { daysToSecs } from '@utils/dateTools'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { LockCommunityTokensBtn } from './LockCommunityTokensBtn'
 import { LockTokensModal, LockTokensModalFormValues } from './LockTokensModal'
 import { useCreatePosition } from '../hooks/useCreatePosition'
@@ -44,9 +45,6 @@ import {
 } from '@hooks/queries/mintInfo'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { fetchJupiterPrice } from '@hooks/queries/jupiterPrice'
-import {useHeliumClient} from "../../VoterWeightPlugins/useHeliumClient";
-import {Registrar} from "../sdk/types";
-import {useVotingClients} from "@hooks/useVotingClients";
 
 export const LockTokensAccount: React.FC<{
   // tokenOwnerRecordPk: string | string[] | undefined // @asktree: this was unused
@@ -76,18 +74,15 @@ export const LockTokensAccount: React.FC<{
       : // I wanted to eliminate `null` as a possible type
         wallet?.publicKey ?? undefined
 
-  const { heliumClient: vsrClient } = useHeliumClient();
-  const votingClients = useVotingClients();
-  
-  const vsrRegistrar = useAsync<Registrar | undefined>(
-    async () => {
-      if (realm && vsrClient) {
-        return vsrClient.getRegistrarAccount(realm?.pubkey, realm?.account.communityMint) as Promise<Registrar>
-      }
-    },
-    [realm, vsrClient]
-  )
-
+  const [
+    currentClient,
+    vsrClient,
+    vsrRegistrar,
+  ] = useVotePluginsClientStore((s) => [
+    s.state.currentRealmVotingClient,
+    s.state.heliumVsrClient,
+    s.state.heliumVsrRegistrar,
+  ])
   const {
     loading: loadingSubDaos,
     error: subDaosError,
@@ -141,7 +136,7 @@ export const LockTokensAccount: React.FC<{
         vsrClient
       ) {
         await getPositions({
-          votingClient: votingClients('community'),  // community mint is hardcoded for getPositions
+          votingClient: currentClient,
           realmPk: realm.pubkey,
           communityMintPk: realm.account.communityMint,
           walletPk: tokenOwnerRecordWalletPk
@@ -213,10 +208,10 @@ export const LockTokensAccount: React.FC<{
     (lockupPeriodInDays: number) =>
       calcLockupMultiplier({
         lockupSecs: daysToSecs(lockupPeriodInDays),
-        registrar: vsrRegistrar.result ?? null,
+        registrar: vsrRegistrar,
         realm,
       }),
-    [realm, vsrRegistrar.result]
+    [realm, vsrRegistrar]
   )
 
   const handleLockTokens = async (values: LockTokensModalFormValues) => {
@@ -234,7 +229,7 @@ export const LockTokensAccount: React.FC<{
 
     if (!error) {
       await getPositions({
-        votingClient: votingClients('community'),  // community mint is hardcoded for getPositions
+        votingClient: currentClient,
         realmPk: realm!.pubkey,
         communityMintPk: realm!.account.communityMint,
         walletPk: wallet!.publicKey!,

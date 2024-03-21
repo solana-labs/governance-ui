@@ -17,7 +17,6 @@ import {
   DEFAULT_NFT_CONFIG,
   DEFAULT_VSR_CONFIG,
   DEFAULT_CIVIC_CONFIG,
-  DEFAULT_QV_CONFIG,
 } from '../VotingStructureSelector';
 import { SectionBlock } from '@hub/components/EditWalletRules/SectionBlock';
 import { SectionHeader } from '@hub/components/EditWalletRules/SectionHeader';
@@ -48,7 +47,6 @@ export function buildUpdates(config: Config) {
     nftCollectionSize: config.nftCollectionSize,
     nftCollectionWeight: config.nftCollectionWeight,
     civicPassType: config.civicPassType,
-    chainingEnabled: config.chainingEnabled,
   };
 }
 
@@ -117,11 +115,6 @@ function votingStructureText(
     typeof maxVotingPluginDiff[0] === 'undefined'
   ) {
     existingText = 'Civic';
-  } else if (
-    votingPluginDiff[0]?.equals(DEFAULT_QV_CONFIG.votingProgramId) &&
-    typeof maxVotingPluginDiff[0] === 'undefined'
-  ) {
-    existingText = 'QV';
   } else if (votingPluginDiff[0] || maxVotingPluginDiff[0]) {
     existingText = 'Custom';
   }
@@ -141,11 +134,6 @@ function votingStructureText(
     typeof maxVotingPluginDiff[1] === 'undefined'
   ) {
     newText = 'Civic';
-  } else if (
-    votingPluginDiff[1]?.equals(DEFAULT_QV_CONFIG.votingProgramId) &&
-    typeof maxVotingPluginDiff[1] === 'undefined'
-  ) {
-    newText = 'QV';
   } else if (votingPluginDiff[1] || maxVotingPluginDiff[1]) {
     newText = 'Custom';
   }
@@ -327,25 +315,14 @@ export function UpdatesList(props: Props) {
                           )[1]
                         }
                       </div>
-                      {updates.chainingEnabled ? (
-                        <div className="ml-3 text-base text-neutral-500">
-                          {'⬅ ' +
-                            votingStructureText(
-                              updates.communityVotingPlugin || [],
-                              updates.communityMaxVotingPlugin || [],
-                            )[0] +
-                            ' (Chaining)'}
-                        </div>
-                      ) : (
-                        <div className="ml-3 text-base text-neutral-500 line-through">
-                          {
-                            votingStructureText(
-                              updates.communityVotingPlugin || [],
-                              updates.communityMaxVotingPlugin || [],
-                            )[0]
-                          }
-                        </div>
-                      )}
+                      <div className="ml-3 text-base text-neutral-500 line-through">
+                        {
+                          votingStructureText(
+                            updates.communityVotingPlugin || [],
+                            updates.communityMaxVotingPlugin || [],
+                          )[0]
+                        }
+                      </div>
                     </div>
                   }
                 />

@@ -19,14 +19,11 @@ import { abbreviateAddress } from '@utils/formatting'
 import clsx from 'clsx'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import { GoverningTokenType } from '@solana/spl-governance'
-import {ExclamationIcon, QuestionMarkCircleIcon} from "@heroicons/react/outline";
-import Tooltip from "@components/Tooltip";
 
 interface Props {
   className?: string
   role: 'community' | 'council'
   hideIfZero?: boolean
-  unrecognizedPlugin?: boolean
   children?: React.ReactNode
 }
 
@@ -34,7 +31,6 @@ export default function VanillaVotingPower({
   role,
   hideIfZero,
   children,
-  unrecognizedPlugin = false,
   ...props
 }: Props) {
   const realm = useRealmQuery().data?.result
@@ -122,13 +118,6 @@ export default function VanillaVotingPower({
         disabled && 'hidden'
       )}
     >
-      {unrecognizedPlugin && <div className="flex text-sm  text-orange mb-1">
-        <ExclamationIcon className="flex-shrink-0 h-5 w-5 mr-2" />
-        Unrecognized plugin
-        <Tooltip content="This DAO uses an unrecognised vote weight plugin - your vote weight may be shown incorrectly in the UI">
-          <QuestionMarkCircleIcon className="cursor-help h-5 ml-1 w-4" />
-        </Tooltip>
-      </div>}
       <div className={'p-3 rounded-md bg-bkg-1'}>
         <div className="text-fgd-3 text-xs">
           {tokenName}

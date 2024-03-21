@@ -35,6 +35,7 @@ import * as yup from 'yup'
 import { getGrantInstruction } from 'VoteStakeRegistry/actions/getGrantInstruction'
 import { getRegistrarPDA } from 'VoteStakeRegistry/sdk/accounts'
 import { tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import dayjs from 'dayjs'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
@@ -43,7 +44,6 @@ import queryClient from '@hooks/queries/queryClient'
 import asFindable from '@utils/queries/asFindable'
 import { tokenOwnerRecordQueryKeys } from '@hooks/queries/tokenOwnerRecord'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
-import {useVsrClient} from "../../../VoterWeightPlugins/useVsrClient";
 
 const Grant = ({
   index,
@@ -52,7 +52,7 @@ const Grant = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { vsrClient } = useVsrClient();
+  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const dateNow = dayjs().unix()
   const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
@@ -198,7 +198,7 @@ const Grant = ({
         startTime: form.startDateUnixSeconds,
         lockupKind: form.lockupKind.value,
         allowClawback: form.allowClawback,
-        client: vsrClient!,
+        client: client!,
       })
       serializedInstruction = serializeInstructionToBase64(grantIx!)
     }
@@ -212,7 +212,7 @@ const Grant = ({
     }
     return obj
   }, [
-    vsrClient,
+    client,
     connection,
     form,
     realm,
@@ -287,23 +287,23 @@ const Grant = ({
 
   useEffect(() => {
     const getGrantMints = async () => {
-      const clientProgramId = vsrClient!.program.programId
-      const { registrar } = getRegistrarPDA(
-          realm!.pubkey,
-          realm!.account.communityMint,
-          clientProgramId
+      const clientProgramId = client!.program.programId
+      const { registrar } = await getRegistrarPDA(
+        realm!.pubkey,
+        realm!.account.communityMint,
+        clientProgramId
       )
-      const existingRegistrar = await tryGetRegistrar(registrar, vsrClient!)
+      const existingRegistrar = await tryGetRegistrar(registrar, client!)
       if (existingRegistrar) {
         setUseableGrantMints(
           existingRegistrar.votingMints.map((x) => x.mint.toBase58())
         )
       }
     }
-    if (vsrClient) {
+    if (client) {
       getGrantMints()
     }
-  }, [vsrClient, realm])
+  }, [client, realm])
 
   const isNotVested =
     form.lockupKind.value !== 'monthly' && form.lockupKind.value !== 'daily'

@@ -7,8 +7,7 @@ import { useRealmConfigQuery } from './queries/realmConfig'
 import { useRouter } from 'next/router'
 import { useRealmGovernancesQuery } from './queries/governance'
 import { useMemo } from 'react'
-import { useRealmVoterWeights} from "@hooks/useRealmVoterWeightPlugins";
-import {GovernanceConfig} from "@solana/spl-governance";
+import { useLegacyVoterWeight } from './queries/governancePower'
 
 type Package = {
   name: string
@@ -45,18 +44,7 @@ export default function useGovernanceAssets() {
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
   const { symbol } = useRouter().query
-  const {communityWeight, councilWeight} = useRealmVoterWeights();
-  const ownVoterWeights = {
-    community: communityWeight?.value,
-    council: councilWeight?.value,
-  }
-
-  const canCreateProposal = (config: GovernanceConfig) => {
-    return (
-        ownVoterWeights.community?.gte(config.minCommunityTokensToCreateProposal) ||
-        ownVoterWeights.council?.gte(config.minCouncilTokensToCreateProposal)
-    )
-  }
+  const { result: ownVoterWeight } = useLegacyVoterWeight()
 
   const governedTokenAccounts: AssetAccount[] = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
@@ -76,14 +64,15 @@ export default function useGovernanceAssets() {
 
   function canUseGovernanceForInstruction(types: AccountType[]) {
     return (
-        realm &&
-        assetAccounts
-            .filter((x) => types.find((t) => t === x.type))
-            .some((govAcc) =>
-                canCreateProposal(govAcc.governance.account.config)
-            )
+      realm &&
+      assetAccounts
+        .filter((x) => types.find((t) => t === x.type))
+        .some((govAcc) =>
+          ownVoterWeight?.canCreateProposal(govAcc.governance.account.config)
+        )
     )
   }
+
   const canMintRealmCouncilToken = () => {
     return !!assetAccounts.find(
       (x) =>
@@ -96,7 +85,7 @@ export default function useGovernanceAssets() {
     )
     return (
       governance &&
-      canCreateProposal(governance?.account?.config)
+      ownVoterWeight?.canCreateProposal(governance?.account?.config)
     )
   })
 
@@ -111,7 +100,7 @@ export default function useGovernanceAssets() {
   const canUseAnyInstruction =
     realm &&
     governancesArray.some((gov) =>
-      canCreateProposal(gov.account.config)
+      ownVoterWeight?.canCreateProposal(gov.account.config)
     )
 
   const realmAuth =
@@ -120,7 +109,7 @@ export default function useGovernanceAssets() {
       (x) => x.pubkey.toBase58() === realm.account.authority?.toBase58()
     )
   const canUseAuthorityInstruction =
-    realmAuth && canCreateProposal(realmAuth?.account.config)
+    realmAuth && ownVoterWeight?.canCreateProposal(realmAuth?.account.config)
 
   const governedSPLTokenAccounts = governedTokenAccounts.filter(
     (x) => x.type === AccountType.TOKEN
@@ -138,7 +127,7 @@ export default function useGovernanceAssets() {
       )
       return (
         governance &&
-        canCreateProposal(governance?.account?.config)
+        ownVoterWeight?.canCreateProposal(governance?.account?.config)
       )
     }
   )
@@ -308,7 +297,7 @@ export default function useGovernanceAssets() {
       isVisible:
         realm &&
         governancesArray.some((g) =>
-          canCreateProposal(g.account.config)
+          ownVoterWeight?.canCreateProposal(g.account.config)
         ),
       packageId: PackageEnum.Common,
     },

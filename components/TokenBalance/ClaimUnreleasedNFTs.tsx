@@ -2,7 +2,10 @@ import useRealm from '@hooks/useRealm'
 import { useEffect, useState } from 'react'
 import { TransactionInstruction } from '@solana/web3.js'
 import { SecondaryButton } from '@components/Button'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { chunks } from '@utils/helpers'
+import { getRegistrarPDA, getVoterWeightRecord } from '@utils/plugin/accounts'
 import {
   sendTransactionsV3,
   SequenceType,
@@ -19,7 +22,6 @@ import {
   proposalQueryKeys,
   useRealmProposalsQuery,
 } from '@hooks/queries/proposal'
-import {useNftClient} from "../../VoterWeightPlugins/useNftClient";
 
 const NFT_SOL_BALANCE = 0.0014616
 
@@ -35,7 +37,9 @@ const ClaimUnreleasedNFTs = ({
   const [solToBeClaimed, setSolToBeClaimed] = useState(0)
   const ownNftVoteRecordsFilterd = ownNftVoteRecords
   const realm = useRealmQuery().data?.result
-  const { nftClient } = useNftClient();
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
   const { isNftMode } = useRealm()
 
   const { data: tokenOwnerRecord } = useAddressQuery_CommunityTokenOwner()
@@ -45,12 +49,20 @@ const ClaimUnreleasedNFTs = ({
     if (!wallet?.publicKey) throw new Error('no wallet')
     if (!realm) throw new Error()
     if (!tokenOwnerRecord) throw new Error()
-    if (!nftClient) throw new Error("not an NFT realm")
 
     setIsLoading(true)
     const instructions: TransactionInstruction[] = []
-    const { registrar } = nftClient.getRegistrarPDA(realm.pubkey, realm.account.communityMint);
-    const { voterWeightPk } = nftClient.getVoterWeightRecordPDA(realm.pubkey, realm.account.communityMint, wallet.publicKey)
+    const { registrar } = await getRegistrarPDA(
+      realm.pubkey,
+      realm.account.communityMint,
+      client.client!.program.programId
+    )
+    const { voterWeightPk } = await getVoterWeightRecord(
+      realm.pubkey,
+      realm.account.communityMint,
+      wallet.publicKey,
+      client.client!.program.programId
+    )
 
     const nfts = ownNftVoteRecordsFilterd.slice(
       0,
@@ -74,7 +86,7 @@ const ClaimUnreleasedNFTs = ({
         // ignore this one as it's still in voting
         continue
       }
-      const relinquishNftVoteIx = await nftClient.program.methods
+      const relinquishNftVoteIx = await (client.client as NftVoterClient).program.methods
         .relinquishNftVote()
         .accounts({
           registrar,
@@ -116,7 +128,7 @@ const ClaimUnreleasedNFTs = ({
     }
   }
   const getNftsVoteRecord = async () => {
-    if (!nftClient) throw new Error("not an NFT realm");
+    const nftClient = client.client as NftVoterClient
     const nftVoteRecords = await nftClient.program.account.nftVoteRecord?.all([
       {
         memcmp: {
@@ -141,11 +153,11 @@ const ClaimUnreleasedNFTs = ({
     setSolToBeClaimed(nftVoteRecordsFiltered.length * NFT_SOL_BALANCE)
   }
   useEffect(() => {
-    if (wallet?.publicKey && isNftMode && nftClient) {
+    if (wallet?.publicKey && isNftMode && client.client) {
       getNftsVoteRecord()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [nftClient, isNftMode, wallet?.publicKey?.toBase58()])
+  }, [client.clientType, isNftMode, wallet?.publicKey?.toBase58()])
 
   if (isNftMode) {
     return (

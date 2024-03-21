@@ -122,7 +122,7 @@ const VotingMintConfig = ({
       ...form,
     }
 
-    const { registrar } = getRegistrarPDA(
+    const { registrar } = await getRegistrarPDA(
       realm.pubkey,
       realm.account.communityMint,
       vsrClient.program.programId

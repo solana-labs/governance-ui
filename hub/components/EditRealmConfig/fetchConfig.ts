@@ -1,4 +1,5 @@
-import { Wallet } from '@coral-xyz/anchor';
+import { GATEWAY_PLUGINS_PKS, NFT_PLUGINS_PKS } from '@constants/plugins';
+import { AnchorProvider, Wallet } from '@coral-xyz/anchor';
 
 import { GatewayClient } from '@solana/governance-program-library';
 import {
@@ -16,8 +17,9 @@ import BN from 'bn.js';
 
 import { tryGetNftRegistrar } from 'VoteStakeRegistry/sdk/api';
 
-import { VoterWeightPluginInfo } from '../../../VoterWeightPlugins/lib/types';
+import { getNetworkFromEndpoint } from '@utils/connection';
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts';
+import { tryGetRegistar as tryGetGatewayRegistrar } from '@utils/plugin/gateway';
 import { parseMintAccountData, MintAccount } from '@utils/tokens';
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient';
 
@@ -33,13 +35,12 @@ export interface Config {
   nftCollectionWeight: BN;
   realmAuthority?: PublicKey;
   civicPassType?: PublicKey;
-  chainingEnabled: boolean;
 }
 
 export async function fetchConfig(
   connection: Connection,
   realmPublicKey: PublicKey,
-  currentPlugins: VoterWeightPluginInfo[],
+  wallet: Pick<Wallet, 'publicKey' | 'signTransaction' | 'signAllTransactions'>,
 ): Promise<Config> {
   const realm = await getRealm(connection, realmPublicKey);
 
@@ -85,40 +86,46 @@ export async function fetchConfig(
   let nftCollectionSize = 0;
   let nftCollectionWeight = new BN(0);
   let civicPassType: PublicKey | undefined = undefined;
+  const defaultOptions = AnchorProvider.defaultOptions();
+  const anchorProvider = new AnchorProvider(connection, wallet, defaultOptions);
 
-  const nftClient = currentPlugins.find((plugin) => plugin.name === 'NFT')
-    ?.client as NftVoterClient | undefined;
-  const gatewayClient = currentPlugins.find(
-    (plugin) => plugin.name === 'gateway',
-  )?.client as GatewayClient | undefined;
+  const isDevnet = getNetworkFromEndpoint(connection.rpcEndpoint) === 'devnet';
+  const nftClient = await NftVoterClient.connect(anchorProvider, isDevnet);
+  const gatewayClient = await GatewayClient.connect(anchorProvider, isDevnet);
+  const pluginPublicKey =
+    configProgramAccount.account.communityTokenConfig.voterWeightAddin;
 
-  if (nftClient && realm.account.communityMint) {
-    const programId = nftClient.program.programId;
-    const registrarPDA = (
-      await getPluginRegistrarPDA(
-        realmPublicKey,
-        realm.account.communityMint,
-        programId,
-      )
-    ).registrar;
+  if (pluginPublicKey && NFT_PLUGINS_PKS.includes(pluginPublicKey.toBase58())) {
+    if (nftClient && realm.account.communityMint) {
+      const programId = nftClient.program.programId;
+      const registrarPDA = (
+        await getPluginRegistrarPDA(
+          realmPublicKey,
+          realm.account.communityMint,
+          programId,
+        )
+      ).registrar;
 
-    const registrar: any = await tryGetNftRegistrar(registrarPDA, nftClient);
+      const registrar: any = await tryGetNftRegistrar(registrarPDA, nftClient);
 
-    const collections = registrar?.collectionConfigs || [];
+      const collections = registrar?.collectionConfigs || [];
 
-    if (collections[0]) {
-      nftCollection = new PublicKey(collections[0].collection);
-      nftCollectionSize = collections[0].size;
-      nftCollectionWeight = collections[0].weight;
+      if (collections[0]) {
+        nftCollection = new PublicKey(collections[0].collection);
+        nftCollectionSize = collections[0].size;
+        nftCollectionWeight = collections[0].weight;
+      }
     }
   }
 
-  if (gatewayClient && realm.account.communityMint) {
-    const registrar = await gatewayClient.getRegistrarAccount(
-      realm.pubkey,
-      realm.account.communityMint,
-    );
-    civicPassType = registrar?.gatekeeperNetwork;
+  if (
+    pluginPublicKey &&
+    GATEWAY_PLUGINS_PKS.includes(pluginPublicKey.toBase58())
+  ) {
+    if (gatewayClient && realm.account.communityMint) {
+      const registrar = await tryGetGatewayRegistrar(realm, gatewayClient);
+      civicPassType = registrar?.gatekeeperNetwork;
+    }
   }
 
   const mintPkStr = realm.account.communityMint.toBase58();
@@ -173,6 +180,5 @@ export async function fetchConfig(
     config: realmConfig,
     configAccount: configProgramAccount.account,
     realmAuthority: realm.account.authority,
-    chainingEnabled: false,
   };
 }

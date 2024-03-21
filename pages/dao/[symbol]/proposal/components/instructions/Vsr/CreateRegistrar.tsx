@@ -107,7 +107,7 @@ const CreateVsrRegistrar = ({
       return returnInvalid()
     }
 
-    const { registrar, registrarBump } = getRegistrarPDA(
+    const { registrar, registrarBump } = await getRegistrarPDA(
       realm.pubkey,
       realm.account.communityMint,
       vsrClient.program.programId

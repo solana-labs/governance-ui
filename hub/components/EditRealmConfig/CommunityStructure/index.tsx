@@ -26,7 +26,6 @@ interface Props
     nftCollectionSize: number;
     nftCollectionWeight: BN;
     civicPassType: Config['civicPassType'];
-    chainingEnabled: boolean;
   }> {
   currentConfigAccount: Config['configAccount'];
   currentNftCollection?: PublicKey;
@@ -57,7 +56,6 @@ export function CommunityStructure(props: Props) {
     nftCollectionSize: props.nftCollectionSize,
     nftCollectionWeight: props.nftCollectionWeight,
     civicPassType: props.civicPassType,
-    chainingEnabled: props.chainingEnabled,
   };
 
   const minTokensToManage = new BigNumber(
@@ -207,10 +205,6 @@ export function CommunityStructure(props: Props) {
                 props.configAccount.communityTokenConfig.tokenType !==
                 GoverningTokenType.Membership
               }
-              allowQV={
-                props.configAccount.communityTokenConfig.tokenType !==
-                GoverningTokenType.Membership
-              }
               className="w-full"
               communityMint={props.communityMint}
               currentStructure={currentVotingStructure}
@@ -222,7 +216,6 @@ export function CommunityStructure(props: Props) {
                 nftCollectionSize,
                 nftCollectionWeight,
                 civicPassType,
-                chainingEnabled,
               }) => {
                 const newConfig = produce(
                   { ...props.configAccount },
@@ -264,13 +257,6 @@ export function CommunityStructure(props: Props) {
                     !props.civicPassType?.equals(civicPassType)
                   ) {
                     props.onCivicPassTypeChange?.(civicPassType);
-                  }
-
-                  if (
-                    typeof chainingEnabled !== 'undefined' &&
-                    props.chainingEnabled !== chainingEnabled
-                  ) {
-                    props.onChainingEnabledChange?.(chainingEnabled);
                   }
                 }, 0);
               }}

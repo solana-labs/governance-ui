@@ -336,20 +336,8 @@ export class VoterWeight implements VoterWeightInterface {
     }
   }
 
-  getTokenRecordToCreateProposal(
-    config: GovernanceConfig,
-    voteByCouncil: boolean
-  ) {
-    // if the vote is by council, prefer council token
-    if (voteByCouncil) {
-      if (this.councilTokenRecord && this.hasMinCouncilWeight(config.minCouncilTokensToCreateProposal)) {
-        return this.councilTokenRecord
-      }
-      if (this.communityTokenRecord) {
-        return this.communityTokenRecord
-      }
-    }
-    //  prefer community token owner record as proposal owner
+  getTokenRecordToCreateProposal(config: GovernanceConfig) {
+    // Prefer community token owner record as proposal owner
     if (this.hasMinCommunityWeight(config.minCommunityTokensToCreateProposal)) {
       return this.communityTokenRecord!
     }
@@ -357,59 +345,7 @@ export class VoterWeight implements VoterWeightInterface {
       return this.councilTokenRecord!
     }
 
-    throw new Error('Current wallet has no Token Owner Records')
-  }
-}
-
-// Deprecated: used to adapt the useLegacyVoterWeight hook to use the voter weight plugins,
-// without having to reference each plugin individually, and to support chaining.
-// Note - instead of this, you should probably be using the useRealmVoterWeightPlugins hook
-export class LegacyVoterWeightAdapter extends VoterWeight {
-  constructor(
-    readonly voterWeights: {
-      community: BN | undefined
-      council: BN | undefined
-    },
-    tokenOwnerRecords: {
-      community: ProgramAccount<TokenOwnerRecord> | undefined
-      council: ProgramAccount<TokenOwnerRecord> | undefined
-    }
-  ) {
-    super(tokenOwnerRecords.community, tokenOwnerRecords.council)
-  }
-
-  hasAnyWeight() {
-    return (
-      (!!this.voterWeights.community &&
-        !this.voterWeights.community.isZero()) ||
-      (!!this.voterWeights.council && !this.voterWeights.council.isZero())
-    )
-  }
-
-  hasMinCommunityWeight(minCommunityWeight: BN) {
-    return (
-      !!this.communityTokenRecord &&
-      this.voterWeights.community?.gte(minCommunityWeight)
-    )
-  }
-  hasMinCouncilWeight(minCouncilWeight: BN) {
-    return (
-      !!this.councilTokenRecord &&
-      this.voterWeights.council?.gte(minCouncilWeight)
-    )
-  }
-
-  hasMinAmountToVote(mintPk: PublicKey) {
-    const isCommunity =
-      this.communityTokenRecord?.account.governingTokenMint.toBase58() ===
-      mintPk.toBase58()
-    const isCouncil =
-      this.councilTokenRecord?.account.governingTokenMint.toBase58() ===
-      mintPk.toBase58()
-
-    if (isCouncil) return this.hasMinCouncilWeight(new BN(0))
-    if (isCommunity) return this.hasMinCommunityWeight(new BN(0))
-    return false
+    throw new Error('Not enough vote weight to create proposal')
   }
 }
 

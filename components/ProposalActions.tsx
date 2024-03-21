@@ -17,8 +17,10 @@ import { Proposal } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { cancelProposal } from 'actions/cancelProposal'
 import { getProgramVersionForRealm } from '@models/registry/api'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import dayjs from 'dayjs'
 import { diffTime } from './ProposalRemainingVotingTime'
+import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import {
   proposalQueryKeys,
@@ -36,7 +38,6 @@ import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import { TransactionInstruction } from '@solana/web3.js'
 import useQueryContext from '@hooks/useQueryContext'
 import { useRouter } from 'next/router'
-import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
 
 const ProposalActionsPanel = () => {
   const { propose } = useCreateProposal()
@@ -55,9 +56,11 @@ const ProposalActionsPanel = () => {
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
   const connection = useLegacyConnectionContext()
 
-  // TODO check the kind to be passed
-  const { maxVoterWeightPk } = useRealmVoterWeightPlugins()
-
+  const maxVoteRecordPk = useMaxVoteRecord()?.pubkey
+  const votePluginsClientMaxVoterWeight = useVotePluginsClientStore(
+    (s) => s.state.maxVoterWeight
+  )
+  const maxVoterWeight = maxVoteRecordPk || votePluginsClientMaxVoterWeight
   const canFinalizeVote =
     hasVoteTimeExpired && proposal?.account.state === ProposalState.Voting
   const now = new Date().getTime() / 1000 // unix timestamp in seconds
@@ -171,7 +174,7 @@ const ProposalActionsPanel = () => {
           rpcContext,
           governance?.account.realm,
           proposal,
-          maxVoterWeightPk,
+          maxVoterWeight,
           proposalOwner
         )
       }
