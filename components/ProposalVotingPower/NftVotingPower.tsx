@@ -1,28 +1,19 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import classNames from 'classnames'
 import { BigNumber } from 'bignumber.js'
-import { Transaction, TransactionInstruction } from '@solana/web3.js'
-import {
-  SYSTEM_PROGRAM_ID,
-  withCreateTokenOwnerRecord,
-} from '@solana/spl-governance'
-import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
-
+import { Transaction } from '@solana/web3.js'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import Button from '@components/Button'
-import { getVoterWeightRecord } from '@utils/plugin/accounts'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { sendTransaction } from '@utils/send'
 
 import VotingPowerPct from './VotingPowerPct'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
-import { useGovernancePowerAsync } from '@hooks/queries/governancePower'
 import useUserOrDelegator from '@hooks/useUserOrDelegator'
-import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
 import { useConnection } from '@solana/wallet-adapter-react'
 import { useVotingNfts } from '@hooks/queries/plugins/nftVoter'
+import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
+import {useJoinRealm} from "@hooks/useJoinRealm";
 
 interface Props {
   className?: string
@@ -36,50 +27,17 @@ const Join = () => {
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const realm = useRealmQuery().data?.result
+  const { userNeedsTokenOwnerRecord, handleRegister } = useJoinRealm();
 
-  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
-  const client = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
-  )
+  const join = async () => {
+    if (!realm || !wallet?.publicKey) throw new Error()
 
-  const handleRegister = async () => {
-    if (!realm || !wallet?.publicKey || !client.client) throw new Error()
-
-    const programVersion = await fetchProgramVersion(connection, realm.owner)
-
-    const instructions: TransactionInstruction[] = []
-    const { voterWeightPk } = await getVoterWeightRecord(
-      realm.pubkey,
-      realm.account.communityMint,
-      wallet.publicKey,
-      client.client.program.programId
-    )
-    const createVoterWeightRecordIx = await (client.client as NftVoterClient).program.methods
-      .createVoterWeightRecord(wallet.publicKey)
-      .accounts({
-        voterWeightRecord: voterWeightPk,
-        governanceProgramId: realm.owner,
-        realm: realm.pubkey,
-        realmGoverningTokenMint: realm.account.communityMint,
-        payer: wallet.publicKey,
-        systemProgram: SYSTEM_PROGRAM_ID,
-      })
-      .instruction()
-    instructions.push(createVoterWeightRecordIx)
-    await withCreateTokenOwnerRecord(
-      instructions,
-      realm.owner,
-      programVersion,
-      realm.pubkey,
-      wallet.publicKey,
-      realm.account.communityMint,
-      wallet.publicKey
-    )
+    const instructions = await handleRegister();
     const transaction = new Transaction()
     transaction.add(...instructions)
 
     await sendTransaction({
-      transaction: transaction,
+      transaction,
       wallet: wallet,
       connection: connection,
       signers: [],
@@ -91,8 +49,8 @@ const Join = () => {
   return (
     (actingAsWalletPk?.toString() === wallet?.publicKey?.toString() &&
       connected &&
-      !ownTokenRecord && (
-        <Button className="w-full mt-3" onClick={handleRegister}>
+        userNeedsTokenOwnerRecord && (
+        <Button className="w-full mt-3" onClick={join}>
           Join
         </Button>
       )) ||
@@ -103,10 +61,11 @@ const Join = () => {
 export default function NftVotingPower(props: Props) {
   const userPk = useUserOrDelegator()
   const nfts = useVotingNfts(userPk)
-  const {
-    result: votingPower,
-    loading: votingPowerLoading,
-  } = useGovernancePowerAsync('community')
+
+  const { isReady, totalCalculatedVoterWeight } = useRealmVoterWeightPlugins(
+    'community'
+  )
+
   const maxWeight = useNftPluginStore((s) => s.state.maxVoteRecord)
 
   const displayNfts = (nfts ?? []).slice(0, 3)
@@ -114,9 +73,9 @@ export default function NftVotingPower(props: Props) {
   const max = maxWeight
     ? new BigNumber(maxWeight.account.maxVoterWeight.toString())
     : null
-  const amount = new BigNumber((votingPower ?? 0).toString())
+  const amount = new BigNumber((totalCalculatedVoterWeight?.value ?? 0).toString())
 
-  if (votingPowerLoading || nfts === undefined) {
+  if (!isReady || nfts === undefined) {
     return (
       <div
         className={classNames(

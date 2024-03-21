@@ -1,9 +1,18 @@
 import { useRouter } from 'next/router'
 import Footer from '@components/Footer'
+import {PluginDebug} from "../VoterWeightPlugins/lib/PluginDebug";
+import React from "react";
 
 const PageBodyContainer = ({ children }) => {
-  const { pathname } = useRouter()
+  const { pathname, query } = useRouter()
   const isNewRealmsWizard = /\/realms\/new\/\w+/.test(pathname)
+
+  // TODO TEMP DEBUG - REMOVE BEFORE MERGE
+  if (
+      query['debug'] !== undefined
+  ) {
+    return <PluginDebug/>
+  }
 
   return (
     <>

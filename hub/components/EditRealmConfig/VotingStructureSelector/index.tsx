@@ -5,7 +5,9 @@ import BN from 'bn.js';
 import { produce } from 'immer';
 import { useEffect, useRef, useState } from 'react';
 
+import { defaultPass } from '../../../../GatewayPlugin/config';
 import { Config } from '../fetchConfig';
+import { ChainToggleConfigurator } from '@hub/components/EditRealmConfig/VotingStructureSelector/ChainToggle';
 import cx from '@hub/lib/cx';
 
 import { DEFAULT_NFT_VOTER_PLUGIN } from '@tools/constants';
@@ -29,6 +31,18 @@ export const DEFAULT_CIVIC_CONFIG = {
     'GgathUhdrCWRHowoRKACjgWhYHfxCEdBi5ViqYN6HVxk',
   ),
   maxVotingProgramId: undefined,
+};
+
+export const DEFAULT_QV_CONFIG = {
+  votingProgramId: new PublicKey('quadCSapU8nTdLg73KHDnmdxKnJQsh7GUbu5tZfnRRr'),
+  maxVotingProgramId: undefined, // the QV plugin does not use a max voting weight record.
+};
+
+export const PLUGIN_DISPLAY_NAMES = {
+  [DEFAULT_NFT_VOTER_PLUGIN]: 'NFT Plugin',
+  [DEFAULT_VSR_CONFIG.votingProgramId.toBase58() || '']: 'VSR Plugin',
+  [DEFAULT_CIVIC_CONFIG.votingProgramId.toBase58() || '']: 'Civic Plugin',
+  [DEFAULT_QV_CONFIG.votingProgramId.toBase58() || '']: 'QV Plugin',
 };
 
 const itemStyles = cx(
@@ -59,12 +73,14 @@ type VotingStructure = {
   nftCollectionSize?: number;
   nftCollectionWeight?: BN;
   civicPassType?: PublicKey;
+  chainingEnabled?: boolean;
 };
 
 interface Props {
   allowNFT?: boolean;
   allowCivic?: boolean;
   allowVSR?: boolean;
+  allowQV?: boolean;
   className?: string;
   communityMint: Config['communityMint'];
   currentStructure: VotingStructure;
@@ -118,8 +134,22 @@ function isCivicConfig(config: Props['structure']) {
   return areConfigsEqual(config, DEFAULT_CIVIC_CONFIG);
 }
 
+function isQVConfig(config: Props['structure']) {
+  return areConfigsEqual(config, DEFAULT_QV_CONFIG);
+}
+
+// true if this plugin supports chaining with other plugins
+function isChainablePlugin(config: Props['structure']) {
+  return isCivicConfig(config) || isQVConfig(config);
+}
+
 function isCustomConfig(config: Props['structure']) {
-  return !isNFTConfig(config) && !isVSRConfig(config) && !isCivicConfig(config);
+  return (
+    !isNFTConfig(config) &&
+    !isVSRConfig(config) &&
+    !isCivicConfig(config) &&
+    !isQVConfig(config)
+  );
 }
 
 export function getLabel(value: Props['structure']): string {
@@ -135,8 +165,25 @@ export function getLabel(value: Props['structure']): string {
     return 'Civic';
   }
 
+  if (isQVConfig(value)) {
+    return 'QV';
+  }
+
   return 'Custom';
 }
+
+const getDefaults = (value: Props['structure']): Partial<Config> => {
+  let result: Partial<Config> = {};
+
+  if (isCivicConfig(value)) {
+    result = {
+      ...result,
+      civicPassType: new PublicKey(defaultPass.value),
+    };
+  }
+
+  return result;
+};
 
 function getDescription(value: Props['structure']): string {
   if (isNFTConfig(value)) {
@@ -151,6 +198,10 @@ function getDescription(value: Props['structure']): string {
     return 'Governance based on Civic verification';
   }
 
+  if (isQVConfig(value)) {
+    return 'Quadratic voting';
+  }
+
   return 'Add a custom program ID for governance structure';
 }
 
@@ -162,6 +213,15 @@ export function VotingStructureSelector(props: Props) {
       !props.structure.votingProgramId,
   );
   const trigger = useRef<HTMLButtonElement>(null);
+
+  // only show the chain toggle if the plugin supports chaining
+  // and there is a previous plugin to chain with
+  // and the current plugin is not the same as the previous plugin
+  const shouldShowChainToggle =
+    isChainablePlugin(props.structure) &&
+    !!props.currentStructure.votingProgramId &&
+    props.structure.votingProgramId?.toBase58() !==
+      props.currentStructure.votingProgramId?.toBase58();
 
   useEffect(() => {
     if (trigger.current) {
@@ -203,6 +263,7 @@ export function VotingStructureSelector(props: Props) {
               const newConfig = produce({ ...props.structure }, (data) => {
                 data.votingProgramId = value || undefined;
                 data.nftCollection = undefined;
+                data.chainingEnabled = isChainablePlugin(data);
               });
 
               props.onChange?.(newConfig);
@@ -262,6 +323,20 @@ export function VotingStructureSelector(props: Props) {
             }}
           />
         )}
+        {shouldShowChainToggle && (
+          <ChainToggleConfigurator
+            chainingEnabled={props.structure.chainingEnabled ?? false}
+            previousPlugin={
+              props.currentStructure.votingProgramId?.toBase58() || ''
+            }
+            onChange={(value) => {
+              const newConfig = produce({ ...props.structure }, (data) => {
+                data.chainingEnabled = value;
+              });
+              props.onChange?.(newConfig);
+            }}
+          />
+        )}
         <DropdownMenu.Portal>
           <DropdownMenu.Content
             // weo weo z-index crap
@@ -273,6 +348,7 @@ export function VotingStructureSelector(props: Props) {
               ...(props.allowCivic ? [DEFAULT_CIVIC_CONFIG] : []),
               ...(props.allowNFT ? [DEFAULT_NFT_CONFIG] : []),
               ...(props.allowVSR ? [DEFAULT_VSR_CONFIG] : []),
+              ...(props.allowQV ? [DEFAULT_QV_CONFIG] : []),
               ...(isCustomConfig(props.currentStructure)
                 ? [props.currentStructure]
                 : [{}]),
@@ -299,7 +375,11 @@ export function VotingStructureSelector(props: Props) {
                       props.onChange?.({});
                       setIsDefault(true);
                     } else {
-                      props.onChange?.(config);
+                      const changes = {
+                        ...getDefaults(config), // add any default values (e.g. chainingEnabled)
+                        ...config,
+                      };
+                      props.onChange?.(changes);
                       setIsDefault(false);
                     }
                   }}

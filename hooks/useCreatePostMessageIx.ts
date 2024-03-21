@@ -6,12 +6,13 @@ import {
   GOVERNANCE_CHAT_PROGRAM_ID,
   withPostChatMessage,
 } from '@solana/spl-governance'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRouteProposalQuery } from '@hooks/queries/proposal'
 import { Keypair, TransactionInstruction } from '@solana/web3.js'
 import useUserOrDelegator from './useUserOrDelegator'
+import {useRealmVoterWeightPlugins} from "@hooks/useRealmVoterWeightPlugins";
+import {convertTypeToVoterWeightAction} from "../VoterWeightPlugins";
 
 /** This is WIP and shouldn't be used
  * @deprecated
@@ -21,9 +22,8 @@ const useCreatePostMessageIx = () => {
   const realm = useRealmQuery().data?.result
   const walletPk = useWalletOnePointOh()?.publicKey ?? undefined
   const actingWalletPk = useUserOrDelegator()
-  const votingPluginClient = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
-  )
+  const { updateVoterWeightRecords, voterWeightPks, voterWeightPkForWallet } = useRealmVoterWeightPlugins();
+  const voterWeightPk = actingWalletPk ? voterWeightPkForWallet(actingWalletPk) : undefined;
   const proposal = useRouteProposalQuery().data?.result
 
   return useCallback(
@@ -47,13 +47,10 @@ const useCreatePostMessageIx = () => {
         proposal.account.governingTokenMint,
         actingWalletPk
       )
+        const updateVWRInstructions = await updateVoterWeightRecords(actingWalletPk, convertTypeToVoterWeightAction('commentProposal'));
 
-      const plugin = await votingPluginClient?.withUpdateVoterWeightRecord(
-        instructions,
-        userTorPk,
-        'commentProposal',
-        createNftTicketsIxs
-      )
+      instructions.push(...updateVWRInstructions.pre);
+      createNftTicketsIxs.push(...updateVWRInstructions.post);
 
       const body = new ChatMessageBody({
         type: ChatMessageBodyType.Text,
@@ -73,10 +70,10 @@ const useCreatePostMessageIx = () => {
         walletPk,
         undefined,
         body,
-        plugin?.voterWeightPk
+        voterWeightPk
       )
     },
-    [actingWalletPk, proposal, realm, votingPluginClient, walletPk]
+    [actingWalletPk, proposal, realm, voterWeightPks, walletPk]
   )
 }
 
