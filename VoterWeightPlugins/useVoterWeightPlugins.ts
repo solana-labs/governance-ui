@@ -38,7 +38,7 @@ import {useTokenOwnerRecord} from "./hooks/useTokenOwnerRecord";
 export interface UseVoterWeightPluginsReturnType {
   isReady: boolean
   plugins: VoterWeightPlugins | undefined // undefined means we are still loading
-  updateVoterWeightRecords: (walletPk: PublicKey, action?: VoterWeightAction, target?: PublicKey) => Promise<{
+  updateVoterWeightRecords: (walletPk: PublicKey, action?: VoterWeightAction) => Promise<{
     pre: TransactionInstruction[]
     post: TransactionInstruction[]
   }>
