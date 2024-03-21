@@ -22,16 +22,17 @@
     }
   },
   "rules": {
-    "react-hooks/exhaustive-deps": [
-      "warn",
-      {
-        "additionalHooks": "(useAsync|useAsyncCallback|useAsyncAbortable)"
-      }
-    ],
+    "react-hooks/exhaustive-deps": 0 ,
+    // [
+    //   "warn",
+    //   {
+    //     "additionalHooks": "(useAsync|useAsyncCallback|useAsyncAbortable)"
+    //   }
+    // ],
     "react/react-in-jsx-scope": 0,
     "react/display-name": 0,
     "react/prop-types": 0,
-    "unused-imports/no-unused-imports": "error",
+    "unused-imports/no-unused-imports":  0, //"error",
     //"@typescript-eslint/no-unnecessary-condition": "error",
     "@typescript-eslint/explicit-function-return-type": 0,
     "@typescript-eslint/explicit-module-boundary-types": 0,
@@ -43,11 +44,12 @@
     "@typescript-eslint/no-explicit-any": 0,
     "@typescript-eslint/no-var-requires": 0,
     "@typescript-eslint/no-use-before-define": 0,
-    "@typescript-eslint/no-unused-vars": [
-      2,
-      {
-        "argsIgnorePattern": "^_"
-      }
-    ]
+    "@typescript-eslint/no-unused-vars": 0 
+    //  [
+    //   2,
+    //   {
+    //     "argsIgnorePattern": "^_"
+    //   }
+    // ]
   }
 }

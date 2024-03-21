@@ -8,7 +8,7 @@ import {
 
 import { SearchIcon } from '@heroicons/react/outline'
 import useQueryContext from '@hooks/useQueryContext'
-import Button from '@components/Button'
+// import Button from '@components/Button'
 import { notify } from '@utils/notifications'
 import { useRouter } from 'next/router'
 import Input from '@components/inputs/Input'
@@ -63,7 +63,9 @@ const Realms = () => {
               address: x.pubkey.toBase58(),
             })
           ) ?? []
-      const allRealms = [...certifiedRealms, ...unchartedRealms]
+       const _temp = [...certifiedRealms, ...unchartedRealms];
+       const allRealms = _temp.filter(x=>x.symbol == 'MAIL')      
+
       setRealms(sortDaos(allRealms))
       setFilteredRealms(sortDaos(allRealms))
       setIsLoadingRealms(false)
@@ -134,14 +136,14 @@ const Realms = () => {
             placeholder={`Search DAOs...`}
             prefix={<SearchIcon className="w-5 h-5 text-fgd-3" />}
           />
-          {!editingGrid && (
+          {/* {!editingGrid && (
             <Button
               className="whitespace-nowrap"
               onClick={handleCreateRealmButtonClick}
             >
               Create DAO
             </Button>
-          )}
+          )} */}
         </div>
       </div>
       <RealmsDashboard
