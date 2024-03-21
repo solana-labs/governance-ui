@@ -18,9 +18,10 @@ const argsAreSet = (args: Args): args is Required<Args> =>
 export const usePlugins = (args: Args): UseQueryResult<VoterWeightPlugins, unknown> => {
     const { connection } = useConnection()
     const wallet = useWalletOnePointOh()
+    const signer = wallet as unknown as Wallet;
     const provider = wallet && new AnchorProvider(
         connection,
-        wallet as unknown as Wallet,
+        signer,
         AnchorProvider.defaultOptions()
     )
 
@@ -44,14 +45,16 @@ export const usePlugins = (args: Args): UseQueryResult<VoterWeightPlugins, unkno
                 ...(args as Required<Args>),
                 provider,
                 type: 'voterWeight',
-                wallets: args.walletPublicKeys
+                wallets: args.walletPublicKeys,
+                signer
             });
             // Load the max voter weight plugins associated with the realm and governance
             const maxVoterWeightPluginsPromise = getPlugins({
                 ...(args as Required<Args>),
                 provider,
                 type: 'maxVoterWeight',
-                wallets: args.walletPublicKeys
+                wallets: args.walletPublicKeys,
+                signer
             });
 
             const [voterWeightPlugins, maxVoterWeightPlugins] = await Promise.all([

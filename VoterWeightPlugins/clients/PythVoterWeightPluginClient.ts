@@ -1,9 +1,8 @@
 import {Client} from "@solana/governance-program-library";
-import {Keypair, PublicKey, TransactionInstruction} from "@solana/web3.js";
+import {PublicKey, TransactionInstruction} from "@solana/web3.js";
 import BN from "bn.js";
 import {PythClient, StakeConnection} from "@pythnetwork/staking";
-import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
-import {Provider} from "@coral-xyz/anchor";
+import {Provider, Wallet} from "@coral-xyz/anchor";
 import {VoterWeightAction} from "@solana/spl-governance";
 import {convertVoterWeightActionToType} from "../lib/utils";
 
@@ -15,7 +14,14 @@ export class PythVoterWeightPluginClient extends Client<any> {
         return null;
     }
 
-    // NO-OP Pyth records are created through the Pyth dApp. TODO: Double-check
+    getMaxVoterWeightRecordPDA() {
+        return {
+            maxVoterWeightPk: this.maxVoterWeightPkCached,
+            maxVoterWeightRecordBump: 0         // TODO This is wrong for Pyth - but it doesn't matter as it is not used
+        }
+    }
+
+    // NO-OP Pyth records are created through the Pyth dApp.
     async createVoterWeightRecord(): Promise<TransactionInstruction | null> {
         return null;
     }
@@ -39,6 +45,13 @@ export class PythVoterWeightPluginClient extends Client<any> {
             target
         )
 
+        instructions.forEach((instruction, i) => {
+            console.log("instruction:", i);
+            instruction.keys.filter(k => k.isSigner).forEach(k => {
+                console.log("signer:", k.pubkey.toBase58());
+            })
+        })
+
         return { pre: instructions };
     }
     // NO-OP
@@ -54,15 +67,21 @@ export class PythVoterWeightPluginClient extends Client<any> {
             return new BN(0)
         }
     }
-    constructor(program: typeof PythClient.prototype.program, private client: StakeConnection, devnet:boolean) {
+    constructor(program: typeof PythClient.prototype.program, private client: StakeConnection, devnet:boolean, private maxVoterWeightPkCached: PublicKey) {
         super(program, devnet);
     }
 
-    static async connect(provider: Provider, devnet = false): Promise<PythVoterWeightPluginClient> {
+    static async connect(provider: Provider, devnet = false, wallet: Wallet): Promise<PythVoterWeightPluginClient> {
         const pythClient = await PythClient.connect(
             provider.connection,
-            new NodeWallet(new Keypair())
+            wallet
         )
-        return new PythVoterWeightPluginClient(pythClient.program, pythClient, devnet);
+
+        // The pyth voting client only exposes its max voter weight record using an async function.
+        // Since the VoterWeightPluginClient needs it in a synchronous context, we need to cache it here.
+        const maxVoterWeightPkCached = (await pythClient.program.methods.updateMaxVoterWeight().pubkeys()).maxVoterRecord
+
+        if (!maxVoterWeightPkCached) throw new Error("Max voter weight record not found");
+        return new PythVoterWeightPluginClient(pythClient.program, pythClient, devnet, maxVoterWeightPkCached);
     }
 }

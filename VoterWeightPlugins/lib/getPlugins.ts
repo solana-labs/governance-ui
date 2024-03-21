@@ -2,7 +2,7 @@ import { PublicKey, Connection } from '@solana/web3.js'
 import { fetchRealmConfigQuery } from '@hooks/queries/realmConfig'
 import { findPluginName, PluginName } from '@constants/plugins'
 import { loadClient } from '../clients/'
-import {Provider} from '@coral-xyz/anchor'
+import {Provider, Wallet} from '@coral-xyz/anchor'
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts'
 import {PluginType, VoterWeightPluginInfo} from './types'
 import BN from 'bn.js'
@@ -54,13 +54,15 @@ export const getPlugins = async ({
   governanceMintPublicKey,
   provider,
   type, 
-  wallets
+  wallets,
+  signer
 }: {
   realmPublicKey: PublicKey
   governanceMintPublicKey: PublicKey
   provider: Provider
   type: PluginType
   wallets: PublicKey[]
+  signer: Wallet
 }): Promise<VoterWeightPluginInfo[]> => {
   const plugins: VoterWeightPluginInfo[] = []
   let programId = await getInitialPluginProgramId(realmPublicKey, governanceMintPublicKey, provider.connection, type)
@@ -72,7 +74,8 @@ export const getPlugins = async ({
       const client = await loadClient(
           pluginName as PluginName,
           programId,
-          provider
+          provider,
+          signer
       )
 
       // obtain the currently stored on-chain voter weight or max voter weight depending on the passed-in type
