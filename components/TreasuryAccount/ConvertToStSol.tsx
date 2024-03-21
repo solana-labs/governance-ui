@@ -3,7 +3,7 @@ import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import AccountLabel from './AccountHeader'
 import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   StakingViewForm,
   UiInstruction,
@@ -32,7 +32,6 @@ import {
   LIDO_PROGRAM_ID,
   LIDO_PROGRAM_ID_DEVNET,
 } from '@constants/pubkeys/lido'
-import {useVoteByCouncilToggle} from "@hooks/useVoteByCouncilToggle";
 
 const defaultFormState = {
   destinationAccount: undefined,
@@ -56,7 +55,7 @@ const STSOL_MINT_DEVNET = '5nnLCgZn1EQaLj1ub8vYbQgBhkWi97x4JC5ARVPhci4V'
 
 const ConvertToStSol = () => {
   const realm = useRealmQuery().data?.result
-  const {symbol } = useRealm()
+  const { canChooseWhoVote, symbol } = useRealm()
   const { canUseTransferInstruction } = useGovernanceAssets()
   const { governedTokenAccounts } = useGovernanceAssets()
   const { fmtUrlWithCluster } = useQueryContext()
@@ -73,7 +72,7 @@ const ConvertToStSol = () => {
   )
   const [form, setForm] = useState<StakingViewForm>(defaultFormState)
   const [showOptions, setShowOptions] = useState(false)
-  const { voteByCouncil, shouldShowVoteByCouncilToggle, setVoteByCouncil } = useVoteByCouncilToggle();
+  const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
   const mintMinAmount = form.governedTokenAccount?.extensions?.mint
@@ -261,13 +260,13 @@ const ConvertToStSol = () => {
                 })
               }
             />
-            {shouldShowVoteByCouncilToggle && (
-                <VoteBySwitch
-                    checked={voteByCouncil}
-                    onChange={() => {
-                      setVoteByCouncil(!voteByCouncil)
-                    }}
-                ></VoteBySwitch>
+            {canChooseWhoVote && (
+              <VoteBySwitch
+                checked={voteByCouncil}
+                onChange={() => {
+                  setVoteByCouncil(!voteByCouncil)
+                }}
+              />
             )}
           </>
         )}

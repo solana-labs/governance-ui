@@ -8,6 +8,7 @@ import {
 import { validateInstruction } from '@utils/instructionTools'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NewProposalContext } from '../../../new'
 import InstructionForm, { InstructionInput } from '../FormCreator'
 import { InstructionInputType } from '../inputInstructionType'
@@ -17,8 +18,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
-import {configureCivicRegistrarIx} from "../../../../../../../GatewayPlugin/sdk/api";
-import {useGatewayVoterWeightPlugin} from "../../../../../../../VoterWeightPlugins";
+import {configureCivicRegistrarIx} from "@utils/plugin/gateway";
 
 interface ConfigureGatewayForm {
   governedAccount: AssetAccount | undefined
@@ -35,13 +35,13 @@ const ConfigureGatewayPlugin = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const realm = useRealmQuery().data?.result
+  const gatewayClient = useVotePluginsClientStore((s) => s.state.gatewayClient)
   const { assetAccounts } = useGovernanceAssets()
   const wallet = useWalletOnePointOh()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<ConfigureGatewayForm>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
-  const { gatewayClient } = useGatewayVoterWeightPlugin();
 
   const chosenGatekeeperNetwork = useMemo(() => {
     return form?.otherGatekeeperNetwork || form?.gatekeeperNetwork
@@ -53,12 +53,11 @@ const ConfigureGatewayPlugin = ({
     if (
       isValid &&
       form!.governedAccount?.governance?.account &&
-      wallet?.publicKey &&
-        realm && gatewayClient
+      wallet?.publicKey
     ) {
       const configureRegistrarTx = await configureCivicRegistrarIx(
-          realm,
-          gatewayClient,
+          realm!,
+          gatewayClient!,
           chosenGatekeeperNetwork!,
       )
       serializedInstruction = serializeInstructionToBase64(configureRegistrarTx)

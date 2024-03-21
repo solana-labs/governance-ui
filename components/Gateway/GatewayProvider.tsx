@@ -1,9 +1,9 @@
 import { FC } from 'react'
 import { GatewayProvider as InternalGatewayProvider } from '@civic/solana-gateway-react'
+import useVotePluginsClientStore from '../../stores/useVotePluginsClientStore'
+import useGatewayPluginStore from '../../GatewayPlugin/store/gatewayPluginStore'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import { useGatewayVoterWeightPlugin } from 'VoterWeightPlugins'
-import { useConnection } from '@solana/wallet-adapter-react'
-import {getNetworkFromEndpoint} from "@utils/connection";
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 /**
  * Wrapper for the Civic Gateway Provider react component. This component is responsible for
@@ -14,19 +14,22 @@ import {getNetworkFromEndpoint} from "@utils/connection";
  */
 export const GatewayProvider: FC = ({ children }) => {
   const wallet = useWalletOnePointOh()
-  const { gatekeeperNetwork, isReady } = useGatewayVoterWeightPlugin()
-  const { connection } = useConnection()
-    const network = getNetworkFromEndpoint(connection.rpcEndpoint);
-    const cluster = network === 'mainnet'
-      ? 'mainnet-beta'
-      : network
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
+  const gatekeeperNetwork = useGatewayPluginStore(
+    (s) => s.state.gatekeeperNetwork
+  )
+  const connection = useLegacyConnectionContext()
+  const cluster =
+    connection.cluster === 'mainnet' ? 'mainnet-beta' : connection.cluster
 
-  if (!wallet || !wallet.publicKey || !isReady || !gatekeeperNetwork)
+  if (!wallet || !wallet.publicKey || !client || !gatekeeperNetwork)
     return <>{children}</>
 
   return (
     <InternalGatewayProvider
-      connection={connection}
+      connection={connection.current}
       cluster={cluster}
       gatekeeperNetwork={gatekeeperNetwork}
       wallet={{

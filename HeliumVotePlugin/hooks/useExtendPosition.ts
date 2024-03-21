@@ -11,15 +11,18 @@ import {
   sendTransactionsV3,
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
+import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { withCreateTokenOwnerRecord } from '@solana/spl-governance'
 import { useRealmQuery } from '@hooks/queries/realm'
-import {useHeliumClient} from "../../VoterWeightPlugins/useHeliumClient";
 
 export const useExtendPosition = () => {
   const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
   const realm = useRealmQuery().data?.result
   const { realmInfo } = useRealm()
-  const {heliumClient} = useHeliumClient();
+  const [{ client }] = useVotePluginsClientStore((s) => [
+    s.state.currentRealmVotingClient,
+  ])
   const { error, loading, execute } = useAsyncCallback(
     async ({
       position,
@@ -38,8 +41,9 @@ export const useExtendPosition = () => {
         !provider ||
         !realm ||
         !wallet ||
-        !heliumClient ||
-        !realmInfo;
+        !client ||
+        !realmInfo ||
+        !(client instanceof HeliumVsrClient)
 
       const idl = await Program.fetchIdl(programId, provider)
       const hsdProgram = await init(provider as any, programId, idl)
@@ -80,7 +84,7 @@ export const useExtendPosition = () => {
           )
         } else {
           instructions.push(
-            await heliumClient.program.methods
+            await client.program.methods
               .resetLockupV0({
                 kind: position.lockup.kind,
                 periods: lockupPeriodsInDays,

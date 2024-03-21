@@ -114,8 +114,7 @@ export const voteRegistryLockDeposit = async ({
   if (!amountFromVoteRegistryDeposit.isZero()) {
     const period = getPeriod(lockUpPeriodInDays, lockupKind)
     const resetLockup = await client?.program.methods
-        // The cast to any works around an anchor issue with interpreting enums
-      .resetLockup(depositIdx, { [lockupKind]: {} } as any, period)
+      .resetLockup(depositIdx, { [lockupKind]: {} }, period)
       .accounts({
         registrar: registrar,
         voter: voter,

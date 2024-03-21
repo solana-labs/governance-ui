@@ -106,8 +106,10 @@ export const createProposal = async (
   //will run only if plugin is connected with realm
   const plugin = await client?.withUpdateVoterWeightRecord(
     instructions,
+    tokenOwnerRecord.pubkey,
     'createProposal',
     createNftTicketsIxs,
+    governance
   )
 
   const proposalAddress = await withCreateProposal(

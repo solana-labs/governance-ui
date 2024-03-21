@@ -2,11 +2,12 @@ import { useVotingNfts } from '@hooks/queries/plugins/nftVoter'
 import { usePrevious } from '@hooks/usePrevious'
 import useUserOrDelegator from '@hooks/useUserOrDelegator'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
 import { useEffect, useState } from 'react'
 import useTransactionsStore from 'stores/useTransactionStore'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import Modal from './Modal'
-import {useNftClient} from "../VoterWeightPlugins/useNftClient";
 
 const NftVotingCountingModal = () => {
   const votingInProgress = useNftProposalStore((s) => s.votingInProgress)
@@ -21,6 +22,9 @@ const NftVotingComponent = () => {
     countedNftsForProposal,
     proposal,
   } = useNftProposalStore()
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
   const wallet = useWalletOnePointOh()
   const userPk = useUserOrDelegator()
   const votingNfts = useVotingNfts(userPk) ?? []
@@ -32,7 +36,6 @@ const NftVotingComponent = () => {
   const lastTransactionNftsCount = 5
   const maxNftsPerTransaction = 8
 
-  const { nftClient } = useNftClient()
   const [usedNftsCount, setUsedNftsCount] = useState(0)
   const [remainingVotingPower, setRemainingVotingPower] = useState(0)
   const handleCalcCountedNfts = (val: number) => {
@@ -80,7 +83,7 @@ const NftVotingComponent = () => {
       wrapperStyle={{ top: '-350px' }}
       onClose={() =>
         closeNftVotingCountingModal(
-          nftClient!,
+          (client.client as unknown) as NftVoterClient,
           proposal!,
           wallet!.publicKey!
         )

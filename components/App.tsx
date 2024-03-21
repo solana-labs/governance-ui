@@ -5,6 +5,7 @@ import Head from 'next/head'
 import Script from 'next/script'
 import { useRouter } from 'next/router'
 import { GatewayProvider } from '@components/Gateway/GatewayProvider'
+import { useVotingPlugins } from '@hooks/useVotingPlugins'
 import { VSR_PLUGIN_PKS } from '@constants/plugins'
 import ErrorBoundary from '@components/ErrorBoundary'
 import useHandleGovernanceAssetsStore from '@hooks/handleGovernanceAssetsStore'
@@ -15,6 +16,7 @@ import tokenPriceService from '@utils/services/tokenPrice'
 import TransactionLoader from '@components/TransactionLoader'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import useRealm from '@hooks/useRealm'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import NftVotingCountingModal from '@components/NftVotingCountingModal'
 import { getResourcePathPart } from '@tools/core/resources'
 import useSerumGovStore from 'stores/useSerumGovStore'
@@ -35,8 +37,6 @@ import {
 import { WALLET_PROVIDERS } from '@utils/wallet-adapters'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { useAsync } from 'react-async-hook'
-import { useVsrClient } from '../VoterWeightPlugins/useVsrClient'
-import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
@@ -102,6 +102,7 @@ const allowedDomains = [
 
 export function AppContents(props: Props) {
   handleRouterHistory()
+  useVotingPlugins()
   useHandleGovernanceAssetsStore()
   useEffect(() => {
     tokenPriceService.fetchSolanaTokenList()
@@ -109,25 +110,20 @@ export function AppContents(props: Props) {
 
   const { getOwnedDeposits, resetDepositState } = useDepositStore()
 
-  const { plugins } = useRealmVoterWeightPlugins('community')
-  const usesVsr = plugins?.voterWeight.find((plugin) =>
-    VSR_PLUGIN_PKS.includes(plugin.programId.toString())
-  )
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
-
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
 
   const { realmInfo } = useRealm()
   const wallet = useWalletOnePointOh()
   const connection = useLegacyConnectionContext()
+  const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
 
   const router = useRouter()
   const { cluster } = router.query
   const updateSerumGovAccounts = useSerumGovStore(
     (s) => s.actions.updateSerumGovAccounts
   )
-  const { vsrClient } = useVsrClient()
 
   const realmName = realmInfo?.displayName ?? realm?.account?.name
   const title = realmName ? `${realmName}` : 'Realms'
@@ -176,11 +172,7 @@ export function AppContents(props: Props) {
 
   // Validate it's an ico file
   function isValidSymbol(symbol) {
-    return (
-      typeof symbol === 'string' &&
-      symbol.trim() !== '' &&
-      /^[a-zA-Z0-9-_]+$/.test(symbol)
-    )
+    return typeof symbol === 'string' && symbol.trim() !== '' && /^[a-zA-Z0-9-_]+$/.test(symbol);
   }
   const { result: faviconExists } = useAsync(async () => {
     if (!faviconUrl) {
@@ -199,7 +191,10 @@ export function AppContents(props: Props) {
   useEffect(() => {
     if (
       realm &&
-      usesVsr &&
+      config?.account.communityTokenConfig.voterWeightAddin &&
+      VSR_PLUGIN_PKS.includes(
+        config.account.communityTokenConfig.voterWeightAddin.toBase58()
+      ) &&
       realm.pubkey &&
       wallet?.connected &&
       ownTokenRecord &&

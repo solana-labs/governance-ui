@@ -45,8 +45,7 @@ export const getUpdateVoterWeightRecordInstruction = async (
     )
   }
   const updateVoterWeightRecordIx = await program.methods
-    // The cast to any works around an anchor issue with interpreting enums
-    .updateVoterWeightRecord({ [type]: {} } as any)
+    .updateVoterWeightRecord({ [type]: {} })
     .accounts({
       registrar: registrar,
       voterWeightRecord: voterWeightPk,
@@ -104,8 +103,7 @@ export const getUpdateVoterWeightRecordInstructionV2 = async (
   for (const chunk of [...nftChunks]) {
     createNftTicketIxs.push(
       await program.methods
-        // The cast to any works around an anchor issue with interpreting enums
-        .createNftActionTicket({ [type]: {} } as any)
+        .createNftActionTicket({ [type]: {} })
         .accounts({
           registrar,
           voterWeightRecord: voterWeightPk,
@@ -141,8 +139,7 @@ export const getUpdateVoterWeightRecordInstructionV2 = async (
     const typesafeParams = [param as typeof param & { collection: typeof param.collection & { key : PublicKey }}]
 
     const instruction = await program.methods
-      // The cast to any works around an anchor issue with interpreting enums
-      .createCnftActionTicket({ [type]: {} } as any, typesafeParams)
+      .createCnftActionTicket({ [type]: {} }, typesafeParams)
       .accounts({
         registrar,
         voterWeightRecord: voterWeightPk,
@@ -161,8 +158,7 @@ export const getUpdateVoterWeightRecordInstructionV2 = async (
   }
 
   const updateVoterWeightRecordIx = await program.methods
-    // The cast to any works around an anchor issue with interpreting enums
-    .updateVoterWeightRecord({ [type]: {} } as any)
+    .updateVoterWeightRecord({ [type]: {} })
     .accounts({
       registrar: registrar,
       voterWeightRecord: voterWeightPk,

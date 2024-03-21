@@ -17,7 +17,7 @@ import {
 import { precision } from '@utils/formatting'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { voteRegistryLockDeposit } from 'VoteStakeRegistry/actions/voteRegistryLockDeposit'
-import { DepositWithMintAccount, Registrar } from 'VoteStakeRegistry/sdk/accounts'
+import { DepositWithMintAccount } from 'VoteStakeRegistry/sdk/accounts'
 import {
   yearsToDays,
   daysToMonths,
@@ -39,6 +39,7 @@ import {
   vestingPeriods,
 } from 'VoteStakeRegistry/tools/types'
 import BigNumber from 'bignumber.js'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { calcMintMultiplier } from 'VoteStakeRegistry/tools/deposits'
 import ButtonGroup from '@components/ButtonGroup'
 import InlineNotification from '@components/InlineNotification'
@@ -51,7 +52,6 @@ import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 import { useConnection } from '@solana/wallet-adapter-react'
 import { tokenAccountQueryKeys } from '@hooks/queries/tokenAccount'
 import queryClient from '@hooks/queries/queryClient'
-import {useVsrClient} from "../../../VoterWeightPlugins/useVsrClient";
 
 const YES = 'Yes'
 const NO = 'No'
@@ -71,9 +71,10 @@ const LockTokensModal = ({
   const { realmTokenAccount, realmInfo } = useRealm()
   const { data: tokenOwnerRecordPk } = useAddressQuery_CommunityTokenOwner()
 
-  const { vsrClient: client, plugin } = useVsrClient();
-  const voteStakeRegistryRegistrar = plugin?.params as Registrar | undefined;
-
+  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
+  const voteStakeRegistryRegistrar = useVotePluginsClientStore(
+    (s) => s.state.voteStakeRegistryRegistrar
+  )
   const { connection } = useConnection()
   const endpoint = connection.rpcEndpoint
   const wallet = useWalletOnePointOh()
@@ -138,7 +139,7 @@ const LockTokensModal = ({
     })
   const maxMultiplier = calcMintMultiplier(
     maxNonCustomDaysLockup * SECS_PER_DAY,
-    voteStakeRegistryRegistrar ?? null,
+    voteStakeRegistryRegistrar,
     realm
   )
 
@@ -215,7 +216,7 @@ const LockTokensModal = ({
     : ''
   const currentMultiplier = calcMintMultiplier(
     lockupPeriodDays * SECS_PER_DAY,
-    voteStakeRegistryRegistrar ?? null,
+    voteStakeRegistryRegistrar,
     realm,
     lockupType.value !== 'constant'
   )

@@ -1,6 +1,7 @@
 import {
   PublicKey,
   SystemProgram,
+  SYSVAR_INSTRUCTIONS_PUBKEY,
   SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
 } from '@solana/web3.js'
@@ -54,17 +55,17 @@ export const withCreateNewDeposit = async ({
   const clientProgramId = client!.program.programId
   let tokenOwnerRecordPubKey = tokenOwnerRecordPk
 
-  const { registrar } = getRegistrarPDA(
+  const { registrar } = await getRegistrarPDA(
     realmPk,
     communityMintPk,
     clientProgramId
   )
-  const { voter } = getVoterPDA(
+  const { voter, voterBump } = await getVoterPDA(
     registrar,
     walletPk,
     clientProgramId
   )
-  const { voterWeightPk } = getVoterWeightPDA(
+  const { voterWeightPk, voterWeightBump } = await getVoterWeightPDA(
     registrar,
     walletPk,
     clientProgramId
@@ -93,7 +94,19 @@ export const withCreateNewDeposit = async ({
   }
 
   if (!existingVoter) {
-    const createVoterIx = await client?.createVoterWeightRecord(voter, realmPk, communityMintPk)
+    const createVoterIx = await client?.program.methods
+      .createVoter(voterBump, voterWeightBump)
+      .accounts({
+        registrar: registrar,
+        voter: voter,
+        voterAuthority: walletPk,
+        voterWeightRecord: voterWeightPk,
+        payer: walletPk,
+        systemProgram: systemProgram,
+        rent: SYSVAR_RENT_PUBKEY,
+        instructions: SYSVAR_INSTRUCTIONS_PUBKEY,
+      })
+      .instruction()
     instructions.push(createVoterIx)
   }
   const mintCfgIdx = await getMintCfgIdx(registrar, mintPk, client)
@@ -126,7 +139,7 @@ export const withCreateNewDeposit = async ({
     const createDepositEntryInstruction = await client?.program.methods
       .createDepositEntry(
         firstFreeIdx,
-        { [lockupKind]: {} } as any, // The cast to any works around an anchor issue with interpreting enums
+        { [lockupKind]: {} },
         //lockup starts now
         null,
         period,

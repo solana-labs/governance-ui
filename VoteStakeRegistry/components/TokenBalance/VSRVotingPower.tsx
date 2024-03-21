@@ -7,7 +7,7 @@ import { getMintDecimalAmount } from '@tools/sdk/units'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 import BN from 'bn.js'
-import { useVsrGovpowerMulti } from '@hooks/queries/plugins/vsr'
+import { useVsrGovpower, useVsrGovpowerMulti } from '@hooks/queries/plugins/vsr'
 import VotingPowerBox from 'VoteStakeRegistry/components/TokenBalance/VotingPowerBox'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import { useTokenOwnerRecordsDelegatedToUser } from '@hooks/queries/tokenOwnerRecord'
@@ -15,18 +15,20 @@ import { useMemo } from 'react'
 import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
 
 interface Props {
-  className?: string,
-  votingPower: BN | undefined,
-  votingPowerLoading: boolean
-  isLastPlugin: boolean
+  className?: string
 }
 
-export default function VSRCommunityVotingPower({ className, votingPower, votingPowerLoading, isLastPlugin }: Props) {
+export default function VSRCommunityVotingPower(props: Props) {
   const realm = useRealmQuery().data?.result
   const mint = useRealmCommunityMintInfoQuery().data?.result
 
   const deposits = useDepositStore((s) => s.state.deposits)
 
+  const {
+    data: votingPowerResult,
+    isLoading: votingPowerLoading,
+  } = useVsrGovpower()
+  const votingPower = votingPowerResult?.result ?? new BN(0)
   const votingPowerFromDeposits = useDepositStore(
     (s) => s.state.votingPowerFromDeposits
   )
@@ -102,7 +104,7 @@ export default function VSRCommunityVotingPower({ className, votingPower, voting
     return (
       <div
         className={classNames(
-          className,
+          props.className,
           'rounded-md bg-bkg-1 h-[76px] animate-pulse'
         )}
       />
@@ -110,12 +112,11 @@ export default function VSRCommunityVotingPower({ className, votingPower, voting
   }
 
   return (
-    <div className={className}>
+    <div className={props.className}>
       <VotingPowerBox
-        votingPower={votingPower ?? new BN(0)}
+        votingPower={votingPower}
         mint={mint}
         votingPowerFromDeposits={votingPowerFromDeposits}
-        isLastPlugin={isLastPlugin}
         className="p-3"
       />
       <div className="flex flex-col pt-4 px-4 gap-1.5">

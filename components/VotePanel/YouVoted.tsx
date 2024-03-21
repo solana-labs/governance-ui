@@ -13,6 +13,7 @@ import {
 } from '@heroicons/react/solid'
 import Button from '../Button'
 import { getProgramVersionForRealm } from '@models/registry/api'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import Tooltip from '@components/Tooltip'
 import {
   useVoterTokenRecord,
@@ -34,9 +35,11 @@ import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import queryClient from '@hooks/queries/queryClient'
 import { CheckmarkFilled } from '@carbon/icons-react'
-import {useVotingClientForGoverningTokenMint} from "@hooks/useVotingClients";
 
 export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
   const proposal = useRouteProposalQuery().data?.result
   const realm = useRealmQuery().data?.result
   const { realmInfo } = useRealm()
@@ -57,7 +60,6 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
   const vetoVotertokenRecord = useUserVetoTokenRecord()
   const voterTokenRecord =
     quorum === 'electoral' ? electoralVoterTokenRecord : vetoVotertokenRecord
-  const votingClient = useVotingClientForGoverningTokenMint(proposal?.account.governingTokenMint)
 
   const isWithdrawEnabled =
     connected &&
@@ -129,7 +131,7 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
         voterTokenRecord.pubkey,
         ownVoteRecord.pubkey,
         instructions,
-        votingClient
+        client
       )
       queryClient.invalidateQueries({
         queryKey: proposalQueryKeys.all(connection.endpoint),

@@ -43,7 +43,6 @@ enum ProposalType {
   DEPOSIT = 'Deposit',
   WITHDRAW = 'Withdraw',
 }
-import {useVoteByCouncilToggle} from "@hooks/useVoteByCouncilToggle";
 
 const MangoModal = ({ account }: { account: AssetAccount }) => {
   const { canUseTransferInstruction } = useGovernanceAssets()
@@ -57,7 +56,7 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
   const router = useRouter()
   const { symbol } = useRealm()
   const [isProposing, setIsProposing] = useState(false)
-  const { voteByCouncil, setVoteByCouncil } = useVoteByCouncilToggle();
+  const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [isLoadingMangoAccount, setIsLoadingMangoAccount] = useState<boolean>(
     true
   )
@@ -108,7 +107,7 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
       } to the Mango`,
     })
   }, [proposalType])
-
+  
   const SOL_BUFFER = 0.02
 
   const treasuryAmount = new BN(
@@ -126,7 +125,7 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
   }
   const maxAmountFtm = maxAmount.toNumber().toFixed(4)
   const currentPrecision = precision(mintMinAmount)
-
+  
   const schema = yup.object().shape({
     mangoAccount: yup
       .object()
@@ -168,7 +167,7 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
         mangoGroup!,
         account.extensions.token!.account.owner!
       )
-
+      
       if (accounts) {
         setMangoAccounts(accounts)
       }
@@ -272,7 +271,7 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
             )
           )
           .instruction()
-
+  
         const depositAccInstData = {
           data: getInstructionDataFromBase64(
             serializeInstructionToBase64(methodByProposalInstruction!)
@@ -281,10 +280,10 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
             account?.governance.account?.config.minInstructionHoldUpTime,
           prerequisiteInstructions: [],
         }
-
+  
         instructions.push(depositAccInstData)
       }
-
+      
       if (proposalType === ProposalType.WITHDRAW) {
         const withdrawTxs = await mangoClient!.tokenWithdrawNativeIx(mangoGroup!, form.mangoAccount!, account.extensions.mint!.publicKey!, tokens, false)
 
@@ -301,7 +300,7 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
           instructions.push(withdrawAccInsData)
         }
       }
-
+      
 
       if (form.delegate) {
         const delegateIx = await mangoClient!.program.methods

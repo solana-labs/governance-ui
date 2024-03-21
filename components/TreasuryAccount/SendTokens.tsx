@@ -17,7 +17,7 @@ import {
   SendTokenCompactViewForm,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 
 import { getTokenTransferSchema } from '@utils/validations'
@@ -47,13 +47,12 @@ import { useRealmQuery } from '@hooks/queries/realm'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { fetchJupiterPrice } from '@hooks/queries/jupiterPrice'
 import { useAsync } from 'react-async-hook'
-import {useVoteByCouncilToggle} from "@hooks/useVoteByCouncilToggle";
 
 const SendTokens = () => {
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const connection = useLegacyConnectionContext()
   const realm = useRealmQuery().data?.result
-  const { realmInfo, symbol} = useRealm()
+  const { realmInfo, symbol, canChooseWhoVote } = useRealm()
   const { handleCreateProposal } = useCreateProposal()
   const { canUseTransferInstruction } = useGovernanceAssets()
   const tokenInfo = useTreasuryAccountStore((s) => s.tokenInfo)
@@ -71,7 +70,7 @@ const SendTokens = () => {
     title: '',
     description: '',
   })
-  const { voteByCouncil, shouldShowVoteByCouncilToggle, setVoteByCouncil } = useVoteByCouncilToggle();
+  const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [showOptions, setShowOptions] = useState(false)
   const [
     destinationAccount,
@@ -346,13 +345,13 @@ const SendTokens = () => {
                 })
               }
             ></Textarea>
-            {shouldShowVoteByCouncilToggle && (
-                <VoteBySwitch
-                    checked={voteByCouncil}
-                    onChange={() => {
-                      setVoteByCouncil(!voteByCouncil)
-                    }}
-                ></VoteBySwitch>
+            {canChooseWhoVote && (
+              <VoteBySwitch
+                checked={voteByCouncil}
+                onChange={() => {
+                  setVoteByCouncil(!voteByCouncil)
+                }}
+              ></VoteBySwitch>
             )}
           </>
         )}

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { TransactionInstruction } from '@solana/web3.js'
 import { SecondaryButton } from '@components/Button'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import { chunks } from '@utils/helpers'
 import {
   registrarKey,
@@ -18,7 +20,6 @@ import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/to
 import { useConnection } from '@solana/wallet-adapter-react'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmProposalsQuery } from '@hooks/queries/proposal'
-import {useHeliumClient} from "../../VoterWeightPlugins/useHeliumClient";
 
 const NFT_SOL_BALANCE = 0.0014616
 
@@ -33,29 +34,30 @@ const ClaimUnreleasedPositions = ({
   const [ownVoteRecords, setOwnVoteRecords] = useState<any[]>([])
   const [solToBeClaimed, setSolToBeClaimed] = useState(0)
   const realm = useRealmQuery().data?.result
-  const { heliumClient } = useHeliumClient();
+  const votingPlugin = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
   const { data: proposalsArray } = useRealmProposalsQuery()
   const { data: tokenOwnerRecord } = useAddressQuery_CommunityTokenOwner()
-  const isHeliumVsr = !!heliumClient;
+  const isHeliumVsr = votingPlugin.client instanceof HeliumVsrClient
 
   const releasePositions = async () => {
     if (!wallet?.publicKey) throw new Error('no wallet')
     if (!realm) throw new Error()
     if (!tokenOwnerRecord) throw new Error()
-    if (!heliumClient) throw new Error("No Helium client")
 
     setIsLoading(true)
     const instructions: TransactionInstruction[] = []
     const [registrar] = registrarKey(
       realm.pubkey,
       realm.account.communityMint,
-      heliumClient!.program.programId
+      votingPlugin.client!.program.programId
     )
 
     const [voterWeightPk] = voterWeightRecordKey(
       registrar,
       wallet.publicKey,
-      heliumClient!.program.programId
+      votingPlugin.client!.program.programId
     )
 
     const voteRecords = ownVoteRecords
@@ -65,7 +67,7 @@ const ClaimUnreleasedPositions = ({
       )
       const [posKey] = positionKey(
         i.account.nftMint,
-        heliumClient.program.programId
+        votingPlugin.client!.program.programId
       )
       if (
         proposal === undefined ||
@@ -75,7 +77,7 @@ const ClaimUnreleasedPositions = ({
         continue
       }
 
-      const relinquishVoteIx = await heliumClient.program.methods
+      const relinquishVoteIx = await (votingPlugin.client as HeliumVsrClient).program.methods
         .relinquishVoteV0()
         .accounts({
           registrar,
@@ -118,8 +120,7 @@ const ClaimUnreleasedPositions = ({
     }
   }
   const getVoteRecords = async () => {
-    const currentClient = heliumClient;
-    if (!currentClient) return
+    const currentClient = votingPlugin.client as HeliumVsrClient
     const voteRecords =
       (await currentClient.program.account['nftVoteRecord']?.all([
         {
@@ -147,11 +148,11 @@ const ClaimUnreleasedPositions = ({
   }
 
   useEffect(() => {
-    if (wallet?.publicKey && isHeliumVsr && heliumClient) {
+    if (wallet?.publicKey && isHeliumVsr && votingPlugin.client) {
       getVoteRecords()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [heliumClient, isHeliumVsr, wallet?.publicKey?.toBase58()])
+  }, [votingPlugin.clientType, isHeliumVsr, wallet?.publicKey?.toBase58()])
 
   if (isHeliumVsr) {
     return (

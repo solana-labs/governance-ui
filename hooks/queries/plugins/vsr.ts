@@ -11,11 +11,10 @@ import { fetchRealmConfigQuery, useRealmConfigQuery } from '../realmConfig'
 import queryClient from '../queryClient'
 import { useConnection } from '@solana/wallet-adapter-react'
 import useUserOrDelegator from '@hooks/useUserOrDelegator'
+import { useAsync } from 'react-async-hook'
 import { getLockTokensVotingPowerPerWallet } from 'VoteStakeRegistry/tools/deposits'
 import { useQuery } from '@tanstack/react-query'
 import { findPluginName } from '@constants/plugins'
-import {useVsrClient} from "../../../VoterWeightPlugins/useVsrClient";
-import {getPluginClientCached} from "@hooks/queries/pluginRegistrar";
 
 const VOTER_INFO_EVENT_NAME = 'VoterInfo'
 
@@ -38,8 +37,6 @@ export const vsrQueryKeys = {
   ],
 }
 
-// @deprecated - use the vsr voting client instead (useVsrClient), or preferably just obtain the weight generically for all plugins using
-// useRealmVoterWeightPlugins().totalCalculatedVoterWeight
 export const getVsrGovpower = async (
   connection: Connection,
   realmPk: PublicKey,
@@ -47,19 +44,25 @@ export const getVsrGovpower = async (
 ) => {
   const { result: realm } = await fetchRealmByPubkey(connection, realmPk)
   if (realm === undefined) throw new Error()
-  const plugin = await getPluginClientCached(realmPk, connection, walletPk, 'VSR', 'voterWeight');
-  const votingPower =await plugin?.client?.calculateVoterWeight(
-    walletPk,
+  const communityMintPk = realm.account.communityMint
+  const config = await fetchRealmConfigQuery(connection, realmPk)
+  const programId = config.result?.account.communityTokenConfig.voterWeightAddin
+  if (programId === undefined)
+    return { found: false, result: undefined } as const
+
+  const { registrar: registrarPk } = await getRegistrarPDA(
     realmPk,
-    realm.account.communityMint,
-    new BN(0) // technically incorrect. Should obtain the voter weight from the input TOR
-  );
-
-  if (!votingPower) {
-    return {found: false, result: undefined} as const
-  }
-
-  return { found: true, result: votingPower }
+    communityMintPk,
+    programId
+  )
+  const { voter: voterPk } = await getVoterPDA(registrarPk, walletPk, programId)
+  const votingPower = await fetchVotingPower(
+    connection,
+    programId,
+    registrarPk,
+    voterPk
+  )
+  return votingPower
 }
 
 const extractVotingPowerFromSimulation = (
@@ -146,21 +149,28 @@ export const useRegistrarPk = () => {
   const communityMintPk = realm?.account.communityMint
   const config = useRealmConfigQuery().data?.result
   const programId = config?.account.communityTokenConfig.voterWeightAddin
-  return realm &&
+  return useAsync(
+    async () =>
+      realm &&
       communityMintPk &&
       programId &&
-      getRegistrarPDA(realm.pubkey, communityMintPk, programId)
+      getRegistrarPDA(realm.pubkey, communityMintPk, programId),
+    [communityMintPk, programId, realm]
+  )
 }
 
 export const useVoterPk = (walletPk: PublicKey | undefined) => {
-  const registrar = useRegistrarPk()
+  const registrar = useRegistrarPk().result
   const config = useRealmConfigQuery().data?.result
   const programId = config?.account.communityTokenConfig.voterWeightAddin
-
-  return registrar &&
+  return useAsync(
+    async () =>
+      registrar &&
       walletPk &&
       programId &&
-      getVoterPDA(registrar.registrar, walletPk, programId);
+      getVoterPDA(registrar.registrar, walletPk, programId),
+    [programId, registrar, walletPk]
+  )
 }
 
 export const useVsrGovpower = () => {
@@ -168,8 +178,8 @@ export const useVsrGovpower = () => {
   const actingAsWallet = useUserOrDelegator()
   const config = useRealmConfigQuery().data?.result
   const pluginId = config?.account.communityTokenConfig.voterWeightAddin
-  const voterPk = useVoterPk(actingAsWallet)?.voter
-  const registrarPk = useRegistrarPk()?.registrar
+  const voterPk = useVoterPk(actingAsWallet).result?.voter
+  const registrarPk = useRegistrarPk().result?.registrar
   const pluginName = findPluginName(pluginId)
 
   const enabled =
@@ -222,7 +232,6 @@ const voterPowerLogQueryFn = async (
 export const useVsrGovpowerMulti = (wallets: PublicKey[] | undefined) => {
   const { connection } = useConnection()
   const realm = useRealmQuery().data?.result
-  const { vsrClient } = useVsrClient();
 
   return useQuery({
     enabled: wallets !== undefined && wallets.length > 0,
@@ -242,23 +251,29 @@ export const useVsrGovpowerMulti = (wallets: PublicKey[] | undefined) => {
       const config = await fetchRealmConfigQuery(connection, realm.pubkey)
       const programId =
         config.result?.account.communityTokenConfig.voterWeightAddin
-      if (!vsrClient || programId === undefined) return undefined
+      if (programId === undefined) return undefined
+
+      const client = {
+        program: new Program<VoterStakeRegistry>(IDL, programId, {
+          connection,
+        }),
+      }
 
       const x = await getLockTokensVotingPowerPerWallet(
         wallets,
         realm,
-          vsrClient,
+        client,
         connection
       )
 
-      const { registrar: registrarPk } = getRegistrarPDA(
-          realm.pubkey,
-          realm.account.communityMint,
-          programId
+      const { registrar: registrarPk } = await getRegistrarPDA(
+        realm.pubkey,
+        realm.account.communityMint,
+        programId
       )
 
       for (const [key, power] of Object.entries(x)) {
-        const { voter: voterPk } = getVoterPDA(
+        const { voter: voterPk } = await getVoterPDA(
           registrarPk,
           new PublicKey(key),
           programId

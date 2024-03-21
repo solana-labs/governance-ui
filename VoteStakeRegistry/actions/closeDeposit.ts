@@ -27,12 +27,12 @@ export const closeDeposit = async ({
   const instructions: TransactionInstruction[] = []
   const clientProgramId = client!.program.programId
 
-  const { registrar } = getRegistrarPDA(
+  const { registrar } = await getRegistrarPDA(
     realmPk,
     communityMintPk,
     client!.program.programId
   )
-  const { voter } = getVoterPDA(
+  const { voter } = await getVoterPDA(
     registrar,
     wallet!.publicKey!,
     clientProgramId

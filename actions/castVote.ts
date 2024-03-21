@@ -293,9 +293,9 @@ export async function castVote(
   const pluginPostMessageIxs: TransactionInstruction[] = []
   const postMessageIxs: TransactionInstruction[] = []
   if (message) {
-
     const plugin = await votingPlugin?.withUpdateVoterWeightRecord(
       pluginPostMessageIxs,
+      tokenOwnerRecord,
       'commentProposal',
       createPostMessageTicketIxs
     )

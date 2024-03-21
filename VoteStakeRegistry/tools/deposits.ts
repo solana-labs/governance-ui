@@ -59,12 +59,12 @@ export const getDeposits = async ({
   connection: Connection
 }) => {
   const clientProgramId = client.program.programId
-  const { registrar } = getRegistrarPDA(
+  const { registrar } = await getRegistrarPDA(
     realmPk,
     communityMintPk,
     clientProgramId
   )
-  const { voter } = getVoterPDA(registrar, walletPk, clientProgramId)
+  const { voter } = await getVoterPDA(registrar, walletPk, clientProgramId)
   const existingVoter = await tryGetVoter(voter, client)
   const existingRegistrar = await tryGetRegistrar(registrar, client)
   const mintCfgs = existingRegistrar?.votingMints || []
@@ -161,7 +161,7 @@ const getVotingPowersForWallets = async ({
     event: any
   }[] = []
   for (const walletPk of walletPks) {
-    const { voter } = getVoterPDA(registrarPk, walletPk, clientProgramId)
+    const { voter } = await getVoterPDA(registrarPk, walletPk, clientProgramId)
     voterPks.push(voter)
   }
 
@@ -399,10 +399,10 @@ export const getLockTokensVotingPowerPerWallet = async (
   client: VsrClient,
   connection: Connection
 ) => {
-  const { registrar } = getRegistrarPDA(
-      realm.pubkey,
-      realm.account.communityMint,
-      client.program.programId
+  const { registrar } = await getRegistrarPDA(
+    realm.pubkey,
+    realm.account.communityMint,
+    client.program.programId
   )
   const existingRegistrar = await tryGetRegistrar(registrar, client)
   const latestBlockhash = await connection.getLatestBlockhash()
