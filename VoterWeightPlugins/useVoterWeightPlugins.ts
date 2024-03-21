@@ -38,7 +38,7 @@ import {useTokenOwnerRecord} from "./hooks/useTokenOwnerRecord";
 export interface UseVoterWeightPluginsReturnType {
   isReady: boolean
   plugins: VoterWeightPlugins | undefined // undefined means we are still loading
-  updateVoterWeightRecords: (walletPk: PublicKey, action?: VoterWeightAction) => Promise<{
+  updateVoterWeightRecords: (walletPk: PublicKey, action?: VoterWeightAction, target?: PublicKey) => Promise<{
     pre: TransactionInstruction[]
     post: TransactionInstruction[]
   }>
@@ -106,7 +106,7 @@ export const useVoterWeightPlugins = (
     })
   }
 
-  const updateVoterWeightRecords = (walletPublicKey: PublicKey, action?: VoterWeightAction): Promise<{
+  const updateVoterWeightRecords = (walletPublicKey: PublicKey, action?: VoterWeightAction, target?: PublicKey): Promise<{
     pre: TransactionInstruction[]
     post: TransactionInstruction[]
   }> => {
@@ -128,7 +128,8 @@ export const useVoterWeightPlugins = (
           realmPublicKey,
           governanceMintPublicKey,
           plugins: plugins?.voterWeight,
-          action
+          action,
+          target
         }),
     })
   }

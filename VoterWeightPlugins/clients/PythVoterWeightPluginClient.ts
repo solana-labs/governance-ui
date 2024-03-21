@@ -5,6 +5,7 @@ import {PythClient, StakeConnection} from "@pythnetwork/staking";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
 import {Provider} from "@coral-xyz/anchor";
 import {VoterWeightAction} from "@solana/spl-governance";
+import {convertVoterWeightActionToType} from "../lib/utils";
 
 // A wrapper for the PythClient from @pythnetwork/staking, that implements the generic plugin client interface
 export class PythVoterWeightPluginClient extends Client<any> {
@@ -24,7 +25,7 @@ export class PythVoterWeightPluginClient extends Client<any> {
         return null;
     }
 
-    async updateVoterWeightRecord(voter: PublicKey, realm: PublicKey, mint: PublicKey, action: VoterWeightAction) {
+    async updateVoterWeightRecord(voter: PublicKey, realm: PublicKey, mint: PublicKey, action: VoterWeightAction, inputRecordCallback?: () => Promise<PublicKey>, target?: PublicKey) {
         const stakeAccount = await this.client.getMainAccount(voter)
 
         if (!stakeAccount) throw new Error("Stake account not found for voter");
@@ -34,8 +35,8 @@ export class PythVoterWeightPluginClient extends Client<any> {
         await this.client.withUpdateVoterWeight(
             instructions,
             stakeAccount!,
-            { [action]: {} } as any,
-            mint
+            { [convertVoterWeightActionToType(action)]: {} } as any,
+            target
         )
 
         return { pre: instructions };
