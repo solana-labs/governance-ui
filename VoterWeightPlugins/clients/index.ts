@@ -5,7 +5,7 @@ import {
   QuadraticClient,
 } from '@solana/governance-program-library'
 
-import {Provider} from '@coral-xyz/anchor'
+import {Provider, Wallet} from '@coral-xyz/anchor'
 import {PythVoterWeightPluginClient} from "./PythVoterWeightPluginClient";
 import {PublicKey} from "@solana/web3.js";
 import {VsrClient} from "../../VoteStakeRegistry/sdk/client";
@@ -19,15 +19,16 @@ import {UnrecognisedVoterWeightPluginClient} from "./UnrecognisedVoterWeightPlug
  * @param plugin
  * @param programId
  * @param provider
+ * @param signer
  */
-export const loadClient = (plugin: PluginName, programId: PublicKey, provider: Provider): Promise<Client<any>> => {
+export const loadClient = (plugin: PluginName, programId: PublicKey, provider: Provider, signer: Wallet): Promise<Client<any>> => {
   switch (plugin) {
     case 'QV':
       return QuadraticClient.connect(provider)
     case 'gateway':
       return GatewayClient.connect(provider)
     case 'pyth':
-      return PythVoterWeightPluginClient.connect(provider)
+      return PythVoterWeightPluginClient.connect(provider, undefined, signer)
     case 'VSR':
       return VsrClient.connect(provider, programId)
     case 'HeliumVSR':
