@@ -26,7 +26,7 @@ const Join = () => {
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const realm = useRealmQuery().data?.result
-  const { userNeedsTokenOwnerRecord, handleRegister } = useJoinRealm();
+  const { userNeedsTokenOwnerRecord, userNeedsVoterWeightRecords, handleRegister } = useJoinRealm();
 
   const join = async () => {
     if (!realm || !wallet?.publicKey) throw new Error()
@@ -48,7 +48,7 @@ const Join = () => {
   return (
     (actingAsWalletPk?.toString() === wallet?.publicKey?.toString() &&
       connected &&
-        userNeedsTokenOwnerRecord && (
+        (userNeedsTokenOwnerRecord || userNeedsVoterWeightRecords) && (
         <Button className="w-full mt-3" onClick={join}>
           Join
         </Button>
