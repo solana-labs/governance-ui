@@ -2,7 +2,6 @@
 import classNames from 'classnames'
 import { BigNumber } from 'bignumber.js'
 import { Transaction } from '@solana/web3.js'
-import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import Button from '@components/Button'
 import { sendTransaction } from '@utils/send'
 
@@ -62,16 +61,14 @@ export default function NftVotingPower(props: Props) {
   const userPk = useUserOrDelegator()
   const nfts = useVotingNfts(userPk)
 
-  const { isReady, totalCalculatedVoterWeight } = useRealmVoterWeightPlugins(
-    'community'
+  const { isReady, totalCalculatedVoterWeight, calculatedMaxVoterWeight } = useRealmVoterWeightPlugins(
+    'community',
   )
-
-  const maxWeight = useNftPluginStore((s) => s.state.maxVoteRecord)
 
   const displayNfts = (nfts ?? []).slice(0, 3)
   const remainingCount = Math.max((nfts ?? []).length - 3, 0)
-  const max = maxWeight
-    ? new BigNumber(maxWeight.account.maxVoterWeight.toString())
+  const max = calculatedMaxVoterWeight?.value
+    ? new BigNumber(calculatedMaxVoterWeight.value.toString())
     : null
   const amount = new BigNumber((totalCalculatedVoterWeight?.value ?? 0).toString())
 
