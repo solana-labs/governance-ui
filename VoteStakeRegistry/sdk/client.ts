@@ -25,7 +25,7 @@ export class VsrClient extends Client<typeof IDL> {
     }
   }
 
-  getVoterWeightRecordPDA(realm: PublicKey, mint: PublicKey, walletPk: PublicKey) {
+  async getVoterWeightRecordPDA(realm: PublicKey, mint: PublicKey, walletPk: PublicKey) {
     const {registrar} = this.getRegistrarPDA(realm, mint);
 
     const [voterWeightPk, voterWeightRecordBump] = PublicKey.findProgramAddressSync(
@@ -59,7 +59,7 @@ export class VsrClient extends Client<typeof IDL> {
         voter,
         this.program.programId
     )
-    const { voterWeightPk, voterWeightRecordBump } = this.getVoterWeightRecordPDA(
+    const { voterWeightPk, voterWeightRecordBump } = await this.getVoterWeightRecordPDA(
         realm,
         mint,
         voter
@@ -103,7 +103,7 @@ export class VsrClient extends Client<typeof IDL> {
     const pluginProgramId = this.program.programId;
     const { registrar } = this.getRegistrarPDA(realm, mint)
     const { voter: voterPDA } = getVoterPDA(registrar, voter, pluginProgramId)
-    const { voterWeightPk } = this.getVoterWeightRecordPDA(realm, mint, voter);
+    const { voterWeightPk } = await this.getVoterWeightRecordPDA(realm, mint, voter);
     const ix = await this.program.methods.updateVoterWeightRecord()
         .accounts({
           registrar,

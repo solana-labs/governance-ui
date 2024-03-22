@@ -92,7 +92,7 @@
     "@sentry/nextjs": "7.81.1",
     "@solana-mobile/wallet-adapter-mobile": "2.0.0",
     "@solana/buffer-layout": "4.0.0",
-    "@solana/governance-program-library": "npm:@civic/governance-program-library@0.18.2-beta.23",
+    "@solana/governance-program-library": "npm:@civic/governance-program-library@0.18.2-beta.24",
     "@solana/spl-account-compression": "~0.2.0",
     "@solana/spl-governance": "0.3.28",
     "@solana/spl-token": "0.1.8",

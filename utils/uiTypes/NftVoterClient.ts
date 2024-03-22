@@ -24,10 +24,7 @@ const DEFAULT_NFT_VOTER_PLUGIN_VERSION = ON_NFT_VOTER_V2
 export abstract class NftVoterClient extends Client<any> {
   readonly requiresInputVoterWeight = false;
 
-  getMaxVoterWeightRecordPDA(realm: PublicKey, mint: PublicKey): {
-    maxVoterWeightPk: PublicKey;
-    maxVoterWeightRecordBump: number
-  } | null {
+  async getMaxVoterWeightRecordPDA(realm: PublicKey, mint: PublicKey) {
     const [
       maxVoterWeightPk,
       maxVoterWeightRecordBump,
@@ -46,7 +43,7 @@ export abstract class NftVoterClient extends Client<any> {
   }
 
   async createVoterWeightRecord(voter: PublicKey, realm: PublicKey, mint: PublicKey): Promise<TransactionInstruction | null> {
-    const { voterWeightPk } = this.getVoterWeightRecordPDA(realm, mint, voter)
+    const { voterWeightPk } = await this.getVoterWeightRecordPDA(realm, mint, voter)
     return this.program.methods
         .createVoterWeightRecord(voter)
         .accounts({
@@ -135,7 +132,7 @@ export class NftVoterClientV1 extends NftVoterClient {
     }
 
     const {registrar} = this.getRegistrarPDA(realm, mint);
-    const {voterWeightPk} = this.getVoterWeightRecordPDA(realm, mint, voter);
+    const {voterWeightPk} = await this.getVoterWeightRecordPDA(realm, mint, voter);
     const votingNfts = await getVotingNfts(
         this.program.provider.connection,
         realm,
@@ -181,7 +178,7 @@ export class NftVoterClientV2 extends NftVoterClient {
     }
 
     const {registrar} = this.getRegistrarPDA(realm, mint);
-    const { voterWeightPk } = this.getVoterWeightRecordPDA(realm, mint, voter);
+    const { voterWeightPk } = await this.getVoterWeightRecordPDA(realm, mint, voter);
     const votingNfts = await getVotingNfts(
         this.program.provider.connection,
         realm,

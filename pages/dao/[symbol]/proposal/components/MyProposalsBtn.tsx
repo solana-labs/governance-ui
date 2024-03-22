@@ -313,7 +313,7 @@ const MyProposalsBn = () => {
     setIsLoading(true)
     const instructions: TransactionInstruction[] = []
     const { registrar } = nftClient.getRegistrarPDA(realm.pubkey, realm.account.communityMint);
-    const { voterWeightPk } = nftClient.getVoterWeightRecordPDA(realm.pubkey, realm.account.communityMint, wallet.publicKey);
+    const { voterWeightPk } = await nftClient.getVoterWeightRecordPDA(realm.pubkey, realm.account.communityMint, wallet.publicKey);
 
     const nfts = ownNftVoteRecordsFilterd.slice(
       0,
