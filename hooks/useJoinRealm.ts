@@ -28,7 +28,7 @@ export const useJoinRealm = (): UseJoinRealmReturnType => {
     // A user needs a token owner record if they don't have one already and either
     // there are no plugins (vanilla realm) or
     // the first plugin in the chain requires an input voter weight
-    const userNeedsTokenOwnerRecord = !tokenOwnerRecord && (plugins?.voterWeight.length === 0 || !!plugins?.voterWeight[0].client.requiresInputVoterWeight);
+    const userNeedsTokenOwnerRecord = !tokenOwnerRecord;
     useEffect(() => {
         if (!wallet?.publicKey) return;
         createVoterWeightRecords(wallet.publicKey)
