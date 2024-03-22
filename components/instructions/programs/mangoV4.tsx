@@ -513,6 +513,11 @@ const instructions = () => ({
                 suffix="%"
               />
               <DisplayListingPropertyWrapped
+                label="Platform Liquidation Fee"
+                valKey="PlatformLiquidationFee"
+                suffix="%"
+              />
+              <DisplayListingPropertyWrapped
                 label="Min Vault To Deposits Ratio"
                 valKey="minVaultToDepositsRatio"
                 suffix="%"
@@ -826,6 +831,7 @@ const instructions = () => ({
       { name: 'Admin' },
       { name: 'Mint Info' },
       { name: 'Oracle' },
+      { name: 'Fallback oracle' },
     ],
     getDataUI: async (
       connection: Connection,
@@ -914,6 +920,10 @@ const instructions = () => ({
             args['liquidationFeeOpt'] !== undefined
               ? (args['liquidationFeeOpt'] * 100)?.toFixed(2)
               : undefined,
+          platformLiquidationFee:
+            args['platformLiquidationFeeOpt'] !== undefined
+              ? (args['platformLiquidationFeeOpt'] * 100)?.toFixed(2)
+              : undefined,
           minVaultToDepositsRatio:
             args['minVaultToDepositsRatioOpt'] !== undefined
               ? (args['minVaultToDepositsRatioOpt'] * 100)?.toFixed(2)
@@ -959,6 +969,11 @@ const instructions = () => ({
           depositLimit: args.depositLimitOpt?.toString(),
           setFallbackOracle: args.setFallbackOracle,
           maintWeightShiftAbort: args.maintWeightShiftAbort,
+          zeroUtilRate: args.zeroUtilRateOpt,
+          disableAssetLiquidation: args.disableAssetLiquidationOpt,
+          collateralFeePerDay: args.collateralFeePerDayOpt,
+          forceWithdraw: args.forceWithdrawOpt,
+          forceClose: args.forceCloseOpt,
         }
 
         if (mint) {
@@ -1036,6 +1051,8 @@ const instructions = () => ({
                 maintWeightShiftLiabTarget: args.maintWeightShiftLiabTargetOpt,
                 maintWeightShiftAbort: args.maintWeightShiftAbort,
                 setFallbackOracle: args.setFallbackOracle,
+                forceWithdraw: args.forceWithdrawOpt,
+                forceClose: args.forceCloseOpt,
               }
             : {}
 
@@ -1305,6 +1322,21 @@ const instructions = () => ({
                 }
               />
               <DisplayNullishProperty
+                label="Platform Liquidation Fee"
+                value={
+                  parsedArgs.platformLiquidationFee &&
+                  `${parsedArgs.platformLiquidationFee}%`
+                }
+                currentValue={
+                  bankFormattedValues?.platformLiquidationFee &&
+                  `${bankFormattedValues.platformLiquidationFee}%`
+                }
+                suggestedVal={
+                  invalidFields.platformLiquidationFee &&
+                  `${invalidFields.platformLiquidationFee}%`
+                }
+              />
+              <DisplayNullishProperty
                 label="Min Vault To Deposits Ratio"
                 value={
                   parsedArgs.minVaultToDepositsRatio &&
@@ -1397,6 +1429,16 @@ const instructions = () => ({
                 value={args.oracleOpt?.toBase58()}
                 currentValue={bankFormattedValues?.oracle}
               />
+              {accounts.length &&
+                accounts[4] &&
+                accounts[4].pubkey.toBase58() !==
+                  bankFormattedValues?.fallbackOracle && (
+                  <DisplayNullishProperty
+                    label="Fallback Oracle"
+                    value={accounts[4].pubkey.toBase58()}
+                    currentValue={bankFormattedValues?.fallbackOracle}
+                  />
+                )}
               <DisplayNullishProperty
                 label="Token Conditional Swap Maker Fee Rate"
                 value={parsedArgs.tokenConditionalSwapMakerFeeRate}
@@ -1523,10 +1565,34 @@ const instructions = () => ({
                   ).toFixed(0)})`
                 }
               />
+              {parsedArgs?.disableAssetLiquidation && (
+                <DisplayNullishProperty
+                  label="Disable Asset Liquidation"
+                  value={`${parsedArgs.disableAssetLiquidation}`}
+                  currentValue={null}
+                  suggestedVal={null}
+                />
+              )}
               {parsedArgs?.maintWeightShiftAbort && (
                 <DisplayNullishProperty
                   label="Maint Weight Shift Abort"
                   value={`${parsedArgs.maintWeightShiftAbort}`}
+                  currentValue={null}
+                  suggestedVal={null}
+                />
+              )}
+              {parsedArgs?.forceClose && (
+                <DisplayNullishProperty
+                  label="Force close"
+                  value={`${parsedArgs.forceClose}`}
+                  currentValue={null}
+                  suggestedVal={null}
+                />
+              )}
+              {parsedArgs?.forceWithdraw && (
+                <DisplayNullishProperty
+                  label="Force withdraw"
+                  value={`${parsedArgs.forceWithdraw}`}
                   currentValue={null}
                   suggestedVal={null}
                 />
@@ -1605,6 +1671,56 @@ const instructions = () => ({
         return (
           <div>
             {tokenSymbol ? tokenSymbol : <Loading className="w-5"></Loading>}
+          </div>
+        )
+      } catch (e) {
+        console.log(e)
+        return <div>{JSON.stringify(data)}</div>
+      }
+    },
+  },
+  63223: {
+    name: 'Token Withdraw',
+    accounts: [
+      { name: 'Group' },
+      { name: 'Account' },
+      { name: 'Owner' },
+      { name: 'Bank' },
+      { name: 'Vault' },
+      { name: 'Oracle' },
+      { name: 'TokenAccount' },
+      { name: 'TokenProgram' },
+    ],
+    getDataUI: async (
+      connection: Connection,
+      data: Uint8Array,
+      accounts: AccountMetaData[]
+    ) => {
+      const args = await getDataObjectFlattened<any>(connection, data)
+      const accountInfo = await connection.getParsedAccountInfo(
+        accounts[6].pubkey
+      )
+      const mint = await tryGetMint(
+        connection,
+        new PublicKey(accountInfo.value?.data['parsed'].info.mint)
+      )
+      const tokenInfo = tokenPriceService.getTokenInfo(
+        accountInfo.value?.data['parsed'].info.mint
+      )
+
+      try {
+        return (
+          <div>
+            <div>
+              amount:{' '}
+              {mint?.account.decimals
+                ? formatNumber(
+                    toUiDecimals(args.amount, mint?.account.decimals)
+                  )
+                : args.amount}{' '}
+              {tokenInfo?.symbol}
+            </div>
+            <div>allowBorrow: {args.allowBorrow.toString()}</div>
           </div>
         )
       } catch (e) {
@@ -1930,6 +2046,7 @@ const getFormattedListingValues = (args: FlatListingArgs) => {
     maintLiabWeight: args.maintLiabWeight.toFixed(2),
     initLiabWeight: args.initLiabWeight.toFixed(2),
     liquidationFee: (args['liquidationFee'] * 100).toFixed(2),
+    platformLiquidationFee: (args['platformLiquidationFee'] * 100).toFixed(2),
     minVaultToDepositsRatio: (args['minVaultToDepositsRatio'] * 100).toFixed(2),
     netBorrowLimitPerWindowQuote: toUiDecimals(
       args['netBorrowLimitPerWindowQuote'],
@@ -1959,6 +2076,9 @@ const getFormattedListingValues = (args: FlatListingArgs) => {
     interestTargetUtilization: args.interestTargetUtilization,
     interestCurveScaling: args.interestCurveScaling,
     groupInsuranceFund: args.groupInsuranceFund,
+    collateralFeePerDay: args.collateralFeePerDay,
+    zeroUtilRate: args.zeroUtilRate,
+    disableAssetLiquidation: args.disableAssetLiquidation,
   }
   return formattedArgs
 }

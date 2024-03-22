@@ -104,7 +104,7 @@ export const useTransferPosition = () => {
           )
         }
 
-        notify({ message: 'Transfering' })
+        notify({ message: 'Transferring' })
         await sendTransactionsV3({
           transactionInstructions: [
             {
