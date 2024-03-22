@@ -139,7 +139,7 @@ export class VotingClient {
       return
     }
 
-    const updateVoterWeightRecordIxes = await this.voterWeightPluginDetails.updateVoterWeightRecords(walletPk, VoterWeightAction.CastVote);
+    const updateVoterWeightRecordIxes = await this.voterWeightPluginDetails.updateVoterWeightRecords(walletPk, VoterWeightAction.CastVote, proposal.pubkey);
     const updateMaxVoterWeightRecordIxes = await this.voterWeightPluginDetails.updateMaxVoterWeightRecords();
     instructions.push(...updateMaxVoterWeightRecordIxes, ...updateVoterWeightRecordIxes.pre);
     createNftActionTicketIxs?.push(...updateVoterWeightRecordIxes.post || []);
