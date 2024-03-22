@@ -81,7 +81,7 @@ export const useVoterWeightPlugins = (
   const pks = useVoterWeightPks({
     ...args,
     plugins: plugins?.voterWeight,
-  })
+  }).result ?? { voterWeightPks: undefined, maxVoterWeightPk: undefined }
 
   const createVoterWeightRecords = (walletPublicKey: PublicKey): Promise<TransactionInstruction[]> => {
     if (!realmPublicKey || !governanceMintPublicKey) {

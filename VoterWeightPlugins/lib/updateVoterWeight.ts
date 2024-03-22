@@ -44,7 +44,7 @@ export const updateVoterWeight = async ({
     preIxes.push(...updateVoterWeightRecordIx.pre)
     postIxes.push(...updateVoterWeightRecordIx.post || [])
 
-    getVoterWeightRecordCallback = async () => plugin.client.getVoterWeightRecordPDA(realmPublicKey, governanceMintPublicKey, walletPublicKey).voterWeightPk
+    getVoterWeightRecordCallback = async () => (await plugin.client.getVoterWeightRecordPDA(realmPublicKey, governanceMintPublicKey, walletPublicKey)).voterWeightPk
   }
 
   return { pre: preIxes, post: postIxes }
