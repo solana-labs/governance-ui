@@ -4,7 +4,7 @@ import BN from "bn.js";
 import {PythClient, StakeAccount, StakeConnection} from "@pythnetwork/staking";
 import {Provider, Wallet} from "@coral-xyz/anchor";
 import {VoterWeightAction} from "@solana/spl-governance";
-import {convertVoterWeightActionToType, queryKeys} from "../lib/utils";
+import {convertVoterWeightActionToType} from "../lib/utils";
 import queryClient from "@hooks/queries/queryClient";
 
 // A wrapper for the PythClient from @pythnetwork/staking, that implements the generic plugin client interface
@@ -22,7 +22,7 @@ export class PythVoterWeightPluginClient extends Client<any> {
 
         return {
             maxVoterWeightPk,
-            maxVoterWeightRecordBump: 0         // TODO This is wrong for Pyth - but it doesn't matter as it is not used
+            maxVoterWeightRecordBump: 0         // This is wrong for Pyth - but it doesn't matter as it is not used
         }
     }
 
@@ -31,7 +31,7 @@ export class PythVoterWeightPluginClient extends Client<any> {
 
         return {
             voterWeightPk: voterWeightAccount,
-            voterWeightRecordBump: 0         // TODO This is wrong for Pyth - but it doesn't matter as it is not used
+            voterWeightRecordBump: 0         // This is wrong for Pyth - but it doesn't matter as it is not used
         };
     }
 
@@ -83,7 +83,7 @@ export class PythVoterWeightPluginClient extends Client<any> {
             return new BN(0)
         }
     }
-    constructor(program: typeof PythClient.prototype.program, private client: StakeConnection, devnet:boolean, private maxVoterWeightPkCached: PublicKey) {
+    constructor(program: typeof PythClient.prototype.program, private client: StakeConnection, devnet:boolean) {
         super(program, devnet);
     }
 
@@ -93,11 +93,6 @@ export class PythVoterWeightPluginClient extends Client<any> {
             wallet
         )
 
-        // The pyth voting client only exposes its max voter weight record using an async function.
-        // Since the VoterWeightPluginClient needs it in a synchronous context, we need to cache it here.
-        const maxVoterWeightPkCached = (await pythClient.program.methods.updateMaxVoterWeight().pubkeys()).maxVoterRecord
-
-        if (!maxVoterWeightPkCached) throw new Error("Max voter weight record not found");
-        return new PythVoterWeightPluginClient(pythClient.program, pythClient, devnet, maxVoterWeightPkCached);
+        return new PythVoterWeightPluginClient(pythClient.program, pythClient, devnet);
     }
 }
