@@ -240,6 +240,16 @@ export default function WizardSummary({
         >
           <Header as="h3">{formData?.name}</Header>
         </SummaryModule>
+        {formData?.isQuadratic && (
+          <SummaryModule title="Voting plugins">
+            <Text level="0" className="input-base">
+              Civic Plugin
+            </Text>
+            <Text level="0" className="input-base">
+              Quadratic Voting Plugin
+            </Text>
+          </SummaryModule>
+        )}
         {type === MULTISIG_FORM ? (
           <div className="grid grid-cols-2 gap-2">
             <SummaryModule title="Invited members">
@@ -298,8 +308,10 @@ export default function WizardSummary({
           type === MULTISIG_FORM
             ? 'Create wallet'
             : `Create ${
-                type === COMMUNITY_TOKEN_FORM
+                type === COMMUNITY_TOKEN_FORM && !formData?.isQuadratic
                   ? 'Community Token'
+                  : type === COMMUNITY_TOKEN_FORM && formData?.isQuadratic
+                  ? 'Quadratic Voting'
                   : 'NFT Community'
               } DAO`
         }

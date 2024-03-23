@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { ReactNode, useState } from 'react'
 import { Transition } from '@headlessui/react'
 import Text from '@components/Text'
 
@@ -6,6 +6,12 @@ export default function AdvancedOptionsDropdown({
   className = 'mt-10 md:mt-16 w-fit',
   children,
   title = 'Advanced Options',
+  icon,
+}: {
+  children: ReactNode
+  icon?: ReactNode
+  className?: string
+  title?: string
 }) {
   const [open, setOpen] = useState(false)
   return (
@@ -20,6 +26,7 @@ export default function AdvancedOptionsDropdown({
         <Text level="2" className="font-normal">
           {title}
         </Text>
+        {icon}
         <div
           className={`default-transition ${open ? 'transform rotate-180' : ''}`}
         >

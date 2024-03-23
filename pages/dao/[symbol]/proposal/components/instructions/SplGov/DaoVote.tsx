@@ -186,14 +186,14 @@ const DaoVote = ({
           // Explicitly request the version before making RPC calls to work around race conditions in resolving
           // the version for RealmInfo
 
-          const { registrar } = await getRegistrarPDA(
+          const { registrar } = getRegistrarPDA(
             realmPk,
             governingMint,
             pluginPk
           )
-          const { voter } = await getVoterPDA(registrar, walletPk, pluginPk)
+          const { voter } = getVoterPDA(registrar, walletPk, pluginPk)
           voterWeightPk = (
-            await getVoterWeightPDA(registrar, walletPk, pluginPk)
+            getVoterWeightPDA(registrar, walletPk, pluginPk)
           ).voterWeightPk
 
           const updateVoterWeightRecordIx = await vsrClient.program.methods

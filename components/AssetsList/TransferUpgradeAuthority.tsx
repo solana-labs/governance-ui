@@ -6,7 +6,7 @@ import Button, { LinkButton } from '@components/Button'
 import Textarea from 'components/inputs/Textarea'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
 import { getValidatedPublickKey } from 'utils/validations'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { UiInstruction } from 'utils/uiTypes/proposalCreationTypes'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { useRouter } from 'next/router'
@@ -21,6 +21,7 @@ import { abbreviateAddress } from '@utils/formatting'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import {useVoteByCouncilToggle} from "@hooks/useVoteByCouncilToggle";
 
 interface CloseBuffersForm {
   governedAccount: AssetAccount | undefined
@@ -37,7 +38,7 @@ const TransferUpgradeAuthority = ({ program }: { program: AssetAccount }) => {
   const { fmtUrlWithCluster } = useQueryContext()
   const { symbol } = router.query
   const realm = useRealmQuery().data?.result
-  const { realmInfo, canChooseWhoVote } = useRealm()
+  const { realmInfo} = useRealm()
   const programId: PublicKey | undefined = realmInfo?.programId
 
   const [form, setForm] = useState<CloseBuffersForm>({
@@ -49,7 +50,7 @@ const TransferUpgradeAuthority = ({ program }: { program: AssetAccount }) => {
     description: '',
     title: '',
   })
-  const [voteByCouncil, setVoteByCouncil] = useState(false)
+  const { voteByCouncil, shouldShowVoteByCouncilToggle, setVoteByCouncil } = useVoteByCouncilToggle();
   const [showOptions, setShowOptions] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
@@ -219,13 +220,13 @@ const TransferUpgradeAuthority = ({ program }: { program: AssetAccount }) => {
                 })
               }
             />
-            {canChooseWhoVote && (
-              <VoteBySwitch
-                checked={voteByCouncil}
-                onChange={() => {
-                  setVoteByCouncil(!voteByCouncil)
-                }}
-              />
+            {shouldShowVoteByCouncilToggle && (
+                <VoteBySwitch
+                    checked={voteByCouncil}
+                    onChange={() => {
+                      setVoteByCouncil(!voteByCouncil)
+                    }}
+                ></VoteBySwitch>
             )}
           </>
         )}

@@ -26,8 +26,6 @@ import Switch from '@components/Switch'
 import ProposalSelectCard from '@components/ProposalSelectCard'
 import Checkbox from '@components/inputs/Checkbox'
 import Button from '@components/Button'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { notify } from '@utils/notifications'
 import { sendSignedTransaction } from '@utils/send'
 import { compareProposals, filterProposals } from '@utils/proposals'
@@ -56,6 +54,8 @@ import queryClient from '@hooks/queries/queryClient'
 import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 import { getFeeEstimate } from '@tools/feeEstimate'
 import { createComputeBudgetIx } from '@blockworks-foundation/mango-v4'
+import {useNftClient} from "../../../VoterWeightPlugins/useNftClient";
+import {useVotingClients} from "@hooks/useVotingClients";
 
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
@@ -96,9 +96,8 @@ const REALM = () => {
     SelectedProposal[]
   >([])
 
-  const client = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
-  )
+  const votingClients = useVotingClients();
+  const { nftClient } = useNftClient();
   const wallet = useWalletOnePointOh()
   const { connection } = useConnection()
 
@@ -278,6 +277,10 @@ const REALM = () => {
           realm.account.communityMint.toBase58()
             ? ownTokenRecord
             : ownCouncilTokenRecord
+        const role = selectedProposal.proposal.governingTokenMint.toBase58() ===
+            realm.account.communityMint.toBase58()
+            ? 'community'
+            : 'council'
 
         if (relevantTokenRecord === undefined)
           throw new Error('token owner record not found or not yet loaded')
@@ -285,7 +288,7 @@ const REALM = () => {
         const instructions: TransactionInstruction[] = []
 
         //will run only if plugin is connected with realm
-        const plugin = await client?.withCastPluginVote(
+        const plugin = await votingClients(role)?.withCastPluginVote(
           instructions,
           {
             account: selectedProposal.proposal,
@@ -294,7 +297,7 @@ const REALM = () => {
           },
           relevantTokenRecord.pubkey
         )
-        if (client.client instanceof NftVoterClient === false) {
+        if (!nftClient) {
           await withCastVote(
             instructions,
             realmInfo!.programId,

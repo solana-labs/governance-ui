@@ -1,6 +1,9 @@
 import { AnchorProvider, Wallet } from '@coral-xyz/anchor';
 
-import { GatewayClient } from '@solana/governance-program-library';
+import {
+  GatewayClient,
+  QuadraticClient,
+} from '@solana/governance-program-library';
 import {
   createSetRealmConfig,
   GoverningTokenType,
@@ -17,13 +20,19 @@ import type {
 } from '@solana/web3.js';
 
 import {
+  configureCivicRegistrarIx,
+  createCivicRegistrarIx,
+} from '../../../GatewayPlugin/sdk/api';
+import {
+  configureQuadraticRegistrarIx,
+  createQuadraticRegistrarIx,
+  DEFAULT_COEFFICIENTS,
+} from '../../../QuadraticPlugin/sdk/api';
+import { DEFAULT_QV_CONFIG } from '@hub/components/EditRealmConfig/VotingStructureSelector';
+import {
   getMaxVoterWeightRecord,
   getRegistrarPDA,
 } from '@utils/plugin/accounts';
-import {
-  configureCivicRegistrarIx,
-  createCivicRegistrarIx,
-} from '@utils/plugin/gateway';
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient';
 
 import { Config } from './fetchConfig';
@@ -48,6 +57,9 @@ function shouldAddConfigInstruction(config: Config, currentConfig: Config) {
 
   return false;
 }
+
+const configUsesVoterWeightPlugin = (config: Config, plugin: PublicKey) =>
+  config.configAccount.communityTokenConfig.voterWeightAddin?.equals(plugin);
 
 export async function createTransaction(
   realmPublicKey: PublicKey,
@@ -87,8 +99,12 @@ export async function createTransaction(
         currentConfig.nftCollectionSize !== config.nftCollectionSize ||
         !currentConfig.nftCollectionWeight.eq(config.nftCollectionWeight))
     ) {
-      const nftClient = await NftVoterClient.connect(anchorProvider, isDevnet);
-      const { registrar } = await getRegistrarPDA(
+      const nftClient = await NftVoterClient.connect(
+        anchorProvider,
+        undefined,
+        isDevnet,
+      );
+      const { registrar } = getRegistrarPDA(
         realmPublicKey,
         config.communityMint.publicKey,
         nftClient.program.programId,
@@ -154,7 +170,16 @@ export async function createTransaction(
         isDevnet,
       );
 
-      const instruction = currentConfig.civicPassType
+      const predecessorPlugin = config.chainingEnabled
+        ? currentConfig.configAccount.communityTokenConfig.voterWeightAddin
+        : undefined;
+
+      const existingRegistrarAccount = await gatewayClient.getRegistrarAccount(
+        realmPublicKey,
+        config.communityMint.publicKey,
+      );
+
+      const instruction = existingRegistrarAccount
         ? await configureCivicRegistrarIx(
             realmAccount,
             gatewayClient,
@@ -165,6 +190,47 @@ export async function createTransaction(
             wallet.publicKey,
             gatewayClient,
             config.civicPassType,
+            predecessorPlugin,
+          );
+
+      instructions.push(instruction);
+    } else if (
+      configUsesVoterWeightPlugin(config, DEFAULT_QV_CONFIG.votingProgramId) &&
+      !configUsesVoterWeightPlugin(
+        currentConfig,
+        DEFAULT_QV_CONFIG.votingProgramId,
+      )
+    ) {
+      // Configure the registrar for the quadratic voting plugin for the DAO
+      // Since QV needs to be paired up with some other plugin that protects against sybil attacks,
+      // it will typically have a predecessor plugin (e.g. the Civic Gateway plugin)
+      const predecessorPlugin = config.chainingEnabled
+        ? currentConfig.configAccount.communityTokenConfig.voterWeightAddin
+        : undefined;
+
+      const quadraticClient = await QuadraticClient.connect(
+        anchorProvider,
+        isDevnet,
+      );
+
+      const existingRegistrarAccount = await quadraticClient.getRegistrarAccount(
+        realmPublicKey,
+        config.communityMint.publicKey,
+      );
+
+      const instruction = existingRegistrarAccount
+        ? await configureQuadraticRegistrarIx(
+            realmAccount,
+            quadraticClient,
+            config.qvCoefficients || DEFAULT_COEFFICIENTS,
+            predecessorPlugin,
+          )
+        : await createQuadraticRegistrarIx(
+            realmAccount,
+            wallet.publicKey,
+            quadraticClient,
+            config.qvCoefficients || DEFAULT_COEFFICIENTS,
+            predecessorPlugin,
           );
 
       instructions.push(instruction);

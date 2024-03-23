@@ -1,11 +1,11 @@
 import { PublicKey } from '@solana/web3.js'
 
-export const getRegistrarPDA = async (
+export const getRegistrarPDA = (
   realmPk: PublicKey,
   mint: PublicKey,
   clientProgramId: PublicKey
 ) => {
-  const [registrar, registrarBump] = await PublicKey.findProgramAddress(
+  const [registrar, registrarBump] = PublicKey.findProgramAddressSync(
     [Buffer.from('registrar'), realmPk.toBuffer(), mint.toBuffer()],
     clientProgramId
   )

@@ -20,7 +20,6 @@ import { withFinalizeVote } from '@solana/spl-governance'
 import { chunks } from '@utils/helpers'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { notify } from '@utils/notifications'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import {
@@ -35,6 +34,7 @@ import queryClient from '@hooks/queries/queryClient'
 import { proposalQueryKeys } from '@hooks/queries/proposal'
 import asFindable from '@utils/queries/asFindable'
 import { fetchTokenAccountByPubkey } from '@hooks/queries/tokenAccount'
+import {useVotingClients} from "@hooks/useVotingClients";
 
 // TODO make this have reasonable props
 // TODO, also just refactor it
@@ -46,16 +46,12 @@ const VanillaWithdrawTokensButton = ({
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const { connection } = useConnection()
-
-  const client = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
-  )
-
   const maxVoterWeight = useMaxVoteRecord()?.pubkey || undefined
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
+  const votingClient = useVotingClients()(role);
 
   const relevantTokenConfig =
     role === 'community'
@@ -163,7 +159,7 @@ const VanillaWithdrawTokensButton = ({
           depositTokenRecord!.account.governingTokenOwner,
           wallet!.publicKey!
         )
-        await client.withRelinquishVote(
+        await votingClient.withRelinquishVote(
           instructions,
           proposal,
           voteRecord.pubkey,
@@ -204,6 +200,11 @@ const VanillaWithdrawTokensButton = ({
       depositTokenRecord!.account.governingTokenMint,
       wallet!.publicKey!
     )
+
+    // Force the UI to recalculate voter weight
+    queryClient.invalidateQueries({
+      queryKey: ['calculateVoterWeight'],
+    })
 
     try {
       // use chunks of 8 here since we added finalize,

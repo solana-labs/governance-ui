@@ -53,7 +53,7 @@ import {
 } from '@hooks/queries/digitalAssets'
 import { useNftRegistrarCollection } from '@hooks/useNftRegistrarCollection'
 import { NFT_PLUGINS_PKS } from '@constants/plugins'
-import {ProfileName} from "@components/Profile/ProfileName";
+import { ProfileName } from '@components/Profile/ProfileName'
 
 const RevokeMembership: FC<{ member: PublicKey; mint: PublicKey }> = ({
   member,
@@ -438,7 +438,7 @@ const MemberOverview = ({
       <div className="flex flex-col space-y-3 md:space-y-0 md:flex-row md:space-x-3">
         {(communityAmount || !councilAmount) && (
           <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all">
-            <p>{tokenName} Votes</p>
+            <p>{tokenName} votes</p>
             <div className="font-bold text-fgd-1 text-2xl flex items-center">
               {communityAmount || 0}{' '}
               {hasCommunityTokenOutsideRealm && (
@@ -451,7 +451,7 @@ const MemberOverview = ({
         )}
         {councilAmount && (
           <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all">
-            <p>Council Votes</p>
+            <p>Council votes</p>
             <div className="font-bold text-fgd-1 text-2xl flex items-center">
               {councilAmount}{' '}
               {hasCouncilTokenOutsideRealm && (

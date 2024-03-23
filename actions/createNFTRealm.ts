@@ -66,10 +66,10 @@ export default async function createNFTRealm({
   })
 
   console.log('NFT REALM realm public-key', realmPk.toBase58())
-  const { registrar } = await getRegistrarPDA(
-    realmPk,
-    communityMintPk,
-    nftClient!.program.programId
+  const { registrar } = getRegistrarPDA(
+      realmPk,
+      communityMintPk,
+      nftClient!.program.programId
   )
   const instructionCR = await nftClient!.program.methods
     .createRegistrar(10) // Max collections

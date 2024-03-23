@@ -14,10 +14,13 @@ import {
 import BN from 'bn.js'
 import { sendTransaction } from '@utils/send'
 import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
+import queryClient from "@hooks/queries/queryClient";
+import {useJoinRealm} from "@hooks/useJoinRealm";
 
 export const useDepositCallback = (
   role: 'community' | 'council' | 'undefined'
 ) => {
+  const { handleRegister } = useJoinRealm();
   const wallet = useWalletOnePointOh()
   const walletPk = wallet?.publicKey ?? undefined
   const realmPk = useSelectedRealmPubkey()
@@ -75,8 +78,12 @@ export const useDepositCallback = (
         amount
       )
 
+      // instructions required to create voter weight records for any plugins connected to the realm
+      // no need to create the TOR, as it is already created by the deposit.
+      const pluginRegisterInstructions = await handleRegister(false)
+
       const transaction = new Transaction()
-      transaction.add(...instructions)
+      transaction.add(...instructions, ...pluginRegisterInstructions)
 
       await sendTransaction({
         connection,
@@ -86,6 +93,11 @@ export const useDepositCallback = (
         sendingMessage: 'Depositing tokens',
         successMessage: 'Tokens have been deposited',
       })
+
+        // Force the UI to recalculate voter weight
+        queryClient.invalidateQueries({
+            queryKey: ['calculateVoterWeight'],
+        })
     },
     [connection, realmPk, role, wallet, walletPk]
   )

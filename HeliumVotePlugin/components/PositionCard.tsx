@@ -1,5 +1,4 @@
 import React, { useCallback, useState, useMemo } from 'react'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { fmtMintAmount, getMintDecimalAmount } from '@tools/sdk/units'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { abbreviateAddress } from '@utils/formatting'
@@ -14,7 +13,7 @@ import {
   getMinDurationFmt,
   getTimeLeftFromNowFmt,
 } from '@utils/dateTools'
-import { PositionWithMeta, SubDaoWithMeta } from '../sdk/types'
+import {PositionWithMeta, Registrar, SubDaoWithMeta} from '../sdk/types'
 import useHeliumVsrStore from '../hooks/useHeliumVsrStore'
 import {
   LockTokensModal,
@@ -39,6 +38,9 @@ import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 import queryClient from '@hooks/queries/queryClient'
 import { tokenAccountQueryKeys } from '@hooks/queries/tokenAccount'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import {useHeliumClient} from "../../VoterWeightPlugins/useHeliumClient";
+import {useVotingClients} from "@hooks/useVotingClients";
+import {useAsync} from "react-async-hook";
 
 interface PositionCardProps {
   subDaos?: SubDaoWithMeta[]
@@ -65,15 +67,17 @@ export const PositionCard: React.FC<PositionCardProps> = ({
     s.state.positions,
     s.getPositions,
   ])
-  const [
-    currentClient,
-    vsrClient,
-    vsrRegistrar,
-  ] = useVotePluginsClientStore((s) => [
-    s.state.currentRealmVotingClient,
-    s.state.heliumVsrClient,
-    s.state.heliumVsrRegistrar,
-  ])
+  const { heliumClient: vsrClient } = useHeliumClient();
+  const votingClients = useVotingClients();
+
+  const vsrRegistrar = useAsync<Registrar | undefined>(
+      async () => {
+        if (realm && vsrClient) {
+          return vsrClient.getRegistrarAccount(realm?.pubkey, realm?.account.communityMint) as Promise<Registrar>
+        }
+      },
+      [realm, vsrClient]
+  )
 
   const transferablePositions: PositionWithMeta[] = useMemo(() => {
     if (!unixNow || !positions.length) {
@@ -189,10 +193,10 @@ export const PositionCard: React.FC<PositionCardProps> = ({
     (lockupPeriodInDays: number) =>
       calcLockupMultiplier({
         lockupSecs: daysToSecs(lockupPeriodInDays),
-        registrar: vsrRegistrar,
+        registrar: vsrRegistrar.result ?? null,
         realm,
       }),
-    [realm, vsrRegistrar]
+    [realm, vsrRegistrar.result]
   )
 
   const refetchState = async () => {
@@ -200,7 +204,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
       queryKey: tokenAccountQueryKeys.all(connection.endpoint),
     })
     await getPositions({
-      votingClient: currentClient,
+      votingClient: votingClients('community'),  // community mint is hardcoded for getPositions
       realmPk: realm!.pubkey,
       communityMintPk: realm!.account.communityMint,
       walletPk: wallet!.publicKey!,

@@ -3,7 +3,7 @@ import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import AccountLabel from './AccountHeader'
 import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   StakingViewForm,
   UiInstruction,
@@ -27,10 +27,11 @@ import { AssetAccount } from '@utils/uiTypes/assets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import {useVoteByCouncilToggle} from "@hooks/useVoteByCouncilToggle";
 
 const ConvertToMsol = () => {
   const realm = useRealmQuery().data?.result
-  const { canChooseWhoVote, symbol } = useRealm()
+  const {symbol } = useRealm()
   const { canUseTransferInstruction } = useGovernanceAssets()
   const { governedTokenAccounts } = useGovernanceAssets()
   const { fmtUrlWithCluster } = useQueryContext()
@@ -51,7 +52,7 @@ const ConvertToMsol = () => {
     description: '',
   })
   const [showOptions, setShowOptions] = useState(false)
-  const [voteByCouncil, setVoteByCouncil] = useState(false)
+  const { voteByCouncil, shouldShowVoteByCouncilToggle, setVoteByCouncil } = useVoteByCouncilToggle();
   const [isLoading, setIsLoading] = useState(false)
 
   const mSolTokenAccounts = governedTokenAccounts.filter(
@@ -223,13 +224,13 @@ const ConvertToMsol = () => {
                 })
               }
             ></Textarea>
-            {canChooseWhoVote && (
-              <VoteBySwitch
-                checked={voteByCouncil}
-                onChange={() => {
-                  setVoteByCouncil(!voteByCouncil)
-                }}
-              ></VoteBySwitch>
+            {shouldShowVoteByCouncilToggle && (
+                <VoteBySwitch
+                    checked={voteByCouncil}
+                    onChange={() => {
+                      setVoteByCouncil(!voteByCouncil)
+                    }}
+                ></VoteBySwitch>
             )}
           </>
         )}

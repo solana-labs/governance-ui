@@ -5,7 +5,7 @@ import Button, { SecondaryButton } from '@components/Button'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
 import { abbreviateAddress, precision } from 'utils/formatting'
 import { getMintSchema } from 'utils/validations'
-import { FC, useMemo, useState } from 'react'
+import React, { FC, useMemo, useState } from 'react'
 import { MintForm, UiInstruction } from 'utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssets from 'hooks/useGovernanceAssets'
 import {
@@ -32,6 +32,7 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import {useVoteByCouncilToggle} from "@hooks/useVoteByCouncilToggle";
 
 interface AddMemberForm extends Omit<MintForm, 'mintAccount'> {
   description: string
@@ -43,7 +44,6 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
   mintAccount,
 }) => {
   const programVersion = useProgramVersion()
-  const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [showOptions, setShowOptions] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
@@ -51,12 +51,13 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
   const router = useRouter()
   const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
+  const { voteByCouncil, shouldShowVoteByCouncilToggle, setVoteByCouncil } = useVoteByCouncilToggle();
 
   const { fmtUrlWithCluster } = useQueryContext()
   const { symbol } = router.query
 
   const realm = useRealmQuery().data?.result
-  const { realmInfo, canChooseWhoVote } = useRealm()
+  const { realmInfo } = useRealm()
   const { data: mintInfo } = useMintInfoByPubkeyQuery(mintAccount.pubkey)
 
   const programId: PublicKey | undefined = realmInfo?.programId
@@ -242,6 +243,7 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
 
         router.push(url)
       } catch (error) {
+        console.log('Error creating proposal', error);
         notify({
           type: 'error',
           message: `${error}`,
@@ -343,13 +345,13 @@ const AddMemberForm: FC<{ close: () => void; mintAccount: AssetAccount }> = ({
             onBlur={validateAmountOnBlur}
           />
 
-          {canChooseWhoVote && (
-            <VoteBySwitch
-              checked={voteByCouncil}
-              onChange={() => {
-                setVoteByCouncil(!voteByCouncil)
-              }}
-            />
+          {shouldShowVoteByCouncilToggle && (
+              <VoteBySwitch
+                  checked={voteByCouncil}
+                  onChange={() => {
+                    setVoteByCouncil(!voteByCouncil)
+                  }}
+              ></VoteBySwitch>
           )}
         </>
       )}

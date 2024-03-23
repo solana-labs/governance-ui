@@ -219,7 +219,7 @@ export default function Header({ tokenOwnerRecord, governance }: Props) {
             </Link>
           </div>
           <p className="text-fgd-3">
-            Community Votes: {/** todo check for council */}
+            Community votes: {/** todo check for council */}
             {fmtMintAmount(
               mint,
               new BN(

@@ -7,14 +7,21 @@ import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { getMintMetadata } from '../instructions/programs/splToken'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
-import { useVsrGovpower } from '@hooks/queries/plugins/vsr'
 import VSRCommunityVotingPower from 'VoteStakeRegistry/components/TokenBalance/VSRVotingPower'
 import DepositCommunityTokensBtn from 'VoteStakeRegistry/components/TokenBalance/DepositCommunityTokensBtn'
 import useDelegators from '@components/VotePanel/useDelegators'
+import {useRealmVoterWeightPlugins} from "@hooks/useRealmVoterWeightPlugins";
+import {CalculatedWeight, VoterWeightPlugins} from "../../VoterWeightPlugins/lib/types";
+import { BN } from '@coral-xyz/anchor'
 
 interface Props {
   className?: string
 }
+
+const findVSRVoterWeight = (calculatedVoterWeight: CalculatedWeight | undefined): BN|undefined =>
+    calculatedVoterWeight?.details.find((detail) => detail.pluginName === 'VSR')?.pluginWeight ?? undefined;
+
+const isVSRLastVoterWeightPlugin = (plugins: VoterWeightPlugins | undefined) => plugins?.voterWeight[plugins.voterWeight.length - 1].name === 'VSR';
 
 export default function LockedCommunityVotingPower(props: Props) {
   const realm = useRealmQuery().data?.result
@@ -25,12 +32,13 @@ export default function LockedCommunityVotingPower(props: Props) {
   const mint = mintData?.result
 
   const { realmTokenAccount } = useRealm()
+  const {  totalCalculatedVoterWeight, isReady: votingPowerReady, plugins } = useRealmVoterWeightPlugins('community');
 
-  const {
-    data: votingPowerResult,
-    isLoading: votingPowerLoading,
-  } = useVsrGovpower()
-  const votingPower = votingPowerResult?.result
+  // in case the VSR plugin is the last plugin, this is the final calculated voter weight.
+  // however, if it is one in a chain, we are just showing an intermediate calculation here.
+  // This affects how it appears in the UI
+  const votingPower = findVSRVoterWeight(totalCalculatedVoterWeight)
+  const isLastVoterWeightPlugin = isVSRLastVoterWeightPlugin(plugins);
 
   const isLoading = useDepositStore((s) => s.state.isLoading)
 
@@ -45,7 +53,7 @@ export default function LockedCommunityVotingPower(props: Props) {
   // memoize useAsync inputs to prevent constant refetch
   const relevantDelegators = useDelegators('community')
 
-  if (isLoading || votingPowerLoading || mintLoading) {
+  if (isLoading || !votingPowerReady || mintLoading) {
     return (
       <div
         className={classNames(
@@ -64,7 +72,7 @@ export default function LockedCommunityVotingPower(props: Props) {
           You do not have any voting power in this dao.
         </div>
       ) : (
-        <VSRCommunityVotingPower />
+        <VSRCommunityVotingPower votingPower={votingPower} votingPowerLoading={!votingPowerReady} isLastPlugin={isLastVoterWeightPlugin}/>
       )}
 
       {depositAmount.isGreaterThan(0) && (

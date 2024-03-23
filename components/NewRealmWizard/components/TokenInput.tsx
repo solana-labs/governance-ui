@@ -221,7 +221,7 @@ export default function TokenInput({
               render={({ field, fieldState: { error } }) => (
                 <FormField
                   title="What is the minimum number of community tokens needed to manage this DAO?"
-                  description="A user will need at least this many community token to edit the DAO."
+                  description="A user will need at least this many community tokens to edit the DAO."
                   disabled={!validMintAddress}
                 >
                   <Input

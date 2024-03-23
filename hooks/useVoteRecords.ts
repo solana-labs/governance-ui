@@ -14,7 +14,6 @@ import useRpcContext from '@hooks/useRpcContext'
 import { getVoteRecords, getTokenOwnerRecords } from '@models/proposal'
 import useRealm from '@hooks/useRealm'
 import { buildTopVoters } from '@models/proposal'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { getLockTokensVotingPowerPerWallet } from 'VoteStakeRegistry/tools/deposits'
 import { BN } from '@coral-xyz/anchor'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
@@ -27,6 +26,8 @@ import { getNetworkFromEndpoint } from '@utils/connection'
 import { fetchDigitalAssetsByOwner } from './queries/digitalAssets'
 import { useNftRegistrarCollection } from './useNftRegistrarCollection'
 import { useAsync } from 'react-async-hook'
+import {useVsrClient} from "../VoterWeightPlugins/useVsrClient";
+import {useNftRegistrar} from "@hooks/useNftRegistrar";
 
 export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
   const { getRpcContext } = useRpcContext()
@@ -52,7 +53,7 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
   ///
 
   const [context, setContext] = useState<RpcContext | null>(null)
-  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
+  const { vsrClient } = useVsrClient();
   const connection = useLegacyConnectionContext()
   const governingTokenMintPk = proposal?.account.governingTokenMint
 
@@ -61,9 +62,7 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
   // In buildTopVoters.ts, it checks whether the token_owner_record is in the vote_record.
   // If not, the function use record.account.governingTokenDepositAmount as the undecided vote weight, where nft-voter should be 0.
   // Thus, pre-calculating the undecided weight for each nft voter is necessary.
-  const [nftMintRegistrar] = useVotePluginsClientStore((s) => [
-    s.state.nftMintRegistrar,
-  ])
+  const nftMintRegistrar = useNftRegistrar();
   const usedCollectionsPks: string[] = useNftRegistrarCollection()
 
   const { result: undecidedNftsByVoteRecord } = useAsync(async () => {
@@ -165,7 +164,7 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
       const nftVoterPluginTotalWeight = nftMintRegistrar?.collectionConfigs.reduce(
         (prev, curr) => {
           const size = curr.size
-          const weight = curr.weight
+          const weight = curr.weight.toNumber()
           if (typeof size === 'undefined' || typeof weight === 'undefined')
             return prev
           return prev + size * weight
@@ -177,7 +176,7 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
         tokenOwnerRecords,
         mint,
         undecidedNftsByVoteRecord ?? {},
-        new BN(nftVoterPluginTotalWeight)
+        new BN(nftVoterPluginTotalWeight ?? 0)
       )
     }
     return []
@@ -196,12 +195,12 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
   useEffect(() => {
     //VSR only
     const handleGetVsrVotingPowers = async (walletsPks: PublicKey[]) => {
-      if (!realm || !client) throw new Error()
+      if (!realm || !vsrClient) throw new Error()
 
       const votingPerWallet = await getLockTokensVotingPowerPerWallet(
         walletsPks,
         realm,
-        client,
+        vsrClient,
         connection.current
       )
       setUndecidedDepositByVoteRecord(votingPerWallet)
@@ -221,7 +220,7 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
                 tokenOwnerRecord.account.governingTokenOwner.toBase58()
             )
       )
-      if (undecidedData.length && mintsUsedInRealm.length && realm && client) {
+      if (undecidedData.length && mintsUsedInRealm.length && realm && vsrClient) {
         handleGetVsrVotingPowers(
           undecidedData.map((x) => x.account.governingTokenOwner)
         )
@@ -235,7 +234,7 @@ export default function useVoteRecords(proposal?: ProgramAccount<Proposal>) {
     tokenOwnerRecords,
     voteRecords,
     realm,
-    client,
+    vsrClient,
     connection,
     mintsUsedInRealm,
   ])
