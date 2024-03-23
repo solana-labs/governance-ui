@@ -200,17 +200,17 @@ export async function getVoteDepositInstruction({
     const systemProgram = SystemProgram.programId
     const clientProgramId = vsrClient!.program.programId
 
-    const { registrar } = await getRegistrarPDA(
+    const { registrar } = getRegistrarPDA(
       realmPk,
       communityMintPk,
       clientProgramId
     )
-    const { voter, voterBump } = await getVoterPDA(
+    const { voter, voterBump } = getVoterPDA(
       registrar,
       daoWallet,
       clientProgramId
     )
-    const { voterWeightPk, voterWeightBump } = await getVoterWeightPDA(
+    const { voterWeightPk, voterWeightBump } = getVoterWeightPDA(
       registrar,
       daoWallet,
       clientProgramId

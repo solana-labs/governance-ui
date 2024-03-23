@@ -8,7 +8,6 @@ import { postChatMessage } from '../../actions/chat/postMessage'
 import Loading from '../Loading'
 import Tooltip from '@components/Tooltip'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import {
   useUserCommunityTokenOwnerRecord,
@@ -19,6 +18,7 @@ import { useRouteProposalQuery } from '@hooks/queries/proposal'
 import { useVotingPop } from '@components/VotePanel/hooks'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
+import {useVotingClients} from "@hooks/useVotingClients";
 
 const DiscussionForm = () => {
   const [comment, setComment] = useState('')
@@ -27,9 +27,7 @@ const DiscussionForm = () => {
   const realm = useRealmQuery().data?.result
   const { result: ownVoterWeight } = useLegacyVoterWeight()
   const { realmInfo } = useRealm()
-  const client = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
-  )
+  const votingClients = useVotingClients();
   const [submitting, setSubmitting] = useState(false)
 
   const wallet = useWalletOnePointOh()
@@ -40,6 +38,7 @@ const DiscussionForm = () => {
   const commenterVoterTokenRecord =
     tokenRole === 'community' ? ownTokenRecord : ownCouncilTokenRecord
 
+  const votingClient = votingClients(tokenRole ?? 'community');// default to community if no role is provided
   const submitComment = async () => {
     setSubmitting(true)
     if (
@@ -72,7 +71,7 @@ const DiscussionForm = () => {
         commenterVoterTokenRecord,
         msg,
         undefined,
-        client
+        votingClient
       )
 
       setComment('')

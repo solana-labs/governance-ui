@@ -8,7 +8,6 @@ import {
 import { validateInstruction } from '@utils/instructionTools'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NewProposalContext } from '../../../new'
 import InstructionForm, { InstructionInput } from '../FormCreator'
 import { InstructionInputType } from '../inputInstructionType'
@@ -24,6 +23,7 @@ import {
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
+import {useNftClient} from "../../../../../../../VoterWeightPlugins/useNftClient";
 
 interface ConfigureCollectionForm {
   governedAccount: AssetAccount | undefined
@@ -41,7 +41,7 @@ const ConfigureNftPluginCollection = ({
 }) => {
   const realm = useRealmQuery().data?.result
   const mint = useRealmCommunityMintInfoQuery().data?.result
-  const nftClient = useVotePluginsClientStore((s) => s.state.nftClient)
+  const {nftClient} = useNftClient()
   const { assetAccounts } = useGovernanceAssets()
   const wallet = useWalletOnePointOh()
   const shouldBeGoverned = !!(index !== 0 && governance)
@@ -60,10 +60,10 @@ const ConfigureNftPluginCollection = ({
         form!.weight,
         mint!.decimals
       )
-      const { registrar } = await getRegistrarPDA(
-        realm!.pubkey,
-        realm!.account.communityMint,
-        nftClient!.program.programId
+      const { registrar } = getRegistrarPDA(
+          realm!.pubkey,
+          realm!.account.communityMint,
+          nftClient!.program.programId
       )
       const { maxVoterWeightRecord } = await getMaxVoterWeightRecord(
         realm!.pubkey,

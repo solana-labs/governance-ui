@@ -79,6 +79,8 @@ type RealmCreationV3 = {
 
 export type RealmCreation = RealmCreationV2 | RealmCreationV3
 
+export const DEFAULT_MINT_DECIMALS = 6;
+
 export async function prepareRealmCreation({
   connection,
   wallet,
@@ -146,7 +148,7 @@ export async function prepareRealmCreation({
     ? (await fetchMintInfoByPubkey(connection, existingCouncilMintPk)).result
     : undefined
 
-  const communityMintDecimals = existingCommunityMint?.decimals || 6
+  const communityMintDecimals = existingCommunityMint?.decimals || DEFAULT_MINT_DECIMALS
 
   const communityMaxVoteWeightSource = parseMintMaxVoteWeight(
     useSupplyFactor,

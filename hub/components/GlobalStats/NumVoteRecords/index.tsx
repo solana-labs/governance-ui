@@ -24,7 +24,7 @@ export function NumVoteRecords(props: Props) {
         props.className,
       )}
     >
-      <common.Label>Number of Votes</common.Label>
+      <common.Label>Number of votes</common.Label>
       <common.Value>
         {formatNumber(props.voteRecords.length, undefined, {
           maximumFractionDigits: 0,

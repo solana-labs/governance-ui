@@ -4,8 +4,6 @@ import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { useAsyncCallback } from 'react-async-hook'
 import { PositionWithMeta } from '../sdk/types'
 import useRealm from '@hooks/useRealm'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import { useSolanaUnixNow } from '@hooks/useSolanaUnixNow'
 import { SequenceType } from '@blockworks-foundation/mangolana/lib/globalTypes'
 import { notify } from '@utils/notifications'
@@ -15,15 +13,14 @@ import {
 } from '@utils/sendTransactions'
 import { withCreateTokenOwnerRecord } from '@solana/spl-governance'
 import { useRealmQuery } from '@hooks/queries/realm'
+import {useHeliumClient} from "../../VoterWeightPlugins/useHeliumClient";
 
 export const useClosePosition = () => {
   const { unixNow } = useSolanaUnixNow()
   const { connection, wallet } = useWalletDeprecated()
   const realm = useRealmQuery().data?.result
   const { realmInfo } = useRealm()
-  const [{ client }] = useVotePluginsClientStore((s) => [
-    s.state.currentRealmVotingClient,
-  ])
+  const { heliumClient } = useHeliumClient();
   const { error, loading, execute } = useAsyncCallback(
     async ({
       position,
@@ -39,8 +36,7 @@ export const useClosePosition = () => {
         !connection.current ||
         !realm ||
         !realmInfo ||
-        !client ||
-        !(client instanceof HeliumVsrClient) ||
+        !heliumClient ||
         !wallet ||
         position.numActiveVotes > 0 ||
         // lockupExpired
@@ -69,7 +65,7 @@ export const useClosePosition = () => {
         }
 
         instructions.push(
-          await client.program.methods
+          await heliumClient.program.methods
             .withdrawV0({
               amount: position.amountDepositedNative,
             })
@@ -81,7 +77,7 @@ export const useClosePosition = () => {
         )
 
         instructions.push(
-          await client.program.methods
+          await heliumClient.program.methods
             .closePositionV0()
             .accounts({
               position: position.pubkey,

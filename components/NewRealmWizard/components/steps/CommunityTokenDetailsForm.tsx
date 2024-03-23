@@ -11,8 +11,14 @@ import FormField from '@components/NewRealmWizard/components/FormField'
 import FormFooter from '@components/NewRealmWizard/components/FormFooter'
 import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
 import Input, { RadioGroup } from '@components/NewRealmWizard/components/Input'
+import { CogIcon, ExternalLinkIcon } from '@heroicons/react/outline'
+
 import { GenericTokenIcon } from '@components/NewRealmWizard/components/TokenInfoTable'
 import TokenInput, { TokenWithMintInfo, COMMUNITY_TOKEN } from '../TokenInput'
+import { getCoefficients } from '../../../../actions/addPlugins/addQVPlugin'
+import { useConnection } from '@solana/wallet-adapter-react'
+import { PublicKey } from '@solana/web3.js'
+import CivicPassSelector from '../CivicPassSelector'
 
 export const CommunityTokenSchema = {
   useExistingCommunityToken: yup
@@ -73,6 +79,11 @@ export interface CommunityToken {
   transferCommunityMintAuthority?: boolean
   minimumNumberOfCommunityTokensToGovern?: number
   communityMintSupplyFactor?: number
+  isQuadratic?: boolean
+  coefficientA: number
+  coefficientB: number
+  coefficientC: number
+  civicPass: string
   useSupplyFactor: boolean
   communityAbsoluteMaxVoteWeight?: number
 }
@@ -86,6 +97,8 @@ export default function CommunityTokenForm({
   onPrevClick,
 }) {
   const schema = yup.object(CommunityTokenSchema).required()
+  const { connection } = useConnection()
+
   const {
     watch,
     control,
@@ -96,15 +109,42 @@ export default function CommunityTokenForm({
     // @asktree: I set default values here in order to eliminate a bug where a value was only being set as a side effect of opening advanced options
     defaultValues: {
       useSupplyFactor: true,
+      isQuadratic: false,
+      coefficientA: 1000,
+      coefficientB: 0,
+      coefficientC: 0,
     },
     mode: 'all',
     resolver: yupResolver(schema),
   })
   const useExistingCommunityToken = watch('useExistingCommunityToken')
+  const communityTokenMintAddress = watch('communityTokenMintAddress')
   const useSupplyFactor = watch('useSupplyFactor')
+  const isQuadratic = watch('isQuadratic')
+  const coefficientA = watch('coefficientA')
+  const coefficientB = watch('coefficientB')
+  const coefficientC = watch('coefficientC')
   const [communityTokenInfo, setCommunityTokenInfo] = useState<
     TokenWithMintInfo | undefined
   >()
+
+  useEffect(() => {
+    const fetchCoefficients = async () => {
+      const coefficients = await getCoefficients(
+        undefined,
+        new PublicKey(communityTokenMintAddress),
+        connection
+      )
+      setValue('coefficientA', coefficients[0].toFixed(2))
+      setValue('coefficientB', coefficients[1])
+      setValue('coefficientC', coefficients[2])
+    }
+
+    // If the user wants to use a pre-existing token, we need to adjust the coefficients ot match the decimals of that token
+    if (communityTokenMintAddress) {
+      fetchCoefficients()
+    }
+  }, [connection, communityTokenMintAddress, setValue])
 
   useEffect(() => {
     updateUserInput(formData, CommunityTokenSchema, setValue)
@@ -221,7 +261,7 @@ export default function CommunityTokenForm({
             render={({ field, fieldState: { error } }) => (
               <FormField
                 title="What is the minimum number of community tokens needed to manage this DAO?"
-                description="A user will need at least this many community token to edit the DAO"
+                description="A user will need at least this many community tokens to edit the DAO"
                 // advancedOption
               >
                 <Input
@@ -305,6 +345,17 @@ export default function CommunityTokenForm({
                 advancedOption
                 className="mt-6"
               >
+                {isQuadratic && <div className="body-sm mb-2 text-fgd-2">
+                  <div>
+                    <span className="text-[#5DC9EB]">Note:&nbsp;</span>
+                    Quadratic Voting DAOs typically have a lower circulating supply factor
+                    than non-quadratic DAOs. This is because the quadratic formula
+                    reduces the weight of votes overall.
+                  </div>
+                  <div>
+                    Consider optionally setting a value &lt; 1 here to increase the accuracy of approval thresholds.
+                  </div>
+                </div>}
                 <Input
                   type="tel"
                   placeholder={`1`}
@@ -320,6 +371,154 @@ export default function CommunityTokenForm({
               </FormField>
             )}
           />
+        )}
+
+        <Controller
+            name="isQuadratic"
+            control={control}
+            defaultValue={true}
+          render={({ field: { ref: _, ...field } }) => (
+            <div className="pt-3 mb-6">
+              <FormField
+                title="Create a quadratic dao?"
+                description="This gives more proportional power to smaller token holders, encouraging community participation. Additionally, the Civic Pass plugin will be included, requiring all users to verify their identity and ensuring sybil resistance by mitigating the risk of fake or duplicate accounts."
+                advancedOption
+              >
+                <RadioGroup
+                  {...field}
+                  options={[
+                    { label: 'Default', value: false },
+                    { label: 'Quadratic', value: true },
+                  ]}
+                />
+              </FormField>
+            </div>
+          )}
+        />
+
+        {isQuadratic && (
+          <AdvancedOptionsDropdown
+            title="Quadratic Configuration"
+            icon={
+              <CogIcon
+                width={24}
+                height={24}
+                color="#5DC9EB"
+                className="mr-2"
+              />
+            }
+          >
+            <div className="flex mb-4 items-center">
+              <p className="pl-1 border-gray-500 body-small mb-4">
+                <i>Changes advised for advanced users only</i>
+              </p>
+            </div>
+            <Controller
+              name="civicPass"
+              control={control}
+              defaultValue={''}
+              render={({ field }) => (
+                <FormField title="Civic Pass verification">
+                  <div className="mt-2 mb-6">
+                    <CivicPassSelector
+                      selectedPass={field.value}
+                      onPassSelected={field.onChange}
+                    />
+                  </div>
+                </FormField>
+              )}
+            />
+
+            <FormField
+              title="Quadratic Coefficients"
+              description="Configures the quadratic voting formulae influencing coefficients, which change the weight of votes."
+            >
+              <div className="mb-4 flex mt-[-16px]">
+                <p className="mr-1">See Docs</p>
+                <a
+                  href="https://docs.realms.today/"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <ExternalLinkIcon className="w-6 h-6 ml-1" color="#5DC9EB" />
+                </a>
+              </div>
+            </FormField>
+            <div className="flex space-x-4">
+              <Controller
+                name="coefficientA"
+                control={control}
+                defaultValue={''}
+                render={({ field, fieldState: { error } }) => (
+                  <FormField
+                    title="Coefficient A"
+                    description=""
+                    // advancedOption
+                  >
+                    <Input
+                      type="tel"
+                      placeholder="1000"
+                      error={error?.message || ''}
+                      defaultValue={coefficientA}
+                      {...field}
+                      onChange={(ev) => {
+                        preventNegativeNumberInput(ev)
+                        field.onChange(ev)
+                      }}
+                    />
+                  </FormField>
+                )}
+              />
+              <Controller
+                name="coefficientB"
+                control={control}
+                defaultValue={''}
+                render={({ field, fieldState: { error } }) => (
+                  <FormField
+                    title="Coefficient B"
+                    description=""
+                    // advancedOption
+                  >
+                    <Input
+                      type="tel"
+                      placeholder="0"
+                      error={error?.message || ''}
+                      defaultValue={coefficientB}
+                      {...field}
+                      onChange={(ev) => {
+                        preventNegativeNumberInput(ev)
+                        field.onChange(ev)
+                      }}
+                    />
+                  </FormField>
+                )}
+              />
+              <Controller
+                name="coefficientC"
+                control={control}
+                defaultValue={''}
+                render={({ field, fieldState: { error } }) => (
+                  <FormField
+                    title="Coefficient C"
+                    description=""
+                    // advancedOption
+                  >
+                    <Input
+                      type="tel"
+                      placeholder="0"
+                      error={error?.message || ''}
+                      defaultValue={coefficientC}
+                      {...field}
+                      onChange={(ev) => {
+                        preventNegativeNumberInput(ev)
+                        field.onChange(ev)
+                      }}
+                    />
+                  </FormField>
+                )}
+              />
+            </div>
+          </AdvancedOptionsDropdown>
         )}
       </AdvancedOptionsDropdown>
 
