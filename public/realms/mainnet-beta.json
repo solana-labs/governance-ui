@@ -3247,6 +3247,32 @@
     "twitter": "@pawnspl24",
     "ogImage": "/realms/PAWN/img/pawn.png"
   },
+{
+    "symbol": "PAWNGO",
+    "displayName": "Pawngo DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "shortDescription": "A very good girl.",
+    "discord": "https://discord.gg/Td7QFn2ePz",
+    "bannerImage": "/realms/PAWNGO/img/pawngodao.png",
+    "category": "Memecoin",
+    "sortRank": 3, 
+    "realmId": "2cS5Epb9b1hGifzWi6iYmpHbNueM9FReh8kqNaKrcTFJ",
+    "twitter": "@pawnspl24",
+    "ogImage": "/realms/PAWNGO/img/pawngo.png"
+  },
+  {
+    "symbol": "GCDC",
+    "displayName": "Gay Coinz DAO Coin",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "shortDescription": "We're gonna need a bigger tote!",
+    "discord": "",
+    "bannerImage": "/realms/GCDC/img/gaycoinz-banner.png",
+    "category": "Web3",
+    "sortRank": 3, 
+    "realmId": "5aXNavdJkzp8j2kPbvQbf15kmxdqJgjXJ8CqJ4S1ZTpG",
+    "twitter": "",
+    "ogImage":"/realms/GCDC/img/gaycoinz-logo.png"
+  },
   {
     "symbol": "COMRADE",
     "displayName": "ComradeDAO",
