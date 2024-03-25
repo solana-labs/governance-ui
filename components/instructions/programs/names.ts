@@ -28,7 +28,7 @@ const GOVERNANCE_PROGRAM_NAMES = {
   '7e75Nwsz8i5i4NiDa43CNzKJ4AeQGyRimha46VKTM1Ls': 'spl-governance v3 test',
   MGovW65tDhMMcpEmsegpsdgvzb6zUwGsNjhXFxRAnjd: 'MEAN DAO Governance Program',
   GovMaiHfpVPw8BAM1mbdzgmSZYDw2tdP32J2fapoQoYs: 'Marinade Governance Program',
-  hgovkRU6Ghe1Qoyb54HdSLdqN7VtxaifBzRmh9jtd3S: 'Helium Governance Program',
+  dgov7NC8iaumWw3k8TkmLDybvZBCmd1qwxgLAGAsWxf: 'Drift Governance Program',
 }
 
 // Well known program names displayed on the instruction card
