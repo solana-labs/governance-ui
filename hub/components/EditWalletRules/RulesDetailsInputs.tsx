@@ -1,3 +1,4 @@
+import { NFT_PLUGINS_PKS } from '@constants/plugins';
 import { BN } from '@coral-xyz/anchor';
 import { BigNumber } from 'bignumber.js';
 import { produce } from 'immer';
@@ -6,6 +7,7 @@ import {
   useRealmCommunityMintInfoQuery,
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo';
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig';
 import { ButtonToggle } from '@hub/components/controls/ButtonToggle';
 import { Input } from '@hub/components/controls/Input';
 import { Slider } from '@hub/components/controls/Slider';
@@ -120,6 +122,7 @@ export function CanVote(props: Props) {
 export function VotingPowerToCreateProposals(props: Props) {
   const communityTokenInfo = useRealmCommunityMintInfoQuery();
   const councilTokenInfo = useRealmCouncilMintInfoQuery();
+  const config = useRealmConfigQuery().data?.result;
 
   const tokenInfoQuery =
     props.rules.tokenType === GovernanceTokenType.Community
@@ -140,11 +143,27 @@ export function VotingPowerToCreateProposals(props: Props) {
         .multipliedBy(100)
     : undefined;
 
+  const isNftPlugin =
+    config?.account.communityTokenConfig.voterWeightAddin &&
+    NFT_PLUGINS_PKS.includes(
+      config?.account.communityTokenConfig.voterWeightAddin?.toBase58(),
+    );
+
+  const isNftGovernanceWithoutCouncil =
+    isNftPlugin && props.govPop === 'community' && !councilTokenInfo.data;
+
   return (
     <ValueBlock
       title={`What is the minimum amount of ${props.govPop} governance power required to create a proposal?`}
       description={`A user must have this many ${props.govPop} governance power in order to create a proposal.`}
     >
+      {isNftGovernanceWithoutCouncil ? (
+        <div className="text-sm dark:text-neutral-500 relative top-[-10px]">
+          The council is not added. Max tokens can be 5
+        </div>
+      ) : (
+        ''
+      )}
       <div className="relative">
         <Input
           className="w-full pr-24"
@@ -158,7 +177,14 @@ export function VotingPowerToCreateProposals(props: Props) {
           )}
           onChange={(e) => {
             const text = e.currentTarget.value.replaceAll(/[^\d.-]/g, '');
-            const value = text ? new BigNumber(text) : new BigNumber(0);
+            let value = text ? new BigNumber(text) : new BigNumber(0);
+
+            if (
+              isNftGovernanceWithoutCouncil &&
+              value.isGreaterThan(new BigNumber(5))
+            ) {
+              value = new BigNumber(5);
+            }
             const newRules = produce(props.rules, (data) => {
               data.votingPowerToCreateProposals = value;
             });
