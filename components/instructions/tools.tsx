@@ -61,8 +61,9 @@ export const ACCOUNT_NAMES = {
     'Mango DAO BLAZE Realm Deposit',
   '8gjzxiqcU87cvRc7hFiUJgxqLSV7AQnSttfWC5fD9aim':
     'Mango DAO Treasury Council Mint',
+  oW7juZxrhaGvWw5giRp3P3qTHEZpg2t8n8aXTCpBjNK: 'Mango DAO boost council',
   G1Yc5696GcfL28uAWG6iCaKJwZd8sQzwPJTc2UacsjHN:
-    'Mango DAO Game master Council Mint',
+    'Mango DAO Game Master Council Mint',
   A9xaHx54B9bRYBga4V6LKFrRaARpMJFYVooEXRAanru5:
     'Mango DAO Treasury Council USDC Treasury',
   '7zGXUAeUkY9pEGfApsY26amibvqsf2dmty1cbtxHdfaQ': 'Mango DAO Wallet Governance',
@@ -400,6 +401,7 @@ export const HIDDEN_REALMS = [
   'BWnVbUDohApiiaWBNNGcLH2KXRKEoTBJ7schsKQWYAtj',
   'FsoDEiZ9BoGTAaCLzXkyQWEqNKa5PW2iokzmuD7YsRdL',
   '9nUyxzVL2FUMuWUiVZG66gwK15CJiM3PoLkfrnGfkvt6', // old Drift dao
+  '7mjEBafqqKA2K6SHezMrDV1zBoyNw6SKFcTsBbH2Kxgb', // openBook v2 council wrong config
 ]
 
 //owner and desired accounts we want to show
