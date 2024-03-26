@@ -55,14 +55,12 @@ export default function useCreateProposal() {
     const { result: selectedGovernance } = await fetchGovernanceByPubkey(
       connection.current,
       governance.pubkey
-    )
+    )    
+    const ownTokenRecord = ownVoterWeight?.councilTokenRecord ?? ownVoterWeight?.communityTokenRecord
+
+    if (!ownTokenRecord) throw new Error('token owner record does not exist')
     if (!selectedGovernance) throw new Error('governance not found')
     if (!realm) throw new Error()
-
-    const ownTokenRecord = ownVoterWeight?.getTokenRecordToCreateProposal(
-      selectedGovernance.account.config,
-      voteByCouncil
-    ) // TODO just get the token record the normal way
 
     const defaultProposalMint =
       !mint?.supply.isZero() ||
@@ -88,7 +86,7 @@ export default function useCreateProposal() {
       rpcContext,
       realm,
       governance.pubkey,
-      ownTokenRecord!,
+      ownTokenRecord,
       title,
       description,
       proposalMint,
@@ -134,13 +132,11 @@ export default function useCreateProposal() {
       connection.current,
       governance
     )
+    const ownTokenRecord = ownVoterWeight?.councilTokenRecord ?? ownVoterWeight?.communityTokenRecord
+
+    if (!ownTokenRecord) throw new Error('token owner record does not exist')
     if (!selectedGovernance) throw new Error('governance not found')
     if (!realm) throw new Error()
-
-    const ownTokenRecord = ownVoterWeight?.getTokenRecordToCreateProposal(
-      selectedGovernance.account.config,
-      voteByCouncil
-    )
 
     const defaultProposalMint =
       !mint?.supply.isZero() ||
@@ -165,7 +161,7 @@ export default function useCreateProposal() {
       rpcContext,
       realm,
       governance,
-      ownTokenRecord!,
+      ownTokenRecord,
       title,
       description,
       proposalMint,
