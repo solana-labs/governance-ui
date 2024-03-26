@@ -19,8 +19,11 @@ import UnknownAssetListItem from './UnknownAssetListItem'
 import RealmAuthorityListItem from './RealmAuthorityListItem'
 import StakeListItem from './StakeListItem'
 import { abbreviateAddress } from '@utils/formatting'
+import BigNumber from 'bignumber.js'
+import { formatNumber } from '@utils/formatNumber'
 
 interface Props {
+  mangoAccountsValue: BigNumber
   className?: string
   disableCollapse?: boolean
   expanded?: boolean
@@ -49,76 +52,92 @@ export default function OtherAssetsList(props: Props) {
       itemsToHide={props.itemsToHide}
       showHiddenItems={showHiddenItems}
     >
-      {props.assets
-        .filter((x) =>
-          showHiddenItems
-            ? true
-            : !props.itemsToHide.includes((x as any).address)
-        )
-        .map((asset, i) => {
-          switch (asset.type) {
-            case AssetType.Mint:
-              return (
-                <MintListItem
-                  key={i}
-                  mint={asset}
-                  selected={props.selectedAssetId === asset.id}
-                  onSelect={() => props.onSelect?.(asset)}
-                />
-              )
-            case AssetType.Domain:
-              return (
-                <DomainListItem
-                  key={i}
-                  count={asset.count}
-                  selected={props.selectedAssetId === asset.id}
-                  onSelect={() => props.onSelect?.(asset)}
-                />
-              )
-            case AssetType.Programs:
-              return (
-                <ProgramsListItem
-                  key={i}
-                  count={asset.count}
-                  selected={props.selectedAssetId === asset.id}
-                  onSelect={() => props.onSelect?.(asset)}
-                />
-              )
-            case AssetType.RealmAuthority:
-              return (
-                <RealmAuthorityListItem
-                  key={i}
-                  name={asset.name}
-                  selected={props.selectedAssetId === asset.id}
-                  thumbnail={asset.icon}
-                  onSelect={() => props.onSelect?.(asset)}
-                />
-              )
-            case AssetType.Stake:
-              return (
-                <StakeListItem
-                  key={i}
-                  amount={asset.amount}
-                  publicKey={
-                    asset.raw.extensions.stake?.stakeAccount &&
-                    abbreviateAddress(asset.raw.extensions.stake.stakeAccount!)
-                  }
-                  onSelect={() => props.onSelect?.(asset)}
-                ></StakeListItem>
-              )
-            case AssetType.Unknown:
-              return (
-                <UnknownAssetListItem
-                  key={i}
-                  count={asset.count}
-                  name={asset.name}
-                  selected={props.selectedAssetId === asset.id}
-                  thumbnail={asset.icon}
-                  onSelect={() => props.onSelect?.(asset)}
-                />
-              )
-          }
-        })}
+      {[
+        <p
+          key="mango"
+          style={{
+            marginLeft: '5px',
+            marginBottom: '10px',
+            fontWeight: 'bold',
+            fontSize: '15px',
+          }}
+        >
+          Mango Accounts Treasury: ${formatNumber(props.mangoAccountsValue)}
+        </p>,
+      ].concat(
+        props.assets
+          .filter((x) =>
+            showHiddenItems
+              ? true
+              : !props.itemsToHide.includes((x as any).address)
+          )
+          .map((asset, i) => {
+            switch (asset.type) {
+              case AssetType.Mint:
+                return (
+                  <MintListItem
+                    key={i}
+                    mint={asset}
+                    selected={props.selectedAssetId === asset.id}
+                    onSelect={() => props.onSelect?.(asset)}
+                  />
+                )
+              case AssetType.Domain:
+                return (
+                  <DomainListItem
+                    key={i}
+                    count={asset.count}
+                    selected={props.selectedAssetId === asset.id}
+                    onSelect={() => props.onSelect?.(asset)}
+                  />
+                )
+              case AssetType.Programs:
+                return (
+                  <ProgramsListItem
+                    key={i}
+                    count={asset.count}
+                    selected={props.selectedAssetId === asset.id}
+                    onSelect={() => props.onSelect?.(asset)}
+                  />
+                )
+              case AssetType.RealmAuthority:
+                return (
+                  <RealmAuthorityListItem
+                    key={i}
+                    name={asset.name}
+                    selected={props.selectedAssetId === asset.id}
+                    thumbnail={asset.icon}
+                    onSelect={() => props.onSelect?.(asset)}
+                  />
+                )
+              case AssetType.Stake:
+                return (
+                  <StakeListItem
+                    key={i}
+                    amount={asset.amount}
+                    publicKey={
+                      asset.raw.extensions.stake?.stakeAccount &&
+                      abbreviateAddress(
+                        asset.raw.extensions.stake.stakeAccount!
+                      )
+                    }
+                    onSelect={() => props.onSelect?.(asset)}
+                  ></StakeListItem>
+                )
+              case AssetType.Unknown:
+                return (
+                  <UnknownAssetListItem
+                    key={i}
+                    count={asset.count}
+                    name={asset.name}
+                    selected={props.selectedAssetId === asset.id}
+                    thumbnail={asset.icon}
+                    onSelect={() => props.onSelect?.(asset)}
+                  />
+                )
+            }
+          })
+      )}
     </Collapsible>
   )
 }
