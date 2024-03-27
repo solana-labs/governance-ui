@@ -53,7 +53,7 @@ export const MANGO_DAO_TREASURY = '9RGoboEjmaAjSCXsKi6p6zJucnwF3Eg5NUN9jPS6ziL3'
 // Well known account names displayed on the instruction card
 export const ACCOUNT_NAMES = {
   // Orca DAO Names
-  '6d76JcdNuTLoRarNCuinbjLSWr3dxJuY9uKVViz4HUf9': 'Signaling Governance',
+  '6d76JcdNuTLoRarNCuinbjLSWr3dxJuY9uKVViz4HUf9': 'Off-Chain Governance',
   '64FH4dmmEUFo427wNuHa2mC4TUa55U7iDqePd3PskMWE': 'Council Token Governance',
   '7VZTFBDyJK5pdoQWzi8gEHDuqdmHW8xwghbyQKUxjqVt': 'DAO Contract Governance',
 
