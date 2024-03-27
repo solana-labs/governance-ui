@@ -13,8 +13,10 @@ import VanillaAccountDetails from './VanillaAccountDetails'
 import GovernancePowerCard from '@components/GovernancePower/GovernancePowerCard'
 import SelectPrimaryDelegators from '@components/SelectPrimaryDelegators'
 import PythAccountDetails from 'PythVotePlugin/components/PythAccountDetails'
-import {useRealmVoterWeightPlugins} from "@hooks/useRealmVoterWeightPlugins";
-import {ReactNode} from "react";
+import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
+import { ReactNode } from 'react'
+import QuadraticVotingPower from '@components/ProposalVotingPower/QuadraticVotingPower'
+import VanillaVotingPower from '@components/GovernancePower/Power/Vanilla/VanillaVotingPower'
 
 const LockPluginTokenBalanceCard = dynamic(
   () =>
@@ -66,23 +68,24 @@ const TokenBalanceCardInner = ({
   inAccountDetails?: boolean
 }) => {
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
-  const { plugins }= useRealmVoterWeightPlugins('community');
-  const requiredCards = plugins?.voterWeight.map((plugin) => plugin.name);
+  const { plugins } = useRealmVoterWeightPlugins('community')
+  const requiredCards = plugins?.voterWeight.map((plugin) => plugin.name)
 
-  const showHeliumCard = requiredCards?.includes('HeliumVSR');
-  const showDefaultVSRCard = requiredCards?.includes('VSR');
-  const showPythCard = requiredCards?.includes('pyth');
-  const showNftCard = requiredCards?.includes('NFT');
-  const showGatewayCard = requiredCards?.includes('gateway');
+  const showHeliumCard = requiredCards?.includes('HeliumVSR')
+  const showDefaultVSRCard = requiredCards?.includes('VSR')
+  const showPythCard = requiredCards?.includes('pyth')
+  const showNftCard = requiredCards?.includes('NFT')
+  const showGatewayCard = requiredCards?.includes('gateway')
+  const showQvCard = requiredCards?.includes('QV')
 
   if (showDefaultVSRCard && inAccountDetails) {
     return <LockPluginTokenBalanceCard inAccountDetails={inAccountDetails} /> // does this ever actually occur in the component hierarchy?
   }
 
-  const cards: ReactNode[] = [];
+  const cards: ReactNode[] = []
 
   if (
-      showHeliumCard &&
+    showHeliumCard &&
     (!ownTokenRecord ||
       ownTokenRecord.account.governingTokenDepositAmount.isZero())
   ) {
@@ -107,29 +110,38 @@ const TokenBalanceCardInner = ({
     )
   }
 
-  if (showPythCard){
+  if (showPythCard) {
+    cards.push(
+      <>{inAccountDetails ? <PythAccountDetails /> : <GovernancePowerCard />}</>
+    )
+  }
+
+  if (showGatewayCard) {
+    cards.push(
+      <>{inAccountDetails ? <GatewayCard /> : <GovernancePowerCard />}</>
+    )
+  }
+
+  if (showQvCard) {
     cards.push(
       <>
-      {inAccountDetails ? <PythAccountDetails /> : <GovernancePowerCard />}
+        {inAccountDetails && (
+          <>
+            <QuadraticVotingPower role="community" />
+            <VanillaVotingPower role="council" hideIfZero />
+          </>
+        )}
       </>
     )
   }
 
-  if (showGatewayCard){
-    cards.push(
-        <>
-          {inAccountDetails ?  <GatewayCard /> : <GovernancePowerCard />}
-        </>
-    )
-  }
-
   //Default
-  if (cards.length === 0){
-  cards.push(
-    <>
-      {inAccountDetails ? <VanillaAccountDetails /> : <GovernancePowerCard />}
-    </>
-  )
+  if (cards.length === 0) {
+    cards.push(
+      <>
+        {inAccountDetails ? <VanillaAccountDetails /> : <GovernancePowerCard />}
+      </>
+    )
   }
 
   return <>{cards}</>

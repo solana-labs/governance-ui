@@ -1,5 +1,6 @@
 import EventsIcon from '@carbon/icons-react/lib/Events';
 import WarningFilledIcon from '@carbon/icons-react/lib/WarningFilled';
+import { Coefficients } from '@solana/governance-program-library';
 import { GoverningTokenType } from '@solana/spl-governance';
 import type { PublicKey } from '@solana/web3.js';
 import BigNumber from 'bignumber.js';
@@ -9,6 +10,7 @@ import { produce } from 'immer';
 import { Config } from '../fetchConfig';
 import { TokenTypeSelector } from '../TokenTypeSelector';
 import { VotingStructureSelector } from '../VotingStructureSelector';
+import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins';
 import { ButtonToggle } from '@hub/components/controls/ButtonToggle';
 import { Input } from '@hub/components/controls/Input';
 import { MAX_NUM } from '@hub/components/EditWalletRules/constants';
@@ -26,6 +28,7 @@ interface Props
     nftCollectionSize: number;
     nftCollectionWeight: BN;
     civicPassType: Config['civicPassType'];
+    qvCoefficients?: Coefficients;
     chainingEnabled: boolean;
   }> {
   currentConfigAccount: Config['configAccount'];
@@ -38,6 +41,9 @@ interface Props
 }
 
 export function CommunityStructure(props: Props) {
+  const { plugins } = useRealmVoterWeightPlugins();
+  const inOrderPlugins = plugins?.voterWeight.reverse();
+
   const currentVotingStructure = {
     votingProgramId:
       props.currentConfigAccount.communityTokenConfig.voterWeightAddin,
@@ -47,6 +53,7 @@ export function CommunityStructure(props: Props) {
     nftCollectionSize: props.currentNftCollectionSize,
     nftCollectionWeight: props.currentNftCollectionWeight,
     civicPassType: props.currentCivicPassType,
+    qvCoefficients: props.qvCoefficients,
   };
 
   const votingStructure = {
@@ -57,6 +64,7 @@ export function CommunityStructure(props: Props) {
     nftCollectionSize: props.nftCollectionSize,
     nftCollectionWeight: props.nftCollectionWeight,
     civicPassType: props.civicPassType,
+    qvCoefficients: props.qvCoefficients,
     chainingEnabled: props.chainingEnabled,
   };
 
@@ -189,6 +197,7 @@ export function CommunityStructure(props: Props) {
           )}
         </>
       )}
+
       {props.configAccount.communityTokenConfig.tokenType !==
         GoverningTokenType.Dormant && (
         <ValueBlock
@@ -196,6 +205,21 @@ export function CommunityStructure(props: Props) {
           title="What type of governance structure do you want your DAO’s community to use?"
           description=""
         >
+          {inOrderPlugins &&
+            inOrderPlugins?.length > 1 &&
+            inOrderPlugins.slice(0, -1).map((plugin) => {
+              return (
+                <>
+                  <button
+                    disabled={true}
+                    className="border mb-2 gap-x-4 grid-cols-[100px,1fr,20px] grid h-14 items-center px-4 rounded-md text-left transition-colors dark:bg-neutral-800 dark:border-neutral-700 w-full"
+                  >
+                    {plugin.name}{' '}
+                  </button>
+                  <div className="min-h-[40px] w-0 border-l dark:border-neutral-700 ml-2 mb-2" />
+                </>
+              );
+            })}
           <div>
             <VotingStructureSelector
               allowNFT
@@ -222,6 +246,7 @@ export function CommunityStructure(props: Props) {
                 nftCollectionSize,
                 nftCollectionWeight,
                 civicPassType,
+                qvCoefficients,
                 chainingEnabled,
               }) => {
                 const newConfig = produce(
@@ -264,6 +289,15 @@ export function CommunityStructure(props: Props) {
                     !props.civicPassType?.equals(civicPassType)
                   ) {
                     props.onCivicPassTypeChange?.(civicPassType);
+                  }
+
+                  if (
+                    typeof qvCoefficients !== 'undefined' &&
+                    !props?.qvCoefficients?.every((value) =>
+                      qvCoefficients.includes(value),
+                    )
+                  ) {
+                    props.onQvCoefficientsChange?.(qvCoefficients);
                   }
 
                   if (

@@ -1,8 +1,11 @@
 import ChevronDownIcon from '@carbon/icons-react/lib/ChevronDown';
+import { GATEWAY_PLUGINS_PKS, QV_PLUGINS_PKS } from '@constants/plugins';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import { Coefficients } from '@solana/governance-program-library';
 import { PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
 import { produce } from 'immer';
+
 import { useEffect, useRef, useState } from 'react';
 
 import { defaultPass } from '../../../../GatewayPlugin/config';
@@ -15,6 +18,7 @@ import { DEFAULT_NFT_VOTER_PLUGIN } from '@tools/constants';
 import { CivicConfigurator } from './CivicConfigurator';
 import { Custom } from './Custom';
 import { NFT } from './NFT';
+import { QVConfigurator } from './QVConfigurator';
 
 export const DEFAULT_NFT_CONFIG = {
   votingProgramId: new PublicKey(DEFAULT_NFT_VOTER_PLUGIN),
@@ -27,14 +31,12 @@ export const DEFAULT_VSR_CONFIG = {
 };
 
 export const DEFAULT_CIVIC_CONFIG = {
-  votingProgramId: new PublicKey(
-    'GgathUhdrCWRHowoRKACjgWhYHfxCEdBi5ViqYN6HVxk',
-  ),
+  votingProgramId: new PublicKey(GATEWAY_PLUGINS_PKS[0]),
   maxVotingProgramId: undefined,
 };
 
 export const DEFAULT_QV_CONFIG = {
-  votingProgramId: new PublicKey('quadCSapU8nTdLg73KHDnmdxKnJQsh7GUbu5tZfnRRr'),
+  votingProgramId: new PublicKey(QV_PLUGINS_PKS[0]),
   maxVotingProgramId: undefined, // the QV plugin does not use a max voting weight record.
 };
 
@@ -74,6 +76,7 @@ type VotingStructure = {
   nftCollectionWeight?: BN;
   civicPassType?: PublicKey;
   chainingEnabled?: boolean;
+  qvCoefficients?: Coefficients;
 };
 
 interface Props {
@@ -307,6 +310,17 @@ export function VotingStructureSelector(props: Props) {
                 data.nftCollectionWeight = value;
               });
 
+              props.onChange?.(newConfig);
+            }}
+          />
+        )}
+        {isQVConfig(props.structure) && (
+          <QVConfigurator
+            className="mt-2"
+            onCoefficientsChange={(value) => {
+              const newConfig = produce({ ...props.structure }, (data) => {
+                data.qvCoefficients = value ?? undefined;
+              });
               props.onChange?.(newConfig);
             }}
           />

@@ -1,7 +1,7 @@
 import { QV_PLUGINS_PKS } from '@constants/plugins'
 import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
 
-import {useVoterWeightPluginReadinessReturnType} from "./lib/types";
+import { useVoterWeightPluginReadinessReturnType } from './lib/types'
 
 export interface useQuadraticVoterWeightPluginReturnType
   extends useVoterWeightPluginReadinessReturnType {
@@ -11,7 +11,7 @@ export interface useQuadraticVoterWeightPluginReturnType
 export type Coefficients = [a: number, b: number, c: number]
 
 type QuadraticPluginParams = {
-  coefficients: Coefficients
+  quadraticCoefficients: Coefficients
 }
 
 export const useQuadraticVoterWeightPlugin = (): useQuadraticVoterWeightPluginReturnType => {
@@ -24,7 +24,7 @@ export const useQuadraticVoterWeightPlugin = (): useQuadraticVoterWeightPluginRe
   const isEnabled = quadraticPlugin !== undefined
   const coefficients = (
     (quadraticPlugin?.params as QuadraticPluginParams) || undefined
-  )?.coefficients
+  )?.quadraticCoefficients
 
   return {
     isReady,

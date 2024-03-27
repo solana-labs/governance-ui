@@ -72,6 +72,7 @@ export function Form(props: Props) {
         nftCollectionSize={props.config.nftCollectionSize}
         nftCollectionWeight={props.config.nftCollectionWeight}
         civicPassType={props.config.civicPassType}
+        qvCoefficients={props.config.qvCoefficients}
         chainingEnabled={props.config.chainingEnabled}
         onConfigChange={(config) => {
           const newConfig = produce(props.config, (data) => {
@@ -111,6 +112,13 @@ export function Form(props: Props) {
         onCivicPassTypeChange={(civicPassType) => {
           const newConfig = produce(props.config, (data) => {
             data.civicPassType = civicPassType;
+          });
+
+          props.onConfigChange?.(newConfig);
+        }}
+        onQvCoefficientsChange={(coeffcients) => {
+          const newConfig = produce(props.config, (data) => {
+            data.qvCoefficients = coeffcients;
           });
 
           props.onConfigChange?.(newConfig);

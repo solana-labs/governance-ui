@@ -81,24 +81,25 @@ const ConfigureGatewayPlugin = ({
       .object()
       .nullable()
       .required('Governed account is required'),
-    collection: yup
+    gatekeeperNetwork: yup
       .string()
       .test(
         'accountTests',
-        'Collection address validation error',
+        'Gatekeeper network address validation error',
         function (val: string) {
+          console.log('val', val)
           if (val) {
             try {
               return !!getValidatedPublickKey(val)
             } catch (e) {
-              console.log(e)
+              console.log("error with " + val, e)
               return this.createError({
                 message: `${e}`,
               })
             }
           } else {
             return this.createError({
-              message: `Collection address is required`,
+              message: `Gatekeeper network address is required`,
             })
           }
         }

@@ -5,10 +5,10 @@ import PythVotingPower from '../../../PythVotePlugin/components/PythVotingPower'
 import GatewayCard from '@components/Gateway/GatewayCard'
 import NftVotingPower from '@components/ProposalVotingPower/NftVotingPower'
 import LockedCommunityNFTRecordVotingPower from '@components/ProposalVotingPower/LockedCommunityNFTRecordVotingPower'
-import PluginVotingPower from '@components/ProposalVotingPower/PluginVotingPower'
 import { VSRCard } from '@components/GovernancePower/Power/VSRCard'
 import { VanillaCard } from '@components/GovernancePower/Power/Vanilla/VanillaCard'
 import DriftVotingPower from 'DriftStakeVoterPlugin/components/DriftVotingPower'
+import QuadraticVotingPower from '@components/ProposalVotingPower/QuadraticVotingPower'
 
 /****
  * Note to plugin implementors.
@@ -68,7 +68,7 @@ const CardForPlugin: FC<
     case 'gateway':
       return <GatewayCard />
     case 'QV':
-      return <PluginVotingPower role={role} />
+      return <QuadraticVotingPower role={role} />
     case 'drift':
       return <DriftVotingPower role={role} />
   }

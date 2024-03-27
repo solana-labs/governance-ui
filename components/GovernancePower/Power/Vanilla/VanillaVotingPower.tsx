@@ -132,7 +132,7 @@ export default function VanillaVotingPower({
       <div className={'p-3 rounded-md bg-bkg-1'}>
         <div className="text-fgd-3 text-xs">
           {tokenName}
-          {role === 'council' ? ' Council' : ''} Votes
+          {role === 'council' ? ' Council' : ''} votes
         </div>
         <div className="flex items-center justify-between mt-1">
           <div className=" flex flex-row gap-x-2">

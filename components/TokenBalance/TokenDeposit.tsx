@@ -16,6 +16,11 @@ import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import VanillaVotingPower from '@components/GovernancePower/Power/Vanilla/VanillaVotingPower'
 import { DepositTokensButton } from '@components/DepositTokensButton'
 import VanillaWithdrawTokensButton from './VanillaWithdrawTokensButton'
+import Button from '@components/Button'
+import { useJoinRealm } from '@hooks/useJoinRealm'
+import { Transaction } from '@solana/web3.js'
+import { sendTransaction } from '@utils/send'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 /** deposit + withdraw for vanilla govtokens, used only in account view. plugin views still use this for council. */
 export const TokenDeposit = ({
@@ -23,19 +28,26 @@ export const TokenDeposit = ({
   tokenRole,
   inAccountDetails,
   setHasGovPower,
+  hideVotes,
 }: {
   mint: MintInfo | undefined
   tokenRole: GoverningTokenRole
   inAccountDetails?: boolean
   setHasGovPower?: (hasGovPower: boolean) => void
+  hideVotes?: boolean
 }) => {
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
-
+  const {
+    userNeedsTokenOwnerRecord,
+    userNeedsVoterWeightRecords,
+    handleRegister,
+  } = useJoinRealm()
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
+  const { connection } = useConnection()
 
   const relevantTokenConfig =
     tokenRole === GoverningTokenRole.Community
@@ -82,6 +94,21 @@ export const TokenDeposit = ({
         )
       : '0'
 
+  const join = async () => {
+    const instructions = await handleRegister()
+    const transaction = new Transaction()
+    transaction.add(...instructions)
+
+    await sendTransaction({
+      transaction: transaction,
+      wallet: wallet!,
+      connection,
+      signers: [],
+      sendingMessage: `Registering`,
+      successMessage: `Registered`,
+    })
+  }
+
   useEffect(() => {
     if (availableTokens != '0' || hasTokensDeposited || hasTokensInWallet) {
       if (setHasGovPower) setHasGovPower(true)
@@ -96,6 +123,15 @@ export const TokenDeposit = ({
       ? availableTokens
       : 0
 
+  // There are two buttons available on this UI:
+  // The Deposit button - available if you have tokens to deposit
+  // The Join button - available if you have already deposited tokens (you have a Token Owner Record)
+  // but you may not have all your Voter Weight Records yet.
+  // This latter case may occur if the DAO changes its configuration and new Voter Weight Records are required.
+  // For example if a new plugin is added.
+  const showJoinButton =
+    !userNeedsTokenOwnerRecord && userNeedsVoterWeightRecords
+
   // Do not show deposits for mints with zero supply because nobody can deposit anyway
   if (!mint || mint.supply.isZero()) {
     return null
@@ -103,7 +139,7 @@ export const TokenDeposit = ({
 
   return (
     <div className="w-full">
-      {(availableTokens != '0' || inAccountDetails) && (
+      {(availableTokens != '0' || inAccountDetails) && !hideVotes && (
         <div className="flex items-center space-x-4">
           {tokenRole === GoverningTokenRole.Community ? (
             <VanillaVotingPower className="w-full" role="community" />
@@ -123,7 +159,11 @@ export const TokenDeposit = ({
       </div>
 
       <div className="flex flex-col mt-6 space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
-        {hasTokensInWallet || inAccountDetails ? (
+        {connected && showJoinButton ? (
+          <Button className="w-full" onClick={join}>
+            Update
+          </Button>
+        ) : hasTokensInWallet || inAccountDetails ? (
           <DepositTokensButton
             className="sm:w-1/2 max-w-[200px]"
             role={

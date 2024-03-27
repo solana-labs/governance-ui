@@ -222,14 +222,14 @@ export async function createTransaction(
         ? await configureQuadraticRegistrarIx(
             realmAccount,
             quadraticClient,
-            DEFAULT_COEFFICIENTS,
+            config.qvCoefficients || DEFAULT_COEFFICIENTS,
             predecessorPlugin,
           )
         : await createQuadraticRegistrarIx(
             realmAccount,
             wallet.publicKey,
             quadraticClient,
-            DEFAULT_COEFFICIENTS,
+            config.qvCoefficients || DEFAULT_COEFFICIENTS,
             predecessorPlugin,
           );
 
