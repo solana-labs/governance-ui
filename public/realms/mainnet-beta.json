@@ -3484,5 +3484,14 @@
     "realmId": "GgF6fHb3iM3Um5DtvwbZvpGpYTzYnr1RmZr4NkwHveGp",
     "website": "",
     "twitter": ""
+  },
+  {
+    "symbol": "MAIL",
+    "displayName": "MAIL DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "E4nirMjeAqxWoPLpii8NJwWBQNFArixA524XPArPVdyh",
+    "website": "https://solmail.so",
+    "twitter": "@SolMailOfficial",
+    "ogImage": "/realms/maildao/img/maildao-logo.png"
   }
 ]
