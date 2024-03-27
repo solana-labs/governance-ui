@@ -103,8 +103,6 @@ export class DriftVoterClient extends Client<DriftStakeVoter> {
       totalIfShares,
       insuranceFundVaultBalance
     )
-    console.log('drift voter clint', 3)
-    console.log('drift voter clint amount', amount.toString())
 
     return amount.add(inputVoterWeight)
   }
