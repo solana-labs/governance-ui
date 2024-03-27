@@ -48,10 +48,6 @@ export class DriftVoterClient extends Client<DriftStakeVoter> {
     mint: PublicKey,
     inputVoterWeight: BN
   ): Promise<BN | null> {
-    console.log('drift voter clint', 1)
-
-    // TODO get vanilla weight
-
     const { registrar: registrarPk } = this.getRegistrarPDA(realm, mint)
     const registrar = await this.program.account.registrar.fetch(registrarPk)
     const spotMarketIndex = registrar.spotMarketIndex // could just hardcode spotmarket pk
@@ -82,9 +78,8 @@ export class DriftVoterClient extends Client<DriftStakeVoter> {
       )
     } catch (e) {
       console.log('drift voter client', 'no insurance fund stake account found')
-      return new BN(0)
+      return new BN(0).add(inputVoterWeight)
     }
-    console.log('drift voter clint', 2)
 
     const insuranceFundVault = await fetchTokenAccountByPubkey(
       this.program.provider.connection,
@@ -153,6 +148,21 @@ export class DriftVoterClient extends Client<DriftStakeVoter> {
       spotMarketIndex
     )
 
+    const drift = new Program(DriftIDL, driftProgramId, this.program.provider)
+    let insuranceFundStake:
+      | Awaited<ReturnType<typeof drift.account.insuranceFundStake.fetch>>
+      | undefined
+    try {
+      insuranceFundStake = await drift.account.insuranceFundStake.fetch(
+        insuranceFundStakePk
+      )
+    } catch (e) {
+      console.log('drift voter client', 'no insurance fund stake account found')
+      insuranceFundStake = undefined
+    }
+    const stakePkOrNull =
+      insuranceFundStake === undefined ? null : insuranceFundStakePk
+
     const ix = await this.program.methods
       .updateVoterWeightRecord()
       .accountsStrict({
@@ -160,7 +170,7 @@ export class DriftVoterClient extends Client<DriftStakeVoter> {
         registrar: registrarPk,
         driftProgram: driftProgramId,
         spotMarket: spotMarketPk,
-        insuranceFundStake: insuranceFundStakePk,
+        insuranceFundStake: stakePkOrNull,
         insuranceFundVault: insuranceFundVaultPk,
         tokenOwnerRecord: tokenOwnerRecordPk,
       })
