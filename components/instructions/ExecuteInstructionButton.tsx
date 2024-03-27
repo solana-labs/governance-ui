@@ -11,24 +11,17 @@ import { CheckCircleIcon, PlayIcon, RefreshIcon } from '@heroicons/react/solid'
 import Button from '@components/Button'
 import { RpcContext } from '@solana/spl-governance'
 import useRealm from '@hooks/useRealm'
-import useWalletStore from 'stores/useWalletStore'
 import { ProgramAccount } from '@solana/spl-governance'
-import { PublicKey, Transaction } from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js'
 import Tooltip from '@components/Tooltip'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { notify } from '@utils/notifications'
-import {
-  InstructionOption,
-  InstructionOptions,
-} from '@components/InstructionOptions'
 import dayjs from 'dayjs'
-import {
-  getCastleReconcileInstruction,
-  getCastleRefreshInstructions,
-} from '@utils/instructions/Castle'
-import Wallet from '@project-serum/sol-wallet-adapter'
 import { getFormattedStringFromDays, SECS_PER_DAY } from '@utils/dateTools'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import queryClient from '@hooks/queries/queryClient'
+import { proposalQueryKeys } from '@hooks/queries/proposal'
 
 export enum PlayState {
   Played,
@@ -42,18 +35,15 @@ export function ExecuteInstructionButton({
   playing,
   setPlaying,
   proposalInstruction,
-  instructionOption,
 }: {
   proposal: ProgramAccount<Proposal>
   proposalInstruction: ProgramAccount<ProposalTransaction>
   playing: PlayState
   setPlaying: React.Dispatch<React.SetStateAction<PlayState>>
-  instructionOption: InstructionOption
 }) {
   const { realmInfo } = useRealm()
   const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection)
-  const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
+  const connection = useLegacyConnectionContext()
   const connected = !!wallet?.connected
 
   const [currentSlot, setCurrentSlot] = useState(0)
@@ -89,47 +79,10 @@ export function ExecuteInstructionButton({
     setPlaying(PlayState.Playing)
 
     try {
-      let preExecutionTransactions: Transaction[] | undefined = undefined
-      let adjacentTransaction: Transaction | undefined = undefined
-
-      // Depending on the instruction option, add the appropriate pre-execution
-      // and adjacent transactions to the proposal execution
-      switch (instructionOption) {
-        case InstructionOptions.castleRefresh:
-          adjacentTransaction = new Transaction().add(
-            ...(await getCastleRefreshInstructions(
-              rpcContext.connection,
-              (wallet as unknown) as Wallet,
-              proposalInstruction
-            ))
-          )
-          break
-        case InstructionOptions.castleReconcileRefresh: {
-          preExecutionTransactions = await getCastleReconcileInstruction(
-            rpcContext.connection,
-            (wallet as unknown) as Wallet,
-            proposalInstruction
-          )
-          adjacentTransaction = new Transaction().add(
-            ...(await getCastleRefreshInstructions(
-              rpcContext.connection,
-              (wallet as unknown) as Wallet,
-              proposalInstruction
-            ))
-          )
-          break
-        }
-      }
-
-      await executeTransaction(
-        rpcContext,
-        proposal,
-        proposalInstruction,
-        adjacentTransaction,
-        preExecutionTransactions
-      )
-
-      await refetchProposals()
+      await executeTransaction(rpcContext, proposal, proposalInstruction)
+      queryClient.invalidateQueries({
+        queryKey: proposalQueryKeys.all(connection.endpoint),
+      })
     } catch (error) {
       notify({ type: 'error', message: `error executing instruction ${error}` })
       console.log('error executing instruction', error)

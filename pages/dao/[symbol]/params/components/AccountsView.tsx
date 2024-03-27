@@ -22,7 +22,7 @@ const AccountsView = ({
         )
         .map((x) => {
           const info = getTreasuryAccountItemInfoV2(x)
-          if (x.isToken || x.isSol || x.type === AccountType.AuxiliaryToken) {
+          if (x.isToken || x.isSol || x.type === AccountType.AUXILIARY_TOKEN) {
             return (
               <div
                 className="bg-bkg-1 p-4 pb-2 rounded-md"

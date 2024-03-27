@@ -16,10 +16,18 @@ import { useEffect, useState } from 'react'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import InlineNotification from '@components/InlineNotification'
 import Link from 'next/link'
-import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
-import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
+import { TokenDeposit } from '@components/TokenBalance/TokenDeposit'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useRouter } from 'next/router'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import {
+  useRealmCommunityMintInfoQuery,
+  useRealmCouncilMintInfoQuery,
+} from '@hooks/queries/mintInfo'
+import { useVsrGovpower } from '@hooks/queries/plugins/vsr'
 
+/** UNUSED */
 const LockPluginTokenBalanceCard = ({
   proposal,
   inAccountDetails,
@@ -29,10 +37,16 @@ const LockPluginTokenBalanceCard = ({
 }) => {
   const [hasGovPower, setHasGovPower] = useState<boolean>(false)
   const { fmtUrlWithCluster } = useQueryContext()
-  const { councilMint, mint, realm, symbol, config } = useRealm()
-  const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
+  const realm = useRealmQuery().data?.result
+  const { symbol } = useRouter().query
+  const config = useRealmConfigQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const councilMint = useRealmCouncilMintInfoQuery().data?.result
+  const [tokenOwnerRecordPk, setTokenOwnerRecordPk] = useState('')
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
+  const walletPublicKey = wallet?.publicKey
+
   const isDepositVisible = (
     depositMint: MintInfo | undefined,
     realmMint: PublicKey | undefined
@@ -52,39 +66,35 @@ const LockPluginTokenBalanceCard = ({
     realm?.account.config.councilMint
   )
 
+  const defaultMint =
+    !mint?.supply.isZero() ||
+    config?.account.communityTokenConfig.maxVoterWeightAddin
+      ? realm?.account.communityMint
+      : !councilMint?.supply.isZero()
+      ? realm?.account.config.councilMint
+      : undefined
+
   useEffect(() => {
-    const getTokenOwnerRecord = async () => {
-      const defaultMint =
-        !mint?.supply.isZero() ||
-        config?.account.communityTokenConfig.maxVoterWeightAddin
-          ? realm!.account.communityMint
-          : !councilMint?.supply.isZero()
-          ? realm!.account.config.councilMint
-          : undefined
-      const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
-        realm!.owner,
-        realm!.pubkey,
-        defaultMint!,
-        wallet!.publicKey!
-      )
-      setTokenOwneRecordPk(tokenOwnerRecordAddress.toBase58())
-    }
-    if (realm && wallet?.connected) {
+    if (realm?.owner && walletPublicKey && defaultMint) {
+      const getTokenOwnerRecord = async () => {
+        const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
+          realm.owner,
+          realm.pubkey,
+          defaultMint,
+          walletPublicKey
+        )
+        setTokenOwnerRecordPk(tokenOwnerRecordAddress.toBase58())
+      }
       getTokenOwnerRecord()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [realm?.pubkey.toBase58(), wallet?.connected])
+  }, [defaultMint, realm, walletPublicKey])
 
   const hasLoaded = mint || councilMint
   return (
     <>
       <div className="flex items-center justify-between">
         <h3 className="mb-0">My governance power</h3>
-        <Link
-          href={fmtUrlWithCluster(
-            `/dao/${symbol}/account/${tokenOwnerRecordPk}`
-          )}
-        >
+        <Link href={fmtUrlWithCluster(`/dao/${symbol}/account/me`)}>
           <a
             className={`default-transition flex items-center text-fgd-2 text-sm transition-all hover:text-fgd-3 ${
               !connected || !tokenOwnerRecordPk
@@ -123,12 +133,10 @@ const LockPluginTokenBalanceCard = ({
               <TokenDeposit
                 mint={councilMint}
                 tokenRole={GoverningTokenRole.Council}
-                councilVote={true}
                 setHasGovPower={setHasGovPower}
               />
             </div>
           )}
-          <DelegateTokenBalanceCard />
         </>
       ) : (
         <>
@@ -152,11 +160,13 @@ const TokenDepositLock = ({
   inAccountDetails?: boolean
   setHasGovPower: (hasGovPower: boolean) => void
 }) => {
-  const { realm, realmTokenAccount, councilTokenAccount } = useRealm()
+  const realm = useRealmQuery().data?.result
+
+  const { realmTokenAccount, councilTokenAccount } = useRealm()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const deposits = useDepositStore((s) => s.state.deposits)
-  const votingPower = useDepositStore((s) => s.state.votingPower)
+  const votingPower = useVsrGovpower().data?.result ?? new BN(0)
   const votingPowerFromDeposits = useDepositStore(
     (s) => s.state.votingPowerFromDeposits
   )
@@ -170,13 +180,9 @@ const TokenDepositLock = ({
 
   const depositRecord = deposits.find(
     (x) =>
-      x.mint.publicKey.toBase58() === realm!.account.communityMint.toBase58() &&
+      x.mint.publicKey.toBase58() === realm?.account.communityMint.toBase58() &&
       x.lockup.kind.none
   )
-  // Do not show deposits for mints with zero supply because nobody can deposit anyway
-  if (!mint || mint.supply.isZero()) {
-    return null
-  }
 
   const depositTokenAccount =
     tokenRole === GoverningTokenRole.Community
@@ -208,13 +214,11 @@ const TokenDepositLock = ({
       ? fmtMintAmount(mint, depositRecord.amountDepositedNative)
       : '0'
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- TODO this is potentially quite serious! please fix next time the file is edited, -@asktree
   useEffect(() => {
     if (availableTokens != '0' || hasTokensDeposited || hasTokensInWallet) {
       setHasGovPower(true)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [availableTokens, hasTokensDeposited, hasTokensInWallet])
+  }, [availableTokens, hasTokensDeposited, hasTokensInWallet, setHasGovPower])
 
   const canShowAvailableTokensMessage = hasTokensInWallet && connected
   const tokensToShow =
@@ -223,6 +227,11 @@ const TokenDepositLock = ({
       : hasTokensInWallet
       ? availableTokens
       : 0
+
+  // Do not show deposits for mints with zero supply because nobody can deposit anyway
+  if (!mint || mint.supply.isZero()) {
+    return null
+  }
 
   return (
     <>
@@ -236,7 +245,7 @@ const TokenDepositLock = ({
           />
         </div>
       ) : null}
-      {votingPower.toNumber() > 0 && (
+      {!votingPower.isZero() && (
         <div className="flex space-x-4 items-center mt-4">
           <VotingPowerBox
             votingPower={votingPower}
@@ -246,6 +255,7 @@ const TokenDepositLock = ({
           ></VotingPowerBox>
         </div>
       )}
+
       {(availableTokens != '0' || lockTokensFmt != '0') && (
         <div className="pt-4 px-4">
           {availableTokens != '0' && (
@@ -267,9 +277,7 @@ const TokenDepositLock = ({
         </div>
       )}
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
-        <DepositCommunityTokensBtn
-          inAccountDetails={inAccountDetails}
-        ></DepositCommunityTokensBtn>
+        <DepositCommunityTokensBtn inAccountDetails={inAccountDetails} />
         {inAccountDetails && (
           <WithDrawCommunityTokens></WithDrawCommunityTokens>
         )}

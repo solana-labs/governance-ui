@@ -2,14 +2,15 @@ import Button, { SecondaryButton } from '@components/Button'
 import Loading from '@components/Loading'
 import Modal from '@components/Modal'
 import { ThumbDownIcon, ThumbUpIcon } from '@heroicons/react/solid'
+import { useGovernanceByPubkeyQuery } from '@hooks/queries/governance'
+import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
 import useCreateProposal from '@hooks/useCreateProposal'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import {
-  getGovernanceProgramVersion,
   getInstructionDataFromBase64,
-  Governance,
   ProgramAccount,
   Proposal,
   Realm,
@@ -24,7 +25,6 @@ import { notify } from '@utils/notifications'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 
 interface Props {
   onClose: () => void
@@ -33,7 +33,7 @@ interface Props {
   proposal: ProgramAccount<Proposal>
   voterTokenRecord: ProgramAccount<TokenOwnerRecord>
   realm: ProgramAccount<Realm>
-  currentGovernance?: ProgramAccount<Governance>
+  currentGovernancePk?: PublicKey
   programId?: PublicKey | null
 }
 export default function VoteProposalModal({
@@ -43,7 +43,7 @@ export default function VoteProposalModal({
   voterTokenRecord,
   programId,
   realm,
-  currentGovernance,
+  currentGovernancePk,
   proposal,
 }: Props) {
   const router = useRouter()
@@ -53,10 +53,13 @@ export default function VoteProposalModal({
   // const [comment, setComment] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const { wallet } = useWalletDeprecated()
 
   const { handleCreateProposal } = useCreateProposal()
+
+  const currentGovernance = useGovernanceByPubkeyQuery(currentGovernancePk).data
+    ?.result
 
   const submitVote = async (vote: YesNoVote) => {
     if (!wallet || !wallet.publicKey) {
@@ -76,7 +79,7 @@ export default function VoteProposalModal({
 
       const governanceAuthority = voterTokenRecord.account.governingTokenOwner
 
-      const programVersion = await getGovernanceProgramVersion(
+      const programVersion = await fetchProgramVersion(
         connection.current,
         programId
       )
@@ -130,7 +133,6 @@ export default function VoteProposalModal({
           data: getInstructionDataFromBase64(serialized),
           holdUpTime: currentGovernance.account.config.minInstructionHoldUpTime,
           prerequisiteInstructions: [],
-          shouldSplitIntoSeparateTxs: true,
         }
         instructionsData.push(data)
       })

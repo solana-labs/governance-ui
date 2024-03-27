@@ -5,7 +5,6 @@ import Input from 'components/inputs/Input'
 import Button, { LinkButton } from '@components/Button'
 import Textarea from 'components/inputs/Textarea'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
-import useWalletStore from 'stores/useWalletStore'
 import { validateBuffer } from 'utils/validations'
 import { useEffect, useState } from 'react'
 import {
@@ -16,7 +15,6 @@ import {
   getInstructionDataFromBase64,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
-import { Governance, ProgramAccount } from '@solana/spl-governance'
 import { useRouter } from 'next/router'
 import { notify } from 'utils/notifications'
 import useQueryContext from 'hooks/useQueryContext'
@@ -24,39 +22,34 @@ import { validateInstruction } from 'utils/instructionTools'
 import * as yup from 'yup'
 import { createUpgradeInstruction } from '@tools/sdk/bpfUpgradeableLoader/createUpgradeInstruction'
 import { debounce } from '@utils/debounce'
-import { isFormValid } from '@utils/formValidation'
+import { isFormValid, validatePubkey } from '@utils/formValidation'
 import ProgramUpgradeInfo from 'pages/dao/[symbol]/proposal/components/instructions/bpfUpgradeableLoader/ProgramUpgradeInfo'
 import { getProgramName } from '@components/instructions/programs/names'
 import useCreateProposal from '@hooks/useCreateProposal'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 interface UpgradeProgramCompactForm extends ProgramUpgradeForm {
   description: string
   title: string
 }
 
-const UpgradeProgram = ({
-  program,
-}: {
-  program: ProgramAccount<Governance>
-}) => {
+const UpgradeProgram = ({ program }: { program: AssetAccount }) => {
   const router = useRouter()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
-  const { assetAccounts } = useGovernanceAssets()
-  const governedAccount = assetAccounts.find(
-    (x) => x.governance.pubkey.toBase58() === program.pubkey.toBase58()
-  )
   const { handleCreateProposal } = useCreateProposal()
   const { fmtUrlWithCluster } = useQueryContext()
-  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const { symbol } = router.query
-  const { realmInfo, canChooseWhoVote, realm } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { realmInfo, canChooseWhoVote } = useRealm()
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<UpgradeProgramCompactForm>({
-    governedAccount: governedAccount,
+    governedAccount: program,
     programId: programId?.toString(),
+    bufferSpillAddress: wallet?.publicKey ? wallet.publicKey.toBase58() : '',
     bufferAddress: '',
     description: '',
     title: '',
@@ -65,8 +58,8 @@ const UpgradeProgram = ({
   const [showOptions, setShowOptions] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
-  const proposalTitle = `Upgrade ${form.governedAccount?.governance?.account.governedAccount.toBase58()}`
-  const name = program ? getProgramName(program.account.governedAccount) : ''
+  const proposalTitle = `Upgrade ${form.governedAccount?.pubkey.toBase58()}`
+  const name = program ? getProgramName(program.pubkey) : ''
 
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
@@ -81,7 +74,7 @@ const UpgradeProgram = ({
             await validateBuffer(
               connection,
               val,
-              form.governedAccount?.governance?.pubkey
+              form.governedAccount?.extensions.program?.authority
             )
             return true
           } catch (e) {
@@ -94,6 +87,12 @@ const UpgradeProgram = ({
             message: `Buffer address is required`,
           })
         }
+      }),
+    bufferSpillAddress: yup
+      .string()
+      .required("Spill account is required")
+      .test('is-spill-account-valid', 'Invalid Spill Account', function (val: string) {
+        return val ? validatePubkey(val) : true
       }),
     governedAccount: yup
       .object()
@@ -110,10 +109,10 @@ const UpgradeProgram = ({
       wallet?.publicKey
     ) {
       const upgradeIx = await createUpgradeInstruction(
-        form.governedAccount.governance.account.governedAccount,
+        form.governedAccount.pubkey,
         new PublicKey(form.bufferAddress),
-        form.governedAccount.governance.pubkey,
-        wallet!.publicKey
+        form.governedAccount.extensions.program!.authority,
+        new PublicKey(form.bufferSpillAddress!)
       )
       serializedInstruction = serializeInstructionToBase64(upgradeIx)
     }
@@ -143,15 +142,10 @@ const UpgradeProgram = ({
         prerequisiteInstructions: instruction.prerequisiteInstructions || [],
       }
       try {
-        // Fetch governance to get up to date proposalCount
-        const selectedGovernance = (await fetchRealmGovernance(
-          governance?.pubkey
-        )) as ProgramAccount<Governance>
-
         proposalAddress = await handleCreateProposal({
           title: form.title ? form.title : proposalTitle,
           description: form.description ? form.description : '',
-          governance: selectedGovernance,
+          governance: governance!,
           instructionsData: [instructionData],
           voteByCouncil,
           isDraft: false,
@@ -201,8 +195,21 @@ const UpgradeProgram = ({
           noMaxWidth={true}
           error={formErrors['bufferAddress']}
         />
+        <Input
+          label="Spill account"
+          value={form.bufferSpillAddress}
+          type="text"
+          onChange={(evt) =>
+            handleSetForm({
+              value: evt.target.value,
+              propertyName: 'bufferSpillAddress',
+            })
+          }
+          noMaxWidth={true}
+          error={formErrors['bufferSpillAddress']}
+        />
         <ProgramUpgradeInfo
-          governancePk={form.governedAccount?.governance?.pubkey}
+          authority={form.governedAccount?.extensions.program?.authority}
         />
         <LinkButton
           className="flex items-center text-primary-light"

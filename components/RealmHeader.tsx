@@ -4,13 +4,13 @@ import { ChatAlt2Icon, CogIcon, UsersIcon } from '@heroicons/react/outline'
 import { ChevronLeftIcon } from '@heroicons/react/solid'
 import Link from 'next/link'
 import useQueryContext from 'hooks/useQueryContext'
-
-import useMembersStore from 'stores/useMembersStore'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 
 const RealmHeader = () => {
   const { fmtUrlWithCluster } = useQueryContext()
-  const { realmInfo, realmDisplayName, symbol, config } = useRealm()
-  const activeMembers = useMembersStore((s) => s.compact.activeMembers)
+  const config = useRealmConfigQuery().data?.result
+  const { realmInfo, symbol } = useRealm()
+
   const isBackNavVisible = realmInfo?.symbol !== 'ORCA' // hide backnav for the default realm
 
   const forumUrl = `https://forums.orca.so/`
@@ -31,7 +31,7 @@ const RealmHeader = () => {
         ) : null}
       </div>
       <div className="flex flex-col items-center md:flex-row md:justify-between">
-        {realmDisplayName ? (
+        {realmInfo?.displayName ? (
           <div className="flex items-center">
             <div className="flex flex-col items-center pb-3 md:flex-row md:pb-0">
               {/* {realmInfo?.ogImage ? (
@@ -57,7 +57,7 @@ const RealmHeader = () => {
             <Link href={fmtUrlWithCluster(`/dao/${symbol}/members`)}>
               <a className="flex items-center text-sm cursor-pointer default-transition text-fgd-2 hover:text-fgd-3">
                 <UsersIcon className="flex-shrink-0 w-5 h-5 mr-1" />
-                Members ({activeMembers.length})
+                Members
               </a>
             </Link>
           )}

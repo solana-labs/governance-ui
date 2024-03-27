@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
 import * as yup from 'yup'
 import {
   Governance,
@@ -8,19 +8,17 @@ import {
 import { validateInstruction } from '@utils/instructionTools'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
-import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NewProposalContext } from '../../../new'
-import InstructionForm, {
-  InstructionInput,
-  InstructionInputType,
-} from '../FormCreator'
+import InstructionForm, { InstructionInput } from '../FormCreator'
+import { InstructionInputType } from '../inputInstructionType'
 import { PublicKey } from '@solana/web3.js'
 import { getValidatedPublickKey } from '@utils/validations'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { getRegistrarPDA } from '@utils/plugin/accounts'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import {configureCivicRegistrarIx} from "@utils/plugin/gateway";
 
 interface ConfigureGatewayForm {
   governedAccount: AssetAccount | undefined
@@ -36,7 +34,7 @@ const ConfigureGatewayPlugin = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { realm } = useRealm()
+  const realm = useRealmQuery().data?.result
   const gatewayClient = useVotePluginsClientStore((s) => s.state.gatewayClient)
   const { assetAccounts } = useGovernanceAssets()
   const wallet = useWalletOnePointOh()
@@ -57,24 +55,11 @@ const ConfigureGatewayPlugin = ({
       form!.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const remainingAccounts = form!.predecessor
-        ? [{ pubkey: form!.predecessor, isSigner: false, isWritable: false }]
-        : []
-      const { registrar } = await getRegistrarPDA(
-        realm!.pubkey,
-        realm!.account.communityMint,
-        gatewayClient!.program.programId
+      const configureRegistrarTx = await configureCivicRegistrarIx(
+          realm!,
+          gatewayClient!,
+          chosenGatekeeperNetwork!,
       )
-      const configureRegistrarTx = await gatewayClient!.program.methods
-        .configureRegistrar(false)
-        .accounts({
-          registrar,
-          realm: realm!.pubkey,
-          realmAuthority: realm!.account.authority!,
-          gatekeeperNetwork: chosenGatekeeperNetwork,
-        })
-        .remainingAccounts(remainingAccounts)
-        .instruction()
       serializedInstruction = serializeInstructionToBase64(configureRegistrarTx)
     }
     return {

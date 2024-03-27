@@ -71,7 +71,6 @@ export default async function getMeanCreateAccountInstruction({
       isValid: true,
       governance: governedTokenAccount?.governance,
       additionalSerializedInstructions,
-      shouldSplitIntoSeparateTxs: true,
     }
     return obj
   }
@@ -81,7 +80,6 @@ export default async function getMeanCreateAccountInstruction({
     isValid: false,
     governance: governedTokenAccount?.governance,
     additionalSerializedInstructions: [],
-    shouldSplitIntoSeparateTxs: true,
   }
 
   return obj

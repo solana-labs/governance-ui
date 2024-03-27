@@ -2,7 +2,6 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Stream } from '@mean-dao/payment-streaming'
 import { Governance, ProgramAccount } from '@solana/spl-governance'
 import React, { useContext, useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 
 import Input from '@components/inputs/Input'
 import getMeanTransferStreamInstruction from '@utils/instructions/Mean/getMeanTransferStreamInstruction'
@@ -11,6 +10,7 @@ import { getMeanTransferStreamSchema } from '@utils/validations'
 
 import { NewProposalContext } from '../../../new'
 import SelectStream from './SelectStream'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 interface Props {
   index: number
@@ -33,7 +33,7 @@ const MeanTransferStreamComponent = ({ index, governance }: Props) => {
   }
 
   // instruction
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
 
   const schema = getMeanTransferStreamSchema()
   const { handleSetInstructions } = useContext(NewProposalContext)

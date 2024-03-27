@@ -9,6 +9,7 @@ import { map, Status } from '@utils/uiTypes/Result'
 import useTreasuryInfo from '@hooks/useTreasuryInfo'
 import { AuxiliaryWallet, Wallet } from '@models/treasury/Wallet'
 import { Asset } from '@models/treasury/Asset'
+import { useTreasurySelectState } from '@components/treasuryV2/Details/treasurySelectStore'
 
 export default function Treasury() {
   const data = useTreasuryInfo()
@@ -43,6 +44,21 @@ export default function Treasury() {
     return () => observer.current?.disconnect()
   }, [stickyTracker, observer, setIsStickied])
 
+  const [treasurySelect, setTreasurySelect] = useTreasurySelectState()
+
+  // @asktree: We are migrating away from prop-drilling data as state towards, a hook that manages state (and no data)
+  // But for now views can use either
+
+  // If the new system is used, then the legacy prop-drilled data and state should just be a special value.
+  const legacySelectedWallet =
+    treasurySelect?._kind === 'Legacy'
+      ? selectedWallet
+      : ('USE NON-LEGACY STATE' as const)
+  const legacySelectedAsset =
+    treasurySelect?._kind === 'Legacy'
+      ? selectedAsset
+      : ('USE NON-LEGACY STATE' as const)
+
   return (
     <div className="rounded-lg bg-bkg-2 p-6 min-h-full flex flex-col">
       <header className="space-y-6 border-b border-white/10 pb-4">
@@ -70,15 +86,17 @@ export default function Treasury() {
               wallets: data.wallets,
             }))
           )}
-          selectedAsset={selectedAsset}
-          selectedWallet={selectedWallet}
+          selectedAsset={legacySelectedAsset}
+          selectedWallet={legacySelectedWallet}
           onSelectAsset={(asset, wallet) => {
             setSelectedWallet(wallet)
             setSelectedAsset(() => asset)
+            setTreasurySelect({ _kind: 'Legacy' })
           }}
           onSelectWallet={(wallet) => {
             setSelectedWallet(() => wallet)
             setSelectedAsset(null)
+            setTreasurySelect({ _kind: 'Legacy' })
           }}
         />
         <div>
@@ -91,8 +109,8 @@ export default function Treasury() {
             <Details
               className="pt-4"
               data={map(() => ({
-                asset: selectedAsset,
-                wallet: selectedWallet,
+                asset: legacySelectedAsset,
+                wallet: legacySelectedWallet,
               }))(data)}
               isStickied={isStickied}
             />

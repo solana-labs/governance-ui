@@ -27,14 +27,12 @@ export default function VotingPowerPct(props: Props) {
       className={classNames(
         props.className,
         'leading-[15px]',
-        'text-[11px]',
+        'text-xs',
         'text-right',
-        'text-white/70'
+        'text-fgd-2'
       )}
     >
       {getPct(props.amount, props.total)}% of total
-      <br />
-      voting power
     </div>
   )
 }

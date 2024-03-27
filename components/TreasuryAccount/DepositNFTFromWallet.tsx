@@ -1,128 +1,162 @@
-import React, { useEffect, useRef, useState } from 'react'
-import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import useWalletStore from 'stores/useWalletStore'
+import { useState } from 'react'
 import Button from '@components/Button'
 import Tooltip from '@components/Tooltip'
-import { NFTWithMint } from '@utils/uiTypes/nfts'
-import { notify } from '@utils/notifications'
-import { web3 } from '@coral-xyz/anchor'
-import {
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  Token,
-  TOKEN_PROGRAM_ID,
-} from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
-import { createATA } from '@utils/ataTools'
-import { getTokenAccountsByMint } from '@utils/tokens'
-import { sendTransaction } from '@utils/send'
-import NFTSelector, { NftSelectorFunctions } from '@components/NFTS/NFTSelector'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import NFTSelector from '@components/NFTS/NFTSelector'
 import NFTAccountSelect from './NFTAccountSelect'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { notify } from '@utils/notifications'
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  TOKEN_PROGRAM_ID,
+  Token,
+} from '@solana/spl-token'
+import { createATA } from '@utils/ataTools'
+import { createIx_transferNft } from '@utils/metaplex'
+import { SequenceType, sendTransactionsV3 } from '@utils/sendTransactions'
+import { getNativeTreasuryAddress } from '@solana/spl-governance'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import useGovernanceSelect from '@hooks/useGovernanceSelect'
+import queryClient from '@hooks/queries/queryClient'
+import {
+  digitalAssetsQueryKeys,
+  fetchDigitalAssetById,
+} from '@hooks/queries/digitalAssets'
+import { getNetworkFromEndpoint } from '@utils/connection'
+import { buildTransferCnftInstruction } from '@hooks/instructions/useTransferCnftInstruction'
+import { useRealmQuery } from '@hooks/queries/realm'
+import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
+
+const useMetaplexDeposit = () => {
+  const wallet = useWalletOnePointOh()
+  const connection = useLegacyConnectionContext()
+  const realm = useRealmQuery().data?.result
+
+  return async (nftId: PublicKey, governance: PublicKey) => {
+    if (!wallet?.publicKey) throw new Error()
+    if (realm === undefined) throw new Error()
+
+    // ostensibly currentAccount should in fact be a native treasury, but I haven't verified this.
+    const toOwner = await getNativeTreasuryAddress(realm.owner, governance)
+    const network = getNetworkFromEndpoint(connection.current.rpcEndpoint)
+    if (network === 'localnet') throw new Error()
+    const nft = (await fetchDigitalAssetById(network, nftId)).result
+    if (nft === undefined) throw new Error('nft not found')
+
+    const ix = nft.compression?.compressed
+      ? await buildTransferCnftInstruction(connection.current, nftId, toOwner)
+      : await createIx_transferNft(
+          connection.current,
+          wallet.publicKey,
+          toOwner,
+          nftId,
+          wallet.publicKey,
+          wallet.publicKey
+        )
+
+    await sendTransactionsV3({
+      connection: connection.current,
+      wallet,
+      transactionInstructions: [
+        {
+          instructionsSet: [{ transactionInstruction: ix }],
+          sequenceType: SequenceType.Parallel,
+        },
+      ],
+    })
+  }
+}
 
 const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
-  const nftSelectorRef = useRef<NftSelectorFunctions>(null)
-  const { setCurrentAccount } = useTreasuryAccountStore()
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
-  const { getNfts } = useTreasuryAccountStore()
-  const [selectedNfts, setSelectedNfts] = useState<NFTWithMint[]>([])
+  const [selectedNfts, setSelectedNfts] = useState<PublicKey[]>([])
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const [isLoading, setIsLoading] = useState(false)
-  const [sendingSuccess, setSendingSuccess] = useState(false)
-  const { nftsGovernedTokenAccounts } = useGovernanceAssets()
+
+  const deposit = useMetaplexDeposit()
+
+  const [selectedGovernance, setSelectedGovernance] = useGovernanceSelect(
+    currentAccount?.governance.pubkey
+  )
+  const realm = useRealmQuery().data?.result
 
   const handleDeposit = async () => {
-    for (const i of selectedNfts) {
+    if (selectedGovernance === undefined) throw new Error()
+    if (realm === undefined) throw new Error()
+
+    // really these should probably get batched into one TX or whatever.
+    for (const nftMint of selectedNfts) {
       setIsLoading(true)
-      setSendingSuccess(false)
-      try {
-        const owner = currentAccount?.isSol
-          ? currentAccount.extensions.transferAddress!
-          : currentAccount!.governance!.pubkey
-        const ConnectedWalletAddress = wallet?.publicKey
-        const selectedNft = i
-        const nftMintPk = new PublicKey(selectedNft.mintAddress)
-        const tokenAccountsWithNftMint = await getTokenAccountsByMint(
-          connection.current,
-          nftMintPk.toBase58()
-        )
-        //we find ata from connected wallet that holds the nft
-        const fromAddress = tokenAccountsWithNftMint.find(
-          (x) =>
-            x.account.owner.toBase58() === ConnectedWalletAddress?.toBase58()
-        )?.publicKey
-        //we check is there ata created for nft before
-        const doseAtaForReciverAddressExisit = tokenAccountsWithNftMint.find(
-          (x) => x.account.owner.toBase58() === owner.toBase58()
+
+      const network = getNetworkFromEndpoint(connection.current.rpcEndpoint)
+      if (network === 'localnet') throw new Error()
+
+      const nft = (await fetchDigitalAssetById(network, nftMint)).result
+      if (nft === undefined) throw new Error('nft not found')
+      if (nft.compression.compressed === false) {
+        const owner = await getNativeTreasuryAddress(
+          realm.owner,
+          selectedGovernance
         )
 
         const ataPk = await Token.getAssociatedTokenAddress(
           ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
           TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-          nftMintPk, // mint
+          nftMint, // mint
           owner!, // owner
           true
         )
-        if (!doseAtaForReciverAddressExisit) {
+
+        const ataQueried = await connection.current.getAccountInfo(ataPk)
+
+        if (ataQueried === null) {
           await createATA(
             connection.current,
             wallet,
-            nftMintPk,
+            nftMint,
             owner!,
             wallet!.publicKey!
           )
         }
-        const transaction = new web3.Transaction().add(
-          Token.createTransferInstruction(
-            TOKEN_PROGRAM_ID,
-            fromAddress!,
-            ataPk,
-            wallet!.publicKey!,
-            [],
-            1
-          )
-        )
-        await sendTransaction({
-          connection: connection.current,
-          wallet: wallet!,
-          transaction,
-          sendingMessage: 'Depositing NFT',
-          successMessage: 'NFT has been deposited',
-        })
-        setSendingSuccess(true)
-        nftSelectorRef.current?.handleGetNfts()
-        getNfts(nftsGovernedTokenAccounts, connection)
-      } catch (e) {
-        notify({
-          type: 'error',
-          message: 'Unable to send selected nft',
-        })
       }
+
+      await deposit(new PublicKey(nftMint), selectedGovernance)
+        .then(() => {
+          queryClient.invalidateQueries(digitalAssetsQueryKeys.all(network))
+        })
+        .catch((e) => {
+          notify({
+            type: 'error',
+            message: 'Unable to send selected nft',
+          })
+          throw e
+        })
+
       setIsLoading(false)
     }
   }
 
-  useEffect(() => {
-    if (sendingSuccess) {
-      setCurrentAccount(currentAccount!, connection)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [connected, sendingSuccess])
+  const walletPk = wallet?.publicKey
 
   return (
     <>
-      <NFTAccountSelect
-        onChange={(value) => setCurrentAccount(value, connection)}
-        currentAccount={currentAccount}
-        nftsGovernedTokenAccounts={nftsGovernedTokenAccounts}
-      ></NFTAccountSelect>
-      <NFTSelector
-        ref={nftSelectorRef}
-        ownersPk={[wallet!.publicKey!]}
-        onNftSelect={(selected) => setSelectedNfts(selected)}
-      ></NFTSelector>
+      {selectedGovernance && (
+        <NFTAccountSelect
+          onChange={setSelectedGovernance}
+          selectedGovernance={selectedGovernance}
+        />
+      )}
+      {walletPk ? (
+        <NFTSelector
+          owner={walletPk}
+          setSelectedNfts={setSelectedNfts}
+          selectedNfts={selectedNfts}
+        />
+      ) : (
+        'Please connect your wallet'
+      )}
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
         <div className="ml-auto">
           {additionalBtns}

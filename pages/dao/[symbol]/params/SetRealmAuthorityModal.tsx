@@ -8,12 +8,13 @@ import {
   withSetRealmAuthority,
 } from '@solana/spl-governance'
 import useRealm from '@hooks/useRealm'
-import useWalletStore from 'stores/useWalletStore'
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
 import { sendTransaction } from '@utils/send'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import GovernanceAccountSelect from '../proposal/components/GovernanceAccountSelect'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const SetRealmAuthorityModal = ({
   closeModal,
@@ -22,10 +23,10 @@ const SetRealmAuthorityModal = ({
   closeModal: () => void
   isOpen: boolean
 }) => {
-  const { realmInfo, realm } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const { realmInfo } = useRealm()
   const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection)
-  const { fetchRealm, fetchAllRealms } = useWalletStore((s) => s.actions)
+  const connection = useLegacyConnectionContext()
   const { governancesArray } = useGovernanceAssets()
   const [account, setAccount] = useState<ProgramAccount<Governance> | null>(
     null
@@ -53,8 +54,6 @@ const SetRealmAuthorityModal = ({
       sendingMessage: `Setting authority`,
       successMessage: `Authority set`,
     })
-    await fetchAllRealms(realmInfo!.programId)
-    await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
     setSettingAuthority(false)
     closeModal()
   }

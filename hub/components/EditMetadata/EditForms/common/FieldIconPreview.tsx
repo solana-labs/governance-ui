@@ -18,8 +18,10 @@ export function FieldIconPreview(props: Props) {
   useEffect(() => {
     setIsValid(true);
   }, [setIsValid, props.url]);
-
-  if (props.url?.includes('www.youtube.com') && props.allowYoutube) {
+  if (
+    props.url?.startsWith('youtube.com/') ||
+    (props.url?.startsWith('youtu.be/') && props.allowYoutube)
+  ) {
     return (
       <div
         className={cx(
@@ -37,7 +39,7 @@ export function FieldIconPreview(props: Props) {
             allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
             frameBorder="0"
             height="100%"
-            src={getYoutubeEmbedUrl(props.url)}
+            src={getYoutubeEmbedUrl(props.url) || ''}
             width="100%"
           />
         </AspectRatio.Root>

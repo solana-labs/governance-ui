@@ -1,9 +1,9 @@
 import { XCircleIcon, CheckCircleIcon } from '@heroicons/react/outline'
 import { BanIcon } from '@heroicons/react/solid'
-import useProposal from '@hooks/useProposal'
 import useProposalVotes from '@hooks/useProposalVotes'
-import { ProposalState } from '@solana/spl-governance'
-import { useVetoingPop } from './VotePanel/VetoButtons'
+import { GovernanceAccountType, ProposalState, VoteType } from '@solana/spl-governance'
+import { useRouteProposalQuery } from '@hooks/queries/proposal'
+import { useVetoingPop } from './VotePanel/hooks'
 
 const VetoResult = () => {
   const vetoingPop = useVetoingPop()
@@ -22,8 +22,15 @@ const ApprovalResult = () => (
   </div>
 )
 
+const MultiChoiceResult = () => (
+  <div className="bg-bkg-1 flex items-center p-3 rounded-md">
+    <CheckCircleIcon className="h-5 mr-1.5 text-green w-5" />
+    <h4 className="mb-0">The proposal is completed</h4>
+  </div>
+)
+
 const FailResult = () => {
-  const { proposal } = useProposal()
+  const proposal = useRouteProposalQuery().data?.result
   const voteData = useProposalVotes(proposal?.account)
 
   return voteData.yesVotesRequired === undefined ? null : (
@@ -55,7 +62,7 @@ const FailResult = () => {
 }
 
 const VoteResultStatus = () => {
-  const { proposal } = useProposal()
+  const proposal = useRouteProposalQuery().data?.result
 
   const status =
     proposal &&
@@ -69,7 +76,13 @@ const VoteResultStatus = () => {
       ? 'vetoed'
       : 'denied')
 
-  return status === undefined ? null : status === 'approved' ? (
+  const isMulti = proposal?.account.voteType !== VoteType.SINGLE_CHOICE
+   && proposal?.account.accountType === GovernanceAccountType.ProposalV2
+
+  return status === undefined ? null : status === 'approved' ? isMulti ?
+  (
+    <MultiChoiceResult />
+  ) : (    
     <ApprovalResult />
   ) : status === 'vetoed' ? (
     <VetoResult />

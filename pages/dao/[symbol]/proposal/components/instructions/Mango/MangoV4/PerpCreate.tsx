@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import {
   Keypair,
   PublicKey,
@@ -13,16 +13,19 @@ import { NewProposalContext } from '../../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
-import InstructionForm, {
-  InstructionInput,
-  InstructionInputType,
-} from '../../FormCreator'
+import InstructionForm, { InstructionInput } from '../../FormCreator'
+import { InstructionInputType } from '../../inputInstructionType'
 import UseMangoV4 from '@hooks/useMangoV4'
 import { BN } from '@coral-xyz/anchor'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import ForwarderProgram, {
+  useForwarderProgramHelpers,
+} from '@components/ForwarderProgram/ForwarderProgram'
+import ProgramSelector from '@components/Mango/ProgramSelector'
+import useProgramSelector from '@components/Mango/useProgramSelector'
 
 interface PerpCreateForm {
   governedAccount: AssetAccount | null
@@ -56,6 +59,7 @@ interface PerpCreateForm {
   positivePnlLiquidationFee: number
   perpMarketIndex: number
   holdupTime: number
+  platformLiquidationFee: number
 }
 
 const PerpCreate = ({
@@ -66,7 +70,11 @@ const PerpCreate = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletOnePointOh()
-  const { mangoClient, mangoGroup, getAdditionalLabelInfo } = UseMangoV4()
+  const programSelectorHook = useProgramSelector()
+  const { mangoClient, mangoGroup, getAdditionalLabelInfo } = UseMangoV4(
+    programSelectorHook.program?.val,
+    programSelectorHook.program?.group
+  )
   const { assetAccounts } = useGovernanceAssets()
   const solAccounts = assetAccounts.filter(
     (x) =>
@@ -74,7 +82,7 @@ const PerpCreate = ({
       mangoGroup?.admin &&
       x.extensions.transferAddress?.equals(mangoGroup?.admin)
   )
-  const { connection } = useWalletStore()
+  const connection = useLegacyConnectionContext()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<PerpCreateForm>({
     governedAccount: null,
@@ -108,9 +116,11 @@ const PerpCreate = ({
     settlePnlLimitWindowSize: 60 * 60,
     positivePnlLiquidationFee: 0,
     holdupTime: 0,
+    platformLiquidationFee: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
+  const forwarderProgramHelpers = useForwarderProgramHelpers()
 
   const validateInstruction = async (): Promise<boolean> => {
     const { isValid, validationErrors } = await isFormValid(schema, form)
@@ -201,7 +211,8 @@ const PerpCreate = ({
           Number(form.settleTokenIndex),
           Number(form.settlePnlLimitFactor),
           new BN(form.settlePnlLimitWindowSize),
-          Number(form.positivePnlLiquidationFee)
+          Number(form.positivePnlLiquidationFee),
+          Number(form.platformLiquidationFee)
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -215,14 +226,16 @@ const PerpCreate = ({
         .signers([bids, asks, eventQueue])
         .instruction()
 
-      serializedInstruction = serializeInstructionToBase64(ix)
+      serializedInstruction = serializeInstructionToBase64(
+        forwarderProgramHelpers.withForwarderWrapper(ix)
+      )
     }
     const obj: UiInstruction = {
       prerequisiteInstructions: prerequisiteInstructions,
       prerequisiteInstructionsSigners: prerequisiteInstructionsSigners,
-      shouldSplitIntoSeparateTxs: true,
       serializedInstruction: serializedInstruction,
       isValid,
+      chunkBy: 1,
       governance: form.governedAccount?.governance,
       customHoldUpTime: form.holdupTime,
     }
@@ -235,7 +248,11 @@ const PerpCreate = ({
       index
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form])
+  }, [
+    form,
+    forwarderProgramHelpers.form,
+    forwarderProgramHelpers.withForwarderWrapper,
+  ])
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
@@ -256,11 +273,11 @@ const PerpCreate = ({
       !mangoGroup || mangoGroup?.perpMarketsMapByMarketIndex.size === 0
         ? 0
         : Math.max(...[...mangoGroup!.perpMarketsMapByMarketIndex.keys()]) + 1
-    setForm({
-      ...form,
+    setForm((prevForm) => ({
+      ...prevForm,
       perpMarketIndex: perpMarketIndex,
-    })
-  }, [mangoGroup?.perpMarketsMapByMarketIndex.size])
+    }))
+  }, [mangoGroup])
 
   const inputs: InstructionInput[] = [
     {
@@ -505,9 +522,20 @@ const PerpCreate = ({
       inputType: 'number',
       name: 'positivePnlLiquidationFee',
     },
+    {
+      label: `Platform Liquidation Fee`,
+      subtitle: getAdditionalLabelInfo('platformLiquidationFee'),
+      initialValue: form.platformLiquidationFee,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'platformLiquidationFee',
+    },
   ]
   return (
     <>
+      <ProgramSelector
+        programSelectorHook={programSelectorHook}
+      ></ProgramSelector>
       {form && (
         <InstructionForm
           outerForm={form}
@@ -517,6 +545,7 @@ const PerpCreate = ({
           formErrors={formErrors}
         ></InstructionForm>
       )}
+      <ForwarderProgram {...forwarderProgramHelpers}></ForwarderProgram>
     </>
   )
 }

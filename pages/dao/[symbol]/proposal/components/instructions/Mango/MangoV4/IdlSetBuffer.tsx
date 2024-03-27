@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid, validatePubkey } from '@utils/formValidation'
@@ -9,12 +9,9 @@ import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
-import UseMangoV4 from '@hooks/useMangoV4'
 import { NewProposalContext } from '../../../../new'
-import InstructionForm, {
-  InstructionInput,
-  InstructionInputType,
-} from '../../FormCreator'
+import InstructionForm, { InstructionInput } from '../../FormCreator'
+import { InstructionInputType } from '../../inputInstructionType'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 interface AltSetForm {
@@ -33,13 +30,9 @@ const IdlSetBuffer = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletOnePointOh()
-  const { mangoGroup } = UseMangoV4()
   const { assetAccounts } = useGovernanceAssets()
-  const solAccounts = assetAccounts.filter(
-    (x) =>
-      x.type === AccountType.SOL &&
-      mangoGroup?.admin &&
-      x.extensions.transferAddress?.equals(mangoGroup.admin)
+  const govAccounts = assetAccounts.filter(
+    (x) => x.type === AccountType.PROGRAM
   )
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<AltSetForm>({
@@ -68,7 +61,7 @@ const IdlSetBuffer = ({
       const ix = await createIdlUpgradeInstruction(
         new PublicKey(form.programId),
         new PublicKey(form.buffer),
-        form.governedAccount.extensions.transferAddress!,
+        form.governedAccount.governance.pubkey!,
         new PublicKey(form.idlAccount)
       )
       serializedInstruction = serializeInstructionToBase64(ix)
@@ -121,7 +114,7 @@ const IdlSetBuffer = ({
       type: InstructionInputType.GOVERNED_ACCOUNT,
       shouldBeGoverned: shouldBeGoverned as any,
       governance: governance,
-      options: solAccounts,
+      options: govAccounts,
     },
     {
       label: 'Instruction hold up time (days)',
@@ -167,7 +160,7 @@ const IdlSetBuffer = ({
 
 export default IdlSetBuffer
 
-export async function createIdlUpgradeInstruction(
+async function createIdlUpgradeInstruction(
   programId: PublicKey,
   bufferAddress: PublicKey,
   upgradeAuthority: PublicKey,

@@ -14,6 +14,7 @@ import BN from 'bn.js';
 import type { Logger } from '../Logs';
 import { WSOL_MINT_PK } from '@components/instructions/tools';
 import { abbreviateAddress } from '@hub/lib/abbreviateAddress';
+import { DEFAULT_NFT_VOTER_PLUGIN } from '@tools/constants';
 import { getRealmConfigAccountOrDefault } from '@tools/governance/configs';
 import group from '@utils/group';
 import { pause } from '@utils/pause';
@@ -153,7 +154,7 @@ export async function fetchData(
             // Get NFT DAOs
             if (
               realmConfig.account.communityTokenConfig.voterWeightAddin?.equals(
-                new PublicKey('GnftV5kLjd67tvHpNGyodwWveEKivz3ZWvvE3Z4xi2iw'),
+                new PublicKey(DEFAULT_NFT_VOTER_PLUGIN),
               )
             ) {
               nftRealms.push(realm.publicKey);

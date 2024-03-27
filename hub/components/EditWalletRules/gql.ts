@@ -12,7 +12,6 @@ export const getGovernanceRules = gql`
       publicKey
     }
     realmByUrlId(urlId: $realmUrlId) {
-      programPublicKey
       publicKey
       governance(governance: $governancePublicKey) {
         communityTokenRules {
@@ -58,10 +57,7 @@ const Rules = IT.type({
   canVeto: IT.boolean,
   canVote: IT.boolean,
   quorumPercent: IT.number,
-  tokenMintAddress: PublicKey,
-  tokenMintDecimals: BigNumber,
   tokenType: GovernanceTokenType,
-  totalSupply: BigNumber,
   vetoQuorumPercent: IT.number,
   voteTipping: GovernanceVoteTipping,
   votingPowerToCreateProposals: BigNumber,
@@ -75,7 +71,6 @@ export const getGovernanceRulesResp = IT.type({
     }),
   ]),
   realmByUrlId: IT.type({
-    programPublicKey: PublicKey,
     publicKey: PublicKey,
     governance: IT.type({
       communityTokenRules: Rules,

@@ -1,12 +1,22 @@
-import { BN } from '@coral-xyz/anchor'
+import { BN, Program } from '@coral-xyz/anchor'
 import { Metaplex } from '@metaplex-foundation/js'
-import { Connection, PublicKey } from '@solana/web3.js'
+import { Connection, PublicKey, SYSVAR_CLOCK_PUBKEY } from '@solana/web3.js'
 import { registrarKey, positionKey } from '@helium/voter-stake-registry-sdk'
-import { delegatedPositionKey } from '@helium/helium-sub-daos-sdk'
+import {
+  PROGRAM_ID,
+  EPOCH_LENGTH,
+  init,
+  delegatedPositionKey,
+} from '@helium/helium-sub-daos-sdk'
 import { tryGetMint } from '@utils/tokens'
 import { calcPositionVotingPower } from './calcPositionVotingPower'
 import { HeliumVsrClient } from '../sdk/client'
-import { Registrar, Position, PositionWithMeta } from '../sdk/types'
+import {
+  Registrar,
+  PositionWithMeta,
+  PositionV0,
+  DelegatedPositionV0,
+} from '../sdk/types'
 import { chunks } from '@utils/helpers'
 import { HNT_MINT } from '@helium/spl-utils'
 
@@ -29,10 +39,11 @@ export const getPositions = async (
 ): Promise<GetPositionsReturn> => {
   const { realmPk, walletPk, communityMintPk, client, connection } = args
   const positions: PositionWithMeta[] = []
-  let amountLocked: BN = new BN(0)
-  let votingPower: BN = new BN(0)
-
-  const now = new BN(Math.round(new Date().getTime() / 1000))
+  let amountLocked = new BN(0)
+  let votingPower = new BN(0)
+  const clock = await connection.getAccountInfo(SYSVAR_CLOCK_PUBKEY)
+  const now = new BN(Number(clock!.data.readBigInt64LE(8 * 4)))
+  const isHNT = communityMintPk.equals(HNT_MINT)
   const metaplex = new Metaplex(connection)
   const registrarPk = registrarKey(realmPk, communityMintPk)[0]
   const registrar = (await client.program.account.registrar.fetch(
@@ -61,62 +72,74 @@ export const getPositions = async (
     (posKey) => delegatedPositionKey(posKey)[0]
   )
 
-  const delegatedPositionAccInfos = communityMintPk.equals(HNT_MINT)
-    ? (
-        await Promise.all(
-          chunks(delegatedPosKeys, 99).map((chunk) =>
-            connection.getMultipleAccountsInfo(chunk)
+  const delegatedPositionAccs = isHNT
+    ? await (async () => {
+        const idl = await Program.fetchIdl(PROGRAM_ID, client.program.provider)
+        const hsdProgram = await init(
+          client.program.provider as any,
+          PROGRAM_ID,
+          idl
+        )
+
+        return (
+          await Promise.all(
+            chunks(delegatedPosKeys, 99).map((chunk) =>
+              connection.getMultipleAccountsInfo(chunk)
+            )
           )
         )
-      ).flat()
+          .flat()
+          .map((delegatedPos) =>
+            delegatedPos
+              ? (hsdProgram.coder.accounts.decode(
+                  'DelegatedPositionV0',
+                  delegatedPos.data
+                ) as DelegatedPositionV0)
+              : null
+          )
+      })()
     : []
 
   positions.push(
-    ...positionAccInfos
-      .map(
-        (pos) =>
-          client.program.coder.accounts.decode(
-            'PositionV0',
-            pos!.data
-          ) as Position
-      )
-      .map((pos, idx) => {
-        return {
-          ...pos,
-          pubkey: posKeys[idx],
-          isDelegated: !!delegatedPositionAccInfos[idx],
-          hasGenesisMultiplier: pos.genesisEnd.gt(now),
-          votingPower: calcPositionVotingPower({
-            position: pos,
-            registrar,
-          }),
-          votingMint: {
-            ...mintCfgs[pos.votingMintConfigIdx],
-            mint: mints[mintCfgs[pos.votingMintConfigIdx].mint.toBase58()],
-          },
-        } as PositionWithMeta
-      })
-      .filter((pos) => {
-        const lockup = pos.lockup
-        const lockupKind = Object.keys(lockup.kind)[0]
-        return ['constant', 'cliff'].includes(lockupKind)
-      })
-  )
+    ...positionAccInfos.map((posAccInfo, idx) => {
+      const pos = client.program.coder.accounts.decode(
+        'PositionV0',
+        posAccInfo!.data
+      ) as PositionV0
 
-  amountLocked = positions.reduce(
-    (acc, pos) => acc.add(pos.amountDepositedNative),
-    new BN(0)
-  )
+      const isDelegated = !!delegatedPositionAccs[idx]
+      const delegatedSubDao = isDelegated
+        ? delegatedPositionAccs[idx]?.subDao
+        : null
+      const hasRewards = isDelegated
+        ? delegatedPositionAccs[idx]!.lastClaimedEpoch.add(new BN(1)).lt(
+            now.div(new BN(EPOCH_LENGTH))
+          )
+        : false
 
-  votingPower = positions.reduce(
-    (acc, pos) =>
-      acc.add(
-        calcPositionVotingPower({
-          position: pos,
-          registrar,
-        })
-      ),
-    new BN(0)
+      const posVotingPower = calcPositionVotingPower({
+        position: pos,
+        registrar,
+        unixNow: now,
+      })
+
+      amountLocked = amountLocked.add(pos.amountDepositedNative)
+      votingPower = votingPower.add(posVotingPower)
+
+      return {
+        ...pos,
+        pubkey: posKeys[idx],
+        isDelegated,
+        delegatedSubDao,
+        hasRewards,
+        hasGenesisMultiplier: pos.genesisEnd.gt(now),
+        votingPower: posVotingPower,
+        votingMint: {
+          ...mintCfgs[pos.votingMintConfigIdx],
+          mint: mints[mintCfgs[pos.votingMintConfigIdx].mint.toBase58()],
+        },
+      } as PositionWithMeta
+    })
   )
 
   return {

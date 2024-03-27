@@ -29,19 +29,6 @@ export const getSolInvestments = () => [
     strategyDescription: '',
     createProposalFcn: () => null,
   },
-  {
-    liquidity: 0,
-    protocolSymbol: '',
-    apy: '',
-    protocolName: 'Mango',
-    handledMint: '',
-    handledTokenSymbol: '',
-    handledTokenImgSrc: '',
-    protocolLogoSrc: 'https://alpha.mango.markets/logos/logo-mark.svg',
-    strategyName: 'Trade',
-    strategyDescription: '',
-    createProposalFcn: () => null,
-  },
 ]
 
 export const getTokenInvestments = (tokenImg: string) => [
@@ -58,5 +45,18 @@ export const getTokenInvestments = (tokenImg: string) => [
     strategyDescription: '',
     createProposalFcn: () => null,
     noProtocol: true,
+  },
+  {
+    liquidity: 0,
+    protocolSymbol: '',
+    apy: '',
+    protocolName: 'Mango',
+    handledMint: '',
+    handledTokenSymbol: '',
+    handledTokenImgSrc: tokenImg,
+    protocolLogoSrc: 'https://mango.markets/logos/logo-mark.svg',
+    strategyName: 'Trade',
+    strategyDescription: '',
+    createProposalFcn: () => null,
   },
 ]

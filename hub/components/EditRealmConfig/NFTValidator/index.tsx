@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 
 import { Input } from '@hub/components/controls/Input';
 import { useCluster } from '@hub/hooks/useCluster';
+import { DEFAULT_NFT_VOTER_PLUGIN } from '@tools/constants';
 
 interface NFTCollection {
   description?: string;
@@ -69,7 +70,7 @@ export function NFTValidator(props: Props) {
       <Input
         className="w-full"
         disabled={props.disabled}
-        placeholder="e.g. GnftV5kLjd67tvHpNGyodwWveEKivz3ZWvvE3Z4xi2iw"
+        placeholder={`e.g. ${DEFAULT_NFT_VOTER_PLUGIN}`}
         value={address}
         onBlur={(e) => {
           const text = e.currentTarget.value;

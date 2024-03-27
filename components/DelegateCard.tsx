@@ -1,5 +1,3 @@
-import useRealm from '../hooks/useRealm'
-import useWalletStore from '../stores/useWalletStore'
 import React, { useState, FunctionComponent } from 'react'
 import {
   Transaction,
@@ -8,33 +6,33 @@ import {
   PublicKey,
 } from '@solana/web3.js'
 import Input from './inputs/Input'
-import {
-  withSetGovernanceDelegate,
-  getGovernanceProgramVersion,
-} from '@solana/spl-governance'
+import { withSetGovernanceDelegate } from '@solana/spl-governance'
 import { sendTransaction } from 'utils/send'
 import { CashIcon, CreditCardIcon } from '@heroicons/react/solid'
 import Button from './Button'
 import Checkbox from '@components/inputs/Checkbox'
 import Divider from './Divider'
-import { DisplayAddress } from '@cardinal/namespaces-components'
 import { tryParseKey } from 'tools/validators/pubkey'
 import { XCircleIcon } from '@heroicons/react/outline'
 import Tooltip from './Tooltip'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import {
+  useUserCommunityTokenOwnerRecord,
+  useUserCouncilTokenOwnerRecord,
+} from '@hooks/queries/tokenOwnerRecord'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useConnection } from '@solana/wallet-adapter-react'
+import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
+import { ProfileName } from "@components/Profile";
 
 const DelegateCard = () => {
-  const {
-    realm,
-    tokenRecords,
-    councilTokenOwnerRecords,
-    ownTokenRecord,
-    ownCouncilTokenRecord,
-  } = useRealm()
+  const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+  const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
+  const realm = useRealmQuery().data?.result
+
   const [isLoading, setLoading] = useState<boolean>(false)
   const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection.current)
-  const { fetchRealm } = useWalletStore((s) => s.actions)
+  const { connection } = useConnection()
 
   const [delegateKey, setDelegateKey] = useState('')
   const [delegateCouncilToken, setDelegateCouncilToken] = useState(true)
@@ -50,7 +48,7 @@ const DelegateCard = () => {
 
     try {
       setLoading(true)
-      const programVersion = await getGovernanceProgramVersion(
+      const programVersion = await fetchProgramVersion(
         connection,
         realm.owner // governance program public key
       )
@@ -91,7 +89,6 @@ const DelegateCard = () => {
       transaction.add(...instructions)
 
       await sendTransaction({ transaction, wallet, connection, signers })
-      await fetchRealm(realm?.owner, realm?.pubkey)
       setLoading(false)
     } catch (error) {
       console.log('error', error)
@@ -110,7 +107,7 @@ const DelegateCard = () => {
     }
 
     try {
-      const programVersion = await getGovernanceProgramVersion(
+      const programVersion = await fetchProgramVersion(
         connection,
         realm.owner // governance program public key
       )
@@ -133,8 +130,6 @@ const DelegateCard = () => {
       transaction.add(...instructions)
 
       await sendTransaction({ transaction, wallet, connection, signers })
-
-      await fetchRealm(realm?.owner, realm?.pubkey)
       setLoading(false)
     } catch (error) {
       console.log('error', error)
@@ -144,20 +139,12 @@ const DelegateCard = () => {
 
   const parsedDelegateKey = tryParseKey(delegateKey)
 
-  const tokenRecord =
-    tokenRecords && wallet?.publicKey
-      ? tokenRecords[wallet.publicKey.toBase58()]
-      : undefined
-
-  const councilRecord =
-    councilTokenOwnerRecords && wallet?.publicKey
-      ? councilTokenOwnerRecords[wallet.publicKey.toBase58()]
-      : undefined
-
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
       <h3 className="mb-4">Delegate tokens</h3>
-      {wallet && wallet.publicKey && (tokenRecord || councilRecord) ? (
+      {wallet &&
+      wallet.publicKey &&
+      (ownTokenRecord || ownCouncilTokenRecord) ? (
         <>
           <div className="text-sm text-th-fgd-1 flex flex-row items-center justify-between mt-4">
             Allow any wallet to vote or create proposals with your deposited
@@ -167,19 +154,18 @@ const DelegateCard = () => {
             This will not allow the delegated wallet to withdraw or send tokens.
           </div>
 
-          {councilRecord && (
+          {ownCouncilTokenRecord && (
             <div className="flex justify-between items-center content-center mt-4 w-full">
               <div className="mr-2 py-1 text-sm text-fgd-2 w-40 h-8 flex items-center">
                 Council Delegation
               </div>
-              {councilRecord?.account.governanceDelegate && (
+              {ownCouncilTokenRecord?.account.governanceDelegate && (
                 <div className="flex items-center content-center">
-                  <DisplayAddress
-                    connection={connection}
-                    address={councilRecord?.account.governanceDelegate}
-                    height="12px"
-                    width="100px"
-                    dark={true}
+                  <ProfileName
+                      publicKey={ownCouncilTokenRecord?.account.governanceDelegate}
+                      height="12px"
+                      width="100px"
+                      dark={true}
                   />
                   <Tooltip content={'Remove Delegate'}>
                     <XCircleIcon
@@ -191,17 +177,16 @@ const DelegateCard = () => {
               )}
             </div>
           )}
-          {tokenRecord && (
+          {ownTokenRecord && (
             <div className="flex justify-between items-center content-center mt-4 w-full">
               <div className="mr-2 py-1 text-sm text-fgd-2 w-40 h-8 flex items-center">
                 Community Delegation
               </div>
 
-              {tokenRecord?.account.governanceDelegate && (
+              {ownTokenRecord?.account.governanceDelegate && (
                 <div className="flex items-center content-center">
-                  <DisplayAddress
-                    connection={connection}
-                    address={tokenRecord?.account.governanceDelegate}
+                  <ProfileName
+                    publicKey={ownTokenRecord?.account.governanceDelegate}
                     height="12px"
                     width="100px"
                     dark={true}
@@ -223,26 +208,30 @@ const DelegateCard = () => {
             label="Token Type"
             icon={<CashIcon className="h-8 text-primary-light w-4 mr-2" />}
           >
-            {councilRecord && (
+            {ownCouncilTokenRecord && (
               <div className="form-check">
                 <Checkbox
                   checked={delegateCouncilToken}
                   label={'Council Token'}
                   // if user only has 1 type of token, then default it checked and disable unchecking
-                  disabled={tokenRecord && councilRecord ? false : true}
+                  disabled={
+                    ownTokenRecord && ownCouncilTokenRecord ? false : true
+                  }
                   onChange={() =>
                     setDelegateCouncilToken(!delegateCouncilToken)
                   }
                 />
               </div>
             )}
-            {tokenRecord && (
+            {ownTokenRecord && (
               <div className="form-check">
                 <Checkbox
                   checked={delegateCommunityToken}
                   label={'Community Token'}
                   // if user only has 1 type of token, then default it checked and disable unchecking
-                  disabled={tokenRecord && councilRecord ? false : true}
+                  disabled={
+                    ownTokenRecord && ownCouncilTokenRecord ? false : true
+                  }
                   onChange={() =>
                     setDelegateCommunityToken(!delegateCommunityToken)
                   }
@@ -263,7 +252,7 @@ const DelegateCard = () => {
               value={delegateKey}
               onChange={(e) => setDelegateKey(e.target.value)}
               placeholder="Public key"
-              disabled={!councilRecord && !tokenRecord}
+              disabled={!ownCouncilTokenRecord && !ownTokenRecord}
             />
           </InputRow>
 
@@ -273,7 +262,7 @@ const DelegateCard = () => {
             isLoading={isLoading}
             disabled={
               !parsedDelegateKey ||
-              (!councilRecord && !tokenRecord) ||
+              (!ownCouncilTokenRecord && !ownTokenRecord) ||
               (!delegateCouncilToken && !delegateCommunityToken)
             }
           >

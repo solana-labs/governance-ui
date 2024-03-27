@@ -1,4 +1,3 @@
-import React from 'react'
 import cx from 'classnames'
 import {
   PencilIcon,
@@ -18,7 +17,6 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Tooltip from '@components/Tooltip'
 import { formatNumber } from '@utils/formatNumber'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
-import useRealm from '@hooks/useRealm'
 import Section from '../Section'
 import Address from '@components/Address'
 import useProgramVersion from '@hooks/useProgramVersion'
@@ -26,6 +24,10 @@ import clsx from 'clsx'
 import TokenIcon from '@components/treasuryV2/icons/TokenIcon'
 import { NFTVotePluginSettingsDisplay } from '@components/NFTVotePluginSettingsDisplay'
 import useQueryContext from '@hooks/useQueryContext'
+import { DEFAULT_GOVERNANCE_PROGRAM_VERSION } from '@components/instructions/tools'
+import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
+import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import { NFT_PLUGINS_PKS } from '@constants/plugins'
 
 const DISABLED = new BigNumber(DISABLED_VOTER_WEIGHT.toString())
 
@@ -36,12 +38,19 @@ interface Props {
 
 export default function Config(props: Props) {
   const { canUseAuthorityInstruction } = useGovernanceAssets()
-  const { mint, symbol } = useRealm()
+  const mint = useRealmCommunityMintInfoQuery().data?.result
   const router = useRouter()
+  const { symbol } = router.query
   const { fmtUrlWithCluster } = useQueryContext()
 
   const programVersion = useProgramVersion()
-  const councilRulesSupported = programVersion >= 3
+  const councilRulesSupported =
+    (programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) >= 3
+
+  const config = useRealmConfigQuery().data?.result
+  const currentPluginPk = config?.account.communityTokenConfig.voterWeightAddin
+  const isNftMode =
+    currentPluginPk && NFT_PLUGINS_PKS.includes(currentPluginPk?.toBase58())
 
   return (
     <div className={props.className}>
@@ -69,7 +78,7 @@ export default function Config(props: Props) {
             )}
             disabled={!canUseAuthorityInstruction}
             onClick={() =>
-              router.push(fmtUrlWithCluster(`/realm/${symbol}/config/edit`))
+              router.push(fmtUrlWithCluster(`/dao/${symbol}/editConfig`))
             }
           >
             <PencilIcon className="h-4 w-4" />
@@ -131,14 +140,17 @@ export default function Config(props: Props) {
               councilRulesSupported ? 'grid-cols-1' : 'grid-cols-2'
             )}
           >
-            {programVersion >= 3 && (
+            {(programVersion ?? DEFAULT_GOVERNANCE_PROGRAM_VERSION) >= 3 && (
               <Section
                 icon={<TokenIcon />}
                 name={'Token type'}
                 value={
-                  { 0: 'Liquid', 1: 'Membership', 2: 'Disabled' }[
-                    props.realmAuthority.config.communityTokenConfig!.tokenType
-                  ]
+                  props.realmAuthority.config.communityTokenConfig
+                    ? { 0: 'Liquid', 1: 'Membership', 2: 'Disabled' }[
+                        props.realmAuthority.config.communityTokenConfig
+                          .tokenType
+                      ]
+                    : 'Liquid'
                 }
               />
             )}
@@ -200,15 +212,20 @@ export default function Config(props: Props) {
               <div className="font-bold">Council Rules</div>
             </div>
             <div className="grid grid-cols-1 gap-8">
-              <Section
-                icon={<TokenIcon />}
-                name={'Token type'}
-                value={
-                  { 0: 'Liquid', 1: 'Membership', 2: 'Disabled' }[
-                    props.realmAuthority.config.councilTokenConfig!.tokenType
-                  ]
-                }
-              />
+              {
+                <Section
+                  icon={<TokenIcon />}
+                  name={'Token type'}
+                  value={
+                    props.realmAuthority.config.councilTokenConfig
+                      ? { 0: 'Liquid', 1: 'Membership', 2: 'Disabled' }[
+                          props.realmAuthority.config.councilTokenConfig
+                            .tokenType
+                        ]
+                      : 'Liquid'
+                  }
+                />
+              }
               <Section
                 icon={<BeakerIcon />}
                 name={'Use council voter weight add‑in'}
@@ -261,7 +278,7 @@ export default function Config(props: Props) {
           </div>
         )}
       </div>
-      <NFTVotePluginSettingsDisplay className="mt-24" />
+      {isNftMode && <NFTVotePluginSettingsDisplay className="mt-24" />}
     </div>
   )
 }

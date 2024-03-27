@@ -15,13 +15,3 @@ export const splitPhoneNumber = (phoneNumber: string): PhoneData => {
 
   return { baseNumber, countryCode }
 }
-
-export const formatPhoneNumber = (phoneNumber: string) => {
-  if (!phoneNumber) {
-    throw new Error('No phone data found!')
-  }
-
-  return parsePhoneNumber(phoneNumber)
-    .formatInternational()
-    .replaceAll(' ', '-')
-}

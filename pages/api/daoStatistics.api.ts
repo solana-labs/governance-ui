@@ -23,6 +23,7 @@ import { getRealmConfigAccountOrDefault } from '@tools/governance/configs'
 import { chunks } from '@utils/helpers'
 import { differenceInMinutes, minutesToMilliseconds } from 'date-fns'
 import { pause } from '@utils/pause'
+import { DEFAULT_NFT_VOTER_PLUGIN } from '@tools/constants'
 
 interface CachedTokenAccounts {
   time: number
@@ -112,7 +113,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     if (
       realmConfig.account.communityTokenConfig.voterWeightAddin?.equals(
-        new PublicKey('GnftV5kLjd67tvHpNGyodwWveEKivz3ZWvvE3Z4xi2iw')
+        new PublicKey(DEFAULT_NFT_VOTER_PLUGIN)
       )
     ) {
       nftRealms.push(realm)

@@ -14,7 +14,7 @@ export const calcMultiplier = ({
   lockupSaturationSecs: number
 }): number => {
   let multiplier = 0
-  const base = baselineScaledFactor !== 0 ? baselineScaledFactor : 1 * 1e9
+  const base = baselineScaledFactor !== 0 ? baselineScaledFactor : 1e9
 
   multiplier =
     (Math.min(lockupSecs / lockupSaturationSecs, 1) *

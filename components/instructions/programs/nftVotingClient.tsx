@@ -1,13 +1,14 @@
-import { Wallet } from '@marinade.finance/marinade-ts-sdk'
 import { AnchorProvider, BorshInstructionCoder } from '@coral-xyz/anchor'
-import { NftVoterClient } from '@solana/governance-program-library'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { AccountMetaData, getRealm } from '@solana/spl-governance'
 import { Connection, Keypair } from '@solana/web3.js'
 import { fmtTokenAmount } from '@utils/formatting'
 import { tryGetMint } from '@utils/tokens'
+import { DEFAULT_NFT_VOTER_PLUGIN } from '@tools/constants'
+import EmptyWallet from '@utils/Mango/listingTools'
 
 export const NFT_VOTER_INSTRUCTIONS = {
-  GnftV5kLjd67tvHpNGyodwWveEKivz3ZWvvE3Z4xi2iw: {
+  [DEFAULT_NFT_VOTER_PLUGIN]: {
     132: {
       name: 'Create registrar',
       accounts: [
@@ -23,7 +24,7 @@ export const NFT_VOTER_INSTRUCTIONS = {
           const options = AnchorProvider.defaultOptions()
           const provider = new AnchorProvider(
             connection,
-            new Wallet(Keypair.generate()),
+            new EmptyWallet(Keypair.generate()),
             options
           )
           const nftClient = await NftVoterClient.connect(provider)
@@ -61,7 +62,7 @@ export const NFT_VOTER_INSTRUCTIONS = {
           const options = AnchorProvider.defaultOptions()
           const provider = new AnchorProvider(
             connection,
-            new Wallet(Keypair.generate()),
+            new EmptyWallet(Keypair.generate()),
             options
           )
           const realm = await getRealm(connection, accounts[1].pubkey)

@@ -112,7 +112,6 @@ Args): Promise<UiInstruction> {
       isValid: true,
       governance: governedTokenAccount?.governance,
       additionalSerializedInstructions,
-      shouldSplitIntoSeparateTxs: true,
     }
     return obj
   }
@@ -122,7 +121,6 @@ Args): Promise<UiInstruction> {
     isValid: false,
     governance: governedTokenAccount?.governance,
     additionalSerializedInstructions: [],
-    shouldSplitIntoSeparateTxs: true,
   }
 
   return obj

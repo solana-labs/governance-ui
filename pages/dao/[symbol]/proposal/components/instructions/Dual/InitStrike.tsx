@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState, useMemo } from 'react'
 import { ProgramAccount, Governance } from '@solana/spl-governance'
 import {
   UiInstruction,
@@ -10,10 +10,10 @@ import GovernedAccountSelect from '../../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Input from '@components/inputs/Input'
 import { getInitStrikeInstruction } from '@utils/instructions/Dual'
-import useWalletStore from 'stores/useWalletStore'
 import { getDualFinanceInitStrikeSchema } from '@utils/validations'
 import Tooltip from '@components/Tooltip'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 const InitStrike = ({
   index,
@@ -28,7 +28,7 @@ const InitStrike = ({
     soName: '',
     strikes: '',
   })
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const { assetAccounts } = useGovernanceAssets()
@@ -60,7 +60,7 @@ const InitStrike = ({
   useEffect(() => {
     setGovernedAccount(form.baseTreasury?.governance)
   }, [form.baseTreasury])
-  const schema = getDualFinanceInitStrikeSchema()
+  const schema = useMemo(getDualFinanceInitStrikeSchema, [])
 
   return (
     <>

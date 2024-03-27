@@ -14,8 +14,8 @@ import {
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
 import { web3 } from '@coral-xyz/anchor'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 const REALMS_PUBLIC_KEY = new web3.PublicKey(
   'BUxZD6aECR5B5MopyvvYqJxwSKDBhx2jSSo1U32en6mj'
@@ -32,6 +32,9 @@ const themeVariables: IncomingThemeVariables = {
       ...defaultVariables.dark.colors,
       bg: 'bg-bkg-1',
       toggleBackgroundActive: 'bg-primary-light',
+    },
+    textStyles: {
+      input: 'text-primary-1 bg-bkg-1 border-none hover:border-none',
     },
     outlinedInput: `${defaultVariables.dark.outlinedInput} focus-within:border-primary-light`,
     disabledButton: `${defaultVariables.dark.disabledButton} border-primary-light font-bold rounded-full border-fgd-3 text-fgd-3 cursor-not-allowed`,
@@ -98,7 +101,7 @@ export default function DialectNotificationsModal(
   props: DialectNotificationsModalProps
 ) {
   const { theme } = useTheme()
-  const wallet = useWalletStore((store) => store.current)
+  const wallet = useWalletOnePointOh()
 
   const [
     dialectSolanaWalletAdapter,

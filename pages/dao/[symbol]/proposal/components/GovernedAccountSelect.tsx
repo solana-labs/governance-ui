@@ -9,7 +9,7 @@ import {
   getSolAccountLabel,
   getTokenAccountLabelInfo,
 } from '@utils/tokens'
-import React, { cloneElement, useEffect, useContext, useState } from 'react'
+import { cloneElement, useEffect, useContext, useState } from 'react'
 import { AssetAccount, AccountType } from '@utils/uiTypes/assets'
 import UnselectedWalletIcon from '@components/treasuryV2/icons/UnselectedWalletIcon'
 import { abbreviateAddress } from '@utils/formatting'
@@ -213,6 +213,7 @@ const GovernedAccountSelect = ({
               showRealmAuthority
               assets={walletInfo.assets}
               className="h-4"
+              governance={value.governance.pubkey}
             />
           </div>
         ) : (
@@ -276,9 +277,7 @@ const GovernedAccountSelect = ({
 
           <div className="space-y-0.5 text-xs text-fgd-3">
             Program:{' '}
-            {programName
-              ? programName
-              : abbreviateAddress(value.governance.account.governedAccount)}
+            {programName ? programName : abbreviateAddress(value.pubkey)}
           </div>
         </div>
         {walletInfo ? (
@@ -291,6 +290,7 @@ const GovernedAccountSelect = ({
               showRealmAuthority
               assets={walletInfo.assets}
               className="h-4"
+              governance={value.governance.pubkey}
             />
           </div>
         ) : (

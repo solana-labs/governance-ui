@@ -1,5 +1,6 @@
-import { AnchorProvider, Wallet } from '@project-serum/anchor';
-import { NftVoterClient } from '@solana/governance-program-library';
+import { AnchorProvider, Wallet } from '@coral-xyz/anchor';
+
+import { GatewayClient } from '@solana/governance-program-library';
 import {
   createSetRealmConfig,
   GoverningTokenType,
@@ -19,6 +20,11 @@ import {
   getMaxVoterWeightRecord,
   getRegistrarPDA,
 } from '@utils/plugin/accounts';
+import {
+  configureCivicRegistrarIx,
+  createCivicRegistrarIx,
+} from '@utils/plugin/gateway';
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient';
 
 import { Config } from './fetchConfig';
 import { buildUpdates, diff } from './UpdatesList';
@@ -44,8 +50,7 @@ function shouldAddConfigInstruction(config: Config, currentConfig: Config) {
 }
 
 export async function createTransaction(
-  programId: PublicKey,
-  realm: PublicKey,
+  realmPublicKey: PublicKey,
   governance: PublicKey,
   config: Config,
   currentConfig: Config,
@@ -53,23 +58,21 @@ export async function createTransaction(
   isDevnet?: boolean,
   wallet?: Omit<Wallet, 'payer'>,
 ) {
+  const realmAccount = await getRealm(connection, realmPublicKey);
+
+  const programId = realmAccount.owner;
   const instructions: TransactionInstruction[] = [];
-  const realmConfig = await tryGetRealmConfig(connection, programId, realm);
+  const realmConfig = await tryGetRealmConfig(
+    connection,
+    programId,
+    realmPublicKey,
+  );
   const programVersion = await getGovernanceProgramVersion(
     connection,
     programId,
   );
-  const realmAccount = await getRealm(connection, realm);
 
-  if (
-    realmAccount.account.authority &&
-    wallet &&
-    config.nftCollection &&
-    (!currentConfig.nftCollection ||
-      !currentConfig.nftCollection.equals(config.nftCollection) ||
-      currentConfig.nftCollectionSize !== config.nftCollectionSize ||
-      !currentConfig.nftCollectionWeight.eq(config.nftCollectionWeight))
-  ) {
+  if (realmAccount.account.authority && wallet) {
     const defaultOptions = AnchorProvider.defaultOptions();
     const anchorProvider = new AnchorProvider(
       connection,
@@ -77,62 +80,95 @@ export async function createTransaction(
       defaultOptions,
     );
 
-    const nftClient = await NftVoterClient.connect(anchorProvider, isDevnet);
-    const { registrar } = await getRegistrarPDA(
-      realm,
-      config.communityMint.publicKey,
-      nftClient.program.programId,
-    );
-    const { maxVoterWeightRecord } = await getMaxVoterWeightRecord(
-      realm,
-      config.communityMint.publicKey,
-      nftClient.program.programId,
-    );
+    if (
+      config.nftCollection &&
+      (!currentConfig.nftCollection ||
+        !currentConfig.nftCollection.equals(config.nftCollection) ||
+        currentConfig.nftCollectionSize !== config.nftCollectionSize ||
+        !currentConfig.nftCollectionWeight.eq(config.nftCollectionWeight))
+    ) {
+      const nftClient = await NftVoterClient.connect(anchorProvider, isDevnet);
+      const { registrar } = await getRegistrarPDA(
+        realmPublicKey,
+        config.communityMint.publicKey,
+        nftClient.program.programId,
+      );
+      const { maxVoterWeightRecord } = await getMaxVoterWeightRecord(
+        realmPublicKey,
+        config.communityMint.publicKey,
+        nftClient.program.programId,
+      );
 
-    instructions.push(
-      await nftClient.program.methods
-        .createRegistrar(10)
-        .accounts({
-          registrar,
-          realm,
-          governanceProgramId: programId,
-          realmAuthority: realmAccount.account.authority,
-          governingTokenMint: config.communityMint.publicKey,
-          payer: wallet.publicKey,
-          systemProgram: SYSTEM_PROGRAM_ID,
-        })
-        .instruction(),
-    );
+      instructions.push(
+        await nftClient.program.methods
+          .createRegistrar(10)
+          .accounts({
+            registrar,
+            realm: realmPublicKey,
+            governanceProgramId: programId,
+            realmAuthority: realmAccount.account.authority,
+            governingTokenMint: config.communityMint.publicKey,
+            payer: wallet.publicKey,
+            systemProgram: SYSTEM_PROGRAM_ID,
+          })
+          .instruction(),
+      );
 
-    instructions.push(
-      await nftClient.program.methods
-        .createMaxVoterWeightRecord()
-        .accounts({
-          maxVoterWeightRecord,
-          realm,
-          governanceProgramId: programId,
-          realmGoverningTokenMint: config.communityMint.publicKey,
-          payer: wallet.publicKey,
-          systemProgram: SYSTEM_PROGRAM_ID,
-        })
-        .instruction(),
-    );
+      instructions.push(
+        await nftClient.program.methods
+          .createMaxVoterWeightRecord()
+          .accounts({
+            maxVoterWeightRecord,
+            realm: realmPublicKey,
+            governanceProgramId: programId,
+            realmGoverningTokenMint: config.communityMint.publicKey,
+            payer: wallet.publicKey,
+            systemProgram: SYSTEM_PROGRAM_ID,
+          })
+          .instruction(),
+      );
 
-    instructions.push(
-      await nftClient.program.methods
-        .configureCollection(
-          config.nftCollectionWeight,
-          config.nftCollectionSize,
-        )
-        .accounts({
-          registrar,
-          realm,
-          maxVoterWeightRecord,
-          realmAuthority: realmAccount.account.authority,
-          collection: config.nftCollection,
-        })
-        .instruction(),
-    );
+      instructions.push(
+        await nftClient.program.methods
+          .configureCollection(
+            config.nftCollectionWeight,
+            config.nftCollectionSize,
+          )
+          .accounts({
+            registrar,
+            realm: realmPublicKey,
+            maxVoterWeightRecord,
+            realmAuthority: realmAccount.account.authority,
+            collection: config.nftCollection,
+          })
+          .instruction(),
+      );
+    } else if (
+      config.civicPassType &&
+      (!currentConfig.civicPassType ||
+        !currentConfig.civicPassType.equals(config.civicPassType))
+    ) {
+      // If this DAO uses Civic, we need to either create or configure the Civic gateway plugin registrar.
+      const gatewayClient = await GatewayClient.connect(
+        anchorProvider,
+        isDevnet,
+      );
+
+      const instruction = currentConfig.civicPassType
+        ? await configureCivicRegistrarIx(
+            realmAccount,
+            gatewayClient,
+            config.civicPassType,
+          )
+        : await createCivicRegistrarIx(
+            realmAccount,
+            wallet.publicKey,
+            gatewayClient,
+            config.civicPassType,
+          );
+
+      instructions.push(instruction);
+    }
   }
 
   if (shouldAddConfigInstruction(config, currentConfig)) {
@@ -140,7 +176,7 @@ export async function createTransaction(
       await createSetRealmConfig(
         programId,
         programVersion,
-        realm,
+        realmPublicKey,
         governance,
         config.configAccount.councilTokenConfig.tokenType ===
           GoverningTokenType.Dormant

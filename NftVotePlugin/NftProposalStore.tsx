@@ -1,5 +1,5 @@
 import create, { State } from 'zustand'
-import { NftVoterClient } from '@solana/governance-program-library'
+import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { ProgramAccount, Proposal } from '@solana/spl-governance'
 import { getUsedNftsForProposal, NftVoteRecord } from './accounts'
 import { PublicKey } from '@solana/web3.js'

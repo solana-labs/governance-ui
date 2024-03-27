@@ -8,15 +8,7 @@ import Switch from '@components/Switch'
 import Select from '@components/inputs/Select'
 import { usePrevious } from '@hooks/usePrevious'
 import { DISABLED_VALUE } from '@tools/constants'
-
-export enum InstructionInputType {
-  GOVERNED_ACCOUNT,
-  INPUT,
-  TEXTAREA,
-  SWITCH,
-  SELECT,
-  DISABLEABLE_INPUT,
-}
+import { InstructionInputType } from './inputInstructionType'
 
 export interface InstructionInput {
   label: string
@@ -51,9 +43,9 @@ const InstructionForm = ({
   setFormErrors: React.Dispatch<React.SetStateAction<any>>
   formErrors
   setForm: React.Dispatch<React.SetStateAction<any>>
-  outerForm: any
+  outerForm: { [key: string]: any } | undefined
 }) => {
-  const [form, setInnerForm] = useState({})
+  const [form, setInnerForm] = useState(outerForm ? { ...outerForm } : {})
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setInnerForm({ ...outerForm, [propertyName]: value })
@@ -61,10 +53,12 @@ const InstructionForm = ({
   const previousInitialValue = usePrevious(
     JSON.stringify(inputs.map((x) => x.initialValue))
   )
+
   useEffect(() => {
     setForm(form)
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(form)])
+
   useEffect(() => {
     setInnerForm({
       ...inputs.reduce((a, v) => ({ ...a, [v.name]: v.initialValue }), {}),

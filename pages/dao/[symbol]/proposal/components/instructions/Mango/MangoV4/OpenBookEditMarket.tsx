@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
@@ -9,13 +9,16 @@ import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
-import InstructionForm, {
-  InstructionInput,
-  InstructionInputType,
-} from '../../FormCreator'
+import InstructionForm, { InstructionInput } from '../../FormCreator'
+import { InstructionInputType } from '../../inputInstructionType'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { MarketIndex } from '@blockworks-foundation/mango-v4/dist/types/src/accounts/serum3'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import ForwarderProgram, {
+  useForwarderProgramHelpers,
+} from '@components/ForwarderProgram/ForwarderProgram'
+import ProgramSelector from '@components/Mango/ProgramSelector'
+import useProgramSelector from '@components/Mango/useProgramSelector'
 
 type NameMarketIndexVal = {
   name: string
@@ -25,7 +28,10 @@ type NameMarketIndexVal = {
 interface OpenBookEditMarketForm {
   governedAccount: AssetAccount | null
   market: NameMarketIndexVal | null
+  name: string
   reduceOnly: boolean
+  forceClose: boolean
+  oraclePriceBand: number
   holdupTime: number
 }
 
@@ -37,8 +43,13 @@ const OpenBookEditMarket = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletOnePointOh()
-  const { mangoClient, mangoGroup } = UseMangoV4()
+  const programSelectorHook = useProgramSelector()
+  const { mangoClient, mangoGroup } = UseMangoV4(
+    programSelectorHook.program?.val,
+    programSelectorHook.program?.group
+  )
   const { assetAccounts } = useGovernanceAssets()
+  const forwarderProgramHelpers = useForwarderProgramHelpers()
   const solAccounts = assetAccounts.filter(
     (x) =>
       x.type === AccountType.SOL &&
@@ -49,8 +60,11 @@ const OpenBookEditMarket = ({
   const [form, setForm] = useState<OpenBookEditMarketForm>({
     governedAccount: null,
     reduceOnly: false,
+    forceClose: false,
     market: null,
     holdupTime: 0,
+    oraclePriceBand: 0,
+    name: '',
   })
   const [currentMarkets, setCurrentMarkets] = useState<NameMarketIndexVal[]>([])
   const [formErrors, setFormErrors] = useState({})
@@ -74,7 +88,12 @@ const OpenBookEditMarket = ({
       )
 
       const ix = await mangoClient!.program.methods
-        .serum3EditMarket(form.reduceOnly)
+        .serum3EditMarket(
+          form.reduceOnly,
+          form.forceClose,
+          form.name,
+          form.oraclePriceBand
+        )
         .accounts({
           group: mangoGroup!.publicKey,
           admin: form.governedAccount.extensions.transferAddress,
@@ -82,11 +101,14 @@ const OpenBookEditMarket = ({
         })
         .instruction()
 
-      serializedInstruction = serializeInstructionToBase64(ix)
+      serializedInstruction = serializeInstructionToBase64(
+        forwarderProgramHelpers.withForwarderWrapper(ix)
+      )
     }
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
       isValid,
+      chunkBy: 1,
       governance: form.governedAccount?.governance,
       customHoldUpTime: form.holdupTime,
     }
@@ -99,7 +121,11 @@ const OpenBookEditMarket = ({
       index
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form])
+  }, [
+    form,
+    forwarderProgramHelpers.form,
+    forwarderProgramHelpers.withForwarderWrapper,
+  ])
   useEffect(() => {
     const getMarkets = async () => {
       const markets = [...mangoGroup!.serum3MarketsMapByExternal.values()].map(
@@ -113,21 +139,26 @@ const OpenBookEditMarket = ({
     if (mangoGroup) {
       getMarkets()
     }
-  }, [mangoGroup?.publicKey.toBase58()])
+  }, [mangoGroup])
+
   useEffect(() => {
     const getCurrentMarketProps = () => {
       const market = mangoGroup!.serum3MarketsMapByMarketIndex.get(
         Number(form.market?.value)
       )
-      setForm({
-        ...form,
+      setForm((prevForm) => ({
+        ...prevForm,
+        oraclePriceBand: Number(market?.oraclePriceBand) || 0,
         reduceOnly: market?.reduceOnly || false,
-      })
+        forceClose: market?.forceClose || false,
+        name: market?.name || '',
+      }))
     }
     if (form.market && mangoGroup) {
       getCurrentMarketProps()
     }
-  }, [form.market?.value])
+  }, [form.market, mangoGroup])
+
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
@@ -152,6 +183,13 @@ const OpenBookEditMarket = ({
       name: 'holdupTime',
     },
     {
+      label: 'Price band',
+      initialValue: form.oraclePriceBand,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'oraclePriceBand',
+    },
+    {
       label: 'Market',
       name: 'market',
       type: InstructionInputType.SELECT,
@@ -159,15 +197,31 @@ const OpenBookEditMarket = ({
       options: currentMarkets,
     },
     {
+      label: 'Name',
+      name: 'name',
+      type: InstructionInputType.INPUT,
+      initialValue: form.name,
+      inputType: 'text',
+    },
+    {
       label: 'Reduce Only',
       initialValue: form.reduceOnly,
       type: InstructionInputType.SWITCH,
       name: 'reduceOnly',
     },
+    {
+      label: 'Force Close',
+      initialValue: form.forceClose,
+      type: InstructionInputType.SWITCH,
+      name: 'forceClose',
+    },
   ]
 
   return (
     <>
+      <ProgramSelector
+        programSelectorHook={programSelectorHook}
+      ></ProgramSelector>
       {form && (
         <InstructionForm
           outerForm={form}
@@ -177,6 +231,7 @@ const OpenBookEditMarket = ({
           formErrors={formErrors}
         ></InstructionForm>
       )}
+      <ForwarderProgram {...forwarderProgramHelpers}></ForwarderProgram>
     </>
   )
 }

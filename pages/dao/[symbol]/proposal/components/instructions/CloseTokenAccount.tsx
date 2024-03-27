@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import {
   Governance,
   ProgramAccount,
@@ -6,16 +6,12 @@ import {
 } from '@solana/spl-governance'
 import { validateInstruction } from '@utils/instructionTools'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
-import useWalletStore from 'stores/useWalletStore'
 
 import { NewProposalContext } from '../../new'
-import useRealm from '@hooks/useRealm'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { AssetAccount } from '@utils/uiTypes/assets'
-import InstructionForm, {
-  InstructionInput,
-  InstructionInputType,
-} from './FormCreator'
+import InstructionForm, { InstructionInput } from './FormCreator'
+import { InstructionInputType } from './inputInstructionType'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
@@ -27,9 +23,11 @@ import { PublicKey } from '@solana/web3.js'
 import { getATA } from '@utils/ataTools'
 import { sendTransactionsV3, SequenceType } from '@utils/sendTransactions'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
-export interface CloseTokenAccountForm {
-  governedAccount: AssetAccount | undefined
+interface CloseTokenAccountForm {
+  governedAccount: AssetAccount | undefined | null
   fundsDestinationAccount: string
   solRentDestination: string
 }
@@ -41,12 +39,16 @@ const CloseTokenAccount = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { realm } = useRealm()
+  const realm = useRealmQuery().data?.result
   const wallet = useWalletOnePointOh()
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
-  const [form, setForm] = useState<CloseTokenAccountForm>()
+  const [form, setForm] = useState<CloseTokenAccountForm>({
+    governedAccount: null,
+    fundsDestinationAccount: '',
+    solRentDestination: '',
+  })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
   const schema = yup.object().shape({

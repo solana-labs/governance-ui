@@ -1,4 +1,3 @@
-import React from 'react'
 import cx from 'classnames'
 import { ChevronDownIcon } from '@heroicons/react/outline'
 
@@ -141,6 +140,7 @@ export default function AuxiliaryWalletListItem(props: Props) {
               <AssetsPreviewIconList
                 assets={props.wallet.assets}
                 className="pl-5 mt-1"
+                governance={undefined}
               />
             </div>
             <ChevronDownIcon
@@ -165,6 +165,7 @@ export default function AuxiliaryWalletListItem(props: Props) {
           className="pt-4"
           selectedAssetId={props.selectedAsset?.id}
           onSelectAsset={props.onSelectAsset}
+          governance={undefined}
         />
       )}
     </div>

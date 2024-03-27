@@ -14,7 +14,7 @@ import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
 import { validateSolAddress } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { useRouter } from 'next/router'
-import React, {
+import {
   FC,
   useCallback,
   useContext,
@@ -24,6 +24,8 @@ import React, {
 } from 'react'
 import { NewProposalContext } from '../../../new'
 import useMembershipTypes from './useMembershipTypes'
+import { useRealmQuery } from '@hooks/queries/realm'
+import Tooltip from '@components/Tooltip'
 
 type Form = {
   memberKey?: string
@@ -48,7 +50,9 @@ const RevokeGoverningTokens: FC<{
   })
   const [formErrors, setFormErrors] = useState<Errors>({})
   const membershipTypes = useMembershipTypes()
-  const { realmInfo, realm } = useRealm()
+  const realm = useRealmQuery().data?.result
+
+  const { realmInfo } = useRealm()
   const programId: PublicKey | undefined = realmInfo?.programId
   const programVersion = useProgramVersion()
 
@@ -94,6 +98,8 @@ const RevokeGoverningTokens: FC<{
 
   const { data: mintInfo } = useMintInfoByPubkeyQuery(selectedMint)
   const governance = useGovernanceForGovernedAddress(selectedMint)
+  const revokeTokenAuthority =
+    mintInfo?.result?.mintAuthority ?? governance?.pubkey
 
   const getInstruction = useCallback(async (): Promise<UiInstruction> => {
     const errors: Errors = {}
@@ -132,7 +138,9 @@ const RevokeGoverningTokens: FC<{
       realm === undefined ||
       programId === undefined ||
       mintInfo?.result === undefined ||
-      governance === undefined
+      governance === undefined ||
+      revokeTokenAuthority === undefined ||
+      programVersion === undefined
     ) {
       throw new Error('proposal created before necessary data is fetched')
     }
@@ -142,7 +150,7 @@ const RevokeGoverningTokens: FC<{
       realm.pubkey,
       member,
       selectedMint,
-      governance.pubkey,
+      revokeTokenAuthority,
       getMintNaturalAmountFromDecimalAsBN(
         parseFloat(form.amount),
         mintInfo.result.decimals
@@ -190,17 +198,26 @@ const RevokeGoverningTokens: FC<{
 
   return (
     <>
-      <Select
-        label="Membership Type"
-        value={selectedMembershipType}
-        onChange={(x) => setForm((p) => ({ ...p, membershipPopulation: x }))}
+      <Tooltip
+        content={
+          Object.keys(membershipTypes).length === 0
+            ? 'Your DAO has no governance tokens with the Membership token type'
+            : undefined
+        }
       >
-        {Object.keys(membershipTypes).map((x) => (
-          <Select.Option key={x} value={x}>
-            {capitalizeFirstLetter(x)}
-          </Select.Option>
-        ))}
-      </Select>
+        <Select
+          label="Membership Token"
+          disabled={Object.keys(membershipTypes).length === 0}
+          value={selectedMembershipType}
+          onChange={(x) => setForm((p) => ({ ...p, membershipPopulation: x }))}
+        >
+          {Object.keys(membershipTypes).map((x) => (
+            <Select.Option key={x} value={x}>
+              {capitalizeFirstLetter(x)}
+            </Select.Option>
+          ))}
+        </Select>
+      </Tooltip>
       <Input
         label="Member Public Key"
         value={form.memberKey}

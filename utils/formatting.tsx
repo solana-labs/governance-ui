@@ -16,6 +16,11 @@ export const calculatePct = (c = new BN(0), total?: BN) => {
     .toNumber()
 }
 
+/**
+ * @deprecated
+ * you shouldn't cast a BN to a number
+ * use fmtBnMintDecimals
+ */
 export const fmtTokenAmount = (c: BN, decimals?: number) =>
   c?.div(new BN(10).pow(new BN(decimals ?? 0))).toNumber() || 0
 
@@ -35,7 +40,7 @@ export function precision(a) {
   return p
 }
 
-export const fmtMsToTime = (milliseconds: number) => {
+const fmtMsToTime = (milliseconds: number) => {
   let seconds = Math.floor(milliseconds / 1000)
   let minutes = Math.floor(seconds / 60)
   let hours = Math.floor(minutes / 60)

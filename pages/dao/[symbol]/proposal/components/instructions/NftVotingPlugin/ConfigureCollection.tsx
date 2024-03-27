@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import * as yup from 'yup'
 import {
   Governance,
@@ -8,13 +8,10 @@ import {
 import { validateInstruction } from '@utils/instructionTools'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
-import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NewProposalContext } from '../../../new'
-import InstructionForm, {
-  InstructionInput,
-  InstructionInputType,
-} from '../FormCreator'
+import InstructionForm, { InstructionInput } from '../FormCreator'
+import { InstructionInputType } from '../inputInstructionType'
 import { PublicKey } from '@solana/web3.js'
 import { getValidatedPublickKey } from '@utils/validations'
 import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
@@ -25,6 +22,8 @@ import {
   getRegistrarPDA,
 } from '@utils/plugin/accounts'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
+import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 
 interface ConfigureCollectionForm {
   governedAccount: AssetAccount | undefined
@@ -40,7 +39,8 @@ const ConfigureNftPluginCollection = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { realm, mint } = useRealm()
+  const realm = useRealmQuery().data?.result
+  const mint = useRealmCommunityMintInfoQuery().data?.result
   const nftClient = useVotePluginsClientStore((s) => s.state.nftClient)
   const { assetAccounts } = useGovernanceAssets()
   const wallet = useWalletOnePointOh()
@@ -88,7 +88,6 @@ const ConfigureNftPluginCollection = ({
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form!.governedAccount?.governance,
-      chunkSplitByDefault: true,
     }
     return obj
   }

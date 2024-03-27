@@ -2,7 +2,7 @@ import axios from 'axios'
 
 const urlRegex =
   // eslint-disable-next-line
-  /(https:\/\/)(gist\.github.com\/)([\w\/]{1,39}\/)([\w]{1,32})/
+  /(https:\/\/)(gist\.github.com\/)([\w\/-]{1,39}\/)([\w-]{1,32})/
 
 export const gistApi = {
   fetchGistFile: fetchGistFile,
@@ -20,6 +20,7 @@ async function fetchGistFile(gistUrl: string) {
     this.abortController = controller
   }
   const pieces = gistUrl.match(urlRegex)
+
   if (pieces) {
     const justIdWithoutUser = pieces[4]
     if (justIdWithoutUser) {

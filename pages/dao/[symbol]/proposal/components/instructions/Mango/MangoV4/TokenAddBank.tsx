@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { PublicKey, SYSVAR_RENT_PUBKEY } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
@@ -10,13 +10,13 @@ import { Governance, SYSTEM_PROGRAM_ID } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
-import InstructionForm, {
-  InstructionInput,
-  InstructionInputType,
-} from '../../FormCreator'
+import InstructionForm, { InstructionInput } from '../../FormCreator'
+import { InstructionInputType } from '../../inputInstructionType'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import ProgramSelector from '@components/Mango/ProgramSelector'
+import useProgramSelector from '@components/Mango/useProgramSelector'
 
 type NamePkVal = {
   name: string
@@ -37,7 +37,11 @@ const TokenAddBank = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletOnePointOh()
-  const { mangoGroup, mangoClient } = UseMangoV4()
+  const programSelectorHook = useProgramSelector()
+  const { mangoClient, mangoGroup } = UseMangoV4(
+    programSelectorHook.program?.val,
+    programSelectorHook.program?.group
+  )
   const { assetAccounts } = useGovernanceAssets()
   const solAccounts = assetAccounts.filter(
     (x) =>
@@ -109,6 +113,7 @@ const TokenAddBank = ({
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form])
+
   useEffect(() => {
     const getTokens = async () => {
       const currentTokens = [...mangoGroup!.banksMapByMint.values()].map(
@@ -122,7 +127,8 @@ const TokenAddBank = ({
     if (mangoGroup) {
       getTokens()
     }
-  }, [mangoGroup?.publicKey.toBase58()])
+  }, [mangoGroup])
+
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
@@ -147,7 +153,7 @@ const TokenAddBank = ({
       name: 'holdupTime',
     },
     {
-      label: 'Tokens',
+      label: 'Token',
       name: 'token',
       type: InstructionInputType.SELECT,
       initialValue: form.token,
@@ -157,6 +163,9 @@ const TokenAddBank = ({
 
   return (
     <>
+      <ProgramSelector
+        programSelectorHook={programSelectorHook}
+      ></ProgramSelector>
       {form && (
         <InstructionForm
           outerForm={form}

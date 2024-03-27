@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useRouter } from 'next/router'
 
 import { PublicKey } from '@solana/web3.js'
-import useWalletStore from 'stores/useWalletStore'
 import createTokenizedRealm from 'actions/createTokenizedRealm'
 import useQueryContext from '@hooks/useQueryContext'
 
@@ -37,6 +36,7 @@ import {
   GoverningTokenType,
 } from '@solana/spl-governance'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export const FORM_NAME = 'tokenized'
 
@@ -72,7 +72,11 @@ const transformFormData2RealmCreation = (formData: CommunityTokenForm) => {
         formData.transferCommunityMintAuthority ?? true,
       // COUNCIL INFO
       createCouncil: formData.addCouncil ?? false,
-
+      communityTokenConfig: new GoverningTokenConfigAccountArgs({
+        tokenType: GoverningTokenType.Liquid,
+        voterWeightAddin: undefined,
+        maxVoterWeightAddin: undefined,
+      }),
       existingCouncilMintPk: formData.councilTokenMintAddress
         ? new PublicKey(formData.councilTokenMintAddress)
         : undefined,
@@ -105,7 +109,7 @@ const transformFormData2RealmCreation = (formData: CommunityTokenForm) => {
 }
 
 export default function CommunityTokenWizard() {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const { push } = useRouter()

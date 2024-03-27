@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import * as yup from 'yup'
 import {
   Governance,
@@ -12,14 +12,13 @@ import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NewProposalContext } from '../../../new'
-import InstructionForm, {
-  InstructionInput,
-  InstructionInputType,
-} from '../FormCreator'
+import InstructionForm, { InstructionInput } from '../FormCreator'
+import { InstructionInputType } from '../inputInstructionType'
 import { getMaxVoterWeightRecord } from '@utils/plugin/accounts'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useRealmQuery } from '@hooks/queries/realm'
 
 interface CreateNftMaxVoterWeightRecord {
   governedAccount: AssetAccount | undefined
@@ -32,7 +31,9 @@ const CreateNftPluginMaxVoterWeightRecord = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { realm, realmInfo } = useRealm()
+  const realm = useRealmQuery().data?.result
+
+  const { realmInfo } = useRealm()
   const nftClient = useVotePluginsClientStore((s) => s.state.nftClient)
   const { assetAccounts } = useGovernanceAssets()
   const wallet = useWalletOnePointOh()

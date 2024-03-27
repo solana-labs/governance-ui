@@ -7,13 +7,13 @@ import type {
 
 import { Asset, Token } from './Asset'
 
-export interface CommonRules {
+interface CommonRules {
   maxVotingTime: number
   minInstructionHoldupTime: number
   votingCoolOffSeconds: number
 }
 
-export interface Rules {
+interface Rules {
   decimals?: number
   minTokensToCreateProposal: BigNumber
   voteThresholdPercentage: number | 'disabled'

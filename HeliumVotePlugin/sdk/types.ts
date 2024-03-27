@@ -10,6 +10,7 @@ export type VotingMintConfig = IdlTypes<HeliumVoterStakeRegistry>['VotingMintCon
 type RegistrarV0 = IdlAccounts<HeliumVoterStakeRegistry>['registrar']
 export type Lockup = IdlTypes<HeliumVoterStakeRegistry>['Lockup']
 export type PositionV0 = IdlAccounts<HeliumVoterStakeRegistry>['positionV0']
+export type DelegatedPositionV0 = IdlAccounts<HeliumSubDaos>['delegatedPositionV0']
 export interface Registrar extends RegistrarV0 {
   votingMints: VotingMintConfig[]
 }
@@ -19,6 +20,8 @@ export interface Position extends Omit<PositionV0, 'lockup'> {
 export interface PositionWithMeta extends Position {
   pubkey: PublicKey
   isDelegated: boolean
+  delegatedSubDao: PublicKey | null
+  hasRewards: boolean
   hasGenesisMultiplier: boolean
   votingPower: BN
   votingMint: VotingMintConfig & {
@@ -26,8 +29,8 @@ export interface PositionWithMeta extends Position {
   }
 }
 export type LockupKind = IdlTypes<HeliumVoterStakeRegistry>['LockupKind']
-export type InitializePositionV0Args = IdlTypes<HeliumVoterStakeRegistry>['InitializePositionArgsV0']
-
+/* export type InitializePositionV0Args = IdlTypes<HeliumVoterStakeRegistry>['InitializePositionArgsV0']
+ */
 export type SubDao = IdlAccounts<HeliumSubDaos>['subDaoV0']
 export interface SubDaoWithMeta extends Omit<SubDao, 'dntMint'> {
   pubkey: PublicKey

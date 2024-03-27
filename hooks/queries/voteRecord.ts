@@ -1,12 +1,23 @@
 import { EndpointTypes } from '@models/types'
-import { getVoteRecord } from '@solana/spl-governance'
+import {
+  VoteRecord,
+  getGovernanceAccounts,
+  getVoteRecord,
+  pubkeyFilter,
+} from '@solana/spl-governance'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
 import { getNetworkFromEndpoint } from '@utils/connection'
 import asFindable from '@utils/queries/asFindable'
-import useWalletStore from 'stores/useWalletStore'
 import { useAddressQuery_SelectedProposalVoteRecord } from './addresses/voteRecord'
 import queryClient from './queryClient'
+import { useRealmQuery } from './realm'
+import { useVotingPop } from '@components/VotePanel/hooks'
+import {
+  useAddressQuery_CommunityTokenOwner,
+  useAddressQuery_CouncilTokenOwner,
+} from './addresses/tokenOwnerRecord'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export const voteRecordQueryKeys = {
   all: (cluster: EndpointTypes) => [cluster, 'VoteRecord'],
@@ -14,6 +25,11 @@ export const voteRecordQueryKeys = {
     ...voteRecordQueryKeys.all(cluster),
     k.toString(),
   ],
+  byRealmXOwner: (
+    cluster: EndpointTypes,
+    realm: PublicKey,
+    owner: PublicKey
+  ) => [...voteRecordQueryKeys.all(cluster), realm, owner],
 }
 
 // currently unused
@@ -27,8 +43,8 @@ export const useVoteRecordByTokenOwnerRecordQuery = (
   return query
 }
 
-export const useVoteRecordByPubkeyQuery = (pubkey?: PublicKey) => {
-  const connection = useWalletStore((s) => s.connection)
+export const useVoteRecordByPubkeyQuery = (pubkey: PublicKey | undefined) => {
+  const connection = useLegacyConnectionContext()
 
   const enabled = pubkey !== undefined
   const query = useQuery({
@@ -45,6 +61,45 @@ export const useVoteRecordByPubkeyQuery = (pubkey?: PublicKey) => {
   return query
 }
 
+// doesn't actually filter by realm !
+export const useVoteRecordsByOwnerQuery = (owner: PublicKey | undefined) => {
+  const connection = useLegacyConnectionContext()
+  const realm = useRealmQuery().data?.result
+
+  const enabled = owner !== undefined && realm?.pubkey !== undefined
+  const query = useQuery({
+    queryKey: enabled
+      ? voteRecordQueryKeys.byRealmXOwner(
+          connection.cluster,
+          realm?.pubkey,
+          owner
+        )
+      : undefined,
+    queryFn: async () => {
+      if (!enabled) throw new Error()
+      const results = await getGovernanceAccounts(
+        connection.current,
+        realm.owner,
+        VoteRecord,
+        [pubkeyFilter(33, owner)!]
+      )
+
+      // since we got the data for these accounts, lets save it
+      results.forEach((x) => {
+        queryClient.setQueryData(
+          voteRecordQueryKeys.byPubkey(connection.cluster, x.pubkey),
+          { found: true, result: x }
+        )
+      })
+
+      return results
+    },
+    enabled,
+  })
+
+  return query
+}
+
 export const fetchVoteRecordByPubkey = (
   connection: Connection,
   pubkey: PublicKey
@@ -54,4 +109,31 @@ export const fetchVoteRecordByPubkey = (
     queryKey: voteRecordQueryKeys.byPubkey(cluster, pubkey),
     queryFn: () => asFindable(getVoteRecord)(connection, pubkey),
   })
+}
+
+export const useProposalVoteRecordQuery = (quorum: 'electoral' | 'veto') => {
+  const tokenRole = useVotingPop()
+  const community = useAddressQuery_CommunityTokenOwner()
+  const council = useAddressQuery_CouncilTokenOwner()
+
+  const electoral =
+    tokenRole === undefined
+      ? undefined
+      : tokenRole === 'community'
+      ? community
+      : council
+  const veto =
+    tokenRole === undefined
+      ? undefined
+      : tokenRole === 'community'
+      ? council
+      : community
+
+  const selectedTokenRecord = quorum === 'electoral' ? electoral : veto
+
+  const pda = useAddressQuery_SelectedProposalVoteRecord(
+    selectedTokenRecord?.data
+  )
+
+  return useVoteRecordByPubkeyQuery(pda.data)
 }

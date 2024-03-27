@@ -22,11 +22,9 @@ import { VOTE_STAKE_REGISTRY_INSTRUCTIONS } from './programs/voteStakeRegistry'
 import { MARINADE_INSTRUCTIONS } from './programs/marinade'
 import { SOLEND_PROGRAM_INSTRUCTIONS } from './programs/solend'
 import { ATA_PROGRAM_INSTRUCTIONS } from './programs/associatedTokenAccount'
-import { STREAMFLOW_INSTRUCTIONS } from './programs/streamflow'
 import { governance as foresightGov } from '@foresight-tmp/foresight-sdk'
 import { ConnectionContext } from '@utils/connection'
 import { NFT_VOTER_INSTRUCTIONS } from './programs/nftVotingClient'
-import { PROGRAM_IDS } from '@castlefinance/vault-sdk'
 import { FORESIGHT_INSTRUCTIONS } from './programs/foresight'
 import { LIDO_INSTRUCTIONS } from './programs/lido'
 import { NAME_SERVICE_INSTRUCTIONS } from './programs/nameService'
@@ -35,20 +33,21 @@ import { VALIDATORDAO_INSTRUCTIONS } from './programs/validatordao'
 import { POSEIDON_INSTRUCTIONS } from './programs/poseidon'
 import { MANGO_V4_INSTRUCTIONS } from './programs/mangoV4'
 import { DUAL_INSTRUCTIONS } from './programs/dual'
-
-export const V3_DEFAULT_GOVERNANCE_PROGRAM_ID =
-  '7e75Nwsz8i5i4NiDa43CNzKJ4AeQGyRimha46VKTM1Ls'
-
-export const V2_DEFAULT_GOVERNANCE_PROGRAM_ID =
-  'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'
+import { SWITCHBOARD_INSTRUCTIONS } from './programs/switchboard'
+import { STAKE_INSTRUCTIONS } from './programs/stake'
+import dayjs from 'dayjs'
+import { JUPITER_REF } from './programs/jupiterRef'
 
 /**
  * Default governance program id instance
  */
-export const DEFAULT_GOVERNANCE_PROGRAM_ID = V2_DEFAULT_GOVERNANCE_PROGRAM_ID
-export const DEFAULT_GOVERNANCE_PROGRAM_VERSION = 2
+export const DEFAULT_GOVERNANCE_PROGRAM_ID =
+  'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'
+export const DEFAULT_GOVERNANCE_PROGRAM_VERSION = 3
 
 export const MANGO_DAO_TREASURY = '9RGoboEjmaAjSCXsKi6p6zJucnwF3Eg5NUN9jPS6ziL3'
+export const MANGO_INSTRUCTION_FORWARDER =
+  'ixFPGCPYEp5GzhoahhHFVL8VVzkq1kc2eeFZh3qpYca'
 
 // Well known account names displayed on the instruction card
 export const ACCOUNT_NAMES = {
@@ -62,12 +61,33 @@ export const ACCOUNT_NAMES = {
   '9pDEi3yT9ooT1uw1PApQDYK65advJs4Nt65EJG1m59Yq':
     'Mango Developer Council Mint',
   Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z: 'Mango DAO MNGO Treasury Vault',
+  HvBKrep6TbUpLVB4Lyd5T56LohhpPf3ZdNt7wpTiKqn3: 'Mango DAO Game Master Wallet',
+  DiSDgMz4DeNKHXkpqUGoukr1YM9xxc1wH9gusZnMa1ga: 'Mango DAO Dual Realm Deposit',
+  '2gDu12CM56g18Ukc9R1EdmEbToXqGTrnBEqR3zKfVKgt':
+    'Mango DAO BLAZE Realm Deposit',
+  '8gjzxiqcU87cvRc7hFiUJgxqLSV7AQnSttfWC5fD9aim':
+    'Mango DAO Treasury Council Mint',
+  oW7juZxrhaGvWw5giRp3P3qTHEZpg2t8n8aXTCpBjNK: 'Mango DAO boost council',
+  G1Yc5696GcfL28uAWG6iCaKJwZd8sQzwPJTc2UacsjHN:
+    'Mango DAO Game Master Council Mint',
+  A9xaHx54B9bRYBga4V6LKFrRaARpMJFYVooEXRAanru5:
+    'Mango DAO Treasury Council USDC Treasury',
   '7zGXUAeUkY9pEGfApsY26amibvqsf2dmty1cbtxHdfaQ': 'Mango DAO Wallet Governance',
+  '9so7UTo6b6LXBSqdDfh18hjVj8Ng5BmLbYXLB7UrhaaJ':
+    'Mango Treasury Council Wallet',
+  BxZ974q4zsrSThN54rZqNaA6E2CFoj77mUikqK68Lgrf:
+    'Mango Treasury Council Wallet Governance',
+  FnrgYLrpftdsBj5gd4qeaFwDUQZCg2cfo7aqQ1kJmWJy: 'Mango DAO -> DAO Vote Wallet',
+  EWaYDnKhcqS4tVjyhUBoJR1Yx755imqzBm5tb2vQTNtK:
+    'Mango DAO -> DAO Vote Wallet Governance',
   '7D6tGmaMyC8i73Q8X2Fec2S1Zb5rkyai6pctdMqHpHWT':
     'Mango DAO Fast Listing Governance',
   Fmt4596j4uBvYutwQ2ZBw7RGw9EngR8yNijdqemnpiaB: 'Mango DAO Fast Listing Wallet',
   '5tgfd6XgwiXB9otEnzFpXK11m7Q7yZUaAJzWK4oT5UGF': 'Mango DAO Wallet',
   '9RGoboEjmaAjSCXsKi6p6zJucnwF3Eg5NUN9jPS6ziL3': 'Mango DAO MNGO Treasury',
+  Ccg4zf9V2U4PKyx5DBANf9sF2pu4s4XgRNLkaP6yqJZF: 'Mango DAO Checking Wallet',
+  Db8aq5EvSS2DXpKjNxkaZChEc3jy7W3wUq4xFy35AWbo:
+    'Mango DAO Checking Wallet Governance',
   '3r1tQ2qaR5teYPEyGoHwZeZfMU1zxD5FAAmtAJPbj9xX':
     'Mango DAO Opinion Voting Governance',
   '36LbigK7RRiw12u7rb83Ztb9SFrUFUCDfYPxtfZndtyV':
@@ -76,6 +96,7 @@ export const ACCOUNT_NAMES = {
   '4PdEyhrV3gaUj4ffwjKGXBLo42jF2CQCCBoXenwCRWXf':
     'Mango DAO USDC Treasury Vault',
   '6h29sTzK4XsL4Gjo8uXLWXgKLNSXvnnax45RJ4NSCziP': 'Mango DAO USDC Treasury',
+  '4j7rsyag8nFYw4SXk1qQijyaeX8vVbuN28XyjYjSayFZ': 'Mango DAO CHAI Treasury',
   '4WQSYg21RrJNYhF4251XFpoy1uYbMHcMfZNLMXA3x5Mp':
     'Mango DAO Voter Stake Registry Registrar',
   DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE: 'Mango DAO Governance Realm',
@@ -123,6 +144,37 @@ export const ACCOUNT_NAMES = {
   FAFDfoUkaxoMqiNur9F1iigdBNrXFf4uNmS5XrhMewvf:
     'Friends and Family Community Mint',
 
+  // Dean's List DAO
+  '6Vjsy1KabnHtSuHZcXuuCQFWoBML9JscSy3L4NGjqmhM': 'Deans List DAO Treasury',
+  CLgzSdeNcf9CYHiAdmXaPaCw2vYBeiqEeZcgguqirVM9: 'DAO: (DEAN) Strategic Reserve',
+  bDgqY2Qt4y2jSsRNvD7FETkRJJNiYZT1Q3UnAYYzUCo: 'DAO: (DEAN) Community Reserve',
+  BtJaNZrZZmagHGzCU2VazSJWzBS9KY7tG41enBrT2NtU: 'DAO: (DEAN) Liquidity Reserve',
+
+  // Physis DAO
+  '29epeLvAMyRXtpA1HaoKB1hGcAnrc1NvMCbaZ8AVRwEi': 'Physis DAO Treasury',
+  '4i2Yjk5bUiLeVNwqBpkRdFSECSCvMgKoeCSdRSx1TPcz': 'DAO: Rewards (PHY)',
+  EUkYhtkRmxQpnKTvGayBJM3Pt1FQNjaMWP3UCUb38hJN: 'DAO: Grants (PHY)',
+  '3XwmcRf9R6TFqCwhLkftur8Baq45ZYE7DQDj9WUAPsmN': 'DAO: Governance (PHY)',
+
+  '6Va7K51FRbnPcYZTUwkoFfoYtnfh8qyJaZqT4W1GGxVi': 'Physis EcoSystem Treasury',
+  C2KKuAq4UaUFYtm3zcxZMSDUuSEfPSk4yLcq5XaBr4wM: 'EcoSystem: Development (PHY)',
+  F6EHstw5jkmHVLLXj9HEx3xCRsY7Whm7JK266jWFrFSB: 'EcoSystem: CapEX (PHY)',
+  '4gr1JjLD89VAbmQRrLeFDiLFSv2z2zn1tXRWRX4C3kow': 'EcoSystem: OpEX (PHY)',
+  '8eJoFYj8XtwJ9mER7qmb1EEnV8mGYGHyjxRct8ooJXQr': 'EcoSystem: Marketing (PHY)',
+
+  '2jfAMh48b37bBTKkoNwmvNZAqVQc1G7gh5vYv5FoWTUR': 'Physis Team Treasury',
+  '8vXYj8B567R8Di7BUvquiGC7usyPMtL756xx6KERfW9K': 'Team: Community (PHY)',
+  AiGCc2YEwLNER7DETRwv5e82eqLwPL8FMcmmHEhED5Vr: 'Team: Core (PHY)',
+  CpB6PDoxfkg2U8EC8XhyD6TdCAWkhRqZ4Fa3j3UFW6Rv: 'Team: Extraordinary (PHY)',
+
+  BaT8NdFHAhrBpS7gTQX2YgSwazeNLcA4gKooDsAutvCk: 'Physis Alliance Treasury',
+  H4WWxBJoDfGWfE212SF5tcyo75zBJnzCRAUmWpRMcxyH: 'Alliance: Partnerships (PHY)',
+  '5L84NZfjdfWHkkkUT9bJ8jKqtTMrpKsAobtTW4NKpJB1': 'Alliance: Advisors (PHY)',
+
+  E26u3zGmYtR4tnmbhNSQS6kLVmSizSvPCQyu7qGnTWQ3: 'Physis Reserve Treasury',
+  BgDFLAE25QybqyK6TMPdPF7vFTrBu1AjPs2cFkF8R3cb: 'Reserve: Seed (PHY)',
+  GDJKzWrkxWHEPPt4k2Ao1TL7S1CEo4xNRnTAVk3jrmbk: 'Reserve: Launchpad (PHY)',
+
   // GM DAO
   '7WbRWL33mM3pbFLvuqNjBztihQtHWWFPGr4HLHyqViG9': 'Team funds',
   DWhnQm42vCBLkA9RsrBB2spyR3uAJq1BGeroyNMKgnEh: 'Marketing funds',
@@ -131,10 +183,6 @@ export const ACCOUNT_NAMES = {
   '39J1sWHCJgWab8pn6zpTqFCYRXTYVqbEkpLimrq8kTYJ':
     'GSAIL VAULT 2022-2026 VESTING SCHEDULE',
   GAMpPYx4DcJdPhnr7sM84gxym4NiNpzo4G6WufpRLemP: 'GSAIL TREASURY VAULT',
-
-  // Marinade DAO
-  B7ux5n2LYxJhS2TsMAcE98eMbkY3dBHUWyrZPBnDmMT5: 'MNDE Treasury',
-  GewCM8ipoPnEraZZqEp6VgVPLZfxr8xwJREmidXVU1EH: 'mSOL Treasury',
 
   // MonkOG DAO
   CVuCjHrqj97fSTsnSKzEBVPeYzXEEv6uiRjzBLRvnouj: 'MonkOG DAO Treasury Vault',
@@ -201,6 +249,93 @@ export const ACCOUNT_NAMES = {
   '714JsESwkxjDZTaxD2TNe7vqMG52yxug8vaXug5VKBqd':
     'Kaiman dao council mint governance',
   '9rFYGii2nQz74qg5PTYViPj46E82PrJguEC2QvbZVuwk': 'Kaiman dao council mint',
+
+  // Marinade DAO
+  '899YG3yk4F66ZgbNWLHriZHTXSKk9e1kvsKEquW7L6Mo': 'Marinade DAO Realm',
+  MNDEFzGvMt87ueuHvVU9VcTqsAP5b3fTGPsHuuPA5ey: 'MNDE Token Mint',
+  FsrqQfLGdFVtySSSsyZJUzVBA9bvGZSKyhp7nsJCqgJe:
+    'Marinade Realm Config Governance',
+  '26Pw2qvaHgnvHPD73pWr6EUWchpTF3bEzVbEoDPLS21D':
+    'Marinade Realm Config Wallet',
+  '6MGwpuJ5YE1c8jJaF8FKurQdDJeYRf1adX76dovkXxRs': 'Marinade Council Mint',
+  CnPBhNLpwPDY5rw8Wa8bt8DCkRNJ2GoGVf9xb7VYNrRr:
+    'Marinade Admin Authorities Governance',
+  BD9XxcmnvbJHgCcX8b2QMXjmcXHQ332NskFvjq6DTByU:
+    'Marinade Admin Authorities Wallet',
+  M5Fg6GipNvPzWgXNr5wj1EDcp8GB9J53cgyE7YGYLbL:
+    'Marinade Liquid Staking Admin Authority Governance',
+  '42VJbDihcS81YJPbuhHnHgvo1ehu42j8VK9sNwrnAarR':
+    'Marinade Liquid Staking Admin Authority Wallet',
+  '8z6A4qSfL9FFvwX12zqt6HrbzaWthGUqBe4czCn9iXtq':
+    'Marinade MNDE Treasury Governance',
+  B56RWQGf9RFw7t8gxPzrRvk5VRmB5DoF94aLoJ25YtvG: 'Marinade MNDE Treasury Wallet',
+  GR1LBT4cU89cJWE74CP6BsJTf2kriQ9TX59tbDsfxgSi: 'Marinade MNDE Treasury Vault',
+  '23xVZXQrHAZ4rm4nWKAM5eTLeUFmstbs42KF21PA4Ayo':
+    'Marinade Opinion Voting Governance',
+  AyCAAAd7wsw6zy6cVhDf8gp6Mv4K46T84dUrkg7KX7fy:
+    'Marinade Opinion Voting Wallet',
+  CWRgRr4udD66JbVtS9u2Gu7LHBi5m6SM3ytvmWobThEQ:
+    'Marinade Tokadapt Program Governance',
+  AEej7Lywu8EzMznXnxhb1493yCVnmLNXaCKYfUNvQQaJ:
+    'Marinade Escrow Relocker Program Governance',
+  '3cBS14yanCZPRKgdCLnmxHWXFfGjW8bid5zxj7UPqWW5':
+    'Marinade Liquidity Gauges Program Governance',
+  CLydpgqZty5HQq1uMtbXpH1vtmN7erhdBSPbn12NGLmb:
+    'Marinade Validator Gauges Program Governance',
+  G6yWqM2RVjhepkVEayeNVqgKNtpMuwtgqDY3s2N3uzas:
+    'Marinade Referral v1 Program Governance',
+  '6XQFdWeogb5C8c1KsSCkK6rzzxLxzxsPQqoXge9oJ9xR':
+    'Marinade Referral v2 Program Governance',
+  '2aQP7NGhktKR92EsHKSoRzcw5FfcZ8oBWgyoGdB3ouww':
+    'Marinade Directed Stake Program Governance',
+  A8tioq6Joznftd2b6GLY8rrgCka6F81vVztFciWDxEAe:
+    'Marinade Council Budget Governance',
+  J5BEceL5z1EQ7JBqEFu4BfPN4PYCeQaW3GXrzXFfCzhs:
+    'Marinade Council Budget Wallet',
+  H988v6sNu4dw911AeUo6fy5RsTkDtyfcTAMNpdq1Mo6u:
+    'Marinade Council Budget MNDE Vault',
+  '7iUtTuZAh2Len8LiC1u68gUMPMsKh9kce9bcbdGwtBZY':
+    'Marinade Programs Upgrade Governance',
+  '6YAju4nd4t7kyuHV6NvVpMepMk11DgWyYjKVJUak2EEm':
+    'Marinade Programs Upgrade Wallet',
+  indiXdKbsC4QSLQQnn6ngZvkqfywn6KgEeQbkGSpk1V:
+    'Marinade Incentives Distribution Program',
+  '2w6ny74cU6yRxkD6ZACh5M1JznLQ1KB6AUsB7zo2NBHX':
+    'Marinade Voter Stake Registry Program Governance',
+  '6egAu2HDLcSgeUYmiBvNLgp7Bd4nPk16gX9MvWuJpeX2':
+    'Marinade SPL Program Governance',
+
+  // Dual DAO
+  '4yx1NJ4Vqf2zT1oVLk4SySBhhDJXmXFt88ncm4gPxtL7': 'Staking Options Program',
+  '2fJcpdR6qzqDP7fBqvoJQ5PGYdaRFBNyUKZkZf5t12mr': 'Airdrop Program',
+  '8tBcmZAMNm11DuGAS2r6PqSA3CKt72amoz8bVj14xRiT':
+    'Merkle Airdrop Verifier Program',
+  ATCsJvzSbHaJj3a9uKTRHSoD8ZmWPfeC3sYxzcJJHTM5:
+    'Governance Airdrop Verifier Program',
+  DuALd6fooWzVDkaTsQzDAxPGYCnLrnWamdNNTNxicdX8:
+    'Lockup Staking Options Program',
+  '7Z36Efbt7a4nLiV7s5bY7J2e4TJ6V9JEKGccsy2od2bE': 'Dual DAO wallet',
+
+  // AllDomains DAO
+  fP1PNg489M64sRHou3unkCVhj7nU7pYwseDyCPtpqpQ: 'AllDomains DAO Wallet',
+  H53NZSkb8VSiajHdM1yXPYsWwS2ZRZn9K5X6WeomXZ9: 'AllDomains Treasury',
+  '6T7RnoweVwuLEp86gwxpQg3z4xW8eSJdMjzKi9Ei48Mh': 'AllDomains Foundation 1',
+  '5vz3XNcMhPGZeEFwkKqjWA5s3aPLgr2HJh7UvrUeaDaB': 'AllDomains Foundation 2',
+  BaoawH9p2J8yUK9r5YXQs3hQwmUJgscACjmTkh8rMwYL: 'AllDomains (ALL) Token',
+  '8XU6iRnVGp1DSWsbXWQVG3BofKncULJPEcU6YV6VRXDv': 'AllDomains Council Mint',
+  Hq1ffpMA4368gerKRAdVy7KFrUUMo2NwGwVwcXoFy1Th: 'AllDomains Community Rewards',
+  rP3eHs6uEDhQLqJHPLAwaNVENRezAgSnZK6opUtjhhT: 'AllDomains Grants',
+  '27Ma5zSVb8Sv9fuSZcXH2ZghTzdDXuWtzST4NJjXKKVo':
+    'AllDomains Rewards Governance',
+  '82s94bsTpcXfYbP7vTSwFfoi4cJEkoeQTfMif1h9s1AU':
+    'AllDomains Community Governance',
+  CnixsSAVZqvaJEdkFHXXRQmot7RCSJFRHYMJvupbPoiE:
+    'AllDomains Foundation Governance 1',
+  '95vv4h7GWeBG7DbnzMwB15ZinFKBUiPeg6ea7ZqdGjZx':
+    'AllDomains Foundation Governance 2',
+  '6gwjRFcW1Y9iuJwXPdz1zZUa3Hcu855dH6APA5LjD8qK':
+    'AllDomains Treasury Governance',
+  AWVUWfRnHCTgo123mRXB9BRWaxt6JdZXXKhFMQ5mryKJ: 'AllDomains DAO Governance',
 }
 
 // TODO: Add this to on-chain metadata to Governance account
@@ -235,6 +370,7 @@ export const HIDDEN_PROPOSALS = new Map<string, string>([
   ['7P3dtUTSvcQcjtJpZHZKEzrGvvHQdQGJrtKFLNAYHvpv', ''],
   ['H5TnbSBNFKJJwKea8tUj7ETcmhRHXQ1N9XCXBSD6Q9P1', ''],
   ['GeMQWvFTasBoui11RqRzMtDPQ9b2BkMK8NzepWzvuXw3', ''],
+  ['CRmUPr8CbfPQ4MAoo2yxSf5qL2nPsddL69kowMfp1JYP', ''],
 ])
 
 export const DEFAULT_NATIVE_SOL_MINT =
@@ -248,10 +384,6 @@ export function getAccountName(accountPk: PublicKey | string) {
   return ACCOUNT_NAMES[key] ?? getProgramName(accountPk)
 }
 
-export const CHAT_PROGRAM_ID = new PublicKey(
-  '7fjWgipzcHFP3c5TMMWumFHNAL5Eme1gFqqRGnNPbbfG'
-)
-
 export const WSOL_MINT = 'So11111111111111111111111111111111111111112'
 export const WSOL_MINT_PK = new PublicKey(WSOL_MINT)
 
@@ -260,7 +392,6 @@ export const WSOL_MINT_PK = new PublicKey(WSOL_MINT)
 const HIDDEN_MNGO_TREASURES = [
   'GZQSF4Fh9xK7rf9WBEhawXYFw8qPXeatZLUqVQeuW3X8',
   'J6jYLFDWeeGwg4u2TXhKDCcH4fSzJFQyDE2VSv2drRkg',
-  '9VEbrfajRanMXoR1ubQiuR1ni9cNWx4QcGv3WgUUikgu',
   'HXxjhCQwm496HAXsHBWfuVkiXBLinHJqUbVKomCjKsfo',
   'EwPgko6gXD5PAgQaFo1KD7R9tPUEgRcTAfsGvgdhkP4Z',
   '6VYcrmbK4QNC7WpfVRXBAXP59ZH2FkUMBoMYhtgENGMn',
@@ -271,15 +402,26 @@ const HIDDEN_MNGO_TREASURES = [
   'PuXf9LNrmtVDhBTxteNTWS8D2SpzbhYvidkSatjRArt',
 ]
 
+//badly created realms
+export const HIDDEN_REALMS = [
+  'BWnVbUDohApiiaWBNNGcLH2KXRKEoTBJ7schsKQWYAtj',
+  'FsoDEiZ9BoGTAaCLzXkyQWEqNKa5PW2iokzmuD7YsRdL',
+  '9nUyxzVL2FUMuWUiVZG66gwK15CJiM3PoLkfrnGfkvt6', // old Drift dao
+]
+
 //owner and desired accounts we want to show
-export const MNGO_AUXILIARY_TOKEN_ACCOUNTS = [
+const MNGO_AUXILIARY_TOKEN_ACCOUNTS = [
   {
-    owner: '9BVcYqEQxyccuwznvxXqDkSJFavvTyheiTYk231T1A8S',
-    accounts: ['59BEyxwrFpt3x4sZ7TcXC3bHx3seGfqGkATcDx6siLWy'],
+    owner: '58apybWwtWwgVfARs7uJ75Vs1csPimnCCFth7cKwTJAe',
+    accounts: ['DiSDgMz4DeNKHXkpqUGoukr1YM9xxc1wH9gusZnMa1ga'],
   },
   {
-    owner: 'GHsErpcUbwiw1eci65HCDQzySKwQCxYRi5MrGeGpq5dn',
-    accounts: ['8tKwcKM4obpoPmTZNZKDt5cCkAatrwHBNteXNrZRvjWj'],
+    owner: '7hqfhmXK6uXQKmNjUVEJo5acDMLcnyN9p9bZ5Dmnifde',
+    accounts: ['2gDu12CM56g18Ukc9R1EdmEbToXqGTrnBEqR3zKfVKgt'],
+  },
+  {
+    owner: '9so7UTo6b6LXBSqdDfh18hjVj8Ng5BmLbYXLB7UrhaaJ',
+    accounts: ['A9xaHx54B9bRYBga4V6LKFrRaARpMJFYVooEXRAanru5'],
   },
 ]
 
@@ -289,13 +431,7 @@ export const AUXILIARY_TOKEN_ACCOUNTS = {
 
 export const HIDDEN_TREASURES = [...HIDDEN_MNGO_TREASURES]
 
-export const ALL_CASTLE_PROGRAMS = [
-  PROGRAM_IDS['devnet-parity'],
-  PROGRAM_IDS['devnet-staging'],
-  PROGRAM_IDS['mainnet'],
-]
-
-export interface AccountDescriptor {
+interface AccountDescriptor {
   name: string
   important?: boolean
 }
@@ -323,19 +459,21 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...RAYDIUM_INSTRUCTIONS,
   ...MARINADE_INSTRUCTIONS,
   ...LIDO_INSTRUCTIONS,
+  ...SWITCHBOARD_INSTRUCTIONS,
   ...SOLEND_PROGRAM_INSTRUCTIONS,
   ...FORESIGHT_INSTRUCTIONS,
   ...ATA_PROGRAM_INSTRUCTIONS,
   ...SYSTEM_INSTRUCTIONS,
   ...VOTE_STAKE_REGISTRY_INSTRUCTIONS,
   ...NFT_VOTER_INSTRUCTIONS,
-  ...STREAMFLOW_INSTRUCTIONS,
   ...NAME_SERVICE_INSTRUCTIONS,
   ...TOKEN_AUCTION_INSTRUCTIONS,
   ...VALIDATORDAO_INSTRUCTIONS,
   ...POSEIDON_INSTRUCTIONS,
   ...MANGO_V4_INSTRUCTIONS,
   ...DUAL_INSTRUCTIONS,
+  ...STAKE_INSTRUCTIONS,
+  ...JUPITER_REF,
 }
 
 export async function getInstructionDescriptor(
@@ -344,35 +482,98 @@ export async function getInstructionDescriptor(
   realm?: ProgramAccount<Realm> | undefined
 ) {
   let descriptors: any
-  if (realm && instruction.programId.equals(realm.owner)) {
+  let instructionToDecode = { ...instruction }
+  const isUsingForwardProgram =
+    instructionToDecode.programId.toBase58() === MANGO_INSTRUCTION_FORWARDER
+
+  if (
+    (realm && instructionToDecode.programId.equals(realm.owner)) ||
+    instructionToDecode.programId.equals(
+      new PublicKey(DEFAULT_GOVERNANCE_PROGRAM_ID)
+    )
+  ) {
     descriptors =
       GOVERNANCE_INSTRUCTIONS['GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw']
+  } else if (isUsingForwardProgram) {
+    instructionToDecode = {
+      accounts: instructionToDecode.accounts.slice(
+        2,
+        instructionToDecode.accounts.length
+      ),
+      data: instructionToDecode.data.slice(8, instructionToDecode.data.length),
+      programId: instructionToDecode.accounts[1].pubkey,
+    }
+    descriptors =
+      INSTRUCTION_DESCRIPTORS[instructionToDecode.programId.toBase58()]
   } else {
-    descriptors = INSTRUCTION_DESCRIPTORS[instruction.programId.toBase58()]
+    descriptors =
+      INSTRUCTION_DESCRIPTORS[instructionToDecode.programId.toBase58()]
   }
 
   // Make it work for program with one instruction like ATA program
   // and for the one with multiple instructions
-  const descriptor = !instruction.data.length
+  const descriptor = !instructionToDecode.data.length
     ? descriptors
-    : descriptors && descriptors[instruction.data[0]]
-    ? descriptors[instruction.data[0]]
+    : descriptors && descriptors[instructionToDecode.data[0]]
+    ? descriptors[instructionToDecode.data[0]]
     : //backup if first number is same for couple of instructions inside same idl
-    descriptors && descriptors[`${instruction.data[0]}${instruction.data[1]}`]
-    ? descriptors[`${instruction.data[0]}${instruction.data[1]}`]
+    descriptors &&
+      descriptors[
+        `${instructionToDecode.data[0]}${instructionToDecode.data[1]}`
+      ]
+    ? descriptors[
+        `${instructionToDecode.data[0]}${instructionToDecode.data[1]}`
+      ]
     : descriptors
 
   const dataUI = (descriptor?.getDataUI &&
     (await descriptor?.getDataUI(
       connection.current,
-      instruction.data,
-      instruction.accounts,
-      instruction.programId,
+      instructionToDecode.data,
+      instructionToDecode.accounts,
+      instructionToDecode.programId,
       connection.cluster
-    ))) ?? <>{JSON.stringify(instruction.data)}</>
+    ))) ?? <>{JSON.stringify(instructionToDecode.data)}</>
+
+  const dataUiWithAdditionalInfo = (
+    <>
+      {isUsingForwardProgram && (
+        <ForwarderProgramDecode
+          instruction={instruction}
+        ></ForwarderProgramDecode>
+      )}
+      {dataUI}
+    </>
+  )
   return {
     name: descriptor?.name,
     accounts: descriptor?.accounts,
-    dataUI,
+    dataUI: dataUiWithAdditionalInfo,
   }
+}
+
+const ForwarderProgramDecode = ({
+  instruction,
+}: {
+  instruction: InstructionData
+}) => {
+  const timestampBytes = instruction.data.slice(0, 8)
+  const view = new DataView(Buffer.from(timestampBytes).buffer)
+  const timestamp = view.getUint32(0, true) // true for little-endian
+
+  const date = dayjs(timestamp * 1000) // Convert to milliseconds
+
+  return (
+    <div className="py-2 pb-4">
+      <div>
+        Instruction use forwarder program: {MANGO_INSTRUCTION_FORWARDER}
+      </div>
+      <div>
+        Only wallet: {instruction.accounts[0].pubkey.toBase58()} can execute
+      </div>
+      <div>
+        Proposal is executable only until: {date.format('DD-MM-YYYY HH:mm')}
+      </div>
+    </div>
+  )
 }
