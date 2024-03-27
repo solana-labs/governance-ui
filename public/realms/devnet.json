@@ -271,11 +271,11 @@
     "realmId": "4tvK4JBdTcha81x5jL784sF1aECLbmLT3ScWDZRdz4cd"
   },
   {
-    "symbol": "Drift Protocol",
+    "symbol": "drift",
     "bannerImage": "https://i.imgur.com/b9pPf3S.png",
-    "displayName": "Drift Protocol",
+    "displayName": "Drift DAO",
     "programId": "dgov7NC8iaumWw3k8TkmLDybvZBCmd1qwxgLAGAsWxf",
-    "realmId": "9nUyxzVL2FUMuWUiVZG66gwK15CJiM3PoLkfrnGfkvt6",
+    "realmId": "FVVXu18aNUqyFCfq8sGktPM62mqJAGaenv4z6UGUs5em",
     "ogImage": "https://i.imgur.com/HnF1Zzy.png",
     "shortDescription": "A lightning-fast and scalable perpetual futures DEX.",
     "sortRank": 3,
