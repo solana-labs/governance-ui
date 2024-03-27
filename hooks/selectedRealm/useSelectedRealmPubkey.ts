@@ -8,7 +8,13 @@ import MAINNET_REALMS from 'public/realms/mainnet-beta.json'
 import { useMemo } from 'react'
 
 const useSelectedRealmPubkey = () => {
-  const { symbol, cluster } = useRouter().query
+  const { symbol } = useRouter().query
+
+  return useRealmPubkeyByPkOrSymbol(symbol as string)
+}
+
+export const useRealmPubkeyByPkOrSymbol = (symbol: string | undefined) => {
+  const { cluster } = useRouter().query
 
   const parsed = useMemo(
     () => (typeof symbol === 'string' ? tryParsePublicKey(symbol) : undefined),

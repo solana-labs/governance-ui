@@ -85,7 +85,7 @@ const Proposal = () => {
       proposal.account.state === ProposalState.ExecutingWithErrors)
 
   return (
-    <div className="grid grid-cols-12 gap-4">
+    <div className="grid grid-cols-12 gap-4 overflow-y-auto">
       <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12 md:col-span-7 lg:col-span-8 space-y-3">
         {proposal ? (
           <>

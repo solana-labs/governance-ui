@@ -5,7 +5,7 @@ import React, {
   useMemo,
   useState,
 } from 'react'
-import { TransactionInstruction } from '@solana/web3.js'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { tryGetMint } from '@utils/tokens'
 import {
   ClawbackForm,
@@ -231,6 +231,23 @@ const Clawback = ({
   }
   return (
     <>
+      <p>
+        Use only with realm authority governance cant be executed with other
+        governances
+      </p>
+      <p>governance: {realmAuthorityGov?.pubkey.toBase58()}</p>
+      <p>
+        wallet:{' '}
+        {realmAuthorityGov
+          ? PublicKey.findProgramAddressSync(
+              [
+                Buffer.from('native-treasury'),
+                realmAuthorityGov!.pubkey.toBuffer(),
+              ],
+              realm!.owner
+            )[0].toBase58()
+          : null}
+      </p>
       <Select
         label="Voter"
         onChange={(value) => {

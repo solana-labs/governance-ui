@@ -18,7 +18,11 @@ interface Props {
 
 export default function LockedCommunityVotingPower(props: Props) {
   const realm = useRealmQuery().data?.result
-  const mint = useRealmCommunityMintInfoQuery().data?.result
+  const {
+    data: mintData,
+    isLoading: mintLoading,
+  } = useRealmCommunityMintInfoQuery()
+  const mint = mintData?.result
 
   const { realmTokenAccount } = useRealm()
 
@@ -41,7 +45,7 @@ export default function LockedCommunityVotingPower(props: Props) {
   // memoize useAsync inputs to prevent constant refetch
   const relevantDelegators = useDelegators('community')
 
-  if (isLoading || votingPowerLoading || !(votingPower && mint)) {
+  if (isLoading || votingPowerLoading || mintLoading) {
     return (
       <div
         className={classNames(
@@ -54,7 +58,8 @@ export default function LockedCommunityVotingPower(props: Props) {
 
   return (
     <div className={props.className}>
-      {votingPower.isZero() && (relevantDelegators?.length ?? 0) < 1 ? (
+      {(votingPower === undefined || votingPower.isZero()) &&
+      (relevantDelegators?.length ?? 0) < 1 ? (
         <div className={'text-xs text-white/50'}>
           You do not have any voting power in this dao.
         </div>

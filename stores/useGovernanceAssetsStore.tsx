@@ -57,6 +57,7 @@ const additionalPossibleMintAccounts = {
     new PublicKey('EGk8Gw7Z484mzAKb7GwCcqrZd4KwwsyU2Dv9woY6uDQu'),
     new PublicKey('8gjzxiqcU87cvRc7hFiUJgxqLSV7AQnSttfWC5fD9aim'),
     new PublicKey('G1Yc5696GcfL28uAWG6iCaKJwZd8sQzwPJTc2UacsjHN'),
+    new PublicKey('oW7juZxrhaGvWw5giRp3P3qTHEZpg2t8n8aXTCpBjNK'),
   ],
 }
 const tokenAccountOwnerOffset = 32

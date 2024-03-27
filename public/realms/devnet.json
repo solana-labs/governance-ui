@@ -254,5 +254,34 @@
     "website": "https://helium.com",
     "twitter": "@Helium",
     "ogImage": "/realms/Helium/img/mobilelogo.png"
+  },
+  {
+    "symbol": "$GARI",
+    "displayName": "GARI Network DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "HvDndGYjZNMVQDsrdAJJR7DtnQSB5rXM9BJBdwuxiXDg",
+    "ogImage": "/realms/GARI Network DAO/Coin.png",
+    "website": "https://gari.network/",
+    "twitter": "@TheGariNetwork"
+  },
+  {
+    "symbol": "agrippa",
+    "displayName": "agrippa test dao",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "4tvK4JBdTcha81x5jL784sF1aECLbmLT3ScWDZRdz4cd"
+  },
+  {
+    "symbol": "Drift Protocol",
+    "bannerImage": "https://i.imgur.com/b9pPf3S.png",
+    "displayName": "Drift Protocol",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "9nUyxzVL2FUMuWUiVZG66gwK15CJiM3PoLkfrnGfkvt6",
+    "ogImage": "https://i.imgur.com/HnF1Zzy.png",
+    "shortDescription": "A lightning-fast and scalable perpetual futures DEX.",
+    "sortRank": 3,
+    "website": "https://www.drift.trade/",
+    "twitter": "@DriftProtocol",
+    "discord": "http://discord.com/invite/drifting",
+    "github": "https://github.com/drift-labs/protocol-v2"
   }
 ]

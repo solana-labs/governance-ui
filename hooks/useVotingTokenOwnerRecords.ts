@@ -9,7 +9,7 @@ import { getTokenOwnerRecordAddress } from '@solana/spl-governance'
  * Namely, this would be the user + any delegates that are enabled (by default, they all are)
  */
 const useVotingTokenOwnerRecords = () => {
-  const delegated = useTokenOwnerRecordsDelegatedToUser()
+  const { data: delegated } = useTokenOwnerRecordsDelegatedToUser()
   const realm = useRealmQuery().data?.result
   const wallet = useWalletOnePointOh()
 
