@@ -10,8 +10,7 @@ export type DriftStakeVoter = {
           isMut: true
           isSigner: false
           docs: [
-            'The Realm Voter Registrar',
-            'There can only be a single registrar per governance Realm and governing mint of the Realm'
+            'There can only be a single registrar per Realm and governing mint of the Realm'
           ]
         },
         {
@@ -26,9 +25,6 @@ export type DriftStakeVoter = {
           name: 'driftProgramId'
           isMut: false
           isSigner: false
-          docs: [
-            'The program id of the spl-governance program the realm belongs to'
-          ]
         },
         {
           name: 'realm'
@@ -111,39 +107,12 @@ export type DriftStakeVoter = {
       ]
     },
     {
-      name: 'createMaxVoterWeightRecord'
-      accounts: [
-        {
-          name: 'registrar'
-          isMut: false
-          isSigner: false
-        },
-        {
-          name: 'maxVoterWeightRecord'
-          isMut: true
-          isSigner: false
-        },
-        {
-          name: 'payer'
-          isMut: true
-          isSigner: true
-        },
-        {
-          name: 'systemProgram'
-          isMut: false
-          isSigner: false
-        }
-      ]
-      args: []
-    },
-    {
       name: 'updateVoterWeightRecord'
       accounts: [
         {
           name: 'registrar'
           isMut: false
           isSigner: false
-          docs: ['The RealmVoter voting Registrar']
         },
         {
           name: 'voterWeightRecord'
@@ -172,6 +141,7 @@ export type DriftStakeVoter = {
           name: 'insuranceFundStake'
           isMut: false
           isSigner: false
+          isOptional: true
         },
         {
           name: 'driftProgram'
@@ -183,61 +153,6 @@ export type DriftStakeVoter = {
     }
   ]
   accounts: [
-    {
-      name: 'maxVoterWeightRecord'
-      docs: [
-        'MaxVoterWeightRecord account as defined in spl-governance-addin-api',
-        "It's redefined here without account_discriminator for Anchor to treat it as native account",
-        '',
-        'The account is used as an api interface to provide max voting power to the governance program from external addin contracts'
-      ]
-      type: {
-        kind: 'struct'
-        fields: [
-          {
-            name: 'realm'
-            docs: ['The Realm the MaxVoterWeightRecord belongs to']
-            type: 'publicKey'
-          },
-          {
-            name: 'governingTokenMint'
-            docs: [
-              'Governing Token Mint the MaxVoterWeightRecord is associated with',
-              'Note: The addin can take deposits of any tokens and is not restricted to the community or council tokens only'
-            ]
-            type: 'publicKey'
-          },
-          {
-            name: 'maxVoterWeight'
-            docs: [
-              'Max voter weight',
-              'The max voter weight provided by the addin for the given realm and governing_token_mint'
-            ]
-            type: 'u64'
-          },
-          {
-            name: 'maxVoterWeightExpiry'
-            docs: [
-              'The slot when the max voting weight expires',
-              'It should be set to None if the weight never expires',
-              'If the max vote weight decays with time, for example for time locked based weights, then the expiry must be set',
-              'As a pattern Revise instruction to update the max weight should be invoked before governance instruction within the same transaction',
-              'and the expiry set to the current slot to provide up to date weight'
-            ]
-            type: {
-              option: 'u64'
-            }
-          },
-          {
-            name: 'reserved'
-            docs: ['Reserved space for future versions']
-            type: {
-              array: ['u8', 8]
-            }
-          }
-        ]
-      }
-    },
     {
       name: 'registrar'
       docs: [
@@ -466,8 +381,7 @@ export const IDL: DriftStakeVoter = {
           isMut: true,
           isSigner: false,
           docs: [
-            'The Realm Voter Registrar',
-            'There can only be a single registrar per governance Realm and governing mint of the Realm',
+            'There can only be a single registrar per Realm and governing mint of the Realm',
           ],
         },
         {
@@ -482,9 +396,6 @@ export const IDL: DriftStakeVoter = {
           name: 'driftProgramId',
           isMut: false,
           isSigner: false,
-          docs: [
-            'The program id of the spl-governance program the realm belongs to',
-          ],
         },
         {
           name: 'realm',
@@ -567,39 +478,12 @@ export const IDL: DriftStakeVoter = {
       ],
     },
     {
-      name: 'createMaxVoterWeightRecord',
-      accounts: [
-        {
-          name: 'registrar',
-          isMut: false,
-          isSigner: false,
-        },
-        {
-          name: 'maxVoterWeightRecord',
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: 'payer',
-          isMut: true,
-          isSigner: true,
-        },
-        {
-          name: 'systemProgram',
-          isMut: false,
-          isSigner: false,
-        },
-      ],
-      args: [],
-    },
-    {
       name: 'updateVoterWeightRecord',
       accounts: [
         {
           name: 'registrar',
           isMut: false,
           isSigner: false,
-          docs: ['The RealmVoter voting Registrar'],
         },
         {
           name: 'voterWeightRecord',
@@ -628,6 +512,7 @@ export const IDL: DriftStakeVoter = {
           name: 'insuranceFundStake',
           isMut: false,
           isSigner: false,
+          isOptional: true,
         },
         {
           name: 'driftProgram',
@@ -639,61 +524,6 @@ export const IDL: DriftStakeVoter = {
     },
   ],
   accounts: [
-    {
-      name: 'maxVoterWeightRecord',
-      docs: [
-        'MaxVoterWeightRecord account as defined in spl-governance-addin-api',
-        "It's redefined here without account_discriminator for Anchor to treat it as native account",
-        '',
-        'The account is used as an api interface to provide max voting power to the governance program from external addin contracts',
-      ],
-      type: {
-        kind: 'struct',
-        fields: [
-          {
-            name: 'realm',
-            docs: ['The Realm the MaxVoterWeightRecord belongs to'],
-            type: 'publicKey',
-          },
-          {
-            name: 'governingTokenMint',
-            docs: [
-              'Governing Token Mint the MaxVoterWeightRecord is associated with',
-              'Note: The addin can take deposits of any tokens and is not restricted to the community or council tokens only',
-            ],
-            type: 'publicKey',
-          },
-          {
-            name: 'maxVoterWeight',
-            docs: [
-              'Max voter weight',
-              'The max voter weight provided by the addin for the given realm and governing_token_mint',
-            ],
-            type: 'u64',
-          },
-          {
-            name: 'maxVoterWeightExpiry',
-            docs: [
-              'The slot when the max voting weight expires',
-              'It should be set to None if the weight never expires',
-              'If the max vote weight decays with time, for example for time locked based weights, then the expiry must be set',
-              'As a pattern Revise instruction to update the max weight should be invoked before governance instruction within the same transaction',
-              'and the expiry set to the current slot to provide up to date weight',
-            ],
-            type: {
-              option: 'u64',
-            },
-          },
-          {
-            name: 'reserved',
-            docs: ['Reserved space for future versions'],
-            type: {
-              array: ['u8', 8],
-            },
-          },
-        ],
-      },
-    },
     {
       name: 'registrar',
       docs: [
