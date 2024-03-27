@@ -107,39 +107,35 @@ export default function PluginVotingPower({ role, className }: Props) {
 
   return (
     <div className={clsx(className)}>
-      <div>
-        <div className="flex items-center justify-between mt-1">
-          <div className=" flex flex-col gap-x-2">
-            <div className={clsx(className)}>
-              <div className={'p-3 rounded-md bg-bkg-1'}>
-                <div className="text-fgd-3 text-xs">Votes</div>
-                <div className="text-xl font-bold text-fgd-1 hero-text">
-                  {formattedTotal ?? 0}
-                </div>
-                {formattedStaked &&
-                  stakedValue?.gtn(0) &&
-                  formattedVanilla &&
-                  vanillaValue?.gtn(0) && (
-                    <>
-                      <div className="text-fgd-3 text-xs">
-                        {formattedStaked} from Drift insurance staking
-                      </div>
-                      <div className="text-fgd-3 text-xs">
-                        {formattedVanilla} from Realms deposit
-                      </div>
-                    </>
-                  )}
-              </div>
-            </div>
+      <div className="mt-1 flex flex-col gap-x-2">
+        <div className={clsx(className)}>
+          <div className={'p-3 rounded-md bg-bkg-1'}>
+            <div className="text-fgd-3 text-xs">Votes</div>
             <div className="text-xl font-bold text-fgd-1 hero-text">
-              {connected && showJoinButton && (
-                <Button className="w-full" onClick={join}>
-                  Join
-                </Button>
-              )}
-              <DriftDeposit role={role} />
+              {formattedTotal ?? 0}
             </div>
+            {formattedStaked &&
+              stakedValue?.gtn(0) &&
+              formattedVanilla &&
+              vanillaValue?.gtn(0) && (
+                <>
+                  <div className="text-fgd-3 text-xs">
+                    {formattedStaked} from Drift insurance staking
+                  </div>
+                  <div className="text-fgd-3 text-xs">
+                    {formattedVanilla} from Realms deposit
+                  </div>
+                </>
+              )}
           </div>
+        </div>
+        <div className="text-xl font-bold text-fgd-1 hero-text">
+          {connected && showJoinButton && (
+            <Button className="w-full" onClick={join}>
+              Join
+            </Button>
+          )}
+          <DriftDeposit role={role} />
         </div>
       </div>
     </div>
