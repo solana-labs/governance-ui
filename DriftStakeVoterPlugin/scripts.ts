@@ -3,8 +3,8 @@ import { getRealm, serializeInstructionToBase64 } from '@solana/spl-governance'
 import { DRIFT_PROGRAM_ID, DRIFT_STAKE_VOTER_PLUGIN } from './constants'
 import { DriftVoterClient } from './DriftVoterClient'
 import { IDL } from './idl/driftStakeVoter'
-const { PublicKey, Keypair, SystemProgram } = anchor.web3
-const { BN, Program } = anchor
+const { PublicKey, SystemProgram } = anchor.web3
+const { Program } = anchor
 
 const provider = anchor.AnchorProvider.env()
 anchor.setProvider(provider)
