@@ -666,7 +666,6 @@ export default function useGovernanceAssets() {
     [Instructions.PythRecoverAccount]: {
       name: 'Recover Account',
       packageId: PackageEnum.Pyth,
-      isVisible: true,
     },
     /*
       ███████ ███████ ██████  ██    ██ ███    ███
