@@ -155,7 +155,6 @@ export default function useGovernanceAssets() {
       isVisible: symbol === 'FORE',
       image: '/img/foresight.png',
     },
-
     [PackageEnum.GatewayPlugin]: {
       name: 'Gateway Plugin',
       image: '/img/civic.svg',
@@ -178,6 +177,10 @@ export default function useGovernanceAssets() {
     [PackageEnum.PsyFinance]: {
       name: 'PsyFinance',
       image: '/img/psyfinance.png',
+    },
+    [PackageEnum.Pyth]: {
+      name: 'Pyth',
+      image: '/img/pyth.svg',
     },
     [PackageEnum.Serum]: {
       name: 'Serum',
@@ -653,6 +656,18 @@ export default function useGovernanceAssets() {
       packageId: PackageEnum.PsyFinance,
     },
 
+    /*
+      ██████  ██    ██ ████████ ██   ██
+      ██   ██  ██  ██     ██    ██   ██
+      ██████    ████      ██    ███████
+      ██         ██       ██    ██   ██
+      ██         ██       ██    ██   ██
+    */
+    [Instructions.PythRecoverAccount]: {
+      name: 'Recover Account',
+      packageId: PackageEnum.Pyth,
+      isVisible: true,
+    },
     /*
       ███████ ███████ ██████  ██    ██ ███    ███
       ██      ██      ██   ██ ██    ██ ████  ████

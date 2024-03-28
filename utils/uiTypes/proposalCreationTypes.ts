@@ -14,20 +14,21 @@ import * as PaymentStreaming from '@mean-dao/payment-streaming'
 // Alphabetical order
 export enum PackageEnum {
   Common,
+  Distribution,
   Dual,
   Foresight,
   GatewayPlugin,
   Identity,
-  NftPlugin,
   MangoMarketV4,
   MeanFinance,
-  Squads,
+  NftPlugin,
   PsyFinance,
+  Pyth,
   Serum,
   Solend,
+  Squads,
   Switchboard,
   VsrPlugin,
-  Distribution,
 }
 
 export interface UiInstruction {
@@ -398,6 +399,7 @@ export enum Instructions {
   SquadsMeshAddMember,
   SquadsMeshChangeThresholdMember,
   SquadsMeshRemoveMember,
+  PythRecoverAccount,
   StakeValidator,
   SwitchboardFundOracle,
   WithdrawFromOracle,
