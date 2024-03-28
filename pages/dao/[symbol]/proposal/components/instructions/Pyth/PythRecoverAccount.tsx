@@ -13,8 +13,8 @@ import { NewProposalContext } from '../../../new'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { PublicKey } from '@solana/web3.js'
 import { AssetAccount } from '@utils/uiTypes/assets'
-import {StakeConnection} from '@pythnetwork/staking'
-import { PYTH_STAKING_PROGRAM_ID } from './common'
+import { StakeConnection, STAKING_ADDRESS } from '@pythnetwork/staking'
+import { Wallet } from '@coral-xyz/anchor'
 
 export interface PythRecoverAccountForm {
   governedAccount: AssetAccount | null
@@ -52,17 +52,17 @@ const PythRecoverAccount = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-
-      // TODO: create instruction
-
       const stakeConnection = await StakeConnection.createStakeConnection(
         connection.current,
-        wallet,
-        PYTH_STAKING_PROGRAM_ID,
+        {} as Wallet,
+        STAKING_ADDRESS
       )
 
       const stakeAccountPublicKey = new PublicKey(form.stakeAccount)
-      const instruction = await stakeConnection.buildRecoverAccountInstruction(stakeAccountPublicKey, form.governedAccount.pubkey)
+      const instruction = await stakeConnection.buildRecoverAccountInstruction(
+        stakeAccountPublicKey,
+        form.governedAccount.governance.pubkey
+      )
 
       return {
         serializedInstruction: serializeInstructionToBase64(instruction),
@@ -96,9 +96,13 @@ const PythRecoverAccount = ({
     stakeAccount: yup
       .string()
       .required('Stake is required')
-      .test('is-stake-account-valid', 'Invalid Stake Account', function (val: string) {
-        return val ? validatePubkey(val) : true
-      })
+      .test(
+        'is-stake-account-valid',
+        'Invalid Stake Account',
+        function (val: string) {
+          return val ? validatePubkey(val) : true
+        }
+      ),
   })
   const inputs: InstructionInput[] = [
     {
@@ -115,7 +119,7 @@ const PythRecoverAccount = ({
       initialValue: form.stakeAccount,
       type: InstructionInputType.INPUT,
       inputType: 'text',
-      name: 'vault',
+      name: 'stakeAccount',
     },
   ]
 
