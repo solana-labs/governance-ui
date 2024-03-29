@@ -45,7 +45,6 @@ export async function fetchMangoAccounts(
   mangoGroup: Group | null
 ) {
   if (!mangoClient || !mangoGroup) {
-    console.log('Empty??')
     return {
       mangoAccountsValue: new BigNumber(0),
       mangoAccounts: [],
