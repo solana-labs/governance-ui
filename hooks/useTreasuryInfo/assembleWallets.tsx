@@ -39,12 +39,13 @@ function isNotNull<T>(x: T | null): x is T {
   return x !== null
 }
 
-async function fetchMangoAccounts(
+export async function fetchMangoAccounts(
   assets: Asset[],
   mangoClient: MangoClient | null,
   mangoGroup: Group | null
 ) {
   if (!mangoClient || !mangoGroup) {
+    console.log('Empty??')
     return {
       mangoAccountsValue: new BigNumber(0),
       mangoAccounts: [],

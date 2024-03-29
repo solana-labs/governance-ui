@@ -58,10 +58,11 @@ export function useTotalTreasuryPrice() {
   const totalPrice = totalTokensPrice + stakeAccountsTotalPrice
 
   const totalPriceFormatted = governedTokenAccountsWithoutNfts.length
-    ? new BigNumber(totalPrice).toFormat(0)
-    : ''
+    ? new BigNumber(totalPrice)
+    : new BigNumber(0)
 
   return {
     totalPriceFormatted,
+    assetAccounts,
   }
 }
