@@ -12,6 +12,7 @@ import {
   AssetType,
   Domains,
   Stake,
+  Mango,
 } from '@models/treasury/Asset'
 
 import TokenList from './TokenList'
@@ -27,6 +28,7 @@ import {
   isUnknown,
   isDomain,
   isStake,
+  isMango,
 } from '../typeGuards'
 
 import { PublicKey } from '@solana/web3.js'
@@ -38,6 +40,8 @@ import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import useTreasuryAddressForGovernance from '@hooks/useTreasuryAddressForGovernance'
 import { useDigitalAssetsByOwner } from '@hooks/queries/digitalAssets'
 import { SUPPORT_CNFTS } from '@constants/flags'
+import { MangoAccount } from '@blockworks-foundation/mango-v4'
+import BigNumber from 'bignumber.js'
 
 export type Section = 'tokens' | 'nfts' | 'others'
 
@@ -47,14 +51,22 @@ function isTokenLike(asset: Asset): asset is Token | Sol {
 
 function isOther(
   asset: Asset
-): asset is Mint | Programs | Unknown | Domains | RealmAuthority | Stake {
+): asset is
+  | Mint
+  | Programs
+  | Unknown
+  | Domains
+  | RealmAuthority
+  | Stake
+  | Mango {
   return (
     isMint(asset) ||
     isPrograms(asset) ||
     isUnknown(asset) ||
     isRealmAuthority(asset) ||
     isDomain(asset) ||
-    isStake(asset)
+    isStake(asset) ||
+    isMango(asset)
   )
 }
 
@@ -66,6 +78,8 @@ interface Props {
   onSelectAsset?(asset: Asset): void
   onToggleExpandSection?(section: Section): void
   governance: PublicKey | undefined
+  mangoAccounts: MangoAccount[]
+  mangoAccountsValue: BigNumber
 }
 
 export default function AssetList(props: Props) {
@@ -150,7 +164,7 @@ export default function AssetList(props: Props) {
 
   // NOTE possible source of bugs, state wont update if props do.
   const [others, setOthers] = useState<
-    (Mint | Programs | Unknown | Domains | RealmAuthority | Stake)[]
+    (Mint | Programs | Unknown | Domains | RealmAuthority | Stake | Mango)[]
   >(othersFromProps)
   const [itemsToHide, setItemsToHide] = useState<string[]>([])
   useEffect(() => {
@@ -173,6 +187,7 @@ export default function AssetList(props: Props) {
         | Domains
         | RealmAuthority
         | Stake
+        | Mango
       )[] = []
       for await (const token of othersFromProps) {
         if (isMint(token)) {
@@ -234,9 +249,21 @@ export default function AssetList(props: Props) {
       )}
       {others.length > 0 && (
         <OtherAssetsList
+          mangoAccountsValue={props.mangoAccountsValue}
           disableCollapse={!diplayingMultipleAssetTypes}
           expanded={props.expandedSections?.includes('others')}
-          assets={others}
+          assets={
+            props.mangoAccounts.length > 0
+              ? [
+                  {
+                    id: 'mango',
+                    value: props.mangoAccountsValue,
+                    type: AssetType.Mango,
+                  },
+                  ...others,
+                ]
+              : others
+          }
           selectedAssetId={props.selectedAssetId}
           onSelect={props.onSelectAsset}
           onToggleExpand={() => props.onToggleExpandSection?.('others')}

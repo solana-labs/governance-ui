@@ -82,6 +82,8 @@ export default function WalletListItem(props: Props) {
             expandedSections={expandedSections}
             selectedAssetId={props.selectedAsset?.id}
             onSelectAsset={props.onSelectAsset}
+            mangoAccounts={props.wallet.mangoAccounts}
+            mangoAccountsValue={props.wallet.mangoAccountsValue}
             onToggleExpandSection={(section) =>
               setExpandedSections((current) => {
                 if (current.includes(section)) {
