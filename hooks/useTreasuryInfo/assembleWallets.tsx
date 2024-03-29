@@ -39,7 +39,7 @@ function isNotNull<T>(x: T | null): x is T {
   return x !== null
 }
 
-async function fetchMangoAccounts(
+export async function fetchMangoAccounts(
   assets: Asset[],
   mangoClient: MangoClient | null,
   mangoGroup: Group | null
