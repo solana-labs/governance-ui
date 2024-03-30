@@ -3477,11 +3477,20 @@
     "website": "https://www.moutaicoin.co/",
     "twitter": "@Moutai_Sol"
   },
+   {
+    "symbol": "CZOL",
+    "displayName": "CZOLANA",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "DYgeLk9WZnCDzQogeJBP65rG8PLxX5Zw1dmvXZYahkZ8",
+    "ogImage": "/realms/$CZOL - CZOLANA - OFFICIAL DAO DAO Parameters",
+    "website": "https://www.czolana.com/",
+    "twitter": "@Cz_olana"
+  },
   {
     "symbol": "GARBAGE",
     "displayName": "GARBAGE DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "GgF6fHb3iM3Um5DtvwbZvpGpYTzYnr1RmZr4NkwHveGp",
+    "realmId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "website": "",
     "twitter": ""
   }
