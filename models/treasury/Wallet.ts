@@ -5,8 +5,7 @@ import type {
   Governance,
 } from '@solana/spl-governance'
 
-import { Asset, Token } from './Asset'
-import { MangoAccount } from '@blockworks-foundation/mango-v4'
+import { Asset, Mango, Sol, Token } from './Asset'
 
 interface CommonRules {
   maxVotingTime: number
@@ -38,14 +37,10 @@ export interface Wallet {
     votingProposalCount?: number
   }
   totalValue: BigNumber
-  mangoAccountsValue: BigNumber
-  mangoAccounts: MangoAccount[]
 }
 
 export interface AuxiliaryWallet {
-  assets: Token[]
+  assets: (Token | Sol | Mango)[]
   name: string
   totalValue: BigNumber
-  mangoAccountsValue: BigNumber
-  mangoAccounts: MangoAccount[]
 }

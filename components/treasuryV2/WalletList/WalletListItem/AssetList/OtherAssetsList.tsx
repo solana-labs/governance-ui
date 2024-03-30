@@ -20,11 +20,9 @@ import UnknownAssetListItem from './UnknownAssetListItem'
 import RealmAuthorityListItem from './RealmAuthorityListItem'
 import StakeListItem from './StakeListItem'
 import { abbreviateAddress } from '@utils/formatting'
-import BigNumber from 'bignumber.js'
 import MangoListItem from './MangoListItem'
 
 interface Props {
-  mangoAccountsValue: BigNumber
   className?: string
   disableCollapse?: boolean
   expanded?: boolean
@@ -122,7 +120,7 @@ export default function OtherAssetsList(props: Props) {
               return (
                 <MangoListItem
                   key={i}
-                  amount={props.mangoAccountsValue}
+                  amount={asset.value}
                   onSelect={() => []}
                 />
               )

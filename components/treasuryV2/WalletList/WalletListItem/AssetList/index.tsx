@@ -40,8 +40,6 @@ import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import useTreasuryAddressForGovernance from '@hooks/useTreasuryAddressForGovernance'
 import { useDigitalAssetsByOwner } from '@hooks/queries/digitalAssets'
 import { SUPPORT_CNFTS } from '@constants/flags'
-import { MangoAccount } from '@blockworks-foundation/mango-v4'
-import BigNumber from 'bignumber.js'
 
 export type Section = 'tokens' | 'nfts' | 'others'
 
@@ -78,8 +76,6 @@ interface Props {
   onSelectAsset?(asset: Asset): void
   onToggleExpandSection?(section: Section): void
   governance: PublicKey | undefined
-  mangoAccounts: MangoAccount[]
-  mangoAccountsValue: BigNumber
 }
 
 export default function AssetList(props: Props) {
@@ -249,21 +245,9 @@ export default function AssetList(props: Props) {
       )}
       {others.length > 0 && (
         <OtherAssetsList
-          mangoAccountsValue={props.mangoAccountsValue}
           disableCollapse={!diplayingMultipleAssetTypes}
           expanded={props.expandedSections?.includes('others')}
-          assets={
-            props.mangoAccounts.length > 0
-              ? [
-                  {
-                    id: 'mango',
-                    value: props.mangoAccountsValue,
-                    type: AssetType.Mango,
-                  },
-                  ...others,
-                ]
-              : others
-          }
+          assets={others}
           selectedAssetId={props.selectedAssetId}
           onSelect={props.onSelectAsset}
           onToggleExpand={() => props.onToggleExpandSection?.('others')}

@@ -9,7 +9,14 @@ import {
 import { SparklesIcon } from '@heroicons/react/outline'
 
 import { AssetAccount, AccountType } from '@utils/uiTypes/assets'
-import { AssetType, Token, RealmAuthority, Asset } from '@models/treasury/Asset'
+import {
+  AssetType,
+  Token,
+  RealmAuthority,
+  Asset,
+  Mango,
+  Sol,
+} from '@models/treasury/Asset'
 import { AuxiliaryWallet, Wallet } from '@models/treasury/Wallet'
 import { getAccountName } from '@components/instructions/tools'
 import { RealmInfo } from '@models/registry/api'
@@ -134,9 +141,7 @@ export const assembleWallets = async (
         assets: [],
         governanceAccount: account.governance,
         rules: {},
-        mangoAccountsValue: new BigNumber(0),
         stats: {},
-        mangoAccounts: [],
         totalValue: new BigNumber(0),
       }
 
@@ -190,8 +195,6 @@ export const assembleWallets = async (
         assets: [],
         rules: {},
         stats: {},
-        mangoAccounts: [],
-        mangoAccountsValue: new BigNumber(0),
         totalValue: new BigNumber(0),
       }
     }
@@ -228,13 +231,11 @@ export const assembleWallets = async (
         assets: [],
         rules: {},
         stats: {},
-        mangoAccounts: [],
-        mangoAccountsValue: new BigNumber(0),
         totalValue: new BigNumber(0),
       }
     }
 
-    walletMap[walletAddress].assets.push({
+    walletMap[walletAddress].assets.unshift({
       type: AssetType.Domain,
       id: 'domain-list',
       count: new BigNumber(domainList.length),
@@ -244,19 +245,25 @@ export const assembleWallets = async (
 
   const allWallets: any[] = []
   for (const wallet of Object.values(walletMap)) {
-    const { mangoAccounts, mangoAccountsValue } = await fetchMangoAccounts(
+    const { mangoAccountsValue } = await fetchMangoAccounts(
       wallet.assets,
       mangoClient,
       mangoGroup
     )
+
+    if (mangoAccountsValue.gt(0)) {
+      wallet.assets.push({
+        id: 'mango',
+        type: AssetType.Mango,
+        value: mangoAccountsValue,
+      })
+    }
 
     allWallets.push({
       ...wallet,
       name: wallet.governanceAddress
         ? getAccountName(wallet.governanceAddress)
         : getAccountName(wallet.address),
-      mangoAccounts,
-      mangoAccountsValue,
       totalValue: calculateTotalValue([
         ...wallet.assets.map((asset) =>
           'value' in asset ? asset.value : new BigNumber(0)
@@ -294,23 +301,28 @@ export const assembleWallets = async (
           convertAccountToAsset({
             ...account,
             type: AccountType.TOKEN,
-          }) as Promise<Token>
+          }) as Promise<Token | Mango | Sol>
       )
     )
   ).filter(isNotNull)
 
   const {
-    mangoAccounts: auxMangoAccounts,
     mangoAccountsValue: auxMangoAccountsValue,
   } = await fetchMangoAccounts(auxiliaryAssets, mangoClient!, mangoGroup!)
+
+  if (auxMangoAccountsValue.gt(0)) {
+    auxiliaryAssets.unshift({
+      id: 'mango',
+      type: AssetType.Mango,
+      value: auxMangoAccountsValue,
+    })
+  }
 
   const auxiliaryWallets: AuxiliaryWallet[] = auxiliaryAssets.length
     ? [
         {
           assets: auxiliaryAssets,
           name: 'Auxiliary Assets',
-          mangoAccounts: auxMangoAccounts,
-          mangoAccountsValue: auxMangoAccountsValue,
           totalValue: calculateTotalValue([
             ...auxiliaryAssets.map((asset) =>
               'value' in asset ? asset.value : new BigNumber(0)
