@@ -161,8 +161,6 @@ export default function AuxiliaryWalletListItem(props: Props) {
       </button>
       {isOpen && (
         <AssetList
-          mangoAccounts={props.wallet.mangoAccounts}
-          mangoAccountsValue={props.wallet.mangoAccountsValue}
           assets={props.wallet.assets}
           className="pt-4"
           selectedAssetId={props.selectedAsset?.id}
