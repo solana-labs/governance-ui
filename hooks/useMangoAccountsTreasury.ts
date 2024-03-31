@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import UseMangoV4 from './useMangoV4'
 import { fetchMangoAccounts } from './useTreasuryInfo/assembleWallets'
 import { convertAccountToAsset } from './useTreasuryInfo/convertAccountToAsset'
-import { AssetAccount } from '@utils/uiTypes/assets'
+import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import { Asset } from '@models/treasury/Asset'
 
 export function useMangoAccountsTreasury(assetAccounts: AssetAccount[]) {
@@ -18,8 +18,13 @@ export function useMangoAccountsTreasury(assetAccounts: AssetAccount[]) {
 
   useEffect(() => {
     async function fetchMangoValue() {
+      const filteredAssetAccounts = assetAccounts.filter(
+        (a) => a.type !== AccountType.PROGRAM && a.type !== AccountType.NFT
+      )
       const assets = (
-        await Promise.all(assetAccounts.map((a) => convertAccountToAsset(a)))
+        await Promise.all(
+          filteredAssetAccounts.map((a) => convertAccountToAsset(a))
+        )
       ).filter((asset): asset is Asset => asset !== null)
 
       const { mangoAccountsValue: newMangoValue } = await fetchMangoAccounts(
