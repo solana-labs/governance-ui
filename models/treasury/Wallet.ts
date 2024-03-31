@@ -5,7 +5,7 @@ import type {
   Governance,
 } from '@solana/spl-governance'
 
-import { Asset, Token } from './Asset'
+import { Asset, Mango, Sol, Token } from './Asset'
 
 interface CommonRules {
   maxVotingTime: number
@@ -40,7 +40,7 @@ export interface Wallet {
 }
 
 export interface AuxiliaryWallet {
-  assets: Token[]
+  assets: (Token | Sol | Mango)[]
   name: string
   totalValue: BigNumber
 }
