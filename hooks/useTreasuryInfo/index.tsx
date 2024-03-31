@@ -140,6 +140,7 @@ export default function useTreasuryInfo(
       governedTokens: { counts, values },
       name: realmInfo.displayName || realmInfo.symbol,
       totalValue: [...auxWallets, ...wallets].reduce((acc, wallet) => {
+        console.log(wallet.totalValue.toNumber())
         return acc.plus(wallet.totalValue)
       }, new BigNumber(0)),
     },

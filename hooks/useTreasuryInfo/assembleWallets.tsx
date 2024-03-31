@@ -264,12 +264,11 @@ export const assembleWallets = async (
       name: wallet.governanceAddress
         ? getAccountName(wallet.governanceAddress)
         : getAccountName(wallet.address),
-      totalValue: calculateTotalValue([
-        ...wallet.assets.map((asset) =>
+      totalValue: calculateTotalValue(
+        wallet.assets.map((asset) =>
           'value' in asset ? asset.value : new BigNumber(0)
-        ),
-        mangoAccountsValue,
-      ]),
+        )
+      ),
     })
   }
 
@@ -323,12 +322,11 @@ export const assembleWallets = async (
         {
           assets: auxiliaryAssets,
           name: 'Auxiliary Assets',
-          totalValue: calculateTotalValue([
-            ...auxiliaryAssets.map((asset) =>
+          totalValue: calculateTotalValue(
+            auxiliaryAssets.map((asset) =>
               'value' in asset ? asset.value : new BigNumber(0)
-            ),
-            auxMangoAccountsValue,
-          ]),
+            )
+          ),
         },
       ]
     : []
