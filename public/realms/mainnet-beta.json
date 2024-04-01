@@ -3485,4 +3485,15 @@
     "website": "",
     "twitter": ""
   }
+  {
+    "symbol": "fPHX",
+    "displayName": "fPHX Board of Directors",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "H7c8t6cSNXqjGuyon7nBtQG396rsHm38anKr6XcVMuAq",
+    "ogImage": "https://fillmorephx.com/.well-known/phxicon.png",
+    "website": "https://fillmorephx.com/",
+    "sortRank": 3,
+    "shortDescription": "fPHX DAO",
+    "twitter": "@fPHXGallery"
+  }
 ]
