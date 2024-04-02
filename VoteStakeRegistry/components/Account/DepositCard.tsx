@@ -134,7 +134,8 @@ const DepositCard = ({
   const isRealmCommunityMint =
     deposit.mint.publicKey.toBase58() ===
     realm?.account.communityMint.toBase58()
-  const isConstant = type === 'constant'
+  const currentTime = new BN(Math.floor(Date.now()/1000))
+  const isConstant = type === 'constant' && deposit.lockup.endTs > currentTime
   const CardLabel = ({ label, value }) => {
     return (
       <div className="flex flex-col w-1/2 py-2">
