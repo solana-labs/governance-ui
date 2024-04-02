@@ -620,6 +620,10 @@ const instructions = () => ({
                 val={formattedProposedArgs.groupInsuranceFund?.toString()}
                 suggestedVal={invalidFields.groupInsuranceFund?.toString()}
               />
+              <DisplayListingPropertyWrapped
+                label="Collateral Fee Per Day"
+                valKey="collateralFeePerDay"
+              />
             </div>
             <AdvancedOptionsDropdown className="mt-4" title="Raw values">
               <div>{info}</div>
@@ -971,7 +975,10 @@ const instructions = () => ({
           maintWeightShiftAbort: args.maintWeightShiftAbort,
           zeroUtilRate: args.zeroUtilRateOpt,
           disableAssetLiquidation: args.disableAssetLiquidationOpt,
-          collateralFeePerDay: args.collateralFeePerDayOpt,
+          collateralFeePerDay:
+            args.collateralFeePerDayOpt !== undefined
+              ? (args.collateralFeePerDayOpt * 100)?.toFixed(2)
+              : undefined,
           forceWithdraw: args.forceWithdrawOpt,
           forceClose: args.forceCloseOpt,
         }
@@ -1565,6 +1572,21 @@ const instructions = () => ({
                   ).toFixed(0)})`
                 }
               />
+              <DisplayNullishProperty
+                label="Collateral Fee Per Day"
+                value={
+                  parsedArgs.collateralFeePerDay &&
+                  `${parsedArgs.collateralFeePerDay}%`
+                }
+                currentValue={
+                  bankFormattedValues?.collateralFeePerDay &&
+                  `${bankFormattedValues.collateralFeePerDay}%`
+                }
+                suggestedVal={
+                  invalidFields.collateralFeePerDay &&
+                  `${invalidFields.collateralFeePerDay}%`
+                }
+              />
               {parsedArgs?.disableAssetLiquidation && (
                 <DisplayNullishProperty
                   label="Disable Asset Liquidation"
@@ -2076,7 +2098,7 @@ const getFormattedListingValues = (args: FlatListingArgs) => {
     interestTargetUtilization: args.interestTargetUtilization,
     interestCurveScaling: args.interestCurveScaling,
     groupInsuranceFund: args.groupInsuranceFund,
-    collateralFeePerDay: args.collateralFeePerDay,
+    collateralFeePerDay: (args.collateralFeePerDay * 100).toFixed(2),
     zeroUtilRate: args.zeroUtilRate,
     disableAssetLiquidation: args.disableAssetLiquidation,
   }
