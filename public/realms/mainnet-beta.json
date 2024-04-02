@@ -3484,5 +3484,21 @@
     "realmId": "GgF6fHb3iM3Um5DtvwbZvpGpYTzYnr1RmZr4NkwHveGp",
     "website": "",
     "twitter": ""
+  },
+  {
+    "symbol": "TNSR",
+    "category": "NFT",
+    "bannerImage": "https://i.imgur.com/PMLtfh6.png",
+    "displayName": "Tensor DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "4sgAydAiSvnpT73rALCcnYGhi5K2LrB9pJFAEbLMfrXt",
+    "communityMint": "TNSRxcUxoT9xBG3de7PiJyTDYu7kskLqcpddxnEJAS6",
+    "ogImage": "https://i.imgur.com/IP2FsY7.png",
+    "shortDescription": "Future of NFT trading. Built on Solana.",
+    "website": "https://www.tensor.foundation",
+    "keywords": "Tensor, REALM, Governance, TNSR, Tensor NFT Marketplace, NFT, Crypto, Solana, SOL, Trading, Fastest, Fast",
+    "twitter": "@TensorFdn",
+    "discord": "https://discord.gg/a8spfqxEpC",
+    "github": "https://github.com/tensor-foundation"
   }
 ]
