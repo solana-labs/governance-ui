@@ -143,10 +143,6 @@ export default function useGovernanceAssets() {
     [PackageEnum.Common]: {
       name: 'Common',
     },
-    [PackageEnum.Dual]: {
-      name: 'Dual Finance',
-      image: '/img/dual-logo.png',
-    },
     [PackageEnum.Distribution]: {
       name: 'Distribution Program',
     },

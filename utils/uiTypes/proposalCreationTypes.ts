@@ -13,7 +13,6 @@ import { RealmInfo } from '@models/registry/api'
 export enum PackageEnum {
   Common,
   Distribution,
-  Dual,
   GatewayPlugin,
   Identity,
   MangoMarketV4,
@@ -381,91 +380,4 @@ export interface DelegateStakeForm {
   governedTokenAccount: AssetAccount | undefined
   stakingAccount: StakeAccount | undefined
   votePubkey: string
-}
-
-export interface DualFinanceAirdropForm {
-  root: string
-  amount: number
-  eligibilityStart: number
-  eligibilityEnd: number
-  amountPerVoter: number
-  treasury: AssetAccount | undefined
-}
-
-export interface DualFinanceStakingOptionForm {
-  strike: number
-  soName: string | undefined
-  optionExpirationUnixSeconds: number
-  numTokens: string
-  lotSize: number
-  baseTreasury: AssetAccount | undefined
-  quoteTreasury: AssetAccount | undefined
-  payer: AssetAccount | undefined
-  userPk: string | undefined
-}
-
-export interface DualFinanceGsoForm {
-  strike: number
-  soName: string | undefined
-  optionExpirationUnixSeconds: number
-  numTokens: number
-  lotSize: number
-  subscriptionPeriodEnd: number
-  lockupRatio: number
-  lockupMint: string
-  baseTreasury: AssetAccount | undefined
-  quoteTreasury: AssetAccount | undefined
-  payer: AssetAccount | undefined
-}
-
-export interface DualFinanceLiquidityStakingOptionForm {
-  optionExpirationUnixSeconds: number
-  numTokens: number
-  lotSize: number
-  baseTreasury: AssetAccount | undefined
-  quoteTreasury: AssetAccount | undefined
-  payer: AssetAccount | undefined
-}
-
-export interface DualFinanceInitStrikeForm {
-  strikes: string
-  soName: string
-  payer: AssetAccount | undefined
-  baseTreasury: AssetAccount | undefined
-}
-
-export interface DualFinanceExerciseForm {
-  numTokens: number
-  soName: string | undefined
-  baseTreasury: AssetAccount | undefined
-  quoteTreasury: AssetAccount | undefined
-  optionAccount: AssetAccount | undefined
-}
-
-export interface DualFinanceWithdrawForm {
-  soName: string | undefined
-  baseTreasury: AssetAccount | undefined
-  mintPk: string | undefined
-}
-
-export interface DualFinanceGsoWithdrawForm {
-  soName: string | undefined
-  baseTreasury: AssetAccount | undefined
-}
-
-export interface DualFinanceDelegateForm {
-  delegateAccount: string | undefined
-  realm: string | undefined
-  delegateToken: AssetAccount | undefined
-}
-
-export interface DualFinanceDelegateWithdrawForm {
-  realm: string | undefined
-  delegateToken: AssetAccount | undefined
-}
-
-export interface DualFinanceVoteDepositForm {
-  numTokens: number
-  realm: string | undefined
-  delegateToken: AssetAccount | undefined
 }
