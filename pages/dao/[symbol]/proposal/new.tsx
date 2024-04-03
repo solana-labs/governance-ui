@@ -72,7 +72,6 @@ import MakeSetMarketMetadataParams from './components/instructions/Foresight/Mak
 import CloseTokenAccount from './components/instructions/CloseTokenAccount'
 import CloseMultipleTokenAccounts from './components/instructions/CloseMultipleTokenAccounts'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
-import StakingOption from './components/instructions/Dual/StakingOption'
 import MeanCreateAccount from './components/instructions/Mean/MeanCreateAccount'
 import MeanFundAccount from './components/instructions/Mean/MeanFundAccount'
 import MeanWithdrawFromAccount from './components/instructions/Mean/MeanWithdrawFromAccount'
@@ -108,12 +107,6 @@ import AddKeyToDID from './components/instructions/Identity/AddKeyToDID'
 import RemoveKeyFromDID from './components/instructions/Identity/RemoveKeyFromDID'
 import AddServiceToDID from './components/instructions/Identity/AddServiceToDID'
 import RemoveServiceFromDID from './components/instructions/Identity/RemoveServiceFromDID'
-import DualAirdrop from './components/instructions/Dual/DualAirdrop'
-import DualWithdraw from './components/instructions/Dual/DualWithdraw'
-import DualExercise from './components/instructions/Dual/DualExercise'
-import DualDelegate from './components/instructions/Dual/DualDelegate'
-import DualVoteDepositWithdraw from './components/instructions/Dual/DualVoteDepositWithdraw'
-import DualVoteDeposit from './components/instructions/Dual/DualVoteDeposit'
 import PsyFinanceMintAmericanOptions from './components/instructions/PsyFinance/MintAmericanOptions'
 import IxGateSet from './components/instructions/Mango/MangoV4/IxGateSet'
 import StubOracleCreate from './components/instructions/Mango/MangoV4/StubOracleCreate'
@@ -127,14 +120,10 @@ import PsyFinanceExerciseOption from './components/instructions/PsyFinance/Exerc
 import RevokeGoverningTokens from './components/instructions/SplGov/RevokeGoverningTokens'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import SetMintAuthority from './components/instructions/SetMintAuthroity'
-import LiquidityStakingOption from './components/instructions/Dual/LiquidityStakingOption'
-import InitStrike from './components/instructions/Dual/InitStrike'
 import IdlSetBuffer from './components/instructions/Mango/MangoV4/IdlSetBuffer'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { usePrevious } from '@hooks/usePrevious'
 import DaoVote from './components/instructions/SplGov/DaoVote'
-import DualGso from './components/instructions/Dual/DualGso'
-import DualGsoWithdraw from './components/instructions/Dual/DualGsoWithdraw'
 import MultiChoiceForm from '../../../../components/MultiChoiceForm'
 import MeshRemoveMember from './components/instructions/Squads/MeshRemoveMember'
 import MeshAddMember from './components/instructions/Squads/MeshAddMember'
@@ -489,17 +478,6 @@ const New = () => {
       [Instructions.Grant]: Grant,
       [Instructions.Clawback]: Clawback,
       [Instructions.CreateAssociatedTokenAccount]: CreateAssociatedTokenAccount,
-      [Instructions.DualFinanceAirdrop]: DualAirdrop,
-      [Instructions.DualFinanceStakingOption]: StakingOption,
-      [Instructions.DualFinanceGso]: DualGso,
-      [Instructions.DualFinanceGsoWithdraw]: DualGsoWithdraw,
-      [Instructions.DualFinanceInitStrike]: InitStrike,
-      [Instructions.DualFinanceLiquidityStakingOption]: LiquidityStakingOption,
-      [Instructions.DualFinanceStakingOptionWithdraw]: DualWithdraw,
-      [Instructions.DualFinanceExerciseStakingOption]: DualExercise,
-      [Instructions.DualFinanceDelegate]: DualDelegate,
-      [Instructions.DualFinanceDelegateWithdraw]: DualVoteDepositWithdraw,
-      [Instructions.DualFinanceVoteDeposit]: DualVoteDeposit,
       [Instructions.DaoVote]: DaoVote,
       [Instructions.MeanCreateAccount]: MeanCreateAccount,
       [Instructions.MeanFundAccount]: MeanFundAccount,

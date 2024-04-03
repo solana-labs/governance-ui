@@ -32,7 +32,6 @@ import { TOKEN_AUCTION_INSTRUCTIONS } from './programs/tokenAuction'
 import { VALIDATORDAO_INSTRUCTIONS } from './programs/validatordao'
 import { POSEIDON_INSTRUCTIONS } from './programs/poseidon'
 import { MANGO_V4_INSTRUCTIONS } from './programs/mangoV4'
-import { DUAL_INSTRUCTIONS } from './programs/dual'
 import { SWITCHBOARD_INSTRUCTIONS } from './programs/switchboard'
 import { STAKE_INSTRUCTIONS } from './programs/stake'
 import dayjs from 'dayjs'
@@ -299,17 +298,6 @@ export const ACCOUNT_NAMES = {
   '6egAu2HDLcSgeUYmiBvNLgp7Bd4nPk16gX9MvWuJpeX2':
     'Marinade SPL Program Governance',
 
-  // Dual DAO
-  '4yx1NJ4Vqf2zT1oVLk4SySBhhDJXmXFt88ncm4gPxtL7': 'Staking Options Program',
-  '2fJcpdR6qzqDP7fBqvoJQ5PGYdaRFBNyUKZkZf5t12mr': 'Airdrop Program',
-  '8tBcmZAMNm11DuGAS2r6PqSA3CKt72amoz8bVj14xRiT':
-    'Merkle Airdrop Verifier Program',
-  ATCsJvzSbHaJj3a9uKTRHSoD8ZmWPfeC3sYxzcJJHTM5:
-    'Governance Airdrop Verifier Program',
-  DuALd6fooWzVDkaTsQzDAxPGYCnLrnWamdNNTNxicdX8:
-    'Lockup Staking Options Program',
-  '7Z36Efbt7a4nLiV7s5bY7J2e4TJ6V9JEKGccsy2od2bE': 'Dual DAO wallet',
-
   // AllDomains DAO
   fP1PNg489M64sRHou3unkCVhj7nU7pYwseDyCPtpqpQ: 'AllDomains DAO Wallet',
   H53NZSkb8VSiajHdM1yXPYsWwS2ZRZn9K5X6WeomXZ9: 'AllDomains Treasury',
@@ -466,7 +454,6 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...VALIDATORDAO_INSTRUCTIONS,
   ...POSEIDON_INSTRUCTIONS,
   ...MANGO_V4_INSTRUCTIONS,
-  ...DUAL_INSTRUCTIONS,
   ...STAKE_INSTRUCTIONS,
   ...JUPITER_REF,
 }

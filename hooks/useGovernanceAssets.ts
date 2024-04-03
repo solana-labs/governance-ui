@@ -349,69 +349,6 @@ export default function useGovernanceAssets() {
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Common,
     },
-    [Instructions.DualFinanceDelegateWithdraw]: {
-      name: 'Withdraw Vote Deposit',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Common,
-    },
-    [Instructions.DualFinanceVoteDeposit]: {
-      name: 'Join a VSR DAO',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Common,
-    },
-    /*
-      ██████  ██    ██  █████  ██          ███████ ██ ███    ██  █████  ███    ██  ██████ ███████
-      ██   ██ ██    ██ ██   ██ ██          ██      ██ ████   ██ ██   ██ ████   ██ ██      ██
-      ██   ██ ██    ██ ███████ ██          █████   ██ ██ ██  ██ ███████ ██ ██  ██ ██      █████
-      ██   ██ ██    ██ ██   ██ ██          ██      ██ ██  ██ ██ ██   ██ ██  ██ ██ ██      ██
-      ██████   ██████  ██   ██ ███████     ██      ██ ██   ████ ██   ██ ██   ████  ██████ ███████
-    */
-
-    [Instructions.DualFinanceStakingOption]: {
-      name: 'Staking Option',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Dual,
-    },
-    [Instructions.DualFinanceGso]: {
-      name: 'Lockup Staking Option',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Dual,
-    },
-    [Instructions.DualFinanceLiquidityStakingOption]: {
-      name: 'Liquidity Staking Option',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Dual,
-    },
-    [Instructions.DualFinanceInitStrike]: {
-      name: 'Init Staking Option Strike',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Dual,
-    },
-    [Instructions.DualFinanceExerciseStakingOption]: {
-      name: 'Exercise Staking Option',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Dual,
-    },
-    [Instructions.DualFinanceGsoWithdraw]: {
-      name: 'Lockup Staking Option Withdraw',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Dual,
-    },
-    [Instructions.DualFinanceStakingOptionWithdraw]: {
-      name: 'Withdraw',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Dual,
-    },
-    [Instructions.DualFinanceAirdrop]: {
-      name: 'Airdrop',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Dual,
-    },
-    [Instructions.DualFinanceDelegate]: {
-      name: 'Delegate',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Dual,
-    },
 
     /*
       ███████  ██████  ██████  ███████ ███████ ██  ██████  ██   ██ ████████
