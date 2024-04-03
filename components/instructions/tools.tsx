@@ -20,7 +20,6 @@ import { SPL_TOKEN_INSTRUCTIONS } from './programs/splToken'
 import { SYSTEM_INSTRUCTIONS } from './programs/system'
 import { VOTE_STAKE_REGISTRY_INSTRUCTIONS } from './programs/voteStakeRegistry'
 import { MARINADE_INSTRUCTIONS } from './programs/marinade'
-import { SOLEND_PROGRAM_INSTRUCTIONS } from './programs/solend'
 import { ATA_PROGRAM_INSTRUCTIONS } from './programs/associatedTokenAccount'
 import { ConnectionContext } from '@utils/connection'
 import { NFT_VOTER_INSTRUCTIONS } from './programs/nftVotingClient'
@@ -200,7 +199,6 @@ export const ACCOUNT_NAMES = {
   Gr6PqrrZqiay44937AKthj7FEpShCBb94Jgw89BUr2b2: 'daoSOL',
   '2fEL6au59KfmtarX5cJD4a6EaxRr6gLBvFkE65uEPJ4U': 'DAOJONES',
   FboFh3DkwmAeH4GyM5Ttd8ismd2wq6c8MrRkSsmr5nQW: 'LUNA',
-  GnfeSuTwbXcxVnuXJTzx172174PJAHUfXpNgsBdGCncd: 'Solend Holdings',
 
   // Jungle DeFi Community DAO
   Ebuwy24prHRL3QEAT911wWD8aa493ikZeH7LfYzMQxS1: 'Incoming Protocol Fees/Assets',
@@ -439,7 +437,6 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...MARINADE_INSTRUCTIONS,
   ...LIDO_INSTRUCTIONS,
   ...SWITCHBOARD_INSTRUCTIONS,
-  ...SOLEND_PROGRAM_INSTRUCTIONS,
   ...ATA_PROGRAM_INSTRUCTIONS,
   ...SYSTEM_INSTRUCTIONS,
   ...VOTE_STAKE_REGISTRY_INSTRUCTIONS,

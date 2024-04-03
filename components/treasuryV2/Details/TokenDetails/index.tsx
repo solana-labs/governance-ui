@@ -1,11 +1,9 @@
-import React from 'react'
 import cx from 'classnames'
 
 import { Token, Sol } from '@models/treasury/Asset'
 import { Wallet } from '@models/treasury/Wallet'
 
 import Header from './Header'
-import Investments from './Investments'
 import Activity from './Activity'
 import StickyScrolledContainer from '../StickyScrolledContainer'
 //import Auction from './Auction'
@@ -39,14 +37,6 @@ export default function TokenDetails(props: Props) {
       >
         <Header asset={props.asset} wallet={props.wallet} />
         <section className="p-6 bg-bkg-3">
-          {props.governanceAddress && (
-            <Investments
-              asset={props.asset}
-              wallet={props.wallet}
-              className="mb-10"
-              governanceAddress={props.governanceAddress}
-            />
-          )}
           {/* Do not remove hidden until release */}
           {/* {props.asset.type === AssetType.Token && isOwnedBySolAccounts && (
             <Auction asset={props.asset} className="mb-10" />

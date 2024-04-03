@@ -176,10 +176,6 @@ export default function useGovernanceAssets() {
       // Hide serum package for now, due to wallet disconnection bug
       isVisible: false,
     },
-    [PackageEnum.Solend]: {
-      name: 'Solend',
-      image: '/img/solend.png',
-    },
     [PackageEnum.Squads]: {
       name: 'Squads',
       image: '/img/squads.png',
@@ -565,38 +561,6 @@ export default function useGovernanceAssets() {
       packageId: PackageEnum.Serum,
     },
 
-    /*
-      ███████  ██████  ██      ███████ ███    ██ ██████
-      ██      ██    ██ ██      ██      ████   ██ ██   ██
-      ███████ ██    ██ ██      █████   ██ ██  ██ ██   ██
-           ██ ██    ██ ██      ██      ██  ██ ██ ██   ██
-      ███████  ██████  ███████ ███████ ██   ████ ██████
-    */
-
-    [Instructions.CreateSolendObligationAccount]: {
-      name: 'Create Obligation Account',
-      packageId: PackageEnum.Solend,
-    },
-    [Instructions.DepositReserveLiquidityAndObligationCollateral]: {
-      name: 'Deposit Funds',
-      packageId: PackageEnum.Solend,
-    },
-    [Instructions.InitSolendObligationAccount]: {
-      name: 'Init Obligation Account',
-      packageId: PackageEnum.Solend,
-    },
-    [Instructions.RefreshSolendObligation]: {
-      name: 'Refresh Obligation',
-      packageId: PackageEnum.Solend,
-    },
-    [Instructions.RefreshSolendReserve]: {
-      name: 'Refresh Reserve',
-      packageId: PackageEnum.Solend,
-    },
-    [Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity]: {
-      name: 'Withdraw Funds',
-      packageId: PackageEnum.Solend,
-    },
     /*
     ███████  ██████  ██    ██  █████  ██████  ███████ 
     ██      ██    ██ ██    ██ ██   ██ ██   ██ ██      

@@ -1,6 +1,5 @@
 import { notify } from '@utils/notifications'
 import { getPsyFiStrategies } from 'Strategies/protocols/psyfi'
-import { getSolendStrategies } from 'Strategies/protocols/solend'
 import { TreasuryStrategy } from 'Strategies/types/types'
 import create, { State } from 'zustand'
 
@@ -18,14 +17,19 @@ const useStrategiesStore = create<StrategiesStore>((set, _get) => ({
       s.strategiesLoading = true
     })
     try {
-      const [solend, psyfi] = await Promise.all([
-        getSolendStrategies(),
+      const [
+        //solend,
+        psyfi,
+      ] = await Promise.all([
+        //getSolendStrategies(),
         getPsyFiStrategies(),
       ])
 
       //add fetch functions for your protocol in promise.all
-      const strategies: TreasuryStrategy[] = [...solend, ...psyfi]
-
+      const strategies: TreasuryStrategy[] = [
+        //...solend,
+        ...psyfi,
+      ]
       set((s) => {
         s.strategies = strategies
       })

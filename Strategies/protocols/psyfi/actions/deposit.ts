@@ -20,7 +20,6 @@ import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import { instructions as psyFiInstructions, PsyFiEuros } from 'psyfi-euros-test'
 import { PsyFiActionForm, PsyFiStrategyInfo } from '../types'
-import { syncNative } from '@solendprotocol/solend-sdk'
 
 export const deposit = async (
   rpcContext: RpcContext,
@@ -176,4 +175,9 @@ export const deposit = async (
   })
   instructions.push(fullPropInstruction)
   return instructions
+}
+
+// was using solend sdk
+function syncNative(_poolMintATA: any): TransactionInstruction {
+  throw new Error('Function not implemented.')
 }

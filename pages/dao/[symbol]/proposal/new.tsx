@@ -43,12 +43,6 @@ import CreateAssociatedTokenAccount from './components/instructions/CreateAssoci
 import CustomBase64 from './components/instructions/CustomBase64'
 import Empty from './components/instructions/Empty'
 import Mint from './components/instructions/Mint'
-import CreateObligationAccount from './components/instructions/Solend/CreateObligationAccount'
-import DepositReserveLiquidityAndObligationCollateral from './components/instructions/Solend/DepositReserveLiquidityAndObligationCollateral'
-import InitObligationAccount from './components/instructions/Solend/InitObligationAccount'
-import RefreshObligation from './components/instructions/Solend/RefreshObligation'
-import RefreshReserve from './components/instructions/Solend/RefreshReserve'
-import WithdrawObligationCollateralAndRedeemReserveLiquidity from './components/instructions/Solend/WithdrawObligationCollateralAndRedeemReserveLiquidity'
 import SplTokenTransfer from './components/instructions/SplTokenTransfer'
 import VoteBySwitch from './components/VoteBySwitch'
 import CreateNftPluginRegistrar from './components/instructions/NftVotingPlugin/CreateRegistrar'
@@ -472,18 +466,12 @@ const New = () => {
       [Instructions.SquadsMeshAddMember]: MeshAddMember,
       [Instructions.SquadsMeshChangeThresholdMember]: MeshChangeThresholdMember,
       [Instructions.PythRecoverAccount]: PythRecoverAccount,
-      [Instructions.CreateSolendObligationAccount]: CreateObligationAccount,
-      [Instructions.InitSolendObligationAccount]: InitObligationAccount,
-      [Instructions.DepositReserveLiquidityAndObligationCollateral]: DepositReserveLiquidityAndObligationCollateral,
-      [Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity]: WithdrawObligationCollateralAndRedeemReserveLiquidity,
       [Instructions.PsyFinanceMintAmericanOptions]: PsyFinanceMintAmericanOptions,
       [Instructions.PsyFinanceBurnWriterForQuote]: PsyFinanceBurnWriterTokenForQuote,
       [Instructions.PsyFinanceClaimUnderlyingPostExpiration]: PsyFinanceClaimUnderlyingPostExpiration,
       [Instructions.PsyFinanceExerciseOption]: PsyFinanceExerciseOption,
       [Instructions.SwitchboardFundOracle]: SwitchboardFundOracle,
       [Instructions.WithdrawFromOracle]: WithdrawFromOracle,
-      [Instructions.RefreshSolendObligation]: RefreshObligation,
-      [Instructions.RefreshSolendReserve]: RefreshReserve,
       [Instructions.RealmConfig]: RealmConfig,
       [Instructions.CreateNftPluginRegistrar]: CreateNftPluginRegistrar,
       [Instructions.CreateNftPluginMaxVoterWeight]: CreateNftPluginMaxVoterWeightRecord,

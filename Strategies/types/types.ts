@@ -1,8 +1,5 @@
 import { PublicKey } from '@solana/web3.js'
-import {
-  CreateSolendStrategyParams,
-  SolendSubStrategy,
-} from 'Strategies/protocols/solend'
+
 import { VaultInfo } from 'Strategies/protocols/psyfi/types'
 
 export interface TreasuryStrategy {
@@ -32,11 +29,6 @@ export type MangoStrategy = TreasuryStrategy & {
   // if promise is successfully resolved it will automatically redirect to created proposal
   createProposalFcn: HandleCreateProposalWithStrategy
 } */
-
-export type SolendStrategy = TreasuryStrategy & {
-  reserves: Array<SolendSubStrategy>
-  createProposalFcn: CreateSolendStrategyParams
-}
 
 export type PsyFiStrategy = TreasuryStrategy & {
   vaultAccounts: {

@@ -3,7 +3,6 @@ import { ProgramAccount } from '@solana/spl-governance'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey, Keypair, TransactionInstruction } from '@solana/web3.js'
 import { getNameOf } from '@tools/core/script'
-import { SupportedMintName } from '@tools/sdk/solend/configuration'
 import { DepositWithMintAccount, Voter } from 'VoteStakeRegistry/sdk/accounts'
 import { LockupKind } from 'VoteStakeRegistry/tools/types'
 import { AssetAccount, StakeAccount } from '@utils/uiTypes/assets'
@@ -20,7 +19,6 @@ export enum PackageEnum {
   PsyFinance,
   Pyth,
   Serum,
-  Solend,
   Squads,
   Switchboard,
   VsrPlugin,
@@ -159,37 +157,6 @@ export interface CreateAssociatedTokenAccountForm {
   splTokenMint?: string
 }
 
-export interface CreateSolendObligationAccountForm {
-  governedAccount?: AssetAccount
-}
-
-export interface InitSolendObligationAccountForm {
-  governedAccount?: AssetAccount
-}
-
-export interface DepositReserveLiquidityAndObligationCollateralForm {
-  governedAccount?: AssetAccount
-  uiAmount: string
-  mintName?: SupportedMintName
-}
-
-export interface WithdrawObligationCollateralAndRedeemReserveLiquidityForm {
-  governedAccount?: AssetAccount
-  uiAmount: string
-  mintName?: SupportedMintName
-  destinationLiquidity?: string
-}
-
-export interface RefreshObligationForm {
-  governedAccount?: AssetAccount
-  mintName?: SupportedMintName
-}
-
-export interface RefreshReserveForm {
-  governedAccount?: AssetAccount
-  mintName?: SupportedMintName
-}
-
 export interface CreateTokenMetadataForm {
   name: string
   symbol: string
@@ -252,16 +219,13 @@ export enum Instructions {
   CreateGatewayPluginRegistrar,
   CreateNftPluginMaxVoterWeight,
   CreateNftPluginRegistrar,
-  CreateSolendObligationAccount,
   CreateTokenMetadata,
   CreateVsrRegistrar,
   DeactivateValidatorStake,
-  DepositReserveLiquidityAndObligationCollateral,
   DifferValidatorStake,
   DaoVote,
   DelegateStake,
   Grant,
-  InitSolendObligationAccount,
   JoinDAO,
   MangoV4PerpCreate,
   MangoV4PerpEdit,
@@ -288,8 +252,6 @@ export enum Instructions {
   PsyFinanceExerciseOption,
   PsyFinanceMintAmericanOptions,
   RealmConfig,
-  RefreshSolendObligation,
-  RefreshSolendReserve,
   SerumGrantLockedMSRM,
   SerumGrantLockedSRM,
   SerumGrantVestMSRM,
@@ -308,7 +270,6 @@ export enum Instructions {
   TransferDomainName,
   UpdateTokenMetadata,
   VotingMintConfig,
-  WithdrawObligationCollateralAndRedeemReserveLiquidity,
   WithdrawValidatorStake,
   SplitStake,
   AddKeyToDID,

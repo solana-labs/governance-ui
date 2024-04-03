@@ -32,7 +32,6 @@ import {
   Token,
 } from '@solana/spl-token'
 import { WSOL_MINT } from '@components/instructions/tools'
-import { syncNative } from '@solendprotocol/solend-sdk'
 
 interface TokenAddBankForm {
   governedAccount: AssetAccount | null
@@ -233,3 +232,7 @@ const SwitchboardFundOracle = ({
 }
 
 export default SwitchboardFundOracle
+
+function syncNative(_wsolAddress: PublicKey): TransactionInstruction {
+  throw new Error('Function not implemented. Was using solend sdk.')
+}

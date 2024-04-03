@@ -4,7 +4,6 @@ import { tryGetMint, tryGetTokenAccount } from '../../../utils/tokens'
 import BN from 'bn.js'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
 import tokenPriceService from '@utils/services/tokenPrice'
-import { TokenInstruction } from '@solendprotocol/solend-sdk/dist/instructions/instruction'
 import { AuthorityType } from '@solana/spl-token'
 import { struct, u8 } from 'buffer-layout'
 import { publicKey } from '@coral-xyz/borsh'
@@ -99,7 +98,7 @@ export const SPL_TOKEN_INSTRUCTIONS = {
         //accounts: AccountMetaData[]
       ) => {
         interface SetAuthorityInstructionData {
-          instruction: TokenInstruction.SetAuthority
+          instruction: 6
           authorityType: AuthorityType
           newAuthorityOption: 1 | 0
           newAuthority: PublicKey

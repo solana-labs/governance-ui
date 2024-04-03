@@ -2857,7 +2857,7 @@
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
   integrity sha512-Vvn3zZrhQZkkBE8LSuW3em98c0FwgO4nxzv6OdSxPKJIEKY2bGbHn+mhGIPerzI4twdxaP8/0+06HBpwf345Lw==
 
-"@pythnetwork/client@2.17.0", "@pythnetwork/client@^2.5.1":
+"@pythnetwork/client@2.17.0":
   version "2.17.0"
   resolved "https://registry.yarnpkg.com/@pythnetwork/client/-/client-2.17.0.tgz#b155af06958f4b729bfee1c07130c556598cf168"
   integrity sha512-hv285vehmLH6N762Z4jqvPTM+hCYnXQaUp6DMgLUpDHvE0mTbwW9PvlxYoUJZGtyeCDkgn9HrTWXPtnaXTRr+Q==
@@ -4053,7 +4053,7 @@
     bigint-buffer "^1.1.5"
     bignumber.js "^9.0.1"
 
-"@solana/buffer-layout@4.0.0", "@solana/buffer-layout@^3.0.0", "@solana/buffer-layout@^4.0.0":
+"@solana/buffer-layout@4.0.0", "@solana/buffer-layout@^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@solana/buffer-layout/-/buffer-layout-4.0.0.tgz#75b1b11adc487234821c81dfae3119b73a5fd734"
   integrity sha512-lR0EMP2HC3+Mxwd4YcnZb0smnaDw7Bl2IQWZiTevRH5ZZBZn6VRWn3/92E3qdU4SSImJkA6IDHawOHAnx/qUvQ==
@@ -4710,22 +4710,6 @@
     node-fetch "^2.6.12"
     rpc-websockets "^7.5.1"
     superstruct "^0.14.2"
-
-"@solendprotocol/solend-sdk@0.5.5":
-  version "0.5.5"
-  resolved "https://registry.yarnpkg.com/@solendprotocol/solend-sdk/-/solend-sdk-0.5.5.tgz#a8077532e1ca2ecd7d619fee4f339cd6b33e4a04"
-  integrity sha512-7eZSM/vl7Bijbg3n/vnO4z5p3VX7eb453pKkVeiT6FmQuC403GrNU3wUz3TVJZlzhsg76X81udK2qZaOKaWrZQ==
-  dependencies:
-    "@pythnetwork/client" "^2.5.1"
-    "@solana/buffer-layout" "^3.0.0"
-    "@solana/spl-token" "^0.1.8"
-    "@solana/web3.js" "^1.31.0"
-    axios "^0.24.0"
-    bignumber.js "^9.0.2"
-    bn.js "^5.2.0"
-    buffer "^6.0.3"
-    buffer-layout "^1.2.0"
-    isomorphic-fetch "^3.0.0"
 
 "@solflare-wallet/sdk@^1.2.0":
   version "1.2.0"
@@ -6615,13 +6599,6 @@ axios@^0.21.0, axios@^0.21.3:
   integrity sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==
   dependencies:
     follow-redirects "^1.14.0"
-
-axios@^0.24.0:
-  version "0.24.0"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-0.24.0.tgz#804e6fa1e4b9c5288501dd9dff56a7a0940d20d6"
-  integrity sha512-Q6cWsys88HoPgAaFAVUb0WpPk0O8iTeisR9IMqy9G8AbO4NlpVknrnQS03zzF9PGAWgO3cgletO3VjV/P7VztA==
-  dependencies:
-    follow-redirects "^1.14.4"
 
 axios@^0.25.0:
   version "0.25.0"
@@ -9457,7 +9434,7 @@ focus-lock@^0.11.2:
   dependencies:
     tslib "^2.0.3"
 
-follow-redirects@^1.14.0, follow-redirects@^1.14.4, follow-redirects@^1.14.7, follow-redirects@^1.14.8, follow-redirects@^1.14.9, follow-redirects@^1.15.0:
+follow-redirects@^1.14.0, follow-redirects@^1.14.7, follow-redirects@^1.14.8, follow-redirects@^1.14.9, follow-redirects@^1.15.0:
   version "1.15.2"
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.2.tgz#b460864144ba63f2681096f274c4e57026da2c13"
   integrity sha512-VQLG33o04KaQ8uYi2tVNbdrWp1QWxNNea+nmIB4EVM28v0hmP17z7aG1+wAkNzVq4KeXTq3221ye5qTJP91JwA==
