@@ -152,11 +152,6 @@ export default function useGovernanceAssets() {
     [PackageEnum.Distribution]: {
       name: 'Distribution Program',
     },
-    [PackageEnum.Foresight]: {
-      name: 'Foresight',
-      isVisible: symbol === 'FORE',
-      image: '/img/foresight.png',
-    },
     [PackageEnum.GatewayPlugin]: {
       name: 'Gateway Plugin',
       image: '/img/civic.svg',

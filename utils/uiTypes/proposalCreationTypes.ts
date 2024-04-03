@@ -14,7 +14,6 @@ export enum PackageEnum {
   Common,
   Distribution,
   Dual,
-  Foresight,
   GatewayPlugin,
   Identity,
   MangoMarketV4,
