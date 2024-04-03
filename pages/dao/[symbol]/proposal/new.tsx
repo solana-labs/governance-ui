@@ -62,13 +62,7 @@ import WithdrawValidatorStake from './components/instructions/Validators/Withdra
 import DelegateStake from './components/instructions/Validators/DelegateStake'
 import SplitStake from './components/instructions/Validators/SplitStake'
 import useCreateProposal from '@hooks/useCreateProposal'
-import MakeInitMarketParams from './components/instructions/Foresight/MakeInitMarketParams'
-import MakeInitMarketListParams from './components/instructions/Foresight/MakeInitMarketListParams'
-import MakeInitCategoryParams from './components/instructions/Foresight/MakeInitCategoryParams'
-import MakeResolveMarketParams from './components/instructions/Foresight/MakeResolveMarketParams'
-import MakeAddMarketListToCategoryParams from './components/instructions/Foresight/MakeAddMarketListToCategoryParams'
 import RealmConfig from './components/instructions/RealmConfig'
-import MakeSetMarketMetadataParams from './components/instructions/Foresight/MakeSetMarketMetadataParams'
 import CloseTokenAccount from './components/instructions/CloseTokenAccount'
 import CloseMultipleTokenAccounts from './components/instructions/CloseMultipleTokenAccounts'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
@@ -500,12 +494,6 @@ const New = () => {
       [Instructions.WithdrawFromOracle]: WithdrawFromOracle,
       [Instructions.RefreshSolendObligation]: RefreshObligation,
       [Instructions.RefreshSolendReserve]: RefreshReserve,
-      [Instructions.ForesightInitMarket]: MakeInitMarketParams,
-      [Instructions.ForesightInitMarketList]: MakeInitMarketListParams,
-      [Instructions.ForesightInitCategory]: MakeInitCategoryParams,
-      [Instructions.ForesightResolveMarket]: MakeResolveMarketParams,
-      [Instructions.ForesightAddMarketListToCategory]: MakeAddMarketListToCategoryParams,
-      [Instructions.ForesightSetMarketMetadata]: MakeSetMarketMetadataParams,
       [Instructions.RealmConfig]: RealmConfig,
       [Instructions.CreateNftPluginRegistrar]: CreateNftPluginRegistrar,
       [Instructions.CreateNftPluginMaxVoterWeight]: CreateNftPluginMaxVoterWeightRecord,

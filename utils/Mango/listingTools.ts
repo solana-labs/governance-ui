@@ -18,7 +18,7 @@ import {
   getSwitchBoardPresets,
 } from '@blockworks-foundation/mango-v4-settings/lib/helpers/listingTools'
 import { AnchorProvider, BN, Program, Wallet } from '@coral-xyz/anchor'
-import { MAINNET_USDC_MINT } from '@foresight-tmp/foresight-sdk/dist/consts'
+import { MAINNET_USDC_MINT } from '@tools/constants'
 import { Market } from '@project-serum/serum'
 import { PythHttpClient, parsePriceData } from '@pythnetwork/client'
 import {

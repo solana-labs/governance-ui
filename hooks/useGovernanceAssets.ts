@@ -351,39 +351,6 @@ export default function useGovernanceAssets() {
     },
 
     /*
-      ███████  ██████  ██████  ███████ ███████ ██  ██████  ██   ██ ████████
-      ██      ██    ██ ██   ██ ██      ██      ██ ██       ██   ██    ██
-      █████   ██    ██ ██████  █████   ███████ ██ ██   ███ ███████    ██
-      ██      ██    ██ ██   ██ ██           ██ ██ ██    ██ ██   ██    ██
-      ██       ██████  ██   ██ ███████ ███████ ██  ██████  ██   ██    ██
-    */
-
-    [Instructions.ForesightAddMarketListToCategory]: {
-      name: 'Add Market List To Category',
-      packageId: PackageEnum.Foresight,
-    },
-    [Instructions.ForesightInitCategory]: {
-      name: 'Init Category',
-      packageId: PackageEnum.Foresight,
-    },
-    [Instructions.ForesightInitMarket]: {
-      name: 'Init Market',
-      packageId: PackageEnum.Foresight,
-    },
-    [Instructions.ForesightInitMarketList]: {
-      name: 'Init Market List',
-      packageId: PackageEnum.Foresight,
-    },
-    [Instructions.ForesightResolveMarket]: {
-      name: 'Resolve Market',
-      packageId: PackageEnum.Foresight,
-    },
-    [Instructions.ForesightSetMarketMetadata]: {
-      name: 'Set Market Metadata',
-      packageId: PackageEnum.Foresight,
-    },
-
-    /*
       ██ ██████  ███████ ███    ██ ████████ ██ ████████ ██    ██
       ██ ██   ██ ██      ████   ██    ██    ██    ██     ██  ██
       ██ ██   ██ █████   ██ ██  ██    ██    ██    ██      ████

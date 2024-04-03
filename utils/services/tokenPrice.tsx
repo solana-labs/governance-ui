@@ -4,7 +4,7 @@ import { mergeDeepRight } from 'ramda'
 import { notify } from '@utils/notifications'
 import { WSOL_MINT } from '@components/instructions/tools'
 import overrides from 'public/realms/token-overrides.json'
-import { MAINNET_USDC_MINT } from '@foresight-tmp/foresight-sdk/dist/consts'
+import { MAINNET_USDC_MINT } from '@tools/constants'
 import { Price, TokenInfo } from './types'
 import { chunks } from '@utils/helpers'
 
