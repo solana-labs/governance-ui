@@ -1,6 +1,5 @@
 import Button from '@components/Button'
 import NotifiIcon from '@components/NotifiIcon'
-import { defaultVariables } from '@dialectlabs/react-ui'
 import styled from '@emotion/styled'
 import { Transition } from '@headlessui/react'
 import { DeviceMobileIcon } from '@heroicons/react/outline'
@@ -9,7 +8,6 @@ import { BellIcon, KeyIcon, MailIcon } from '@heroicons/react/solid'
 import { useEffect, useRef, useState } from 'react'
 import useNotificationStore, { ModalStates } from 'stores/useNotificationStore'
 
-import DialectNotificationsModal from '@components/DialectNotificationsModal'
 import NotificationCardContainer from '@components/NotificationsCard/NotificationCardContainer'
 import TelegramIcon from './TelegramIcon'
 
@@ -149,15 +147,9 @@ export default function NotificationsSwitch() {
     </div>
   )
 
-  const DialectBellIcon = defaultVariables.dark.icons.bell
-
   return (
     <div className="relative" ref={wrapperRef}>
-      <Transition
-        className={defaultVariables.dark.modalWrapper}
-        show={openModal}
-        {...defaultVariables.animations.popup}
-      >
+      <Transition show={openModal}>
         {modalState === ModalStates.Selection && (
           <div className="w-fit h-fit bg-bkg-5 -top-4 right-0 absolute rounded-lg shadow-md">
             <div className="h-full flex flex-col items-center pt-4">
@@ -174,19 +166,6 @@ export default function NotificationsSwitch() {
             </div>
           </div>
         )}
-
-        {modalState === ModalStates.Dialect && (
-          <DialectNotificationsModal
-            onModalClose={() => {
-              setOpenModal(false)
-            }}
-            onBackClick={() =>
-              setNotificationStore((state) => {
-                state.modalState = ModalStates.Selection
-              })
-            }
-          />
-        )}
         {modalState === ModalStates.Notifi && (
           <NotificationCardContainer
             onClose={() => setOpenModal(!openModal)}
@@ -202,9 +181,7 @@ export default function NotificationsSwitch() {
         className="bg-bkg-2 default-transition flex items-center justify-center h-10 rounded-full w-10 hover:bg-bkg-3"
         onClick={() => setOpenModal(!openModal)}
         ref={bellRef}
-      >
-        <DialectBellIcon />
-      </button>
+      ></button>
     </div>
   )
 }

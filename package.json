@@ -29,7 +29,6 @@
     ]
   },
   "dependencies": {
-    "@blockworks-foundation/mango-mints-redemption": "0.0.10",
     "@blockworks-foundation/mango-v4": "0.23.1",
     "@blockworks-foundation/mango-v4-rc": "npm:@blockworks-foundation/mango-v4@0.23.0-rc1",
     "@blockworks-foundation/mango-v4-settings": "0.14.19",
@@ -41,8 +40,6 @@
     "@civic/solana-gateway-react": "^0.16.10",
     "@coral-xyz/anchor": "0.29.0",
     "@coral-xyz/borsh": "0.27.0",
-    "@dialectlabs/react-sdk-blockchain-solana": "1.0.0-beta.3",
-    "@dialectlabs/react-ui": "1.1.0-beta.5",
     "@dual-finance/airdrop": "0.2.2",
     "@dual-finance/gso": "0.0.17",
     "@dual-finance/staking-options": "0.0.26",

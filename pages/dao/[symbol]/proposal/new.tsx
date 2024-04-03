@@ -136,13 +136,11 @@ import DaoVote from './components/instructions/SplGov/DaoVote'
 import DualGso from './components/instructions/Dual/DualGso'
 import DualGsoWithdraw from './components/instructions/Dual/DualGsoWithdraw'
 import MultiChoiceForm from '../../../../components/MultiChoiceForm'
-import CloseVaults from './components/instructions/DistrubtionProgram/CloseVaults'
-import FillVaults from './components/instructions/DistrubtionProgram/FillVaults'
 import MeshRemoveMember from './components/instructions/Squads/MeshRemoveMember'
 import MeshAddMember from './components/instructions/Squads/MeshAddMember'
 import MeshChangeThresholdMember from './components/instructions/Squads/MeshChangeThresholdMember'
 import PythRecoverAccount from './components/instructions/Pyth/PythRecoverAccount'
-import { useVoteByCouncilToggle } from "@hooks/useVoteByCouncilToggle";
+import { useVoteByCouncilToggle } from '@hooks/useVoteByCouncilToggle'
 
 const TITLE_LENGTH_LIMIT = 130
 // the true length limit is either at the tx size level, and maybe also the total account size level (I can't remember)
@@ -203,7 +201,11 @@ const New = () => {
     title: typeof router.query['t'] === 'string' ? router.query['t'] : '',
     description: '',
   })
-  const { voteByCouncil, shouldShowVoteByCouncilToggle, setVoteByCouncil } = useVoteByCouncilToggle();
+  const {
+    voteByCouncil,
+    shouldShowVoteByCouncilToggle,
+    setVoteByCouncil,
+  } = useVoteByCouncilToggle()
   const [multiChoiceForm, setMultiChoiceForm] = useState<{
     governance: PublicKey | undefined
     options: string[]
@@ -499,8 +501,6 @@ const New = () => {
       [Instructions.DualFinanceDelegateWithdraw]: DualVoteDepositWithdraw,
       [Instructions.DualFinanceVoteDeposit]: DualVoteDeposit,
       [Instructions.DaoVote]: DaoVote,
-      [Instructions.DistributionCloseVaults]: CloseVaults,
-      [Instructions.DistributionFillVaults]: FillVaults,
       [Instructions.MeanCreateAccount]: MeanCreateAccount,
       [Instructions.MeanFundAccount]: MeanFundAccount,
       [Instructions.MeanWithdrawFromAccount]: MeanWithdrawFromAccount,
@@ -719,14 +719,14 @@ const New = () => {
                 })}
               />
             </div>
-              {shouldShowVoteByCouncilToggle && (
-                  <VoteBySwitch
-                      checked={voteByCouncil}
-                      onChange={() => {
-                          setVoteByCouncil(!voteByCouncil)
-                      }}
-                  ></VoteBySwitch>
-              )}
+            {shouldShowVoteByCouncilToggle && (
+              <VoteBySwitch
+                checked={voteByCouncil}
+                onChange={() => {
+                  setVoteByCouncil(!voteByCouncil)
+                }}
+              ></VoteBySwitch>
+            )}
             <div className="max-w-lg w-full mb-4 flex flex-wrap gap-2 justify-between items-end">
               <div className="flex grow basis-0">
                 <ProposalTypeRadioButton

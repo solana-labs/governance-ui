@@ -8,7 +8,6 @@ import * as RE from '@hub/types/Result';
 
 import { Connect } from './Connect';
 import { Connected } from './Connected';
-import { DialectNotifications } from './DialectNotifications';
 import * as gql from './gql';
 import { Loading } from './Loading';
 import { UserDropdown } from './UserDropdown';
@@ -48,7 +47,6 @@ export function User(props: Props) {
       ),
       ({ me }) => (
         <div className={cx(props.className, 'flex', 'items-center')}>
-          <DialectNotifications className="mx-2" />
           <UserDropdown user={me} compressed={props.compressed} />
         </div>
       ),
