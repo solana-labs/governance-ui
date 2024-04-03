@@ -19,7 +19,7 @@ type UseJoinRealmReturnType = {
 
 export const useJoinRealm = (): UseJoinRealmReturnType => {
     const tokenOwnerRecord = useUserCommunityTokenOwnerRecord().data?.result
-    const { plugins , createVoterWeightRecords } = useRealmVoterWeightPlugins();
+    const { createVoterWeightRecords } = useRealmVoterWeightPlugins();
     const realm = useRealmQuery().data?.result
     const wallet = useWalletOnePointOh()
     const programVersion = useProgramVersion()

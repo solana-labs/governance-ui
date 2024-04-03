@@ -65,7 +65,7 @@ export class PythVoterWeightPluginClient extends Client<any> {
     }
 
     async updateVoterWeightRecord(voter: PublicKey, realm: PublicKey, mint: PublicKey, action: VoterWeightAction, inputRecordCallback?: () => Promise<PublicKey>, target?: PublicKey) {
-        let instructions: TransactionInstruction[] = [];
+        const instructions: TransactionInstruction[] = [];
         await this.getUpdateVoterWeightPks(instructions, voter, action, target);
 
         return { pre: instructions };
