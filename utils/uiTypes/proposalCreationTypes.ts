@@ -20,7 +20,6 @@ export enum PackageEnum {
   Pyth,
   Serum,
   Squads,
-  Switchboard,
   VsrPlugin,
 }
 
@@ -261,8 +260,6 @@ export enum Instructions {
   SerumUpdateGovConfigParams,
   PythRecoverAccount,
   StakeValidator,
-  SwitchboardFundOracle,
-  WithdrawFromOracle,
   Transfer,
   TransferDomainName,
   UpdateTokenMetadata,

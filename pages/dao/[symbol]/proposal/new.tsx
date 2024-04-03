@@ -48,8 +48,6 @@ import VoteBySwitch from './components/VoteBySwitch'
 import CreateNftPluginRegistrar from './components/instructions/NftVotingPlugin/CreateRegistrar'
 import CreateNftPluginMaxVoterWeightRecord from './components/instructions/NftVotingPlugin/CreateMaxVoterWeightRecord'
 import ConfigureNftPluginCollection from './components/instructions/NftVotingPlugin/ConfigureCollection'
-import SwitchboardFundOracle from './components/instructions/Switchboard/FundOracle'
-import WithdrawFromOracle from './components/instructions/Switchboard/WithdrawFromOracle'
 import StakeValidator from './components/instructions/Validators/StakeValidator'
 import DeactivateValidatorStake from './components/instructions/Validators/DeactivateStake'
 import WithdrawValidatorStake from './components/instructions/Validators/WithdrawStake'
@@ -464,8 +462,6 @@ const New = () => {
       [Instructions.PsyFinanceBurnWriterForQuote]: PsyFinanceBurnWriterTokenForQuote,
       [Instructions.PsyFinanceClaimUnderlyingPostExpiration]: PsyFinanceClaimUnderlyingPostExpiration,
       [Instructions.PsyFinanceExerciseOption]: PsyFinanceExerciseOption,
-      [Instructions.SwitchboardFundOracle]: SwitchboardFundOracle,
-      [Instructions.WithdrawFromOracle]: WithdrawFromOracle,
       [Instructions.RealmConfig]: RealmConfig,
       [Instructions.CreateNftPluginRegistrar]: CreateNftPluginRegistrar,
       [Instructions.CreateNftPluginMaxVoterWeight]: CreateNftPluginMaxVoterWeightRecord,

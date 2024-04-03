@@ -180,10 +180,6 @@ export default function useGovernanceAssets() {
       name: 'Squads',
       image: '/img/squads.png',
     },
-    [PackageEnum.Switchboard]: {
-      name: 'Switchboard',
-      image: '/img/switchboard.png',
-    },
     [PackageEnum.VsrPlugin]: {
       name: 'Vsr Plugin',
       isVisible:
@@ -568,23 +564,6 @@ export default function useGovernanceAssets() {
          ██ ██ ▄▄ ██ ██    ██ ██   ██ ██   ██      ██ 
     ███████  ██████   ██████  ██   ██ ██████  ███████ 
     */
-
-    /*
-      ███████ ██     ██ ██ ████████  ██████ ██   ██ ██████   ██████   █████  ██████  ██████
-      ██      ██     ██ ██    ██    ██      ██   ██ ██   ██ ██    ██ ██   ██ ██   ██ ██   ██
-      ███████ ██  █  ██ ██    ██    ██      ███████ ██████  ██    ██ ███████ ██████  ██   ██
-           ██ ██ ███ ██ ██    ██    ██      ██   ██ ██   ██ ██    ██ ██   ██ ██   ██ ██   ██
-      ███████  ███ ███  ██    ██     ██████ ██   ██ ██████   ██████  ██   ██ ██   ██ ██████
-    */
-
-    [Instructions.SwitchboardFundOracle]: {
-      name: 'Fund Oracle',
-      packageId: PackageEnum.Switchboard,
-    },
-    [Instructions.WithdrawFromOracle]: {
-      name: 'Withdraw from Oracle',
-      packageId: PackageEnum.Switchboard,
-    },
 
     /*
       ██    ██ ███████ ██████      ██████  ██      ██    ██  ██████  ██ ███    ██
