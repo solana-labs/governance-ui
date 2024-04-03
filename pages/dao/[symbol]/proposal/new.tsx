@@ -66,11 +66,6 @@ import RealmConfig from './components/instructions/RealmConfig'
 import CloseTokenAccount from './components/instructions/CloseTokenAccount'
 import CloseMultipleTokenAccounts from './components/instructions/CloseMultipleTokenAccounts'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
-import MeanCreateAccount from './components/instructions/Mean/MeanCreateAccount'
-import MeanFundAccount from './components/instructions/Mean/MeanFundAccount'
-import MeanWithdrawFromAccount from './components/instructions/Mean/MeanWithdrawFromAccount'
-import MeanCreateStream from './components/instructions/Mean/MeanCreateStream'
-import MeanTransferStream from './components/instructions/Mean/MeanTransferStream'
 import ChangeDonation from './components/instructions/Change/ChangeDonation'
 import VotingMintConfig from './components/instructions/Vsr/VotingMintConfig'
 import CreateVsrRegistrar from './components/instructions/Vsr/CreateRegistrar'
@@ -473,11 +468,6 @@ const New = () => {
       [Instructions.Clawback]: Clawback,
       [Instructions.CreateAssociatedTokenAccount]: CreateAssociatedTokenAccount,
       [Instructions.DaoVote]: DaoVote,
-      [Instructions.MeanCreateAccount]: MeanCreateAccount,
-      [Instructions.MeanFundAccount]: MeanFundAccount,
-      [Instructions.MeanWithdrawFromAccount]: MeanWithdrawFromAccount,
-      [Instructions.MeanCreateStream]: MeanCreateStream,
-      [Instructions.MeanTransferStream]: MeanTransferStream,
       [Instructions.SquadsMeshRemoveMember]: MeshRemoveMember,
       [Instructions.SquadsMeshAddMember]: MeshAddMember,
       [Instructions.SquadsMeshChangeThresholdMember]: MeshChangeThresholdMember,

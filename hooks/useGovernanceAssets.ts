@@ -172,10 +172,6 @@ export default function useGovernanceAssets() {
       name: 'Mango Market v4',
       image: '/img/mango.png',
     },
-    [PackageEnum.MeanFinance]: {
-      name: 'Mean Finance',
-      image: '/img/meanfinance.png',
-    },
     [PackageEnum.PsyFinance]: {
       name: 'PsyFinance',
       image: '/img/psyfinance.png',
@@ -505,34 +501,6 @@ export default function useGovernanceAssets() {
       name: 'Idl Set Buffer',
       packageId: PackageEnum.MangoMarketV4,
       isVisible: canUseAnyInstruction,
-    },
-    /*
-      ███    ███ ███████  █████  ███    ██     ███████ ██ ███    ██  █████  ███    ██  ██████ ███████
-      ████  ████ ██      ██   ██ ████   ██     ██      ██ ████   ██ ██   ██ ████   ██ ██      ██
-      ██ ████ ██ █████   ███████ ██ ██  ██     █████   ██ ██ ██  ██ ███████ ██ ██  ██ ██      █████
-      ██  ██  ██ ██      ██   ██ ██  ██ ██     ██      ██ ██  ██ ██ ██   ██ ██  ██ ██ ██      ██
-      ██      ██ ███████ ██   ██ ██   ████     ██      ██ ██   ████ ██   ██ ██   ████  ██████ ███████
-    */
-
-    [Instructions.MeanCreateAccount]: {
-      name: 'Payment Stream: New account',
-      packageId: PackageEnum.MeanFinance,
-    },
-    [Instructions.MeanFundAccount]: {
-      name: 'Payment Stream: Fund account',
-      packageId: PackageEnum.MeanFinance,
-    },
-    [Instructions.MeanWithdrawFromAccount]: {
-      name: 'Payment Stream: Withdraw funds',
-      packageId: PackageEnum.MeanFinance,
-    },
-    [Instructions.MeanCreateStream]: {
-      name: 'Payment Stream: New stream',
-      packageId: PackageEnum.MeanFinance,
-    },
-    [Instructions.MeanTransferStream]: {
-      name: 'Payment Stream: Transfer stream',
-      packageId: PackageEnum.MeanFinance,
     },
 
     /*

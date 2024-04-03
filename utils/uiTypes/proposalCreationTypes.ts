@@ -8,7 +8,6 @@ import { DepositWithMintAccount, Voter } from 'VoteStakeRegistry/sdk/accounts'
 import { LockupKind } from 'VoteStakeRegistry/tools/types'
 import { AssetAccount, StakeAccount } from '@utils/uiTypes/assets'
 import { RealmInfo } from '@models/registry/api'
-import * as PaymentStreaming from '@mean-dao/payment-streaming'
 
 // Alphabetical order
 export enum PackageEnum {
@@ -19,7 +18,6 @@ export enum PackageEnum {
   GatewayPlugin,
   Identity,
   MangoMarketV4,
-  MeanFinance,
   NftPlugin,
   PsyFinance,
   Pyth,
@@ -54,47 +52,6 @@ export interface DomainNameTransferForm {
   destinationAccount: string
   governedAccount: AssetAccount | undefined
   domainAddress: string | undefined
-}
-
-export interface MeanCreateAccount {
-  governedTokenAccount: AssetAccount | undefined
-  label: string | undefined
-  mintInfo: MintInfo | undefined
-  amount: number | undefined
-  type: PaymentStreaming.AccountType
-}
-
-export interface MeanFundAccount {
-  governedTokenAccount: AssetAccount | undefined
-  mintInfo: MintInfo | undefined
-  amount: number | undefined
-  paymentStreamingAccount: PaymentStreaming.PaymentStreamingAccount | undefined
-}
-
-export interface MeanWithdrawFromAccount {
-  governedTokenAccount: AssetAccount | undefined
-  mintInfo: MintInfo | undefined
-  amount: number | undefined
-  paymentStreamingAccount: PaymentStreaming.PaymentStreamingAccount | undefined
-  destination: string | undefined
-}
-
-export interface MeanCreateStream {
-  governedTokenAccount: AssetAccount | undefined
-  paymentStreamingAccount: PaymentStreaming.PaymentStreamingAccount | undefined
-  streamName: string | undefined
-  destination: string | undefined
-  mintInfo: MintInfo | undefined
-  allocationAssigned: number | undefined
-  rateAmount: number | undefined
-  rateInterval: 0 | 1 | 2 | 3 | 4 | 5
-  startDate: string
-}
-
-export interface MeanTransferStream {
-  governedTokenAccount: AssetAccount | undefined
-  stream: PaymentStreaming.Stream | undefined
-  destination: string | undefined
 }
 
 export interface GrantForm {
@@ -325,11 +282,6 @@ export enum Instructions {
   MangoV4TokenAddBank,
   MangoV4AdminWithdrawTokenFees,
   MangoV4WithdrawPerpFees,
-  MeanCreateAccount,
-  MeanCreateStream,
-  MeanFundAccount,
-  MeanTransferStream,
-  MeanWithdrawFromAccount,
   Mint,
   None,
   ProgramUpgrade,
