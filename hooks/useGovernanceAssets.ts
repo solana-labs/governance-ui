@@ -568,18 +568,7 @@ export default function useGovernanceAssets() {
          ██ ██ ▄▄ ██ ██    ██ ██   ██ ██   ██      ██ 
     ███████  ██████   ██████  ██   ██ ██████  ███████ 
     */
-    [Instructions.SquadsMeshAddMember]: {
-      name: 'Mesh Add Member',
-      packageId: PackageEnum.Squads,
-    },
-    [Instructions.SquadsMeshChangeThresholdMember]: {
-      name: 'Mesh Change Threshold',
-      packageId: PackageEnum.Squads,
-    },
-    [Instructions.SquadsMeshRemoveMember]: {
-      name: 'Mesh Remove Member',
-      packageId: PackageEnum.Squads,
-    },
+
     /*
       ███████ ██     ██ ██ ████████  ██████ ██   ██ ██████   ██████   █████  ██████  ██████
       ██      ██     ██ ██    ██    ██      ██   ██ ██   ██ ██    ██ ██   ██ ██   ██ ██   ██

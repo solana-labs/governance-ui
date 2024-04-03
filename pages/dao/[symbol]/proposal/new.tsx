@@ -108,9 +108,6 @@ import { useRealmQuery } from '@hooks/queries/realm'
 import { usePrevious } from '@hooks/usePrevious'
 import DaoVote from './components/instructions/SplGov/DaoVote'
 import MultiChoiceForm from '../../../../components/MultiChoiceForm'
-import MeshRemoveMember from './components/instructions/Squads/MeshRemoveMember'
-import MeshAddMember from './components/instructions/Squads/MeshAddMember'
-import MeshChangeThresholdMember from './components/instructions/Squads/MeshChangeThresholdMember'
 import PythRecoverAccount from './components/instructions/Pyth/PythRecoverAccount'
 import { useVoteByCouncilToggle } from '@hooks/useVoteByCouncilToggle'
 
@@ -462,9 +459,6 @@ const New = () => {
       [Instructions.Clawback]: Clawback,
       [Instructions.CreateAssociatedTokenAccount]: CreateAssociatedTokenAccount,
       [Instructions.DaoVote]: DaoVote,
-      [Instructions.SquadsMeshRemoveMember]: MeshRemoveMember,
-      [Instructions.SquadsMeshAddMember]: MeshAddMember,
-      [Instructions.SquadsMeshChangeThresholdMember]: MeshChangeThresholdMember,
       [Instructions.PythRecoverAccount]: PythRecoverAccount,
       [Instructions.PsyFinanceMintAmericanOptions]: PsyFinanceMintAmericanOptions,
       [Instructions.PsyFinanceBurnWriterForQuote]: PsyFinanceBurnWriterTokenForQuote,
