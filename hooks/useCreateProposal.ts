@@ -51,13 +51,11 @@ export default function useCreateProposal() {
       connection.current,
       governance.pubkey
     )
+    const ownTokenRecord = ownVoterWeight?.councilTokenRecord ?? ownVoterWeight?.communityTokenRecord
+
+    if (!ownTokenRecord) throw new Error('token owner record does not exist')
     if (!selectedGovernance) throw new Error('governance not found')
     if (!realm) throw new Error()
-
-    const ownTokenRecord = ownVoterWeight?.getTokenRecordToCreateProposal(
-      selectedGovernance.account.config,
-        voteByCouncil
-    )
 
     // this is somewhat confusing - the basic idea is:
     // although a vote may be by community vote, the proposer may create it with their council token
@@ -91,7 +89,7 @@ export default function useCreateProposal() {
       rpcContext,
       realm,
       governance.pubkey,
-      ownTokenRecord!,
+      ownTokenRecord,
       title,
       description,
       proposalMint,
@@ -137,13 +135,12 @@ export default function useCreateProposal() {
       connection.current,
       governance
     )
+    const ownTokenRecord = ownVoterWeight?.councilTokenRecord ?? ownVoterWeight?.communityTokenRecord
+
+    if (!ownTokenRecord) throw new Error('token owner record does not exist')
     if (!selectedGovernance) throw new Error('governance not found')
     if (!realm) throw new Error()
 
-    const ownTokenRecord = ownVoterWeight?.getTokenRecordToCreateProposal(
-      selectedGovernance.account.config,
-        voteByCouncil
-    )
     // this is somewhat confusing - the basic idea is:
     // although a vote may be by community vote, the proposer may create it with their council token
     // The choice of which token to use is made when the token record is selected
@@ -174,7 +171,7 @@ export default function useCreateProposal() {
       rpcContext,
       realm,
       governance,
-      ownTokenRecord!,
+      ownTokenRecord,
       title,
       description,
       proposalMint,

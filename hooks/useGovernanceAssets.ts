@@ -166,7 +166,6 @@ export default function useGovernanceAssets() {
       isVisible: symbol === 'FORE',
       image: '/img/foresight.png',
     },
-
     [PackageEnum.GatewayPlugin]: {
       name: 'Gateway Plugin',
       image: '/img/civic.svg',
@@ -189,6 +188,10 @@ export default function useGovernanceAssets() {
     [PackageEnum.PsyFinance]: {
       name: 'PsyFinance',
       image: '/img/psyfinance.png',
+    },
+    [PackageEnum.Pyth]: {
+      name: 'Pyth',
+      image: '/img/pyth.svg',
     },
     [PackageEnum.Serum]: {
       name: 'Serum',
@@ -665,6 +668,17 @@ export default function useGovernanceAssets() {
     },
 
     /*
+      ██████  ██    ██ ████████ ██   ██
+      ██   ██  ██  ██     ██    ██   ██
+      ██████    ████      ██    ███████
+      ██         ██       ██    ██   ██
+      ██         ██       ██    ██   ██
+    */
+    [Instructions.PythRecoverAccount]: {
+      name: 'Recover Account',
+      packageId: PackageEnum.Pyth,
+    },
+    /*
       ███████ ███████ ██████  ██    ██ ███    ███
       ██      ██      ██   ██ ██    ██ ████  ████
       ███████ █████   ██████  ██    ██ ██ ████ ██
@@ -743,17 +757,14 @@ export default function useGovernanceAssets() {
     [Instructions.SquadsMeshAddMember]: {
       name: 'Mesh Add Member',
       packageId: PackageEnum.Squads,
-      isVisible: true,
     },
     [Instructions.SquadsMeshChangeThresholdMember]: {
       name: 'Mesh Change Threshold',
       packageId: PackageEnum.Squads,
-      isVisible: true,
     },
     [Instructions.SquadsMeshRemoveMember]: {
       name: 'Mesh Remove Member',
       packageId: PackageEnum.Squads,
-      isVisible: true,
     },
     /*
       ███████ ██     ██ ██ ████████  ██████ ██   ██ ██████   ██████   █████  ██████  ██████

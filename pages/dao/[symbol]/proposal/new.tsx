@@ -141,7 +141,8 @@ import FillVaults from './components/instructions/DistrubtionProgram/FillVaults'
 import MeshRemoveMember from './components/instructions/Squads/MeshRemoveMember'
 import MeshAddMember from './components/instructions/Squads/MeshAddMember'
 import MeshChangeThresholdMember from './components/instructions/Squads/MeshChangeThresholdMember'
-import {useVoteByCouncilToggle} from "@hooks/useVoteByCouncilToggle";
+import PythRecoverAccount from './components/instructions/Pyth/PythRecoverAccount'
+import { useVoteByCouncilToggle } from "@hooks/useVoteByCouncilToggle";
 
 const TITLE_LENGTH_LIMIT = 130
 // the true length limit is either at the tx size level, and maybe also the total account size level (I can't remember)
@@ -508,6 +509,7 @@ const New = () => {
       [Instructions.SquadsMeshRemoveMember]: MeshRemoveMember,
       [Instructions.SquadsMeshAddMember]: MeshAddMember,
       [Instructions.SquadsMeshChangeThresholdMember]: MeshChangeThresholdMember,
+      [Instructions.PythRecoverAccount]: PythRecoverAccount,
       [Instructions.CreateSolendObligationAccount]: CreateObligationAccount,
       [Instructions.InitSolendObligationAccount]: InitObligationAccount,
       [Instructions.DepositReserveLiquidityAndObligationCollateral]: DepositReserveLiquidityAndObligationCollateral,

@@ -477,8 +477,8 @@ const EditToken = ({
         maintWeightShiftLiabTarget: currentToken.maintWeightShiftLiabTarget.toNumber(),
         depositLimit: currentToken.depositLimit.toString(),
         zeroUtilRate: currentToken.zeroUtilRate.toNumber(),
-        platformLiquidationFeeOpt: currentToken.platformLiquidationFee.toNumber(),
-        collateralFeePerDayOpt: currentToken.collateralFeePerDay,
+        platformLiquidationFee: currentToken.platformLiquidationFee.toNumber(),
+        collateralFeePerDay: currentToken.collateralFeePerDay,
       }
       setForm((prevForm) => ({
         ...prevForm,

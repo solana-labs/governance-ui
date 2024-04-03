@@ -17,6 +17,8 @@ import {
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import UseMangoV4 from '@hooks/useMangoV4'
+import useProgramSelector from '@components/Mango/useProgramSelector'
 
 interface Data {
   auxiliaryWallets: AuxiliaryWallet[]
@@ -40,6 +42,12 @@ export default function useTreasuryInfo(
   const { realmInfo } = useRealm()
   const connection = useLegacyConnectionContext()
   const accounts = useGovernanceAssetsStore((s) => s.assetAccounts)
+
+  const programSelectorHook = useProgramSelector()
+  const { mangoClient, mangoGroup } = UseMangoV4(
+    programSelectorHook.program?.val,
+    programSelectorHook.program?.group
+  )
 
   const loadingGovernedAccounts = useGovernanceAssetsStore(
     (s) => s.loadGovernedAccounts
@@ -84,6 +92,8 @@ export default function useTreasuryInfo(
         accounts,
         domains,
         realmInfo.programId,
+        mangoGroup,
+        mangoClient,
         realm?.account.config.councilMint?.toBase58(),
         realm?.account.communityMint?.toBase58(),
         councilMint,

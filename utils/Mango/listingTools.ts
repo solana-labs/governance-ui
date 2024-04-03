@@ -174,7 +174,7 @@ export type ListingArgsFormatted = {
   groupInsuranceFund: boolean
   zeroUtilRate: number
   disableAssetLiquidation: boolean
-  collateralFeePerDay: number
+  collateralFeePerDay: string
 }
 
 export type EditTokenArgsFormatted = ListingArgsFormatted & {
