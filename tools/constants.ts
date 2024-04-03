@@ -21,3 +21,7 @@ export const DEFAULT_NFT_VOTER_PLUGIN_V2 =
 export const JUPITER_REFERRAL_PK = new PublicKey(
   'EV4qhLE2yPKdUPdQ74EWJUn21xT3eGQxG3DRR1g9NNFc'
 )
+
+export const MAINNET_USDC_MINT = new PublicKey(
+  'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
+)
