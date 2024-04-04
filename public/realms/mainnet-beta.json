@@ -3500,5 +3500,14 @@
     "twitter": "@TensorFdn",
     "discord": "https://discord.gg/a8spfqxEpC",
     "github": "https://github.com/tensor-foundation"
+  },
+  {
+    "symbol": "Jito",
+    "displayName": "Jito",
+    "programId": "jtogvBNH3WBSWDYD5FJfQP2ZxNTuf82zL8GkEhPeaJx",
+    "realmId": "jjCAwuuNpJCNMLAanpwgJZ6cdXzLPXe2GfD6TaDQBXt",
+    "ogImage": "/realms/Jito/jito.png",
+    "website": "https://jito.network",
+    "twitter": "@jito_sol"
   }
 ]
