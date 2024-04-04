@@ -129,9 +129,12 @@ interface EditTokenForm {
   maintWeightShiftLiabTarget: number
   maintWeightShiftAbort: boolean
   setFallbackOracle: boolean
-  depositLimit: number
+  depositLimit: string
   zeroUtilRate: number
   platformLiquidationFee: number
+  disableAssetLiquidation: boolean
+  collateralFeePerDay: number
+  forceWithdraw: boolean
 }
 
 const defaultFormValues: EditTokenForm = {
@@ -181,9 +184,12 @@ const defaultFormValues: EditTokenForm = {
   maintWeightShiftLiabTarget: 0,
   maintWeightShiftAbort: false,
   setFallbackOracle: false,
-  depositLimit: 0,
+  depositLimit: '0',
   zeroUtilRate: 0,
   platformLiquidationFee: 0,
+  disableAssetLiquidation: false,
+  collateralFeePerDay: 0,
+  forceWithdraw: false,
 }
 
 const EditToken = ({
@@ -347,7 +353,10 @@ const EditToken = ({
           values.setFallbackOracle!,
           getNullOrTransform(values.depositLimit, BN),
           getNullOrTransform(values.zeroUtilRate, null, Number),
-          getNullOrTransform(values.platformLiquidationFee, null, Number)
+          getNullOrTransform(values.platformLiquidationFee, null, Number),
+          values.disableAssetLiquidation!,
+          getNullOrTransform(values.collateralFeePerDay, null, Number),
+          values.forceWithdraw!
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -466,9 +475,10 @@ const EditToken = ({
         maintWeightShiftEnd: currentToken.maintWeightShiftEnd.toNumber(),
         maintWeightShiftAssetTarget: currentToken.maintWeightShiftAssetTarget.toNumber(),
         maintWeightShiftLiabTarget: currentToken.maintWeightShiftLiabTarget.toNumber(),
-        depositLimit: currentToken.depositLimit.toNumber(),
+        depositLimit: currentToken.depositLimit.toString(),
         zeroUtilRate: currentToken.zeroUtilRate.toNumber(),
-        platformLiquidationFeeOpt: currentToken.platformLiquidationFee.toNumber(),
+        platformLiquidationFee: currentToken.platformLiquidationFee.toNumber(),
+        collateralFeePerDay: currentToken.collateralFeePerDay,
       }
       setForm((prevForm) => ({
         ...prevForm,
@@ -539,6 +549,13 @@ const EditToken = ({
       initialValue: form.fallbackOracle,
       type: InstructionInputType.INPUT,
       name: 'fallbackOracle',
+    },
+    {
+      label: keyToLabel['setFallbackOracle'],
+      subtitle: getAdditionalLabelInfo('setFallbackOracle'),
+      initialValue: form.setFallbackOracle,
+      type: InstructionInputType.SWITCH,
+      name: 'setFallbackOracle',
     },
     {
       label: keyToLabel['oracleConfFilter'],
@@ -846,13 +863,6 @@ const EditToken = ({
       name: 'maintWeightShiftAbort',
     },
     {
-      label: keyToLabel['setFallbackOracle'],
-      subtitle: getAdditionalLabelInfo('setFallbackOracle'),
-      initialValue: form.setFallbackOracle,
-      type: InstructionInputType.SWITCH,
-      name: 'setFallbackOracle',
-    },
-    {
       label: keyToLabel['depositLimit'],
       subtitle: getAdditionalLabelInfo('depositLimit'),
       initialValue: form.depositLimit,
@@ -875,6 +885,28 @@ const EditToken = ({
       type: InstructionInputType.INPUT,
       inputType: 'number',
       name: 'platformLiquidationFee',
+    },
+    {
+      label: keyToLabel['disableAssetLiquidation'],
+      subtitle: getAdditionalLabelInfo('disableAssetLiquidation'),
+      initialValue: form.disableAssetLiquidation,
+      type: InstructionInputType.SWITCH,
+      name: 'disableAssetLiquidation',
+    },
+    {
+      label: keyToLabel['collateralFeePerDay'],
+      subtitle: getAdditionalLabelInfo('collateralFeePerDay'),
+      initialValue: form.collateralFeePerDay,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'collateralFeePerDay',
+    },
+    {
+      label: keyToLabel['forceWithdraw'],
+      subtitle: getAdditionalLabelInfo('forceWithdraw'),
+      initialValue: form.forceWithdraw,
+      type: InstructionInputType.SWITCH,
+      name: 'forceWithdraw',
     },
   ]
 

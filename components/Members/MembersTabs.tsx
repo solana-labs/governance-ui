@@ -12,8 +12,8 @@ import {
 } from '@hooks/queries/mintInfo'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import { NFT_PLUGINS_PKS } from '@constants/plugins'
-import {ProfileName} from "@components/Profile/ProfileName";
-import {ProfileImage} from "@components/Profile";
+import { ProfileName } from '@components/Profile/ProfileName'
+import { ProfileImage } from '@components/Profile'
 
 interface MembersTabsProps {
   activeTab: Member
@@ -123,7 +123,11 @@ const MemberItems = ({
   }, [walletAddress])
   const renderAddressImage = useMemo(
     () => (
-        <ProfileImage publicKey={new PublicKey(walletAddress)} expanded={false} className="w-6 h-6 text-fgd-3" />
+      <ProfileImage
+        publicKey={new PublicKey(walletAddress)}
+        expanded={false}
+        className="w-6 h-6 text-fgd-3"
+      />
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     [walletAddress]
@@ -149,7 +153,7 @@ const MemberItems = ({
           <span className="text-xs text-fgd-3">
             {(communityAmount || !councilAmount) && (
               <span className="flex items-center">
-                {tokenName} Votes {communityAmount || 0}
+                {tokenName} votes {communityAmount || 0}
                 {hasCommunityTokenOutsideRealm && (
                   <LogoutIcon className="w-4 h-4 ml-1"></LogoutIcon>
                 )}
@@ -157,7 +161,7 @@ const MemberItems = ({
             )}
             {councilAmount && (
               <span className="flex items-center">
-                Council Votes {councilAmount}{' '}
+                Council votes {councilAmount}{' '}
                 {hasCouncilTokenOutsideRealm && (
                   <LogoutIcon className="w-4 h-4 ml-1"></LogoutIcon>
                 )}

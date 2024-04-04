@@ -12,8 +12,6 @@ import { useAsyncCallback } from 'react-async-hook'
 import { positionKey } from '@helium/voter-stake-registry-sdk'
 import useRealm from '@hooks/useRealm'
 import { LockupKind } from 'HeliumVotePlugin/components/LockTokensModal'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import { notify } from '@utils/notifications'
 import {
   sendTransactionsV3,
@@ -21,15 +19,16 @@ import {
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
 import { useRealmQuery } from '@hooks/queries/realm'
+import {useHeliumClient} from "../../VoterWeightPlugins/useHeliumClient";
 
 export const useCreatePosition = () => {
   const { connection, wallet } = useWalletDeprecated()
   const realm = useRealmQuery().data?.result
   const { realmInfo } = useRealm()
-  const [{ client }, registrarPk] = useVotePluginsClientStore((s) => [
-    s.state.currentRealmVotingClient,
-    s.state.voteStakeRegistryRegistrarPk,
-  ])
+  const {heliumClient} = useHeliumClient();
+  const registrarPk = realm && heliumClient ?
+      heliumClient.getRegistrarPDA(realm.pubkey, realm.account.communityMint).registrar : undefined;
+
   const { error, loading, execute } = useAsyncCallback(
     async ({
       amount,
@@ -47,8 +46,7 @@ export const useCreatePosition = () => {
         !connection.current ||
         !registrarPk ||
         !realm ||
-        !client ||
-        !(client instanceof HeliumVsrClient) ||
+        !heliumClient ||
         !wallet ||
         !realmInfo ||
         !realmInfo.programVersion
@@ -98,7 +96,7 @@ export const useCreatePosition = () => {
         }
 
         instructions.push(
-          await client.program.methods
+          await heliumClient.program.methods
             .initializePositionV0({
               kind: { [lockupKind]: {} },
               periods: lockupPeriodsInDays,
@@ -113,7 +111,7 @@ export const useCreatePosition = () => {
         )
 
         instructions.push(
-          await client.program.methods
+          await heliumClient.program.methods
             .depositV0({
               amount,
             })

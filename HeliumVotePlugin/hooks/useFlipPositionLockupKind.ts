@@ -12,20 +12,17 @@ import {
   sendTransactionsV3,
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import { useSolanaUnixNow } from '@hooks/useSolanaUnixNow'
 import { withCreateTokenOwnerRecord } from '@solana/spl-governance'
 import { useRealmQuery } from '@hooks/queries/realm'
+import {useHeliumClient} from "../../VoterWeightPlugins/useHeliumClient";
 
 export const useFlipPositionLockupKind = () => {
   const { unixNow } = useSolanaUnixNow()
   const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
   const realm = useRealmQuery().data?.result
   const { realmInfo } = useRealm()
-  const [{ client }] = useVotePluginsClientStore((s) => [
-    s.state.currentRealmVotingClient,
-  ])
+  const {heliumClient} = useHeliumClient();
   const { error, loading, execute } = useAsyncCallback(
     async ({
       position,
@@ -41,10 +38,9 @@ export const useFlipPositionLockupKind = () => {
         !connection.current ||
         !realm ||
         !wallet ||
-        !client ||
+        !heliumClient ||
         !unixNow ||
         !realmInfo ||
-        !(client instanceof HeliumVsrClient) ||
         position.numActiveVotes > 0
 
       const lockupKind = Object.keys(position.lockup.kind)[0] as string
@@ -100,7 +96,7 @@ export const useFlipPositionLockupKind = () => {
           )
         } else {
           instructions.push(
-            await client.program.methods
+            await heliumClient.program.methods
               .resetLockupV0({
                 kind,
                 periods: positionLockupPeriodInDays,

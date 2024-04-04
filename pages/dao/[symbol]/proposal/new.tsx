@@ -87,19 +87,14 @@ import CreateTokenMetadata from './components/instructions/CreateTokenMetadata'
 import UpdateTokenMetadata from './components/instructions/UpdateTokenMetadata'
 import classNames from 'classnames'
 import TokenRegister from './components/instructions/Mango/MangoV4/TokenRegister'
-import TokenRegisterV23 from './components/instructions/Mango/MangoV4/TokenRegisterV23'
 import EditToken from './components/instructions/Mango/MangoV4/EditToken'
-import EditTokenV23 from './components/instructions/Mango/MangoV4/EditTokenV23'
 import PerpEdit from './components/instructions/Mango/MangoV4/PerpEdit'
-import PerpEditV23 from './components/instructions/Mango/MangoV4/PerpEditV23'
 import GroupEdit from './components/instructions/Mango/MangoV4/GroupEdit'
-import GroupEditV23 from './components/instructions/Mango/MangoV4/GroupEditV23'
 import AdminTokenWithdrawFees from './components/instructions/Mango/MangoV4/WithdrawTokenFees'
 import WithdrawPerpFees from './components/instructions/Mango/MangoV4/WithdrawPerpFees'
 import OpenBookRegisterMarket from './components/instructions/Mango/MangoV4/OpenBookRegisterMarket'
 import OpenBookEditMarket from './components/instructions/Mango/MangoV4/OpenBookEditMarket'
 import PerpCreate from './components/instructions/Mango/MangoV4/PerpCreate'
-import PerpCreateV23 from './components/instructions/Mango/MangoV4/PerpCreateV23'
 import TokenRegisterTrustless from './components/instructions/Mango/MangoV4/TokenRegisterTrustless'
 import TransferDomainName from './components/instructions/TransferDomainName'
 import InitUser from './components/instructions/Serum/InitUser'
@@ -121,7 +116,6 @@ import DualVoteDepositWithdraw from './components/instructions/Dual/DualVoteDepo
 import DualVoteDeposit from './components/instructions/Dual/DualVoteDeposit'
 import PsyFinanceMintAmericanOptions from './components/instructions/PsyFinance/MintAmericanOptions'
 import IxGateSet from './components/instructions/Mango/MangoV4/IxGateSet'
-import IxGateSetV23 from './components/instructions/Mango/MangoV4/IxGateSetV23'
 import StubOracleCreate from './components/instructions/Mango/MangoV4/StubOracleCreate'
 import StubOracleSet from './components/instructions/Mango/MangoV4/StubOracleSet'
 import AltSet from './components/instructions/Mango/MangoV4/AltSet'
@@ -147,6 +141,8 @@ import FillVaults from './components/instructions/DistrubtionProgram/FillVaults'
 import MeshRemoveMember from './components/instructions/Squads/MeshRemoveMember'
 import MeshAddMember from './components/instructions/Squads/MeshAddMember'
 import MeshChangeThresholdMember from './components/instructions/Squads/MeshChangeThresholdMember'
+import PythRecoverAccount from './components/instructions/Pyth/PythRecoverAccount'
+import { useVoteByCouncilToggle } from "@hooks/useVoteByCouncilToggle";
 
 const TITLE_LENGTH_LIMIT = 130
 // the true length limit is either at the tx size level, and maybe also the total account size level (I can't remember)
@@ -201,14 +197,13 @@ const New = () => {
   const { handleCreateProposal, proposeMultiChoice } = useCreateProposal()
   const { fmtUrlWithCluster } = useQueryContext()
   const realm = useRealmQuery().data?.result
-
-  const { symbol, realmInfo, canChooseWhoVote } = useRealm()
+  const { symbol, realmInfo } = useRealm()
   const { availableInstructions } = useGovernanceAssets()
-  const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [form, setForm] = useState({
     title: typeof router.query['t'] === 'string' ? router.query['t'] : '',
     description: '',
   })
+  const { voteByCouncil, shouldShowVoteByCouncilToggle, setVoteByCouncil } = useVoteByCouncilToggle();
   const [multiChoiceForm, setMultiChoiceForm] = useState<{
     governance: PublicKey | undefined
     options: string[]
@@ -473,26 +468,20 @@ const New = () => {
       [Instructions.Base64]: CustomBase64,
       [Instructions.None]: Empty,
       [Instructions.MangoV4TokenRegister]: TokenRegister,
-      [Instructions.MangoV4TokenRegisterV23]: TokenRegisterV23,
       [Instructions.MangoV4TokenEdit]: EditToken,
-      [Instructions.MangoV4TokenEditV23]: EditTokenV23,
       [Instructions.MangoV4GroupEdit]: GroupEdit,
-      [Instructions.MangoV4GroupEditV23]: GroupEditV23,
       [Instructions.MangoV4AdminWithdrawTokenFees]: AdminTokenWithdrawFees,
       [Instructions.MangoV4WithdrawPerpFees]: WithdrawPerpFees,
       [Instructions.IdlSetBuffer]: IdlSetBuffer,
       [Instructions.MangoV4OpenBookEditMarket]: OpenBookEditMarket,
       [Instructions.MangoV4IxGateSet]: IxGateSet,
-      [Instructions.MangoV4IxGateSetV23]: IxGateSetV23,
       [Instructions.MangoV4AltExtend]: AltExtend,
       [Instructions.MangoV4AltSet]: AltSet,
       [Instructions.MangoV4StubOracleCreate]: StubOracleCreate,
       [Instructions.MangoV4StubOracleSet]: StubOracleSet,
       [Instructions.MangoV4PerpEdit]: PerpEdit,
-      [Instructions.MangoV4PerpEditV23]: PerpEditV23,
       [Instructions.MangoV4OpenBookRegisterMarket]: OpenBookRegisterMarket,
       [Instructions.MangoV4PerpCreate]: PerpCreate,
-      [Instructions.MangoV4PerpCreateV23]: PerpCreateV23,
       [Instructions.MangoV4TokenRegisterTrustless]: TokenRegisterTrustless,
       [Instructions.MangoV4TokenAddBank]: TokenAddBank,
       [Instructions.Grant]: Grant,
@@ -520,6 +509,7 @@ const New = () => {
       [Instructions.SquadsMeshRemoveMember]: MeshRemoveMember,
       [Instructions.SquadsMeshAddMember]: MeshAddMember,
       [Instructions.SquadsMeshChangeThresholdMember]: MeshChangeThresholdMember,
+      [Instructions.PythRecoverAccount]: PythRecoverAccount,
       [Instructions.CreateSolendObligationAccount]: CreateObligationAccount,
       [Instructions.InitSolendObligationAccount]: InitObligationAccount,
       [Instructions.DepositReserveLiquidityAndObligationCollateral]: DepositReserveLiquidityAndObligationCollateral,
@@ -729,14 +719,14 @@ const New = () => {
                 })}
               />
             </div>
-            {canChooseWhoVote && (
-              <VoteBySwitch
-                checked={voteByCouncil}
-                onChange={() => {
-                  setVoteByCouncil(!voteByCouncil)
-                }}
-              ></VoteBySwitch>
-            )}
+              {shouldShowVoteByCouncilToggle && (
+                  <VoteBySwitch
+                      checked={voteByCouncil}
+                      onChange={() => {
+                          setVoteByCouncil(!voteByCouncil)
+                      }}
+                  ></VoteBySwitch>
+              )}
             <div className="max-w-lg w-full mb-4 flex flex-wrap gap-2 justify-between items-end">
               <div className="flex grow basis-0">
                 <ProposalTypeRadioButton

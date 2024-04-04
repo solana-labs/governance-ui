@@ -7,7 +7,8 @@ import { useRealmConfigQuery } from './queries/realmConfig'
 import { useRouter } from 'next/router'
 import { useRealmGovernancesQuery } from './queries/governance'
 import { useMemo } from 'react'
-import { useLegacyVoterWeight } from './queries/governancePower'
+import { useRealmVoterWeights } from '@hooks/useRealmVoterWeightPlugins'
+import { GovernanceConfig } from '@solana/spl-governance'
 
 type Package = {
   name: string
@@ -44,7 +45,19 @@ export default function useGovernanceAssets() {
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
   const { symbol } = useRouter().query
-  const { result: ownVoterWeight } = useLegacyVoterWeight()
+  const { communityWeight, councilWeight } = useRealmVoterWeights()
+  const ownVoterWeights = {
+    community: communityWeight?.value,
+    council: councilWeight?.value,
+  }
+
+  const canCreateProposal = (config: GovernanceConfig) => {
+    return (
+      ownVoterWeights.community?.gte(
+        config.minCommunityTokensToCreateProposal
+      ) || ownVoterWeights.council?.gte(config.minCouncilTokensToCreateProposal)
+    )
+  }
 
   const governedTokenAccounts: AssetAccount[] = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
@@ -67,12 +80,9 @@ export default function useGovernanceAssets() {
       realm &&
       assetAccounts
         .filter((x) => types.find((t) => t === x.type))
-        .some((govAcc) =>
-          ownVoterWeight?.canCreateProposal(govAcc.governance.account.config)
-        )
+        .some((govAcc) => canCreateProposal(govAcc.governance.account.config))
     )
   }
-
   const canMintRealmCouncilToken = () => {
     return !!assetAccounts.find(
       (x) =>
@@ -83,10 +93,7 @@ export default function useGovernanceAssets() {
     const governance = governancesArray.find(
       (x) => acc.governance.pubkey.toBase58() === x.pubkey.toBase58()
     )
-    return (
-      governance &&
-      ownVoterWeight?.canCreateProposal(governance?.account?.config)
-    )
+    return governance && canCreateProposal(governance?.account?.config)
   })
 
   const canUseProgramUpgradeInstruction = canUseGovernanceForInstruction([
@@ -99,9 +106,7 @@ export default function useGovernanceAssets() {
 
   const canUseAnyInstruction =
     realm &&
-    governancesArray.some((gov) =>
-      ownVoterWeight?.canCreateProposal(gov.account.config)
-    )
+    governancesArray.some((gov) => canCreateProposal(gov.account.config))
 
   const realmAuth =
     realm &&
@@ -109,7 +114,7 @@ export default function useGovernanceAssets() {
       (x) => x.pubkey.toBase58() === realm.account.authority?.toBase58()
     )
   const canUseAuthorityInstruction =
-    realmAuth && ownVoterWeight?.canCreateProposal(realmAuth?.account.config)
+    realmAuth && canCreateProposal(realmAuth?.account.config)
 
   const governedSPLTokenAccounts = governedTokenAccounts.filter(
     (x) => x.type === AccountType.TOKEN
@@ -125,10 +130,7 @@ export default function useGovernanceAssets() {
       const governance = governancesArray.find(
         (x) => acc.governance.pubkey.toBase58() === x.pubkey.toBase58()
       )
-      return (
-        governance &&
-        ownVoterWeight?.canCreateProposal(governance?.account?.config)
-      )
+      return governance && canCreateProposal(governance?.account?.config)
     }
   )
 
@@ -155,9 +157,8 @@ export default function useGovernanceAssets() {
       isVisible: symbol === 'FORE',
       image: '/img/foresight.png',
     },
-
     [PackageEnum.GatewayPlugin]: {
-      name: 'Gateway Plugin',
+      name: 'Civic Plugin',
       image: '/img/civic.svg',
     },
     [PackageEnum.Identity]: {
@@ -178,6 +179,10 @@ export default function useGovernanceAssets() {
     [PackageEnum.PsyFinance]: {
       name: 'PsyFinance',
       image: '/img/psyfinance.png',
+    },
+    [PackageEnum.Pyth]: {
+      name: 'Pyth',
+      image: '/img/pyth.svg',
     },
     [PackageEnum.Serum]: {
       name: 'Serum',
@@ -296,9 +301,7 @@ export default function useGovernanceAssets() {
       name: 'None',
       isVisible:
         realm &&
-        governancesArray.some((g) =>
-          ownVoterWeight?.canCreateProposal(g.account.config)
-        ),
+        governancesArray.some((g) => canCreateProposal(g.account.config)),
       packageId: PackageEnum.Common,
     },
     [Instructions.ProgramUpgrade]: {
@@ -519,18 +522,8 @@ export default function useGovernanceAssets() {
       packageId: PackageEnum.MangoMarketV4,
       isVisible: canUseAnyInstruction,
     },
-    [Instructions.MangoV4PerpCreateV23]: {
-      name: 'Create Perp v23',
-      packageId: PackageEnum.MangoMarketV4,
-      isVisible: canUseAnyInstruction,
-    },
     [Instructions.MangoV4PerpEdit]: {
       name: 'Edit Perp',
-      packageId: PackageEnum.MangoMarketV4,
-      isVisible: canUseAnyInstruction,
-    },
-    [Instructions.MangoV4PerpEditV23]: {
-      name: 'Edit Perp v23',
       packageId: PackageEnum.MangoMarketV4,
       isVisible: canUseAnyInstruction,
     },
@@ -544,18 +537,8 @@ export default function useGovernanceAssets() {
       packageId: PackageEnum.MangoMarketV4,
       isVisible: canUseAnyInstruction,
     },
-    [Instructions.MangoV4TokenEditV23]: {
-      name: 'Edit Token v23',
-      packageId: PackageEnum.MangoMarketV4,
-      isVisible: canUseAnyInstruction,
-    },
     [Instructions.MangoV4TokenRegister]: {
       name: 'Register Token',
-      packageId: PackageEnum.MangoMarketV4,
-      isVisible: canUseAnyInstruction,
-    },
-    [Instructions.MangoV4TokenRegisterV23]: {
-      name: 'Register Token v23',
       packageId: PackageEnum.MangoMarketV4,
       isVisible: canUseAnyInstruction,
     },
@@ -566,11 +549,6 @@ export default function useGovernanceAssets() {
     },
     [Instructions.MangoV4GroupEdit]: {
       name: 'Edit Group',
-      packageId: PackageEnum.MangoMarketV4,
-      isVisible: canUseAnyInstruction,
-    },
-    [Instructions.MangoV4GroupEditV23]: {
-      name: 'Edit Group v23',
       packageId: PackageEnum.MangoMarketV4,
       isVisible: canUseAnyInstruction,
     },
@@ -591,11 +569,6 @@ export default function useGovernanceAssets() {
     },
     [Instructions.MangoV4IxGateSet]: {
       name: 'Enable/Disable individual instructions in Group',
-      packageId: PackageEnum.MangoMarketV4,
-      isVisible: canUseAnyInstruction,
-    },
-    [Instructions.MangoV4IxGateSetV23]: {
-      name: 'Enable/Disable individual instructions in Group v23',
       packageId: PackageEnum.MangoMarketV4,
       isVisible: canUseAnyInstruction,
     },
@@ -684,6 +657,17 @@ export default function useGovernanceAssets() {
     },
 
     /*
+      ██████  ██    ██ ████████ ██   ██
+      ██   ██  ██  ██     ██    ██   ██
+      ██████    ████      ██    ███████
+      ██         ██       ██    ██   ██
+      ██         ██       ██    ██   ██
+    */
+    [Instructions.PythRecoverAccount]: {
+      name: 'Recover Account',
+      packageId: PackageEnum.Pyth,
+    },
+    /*
       ███████ ███████ ██████  ██    ██ ███    ███
       ██      ██      ██   ██ ██    ██ ████  ████
       ███████ █████   ██████  ██    ██ ██ ████ ██
@@ -762,17 +746,14 @@ export default function useGovernanceAssets() {
     [Instructions.SquadsMeshAddMember]: {
       name: 'Mesh Add Member',
       packageId: PackageEnum.Squads,
-      isVisible: true,
     },
     [Instructions.SquadsMeshChangeThresholdMember]: {
       name: 'Mesh Change Threshold',
       packageId: PackageEnum.Squads,
-      isVisible: true,
     },
     [Instructions.SquadsMeshRemoveMember]: {
       name: 'Mesh Remove Member',
       packageId: PackageEnum.Squads,
-      isVisible: true,
     },
     /*
       ███████ ██     ██ ██ ████████  ██████ ██   ██ ██████   ██████   █████  ██████  ██████
