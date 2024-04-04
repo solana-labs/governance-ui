@@ -24,6 +24,7 @@ import {
   VSR_PLUGIN_PKS,
   HELIUM_VSR_PLUGINS_PKS,
   GATEWAY_PLUGINS_PKS,
+  QV_PLUGINS_PKS,
 } from '@constants/plugins'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { validatePubkey } from './formValidation'
@@ -34,6 +35,7 @@ const supportedPlugins = [
   ...VSR_PLUGIN_PKS,
   ...HELIUM_VSR_PLUGINS_PKS,
   ...GATEWAY_PLUGINS_PKS,
+  ...QV_PLUGINS_PKS
 ]
 
 const getValidateAccount = async (

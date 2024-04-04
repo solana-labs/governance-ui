@@ -6,7 +6,7 @@ import { LinkButton } from '@components/Button'
 import useQueryContext from '@hooks/useQueryContext'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
-import { useGovernancePowerAsync } from '@hooks/queries/governancePower'
+import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
 
 const NEW_TREASURY_ROUTE = `/treasury/new`
 
@@ -15,8 +15,18 @@ export default function NewWalletButton() {
   const connected = !!wallet?.connected
   const realm = useRealmQuery().data?.result
 
-  const { result: councilGovPower } = useGovernancePowerAsync('council')
-  const { result: communityGovPower } = useGovernancePowerAsync('community')
+  const {
+    isReady: communityIsReady,
+    totalCalculatedVoterWeight: communityCalculatedVoterWeight,
+  } = useRealmVoterWeightPlugins('community')
+  const {
+    isReady: councilIsReady,
+    totalCalculatedVoterWeight: councilCalculatedVoterWeight,
+  } = useRealmVoterWeightPlugins('council')
+  const isReady = communityIsReady && councilIsReady
+
+  const communityGovPower = communityCalculatedVoterWeight?.value
+  const councilGovPower = councilCalculatedVoterWeight?.value
 
   const {
     symbol,
@@ -27,11 +37,12 @@ export default function NewWalletButton() {
   const { fmtUrlWithCluster } = useQueryContext()
 
   const canCreateGovernance =
-    councilGovPower?.gtn(0) ||
-    (realm &&
-      communityGovPower?.gt(
-        realm.account.config.minCommunityTokensToCreateGovernance
-      ))
+    isReady &&
+    (councilGovPower?.gtn(0) ||
+      (realm &&
+        communityGovPower?.gt(
+          realm.account.config.minCommunityTokensToCreateGovernance
+        )))
 
   const addNewAssetTooltip = !connected
     ? 'Connect your wallet to create new asset'

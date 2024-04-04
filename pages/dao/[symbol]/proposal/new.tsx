@@ -142,6 +142,7 @@ import MeshRemoveMember from './components/instructions/Squads/MeshRemoveMember'
 import MeshAddMember from './components/instructions/Squads/MeshAddMember'
 import MeshChangeThresholdMember from './components/instructions/Squads/MeshChangeThresholdMember'
 import PythRecoverAccount from './components/instructions/Pyth/PythRecoverAccount'
+import { useVoteByCouncilToggle } from "@hooks/useVoteByCouncilToggle";
 
 const TITLE_LENGTH_LIMIT = 130
 // the true length limit is either at the tx size level, and maybe also the total account size level (I can't remember)
@@ -196,14 +197,13 @@ const New = () => {
   const { handleCreateProposal, proposeMultiChoice } = useCreateProposal()
   const { fmtUrlWithCluster } = useQueryContext()
   const realm = useRealmQuery().data?.result
-
-  const { symbol, realmInfo, canChooseWhoVote } = useRealm()
+  const { symbol, realmInfo } = useRealm()
   const { availableInstructions } = useGovernanceAssets()
-  const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [form, setForm] = useState({
     title: typeof router.query['t'] === 'string' ? router.query['t'] : '',
     description: '',
   })
+  const { voteByCouncil, shouldShowVoteByCouncilToggle, setVoteByCouncil } = useVoteByCouncilToggle();
   const [multiChoiceForm, setMultiChoiceForm] = useState<{
     governance: PublicKey | undefined
     options: string[]
@@ -719,14 +719,14 @@ const New = () => {
                 })}
               />
             </div>
-            {canChooseWhoVote && (
-              <VoteBySwitch
-                checked={voteByCouncil}
-                onChange={() => {
-                  setVoteByCouncil(!voteByCouncil)
-                }}
-              ></VoteBySwitch>
-            )}
+              {shouldShowVoteByCouncilToggle && (
+                  <VoteBySwitch
+                      checked={voteByCouncil}
+                      onChange={() => {
+                          setVoteByCouncil(!voteByCouncil)
+                      }}
+                  ></VoteBySwitch>
+              )}
             <div className="max-w-lg w-full mb-4 flex flex-wrap gap-2 justify-between items-end">
               <div className="flex grow basis-0">
                 <ProposalTypeRadioButton
