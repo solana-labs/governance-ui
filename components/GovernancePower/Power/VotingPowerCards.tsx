@@ -64,7 +64,7 @@ const CardForPlugin: FC<
     case 'VSR':
       return <VSRCard role={role} {...props} />
     case 'gateway':
-      return <GatewayCard />
+      return <GatewayCard role={role} />
     case 'QV':
       return <QuadraticVotingPower role={role} />
   }

@@ -118,7 +118,13 @@ const TokenBalanceCardInner = ({
 
   if (showGatewayCard) {
     cards.push(
-      <>{inAccountDetails ? <GatewayCard /> : <GovernancePowerCard />}</>
+      <>
+        {inAccountDetails ? (
+          <GatewayCard role="community" />
+        ) : (
+          <GovernancePowerCard />
+        )}
+      </>
     )
   }
 

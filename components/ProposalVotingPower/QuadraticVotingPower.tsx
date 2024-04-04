@@ -1,24 +1,21 @@
 import classNames from 'classnames'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 
+import { GatewayStatus, useGateway } from '@civic/solana-gateway-react'
+import { useMembersQuery } from '@components/Members/useMembers'
+import { BN } from '@coral-xyz/anchor'
+import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
 import { useRealmQuery } from '@hooks/queries/realm'
-import { useMemo } from 'react'
-import { BigNumber } from 'bignumber.js'
-import clsx from 'clsx'
+import { useDelegatorAwareVoterWeight } from '@hooks/useDelegatorAwareVoterWeight'
 import {
   useRealmVoterWeightPlugins,
   useRealmVoterWeights,
 } from '@hooks/useRealmVoterWeightPlugins'
+import { BigNumber } from 'bignumber.js'
+import { useMemo } from 'react'
+import PluginVotingPower from './PluginVotingPower'
 import QuadraticVotingInfoModal from './QuadraticVotingInfoModal'
-import { useMembersQuery } from '@components/Members/useMembers'
-import { TokenDeposit } from '@components/TokenBalance/TokenDeposit'
-import { GoverningTokenRole } from '@solana/spl-governance'
-import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
-import { getMintMetadata } from '@components/instructions/programs/splToken'
-import { BN } from '@coral-xyz/anchor'
-import { GatewayStatus, useGateway } from '@civic/solana-gateway-react'
-import {useDelegatorAwareVoterWeight} from "@hooks/useDelegatorAwareVoterWeight";
 
 interface Props {
   className?: string
@@ -56,14 +53,6 @@ export default function QuadraticVotingPower({ role, className }: Props) {
     [mintInfo, ownVoterWeight?.communityTokenRecord]
   )
 
-  const relevantMint =
-    role === 'community'
-      ? realm?.account.communityMint
-      : realm?.account.config.councilMint
-
-  const tokenName =
-    getMintMetadata(relevantMint)?.name ?? realm?.account.name ?? ''
-
   const formattedMax =
     mintInfo && calculatedMaxVoterWeight?.value
       ? new BigNumber(calculatedMaxVoterWeight?.value.toString())
@@ -85,7 +74,9 @@ export default function QuadraticVotingPower({ role, className }: Props) {
   const { communityWeight, councilWeight } = useRealmVoterWeights()
   const { gatewayStatus } = useGateway()
   const isQVEnabled = plugins?.voterWeight.some((p) => p.name === 'QV')
-  const isGatewayEnabled = plugins?.voterWeight.some((p) => p.name === 'gateway')
+  const isGatewayEnabled = plugins?.voterWeight.some(
+    (p) => p.name === 'gateway'
+  )
 
   const hasAnyVotingPower =
     councilWeight?.value?.gt(new BN(0)) && communityWeight?.value?.gt(new BN(0))
@@ -114,37 +105,17 @@ export default function QuadraticVotingPower({ role, className }: Props) {
           />
         </div>
       )}
-      <div className={'p-3 rounded-md bg-bkg-1'}>
-        <div className="flex items-center justify-between mt-1 w-full">
-          <div className={`${clsx(className)} w-full`}>
-            <div className="flex flex-col">
-              <div className="text-fgd-3 text-xs">
-                {tokenName}
-                {role === 'council' ? ' Council' : ''} votes
-              </div>
-              <div className="flex items-center">
-                <p className="font-bold mr-2 text-xl">
-                  {formattedTotal ?? '0'}
-                </p>
-                <p className="text-fgd-3 text-xs justify-self">
-                  ({formattedTokenAmount ?? '0'} tokens)
-                </p>
-              </div>
-            </div>
-            {!isGatewayEnabled ||
-              (gatewayStatus === GatewayStatus.ACTIVE && (
-                <div className="text-xl font-bold text-fgd-1 hero-text">
-                  <TokenDeposit
-                    mint={mintInfo}
-                    tokenRole={GoverningTokenRole.Community}
-                    inAccountDetails={true}
-                    hideVotes={true}
-                  />
-                </div>
-              ))}
-          </div>
-        </div>
-      </div>
+      {
+        // check if the last plugin is gateway to show the voting power
+        plugins?.voterWeight[plugins.voterWeight.length - 1].name === 'QV' && (
+          <PluginVotingPower
+            role={role}
+            showDepositButton={
+              !isGatewayEnabled || gatewayStatus === GatewayStatus.ACTIVE
+            }
+          />
+        )
+      }
     </div>
   )
 }

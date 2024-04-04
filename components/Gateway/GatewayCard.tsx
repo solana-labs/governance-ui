@@ -4,13 +4,21 @@ import { InformationCircleIcon } from '@heroicons/react/solid'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useState } from 'react'
 import { useGatewayVoterWeightPlugin } from '../../VoterWeightPlugins'
-import { useRealmVoterWeights } from '@hooks/useRealmVoterWeightPlugins'
+import {
+  useRealmVoterWeightPlugins,
+  useRealmVoterWeights,
+} from '@hooks/useRealmVoterWeightPlugins'
 import { BN } from '@coral-xyz/anchor'
 import { GatewayStatus, useGateway } from '@civic/solana-gateway-react'
 import useUserGovTokenAccountQuery from '@hooks/useUserGovTokenAccount'
 import BigNumber from 'bignumber.js'
+import PluginVotingPower from '@components/ProposalVotingPower/PluginVotingPower'
 
-const GatewayCard = () => {
+interface Props {
+  role: 'community' | 'council'
+}
+
+const GatewayCard = ({ role }: Props) => {
   const [showGatewayModal, setShowGatewayModal] = useState(false)
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
@@ -22,6 +30,8 @@ const GatewayCard = () => {
     isEnabled,
   } = useGatewayVoterWeightPlugin()
   const { communityWeight, councilWeight } = useRealmVoterWeights()
+
+  const { plugins } = useRealmVoterWeightPlugins(role)
 
   const userAta = useUserGovTokenAccountQuery('community').data?.result
   const depositAmount = userAta?.amount
@@ -67,6 +77,11 @@ const GatewayCard = () => {
             ? 'You are approved to vote'
             : 'Verify your personhood with Civic Pass to vote.'}
         </p>
+        {
+          // check if the last plugin is gateway to show the voting power
+          plugins?.voterWeight[plugins.voterWeight.length - 1].name ===
+            'gateway' && <PluginVotingPower role={role} />
+        }
         {showGatewayModal && (
           <Modal
             sizeClassName="sm:max-w-3xl"
