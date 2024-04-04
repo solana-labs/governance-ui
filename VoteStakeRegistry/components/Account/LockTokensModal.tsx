@@ -79,12 +79,6 @@ const LockTokensModal = ({
   const wallet = useWalletOnePointOh()
   const deposits = useDepositStore((s) => s.state.deposits)
   const fiveYearsSecs = yearsToSecs(5)
-  const maxLockupSecs =
-    (realm &&
-      voteStakeRegistryRegistrar?.votingMints
-        .find((x) => x.mint.equals(realm.account.communityMint))
-        ?.lockupSaturationSecs.toNumber()) ||
-    fiveYearsSecs
 
   const lockupPeriods: Period[] = useMemo(() => {
     return [
@@ -128,8 +122,10 @@ const LockTokensModal = ({
             ) <= x.defaultValue || x.display === 'Custom'
           : true
       )
-      .filter((x) => x.defaultValue <= secsToDays(maxLockupSecs))
-  }, [depositToUnlock, maxLockupSecs])
+      .filter((x) => {
+        return x.defaultValue <= secsToDays(fiveYearsSecs)
+      })
+  }, [depositToUnlock, fiveYearsSecs])
 
   const maxNonCustomDaysLockup = lockupPeriods
     .map((x) => x.defaultValue)
