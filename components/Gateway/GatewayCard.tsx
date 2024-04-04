@@ -80,7 +80,9 @@ const GatewayCard = ({ role }: Props) => {
         {
           // check if the last plugin is gateway to show the voting power
           plugins?.voterWeight[plugins.voterWeight.length - 1].name ===
-            'gateway' && <PluginVotingPower role={role} />
+            'gateway' && (
+            <PluginVotingPower role={role} showDepositButton={false} />
+          )
         }
         {showGatewayModal && (
           <Modal
