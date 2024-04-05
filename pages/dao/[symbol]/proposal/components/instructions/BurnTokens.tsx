@@ -22,7 +22,7 @@ const BurnTokens = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
+  const { governedSPLTokenAccounts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<BurnTokensForm>({
     amount: undefined,
@@ -122,7 +122,7 @@ const BurnTokens = ({
     <>
       <GovernedAccountSelect
         label="Select Token account"
-        governedAccounts={governedTokenAccountsWithoutNfts}
+        governedAccounts={governedSPLTokenAccounts}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedTokenAccount' })
         }}
