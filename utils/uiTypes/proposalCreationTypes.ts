@@ -51,6 +51,12 @@ export interface SplTokenTransferForm {
   mintInfo: MintInfo | undefined
 }
 
+export interface BurnTokensForm {
+  amount: number | undefined
+  governedTokenAccount: AssetAccount | undefined
+  mintInfo: MintInfo | undefined
+}
+
 export interface DomainNameTransferForm {
   destinationAccount: string
   governedAccount: AssetAccount | undefined
@@ -317,6 +323,7 @@ export interface JoinDAOForm {
 
 export enum Instructions {
   Base64,
+  Burn,
   ChangeMakeDonation,
   Clawback,
   CloseTokenAccount,
