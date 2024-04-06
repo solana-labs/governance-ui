@@ -3519,7 +3519,8 @@
     "website": "https://jito.network",
     "twitter": "@jito_sol"
   },
-  { "symbol": "CONNECT",
+  { 
+    "symbol": "CONNECT",
     "displayName": "ConnectSol",
     "programId": "GkB3FSNBZdRuNVb2eefNGaUD2fBfPVQvJ14Xn9JM8KL9",
     "realmId": "Hs82N9vMkXrt2w8nnetj2W6EhMa7YHSdSJXTGtnowfR4",
