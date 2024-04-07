@@ -22,6 +22,7 @@ export enum AssetType {
   Unknown,
   TokenOwnerRecordAsset,
   Stake,
+  Mango,
 }
 
 export interface Mint {
@@ -92,6 +93,12 @@ export interface Stake {
   value: BigNumber
 }
 
+export interface Mango {
+  id: string
+  type: AssetType.Mango
+  value: BigNumber
+}
+
 export interface Unknown {
   type: AssetType.Unknown
   address: string
@@ -118,3 +125,4 @@ export type Asset =
   | Token
   | Unknown
   | Stake
+  | Mango

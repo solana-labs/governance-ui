@@ -2,7 +2,6 @@ import { PublicKey } from '@solana/web3.js'
 import type BN from 'bn.js'
 import cx from 'classnames'
 
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import NFTIcon from '@components/treasuryV2/icons/NFTCollectionPreviewIcon'
 import { useConnection } from '@solana/wallet-adapter-react'
 import { useAsync } from 'react-async-hook'
@@ -10,6 +9,7 @@ import { fetchDigitalAssetById } from '@hooks/queries/digitalAssets'
 import { getNetworkFromEndpoint } from '@utils/connection'
 import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
 import BigNumber from 'bignumber.js'
+import {useNftRegistrar} from "@hooks/useNftRegistrar";
 
 interface CollectionConfig {
   collection: PublicKey
@@ -23,7 +23,7 @@ interface Props {
 
 export function NFTVotePluginSettingsDisplay(props: Props) {
   const { connection } = useConnection()
-  const registrar = useVotePluginsClientStore((s) => s.state.nftMintRegistrar)
+  const registrar = useNftRegistrar();
 
   const { result: configsWithNames } = useAsync(async () => {
     const collectionConfigs = (registrar?.collectionConfigs ||

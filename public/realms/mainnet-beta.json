@@ -3497,6 +3497,40 @@
     "website": "https://bluegiantfoundation.vercel.app/",
     "twitter": "@BlueGiantFdn",
     "keywords": "Blue Giant, REALM, Governance, Financial Freedom, DEFI, Decentralized Finance, Decentralised Finance, Crypto, Decentralize, Solana, SOL, SPL, Trading, SPL Tokens, Investing, Investment Tools, Stocks",
-    "discord": ""
+    "discord": "https://discord.com/invite/7bu9wuSy"
+  },
+  {
+    "symbol": "sinDAO",
+    "displayName": "sinDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "7boMaQ9LG3eHXEsiWWWs7RDP2Z8ASJ3wJevTmuTh1qhL",
+    "ogImage": "/realms/sinDAO/sindao.png",
+    "website": "https://sindao.org",
+    "twitter": "@thesinDAO"
+   },
+   {
+    "symbol": "TNSR",
+    "category": "NFT",
+    "bannerImage": "https://i.imgur.com/PMLtfh6.png",
+    "displayName": "Tensor DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "4sgAydAiSvnpT73rALCcnYGhi5K2LrB9pJFAEbLMfrXt",
+    "communityMint": "TNSRxcUxoT9xBG3de7PiJyTDYu7kskLqcpddxnEJAS6",
+    "ogImage": "https://i.imgur.com/IP2FsY7.png",
+    "shortDescription": "Future of NFT trading. Built on Solana.",
+    "website": "https://www.tensor.foundation",
+    "keywords": "Tensor, REALM, Governance, TNSR, Tensor NFT Marketplace, NFT, Crypto, Solana, SOL, Trading, Fastest, Fast",
+    "twitter": "@TensorFdn",
+    "discord": "https://discord.gg/a8spfqxEpC",
+    "github": "https://github.com/tensor-foundation"
+  },
+  {
+    "symbol": "Jito",
+    "displayName": "Jito",
+    "programId": "jtogvBNH3WBSWDYD5FJfQP2ZxNTuf82zL8GkEhPeaJx",
+    "realmId": "jjCAwuuNpJCNMLAanpwgJZ6cdXzLPXe2GfD6TaDQBXt",
+    "ogImage": "/realms/Jito/jito.png",
+    "website": "https://jito.network",
+    "twitter": "@jito_sol"
   }
 ]

@@ -2,8 +2,6 @@ import {
   InstructionDataWithHoldUpTime,
   createProposal,
 } from 'actions/createProposal'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import useRealm from './useRealm'
 import useRpcContext from './useRpcContext'
 import { fetchGovernanceByPubkey } from './queries/governance'
 import { PublicKey } from '@solana/web3.js'
@@ -18,12 +16,9 @@ import queryClient from './queries/queryClient'
 import { proposalQueryKeys } from './queries/proposal'
 import { createLUTProposal } from 'actions/createLUTproposal'
 import { useLegacyVoterWeight } from './queries/governancePower'
+import {useVotingClients} from "@hooks/useVotingClients";
 
 export default function useCreateProposal() {
-  const client = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
-  )
-
   const connection = useLegacyConnectionContext()
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
@@ -31,8 +26,8 @@ export default function useCreateProposal() {
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
   const { result: ownVoterWeight } = useLegacyVoterWeight()
 
-  const { canChooseWhoVote } = useRealm()
   const { getRpcContext } = useRpcContext()
+  const votingClients = useVotingClients();
 
   /** @deprecated because the api is goofy, use `propose` */
   const handleCreateProposal = async ({
@@ -55,12 +50,19 @@ export default function useCreateProposal() {
     const { result: selectedGovernance } = await fetchGovernanceByPubkey(
       connection.current,
       governance.pubkey
-    )    
+    )
     const ownTokenRecord = ownVoterWeight?.councilTokenRecord ?? ownVoterWeight?.communityTokenRecord
 
     if (!ownTokenRecord) throw new Error('token owner record does not exist')
     if (!selectedGovernance) throw new Error('governance not found')
     if (!realm) throw new Error()
+
+    // this is somewhat confusing - the basic idea is:
+    // although a vote may be by community vote, the proposer may create it with their council token
+    // The choice of which token to use is made when the token record is selected
+    const proposeByCouncil = ownVoterWeight?.councilTokenRecord?.pubkey.toBase58() === (ownTokenRecord?.pubkey.toBase58() ?? "");
+    // now we can we identify whether we are using the community or council voting client (to decide which (if any) plugins to use)
+    const votingClient = votingClients(proposeByCouncil ? 'council' : 'community');
 
     const defaultProposalMint =
       !mint?.supply.isZero() ||
@@ -71,7 +73,7 @@ export default function useCreateProposal() {
         : undefined
 
     const proposalMint =
-      canChooseWhoVote && voteByCouncil
+      voteByCouncil
         ? realm?.account.config.councilMint
         : defaultProposalMint
 
@@ -80,6 +82,7 @@ export default function useCreateProposal() {
     }
     const rpcContext = getRpcContext()
     if (!rpcContext) throw new Error()
+
 
     const create = utilizeLookupTable ? createLUTProposal : createProposal
     const proposalAddress = await create(
@@ -94,7 +97,7 @@ export default function useCreateProposal() {
       instructionsData,
       isDraft,
       ['Approve'],
-      client
+      votingClient
     )
     queryClient.invalidateQueries({
       queryKey: proposalQueryKeys.all(connection.endpoint),
@@ -138,6 +141,13 @@ export default function useCreateProposal() {
     if (!selectedGovernance) throw new Error('governance not found')
     if (!realm) throw new Error()
 
+    // this is somewhat confusing - the basic idea is:
+    // although a vote may be by community vote, the proposer may create it with their council token
+    // The choice of which token to use is made when the token record is selected
+    const proposeByCouncil = ownVoterWeight?.councilTokenRecord?.pubkey.toBase58() === (ownTokenRecord?.pubkey.toBase58() ?? "");
+    // now we can we identify whether we are using the community or council voting client (to decide which (if any) plugins to use)
+    const votingClient = votingClients(proposeByCouncil ? 'council' : 'community');
+
     const defaultProposalMint =
       !mint?.supply.isZero() ||
       config?.account.communityTokenConfig.voterWeightAddin
@@ -147,7 +157,7 @@ export default function useCreateProposal() {
         : undefined
 
     const proposalMint =
-      canChooseWhoVote && voteByCouncil
+      voteByCouncil
         ? realm?.account.config.councilMint
         : defaultProposalMint
 
@@ -169,7 +179,7 @@ export default function useCreateProposal() {
       instructionsData,
       isDraft,
       options,
-      client
+      votingClient
     )
     queryClient.invalidateQueries({
       queryKey: proposalQueryKeys.all(connection.endpoint),
