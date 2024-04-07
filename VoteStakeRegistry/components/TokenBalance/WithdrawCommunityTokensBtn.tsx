@@ -27,13 +27,13 @@ import { proposalQueryKeys } from '@hooks/queries/proposal'
 import queryClient from '@hooks/queries/queryClient'
 import asFindable from '@utils/queries/asFindable'
 import { tokenAccountQueryKeys } from '@hooks/queries/tokenAccount'
-import {useVsrClient} from "../../../VoterWeightPlugins/useVsrClient";
+import { useVsrClient } from '../../../VoterWeightPlugins/useVsrClient'
 
 const WithDrawCommunityTokens = () => {
   const { getOwnedDeposits } = useDepositStore()
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const realm = useRealmQuery().data?.result
-  const { vsrClient } = useVsrClient();
+  const { vsrClient } = useVsrClient()
 
   const {
     realmInfo,

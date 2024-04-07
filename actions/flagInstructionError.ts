@@ -1,17 +1,13 @@
-import {
-  Keypair,
-  PublicKey,
-  Transaction,
-  TransactionInstruction,
-} from '@solana/web3.js'
+import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js'
 
 import { Proposal } from '@solana/spl-governance'
 
 import { withFlagTransactionError } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import { sendTransaction } from '@utils/send'
 import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
+import { SequenceType } from '@blockworks-foundation/mangolana/lib/globalTypes'
+import { sendTransactionsV3 } from '@utils/sendTransactions'
 
 export const flagInstructionError = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -37,16 +33,21 @@ export const flagInstructionError = async (
     proposalInstruction
   )
 
-  const transaction = new Transaction({ feePayer: walletPubkey })
+  const txes = [instructions].map((txBatch) => {
+    return {
+      instructionsSet: txBatch.map((x) => {
+        return {
+          transactionInstruction: x,
+          signers: signers,
+        }
+      }),
+      sequenceType: SequenceType.Sequential,
+    }
+  })
 
-  transaction.add(...instructions)
-
-  await sendTransaction({
-    transaction,
+  await sendTransactionsV3({
     connection,
     wallet,
-    signers,
-    sendingMessage: 'Flagging instruction as broken',
-    successMessage: 'Instruction flagged as broken',
+    transactionInstructions: txes,
   })
 }
