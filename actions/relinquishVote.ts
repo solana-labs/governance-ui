@@ -89,9 +89,22 @@ export const relinquishVote = async (
       transactionInstructions: instArray,
     })
   } else {
-    const transaction = new Transaction()
-    transaction.add(...instructions)
+    const txes = [instructions].map((txBatch) => {
+      return {
+        instructionsSet: txBatch.map((x) => {
+          return {
+            transactionInstruction: x,
+            signers: signers,
+          }
+        }),
+        sequenceType: SequenceType.Sequential,
+      }
+    })
 
-    await sendTransaction({ transaction, wallet, connection, signers })
+    await sendTransactionsV3({
+      connection,
+      wallet,
+      transactionInstructions: txes,
+    })
   }
 }

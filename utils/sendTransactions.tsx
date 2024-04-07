@@ -16,6 +16,7 @@ import {
 import { getFeeEstimate } from '@tools/feeEstimate'
 import { TransactionInstructionWithSigners } from '@blockworks-foundation/mangolana/lib/globalTypes'
 import { createComputeBudgetIx } from '@blockworks-foundation/mango-v4'
+import { BACKUP_CONNECTIONS } from './connection'
 
 export type WalletSigner = Pick<
   SignerWalletAdapter,
@@ -66,7 +67,7 @@ export const sendTransactionsV3 = async ({
       transactionInstructionsWithFee.push(txObjWithFee)
     }
   }
-  
+
   const callbacksWithUiComponent = {
     afterBatchSign: (signedTxnsCount) => {
       if (callbacks?.afterBatchSign) {
@@ -133,7 +134,8 @@ export const sendTransactionsV3 = async ({
     timeoutStrategy,
     callbacks: callbacksWithUiComponent,
     config: cfg,
-    confirmLevel: 'confirmed', //TODO base this on connection confirmation level
+    confirmLevel: 'confirmed',
+    backupConnections: BACKUP_CONNECTIONS, //TODO base this on connection confirmation level
     //lookupTableAccounts,
   })
 }
