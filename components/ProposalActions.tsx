@@ -261,7 +261,7 @@ const ProposalActionsPanel = () => {
           title: proposal.account.name,
           description: proposal.account.descriptionLink,
           voteByCouncil:
-            proposal.account.governingTokenMint !== realmInfo.communityMint,
+            !realmInfo.communityMint || !proposal.account.governingTokenMint.equals(realmInfo.communityMint),
           instructionsData: transactions
             ? [
                 ...transactions.flatMap((tx) =>
