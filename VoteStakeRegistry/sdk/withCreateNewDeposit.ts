@@ -93,7 +93,7 @@ export const withCreateNewDeposit = async ({
   }
 
   if (!existingVoter) {
-    const createVoterIx = await client?.createVoterWeightRecord(voter, realmPk, communityMintPk)
+    const createVoterIx = await client?.createVoterWeightRecord(walletPk, realmPk, communityMintPk)
     instructions.push(createVoterIx)
   }
   const mintCfgIdx = await getMintCfgIdx(registrar, mintPk, client)
