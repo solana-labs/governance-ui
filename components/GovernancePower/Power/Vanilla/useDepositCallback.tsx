@@ -12,10 +12,10 @@ import {
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
 import BN from 'bn.js'
-import { sendTransaction } from '@utils/send'
 import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
 import queryClient from "@hooks/queries/queryClient";
 import {useJoinRealm} from "@hooks/useJoinRealm";
+import { SequenceType, sendTransactionsV3 } from '@utils/sendTransactions'
 
 export const useDepositCallback = (
   role: 'community' | 'council' | 'undefined'
@@ -85,13 +85,22 @@ export const useDepositCallback = (
       const transaction = new Transaction()
       transaction.add(...instructions, ...pluginRegisterInstructions)
 
-      await sendTransaction({
+      const txes = [instructions].map((txBatch) => {
+        return {
+          instructionsSet: txBatch.map((x) => {
+            return {
+              transactionInstruction: x,
+              signers: signers,
+            }
+          }),
+          sequenceType: SequenceType.Sequential,
+        }
+      })
+
+      await sendTransactionsV3({
         connection,
         wallet: wallet!,
-        transaction,
-        signers,
-        sendingMessage: 'Depositing tokens',
-        successMessage: 'Tokens have been deposited',
+        transactionInstructions: txes,
       })
 
         // Force the UI to recalculate voter weight
