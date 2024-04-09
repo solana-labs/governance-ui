@@ -1,14 +1,12 @@
 import {
   Keypair,
   PublicKey,
-  Transaction,
   TransactionInstruction,
 } from '@solana/web3.js'
 
 import { Proposal } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import { sendTransaction } from '../utils/send'
 import { withRelinquishVote } from '@solana/spl-governance'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
 import { chunks } from '@utils/helpers'
