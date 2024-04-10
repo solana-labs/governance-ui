@@ -58,7 +58,10 @@ export const getClient = async (connection: Connection) => {
       const client = MangoClient.connect(
         adminProvider,
         'mainnet-beta',
-        MANGO_V4_ID['mainnet-beta']
+        MANGO_V4_ID['mainnet-beta'],
+        {
+            idsSource: 'api',
+          }
       )
 
       return client

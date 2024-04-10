@@ -87,7 +87,6 @@ const DaoVote = ({
           .object()
           .nullable()
           .required('Program governed account is required'),
-        realm: yup.string().required(),
         proposal: yup.string().required(),
         voteOption: yup.string().required(),
       }),
@@ -192,9 +191,8 @@ const DaoVote = ({
             pluginPk
           )
           const { voter } = getVoterPDA(registrar, walletPk, pluginPk)
-          voterWeightPk = (
-            getVoterWeightPDA(registrar, walletPk, pluginPk)
-          ).voterWeightPk
+          voterWeightPk = getVoterWeightPDA(registrar, walletPk, pluginPk)
+            .voterWeightPk
 
           const updateVoterWeightRecordIx = await vsrClient.program.methods
             .updateVoterWeightRecord()
@@ -310,7 +308,7 @@ const DaoVote = ({
       <Tooltip content="Token to be delegated.">
         <GovernedAccountSelect
           label="Delegate Token"
-          governedAccounts={assetAccounts.filter((x) => x.isSol)}
+          governedAccounts={assetAccounts.filter((x) => x.isToken)}
           onChange={(value) => {
             handleSetForm({ value, propertyName: 'delegateToken' })
           }}
