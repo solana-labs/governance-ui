@@ -50,7 +50,10 @@ export default function UseMangoV4(programId?: PublicKey, group?: PublicKey) {
     const client = await MangoClient.connect(
       adminProvider,
       clientCluster,
-      program
+      program,
+      {
+        idsSource: 'api',
+      }
     )
 
     return client
@@ -93,11 +96,11 @@ export default function UseMangoV4(programId?: PublicKey, group?: PublicKey) {
   const getMaxBorrowForBank = (
     group: Group,
     bank: Bank,
-    mangoAccount: MangoAccount,
+    mangoAccount: MangoAccount
   ) => {
     try {
       const maxBorrow = new Decimal(
-        mangoAccount.getMaxWithdrawWithBorrowForTokenUi(group, bank.mint),
+        mangoAccount.getMaxWithdrawWithBorrowForTokenUi(group, bank.mint)
       )
       return maxBorrow
     } catch (e) {
@@ -110,7 +113,7 @@ export default function UseMangoV4(programId?: PublicKey, group?: PublicKey) {
     group: Group,
     bank: Bank,
     mangoAccount: MangoAccount,
-    allowBorrow = false,
+    allowBorrow = false
   ): Decimal => {
     const accountBalance = new Decimal(mangoAccount.getTokenBalanceUi(bank))
     const vaultBalance = group.getTokenVaultBalanceByMintUi(bank.mint)
@@ -120,7 +123,7 @@ export default function UseMangoV4(programId?: PublicKey, group?: PublicKey) {
       : bank.initAssetWeight.toNumber() === 0
       ? Decimal.min(accountBalance, vaultBalance)
       : Decimal.min(accountBalance, vaultBalance, maxBorrow)
-  
+
     return Decimal.max(0, maxWithdraw)
   }
 

@@ -69,14 +69,16 @@ export async function fetchMangoAccounts(
   ).map((o) => new PublicKey(o))
 
   const mangoAccounts: MangoAccount[] = []
-  for (const tokenAccountOwner of tokenAccountOwners) {
-    const accounts = await mangoClient.getMangoAccountsForOwner(
-      mangoGroup,
-      tokenAccountOwner
-    )
+  if (tokenAccountOwners.length <= 2) {
+    for (const tokenAccountOwner of tokenAccountOwners) {
+      const accounts = await mangoClient.getMangoAccountsForOwner(
+        mangoGroup,
+        tokenAccountOwner
+      )
 
-    if (accounts) {
-      mangoAccounts.push(...accounts)
+      if (accounts) {
+        mangoAccounts.push(...accounts)
+      }
     }
   }
 

@@ -6,7 +6,7 @@ export const getRegistrarPDA = (
   clientProgramId: PublicKey
 ) => {
   const [registrar, registrarBump] = PublicKey.findProgramAddressSync(
-    [Buffer.from('registrar'), realmPk.toBuffer(), mint.toBuffer()],
+    [realmPk.toBuffer(), Buffer.from('registrar'), mint.toBuffer()],
     clientProgramId
   )
   return {

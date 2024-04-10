@@ -20,7 +20,10 @@ export const useMangoClient = (connection: Connection) => {
       const client = await MangoClient.connect(
         adminProvider,
         cluster,
-        MANGO_V4_ID[cluster]
+        MANGO_V4_ID[cluster],
+        {
+          idsSource: 'api',
+        }
       )
 
       return client
