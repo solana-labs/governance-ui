@@ -55,9 +55,10 @@ export async function getMerkleAirdropInstruction({
     }
     const airdropTransactionContext: AirdropConfigureContext = await airdrop.createConfigMerkleTransaction(
       form.treasury.pubkey, // source
-      form.treasury.extensions.token!.account.owner!, // authority
+      wallet.publicKey,
       new BN(0),
-      root
+      root,
+      form.treasury.extensions.token!.account.owner!, // close authority
     )
     const prerequisiteInstructions: TransactionInstruction[] = []
     for (const instruction of airdropTransactionContext.transaction
