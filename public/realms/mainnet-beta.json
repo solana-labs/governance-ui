@@ -3520,13 +3520,15 @@
     "twitter": "@jito_sol"
     
   }
-  { "symbol": "AntiBONK",
-    "displayName": "AntiBONK DAO",
+  {
+    "symbol": "AntiBONK Inu",
+    "displayName": "AntiBONK Inu",
     "programmId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "B97gzPGfYtGxvGabeWYe4kqBXnViVj6EVgnKU2eUziq8",
     "ogImage": "/realms/AntiBONK_Inu/logo.jpg",
     "bannerImage": "/realms/AntiBONK_Inu/bg.jpg",
     "website": "https://www.antibonkcoin.com",
-    "twitter": "@antibonkinu"},
+    "twitter": "@antibonkinu"
+  },
 
 ]
