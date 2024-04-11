@@ -10,6 +10,8 @@ import { WalletAdapter } from '@solana/wallet-adapter-base'
 import { Airdrop, AirdropConfigureContext } from '@dual-finance/airdrop'
 import { BN } from '@coral-xyz/anchor'
 import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
+import { TransactionInstruction } from '@solana/web3.js'
+import { TOKEN_PROGRAM_ID, Token } from '@solana/spl-token'
 
 interface AirdropArgs {
   connection: ConnectionContext
@@ -54,19 +56,27 @@ export async function getMerkleAirdropInstruction({
     const airdropTransactionContext: AirdropConfigureContext = await airdrop.createConfigMerkleTransaction(
       form.treasury.pubkey, // source
       form.treasury.extensions.token!.account.owner!, // authority
-      amountNatural,
+      new BN(0),
       root
     )
-
+    const prerequisiteInstructions: TransactionInstruction[] = []
     for (const instruction of airdropTransactionContext.transaction
       .instructions) {
-      additionalSerializedInstructions.push(
-        serializeInstructionToBase64(instruction)
-      )
+      prerequisiteInstructions.push(instruction)
     }
 
+    const vaultAddress = airdrop.getVaultAddress(airdropTransactionContext.airdropState);
+    const transferIx = Token.createTransferInstruction(
+      TOKEN_PROGRAM_ID,
+      form.treasury.pubkey,
+      vaultAddress,
+      form.treasury.extensions.token!.account.owner!,
+      [],
+      amountNatural,
+    )
+
     return {
-      serializedInstruction,
+      serializedInstruction: serializeInstructionToBase64(transferIx),
       additionalSerializedInstructions,
       isValid: true,
       governance: form.treasury?.governance,
