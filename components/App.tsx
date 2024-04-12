@@ -242,8 +242,8 @@ export function AppContents(props: Props) {
         <meta
           property="og:image"
           content={
-            realmInfoStatic?.bannerImage ? realmInfoStatic.bannerImage :
-            realmInfoStatic?.ogImage ? realmInfoStatic.ogImage :
+            realmInfoStatic?.bannerImage ? "https://app.realms.today"+realmInfoStatic.bannerImage :
+            realmInfoStatic?.ogImage ? "https://app.realms.today"+realmInfoStatic.ogImage :
             "https://raw.githubusercontent.com/solana-labs/governance-ui/main/public/img/logo-realms.png"
           }
         />
