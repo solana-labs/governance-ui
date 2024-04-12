@@ -51,7 +51,13 @@ export default function useCreateProposal() {
       connection.current,
       governance.pubkey
     )
-    const ownTokenRecord = ownVoterWeight?.councilTokenRecord ?? ownVoterWeight?.communityTokenRecord
+    const minCouncilTokensToCreateProposal = selectedGovernance?.account.config.minCouncilTokensToCreateProposal
+    const councilPower = ownVoterWeight?.councilTokenRecord?.account.governingTokenDepositAmount
+
+    const ownTokenRecord = 
+      minCouncilTokensToCreateProposal && councilPower && councilPower >= minCouncilTokensToCreateProposal ?
+      ownVoterWeight?.councilTokenRecord : 
+      ownVoterWeight?.communityTokenRecord
 
     if (!ownTokenRecord) throw new Error('token owner record does not exist')
     if (!selectedGovernance) throw new Error('governance not found')
@@ -135,7 +141,14 @@ export default function useCreateProposal() {
       connection.current,
       governance
     )
-    const ownTokenRecord = ownVoterWeight?.councilTokenRecord ?? ownVoterWeight?.communityTokenRecord
+
+    const minCouncilTokensToCreateProposal = selectedGovernance?.account.config.minCouncilTokensToCreateProposal
+    const councilPower = ownVoterWeight?.councilTokenRecord?.account.governingTokenDepositAmount
+
+    const ownTokenRecord = 
+      minCouncilTokensToCreateProposal && councilPower && councilPower >= minCouncilTokensToCreateProposal ?
+      ownVoterWeight?.councilTokenRecord : 
+      ownVoterWeight?.communityTokenRecord
 
     if (!ownTokenRecord) throw new Error('token owner record does not exist')
     if (!selectedGovernance) throw new Error('governance not found')
