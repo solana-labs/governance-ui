@@ -58,6 +58,7 @@ export async function getMerkleAirdropInstruction({
       wallet.publicKey,
       new BN(0),
       root,
+      undefined,
       form.treasury.extensions.token!.account.owner!, // close authority
     )
     const prerequisiteInstructions: TransactionInstruction[] = []
