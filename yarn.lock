@@ -831,14 +831,15 @@
     js-sha256 "^0.9.0"
     tweetnacl "1.0.3"
 
-"@dual-finance/airdrop@0.2.2":
-  version "0.2.2"
-  resolved "https://registry.yarnpkg.com/@dual-finance/airdrop/-/airdrop-0.2.2.tgz#cb0c0c1ccc15989f7cb94e68fb9282797a560912"
-  integrity sha512-z1b8XkTxJJGmaPDbjdQaoBIuWgCMHQmtDBdIDL0pEhW4VQol78zQw2IcFPS7JvDHSAsDvNZSoYcYe9gRNeHyXg==
+"@dual-finance/airdrop@0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@dual-finance/airdrop/-/airdrop-0.3.1.tgz#64b697ee0e82da69d50ab5be517929a11fc2f138"
+  integrity sha512-V+6wcyyWZfLB6Yj1gUMlTO+DptsG21kumh+TF38e6Z/Z8Fu9I3c8mNY1Dh8KZNCZwlw2cF+PB2fO2kWUqvd/ZA==
   dependencies:
     "@coral-xyz/anchor" "^0.26.0"
     "@solana/spl-token" "^0.3.6"
     "@solana/web3.js" "^1.73.2"
+    bs58 "^5.0.0"
     js-sha3 "^0.8.0"
 
 "@dual-finance/gso@0.0.17":
