@@ -37,6 +37,7 @@ import { tryParsePublicKey } from '@tools/core/pubkey'
 import { useAsync } from 'react-async-hook'
 import { useVsrClient } from '../VoterWeightPlugins/useVsrClient'
 import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
+import mainnetBetaRealms from 'public/realms/mainnet-beta.json'
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
@@ -131,6 +132,10 @@ export function AppContents(props: Props) {
 
   const realmName = realmInfo?.displayName ?? realm?.account?.name
   const title = realmName ? `${realmName}` : 'Realms'
+
+  const realmInfoStatic = mainnetBetaRealms.find(
+    (x) => x.realmId === realm?.pubkey.toBase58()
+  )
 
   // Note: ?v==${Date.now()} is added to the url to force favicon refresh.
   // Without it browsers would cache the last used and won't change it for different realms
@@ -234,6 +239,7 @@ export function AppContents(props: Props) {
     <div className="relative bg-bkg-1 text-fgd-1">
       <Head>
         <meta property="og:title" content={title} key="title" />
+        <meta property="og:image" content={realmInfoStatic?.bannerImage} />
         <title>{title}</title>
         <style>{`
           body {
