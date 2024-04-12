@@ -240,6 +240,14 @@ export function AppContents(props: Props) {
       <Head>
         <meta property="og:title" content={title} key="title" />
         <meta
+          property="og:image"
+          content={
+            realmInfoStatic?.bannerImage ? realmInfoStatic.bannerImage :
+            realmInfoStatic?.ogImage ? realmInfoStatic.ogImage :
+            "https://raw.githubusercontent.com/solana-labs/governance-ui/main/public/img/logo-realms.png"
+          }
+        />
+        <meta
           property="twitter:image"
           content={
             realmInfoStatic?.bannerImage ? realmInfoStatic.bannerImage :
