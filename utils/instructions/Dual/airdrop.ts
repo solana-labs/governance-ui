@@ -74,7 +74,7 @@ export async function getMerkleAirdropInstruction({
       vaultAddress,
       form.treasury.extensions.token!.account.owner!,
       [],
-      amountNatural,
+      amountNatural.toNumber(),
     )
 
     return {
