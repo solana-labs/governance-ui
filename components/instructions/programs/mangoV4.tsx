@@ -977,7 +977,7 @@ const instructions = () => ({
           disableAssetLiquidation: args.disableAssetLiquidationOpt,
           collateralFeePerDay:
             args.collateralFeePerDayOpt !== undefined
-              ? (args.collateralFeePerDayOpt * 100)?.toFixed(2)
+              ? (args.collateralFeePerDayOpt * 100)?.toFixed(4)
               : undefined,
           forceWithdraw: args.forceWithdrawOpt,
           forceClose: args.forceCloseOpt,
