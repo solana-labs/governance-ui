@@ -270,6 +270,12 @@ export async function prepareRealmCreation({
     params._programVersion === 3 ? params.councilTokenConfig : undefined
   )
 
+  const doesRealmExist = await connection.getAccountInfo(realmPk)
+
+  if (doesRealmExist?.data) {
+    throw new Error('Realm with the same name already exists.')
+  }
+
   console.log('Prepare realm - council members', councilWalletPks)
   for (const teamWalletPk of councilWalletPks) {
     // In version 3 we just deposit council tokens directly into the DAO
