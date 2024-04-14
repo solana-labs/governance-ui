@@ -477,7 +477,12 @@ const instructions = () => ({
                 suffix="%"
               />
               <DisplayListingPropertyWrapped
-                label="Interest rate max rate"
+                label="Zero Util Rate"
+                valKey={'zeroUtilRate'}
+                suffix="%"
+              />
+              <DisplayListingPropertyWrapped
+                label="Zero util rate"
                 valKey={'maxRate'}
                 suffix="%"
               />
@@ -973,7 +978,10 @@ const instructions = () => ({
           depositLimit: args.depositLimitOpt?.toString(),
           setFallbackOracle: args.setFallbackOracle,
           maintWeightShiftAbort: args.maintWeightShiftAbort,
-          zeroUtilRate: args.zeroUtilRateOpt,
+          zeroUtilRate:
+            args.zeroUtilRateOpt !== undefined
+              ? (args.zeroUtilRateOpt * 100).toFixed(2)
+              : undefined,
           disableAssetLiquidation: args.disableAssetLiquidationOpt,
           collateralFeePerDay:
             args.collateralFeePerDayOpt !== undefined
@@ -1259,6 +1267,17 @@ const instructions = () => ({
                 }
                 suggestedVal={
                   invalidFields.maxRate && `${invalidFields.maxRate}%`
+                }
+              />
+              <DisplayNullishProperty
+                label="Zero util rate"
+                value={parsedArgs.zeroUtilRate && `${parsedArgs.zeroUtilRate}%`}
+                currentValue={
+                  bankFormattedValues?.zeroUtilRate &&
+                  `${bankFormattedValues.zeroUtilRate}%`
+                }
+                suggestedVal={
+                  invalidFields.zeroUtilRate && `${invalidFields.zeroUtilRate}%`
                 }
               />
               <DisplayNullishProperty
@@ -2099,7 +2118,7 @@ const getFormattedListingValues = (args: FlatListingArgs) => {
     interestCurveScaling: args.interestCurveScaling,
     groupInsuranceFund: args.groupInsuranceFund,
     collateralFeePerDay: (args.collateralFeePerDay * 100).toFixed(2),
-    zeroUtilRate: args.zeroUtilRate,
+    zeroUtilRate: (args.zeroUtilRate * 100).toFixed(2),
     disableAssetLiquidation: args.disableAssetLiquidation,
   }
   return formattedArgs
