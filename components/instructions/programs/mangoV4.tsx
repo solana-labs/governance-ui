@@ -482,7 +482,7 @@ const instructions = () => ({
                 suffix="%"
               />
               <DisplayListingPropertyWrapped
-                label="Zero util rate"
+                label="Max fee rate"
                 valKey={'maxRate'}
                 suffix="%"
               />
