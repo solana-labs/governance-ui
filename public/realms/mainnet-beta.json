@@ -3518,5 +3518,21 @@
     "ogImage": "/realms/Jito/jito.png",
     "website": "https://jito.network",
     "twitter": "@jito_sol"
+  },
+  {
+    "symbol": "KORRA",
+    "bannerImage": "/realms/KORRA DAO/img/KORRA DAO banner.jpg",
+    "displayName": "KORRA DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "AiiHHhrsRSmhHW4Aitupzeu6PnvwiNV2EWDrBaoQZfo3",
+    "communityMint": "t5cSTUSZzUAQXQKzQvhieFG4Hz4xC23z9du1Chp8gES",
+    "ogImage": "/realms/KORRA DAO/img/korra official.jpg",
+    "shortDescription": "Discover KORRA DAO: where crypto meets compassion and education. KORRA, Myro's real-life playmate, is a community-driven token on the Solana network committed to making a positive impact. Our DAO focuses on charitable giving, blockchain education, and safe trading. Join us in shaping a better world through decentralized finance.",
+    "website": "https://www.korrathedog.xyz/",
+    "sortRank": 3,
+    "keywords": "Web3, REALM, Governance, KORRA, Meme, DAO, Incubator, Charity, Solana, SOL, Crypto, Trading, Best, Fast, NFG",
+    "twitter": "@korratoken",
+    "telegram": "https://t.me/korratoken",
+    "github": "https://korra.gitbook.io/"
   }
 ]
