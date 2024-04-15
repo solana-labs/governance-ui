@@ -323,7 +323,7 @@ export interface JoinDAOForm {
 
 export enum Instructions {
   Base64,
-  Burn,
+  // Burn,
   ChangeMakeDonation,
   Clawback,
   CloseTokenAccount,

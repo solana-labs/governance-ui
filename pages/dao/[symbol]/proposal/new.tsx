@@ -461,7 +461,7 @@ const New = () => {
     | null
   } = useMemo(
     () => ({
-      [Instructions.Burn]: BurnTokens,
+      // [Instructions.Burn]: BurnTokens,
       [Instructions.Transfer]: SplTokenTransfer,
       [Instructions.ProgramUpgrade]: ProgramUpgrade,
       [Instructions.Mint]: Mint,
