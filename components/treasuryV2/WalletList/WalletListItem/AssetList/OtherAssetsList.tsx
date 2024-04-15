@@ -9,6 +9,7 @@ import {
   RealmAuthority,
   Unknown,
   Stake,
+  Mango,
 } from '@models/treasury/Asset'
 
 import Collapsible from './Collapsible'
@@ -19,16 +20,25 @@ import UnknownAssetListItem from './UnknownAssetListItem'
 import RealmAuthorityListItem from './RealmAuthorityListItem'
 import StakeListItem from './StakeListItem'
 import { abbreviateAddress } from '@utils/formatting'
+import MangoListItem from './MangoListItem'
 
 interface Props {
   className?: string
   disableCollapse?: boolean
   expanded?: boolean
-  assets: (Mint | Domains | Programs | RealmAuthority | Unknown | Stake)[]
+  assets: (
+    | Mint
+    | Domains
+    | Programs
+    | RealmAuthority
+    | Unknown
+    | Stake
+    | Mango
+  )[]
   selectedAssetId?: string | null
   itemsToHide: string[]
   onSelect?(
-    asset: Mint | Domains | Programs | RealmAuthority | Unknown | Stake
+    asset: Mint | Domains | Programs | RealmAuthority | Unknown | Stake | Mango
   ): void
   onToggleExpand?(): void
 }
@@ -105,6 +115,14 @@ export default function OtherAssetsList(props: Props) {
                   }
                   onSelect={() => props.onSelect?.(asset)}
                 ></StakeListItem>
+              )
+            case AssetType.Mango:
+              return (
+                <MangoListItem
+                  key={i}
+                  amount={asset.value}
+                  onSelect={() => []}
+                />
               )
             case AssetType.Unknown:
               return (

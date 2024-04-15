@@ -129,7 +129,7 @@ interface EditTokenForm {
   maintWeightShiftLiabTarget: number
   maintWeightShiftAbort: boolean
   setFallbackOracle: boolean
-  depositLimit: number
+  depositLimit: string
   zeroUtilRate: number
   platformLiquidationFee: number
   disableAssetLiquidation: boolean
@@ -184,7 +184,7 @@ const defaultFormValues: EditTokenForm = {
   maintWeightShiftLiabTarget: 0,
   maintWeightShiftAbort: false,
   setFallbackOracle: false,
-  depositLimit: 0,
+  depositLimit: '0',
   zeroUtilRate: 0,
   platformLiquidationFee: 0,
   disableAssetLiquidation: false,
@@ -475,10 +475,10 @@ const EditToken = ({
         maintWeightShiftEnd: currentToken.maintWeightShiftEnd.toNumber(),
         maintWeightShiftAssetTarget: currentToken.maintWeightShiftAssetTarget.toNumber(),
         maintWeightShiftLiabTarget: currentToken.maintWeightShiftLiabTarget.toNumber(),
-        depositLimit: currentToken.depositLimit.toNumber(),
+        depositLimit: currentToken.depositLimit.toString(),
         zeroUtilRate: currentToken.zeroUtilRate.toNumber(),
-        platformLiquidationFeeOpt: currentToken.platformLiquidationFee.toNumber(),
-        collateralFeePerDayOpt: currentToken.collateralFeePerDay,
+        platformLiquidationFee: currentToken.platformLiquidationFee.toNumber(),
+        collateralFeePerDay: currentToken.collateralFeePerDay,
       }
       setForm((prevForm) => ({
         ...prevForm,

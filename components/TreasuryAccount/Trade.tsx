@@ -51,6 +51,7 @@ import {
 import { deriveAllBoundedStrategyKeysV2 } from '@utils/instructions/PsyFinance/poseidon'
 import { TokenInfo } from '@utils/services/types'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import {useVoteByCouncilToggle} from "@hooks/useVoteByCouncilToggle";
 
 type TradeProps = { tokenAccount: AssetAccount }
 
@@ -173,7 +174,7 @@ const Trade: React.FC<TradeProps> = ({ tokenAccount }) => {
   const { wallet, anchorProvider } = useWalletDeprecated()
   const { handleCreateProposal } = useCreateProposal()
   const { canUseTransferInstruction } = useGovernanceAssets()
-  const { canChooseWhoVote, symbol } = useRealm()
+  const {symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
   const [form, setForm] = useState<TradeForm>({
     amount: 0,
@@ -190,7 +191,7 @@ const Trade: React.FC<TradeProps> = ({ tokenAccount }) => {
   })
   const [formErrors, setFormErrors] = useState({})
   const [showOptions, setShowOptions] = useState(false)
-  const [voteByCouncil, setVoteByCouncil] = useState(false)
+  const { voteByCouncil, shouldShowVoteByCouncilToggle, setVoteByCouncil } = useVoteByCouncilToggle();
   const [isLoading, setIsLoading] = useState(false)
   const [destinationToken, setDestinationToken] = useState<TokenInfo>()
 
@@ -438,7 +439,7 @@ const Trade: React.FC<TradeProps> = ({ tokenAccount }) => {
           <ProposalOptions
             handleSetForm={handleSetForm}
             form={form}
-            canChooseWhoVote={canChooseWhoVote}
+            shouldShowVoteByCouncilToggle={shouldShowVoteByCouncilToggle}
             voteByCouncil={voteByCouncil}
             setVoteByCouncil={setVoteByCouncil}
           />

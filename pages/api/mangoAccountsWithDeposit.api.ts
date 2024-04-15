@@ -31,7 +31,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const client = await MangoClient.connect(
       adminProvider,
       clientCluster,
-      MANGO_V4_ID[clientCluster]
+      MANGO_V4_ID[clientCluster],
+      {
+        idsSource: 'api',
+      }
     )
     const group = await client.getGroup(MAINNET_GROUP)
 

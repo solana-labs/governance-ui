@@ -5,12 +5,7 @@ import {
   RpcContext,
   withExecuteTransaction,
 } from '@solana/spl-governance'
-import {
-  ComputeBudgetProgram,
-  Transaction,
-  TransactionInstruction,
-} from '@solana/web3.js'
-import { sendSignedTransaction, signTransaction } from '@utils/send'
+import { ComputeBudgetProgram, TransactionInstruction } from '@solana/web3.js'
 import {
   sendTransactionsV3,
   SequenceType,
@@ -60,19 +55,21 @@ export const executeInstructions = async (
       transactionInstructions: txes,
     })
   } else {
-    const transaction = new Transaction()
-    transaction.add(...instructions)
-    const signedTransaction = await signTransaction({
-      transaction,
-      wallet,
-      connection,
-      signers: [],
+    const txes = [instructions].map((txBatch) => {
+      return {
+        instructionsSet: txBatch.map((x) => {
+          return {
+            transactionInstruction: x,
+          }
+        }),
+        sequenceType: SequenceType.Sequential,
+      }
     })
-    await sendSignedTransaction({
-      signedTransaction,
+
+    await sendTransactionsV3({
       connection,
-      sendingMessage: 'Executing instruction',
-      successMessage: 'Execution finalized',
+      wallet,
+      transactionInstructions: txes,
     })
   }
 }

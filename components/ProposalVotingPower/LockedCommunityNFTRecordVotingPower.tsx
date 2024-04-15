@@ -10,12 +10,12 @@ import { BN } from '@coral-xyz/anchor'
 import Link from 'next/link'
 import useQueryContext from '@hooks/useQueryContext'
 import InlineNotification from '@components/InlineNotification'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
+import {useVotingClients} from "@hooks/useVotingClients";
 
 interface Props {
   className?: string
@@ -32,9 +32,8 @@ export default function LockedCommunityNFTRecordVotingPower(props: Props) {
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const { data: tokenOwnerRecordPk } = useAddressQuery_CommunityTokenOwner()
-  const [currentClient] = useVotePluginsClientStore((s) => [
-    s.state.currentRealmVotingClient,
-  ])
+  // this is only available for the community role as long as the rest of the hooks are hard-coding it
+  const votingClient = useVotingClients()('community')
   const [
     loadingPositions,
     votingPower,
@@ -50,10 +49,10 @@ export default function LockedCommunityNFTRecordVotingPower(props: Props) {
   ])
 
   useEffect(() => {
-    if (currentClient.heliumVsrVotingPositions.length !== positions.length) {
-      propagatePositions({ votingClient: currentClient })
+    if (votingClient.heliumVsrVotingPositions.length !== positions.length) {
+      propagatePositions({ votingClient })
     }
-  }, [positions, currentClient, propagatePositions])
+  }, [positions, votingClient, propagatePositions])
 
   useEffect(() => {
     if (mint && votingPower) {

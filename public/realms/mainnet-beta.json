@@ -106,6 +106,14 @@
     "github": "https://github.com/blockworks-foundation/"
   },
   {
+    "symbol": "OBV2",
+    "category": "defi",
+    "displayName": "OpenBook V2 Council",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "EVDdDLdhSMU8nzLEmoRMuH7rReXXgDibAtTPg66m4JHW",
+    "communityMint": "A5tGJvsUpehqSzzWY2whuPfBvBXTRQsUCDcjZ2HC479m"
+  },
+  {
     "symbol": "XAND",
     "category": "defi",
     "displayName": "Xandeum DAO",
