@@ -1,8 +1,4 @@
-import {
-  sendTransactionsV3,
-  SequenceType,
-  txBatchesToInstructionSetWithSigners,
-} from 'utils/sendTransactions'
+import { sendTransactionsV3, SequenceType } from 'utils/sendTransactions'
 import { chunks } from '@utils/helpers'
 
 import {
@@ -37,27 +33,27 @@ export default async function createMultisigWallet({
   })
 
   try {
-    const councilMembersChunks = chunks(councilMembersInstructions, 10)
-    // only walletPk needs to sign the minting instructions and it's a signer by default and we don't have to include any more signers
-    const councilMembersSignersChunks = Array(councilMembersChunks.length).fill(
-      []
-    )
-    const signers = [
-      mintsSetupSigners,
-      ...councilMembersSignersChunks,
-      realmSigners,
-    ]
+    const councilMembersChunks = chunks(councilMembersInstructions, 8)
+
+    const allSigners = [...mintsSetupSigners, ...realmSigners]
+
     const txes = [
-      mintsSetupInstructions,
+      ...chunks(mintsSetupInstructions, 5),
       ...councilMembersChunks,
-      realmInstructions,
-    ].map((txBatch, batchIdx) => {
+      ...chunks(realmInstructions, 15),
+    ].map((txBatch) => {
       return {
-        instructionsSet: txBatchesToInstructionSetWithSigners(
-          txBatch,
-          signers,
-          batchIdx
-        ),
+        instructionsSet: txBatch.map((txInst) => {
+          const signers = allSigners.filter((x) =>
+            txInst.keys
+              .filter((key) => key.isSigner)
+              .find((key) => key.pubkey.equals(x.publicKey))
+          )
+          return {
+            transactionInstruction: txInst,
+            signers,
+          }
+        }),
         sequenceType: SequenceType.Sequential,
       }
     })

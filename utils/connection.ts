@@ -2,6 +2,10 @@ import type { EndpointTypes } from '@models/types'
 import { Connection } from '@solana/web3.js'
 import type { EndpointInfo } from '../@types/types'
 
+export const BACKUP_CONNECTIONS = [
+  new Connection('https://api.mngo.cloud/lite-rpc/v1/', 'recent'),
+]
+
 const ENDPOINTS: EndpointInfo[] = [
   {
     name: 'mainnet',

@@ -477,7 +477,12 @@ const instructions = () => ({
                 suffix="%"
               />
               <DisplayListingPropertyWrapped
-                label="Interest rate max rate"
+                label="Zero Util Rate"
+                valKey={'zeroUtilRate'}
+                suffix="%"
+              />
+              <DisplayListingPropertyWrapped
+                label="Max fee rate"
                 valKey={'maxRate'}
                 suffix="%"
               />
@@ -619,6 +624,10 @@ const instructions = () => ({
                 label="Group Insurance Fund"
                 val={formattedProposedArgs.groupInsuranceFund?.toString()}
                 suggestedVal={invalidFields.groupInsuranceFund?.toString()}
+              />
+              <DisplayListingPropertyWrapped
+                label="Collateral Fee Per Day"
+                valKey="collateralFeePerDay"
               />
             </div>
             <AdvancedOptionsDropdown className="mt-4" title="Raw values">
@@ -969,9 +978,15 @@ const instructions = () => ({
           depositLimit: args.depositLimitOpt?.toString(),
           setFallbackOracle: args.setFallbackOracle,
           maintWeightShiftAbort: args.maintWeightShiftAbort,
-          zeroUtilRate: args.zeroUtilRateOpt,
+          zeroUtilRate:
+            args.zeroUtilRateOpt !== undefined
+              ? (args.zeroUtilRateOpt * 100).toFixed(2)
+              : undefined,
           disableAssetLiquidation: args.disableAssetLiquidationOpt,
-          collateralFeePerDay: args.collateralFeePerDayOpt,
+          collateralFeePerDay:
+            args.collateralFeePerDayOpt !== undefined
+              ? (args.collateralFeePerDayOpt * 100)?.toFixed(4)
+              : undefined,
           forceWithdraw: args.forceWithdrawOpt,
           forceClose: args.forceCloseOpt,
         }
@@ -1252,6 +1267,17 @@ const instructions = () => ({
                 }
                 suggestedVal={
                   invalidFields.maxRate && `${invalidFields.maxRate}%`
+                }
+              />
+              <DisplayNullishProperty
+                label="Zero util rate"
+                value={parsedArgs.zeroUtilRate && `${parsedArgs.zeroUtilRate}%`}
+                currentValue={
+                  bankFormattedValues?.zeroUtilRate &&
+                  `${bankFormattedValues.zeroUtilRate}%`
+                }
+                suggestedVal={
+                  invalidFields.zeroUtilRate && `${invalidFields.zeroUtilRate}%`
                 }
               />
               <DisplayNullishProperty
@@ -1563,6 +1589,21 @@ const instructions = () => ({
                       bank.mintDecimals
                     ) * bank.uiPrice
                   ).toFixed(0)})`
+                }
+              />
+              <DisplayNullishProperty
+                label="Collateral Fee Per Day"
+                value={
+                  parsedArgs.collateralFeePerDay &&
+                  `${parsedArgs.collateralFeePerDay}%`
+                }
+                currentValue={
+                  bankFormattedValues?.collateralFeePerDay &&
+                  `${bankFormattedValues.collateralFeePerDay}%`
+                }
+                suggestedVal={
+                  invalidFields.collateralFeePerDay &&
+                  `${invalidFields.collateralFeePerDay}%`
                 }
               />
               {parsedArgs?.disableAssetLiquidation && (
@@ -2076,8 +2117,8 @@ const getFormattedListingValues = (args: FlatListingArgs) => {
     interestTargetUtilization: args.interestTargetUtilization,
     interestCurveScaling: args.interestCurveScaling,
     groupInsuranceFund: args.groupInsuranceFund,
-    collateralFeePerDay: args.collateralFeePerDay,
-    zeroUtilRate: args.zeroUtilRate,
+    collateralFeePerDay: (args.collateralFeePerDay * 100).toFixed(2),
+    zeroUtilRate: (args.zeroUtilRate * 100).toFixed(2),
     disableAssetLiquidation: args.disableAssetLiquidation,
   }
   return formattedArgs

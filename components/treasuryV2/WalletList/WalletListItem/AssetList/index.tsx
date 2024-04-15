@@ -12,6 +12,7 @@ import {
   AssetType,
   Domains,
   Stake,
+  Mango,
 } from '@models/treasury/Asset'
 
 import TokenList from './TokenList'
@@ -27,6 +28,7 @@ import {
   isUnknown,
   isDomain,
   isStake,
+  isMango,
 } from '../typeGuards'
 
 import { PublicKey } from '@solana/web3.js'
@@ -47,14 +49,22 @@ function isTokenLike(asset: Asset): asset is Token | Sol {
 
 function isOther(
   asset: Asset
-): asset is Mint | Programs | Unknown | Domains | RealmAuthority | Stake {
+): asset is
+  | Mint
+  | Programs
+  | Unknown
+  | Domains
+  | RealmAuthority
+  | Stake
+  | Mango {
   return (
     isMint(asset) ||
     isPrograms(asset) ||
     isUnknown(asset) ||
     isRealmAuthority(asset) ||
     isDomain(asset) ||
-    isStake(asset)
+    isStake(asset) ||
+    isMango(asset)
   )
 }
 
@@ -150,7 +160,7 @@ export default function AssetList(props: Props) {
 
   // NOTE possible source of bugs, state wont update if props do.
   const [others, setOthers] = useState<
-    (Mint | Programs | Unknown | Domains | RealmAuthority | Stake)[]
+    (Mint | Programs | Unknown | Domains | RealmAuthority | Stake | Mango)[]
   >(othersFromProps)
   const [itemsToHide, setItemsToHide] = useState<string[]>([])
   useEffect(() => {
@@ -173,6 +183,7 @@ export default function AssetList(props: Props) {
         | Domains
         | RealmAuthority
         | Stake
+        | Mango
       )[] = []
       for await (const token of othersFromProps) {
         if (isMint(token)) {

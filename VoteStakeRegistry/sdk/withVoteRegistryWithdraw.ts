@@ -49,13 +49,13 @@ export const withVoteRegistryWithdraw = async ({
   }
   const clientProgramId = client!.program.programId
 
-  const { registrar } = await getRegistrarPDA(
+  const { registrar } = getRegistrarPDA(
     realmPk,
     communityMintPk,
     client!.program.programId
   )
-  const { voter } = await getVoterPDA(registrar, walletPk, clientProgramId)
-  const { voterWeightPk } = await getVoterWeightPDA(
+  const { voter } = getVoterPDA(registrar, walletPk, clientProgramId)
+  const { voterWeightPk } = getVoterWeightPDA(
     registrar,
     walletPk,
     clientProgramId

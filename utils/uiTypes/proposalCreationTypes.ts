@@ -14,20 +14,21 @@ import * as PaymentStreaming from '@mean-dao/payment-streaming'
 // Alphabetical order
 export enum PackageEnum {
   Common,
+  Distribution,
   Dual,
   Foresight,
   GatewayPlugin,
   Identity,
-  NftPlugin,
   MangoMarketV4,
   MeanFinance,
-  Squads,
+  NftPlugin,
   PsyFinance,
+  Pyth,
   Serum,
   Solend,
+  Squads,
   Switchboard,
   VsrPlugin,
-  Distribution,
 }
 
 export interface UiInstruction {
@@ -47,6 +48,12 @@ export interface SplTokenTransferForm {
   amount: number | undefined
   governedTokenAccount: AssetAccount | undefined
   programId: string | undefined
+  mintInfo: MintInfo | undefined
+}
+
+export interface BurnTokensForm {
+  amount: number | undefined
+  governedTokenAccount: AssetAccount | undefined
   mintInfo: MintInfo | undefined
 }
 
@@ -316,6 +323,7 @@ export interface JoinDAOForm {
 
 export enum Instructions {
   Base64,
+  Burn,
   ChangeMakeDonation,
   Clawback,
   CloseTokenAccount,

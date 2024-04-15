@@ -1,9 +1,4 @@
-import {
-  Keypair,
-  PublicKey,
-  Transaction,
-  TransactionInstruction,
-} from '@solana/web3.js'
+import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js'
 
 import {
   RpcContext,
@@ -12,10 +7,10 @@ import {
 } from '@solana/spl-governance'
 import { Proposal } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import { sendTransaction } from 'utils/send'
 import { withCancelProposal } from '@solana/spl-governance'
 import { getProposalDepositPk } from '@utils/helpers'
 import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
+import { SequenceType, sendTransactionsV3 } from '@utils/sendTransactions'
 
 export const cancelProposal = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -67,11 +62,11 @@ export const cancelProposal = async (
     connection.getBalance(possibleTorDeposit),
   ])
 
-  let refundAddress;
+  let refundAddress
   if (delegateDeposit && delegateDeposit > 0 && possibleDelegateDeposit) {
-    refundAddress = proposalOwner.account.governanceDelegate;
+    refundAddress = proposalOwner.account.governanceDelegate
   } else if (torDeposit && torDeposit > 0) {
-    refundAddress = proposalOwner.account.governingTokenOwner;
+    refundAddress = proposalOwner.account.governingTokenOwner
   }
 
   if (refundAddress) {
@@ -84,16 +79,21 @@ export const cancelProposal = async (
     )
   }
 
-  const transaction = new Transaction({ feePayer: walletPubkey })
+  const txes = [instructions].map((txBatch) => {
+    return {
+      instructionsSet: txBatch.map((x) => {
+        return {
+          transactionInstruction: x,
+          signers: signers,
+        }
+      }),
+      sequenceType: SequenceType.Sequential,
+    }
+  })
 
-  transaction.add(...instructions)
-
-  await sendTransaction({
-    transaction,
-    wallet,
+  await sendTransactionsV3({
     connection,
-    signers,
-    sendingMessage: 'Cancelling proposal',
-    successMessage: 'Proposal cancelled',
+    wallet,
+    transactionInstructions: txes,
   })
 }

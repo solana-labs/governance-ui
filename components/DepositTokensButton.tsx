@@ -2,7 +2,7 @@ import { BigNumber } from 'bignumber.js'
 import Button, { ButtonProps, SecondaryButton } from '@components/Button'
 import BN from 'bn.js'
 import useUserGovTokenAccountQuery from '@hooks/useUserGovTokenAccount'
-import { useDepositCallback } from './GovernancePower/Vanilla/useDepositCallback'
+import { useDepositCallback } from './GovernancePower/Power/Vanilla/useDepositCallback'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import Modal from './Modal'
 import { useState, useEffect } from 'react'
@@ -94,7 +94,7 @@ export const DepositTokensButton = ({
                 await deposit(nativeAmount)
                 setOpenModal(false)
               }}
-              disabled={humanReadableMax !== undefined && (parseInt(amount) > humanReadableMax || parseInt(amount)<= 0)}
+              disabled={humanReadableMax !== undefined && (parseFloat(amount) > humanReadableMax || parseFloat(amount)<= 0)}
             >
               Confirm
             </Button>

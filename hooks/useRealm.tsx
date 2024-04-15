@@ -8,10 +8,6 @@ import {
   useUserCouncilTokenOwnerRecord,
 } from './queries/tokenOwnerRecord'
 import { useRealmConfigQuery } from './queries/realmConfig'
-import {
-  useRealmCommunityMintInfoQuery,
-  useRealmCouncilMintInfoQuery,
-} from './queries/mintInfo'
 import { useSelectedRealmInfo } from './selectedRealm/useSelectedRealmRegistryEntry'
 import { useUserTokenAccountsQuery } from './queries/tokenAccount'
 
@@ -27,9 +23,6 @@ export default function useRealm() {
   const realmInfo = useSelectedRealmInfo()
 
   const config = useRealmConfigQuery().data?.result
-  const mint = useRealmCommunityMintInfoQuery().data?.result
-  const councilMint = useRealmCouncilMintInfoQuery().data?.result
-
   const currentPluginPk = config?.account?.communityTokenConfig.voterWeightAddin
 
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
@@ -54,13 +47,6 @@ export default function useRealm() {
       ),
     [realm, tokenAccounts]
   )
-
-  const canChooseWhoVote =
-    realm?.account.communityMint &&
-    (!mint?.supply.isZero() ||
-      config?.account.communityTokenConfig.voterWeightAddin) &&
-    realm.account.config.councilMint &&
-    !councilMint?.supply.isZero()
 
   //TODO take from realm config when available
   const realmCfgMaxOutstandingProposalCount = 10
@@ -100,7 +86,6 @@ export default function useRealm() {
       /** @deprecated just use the token owner record directly, ok? */
       //ownVoterWeight,
       //realmDisplayName: realmInfo?.displayName ?? realm?.account?.name,
-      canChooseWhoVote,
       //councilTokenOwnerRecords,
       toManyCouncilOutstandingProposalsForUse,
       toManyCommunityOutstandingProposalsForUser,
@@ -111,7 +96,6 @@ export default function useRealm() {
       isNftMode,
     }),
     [
-      canChooseWhoVote,
       councilTokenAccount,
       currentPluginPk,
       isNftMode,

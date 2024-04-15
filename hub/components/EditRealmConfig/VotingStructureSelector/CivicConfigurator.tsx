@@ -4,7 +4,11 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { PublicKey } from '@solana/web3.js';
 import React, { FC, useRef, useState } from 'react';
 
-import { availablePasses } from '../../../../GatewayPlugin/config';
+import {
+  availablePasses,
+  CivicPass,
+  defaultPass,
+} from '../../../../GatewayPlugin/config';
 import Input from '@components/inputs/Input';
 import cx from '@hub/lib/cx';
 
@@ -30,20 +34,9 @@ const labelStyles = cx('font-700', 'dark:text-neutral-50', 'w-full');
 const descriptionStyles = cx('dark:text-neutral-400 text-sm');
 const iconStyles = cx('fill-neutral-500', 'h-5', 'transition-transform', 'w-4');
 
-// Infer the types from the available passes, giving type safety on the `other` and `default` pass types
-type ArrayElement<
-  ArrayType extends readonly unknown[]
-> = ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
-type CivicPass = ArrayElement<typeof availablePasses>;
-
 const isOther = (pass: CivicPass | undefined): boolean =>
   pass?.name === 'Other';
 const other = availablePasses.find(isOther) as CivicPass;
-
-// if nothing is selected, Uniqueness is most likely what the user wants
-const defaultPass = availablePasses.find(
-  (pass) => pass.name === 'Uniqueness',
-) as CivicPass;
 
 // If Other is selected, allow the user to enter a custom pass address here.
 const ManualPassEntry: FC<{
