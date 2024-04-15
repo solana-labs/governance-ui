@@ -142,6 +142,7 @@ import { usePrevious } from '@hooks/usePrevious'
 import MultiChoiceForm from '../../../../components/MultiChoiceForm'
 // import CloseVaults from './components/instructions/DistrubtionProgram/CloseVaults'
 // import FillVaults from './components/instructions/DistrubtionProgram/FillVaults'
+import { useVoteByCouncilToggle } from "@hooks/useVoteByCouncilToggle";
 
 const TITLE_LENGTH_LIMIT = 130
 // the true length limit is either at the tx size level, and maybe also the total account size level (I can't remember)
