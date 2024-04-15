@@ -92,8 +92,6 @@ export default function useTreasuryInfo(
         accounts,
         domains,
         realmInfo.programId,
-        mangoGroup,
-        mangoClient,
         realm?.account.config.councilMint?.toBase58(),
         realm?.account.communityMint?.toBase58(),
         councilMint,
