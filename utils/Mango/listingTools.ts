@@ -14,8 +14,6 @@ import {
   LISTING_PRESETS_KEY,
   getPresetWithAdjustedNetBorrows,
   getPresetWithAdjustedDepositLimit,
-  getPythPresets,
-  getSwitchBoardPresets,
 } from '@blockworks-foundation/mango-v4-settings/lib/helpers/listingTools'
 import { AnchorProvider, BN, Program, Wallet } from '@coral-xyz/anchor'
 import { MAINNET_USDC_MINT } from '@foresight-tmp/foresight-sdk/dist/consts'
@@ -220,14 +218,11 @@ type ProposedListingPresets = {
 }
 
 export const getFormattedListingPresets = (
-  isPythOracle: boolean,
   uiDeposits?: number,
   decimals?: number,
   tokenPrice?: number
 ) => {
-  const PRESETS = !isPythOracle
-    ? getSwitchBoardPresets(LISTING_PRESETS)
-    : getPythPresets(LISTING_PRESETS)
+  const PRESETS = LISTING_PRESETS
 
   const PROPOSED_LISTING_PRESETS: ProposedListingPresets = Object.keys(
     PRESETS
@@ -294,14 +289,9 @@ const fetchJupiterRoutes = async (
   }
 }
 
-export const getSuggestedCoinPresetInfo = async (
-  outputMint: string,
-  hasPythOracle: boolean
-) => {
+export const getSuggestedCoinPresetInfo = async (outputMint: string) => {
   try {
-    const PRESETS = !hasPythOracle
-      ? getSwitchBoardPresets(LISTING_PRESETS)
-      : getPythPresets(LISTING_PRESETS)
+    const PRESETS = LISTING_PRESETS
 
     const swaps = await Promise.all([
       fetchJupiterRoutes(

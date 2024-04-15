@@ -1,9 +1,4 @@
-import {
-  Bank,
-  OracleProvider,
-  USDC_MINT,
-  toUiDecimals,
-} from '@blockworks-foundation/mango-v4'
+import { Bank, USDC_MINT, toUiDecimals } from '@blockworks-foundation/mango-v4'
 import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
 import { BN, BorshInstructionCoder } from '@coral-xyz/anchor'
 import { AccountMetaData } from '@solana/spl-governance'
@@ -253,14 +248,12 @@ const instructions = () => ({
       )
 
       const presetInfo = await getSuggestedCoinPresetInfo(
-        proposedMint.toBase58(),
-        proposedOracle.type === 'Pyth'
+        proposedMint.toBase58()
       )
 
       const formattedProposedArgs = getFormattedListingValues(args)
 
       const formattedSuggestedPresets = getFormattedListingPresets(
-        proposedOracle.type === 'Pyth',
         0,
         mintInfo?.account.decimals || 0,
         oracleData.uiPrice
@@ -519,7 +512,7 @@ const instructions = () => ({
               />
               <DisplayListingPropertyWrapped
                 label="Platform Liquidation Fee"
-                valKey="PlatformLiquidationFee"
+                valKey="platformLiquidationFee"
                 suffix="%"
               />
               <DisplayListingPropertyWrapped
@@ -995,7 +988,6 @@ const instructions = () => ({
           bank = mangoGroup.getFirstBankByMint(mint)
           bankFormattedValues = getFormattedBankValues(mangoGroup, bank)
           mintData = tokenPriceService.getTokenInfo(mint.toBase58())
-          const isPyth = bank?.oracleProvider === OracleProvider.Pyth
 
           const midPriceImpacts = getMidPriceImpacts(
             mangoGroup.pis.length ? mangoGroup.pis : []
@@ -1024,8 +1016,7 @@ const instructions = () => ({
             ? getProposedKey(
                 priceImpact.avg_price_impact_percent < 1
                   ? priceImpact?.target_amount
-                  : undefined,
-                bank.oracleProvider === OracleProvider.Pyth
+                  : undefined
               )
             : 'UNTRUSTED'
 
@@ -1037,12 +1028,11 @@ const instructions = () => ({
                   : '',
               }
             : {
-                presetKey: 'asset_250p',
+                presetKey: 'asset_250',
                 priceImpact: '0',
               }
 
           const suggestedPreset = getFormattedListingPresets(
-            !!isPyth,
             bank.uiDeposits(),
             bank.mintDecimals,
             bank.uiPrice
