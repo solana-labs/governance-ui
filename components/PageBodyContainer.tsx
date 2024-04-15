@@ -4,12 +4,12 @@ const PageBodyContainer = ({ children }) => {
   const { pathname, query } = useRouter()
   const isNewRealmsWizard = /\/realms\/new\/\w+/.test(pathname)
 
-  // TODO TEMP DEBUG - REMOVE BEFORE MERGE
-  if (
-      query['debug'] !== undefined
-  ) {
-    return <PluginDebug/>
-  }
+  // // TODO TEMP DEBUG - REMOVE BEFORE MERGE
+  // if (
+  //     query['debug'] !== undefined
+  // ) {
+  //   return <PluginDebug/>
+  // }
 
   return (
     <>
