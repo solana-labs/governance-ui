@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router'
 
 const PageBodyContainer = ({ children }) => {
-  const { pathname, query } = useRouter()
+  const { pathname } = useRouter()
   const isNewRealmsWizard = /\/realms\/new\/\w+/.test(pathname)
 
   // // TODO TEMP DEBUG - REMOVE BEFORE MERGE
