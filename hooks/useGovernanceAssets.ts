@@ -663,10 +663,10 @@ export default function useGovernanceAssets() {
       ██         ██       ██    ██   ██
       ██         ██       ██    ██   ██
     */
-    [Instructions.PythRecoverAccount]: {
-      name: 'Recover Account',
-      packageId: PackageEnum.Pyth,
-    },
+    // [Instructions.PythRecoverAccount]: {
+    //   name: 'Recover Account',
+    //   packageId: PackageEnum.Pyth,
+    // },
     /*
       ███████ ███████ ██████  ██    ██ ███    ███
       ██      ██      ██   ██ ██    ██ ████  ████
