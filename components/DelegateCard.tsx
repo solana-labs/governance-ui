@@ -6,16 +6,12 @@ import {
   PublicKey,
 } from '@solana/web3.js'
 import Input from './inputs/Input'
-import {
-  withSetGovernanceDelegate,
-  getGovernanceProgramVersion,
-} from '@solana/spl-governance'
+import { withSetGovernanceDelegate } from '@solana/spl-governance'
 import { sendTransaction } from 'utils/send'
 import { CashIcon, CreditCardIcon } from '@heroicons/react/solid'
 import Button from './Button'
 import Checkbox from '@components/inputs/Checkbox'
 import Divider from './Divider'
-import { DisplayAddress } from '@cardinal/namespaces-components'
 import { tryParseKey } from 'tools/validators/pubkey'
 import { XCircleIcon } from '@heroicons/react/outline'
 import Tooltip from './Tooltip'
@@ -26,6 +22,8 @@ import {
 } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useConnection } from '@solana/wallet-adapter-react'
+import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
+import { ProfileName } from "@components/Profile";
 
 const DelegateCard = () => {
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
@@ -50,7 +48,7 @@ const DelegateCard = () => {
 
     try {
       setLoading(true)
-      const programVersion = await getGovernanceProgramVersion(
+      const programVersion = await fetchProgramVersion(
         connection,
         realm.owner // governance program public key
       )
@@ -109,7 +107,7 @@ const DelegateCard = () => {
     }
 
     try {
-      const programVersion = await getGovernanceProgramVersion(
+      const programVersion = await fetchProgramVersion(
         connection,
         realm.owner // governance program public key
       )
@@ -163,12 +161,11 @@ const DelegateCard = () => {
               </div>
               {ownCouncilTokenRecord?.account.governanceDelegate && (
                 <div className="flex items-center content-center">
-                  <DisplayAddress
-                    connection={connection}
-                    address={ownCouncilTokenRecord?.account.governanceDelegate}
-                    height="12px"
-                    width="100px"
-                    dark={true}
+                  <ProfileName
+                      publicKey={ownCouncilTokenRecord?.account.governanceDelegate}
+                      height="12px"
+                      width="100px"
+                      dark={true}
                   />
                   <Tooltip content={'Remove Delegate'}>
                     <XCircleIcon
@@ -188,9 +185,8 @@ const DelegateCard = () => {
 
               {ownTokenRecord?.account.governanceDelegate && (
                 <div className="flex items-center content-center">
-                  <DisplayAddress
-                    connection={connection}
-                    address={ownTokenRecord?.account.governanceDelegate}
+                  <ProfileName
+                    publicKey={ownTokenRecord?.account.governanceDelegate}
                     height="12px"
                     width="100px"
                     dark={true}

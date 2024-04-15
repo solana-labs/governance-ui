@@ -15,7 +15,7 @@ import useQueryContext from '@hooks/useQueryContext'
 import { useRouter } from 'next/router'
 import { notify } from '@utils/notifications'
 import useRealm from '@hooks/useRealm'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Button from '@components/Button'
 import * as yup from 'yup'
 import { useDropzone } from 'react-dropzone'
@@ -30,6 +30,7 @@ import { Metaplex } from '@metaplex-foundation/js'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import {useVoteByCouncilToggle} from "@hooks/useVoteByCouncilToggle";
 
 interface GovernanceConfigForm {
   mintAccount: AssetAccount | undefined
@@ -51,7 +52,7 @@ const MetadataCreationModal = ({
 }) => {
   const router = useRouter()
   const realm = useRealmQuery().data?.result
-  const { canChooseWhoVote, symbol, realmInfo } = useRealm()
+  const {symbol, realmInfo } = useRealm()
   const programId: PublicKey | undefined = realmInfo?.programId
 
   const { assetAccounts } = useGovernanceAssets()
@@ -65,7 +66,7 @@ const MetadataCreationModal = ({
   const { handleCreateProposal } = useCreateProposal()
   const [formErrors, setFormErrors] = useState({})
   const [creatingProposal, setCreatingProposal] = useState(false)
-  const [voteByCouncil, setVoteByCouncil] = useState(false)
+  const { voteByCouncil, shouldShowVoteByCouncilToggle, setVoteByCouncil } = useVoteByCouncilToggle();
   const [selectedImage, setSelectedImage] = useState<null | string>(null)
   const [imageFile, setImageFile] = useState<null | Buffer>(null)
   const [mintAuthority, setMintAuthority] = useState<
@@ -400,13 +401,13 @@ const MetadataCreationModal = ({
           }
         ></Textarea>
 
-        {canChooseWhoVote && (
-          <VoteBySwitch
-            checked={voteByCouncil}
-            onChange={() => {
-              setVoteByCouncil(!voteByCouncil)
-            }}
-          ></VoteBySwitch>
+        {shouldShowVoteByCouncilToggle && (
+            <VoteBySwitch
+                checked={voteByCouncil}
+                onChange={() => {
+                  setVoteByCouncil(!voteByCouncil)
+                }}
+            ></VoteBySwitch>
         )}
       </div>
       <div className="flex justify-end pt-6 mt-6 space-x-4 border-t border-fgd-4">

@@ -1,42 +1,43 @@
-import { useState } from 'react'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
 
+import useQueryContext from '@hooks/useQueryContext'
 import { PublicKey } from '@solana/web3.js'
 import createTokenizedRealm from 'actions/createTokenizedRealm'
-import useQueryContext from '@hooks/useQueryContext'
 
 import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
 
 import { notify } from '@utils/notifications'
 
 import FormPage from '@components/NewRealmWizard/PageTemplate'
+import AddCouncilForm, {
+  AddCouncil,
+  AddCouncilSchema,
+} from '@components/NewRealmWizard/components/steps/AddCouncilForm'
 import BasicDetailsForm, {
-  BasicDetailsSchema,
   BasicDetails,
+  BasicDetailsSchema,
 } from '@components/NewRealmWizard/components/steps/BasicDetailsForm'
 import CommunityTokenDetailsForm, {
-  CommunityTokenSchema,
   CommunityToken,
+  CommunityTokenSchema,
 } from '@components/NewRealmWizard/components/steps/CommunityTokenDetailsForm'
+import InviteMembersForm, {
+  InviteMembers,
+  InviteMembersSchema,
+} from '@components/NewRealmWizard/components/steps/InviteMembersForm'
 import YesVotePercentageForm, {
-  CommunityYesVotePercentageSchema,
   CommunityYesVotePercentage,
+  CommunityYesVotePercentageSchema,
   CouncilYesVotePercentageSchema,
 } from '@components/NewRealmWizard/components/steps/YesVotePercentageThresholdForm'
-import AddCouncilForm, {
-  AddCouncilSchema,
-  AddCouncil,
-} from '@components/NewRealmWizard/components/steps/AddCouncilForm'
-import InviteMembersForm, {
-  InviteMembersSchema,
-  InviteMembers,
-} from '@components/NewRealmWizard/components/steps/InviteMembersForm'
+import { PluginName } from '@constants/plugins'
+import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import {
   GoverningTokenConfigAccountArgs,
   GoverningTokenType,
 } from '@solana/spl-governance'
-import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
-import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
 export const FORM_NAME = 'tokenized'
 
@@ -55,6 +56,12 @@ const transformFormData2RealmCreation = (formData: CommunityTokenForm) => {
 
   const programIdAddress = formData?.programId || DEFAULT_GOVERNANCE_PROGRAM_ID
 
+  // If plugins are being added to the realm, we want to delay setting the realm authority
+  // until after they are added, so that the plugins can be added by the current wallet, without going through
+  // a proposal.
+  // If more plugins are included in the Community token flow, then we should generalise this
+  const shouldSkipSettingRealmAuthority = formData.isQuadratic ?? false
+
   const params = {
     ...{
       programIdAddress,
@@ -72,7 +79,11 @@ const transformFormData2RealmCreation = (formData: CommunityTokenForm) => {
         formData.transferCommunityMintAuthority ?? true,
       // COUNCIL INFO
       createCouncil: formData.addCouncil ?? false,
-
+      communityTokenConfig: new GoverningTokenConfigAccountArgs({
+        tokenType: GoverningTokenType.Liquid,
+        voterWeightAddin: undefined,
+        maxVoterWeightAddin: undefined,
+      }),
       existingCouncilMintPk: formData.councilTokenMintAddress
         ? new PublicKey(formData.councilTokenMintAddress)
         : undefined,
@@ -80,6 +91,11 @@ const transformFormData2RealmCreation = (formData: CommunityTokenForm) => {
         formData.transferCouncilMintAuthority ?? true,
       councilWalletPks:
         formData?.memberAddresses?.map((w) => new PublicKey(w)) || [],
+      skipRealmAuthority: shouldSkipSettingRealmAuthority,
+      coefficientA: formData.coefficientA,
+      coefficientB: formData.coefficientB,
+      coefficientC: formData.coefficientC,
+      civicPass: formData.civicPass,
     },
     ...(formData._programVersion === 3
       ? ({
@@ -157,10 +173,18 @@ export default function CommunityTokenWizard() {
         throw new Error('No valid wallet connected')
       }
 
+      // A Quadratic Voting DAO includes two plugins:
+      // - Gateway Plugin: sybil resistance protection (by default provided by civic.com)
+      // - QV Plugin: adapt the vote weight according to the quadratic formula: ax^1/2 + bx + c
+      const pluginList: PluginName[] = formData.isQuadratic
+        ? ['gateway', 'QV']
+        : []
+
       const results = await createTokenizedRealm({
         wallet,
         connection: connection.current,
         ...transformFormData2RealmCreation(formData),
+        pluginList,
       })
 
       if (results) {

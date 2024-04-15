@@ -2,7 +2,6 @@ import Modal from '@components/Modal'
 import ModalHeader from './ModalHeader'
 import SolendModalContent from './SolendModalContent'
 import { SolendStrategy } from 'Strategies/types/types'
-import EverlendModalContent from './EverlendModalContent'
 import { PsyFiStrategies } from './psyfi'
 import { AssetAccount } from '@utils/uiTypes/assets'
 
@@ -41,14 +40,6 @@ const DepositModal = ({
       {protocolName === 'Solend' ? (
         <SolendModalContent
           proposedInvestment={proposedInvestment as SolendStrategy}
-          governedTokenAccount={governedTokenAccount}
-          handledMint={handledMint}
-          createProposalFcn={createProposalFcn}
-        />
-      ) : null}
-      {protocolName === 'Everlend' ? (
-        <EverlendModalContent
-          proposedInvestment={proposedInvestment}
           governedTokenAccount={governedTokenAccount}
           handledMint={handledMint}
           createProposalFcn={createProposalFcn}

@@ -5,7 +5,6 @@ import { WSOL_MINT } from '@components/instructions/tools'
 import useStrategiesStore from 'Strategies/store/useStrategiesStore'
 import { AssetType, Sol, Token } from '@models/treasury/Asset'
 import { Result, Status, Ok } from '@utils/uiTypes/Result'
-import { EVERLEND } from 'Strategies/protocols/everlend/tools'
 import { SOLEND } from 'Strategies/protocols/solend'
 import { TreasuryStrategy } from 'Strategies/types/types'
 import loadData from './loadData'
@@ -62,7 +61,7 @@ export function useAccountInvestments(args: Args) {
   )
 
   useEffect(() => {
-    getStrategies(connection)
+    getStrategies()
     setCalledGetStrategies(true)
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [])
@@ -86,9 +85,6 @@ export function useAccountInvestments(args: Args) {
         tokenAmount,
         wallet: args.wallet,
         connection: connection.current,
-        loadEverlend: !!visibleInvestments.filter(
-          (x) => x.protocolName === EVERLEND
-        ).length,
         loadSolend: !!visibleInvestments.filter(
           (x) => x.protocolName === SOLEND
         ).length,

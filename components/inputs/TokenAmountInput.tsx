@@ -15,6 +15,10 @@ type Props = Omit<
   setError: (x: string | undefined) => void
 }
 
+/**
+ * @deprecated
+ * I feel like I must have been on drugs when I wrote this
+ */
 const TokenAmountInput: FC<Props> = ({
   mint,
   setValue,

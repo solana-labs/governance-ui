@@ -5,17 +5,20 @@ import { getMintDecimalAmount } from '@tools/sdk/units'
 import { LightningBoltIcon } from '@heroicons/react/solid'
 import Tooltip from '@components/Tooltip'
 import VotingPowerPct from '@components/ProposalVotingPower/VotingPowerPct'
+import clsx from "clsx";
 
 const VotingPowerBox = ({
   votingPower,
   mint,
   votingPowerFromDeposits,
+  isLastPlugin = true,
   className = '',
   style,
 }: {
   votingPower: BN
   mint: MintInfo
   votingPowerFromDeposits: BN
+  isLastPlugin?: boolean
   className?: string
   style?: any
 }) => {
@@ -33,14 +36,13 @@ const VotingPowerBox = ({
 
   return (
     <>
-      {' '}
       <div
         className={`bg-bkg-1 flex justify-between items-center rounded-md ${className}`}
         style={style}
       >
         <div>
-          <p className="text-fgd-3">Votes</p>
-          <span className="mb-0 flex font-bold items-center hero-text">
+          <p className="text-fgd-3">{ isLastPlugin ? 'Votes' : 'Token Power via Locking'}</p>
+          <span className={clsx("mb-0 flex font-bold items-center", (isLastPlugin ? "hero-text" : "text-xs"))}>
             {votingPowerBigNum.toFormat(2)}{' '}
             {!votingPowerFromDeposits.isZero() && !votingPower.isZero() && (
               <Tooltip content="Vote Weight Multiplier – Increase your vote weight by locking tokens">

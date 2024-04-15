@@ -35,11 +35,31 @@ export const useTokenAccountsByOwnerQuery = (pubkey: PublicKey | undefined) => {
       results.forEach((x) => {
         queryClient.setQueryData(
           tokenAccountQueryKeys.byPubkey(connection.rpcEndpoint, x.publicKey),
-          { found: true, result: x }
+          { found: true, result: x.account }
         )
       })
 
       return results
+    },
+    enabled,
+  })
+
+  return query
+}
+
+export const useTokenAccountByPubkeyQuery = (pubkey: PublicKey | undefined) => {
+  const { connection } = useConnection()
+
+  const enabled = pubkey !== undefined
+  const query = useQuery({
+    queryKey: enabled
+      ? tokenAccountQueryKeys.byPubkey(connection.rpcEndpoint, pubkey)
+      : undefined,
+    queryFn: async () => {
+      if (!enabled) throw new Error()
+      return asFindable((...x: Parameters<typeof tryGetTokenAccount>) =>
+        tryGetTokenAccount(...x).then((x) => x?.account)
+      )(connection, pubkey)
     },
     enabled,
   })

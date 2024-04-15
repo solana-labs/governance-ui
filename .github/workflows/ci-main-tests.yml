@@ -15,19 +15,14 @@ jobs:
       contents: read
       security-events: write
 
-    strategy:
-      fail-fast: false
-      matrix:
-        language: ['javascript']
-
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Initialise CodeQL
         uses: github/codeql-action/init@v2
         with:
-          languages: ${{ matrix.language }}
+          languages: 'javascript'
 
       - name: Run CodeQL
         uses: github/codeql-action/analyze@v2
@@ -37,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Report all vulnerabilities GitHub security tab
       - name: Report on all vulnerabilities
@@ -71,12 +66,12 @@ jobs:
       runs-on: ubuntu-latest
       steps:
         - name: Checkout repository
-          uses: actions/checkout@v3
+          uses: actions/checkout@v4
 
         - name: Setup Node
-          uses: actions/setup-node@v3
+          uses: actions/setup-node@v4
           with:
-            node-version: lts/*
+            node-version: 20
             cache: yarn
 
         - name: Cache dependencies
@@ -86,7 +81,7 @@ jobs:
             key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
         - name: Install dependencies
-          run: yarn install --frozen-lockfile
+          run: yarn ci
 
         - name: Run tests
           run: yarn test-all

@@ -1,10 +1,11 @@
 import Tooltip from '@components/Tooltip'
 import { InformationCircleIcon } from '@heroicons/react/outline'
+import { fetchJupiterPrice } from '@hooks/queries/jupiterPrice'
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { getMintDecimalAmount } from '@tools/sdk/units'
-import tokenPriceService from '@utils/services/tokenPrice'
 import BN from 'bn.js'
+import { useAsync } from 'react-async-hook'
 
 const InfoBox = ({
   title,
@@ -27,11 +28,19 @@ const InfoBox = ({
       ? formatter.format(getMintDecimalAmount(mint, val).toNumber())
       : '0'
   }
-  const price = realm
-    ? tokenPriceService.getUSDTokenPrice(realm.account.communityMint.toBase58())
-    : 0
+
+  const { result: price } = useAsync(
+    async () =>
+      realm
+        ? await fetchJupiterPrice(realm.account.communityMint).then((x) =>
+            x.found ? x.result.price : 0
+          )
+        : undefined,
+    [realm]
+  )
+
   const totalPrice =
-    val !== undefined
+    val !== undefined && price !== undefined
       ? mint
         ? formatter.format(getMintDecimalAmount(mint, val).toNumber() * price)
         : ''

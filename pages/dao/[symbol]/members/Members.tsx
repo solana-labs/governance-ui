@@ -1,5 +1,5 @@
 import useRealm from '@hooks/useRealm'
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import MemberOverview from '@components/Members/MemberOverview'
 import { PlusCircleIcon, SearchIcon, UsersIcon } from '@heroicons/react/outline'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -12,9 +12,13 @@ import MembersTabs from '@components/Members/MembersTabs'
 import Select from '@components/inputs/Select'
 import Input from '@components/inputs/Input'
 import { Member } from '@utils/uiTypes/members'
-import useMembersStore from 'stores/useMembersStore'
 import PaginationComponent from '@components/Pagination'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useMembersQuery } from '@components/Members/useMembers'
+import { useConnection } from '@solana/wallet-adapter-react'
+import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
+import { determineVotingPowerType } from '@hooks/queries/governancePower'
+import { useAsync } from 'react-async-hook'
 
 const Members = () => {
   const {
@@ -24,7 +28,7 @@ const Members = () => {
   } = useRealm()
   const pagination = useRef<{ setPage: (val) => void }>(null)
   const membersPerPage = 10
-  const activeMembers = useMembersStore((s) => s.compact.activeMembers)
+
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const {
@@ -32,19 +36,41 @@ const Members = () => {
     canMintRealmCouncilToken,
   } = useGovernanceAssets()
   const [paginatedMembers, setPaginatedMembers] = useState<Member[]>([])
-  const [activeMember, setActiveMember] = useState<Member>(activeMembers[0])
+  const [activeMember, setActiveMember] = useState<Member>()
   const [openAddMemberModal, setOpenAddMemberModal] = useState(false)
   const [searchString, setSearchString] = useState('')
   const [filteredMembers, setFilteredMembers] = useState<Member[]>([])
+
+  const { connection } = useConnection()
+  const realmPk = useSelectedRealmPubkey()
+  const { data: activeMembersData } = useMembersQuery()
+
+  const { result: kind } = useAsync(async () => {
+    if (realmPk === undefined) return undefined
+    return determineVotingPowerType(connection, realmPk, 'community')
+  }, [connection, realmPk])
+
+  // if this is not vanilla or NFT, this view is used only to show council. filter accordingly.
+  const councilOnly = !(kind === 'vanilla' || kind === 'NFT')
+  const activeMembers = useMemo(
+    () =>
+      councilOnly
+        ? activeMembersData?.filter((x) => x.councilVotes.gtn(0))
+        : activeMembersData,
+    [activeMembersData, councilOnly]
+  )
+
   const filterMembers = (v) => {
-    setSearchString(v)
-    if (v.length > 0) {
-      const filtered = activeMembers.filter((r) =>
-        r.walletAddress?.toLowerCase().includes(v.toLowerCase())
-      )
-      setFilteredMembers(filtered)
-    } else {
-      setFilteredMembers(activeMembers)
+    if (activeMembers !== undefined) {
+      setSearchString(v)
+      if (v.length > 0) {
+        const filtered = activeMembers.filter((r) =>
+          r.walletAddress?.toLowerCase().includes(v.toLowerCase())
+        )
+        setFilteredMembers(filtered)
+      } else {
+        setFilteredMembers(activeMembers)
+      }
     }
   }
 
@@ -69,17 +95,17 @@ const Members = () => {
     )
   }
   useEffect(() => {
-    if (activeMembers.length > 0) {
+    if (activeMembers && activeMembers.length > 0) {
       setActiveMember(activeMembers[0])
       setFilteredMembers(activeMembers)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [JSON.stringify(activeMembers)])
+  }, [activeMembers])
   useEffect(() => {
     setPaginatedMembers(paginateMembers(0))
     pagination?.current?.setPage(0)
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [JSON.stringify(filteredMembers)])
+
   return (
     <div className="bg-bkg-2 rounded-lg p-4 md:p-6">
       <div className="grid grid-cols-12 gap-6">
@@ -94,7 +120,7 @@ const Members = () => {
               ) : null}
               <div>
                 <p>{realmInfo?.displayName}</p>
-                <h1 className="mb-0">Members</h1>
+                <h1 className="mb-0">{councilOnly ? 'Council ' : ''}Members</h1>
               </div>
             </div>
             <div className="flex space-x-3">
@@ -103,9 +129,11 @@ const Members = () => {
                   <UsersIcon className="flex-shrink-0 h-8 mr-2 text-primary-light w-8" />
                   <div>
                     <p>Members</p>
-                    <div className="font-bold text-fgd-1 text-2xl">
-                      {activeMembers.length}
-                    </div>
+                    {activeMembers !== undefined && (
+                      <div className="font-bold text-fgd-1 text-2xl">
+                        {activeMembers.length}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -113,7 +141,7 @@ const Members = () => {
           </div>
         </div>
         <div className="col-span-12 lg:col-span-4">
-          {activeMembers.length > 15 ? (
+          {activeMembers !== undefined && activeMembers.length > 15 ? (
             <div className="hidden lg:block mb-2">
               <Input
                 className="pl-8"
@@ -129,7 +157,7 @@ const Members = () => {
             <p>
               {searchString.length > 0
                 ? `${filteredMembers.length} Members Found`
-                : `${activeMembers.length} Members`}
+                : `${activeMembers ? activeMembers.length : ''} Members`}
             </p>
             <Tooltip contentClassName="ml-auto" content={addNewMemberTooltip}>
               <LinkButton
@@ -159,7 +187,7 @@ const Members = () => {
               placeholder="Please select..."
               value={activeMember?.walletAddress}
             >
-              {activeMembers.map((x) => {
+              {activeMembers?.map((x) => {
                 return (
                   <Select.Option
                     key={x?.walletAddress}
@@ -172,11 +200,13 @@ const Members = () => {
             </Select>
           </div>
           <div className="hidden lg:block">
-            <MembersTabs
-              activeTab={activeMember}
-              onChange={(t) => setActiveMember(t)}
-              tabs={paginatedMembers}
-            />
+            {activeMember !== undefined && (
+              <MembersTabs
+                activeTab={activeMember}
+                onChange={(t) => setActiveMember(t)}
+                tabs={paginatedMembers}
+              />
+            )}
             <PaginationComponent
               ref={pagination}
               totalPages={Math.ceil(filteredMembers.length / 10)}
@@ -185,7 +215,12 @@ const Members = () => {
           </div>
         </div>
         <div className="col-span-12 lg:col-span-8">
-          {activeMember ? <MemberOverview member={activeMember} /> : null}
+          {activeMember ? (
+            <MemberOverview
+              member={activeMember}
+              activeMembers={activeMembers}
+            />
+          ) : null}
         </div>
       </div>
       {openAddMemberModal && (

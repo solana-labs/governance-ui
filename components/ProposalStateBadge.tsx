@@ -181,23 +181,25 @@ export default function ProposalStateBadge(props: Props) {
   }
 
   return (
-    <div
-      className={classNames(
-        props.className,
-        'border',
-        'inline-flex',
-        'min-w-max',
-        'items-center',
-        'px-2',
-        'py-1',
-        'rounded-full',
-        'text-xs',
-        getBorderColor(props.proposal.state, otherState),
-        getOpacity(props.proposal.state, otherState),
-        getTextColor(props.proposal.state, otherState)
-      )}
-    >
-      {getLabel(props.proposal.state, otherState)}
+    <div>
+      <div
+        className={classNames(
+          props.className,
+          'border',
+          'inline-flex',
+          'min-w-max',
+          'items-center',
+          'px-2',
+          'py-1',
+          'rounded-full',
+          'text-xs',
+          getBorderColor(props.proposal.state, otherState),
+          getOpacity(props.proposal.state, otherState),
+          getTextColor(props.proposal.state, otherState)
+        )}
+      >
+        {getLabel(props.proposal.state, otherState)}
+      </div>
     </div>
   )
 }

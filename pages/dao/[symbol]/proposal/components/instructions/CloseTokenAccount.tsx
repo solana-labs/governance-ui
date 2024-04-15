@@ -10,10 +10,8 @@ import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { AssetAccount } from '@utils/uiTypes/assets'
-import InstructionForm, {
-  InstructionInput,
-  InstructionInputType,
-} from './FormCreator'
+import InstructionForm, { InstructionInput } from './FormCreator'
+import { InstructionInputType } from './inputInstructionType'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
@@ -28,8 +26,8 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 
-export interface CloseTokenAccountForm {
-  governedAccount: AssetAccount | undefined
+interface CloseTokenAccountForm {
+  governedAccount: AssetAccount | undefined | null
   fundsDestinationAccount: string
   solRentDestination: string
 }
@@ -46,7 +44,11 @@ const CloseTokenAccount = ({
   const connection = useLegacyConnectionContext()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
-  const [form, setForm] = useState<CloseTokenAccountForm>()
+  const [form, setForm] = useState<CloseTokenAccountForm>({
+    governedAccount: null,
+    fundsDestinationAccount: '',
+    solRentDestination: '',
+  })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
   const schema = yup.object().shape({

@@ -4,7 +4,6 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useRealmAccount from '@hooks/useRealmAccount'
 import { getCertifiedRealmInfos, RealmInfo } from '@models/registry/api'
 import {
-  getGovernanceProgramVersion,
   Governance,
   ProgramAccount,
   serializeInstructionToBase64,
@@ -24,7 +23,9 @@ import { notify } from '@utils/notifications'
 import { NewProposalContext } from '../../new'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
 
+/** This is an instruction component to deposit tokens in another DAO */
 const JoinDAO = ({
   index,
   governance,
@@ -125,7 +126,7 @@ const JoinDAO = ({
       form.mintInfo.decimals
     )
 
-    const programVersion = await getGovernanceProgramVersion(
+    const programVersion = await fetchProgramVersion(
       connection.current,
       form.realm.programId
     )
@@ -161,7 +162,7 @@ const JoinDAO = ({
       ((routeHasClusterInPath && cluster) || !routeHasClusterInPath)
     ) {
       const realms = getCertifiedRealmInfos(connection)
-      setCertifiedRealms(realms.filter((r) => !!r.communityMint))
+      setCertifiedRealms(realms)
     } else setCertifiedRealms([])
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [connection.current.rpcEndpoint])
@@ -200,7 +201,11 @@ const JoinDAO = ({
         error={formErrors['realm']}
       >
         {certifiedRealms.map((r) => (
-          <Select.Option className="border-red" key="haha" value={r}>
+          <Select.Option
+            className="border-red"
+            key={r.realmId.toString()}
+            value={r}
+          >
             {r.displayName}
           </Select.Option>
         ))}

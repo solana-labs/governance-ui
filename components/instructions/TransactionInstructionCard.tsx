@@ -5,16 +5,21 @@ import InstructionProgram from './InstructionProgram'
 import { useCallback, useEffect, useState } from 'react'
 import {
   InstructionDescriptor,
+  MANGO_INSTRUCTION_FORWARDER,
   WSOL_MINT,
   getInstructionDescriptor,
 } from './tools'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import axios from 'axios'
 import tokenPriceService from '@utils/services/tokenPrice'
-import { fetchNFTbyMint } from '@hooks/queries/nft'
 import { fetchTokenAccountByPubkey } from '@hooks/queries/tokenAccount'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { useRealmQuery } from '@hooks/queries/realm'
+import queryClient from '@hooks/queries/queryClient'
+import {
+  dasByIdQueryFn,
+  digitalAssetsQueryKeys,
+} from '@hooks/queries/digitalAssets'
+import { getNetworkFromEndpoint } from '@utils/connection'
 
 const TransactionInstructionCard = ({
   instructionData,
@@ -25,10 +30,16 @@ const TransactionInstructionCard = ({
 }) => {
   const connection = useLegacyConnectionContext()
   const realm = useRealmQuery().data?.result
-  const {
-    nftsGovernedTokenAccounts,
-    governedTokenAccountsWithoutNfts,
-  } = useGovernanceAssets()
+  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
+  const instructionUseInstructionForwarder =
+    instructionData.programId.toBase58() === MANGO_INSTRUCTION_FORWARDER
+  const instructionAccounts = instructionUseInstructionForwarder
+    ? [...instructionData.accounts.slice(2, instructionData.accounts.length)]
+    : instructionData.accounts
+
+  const programId = instructionUseInstructionForwarder
+    ? instructionData.accounts[1].pubkey
+    : instructionData.programId
 
   const [descriptor, setDescriptor] = useState<InstructionDescriptor>()
   const [nftImgUrl, setNftImgUrl] = useState('')
@@ -55,24 +66,19 @@ const TransactionInstructionCard = ({
     const isSol = governedTokenAccountsWithoutNfts.find(
       (x) => x.extensions.transferAddress?.toBase58() === sourcePk.toBase58()
     )?.isSol
-    const isNFTAccount = nftsGovernedTokenAccounts.find(
-      (x) =>
-        x.extensions.transferAddress?.toBase58() ===
-          tokenAccount?.owner.toBase58() ||
-        x.governance.pubkey.toBase58() === tokenAccount?.owner.toBase58()
-    )
 
-    if (isNFTAccount && mint) {
-      try {
-        const result = await fetchNFTbyMint(connection.current, mint)
-        if (result.found) {
-          const url = (await axios.get(result.result.uri)).data
-          setNftImgUrl(url.image)
-        }
-      } catch (e) {
-        console.log(e)
+    if (mint) {
+      const network = getNetworkFromEndpoint(connection.current.rpcEndpoint)
+      if (network === 'localnet') throw new Error()
+
+      const { result: nft } = await queryClient.fetchQuery({
+        queryKey: digitalAssetsQueryKeys.byId(network, mint),
+        queryFn: () => dasByIdQueryFn(network, mint),
+        staleTime: Infinity,
+      })
+      if (nft !== undefined) {
+        setNftImgUrl(nft.content.files[0]?.cdn_uri ?? nft.content.files[0]?.uri)
       }
-      return
     }
 
     if (isSol) {
@@ -87,7 +93,7 @@ const TransactionInstructionCard = ({
       setTokenImgUrl(imgUrl)
     }
     return
-  }, [instructionData.accounts])
+  }, [connection, governedTokenAccountsWithoutNfts, instructionData.accounts])
 
   useEffect(() => {
     handleGetDescriptors()
@@ -110,16 +116,17 @@ const TransactionInstructionCard = ({
       </div>
       <InstructionProgram
         connection={connection}
-        programId={instructionData.programId}
+        programId={programId}
       ></InstructionProgram>
       <div className="border-b border-bkg-4 mb-6">
-        {instructionData.accounts.map((am, idx) => (
+        {instructionAccounts.map((am, idx) => (
           <InstructionAccount
             endpoint={connection.endpoint}
             key={idx}
             index={idx}
             accountMeta={am}
             descriptor={descriptor}
+            programId={programId}
           />
         ))}
       </div>

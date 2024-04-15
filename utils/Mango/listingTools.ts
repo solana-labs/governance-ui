@@ -1,23 +1,54 @@
 import {
+  Bank,
+  Group,
+  I80F48,
+  OPENBOOK_PROGRAM_ID,
   RouteInfo,
   toNative,
   toUiDecimals,
+  toUiDecimalsForQuote,
 } from '@blockworks-foundation/mango-v4'
-import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
+import {
+  LISTING_PRESET,
+  LISTING_PRESETS,
+  LISTING_PRESETS_KEY,
+  getPresetWithAdjustedNetBorrows,
+  getPresetWithAdjustedDepositLimit,
+  getPythPresets,
+  getSwitchBoardPresets,
+} from '@blockworks-foundation/mango-v4-settings/lib/helpers/listingTools'
+import { AnchorProvider, BN, Program, Wallet } from '@coral-xyz/anchor'
 import { MAINNET_USDC_MINT } from '@foresight-tmp/foresight-sdk/dist/consts'
-import { PythHttpClient } from '@pythnetwork/client'
-import { Connection, Keypair, PublicKey, Transaction } from '@solana/web3.js'
+import { Market } from '@project-serum/serum'
+import { PythHttpClient, parsePriceData } from '@pythnetwork/client'
+import {
+  AccountInfo,
+  Connection,
+  Keypair,
+  PublicKey,
+  Transaction,
+  VersionedTransaction,
+} from '@solana/web3.js'
+import SwitchboardProgram from '@switchboard-xyz/sbv2-lite'
+import { notify } from '@utils/notifications'
+import Big from 'big.js'
 import { secondsToHours } from 'date-fns'
 
-export const MAINNET_PYTH_PROGRAM = new PublicKey(
+export const REDUCE_ONLY_OPTIONS = [
+  { value: 0, name: 'Disabled' },
+  { value: 1, name: 'No borrows and no deposits' },
+  { value: 2, name: 'No borrows' },
+]
+
+const MAINNET_PYTH_PROGRAM = new PublicKey(
   'FsJ3A3u2vn5cTVofAjvy6y5kwABJAqYWpe4975bi2epH'
 )
 
-export type ListingArgs = {
+export type FlatListingArgs = {
   name: string
   tokenIndex: number
   'oracleConfig.confFilter': number
-  'oracleConfig.maxStalenessSlots': number
+  'oracleConfig.maxStalenessSlots': number | null
   'interestRateParams.util0': number
   'interestRateParams.rate0': number
   'interestRateParams.util1': number
@@ -31,19 +62,85 @@ export type ListingArgs = {
   maintLiabWeight: number
   initLiabWeight: number
   liquidationFee: number
+  platformLiquidationFee: number
   minVaultToDepositsRatio: number
   netBorrowLimitPerWindowQuote: number
   netBorrowLimitWindowSizeTs: number
-  insuranceFound: boolean
-  borrowWeightScale: number
-  depositWeightScale: number
+  borrowWeightScaleStartQuote: number
+  depositWeightScaleStartQuote: number
+  stablePriceDelayGrowthLimit: number
+  stablePriceDelayIntervalSeconds: number
+  stablePriceGrowthLimit: number
+  tokenConditionalSwapMakerFeeRate: number
+  tokenConditionalSwapTakerFeeRate: number
+  flashLoanSwapFeeRate: number
+  reduceOnly: number
+  groupInsuranceFund: boolean
+  oracle: PublicKey
+  depositLimit: number
+  interestTargetUtilization: number
+  interestCurveScaling: number
+  setFallbackOracle: boolean
+  maintWeightShiftAbort: boolean
+  zeroUtilRate: number
+  disableAssetLiquidation: boolean
+  collateralFeePerDay: number
+}
+
+export type FlatEditArgs = {
+  nameOpt: string
+  tokenIndex: number
+  'oracleConfigOpt.confFilter': number
+  'oracleConfigOpt.maxStalenessSlots': number
+  'interestRateParamsOpt.util0': number
+  'interestRateParamsOpt.rate0': number
+  'interestRateParamsOpt.util1': number
+  'interestRateParamsOpt.rate1': number
+  'interestRateParamsOpt.maxRate': number
+  'interestRateParamsOpt.adjustmentFactor': number
+  loanFeeRateOpt: number
+  loanOriginationFeeRateOpt: number
+  maintAssetWeightOpt: number
+  initAssetWeightOpt: number
+  maintLiabWeightOpt: number
+  initLiabWeightOpt: number
+  liquidationFeeOpt: number
+  platformLiquidationFeeOpt: number
+  minVaultToDepositsRatioOpt: number
+  netBorrowLimitPerWindowQuoteOpt: number
+  netBorrowLimitWindowSizeTsOpt: number
+  borrowWeightScaleStartQuoteOpt: number
+  depositWeightScaleStartQuoteOpt: number
+  stablePriceDelayGrowthLimitOpt: number
+  stablePriceDelayIntervalSecondsOpt: number
+  stablePriceGrowthLimitOpt: number
+  tokenConditionalSwapMakerFeeRateOpt: number
+  tokenConditionalSwapTakerFeeRateOpt: number
+  flashLoanSwapFeeRateOpt: number
+  reduceOnlyOpt: number
+  groupInsuranceFundOpt: boolean
+  oracleOpt: PublicKey
+  interestCurveScalingOpt: number
+  interestTargetUtilizationOpt: number
+  maintWeightShiftStartOpt: BN
+  maintWeightShiftEndOpt: BN
+  maintWeightShiftAssetTargetOpt: number
+  maintWeightShiftLiabTargetOpt: number
+  maintWeightShiftAbort: boolean
+  setFallbackOracle: boolean
+  depositLimitOpt: number
+  zeroUtilRateOpt: number
+  disableAssetLiquidationOpt: boolean
+  collateralFeePerDayOpt: number
+  forceWithdrawOpt: boolean
+  forceCloseOpt: boolean
 }
 
 export type ListingArgsFormatted = {
   tokenIndex: number
   tokenName: string
   oracleConfidenceFilter: string
-  oracleMaxStalenessSlots: number
+  oracleMaxStalenessSlots: number | null
   interestRateUtilizationPoint1: string
   interestRateUtilizationPoint0: string
   interestRatePoint0: string
@@ -57,214 +154,275 @@ export type ListingArgsFormatted = {
   maintLiabWeight: string
   initLiabWeight: string
   liquidationFee: string
+  platformLiquidationFee: string
   minVaultToDepositsRatio: string
   netBorrowLimitPerWindowQuote: number
   netBorrowLimitWindowSizeTs: number
+  borrowWeightScaleStartQuote: number
+  depositWeightScaleStartQuote: number
+  stablePriceDelayGrowthLimit: string
+  stablePriceDelayIntervalSeconds: number
+  stablePriceGrowthLimit: string
+  tokenConditionalSwapMakerFeeRate: number
+  tokenConditionalSwapTakerFeeRate: number
+  flashLoanSwapFeeRate: string
+  reduceOnly: string
+  oracle: string
+  depositLimit: string
+  interestTargetUtilization: number
+  interestCurveScaling: number
+  groupInsuranceFund: boolean
+  zeroUtilRate: string
+  disableAssetLiquidation: boolean
+  collateralFeePerDay: string
 }
 
-export const getFormattedListingValues = (args: ListingArgs) => {
-  const formattedArgs: ListingArgsFormatted = {
-    tokenIndex: args.tokenIndex,
-    tokenName: args.name,
-    oracleConfidenceFilter: (args['oracleConfig.confFilter'] * 100).toFixed(2),
-    oracleMaxStalenessSlots: args['oracleConfig.maxStalenessSlots'],
-    interestRateUtilizationPoint0: (
-      args['interestRateParams.util0'] * 100
-    ).toFixed(2),
-    interestRatePoint0: (args['interestRateParams.rate0'] * 100).toFixed(2),
-    interestRateUtilizationPoint1: (
-      args['interestRateParams.util1'] * 100
-    ).toFixed(2),
-    interestRatePoint1: (args['interestRateParams.rate1'] * 100).toFixed(2),
-    maxRate: (args['interestRateParams.maxRate'] * 100).toFixed(2),
-    adjustmentFactor: (
-      args['interestRateParams.adjustmentFactor'] * 100
-    ).toFixed(2),
-    loanFeeRate: (args.loanFeeRate * 10000).toFixed(2),
-    loanOriginationFeeRate: (args.loanOriginationFeeRate * 10000).toFixed(2),
-    maintAssetWeight: args.maintAssetWeight.toFixed(2),
-    initAssetWeight: args.initAssetWeight.toFixed(2),
-    maintLiabWeight: args.maintLiabWeight.toFixed(2),
-    initLiabWeight: args.initLiabWeight.toFixed(2),
-    liquidationFee: (args['liquidationFee'] * 100).toFixed(2),
-    minVaultToDepositsRatio: (args['minVaultToDepositsRatio'] * 100).toFixed(2),
-    netBorrowLimitPerWindowQuote: toUiDecimals(
-      args['netBorrowLimitPerWindowQuote'],
-      6
-    ),
-    netBorrowLimitWindowSizeTs: secondsToHours(args.netBorrowLimitWindowSizeTs),
+export type EditTokenArgsFormatted = ListingArgsFormatted & {
+  maintWeightShiftStart: number
+  maintWeightShiftEnd: number
+  maintWeightShiftAssetTarget: number
+  maintWeightShiftLiabTarget: number
+  maintWeightShiftAbort: boolean
+  setFallbackOracle: boolean
+  forceWithdraw: boolean
+  forceClose: boolean
+}
+
+const transformPresetToProposed = (listingPreset: LISTING_PRESET) => {
+  const proposedPreset: FormattedListingPreset = {
+    ...listingPreset,
+    'oracleConfig.maxStalenessSlots':
+      listingPreset.maxStalenessSlots === -1
+        ? null
+        : listingPreset.maxStalenessSlots!,
+    'oracleConfig.confFilter': listingPreset.oracleConfFilter,
+    'interestRateParams.adjustmentFactor': listingPreset.adjustmentFactor,
+    'interestRateParams.util0': listingPreset.util0,
+    'interestRateParams.rate0': listingPreset.rate0,
+    'interestRateParams.util1': listingPreset.util1,
+    'interestRateParams.rate1': listingPreset.rate1,
+    'interestRateParams.maxRate': listingPreset.maxRate,
+    groupInsuranceFund: listingPreset.groupInsuranceFund,
+    maintWeightShiftAbort: false,
+    setFallbackOracle: false,
   }
-  return formattedArgs
+
+  return proposedPreset
 }
 
-const listingBase: Omit<ListingArgs, 'name' | 'tokenIndex'> = {
-  'oracleConfig.maxStalenessSlots': 120,
-  'oracleConfig.confFilter': 0.1,
-  'interestRateParams.adjustmentFactor': 0.004,
-  'interestRateParams.util0': 0.5,
-  'interestRateParams.rate0': 0.052,
-  'interestRateParams.util1': 0.8,
-  'interestRateParams.rate1': 0.1446,
-  'interestRateParams.maxRate': 1.4456,
-  loanFeeRate: 0.005,
-  loanOriginationFeeRate: 0.001,
-  maintAssetWeight: 0.9,
-  initAssetWeight: 0.8,
-  maintLiabWeight: 1.1,
-  initLiabWeight: 1.2,
-  liquidationFee: 0.05,
-  minVaultToDepositsRatio: 0.2,
-  netBorrowLimitWindowSizeTs: 24 * 60 * 60,
-  netBorrowLimitPerWindowQuote: toNative(50000, 6).toNumber(),
-  insuranceFound: true,
-  borrowWeightScale: toNative(250000, 6).toNumber(),
-  depositWeightScale: toNative(250000, 6).toNumber(),
+type FormattedListingPreset = Omit<
+  FlatListingArgs,
+  'name' | 'tokenIndex' | 'oracle'
+>
+
+type ProposedListingPresets = {
+  [key in LISTING_PRESETS_KEY]: FormattedListingPreset
 }
 
-export type LISTING_PRESETS_KEYS =
-  | 'PREMIUM'
-  | 'MID'
-  | 'MEME'
-  | 'SHIT'
-  | 'UNTRUSTED'
+export const getFormattedListingPresets = (
+  isPythOracle: boolean,
+  uiDeposits?: number,
+  decimals?: number,
+  tokenPrice?: number
+) => {
+  const PRESETS = !isPythOracle
+    ? getSwitchBoardPresets(LISTING_PRESETS)
+    : getPythPresets(LISTING_PRESETS)
 
-export const LISTING_PRESETS: {
-  [key in LISTING_PRESETS_KEYS]:
-    | (typeof listingBase & { presetName: string })
-    | Record<string, never>
-} = {
-  //Price impact $100,000 < 1%
-  PREMIUM: {
-    ...listingBase,
-    presetName: 'Premium',
-  },
-  //Price impact $20,000 < 1%
-  MID: {
-    ...listingBase,
-    maintAssetWeight: 0.75,
-    initAssetWeight: 0.5,
-    maintLiabWeight: 1.2,
-    initLiabWeight: 1.4,
-    liquidationFee: 0.1,
-    netBorrowLimitPerWindowQuote: toNative(20000, 6).toNumber(),
-    presetName: 'Mid',
-    borrowWeightScale: toNative(50000, 6).toNumber(),
-    depositWeightScale: toNative(50000, 6).toNumber(),
-    insuranceFound: false,
-  },
-  //Price impact $5,000 < 1%
-  MEME: {
-    ...listingBase,
-    'oracleConfig.maxStalenessSlots': 800,
-    loanOriginationFeeRate: 0.002,
-    maintAssetWeight: 0,
-    initAssetWeight: 0,
-    maintLiabWeight: 1.25,
-    initLiabWeight: 1.5,
-    liquidationFee: 0.125,
-    netBorrowLimitPerWindowQuote: toNative(5000, 6).toNumber(),
-    borrowWeightScale: toNative(20000, 6).toNumber(),
-    depositWeightScale: toNative(20000, 6).toNumber(),
-    insuranceFound: false,
-    presetName: 'Meme',
-  },
-  //Price impact $1,000 < 1%
-  SHIT: {
-    ...listingBase,
-    'oracleConfig.maxStalenessSlots': 800,
-    loanOriginationFeeRate: 0.002,
-    maintAssetWeight: 0,
-    initAssetWeight: 0,
-    maintLiabWeight: 1.4,
-    initLiabWeight: 1.8,
-    liquidationFee: 0.2,
-    netBorrowLimitPerWindowQuote: toNative(1000, 6).toNumber(),
-    borrowWeightScale: toNative(5000, 6).toNumber(),
-    depositWeightScale: toNative(5000, 6).toNumber(),
-    insuranceFound: false,
-    presetName: 'Shit',
-  },
-  UNTRUSTED: {},
+  const PROPOSED_LISTING_PRESETS: ProposedListingPresets = Object.keys(
+    PRESETS
+  ).reduce((accumulator, key) => {
+    let adjustedPreset = PRESETS[key]
+    if (uiDeposits && tokenPrice) {
+      adjustedPreset = getPresetWithAdjustedNetBorrows(
+        PRESETS[key],
+        uiDeposits,
+        tokenPrice,
+        toUiDecimals(PRESETS[key].netBorrowLimitPerWindowQuote, 6)
+      )
+    }
+
+    if (decimals && tokenPrice) {
+      adjustedPreset = getPresetWithAdjustedDepositLimit(
+        adjustedPreset,
+        tokenPrice,
+        decimals
+      )
+    }
+    accumulator[key] = transformPresetToProposed(adjustedPreset)
+    return accumulator
+  }, {} as ProposedListingPresets)
+  return PROPOSED_LISTING_PRESETS
 }
 
-export const coinTiersToNames: {
-  [key in LISTING_PRESETS_KEYS]: string
-} = {
-  PREMIUM: 'Blue Chip',
-  MID: 'Midwit',
-  MEME: 'Meme',
-  SHIT: 'Shit Coin',
-  UNTRUSTED: 'Untrusted',
-}
-
-export const fetchJupiterRoutes = async (
+const fetchJupiterRoutes = async (
   inputMint = 'So11111111111111111111111111111111111111112',
   outputMint = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
   amount = 0,
-  slippage = 50,
   swapMode = 'ExactIn',
+  slippage = 50,
   feeBps = 0
 ) => {
   {
-    const paramsString = new URLSearchParams({
-      inputMint: inputMint.toString(),
-      outputMint: outputMint.toString(),
-      amount: amount.toString(),
-      slippageBps: Math.ceil(slippage * 100).toString(),
-      feeBps: feeBps.toString(),
-      swapMode,
-    }).toString()
+    try {
+      const paramsString = new URLSearchParams({
+        inputMint: inputMint.toString(),
+        outputMint: outputMint.toString(),
+        amount: amount.toString(),
+        slippageBps: Math.ceil(slippage * 100).toString(),
+        feeBps: feeBps.toString(),
+        swapMode,
+      }).toString()
 
-    const response = await fetch(
-      `https://quote-api.jup.ag/v4/quote?${paramsString}`
-    )
+      const jupiterSwapBaseUrl =
+        process.env.NEXT_PUBLIC_JUPTER_SWAP_API_ENDPOINT ||
+        'https://public.jupiterapi.com'
+      const response = await fetch(
+        `${jupiterSwapBaseUrl}/quote?${paramsString}`
+      )
 
-    const res = await response.json()
-    const data = res.data
-
-    return {
-      routes: res.data as RouteInfo[],
-      bestRoute: (data.length ? data[0] : null) as RouteInfo | null,
+      const res = await response.json()
+      return {
+        bestRoute: (res ? res : null) as RouteInfo | null,
+      }
+    } catch (e) {
+      console.log(e)
+      return {
+        bestRoute: null,
+      }
     }
   }
 }
 
-export const getSuggestedCoinTier = async (outputMint: string) => {
-  const TIERS: LISTING_PRESETS_KEYS[] = ['PREMIUM', 'MID', 'MEME', 'SHIT']
-  const swaps = await Promise.all([
-    fetchJupiterRoutes(
-      MAINNET_USDC_MINT.toBase58(),
-      outputMint,
-      toNative(100000, 6).toNumber()
-    ),
-    fetchJupiterRoutes(
-      MAINNET_USDC_MINT.toBase58(),
-      outputMint,
-      toNative(20000, 6).toNumber()
-    ),
-    fetchJupiterRoutes(
-      MAINNET_USDC_MINT.toBase58(),
-      outputMint,
-      toNative(5000, 6).toNumber()
-    ),
-    fetchJupiterRoutes(
-      MAINNET_USDC_MINT.toBase58(),
-      outputMint,
-      toNative(1000, 6).toNumber()
-    ),
-  ])
-  const indexForTierFromSwaps = swaps.findIndex(
-    (x) => x.bestRoute?.priceImpactPct && x.bestRoute?.priceImpactPct * 100 < 1
-  )
-  const tier =
-    indexForTierFromSwaps > -1 ? TIERS[indexForTierFromSwaps] : 'UNTRUSTED'
-  return {
-    tier,
-    priceImpact: (
-      (indexForTierFromSwaps > -1
-        ? swaps[indexForTierFromSwaps].bestRoute!.priceImpactPct
-        : swaps[swaps.length - 1].bestRoute!.priceImpactPct) * 100
-    ).toFixed(2),
+export const getSuggestedCoinPresetInfo = async (
+  outputMint: string,
+  hasPythOracle: boolean
+) => {
+  try {
+    const PRESETS = !hasPythOracle
+      ? getSwitchBoardPresets(LISTING_PRESETS)
+      : getPythPresets(LISTING_PRESETS)
+
+    const swaps = await Promise.all([
+      fetchJupiterRoutes(
+        MAINNET_USDC_MINT.toBase58(),
+        outputMint,
+        toNative(250000, 6).toNumber()
+      ),
+      fetchJupiterRoutes(
+        MAINNET_USDC_MINT.toBase58(),
+        outputMint,
+        toNative(100000, 6).toNumber()
+      ),
+      fetchJupiterRoutes(
+        MAINNET_USDC_MINT.toBase58(),
+        outputMint,
+        toNative(20000, 6).toNumber()
+      ),
+      fetchJupiterRoutes(
+        MAINNET_USDC_MINT.toBase58(),
+        outputMint,
+        toNative(10000, 6).toNumber()
+      ),
+      fetchJupiterRoutes(
+        MAINNET_USDC_MINT.toBase58(),
+        outputMint,
+        toNative(5000, 6).toNumber()
+      ),
+      fetchJupiterRoutes(
+        MAINNET_USDC_MINT.toBase58(),
+        outputMint,
+        toNative(1000, 6).toNumber()
+      ),
+      fetchJupiterRoutes(
+        MAINNET_USDC_MINT.toBase58(),
+        outputMint,
+        toNative(250000, 6).toNumber(),
+        'ExactOut'
+      ),
+      fetchJupiterRoutes(
+        MAINNET_USDC_MINT.toBase58(),
+        outputMint,
+        toNative(100000, 6).toNumber(),
+        'ExactOut'
+      ),
+      fetchJupiterRoutes(
+        MAINNET_USDC_MINT.toBase58(),
+        outputMint,
+        toNative(20000, 6).toNumber(),
+        'ExactOut'
+      ),
+      fetchJupiterRoutes(
+        MAINNET_USDC_MINT.toBase58(),
+        outputMint,
+        toNative(20000, 6).toNumber(),
+        'ExactOut'
+      ),
+      fetchJupiterRoutes(
+        MAINNET_USDC_MINT.toBase58(),
+        outputMint,
+        toNative(5000, 6).toNumber(),
+        'ExactOut'
+      ),
+      fetchJupiterRoutes(
+        MAINNET_USDC_MINT.toBase58(),
+        outputMint,
+        toNative(1000, 6).toNumber(),
+        'ExactOut'
+      ),
+    ])
+    const bestRoutesSwaps = swaps
+      .filter((x) => x.bestRoute)
+      .map((x) => x.bestRoute!)
+
+    const averageSwaps = bestRoutesSwaps.reduce(
+      (acc: { amount: string; priceImpactPct: number }[], val) => {
+        if (val.swapMode === 'ExactIn') {
+          const exactOutRoute = bestRoutesSwaps.find(
+            (x) => x.outAmount === val.inAmount && x.swapMode === 'ExactOut'
+          )
+
+          acc.push({
+            amount: val.inAmount.toString(),
+            priceImpactPct: exactOutRoute?.priceImpactPct
+              ? (Number(val.priceImpactPct) +
+                  Number(exactOutRoute.priceImpactPct)) /
+                2
+              : Number(val.priceImpactPct),
+          })
+        }
+        return acc
+      },
+      []
+    )
+
+    const indexForTargetAmount = averageSwaps.findIndex(
+      (x) => x?.priceImpactPct && x?.priceImpactPct * 100 < 1
+    )
+
+    const targetAmount =
+      indexForTargetAmount > -1
+        ? toUiDecimals(new BN(averageSwaps[indexForTargetAmount].amount), 6)
+        : 0
+
+    const preset: LISTING_PRESET =
+      Object.values(PRESETS).find(
+        (x) => x.preset_target_amount === targetAmount
+      ) || PRESETS.UNTRUSTED
+
+    return {
+      presetKey: preset.preset_key,
+      priceImpact: (indexForTargetAmount > -1
+        ? averageSwaps[indexForTargetAmount]!.priceImpactPct
+        : 100
+      ).toFixed(2),
+    }
+  } catch (e) {
+    console.log(e)
+    return {
+      presetKey: 'UNTRUSTED',
+      priceImpact: '100',
+    }
   }
 }
 
@@ -283,7 +441,7 @@ export const compareObjectsAndGetDifferentKeys = <T extends object>(
   return diffKeys as (keyof T)[]
 }
 
-export const isSwitchboardOracle = async (
+const isSwitchboardOracle = async (
   connection: Connection,
   feedPk: PublicKey
 ) => {
@@ -306,6 +464,7 @@ export const isSwitchboardOracle = async (
   )
   const feeds = await switchboardProgram.account.aggregatorAccountData.all()
   const feed = feeds.find((x) => x.publicKey.equals(feedPk))
+
   return feed
     ? `https://app.switchboard.xyz/solana/mainnet-beta/feed/${feedPk.toBase58()}`
     : ''
@@ -322,7 +481,7 @@ export const isPythOracle = async (
   )
 
   if (feed) {
-    return `https://pyth.network/price-feeds/${feed.asset_type.toLowerCase()}-${feed.base.toLowerCase()}-${feed.quote_currency.toLowerCase()}?cluster=mainnet-beta`
+    return `https://pyth.network/price-feeds/${feed.asset_type.toLowerCase()}-${feed.base.toLowerCase()}-${feed.quote_currency.toLowerCase()}?cluster=solana-mainnet-beta`
   }
   return ''
 }
@@ -351,19 +510,246 @@ export const getOracle = async (connection: Connection, feedPk: PublicKey) => {
 export default class EmptyWallet implements Wallet {
   constructor(readonly payer: Keypair) {}
 
-  async signTransaction(tx: Transaction): Promise<Transaction> {
-    tx.partialSign(this.payer)
+  async signTransaction<T extends Transaction | VersionedTransaction>(
+    tx: T
+  ): Promise<T> {
+    if (tx instanceof Transaction) {
+      tx.partialSign(this.payer)
+    }
+
     return tx
   }
 
-  async signAllTransactions(txs: Transaction[]): Promise<Transaction[]> {
+  async signAllTransactions<T extends Transaction | VersionedTransaction>(
+    txs: T[]
+  ): Promise<T[]> {
     return txs.map((t) => {
-      t.partialSign(this.payer)
+      if (t instanceof Transaction) {
+        t.partialSign(this.payer)
+      }
       return t
     })
   }
 
   get publicKey(): PublicKey {
     return this.payer.publicKey
+  }
+}
+
+export const getBestMarket = async ({
+  baseMint,
+  quoteMint,
+  cluster,
+  connection,
+}: {
+  baseMint: string
+  quoteMint: string
+  cluster: 'devnet' | 'mainnet-beta'
+  connection: Connection
+}) => {
+  try {
+    const dexProgramPk = OPENBOOK_PROGRAM_ID[cluster]
+
+    const markets = await Market.findAccountsByMints(
+      connection,
+      new PublicKey(baseMint),
+      new PublicKey(quoteMint),
+      dexProgramPk
+    )
+
+    if (!markets.length) {
+      return undefined
+    }
+    const marketsDataJsons = await Promise.all([
+      ...markets.map((x) =>
+        fetch(`/openSerumApi/market/${x.publicKey.toBase58()}`)
+      ),
+    ])
+    const marketsData = await Promise.all([
+      ...marketsDataJsons.map((x) => x.json()),
+    ])
+    let error = ''
+    let sortedMarkets = marketsData.sort((a, b) => b.volume24h - a.volume24h)
+    let firstBestMarket = sortedMarkets[0]
+
+    if (firstBestMarket.volume24h === 0) {
+      error = 'Openbook market had 0 volume in last 24h check it carefully'
+    }
+    sortedMarkets = sortedMarkets.sort(
+      (a, b) => b.quoteDepositsTotal - a.quoteDepositsTotal
+    )
+    firstBestMarket = sortedMarkets[0]
+
+    return sortedMarkets.length
+      ? { pubKey: new PublicKey(firstBestMarket.id), error: error }
+      : undefined
+  } catch (e) {
+    notify({
+      message: 'Openbook market not found',
+      type: 'error',
+    })
+  }
+}
+
+export const decodePriceFromOracleAi = async (
+  ai: AccountInfo<Buffer>,
+  connection: Connection,
+  type: string
+): Promise<{
+  uiPrice: number
+  lastUpdatedSlot: number
+  deviation: string
+}> => {
+  let uiPrice, lastUpdatedSlot, deviation
+  try {
+    if (type === 'Pyth') {
+      const priceData = parsePriceData(ai.data)
+      uiPrice = priceData.previousPrice
+      lastUpdatedSlot = parseInt(priceData.lastSlot.toString())
+      deviation =
+        priceData.previousConfidence !== undefined
+          ? ((priceData.previousConfidence / uiPrice) * 100).toFixed(2)
+          : undefined
+    } else if (type === 'Switchboard') {
+      const program = await SwitchboardProgram.loadMainnet(connection)
+      uiPrice = program.decodeLatestAggregatorValue(ai)!.toNumber()
+      lastUpdatedSlot = program
+        .decodeAggregator(ai)
+        .latestConfirmedRound!.roundOpenSlot!.toNumber()
+      deviation = (
+        (switchboardDecimalToBig(
+          program.decodeAggregator(ai).latestConfirmedRound.stdDeviation
+        ).toNumber() /
+          uiPrice) *
+        100
+      ).toFixed(2)
+    }
+    return { uiPrice, lastUpdatedSlot, deviation }
+  } catch (e) {
+    return { uiPrice, lastUpdatedSlot, deviation }
+  }
+}
+
+export function switchboardDecimalToBig(sbDecimal: {
+  mantissa: BN
+  scale: number
+}): Big {
+  const mantissa = new Big(sbDecimal.mantissa.toString())
+  const scale = sbDecimal.scale
+  const oldDp = Big.DP
+  Big.DP = 20
+  const result: Big = mantissa.div(new Big(10).pow(scale))
+  Big.DP = oldDp
+  return result
+}
+
+export const getFormattedBankValues = (group: Group, bank: Bank) => {
+  return {
+    ...bank,
+    publicKey: bank.publicKey.toBase58(),
+    vault: bank.vault.toBase58(),
+    oracle: bank.oracle.toBase58(),
+    fallbackOracle: bank.fallbackOracle.toBase58(),
+    stablePrice: group.toUiPrice(
+      I80F48.fromNumber(bank.stablePriceModel.stablePrice),
+      bank.mintDecimals
+    ),
+    maxStalenessSlots: bank.oracleConfig.maxStalenessSlots.toNumber(),
+    lastStablePriceUpdated: new Date(
+      1000 * bank.stablePriceModel.lastUpdateTimestamp.toNumber()
+    ).toUTCString(),
+    stablePriceGrowthLimitsDelay: (
+      100 * bank.stablePriceModel.delayGrowthLimit
+    ).toFixed(2),
+    stablePriceGrowthLimitsStable: (
+      100 * bank.stablePriceModel.stableGrowthLimit
+    ).toFixed(2),
+    loanFeeRate: (10000 * bank.loanFeeRate.toNumber()).toFixed(2),
+    loanOriginationFeeRate: (
+      10000 * bank.loanOriginationFeeRate.toNumber()
+    ).toFixed(2),
+    collectedFeesNative: toUiDecimals(
+      bank.collectedFeesNative.toNumber(),
+      bank.mintDecimals
+    ).toFixed(2),
+    collectedFeesNativePrice: (
+      toUiDecimals(bank.collectedFeesNative.toNumber(), bank.mintDecimals) *
+      bank.uiPrice
+    ).toFixed(2),
+    dust: bank.dust.toNumber(),
+    deposits: toUiDecimals(
+      bank.indexedDeposits.mul(bank.depositIndex).toNumber(),
+      bank.mintDecimals
+    ),
+    depositsPrice: (
+      toUiDecimals(
+        bank.indexedDeposits.mul(bank.depositIndex).toNumber(),
+        bank.mintDecimals
+      ) * bank.uiPrice
+    ).toFixed(2),
+    borrows: toUiDecimals(
+      bank.indexedBorrows.mul(bank.borrowIndex).toNumber(),
+      bank.mintDecimals
+    ),
+    borrowsPrice: (
+      toUiDecimals(
+        bank.indexedBorrows.mul(bank.borrowIndex).toNumber(),
+        bank.mintDecimals
+      ) * bank.uiPrice
+    ).toFixed(2),
+    avgUtilization: bank.avgUtilization.toNumber() * 100,
+    maintAssetWeight: bank.maintAssetWeight.toFixed(2),
+    maintLiabWeight: bank.maintLiabWeight.toFixed(2),
+    initAssetWeight: bank.initAssetWeight.toFixed(2),
+    initLiabWeight: bank.initLiabWeight.toFixed(2),
+    scaledInitAssetWeight: bank.scaledInitAssetWeight(bank.price).toFixed(2),
+    scaledInitLiabWeight: bank.scaledInitLiabWeight(bank.price).toFixed(2),
+    depositWeightScaleStartQuote: toUiDecimalsForQuote(
+      bank.depositWeightScaleStartQuote
+    ),
+    borrowWeightScaleStartQuote: toUiDecimalsForQuote(
+      bank.borrowWeightScaleStartQuote
+    ),
+    rate0: (100 * bank.rate0.toNumber()).toFixed(2),
+    util0: (100 * bank.util0.toNumber()).toFixed(),
+    rate1: (100 * bank.rate1.toNumber()).toFixed(2),
+    util1: (100 * bank.util1.toNumber()).toFixed(),
+    maxRate: (100 * bank.maxRate.toNumber()).toFixed(2),
+    adjustmentFactor: (bank.adjustmentFactor.toNumber() * 100).toFixed(2),
+    depositRate: bank.getDepositRateUi(),
+    borrowRate: bank.getBorrowRateUi(),
+    lastIndexUpdate: new Date(
+      1000 * bank.indexLastUpdated.toNumber()
+    ).toUTCString(),
+    lastRatesUpdate: new Date(
+      1000 * bank.bankRateLastUpdated.toNumber()
+    ).toUTCString(),
+    oracleConfFilter:
+      bank.oracleConfig.confFilter.toNumber() === Number.MAX_SAFE_INTEGER
+        ? ''
+        : (100 * bank.oracleConfig.confFilter.toNumber()).toFixed(2),
+    minVaultToDepositsRatio: bank.minVaultToDepositsRatio * 100,
+    netBorrowsInWindow: toUiDecimalsForQuote(
+      I80F48.fromI64(bank.netBorrowsInWindow).mul(bank.price)
+    ).toFixed(2),
+    netBorrowLimitPerWindowQuote: toUiDecimals(
+      bank.netBorrowLimitPerWindowQuote,
+      6
+    ),
+    liquidationFee: (bank.liquidationFee.toNumber() * 100).toFixed(2),
+    platformLiquidationFee: (
+      bank.platformLiquidationFee.toNumber() * 100
+    ).toFixed(2),
+    netBorrowLimitWindowSizeTs: secondsToHours(
+      bank.netBorrowLimitWindowSizeTs.toNumber()
+    ),
+    depositLimit: bank.depositLimit.toString(),
+    interestTargetUtilization: bank.interestTargetUtilization,
+    interestCurveScaling: bank.interestCurveScaling,
+    reduceOnly: REDUCE_ONLY_OPTIONS[bank.reduceOnly].name,
+    maintWeightShiftStart: bank.maintWeightShiftStart.toNumber(),
+    maintWeightShiftEnd: bank.maintWeightShiftEnd.toNumber(),
+    maintWeightShiftAssetTarget: bank.maintWeightShiftAssetTarget.toNumber(),
+    maintWeightShiftLiabTarget: bank.maintWeightShiftLiabTarget.toNumber(),
   }
 }

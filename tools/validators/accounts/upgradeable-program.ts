@@ -1,8 +1,6 @@
 // Copied from Explorer code https://github.com/solana-labs/solana/blob/master/explorer/src/validators/accounts/upgradeable-program.ts
 
-import { ParsedAccountData, AccountInfo, PublicKey } from '@solana/web3.js'
-
-import { type, number, literal, nullable, Infer, create } from 'superstruct'
+import { type, number, literal, nullable, Infer } from 'superstruct'
 import { PublicKeyFromString } from '../pubkey'
 
 export type ProgramAccountInfo = Infer<typeof ProgramAccountInfo>
@@ -40,29 +38,3 @@ export const ProgramBufferAccount = type({
   type: literal('buffer'),
   info: ProgramBufferAccountInfo,
 })
-
-export function validateProgramBufferAccount(
-  info: AccountInfo<Buffer | ParsedAccountData>,
-  bufferAuthority: PublicKey
-) {
-  if (
-    !('parsed' in info.data && info.data.program === 'bpf-upgradeable-loader')
-  ) {
-    throw new Error('Invalid program buffer account')
-  }
-
-  let buffer: ProgramBufferAccount
-
-  try {
-    buffer = create(info.data.parsed, ProgramBufferAccount)
-  } catch {
-    throw new Error('Invalid program buffer account')
-  }
-
-  if (buffer.info.authority?.toBase58() !== bufferAuthority.toBase58()) {
-    throw new Error(
-      `Buffer authority must be set to governance account 
-        ${bufferAuthority.toBase58()}`
-    )
-  }
-}

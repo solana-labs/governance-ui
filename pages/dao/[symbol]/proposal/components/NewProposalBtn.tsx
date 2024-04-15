@@ -2,11 +2,12 @@ import Link from 'next/link'
 import { PlusCircleIcon } from '@heroicons/react/outline'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import Tooltip from '@components/Tooltip'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmGovernancesQuery } from '@hooks/queries/governance'
+import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 
 const NewProposalBtn = () => {
   const { fmtUrlWithCluster } = useQueryContext()
@@ -15,10 +16,9 @@ const NewProposalBtn = () => {
   const connected = !!wallet?.connected
 
   const realm = useRealmQuery().data?.result
-
+  const { result: ownVoterWeight } = useLegacyVoterWeight()
   const {
     symbol,
-    ownVoterWeight,
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
@@ -30,7 +30,7 @@ const NewProposalBtn = () => {
   const canCreateProposal =
     realm &&
     governanceItems.some((g) =>
-      ownVoterWeight.canCreateProposal(g.account.config)
+      ownVoterWeight?.canCreateProposal(g.account.config)
     ) &&
     !toManyCommunityOutstandingProposalsForUser &&
     !toManyCouncilOutstandingProposalsForUse
@@ -40,7 +40,7 @@ const NewProposalBtn = () => {
     : governanceItems.length === 0
     ? 'There is no governance configuration to create a new proposal'
     : !governanceItems.some((g) =>
-        ownVoterWeight.canCreateProposal(g.account.config)
+        ownVoterWeight?.canCreateProposal(g.account.config)
       )
     ? "You don't have enough governance power to create a new proposal"
     : toManyCommunityOutstandingProposalsForUser

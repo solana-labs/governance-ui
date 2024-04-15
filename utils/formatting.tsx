@@ -16,6 +16,11 @@ export const calculatePct = (c = new BN(0), total?: BN) => {
     .toNumber()
 }
 
+/**
+ * @deprecated
+ * you shouldn't cast a BN to a number
+ * use fmtBnMintDecimals
+ */
 export const fmtTokenAmount = (c: BN, decimals?: number) =>
   c?.div(new BN(10).pow(new BN(decimals ?? 0))).toNumber() || 0
 

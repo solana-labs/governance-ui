@@ -42,7 +42,7 @@ export const createBase64Proposal = async (
   const governanceAuthority = walletPk
   const signatory = walletPk
   const payer = walletPk
-  console.log(wallet)
+
   // Changed this because it is misbehaving on my local validator setup.
   const programVersion = await getGovernanceProgramVersion(
     connection,
@@ -55,17 +55,17 @@ export const createBase64Proposal = async (
   const useDenyOption = true
   let voterWeightPluginPk: PublicKey | undefined = undefined
   if (client) {
-    const { registrar } = await getRegistrarPDA(
+    const { registrar } = getRegistrarPDA(
       realm,
       proposalMint,
       client.program.programId
     )
-    const { voter } = await getVoterPDA(
+    const { voter } = getVoterPDA(
       registrar,
       walletPk,
       client.program.programId
     )
-    const { voterWeightPk } = await getVoterWeightPDA(
+    const { voterWeightPk } = getVoterWeightPDA(
       registrar,
       walletPk,
       client.program.programId

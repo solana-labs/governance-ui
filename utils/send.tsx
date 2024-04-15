@@ -10,6 +10,8 @@ import Wallet from '@project-serum/sol-wallet-adapter'
 import { sleep } from '@project-serum/common'
 import { WalletSigner } from '@solana/spl-governance'
 import { invalidateInstructionAccounts } from '@hooks/queries/queryClient'
+import { createComputeBudgetIx } from '@blockworks-foundation/mango-v4'
+import { getFeeEstimate } from '@tools/feeEstimate'
 
 class TransactionError extends Error {
   public txid: string
@@ -69,9 +71,12 @@ export async function signTransaction({
   signers?: Array<Keypair>
   connection: Connection
 }) {
-  transaction.recentBlockhash = (
-    await connection.getLatestBlockhash('max')
-  ).blockhash
+  const [{ blockhash: recentBlockhash }, fee] = await Promise.all([
+    connection.getLatestBlockhash('max'),
+    getFeeEstimate(connection),
+  ])
+  transaction.add(createComputeBudgetIx(fee))
+  transaction.recentBlockhash = recentBlockhash
   transaction.setSigners(wallet!.publicKey!, ...signers.map((s) => s.publicKey))
   if (signers.length > 0) {
     transaction.partialSign(...signers)
@@ -91,9 +96,14 @@ export async function signTransactions({
   wallet: Wallet
   connection: Connection
 }) {
-  const blockhash = (await connection.getLatestBlockhash('max')).blockhash
+  const [{ blockhash: recentBlockhash }, fee] = await Promise.all([
+    connection.getLatestBlockhash('max'),
+    getFeeEstimate(connection),
+  ])
+
   transactionsAndSigners.forEach(({ transaction, signers = [] }) => {
-    transaction.recentBlockhash = blockhash
+    transaction.add(createComputeBudgetIx(fee))
+    transaction.recentBlockhash = recentBlockhash
     transaction.setSigners(
       wallet!.publicKey!,
       ...signers.map((s) => s.publicKey)

@@ -1,4 +1,3 @@
-import useRealm from '@hooks/useRealm'
 import { fmtMintAmount, getHoursFromTimestamp } from '@tools/sdk/units'
 import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import { getFormattedStringFromDays, SECS_PER_DAY } from '@utils/dateTools'
@@ -14,12 +13,13 @@ import {
   useRealmCommunityMintInfoQuery,
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
+import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 
 const ParamsView = ({ activeGovernance }) => {
   const realm = useRealmQuery().data?.result
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
-  const { ownVoterWeight } = useRealm()
+  const { result: ownVoterWeight } = useLegacyVoterWeight()
   const programVersion = useProgramVersion()
   const realmAccount = realm?.account
   const communityMint = realmAccount?.communityMint.toBase58()
@@ -37,6 +37,19 @@ const ParamsView = ({ activeGovernance }) => {
       : fmtMintAmount(
           mint,
           activeGovernance?.account?.config?.minCommunityTokensToCreateProposal
+        )
+    : 'calculating...'
+
+  const minCouncilTokensToCreateProposal = activeGovernance?.account?.config
+    ?.minCouncilTokensToCreateProposal
+    ? mint &&
+      DISABLED_VOTER_WEIGHT.eq(
+        activeGovernance.account.config.minCouncilTokensToCreateProposal
+      )
+      ? 'Disabled'
+      : fmtMintAmount(
+          mint,
+          activeGovernance?.account?.config?.minCouncilTokensToCreateProposal
         )
     : 'calculating...'
 
@@ -66,10 +79,7 @@ const ParamsView = ({ activeGovernance }) => {
             <AddressField
               label="Min council tokens to create a proposal"
               padding
-              val={fmtMintAmount(
-                councilMint,
-                activeGovernance.account.config.minCouncilTokensToCreateProposal
-              )}
+              val={minCouncilTokensToCreateProposal}
             />
           )}
           <NumberField
@@ -141,6 +151,7 @@ const ParamsView = ({ activeGovernance }) => {
           <div className="flex">
             <Button
               disabled={
+                ownVoterWeight === undefined ||
                 !ownVoterWeight.canCreateProposal(
                   activeGovernance.account.config
                 )
@@ -150,7 +161,7 @@ const ParamsView = ({ activeGovernance }) => {
               }
               onClick={() => {
                 if (
-                  ownVoterWeight.canCreateProposal(
+                  ownVoterWeight?.canCreateProposal(
                     activeGovernance.account.config
                   )
                 ) {

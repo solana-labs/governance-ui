@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Asset } from '@models/treasury/Asset'
 import { Result, Status } from '@utils/uiTypes/Result'
@@ -15,8 +15,8 @@ interface Props {
     auxiliaryWallets: AuxiliaryWallet[]
     wallets: Wallet[]
   }>
-  selectedAsset?: Asset | null
-  selectedWallet?: AuxiliaryWallet | Wallet | null
+  selectedAsset?: Asset | null | 'USE NON-LEGACY STATE'
+  selectedWallet?: AuxiliaryWallet | Wallet | null | 'USE NON-LEGACY STATE'
   onSelectAsset?(asset: Asset, wallet: AuxiliaryWallet | Wallet): void
   onSelectWallet?(wallet: AuxiliaryWallet | Wallet): void
 }
@@ -44,6 +44,7 @@ export default function WalletList(props: Props) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [props.data._tag])
+  console.log("Wallet List", props);
 
   switch (props.data._tag) {
     case Status.Failed:
@@ -92,10 +93,15 @@ export default function WalletList(props: Props) {
                 expanded={expanded.includes(wallet.address)}
                 selected={
                   (props.selectedWallet &&
+                    props.selectedWallet !== 'USE NON-LEGACY STATE' &&
                     'address' in props.selectedWallet &&
                     props.selectedWallet.address) === wallet.address
                 }
-                selectedAsset={props.selectedAsset}
+                selectedAsset={
+                  props.selectedAsset !== 'USE NON-LEGACY STATE'
+                    ? props.selectedAsset
+                    : null
+                }
                 wallet={wallet}
                 onExpand={() => {
                   setExpanded((list) => {
@@ -112,29 +118,31 @@ export default function WalletList(props: Props) {
                   props.onSelectAsset?.(asset, wallet)
                 }}
                 onSelectWallet={() => {
-                  const current = props.selectedWallet
                   props.onSelectWallet?.(wallet)
-                  setExpanded((list) => {
-                    const curKey = current
-                      ? 'address' in current
-                        ? current.address
-                        : current.name
-                      : null
 
-                    if (
-                      wallet.address === curKey &&
-                      list.includes(wallet.address) &&
-                      !props.selectedAsset
-                    ) {
-                      return list.filter((str) => str !== wallet.address)
-                    } else if (!list.includes(wallet.address)) {
-                      return list
-                        .filter((str) => str !== curKey)
-                        .concat(wallet.address)
-                    } else {
-                      return list
-                    }
-                  })
+                  const current = props.selectedWallet
+                  if (current !== 'USE NON-LEGACY STATE')
+                    setExpanded((list) => {
+                      const curKey = current
+                        ? 'address' in current
+                          ? current.address
+                          : current.name
+                        : null
+
+                      if (
+                        wallet.address === curKey &&
+                        list.includes(wallet.address) &&
+                        !props.selectedAsset
+                      ) {
+                        return list.filter((str) => str !== wallet.address)
+                      } else if (!list.includes(wallet.address)) {
+                        return list
+                          .filter((str) => str !== curKey)
+                          .concat(wallet.address)
+                      } else {
+                        return list
+                      }
+                    })
                 }}
               />
             ))}
@@ -143,11 +151,18 @@ export default function WalletList(props: Props) {
                 key={wallet.name}
                 expanded={expanded.includes(wallet.name)}
                 selected={
-                  props.selectedWallet && 'address' in props.selectedWallet
+                  props.selectedWallet &&
+                  props.selectedWallet !== 'USE NON-LEGACY STATE' &&
+                  'address' in props.selectedWallet
                     ? false
-                    : props.selectedWallet?.name === wallet.name
+                    : // @ts-ignore
+                      props.selectedWallet?.name === wallet.name
                 }
-                selectedAsset={props.selectedAsset}
+                selectedAsset={
+                  props.selectedAsset !== 'USE NON-LEGACY STATE'
+                    ? props.selectedAsset
+                    : null
+                }
                 wallet={wallet}
                 onExpand={() => {
                   setExpanded((list) => {
@@ -162,29 +177,30 @@ export default function WalletList(props: Props) {
                   props.onSelectAsset?.(asset, wallet)
                 }}
                 onSelectWallet={() => {
-                  const current = props.selectedWallet
                   props.onSelectWallet?.(wallet)
-                  setExpanded((list) => {
-                    const curKey = current
-                      ? 'address' in current
-                        ? current.address
-                        : current.name
-                      : null
+                  const current = props.selectedWallet
+                  if (current !== 'USE NON-LEGACY STATE')
+                    setExpanded((list) => {
+                      const curKey = current
+                        ? 'address' in current
+                          ? current.address
+                          : current.name
+                        : null
 
-                    if (
-                      wallet.name === curKey &&
-                      list.includes(wallet.name) &&
-                      !props.selectedAsset
-                    ) {
-                      return list.filter((str) => str !== wallet.name)
-                    } else if (!list.includes(wallet.name)) {
-                      return list
-                        .filter((str) => str !== curKey)
-                        .concat(wallet.name)
-                    } else {
-                      return list
-                    }
-                  })
+                      if (
+                        wallet.name === curKey &&
+                        list.includes(wallet.name) &&
+                        !props.selectedAsset
+                      ) {
+                        return list.filter((str) => str !== wallet.name)
+                      } else if (!list.includes(wallet.name)) {
+                        return list
+                          .filter((str) => str !== curKey)
+                          .concat(wallet.name)
+                      } else {
+                        return list
+                      }
+                    })
                 }}
               />
             ))}

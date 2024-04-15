@@ -48,12 +48,6 @@ export type PsyFiStrategy = TreasuryStrategy & {
   otherStrategies: Array<PsyFiStrategy>
 }
 
-export type EverlendStrategy = TreasuryStrategy & {
-  poolMint: string
-  decimals: number
-  rateEToken: number
-}
-
 /* 
 type HandleCreateProposalWithStrategy = (
   { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,

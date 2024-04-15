@@ -1,37 +1,30 @@
-import useRealmProposals from '@hooks/useRealmProposals'
-import { TokenOwnerRecordAsset } from '@models/treasury/Asset'
-import { Governance, ProgramAccount, Realm } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import ProposalDetails from './ProposalDetails'
+import { useTokenOwnerRecordByPubkeyQuery } from '@hooks/queries/tokenOwnerRecord'
+import { useARealmProposalsQuery } from '@hooks/queries/proposal'
+import { ProposalState } from '@solana/spl-governance'
 
 interface Props {
-  className?: string
-  currentGovernance?: ProgramAccount<Governance>
-  tokenOwnerRecordAsset: TokenOwnerRecordAsset
-  realmAccount: ProgramAccount<Realm>
-  programId?: PublicKey | null
-  realmSymbol: string
+  governance: PublicKey
+  tokenOwnerRecord: PublicKey
 }
-export default function RealmDetails(props: Props) {
-  const { votingProposals, governances, voteRecords } = useRealmProposals(
-    props.tokenOwnerRecordAsset,
-    props.realmAccount.pubkey,
-    props.programId
+export default function RealmDetails({ tokenOwnerRecord, governance }: Props) {
+  const tor = useTokenOwnerRecordByPubkeyQuery(tokenOwnerRecord).data?.result
+
+  const { data: proposals } = useARealmProposalsQuery(tor?.account.realm)
+  const votingProposals = proposals?.filter(
+    (x) => x.account.state === ProposalState.Voting
   )
 
-  return (
+  return tor === undefined || votingProposals === undefined ? null : (
     <div className="space-y-4">
       {votingProposals.map((p) => (
         <ProposalDetails
-          key={p[0]}
-          voteRecord={voteRecords[p[0]]}
-          proposal={p[1]}
-          realm={props.realmAccount}
-          proposalGovernance={governances[p[1].account.governance.toBase58()]}
-          currentGovernance={props.currentGovernance}
-          tokenOwnerRecord={props.tokenOwnerRecordAsset.tokenOwnerRecordAccount}
-          programId={props.programId}
-          realmSymbol={props.realmSymbol}
+          key={p.pubkey.toString()}
+          proposal={p}
+          realmPk={tor.account.realm}
+          owningGovernancePk={governance}
+          tokenOwnerRecordPk={tokenOwnerRecord}
         />
       ))}
       {votingProposals.length <= 0 && (

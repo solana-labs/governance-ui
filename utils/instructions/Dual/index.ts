@@ -10,7 +10,10 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js'
 
-import { StakingOptions } from '@dual-finance/staking-options'
+import {
+  DUAL_DAO_WALLET_PK,
+  StakingOptions,
+} from '@dual-finance/staking-options'
 import { ConnectionContext } from '@utils/connection'
 import { validateInstruction } from '@utils/instructionTools'
 import {
@@ -20,6 +23,8 @@ import {
   DualFinanceWithdrawForm,
   UiInstruction,
   DualFinanceInitStrikeForm,
+  DualFinanceGsoForm,
+  DualFinanceGsoWithdrawForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import {
   createAssociatedTokenAccount,
@@ -33,6 +38,7 @@ import {
 } from '@project-serum/serum/lib/token-instructions'
 import { BN, web3, utils } from '@coral-xyz/anchor'
 import { Token } from '@solana/spl-token'
+import { GSO } from '@dual-finance/gso'
 
 interface StakingOptionArgs {
   connection: ConnectionContext
@@ -60,6 +66,10 @@ interface InitStrikeArgs {
 
 function getStakingOptionsApi(connection: ConnectionContext) {
   return new StakingOptions(connection.endpoint, 'confirmed')
+}
+
+function getGsoApi(connection: ConnectionContext) {
+  return new GSO(connection.endpoint, 'confirmed')
 }
 
 function toBeBytes(x: number) {
@@ -116,7 +126,7 @@ export async function getConfigInstruction({
         account: helperTokenAccount.publicKey,
         mint: baseMint,
         owner: form.baseTreasury.isSol
-          ? form.baseTreasury.governance.pubkey
+          ? form.baseTreasury.extensions.transferAddress
           : form.baseTreasury.extensions.token?.account.owner,
       })
     )
@@ -131,7 +141,8 @@ export async function getConfigInstruction({
           //owner is sol wallet or governance same as baseTokenAccount
           form.baseTreasury.extensions!.token!.account.owner,
           [],
-          form.numTokens
+          // @ts-ignore
+          form.numTokens as unknown as bigint
         )
       )
     )
@@ -171,7 +182,7 @@ export async function getConfigInstruction({
       serializeInstructionToBase64(configInstruction)
     )
 
-    const initStrikeInstruction = await so.createInitStrikeInstruction(
+    const initStrikeInstruction = await so.createInitStrikeReversibleInstruction(
       new BN(form.strike),
       form.soName,
       //authority sol wallet
@@ -201,7 +212,7 @@ export async function getConfigInstruction({
 
     if (!(await connection.current.getAccountInfo(userSoAccount))) {
       const [ataIx] = await createAssociatedTokenAccount(
-        wallet.publicKey,
+        form.payer.extensions.transferAddress!,
         new PublicKey(form.userPk),
         soMint
       )
@@ -239,10 +250,176 @@ export async function getConfigInstruction({
       serializedInstruction,
       isValid: true,
       prerequisiteInstructions: prerequisiteInstructions,
-      prerequisiteInstructionsSigners: [helperTokenAccount],
+      prerequisiteInstructionsSigners: [helperTokenAccount, null],
       governance: form.baseTreasury?.governance,
       additionalSerializedInstructions,
       chunkBy: 2,
+    }
+  }
+
+  const obj: UiInstruction = {
+    serializedInstruction,
+    isValid: false,
+    governance: form.baseTreasury?.governance,
+    additionalSerializedInstructions,
+    chunkBy: 1,
+  }
+  return obj
+}
+
+interface StakingOptionGsoArgs {
+  connection: ConnectionContext
+  form: DualFinanceGsoForm
+  setFormErrors: any
+  schema: any
+  wallet: WalletAdapter | undefined
+}
+
+export async function getConfigGsoInstruction({
+  connection,
+  wallet,
+  form,
+  schema,
+  setFormErrors,
+}: StakingOptionGsoArgs): Promise<UiInstruction> {
+  const isValid = await validateInstruction({ schema, form, setFormErrors })
+
+  const serializedInstruction = ''
+  const additionalSerializedInstructions: string[] = []
+  const prerequisiteInstructions: TransactionInstruction[] = []
+  if (
+    isValid &&
+    form.soName &&
+    form.baseTreasury &&
+    form.quoteTreasury &&
+    form.payer &&
+    wallet?.publicKey
+  ) {
+    const baseMint = form.baseTreasury.extensions.mint?.publicKey
+    const space = 165
+    const rent = await connection.current.getMinimumBalanceForRentExemption(
+      space,
+      'processed'
+    )
+    //Creating checking account on the fly with same mint as base and owner
+    //made to be more safe - instructions don't have access to main treasury
+    const helperTokenAccount = new Keypair()
+    //run as prerequsite instructions payer is connected wallet
+    prerequisiteInstructions.push(
+      SystemProgram.createAccount({
+        fromPubkey: wallet.publicKey,
+        newAccountPubkey: helperTokenAccount.publicKey,
+        lamports: rent,
+        space: space,
+        programId: TOKEN_PROGRAM_ID,
+      }),
+      //initialized account with same mint as base
+      initializeAccount({
+        account: helperTokenAccount.publicKey,
+        mint: baseMint,
+        owner: form.baseTreasury.isSol
+          ? form.baseTreasury.governance.pubkey
+          : form.baseTreasury.extensions.token?.account.owner,
+      })
+    )
+
+    additionalSerializedInstructions.push(
+      //transfer funds from base treasury to the helper checking account
+      serializeInstructionToBase64(
+        Token.createTransferInstruction(
+          TOKEN_PROGRAM_ID,
+          form.baseTreasury.extensions.transferAddress!,
+          helperTokenAccount.publicKey,
+          //owner is sol wallet or governance same as baseTreasury
+          form.baseTreasury.extensions!.token!.account.owner,
+          [],
+          // @ts-ignore
+          form.numTokens as unknown as bigint
+        )
+      )
+    )
+
+    const quoteTreasuryAccount = await tryGetTokenAccount(
+      connection.current,
+      form.quoteTreasury.pubkey
+    )
+    const quoteMint = quoteTreasuryAccount?.account.mint
+
+    // Should not happen.
+    if (!baseMint || !quoteMint) {
+      return {
+        serializedInstruction,
+        isValid: false,
+        governance: form.baseTreasury?.governance,
+        additionalSerializedInstructions: [],
+        chunkBy: 1,
+      }
+    }
+
+    const gso = getGsoApi(connection)
+    const baseAccount = helperTokenAccount.publicKey
+    const quoteAccount = form.quoteTreasury.pubkey
+    const optionsPerMillion = Math.floor(form.lockupRatio * 1_000_000)
+    const strikeAtomsPerLot = form.strike;
+    // Set all GSOs to have the same expiration and lockup period. This means
+    // that users will be able to unstake at the same time as option expiration.
+    const lockupPeriodEnd = form.optionExpirationUnixSeconds
+    const lockupMint = new PublicKey(form.lockupMint);
+    const configInstruction = await gso.createConfigInstruction(
+      optionsPerMillion,
+      lockupPeriodEnd,
+      form.optionExpirationUnixSeconds,
+      form.subscriptionPeriodEnd,
+      new BN(form.numTokens),
+      form.soName,
+      strikeAtomsPerLot,
+      form.payer.extensions.transferAddress!,
+      lockupMint,
+      baseMint,
+      quoteMint,
+      baseAccount,
+      quoteAccount,
+      form.lotSize
+    )
+
+    additionalSerializedInstructions.push(
+      serializeInstructionToBase64(configInstruction)
+    )
+
+    const nameInstruction = await gso.createNameTokensInstruction(
+      form.soName,
+      strikeAtomsPerLot,
+      form.payer.extensions.transferAddress!,
+      baseMint
+    )
+
+    additionalSerializedInstructions.push(
+      serializeInstructionToBase64(nameInstruction)
+    )
+
+    //after everything we close helper account
+    additionalSerializedInstructions.push(
+      serializeInstructionToBase64(
+        closeAccount({
+          source: helperTokenAccount.publicKey,
+          //sol wallet
+          destination: form.payer.extensions.transferAddress,
+          //owner governance or sol wallet same as baseTokenAccount
+          owner: form.baseTreasury.extensions.token?.account.owner,
+        })
+      )
+    )
+
+    return {
+      serializedInstruction,
+      isValid: true,
+      prerequisiteInstructions: prerequisiteInstructions,
+      prerequisiteInstructionsSigners: [helperTokenAccount],
+      governance: form.baseTreasury?.governance,
+      additionalSerializedInstructions,
+      // chunkBy 1 because the config instruction uses a lot of accounts, so
+      // isolate it.
+      chunkBy: 1,
     }
   }
 
@@ -306,6 +483,17 @@ export async function getExerciseInstruction({
       additionalSerializedInstructions.push(serializeInstructionToBase64(ataIx))
     }
 
+    // Possibly init the base token account that is receiving tokens from exercise.
+    const walletBaseAta = await findAssociatedTokenAddress(wallet.publicKey, baseMint);
+    if ((await connection.current.getAccountInfo(walletBaseAta)) === null) {
+      const [ataIx] = await createAssociatedTokenAccount(
+        wallet.publicKey,
+        wallet.publicKey,
+        baseMint
+      )
+      additionalSerializedInstructions.push(serializeInstructionToBase64(ataIx))
+    }
+
     const prerequisiteInstructions: TransactionInstruction[] = []
     const space = 165
     const rent = await connection.current.getMinimumBalanceForRentExemption(
@@ -326,7 +514,7 @@ export async function getExerciseInstruction({
         account: quoteHelperTokenAccount.publicKey,
         mint: quoteMint,
         owner: form.baseTreasury.isSol
-          ? form.baseTreasury.governance.pubkey
+          ? form.baseTreasury.extensions.transferAddress
           : form.baseTreasury.extensions.token?.account.owner,
       })
     )
@@ -347,6 +535,7 @@ export async function getExerciseInstruction({
       )
     )
 
+    // TODO: Consider using reversible
     const exerciseInstruction = await so.createExerciseInstruction(
       new BN(form.numTokens),
       new BN(strike),
@@ -366,7 +555,7 @@ export async function getExerciseInstruction({
           source: quoteHelperTokenAccount.publicKey,
           destination: wallet.publicKey,
           owner: form.baseTreasury.isSol
-            ? form.baseTreasury.governance.pubkey
+            ? form.baseTreasury.extensions.transferAddress
             : form.baseTreasury.extensions.token?.account.owner,
         })
       )
@@ -412,13 +601,25 @@ export async function getWithdrawInstruction({
   const serializedInstruction = ''
   const additionalSerializedInstructions: string[] = []
   const prerequisiteInstructions: TransactionInstruction[] = []
+  // First is for base token, second is for quote token.
   let helperTokenAccount: Keypair | null = null
-  if (isValid && form.soName && form.baseTreasury && wallet?.publicKey) {
+  let helperTokenAccount2: Keypair | null = null
+  if (
+    isValid &&
+    form.soName &&
+    form.baseTreasury &&
+    wallet?.publicKey &&
+    form.mintPk
+  ) {
     const so = getStakingOptionsApi(connection)
     const authority = form.baseTreasury.isSol
       ? form.baseTreasury.extensions.transferAddress
       : form.baseTreasury.extensions.token!.account.owner!
-    let destination = form.baseTreasury.pubkey
+    let baseDestination = form.baseTreasury.pubkey
+    let quoteDestination = (
+      await so.getState(form.soName, new PublicKey(form.mintPk))
+    ).quoteAccount as PublicKey
+
     if (form.baseTreasury.isSol) {
       const baseMint = form.mintPk
       const space = 165
@@ -442,20 +643,64 @@ export async function getWithdrawInstruction({
         initializeAccount({
           account: helperTokenAccount.publicKey,
           mint: new PublicKey(baseMint!),
-          owner: form.baseTreasury.governance.pubkey,
+          owner: authority,
         })
       )
-      destination = helperTokenAccount.publicKey
+      baseDestination = helperTokenAccount.publicKey
+
+      const quoteMint = (
+        await so.getState(form.soName, new PublicKey(form.mintPk))
+      ).quoteMint
+      helperTokenAccount2 = new Keypair()
+      //run as prerequsite instructions payer is connected wallet
+      prerequisiteInstructions.push(
+        SystemProgram.createAccount({
+          fromPubkey: wallet.publicKey,
+          newAccountPubkey: helperTokenAccount2.publicKey,
+          lamports: rent,
+          space: space,
+          programId: TOKEN_PROGRAM_ID,
+        }),
+        //initialized account with same mint as quote
+        initializeAccount({
+          account: helperTokenAccount2.publicKey,
+          mint: new PublicKey(quoteMint!),
+          owner: authority,
+        })
+      )
+      quoteDestination = helperTokenAccount2.publicKey
+
+      // Initialize the fee account so the tx succeeds. This happens when there
+      // is a base token that DUAL DAO has never received before.
+      const feeAccount = await StakingOptions.getFeeAccount(
+        new PublicKey(quoteMint!)
+      )
+      if (!(await connection.current.getAccountInfo(feeAccount))) {
+        const [ataIx] = await createAssociatedTokenAccount(
+          wallet.publicKey,
+          DUAL_DAO_WALLET_PK,
+          new PublicKey(quoteMint!)
+        )
+        additionalSerializedInstructions.push(
+          serializeInstructionToBase64(ataIx)
+        )
+      }
     }
 
     const withdrawInstruction = form.baseTreasury.isSol
       ? await so.createWithdrawInstructionWithMint(
           form.soName,
           authority!,
-          destination,
-          new PublicKey(form.mintPk!)
+          baseDestination,
+          new PublicKey(form.mintPk!),
+          quoteDestination
         )
-      : await so.createWithdrawInstruction(form.soName, authority!, destination)
+      : await so.createWithdrawInstruction(
+          form.soName,
+          authority!,
+          baseDestination,
+          quoteDestination
+        )
 
     additionalSerializedInstructions.push(
       serializeInstructionToBase64(withdrawInstruction)
@@ -465,8 +710,66 @@ export async function getWithdrawInstruction({
       serializedInstruction,
       prerequisiteInstructions: prerequisiteInstructions,
       prerequisiteInstructionsSigners: helperTokenAccount
-        ? [helperTokenAccount]
+        ? [null, helperTokenAccount, null, helperTokenAccount2]
         : [],
+      isValid: true,
+      governance: form.baseTreasury?.governance,
+      additionalSerializedInstructions,
+      chunkBy: 2,
+    }
+  }
+
+  return {
+    serializedInstruction,
+    isValid: false,
+    governance: form.baseTreasury?.governance,
+    additionalSerializedInstructions: [],
+  }
+}
+
+interface GsoWithdrawArgs {
+  connection: ConnectionContext
+  form: DualFinanceGsoWithdrawForm
+  setFormErrors: any
+  schema: any
+  wallet: WalletAdapter | undefined
+}
+
+export async function getGsoWithdrawInstruction({
+  connection,
+  wallet,
+  form,
+  schema,
+  setFormErrors,
+}: GsoWithdrawArgs): Promise<UiInstruction> {
+  const isValid = await validateInstruction({ schema, form, setFormErrors })
+
+  const serializedInstruction = ''
+  const additionalSerializedInstructions: string[] = []
+  if (isValid && form.soName && form.baseTreasury && wallet?.publicKey) {
+    const gso = getGsoApi(connection)
+    const authority = form.baseTreasury.extensions.token!.account.owner!
+    const baseMint = form.baseTreasury.extensions.mint?.publicKey
+    const destination = form.baseTreasury.pubkey
+
+    // Should always exist because of validations.
+    if (baseMint) {
+      const withdrawInstruction = await gso.createWithdrawInstruction(
+        form.soName,
+        baseMint,
+        authority!,
+        destination
+      )
+
+      additionalSerializedInstructions.push(
+        serializeInstructionToBase64(withdrawInstruction)
+      )
+    }
+
+    // Does not use a helper token account. If the DAO requires that, they need
+    // to just set the baseTreasury to be an empty token account.
+    return {
+      serializedInstruction,
       isValid: true,
       governance: form.baseTreasury?.governance,
       additionalSerializedInstructions,
@@ -525,7 +828,7 @@ export async function getConfigLsoInstruction({
         account: helperTokenAccount.publicKey,
         mint: baseMint,
         owner: form.baseTreasury.isSol
-          ? form.baseTreasury.governance.pubkey
+          ? form.baseTreasury.extensions.transferAddress
           : form.baseTreasury.extensions.token?.account.owner,
       })
     )

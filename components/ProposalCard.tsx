@@ -2,7 +2,7 @@ import styled from '@emotion/styled'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import ProposalStateBadge from './ProposalStateBadge'
 import Link from 'next/link'
-import { Proposal, ProposalState } from '@solana/spl-governance'
+import { GovernanceAccountType, Proposal, ProposalState, VoteType } from '@solana/spl-governance'
 import { ApprovalProgress, VetoProgress } from './QuorumProgress'
 import useRealm from '../hooks/useRealm'
 import useProposalVotes from '../hooks/useProposalVotes'
@@ -12,6 +12,7 @@ import ProposalMyVoteBadge from '../components/ProposalMyVoteBadge'
 import useQueryContext from '../hooks/useQueryContext'
 import { PublicKey } from '@solana/web3.js'
 import VoteResults from './VoteResults'
+import MultiChoiceVotes from './MultiChoiceVotes'
 
 type ProposalCardProps = {
   proposalPk: PublicKey
@@ -32,6 +33,8 @@ const ProposalCard = ({ proposalPk, proposal }: ProposalCardProps) => {
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
   const votesData = useProposalVotes(proposal)
+  const isMulti = proposal.voteType !== VoteType.SINGLE_CHOICE
+   && proposal.accountType === GovernanceAccountType.ProposalV2
 
   return (
     <div>
@@ -58,8 +61,13 @@ const ProposalCard = ({ proposalPk, proposal }: ProposalCardProps) => {
               </div>
               <ProposalTimeStatus proposal={proposal} />
             </div>
-            {proposal.state === ProposalState.Voting && (
-              <div className="border-t border-fgd-4 flex flex-col lg:flex-row mt-2 p-4 gap-x-4 gap-y-3">
+            {proposal.state === ProposalState.Voting ?
+              isMulti ?
+              <div className="pb-4 px-6">
+                <MultiChoiceVotes proposal={proposal} limit={3}/>
+              </div>
+              :
+              (<div className="border-t border-fgd-4 flex flex-col lg:flex-row mt-2 p-4 gap-x-4 gap-y-3">
                 <div className="w-full lg:w-auto flex-1">
                   <VoteResults isListView proposal={proposal} />
                 </div>
@@ -87,8 +95,8 @@ const ProposalCard = ({ proposalPk, proposal }: ProposalCardProps) => {
                     </div>
                   </>
                 ) : undefined}
-              </div>
-            )}
+              </div>)
+            : ""}
           </StyledCardWrapper>
         </a>
       </Link>

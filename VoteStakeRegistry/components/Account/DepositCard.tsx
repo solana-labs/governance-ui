@@ -15,7 +15,6 @@ import { useState } from 'react'
 import { closeDeposit } from 'VoteStakeRegistry/actions/closeDeposit'
 import { abbreviateAddress } from '@utils/formatting'
 import { notify } from '@utils/notifications'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import dayjs from 'dayjs'
 import {
   getMinDurationFmt,
@@ -31,6 +30,7 @@ import { useRealmQuery } from '@hooks/queries/realm'
 import { useConnection } from '@solana/wallet-adapter-react'
 import queryClient from '@hooks/queries/queryClient'
 import { tokenAccountQueryKeys } from '@hooks/queries/tokenAccount'
+import {useVsrClient} from "../../../VoterWeightPlugins/useVsrClient";
 
 const DepositCard = ({
   deposit,
@@ -44,7 +44,7 @@ const DepositCard = ({
   const realm = useRealmQuery().data?.result
 
   const { realmInfo } = useRealm()
-  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
+  const { vsrClient: client } = useVsrClient()
   const actualClient = vsrClient || client
   const wallet = useWalletOnePointOh()
   const { connection } = useConnection()
@@ -218,8 +218,7 @@ const DepositCard = ({
               value={(deposit.votingPower.isZero() ||
               deposit.votingPowerBaseline.isZero()
                 ? 0
-                : deposit.votingPower.toNumber() /
-                  deposit.votingPowerBaseline.toNumber()
+                : deposit.votingPower.mul(new BN(100)).div(deposit.votingPowerBaseline).toNumber() / 100
               ).toFixed(2)}
             />
           )}

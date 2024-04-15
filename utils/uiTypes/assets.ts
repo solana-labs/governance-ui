@@ -13,6 +13,7 @@ interface AccountExtension {
   program?: {
     authority: PublicKey
   }
+  stake?: StakeAccount
 }
 
 export type GovernanceProgramAccountWithNativeTreasuryAddress = ProgramAccount<Governance> & {
@@ -35,7 +36,8 @@ export enum AccountType {
   PROGRAM,
   NFT,
   GENERIC,
-  AuxiliaryToken,
+  AUXILIARY_TOKEN,
+  STAKE,
 }
 
 export class AccountTypeToken implements AssetAccount {
@@ -73,7 +75,7 @@ export class AccountTypeAuxiliaryToken implements AssetAccount {
   ) {
     this.governance = {} as any
     this.pubkey = tokenAccount.publicKey
-    this.type = AccountType.AuxiliaryToken
+    this.type = AccountType.AUXILIARY_TOKEN
     this.extensions = {
       token: tokenAccount,
       mint: mint,
@@ -99,6 +101,32 @@ export class AccountTypeProgram implements AssetAccount {
     this.extensions = {
       program: {
         authority: owner,
+      },
+    }
+  }
+}
+
+export class AccountTypeStake implements AssetAccount {
+  governance: GovernanceProgramAccountWithNativeTreasuryAddress
+  type: AccountType
+  extensions: AccountExtension
+  pubkey: PublicKey
+  constructor(
+    governance: GovernanceProgramAccountWithNativeTreasuryAddress,
+    stakePk: PublicKey,
+    state: StakeState,
+    delegatedValidator: PublicKey | null,
+    amount: number
+  ) {
+    this.governance = governance
+    this.pubkey = stakePk
+    this.type = AccountType.STAKE
+    this.extensions = {
+      stake: {
+        stakeAccount: stakePk,
+        state: state,
+        delegatedValidator: delegatedValidator,
+        amount: amount,
       },
     }
   }

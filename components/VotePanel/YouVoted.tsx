@@ -1,4 +1,4 @@
-import { VoteKind, withFinalizeVote } from '@solana/spl-governance'
+import { GovernanceAccountType, VoteKind, VoteType, withFinalizeVote } from '@solana/spl-governance'
 import { TransactionInstruction } from '@solana/web3.js'
 import { useState } from 'react'
 import { relinquishVote } from '../../actions/relinquishVote'
@@ -11,11 +11,15 @@ import {
   BanIcon,
   MinusCircleIcon,
 } from '@heroicons/react/solid'
-import { SecondaryButton } from '../Button'
+import Button from '../Button'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import Tooltip from '@components/Tooltip'
-import { useVoterTokenRecord, useIsVoting, useIsInCoolOffTime } from './hooks'
+import {
+  useVoterTokenRecord,
+  useIsVoting,
+  useIsInCoolOffTime,
+  useUserVetoTokenRecord,
+} from './hooks'
 import assertUnreachable from '@utils/typescript/assertUnreachable'
 import { useHasVoteTimeExpired } from '@hooks/useHasVoteTimeExpired'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
@@ -29,11 +33,10 @@ import { useProposalGovernanceQuery } from '@hooks/useProposal'
 import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import queryClient from '@hooks/queries/queryClient'
+import { CheckmarkFilled } from '@carbon/icons-react'
+import {useVotingClientForGoverningTokenMint} from "@hooks/useVotingClients";
 
 export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
-  const client = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
-  )
   const proposal = useRouteProposalQuery().data?.result
   const realm = useRealmQuery().data?.result
   const { realmInfo } = useRealm()
@@ -50,7 +53,11 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
 
   const { data } = useProposalVoteRecordQuery(quorum)
   const ownVoteRecord = data?.result
-  const voterTokenRecord = useVoterTokenRecord()
+  const electoralVoterTokenRecord = useVoterTokenRecord()
+  const vetoVotertokenRecord = useUserVetoTokenRecord()
+  const voterTokenRecord =
+    quorum === 'electoral' ? electoralVoterTokenRecord : vetoVotertokenRecord
+  const votingClient = useVotingClientForGoverningTokenMint(proposal?.account.governingTokenMint)
 
   const isWithdrawEnabled =
     connected &&
@@ -122,7 +129,7 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
         voterTokenRecord.pubkey,
         ownVoteRecord.pubkey,
         instructions,
-        client
+        votingClient
       )
       queryClient.invalidateQueries({
         queryKey: proposalQueryKeys.all(connection.endpoint),
@@ -135,13 +142,39 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
 
   const vote = ownVoteRecord?.account.vote
 
+  const isMulti = proposal?.account.voteType !== VoteType.SINGLE_CHOICE
+    && proposal?.account.accountType === GovernanceAccountType.ProposalV2
+  
+  const nota = '$$_NOTA_$$'
+
   return vote !== undefined ? (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-4">
       <div className="flex flex-col items-center justify-center">
         <h3 className="text-center">
           {quorum === 'electoral' ? 'Your vote' : 'You voted to veto'}
         </h3>
-        {vote.voteType === VoteKind.Approve ? (
+        {vote.voteType === VoteKind.Approve ? 
+          isMulti ? 
+            vote.approveChoices?.map((choice, index) => (
+              choice.weightPercentage ?
+              <div className="p-1 w-full" key={index}>
+                <Button
+                  className='w-full border border-primary-light text-primary-light bg-transparent'
+                  disabled={true}
+                >
+                  <div className="flex flex-row gap-2 justify-center">
+                    <div><CheckmarkFilled /></div>
+                    <div>{
+                      proposal?.account.options[index].label === nota ?
+                        "None of the Above" :
+                        proposal?.account.options[index].label
+                    }</div>
+                  </div>
+                </Button>
+              </div>
+              : null
+            )) 
+          : (
           <Tooltip content={`You voted "Yes"`}>
             <div className="flex flex-row items-center justify-center rounded-full border border-[#8EFFDD] p-2 mt-2">
               <ThumbUpIcon className="h-4 w-4 fill-[#8EFFDD]" />
@@ -172,15 +205,16 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
       {(isVoting || isInCoolOffTime) && (
         <div className="items-center justify-center flex w-full gap-5">
           <div className="flex flex-col gap-6 items-center">
-            <SecondaryButton
+            <Button
               className="min-w-[200px]"
               isLoading={isLoading}
               tooltipMessage={withdrawTooltipContent}
               onClick={() => submitRelinquishVote()}
               disabled={!isWithdrawEnabled || isLoading}
             >
-              Relinquish Vote
-            </SecondaryButton>
+              Withdraw Vote
+            </Button>
+
             {isInCoolOffTime && (
               <div className="text-xs">
                 Warning: If you withdraw your vote now you can only deny the

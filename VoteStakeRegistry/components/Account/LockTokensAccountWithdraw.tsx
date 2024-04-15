@@ -27,9 +27,9 @@ import {
   LockClosedIcon,
 } from '@heroicons/react/outline'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
-import Account from './Account'
+import Account from '../../../pages/dao/[symbol]/account/Account'
 import { abbreviateAddress } from '@utils/formatting'
-import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
+import { TokenDeposit } from '@components/TokenBalance/TokenDeposit'
 import { VsrClient } from 'VoteStakeRegistry/sdk/client'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
@@ -41,6 +41,7 @@ import {
 } from '@hooks/queries/mintInfo'
 import { useConnection } from '@solana/wallet-adapter-react'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { useVsrGovpower } from '@hooks/queries/plugins/vsr'
 
 interface DepositBox {
   mintPk: PublicKey
@@ -61,7 +62,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
   const [reducedDeposits, setReducedDeposits] = useState<DepositBox[]>([])
   const [ownDeposits, setOwnDeposits] = useState<DepositWithMintAccount[]>([])
   const [deposits, setDeposits] = useState<DepositWithMintAccount[]>([])
-  const [votingPower, setVotingPower] = useState<BN>(new BN(0))
+  const votingPower = useVsrGovpower().data?.result ?? new BN(0)
   const [votingPowerFromDeposits, setVotingPowerFromDeposits] = useState<BN>(
     new BN(0)
   )
@@ -139,11 +140,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
     setIsLoading(true)
     try {
       if (realm!.pubkey && wallet?.publicKey && client) {
-        const {
-          deposits,
-          votingPower,
-          votingPowerFromDeposits,
-        } = await getDeposits({
+        const { deposits, votingPowerFromDeposits } = await getDeposits({
           realmPk: realm!.pubkey,
           communityMintPk: realm!.account.communityMint,
           walletPk: tokenOwnerRecordWalletPk
@@ -182,12 +179,10 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
           return curr
         }, [] as DepositBox[])
         setVotingPowerFromDeposits(votingPowerFromDeposits)
-        setVotingPower(votingPower)
         setDeposits(deposits)
         setReducedDeposits(reducedDeposits)
       } else if (!wallet?.connected) {
         setVotingPowerFromDeposits(new BN(0))
-        setVotingPower(new BN(0))
         setDeposits([])
         setReducedDeposits([])
       }
@@ -443,7 +438,6 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
           <TokenDeposit
             mint={councilMint}
             tokenRole={GoverningTokenRole.Council}
-            councilVote={true}
             inAccountDetails={true}
           />
         </div>

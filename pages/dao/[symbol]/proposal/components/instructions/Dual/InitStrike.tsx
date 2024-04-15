@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState, useMemo } from 'react'
 import { ProgramAccount, Governance } from '@solana/spl-governance'
 import {
   UiInstruction,
@@ -60,7 +60,7 @@ const InitStrike = ({
   useEffect(() => {
     setGovernedAccount(form.baseTreasury?.governance)
   }, [form.baseTreasury])
-  const schema = getDualFinanceInitStrikeSchema()
+  const schema = useMemo(getDualFinanceInitStrikeSchema, [])
 
   return (
     <>

@@ -18,7 +18,6 @@ import { validatePubkey } from '@utils/formValidation'
 import useSerumGovStore from 'stores/useSerumGovStore'
 import useWalletDeprecated from '@hooks/useWalletDeprecated'
 import { NewProposalContext } from '../../../new'
-import { findProgramAddressSync } from '@coral-xyz/anchor/dist/cjs/utils/pubkey'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useConnection } from '@solana/wallet-adapter-react'
 
@@ -56,7 +55,7 @@ const InitUser = ({
       debounce.debounceFcn(async () => {
         const pubKey = tryParseKey(form.owner)
         if (pubKey) {
-          const [account] = findProgramAddressSync(
+          const [account] = PublicKey.findProgramAddressSync(
             [Buffer.from('user'), pubKey.toBuffer()],
             new PublicKey(form.programId)
           )

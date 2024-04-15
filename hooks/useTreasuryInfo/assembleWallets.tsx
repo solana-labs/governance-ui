@@ -9,16 +9,20 @@ import {
 import { SparklesIcon } from '@heroicons/react/outline'
 
 import { AssetAccount, AccountType } from '@utils/uiTypes/assets'
-import { AssetType, Token, RealmAuthority } from '@models/treasury/Asset'
+import {
+  AssetType,
+  Token,
+  RealmAuthority,
+  Asset,
+  Mango,
+  Sol,
+} from '@models/treasury/Asset'
 import { AuxiliaryWallet, Wallet } from '@models/treasury/Wallet'
 import { getAccountName } from '@components/instructions/tools'
-import { NFT } from '@models/treasury/NFT'
 import { RealmInfo } from '@models/registry/api'
 
 import { calculateTotalValue } from './calculateTotalValue'
 import { convertAccountToAsset } from './convertAccountToAsset'
-import { groupNftsByWallet } from './groupNftsByWallet'
-import { groupNftsIntoCollections } from './groupNftsIntoCollections'
 import {
   ProgramAssetAccount,
   groupProgramsByWallet,
@@ -29,19 +33,74 @@ import { Domain } from '@models/treasury/Domain'
 import { groupDomainsByWallet } from './groupDomainsByWallet'
 import { ConnectionContext } from '@utils/connection'
 import { PublicKey } from '@solana/web3.js'
-import getTokenOwnerRecordsForWallet from './getTokenOwnerRecordsForWallet'
-import { tryParseKey } from '@tools/validators/pubkey'
+import {
+  MangoClient,
+  Group,
+  MangoAccount,
+  I80F48,
+  toUiDecimals,
+} from '@blockworks-foundation/mango-v4'
+import { BN } from '@coral-xyz/anchor'
 
 function isNotNull<T>(x: T | null): x is T {
   return x !== null
 }
 
+export async function fetchMangoAccounts(
+  assets: Asset[],
+  mangoClient: MangoClient | null,
+  mangoGroup: Group | null
+) {
+  if (!mangoClient || !mangoGroup) {
+    return {
+      mangoAccountsValue: new BigNumber(0),
+      mangoAccounts: [],
+    }
+  }
+
+  const tokenAccountOwners = Array.from(
+    new Set(
+      assets
+        .filter((a) => a.type === AssetType.Token)
+        .filter((a: Token) => a.raw.extensions.token)
+        .filter((a: Token) => a.raw.extensions.token!.account.owner)
+        .map((a: Token) => a.raw.extensions.token!.account.owner.toString())
+    )
+  ).map((o) => new PublicKey(o))
+
+  const mangoAccounts: MangoAccount[] = []
+  if (tokenAccountOwners.length <= 2) {
+    for (const tokenAccountOwner of tokenAccountOwners) {
+      const accounts = await mangoClient.getMangoAccountsForOwner(
+        mangoGroup,
+        tokenAccountOwner
+      )
+
+      if (accounts) {
+        mangoAccounts.push(...accounts)
+      }
+    }
+  }
+
+  const mangoAccountsValue = mangoAccounts.reduce((acc: I80F48, account) => {
+    const value = account.getAssetsValue(mangoGroup!)
+    acc = acc.add(value)
+    return acc
+  }, new I80F48(new BN(0)))
+
+  return {
+    mangoAccountsValue: new BigNumber(toUiDecimals(mangoAccountsValue, 6)),
+    mangoAccounts,
+  }
+}
+
 export const assembleWallets = async (
   connection: ConnectionContext,
   accounts: AssetAccount[],
-  nfts: NFT[],
   domains: Domain[],
   programId: PublicKey,
+  mangoGroup: Group | null,
+  mangoClient: MangoClient | null,
   councilMintAddress?: string,
   communityMintAddress?: string,
   councilMint?: MintInfo,
@@ -51,7 +110,6 @@ export const assembleWallets = async (
   realmInfo?: RealmInfo
 ) => {
   const walletMap: { [address: string]: Wallet } = {}
-  const nftsGroupedByWallet = groupNftsByWallet(nfts)
   const programs = accounts.filter(
     (account) => account.type === AccountType.PROGRAM
   ) as ProgramAssetAccount[]
@@ -65,7 +123,6 @@ export const assembleWallets = async (
 
   for (const account of accounts) {
     let walletAddress = ''
-
     if (account.isSol && account.extensions.transferAddress) {
       walletAddress = account.extensions.transferAddress.toBase58()
     } else if (account.governance.pubkey) {
@@ -119,7 +176,7 @@ export const assembleWallets = async (
       account.type !== AccountType.NFT &&
       account.type !== AccountType.PROGRAM
     ) {
-      const asset = convertAccountToAsset(
+      const asset = await convertAccountToAsset(
         account,
         councilMintAddress,
         communityMintAddress
@@ -128,15 +185,6 @@ export const assembleWallets = async (
       if (asset) {
         walletMap[walletAddress].assets.push(asset)
       }
-    }
-
-    if (account.type === AccountType.SOL) {
-      const tokenOwnerRecords = await getTokenOwnerRecordsForWallet(
-        connection,
-        account.governance,
-        tryParseKey(walletAddress)
-      )
-      walletMap[walletAddress].assets.push(...tokenOwnerRecords)
     }
   }
 
@@ -189,7 +237,7 @@ export const assembleWallets = async (
       }
     }
 
-    walletMap[walletAddress].assets.push({
+    walletMap[walletAddress].assets.unshift({
       type: AssetType.Domain,
       id: 'domain-list',
       count: new BigNumber(domainList.length),
@@ -197,26 +245,23 @@ export const assembleWallets = async (
     })
   }
 
-  for (const [walletAddress, nftList] of Object.entries(nftsGroupedByWallet)) {
-    if (!walletMap[walletAddress]) {
-      walletMap[walletAddress] = {
-        address: walletAddress,
-        assets: [],
-        rules: {},
-        stats: {},
-        totalValue: new BigNumber(0),
-      }
+  const allWallets: any[] = []
+  for (const wallet of Object.values(walletMap)) {
+    const { mangoAccountsValue } = await fetchMangoAccounts(
+      wallet.assets,
+      mangoClient,
+      mangoGroup
+    )
+
+    if (mangoAccountsValue.gt(0)) {
+      wallet.assets.push({
+        id: 'mango',
+        type: AssetType.Mango,
+        value: mangoAccountsValue,
+      })
     }
 
-    const collections = groupNftsIntoCollections(nftList)
-
-    for (const collection of collections) {
-      walletMap[walletAddress].assets.push(collection)
-    }
-  }
-
-  const allWallets = Object.values(walletMap)
-    .map((wallet) => ({
+    allWallets.push({
       ...wallet,
       name: wallet.governanceAddress
         ? getAccountName(wallet.governanceAddress)
@@ -226,38 +271,53 @@ export const assembleWallets = async (
           'value' in asset ? asset.value : new BigNumber(0)
         )
       ),
-    }))
-    .sort((a, b) => {
-      if (a.totalValue.isZero() && b.totalValue.isZero()) {
-        const aContainsSortable = a.assets.some(
-          (asset) =>
-            asset.type === AssetType.NFTCollection ||
-            asset.type === AssetType.Programs
-        )
-        const bContainsSortable = b.assets.some(
-          (asset) =>
-            asset.type === AssetType.NFTCollection ||
-            asset.type === AssetType.Programs
-        )
-
-        if (aContainsSortable && !bContainsSortable) {
-          return -1
-        } else if (!aContainsSortable && bContainsSortable) {
-          return 1
-        } else {
-          return b.assets.length - a.assets.length
-        }
-      }
-
-      return b.totalValue.comparedTo(a.totalValue)
     })
+  }
 
-  const auxiliaryAssets = ungovernedAssets
-    .map(
-      (account) =>
-        convertAccountToAsset({ ...account, type: AccountType.TOKEN }) as Token
+  allWallets.sort((a, b) => {
+    if (a.totalValue.isZero() && b.totalValue.isZero()) {
+      const aContainsSortable = a.assets.some(
+        (asset) => asset.type === AssetType.Programs
+      )
+      const bContainsSortable = b.assets.some(
+        (asset) => asset.type === AssetType.Programs
+      )
+
+      if (aContainsSortable && !bContainsSortable) {
+        return -1
+      } else if (!aContainsSortable && bContainsSortable) {
+        return 1
+      } else {
+        return b.assets.length - a.assets.length
+      }
+    }
+
+    return b.totalValue.comparedTo(a.totalValue)
+  })
+
+  const auxiliaryAssets = (
+    await Promise.all(
+      ungovernedAssets.map(
+        (account) =>
+          convertAccountToAsset({
+            ...account,
+            type: AccountType.TOKEN,
+          }) as Promise<Token | Mango | Sol>
+      )
     )
-    .filter(isNotNull)
+  ).filter(isNotNull)
+
+  const {
+    mangoAccountsValue: auxMangoAccountsValue,
+  } = await fetchMangoAccounts(auxiliaryAssets, mangoClient!, mangoGroup!)
+
+  if (auxMangoAccountsValue.gt(0)) {
+    auxiliaryAssets.unshift({
+      id: 'mango',
+      type: AssetType.Mango,
+      value: auxMangoAccountsValue,
+    })
+  }
 
   const auxiliaryWallets: AuxiliaryWallet[] = auxiliaryAssets.length
     ? [

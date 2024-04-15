@@ -18,7 +18,6 @@ import BigNumber from 'bignumber.js'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { SolendStrategy } from 'Strategies/types/types'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import AdditionalProposalOptions from '@components/AdditionalProposalOptions'
 import { validateInstruction } from '@utils/instructionTools'
 import * as yup from 'yup'
@@ -40,6 +39,9 @@ import {
 } from '@hooks/queries/mintInfo'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { useRealmProposalsQuery } from '@hooks/queries/proposal'
+import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
+import {useVotingClients} from "@hooks/useVotingClients";
+import {useVoteByCouncilToggle} from "@hooks/useVoteByCouncilToggle";
 
 const SolendWithdraw = ({
   proposedInvestment,
@@ -64,15 +66,14 @@ const SolendWithdraw = ({
   const config = useRealmConfigQuery().data?.result
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
-  const { realmInfo, ownVoterWeight } = useRealm()
+  const { result: ownVoterWeight } = useLegacyVoterWeight()
+  const { realmInfo } = useRealm()
   const [isWithdrawing, setIsWithdrawing] = useState(false)
-  const [voteByCouncil, setVoteByCouncil] = useState(false)
+  const { voteByCouncil, setVoteByCouncil } = useVoteByCouncilToggle();
   const [deposits, setDeposits] = useState<{
     [reserveAddress: string]: { amount: number; amountExact: number }
   }>({})
-  const client = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
-  )
+  const votingClients = useVotingClients();
   const proposals = useRealmProposalsQuery().data
   const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
@@ -199,6 +200,7 @@ const SolendWithdraw = ({
   }
 
   const handleWithdraw = async () => {
+    if (ownVoterWeight === undefined) throw new Error()
     if (proposals === undefined) throw new Error()
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     if (!isValid) {
@@ -256,7 +258,7 @@ const SolendWithdraw = ({
         governedTokenAccount!.governance!.account!.proposalCount,
         false,
         connection,
-        client
+        votingClients(voteByCouncil? 'council' : 'community'),
       )
       const url = fmtUrlWithCluster(
         `/dao/${symbol}/proposal/${proposalAddress}`

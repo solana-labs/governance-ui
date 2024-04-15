@@ -17,7 +17,7 @@ import {
 import { precision } from '@utils/formatting'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { voteRegistryLockDeposit } from 'VoteStakeRegistry/actions/voteRegistryLockDeposit'
-import { DepositWithMintAccount } from 'VoteStakeRegistry/sdk/accounts'
+import { DepositWithMintAccount, Registrar } from 'VoteStakeRegistry/sdk/accounts'
 import {
   yearsToDays,
   daysToMonths,
@@ -37,10 +37,8 @@ import {
   Period,
   VestingPeriod,
   vestingPeriods,
-  DAILY,
 } from 'VoteStakeRegistry/tools/types'
 import BigNumber from 'bignumber.js'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { calcMintMultiplier } from 'VoteStakeRegistry/tools/deposits'
 import ButtonGroup from '@components/ButtonGroup'
 import InlineNotification from '@components/InlineNotification'
@@ -53,6 +51,7 @@ import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 import { useConnection } from '@solana/wallet-adapter-react'
 import { tokenAccountQueryKeys } from '@hooks/queries/tokenAccount'
 import queryClient from '@hooks/queries/queryClient'
+import {useVsrClient} from "../../../VoterWeightPlugins/useVsrClient";
 
 const YES = 'Yes'
 const NO = 'No'
@@ -72,21 +71,14 @@ const LockTokensModal = ({
   const { realmTokenAccount, realmInfo } = useRealm()
   const { data: tokenOwnerRecordPk } = useAddressQuery_CommunityTokenOwner()
 
-  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
-  const voteStakeRegistryRegistrar = useVotePluginsClientStore(
-    (s) => s.state.voteStakeRegistryRegistrar
-  )
+  const { vsrClient: client, plugin } = useVsrClient();
+  const voteStakeRegistryRegistrar = plugin?.params as Registrar | undefined;
+
   const { connection } = useConnection()
   const endpoint = connection.rpcEndpoint
   const wallet = useWalletOnePointOh()
   const deposits = useDepositStore((s) => s.state.deposits)
   const fiveYearsSecs = yearsToSecs(5)
-  const maxLockupSecs =
-    (realm &&
-      voteStakeRegistryRegistrar?.votingMints
-        .find((x) => x.mint.equals(realm.account.communityMint))
-        ?.lockupSaturationSecs.toNumber()) ||
-    fiveYearsSecs
 
   const lockupPeriods: Period[] = useMemo(() => {
     return [
@@ -111,7 +103,14 @@ const LockTokensModal = ({
         display: '5y',
       },
       {
-        defaultValue: 1,
+        defaultValue: depositToUnlock
+          ? Math.ceil(
+              secsToDays(
+                depositToUnlock?.lockup.endTs.toNumber() -
+                  depositToUnlock.lockup.startTs.toNumber()
+              )
+            )
+          : 1,
         display: 'Custom',
       },
     ]
@@ -123,8 +122,10 @@ const LockTokensModal = ({
             ) <= x.defaultValue || x.display === 'Custom'
           : true
       )
-      .filter((x) => x.defaultValue <= secsToDays(maxLockupSecs))
-  }, [depositToUnlock, maxLockupSecs])
+      .filter((x) => {
+        return x.defaultValue <= secsToDays(fiveYearsSecs)
+      })
+  }, [depositToUnlock, fiveYearsSecs])
 
   const maxNonCustomDaysLockup = lockupPeriods
     .map((x) => x.defaultValue)
@@ -133,7 +134,7 @@ const LockTokensModal = ({
     })
   const maxMultiplier = calcMintMultiplier(
     maxNonCustomDaysLockup * SECS_PER_DAY,
-    voteStakeRegistryRegistrar,
+    voteStakeRegistryRegistrar ?? null,
     realm
   )
 
@@ -143,6 +144,7 @@ const LockTokensModal = ({
       x.lockup.kind.none
   )
   const [lockupPeriodDays, setLockupPeriodDays] = useState<number>(0)
+
   const allowClawback = false
   const [lockupPeriod, setLockupPeriod] = useState<Period>(lockupPeriods[0])
   const [amount, setAmount] = useState<number | undefined>()
@@ -170,6 +172,7 @@ const LockTokensModal = ({
         depositToUnlock?.amountInitiallyLockedNative
       )
     : 0
+
   const maxAmountToLock =
     depositRecord && mint
       ? wantToLockMoreThenDeposited
@@ -208,8 +211,9 @@ const LockTokensModal = ({
     : ''
   const currentMultiplier = calcMintMultiplier(
     lockupPeriodDays * SECS_PER_DAY,
-    voteStakeRegistryRegistrar,
-    realm
+    voteStakeRegistryRegistrar ?? null,
+    realm,
+    lockupType.value !== 'constant'
   )
   const currentPercentOfMaxMultiplier =
     (100 * currentMultiplier) / maxMultiplier
@@ -376,16 +380,10 @@ const LockTokensModal = ({
                     onChange={(type) =>
                       setLockupType(
                         //@ts-ignore
-                        lockupTypes
-                          .filter(
-                            (x) => x.value !== MONTHLY && x.value !== DAILY
-                          )
-                          .find((t) => t.displayName === type)
+                        lockupTypes.find((t) => t.displayName === type)
                       )
                     }
-                    values={lockupTypes
-                      .filter((x) => x.value !== MONTHLY && x.value !== DAILY)
-                      .map((type) => type.displayName)}
+                    values={lockupTypes.map((type) => type.displayName)}
                   />
                 </div>
               </>
@@ -437,7 +435,7 @@ const LockTokensModal = ({
                   values={lockupPeriods.map((p) => p.display)}
                 />
               </div>
-              {lockupPeriod.defaultValue === 1 && (
+              {lockupPeriod.display === 'Custom' && (
                 <>
                   <div className={`${labelClasses} flex justify-between`}>
                     Number of days

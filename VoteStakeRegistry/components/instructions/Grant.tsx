@@ -1,11 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import Input from '@components/inputs/Input'
 import useRealm from '@hooks/useRealm'
 import { AccountInfo } from '@solana/spl-token'
@@ -41,7 +35,6 @@ import * as yup from 'yup'
 import { getGrantInstruction } from 'VoteStakeRegistry/actions/getGrantInstruction'
 import { getRegistrarPDA } from 'VoteStakeRegistry/sdk/accounts'
 import { tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import dayjs from 'dayjs'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
@@ -50,6 +43,7 @@ import queryClient from '@hooks/queries/queryClient'
 import asFindable from '@utils/queries/asFindable'
 import { tokenOwnerRecordQueryKeys } from '@hooks/queries/tokenOwnerRecord'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import {useVsrClient} from "../../../VoterWeightPlugins/useVsrClient";
 
 const Grant = ({
   index,
@@ -58,7 +52,7 @@ const Grant = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
+  const { vsrClient } = useVsrClient();
   const dateNow = dayjs().unix()
   const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
@@ -83,7 +77,7 @@ const Grant = ({
   })
   const schema = useMemo(
     () =>
-      getTokenTransferSchema({ form, connection }).concat(
+      getTokenTransferSchema({ form, connection, ignoreAmount: true }).concat(
         yup.object().shape({
           startDateUnixSeconds: yup
             .number()
@@ -160,7 +154,6 @@ const Grant = ({
         form.amount!,
         form.governedTokenAccount.extensions.mint.account.decimals
       )
-      //const currentTokenOwnerRecord = tokenRecords[form.destinationAccount]
 
       const destinationTokenOwnerRecordPk = await getTokenOwnerRecordAddress(
         realm.owner,
@@ -168,7 +161,7 @@ const Grant = ({
         realm.account.communityMint,
         destinationAccount
       )
-      const currentTokenOwnerRecord = queryClient.fetchQuery({
+      const currentTokenOwnerRecord = await queryClient.fetchQuery({
         queryKey: tokenOwnerRecordQueryKeys.byPubkey(
           connection.cluster,
           destinationTokenOwnerRecordPk
@@ -180,7 +173,7 @@ const Grant = ({
           ),
       })
 
-      if (!currentTokenOwnerRecord) {
+      if (!currentTokenOwnerRecord.found) {
         await withCreateTokenOwnerRecord(
           prerequisiteInstructions,
           realm!.owner,
@@ -205,7 +198,7 @@ const Grant = ({
         startTime: form.startDateUnixSeconds,
         lockupKind: form.lockupKind.value,
         allowClawback: form.allowClawback,
-        client: client!,
+        client: vsrClient!,
       })
       serializedInstruction = serializeInstructionToBase64(grantIx!)
     }
@@ -215,10 +208,11 @@ const Grant = ({
       isValid,
       governance: form.governedTokenAccount?.governance,
       prerequisiteInstructions: prerequisiteInstructions,
+      chunkBy: 1,
     }
     return obj
   }, [
-    client,
+    vsrClient,
     connection,
     form,
     realm,
@@ -293,23 +287,23 @@ const Grant = ({
 
   useEffect(() => {
     const getGrantMints = async () => {
-      const clientProgramId = client!.program.programId
-      const { registrar } = await getRegistrarPDA(
-        realm!.pubkey,
-        realm!.account.communityMint,
-        clientProgramId
+      const clientProgramId = vsrClient!.program.programId
+      const { registrar } = getRegistrarPDA(
+          realm!.pubkey,
+          realm!.account.communityMint,
+          clientProgramId
       )
-      const existingRegistrar = await tryGetRegistrar(registrar, client!)
+      const existingRegistrar = await tryGetRegistrar(registrar, vsrClient!)
       if (existingRegistrar) {
         setUseableGrantMints(
           existingRegistrar.votingMints.map((x) => x.mint.toBase58())
         )
       }
     }
-    if (client) {
+    if (vsrClient) {
       getGrantMints()
     }
-  }, [client, realm])
+  }, [vsrClient, realm])
 
   const isNotVested =
     form.lockupKind.value !== 'monthly' && form.lockupKind.value !== 'daily'

@@ -1,14 +1,21 @@
-import { Keypair, Transaction, TransactionInstruction } from '@solana/web3.js'
+import {
+  Connection,
+  Keypair,
+  PublicKey,
+  TransactionInstruction,
+} from '@solana/web3.js'
 import {
   ChatMessageBody,
-  getGovernanceProgramVersion,
+  GovernanceAccountType,
   GOVERNANCE_CHAT_PROGRAM_ID,
   Proposal,
   Realm,
-  TokenOwnerRecord,
   VoteChoice,
   VoteKind,
+  VoteType,
   withPostChatMessage,
+  withCreateTokenOwnerRecord,
+  getVoteRecordAddress,
 } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
@@ -23,11 +30,17 @@ import {
   SequenceType,
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
-import { sendTransaction } from '@utils/send'
 import { calcCostOfNftVote, checkHasEnoughSolToVote } from '@tools/nftVoteCalc'
 import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
 import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
+import { fetchRealmByPubkey } from '@hooks/queries/realm'
+import { fetchProposalByPubkeyQuery } from '@hooks/queries/proposal'
+import { DELEGATOR_BATCH_VOTE_SUPPORT_BY_PLUGIN } from '@constants/flags'
+import { fetchTokenOwnerRecordByPubkey } from '@hooks/queries/tokenOwnerRecord'
+import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
+import { fetchVoteRecordByPubkey } from '@hooks/queries/voteRecord'
+import { findPluginName } from '@constants/plugins'
 
 const getVetoTokenMint = (
   proposal: ProgramAccount<Proposal>,
@@ -44,80 +57,197 @@ const getVetoTokenMint = (
   return vetoTokenMint
 }
 
+const createDelegatorVote = async ({
+  connection,
+  realmPk,
+  proposalPk,
+  tokenOwnerRecordPk,
+  userPk,
+  vote,
+  votingPlugin,
+}: {
+  connection: Connection
+  realmPk: PublicKey
+  proposalPk: PublicKey
+  tokenOwnerRecordPk: PublicKey
+  userPk: PublicKey
+  vote: Vote
+  votingPlugin: VotingClient | undefined
+}) => {
+  //
+  const realm = (await fetchRealmByPubkey(connection, realmPk)).result
+  if (!realm) throw new Error()
+  const proposal = (await fetchProposalByPubkeyQuery(connection, proposalPk))
+    .result
+  if (!proposal) throw new Error()
+
+  if (
+    !DELEGATOR_BATCH_VOTE_SUPPORT_BY_PLUGIN[
+      findPluginName(votingPlugin?.client?.program.programId)
+    ]
+  )
+    throw new Error()
+
+  const programVersion = await fetchProgramVersion(connection, realm.owner)
+
+  const castVoteIxs: TransactionInstruction[] = []
+
+  const pluginAddresses = await votingPlugin?.withCastPluginVote(
+    castVoteIxs,
+    proposal,
+    tokenOwnerRecordPk
+    //createCastNftVoteTicketIxs
+  )
+  await withCastVote(
+    castVoteIxs,
+    realm.owner,
+    programVersion,
+    realm.pubkey,
+    proposal.account.governance,
+    proposal.pubkey,
+    proposal.account.tokenOwnerRecord,
+    tokenOwnerRecordPk,
+    userPk,
+    proposal.account.governingTokenMint,
+    vote,
+    userPk,
+    pluginAddresses?.voterWeightPk,
+    pluginAddresses?.maxVoterWeightRecord
+  )
+
+  return castVoteIxs
+}
+
+const createTokenOwnerRecordIfNeeded = async ({
+  connection,
+  realmPk,
+  tokenOwnerRecordPk,
+  payer,
+  governingTokenMint,
+}: {
+  connection: Connection
+  realmPk: PublicKey
+  tokenOwnerRecordPk: PublicKey
+  payer: PublicKey
+  governingTokenMint: PublicKey
+}) => {
+  const realm = await fetchRealmByPubkey(connection, realmPk)
+  if (!realm.result) throw new Error()
+  const version = await fetchProgramVersion(connection, realm.result.owner)
+
+  const tokenOwnerRecord = await fetchTokenOwnerRecordByPubkey(
+    connection,
+    tokenOwnerRecordPk
+  )
+  if (tokenOwnerRecord.result) return []
+  // create token owner record
+  const ixs: TransactionInstruction[] = []
+  await withCreateTokenOwnerRecord(
+    ixs,
+    realm.result.owner,
+    version,
+    realmPk,
+    payer,
+    governingTokenMint,
+    payer
+  )
+  return ixs
+}
+
 export async function castVote(
   { connection, wallet, programId, walletPubkey }: RpcContext,
   realm: ProgramAccount<Realm>,
   proposal: ProgramAccount<Proposal>,
-  tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>,
+  tokenOwnerRecord: PublicKey,
   voteKind: VoteKind,
   message?: ChatMessageBody | undefined,
   votingPlugin?: VotingClient,
-  runAfterConfirmation?: (() => void) | null
+  runAfterConfirmation?: (() => void) | null,
+  voteWeights?: number[],
+  additionalTokenOwnerRecords?: PublicKey[]
 ) {
-  const signers: Keypair[] = []
-  const instructions: TransactionInstruction[] = []
+  const chatMessageSigners: Keypair[] = []
+
+  const createCastNftVoteTicketIxs: TransactionInstruction[] = []
+  const createPostMessageTicketIxs: TransactionInstruction[] = []
 
   const governanceAuthority = walletPubkey
   const payer = walletPubkey
   // Explicitly request the version before making RPC calls to work around race conditions in resolving
   // the version for RealmInfo
-  const programVersion = await getGovernanceProgramVersion(
-    connection,
-    programId
-  )
+  const programVersion = await fetchProgramVersion(connection, programId)
 
+  const pluginCastVoteIxs: TransactionInstruction[] = []
   //will run only if any plugin is connected with realm
   const plugin = await votingPlugin?.withCastPluginVote(
-    instructions,
+    pluginCastVoteIxs,
     proposal,
-    tokenOwnerRecord
+    tokenOwnerRecord,
+    createCastNftVoteTicketIxs
   )
+
+  const isMulti =
+    proposal.account.voteType !== VoteType.SINGLE_CHOICE &&
+    proposal.account.accountType === GovernanceAccountType.ProposalV2
 
   // It is not clear that defining these extraneous fields, `deny` and `veto`, is actually necessary.
   // See:  https://discord.com/channels/910194960941338677/910630743510777926/1044741454175674378
-  const vote =
-    voteKind === VoteKind.Approve
-      ? new Vote({
-          voteType: VoteKind.Approve,
-          approveChoices: [new VoteChoice({ rank: 0, weightPercentage: 100 })],
-          deny: undefined,
-          veto: undefined,
-        })
-      : voteKind === VoteKind.Deny
-      ? new Vote({
-          voteType: VoteKind.Deny,
-          approveChoices: undefined,
-          deny: true,
-          veto: undefined,
-        })
-      : voteKind == VoteKind.Veto
-      ? new Vote({
-          voteType: VoteKind.Veto,
-          veto: true,
-          deny: undefined,
-          approveChoices: undefined,
-        })
-      : new Vote({
-          voteType: VoteKind.Abstain,
-          veto: undefined,
-          deny: undefined,
-          approveChoices: undefined,
-        })
+  const vote = isMulti
+    ? new Vote({
+        voteType: VoteKind.Approve,
+        approveChoices: proposal.account.options.map((_o, index) => {
+          if (voteWeights?.includes(index)) {
+            return new VoteChoice({ rank: 0, weightPercentage: 100 })
+          } else {
+            return new VoteChoice({ rank: 0, weightPercentage: 0 })
+          }
+        }),
+        deny: undefined,
+        veto: undefined,
+      })
+    : voteKind === VoteKind.Approve
+    ? new Vote({
+        voteType: VoteKind.Approve,
+        approveChoices: [new VoteChoice({ rank: 0, weightPercentage: 100 })],
+        deny: undefined,
+        veto: undefined,
+      })
+    : voteKind === VoteKind.Deny
+    ? new Vote({
+        voteType: VoteKind.Deny,
+        approveChoices: undefined,
+        deny: true,
+        veto: undefined,
+      })
+    : voteKind == VoteKind.Veto
+    ? new Vote({
+        voteType: VoteKind.Veto,
+        veto: true,
+        deny: undefined,
+        approveChoices: undefined,
+      })
+    : new Vote({
+        voteType: VoteKind.Abstain,
+        veto: undefined,
+        deny: undefined,
+        approveChoices: undefined,
+      })
 
   const tokenMint =
     voteKind === VoteKind.Veto
       ? getVetoTokenMint(proposal, realm)
       : proposal.account.governingTokenMint
 
+  const castVoteIxs: TransactionInstruction[] = []
   await withCastVote(
-    instructions,
+    castVoteIxs,
     programId,
     programVersion,
     realm.pubkey,
     proposal.account.governance,
     proposal.pubkey,
     proposal.account.tokenOwnerRecord,
-    tokenOwnerRecord.pubkey,
+    tokenOwnerRecord,
     governanceAuthority,
     tokenMint,
     vote,
@@ -126,22 +256,59 @@ export async function castVote(
     plugin?.maxVoterWeightRecord
   )
 
+  const delegatorCastVoteAtoms =
+    additionalTokenOwnerRecords &&
+    DELEGATOR_BATCH_VOTE_SUPPORT_BY_PLUGIN[
+      findPluginName(votingPlugin?.client?.program.programId)
+    ]
+      ? (
+          await Promise.all(
+            additionalTokenOwnerRecords.map(async (tokenOwnerRecordPk) => {
+              // Skip vote if already voted
+              const voteRecordPk = await getVoteRecordAddress(
+                realm.owner,
+                proposal.pubkey,
+                tokenOwnerRecordPk
+              )
+              const voteRecord = await fetchVoteRecordByPubkey(
+                connection,
+                voteRecordPk
+              )
+              if (voteRecord.found) return undefined
+
+              return createDelegatorVote({
+                connection,
+                realmPk: realm.pubkey,
+                proposalPk: proposal.pubkey,
+                tokenOwnerRecordPk,
+                userPk: walletPubkey,
+                vote,
+                votingPlugin: votingPlugin,
+              })
+            })
+          )
+        ).filter((x): x is NonNullable<typeof x> => x !== undefined)
+      : []
+
+  const pluginPostMessageIxs: TransactionInstruction[] = []
+  const postMessageIxs: TransactionInstruction[] = []
   if (message) {
+
     const plugin = await votingPlugin?.withUpdateVoterWeightRecord(
-      instructions,
-      tokenOwnerRecord,
-      'commentProposal'
+      pluginPostMessageIxs,
+      'commentProposal',
+      createPostMessageTicketIxs
     )
 
     await withPostChatMessage(
-      instructions,
-      signers,
+      postMessageIxs,
+      chatMessageSigners,
       GOVERNANCE_CHAT_PROGRAM_ID,
       programId,
       realm.pubkey,
       proposal.account.governance,
       proposal.pubkey,
-      tokenOwnerRecord.pubkey,
+      tokenOwnerRecord,
       governanceAuthority,
       payer,
       undefined,
@@ -150,53 +317,75 @@ export async function castVote(
     )
   }
 
-  const ixChunkCount = message ? 4 : 2
   const isNftVoter = votingPlugin?.client instanceof NftVoterClient
   const isHeliumVoter = votingPlugin?.client instanceof HeliumVsrClient
+  const tokenOwnerRecordIxs = await createTokenOwnerRecordIfNeeded({
+    connection,
+    realmPk: realm.pubkey,
+    tokenOwnerRecordPk: tokenOwnerRecord,
+    payer,
+    governingTokenMint: tokenMint,
+  })
 
   if (!isNftVoter && !isHeliumVoter) {
-    const transaction = new Transaction()
-    transaction.add(...instructions)
+    const batch1 = [
+      ...tokenOwnerRecordIxs,
+      ...pluginCastVoteIxs,
+      ...castVoteIxs,
+      ...pluginPostMessageIxs,
+      ...postMessageIxs,
+    ]
+    // chunk size chosen conservatively. "Atoms" refers to atomic clusters of instructions (namely, updatevoterweight? + vote)
+    const delegatorBatches = chunks(delegatorCastVoteAtoms, 2).map((x) =>
+      x.flat()
+    )
+    const actions = [batch1, ...delegatorBatches].map((ixs) => ({
+      instructionsSet: ixs.map((ix) => ({
+        transactionInstruction: ix,
+        signers: chatMessageSigners.filter((kp) =>
+          ix.keys.find((key) => key.isSigner && key.pubkey.equals(kp.publicKey))
+        ),
+      })),
+      sequenceType: SequenceType.Parallel,
+    }))
 
-    await sendTransaction({ transaction, wallet, connection, signers })
-    if (runAfterConfirmation) {
-      runAfterConfirmation()
-    }
+    await sendTransactionsV3({
+      connection,
+      wallet,
+      transactionInstructions: actions,
+      callbacks: {
+        afterAllTxConfirmed: () => {
+          if (runAfterConfirmation) {
+            runAfterConfirmation()
+          }
+        },
+      },
+    })
   }
 
   // we need to chunk instructions
   if (isHeliumVoter) {
-    // update voter weight + cast vote from spl gov need to be in one transaction
-    const ixsWithOwnChunk = instructions.slice(-ixChunkCount)
-    const remainingIxsToChunk = instructions.slice(
-      0,
-      instructions.length - ixChunkCount
+    // @asktree: I'm aware of no rationale for chunking in this particular manner
+    const chunkerz = chunks(
+      [
+        ...pluginCastVoteIxs,
+        ...castVoteIxs,
+        ...pluginPostMessageIxs,
+        ...postMessageIxs,
+      ],
+      2
     )
 
-    const splIxsWithAccountsChunk = chunks(ixsWithOwnChunk, 2)
-    const positionsAccountsChunks = chunks(remainingIxsToChunk, 2)
-    const ixsChunks = [
-      ...positionsAccountsChunks.map((txBatch, batchIdx) => {
-        return {
-          instructionsSet: txBatchesToInstructionSetWithSigners(
-            txBatch,
-            [],
-            batchIdx
-          ),
-          sequenceType: SequenceType.Parallel,
-        }
-      }),
-      ...splIxsWithAccountsChunk.map((txBatch, batchIdx) => {
-        return {
-          instructionsSet: txBatchesToInstructionSetWithSigners(
-            txBatch,
-            message ? [[], signers] : [],
-            batchIdx
-          ),
-          sequenceType: SequenceType.Sequential,
-        }
-      }),
-    ]
+    const ixsChunks = chunkerz.map((txBatch, batchIdx) => {
+      return {
+        instructionsSet: txBatchesToInstructionSetWithSigners(
+          txBatch,
+          message ? [[], chatMessageSigners] : [], // seeing signer related bugs when posting chat? This is likely culprit
+          batchIdx
+        ),
+        sequenceType: SequenceType.Sequential,
+      }
+    })
 
     await sendTransactionsV3({
       connection,
@@ -218,17 +407,25 @@ export async function castVote(
       openNftVotingCountingModal,
       closeNftVotingCountingModal,
     } = useNftProposalStore.getState()
-    //update voter weight + cast vote from spl gov need to be in one transaction
-    const ixsWithOwnChunk = instructions.slice(-ixChunkCount)
-    const remainingIxsToChunk = instructions.slice(
-      0,
-      instructions.length - ixChunkCount
+
+    const createNftVoteTicketsChunks = chunks(
+      [...createCastNftVoteTicketIxs, ...createPostMessageTicketIxs],
+      1
     )
 
-    const splIxsWithAccountsChunk = chunks(ixsWithOwnChunk, 2)
-    const nftsAccountsChunks = chunks(remainingIxsToChunk, 2)
+    // last element of pluginCastVoteIxs
+    const last = pluginCastVoteIxs[pluginCastVoteIxs.length - 1]
+    // everything except last element of pluginCastVoteIxs
+    const nftCountingChunks = pluginCastVoteIxs.slice(0, -1)
+    const voteChunk = [last, ...castVoteIxs] // the final nft-voter.CastNftVote instruction has to in same tx as the vote
+    const chunkedIxs = [...chunks(nftCountingChunks, 2), voteChunk].filter(
+      (x) => x.length > 0
+    )
+
+    // note that we are not chunking postMessageIxs, not yet supported (somehow)
+
     const instructionsChunks = [
-      ...nftsAccountsChunks.map((txBatch, batchIdx) => {
+      ...createNftVoteTicketsChunks.map((txBatch, batchIdx) => {
         return {
           instructionsSet: txBatchesToInstructionSetWithSigners(
             txBatch,
@@ -238,11 +435,11 @@ export async function castVote(
           sequenceType: SequenceType.Parallel,
         }
       }),
-      ...splIxsWithAccountsChunk.map((txBatch, batchIdx) => {
+      ...chunkedIxs.map((txBatch, batchIdx) => {
         return {
           instructionsSet: txBatchesToInstructionSetWithSigners(
             txBatch,
-            message ? [[], signers] : [],
+            message ? [[], chatMessageSigners] : [], // seeing signer related bugs when posting chat? This is likely culprit
             batchIdx
           ),
           sequenceType: SequenceType.Sequential,
@@ -250,14 +447,17 @@ export async function castVote(
       }),
     ]
     const totalVoteCost = await calcCostOfNftVote(
+      connection,
       message,
       instructionsChunks.length,
       proposal.pubkey,
-      votingPlugin
+      votingPlugin,
+      realm.pubkey,
+      walletPubkey
     )
     const hasEnoughSol = await checkHasEnoughSolToVote(
       totalVoteCost,
-      wallet.publicKey!,
+      walletPubkey,
       connection
     )
     if (!hasEnoughSol) {

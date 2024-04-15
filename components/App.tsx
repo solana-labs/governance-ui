@@ -1,13 +1,10 @@
 import { ThemeProvider } from 'next-themes'
-import { WalletIdentityProvider } from '@cardinal/namespaces-components'
 import dynamic from 'next/dynamic'
 import React, { useEffect, useMemo } from 'react'
 import Head from 'next/head'
 import Script from 'next/script'
 import { useRouter } from 'next/router'
 import { GatewayProvider } from '@components/Gateway/GatewayProvider'
-import { usePrevious } from '@hooks/usePrevious'
-import { useVotingPlugins } from '@hooks/useVotingPlugins'
 import { VSR_PLUGIN_PKS } from '@constants/plugins'
 import ErrorBoundary from '@components/ErrorBoundary'
 import useHandleGovernanceAssetsStore from '@hooks/handleGovernanceAssetsStore'
@@ -17,11 +14,7 @@ import PageBodyContainer from '@components/PageBodyContainer'
 import tokenPriceService from '@utils/services/tokenPrice'
 import TransactionLoader from '@components/TransactionLoader'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useMembers from '@components/Members/useMembers'
 import useRealm from '@hooks/useRealm'
-import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import NftVotingCountingModal from '@components/NftVotingCountingModal'
 import { getResourcePathPart } from '@tools/core/resources'
 import useSerumGovStore from 'stores/useSerumGovStore'
@@ -41,6 +34,9 @@ import {
 } from '@sqds/iframe-adapter'
 import { WALLET_PROVIDERS } from '@utils/wallet-adapters'
 import { tryParsePublicKey } from '@tools/core/pubkey'
+import { useAsync } from 'react-async-hook'
+import { useVsrClient } from '../VoterWeightPlugins/useVsrClient'
+import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
@@ -97,38 +93,41 @@ export function App(props: Props) {
   )
 }
 
+const allowedFaviconPaths = ['/realms/']
+const allowedDomains = [
+  'https://app.realms.today',
+  'http://localhost',
+  'http://localhost:3000',
+]
+
 export function AppContents(props: Props) {
   handleRouterHistory()
-  useVotingPlugins()
   useHandleGovernanceAssetsStore()
-  useMembers()
   useEffect(() => {
     tokenPriceService.fetchSolanaTokenList()
   }, [])
-  const { governedTokenAccounts } = useGovernanceAssets()
-  const possibleNftsAccounts = useMemo(
-    () => governedTokenAccounts.filter((x) => x.isSol || x.isNft),
-    [governedTokenAccounts]
-  )
-  const { getNfts } = useTreasuryAccountStore()
+
   const { getOwnedDeposits, resetDepositState } = useDepositStore()
 
+  const { plugins } = useRealmVoterWeightPlugins('community')
+  const usesVsr = plugins?.voterWeight.find((plugin) =>
+    VSR_PLUGIN_PKS.includes(plugin.programId.toString())
+  )
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
+
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
 
   const { realmInfo } = useRealm()
   const wallet = useWalletOnePointOh()
   const connection = useLegacyConnectionContext()
-  const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
-  const prevStringifyPossibleNftsAccounts = usePrevious(
-    JSON.stringify(possibleNftsAccounts)
-  )
+
   const router = useRouter()
-  const { cluster, symbol } = router.query
+  const { cluster } = router.query
   const updateSerumGovAccounts = useSerumGovStore(
     (s) => s.actions.updateSerumGovAccounts
   )
+  const { vsrClient } = useVsrClient()
 
   const realmName = realmInfo?.displayName ?? realm?.account?.name
   const title = realmName ? `${realmName}` : 'Realms'
@@ -136,20 +135,71 @@ export function AppContents(props: Props) {
   // Note: ?v==${Date.now()} is added to the url to force favicon refresh.
   // Without it browsers would cache the last used and won't change it for different realms
   // https://stackoverflow.com/questions/2208933/how-do-i-force-a-favicon-refresh
-  const faviconUrl =
-    symbol &&
-    tryParsePublicKey(symbol as string) === undefined && // don't try to use a custom favicon if this is a pubkey-based url
-    `/realms/${getResourcePathPart(
-      symbol as string
-    )}/favicon.ico?v=${Date.now()}`
+
+  const faviconUrl = useMemo(() => {
+    const symbol = router.query.symbol
+
+    if (!symbol || tryParsePublicKey(symbol as string) !== undefined) {
+      return null
+    }
+    if (!isValidSymbol(symbol)) {
+      console.error('Invalid symbol')
+      return null
+    }
+
+    const resourcePath = getResourcePathPart(symbol as string)
+    const fullUrl = `${
+      window.location.origin
+    }/realms/${resourcePath}/favicon.ico?v=${Date.now()}`
+
+    // Check if the domain is in the allow list
+    try {
+      const urlObject = new URL(fullUrl)
+      if (!allowedDomains.includes(urlObject.origin)) {
+        console.error('Domain not in allowed list')
+        return null
+      }
+      // Check if the path is in the allow list
+      if (
+        !allowedFaviconPaths.some((path) => urlObject.pathname.startsWith(path))
+      ) {
+        console.error('Path not in allowed list')
+        return null
+      }
+
+      return urlObject.href
+    } catch (error) {
+      console.error('Invalid URL:', error)
+      return null
+    }
+  }, [router.query.symbol])
+
+  // Validate it's an ico file
+  function isValidSymbol(symbol) {
+    return (
+      typeof symbol === 'string' &&
+      symbol.trim() !== '' &&
+      /^[a-zA-Z0-9-_]+$/.test(symbol)
+    )
+  }
+  const { result: faviconExists } = useAsync(async () => {
+    if (!faviconUrl) {
+      return false
+    }
+
+    try {
+      const response = await fetch(faviconUrl)
+      return response.status === 200
+    } catch (error) {
+      console.error('Error fetching favicon:', error)
+      return false
+    }
+  }, [faviconUrl])
 
   useEffect(() => {
     if (
       realm &&
-      config?.account.communityTokenConfig.voterWeightAddin &&
-      VSR_PLUGIN_PKS.includes(
-        config.account.communityTokenConfig.voterWeightAddin.toBase58()
-      ) &&
+      usesVsr &&
       realm.pubkey &&
       wallet?.connected &&
       ownTokenRecord &&
@@ -177,22 +227,6 @@ export function AppContents(props: Props) {
   ])
 
   useEffect(() => {
-    if (
-      prevStringifyPossibleNftsAccounts !==
-        JSON.stringify(possibleNftsAccounts) &&
-      realm?.pubkey
-    ) {
-      getNfts(possibleNftsAccounts, connection)
-    }
-  }, [
-    connection,
-    getNfts,
-    possibleNftsAccounts,
-    prevStringifyPossibleNftsAccounts,
-    realm?.pubkey,
-  ])
-
-  useEffect(() => {
     updateSerumGovAccounts(cluster as string | undefined)
   }, [cluster, updateSerumGovAccounts])
 
@@ -206,7 +240,7 @@ export function AppContents(props: Props) {
             background-color: #17161c;
           }
         `}</style>
-        {faviconUrl ? (
+        {faviconUrl && faviconExists ? (
           <>
             <link rel="icon" href={faviconUrl} />
           </>
@@ -287,15 +321,13 @@ export function AppContents(props: Props) {
       <GoogleTag />
       <ErrorBoundary>
         <ThemeProvider defaultTheme="Dark">
-          <WalletIdentityProvider appName={'Realms'}>
-            <GatewayProvider>
-              <NavBar />
-              <Notifications />
-              <TransactionLoader></TransactionLoader>
-              <NftVotingCountingModal />
-              <PageBodyContainer>{props.children}</PageBodyContainer>
-            </GatewayProvider>
-          </WalletIdentityProvider>
+          <GatewayProvider>
+            <NavBar />
+            <Notifications />
+            <TransactionLoader></TransactionLoader>
+            <NftVotingCountingModal />
+            <PageBodyContainer>{props.children}</PageBodyContainer>
+          </GatewayProvider>
         </ThemeProvider>
       </ErrorBoundary>
     </div>

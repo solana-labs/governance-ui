@@ -25,7 +25,6 @@ import BigNumber from 'bignumber.js'
 import { useRouter } from 'next/router'
 import { pdas } from 'psyfi-euros-test'
 import React, { useCallback, useEffect, useState } from 'react'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import {
   Action,
   CreatePsyFiStrategy,
@@ -44,6 +43,9 @@ import {
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
+import {useVotingClients} from "@hooks/useVotingClients";
+import {useVoteByCouncilToggle} from "@hooks/useVoteByCouncilToggle";
 
 const SOL_BUFFER = 0.02
 
@@ -65,14 +67,14 @@ export const Deposit: React.FC<{
   const { symbol } = router.query
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
-  const { realmInfo, ownVoterWeight } = useRealm()
+  const { result: ownVoterWeight } = useLegacyVoterWeight()
+
+  const { realmInfo } = useRealm()
   const {
     canUseTransferInstruction,
     governedTokenAccountsWithoutNfts,
   } = useGovernanceAssets()
-  const client = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
-  )
+  const votingClients = useVotingClients();
   const connection = useLegacyConnectionContext()
   const wallet = useWalletOnePointOh()
   const [ownedStrategyTokenAccount, setOwnedStrategyTokenAccount] = useState<
@@ -86,7 +88,7 @@ export const Deposit: React.FC<{
   >()
   const [depositReceiptPubkey, setDepositReceiptPubkey] = useState<PublicKey>()
   const [isDepositing, setIsDepositing] = useState(false)
-  const [voteByCouncil, setVoteByCouncil] = useState(false)
+  const { voteByCouncil, setVoteByCouncil } = useVoteByCouncilToggle();
   const [form, setForm] = useState<PsyFiStrategyForm>({
     strategy: proposedInvestment,
     title: '',
@@ -210,7 +212,7 @@ export const Deposit: React.FC<{
         connection.current,
         connection.endpoint
       )
-      const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
+      const ownTokenRecord = ownVoterWeight!.getTokenRecordToCreateProposal(
         governedTokenAccount!.governance!.account.config,
         voteByCouncil
       )
@@ -251,7 +253,7 @@ export const Deposit: React.FC<{
         governedTokenAccount!.governance!.account!.proposalCount,
         false,
         connection,
-        client
+        votingClients(voteByCouncil? 'council' : 'community')
       )
       const url = fmtUrlWithCluster(
         `/dao/${symbol}/proposal/${proposalAddress}`
@@ -265,7 +267,7 @@ export const Deposit: React.FC<{
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [
-    client,
+    votingClients,
     config,
     connection,
     councilMint,

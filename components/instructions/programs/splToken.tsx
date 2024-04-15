@@ -9,12 +9,12 @@ import { AuthorityType } from '@solana/spl-token'
 import { struct, u8 } from 'buffer-layout'
 import { publicKey } from '@coral-xyz/borsh'
 
-export interface TokenMintMetadata {
+interface TokenMintMetadata {
   name: string
 }
 
 // Mint metadata for Well known tokens displayed on the instruction card
-export const MINT_METADATA = {
+const MINT_METADATA = {
   MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac: { name: 'MNGO' },
   EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: { name: 'USDC' },
   '5oVNBeEEQvYi1cX3ir8Dx5n1P7pdxydbGF2X4TxVusJm': { name: 'SOCN' },
@@ -22,6 +22,7 @@ export const MINT_METADATA = {
   MyHd6a7HWKTMeJMHBkrbMq4hZwZxwn9x7dxXcopQ4Wd: { name: 'OMH' },
   UXPhBoR3qG4UCiGNJfV7MqhHyFqKN68g45GoYvAeL2M: { name: 'UXP' },
   H7uqouPsJkeEiLpCEoC1qYVVquDrZan6ZfdPK2gS44zm: { name: 'FORE' },
+  BaoawH9p2J8yUK9r5YXQs3hQwmUJgscACjmTkh8rMwYL: { name: 'ALL' },
 }
 
 export function getMintMetadata(

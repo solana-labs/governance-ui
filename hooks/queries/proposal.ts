@@ -1,14 +1,19 @@
-import { PublicKey } from '@solana/web3.js'
+import { Connection, PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'
 import asFindable from '@utils/queries/asFindable'
-import { getProposal, getProposalsByGovernance } from '@solana/spl-governance'
-import { useRealmQuery } from './realm'
+import {
+  getAllProposals,
+  getProposal,
+  getProposalsByGovernance,
+} from '@solana/spl-governance'
+import { fetchRealmByPubkey, useRealmQuery } from './realm'
 import { useRouter } from 'next/router'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { useMemo } from 'react'
 import { useRealmGovernancesQuery } from './governance'
 import queryClient from './queryClient'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import { HIDDEN_PROPOSALS } from '@components/instructions/tools'
 
 export const proposalQueryKeys = {
   all: (endpoint: string) => [endpoint, 'Proposal'],
@@ -22,6 +27,15 @@ export const proposalQueryKeys = {
     realm,
   ],
 }
+
+export const fetchProposalByPubkeyQuery = (
+  connection: Connection,
+  pubkey: PublicKey
+) =>
+  queryClient.fetchQuery({
+    queryKey: proposalQueryKeys.byPubkey(connection.rpcEndpoint, pubkey),
+    queryFn: () => asFindable(getProposal)(connection, pubkey),
+  })
 
 export const useProposalByPubkeyQuery = (pubkey: PublicKey | undefined) => {
   const connection = useLegacyConnectionContext()
@@ -37,7 +51,6 @@ export const useProposalByPubkeyQuery = (pubkey: PublicKey | undefined) => {
     },
     enabled,
   })
-
   return query
 }
 
@@ -54,6 +67,7 @@ export const useRouteProposalQuery = () => {
   return useProposalByPubkeyQuery(proposalPk)
 }
 
+// TODO rename to useSelectedRealmProposalsQuery
 export const useRealmProposalsQuery = () => {
   const connection = useLegacyConnectionContext()
   const realm = useRealmQuery().data?.result
@@ -66,15 +80,22 @@ export const useRealmProposalsQuery = () => {
       : undefined,
     queryFn: async () => {
       if (!enabled) throw new Error()
+      console.log('query: fetching realm proposals')
 
       const results = (
         await Promise.all(
           governances.map((x) =>
+            // why not just get all proposals for a realm? what was i doing here?
             getProposalsByGovernance(connection.current, realm.owner, x.pubkey)
           )
         )
-      ).flat()
+      )
+        .flat()
+        // Blacklisted proposals which should not be displayed in the UI
+        // hidden legacy accounts to declutter UI
+        .filter((x) => HIDDEN_PROPOSALS.get(x.pubkey.toBase58()) === undefined)
 
+      // TODO instead of using setQueryData, prefetch queries on mouseover ?
       results.forEach((x) => {
         queryClient.setQueryData(
           proposalQueryKeys.byPubkey(connection.endpoint, x.pubkey),
@@ -88,4 +109,38 @@ export const useRealmProposalsQuery = () => {
   })
 
   return query
+}
+
+export const useARealmProposalsQuery = (realmPk: PublicKey | undefined) => {
+  const connection = useLegacyConnectionContext()
+
+  const enabled = realmPk !== undefined
+  return useQuery({
+    queryKey: enabled
+      ? proposalQueryKeys.byRealm(connection.endpoint, realmPk)
+      : undefined,
+    queryFn: async () => {
+      if (!enabled) throw new Error()
+      console.log('query: fetching realm proposals')
+
+      const realm = (await fetchRealmByPubkey(connection.current, realmPk))
+        .result
+      if (realm === undefined) throw new Error()
+
+      const results = (
+        await getAllProposals(connection.current, realm.owner, realmPk)
+      ).flat()
+
+      // TODO instead of using setQueryData, prefetch queries on mouseover ?
+      results.forEach((x) => {
+        queryClient.setQueryData(
+          proposalQueryKeys.byPubkey(connection.endpoint, x.pubkey),
+          { found: true, result: x }
+        )
+      })
+
+      return results
+    },
+    enabled,
+  })
 }

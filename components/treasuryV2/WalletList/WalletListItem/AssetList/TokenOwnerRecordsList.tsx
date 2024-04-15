@@ -1,27 +1,44 @@
 import { UserGroupIcon } from '@heroicons/react/solid'
-import { TokenOwnerRecordAsset } from '@models/treasury/Asset'
 import { BN_ZERO } from '@solana/spl-governance'
 import { useMemo } from 'react'
 import Collapsible from './Collapsible'
 import TokenOwnerRecordListItem from './TokenOwnerRecordListItem'
+import { PublicKey } from '@solana/web3.js'
+import { useAsync } from 'react-async-hook'
+import { useConnection } from '@solana/wallet-adapter-react'
+import { fetchTokenOwnerRecordsByOwnerAnyRealm } from '@hooks/queries/tokenOwnerRecord'
 
 interface Props {
   className?: string
   disableCollapse?: boolean
   expanded?: boolean
-  assets: TokenOwnerRecordAsset[]
-  selectedAssetId?: string | null
-  onSelect?(asset: TokenOwnerRecordAsset): void
   onToggleExpand?(): void
+  governance: PublicKey
 }
-export default function TokenOwnerRecordsList(props: Props) {
-  const validTokenOwnerRecords = useMemo(() => {
-    return props.assets.filter((a) =>
-      a.tokenOwnerRecordAccount.account.governingTokenDepositAmount.gt(BN_ZERO)
-    )
-  }, [props.assets])
 
-  if (!validTokenOwnerRecords.length) return null
+/**
+ * CURRENTLY NOT USED
+ * This was from work by Serum for intra-dao voting. As of Sep 29, 2023, it has no known users.
+ * In my (Agrippa's) opinion, a treasury-based flow for intra-dao voting is inferior to a generic
+ * wallet extension for the browser for building proposals using the same UI that normal users use to interact.
+ * (In the vein of Cordelia or Fuze wallet, or whatever the Squads thing is called)
+ */
+export default function TokenOwnerRecordsList({ governance, ...props }: Props) {
+  const { connection } = useConnection()
+
+  const { result: tors } = useAsync(
+    // TODO get same for the native treasuries !
+    async () => fetchTokenOwnerRecordsByOwnerAnyRealm(connection, governance),
+    [connection, governance]
+  )
+
+  const validTokenOwnerRecords = useMemo(() => {
+    return tors?.filter((a) =>
+      a.account.governingTokenDepositAmount.gt(BN_ZERO)
+    )
+  }, [tors])
+
+  if (!validTokenOwnerRecords?.length) return null
 
   return (
     <Collapsible
@@ -35,20 +52,9 @@ export default function TokenOwnerRecordsList(props: Props) {
     >
       {validTokenOwnerRecords.map((a) => (
         <TokenOwnerRecordListItem
-          key={a.address.toBase58()}
-          onSelect={() => props.onSelect?.(a)}
-          name={a.realmSymbol}
-          thumbnail={
-            a.realmImage ? (
-              <img
-                src={a.realmImage}
-                alt={a.realmSymbol}
-                className="h-6 w-auto"
-              />
-            ) : (
-              <UserGroupIcon className="h-6 w-6" />
-            )
-          }
+          key={a.pubkey.toBase58()}
+          pubkey={a.pubkey}
+          governance={governance}
         />
       ))}
     </Collapsible>

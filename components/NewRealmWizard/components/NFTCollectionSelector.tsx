@@ -27,10 +27,22 @@ function ImageWithLoader({
   )
 }
 
-const NFTCollectionSelector = ({ collections = {}, onChange, value }) => {
+const NFTCollectionSelector = ({
+  isLoading,
+  collections = {},
+  onChange,
+  value,
+}) => {
   const optionClass =
     'z-0 group flex flex-wrap md:items-center md:space-x-8 flex-wrap py-4 px-2 md:px-8 relative w-full default-transition rounded-md hover:cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 hover:opacity-100 hover:bg-bkg-3'
 
+  if (isLoading) {
+    return (
+      <Header as="h3">
+        Loading verified NFT collections from your wallet...
+      </Header>
+    )
+  }
   if (Object.keys(collections).length === 0) {
     return (
       <Header as="h3">
@@ -44,9 +56,10 @@ const NFTCollectionSelector = ({ collections = {}, onChange, value }) => {
       <div className={`w-full space-y-3`}>
         {Object.keys(collections).map((key) => {
           const collection = collections[key]
-          const totalNfts = collection.nfts.length
-          const images = collection.nfts.slice(0, 2).map((nft) => nft.image)
-
+          const totalNfts = collection?.nfts.length
+          const images = collection?.nfts
+            .slice(0, 2)
+            .map((nft) => nft.content.links?.image)
           for (let i = images.length; i < 3; i++) {
             images.unshift('')
           }
@@ -61,13 +74,13 @@ const NFTCollectionSelector = ({ collections = {}, onChange, value }) => {
                 >
                   <div className="">
                     <ImageWithLoader
-                      src={collection?.image || ''}
+                      src={collection?.content.links?.image || ''}
                       className="flex justify-center w-16 h-16 border rounded-full border-fgd-4 md:w-20 md:h-20"
                       alt="Collection icon"
                     />
                   </div>
                   <div className="flex flex-col mx-4 grow w-min md:mx-0">
-                    <Text>{collection?.name}</Text>
+                    <Text>{collection?.content.metadata.name}</Text>
                     <Text level="2" className="text-fgd-2">
                       {totalNfts} {`NFT${totalNfts === 1 ? '' : 's'}`}
                     </Text>

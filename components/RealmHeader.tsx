@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import useRealm from 'hooks/useRealm'
 import { ChartPieIcon, CogIcon, UsersIcon } from '@heroicons/react/outline'
 import { ChevronLeftIcon } from '@heroicons/react/solid'
@@ -7,10 +7,14 @@ import useQueryContext from 'hooks/useQueryContext'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 import { getRealmExplorerHost } from 'tools/routing'
 
-import useMembersStore from 'stores/useMembersStore'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
+import { GoverningTokenType } from '@solana/spl-governance'
+import { determineVotingPowerType } from '@hooks/queries/governancePower'
+import { useAsync } from 'react-async-hook'
+import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 const RealmHeader = () => {
   const { fmtUrlWithCluster } = useQueryContext()
@@ -19,12 +23,23 @@ const RealmHeader = () => {
   const { REALM } = process.env
 
   const { realmInfo, symbol, vsrMode } = useRealm()
-  const activeMembers = useMembersStore((s) => s.compact.activeMembers)
 
   const explorerHost = getRealmExplorerHost(realmInfo)
   const realmUrl = `https://${explorerHost}/#/realm/${realmInfo?.realmId.toBase58()}?programId=${realmInfo?.programId.toBase58()}`
 
   const [isBackNavVisible, setIsBackNavVisible] = useState(true)
+
+  const { connection } = useConnection()
+  const realmPk = useSelectedRealmPubkey()
+
+  const { result: kind } = useAsync(async () => {
+    if (realmPk === undefined) return undefined
+    return determineVotingPowerType(connection, realmPk, 'community')
+  }, [connection, realmPk])
+  const membersTabIsCouncilOnly = !(kind === 'vanilla' || kind === 'NFT')
+  const councilExists =
+    realm?.account.config.councilMint !== undefined &&
+    config?.account.councilTokenConfig?.tokenType !== GoverningTokenType.Dormant
 
   useEffect(() => {
     setIsBackNavVisible(realmInfo?.symbol !== REALM)
@@ -69,14 +84,6 @@ const RealmHeader = () => {
           <div className="w-40 h-10 rounded-md animate-pulse bg-bkg-3" />
         )}
         <div className="flex items-center space-x-4">
-          {!config?.account.communityTokenConfig.voterWeightAddin && (
-            <Link href={fmtUrlWithCluster(`/dao/${symbol}/members`)}>
-              <a className="flex items-center text-sm cursor-pointer default-transition text-fgd-2 hover:text-fgd-3">
-                <UsersIcon className="flex-shrink-0 w-5 h-5 mr-1" />
-                Members ({activeMembers.length})
-              </a>
-            </Link>
-          )}
           {vsrMode === 'default' && (
             <Link href={fmtUrlWithCluster(`/dao/${symbol}/token-stats`)}>
               <a className="flex items-center text-sm cursor-pointer default-transition text-fgd-2 hover:text-fgd-3">
@@ -85,6 +92,14 @@ const RealmHeader = () => {
                   ? realm?.account.name
                   : symbol}{' '}
                 stats
+              </a>
+            </Link>
+          )}
+          {(!membersTabIsCouncilOnly || councilExists) && (
+            <Link href={fmtUrlWithCluster(`/dao/${symbol}/members`)}>
+              <a className="flex items-center text-sm cursor-pointer default-transition text-fgd-2 hover:text-fgd-3">
+                <UsersIcon className="flex-shrink-0 w-5 h-5 mr-1" />
+                {membersTabIsCouncilOnly ? 'Council' : 'Members'}
               </a>
             </Link>
           )}

@@ -6,11 +6,17 @@ import {
   showTransactionError,
   showTransactionsProcessUi,
 } from './transactionsLoader'
-import {
-  sendSignAndConfirmTransactions,
-  sendSignAndConfirmTransactionsProps,
-} from '@blockworks-foundation/mangolana/lib/transactions'
+
 import { invalidateInstructionAccounts } from '@hooks/queries/queryClient'
+import {
+  sendSignAndConfirmTransactionsProps,
+  sendSignAndConfirmTransactions,
+  TransactionInstructionWithType,
+} from '@blockworks-foundation/mangolana/lib/transactions'
+import { getFeeEstimate } from '@tools/feeEstimate'
+import { TransactionInstructionWithSigners } from '@blockworks-foundation/mangolana/lib/globalTypes'
+import { createComputeBudgetIx } from '@blockworks-foundation/mango-v4'
+import { BACKUP_CONNECTIONS } from './connection'
 
 export type WalletSigner = Pick<
   SignerWalletAdapter,
@@ -31,14 +37,37 @@ export enum SequenceType {
   StopOnFailure,
 }
 
-export const sendTransactionsV3 = ({
+export const sendTransactionsV3 = async ({
   connection,
   wallet,
   transactionInstructions,
   timeoutStrategy,
   callbacks,
   config,
-}: sendSignAndConfirmTransactionsProps) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  lookupTableAccounts,
+  autoFee = true,
+}: sendSignAndConfirmTransactionsProps & {
+  lookupTableAccounts?: any
+  autoFee?: boolean
+}) => {
+  const transactionInstructionsWithFee: TransactionInstructionWithType[] = []
+  const fee = await getFeeEstimate(connection)
+  for (const tx of transactionInstructions) {
+    if (tx.instructionsSet.length) {
+      const txObjWithFee = {
+        ...tx,
+        instructionsSet: autoFee
+          ? [
+              new TransactionInstructionWithSigners(createComputeBudgetIx(fee)),
+              ...tx.instructionsSet,
+            ]
+          : [...tx.instructionsSet],
+      }
+      transactionInstructionsWithFee.push(txObjWithFee)
+    }
+  }
+
   const callbacksWithUiComponent = {
     afterBatchSign: (signedTxnsCount) => {
       if (callbacks?.afterBatchSign) {
@@ -51,18 +80,17 @@ export const sendTransactionsV3 = ({
         callbacks?.afterAllTxConfirmed()
       }
       closeTransactionProcessUi()
+      transactionInstructionsWithFee.forEach((x) =>
+        x.instructionsSet.forEach((x) =>
+          invalidateInstructionAccounts(x.transactionInstruction)
+        )
+      )
     },
     afterEveryTxConfirmation: () => {
       if (callbacks?.afterEveryTxConfirmation) {
         callbacks?.afterEveryTxConfirmation()
       }
       incrementProcessedTransactions()
-      // TODO could optimize to only invalidate the accts associated with this tx, current api doesnt allow this
-      transactionInstructions.forEach((x) =>
-        x.instructionsSet.forEach((x) =>
-          invalidateInstructionAccounts(x.transactionInstruction)
-        )
-      )
     },
     onError: (e, notProcessedTransactions, originalProps) => {
       if (callbacks?.onError) {
@@ -73,16 +101,22 @@ export const sendTransactionsV3 = ({
           sendTransactionsV3({
             ...originalProps,
             transactionInstructions: notProcessedTransactions,
+            autoFee: false,
           }),
         getErrorMsg(e),
         e.txid
+      )
+      transactionInstructionsWithFee.forEach((x) =>
+        x.instructionsSet.forEach((x) =>
+          invalidateInstructionAccounts(x.transactionInstruction)
+        )
       )
     },
   }
 
   const cfg = {
     maxTxesInBatch:
-      transactionInstructions.filter(
+      transactionInstructionsWithFee.filter(
         (x) => x.sequenceType === SequenceType.Sequential
       ).length > 0
         ? 20
@@ -96,11 +130,13 @@ export const sendTransactionsV3 = ({
   return sendSignAndConfirmTransactions({
     connection,
     wallet,
-    transactionInstructions,
+    transactionInstructions: transactionInstructionsWithFee,
     timeoutStrategy,
     callbacks: callbacksWithUiComponent,
     config: cfg,
-    confirmLevel: 'confirmed', //TODO base this on connection confirmation level
+    confirmLevel: 'confirmed',
+    backupConnections: BACKUP_CONNECTIONS, //TODO base this on connection confirmation level
+    //lookupTableAccounts,
   })
 }
 
@@ -129,17 +165,21 @@ export const txBatchesToInstructionSetWithSigners = (
   txBatch: TransactionInstruction[],
   signerBatches: Keypair[][],
   batchIdx?: number
-) => {
+): { transactionInstruction: TransactionInstruction; signers: Keypair[] }[] => {
   return txBatch.map((tx, txIdx) => {
+    let signers: Keypair[] = []
+
+    if (
+      typeof batchIdx !== 'undefined' &&
+      signerBatches?.length &&
+      signerBatches?.[batchIdx]?.[txIdx]
+    ) {
+      signers = [signerBatches[batchIdx][txIdx]]
+    }
+
     return {
       transactionInstruction: tx,
-      signers:
-        typeof batchIdx !== 'undefined' &&
-        signerBatches.length &&
-        signerBatches[batchIdx] &&
-        signerBatches[batchIdx][txIdx]
-          ? [signerBatches[batchIdx][txIdx]]
-          : [],
+      signers,
     }
   })
 }

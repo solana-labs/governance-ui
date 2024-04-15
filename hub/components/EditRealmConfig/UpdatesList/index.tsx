@@ -10,12 +10,14 @@ import { PublicKey } from '@solana/web3.js';
 import { BigNumber } from 'bignumber.js';
 import BN from 'bn.js';
 
+import { availablePasses } from '../../../../GatewayPlugin/config';
 import { Config } from '../fetchConfig';
 import { getLabel } from '../TokenTypeSelector';
 import {
   DEFAULT_NFT_CONFIG,
   DEFAULT_VSR_CONFIG,
   DEFAULT_CIVIC_CONFIG,
+  DEFAULT_QV_CONFIG,
 } from '../VotingStructureSelector';
 import { SectionBlock } from '@hub/components/EditWalletRules/SectionBlock';
 import { SectionHeader } from '@hub/components/EditWalletRules/SectionHeader';
@@ -45,6 +47,8 @@ export function buildUpdates(config: Config) {
     nftCollection: config.nftCollection,
     nftCollectionSize: config.nftCollectionSize,
     nftCollectionWeight: config.nftCollectionWeight,
+    civicPassType: config.civicPassType,
+    chainingEnabled: config.chainingEnabled,
   };
 }
 
@@ -81,6 +85,16 @@ export function diff<T extends { [key: string]: unknown }>(
   return diffs;
 }
 
+const civicPassTypeLabel = (civicPassType: PublicKey | undefined): string => {
+  if (!civicPassType) return 'None';
+  const foundPass = availablePasses.find(
+    (pass) => pass.value === civicPassType?.toBase58(),
+  );
+
+  if (!foundPass) return 'Other (' + abbreviateAddress(civicPassType) + ')';
+  return foundPass.name;
+};
+
 function votingStructureText(
   votingPluginDiff: [PublicKey | undefined, PublicKey | undefined],
   maxVotingPluginDiff: [PublicKey | undefined, PublicKey | undefined],
@@ -103,6 +117,11 @@ function votingStructureText(
     typeof maxVotingPluginDiff[0] === 'undefined'
   ) {
     existingText = 'Civic';
+  } else if (
+    votingPluginDiff[0]?.equals(DEFAULT_QV_CONFIG.votingProgramId) &&
+    typeof maxVotingPluginDiff[0] === 'undefined'
+  ) {
+    existingText = 'QV';
   } else if (votingPluginDiff[0] || maxVotingPluginDiff[0]) {
     existingText = 'Custom';
   }
@@ -122,6 +141,11 @@ function votingStructureText(
     typeof maxVotingPluginDiff[1] === 'undefined'
   ) {
     newText = 'Civic';
+  } else if (
+    votingPluginDiff[1]?.equals(DEFAULT_QV_CONFIG.votingProgramId) &&
+    typeof maxVotingPluginDiff[1] === 'undefined'
+  ) {
+    newText = 'QV';
   } else if (votingPluginDiff[1] || maxVotingPluginDiff[1]) {
     newText = 'Custom';
   }
@@ -156,7 +180,8 @@ export function UpdatesList(props: Props) {
     'communityMaxVotingPlugin' in updates ||
     'nftCollection' in updates ||
     'nftCollectionSize' in updates ||
-    'nftCollectionWeight' in updates;
+    'nftCollectionWeight' in updates ||
+    'civicPassType' in updates;
 
   const hasCouncilUpdates =
     'councilTokenType' in updates ||
@@ -302,14 +327,25 @@ export function UpdatesList(props: Props) {
                           )[1]
                         }
                       </div>
-                      <div className="ml-3 text-base text-neutral-500 line-through">
-                        {
-                          votingStructureText(
-                            updates.communityVotingPlugin || [],
-                            updates.communityMaxVotingPlugin || [],
-                          )[0]
-                        }
-                      </div>
+                      {updates.chainingEnabled ? (
+                        <div className="ml-3 text-base text-neutral-500">
+                          {'⬅ ' +
+                            votingStructureText(
+                              updates.communityVotingPlugin || [],
+                              updates.communityMaxVotingPlugin || [],
+                            )[0] +
+                            ' (Chaining)'}
+                        </div>
+                      ) : (
+                        <div className="ml-3 text-base text-neutral-500 line-through">
+                          {
+                            votingStructureText(
+                              updates.communityVotingPlugin || [],
+                              updates.communityMaxVotingPlugin || [],
+                            )[0]
+                          }
+                        </div>
+                      )}
                     </div>
                   }
                 />
@@ -415,6 +451,19 @@ export function UpdatesList(props: Props) {
                       {new BigNumber(updates.nftCollectionWeight[0].toString())
                         .shiftedBy(-props.config.communityMint.account.decimals)
                         .toFormat()}
+                    </div>
+                  </div>
+                }
+              />
+            )}
+            {'civicPassType' in updates && (
+              <SummaryItem
+                label="Civic Pass Type"
+                value={
+                  <div className="flex items-baseline">
+                    <div>{civicPassTypeLabel(updates.civicPassType[1])}</div>
+                    <div className="ml-3 text-base text-neutral-500 line-through">
+                      {civicPassTypeLabel(updates.civicPassType[0])}
                     </div>
                   </div>
                 }

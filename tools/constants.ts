@@ -1,10 +1,5 @@
+import { PublicKey } from '@solana/web3.js'
 import BN from 'bn.js'
-
-/**
- * The minimum amount of community tokens to create governance and proposals, for tokens with 0 supply
- * Note: This is deprectaed value and should not be used any longer
- */
-export const MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY = 1000000
 
 /**
  * u64::MAX value used to denote disabled threshold
@@ -19,3 +14,10 @@ export const SIMULATION_WALLET = 'ENmcpFCpxN1CqyUjuog9yyUVfdXBKF3LVCwLr7grJZpk'
 
 export const DEFAULT_NFT_VOTER_PLUGIN =
   'GnftV5kLjd67tvHpNGyodwWveEKivz3ZWvvE3Z4xi2iw'
+
+export const DEFAULT_NFT_VOTER_PLUGIN_V2 =
+  'GnftVc21v2BRchsRa9dGdrVmJPLZiRHe9j2offnFTZFg'
+
+export const JUPITER_REFERRAL_PK = new PublicKey(
+  'EV4qhLE2yPKdUPdQ74EWJUn21xT3eGQxG3DRR1g9NNFc'
+)

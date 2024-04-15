@@ -12,6 +12,17 @@ const INSTRUCTIONS = {
       )
     },
   },
+  186: {
+    name: 'Withdraw All From Oracle',
+    accounts: [],
+    getDataUI: async (connection: Connection, data: Uint8Array) => {
+      return (
+        <>
+          <div>{JSON.stringify(data)}</div>
+        </>
+      )
+    },
+  },
 }
 
 export const SWITCHBOARD_INSTRUCTIONS = {

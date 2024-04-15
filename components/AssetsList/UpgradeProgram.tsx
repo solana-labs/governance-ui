@@ -6,7 +6,7 @@ import Button, { LinkButton } from '@components/Button'
 import Textarea from 'components/inputs/Textarea'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
 import { validateBuffer } from 'utils/validations'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   ProgramUpgradeForm,
   UiInstruction,
@@ -22,7 +22,7 @@ import { validateInstruction } from 'utils/instructionTools'
 import * as yup from 'yup'
 import { createUpgradeInstruction } from '@tools/sdk/bpfUpgradeableLoader/createUpgradeInstruction'
 import { debounce } from '@utils/debounce'
-import { isFormValid } from '@utils/formValidation'
+import { isFormValid, validatePubkey } from '@utils/formValidation'
 import ProgramUpgradeInfo from 'pages/dao/[symbol]/proposal/components/instructions/bpfUpgradeableLoader/ProgramUpgradeInfo'
 import { getProgramName } from '@components/instructions/programs/names'
 import useCreateProposal from '@hooks/useCreateProposal'
@@ -30,6 +30,7 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import {useVoteByCouncilToggle} from "@hooks/useVoteByCouncilToggle";
 
 interface UpgradeProgramCompactForm extends ProgramUpgradeForm {
   description: string
@@ -44,16 +45,17 @@ const UpgradeProgram = ({ program }: { program: AssetAccount }) => {
   const { fmtUrlWithCluster } = useQueryContext()
   const { symbol } = router.query
   const realm = useRealmQuery().data?.result
-  const { realmInfo, canChooseWhoVote } = useRealm()
+  const { realmInfo} = useRealm()
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<UpgradeProgramCompactForm>({
     governedAccount: program,
     programId: programId?.toString(),
+    bufferSpillAddress: wallet?.publicKey ? wallet.publicKey.toBase58() : '',
     bufferAddress: '',
     description: '',
     title: '',
   })
-  const [voteByCouncil, setVoteByCouncil] = useState(false)
+  const { voteByCouncil, shouldShowVoteByCouncilToggle, setVoteByCouncil } = useVoteByCouncilToggle();
   const [showOptions, setShowOptions] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
@@ -87,6 +89,12 @@ const UpgradeProgram = ({ program }: { program: AssetAccount }) => {
           })
         }
       }),
+    bufferSpillAddress: yup
+      .string()
+      .required("Spill account is required")
+      .test('is-spill-account-valid', 'Invalid Spill Account', function (val: string) {
+        return val ? validatePubkey(val) : true
+      }),
     governedAccount: yup
       .object()
       .nullable()
@@ -105,7 +113,7 @@ const UpgradeProgram = ({ program }: { program: AssetAccount }) => {
         form.governedAccount.pubkey,
         new PublicKey(form.bufferAddress),
         form.governedAccount.extensions.program!.authority,
-        wallet!.publicKey
+        new PublicKey(form.bufferSpillAddress!)
       )
       serializedInstruction = serializeInstructionToBase64(upgradeIx)
     }
@@ -188,6 +196,19 @@ const UpgradeProgram = ({ program }: { program: AssetAccount }) => {
           noMaxWidth={true}
           error={formErrors['bufferAddress']}
         />
+        <Input
+          label="Spill account"
+          value={form.bufferSpillAddress}
+          type="text"
+          onChange={(evt) =>
+            handleSetForm({
+              value: evt.target.value,
+              propertyName: 'bufferSpillAddress',
+            })
+          }
+          noMaxWidth={true}
+          error={formErrors['bufferSpillAddress']}
+        />
         <ProgramUpgradeInfo
           authority={form.governedAccount?.extensions.program?.authority}
         />
@@ -232,13 +253,13 @@ const UpgradeProgram = ({ program }: { program: AssetAccount }) => {
                 })
               }
             />
-            {canChooseWhoVote && (
-              <VoteBySwitch
-                checked={voteByCouncil}
-                onChange={() => {
-                  setVoteByCouncil(!voteByCouncil)
-                }}
-              />
+            {shouldShowVoteByCouncilToggle && (
+                <VoteBySwitch
+                    checked={voteByCouncil}
+                    onChange={() => {
+                      setVoteByCouncil(!voteByCouncil)
+                    }}
+                ></VoteBySwitch>
             )}
           </>
         )}

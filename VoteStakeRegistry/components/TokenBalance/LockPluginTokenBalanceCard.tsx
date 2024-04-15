@@ -16,8 +16,7 @@ import { useEffect, useState } from 'react'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import InlineNotification from '@components/InlineNotification'
 import Link from 'next/link'
-import DelegateTokenBalanceCard from '@components/TokenBalance/DelegateTokenBalanceCard'
-import { TokenDeposit } from '@components/TokenBalance/TokenBalanceCard'
+import { TokenDeposit } from '@components/TokenBalance/TokenDeposit'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRouter } from 'next/router'
@@ -26,7 +25,9 @@ import {
   useRealmCommunityMintInfoQuery,
   useRealmCouncilMintInfoQuery,
 } from '@hooks/queries/mintInfo'
+import { useVsrGovpower } from '@hooks/queries/plugins/vsr'
 
+/** UNUSED */
 const LockPluginTokenBalanceCard = ({
   proposal,
   inAccountDetails,
@@ -93,11 +94,7 @@ const LockPluginTokenBalanceCard = ({
     <>
       <div className="flex items-center justify-between">
         <h3 className="mb-0">My governance power</h3>
-        <Link
-          href={fmtUrlWithCluster(
-            `/dao/${symbol}/account/${tokenOwnerRecordPk}`
-          )}
-        >
+        <Link href={fmtUrlWithCluster(`/dao/${symbol}/account/me`)}>
           <a
             className={`default-transition flex items-center text-fgd-2 text-sm transition-all hover:text-fgd-3 ${
               !connected || !tokenOwnerRecordPk
@@ -136,12 +133,10 @@ const LockPluginTokenBalanceCard = ({
               <TokenDeposit
                 mint={councilMint}
                 tokenRole={GoverningTokenRole.Council}
-                councilVote={true}
                 setHasGovPower={setHasGovPower}
               />
             </div>
           )}
-          <DelegateTokenBalanceCard />
         </>
       ) : (
         <>
@@ -171,7 +166,7 @@ const TokenDepositLock = ({
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const deposits = useDepositStore((s) => s.state.deposits)
-  const votingPower = useDepositStore((s) => s.state.votingPower)
+  const votingPower = useVsrGovpower().data?.result ?? new BN(0)
   const votingPowerFromDeposits = useDepositStore(
     (s) => s.state.votingPowerFromDeposits
   )
@@ -223,7 +218,7 @@ const TokenDepositLock = ({
     if (availableTokens != '0' || hasTokensDeposited || hasTokensInWallet) {
       setHasGovPower(true)
     }
-  }, [availableTokens, hasTokensDeposited, hasTokensInWallet])
+  }, [availableTokens, hasTokensDeposited, hasTokensInWallet, setHasGovPower])
 
   const canShowAvailableTokensMessage = hasTokensInWallet && connected
   const tokensToShow =
@@ -250,7 +245,7 @@ const TokenDepositLock = ({
           />
         </div>
       ) : null}
-      {votingPower.toNumber() > 0 && (
+      {!votingPower.isZero() && (
         <div className="flex space-x-4 items-center mt-4">
           <VotingPowerBox
             votingPower={votingPower}
@@ -260,6 +255,7 @@ const TokenDepositLock = ({
           ></VotingPowerBox>
         </div>
       )}
+
       {(availableTokens != '0' || lockTokensFmt != '0') && (
         <div className="pt-4 px-4">
           {availableTokens != '0' && (
@@ -281,9 +277,7 @@ const TokenDepositLock = ({
         </div>
       )}
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
-        <DepositCommunityTokensBtn
-          inAccountDetails={inAccountDetails}
-        ></DepositCommunityTokensBtn>
+        <DepositCommunityTokensBtn inAccountDetails={inAccountDetails} />
         {inAccountDetails && (
           <WithDrawCommunityTokens></WithDrawCommunityTokens>
         )}

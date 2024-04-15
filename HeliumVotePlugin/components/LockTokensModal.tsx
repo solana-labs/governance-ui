@@ -12,7 +12,7 @@ import { QuestionMarkCircleIcon } from '@heroicons/react/solid'
 import { notify } from '@utils/notifications'
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 
-export const defaultLockupPeriods = [
+const defaultLockupPeriods = [
   {
     value: 183,
     display: '6m',

@@ -1,6 +1,5 @@
 import { getAssociatedTokenAddress } from '@blockworks-foundation/mango-v4'
 import * as anchor from '@coral-xyz/anchor'
-import { findProgramAddressSync } from '@coral-xyz/anchor/dist/cjs/utils/pubkey'
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import {
   Connection,
@@ -98,7 +97,7 @@ const MAIN_SRM_MINT = new PublicKey(
 const MAIN_MSRM_MINT = new PublicKey(
   'MSRMcoVyrFxnSgo5uXwone5SKcGhT1KEJMFEkMEWf9L'
 )
-const [DEV_GSRM_MINT] = findProgramAddressSync(
+const [DEV_GSRM_MINT] = PublicKey.findProgramAddressSync(
   [Buffer.from('gSRM')],
   DEV_PROGRAM_ID
 )
@@ -240,11 +239,14 @@ interface SerumGovStore extends State {
 const useSerumGovStore = create<SerumGovStore>((set, get) => ({
   programId: DEV_PROGRAM_ID,
   gsrmMint: DEV_GSRM_MINT,
-  authority: findProgramAddressSync(
+  authority: PublicKey.findProgramAddressSync(
     [Buffer.from('authority')],
     DEV_PROGRAM_ID
   )[0],
-  config: findProgramAddressSync([Buffer.from('config')], DEV_PROGRAM_ID)[0],
+  config: PublicKey.findProgramAddressSync(
+    [Buffer.from('config')],
+    DEV_PROGRAM_ID
+  )[0],
   srmMint: DEV_SRM_MINT,
   msrmMint: DEV_MSRM_MINT,
 
@@ -330,7 +332,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
         get().programId,
         provider
       )
-      const [account] = findProgramAddressSync(
+      const [account] = PublicKey.findProgramAddressSync(
         [Buffer.from('user'), owner.toBuffer()],
         get().programId
       )
@@ -573,7 +575,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
               )
               instructions.push(ix)
             }
-            const [srmVault] = findProgramAddressSync(
+            const [srmVault] = PublicKey.findProgramAddressSync(
               [Buffer.from('vault'), get().srmMint.toBuffer()],
               program.programId
             )
@@ -621,7 +623,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
               )
               instructions.push(ix)
             }
-            const [msrmVault] = findProgramAddressSync(
+            const [msrmVault] = PublicKey.findProgramAddressSync(
               [Buffer.from('vault'), get().msrmMint.toBuffer()],
               program.programId
             )
@@ -710,7 +712,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
           owner,
           true
         )
-        const [srmVault] = findProgramAddressSync(
+        const [srmVault] = PublicKey.findProgramAddressSync(
           [Buffer.from('vault'), get().srmMint.toBuffer()],
           program.programId
         )
@@ -735,7 +737,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
           owner,
           true
         )
-        const [msrmVault] = findProgramAddressSync(
+        const [msrmVault] = PublicKey.findProgramAddressSync(
           [Buffer.from('vault'), get().msrmMint.toBuffer()],
           program.programId
         )
@@ -780,7 +782,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
             owner.publicKey,
             true
           )
-          const [redeemTicket] = findProgramAddressSync(
+          const [redeemTicket] = PublicKey.findProgramAddressSync(
             [
               Buffer.from('redeem_ticket'),
               lockedAccount.address.toBuffer(),
@@ -839,7 +841,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
         owner,
         true
       )
-      const [redeemTicket] = findProgramAddressSync(
+      const [redeemTicket] = PublicKey.findProgramAddressSync(
         [
           Buffer.from('redeem_ticket'),
           lockedAccount.address.toBuffer(),
@@ -886,7 +888,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
           owner.publicKey,
           true
         )
-        const [redeemTicket] = findProgramAddressSync(
+        const [redeemTicket] = PublicKey.findProgramAddressSync(
           [
             Buffer.from('redeem_ticket'),
             vestAccount.address.toBuffer(),
@@ -940,7 +942,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
         true
       )
 
-      const [redeemTicket] = findProgramAddressSync(
+      const [redeemTicket] = PublicKey.findProgramAddressSync(
         [
           Buffer.from('redeem_ticket'),
           vestAccount.address.toBuffer(),
@@ -979,7 +981,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
         provider
       )
 
-      const [ownerUserAccount] = findProgramAddressSync(
+      const [ownerUserAccount] = PublicKey.findProgramAddressSync(
         [Buffer.from('user'), owner.toBuffer()],
         program.programId
       )
@@ -1013,12 +1015,12 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
       const userAccount = await get().actions.getUserAccount(provider, owner)
       // if (!userAccount) throw new Error('User account not found.')
 
-      const [userAccountAddress] = findProgramAddressSync(
+      const [userAccountAddress] = PublicKey.findProgramAddressSync(
         [Buffer.from('user'), owner.toBuffer()],
         get().programId
       )
 
-      const [lockedAccount] = findProgramAddressSync(
+      const [lockedAccount] = PublicKey.findProgramAddressSync(
         [
           Buffer.from('locked_account'),
           owner.toBuffer(),
@@ -1031,14 +1033,14 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
         program.programId
       )
 
-      const [claimTicket] = findProgramAddressSync(
+      const [claimTicket] = PublicKey.findProgramAddressSync(
         [Buffer.from('claim_ticket'), lockedAccount.toBuffer()],
         program.programId
       )
 
       let ix: TransactionInstruction
       if (!isMsrm) {
-        const [srmVault] = findProgramAddressSync(
+        const [srmVault] = PublicKey.findProgramAddressSync(
           [Buffer.from('vault'), get().srmMint.toBuffer()],
           program.programId
         )
@@ -1063,7 +1065,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
           })
           .instruction()
       } else {
-        const [msrmVault] = findProgramAddressSync(
+        const [msrmVault] = PublicKey.findProgramAddressSync(
           [Buffer.from('vault'), get().msrmMint.toBuffer()],
           program.programId
         )
@@ -1108,12 +1110,12 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
 
       const userAccount = await get().actions.getUserAccount(provider, owner)
 
-      const [userAccountAddress] = findProgramAddressSync(
+      const [userAccountAddress] = PublicKey.findProgramAddressSync(
         [Buffer.from('user'), owner.toBuffer()],
         get().programId
       )
 
-      const [vestAccount] = findProgramAddressSync(
+      const [vestAccount] = PublicKey.findProgramAddressSync(
         [
           Buffer.from('vest_account'),
           owner.toBuffer(),
@@ -1126,7 +1128,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
         program.programId
       )
 
-      const [claimTicket] = findProgramAddressSync(
+      const [claimTicket] = PublicKey.findProgramAddressSync(
         [Buffer.from('claim_ticket'), vestAccount.toBuffer()],
         program.programId
       )
@@ -1134,7 +1136,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
       let ix: TransactionInstruction
 
       if (!isMsrm) {
-        const [srmVault] = findProgramAddressSync(
+        const [srmVault] = PublicKey.findProgramAddressSync(
           [Buffer.from('vault'), get().srmMint.toBuffer()],
           program.programId
         )
@@ -1160,7 +1162,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
           })
           .instruction()
       } else {
-        const [msrmVault] = findProgramAddressSync(
+        const [msrmVault] = PublicKey.findProgramAddressSync(
           [Buffer.from('vault'), get().srmMint.toBuffer()],
           program.programId
         )
@@ -1214,7 +1216,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
           owner.publicKey
         )
 
-        const [vault] = findProgramAddressSync(
+        const [vault] = PublicKey.findProgramAddressSync(
           [
             Buffer.from('vault'),
             !isMsrm ? get().srmMint.toBuffer() : get().srmMint.toBuffer(),
@@ -1222,7 +1224,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
           program.programId
         )
 
-        const [userAccountAddress] = findProgramAddressSync(
+        const [userAccountAddress] = PublicKey.findProgramAddressSync(
           [Buffer.from('user'), owner.publicKey.toBuffer()],
           program.programId
         )
@@ -1247,7 +1249,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
           ? new anchor.BN(userAccount.lockIndex).toArrayLike(Buffer, 'le', 8)
           : new anchor.BN('0').toArrayLike(Buffer, 'le', 8)
 
-        const [lockedAccount] = findProgramAddressSync(
+        const [lockedAccount] = PublicKey.findProgramAddressSync(
           [
             Buffer.from('locked_account'),
             owner.publicKey.toBuffer(),
@@ -1256,7 +1258,7 @@ const useSerumGovStore = create<SerumGovStore>((set, get) => ({
           program.programId
         )
 
-        const [claimTicket] = findProgramAddressSync(
+        const [claimTicket] = PublicKey.findProgramAddressSync(
           [Buffer.from('claim_ticket'), lockedAccount.toBuffer()],
           program.programId
         )

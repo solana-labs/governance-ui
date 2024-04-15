@@ -2,7 +2,7 @@ import Input from '@components/inputs/Input'
 import { GrantInstruction } from '@components/instructions/programs/voteStakeRegistry'
 import { MANGO_DAO_TREASURY } from '@components/instructions/tools'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
-import { SearchIcon, UserCircleIcon } from '@heroicons/react/outline'
+import { SearchIcon } from '@heroicons/react/outline'
 import useRealm from '@hooks/useRealm'
 import { BN, BorshInstructionCoder } from '@coral-xyz/anchor'
 import {
@@ -15,15 +15,13 @@ import dayjs from 'dayjs'
 import dynamic from 'next/dynamic'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import {
   DAYS_PER_MONTH,
   getMinDurationFmt,
   getTimeLeftFromNowFmt,
 } from '@utils/dateTools'
 import InfoBox from 'VoteStakeRegistry/components/LockTokenStats/InfoBox'
-import { AddressImage, DisplayAddress } from '@cardinal/namespaces-components'
-import { LockupType } from 'VoteStakeRegistry/sdk/accounts'
+import { LockupType, Registrar } from 'VoteStakeRegistry/sdk/accounts'
 import {
   DepositWithWallet,
   getProposalsTransactions,
@@ -47,6 +45,8 @@ import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { useRealmProposalsQuery } from '@hooks/queries/proposal'
 import { useQuery } from '@tanstack/react-query'
 import { IDL } from 'VoteStakeRegistry/sdk/voter_stake_registry'
+import { ProfileImage, ProfileName } from '@components/Profile'
+import {useVsrClient} from "../../../../VoterWeightPlugins/useVsrClient";
 
 const VestingVsTime = dynamic(
   () => import('VoteStakeRegistry/components/LockTokenStats/VestingVsTime'),
@@ -134,14 +134,10 @@ const LockTokenStats = () => {
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const { symbol } = useRouter().query
   const { realmInfo } = useRealm()
-  const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
-  const voteStakeRegistryRegistrarPk = useVotePluginsClientStore(
-    (s) => s.state.voteStakeRegistryRegistrarPk
-  )
-  const voteStakeRegistryRegistrar = useVotePluginsClientStore(
-    (s) => s.state.voteStakeRegistryRegistrar
-  )
-  const connection = useLegacyConnectionContext()
+  const { vsrClient, plugin } = useVsrClient();
+  const voteStakeRegistryRegistrar = plugin?.params as Registrar | undefined;
+  const voteStakeRegistryRegistrarPk = plugin?.registrarPublicKey;
+
   const governedTokenAccounts = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
   )
@@ -186,10 +182,12 @@ const LockTokenStats = () => {
         depositsWithWalletsInner.push(depositWithWallet)
       }
     }
-    return depositsWithWalletsInner.sort(
-      (a, b) =>
-        b.deposit.amountDepositedNative.toNumber() -
-        a.deposit.amountDepositedNative.toNumber()
+    return depositsWithWalletsInner.sort((a, b) =>
+      a.deposit.amountDepositedNative.eq(b.deposit.amountDepositedNative)
+        ? 0
+        : a.deposit.amountDepositedNative.lt(b.deposit.amountDepositedNative)
+        ? 1
+        : -1
     )
   }, [
     realm?.account.communityMint,
@@ -435,9 +433,8 @@ const LockTokenStats = () => {
       : symbol
   const renderAddressName = (wallet) => {
     return (
-      <DisplayAddress
-        connection={connection.current}
-        address={new PublicKey(wallet)}
+      <ProfileName
+        publicKey={new PublicKey(wallet)}
         height="25px"
         width="100px"
         dark={true}
@@ -445,13 +442,10 @@ const LockTokenStats = () => {
     )
   }
   const renderAddressImage = (wallet) => (
-    <AddressImage
-      dark={true}
-      connection={connection.current}
-      address={new PublicKey(wallet)}
-      height="25px"
-      width="25px"
-      placeholder={<UserCircleIcon className="h-6 text-fgd-3 w-6" />}
+    <ProfileImage
+      publicKey={new PublicKey(wallet)}
+      expanded={false}
+      className="h-6 text-fgd-3 w-6"
     />
   )
 
@@ -546,7 +540,7 @@ const LockTokenStats = () => {
                         .reduce((acc, curr) => {
                           return acc.add(curr.vestingAmount)
                         }, new BN(0))
-                        .toNumber(),
+                        .toString(),
                     }
                   }),
                 ]}

@@ -8,7 +8,13 @@ import MAINNET_REALMS from 'public/realms/mainnet-beta.json'
 import { useMemo } from 'react'
 
 const useSelectedRealmPubkey = () => {
-  const { symbol, cluster } = useRouter().query
+  const { symbol } = useRouter().query
+
+  return useRealmPubkeyByPkOrSymbol(symbol as string)
+}
+
+export const useRealmPubkeyByPkOrSymbol = (symbol: string | undefined) => {
+  const { cluster } = useRouter().query
 
   const parsed = useMemo(
     () => (typeof symbol === 'string' ? tryParsePublicKey(symbol) : undefined),
@@ -17,6 +23,7 @@ const useSelectedRealmPubkey = () => {
 
   // if we cant just parse the realm pk from the url, look it up.
   // this happens a lot and might be slightly expensive so i decided to use react-query
+  // but really something not async would be more appropriate.
   const { data: lookup } = useQuery({
     enabled: typeof symbol === 'string' && parsed === undefined,
     queryKey: ['Realms symbol lookup', symbol],

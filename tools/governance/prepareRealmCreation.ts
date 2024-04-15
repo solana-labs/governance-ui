@@ -6,11 +6,12 @@ import {
 } from '@solana/web3.js'
 
 import {
-  getGovernanceProgramVersion,
   GovernanceConfig,
   GoverningTokenConfigAccountArgs,
+  GoverningTokenType,
   SetRealmAuthorityAction,
   TOKEN_PROGRAM_ID,
+  VoteThresholdType,
   VoteTipping,
   WalletSigner,
   withCreateGovernance,
@@ -22,7 +23,6 @@ import {
 } from '@solana/spl-governance'
 
 import { getWalletPublicKey } from '@utils/sendTransactions'
-import { tryGetMint } from '@utils/tokens'
 
 import { parseMintMaxVoteWeight } from '@tools/governance/units'
 import {
@@ -38,6 +38,8 @@ import { DISABLED_VOTER_WEIGHT } from '@tools/constants'
 import BN from 'bn.js'
 import { createGovernanceThresholds } from './configs'
 import { Token } from '@solana/spl-token'
+import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
+import { fetchMintInfoByPubkey } from '@hooks/queries/mintInfo'
 
 export interface Web3Context {
   connection: Connection
@@ -66,7 +68,7 @@ interface RealmCreationV2 {
   transferCouncilMintAuthority: boolean
   councilWalletPks: PublicKey[]
 
-  communityTokenConfig?: GoverningTokenConfigAccountArgs
+  communityTokenConfig: GoverningTokenConfigAccountArgs
   skipRealmAuthority?: boolean
 }
 type RealmCreationV3 = {
@@ -76,6 +78,8 @@ type RealmCreationV3 = {
 } & Omit<RealmCreationV2, '_programVersion'>
 
 export type RealmCreation = RealmCreationV2 | RealmCreationV3
+
+export const DEFAULT_MINT_DECIMALS = 6;
 
 export async function prepareRealmCreation({
   connection,
@@ -115,23 +119,36 @@ export async function prepareRealmCreation({
 
   const walletPk = getWalletPublicKey(wallet as any)
   const programIdPk = new PublicKey(programIdAddress)
-  const programVersion = await getGovernanceProgramVersion(
-    connection,
-    programIdPk
-  )
+  const programVersion = await fetchProgramVersion(connection, programIdPk)
+  if (programVersion !== params._programVersion)
+    throw new Error('form state and queried program version mismatch')
 
   console.log(
     'Prepare realm - program and version',
     programIdAddress,
     programVersion
   )
-  const communityMintAccount =
-    existingCommunityMintPk &&
-    (await tryGetMint(connection, existingCommunityMintPk))
-  const zeroCommunityTokenSupply = existingCommunityMintPk
-    ? communityMintAccount?.account.supply.isZero()
-    : true
-  const communityMintDecimals = communityMintAccount?.account?.decimals || 6
+
+  const {
+    communityVoteThreshold,
+    councilVoteThreshold,
+    councilVetoVoteThreshold,
+    communityVetoVoteThreshold,
+  } = createGovernanceThresholds(
+    programVersion,
+    communityYesVotePercentage,
+    params._programVersion === 3 ? params.councilYesVotePercentage : 'disabled'
+  )
+
+  const existingCommunityMint = existingCommunityMintPk
+    ? (await fetchMintInfoByPubkey(connection, existingCommunityMintPk)).result
+    : undefined
+
+  const existingCouncilMint = existingCouncilMintPk
+    ? (await fetchMintInfoByPubkey(connection, existingCouncilMintPk)).result
+    : undefined
+
+  const communityMintDecimals = existingCommunityMint?.decimals || DEFAULT_MINT_DECIMALS
 
   const communityMaxVoteWeightSource = parseMintMaxVoteWeight(
     useSupplyFactor,
@@ -141,20 +158,14 @@ export async function prepareRealmCreation({
   )
 
   console.log('Prepare realm - community mint address', existingCommunityMintPk)
-  console.log('Prepare realm - community mint account', communityMintAccount)
+  console.log('Prepare realm - community mint account', existingCommunityMint)
 
-  const councilMintAccount =
-    existingCouncilMintPk &&
-    (await tryGetMint(connection, existingCouncilMintPk))
-  const zeroCouncilTokenSupply = existingCouncilMintPk
-    ? councilMintAccount?.account.supply.isZero()
-    : true
-  const councilMintHasMintAuthority = councilMintAccount
-    ? !!councilMintAccount.account.mintAuthority
+  const councilMintHasMintAuthority = existingCouncilMint
+    ? !!existingCouncilMint.mintAuthority
     : true
 
   console.log('Prepare realm - council mint address', existingCouncilMintPk)
-  console.log('Prepare realm - council mint account', councilMintAccount)
+  console.log('Prepare realm - council mint account', existingCouncilMint)
 
   let communityMintPk = existingCommunityMintPk
 
@@ -171,24 +182,9 @@ export async function prepareRealmCreation({
     )
   }
 
-  console.log(
-    'Prepare realm - zero community token supply',
-    zeroCommunityTokenSupply,
-    ' | zero council token supply',
-    zeroCouncilTokenSupply
-  )
   console.log('Prepare realm - council mint address', existingCouncilMintPk)
   // Create council mint
   let councilMintPk
-
-  if (
-    zeroCommunityTokenSupply &&
-    zeroCouncilTokenSupply &&
-    nftCollectionCount === 0 &&
-    councilWalletPks.length === 0
-  ) {
-    throw new Error('no tokens exist that could govern this DAO')
-  }
 
   if (!existingCouncilMintPk && createCouncil) {
     councilMintPk = await withCreateMint(
@@ -203,6 +199,52 @@ export async function prepareRealmCreation({
   } else {
     councilMintPk = existingCouncilMintPk
   }
+
+  // START check if realm is governable ----------------
+  const communityEnabledInConfig = communityTokenConfig
+    ? communityTokenConfig.tokenType !== GoverningTokenType.Dormant
+    : false
+  // community can govern if...
+  const communityCanGovern =
+    // its enabled
+    communityEnabledInConfig &&
+    // ...and has a vote threshold
+    communityVoteThreshold.type !== VoteThresholdType.Disabled &&
+    (communityVoteThreshold.value ?? 0 > 0) &&
+    // ... and has supply
+    (existingCommunityMint?.supply.gtn(0) ?? false)
+
+  const incomingCouncilMembers = councilWalletPks.length
+  const councilEnabledInConfig =
+    params._programVersion !== 2
+      ? params.councilTokenConfig.tokenType === GoverningTokenType.Membership
+      : communityTokenConfig
+      ? // if version 2, council just uses community config
+        communityTokenConfig.tokenType !== GoverningTokenType.Dormant
+      : false // just assume if no community config is supplied for some reason, we can't count on anything.
+  // council can govern if...
+  const councilCanGovern =
+    // it has a mint...
+    councilMintPk &&
+    // its enabled...
+    councilEnabledInConfig && // NOTE: technically it can be enabled, but undefined.
+    // ...and has a vote threshold
+    councilVoteThreshold.type !== VoteThresholdType.Disabled &&
+    (councilVoteThreshold.value ?? 0 > 0) &&
+    // and either the council mint has supply... OR
+    ((existingCouncilMint?.supply.gtn(0) ?? false) ||
+      // there are incoming council members
+      incomingCouncilMembers > 0)
+
+  console.log('Prepare realm - can community govern?', communityCanGovern)
+  if (
+    !communityCanGovern &&
+    nftCollectionCount === 0 && // note this is not the most thorough check possible for nft realms
+    !councilCanGovern
+  ) {
+    throw new Error('no tokens exist that could govern this DAO')
+  }
+  // END ---------------------------------------------
 
   // Convert to mint natural amount
   const minCommunityTokensToCreateAsMintValue =
@@ -227,6 +269,12 @@ export async function prepareRealmCreation({
     communityTokenConfig,
     params._programVersion === 3 ? params.councilTokenConfig : undefined
   )
+
+  const doesRealmExist = await connection.getAccountInfo(realmPk)
+
+  if (doesRealmExist?.data) {
+    throw new Error('Realm with the same name already exists.')
+  }
 
   console.log('Prepare realm - council members', councilWalletPks)
   for (const teamWalletPk of councilWalletPks) {
@@ -303,17 +351,6 @@ export async function prepareRealmCreation({
     }
   }
 
-  const {
-    communityVoteThreshold,
-    councilVoteThreshold,
-    councilVetoVoteThreshold,
-    communityVetoVoteThreshold,
-  } = createGovernanceThresholds(
-    programVersion,
-    communityYesVotePercentage,
-    params._programVersion === 3 ? params.councilYesVotePercentage : 'disabled'
-  )
-
   const VOTING_COOLOFF_TIME_DEFAULT = getTimestampFromHours(12)
   // Put community and council mints under the realm governance with default config
   const config = new GovernanceConfig({
@@ -363,7 +400,7 @@ export async function prepareRealmCreation({
       walletPk,
       []
     )
-    if (communityMintAccount?.account.freezeAuthority) {
+    if (existingCommunityMint?.freezeAuthority) {
       const freezeMintAuthorityPassIx = Token.createSetAuthorityInstruction(
         TOKEN_PROGRAM_ID,
         communityMintPk,
@@ -390,7 +427,7 @@ export async function prepareRealmCreation({
       walletPk,
       []
     )
-    if (councilMintAccount?.account.freezeAuthority) {
+    if (existingCouncilMint?.freezeAuthority) {
       const freezeMintAuthorityPassIx = Token.createSetAuthorityInstruction(
         TOKEN_PROGRAM_ID,
         councilMintPk,
