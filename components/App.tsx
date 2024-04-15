@@ -35,7 +35,8 @@ import {
 import { WALLET_PROVIDERS } from '@utils/wallet-adapters'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { useAsync } from 'react-async-hook'
-import Footer from './Footer'
+import { useVsrClient } from '../VoterWeightPlugins/useVsrClient'
+import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
 
 const Notifications = dynamic(() => import('../components/Notification'), {
   ssr: false,
@@ -329,7 +330,6 @@ export function AppContents(props: Props) {
           </GatewayProvider>
         </ThemeProvider>
       </ErrorBoundary>
-      <Footer />
     </div>
   )
 }
