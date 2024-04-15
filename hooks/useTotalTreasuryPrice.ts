@@ -6,7 +6,7 @@ import { useJupiterPricesByMintsQuery } from './queries/jupiterPrice'
 import { PublicKey } from '@metaplex-foundation/js'
 import { WSOL_MINT } from '@components/instructions/tools'
 import { AccountType } from '@utils/uiTypes/assets'
-import { useMangoAccountsTreasury } from './useMangoAccountsTreasury'
+// import { useMangoAccountsTreasury } from './useMangoAccountsTreasury'
 
 export function useTotalTreasuryPrice() {
   const {
@@ -15,7 +15,7 @@ export function useTotalTreasuryPrice() {
     auxiliaryTokenAccounts,
   } = useGovernanceAssets()
 
-  const mintsToFetch = [
+  const mintsToFetch = [  
     ...governedTokenAccountsWithoutNfts,
     ...auxiliaryTokenAccounts,
   ]
@@ -27,9 +27,9 @@ export function useTotalTreasuryPrice() {
     new PublicKey(WSOL_MINT),
   ])
 
-  const { isFetching } = useMangoAccountsTreasury(
-    assetAccounts
-  )
+  // const { mangoAccountsValue, isFetching } = useMangoAccountsTreasury(
+  //   assetAccounts
+  // )
 
   const totalTokensPrice = [
     ...governedTokenAccountsWithoutNfts,
@@ -68,7 +68,7 @@ export function useTotalTreasuryPrice() {
   )
 
   return {
-    isFetching,
+    // isFetching,
     totalPriceFormatted,
   }
 }
