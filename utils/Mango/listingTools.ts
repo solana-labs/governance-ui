@@ -20,16 +20,14 @@ import {
 import { AnchorProvider, BN, Program, Wallet } from '@coral-xyz/anchor'
 import { MAINNET_USDC_MINT } from '@tools/constants'
 import { Market } from '@project-serum/serum'
-import { PythHttpClient, parsePriceData } from '@pythnetwork/client'
+import { PythHttpClient } from '@pythnetwork/client'
 import {
-  AccountInfo,
   Connection,
   Keypair,
   PublicKey,
   Transaction,
   VersionedTransaction,
 } from '@solana/web3.js'
-import SwitchboardProgram from '@switchboard-xyz/sbv2-lite'
 import { notify } from '@utils/notifications'
 import Big from 'big.js'
 import { secondsToHours } from 'date-fns'
@@ -588,45 +586,6 @@ export const getBestMarket = async ({
       message: 'Openbook market not found',
       type: 'error',
     })
-  }
-}
-
-export const decodePriceFromOracleAi = async (
-  ai: AccountInfo<Buffer>,
-  connection: Connection,
-  type: string
-): Promise<{
-  uiPrice: number
-  lastUpdatedSlot: number
-  deviation: string
-}> => {
-  let uiPrice, lastUpdatedSlot, deviation
-  try {
-    if (type === 'Pyth') {
-      const priceData = parsePriceData(ai.data)
-      uiPrice = priceData.previousPrice
-      lastUpdatedSlot = parseInt(priceData.lastSlot.toString())
-      deviation =
-        priceData.previousConfidence !== undefined
-          ? ((priceData.previousConfidence / uiPrice) * 100).toFixed(2)
-          : undefined
-    } else if (type === 'Switchboard') {
-      const program = await SwitchboardProgram.loadMainnet(connection)
-      uiPrice = program.decodeLatestAggregatorValue(ai)!.toNumber()
-      lastUpdatedSlot = program
-        .decodeAggregator(ai)
-        .latestConfirmedRound!.roundOpenSlot!.toNumber()
-      deviation = (
-        (switchboardDecimalToBig(
-          program.decodeAggregator(ai).latestConfirmedRound.stdDeviation
-        ).toNumber() /
-          uiPrice) *
-        100
-      ).toFixed(2)
-    }
-    return { uiPrice, lastUpdatedSlot, deviation }
-  } catch (e) {
-    return { uiPrice, lastUpdatedSlot, deviation }
   }
 }
 

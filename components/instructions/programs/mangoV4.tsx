@@ -17,7 +17,6 @@ import {
   EditTokenArgsFormatted,
   FlatEditArgs,
   getFormattedListingPresets,
-  decodePriceFromOracleAi,
   getFormattedBankValues,
   REDUCE_ONLY_OPTIONS,
   getSuggestedCoinPresetInfo,
@@ -236,21 +235,15 @@ const instructions = () => ({
         info,
         proposedOracle,
         args,
-        oracleAi,
+        //oracleAi,
         mintInfo,
       ] = await Promise.all([
         displayArgs(connection, data),
         getOracle(connection, oracle),
         getDataObjectFlattened<FlatListingArgs>(connection, data),
-        connection.getAccountInfo(oracle),
+        //connection.getAccountInfo(oracle),
         tryGetMint(connection, proposedMint),
       ])
-
-      const oracleData = await decodePriceFromOracleAi(
-        oracleAi!,
-        connection,
-        proposedOracle.type
-      )
 
       const presetInfo = await getSuggestedCoinPresetInfo(
         proposedMint.toBase58(),
@@ -263,7 +256,7 @@ const instructions = () => ({
         proposedOracle.type === 'Pyth',
         0,
         mintInfo?.account.decimals || 0,
-        oracleData.uiPrice
+        0 //oracleData.uiPrice
       )
 
       const currentListingArgsMatchedTier = Object.values(
@@ -775,32 +768,13 @@ const instructions = () => ({
     getDataUI: async (
       connection: Connection,
       data: Uint8Array,
-      accounts: AccountMetaData[]
+      _accounts: AccountMetaData[]
     ) => {
-      const oracle = accounts[6].pubkey
-
-      const [info, proposedOracle, oracleAi] = await Promise.all([
-        displayArgs(connection, data),
-        getOracle(connection, oracle),
-        connection.getAccountInfo(oracle),
-      ])
-
-      const oracleData = await decodePriceFromOracleAi(
-        oracleAi!,
-        connection,
-        proposedOracle.type
-      )
+      const [info] = await Promise.all([displayArgs(connection, data)])
       try {
         return (
           <div>
-            {oracleData.uiPrice ? (
-              <div className="py-4 space-y-2">
-                <div>Oracle Price: ${oracleData.uiPrice}</div>
-                <div>Oracle Last known confidence: {oracleData.deviation}%</div>
-              </div>
-            ) : (
-              <div className="py-4">No Oracle Data</div>
-            )}
+            <div className="py-4">No Oracle Data</div>
             <div>{info}</div>
           </div>
         )

@@ -29,7 +29,6 @@ import { TOKEN_AUCTION_INSTRUCTIONS } from './programs/tokenAuction'
 import { VALIDATORDAO_INSTRUCTIONS } from './programs/validatordao'
 import { POSEIDON_INSTRUCTIONS } from './programs/poseidon'
 import { MANGO_V4_INSTRUCTIONS } from './programs/mangoV4'
-import { SWITCHBOARD_INSTRUCTIONS } from './programs/switchboard'
 import { STAKE_INSTRUCTIONS } from './programs/stake'
 import dayjs from 'dayjs'
 import { JUPITER_REF } from './programs/jupiterRef'
@@ -436,7 +435,6 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...RAYDIUM_INSTRUCTIONS,
   ...MARINADE_INSTRUCTIONS,
   ...LIDO_INSTRUCTIONS,
-  ...SWITCHBOARD_INSTRUCTIONS,
   ...ATA_PROGRAM_INSTRUCTIONS,
   ...SYSTEM_INSTRUCTIONS,
   ...VOTE_STAKE_REGISTRY_INSTRUCTIONS,
