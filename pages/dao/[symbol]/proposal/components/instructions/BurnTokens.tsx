@@ -12,7 +12,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance, serializeInstructionToBase64 } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import GovernedAccountSelect from '../GovernedAccountSelect'
-import { TOKEN_PROGRAM_ID, Token} from "@solana/spl-token"
+import { TOKEN_PROGRAM_ID, Token, u64} from "@solana/spl-token"
 import { validateInstruction } from '@utils/instructionTools'
 
 const BurnTokens = ({
@@ -80,14 +80,14 @@ const BurnTokens = ({
             form.amount!,
             form.governedTokenAccount.extensions.mint!.account.decimals
         )
-
+        
         const burnIx = Token.createBurnInstruction(
             TOKEN_PROGRAM_ID,
             mintPK,
             tokenAccount,
             sourceWallet,
             [],
-            burnAmount
+            new u64(burnAmount.toString())
         )
         
         serializedInstruction = serializeInstructionToBase64(burnIx)
