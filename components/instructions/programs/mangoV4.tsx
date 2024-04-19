@@ -475,7 +475,7 @@ const instructions = () => ({
                 suffix="%"
               />
               <DisplayListingPropertyWrapped
-                label="Max fee rate"
+                label="Interest rate max rate"
                 valKey={'maxRate'}
                 suffix="%"
               />
