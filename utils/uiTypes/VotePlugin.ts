@@ -99,6 +99,16 @@ export class VotingClient {
     }
   }
 
+  // Take this exact voting client, but set a different voter wallet - useful for combining delegate and delegator votes
+  public for(wallet: PublicKey): VotingClient {
+    return new VotingClient({
+      client: this.client,
+      realm: this.realm,
+      walletPk: wallet,
+      voterWeightPluginDetails: this.voterWeightPluginDetails,
+    })
+  }
+
   private get voterWeightPk() {
     return this.walletPk ? this.voterWeightPluginDetails.voterWeightPkForWallet(this.walletPk) : undefined
   }

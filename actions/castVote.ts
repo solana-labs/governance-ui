@@ -16,6 +16,7 @@ import {
   withPostChatMessage,
   withCreateTokenOwnerRecord,
   getVoteRecordAddress,
+  getTokenOwnerRecord,
 } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
@@ -62,7 +63,7 @@ const createDelegatorVote = async ({
   realmPk,
   proposalPk,
   tokenOwnerRecordPk,
-  userPk,
+  delegatePk,
   vote,
   votingPlugin,
 }: {
@@ -70,7 +71,7 @@ const createDelegatorVote = async ({
   realmPk: PublicKey
   proposalPk: PublicKey
   tokenOwnerRecordPk: PublicKey
-  userPk: PublicKey
+  delegatePk: PublicKey
   vote: Vote
   votingPlugin: VotingClient | undefined
 }) => {
@@ -107,10 +108,10 @@ const createDelegatorVote = async ({
     proposal.pubkey,
     proposal.account.tokenOwnerRecord,
     tokenOwnerRecordPk,
-    userPk,
+    delegatePk,
     proposal.account.governingTokenMint,
     vote,
-    userPk,
+    delegatePk,
     pluginAddresses?.voterWeightPk,
     pluginAddresses?.maxVoterWeightRecord
   )
@@ -276,14 +277,16 @@ export async function castVote(
               )
               if (voteRecord.found) return undefined
 
+              const torOwnerPk = (await getTokenOwnerRecord(connection, tokenOwnerRecordPk)).account.governingTokenOwner
+
               return createDelegatorVote({
                 connection,
                 realmPk: realm.pubkey,
                 proposalPk: proposal.pubkey,
                 tokenOwnerRecordPk,
-                userPk: walletPubkey,
+                delegatePk: walletPubkey,
                 vote,
-                votingPlugin: votingPlugin,
+                votingPlugin: votingPlugin?.for(torOwnerPk),
               })
             })
           )
