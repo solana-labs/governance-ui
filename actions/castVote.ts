@@ -42,6 +42,7 @@ import { fetchTokenOwnerRecordByPubkey } from '@hooks/queries/tokenOwnerRecord'
 import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
 import { fetchVoteRecordByPubkey } from '@hooks/queries/voteRecord'
 import { findPluginName } from '@constants/plugins'
+import { BN } from '@coral-xyz/anchor'
 
 const getVetoTokenMint = (
   proposal: ProgramAccount<Proposal>,
@@ -165,7 +166,8 @@ export async function castVote(
   votingPlugin?: VotingClient,
   runAfterConfirmation?: (() => void) | null,
   voteWeights?: number[],
-  additionalTokenOwnerRecords?: PublicKey[]
+  additionalTokenOwnerRecords?: PublicKey[],
+  calculatedVoterWeight: BN | null = null
 ) {
   const chatMessageSigners: Keypair[] = []
 
@@ -177,15 +179,6 @@ export async function castVote(
   // Explicitly request the version before making RPC calls to work around race conditions in resolving
   // the version for RealmInfo
   const programVersion = await fetchProgramVersion(connection, programId)
-
-  const pluginCastVoteIxs: TransactionInstruction[] = []
-  //will run only if any plugin is connected with realm
-  const plugin = await votingPlugin?.withCastPluginVote(
-    pluginCastVoteIxs,
-    proposal,
-    tokenOwnerRecord,
-    createCastNftVoteTicketIxs
-  )
 
   const isMulti =
     proposal.account.voteType !== VoteType.SINGLE_CHOICE &&
@@ -240,22 +233,34 @@ export async function castVote(
       : proposal.account.governingTokenMint
 
   const castVoteIxs: TransactionInstruction[] = []
-  await withCastVote(
-    castVoteIxs,
-    programId,
-    programVersion,
-    realm.pubkey,
-    proposal.account.governance,
-    proposal.pubkey,
-    proposal.account.tokenOwnerRecord,
-    tokenOwnerRecord,
-    governanceAuthority,
-    tokenMint,
-    vote,
-    payer,
-    plugin?.voterWeightPk,
-    plugin?.maxVoterWeightRecord
-  )
+  const pluginCastVoteIxs: TransactionInstruction[] = []
+
+  if (calculatedVoterWeight !== null && calculatedVoterWeight.gtn(0)) {
+    //will run only if any plugin is connected with realm
+    const plugin = await votingPlugin?.withCastPluginVote(
+      pluginCastVoteIxs,
+      proposal,
+      tokenOwnerRecord,
+      createCastNftVoteTicketIxs
+    )
+
+    await withCastVote(
+      castVoteIxs,
+      programId,
+      programVersion,
+      realm.pubkey,
+      proposal.account.governance,
+      proposal.pubkey,
+      proposal.account.tokenOwnerRecord,
+      tokenOwnerRecord,
+      governanceAuthority,
+      tokenMint,
+      vote,
+      payer,
+      plugin?.voterWeightPk,
+      plugin?.maxVoterWeightRecord
+    )
+  }
 
   const delegatorCastVoteAtoms =
     additionalTokenOwnerRecords &&
@@ -277,7 +282,9 @@ export async function castVote(
               )
               if (voteRecord.found) return undefined
 
-              const torOwnerPk = (await getTokenOwnerRecord(connection, tokenOwnerRecordPk)).account.governingTokenOwner
+              const torOwnerPk = (
+                await getTokenOwnerRecord(connection, tokenOwnerRecordPk)
+              ).account.governingTokenOwner
 
               return createDelegatorVote({
                 connection,
@@ -296,7 +303,6 @@ export async function castVote(
   const pluginPostMessageIxs: TransactionInstruction[] = []
   const postMessageIxs: TransactionInstruction[] = []
   if (message) {
-
     const plugin = await votingPlugin?.withUpdateVoterWeightRecord(
       pluginPostMessageIxs,
       'commentProposal',
