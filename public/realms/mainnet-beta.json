@@ -3518,5 +3518,19 @@
     "ogImage": "/realms/Jito/jito.png",
     "website": "https://jito.network",
     "twitter": "@jito_sol"
+  },
+   {
+    "symbol": "FIM",
+    "category": "defi",
+    "bannerImage": "/realms/FinanceIsMagic/Banner.png",
+    "displayName": "Finance Is Magic",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "JCv4VFAMUrwwGfjnRsS2DmujNEEfNs9KT3jentpQYnsg",
+    "communityMint": "64pwL5YCL1ctSVUpNsBAsw7V6ZPiZmrEJ1dNhdsQwKx2",
+    "ogImage": "/realms/FinanceIsMagic/Logo.png",
+    "shortDescription": "DeFi magic with memecoins and liquidity.",
+    "website": "https://fimcoin.com",
+    "keywords": "DeFi, REALM, Governance, FIM, Decentralized Finance, Crypto, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, SPL Tokens",
+    "twitter": "@financeismagic"
   }
 ]
