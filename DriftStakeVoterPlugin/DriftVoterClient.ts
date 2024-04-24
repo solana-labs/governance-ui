@@ -161,6 +161,8 @@ export class DriftVoterClient extends Client<DriftStakeVoter> {
       spotMarketIndex
     )
 
+    const drift = new Program(DriftIDL, driftProgramId, this.program.provider)
+
     const spotMarket = await queryClient.fetchQuery({
       queryKey: ['Drift Spot Market', spotMarketPk.toString()],
       queryFn: async () => drift.account.spotMarket.fetchNullable(spotMarketPk),
@@ -174,7 +176,6 @@ export class DriftVoterClient extends Client<DriftStakeVoter> {
     const insuranceFundVaultPkOrNull =
       insuranceFundVault.found === false ? null : insuranceFundVaultPk
 
-    const drift = new Program(DriftIDL, driftProgramId, this.program.provider)
     let insuranceFundStake:
       | Awaited<ReturnType<typeof drift.account.insuranceFundStake.fetch>>
       | undefined
