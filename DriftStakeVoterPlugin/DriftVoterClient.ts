@@ -16,6 +16,7 @@ import {
 import { fetchTokenAccountByPubkey } from '@hooks/queries/tokenAccount'
 import { DRIFT_STAKE_VOTER_PLUGIN } from './constants'
 import { fetchRealmByPubkey } from '@hooks/queries/realm'
+import queryClient from '@hooks/queries/queryClient'
 
 export class DriftVoterClient extends Client<DriftStakeVoter> {
   readonly requiresInputVoterWeight = true
@@ -150,6 +151,21 @@ export class DriftVoterClient extends Client<DriftStakeVoter> {
       spotMarketIndex
     )
 
+    const spotMarket = await queryClient.fetchQuery({
+      queryKey: ['Drift Spot Market', spotMarketPk.toString()],
+      queryFn: async () =>
+        this.program.provider.connection.getAccountInfo(spotMarketPk),
+    })
+    const spotMarketPkOrNull = spotMarket === null ? null : spotMarketPk
+
+    const insuranceFundVault = await queryClient.fetchQuery({
+      queryKey: ['Drift Insurance Fund Vault', insuranceFundVaultPk.toString()],
+      queryFn: async () =>
+        this.program.provider.connection.getAccountInfo(insuranceFundVaultPk),
+    })
+    const insuranceFundVaultPkOrNull =
+      insuranceFundVault === null ? null : insuranceFundVaultPk
+
     const drift = new Program(DriftIDL, driftProgramId, this.program.provider)
     let insuranceFundStake:
       | Awaited<ReturnType<typeof drift.account.insuranceFundStake.fetch>>
@@ -171,9 +187,9 @@ export class DriftVoterClient extends Client<DriftStakeVoter> {
         voterWeightRecord: voterWeightPk,
         registrar: registrarPk,
         driftProgram: driftProgramId,
-        spotMarket: spotMarketPk,
+        spotMarket: spotMarketPkOrNull,
         insuranceFundStake: stakePkOrNull,
-        insuranceFundVault: insuranceFundVaultPk,
+        insuranceFundVault: insuranceFundVaultPkOrNull,
         tokenOwnerRecord: tokenOwnerRecordPk,
       })
       .instruction()
