@@ -71,7 +71,7 @@ const GovernedAccountSelect = ({
   label?: string
   noMaxWidth?: boolean
   autoSelectFirst?: boolean
-  type?: 'mint' | 'token' | 'wallet'
+  type?: 'mint' | 'token' | 'wallet' | 'program'
 }) => {
   const realm = useRealm()
   const treasuryInfo = useTreasuryInfo(false)
@@ -97,6 +97,9 @@ const GovernedAccountSelect = ({
         | ReturnType<typeof getSolAccountLabel>
     }[]
   >([])
+  const [programs, setPrograms] = useState<
+  AssetAccount[]
+>([])
   const programId = realm.realmInfo?.programId
 
   useEffect(() => {
@@ -118,6 +121,11 @@ const GovernedAccountSelect = ({
             : getTokenAccountLabelInfo(account),
         }))
     )
+    setPrograms(
+      governedAccounts
+        .filter((account) => account.type === AccountType.PROGRAM)
+    )
+
 
     if (programId) {
       const governances = new Set<string>([])
@@ -235,20 +243,6 @@ const GovernedAccountSelect = ({
       return null
     }
 
-    const wallet = wallets.find(({ account }) =>
-      account.pubkey.equals(value.pubkey)
-    )
-
-    if (!wallet) {
-      return null
-    }
-
-    const accountName = value.isSol
-      ? getSolAccountLabel(value).tokenAccountName
-      : value.isToken
-      ? getTokenAccountLabelInfo(value).tokenAccountName
-      : getMintAccountLabelInfo(value).mintAccountName
-
     const walletInfo = RE.isOk(treasuryInfo)
       ? treasuryInfo.data.wallets.find(
           (wallet) =>
@@ -264,20 +258,12 @@ const GovernedAccountSelect = ({
           <UnselectedWalletIcon className="h-10 w-10 stroke-white/50" />
         </div>
         <div>
-          {accountName ? (
-            <div className="mb-0.5 truncate w-full">{accountName}</div>
-          ) : (
             <div className="mb-0.5 truncate w-full">
-              {abbreviateAddress(wallet.walletAddress)}
+              {programName ? programName : abbreviateAddress(value.pubkey)}
             </div>
-          )}
-          <div className="space-y-0.5 text-xs text-fgd-3">
-            <div>Rules: {abbreviateAddress(value.governance.pubkey)}</div>
-          </div>
 
           <div className="space-y-0.5 text-xs text-fgd-3">
-            Program:{' '}
-            {programName ? programName : abbreviateAddress(value.pubkey)}
+            <div>Rules: {abbreviateAddress(value.governance.pubkey)}</div>
           </div>
         </div>
         {walletInfo ? (
@@ -448,7 +434,7 @@ const GovernedAccountSelect = ({
             ? getTokenView(value)
             : type === 'mint'
             ? getMintView(value)
-            : value?.type === AccountType.PROGRAM
+            : type === 'program'
             ? getProgramView(value, true)
             : getWalletView(value, true)
         }
@@ -501,6 +487,29 @@ const GovernedAccountSelect = ({
                 ) : null
               })
               .filter(exists)
+          : type === 'program' ?
+
+            programs
+              .filter((program) =>
+                !shouldBeGoverned
+                  ? !shouldBeGoverned
+                  : program.governance?.pubkey.toBase58() ===
+                    governance?.pubkey?.toBase58()
+              )
+              .map((program) => {
+                const label = getProgramView(program)
+
+                return label ? (
+                  <Select.Option
+                    className="border-red"
+                    key={program.pubkey.toBase58()}
+                    value={program}
+                  >
+                    {label}
+                  </Select.Option>
+                ) : null
+              })
+              .filter(exists)
           : wallets
               .filter((wallet) =>
                 !shouldBeGoverned
@@ -509,10 +518,7 @@ const GovernedAccountSelect = ({
                     governance?.pubkey?.toBase58()
               )
               .map((wallet) => {
-                const label =
-                  wallet.account.type === AccountType.PROGRAM
-                    ? getProgramView(wallet.account)
-                    : getWalletView(wallet.account)
+                const label = getWalletView(wallet.account)
 
                 return label ? (
                   <Select.Option
