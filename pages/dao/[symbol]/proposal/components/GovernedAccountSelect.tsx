@@ -259,6 +259,7 @@ const GovernedAccountSelect = ({
         </div>
         <div>
           <div className="mb-0.5 truncate w-full">
+            Program:{' '}
             {programName ? programName : abbreviateAddress(value.pubkey)}
           </div>
 
