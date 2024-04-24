@@ -1,4 +1,10 @@
-import { GovernanceAccountType, VoteKind, VoteType, withFinalizeVote } from '@solana/spl-governance'
+import {
+  GovernanceAccountType,
+  VoteKind,
+  VoteType,
+  getVoteRecordAddress,
+  withFinalizeVote,
+} from '@solana/spl-governance'
 import { TransactionInstruction } from '@solana/web3.js'
 import { useState } from 'react'
 import { relinquishVote } from '../../actions/relinquishVote'
@@ -19,6 +25,7 @@ import {
   useIsVoting,
   useIsInCoolOffTime,
   useUserVetoTokenRecord,
+  useVotingPop,
 } from './hooks'
 import assertUnreachable from '@utils/typescript/assertUnreachable'
 import { useHasVoteTimeExpired } from '@hooks/useHasVoteTimeExpired'
@@ -30,11 +37,17 @@ import {
   useRouteProposalQuery,
 } from '@hooks/queries/proposal'
 import { useProposalGovernanceQuery } from '@hooks/useProposal'
-import { useProposalVoteRecordQuery } from '@hooks/queries/voteRecord'
+import {
+  fetchVoteRecordByPubkey,
+  useProposalVoteRecordQuery,
+} from '@hooks/queries/voteRecord'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import queryClient from '@hooks/queries/queryClient'
 import { CheckmarkFilled } from '@carbon/icons-react'
-import {useVotingClientForGoverningTokenMint} from "@hooks/useVotingClients";
+import { useVotingClientForGoverningTokenMint } from '@hooks/useVotingClients'
+import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
+import { useAsync } from 'react-async-hook'
+import { useBatchedVoteDelegators } from './useDelegators'
 
 export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
   const proposal = useRouteProposalQuery().data?.result
@@ -57,7 +70,9 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
   const vetoVotertokenRecord = useUserVetoTokenRecord()
   const voterTokenRecord =
     quorum === 'electoral' ? electoralVoterTokenRecord : vetoVotertokenRecord
-  const votingClient = useVotingClientForGoverningTokenMint(proposal?.account.governingTokenMint)
+  const votingClient = useVotingClientForGoverningTokenMint(
+    proposal?.account.governingTokenMint
+  )
 
   const isWithdrawEnabled =
     connected &&
@@ -140,11 +155,77 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
     setIsLoading(false)
   }
 
-  const vote = ownVoteRecord?.account.vote
+  const communityDelegators = useBatchedVoteDelegators('community')
+  const councilDelegators = useBatchedVoteDelegators('council')
+  const votingPop = useVotingPop()
+  const { voterWeightForWallet } = useRealmVoterWeightPlugins(votingPop)
 
-  const isMulti = proposal?.account.voteType !== VoteType.SINGLE_CHOICE
-    && proposal?.account.accountType === GovernanceAccountType.ProposalV2
-  
+  const ownVoterWeight = wallet?.publicKey
+    ? voterWeightForWallet(wallet?.publicKey)
+    : undefined
+  const hasVotingPower = !!(
+    ownVoterWeight?.value && ownVoterWeight.value?.gtn(0)
+  )
+
+  const delegatorVote = useAsync(async () => {
+    const relevantDelegators =
+      votingPop === 'community' ? communityDelegators : councilDelegators
+
+    if (
+      !hasVotingPower &&
+      proposal &&
+      relevantDelegators &&
+      relevantDelegators.length > 0
+    ) {
+      const delegatorisVoteList = await Promise.all(
+        relevantDelegators.map(async (delegator) => {
+          const pda = await getVoteRecordAddress(
+            proposal.owner,
+            proposal.pubkey,
+            delegator.pubkey
+          )
+          const voteRecord = await fetchVoteRecordByPubkey(
+            connection.current,
+            pda
+          )
+          return voteRecord
+        })
+      )
+
+      const allVoted = !delegatorisVoteList
+        .map((vote) => !!vote.found)
+        .includes(false)
+      return allVoted ? delegatorisVoteList[0].result : null
+    }
+  }, [
+    communityDelegators?.length,
+    connection.current,
+    councilDelegators?.length,
+    hasVotingPower,
+    proposal?.pubkey,
+    votingPop,
+  ])
+
+  const getDelegatorVoteForQuorum = () => {
+    if (
+      // yes/no vote
+      (quorum === 'electoral' && !delegatorVote?.result?.account.vote?.veto) ||
+      // veto vote
+      (quorum === 'veto' && delegatorVote?.result?.account.vote?.veto)
+    ) {
+      return delegatorVote?.result?.account.vote
+    }
+    return undefined
+  }
+
+  const vote = hasVotingPower
+    ? ownVoteRecord?.account.vote
+    : getDelegatorVoteForQuorum()
+
+  const isMulti =
+    proposal?.account.voteType !== VoteType.SINGLE_CHOICE &&
+    proposal?.account.accountType === GovernanceAccountType.ProposalV2
+
   const nota = '$$_NOTA_$$'
 
   return vote !== undefined ? (
@@ -153,33 +234,36 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
         <h3 className="text-center">
           {quorum === 'electoral' ? 'Your vote' : 'You voted to veto'}
         </h3>
-        {vote.voteType === VoteKind.Approve ? 
-          isMulti ? 
-            vote.approveChoices?.map((choice, index) => (
-              choice.weightPercentage ?
-              <div className="p-1 w-full" key={index}>
-                <Button
-                  className='w-full border border-primary-light text-primary-light bg-transparent'
-                  disabled={true}
-                >
-                  <div className="flex flex-row gap-2 justify-center">
-                    <div><CheckmarkFilled /></div>
-                    <div>{
-                      proposal?.account.options[index].label === nota ?
-                        "None of the Above" :
-                        proposal?.account.options[index].label
-                    }</div>
-                  </div>
-                </Button>
+        {vote.voteType === VoteKind.Approve ? (
+          isMulti ? (
+            vote.approveChoices?.map((choice, index) =>
+              choice.weightPercentage ? (
+                <div className="p-1 w-full" key={index}>
+                  <Button
+                    className="w-full border border-primary-light text-primary-light bg-transparent"
+                    disabled={true}
+                  >
+                    <div className="flex flex-row gap-2 justify-center">
+                      <div>
+                        <CheckmarkFilled />
+                      </div>
+                      <div>
+                        {proposal?.account.options[index].label === nota
+                          ? 'None of the Above'
+                          : proposal?.account.options[index].label}
+                      </div>
+                    </div>
+                  </Button>
+                </div>
+              ) : null
+            )
+          ) : (
+            <Tooltip content={`You voted "Yes"`}>
+              <div className="flex flex-row items-center justify-center rounded-full border border-[#8EFFDD] p-2 mt-2">
+                <ThumbUpIcon className="h-4 w-4 fill-[#8EFFDD]" />
               </div>
-              : null
-            )) 
-          : (
-          <Tooltip content={`You voted "Yes"`}>
-            <div className="flex flex-row items-center justify-center rounded-full border border-[#8EFFDD] p-2 mt-2">
-              <ThumbUpIcon className="h-4 w-4 fill-[#8EFFDD]" />
-            </div>
-          </Tooltip>
+            </Tooltip>
+          )
         ) : vote.voteType === VoteKind.Deny ? (
           <Tooltip content={`You voted "No"`}>
             <div className="flex flex-row items-center justify-center rounded-full border border-[#FF7C7C] p-2 mt-2">
