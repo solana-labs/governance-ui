@@ -68,8 +68,6 @@ export class DriftVoterClient extends Client<DriftStakeVoter> {
       spotMarketIndex
     )
 
-    const spotMarket = await drift.account.spotMarket.fetch(spotMarketPk)
-
     let insuranceFundStake: Awaited<
       ReturnType<typeof drift.account.insuranceFundStake.fetch>
     >
@@ -79,17 +77,29 @@ export class DriftVoterClient extends Client<DriftStakeVoter> {
       )
     } catch (e) {
       console.log('drift voter client', 'no insurance fund stake account found')
-      return new BN(0).add(inputVoterWeight)
+      return inputVoterWeight
+    }
+
+    const spotMarket = await queryClient.fetchQuery({
+      queryKey: ['Drift Spot Market', spotMarketPk.toString()],
+      queryFn: async () => drift.account.spotMarket.fetchNullable(spotMarketPk),
+    })
+
+    if (spotMarket === null) {
+      console.log('Drift spot market not found: ' + spotMarketPk.toString())
+      return inputVoterWeight
     }
 
     const insuranceFundVault = await fetchTokenAccountByPubkey(
       this.program.provider.connection,
       insuranceFundVaultPk
     )
-    if (insuranceFundVault.result === undefined)
-      throw new Error(
+    if (insuranceFundVault.result === undefined) {
+      console.log(
         'Insurance fund vault not found: ' + insuranceFundVaultPk.toString()
       )
+      return inputVoterWeight
+    }
 
     const nShares = insuranceFundStake.ifShares
     const withdrawRequestShares = insuranceFundStake.lastWithdrawRequestShares
@@ -153,18 +163,16 @@ export class DriftVoterClient extends Client<DriftStakeVoter> {
 
     const spotMarket = await queryClient.fetchQuery({
       queryKey: ['Drift Spot Market', spotMarketPk.toString()],
-      queryFn: async () =>
-        this.program.provider.connection.getAccountInfo(spotMarketPk),
+      queryFn: async () => drift.account.spotMarket.fetchNullable(spotMarketPk),
     })
     const spotMarketPkOrNull = spotMarket === null ? null : spotMarketPk
 
-    const insuranceFundVault = await queryClient.fetchQuery({
-      queryKey: ['Drift Insurance Fund Vault', insuranceFundVaultPk.toString()],
-      queryFn: async () =>
-        this.program.provider.connection.getAccountInfo(insuranceFundVaultPk),
-    })
+    const insuranceFundVault = await fetchTokenAccountByPubkey(
+      this.program.provider.connection,
+      insuranceFundVaultPk
+    )
     const insuranceFundVaultPkOrNull =
-      insuranceFundVault === null ? null : insuranceFundVaultPk
+      insuranceFundVault.found === false ? null : insuranceFundVaultPk
 
     const drift = new Program(DriftIDL, driftProgramId, this.program.provider)
     let insuranceFundStake:
