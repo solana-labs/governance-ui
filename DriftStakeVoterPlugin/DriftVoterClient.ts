@@ -126,7 +126,11 @@ export class DriftVoterClient extends Client<DriftStakeVoter> {
       mint,
       voter
     )
-    const { voterWeightPk } = this.getVoterWeightRecordPDA(realm, mint, voter)
+    const { voterWeightPk } = await this.getVoterWeightRecordPDA(
+      realm,
+      mint,
+      voter
+    )
     const { registrar: registrarPk } = this.getRegistrarPDA(realm, mint)
     const registrar = await this.program.account.registrar.fetch(registrarPk)
     const spotMarketIndex = registrar.spotMarketIndex // could just hardcode spotmarket pk
