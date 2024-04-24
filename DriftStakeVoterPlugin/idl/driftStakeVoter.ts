@@ -131,11 +131,13 @@ export type DriftStakeVoter = {
           name: 'spotMarket'
           isMut: false
           isSigner: false
+          isOptional: true
         },
         {
           name: 'insuranceFundVault'
           isMut: false
           isSigner: false
+          isOptional: true
         },
         {
           name: 'insuranceFundStake'
@@ -502,11 +504,13 @@ export const IDL: DriftStakeVoter = {
           name: 'spotMarket',
           isMut: false,
           isSigner: false,
+          isOptional: true,
         },
         {
           name: 'insuranceFundVault',
           isMut: false,
           isSigner: false,
+          isOptional: true,
         },
         {
           name: 'insuranceFundStake',
