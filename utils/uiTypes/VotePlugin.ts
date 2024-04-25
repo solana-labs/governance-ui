@@ -99,6 +99,16 @@ export class VotingClient {
     }
   }
 
+  // Take this exact voting client, but set a different voter wallet - useful for combining delegate and delegator votes
+  public for(wallet: PublicKey): VotingClient {
+    return new VotingClient({
+      client: this.client,
+      realm: this.realm,
+      walletPk: wallet,
+      voterWeightPluginDetails: this.voterWeightPluginDetails,
+    })
+  }
+
   private get voterWeightPk() {
     return this.walletPk ? this.voterWeightPluginDetails.voterWeightPkForWallet(this.walletPk) : undefined
   }
@@ -111,10 +121,11 @@ export class VotingClient {
     instructions: TransactionInstruction[],
     type: UpdateVoterWeightRecordTypes,
     createNftActionTicketIxs?: TransactionInstruction[],
+    target? : PublicKey
   ): Promise<ProgramAddresses | undefined> => {
     if (!this.walletPk) return undefined;
 
-    const {pre: preIxes, post: postIxes} = await this.voterWeightPluginDetails.updateVoterWeightRecords(this.walletPk, convertTypeToVoterWeightAction(type))
+    const {pre: preIxes, post: postIxes} = await this.voterWeightPluginDetails.updateVoterWeightRecords(this.walletPk, convertTypeToVoterWeightAction(type), target)
     instructions.push(...preIxes);
     createNftActionTicketIxs?.push(...postIxes);
 

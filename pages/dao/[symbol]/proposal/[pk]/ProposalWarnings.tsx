@@ -142,7 +142,8 @@ const BufferAuthorityMismatch = () => (
       </div>
       <div className="ml-3">
         <h3 className="text-sm font-medium text-red-800">
-          Danger alert: The current buffer authority does not match the DAO wallet
+          Danger alert: The current buffer authority does not match the DAO
+          wallet
         </h3>
         <div className="mt-2">
           <p className="text-sm text-red-700">
@@ -184,7 +185,7 @@ const useProposalSafetyCheck = (proposal: Proposal) => {
   const config = useRealmConfigQuery().data?.result
   const { realmInfo } = useRealm()
   const { data: transactions } = useSelectedProposalTransactions()
-  const {data: bufferAuthorities} = useBufferAccountsAuthority()
+  const { data: bufferAuthorities } = useBufferAccountsAuthority()
   const governance = useGovernanceByPubkeyQuery(proposal?.governance).data
     ?.result
 
@@ -265,8 +266,14 @@ const useProposalSafetyCheck = (proposal: Proposal) => {
     }
 
     if (treasuryAddress.result) {
-      const treasury = treasuryAddress.result;
-      if (bufferAuthorities?.some(authority => !authority.equals(treasury))) {
+      const treasury = treasuryAddress.result
+      if (
+        governance &&
+        bufferAuthorities?.some(
+          (authority) =>
+            !authority.equals(treasury) && !authority.equals(governance.pubkey)
+        )
+      ) {
         proposalWarnings.push('bufferAuthorityMismatch')
       }
     }

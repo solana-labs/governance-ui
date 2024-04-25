@@ -34,6 +34,7 @@ export default function UseMangoV4(programId?: PublicKey, group?: PublicKey) {
     : MAINNET_GROUP
 
   const program = programId ? programId : MANGO_V4_ID[clientCluster]
+  const isMainMangoProgram = program.equals(MANGO_V4_ID[clientCluster])
   const [mangoClient, setMangoClient] = useState<MangoClient | null>(null)
   const [mangoGroup, setMangoGroup] = useState<Group | null>(null)
   const getClient = async (
@@ -52,7 +53,7 @@ export default function UseMangoV4(programId?: PublicKey, group?: PublicKey) {
       clientCluster,
       program,
       {
-        idsSource: 'api',
+        idsSource: isMainMangoProgram ? 'api' : undefined,
       }
     )
 
