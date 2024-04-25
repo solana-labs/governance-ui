@@ -2535,11 +2535,6 @@
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.3.2.tgz#6f26dbc8fbc7205873ce3cee2f690eba0d421b39"
   integrity sha512-MVC8EAQp7MvEcm30KWENFjgR+Mkmf+D189XJTkFIlwohU5hcBbn1ZkKq7KVTi2Hme3PMGF390DaL52beVrIihQ==
 
-"@noble/hashes@1.3.3":
-  version "1.3.3"
-  resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.3.3.tgz#39908da56a4adc270147bb07968bf3b16cfe1699"
-  integrity sha512-V7/fPHgl+jsVPXqqeOzT8egNj2iBIVt+ECeMMG8TdcnTikP3oaBtUVqpT/gYCR68aEBJSF+XbYUxStjbFMqIIA==
-
 "@noble/hashes@1.4.0", "@noble/hashes@^1.1.3", "@noble/hashes@^1.3.0", "@noble/hashes@^1.3.1":
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.4.0.tgz#45814aa329f30e4fe0ba49426f49dfccdd066426"
@@ -2957,7 +2952,7 @@
     bn.js "^5.1.2"
     buffer-layout "^1.2.0"
 
-"@project-serum/sol-wallet-adapter@0.2.0", "@project-serum/sol-wallet-adapter@0.2.6", "@project-serum/sol-wallet-adapter@^0.2.6":
+"@project-serum/sol-wallet-adapter@0.2.6", "@project-serum/sol-wallet-adapter@^0.2.6":
   version "0.2.6"
   resolved "https://registry.yarnpkg.com/@project-serum/sol-wallet-adapter/-/sol-wallet-adapter-0.2.6.tgz#b4cd25a566294354427c97c26d716112b91a0107"
   integrity sha512-cpIb13aWPW8y4KzkZAPDgw+Kb+DXjCC6rZoH74MGm3I/6e/zKyGnfAuW5olb2zxonFqsYgnv7ev8MQnvSgJ3/g==
@@ -4165,7 +4160,7 @@
     bs58 "^5.0.0"
     js-base64 "^3.7.5"
 
-"@solana-mobile/mobile-wallet-adapter-protocol@^2.0.0", "@solana-mobile/mobile-wallet-adapter-protocol@^2.1.2":
+"@solana-mobile/mobile-wallet-adapter-protocol@^2.1.2":
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/@solana-mobile/mobile-wallet-adapter-protocol/-/mobile-wallet-adapter-protocol-2.1.2.tgz#e812c6bc07e7552902225ea62bc0f829ddf2acdf"
   integrity sha512-z7LPeWzdEUoavU5P1PSbtxLTNE/MB6ACgaIPPAMjRdEk/jUvunquWKmbOX4vkFD6QbD98ykc4NZOt5iki7Z6hw==
@@ -4801,7 +4796,7 @@
   dependencies:
     "@solana/wallet-adapter-base" "^0.9.22"
 
-"@solana/wallet-standard-chains@^1.0.0", "@solana/wallet-standard-chains@^1.1.0":
+"@solana/wallet-standard-chains@^1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@solana/wallet-standard-chains/-/wallet-standard-chains-1.1.0.tgz#459b297e71b0d9c1196c11a0578b38c85998be7d"
   integrity sha512-IRJHf94UZM8AaRRmY18d34xCJiVPJej1XVwXiTjihHnmwD0cxdQbc/CKjrawyqFyQAKJx7raE5g9mnJsAdspTg==
@@ -4817,7 +4812,7 @@
     "@solana/wallet-standard-features" "^1.2.0"
     "@solana/wallet-standard-util" "^1.1.1"
 
-"@solana/wallet-standard-features@^1.0.0", "@solana/wallet-standard-features@^1.0.1", "@solana/wallet-standard-features@^1.1.0", "@solana/wallet-standard-features@^1.2.0":
+"@solana/wallet-standard-features@^1.0.1", "@solana/wallet-standard-features@^1.1.0", "@solana/wallet-standard-features@^1.2.0":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@solana/wallet-standard-features/-/wallet-standard-features-1.2.0.tgz#be8b3824abf5ebcfeaa7298445bf53f76a27c935"
   integrity sha512-tUd9srDLkRpe1BYg7we+c4UhRQkq+XQWswsr/L1xfGmoRDF47BPSXf4zE7ZU2GRBGvxtGt7lwJVAufQyQYhxTQ==
@@ -4825,7 +4820,7 @@
     "@wallet-standard/base" "^1.0.1"
     "@wallet-standard/features" "^1.0.3"
 
-"@solana/wallet-standard-util@^1.0.0", "@solana/wallet-standard-util@^1.1.1":
+"@solana/wallet-standard-util@^1.1.1":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@solana/wallet-standard-util/-/wallet-standard-util-1.1.1.tgz#f645fdd8b7d3c553a3b59aa19c25c51a1badce66"
   integrity sha512-dPObl4ntmfOc0VAGGyyFvrqhL8UkHXmVsgbj0K9RcznKV4KB3MgjGwzo8CTSX5El5lkb0rDeEzFqvToJXRz3dw==
@@ -4834,7 +4829,7 @@
     "@solana/wallet-standard-chains" "^1.1.0"
     "@solana/wallet-standard-features" "^1.2.0"
 
-"@solana/wallet-standard-wallet-adapter-base@^1.0.1", "@solana/wallet-standard-wallet-adapter-base@^1.1.2":
+"@solana/wallet-standard-wallet-adapter-base@^1.1.2":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@solana/wallet-standard-wallet-adapter-base/-/wallet-standard-wallet-adapter-base-1.1.2.tgz#f030f412cd16b06e95c6da5548a03113319d3620"
   integrity sha512-DqhzYbgh3disHMgcz6Du7fmpG29BYVapNEEiL+JoVMa+bU9d4P1wfwXUNyJyRpGGNXtwhyZjIk2umWbe5ZBNaQ==
@@ -4921,7 +4916,7 @@
     eventemitter3 "^5.0.1"
     uuid "^9.0.0"
 
-"@solflare-wallet/sdk@^1.2.0", "@solflare-wallet/sdk@^1.3.0":
+"@solflare-wallet/sdk@^1.3.0":
   version "1.4.2"
   resolved "https://registry.yarnpkg.com/@solflare-wallet/sdk/-/sdk-1.4.2.tgz#630b9a26f7bca255ee4a7088f287ae8c8335e345"
   integrity sha512-jrseNWipwl9xXZgrzwZF3hhL0eIVxuEtoZOSLmuPuef7FgHjstuTtNJAeT4icA7pzdDV4hZvu54pI2r2f7SmrQ==
@@ -6053,7 +6048,7 @@
   dependencies:
     "@wallet-standard/base" "^1.0.1"
 
-"@wallet-standard/base@^1.0.0", "@wallet-standard/base@^1.0.1":
+"@wallet-standard/base@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@wallet-standard/base/-/base-1.0.1.tgz#860dd94d47c9e3c5c43b79d91c6afdbd7a36264e"
   integrity sha512-1To3ekMfzhYxe0Yhkpri+Fedq0SYcfrOfJi3vbLjMwF2qiKPjTGLwZkf2C9ftdQmxES+hmxhBzTwF4KgcOwf8w==
@@ -6392,6 +6387,20 @@ acorn@^8.0.4, acorn@^8.1.0, acorn@^8.11.3, acorn@^8.4.1, acorn@^8.8.0, acorn@^8.
   version "8.11.3"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-8.11.3.tgz#71e0b14e13a4ec160724b38fb7b0f233b1b81d7a"
   integrity sha512-Y9rRfJG5jcKOE0CLisYbojUjIrIEE7AGMzA/Sm4BslANhbS+cDMpgBdcPT91oJ7OuJ9hYJBx59RjbhxVnrF8Xg==
+
+add-to-calendar-button-react@2.6.13:
+  version "2.6.13"
+  resolved "https://registry.yarnpkg.com/add-to-calendar-button-react/-/add-to-calendar-button-react-2.6.13.tgz#4a0254983f90b74ad7f23fc613beb994f3519cf7"
+  integrity sha512-GQZNxHTkUBZ+I8Y9ojIjFpRRtfVxy5zKdru9PZM0hVJIq2nWuvjU7XgAMXhYQ41adTIXiZa/A5LUC4Xm4+CH7g==
+  dependencies:
+    add-to-calendar-button "^2.6.13"
+
+add-to-calendar-button@^2.6.13:
+  version "2.6.13"
+  resolved "https://registry.yarnpkg.com/add-to-calendar-button/-/add-to-calendar-button-2.6.13.tgz#e52c22ee5dc6262d842c5f124e809df3f6eee78b"
+  integrity sha512-Me2n/8uV8AWq3guJI0tbBpVgeXTsMVXAXmxfZeCFPh6PHItr1pQjKlPRKZmf84BSdDJHvVLXG7kGKE/X78D2pA==
+  dependencies:
+    timezones-ical-library "^1.8.2"
 
 aes-js@3.0.0:
   version "3.0.0"
@@ -15388,6 +15397,11 @@ thread-stream@^0.15.1:
   version "2.3.8"
   resolved "https://registry.yarnpkg.com/through/-/through-2.3.8.tgz#0dd4c9ffaabc357960b1b724115d7e0e86a2e1f5"
   integrity sha512-w89qg7PI8wAdvX60bMDP+bFoD5Dvhm9oLheFp5O4a2QF0cSBGsBX4qZmadPMvVqlLJBBci+WqGGOAPvcDeNSVg==
+
+timezones-ical-library@^1.8.2:
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/timezones-ical-library/-/timezones-ical-library-1.8.2.tgz#33a96db1f2bcce87d5e00ee64f263b9925c37719"
+  integrity sha512-0bbCp+xXtTUOcBo7bAGkzK5yMiNnY/FmJblTlnkGcqW5O+SChvWNtvsOX9WqbU5/8sT+Nl/MKQ7c9qafIkUstA==
 
 timsort@^0.3.0:
   version "0.3.0"
