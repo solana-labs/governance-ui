@@ -184,7 +184,7 @@ const Proposal = () => {
                             <AddToCalendarButton
                               hideCheckmark
                               size="6|4|2"
-                              name={`${realmInfo?.displayName} voting time for proposal: ${proposal.account.name} ends in 30min`}
+                              name={`${realmInfo?.displayName} voting time for proposal: ${proposal.account.name} soon ends`}
                               location={`${window.location.pathname}`}
                               description={''}
                               startDate={dayjs
@@ -208,7 +208,7 @@ const Proposal = () => {
                               <AddToCalendarButton
                                 hideCheckmark
                                 size="6|4|2"
-                                name={`${realmInfo?.displayName} cool off time for proposal: ${proposal.account.name} ends in 30min`}
+                                name={`${realmInfo?.displayName} cool off time for proposal: ${proposal.account.name} soon ends`}
                                 location={`${window.location.pathname}`}
                                 description={''}
                                 startDate={dayjs
