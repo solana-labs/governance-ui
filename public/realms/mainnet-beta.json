@@ -55,6 +55,19 @@
     "shortDescription": "A small but mighty developer DAO! 🚀 We're like the little engines that could, tirelessly building, testing, and occasionally chewing glass to create a better ecosystem"
   },
   {
+    "symbol": "POLL",
+    "displayName": "POLL DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "WUd1MpRwqw15cJpodXBiuyGv3rqYW99weEqrvkZpYFW",
+    "bannerImage": "/realms/POLL_DAO/Vote Vote Vote.png",
+    "website": "-",
+    "twitter": "-",
+    "discord": "-",
+    "ogImage": "/realms/POLL_DAO/poll.jpg",
+    "github": "-",
+    "shortDescription": "A POLL DAO appeared"
+    },
+  {
     "symbol": "DEAN",
     "displayName": "Dean's List Network State",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
