@@ -48,6 +48,7 @@ import { useVotingClientForGoverningTokenMint } from '@hooks/useVotingClients'
 import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
 import { useAsync } from 'react-async-hook'
 import { useBatchedVoteDelegators } from './useDelegators'
+import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
 
 export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
   const proposal = useRouteProposalQuery().data?.result
@@ -155,12 +156,26 @@ export const YouVoted = ({ quorum }: { quorum: 'electoral' | 'veto' }) => {
     setIsLoading(false)
   }
 
+  const selectedCommunityDelegator = useSelectedDelegatorStore(
+    (s) => s.communityDelegator
+  )
+  const selectedCouncilDelegator = useSelectedDelegatorStore(
+    (s) => s.councilDelegator
+  )
+
   const communityDelegators = useBatchedVoteDelegators('community')
   const councilDelegators = useBatchedVoteDelegators('council')
   const votingPop = useVotingPop()
   const { voterWeightForWallet } = useRealmVoterWeightPlugins(votingPop)
 
-  const ownVoterWeight = wallet?.publicKey
+  const relevantSelectedDelegator =
+    votingPop === 'community'
+      ? selectedCommunityDelegator
+      : selectedCouncilDelegator
+
+  const ownVoterWeight = relevantSelectedDelegator
+    ? voterWeightForWallet(relevantSelectedDelegator)
+    : wallet?.publicKey
     ? voterWeightForWallet(wallet?.publicKey)
     : undefined
   const hasVotingPower = !!(

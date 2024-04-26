@@ -136,7 +136,9 @@ export const useSubmitVote = () => {
         role === 'community'
           ? voterWeightForWalletCommunity
           : voterWeightForWalletCouncil
-      const ownVoterWeight = wallet?.publicKey
+      const ownVoterWeight = relevantSelectedDelegator
+        ? voterWeightForWallet(relevantSelectedDelegator)
+        : wallet?.publicKey
         ? voterWeightForWallet(wallet?.publicKey)
         : undefined
 

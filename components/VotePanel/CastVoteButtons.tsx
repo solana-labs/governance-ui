@@ -98,9 +98,8 @@ export const CastVoteButtons = () => {
       })
     }
   }
-  const isFinalVoteCast = hasVotingPower
-    ? isVoteCast
-    : isDelegatorsVoteCast.result
+  const isFinalVoteCast =
+    isVoteCast || hasVotingPower ? isVoteCast : isDelegatorsVoteCast.result
 
   return (isVoting && !isFinalVoteCast) ||
     (isInCoolOffTime && !isFinalVoteCast) ? (
