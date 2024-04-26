@@ -33,21 +33,23 @@ export default function PluginVotingPower({ role, className }: Props) {
   const mintInfo = useMintInfoByPubkeyQuery(realm?.account.communityMint).data
     ?.result
 
-  const { calculatedVoterWeight, isReady } = useRealmVoterWeightPlugins(role)
+  const { totalCalculatedVoterWeight, isReady } = useRealmVoterWeightPlugins(
+    role
+  )
 
-  const vanillaValue = calculatedVoterWeight?.initialValue
-  const stakedValue = calculatedVoterWeight?.value?.sub(
+  const vanillaValue = totalCalculatedVoterWeight?.initialValue
+  const stakedValue = totalCalculatedVoterWeight?.value?.sub(
     vanillaValue ?? new BN(0)
   )
 
   const formattedTotal = useMemo(
     () =>
-      mintInfo && calculatedVoterWeight?.value
-        ? new BigNumber(calculatedVoterWeight?.value.toString())
+      mintInfo && totalCalculatedVoterWeight?.value
+        ? new BigNumber(totalCalculatedVoterWeight?.value.toString())
             .shiftedBy(-mintInfo.decimals)
             .toFormat(2)
         : undefined,
-    [mintInfo, calculatedVoterWeight?.value]
+    [mintInfo, totalCalculatedVoterWeight?.value]
   )
 
   const formattedStaked = useMemo(

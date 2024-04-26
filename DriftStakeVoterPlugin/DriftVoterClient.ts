@@ -231,7 +231,11 @@ export class DriftVoterClient extends Client<DriftStakeVoter> {
     realm: PublicKey,
     mint: PublicKey
   ): Promise<TransactionInstruction | null> {
-    const { voterWeightPk } = this.getVoterWeightRecordPDA(realm, mint, voter)
+    const { voterWeightPk } = await this.getVoterWeightRecordPDA(
+      realm,
+      mint,
+      voter
+    )
     const { registrar } = this.getRegistrarPDA(realm, mint)
 
     return this.program.methods
