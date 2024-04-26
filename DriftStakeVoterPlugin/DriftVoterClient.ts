@@ -68,14 +68,13 @@ export class DriftVoterClient extends Client<DriftStakeVoter> {
       spotMarketIndex
     )
 
-    let insuranceFundStake: Awaited<
-      ReturnType<typeof drift.account.insuranceFundStake.fetch>
-    >
-    try {
-      insuranceFundStake = await drift.account.insuranceFundStake.fetch(
-        insuranceFundStakePk
-      )
-    } catch (e) {
+    const insuranceFundStake = await queryClient.fetchQuery({
+      queryKey: ['Insurance Fund Stake', insuranceFundStakePk.toString()],
+      queryFn: async () =>
+        drift.account.insuranceFundStake.fetchNullable(insuranceFundStakePk),
+    })
+
+    if (insuranceFundStake === null) {
       console.log('drift voter client', 'no insurance fund stake account found')
       return inputVoterWeight
     }
@@ -83,6 +82,7 @@ export class DriftVoterClient extends Client<DriftStakeVoter> {
     const spotMarket = await queryClient.fetchQuery({
       queryKey: ['Drift Spot Market', spotMarketPk.toString()],
       queryFn: async () => drift.account.spotMarket.fetchNullable(spotMarketPk),
+      staleTime: 1000 * 10,
     })
 
     if (spotMarket === null) {
