@@ -45,5 +45,3 @@ yarn-error.log*
 .sentryclirc
 
 .vscode/settings.json
-
-install-state.gz
