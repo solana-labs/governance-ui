@@ -32,7 +32,7 @@ export default function GovernancePowerForRole({
     // if there are multiple plugins, show the generic plugin voting power
     if ((plugins?.voterWeight.length ?? 0) > 1) return 'composite'
     return determineVotingPowerType(connection, realmPk, role)
-  }, [connection, realmPk, role])
+  }, [connection, plugins?.voterWeight.length, realmPk, role])
 
   if (connected && kind === undefined && !props.hideIfZero) {
     return (
