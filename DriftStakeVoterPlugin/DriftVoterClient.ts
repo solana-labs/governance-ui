@@ -82,7 +82,6 @@ export class DriftVoterClient extends Client<DriftStakeVoter> {
     const spotMarket = await queryClient.fetchQuery({
       queryKey: ['Drift Spot Market', spotMarketPk.toString()],
       queryFn: async () => drift.account.spotMarket.fetchNullable(spotMarketPk),
-      staleTime: 1000 * 10,
     })
 
     if (spotMarket === null) {
