@@ -2107,7 +2107,7 @@ const getFormattedListingValues = (args: FlatListingArgs) => {
     interestTargetUtilization: args.interestTargetUtilization,
     interestCurveScaling: args.interestCurveScaling,
     groupInsuranceFund: args.groupInsuranceFund,
-    collateralFeePerDay: (args.collateralFeePerDay * 100).toFixed(2),
+    collateralFeePerDay: (args.collateralFeePerDay * 100).toFixed(4),
     zeroUtilRate: (args.zeroUtilRate * 100).toFixed(2),
     disableAssetLiquidation: args.disableAssetLiquidation,
   }
