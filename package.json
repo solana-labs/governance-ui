@@ -122,6 +122,7 @@
     "@urql/exchange-multipart-fetch": "1.0.1",
     "@urql/exchange-persisted-fetch": "2.0.0",
     "@urql/exchange-request-policy": "1.0.0",
+    "add-to-calendar-button-react": "2.6.13",
     "arweave": "1.11.4",
     "axios": "0.26.1",
     "bignumber.js": "9.0.2",
@@ -277,6 +278,7 @@
     }
   },
   "volta": {
-    "node": "18.19.0"
+    "node": "18.19.0",
+    "yarn": "1.22.19"
   }
 }

@@ -28,10 +28,10 @@ import {
   getMultipleAccountInfoChunked,
   MintAccount,
   parseMintAccountData,
-  parseTokenAccountData,
   TokenAccount,
   TokenProgramAccount,
 } from '@utils/tokens'
+import { parseTokenAccountData } from '@utils/parseTokenAccountData'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { ConnectionContext } from '@utils/connection'
 import {
