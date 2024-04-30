@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { fetchRealmByPubkey } from '@hooks/queries/realm'
 import { useConnection } from '@solana/wallet-adapter-react'
-import { Keypair, Transaction, TransactionInstruction } from '@solana/web3.js'
+import { Keypair, TransactionInstruction } from '@solana/web3.js'
 import { approveTokenTransfer } from '@utils/tokens'
 import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
 import { withDepositGoverningTokens } from '@solana/spl-governance'
@@ -13,14 +13,15 @@ import {
 } from '@solana/spl-token'
 import BN from 'bn.js'
 import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
-import queryClient from "@hooks/queries/queryClient";
-import {useJoinRealm} from "@hooks/useJoinRealm";
+import queryClient from '@hooks/queries/queryClient'
+import { useJoinRealm } from '@hooks/useJoinRealm'
 import { SequenceType, sendTransactionsV3 } from '@utils/sendTransactions'
+import { queryKeys } from 'VoterWeightPlugins/lib/utils'
 
 export const useDepositCallback = (
   role: 'community' | 'council' | 'undefined'
 ) => {
-  const { handleRegister } = useJoinRealm();
+  const { handleRegister } = useJoinRealm()
   const wallet = useWalletOnePointOh()
   const walletPk = wallet?.publicKey ?? undefined
   const realmPk = useSelectedRealmPubkey()
@@ -49,17 +50,27 @@ export const useDepositCallback = (
       const signers: Keypair[] = []
 
       // Checks if the connected wallet is the Squads Multisig extension (or any PDA wallet for future reference). If it is the case, it will not use an ephemeral signer.
-      const transferAuthority = wallet?.name == "SquadsX"
-        ? undefined
-        : approveTokenTransfer(instructions, [], userAtaPk, wallet!.publicKey!, amount);
+      const transferAuthority =
+        wallet?.name == 'SquadsX'
+          ? undefined
+          : approveTokenTransfer(
+              instructions,
+              [],
+              userAtaPk,
+              wallet!.publicKey!,
+              amount
+            )
 
       if (transferAuthority) {
-        signers.push(transferAuthority);
+        signers.push(transferAuthority)
       }
 
       const programVersion = await fetchProgramVersion(connection, realm.owner)
 
-      const publicKeyToUse = transferAuthority != undefined && wallet?.publicKey != null ? transferAuthority.publicKey : wallet?.publicKey;
+      const publicKeyToUse =
+        transferAuthority != undefined && wallet?.publicKey != null
+          ? transferAuthority.publicKey
+          : wallet?.publicKey
 
       if (!publicKeyToUse) {
         throw new Error()
@@ -82,31 +93,40 @@ export const useDepositCallback = (
       // no need to create the TOR, as it is already created by the deposit.
       const pluginRegisterInstructions = await handleRegister(false)
 
-      const transaction = new Transaction()
-      transaction.add(...instructions, ...pluginRegisterInstructions)
-
-      const txes = [instructions].map((txBatch) => {
-        return {
-          instructionsSet: txBatch.map((x) => {
-            return {
-              transactionInstruction: x,
-              signers: signers,
-            }
-          }),
-          sequenceType: SequenceType.Sequential,
+      const txes = [[...instructions, ...pluginRegisterInstructions]].map(
+        (txBatch) => {
+          return {
+            instructionsSet: txBatch.map((x) => {
+              return {
+                transactionInstruction: x,
+                signers: signers,
+              }
+            }),
+            sequenceType: SequenceType.Sequential,
+          }
         }
-      })
+      )
 
       await sendTransactionsV3({
         connection,
         wallet: wallet!,
         transactionInstructions: txes,
       })
+      queryClient.invalidateQueries({
+        queryKey: [
+          'createVoterWeightRecords',
+          ...queryKeys({
+            realmPulicKey: realmPk,
+            governanceMintPublicKey: mint,
+            WalletPublicKey: walletPk,
+          }),
+        ],
+      })
 
-        // Force the UI to recalculate voter weight
-        queryClient.invalidateQueries({
-            queryKey: ['calculateVoterWeight'],
-        })
+      // Force the UI to recalculate voter weight
+      queryClient.invalidateQueries({
+        queryKey: ['calculateVoterWeight'],
+      })
     },
     [connection, realmPk, role, wallet, walletPk]
   )
