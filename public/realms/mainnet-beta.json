@@ -3532,5 +3532,18 @@
     "website": "https://fimcoin.com",
     "keywords": "DeFi, REALM, Governance, FIM, Decentralized Finance, Crypto, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, SPL Tokens",
     "twitter": "@financeismagic"
+  },
+   {
+    "symbol": "KING",
+    "displayName": "Mewfasa DAO",
+    "category": "web3",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "2Gn1tf4WyFv8tk4kzd7GZCrw44P5d3mq6qEzjWyq159H",
+    "bannerImage": "/realms/MewfasaDAO/banner-dao.jpg",
+    "ogImage": "/realms/MewfasaDAO/mewfasadao.jpg",
+    "twitter": "@MewfasaK53969",
+    "website": "https://mewfasa.fun/",
+    "shortDescription": "Mewfasa - The Lion Cat King",
+    "keywords": "Web3, Governance, Community, Solana"
   }
 ]
