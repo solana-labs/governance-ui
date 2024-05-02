@@ -150,6 +150,8 @@ function isChainablePlugin(config: Props['structure']) {
 
 function isDefaultConfig(config: Props['structure']) {
   return (
+    Object.hasOwnProperty.call(config, 'votingProgramId') &&
+    Object.hasOwnProperty.call(config, 'maxVotingProgramId') &&
     config.votingProgramId === undefined &&
     config.maxVotingProgramId === undefined
   );
@@ -218,6 +220,11 @@ function getDescription(value: Props['structure']): string {
   return 'Add a custom program ID for governance structure';
 }
 
+const withoutUndefined = <T extends Record<string, unknown>>(obj: T): T =>
+  Object.fromEntries(
+    Object.entries(obj).filter(([, value]) => value !== undefined),
+  ) as T;
+
 export function VotingStructureSelector(props: Props) {
   const [open, setOpen] = useState(false);
   const [width, setWidth] = useState(0);
@@ -225,16 +232,20 @@ export function VotingStructureSelector(props: Props) {
     !props.currentStructure.maxVotingProgramId &&
       !props.structure.votingProgramId,
   );
+  console.log('in VotingStructureSelector', { props, isDefault });
   const trigger = useRef<HTMLButtonElement>(null);
+
+  const savedConfig = withoutUndefined(props.structure);
+  const currentConfig = withoutUndefined(props.currentStructure);
 
   // only show the chain toggle if the plugin supports chaining
   // and there is a previous plugin to chain with
   // and the current plugin is not the same as the previous plugin
   const shouldShowChainToggle =
     isChainablePlugin(props.structure) &&
-    !!props.currentStructure.votingProgramId &&
+    !!currentConfig.votingProgramId &&
     props.structure.votingProgramId?.toBase58() !==
-      props.currentStructure.votingProgramId?.toBase58();
+      currentConfig.votingProgramId?.toBase58();
 
   useEffect(() => {
     if (trigger.current) {
@@ -256,24 +267,24 @@ export function VotingStructureSelector(props: Props) {
           ref={trigger}
         >
           <div className={labelStyles}>
-            {areConfigsEqual({}, props.structure) && isDefault
+            {areConfigsEqual({}, savedConfig) && isDefault
               ? 'Default'
-              : getLabel(props.structure)}
+              : getLabel(savedConfig)}
           </div>
           <div className={descriptionStyles}>
-            {areConfigsEqual({}, props.structure) && isDefault
+            {areConfigsEqual({}, savedConfig) && isDefault
               ? 'Governance is based on token ownership'
-              : getDescription(props.structure)}
+              : getDescription(savedConfig)}
           </div>
           <ChevronDownIcon className={cx(iconStyles, open && '-rotate-180')} />
         </DropdownMenu.Trigger>
-        {isCustomConfig(props.structure) && !isDefault && (
+        {isCustomConfig(savedConfig) && !isDefault && (
           <Custom
             className="mt-2"
-            maxVotingProgramId={props.structure.maxVotingProgramId}
-            votingProgramId={props.structure.votingProgramId}
+            maxVotingProgramId={savedConfig.maxVotingProgramId}
+            votingProgramId={savedConfig.votingProgramId}
             onVotingProgramIdChange={(value) => {
-              const newConfig = produce({ ...props.structure }, (data) => {
+              const newConfig = produce({ ...savedConfig }, (data) => {
                 data.votingProgramId = value || undefined;
                 data.nftCollection = undefined;
                 data.chainingEnabled = isChainablePlugin(data);
@@ -282,7 +293,7 @@ export function VotingStructureSelector(props: Props) {
               props.onChange?.(newConfig);
             }}
             onMaxVotingProgramIdChange={(value) => {
-              const newConfig = produce({ ...props.structure }, (data) => {
+              const newConfig = produce({ ...savedConfig }, (data) => {
                 data.maxVotingProgramId = value || undefined;
                 data.nftCollection = undefined;
               });
@@ -291,32 +302,30 @@ export function VotingStructureSelector(props: Props) {
             }}
           />
         )}
-        {isNFTConfig(props.structure) && (
+        {isNFTConfig(savedConfig) && (
           <NFT
             className="mt-2"
             communityMint={props.communityMint}
-            currentNftCollection={props.currentStructure.nftCollection}
-            nftCollection={props.structure.nftCollection}
-            nftCollectionSize={props.structure.nftCollectionSize || 0}
-            nftCollectionWeight={
-              props.structure.nftCollectionWeight || new BN(0)
-            }
+            currentNftCollection={currentConfig.nftCollection}
+            nftCollection={savedConfig.nftCollection}
+            nftCollectionSize={savedConfig.nftCollectionSize || 0}
+            nftCollectionWeight={savedConfig.nftCollectionWeight || new BN(0)}
             onCollectionChange={(value) => {
-              const newConfig = produce({ ...props.structure }, (data) => {
+              const newConfig = produce({ ...savedConfig }, (data) => {
                 data.nftCollection = value || undefined;
               });
 
               props.onChange?.(newConfig);
             }}
             onCollectionSizeChange={(value) => {
-              const newConfig = produce({ ...props.structure }, (data) => {
+              const newConfig = produce({ ...savedConfig }, (data) => {
                 data.nftCollectionSize = value;
               });
 
               props.onChange?.(newConfig);
             }}
             onCollectionWeightChange={(value) => {
-              const newConfig = produce({ ...props.structure }, (data) => {
+              const newConfig = produce({ ...savedConfig }, (data) => {
                 data.nftCollectionWeight = value;
               });
 
@@ -324,23 +333,23 @@ export function VotingStructureSelector(props: Props) {
             }}
           />
         )}
-        {isQVConfig(props.structure) && (
+        {isQVConfig(savedConfig) && (
           <QVConfigurator
             className="mt-2"
             onCoefficientsChange={(value) => {
-              const newConfig = produce({ ...props.structure }, (data) => {
+              const newConfig = produce({ ...savedConfig }, (data) => {
                 data.qvCoefficients = value ?? undefined;
               });
               props.onChange?.(newConfig);
             }}
           />
         )}
-        {isCivicConfig(props.structure) && (
+        {isCivicConfig(savedConfig) && (
           <CivicConfigurator
             className="mt-2"
-            currentPassType={props.currentStructure.civicPassType}
+            currentPassType={currentConfig.civicPassType}
             onPassTypeChange={(value) => {
-              const newConfig = produce({ ...props.structure }, (data) => {
+              const newConfig = produce({ ...savedConfig }, (data) => {
                 data.civicPassType = value ?? undefined;
               });
               props.onChange?.(newConfig);
@@ -349,12 +358,10 @@ export function VotingStructureSelector(props: Props) {
         )}
         {shouldShowChainToggle && (
           <ChainToggleConfigurator
-            chainingEnabled={props.structure.chainingEnabled ?? false}
-            previousPlugin={
-              props.currentStructure.votingProgramId?.toBase58() || ''
-            }
+            chainingEnabled={savedConfig.chainingEnabled ?? false}
+            previousPlugin={currentConfig.votingProgramId?.toBase58() || ''}
             onChange={(value) => {
-              const newConfig = produce({ ...props.structure }, (data) => {
+              const newConfig = produce({ ...savedConfig }, (data) => {
                 data.chainingEnabled = value;
               });
               props.onChange?.(newConfig);
@@ -373,18 +380,32 @@ export function VotingStructureSelector(props: Props) {
               ...(props.allowNFT ? [DEFAULT_NFT_CONFIG] : []),
               ...(props.allowVSR ? [DEFAULT_VSR_CONFIG] : []),
               ...(props.allowQV ? [DEFAULT_QV_CONFIG] : []),
-              ...(isCustomConfig(props.currentStructure)
-                ? [props.currentStructure]
+              ...(isCustomConfig(currentConfig)
+                ? [currentConfig]
                 : [INITIAL_CUSTOM_CONFIG]),
               'default',
             ] as const)
+              // Show all options in the dropdown except the currently selected one
               .filter((config) => {
                 if (typeof config === 'string') {
-                  return !areConfigsEqual({}, props.structure);
+                  console.log(
+                    'filter',
+                    'default',
+                    areConfigsEqual({}, savedConfig),
+                  );
+                  return !areConfigsEqual({}, savedConfig);
                 }
+                console.log(
+                  'filter',
+                  getLabel(config),
+                  config,
+                  areConfigsEqual(config, savedConfig),
+                  'config === INITIAL_CUSTOM_CONFIG',
+                  config === INITIAL_CUSTOM_CONFIG,
+                );
                 return (
                   config === INITIAL_CUSTOM_CONFIG ||
-                  !areConfigsEqual(config, props.structure)
+                  !areConfigsEqual(config, savedConfig)
                 );
               })
               .map((config, i) => (
