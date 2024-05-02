@@ -3532,5 +3532,23 @@
     "website": "https://fimcoin.com",
     "keywords": "DeFi, REALM, Governance, FIM, Decentralized Finance, Crypto, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, SPL Tokens",
     "twitter": "@financeismagic"
-  }
+  },
+  {
+   "symbol": "ThugzLifeNFT",
+   "category": "NFT",
+   "bannerImage": "/realms/ThugzLifeNFT/banner.jpg",
+   "displayName": "Thugz Life NFT DAO",
+   "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+   "realmId": "H7hpdNThGTQkJ14nn2p4MidPXmrq2yEnw5ZNC5h919pX",
+   "communityMint": "FxavgSHa2iVGk2U4AdwYDNpD9wxV2WMSm7BA64BbtgP9",
+   "ogImage": "/realms/ThugzLifeNFT/logo.png",
+   "shortDescription": "StreetCulture & Gaming NFT Community. Since September 2021. We've created @War_Thugz game concept. Innovation by @ThugzLabs. JOIN NOW : https://thugz.life",
+   "website": "https://thugz.life",
+   "keywords": "Thugz, DAO, REALM, Governance, Thugz Life, Web3, Gaming, NFT, Crypto, Solana, SOL, Street Culture, Community, Digg, Alpha, Social, Entertainment, 911, Street Workout",
+   "twitter": "@Thugz_NFT",
+   "discord": "https://discord.gg/pJ86xvC8NA",
+   "github": "https://github.com/ThugzLabs",
+   "linkedin": "https://www.linkedin.com/company/thugz-labs/",
+   "instagram": "https://instagram.com/thugz.life.nft"
+ }
 ]
