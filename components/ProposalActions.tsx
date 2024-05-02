@@ -261,7 +261,10 @@ const ProposalActionsPanel = () => {
           title: proposal.account.name,
           description: proposal.account.descriptionLink,
           voteByCouncil:
-            !realmInfo.communityMint || !proposal.account.governingTokenMint.equals(realmInfo.communityMint),
+            !realmInfo.communityMint ||
+            !proposal.account.governingTokenMint.equals(
+              realmInfo.communityMint
+            ),
           instructionsData: transactions
             ? [
                 ...transactions.flatMap((tx) =>
@@ -279,7 +282,7 @@ const ProposalActionsPanel = () => {
                           isValid: true,
                           governance: undefined,
                           customHoldUpTime: tx.account.holdUpTime,
-                          chunkBy: 2,
+                          chunkBy: 1,
                         },
                       })
                   )
