@@ -2,6 +2,7 @@ import EditIcon from '@carbon/icons-react/lib/Edit';
 import EventsIcon from '@carbon/icons-react/lib/Events';
 import RuleIcon from '@carbon/icons-react/lib/Rule';
 import ScaleIcon from '@carbon/icons-react/lib/Scale';
+import { Coefficients } from '@solana/governance-program-library';
 import {
   MintMaxVoteWeightSourceType,
   MintMaxVoteWeightSource,
@@ -9,6 +10,8 @@ import {
 import { PublicKey } from '@solana/web3.js';
 import { BigNumber } from 'bignumber.js';
 import BN from 'bn.js';
+
+import { FC } from 'react';
 
 import { availablePasses } from '../../../../GatewayPlugin/config';
 import { Config } from '../fetchConfig';
@@ -48,6 +51,7 @@ export function buildUpdates(config: Config) {
     nftCollectionSize: config.nftCollectionSize,
     nftCollectionWeight: config.nftCollectionWeight,
     civicPassType: config.civicPassType,
+    qvCoefficients: config.qvCoefficients,
     chainingEnabled: config.chainingEnabled,
   };
 }
@@ -93,6 +97,27 @@ const civicPassTypeLabel = (civicPassType: PublicKey | undefined): string => {
 
   if (!foundPass) return 'Other (' + abbreviateAddress(civicPassType) + ')';
   return foundPass.name;
+};
+
+// display QV coefficients inline with A, B, C as labels
+const QvCoefficientsDisplay: FC<{ qvCoefficients: Coefficients | undefined }> = ({
+  qvCoefficients,
+}) => {
+  if (!qvCoefficients) return null;
+  const coefficient = (label: string, value: number) => (
+    <div className="flex items-baseline">
+      <div>{label}</div>
+      <div className="ml-3">{value}</div>
+    </div>
+  );
+
+  return (
+    <>
+      {coefficient('A', qvCoefficients[0])}
+      {coefficient('B', qvCoefficients[1])}
+      {coefficient('C', qvCoefficients[2])}
+    </>
+  );
 };
 
 function votingStructureText(
@@ -669,6 +694,19 @@ export function UpdatesList(props: Props) {
             )}
           </div>
         </div>
+      )}
+      {'qvCoefficients' in updates && (
+        <SummaryItem
+          label="QV Coefficients"
+          value={
+            <div className="flex items-baseline">
+              <div><QvCoefficientsDisplay qvCoefficients={updates.qvCoefficients[1]}/></div>
+              <div className="ml-3 text-base text-neutral-500 line-through">
+                <QvCoefficientsDisplay qvCoefficients={updates.qvCoefficients[0]}/>
+              </div>
+            </div>
+          }
+        />
       )}
     </SectionBlock>
   );
