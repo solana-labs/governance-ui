@@ -20,7 +20,7 @@ interface Props {
   role: 'community' | 'council'
 }
 
-export default function PluginVotingPower({ role, className }: Props) {
+export default function DriftVotingPower({ role, className }: Props) {
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const { connection } = useConnection()
