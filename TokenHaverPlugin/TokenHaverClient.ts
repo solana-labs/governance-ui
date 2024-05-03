@@ -77,6 +77,7 @@ export class TokenHaverClient extends Client<TokenHaver> {
       await Promise.all(
         registrar.mints.map(async (mint) => {
           const tokenAccountPk = await getAssociatedTokenAddress(mint, voter)
+          // filter out empty accounts
           const account = await fetchTokenAccountByPubkey(
             this.program.provider.connection,
             tokenAccountPk
