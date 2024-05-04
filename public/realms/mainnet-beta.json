@@ -3545,5 +3545,18 @@
     "website": "https://mewfasa.fun/",
     "shortDescription": "Mewfasa - The Lion Cat King",
     "keywords": "Web3, Governance, Community, Solana"
+  },
+  {
+    "symbol": "RZ",
+    "bannerImage": "/realms/RZ/rz_banner.jpg",
+    "displayName": "RZ METAVERSITY",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "39bZxPghVCBshfMf5e69vtRUjwWYx2G1aSQgEdAscbwy",
+    "ogImage": "/realms/RZ/rz_logo.png",
+    "shortDescription": "Decentralize Your Crypto Knowledge.",
+    "sortRank": 3,
+    "website": "https://rzmetaversity.com/",
+    "twitter": "@RZMetaversity",
+    "discord": "https://discord.gg/Y3pAjsZk9M"
   }
 ]
