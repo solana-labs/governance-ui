@@ -456,7 +456,7 @@ const isSwitchboardOracle = async (
   const feed = feeds.find((x) => x.publicKey.equals(feedPk))
 
   return feed
-    ? `https://app.switchboard.xyz/solana/mainnet-beta/feed/${feedPk.toBase58()}`
+    ? `https://app.switchboard.xyz/solana/mainnet/feed/${feedPk.toBase58()}`
     : ''
 }
 

@@ -2,6 +2,7 @@ import { PROGRAM_ID as HELIUM_VSR_PROGRAM_ID } from '@helium/voter-stake-registr
 import { PublicKey } from '@solana/web3.js'
 import { DEFAULT_NFT_VOTER_PLUGIN } from '@tools/constants'
 import { DRIFT_STAKE_VOTER_PLUGIN } from 'DriftStakeVoterPlugin/constants'
+import { TOKEN_HAVER_PLUGIN } from 'TokenHaverPlugin/constants'
 
 export const VSR_PLUGIN_PKS: string[] = [
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo',
@@ -45,6 +46,7 @@ export type PluginName =
   | 'NFT'
   | 'pyth'
   | 'drift'
+  | 'token_haver'
   | 'unknown'
 
 export const findPluginName = (programId: PublicKey | undefined): PluginName =>
@@ -64,26 +66,30 @@ export const findPluginName = (programId: PublicKey | undefined): PluginName =>
     ? 'pyth'
     : DRIFT_PLUGIN_PK.includes(programId.toString())
     ? 'drift'
+    : TOKEN_HAVER_PLUGIN.toString() === programId.toString()
+    ? 'token_haver'
     : 'unknown'
 
 // Used when creating a new realm to choose which voterWeightAddin to use
-export const pluginNameToCanonicalProgramId = (pluginName: PluginName): PublicKey | undefined => {
+export const pluginNameToCanonicalProgramId = (
+  pluginName: PluginName
+): PublicKey | undefined => {
   const lastPk = (arr: string[]) => new PublicKey(arr[arr.length - 1])
 
-    switch (pluginName) {
-        case 'VSR':
-        return lastPk(VSR_PLUGIN_PKS)
-        case 'HeliumVSR':
-        return lastPk(HELIUM_VSR_PLUGINS_PKS)
-        case 'NFT':
-        return lastPk(NFT_PLUGINS_PKS)
-        case 'gateway':
-        return lastPk(GATEWAY_PLUGINS_PKS)
-        case 'QV':
-        return lastPk(QV_PLUGINS_PKS)
-        case 'pyth':
-        return lastPk(PYTH_PLUGIN_PK)
-        default:
-        return undefined
-    }
+  switch (pluginName) {
+    case 'VSR':
+      return lastPk(VSR_PLUGIN_PKS)
+    case 'HeliumVSR':
+      return lastPk(HELIUM_VSR_PLUGINS_PKS)
+    case 'NFT':
+      return lastPk(NFT_PLUGINS_PKS)
+    case 'gateway':
+      return lastPk(GATEWAY_PLUGINS_PKS)
+    case 'QV':
+      return lastPk(QV_PLUGINS_PKS)
+    case 'pyth':
+      return lastPk(PYTH_PLUGIN_PK)
+    default:
+      return undefined
+  }
 }
