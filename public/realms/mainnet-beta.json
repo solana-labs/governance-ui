@@ -3564,7 +3564,7 @@
     "displayName": "NFT Markets Hub",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "GUn3aDwE8PNVDTJk4uQx4cSbqZksiHj7YpsTJE8Fn9yX",
-    "bannerImage": "/realms/NFTM/NFTMbanner.png",
-    "ogImage": "/realms/NFTM/NFTMlogo.png"
+    "bannerImage": "https://github.com/NFT-Markets-Hub/NFTM/blob/main/public/realms/NFTM/NFTMbanner.png",
+    "ogImage": "https://github.com/NFT-Markets-Hub/NFTM/blob/main/public/realms/NFTM/NFTMlogo.png"
   }
 ]
