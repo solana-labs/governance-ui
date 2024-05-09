@@ -21,15 +21,15 @@ const RealmHeader = () => {
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
   const { REALM } = process.env
+  const { connection } = useConnection()
 
   const { realmInfo, symbol, vsrMode } = useRealm()
 
   const explorerHost = getRealmExplorerHost(realmInfo)
-  const realmUrl = `https://${explorerHost}/#/realm/${realmInfo?.realmId.toBase58()}?programId=${realmInfo?.programId.toBase58()}`
+  const realmUrl = `https://${explorerHost}/account/${realmInfo?.realmId.toBase58()}${connection.rpcEndpoint.includes("devnet") ? "?cluster=devnet" : ""}`
 
   const [isBackNavVisible, setIsBackNavVisible] = useState(true)
 
-  const { connection } = useConnection()
   const realmPk = useSelectedRealmPubkey()
 
   const { result: kind } = useAsync(async () => {

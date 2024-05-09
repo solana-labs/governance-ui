@@ -38,11 +38,13 @@ import { AddToCalendarButton } from 'add-to-calendar-button-react'
 import { CalendarAdd } from '@carbon/icons-react'
 import Modal from '@components/Modal'
 import dayjs from 'dayjs'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 const Proposal = () => {
   const { realmInfo, symbol } = useRealm()
   const proposal = useRouteProposalQuery().data?.result
   const governance = useProposalGovernanceQuery().data?.result
+  const {connection} = useConnection()
   const descriptionLink = proposal?.account.descriptionLink
   const allowDiscussion = realmInfo?.allowDiscussion ?? true
   const isMulti =
@@ -113,7 +115,7 @@ const Proposal = () => {
                 <a
                   href={`https://${getRealmExplorerHost(
                     realmInfo
-                  )}/#/proposal/${proposal.pubkey.toBase58()}?programId=${proposal.owner.toBase58()}`}
+                  )}/account/${proposal.pubkey.toBase58()}${connection.rpcEndpoint.includes("devnet") ? "?cluster=devnet" : ""}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
