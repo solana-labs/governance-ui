@@ -3558,5 +3558,13 @@
     "website": "https://mewfasa.fun/",
     "shortDescription": "Mewfasa - The Lion Cat King",
     "keywords": "Web3, Governance, Community, Solana"
+ },
+  {
+    "symbol": "NFTM",
+    "displayName": "NFT Markets Hub",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "GUn3aDwE8PNVDTJk4uQx4cSbqZksiHj7YpsTJE8Fn9yX",
+    "bannerImage": "/realms/NFTMarketsHub/NFTMbanner.jpg",
+    "ogImage": "/realms/NFTMarketsHub/NFTMlogo.jpg"
   }
 ]
