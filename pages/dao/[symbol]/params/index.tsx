@@ -218,7 +218,7 @@ const Params = () => {
                 {communityMintMaxVoteWeightSource && (
                   <AddressField
                     padding
-                    label="Community mint max vote weight source"
+                    label="Community max vote weight source"
                     val={`${
                       communityMintMaxVoteWeightSource.type ===
                       MintMaxVoteWeightSourceType.SupplyFraction
