@@ -414,10 +414,42 @@ const MNGO_AUXILIARY_TOKEN_ACCOUNTS = [
     owner: '7hqfhmXK6uXQKmNjUVEJo5acDMLcnyN9p9bZ5Dmnifde',
     accounts: ['2gDu12CM56g18Ukc9R1EdmEbToXqGTrnBEqR3zKfVKgt'],
   },
+  //treasury management council
   {
     owner: '9so7UTo6b6LXBSqdDfh18hjVj8Ng5BmLbYXLB7UrhaaJ',
-    accounts: ['A9xaHx54B9bRYBga4V6LKFrRaARpMJFYVooEXRAanru5'],
+    accounts: [
+      'A9xaHx54B9bRYBga4V6LKFrRaARpMJFYVooEXRAanru5',
+      '8Wkbx6Daq3RQY492HaXK2nbVLXKCL5SGcab3RHzBCzpV',
+      '7D2j3MpXMveMEkdR94QfMh5nS3HdFD7uQHKhaLenR8u6',
+      '5d5CU8viHKiwrwjgNUFtb6AxUjdiZ1xmLo2m3AMYa9K5',
+    ],
   },
+  //boost council
+  {
+    owner: 'BExGoGVK6k6mUL6oHmabbc2EtwNqhJUeNoJWijF6t3ZB',
+    accounts: [
+      'HuDbGjhoPMWxVUxJmaY4uinDF5RmSufg2SCwjxpCRvXX',
+      'AnmvgZbSre3NyGn4CeSNZDTN7NMmribt4eNTFDAQSGuv',
+    ],
+  },
+  //vsr
+  {
+    owner: 'DZZWE1PR8qTkH3dLTrD7kcNEs6xx3GmSuFbzW29dyHv7',
+    accounts: ['CJoHzb9FVJUKanFdmjjXD84Hg94qgE4egu8s2tGYTVdE'],
+  },
+  {
+    owner: 'VrT8f16NLADvYR73YiDMwxZREPbJgiZqLvN6HLQj4hR',
+    accounts: ['BkNq5TQvPkDnQWNgn1j2Q2SAFe3r5m2PazRwC7YUSHAT'],
+  },
+  {
+    owner: '3H5PPK1bhHKmCAG5zwUyxpKDijES3H9uRAUCBrW8rGPX',
+    accounts: ['3sC3vzVz9YoiR12QKgvxHD6Q2LBfhL1ev63tsUaUS2EJ'],
+  },
+  {
+    owner: 'DdZWj3nWSzJMMv1LMTHm9gTJ37wHLNXTMzqjWCokvKEn',
+    accounts: ['6XfCUQuq4juhqWLCW6LeivZd1eGuCRp4Mw3D6nkwXwFG'],
+  },
+  //
 ]
 
 export const AUXILIARY_TOKEN_ACCOUNTS = {
