@@ -29,6 +29,8 @@ import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
 import { useRealmGovernancesQuery } from '@hooks/queries/governance'
+import useFormatTokenAmount from '@hooks/useFormatTokenAmount'
+import { BN } from 'bn.js'
 
 const Params = () => {
   const mint = useRealmCommunityMintInfoQuery().data?.result
@@ -48,6 +50,7 @@ const Params = () => {
   const mintGovernancesWithMintInfo = assetAccounts.filter((x) => {
     return x.type === AccountType.MINT
   })
+  const formatTokenAmount = useFormatTokenAmount(realm?.account.communityMint)
 
   const hasAuthorityGovernances = governancesArray?.filter((governance) => {
     const filteredMintGovernances = mintGovernancesWithMintInfo.filter(
@@ -109,6 +112,7 @@ const Params = () => {
     DISABLED_VOTER_WEIGHT.eq(realmConfig.minCommunityTokensToCreateGovernance)
       ? 'Disabled'
       : realmConfig?.minCommunityTokensToCreateGovernance &&
+        mint &&
         fmtMintAmount(mint, realmConfig.minCommunityTokensToCreateGovernance)
 
   useEffect(() => {
@@ -214,12 +218,22 @@ const Params = () => {
                 {communityMintMaxVoteWeightSource && (
                   <AddressField
                     padding
-                    label="Community mint max vote weight source"
+                    label="Community max vote weight source"
                     val={`${
                       communityMintMaxVoteWeightSource.type ===
                       MintMaxVoteWeightSourceType.SupplyFraction
-                        ? `${communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}%`
-                        : fmtBNAmount(communityMintMaxVoteWeightSource.value)
+                        ? `${communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}% of supply`
+                        : formatTokenAmount
+                        ? fmtBNAmount(
+                            new BN(
+                              formatTokenAmount(
+                                communityMintMaxVoteWeightSource.value
+                              )
+                            )
+                          )
+                        : `${fmtBNAmount(
+                            communityMintMaxVoteWeightSource.value
+                          )} (raw)`
                     }`}
                   />
                 )}
