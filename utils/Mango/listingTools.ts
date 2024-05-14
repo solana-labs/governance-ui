@@ -271,7 +271,7 @@ const fetchJupiterRoutes = async (
 
       const jupiterSwapBaseUrl =
         process.env.NEXT_PUBLIC_JUPTER_SWAP_API_ENDPOINT ||
-        'https://public.jupiterapi.com'
+        'https://quote-api.jup.ag/v6'
       const response = await fetch(
         `${jupiterSwapBaseUrl}/quote?${paramsString}`
       )
