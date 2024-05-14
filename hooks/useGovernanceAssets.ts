@@ -274,6 +274,11 @@ export default function useGovernanceAssets() {
       name: 'Delegate Stake Account',
       packageId: PackageEnum.Common,
     },
+    [Instructions.RemoveStakeLock]: {
+      name: 'Delegate Stake Remove Lock',
+      packageId: PackageEnum.Common,
+      isVisible: true,
+    },
     [Instructions.DifferValidatorStake]: {
       name: 'Differ validator stake',
       // Not to be used for now
@@ -320,7 +325,7 @@ export default function useGovernanceAssets() {
     },
     [Instructions.Transfer]: {
       name: 'Transfer Tokens',
-      isVisible: canUseTokenTransferInstruction,
+      isVisible: true,
       packageId: PackageEnum.Common,
     },
     [Instructions.Burn]: {
