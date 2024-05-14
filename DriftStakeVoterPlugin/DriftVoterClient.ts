@@ -21,6 +21,15 @@ import queryClient from '@hooks/queries/queryClient'
 export class DriftVoterClient extends Client<DriftStakeVoter> {
   readonly requiresInputVoterWeight = true
 
+  async _fetchRegistrar(realm: PublicKey, mint: PublicKey) {
+    const { registrar: registrarPk } = this.getRegistrarPDA(realm, mint)
+    const registrar = await queryClient.fetchQuery(
+      ['Drift', 'Plugin Registrar', registrarPk],
+      () => this.program.account.registrar.fetch(registrarPk)
+    )
+    return registrar
+  }
+
   constructor(
     public program: Program<DriftStakeVoter>,
     public devnet: boolean
@@ -49,8 +58,7 @@ export class DriftVoterClient extends Client<DriftStakeVoter> {
     mint: PublicKey,
     inputVoterWeight: BN
   ): Promise<BN | null> {
-    const { registrar: registrarPk } = this.getRegistrarPDA(realm, mint)
-    const registrar = await this.program.account.registrar.fetch(registrarPk)
+    const registrar = await this._fetchRegistrar(realm, mint)
     const spotMarketIndex = registrar.spotMarketIndex // could just hardcode spotmarket pk
     const driftProgramId = registrar.driftProgramId // likewise
     const drift = new Program(DriftIDL, driftProgramId, this.program.provider)
@@ -142,7 +150,7 @@ export class DriftVoterClient extends Client<DriftStakeVoter> {
       voter
     )
     const { registrar: registrarPk } = this.getRegistrarPDA(realm, mint)
-    const registrar = await this.program.account.registrar.fetch(registrarPk)
+    const registrar = await this._fetchRegistrar(realm, mint)
     const spotMarketIndex = registrar.spotMarketIndex // could just hardcode spotmarket pk
     const driftProgramId = registrar.driftProgramId // likewise
     //const drift = new Program(DriftIDL, driftProgramId, this.program.provider)
