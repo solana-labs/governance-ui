@@ -1,27 +1,28 @@
-import { Wallet } from '@coral-xyz/anchor';
-
 import {
   Coefficients,
   GatewayClient,
 } from '@solana/governance-program-library';
+import { QuadraticClient } from '@solana/governance-program-library/dist/quadraticVoter/client';
 import {
-  RealmConfig,
-  RealmConfigAccount,
   getRealm,
   getRealmConfigAddress,
-  ProgramAccount,
   GovernanceAccountParser,
-  GoverningTokenType,
   GoverningTokenConfig,
+  GoverningTokenType,
+  ProgramAccount,
+  RealmConfig,
+  RealmConfigAccount,
 } from '@solana/spl-governance';
 import { Connection, PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
 
+import { QuadraticPluginParams } from 'VoterWeightPlugins/useQuadraticVoterWeightPlugin';
 import { tryGetNftRegistrar } from 'VoteStakeRegistry/sdk/api';
 
+import { AnchorParams } from '../../../QuadraticPlugin/sdk/api';
 import { VoterWeightPluginInfo } from '../../../VoterWeightPlugins/lib/types';
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts';
-import { parseMintAccountData, MintAccount } from '@utils/tokens';
+import { MintAccount, parseMintAccountData } from '@utils/tokens';
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient';
 
 export interface Config {
@@ -89,12 +90,14 @@ export async function fetchConfig(
   let nftCollectionSize = 0;
   let nftCollectionWeight = new BN(0);
   let civicPassType: PublicKey | undefined = undefined;
+  let qvCoefficients: Coefficients | undefined = undefined;
 
   const nftClient = currentPlugins.find((plugin) => plugin.name === 'NFT')
     ?.client as NftVoterClient | undefined;
   const gatewayClient = currentPlugins.find(
     (plugin) => plugin.name === 'gateway',
   )?.client as GatewayClient | undefined;
+  const quadraticPlugin = currentPlugins.find((plugin) => plugin.name === 'QV');
 
   if (nftClient && realm.account.communityMint) {
     const programId = nftClient.program.programId;
@@ -123,6 +126,15 @@ export async function fetchConfig(
       realm.account.communityMint,
     );
     civicPassType = registrar?.gatekeeperNetwork;
+  }
+
+  if (quadraticPlugin && realm.account.communityMint) {
+    const anchorCoefficients = (quadraticPlugin?.params as
+      | AnchorParams
+      | undefined)?.quadraticCoefficients;
+    qvCoefficients = anchorCoefficients
+      ? QuadraticClient.convertCoefficientsFromAnchorType(anchorCoefficients)
+      : undefined;
   }
 
   const mintPkStr = realm.account.communityMint.toBase58();
@@ -178,5 +190,6 @@ export async function fetchConfig(
     configAccount: configProgramAccount.account,
     realmAuthority: realm.account.authority,
     chainingEnabled: false,
+    qvCoefficients,
   };
 }

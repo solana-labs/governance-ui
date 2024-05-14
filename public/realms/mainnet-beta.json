@@ -55,6 +55,19 @@
     "shortDescription": "A small but mighty developer DAO! 🚀 We're like the little engines that could, tirelessly building, testing, and occasionally chewing glass to create a better ecosystem"
   },
   {
+    "symbol": "POLL",
+    "displayName": "POLL",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "WUd1MpRwqw15cJpodXBiuyGv3rqYW99weEqrvkZpYFW",
+    "bannerImage": "/realms/Poll DAO/Vote Vote Vote.png",
+    "website": "-",
+    "twitter": "@PollDAO",
+    "discord": "-",
+    "ogImage": "/realms/Poll DAO/poll.jpg",
+    "github": "-",
+    "shortDescription": "Poll it"
+  },
+  {
     "symbol": "Dean's List Network State",
     "displayName": "Dean's List Network State",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -3545,5 +3558,19 @@
     "website": "https://mewfasa.fun/",
     "shortDescription": "Mewfasa - The Lion Cat King",
     "keywords": "Web3, Governance, Community, Solana"
+  },
+  {
+    "symbol": "DRIFT",
+    "bannerImage": "https://i.imgur.com/b9pPf3S.png",
+    "displayName": "Drift Protocol",
+    "programId": "dgov7NC8iaumWw3k8TkmLDybvZBCmd1qwxgLAGAsWxf",
+    "realmId": "FVVXu18aNUqyFCfq8sGktPM62mqJAGaenv4z6UGUs5em",
+    "ogImage": "https://i.imgur.com/HnF1Zzy.png",
+    "shortDescription": "A lightning-fast and scalable perpetual futures DEX.",
+    "sortRank": 4,
+    "website": "https://www.drift.trade/",
+    "twitter": "@DriftProtocol",
+    "discord": "http://discord.com/invite/drifting",
+    "github": "https://github.com/drift-labs/protocol-v2"
   }
 ]
