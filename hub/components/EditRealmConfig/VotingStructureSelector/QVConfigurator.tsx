@@ -11,11 +11,18 @@ import { preventNegativeNumberInput } from '@utils/helpers';
 
 interface Props {
   className?: string;
+  currentCoefficients?: Coefficients;
   onCoefficientsChange(value: Coefficients | undefined): void;
 }
 
-export function QVConfigurator({ className, onCoefficientsChange }: Props) {
-  const [coefficients, setCoefficients] = useState<Coefficients>([1000, 0, 0]);
+export function QVConfigurator({
+  className,
+  onCoefficientsChange,
+  currentCoefficients,
+}: Props) {
+  const [coefficients, setCoefficients] = useState<Coefficients>(
+    currentCoefficients ?? [1000, 0, 0],
+  );
   const { connection } = useConnection();
   const realm = useRealmQuery().data?.result;
 
@@ -38,6 +45,8 @@ export function QVConfigurator({ className, onCoefficientsChange }: Props) {
       fetchCoefficients();
     }
   }, [connection, realm?.account.communityMint]);
+
+  console.log('QVConfigurator', { coefficients });
 
   return (
     <div className={className}>

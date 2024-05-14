@@ -120,6 +120,7 @@ export function EditRealmConfig(props: Props) {
         plugins?.voterWeight ?? [],
       )
         .then((config) => {
+          console.log('Fetched config', config);
           setConfig({ ...config });
           setProposalTitle(
             `Update Realms Config for "${result.data.realmByUrlId.name}"`,
