@@ -153,6 +153,8 @@ export class DriftVoterClient extends Client<DriftStakeVoter> {
     const registrar = await this._fetchRegistrar(realm, mint)
     const spotMarketIndex = registrar.spotMarketIndex // could just hardcode spotmarket pk
     const driftProgramId = registrar.driftProgramId // likewise
+    const drift = new Program(DriftIDL, driftProgramId, this.program.provider)
+
     //const drift = new Program(DriftIDL, driftProgramId, this.program.provider)
     const spotMarketPk = await getSpotMarketPublicKey(
       driftProgramId,
@@ -181,7 +183,6 @@ export class DriftVoterClient extends Client<DriftStakeVoter> {
     const insuranceFundVaultPkOrNull =
       insuranceFundVault.found === false ? null : insuranceFundVaultPk
 
-    const drift = new Program(DriftIDL, driftProgramId, this.program.provider)
     let insuranceFundStake:
       | Awaited<ReturnType<typeof drift.account.insuranceFundStake.fetch>>
       | undefined
