@@ -10,7 +10,6 @@ import {
 import {
   PublicKey,
   StakeProgram,
-  Transaction,
   TransactionInstruction,
 } from '@solana/web3.js'
 import BufferLayout from 'buffer-layout'
@@ -21,15 +20,15 @@ import {
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
 import { isFormValid } from '@utils/formValidation'
-import { web3 } from '@coral-xyz/anchor'
+//import { web3 } from '@coral-xyz/anchor'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import Input from '@components/inputs/Input'
-import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes'
-import { StakeAccount, StakeState } from '@utils/uiTypes/assets'
-import { getFilteredProgramAccounts } from '@utils/helpers'
+//import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes'
+//import { StakeAccount, StakeState } from '@utils/uiTypes/assets'
+//import { getFilteredProgramAccounts } from '@utils/helpers'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
-import { SIMULATION_WALLET } from '@tools/constants'
+import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes'
 
 const RemoveLockup = ({
   index,
@@ -66,66 +65,66 @@ const RemoveLockup = ({
     })
   }
 
-  const getStakeAccounts = async (): Promise<StakeAccount[]> => {
-    if (!form.governedTokenAccount) return []
+  //   const getStakeAccounts = async (): Promise<StakeAccount[]> => {
+  //     if (!form.governedTokenAccount) return []
 
-    const accountsNotYetStaked = await getFilteredProgramAccounts(
-      connection.current,
-      StakeProgram.programId,
-      [
-        {
-          memcmp: {
-            offset: 0,
-            bytes: bs58.encode([1, 0, 0, 0]),
-          },
-        },
-        {
-          memcmp: {
-            offset: 44,
-            bytes: form.governedTokenAccount.pubkey.toBase58(),
-          },
-        },
-      ]
-    )
+  //     const accountsNotYetStaked = await getFilteredProgramAccounts(
+  //       connection.current,
+  //       StakeProgram.programId,
+  //       [
+  //         {
+  //           memcmp: {
+  //             offset: 0,
+  //             bytes: bs58.encode([1, 0, 0, 0]),
+  //           },
+  //         },
+  //         {
+  //           memcmp: {
+  //             offset: 44,
+  //             bytes: form.governedTokenAccount.pubkey.toBase58(),
+  //           },
+  //         },
+  //       ]
+  //     )
 
-    const accountsStaked = await getFilteredProgramAccounts(
-      connection.current,
-      StakeProgram.programId,
-      [
-        {
-          memcmp: {
-            offset: 0,
-            bytes: bs58.encode([2, 0, 0, 0]),
-          },
-        },
-        {
-          memcmp: {
-            offset: 44,
-            bytes: form.governedTokenAccount.pubkey.toBase58(),
-          },
-        },
-      ]
-    )
+  //     const accountsStaked = await getFilteredProgramAccounts(
+  //       connection.current,
+  //       StakeProgram.programId,
+  //       [
+  //         {
+  //           memcmp: {
+  //             offset: 0,
+  //             bytes: bs58.encode([2, 0, 0, 0]),
+  //           },
+  //         },
+  //         {
+  //           memcmp: {
+  //             offset: 44,
+  //             bytes: form.governedTokenAccount.pubkey.toBase58(),
+  //           },
+  //         },
+  //       ]
+  //     )
 
-    const stakingAccounts = accountsNotYetStaked.concat(
-      accountsStaked.filter((x) => {
-        // filter all accounts which are not yet deactivated
-        const data = x.accountInfo.data.slice(172, 172 + 8)
-        return !data.equals(
-          Buffer.from([255, 255, 255, 255, 255, 255, 255, 255])
-        )
-      })
-    )
+  //     const stakingAccounts = accountsNotYetStaked.concat(
+  //       accountsStaked.filter((x) => {
+  //         // filter all accounts which are not yet deactivated
+  //         const data = x.accountInfo.data.slice(172, 172 + 8)
+  //         return !data.equals(
+  //           Buffer.from([255, 255, 255, 255, 255, 255, 255, 255])
+  //         )
+  //       })
+  //     )
 
-    return stakingAccounts.map((x) => {
-      return {
-        stakeAccount: x.publicKey,
-        state: StakeState.Inactive,
-        delegatedValidator: web3.PublicKey.default,
-        amount: x.accountInfo.lamports / web3.LAMPORTS_PER_SOL,
-      }
-    })
-  }
+  //     return stakingAccounts.map((x) => {
+  //       return {
+  //         stakeAccount: x.publicKey,
+  //         state: StakeState.Inactive,
+  //         delegatedValidator: web3.PublicKey.default,
+  //         amount: x.accountInfo.lamports / web3.LAMPORTS_PER_SOL,
+  //       }
+  //     })
+  //   }
 
   //const [stakeAccounts, setStakeAccounts] = useState<StakeAccount[]>([])
 
@@ -180,17 +179,29 @@ const RemoveLockup = ({
     const authorizedPubkey = form.governedTokenAccount.extensions
       .transferAddress!
     const stakePubkey = new PublicKey(form.stakeAccount)
-    console.log('14SPGuYJANnAhmpKy6bwXKJ5Njqxnr8k2jZ9DnzN84de')
+
+    //greed dao test pubkey stake account pk 14SPGuYJANnAhmpKy6bwXKJ5Njqxnr8k2jZ9DnzN84de
+
     const layout = BufferLayout.struct([
       BufferLayout.u32('instruction'),
-      BufferLayout.nu64('unixTimestamp'),
+      BufferLayout.u8('hasUnixTimestamp'),
+      BufferLayout.ns64('unixTimestamp'),
+      BufferLayout.u8('hasEpoch'),
+      //can add epoch if needed
+      BufferLayout.u8('hasCustodian'),
+      //can add custodian if needed
     ])
     const data = Buffer.alloc(layout.span)
 
+    //any date in past will unlock the stake account.
     layout.encode(
       {
+        //lockup instruction index in stake program
         instruction: 6,
-        unixTimestamp: 1715728831,
+        //option padding
+        hasUnixTimestamp: 1,
+        //any past time unixtimestamp
+        unixTimestamp: 1715685793,
       },
       data
     )
@@ -213,13 +224,7 @@ const RemoveLockup = ({
       programId,
       data,
     })
-    const transaction = new Transaction({
-      feePayer: new PublicKey(SIMULATION_WALLET),
-    }).add(instruction)
 
-    const resp = await connection.current.simulateTransaction(transaction)
-
-    console.log(resp, '@@@@')
     return {
       serializedInstruction: serializeInstructionToBase64(instruction),
       additionalSerializedInstructions: [],
