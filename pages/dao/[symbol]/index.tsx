@@ -51,7 +51,6 @@ import {
   useRealmProposalsQuery,
 } from '@hooks/queries/proposal'
 import queryClient from '@hooks/queries/queryClient'
-import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 import { getFeeEstimate } from '@tools/feeEstimate'
 import { createComputeBudgetIx } from '@blockworks-foundation/mango-v4'
 import { useNftClient } from '../../../VoterWeightPlugins/useNftClient'
@@ -80,7 +79,6 @@ const REALM = () => {
   const realmQuery = useRealmQuery()
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
-  const { result: ownVoterWeight } = useLegacyVoterWeight()
   const { realmInfo } = useRealm()
   const proposalsPerPage = 20
   const [filters, setFilters] = useState<Filters>(InitialFilters)
