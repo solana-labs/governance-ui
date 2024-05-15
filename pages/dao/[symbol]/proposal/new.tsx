@@ -142,8 +142,9 @@ import MeshRemoveMember from './components/instructions/Squads/MeshRemoveMember'
 import MeshAddMember from './components/instructions/Squads/MeshAddMember'
 import MeshChangeThresholdMember from './components/instructions/Squads/MeshChangeThresholdMember'
 import PythRecoverAccount from './components/instructions/Pyth/PythRecoverAccount'
-import { useVoteByCouncilToggle } from "@hooks/useVoteByCouncilToggle";
+import { useVoteByCouncilToggle } from '@hooks/useVoteByCouncilToggle'
 import BurnTokens from './components/instructions/BurnTokens'
+import RemoveLockup from './components/instructions/Validators/removeLockup'
 
 const TITLE_LENGTH_LIMIT = 130
 // the true length limit is either at the tx size level, and maybe also the total account size level (I can't remember)
@@ -204,7 +205,11 @@ const New = () => {
     title: typeof router.query['t'] === 'string' ? router.query['t'] : '',
     description: '',
   })
-  const { voteByCouncil, shouldShowVoteByCouncilToggle, setVoteByCouncil } = useVoteByCouncilToggle();
+  const {
+    voteByCouncil,
+    shouldShowVoteByCouncilToggle,
+    setVoteByCouncil,
+  } = useVoteByCouncilToggle()
   const [multiChoiceForm, setMultiChoiceForm] = useState<{
     governance: PublicKey | undefined
     options: string[]
@@ -547,6 +552,7 @@ const New = () => {
       [Instructions.DeactivateValidatorStake]: DeactivateValidatorStake,
       [Instructions.WithdrawValidatorStake]: WithdrawValidatorStake,
       [Instructions.DelegateStake]: DelegateStake,
+      [Instructions.RemoveStakeLock]: RemoveLockup,
       [Instructions.SplitStake]: SplitStake,
       [Instructions.DifferValidatorStake]: null,
       [Instructions.TransferDomainName]: TransferDomainName,
@@ -721,14 +727,14 @@ const New = () => {
                 })}
               />
             </div>
-              {shouldShowVoteByCouncilToggle && (
-                  <VoteBySwitch
-                      checked={voteByCouncil}
-                      onChange={() => {
-                          setVoteByCouncil(!voteByCouncil)
-                      }}
-                  ></VoteBySwitch>
-              )}
+            {shouldShowVoteByCouncilToggle && (
+              <VoteBySwitch
+                checked={voteByCouncil}
+                onChange={() => {
+                  setVoteByCouncil(!voteByCouncil)
+                }}
+              ></VoteBySwitch>
+            )}
             <div className="max-w-lg w-full mb-4 flex flex-wrap gap-2 justify-between items-end">
               <div className="flex grow basis-0">
                 <ProposalTypeRadioButton

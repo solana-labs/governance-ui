@@ -355,6 +355,7 @@ export enum Instructions {
   DistributionCloseVaults,
   DistributionFillVaults,
   DelegateStake,
+  RemoveStakeLock,
   ForesightAddMarketListToCategory,
   ForesightInitCategory,
   ForesightInitMarket,
@@ -480,6 +481,11 @@ export interface ValidatorWithdrawStakeForm {
   governedTokenAccount: AssetAccount | undefined
   stakingAccount: StakeAccount | undefined
   amount: number
+}
+
+export interface ValidatorRemoveLockup {
+  governedTokenAccount: AssetAccount | undefined
+  stakeAccount: string
 }
 
 export interface DelegateStakeForm {
