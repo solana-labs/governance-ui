@@ -54,8 +54,9 @@ import queryClient from '@hooks/queries/queryClient'
 import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 import { getFeeEstimate } from '@tools/feeEstimate'
 import { createComputeBudgetIx } from '@blockworks-foundation/mango-v4'
-import {useNftClient} from "../../../VoterWeightPlugins/useNftClient";
-import {useVotingClients} from "@hooks/useVotingClients";
+import { useNftClient } from '../../../VoterWeightPlugins/useNftClient'
+import { useVotingClients } from '@hooks/useVotingClients'
+import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
 
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
@@ -96,8 +97,8 @@ const REALM = () => {
     SelectedProposal[]
   >([])
 
-  const votingClients = useVotingClients();
-  const { nftClient } = useNftClient();
+  const votingClients = useVotingClients()
+  const { nftClient } = useNftClient()
   const wallet = useWalletOnePointOh()
   const { connection } = useConnection()
 
@@ -224,18 +225,19 @@ const REALM = () => {
     }
   }, [])
 
+  const {
+    ownVoterWeight: communityOwnVoterWeight,
+  } = useRealmVoterWeightPlugins('community')
+  const { ownVoterWeight: councilOwnVoterWeight } = useRealmVoterWeightPlugins(
+    'council'
+  )
+
   const allVotingProposalsSelected =
     selectedProposals.length === votingProposals?.length
   const hasCommunityVoteWeight =
-    ownTokenRecord &&
-    ownVoterWeight?.hasMinAmountToVote(
-      ownTokenRecord.account.governingTokenMint
-    )
+    ownTokenRecord && communityOwnVoterWeight?.value?.gtn(0)
   const hasCouncilVoteWeight =
-    ownCouncilTokenRecord &&
-    ownVoterWeight?.hasMinAmountToVote(
-      ownCouncilTokenRecord.account.governingTokenMint
-    )
+    ownCouncilTokenRecord && councilOwnVoterWeight?.value?.gtn(0)
 
   const cantMultiVote =
     selectedProposals.length === 0 ||
@@ -277,8 +279,9 @@ const REALM = () => {
           realm.account.communityMint.toBase58()
             ? ownTokenRecord
             : ownCouncilTokenRecord
-        const role = selectedProposal.proposal.governingTokenMint.toBase58() ===
-            realm.account.communityMint.toBase58()
+        const role =
+          selectedProposal.proposal.governingTokenMint.toBase58() ===
+          realm.account.communityMint.toBase58()
             ? 'community'
             : 'council'
 

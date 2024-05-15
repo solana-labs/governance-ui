@@ -16,6 +16,7 @@ import {SignerWalletAdapter} from "@solana/wallet-adapter-base";
 
 export type UseRealmVoterWeightPluginsReturnType = UseVoterWeightPluginsReturnType & {
   totalCalculatedVoterWeight: CalculatedWeight | undefined,
+  ownVoterWeight: CalculatedWeight | undefined
   voterWeightForWallet: (walletPublicKey: PublicKey) => CalculatedWeight | undefined
   voterWeightPkForWallet: (walletPublicKey: PublicKey) => PublicKey | undefined
 }
@@ -65,6 +66,9 @@ export const useRealmVoterWeightPlugins = (
   const selectedDelegator = useSelectedDelegatorStore((s) =>
     role === 'community' ? s.communityDelegator : s.councilDelegator
   )
+
+  const mainWalletPk = selectedDelegator || wallet?.publicKey
+
   const delegators = useDelegators(role)
   const walletPublicKeys =  getWalletList(
       selectedDelegator,
@@ -96,6 +100,7 @@ export const useRealmVoterWeightPlugins = (
     }
   ) : undefined;
 
+
   // This requires that the index of the wallet in the list of wallets remains consistent with the output voter weights,
   // while not ideal, this is simpler than the alternative, which would be to return a map of wallet public keys to voter weights
   // or something similar.
@@ -111,9 +116,12 @@ export const useRealmVoterWeightPlugins = (
     return nonAggregatedResult.voterWeightPks?.[walletIndex]
   }
 
+  const ownVoterWeight = mainWalletPk ? voterWeightForWallet(mainWalletPk) : undefined
+
   return {
     ...nonAggregatedResult,
     totalCalculatedVoterWeight,
+    ownVoterWeight,
     voterWeightForWallet,
     voterWeightPkForWallet,
   }
