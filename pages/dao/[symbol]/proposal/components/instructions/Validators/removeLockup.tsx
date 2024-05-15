@@ -28,7 +28,6 @@ import Input from '@components/inputs/Input'
 //import { StakeAccount, StakeState } from '@utils/uiTypes/assets'
 //import { getFilteredProgramAccounts } from '@utils/helpers'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
-import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes'
 
 const RemoveLockup = ({
   index,
@@ -153,7 +152,7 @@ const RemoveLockup = ({
       }
     }
     const governanceAccount = governance?.account
-
+    console.log(governanceAccount)
     if (
       !connection ||
       !isValid ||
@@ -163,16 +162,6 @@ const RemoveLockup = ({
       !form.governedTokenAccount?.isSol ||
       !form.stakeAccount
     ) {
-      console.log({
-        connection,
-        isValid,
-        programId,
-        governanceAccount,
-        governancePk,
-        isSol: form.governedTokenAccount?.isSol,
-        stake: form.stakeAccount,
-      })
-
       return returnInvalid()
     }
 
@@ -187,9 +176,9 @@ const RemoveLockup = ({
       BufferLayout.u8('hasUnixTimestamp'),
       BufferLayout.ns64('unixTimestamp'),
       BufferLayout.u8('hasEpoch'),
-      //can add epoch if needed
+      //add epoch field if needed
       BufferLayout.u8('hasCustodian'),
-      //can add custodian if needed
+      //add custodian field if needed
     ])
     const data = Buffer.alloc(layout.span)
 
@@ -251,7 +240,7 @@ const RemoveLockup = ({
       index
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form])
+  }, [form, governedAccount])
   useEffect(() => {
     setGovernedAccount(form.governedTokenAccount?.governance)
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
