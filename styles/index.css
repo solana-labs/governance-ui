@@ -380,13 +380,17 @@ https://developer.mozilla.org/en-US/docs/Web/CSS/word-break#values */
   overflow-wrap: anywhere;
 }
 
+.gatewayButton > span:hover{
+  @apply !text-fgd-1;
+}
+
 .gatewayButton > span {
-  @apply !text-bkg-2 !pl-0 !text-sm;
+  @apply !text-primary-light !pl-0 hover:!text-fgd-1;
   margin-left: 23px;
 }
 
 .gatewayButton > svg {
-  filter: brightness(0) invert(0);
+  filter: brightness(0) saturate(100%) invert(71%) sepia(67%) saturate(514%) hue-rotate(161deg) brightness(97%) contrast(90%);
   min-width: 24px;
   padding-top: 4px;
 }
