@@ -331,10 +331,10 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@blockworks-foundation/mango-mints-redemption@0.0.10":
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-mints-redemption/-/mango-mints-redemption-0.0.10.tgz#51a9a3f8b9278e9686da96747b05b019087e3d37"
-  integrity sha512-8HR1xUzI1pOvbYqVV3afRm9YcSysI/9j/Rk6snw7IU1jTrIEpGgDJGGqwUjotFgKf4Nql2dGwAUrF/dO04W7bQ==
+"@blockworks-foundation/mango-mints-redemption@0.0.11":
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-mints-redemption/-/mango-mints-redemption-0.0.11.tgz#5b33ec316007c34993a9be8f739af9cb94ebe322"
+  integrity sha512-kMY0e26xK5LxuLbdnCxexo2oHYT46nv+jNRMMzCDJn3z6JjiQpqYS2EpgvkSSSHa4MjJzonp377GxvYyIfeYxg==
   dependencies:
     "@coral-xyz/anchor" "^0.28.0"
     "@solana/spl-token" "^0.3.8"
@@ -342,29 +342,21 @@
     keccak256 "^1.0.6"
     merkletreejs "^0.3.11"
 
-"@blockworks-foundation/mango-v4-settings@0.14.15":
-  version "0.14.15"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4-settings/-/mango-v4-settings-0.14.15.tgz#0ac04f2cffbd27a4129bc2086ec1418e29393880"
-  integrity sha512-GBo43KCosdaohbtS3Rtz8e2zsLsiN3JqTfLKVtStRYO3f2tQLzeo/D2Khz07psw2egq6TCNZJH7+v32iGrPq0w==
+"@blockworks-foundation/mango-v4-settings@0.14.22":
+  version "0.14.22"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4-settings/-/mango-v4-settings-0.14.22.tgz#7d7c9759b73d2c8166cf5f0871969e3764ea4139"
+  integrity sha512-YSJrCgeI6aC/RsL8dRyJmpKYB2CkY9YaiZ9PVjNWrQOcgQkp/DNaaI1CBFpZshtg6VtpFraQh6IrOmXzaAvglA==
   dependencies:
     bn.js "^5.2.1"
     eslint-config-prettier "^9.0.0"
 
-"@blockworks-foundation/mango-v4-settings@0.14.21":
-  version "0.14.21"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4-settings/-/mango-v4-settings-0.14.21.tgz#d7aeb3bc827acd7d558bfba5d8ec1b48c590a746"
-  integrity sha512-QbveR8YSH4DI7sskeYBpEBHREWF2bCh/rJ7WymSlqmsIYR1DOvsk+ZqUdrDCtGEjZZb+3jrP77jjc3XMe1jZig==
+"@blockworks-foundation/mango-v4@0.26.0":
+  version "0.26.0"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4/-/mango-v4-0.26.0.tgz#fa7c3aff40acb2bf6a13f51ab7634a6dbd6a8e03"
+  integrity sha512-PLYSJINFQcGdFgQJd6qEQXtCX2Fn9doCZcbxcncKapFrlCy9TeqGN8j0+SkipeFmXtEvwSeGXzRzcTgMzeeRkg==
   dependencies:
-    bn.js "^5.2.1"
-    eslint-config-prettier "^9.0.0"
-
-"@blockworks-foundation/mango-v4@0.23.4":
-  version "0.23.4"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-v4/-/mango-v4-0.23.4.tgz#c1a924a053156a92aaaf31eef8ea4e8ceeb2c6f4"
-  integrity sha512-7TXYVrggKb2qbADAgCW46BQCLIeRc/hkNOA0RIBPbi0EntdKPwIXy9yKoyUaa4fM7Uvx4wTqNlP3YAKKjNQOSw==
-  dependencies:
-    "@blockworks-foundation/mango-v4-settings" "0.14.15"
-    "@blockworks-foundation/mangolana" "0.0.15"
+    "@blockworks-foundation/mango-v4-settings" "0.14.22"
+    "@blockworks-foundation/mangolana" "0.0.17"
     "@coral-xyz/anchor" "^0.28.1-beta.2"
     "@project-serum/serum" "0.13.65"
     "@pythnetwork/client" "~2.14.0"
@@ -380,26 +372,15 @@
     lodash "^4.17.21"
     node-kraken-api "^2.2.2"
 
-"@blockworks-foundation/mangolana@0.0.15":
-  version "0.0.15"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mangolana/-/mangolana-0.0.15.tgz#8a603675028f7d7ab400cc58bf3058d2e7514cde"
-  integrity sha512-P31XW2w2lFBgzM+529H2f3Kz8rNC7+h0pYZub9kOcsACAt7TwLksg1fGuzSvekLn6M1JmVpPa9nISdAVfsZB5g==
+"@blockworks-foundation/mangolana@0.0.17":
+  version "0.0.17"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mangolana/-/mangolana-0.0.17.tgz#9f9a227c61faa3fba8c99a645b1897c46d8edea7"
+  integrity sha512-k4YXV5DjzF3hUJS9NYJCtkPVYgLV/EuKv/XDLEmnWX66V3YopST7aHmdfzj1tb8QJDuE3t+aRC66WXOeGNTUpA==
   dependencies:
-    "@solana/web3.js" "^1.88.0"
+    "@solana/web3.js" "^1.91.6"
     bs58 "^5.0.0"
     isomorphic-ws "^5.0.0"
-    node-fetch "2.6.11"
-    ws "^8.16.0"
-
-"@blockworks-foundation/mangolana@0.0.16":
-  version "0.0.16"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mangolana/-/mangolana-0.0.16.tgz#d45a10e0d6325eb72228280c155a87ef0992a432"
-  integrity sha512-eoVmWWkYyreK0fH5katFvPTv5GhBetnHikpl/GNU8sm0tVzsQqmgqeqwtFjFZvbg81/Wne0JKrSNPEeKL8eEZA==
-  dependencies:
-    "@solana/web3.js" "^1.88.0"
-    bs58 "^5.0.0"
-    isomorphic-ws "^5.0.0"
-    node-fetch "2.6.11"
+    node-fetch "3.3.2"
     ws "^8.16.0"
 
 "@blocto/sdk@^0.2.22":
@@ -4808,7 +4789,7 @@
     "@solana/wallet-standard-core" "^1.1.1"
     "@solana/wallet-standard-wallet-adapter" "^1.1.2"
 
-"@solana/web3.js@1.56.0", "@solana/web3.js@1.78.2", "@solana/web3.js@^1.17.0", "@solana/web3.js@^1.21.0", "@solana/web3.js@^1.22.0", "@solana/web3.js@^1.30.2", "@solana/web3.js@^1.31.0", "@solana/web3.js@^1.32.0", "@solana/web3.js@^1.35.1", "@solana/web3.js@^1.36.0", "@solana/web3.js@^1.37.1", "@solana/web3.js@^1.43.4", "@solana/web3.js@^1.44.3", "@solana/web3.js@^1.50.1", "@solana/web3.js@^1.53.0", "@solana/web3.js@^1.56.2", "@solana/web3.js@^1.59.1", "@solana/web3.js@^1.63.0", "@solana/web3.js@^1.63.1", "@solana/web3.js@^1.66.2", "@solana/web3.js@^1.68.0", "@solana/web3.js@^1.73.0", "@solana/web3.js@^1.73.2", "@solana/web3.js@^1.77.3", "@solana/web3.js@^1.78.2", "@solana/web3.js@^1.87.5", "@solana/web3.js@^1.87.6", "@solana/web3.js@^1.88.0", "@solana/web3.js@^1.89.1":
+"@solana/web3.js@1.56.0", "@solana/web3.js@1.78.2", "@solana/web3.js@^1.17.0", "@solana/web3.js@^1.21.0", "@solana/web3.js@^1.22.0", "@solana/web3.js@^1.30.2", "@solana/web3.js@^1.31.0", "@solana/web3.js@^1.32.0", "@solana/web3.js@^1.35.1", "@solana/web3.js@^1.36.0", "@solana/web3.js@^1.37.1", "@solana/web3.js@^1.43.4", "@solana/web3.js@^1.44.3", "@solana/web3.js@^1.50.1", "@solana/web3.js@^1.53.0", "@solana/web3.js@^1.56.2", "@solana/web3.js@^1.59.1", "@solana/web3.js@^1.63.0", "@solana/web3.js@^1.63.1", "@solana/web3.js@^1.66.2", "@solana/web3.js@^1.68.0", "@solana/web3.js@^1.73.0", "@solana/web3.js@^1.73.2", "@solana/web3.js@^1.77.3", "@solana/web3.js@^1.78.2", "@solana/web3.js@^1.87.5", "@solana/web3.js@^1.87.6", "@solana/web3.js@^1.89.1", "@solana/web3.js@^1.91.6":
   version "1.78.2"
   resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.78.2.tgz#ae976ce2f793077aa104ab455f9f75be86a3e2a4"
   integrity sha512-oF+TmBZCt3eAEl4Meu3GO2p6G8wdyoKgXgTKzQpIUIhpMGA/dVQzyMFpKjCgoTU1Kx+/UF3gXUdsZOxQukGbvQ==
@@ -8339,6 +8320,11 @@ dashdash@^1.12.0:
   dependencies:
     assert-plus "^1.0.0"
 
+data-uri-to-buffer@^4.0.0:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/data-uri-to-buffer/-/data-uri-to-buffer-4.0.1.tgz#d8feb2b2881e6a4f58c2e08acfd0e2834e26222e"
+  integrity sha512-0R9ikRb668HB7QDxT1vkpuUBtqc53YyAwMwGeUFKRojY/NWKvdZ+9UYtRfGmhqNbRkTSVpMbmyhXipFFv2cb/A==
+
 data-urls@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/data-urls/-/data-urls-3.0.2.tgz#9cf24a477ae22bcef5cd5f6f0bfbc1d2d3be9143"
@@ -9508,6 +9494,14 @@ fbjs@^2.0.0:
     setimmediate "^1.0.5"
     ua-parser-js "^0.7.18"
 
+fetch-blob@^3.1.2, fetch-blob@^3.1.4:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/fetch-blob/-/fetch-blob-3.2.0.tgz#f09b8d4bbd45adc6f0c20b7e787e793e309dcce9"
+  integrity sha512-7yAQpD2UMJzLi1Dqv7qFYnPbaPx7ZfFK6PiIxQ4PfkGPyNyl2Ugx+a/umUonmKqjhM4DnfbMvdX6otXq83soQQ==
+  dependencies:
+    node-domexception "^1.0.0"
+    web-streams-polyfill "^3.0.3"
+
 fetch-retry@^5.0.6:
   version "5.0.6"
   resolved "https://registry.yarnpkg.com/fetch-retry/-/fetch-retry-5.0.6.tgz#17d0bc90423405b7a88b74355bf364acd2a7fa56"
@@ -9670,6 +9664,13 @@ form-data@~2.3.2:
     asynckit "^0.4.0"
     combined-stream "^1.0.6"
     mime-types "^2.1.12"
+
+formdata-polyfill@^4.0.10:
+  version "4.0.10"
+  resolved "https://registry.yarnpkg.com/formdata-polyfill/-/formdata-polyfill-4.0.10.tgz#24807c31c9d402e002ab3d8c720144ceb8848423"
+  integrity sha512-buewHzMvYL29jdeQTVILecSaZKnt/RJWjoZCF5OW60Z67/GmSLBkOFM7qh1PI3zFNtJbaZL5eQu1vLfazOwj4g==
+  dependencies:
+    fetch-blob "^3.1.2"
 
 fp-ts@2.12.2:
   version "2.12.2"
@@ -12530,6 +12531,11 @@ node-addon-api@^7.0.0:
   resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-7.1.0.tgz#71f609369379c08e251c558527a107107b5e0fdb"
   integrity sha512-mNcltoe1R8o7STTegSOHdnJNN7s5EUvhoS7ShnTHDyOSd+8H+UdWODq6qSv67PjC8Zc5JRT8+oLAMCr0SIXw7g==
 
+node-domexception@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/node-domexception/-/node-domexception-1.0.0.tgz#6888db46a1f71c0b76b3f7555016b63fe64766e5"
+  integrity sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==
+
 node-emoji@^1.11.0:
   version "1.11.0"
   resolved "https://registry.yarnpkg.com/node-emoji/-/node-emoji-1.11.0.tgz#69a0150e6946e2f115e9d7ea4df7971e2628301c"
@@ -12549,12 +12555,14 @@ node-fetch@2.6.1, node-fetch@2.6.7:
   dependencies:
     whatwg-url "^5.0.0"
 
-node-fetch@2.6.11:
-  version "2.6.11"
-  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.11.tgz#cde7fc71deef3131ef80a738919f999e6edfff25"
-  integrity sha512-4I6pdBY1EthSqDmJkiNk3JIT8cswwR9nfeW/cPdUagJYEQG7R95WRH74wpz7ma8Gh/9dI9FP+OU+0E4FvtA55w==
+node-fetch@3.3.2:
+  version "3.3.2"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-3.3.2.tgz#d1e889bacdf733b4ff3b2b243eb7a12866a0b78b"
+  integrity sha512-dRB78srN/l6gqWulah9SrxeYnxeddIG30+GOqK/9OlLVyLg3HPnr6SqOWTWOXKRwC2eGYCkZ59NNuSgvSrpgOA==
   dependencies:
-    whatwg-url "^5.0.0"
+    data-uri-to-buffer "^4.0.0"
+    fetch-blob "^3.1.4"
+    formdata-polyfill "^4.0.10"
 
 node-fetch@^2.6.1, node-fetch@^2.6.12, node-fetch@^2.6.7:
   version "2.6.12"
@@ -16040,6 +16048,11 @@ wcwidth@^1.0.1:
   integrity sha512-XHPEwS0q6TaxcvG85+8EYkbiCux2XtWG2mkc47Ng2A77BQu9+DqIOJldST4HgPkuea7dvKSj5VgX3P1d4rW8Tg==
   dependencies:
     defaults "^1.0.3"
+
+web-streams-polyfill@^3.0.3:
+  version "3.3.3"
+  resolved "https://registry.yarnpkg.com/web-streams-polyfill/-/web-streams-polyfill-3.3.3.tgz#2073b91a2fdb1fbfbd401e7de0ac9f8214cecb4b"
+  integrity sha512-d2JWLCivmZYTSIoge9MsgFCZrt571BikcWGYkjC1khllbTeDlGqZ2D8vD8E/lJa8WGWbb7Plm8/XJYV7IJHZZw==
 
 web3-utils@^1.3.4:
   version "1.10.0"
