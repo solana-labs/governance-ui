@@ -125,6 +125,8 @@ const IxGateSet = ({
     TokenConditionalSwapCreateLinearAuction: true,
     Serum3PlaceOrderV2: true,
     TokenForceWithdraw: true,
+    SequenceCheck: true,
+    HealthCheck: true,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -646,6 +648,18 @@ const IxGateSet = ({
       initialValue: form.TokenForceWithdraw,
       type: InstructionInputType.SWITCH,
       name: 'TokenForceWithdraw',
+    },
+    {
+      label: 'Sequence Check',
+      initialValue: form.SequenceCheck,
+      type: InstructionInputType.SWITCH,
+      name: 'SequenceCheck',
+    },
+    {
+      label: 'Health Check',
+      initialValue: form.HealthCheck,
+      type: InstructionInputType.SWITCH,
+      name: 'HealthCheck',
     },
   ]
 
