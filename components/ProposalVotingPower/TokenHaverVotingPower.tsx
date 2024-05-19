@@ -39,7 +39,7 @@ export default function TokenHaverVotingPower({ role, className }: Props) {
       mintInfo && voterWeight?.value
         ? new BigNumber(voterWeight?.value.toString())
             .shiftedBy(-mintInfo.decimals)
-            .toFixed(2)
+            .toFixed(0)
             .toString()
         : undefined,
     [mintInfo, voterWeight?.value]
