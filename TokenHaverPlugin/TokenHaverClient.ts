@@ -48,7 +48,7 @@ export class TokenHaverClient extends Client<TokenHaver> {
         })
       )
     ).reduce((acc, curr) => acc + curr, 0)
-    return new BN(countOfTokensUserHas)
+    return new BN(countOfTokensUserHas).muln(10 ** 9)
   }
 
   async updateVoterWeightRecord(
