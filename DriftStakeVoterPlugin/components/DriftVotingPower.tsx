@@ -79,7 +79,7 @@ export default function DriftVotingPower({ role, className }: Props) {
   // This latter case may occur if the DAO changes its configuration and new Voter Weight Records are required.
   // For example if a new plugin is added.
   const showJoinButton =
-    !userNeedsTokenOwnerRecord && userNeedsVoterWeightRecords
+    userNeedsTokenOwnerRecord || userNeedsVoterWeightRecords
 
   const join = async () => {
     const instructions = await handleRegister()
