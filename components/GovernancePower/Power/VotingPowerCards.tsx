@@ -9,7 +9,7 @@ import QuadraticVotingPower from '@components/ProposalVotingPower/QuadraticVotin
 import { VSRCard } from '@components/GovernancePower/Power/VSRCard'
 import { VanillaCard } from '@components/GovernancePower/Power/Vanilla/VanillaCard'
 import DriftVotingPower from 'DriftStakeVoterPlugin/components/DriftVotingPower'
-import PluginVotingPower from '@components/ProposalVotingPower/PluginVotingPower'
+import TokenHaverVotingPower from '@components/ProposalVotingPower/TokenHaverVotingPower'
 
 /****
  * Note to plugin implementors.
@@ -74,7 +74,7 @@ const CardForPlugin: FC<
     case 'drift':
       return <DriftVotingPower role={role} />
     case 'token_haver':
-      return <PluginVotingPower role={role} showDepositButton={false} />
+      return <TokenHaverVotingPower role={role} />
   }
 }
 

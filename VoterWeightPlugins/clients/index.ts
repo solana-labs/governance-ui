@@ -13,6 +13,7 @@ import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { HeliumVsrClient } from '../../HeliumVotePlugin/sdk/client'
 import { UnrecognisedVoterWeightPluginClient } from './UnrecognisedVoterWeightPluginClient'
 import { DriftVoterClient } from 'DriftStakeVoterPlugin/DriftVoterClient'
+import { TokenHaverClient } from 'TokenHaverPlugin/TokenHaverClient'
 
 /**
  * Given a plugin name and program ID, load the appropriate client
@@ -43,6 +44,8 @@ export const loadClient = (
       return NftVoterClient.connect(provider, programId)
     case 'drift':
       return DriftVoterClient.connect(provider, programId)
+    case 'token_haver':
+      return TokenHaverClient.connect(provider, programId)
     default:
       return UnrecognisedVoterWeightPluginClient.connect(provider, programId)
   }
