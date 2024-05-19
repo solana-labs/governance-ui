@@ -2,10 +2,13 @@ import classNames from 'classnames'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 
 import { getMintMetadata } from '@components/instructions/programs/splToken'
+import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useDelegatorAwareVoterWeight } from '@hooks/useDelegatorAwareVoterWeight'
 import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
+import { BigNumber } from 'bignumber.js'
 import clsx from 'clsx'
+import { useMemo } from 'react'
 
 interface Props {
   className?: string
@@ -16,6 +19,9 @@ interface Props {
 export default function TokenHaverVotingPower({ role, className }: Props) {
   const realm = useRealmQuery().data?.result
   const voterWeight = useDelegatorAwareVoterWeight(role)
+
+  const mintInfo = useMintInfoByPubkeyQuery(realm?.account.communityMint).data
+    ?.result
 
   const isLoading = useDepositStore((s) => s.state.isLoading)
   const { isReady } = useRealmVoterWeightPlugins(role)
@@ -28,7 +34,16 @@ export default function TokenHaverVotingPower({ role, className }: Props) {
   const tokenName =
     getMintMetadata(relevantMint)?.name ?? realm?.account.name ?? ''
 
-  const formattedTotal = voterWeight?.value?.toString() ?? 0
+  const formattedTotal = useMemo(
+    () =>
+      mintInfo && voterWeight?.value
+        ? new BigNumber(voterWeight?.value.toString())
+            .shiftedBy(-mintInfo.decimals)
+            .toFixed(0)
+            .toString()
+        : undefined,
+    [mintInfo, voterWeight?.value]
+  )
 
   if (isLoading || !isReady) {
     return (
