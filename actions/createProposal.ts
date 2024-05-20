@@ -111,6 +111,8 @@ export const createProposal = async (
     governance
   )
 
+  console.log("plugin", plugin)
+
   const proposalAddress = await withCreateProposal(
     instructions,
     programId,
