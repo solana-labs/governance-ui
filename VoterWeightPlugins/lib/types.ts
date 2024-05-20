@@ -2,13 +2,15 @@ import {PublicKey} from "@solana/web3.js";
 import {BN, Idl} from "@coral-xyz/anchor";
 import {PluginName} from "@constants/plugins";
 import {Client} from "@solana/governance-program-library";
+import {RealmConfig} from "@solana/spl-governance";
 
 export type PluginType = 'voterWeight' | 'maxVoterWeight'
 
 export type UseVoterWeightPluginsArgs = {
     realmPublicKey?: PublicKey
     governanceMintPublicKey?: PublicKey
-    walletPublicKeys?: PublicKey[]
+    walletPublicKeys?: PublicKey[],
+    realmConfig?: RealmConfig
 }
 
 export type VoterWeightPluginInfo<TParams = unknown, TClient extends Idl = Idl> = {

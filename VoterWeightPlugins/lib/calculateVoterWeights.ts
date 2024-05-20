@@ -19,6 +19,7 @@ type CalculateMaxVoterWeightParams = {
     governanceMintPublicKey: PublicKey
     plugins: VoterWeightPluginInfo[],
     mintInfo: MintInfo,
+    configuredMaxVoteWeight: BN,
     useOnChainWeight?: boolean
 }
 
@@ -100,12 +101,19 @@ export const calculateMaxVoterWeight = async ({
      governanceMintPublicKey,
      plugins,
      mintInfo,
+     configuredMaxVoteWeight
 }: CalculateMaxVoterWeightParams): Promise<CalculatedWeight> => {
-    const tokenSupply = mintInfo?.supply
+    console.log('calculateMaxVoterWeight', {
+        realm: realmPublicKey.toString(),
+        mint: governanceMintPublicKey.toString(),
+        plugins: plugins.map(p => p.name),
+        supply: mintInfo?.supply.toString(),
+        configuredMax: configuredMaxVoteWeight.toString()
+    });
 
     const startingWeight: CalculatedWeight = {
-        value: tokenSupply,
-        initialValue: tokenSupply,
+        value: configuredMaxVoteWeight,
+        initialValue: configuredMaxVoteWeight,
         details: []
     };
 

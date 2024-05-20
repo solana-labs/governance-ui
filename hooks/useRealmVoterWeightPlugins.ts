@@ -81,6 +81,7 @@ export const useRealmVoterWeightPlugins = (
     realmPublicKey: realm?.pubkey,
     governanceMintPublicKey,
     walletPublicKeys,
+    realmConfig: realm?.account.config,
   })
 
   const totalCalculatedVoterWeight = nonAggregatedResult.calculatedVoterWeights?.length ? nonAggregatedResult.calculatedVoterWeights?.reduce(
