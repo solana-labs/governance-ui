@@ -123,7 +123,13 @@ export class VotingClient {
     createNftActionTicketIxs?: TransactionInstruction[],
     target? : PublicKey
   ): Promise<ProgramAddresses | undefined> => {
-    if (!this.walletPk) return undefined;
+    // nothing to do if no wallet is connected, or no plugins are attached to this realm
+    if (
+        !this.walletPk ||
+        !this.voterWeightPluginDetails.plugins ||
+        (this.voterWeightPluginDetails.plugins.voterWeight.length === 0
+        && this.voterWeightPluginDetails.plugins.maxVoterWeight.length === 0)
+    ) return undefined;
 
     const {pre: preIxes, post: postIxes} = await this.voterWeightPluginDetails.updateVoterWeightRecords(this.walletPk, convertTypeToVoterWeightAction(type), target)
     instructions.push(...preIxes);
