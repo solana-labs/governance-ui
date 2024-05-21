@@ -471,7 +471,7 @@ export class SimpleGatedVoterWeight implements VoterWeightInterface {
 }
 
 /** Returns max VoteWeight for given mint and max source */
-function getMintMaxVoteWeight(
+export function getMintMaxVoteWeight(
   mint: MintInfo,
   maxVoteWeightSource: MintMaxVoteWeightSource
 ) {

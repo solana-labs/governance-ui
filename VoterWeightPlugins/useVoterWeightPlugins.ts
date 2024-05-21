@@ -77,6 +77,7 @@ export const useVoterWeightPlugins = (
     ...args,
     plugins: plugins?.maxVoterWeight,
     mintInfo,
+    realmConfig: args.realmConfig
   })
   const pks = useVoterWeightPks({
     ...args,
