@@ -3572,5 +3572,15 @@
     "twitter": "@DriftProtocol",
     "discord": "http://discord.com/invite/drifting",
     "github": "https://github.com/drift-labs/protocol-v2"
-  }
+  },
+  {
+    "symbol": "GREED",
+    "bannerImage": "https://i.imgur.com/i1gGoIw.jpg",
+    "displayName": "The $GREED Experiment",
+    "programId": "GovRp7uazvmYkQ7gqjdfjKFwr6pHDcYFWH3SP9DHzdtR",
+    "realmId": "8KG5Z3thhSwQCVWdnNdPZV5JQJya2gNaBELjLA8xhEcs",
+    "ogImage": "/realms/The%20%24GREED%20Experiment/The_%24GREED_Experiment_logo.png",
+    "website": "https://x.com/voshy",
+    "twitter": "@voshy"
+  },
 ]
