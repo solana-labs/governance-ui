@@ -45,4 +45,7 @@ export const useVoterWeightPks = (args: Args): UseAsyncReturn<{
             voterWeightPks,
             maxVoterWeightPk
         }
-    }, []);
+    }, [
+        args.plugins?.length,
+        args.walletPublicKeys?.map((pk) => pk.toBase58()).join(','),
+      ])
