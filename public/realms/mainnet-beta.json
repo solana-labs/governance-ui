@@ -1,18 +1,5 @@
 [
   {
-    "symbol": "Advocat",
-    "displayName": "Advocat Dao",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "6EDtfGKVh5vUuPJ1Tf4KLCLoH6JCmFhcBjQDs84ZuhQz",
-    "communityMint": "FxwbKC8s3dq8kkwJyHN5KEwDuhzawgfTmWRnfnX6jBho",
-    "ogImage": "/realms/Advocat/AdvocatDEV.png",
-    "bannerImage": "/realms/Advocat/AdvocatBusiness.png",
-    "shortDescription": "Community Governance of the Advocat Campaign for Solana.",
-    "website": "https://advocat.live",
-    "keywords": "Advocat, Solana, Meme, DAO, Crypto, Community, REALM, Governance, SOL, SPL, Support, Cat, Coin",
-    "twitter": "@notacatcoin"
-  },
-  {
     "symbol": "CAS",
     "displayName": "Cyborg Ape Society",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -3595,4 +3582,17 @@
     "website": "https://x.com/voshy",
     "twitter": "@voshy"
   }
+  { "symbol": "Advocat",
+
+    "displayName": "Advocat DAO",
+
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+
+    "realmId": "6EDtfGKVh5vUuPJ1Tf4KLCLoH6JCmFhcBjQDs84ZuhQz",
+
+    "ogImage": "/realms/Advocat/AdvocatDEV.png",
+
+    "website": "https://advocat.live",
+
+    "twitter": "@notacatcoin" },
 ]
