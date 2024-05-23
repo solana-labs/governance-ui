@@ -8,11 +8,10 @@
     "ogImage": "/realms/Advocat/AdvocatDEV.png",
     "bannerImage": "/realms/Advocat/AdvocatBusiness.png",
     "shortDescription": "Community Governance of the Advocat Campaign for Solana.",
-    "sortRank": -1000,
     "website": "https://Advocat.live",
     "keywords": "Advocat, Solana, Meme, DAO, Crypto, Community, REALM, Governance, SOL, SPL, Support, Cat, Coin",
     "twitter": "@notacatcoin"
-  }
+  },
   {
     "symbol": "CAS",
     "displayName": "Cyborg Ape Society",
