@@ -3578,7 +3578,8 @@
     "displayName": "The $GREED Experiment",
     "programId": "GovRp7uazvmYkQ7gqjdfjKFwr6pHDcYFWH3SP9DHzdtR",
     "realmId": "8KG5Z3thhSwQCVWdnNdPZV5JQJya2gNaBELjLA8xhEcs",
-    "ogImage": "/realms/The%20%24GREED%20Experiment/The_%24GREED_Experiment_logo.png",
+    "ogImage": "https://cdn.blastctrl.com/greed/dao_logo.png",
+    "bannerImage": "https://cdn.blastctrl.com/greed/dao_banner.png",
     "website": "https://x.com/voshy",
     "twitter": "@voshy"
   }
