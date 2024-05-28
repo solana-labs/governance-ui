@@ -4,6 +4,7 @@ import {
   I80F48,
   OPENBOOK_PROGRAM_ID,
   RouteInfo,
+  USDC_MINT,
   toNative,
   toUiDecimals,
   toUiDecimalsForQuote,
@@ -16,7 +17,6 @@ import {
   getPresetWithAdjustedDepositLimit,
 } from '@blockworks-foundation/mango-v4-settings/lib/helpers/listingTools'
 import { AnchorProvider, BN, Program, Wallet } from '@coral-xyz/anchor'
-import { MAINNET_USDC_MINT } from '@foresight-tmp/foresight-sdk/dist/consts'
 import { Market } from '@project-serum/serum'
 import { PythHttpClient, parsePriceData } from '@pythnetwork/client'
 import {
@@ -295,67 +295,67 @@ export const getSuggestedCoinPresetInfo = async (outputMint: string) => {
 
     const swaps = await Promise.all([
       fetchJupiterRoutes(
-        MAINNET_USDC_MINT.toBase58(),
+        USDC_MINT.toBase58(),
         outputMint,
         toNative(250000, 6).toNumber()
       ),
       fetchJupiterRoutes(
-        MAINNET_USDC_MINT.toBase58(),
+        USDC_MINT.toBase58(),
         outputMint,
         toNative(100000, 6).toNumber()
       ),
       fetchJupiterRoutes(
-        MAINNET_USDC_MINT.toBase58(),
+        USDC_MINT.toBase58(),
         outputMint,
         toNative(20000, 6).toNumber()
       ),
       fetchJupiterRoutes(
-        MAINNET_USDC_MINT.toBase58(),
+        USDC_MINT.toBase58(),
         outputMint,
         toNative(10000, 6).toNumber()
       ),
       fetchJupiterRoutes(
-        MAINNET_USDC_MINT.toBase58(),
+        USDC_MINT.toBase58(),
         outputMint,
         toNative(5000, 6).toNumber()
       ),
       fetchJupiterRoutes(
-        MAINNET_USDC_MINT.toBase58(),
+        USDC_MINT.toBase58(),
         outputMint,
         toNative(1000, 6).toNumber()
       ),
       fetchJupiterRoutes(
-        MAINNET_USDC_MINT.toBase58(),
+        USDC_MINT.toBase58(),
         outputMint,
         toNative(250000, 6).toNumber(),
         'ExactOut'
       ),
       fetchJupiterRoutes(
-        MAINNET_USDC_MINT.toBase58(),
+        USDC_MINT.toBase58(),
         outputMint,
         toNative(100000, 6).toNumber(),
         'ExactOut'
       ),
       fetchJupiterRoutes(
-        MAINNET_USDC_MINT.toBase58(),
+        USDC_MINT.toBase58(),
         outputMint,
         toNative(20000, 6).toNumber(),
         'ExactOut'
       ),
       fetchJupiterRoutes(
-        MAINNET_USDC_MINT.toBase58(),
+        USDC_MINT.toBase58(),
         outputMint,
         toNative(20000, 6).toNumber(),
         'ExactOut'
       ),
       fetchJupiterRoutes(
-        MAINNET_USDC_MINT.toBase58(),
+        USDC_MINT.toBase58(),
         outputMint,
         toNative(5000, 6).toNumber(),
         'ExactOut'
       ),
       fetchJupiterRoutes(
-        MAINNET_USDC_MINT.toBase58(),
+        USDC_MINT.toBase58(),
         outputMint,
         toNative(1000, 6).toNumber(),
         'ExactOut'
