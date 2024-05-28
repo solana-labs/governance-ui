@@ -79,7 +79,7 @@ export const STAKE_INSTRUCTIONS = {
             BufferLayout.u8('hasCustodian'),
             //add custodian field if needed
           ])
-          //decode
+          // decode
           const data = layout.decode(Buffer.from(_data))
           const accData = await _connection.getParsedAccountInfo(
             _accounts[0].pubkey
