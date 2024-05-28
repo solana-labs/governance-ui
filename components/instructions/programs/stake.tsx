@@ -79,9 +79,17 @@ export const STAKE_INSTRUCTIONS = {
           //add custodian field if needed
         ])
         const data = layout.decode(Buffer.from(_data))
-
+        const accData = await _connection.getParsedAccountInfo(
+          _accounts[0].pubkey
+        )
+        const stakeMeta = accData.value?.data['parsed'].info.meta
         return (
           <>
+            <div className="mb-3">
+              <div>staker: {stakeMeta.authorized.staker}</div>
+              <div>withdraw authority: {stakeMeta.authorized.staker}</div>
+              <div>lockup authority: {stakeMeta.lockup.custodian}</div>
+            </div>
             <div>
               Unlock date:{' '}
               {dayjs.unix(data.unixTimestamp).format('DD-MM-YYYY HH:mm')}
