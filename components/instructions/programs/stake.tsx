@@ -86,9 +86,9 @@ export const STAKE_INSTRUCTIONS = {
               Unlock date:{' '}
               {dayjs.unix(data.unixTimestamp).format('DD-MM-YYYY HH:mm')}
             </div>
-            {(data.hasEpoch !== 0 || data.hasCustodian !== 0) && (
-              <div className="text-red">
-                Warning detected epoch or custodian change
+            {(data.hasEpoch !== 1 || data.hasCustodian !== 0) && (
+              <div className="text-red mt-3">
+                Warning! detected epoch or custodian change
               </div>
             )}
           </>
