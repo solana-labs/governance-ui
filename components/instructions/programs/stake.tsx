@@ -86,9 +86,9 @@ export const STAKE_INSTRUCTIONS = {
         return (
           <>
             <div className="mb-3">
-              <div>staker: {stakeMeta.authorized.staker}</div>
-              <div>withdraw authority: {stakeMeta.authorized.staker}</div>
-              <div>lockup authority: {stakeMeta.lockup.custodian}</div>
+              <div>Staker: {stakeMeta.authorized.staker}</div>
+              <div>Withdraw authority: {stakeMeta.authorized.staker}</div>
+              <div>Lockup authority: {stakeMeta.lockup.custodian}</div>
             </div>
             <div>
               Unlock date:{' '}
