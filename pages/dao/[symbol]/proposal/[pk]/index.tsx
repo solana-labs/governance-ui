@@ -39,12 +39,14 @@ import { CalendarAdd } from '@carbon/icons-react'
 import Modal from '@components/Modal'
 import dayjs from 'dayjs'
 import { useConnection } from '@solana/wallet-adapter-react'
+import { useTokenOwnerRecordsForRealmQuery } from '@hooks/queries/tokenOwnerRecord'
 
 const Proposal = () => {
   const { realmInfo, symbol } = useRealm()
   const proposal = useRouteProposalQuery().data?.result
   const governance = useProposalGovernanceQuery().data?.result
-  const {connection} = useConnection()
+  const { data: tors } = useTokenOwnerRecordsForRealmQuery()
+  const { connection } = useConnection()
   const descriptionLink = proposal?.account.descriptionLink
   const allowDiscussion = realmInfo?.allowDiscussion ?? true
   const isMulti =
@@ -78,6 +80,12 @@ const Proposal = () => {
       setDescription('')
     }
   }, [descriptionLink])
+
+  const proposedBy =
+    proposal &&
+    tors
+      ?.find((x) => x.pubkey.equals(proposal.account.tokenOwnerRecord))
+      ?.account.governingTokenOwner.toBase58()
 
   const { fmtUrlWithCluster } = useQueryContext()
   const showTokenBalance = proposal
@@ -115,7 +123,11 @@ const Proposal = () => {
                 <a
                   href={`https://${getRealmExplorerHost(
                     realmInfo
-                  )}/account/${proposal.pubkey.toBase58()}${connection.rpcEndpoint.includes("devnet") ? "?cluster=devnet" : ""}`}
+                  )}/account/${proposal.pubkey.toBase58()}${
+                    connection.rpcEndpoint.includes('devnet')
+                      ? '?cluster=devnet'
+                      : ''
+                  }`}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
@@ -132,6 +144,16 @@ const Proposal = () => {
                 </h1>
                 <ProposalStateBadge proposal={proposal.account} />
               </div>
+              {proposedBy && (
+                <p className="text-[10px]">
+                  Proposed by:{' '}
+                  {tors
+                    ?.find((x) =>
+                      x.pubkey.equals(proposal.account.tokenOwnerRecord)
+                    )
+                    ?.account.governingTokenOwner.toBase58()}
+                </p>
+              )}
             </div>
 
             {description && (

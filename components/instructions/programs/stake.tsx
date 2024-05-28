@@ -1,6 +1,7 @@
 import { Connection, LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { AccountMetaData } from '@solana/spl-governance'
 import * as BufferLayout from '@solana/buffer-layout'
+import dayjs from 'dayjs'
 
 export const STAKE_INSTRUCTIONS = {
   Stake11111111111111111111111111111111111111: {
@@ -58,6 +59,40 @@ export const STAKE_INSTRUCTIONS = {
         _accounts: AccountMetaData[]
       ) => {
         return <></>
+      },
+    },
+    6: {
+      name: 'Stake Program - Unlock',
+      accounts: [{ name: 'Stake Account' }, { name: 'Vote Account' }],
+      getDataUI: async (
+        _connection: Connection,
+        _data: Uint8Array,
+        _accounts: AccountMetaData[]
+      ) => {
+        const layout = BufferLayout.struct<any['Unlock']>([
+          BufferLayout.u32('instruction'),
+          BufferLayout.u8('hasUnixTimestamp'),
+          BufferLayout.ns64('unixTimestamp'),
+          BufferLayout.u8('hasEpoch'),
+          //add epoch field if needed
+          BufferLayout.u8('hasCustodian'),
+          //add custodian field if needed
+        ])
+        const data = layout.decode(Buffer.from(_data))
+
+        return (
+          <>
+            <div>
+              Unlock date:{' '}
+              {dayjs.unix(data.unixTimestamp).format('DD-MM-YYYY HH:mm')}
+            </div>
+            {(data.hasEpoch !== 0 || data.hasCustodian !== 0) && (
+              <div className="text-red">
+                Warning detected epoch or custodian change
+              </div>
+            )}
+          </>
+        )
       },
     },
   },
