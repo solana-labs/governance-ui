@@ -4,7 +4,6 @@ import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import { HELIUM_VSR_PLUGINS_PKS, VSR_PLUGIN_PKS } from '../constants/plugins'
 import { useRealmQuery } from './queries/realm'
 import { useRealmConfigQuery } from './queries/realmConfig'
-import { useRouter } from 'next/router'
 import { useRealmGovernancesQuery } from './queries/governance'
 import { useMemo } from 'react'
 import { useRealmVoterWeights } from '@hooks/useRealmVoterWeightPlugins'
@@ -44,7 +43,6 @@ export type InstructionType = {
 export default function useGovernanceAssets() {
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
-  const { symbol } = useRouter().query
   const { communityWeight, councilWeight } = useRealmVoterWeights()
   const ownVoterWeights = {
     community: communityWeight?.value,
@@ -151,11 +149,6 @@ export default function useGovernanceAssets() {
     },
     [PackageEnum.Distribution]: {
       name: 'Distribution Program',
-    },
-    [PackageEnum.Foresight]: {
-      name: 'Foresight',
-      isVisible: symbol === 'FORE',
-      image: '/img/foresight.png',
     },
     [PackageEnum.GatewayPlugin]: {
       name: 'Civic Plugin',
@@ -420,39 +413,6 @@ export default function useGovernanceAssets() {
       name: 'Delegate',
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Dual,
-    },
-
-    /*
-      ███████  ██████  ██████  ███████ ███████ ██  ██████  ██   ██ ████████
-      ██      ██    ██ ██   ██ ██      ██      ██ ██       ██   ██    ██
-      █████   ██    ██ ██████  █████   ███████ ██ ██   ███ ███████    ██
-      ██      ██    ██ ██   ██ ██           ██ ██ ██    ██ ██   ██    ██
-      ██       ██████  ██   ██ ███████ ███████ ██  ██████  ██   ██    ██
-    */
-
-    [Instructions.ForesightAddMarketListToCategory]: {
-      name: 'Add Market List To Category',
-      packageId: PackageEnum.Foresight,
-    },
-    [Instructions.ForesightInitCategory]: {
-      name: 'Init Category',
-      packageId: PackageEnum.Foresight,
-    },
-    [Instructions.ForesightInitMarket]: {
-      name: 'Init Market',
-      packageId: PackageEnum.Foresight,
-    },
-    [Instructions.ForesightInitMarketList]: {
-      name: 'Init Market List',
-      packageId: PackageEnum.Foresight,
-    },
-    [Instructions.ForesightResolveMarket]: {
-      name: 'Resolve Market',
-      packageId: PackageEnum.Foresight,
-    },
-    [Instructions.ForesightSetMarketMetadata]: {
-      name: 'Set Market Metadata',
-      packageId: PackageEnum.Foresight,
     },
 
     /*

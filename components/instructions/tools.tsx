@@ -22,10 +22,8 @@ import { VOTE_STAKE_REGISTRY_INSTRUCTIONS } from './programs/voteStakeRegistry'
 import { MARINADE_INSTRUCTIONS } from './programs/marinade'
 import { SOLEND_PROGRAM_INSTRUCTIONS } from './programs/solend'
 import { ATA_PROGRAM_INSTRUCTIONS } from './programs/associatedTokenAccount'
-import { governance as foresightGov } from '@foresight-tmp/foresight-sdk'
 import { ConnectionContext } from '@utils/connection'
 import { NFT_VOTER_INSTRUCTIONS } from './programs/nftVotingClient'
-import { FORESIGHT_INSTRUCTIONS } from './programs/foresight'
 import { LIDO_INSTRUCTIONS } from './programs/lido'
 import { NAME_SERVICE_INSTRUCTIONS } from './programs/nameService'
 import { TOKEN_AUCTION_INSTRUCTIONS } from './programs/tokenAuction'
@@ -107,8 +105,6 @@ export const ACCOUNT_NAMES = {
   MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac: 'MNGO Token Mint',
   H7uqouPsJkeEiLpCEoC1qYVVquDrZan6ZfdPK2gS44zm: 'FORE Devnet Token Mint',
   '4ahVJVavHM8DZCtjX6YuKSTFx6KJwRPmVCJtjdQYdUU7': 'FORE Mainnet Token Mint',
-  [foresightGov.DEVNET_TREASURY.toBase58()]: 'Foresight Devnet Governance',
-  [foresightGov.MAINNET_TREASURY.toBase58()]: 'Foresight Mainnet Governance',
   EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: 'USDC Token Mint',
 
   MyHd6a7HWKTMeJMHBkrbMq4hZwZxwn9x7dxXcopQ4Wd: 'OMH Token',
@@ -488,7 +484,6 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...LIDO_INSTRUCTIONS,
   ...SWITCHBOARD_INSTRUCTIONS,
   ...SOLEND_PROGRAM_INSTRUCTIONS,
-  ...FORESIGHT_INSTRUCTIONS,
   ...ATA_PROGRAM_INSTRUCTIONS,
   ...SYSTEM_INSTRUCTIONS,
   ...VOTE_STAKE_REGISTRY_INSTRUCTIONS,
