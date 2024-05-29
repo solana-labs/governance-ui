@@ -3582,5 +3582,15 @@
     "bannerImage": "https://cdn.blastctrl.com/greed/dao_banner.png",
     "website": "https://x.com/voshy",
     "twitter": "@voshy"
+  },
+  {
+    "symbol": "GUAC",
+    "displayName": "The Guacamole AvocaDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Ha56K8MGrJuiJSyK2UaYRpAf7Hu2BZw2XALEmW9EQemu",
+    "ogImage": "/realms/Guacamole/Guacamole_Token_Logo_Green.png",
+    "bannerImage": "/realms/Guacamole/Guacamole_Banner.png",
+    "website": "https://guac.gg",
+    "twitter": "@guac_gg"
   }
 ]
