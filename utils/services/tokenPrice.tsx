@@ -4,9 +4,9 @@ import { mergeDeepRight } from 'ramda'
 import { notify } from '@utils/notifications'
 import { WSOL_MINT } from '@components/instructions/tools'
 import overrides from 'public/realms/token-overrides.json'
-import { MAINNET_USDC_MINT } from '@foresight-tmp/foresight-sdk/dist/consts'
 import { Price, TokenInfo } from './types'
 import { chunks } from '@utils/helpers'
+import { USDC_MINT } from '@blockworks-foundation/mango-v4'
 
 //this service provide prices it is not recommended to get anything more from here besides token name or price.
 //decimals from metadata can be different from the realm on chain one
@@ -75,13 +75,13 @@ class TokenPriceService {
           })
         }
       }
-      const USDC_MINT = MAINNET_USDC_MINT.toBase58()
-      if (!this._tokenPriceToUSDlist[USDC_MINT]) {
-        this._tokenPriceToUSDlist[USDC_MINT] = {
-          id: USDC_MINT,
+      const USDC_MINT_BASE = USDC_MINT.toBase58()
+      if (!this._tokenPriceToUSDlist[USDC_MINT_BASE]) {
+        this._tokenPriceToUSDlist[USDC_MINT_BASE] = {
+          id: USDC_MINT_BASE,
           mintSymbol: 'USDC',
           price: 1,
-          vsToken: USDC_MINT,
+          vsToken: USDC_MINT_BASE,
           vsTokenSymbol: 'USDC',
         }
       }

@@ -1,5 +1,4 @@
 import { PublicKey } from '@solana/web3.js'
-import { consts as foresightConsts } from '@foresight-tmp/foresight-sdk/'
 import {
   LIDO_PROGRAM_ID,
   LIDO_PROGRAM_ID_DEVNET,
@@ -63,7 +62,6 @@ const PROGRAM_NAMES = {
     'Raydium Voter Stake Registry Program',
   VoteMBhDCqGLRgYpp9o7DGyq81KNmwjXQRAHStjtJsS:
     'Marinade Voter Stake Registry Program',
-  [foresightConsts.PROGRAM_ID]: 'Foresight Dex',
   [NAME_PROGRAM_ID.toBase58()]: 'Solana Name Service Program',
   AwyKDr1Z5BfdvK3jX1UWopyjsJSV5cq4cuJpoYLofyEn: 'Validator Dao',
   Stake11111111111111111111111111111111111111: 'Stake Program',
