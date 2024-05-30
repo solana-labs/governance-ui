@@ -36,7 +36,9 @@ const DiscussionForm = () => {
   const proposal = useRouteProposalQuery().data?.result
   const tokenRole = useVotingPop()
   const commenterVoterTokenRecord =
-    tokenRole === 'community' ? ownTokenRecord : ownCouncilTokenRecord
+    tokenRole === 'community' ? 
+      ownTokenRecord ?? ownCouncilTokenRecord : 
+      ownCouncilTokenRecord
 
   const votingClient = votingClients(tokenRole ?? 'community');// default to community if no role is provided
   const submitComment = async () => {
@@ -71,7 +73,7 @@ const DiscussionForm = () => {
         commenterVoterTokenRecord,
         msg,
         undefined,
-        votingClient
+        ownTokenRecord ? votingClient : undefined // use votingClient only if the community TOR is used for commenting
       )
 
       setComment('')
