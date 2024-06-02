@@ -324,6 +324,7 @@ export function VotingStructureSelector(props: Props) {
         {isQVConfig(props.structure) && (
           <QVConfigurator
             className="mt-2"
+            currentCoefficients={props.currentStructure.qvCoefficients}
             onCoefficientsChange={(value) => {
               const newConfig = produce({ ...props.structure }, (data) => {
                 data.qvCoefficients = value ?? undefined;
