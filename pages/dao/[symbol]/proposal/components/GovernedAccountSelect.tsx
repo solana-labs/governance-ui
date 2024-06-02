@@ -34,7 +34,7 @@ import MintIcon from '@components/treasuryV2/icons/MintIcon'
 import { getAccountName } from '@components/instructions/tools'
 
 function exists<T>(item: T | null | undefined): item is T {
-  return item !== null || item !== undefined
+  return item !== null && item !== undefined
 }
 
 function RulesPill(props: { icon: JSX.Element; value: string; label: string }) {
