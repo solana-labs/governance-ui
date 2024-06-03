@@ -1,6 +1,6 @@
 export enum Status {
   /**
-   * The Result has completed, but an error has occured
+   * The Result has completed, but an error has occurred
    */
   Failed,
   /**
@@ -18,12 +18,12 @@ export enum Status {
 }
 
 /**
- * The Result has completed, but an error has occured
+ * The Result has completed, but an error has occurred
  */
 export interface Failed<E extends Error> {
   _tag: Status.Failed;
   /**
-   * The error that has occured
+   * The error that has occurred
    */
   error: E;
 }
