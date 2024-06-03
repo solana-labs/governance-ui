@@ -3582,5 +3582,16 @@
     "bannerImage": "https://cdn.blastctrl.com/greed/dao_banner.png",
     "website": "https://x.com/voshy",
     "twitter": "@voshy"
+  },
+  {
+    "symbol": "CHINGON",
+    "bannerImage": "https://imgur.com/1QKahef",
+    "displayName": "Mexico Chingon",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "CJmgp9zNXkHpnM9kUbxSJ2ykSHQCP8BncPRSp3DQVYqg",
+    "ogImage": "https://imgur.com/QbaIY2h",
+    "shortDescription": "CHINGON es la criptomoneda de la comunidad Mexicana",
+    "website": "https://chingon.live/",
+    "twitter": "@Mexico_chingon"
   }
 ]
