@@ -3584,14 +3584,19 @@
     "twitter": "@voshy"
   },
   {
-    "symbol": "SIRIUS",
+     "symbol": "SIRIUS",
+    "category": "DAO, gaming, NFT, Metaverse, Community",
+    "bannerImage": "https://imgur.com/a/LQIYrBV.png",
     "displayName": "DAO SIRIUS",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "8C3arQQuCNrXXhd2enowg8d5gR9ee7TdQXqE7x3aW2sm",
-    "ogImage": "https://github.com/AL3X3R/governance-ui/blob/main/public/realms/DAO_Sirius_Logo_mini_blk-removebg-preview-transformed (1).png",
-    "bannerImage": "https://github.com/AL3X3R/governance-ui/blob/main/public/realms/826b7b65-3fb9-44ae-a660-de3fddebba3f-3401969726-146498628.jpg",
-    "website": "https://x.com/daosirius",
-    "twitter": "@daosirius"
+    "ogImage": "https://imgur.com/a/9zfgc5V.png",
+    "shortDescription": "Decentralized Autonomous Organization focused on the creation and administration of a Space Fleet on Star Atlas Solana Project",
+    "sortRank": 3,
+    "website": "https://twitter.com/daosirius",
+    "twitter": "@daosirius",
+    "discord": "https://discord.gg/N8ySbF53ZM",
+    "github": "https://github.com/staratlasmeta/"
   },
   { 
     "symbol": "Advocat",
