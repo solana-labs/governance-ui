@@ -3592,5 +3592,15 @@
     "bannerImage": "https://github.com/AL3X3R/governance-ui/blob/main/public/realms/826b7b65-3fb9-44ae-a660-de3fddebba3f-3401969726-146498628.jpg",
     "website": "https://x.com/daosirius",
     "twitter": "@daosirius"
+  },
+  { 
+    "symbol": "Advocat",
+    "displayName": "Advocat DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "FDZPbcWoPfeVZxKev7syLPA7RNiEbK8wW5upW7KnMcSY",
+    "ogImage": "/realms/Advocat/logo.png",
+    "bannerImage": "/realms/Advocat/AdvocatBusiness.png",
+    "website": "https://advocat.live",
+    "twitter": "@notacatcoin" 
   }
-]
+
