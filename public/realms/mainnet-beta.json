@@ -3584,7 +3584,7 @@
     "twitter": "@voshy"
   },
   {
-     "symbol": "SIRIUS",
+    "symbol": "SIRIUS",
     "category": "DAO, gaming, NFT, Metaverse, Community",
     "bannerImage": "https://imgur.com/a/LQIYrBV.png",
     "displayName": "DAO SIRIUS",
@@ -3595,8 +3595,7 @@
     "sortRank": 3,
     "website": "https://twitter.com/daosirius",
     "twitter": "@daosirius",
-    "discord": "https://discord.gg/N8ySbF53ZM",
-    "github": "https://github.com/staratlasmeta/"
+    "discord": "https://discord.gg/N8ySbF53ZM"
   },
   { 
     "symbol": "Advocat",
@@ -3606,6 +3605,6 @@
     "ogImage": "/realms/Advocat/logo.png",
     "bannerImage": "/realms/Advocat/AdvocatBusiness.png",
     "website": "https://advocat.live",
-    "twitter": "@notacatcoin" 
+    "twitter": "@notacatcoin"
     ]
 
