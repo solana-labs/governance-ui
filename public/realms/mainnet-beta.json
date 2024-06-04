@@ -3591,4 +3591,14 @@
     "bannerImage": "/realms/Advocat/AdvocatBusiness.png",
     "website": "https://advocat.live",
     "twitter": "@notacatcoin" }
+  },
+  { 
+    "symbol": "SIRIUS",
+    "displayName": "DAO SIRIUS",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "8C3arQQuCNrXXhd2enowg8d5gR9ee7TdQXqE7x3aW2sm",
+    "ogImage": "https://imgur.com/a/9zfgc5V.png",
+    "bannerImage": "https://imgur.com/gallery/dao-sirius-LQIYrBV.png",
+    "website": "https://x.com/daosirius",
+    "twitter": "@daosirius" },
 ]
