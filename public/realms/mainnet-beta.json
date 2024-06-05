@@ -3583,6 +3583,16 @@
     "website": "https://x.com/voshy",
     "twitter": "@voshy"
   },
+  {
+    "symbol": "GUAC",
+    "displayName": "The Guacamole AvocaDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Ha56K8MGrJuiJSyK2UaYRpAf7Hu2BZw2XALEmW9EQemu",
+    "ogImage": "/realms/Guacamole/Guacamole_Token_Logo_Green.png",
+    "bannerImage": "/realms/Guacamole/Guacamole_Banner.png",
+    "website": "https://guac.gg",
+    "twitter": "@guac_gg"
+  },
   { "symbol": "Advocat",
     "displayName": "Advocat DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -3590,5 +3600,6 @@
     "ogImage": "/realms/Advocat/logo.png",
     "bannerImage": "/realms/Advocat/AdvocatBusiness.png",
     "website": "https://advocat.live",
-    "twitter": "@notacatcoin" }
+    "twitter": "@notacatcoin" 
+  }
 ]
