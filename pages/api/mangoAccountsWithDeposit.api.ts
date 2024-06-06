@@ -51,6 +51,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       .map((x) => ({
         mangoAccount: x.publicKey.toBase58(),
         wallet: x.owner.toBase58(),
+        amount: x.getTokenBalanceUi(bankForMint[0]),
       }))
 
     res.status(200).json(usersWithNonZeroBalance)
