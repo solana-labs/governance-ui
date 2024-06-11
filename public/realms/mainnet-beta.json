@@ -127,6 +127,15 @@
     "communityMint": "A5tGJvsUpehqSzzWY2whuPfBvBXTRQsUCDcjZ2HC479m"
   },
   {
+    "symbol": "NLDAO",
+    "ogImage": "https://arweave.net/SEOxljn_3ij0m9Rzp06l3SBJ692TdQcCsX7oFvx-jfs",
+    "category": "legal",
+    "displayName": "Nous Legal DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Hyi8vJopSGFa36uF1rdvjvG5yptAcFWYTxqr2YF3hA8j",
+    "communityMint": "Fj1tPZzgBnsbQMWgJM3CNjM8NZ9XHED7hhnHTN6GNZAF"
+  },
+  {
     "symbol": "XAND",
     "category": "defi",
     "displayName": "Xandeum DAO",
