@@ -15,6 +15,8 @@ const MyError = ({ statusCode, hasGetInitialPropsRun, err }) => {
 }
 
 MyError.getInitialProps = async (context) => {
+  await Sentry.captureUnderscoreErrorException(context)
+
   const errorInitialProps = await NextErrorComponent.getInitialProps(context)
 
   const { res, err, asPath } = context
@@ -47,7 +49,6 @@ MyError.getInitialProps = async (context) => {
     // Flushing before returning is necessary if deploying to Vercel, see
     // https://vercel.com/docs/platform/limits#streaming-responses
     await Sentry.flush(2000)
-
     return errorInitialProps
   }
 
