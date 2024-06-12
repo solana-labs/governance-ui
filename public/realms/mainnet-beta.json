@@ -3611,4 +3611,11 @@
     "website": "https://advocat.live",
     "twitter": "@notacatcoin" 
   }
+  { "symbol": "AntiBONK",
+"displayName": "AntiBONK Inu",
+"programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+"realmId": "B97gzPGfYtGxvGabeWYe4kqBXnViVj6EVgnKU2eUziq8",
+"ogImage": "/realms/AntiBONK/logo.png",
+"website": "https://www.antibonkcoin.com/",
+"twitter": "@antibonkinu" },
 ]
