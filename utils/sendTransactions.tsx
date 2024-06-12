@@ -115,12 +115,7 @@ export const sendTransactionsV3 = async ({
   }
 
   const cfg = {
-    maxTxesInBatch:
-      transactionInstructionsWithFee.filter(
-        (x) => x.sequenceType === SequenceType.Sequential
-      ).length > 0
-        ? 20
-        : 30,
+    maxTxesInBatch: 1,
     autoRetry: false,
     maxRetries: 5,
     retried: 0,
