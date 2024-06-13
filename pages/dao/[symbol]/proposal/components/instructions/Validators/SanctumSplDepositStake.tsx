@@ -10,21 +10,38 @@ import {
   PublicKey,
   StakeAuthorizationLayout,
   StakeProgram,
+  SystemProgram,
+  TransactionInstruction,
 } from '@solana/web3.js'
 
-import {
-  UiInstruction,
-  ValidatorDeactivateStakeForm,
-} from '@utils/uiTypes/proposalCreationTypes'
+import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
 import { web3 } from '@coral-xyz/anchor'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes'
-import { StakeAccount, StakeState } from '@utils/uiTypes/assets'
+import { AssetAccount, StakeAccount, StakeState } from '@utils/uiTypes/assets'
 import StakeAccountSelect from '../../StakeAccountSelect'
 import { getFilteredProgramAccounts } from '@utils/helpers'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import {
+  STAKE_POOL_INSTRUCTION_LAYOUTS,
+  getStakePoolAccount,
+} from '@solana/spl-stake-pool'
+import Input from '@components/inputs/Input'
+import { tryGetAta } from '@utils/validations'
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  TOKEN_PROGRAM_ID,
+  Token,
+} from '@solana/spl-token'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+
+type SanctumSplDepositStake = {
+  governedTokenAccount: AssetAccount | undefined
+  stakingAccount: StakeAccount | undefined
+  stakePool: string
+}
 
 const SanctumSplDepositStake = ({
   index,
@@ -33,14 +50,16 @@ const SanctumSplDepositStake = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
+  const wallet = useWalletOnePointOh()
   const connection = useLegacyConnectionContext()
   const programId: PublicKey = StakeProgram.programId
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)
 
-  const [form, setForm] = useState<ValidatorDeactivateStakeForm>({
+  const [form, setForm] = useState<SanctumSplDepositStake>({
     stakingAccount: undefined,
     governedTokenAccount: undefined,
+    stakePool: '9jWbABPXfc75wseAbLEkBCb1NRaX9EbJZJTDQnbtpzc1',
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -58,6 +77,12 @@ const SanctumSplDepositStake = ({
     handleSetForm({
       value: value,
       propertyName: 'stakingAccount',
+    })
+  }
+  const setStakePool = (value) => {
+    handleSetForm({
+      value: value,
+      propertyName: 'stakePool',
     })
   }
 
@@ -140,6 +165,8 @@ const SanctumSplDepositStake = ({
       console.log('Invalid form')
       return returnInvalid()
     }
+
+    const prequsiteInstructions: TransactionInstruction[] = []
     const instruction = web3.StakeProgram.authorize({
       stakePubkey: form.stakingAccount.stakeAccount,
       authorizedPubkey: form.governedTokenAccount.pubkey,
@@ -148,10 +175,85 @@ const SanctumSplDepositStake = ({
       ),
       stakeAuthorizationType: StakeAuthorizationLayout.Withdrawer,
     })
+    const stakePool = await getStakePoolAccount(
+      connection.current,
+      new PublicKey(form.stakePool)
+    )
+    const ataAddress = await Token.getAssociatedTokenAddress(
+      ASSOCIATED_TOKEN_PROGRAM_ID,
+      TOKEN_PROGRAM_ID,
+      stakePool.account.data.poolMint,
+      form.governedTokenAccount.pubkey,
+      true
+    )
+    const ataAccount = await tryGetAta(
+      connection.current,
+      stakePool.account.data.poolMint,
+      form.governedTokenAccount.pubkey
+    )
+    if (!ataAccount) {
+      prequsiteInstructions.push(
+        Token.createAssociatedTokenAccountInstruction(
+          ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+          TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+          stakePool.account.data.poolMint, // mint
+          ataAddress, // ata
+          form.governedTokenAccount.pubkey, // owner of token account
+          wallet!.publicKey! // fee payer
+        )
+      )
+    }
+
+    const type = STAKE_POOL_INSTRUCTION_LAYOUTS.DepositSol
+    const data = encodeData(type, {
+      lamports: stakePool.account.data.totalLamports.toNumber(),
+    })
+
+    const keys = [
+      { pubkey: stakePool.pubkey, isSigner: false, isWritable: true },
+      {
+        pubkey: new PublicKey('BKi84JsPEnXT4UBTZtET5h8Uf2y3qLWAnyAZXtMVNK1o'),
+        isSigner: false,
+        isWritable: false,
+      },
+      {
+        pubkey: stakePool.account.data.reserveStake,
+        isSigner: false,
+        isWritable: true,
+      },
+      {
+        pubkey: form.stakingAccount.stakeAccount,
+        isSigner: true,
+        isWritable: true,
+      },
+      { pubkey: ataAddress, isSigner: false, isWritable: true },
+      {
+        pubkey: new PublicKey('ERxpThUFmXstSEhWA4R6Uo7S3YvyPg1ZV1KAgtuK3p6t'),
+        isSigner: false,
+        isWritable: true,
+      },
+      { pubkey: ataAddress, isSigner: false, isWritable: true },
+      {
+        pubkey: stakePool.account.data.poolMint,
+        isSigner: false,
+        isWritable: true,
+      },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+      { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+    ]
+
+    const stakeix = new TransactionInstruction({
+      programId: new PublicKey('SP12tWFxD9oJsVWNavTTBZvMbA6gkAmxtVgxdqvyvhY'),
+      keys,
+      data,
+    })
+
     return {
-      serializedInstruction: serializeInstructionToBase64(
-        instruction.instructions[0]
-      ),
+      serializedInstruction: '',
+      additionalSerializedInstructions: [
+        serializeInstructionToBase64(instruction.instructions[0]),
+        serializeInstructionToBase64(stakeix),
+      ],
       isValid: true,
       governance: form.governedTokenAccount.governance,
     }
@@ -198,12 +300,20 @@ const SanctumSplDepositStake = ({
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
       ></GovernedAccountSelect>
+
       <StakeAccountSelect
         label="Staking Account"
         stakeAccounts={stakeAccounts}
         value={form.stakingAccount}
         error={formErrors['stakingAccount']}
         onChange={setStakingAccount}
+      />
+      <Input
+        label="Stake Pool"
+        value={form.stakePool}
+        error={formErrors['stakePool']}
+        type="text"
+        onChange={setStakePool}
       />
       <div
         style={{
@@ -220,3 +330,11 @@ const SanctumSplDepositStake = ({
 }
 
 export default SanctumSplDepositStake
+export function encodeData(type: any, fields?: any): Buffer {
+  const allocLength = type.layout.span
+  const data = Buffer.alloc(allocLength)
+  const layoutFields = Object.assign({ instruction: type.index }, fields)
+  type.layout.encode(layoutFields, data)
+
+  return data
+}
