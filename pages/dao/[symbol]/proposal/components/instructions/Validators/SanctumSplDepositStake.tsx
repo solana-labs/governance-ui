@@ -10,7 +10,6 @@ import {
   PublicKey,
   StakeAuthorizationLayout,
   StakeProgram,
-  SystemProgram,
   TransactionInstruction,
 } from '@solana/web3.js'
 
@@ -25,7 +24,7 @@ import StakeAccountSelect from '../../StakeAccountSelect'
 import { getFilteredProgramAccounts } from '@utils/helpers'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import {
-  STAKE_POOL_INSTRUCTION_LAYOUTS,
+  StakePoolInstruction,
   getStakePoolAccount,
 } from '@solana/spl-stake-pool'
 import Input from '@components/inputs/Input'
@@ -59,7 +58,7 @@ const SanctumSplDepositStake = ({
   const [form, setForm] = useState<SanctumSplDepositStake>({
     stakingAccount: undefined,
     governedTokenAccount: undefined,
-    stakePool: '9jWbABPXfc75wseAbLEkBCb1NRaX9EbJZJTDQnbtpzc1',
+    stakePool: 'BmEgS5XpWJJDqT3FVfB6ZmoELQrWkJxDXo3cNoJVsNFK',
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -167,14 +166,7 @@ const SanctumSplDepositStake = ({
     }
 
     const prequsiteInstructions: TransactionInstruction[] = []
-    const instruction = web3.StakeProgram.authorize({
-      stakePubkey: form.stakingAccount.stakeAccount,
-      authorizedPubkey: form.governedTokenAccount.pubkey,
-      newAuthorizedPubkey: new PublicKey(
-        'BKi84JsPEnXT4UBTZtET5h8Uf2y3qLWAnyAZXtMVNK1o'
-      ),
-      stakeAuthorizationType: StakeAuthorizationLayout.Withdrawer,
-    })
+
     const stakePool = await getStakePoolAccount(
       connection.current,
       new PublicKey(form.stakePool)
@@ -204,55 +196,61 @@ const SanctumSplDepositStake = ({
       )
     }
 
-    const type = STAKE_POOL_INSTRUCTION_LAYOUTS.DepositSol
-    const data = encodeData(type, {
-      lamports: stakePool.account.data.totalLamports.toNumber(),
+    const [withdrawAuthPk] = await PublicKey.findProgramAddress(
+      [new PublicKey(form.stakePool).toBuffer(), Buffer.from('withdraw')],
+      new PublicKey('SP12tWFxD9oJsVWNavTTBZvMbA6gkAmxtVgxdqvyvhY')
+    )
+    const [validatorStake] = await PublicKey.findProgramAddress(
+      [
+        new PublicKey(
+          'CNcaYdqkCwxDpKSVK8in5f6kqrTiZ5SuHsHFDqx6jNvu'
+        ).toBuffer(),
+        new PublicKey(form.stakePool).toBuffer(),
+      ],
+      new PublicKey('SP12tWFxD9oJsVWNavTTBZvMbA6gkAmxtVgxdqvyvhY')
+    )
+    const authorizeWithdrawIx = web3.StakeProgram.authorize({
+      stakePubkey: form.stakingAccount.stakeAccount,
+      authorizedPubkey: form.governedTokenAccount.pubkey,
+      newAuthorizedPubkey: stakePool.account.data.stakeDepositAuthority,
+      stakeAuthorizationType: StakeAuthorizationLayout.Withdrawer,
     })
+    console.log(authorizeWithdrawIx)
 
-    const keys = [
-      { pubkey: stakePool.pubkey, isSigner: false, isWritable: true },
-      {
-        pubkey: new PublicKey('BKi84JsPEnXT4UBTZtET5h8Uf2y3qLWAnyAZXtMVNK1o'),
-        isSigner: false,
-        isWritable: false,
-      },
-      {
-        pubkey: stakePool.account.data.reserveStake,
-        isSigner: false,
-        isWritable: true,
-      },
-      {
-        pubkey: form.stakingAccount.stakeAccount,
-        isSigner: true,
-        isWritable: true,
-      },
-      { pubkey: ataAddress, isSigner: false, isWritable: true },
-      {
-        pubkey: new PublicKey('ERxpThUFmXstSEhWA4R6Uo7S3YvyPg1ZV1KAgtuK3p6t'),
-        isSigner: false,
-        isWritable: true,
-      },
-      { pubkey: ataAddress, isSigner: false, isWritable: true },
-      {
-        pubkey: stakePool.account.data.poolMint,
-        isSigner: false,
-        isWritable: true,
-      },
-      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
-      { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
-    ]
-
-    const stakeix = new TransactionInstruction({
-      programId: new PublicKey('SP12tWFxD9oJsVWNavTTBZvMbA6gkAmxtVgxdqvyvhY'),
-      keys,
-      data,
+    const authorizeStakerIx = web3.StakeProgram.authorize({
+      stakePubkey: form.stakingAccount.stakeAccount,
+      authorizedPubkey: form.governedTokenAccount.pubkey,
+      newAuthorizedPubkey: stakePool.account.data.stakeDepositAuthority,
+      stakeAuthorizationType: StakeAuthorizationLayout.Staker,
+    })
+    const stakeIx = StakePoolInstruction.depositStake({
+      stakePool: new PublicKey(form.stakePool),
+      validatorList: stakePool.account.data.validatorList,
+      depositAuthority: stakePool.account.data.stakeDepositAuthority,
+      reserveStake: stakePool.account.data.reserveStake,
+      managerFeeAccount: stakePool.account.data.managerFeeAccount,
+      referralPoolAccount: ataAddress,
+      destinationPoolAccount: ataAddress,
+      withdrawAuthority: withdrawAuthPk,
+      depositStake: form.stakingAccount.stakeAccount,
+      validatorStake: validatorStake,
+      poolMint: stakePool.account.data.poolMint,
     })
 
     return {
       serializedInstruction: '',
       additionalSerializedInstructions: [
-        serializeInstructionToBase64(instruction.instructions[0]),
-        serializeInstructionToBase64(stakeix),
+        serializeInstructionToBase64(authorizeStakerIx.instructions[0]),
+        serializeInstructionToBase64(authorizeWithdrawIx.instructions[0]),
+        serializeInstructionToBase64(
+          new TransactionInstruction({
+            programId: new PublicKey(
+              'SP12tWFxD9oJsVWNavTTBZvMbA6gkAmxtVgxdqvyvhY'
+            ),
+            keys: stakeIx.keys,
+            data: stakeIx.data,
+          })
+        ),
       ],
       isValid: true,
       governance: form.governedTokenAccount.governance,
