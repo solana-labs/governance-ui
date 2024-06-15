@@ -8,6 +8,7 @@ import {
 
 import {
   PublicKey,
+  SYSVAR_CLOCK_PUBKEY,
   StakeAuthorizationLayout,
   StakeProgram,
   TransactionInstruction,
@@ -209,20 +210,20 @@ const SanctumSplDepositStake = ({
       ],
       new PublicKey('SP12tWFxD9oJsVWNavTTBZvMbA6gkAmxtVgxdqvyvhY')
     )
-    const authorizeWithdrawIx = web3.StakeProgram.authorize({
+    const authorizeWithdrawIx = StakeProgram.authorize({
       stakePubkey: form.stakingAccount.stakeAccount,
       authorizedPubkey: form.governedTokenAccount.pubkey,
       newAuthorizedPubkey: stakePool.account.data.stakeDepositAuthority,
       stakeAuthorizationType: StakeAuthorizationLayout.Withdrawer,
     })
-    console.log(authorizeWithdrawIx)
 
-    const authorizeStakerIx = web3.StakeProgram.authorize({
+    const authorizeStakerIx = StakeProgram.authorize({
       stakePubkey: form.stakingAccount.stakeAccount,
       authorizedPubkey: form.governedTokenAccount.pubkey,
       newAuthorizedPubkey: stakePool.account.data.stakeDepositAuthority,
       stakeAuthorizationType: StakeAuthorizationLayout.Staker,
     })
+
     const stakeIx = StakePoolInstruction.depositStake({
       stakePool: new PublicKey(form.stakePool),
       validatorList: stakePool.account.data.validatorList,
@@ -236,12 +237,35 @@ const SanctumSplDepositStake = ({
       validatorStake: validatorStake,
       poolMint: stakePool.account.data.poolMint,
     })
-
+    const modifiedAuthorize1 = {
+      ...authorizeStakerIx.instructions[0],
+      keys: authorizeStakerIx.instructions[0].keys.map((x) => {
+        if (x.pubkey.equals(SYSVAR_CLOCK_PUBKEY)) {
+          return {
+            ...x,
+            isWritable: false,
+          }
+        }
+        return x
+      }),
+    }
+    const modifiedAuthorize2 = {
+      ...authorizeWithdrawIx.instructions[0],
+      keys: authorizeWithdrawIx.instructions[0].keys.map((x) => {
+        if (x.pubkey.equals(SYSVAR_CLOCK_PUBKEY)) {
+          return {
+            ...x,
+            isWritable: false,
+          }
+        }
+        return x
+      }),
+    }
     return {
       serializedInstruction: '',
       additionalSerializedInstructions: [
-        serializeInstructionToBase64(authorizeStakerIx.instructions[0]),
-        serializeInstructionToBase64(authorizeWithdrawIx.instructions[0]),
+        serializeInstructionToBase64(modifiedAuthorize1),
+        serializeInstructionToBase64(modifiedAuthorize2),
         serializeInstructionToBase64(
           new TransactionInstruction({
             programId: new PublicKey(
@@ -328,6 +352,7 @@ const SanctumSplDepositStake = ({
 }
 
 export default SanctumSplDepositStake
+
 export function encodeData(type: any, fields?: any): Buffer {
   const allocLength = type.layout.span
   const data = Buffer.alloc(allocLength)
