@@ -315,6 +315,10 @@ export default function useGovernanceAssets() {
       name: 'Stake A Validator',
       packageId: PackageEnum.Common,
     },
+    [Instructions.SanctumSplDepositStake]: {
+      name: 'Sanctum Spl Deposit Stake',
+      packageId: PackageEnum.Common,
+    },
     [Instructions.Transfer]: {
       name: 'Transfer Tokens',
       isVisible: canUseTokenTransferInstruction,

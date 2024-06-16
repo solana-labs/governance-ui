@@ -57,6 +57,7 @@ import ConfigureNftPluginCollection from './components/instructions/NftVotingPlu
 import SwitchboardFundOracle from './components/instructions/Switchboard/FundOracle'
 import WithdrawFromOracle from './components/instructions/Switchboard/WithdrawFromOracle'
 import StakeValidator from './components/instructions/Validators/StakeValidator'
+import SanctumSplDepositStake from './components/instructions/Validators/SanctumSplDepositStake'
 import DeactivateValidatorStake from './components/instructions/Validators/DeactivateStake'
 import WithdrawValidatorStake from './components/instructions/Validators/WithdrawStake'
 import DelegateStake from './components/instructions/Validators/DelegateStake'
@@ -537,6 +538,7 @@ const New = () => {
       [Instructions.CreateTokenMetadata]: CreateTokenMetadata,
       [Instructions.UpdateTokenMetadata]: UpdateTokenMetadata,
       [Instructions.StakeValidator]: StakeValidator,
+      [Instructions.SanctumSplDepositStake]: SanctumSplDepositStake,
       [Instructions.DeactivateValidatorStake]: DeactivateValidatorStake,
       [Instructions.WithdrawValidatorStake]: WithdrawValidatorStake,
       [Instructions.DelegateStake]: DelegateStake,
