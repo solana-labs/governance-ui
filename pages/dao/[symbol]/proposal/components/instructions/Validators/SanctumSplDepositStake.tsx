@@ -41,6 +41,7 @@ type SanctumSplDepositStake = {
   governedTokenAccount: AssetAccount | undefined
   stakingAccount: StakeAccount | undefined
   stakePool: string
+  voteAccount: string
 }
 
 const SanctumSplDepositStake = ({
@@ -52,14 +53,18 @@ const SanctumSplDepositStake = ({
 }) => {
   const wallet = useWalletOnePointOh()
   const connection = useLegacyConnectionContext()
-  const programId: PublicKey = StakeProgram.programId
+  const stakeProgramId: PublicKey = StakeProgram.programId
+  const sanctumStakeProgramId = new PublicKey(
+    'SP12tWFxD9oJsVWNavTTBZvMbA6gkAmxtVgxdqvyvhY'
+  )
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)
 
   const [form, setForm] = useState<SanctumSplDepositStake>({
     stakingAccount: undefined,
     governedTokenAccount: undefined,
-    stakePool: 'BmEgS5XpWJJDqT3FVfB6ZmoELQrWkJxDXo3cNoJVsNFK',
+    stakePool: '',
+    voteAccount: '',
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -81,8 +86,14 @@ const SanctumSplDepositStake = ({
   }
   const setStakePool = (value) => {
     handleSetForm({
-      value: value,
+      value: value.target.value,
       propertyName: 'stakePool',
+    })
+  }
+  const setVoteAccount = (value) => {
+    handleSetForm({
+      value: value.target.value,
+      propertyName: 'voteAccount',
     })
   }
 
@@ -91,7 +102,7 @@ const SanctumSplDepositStake = ({
 
     const stakingAccounts = await getFilteredProgramAccounts(
       connection.current,
-      StakeProgram.programId,
+      stakeProgramId,
       [
         {
           memcmp: {
@@ -158,7 +169,7 @@ const SanctumSplDepositStake = ({
     if (
       !connection ||
       !isValid ||
-      !programId ||
+      !stakeProgramId ||
       !form.governedTokenAccount?.isSol ||
       !form.stakingAccount?.stakeAccount
     ) {
@@ -184,6 +195,7 @@ const SanctumSplDepositStake = ({
       stakePool.account.data.poolMint,
       form.governedTokenAccount.pubkey
     )
+
     if (!ataAccount) {
       prequsiteInstructions.push(
         Token.createAssociatedTokenAccountInstruction(
@@ -199,16 +211,14 @@ const SanctumSplDepositStake = ({
 
     const [withdrawAuthPk] = await PublicKey.findProgramAddress(
       [new PublicKey(form.stakePool).toBuffer(), Buffer.from('withdraw')],
-      new PublicKey('SP12tWFxD9oJsVWNavTTBZvMbA6gkAmxtVgxdqvyvhY')
+      sanctumStakeProgramId
     )
     const [validatorStake] = await PublicKey.findProgramAddress(
       [
-        new PublicKey(
-          'CNcaYdqkCwxDpKSVK8in5f6kqrTiZ5SuHsHFDqx6jNvu'
-        ).toBuffer(),
+        new PublicKey(form.voteAccount).toBuffer(),
         new PublicKey(form.stakePool).toBuffer(),
       ],
-      new PublicKey('SP12tWFxD9oJsVWNavTTBZvMbA6gkAmxtVgxdqvyvhY')
+      sanctumStakeProgramId
     )
     const authorizeWithdrawIx = StakeProgram.authorize({
       stakePubkey: form.stakingAccount.stakeAccount,
@@ -237,6 +247,7 @@ const SanctumSplDepositStake = ({
       validatorStake: validatorStake,
       poolMint: stakePool.account.data.poolMint,
     })
+    //don't need to be writable any more problems probably comes from old solana/web3.js version
     const modifiedAuthorize1 = {
       ...authorizeStakerIx.instructions[0],
       keys: authorizeStakerIx.instructions[0].keys.map((x) => {
@@ -249,6 +260,7 @@ const SanctumSplDepositStake = ({
         return x
       }),
     }
+    //don't need to be writable any more problems probably comes from old solana/web3.js version
     const modifiedAuthorize2 = {
       ...authorizeWithdrawIx.instructions[0],
       keys: authorizeWithdrawIx.instructions[0].keys.map((x) => {
@@ -262,15 +274,14 @@ const SanctumSplDepositStake = ({
       }),
     }
     return {
+      prerequisiteInstructions: prequsiteInstructions,
       serializedInstruction: '',
       additionalSerializedInstructions: [
         serializeInstructionToBase64(modifiedAuthorize1),
         serializeInstructionToBase64(modifiedAuthorize2),
         serializeInstructionToBase64(
           new TransactionInstruction({
-            programId: new PublicKey(
-              'SP12tWFxD9oJsVWNavTTBZvMbA6gkAmxtVgxdqvyvhY'
-            ),
+            programId: sanctumStakeProgramId,
             keys: stakeIx.keys,
             data: stakeIx.data,
           })
@@ -337,16 +348,20 @@ const SanctumSplDepositStake = ({
         type="text"
         onChange={setStakePool}
       />
+      <Input
+        label="Vote Account"
+        value={form.voteAccount}
+        error={formErrors['voteAccount']}
+        type="text"
+        onChange={setVoteAccount}
+      />
       <div
         style={{
           fontSize: '14px',
           color: 'rgba(164, 172, 183, 1)',
           marginTop: '18px',
         }}
-      >
-        Deactivate the staking account for a validator. This will make the
-        stakes available to withdraw at the next epoch (2-4 days).
-      </div>
+      ></div>
     </>
   )
 }
