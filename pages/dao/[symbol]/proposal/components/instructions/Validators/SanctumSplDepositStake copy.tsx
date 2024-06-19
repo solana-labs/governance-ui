@@ -7,17 +7,16 @@ import {
 } from '@solana/spl-governance'
 
 import {
-  Keypair,
-  LAMPORTS_PER_SOL,
   PublicKey,
+  SYSVAR_CLOCK_PUBKEY,
+  StakeAuthorizationLayout,
   StakeProgram,
-  SystemProgram,
   TransactionInstruction,
 } from '@solana/web3.js'
 
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
-import { BN, web3 } from '@coral-xyz/anchor'
+import { web3 } from '@coral-xyz/anchor'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes'
@@ -26,12 +25,16 @@ import StakeAccountSelect from '../../StakeAccountSelect'
 import { getFilteredProgramAccounts } from '@utils/helpers'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import {
-  StakePool,
   StakePoolInstruction,
   getStakePoolAccount,
 } from '@solana/spl-stake-pool'
 import Input from '@components/inputs/Input'
 import { tryGetAta } from '@utils/validations'
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  TOKEN_PROGRAM_ID,
+  Token,
+} from '@solana/spl-token'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
 type SanctumSplDepositStake = {
@@ -60,8 +63,8 @@ const SanctumSplDepositStake = ({
   const [form, setForm] = useState<SanctumSplDepositStake>({
     stakingAccount: undefined,
     governedTokenAccount: undefined,
-    stakePool: '9jWbABPXfc75wseAbLEkBCb1NRaX9EbJZJTDQnbtpzc1',
-    voteAccount: '5EYp3kCdMLq52vzZ4ucsVyYaaxQe5MKTquxahjXpcShS',
+    stakePool: '',
+    voteAccount: '',
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -145,6 +148,12 @@ const SanctumSplDepositStake = ({
     const stakingAccounts = await getStakeAccounts()
     setStakeAccounts(stakingAccounts)
 
+    if (
+      !form.stakingAccount ||
+      !form.stakingAccount.stakeAccount ||
+      !form.stakingAccount.delegatedValidator
+    )
+      return false
     return true
   }
 
@@ -161,7 +170,8 @@ const SanctumSplDepositStake = ({
       !connection ||
       !isValid ||
       !stakeProgramId ||
-      !form.governedTokenAccount?.isSol
+      !form.governedTokenAccount?.isSol ||
+      !form.stakingAccount?.stakeAccount
     ) {
       console.log('Invalid form')
       return returnInvalid()
@@ -173,95 +183,102 @@ const SanctumSplDepositStake = ({
       connection.current,
       new PublicKey(form.stakePool)
     )
-
+    const ataAddress = await Token.getAssociatedTokenAddress(
+      ASSOCIATED_TOKEN_PROGRAM_ID,
+      TOKEN_PROGRAM_ID,
+      stakePool.account.data.poolMint,
+      form.governedTokenAccount.pubkey,
+      true
+    )
     const ataAccount = await tryGetAta(
       connection.current,
       stakePool.account.data.poolMint,
       form.governedTokenAccount.pubkey
     )
 
+    if (!ataAccount) {
+      prequsiteInstructions.push(
+        Token.createAssociatedTokenAccountInstruction(
+          ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+          TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+          stakePool.account.data.poolMint, // mint
+          ataAddress, // ata
+          form.governedTokenAccount.pubkey, // owner of token account
+          wallet!.publicKey! // fee payer
+        )
+      )
+    }
+
     const [withdrawAuthPk] = await PublicKey.findProgramAddress(
       [new PublicKey(form.stakePool).toBuffer(), Buffer.from('withdraw')],
       sanctumStakeProgramId
     )
-    // const [validatorStake] = await PublicKey.findProgramAddress(
-    //   [
-    //     new PublicKey(form.voteAccount).toBuffer(),
-    //     new PublicKey(form.stakePool).toBuffer(),
-    //   ],
-    //   sanctumStakeProgramId
-    // )
-
-    const poolAmount = Number(0.1 * LAMPORTS_PER_SOL)
-
-    const stakeAccountRentExemption = await connection.current.getMinimumBalanceForRentExemption(
-      StakeProgram.space
-    )
-
-    const [stakeAccountAddress] = await PublicKey.findProgramAddress(
+    const [validatorStake] = await PublicKey.findProgramAddress(
       [
         new PublicKey(form.voteAccount).toBuffer(),
         new PublicKey(form.stakePool).toBuffer(),
       ],
       sanctumStakeProgramId
     )
-    const stakeAccount = await connection.current.getAccountInfo(
-      stakeAccountAddress
-    )
-    if (!stakeAccount) {
-      console.log('error')
-      throw new Error('Invalid Stake Account')
-    }
-
-    const availableForWithdrawal = calcLamportsWithdrawAmount(
-      stakePool.account.data,
-      stakeAccount.lamports - LAMPORTS_PER_SOL - stakeAccountRentExemption
-    )
-
-    if (availableForWithdrawal < poolAmount) {
-      // noinspection ExceptionCaughtLocallyJS
-      throw new Error(
-        `Not enough lamports available for withdrawal from ${stakeAccountAddress},
-            ${poolAmount} asked, ${availableForWithdrawal} available.`
-      )
-    }
-    const withdrawAccount = {
-      stakeAddress: stakeAccountAddress,
-      voteAddress: new PublicKey(form.voteAccount),
-      poolAmount,
-    }
-
-    const stakeReceiverKeypair = Keypair.generate()
-    const stakeToReceive = stakeReceiverKeypair.publicKey
-    prequsiteInstructions.push(
-      SystemProgram.createAccount({
-        fromPubkey: wallet!.publicKey!,
-        newAccountPubkey: stakeReceiverKeypair.publicKey,
-        lamports: stakeAccountRentExemption,
-        space: StakeProgram.space,
-        programId: StakeProgram.programId,
-      })
-    )
-
-    const stakeIx = StakePoolInstruction.withdrawStake({
-      stakePool: new PublicKey(form.stakePool),
-      validatorList: stakePool.account.data.validatorList,
-      validatorStake: withdrawAccount.stakeAddress,
-      destinationStake: stakeToReceive,
-      destinationStakeAuthority: form.governedTokenAccount.pubkey,
-      sourceTransferAuthority: form.governedTokenAccount.pubkey,
-      sourcePoolAccount: ataAccount!.publicKey,
-      managerFeeAccount: stakePool.account.data.managerFeeAccount,
-      poolMint: stakePool.account.data.poolMint,
-      poolTokens: withdrawAccount.poolAmount,
-      withdrawAuthority: withdrawAuthPk,
+    const authorizeWithdrawIx = StakeProgram.authorize({
+      stakePubkey: form.stakingAccount.stakeAccount,
+      authorizedPubkey: form.governedTokenAccount.pubkey,
+      newAuthorizedPubkey: stakePool.account.data.stakeDepositAuthority,
+      stakeAuthorizationType: StakeAuthorizationLayout.Withdrawer,
     })
 
+    const authorizeStakerIx = StakeProgram.authorize({
+      stakePubkey: form.stakingAccount.stakeAccount,
+      authorizedPubkey: form.governedTokenAccount.pubkey,
+      newAuthorizedPubkey: stakePool.account.data.stakeDepositAuthority,
+      stakeAuthorizationType: StakeAuthorizationLayout.Staker,
+    })
+
+    const stakeIx = StakePoolInstruction.depositStake({
+      stakePool: new PublicKey(form.stakePool),
+      validatorList: stakePool.account.data.validatorList,
+      depositAuthority: stakePool.account.data.stakeDepositAuthority,
+      reserveStake: stakePool.account.data.reserveStake,
+      managerFeeAccount: stakePool.account.data.managerFeeAccount,
+      referralPoolAccount: ataAddress,
+      destinationPoolAccount: ataAddress,
+      withdrawAuthority: withdrawAuthPk,
+      depositStake: form.stakingAccount.stakeAccount,
+      validatorStake: validatorStake,
+      poolMint: stakePool.account.data.poolMint,
+    })
+    //don't need to be writable any more problems probably comes from old solana/web3.js version
+    const modifiedAuthorize1 = {
+      ...authorizeStakerIx.instructions[0],
+      keys: authorizeStakerIx.instructions[0].keys.map((x) => {
+        if (x.pubkey.equals(SYSVAR_CLOCK_PUBKEY)) {
+          return {
+            ...x,
+            isWritable: false,
+          }
+        }
+        return x
+      }),
+    }
+    //don't need to be writable any more problems probably comes from old solana/web3.js version
+    const modifiedAuthorize2 = {
+      ...authorizeWithdrawIx.instructions[0],
+      keys: authorizeWithdrawIx.instructions[0].keys.map((x) => {
+        if (x.pubkey.equals(SYSVAR_CLOCK_PUBKEY)) {
+          return {
+            ...x,
+            isWritable: false,
+          }
+        }
+        return x
+      }),
+    }
     return {
       prerequisiteInstructions: prequsiteInstructions,
-      prerequisiteInstructionsSigners: [stakeReceiverKeypair],
       serializedInstruction: '',
       additionalSerializedInstructions: [
+        serializeInstructionToBase64(modifiedAuthorize1),
+        serializeInstructionToBase64(modifiedAuthorize2),
         serializeInstructionToBase64(
           new TransactionInstruction({
             programId: sanctumStakeProgramId,
@@ -358,26 +375,4 @@ export function encodeData(type: any, fields?: any): Buffer {
   type.layout.encode(layoutFields, data)
 
   return data
-}
-
-export function calcLamportsWithdrawAmount(
-  stakePool: StakePool,
-  poolTokens: number
-): number {
-  const numerator = new BN(poolTokens).mul(stakePool.totalLamports)
-  const denominator = stakePool.poolTokenSupply
-  if (numerator.lt(denominator)) {
-    return 0
-  }
-  return divideBnToNumber(numerator, denominator)
-}
-
-export function divideBnToNumber(numerator: BN, denominator: BN): number {
-  if (denominator.isZero()) {
-    return 0
-  }
-  const quotient = numerator.div(denominator).toNumber()
-  const rem = numerator.umod(denominator)
-  const gcd = rem.gcd(denominator)
-  return quotient + rem.div(gcd).toNumber() / denominator.div(gcd).toNumber()
 }
