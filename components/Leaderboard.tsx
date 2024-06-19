@@ -23,7 +23,6 @@ const Leaderboard = () => {
     )
   }
 
-
   if (!leaders?.length) {
     return (
       <div className="p-10">
