@@ -3611,4 +3611,11 @@
     "website": "https://advocat.live",
     "twitter": "@notacatcoin" 
   }
+  { "symbol": "SOLI",
+    "displayName": "Commune, Eat, Tea",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "7s8AquN8vPfutRWFFSMHzfxUAGypbQA42iEpaJxH1Ub6",
+    "ogImage": "/realms/CET.jpg",
+    "website": "",
+    "twitter": "" },
 ]
