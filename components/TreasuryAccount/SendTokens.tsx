@@ -263,7 +263,7 @@ const SendTokens = () => {
     return null
   }
 
-  const addRecepient = () => {
+  const addRecipient = () => {
     const newAddresses = [...form.destinationAccount]
     const newAmounts = [...form.amount]
     const newTxDollars = [...form.txDollarAmount]
@@ -318,7 +318,7 @@ const SendTokens = () => {
       <div className="space-y-4 w-full pb-4">
         {form.destinationAccount.map((acc, idx) => (
           <div className="flex flex-col gap-2" key={idx}>
-            <StyledLabel>Recepient {idx+1}</StyledLabel>
+            <StyledLabel>Recipient {idx+1}</StyledLabel>
             <Input
               label="Destination account"
               value={form.destinationAccount[idx]}
@@ -368,10 +368,10 @@ const SendTokens = () => {
         ))}
         <div 
           className="flex gap-2 items-center justify-end cursor-pointer text-sm"
-          onClick={addRecepient}
+          onClick={addRecipient}
         >
           <AddAlt className="text-green" />
-          <div>Add another recepient</div>
+          <div>Add another recipient</div>
         </div>
         <div
           className={'flex items-center hover:cursor-pointer w-24'}
