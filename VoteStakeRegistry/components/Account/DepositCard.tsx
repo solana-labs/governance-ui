@@ -30,7 +30,7 @@ import { useRealmQuery } from '@hooks/queries/realm'
 import { useConnection } from '@solana/wallet-adapter-react'
 import queryClient from '@hooks/queries/queryClient'
 import { tokenAccountQueryKeys } from '@hooks/queries/tokenAccount'
-import {useVsrClient} from "../../../VoterWeightPlugins/useVsrClient";
+import { useVsrClient } from '../../../VoterWeightPlugins/useVsrClient'
 
 const DepositCard = ({
   deposit,
@@ -134,7 +134,7 @@ const DepositCard = ({
   const isRealmCommunityMint =
     deposit.mint.publicKey.toBase58() ===
     realm?.account.communityMint.toBase58()
-  const isConstant = type === 'constant'
+  const isConstant = type === 'constant' || type === 'cliff'
   const CardLabel = ({ label, value }) => {
     return (
       <div className="flex flex-col w-1/2 py-2">
@@ -218,7 +218,10 @@ const DepositCard = ({
               value={(deposit.votingPower.isZero() ||
               deposit.votingPowerBaseline.isZero()
                 ? 0
-                : deposit.votingPower.mul(new BN(100)).div(deposit.votingPowerBaseline).toNumber() / 100
+                : deposit.votingPower
+                    .mul(new BN(100))
+                    .div(deposit.votingPowerBaseline)
+                    .toNumber() / 100
               ).toFixed(2)}
             />
           )}
