@@ -46,7 +46,6 @@ import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { fetchJupiterPrice } from '@hooks/queries/jupiterPrice'
-import { useAsync } from 'react-async-hook'
 import {useVoteByCouncilToggle} from "@hooks/useVoteByCouncilToggle";
 import { AddAlt } from '@carbon/icons-react'
 import { StyledLabel } from '@components/inputs/styles'
