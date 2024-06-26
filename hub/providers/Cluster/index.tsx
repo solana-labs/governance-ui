@@ -6,7 +6,7 @@ import { createContext, useEffect, useState } from 'react';
 const DEVNET_RPC_ENDPOINT =
   process.env.DEVNET_RPC || 'https://api.dao.devnet.solana.com/';
 const MAINNET_RPC_ENDPOINT =
-  process.env.MAINNET_RPC || 'http://realms-realms-c335.mainnet.rpcpool.com';
+  process.env.MAINNET_RPC || 'https://mainnet.helius-rpc.com/?api-key=09efbe04-3da6-4492-aa39-84a7a3e27016';
 const TESTNET_RPC_ENDPOINT = 'http://127.0.0.1:8899';
 
 export enum ClusterType {
