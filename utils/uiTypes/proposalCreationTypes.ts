@@ -6,7 +6,7 @@ import { getNameOf } from '@tools/core/script'
 import { SupportedMintName } from '@tools/sdk/solend/configuration'
 import { DepositWithMintAccount, Voter } from 'VoteStakeRegistry/sdk/accounts'
 import { LockupKind } from 'VoteStakeRegistry/tools/types'
-import { consts as foresightConsts } from '@foresight-tmp/foresight-sdk'
+// import { consts as foresightConsts } from '@foresight-tmp/foresight-sdk'
 import { AssetAccount, StakeAccount } from '@utils/uiTypes/assets'
 import { RealmInfo } from '@models/registry/api'
 import * as PaymentStreaming from '@mean-dao/payment-streaming'
@@ -16,7 +16,7 @@ export enum PackageEnum {
   Common,
   Distribution,
   Dual,
-  Foresight,
+  // Foresight,
   GatewayPlugin,
   Identity,
   MangoMarketV4,
@@ -196,35 +196,35 @@ export interface PsyFinanceExerciseOption {
 
 /* End PsyOptions American options */
 
-export interface ForesightHasGovernedAccount {
-  governedAccount: AssetAccount
-}
+// export interface ForesightHasGovernedAccount {
+//   governedAccount: AssetAccount
+// }
 
-export interface ForesightHasMarketListId extends ForesightHasGovernedAccount {
-  marketListId: string
-}
+// export interface ForesightHasMarketListId extends ForesightHasGovernedAccount {
+//   marketListId: string
+// }
 
-export interface ForesightHasMarketId extends ForesightHasMarketListId {
-  marketId: number
-}
+// export interface ForesightHasMarketId extends ForesightHasMarketListId {
+//   marketId: number
+// }
 
-export interface ForesightHasCategoryId extends ForesightHasGovernedAccount {
-  categoryId: string
-}
+// export interface ForesightHasCategoryId extends ForesightHasGovernedAccount {
+//   categoryId: string
+// }
 
-export interface ForesightMakeAddMarketListToCategoryParams
-  extends ForesightHasCategoryId,
-  ForesightHasMarketListId { }
+// export interface ForesightMakeAddMarketListToCategoryParams
+//   extends ForesightHasCategoryId,
+//   ForesightHasMarketListId { }
 
-export interface ForesightMakeResolveMarketParams extends ForesightHasMarketId {
-  winner: number
-}
+// export interface ForesightMakeResolveMarketParams extends ForesightHasMarketId {
+//   winner: number
+// }
 
-export interface ForesightMakeSetMarketMetadataParams
-  extends ForesightHasMarketId {
-  content: string
-  field: foresightConsts.MarketMetadataFieldName
-}
+// export interface ForesightMakeSetMarketMetadataParams
+//   extends ForesightHasMarketId {
+//   content: string
+//   field: foresightConsts.MarketMetadataFieldName
+// }
 export interface Base64InstructionForm {
   governedAccount: AssetAccount | undefined
   base64: string
