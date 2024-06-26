@@ -32,190 +32,190 @@ import { notify } from '@utils/notifications'
 import Big from 'big.js'
 import { secondsToHours } from 'date-fns'
 
-// export const REDUCE_ONLY_OPTIONS = [
-//   { value: 0, name: 'Disabled' },
-//   { value: 1, name: 'No borrows and no deposits' },
-//   { value: 2, name: 'No borrows' },
-// ]
+export const REDUCE_ONLY_OPTIONS = [
+  { value: 0, name: 'Disabled' },
+  { value: 1, name: 'No borrows and no deposits' },
+  { value: 2, name: 'No borrows' },
+]
 
-// const MAINNET_PYTH_PROGRAM = new PublicKey(
-//   'FsJ3A3u2vn5cTVofAjvy6y5kwABJAqYWpe4975bi2epH'
-// )
+const MAINNET_PYTH_PROGRAM = new PublicKey(
+  'FsJ3A3u2vn5cTVofAjvy6y5kwABJAqYWpe4975bi2epH'
+)
 
-// export type FlatListingArgs = {
-//   name: string
-//   tokenIndex: number
-//   'oracleConfig.confFilter': number
-//   'oracleConfig.maxStalenessSlots': number | null
-//   'interestRateParams.util0': number
-//   'interestRateParams.rate0': number
-//   'interestRateParams.util1': number
-//   'interestRateParams.rate1': number
-//   'interestRateParams.maxRate': number
-//   'interestRateParams.adjustmentFactor': number
-//   loanFeeRate: number
-//   loanOriginationFeeRate: number
-//   maintAssetWeight: number
-//   initAssetWeight: number
-//   maintLiabWeight: number
-//   initLiabWeight: number
-//   liquidationFee: number
-//   platformLiquidationFee: number
-//   minVaultToDepositsRatio: number
-//   netBorrowLimitPerWindowQuote: number
-//   netBorrowLimitWindowSizeTs: number
-//   borrowWeightScaleStartQuote: number
-//   depositWeightScaleStartQuote: number
-//   stablePriceDelayGrowthLimit: number
-//   stablePriceDelayIntervalSeconds: number
-//   stablePriceGrowthLimit: number
-//   tokenConditionalSwapMakerFeeRate: number
-//   tokenConditionalSwapTakerFeeRate: number
-//   flashLoanSwapFeeRate: number
-//   reduceOnly: number
-//   groupInsuranceFund: boolean
-//   oracle: PublicKey
-//   depositLimit: number
-//   interestTargetUtilization: number
-//   interestCurveScaling: number
-//   setFallbackOracle: boolean
-//   maintWeightShiftAbort: boolean
-//   zeroUtilRate: number
-//   disableAssetLiquidation: boolean
-//   collateralFeePerDay: number
-// }
+export type FlatListingArgs = {
+  name: string
+  tokenIndex: number
+  'oracleConfig.confFilter': number
+  'oracleConfig.maxStalenessSlots': number | null
+  'interestRateParams.util0': number
+  'interestRateParams.rate0': number
+  'interestRateParams.util1': number
+  'interestRateParams.rate1': number
+  'interestRateParams.maxRate': number
+  'interestRateParams.adjustmentFactor': number
+  loanFeeRate: number
+  loanOriginationFeeRate: number
+  maintAssetWeight: number
+  initAssetWeight: number
+  maintLiabWeight: number
+  initLiabWeight: number
+  liquidationFee: number
+  platformLiquidationFee: number
+  minVaultToDepositsRatio: number
+  netBorrowLimitPerWindowQuote: number
+  netBorrowLimitWindowSizeTs: number
+  borrowWeightScaleStartQuote: number
+  depositWeightScaleStartQuote: number
+  stablePriceDelayGrowthLimit: number
+  stablePriceDelayIntervalSeconds: number
+  stablePriceGrowthLimit: number
+  tokenConditionalSwapMakerFeeRate: number
+  tokenConditionalSwapTakerFeeRate: number
+  flashLoanSwapFeeRate: number
+  reduceOnly: number
+  groupInsuranceFund: boolean
+  oracle: PublicKey
+  depositLimit: number
+  interestTargetUtilization: number
+  interestCurveScaling: number
+  setFallbackOracle: boolean
+  maintWeightShiftAbort: boolean
+  zeroUtilRate: number
+  disableAssetLiquidation: boolean
+  collateralFeePerDay: number
+}
 
-// export type FlatEditArgs = {
-//   nameOpt: string
-//   tokenIndex: number
-//   'oracleConfigOpt.confFilter': number
-//   'oracleConfigOpt.maxStalenessSlots': number
-//   'interestRateParamsOpt.util0': number
-//   'interestRateParamsOpt.rate0': number
-//   'interestRateParamsOpt.util1': number
-//   'interestRateParamsOpt.rate1': number
-//   'interestRateParamsOpt.maxRate': number
-//   'interestRateParamsOpt.adjustmentFactor': number
-//   loanFeeRateOpt: number
-//   loanOriginationFeeRateOpt: number
-//   maintAssetWeightOpt: number
-//   initAssetWeightOpt: number
-//   maintLiabWeightOpt: number
-//   initLiabWeightOpt: number
-//   liquidationFeeOpt: number
-//   platformLiquidationFeeOpt: number
-//   minVaultToDepositsRatioOpt: number
-//   netBorrowLimitPerWindowQuoteOpt: number
-//   netBorrowLimitWindowSizeTsOpt: number
-//   borrowWeightScaleStartQuoteOpt: number
-//   depositWeightScaleStartQuoteOpt: number
-//   stablePriceDelayGrowthLimitOpt: number
-//   stablePriceDelayIntervalSecondsOpt: number
-//   stablePriceGrowthLimitOpt: number
-//   tokenConditionalSwapMakerFeeRateOpt: number
-//   tokenConditionalSwapTakerFeeRateOpt: number
-//   flashLoanSwapFeeRateOpt: number
-//   reduceOnlyOpt: number
-//   groupInsuranceFundOpt: boolean
-//   oracleOpt: PublicKey
-//   interestCurveScalingOpt: number
-//   interestTargetUtilizationOpt: number
-//   maintWeightShiftStartOpt: BN
-//   maintWeightShiftEndOpt: BN
-//   maintWeightShiftAssetTargetOpt: number
-//   maintWeightShiftLiabTargetOpt: number
-//   maintWeightShiftAbort: boolean
-//   setFallbackOracle: boolean
-//   depositLimitOpt: number
-//   zeroUtilRateOpt: number
-//   disableAssetLiquidationOpt: boolean
-//   collateralFeePerDayOpt: number
-//   forceWithdrawOpt: boolean
-//   forceCloseOpt: boolean
-// }
+export type FlatEditArgs = {
+  nameOpt: string
+  tokenIndex: number
+  'oracleConfigOpt.confFilter': number
+  'oracleConfigOpt.maxStalenessSlots': number
+  'interestRateParamsOpt.util0': number
+  'interestRateParamsOpt.rate0': number
+  'interestRateParamsOpt.util1': number
+  'interestRateParamsOpt.rate1': number
+  'interestRateParamsOpt.maxRate': number
+  'interestRateParamsOpt.adjustmentFactor': number
+  loanFeeRateOpt: number
+  loanOriginationFeeRateOpt: number
+  maintAssetWeightOpt: number
+  initAssetWeightOpt: number
+  maintLiabWeightOpt: number
+  initLiabWeightOpt: number
+  liquidationFeeOpt: number
+  platformLiquidationFeeOpt: number
+  minVaultToDepositsRatioOpt: number
+  netBorrowLimitPerWindowQuoteOpt: number
+  netBorrowLimitWindowSizeTsOpt: number
+  borrowWeightScaleStartQuoteOpt: number
+  depositWeightScaleStartQuoteOpt: number
+  stablePriceDelayGrowthLimitOpt: number
+  stablePriceDelayIntervalSecondsOpt: number
+  stablePriceGrowthLimitOpt: number
+  tokenConditionalSwapMakerFeeRateOpt: number
+  tokenConditionalSwapTakerFeeRateOpt: number
+  flashLoanSwapFeeRateOpt: number
+  reduceOnlyOpt: number
+  groupInsuranceFundOpt: boolean
+  oracleOpt: PublicKey
+  interestCurveScalingOpt: number
+  interestTargetUtilizationOpt: number
+  maintWeightShiftStartOpt: BN
+  maintWeightShiftEndOpt: BN
+  maintWeightShiftAssetTargetOpt: number
+  maintWeightShiftLiabTargetOpt: number
+  maintWeightShiftAbort: boolean
+  setFallbackOracle: boolean
+  depositLimitOpt: number
+  zeroUtilRateOpt: number
+  disableAssetLiquidationOpt: boolean
+  collateralFeePerDayOpt: number
+  forceWithdrawOpt: boolean
+  forceCloseOpt: boolean
+}
 
-// export type ListingArgsFormatted = {
-//   tokenIndex: number
-//   tokenName: string
-//   oracleConfidenceFilter: string
-//   oracleMaxStalenessSlots: number | null
-//   interestRateUtilizationPoint1: string
-//   interestRateUtilizationPoint0: string
-//   interestRatePoint0: string
-//   interestRatePoint1: string
-//   adjustmentFactor: string
-//   maxRate: string
-//   loanFeeRate: string
-//   loanOriginationFeeRate: string
-//   maintAssetWeight: string
-//   initAssetWeight: string
-//   maintLiabWeight: string
-//   initLiabWeight: string
-//   liquidationFee: string
-//   platformLiquidationFee: string
-//   minVaultToDepositsRatio: string
-//   netBorrowLimitPerWindowQuote: number
-//   netBorrowLimitWindowSizeTs: number
-//   borrowWeightScaleStartQuote: number
-//   depositWeightScaleStartQuote: number
-//   stablePriceDelayGrowthLimit: string
-//   stablePriceDelayIntervalSeconds: number
-//   stablePriceGrowthLimit: string
-//   tokenConditionalSwapMakerFeeRate: number
-//   tokenConditionalSwapTakerFeeRate: number
-//   flashLoanSwapFeeRate: string
-//   reduceOnly: string
-//   oracle: string
-//   depositLimit: string
-//   interestTargetUtilization: number
-//   interestCurveScaling: number
-//   groupInsuranceFund: boolean
-//   zeroUtilRate: string
-//   disableAssetLiquidation: boolean
-//   collateralFeePerDay: string
-// }
+export type ListingArgsFormatted = {
+  tokenIndex: number
+  tokenName: string
+  oracleConfidenceFilter: string
+  oracleMaxStalenessSlots: number | null
+  interestRateUtilizationPoint1: string
+  interestRateUtilizationPoint0: string
+  interestRatePoint0: string
+  interestRatePoint1: string
+  adjustmentFactor: string
+  maxRate: string
+  loanFeeRate: string
+  loanOriginationFeeRate: string
+  maintAssetWeight: string
+  initAssetWeight: string
+  maintLiabWeight: string
+  initLiabWeight: string
+  liquidationFee: string
+  platformLiquidationFee: string
+  minVaultToDepositsRatio: string
+  netBorrowLimitPerWindowQuote: number
+  netBorrowLimitWindowSizeTs: number
+  borrowWeightScaleStartQuote: number
+  depositWeightScaleStartQuote: number
+  stablePriceDelayGrowthLimit: string
+  stablePriceDelayIntervalSeconds: number
+  stablePriceGrowthLimit: string
+  tokenConditionalSwapMakerFeeRate: number
+  tokenConditionalSwapTakerFeeRate: number
+  flashLoanSwapFeeRate: string
+  reduceOnly: string
+  oracle: string
+  depositLimit: string
+  interestTargetUtilization: number
+  interestCurveScaling: number
+  groupInsuranceFund: boolean
+  zeroUtilRate: string
+  disableAssetLiquidation: boolean
+  collateralFeePerDay: string
+}
 
-// export type EditTokenArgsFormatted = ListingArgsFormatted & {
-//   maintWeightShiftStart: number
-//   maintWeightShiftEnd: number
-//   maintWeightShiftAssetTarget: number
-//   maintWeightShiftLiabTarget: number
-//   maintWeightShiftAbort: boolean
-//   setFallbackOracle: boolean
-//   forceWithdraw: boolean
-//   forceClose: boolean
-// }
+export type EditTokenArgsFormatted = ListingArgsFormatted & {
+  maintWeightShiftStart: number
+  maintWeightShiftEnd: number
+  maintWeightShiftAssetTarget: number
+  maintWeightShiftLiabTarget: number
+  maintWeightShiftAbort: boolean
+  setFallbackOracle: boolean
+  forceWithdraw: boolean
+  forceClose: boolean
+}
 
-// const transformPresetToProposed = (listingPreset: LISTING_PRESET) => {
-//   const proposedPreset: FormattedListingPreset = {
-//     ...listingPreset,
-//     'oracleConfig.maxStalenessSlots':
-//       listingPreset.maxStalenessSlots === -1
-//         ? null
-//         : listingPreset.maxStalenessSlots!,
-//     'oracleConfig.confFilter': listingPreset.oracleConfFilter,
-//     'interestRateParams.adjustmentFactor': listingPreset.adjustmentFactor,
-//     'interestRateParams.util0': listingPreset.util0,
-//     'interestRateParams.rate0': listingPreset.rate0,
-//     'interestRateParams.util1': listingPreset.util1,
-//     'interestRateParams.rate1': listingPreset.rate1,
-//     'interestRateParams.maxRate': listingPreset.maxRate,
-//     groupInsuranceFund: listingPreset.groupInsuranceFund,
-//     maintWeightShiftAbort: false,
-//     setFallbackOracle: false,
-//   }
+const transformPresetToProposed = (listingPreset: LISTING_PRESET) => {
+  const proposedPreset: FormattedListingPreset = {
+    ...listingPreset,
+    'oracleConfig.maxStalenessSlots':
+      listingPreset.maxStalenessSlots === -1
+        ? null
+        : listingPreset.maxStalenessSlots!,
+    'oracleConfig.confFilter': listingPreset.oracleConfFilter,
+    'interestRateParams.adjustmentFactor': listingPreset.adjustmentFactor,
+    'interestRateParams.util0': listingPreset.util0,
+    'interestRateParams.rate0': listingPreset.rate0,
+    'interestRateParams.util1': listingPreset.util1,
+    'interestRateParams.rate1': listingPreset.rate1,
+    'interestRateParams.maxRate': listingPreset.maxRate,
+    groupInsuranceFund: listingPreset.groupInsuranceFund,
+    maintWeightShiftAbort: false,
+    setFallbackOracle: false,
+  }
 
-//   return proposedPreset
-// }
+  return proposedPreset
+}
 
-// type FormattedListingPreset = Omit<
-//   FlatListingArgs,
-//   'name' | 'tokenIndex' | 'oracle'
-// >
+type FormattedListingPreset = Omit<
+  FlatListingArgs,
+  'name' | 'tokenIndex' | 'oracle'
+>
 
-// type ProposedListingPresets = {
-//   [key in LISTING_PRESETS_KEY]: FormattedListingPreset
-// }
+type ProposedListingPresets = {
+  [key in LISTING_PRESETS_KEY]: FormattedListingPreset
+}
 
 export const getFormattedListingPresets = (
   uiDeposits?: number,
@@ -254,24 +254,24 @@ export const getFormattedListingPresets = (
   return PROPOSED_LISTING_PRESETS
 }
 
-// const fetchJupiterRoutes = async (
-//   inputMint = 'So11111111111111111111111111111111111111112',
-//   outputMint = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
-//   amount = 0,
-//   swapMode = 'ExactIn',
-//   slippage = 50,
-//   feeBps = 0
-// ) => {
-//   {
-//     try {
-//       const paramsString = new URLSearchParams({
-//         inputMint: inputMint.toString(),
-//         outputMint: outputMint.toString(),
-//         amount: amount.toString(),
-//         slippageBps: Math.ceil(slippage * 100).toString(),
-//         feeBps: feeBps.toString(),
-//         swapMode,
-//       }).toString()
+const fetchJupiterRoutes = async (
+  inputMint = 'So11111111111111111111111111111111111111112',
+  outputMint = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+  amount = 0,
+  swapMode = 'ExactIn',
+  slippage = 50,
+  feeBps = 0
+) => {
+  {
+    try {
+      const paramsString = new URLSearchParams({
+        inputMint: inputMint.toString(),
+        outputMint: outputMint.toString(),
+        amount: amount.toString(),
+        slippageBps: Math.ceil(slippage * 100).toString(),
+        feeBps: feeBps.toString(),
+        swapMode,
+      }).toString()
 
       const jupiterSwapBaseUrl =
         process.env.NEXT_PUBLIC_JUPTER_SWAP_API_ENDPOINT ||
@@ -280,18 +280,18 @@ export const getFormattedListingPresets = (
         `${jupiterSwapBaseUrl}/quote?${paramsString}`
       )
 
-//       const res = await response.json()
-//       return {
-//         bestRoute: (res ? res : null) as RouteInfo | null,
-//       }
-//     } catch (e) {
-//       console.log(e)
-//       return {
-//         bestRoute: null,
-//       }
-//     }
-//   }
-// }
+      const res = await response.json()
+      return {
+        bestRoute: (res ? res : null) as RouteInfo | null,
+      }
+    } catch (e) {
+      console.log(e)
+      return {
+        bestRoute: null,
+      }
+    }
+  }
+}
 
 export const getSuggestedCoinPresetInfo = async (outputMint: string) => {
   try {
@@ -369,273 +369,273 @@ export const getSuggestedCoinPresetInfo = async (outputMint: string) => {
       .filter((x) => x.bestRoute)
       .map((x) => x.bestRoute!)
 
-//     const averageSwaps = bestRoutesSwaps.reduce(
-//       (acc: { amount: string; priceImpactPct: number }[], val) => {
-//         if (val.swapMode === 'ExactIn') {
-//           const exactOutRoute = bestRoutesSwaps.find(
-//             (x) => x.outAmount === val.inAmount && x.swapMode === 'ExactOut'
-//           )
+    const averageSwaps = bestRoutesSwaps.reduce(
+      (acc: { amount: string; priceImpactPct: number }[], val) => {
+        if (val.swapMode === 'ExactIn') {
+          const exactOutRoute = bestRoutesSwaps.find(
+            (x) => x.outAmount === val.inAmount && x.swapMode === 'ExactOut'
+          )
 
-//           acc.push({
-//             amount: val.inAmount.toString(),
-//             priceImpactPct: exactOutRoute?.priceImpactPct
-//               ? (Number(val.priceImpactPct) +
-//                   Number(exactOutRoute.priceImpactPct)) /
-//                 2
-//               : Number(val.priceImpactPct),
-//           })
-//         }
-//         return acc
-//       },
-//       []
-//     )
+          acc.push({
+            amount: val.inAmount.toString(),
+            priceImpactPct: exactOutRoute?.priceImpactPct
+              ? (Number(val.priceImpactPct) +
+                  Number(exactOutRoute.priceImpactPct)) /
+                2
+              : Number(val.priceImpactPct),
+          })
+        }
+        return acc
+      },
+      []
+    )
 
-//     const indexForTargetAmount = averageSwaps.findIndex(
-//       (x) => x?.priceImpactPct && x?.priceImpactPct * 100 < 1
-//     )
+    const indexForTargetAmount = averageSwaps.findIndex(
+      (x) => x?.priceImpactPct && x?.priceImpactPct * 100 < 1
+    )
 
-//     const targetAmount =
-//       indexForTargetAmount > -1
-//         ? toUiDecimals(new BN(averageSwaps[indexForTargetAmount].amount), 6)
-//         : 0
+    const targetAmount =
+      indexForTargetAmount > -1
+        ? toUiDecimals(new BN(averageSwaps[indexForTargetAmount].amount), 6)
+        : 0
 
-//     const preset: LISTING_PRESET =
-//       Object.values(PRESETS).find(
-//         (x) => x.preset_target_amount === targetAmount
-//       ) || PRESETS.UNTRUSTED
+    const preset: LISTING_PRESET =
+      Object.values(PRESETS).find(
+        (x) => x.preset_target_amount === targetAmount
+      ) || PRESETS.UNTRUSTED
 
-//     return {
-//       presetKey: preset.preset_key,
-//       priceImpact: (indexForTargetAmount > -1
-//         ? averageSwaps[indexForTargetAmount]!.priceImpactPct
-//         : 100
-//       ).toFixed(2),
-//     }
-//   } catch (e) {
-//     console.log(e)
-//     return {
-//       presetKey: 'UNTRUSTED',
-//       priceImpact: '100',
-//     }
-//   }
-// }
+    return {
+      presetKey: preset.preset_key,
+      priceImpact: (indexForTargetAmount > -1
+        ? averageSwaps[indexForTargetAmount]!.priceImpactPct
+        : 100
+      ).toFixed(2),
+    }
+  } catch (e) {
+    console.log(e)
+    return {
+      presetKey: 'UNTRUSTED',
+      priceImpact: '100',
+    }
+  }
+}
 
-// export const compareObjectsAndGetDifferentKeys = <T extends object>(
-//   object1: T,
-//   object2: T
-// ): (keyof T)[] => {
-//   const diffKeys: string[] = []
+export const compareObjectsAndGetDifferentKeys = <T extends object>(
+  object1: T,
+  object2: T
+): (keyof T)[] => {
+  const diffKeys: string[] = []
 
-//   Object.keys(object1).forEach((key) => {
-//     if (object1[key] !== object2[key]) {
-//       diffKeys.push(key)
-//     }
-//   })
+  Object.keys(object1).forEach((key) => {
+    if (object1[key] !== object2[key]) {
+      diffKeys.push(key)
+    }
+  })
 
-//   return diffKeys as (keyof T)[]
-// }
+  return diffKeys as (keyof T)[]
+}
 
-// const isSwitchboardOracle = async (
-//   connection: Connection,
-//   feedPk: PublicKey
-// ) => {
-//   const SWITCHBOARD_PROGRAM_ID = 'SW1TCH7qEPTdLsDHRgPuMQjbQxKdH2aBStViMFnt64f'
+const isSwitchboardOracle = async (
+  connection: Connection,
+  feedPk: PublicKey
+) => {
+  const SWITCHBOARD_PROGRAM_ID = 'SW1TCH7qEPTdLsDHRgPuMQjbQxKdH2aBStViMFnt64f'
 
-//   const options = AnchorProvider.defaultOptions()
-//   const provider = new AnchorProvider(
-//     connection,
-//     new EmptyWallet(Keypair.generate()),
-//     options
-//   )
-//   const idl = await Program.fetchIdl(
-//     new PublicKey(SWITCHBOARD_PROGRAM_ID),
-//     provider
-//   )
-//   const switchboardProgram = new Program(
-//     idl!,
-//     new PublicKey(SWITCHBOARD_PROGRAM_ID),
-//     provider
-//   )
-//   const feeds = await switchboardProgram.account.aggregatorAccountData.all()
-//   const feed = feeds.find((x) => x.publicKey.equals(feedPk))
+  const options = AnchorProvider.defaultOptions()
+  const provider = new AnchorProvider(
+    connection,
+    new EmptyWallet(Keypair.generate()),
+    options
+  )
+  const idl = await Program.fetchIdl(
+    new PublicKey(SWITCHBOARD_PROGRAM_ID),
+    provider
+  )
+  const switchboardProgram = new Program(
+    idl!,
+    new PublicKey(SWITCHBOARD_PROGRAM_ID),
+    provider
+  )
+  const feeds = await switchboardProgram.account.aggregatorAccountData.all()
+  const feed = feeds.find((x) => x.publicKey.equals(feedPk))
 
   return feed
     ? `https://app.switchboard.xyz/solana/mainnet/feed/${feedPk.toBase58()}`
     : ''
 }
 
-// export const isPythOracle = async (
-//   connection: Connection,
-//   feedPk: PublicKey
-// ) => {
-//   const pythClient = new PythHttpClient(connection, MAINNET_PYTH_PROGRAM)
-//   const pythAccounts = await pythClient.getData()
-//   const feed = pythAccounts.products.find(
-//     (x) => x.price_account === feedPk.toBase58()
-//   )
+export const isPythOracle = async (
+  connection: Connection,
+  feedPk: PublicKey
+) => {
+  const pythClient = new PythHttpClient(connection, MAINNET_PYTH_PROGRAM)
+  const pythAccounts = await pythClient.getData()
+  const feed = pythAccounts.products.find(
+    (x) => x.price_account === feedPk.toBase58()
+  )
 
-//   if (feed) {
-//     return `https://pyth.network/price-feeds/${feed.asset_type.toLowerCase()}-${feed.base.toLowerCase()}-${feed.quote_currency.toLowerCase()}?cluster=solana-mainnet-beta`
-//   }
-//   return ''
-// }
+  if (feed) {
+    return `https://pyth.network/price-feeds/${feed.asset_type.toLowerCase()}-${feed.base.toLowerCase()}-${feed.quote_currency.toLowerCase()}?cluster=solana-mainnet-beta`
+  }
+  return ''
+}
 
-// export const getOracle = async (connection: Connection, feedPk: PublicKey) => {
-//   const switchboardUrl = await isSwitchboardOracle(connection, feedPk)
-//   if (switchboardUrl) {
-//     return {
-//       type: 'Switchboard',
-//       url: switchboardUrl,
-//     }
-//   }
-//   const pythUrl = await isPythOracle(connection, feedPk)
-//   if (pythUrl) {
-//     return {
-//       type: 'Pyth',
-//       url: pythUrl,
-//     }
-//   }
-//   return {
-//     type: 'Unknown',
-//     url: '',
-//   }
-// }
+export const getOracle = async (connection: Connection, feedPk: PublicKey) => {
+  const switchboardUrl = await isSwitchboardOracle(connection, feedPk)
+  if (switchboardUrl) {
+    return {
+      type: 'Switchboard',
+      url: switchboardUrl,
+    }
+  }
+  const pythUrl = await isPythOracle(connection, feedPk)
+  if (pythUrl) {
+    return {
+      type: 'Pyth',
+      url: pythUrl,
+    }
+  }
+  return {
+    type: 'Unknown',
+    url: '',
+  }
+}
 
-// export default class EmptyWallet implements Wallet {
-//   constructor(readonly payer: Keypair) {}
+export default class EmptyWallet implements Wallet {
+  constructor(readonly payer: Keypair) {}
 
-//   async signTransaction<T extends Transaction | VersionedTransaction>(
-//     tx: T
-//   ): Promise<T> {
-//     if (tx instanceof Transaction) {
-//       tx.partialSign(this.payer)
-//     }
+  async signTransaction<T extends Transaction | VersionedTransaction>(
+    tx: T
+  ): Promise<T> {
+    if (tx instanceof Transaction) {
+      tx.partialSign(this.payer)
+    }
 
-//     return tx
-//   }
+    return tx
+  }
 
-//   async signAllTransactions<T extends Transaction | VersionedTransaction>(
-//     txs: T[]
-//   ): Promise<T[]> {
-//     return txs.map((t) => {
-//       if (t instanceof Transaction) {
-//         t.partialSign(this.payer)
-//       }
-//       return t
-//     })
-//   }
+  async signAllTransactions<T extends Transaction | VersionedTransaction>(
+    txs: T[]
+  ): Promise<T[]> {
+    return txs.map((t) => {
+      if (t instanceof Transaction) {
+        t.partialSign(this.payer)
+      }
+      return t
+    })
+  }
 
-//   get publicKey(): PublicKey {
-//     return this.payer.publicKey
-//   }
-// }
+  get publicKey(): PublicKey {
+    return this.payer.publicKey
+  }
+}
 
-// export const getBestMarket = async ({
-//   baseMint,
-//   quoteMint,
-//   cluster,
-//   connection,
-// }: {
-//   baseMint: string
-//   quoteMint: string
-//   cluster: 'devnet' | 'mainnet-beta'
-//   connection: Connection
-// }) => {
-//   try {
-//     const dexProgramPk = OPENBOOK_PROGRAM_ID[cluster]
+export const getBestMarket = async ({
+  baseMint,
+  quoteMint,
+  cluster,
+  connection,
+}: {
+  baseMint: string
+  quoteMint: string
+  cluster: 'devnet' | 'mainnet-beta'
+  connection: Connection
+}) => {
+  try {
+    const dexProgramPk = OPENBOOK_PROGRAM_ID[cluster]
 
-//     const markets = await Market.findAccountsByMints(
-//       connection,
-//       new PublicKey(baseMint),
-//       new PublicKey(quoteMint),
-//       dexProgramPk
-//     )
+    const markets = await Market.findAccountsByMints(
+      connection,
+      new PublicKey(baseMint),
+      new PublicKey(quoteMint),
+      dexProgramPk
+    )
 
-//     if (!markets.length) {
-//       return undefined
-//     }
-//     const marketsDataJsons = await Promise.all([
-//       ...markets.map((x) =>
-//         fetch(`/openSerumApi/market/${x.publicKey.toBase58()}`)
-//       ),
-//     ])
-//     const marketsData = await Promise.all([
-//       ...marketsDataJsons.map((x) => x.json()),
-//     ])
-//     let error = ''
-//     let sortedMarkets = marketsData.sort((a, b) => b.volume24h - a.volume24h)
-//     let firstBestMarket = sortedMarkets[0]
+    if (!markets.length) {
+      return undefined
+    }
+    const marketsDataJsons = await Promise.all([
+      ...markets.map((x) =>
+        fetch(`/openSerumApi/market/${x.publicKey.toBase58()}`)
+      ),
+    ])
+    const marketsData = await Promise.all([
+      ...marketsDataJsons.map((x) => x.json()),
+    ])
+    let error = ''
+    let sortedMarkets = marketsData.sort((a, b) => b.volume24h - a.volume24h)
+    let firstBestMarket = sortedMarkets[0]
 
-//     if (firstBestMarket.volume24h === 0) {
-//       error = 'Openbook market had 0 volume in last 24h check it carefully'
-//     }
-//     sortedMarkets = sortedMarkets.sort(
-//       (a, b) => b.quoteDepositsTotal - a.quoteDepositsTotal
-//     )
-//     firstBestMarket = sortedMarkets[0]
+    if (firstBestMarket.volume24h === 0) {
+      error = 'Openbook market had 0 volume in last 24h check it carefully'
+    }
+    sortedMarkets = sortedMarkets.sort(
+      (a, b) => b.quoteDepositsTotal - a.quoteDepositsTotal
+    )
+    firstBestMarket = sortedMarkets[0]
 
-//     return sortedMarkets.length
-//       ? { pubKey: new PublicKey(firstBestMarket.id), error: error }
-//       : undefined
-//   } catch (e) {
-//     notify({
-//       message: 'Openbook market not found',
-//       type: 'error',
-//     })
-//   }
-// }
+    return sortedMarkets.length
+      ? { pubKey: new PublicKey(firstBestMarket.id), error: error }
+      : undefined
+  } catch (e) {
+    notify({
+      message: 'Openbook market not found',
+      type: 'error',
+    })
+  }
+}
 
-// export const decodePriceFromOracleAi = async (
-//   ai: AccountInfo<Buffer>,
-//   connection: Connection,
-//   type: string
-// ): Promise<{
-//   uiPrice: number
-//   lastUpdatedSlot: number
-//   deviation: string
-// }> => {
-//   let uiPrice, lastUpdatedSlot, deviation
-//   try {
-//     if (type === 'Pyth') {
-//       const priceData = parsePriceData(ai.data)
-//       uiPrice = priceData.previousPrice
-//       lastUpdatedSlot = parseInt(priceData.lastSlot.toString())
-//       deviation =
-//         priceData.previousConfidence !== undefined
-//           ? ((priceData.previousConfidence / uiPrice) * 100).toFixed(2)
-//           : undefined
-//     } else if (type === 'Switchboard') {
-//       const program = await SwitchboardProgram.loadMainnet(connection)
-//       uiPrice = program.decodeLatestAggregatorValue(ai)!.toNumber()
-//       lastUpdatedSlot = program
-//         .decodeAggregator(ai)
-//         .latestConfirmedRound!.roundOpenSlot!.toNumber()
-//       deviation = (
-//         (switchboardDecimalToBig(
-//           program.decodeAggregator(ai).latestConfirmedRound.stdDeviation
-//         ).toNumber() /
-//           uiPrice) *
-//         100
-//       ).toFixed(2)
-//     }
-//     return { uiPrice, lastUpdatedSlot, deviation }
-//   } catch (e) {
-//     return { uiPrice, lastUpdatedSlot, deviation }
-//   }
-// }
+export const decodePriceFromOracleAi = async (
+  ai: AccountInfo<Buffer>,
+  connection: Connection,
+  type: string
+): Promise<{
+  uiPrice: number
+  lastUpdatedSlot: number
+  deviation: string
+}> => {
+  let uiPrice, lastUpdatedSlot, deviation
+  try {
+    if (type === 'Pyth') {
+      const priceData = parsePriceData(ai.data)
+      uiPrice = priceData.previousPrice
+      lastUpdatedSlot = parseInt(priceData.lastSlot.toString())
+      deviation =
+        priceData.previousConfidence !== undefined
+          ? ((priceData.previousConfidence / uiPrice) * 100).toFixed(2)
+          : undefined
+    } else if (type === 'Switchboard') {
+      const program = await SwitchboardProgram.loadMainnet(connection)
+      uiPrice = program.decodeLatestAggregatorValue(ai)!.toNumber()
+      lastUpdatedSlot = program
+        .decodeAggregator(ai)
+        .latestConfirmedRound!.roundOpenSlot!.toNumber()
+      deviation = (
+        (switchboardDecimalToBig(
+          program.decodeAggregator(ai).latestConfirmedRound.stdDeviation
+        ).toNumber() /
+          uiPrice) *
+        100
+      ).toFixed(2)
+    }
+    return { uiPrice, lastUpdatedSlot, deviation }
+  } catch (e) {
+    return { uiPrice, lastUpdatedSlot, deviation }
+  }
+}
 
-// export function switchboardDecimalToBig(sbDecimal: {
-//   mantissa: BN
-//   scale: number
-// }): Big {
-//   const mantissa = new Big(sbDecimal.mantissa.toString())
-//   const scale = sbDecimal.scale
-//   const oldDp = Big.DP
-//   Big.DP = 20
-//   const result: Big = mantissa.div(new Big(10).pow(scale))
-//   Big.DP = oldDp
-//   return result
-// }
+export function switchboardDecimalToBig(sbDecimal: {
+  mantissa: BN
+  scale: number
+}): Big {
+  const mantissa = new Big(sbDecimal.mantissa.toString())
+  const scale = sbDecimal.scale
+  const oldDp = Big.DP
+  Big.DP = 20
+  const result: Big = mantissa.div(new Big(10).pow(scale))
+  Big.DP = oldDp
+  return result
+}
 
 export const getFormattedBankValues = (group: Group, bank: Bank) => {
   return {
