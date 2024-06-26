@@ -315,10 +315,10 @@ export default function useGovernanceAssets() {
       name: 'Stake A Validator',
       packageId: PackageEnum.Common,
     },
-    [Instructions.SanctumSplDepositStake]: {
-      name: 'Sanctum Spl Deposit Stake',
-      packageId: PackageEnum.Common,
-    },
+    // [Instructions.SanctumSplDepositStake]: {
+    //   name: 'Sanctum Spl Deposit Stake',
+    //   packageId: PackageEnum.Common,
+    // },
     [Instructions.Transfer]: {
       name: 'Transfer Tokens',
       isVisible: canUseTokenTransferInstruction,
@@ -337,10 +337,10 @@ export default function useGovernanceAssets() {
       name: 'Withdraw validator stake',
       packageId: PackageEnum.Common,
     },
-    // [Instructions.SetMintAuthority]: {
-    //   name: 'Set Mint Authority',
-    //   packageId: PackageEnum.Common,
-    // },
+    [Instructions.SetMintAuthority]: {
+      name: 'Set Mint Authority',
+      packageId: PackageEnum.Common,
+    },
     // [Instructions.SplitStake]: {
     //   name: 'Split Stake Validator',
     //   packageId: PackageEnum.Common,

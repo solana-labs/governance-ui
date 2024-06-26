@@ -544,7 +544,7 @@ const New = () => {
       [Instructions.CreateTokenMetadata]: CreateTokenMetadata,
       [Instructions.UpdateTokenMetadata]: UpdateTokenMetadata,
       [Instructions.StakeValidator]: StakeValidator,
-      [Instructions.SanctumSplDepositStake]: SanctumSplDepositStake,
+      // [Instructions.SanctumSplDepositStake]: SanctumSplDepositStake,
       [Instructions.DeactivateValidatorStake]: DeactivateValidatorStake,
       [Instructions.WithdrawValidatorStake]: WithdrawValidatorStake,
       [Instructions.DelegateStake]: DelegateStake,

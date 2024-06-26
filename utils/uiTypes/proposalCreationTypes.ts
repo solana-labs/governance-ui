@@ -385,7 +385,7 @@ export enum Instructions {
   // RemoveServiceFromDID,
   RevokeGoverningTokens,
   SetMintAuthority,
-  SanctumSplDepositStake,
+  // SanctumSplDepositStake,
 }
 
 export interface ComponentInstructionData {
