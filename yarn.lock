@@ -1407,19 +1407,6 @@
     "@floating-ui/dom" "^0.5.3"
     use-isomorphic-layout-effect "^1.1.1"
 
-"@foresight-tmp/foresight-sdk@0.1.46":
-  version "0.1.46"
-  resolved "https://registry.yarnpkg.com/@foresight-tmp/foresight-sdk/-/foresight-sdk-0.1.46.tgz#f928dde22f424cfd438f8c9116d5ce84f5b56864"
-  integrity sha512-fqYnT+OrRDe84OWoDGow4KB5KYX/sRP+jg0Ylz0ExdNqoewK8gLmmAg6AvPc+B9ItAhcDhEBf0H/cGG6HpIQdw==
-  dependencies:
-    "@project-serum/anchor" "^0.23.0"
-    "@project-serum/serum" "0.13.64"
-    "@solana/web3.js" "^1.37.1"
-    assert "^2.0.0"
-    axios "^0.24.0"
-    buffer-layout "^1.2.2"
-    lodash "^4.17.21"
-    process "^0.11.10"
 
 "@fractalwagmi/popup-connection@^1.0.18":
   version "1.0.21"
