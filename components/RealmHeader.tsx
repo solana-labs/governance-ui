@@ -12,11 +12,11 @@ const RealmHeader = () => {
   const { REALM } = process.env
   const { connection } = useConnection()
 
-  const { realmInfo, symbol, vsrMode } = useRealm()
+  const { realmInfo, symbol } = useRealm()
   const { realmInfo, symbol } = useRealm()
 
   const explorerHost = getRealmExplorerHost(realmInfo)
-  const realmUrl = `https://${explorerHost}/#/realm/${realmInfo?.realmId.toBase58()}?programId=${realmInfo?.programId.toBase58()}`
+  // const realmUrl = `https://${explorerHost}/#/realm/${realmInfo?.realmId.toBase58()}?programId=${realmInfo?.programId.toBase58()}`
 
   const [isBackNavVisible, setIsBackNavVisible] = useState(true)
 
@@ -27,10 +27,10 @@ const RealmHeader = () => {
     if (realmPk === undefined) return undefined
     return determineVotingPowerType(connection, realmPk, 'community')
   }, [connection, realmPk])
-  const membersTabIsCouncilOnly = !(kind === 'vanilla' || kind === 'NFT')
-  const councilExists =
-    realm?.account.config.councilMint !== undefined &&
-    config?.account.councilTokenConfig?.tokenType !== GoverningTokenType.Dormant
+  // const membersTabIsCouncilOnly = !(kind === 'vanilla' || kind === 'NFT')
+  // const councilExists =
+  //   realm?.account.config.councilMint !== undefined &&
+  //   config?.account.councilTokenConfig?.tokenType !== GoverningTokenType.Dormant
 
   useEffect(() => {
     setIsBackNavVisible(realmInfo?.symbol !== REALM)
