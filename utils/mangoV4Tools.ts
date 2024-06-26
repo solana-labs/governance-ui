@@ -60,8 +60,8 @@ export const getClient = async (connection: Connection) => {
         'mainnet-beta',
         MANGO_V4_ID['mainnet-beta'],
         {
-            idsSource: 'api',
-          }
+          idsSource: 'api',
+        }
       )
 
       return client

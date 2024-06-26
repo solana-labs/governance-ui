@@ -93,6 +93,15 @@ interface Props {
 
 function areConfigsEqual(a: Props['structure'], b: Props['structure']) {
   if (
+    Object.hasOwnProperty.call(a, 'maxVotingProgramId') !==
+      Object.hasOwnProperty.call(b, 'maxVotingProgramId') ||
+    Object.hasOwnProperty.call(a, 'votingProgramId') !==
+      Object.hasOwnProperty.call(b, 'votingProgramId')
+  ) {
+    return false;
+  }
+
+  if (
     (a.maxVotingProgramId && !b.maxVotingProgramId) ||
     (!a.maxVotingProgramId && b.maxVotingProgramId)
   ) {
@@ -246,12 +255,10 @@ export function VotingStructureSelector(props: Props) {
           ref={trigger}
         >
           <div className={labelStyles}>
-            {areConfigsEqual({}, props.structure) && isDefault
-              ? 'Default'
-              : getLabel(props.structure)}
+            {isDefault ? 'Default' : getLabel(props.structure)}
           </div>
           <div className={descriptionStyles}>
-            {areConfigsEqual({}, props.structure) && isDefault
+            {isDefault
               ? 'Governance is based on token ownership'
               : getDescription(props.structure)}
           </div>
@@ -363,16 +370,15 @@ export function VotingStructureSelector(props: Props) {
               ...(props.allowNFT ? [DEFAULT_NFT_CONFIG] : []),
               ...(props.allowVSR ? [DEFAULT_VSR_CONFIG] : []),
               ...(props.allowQV ? [DEFAULT_QV_CONFIG] : []),
-              ...(isCustomConfig(props.currentStructure)
+              ...(isCustomConfig(props.currentStructure) && !isDefault
                 ? [props.currentStructure]
                 : [{}]),
               'default',
             ] as const)
               .filter((config) => {
                 if (typeof config === 'string') {
-                  return !areConfigsEqual({}, props.structure);
+                  return !isDefault;
                 }
-
                 return !areConfigsEqual(config, props.structure);
               })
               .map((config, i) => (

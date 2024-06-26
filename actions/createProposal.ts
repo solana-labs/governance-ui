@@ -108,6 +108,7 @@ export const createProposal = async (
     instructions,
     'createProposal',
     createNftTicketsIxs,
+    governance
   )
 
   const proposalAddress = await withCreateProposal(

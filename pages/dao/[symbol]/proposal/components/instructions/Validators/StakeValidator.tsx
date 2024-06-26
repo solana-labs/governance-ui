@@ -93,7 +93,7 @@ const StakeValidator = ({
         .oneOf(validators),
       amount: yup
         .number()
-        .min(1, 'Amount must be positive number')
+        .min(0.1, 'Amount must be positive number')
         .required('Amount is required'),
       seed: yup
         .number()
@@ -200,6 +200,7 @@ const StakeValidator = ({
       isValid: true,
       governance: form.governedTokenAccount.governance,
       prerequisiteInstructions: prerequisiteInstructions,
+      chunkBy: 1,
     }
   }
 

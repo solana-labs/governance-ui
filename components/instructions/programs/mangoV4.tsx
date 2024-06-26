@@ -1,9 +1,4 @@
-import {
-  Bank,
-  OracleProvider,
-  USDC_MINT,
-  toUiDecimals,
-} from '@blockworks-foundation/mango-v4'
+import { Bank, USDC_MINT, toUiDecimals } from '@blockworks-foundation/mango-v4'
 import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
 import { BN, BorshInstructionCoder } from '@coral-xyz/anchor'
 import { AccountMetaData } from '@solana/spl-governance'
@@ -253,14 +248,12 @@ const instructions = () => ({
       )
 
       const presetInfo = await getSuggestedCoinPresetInfo(
-        proposedMint.toBase58(),
-        proposedOracle.type === 'Pyth'
+        proposedMint.toBase58()
       )
 
       const formattedProposedArgs = getFormattedListingValues(args)
 
       const formattedSuggestedPresets = getFormattedListingPresets(
-        proposedOracle.type === 'Pyth',
         0,
         mintInfo?.account.decimals || 0,
         oracleData.uiPrice
@@ -482,19 +475,19 @@ const instructions = () => ({
                 suffix="%"
               />
               <DisplayListingPropertyWrapped
-                label="Max fee rate"
+                label="Interest rate max rate"
                 valKey={'maxRate'}
                 suffix="%"
               />
               <DisplayListingPropertyWrapped
                 label="Loan Fee Rate"
                 valKey={'loanFeeRate'}
-                suffix=" bps"
+                suffix=" %"
               />
               <DisplayListingPropertyWrapped
                 label="Loan Origination Fee Rate"
                 valKey={'loanOriginationFeeRate'}
-                suffix=" bps"
+                suffix=" %"
               />
               <DisplayListingPropertyWrapped
                 label="Maintenance Asset Weight"
@@ -519,7 +512,7 @@ const instructions = () => ({
               />
               <DisplayListingPropertyWrapped
                 label="Platform Liquidation Fee"
-                valKey="PlatformLiquidationFee"
+                valKey="platformLiquidationFee"
                 suffix="%"
               />
               <DisplayListingPropertyWrapped
@@ -628,6 +621,7 @@ const instructions = () => ({
               <DisplayListingPropertyWrapped
                 label="Collateral Fee Per Day"
                 valKey="collateralFeePerDay"
+                suffix=" %"
               />
             </div>
             <AdvancedOptionsDropdown className="mt-4" title="Raw values">
@@ -915,11 +909,11 @@ const instructions = () => ({
               : undefined,
           loanFeeRate:
             args.loanFeeRateOpt !== undefined
-              ? (args.loanFeeRateOpt * 10000)?.toFixed(2)
+              ? (args.loanFeeRateOpt * 100)?.toFixed(2)
               : undefined,
           loanOriginationFeeRate:
             args.loanOriginationFeeRateOpt !== undefined
-              ? (args.loanOriginationFeeRateOpt * 10000)?.toFixed(2)
+              ? (args.loanOriginationFeeRateOpt * 100)?.toFixed(2)
               : undefined,
           maintAssetWeight: args.maintAssetWeightOpt?.toFixed(2),
           initAssetWeight: args.initAssetWeightOpt?.toFixed(2),
@@ -995,7 +989,6 @@ const instructions = () => ({
           bank = mangoGroup.getFirstBankByMint(mint)
           bankFormattedValues = getFormattedBankValues(mangoGroup, bank)
           mintData = tokenPriceService.getTokenInfo(mint.toBase58())
-          const isPyth = bank?.oracleProvider === OracleProvider.Pyth
 
           const midPriceImpacts = getMidPriceImpacts(
             mangoGroup.pis.length ? mangoGroup.pis : []
@@ -1024,8 +1017,7 @@ const instructions = () => ({
             ? getProposedKey(
                 priceImpact.avg_price_impact_percent < 1
                   ? priceImpact?.target_amount
-                  : undefined,
-                bank.oracleProvider === OracleProvider.Pyth
+                  : undefined
               )
             : 'UNTRUSTED'
 
@@ -1037,12 +1029,11 @@ const instructions = () => ({
                   : '',
               }
             : {
-                presetKey: 'asset_250p',
+                presetKey: 'asset_250',
                 priceImpact: '0',
               }
 
           const suggestedPreset = getFormattedListingPresets(
-            !!isPyth,
             bank.uiDeposits(),
             bank.mintDecimals,
             bank.uiPrice
@@ -1094,6 +1085,9 @@ const instructions = () => ({
                       0
                   )
                 )
+              }
+              if (x === 'collateralFeePerDay') {
+                return false
               }
               return true
             })
@@ -1282,31 +1276,28 @@ const instructions = () => ({
               />
               <DisplayNullishProperty
                 label="Loan Fee Rate"
-                value={
-                  parsedArgs.loanFeeRate && `${parsedArgs.loanFeeRate} bps`
-                }
+                value={parsedArgs.loanFeeRate && `${parsedArgs.loanFeeRate} %`}
                 currentValue={
                   bankFormattedValues?.loanFeeRate &&
-                  `${bankFormattedValues.loanFeeRate} bps`
+                  `${bankFormattedValues.loanFeeRate} %`
                 }
                 suggestedVal={
-                  invalidFields.loanFeeRate &&
-                  `${invalidFields.loanFeeRate} bps`
+                  invalidFields.loanFeeRate && `${invalidFields.loanFeeRate} %`
                 }
               />
               <DisplayNullishProperty
                 label="Loan Origination Fee Rate"
                 value={
                   parsedArgs.loanOriginationFeeRate &&
-                  `${parsedArgs.loanOriginationFeeRate} bps`
+                  `${parsedArgs.loanOriginationFeeRate} %`
                 }
                 currentValue={
                   bankFormattedValues?.loanOriginationFeeRate &&
-                  `${bankFormattedValues.loanOriginationFeeRate} bps`
+                  `${bankFormattedValues.loanOriginationFeeRate} %`
                 }
                 suggestedVal={
                   invalidFields.loanOriginationFeeRate &&
-                  `${invalidFields.loanOriginationFeeRate} bps`
+                  `${invalidFields.loanOriginationFeeRate} %`
                 }
               />
               <DisplayNullishProperty
@@ -2080,8 +2071,8 @@ const getFormattedListingValues = (args: FlatListingArgs) => {
     adjustmentFactor: (
       args['interestRateParams.adjustmentFactor'] * 100
     ).toFixed(2),
-    loanFeeRate: (args.loanFeeRate * 10000).toFixed(2),
-    loanOriginationFeeRate: (args.loanOriginationFeeRate * 10000).toFixed(2),
+    loanFeeRate: (args.loanFeeRate * 100).toFixed(2),
+    loanOriginationFeeRate: (args.loanOriginationFeeRate * 100).toFixed(2),
     maintAssetWeight: args.maintAssetWeight.toFixed(2),
     initAssetWeight: args.initAssetWeight.toFixed(2),
     maintLiabWeight: args.maintLiabWeight.toFixed(2),
@@ -2117,7 +2108,7 @@ const getFormattedListingValues = (args: FlatListingArgs) => {
     interestTargetUtilization: args.interestTargetUtilization,
     interestCurveScaling: args.interestCurveScaling,
     groupInsuranceFund: args.groupInsuranceFund,
-    collateralFeePerDay: (args.collateralFeePerDay * 100).toFixed(2),
+    collateralFeePerDay: (args.collateralFeePerDay * 100).toFixed(4),
     zeroUtilRate: (args.zeroUtilRate * 100).toFixed(2),
     disableAssetLiquidation: args.disableAssetLiquidation,
   }

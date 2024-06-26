@@ -12,8 +12,8 @@ import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, { InstructionInput } from '../../FormCreator'
 import { InstructionInputType } from '../../inputInstructionType'
 import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
-import { buildIxGate } from '@blockworks-foundation/mango-v4-rc'
-import { IxGateParams } from '@blockworks-foundation/mango-v4-rc/dist/types/src/clientIxParamBuilder'
+import { buildIxGate } from '@blockworks-foundation/mango-v4'
+import { IxGateParams } from '@blockworks-foundation/mango-v4/dist/types/src/clientIxParamBuilder'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import useProgramSelector from '@components/Mango/useProgramSelector'
 import ProgramSelector from '@components/Mango/ProgramSelector'
@@ -125,6 +125,8 @@ const IxGateSet = ({
     TokenConditionalSwapCreateLinearAuction: true,
     Serum3PlaceOrderV2: true,
     TokenForceWithdraw: true,
+    SequenceCheck: true,
+    HealthCheck: true,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -646,6 +648,18 @@ const IxGateSet = ({
       initialValue: form.TokenForceWithdraw,
       type: InstructionInputType.SWITCH,
       name: 'TokenForceWithdraw',
+    },
+    {
+      label: 'Sequence Check',
+      initialValue: form.SequenceCheck,
+      type: InstructionInputType.SWITCH,
+      name: 'SequenceCheck',
+    },
+    {
+      label: 'Health Check',
+      initialValue: form.HealthCheck,
+      type: InstructionInputType.SWITCH,
+      name: 'HealthCheck',
     },
   ]
 

@@ -21,7 +21,7 @@ import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { addQVPlugin } from './addPlugins/addQVPlugin'
 import { defaultSybilResistancePass } from '../GatewayPlugin/config'
 import { addGatewayPlugin } from './addPlugins/addGatewayPlugin'
-import { Coefficients } from 'QuadraticPlugin/sdk/api'
+import {Coefficients} from "@solana/governance-program-library";
 
 type CreateWithPlugin = {
   pluginList: PluginName[]

@@ -9,9 +9,9 @@ import { BN_ZERO } from '@solana/spl-governance'
 import {
   getMultipleAccountInfoChunked,
   getTokenAccountsByMint,
-  parseTokenAccountData,
   TokenProgramAccount,
 } from '@utils/tokens'
+import { parseTokenAccountData } from '@utils/parseTokenAccountData'
 import { capitalize } from '@utils/helpers'
 import { Member } from 'utils/uiTypes/members'
 import { useRealmQuery } from '@hooks/queries/realm'

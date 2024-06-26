@@ -2,11 +2,10 @@
 import { Connection, PublicKey } from '@solana/web3.js'
 import { AnchorProvider, Wallet } from '@coral-xyz/anchor'
 import {
-  Coefficients,
   DEFAULT_COEFFICIENTS,
   toAnchorType,
 } from '../../QuadraticPlugin/sdk/api'
-import { QuadraticClient } from '@solana/governance-program-library'
+import {Coefficients, QuadraticClient} from '@solana/governance-program-library'
 import { getRegistrarPDA } from '@utils/plugin/accounts'
 import { SYSTEM_PROGRAM_ID } from '@solana/spl-governance'
 import { AddPluginResult } from './types'

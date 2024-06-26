@@ -1,13 +1,11 @@
 import { PublicKey } from '@solana/web3.js'
-import { QuadraticClient } from '@solana/governance-program-library'
+import {Coefficients, QuadraticClient } from '@solana/governance-program-library'
 import {
   ProgramAccount,
   Realm,
   SYSTEM_PROGRAM_ID,
 } from '@solana/spl-governance'
 import { getRegistrarPDA } from '@utils/plugin/accounts'
-
-export type Coefficients = [a: number, b: number, c: number]
 
 // By default, the quadratic plugin will use a function ax-2 + bx - c
 // resulting in a vote weight that is the square root of the token balance
@@ -24,15 +22,11 @@ export const toAnchorType = (coefficients: Coefficients) => ({
   c: coefficients[2],
 })
 
-// Get the registrar account for a given realm
-export const tryGetQuadraticRegistrar = async (
-  registrarPk: PublicKey,
-  quadraticClient: QuadraticClient
-) => {
-  try {
-    return await quadraticClient.program.account.registrar.fetch(registrarPk)
-  } catch (e) {
-    return null
+export type AnchorParams = {
+  quadraticCoefficients: {
+    a: number;
+    b: number;
+    c: number;
   }
 }
 
@@ -98,4 +92,9 @@ export const configureQuadraticRegistrarIx = async (
     })
     .remainingAccounts(remainingAccounts)
     .instruction()
+}
+
+export const coefficientsEqual = (x: Coefficients, y: Coefficients | undefined): boolean => {
+  if (!y) return false
+  return x[0] === y[0] && x[1] === y[1] && x[2] === y[2]
 }

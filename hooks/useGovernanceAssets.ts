@@ -4,7 +4,6 @@ import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import { HELIUM_VSR_PLUGINS_PKS, VSR_PLUGIN_PKS } from '../constants/plugins'
 import { useRealmQuery } from './queries/realm'
 import { useRealmConfigQuery } from './queries/realmConfig'
-import { useRouter } from 'next/router'
 import { useRealmGovernancesQuery } from './queries/governance'
 import { useMemo } from 'react'
 import { useRealmVoterWeights } from '@hooks/useRealmVoterWeightPlugins'
@@ -44,7 +43,6 @@ export type InstructionType = {
 export default function useGovernanceAssets() {
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
-  const { symbol } = useRouter().query
   const { communityWeight, councilWeight } = useRealmVoterWeights()
   const ownVoterWeights = {
     community: communityWeight?.value,
@@ -151,11 +149,6 @@ export default function useGovernanceAssets() {
     },
     [PackageEnum.Distribution]: {
       name: 'Distribution Program',
-    },
-    [PackageEnum.Foresight]: {
-      name: 'Foresight',
-      isVisible: symbol === 'FORE',
-      image: '/img/foresight.png',
     },
     [PackageEnum.GatewayPlugin]: {
       name: 'Civic Plugin',
@@ -274,6 +267,10 @@ export default function useGovernanceAssets() {
       name: 'Delegate Stake Account',
       packageId: PackageEnum.Common,
     },
+    [Instructions.RemoveStakeLock]: {
+      name: 'Stake Account Remove Lock',
+      packageId: PackageEnum.Common,
+    },
     [Instructions.DifferValidatorStake]: {
       name: 'Differ validator stake',
       // Not to be used for now
@@ -316,6 +313,10 @@ export default function useGovernanceAssets() {
     },
     [Instructions.StakeValidator]: {
       name: 'Stake A Validator',
+      packageId: PackageEnum.Common,
+    },
+    [Instructions.SanctumSplDepositStake]: {
+      name: 'Sanctum Spl Deposit Stake',
       packageId: PackageEnum.Common,
     },
     [Instructions.Transfer]: {
