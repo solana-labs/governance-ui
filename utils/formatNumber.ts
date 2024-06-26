@@ -1,6 +1,7 @@
-import type { BigNumber } from 'bignumber.js'
+import { BigNumber } from 'bignumber.js'
 
 import { getUserLocale } from './getUserLocale'
+import { BN } from '@coral-xyz/anchor'
 
 const getFormatter = (() => {
   const formatters = new Map<string, (number: number) => string>()
@@ -58,3 +59,17 @@ export function formatNumber(
 
   return number.toFormat(options?.maximumSignificantDigits || 2)
 }
+
+export function formatBN(value: BN, decimals: number) {
+  const num = new BigNumber(value.toString()).shiftedBy(-decimals)
+
+  if (typeof Intl === 'undefined' || typeof navigator === 'undefined') {
+    return num.toFormat()
+  }
+
+  const formatter = new Intl.NumberFormat(navigator.language, {
+    minimumFractionDigits: decimals,
+  })
+  return formatter.format(num.toNumber())
+}
+

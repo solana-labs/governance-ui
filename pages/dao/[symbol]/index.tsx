@@ -56,6 +56,7 @@ import { createComputeBudgetIx } from '@blockworks-foundation/mango-v4'
 import { useNftClient } from '../../../VoterWeightPlugins/useNftClient'
 import { useVotingClients } from '@hooks/useVotingClients'
 import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
+import Leaderboard from '@components/Leaderboard'
 
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
@@ -445,7 +446,7 @@ const REALM = () => {
                 <Tabs
                   activeTab={activeTab}
                   onChange={(t) => setActiveTab(t)}
-                  tabs={['Proposals', 'About']}
+                  tabs={['Proposals', 'Leaderboard', 'About']}
                 />
                 {activeTab === 'Proposals' && (
                   <>
@@ -533,6 +534,7 @@ const REALM = () => {
                     </div>
                   </>
                 )}
+                {activeTab === 'Leaderboard' && <Leaderboard />}
                 {activeTab === 'About' && <AboutRealm />}
               </div>
             </div>
