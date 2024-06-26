@@ -22,10 +22,8 @@ import { VOTE_STAKE_REGISTRY_INSTRUCTIONS } from './programs/voteStakeRegistry'
 import { MARINADE_INSTRUCTIONS } from './programs/marinade'
 import { SOLEND_PROGRAM_INSTRUCTIONS } from './programs/solend'
 import { ATA_PROGRAM_INSTRUCTIONS } from './programs/associatedTokenAccount'
-// import { governance as foresightGov } from '@foresight-tmp/foresight-sdk'
 import { ConnectionContext } from '@utils/connection'
 import { NFT_VOTER_INSTRUCTIONS } from './programs/nftVotingClient'
-import { FORESIGHT_INSTRUCTIONS } from './programs/foresight'
 import { LIDO_INSTRUCTIONS } from './programs/lido'
 import { NAME_SERVICE_INSTRUCTIONS } from './programs/nameService'
 import { TOKEN_AUCTION_INSTRUCTIONS } from './programs/tokenAuction'
@@ -37,6 +35,7 @@ import { SWITCHBOARD_INSTRUCTIONS } from './programs/switchboard'
 import { STAKE_INSTRUCTIONS } from './programs/stake'
 import dayjs from 'dayjs'
 import { JUPITER_REF } from './programs/jupiterRef'
+import { STAKE_SANCTUM_INSTRUCTIONS } from './programs/stakeSanctum'
 
 /**
  * Default governance program id instance
@@ -113,8 +112,6 @@ export const ACCOUNT_NAMES = {
   MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac: 'MNGO Token Mint',
   H7uqouPsJkeEiLpCEoC1qYVVquDrZan6ZfdPK2gS44zm: 'FORE Devnet Token Mint',
   '4ahVJVavHM8DZCtjX6YuKSTFx6KJwRPmVCJtjdQYdUU7': 'FORE Mainnet Token Mint',
-  // [foresightGov.DEVNET_TREASURY.toBase58()]: 'Foresight Devnet Governance',
-  // [foresightGov.MAINNET_TREASURY.toBase58()]: 'Foresight Mainnet Governance',
   EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: 'USDC Token Mint',
 
   MyHd6a7HWKTMeJMHBkrbMq4hZwZxwn9x7dxXcopQ4Wd: 'OMH Token',
@@ -420,10 +417,42 @@ const MNGO_AUXILIARY_TOKEN_ACCOUNTS = [
     owner: '7hqfhmXK6uXQKmNjUVEJo5acDMLcnyN9p9bZ5Dmnifde',
     accounts: ['2gDu12CM56g18Ukc9R1EdmEbToXqGTrnBEqR3zKfVKgt'],
   },
+  //treasury management council
   {
     owner: '9so7UTo6b6LXBSqdDfh18hjVj8Ng5BmLbYXLB7UrhaaJ',
-    accounts: ['A9xaHx54B9bRYBga4V6LKFrRaARpMJFYVooEXRAanru5'],
+    accounts: [
+      'A9xaHx54B9bRYBga4V6LKFrRaARpMJFYVooEXRAanru5',
+      '8Wkbx6Daq3RQY492HaXK2nbVLXKCL5SGcab3RHzBCzpV',
+      '7D2j3MpXMveMEkdR94QfMh5nS3HdFD7uQHKhaLenR8u6',
+      '5d5CU8viHKiwrwjgNUFtb6AxUjdiZ1xmLo2m3AMYa9K5',
+    ],
   },
+  //boost council
+  {
+    owner: 'BExGoGVK6k6mUL6oHmabbc2EtwNqhJUeNoJWijF6t3ZB',
+    accounts: [
+      'HuDbGjhoPMWxVUxJmaY4uinDF5RmSufg2SCwjxpCRvXX',
+      'AnmvgZbSre3NyGn4CeSNZDTN7NMmribt4eNTFDAQSGuv',
+    ],
+  },
+  //vsr
+  {
+    owner: 'DZZWE1PR8qTkH3dLTrD7kcNEs6xx3GmSuFbzW29dyHv7',
+    accounts: ['CJoHzb9FVJUKanFdmjjXD84Hg94qgE4egu8s2tGYTVdE'],
+  },
+  {
+    owner: 'VrT8f16NLADvYR73YiDMwxZREPbJgiZqLvN6HLQj4hR',
+    accounts: ['BkNq5TQvPkDnQWNgn1j2Q2SAFe3r5m2PazRwC7YUSHAT'],
+  },
+  {
+    owner: '3H5PPK1bhHKmCAG5zwUyxpKDijES3H9uRAUCBrW8rGPX',
+    accounts: ['3sC3vzVz9YoiR12QKgvxHD6Q2LBfhL1ev63tsUaUS2EJ'],
+  },
+  {
+    owner: 'DdZWj3nWSzJMMv1LMTHm9gTJ37wHLNXTMzqjWCokvKEn',
+    accounts: ['6XfCUQuq4juhqWLCW6LeivZd1eGuCRp4Mw3D6nkwXwFG'],
+  },
+  //
 ]
 
 export const AUXILIARY_TOKEN_ACCOUNTS = {
@@ -462,7 +491,6 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...LIDO_INSTRUCTIONS,
   ...SWITCHBOARD_INSTRUCTIONS,
   ...SOLEND_PROGRAM_INSTRUCTIONS,
-  ...FORESIGHT_INSTRUCTIONS,
   ...ATA_PROGRAM_INSTRUCTIONS,
   ...SYSTEM_INSTRUCTIONS,
   ...VOTE_STAKE_REGISTRY_INSTRUCTIONS,
@@ -474,6 +502,7 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...MANGO_V4_INSTRUCTIONS,
   ...DUAL_INSTRUCTIONS,
   ...STAKE_INSTRUCTIONS,
+  ...STAKE_SANCTUM_INSTRUCTIONS,
   ...JUPITER_REF,
 }
 

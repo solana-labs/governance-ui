@@ -9,11 +9,32 @@ import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 const RealmHeader = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const config = useRealmConfigQuery().data?.result
+  const { REALM } = process.env
+  const { connection } = useConnection()
+
+  const { realmInfo, symbol, vsrMode } = useRealm()
   const { realmInfo, symbol } = useRealm()
 
-  const isBackNavVisible = realmInfo?.symbol !== 'ORCA' // hide backnav for the default realm
+  const explorerHost = getRealmExplorerHost(realmInfo)
+  const realmUrl = `https://${explorerHost}/#/realm/${realmInfo?.realmId.toBase58()}?programId=${realmInfo?.programId.toBase58()}`
 
-  const forumUrl = `https://forums.orca.so/`
+  const [isBackNavVisible, setIsBackNavVisible] = useState(true)
+
+  const { connection } = useConnection()
+  const realmPk = useSelectedRealmPubkey()
+
+  const { result: kind } = useAsync(async () => {
+    if (realmPk === undefined) return undefined
+    return determineVotingPowerType(connection, realmPk, 'community')
+  }, [connection, realmPk])
+  const membersTabIsCouncilOnly = !(kind === 'vanilla' || kind === 'NFT')
+  const councilExists =
+    realm?.account.config.councilMint !== undefined &&
+    config?.account.councilTokenConfig?.tokenType !== GoverningTokenType.Dormant
+
+  useEffect(() => {
+    setIsBackNavVisible(realmInfo?.symbol !== REALM)
+  }, [realmInfo?.symbol, REALM])
 
   return (
     <div className="px-4 pt-4 pb-4 rounded-t-lg bg-bkg-2 md:px-6 md:pt-6">

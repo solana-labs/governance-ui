@@ -2,7 +2,8 @@ import { BN, web3 } from '@coral-xyz/anchor'
 import { AccountMetaData } from '@solana/spl-governance'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
 import tokenPriceService from '@utils/services/tokenPrice'
-import { parseMintAccountData, parseTokenAccountData } from '@utils/tokens'
+import { parseMintAccountData } from '@utils/tokens'
+import { parseTokenAccountData } from '@utils/parseTokenAccountData'
 import { InstructionDescriptorFactory } from '../tools'
 
 const common_instructions = (): Record<

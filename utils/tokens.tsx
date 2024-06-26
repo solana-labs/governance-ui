@@ -7,7 +7,6 @@ import {
 } from '@solana/web3.js'
 import {
   AccountInfo,
-  AccountLayout,
   MintInfo,
   MintLayout,
   Token,
@@ -25,6 +24,7 @@ import { BN } from '@coral-xyz/anchor'
 import { abbreviateAddress } from './formatting'
 import BigNumber from 'bignumber.js'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import { parseTokenAccountData } from './parseTokenAccountData'
 
 export type TokenAccount = AccountInfo
 export type MintAccount = MintInfo
@@ -139,45 +139,6 @@ export const TOKEN_PROGRAM_ID = new PublicKey(
 export const BPF_UPGRADE_LOADER_ID = new PublicKey(
   'BPFLoaderUpgradeab1e11111111111111111111111'
 )
-
-/** @asktree its very unclear why this must exist, like... why doesn't spl-token do this? */
-export function parseTokenAccountData(
-  account: PublicKey,
-  data: Buffer
-): TokenAccount {
-  const accountInfo = AccountLayout.decode(data)
-  accountInfo.address = account
-  accountInfo.mint = new PublicKey(accountInfo.mint)
-  accountInfo.owner = new PublicKey(accountInfo.owner)
-  accountInfo.amount = u64.fromBuffer(accountInfo.amount)
-
-  if (accountInfo.delegateOption === 0) {
-    accountInfo.delegate = null
-    accountInfo.delegatedAmount = new u64(0)
-  } else {
-    accountInfo.delegate = new PublicKey(accountInfo.delegate)
-    accountInfo.delegatedAmount = u64.fromBuffer(accountInfo.delegatedAmount)
-  }
-
-  accountInfo.isInitialized = accountInfo.state !== 0
-  accountInfo.isFrozen = accountInfo.state === 2
-
-  if (accountInfo.isNativeOption === 1) {
-    accountInfo.rentExemptReserve = u64.fromBuffer(accountInfo.isNative)
-    accountInfo.isNative = true
-  } else {
-    accountInfo.rentExemptReserve = null
-    accountInfo.isNative = false
-  }
-
-  if (accountInfo.closeAuthorityOption === 0) {
-    accountInfo.closeAuthority = null
-  } else {
-    accountInfo.closeAuthority = new PublicKey(accountInfo.closeAuthority)
-  }
-
-  return accountInfo
-}
 
 /** @deprecated -- why not just use the normal mint layout? */
 export function parseMintAccountData(data: Buffer): MintAccount {

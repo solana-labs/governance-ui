@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { fetchRealmByPubkey } from '@hooks/queries/realm'
 import { useConnection } from '@solana/wallet-adapter-react'
-import { Keypair, Transaction, TransactionInstruction } from '@solana/web3.js'
+import { Keypair, TransactionInstruction } from '@solana/web3.js'
 import { approveTokenTransfer } from '@utils/tokens'
 import useSelectedRealmPubkey from '@hooks/selectedRealm/useSelectedRealmPubkey'
 import { withDepositGoverningTokens } from '@solana/spl-governance'
@@ -82,10 +82,7 @@ export const useDepositCallback = (
       // no need to create the TOR, as it is already created by the deposit.
       const pluginRegisterInstructions = await handleRegister(false)
 
-      const transaction = new Transaction()
-      transaction.add(...instructions, ...pluginRegisterInstructions)
-
-      const txes = [instructions].map((txBatch) => {
+      const txes = [[...instructions, ...pluginRegisterInstructions]].map((txBatch) => {
         return {
           instructionsSet: txBatch.map((x) => {
             return {

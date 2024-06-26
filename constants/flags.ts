@@ -16,4 +16,6 @@ export const DELEGATOR_BATCH_VOTE_SUPPORT_BY_PLUGIN: Record<
   NFT: false,
   pyth: false,
   unknown: false,
+  drift: false,
+  token_haver: false,
 }

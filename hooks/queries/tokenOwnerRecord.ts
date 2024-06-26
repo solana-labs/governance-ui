@@ -17,6 +17,7 @@ import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import queryClient from './queryClient'
 import mainnetBetaRealms from 'public/realms/mainnet-beta.json'
+import { determineVotingPowerType } from './governancePower'
 
 export const tokenOwnerRecordQueryKeys = {
   all: (endpoint: string) => [endpoint, 'TokenOwnerRecord'],
@@ -107,11 +108,19 @@ export const useTokenOwnerRecordsForRealmQuery = () => {
       const filter = pubkeyFilter(1, realm.pubkey)
       if (!filter) throw new Error() // unclear why this would ever happen, probably it just cannot
 
+      const votingType = await determineVotingPowerType(connection.current, realm.pubkey, "community")
+      const councilOnly = !(votingType === 'vanilla' || votingType === 'NFT')
+      const councilMint = realm.account.config.councilMint
+
+      const mintFilter = councilOnly && councilMint ? 
+        pubkeyFilter(33, councilMint) : 
+        null
+
       const results = await getGovernanceAccounts(
         connection.current,
         realm.owner,
         TokenOwnerRecord,
-        [filter]
+        mintFilter ? [filter, mintFilter] : [filter]
       )
 
       // This may or may not be resource intensive for big DAOs, and is not too useful

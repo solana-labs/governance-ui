@@ -1,21 +1,20 @@
 import type { EndpointTypes } from '@models/types'
 import { Connection } from '@solana/web3.js'
 import type { EndpointInfo } from '../@types/types'
+import { DEVNET_RPC, MAINNET_RPC } from '@constants/endpoints'
 
 export const BACKUP_CONNECTIONS = [
-  new Connection('https://api.mngo.cloud/lite-rpc/v1/', 'recent'),
+  new Connection(`https://api.mngo.cloud/lite-rpc/v1-mangoui-812743`, 'recent'),
 ]
 
 const ENDPOINTS: EndpointInfo[] = [
   {
     name: 'mainnet',
-    url:
-      process.env.MAINNET_RPC ||
-      'https://mainnet.helius-rpc.com/?api-key=09efbe04-3da6-4492-aa39-84a7a3e27016',
+    url: MAINNET_RPC,
   },
   {
     name: 'devnet',
-    url: process.env.DEVNET_RPC || 'https://api.dao.devnet.solana.com/',
+    url: DEVNET_RPC,
   },
   {
     name: 'localnet',

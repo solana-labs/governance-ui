@@ -8,6 +8,8 @@ import LockedCommunityNFTRecordVotingPower from '@components/ProposalVotingPower
 import QuadraticVotingPower from '@components/ProposalVotingPower/QuadraticVotingPower'
 import { VSRCard } from '@components/GovernancePower/Power/VSRCard'
 import { VanillaCard } from '@components/GovernancePower/Power/Vanilla/VanillaCard'
+import DriftVotingPower from 'DriftStakeVoterPlugin/components/DriftVotingPower'
+import TokenHaverVotingPower from '@components/ProposalVotingPower/TokenHaverVotingPower'
 
 /****
  * Note to plugin implementors.
@@ -31,6 +33,8 @@ const pluginsWithDedicatedVotingPowerUI = [
   'VSR',
   'gateway',
   'QV',
+  'drift',
+  'token_haver',
 ] as const
 
 export type VotingCardProps = {
@@ -67,6 +71,10 @@ const CardForPlugin: FC<
       return <GatewayCard role={role} />
     case 'QV':
       return <QuadraticVotingPower role={role} />
+    case 'drift':
+      return <DriftVotingPower role={role} />
+    case 'token_haver':
+      return <TokenHaverVotingPower role={role} />
   }
 }
 

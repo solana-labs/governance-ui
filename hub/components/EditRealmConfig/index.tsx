@@ -319,7 +319,6 @@ export function EditRealmConfig(props: Props) {
                                   24 *
                                   governance.minInstructionHoldupDays,
                                 prerequisiteInstructions: [],
-                                chunkBy: 3,
                               })),
                               governance: governance.governanceAddress,
                             });

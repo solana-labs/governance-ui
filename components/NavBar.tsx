@@ -1,8 +1,9 @@
 import useQueryContext from '@hooks/useQueryContext'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
-import NotificationsSwitch from './NotificationsSwitch'
-// import ThemeSwitch from './ThemeSwitch'
+import ThemeSwitch from './ThemeSwitch'
+import { ExternalLinkIcon } from '@heroicons/react/outline'
+import DialectNotifications from './Dialect'
 
 const ConnectWalletButtonDynamic = dynamic(
   async () => await import('./ConnectWalletButton'),
@@ -24,8 +25,17 @@ const NavBar = () => {
           </div>
         </Link>
         <div className="flex items-center justify-end space-x-2 md:space-x-4">
-          {/* <ThemeSwitch /> */}
-          <NotificationsSwitch />
+          <a
+            className="border-b border-transparent items-center cursor-pointer -mb-[1px] transition-colors hidden sm:flex hover:border-white"
+            href="https://docs.realms.today/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <div className="text-white text-sm">Read the Docs</div>
+            <ExternalLinkIcon className="stroke-white h-4 w-4 ml-2" />
+          </a>
+          <ThemeSwitch />
+          <DialectNotifications />
           <ConnectWalletButtonDynamic />
         </div>
       </div>
