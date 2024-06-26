@@ -125,7 +125,7 @@ import SelectInstructionType from '@components/SelectInstructionType'
 // import PsyFinanceExerciseOption from './components/instructions/PsyFinance/ExerciseOption'
 import RevokeGoverningTokens from './components/instructions/SplGov/RevokeGoverningTokens'
 // import PreviousRouteBtn from '@components/PreviousRouteBtn'
-// import SetMintAuthority from './components/instructions/SetMintAuthroity'
+import SetMintAuthority from './components/instructions/SetMintAuthroity'
 // import LiquidityStakingOption from './components/instructions/Dual/LiquidityStakingOption'
 // import InitStrike from './components/instructions/Dual/InitStrike'
 // import IdlSetBuffer from './components/instructions/Mango/MangoV4/IdlSetBuffer'
@@ -467,199 +467,28 @@ const New = () => {
     | null
   } = useMemo(
     () => ({
-      // [Instructions.Burn]: BurnTokens,
       [Instructions.Transfer]: SplTokenTransfer,
       [Instructions.ProgramUpgrade]: ProgramUpgrade,
       [Instructions.Mint]: Mint,
       [Instructions.Base64]: CustomBase64,
       [Instructions.None]: Empty,
-      // [Instructions.MangoV4TokenRegister]: TokenRegister,
-      // [Instructions.MangoV4TokenEdit]: EditToken,
-      // [Instructions.MangoV4GroupEdit]: GroupEdit,
-      // [Instructions.MangoV4AdminWithdrawTokenFees]: AdminTokenWithdrawFees,
-      // [Instructions.MangoV4WithdrawPerpFees]: WithdrawPerpFees,
-      // [Instructions.IdlSetBuffer]: IdlSetBuffer,
-      // [Instructions.MangoV4OpenBookEditMarket]: OpenBookEditMarket,
-      // [Instructions.MangoV4IxGateSet]: IxGateSet,
-      // [Instructions.MangoV4AltExtend]: AltExtend,
-      // [Instructions.MangoV4AltSet]: AltSet,
-      // [Instructions.MangoV4StubOracleCreate]: StubOracleCreate,
-      // [Instructions.MangoV4StubOracleSet]: StubOracleSet,
-      // [Instructions.MangoV4PerpEdit]: PerpEdit,
-      // [Instructions.MangoV4OpenBookRegisterMarket]: OpenBookRegisterMarket,
-      // [Instructions.MangoV4PerpCreate]: PerpCreate,
-      // [Instructions.MangoV4TokenRegisterTrustless]: TokenRegisterTrustless,
-      // [Instructions.MangoV4TokenAddBank]: TokenAddBank,
       [Instructions.Grant]: Grant,
       [Instructions.Clawback]: Clawback,
       [Instructions.CreateAssociatedTokenAccount]: CreateAssociatedTokenAccount,
-      // [Instructions.DualFinanceAirdrop]: DualAirdrop,
-      // [Instructions.DualFinanceStakingOption]: StakingOption,
-      // [Instructions.DualFinanceGso]: DualGso,
-      // [Instructions.DualFinanceGsoWithdraw]: DualGsoWithdraw,
-      // [Instructions.DualFinanceInitStrike]: InitStrike,
-      // [Instructions.DualFinanceLiquidityStakingOption]: LiquidityStakingOption,
-      // [Instructions.DualFinanceStakingOptionWithdraw]: DualWithdraw,
-      // [Instructions.DualFinanceExerciseStakingOption]: DualExercise,
-      // [Instructions.DualFinanceDelegate]: DualDelegate,
-      // [Instructions.DualFinanceDelegateWithdraw]: DualVoteDepositWithdraw,
-      // [Instructions.DualFinanceVoteDeposit]: DualVoteDeposit,
-      // [Instructions.DualFinanceVote]: DualVote,
-      // [Instructions.DistributionCloseVaults]: CloseVaults,
-      // [Instructions.DistributionFillVaults]: FillVaults,
-      // [Instructions.MeanCreateAccount]: MeanCreateAccount,
-      // [Instructions.MeanFundAccount]: MeanFundAccount,
-      // [Instructions.MeanWithdrawFromAccount]: MeanWithdrawFromAccount,
-      // [Instructions.MeanCreateStream]: MeanCreateStream,
-      // [Instructions.MeanTransferStream]: MeanTransferStream,
-      // [Instructions.CreateSolendObligationAccount]: CreateObligationAccount,
-      // [Instructions.InitSolendObligationAccount]: InitObligationAccount,
-      // [Instructions.DepositReserveLiquidityAndObligationCollateral]: DepositReserveLiquidityAndObligationCollateral,
-      // [Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity]: WithdrawObligationCollateralAndRedeemReserveLiquidity,
-      // [Instructions.PsyFinanceMintAmericanOptions]: PsyFinanceMintAmericanOptions,
-      // [Instructions.PsyFinanceBurnWriterForQuote]: PsyFinanceBurnWriterTokenForQuote,
-      // [Instructions.PsyFinanceClaimUnderlyingPostExpiration]: PsyFinanceClaimUnderlyingPostExpiration,
-      // [Instructions.PsyFinanceExerciseOption]: PsyFinanceExerciseOption,
-      // [Instructions.SwitchboardFundOracle]: SwitchboardFundOracle,
-      // [Instructions.WithdrawFromOracle]: WithdrawFromOracle,
-      // [Instructions.RefreshSolendObligation]: RefreshObligation,
-      // [Instructions.RefreshSolendReserve]: RefreshReserve,
-      // [Instructions.ForesightInitMarket]: MakeInitMarketParams,
-      // [Instructions.ForesightInitMarketList]: MakeInitMarketListParams,
-      // [Instructions.ForesightInitCategory]: MakeInitCategoryParams,
-      // [Instructions.ForesightResolveMarket]: MakeResolveMarketParams,
-      // [Instructions.ForesightAddMarketListToCategory]: MakeAddMarketListToCategoryParams,
-      // [Instructions.ForesightSetMarketMetadata]: MakeSetMarketMetadataParams,
       [Instructions.RealmConfig]: RealmConfig,
-      // [Instructions.CreateNftPluginRegistrar]: CreateNftPluginRegistrar,
-      // [Instructions.CreateNftPluginMaxVoterWeight]: CreateNftPluginMaxVoterWeightRecord,
-      // [Instructions.ConfigureNftPluginCollection]: ConfigureNftPluginCollection,
       [Instructions.CloseTokenAccount]: CloseTokenAccount,
       [Instructions.CloseMultipleTokenAccounts]: CloseMultipleTokenAccounts,
-      // [Instructions.VotingMintConfig]: VotingMintConfig,
-      // [Instructions.CreateVsrRegistrar]: CreateVsrRegistrar,
-      // [Instructions.CreateGatewayPluginRegistrar]: CreateGatewayPluginRegistrar,
-      // [Instructions.ConfigureGatewayPlugin]: ConfigureGatewayPlugin,
       [Instructions.ChangeMakeDonation]: ChangeDonation,
       [Instructions.CreateTokenMetadata]: CreateTokenMetadata,
       [Instructions.UpdateTokenMetadata]: UpdateTokenMetadata,
       [Instructions.StakeValidator]: StakeValidator,
-      // [Instructions.SanctumSplDepositStake]: SanctumSplDepositStake,
       [Instructions.DeactivateValidatorStake]: DeactivateValidatorStake,
       [Instructions.WithdrawValidatorStake]: WithdrawValidatorStake,
       [Instructions.DelegateStake]: DelegateStake,
-      // [Instructions.RemoveStakeLock]: RemoveLockup,
-      // [Instructions.SplitStake]: SplitStake,
       [Instructions.DifferValidatorStake]: null,
-      // [Instructions.TransferDomainName]: TransferDomainName,
-      // [Instructions.SerumInitUser]: InitUser,
-      // [Instructions.SerumGrantLockedSRM]: {
-      //   componentBuilderFunction: ({ index, governance }) => (
-      //     <GrantForm
-      //       index={index}
-      //       governance={governance}
-      //       isLocked={true}
-      //       isMsrm={false}
-      //     />
-      //   ),
-      // },
-      // [Instructions.SerumGrantLockedMSRM]: {
-      //   componentBuilderFunction: ({ index, governance }) => (
-      //     <GrantForm
-      //       index={index}
-      //       governance={governance}
-      //       isLocked={true}
-      //       isMsrm={true}
-      //     />
-      //   ),
-      // },
-      // [Instructions.SerumGrantVestSRM]: {
-      //   componentBuilderFunction: ({ index, governance }) => (
-      //     <GrantForm
-      //       index={index}
-      //       governance={governance}
-      //       isLocked={false}
-      //       isMsrm={false}
-      //     />
-      //   ),
-      // },
-      // [Instructions.SerumGrantVestMSRM]: {
-      //   componentBuilderFunction: ({ index, governance }) => (
-      //     <GrantForm
-      //       index={index}
-      //       governance={governance}
-      //       isLocked={false}
-      //       isMsrm={true}
-      //     />
-      //   ),
-      // },
-      // [Instructions.SerumUpdateGovConfigParams]: UpdateConfigParams,
-      // [Instructions.SerumUpdateGovConfigAuthority]: UpdateConfigAuthority,
       [Instructions.JoinDAO]: JoinDAO,
-      // [Instructions.AddKeyToDID]: AddKeyToDID,
-      // [Instructions.RemoveKeyFromDID]: RemoveKeyFromDID,
-      // [Instructions.AddServiceToDID]: AddServiceToDID,
-      // [Instructions.RemoveServiceFromDID]: RemoveServiceFromDID,
       [Instructions.RevokeGoverningTokens]: RevokeGoverningTokens,
-      // [Instructions.SagaPreOrder]: SagaPreOrder,
-      // [Instructions.DepositToMangoAccount]: MakeDepositToMangoAccount,
-      // [Instructions.DepositToMangoAccountCsv]: MakeDepositToMangoAccountCsv,
-      // [Instructions.StakeValidator]: StakeValidator,
-      // [Instructions.DeactivateValidatorStake]: DeactivateValidatorStake,
-      // [Instructions.WithdrawValidatorStake]: WithdrawValidatorStake,
-      // [Instructions.DifferValidatorStake]: null,
-      // [Instructions.TransferDomainName]: TransferDomainName,
-      // [Instructions.EverlendDeposit]: DepositForm,
-      // [Instructions.EverlendWithdraw]: WithdrawForm,
-      // [Instructions.SerumInitUser]: InitUser,
-      // [Instructions.SerumGrantLockedSRM]: {
-      //   componentBuilderFunction: ({ index, governance }) => (
-      //     <GrantForm
-      //       index={index}
-      //       governance={governance}
-      //       isLocked={true}
-      //       isMsrm={false}
-      //     />
-      //   ),
-      // },
-      // [Instructions.SerumGrantLockedMSRM]: {
-      //   componentBuilderFunction: ({ index, governance }) => (
-      //     <GrantForm
-      //       index={index}
-      //       governance={governance}
-      //       isLocked={true}
-      //       isMsrm={true}
-      //     />
-      //   ),
-      // },
-      // [Instructions.SerumGrantVestSRM]: {
-      //   componentBuilderFunction: ({ index, governance }) => (
-      //     <GrantForm
-      //       index={index}
-      //       governance={governance}
-      //       isLocked={false}
-      //       isMsrm={false}
-      //     />
-      //   ),
-      // },
-      // [Instructions.SerumGrantVestMSRM]: {
-      //   componentBuilderFunction: ({ index, governance }) => (
-      //     <GrantForm
-      //       index={index}
-      //       governance={governance}
-      //       isLocked={false}
-      //       isMsrm={true}
-      //     />
-      //   ),
-      // },
-      // [Instructions.SerumUpdateGovConfigParams]: UpdateConfigParams,
-      // [Instructions.SerumUpdateGovConfigAuthority]: UpdateConfigAuthority,
-      // [Instructions.JoinDAO]: JoinDAO,
-      // [Instructions.ClaimMangoTokens]: ClaimMangoTokens,
-      // [Instructions.AddKeyToDID]: AddKeyToDID,
-      // [Instructions.RemoveKeyFromDID]: RemoveKeyFromDID,
-      // [Instructions.AddServiceToDID]: AddServiceToDID,
-      // [Instructions.RemoveServiceFromDID]: RemoveServiceFromDID,
+      [Instructions.SetMintAuthority]: SetMintAuthority,
     }),
     [governance?.pubkey?.toBase58()]
   )

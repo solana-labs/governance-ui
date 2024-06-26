@@ -267,10 +267,6 @@ export default function useGovernanceAssets() {
       name: 'Delegate Stake Account',
       packageId: PackageEnum.Common,
     },
-    [Instructions.RemoveStakeLock]: {
-      name: 'Stake Account Remove Lock',
-      packageId: PackageEnum.Common,
-    },
     [Instructions.DifferValidatorStake]: {
       name: 'Differ validator stake',
       // Not to be used for now
