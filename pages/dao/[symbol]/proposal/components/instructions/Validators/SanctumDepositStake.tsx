@@ -37,14 +37,14 @@ import {
 } from '@solana/spl-token'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 
-type SanctumSplDepositStake = {
+type SanctumDepositStake = {
   governedTokenAccount: AssetAccount | undefined
   stakingAccount: StakeAccount | undefined
   stakePool: string
   voteAccount: string
 }
 
-const SanctumSplDepositStake = ({
+const SanctumDepositStake = ({
   index,
   governance,
 }: {
@@ -60,7 +60,7 @@ const SanctumSplDepositStake = ({
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)
 
-  const [form, setForm] = useState<SanctumSplDepositStake>({
+  const [form, setForm] = useState<SanctumDepositStake>({
     stakingAccount: undefined,
     governedTokenAccount: undefined,
     stakePool: '',
@@ -366,7 +366,7 @@ const SanctumSplDepositStake = ({
   )
 }
 
-export default SanctumSplDepositStake
+export default SanctumDepositStake
 
 export function encodeData(type: any, fields?: any): Buffer {
   const allocLength = type.layout.span

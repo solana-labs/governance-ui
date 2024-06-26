@@ -315,8 +315,12 @@ export default function useGovernanceAssets() {
       name: 'Stake A Validator',
       packageId: PackageEnum.Common,
     },
-    [Instructions.SanctumSplDepositStake]: {
-      name: 'Sanctum Spl Deposit Stake',
+    [Instructions.SanctumDepositStake]: {
+      name: 'Sanctum Deposit Stake',
+      packageId: PackageEnum.Common,
+    },
+    [Instructions.SanctumWithdrawStake]: {
+      name: 'Sanctum Withdraw Stake',
       packageId: PackageEnum.Common,
     },
     [Instructions.Transfer]: {

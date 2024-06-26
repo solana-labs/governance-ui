@@ -7,7 +7,6 @@ import {
 } from '@solana/spl-governance'
 
 import {
-  Keypair,
   LAMPORTS_PER_SOL,
   PublicKey,
   StakeProgram,
@@ -17,13 +16,10 @@ import {
 
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
-import { BN, web3 } from '@coral-xyz/anchor'
+import { BN } from '@coral-xyz/anchor'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
-import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes'
-import { AssetAccount, StakeAccount, StakeState } from '@utils/uiTypes/assets'
-import StakeAccountSelect from '../../StakeAccountSelect'
-import { getFilteredProgramAccounts } from '@utils/helpers'
+import { AssetAccount } from '@utils/uiTypes/assets'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import {
   StakePool,
@@ -31,17 +27,17 @@ import {
   getStakePoolAccount,
 } from '@solana/spl-stake-pool'
 import Input from '@components/inputs/Input'
-import { tryGetAta } from '@utils/validations'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { genShortestUnusedSeed } from '@utils/address'
 
-type SanctumSplDepositStake = {
+type SanctumWithdrawStakeForm = {
   governedTokenAccount: AssetAccount | undefined
-  stakingAccount: StakeAccount | undefined
   stakePool: string
   voteAccount: string
+  amount: number
 }
 
-const SanctumSplDepositStake = ({
+const SanctumWithdrawStake = ({
   index,
   governance,
 }: {
@@ -57,8 +53,8 @@ const SanctumSplDepositStake = ({
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)
 
-  const [form, setForm] = useState<SanctumSplDepositStake>({
-    stakingAccount: undefined,
+  const [form, setForm] = useState<SanctumWithdrawStakeForm>({
+    amount: 0,
     governedTokenAccount: undefined,
     stakePool: '9jWbABPXfc75wseAbLEkBCb1NRaX9EbJZJTDQnbtpzc1',
     voteAccount: '5EYp3kCdMLq52vzZ4ucsVyYaaxQe5MKTquxahjXpcShS',
@@ -74,13 +70,6 @@ const SanctumSplDepositStake = ({
   const [governedAccount, setGovernedAccount] = useState<
     ProgramAccount<Governance> | undefined
   >(undefined)
-
-  const setStakingAccount = (value) => {
-    handleSetForm({
-      value: value,
-      propertyName: 'stakingAccount',
-    })
-  }
   const setStakePool = (value) => {
     handleSetForm({
       value: value.target.value,
@@ -94,56 +83,15 @@ const SanctumSplDepositStake = ({
     })
   }
 
-  const getStakeAccounts = async (): Promise<StakeAccount[]> => {
-    if (!form.governedTokenAccount) return []
-
-    const stakingAccounts = await getFilteredProgramAccounts(
-      connection.current,
-      stakeProgramId,
-      [
-        {
-          memcmp: {
-            offset: 0,
-            bytes: bs58.encode([2, 0, 0, 0]),
-          },
-        },
-        {
-          memcmp: {
-            offset: 44,
-            bytes: form.governedTokenAccount.pubkey.toBase58(),
-          },
-        },
-        {
-          memcmp: {
-            offset: 172,
-            bytes: bs58.encode([255, 255, 255, 255, 255, 255, 255, 255]), // equivalent to u64::max for deactivation epoch / not deactivated yet
-          },
-        },
-      ]
-    )
-
-    return stakingAccounts.map((x) => {
-      const validatorPk = web3.PublicKey.decode(
-        x.accountInfo.data.slice(124, 124 + 32)
-      )
-      return {
-        stakeAccount: x.publicKey,
-        state: StakeState.Active,
-        delegatedValidator: validatorPk as web3.PublicKey,
-        amount: x.accountInfo.lamports / web3.LAMPORTS_PER_SOL,
-      }
+  const setAmount = (value) => {
+    handleSetForm({
+      value: value.target.value,
+      propertyName: 'amount',
     })
   }
 
-  //getStakeAccounts().then(x => setStakeAccounts(x))
-
-  const [stakeAccounts, setStakeAccounts] = useState<StakeAccount[]>([])
-
   const validateInstruction = async (): Promise<boolean> => {
     if (!form.governedTokenAccount) return false
-
-    const stakingAccounts = await getStakeAccounts()
-    setStakeAccounts(stakingAccounts)
 
     return true
   }
@@ -157,42 +105,22 @@ const SanctumSplDepositStake = ({
         governance: undefined,
       }
     }
-    if (
-      !connection ||
-      !isValid ||
-      !stakeProgramId ||
-      !form.governedTokenAccount?.isSol
-    ) {
+    if (!connection || !isValid || !stakeProgramId) {
       console.log('Invalid form')
       return returnInvalid()
     }
-
-    const prequsiteInstructions: TransactionInstruction[] = []
 
     const stakePool = await getStakePoolAccount(
       connection.current,
       new PublicKey(form.stakePool)
     )
 
-    const ataAccount = await tryGetAta(
-      connection.current,
-      stakePool.account.data.poolMint,
-      form.governedTokenAccount.pubkey
-    )
-
     const [withdrawAuthPk] = await PublicKey.findProgramAddress(
       [new PublicKey(form.stakePool).toBuffer(), Buffer.from('withdraw')],
       sanctumStakeProgramId
     )
-    // const [validatorStake] = await PublicKey.findProgramAddress(
-    //   [
-    //     new PublicKey(form.voteAccount).toBuffer(),
-    //     new PublicKey(form.stakePool).toBuffer(),
-    //   ],
-    //   sanctumStakeProgramId
-    // )
 
-    const poolAmount = Number(0.1 * LAMPORTS_PER_SOL)
+    const poolAmount = Number(Number(form.amount) * LAMPORTS_PER_SOL)
 
     const stakeAccountRentExemption = await connection.current.getMinimumBalanceForRentExemption(
       StakeProgram.space
@@ -225,32 +153,38 @@ const SanctumSplDepositStake = ({
             ${poolAmount} asked, ${availableForWithdrawal} available.`
       )
     }
+    const tokenAccAuthority = form.governedTokenAccount!.extensions.token!
+      .account.owner!
     const withdrawAccount = {
       stakeAddress: stakeAccountAddress,
       voteAddress: new PublicKey(form.voteAccount),
       poolAmount,
     }
 
-    const stakeReceiverKeypair = Keypair.generate()
-    const stakeToReceive = stakeReceiverKeypair.publicKey
-    prequsiteInstructions.push(
-      SystemProgram.createAccount({
-        fromPubkey: wallet!.publicKey!,
-        newAccountPubkey: stakeReceiverKeypair.publicKey,
-        lamports: stakeAccountRentExemption,
-        space: StakeProgram.space,
-        programId: StakeProgram.programId,
-      })
+    const stakeReceiver = await genShortestUnusedSeed(
+      connection.current,
+      tokenAccAuthority,
+      StakeProgram.programId
     )
+
+    const createAccIx = SystemProgram.createAccountWithSeed({
+      fromPubkey: wallet!.publicKey!,
+      newAccountPubkey: stakeReceiver.derived,
+      lamports: stakeAccountRentExemption,
+      space: StakeProgram.space,
+      programId: StakeProgram.programId,
+      seed: stakeReceiver.seed,
+      basePubkey: stakeReceiver.base,
+    })
 
     const stakeIx = StakePoolInstruction.withdrawStake({
       stakePool: new PublicKey(form.stakePool),
       validatorList: stakePool.account.data.validatorList,
       validatorStake: withdrawAccount.stakeAddress,
-      destinationStake: stakeToReceive,
-      destinationStakeAuthority: form.governedTokenAccount.pubkey,
-      sourceTransferAuthority: form.governedTokenAccount.pubkey,
-      sourcePoolAccount: ataAccount!.publicKey,
+      destinationStake: stakeReceiver.derived,
+      destinationStakeAuthority: tokenAccAuthority,
+      sourceTransferAuthority: tokenAccAuthority,
+      sourcePoolAccount: form.governedTokenAccount!.extensions.token!.publicKey,
       managerFeeAccount: stakePool.account.data.managerFeeAccount,
       poolMint: stakePool.account.data.poolMint,
       poolTokens: withdrawAccount.poolAmount,
@@ -258,10 +192,9 @@ const SanctumSplDepositStake = ({
     })
 
     return {
-      prerequisiteInstructions: prequsiteInstructions,
-      prerequisiteInstructionsSigners: [stakeReceiverKeypair],
       serializedInstruction: '',
       additionalSerializedInstructions: [
+        serializeInstructionToBase64(createAccIx),
         serializeInstructionToBase64(
           new TransactionInstruction({
             programId: sanctumStakeProgramId,
@@ -271,7 +204,7 @@ const SanctumSplDepositStake = ({
         ),
       ],
       isValid: true,
-      governance: form.governedTokenAccount.governance,
+      governance: form.governedTokenAccount!.governance,
     }
   }
 
@@ -295,9 +228,6 @@ const SanctumSplDepositStake = ({
   }, [form])
   useEffect(() => {
     setGovernedAccount(form.governedTokenAccount?.governance)
-    if (form.governedTokenAccount) {
-      getStakeAccounts().then((x) => setStakeAccounts(x))
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [form.governedTokenAccount])
 
@@ -305,9 +235,7 @@ const SanctumSplDepositStake = ({
     <>
       <GovernedAccountSelect
         label="Treasury account"
-        governedAccounts={governedTokenAccountsWithoutNfts.filter(
-          (x) => x.isSol
-        )}
+        governedAccounts={governedTokenAccountsWithoutNfts}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedTokenAccount' })
         }}
@@ -315,15 +243,8 @@ const SanctumSplDepositStake = ({
         error={formErrors['governedTokenAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
+        type="token"
       ></GovernedAccountSelect>
-
-      <StakeAccountSelect
-        label="Staking Account"
-        stakeAccounts={stakeAccounts}
-        value={form.stakingAccount}
-        error={formErrors['stakingAccount']}
-        onChange={setStakingAccount}
-      />
       <Input
         label="Stake Pool"
         value={form.stakePool}
@@ -338,6 +259,13 @@ const SanctumSplDepositStake = ({
         type="text"
         onChange={setVoteAccount}
       />
+      <Input
+        label="Amount"
+        value={form.amount}
+        error={formErrors['amount']}
+        type="number"
+        onChange={setAmount}
+      />
       <div
         style={{
           fontSize: '14px',
@@ -349,7 +277,7 @@ const SanctumSplDepositStake = ({
   )
 }
 
-export default SanctumSplDepositStake
+export default SanctumWithdrawStake
 
 export function encodeData(type: any, fields?: any): Buffer {
   const allocLength = type.layout.span

@@ -53,7 +53,6 @@ export function useMangoAccountsTreasury(assetAccounts: AssetAccount[]) {
       !isFetchingMangoAcc &&
       !mangoAccWasFetched
     ) {
-      console.log('123')
       fetchMangoValue().finally(() => {
         setIsFetchingMangoAcc(false)
         setIsFetching(false)
