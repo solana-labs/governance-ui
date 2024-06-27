@@ -479,6 +479,7 @@ const EditToken = ({
         zeroUtilRate: currentToken.zeroUtilRate.toNumber(),
         platformLiquidationFee: currentToken.platformLiquidationFee.toNumber(),
         collateralFeePerDay: currentToken.collateralFeePerDay,
+        disableAssetLiquidation: !currentToken.allowAssetLiquidation,
       }
       setForm((prevForm) => ({
         ...prevForm,
