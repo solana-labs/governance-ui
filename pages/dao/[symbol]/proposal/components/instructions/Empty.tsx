@@ -53,10 +53,7 @@ const Empty = ({
   return (
     <GovernedAccountSelect
       label="Wallet"
-      governedAccounts={assetAccounts.filter((x) =>
-        // ownVoterWeight?.canCreateProposal(x.governance.account.config)
-        true
-      )}
+      governedAccounts={assetAccounts}
       onChange={(value) => {
         handleSetForm({ value, propertyName: 'governedAccount' })
       }}
