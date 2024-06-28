@@ -17,8 +17,7 @@ import { proposalQueryKeys } from './queries/proposal'
 import { createLUTProposal } from 'actions/createLUTproposal'
 import { useLegacyVoterWeight } from './queries/governancePower'
 import {useVotingClients} from "@hooks/useVotingClients";
-import { useTokenOwnerRecordsDelegatedToUser } from './queries/tokenOwnerRecord'
-import { ProgramAccount, ProgramAccountWithType, TokenOwnerRecord } from '@solana/spl-governance'
+import { ProgramAccount, TokenOwnerRecord } from '@solana/spl-governance'
 
 export default function useCreateProposal() {
   const connection = useLegacyConnectionContext()
@@ -120,11 +119,12 @@ export default function useCreateProposal() {
 
   const propose = (
     params: Omit<Parameters<typeof handleCreateProposal>[0], 'governance'> & {
-      governance: PublicKey
+      governance: PublicKey,
+      myDelegatedTors?: ProgramAccount<TokenOwnerRecord>[] | undefined
     }
   ) => {
-    const { governance, ...rest } = params
-    return handleCreateProposal({ ...rest, governance: { pubkey: governance } })
+    const { governance, myDelegatedTors , ...rest} = params
+    return handleCreateProposal({ ...rest, governance: { pubkey: governance }, myDelegatedTors })
   }
 
   const proposeMultiChoice = async ({
