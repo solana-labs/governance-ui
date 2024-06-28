@@ -9,7 +9,6 @@ import {
 import { NewProposalContext } from '../../new'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 const Empty = ({
   index,
   governance,
@@ -20,7 +19,6 @@ const Empty = ({
   const [form, setForm] = useState<EmptyInstructionForm>({
     governedAccount: undefined,
   })
-  const { result: ownVoterWeight } = useLegacyVoterWeight()
   const { assetAccounts } = useGovernanceAssets()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [formErrors, setFormErrors] = useState({})
