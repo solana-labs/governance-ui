@@ -49,7 +49,7 @@ export default function useCreateProposal() {
     voteByCouncil?: boolean
     isDraft?: boolean
     utilizeLookupTable?: boolean,
-    myDelegatedTors: ProgramAccount<TokenOwnerRecord>[] | undefined
+    myDelegatedTors?: ProgramAccount<TokenOwnerRecord>[] | undefined
   }) => {
     const { result: selectedGovernance } = await fetchGovernanceByPubkey(
       connection.current,
