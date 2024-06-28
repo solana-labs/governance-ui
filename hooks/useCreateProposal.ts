@@ -17,6 +17,8 @@ import { proposalQueryKeys } from './queries/proposal'
 import { createLUTProposal } from 'actions/createLUTproposal'
 import { useLegacyVoterWeight } from './queries/governancePower'
 import {useVotingClients} from "@hooks/useVotingClients";
+import { useTokenOwnerRecordsDelegatedToUser } from './queries/tokenOwnerRecord'
+import { ProgramAccount, ProgramAccountWithType, TokenOwnerRecord } from '@solana/spl-governance'
 
 export default function useCreateProposal() {
   const connection = useLegacyConnectionContext()
@@ -38,6 +40,7 @@ export default function useCreateProposal() {
     voteByCouncil = false,
     isDraft = false,
     utilizeLookupTable,
+    myDelegatedTors
   }: {
     title: string
     description: string
@@ -45,7 +48,8 @@ export default function useCreateProposal() {
     instructionsData: InstructionDataWithHoldUpTime[]
     voteByCouncil?: boolean
     isDraft?: boolean
-    utilizeLookupTable?: boolean
+    utilizeLookupTable?: boolean,
+    myDelegatedTors: ProgramAccount<TokenOwnerRecord>[] | undefined
   }) => {
     const { result: selectedGovernance } = await fetchGovernanceByPubkey(
       connection.current,
@@ -54,10 +58,13 @@ export default function useCreateProposal() {
     const minCouncilTokensToCreateProposal = selectedGovernance?.account.config.minCouncilTokensToCreateProposal
     const councilPower = ownVoterWeight?.councilTokenRecord?.account.governingTokenDepositAmount
 
-    const ownTokenRecord = 
+    const ownTokenRecord = myDelegatedTors ?
+      myDelegatedTors[0] :
       minCouncilTokensToCreateProposal && councilPower && councilPower >= minCouncilTokensToCreateProposal ?
       ownVoterWeight?.councilTokenRecord : 
       ownVoterWeight?.communityTokenRecord
+    
+    console.log(ownTokenRecord?.pubkey.toBase58())
 
     if (!ownTokenRecord) throw new Error('token owner record does not exist')
     if (!selectedGovernance) throw new Error('governance not found')
