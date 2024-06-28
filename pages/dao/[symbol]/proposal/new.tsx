@@ -141,6 +141,7 @@ import PythRecoverAccount from './components/instructions/Pyth/PythRecoverAccoun
 import { useVoteByCouncilToggle } from '@hooks/useVoteByCouncilToggle'
 import BurnTokens from './components/instructions/BurnTokens'
 import RemoveLockup from './components/instructions/Validators/removeLockup'
+import { useTokenOwnerRecordsDelegatedToUser } from '@hooks/queries/tokenOwnerRecord'
 
 const TITLE_LENGTH_LIMIT = 130
 // the true length limit is either at the tx size level, and maybe also the total account size level (I can't remember)
@@ -385,6 +386,7 @@ const New = () => {
             instructionsData,
             voteByCouncil,
             isDraft,
+            myDelegatedTors: myDelegationPower
           })
 
           const url = fmtUrlWithCluster(
@@ -636,6 +638,8 @@ const New = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     [governance?.pubkey?.toBase58()]
   )
+
+  const myDelegationPower = useTokenOwnerRecordsDelegatedToUser().data
 
   return (
     <div className="grid grid-cols-12 gap-4">
