@@ -39,13 +39,13 @@ import { CalendarAdd } from '@carbon/icons-react'
 import Modal from '@components/Modal'
 import dayjs from 'dayjs'
 import { useConnection } from '@solana/wallet-adapter-react'
-import { useTokenOwnerRecordsForRealmQuery } from '@hooks/queries/tokenOwnerRecord'
+import { useTokenOwnerRecordByPubkeyQuery } from '@hooks/queries/tokenOwnerRecord'
 
 const Proposal = () => {
   const { realmInfo, symbol } = useRealm()
   const proposal = useRouteProposalQuery().data?.result
   const governance = useProposalGovernanceQuery().data?.result
-  const { data: tors } = useTokenOwnerRecordsForRealmQuery()
+  const tor = useTokenOwnerRecordByPubkeyQuery(proposal?.account.tokenOwnerRecord).data?.result
   const { connection } = useConnection()
   const descriptionLink = proposal?.account.descriptionLink
   const allowDiscussion = realmInfo?.allowDiscussion ?? true
@@ -83,9 +83,7 @@ const Proposal = () => {
 
   const proposedBy =
     proposal &&
-    tors
-      ?.find((x) => x.pubkey.equals(proposal.account.tokenOwnerRecord))
-      ?.account.governingTokenOwner.toBase58()
+    tor?.account.governingTokenOwner.toBase58()
 
   const { fmtUrlWithCluster } = useQueryContext()
   const showTokenBalance = proposal
@@ -147,11 +145,7 @@ const Proposal = () => {
               {proposedBy && (
                 <p className="text-[10px]">
                   Proposed by:{' '}
-                  {tors
-                    ?.find((x) =>
-                      x.pubkey.equals(proposal.account.tokenOwnerRecord)
-                    )
-                    ?.account.governingTokenOwner.toBase58()}
+                  {tor?.account.governingTokenOwner.toBase58()}
                 </p>
               )}
             </div>
