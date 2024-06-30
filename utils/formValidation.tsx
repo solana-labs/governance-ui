@@ -45,6 +45,59 @@ export const isFormValid = async (schema, formValues, abortEarly = false) => {
   return values
 }
 
+export const isBatchFormValid = async (schema, formValues, abortEarly = false) => {
+  if (!schema) {
+    throw 'please provide schema'
+  }
+
+  const values = new SanitizedObject({
+    isValid: false,
+    validationErrors: new SanitizedObject({}),
+  }) as formValidation
+
+  values.validationErrors.amount = formValues.amount.map(_ => "")
+  values.validationErrors.destinationAccount = formValues.destinationAccount.map(_ => "")
+
+  try {
+    await schema.validate(formValues, { abortEarly })
+    values.isValid = true
+  } catch (err) {
+    console.log('Validation Error', err)
+
+    values.isValid = false
+    const fieldName = err.path
+    if (
+      abortEarly &&
+      Object.prototype.hasOwnProperty.call(schema.fields, fieldName)
+    ) {
+      values.validationErrors[fieldName] = err.errors
+      
+    } else {
+      err.inner?.forEach((error) => {
+        const fieldName = error.path
+                  
+        if (fieldName.includes("amount")) {
+          const idx = parseInt(fieldName.replace(/^\D+/g, ''))
+          values.validationErrors.amount[idx] = error.message
+        } else if (fieldName.includes("destinationAccount")) {
+          const idx = parseInt(fieldName.replace(/^\D+/g, ''))
+          values.validationErrors.destinationAccount[idx] = error.message
+        }
+
+        if (
+          error.path &&
+          Object.prototype.hasOwnProperty.call(schema.fields, fieldName)
+        ) {
+          
+          values.validationErrors[fieldName] = error.message
+        }
+      })
+    }
+  }
+
+  return values
+}
+
 export function validatePubkey(address: string) {
   try {
     new PublicKey(address)
