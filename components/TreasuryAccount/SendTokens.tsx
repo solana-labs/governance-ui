@@ -135,8 +135,6 @@ const SendTokens = () => {
       ).toFixed(currentPrecision)
     )
     
-    console.log(newVal)
-
     newAmounts[idx] = newVal
 
     const mint = currentAccount?.extensions.mint?.publicKey
@@ -190,6 +188,7 @@ const SendTokens = () => {
           : null,
         holdUpTime: governance?.account?.config.minInstructionHoldUpTime,
         prerequisiteInstructions: ix.prerequisiteInstructions || [],
+        chunkBy: 4
       }))
 
       try {
@@ -236,19 +235,6 @@ const SendTokens = () => {
   }, [currentAccount])
 
   const schema = getBatchTokenTransferSchema({ form, connection, nftMode: false })
-
-  // const { result: transactionDolarAmount } = useAsync(async () => {
-  //   const mint = currentAccount?.extensions.mint?.publicKey
-  //   if (mint === undefined) return undefined
-  //   const amount = form.amount ?? 0
-  //   const priceData = await fetchJupiterPrice(mint)
-  //   const price = priceData.result?.price ?? 0
-
-  //   const totalPrice = amount * price
-  //   const totalPriceFormatted =
-  //     amount && price ? new BigNumber(totalPrice).toFormat(2) : ''
-  //   return totalPriceFormatted
-  // }, [form.amount, currentAccount?.extensions.mint?.publicKey])
 
   const proposalTitle = `Transfer tokens`
   // ${
@@ -306,8 +292,6 @@ const SendTokens = () => {
       }
     })
   }
-
-  console.log(form)
 
   return (
     <>
