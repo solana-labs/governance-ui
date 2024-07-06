@@ -120,7 +120,10 @@ export interface ClawbackForm {
   holdupTime: number
 }
 
-export interface SendTokenCompactViewForm extends SplTokenTransferForm {
+export interface SendTokenCompactViewForm extends Omit<SplTokenTransferForm, 'amount' | 'destinationAccount'> {
+  destinationAccount: string[]
+  amount: (number | undefined)[]
+  txDollarAmount: (string | undefined)[]
   description: string
   title: string
 }
