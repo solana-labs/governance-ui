@@ -221,9 +221,11 @@ const NftDisplayList = ({
 const MemberOverview = ({
   member,
   activeMembers,
+  vsrDisplay
 }: {
   member: Member
-  activeMembers: any[] | undefined
+  activeMembers: any[] | undefined,
+  vsrDisplay?: boolean
 }) => {
   const programVersion = useProgramVersion()
   const realm = useRealmQuery().data?.result
@@ -436,7 +438,7 @@ const MemberOverview = ({
         </div>
       </div>
       <div className="flex flex-col space-y-3 md:space-y-0 md:flex-row md:space-x-3">
-        {(communityAmount || !councilAmount) && (
+        {(communityAmount || !councilAmount && !vsrDisplay) && (
           <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all">
             <p>{tokenName} votes</p>
             <div className="font-bold text-fgd-1 text-2xl flex items-center">
@@ -449,7 +451,7 @@ const MemberOverview = ({
             <p>Vote Power Rank: {memberVotePowerRank}</p>
           </div>
         )}
-        {councilAmount && (
+        {councilAmount && !vsrDisplay && (
           <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all">
             <p>Council votes</p>
             <div className="font-bold text-fgd-1 text-2xl flex items-center">

@@ -19,12 +19,14 @@ interface MembersTabsProps {
   activeTab: Member
   onChange: (x) => void
   tabs: Array<Member>
+  vsrMode?: boolean
 }
 
 const MembersTabs: FunctionComponent<MembersTabsProps> = ({
   activeTab,
   onChange,
   tabs,
+  vsrMode
 }) => {
   const realm = useRealmQuery().data?.result
   const mint = useRealmCommunityMintInfoQuery().data?.result
@@ -69,6 +71,7 @@ const MembersTabs: FunctionComponent<MembersTabsProps> = ({
               activeTab={activeTab}
               tokenName={tokenName || nftName || ''}
               onChange={onChange}
+              vsrMode={vsrMode}
             ></MemberItems>
           )
         )
@@ -86,13 +89,15 @@ const MemberItems = ({
   activeTab,
   tokenName,
   onChange,
+  vsrMode
 }: {
   member: Member
   mint?: MintInfo
   councilMint?: MintInfo
   activeTab: Member
   tokenName: string
-  onChange: (member: Member) => void
+  onChange: (member: Member) => void,
+  vsrMode?: boolean
 }) => {
   const {
     walletAddress,
@@ -149,25 +154,27 @@ const MemberItems = ({
         </div>
         <div>
           <h3 className="flex mb-1 text-base font-bold">{renderAddressName}</h3>
-          {/* <p className="mb-0 text-xs text-fgd-1">Votes Cast: {votesCasted}</p> */}
-          <span className="text-xs text-fgd-3">
-            {(communityAmount || !councilAmount) && (
-              <span className="flex items-center">
-                {tokenName} votes {communityAmount || 0}
-                {hasCommunityTokenOutsideRealm && (
-                  <LogoutIcon className="w-4 h-4 ml-1"></LogoutIcon>
-                )}
-              </span>
-            )}
-            {councilAmount && (
-              <span className="flex items-center">
-                Council votes {councilAmount}{' '}
-                {hasCouncilTokenOutsideRealm && (
-                  <LogoutIcon className="w-4 h-4 ml-1"></LogoutIcon>
-                )}
-              </span>
-            )}
-          </span>
+          {vsrMode ?
+            '' :
+            <span className="text-xs text-fgd-3">
+              {(communityAmount || !councilAmount) && (
+                <span className="flex items-center">
+                  {tokenName} votes {communityAmount || 0}
+                  {hasCommunityTokenOutsideRealm && (
+                    <LogoutIcon className="w-4 h-4 ml-1"></LogoutIcon>
+                  )}
+                </span>
+              )}
+              {councilAmount && (
+                <span className="flex items-center">
+                  Council votes {councilAmount}{' '}
+                  {hasCouncilTokenOutsideRealm && (
+                    <LogoutIcon className="w-4 h-4 ml-1"></LogoutIcon>
+                  )}
+                </span>
+              )}
+            </span>
+          }
         </div>
       </div>
     </button>
