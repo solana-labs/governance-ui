@@ -1,5 +1,5 @@
 import useRealm from '@hooks/useRealm'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import MemberOverview from '@components/Members/MemberOverview'
 import { PlusCircleIcon, SearchIcon, UsersIcon } from '@heroicons/react/outline'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'

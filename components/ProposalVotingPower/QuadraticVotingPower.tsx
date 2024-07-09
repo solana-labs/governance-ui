@@ -2,7 +2,6 @@ import classNames from 'classnames'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 
 import { GatewayStatus, useGateway } from '@civic/solana-gateway-react'
-import { useMembersQuery } from '@components/Members/useMembers'
 import { BN } from '@coral-xyz/anchor'
 import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
