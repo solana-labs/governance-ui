@@ -6,16 +6,13 @@ import Link from 'next/link'
 import useQueryContext from 'hooks/useQueryContext'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 import { getRealmExplorerHost } from 'tools/routing'
-
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { useRealmQuery } from '@hooks/queries/realm'
-import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import { useConnection } from '@solana/wallet-adapter-react'
 
 const RealmHeader = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const realm = useRealmQuery().data?.result
-  const config = useRealmConfigQuery().data?.result
   const { REALM } = process.env
   const { connection } = useConnection()
 
