@@ -446,6 +446,18 @@ const MNGO_AUXILIARY_TOKEN_ACCOUNTS = [
     owner: 'DdZWj3nWSzJMMv1LMTHm9gTJ37wHLNXTMzqjWCokvKEn',
     accounts: ['6XfCUQuq4juhqWLCW6LeivZd1eGuCRp4Mw3D6nkwXwFG'],
   },
+  {
+    owner: '7v1dD4kTJcBC7zV9MSrz7Ddyz8Dvs24QUMnZeQQCxeyV',
+    accounts: ['CEGxhB84XffJBfXm8WphwSczrpaJX6cRJjZz3QqNWJSZ'],
+  },
+  {
+    owner: 'A99Whcw3pNdYXQ1DikQsLLNNjbsw8rD1zdvX4LTvZ8pD',
+    accounts: ['CkxhXSSgqBM7HrZE6zrQPBNCb7eHN4nm1FHd3Ad1XARX'],
+  },
+  {
+    owner: 'FRYXAjyVnvXja8chgdq47qL3CKoyBjUg4ro7M7QQn1aD',
+    accounts: ['24frxVoDzo7bAimBU6rDhB1McxWNvzX9qddPMSv9VACZ'],
+  },
   //
 ]
 
