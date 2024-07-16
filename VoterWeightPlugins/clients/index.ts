@@ -7,6 +7,7 @@ import {
 
 import { Provider, Wallet } from '@coral-xyz/anchor'
 import { PythVoterWeightPluginClient } from './PythVoterWeightPluginClient'
+import { ParclVoterWeightPluginClient } from 'ParclVotePlugin/ParclVoterWeightPluginClient'
 import { PublicKey } from '@solana/web3.js'
 import { VsrClient } from '../../VoteStakeRegistry/sdk/client'
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
@@ -46,6 +47,8 @@ export const loadClient = (
       return DriftVoterClient.connect(provider, programId)
     case 'token_haver':
       return TokenHaverClient.connect(provider, programId)
+    case 'parcl':
+      return ParclVoterWeightPluginClient.connect(provider, undefined, signer)
     default:
       return UnrecognisedVoterWeightPluginClient.connect(provider, programId)
   }
