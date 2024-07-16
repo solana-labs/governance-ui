@@ -365,7 +365,7 @@ const EditToken = ({
           mintInfo: mintInfo.publicKey,
           fallbackOracle: form.fallbackOracle
             ? new PublicKey(form.fallbackOracle)
-            : bank.fallbackOracle,
+            : PublicKey.default,
         })
         .remainingAccounts([
           {
