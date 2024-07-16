@@ -8,7 +8,6 @@ import {
   FlatListingArgs,
   ListingArgsFormatted,
   getOracle,
-  getBestMarket,
   EditTokenArgsFormatted,
   FlatEditArgs,
   getFormattedListingPresets,
@@ -676,17 +675,10 @@ const instructions = () => ({
         quoteMint = currentMarket.quoteMintAddress
       }
 
-      const bestMarket = await getBestMarket({
-        baseMint: baseMint!.toBase58(),
-        quoteMint: quoteMint!.toBase58(),
-        cluster: 'mainnet-beta',
-        connection,
-      })
-
       try {
         return (
           <div>
-            {bestMarket && openbookMarketPk.equals(bestMarket.pubKey) && (
+            {/* {bestMarket && openbookMarketPk.equals(bestMarket.pubKey) && (
               <div className="text-green flex items-center">
                 <CheckCircleIcon className="w-5 mr-2"></CheckCircleIcon>
                 Proposed market match the best market according to listing
@@ -723,7 +715,7 @@ const instructions = () => ({
                   </div>
                 </div>
               </div>
-            )}
+            )} */}
             <div className="py-3 flex">
               <div className="mr-2">Proposed market: </div>
               <a
