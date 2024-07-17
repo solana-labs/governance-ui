@@ -2,7 +2,7 @@
   "rules": [
     {
       "pathPattern": "/dao/**",
-      "apiPath": "https://actions.dialect.to/api/realms/vote/dao/**"
+      "apiPath": "https://realms.dial.to/vote/dao/**"
     }
   ]
 }
