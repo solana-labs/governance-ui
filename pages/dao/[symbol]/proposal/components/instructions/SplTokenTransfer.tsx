@@ -163,7 +163,7 @@ const SplTokenTransfer = ({
         error={formErrors['governedTokenAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
-        type="token"
+        type="wallet"
       ></GovernedAccountSelect>
       <Input
         label="Destination account"
