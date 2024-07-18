@@ -137,14 +137,18 @@ const ParclAccountDetails = () => {
   return (
     <>
       {hasLoaded ? (
-        <div className={`${`flex w-full gap-8 md:gap-12`}`}>
-          {!connected && (
-            <div className={'text-xs text-white/50 mt-8'}>
-              Connect your wallet to see governance power
-            </div>
+        <div className={`${`flex flex-col w-full`}`}>
+          {!connected ? (
+              <div className={'text-xs text-white/50 mt-8'}>
+                Connect your wallet to see governance power
+              </div>
+            ) : 
+            (
+            <>
+              <TokenDeposit mintInfo={communityMint} mintAddress={realm.account.communityMint} role={"community"} inAccountDetails={true} />
+              <TokenDeposit mintInfo={councilMint} mintAddress={councilMintAddress} role={"council"} inAccountDetails={true} />
+            </>
           )}
-          <TokenDeposit mintInfo={communityMint} mintAddress={realm.account.communityMint} role={"community"} inAccountDetails={true} />
-          <TokenDeposit mintInfo={councilMint} mintAddress={councilMintAddress} role={"council"} inAccountDetails={true} />
         </div>
       ) : (
         <>

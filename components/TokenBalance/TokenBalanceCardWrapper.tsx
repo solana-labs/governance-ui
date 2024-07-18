@@ -149,7 +149,8 @@ const TokenBalanceCardInner = ({
   if (showParclCard) {
     cards.push(
       <React.Fragment key="parcl">
-        {inAccountDetails ? <ParclAccountDetails /> : <GovernancePowerCard />}
+        {!inAccountDetails && <GovernancePowerTitle />}
+        <ParclAccountDetails />
       </React.Fragment>
     )
   }
