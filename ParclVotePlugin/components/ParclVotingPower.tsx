@@ -13,6 +13,7 @@ import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import { GoverningTokenType } from '@solana/spl-governance'
 import useParclScalingFactor from '@hooks/parcl/useScalingFactor'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import { useUserTokenAccountsQuery } from '@hooks/queries/tokenAccount'
 
 interface Props {
   className?: string
@@ -29,7 +30,7 @@ export default function ParclVotingPower({
 }: Props) {
   const realm = useRealmQuery().data?.result
   const realmConfig = useRealmConfigQuery().data?.result
-
+  const { data: tokenAccounts } = useUserTokenAccountsQuery()
   const wallet = useWalletOnePointOh()
 
   const { connection } = useConnection()
@@ -43,11 +44,15 @@ export default function ParclVotingPower({
 
   const { result: personalAmount } = useAsync(
     async () =>
-      wallet?.publicKey && getParclGovPower(connection, wallet?.publicKey),
-    [connection, wallet]
+      wallet?.publicKey && role === 'community'
+         ? getParclGovPower(connection, wallet.publicKey)
+         : tokenAccounts?.find(
+              (a) => relevantMint && a.account.mint.equals(relevantMint)
+           )?.account.amount as BN,
+    [connection, wallet, role, relevantMint, tokenAccounts]
   )
 
-  const parclScalingFactor: number | undefined = useParclScalingFactor()
+  const parclScalingFactor = useParclScalingFactor() ?? 1;
 
   const totalAmount = personalAmount ?? new BN(0)
 
@@ -57,7 +62,7 @@ export default function ParclVotingPower({
         ? new BigNumber(totalAmount.toString())
             .multipliedBy(
               role === 'community' 
-              ? (parclScalingFactor ?? 1) 
+              ? parclScalingFactor
               : 1
             )
             .shiftedBy(-mintInfo.decimals)
