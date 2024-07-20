@@ -10,6 +10,7 @@ import { VSRCard } from '@components/GovernancePower/Power/VSRCard'
 import { VanillaCard } from '@components/GovernancePower/Power/Vanilla/VanillaCard'
 import DriftVotingPower from 'DriftStakeVoterPlugin/components/DriftVotingPower'
 import TokenHaverVotingPower from '@components/ProposalVotingPower/TokenHaverVotingPower'
+import ParclVotingPower from 'ParclVotePlugin/components/ParclVotingPower'
 
 /****
  * Note to plugin implementors.
@@ -35,6 +36,7 @@ const pluginsWithDedicatedVotingPowerUI = [
   'QV',
   'drift',
   'token_haver',
+  "parcl"
 ] as const
 
 export type VotingCardProps = {
@@ -75,6 +77,8 @@ const CardForPlugin: FC<
       return <DriftVotingPower role={role} />
     case 'token_haver':
       return <TokenHaverVotingPower role={role} />
+    case 'parcl':
+      return <ParclVotingPower role={role} />
   }
 }
 

@@ -12,7 +12,7 @@ import { ON_NFT_VOTER_V2 } from '@constants/flags'
 import { fetchRealmByPubkey } from './realm'
 import { fetchRealmConfigQuery } from './realmConfig'
 
-
+import { StakeConnection } from "@parcl-oss/staking"
 import {
   LegacyVoterWeightAdapter,
 } from '@models/voteWeights'
@@ -114,6 +114,24 @@ export const getPythGovPower = async (
     return new BN(0)
   }
 }
+
+export const getParclGovPower = async (
+  connection: Connection,
+  user: PublicKey | undefined
+): Promise<BN> => {
+  if (!user) return new BN(0)
+  const client = await StakeConnection.connect(
+    connection,
+    new NodeWallet(new Keypair())
+  )
+  const stakeAccount = await client.getMainAccount(user)
+  if (stakeAccount) {
+    return stakeAccount.getVoterWeight(await client.getTime()).toBN()
+  } else {
+    return new BN(0)
+  }
+}
+
 
 export const determineVotingPowerType = async (
   connection: Connection,
