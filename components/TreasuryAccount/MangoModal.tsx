@@ -235,6 +235,7 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
           holdUpTime:
             account?.governance.account?.config.minInstructionHoldUpTime,
           prerequisiteInstructions: [],
+          chunkBy: 1,
         }
 
         instructions.push(createAccInstData)
@@ -294,6 +295,7 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
           holdUpTime:
             account?.governance.account?.config.minInstructionHoldUpTime,
           prerequisiteInstructions: [],
+          chunkBy: 1,
         }
 
         instructions.push(depositAccInstData)
@@ -316,6 +318,7 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
             holdUpTime:
               account?.governance.account?.config.minInstructionHoldUpTime,
             prerequisiteInstructions: [],
+            chunkBy: 1,
           }
 
           instructions.push(withdrawAccInsData)
@@ -339,6 +342,7 @@ const MangoModal = ({ account }: { account: AssetAccount }) => {
           holdUpTime:
             account?.governance.account?.config.minInstructionHoldUpTime,
           prerequisiteInstructions: [],
+          chunkBy: 1,
         }
 
         instructions.push(delegateAccInstData)
