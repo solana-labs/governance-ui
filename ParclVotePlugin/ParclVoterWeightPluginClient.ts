@@ -45,10 +45,13 @@ export class ParclVoterWeightPluginClient extends Client<any> {
         return null;
     }
 
-    private async getStakeAccount(voter: PublicKey): Promise<StakeAccount> {
+    private async getStakeAccount(voter: PublicKey): Promise<StakeAccount | null> {
         return queryClient.fetchQuery({
             queryKey: ['parcl getStakeAccount', voter],
-            queryFn: () => this.client.getMainAccount(voter),
+            queryFn: async() => {
+                const account = await this.client.getMainAccount(voter)
+                return account !== undefined ? account : null
+            },
         })
     }
 
