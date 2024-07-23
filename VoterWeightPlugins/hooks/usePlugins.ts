@@ -40,32 +40,41 @@ export const usePlugins = (args: Args): UseQueryResult<VoterWeightPlugins, unkno
                 voterWeight: [],
                 maxVoterWeight: []
             };
-            // Load the voter weight plugins associated with the realm and governance
-            const voterWeightPluginsPromise = getPlugins({
-                ...(args as Required<Args>),
-                provider,
-                type: 'voterWeight',
-                wallets: args.walletPublicKeys,
-                signer
-            });
-            // Load the max voter weight plugins associated with the realm and governance
-            const maxVoterWeightPluginsPromise = getPlugins({
-                ...(args as Required<Args>),
-                provider,
-                type: 'maxVoterWeight',
-                wallets: args.walletPublicKeys,
-                signer
-            });
 
-            const [voterWeightPlugins, maxVoterWeightPlugins] = await Promise.all([
-                voterWeightPluginsPromise,
-                maxVoterWeightPluginsPromise
-            ]);
+            try {
+                // Load the voter weight plugins associated with the realm and governance
+                const voterWeightPluginsPromise = getPlugins({
+                    ...(args as Required<Args>),
+                    provider,
+                    type: 'voterWeight',
+                    wallets: args.walletPublicKeys,
+                    signer
+                });
+                // Load the max voter weight plugins associated with the realm and governance
+                const maxVoterWeightPluginsPromise = getPlugins({
+                    ...(args as Required<Args>),
+                    provider,
+                    type: 'maxVoterWeight',
+                    wallets: args.walletPublicKeys,
+                    signer
+                });
 
-            return {
-                voterWeight: voterWeightPlugins,
-                maxVoterWeight: maxVoterWeightPlugins
-            };
+                const [voterWeightPlugins, maxVoterWeightPlugins] = await Promise.all([
+                    voterWeightPluginsPromise,
+                    maxVoterWeightPluginsPromise
+                ]);
+
+                return {
+                    voterWeight: voterWeightPlugins,
+                    maxVoterWeight: maxVoterWeightPlugins
+                };
+            } catch {
+                return {
+                    voterWeight: [],
+                    maxVoterWeight: []
+                };
+            }
+            
         },
         {
             enabled: argsAreSet(args),
