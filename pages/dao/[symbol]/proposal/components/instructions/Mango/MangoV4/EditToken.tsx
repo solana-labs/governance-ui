@@ -351,7 +351,7 @@ const EditToken = ({
           getNullOrTransform(values.maintWeightShiftLiabTarget, null, Number),
           values.maintWeightShiftAbort!,
           values.setFallbackOracle!,
-          getNullOrTransform(values.depositLimit, BN),
+          getNullOrTransform(values.depositLimit?.toString(), BN),
           getNullOrTransform(values.zeroUtilRate, null, Number),
           getNullOrTransform(values.platformLiquidationFee, null, Number),
           values.disableAssetLiquidation!,
