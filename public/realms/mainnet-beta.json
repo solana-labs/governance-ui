@@ -3609,5 +3609,14 @@
     "bannerImage": "/realms/Advocat/AdvocatBusiness.png",
     "website": "https://advocat.live",
     "twitter": "@notacatcoin" 
+  },{ 
+    "symbol": "ELIXDAO",
+    "displayName": "Elixir Games DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "4hvTFBAPi3HzC7L9XJuMvst23EumyJNVKXL9TTNc6utd",
+    "ogImage": "/realms/ElixirGamesDAO/logo.png",
+    "bannerImage": "/realms/ElixirGamesDAO/banner.png",
+    "website": "https://elixir.games",
+    "twitter": "@Elixir_Games" 
   }
 ]
