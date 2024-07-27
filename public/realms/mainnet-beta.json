@@ -1,5 +1,21 @@
 [
   {
+    "symbol": "Fre.eco",
+    "displayName": "Free Eco Association",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "5quegYTkgjJXdtn9Dw7VEamZipWxzVxZ2Fw9Uamb5SKa",
+    "bannerImage": "/realms/Free Eco Association DAO, Switzerland/Background.jpg",
+    "ogImage": "/realms/Free Eco Association DAO, Switzerland/Free Eco DAO COIN.png",
+    "website": "fre.eco",
+    "keywords": "crypto, Solana, SOL, SPL, eco, dao, fco, free, ico, ido,",
+    "twitter": "@FreEcoDAO",
+    "telegram": "t.me/FreEcoDAO",
+    "youtube": "@Fre.ecoDAO",
+    "shortDescription": "Utility and voting token of the Free Eco (Fre.eco) DAO & Bio Market 3.0 ecosystem, which enables holders to buy and sell 100% BIO ORGANIC VEGAN products and services for fiat and crypto, participate in decision-making processes, donate and invest into eco-friendly sustainable projects, propose initiatives, vote on matters vital to the project's development and growth. Backed by the Free Eco Association & DAO, headquartered in Geneva, Switzerland. Our mission is to promote the sustainable eco-friendly way of life, to support eco projects and empower individuals, businesses and communities to embrace Eco-friendly practices.",
+    "donation address": "freeco.sol, 9wX9CfEtos31kTBAK9HpEmaWo7vM7bfLsyvXWoUcavvd"
+
+  },
+  {
     "symbol": "CAS",
     "displayName": "Cyborg Ape Society",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -12,7 +28,7 @@
     "discord": "https://discord.gg/9ue6ktyu",
     "shortDescription": "Cyborg Apes Society Mission DAO",
     "sortRank": -1000
-  },
+      },
   {
     "symbol": "Frictionless",
     "displayName": "Frictionless DAO",
