@@ -258,7 +258,7 @@ const EditToken = ({
         },
         forcedValues
       )
-      console.log(values)
+
       const oracleConfFilter =
         (form.oracleConfFilter as number | string) === ''
           ? null
