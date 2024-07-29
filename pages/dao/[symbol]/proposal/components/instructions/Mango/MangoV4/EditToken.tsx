@@ -258,7 +258,7 @@ const EditToken = ({
         },
         forcedValues
       )
-
+      console.log(values)
       const oracleConfFilter =
         (form.oracleConfFilter as number | string) === ''
           ? null
@@ -351,7 +351,12 @@ const EditToken = ({
           getNullOrTransform(values.maintWeightShiftLiabTarget, null, Number),
           values.maintWeightShiftAbort!,
           values.setFallbackOracle!,
-          getNullOrTransform(values.depositLimit?.toString(), BN),
+          getNullOrTransform(
+            values.depositLimit !== null && values.depositLimit !== undefined
+              ? values.depositLimit?.toString()
+              : null,
+            BN
+          ),
           getNullOrTransform(values.zeroUtilRate, null, Number),
           getNullOrTransform(values.platformLiquidationFee, null, Number),
           values.disableAssetLiquidation!,
