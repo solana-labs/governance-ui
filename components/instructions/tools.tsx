@@ -327,6 +327,9 @@ export const ACCOUNT_NAMES = {
   '6gwjRFcW1Y9iuJwXPdz1zZUa3Hcu855dH6APA5LjD8qK':
     'AllDomains Treasury Governance',
   AWVUWfRnHCTgo123mRXB9BRWaxt6JdZXXKhFMQ5mryKJ: 'AllDomains DAO Governance',
+  
+  // Parcl
+  "9Waj7NNTzEhyHf1j1F36xgtnXaLoAxVBFhf6VxE9fgaf": 'Parcl DAO'
 }
 
 // TODO: Add this to on-chain metadata to Governance account
@@ -362,6 +365,8 @@ export const HIDDEN_PROPOSALS = new Map<string, string>([
   ['H5TnbSBNFKJJwKea8tUj7ETcmhRHXQ1N9XCXBSD6Q9P1', ''],
   ['GeMQWvFTasBoui11RqRzMtDPQ9b2BkMK8NzepWzvuXw3', ''],
   ['CRmUPr8CbfPQ4MAoo2yxSf5qL2nPsddL69kowMfp1JYP', ''],
+  ['8msNFq5VBectsGAv66zYx5QRve1p3m6ZEz49xaWX3tbd', ''],
+  ['3jU2YuKXKBw4cWx9taPDfhQZ8RFLmFUx3HLxMrh7w749', ''],
 ])
 
 export const DEFAULT_NATIVE_SOL_MINT =
