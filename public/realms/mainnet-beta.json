@@ -766,22 +766,6 @@
     "ogImage": "/realms/KiwiDAO/img/kiwi_logo.png"
   },
   {
-    "symbol": "FIDA",
-    "category": "web3",
-    "bannerImage": "https://i.imgur.com/zXTrhXU.png",
-    "displayName": "Bonfida DAO",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "6NzVDMfEBJvkFDnjPx53K7mLGW3yQdSjLhsamS8go4cn",
-    "ogImage": "https://i.imgur.com/34Ss9kj.png",
-    "shortDescription": "Bonfida has a simple, yet realistic goal of providing products and services that will enhance the Solana blockchain experience.",
-    "sortRank": 2,
-    "website": "https://bonfida.org/",
-    "twitter": "@bonfida",
-    "keywords": "Bonfida, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
-    "discord": "https://discord.gg/tusXFZXGTV",
-    "github": "https://github.com/Bonfida"
-  },
-  {
     "symbol": "N&F",
     "displayName": "Nick & Family",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",

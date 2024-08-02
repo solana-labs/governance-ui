@@ -3830,24 +3830,6 @@
       }
     ]
   },
-  "6NzVDMfEBJvkFDnjPx53K7mLGW3yQdSjLhsamS8go4cn": {
-    "symbol": "Bonfida",
-    "heading": "Bonfida has a simple, yet realistic goal of providing products and services that will enhance the Solana blockchain experience. ",
-    "about": [
-      {
-        "heading": "Introduction",
-        "content": [
-          "Bonfida is known as the top infrastructure developer on Solana. This accolade has been earned from our contributions to the ecosystem by providing services and products that allow for the wider ecosystem to flourish.",
-          "Bonfida’s primary product is the Solana Name Service (SNS). SNS has a straightforward mission of providing users with a Web3 ID. One of the clear benefits of the name service is a human-readable name that maps to a SOL address. Wallet address formats can be a barrier to entry, and therefore having an identifiable address can facilitate payments, efficiency, and overall user experience in our sphere. A name, not a number.",
-          "Besides SNS, Bonfida’s contributions to the ecosystem include; (1) creating a new Serum Core engine, the Asset Agnostic Orderbook (AOB), (2) xMS, the cross-messaging service, to name a few.  As a result of these contributions, our developers are highly respected and sought after within the Solana ecosystem."
-        ]
-      }
-    ],
-    "documentation": {
-      "title": "Docs",
-      "url": "https://docs.bonfida.org/collection/overview"
-    }
-  },
   "3MMDxjv1SzEFQDKryT7csAvaydYtrgMAc3L9xL9CVLCg": {
     "symbol": "Project Serum",
     "heading": "Faster, Cheaper and more Powerful DeFi",
