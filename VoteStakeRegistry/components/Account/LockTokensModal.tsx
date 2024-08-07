@@ -179,7 +179,7 @@ const LockTokensModal = ({
         ? getMintDecimalAmount(
             mint,
             depositRecord?.amountDepositedNative.add(
-              new BN(realmTokenAccount?.account.amount)
+              new BN(realmTokenAccount?.account.amount ?? 0)
             )
           )
         : getMintDecimalAmount(mint, depositRecord?.amountDepositedNative)
@@ -191,7 +191,7 @@ const LockTokensModal = ({
         ? fmtMintAmount(
             mint,
             depositRecord?.amountDepositedNative.add(
-              new BN(realmTokenAccount?.account.amount)
+              new BN(realmTokenAccount?.account.amount ?? 0)
             )
           )
         : fmtMintAmount(mint, depositRecord?.amountDepositedNative)
@@ -276,7 +276,7 @@ const LockTokensModal = ({
       lockUpPeriodInDays: lockupPeriodDays,
       lockupKind: lockupType.value,
       sourceDepositIdx: depositRecord!.index,
-      sourceTokenAccount: realmTokenAccount?.publicKey,
+      sourceTokenAccount: realmTokenAccount!.publicKey,
       allowClawback: allowClawback,
       tokenOwnerRecordPk,
       client: client,
