@@ -3585,7 +3585,8 @@
     "website": "https://guac.gg",
     "twitter": "@guac_gg"
   },
-  { "symbol": "Advocat",
+  { 
+    "symbol": "Advocat",
     "displayName": "Advocat DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "FDZPbcWoPfeVZxKev7syLPA7RNiEbK8wW5upW7KnMcSY",
@@ -3593,5 +3594,18 @@
     "bannerImage": "/realms/Advocat/AdvocatBusiness.png",
     "website": "https://advocat.live",
     "twitter": "@notacatcoin" 
+  },
+  {
+    "symbol": "BARK",
+    "displayName": "BARK",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "BRtTeK1XLJ2e11nn8wzhhPZRzaUW2SV1NhVhXcC42Niq",
+    "ogImage": "/realms/BARK/bark.png",
+    "shortDescription": "BARK leverages Solana’s fast and cost-efficient network to drive impactful SoFi solutions",
+    "keywords": "Solana, Charity, Social Good, Community, Governance, DeFi, Real-Word Assets, Supply-Chain, Multi-token Economics, Tokenization, CNFT, SPL",
+    "bannerImage": "/realms/BARK/bark-banner.png",
+    "website": "https://barkprotocol.com",
+    "twitter": "@bark_protocol",
+    "github": "https://github/bark-community"
   }
 ]
