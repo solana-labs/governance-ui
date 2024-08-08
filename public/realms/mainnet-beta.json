@@ -3593,5 +3593,22 @@
     "bannerImage": "/realms/Advocat/AdvocatBusiness.png",
     "website": "https://advocat.live",
     "twitter": "@notacatcoin" 
+  },
+  { 
+    "symbol": "LABS",
+    "category": "defi",
+    "bannerImage": "https://imgur.com/a/epicentral-labs-dao-banner-0d8bSHp",
+    "displayName": "Epicentral Labs DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "5PP7vKjJyLw1MR55LoexRsCj3CpZj9MdD6aNXRrvxG42",
+    "communityMint": "LABSh5DTebUcUbEoLzXKCiXFJLecDFiDWiBGUU1GpxR",
+    "ogImage": "/realms/EpicentralLabsDAO/Epicentral-Labs-Logo.png",
+    "shortDescription": "Epicentral Labs introduces innovative solutions and services for new or already existing Solana-based projects with the main goal to connect, collaborate, and educate today's webspace with how blockchain can immerse user experience.",
+    "sortRank": 6,
+    "website": "https://epicentrallabs.com/",
+    "keywords": "Epicentral Labs, REALM, Governance, DEFI, Decentralized Finance, Developer Tooling, Crypto, Solana, Ethereum, Decentralize, Community, SOL, SPL, Integrated, Trading, Infrastructure, SPL Tokens",
+    "twitter": "@EpicentralLabs",
+    "discord": "https://discord.gg/5asAuY2sR8",
+    "github": "https://github.com/EpicentralLabs"
   }
 ]
