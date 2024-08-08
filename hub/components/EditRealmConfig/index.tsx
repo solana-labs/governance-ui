@@ -32,6 +32,7 @@ import { Form } from './Form';
 import * as gql from './gql';
 import { RealmHeader } from './RealmHeader';
 import { Summary } from './Summary';
+import { useTokenOwnerRecordsDelegatedToUser } from '@hooks/queries/tokenOwnerRecord';
 
 type Governance = TypeOf<
   typeof gql.getGovernanceResp
@@ -166,6 +167,8 @@ export function EditRealmConfig(props: Props) {
       }
     }
   }, [governanceResult._tag]);
+
+  const myDelegationPower = useTokenOwnerRecordsDelegatedToUser().data
 
   return pipe(
     result,
@@ -321,6 +324,7 @@ export function EditRealmConfig(props: Props) {
                                 prerequisiteInstructions: [],
                               })),
                               governance: governance.governanceAddress,
+                              myDelegatedTors: myDelegationPower
                             });
 
                             if (proposalAddress) {
