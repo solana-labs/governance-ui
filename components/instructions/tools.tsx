@@ -404,6 +404,7 @@ export const HIDDEN_REALMS = [
   'FsoDEiZ9BoGTAaCLzXkyQWEqNKa5PW2iokzmuD7YsRdL',
   '9nUyxzVL2FUMuWUiVZG66gwK15CJiM3PoLkfrnGfkvt6', // old Drift dao
   '7mjEBafqqKA2K6SHezMrDV1zBoyNw6SKFcTsBbH2Kxgb', // openBook v2 council wrong config
+  '6NzVDMfEBJvkFDnjPx53K7mLGW3yQdSjLhsamS8go4cn', // old bonfida dao
 ]
 
 //owner and desired accounts we want to show
