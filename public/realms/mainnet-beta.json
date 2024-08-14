@@ -3609,5 +3609,13 @@
     "twitter": "@EpicentralLabs",
     "discord": "https://discord.gg/5asAuY2sR8",
     "github": "https://github.com/EpicentralLabs"
-  }
+  },
+  { 
+{ "symbol": "FOXTAG",
+"displayName": "$SOLFOX Official DAO",
+"programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+"realmId": "8PzqFQWeiyQLAtiDG4GV8bmS1YDCM7xy6SNz1eMsiw8A",
+"ogImage": "/realms/SOLFOX/foxtag.png",
+"website": "https://solfoxlegion.com",
+"twitter": "@solfoxlegion" }
 ]
