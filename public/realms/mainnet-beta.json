@@ -3611,11 +3611,12 @@
     "github": "https://github.com/EpicentralLabs"
   },
 { 
-"symbol": "FOXTAG",
-"displayName": "$SOLFOX Official DAO",
-"programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-"realmId": "8PzqFQWeiyQLAtiDG4GV8bmS1YDCM7xy6SNz1eMsiw8A",
-"ogImage": "/realms/FOXTAG.png",
-"website": "https://solfoxlegion.com",
-"twitter": "@solfoxlegion" }
+  "symbol": "FOXTAG",
+  "displayName": "$SOLFOX Official DAO",
+  "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+  "realmId": "8PzqFQWeiyQLAtiDG4GV8bmS1YDCM7xy6SNz1eMsiw8A",
+  "ogImage": "/realms/FOXTAG.png",
+  "website": "https://solfoxlegion.com",
+  "twitter": "@solfoxlegion"
 }
+]
