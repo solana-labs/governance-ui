@@ -766,22 +766,6 @@
     "ogImage": "/realms/KiwiDAO/img/kiwi_logo.png"
   },
   {
-    "symbol": "FIDA",
-    "category": "web3",
-    "bannerImage": "https://i.imgur.com/zXTrhXU.png",
-    "displayName": "Bonfida DAO",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "6NzVDMfEBJvkFDnjPx53K7mLGW3yQdSjLhsamS8go4cn",
-    "ogImage": "https://i.imgur.com/34Ss9kj.png",
-    "shortDescription": "Bonfida has a simple, yet realistic goal of providing products and services that will enhance the Solana blockchain experience.",
-    "sortRank": 2,
-    "website": "https://bonfida.org/",
-    "twitter": "@bonfida",
-    "keywords": "Bonfida, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
-    "discord": "https://discord.gg/tusXFZXGTV",
-    "github": "https://github.com/Bonfida"
-  },
-  {
     "symbol": "N&F",
     "displayName": "Nick & Family",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -3609,5 +3593,21 @@
     "bannerImage": "/realms/Advocat/AdvocatBusiness.png",
     "website": "https://advocat.live",
     "twitter": "@notacatcoin" 
+  },
+  { 
+    "symbol": "LABS",
+    "category": "defi",
+    "bannerImage": "/realms/EpicentralLabsDAO/EpicentralDAOBanner.png",
+    "displayName": "Epicentral Labs DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "5PP7vKjJyLw1MR55LoexRsCj3CpZj9MdD6aNXRrvxG42",
+    "communityMint": "LABSh5DTebUcUbEoLzXKCiXFJLecDFiDWiBGUU1GpxR",
+    "ogImage": "/realms/EpicentralLabsDAO/Epicentral-Labs-Logo.png",
+    "shortDescription": "Epicentral Labs introduces innovative solutions and services for new or already existing Solana-based projects with the main goal to connect, collaborate, and educate today's webspace with how blockchain can immerse user experience.",
+    "website": "https://epicentrallabs.com/",
+    "keywords": "Epicentral Labs, REALM, Governance, DEFI, Decentralized Finance, Developer Tooling, Crypto, Solana, Ethereum, Decentralize, Community, SOL, SPL, Integrated, Trading, Infrastructure, SPL Tokens",
+    "twitter": "@EpicentralLabs",
+    "discord": "https://discord.gg/5asAuY2sR8",
+    "github": "https://github.com/EpicentralLabs"
   }
 ]
