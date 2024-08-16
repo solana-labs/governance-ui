@@ -174,8 +174,7 @@
     "tsconfig-paths": "3.14.1",
     "urql": "3.0.3",
     "yup": "0.32.11",
-    "zustand": "3.7.2",
-    "@solana/promises": "2.0.0-canary-20240812091942"
+    "zustand": "3.7.2"
   },
   "devDependencies": {
     "@lavamoat/allow-scripts": "2.3.0",
