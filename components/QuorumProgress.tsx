@@ -39,6 +39,7 @@ const QuorumProgress = ({
             ).toLocaleString(undefined, {
               maximumFractionDigits: 0,
             })} ${(progress ?? 0) > 0 ? 'more' : ''} ${voteKindTitle} vote${
+              //@ts-ignore
               (votesRequired ?? 0) > 1 ? 's' : ''
             } required`}</p>
           ) : (
