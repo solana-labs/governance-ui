@@ -33,7 +33,6 @@ export default function NFTList({ governance, ...props }: Props) {
         .map((x) => new PublicKey(x)),
     [nfts]
   )
-  console.log('collectionIds', JSON.stringify(collectionIds))
 
   const hasNftWithoutCollection = nfts?.find((x) => x.grouping.length < 1)
 

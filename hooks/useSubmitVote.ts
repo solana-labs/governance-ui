@@ -1,6 +1,5 @@
 import useWalletOnePointOh from './useWalletOnePointOh'
 import useRealm from './useRealm'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useNftProposalStore from 'NftVotePlugin/NftProposalStore'
 import { useAsyncCallback } from 'react-async-hook'
 import {
@@ -22,34 +21,29 @@ import { castVote } from 'actions/castVote'
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { notify } from '@utils/notifications'
 import { useRealmQuery } from './queries/realm'
-import { useRealmConfigQuery } from './queries/realmConfig'
 import { proposalQueryKeys, useRouteProposalQuery } from './queries/proposal'
 import useLegacyConnectionContext from './useLegacyConnectionContext'
-import { NFT_PLUGINS_PKS } from '@constants/plugins'
 import { TransactionInstruction } from '@solana/web3.js'
 import useProgramVersion from './useProgramVersion'
 import useVotingTokenOwnerRecords from './useVotingTokenOwnerRecords'
 import { useMemo } from 'react'
 import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
 import { useBatchedVoteDelegators } from '@components/VotePanel/useDelegators'
+import { useVotingClients } from '@hooks/useVotingClients'
+import { useNftClient } from '../VoterWeightPlugins/useNftClient'
+import { useRealmVoterWeightPlugins } from './useRealmVoterWeightPlugins'
 
 export const useSubmitVote = () => {
   const wallet = useWalletOnePointOh()
   const connection = useLegacyConnectionContext()
   const realm = useRealmQuery().data?.result
-  const config = useRealmConfigQuery().data?.result
   const proposal = useRouteProposalQuery().data?.result
   const { realmInfo } = useRealm()
   const { closeNftVotingCountingModal } = useNftProposalStore.getState()
-  const client = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
-  )
+  const votingClients = useVotingClients() // TODO this should be passed the role
+  const { nftClient } = useNftClient()
 
-  const isNftPlugin =
-    config?.account.communityTokenConfig.voterWeightAddin &&
-    NFT_PLUGINS_PKS.includes(
-      config?.account.communityTokenConfig.voterWeightAddin?.toBase58()
-    )
+  const isNftPlugin = !!nftClient
 
   const selectedCommunityDelegator = useSelectedDelegatorStore(
     (s) => s.communityDelegator
@@ -59,6 +53,13 @@ export const useSubmitVote = () => {
   )
   const communityDelegators = useBatchedVoteDelegators('community')
   const councilDelegators = useBatchedVoteDelegators('council')
+
+  const {
+    voterWeightForWallet: voterWeightForWalletCommunity,
+  } = useRealmVoterWeightPlugins('community')
+  const {
+    voterWeightForWallet: voterWeightForWalletCouncil,
+  } = useRealmVoterWeightPlugins('council')
 
   const { error, loading, execute } = useAsyncCallback(
     async ({
@@ -131,6 +132,17 @@ export const useSubmitVote = () => {
         : councilDelegators
       )?.map((x) => x.pubkey)
 
+      const voterWeightForWallet =
+        role === 'community'
+          ? voterWeightForWalletCommunity
+          : voterWeightForWalletCouncil
+      const ownVoterWeight = relevantSelectedDelegator
+        ? voterWeightForWallet(relevantSelectedDelegator)
+        : wallet?.publicKey
+        ? voterWeightForWallet(wallet?.publicKey)
+        : undefined
+
+      const votingClient = votingClients(role)
       try {
         await castVote(
           rpcContext,
@@ -139,10 +151,11 @@ export const useSubmitVote = () => {
           tokenOwnerRecordPk,
           vote,
           msg,
-          role === 'community' ? client : undefined, // NOTE: currently FE doesn't support council plugins fully
+          votingClient,
           confirmationCallback,
           voteWeights,
-          relevantDelegators
+          relevantDelegators,
+          ownVoterWeight?.value
         )
         queryClient.invalidateQueries({
           queryKey: proposalQueryKeys.all(connection.current.rpcEndpoint),
@@ -157,7 +170,7 @@ export const useSubmitVote = () => {
       } finally {
         if (isNftPlugin) {
           closeNftVotingCountingModal(
-            client.client as NftVoterClient,
+            votingClient.client as NftVoterClient,
             proposal!,
             wallet!.publicKey!
           )
@@ -188,10 +201,8 @@ export const useCreateVoteIxs = () => {
   const programVersion = useProgramVersion()
   const realm = useRealmQuery().data?.result
   const wallet = useWalletOnePointOh()
-  const votingPluginClient = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
-  )
   const getVotingTokenOwnerRecords = useVotingTokenOwnerRecords()
+  const votingClients = useVotingClients()
 
   // get delegates
 
@@ -204,7 +215,6 @@ export const useCreateVoteIxs = () => {
       walletPk !== undefined
         ? // eslint-disable-next-line @typescript-eslint/no-unused-vars
           async ({ voteKind, governingBody, proposal, comment }: VoteArgs) => {
-            //const signers: Keypair[] = []
             const instructions: TransactionInstruction[] = []
 
             const governingTokenMint =
@@ -214,12 +224,13 @@ export const useCreateVoteIxs = () => {
             if (governingTokenMint === undefined)
               throw new Error(`no mint for ${governingBody} governing body`)
 
+            const votingClient = votingClients(governingBody)
             const vote = formatVote(voteKind)
 
             const votingTors = await getVotingTokenOwnerRecords(governingBody)
             for (const torPk of votingTors) {
               //will run only if any plugin is connected with realm
-              const votingPluginHelpers = await votingPluginClient?.withCastPluginVote(
+              const votingPluginHelpers = await votingClient.withCastPluginVote(
                 instructions,
                 proposal,
                 torPk
@@ -246,13 +257,7 @@ export const useCreateVoteIxs = () => {
             }
           }
         : undefined,
-    [
-      getVotingTokenOwnerRecords,
-      programVersion,
-      realm,
-      votingPluginClient,
-      walletPk,
-    ]
+    [getVotingTokenOwnerRecords, programVersion, realm, votingClients, walletPk]
   )
 }
 

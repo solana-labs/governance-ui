@@ -24,6 +24,7 @@ import {
   VSR_PLUGIN_PKS,
   HELIUM_VSR_PLUGINS_PKS,
   GATEWAY_PLUGINS_PKS,
+  QV_PLUGINS_PKS,
 } from '@constants/plugins'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import { validatePubkey } from './formValidation'
@@ -34,6 +35,7 @@ const supportedPlugins = [
   ...VSR_PLUGIN_PKS,
   ...HELIUM_VSR_PLUGINS_PKS,
   ...GATEWAY_PLUGINS_PKS,
+  ...QV_PLUGINS_PKS
 ]
 
 const getValidateAccount = async (
@@ -974,6 +976,172 @@ export const getTokenTransferSchema = ({
               message: `Destination account is required`,
             })
           }
+        }
+      ),
+  })
+}
+
+export const getBatchTokenTransferSchema = ({
+  form,
+  connection,
+  tokenAmount,
+  mintDecimals,
+  nftMode,
+  ignoreAmount,
+}: {
+  form: any
+  connection: ConnectionContext
+  tokenAmount?: BN
+  mintDecimals?: number
+  nftMode?: boolean
+  ignoreAmount?: boolean
+}) => {
+  const governedTokenAccount = form.governedTokenAccount as AssetAccount
+  return yup.object().shape({
+    governedTokenAccount: yup.object().required('Source account is required'),
+    amount: yup.array().of(
+      yup.number()
+      .typeError('Amount is required')
+      .test(
+        'amount',
+        'Transfer amount must be less than the source account available amount',
+        async function (val: number) {
+          const isNft = nftMode || governedTokenAccount?.isNft
+          if (isNft || ignoreAmount) {
+            return true
+          }
+          if (val && !form.governedTokenAccount) {
+            return this.createError({
+              message: `Please select source account to validate the amount`,
+            })
+          }
+          if (
+            val &&
+            governedTokenAccount &&
+            governedTokenAccount?.extensions.mint
+          ) {
+            const mintValue = getMintNaturalAmountFromDecimalAsBN(
+              val,
+              typeof mintDecimals !== 'undefined'
+                ? mintDecimals
+                : governedTokenAccount?.extensions.mint.account.decimals
+            )
+            if (tokenAmount) {
+              return tokenAmount.gte(mintValue)
+            }
+            return !!(governedTokenAccount?.extensions.token?.publicKey &&
+            !governedTokenAccount.isSol
+              ? governedTokenAccount.extensions.token.account.amount.gte(
+                  mintValue
+                )
+              : new BN(
+                  governedTokenAccount.extensions.solAccount!.lamports
+                ).gte(mintValue))
+          }
+          return this.createError({
+            message: `Amount is required`,
+          })
+        }
+      )),
+    destinationAccount: yup
+      .array().of(
+        yup
+        .string()
+        .test(
+          'accountTests',
+          'Account validation error',
+          async function (val: string) {
+            if (val) {
+              try {
+                if (
+                  governedTokenAccount?.extensions?.transferAddress?.toBase58() ==
+                  val
+                ) {
+                  return this.createError({
+                    message: `Destination account address can't be same as source account`,
+                  })
+                }
+                await validateDestinationAccAddress(
+                  connection,
+                  val,
+                  governedTokenAccount?.extensions.transferAddress
+                )
+                return true
+              } catch (e) {
+                console.log(e)
+                return this.createError({
+                  message: `${e}`,
+                })
+              }
+            } else {
+              return this.createError({
+                message: `Destination account is required`,
+              })
+            }
+          }
+        )
+      ),
+  })
+}
+
+export const getBurnTokensSchema = ({
+  form,
+  tokenAmount,
+  mintDecimals,
+  nftMode,
+  ignoreAmount,
+}: {
+  form: any
+  tokenAmount?: BN
+  mintDecimals?: number
+  nftMode?: boolean
+  ignoreAmount?: boolean
+}) => {
+  const governedTokenAccount = form.governedTokenAccount as AssetAccount
+  return yup.object().shape({
+    governedTokenAccount: yup.object().required('Token account is required'),
+    amount: yup
+      .number()
+      .typeError('Amount is required')
+      .test(
+        'amount',
+        'Transfer amount must be less than the source account available amount',
+        async function (val: number) {
+          const isNft = nftMode || governedTokenAccount?.isNft
+          if (isNft || ignoreAmount) {
+            return true
+          }
+          if (val && !form.governedTokenAccount) {
+            return this.createError({
+              message: `Please select source account to validate the amount`,
+            })
+          }
+          if (
+            val &&
+            governedTokenAccount &&
+            governedTokenAccount?.extensions.mint
+          ) {
+            const mintValue = getMintNaturalAmountFromDecimalAsBN(
+              val,
+              typeof mintDecimals !== 'undefined'
+                ? mintDecimals
+                : governedTokenAccount?.extensions.mint.account.decimals
+            )
+            if (tokenAmount) {
+              return tokenAmount.gte(mintValue)
+            }
+            return !!(governedTokenAccount?.extensions.token?.publicKey &&
+            !governedTokenAccount.isSol
+              ? governedTokenAccount.extensions.token.account.amount.gte(
+                  mintValue
+                )
+              : new BN(
+                  governedTokenAccount.extensions.solAccount!.lamports
+                ).gte(mintValue))
+          }
+          return this.createError({
+            message: `Amount is required`,
+          })
         }
       ),
   })

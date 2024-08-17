@@ -12,19 +12,21 @@ import {
 } from '@hooks/queries/mintInfo'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import { NFT_PLUGINS_PKS } from '@constants/plugins'
-import {ProfileName} from "@components/Profile/ProfileName";
-import {ProfileImage} from "@components/Profile";
+import { ProfileName } from '@components/Profile/ProfileName'
+import { ProfileImage } from '@components/Profile'
 
 interface MembersTabsProps {
   activeTab: Member
   onChange: (x) => void
   tabs: Array<Member>
+  vsrMode?: boolean
 }
 
 const MembersTabs: FunctionComponent<MembersTabsProps> = ({
   activeTab,
   onChange,
   tabs,
+  vsrMode
 }) => {
   const realm = useRealmQuery().data?.result
   const mint = useRealmCommunityMintInfoQuery().data?.result
@@ -69,6 +71,7 @@ const MembersTabs: FunctionComponent<MembersTabsProps> = ({
               activeTab={activeTab}
               tokenName={tokenName || nftName || ''}
               onChange={onChange}
+              vsrMode={vsrMode}
             ></MemberItems>
           )
         )
@@ -86,13 +89,15 @@ const MemberItems = ({
   activeTab,
   tokenName,
   onChange,
+  vsrMode
 }: {
   member: Member
   mint?: MintInfo
   councilMint?: MintInfo
   activeTab: Member
   tokenName: string
-  onChange: (member: Member) => void
+  onChange: (member: Member) => void,
+  vsrMode?: boolean
 }) => {
   const {
     walletAddress,
@@ -123,7 +128,11 @@ const MemberItems = ({
   }, [walletAddress])
   const renderAddressImage = useMemo(
     () => (
-        <ProfileImage publicKey={new PublicKey(walletAddress)} expanded={false} className="w-6 h-6 text-fgd-3" />
+      <ProfileImage
+        publicKey={new PublicKey(walletAddress)}
+        expanded={false}
+        className="w-6 h-6 text-fgd-3"
+      />
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     [walletAddress]
@@ -145,25 +154,27 @@ const MemberItems = ({
         </div>
         <div>
           <h3 className="flex mb-1 text-base font-bold">{renderAddressName}</h3>
-          {/* <p className="mb-0 text-xs text-fgd-1">Votes Cast: {votesCasted}</p> */}
-          <span className="text-xs text-fgd-3">
-            {(communityAmount || !councilAmount) && (
-              <span className="flex items-center">
-                {tokenName} Votes {communityAmount || 0}
-                {hasCommunityTokenOutsideRealm && (
-                  <LogoutIcon className="w-4 h-4 ml-1"></LogoutIcon>
-                )}
-              </span>
-            )}
-            {councilAmount && (
-              <span className="flex items-center">
-                Council Votes {councilAmount}{' '}
-                {hasCouncilTokenOutsideRealm && (
-                  <LogoutIcon className="w-4 h-4 ml-1"></LogoutIcon>
-                )}
-              </span>
-            )}
-          </span>
+          {vsrMode ?
+            '' :
+            <span className="text-xs text-fgd-3">
+              {(communityAmount || !councilAmount) && (
+                <span className="flex items-center">
+                  {tokenName} votes {communityAmount || 0}
+                  {hasCommunityTokenOutsideRealm && (
+                    <LogoutIcon className="w-4 h-4 ml-1"></LogoutIcon>
+                  )}
+                </span>
+              )}
+              {councilAmount && (
+                <span className="flex items-center">
+                  Council votes {councilAmount}{' '}
+                  {hasCouncilTokenOutsideRealm && (
+                    <LogoutIcon className="w-4 h-4 ml-1"></LogoutIcon>
+                  )}
+                </span>
+              )}
+            </span>
+          }
         </div>
       </div>
     </button>

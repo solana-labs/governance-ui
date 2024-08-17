@@ -171,6 +171,7 @@ const ProgramUpgrade = ({
     <>
       <GovernedAccountSelect
         label="Program"
+        type='program'
         governedAccounts={governedProgramAccounts}
         onChange={(value) => {
           handleSetForm({

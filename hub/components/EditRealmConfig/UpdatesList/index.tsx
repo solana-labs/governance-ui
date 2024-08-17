@@ -2,6 +2,7 @@ import EditIcon from '@carbon/icons-react/lib/Edit';
 import EventsIcon from '@carbon/icons-react/lib/Events';
 import RuleIcon from '@carbon/icons-react/lib/Rule';
 import ScaleIcon from '@carbon/icons-react/lib/Scale';
+import { Coefficients } from '@solana/governance-program-library';
 import {
   MintMaxVoteWeightSourceType,
   MintMaxVoteWeightSource,
@@ -10,6 +11,8 @@ import { PublicKey } from '@solana/web3.js';
 import { BigNumber } from 'bignumber.js';
 import BN from 'bn.js';
 
+import { FC } from 'react';
+
 import { availablePasses } from '../../../../GatewayPlugin/config';
 import { Config } from '../fetchConfig';
 import { getLabel } from '../TokenTypeSelector';
@@ -17,6 +20,7 @@ import {
   DEFAULT_NFT_CONFIG,
   DEFAULT_VSR_CONFIG,
   DEFAULT_CIVIC_CONFIG,
+  DEFAULT_QV_CONFIG,
 } from '../VotingStructureSelector';
 import { SectionBlock } from '@hub/components/EditWalletRules/SectionBlock';
 import { SectionHeader } from '@hub/components/EditWalletRules/SectionHeader';
@@ -47,6 +51,8 @@ export function buildUpdates(config: Config) {
     nftCollectionSize: config.nftCollectionSize,
     nftCollectionWeight: config.nftCollectionWeight,
     civicPassType: config.civicPassType,
+    qvCoefficients: config.qvCoefficients,
+    chainingEnabled: config.chainingEnabled,
   };
 }
 
@@ -93,6 +99,27 @@ const civicPassTypeLabel = (civicPassType: PublicKey | undefined): string => {
   return foundPass.name;
 };
 
+// display QV coefficients inline with A, B, C as labels
+const QvCoefficientsDisplay: FC<{
+  qvCoefficients: Coefficients | undefined;
+}> = ({ qvCoefficients }) => {
+  if (!qvCoefficients) return null;
+  const coefficient = (label: string, value: number) => (
+    <div className="flex items-baseline">
+      <div>{label}</div>
+      <div className="ml-3">{value}</div>
+    </div>
+  );
+
+  return (
+    <>
+      {coefficient('A', qvCoefficients[0])}
+      {coefficient('B', qvCoefficients[1])}
+      {coefficient('C', qvCoefficients[2])}
+    </>
+  );
+};
+
 function votingStructureText(
   votingPluginDiff: [PublicKey | undefined, PublicKey | undefined],
   maxVotingPluginDiff: [PublicKey | undefined, PublicKey | undefined],
@@ -115,6 +142,11 @@ function votingStructureText(
     typeof maxVotingPluginDiff[0] === 'undefined'
   ) {
     existingText = 'Civic';
+  } else if (
+    votingPluginDiff[0]?.equals(DEFAULT_QV_CONFIG.votingProgramId) &&
+    typeof maxVotingPluginDiff[0] === 'undefined'
+  ) {
+    existingText = 'QV';
   } else if (votingPluginDiff[0] || maxVotingPluginDiff[0]) {
     existingText = 'Custom';
   }
@@ -134,6 +166,11 @@ function votingStructureText(
     typeof maxVotingPluginDiff[1] === 'undefined'
   ) {
     newText = 'Civic';
+  } else if (
+    votingPluginDiff[1]?.equals(DEFAULT_QV_CONFIG.votingProgramId) &&
+    typeof maxVotingPluginDiff[1] === 'undefined'
+  ) {
+    newText = 'QV';
   } else if (votingPluginDiff[1] || maxVotingPluginDiff[1]) {
     newText = 'Custom';
   }
@@ -315,14 +352,25 @@ export function UpdatesList(props: Props) {
                           )[1]
                         }
                       </div>
-                      <div className="ml-3 text-base text-neutral-500 line-through">
-                        {
-                          votingStructureText(
-                            updates.communityVotingPlugin || [],
-                            updates.communityMaxVotingPlugin || [],
-                          )[0]
-                        }
-                      </div>
+                      {updates.chainingEnabled ? (
+                        <div className="ml-3 text-base text-neutral-500">
+                          {'⬅ ' +
+                            votingStructureText(
+                              updates.communityVotingPlugin || [],
+                              updates.communityMaxVotingPlugin || [],
+                            )[0] +
+                            ' (Chaining)'}
+                        </div>
+                      ) : (
+                        <div className="ml-3 text-base text-neutral-500 line-through">
+                          {
+                            votingStructureText(
+                              updates.communityVotingPlugin || [],
+                              updates.communityMaxVotingPlugin || [],
+                            )[0]
+                          }
+                        </div>
+                      )}
                     </div>
                   }
                 />
@@ -646,6 +694,25 @@ export function UpdatesList(props: Props) {
             )}
           </div>
         </div>
+      )}
+      {'qvCoefficients' in updates && (
+        <SummaryItem
+          label="QV Coefficients"
+          value={
+            <div className="flex items-baseline">
+              <div>
+                <QvCoefficientsDisplay
+                  qvCoefficients={updates.qvCoefficients[1]}
+                />
+              </div>
+              <div className="ml-3 text-base text-neutral-500 line-through">
+                <QvCoefficientsDisplay
+                  qvCoefficients={updates.qvCoefficients[0]}
+                />
+              </div>
+            </div>
+          }
+        />
       )}
     </SectionBlock>
   );

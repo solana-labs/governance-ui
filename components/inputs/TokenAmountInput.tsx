@@ -1,8 +1,5 @@
-import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
 import { PublicKey } from '@solana/web3.js'
-import { precision } from '@utils/formatting'
-import BigNumber from 'bignumber.js'
-import { FC, useMemo } from 'react'
+import { FC } from 'react'
 import Input, { InputProps } from './Input'
 
 type Props = Omit<
@@ -26,20 +23,6 @@ const TokenAmountInput: FC<Props> = ({
   value,
   ...props
 }) => {
-  const { data: mintInfo } = useMintInfoByPubkeyQuery(mint)
-
-  const mintMinAmount = useMemo(
-    () =>
-      mintInfo?.result
-        ? new BigNumber(1).shiftedBy(mintInfo.result.decimals).toNumber()
-        : 1,
-    [mintInfo?.result]
-  )
-
-  const currentPrecision = useMemo(() => precision(mintMinAmount), [
-    mintMinAmount,
-  ])
-
   const validateAmount = () => {
     if (value === undefined || value === '') {
       if (props.required) {
@@ -50,16 +33,16 @@ const TokenAmountInput: FC<Props> = ({
 
     setValue(
       Math.max(
-        Number(mintMinAmount),
+        1,
         Math.min(Number(Number.MAX_SAFE_INTEGER), Number(value))
-      ).toFixed(currentPrecision)
+      ).toFixed(0)
     )
   }
 
   return (
     <Input
       disabled={props.disabled || mint === undefined}
-      min={mintMinAmount}
+      min={1}
       label="Amount"
       value={value}
       type="number"
@@ -67,7 +50,7 @@ const TokenAmountInput: FC<Props> = ({
         setValue(e.target.value)
         setError(undefined)
       }}
-      step={mintMinAmount}
+      step={1}
       error={props.error}
       onBlur={(e) => {
         props.onBlur?.(e)

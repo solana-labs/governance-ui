@@ -17,10 +17,9 @@ import { MintInfo } from '@solana/spl-token'
 import { BN } from '@coral-xyz/anchor'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { getDeposits } from 'VoteStakeRegistry/tools/deposits'
-import { DepositWithMintAccount } from 'VoteStakeRegistry/sdk/accounts'
+import {DepositWithMintAccount, Registrar} from 'VoteStakeRegistry/sdk/accounts'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { notify } from '@utils/notifications'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import {
   getTokenOwnerRecordAddress,
   GoverningTokenRole,
@@ -44,6 +43,7 @@ import {
 } from '@hooks/queries/mintInfo'
 import { useConnection } from '@solana/wallet-adapter-react'
 import { useVsrGovpower } from '@hooks/queries/plugins/vsr'
+import {useVsrClient} from "../../../VoterWeightPlugins/useVsrClient";
 
 interface DepositBox {
   mintPk: PublicKey
@@ -63,10 +63,9 @@ const LockTokensAccount: React.FC<{
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
   const { realmInfo } = useRealm()
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
-  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
-  const registrar = useVotePluginsClientStore(
-    (s) => s.state.voteStakeRegistryRegistrar
-  )
+  const { vsrClient: client, plugin } = useVsrClient();
+  const registrar = plugin?.params as Registrar | undefined;
+
   const isZeroMultiplierConfig = !registrar?.votingMints.filter(
     (x) => !x.maxExtraLockupVoteWeightScaledFactor.isZero()
   ).length

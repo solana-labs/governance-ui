@@ -6,7 +6,6 @@ import { getNameOf } from '@tools/core/script'
 import { SupportedMintName } from '@tools/sdk/solend/configuration'
 import { DepositWithMintAccount, Voter } from 'VoteStakeRegistry/sdk/accounts'
 import { LockupKind } from 'VoteStakeRegistry/tools/types'
-import { consts as foresightConsts } from '@foresight-tmp/foresight-sdk'
 import { AssetAccount, StakeAccount } from '@utils/uiTypes/assets'
 import { RealmInfo } from '@models/registry/api'
 import * as PaymentStreaming from '@mean-dao/payment-streaming'
@@ -14,19 +13,20 @@ import * as PaymentStreaming from '@mean-dao/payment-streaming'
 // Alphabetical order
 export enum PackageEnum {
   Common,
+  Distribution,
   Dual,
-  Foresight,
   GatewayPlugin,
   Identity,
-  NftPlugin,
   MangoMarketV4,
   MeanFinance,
+  NftPlugin,
   PsyFinance,
+  Pyth,
   Serum,
   Solend,
+  Squads,
   Switchboard,
   VsrPlugin,
-  Distribution,
 }
 
 export interface UiInstruction {
@@ -46,6 +46,12 @@ export interface SplTokenTransferForm {
   amount: number | undefined
   governedTokenAccount: AssetAccount | undefined
   programId: string | undefined
+  mintInfo: MintInfo | undefined
+}
+
+export interface BurnTokensForm {
+  amount: number | undefined
+  governedTokenAccount: AssetAccount | undefined
   mintInfo: MintInfo | undefined
 }
 
@@ -114,7 +120,10 @@ export interface ClawbackForm {
   holdupTime: number
 }
 
-export interface SendTokenCompactViewForm extends SplTokenTransferForm {
+export interface SendTokenCompactViewForm extends Omit<SplTokenTransferForm, 'amount' | 'destinationAccount'> {
+  destinationAccount: string[]
+  amount: (number | undefined)[]
+  txDollarAmount: (string | undefined)[]
   description: string
   title: string
 }
@@ -188,35 +197,6 @@ export interface PsyFinanceExerciseOption {
 
 /* End PsyOptions American options */
 
-export interface ForesightHasGovernedAccount {
-  governedAccount: AssetAccount
-}
-
-export interface ForesightHasMarketListId extends ForesightHasGovernedAccount {
-  marketListId: string
-}
-
-export interface ForesightHasMarketId extends ForesightHasMarketListId {
-  marketId: number
-}
-
-export interface ForesightHasCategoryId extends ForesightHasGovernedAccount {
-  categoryId: string
-}
-
-export interface ForesightMakeAddMarketListToCategoryParams
-  extends ForesightHasCategoryId,
-    ForesightHasMarketListId {}
-
-export interface ForesightMakeResolveMarketParams extends ForesightHasMarketId {
-  winner: number
-}
-
-export interface ForesightMakeSetMarketMetadataParams
-  extends ForesightHasMarketId {
-  content: string
-  field: foresightConsts.MarketMetadataFieldName
-}
 export interface Base64InstructionForm {
   governedAccount: AssetAccount | undefined
   base64: string
@@ -315,6 +295,7 @@ export interface JoinDAOForm {
 
 export enum Instructions {
   Base64,
+  Burn,
   ChangeMakeDonation,
   Clawback,
   CloseTokenAccount,
@@ -346,12 +327,7 @@ export enum Instructions {
   DistributionCloseVaults,
   DistributionFillVaults,
   DelegateStake,
-  ForesightAddMarketListToCategory,
-  ForesightInitCategory,
-  ForesightInitMarket,
-  ForesightInitMarketList,
-  ForesightResolveMarket,
-  ForesightSetMarketMetadata,
+  RemoveStakeLock,
   Grant,
   InitSolendObligationAccount,
   JoinDAO,
@@ -394,6 +370,10 @@ export enum Instructions {
   SerumInitUser,
   SerumUpdateGovConfigAuthority,
   SerumUpdateGovConfigParams,
+  SquadsMeshAddMember,
+  SquadsMeshChangeThresholdMember,
+  SquadsMeshRemoveMember,
+  PythRecoverAccount,
   StakeValidator,
   SwitchboardFundOracle,
   WithdrawFromOracle,
@@ -410,6 +390,8 @@ export enum Instructions {
   RemoveServiceFromDID,
   RevokeGoverningTokens,
   SetMintAuthority,
+  SanctumDepositStake,
+  SanctumWithdrawStake,
 }
 
 export interface ComponentInstructionData {
@@ -467,6 +449,11 @@ export interface ValidatorWithdrawStakeForm {
   governedTokenAccount: AssetAccount | undefined
   stakingAccount: StakeAccount | undefined
   amount: number
+}
+
+export interface ValidatorRemoveLockup {
+  governedTokenAccount: AssetAccount | undefined
+  stakeAccount: string
 }
 
 export interface DelegateStakeForm {

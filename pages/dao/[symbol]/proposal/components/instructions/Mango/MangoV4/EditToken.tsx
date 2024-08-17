@@ -12,7 +12,6 @@ import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, { InstructionInput } from '../../FormCreator'
 import { InstructionInputType } from '../../inputInstructionType'
-import UseMangoV4 from '@hooks/useMangoV4'
 import { getChangedValues, getNullOrTransform } from '@utils/mangoV4Tools'
 import { BN } from '@coral-xyz/anchor'
 import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
@@ -22,9 +21,13 @@ import ForwarderProgram, {
   useForwarderProgramHelpers,
 } from '@components/ForwarderProgram/ForwarderProgram'
 import { REDUCE_ONLY_OPTIONS } from '@utils/Mango/listingTools'
+import ProgramSelector from '@components/Mango/ProgramSelector'
+import useProgramSelector from '@components/Mango/useProgramSelector'
+import UseMangoV4 from '@hooks/useMangoV4'
 
 const keyToLabel = {
   oraclePk: 'Oracle',
+  fallbackOracle: 'Fallback Oracle',
   oracleConfFilter: 'Oracle Confidence Filter',
   maxStalenessSlots: 'Max Staleness Slots',
   mintPk: 'Mint',
@@ -67,6 +70,11 @@ const keyToLabel = {
   maintWeightShiftAbort: 'Maint Weight Shift Abort',
   setFallbackOracle: 'Set Fallback Oracle',
   depositLimit: 'Deposit Limit',
+  zeroUtilRate: 'Zero Util Rate',
+  platformLiquidationFee: 'Platform Liquidation Fee',
+  disableAssetLiquidation: 'Disable Asset Liquidation',
+  collateralFeePerDay: 'Collateral Fee Per Day',
+  forceWithdraw: 'Force Withdraw',
 }
 
 type NamePkVal = {
@@ -78,6 +86,7 @@ interface EditTokenForm {
   governedAccount: AssetAccount | null
   token: null | NamePkVal
   oraclePk: string
+  fallbackOracle: string
   oracleConfFilter: number
   maxStalenessSlots: number
   mintPk: string
@@ -120,13 +129,19 @@ interface EditTokenForm {
   maintWeightShiftLiabTarget: number
   maintWeightShiftAbort: boolean
   setFallbackOracle: boolean
-  depositLimit: number
+  depositLimit: string
+  zeroUtilRate: number
+  platformLiquidationFee: number
+  disableAssetLiquidation: boolean
+  collateralFeePerDay: number
+  forceWithdraw: boolean
 }
 
 const defaultFormValues: EditTokenForm = {
   governedAccount: null,
   token: null,
   oraclePk: '',
+  fallbackOracle: '',
   oracleConfFilter: 0,
   maxStalenessSlots: 0,
   mintPk: '',
@@ -169,7 +184,12 @@ const defaultFormValues: EditTokenForm = {
   maintWeightShiftLiabTarget: 0,
   maintWeightShiftAbort: false,
   setFallbackOracle: false,
-  depositLimit: 0,
+  depositLimit: '0',
+  zeroUtilRate: 0,
+  platformLiquidationFee: 0,
+  disableAssetLiquidation: false,
+  collateralFeePerDay: 0,
+  forceWithdraw: false,
 }
 
 const EditToken = ({
@@ -180,7 +200,12 @@ const EditToken = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletOnePointOh()
-  const { getAdditionalLabelInfo, mangoClient, mangoGroup } = UseMangoV4()
+  const programSelectorHook = useProgramSelector()
+
+  const { getAdditionalLabelInfo, mangoClient, mangoGroup } = UseMangoV4(
+    programSelectorHook.program?.val,
+    programSelectorHook.program?.group
+  )
   const { assetAccounts } = useGovernanceAssets()
   const [forcedValues, setForcedValues] = useState<string[]>([])
   const forwarderProgramHelpers = useForwarderProgramHelpers()
@@ -326,13 +351,26 @@ const EditToken = ({
           getNullOrTransform(values.maintWeightShiftLiabTarget, null, Number),
           values.maintWeightShiftAbort!,
           values.setFallbackOracle!,
-          getNullOrTransform(values.depositLimit, BN)
+          getNullOrTransform(
+            values.depositLimit !== null && values.depositLimit !== undefined
+              ? values.depositLimit?.toString()
+              : null,
+            BN
+          ),
+          getNullOrTransform(values.zeroUtilRate, null, Number),
+          getNullOrTransform(values.platformLiquidationFee, null, Number),
+          values.disableAssetLiquidation!,
+          getNullOrTransform(values.collateralFeePerDay, null, Number),
+          values.forceWithdraw!
         )
         .accounts({
           group: mangoGroup!.publicKey,
           oracle: form.oraclePk ? new PublicKey(form.oraclePk) : bank.oracle,
           admin: form.governedAccount.extensions.transferAddress,
           mintInfo: mintInfo.publicKey,
+          fallbackOracle: form.fallbackOracle
+            ? new PublicKey(form.fallbackOracle)
+            : PublicKey.default,
         })
         .remainingAccounts([
           {
@@ -387,13 +425,18 @@ const EditToken = ({
 
   const formTokenPk = form.token?.value.toBase58()
   useEffect(() => {
-    if (formTokenPk && mangoGroup) {
+    if (
+      formTokenPk &&
+      mangoGroup &&
+      mangoGroup!.banksMapByMint.get(formTokenPk)
+    ) {
       const currentToken = mangoGroup!.banksMapByMint.get(formTokenPk)![0]
       const groupInsuranceFund = mangoGroup.mintInfosMapByMint.get(formTokenPk)
         ?.groupInsuranceFund
 
       const vals = {
         oraclePk: currentToken.oracle.toBase58(),
+        fallbackOracle: currentToken.fallbackOracle.toBase58(),
         oracleConfFilter: currentToken.oracleConfig.confFilter.toNumber(),
         maxStalenessSlots: currentToken.oracleConfig.maxStalenessSlots.toNumber(),
         mintPk: currentToken.mint.toBase58(),
@@ -437,7 +480,11 @@ const EditToken = ({
         maintWeightShiftEnd: currentToken.maintWeightShiftEnd.toNumber(),
         maintWeightShiftAssetTarget: currentToken.maintWeightShiftAssetTarget.toNumber(),
         maintWeightShiftLiabTarget: currentToken.maintWeightShiftLiabTarget.toNumber(),
-        depositLimit: currentToken.depositLimit.toNumber(),
+        depositLimit: currentToken.depositLimit.toString(),
+        zeroUtilRate: currentToken.zeroUtilRate.toNumber(),
+        platformLiquidationFee: currentToken.platformLiquidationFee.toNumber(),
+        collateralFeePerDay: currentToken.collateralFeePerDay,
+        disableAssetLiquidation: !currentToken.allowAssetLiquidation,
       }
       setForm((prevForm) => ({
         ...prevForm,
@@ -502,6 +549,19 @@ const EditToken = ({
       initialValue: form.oraclePk,
       type: InstructionInputType.INPUT,
       name: 'oraclePk',
+    },
+    {
+      label: keyToLabel['fallbackOracle'],
+      initialValue: form.fallbackOracle,
+      type: InstructionInputType.INPUT,
+      name: 'fallbackOracle',
+    },
+    {
+      label: keyToLabel['setFallbackOracle'],
+      subtitle: getAdditionalLabelInfo('setFallbackOracle'),
+      initialValue: form.setFallbackOracle,
+      type: InstructionInputType.SWITCH,
+      name: 'setFallbackOracle',
     },
     {
       label: keyToLabel['oracleConfFilter'],
@@ -809,13 +869,6 @@ const EditToken = ({
       name: 'maintWeightShiftAbort',
     },
     {
-      label: keyToLabel['setFallbackOracle'],
-      subtitle: getAdditionalLabelInfo('setFallbackOracle'),
-      initialValue: form.setFallbackOracle,
-      type: InstructionInputType.SWITCH,
-      name: 'setFallbackOracle',
-    },
-    {
       label: keyToLabel['depositLimit'],
       subtitle: getAdditionalLabelInfo('depositLimit'),
       initialValue: form.depositLimit,
@@ -823,10 +876,51 @@ const EditToken = ({
       inputType: 'number',
       name: 'depositLimit',
     },
+    {
+      label: keyToLabel['zeroUtilRate'],
+      subtitle: getAdditionalLabelInfo('zeroUtilRate'),
+      initialValue: form.zeroUtilRate,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'zeroUtilRate',
+    },
+    {
+      label: keyToLabel['platformLiquidationFee'],
+      subtitle: getAdditionalLabelInfo('platformLiquidationFee'),
+      initialValue: form.platformLiquidationFee,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'platformLiquidationFee',
+    },
+    {
+      label: keyToLabel['disableAssetLiquidation'],
+      subtitle: getAdditionalLabelInfo('disableAssetLiquidation'),
+      initialValue: form.disableAssetLiquidation,
+      type: InstructionInputType.SWITCH,
+      name: 'disableAssetLiquidation',
+    },
+    {
+      label: keyToLabel['collateralFeePerDay'],
+      subtitle: getAdditionalLabelInfo('collateralFeePerDay'),
+      initialValue: form.collateralFeePerDay,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'collateralFeePerDay',
+    },
+    {
+      label: keyToLabel['forceWithdraw'],
+      subtitle: getAdditionalLabelInfo('forceWithdraw'),
+      initialValue: form.forceWithdraw,
+      type: InstructionInputType.SWITCH,
+      name: 'forceWithdraw',
+    },
   ]
 
   return (
     <>
+      <ProgramSelector
+        programSelectorHook={programSelectorHook}
+      ></ProgramSelector>
       {form && (
         <>
           <InstructionForm

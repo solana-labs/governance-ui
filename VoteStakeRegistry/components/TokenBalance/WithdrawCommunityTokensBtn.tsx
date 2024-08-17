@@ -15,7 +15,6 @@ import { withVoteRegistryWithdraw } from 'VoteStakeRegistry/sdk/withVoteRegistry
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { notify } from '@utils/notifications'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { useState } from 'react'
 import Loading from '@components/Loading'
 import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
@@ -28,12 +27,13 @@ import { proposalQueryKeys } from '@hooks/queries/proposal'
 import queryClient from '@hooks/queries/queryClient'
 import asFindable from '@utils/queries/asFindable'
 import { tokenAccountQueryKeys } from '@hooks/queries/tokenAccount'
+import { useVsrClient } from '../../../VoterWeightPlugins/useVsrClient'
 
 const WithDrawCommunityTokens = () => {
   const { getOwnedDeposits } = useDepositStore()
-  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const realm = useRealmQuery().data?.result
+  const { vsrClient } = useVsrClient()
 
   const {
     realmInfo,
@@ -91,7 +91,10 @@ const WithDrawCommunityTokens = () => {
               )
             ).result
             if (!governance) throw new Error('failed to fetch governance')
-            if (proposal.account.getTimeToVoteEnd(governance.account) > 0) {
+            if (
+              proposal.account.getTimeToVoteEnd(governance.account) > 0 &&
+              governance.account.realm.equals(realm!.pubkey)
+            ) {
               setIsLoading(false)
               // Note: It's technically possible to withdraw the vote here but I think it would be confusing and people would end up unconsciously withdrawing their votes
               notify({
@@ -147,7 +150,7 @@ const WithDrawCommunityTokens = () => {
       tokenOwnerRecordPubKey: ownTokenRecord!.pubkey,
       depositIndex: depositRecord!.index,
       connection,
-      client: client,
+      client: vsrClient,
       splProgramId: realm!.owner,
       splProgramVersion: realmInfo!.programVersion,
     })
@@ -176,7 +179,7 @@ const WithDrawCommunityTokens = () => {
         realmPk: realm!.pubkey,
         communityMintPk: realm!.account.communityMint,
         walletPk: wallet!.publicKey!,
-        client: client!,
+        client: vsrClient!,
         connection,
       })
       queryClient.invalidateQueries(

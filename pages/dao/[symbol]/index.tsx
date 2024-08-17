@@ -26,8 +26,6 @@ import Switch from '@components/Switch'
 import ProposalSelectCard from '@components/ProposalSelectCard'
 import Checkbox from '@components/inputs/Checkbox'
 import Button from '@components/Button'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { NftVoterClient } from '@utils/uiTypes/NftVoterClient'
 import { notify } from '@utils/notifications'
 import { sendSignedTransaction } from '@utils/send'
 import { compareProposals, filterProposals } from '@utils/proposals'
@@ -53,9 +51,11 @@ import {
   useRealmProposalsQuery,
 } from '@hooks/queries/proposal'
 import queryClient from '@hooks/queries/queryClient'
-import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 import { getFeeEstimate } from '@tools/feeEstimate'
 import { createComputeBudgetIx } from '@blockworks-foundation/mango-v4'
+import { useNftClient } from '../../../VoterWeightPlugins/useNftClient'
+import { useVotingClients } from '@hooks/useVotingClients'
+import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
 
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
@@ -79,7 +79,6 @@ const REALM = () => {
   const realmQuery = useRealmQuery()
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const councilMint = useRealmCouncilMintInfoQuery().data?.result
-  const { result: ownVoterWeight } = useLegacyVoterWeight()
   const { realmInfo } = useRealm()
   const proposalsPerPage = 20
   const [filters, setFilters] = useState<Filters>(InitialFilters)
@@ -96,9 +95,8 @@ const REALM = () => {
     SelectedProposal[]
   >([])
 
-  const client = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
-  )
+  const votingClients = useVotingClients()
+  const { nftClient } = useNftClient()
   const wallet = useWalletOnePointOh()
   const { connection } = useConnection()
 
@@ -225,18 +223,19 @@ const REALM = () => {
     }
   }, [])
 
+  const {
+    ownVoterWeight: communityOwnVoterWeight,
+  } = useRealmVoterWeightPlugins('community')
+  const { ownVoterWeight: councilOwnVoterWeight } = useRealmVoterWeightPlugins(
+    'council'
+  )
+
   const allVotingProposalsSelected =
     selectedProposals.length === votingProposals?.length
   const hasCommunityVoteWeight =
-    ownTokenRecord &&
-    ownVoterWeight?.hasMinAmountToVote(
-      ownTokenRecord.account.governingTokenMint
-    )
+    ownTokenRecord && communityOwnVoterWeight?.value?.gtn(0)
   const hasCouncilVoteWeight =
-    ownCouncilTokenRecord &&
-    ownVoterWeight?.hasMinAmountToVote(
-      ownCouncilTokenRecord.account.governingTokenMint
-    )
+    ownCouncilTokenRecord && councilOwnVoterWeight?.value?.gtn(0)
 
   const cantMultiVote =
     selectedProposals.length === 0 ||
@@ -278,6 +277,11 @@ const REALM = () => {
           realm.account.communityMint.toBase58()
             ? ownTokenRecord
             : ownCouncilTokenRecord
+        const role =
+          selectedProposal.proposal.governingTokenMint.toBase58() ===
+          realm.account.communityMint.toBase58()
+            ? 'community'
+            : 'council'
 
         if (relevantTokenRecord === undefined)
           throw new Error('token owner record not found or not yet loaded')
@@ -285,7 +289,7 @@ const REALM = () => {
         const instructions: TransactionInstruction[] = []
 
         //will run only if plugin is connected with realm
-        const plugin = await client?.withCastPluginVote(
+        const plugin = await votingClients(role)?.withCastPluginVote(
           instructions,
           {
             account: selectedProposal.proposal,
@@ -294,7 +298,7 @@ const REALM = () => {
           },
           relevantTokenRecord.pubkey
         )
-        if (client.client instanceof NftVoterClient === false) {
+        if (!nftClient) {
           await withCastVote(
             instructions,
             realmInfo!.programId,

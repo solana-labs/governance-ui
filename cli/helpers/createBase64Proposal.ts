@@ -55,17 +55,17 @@ export const createBase64Proposal = async (
   const useDenyOption = true
   let voterWeightPluginPk: PublicKey | undefined = undefined
   if (client) {
-    const { registrar } = await getRegistrarPDA(
+    const { registrar } = getRegistrarPDA(
       realm,
       proposalMint,
       client.program.programId
     )
-    const { voter } = await getVoterPDA(
+    const { voter } = getVoterPDA(
       registrar,
       walletPk,
       client.program.programId
     )
-    const { voterWeightPk } = await getVoterWeightPDA(
+    const { voterWeightPk } = getVoterWeightPDA(
       registrar,
       walletPk,
       client.program.programId

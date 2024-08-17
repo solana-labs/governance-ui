@@ -1,9 +1,4 @@
-import {
-  Bank,
-  OracleProvider,
-  USDC_MINT,
-  toUiDecimals,
-} from '@blockworks-foundation/mango-v4'
+import { Bank, USDC_MINT, toUiDecimals } from '@blockworks-foundation/mango-v4'
 import AdvancedOptionsDropdown from '@components/NewRealmWizard/components/AdvancedOptionsDropdown'
 import { BN, BorshInstructionCoder } from '@coral-xyz/anchor'
 import { AccountMetaData } from '@solana/spl-governance'
@@ -13,7 +8,6 @@ import {
   FlatListingArgs,
   ListingArgsFormatted,
   getOracle,
-  getBestMarket,
   EditTokenArgsFormatted,
   FlatEditArgs,
   getFormattedListingPresets,
@@ -253,14 +247,12 @@ const instructions = () => ({
       )
 
       const presetInfo = await getSuggestedCoinPresetInfo(
-        proposedMint.toBase58(),
-        proposedOracle.type === 'Pyth'
+        proposedMint.toBase58()
       )
 
       const formattedProposedArgs = getFormattedListingValues(args)
 
       const formattedSuggestedPresets = getFormattedListingPresets(
-        proposedOracle.type === 'Pyth',
         0,
         mintInfo?.account.decimals || 0,
         oracleData.uiPrice
@@ -477,6 +469,11 @@ const instructions = () => ({
                 suffix="%"
               />
               <DisplayListingPropertyWrapped
+                label="Zero Util Rate"
+                valKey={'zeroUtilRate'}
+                suffix="%"
+              />
+              <DisplayListingPropertyWrapped
                 label="Interest rate max rate"
                 valKey={'maxRate'}
                 suffix="%"
@@ -484,12 +481,12 @@ const instructions = () => ({
               <DisplayListingPropertyWrapped
                 label="Loan Fee Rate"
                 valKey={'loanFeeRate'}
-                suffix=" bps"
+                suffix=" %"
               />
               <DisplayListingPropertyWrapped
                 label="Loan Origination Fee Rate"
                 valKey={'loanOriginationFeeRate'}
-                suffix=" bps"
+                suffix=" %"
               />
               <DisplayListingPropertyWrapped
                 label="Maintenance Asset Weight"
@@ -510,6 +507,11 @@ const instructions = () => ({
               <DisplayListingPropertyWrapped
                 label="Liquidation Fee"
                 valKey="liquidationFee"
+                suffix="%"
+              />
+              <DisplayListingPropertyWrapped
+                label="Platform Liquidation Fee"
+                valKey="platformLiquidationFee"
                 suffix="%"
               />
               <DisplayListingPropertyWrapped
@@ -567,6 +569,7 @@ const instructions = () => ({
               <DisplayListingPropertyWrapped
                 label="Flash Loan Deposit Fee Rate"
                 valKey="flashLoanSwapFeeRate"
+                suffix=" bps"
               />
               <DisplayListingProperty
                 label="Deposit Limit (compared with 5% margin)"
@@ -613,6 +616,11 @@ const instructions = () => ({
                 label="Group Insurance Fund"
                 val={formattedProposedArgs.groupInsuranceFund?.toString()}
                 suggestedVal={invalidFields.groupInsuranceFund?.toString()}
+              />
+              <DisplayListingPropertyWrapped
+                label="Collateral Fee Per Day"
+                valKey="collateralFeePerDay"
+                suffix=" %"
               />
             </div>
             <AdvancedOptionsDropdown className="mt-4" title="Raw values">
@@ -667,17 +675,10 @@ const instructions = () => ({
         quoteMint = currentMarket.quoteMintAddress
       }
 
-      const bestMarket = await getBestMarket({
-        baseMint: baseMint!.toBase58(),
-        quoteMint: quoteMint!.toBase58(),
-        cluster: 'mainnet-beta',
-        connection,
-      })
-
       try {
         return (
           <div>
-            {bestMarket && openbookMarketPk.equals(bestMarket.pubKey) && (
+            {/* {bestMarket && openbookMarketPk.equals(bestMarket.pubKey) && (
               <div className="text-green flex items-center">
                 <CheckCircleIcon className="w-5 mr-2"></CheckCircleIcon>
                 Proposed market match the best market according to listing
@@ -714,7 +715,7 @@ const instructions = () => ({
                   </div>
                 </div>
               </div>
-            )}
+            )} */}
             <div className="py-3 flex">
               <div className="mr-2">Proposed market: </div>
               <a
@@ -825,6 +826,7 @@ const instructions = () => ({
       { name: 'Admin' },
       { name: 'Mint Info' },
       { name: 'Oracle' },
+      { name: 'Fallback oracle' },
     ],
     getDataUI: async (
       connection: Connection,
@@ -899,11 +901,11 @@ const instructions = () => ({
               : undefined,
           loanFeeRate:
             args.loanFeeRateOpt !== undefined
-              ? (args.loanFeeRateOpt * 10000)?.toFixed(2)
+              ? (args.loanFeeRateOpt * 100)?.toFixed(2)
               : undefined,
           loanOriginationFeeRate:
             args.loanOriginationFeeRateOpt !== undefined
-              ? (args.loanOriginationFeeRateOpt * 10000)?.toFixed(2)
+              ? (args.loanOriginationFeeRateOpt * 100)?.toFixed(2)
               : undefined,
           maintAssetWeight: args.maintAssetWeightOpt?.toFixed(2),
           initAssetWeight: args.initAssetWeightOpt?.toFixed(2),
@@ -912,6 +914,10 @@ const instructions = () => ({
           liquidationFee:
             args['liquidationFeeOpt'] !== undefined
               ? (args['liquidationFeeOpt'] * 100)?.toFixed(2)
+              : undefined,
+          platformLiquidationFee:
+            args['platformLiquidationFeeOpt'] !== undefined
+              ? (args['platformLiquidationFeeOpt'] * 100)?.toFixed(2)
               : undefined,
           minVaultToDepositsRatio:
             args['minVaultToDepositsRatioOpt'] !== undefined
@@ -941,7 +947,10 @@ const instructions = () => ({
             args.tokenConditionalSwapMakerFeeRateOpt,
           tokenConditionalSwapTakerFeeRate:
             args.tokenConditionalSwapTakerFeeRateOpt,
-          flashLoanSwapFeeRate: args.flashLoanSwapFeeRateOpt,
+          flashLoanSwapFeeRate:
+            args.flashLoanSwapFeeRateOpt !== undefined
+              ? (args.loanOriginationFeeRateOpt * 10000)?.toFixed(2)
+              : undefined,
           reduceOnly:
             args.reduceOnlyOpt !== undefined
               ? REDUCE_ONLY_OPTIONS[args.reduceOnlyOpt].name
@@ -955,13 +964,23 @@ const instructions = () => ({
           depositLimit: args.depositLimitOpt?.toString(),
           setFallbackOracle: args.setFallbackOracle,
           maintWeightShiftAbort: args.maintWeightShiftAbort,
+          zeroUtilRate:
+            args.zeroUtilRateOpt !== undefined
+              ? (args.zeroUtilRateOpt * 100).toFixed(2)
+              : undefined,
+          disableAssetLiquidation: args.disableAssetLiquidationOpt,
+          collateralFeePerDay:
+            args.collateralFeePerDayOpt !== undefined
+              ? (args.collateralFeePerDayOpt * 100)?.toFixed(4)
+              : undefined,
+          forceWithdraw: args.forceWithdrawOpt,
+          forceClose: args.forceCloseOpt,
         }
 
         if (mint) {
           bank = mangoGroup.getFirstBankByMint(mint)
           bankFormattedValues = getFormattedBankValues(mangoGroup, bank)
           mintData = tokenPriceService.getTokenInfo(mint.toBase58())
-          const isPyth = bank?.oracleProvider === OracleProvider.Pyth
 
           const midPriceImpacts = getMidPriceImpacts(
             mangoGroup.pis.length ? mangoGroup.pis : []
@@ -990,8 +1009,7 @@ const instructions = () => ({
             ? getProposedKey(
                 priceImpact.avg_price_impact_percent < 1
                   ? priceImpact?.target_amount
-                  : undefined,
-                bank.oracleProvider === OracleProvider.Pyth
+                  : undefined
               )
             : 'UNTRUSTED'
 
@@ -1003,12 +1021,11 @@ const instructions = () => ({
                   : '',
               }
             : {
-                presetKey: 'asset_250p',
+                presetKey: 'asset_250',
                 priceImpact: '0',
               }
 
           const suggestedPreset = getFormattedListingPresets(
-            !!isPyth,
             bank.uiDeposits(),
             bank.mintDecimals,
             bank.uiPrice
@@ -1032,6 +1049,8 @@ const instructions = () => ({
                 maintWeightShiftLiabTarget: args.maintWeightShiftLiabTargetOpt,
                 maintWeightShiftAbort: args.maintWeightShiftAbort,
                 setFallbackOracle: args.setFallbackOracle,
+                forceWithdraw: args.forceWithdrawOpt,
+                forceClose: args.forceCloseOpt,
               }
             : {}
 
@@ -1058,6 +1077,9 @@ const instructions = () => ({
                       0
                   )
                 )
+              }
+              if (x === 'collateralFeePerDay') {
+                return false
               }
               return true
             })
@@ -1234,32 +1256,40 @@ const instructions = () => ({
                 }
               />
               <DisplayNullishProperty
-                label="Loan Fee Rate"
-                value={
-                  parsedArgs.loanFeeRate && `${parsedArgs.loanFeeRate} bps`
-                }
+                label="Zero util rate"
+                value={parsedArgs.zeroUtilRate && `${parsedArgs.zeroUtilRate}%`}
                 currentValue={
-                  bankFormattedValues?.loanFeeRate &&
-                  `${bankFormattedValues.loanFeeRate} bps`
+                  bankFormattedValues?.zeroUtilRate &&
+                  `${bankFormattedValues.zeroUtilRate}%`
                 }
                 suggestedVal={
-                  invalidFields.loanFeeRate &&
-                  `${invalidFields.loanFeeRate} bps`
+                  invalidFields.zeroUtilRate && `${invalidFields.zeroUtilRate}%`
+                }
+              />
+              <DisplayNullishProperty
+                label="Loan Fee Rate"
+                value={parsedArgs.loanFeeRate && `${parsedArgs.loanFeeRate} %`}
+                currentValue={
+                  bankFormattedValues?.loanFeeRate &&
+                  `${bankFormattedValues.loanFeeRate} %`
+                }
+                suggestedVal={
+                  invalidFields.loanFeeRate && `${invalidFields.loanFeeRate} %`
                 }
               />
               <DisplayNullishProperty
                 label="Loan Origination Fee Rate"
                 value={
                   parsedArgs.loanOriginationFeeRate &&
-                  `${parsedArgs.loanOriginationFeeRate} bps`
+                  `${parsedArgs.loanOriginationFeeRate} %`
                 }
                 currentValue={
                   bankFormattedValues?.loanOriginationFeeRate &&
-                  `${bankFormattedValues.loanOriginationFeeRate} bps`
+                  `${bankFormattedValues.loanOriginationFeeRate} %`
                 }
                 suggestedVal={
                   invalidFields.loanOriginationFeeRate &&
-                  `${invalidFields.loanOriginationFeeRate} bps`
+                  `${invalidFields.loanOriginationFeeRate} %`
                 }
               />
               <DisplayNullishProperty
@@ -1298,6 +1328,21 @@ const instructions = () => ({
                 suggestedVal={
                   invalidFields.liquidationFee &&
                   `${invalidFields.liquidationFee}%`
+                }
+              />
+              <DisplayNullishProperty
+                label="Platform Liquidation Fee"
+                value={
+                  parsedArgs.platformLiquidationFee &&
+                  `${parsedArgs.platformLiquidationFee}%`
+                }
+                currentValue={
+                  bankFormattedValues?.platformLiquidationFee &&
+                  `${bankFormattedValues.platformLiquidationFee}%`
+                }
+                suggestedVal={
+                  invalidFields.platformLiquidationFee &&
+                  `${invalidFields.platformLiquidationFee}%`
                 }
               />
               <DisplayNullishProperty
@@ -1393,6 +1438,16 @@ const instructions = () => ({
                 value={args.oracleOpt?.toBase58()}
                 currentValue={bankFormattedValues?.oracle}
               />
+              {accounts.length &&
+                accounts[4] &&
+                accounts[4].pubkey.toBase58() !==
+                  bankFormattedValues?.fallbackOracle && (
+                  <DisplayNullishProperty
+                    label="Fallback Oracle"
+                    value={accounts[4].pubkey.toBase58()}
+                    currentValue={bankFormattedValues?.fallbackOracle}
+                  />
+                )}
               <DisplayNullishProperty
                 label="Token Conditional Swap Maker Fee Rate"
                 value={parsedArgs.tokenConditionalSwapMakerFeeRate}
@@ -1411,9 +1466,18 @@ const instructions = () => ({
               />
               <DisplayNullishProperty
                 label="Flash Loan Swap Fee Rate"
-                value={parsedArgs.flashLoanSwapFeeRate}
-                currentValue={bankFormattedValues?.flashLoanSwapFeeRate}
-                suggestedVal={invalidFields.flashLoanSwapFeeRate}
+                value={
+                  parsedArgs.flashLoanSwapFeeRate &&
+                  `${parsedArgs.flashLoanSwapFeeRate} bps`
+                }
+                currentValue={
+                  bankFormattedValues?.flashLoanSwapFeeRate &&
+                  `${bankFormattedValues.flashLoanSwapFeeRate} bps`
+                }
+                suggestedVal={
+                  invalidFields.flashLoanSwapFeeRate &&
+                  `${invalidFields.flashLoanSwapFeeRate} bps`
+                }
               />
               <DisplayNullishProperty
                 label="Reduce only"
@@ -1510,10 +1574,49 @@ const instructions = () => ({
                   ).toFixed(0)})`
                 }
               />
+              <DisplayNullishProperty
+                label="Collateral Fee Per Day"
+                value={
+                  parsedArgs.collateralFeePerDay &&
+                  `${parsedArgs.collateralFeePerDay}%`
+                }
+                currentValue={
+                  bankFormattedValues?.collateralFeePerDay &&
+                  `${bankFormattedValues.collateralFeePerDay}%`
+                }
+                suggestedVal={
+                  invalidFields.collateralFeePerDay &&
+                  `${invalidFields.collateralFeePerDay}%`
+                }
+              />
+              {parsedArgs?.disableAssetLiquidation && (
+                <DisplayNullishProperty
+                  label="Disable Asset Liquidation"
+                  value={`${parsedArgs.disableAssetLiquidation}`}
+                  currentValue={null}
+                  suggestedVal={null}
+                />
+              )}
               {parsedArgs?.maintWeightShiftAbort && (
                 <DisplayNullishProperty
                   label="Maint Weight Shift Abort"
                   value={`${parsedArgs.maintWeightShiftAbort}`}
+                  currentValue={null}
+                  suggestedVal={null}
+                />
+              )}
+              {parsedArgs?.forceClose && (
+                <DisplayNullishProperty
+                  label="Force close"
+                  value={`${parsedArgs.forceClose}`}
+                  currentValue={null}
+                  suggestedVal={null}
+                />
+              )}
+              {parsedArgs?.forceWithdraw && (
+                <DisplayNullishProperty
+                  label="Force withdraw"
+                  value={`${parsedArgs.forceWithdraw}`}
                   currentValue={null}
                   suggestedVal={null}
                 />
@@ -1566,7 +1669,7 @@ const instructions = () => ({
       }
     },
   },
-  73195: {
+  11366: {
     name: 'Withdraw all token fees',
     accounts: [
       { name: 'Group' },
@@ -1592,6 +1695,56 @@ const instructions = () => ({
         return (
           <div>
             {tokenSymbol ? tokenSymbol : <Loading className="w-5"></Loading>}
+          </div>
+        )
+      } catch (e) {
+        console.log(e)
+        return <div>{JSON.stringify(data)}</div>
+      }
+    },
+  },
+  63223: {
+    name: 'Token Withdraw',
+    accounts: [
+      { name: 'Group' },
+      { name: 'Account' },
+      { name: 'Owner' },
+      { name: 'Bank' },
+      { name: 'Vault' },
+      { name: 'Oracle' },
+      { name: 'TokenAccount' },
+      { name: 'TokenProgram' },
+    ],
+    getDataUI: async (
+      connection: Connection,
+      data: Uint8Array,
+      accounts: AccountMetaData[]
+    ) => {
+      const args = await getDataObjectFlattened<any>(connection, data)
+      const accountInfo = await connection.getParsedAccountInfo(
+        accounts[6].pubkey
+      )
+      const mint = await tryGetMint(
+        connection,
+        new PublicKey(accountInfo.value?.data['parsed'].info.mint)
+      )
+      const tokenInfo = tokenPriceService.getTokenInfo(
+        accountInfo.value?.data['parsed'].info.mint
+      )
+
+      try {
+        return (
+          <div>
+            <div>
+              amount:{' '}
+              {mint?.account.decimals
+                ? formatNumber(
+                    toUiDecimals(args.amount, mint?.account.decimals)
+                  )
+                : args.amount}{' '}
+              {tokenInfo?.symbol}
+            </div>
+            <div>allowBorrow: {args.allowBorrow.toString()}</div>
           </div>
         )
       } catch (e) {
@@ -1726,6 +1879,7 @@ const instructions = () => ({
 
 export const MANGO_V4_INSTRUCTIONS = {
   '4MangoMjqJ2firMokCjjGgoK8d4MXcrgL7XJaL3w6fVg': instructions(),
+  zF2vSz6V9g1YHGmfrzsY497NJzbRr84QUrPry4bLQ25: instructions(),
 }
 
 async function getDataObjectFlattened<T>(
@@ -1909,13 +2063,14 @@ const getFormattedListingValues = (args: FlatListingArgs) => {
     adjustmentFactor: (
       args['interestRateParams.adjustmentFactor'] * 100
     ).toFixed(2),
-    loanFeeRate: (args.loanFeeRate * 10000).toFixed(2),
-    loanOriginationFeeRate: (args.loanOriginationFeeRate * 10000).toFixed(2),
+    loanFeeRate: (args.loanFeeRate * 100).toFixed(2),
+    loanOriginationFeeRate: (args.loanOriginationFeeRate * 100).toFixed(2),
     maintAssetWeight: args.maintAssetWeight.toFixed(2),
     initAssetWeight: args.initAssetWeight.toFixed(2),
     maintLiabWeight: args.maintLiabWeight.toFixed(2),
     initLiabWeight: args.initLiabWeight.toFixed(2),
     liquidationFee: (args['liquidationFee'] * 100).toFixed(2),
+    platformLiquidationFee: (args['platformLiquidationFee'] * 100).toFixed(2),
     minVaultToDepositsRatio: (args['minVaultToDepositsRatio'] * 100).toFixed(2),
     netBorrowLimitPerWindowQuote: toUiDecimals(
       args['netBorrowLimitPerWindowQuote'],
@@ -1939,12 +2094,15 @@ const getFormattedListingValues = (args: FlatListingArgs) => {
     stablePriceGrowthLimit: (args.stablePriceGrowthLimit * 100).toFixed(2),
     tokenConditionalSwapMakerFeeRate: args.tokenConditionalSwapMakerFeeRate,
     tokenConditionalSwapTakerFeeRate: args.tokenConditionalSwapTakerFeeRate,
-    flashLoanSwapFeeRate: args.flashLoanSwapFeeRate,
+    flashLoanSwapFeeRate: (args.flashLoanSwapFeeRate * 10000).toFixed(2),
     reduceOnly: REDUCE_ONLY_OPTIONS[args.reduceOnly].name,
     depositLimit: args.depositLimit.toString(),
     interestTargetUtilization: args.interestTargetUtilization,
     interestCurveScaling: args.interestCurveScaling,
     groupInsuranceFund: args.groupInsuranceFund,
+    collateralFeePerDay: (args.collateralFeePerDay * 100).toFixed(4),
+    zeroUtilRate: (args.zeroUtilRate * 100).toFixed(2),
+    disableAssetLiquidation: args.disableAssetLiquidation,
   }
   return formattedArgs
 }

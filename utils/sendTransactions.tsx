@@ -16,6 +16,7 @@ import {
 import { getFeeEstimate } from '@tools/feeEstimate'
 import { TransactionInstructionWithSigners } from '@blockworks-foundation/mangolana/lib/globalTypes'
 import { createComputeBudgetIx } from '@blockworks-foundation/mango-v4'
+import { BACKUP_CONNECTIONS } from './connection'
 
 export type WalletSigner = Pick<
   SignerWalletAdapter,
@@ -45,18 +46,26 @@ export const sendTransactionsV3 = async ({
   config,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   lookupTableAccounts,
-}: sendSignAndConfirmTransactionsProps & { lookupTableAccounts?: any }) => {
+  autoFee = true,
+}: sendSignAndConfirmTransactionsProps & {
+  lookupTableAccounts?: any
+  autoFee?: boolean
+}) => {
   const transactionInstructionsWithFee: TransactionInstructionWithType[] = []
   const fee = await getFeeEstimate(connection)
   for (const tx of transactionInstructions) {
-    const txObjWithFee = {
-      ...tx,
-      instructionSet: [
-        new TransactionInstructionWithSigners(createComputeBudgetIx(fee)),
-        ...tx.instructionsSet,
-      ],
+    if (tx.instructionsSet.length) {
+      const txObjWithFee = {
+        ...tx,
+        instructionsSet: autoFee
+          ? [
+              new TransactionInstructionWithSigners(createComputeBudgetIx(fee)),
+              ...tx.instructionsSet,
+            ]
+          : [...tx.instructionsSet],
+      }
+      transactionInstructionsWithFee.push(txObjWithFee)
     }
-    transactionInstructionsWithFee.push(txObjWithFee)
   }
 
   const callbacksWithUiComponent = {
@@ -92,6 +101,7 @@ export const sendTransactionsV3 = async ({
           sendTransactionsV3({
             ...originalProps,
             transactionInstructions: notProcessedTransactions,
+            autoFee: false,
           }),
         getErrorMsg(e),
         e.txid
@@ -124,7 +134,8 @@ export const sendTransactionsV3 = async ({
     timeoutStrategy,
     callbacks: callbacksWithUiComponent,
     config: cfg,
-    confirmLevel: 'confirmed', //TODO base this on connection confirmation level
+    confirmLevel: 'confirmed',
+    backupConnections: BACKUP_CONNECTIONS, //TODO base this on connection confirmation level
     //lookupTableAccounts,
   })
 }
