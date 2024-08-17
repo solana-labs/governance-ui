@@ -3595,6 +3595,15 @@
     "twitter": "@notacatcoin" 
   },
   { 
+    "symbol": "FOXTAG",
+    "displayName": "$SOLFOX Official DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "8PzqFQWeiyQLAtiDG4GV8bmS1YDCM7xy6SNz1eMsiw8A",
+    "ogImage": "realms/FOXTAG/FOXTAG.png",
+    "website": "https://solfoxlegion.com",
+    "twitter": "@solfoxlegion"
+  },
+  { 
     "symbol": "LABS",
     "category": "defi",
     "bannerImage": "/realms/EpicentralLabsDAO/EpicentralDAOBanner.png",
