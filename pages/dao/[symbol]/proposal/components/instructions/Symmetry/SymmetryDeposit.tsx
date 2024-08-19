@@ -39,7 +39,7 @@ const SymmetryDeposit = ({
   const { handleSetInstructions } = useContext(NewProposalContext);
   const [managedBaskets, setManagedBaskets] = useState<any>(undefined);
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const [selectBasketPopup, setSelectBasketPopup] = useState(false);
+  const [assetAccountsLoaded, setAssetAccountsLoaded] = useState(false);
 
 
   const handleSetForm = ({ propertyName, value }) => {
@@ -47,13 +47,13 @@ const SymmetryDeposit = ({
     setForm({ ...form, [propertyName]: value })
   }
 
-  const handleSelectBasket = (basket: any) => {
-    handleSetForm({ propertyName: 'basketAddress', value: basket.basket.ownAddress })
-    console.log('setting basketAddress' , basket.basket.ownAddress.toBase58());
-  }
+  useEffect(() => {
+    if(assetAccounts && assetAccounts.length > 0 && !assetAccountsLoaded)
+      setAssetAccountsLoaded(true);
+  }, [assetAccounts]);
 
   useEffect(() => {
-    if(assetAccounts) {
+    if(assetAccountsLoaded) {
       console.log('assetacc',assetAccounts);
       const basketsOwnerAccounts: FilterOption[] = assetAccounts.filter(x => x.isSol).map((token) => {
         return {
@@ -81,7 +81,7 @@ const SymmetryDeposit = ({
         });
       });
     }
-  }, []);
+  }, [assetAccountsLoaded]);
 
   useEffect(() => {
     handleSetInstructions(
@@ -118,57 +118,62 @@ const SymmetryDeposit = ({
   }
   
   return <>
-    <div className='flex flex-col gap-4 w-fit border rounded-md p-4'>
-      <Button className='w-fit' onClick={() => setSelectBasketPopup(true)}>
-        Select Basket
-      </Button>
-      {
-        form.basketAddress &&
-        <div className='flex flex-col gap-2'>
-          <p className='text-fgd-1'>Selected Basket:</p>
-          <p className='text-fgd-3'>{form.basketAddress.toBase58()}</p>
-          <a className='p-3 bg-bkg-4 hover:bg-bkg-5 w-fit rounded-md flex items-center gap-2' href={`https://app.symmetry.fi/view/${form.basketAddress.toBase58()}`} target='_blank' rel='noreferrer'>
-            <img src={'/img/symmetry.png'} className='h-4 w-4' />
-            <p className='text-sm text-fgd-1'>View Basket on Symmetry</p>
-          </a>
-        </div>
-      }
-    </div>
-
-      <GovernedAccountSelect
-        label="Token to Deposit"
-        governedAccounts={assetAccounts.filter(x => x.isToken)}
-        onChange={(value) => {
-          handleSetForm({ value, propertyName: 'governedAccount' })
+    {
+      managedBaskets ?
+      <Select
+        label='Select Basket'
+        subtitle='Select a basket managed by the DAO'
+        value={form.basketAddress?.toBase58()}
+        placeholder="Select Basket"
+        onChange={(e) => {
+          handleSetForm({ propertyName: 'basketAddress', value: new PublicKey(e) })
         }}
-        value={form.governedAccount}
-        error={formErrors['governedAccount']}
-        shouldBeGoverned={shouldBeGoverned}
-        governance={governance}
-        type='token'
-      />
+      >
+        {
+          managedBaskets.map((basket, i) => {
+            return <Select.Option key={i} value={basket.basket.ownAddress.toBase58()}>
+              {
+                basket.composition.name + " (" + basket.composition.symbol + ") : " + basket.basket.ownAddress.toBase58()
+              }
+            </Select.Option>
+          })
+        }
+      </Select>
+      :
+      <p className='text-sm'>Loading Baskets Managed by the DAO</p>
+    }
+    {
+      form.basketAddress &&
+      <div className='flex flex-col gap-2'>
+        <p className='text-fgd-1'>Selected Basket:</p>
+        <p className='text-fgd-3'>{form.basketAddress.toBase58()}</p>
+        <a className='p-3 bg-bkg-4 hover:bg-bkg-5 w-fit rounded-md flex items-center gap-2' href={`https://app.symmetry.fi/view/${form.basketAddress.toBase58()}`} target='_blank' rel='noreferrer'>
+          <img src={'/img/symmetry.png'} className='h-4 w-4' />
+          <p className='text-sm text-fgd-1'>View Basket on Symmetry</p>
+        </a>
+      </div>
+    }
+    <GovernedAccountSelect
+      label="USDC Account to Deposit"
+      governedAccounts={assetAccounts.filter(x => x.extensions.mint?.publicKey.toBase58() === 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v')} /* Only allow USDC deposits for now */
+      onChange={(value) => {
+        handleSetForm({ value, propertyName: 'governedAccount' })
+      }}
+      value={form.governedAccount}
+      error={formErrors['governedAccount']}
+      shouldBeGoverned={shouldBeGoverned}
+      governance={governance}
+      type='token'
+    />
 
-      <Input
-        subtitle={"Amount of selected tokens will be deposited into the basket"}
-        label="Deposit Amount"
-        value={form.depositAmount}
-        type="number"
-        onChange={(e) => handleSetForm({ propertyName: 'depositAmount', value: e.target.value })}
-        error={formErrors['depositAmount']}
-      />
-      {
-        selectBasketPopup &&
-        <SelectBasketModal
-          open={selectBasketPopup}
-          onClose={() => setSelectBasketPopup(false)}
-          managedBaskets={managedBaskets}
-          sdk={basketsSdk}
-          onSelect={(basket) => {
-            handleSelectBasket(basket);
-            setSelectBasketPopup(false);
-          }}
-        />
-      }
+    <Input
+      subtitle={"Amount of selected tokens will be deposited into the basket"}
+      label="Deposit Amount"
+      value={form.depositAmount}
+      type="number"
+      onChange={(e) => handleSetForm({ propertyName: 'depositAmount', value: e.target.value })}
+      error={formErrors['depositAmount']}
+    />
   </>
 }
 

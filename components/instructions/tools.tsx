@@ -36,6 +36,7 @@ import { STAKE_INSTRUCTIONS } from './programs/stake'
 import dayjs from 'dayjs'
 import { JUPITER_REF } from './programs/jupiterRef'
 import { STAKE_SANCTUM_INSTRUCTIONS } from './programs/stakeSanctum'
+import { SYMMETRY_V2_INSTRUCTIONS } from './programs/symmetryV2'
 
 /**
  * Default governance program id instance
@@ -516,6 +517,7 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...STAKE_INSTRUCTIONS,
   ...STAKE_SANCTUM_INSTRUCTIONS,
   ...JUPITER_REF,
+  ...SYMMETRY_V2_INSTRUCTIONS,
 }
 
 export async function getInstructionDescriptor(
@@ -525,6 +527,7 @@ export async function getInstructionDescriptor(
 ) {
   let descriptors: any
   let instructionToDecode = { ...instruction }
+  console.log('INX TO DECODE', instructionToDecode)
   const isUsingForwardProgram =
     instructionToDecode.programId.toBase58() === MANGO_INSTRUCTION_FORWARDER
 

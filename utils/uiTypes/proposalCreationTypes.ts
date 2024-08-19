@@ -607,6 +607,7 @@ export interface SymmetryWithdrawForm {
   governedAccount?: AssetAccount,
   basketAddress?: PublicKey,
   withdrawAmount: number,
+  withdrawType: number
 }
 
 

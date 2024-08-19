@@ -13,6 +13,8 @@ import Button from '@components/Button'
 import useGovernanceAssets from '@hooks/useGovernanceAssets';
 import GovernedAccountSelect from '../../GovernedAccountSelect';
 import { SelectBasketModal } from './SelectBasketModal';
+import Select from '@components/inputs/Select';
+import { PublicKey } from '@solana/web3.js';
 
 const SymmetryWithdraw = ({ 
   index,
@@ -28,13 +30,14 @@ const SymmetryWithdraw = ({
     governedAccount: undefined,
     basketAddress: undefined,
     withdrawAmount: 0,
+    withdrawType: 3
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext);
   const [managedBaskets, setManagedBaskets] = useState<any>(undefined);
   const shouldBeGoverned = !!(index !== 0 && governance)
-  const [selectBasketPopup, setSelectBasketPopup] = useState(false);
-
+  const [assetAccountsLoaded, setAssetAccountsLoaded] = useState(false);
+  const [selectedBasket, setSelectedBasket] = useState<any>(undefined);
 
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
@@ -47,7 +50,12 @@ const SymmetryWithdraw = ({
   }
 
   useEffect(() => {
-    if(assetAccounts) {
+    if(assetAccounts && assetAccounts.length > 0 && !assetAccountsLoaded)
+      setAssetAccountsLoaded(true);
+  }, [assetAccounts]);
+
+  useEffect(() => {
+    if(assetAccountsLoaded) {
       console.log('assetacc',assetAccounts);
       const basketsOwnerAccounts: FilterOption[] = assetAccounts.filter(x => x.isSol).map((token) => {
         return {
@@ -75,7 +83,7 @@ const SymmetryWithdraw = ({
         });
       });
     }
-  }, []);
+  }, [assetAccountsLoaded]);
 
   useEffect(() => {
     handleSetInstructions(
@@ -103,7 +111,7 @@ const SymmetryWithdraw = ({
       form.governedAccount?.governance.nativeTreasuryAddress,
       form.basketAddress,
       Number(form.withdrawAmount),
-      3
+      form.withdrawType
     )
     
     return {
@@ -114,7 +122,7 @@ const SymmetryWithdraw = ({
   }
   
   return <>
-    <div className='flex flex-col gap-4 w-fit border rounded-md p-4'>
+    {/* <div className='flex flex-col gap-4 w-fit border rounded-md p-4'>
       <Button className='w-fit' onClick={() => setSelectBasketPopup(true)}>
         Select Basket
       </Button>
@@ -129,42 +137,88 @@ const SymmetryWithdraw = ({
           </a>
         </div>
       }
-    </div>
-
-      <GovernedAccountSelect
-        label="Token to Withdraw"
-        governedAccounts={assetAccounts.filter(x => x.isToken)}
-        onChange={(value) => {
-          handleSetForm({ value, propertyName: 'governedAccount' })
+    </div> */}
+    {
+      managedBaskets ?
+      <Select
+        label='Select Basket'
+        subtitle='Select a basket managed by the DAO'
+        value={form.basketAddress?.toBase58()}
+        placeholder="Select Basket"
+        onChange={(e) => {
+          handleSetForm({ propertyName: 'basketAddress', value: new PublicKey(e) })
+          setSelectedBasket(managedBaskets.filter(x => x.basket.ownAddress.toBase58() === e)[0]);
         }}
-        value={form.governedAccount}
-        error={formErrors['governedAccount']}
-        shouldBeGoverned={shouldBeGoverned}
-        governance={governance}
-        type='token'
-      />
+      >
+        {
+          managedBaskets.map((basket, i) => {
+            return <Select.Option key={i} value={basket.basket.ownAddress.toBase58()}>
+              {
+                basket.composition.name + " (" + basket.composition.symbol + ") : " + basket.basket.ownAddress.toBase58()
+              }
+            </Select.Option>
+          })
+        }
+      </Select>
+      :
+      <p className='text-sm'>Loading Baskets Managed by the DAO</p>
+    }
+    {
+      form.basketAddress &&
+      <div className='flex flex-col gap-2'>
+        <p className='text-fgd-1'>Selected Basket:</p>
+        <p className='text-fgd-3'>{form.basketAddress.toBase58()}</p>
+        <a className='p-3 bg-bkg-4 hover:bg-bkg-5 w-fit rounded-md flex items-center gap-2' href={`https://app.symmetry.fi/view/${form.basketAddress.toBase58()}`} target='_blank' rel='noreferrer'>
+          <img src={'/img/symmetry.png'} className='h-4 w-4' />
+          <p className='text-sm text-fgd-1'>View Basket on Symmetry</p>
+        </a>
+      </div>
+    }
+    {
+      form.basketAddress && 
+      <GovernedAccountSelect
+      label="Token to Withdraw"
+      governedAccounts={assetAccounts.filter(x => x.isToken).filter(x => x.extensions.mint?.publicKey.toBase58() === selectedBasket?.composition?.basketTokenMint)}
+      onChange={(value) => {
+        console.log('govac', value)
+        handleSetForm({ value, propertyName: 'governedAccount' })
+      }}
+      value={form.governedAccount}
+      error={formErrors['governedAccount']}
+      shouldBeGoverned={shouldBeGoverned}
+      governance={governance}
+      type='token'
+    />
+    }
 
       <Input
-        subtitle={"Amount of selected tokens will be deposited into the basket"}
+        subtitle={"Select amount of basket tokens you'd like to withdraw with."}
         label="Withdraw Amount"
         value={form.withdrawAmount}
         type="number"
         onChange={(e) => handleSetForm({ propertyName: 'withdrawAmount', value: e.target.value })}
         error={formErrors['withdrawAmount']}
       />
-      {
-        selectBasketPopup &&
-        <SelectBasketModal
-          open={selectBasketPopup}
-          onClose={() => setSelectBasketPopup(false)}
-          managedBaskets={managedBaskets}
-          sdk={basketsSdk}
-          onSelect={(basket) => {
-            handleSelectBasket(basket);
-            setSelectBasketPopup(false);
-          }}
-        />
-      }
+      <Select
+        label='Withdrawal Type'
+        subtitle='You can withdraw basket tokens directly, or rebalance them and receive USDC'
+        value={form.withdrawType}
+        placeholder="Withdrawal Type"
+        onChange={(e) => {
+          console.log("wi", e);
+          handleSetForm({ propertyName: 'withdrawType', value: e })
+        }}
+        componentLabel={
+          form.withdrawType === 2 ? 'Rebalance & Receive USDC' : 'Withdraw Basket Composition'
+        }
+      >
+        <Select.Option key={0} value={2}>
+          Rebalance & Receive USDC
+        </Select.Option>
+        <Select.Option key={1} value={3}>
+          Withdraw Basket Composition
+        </Select.Option>
+      </Select>
   </>
 }
 
