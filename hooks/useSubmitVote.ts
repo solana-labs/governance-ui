@@ -167,7 +167,9 @@ export const useSubmitVote = () => {
       } catch (e) {
         console.error(e)
         notify({ type: 'error', message: e.message })
-        throw e
+        if (msg) {
+          throw e
+        }
       } finally {
         if (isNftPlugin) {
           closeNftVotingCountingModal(

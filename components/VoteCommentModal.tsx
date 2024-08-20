@@ -40,6 +40,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
       comment,
       voteWeights: isMulti,
     }).then(() => onClose())
+      .catch(console.log)
   }
 
   return (
