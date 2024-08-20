@@ -180,7 +180,7 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
     const stakeAccounts = await loadStakeAccounts(
       connection,
       governedTokenAccounts.filter(
-        (x) => x.isSol && x.extensions.solAccount?.lamports
+        (x) => x.isSol
       )
     )
     accounts.push(...stakeAccounts)
