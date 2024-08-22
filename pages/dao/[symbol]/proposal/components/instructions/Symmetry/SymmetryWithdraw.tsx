@@ -1,18 +1,13 @@
 import { ProgramAccount, Governance, serializeInstructionToBase64 } from '@solana/spl-governance'
-import { SymmetryDepositForm, SymmetryWithdrawForm, UiInstruction } from '@utils/uiTypes/proposalCreationTypes';
+import { SymmetryWithdrawForm, UiInstruction } from '@utils/uiTypes/proposalCreationTypes';
 import { useContext, useEffect, useState } from 'react';
-import Tooltip from '@components/Tooltip'
 import Input from '@components/inputs/Input'
 import { NewProposalContext } from '../../../new';
-import Switch from '@components/Switch';
-import { Basket, BasketsSDK, FilterOption } from "@symmetry-hq/baskets-sdk";
+import { BasketsSDK, FilterOption } from "@symmetry-hq/baskets-sdk";
 import { sellBasketIx } from "@symmetry-hq/baskets-sdk/dist/basketInstructions";
-
 import { useConnection } from '@solana/wallet-adapter-react';
-import Button from '@components/Button'
 import useGovernanceAssets from '@hooks/useGovernanceAssets';
 import GovernedAccountSelect from '../../GovernedAccountSelect';
-import { SelectBasketModal } from './SelectBasketModal';
 import Select from '@components/inputs/Select';
 import { PublicKey } from '@solana/web3.js';
 

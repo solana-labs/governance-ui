@@ -9,7 +9,7 @@ import { BasketsSDK, FilterOption } from "@symmetry-hq/baskets-sdk";
 import { editBasketIx } from "@symmetry-hq/baskets-sdk/dist/basketInstructions";
 import { useConnection } from '@solana/wallet-adapter-react';
 import Button from '@components/Button';
-import { AddTokenToBasketModal } from './AddTokenToBasketModal';
+import AddTokenToBasketModal from './AddTokenToBasketModal';
 import { TrashCan } from '@carbon/icons-react';
 import { PublicKey } from '@solana/web3.js';
 import { LinkIcon } from '@heroicons/react/solid';

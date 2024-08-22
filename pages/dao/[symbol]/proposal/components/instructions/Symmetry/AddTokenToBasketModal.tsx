@@ -3,7 +3,7 @@ import Input from "@components/inputs/Input"
 import { useEffect, useState } from "react"
 
 
-export const AddTokenToBasketModal = ({
+const AddTokenToBasketModal = ({
   open,
   onClose,
   supportedTokens,
@@ -70,3 +70,4 @@ export const AddTokenToBasketModal = ({
 
 }
 
+export default AddTokenToBasketModal;
