@@ -470,7 +470,7 @@ const LockTokensModal = ({
                       [...fixedlockupPeriods.filter((_, i) => i%2 === 0), lockupPeriods[lockupLen-1]]
                       .map((p) => p.display) :
                       [
-                        ...fixedlockupPeriods.slice(Math.floor(withinPeriod/2), Math.floor(withinPeriod/2)+5), 
+                        ...fixedlockupPeriods.slice(Math.floor(withinPeriod/2), Math.floor(withinPeriod/2)+6), 
                         lockupPeriods[lockupLen-1]
                       ]
                       .map((p) => p.display)
