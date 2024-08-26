@@ -15,7 +15,7 @@ import {
   withSignOffProposal,
   withAddSignatory,
   RpcContext,
-} from '@solana/spl-governance'
+} from '@realms-today/spl-governance'
 import {
   sendTransactionsV3,
   SequenceType,

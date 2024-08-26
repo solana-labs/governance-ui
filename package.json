@@ -86,6 +86,7 @@
     "@radix-ui/react-toast": "1.0.0",
     "@radix-ui/react-toolbar": "1.0.0",
     "@radix-ui/react-tooltip": "1.0.0",
+    "@realms-today/spl-governance": "0.3.29",
     "@sentry/nextjs": "7.81.1",
     "@solana-mobile/wallet-adapter-mobile": "2.0.0",
     "@solana/buffer-layout": "4.0.0",

@@ -1,4 +1,4 @@
-import { getGovernanceProgramVersion } from '@solana/spl-governance'
+import { getGovernanceProgramVersion } from '@realms-today/spl-governance'
 import { useConnection } from '@solana/wallet-adapter-react'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { useQuery } from '@tanstack/react-query'

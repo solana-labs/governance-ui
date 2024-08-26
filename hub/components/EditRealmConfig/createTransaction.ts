@@ -12,7 +12,7 @@ import {
   getRealm,
   getGovernanceProgramVersion,
   SYSTEM_PROGRAM_ID,
-} from '@solana/spl-governance';
+} from '@realms-today/spl-governance';
 import type {
   Connection,
   PublicKey,
