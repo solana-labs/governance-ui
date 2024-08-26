@@ -14,7 +14,7 @@ import {
   withSignOffProposal,
   withAddSignatory,
   MultiChoiceType,
-} from '@solana/spl-governance'
+} from '@realms-today/spl-governance'
 import {
   sendTransactionsV3,
   SequenceType,
