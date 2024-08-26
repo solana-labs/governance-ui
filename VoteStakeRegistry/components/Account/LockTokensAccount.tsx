@@ -365,7 +365,7 @@ const LockTokensAccount: React.FC<{
                       )?.index
                   )
                   ?.map((x, idx) => (
-                    <DepositCard deposit={x} key={idx}></DepositCard>
+                    <DepositCard deposit={x} key={idx} registrar={registrar}></DepositCard>
                   ))}
                 {!isZeroMultiplierConfig && (
                   <div className="border border-fgd-4 flex flex-col items-center justify-center p-6 rounded-lg">
