@@ -9,12 +9,14 @@ import {
   Realm,
   TokenOwnerRecord,
   VoteType,
-  withCreateProposal,
   getSignatoryRecordAddress,
   withInsertTransaction,
   withSignOffProposal,
   withAddSignatory,
   RpcContext,
+} from '@solana/spl-governance'
+import {
+  withCreateProposal
 } from '@realms-today/spl-governance'
 import {
   sendTransactionsV3,
