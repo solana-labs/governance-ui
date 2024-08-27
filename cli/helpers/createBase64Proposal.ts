@@ -8,9 +8,11 @@ import {
   VoteType,
   WalletSigner,
   withAddSignatory,
-  withCreateProposal,
   withInsertTransaction,
   withSignOffProposal,
+} from '@solana/spl-governance'
+import {
+  withCreateProposal
 } from '@realms-today/spl-governance'
 import { Connection, PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { chunk } from 'lodash'
