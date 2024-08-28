@@ -53,6 +53,8 @@
     "@helium/spl-utils": "0.0.44",
     "@helium/voter-stake-registry-sdk": "0.0.44",
     "@heroicons/react": "1.0.6",
+    "@hoodieshq/solana-magic-link-wallet-adapter-react-ui": "1.1.2",
+    "@hoodieshq/solana-wallet-adapter-magic-link": "1.1.2",
     "@hookform/resolvers": "2.8.10",
     "@identity.com/sol-did-client": "3.3.0",
     "@jup-ag/referral-sdk": "0.1.5",
