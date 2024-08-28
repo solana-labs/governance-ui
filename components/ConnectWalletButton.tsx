@@ -24,6 +24,8 @@ const StyledWalletProviderLabel = styled.p`
   line-height: 1.5;
 `
 
+// TODO: integrate MagiLink wallet
+
 const ConnectWalletButton = (props) => {
   const { pathname, query, replace } = useRouter()
   const [isLoading, setIsLoading] = useState(false)
