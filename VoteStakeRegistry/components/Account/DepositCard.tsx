@@ -222,7 +222,7 @@ const DepositCard = ({
               value={(deposit.votingPower.isZero() ||
               deposit.votingPowerBaseline.isZero()
                 ? 
-                registrar ?
+                registrar && deposit.amountDepositedNative.gt(new BN(0)) ?
                   deposit.votingPower.mul(new BN(100)).div(
                     deposit.amountDepositedNative.mul(
                       new BN(10).pow(
