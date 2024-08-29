@@ -127,6 +127,7 @@ const IxGateSet = ({
     TokenForceWithdraw: true,
     SequenceCheck: true,
     HealthCheck: true,
+    GroupChangeInsuranceFund: true,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -660,6 +661,12 @@ const IxGateSet = ({
       initialValue: form.HealthCheck,
       type: InstructionInputType.SWITCH,
       name: 'HealthCheck',
+    },
+    {
+      label: 'Group Change Insurance Fund',
+      initialValue: form.GroupChangeInsuranceFund,
+      type: InstructionInputType.SWITCH,
+      name: 'GroupChangeInsuranceFund',
     },
   ]
 
