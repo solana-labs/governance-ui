@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@blockworks-foundation/mango-mints-redemption": "0.0.11",
-    "@blockworks-foundation/mango-v4": "0.32.12",
+    "@blockworks-foundation/mango-v4": "0.33.4",
     "@blockworks-foundation/mango-v4-settings": "0.14.24",
     "@blockworks-foundation/mangolana": "0.0.18",
     "@bonfida/spl-name-service": "0.1.47",
@@ -240,6 +240,7 @@
     "@nivo/bar/**/d3-color": "3.1.0",
     "dset": "3.1.2",
     "**/@solana/spl-token-registry/cross-fetch/node-fetch": "2.6.7",
+    "**/@blockworks-foundation/mangolana/node-fetch": "npm:@blockworks-foundation/node-fetch@2.6.11",
     "@bonfida/spl-name-service": "0.1.47",
     "@bundlr-network/client": "0.7.15",
     "@carbon/icons-react": "11.7.0",
