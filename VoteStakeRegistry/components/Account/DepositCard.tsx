@@ -213,7 +213,7 @@ const DepositCard = ({
               )}`}
               value={`${dayjs(
                 deposit!.nextVestingTimestamp!.toNumber() * 1000
-              ).format('DD-MM-YYYY HH:mm')}`}
+              ).format('MM-DD-YYYY HH:mm')}`}
             />
           )}
           {isRealmCommunityMint && (
