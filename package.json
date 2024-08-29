@@ -112,6 +112,7 @@
     "@sqds/mesh": "1.0.6",
     "@switchboard-xyz/sbv2-lite": "0.2.4",
     "@switchboard-xyz/solana.js": "3.2.5",
+    "@symmetry-hq/baskets-sdk": "0.0.45",
     "@tailwindcss/forms": "0.5.3",
     "@tailwindcss/line-clamp": "0.4.2",
     "@tanstack/react-query": "4.14.3",
