@@ -3209,12 +3209,13 @@
   resolved "https://registry.yarnpkg.com/@pythnetwork/staking-wasm/-/staking-wasm-0.3.4.tgz#29c0f47467249a4c66814a8aab9eadf2cc008add"
   integrity sha512-0ZdaWmueVO5hucdVH4UDfHyBuxtW6UDcrpEFtD/3pq4naQjcgu1u6rK8iL2pgKi8W2UlsB4vwJqay2Sf1sA4mw==
 
-"@pythnetwork/staking@2.2.0":
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/@pythnetwork/staking/-/staking-2.2.0.tgz#731f3084be22077e7ce974d1461ca676360bb817"
-  integrity sha512-+gMKotgB1gNemVTmS7pRLsSfNWTLVMY0SeGSO2Md1nOkMImGCTq0mBa83fJekj8GF79jqx62c/SHKt/iTRnNDA==
+"@pythnetwork/staking@2.3.1":
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/@pythnetwork/staking/-/staking-2.3.1.tgz#53f7ae9f9941fbea7e1464fe822fad60d2be8b63"
+  integrity sha512-TX5irBFy+1dhOxdRjC6NbcSCw33ZiAq9lbTb32mA/dnD6HgK9qPNg1TyflM3Bqa76VqlBP8uiGGKQYSuaCFAWw==
   dependencies:
     "@coral-xyz/anchor" "^0.29.0"
+    "@pythnetwork/solana-utils" "^0.4.1"
     "@pythnetwork/staking-wasm" "*"
     "@solana/spl-governance" "0.3.26"
     "@solana/spl-token" "^0.1.8"
