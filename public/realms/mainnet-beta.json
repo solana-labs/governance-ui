@@ -3618,5 +3618,20 @@
     "twitter": "@EpicentralLabs",
     "discord": "https://discord.gg/5asAuY2sR8",
     "github": "https://github.com/EpicentralLabs"
+  },
+  { 
+    "symbol": "COAL",
+    "bannerImage": "/realms/CoalitionDAO/banner.png",
+    "displayName": "CoalitionDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "4HRDvxcErtP4MxWqpmem7CfwGU9LbYfJd9JCNz5s5RTd",
+    "communityMint": "E3yUqBNTZxV8ELvW99oRLC7z4ddbJqqR4NphwrMug9zu",
+    "ogImage": "/realms/CoalitionDAO/logo.png",
+    "shortDescription": "A coalition of miners and engineers.",
+    "website": "https://coal.digital/",
+    "keywords": "Proof of work, Crypto mining, Community, Governance, Solana",
+    "twitter": "@coalonsolana",
+    "discord": "https://discord.gg/WJVYcHHGHr",
+    "github": "https://github.com/coal-digital"
   }
 ]
