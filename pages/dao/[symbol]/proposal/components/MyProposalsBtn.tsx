@@ -2,6 +2,7 @@ import useRealm from '@hooks/useRealm'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   getProposalDepositsByDepositPayer,
+  getVoteRecord,
   getVoteRecordAddress,
   ProgramAccount,
   Proposal,
@@ -236,7 +237,7 @@ const MyProposalsBn = () => {
       instructions,
       proposal: ProgramAccount<Proposal>
     ) => {
-      const voterTokenRecord =
+      let voterTokenRecord =
         proposal.account.governingTokenMint.toBase58() ===
         realm?.account.communityMint.toBase58()
           ? ownTokenRecord
@@ -248,12 +249,32 @@ const MyProposalsBn = () => {
       const governanceAuthority = wallet!.publicKey!
       const beneficiary = wallet!.publicKey!
 
-      const voteRecordPk = await getVoteRecordAddress(
+      let voteRecordPk = await getVoteRecordAddress(
         realm!.owner,
         proposal.pubkey,
         voterTokenRecord!.pubkey
       )
+      
+      let governingTokenMint = proposal.account.governingTokenMint
 
+      try {
+        await getVoteRecord(connection, voteRecordPk)
+      } catch {
+        voterTokenRecord = role === "community" ?
+          ownCouncilTokenRecord :
+          ownTokenRecord
+
+        voteRecordPk = await getVoteRecordAddress(
+          realm!.owner,
+          proposal.pubkey,
+          voterTokenRecord!.pubkey
+        )
+
+        governingTokenMint = role === "community" && realm?.account.config.councilMint ?
+          realm.account.config.councilMint :
+          realm?.account.communityMint!
+      }
+      
       const inst = await withRelinquishVote(
         instructions,
         realm!.owner,
@@ -262,7 +283,7 @@ const MyProposalsBn = () => {
         proposal.account.governance,
         proposal.pubkey,
         voterTokenRecord!.pubkey,
-        proposal.account.governingTokenMint,
+        governingTokenMint,
         voteRecordPk,
         governanceAuthority,
         beneficiary
