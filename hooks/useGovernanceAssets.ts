@@ -649,7 +649,7 @@ export default function useGovernanceAssets() {
       packageId: PackageEnum.Pyth,
     },
     [Instructions.PythUpdatePoolAuthority]: {
-      name: 'Update pool authority',
+      name: 'Update Pool Authority',
       packageId: PackageEnum.Pyth,
     },
     /*
