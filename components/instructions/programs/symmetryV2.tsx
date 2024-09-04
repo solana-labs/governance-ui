@@ -18,6 +18,17 @@ const rebalanceAndLpLayout = BufferLayout.seq(
   'rebalanceAndLp'
 );
 
+
+const SymmetryLogoLink = () => {
+  return <a href="https://symmetry.fi" target="_blank" rel="noopener noreferrer">
+  <svg width="48" height="48" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="400" height="400" rx="44" fill="#1A3FFF"/>
+    <path d="M232.642 233.053L166.536 233.053C143.567 233.053 130.055 241.523 118.917 252.661C100.429 271.148 103.231 296.358 103.231 296.358L232.642 296.358L296.508 232.493L232.642 168.627L232.642 233.053Z" fill="white"/>
+    <path d="M166.948 167.504L233.054 167.504C256.023 167.504 269.535 159.034 280.673 147.896C299.16 129.409 296.359 104.199 296.359 104.199L166.948 104.199L103.082 168.064L166.948 231.93L166.948 167.504Z" fill="white"/>
+  </svg>
+</a>
+}
+
 export const SYMMETRY_V2_INSTRUCTIONS = {
   "2KehYt3KsEQR53jYcxjbQp2d2kCp4AkuQW68atufRwSr": {
     78: {
@@ -43,10 +54,32 @@ export const SYMMETRY_V2_INSTRUCTIONS = {
         ]).decode(Buffer.from(data), 8)
 
         return (
-          <>
-            <p>Withdraw Amount: {amount / 10**6}</p>
-            <p>Rebalance to USDC: {rebalance === 2 ? 'Yes' : 'No - Withdraw Assets Directly'}</p>
-          </>
+          <div className="bg-black font-body text-gray-200 p-6 rounded-lg shadow-lg max-w-2xl mx-auto">
+            <div className="flex items-center gap-2 mb-4">
+              <SymmetryLogoLink />
+              <div className="flex flex-col">
+                <p className="text-2xl m-0 font-semibold text-gray-100">Withdraw from Basket</p>
+                <p className="text-gray-400 m-0">Basket Tokens will be burnt to redeem underlying assets:</p>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div className="bg-gray-900 rounded-md p-4 border border-gray-700">
+                <dl className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <dt className="text-gray-400">Withdraw:</dt>
+                    <dd className="font-medium text-2xl">{(amount / 10**6).toFixed(2)} Basket Tokens</dd>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <dt className="text-gray-400">Rebalance to USDC:</dt>
+                    <dd className="font-medium">
+                      {rebalance === 2 ? 'Yes' : 'No - Withdraw Assets Directly'}
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+          </div>
+          
         )
       },
     },
@@ -79,9 +112,25 @@ export const SYMMETRY_V2_INSTRUCTIONS = {
         ]).decode(Buffer.from(data), 8)
 
         return (
-          <>
-            <p>USDC Deposit Amount: {amount / 10**6}</p>
-          </>
+          <div className="bg-black font-body text-gray-200 p-6 rounded-lg shadow-lg max-w-2xl mx-auto">
+            <div className="flex items-center gap-2 mb-4">
+              <SymmetryLogoLink />
+              <div className="flex flex-col">
+                <p className="text-2xl m-0 font-semibold text-gray-100">USDC Deposit Information</p>
+                <p className="text-gray-400 m-0">After the deposit, basket tokens will be minted to the DAO.</p>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div className="bg-gray-900 rounded-md p-4 border border-gray-700">
+                <dl className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <dt className="text-gray-400">USDC Deposit Amount:</dt>
+                    <dd className="font-medium text-2xl">{(amount / 10**6).toFixed(2)} USDC</dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+          </div>
         )
       },
     },
@@ -132,26 +181,78 @@ export const SYMMETRY_V2_INSTRUCTIONS = {
         }).filter(x => x != null)
 
         return (
-          <>
-            <p>Manager Fee: {managerFee / 100}%</p>
-            <p>Rebalance Check Interval: {rebalanceInterval / 60} minutes</p>
-            <p>Rebalance Trigger Threshold: {rebalanceThreshold / 100}%</p>
-            <p>Maximum Slippage Allowed During Rebalancing: {rebalanceSlippage / 100}%</p>
-            <p>Liquidity Provision Threshold: {lpOffsetThreshold / 100}%</p>
-            <p>Rebalancing Enabled: {rebalanceAndLp[0] === 0 ? "Yes" : "No"}</p>
-            <p>Liquidity Provision Enabled: {rebalanceAndLp[1] === 0 ? "No" : "Yes"}</p>
-            <p>Basket Composition Size: {numOfTokens} Tokens</p>
-            <div className="text-sm">
-              Basket Composition:
-              {
-                composition.map((compItem, i) => {
-                  return <div className="flex items-center">
-                    <p className="text-sm">{compItem.weight}% {compItem.symbol} <a className="text-blue" target="_blank" href={"https://solscan.io/token/"+compItem.tokenMint}>({compItem.tokenMint.slice(0,6)}...)</a></p>
-                  </div>
-                })
-              }
+          <div className="bg-black font-body text-gray-200 p-6 rounded-lg shadow-lg max-w-2xl mx-auto">
+            <div className="flex items-center gap-2 mb-4">
+              <a href="https://symmetry.fi" target="_blank">
+                <svg width="48" height="48" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="400" height="400" rx="44" fill="#1A3FFF"/>
+                  <path d="M232.642 233.053L166.536 233.053C143.567 233.053 130.055 241.523 118.917 252.661C100.429 271.148 103.231 296.358 103.231 296.358L232.642 296.358L296.508 232.493L232.642 168.627L232.642 233.053Z" fill="white"/>
+                  <path d="M166.948 167.504L233.054 167.504C256.023 167.504 269.535 159.034 280.673 147.896C299.16 129.409 296.359 104.199 296.359 104.199L166.948 104.199L103.082 168.064L166.948 231.93L166.948 167.504Z" fill="white"/>
+                </svg>
+              </a>
+              <div className="flex flex-col">
+                <p className="text-2xl m-0 font-semibold text-gray-100">Editing Basket Settings</p>
+                <p className="text-gray-400 m-0">If the proposal passes, the basket will be edited to the following settings:</p>
+              </div>
             </div>
-          </>
+            <div className="space-y-4">
+              <div className="bg-gray-900 rounded-md p-4 border border-gray-700">
+                <dl className="space-y-2">
+                  <div className="flex justify-between">
+                    <dt className="text-gray-400">Manager Fee:</dt>
+                    <dd className="font-medium">{managerFee / 100}%</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt className="text-gray-400">Rebalance Check Interval:</dt>
+                    <dd className="font-medium">{rebalanceInterval / 60} minutes</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt className="text-gray-400">Rebalance Trigger Threshold:</dt>
+                    <dd className="font-medium">{rebalanceThreshold / 100}%</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt className="text-gray-400">Maximum Slippage Allowed During Rebalancing:</dt>
+                    <dd className="font-medium">{rebalanceSlippage / 100}%</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt className="text-gray-400">Liquidity Provision Threshold:</dt>
+                    <dd className="font-medium">{lpOffsetThreshold / 100}%</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt className="text-gray-400">Rebalancing Enabled:</dt>
+                    <dd className="font-medium">{rebalanceAndLp[0] === 0 ? "Yes" : "No"}</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt className="text-gray-400">Liquidity Provision Enabled:</dt>
+                    <dd className="font-medium">{rebalanceAndLp[1] === 0 ? "Yes" : "No"}</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt className="text-gray-400">Basket Composition Size:</dt>
+                    <dd className="font-medium">{numOfTokens} Tokens</dd>
+                  </div>
+                </dl>
+              </div>
+              <div className="bg-gray-900 rounded-md p-4 border border-gray-700">
+                <h3 className="text-lg font-medium mb-2 text-gray-100">Basket Composition:</h3>
+                <ul className="space-y-2">
+                  {composition.map((compItem, i) => (
+                    <li key={i} className="w-full grid grid-cols-3">
+                      <p className="text-gray-400 text-left">{compItem.symbol}</p>
+                      <p className="font-medium text-left">{compItem.weight}%</p>
+                      <a
+                        className="text-xs text-right text-cyan-400 hover:underline"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        href={`https://solscan.io/token/${compItem.tokenMint}`}
+                      >
+                        ({compItem.tokenMint.slice(0,6)}...)
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
         )
       },
     },
@@ -188,7 +289,14 @@ export const SYMMETRY_V2_INSTRUCTIONS = {
           targetCompositionLayout,
           targetWeightsLayout,
         ]).decode(Buffer.from(data), 8)
-
+        const getBasketType = (type) => {
+          switch (type) {
+            case 0: return "Bundle";
+            case 1: return "Portfolio";
+            case 2: return "Private";
+            default: return "Unknown";
+          }
+        };
 
         let basketsSdk = await BasketsSDK.init(connection);
         let tokenData = basketsSdk.getTokenListData();
@@ -213,28 +321,86 @@ export const SYMMETRY_V2_INSTRUCTIONS = {
         }).filter(x => x != null)
 
         return (
-          <>
-            <p>Manager Fee: {managerFee / 100}%</p>
-            <p>Host Platform Fee: {hostFee / 100}%</p>
-            <p>Basket Type: {basketType === 0 ? "Bundle" : basketType === 1 ? "Portfolio" : "Private"}</p>
-            <p>Rebalance Check Interval: {rebalanceInterval / 60} minutes</p>
-            <p>Rebalance Trigger Threshold: {rebalanceThreshold / 100}%</p>
-            <p>Maximum Slippage Allowed During Rebalancing: {rebalanceSlippage / 100}%</p>
-            <p>Liquidity Provision Threshold: {lpOffsetThreshold / 100}%</p>
-            <p>Rebalancing Enabled: {rebalanceAndLp[0] === 0 ? "Yes" : "No"}</p>
-            <p>Liquidity Provision Enabled: {rebalanceAndLp[1] === 0 ? "No" : "Yes"}</p>
-            <p>Basket Composition Size: {numOfTokens} Tokens</p>
-            <div className="text-sm">
-              Basket Composition:
-              {
-                composition.map((compItem, i) => {
-                  return <div className="flex items-center">
-                    <p className="text-sm">{compItem.weight}% {compItem.symbol} <a className="text-blue" target="_blank" href={"https://solscan.io/token/"+compItem.tokenMint}>({compItem.tokenMint.slice(0,6)}...)</a></p>
-                  </div>
-                })
-              }
+          <div className="bg-black font-body text-gray-200 p-6 rounded-lg shadow-lg max-w-2xl mx-auto">
+            <div className="flex items-center gap-2 mb-4">
+              <a href="https://symmetry.fi" target="_blank" rel="noopener noreferrer">
+                <svg width="48" height="48" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="400" height="400" rx="44" fill="#1A3FFF"/>
+                  <path d="M232.642 233.053L166.536 233.053C143.567 233.053 130.055 241.523 118.917 252.661C100.429 271.148 103.231 296.358 103.231 296.358L232.642 296.358L296.508 232.493L232.642 168.627L232.642 233.053Z" fill="white"/>
+                  <path d="M166.948 167.504L233.054 167.504C256.023 167.504 269.535 159.034 280.673 147.896C299.16 129.409 296.359 104.199 296.359 104.199L166.948 104.199L103.082 168.064L166.948 231.93L166.948 167.504Z" fill="white"/>
+                </svg>
+              </a>
+              <div className="flex flex-col">
+                <p className="text-2xl m-0 font-semibold text-gray-100">Creating a Basket</p>
+                <p className="text-gray-400 m-0">If the proposal passes, a basket will be created with the following settings:</p>
+              </div>
             </div>
-          </>
+            <div className="space-y-4">
+              <div className="bg-gray-900 rounded-md p-4 border border-gray-700">
+                <dl className="space-y-2">
+                  <div className="flex justify-between">
+                    <dt className="text-gray-400">Manager Fee:</dt>
+                    <dd className="font-medium">{managerFee / 100}%</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt className="text-gray-400">Host Platform Fee:</dt>
+                    <dd className="font-medium">{hostFee / 100}%</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt className="text-gray-400">Basket Type:</dt>
+                    <dd className="font-medium">{getBasketType(basketType)}</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt className="text-gray-400">Rebalance Check Interval:</dt>
+                    <dd className="font-medium">{rebalanceInterval / 60} minutes</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt className="text-gray-400">Rebalance Trigger Threshold:</dt>
+                    <dd className="font-medium">{rebalanceThreshold / 100}%</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt className="text-gray-400">Maximum Slippage Allowed During Rebalancing:</dt>
+                    <dd className="font-medium">{rebalanceSlippage / 100}%</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt className="text-gray-400">Liquidity Provision Threshold:</dt>
+                    <dd className="font-medium">{lpOffsetThreshold / 100}%</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt className="text-gray-400">Rebalancing Enabled:</dt>
+                    <dd className="font-medium">{rebalanceAndLp[0] === 0 ? "Yes" : "No"}</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt className="text-gray-400">Liquidity Provision Enabled:</dt>
+                    <dd className="font-medium">{rebalanceAndLp[1] === 0 ? "Yes" : "No"}</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt className="text-gray-400">Basket Composition Size:</dt>
+                    <dd className="font-medium">{numOfTokens} Tokens</dd>
+                  </div>
+                </dl>
+              </div>
+              <div className="bg-gray-900 rounded-md p-4 border border-gray-700">
+                <h3 className="text-lg font-medium mb-2 text-gray-100">Basket Composition:</h3>
+                <ul className="space-y-2">
+                  {composition.map((compItem, i) => (
+                    <li key={i} className="w-full grid grid-cols-3">
+                      <p className="text-gray-400 text-left">{compItem.symbol}</p>
+                      <p className="font-medium text-left">{compItem.weight}%</p>
+                      <a
+                        className="text-xs text-right text-cyan-400 hover:underline"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        href={`https://solscan.io/token/${compItem.tokenMint}`}
+                      >
+                        ({compItem.tokenMint.slice(0,6)}...)
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
         )
       },
     },

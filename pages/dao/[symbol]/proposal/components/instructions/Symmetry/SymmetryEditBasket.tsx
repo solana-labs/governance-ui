@@ -15,6 +15,13 @@ import { PublicKey } from '@solana/web3.js';
 import { LinkIcon } from '@heroicons/react/solid';
 import useGovernanceAssets from '@hooks/useGovernanceAssets';
 import Select from '@components/inputs/Select';
+import GovernedAccountSelect from '../../GovernedAccountSelect';
+import ArrowButton from './components/ArrowButton';
+
+
+export const LoaderIcon = () => {
+  return <div className='w-[12px] h-[12px] border-2 rounded-full border-[#e0e0e0] border-r-[#616161] animate-spin' />;
+}
 
 const SymmetryEditBasket = ({ 
   index,
@@ -46,6 +53,7 @@ const SymmetryEditBasket = ({
   const [addTokenModal, setAddTokenModal] = useState(false);
   const [supportedTokens, setSupportedTokens] = useState<any|null>(null);
   const [assetAccountsLoaded, setAssetAccountsLoaded] = useState(false);
+  const [govAccount, setGovAccount] = useState<any>(undefined);
 
 
   const handleSetForm = ({ propertyName, value }) => {
@@ -87,13 +95,12 @@ const SymmetryEditBasket = ({
   }, [assetAccounts]);
 
   useEffect(() => {
-    if(assetAccountsLoaded) {
-      const basketsOwnerAccounts: FilterOption[] = assetAccounts.filter(x => x.isSol).map((token) => {
-        return {
-          filterType: 'manager',
-          filterPubkey: token.pubkey
-        }
-      })
+    if(form.governedAccount) {
+      console.log("govAcc", form.governedAccount);
+      const basketsOwnerAccounts: FilterOption[] = [{
+        filterType: 'manager',
+        filterPubkey: form.governedAccount.pubkey
+      }]
       if(basketsOwnerAccounts.length > 0) {
         BasketsSDK.init(connection).then((sdk) => {
           setSupportedTokens(sdk.getTokenListData());
@@ -114,7 +121,7 @@ const SymmetryEditBasket = ({
         });
       }
     }
-  }, [assetAccountsLoaded]);
+  }, [form.governedAccount]);
 
   useEffect(() => {
     handleSetInstructions(
@@ -155,7 +162,29 @@ const SymmetryEditBasket = ({
   
   return <>
     {
-      managedBaskets ?
+      assetAccountsLoaded ?
+      <GovernedAccountSelect
+        label="Select DAO Account that manages the Basket"
+        governedAccounts={assetAccounts.filter(x => x.isSol)}
+        onChange={(value) => {
+          handleSetForm({ value, propertyName: 'governedAccount' })
+        }}
+        value={form.governedAccount}
+        error={formErrors['governedAccount']}
+        shouldBeGoverned={shouldBeGoverned}
+        governance={governance}
+        type='wallet'
+      />
+      :
+      <div className='flex items-center gap-2 p-2 px-3 rounded-full bg-lime-700 max-w-fit'>
+        <LoaderIcon/>
+        <p className='text-sm font-bold'>Loading DAO Accounts</p>
+      </div>
+      
+    }
+    {
+      form.governedAccount &&
+      (managedBaskets ?
       <Select
         label='Select Basket to Edit'
         subtitle='Select a basket managed by the DAO'
@@ -174,16 +203,20 @@ const SymmetryEditBasket = ({
         }
       </Select>
       :
-      <p className='text-sm'>Loading Baskets Managed by the DAO</p>
+      <div className='flex items-center gap-2 p-2 px-3 rounded-full bg-blue-700 max-w-fit'>
+        <LoaderIcon/>
+        <p className='text-sm font-bold'>Loading Baskets Managed by the Account</p>
+      </div>)
     }
     
     {
       form.basketAddress &&
       <>
-      <a className='p-3 bg-bkg-4 hover:bg-bkg-5 w-fit rounded-md flex items-center gap-2' href={`https://app.symmetry.fi/view/${form.basketAddress.toBase58()}`} target='_blank' rel='noreferrer'>
-        <img src={'/img/symmetry.png'} className='h-4 w-4' />
-        <p className='text-sm text-fgd-1'>View Basket on Symmetry</p>
-      </a>
+      <div className='flex flex-col gap-2'>
+        <a className='max-w-fit' href={`https://app.symmetry.fi/view/${form.basketAddress.toBase58()}`} target='_blank' rel='noreferrer'>
+          <ArrowButton title='View Basket on Symmetry'/>
+        </a>
+      </div>
       <Tooltip content="If enabled, basket will be public, allowing anyone to deposit/withdraw their funds.">
       <p className="text-sm text-fgd-1 mt-2 mb-1">Allow anyone to Deposit</p>
       <Switch checked={form.basketType === 1} onChange={(x) => handleSetForm({ value: x ? 1 : 2, propertyName: 'basketType' })}/>
