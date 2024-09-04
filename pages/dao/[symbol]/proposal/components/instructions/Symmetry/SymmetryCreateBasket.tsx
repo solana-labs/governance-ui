@@ -315,6 +315,30 @@ const SymmetryCreateBasket = ({
         }
         
       </div>
+      {
+        form.governedAccount &&
+          <div className='w-full flex items-center gap-2 p-4 border text-yellow-500 border-yellow-500 rounded-md'>
+            <svg
+              className='flex flex-shrink-0'
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M7.86 2h8.28L22 7.86v8.28L16.14 22H7.86L2 16.14V7.86L7.86 2z" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            <p className='text-xs text-yellow-500'>
+              Make sure {form.governedAccount?.pubkey.toBase58()} has at least 0.22 SOL, which will required to deploy the basket after the proposal passes.
+            </p>
+          </div>
+      }
     </>
   )
 }
