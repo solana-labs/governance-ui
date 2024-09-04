@@ -11,7 +11,7 @@ import GovernedAccountSelect from '../../GovernedAccountSelect';
 import Select from '@components/inputs/Select';
 import { PublicKey } from '@solana/web3.js';
 import { LoaderIcon } from './SymmetryEditBasket';
-import { ArrowButton } from './components/ArrowButton';
+import ArrowButton from './components/ArrowButton';
 
 const SymmetryWithdraw = ({ 
   index,

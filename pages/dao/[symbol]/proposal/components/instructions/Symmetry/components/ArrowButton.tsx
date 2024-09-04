@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const ArrowButton = ({
+const ArrowButton = ({
   title,
   children=<></>
 }) => {
@@ -33,3 +33,5 @@ export const ArrowButton = ({
     </button>
   )
 }
+
+export default ArrowButton;

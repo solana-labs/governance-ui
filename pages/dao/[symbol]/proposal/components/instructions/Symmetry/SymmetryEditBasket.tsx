@@ -16,7 +16,7 @@ import { LinkIcon } from '@heroicons/react/solid';
 import useGovernanceAssets from '@hooks/useGovernanceAssets';
 import Select from '@components/inputs/Select';
 import GovernedAccountSelect from '../../GovernedAccountSelect';
-import { ArrowButton } from './components/ArrowButton';
+import ArrowButton from './components/ArrowButton';
 
 
 export const LoaderIcon = () => {
