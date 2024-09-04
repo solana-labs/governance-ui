@@ -648,6 +648,10 @@ export default function useGovernanceAssets() {
       name: 'Recover Account',
       packageId: PackageEnum.Pyth,
     },
+    [Instructions.PythUpdatePoolAuthority]: {
+      name: 'Update Pool Authority',
+      packageId: PackageEnum.Pyth,
+    },
     /*
       ███████ ███████ ██████  ██    ██ ███    ███
       ██      ██      ██   ██ ██    ██ ████  ████
