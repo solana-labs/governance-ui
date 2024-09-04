@@ -7,7 +7,7 @@ import { BasketsSDK, FilterOption } from "@symmetry-hq/baskets-sdk";
 import { buyBasketIx } from "@symmetry-hq/baskets-sdk/dist/basketInstructions";
 import ArrowButton from './components/ArrowButton';
 import { useConnection } from '@solana/wallet-adapter-react';
-import { PublicKey } from '@solana/web3.js';s
+import { PublicKey } from '@solana/web3.js';
 import useGovernanceAssets from '@hooks/useGovernanceAssets';
 import Select from '@components/inputs/Select';
 import GovernedAccountSelect from '../../GovernedAccountSelect';
