@@ -375,6 +375,7 @@ export enum Instructions {
   SquadsMeshChangeThresholdMember,
   SquadsMeshRemoveMember,
   PythRecoverAccount,
+  PythUpdatePoolAuthority,
   StakeValidator,
   SwitchboardFundOracle,
   WithdrawFromOracle,
