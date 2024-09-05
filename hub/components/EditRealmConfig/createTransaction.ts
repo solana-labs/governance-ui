@@ -10,9 +10,11 @@ import {
   GoverningTokenConfigAccountArgs,
   tryGetRealmConfig,
   getRealm,
-  getGovernanceProgramVersion,
   SYSTEM_PROGRAM_ID,
-} from '@realms-today/spl-governance';
+} from '@solana/spl-governance';
+import {
+  getGovernanceProgramVersion
+} from "@realms-today/spl-governance"
 import type {
   Connection,
   PublicKey,

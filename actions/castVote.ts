@@ -244,6 +244,8 @@ export async function castVote(
       createCastNftVoteTicketIxs
     )
 
+    console.log(plugin?.voterWeightPk?.toBase58(), "voter weight pk")
+
     await withCastVote(
       castVoteIxs,
       programId,
