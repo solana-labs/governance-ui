@@ -136,9 +136,9 @@
     "communityMint": "Fj1tPZzgBnsbQMWgJM3CNjM8NZ9XHED7hhnHTN6GNZAF"
   },
   {
-    "symbol": "XAND",
+    "symbol": "XANDC",
     "category": "defi",
-    "displayName": "Xandeum DAO",
+    "displayName": "Xandeum DevNet DAO",
     "programId": "DcG2PZTnj8s4Pnmp7xJswniCskckU5E6XsrKuyD7NYFK",
     "realmId": "CFprdZRYitjPYEDUQKDQZwao1jcRcU1z1GsFspMpN8Ci",
     "communityMint": "2j437Lt84XvysJiYbXTSJfAMy26Et9HiVGFvGFp8nYWH",
@@ -3599,7 +3599,11 @@
     "displayName": "$SOLFOX Official DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "8PzqFQWeiyQLAtiDG4GV8bmS1YDCM7xy6SNz1eMsiw8A",
+<<<<<<< HEAD
     "ogImage": "realms/FOXTAG/FOXTAG.png",
+=======
+    "ogImage": "/realms/FOXTAG/FOXTAG.png",
+>>>>>>> ad733a39d19bf2ffe9ddefdf01716685ce85f7c1
     "website": "https://solfoxlegion.com",
     "twitter": "@solfoxlegion"
   },
@@ -3607,7 +3611,7 @@
     "symbol": "LABS",
     "category": "defi",
     "bannerImage": "/realms/EpicentralLabsDAO/EpicentralDAOBanner.png",
-    "displayName": "Epicentral Labs DAO",
+    "displayName": "EpicentralDAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "5PP7vKjJyLw1MR55LoexRsCj3CpZj9MdD6aNXRrvxG42",
     "communityMint": "LABSh5DTebUcUbEoLzXKCiXFJLecDFiDWiBGUU1GpxR",
@@ -3618,5 +3622,20 @@
     "twitter": "@EpicentralLabs",
     "discord": "https://discord.gg/5asAuY2sR8",
     "github": "https://github.com/EpicentralLabs"
+  },
+  { 
+    "symbol": "COAL",
+    "bannerImage": "/realms/CoalitionDAO/banner.png",
+    "displayName": "CoalitionDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "4HRDvxcErtP4MxWqpmem7CfwGU9LbYfJd9JCNz5s5RTd",
+    "communityMint": "E3yUqBNTZxV8ELvW99oRLC7z4ddbJqqR4NphwrMug9zu",
+    "ogImage": "/realms/CoalitionDAO/logo.png",
+    "shortDescription": "A coalition of miners and engineers.",
+    "website": "https://coal.digital/",
+    "keywords": "Proof of work, Crypto mining, Community, Governance, Solana",
+    "twitter": "@coalonsolana",
+    "discord": "https://discord.gg/WJVYcHHGHr",
+    "github": "https://github.com/coal-digital"
   }
 ]

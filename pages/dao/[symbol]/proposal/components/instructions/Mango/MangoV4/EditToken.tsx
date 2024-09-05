@@ -135,6 +135,7 @@ interface EditTokenForm {
   disableAssetLiquidation: boolean
   collateralFeePerDay: number
   forceWithdraw: boolean
+  tier: string
 }
 
 const defaultFormValues: EditTokenForm = {
@@ -190,6 +191,7 @@ const defaultFormValues: EditTokenForm = {
   disableAssetLiquidation: false,
   collateralFeePerDay: 0,
   forceWithdraw: false,
+  tier: '',
 }
 
 const EditToken = ({
@@ -361,7 +363,8 @@ const EditToken = ({
           getNullOrTransform(values.platformLiquidationFee, null, Number),
           values.disableAssetLiquidation!,
           getNullOrTransform(values.collateralFeePerDay, null, Number),
-          values.forceWithdraw!
+          values.forceWithdraw!,
+          getNullOrTransform(values.tier, null, String)
         )
         .accounts({
           group: mangoGroup!.publicKey,

@@ -29,6 +29,7 @@ const DiscussionForm = () => {
   const { realmInfo } = useRealm()
   const votingClients = useVotingClients();
   const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
 
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
@@ -43,6 +44,7 @@ const DiscussionForm = () => {
   const votingClient = votingClients(tokenRole ?? 'community');// default to community if no role is provided
   const submitComment = async () => {
     setSubmitting(true)
+    setError('')
     if (
       !realm ||
       !proposal ||
@@ -79,6 +81,7 @@ const DiscussionForm = () => {
       setComment('')
     } catch (ex) {
       console.error("Can't post chat message", ex)
+      setError(ex.message);
       //TODO: How do we present transaction errors to users? Just the notification?
     } finally {
       setSubmitting(false)
@@ -118,6 +121,7 @@ const DiscussionForm = () => {
           </Button>
         </Tooltip>
       </div>
+      {error && <p className="mt-1 text-red">{error}</p>}
     </>
   )
 }

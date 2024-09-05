@@ -6,7 +6,6 @@ import {
   Realm,
   TokenOwnerRecord,
   VoteType,
-  withCreateProposal,
   getSignatoryRecordAddress,
   RpcContext,
   withInsertTransaction,
@@ -15,6 +14,9 @@ import {
   withAddSignatory,
   MultiChoiceType,
 } from '@solana/spl-governance'
+import {
+  withCreateProposal,
+} from '@realms-today/spl-governance'
 import {
   sendTransactionsV3,
   SequenceType,

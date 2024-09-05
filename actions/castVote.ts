@@ -27,7 +27,6 @@ import { withCastVote } from '@solana/spl-governance'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
 import { chunks } from '@utils/helpers'
 import {
-  sendTransactionsV3,
   SequenceType,
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
@@ -43,6 +42,7 @@ import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
 import { fetchVoteRecordByPubkey } from '@hooks/queries/voteRecord'
 import { findPluginName } from '@constants/plugins'
 import { BN } from '@coral-xyz/anchor'
+import { postComment } from './chat/postMessage'
 
 const getVetoTokenMint = (
   proposal: ProgramAccount<Proposal>,
@@ -358,7 +358,7 @@ export async function castVote(
       sequenceType: SequenceType.Parallel,
     }))
 
-    await sendTransactionsV3({
+    await postComment({
       connection,
       wallet,
       transactionInstructions: actions,
@@ -396,7 +396,7 @@ export async function castVote(
       }
     })
 
-    await sendTransactionsV3({
+    await postComment({
       connection,
       wallet,
       transactionInstructions: ixsChunks,
@@ -470,10 +470,10 @@ export async function castVote(
       connection
     )
     if (!hasEnoughSol) {
-      return
+      throw new Error('Not enough SOL.')
     }
 
-    await sendTransactionsV3({
+    await postComment({
       connection,
       wallet,
       transactionInstructions: instructionsChunks,

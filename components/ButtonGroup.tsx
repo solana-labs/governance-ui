@@ -44,7 +44,7 @@ const ButtonGroup: FunctionComponent<ButtonGroupProps> = ({
             key={`${v}${i}`}
             onClick={() => onChange(v)}
             style={{
-              width: `${100 / values.length}%`,
+              width: `${98 / values.length}%`,
             }}
           >
             {names ? (unit ? names[i] + unit : names[i]) : unit ? v + unit : v}
