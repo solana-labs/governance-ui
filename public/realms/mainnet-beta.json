@@ -3599,11 +3599,7 @@
     "displayName": "$SOLFOX Official DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "8PzqFQWeiyQLAtiDG4GV8bmS1YDCM7xy6SNz1eMsiw8A",
-<<<<<<< HEAD
-    "ogImage": "realms/FOXTAG/FOXTAG.png",
-=======
     "ogImage": "/realms/FOXTAG/FOXTAG.png",
->>>>>>> ad733a39d19bf2ffe9ddefdf01716685ce85f7c1
     "website": "https://solfoxlegion.com",
     "twitter": "@solfoxlegion"
   },
@@ -3637,5 +3633,18 @@
     "twitter": "@coalonsolana",
     "discord": "https://discord.gg/WJVYcHHGHr",
     "github": "https://github.com/coal-digital"
+  },
+  { 
+    "symbol": "JETSKI",
+    "bannerImage": "/realms/JetSkiDAO/banner.png",
+    "displayName": "JetSki DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "FEPMbc7rB8BF3anr9eHHfi2VeZKnCdWKWZW9guu3oxuT",
+    "communityMint": "E7saHtwrZ3i6QNNB15Kq4R8e4mLz5J5XMtJybHNhpump",
+    "ogImage": "/realms/JetSkiDAO/logo.jpeg",
+    "shortDescription": "The first community managed basket DAO on Solana.",
+    "website": "https://deanslistdao.notion.site/JetSki-DAO-380d86533e154e4c8bbd66a11c54194f",
+    "twitter": "@JetSkiDAO",
+    "telegram": "https://t.me/+mlW159EpFtY1N2U0D"
   }
 ]
