@@ -17,6 +17,13 @@ import { proposalQueryKeys } from './queries/proposal'
 import { createLUTProposal } from 'actions/createLUTproposal'
 import { useLegacyVoterWeight } from './queries/governancePower'
 import {useVotingClients} from "@hooks/useVotingClients";
+import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
+import useRealm from '@hooks/useRealm'
+import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import BN from 'bn.js'
+import { formatNumber } from '@utils/formatNumber'
+import { BigNumber } from 'bignumber.js'
+import { Governance, ProgramAccount } from '@solana/spl-governance'
 
 export default function useCreateProposal() {
   const connection = useLegacyConnectionContext()
@@ -201,4 +208,59 @@ export default function useCreateProposal() {
   }
 
   return { handleCreateProposal, propose, proposeMultiChoice }
+}
+
+export const useCanCreateProposal = (
+  governance?: ProgramAccount<Governance> | null
+) => {
+  const wallet = useWalletOnePointOh()
+  const connected = !!wallet?.connected
+
+  const realm = useRealmQuery().data?.result
+
+  const {
+    ownVoterWeight: communityOwnVoterWeight,
+  } = useRealmVoterWeightPlugins('community')
+  const {
+    isReady,
+    ownVoterWeight: councilOwnVoterWeight,
+  } = useRealmVoterWeightPlugins('council')
+  const {
+    toManyCommunityOutstandingProposalsForUser,
+    toManyCouncilOutstandingProposalsForUse,
+  } = useRealm()
+
+  const communityOwnVoterWeightValue = communityOwnVoterWeight && communityOwnVoterWeight.value
+  const councilOwnVoterWeightValue = councilOwnVoterWeight && councilOwnVoterWeight.value
+
+  const minWeightToCreateProposal = (governance?.pubkey == realm?.account.communityMint ?
+    governance?.account.config.minCommunityTokensToCreateProposal :
+    governance?.account.config.minCouncilTokensToCreateProposal) || new BN(1)
+
+  const votingPower = communityOwnVoterWeightValue || councilOwnVoterWeightValue
+
+  const hasEnoughVotingPower = votingPower?.gt(minWeightToCreateProposal)
+
+  const canCreateProposal =
+    realm &&
+    hasEnoughVotingPower &&
+    !toManyCommunityOutstandingProposalsForUser &&
+    !toManyCouncilOutstandingProposalsForUse
+
+  const error = !connected
+    ? 'Connect your wallet to create new proposal'
+    : isReady && !communityOwnVoterWeight && !councilOwnVoterWeight
+    ? 'There is no governance configuration to create a new proposal'
+    : !hasEnoughVotingPower
+    ? `Please select only one account with at least ${formatNumber(new BigNumber(minWeightToCreateProposal.toString()))} governance power to create a new proposal.`
+    : toManyCommunityOutstandingProposalsForUser
+    ? 'Too many community outstanding proposals. You need to finalize them before creating a new one.'
+    : toManyCouncilOutstandingProposalsForUse
+    ? 'Too many council outstanding proposals. You need to finalize them before creating a new one.'
+    : ''
+
+  return {
+    canCreateProposal,
+    error
+  }
 }
