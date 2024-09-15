@@ -3646,5 +3646,20 @@
     "website": "https://deanslistdao.notion.site/JetSki-DAO-380d86533e154e4c8bbd66a11c54194f",
     "twitter": "@JetSkiDAO",
     "telegram": "https://t.me/+mlW159EpFtY1N2U0D"
-  }
+  },
+    { 
+    "symbol": "CAPN",
+    "bannerImage": "/realms/capn_dao/banner_nigeria.png",
+    "displayName": "$CaptainNigeria DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "4T5TxsLxmzsbw5ovrFMnxD5gyU7zZpXhMSZ14Y6bQE1c",
+    "communityMint": "AZrbPbVJJeDjtDKzVxachYy4DdmoVjWcwv8cMrpbEmY3",
+    "ogImage": "/realms/capn_dao/capn_shield.png",
+    "shortDescription": "A coalition of miners and engineers.",
+    "website": "https://linktr.ee/captainhaiti",
+    "keywords": "Nigeria, Captain Nigeria, Token War, Solana, DAO",
+    "twitter": "@captainhaiti",
+    "discord": "https://discord.gg/V7up2tCd",
+    "github": "https://github.com/captainhaiti"
+  },
 ]
