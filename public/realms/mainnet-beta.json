@@ -3646,5 +3646,19 @@
     "website": "https://deanslistdao.notion.site/JetSki-DAO-380d86533e154e4c8bbd66a11c54194f",
     "twitter": "@JetSkiDAO",
     "telegram": "https://t.me/+mlW159EpFtY1N2U0D"
+  },
+  {
+    "symbol": "AdrenaDAO",
+    "displayName": "Adrena DAO",
+    "category": "defi",
+    "bannerImage": "/realms/Adrena/banner.png",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "GWe1VYTRMujAtGVhSLwSn4YPsXBLe5qfkzNAYAKD44Nk",
+    "ogImage": "/realms/Adrena/logo.png",
+    "shortDescription": "Perpetuals DEX for the Solana community.",
+    "website": "https://app.adrena.xyz/",
+    "twitter": "@AdrenaProtocol",
+    "discord": "https://discord.gg/adrena",
+    "github": "https://github.com/AdrenaFoundation"
   }
 ]
