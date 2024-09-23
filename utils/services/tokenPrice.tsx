@@ -151,10 +151,7 @@ class TokenPriceService {
 
       return finalTokenInfo;
     } else {
-      notify({
-        type: 'error',
-        message: 'Token data could not be retrieved',
-      });
+      console.error(`Metadata retrieving failed for ${mintAddress}`);
       return undefined;
     }
   } catch (e) {
