@@ -635,7 +635,7 @@ const New = () => {
     [governance?.pubkey?.toBase58()]
   )
 
-  const { canCreateProposal, error } = useCanCreateProposal(isMulti ? multiChoiceForm.governance : governance)
+  const { canCreateProposal, error, warning } = useCanCreateProposal(isMulti ? multiChoiceForm.governance : governance)
 
   return (
     <div className="grid grid-cols-12 gap-4">
@@ -849,6 +849,7 @@ const New = () => {
                 Add proposal
               </Button>
             </div>
+            {warning && <p className="p-2 text-right text-gray-400">{warning}</p>}
             {error && <p className="p-2 text-right text-red-400">{error}</p>}
           </div>
         </>
