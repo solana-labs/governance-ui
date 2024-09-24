@@ -107,7 +107,7 @@ export const getPythGovPower = async (
   })
   const voterWeight = await pythClient.getVoterWeight(user)
 
-  return new BN(voterWeight)
+  return new BN(voterWeight.toString())
 }
 
 export const getParclGovPower = async (

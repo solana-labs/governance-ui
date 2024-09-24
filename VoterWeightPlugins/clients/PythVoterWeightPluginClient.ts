@@ -33,7 +33,7 @@ export class PythVoterWeightPluginClient extends Client<any> {
 
     async getVoterWeightRecordPDA(realm: PublicKey, mint: PublicKey, voter: PublicKey) {
         const stakeAccount = await this.getStakeAccount(voter)
-        const [address, bump] = getVoterWeightRecordAddress(stakeAccount.address);
+        const [address, bump] = getVoterWeightRecordAddress(stakeAccount);
 
         return {
             voterWeightPk: address,
@@ -58,10 +58,10 @@ export class PythVoterWeightPluginClient extends Client<any> {
         return null;
     }
 
-    private async getStakeAccount(voter: PublicKey): Promise<StakeAccountPositions> {
+    private async getStakeAccount(voter: PublicKey): Promise<PublicKey> {
         return queryClient.fetchQuery({
-            queryKey: ['pyth getStakeAccount', voter],
-            queryFn: () => this.client.getMainStakeAccount(voter),
+            queryKey: ['pyth getStakeAccount', voter.toBase58()],
+            queryFn: () => this.client.getMainStakeAccount(voter).then(x => x?.stakeAccountPosition),
         })
     }
 
@@ -76,7 +76,7 @@ export class PythVoterWeightPluginClient extends Client<any> {
         const stakeAccount = await this.getStakeAccount(voter)
 
         const ix = await this.client.getUpdateVoterWeightInstruction(
-            stakeAccount.address,
+            stakeAccount,
             { [convertVoterWeightActionToType(action)]: {} } as any,
             target,
         )
@@ -89,7 +89,7 @@ export class PythVoterWeightPluginClient extends Client<any> {
     }
     async calculateVoterWeight(voter: PublicKey): Promise<BN | null> {
         const voterWeight = await this.client.getVoterWeight(voter);
-        return new BN(voterWeight);
+        return new BN(voterWeight.toString());
     }
     
     constructor(
