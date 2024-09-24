@@ -1,11 +1,11 @@
 import {Client} from "@solana/governance-program-library";
 import {PublicKey, TransactionInstruction} from "@solana/web3.js";
 import BN from "bn.js";
-import {PythClient, StakeAccount, StakeConnection} from "@pythnetwork/staking";
-import {Provider, Wallet} from "@coral-xyz/anchor";
+import {Program, Provider, Wallet} from "@coral-xyz/anchor";
 import {VoterWeightAction} from "@solana/spl-governance";
 import {convertVoterWeightActionToType} from "../lib/utils";
 import queryClient from "@hooks/queries/queryClient";
+import { getMaxVoterWeightRecordAddress, getVoterWeightRecordAddress, PythStakingClient, StakeAccountPositions } from "@pythnetwork/staking-sdk";
 
 // A wrapper for the PythClient from @pythnetwork/staking, that implements the generic plugin client interface
 export class PythVoterWeightPluginClient extends Client<any> {
@@ -16,23 +16,36 @@ export class PythVoterWeightPluginClient extends Client<any> {
     }
 
     async getMaxVoterWeightRecordPDA() {
-        const maxVoterWeightPk =  (await this.client.program.methods.updateMaxVoterWeight().pubkeys()).maxVoterRecord
-
-        if (!maxVoterWeightPk) return null;
+        const [address, bump] = getMaxVoterWeightRecordAddress();
 
         return {
-            maxVoterWeightPk,
-            maxVoterWeightRecordBump: 0         // This is wrong for Pyth - but it doesn't matter as it is not used
+            maxVoterWeightPk: address,
+            maxVoterWeightRecordBump: bump,
         }
     }
 
+    async getMaxVoterWeightRecord(realm: PublicKey, mint: PublicKey) {
+        const {maxVoterWeightPk} = await this.getMaxVoterWeightRecordPDA();
+        return this.client.stakingProgram.account.maxVoterWeightRecord.fetch(
+            maxVoterWeightPk,
+        );
+    }
+
     async getVoterWeightRecordPDA(realm: PublicKey, mint: PublicKey, voter: PublicKey) {
-        const { voterWeightAccount } = await this.getUpdateVoterWeightPks([], voter, VoterWeightAction.CastVote, PublicKey.default);
+        const stakeAccount = await this.getStakeAccount(voter)
+        const [address, bump] = getVoterWeightRecordAddress(stakeAccount.address);
 
         return {
-            voterWeightPk: voterWeightAccount,
-            voterWeightRecordBump: 0         // This is wrong for Pyth - but it doesn't matter as it is not used
-        };
+            voterWeightPk: address,
+            voterWeightRecordBump: bump,
+        }
+    }
+
+    async getVoterWeightRecord(realm: PublicKey, mint: PublicKey, walletPk: PublicKey) {
+        const {voterWeightPk} = await this.getVoterWeightRecordPDA(realm, mint, walletPk);
+        return this.client.stakingProgram.account.voterWeightRecord.fetch(
+            voterWeightPk,
+        );
     }
 
     // NO-OP Pyth records are created through the Pyth dApp.
@@ -45,54 +58,64 @@ export class PythVoterWeightPluginClient extends Client<any> {
         return null;
     }
 
-    private async getStakeAccount(voter: PublicKey): Promise<StakeAccount> {
+    private async getStakeAccount(voter: PublicKey): Promise<StakeAccountPositions> {
         return queryClient.fetchQuery({
             queryKey: ['pyth getStakeAccount', voter],
-            queryFn: () => this.client.getMainAccount(voter),
+            queryFn: () => this.client.getMainStakeAccount(voter),
         })
     }
 
-    private async getUpdateVoterWeightPks(instructions: TransactionInstruction[], voter: PublicKey, action: VoterWeightAction, target?: PublicKey) {
+    async updateVoterWeightRecord(
+        voter: PublicKey,
+        realm: PublicKey,
+        mint: PublicKey,
+        action: VoterWeightAction,
+        inputRecordCallback?: () => Promise<PublicKey>,
+        target?: PublicKey
+    ) {
         const stakeAccount = await this.getStakeAccount(voter)
 
-        if (!stakeAccount) throw new Error("Stake account not found for voter " + voter.toString());
-        return this.client.withUpdateVoterWeight(
-            instructions,
-            stakeAccount,
+        const ix = await this.client.getUpdateVoterWeightInstruction(
+            stakeAccount.address,
             { [convertVoterWeightActionToType(action)]: {} } as any,
-            target
-        );
-    }
-
-    async updateVoterWeightRecord(voter: PublicKey, realm: PublicKey, mint: PublicKey, action: VoterWeightAction, inputRecordCallback?: () => Promise<PublicKey>, target?: PublicKey) {
-        const instructions: TransactionInstruction[] = [];
-        await this.getUpdateVoterWeightPks(instructions, voter, action, target);
-
-        return { pre: instructions };
+            target,
+        )
+        
+        return { pre: [ix] };
     }
     // NO-OP
     async updateMaxVoterWeightRecord(): Promise<TransactionInstruction | null> {
         return null;
     }
     async calculateVoterWeight(voter: PublicKey): Promise<BN | null> {
-        const stakeAccount = await this.getStakeAccount(voter)
-
-        if (stakeAccount) {
-            return stakeAccount.getVoterWeight(await this.client.getTime()).toBN()
-        } else {
-            return new BN(0)
-        }
+        const voterWeight = await this.client.getVoterWeight(voter);
+        return new BN(voterWeight);
     }
-    constructor(program: typeof PythClient.prototype.program, private client: StakeConnection, devnet:boolean) {
-        super(program, devnet);
+    
+    constructor(
+        program: Program<any>,
+        private client: PythStakingClient
+    ) {
+        super(program);
     }
 
-    static async connect(provider: Provider, devnet = false, wallet: Wallet): Promise<PythVoterWeightPluginClient> {
-        const pythClient = await PythClient.connect(
-            provider.connection,
-            wallet
-        )
+    static async connect(provider: Provider, programId: PublicKey, wallet: Wallet): Promise<PythVoterWeightPluginClient> {
+        const pythClient = new PythStakingClient({
+            connection: provider.connection,
+            wallet,
+        })
 
-        return new PythVoterWeightPluginClient(pythClient.program, pythClient, devnet);
+        const dummyProgram = new Program(
+            {
+                version: "",
+                name: 'unrecognised',
+                accounts: [],
+                instructions: []
+            },
+            programId,
+            provider
+        );
+
+        return new PythVoterWeightPluginClient(dummyProgram, pythClient);
     }
 }

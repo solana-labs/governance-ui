@@ -36,7 +36,7 @@ export const loadClient = (
     case 'gateway':
       return GatewayClient.connect(provider)
     case 'pyth':
-      return PythVoterWeightPluginClient.connect(provider, undefined, signer)
+      return PythVoterWeightPluginClient.connect(provider, programId, signer)
     case 'VSR':
       return VsrClient.connect(provider, programId)
     case 'HeliumVSR':
