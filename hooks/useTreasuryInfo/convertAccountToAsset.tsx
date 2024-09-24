@@ -2,7 +2,7 @@ import { BigNumber } from 'bignumber.js'
 
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import { AssetType, Asset } from '@models/treasury/Asset'
-import { getTreasuryAccountItemInfoV2 } from '@utils/treasuryTools'
+import { getTreasuryAccountItemInfoV2Async } from '@utils/treasuryTools'
 import TokenIcon from '@components/treasuryV2/icons/TokenIcon'
 import { WSOL_MINT } from '@components/instructions/tools'
 import { abbreviateAddress } from '@utils/formatting'
@@ -16,7 +16,7 @@ export const convertAccountToAsset = async (
   councilMintAddress?: string,
   communityMintAddress?: string
 ): Promise<Asset | null> => {
-  const info = getTreasuryAccountItemInfoV2(account)
+  const info = await getTreasuryAccountItemInfoV2Async(account)
 
   switch (account.type) {
     case AccountType.AUXILIARY_TOKEN:
