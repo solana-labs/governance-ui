@@ -16,7 +16,7 @@ import { StakeConnection } from "@parcl-oss/staking"
 import {
   LegacyVoterWeightAdapter,
 } from '@models/voteWeights'
-import { PythClient } from '@pythnetwork/staking'
+import { PythStakingClient } from "@pythnetwork/staking-sdk";
 import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet'
 import { findPluginName } from '@constants/plugins'
 import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
@@ -102,17 +102,12 @@ export const getPythGovPower = async (
 ): Promise<BN> => {
   if (!user) return new BN(0)
 
-  const pythClient = await PythClient.connect(
+  const pythClient = new PythStakingClient({
     connection,
-    new NodeWallet(new Keypair())
-  )
-  const stakeAccount = await pythClient.getMainAccount(user)
+  })
+  const voterWeight = await pythClient.getVoterWeight(user)
 
-  if (stakeAccount) {
-    return stakeAccount.getVoterWeight(await pythClient.getTime()).toBN()
-  } else {
-    return new BN(0)
-  }
+  return new BN(voterWeight)
 }
 
 export const getParclGovPower = async (
