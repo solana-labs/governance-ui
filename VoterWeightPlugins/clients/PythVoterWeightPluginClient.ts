@@ -7,7 +7,7 @@ import {convertVoterWeightActionToType} from "../lib/utils";
 import queryClient from "@hooks/queries/queryClient";
 import { getMaxVoterWeightRecordAddress, getVoterWeightRecordAddress, PythStakingClient, StakeAccountPositions } from "@pythnetwork/staking-sdk";
 
-// A wrapper for the PythClient from @pythnetwork/staking, that implements the generic plugin client interface
+// A wrapper for the PythClient from @pythnetwork/staking-sdk, that implements the generic plugin client interface
 export class PythVoterWeightPluginClient extends Client<any> {
     readonly requiresInputVoterWeight = false;
     // The pyth plugin does not have a registrar account
