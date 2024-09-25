@@ -13,8 +13,7 @@ import { NewProposalContext } from '../../../new'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { PublicKey } from '@solana/web3.js'
 import { AssetAccount } from '@utils/uiTypes/assets'
-import { StakeConnection, STAKING_ADDRESS } from '@pythnetwork/staking'
-import { Wallet } from '@coral-xyz/anchor'
+import { PythStakingClient } from '@pythnetwork/staking-sdk'
 
 export interface PythRecoverAccountForm {
   governedAccount: AssetAccount | null
@@ -52,14 +51,12 @@ const PythRecoverAccount = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const stakeConnection = await StakeConnection.createStakeConnection(
-        connection.current,
-        {} as Wallet,
-        STAKING_ADDRESS
-      )
+      const pythClient = new PythStakingClient({
+        connection: connection.current,
+      })
 
       const stakeAccountPublicKey = new PublicKey(form.stakeAccount)
-      const instruction = await stakeConnection.buildRecoverAccountInstruction(
+      const instruction = await pythClient.getRecoverAccountInstruction(
         stakeAccountPublicKey,
         form.governedAccount.governance.pubkey
       )
