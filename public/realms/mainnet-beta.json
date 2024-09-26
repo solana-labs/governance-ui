@@ -3646,5 +3646,16 @@
     "website": "https://deanslistdao.notion.site/JetSki-DAO-380d86533e154e4c8bbd66a11c54194f",
     "twitter": "@JetSkiDAO",
     "telegram": "https://t.me/+mlW159EpFtY1N2U0D"
-  }
-]
+  },
+  { 
+    "symbol": "PIBBLE",
+    "bannerImage": "/realms/PibbleDAO/banner.png",
+    "displayName": "Pibble's Treats",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "GqPQwmN6VdqPEez9MrHCwLGfjy8z7g1fe432thRBrpLL",
+    "communityMint": "6qoHodWitraGtWFiLEvUZPz9THQt2vUJzV9Xd68ykAYP",
+    "ogImage": "/realms/PibbleDAO/logo.png",
+    "website": "https://pibble.xyz",
+    "twitter": "@PibbleSolana",
+    "telegram": "https://web.telegram.org/a/#-1002038034452"
+  },
