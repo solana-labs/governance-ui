@@ -22,8 +22,6 @@ const TermsPopupModal = () => {
         setOpenModal(false)
       }
     }
-
-    console.log("Current accept-term state, ", localStorage.getItem("accept-terms"))
   })
 
   const acceptTerms = () => {
@@ -36,7 +34,6 @@ const TermsPopupModal = () => {
     router.push("https://realms.today#terms-rejected")
   }
 
-  console.log("Current Open Modal: ", openModal, "Current Set Client: ", isClient)
   return (
     <>
     {isClient && openModal ? 
