@@ -31,7 +31,7 @@ const TermsPopupModal = () => {
 
   const rejectTerms = () => {
     localStorage.setItem("accept-terms", "false")
-    router.push("https://realms.today#terms-rejected")
+    router.push("https://realms.today?terms=rejected")
   }
 
   return (
