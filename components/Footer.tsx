@@ -67,7 +67,7 @@ const Footer = () => {
           <SocialIcons className="mb-5" />
           <div className="flex flex-col justify-center sm:space-x-2 text-center text-sm opacity-70 sm:flex-row sm:text-sm sm:text-left">
             <div className="flex-shrink-0">
-              © 2024 The Realms Today Trust
+              © 2024 Realms Today Ltd
             </div>
             <span className="hidden sm:block mx-2">|</span>
             <Link href="https://realms.today/terms" passHref>
