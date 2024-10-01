@@ -3647,4 +3647,11 @@
     "twitter": "@JetSkiDAO",
     "telegram": "https://t.me/+mlW159EpFtY1N2U0D"
   }
+  { "symbol": "SOLI",
+    "displayName": "Commune, Eat, Tea",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "7s8AquN8vPfutRWFFSMHzfxUAGypbQA42iEpaJxH1Ub6",
+    "ogImage": "/realms/CET.jpg",
+    "website": "",
+    "twitter": "" },
 ]
