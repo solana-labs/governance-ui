@@ -750,6 +750,18 @@
     "twitter": "@goblingold_fi"
   },
   {
+    "symbol": "pumpkinSOL",
+    "displayName": "Pumpkin's Pool",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "EpvSHe3dnTQvz5qK8ks7zEbzA3ZABqaXW7fJfr8ULFiy",
+    "ogImage": "/realms/pumpkinspool/pumpkin.png",
+    "bannerImage": "/realms/pumpkinspool/pumpkin_header.png",
+    "website": "https:/pumpkinspool.eco",
+    "twitter": "@pumpkinspool",
+    "discord": "https://discord.gg/pF6pMHApwP",
+    "shortDescription": "Pumpkin’s Pool delivers top staking returns while supporting animal welfare."
+  },
+  {
     "symbol": "DAINV",
     "displayName": "Digital Asset Investing",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
