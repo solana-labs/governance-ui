@@ -13,8 +13,7 @@ import { NewProposalContext } from '../../../new'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { AssetAccount } from '@utils/uiTypes/assets'
-import { StakeConnection, STAKING_ADDRESS } from '@pythnetwork/staking'
-import { Wallet } from '@coral-xyz/anchor'
+import { PythStakingClient, getConfigAddress } from '@pythnetwork/staking-sdk'
 
 export interface PythUpdatePoolAuthorityForm {
   governedAccount: AssetAccount | null
@@ -54,19 +53,19 @@ const PythUpdatePoolAuthority = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const stakeConnection = await StakeConnection.createStakeConnection(
-        connection.current,
-        {} as Wallet,
-        STAKING_ADDRESS
-      )
+      const pythClient = new PythStakingClient({
+        connection: connection.current,
+      })
+
+      const [configAddress, _] = getConfigAddress();
 
       const poolAuthorityPublicKey = new PublicKey(form.poolAuthority)
       const instruction : TransactionInstruction = {
         keys: [
           {pubkey : form.governedAccount.governance.pubkey, isSigner: true, isWritable: false},
-          {pubkey : stakeConnection.configAddress, isSigner: false, isWritable: true},
+          {pubkey : configAddress, isSigner: false, isWritable: true},
         ],
-        programId : stakeConnection.program.programId,
+        programId : pythClient.stakingProgram.programId,
         data : Buffer.concat([INSTRUCTION_DISCRIMINATOR, poolAuthorityPublicKey.toBuffer()])
       }
 

@@ -33,7 +33,7 @@ export function GlobalFooter(props: Props) {
           'sm:text-sm',
         )}
       >
-        <div>© {year} The Realms Today Trust</div>
+        <div>© {year} Realms Today Ltd</div>
         <div className="hidden sm:block mx-2">|</div>
         <a href="https://realms.today/terms" target="_blank" rel="noreferrer">
           Terms

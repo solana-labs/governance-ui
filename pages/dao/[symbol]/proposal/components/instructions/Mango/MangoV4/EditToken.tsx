@@ -436,7 +436,7 @@ const EditToken = ({
       const currentToken = mangoGroup!.banksMapByMint.get(formTokenPk)![0]
       const groupInsuranceFund = mangoGroup.mintInfosMapByMint.get(formTokenPk)
         ?.groupInsuranceFund
-
+      console.log(currentToken.tier)
       const vals = {
         oraclePk: currentToken.oracle.toBase58(),
         fallbackOracle: currentToken.fallbackOracle.toBase58(),
@@ -488,6 +488,7 @@ const EditToken = ({
         platformLiquidationFee: currentToken.platformLiquidationFee.toNumber(),
         collateralFeePerDay: currentToken.collateralFeePerDay,
         disableAssetLiquidation: !currentToken.allowAssetLiquidation,
+        tier: currentToken.tier,
       }
       setForm((prevForm) => ({
         ...prevForm,
@@ -916,6 +917,13 @@ const EditToken = ({
       initialValue: form.forceWithdraw,
       type: InstructionInputType.SWITCH,
       name: 'forceWithdraw',
+    },
+    {
+      label: keyToLabel['tier'],
+      subtitle: getAdditionalLabelInfo('tier'),
+      initialValue: form.tier,
+      type: InstructionInputType.INPUT,
+      name: 'tier',
     },
   ]
 
