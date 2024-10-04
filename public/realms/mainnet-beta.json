@@ -3658,5 +3658,17 @@
     "website": "https://deanslistdao.notion.site/JetSki-DAO-380d86533e154e4c8bbd66a11c54194f",
     "twitter": "@JetSkiDAO",
     "telegram": "https://t.me/+mlW159EpFtY1N2U0D"
+  },
+  { 
+    "symbol": "MRGY",
+    "displayName": "Mergey",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "GgXxU6HPCMFmwYkuFdbkm8QAvVhWiexraZAy9CX4CYRU",
+    "communityMint": "4i1ZW16fF5EHunJ9hCV4nqz9ckmeM6hg11BREy5x2Knw",
+    "ogImage": "/realms/mergey/logo.png",
+    "shortDescription": "Acquire. Merge. Divest. Permissionless memecoin M&A on Solana.",
+    "website": "https://mergey.fun",
+    "twitter": "@mergeydotfun",
+    "telegram": "https://t.me/+vUtROD2-n_4xNzZh"
   }
 ]
