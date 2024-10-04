@@ -63,7 +63,7 @@ import DeactivateValidatorStake from './components/instructions/Validators/Deact
 import WithdrawValidatorStake from './components/instructions/Validators/WithdrawStake'
 import DelegateStake from './components/instructions/Validators/DelegateStake'
 import SplitStake from './components/instructions/Validators/SplitStake'
-import useCreateProposal from '@hooks/useCreateProposal'
+import useCreateProposal, { useCanCreateProposal } from '@hooks/useCreateProposal'
 import RealmConfig from './components/instructions/RealmConfig'
 import CloseTokenAccount from './components/instructions/CloseTokenAccount'
 import CloseMultipleTokenAccounts from './components/instructions/CloseMultipleTokenAccounts'
@@ -157,7 +157,7 @@ const schema = yup.object().shape({
 })
 
 const multiChoiceSchema = yup.object().shape({
-  governance: yup.string().required('Governance is required'),
+  governance: yup.object().required('Governance is required'),
 
   options: yup.array().of(yup.string().required('Option cannot be empty')),
 })
@@ -212,10 +212,10 @@ const New = () => {
     setVoteByCouncil,
   } = useVoteByCouncilToggle()
   const [multiChoiceForm, setMultiChoiceForm] = useState<{
-    governance: PublicKey | undefined
+    governance: ProgramAccount<Governance> | null
     options: string[]
   }>({
-    governance: undefined,
+    governance: null,
     options: ['', ''], // the multichoice form starts with 2 blank options for the poll
   })
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -331,7 +331,7 @@ const New = () => {
             proposalAddress = await proposeMultiChoice({
               title: form.title,
               description: form.description,
-              governance: multiChoiceForm.governance,
+              governance: multiChoiceForm.governance.pubkey,
               instructionsData: [],
               voteByCouncil,
               options,
@@ -647,6 +647,8 @@ const New = () => {
     [governance?.pubkey?.toBase58()]
   )
 
+  const { canCreateProposal, error, warning } = useCanCreateProposal(isMulti ? multiChoiceForm.governance : governance)
+
   return (
     <div className="grid grid-cols-12 gap-4">
       <div
@@ -845,7 +847,7 @@ const New = () => {
             )}
             <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
               <SecondaryButton
-                disabled={isLoading}
+                disabled={isLoading || !canCreateProposal}
                 isLoading={isLoadingDraft}
                 onClick={() => handleCreate(true)}
               >
@@ -853,12 +855,14 @@ const New = () => {
               </SecondaryButton>
               <Button
                 isLoading={isLoadingSignedProposal}
-                disabled={isLoading}
+                disabled={isLoading || !canCreateProposal}
                 onClick={() => handleCreate(false)}
               >
                 Add proposal
               </Button>
             </div>
+            {warning && <p className="p-2 text-right text-gray-400">{warning}</p>}
+            {error && <p className="p-2 text-right text-red-400">{error}</p>}
           </div>
         </>
       </div>
