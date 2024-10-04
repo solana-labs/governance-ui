@@ -212,7 +212,7 @@ const LockTokensModal = ({
         ? getMintDecimalAmount(
             mint,
             depositRecord?.amountDepositedNative.add(
-              new BN(realmTokenAccount!.account.amount)
+              new BN(realmTokenAccount?.account.amount ?? 0)
             )
           )
         : getMintDecimalAmount(mint, depositRecord?.amountDepositedNative)
@@ -224,7 +224,7 @@ const LockTokensModal = ({
         ? fmtMintAmount(
             mint,
             depositRecord?.amountDepositedNative.add(
-              new BN(realmTokenAccount!.account.amount)
+              new BN(realmTokenAccount?.account.amount ?? 0)
             )
           )
         : fmtMintAmount(mint, depositRecord?.amountDepositedNative)
