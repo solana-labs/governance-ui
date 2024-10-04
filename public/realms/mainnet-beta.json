@@ -750,6 +750,18 @@
     "twitter": "@goblingold_fi"
   },
   {
+    "symbol": "pumpkinSOL",
+    "displayName": "Pumpkin's Pool",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "EpvSHe3dnTQvz5qK8ks7zEbzA3ZABqaXW7fJfr8ULFiy",
+    "ogImage": "/realms/pumpkinspool/pumpkin_logo_cropped.png",
+    "bannerImage": "/realms/pumpkinspool/pumpkin_header.png",
+    "website": "https:/pumpkinspool.eco",
+    "twitter": "@pumpkinspool",
+    "discord": "https://discord.gg/pF6pMHApwP",
+    "shortDescription": "Pumpkin’s Pool delivers top staking returns while supporting animal welfare."
+  },
+  {
     "symbol": "DAINV",
     "displayName": "Digital Asset Investing",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -3660,5 +3672,16 @@
     "website": "https://ikb-token.co",
     "twitter": "@ikb_token",
     "telegram": "https://t.me/+8Fzp2CFx2yZiMDI5"
-  }  
-]
+  },
+  {
+    "symbol": "MRGY",
+    "displayName": "Mergey",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "GgXxU6HPCMFmwYkuFdbkm8QAvVhWiexraZAy9CX4CYRU",
+    "communityMint": "4i1ZW16fF5EHunJ9hCV4nqz9ckmeM6hg11BREy5x2Knw",
+    "ogImage": "/realms/mergey/logo.png",
+    "shortDescription": "Acquire. Merge. Divest. Permissionless memecoin M&A on Solana.",
+    "website": "https://mergey.fun",
+    "twitter": "@mergeydotfun",
+    "telegram": "https://t.me/+vUtROD2-n_4xNzZh"
+  }
