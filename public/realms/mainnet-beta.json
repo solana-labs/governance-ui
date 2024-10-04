@@ -3660,6 +3660,20 @@
     "telegram": "https://t.me/+mlW159EpFtY1N2U0D"
   },
   { 
+    "symbol": "IKB",
+    "bannerImage": "/realms/IKB/ikb_dao_banner.jpg",
+    "displayName": "International Klein Blue DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "6Tae5nNMnyNpCqrBMHoyNVVRdbYkwnvL9EgzQkin9aHN",
+    "communityMint": "F7viRR7XKFeDxMG441DC1KDZu8cFjPvGFF6tnKYNVvFc",
+    "ogImage": "/realms/IKB/ikb_dao_logo.jpg",
+    "shortDescription": "The first modern art meme token. The IKB DAO federates $IKB token holders, enabling them to collaborate to perform experiments and to support the art community.",
+    "keywords": "blue, International Klein Blue, art, modern art, artmeme, meme, art community, art experiments",
+    "website": "https://ikb-token.co",
+    "twitter": "@ikb_token",
+    "telegram": "https://t.me/+8Fzp2CFx2yZiMDI5"
+  },
+  {
     "symbol": "MRGY",
     "displayName": "Mergey",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
