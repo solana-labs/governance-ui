@@ -12,7 +12,6 @@ import { USDC_MINT } from '@blockworks-foundation/mango-v4'
 //decimals from metadata can be different from the realm on chain one
 const priceEndpoint = 'https://price.jup.ag/v4/price'
 const tokenListUrl = 'https://token.jup.ag/strict'
-//const tokenListUrl = 'https://tokens.jup.ag/tokens' // The full list is available but takes much longer to load
 
 export type TokenInfoWithoutDecimals = Omit<TokenInfo, 'decimals'>
 
@@ -22,11 +21,9 @@ class TokenPriceService {
   _tokenPriceToUSDlist: {
     [mintAddress: string]: Price
   }
-  _unverifiedTokenCache: { [mintAddress: string]: TokenInfoWithoutDecimals };
   constructor() {
     this._tokenList = []
     this._tokenPriceToUSDlist = {}
-    this._unverifiedTokenCache = {}
   }
   async fetchSolanaTokenList() {
     try {
@@ -116,50 +113,6 @@ class TokenPriceService {
       (x) => x.address === mintAddress
     )
     return tokenListRecord
-  }
-
-  // This async method is used to lookup additional tokens not on JUP's strict list
-  async getTokenInfoAsync(mintAddress: string): Promise<TokenInfoWithoutDecimals | undefined> {
-    if (!mintAddress || mintAddress.trim() === '') {
-      return undefined;
-    }
-    // Check the strict token list first
-    let tokenListRecord = this._tokenList?.find((x) => x.address === mintAddress);
-    if (tokenListRecord) {
-      return tokenListRecord;
-    }
-
-    // Check the unverified token list cache next to avoid repeatedly loading token metadata
-    if (this._unverifiedTokenCache[mintAddress]) {
-      return this._unverifiedTokenCache[mintAddress];
-    }
-
-    // Get the token data from JUP's api
-    const requestURL = `https://tokens.jup.ag/token/${mintAddress}`
-    const response = await axios.get(requestURL);
-
-    if (response.data) {
-      // Remove decimals and add chainId to match the TokenInfoWithoutDecimals struct
-      const { decimals, ...tokenInfoWithoutDecimals } = response.data;
-      const finalTokenInfo = {
-        ...tokenInfoWithoutDecimals,
-        chainId: 101
-      };
-
-      // Add to unverified token cache
-      this._unverifiedTokenCache[mintAddress] = finalTokenInfo;
-
-      return finalTokenInfo;
-    } else {
-      console.error(`Metadata retrieving failed for ${mintAddress}`);
-      return undefined;
-    }
-  } catch (e) {
-    notify({
-      type: 'error',
-      message: 'Unable to fetch token information',
-    });
-    return undefined;
   }
   /**
    * For decimals use on chain tryGetMint
