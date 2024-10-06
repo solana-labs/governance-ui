@@ -26,6 +26,7 @@ import {
   getFormattedStringFromDays,
   secsToDays,
   yearsToSecs,
+  daysToSecs,
 } from '@utils/dateTools'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { voteRegistryStartUnlock } from 'VoteStakeRegistry/actions/voteRegistryStartUnlock'
@@ -73,7 +74,12 @@ const LockTokensModal = ({
 
   const { vsrClient: client, plugin } = useVsrClient();
   const voteStakeRegistryRegistrar = plugin?.params as Registrar | undefined;
-
+  const saturationSecs = realm && voteStakeRegistryRegistrar ? 
+    voteStakeRegistryRegistrar.votingMints.find(x => x.mint.equals(
+      realm.account.communityMint
+    ))?.lockupSaturationSecs :
+    undefined
+  
   const { connection } = useConnection()
   const endpoint = connection.rpcEndpoint
   const wallet = useWalletOnePointOh()
@@ -82,6 +88,26 @@ const LockTokensModal = ({
 
   const lockupPeriods: Period[] = useMemo(() => {
     return [
+      {
+        defaultValue: 30,
+        display: '30d',
+      },
+      {
+        defaultValue: 60,
+        display: '60d',
+      },
+      {
+        defaultValue: 90,
+        display: '90d',
+      },
+      {
+        defaultValue: 120,
+        display: '120d',
+      },
+      {
+        defaultValue: 180,
+        display: '180d',
+      },
       {
         defaultValue: yearsToDays(1),
         display: '1y',
@@ -126,6 +152,13 @@ const LockTokensModal = ({
         return x.defaultValue <= secsToDays(fiveYearsSecs)
       })
   }, [depositToUnlock, fiveYearsSecs])
+
+  const lockupLen = lockupPeriods.length
+  const fixedlockupPeriods = lockupPeriods.slice(0, lockupLen-1)
+
+  const withinPeriod = saturationSecs ? 
+    lockupPeriods.findIndex(p => daysToSecs(p.defaultValue) >= saturationSecs.toNumber()) : 
+    5
 
   const maxNonCustomDaysLockup = lockupPeriods
     .map((x) => x.defaultValue)
@@ -432,7 +465,16 @@ const LockTokensModal = ({
                       lockupPeriods.find((p) => p.display === period)
                     )
                   }
-                  values={lockupPeriods.map((p) => p.display)}
+                  values={
+                    withinPeriod === -1 ?
+                      [...fixedlockupPeriods.filter((_, i) => i%2 === 0), lockupPeriods[lockupLen-1]]
+                      .map((p) => p.display) :
+                      [
+                        ...fixedlockupPeriods.slice(Math.floor(withinPeriod/2), Math.floor(withinPeriod/2)+6), 
+                        lockupPeriods[lockupLen-1]
+                      ]
+                      .map((p) => p.display)
+                  }
                 />
               </div>
               {lockupPeriod.display === 'Custom' && (

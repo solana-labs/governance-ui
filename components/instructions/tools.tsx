@@ -35,6 +35,8 @@ import { SWITCHBOARD_INSTRUCTIONS } from './programs/switchboard'
 import { STAKE_INSTRUCTIONS } from './programs/stake'
 import dayjs from 'dayjs'
 import { JUPITER_REF } from './programs/jupiterRef'
+import { STAKE_SANCTUM_INSTRUCTIONS } from './programs/stakeSanctum'
+import { SYMMETRY_V2_INSTRUCTIONS } from './programs/symmetryV2'
 
 /**
  * Default governance program id instance
@@ -326,6 +328,9 @@ export const ACCOUNT_NAMES = {
   '6gwjRFcW1Y9iuJwXPdz1zZUa3Hcu855dH6APA5LjD8qK':
     'AllDomains Treasury Governance',
   AWVUWfRnHCTgo123mRXB9BRWaxt6JdZXXKhFMQ5mryKJ: 'AllDomains DAO Governance',
+  
+  // Parcl
+  "9Waj7NNTzEhyHf1j1F36xgtnXaLoAxVBFhf6VxE9fgaf": 'Parcl DAO'
 }
 
 // TODO: Add this to on-chain metadata to Governance account
@@ -361,6 +366,8 @@ export const HIDDEN_PROPOSALS = new Map<string, string>([
   ['H5TnbSBNFKJJwKea8tUj7ETcmhRHXQ1N9XCXBSD6Q9P1', ''],
   ['GeMQWvFTasBoui11RqRzMtDPQ9b2BkMK8NzepWzvuXw3', ''],
   ['CRmUPr8CbfPQ4MAoo2yxSf5qL2nPsddL69kowMfp1JYP', ''],
+  ['8msNFq5VBectsGAv66zYx5QRve1p3m6ZEz49xaWX3tbd', ''],
+  ['3jU2YuKXKBw4cWx9taPDfhQZ8RFLmFUx3HLxMrh7w749', ''],
 ])
 
 export const DEFAULT_NATIVE_SOL_MINT =
@@ -398,6 +405,7 @@ export const HIDDEN_REALMS = [
   'FsoDEiZ9BoGTAaCLzXkyQWEqNKa5PW2iokzmuD7YsRdL',
   '9nUyxzVL2FUMuWUiVZG66gwK15CJiM3PoLkfrnGfkvt6', // old Drift dao
   '7mjEBafqqKA2K6SHezMrDV1zBoyNw6SKFcTsBbH2Kxgb', // openBook v2 council wrong config
+  '6NzVDMfEBJvkFDnjPx53K7mLGW3yQdSjLhsamS8go4cn', // old bonfida dao
 ]
 
 //owner and desired accounts we want to show
@@ -444,6 +452,18 @@ const MNGO_AUXILIARY_TOKEN_ACCOUNTS = [
   {
     owner: 'DdZWj3nWSzJMMv1LMTHm9gTJ37wHLNXTMzqjWCokvKEn',
     accounts: ['6XfCUQuq4juhqWLCW6LeivZd1eGuCRp4Mw3D6nkwXwFG'],
+  },
+  {
+    owner: '7v1dD4kTJcBC7zV9MSrz7Ddyz8Dvs24QUMnZeQQCxeyV',
+    accounts: ['CEGxhB84XffJBfXm8WphwSczrpaJX6cRJjZz3QqNWJSZ'],
+  },
+  {
+    owner: 'A99Whcw3pNdYXQ1DikQsLLNNjbsw8rD1zdvX4LTvZ8pD',
+    accounts: ['CkxhXSSgqBM7HrZE6zrQPBNCb7eHN4nm1FHd3Ad1XARX'],
+  },
+  {
+    owner: 'FRYXAjyVnvXja8chgdq47qL3CKoyBjUg4ro7M7QQn1aD',
+    accounts: ['24frxVoDzo7bAimBU6rDhB1McxWNvzX9qddPMSv9VACZ'],
   },
   //
 ]
@@ -495,7 +515,9 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...MANGO_V4_INSTRUCTIONS,
   ...DUAL_INSTRUCTIONS,
   ...STAKE_INSTRUCTIONS,
+  ...STAKE_SANCTUM_INSTRUCTIONS,
   ...JUPITER_REF,
+  ...SYMMETRY_V2_INSTRUCTIONS,
 }
 
 export async function getInstructionDescriptor(

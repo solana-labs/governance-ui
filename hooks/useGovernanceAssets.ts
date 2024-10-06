@@ -188,6 +188,10 @@ export default function useGovernanceAssets() {
       name: 'Solend',
       image: '/img/solend.png',
     },
+    [PackageEnum.Symmetry]: {
+      name: 'Symmetry',
+      image: '/img/symmetry.png',
+    },
     [PackageEnum.Squads]: {
       name: 'Squads',
       image: '/img/squads.png',
@@ -313,6 +317,14 @@ export default function useGovernanceAssets() {
     },
     [Instructions.StakeValidator]: {
       name: 'Stake A Validator',
+      packageId: PackageEnum.Common,
+    },
+    [Instructions.SanctumDepositStake]: {
+      name: 'Sanctum Deposit Stake',
+      packageId: PackageEnum.Common,
+    },
+    [Instructions.SanctumWithdrawStake]: {
+      name: 'Sanctum Withdraw Stake',
       packageId: PackageEnum.Common,
     },
     [Instructions.Transfer]: {
@@ -636,6 +648,10 @@ export default function useGovernanceAssets() {
       name: 'Recover Account',
       packageId: PackageEnum.Pyth,
     },
+    [Instructions.PythUpdatePoolAuthority]: {
+      name: 'Update Pool Authority',
+      packageId: PackageEnum.Pyth,
+    },
     /*
       ███████ ███████ ██████  ██    ██ ███    ███
       ██      ██      ██   ██ ██    ██ ████  ████
@@ -704,6 +720,30 @@ export default function useGovernanceAssets() {
     [Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity]: {
       name: 'Withdraw Funds',
       packageId: PackageEnum.Solend,
+    },
+
+    /*
+    ███████ ██    ██ ███    ███ ███    ███ ███████ ████████ ██████  ██    ██ 
+    ██       ██  ██  ████  ████ ████  ████ ██         ██    ██   ██  ██  ██  
+    ███████   ████   ██ ████ ██ ██ ████ ██ █████      ██    ██████    ████   
+         ██    ██    ██  ██  ██ ██  ██  ██ ██         ██    ██   ██    ██    
+    ███████    ██    ██      ██ ██      ██ ███████    ██    ██   ██    ██    
+    */
+    [Instructions.SymmetryCreateBasket]: {
+      name: 'Create Basket',
+      packageId: PackageEnum.Symmetry,
+    },
+    [Instructions.SymmetryEditBasket]: {
+      name: 'Edit Basket',
+      packageId: PackageEnum.Symmetry,
+    },
+    [Instructions.SymmetryDeposit]: {
+      name: 'Deposit into Basket',
+      packageId: PackageEnum.Symmetry,
+    },
+    [Instructions.SymmetryWithdraw]: {
+      name: 'Withdraw from Basket',
+      packageId: PackageEnum.Symmetry,
     },
     /*
     ███████  ██████  ██    ██  █████  ██████  ███████ 

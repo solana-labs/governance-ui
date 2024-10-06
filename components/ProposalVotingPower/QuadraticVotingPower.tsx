@@ -2,7 +2,6 @@ import classNames from 'classnames'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 
 import { GatewayStatus, useGateway } from '@civic/solana-gateway-react'
-import { useMembersQuery } from '@components/Members/useMembers'
 import { BN } from '@coral-xyz/anchor'
 import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
 import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
@@ -16,6 +15,8 @@ import { BigNumber } from 'bignumber.js'
 import { useMemo } from 'react'
 import PluginVotingPower from './PluginVotingPower'
 import QuadraticVotingInfoModal from './QuadraticVotingInfoModal'
+import { useTokenOwnerRecordsForRealmQuery } from '@hooks/queries/tokenOwnerRecord'
+import { Member } from '@utils/uiTypes/members'
 
 interface Props {
   className?: string
@@ -24,13 +25,17 @@ interface Props {
 
 export default function QuadraticVotingPower({ role, className }: Props) {
   const realm = useRealmQuery().data?.result
-  const { data: activeMembersData } = useMembersQuery()
+  const { data: activeMembersData } = useTokenOwnerRecordsForRealmQuery()
   const voterWeight = useDelegatorAwareVoterWeight(role)
 
   const mintInfo = useMintInfoByPubkeyQuery(realm?.account.communityMint).data
     ?.result
 
-  const activeMembers = useMemo(() => activeMembersData, [activeMembersData])
+  const activeMembers: Member[] | undefined = useMemo(() => activeMembersData?.map(member => ({
+    walletAddress: member.account.governingTokenOwner.toBase58(),
+    communityVotes: new BN(0),
+    councilVotes: new BN(0)
+  })), [activeMembersData])
 
   const isLoading = useDepositStore((s) => s.state.isLoading)
   const {

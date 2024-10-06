@@ -24,6 +24,7 @@ export enum PackageEnum {
   Pyth,
   Serum,
   Solend,
+  Symmetry,
   Squads,
   Switchboard,
   VsrPlugin,
@@ -120,7 +121,10 @@ export interface ClawbackForm {
   holdupTime: number
 }
 
-export interface SendTokenCompactViewForm extends SplTokenTransferForm {
+export interface SendTokenCompactViewForm extends Omit<SplTokenTransferForm, 'amount' | 'destinationAccount'> {
+  destinationAccount: string[]
+  amount: (number | undefined)[]
+  txDollarAmount: (string | undefined)[]
   description: string
   title: string
 }
@@ -371,6 +375,7 @@ export enum Instructions {
   SquadsMeshChangeThresholdMember,
   SquadsMeshRemoveMember,
   PythRecoverAccount,
+  PythUpdatePoolAuthority,
   StakeValidator,
   SwitchboardFundOracle,
   WithdrawFromOracle,
@@ -387,6 +392,12 @@ export enum Instructions {
   RemoveServiceFromDID,
   RevokeGoverningTokens,
   SetMintAuthority,
+  SanctumDepositStake,
+  SanctumWithdrawStake,
+  SymmetryCreateBasket,
+  SymmetryEditBasket,
+  SymmetryDeposit,
+  SymmetryWithdraw
 }
 
 export interface ComponentInstructionData {
@@ -542,4 +553,60 @@ export interface DualFinanceVoteDepositForm {
   numTokens: number
   realm: string | undefined
   delegateToken: AssetAccount | undefined
+}
+
+export interface SymmetryCreateBasketForm {
+  governedAccount?: AssetAccount,
+  basketType: number,
+  basketName: string,
+  basketSymbol: string,
+  basketMetadataUrl: string,
+  basketComposition: {
+    name: string,
+    symbol: string,
+    token: PublicKey;
+    weight: number;
+  }[],
+  rebalanceThreshold: number,
+  rebalanceSlippageTolerance: number,
+  depositFee: number,
+  feeCollectorAddress:string,
+  liquidityProvision: boolean,
+  liquidityProvisionRange: number,
+}
+
+
+export interface SymmetryEditBasketForm {
+  governedAccount?: AssetAccount,
+  basketAddress?: PublicKey,
+  basketType: number,
+  basketName: string,
+  basketSymbol: string,
+  basketMetadataUrl: string,
+  basketComposition: {
+    name: string,
+    symbol: string,
+    token: PublicKey;
+    weight: number;
+  }[],
+  rebalanceThreshold: number,
+  rebalanceSlippageTolerance: number,
+  depositFee: number,
+  feeCollectorAddress:string,
+  liquidityProvision: boolean,
+  liquidityProvisionRange: number,
+}
+
+export interface SymmetryDepositForm {
+  governedAccount?: AssetAccount,
+  basketAddress?: PublicKey,
+  depositToken?: PublicKey,
+  depositAmount: number,
+}
+
+export interface SymmetryWithdrawForm {
+  governedAccount?: AssetAccount,
+  basketAddress?: PublicKey,
+  withdrawAmount: number,
+  withdrawType: number
 }

@@ -11,6 +11,7 @@ export const VSR_PLUGIN_PKS: string[] = [
   'VoteWPk9yyGmkX4U77nEWRJWpcc8kUfrPoghxENpstL',
   'VoteMBhDCqGLRgYpp9o7DGyq81KNmwjXQRAHStjtJsS',
   '5sWzuuYkeWLBdAv3ULrBfqA51zF7Y4rnVzereboNDCPn',
+  'HBZ5oXbFBFbr8Krt2oMU7ApHFeukdRS8Rye1f3T66vg5',
 ]
 
 export const HELIUM_VSR_PLUGINS_PKS: string[] = [
@@ -35,6 +36,10 @@ export const PYTH_PLUGIN_PK: string[] = [
   'pytS9TjG1qyAZypk7n8rw8gfW9sUaqqYyMhJQ4E7JCQ',
 ]
 
+export const PARCL_PLUGIN_PK: string[] = [
+  '2gWf5xLAzZaKX9tQj9vuXsaxTWtzTZDFRn21J3zjNVgu',
+]
+
 export const DRIFT_PLUGIN_PK = [DRIFT_STAKE_VOTER_PLUGIN]
 
 export type PluginName =
@@ -47,6 +52,7 @@ export type PluginName =
   | 'pyth'
   | 'drift'
   | 'token_haver'
+  | 'parcl'
   | 'unknown'
 
 export const findPluginName = (programId: PublicKey | undefined): PluginName =>
@@ -68,6 +74,8 @@ export const findPluginName = (programId: PublicKey | undefined): PluginName =>
     ? 'drift'
     : TOKEN_HAVER_PLUGIN.toString() === programId.toString()
     ? 'token_haver'
+    : PARCL_PLUGIN_PK.includes(programId.toString())
+    ? 'parcl'
     : 'unknown'
 
 // Used when creating a new realm to choose which voterWeightAddin to use

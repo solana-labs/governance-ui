@@ -57,11 +57,13 @@ import ConfigureNftPluginCollection from './components/instructions/NftVotingPlu
 import SwitchboardFundOracle from './components/instructions/Switchboard/FundOracle'
 import WithdrawFromOracle from './components/instructions/Switchboard/WithdrawFromOracle'
 import StakeValidator from './components/instructions/Validators/StakeValidator'
+import SanctumDepositStake from './components/instructions/Validators/SanctumDepositStake'
+import SanctumWithdrawStake from './components/instructions/Validators/SanctumWithdrawStake'
 import DeactivateValidatorStake from './components/instructions/Validators/DeactivateStake'
 import WithdrawValidatorStake from './components/instructions/Validators/WithdrawStake'
 import DelegateStake from './components/instructions/Validators/DelegateStake'
 import SplitStake from './components/instructions/Validators/SplitStake'
-import useCreateProposal from '@hooks/useCreateProposal'
+import useCreateProposal, { useCanCreateProposal } from '@hooks/useCreateProposal'
 import RealmConfig from './components/instructions/RealmConfig'
 import CloseTokenAccount from './components/instructions/CloseTokenAccount'
 import CloseMultipleTokenAccounts from './components/instructions/CloseMultipleTokenAccounts'
@@ -139,6 +141,11 @@ import PythRecoverAccount from './components/instructions/Pyth/PythRecoverAccoun
 import { useVoteByCouncilToggle } from '@hooks/useVoteByCouncilToggle'
 import BurnTokens from './components/instructions/BurnTokens'
 import RemoveLockup from './components/instructions/Validators/removeLockup'
+import SymmetryCreateBasket from './components/instructions/Symmetry/SymmetryCreateBasket'
+import SymmetryEditBasket from './components/instructions/Symmetry/SymmetryEditBasket'
+import SymmetryDeposit from './components/instructions/Symmetry/SymmetryDeposit'
+import SymmetryWithdraw from './components/instructions/Symmetry/SymmetryWithdraw'
+import PythUpdatePoolAuthority from './components/instructions/Pyth/PythUpdatePoolAuthority'
 
 const TITLE_LENGTH_LIMIT = 130
 // the true length limit is either at the tx size level, and maybe also the total account size level (I can't remember)
@@ -150,7 +157,7 @@ const schema = yup.object().shape({
 })
 
 const multiChoiceSchema = yup.object().shape({
-  governance: yup.string().required('Governance is required'),
+  governance: yup.object().required('Governance is required'),
 
   options: yup.array().of(yup.string().required('Option cannot be empty')),
 })
@@ -205,10 +212,10 @@ const New = () => {
     setVoteByCouncil,
   } = useVoteByCouncilToggle()
   const [multiChoiceForm, setMultiChoiceForm] = useState<{
-    governance: PublicKey | undefined
+    governance: ProgramAccount<Governance> | null
     options: string[]
   }>({
-    governance: undefined,
+    governance: null,
     options: ['', ''], // the multichoice form starts with 2 blank options for the poll
   })
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -324,7 +331,7 @@ const New = () => {
             proposalAddress = await proposeMultiChoice({
               title: form.title,
               description: form.description,
-              governance: multiChoiceForm.governance,
+              governance: multiChoiceForm.governance.pubkey,
               instructionsData: [],
               voteByCouncil,
               options,
@@ -511,6 +518,7 @@ const New = () => {
       [Instructions.SquadsMeshAddMember]: MeshAddMember,
       [Instructions.SquadsMeshChangeThresholdMember]: MeshChangeThresholdMember,
       [Instructions.PythRecoverAccount]: PythRecoverAccount,
+      [Instructions.PythUpdatePoolAuthority]: PythUpdatePoolAuthority,
       [Instructions.CreateSolendObligationAccount]: CreateObligationAccount,
       [Instructions.InitSolendObligationAccount]: InitObligationAccount,
       [Instructions.DepositReserveLiquidityAndObligationCollateral]: DepositReserveLiquidityAndObligationCollateral,
@@ -537,6 +545,8 @@ const New = () => {
       [Instructions.CreateTokenMetadata]: CreateTokenMetadata,
       [Instructions.UpdateTokenMetadata]: UpdateTokenMetadata,
       [Instructions.StakeValidator]: StakeValidator,
+      [Instructions.SanctumDepositStake]: SanctumDepositStake,
+      [Instructions.SanctumWithdrawStake]: SanctumWithdrawStake,
       [Instructions.DeactivateValidatorStake]: DeactivateValidatorStake,
       [Instructions.WithdrawValidatorStake]: WithdrawValidatorStake,
       [Instructions.DelegateStake]: DelegateStake,
@@ -594,6 +604,10 @@ const New = () => {
       [Instructions.RemoveServiceFromDID]: RemoveServiceFromDID,
       [Instructions.RevokeGoverningTokens]: RevokeGoverningTokens,
       [Instructions.SetMintAuthority]: SetMintAuthority,
+      [Instructions.SymmetryCreateBasket]: SymmetryCreateBasket,
+      [Instructions.SymmetryEditBasket]: SymmetryEditBasket,
+      [Instructions.SymmetryDeposit]: SymmetryDeposit,
+      [Instructions.SymmetryWithdraw]: SymmetryWithdraw,
     }),
     [governance?.pubkey?.toBase58()]
   )
@@ -632,6 +646,8 @@ const New = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
     [governance?.pubkey?.toBase58()]
   )
+
+  const { canCreateProposal, error, warning } = useCanCreateProposal(isMulti ? multiChoiceForm.governance : governance)
 
   return (
     <div className="grid grid-cols-12 gap-4">
@@ -831,7 +847,7 @@ const New = () => {
             )}
             <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
               <SecondaryButton
-                disabled={isLoading}
+                disabled={isLoading || !canCreateProposal}
                 isLoading={isLoadingDraft}
                 onClick={() => handleCreate(true)}
               >
@@ -839,12 +855,14 @@ const New = () => {
               </SecondaryButton>
               <Button
                 isLoading={isLoadingSignedProposal}
-                disabled={isLoading}
+                disabled={isLoading || !canCreateProposal}
                 onClick={() => handleCreate(false)}
               >
                 Add proposal
               </Button>
             </div>
+            {warning && <p className="p-2 text-right text-gray-400">{warning}</p>}
+            {error && <p className="p-2 text-right text-red-400">{error}</p>}
           </div>
         </>
       </div>

@@ -228,21 +228,25 @@ export const getFormattedListingPresets = (
     PRESETS
   ).reduce((accumulator, key) => {
     let adjustedPreset = PRESETS[key]
-    if (uiDeposits && tokenPrice) {
-      adjustedPreset = getPresetWithAdjustedNetBorrows(
-        PRESETS[key],
-        uiDeposits,
-        tokenPrice,
-        toUiDecimals(PRESETS[key].netBorrowLimitPerWindowQuote, 6)
-      )
-    }
+    try {
+      if (uiDeposits && tokenPrice) {
+        adjustedPreset = getPresetWithAdjustedNetBorrows(
+          PRESETS[key],
+          uiDeposits,
+          tokenPrice,
+          toUiDecimals(PRESETS[key].netBorrowLimitPerWindowQuote, 6)
+        )
+      }
 
-    if (decimals && tokenPrice) {
-      adjustedPreset = getPresetWithAdjustedDepositLimit(
-        adjustedPreset,
-        tokenPrice,
-        decimals
-      )
+      if (decimals && tokenPrice) {
+        adjustedPreset = getPresetWithAdjustedDepositLimit(
+          adjustedPreset,
+          tokenPrice,
+          decimals
+        )
+      }
+    } catch (e) {
+      console.log(e)
     }
     accumulator[key] = transformPresetToProposed(adjustedPreset)
     return accumulator
@@ -640,7 +644,7 @@ export const getFormattedBankValues = (group: Group, bank: Bank) => {
     vault: bank.vault.toBase58(),
     oracle: bank.oracle.toBase58(),
     fallbackOracle: bank.fallbackOracle.toBase58(),
-    stablePrice: group.toUiPrice(
+    stablePrice: toUiDecimals(
       I80F48.fromNumber(bank.stablePriceModel.stablePrice),
       bank.mintDecimals
     ),

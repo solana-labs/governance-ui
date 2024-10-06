@@ -1,4 +1,4 @@
-import { Connection, LAMPORTS_PER_SOL } from '@solana/web3.js'
+import { Connection, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js'
 import { AccountMetaData } from '@solana/spl-governance'
 import * as BufferLayout from '@solana/buffer-layout'
 import dayjs from 'dayjs'
@@ -106,6 +106,59 @@ export const STAKE_INSTRUCTIONS = {
         } catch (e) {
           return <></>
         }
+      },
+    },
+    1: {
+      name: 'Stake Program - Change Authority',
+      accounts: [
+        { name: 'Stake Account' },
+        { name: '' },
+        { name: 'Authorized' },
+      ],
+      getDataUI: async (
+        _connection: Connection,
+        _data: Uint8Array,
+        _accounts: AccountMetaData[]
+      ) => {
+        const layout = BufferLayout.struct<any['Authorize']>([
+          BufferLayout.u32('instruction'),
+          BufferLayout.blob(32, 'newAuthorized'),
+          BufferLayout.u32('voteAuthorizationType'),
+        ])
+        const data = layout.decode(Buffer.from(_data))
+
+        return (
+          <>
+            <p>New Authority: {new PublicKey(data.newAuthorized).toBase58()}</p>
+            <p>
+              Change of:{' '}
+              {data.voteAuthorizationType === 0 ? 'Staker' : 'Withdrawer'}
+            </p>
+          </>
+        )
+      },
+    },
+    9: {
+      name: 'Stake Program - Deposit Stake',
+      accounts: [
+        { name: 'Stake Pool' },
+        { name: 'Validator List' },
+        { name: 'Deposit Authority' },
+        { name: 'Withdraw Authority' },
+        { name: 'Deposit Stake' },
+        { name: 'Validator Stake' },
+        { name: 'Reserve Stake' },
+        { name: 'Destination PoolAccount' },
+        { name: 'Manager Fee Account' },
+        { name: 'Referral Pool Account' },
+        { name: 'Pool Mint' },
+      ],
+      getDataUI: async (
+        _connection: Connection,
+        _data: Uint8Array,
+        _accounts: AccountMetaData[]
+      ) => {
+        return <></>
       },
     },
   },

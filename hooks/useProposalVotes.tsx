@@ -11,6 +11,7 @@ import {
 } from './queries/mintInfo'
 import { useGovernanceByPubkeyQuery } from './queries/governance'
 import usePythScalingFactor from './PythNetwork/useScalingFactor'
+import useParclScalingFactor from './parcl/useScalingFactor'
 
 // TODO support council plugins
 export default function useProposalVotes(proposal?: Proposal) {
@@ -23,6 +24,8 @@ export default function useProposalVotes(proposal?: Proposal) {
     ?.result?.account
   // This is always undefined except for Pyth
   const pythScalingFactor: number | undefined = usePythScalingFactor();
+  // This is always undefined except for parcl
+  const parclScalingFactor: number | undefined = useParclScalingFactor();
 
   const programVersion = useProgramVersion()
 
@@ -104,12 +107,12 @@ export default function useProposalVotes(proposal?: Proposal) {
     voteThresholdPct,
     yesVotePct,
     yesVoteProgress,
-    yesVoteCount: Math.floor(yesVoteCount * (pythScalingFactor || 1)),
-    noVoteCount: Math.floor(noVoteCount * (pythScalingFactor || 1)),
+    yesVoteCount: Math.floor(yesVoteCount * (pythScalingFactor || parclScalingFactor || 1)),
+    noVoteCount: Math.floor(noVoteCount * (pythScalingFactor || parclScalingFactor || 1)),
     relativeYesVotes,
     relativeNoVotes,
     minimumYesVotes,
-    yesVotesRequired: yesVotesRequired * (pythScalingFactor || 1),
+    yesVotesRequired: yesVotesRequired * (pythScalingFactor || parclScalingFactor || 1),
   }
 
   // @asktree: you may be asking yourself, "is this different from the more succinct way to write this?"

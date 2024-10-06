@@ -4,7 +4,7 @@ import type { EndpointInfo } from '../@types/types'
 import { DEVNET_RPC, MAINNET_RPC } from '@constants/endpoints'
 
 export const BACKUP_CONNECTIONS = [
-  new Connection('https://api.mngo.cloud/lite-rpc/v1/', 'recent'),
+  new Connection(`https://rpc.mngo.cloud/rlmk0lo5odee/`, 'recent'),
 ]
 
 const ENDPOINTS: EndpointInfo[] = [

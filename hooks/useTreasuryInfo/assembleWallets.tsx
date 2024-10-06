@@ -83,9 +83,14 @@ export async function fetchMangoAccounts(
   }
 
   const mangoAccountsValue = mangoAccounts.reduce((acc: I80F48, account) => {
-    const value = account.getAssetsValue(mangoGroup!)
-    acc = acc.add(value)
-    return acc
+    try {
+      const value = account.getAssetsValue(mangoGroup!)
+      acc = acc.add(value)
+      return acc
+    } catch (e) {
+      console.log(e)
+      return acc
+    }
   }, new I80F48(new BN(0)))
 
   return {

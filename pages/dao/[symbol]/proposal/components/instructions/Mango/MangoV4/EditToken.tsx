@@ -135,6 +135,7 @@ interface EditTokenForm {
   disableAssetLiquidation: boolean
   collateralFeePerDay: number
   forceWithdraw: boolean
+  tier: string
 }
 
 const defaultFormValues: EditTokenForm = {
@@ -190,6 +191,7 @@ const defaultFormValues: EditTokenForm = {
   disableAssetLiquidation: false,
   collateralFeePerDay: 0,
   forceWithdraw: false,
+  tier: '',
 }
 
 const EditToken = ({
@@ -351,12 +353,18 @@ const EditToken = ({
           getNullOrTransform(values.maintWeightShiftLiabTarget, null, Number),
           values.maintWeightShiftAbort!,
           values.setFallbackOracle!,
-          getNullOrTransform(values.depositLimit, BN),
+          getNullOrTransform(
+            values.depositLimit !== null && values.depositLimit !== undefined
+              ? values.depositLimit?.toString()
+              : null,
+            BN
+          ),
           getNullOrTransform(values.zeroUtilRate, null, Number),
           getNullOrTransform(values.platformLiquidationFee, null, Number),
           values.disableAssetLiquidation!,
           getNullOrTransform(values.collateralFeePerDay, null, Number),
-          values.forceWithdraw!
+          values.forceWithdraw!,
+          getNullOrTransform(values.tier, null, String)
         )
         .accounts({
           group: mangoGroup!.publicKey,
@@ -365,7 +373,7 @@ const EditToken = ({
           mintInfo: mintInfo.publicKey,
           fallbackOracle: form.fallbackOracle
             ? new PublicKey(form.fallbackOracle)
-            : bank.fallbackOracle,
+            : PublicKey.default,
         })
         .remainingAccounts([
           {
@@ -428,7 +436,7 @@ const EditToken = ({
       const currentToken = mangoGroup!.banksMapByMint.get(formTokenPk)![0]
       const groupInsuranceFund = mangoGroup.mintInfosMapByMint.get(formTokenPk)
         ?.groupInsuranceFund
-
+      console.log(currentToken.tier)
       const vals = {
         oraclePk: currentToken.oracle.toBase58(),
         fallbackOracle: currentToken.fallbackOracle.toBase58(),
@@ -479,6 +487,8 @@ const EditToken = ({
         zeroUtilRate: currentToken.zeroUtilRate.toNumber(),
         platformLiquidationFee: currentToken.platformLiquidationFee.toNumber(),
         collateralFeePerDay: currentToken.collateralFeePerDay,
+        disableAssetLiquidation: !currentToken.allowAssetLiquidation,
+        tier: currentToken.tier,
       }
       setForm((prevForm) => ({
         ...prevForm,
@@ -907,6 +917,13 @@ const EditToken = ({
       initialValue: form.forceWithdraw,
       type: InstructionInputType.SWITCH,
       name: 'forceWithdraw',
+    },
+    {
+      label: keyToLabel['tier'],
+      subtitle: getAdditionalLabelInfo('tier'),
+      initialValue: form.tier,
+      type: InstructionInputType.INPUT,
+      name: 'tier',
     },
   ]
 

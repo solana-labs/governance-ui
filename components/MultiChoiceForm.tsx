@@ -5,9 +5,10 @@ import { XCircleIcon } from '@heroicons/react/solid'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Input from '@components/inputs/Input'
 import GovernedAccountSelect from '../pages/dao/[symbol]/proposal/components/GovernedAccountSelect'
-import { PublicKey } from '@solana/web3.js'
 import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
+import { Governance, ProgramAccount } from '@solana/spl-governance'
+import { useEffect } from 'react'
 
 const MultiChoiceForm = ({
   multiChoiceForm,
@@ -17,7 +18,7 @@ const MultiChoiceForm = ({
   updateMultiFormErrors,
 }: {
   multiChoiceForm: {
-    governance: PublicKey | undefined
+    governance: ProgramAccount<Governance> | null
     options: string[]
   }
   updateMultiChoiceForm: any
@@ -36,6 +37,17 @@ const MultiChoiceForm = ({
     updateMultiFormErrors({})
     updateMultiChoiceForm({ ...multiChoiceForm, [propertyName]: value })
   }
+
+  const governedAccounts = assetAccounts.filter((x) =>
+    ownVoterWeight?.canCreateProposal(x.governance.account.config)
+  )
+
+  useEffect(() => {
+    handleMultiForm({
+      value: governedAccounts.length ? governedAccounts[0].governance : null,
+      propertyName: 'governance'
+    })
+  }, [governedAccounts.length]);
 
   const handleNotaButton = () => {
     const options = [...multiChoiceForm.options]
@@ -78,12 +90,10 @@ const MultiChoiceForm = ({
     <div className="mt-8 mb-8">
       <GovernedAccountSelect
         label="Which wallet’s rules should this proposal follow?"
-        governedAccounts={assetAccounts.filter((x) =>
-          ownVoterWeight?.canCreateProposal(x.governance.account.config)
-        )}
+        governedAccounts={governedAccounts}
         onChange={(value: AssetAccount) => {
           handleMultiForm({
-            value: value.governance.pubkey,
+            value: value.governance,
             propertyName: 'governance',
           })
         }}
@@ -91,7 +101,7 @@ const MultiChoiceForm = ({
           governance
             ? assetAccounts.find(
                 (x) =>
-                  x.governance.pubkey.equals(governance) &&
+                  x.governance.pubkey.equals(governance.pubkey) &&
                   x.type === AccountType.SOL
               )
             : null

@@ -24,14 +24,14 @@ const SetRealmConfigWarning = () => (
       </div>
       <div className="ml-3">
         <h3 className="text-sm font-medium text-yellow-800">
-          Instructions like this one are dangerous
+          Instructions like this one change the way the DAO is governed
         </h3>
         <div className="mt-2">
           <p className="text-sm text-yellow-700">
-            This proposal writes to your realm configuration, this could affect
-            how votes are counted. Both the instruction data AND accounts list
-            contain parameters. Do not pass this proposal if there are any
-            accounts you do not recognize.
+            This proposal writes to your realm configuration, which could affect how 
+            votes are counted. Both the instruction data AND accounts list contain parameters. 
+            Before you vote, make sure you review the proposal&apos;s instructions and the concerned 
+            accounts, and understand the implications of passing this proposal.
           </p>
         </div>
       </div>
@@ -75,14 +75,14 @@ const SetGovernanceConfig = () => (
       </div>
       <div className="ml-3">
         <h3 className="text-sm font-medium text-yellow-800">
-          Instructions like this one are dangerous
+          Instructions like this one change the way the DAO is governed
         </h3>
         <div className="mt-2">
           <p className="text-sm text-yellow-700">
-            This proposal writes to your governance configuration, this could
-            affect how votes are counted. Both the instruction data AND accounts
-            list contain parameters. Do not pass this proposal if there are any
-            accounts you do not recognize.
+            This proposal writes to your governance configuration, which could affect how 
+            votes are counted. Both the instruction data AND accounts list contain parameters. 
+            Before you vote, make sure you review the proposal&apos;s instructions and the concerned 
+            accounts, and understand the implications of passing this proposal.
           </p>
         </div>
       </div>

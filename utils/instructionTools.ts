@@ -20,7 +20,7 @@ import {
 } from '@tools/sdk/units'
 import { ConnectionContext } from 'utils/connection'
 import { getATA } from './ataTools'
-import { isFormValid } from './formValidation'
+import { isBatchFormValid, isFormValid } from './formValidation'
 import { UiInstruction } from './uiTypes/proposalCreationTypes'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import {
@@ -36,6 +36,16 @@ export const validateInstruction = async ({
   setFormErrors,
 }): Promise<boolean> => {
   const { isValid, validationErrors } = await isFormValid(schema, form)
+  setFormErrors(validationErrors)
+  return isValid
+}
+
+export const validateBatchInstruction = async ({
+  schema,
+  form,
+  setFormErrors,
+}): Promise<boolean> => {
+  const { isValid, validationErrors } = await isBatchFormValid(schema, form)
   setFormErrors(validationErrors)
   return isValid
 }
@@ -121,6 +131,97 @@ export async function getTransferInstruction({
   return obj
 }
 
+/** @deprecated */
+export async function getBatchTransferInstruction({
+  schema,
+  form,
+  programId,
+  connection,
+  wallet,
+  currentAccount,
+  setFormErrors,
+}: {
+  schema: any
+  form: any
+  programId: PublicKey | undefined
+  connection: ConnectionContext
+  wallet: WalletAdapter | undefined
+  currentAccount: AssetAccount | null
+  setFormErrors: any
+}): Promise<UiInstruction[]> {
+  const isValid = await validateBatchInstruction({ schema, form, setFormErrors })
+
+  const ixs: {
+    serializedInstruction: string,
+    prerequisiteInstructions: TransactionInstruction[]
+  }[] = []
+
+  for (let i = 0; i < form.destinationAccount.length; i++) {
+    let serializedInstruction = ''
+    const prerequisiteInstructions: TransactionInstruction[] = []
+    const governedTokenAccount = form.governedTokenAccount as AssetAccount
+    if (
+      isValid &&
+      programId &&
+      governedTokenAccount.extensions?.token?.publicKey &&
+      governedTokenAccount.extensions?.token &&
+      governedTokenAccount.extensions?.mint?.account
+    ) {
+      const sourceAccount = governedTokenAccount.extensions.transferAddress
+      //this is the original owner
+      const destinationAccount = new PublicKey(form.destinationAccount[i])
+      const mintPK = form.governedTokenAccount.extensions.mint.publicKey
+      const mintAmount = parseMintNaturalAmountFromDecimal(
+        form.amount[i]!,
+        governedTokenAccount.extensions.mint.account.decimals
+      )
+  
+      //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
+      const { currentAddress: receiverAddress, needToCreateAta } = await getATA({
+        connection: connection,
+        receiverAddress: destinationAccount,
+        mintPK,
+        wallet: wallet!,
+      })
+      //we push this createATA instruction to transactions to create right before creating proposal
+      //we don't want to create ata only when instruction is serialized
+      if (needToCreateAta) {
+        prerequisiteInstructions.push(
+          Token.createAssociatedTokenAccountInstruction(
+            ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+            TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+            mintPK, // mint
+            receiverAddress, // ata
+            destinationAccount, // owner of token account
+            wallet!.publicKey! // fee payer
+          )
+        )
+      }
+  
+      const transferIx = Token.createTransferInstruction(
+        TOKEN_PROGRAM_ID,
+        sourceAccount!,
+        receiverAddress,
+        currentAccount!.extensions!.token!.account.owner,
+        [],
+        new u64(mintAmount.toString())
+      )
+      serializedInstruction = serializeInstructionToBase64(transferIx)
+    }  
+    ixs.push({serializedInstruction, prerequisiteInstructions})
+  }
+  
+  const obj: UiInstruction[] = ixs.map(ix => ({
+    serializedInstruction: ix.serializedInstruction,
+    isValid,
+    governance: currentAccount?.governance,
+    prerequisiteInstructions: ix.prerequisiteInstructions,
+    chunkBy: 4,
+  }))
+
+  return obj
+}
+
 export async function getSolTransferInstruction({
   schema,
   form,
@@ -163,6 +264,63 @@ export async function getSolTransferInstruction({
     prerequisiteInstructions: prerequisiteInstructions,
     chunkBy: 4,
   }
+  return obj
+}
+
+export async function getBatchSolTransferInstruction({
+  schema,
+  form,
+  programId,
+  currentAccount,
+  setFormErrors,
+}: {
+  schema: any
+  form: any
+  programId: PublicKey | undefined
+  connection: ConnectionContext
+  wallet: WalletAdapter | undefined
+  currentAccount: AssetAccount | null
+  setFormErrors: any
+}): Promise<UiInstruction[]> {
+  const isValid = await validateBatchInstruction({ schema, form, setFormErrors })
+
+  const ixs: {
+    serializedInstruction: string,
+    prerequisiteInstructions: TransactionInstruction[]
+  }[] = []
+
+  for (let i = 0; i < form.destinationAccount.length; i++) {
+    let serializedInstruction = ''
+    const prerequisiteInstructions: TransactionInstruction[] = []
+    const governedTokenAccount = form.governedTokenAccount as AssetAccount
+    if (isValid && programId && governedTokenAccount?.extensions.mint?.account) {
+      const sourceAccount = governedTokenAccount.extensions.transferAddress
+      const destinationAccount = new PublicKey(form.destinationAccount[i])
+      //We have configured mint that has same decimals settings as SOL
+      const mintAmount = parseMintNaturalAmountFromDecimal(
+        form.amount[i]!,
+        governedTokenAccount.extensions.mint.account.decimals
+      )
+  
+      const transferIx = SystemProgram.transfer({
+        fromPubkey: sourceAccount!,
+        toPubkey: destinationAccount,
+        lamports: mintAmount,
+      })
+      serializedInstruction = serializeInstructionToBase64(transferIx)
+    }
+
+    ixs.push({serializedInstruction,prerequisiteInstructions})
+  }
+  
+  const obj: UiInstruction[] = ixs.map(ix => ({
+    serializedInstruction: ix.serializedInstruction,
+    isValid,
+    governance: currentAccount?.governance,
+    prerequisiteInstructions: ix.prerequisiteInstructions,
+    chunkBy: 4,
+  }))
+
   return obj
 }
 
