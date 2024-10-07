@@ -11,8 +11,6 @@ import asFindable from '@utils/queries/asFindable'
 import {
   useAddressQuery_CommunityTokenOwner,
   useAddressQuery_CouncilTokenOwner,
-  useAddressQuery_CommunityTokenOwnerByPK,
-  useAddressQuery_CouncilTokenOwnerByPK
 } from './addresses/tokenOwnerRecord'
 import { useRealmQuery } from './realm'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
@@ -284,15 +282,5 @@ export const useUserCommunityTokenOwnerRecord = () => {
 
 export const useUserCouncilTokenOwnerRecord = () => {
   const { data: tokenOwnerRecordPubkey } = useAddressQuery_CouncilTokenOwner()
-  return useTokenOwnerRecordByPubkeyQuery(tokenOwnerRecordPubkey)
-}
-
-export const useUserCommunityTokenOwnerRecordByPK = (pk: PublicKey | undefined) => {
-  const { data: tokenOwnerRecordPubkey } = useAddressQuery_CommunityTokenOwnerByPK(pk)
-  return useTokenOwnerRecordByPubkeyQuery(tokenOwnerRecordPubkey)
-}
-
-export const useUserCouncilTokenOwnerRecordByPK = (pk: PublicKey | undefined) => {
-  const { data: tokenOwnerRecordPubkey } = useAddressQuery_CouncilTokenOwnerByPK(pk)
   return useTokenOwnerRecordByPubkeyQuery(tokenOwnerRecordPubkey)
 }

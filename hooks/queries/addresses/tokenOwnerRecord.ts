@@ -5,17 +5,8 @@ import { useQuery } from '@tanstack/react-query'
 import { useRealmQuery } from '../realm'
 import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
 
-export const useAddressQuery_CouncilTokenOwnerByPK = (owner: PublicKey | undefined) => {
-  const realm = useRealmQuery().data?.result
-  return useAddressQuery_TokenOwnerRecord(
-    realm?.owner,
-    realm?.pubkey,
-    realm?.account.config.councilMint,
-    owner
-  )
-}
-
 export const useAddressQuery_CouncilTokenOwner = () => {
+  const realm = useRealmQuery().data?.result
   const wallet = useWalletOnePointOh()
   const selectedCouncilDelegator = useSelectedDelegatorStore(
     (s) => s.councilDelegator
@@ -27,20 +18,16 @@ export const useAddressQuery_CouncilTokenOwner = () => {
       ? selectedCouncilDelegator
       : wallet?.publicKey ?? undefined
 
-  return useAddressQuery_CouncilTokenOwnerByPK(owner)
-}
-
-export const useAddressQuery_CommunityTokenOwnerByPK = (owner: PublicKey | undefined) => {
-  const realm = useRealmQuery().data?.result
   return useAddressQuery_TokenOwnerRecord(
     realm?.owner,
     realm?.pubkey,
-    realm?.account.communityMint,
+    realm?.account.config.councilMint,
     owner
   )
 }
 
 export const useAddressQuery_CommunityTokenOwner = () => {
+  const realm = useRealmQuery().data?.result
   const wallet = useWalletOnePointOh()
   const selectedCommunityDelegator = useSelectedDelegatorStore(
     (s) => s.communityDelegator
@@ -53,7 +40,12 @@ export const useAddressQuery_CommunityTokenOwner = () => {
       : // I wanted to eliminate `null` as a possible type
         wallet?.publicKey ?? undefined
 
-  return useAddressQuery_CommunityTokenOwnerByPK(owner)
+  return useAddressQuery_TokenOwnerRecord(
+    realm?.owner,
+    realm?.pubkey,
+    realm?.account.communityMint,
+    owner
+  )
 }
 
 export const useAddressQuery_TokenOwnerRecord = (
