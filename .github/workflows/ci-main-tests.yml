@@ -26,7 +26,7 @@ jobs:
 
       - name: Run CodeQL
         uses: github/codeql-action/analyze@v2
-  
+
   sca:
     name: Dependency Scan
     runs-on: ubuntu-latest
@@ -54,37 +54,37 @@ jobs:
           format: 'table'
           severity: 'CRITICAL'
           exit-code: '1'
-      
+
       - name: Upload scan results
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
           sarif_file: 'trivy-results.sarif'
 
   test:
-      name: Run Tests
-      runs-on: ubuntu-latest
-      steps:
-        - name: Checkout repository
-          uses: actions/checkout@v4
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-        - name: Setup Node
-          uses: actions/setup-node@v4
-          with:
-            node-version: 20
-            cache: yarn
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
 
-        - name: Cache dependencies
-          uses: actions/cache@v3
-          with:
-            path: '**/node_modules'
-            key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
-        - name: Install dependencies
-          run: yarn ci
+      - name: Install dependencies
+        run: yarn ci
 
-        - name: Run tests
-          run: yarn test-all
+      - name: Run tests
+        run: yarn test-all
 
   pass:
     name: All tests pass
