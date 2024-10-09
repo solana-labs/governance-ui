@@ -26,7 +26,7 @@ import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
  * @param proposal Metadata about the proposal
  * @param instruction Instruction that will be executed by the proposal
  * @param adjacentTransaction Optional transaction that is sent in the same slot as the proposal instruction.
- * @param preExecutionTransactions Optional tansactions that are executed before the proposal instruction
+ * @param preExecutionTransactions Optional transactions that are executed before the proposal instruction
  */
 export const executeTransaction = async (
   { connection, wallet, programId }: RpcContext,
