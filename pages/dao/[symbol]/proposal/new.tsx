@@ -132,6 +132,7 @@ import DaoVote from './components/instructions/SplGov/DaoVote'
 import DualGso from './components/instructions/Dual/DualGso'
 import DualGsoWithdraw from './components/instructions/Dual/DualGsoWithdraw'
 import MultiChoiceForm from '../../../../components/MultiChoiceForm'
+import UnlockDeposit from 'VoteStakeRegistry/components/instructions/UnlockDeposit'
 import CloseVaults from './components/instructions/DistrubtionProgram/CloseVaults'
 import FillVaults from './components/instructions/DistrubtionProgram/FillVaults'
 import MeshRemoveMember from './components/instructions/Squads/MeshRemoveMember'
@@ -493,6 +494,7 @@ const New = () => {
       [Instructions.MangoV4TokenRegisterTrustless]: TokenRegisterTrustless,
       [Instructions.MangoV4TokenAddBank]: TokenAddBank,
       [Instructions.Grant]: Grant,
+      [Instructions.UnlockDeposit]: UnlockDeposit,
       [Instructions.Clawback]: Clawback,
       [Instructions.CreateAssociatedTokenAccount]: CreateAssociatedTokenAccount,
       [Instructions.DualFinanceAirdrop]: DualAirdrop,
