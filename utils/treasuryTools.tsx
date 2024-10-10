@@ -18,7 +18,7 @@ export const getTreasuryAccountItemInfoV2 = (account: AssetAccount) => {
       ? getMintDecimalAmountFromNatural(
           account.extensions.mint.account,
           new BN(
-            account.isSol
+            account.isSol && account.extensions.solAccount
               ? account.extensions.solAccount!.lamports
               : account.extensions.amount
           )
