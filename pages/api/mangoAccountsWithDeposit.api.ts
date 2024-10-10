@@ -12,9 +12,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (!mint) {
       return res.status(403).json('Please provide mint param')
     }
-    if (!process.env.BACKEND_MAINNET_RPC)
-      return res.status(500).json('BACKEND_MAINNET_RPC not provided in env')
-    const conn = new Connection(process.env.BACKEND_MAINNET_RPC, 'recent')
+    if (!process.env.MAINNET_RPC)
+      return res.status(500).json('MAINNET_RPC not provided in env')
+    const conn = new Connection(process.env.MAINNET_RPC, 'recent')
     const MAINNET_GROUP = new PublicKey(
       '78b8f4cGCwmZ9ysPFMWLaLTkkaYnUjwMJYStWe5RTSSX'
     )
