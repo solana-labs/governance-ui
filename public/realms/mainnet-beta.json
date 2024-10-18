@@ -3695,5 +3695,16 @@
     "ogImage": "/realms/PibbleDAO/logo.png",
     "website": "https://pibble.xyz",
     "twitter": "@PibbleSolana"
-  }
+  },
+  { 
+   "symbol": "kekeDao",
+   "displayName": "kekeDao",
+// programId and realmId can be found in the DAO's Dashboard > Params
+// programId refers to Owner address
+// realmId refers to Pubkey address
+   "programId": "GovRp7uazvmYkQ7gqjdfjKFwr6pHDcYFWH3SP9DHzdtR",
+   "realmId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+   "ogImage": "/realms/kekeDAO/kekeDAO_logo.jpg", // <--- path to logo
+   "bannerImage": "/realms/kekeDAO/kekeDAO_banner.png", // <--- path to banner
+},
   ]
