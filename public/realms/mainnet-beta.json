@@ -3695,5 +3695,14 @@
     "ogImage": "/realms/PibbleDAO/logo.png",
     "website": "https://pibble.xyz",
     "twitter": "@PibbleSolana"
+  },
+  { 
+    "symbol": "CyberFrogsDAO",
+    "displayName": "Cyber Frogs DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "8v4jTqqxuiNwwLnTX1DsXuT1nA5Gu9t6nfaEYsvrXFcs",
+    "ogImage": "/realms/Cyber Frogs DAO/Cyber Frogs DAO.png",
+    "website": "https://cyberfrogs.io/",
+    "twitter": "@CyberFrogsNFT"
   }
   ]
