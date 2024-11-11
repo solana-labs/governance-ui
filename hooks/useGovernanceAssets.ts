@@ -4,10 +4,10 @@ import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import { HELIUM_VSR_PLUGINS_PKS, VSR_PLUGIN_PKS } from '../constants/plugins'
 import { useRealmQuery } from './queries/realm'
 import { useRealmConfigQuery } from './queries/realmConfig'
-import { useRouter } from 'next/router'
 import { useRealmGovernancesQuery } from './queries/governance'
 import { useMemo } from 'react'
-import { useLegacyVoterWeight } from './queries/governancePower'
+import { useRealmVoterWeights } from '@hooks/useRealmVoterWeightPlugins'
+import { GovernanceConfig } from '@solana/spl-governance'
 
 type Package = {
   name: string
@@ -43,8 +43,19 @@ export type InstructionType = {
 export default function useGovernanceAssets() {
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
-  const { symbol } = useRouter().query
-  const { result: ownVoterWeight } = useLegacyVoterWeight()
+  const { communityWeight, councilWeight } = useRealmVoterWeights()
+  const ownVoterWeights = {
+    community: communityWeight?.value,
+    council: councilWeight?.value,
+  }
+
+  const canCreateProposal = (config: GovernanceConfig) => {
+    return (
+      ownVoterWeights.community?.gte(
+        config.minCommunityTokensToCreateProposal
+      ) || ownVoterWeights.council?.gte(config.minCouncilTokensToCreateProposal)
+    )
+  }
 
   const governedTokenAccounts: AssetAccount[] = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
@@ -67,12 +78,9 @@ export default function useGovernanceAssets() {
       realm &&
       assetAccounts
         .filter((x) => types.find((t) => t === x.type))
-        .some((govAcc) =>
-          ownVoterWeight?.canCreateProposal(govAcc.governance.account.config)
-        )
+        .some((govAcc) => canCreateProposal(govAcc.governance.account.config))
     )
   }
-
   const canMintRealmCouncilToken = () => {
     return !!assetAccounts.find(
       (x) =>
@@ -83,10 +91,7 @@ export default function useGovernanceAssets() {
     const governance = governancesArray.find(
       (x) => acc.governance.pubkey.toBase58() === x.pubkey.toBase58()
     )
-    return (
-      governance &&
-      ownVoterWeight?.canCreateProposal(governance?.account?.config)
-    )
+    return governance && canCreateProposal(governance?.account?.config)
   })
 
   const canUseProgramUpgradeInstruction = canUseGovernanceForInstruction([
@@ -99,9 +104,7 @@ export default function useGovernanceAssets() {
 
   const canUseAnyInstruction =
     realm &&
-    governancesArray.some((gov) =>
-      ownVoterWeight?.canCreateProposal(gov.account.config)
-    )
+    governancesArray.some((gov) => canCreateProposal(gov.account.config))
 
   const realmAuth =
     realm &&
@@ -109,7 +112,7 @@ export default function useGovernanceAssets() {
       (x) => x.pubkey.toBase58() === realm.account.authority?.toBase58()
     )
   const canUseAuthorityInstruction =
-    realmAuth && ownVoterWeight?.canCreateProposal(realmAuth?.account.config)
+    realmAuth && canCreateProposal(realmAuth?.account.config)
 
   const governedSPLTokenAccounts = governedTokenAccounts.filter(
     (x) => x.type === AccountType.TOKEN
@@ -125,10 +128,7 @@ export default function useGovernanceAssets() {
       const governance = governancesArray.find(
         (x) => acc.governance.pubkey.toBase58() === x.pubkey.toBase58()
       )
-      return (
-        governance &&
-        ownVoterWeight?.canCreateProposal(governance?.account?.config)
-      )
+      return governance && canCreateProposal(governance?.account?.config)
     }
   )
 
@@ -150,14 +150,8 @@ export default function useGovernanceAssets() {
     [PackageEnum.Distribution]: {
       name: 'Distribution Program',
     },
-    [PackageEnum.Foresight]: {
-      name: 'Foresight',
-      isVisible: symbol === 'FORE',
-      image: '/img/foresight.png',
-    },
-
     [PackageEnum.GatewayPlugin]: {
-      name: 'Gateway Plugin',
+      name: 'Civic Plugin',
       image: '/img/civic.svg',
     },
     [PackageEnum.Identity]: {
@@ -179,6 +173,10 @@ export default function useGovernanceAssets() {
       name: 'PsyFinance',
       image: '/img/psyfinance.png',
     },
+    [PackageEnum.Pyth]: {
+      name: 'Pyth',
+      image: '/img/pyth.svg',
+    },
     [PackageEnum.Serum]: {
       name: 'Serum',
       image: '/img/serum.png',
@@ -189,6 +187,14 @@ export default function useGovernanceAssets() {
     [PackageEnum.Solend]: {
       name: 'Solend',
       image: '/img/solend.png',
+    },
+    [PackageEnum.Symmetry]: {
+      name: 'Symmetry',
+      image: '/img/symmetry.png',
+    },
+    [PackageEnum.Squads]: {
+      name: 'Squads',
+      image: '/img/squads.png',
     },
     [PackageEnum.Switchboard]: {
       name: 'Switchboard',
@@ -265,6 +271,10 @@ export default function useGovernanceAssets() {
       name: 'Delegate Stake Account',
       packageId: PackageEnum.Common,
     },
+    [Instructions.RemoveStakeLock]: {
+      name: 'Stake Account Remove Lock',
+      packageId: PackageEnum.Common,
+    },
     [Instructions.DifferValidatorStake]: {
       name: 'Differ validator stake',
       // Not to be used for now
@@ -292,9 +302,7 @@ export default function useGovernanceAssets() {
       name: 'None',
       isVisible:
         realm &&
-        governancesArray.some((g) =>
-          ownVoterWeight?.canCreateProposal(g.account.config)
-        ),
+        governancesArray.some((g) => canCreateProposal(g.account.config)),
       packageId: PackageEnum.Common,
     },
     [Instructions.ProgramUpgrade]: {
@@ -311,8 +319,21 @@ export default function useGovernanceAssets() {
       name: 'Stake A Validator',
       packageId: PackageEnum.Common,
     },
+    [Instructions.SanctumDepositStake]: {
+      name: 'Sanctum Deposit Stake',
+      packageId: PackageEnum.Common,
+    },
+    [Instructions.SanctumWithdrawStake]: {
+      name: 'Sanctum Withdraw Stake',
+      packageId: PackageEnum.Common,
+    },
     [Instructions.Transfer]: {
       name: 'Transfer Tokens',
+      isVisible: canUseTokenTransferInstruction,
+      packageId: PackageEnum.Common,
+    },
+    [Instructions.Burn]: {
+      name: 'Burn Tokens',
       isVisible: canUseTokenTransferInstruction,
       packageId: PackageEnum.Common,
     },
@@ -335,6 +356,21 @@ export default function useGovernanceAssets() {
     },
     [Instructions.SplitStake]: {
       name: 'Split Stake Validator',
+      packageId: PackageEnum.Common,
+    },
+    [Instructions.DaoVote]: {
+      name: 'Vote in another DAO',
+      isVisible: canUseTransferInstruction,
+      packageId: PackageEnum.Common,
+    },
+    [Instructions.DualFinanceDelegateWithdraw]: {
+      name: 'Withdraw Vote Deposit',
+      isVisible: canUseTransferInstruction,
+      packageId: PackageEnum.Common,
+    },
+    [Instructions.DualFinanceVoteDeposit]: {
+      name: 'Join a VSR DAO',
+      isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Common,
     },
     /*
@@ -389,54 +425,6 @@ export default function useGovernanceAssets() {
       name: 'Delegate',
       isVisible: canUseTransferInstruction,
       packageId: PackageEnum.Dual,
-    },
-    [Instructions.DualFinanceDelegateWithdraw]: {
-      name: 'Withdraw Vote Deposit',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Dual,
-    },
-    [Instructions.DualFinanceVoteDeposit]: {
-      name: 'Vote Deposit',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Dual,
-    },
-    [Instructions.DualFinanceVote]: {
-      name: 'Vote',
-      isVisible: canUseTransferInstruction,
-      packageId: PackageEnum.Dual,
-    },
-
-    /*
-      ███████  ██████  ██████  ███████ ███████ ██  ██████  ██   ██ ████████
-      ██      ██    ██ ██   ██ ██      ██      ██ ██       ██   ██    ██
-      █████   ██    ██ ██████  █████   ███████ ██ ██   ███ ███████    ██
-      ██      ██    ██ ██   ██ ██           ██ ██ ██    ██ ██   ██    ██
-      ██       ██████  ██   ██ ███████ ███████ ██  ██████  ██   ██    ██
-    */
-
-    [Instructions.ForesightAddMarketListToCategory]: {
-      name: 'Add Market List To Category',
-      packageId: PackageEnum.Foresight,
-    },
-    [Instructions.ForesightInitCategory]: {
-      name: 'Init Category',
-      packageId: PackageEnum.Foresight,
-    },
-    [Instructions.ForesightInitMarket]: {
-      name: 'Init Market',
-      packageId: PackageEnum.Foresight,
-    },
-    [Instructions.ForesightInitMarketList]: {
-      name: 'Init Market List',
-      packageId: PackageEnum.Foresight,
-    },
-    [Instructions.ForesightResolveMarket]: {
-      name: 'Resolve Market',
-      packageId: PackageEnum.Foresight,
-    },
-    [Instructions.ForesightSetMarketMetadata]: {
-      name: 'Set Market Metadata',
-      packageId: PackageEnum.Foresight,
     },
 
     /*
@@ -650,6 +638,21 @@ export default function useGovernanceAssets() {
     },
 
     /*
+      ██████  ██    ██ ████████ ██   ██
+      ██   ██  ██  ██     ██    ██   ██
+      ██████    ████      ██    ███████
+      ██         ██       ██    ██   ██
+      ██         ██       ██    ██   ██
+    */
+    [Instructions.PythRecoverAccount]: {
+      name: 'Recover Account',
+      packageId: PackageEnum.Pyth,
+    },
+    [Instructions.PythUpdatePoolAuthority]: {
+      name: 'Update Pool Authority',
+      packageId: PackageEnum.Pyth,
+    },
+    /*
       ███████ ███████ ██████  ██    ██ ███    ███
       ██      ██      ██   ██ ██    ██ ████  ████
       ███████ █████   ██████  ██    ██ ██ ████ ██
@@ -719,6 +722,48 @@ export default function useGovernanceAssets() {
       packageId: PackageEnum.Solend,
     },
 
+    /*
+    ███████ ██    ██ ███    ███ ███    ███ ███████ ████████ ██████  ██    ██ 
+    ██       ██  ██  ████  ████ ████  ████ ██         ██    ██   ██  ██  ██  
+    ███████   ████   ██ ████ ██ ██ ████ ██ █████      ██    ██████    ████   
+         ██    ██    ██  ██  ██ ██  ██  ██ ██         ██    ██   ██    ██    
+    ███████    ██    ██      ██ ██      ██ ███████    ██    ██   ██    ██    
+    */
+    [Instructions.SymmetryCreateBasket]: {
+      name: 'Create Basket',
+      packageId: PackageEnum.Symmetry,
+    },
+    [Instructions.SymmetryEditBasket]: {
+      name: 'Edit Basket',
+      packageId: PackageEnum.Symmetry,
+    },
+    [Instructions.SymmetryDeposit]: {
+      name: 'Deposit into Basket',
+      packageId: PackageEnum.Symmetry,
+    },
+    [Instructions.SymmetryWithdraw]: {
+      name: 'Withdraw from Basket',
+      packageId: PackageEnum.Symmetry,
+    },
+    /*
+    ███████  ██████  ██    ██  █████  ██████  ███████ 
+    ██      ██    ██ ██    ██ ██   ██ ██   ██ ██      
+    ███████ ██    ██ ██    ██ ███████ ██   ██ ███████ 
+         ██ ██ ▄▄ ██ ██    ██ ██   ██ ██   ██      ██ 
+    ███████  ██████   ██████  ██   ██ ██████  ███████ 
+    */
+    [Instructions.SquadsMeshAddMember]: {
+      name: 'Mesh Add Member',
+      packageId: PackageEnum.Squads,
+    },
+    [Instructions.SquadsMeshChangeThresholdMember]: {
+      name: 'Mesh Change Threshold',
+      packageId: PackageEnum.Squads,
+    },
+    [Instructions.SquadsMeshRemoveMember]: {
+      name: 'Mesh Remove Member',
+      packageId: PackageEnum.Squads,
+    },
     /*
       ███████ ██     ██ ██ ████████  ██████ ██   ██ ██████   ██████   █████  ██████  ██████
       ██      ██     ██ ██    ██    ██      ██   ██ ██   ██ ██    ██ ██   ██ ██   ██ ██   ██

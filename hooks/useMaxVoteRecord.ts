@@ -1,15 +1,17 @@
-import { useMemo } from 'react'
-import { MaxVoterWeightRecord, ProgramAccount } from '@solana/spl-governance'
-import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
-import useHeliumVsrStore from 'HeliumVotePlugin/hooks/useHeliumVsrStore'
+import {getMaxVoterWeightRecord} from '@solana/spl-governance'
+import {useRealmVoterWeightPlugins} from "@hooks/useRealmVoterWeightPlugins";
+import {useConnection} from "@solana/wallet-adapter-react";
+import {useAsync} from "react-async-hook";
 
 export const useMaxVoteRecord = () => {
-  const nftMaxVoteRecord = useNftPluginStore((s) => s.state.maxVoteRecord)
-  const heliumMaxVoteRecord = useHeliumVsrStore((s) => s.state.maxVoteRecord)
-  const maxVoteWeightRecord: ProgramAccount<MaxVoterWeightRecord> | null = useMemo(
-    () => nftMaxVoteRecord || heliumMaxVoteRecord || null,
-    [nftMaxVoteRecord, heliumMaxVoteRecord]
-  )
+  const { connection } = useConnection()
+  const { maxVoterWeightPk } = useRealmVoterWeightPlugins();
 
-  return maxVoteWeightRecord
+  const maxVoteWeightRecord = useAsync(async () =>
+          maxVoterWeightPk &&
+          getMaxVoterWeightRecord(connection, maxVoterWeightPk),
+      [maxVoterWeightPk?.toBase58()]
+  );
+
+  return maxVoteWeightRecord.result
 }

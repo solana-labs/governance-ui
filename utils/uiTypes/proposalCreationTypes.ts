@@ -6,7 +6,6 @@ import { getNameOf } from '@tools/core/script'
 import { SupportedMintName } from '@tools/sdk/solend/configuration'
 import { DepositWithMintAccount, Voter } from 'VoteStakeRegistry/sdk/accounts'
 import { LockupKind } from 'VoteStakeRegistry/tools/types'
-import { consts as foresightConsts } from '@foresight-tmp/foresight-sdk'
 import { AssetAccount, StakeAccount } from '@utils/uiTypes/assets'
 import { RealmInfo } from '@models/registry/api'
 import * as PaymentStreaming from '@mean-dao/payment-streaming'
@@ -14,19 +13,21 @@ import * as PaymentStreaming from '@mean-dao/payment-streaming'
 // Alphabetical order
 export enum PackageEnum {
   Common,
+  Distribution,
   Dual,
-  Foresight,
   GatewayPlugin,
   Identity,
-  NftPlugin,
   MangoMarketV4,
   MeanFinance,
+  NftPlugin,
   PsyFinance,
+  Pyth,
   Serum,
   Solend,
+  Symmetry,
+  Squads,
   Switchboard,
   VsrPlugin,
-  Distribution,
 }
 
 export interface UiInstruction {
@@ -46,6 +47,12 @@ export interface SplTokenTransferForm {
   amount: number | undefined
   governedTokenAccount: AssetAccount | undefined
   programId: string | undefined
+  mintInfo: MintInfo | undefined
+}
+
+export interface BurnTokensForm {
+  amount: number | undefined
+  governedTokenAccount: AssetAccount | undefined
   mintInfo: MintInfo | undefined
 }
 
@@ -114,7 +121,10 @@ export interface ClawbackForm {
   holdupTime: number
 }
 
-export interface SendTokenCompactViewForm extends SplTokenTransferForm {
+export interface SendTokenCompactViewForm extends Omit<SplTokenTransferForm, 'amount' | 'destinationAccount'> {
+  destinationAccount: string[]
+  amount: (number | undefined)[]
+  txDollarAmount: (string | undefined)[]
   description: string
   title: string
 }
@@ -188,35 +198,6 @@ export interface PsyFinanceExerciseOption {
 
 /* End PsyOptions American options */
 
-export interface ForesightHasGovernedAccount {
-  governedAccount: AssetAccount
-}
-
-export interface ForesightHasMarketListId extends ForesightHasGovernedAccount {
-  marketListId: string
-}
-
-export interface ForesightHasMarketId extends ForesightHasMarketListId {
-  marketId: number
-}
-
-export interface ForesightHasCategoryId extends ForesightHasGovernedAccount {
-  categoryId: string
-}
-
-export interface ForesightMakeAddMarketListToCategoryParams
-  extends ForesightHasCategoryId,
-    ForesightHasMarketListId {}
-
-export interface ForesightMakeResolveMarketParams extends ForesightHasMarketId {
-  winner: number
-}
-
-export interface ForesightMakeSetMarketMetadataParams
-  extends ForesightHasMarketId {
-  content: string
-  field: foresightConsts.MarketMetadataFieldName
-}
 export interface Base64InstructionForm {
   governedAccount: AssetAccount | undefined
   base64: string
@@ -315,6 +296,7 @@ export interface JoinDAOForm {
 
 export enum Instructions {
   Base64,
+  Burn,
   ChangeMakeDonation,
   Clawback,
   CloseTokenAccount,
@@ -342,16 +324,11 @@ export enum Instructions {
   DualFinanceDelegate,
   DualFinanceDelegateWithdraw,
   DualFinanceVoteDeposit,
-  DualFinanceVote,
+  DaoVote,
   DistributionCloseVaults,
   DistributionFillVaults,
   DelegateStake,
-  ForesightAddMarketListToCategory,
-  ForesightInitCategory,
-  ForesightInitMarket,
-  ForesightInitMarketList,
-  ForesightResolveMarket,
-  ForesightSetMarketMetadata,
+  RemoveStakeLock,
   Grant,
   InitSolendObligationAccount,
   JoinDAO,
@@ -394,6 +371,11 @@ export enum Instructions {
   SerumInitUser,
   SerumUpdateGovConfigAuthority,
   SerumUpdateGovConfigParams,
+  SquadsMeshAddMember,
+  SquadsMeshChangeThresholdMember,
+  SquadsMeshRemoveMember,
+  PythRecoverAccount,
+  PythUpdatePoolAuthority,
   StakeValidator,
   SwitchboardFundOracle,
   WithdrawFromOracle,
@@ -410,6 +392,12 @@ export enum Instructions {
   RemoveServiceFromDID,
   RevokeGoverningTokens,
   SetMintAuthority,
+  SanctumDepositStake,
+  SanctumWithdrawStake,
+  SymmetryCreateBasket,
+  SymmetryEditBasket,
+  SymmetryDeposit,
+  SymmetryWithdraw
 }
 
 export interface ComponentInstructionData {
@@ -469,6 +457,11 @@ export interface ValidatorWithdrawStakeForm {
   amount: number
 }
 
+export interface ValidatorRemoveLockup {
+  governedTokenAccount: AssetAccount | undefined
+  stakeAccount: string
+}
+
 export interface DelegateStakeForm {
   governedTokenAccount: AssetAccount | undefined
   stakingAccount: StakeAccount | undefined
@@ -488,7 +481,7 @@ export interface DualFinanceStakingOptionForm {
   strike: number
   soName: string | undefined
   optionExpirationUnixSeconds: number
-  numTokens: number
+  numTokens: string
   lotSize: number
   baseTreasury: AssetAccount | undefined
   quoteTreasury: AssetAccount | undefined
@@ -504,6 +497,7 @@ export interface DualFinanceGsoForm {
   lotSize: number
   subscriptionPeriodEnd: number
   lockupRatio: number
+  lockupMint: string
   baseTreasury: AssetAccount | undefined
   quoteTreasury: AssetAccount | undefined
   payer: AssetAccount | undefined
@@ -559,4 +553,60 @@ export interface DualFinanceVoteDepositForm {
   numTokens: number
   realm: string | undefined
   delegateToken: AssetAccount | undefined
+}
+
+export interface SymmetryCreateBasketForm {
+  governedAccount?: AssetAccount,
+  basketType: number,
+  basketName: string,
+  basketSymbol: string,
+  basketMetadataUrl: string,
+  basketComposition: {
+    name: string,
+    symbol: string,
+    token: PublicKey;
+    weight: number;
+  }[],
+  rebalanceThreshold: number,
+  rebalanceSlippageTolerance: number,
+  depositFee: number,
+  feeCollectorAddress:string,
+  liquidityProvision: boolean,
+  liquidityProvisionRange: number,
+}
+
+
+export interface SymmetryEditBasketForm {
+  governedAccount?: AssetAccount,
+  basketAddress?: PublicKey,
+  basketType: number,
+  basketName: string,
+  basketSymbol: string,
+  basketMetadataUrl: string,
+  basketComposition: {
+    name: string,
+    symbol: string,
+    token: PublicKey;
+    weight: number;
+  }[],
+  rebalanceThreshold: number,
+  rebalanceSlippageTolerance: number,
+  depositFee: number,
+  feeCollectorAddress:string,
+  liquidityProvision: boolean,
+  liquidityProvisionRange: number,
+}
+
+export interface SymmetryDepositForm {
+  governedAccount?: AssetAccount,
+  basketAddress?: PublicKey,
+  depositToken?: PublicKey,
+  depositAmount: number,
+}
+
+export interface SymmetryWithdrawForm {
+  governedAccount?: AssetAccount,
+  basketAddress?: PublicKey,
+  withdrawAmount: number,
+  withdrawType: number
 }

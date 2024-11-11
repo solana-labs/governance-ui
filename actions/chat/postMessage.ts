@@ -21,6 +21,7 @@ import {
   sendTransactionsV3,
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
+import { sendSignAndConfirmTransactionsProps } from '@blockworks-foundation/mangolana/lib/transactions'
 
 export async function postChatMessage(
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -40,7 +41,6 @@ export async function postChatMessage(
   //will run only if plugin is connected with realm
   const plugin = await client?.withUpdateVoterWeightRecord(
     instructions,
-    tokeOwnerRecord.pubkey,
     'commentProposal',
     createNftTicketsIxs
   )
@@ -90,14 +90,29 @@ export async function postChatMessage(
     }),
   ]
 
-  await sendTransactionsV3({
+  await postComment({
     connection,
     wallet,
     transactionInstructions: instructionsChunks,
     callbacks: undefined,
   })
+}
 
-  // const transaction = new Transaction()
-  // transaction.add(...instructions)
-  // await sendTransaction({ transaction, wallet, connection, signers })
+export async function postComment(
+  transactionProps: sendSignAndConfirmTransactionsProps & {
+    lookupTableAccounts?: any
+    autoFee?: boolean
+}) {
+  try {
+    await sendTransactionsV3(transactionProps)
+  } catch (e) {
+    if (e.message.indexOf('Transaction too large:') !== -1) {
+      const numbers = e.message.match(/\d+/g)
+      const [size, maxSize] = numbers ? numbers.map(Number) : [0, 0]
+      if (size > maxSize) {
+        throw new Error(`You must reduce your comment by ${size - maxSize} character(s).`)
+      }
+    }
+    throw e
+  }
 }

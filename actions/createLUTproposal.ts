@@ -9,13 +9,15 @@ import {
   Realm,
   TokenOwnerRecord,
   VoteType,
-  withCreateProposal,
   getSignatoryRecordAddress,
   withInsertTransaction,
   withSignOffProposal,
   withAddSignatory,
   RpcContext,
 } from '@solana/spl-governance'
+import {
+  withCreateProposal
+} from '@realms-today/spl-governance'
 import {
   sendTransactionsV3,
   SequenceType,
@@ -72,7 +74,6 @@ export const createLUTProposal = async (
   //will run only if plugin is connected with realm
   const plugin = await client?.withUpdateVoterWeightRecord(
     instructions,
-    tokenOwnerRecord.pubkey,
     'createProposal'
   )
 

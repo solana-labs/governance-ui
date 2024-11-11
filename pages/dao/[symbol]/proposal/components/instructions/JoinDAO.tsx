@@ -162,7 +162,7 @@ const JoinDAO = ({
       ((routeHasClusterInPath && cluster) || !routeHasClusterInPath)
     ) {
       const realms = getCertifiedRealmInfos(connection)
-      setCertifiedRealms(realms.filter((r) => !!r.communityMint))
+      setCertifiedRealms(realms)
     } else setCertifiedRealms([])
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
   }, [connection.current.rpcEndpoint])
@@ -201,7 +201,11 @@ const JoinDAO = ({
         error={formErrors['realm']}
       >
         {certifiedRealms.map((r) => (
-          <Select.Option className="border-red" key="haha" value={r}>
+          <Select.Option
+            className="border-red"
+            key={r.realmId.toString()}
+            value={r}
+          >
             {r.displayName}
           </Select.Option>
         ))}

@@ -1,24 +1,28 @@
-import { NFT_PLUGINS_PKS } from '@constants/plugins';
-import { AnchorProvider, Wallet } from '@project-serum/anchor';
-
 import {
-  RealmConfig,
-  RealmConfigAccount,
+  Coefficients,
+  GatewayClient,
+} from '@solana/governance-program-library';
+import { QuadraticClient } from '@solana/governance-program-library/dist/quadraticVoter/client';
+import {
   getRealm,
   getRealmConfigAddress,
-  ProgramAccount,
   GovernanceAccountParser,
-  GoverningTokenType,
   GoverningTokenConfig,
+  GoverningTokenType,
+  ProgramAccount,
+  RealmConfig,
+  RealmConfigAccount,
 } from '@solana/spl-governance';
 import { Connection, PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
 
+import { QuadraticPluginParams } from 'VoterWeightPlugins/useQuadraticVoterWeightPlugin';
 import { tryGetNftRegistrar } from 'VoteStakeRegistry/sdk/api';
 
-import { getNetworkFromEndpoint } from '@utils/connection';
+import { AnchorParams } from '../../../QuadraticPlugin/sdk/api';
+import { VoterWeightPluginInfo } from '../../../VoterWeightPlugins/lib/types';
 import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts';
-import { parseMintAccountData, MintAccount } from '@utils/tokens';
+import { MintAccount, parseMintAccountData } from '@utils/tokens';
 import { NftVoterClient } from '@utils/uiTypes/NftVoterClient';
 
 export interface Config {
@@ -32,12 +36,15 @@ export interface Config {
   nftCollectionSize: number;
   nftCollectionWeight: BN;
   realmAuthority?: PublicKey;
+  civicPassType?: PublicKey;
+  chainingEnabled: boolean;
+  qvCoefficients?: Coefficients;
 }
 
 export async function fetchConfig(
   connection: Connection,
   realmPublicKey: PublicKey,
-  wallet: Pick<Wallet, 'publicKey' | 'signTransaction' | 'signAllTransactions'>,
+  currentPlugins: VoterWeightPluginInfo[],
 ): Promise<Config> {
   const realm = await getRealm(connection, realmPublicKey);
 
@@ -82,35 +89,52 @@ export async function fetchConfig(
   let nftCollection: PublicKey | undefined = undefined;
   let nftCollectionSize = 0;
   let nftCollectionWeight = new BN(0);
-  const defaultOptions = AnchorProvider.defaultOptions();
-  const anchorProvider = new AnchorProvider(connection, wallet, defaultOptions);
+  let civicPassType: PublicKey | undefined = undefined;
+  let qvCoefficients: Coefficients | undefined = undefined;
 
-  const isDevnet = getNetworkFromEndpoint(connection.rpcEndpoint) === 'devnet';
-  const nftClient = await NftVoterClient.connect(anchorProvider, isDevnet);
-  const pluginPublicKey =
-    configProgramAccount.account.communityTokenConfig.voterWeightAddin;
+  const nftClient = currentPlugins.find((plugin) => plugin.name === 'NFT')
+    ?.client as NftVoterClient | undefined;
+  const gatewayClient = currentPlugins.find(
+    (plugin) => plugin.name === 'gateway',
+  )?.client as GatewayClient | undefined;
+  const quadraticPlugin = currentPlugins.find((plugin) => plugin.name === 'QV');
 
-  if (pluginPublicKey && NFT_PLUGINS_PKS.includes(pluginPublicKey.toBase58())) {
-    if (nftClient && realm.account.communityMint) {
-      const programId = nftClient.program.programId;
-      const registrarPDA = (
-        await getPluginRegistrarPDA(
-          realmPublicKey,
-          realm.account.communityMint,
-          programId,
-        )
-      ).registrar;
+  if (nftClient && realm.account.communityMint) {
+    const programId = nftClient.program.programId;
+    const registrarPDA = (
+      await getPluginRegistrarPDA(
+        realmPublicKey,
+        realm.account.communityMint,
+        programId,
+      )
+    ).registrar;
 
-      const registrar: any = await tryGetNftRegistrar(registrarPDA, nftClient);
+    const registrar: any = await tryGetNftRegistrar(registrarPDA, nftClient);
 
-      const collections = registrar?.collectionConfigs || [];
+    const collections = registrar?.collectionConfigs || [];
 
-      if (collections[0]) {
-        nftCollection = new PublicKey(collections[0].collection);
-        nftCollectionSize = collections[0].size;
-        nftCollectionWeight = collections[0].weight;
-      }
+    if (collections[0]) {
+      nftCollection = new PublicKey(collections[0].collection);
+      nftCollectionSize = collections[0].size;
+      nftCollectionWeight = collections[0].weight;
     }
+  }
+
+  if (gatewayClient && realm.account.communityMint) {
+    const registrar = await gatewayClient.getRegistrarAccount(
+      realm.pubkey,
+      realm.account.communityMint,
+    );
+    civicPassType = registrar?.gatekeeperNetwork;
+  }
+
+  if (quadraticPlugin && realm.account.communityMint) {
+    const anchorCoefficients = (quadraticPlugin?.params as
+      | AnchorParams
+      | undefined)?.quadraticCoefficients;
+    qvCoefficients = anchorCoefficients
+      ? QuadraticClient.convertCoefficientsFromAnchorType(anchorCoefficients)
+      : undefined;
   }
 
   const mintPkStr = realm.account.communityMint.toBase58();
@@ -161,8 +185,11 @@ export async function fetchConfig(
     nftCollection,
     nftCollectionSize,
     nftCollectionWeight,
+    civicPassType,
     config: realmConfig,
     configAccount: configProgramAccount.account,
     realmAuthority: realm.account.authority,
+    chainingEnabled: false,
+    qvCoefficients,
   };
 }

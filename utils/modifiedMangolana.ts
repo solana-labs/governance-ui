@@ -27,6 +27,8 @@ import {
   TransactionInstructionWithSigners,
 } from '@blockworks-foundation/mangolana/lib/globalTypes'
 import { WalletSigner } from '@solana/spl-governance'
+import { getFeeEstimate } from '@tools/feeEstimate'
+import { createComputeBudgetIx } from '@blockworks-foundation/mango-v4'
 
 interface TransactionInstructionWithType {
   instructionsSet: TransactionInstructionWithSigners[]
@@ -407,7 +409,7 @@ export const sendSignAndConfirmTransactions = async ({
   const logger = new Logger({ ...config })
   const block =
     timeoutStrategy?.block ?? (await connection.getLatestBlockhash('confirmed'))
-
+  const fee = await getFeeEstimate(connection)
   const walletPk = wallet.publicKey
   if (!walletPk) throw new Error('Wallet not connected!')
 
@@ -438,6 +440,7 @@ export const sendSignAndConfirmTransactions = async ({
     }
 
     const transaction = new Transaction()
+    transaction.add(createComputeBudgetIx(fee))
     transactionInstruction.instructionsSet.forEach((instruction) => {
       transaction.add(instruction.transactionInstruction)
       if (instruction.signers?.length) {

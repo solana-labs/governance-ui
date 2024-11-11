@@ -8,17 +8,17 @@ import {
 import { validateInstruction } from '@utils/instructionTools'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NewProposalContext } from '../../../new'
 import InstructionForm, { InstructionInput } from '../FormCreator'
 import { InstructionInputType } from '../inputInstructionType'
 import { PublicKey } from '@solana/web3.js'
 import { getValidatedPublickKey } from '@utils/validations'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { getRegistrarPDA } from '@utils/plugin/accounts'
 import { AssetAccount } from '@utils/uiTypes/assets'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useRealmQuery } from '@hooks/queries/realm'
+import {configureCivicRegistrarIx} from "../../../../../../../GatewayPlugin/sdk/api";
+import {useGatewayVoterWeightPlugin} from "../../../../../../../VoterWeightPlugins";
 
 interface ConfigureGatewayForm {
   governedAccount: AssetAccount | undefined
@@ -35,13 +35,13 @@ const ConfigureGatewayPlugin = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const realm = useRealmQuery().data?.result
-  const gatewayClient = useVotePluginsClientStore((s) => s.state.gatewayClient)
   const { assetAccounts } = useGovernanceAssets()
   const wallet = useWalletOnePointOh()
   const shouldBeGoverned = !!(index !== 0 && governance)
   const [form, setForm] = useState<ConfigureGatewayForm>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
+  const { gatewayClient } = useGatewayVoterWeightPlugin();
 
   const chosenGatekeeperNetwork = useMemo(() => {
     return form?.otherGatekeeperNetwork || form?.gatekeeperNetwork
@@ -53,26 +53,14 @@ const ConfigureGatewayPlugin = ({
     if (
       isValid &&
       form!.governedAccount?.governance?.account &&
-      wallet?.publicKey
+      wallet?.publicKey &&
+        realm && gatewayClient
     ) {
-      const remainingAccounts = form!.predecessor
-        ? [{ pubkey: form!.predecessor, isSigner: false, isWritable: false }]
-        : []
-      const { registrar } = await getRegistrarPDA(
-        realm!.pubkey,
-        realm!.account.communityMint,
-        gatewayClient!.program.programId
+      const configureRegistrarTx = await configureCivicRegistrarIx(
+          realm,
+          gatewayClient,
+          chosenGatekeeperNetwork!,
       )
-      const configureRegistrarTx = await gatewayClient!.program.methods
-        .configureRegistrar(false)
-        .accounts({
-          registrar,
-          realm: realm!.pubkey,
-          realmAuthority: realm!.account.authority!,
-          gatekeeperNetwork: chosenGatekeeperNetwork,
-        })
-        .remainingAccounts(remainingAccounts)
-        .instruction()
       serializedInstruction = serializeInstructionToBase64(configureRegistrarTx)
     }
     return {
@@ -93,24 +81,25 @@ const ConfigureGatewayPlugin = ({
       .object()
       .nullable()
       .required('Governed account is required'),
-    collection: yup
+    gatekeeperNetwork: yup
       .string()
       .test(
         'accountTests',
-        'Collection address validation error',
+        'Gatekeeper network address validation error',
         function (val: string) {
+          console.log('val', val)
           if (val) {
             try {
               return !!getValidatedPublickKey(val)
             } catch (e) {
-              console.log(e)
+              console.log("error with " + val, e)
               return this.createError({
                 message: `${e}`,
               })
             }
           } else {
             return this.createError({
-              message: `Collection address is required`,
+              message: `Gatekeeper network address is required`,
             })
           }
         }

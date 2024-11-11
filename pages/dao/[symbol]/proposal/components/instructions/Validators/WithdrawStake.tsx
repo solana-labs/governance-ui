@@ -257,7 +257,7 @@ const WithdrawValidatorStake = ({
           marginTop: '18px',
         }}
       >
-        Withraw from staking account for a validator. You can only withdraw from
+        Withdraw from staking account for a validator. You can only withdraw from
         inactivated stake accounts.
       </div>
     </>

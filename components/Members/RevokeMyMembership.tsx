@@ -5,7 +5,6 @@ import Modal from '@components/Modal'
 import { ExclamationCircleIcon, XCircleIcon } from '@heroicons/react/outline'
 import { useMintInfoByPubkeyQuery } from '@hooks/queries/mintInfo'
 import { useRealmQuery } from '@hooks/queries/realm'
-import useGovernanceForGovernedAddress from '@hooks/useGovernanceForGovernedAddress'
 import useProgramVersion from '@hooks/useProgramVersion'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { createRevokeGoverningTokens } from '@solana/spl-governance'
@@ -62,9 +61,9 @@ const Form: FC<{ closeModal: () => void }> = ({ closeModal }) => {
         : (membershipTypes[selectedMembershipType] as PublicKey | undefined),
     [membershipTypes, selectedMembershipType]
   )
+  
   const { data: mintInfo } = useMintInfoByPubkeyQuery(selectedMint)
-  const governance = useGovernanceForGovernedAddress(selectedMint)
-
+  
   // erase errors on dirtying
   useEffect(() => {
     setFormErrors({})
@@ -94,7 +93,6 @@ const Form: FC<{ closeModal: () => void }> = ({ closeModal }) => {
     if (
       realm === undefined ||
       mintInfo?.result === undefined ||
-      governance === undefined ||
       !wallet?.publicKey
     ) {
       throw new Error('proposal created before necessary data is fetched')
@@ -134,7 +132,6 @@ const Form: FC<{ closeModal: () => void }> = ({ closeModal }) => {
     closeModal,
     connection,
     form.amount,
-    governance,
     mintInfo?.result,
     programVersion,
     realm,

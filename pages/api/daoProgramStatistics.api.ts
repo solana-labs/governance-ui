@@ -6,9 +6,9 @@ import { getAllSplGovernanceProgramIds } from './tools/realms'
 import { withSentry } from '@sentry/nextjs'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (!process.env.BACKEND_MAINNET_RPC)
-    return res.status(500).json('BACKEND_MAINNET_RPC not provided in env')
-  const conn = new Connection(process.env.BACKEND_MAINNET_RPC, 'recent')
+  if (!process.env.MAINNET_RPC)
+    return res.status(500).json('MAINNET_RPC not provided in env')
+  const conn = new Connection(process.env.MAINNET_RPC, 'recent')
 
   console.log('fetching spl-gov instances...')
   // Get all realms

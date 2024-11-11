@@ -1,20 +1,37 @@
-import { AnchorProvider, Wallet } from '@project-serum/anchor';
+import { AnchorProvider, Wallet } from '@coral-xyz/anchor';
 
+import {
+  GatewayClient,
+  QuadraticClient,
+} from '@solana/governance-program-library';
 import {
   createSetRealmConfig,
   GoverningTokenType,
   GoverningTokenConfigAccountArgs,
   tryGetRealmConfig,
   getRealm,
-  getGovernanceProgramVersion,
   SYSTEM_PROGRAM_ID,
 } from '@solana/spl-governance';
+import {
+  getGovernanceProgramVersion
+} from "@realms-today/spl-governance"
 import type {
   Connection,
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js';
 
+import {
+  configureCivicRegistrarIx,
+  createCivicRegistrarIx,
+} from '../../../GatewayPlugin/sdk/api';
+import {
+  coefficientsEqual,
+  configureQuadraticRegistrarIx,
+  createQuadraticRegistrarIx,
+  DEFAULT_COEFFICIENTS,
+} from '../../../QuadraticPlugin/sdk/api';
+import { DEFAULT_QV_CONFIG } from '@hub/components/EditRealmConfig/VotingStructureSelector';
 import {
   getMaxVoterWeightRecord,
   getRegistrarPDA,
@@ -44,6 +61,9 @@ function shouldAddConfigInstruction(config: Config, currentConfig: Config) {
   return false;
 }
 
+const configUsesVoterWeightPlugin = (config: Config, plugin: PublicKey) =>
+  config.configAccount.communityTokenConfig.voterWeightAddin?.equals(plugin);
+
 export async function createTransaction(
   realmPublicKey: PublicKey,
   governance: PublicKey,
@@ -67,15 +87,7 @@ export async function createTransaction(
     programId,
   );
 
-  if (
-    realmAccount.account.authority &&
-    wallet &&
-    config.nftCollection &&
-    (!currentConfig.nftCollection ||
-      !currentConfig.nftCollection.equals(config.nftCollection) ||
-      currentConfig.nftCollectionSize !== config.nftCollectionSize ||
-      !currentConfig.nftCollectionWeight.eq(config.nftCollectionWeight))
-  ) {
+  if (realmAccount.account.authority && wallet) {
     const defaultOptions = AnchorProvider.defaultOptions();
     const anchorProvider = new AnchorProvider(
       connection,
@@ -83,62 +95,168 @@ export async function createTransaction(
       defaultOptions,
     );
 
-    const nftClient = await NftVoterClient.connect(anchorProvider, isDevnet);
-    const { registrar } = await getRegistrarPDA(
-      realmPublicKey,
-      config.communityMint.publicKey,
-      nftClient.program.programId,
-    );
-    const { maxVoterWeightRecord } = await getMaxVoterWeightRecord(
-      realmPublicKey,
-      config.communityMint.publicKey,
-      nftClient.program.programId,
-    );
+    if (
+      config.nftCollection &&
+      (!currentConfig.nftCollection ||
+        !currentConfig.nftCollection.equals(config.nftCollection) ||
+        currentConfig.nftCollectionSize !== config.nftCollectionSize ||
+        !currentConfig.nftCollectionWeight.eq(config.nftCollectionWeight))
+    ) {
+      const nftClient = await NftVoterClient.connect(
+        anchorProvider,
+        undefined,
+        isDevnet,
+      );
+      const { registrar } = getRegistrarPDA(
+        realmPublicKey,
+        config.communityMint.publicKey,
+        nftClient.program.programId,
+      );
+      const { maxVoterWeightRecord } = await getMaxVoterWeightRecord(
+        realmPublicKey,
+        config.communityMint.publicKey,
+        nftClient.program.programId,
+      );
 
-    instructions.push(
-      await nftClient.program.methods
-        .createRegistrar(10)
-        .accounts({
-          registrar,
-          realm: realmPublicKey,
-          governanceProgramId: programId,
-          realmAuthority: realmAccount.account.authority,
-          governingTokenMint: config.communityMint.publicKey,
-          payer: wallet.publicKey,
-          systemProgram: SYSTEM_PROGRAM_ID,
-        })
-        .instruction(),
-    );
+      instructions.push(
+        await nftClient.program.methods
+          .createRegistrar(10)
+          .accounts({
+            registrar,
+            realm: realmPublicKey,
+            governanceProgramId: programId,
+            realmAuthority: realmAccount.account.authority,
+            governingTokenMint: config.communityMint.publicKey,
+            payer: wallet.publicKey,
+            systemProgram: SYSTEM_PROGRAM_ID,
+          })
+          .instruction(),
+      );
 
-    instructions.push(
-      await nftClient.program.methods
-        .createMaxVoterWeightRecord()
-        .accounts({
-          maxVoterWeightRecord,
-          realm: realmPublicKey,
-          governanceProgramId: programId,
-          realmGoverningTokenMint: config.communityMint.publicKey,
-          payer: wallet.publicKey,
-          systemProgram: SYSTEM_PROGRAM_ID,
-        })
-        .instruction(),
-    );
+      instructions.push(
+        await nftClient.program.methods
+          .createMaxVoterWeightRecord()
+          .accounts({
+            maxVoterWeightRecord,
+            realm: realmPublicKey,
+            governanceProgramId: programId,
+            realmGoverningTokenMint: config.communityMint.publicKey,
+            payer: wallet.publicKey,
+            systemProgram: SYSTEM_PROGRAM_ID,
+          })
+          .instruction(),
+      );
 
-    instructions.push(
-      await nftClient.program.methods
-        .configureCollection(
-          config.nftCollectionWeight,
-          config.nftCollectionSize,
-        )
-        .accounts({
-          registrar,
-          realm: realmPublicKey,
-          maxVoterWeightRecord,
-          realmAuthority: realmAccount.account.authority,
-          collection: config.nftCollection,
-        })
-        .instruction(),
-    );
+      instructions.push(
+        await nftClient.program.methods
+          .configureCollection(
+            config.nftCollectionWeight,
+            config.nftCollectionSize,
+          )
+          .accounts({
+            registrar,
+            realm: realmPublicKey,
+            maxVoterWeightRecord,
+            realmAuthority: realmAccount.account.authority,
+            collection: config.nftCollection,
+          })
+          .instruction(),
+      );
+    } else if (
+      config.civicPassType &&
+      (!currentConfig.civicPassType ||
+        !currentConfig.civicPassType.equals(config.civicPassType))
+    ) {
+      // If this DAO uses Civic, we need to either create or configure the Civic gateway plugin registrar.
+      const gatewayClient = await GatewayClient.connect(
+        anchorProvider,
+        isDevnet,
+      );
+
+      const predecessorPlugin = config.chainingEnabled
+        ? currentConfig.configAccount.communityTokenConfig.voterWeightAddin
+        : undefined;
+
+      const existingRegistrarAccount = await gatewayClient.getRegistrarAccount(
+        realmPublicKey,
+        config.communityMint.publicKey,
+      );
+
+      const instruction = existingRegistrarAccount
+        ? await configureCivicRegistrarIx(
+            realmAccount,
+            gatewayClient,
+            config.civicPassType,
+          )
+        : await createCivicRegistrarIx(
+            realmAccount,
+            wallet.publicKey,
+            gatewayClient,
+            config.civicPassType,
+            predecessorPlugin,
+          );
+
+      instructions.push(instruction);
+    } else if (
+      (config.qvCoefficients &&
+        !coefficientsEqual(
+          config.qvCoefficients,
+          currentConfig.qvCoefficients,
+        )) ||
+      (configUsesVoterWeightPlugin(config, DEFAULT_QV_CONFIG.votingProgramId) &&
+        !configUsesVoterWeightPlugin(
+          currentConfig,
+          DEFAULT_QV_CONFIG.votingProgramId,
+        ))
+    ) {
+      // Configure the registrar for the quadratic voting plugin for the DAO
+      // Since QV needs to be paired up with some other plugin that protects against sybil attacks,
+      // it will typically have a predecessor plugin (e.g. the Civic Gateway plugin)
+      const predecessorPlugin = config.chainingEnabled
+        ? currentConfig.configAccount.communityTokenConfig.voterWeightAddin
+        : undefined;
+
+      const quadraticClient = await QuadraticClient.connect(
+        anchorProvider,
+        isDevnet,
+      );
+
+      const existingRegistrarAccount = await quadraticClient.getRegistrarAccount(
+        realmPublicKey,
+        config.communityMint.publicKey,
+      );
+
+      // if the update is a simple coefficient update, do not change the predecessor unless also set specifically
+      // Note - the UI is somewhat overloaded here and it would be nicer differentiate
+      // between updates and new plugins being added to the chain
+      const isCoefficientUpdate =
+        existingRegistrarAccount &&
+        config.qvCoefficients &&
+        !coefficientsEqual(config.qvCoefficients, currentConfig.qvCoefficients);
+      const previousVoterWeightPluginProgramId =
+        predecessorPlugin ??
+        (isCoefficientUpdate
+          ? existingRegistrarAccount.previousVoterWeightPluginProgramId
+          : undefined);
+
+      const instruction = existingRegistrarAccount
+        ? await configureQuadraticRegistrarIx(
+            realmAccount,
+            quadraticClient,
+            config.qvCoefficients || DEFAULT_COEFFICIENTS,
+            // keep the existing predecessor when updating the coefficients
+            previousVoterWeightPluginProgramId,
+          )
+        : await createQuadraticRegistrarIx(
+            realmAccount,
+            wallet.publicKey,
+            quadraticClient,
+            config.qvCoefficients || DEFAULT_COEFFICIENTS,
+            predecessorPlugin,
+          );
+
+      instructions.push(instruction);
+    }
   }
 
   if (shouldAddConfigInstruction(config, currentConfig)) {

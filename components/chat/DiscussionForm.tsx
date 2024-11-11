@@ -8,7 +8,6 @@ import { postChatMessage } from '../../actions/chat/postMessage'
 import Loading from '../Loading'
 import Tooltip from '@components/Tooltip'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import {
   useUserCommunityTokenOwnerRecord,
@@ -19,6 +18,7 @@ import { useRouteProposalQuery } from '@hooks/queries/proposal'
 import { useVotingPop } from '@components/VotePanel/hooks'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
 import { useLegacyVoterWeight } from '@hooks/queries/governancePower'
+import {useVotingClients} from "@hooks/useVotingClients";
 
 const DiscussionForm = () => {
   const [comment, setComment] = useState('')
@@ -27,10 +27,9 @@ const DiscussionForm = () => {
   const realm = useRealmQuery().data?.result
   const { result: ownVoterWeight } = useLegacyVoterWeight()
   const { realmInfo } = useRealm()
-  const client = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
-  )
+  const votingClients = useVotingClients();
   const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
 
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
@@ -38,10 +37,14 @@ const DiscussionForm = () => {
   const proposal = useRouteProposalQuery().data?.result
   const tokenRole = useVotingPop()
   const commenterVoterTokenRecord =
-    tokenRole === 'community' ? ownTokenRecord : ownCouncilTokenRecord
+    tokenRole === 'community' ? 
+      ownTokenRecord ?? ownCouncilTokenRecord : 
+      ownCouncilTokenRecord
 
+  const votingClient = votingClients(tokenRole ?? 'community');// default to community if no role is provided
   const submitComment = async () => {
     setSubmitting(true)
+    setError('')
     if (
       !realm ||
       !proposal ||
@@ -72,12 +75,13 @@ const DiscussionForm = () => {
         commenterVoterTokenRecord,
         msg,
         undefined,
-        client
+        ownTokenRecord ? votingClient : undefined // use votingClient only if the community TOR is used for commenting
       )
 
       setComment('')
     } catch (ex) {
       console.error("Can't post chat message", ex)
+      setError(ex.message);
       //TODO: How do we present transaction errors to users? Just the notification?
     } finally {
       setSubmitting(false)
@@ -117,6 +121,7 @@ const DiscussionForm = () => {
           </Button>
         </Tooltip>
       </div>
+      {error && <p className="mt-1 text-red">{error}</p>}
     </>
   )
 }

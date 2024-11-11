@@ -1,34 +1,11 @@
-import {
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  MintInfo,
-  Token,
-  TOKEN_PROGRAM_ID,
-} from '@solana/spl-token'
-import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
+import { MintInfo } from '@solana/spl-token'
 import BN from 'bn.js'
 import useRealm from '@hooks/useRealm'
-import {
-  getProposal,
-  GoverningTokenType,
-  ProposalState,
-} from '@solana/spl-governance'
-import { getUnrelinquishedVoteRecords } from '@models/api'
-import { withRelinquishVote } from '@solana/spl-governance'
-import { withWithdrawGoverningTokens } from '@solana/spl-governance'
-import { sendTransaction } from '@utils/send'
-import { SecondaryButton } from '../Button'
+import { GoverningTokenType } from '@solana/spl-governance'
 import { GoverningTokenRole } from '@solana/spl-governance'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { getMintMetadata } from '../instructions/programs/splToken'
-import { withFinalizeVote } from '@solana/spl-governance'
-import { chunks } from '@utils/helpers'
-import { getProgramVersionForRealm } from '@models/registry/api'
-import { notify } from '@utils/notifications'
-import { ExclamationIcon } from '@heroicons/react/outline'
 import { useEffect } from 'react'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { VSR_PLUGIN_PKS } from '@constants/plugins'
-import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import {
   useUserCommunityTokenOwnerRecord,
@@ -36,40 +13,41 @@ import {
 } from '@hooks/queries/tokenOwnerRecord'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
-import { fetchGovernanceByPubkey } from '@hooks/queries/governance'
-import { useConnection } from '@solana/wallet-adapter-react'
-import queryClient from '@hooks/queries/queryClient'
-import { proposalQueryKeys } from '@hooks/queries/proposal'
-import asFindable from '@utils/queries/asFindable'
-import VanillaVotingPower from '@components/GovernancePower/Vanilla/VanillaVotingPower'
+import VanillaVotingPower from '@components/GovernancePower/Power/Vanilla/VanillaVotingPower'
 import { DepositTokensButton } from '@components/DepositTokensButton'
+import VanillaWithdrawTokensButton from './VanillaWithdrawTokensButton'
+import Button from '@components/Button'
+import { useJoinRealm } from '@hooks/useJoinRealm'
+import { Transaction } from '@solana/web3.js'
+import { sendTransaction } from '@utils/send'
+import { useConnection } from '@solana/wallet-adapter-react'
 
+/** deposit + withdraw for vanilla govtokens, used only in account view. plugin views still use this for council. */
 export const TokenDeposit = ({
   mint,
   tokenRole,
-  councilVote,
   inAccountDetails,
   setHasGovPower,
+  hideVotes,
 }: {
   mint: MintInfo | undefined
   tokenRole: GoverningTokenRole
-  councilVote?: boolean
   inAccountDetails?: boolean
   setHasGovPower?: (hasGovPower: boolean) => void
+  hideVotes?: boolean
 }) => {
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
-  const { connection } = useConnection()
-
-  const client = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
-  )
-
-  const maxVoterWeight = useMaxVoteRecord()?.pubkey || undefined
+  const {
+    userNeedsTokenOwnerRecord,
+    userNeedsVoterWeightRecords,
+    handleRegister,
+  } = useJoinRealm()
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const ownCouncilTokenRecord = useUserCouncilTokenOwnerRecord().data?.result
   const realm = useRealmQuery().data?.result
   const config = useRealmConfigQuery().data?.result
+  const { connection } = useConnection()
 
   const relevantTokenConfig =
     tokenRole === GoverningTokenRole.Community
@@ -78,13 +56,7 @@ export const TokenDeposit = ({
   const isMembership =
     relevantTokenConfig?.tokenType === GoverningTokenType.Membership
 
-  const {
-    realmInfo,
-    realmTokenAccount,
-    councilTokenAccount,
-    toManyCommunityOutstandingProposalsForUser,
-    toManyCouncilOutstandingProposalsForUse,
-  } = useRealm()
+  const { realmTokenAccount, councilTokenAccount } = useRealm()
 
   const depositTokenRecord =
     tokenRole === GoverningTokenRole.Community
@@ -107,166 +79,12 @@ export const TokenDeposit = ({
     tokenRole === GoverningTokenRole.Community ? '' : 'Council'
   }`
 
-  const withdrawAllTokens = async function () {
-    const instructions: TransactionInstruction[] = []
-    // If there are unrelinquished votes for the voter then let's release them in the same instruction as convenience
-    if (depositTokenRecord!.account!.unrelinquishedVotesCount > 0) {
-      const voteRecords = await getUnrelinquishedVoteRecords(
-        connection,
-        realmInfo!.programId,
-        depositTokenRecord!.account!.governingTokenOwner
-      )
-
-      for (const voteRecord of Object.values(voteRecords)) {
-        const proposalQuery = await queryClient.fetchQuery({
-          queryKey: proposalQueryKeys.byPubkey(
-            connection.rpcEndpoint,
-            voteRecord.account.proposal
-          ),
-          staleTime: 0,
-          queryFn: () =>
-            asFindable(() =>
-              getProposal(connection, voteRecord.account.proposal)
-            )(),
-        })
-        const proposal = proposalQuery.result
-        if (!proposal) {
-          continue
-        }
-
-        if (proposal.account.state === ProposalState.Voting) {
-          if (proposal.account.state === ProposalState.Voting) {
-            const governance = (
-              await fetchGovernanceByPubkey(
-                connection,
-                proposal.account.governance
-              )
-            ).result
-            if (!governance) throw new Error('failed to fetch governance')
-            if (proposal.account.getTimeToVoteEnd(governance.account) > 0) {
-              // Note: It's technically possible to withdraw the vote here but I think it would be confusing and people would end up unconsciously withdrawing their votes
-              notify({
-                type: 'error',
-                message: `Can't withdraw tokens while Proposal ${proposal.account.name} is being voted on. Please withdraw your vote first`,
-              })
-              throw new Error(
-                `Can't withdraw tokens while Proposal ${proposal.account.name} is being voted on. Please withdraw your vote first`
-              )
-            } else {
-              // finalize proposal before withdrawing tokens so we don't stop the vote from succeeding
-              await withFinalizeVote(
-                instructions,
-                realmInfo!.programId,
-                getProgramVersionForRealm(realmInfo!),
-                realm!.pubkey,
-                proposal.account.governance,
-                proposal.pubkey,
-                proposal.account.tokenOwnerRecord,
-                proposal.account.governingTokenMint,
-                maxVoterWeight
-              )
-            }
-          }
-        }
-        // Note: We might hit single transaction limits here (accounts and size) if user has too many unrelinquished votes
-        // It's not going to be an issue for now due to the limited number of proposals so I'm leaving it for now
-        // As a temp. work around I'm leaving the 'Release Tokens' button on finalized Proposal to make it possible to release the tokens from one Proposal at a time
-        await withRelinquishVote(
-          instructions,
-          realmInfo!.programId,
-          realmInfo!.programVersion!,
-          realmInfo!.realmId,
-          proposal.account.governance,
-          proposal.pubkey,
-          depositTokenRecord!.pubkey,
-          proposal.account.governingTokenMint,
-          voteRecord.pubkey,
-          depositTokenRecord!.account.governingTokenOwner,
-          wallet!.publicKey!
-        )
-        await client.withRelinquishVote(
-          instructions,
-          proposal,
-          voteRecord.pubkey,
-          depositTokenRecord!.pubkey
-        )
-      }
-    }
-    let ata: PublicKey | null = null
-    if (!depositTokenAccount) {
-      ata = await Token.getAssociatedTokenAddress(
-        ASSOCIATED_TOKEN_PROGRAM_ID,
-        TOKEN_PROGRAM_ID,
-        depositMint!,
-        wallet!.publicKey!,
-        true
-      )
-      const ataIx = Token.createAssociatedTokenAccountInstruction(
-        ASSOCIATED_TOKEN_PROGRAM_ID,
-        TOKEN_PROGRAM_ID,
-        depositMint!,
-        ata,
-        wallet!.publicKey!,
-        wallet!.publicKey! // fee payer
-      )
-      instructions.push(ataIx)
-    }
-
-    await withWithdrawGoverningTokens(
-      instructions,
-      realmInfo!.programId,
-      realmInfo!.programVersion!,
-      realm!.pubkey,
-      depositTokenAccount?.publicKey
-        ? depositTokenAccount!.publicKey
-        : new PublicKey(ata!),
-      depositTokenRecord!.account.governingTokenMint,
-      wallet!.publicKey!
-    )
-
-    try {
-      // use chunks of 8 here since we added finalize,
-      // because previously 9 withdraws used to fit into one tx
-      const ixChunks = chunks(instructions, 8)
-      for (const [index, chunk] of ixChunks.entries()) {
-        const transaction = new Transaction().add(...chunk)
-        await sendTransaction({
-          connection,
-          wallet: wallet!,
-          transaction,
-          sendingMessage:
-            index == ixChunks.length - 1
-              ? 'Withdrawing tokens'
-              : `Releasing tokens (${index}/${ixChunks.length - 2})`,
-          successMessage:
-            index == ixChunks.length - 1
-              ? 'Tokens have been withdrawn'
-              : `Released tokens (${index}/${ixChunks.length - 2})`,
-        })
-      }
-    } catch (ex) {
-      //TODO change to more friendly notification
-      notify({ type: 'error', message: `${ex}` })
-      console.error("Can't withdraw tokens", ex)
-    }
-  }
-
   const hasTokensInWallet =
     depositTokenAccount && depositTokenAccount.account.amount.gt(new BN(0))
 
   const hasTokensDeposited =
     depositTokenRecord &&
     depositTokenRecord.account.governingTokenDepositAmount.gt(new BN(0))
-
-  const withdrawTooltipContent = !connected
-    ? 'Connect your wallet to withdraw'
-    : !hasTokensDeposited
-    ? "You don't have any tokens deposited to withdraw."
-    : !councilVote &&
-      (toManyCouncilOutstandingProposalsForUse ||
-        toManyCommunityOutstandingProposalsForUser)
-    ? 'You have to many outstanding proposals to withdraw.'
-    : ''
 
   const availableTokens =
     depositTokenRecord && mint
@@ -275,6 +93,21 @@ export const TokenDeposit = ({
           depositTokenRecord.account.governingTokenDepositAmount
         )
       : '0'
+
+  const join = async () => {
+    const instructions = await handleRegister()
+    const transaction = new Transaction()
+    transaction.add(...instructions)
+
+    await sendTransaction({
+      transaction: transaction,
+      wallet: wallet!,
+      connection,
+      signers: [],
+      sendingMessage: `Registering`,
+      successMessage: `Registered`,
+    })
+  }
 
   useEffect(() => {
     if (availableTokens != '0' || hasTokensDeposited || hasTokensInWallet) {
@@ -289,12 +122,15 @@ export const TokenDeposit = ({
       : hasTokensInWallet
       ? availableTokens
       : 0
-  const isVsr =
-    config?.account?.communityTokenConfig?.voterWeightAddin &&
-    VSR_PLUGIN_PKS.includes(
-      config?.account?.communityTokenConfig?.voterWeightAddin?.toBase58()
-    ) &&
-    tokenRole === GoverningTokenRole.Community
+
+  // There are two buttons available on this UI:
+  // The Deposit button - available if you have tokens to deposit
+  // The Join button - available if you have already deposited tokens (you have a Token Owner Record)
+  // but you may not have all your Voter Weight Records yet.
+  // This latter case may occur if the DAO changes its configuration and new Voter Weight Records are required.
+  // For example if a new plugin is added.
+  const showJoinButton =
+    !userNeedsTokenOwnerRecord && userNeedsVoterWeightRecords
 
   // Do not show deposits for mints with zero supply because nobody can deposit anyway
   if (!mint || mint.supply.isZero()) {
@@ -303,7 +139,7 @@ export const TokenDeposit = ({
 
   return (
     <div className="w-full">
-      {(availableTokens != '0' || inAccountDetails) && (
+      {(availableTokens != '0' || inAccountDetails) && !hideVotes && (
         <div className="flex items-center space-x-4">
           {tokenRole === GoverningTokenRole.Community ? (
             <VanillaVotingPower className="w-full" role="community" />
@@ -313,57 +149,42 @@ export const TokenDeposit = ({
         </div>
       )}
 
-      {
-        <>
-          <div
-            className={`my-4 opacity-70 text-xs  ${
-              canShowAvailableTokensMessage ? 'block' : 'hidden'
-            }`}
-          >
-            You have {tokensToShow} {hasTokensDeposited ? `more ` : ``}
-            {depositTokenName} tokens available to deposit.
-          </div>
+      <div
+        className={`my-4 opacity-70 text-xs  ${
+          canShowAvailableTokensMessage ? 'block' : 'hidden'
+        }`}
+      >
+        You have {tokensToShow} {hasTokensDeposited ? `more ` : ``}
+        {depositTokenName} tokens available to deposit.
+      </div>
 
-          <div className="flex flex-col mt-6 space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
-            {hasTokensInWallet || inAccountDetails ? (
-              <DepositTokensButton
-                className="sm:w-1/2 max-w-[200px]"
-                role={
-                  tokenRole === GoverningTokenRole.Community
-                    ? 'community'
-                    : 'council'
-                }
-                as={inAccountDetails ? 'primary' : 'secondary'}
-              />
-            ) : null}
-            {!isMembership && // Membership tokens can't be withdrawn (that is their whole point, actually)
-              (inAccountDetails || isVsr) && (
-                <SecondaryButton
-                  tooltipMessage={withdrawTooltipContent}
-                  className="sm:w-1/2 max-w-[200px]"
-                  disabled={
-                    !connected ||
-                    !hasTokensDeposited ||
-                    (!councilVote &&
-                      toManyCommunityOutstandingProposalsForUser) ||
-                    toManyCouncilOutstandingProposalsForUse ||
-                    wallet?.publicKey?.toBase58() !==
-                      depositTokenRecord.account.governingTokenOwner.toBase58()
-                  }
-                  onClick={withdrawAllTokens}
-                >
-                  Withdraw
-                </SecondaryButton>
-              )}
-          </div>
-        </>
-      }
-      {isVsr && (
-        <small className="flex items-center mt-3 text-xs">
-          <ExclamationIcon className="w-5 h-5 mr-2"></ExclamationIcon>
-          Please withdraw your tokens and deposit again to get governance power
-        </small>
-      )}
+      <div className="flex flex-col mt-6 space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
+        {connected && showJoinButton ? (
+          <Button className="w-full" onClick={join}>
+            Update
+          </Button>
+        ) : hasTokensInWallet || inAccountDetails ? (
+          <DepositTokensButton
+            className="sm:w-1/2 max-w-[200px]"
+            role={
+              tokenRole === GoverningTokenRole.Community
+                ? 'community'
+                : 'council'
+            }
+            as={inAccountDetails ? 'primary' : 'secondary'}
+          />
+        ) : null}
+        {!isMembership && // Membership tokens can't be withdrawn (that is their whole point, actually)
+          inAccountDetails && (
+            <VanillaWithdrawTokensButton
+              role={
+                tokenRole === GoverningTokenRole.Community
+                  ? 'community'
+                  : 'council'
+              }
+            />
+          )}
+      </div>
     </div>
   )
 }

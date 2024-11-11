@@ -134,7 +134,10 @@ async function enhanceData(data: Realm): Promise<Realm> {
 
   newRealm.gallery = await Promise.all(
     newRealm.gallery.map(async (image) => {
-      if (image.url.includes('youtube.com')) {
+      if (
+        image.url.startsWith('youtube.com/') ||
+        image.url.startsWith('youtu.be/')
+      ) {
         return removeTypename({ ...image, height: 448, width: 800 });
       }
 

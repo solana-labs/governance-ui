@@ -6,7 +6,6 @@ import {
   Realm,
   TokenOwnerRecord,
   VoteType,
-  withCreateProposal,
   getSignatoryRecordAddress,
   RpcContext,
   withInsertTransaction,
@@ -15,6 +14,9 @@ import {
   withAddSignatory,
   MultiChoiceType,
 } from '@solana/spl-governance'
+import {
+  withCreateProposal,
+} from '@realms-today/spl-governance'
 import {
   sendTransactionsV3,
   SequenceType,
@@ -106,9 +108,9 @@ export const createProposal = async (
   //will run only if plugin is connected with realm
   const plugin = await client?.withUpdateVoterWeightRecord(
     instructions,
-    tokenOwnerRecord.pubkey,
     'createProposal',
-    createNftTicketsIxs
+    createNftTicketsIxs,
+    governance
   )
 
   const proposalAddress = await withCreateProposal(

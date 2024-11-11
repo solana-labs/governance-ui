@@ -7,6 +7,7 @@ import { voteRegistryWithdraw } from 'VoteStakeRegistry/actions/voteRegistryWith
 import {
   DepositWithMintAccount,
   LockupType,
+  Registrar,
 } from 'VoteStakeRegistry/sdk/accounts'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import tokenPriceService from '@utils/services/tokenPrice'
@@ -15,7 +16,6 @@ import { useState } from 'react'
 import { closeDeposit } from 'VoteStakeRegistry/actions/closeDeposit'
 import { abbreviateAddress } from '@utils/formatting'
 import { notify } from '@utils/notifications'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import dayjs from 'dayjs'
 import {
   getMinDurationFmt,
@@ -31,20 +31,23 @@ import { useRealmQuery } from '@hooks/queries/realm'
 import { useConnection } from '@solana/wallet-adapter-react'
 import queryClient from '@hooks/queries/queryClient'
 import { tokenAccountQueryKeys } from '@hooks/queries/tokenAccount'
+import {useVsrClient} from "../../../VoterWeightPlugins/useVsrClient";
 
 const DepositCard = ({
   deposit,
   vsrClient,
+  registrar
 }: {
   deposit: DepositWithMintAccount
-  vsrClient?: VsrClient | undefined
+  vsrClient?: VsrClient | undefined,
+  registrar?: Registrar | undefined
 }) => {
   const { getOwnedDeposits } = useDepositStore()
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
   const realm = useRealmQuery().data?.result
 
   const { realmInfo } = useRealm()
-  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
+  const { vsrClient: client } = useVsrClient()
   const actualClient = vsrClient || client
   const wallet = useWalletOnePointOh()
   const { connection } = useConnection()
@@ -146,6 +149,7 @@ const DepositCard = ({
   const tokenInfo = tokenPriceService.getTokenInfo(
     deposit.mint.publicKey.toBase58()
   )
+
   return (
     <div className="border border-fgd-4 rounded-lg flex flex-col">
       <div className="bg-bkg-3 px-4 py-4 pr-16 rounded-md rounded-b-none flex items-center">
@@ -209,7 +213,7 @@ const DepositCard = ({
               )}`}
               value={`${dayjs(
                 deposit!.nextVestingTimestamp!.toNumber() * 1000
-              ).format('DD-MM-YYYY HH:mm')}`}
+              ).format('MM-DD-YYYY HH:mm')}`}
             />
           )}
           {isRealmCommunityMint && (
@@ -217,7 +221,16 @@ const DepositCard = ({
               label="Vote Multiplier"
               value={(deposit.votingPower.isZero() ||
               deposit.votingPowerBaseline.isZero()
-                ? 0
+                ? 
+                registrar && deposit.amountDepositedNative.gt(new BN(0)) ?
+                  deposit.votingPower.mul(new BN(100)).div(
+                    deposit.amountDepositedNative.mul(
+                      new BN(10).pow(
+                        new BN(registrar!.votingMints[deposit.votingMintConfigIdx].digitShift)
+                      )
+                    )
+                  ).toNumber() / 100
+                  : 0
                 : deposit.votingPower.mul(new BN(100)).div(deposit.votingPowerBaseline).toNumber() / 100
               ).toFixed(2)}
             />

@@ -2,18 +2,23 @@ import useRealm from '@hooks/useRealm'
 import dynamic from 'next/dynamic'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import useQueryContext from '@hooks/useQueryContext'
-import { GATEWAY_PLUGINS_PKS, NFT_PLUGINS_PKS } from '@constants/plugins'
 import GatewayCard from '@components/Gateway/GatewayCard'
 import ClaimUnreleasedNFTs from './ClaimUnreleasedNFTs'
 import Link from 'next/link'
 import { useAddressQuery_CommunityTokenOwner } from '@hooks/queries/addresses/tokenOwnerRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import { useUserCommunityTokenOwnerRecord } from '@hooks/queries/tokenOwnerRecord'
-import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
 import ClaimUnreleasedPositions from 'HeliumVotePlugin/components/ClaimUnreleasedPositions'
 import VanillaAccountDetails from './VanillaAccountDetails'
 import GovernancePowerCard from '@components/GovernancePower/GovernancePowerCard'
 import SelectPrimaryDelegators from '@components/SelectPrimaryDelegators'
+import PythAccountDetails from 'PythVotePlugin/components/PythAccountDetails'
+import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
+import { ReactNode } from 'react'
+import QuadraticVotingPower from '@components/ProposalVotingPower/QuadraticVotingPower'
+import VanillaVotingPower from '@components/GovernancePower/Power/Vanilla/VanillaVotingPower'
+import React from 'react'
+import ParclAccountDetails from 'ParclVotePlugin/components/ParclAccountDetails'
 
 const LockPluginTokenBalanceCard = dynamic(
   () =>
@@ -65,40 +70,40 @@ const TokenBalanceCardInner = ({
   inAccountDetails?: boolean
 }) => {
   const ownTokenRecord = useUserCommunityTokenOwnerRecord().data?.result
-  const config = useRealmConfigQuery().data?.result
+  const { plugins } = useRealmVoterWeightPlugins('community')
+  const requiredCards = plugins?.voterWeight.map((plugin) => plugin.name)
 
-  const { vsrMode } = useRealm()
-  const currentPluginPk = config?.account?.communityTokenConfig.voterWeightAddin
-  const isNftMode =
-    currentPluginPk && NFT_PLUGINS_PKS.includes(currentPluginPk?.toBase58())
-  const isGatewayMode =
-    currentPluginPk && GATEWAY_PLUGINS_PKS.includes(currentPluginPk?.toBase58())
+  const showHeliumCard = requiredCards?.includes('HeliumVSR')
+  const showDefaultVSRCard = requiredCards?.includes('VSR')
+  const showPythCard = requiredCards?.includes('pyth')
+  const showNftCard = requiredCards?.includes('NFT')
+  const showGatewayCard = requiredCards?.includes('gateway')
+  const showQvCard = requiredCards?.includes('QV')
+  const showParclCard = requiredCards?.includes('parcl');
 
-  if (
-    vsrMode === 'default' &&
-    (!ownTokenRecord ||
-      ownTokenRecord.account.governingTokenDepositAmount.isZero())
-  ) {
-    return <LockPluginTokenBalanceCard inAccountDetails={inAccountDetails} />
+  if (showDefaultVSRCard && inAccountDetails) {
+    return <LockPluginTokenBalanceCard inAccountDetails={inAccountDetails} /> // does this ever actually occur in the component hierarchy?
   }
 
+  const cards: ReactNode[] = []
+
   if (
-    vsrMode === 'helium' &&
+    showHeliumCard &&
     (!ownTokenRecord ||
       ownTokenRecord.account.governingTokenDepositAmount.isZero())
   ) {
-    return (
-      <>
+    cards.push(
+      <React.Fragment key="helium">
         {!inAccountDetails && <GovernancePowerTitle />}
         <HeliumVotingPowerCard inAccountDetails={inAccountDetails} />
         <ClaimUnreleasedPositions inAccountDetails={inAccountDetails} />
-      </>
+      </React.Fragment>
     )
   }
 
-  if (isNftMode && inAccountDetails) {
-    return (
-      <div className="grid grid-cols-2 gap-x-2 w-full">
+  if (showNftCard && inAccountDetails) {
+    cards.push(
+      <div className="grid grid-cols-2 gap-x-2 w-full" key="nft">
         <div>
           <NftVotingPower inAccountDetails={inAccountDetails} />
           <ClaimUnreleasedNFTs inAccountDetails={inAccountDetails} />
@@ -108,14 +113,58 @@ const TokenBalanceCardInner = ({
     )
   }
 
-  //Default
-  return (
-    <>
-      {inAccountDetails ? <VanillaAccountDetails /> : <GovernancePowerCard />}
+  if (showPythCard) {
+    cards.push(
+      <React.Fragment key="pyth">
+        {inAccountDetails ? <PythAccountDetails /> : <GovernancePowerCard />}
+      </React.Fragment>
+    )
+  }
 
-      {isGatewayMode && <GatewayCard />}
-    </>
-  )
+  if (showGatewayCard) {
+    cards.push(
+      <React.Fragment key="gateway">
+        {inAccountDetails ? (
+          <GatewayCard role="community" />
+        ) : (
+          <GovernancePowerCard />
+        )}
+      </React.Fragment>
+    )
+  }
+
+  if (showQvCard) {
+    cards.push(
+      <React.Fragment key="qv">
+        {inAccountDetails && (
+          <>
+            <QuadraticVotingPower role="community" />
+            <VanillaVotingPower role="council" hideIfZero />
+          </>
+        )}
+      </React.Fragment>
+    )
+  }
+
+  if (showParclCard) {
+    cards.push(
+      <React.Fragment key="parcl">
+        {!inAccountDetails && <GovernancePowerTitle />}
+        <ParclAccountDetails />
+      </React.Fragment>
+    )
+  }
+
+  //Default
+  if (cards.length === 0) {
+    cards.push(
+      <React.Fragment key="vanilla">
+        {inAccountDetails ? <VanillaAccountDetails /> : <GovernancePowerCard />}
+      </React.Fragment>
+    )
+  }
+
+  return <>{cards}</>
 }
 
 const TokenBalanceCardWrapper = ({

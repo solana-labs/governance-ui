@@ -62,7 +62,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
   const [reducedDeposits, setReducedDeposits] = useState<DepositBox[]>([])
   const [ownDeposits, setOwnDeposits] = useState<DepositWithMintAccount[]>([])
   const [deposits, setDeposits] = useState<DepositWithMintAccount[]>([])
-  const votingPower = useVsrGovpower().result?.result ?? new BN(0)
+  const votingPower = useVsrGovpower().data?.result ?? new BN(0)
   const [votingPowerFromDeposits, setVotingPowerFromDeposits] = useState<BN>(
     new BN(0)
   )
@@ -438,7 +438,6 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
           <TokenDeposit
             mint={councilMint}
             tokenRole={GoverningTokenRole.Council}
-            councilVote={true}
             inAccountDetails={true}
           />
         </div>

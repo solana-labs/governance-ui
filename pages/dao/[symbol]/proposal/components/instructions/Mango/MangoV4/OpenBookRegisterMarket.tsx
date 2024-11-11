@@ -16,6 +16,11 @@ import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { OPENBOOK_PROGRAM_ID } from '@blockworks-foundation/mango-v4'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext'
+import ForwarderProgram, {
+  useForwarderProgramHelpers,
+} from '@components/ForwarderProgram/ForwarderProgram'
+import ProgramSelector from '@components/Mango/ProgramSelector'
+import useProgramSelector from '@components/Mango/useProgramSelector'
 
 interface OpenBookRegisterMarketForm {
   governedAccount: AssetAccount | null
@@ -26,6 +31,7 @@ interface OpenBookRegisterMarketForm {
   marketIndex: number
   name: string
   holdupTime: number
+  oraclePriceBand: number
 }
 
 const OpenBookRegisterMarket = ({
@@ -36,8 +42,13 @@ const OpenBookRegisterMarket = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletOnePointOh()
-  const { mangoClient, mangoGroup } = UseMangoV4()
+  const programSelectorHook = useProgramSelector()
+  const { mangoClient, mangoGroup } = UseMangoV4(
+    programSelectorHook.program?.val,
+    programSelectorHook.program?.group
+  )
   const { assetAccounts } = useGovernanceAssets()
+  const forwarderProgramHelpers = useForwarderProgramHelpers()
   const solAccounts = assetAccounts.filter(
     (x) =>
       x.type === AccountType.SOL &&
@@ -57,6 +68,7 @@ const OpenBookRegisterMarket = ({
     ].toBase58(),
     name: '',
     holdupTime: 0,
+    oraclePriceBand: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -75,7 +87,11 @@ const OpenBookRegisterMarket = ({
       wallet?.publicKey
     ) {
       const ix = await mangoClient!.program.methods
-        .serum3RegisterMarket(Number(form.marketIndex), form.name)
+        .serum3RegisterMarket(
+          Number(form.marketIndex),
+          form.name,
+          form.oraclePriceBand
+        )
         .accounts({
           group: mangoGroup!.publicKey,
           admin: form.governedAccount.extensions.transferAddress,
@@ -87,7 +103,9 @@ const OpenBookRegisterMarket = ({
         })
         .instruction()
 
-      serializedInstruction = serializeInstructionToBase64(ix)
+      serializedInstruction = serializeInstructionToBase64(
+        forwarderProgramHelpers.withForwarderWrapper(ix)
+      )
     }
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
@@ -104,7 +122,11 @@ const OpenBookRegisterMarket = ({
       index
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- TODO please fix, it can cause difficult bugs. You might wanna check out https://bobbyhadz.com/blog/react-hooks-exhaustive-deps for info. -@asktree
-  }, [form])
+  }, [
+    form,
+    forwarderProgramHelpers.form,
+    forwarderProgramHelpers.withForwarderWrapper,
+  ])
 
   const schema = yup.object().shape({
     governedAccount: yup
@@ -204,10 +226,20 @@ const OpenBookRegisterMarket = ({
       type: InstructionInputType.INPUT,
       name: 'openBookProgram',
     },
+    {
+      label: `Oracle Price Band`,
+      initialValue: form.oraclePriceBand,
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      name: 'oraclePriceBand',
+    },
   ]
 
   return (
     <>
+      <ProgramSelector
+        programSelectorHook={programSelectorHook}
+      ></ProgramSelector>
       {form && (
         <InstructionForm
           outerForm={form}
@@ -217,6 +249,7 @@ const OpenBookRegisterMarket = ({
           formErrors={formErrors}
         ></InstructionForm>
       )}
+      <ForwarderProgram {...forwarderProgramHelpers}></ForwarderProgram>
     </>
   )
 }

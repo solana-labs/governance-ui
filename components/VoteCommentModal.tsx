@@ -30,7 +30,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   isMulti,
 }) => {
   const [comment, setComment] = useState('')
-  const { submitting, submitVote } = useSubmitVote()
+  const { submitting, submitVote , error } = useSubmitVote()
 
   const voteString = VOTE_STRINGS[vote]
 
@@ -39,9 +39,8 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
       vote,
       comment,
       voteWeights: isMulti,
-    })
-
-    onClose()
+    }).then(() => onClose())
+      .catch(console.log)
   }
 
   return (
@@ -62,6 +61,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
         onChange={(e) => setComment(e.target.value)}
         // placeholder={`Let the DAO know why you vote '${voteString}'`}
       />
+      {error && <p className="mt-1 text-red">{error.message}</p>}
 
       <div className="flex items-center justify-center mt-8">
         <SecondaryButton className="w-44 mr-4" onClick={onClose}>

@@ -35,7 +35,7 @@ const Footer = () => {
         'lg:pb-24',
         'gap-y-8',
         'md:gap-y-0',
-        'z-10'
+        'z-[1]'
       )}
     >
       <div
@@ -67,7 +67,7 @@ const Footer = () => {
           <SocialIcons className="mb-5" />
           <div className="flex flex-col justify-center sm:space-x-2 text-center text-sm opacity-70 sm:flex-row sm:text-sm sm:text-left">
             <div className="flex-shrink-0">
-              © 2023 Solana Technology Services LLC
+              © 2024 Realms Today Ltd
             </div>
             <span className="hidden sm:block mx-2">|</span>
             <Link href="https://realms.today/terms" passHref>

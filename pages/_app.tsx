@@ -1,5 +1,4 @@
 import type { AppProps } from 'next/app'
-import '@dialectlabs/react-ui/index.css'
 
 import { App as BaseApp } from '@components/App'
 import { App as HubApp } from '@hub/App'

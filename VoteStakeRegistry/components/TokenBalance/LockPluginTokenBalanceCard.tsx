@@ -27,6 +27,7 @@ import {
 } from '@hooks/queries/mintInfo'
 import { useVsrGovpower } from '@hooks/queries/plugins/vsr'
 
+/** UNUSED */
 const LockPluginTokenBalanceCard = ({
   proposal,
   inAccountDetails,
@@ -132,7 +133,6 @@ const LockPluginTokenBalanceCard = ({
               <TokenDeposit
                 mint={councilMint}
                 tokenRole={GoverningTokenRole.Council}
-                councilVote={true}
                 setHasGovPower={setHasGovPower}
               />
             </div>
@@ -166,7 +166,7 @@ const TokenDepositLock = ({
   const wallet = useWalletOnePointOh()
   const connected = !!wallet?.connected
   const deposits = useDepositStore((s) => s.state.deposits)
-  const votingPower = useVsrGovpower().result?.result ?? new BN(0)
+  const votingPower = useVsrGovpower().data?.result ?? new BN(0)
   const votingPowerFromDeposits = useDepositStore(
     (s) => s.state.votingPowerFromDeposits
   )
@@ -277,9 +277,7 @@ const TokenDepositLock = ({
         </div>
       )}
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
-        <DepositCommunityTokensBtn
-          inAccountDetails={inAccountDetails}
-        ></DepositCommunityTokensBtn>
+        <DepositCommunityTokensBtn inAccountDetails={inAccountDetails} />
         {inAccountDetails && (
           <WithDrawCommunityTokens></WithDrawCommunityTokens>
         )}

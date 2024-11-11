@@ -3,7 +3,7 @@ interface Props {
   advancedOption?: boolean
   children: React.ReactNode
   className?: string
-  description: string | React.ReactNode
+  description?: string | React.ReactNode
   disabled?: boolean
   optional?: boolean
   title: string
@@ -59,14 +59,16 @@ export default function FormField({
         {titleExtra}
       </div>
 
-      <Text
-        level="2"
-        className={`pt-1 ${
-          disabled ? 'opacity-10 cursor-not-allowed' : 'text-fgd-2'
-        }`}
-      >
-        {description}
-      </Text>
+      {description && (
+        <Text
+          level="2"
+          className={`pt-1 ${
+            disabled ? 'opacity-10 cursor-not-allowed' : 'text-fgd-2'
+          }`}
+        >
+          {description}
+        </Text>
+      )}
       <div className="mt-4">{children}</div>
     </div>
   )

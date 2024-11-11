@@ -1,10 +1,9 @@
 import Button from '@components/Button'
 import Input from '@components/inputs/Input'
-import useRealm from '@hooks/useRealm'
 import { PublicKey } from '@solana/web3.js'
 import { tryParseKey } from '@tools/validators/pubkey'
 import { abbreviateAddress } from '@utils/formatting'
-import { useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import {
   ArrowCircleDownIcon,
   ArrowCircleUpIcon,
@@ -50,6 +49,7 @@ import { SUPPORT_CNFTS } from '@constants/flags'
 import clsx from 'clsx'
 import { getNetworkFromEndpoint } from '@utils/connection'
 import { buildTransferCnftInstruction } from '@hooks/instructions/useTransferCnftInstruction'
+import {useVoteByCouncilToggle} from "@hooks/useVoteByCouncilToggle";
 
 const SendNft = ({
   initialNftAndGovernanceSelected,
@@ -60,7 +60,6 @@ const SendNft = ({
 }) => {
   const { connection } = useConnection()
   const realm = useRealmQuery().data?.result
-  const { canChooseWhoVote } = useRealm()
   const { propose } = useCreateProposal()
   const { canUseTransferInstruction } = useGovernanceAssets()
   const { fmtUrlWithCluster } = useQueryContext()
@@ -75,7 +74,7 @@ const SendNft = ({
   const [selectedGovernance, setSelectedGovernance] = useGovernanceSelect(
     initialNftAndGovernanceSelected?.[1]
   )
-  const [voteByCouncil, setVoteByCouncil] = useState(false)
+  const { voteByCouncil, shouldShowVoteByCouncilToggle, setVoteByCouncil } = useVoteByCouncilToggle();
   const [showOptions, setShowOptions] = useState(false)
   const [destination, setDestination] = useState<string>('')
   const [title, setTitle] = useState<string>('')
@@ -283,13 +282,13 @@ const SendNft = ({
               value={description}
               onChange={(evt) => setDescription(evt.target.value)}
             ></Textarea>
-            {canChooseWhoVote && (
-              <VoteBySwitch
-                checked={voteByCouncil}
-                onChange={() => {
-                  setVoteByCouncil(!voteByCouncil)
-                }}
-              ></VoteBySwitch>
+            {shouldShowVoteByCouncilToggle && (
+                <VoteBySwitch
+                    checked={voteByCouncil}
+                    onChange={() => {
+                      setVoteByCouncil(!voteByCouncil)
+                    }}
+                ></VoteBySwitch>
             )}
           </>
         )}

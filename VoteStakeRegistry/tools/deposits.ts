@@ -1,8 +1,13 @@
 import { BN, EventParser, Idl, Program } from '@coral-xyz/anchor'
 import { ProgramAccount, Realm } from '@solana/spl-governance'
-import { PublicKey, Transaction, Connection } from '@solana/web3.js'
+import {
+  PublicKey,
+  Transaction,
+  Connection,
+  ComputeBudgetProgram,
+} from '@solana/web3.js'
 import { SIMULATION_WALLET } from '@tools/constants'
-import { DAYS_PER_MONTH } from '@utils/dateTools'
+import { DAYS_PER_MONTH, SECS_PER_DAY } from '@utils/dateTools'
 import { chunks } from '@utils/helpers'
 import { tryGetMint } from '@utils/tokens'
 import {
@@ -54,12 +59,12 @@ export const getDeposits = async ({
   connection: Connection
 }) => {
   const clientProgramId = client.program.programId
-  const { registrar } = await getRegistrarPDA(
+  const { registrar } = getRegistrarPDA(
     realmPk,
     communityMintPk,
     clientProgramId
   )
-  const { voter } = await getVoterPDA(registrar, walletPk, clientProgramId)
+  const { voter } = getVoterPDA(registrar, walletPk, clientProgramId)
   const existingVoter = await tryGetVoter(voter, client)
   const existingRegistrar = await tryGetRegistrar(registrar, client)
   const mintCfgs = existingRegistrar?.votingMints || []
@@ -156,7 +161,7 @@ const getVotingPowersForWallets = async ({
     event: any
   }[] = []
   for (const walletPk of walletPks) {
-    const { voter } = await getVoterPDA(registrarPk, walletPk, clientProgramId)
+    const { voter } = getVoterPDA(registrarPk, walletPk, clientProgramId)
     voterPks.push(voter)
   }
 
@@ -259,31 +264,33 @@ export const calcMultiplier = ({
   maxExtraLockupVoteWeightScaledFactor,
   lockupSecs,
   lockupSaturationSecs,
+  isVested = false,
 }: {
   depositScaledFactor: number
   maxExtraLockupVoteWeightScaledFactor: number
   lockupSecs: number
   lockupSaturationSecs: number
+  isVested?: boolean
 }) => {
-  //   if (isVested) {
-  //     const onMonthSecs = SECS_PER_DAY * DAYS_PER_MONTH
-  //     const n_periods_before_saturation = lockupSaturationSecs / onMonthSecs
-  //     const n_periods = lockupSecs / onMonthSecs
-  //     const n_unsaturated_periods = Math.min(
-  //       n_periods,
-  //       n_periods_before_saturation
-  //     )
-  //     const n_saturated_periods = Math.max(0, n_periods - n_unsaturated_periods)
-  //     const calc =
-  //       (depositScaledFactor +
-  //         (maxExtraLockupVoteWeightScaledFactor / n_periods) *
-  //           (n_saturated_periods +
-  //             ((n_unsaturated_periods + 1) * n_unsaturated_periods) /
-  //               2 /
-  //               n_periods_before_saturation)) /
-  //       depositScaledFactor
-  //     return depositScaledFactor !== 0 ? calc : 0
-  //   }
+  if (isVested) {
+    const onMonthSecs = SECS_PER_DAY * DAYS_PER_MONTH
+    const n_periods_before_saturation = lockupSaturationSecs / onMonthSecs
+    const n_periods = lockupSecs / onMonthSecs
+    const n_unsaturated_periods = Math.min(
+      n_periods,
+      n_periods_before_saturation
+    )
+    const n_saturated_periods = Math.max(0, n_periods - n_unsaturated_periods)
+    const calc =
+      (depositScaledFactor +
+        (maxExtraLockupVoteWeightScaledFactor / n_periods) *
+          (n_saturated_periods +
+            ((n_unsaturated_periods + 1) * n_unsaturated_periods) /
+              2 /
+              n_periods_before_saturation)) /
+      depositScaledFactor
+    return depositScaledFactor !== 0 ? calc : 0
+  }
   const calc =
     (depositScaledFactor +
       (maxExtraLockupVoteWeightScaledFactor *
@@ -318,7 +325,8 @@ export const getPeriod = (
 export const calcMintMultiplier = (
   lockupSecs: number,
   registrar: Registrar | null,
-  realm: ProgramAccount<Realm> | undefined
+  realm: ProgramAccount<Realm> | undefined,
+  isVested?: boolean
 ) => {
   const mintCfgs = registrar?.votingMints
   const mintCfg = mintCfgs?.find(
@@ -339,6 +347,7 @@ export const calcMintMultiplier = (
       maxExtraLockupVoteWeightScaledFactor: maxExtraLockupVoteWeightScaledFactorNum,
       lockupSaturationSecs: lockupSaturationSecsNum,
       lockupSecs,
+      isVested,
     })
 
     return parseFloat(calced.toFixed(2))
@@ -356,6 +365,7 @@ const getDepositsAdditionalInfoEvents = async (
   //because we switch wallet in here we can't use rpc from npm module
   //anchor dont allow to switch wallets inside existing client
   //parse events response as anchor do
+  const latestBlockhash = await connection.getLatestBlockhash()
   const events: any[] = []
   const parser = new EventParser(client.program.programId, client.program.coder)
   const maxRange = 8
@@ -364,12 +374,18 @@ const getDepositsAdditionalInfoEvents = async (
   for (let i = 0; i < numberOfSimulations; i++) {
     const take = maxRange
     const transaction = new Transaction({ feePayer: simulationWallet })
+    transaction.lastValidBlockHeight = latestBlockhash.lastValidBlockHeight
+    transaction.recentBlockhash = latestBlockhash.blockhash
     const logVoterInfoIx = await client.program.methods
       .logVoterInfo(maxRange * i, take)
       .accounts({ registrar, voter })
       .instruction()
+    transaction.add(
+      ComputeBudgetProgram.setComputeUnitLimit({ units: 1_000_000 })
+    )
     transaction.add(logVoterInfoIx)
     // TODO cache using fetchVotingPowerSimulation
+
     const batchOfDeposits = await connection.simulateTransaction(transaction)
     const logEvents = parser.parseLogs(batchOfDeposits.value.logs!)
     events.push(...[...logEvents])
@@ -383,10 +399,10 @@ export const getLockTokensVotingPowerPerWallet = async (
   client: VsrClient,
   connection: Connection
 ) => {
-  const { registrar } = await getRegistrarPDA(
-    realm.pubkey,
-    realm.account.communityMint,
-    client.program.programId
+  const { registrar } = getRegistrarPDA(
+      realm.pubkey,
+      realm.account.communityMint,
+      client.program.programId
   )
   const existingRegistrar = await tryGetRegistrar(registrar, client)
   const latestBlockhash = await connection.getLatestBlockhash()

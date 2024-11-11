@@ -17,6 +17,7 @@ import { useRealmQuery } from '@hooks/queries/realm';
 import useCreateProposal from '@hooks/useCreateProposal';
 import useLegacyConnectionContext from '@hooks/useLegacyConnectionContext';
 import useQueryContext from '@hooks/useQueryContext';
+import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins';
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh';
 import { Primary, Secondary } from '@hub/components/controls/Button';
 import { useQuery } from '@hub/hooks/useQuery';
@@ -79,6 +80,7 @@ export function EditRealmConfig(props: Props) {
       realmUrlId: props.realmUrlId,
     },
   });
+  const { plugins } = useRealmVoterWeightPlugins();
 
   const { propose } = useCreateProposal();
   const [governance, setGovernance] = useState<Governance | null>(null);
@@ -111,15 +113,12 @@ export function EditRealmConfig(props: Props) {
   }, [step]);
 
   useEffect(() => {
-    if (RE.isOk(result) && wallet?.publicKey) {
-      Promise.resolve(wallet.publicKey) // :-)
-        .then((publicKey) =>
-          fetchConfig(connection.current, result.data.realmByUrlId.publicKey, {
-            publicKey,
-            signAllTransactions: wallet.signAllTransactions,
-            signTransaction: wallet.signTransaction,
-          }),
-        )
+    if (RE.isOk(result)) {
+      fetchConfig(
+        connection.current,
+        result.data.realmByUrlId.publicKey,
+        plugins?.voterWeight ?? [],
+      )
         .then((config) => {
           setConfig({ ...config });
           setProposalTitle(
@@ -320,7 +319,6 @@ export function EditRealmConfig(props: Props) {
                                   24 *
                                   governance.minInstructionHoldupDays,
                                 prerequisiteInstructions: [],
-                                chunkBy: 3,
                               })),
                               governance: governance.governanceAddress,
                             });

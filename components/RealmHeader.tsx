@@ -6,22 +6,20 @@ import Link from 'next/link'
 import useQueryContext from 'hooks/useQueryContext'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 import { getRealmExplorerHost } from 'tools/routing'
-
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { useRealmQuery } from '@hooks/queries/realm'
-import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
-import { NFT_PLUGINS_PKS } from '@constants/plugins'
+import { useConnection } from '@solana/wallet-adapter-react'
 
 const RealmHeader = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const realm = useRealmQuery().data?.result
-  const config = useRealmConfigQuery().data?.result
   const { REALM } = process.env
+  const { connection } = useConnection()
 
   const { realmInfo, symbol, vsrMode } = useRealm()
 
   const explorerHost = getRealmExplorerHost(realmInfo)
-  const realmUrl = `https://${explorerHost}/#/realm/${realmInfo?.realmId.toBase58()}?programId=${realmInfo?.programId.toBase58()}`
+  const realmUrl = `https://${explorerHost}/account/${realmInfo?.realmId.toBase58()}${connection.rpcEndpoint.includes("devnet") ? "?cluster=devnet" : ""}`
 
   const [isBackNavVisible, setIsBackNavVisible] = useState(true)
 
@@ -68,17 +66,6 @@ const RealmHeader = () => {
           <div className="w-40 h-10 rounded-md animate-pulse bg-bkg-3" />
         )}
         <div className="flex items-center space-x-4">
-          {(!config?.account.communityTokenConfig.voterWeightAddin ||
-            NFT_PLUGINS_PKS.includes(
-              config?.account.communityTokenConfig.voterWeightAddin.toBase58()
-            )) && (
-            <Link href={fmtUrlWithCluster(`/dao/${symbol}/members`)}>
-              <a className="flex items-center text-sm cursor-pointer default-transition text-fgd-2 hover:text-fgd-3">
-                <UsersIcon className="flex-shrink-0 w-5 h-5 mr-1" />
-                Members
-              </a>
-            </Link>
-          )}
           {vsrMode === 'default' && (
             <Link href={fmtUrlWithCluster(`/dao/${symbol}/token-stats`)}>
               <a className="flex items-center text-sm cursor-pointer default-transition text-fgd-2 hover:text-fgd-3">
@@ -90,6 +77,12 @@ const RealmHeader = () => {
               </a>
             </Link>
           )}
+          <Link href={fmtUrlWithCluster(`/dao/${symbol}/members`)}>
+            <a className="flex items-center text-sm cursor-pointer default-transition text-fgd-2 hover:text-fgd-3">
+              <UsersIcon className="flex-shrink-0 w-5 h-5 mr-1" />
+              Members
+            </a>
+          </Link>
           <Link href={fmtUrlWithCluster(`/dao/${symbol}/params`)}>
             <a className="flex items-center text-sm cursor-pointer default-transition text-fgd-2 hover:text-fgd-3">
               <CogIcon className="flex-shrink-0 w-5 h-5 mr-1" />

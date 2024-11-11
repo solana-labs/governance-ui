@@ -23,6 +23,7 @@ export default function TransactionCard({
       ? PlayState.Played
       : PlayState.Unplayed
   )
+
   return (
     <div className="break-all">
       <h3 className="mb-4 flex">{`Transaction ${index} `}</h3>

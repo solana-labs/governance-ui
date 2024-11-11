@@ -13,8 +13,6 @@ import { PositionWithMeta } from '../sdk/types'
 import { PROGRAM_ID, init, daoKey } from '@helium/helium-sub-daos-sdk'
 import useRealm from '@hooks/useRealm'
 import { LockupKind } from 'HeliumVotePlugin/components/LockTokensModal'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { HeliumVsrClient } from 'HeliumVotePlugin/sdk/client'
 import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
 import { positionKey } from '@helium/voter-stake-registry-sdk'
 import { notify } from '@utils/notifications'
@@ -26,16 +24,16 @@ import {
 import { chunks } from '@utils/helpers'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { useRealmCommunityMintInfoQuery } from '@hooks/queries/mintInfo'
+import {useHeliumClient} from "../../VoterWeightPlugins/useHeliumClient";
 
 export const useSplitPosition = () => {
   const { connection, wallet, anchorProvider: provider } = useWalletDeprecated()
   const realm = useRealmQuery().data?.result
   const mint = useRealmCommunityMintInfoQuery().data?.result
   const { realmInfo } = useRealm()
-  const [{ client }, registrarPk] = useVotePluginsClientStore((s) => [
-    s.state.currentRealmVotingClient,
-    s.state.voteStakeRegistryRegistrarPk,
-  ])
+    const {heliumClient} = useHeliumClient();
+    const registrarPk = realm && heliumClient ?
+        heliumClient.getRegistrarPDA(realm.pubkey, realm.account.communityMint).registrar : undefined;
   const { error, loading, execute } = useAsyncCallback(
     async ({
       sourcePosition,
@@ -59,8 +57,7 @@ export const useSplitPosition = () => {
         !realm ||
         !registrarPk ||
         !realm ||
-        !client ||
-        !(client instanceof HeliumVsrClient) ||
+        !heliumClient ||
         !wallet ||
         !realmInfo ||
         !realmInfo.programVersion ||
@@ -121,7 +118,7 @@ export const useSplitPosition = () => {
         }
 
         instructions.push(
-          await client.program.methods
+          await heliumClient.program.methods
             .initializePositionV0({
               kind: { [lockupKind]: {} },
               periods: lockupPeriodsInDays,
@@ -151,7 +148,7 @@ export const useSplitPosition = () => {
           )
         } else {
           instructions.push(
-            await client.program.methods
+            await heliumClient.program.methods
               .transferV0({
                 amount: amountToTransfer,
               })
@@ -166,7 +163,7 @@ export const useSplitPosition = () => {
 
         if (amountToTransfer.eq(sourcePosition.amountDepositedNative)) {
           instructions.push(
-            await client.program.methods
+            await heliumClient.program.methods
               .closePositionV0()
               .accounts({
                 position: sourcePosition.pubkey,
@@ -186,7 +183,7 @@ export const useSplitPosition = () => {
           sequenceType: SequenceType.Sequential,
         }))
 
-        notify({ message: 'Spliting Position' })
+        notify({ message: 'Splitting Position' })
         await sendTransactionsV3({
           transactionInstructions: txsChunks,
           wallet,

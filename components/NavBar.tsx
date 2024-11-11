@@ -1,9 +1,9 @@
 import useQueryContext from '@hooks/useQueryContext'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
-import NotificationsSwitch from './NotificationsSwitch'
 import ThemeSwitch from './ThemeSwitch'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
+import DialectNotifications from './Dialect'
 
 const ConnectWalletButtonDynamic = dynamic(
   async () => await import('./ConnectWalletButton'),
@@ -38,7 +38,7 @@ const NavBar = () => {
             <ExternalLinkIcon className="stroke-white h-4 w-4 ml-2" />
           </a>
           <ThemeSwitch />
-          <NotificationsSwitch />
+          <DialectNotifications />
           <ConnectWalletButtonDynamic />
         </div>
       </div>

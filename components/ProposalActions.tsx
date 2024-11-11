@@ -17,10 +17,8 @@ import { Proposal } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { cancelProposal } from 'actions/cancelProposal'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import dayjs from 'dayjs'
 import { diffTime } from './ProposalRemainingVotingTime'
-import { useMaxVoteRecord } from '@hooks/useMaxVoteRecord'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
 import {
   proposalQueryKeys,
@@ -38,6 +36,7 @@ import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import { TransactionInstruction } from '@solana/web3.js'
 import useQueryContext from '@hooks/useQueryContext'
 import { useRouter } from 'next/router'
+import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
 
 const ProposalActionsPanel = () => {
   const { propose } = useCreateProposal()
@@ -56,11 +55,9 @@ const ProposalActionsPanel = () => {
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
   const connection = useLegacyConnectionContext()
 
-  const maxVoteRecordPk = useMaxVoteRecord()?.pubkey
-  const votePluginsClientMaxVoterWeight = useVotePluginsClientStore(
-    (s) => s.state.maxVoterWeight
-  )
-  const maxVoterWeight = maxVoteRecordPk || votePluginsClientMaxVoterWeight
+  // TODO check the kind to be passed
+  const { maxVoterWeightPk } = useRealmVoterWeightPlugins()
+
   const canFinalizeVote =
     hasVoteTimeExpired && proposal?.account.state === ProposalState.Voting
   const now = new Date().getTime() / 1000 // unix timestamp in seconds
@@ -174,7 +171,7 @@ const ProposalActionsPanel = () => {
           rpcContext,
           governance?.account.realm,
           proposal,
-          maxVoterWeight,
+          maxVoterWeightPk,
           proposalOwner
         )
       }
@@ -259,12 +256,15 @@ const ProposalActionsPanel = () => {
 
   const handleRepropose = async () => {
     try {
-      if (proposal && realmInfo && signatoryRecord) {
+      if (proposal && realmInfo) {
         const proposalAddress = await propose({
           title: proposal.account.name,
           description: proposal.account.descriptionLink,
           voteByCouncil:
-            proposal.account.governingTokenMint !== realmInfo.communityMint,
+            !realmInfo.communityMint ||
+            !proposal.account.governingTokenMint.equals(
+              realmInfo.communityMint
+            ),
           instructionsData: transactions
             ? [
                 ...transactions.flatMap((tx) =>
@@ -282,6 +282,7 @@ const ProposalActionsPanel = () => {
                           isValid: true,
                           governance: undefined,
                           customHoldUpTime: tx.account.holdUpTime,
+                          chunkBy: 1,
                         },
                       })
                   )

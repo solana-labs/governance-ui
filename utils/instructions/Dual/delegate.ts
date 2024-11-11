@@ -40,6 +40,8 @@ import {
 import { getMintCfgIdx, tryGetVoter } from 'VoteStakeRegistry/sdk/api'
 import { getPeriod } from 'VoteStakeRegistry/tools/deposits'
 import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
+import { fetchRealmByPubkey } from '@hooks/queries/realm'
+import { determineVotingPowerType } from '@hooks/queries/governancePower'
 
 const govProgramId = new PublicKey(
   'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'
@@ -66,6 +68,7 @@ interface VoteDepositArgs {
   setFormErrors: any
   schema: any
   wallet: WalletAdapter | undefined
+  realmPk: PublicKey | undefined
 }
 
 export async function getDelegateInstruction({
@@ -123,8 +126,14 @@ export async function getVoteDepositInstruction({
   form,
   schema,
   setFormErrors,
+  realmPk,
 }: VoteDepositArgs): Promise<UiInstruction> {
-  const isValid = await validateInstruction({ schema, form, setFormErrors })
+  const isValid =
+    (await validateInstruction({ schema, form, setFormErrors })) &&
+    realmPk !== undefined
+  if (!realmPk) {
+    setFormErrors({ realm: 'Realm not found' })
+  }
 
   const serializedInstruction = ''
   const additionalSerializedInstructions: string[] = []
@@ -136,9 +145,25 @@ export async function getVoteDepositInstruction({
     wallet?.publicKey &&
     form.realm &&
     form.delegateToken &&
-    form.delegateToken.extensions.mint?.publicKey
+    form.delegateToken.extensions.mint?.publicKey &&
+    realmPk
   ) {
-    const realmPk = new PublicKey(form.realm)
+    const { result: realm } = await fetchRealmByPubkey(
+      connection.current,
+      realmPk
+    )
+    if (!realm) {
+      throw new Error('Realm not found')
+    }
+    const plugin = await determineVotingPowerType(
+      connection.current,
+      realmPk,
+      'community'
+    )
+    if (plugin !== 'VSR') {
+      throw new Error('this form currently only supports VSR')
+    }
+
     const communityMintPk = form.delegateToken.extensions.mint?.publicKey
     const daoWallet = form.delegateToken.governance.nativeTreasuryAddress
     const amount = getMintNaturalAmountFromDecimalAsBN(
@@ -148,10 +173,10 @@ export async function getVoteDepositInstruction({
 
     const programVersion = await fetchProgramVersion(
       connection.current,
-      govProgramId // governance program public key
+      realm.owner // governance program public key
     )
     const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
-      govProgramId,
+      realm.owner,
       realmPk,
       form.delegateToken.extensions.mint.publicKey,
       daoWallet
@@ -175,17 +200,17 @@ export async function getVoteDepositInstruction({
     const systemProgram = SystemProgram.programId
     const clientProgramId = vsrClient!.program.programId
 
-    const { registrar } = await getRegistrarPDA(
+    const { registrar } = getRegistrarPDA(
       realmPk,
       communityMintPk,
       clientProgramId
     )
-    const { voter, voterBump } = await getVoterPDA(
+    const { voter, voterBump } = getVoterPDA(
       registrar,
       daoWallet,
       clientProgramId
     )
-    const { voterWeightPk, voterWeightBump } = await getVoterWeightPDA(
+    const { voterWeightPk, voterWeightBump } = getVoterWeightPDA(
       registrar,
       daoWallet,
       clientProgramId
@@ -204,7 +229,7 @@ export async function getVoteDepositInstruction({
     if (!isExisintgTokenOwnerRecord) {
       await withCreateTokenOwnerRecord(
         prerequisiteInstructions,
-        govProgramId,
+        realm.owner,
         programVersion,
         realmPk,
         daoWallet,

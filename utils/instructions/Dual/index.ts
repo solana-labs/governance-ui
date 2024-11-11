@@ -141,7 +141,8 @@ export async function getConfigInstruction({
           //owner is sol wallet or governance same as baseTokenAccount
           form.baseTreasury.extensions!.token!.account.owner,
           [],
-          form.numTokens
+          // @ts-ignore
+          form.numTokens as unknown as bigint
         )
       )
     )
@@ -332,7 +333,8 @@ export async function getConfigGsoInstruction({
           //owner is sol wallet or governance same as baseTreasury
           form.baseTreasury.extensions!.token!.account.owner,
           [],
-          form.numTokens
+          // @ts-ignore
+          form.numTokens as unknown as bigint
         )
       )
     )
@@ -362,6 +364,7 @@ export async function getConfigGsoInstruction({
     // Set all GSOs to have the same expiration and lockup period. This means
     // that users will be able to unstake at the same time as option expiration.
     const lockupPeriodEnd = form.optionExpirationUnixSeconds
+    const lockupMint = new PublicKey(form.lockupMint);
     const configInstruction = await gso.createConfigInstruction(
       optionsPerMillion,
       lockupPeriodEnd,
@@ -371,6 +374,7 @@ export async function getConfigGsoInstruction({
       form.soName,
       strikeAtomsPerLot,
       form.payer.extensions.transferAddress!,
+      lockupMint,
       baseMint,
       quoteMint,
       baseAccount,
@@ -475,6 +479,17 @@ export async function getExerciseInstruction({
         wallet.publicKey,
         new PublicKey('7Z36Efbt7a4nLiV7s5bY7J2e4TJ6V9JEKGccsy2od2bE'),
         quoteMint
+      )
+      additionalSerializedInstructions.push(serializeInstructionToBase64(ataIx))
+    }
+
+    // Possibly init the base token account that is receiving tokens from exercise.
+    const walletBaseAta = await findAssociatedTokenAddress(wallet.publicKey, baseMint);
+    if ((await connection.current.getAccountInfo(walletBaseAta)) === null) {
+      const [ataIx] = await createAssociatedTokenAccount(
+        wallet.publicKey,
+        wallet.publicKey,
+        baseMint
       )
       additionalSerializedInstructions.push(serializeInstructionToBase64(ataIx))
     }
@@ -731,7 +746,7 @@ export async function getGsoWithdrawInstruction({
 
   const serializedInstruction = ''
   const additionalSerializedInstructions: string[] = []
-  if (isValid && form.soName && form.baseTreasury && !!form.baseTreasury.isSol && wallet?.publicKey) {
+  if (isValid && form.soName && form.baseTreasury && wallet?.publicKey) {
     const gso = getGsoApi(connection)
     const authority = form.baseTreasury.extensions.token!.account.owner!
     const baseMint = form.baseTreasury.extensions.mint?.publicKey

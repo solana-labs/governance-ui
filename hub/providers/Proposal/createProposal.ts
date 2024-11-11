@@ -1,22 +1,9 @@
-import { SUPPORT_CNFTS } from '@constants/flags';
-import {
-  VSR_PLUGIN_PKS,
-  NFT_PLUGINS_PKS,
-  GATEWAY_PLUGINS_PKS,
-} from '@constants/plugins';
-import { Wallet } from '@coral-xyz/anchor';
 import {
   serializeInstructionToBase64,
   getGovernance,
   getRealm,
   getTokenOwnerRecordForRealm,
-  getRealmConfigAddress,
-  GoverningTokenType,
-  GoverningTokenConfig,
   RpcContext,
-  GovernanceAccountParser,
-  RealmConfigAccount,
-  ProgramAccount,
 } from '@solana/spl-governance';
 import type {
   Connection,
@@ -29,17 +16,8 @@ import {
   InstructionDataWithHoldUpTime,
   createProposal as _createProposal,
 } from 'actions/createProposal';
-import { tryGetNftRegistrar } from 'VoteStakeRegistry/sdk/api';
 
-import {
-  DasNftObject,
-  fetchDigitalAssetsByOwner,
-} from '@hooks/queries/digitalAssets';
-import { getNetworkFromEndpoint } from '@utils/connection';
-import { getRegistrarPDA as getPluginRegistrarPDA } from '@utils/plugin/accounts';
 import { VotingClient } from '@utils/uiTypes/VotePlugin';
-
-import { fetchPlugins } from './fetchPlugins';
 
 interface Args {
   callbacks?: Parameters<typeof _createProposal>[12];
@@ -58,6 +36,7 @@ interface Args {
   requestingUserPublicKey: PublicKey;
   signTransaction(transaction: Transaction): Promise<Transaction>;
   signAllTransactions(transactions: Transaction[]): Promise<Transaction[]>;
+  votingClient: VotingClient | undefined;
 }
 
 /** @deprecated */
@@ -67,7 +46,6 @@ export async function createProposal(args: Args) {
   const [
     governance,
     tokenOwnerRecord,
-    realmConfigPublicKey,
     // eslint-disable-next-line
     councilTokenOwnerRecord,
     // eslint-disable-next-line
@@ -81,7 +59,6 @@ export async function createProposal(args: Args) {
       args.governingTokenMintPublicKey,
       args.requestingUserPublicKey,
     ).catch(() => undefined),
-    getRealmConfigAddress(realm.owner, args.realmPublicKey),
     args.councilTokenMintPublicKey
       ? getTokenOwnerRecordForRealm(
           args.connection,
@@ -101,36 +78,6 @@ export async function createProposal(args: Args) {
         ).catch(() => undefined)
       : undefined,
   ]);
-
-  const realmConfigAccountInfo = await args.connection.getAccountInfo(
-    realmConfigPublicKey,
-  );
-
-  const realmConfig: ProgramAccount<RealmConfigAccount> = realmConfigAccountInfo
-    ? GovernanceAccountParser(RealmConfigAccount)(
-        realmConfigPublicKey,
-        realmConfigAccountInfo,
-      )
-    : {
-        pubkey: realmConfigPublicKey,
-        owner: realm.owner,
-        account: new RealmConfigAccount({
-          realm: args.realmPublicKey,
-          communityTokenConfig: new GoverningTokenConfig({
-            voterWeightAddin: undefined,
-            maxVoterWeightAddin: undefined,
-            tokenType: GoverningTokenType.Liquid,
-            reserved: new Uint8Array(),
-          }),
-          councilTokenConfig: new GoverningTokenConfig({
-            voterWeightAddin: undefined,
-            maxVoterWeightAddin: undefined,
-            tokenType: GoverningTokenType.Liquid,
-            reserved: new Uint8Array(),
-          }),
-          reserved: new Uint8Array(),
-        }),
-      };
 
   let userTOR = tokenOwnerRecord;
 
@@ -174,97 +121,6 @@ export async function createProposal(args: Args) {
 
   const proposalIndex = governance.account.proposalCount;
 
-  const pluginPublicKey =
-    realmConfig.account.communityTokenConfig.voterWeightAddin;
-  let votingClient: VotingClient | undefined = undefined;
-  let votingNfts: DasNftObject[] = [];
-
-  if (pluginPublicKey) {
-    const votingPlugins = await fetchPlugins(
-      args.connection,
-      pluginPublicKey,
-      {
-        publicKey: args.requestingUserPublicKey,
-        signTransaction: args.signTransaction,
-        signAllTransactions: args.signAllTransactions,
-      } as Wallet,
-      args.cluster === 'devnet',
-    );
-    const pluginPublicKeyStr = pluginPublicKey.toBase58();
-    let client: VotingClient['client'] = undefined;
-    // Check for plugins in a particular order. I'm not sure why, but I
-    // borrowed this from /hooks/useVotingPlugins.ts
-    if (
-      VSR_PLUGIN_PKS.includes(pluginPublicKeyStr) &&
-      votingPlugins.vsrClient
-    ) {
-      client = votingPlugins.vsrClient;
-    }
-
-    if (
-      NFT_PLUGINS_PKS.includes(pluginPublicKeyStr) &&
-      votingPlugins.nftClient
-    ) {
-      client = votingPlugins.nftClient;
-
-      if (client && args.communityTokenMintPublicKey) {
-        const programId = client.program.programId;
-        const registrarPDA = (
-          await getPluginRegistrarPDA(
-            args.realmPublicKey,
-            args.communityTokenMintPublicKey,
-            programId,
-          )
-        ).registrar;
-
-        const registrar: any = await tryGetNftRegistrar(registrarPDA, client);
-        const collections: string[] =
-          registrar?.collectionConfigs.map((x: any) =>
-            x.collection.toBase58(),
-          ) || [];
-
-        // const nfts = await getNfts(args.requestingUserPublicKey, {
-        //   cluster: args.cluster,
-        // } as any);
-        const network = getNetworkFromEndpoint(args.connection.rpcEndpoint);
-        if (network === 'localnet') throw new Error();
-        const nfts = await fetchDigitalAssetsByOwner(
-          network,
-          args.requestingUserPublicKey,
-        );
-
-        votingNfts = nfts.filter((nft) => {
-          const collection = nft.grouping.find(
-            (x: any) => x.group_key === 'collection',
-          );
-          return (
-            (SUPPORT_CNFTS || !nft.compression.compressed) &&
-            collection &&
-            collections.includes(collection.group_value) &&
-            nft.creators?.filter((x: any) => x.verified).length > 0
-          );
-        });
-      }
-    }
-
-    if (
-      GATEWAY_PLUGINS_PKS.includes(pluginPublicKeyStr) &&
-      votingPlugins.gatewayClient
-    ) {
-      client = votingPlugins.gatewayClient;
-    }
-
-    if (client) {
-      votingClient = new VotingClient({
-        realm,
-        client,
-        walletPk: args.requestingUserPublicKey,
-      });
-
-      votingClient._setCurrentVoterNfts(votingNfts);
-    }
-  }
-
   return _createProposal(
     {
       connection: args.connection,
@@ -286,7 +142,7 @@ export async function createProposal(args: Args) {
     instructionData,
     args.isDraft,
     args.options,
-    votingClient,
+    args.votingClient,
     args.callbacks,
   );
 }

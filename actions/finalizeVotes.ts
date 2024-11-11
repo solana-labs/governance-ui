@@ -4,17 +4,13 @@ import {
   withRefundProposalDeposit,
 } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
-import {
-  Keypair,
-  PublicKey,
-  Transaction,
-  TransactionInstruction,
-} from '@solana/web3.js'
-import { sendTransaction } from '@utils/send'
+import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { Proposal } from '@solana/spl-governance'
 import { withFinalizeVote } from '@solana/spl-governance'
 import { getProposalDepositPk } from '@utils/helpers'
 import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
+import { SequenceType } from '@blockworks-foundation/mangolana/lib/globalTypes'
+import { sendTransactionsV3 } from '@utils/sendTransactions'
 
 export const finalizeVote = async (
   { connection, wallet, programId }: RpcContext,
@@ -67,30 +63,38 @@ export const finalizeVote = async (
     connection.getBalance(possibleTorDeposit),
   ])
 
-  const activeDeposit = delegateDeposit ? delegateDeposit : torDeposit
+  let refundAddress
+  if (delegateDeposit && delegateDeposit > 0 && possibleDelegateDeposit) {
+    refundAddress = proposalOwner.account.governanceDelegate
+  } else if (torDeposit && torDeposit > 0) {
+    refundAddress = proposalOwner.account.governingTokenOwner
+  }
 
-  if (activeDeposit) {
+  if (refundAddress) {
     await withRefundProposalDeposit(
       instructions,
       programId!,
       programVersion,
       proposal.pubkey,
-      possibleDelegateDeposit && delegateDeposit
-        ? proposalOwner.account.governanceDelegate!
-        : proposalOwner.account.governingTokenOwner!
+      refundAddress
     )
   }
 
-  const transaction = new Transaction()
+  const txes = [instructions].map((txBatch) => {
+    return {
+      instructionsSet: txBatch.map((x) => {
+        return {
+          transactionInstruction: x,
+          signers: signers,
+        }
+      }),
+      sequenceType: SequenceType.Sequential,
+    }
+  })
 
-  transaction.add(...instructions)
-
-  await sendTransaction({
-    transaction,
-    wallet,
+  await sendTransactionsV3({
     connection,
-    signers,
-    sendingMessage: 'Finalizing votes',
-    successMessage: 'Votes finalized',
+    wallet,
+    transactionInstructions: txes,
   })
 }

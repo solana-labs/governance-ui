@@ -15,6 +15,8 @@ import UseMangoV4 from '../../../../../../../../hooks/useMangoV4'
 import { buildIxGate } from '@blockworks-foundation/mango-v4'
 import { IxGateParams } from '@blockworks-foundation/mango-v4/dist/types/src/clientIxParamBuilder'
 import useWalletOnePointOh from '@hooks/useWalletOnePointOh'
+import useProgramSelector from '@components/Mango/useProgramSelector'
+import ProgramSelector from '@components/Mango/ProgramSelector'
 
 type IxGateSetForm = IxGateParams & {
   governedAccount: AssetAccount | null
@@ -29,7 +31,11 @@ const IxGateSet = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletOnePointOh()
-  const { mangoClient, mangoGroup } = UseMangoV4()
+  const programSelectorHook = useProgramSelector()
+  const { mangoClient, mangoGroup } = UseMangoV4(
+    programSelectorHook.program?.val,
+    programSelectorHook.program?.group
+  )
   const { assetAccounts } = useGovernanceAssets()
   const solAccounts = assetAccounts.filter(
     (x) =>
@@ -117,6 +123,11 @@ const IxGateSet = ({
     TokenConditionalSwapStart: true,
     TokenConditionalSwapCreatePremiumAuction: true,
     TokenConditionalSwapCreateLinearAuction: true,
+    Serum3PlaceOrderV2: true,
+    TokenForceWithdraw: true,
+    SequenceCheck: true,
+    HealthCheck: true,
+    GroupChangeInsuranceFund: true,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -627,10 +638,43 @@ const IxGateSet = ({
       type: InstructionInputType.SWITCH,
       name: 'TokenConditionalSwapCreateLinearAuction',
     },
+    {
+      label: 'Serum 3 Place Order V2',
+      initialValue: form.Serum3PlaceOrderV2,
+      type: InstructionInputType.SWITCH,
+      name: 'Serum3PlaceOrderV2',
+    },
+    {
+      label: 'Token Force withdraw',
+      initialValue: form.TokenForceWithdraw,
+      type: InstructionInputType.SWITCH,
+      name: 'TokenForceWithdraw',
+    },
+    {
+      label: 'Sequence Check',
+      initialValue: form.SequenceCheck,
+      type: InstructionInputType.SWITCH,
+      name: 'SequenceCheck',
+    },
+    {
+      label: 'Health Check',
+      initialValue: form.HealthCheck,
+      type: InstructionInputType.SWITCH,
+      name: 'HealthCheck',
+    },
+    {
+      label: 'Group Change Insurance Fund',
+      initialValue: form.GroupChangeInsuranceFund,
+      type: InstructionInputType.SWITCH,
+      name: 'GroupChangeInsuranceFund',
+    },
   ]
 
   return (
     <>
+      <ProgramSelector
+        programSelectorHook={programSelectorHook}
+      ></ProgramSelector>
       {form && (
         <InstructionForm
           outerForm={form}

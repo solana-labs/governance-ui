@@ -57,18 +57,14 @@ import ConfigureNftPluginCollection from './components/instructions/NftVotingPlu
 import SwitchboardFundOracle from './components/instructions/Switchboard/FundOracle'
 import WithdrawFromOracle from './components/instructions/Switchboard/WithdrawFromOracle'
 import StakeValidator from './components/instructions/Validators/StakeValidator'
+import SanctumDepositStake from './components/instructions/Validators/SanctumDepositStake'
+import SanctumWithdrawStake from './components/instructions/Validators/SanctumWithdrawStake'
 import DeactivateValidatorStake from './components/instructions/Validators/DeactivateStake'
 import WithdrawValidatorStake from './components/instructions/Validators/WithdrawStake'
 import DelegateStake from './components/instructions/Validators/DelegateStake'
 import SplitStake from './components/instructions/Validators/SplitStake'
 import useCreateProposal from '@hooks/useCreateProposal'
-import MakeInitMarketParams from './components/instructions/Foresight/MakeInitMarketParams'
-import MakeInitMarketListParams from './components/instructions/Foresight/MakeInitMarketListParams'
-import MakeInitCategoryParams from './components/instructions/Foresight/MakeInitCategoryParams'
-import MakeResolveMarketParams from './components/instructions/Foresight/MakeResolveMarketParams'
-import MakeAddMarketListToCategoryParams from './components/instructions/Foresight/MakeAddMarketListToCategoryParams'
 import RealmConfig from './components/instructions/RealmConfig'
-import MakeSetMarketMetadataParams from './components/instructions/Foresight/MakeSetMarketMetadataParams'
 import CloseTokenAccount from './components/instructions/CloseTokenAccount'
 import CloseMultipleTokenAccounts from './components/instructions/CloseMultipleTokenAccounts'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
@@ -132,12 +128,24 @@ import InitStrike from './components/instructions/Dual/InitStrike'
 import IdlSetBuffer from './components/instructions/Mango/MangoV4/IdlSetBuffer'
 import { useRealmQuery } from '@hooks/queries/realm'
 import { usePrevious } from '@hooks/usePrevious'
-import DualVote from './components/instructions/Dual/DualVote'
+import DaoVote from './components/instructions/SplGov/DaoVote'
 import DualGso from './components/instructions/Dual/DualGso'
 import DualGsoWithdraw from './components/instructions/Dual/DualGsoWithdraw'
 import MultiChoiceForm from '../../../../components/MultiChoiceForm'
 import CloseVaults from './components/instructions/DistrubtionProgram/CloseVaults'
 import FillVaults from './components/instructions/DistrubtionProgram/FillVaults'
+import MeshRemoveMember from './components/instructions/Squads/MeshRemoveMember'
+import MeshAddMember from './components/instructions/Squads/MeshAddMember'
+import MeshChangeThresholdMember from './components/instructions/Squads/MeshChangeThresholdMember'
+import PythRecoverAccount from './components/instructions/Pyth/PythRecoverAccount'
+import { useVoteByCouncilToggle } from '@hooks/useVoteByCouncilToggle'
+import BurnTokens from './components/instructions/BurnTokens'
+import RemoveLockup from './components/instructions/Validators/removeLockup'
+import SymmetryCreateBasket from './components/instructions/Symmetry/SymmetryCreateBasket'
+import SymmetryEditBasket from './components/instructions/Symmetry/SymmetryEditBasket'
+import SymmetryDeposit from './components/instructions/Symmetry/SymmetryDeposit'
+import SymmetryWithdraw from './components/instructions/Symmetry/SymmetryWithdraw'
+import PythUpdatePoolAuthority from './components/instructions/Pyth/PythUpdatePoolAuthority'
 
 const TITLE_LENGTH_LIMIT = 130
 // the true length limit is either at the tx size level, and maybe also the total account size level (I can't remember)
@@ -192,14 +200,17 @@ const New = () => {
   const { handleCreateProposal, proposeMultiChoice } = useCreateProposal()
   const { fmtUrlWithCluster } = useQueryContext()
   const realm = useRealmQuery().data?.result
-
-  const { symbol, realmInfo, canChooseWhoVote } = useRealm()
+  const { symbol, realmInfo } = useRealm()
   const { availableInstructions } = useGovernanceAssets()
-  const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [form, setForm] = useState({
     title: typeof router.query['t'] === 'string' ? router.query['t'] : '',
     description: '',
   })
+  const {
+    voteByCouncil,
+    shouldShowVoteByCouncilToggle,
+    setVoteByCouncil,
+  } = useVoteByCouncilToggle()
   const [multiChoiceForm, setMultiChoiceForm] = useState<{
     governance: PublicKey | undefined
     options: string[]
@@ -458,6 +469,7 @@ const New = () => {
       | null
   } = useMemo(
     () => ({
+      [Instructions.Burn]: BurnTokens,
       [Instructions.Transfer]: SplTokenTransfer,
       [Instructions.ProgramUpgrade]: ProgramUpgrade,
       [Instructions.Mint]: Mint,
@@ -494,7 +506,7 @@ const New = () => {
       [Instructions.DualFinanceDelegate]: DualDelegate,
       [Instructions.DualFinanceDelegateWithdraw]: DualVoteDepositWithdraw,
       [Instructions.DualFinanceVoteDeposit]: DualVoteDeposit,
-      [Instructions.DualFinanceVote]: DualVote,
+      [Instructions.DaoVote]: DaoVote,
       [Instructions.DistributionCloseVaults]: CloseVaults,
       [Instructions.DistributionFillVaults]: FillVaults,
       [Instructions.MeanCreateAccount]: MeanCreateAccount,
@@ -502,6 +514,11 @@ const New = () => {
       [Instructions.MeanWithdrawFromAccount]: MeanWithdrawFromAccount,
       [Instructions.MeanCreateStream]: MeanCreateStream,
       [Instructions.MeanTransferStream]: MeanTransferStream,
+      [Instructions.SquadsMeshRemoveMember]: MeshRemoveMember,
+      [Instructions.SquadsMeshAddMember]: MeshAddMember,
+      [Instructions.SquadsMeshChangeThresholdMember]: MeshChangeThresholdMember,
+      [Instructions.PythRecoverAccount]: PythRecoverAccount,
+      [Instructions.PythUpdatePoolAuthority]: PythUpdatePoolAuthority,
       [Instructions.CreateSolendObligationAccount]: CreateObligationAccount,
       [Instructions.InitSolendObligationAccount]: InitObligationAccount,
       [Instructions.DepositReserveLiquidityAndObligationCollateral]: DepositReserveLiquidityAndObligationCollateral,
@@ -514,12 +531,6 @@ const New = () => {
       [Instructions.WithdrawFromOracle]: WithdrawFromOracle,
       [Instructions.RefreshSolendObligation]: RefreshObligation,
       [Instructions.RefreshSolendReserve]: RefreshReserve,
-      [Instructions.ForesightInitMarket]: MakeInitMarketParams,
-      [Instructions.ForesightInitMarketList]: MakeInitMarketListParams,
-      [Instructions.ForesightInitCategory]: MakeInitCategoryParams,
-      [Instructions.ForesightResolveMarket]: MakeResolveMarketParams,
-      [Instructions.ForesightAddMarketListToCategory]: MakeAddMarketListToCategoryParams,
-      [Instructions.ForesightSetMarketMetadata]: MakeSetMarketMetadataParams,
       [Instructions.RealmConfig]: RealmConfig,
       [Instructions.CreateNftPluginRegistrar]: CreateNftPluginRegistrar,
       [Instructions.CreateNftPluginMaxVoterWeight]: CreateNftPluginMaxVoterWeightRecord,
@@ -534,9 +545,12 @@ const New = () => {
       [Instructions.CreateTokenMetadata]: CreateTokenMetadata,
       [Instructions.UpdateTokenMetadata]: UpdateTokenMetadata,
       [Instructions.StakeValidator]: StakeValidator,
+      [Instructions.SanctumDepositStake]: SanctumDepositStake,
+      [Instructions.SanctumWithdrawStake]: SanctumWithdrawStake,
       [Instructions.DeactivateValidatorStake]: DeactivateValidatorStake,
       [Instructions.WithdrawValidatorStake]: WithdrawValidatorStake,
       [Instructions.DelegateStake]: DelegateStake,
+      [Instructions.RemoveStakeLock]: RemoveLockup,
       [Instructions.SplitStake]: SplitStake,
       [Instructions.DifferValidatorStake]: null,
       [Instructions.TransferDomainName]: TransferDomainName,
@@ -590,6 +604,10 @@ const New = () => {
       [Instructions.RemoveServiceFromDID]: RemoveServiceFromDID,
       [Instructions.RevokeGoverningTokens]: RevokeGoverningTokens,
       [Instructions.SetMintAuthority]: SetMintAuthority,
+      [Instructions.SymmetryCreateBasket]: SymmetryCreateBasket,
+      [Instructions.SymmetryEditBasket]: SymmetryEditBasket,
+      [Instructions.SymmetryDeposit]: SymmetryDeposit,
+      [Instructions.SymmetryWithdraw]: SymmetryWithdraw,
     }),
     [governance?.pubkey?.toBase58()]
   )
@@ -711,7 +729,7 @@ const New = () => {
                 })}
               />
             </div>
-            {canChooseWhoVote && (
+            {shouldShowVoteByCouncilToggle && (
               <VoteBySwitch
                 checked={voteByCouncil}
                 onChange={() => {

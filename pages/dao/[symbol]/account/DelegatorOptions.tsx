@@ -4,7 +4,7 @@ import { useTokenOwnerRecordsDelegatedToUser } from '@hooks/queries/tokenOwnerRe
 import DelegatorsList from './DelegatorsList'
 
 const DelegatorOptions = () => {
-  const delegatesArray = useTokenOwnerRecordsDelegatedToUser()
+  const { data: delegatesArray } = useTokenOwnerRecordsDelegatedToUser()
 
   return delegatesArray === undefined || delegatesArray.length < 1 ? null : (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
