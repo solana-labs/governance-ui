@@ -132,8 +132,8 @@ export const PositionCard: React.FC<PositionCardProps> = ({
   } = useFlipPositionLockupKind()
 
   const {
-    loading: isTransfering,
-    error: transferingError,
+    loading: isTransferring,
+    error: transferringError,
     transferPosition,
   } = useTransferPosition()
 
@@ -267,7 +267,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
       targetPosition,
     })
 
-    if (!transferingError) {
+    if (!transferringError) {
       await refetchState()
     }
   }
@@ -350,7 +350,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
     isExtending ||
     isSpliting ||
     isClosing ||
-    isTransfering ||
+    isTransferring ||
     isFlipping ||
     isDelegating ||
     isUndelegating ||
@@ -489,7 +489,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
                             className="w-full"
                             onClick={() => setIsTransferModalOpen(true)}
                             disabled={isSubmitting}
-                            isLoading={isTransfering}
+                            isLoading={isTransferring}
                           >
                             Transfer
                           </Button>
