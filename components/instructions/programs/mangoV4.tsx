@@ -325,7 +325,7 @@ const instructions = () => ({
         label,
         valKey,
         suffix,
-        prefix: perfix,
+        prefix: prefix,
       }: {
         label: string
         valKey: string
