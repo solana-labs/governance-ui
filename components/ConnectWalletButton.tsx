@@ -178,7 +178,8 @@ const ConnectWalletButton = (props) => {
                         </button>
                       </Menu.Item>
                     ))}
-                  <Menu.Item key={'devnet'}>
+                  {/* Disallow to change cluster manually */}
+                  {/*<Menu.Item key={'devnet'}>
                     <div className="flex items-center w-full p-2 font-normal default-transition h-9 hover:bg-bkg-3 hover:cursor-pointer hover:rounded focus:outline-none">
                       <span className="text-sm">Devnet</span>
                       <Switch
@@ -188,7 +189,7 @@ const ConnectWalletButton = (props) => {
                         }}
                       />
                     </div>
-                  </Menu.Item>
+                  </Menu.Item>*/}
                   {wallet && publicKey && (
                     <>
                       <hr

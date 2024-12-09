@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic'
 import ThemeSwitch from './ThemeSwitch'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 import DialectNotifications from './Dialect'
+import AgridexLogo from './AgridexLogo'
 
 const ConnectWalletButtonDynamic = dynamic(
   async () => await import('./ConnectWalletButton'),
@@ -25,6 +26,7 @@ const NavBar = () => {
               />
               <img src="/img/logo-realms.svg" className="w-8 h-8 sm:w-24" />
             </picture>
+            <AgridexLogo />
           </div>
         </Link>
         <div className="flex items-center justify-end space-x-2 md:space-x-4">

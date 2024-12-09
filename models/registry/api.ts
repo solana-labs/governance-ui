@@ -2,8 +2,8 @@ import { PROGRAM_VERSION_V1 } from '@solana/spl-governance'
 
 import { PublicKey } from '@solana/web3.js'
 
-import devnetRealms from 'public/realms/devnet.json'
-import mainnetBetaRealms from 'public/realms/mainnet-beta.json'
+// import devnetRealms from 'public/realms/devnet.json'
+// import mainnetBetaRealms from 'public/realms/mainnet-beta.json'
 import type { ConnectionContext } from 'utils/connection'
 import { equalsIgnoreCase } from '../../tools/core/strings'
 
@@ -62,8 +62,15 @@ interface RealmInfoAsJSON
 
 // TODO: Once governance program clones registry program and governance
 //       accounts metadata is on-chain the list should be moved there
-const MAINNET_REALMS = parseCertifiedRealms(mainnetBetaRealms)
-const DEVNET_REALMS = parseCertifiedRealms(devnetRealms)
+// TODO replace realmId with real one upon launch
+const MAINNET_REALMS = parseCertifiedRealms([{
+    "symbol": "AGRI",
+    "displayName": "AgriDex DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "735Kg6893iFH2KuGy6uJrVXYKwBi6ky3KLLNPmJ4TMCD",
+    "ogImage": "https://arweave.net/6wVeAl6Jt1G7fAc4nPrhFaq25qJJ8nGeyeft0JY0nJI"
+}]); // parseCertifiedRealms(mainnetBetaRealms)
+const DEVNET_REALMS = []; // parseCertifiedRealms(devnetRealms)
 
 export function parseCertifiedRealms(realms: RealmInfoAsJSON[]) {
   return realms.map((realm) => ({

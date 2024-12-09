@@ -1,5 +1,6 @@
 const lineClamp = require('@tailwindcss/line-clamp')
 const forms = require('@tailwindcss/forms')
+const agridexTheme = require('./agridex-theme.tailwind.config.js')
 
 module.exports = {
   darkMode: 'class',
@@ -28,6 +29,7 @@ module.exports = {
       },
       colors: {
         discord: '#7289da',
+        'agridex-theme': agridexTheme,
         'dark-theme': {
           primary: { light: '#5DC9EB', dark: '#cecece' },
           'secondary-1': { light: '#AFD803', dark: '#6CBF00' },

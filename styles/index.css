@@ -50,6 +50,35 @@
   --discord: theme('colors.light-theme.discord');
 }
 
+/* AgriDex */
+
+[data-theme='Agridex'] {
+  --primary-light: theme('colors.agridex-theme.primary.light');
+  --primary-dark: theme('colors.agridex-theme.primary.dark');
+  --secondary-1-light: theme('colors.agridex-theme.secondary-1.light');
+  --secondary-1-dark: theme('colors.agridex-theme.secondary-1.dark');
+  --secondary-2-light: theme('colors.agridex-theme.secondary-2.light');
+  --secondary-2-dark: theme('colors.agridex-theme.secondary-2.dark');
+  --red: theme('colors.agridex-theme.red');
+  --green: theme('colors.agridex-theme.green');
+  --orange: theme('colors.agridex-theme.orange');
+  --blue: theme('colors.agridex-theme.blue');
+  --bkg-1: theme('colors.agridex-theme.bkg-1');
+  --bkg-2: theme('colors.agridex-theme.bkg-2');
+  --bkg-3: theme('colors.agridex-theme.bkg-3');
+  --bkg-4: theme('colors.agridex-theme.bkg-4');
+  --bkg-5: theme('colors.agridex-theme.bkg-4');
+  --fgd-1: theme('colors.agridex-theme.fgd-1');
+  --fgd-2: theme('colors.agridex-theme.fgd-2');
+  --fgd-3: theme('colors.agridex-theme.fgd-3');
+  --fgd-4: theme('colors.agridex-theme.fgd-4');
+  --discord: theme('colors.agridex-theme.discord');
+}
+
+[data-theme='Agridex'] .dialect {
+    --dt-button-secondary: theme('colors.agridex-theme.bkg-2');
+}
+
 /* base */
 
 * {

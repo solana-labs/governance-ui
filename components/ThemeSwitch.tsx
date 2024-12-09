@@ -12,7 +12,7 @@ const ThemeSwitch = () => {
     theme === 'Dark' ? (
       <button
         className="bg-bkg-2 default-transition flex items-center justify-center h-10 rounded-full w-10 hover:bg-bkg-3"
-        onClick={() => setTheme('Light')}
+        onClick={() => setTheme('Agridex')}
       >
         <SunIcon className="h-5 text-fgd-1 w-5" />
       </button>

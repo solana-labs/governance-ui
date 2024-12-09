@@ -126,15 +126,15 @@ const Realms = () => {
               )}
             </button>
           </div>
-          <Input
+          {cluster === 'devnet' && (<Input
             className="pl-8"
             value={searchString}
             type="text"
             onChange={(e) => filterDaos(e.target.value)}
             placeholder={`Search DAOs...`}
             prefix={<SearchIcon className="w-5 h-5 text-fgd-3" />}
-          />
-          {!editingGrid && (
+          />)}
+          {false && (
             <Button
               className="whitespace-nowrap"
               onClick={handleCreateRealmButtonClick}
