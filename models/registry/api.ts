@@ -67,7 +67,7 @@ const MAINNET_REALMS = parseCertifiedRealms([{
     "symbol": "AGRI",
     "displayName": "AgriDex DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "735Kg6893iFH2KuGy6uJrVXYKwBi6ky3KLLNPmJ4TMCD",
+    "realmId": "",
     "ogImage": "https://arweave.net/6wVeAl6Jt1G7fAc4nPrhFaq25qJJ8nGeyeft0JY0nJI"
 }]); // parseCertifiedRealms(mainnetBetaRealms)
 const DEVNET_REALMS = []; // parseCertifiedRealms(devnetRealms)
