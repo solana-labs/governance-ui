@@ -206,7 +206,7 @@ export type Poseidon = {
           name: 'asks'
           isMut: true
           isSigner: false
-          docs: ["The Serum Market's asks accoutn"]
+          docs: ["The Serum Market's asks account"]
         },
         {
           name: 'openOrders'
