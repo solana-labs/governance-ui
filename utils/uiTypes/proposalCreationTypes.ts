@@ -6,7 +6,6 @@ import { getNameOf } from '@tools/core/script'
 import { SupportedMintName } from '@tools/sdk/solend/configuration'
 import { DepositWithMintAccount, Voter } from 'VoteStakeRegistry/sdk/accounts'
 import { LockupKind } from 'VoteStakeRegistry/tools/types'
-import { consts as foresightConsts } from '@foresight-tmp/foresight-sdk'
 import { AssetAccount, StakeAccount } from '@utils/uiTypes/assets'
 import { RealmInfo } from '@models/registry/api'
 import * as PaymentStreaming from '@mean-dao/payment-streaming'
@@ -16,7 +15,6 @@ export enum PackageEnum {
   Common,
   Distribution,
   Dual,
-  Foresight,
   GatewayPlugin,
   Identity,
   MangoMarketV4,
@@ -26,6 +24,7 @@ export enum PackageEnum {
   Pyth,
   Serum,
   Solend,
+  Symmetry,
   Squads,
   Switchboard,
   VsrPlugin,
@@ -122,7 +121,10 @@ export interface ClawbackForm {
   holdupTime: number
 }
 
-export interface SendTokenCompactViewForm extends SplTokenTransferForm {
+export interface SendTokenCompactViewForm extends Omit<SplTokenTransferForm, 'amount' | 'destinationAccount'> {
+  destinationAccount: string[]
+  amount: (number | undefined)[]
+  txDollarAmount: (string | undefined)[]
   description: string
   title: string
 }
@@ -196,35 +198,6 @@ export interface PsyFinanceExerciseOption {
 
 /* End PsyOptions American options */
 
-export interface ForesightHasGovernedAccount {
-  governedAccount: AssetAccount
-}
-
-export interface ForesightHasMarketListId extends ForesightHasGovernedAccount {
-  marketListId: string
-}
-
-export interface ForesightHasMarketId extends ForesightHasMarketListId {
-  marketId: number
-}
-
-export interface ForesightHasCategoryId extends ForesightHasGovernedAccount {
-  categoryId: string
-}
-
-export interface ForesightMakeAddMarketListToCategoryParams
-  extends ForesightHasCategoryId,
-    ForesightHasMarketListId {}
-
-export interface ForesightMakeResolveMarketParams extends ForesightHasMarketId {
-  winner: number
-}
-
-export interface ForesightMakeSetMarketMetadataParams
-  extends ForesightHasMarketId {
-  content: string
-  field: foresightConsts.MarketMetadataFieldName
-}
 export interface Base64InstructionForm {
   governedAccount: AssetAccount | undefined
   base64: string
@@ -355,12 +328,7 @@ export enum Instructions {
   DistributionCloseVaults,
   DistributionFillVaults,
   DelegateStake,
-  ForesightAddMarketListToCategory,
-  ForesightInitCategory,
-  ForesightInitMarket,
-  ForesightInitMarketList,
-  ForesightResolveMarket,
-  ForesightSetMarketMetadata,
+  RemoveStakeLock,
   Grant,
   InitSolendObligationAccount,
   JoinDAO,
@@ -407,6 +375,7 @@ export enum Instructions {
   SquadsMeshChangeThresholdMember,
   SquadsMeshRemoveMember,
   PythRecoverAccount,
+  PythUpdatePoolAuthority,
   StakeValidator,
   SwitchboardFundOracle,
   WithdrawFromOracle,
@@ -423,6 +392,12 @@ export enum Instructions {
   RemoveServiceFromDID,
   RevokeGoverningTokens,
   SetMintAuthority,
+  SanctumDepositStake,
+  SanctumWithdrawStake,
+  SymmetryCreateBasket,
+  SymmetryEditBasket,
+  SymmetryDeposit,
+  SymmetryWithdraw
 }
 
 export interface ComponentInstructionData {
@@ -480,6 +455,11 @@ export interface ValidatorWithdrawStakeForm {
   governedTokenAccount: AssetAccount | undefined
   stakingAccount: StakeAccount | undefined
   amount: number
+}
+
+export interface ValidatorRemoveLockup {
+  governedTokenAccount: AssetAccount | undefined
+  stakeAccount: string
 }
 
 export interface DelegateStakeForm {
@@ -573,4 +553,60 @@ export interface DualFinanceVoteDepositForm {
   numTokens: number
   realm: string | undefined
   delegateToken: AssetAccount | undefined
+}
+
+export interface SymmetryCreateBasketForm {
+  governedAccount?: AssetAccount,
+  basketType: number,
+  basketName: string,
+  basketSymbol: string,
+  basketMetadataUrl: string,
+  basketComposition: {
+    name: string,
+    symbol: string,
+    token: PublicKey;
+    weight: number;
+  }[],
+  rebalanceThreshold: number,
+  rebalanceSlippageTolerance: number,
+  depositFee: number,
+  feeCollectorAddress:string,
+  liquidityProvision: boolean,
+  liquidityProvisionRange: number,
+}
+
+
+export interface SymmetryEditBasketForm {
+  governedAccount?: AssetAccount,
+  basketAddress?: PublicKey,
+  basketType: number,
+  basketName: string,
+  basketSymbol: string,
+  basketMetadataUrl: string,
+  basketComposition: {
+    name: string,
+    symbol: string,
+    token: PublicKey;
+    weight: number;
+  }[],
+  rebalanceThreshold: number,
+  rebalanceSlippageTolerance: number,
+  depositFee: number,
+  feeCollectorAddress:string,
+  liquidityProvision: boolean,
+  liquidityProvisionRange: number,
+}
+
+export interface SymmetryDepositForm {
+  governedAccount?: AssetAccount,
+  basketAddress?: PublicKey,
+  depositToken?: PublicKey,
+  depositAmount: number,
+}
+
+export interface SymmetryWithdrawForm {
+  governedAccount?: AssetAccount,
+  basketAddress?: PublicKey,
+  withdrawAmount: number,
+  withdrawType: number
 }

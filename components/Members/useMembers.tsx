@@ -9,13 +9,13 @@ import { BN_ZERO } from '@solana/spl-governance'
 import {
   getMultipleAccountInfoChunked,
   getTokenAccountsByMint,
-  parseTokenAccountData,
   TokenProgramAccount,
 } from '@utils/tokens'
+import { parseTokenAccountData } from '@utils/parseTokenAccountData'
 import { capitalize } from '@utils/helpers'
 import { Member } from 'utils/uiTypes/members'
 import { useRealmQuery } from '@hooks/queries/realm'
-import { useTokenOwnerRecordsForRealmQuery } from '@hooks/queries/tokenOwnerRecord'
+import { useCouncilTokenOwnerRecordsForRealmQuery } from '@hooks/queries/tokenOwnerRecord'
 import { useQuery } from '@tanstack/react-query'
 import { useConnection } from '@solana/wallet-adapter-react'
 import { useRealmConfigQuery } from '@hooks/queries/realmConfig'
@@ -31,7 +31,7 @@ import { BN } from '@coral-xyz/anchor'
  */
 export const useMembersQuery = () => {
   const realm = useRealmQuery().data?.result
-  const { data: tors } = useTokenOwnerRecordsForRealmQuery()
+  const { data: tors } = useCouncilTokenOwnerRecordsForRealmQuery()
 
   const connection = useConnection()
   const config = useRealmConfigQuery().data?.result

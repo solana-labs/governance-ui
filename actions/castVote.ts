@@ -16,6 +16,7 @@ import {
   withPostChatMessage,
   withCreateTokenOwnerRecord,
   getVoteRecordAddress,
+  getTokenOwnerRecord,
 } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
@@ -26,7 +27,6 @@ import { withCastVote } from '@solana/spl-governance'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
 import { chunks } from '@utils/helpers'
 import {
-  sendTransactionsV3,
   SequenceType,
   txBatchesToInstructionSetWithSigners,
 } from '@utils/sendTransactions'
@@ -41,6 +41,8 @@ import { fetchTokenOwnerRecordByPubkey } from '@hooks/queries/tokenOwnerRecord'
 import { fetchProgramVersion } from '@hooks/queries/useProgramVersionQuery'
 import { fetchVoteRecordByPubkey } from '@hooks/queries/voteRecord'
 import { findPluginName } from '@constants/plugins'
+import { BN } from '@coral-xyz/anchor'
+import { postComment } from './chat/postMessage'
 
 const getVetoTokenMint = (
   proposal: ProgramAccount<Proposal>,
@@ -62,7 +64,7 @@ const createDelegatorVote = async ({
   realmPk,
   proposalPk,
   tokenOwnerRecordPk,
-  userPk,
+  delegatePk,
   vote,
   votingPlugin,
 }: {
@@ -70,7 +72,7 @@ const createDelegatorVote = async ({
   realmPk: PublicKey
   proposalPk: PublicKey
   tokenOwnerRecordPk: PublicKey
-  userPk: PublicKey
+  delegatePk: PublicKey
   vote: Vote
   votingPlugin: VotingClient | undefined
 }) => {
@@ -107,10 +109,10 @@ const createDelegatorVote = async ({
     proposal.pubkey,
     proposal.account.tokenOwnerRecord,
     tokenOwnerRecordPk,
-    userPk,
+    delegatePk,
     proposal.account.governingTokenMint,
     vote,
-    userPk,
+    delegatePk,
     pluginAddresses?.voterWeightPk,
     pluginAddresses?.maxVoterWeightRecord
   )
@@ -164,7 +166,8 @@ export async function castVote(
   votingPlugin?: VotingClient,
   runAfterConfirmation?: (() => void) | null,
   voteWeights?: number[],
-  additionalTokenOwnerRecords?: PublicKey[]
+  additionalTokenOwnerRecords?: PublicKey[],
+  calculatedVoterWeight: BN | null = null
 ) {
   const chatMessageSigners: Keypair[] = []
 
@@ -176,15 +179,6 @@ export async function castVote(
   // Explicitly request the version before making RPC calls to work around race conditions in resolving
   // the version for RealmInfo
   const programVersion = await fetchProgramVersion(connection, programId)
-
-  const pluginCastVoteIxs: TransactionInstruction[] = []
-  //will run only if any plugin is connected with realm
-  const plugin = await votingPlugin?.withCastPluginVote(
-    pluginCastVoteIxs,
-    proposal,
-    tokenOwnerRecord,
-    createCastNftVoteTicketIxs
-  )
 
   const isMulti =
     proposal.account.voteType !== VoteType.SINGLE_CHOICE &&
@@ -239,22 +233,34 @@ export async function castVote(
       : proposal.account.governingTokenMint
 
   const castVoteIxs: TransactionInstruction[] = []
-  await withCastVote(
-    castVoteIxs,
-    programId,
-    programVersion,
-    realm.pubkey,
-    proposal.account.governance,
-    proposal.pubkey,
-    proposal.account.tokenOwnerRecord,
-    tokenOwnerRecord,
-    governanceAuthority,
-    tokenMint,
-    vote,
-    payer,
-    plugin?.voterWeightPk,
-    plugin?.maxVoterWeightRecord
-  )
+  const pluginCastVoteIxs: TransactionInstruction[] = []
+
+  if (calculatedVoterWeight !== null && calculatedVoterWeight.gtn(0)) {
+    //will run only if any plugin is connected with realm
+    const plugin = await votingPlugin?.withCastPluginVote(
+      pluginCastVoteIxs,
+      proposal,
+      tokenOwnerRecord,
+      createCastNftVoteTicketIxs
+    )
+
+    await withCastVote(
+      castVoteIxs,
+      programId,
+      programVersion,
+      realm.pubkey,
+      proposal.account.governance,
+      proposal.pubkey,
+      proposal.account.tokenOwnerRecord,
+      tokenOwnerRecord,
+      governanceAuthority,
+      tokenMint,
+      vote,
+      payer,
+      plugin?.voterWeightPk,
+      plugin?.maxVoterWeightRecord
+    )
+  }
 
   const delegatorCastVoteAtoms =
     additionalTokenOwnerRecords &&
@@ -276,14 +282,18 @@ export async function castVote(
               )
               if (voteRecord.found) return undefined
 
+              const torOwnerPk = (
+                await getTokenOwnerRecord(connection, tokenOwnerRecordPk)
+              ).account.governingTokenOwner
+
               return createDelegatorVote({
                 connection,
                 realmPk: realm.pubkey,
                 proposalPk: proposal.pubkey,
                 tokenOwnerRecordPk,
-                userPk: walletPubkey,
+                delegatePk: walletPubkey,
                 vote,
-                votingPlugin: votingPlugin,
+                votingPlugin: votingPlugin?.for(torOwnerPk),
               })
             })
           )
@@ -293,7 +303,6 @@ export async function castVote(
   const pluginPostMessageIxs: TransactionInstruction[] = []
   const postMessageIxs: TransactionInstruction[] = []
   if (message) {
-
     const plugin = await votingPlugin?.withUpdateVoterWeightRecord(
       pluginPostMessageIxs,
       'commentProposal',
@@ -349,7 +358,7 @@ export async function castVote(
       sequenceType: SequenceType.Parallel,
     }))
 
-    await sendTransactionsV3({
+    await postComment({
       connection,
       wallet,
       transactionInstructions: actions,
@@ -387,7 +396,7 @@ export async function castVote(
       }
     })
 
-    await sendTransactionsV3({
+    await postComment({
       connection,
       wallet,
       transactionInstructions: ixsChunks,
@@ -461,10 +470,10 @@ export async function castVote(
       connection
     )
     if (!hasEnoughSol) {
-      return
+      throw new Error('Not enough SOL.')
     }
 
-    await sendTransactionsV3({
+    await postComment({
       connection,
       wallet,
       transactionInstructions: instructionsChunks,

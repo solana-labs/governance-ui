@@ -10,9 +10,11 @@ import {
   GoverningTokenConfigAccountArgs,
   tryGetRealmConfig,
   getRealm,
-  getGovernanceProgramVersion,
   SYSTEM_PROGRAM_ID,
 } from '@solana/spl-governance';
+import {
+  getGovernanceProgramVersion
+} from "@realms-today/spl-governance"
 import type {
   Connection,
   PublicKey,
@@ -24,6 +26,7 @@ import {
   createCivicRegistrarIx,
 } from '../../../GatewayPlugin/sdk/api';
 import {
+  coefficientsEqual,
   configureQuadraticRegistrarIx,
   createQuadraticRegistrarIx,
   DEFAULT_COEFFICIENTS,
@@ -195,11 +198,16 @@ export async function createTransaction(
 
       instructions.push(instruction);
     } else if (
-      configUsesVoterWeightPlugin(config, DEFAULT_QV_CONFIG.votingProgramId) &&
-      !configUsesVoterWeightPlugin(
-        currentConfig,
-        DEFAULT_QV_CONFIG.votingProgramId,
-      )
+      (config.qvCoefficients &&
+        !coefficientsEqual(
+          config.qvCoefficients,
+          currentConfig.qvCoefficients,
+        )) ||
+      (configUsesVoterWeightPlugin(config, DEFAULT_QV_CONFIG.votingProgramId) &&
+        !configUsesVoterWeightPlugin(
+          currentConfig,
+          DEFAULT_QV_CONFIG.votingProgramId,
+        ))
     ) {
       // Configure the registrar for the quadratic voting plugin for the DAO
       // Since QV needs to be paired up with some other plugin that protects against sybil attacks,
@@ -218,12 +226,26 @@ export async function createTransaction(
         config.communityMint.publicKey,
       );
 
+      // if the update is a simple coefficient update, do not change the predecessor unless also set specifically
+      // Note - the UI is somewhat overloaded here and it would be nicer differentiate
+      // between updates and new plugins being added to the chain
+      const isCoefficientUpdate =
+        existingRegistrarAccount &&
+        config.qvCoefficients &&
+        !coefficientsEqual(config.qvCoefficients, currentConfig.qvCoefficients);
+      const previousVoterWeightPluginProgramId =
+        predecessorPlugin ??
+        (isCoefficientUpdate
+          ? existingRegistrarAccount.previousVoterWeightPluginProgramId
+          : undefined);
+
       const instruction = existingRegistrarAccount
         ? await configureQuadraticRegistrarIx(
             realmAccount,
             quadraticClient,
             config.qvCoefficients || DEFAULT_COEFFICIENTS,
-            predecessorPlugin,
+            // keep the existing predecessor when updating the coefficients
+            previousVoterWeightPluginProgramId,
           )
         : await createQuadraticRegistrarIx(
             realmAccount,

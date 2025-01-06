@@ -17,6 +17,8 @@ import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
 import { ReactNode } from 'react'
 import QuadraticVotingPower from '@components/ProposalVotingPower/QuadraticVotingPower'
 import VanillaVotingPower from '@components/GovernancePower/Power/Vanilla/VanillaVotingPower'
+import React from 'react'
+import ParclAccountDetails from 'ParclVotePlugin/components/ParclAccountDetails'
 
 const LockPluginTokenBalanceCard = dynamic(
   () =>
@@ -77,6 +79,7 @@ const TokenBalanceCardInner = ({
   const showNftCard = requiredCards?.includes('NFT')
   const showGatewayCard = requiredCards?.includes('gateway')
   const showQvCard = requiredCards?.includes('QV')
+  const showParclCard = requiredCards?.includes('parcl');
 
   if (showDefaultVSRCard && inAccountDetails) {
     return <LockPluginTokenBalanceCard inAccountDetails={inAccountDetails} /> // does this ever actually occur in the component hierarchy?
@@ -90,17 +93,17 @@ const TokenBalanceCardInner = ({
       ownTokenRecord.account.governingTokenDepositAmount.isZero())
   ) {
     cards.push(
-      <>
+      <React.Fragment key="helium">
         {!inAccountDetails && <GovernancePowerTitle />}
         <HeliumVotingPowerCard inAccountDetails={inAccountDetails} />
         <ClaimUnreleasedPositions inAccountDetails={inAccountDetails} />
-      </>
+      </React.Fragment>
     )
   }
 
   if (showNftCard && inAccountDetails) {
     cards.push(
-      <div className="grid grid-cols-2 gap-x-2 w-full">
+      <div className="grid grid-cols-2 gap-x-2 w-full" key="nft">
         <div>
           <NftVotingPower inAccountDetails={inAccountDetails} />
           <ClaimUnreleasedNFTs inAccountDetails={inAccountDetails} />
@@ -112,41 +115,52 @@ const TokenBalanceCardInner = ({
 
   if (showPythCard) {
     cards.push(
-      <>{inAccountDetails ? <PythAccountDetails /> : <GovernancePowerCard />}</>
+      <React.Fragment key="pyth">
+        {inAccountDetails ? <PythAccountDetails /> : <GovernancePowerCard />}
+      </React.Fragment>
     )
   }
 
   if (showGatewayCard) {
     cards.push(
-      <>
+      <React.Fragment key="gateway">
         {inAccountDetails ? (
           <GatewayCard role="community" />
         ) : (
           <GovernancePowerCard />
         )}
-      </>
+      </React.Fragment>
     )
   }
 
   if (showQvCard) {
     cards.push(
-      <>
+      <React.Fragment key="qv">
         {inAccountDetails && (
           <>
             <QuadraticVotingPower role="community" />
             <VanillaVotingPower role="council" hideIfZero />
           </>
         )}
-      </>
+      </React.Fragment>
+    )
+  }
+
+  if (showParclCard) {
+    cards.push(
+      <React.Fragment key="parcl">
+        {!inAccountDetails && <GovernancePowerTitle />}
+        <ParclAccountDetails />
+      </React.Fragment>
     )
   }
 
   //Default
   if (cards.length === 0) {
     cards.push(
-      <>
+      <React.Fragment key="vanilla">
         {inAccountDetails ? <VanillaAccountDetails /> : <GovernancePowerCard />}
-      </>
+      </React.Fragment>
     )
   }
 

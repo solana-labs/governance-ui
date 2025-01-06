@@ -29,8 +29,9 @@ import useVotingTokenOwnerRecords from './useVotingTokenOwnerRecords'
 import { useMemo } from 'react'
 import { useSelectedDelegatorStore } from 'stores/useSelectedDelegatorStore'
 import { useBatchedVoteDelegators } from '@components/VotePanel/useDelegators'
-import {useVotingClients} from "@hooks/useVotingClients";
-import {useNftClient} from "../VoterWeightPlugins/useNftClient";
+import { useVotingClients } from '@hooks/useVotingClients'
+import { useNftClient } from '../VoterWeightPlugins/useNftClient'
+import { useRealmVoterWeightPlugins } from './useRealmVoterWeightPlugins'
 
 export const useSubmitVote = () => {
   const wallet = useWalletOnePointOh()
@@ -39,10 +40,10 @@ export const useSubmitVote = () => {
   const proposal = useRouteProposalQuery().data?.result
   const { realmInfo } = useRealm()
   const { closeNftVotingCountingModal } = useNftProposalStore.getState()
-  const votingClients = useVotingClients(); // TODO this should be passed the role
-  const {nftClient} = useNftClient();
+  const votingClients = useVotingClients() // TODO this should be passed the role
+  const { nftClient } = useNftClient()
 
-  const isNftPlugin = !!nftClient;
+  const isNftPlugin = !!nftClient
 
   const selectedCommunityDelegator = useSelectedDelegatorStore(
     (s) => s.communityDelegator
@@ -52,6 +53,13 @@ export const useSubmitVote = () => {
   )
   const communityDelegators = useBatchedVoteDelegators('community')
   const councilDelegators = useBatchedVoteDelegators('council')
+
+  const {
+    voterWeightForWallet: voterWeightForWalletCommunity,
+  } = useRealmVoterWeightPlugins('community')
+  const {
+    voterWeightForWallet: voterWeightForWalletCouncil,
+  } = useRealmVoterWeightPlugins('council')
 
   const { error, loading, execute } = useAsyncCallback(
     async ({
@@ -124,7 +132,17 @@ export const useSubmitVote = () => {
         : councilDelegators
       )?.map((x) => x.pubkey)
 
-        const votingClient = votingClients(role);
+      const voterWeightForWallet =
+        role === 'community'
+          ? voterWeightForWalletCommunity
+          : voterWeightForWalletCouncil
+      const ownVoterWeight = relevantSelectedDelegator
+        ? voterWeightForWallet(relevantSelectedDelegator)
+        : wallet?.publicKey
+        ? voterWeightForWallet(wallet?.publicKey)
+        : undefined
+
+      const votingClient = votingClients(role)
       try {
         await castVote(
           rpcContext,
@@ -136,7 +154,8 @@ export const useSubmitVote = () => {
           votingClient,
           confirmationCallback,
           voteWeights,
-          relevantDelegators
+          relevantDelegators,
+          ownVoterWeight?.value
         )
         queryClient.invalidateQueries({
           queryKey: proposalQueryKeys.all(connection.current.rpcEndpoint),
@@ -148,10 +167,13 @@ export const useSubmitVote = () => {
       } catch (e) {
         console.error(e)
         notify({ type: 'error', message: e.message })
+        if (msg) {
+          throw e
+        }
       } finally {
         if (isNftPlugin) {
           closeNftVotingCountingModal(
-              votingClient.client as NftVoterClient,
+            votingClient.client as NftVoterClient,
             proposal!,
             wallet!.publicKey!
           )
@@ -183,7 +205,7 @@ export const useCreateVoteIxs = () => {
   const realm = useRealmQuery().data?.result
   const wallet = useWalletOnePointOh()
   const getVotingTokenOwnerRecords = useVotingTokenOwnerRecords()
-  const votingClients = useVotingClients();
+  const votingClients = useVotingClients()
 
   // get delegates
 
@@ -205,8 +227,8 @@ export const useCreateVoteIxs = () => {
             if (governingTokenMint === undefined)
               throw new Error(`no mint for ${governingBody} governing body`)
 
-              const votingClient = votingClients(governingBody);
-              const vote = formatVote(voteKind)
+            const votingClient = votingClients(governingBody)
+            const vote = formatVote(voteKind)
 
             const votingTors = await getVotingTokenOwnerRecords(governingBody)
             for (const torPk of votingTors) {
@@ -238,13 +260,7 @@ export const useCreateVoteIxs = () => {
             }
           }
         : undefined,
-    [
-      getVotingTokenOwnerRecords,
-      programVersion,
-      realm,
-      votingClients,
-      walletPk,
-    ]
+    [getVotingTokenOwnerRecords, programVersion, realm, votingClients, walletPk]
   )
 }
 

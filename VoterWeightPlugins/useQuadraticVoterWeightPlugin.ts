@@ -10,7 +10,7 @@ export interface useQuadraticVoterWeightPluginReturnType
 
 export type Coefficients = [a: number, b: number, c: number]
 
-type QuadraticPluginParams = {
+export type QuadraticPluginParams = {
   quadraticCoefficients: Coefficients
 }
 

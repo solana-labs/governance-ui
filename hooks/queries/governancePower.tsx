@@ -12,11 +12,11 @@ import { ON_NFT_VOTER_V2 } from '@constants/flags'
 import { fetchRealmByPubkey } from './realm'
 import { fetchRealmConfigQuery } from './realmConfig'
 
-
+import { StakeConnection } from "@parcl-oss/staking"
 import {
   LegacyVoterWeightAdapter,
 } from '@models/voteWeights'
-import { PythClient } from '@pythnetwork/staking'
+import { PythStakingClient } from "@pythnetwork/staking-sdk";
 import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet'
 import { findPluginName } from '@constants/plugins'
 import { useRealmVoterWeightPlugins } from '@hooks/useRealmVoterWeightPlugins'
@@ -102,18 +102,31 @@ export const getPythGovPower = async (
 ): Promise<BN> => {
   if (!user) return new BN(0)
 
-  const pythClient = await PythClient.connect(
+  const pythClient = new PythStakingClient({
+    connection,
+  })
+  const voterWeight = await pythClient.getVoterWeight(user)
+
+  return new BN(voterWeight.toString())
+}
+
+export const getParclGovPower = async (
+  connection: Connection,
+  user: PublicKey | undefined
+): Promise<BN> => {
+  if (!user) return new BN(0)
+  const client = await StakeConnection.connect(
     connection,
     new NodeWallet(new Keypair())
   )
-  const stakeAccount = await pythClient.getMainAccount(user)
-
+  const stakeAccount = await client.getMainAccount(user)
   if (stakeAccount) {
-    return stakeAccount.getVoterWeight(await pythClient.getTime()).toBN()
+    return stakeAccount.getVoterWeight(await client.getTime()).toBN()
   } else {
     return new BN(0)
   }
 }
+
 
 export const determineVotingPowerType = async (
   connection: Connection,

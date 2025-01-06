@@ -28,10 +28,10 @@ import {
   getMultipleAccountInfoChunked,
   MintAccount,
   parseMintAccountData,
-  parseTokenAccountData,
   TokenAccount,
   TokenProgramAccount,
 } from '@utils/tokens'
+import { parseTokenAccountData } from '@utils/parseTokenAccountData'
 import tokenPriceService from '@utils/services/tokenPrice'
 import { ConnectionContext } from '@utils/connection'
 import {
@@ -180,7 +180,7 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
     const stakeAccounts = await loadStakeAccounts(
       connection,
       governedTokenAccounts.filter(
-        (x) => x.isSol && x.extensions.solAccount?.lamports
+        (x) => x.isSol
       )
     )
     accounts.push(...stakeAccounts)
