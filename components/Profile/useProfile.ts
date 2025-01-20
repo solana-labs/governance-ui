@@ -13,7 +13,7 @@ const profileIsSet = (profile: BaseProfile): boolean =>
 
 export const useProfile = (
   publicKey?: PublicKey
-): { profile: Profile | undefined; loading: boolean } => {
+): { profile: Profile | undefined; loading: boolean, url: string } => {
   const connection = useLegacyConnectionContext()
   const connectedWallet = useWalletOnePointOh()
 
@@ -35,5 +35,7 @@ export const useProfile = (
     }
   )
 
-  return { profile, loading: isLoading }
+    const url = 'https://civic.me/' + profileWalletPublicKey?.toString()
+
+  return { profile, loading: isLoading, url }
 }
