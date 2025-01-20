@@ -19,7 +19,7 @@ export const ProfileImage: FC<Props> = ({ publicKey, expanded, className }) => {
   ]
   const classes = classNames(commonClasses, className || profilePopupClasses)
 
-  const { profile, loading } = useProfile(publicKey)
+  const { profile, loading, url } = useProfile(publicKey)
 
   // Profile loading - show loading dots
   if (!profile && loading) return <LoadingDots />
@@ -41,7 +41,7 @@ export const ProfileImage: FC<Props> = ({ publicKey, expanded, className }) => {
       <a
           className="underline"
           target="_blank"
-          href={'https://civic.me/' + publicKey?.toString()}
+          href={url}
           rel="noreferrer"
       >
         <ImgWithLoader
