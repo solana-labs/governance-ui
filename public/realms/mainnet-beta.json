@@ -3239,7 +3239,11 @@
   },
   {
     "symbol": "LAVA",
+    "category": "web3",
     "displayName": "LavaDAO",
+    "shortDescription": "LavaDAO is a Colorado LCA created to manage the HeliumDenver eventspace ecosystem.",
+    "sortRank": 3,
+    "bannerImage": "/realms/LavaDAO/img/banner.png",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "shortDescription": "LavaDAO manages the HeliumDenver event space ecosystem and hackathon.",
     "discord": "https://discord.gg/B7DWEgeRum",
@@ -3249,7 +3253,9 @@
     "realmId": "HPhQwEU6GEYd82vkXDQ59pjavVJ7vrEsbnj1fwU9USRA",
     "website": "https://heliumdenver.com",
     "twitter": "@hntdenver",
-    "ogImage": "/realms/LavaDAO/img/lavalogo.png"
+    "discord": "https://discord.gg/9PZpqtRPPb",
+    "ogImage": "/realms/LavaDAO/img/lavalogo.png",
+    "github": "https://github.com/hntdenver"
   },
   {
     "symbol": "PAWN",
