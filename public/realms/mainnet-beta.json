@@ -137,12 +137,25 @@
   },
   {
     "symbol": "XANDC",
-    "category": "defi",
+    "category": "web3",
     "displayName": "Xandeum DevNet DAO",
     "programId": "DcG2PZTnj8s4Pnmp7xJswniCskckU5E6XsrKuyD7NYFK",
     "realmId": "CFprdZRYitjPYEDUQKDQZwao1jcRcU1z1GsFspMpN8Ci",
     "communityMint": "2j437Lt84XvysJiYbXTSJfAMy26Et9HiVGFvGFp8nYWH",
     "ogImage": "https://xandeum.com/wp-content/uploads/2023/05/Xandeum-Logo-Standard.png"
+  },
+  {
+    "symbol": "XAND",
+    "category": "web3",
+    "displayName": "Xandeum DAO",
+    "programId": "4ruGZqLoPVKX27Qm91Qjsqt5AzCtLrhmjKT8ubwHiVZu",
+    "realmId": "5JpYydB2VFcxbPGr8xmpefmJw86GQELCk7cB132wRXCa",
+    "communityMint": "XANDuUoVoUqniKkpcKhrxmvYJybpJvUxJLr21Gaj3Hx",
+    "ogImage": "https://raw.githubusercontent.com/bernieblume/XAND-meta-2024/main/XandToken.png",
+    "discord": "https://discord.gg/mGAxAuwnR9",
+    "twitter": "@xandeumnetwork",
+    "website": "https://www.xandeum.network/",
+    "shortDescription": "Storage Scaling Solution for Solana"
   },
   {
     "symbol": "HPC",
