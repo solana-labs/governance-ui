@@ -3503,6 +3503,20 @@
     "twitter": ""
   },
   {
+    "symbol": "BLUEG",
+    "category": "web3",
+    "bannerImage": "/realms/BlueGiantDAO/BlueGiantFoundation-banner.png",
+    "displayName": "Blue Giant DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Eb9KP4qNNFK6V3EnAhmNExaHZZNiXhyahUvy8LJJY3KF",
+    "ogImage": "/realms/BlueGiantDAO/BlueGiantOGLogo.png",
+    "shortDescription": "We aim to empower users with algorithms for achieving their financial goals confidently amidst the volatile tech and investment landscape.",
+    "website": "https://bluegiantfoundation.vercel.app/",
+    "twitter": "@BlueGiantFdn",
+    "keywords": "Blue Giant, REALM, Governance, Financial Freedom, DEFI, Decentralized Finance, Decentralised Finance, Crypto, Decentralize, Solana, SOL, SPL, Trading, SPL Tokens, Investing, Investment Tools, Stocks",
+    "discord": "https://discord.com/invite/7bu9wuSy"
+  },
+  {
     "symbol": "sinDAO",
     "displayName": "sinDAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
