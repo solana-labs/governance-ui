@@ -45,3 +45,6 @@ yarn-error.log*
 .sentryclirc
 
 .vscode/settings.json
+
+# vim
+*.sw*
