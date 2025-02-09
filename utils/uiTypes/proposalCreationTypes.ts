@@ -114,6 +114,11 @@ export interface GrantForm {
   allowClawback: boolean
 }
 
+export interface UnlockDepositForm {
+  depositEntryIndex: number | undefined
+  voterAuthorityPk: string
+}
+
 export interface ClawbackForm {
   governedTokenAccount: AssetAccount | undefined
   voter: Voter | null
@@ -381,6 +386,7 @@ export enum Instructions {
   WithdrawFromOracle,
   Transfer,
   TransferDomainName,
+  UnlockDeposit,
   UpdateTokenMetadata,
   VotingMintConfig,
   WithdrawObligationCollateralAndRedeemReserveLiquidity,

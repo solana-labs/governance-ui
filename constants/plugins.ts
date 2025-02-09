@@ -14,6 +14,11 @@ export const VSR_PLUGIN_PKS: string[] = [
   'HBZ5oXbFBFbr8Krt2oMU7ApHFeukdRS8Rye1f3T66vg5',
 ]
 
+/** Flags support for VSR UnlockDeposit instruction */
+export const VSR_0_2_5_PLUGIN_PKS: string[] = [
+  'VotEn9AWwTFtJPJSMV5F9jsMY6QwWM5qn3XP9PATGW7',
+]
+
 export const HELIUM_VSR_PLUGINS_PKS: string[] = [
   HELIUM_VSR_PROGRAM_ID.toBase58(),
 ]
