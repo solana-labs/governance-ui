@@ -1,3 +1,8 @@
+# governance-ui
+
+This repo still exists in archived form, but the maintained version has now relocated to: https://github.com/Mythic-Project/governance-ui
+
+
 ### Using custom Swap API endpoints
 
 You can set custom URLs via the configuration for any self-hosted Jupiter APIs, like the [V6 Swap API](https://station.jup.ag/docs/apis/self-hosted) or [Paid Hosted APIs](https://station.jup.ag/docs/apis/self-hosted#paid-hosted-apis) Here is an example:
