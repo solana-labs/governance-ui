@@ -3695,5 +3695,15 @@
     "ogImage": "/realms/PibbleDAO/logo.png",
     "website": "https://pibble.xyz",
     "twitter": "@PibbleSolana"
-  }
+  },
+  {
+    "symbol": "$PogSquad",
+    "displayName": "$Pog Squad",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "DE6ZBTKTQsj3eV2PaUv8mLonXHwmX4u7HYXgjvhxHone",
+    "communityMint": "GfzeQicbKyuDHwTHuksffqNFTu8FqYuaYhhJ7wALPesZ",
+    "ogImage": "/realms/REALMS_PogSquad/bigpog.png",
+    "shortDescription": "Noot Noot",
+    "website": "https://pogonsolana.com",
+    "twitter": "@pogonsolana" },
   ]
