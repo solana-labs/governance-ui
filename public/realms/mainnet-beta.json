@@ -3536,7 +3536,15 @@
     "website": "https://jito.network",
     "twitter": "@jito_sol"
   },
-   {
+  {
+    "symbol": "BACH",
+    "displayName": "BACH Protocol",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "9DWkPYFKcjpGVjwCjgAnYM8T6H4hssEnW27rLDtfU8y5",
+    "ogImage": "/realms/BACH/bach-token-logo-Est.2022.png",
+    "website": "https://musik88.com/bach"
+  },
+  {
     "symbol": "FIM",
     "category": "defi",
     "bannerImage": "/realms/FinanceIsMagic/Banner.png",
