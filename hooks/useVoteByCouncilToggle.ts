@@ -1,4 +1,4 @@
-// The voteByCouncil toggle UI is avaiable on a number of views in Realms.
+// The voteByCouncil toggle UI is available on a number of views in Realms.
 // Whether it is available, or enabled, is determined by the realm's config and the user's tokens.
 // This hook encapsulates this logic
 import { useEffect, useState } from 'react'
