@@ -3695,5 +3695,17 @@
     "ogImage": "/realms/PibbleDAO/logo.png",
     "website": "https://pibble.xyz",
     "twitter": "@PibbleSolana"
+  },
+  {
+    "symbol": "BluC",
+    "displayName": "BluChain Boiler Room",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "6F5c5HfBpoHMbz8eQWPRYXSLKYoXZN3beeTGj2yGffP",
+    "bannerImage": "/realms/BluChainBR/BluChip-coin.png",
+    "ogImage": "/realms/BluChainBR/BluChip-coin.png",
+    "website": "https://BluChain.xyz",
+    "twitter": "@isolexIO",
+    "discord": "https://discord.gg/mcA6nNF9cD",
+    "shortDescription": "BluChain Boiler Room is the governance DAO for the BluChip Foundation, empowering BluC token holders with decision-making authority over the network’s development, treasury, and ecosystem initiatives. Through decentralized voting, members shape the future of BluChain, ensuring transparency, community-driven growth, and fair participation in the blue-collar crypto revolution.",
   }
   ]
