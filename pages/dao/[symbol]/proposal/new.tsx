@@ -61,6 +61,7 @@ import SanctumDepositStake from './components/instructions/Validators/SanctumDep
 import SanctumWithdrawStake from './components/instructions/Validators/SanctumWithdrawStake'
 import DeactivateValidatorStake from './components/instructions/Validators/DeactivateStake'
 import WithdrawValidatorStake from './components/instructions/Validators/WithdrawStake'
+import WithdrawFromVoteAccount from './components/instructions/Validators/WithdrawFromVoteAccount'
 import DelegateStake from './components/instructions/Validators/DelegateStake'
 import SplitStake from './components/instructions/Validators/SplitStake'
 import useCreateProposal from '@hooks/useCreateProposal'
@@ -549,6 +550,7 @@ const New = () => {
       [Instructions.SanctumWithdrawStake]: SanctumWithdrawStake,
       [Instructions.DeactivateValidatorStake]: DeactivateValidatorStake,
       [Instructions.WithdrawValidatorStake]: WithdrawValidatorStake,
+      [Instructions.WithdrawFromVoteAccount]: WithdrawFromVoteAccount,
       [Instructions.DelegateStake]: DelegateStake,
       [Instructions.RemoveStakeLock]: RemoveLockup,
       [Instructions.SplitStake]: SplitStake,

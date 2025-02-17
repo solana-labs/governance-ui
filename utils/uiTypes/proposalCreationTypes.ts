@@ -385,6 +385,7 @@ export enum Instructions {
   VotingMintConfig,
   WithdrawObligationCollateralAndRedeemReserveLiquidity,
   WithdrawValidatorStake,
+  WithdrawFromVoteAccount,
   SplitStake,
   AddKeyToDID,
   RemoveKeyFromDID,
@@ -466,6 +467,14 @@ export interface DelegateStakeForm {
   governedTokenAccount: AssetAccount | undefined
   stakingAccount: StakeAccount | undefined
   votePubkey: string
+}
+
+export interface ValidatorWithdrawFromVoteAccountForm {
+  governedTokenAccount: AssetAccount | undefined
+  validatorVoteKey: string
+  authorizedWithdrawerKey: string
+  toPubkey: string
+  amount: number
 }
 
 export interface DualFinanceAirdropForm {

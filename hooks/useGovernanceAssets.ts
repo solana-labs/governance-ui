@@ -327,6 +327,10 @@ export default function useGovernanceAssets() {
       name: 'Sanctum Withdraw Stake',
       packageId: PackageEnum.Common,
     },
+    [Instructions.WithdrawFromVoteAccount]: {
+      name: 'Withdraw from vote account',
+      packageId: PackageEnum.Common,
+    },
     [Instructions.Transfer]: {
       name: 'Transfer Tokens',
       isVisible: canUseTokenTransferInstruction,
