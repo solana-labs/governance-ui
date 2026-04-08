@@ -8,20 +8,18 @@ import queryClient from './queryClient'
 import { getNetworkFromEndpoint } from '@utils/connection'
 
 type Network = 'devnet' | 'mainnet'
+const HELIUS_RPC_BASE: Record<Network, string> = {
+  mainnet: 'https://mainnet.helius-rpc.com',
+  devnet: 'https://devnet.helius-rpc.com',
+}
+
 const getHeliusEndpoint = (network: Network) => {
-  const url =
-    network === 'devnet'
-      ? process.env.NEXT_PUBLIC_HELIUS_DEVNET_RPC
-      : process.env.NEXT_PUBLIC_HELIUS_MAINNET_RPC
-  if (url === undefined)
+  const apiKey = process.env.NEXT_PUBLIC_GOVERNANCE_UI_HELIUS_API_KEY
+  if (!apiKey)
     throw new Error(
-      `Helius RPC endpoint not set in env: ${
-        network === 'devnet'
-          ? 'NEXT_PUBLIC_HELIUS_DEVNET_RPC'
-          : 'NEXT_PUBLIC_HELIUS_MAINNET_RPC'
-      }`
+      'Helius API key not set in env: NEXT_PUBLIC_GOVERNANCE_UI_HELIUS_API_KEY'
     )
-  return url
+  return `${HELIUS_RPC_BASE[network]}/?api-key=${apiKey}`
 }
 
 export const digitalAssetsQueryKeys = {

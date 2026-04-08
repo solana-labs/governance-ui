@@ -44,7 +44,10 @@ export function Stats(props: Props) {
   const timer = useRef<number | null>(null);
   const wakePrevent = useRef<any>(null);
   const connection = useRef(
-    new Connection(process.env.NEXT_PUBLIC_HELIUS_MAINNET_RPC || '', 'recent'),
+    new Connection(
+      `https://mainnet.helius-rpc.com/?api-key=${process.env.NEXT_PUBLIC_GOVERNANCE_UI_HELIUS_API_KEY ?? ''}`,
+      'recent',
+    ),
   );
   const logger = useRef(new Logger());
 
